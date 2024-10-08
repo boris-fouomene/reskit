@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "npx tsc -p tsconfig.test.json && node dist/test/index",
+    "build": "npx lerna run build",
+    "prestart1": "npm run build",
+    "clean": "npx rimraf dist",
+    "start": "lerna run --parallel watch",
+    "build-publish": "npm run build && npm publish --access public",
+    "clear-npx-cache": "npx clear-npx-cache",
+    "publish-all": "lerna publish"
+  },
+  "keywords": [
+    "TypeScript",
+    "Decorators",
+    "Modular",
+    "Architecture",
+    "Extensible",
+    "Framework",
+    "Custom",
+    "Field",
+    "Types",
+    "Type",
+    "Safety",
+    "API",
+    "Development",
+    "Code",
+    "Organization",
+    "Application",
+    "Scalability",
+    "Dynamic",
+    "Ecosystem",
+    "Clean",
+    "Code",
+    "Object-Oriented",
+    "Programming",
+    "Developer-Friendly",
+    "Open",
+    "Source"
+  ],
+  "author": "Boris Fouomene",
+  "npmClient": "npm",
+  "useWorkspaces": true,
+  "dependencies": {},
+  "devDependencies": {
+    "lerna": "^8.1.8"
+  }
+}

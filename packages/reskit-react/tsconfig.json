@@ -1,0 +1,12 @@
+{
+  "extends" : "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": "src",// TypeScript source directory
+    "outDir": "./dist",  
+    "paths": {
+      
+    }
+  },
+  "include": ["src/**/*"]
+}

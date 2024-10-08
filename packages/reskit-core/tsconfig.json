@@ -1,0 +1,19 @@
+{
+  "extends" : "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": "src",                       // TypeScript source directory
+    "outDir": "./dist",  
+    "paths": {
+        "@utils/*" : ["src/utils/*"],
+        "@utils" : ["src/utils"],
+        "@react/*" : ["src/react/*"],
+        "@react" : ["src/react"],
+        "@session" : ["src/session"],
+        "@session/*" : ["src/session/*"],
+        "@types" : ["src/types"],
+        "@types/*" : ["src/types/*"],
+      }
+  },
+  "include": ["src/**/*"]
+}

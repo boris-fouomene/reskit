@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "forceConsistentCasingInFileNames": true,
+      "module": "commonjs",                     // Use commonjs module system
+      "experimentalDecorators": true,           // Enable experimental support for decorators
+      "emitDecoratorMetadata": true,             // Enable emitting design:type metadata
+      "strict": true,                            // Enable all strict type checking options
+      "resolveJsonModule" : true,
+      "esModuleInterop": true,                  // Compatibility with ES module imports
+      "skipLibCheck": true,                      // Skip type checking of all declaration files
+      "declaration": false, // Generates .d.ts files
+      "sourceMap": true,
+    },
+    "include": ["**/*.ts","**/*.tsx"],
+    "exclude": ["**/node_modules/*"]
+}

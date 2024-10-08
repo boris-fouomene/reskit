@@ -11,6 +11,7 @@ export { default as isPromise } from "./isPromise";
 export { default as stringify } from "./stringify";
 export { default as defaultVal } from "./defaultVal";
 export { default as defaultBool } from "./defaultBool";
+export * from "./date";
 export * from "./sort";
 
 export * from "./object";

@@ -1,4 +1,4 @@
-import { isClientSide } from "../utils/platform";
+import { isClientSide } from "../platform";
 import {parseJSON,stringify} from "../utils/json";
 import { IDict } from '../types/index';
 import isNotEmptyString from '../utils/isNotEmptyString';

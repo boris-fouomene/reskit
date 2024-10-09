@@ -230,10 +230,30 @@ export const defaultObj = function (...args: any[]): object {
     return prevObj || {};
 };
 
- declare global {
+ /**
+ * Declares a global interface extension for the built-in `Object` type.
+ */
+declare global {
+    /**
+     * Interface extension for the built-in `Object` type.
+     */
     interface Object {
-        clone: (any: any) => any;
-        size : (obj:any,breakonFirstElementFound?:boolean) => number;
+        /**
+ * Clones a source object by returning a non-reference copy of the object.
+ *
+ * @param {any} source The object to clone.
+ * @returns {IDict | Array<any>} The cloned object.
+ */
+        clone: (obj: any) => any;
+
+        /**
+ * Determines the size of an object or array.
+ *
+ * @param {any} obj The object or array to determine the size of.
+ * @param {boolean} [breakonFirstElementFound=false] Whether to return immediately after the first element is found.
+ * @returns {number} The size of the object or array.
+ */
+        size: (obj: any, breakonFirstElementFound?: boolean) => number;
     }
 }
 

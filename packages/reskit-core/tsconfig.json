@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": "src",                       // TypeScript source directory
-    "outDir": "./dist/index",    
+    "outDir": "./dist",    
     "paths": {
         "@utils/*" : ["src/utils/*"],
         "@utils" : ["src/utils"],
@@ -16,5 +16,5 @@
       }
   },
   "include": ["src/**/*.ts","src/**/*.tsx"],
-  "exclude": ["test/**/*"]
+  "exclude": ["dist/**/*"]
 }

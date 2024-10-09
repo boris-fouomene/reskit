@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx tsc -p tsconfig.pretest.json && npx tsc -p tsconfig.test.json && node dist/test/index",
-    "build" : "tsc",
+    "test": "npm run build && npm run start-test",
+    "start-test": "node ./dist/test/index",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "build1": "npm run clean && npx tsc -p tsconfig.declaration.json && npx tsc -p tsconfig.json",
     "prestart1": "npm run build",
     "clean": "npx rimraf dist",
@@ -24,6 +25,7 @@
     "react": "^18.3.1",
     "react-fast-compare": "^3.2.2",
     "reflect-metadata": "^0.2.2",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5.6.2"
   },
   "dependencies": {

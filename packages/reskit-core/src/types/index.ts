@@ -23,11 +23,11 @@ declare global {
  *
  * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
  */
-  interface IResource<DataType=any>{}
+  interface ResourceBase<DataType=any>{}
 }
 
 /**
-   @interface The IResource interface represents the base structure for a resource in the application. 
+   @interface The ResourceBase interface represents the base structure for a resource in the application. 
     A resource is a fundamental concept often used to describe an entity or object that can be managed, manipulated, or stored within 
     the system. It typically refers to data objects like database tables, API endpoints, or any entities (like users, posts, or products) that the application deals with. 
     Each resource usually has attributes such as a name, label, or title.
@@ -40,7 +40,7 @@ declare global {
  *
  * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
  */
-    export interface IResource<Datatype = any> {
+  export class ResourceBase<Datatype = any> {
         /**
          * The internal name of the resource.
          *
@@ -49,7 +49,7 @@ declare global {
          * 
          * @example
          * ```typescript
-         * const userResource: IResource = { name: "user" };
+         * const userResource: ResourceBase = { name: "user" };
          * ```
          */
         name?: string;
@@ -62,7 +62,7 @@ declare global {
          *
          * @example
          * ```typescript
-         * const productResource: IResource = { label: "Product" };
+         * const productResource: ResourceBase = { label: "Product" };
          * ```
          */
         label?: string;
@@ -75,7 +75,7 @@ declare global {
          *
          * @example
          * ```typescript
-         * const orderResource: IResource = { title: "Order Management" };
+         * const orderResource: ResourceBase = { title: "Order Management" };
          * ```
          */
         title?: string;
@@ -88,7 +88,7 @@ declare global {
        *
        * @example
        * ```typescript
-       * const userResource: IResource = { tooltip: "This resource manages user information." };
+       * const userResource: ResourceBase = { tooltip: "This resource manages user information." };
        * ```
        */
       tooltip?: string;

@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx tsc -p tsconfig.test.json && node dist/test/index",
-    "build": "npm run clean && npx tsc -p tsconfig.declaration.json && npx tsc -p tsconfig.json",
+    "test": "npx tsc -p tsconfig.pretest.json && npx tsc -p tsconfig.test.json && node dist/test/index",
+    "build" : "tsc",
+    "build1": "npm run clean && npx tsc -p tsconfig.declaration.json && npx tsc -p tsconfig.json",
     "prestart1": "npm run build",
     "clean": "npx rimraf dist",
     "start": "node dist/test/index",

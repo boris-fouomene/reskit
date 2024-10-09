@@ -1,5 +1,5 @@
 import {IField } from '../../types';
-export const fieldsMetaData = "fieldsResourcesMetadata";
+export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**
  * Decorator function to define metadata for a class property.

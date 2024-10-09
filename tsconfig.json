@@ -8,9 +8,9 @@
       "resolveJsonModule" : true,
       "esModuleInterop": true,                  // Compatibility with ES module imports
       "skipLibCheck": true,                      // Skip type checking of all declaration files
-      "declaration": false, // Generates .d.ts files
       "sourceMap": true,
+      "composite": true,
     },
     "include": ["**/*.ts","**/*.tsx"],
-    "exclude": ["**/node_modules/*"]
+    "exclude": ["**/node_modules/*","**/dist/*", "**/*.spec.ts"]
 }

@@ -3,20 +3,56 @@ import isEmpty from "./isEmpty";
 
 /**
  * Type alias for the sort direction.
+ * 
+ * Represents the direction of sorting, either ascending (`"asc"`) or descending (`"desc"`).
+ * 
+ * @example
+ * const sortDirection: ISortDirection = "asc";
  */
 export type ISortDirection = "asc" | "desc";
 
 /**
  * Type alias for a sortable column.
  * 
+ * Represents a column that can be used for sorting, which can be a key of the object being sorted (`keyof T`), 
+ * a string, a number, or a symbol.
+ * 
  * @typeparam T The type of the object being sorted.
+ * 
+ * @example
+ * interface User {
+ *   name: string;
+ *   age: number;
+ * }
+ * 
+ * const sortableColumn: ISortColumn<User> = "name"; // or keyof User, or a string, or a number, or a symbol
  */
 export type ISortColumn<T> = keyof T | string | number | symbol;
 
 /**
  * Options for configuring the `getValue` function to be applied on a given item.
  * 
+ * Provides configuration options for the `getValue` function, which is used to extract the value from an item 
+ * for sorting purposes.
+ * 
  * @typeparam T The type of the item.
+ * 
+ * @property {T} item - The item to be processed.
+ * @property {ISortColumn<T>} column - The column to be used for sorting.
+ * 
+ * @extends {ISortByConfig<T>}
+ * 
+ * @example
+ * interface User {
+ *   name: string;
+ *   age: number;
+ * }
+ * 
+ * const options: ISortByGetItemOptions<User> = {
+ *   item: { name: "John", age: 30 },
+ *   column: "name",
+ *   // other config options from ISortByConfig<User>
+ * };
  */
 export type ISortByGetItemOptions<T = any> = {
   /**
@@ -44,19 +80,79 @@ export type ISortByGetItemOptions<T = any> = {
  *   // ... other ISortByConfig options ...
  * };
  * ```
+ * Configuration options for sorting items.
+ * 
+ * @typeparam T The type of the item being sorted.
  */
 export type ISortByConfig<T = any> = {
-  /** la direction du trie */
+  /**
+   * The direction of the sort.
+   * 
+   * Represents the direction of sorting, either ascending (`"asc"`) or descending (`"desc"`).
+   * 
+   * @default undefined
+   * @example
+   * const config: ISortByConfig<User> = {
+   *   dir: "asc",
+   *   // ...
+   * };
+   */
   dir?: ISortDirection;
-  /** le nom de la colonne à utiliser pour le trie si c'est un tableu */
-  column?: IsortColumn<T>;
-  /** si la casse sera ignorée lors du trie */
+
+  /**
+   * The column to use for sorting if the item is an array.
+   * 
+   * Represents a column that can be used for sorting, which can be a key of the object being sorted (`keyof T`), 
+   * a string, a number, or a symbol.
+   * 
+   * @default undefined
+   * @example
+   * const config: ISortByConfig<User> = {
+   *   column: "name",
+   *   // ...
+   * };
+   */
+  column?: ISortColumn<T>;
+
+  /**
+   * Whether to ignore case when sorting.
+   * 
+   * If `true`, the sort will ignore the case of the values being sorted.
+   * 
+   * @default false
+   * @example
+   * const config: ISortByConfig<User> = {
+   *   ignoreCase: true,
+   *   // ...
+   * };
+   */
   ignoreCase?: boolean;
-  /** le nom de la clé unique à chaque item */
+
+  /**
+   * The name of the unique key for each item.
+   * 
+   * Represents the name of the key that uniquely identifies each item.
+   * 
+   * @default undefined
+   * @example
+   * const config: ISortByConfig<User> = {
+   *   keyName: "id",
+   *   // ...
+   * };
+   */
   keyName?: string;
 
-  /***
-   * la fonction permettant de récupérer à l'instant t la valeur à utiliser pour le trie de l'item item
+  /**
+   * A function to retrieve the value to use for sorting an item.
+   * 
+   * This function takes an `ISortByGetItemOptions` object as an argument and returns the value to use for sorting.
+   * 
+   * @default undefined
+   * @example
+   * const config: ISortByConfig<User> = {
+   *   getValue: (options) => options.item.name,
+   *   // ...
+   * };
    */
   getValue?: (options: ISortByGetItemOptions<T>) => any;
 };

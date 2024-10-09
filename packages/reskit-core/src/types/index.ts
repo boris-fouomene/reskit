@@ -12,7 +12,88 @@ declare global {
      * IFieldMap interface represents a map of field types to their corresponding IFieldBase instances.
   */
   interface IFieldMap {}
+  
+  /**
+ * @interface
+ * A base interface for defining a resource in the application.
+ *
+ * A **resource** is an entity that holds data and can be referenced, displayed, or manipulated
+ * by the system. This interface provides the basic structure for a resource, defining key properties
+ * such as `name`, `label`, `title`, and `tooltip`.
+ *
+ * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
+ */
+  interface IResource<DataType=any>{}
 }
+
+/**
+   @interface The IResource interface represents the base structure for a resource in the application. 
+    A resource is a fundamental concept often used to describe an entity or object that can be managed, manipulated, or stored within 
+    the system. It typically refers to data objects like database tables, API endpoints, or any entities (like users, posts, or products) that the application deals with. 
+    Each resource usually has attributes such as a name, label, or title.
+ * A **resource** can also be seen as an entity that contains data and can be referenced, displayed or manipulated
+ * by the system.\n
+ * this is a base interface for defining a resource in the application.
+ * Common examples of resources are users, products, or database tables.
+ * This interface provides the basic structure for a resource by defining key properties
+ * such as `name`, `label`, and `title`, which are used for internal reference and UI display.
+ *
+ * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
+ */
+    export interface IResource<Datatype = any> {
+        /**
+         * The internal name of the resource.
+         *
+         * This name is used within the system for referencing the resource programmatically.
+         * It is often a short, unique identifier for the resource.
+         * 
+         * @example
+         * ```typescript
+         * const userResource: IResource = { name: "user" };
+         * ```
+         */
+        name?: string;
+      
+        /**
+         * A user-friendly label for the resource.
+         *
+         * This is typically a shorter name intended for display in UI elements, such as dropdowns or buttons.
+         * It helps users identify the resource within the user interface.
+         *
+         * @example
+         * ```typescript
+         * const productResource: IResource = { label: "Product" };
+         * ```
+         */
+        label?: string;
+      
+        /**
+         * A descriptive title for the resource.
+         *
+         * The title provides a more detailed or contextual label for the resource, which is often displayed
+         * in prominent places like headings or page titles. It helps users understand the purpose of the resource.
+         *
+         * @example
+         * ```typescript
+         * const orderResource: IResource = { title: "Order Management" };
+         * ```
+         */
+        title?: string;
+        
+      /**
+       * A short text that appears when the user hovers over the resource.
+       * The tooltip provides additional context or information about the resource.
+       * 
+       * Typically used in user interfaces to clarify what a particular resource represents or to give instructions.
+       *
+       * @example
+       * ```typescript
+       * const userResource: IResource = { tooltip: "This resource manages user information." };
+       * ```
+       */
+      tooltip?: string;
+}
+      
 
 /**
  * IFieldBase interface represents a base field with optional type, label, and name properties.
@@ -121,3 +202,6 @@ export type IMerge<T extends object, U = any> = Omit<T, keyof U> & U;
 
 
 export type IDict<K extends keyof any = any, T = any> = Record<K, T>;
+
+
+

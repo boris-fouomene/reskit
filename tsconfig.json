@@ -1,5 +1,9 @@
 {
     "compilerOptions": {
+      "baseUrl": ".",
+      "rootDir": "src",                       // TypeScript source directory
+      "outDir": "./dist",   
+      
       "forceConsistentCasingInFileNames": true,
       "module": "commonjs",                     // Use commonjs module system
       "experimentalDecorators": true,           // Enable experimental support for decorators
@@ -10,7 +14,18 @@
       "skipLibCheck": true,                      // Skip type checking of all declaration files
       "sourceMap": true,
       "declaration": true,
+      
+      "paths": {
+        "@utils/*" : ["src/utils/*"],
+        "@utils" : ["src/utils"],
+        "@react/*" : ["src/react/*"],
+        "@react" : ["src/react"],
+        "@session" : ["src/session"],
+        "@session/*" : ["src/session/*"],
+        "@types" : ["src/types"],
+        "@types/*" : ["src/types/*"],
+      }
     },
-    "include": ["**/*.ts","**/*.tsx"],
+    "include": ["src/**/*.ts","src/**/*.tsx"],
     "exclude": ["**/node_modules/*","**/dist/*", "**/*.spec.ts"]
 }

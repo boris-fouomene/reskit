@@ -1,8 +1,8 @@
-import { Resource, Field } from "..";
-import {ResourcesManager,ResourceBase } from '../decorators';
+import { Resource, Field } from "../src";
+import {ResourcesManager,ResourceBase } from '../src/decorators';
 
 
-declare module "../types" {
+declare module "../src/types" {
     type IAllResourcesNames = "users";
     interface IFieldMapExport {
         select : IFieldBase<"select"> & {

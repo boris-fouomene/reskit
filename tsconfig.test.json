@@ -1,14 +1,11 @@
 {
-  "extends" : "../../tsconfig.json",
+  "extends" : "./tsconfig.json",
     "compilerOptions": {
-      "outDir": "./dist/test",                // Output directory for built test files
-      "rootDir": "./test",                    // Root directory for test files
+      "outDir": "./dist",                // Output directory for built test files
+      "rootDir": "./",                    // Root directory for test files
       "noEmitOnError": true,                  // Prevent emitting files if there are errors
       "types": ["node"]               // Include node and jest types for testing
     },
     "include": ["./test/**/*.ts"], 
     "exclude": ["./src/**/*"],
-    "references": [
-      {"path": "./"}
-    ]
 }

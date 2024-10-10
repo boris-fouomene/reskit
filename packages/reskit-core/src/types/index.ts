@@ -30,32 +30,33 @@ export interface IFieldBase<FieldType = "text"> {
     databaseTableName?: string;
 }
 
+type IFieldMapBase = {
+  /**
+   * A text field
+   */
+  text: IFieldBase<string>;
+  /**
+   * A number field
+   */
+  number: IFieldBase<number>;
+  /**
+   * A date field
+   */
+  date: IFieldBase<"date">;
+  /**
+   * A datetime field
+   */
+  datetime: IFieldBase<"datetime">;
+  
+  /***
+  * A time field
+  */
+  time : IFieldBase<"time">;
+};
 /**
      * IFieldMap interface represents a map of field types to their corresponding IFieldBase instances.
      */
-  export interface IFieldMap {
-      /**
-       * A text field
-       */
-      text: IFieldBase<string>;
-      /**
-       * A number field
-       */
-      number: IFieldBase<number>;
-      /**
-       * A date field
-       */
-      date: IFieldBase<"date">;
-      /**
-       * A datetime field
-       */
-      datetime: IFieldBase<"datetime">;
-      
-      /***
-      * A time field
-      */
-      time : IFieldBase<"time">;
-}
+  export type IFieldMap = Omit<IFieldMapBase,keyof IFieldMapExport> & IFieldMapExport;
 
 /**
  * The `IField` type represents a field with customizable properties.
@@ -303,7 +304,7 @@ declare global {
   /**
      * IFieldMap interface represents a map of field types to their corresponding IFieldBase instances.
   */
-  interface IFieldMap {}
+  type IFieldMapExport = {}
   
   
   /**

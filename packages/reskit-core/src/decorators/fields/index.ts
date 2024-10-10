@@ -1,4 +1,4 @@
-import {IField } from '@types';
+import {IField,IFieldMap} from '@types';
 export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**
@@ -26,7 +26,7 @@ export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
  * }
  * ```
  */
-export function Field<T extends (keyof IFieldMap | object)  = keyof IFieldMap | object>(options: IField<T>) {
+export function Field<T extends(keyof IFieldMap | object)  = keyof IFieldMap | object>(options: IField<T>) {
   /**
    * Returns a decorator function that sets metadata on the target property.
    */

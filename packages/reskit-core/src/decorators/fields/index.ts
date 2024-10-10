@@ -1,4 +1,4 @@
-import {IField } from '../../types';
+import {IField } from '@types';
 export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**
@@ -6,8 +6,16 @@ export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
  *
  * This function allows specifying field options, including the type, and automatically assigns a default type if none is specified.
  *
- * @template T - The type of the field, extending IFieldType. Defaults to `any` if not specified.
- * @param {IField<T>} options - An object containing field options.
+ ** @template T - The type of the field. Defaults to `any`.
+ * 
+ * - If `T` is a key of `IFieldMap`, it constructs a type by omitting keys from `IFieldBase` 
+ *   and merging with the mapped type from `IFieldMap`, ensuring the `type` field is included.
+ * 
+ * - If `T` is an object, it omits overlapping keys from `IFieldBase` and merges the object type `T`.
+ * 
+ * - If none of the above conditions apply, it defaults to `IFieldBase<T>`.
+ *  
+  @param {IField<T>} options - An object containing field options.
  *                              - `type` (optional): The type of the field (string, number, boolean, etc.)
  *                              - Additional options specific to the field type defined in IField.
  * @returns A decorator function that sets metadata on the target property.
@@ -18,7 +26,7 @@ export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
  * }
  * ```
  */
-export function Field<T = any>(options: IField<T>) {
+export function Field<T extends (keyof IFieldMap | object)  = keyof IFieldMap | object>(options: IField<T>) {
   /**
    * Returns a decorator function that sets metadata on the target property.
    */

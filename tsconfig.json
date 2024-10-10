@@ -9,6 +9,7 @@
       "esModuleInterop": true,                  // Compatibility with ES module imports
       "skipLibCheck": true,                      // Skip type checking of all declaration files
       "sourceMap": true,
+      "declaration": true,
     },
     "include": ["**/*.ts","**/*.tsx"],
     "exclude": ["**/node_modules/*","**/dist/*", "**/*.spec.ts"]

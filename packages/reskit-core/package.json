@@ -2,6 +2,7 @@
   "name": "reskit-core",
   "version": "1.0.0",
   "main": "index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "npm run build && npm run start-test",
     "start-test": "node ./dist/test/index",

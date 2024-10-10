@@ -1,7 +1,11 @@
 import { Resource, Field } from "..";
-import { getResourceMetaData, getResource } from '../decorators/resources/index';
-import { ResourceBase } from '../types/index';
+import {ResourcesManager,ResourceBase } from '../decorators';
 
+declare module ".." {
+    interface IAllResourceNamesMap{
+        "boris" : any;
+    }
+}
 class MyResource extends ResourceBase{
     getLabel(){
         return "yes this is my name";
@@ -13,6 +17,4 @@ class User extends MyResource{
     
 }
 
-console.log(getResourceMetaData(User));
-
-console.log(getResource<User>("boris")?.getLabel());
+const userResource = ResourcesManager.getResource("boris");

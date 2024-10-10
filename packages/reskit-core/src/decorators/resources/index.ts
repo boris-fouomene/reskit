@@ -57,8 +57,8 @@ export class ResourceBase<DataType=any> implements IResourceInstance<DataType> {
    * ```typescript
    * const userResource: IResource = { name: "user" };
    * ```
-   */
-  name?: string | undefined;
+  */
+  name?: IResourcesNames;
 
   /**
        * A user-friendly label for the resource.
@@ -346,7 +346,6 @@ export const resourceMetaData = Symbol("resource");
 export function Resource<DataType=any>(options: IResource<DataType>) {
   return function (target: Function) {
     options = Object.assign({},options);
-    options.name = typeof options?.name ==="string" && options?.name || "";
     if(typeof target =="function"){
       try {
         ResourcesManager.addResource<DataType>((options.name as IResourcesNames),new (target as IConstructor)(options) as ResourceBase<DataType>);

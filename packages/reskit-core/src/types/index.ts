@@ -138,50 +138,15 @@ export type IDict<K extends keyof any = any, T = any> = Record<K, T>;
 
 
 /**
- * Represents an empty interface for a map of all resource names.
- *
- * @interface IAllResourceNamesMap
- *
- * @description
- * An empty interface that can be used as a type for a map or object that contains all resource names.
- * This interface does not define any properties, allowing it to be flexible and adaptable to different use cases.
- *
- * @example
- * const resourceNamesMap: IAllResourceNamesMap = {
- *   'resource1': 'Resource 1',
- *   'resource2': 'Resource 2',
- *   // ...
- * }
- */
-export interface IAllResourceNamesMap {}
-
-/**
  * Represents a type for all resource names.
- *  This type is a union of all possible resource names extracted from the `IAllResourceNamesMap`.
- * 
- * The `keyof` operator is used to extract the keys of the `IAllResourceNamesMap` interface, 
- * which represents all possible resource names. This type is useful for specifying the type 
- * of a variable or property that can hold any resource name.
- * 
- * For example, if `IAllResourceNamesMap` is defined as:
- * 
+ *  This type is a union of all possible resource names.
  * ```typescript
- * export interface IAllResourceNamesMap {
- *   'resource1' : any;
- *   'resource2': any;
- *   'resource3': any;
- * }
+   declare module "@restkit/reskit-core"{
+      type IResourcesNames = 'resource1' | 'resource2' | 'resource3';
+   }
  * ```
- * 
- * Then, `IResourcesNames` would be equivalent to the union type:
- * 
- * ```typescript
- * type IResourcesNames = 'resource1' | 'resource2' | 'resource3';
- * ```
- * 
  * This means that any variable or property with type `IResourcesNames` can only hold 
  * one of the values 'resource1', 'resource2', or 'resource3'.
- * 
  * Here are some examples of using this type:
  * 
  * ```typescript
@@ -190,7 +155,7 @@ export interface IAllResourceNamesMap {}
  * let invalidResourceName: IResourcesNames = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourcesNames'.
  * ```
  */
-export type IResourcesNames = keyof IAllResourceNamesMap;
+export type IResourcesNames = IAllResourcesNames;
 
 
 /**
@@ -219,7 +184,7 @@ export type IResourcesNames = keyof IAllResourceNamesMap;
        * const userResource: IResource = { name: "user" };
        * ```
        */
-      name?: string;
+      name?: IResourcesNames;
     
       /**
        * A user-friendly label for the resource.
@@ -342,22 +307,25 @@ declare global {
   
   
   /**
- * Represents an empty interface for a map of all resource names.
- *
- * @interface IAllResourceNamesMap
- *
- * @description
- * An empty interface that can be used as a type for a map or object that contains all resource names.
- * This interface does not define any properties, allowing it to be flexible and adaptable to different use cases.
- *
- * @example
- * const resourceNamesMap: IAllResourceNamesMap = {
- *   'resource1': 'Resource 1',
- *   'resource2': 'Resource 2',
- *   // ...
- * }
+   A global declaration for all resource names. this is the exported name of the IResourcesNames type.
+ * Represents a type for all resource names.
+ *  This type is a union of all possible resource names.
+ * ```typescript
+     declare module "@restkit/reskit-core"{
+        type IAllResourcesNames = 'resource1' | 'resource2' | 'resource3';
+     }
+ * ```
+ * This means that any variable or property with type `IResourcesNames` can only hold 
+ * one of the values 'resource1', 'resource2', or 'resource3'.
+ * Here are some examples of using this type:
+ * 
+ * ```typescript
+ * let resourceName: IResourcesNames = 'resource1'; // valid
+ * let anotherResourceName: IResourcesNames = 'resource2'; // valid
+ * let invalidResourceName: IResourcesNames = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourcesNames'.
+ * ```
  */
-  interface IAllResourceNamesMap {}
+  type IAllResourcesNames = "";
   
   /**
    @interface The IResource interface represents the base structure for a resource in the application. 

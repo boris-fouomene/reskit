@@ -1,20 +1,16 @@
 import { Resource, Field } from "..";
 import {ResourcesManager,ResourceBase } from '../decorators';
 
-declare module ".." {
-    interface IAllResourceNamesMap{
-        "boris" : any;
-    }
-}
-class MyResource extends ResourceBase{
-    getLabel(){
-        return "yes this is my name";
-    }
+
+declare module "../types" {
+    type IAllResourcesNames = "users";
 }
 
-@Resource({name:"boris"})
-class User extends MyResource{
-    
+@Resource({name:"users"})
+class User extends ResourceBase{
+    label?: string | undefined = "My user";
 }
 
-const userResource = ResourcesManager.getResource("boris");
+const userResource = ResourcesManager.getResource("users");
+
+console.log(userResource?.getFields()," are field and label is ",userResource?.getLabel());

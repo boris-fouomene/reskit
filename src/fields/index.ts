@@ -30,7 +30,7 @@ export function Field<T extends(keyof IFieldMap | object)  = keyof IFieldMap | o
   /**
    * Returns a decorator function that sets metadata on the target property.
    */
-  return (target: any, propertyKey: string) => {
+  return function(target: any, propertyKey: string | symbol){
     /**
      * Get existing fields metadata or initialize an empty object.
      */

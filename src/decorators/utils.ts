@@ -32,7 +32,7 @@ export function createDecorator<KeyType = any, ValueType = any>(key: KeyType) {
      * @param {Object} target - The target object (class) containing the property being decorated.
      * @param {string} propertyKey - The name of the property being decorated.
      */
-    return (target: Object, propertyKey: string) => {
+    return (target: Object, propertyKey: string|symbol) => {
       /**
        * Define the metadata on the target object for the specified property key.
        */
@@ -67,7 +67,7 @@ export function createDecoratorProperty<KeyType = any, ValueType = any>(key: Key
    * @param {Object} target - The target object (class) containing the property being decorated.
    * @param {string} propertyKey - The name of the property being decorated.
    */
-  return (target: Object, propertyKey: string) => {
+  return (target: Object, propertyKey: string | symbol) => {
     /**
      * Define the metadata on the target object for the specified property key with the given default value.
      */

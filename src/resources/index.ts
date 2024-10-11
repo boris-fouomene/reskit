@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { IDict, IResourcesNames, IResource, IField,IResourceInstance } from '@types';
 import { getFields } from '../fields';
 import { isEmpty } from '@utils';
-import { IConstructor } from '../../types/index';
+import { IConstructor } from '../types/index';
 import defaultStr from '@utils/defaultStr';
 
 

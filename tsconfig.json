@@ -2,8 +2,7 @@
     "compilerOptions": {
       "baseUrl": ".",
       "rootDir": "src",                       // TypeScript source directory
-      "outDir": "./dist",   
-      
+      "outDir": "./dist", 
       "forceConsistentCasingInFileNames": true,
       "module": "commonjs",                     // Use commonjs module system
       "experimentalDecorators": true,           // Enable experimental support for decorators
@@ -11,7 +10,7 @@
       "strict": true,                            // Enable all strict type checking options
       "resolveJsonModule" : true,
       "esModuleInterop": true,                  // Compatibility with ES module imports
-      "skipLibCheck": true,                      // Skip type checking of all declaration files
+      //"skipLibCheck": true,                      // Skip type checking of all declaration files
       "sourceMap": true,
       "declaration": true,
       
@@ -26,6 +25,6 @@
         "@types/*" : ["src/types/*"],
       }
     },
-    "include": ["src/**/*.ts","src/**/*.tsx"],
+    "include": ["src/**/*.ts","src/**/*.tsx", "src/types/augmentation.tsx1"],
     "exclude": ["**/node_modules/*","**/dist/*", "**/*.spec.ts"]
 }

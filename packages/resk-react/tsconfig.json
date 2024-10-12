@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "rootDir": ".", // TypeScript source directory
     "outDir": "./dist",
+    "traceResolution": true,
     "paths": {
       "@utils/*": [
         "src/utils/*"

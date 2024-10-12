@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import { Resource, Field } from "@resk/core";
 
-@Resource({ name: "users1" })
+@Resource({})
 class User {
-    @Field({ type: "string" })
+    @Field<"select">({ type: "text",amina:"" })
     name?: string;
 
     @Field({ type: "number" })

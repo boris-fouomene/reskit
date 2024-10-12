@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "rootDir": ".", // TypeScript source directory
     "outDir": "./dist",
+    "target": "es6",
     "forceConsistentCasingInFileNames": true,
     "module": "commonjs", // Use commonjs module system
     "experimentalDecorators": true, // Enable experimental support for decorators

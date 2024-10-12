@@ -1,6 +1,6 @@
 {
   "name": "@resk/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,18 +10,13 @@
   "scripts": {
     "build-all": "npx lerna run build",
     "clean": "npx rimraf dist",
-    "start1": "lerna run --parallel watch",
     "build-publish": "npm run build && npm publish --access public",
     "publish": "lerna publish --yes",
     "clear-npx-cache": "npx clear-npx-cache",
     "publish-all": "lerna publish",
-    "test1": "npm run build-test && npm run start-test",
     "test": "npm run build && npx vitest",
-    "start-test": "node ./dist/test/index",
-    "build-test": "npx tsc --project tsconfig.test.json && tsc-alias -p tsconfig.test.json",
-    "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json && copyfiles -u 1 src/**/*.* dist && npx rimraf dist/src",
-    "build1": "npm run clean && npx tsc -p tsconfig.declaration.json && npx tsc -p tsconfig.json",
-    "prestart1": "npm run build",
+    "build1": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json && copyfiles -u 1 dist/src/**/*.* dist && npx rimraf dist/src",
+    "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "start": "node dist/test/index",
     "build-doc": "npx typedoc",
     "document": "npx ts-node ./generate-typedoc.ts"

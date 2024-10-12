@@ -1,10 +1,9 @@
 {
-  "name": "@reskit",
+  "name": "@resk/core",
   "version": "1.0.0",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "private": true,
   "workspaces": [
     "packages/*"
   ],
@@ -13,6 +12,7 @@
     "clean": "npx rimraf dist",
     "start1": "lerna run --parallel watch",
     "build-publish": "npm run build && npm publish --access public",
+    "publish": "lerna publish --yes",
     "clear-npx-cache": "npx clear-npx-cache",
     "publish-all": "lerna publish",
     "test1": "npm run build-test && npm run start-test",
@@ -83,5 +83,8 @@
     "react-is": "^18.3.1",
     "stable-hash": "^0.0.4",
     "typescript": "^5.6.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

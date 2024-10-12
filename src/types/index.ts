@@ -144,7 +144,7 @@ export type IDict<K extends keyof any = any, T = any> = Record<K, T>;
   Represents a type for all resource names.
  *  This type is a union of all possible resource names.
  * ```typescript
-   declare module "@reskit"{
+   declare module "@resk/core"{
       type IResourcesNamesExtends = 'resource1' | 'resource2' | 'resource3';
    }
  * ```
@@ -299,13 +299,13 @@ export type IConstructor = new (...args: any[]) => {};
 
 
 /**
- * @namespace @reskit
+ * @namespace @resk/core
  * This namespace encapsulates exported types and interfaces related to the ResKit library.
  * The exported types and interfaces can be used externally to extend the ResKit library.
  *
  * @example
  * ```typescript
- * declare module "@reskit" {
+ * declare module "@resk/core" {
  *   // Extends resources names types
  *   type IResourcesNamesExtends = 'users' | 'roles' | 'sales';
  *
@@ -338,7 +338,7 @@ declare global {
    *
    * @example
    * ```typescript
-   * declare module "@reskit" {
+   * declare module "@resk/core" {
    *   type IAllResourcesNames = 'resource1' | 'resource2' | 'resource3';
    * }
    * ```

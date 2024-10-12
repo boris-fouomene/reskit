@@ -1,5 +1,8 @@
 {
-  "name": "reskit-react",
+  "name": "@resk/react",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "1.0.0",
   "main": "index.js",
   "types": "dist/index.d.ts",
@@ -10,6 +13,5 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "dependencies": {
-  }
+  "dependencies": {}
 }

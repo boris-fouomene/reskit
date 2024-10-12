@@ -138,8 +138,8 @@ export type IDict<K extends keyof any = any, T = any> = Record<K, T>;
  * Represents a type for all resource names.
  *  This type is a union of all possible resource names.
  * ```typescript
-   declare module "@restkit/reskit-core"{
-      type IResourcesNames = 'resource1' | 'resource2' | 'resource3';
+   declare module "@reskit"{
+      type IResourcesNamesExtends = 'resource1' | 'resource2' | 'resource3';
    }
  * ```
  * This means that any variable or property with type `IResourcesNames` can only hold 
@@ -309,7 +309,7 @@ declare global {
        * Represents a type for all resource names.
        *  This type is a union of all possible resource names.
        * ```typescript
-       declare module "@restkit/reskit-core"{
+       declare module "@reskit"{
           type IAllResourcesNames = 'resource1' | 'resource2' | 'resource3';
        }
        * ```

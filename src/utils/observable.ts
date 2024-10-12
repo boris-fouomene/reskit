@@ -307,7 +307,7 @@ export const factory = function (): IObservable {
  * 
  * Usage:
  * ```typescript
- * import observable from "@reskit-core/observable";
+ * import observable from "@reskit/observable";
  * const context = observable({});
  * const testCb = (e) => console.log("test");
  * context.on("test", testCb);

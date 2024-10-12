@@ -1,4 +1,7 @@
 {
+    "tsdoc": {
+      "source": "./src"
+    },
     "out": "docs/",
     "mode": "file",
     "includeDeclarations": true,

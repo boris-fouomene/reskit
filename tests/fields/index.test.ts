@@ -1,16 +1,16 @@
-import { Field } from '@fields';
-import { describe, it,expect} from '@jest/globals';
+import { Field, getFields } from '@fields';
+import { describe, it,expect} from 'vitest';
 
 describe('Field Decorator', () => {
   it('should apply the Field decorator with a custom name', () => {
     class TestClass {
       @Field({name: "boris"})
-      myProperty?: string;
+      test?: string;
     }
 
     const instance = new TestClass();
     // Add assertions here to check if the decorator is applied correctly
-    expect(Reflect.getMetadata('fieldName', instance, 'myProperty')).toBe('boris');
+    expect(getFields(new TestClass())).toBe({test:{name:"boris",type:"test"}});
   });
 
   it('should apply the Field decorator without options', () => {

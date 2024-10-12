@@ -1,11 +1,10 @@
 import { IDict } from '@types';
 
 /**
+  @group Platform 
  * Checks if the current environment is a web environment.
- *
  * This function checks for the presence of the `window` object and its `document` property,
  * as well as the `document` object itself, to determine if the environment is a web environment.
- *
  * @returns {boolean} True if the environment is a web environment, false otherwise.
  *
  * @example
@@ -42,6 +41,7 @@ export function isWeb(): boolean {
   return hasWindowDocument && hasDocument && hasNavigator;
 }
 /**
+  @group Platform
  * Checks if the current environment is a Node.js environment.
  *
  * This function checks for the presence of the `process` object and its `versions` property,
@@ -89,7 +89,8 @@ export const isNode: () => boolean = (): boolean => {
 }
 
 /**
- * Checks if the current environment is an Electron environment.
+ *@group Platform 
+  Checks if the current environment is an Electron environment.
  *
  * This function checks for the presence of Electron-specific properties and characteristics
  * in the `window`, `process`, and `navigator` objects to determine if the environment is an Electron environment.
@@ -150,6 +151,7 @@ export const isElectron: () => boolean = (): boolean => {
 }
 
 /**
+  @group Platform
  * Checks if the current device is a touch device.
  *
  * This function assesses the presence of touch event support in the browser to determine if the device is a touch device.
@@ -206,6 +208,7 @@ export const isTouchDevice: () => boolean = (): boolean => {
 
 
 /**
+   @group Platform
  * Checks if the current environment is a server-side environment.
  *
  * This function assesses the presence of server-side environment characteristics,
@@ -252,6 +255,7 @@ export const isClientSide: () => boolean = (): boolean => {
 }
 
 /**
+  @group Platform
  * Checks if the current environment is a mobile browser.
  *
  * This function assesses the presence of mobile browser characteristics,
@@ -291,6 +295,7 @@ export const isMobileBrowser: () => boolean = (): boolean => {
 }
 
 /**
+  @group Platform
  * Checks if the current environment is an Android mobile browser.
  *
  * This function assesses the presence of Android mobile browser characteristics,
@@ -330,6 +335,7 @@ export const isAndroidMobileBrowser: () => boolean = (): boolean => {
 }
 
 /**
+  @group Platform
  * Checks if the current environment is a React Native WebView.
  *
  * This function assesses the presence of React Native WebView characteristics,
@@ -369,6 +375,7 @@ export const isReactNativeWebview: () => boolean = (): boolean => {
   
 
 /**
+  @group Platform
  * Checks if the current environment is a Darwin (macOS) environment.
  *
  * This function assesses the presence of Darwin environment characteristics,
@@ -387,6 +394,7 @@ export const isReactNativeWebview: () => boolean = (): boolean => {
  */
 export const isDarwin: () => boolean = (): boolean => isNode() && process.platform === 'darwin';
 /**
+   @group Platform
  * Checks if the current environment is a Windows (win32) environment.
  *
  * This function assesses the presence of Windows environment characteristics,
@@ -406,6 +414,7 @@ export const isDarwin: () => boolean = (): boolean => isNode() && process.platfo
 export const isWin32: () => boolean = (): boolean => isNode() && process.platform === 'win32';
 
 /**
+  @group Platform
  * Checks if the current environment is a Linux environment.
  *
  * This function assesses the presence of Linux environment characteristics,

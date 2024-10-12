@@ -4,8 +4,8 @@
     "access": "public"
   },
   "version": "1.0.0",
-  "main": "dist/src",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/src/index.js",
+   "types": "dist/src/index.d.ts",
   "scripts": {
     "build-all": "npx lerna run build",
     "clear-npx-cache": "npx clear-npx-cache",

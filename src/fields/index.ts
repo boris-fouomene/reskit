@@ -1,11 +1,15 @@
+import 'reflect-metadata'
 import {IField,IFieldMap} from '@types';
 export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**
- * Decorator function to define metadata for a class property.
+ * Decorator function that creates a decorator for class properties. A decorator is a special kind of function that can be used to modify or enhance classes and their members.
  *
  * This function allows specifying field options, including the type, and automatically assigns a default type if none is specified.
- *
+ *The purpose of this Field function is to add metadata to class properties. Metadata is extra information about the property that can be used later in the program. This is particularly useful for creating dynamic forms, validating data, or generating database schemas based on the class structure.
+
+ * The function takes an input called options, which is an object containing various settings for the field. These options can include things like the field type, validation rules, or display preferences.
+ * The output of this function is another function, known as a decorator function. This decorator function is what actually gets applied to a class property when you use the @Field() syntax in TypeScript.
  ** @template T - The type of the field. Defaults to `any`.
  * 
  * - If `T` is a key of `IFieldMap`, it constructs a type by omitting keys from `IFieldBase` 
@@ -18,7 +22,7 @@ export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
   @param {IField<T>} options - An object containing field options.
  *                              - `type` (optional): The type of the field (string, number, boolean, etc.)
  *                              - Additional options specific to the field type defined in IField.
- * @returns A decorator function that sets metadata on the target property.
+ * @returns A decorator function that takes two parameters: target (the class the property belongs to) and propertyKey (the name of the property).
  * @example
  * ```typescript
  * class MyClass {
@@ -26,7 +30,7 @@ export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
  * }
  * ```
  */
-export function Field<T extends(keyof IFieldMap | object)  = keyof IFieldMap | object>(options: IField<T>) {
+export function Field<T extends (keyof IFieldMap | object) = "text">(options: IField<T>): PropertyDecorator {
   /**
    * Returns a decorator function that sets metadata on the target property.
    */

@@ -9,6 +9,7 @@ const isObj = (x:any) => x && typeof x =='object';
 
 /**
  * Extends the default options with the provided ICurrency object to initialize default values.
+   it sets up default values for currency formatting, merging them with any user-provided options. This ensures that all necessary settings are available for the formatting process.
  * 
  * @param options The ICurrency object to merge with the default options.
  * @returns The merged ICurrency object with default values.
@@ -130,6 +131,7 @@ function checkCurrencyFormat(format: string | { pos: string, neg?: string, zero?
 
 /**
  * Takes a string or array of strings, removes all formatting/cruft, and returns the raw float value.
+    The unformat function takes a formatted currency string and converts it back to a raw number. This is useful when you need to perform calculations on currency values that may have been stored or input as formatted strings.
  *
  * Alias: `accounting.parse(string)`
  *
@@ -192,6 +194,7 @@ export const unformat = (value: any, decimalSeparator?: string): number => {
 
 /**
  * Implementation of toFixed() that treats floats more like decimals.
+	The toFixed function addresses issues with floating-point precision in JavaScript, ensuring that decimal places are rounded correctly for currency display.
  *
  * Fixes binary rounding issues (eg. (0.615).toFixed(2) === "0.61") that present
  * problems for accounting- and finance-related software.
@@ -235,6 +238,7 @@ export const toFixed: (value: number, decimalDigits?: number) => string = (value
 
 /**
  * Format a number, with comma-separated thousands and custom decimalDigits/decimalSeparator places.
+ * The formatNumber function takes a number and formats it with the appropriate thousand separators and decimal places, based on the provided options.
  *
  * Alias: `accounting.format()`
  *
@@ -305,6 +309,7 @@ export const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency |
 
 /**
  * Format a number into currency.
+ * The formatMoney and formatMoneyAsObject functions are the main workhorses of the module. They take a number and format it as a currency string, applying the appropriate symbol, decimal places, and formatting style. The formatMoneyAsObject version provides more detailed information about the formatting process.
  *
  * The symbol can be an object, in which case the other properties can be null.
  * Usage: accounting.formatMoney(number, symbol, decimalDigits, thousandsSep, decimalSep, format)
@@ -418,6 +423,7 @@ export const formatMoney: (number?: number, symbol?: ICurrency | string, decimal
 
 /**
  * Parse the currency format and return an object containing the parsed format and decimal digits.
+ * The parseFormat function helps interpret custom format strings, allowing users to specify how they want their currency displayed (e.g., where the symbol should appear, how many decimal places to show).
  *
  * @param {string} [format] The currency format, a string combining the characters %s, %v, and .#{0,n}, where:
  *   - %s represents the currency symbol,

@@ -324,7 +324,7 @@ export class ResourcesManager {
 export const resourceMetaData = Symbol("resource");
 
 /**
- * A decorator to add resource metadata to a class that implements ResourceBase.
+ * A decorator function that adds resource metadata to a class that implements `ResourceBase`
  * 
  * This decorator stores the resource properties (`name`, `label`, `title`, `tooltip`) using Reflect metadata.
  *
@@ -356,14 +356,13 @@ export function Resource<DataType=any>(options: IResource<DataType>) {
 }
 
 /**
- * Retrieves the fields metadata from a class target.
+ * Retrieves the resource metadata associated with the given target class.
  *
- * This function uses reflection to access the metadata associated with the given target class.
- * It returns an object where the keys are property names, and the values are objects containing the type, name, and any additional options defined in the field metadata.
+ * This function uses reflection to access the metadata stored on the target class using the `@Resource` decorator.
+ * It returns a new object that is a copy of the metadata, which includes properties like `name`, `label`, `title`, and `tooltip`.
  *
  * @param {any} target - The target class or instance from which to retrieve the metadata.
- * @returns {ResourceBase} An object mapping property names to their corresponding metadata, which includes the type and other options.
- * @example
+ * @returns {ResourceBase} An object containing the resource metadata for the given target.
  */
 export const getResourceMetaData = <DataType=any>(target:any): ResourceBase<DataType> =>{
    return Object.assign({}, Reflect.getMetadata(resourceMetaData, target));

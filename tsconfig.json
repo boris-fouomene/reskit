@@ -1,30 +1,75 @@
 {
-    "compilerOptions": {
-      "baseUrl": ".",
-      "rootDir": "src",                       // TypeScript source directory
-      "outDir": "./dist", 
-      "forceConsistentCasingInFileNames": true,
-      "module": "commonjs",                     // Use commonjs module system
-      "experimentalDecorators": true,           // Enable experimental support for decorators
-      "emitDecoratorMetadata": true,             // Enable emitting design:type metadata
-      "strict": true,                            // Enable all strict type checking options
-      "resolveJsonModule" : true,
-      "esModuleInterop": true,                  // Compatibility with ES module imports
-      //"skipLibCheck": true,                      // Skip type checking of all declaration files
-      "sourceMap": true,
-      "declaration": true,
-      
-      "paths": {
-        "@utils/*" : ["src/utils/*"],
-        "@utils" : ["src/utils"],
-        "@react/*" : ["src/react/*"],
-        "@react" : ["src/react"],
-        "@session" : ["src/session"],
-        "@session/*" : ["src/session/*"],
-        "@types" : ["src/types"],
-        "@types/*" : ["src/types/*"],
-      }
-    },
-    "include": ["src/**/*.ts","src/**/*.tsx", "src/types/augmentation.tsx1"],
-    "exclude": ["**/node_modules/*","**/dist/*", "**/*.spec.ts"]
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": ".", // TypeScript source directory
+    "outDir": "./dist",
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs", // Use commonjs module system
+    "experimentalDecorators": true, // Enable experimental support for decorators
+    "emitDecoratorMetadata": true, // Enable emitting design:type metadata
+    "strict": true, // Enable all strict type checking options
+    "resolveJsonModule": true,
+    "esModuleInterop": true, // Compatibility with ES module imports
+    "skipLibCheck": true, // Skip type checking of all declaration files
+    "sourceMap": true,
+    "declaration": true,
+    "paths": {
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@utils": [
+        "src/utils"
+      ],
+      "@react/*": [
+        "src/react/*"
+      ],
+      "@react": [
+        "src/react"
+      ],
+      "@session": [
+        "src/session"
+      ],
+      "@session/*": [
+        "src/session/*"
+      ],
+      "@types": [
+        "src/types"
+      ],
+      "@types/*": [
+        "src/types/*"
+      ],
+      "@fields/*": [
+        "src/fields/*"
+      ],
+      "@fields": [
+        "src/fields"
+      ],
+      "@resources/*": [
+        "src/resources/*"
+      ],
+      "@resources": [
+        "src/resources"
+      ],
+      "@types*": [
+        "src/types*"
+      ],
+      "@/*": [
+        "src/*"
+      ],
+      "@": [
+        "src"
+      ],
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.tsx",
+    "tests/**/*.ts"
+  ],
+  "exclude": [
+    "**/node_modules/*",
+    "**/dist/*",
+    "**/*.spec.ts"
+  ]
 }

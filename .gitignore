@@ -20,6 +20,7 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+package-lock.json
 
 # Logs
 logs

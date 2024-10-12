@@ -75,7 +75,7 @@ export interface IFieldMap extends IFieldMapExtends {
  * // For custom field types, it can accept objects:
  * const customField: IField<{ label: string; required: boolean }> = { label: 'Name', required: true };
  */
-export type IField<T extends (keyof IFieldMap | object)  = keyof IFieldMap | object> = T extends keyof IFieldMap 
+export type IField<T extends (keyof IFieldMap | object)  = "text"> = T extends keyof IFieldMap 
     ? (Omit<IFieldBase, keyof IFieldMap[T] | "type"> & Omit<IFieldMap[T], 'type'> & { type: T })
     : (Omit<IFieldBase, keyof T> & T);
     

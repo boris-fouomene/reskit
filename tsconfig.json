@@ -58,7 +58,7 @@
       ],
       "@": [
         "src"
-      ],
+      ]
     }
   },
   "include": [
@@ -72,10 +72,4 @@
     "**/dist/*",
     "**/*.spec.ts"
   ],
-  "typedocOptions": {
-    "entryPoints": [
-      "src"
-    ],
-    "out": "docs",
-  }
 }

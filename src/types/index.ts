@@ -1,4 +1,5 @@
 /**
+  @interface
  * IFieldBase interface represents a base field with optional type, label, and name properties.
  * The type property defaults to "text" if not specified.
  * 
@@ -28,7 +29,8 @@ export interface IFieldBase<FieldType = "text"> extends IFieldBaseExtends<FieldT
 }
 
 /**
- * IFieldMap interface represents a map of field types to their corresponding IFieldBase instances.
+  @interface
+ * IFieldMapExtends interface represents a map of field types to their corresponding IFieldBase instances.
  */
 export interface IFieldMap extends IFieldMapExtends {
   /**
@@ -74,6 +76,7 @@ export interface IFieldMap extends IFieldMapExtends {
  * 
  * // For custom field types, it can accept objects:
  * const customField: IField<{ label: string; required: boolean }> = { label: 'Name', required: true };
+  @interface
  */
 export type IField<T extends (keyof IFieldMap | object)  = "text"> = T extends keyof IFieldMap 
     ? (Omit<IFieldBase, keyof IFieldMap[T] | "type"> & Omit<IFieldMap[T], 'type'> & { type: T })
@@ -81,7 +84,8 @@ export type IField<T extends (keyof IFieldMap | object)  = "text"> = T extends k
     
 
 /**
-* Merges two object types, excluding properties from the first type 
+* @interface
+  Merges two object types, excluding properties from the first type 
 * that are also present in the second type.
 * 
 * This type will include all properties of the first type `T` 
@@ -103,7 +107,8 @@ export type IMerge<T extends object, U = any> = Omit<T, keyof U> & U;
 
 
 /**
- * Represents a generic dictionary type.
+ * @interface
+   Represents a generic dictionary type.
  *
  * @typedef {Object} IDict
  *
@@ -135,7 +140,8 @@ export type IDict<K extends keyof any = any, T = any> = Record<K, T>;
 
 
 /**
- * Represents a type for all resource names.
+ * @interface
+  Represents a type for all resource names.
  *  This type is a union of all possible resource names.
  * ```typescript
    declare module "@reskit"{
@@ -292,61 +298,86 @@ export interface IResourceInstance<DataType=any> extends IResource<DataType> {
 export type IConstructor = new (...args: any[]) => {};
 
 
-
+/**
+ * @namespace @reskit
+ * This namespace encapsulates exported types and interfaces related to the ResKit library.
+ * The exported types and interfaces can be used externally to extend the ResKit library.
+ *
+ * @example
+ * ```typescript
+ * declare module "@reskit" {
+ *   // Extends resources names types
+ *   type IResourcesNamesExtends = 'users' | 'roles' | 'sales';
+ *
+ *   // Extends IFieldMapExtends with custom field types
+ *   interface IFieldMapExtends<FieldType = "text"> {
+ *     select: IFieldBase<"select"> & {
+ *       // An array of strings representing the select field items
+ *       items: string[];
+ *     };
+ *   }
+ * }
+ * ```
+ */
 declare global {
-  //namespace restkit {
-    /**
-      The global exported alias of IFieldBase interface. 
-     * IFieldBase interface represents a base field with optional type, label, and name properties.
-     * The type property defaults to "text" if not specified.
-     * 
-     * @template FieldType - The type of the field, defaults to "text"
-     */
-    export interface IFieldBaseExtends<FieldType = "text"> {}
-    
-      /**
-      A global declaration for all resource names. this is the exported name of the IResourcesNames type.
-       * Represents a type for all resource names.
-       *  This type is a union of all possible resource names.
-       * ```typescript
-       declare module "@reskit"{
-          type IAllResourcesNames = 'resource1' | 'resource2' | 'resource3';
-       }
-       * ```
-       * This means that any variable or property with type `IResourcesNames` can only hold 
-       * one of the values 'resource1', 'resource2', or 'resource3'.
-       * Here are some examples of using this type:
-       * 
-       * ```typescript
-       * let resourceName: IResourcesNames = 'resource1'; // valid
-       * let anotherResourceName: IResourcesNames = 'resource2'; // valid
-       * let invalidResourceName: IResourcesNames = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourcesNames'.
-       * ```
-       */
-      export type IResourcesNamesExtends = never;
-        
   /**
-    @interface Global declaration of IResource Interface. used to extends IResource Interface externaly
-     The IResource interface represents the base structure for a resource in the application. 
-    A resource is a fundamental concept often used to describe an entity or object that can be managed, manipulated, or stored within 
-    the system. It typically refers to data objects like database tables, API endpoints, or any entities (like users, posts, or products) that the application deals with. 
-    Each resource usually has attributes such as a name, label, or title.
-   * A **resource** can also be seen as an entity that contains data and can be referenced, displayed or manipulated
-   * by the system.\n
-   * this is a base interface for defining a resource in the application.
+    @interface
+   * The global exported alias of the IFieldBase interface. 
+   * IFieldBase interface represents a base field with optional type, label, and name properties.
+   * The type property defaults to "text" if not specified.
+   * 
+   * @template FieldType - The type of the field, defaults to "text".
+   */
+  export interface IFieldBaseExtends<FieldType = "text"> {}
+
+  /**
+    @interface
+   * A global declaration for all resource names. This is the exported name of the IResourcesNames type.
+   * Represents a type for all resource names.
+   * This type is a union of all possible resource names.
+   *
+   * @example
+   * ```typescript
+   * declare module "@reskit" {
+   *   type IAllResourcesNames = 'resource1' | 'resource2' | 'resource3';
+   * }
+   * ```
+   * This means that any variable or property with type `IResourcesNames` can only hold 
+   * one of the values 'resource1', 'resource2', or 'resource3'.
+   *
+   * @example
+   * ```typescript
+   * let resourceName: IResourcesNames = 'resource1'; // valid
+   * let anotherResourceName: IResourcesNames = 'resource2'; // valid
+   * let invalidResourceName: IResourcesNames = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourcesNames'.
+   * ```
+   */
+  export type IResourcesNamesExtends = never;
+
+  /**
+    @interface
+   * Global declaration of the IResource interface, used to extend the IResource interface externally.
+   * The IResource interface represents the base structure for a resource in the application. 
+   * A resource is a fundamental concept often used to describe an entity or object that can be managed, manipulated, or stored within 
+   * the system. It typically refers to data objects like database tables, API endpoints, or any entities (like users, posts, or products) that the application deals with. 
+   * Each resource usually has attributes such as a name, label, or title.
+   *
+   * A **resource** can also be seen as an entity that contains data and can be referenced, displayed, or manipulated
+   * by the system.
+   *
+   * This is a base interface for defining a resource in the application.
    * Common examples of resources are users, products, or database tables.
    * This interface provides the basic structure for a resource by defining key properties
    * such as `name`, `label`, and `title`, which are used for internal reference and UI display.
    *
    * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
    */
-   export interface IResourceExtends<Datatype = any> {}
-       
-       
-   /**
-      A global exported IFieldMap interface alias. 
-       * IFieldMap interface represents a map of field types to their corresponding IFieldBase instances.
-    */
-    export interface IFieldMapExtends {}
-  //}
+  export interface IResourceExtends<Datatype = any> {}
+
+  /**
+    @interface
+   * A global exported IFieldMap interface alias. 
+   * The IFieldMap interface represents a map of field types to their corresponding IFieldBase instances.
+   */
+  export interface IFieldMapExtends {}
 }

@@ -35,9 +35,9 @@ Make sure you have the following installed on your machine:
 To set up ResKit, you'll need to install the necessary packages. Run the following command:
 
 ```typescript
-npm install decor-res reflect-metadata
+npm install @reskit reflect-metadata
 # or
-yarn add decor-res reflect-metadata
+yarn add @reskit reflect-metadata
 ```
 
 Also, install the necessary TypeScript dev dependencies:
@@ -97,7 +97,7 @@ Once you have installed the necessary packages and set up TypeScript, you can st
 
 ```typescript
 import "reflect-metadata";
-import { Resource, Field } from "decor-res";
+import { Resource, Field } from "@reskit";
 
 @Resource()
 class User {
@@ -225,7 +225,7 @@ ResKit can be extended with plugins and custom modules. Define new decorators, e
 ### Example: Custom Decorator Plugin
 
 ```typescript
-import { Resource, Field, customDecorator } from 'decor-res';
+import { Resource, Field, customDecorator } from '@reskit';
 
 function LogField() {
   return customDecorator((target, key) =&gt; {

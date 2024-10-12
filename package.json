@@ -23,7 +23,7 @@
     "build1": "npm run clean && npx tsc -p tsconfig.declaration.json && npx tsc -p tsconfig.json",
     "prestart1": "npm run build",
     "start": "node dist/test/index",
-    "build-doc": "npx tsdoc --config tsdoc.config.json"
+    "build-doc": "npx typedoc"
   },
   "keywords": [
     "TypeScript",

@@ -71,5 +71,11 @@
     "**/node_modules/*",
     "**/dist/*",
     "**/*.spec.ts"
-  ]
+  ],
+  "typedocOptions": {
+    "entryPoints": [
+      "src"
+    ],
+    "out": "docs"
+  }
 }

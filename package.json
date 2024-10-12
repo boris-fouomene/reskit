@@ -1,5 +1,5 @@
 {
-  "name": "@resk/core",
+  "name": "reskit",
   "version": "1.0.1",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
   "main": "dist/index.js",
@@ -51,35 +51,5 @@
   ],
   "author": "Boris Fouomene",
   "npmClient": "npm",
-  "useWorkspaces": true,
-  "devDependencies": {
-    "@types/dotenv": "^6.1.1",
-    "@types/lodash": "^4.17.10",
-    "@types/node": "^22.7.5",
-    "@types/qs": "^6.9.16",
-    "@types/react": "^18.3.11",
-    "@types/react-is": "^18.3.0",
-    "copyfiles": "^2.4.1",
-    "dotenv": "^16.4.5",
-    "fs-extra": "^11.2.0",
-    "lerna": "^8.1.8",
-    "openai": "^4.67.3",
-    "reflect-metadata": "^0.2.2",
-    "ts-jest": "^29.2.5",
-    "tsc-alias": "^1.8.10",
-    "typedoc": "^0.26.9",
-    "vite-tsconfig-paths": "^5.0.1",
-    "vitest": "^2.1.2"
-  },
-  "dependencies": {
-    "lodash": "^4.17.21",
-    "moment": "^2.30.1",
-    "qs": "^6.13.0",
-    "react-is": "^18.3.1",
-    "stable-hash": "^0.0.4",
-    "typescript": "^5.6.3"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
+  "useWorkspaces": true
 }

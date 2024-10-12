@@ -7,7 +7,12 @@
   "main": "dist/src",
   "types": "dist/src/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build-all": "npx lerna run build",
+    "clear-npx-cache": "npx clear-npx-cache",
+    "test": "npm run build && npx vitest",
+    "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "start": "node dist/test/index",
+    "build-doc": "npx typedoc"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +20,7 @@
   "description": "",
   "gitHead": "c9aeff1c7d11fd4adfe41b0bdb7a344d31564e08",
   "dependencies": {
-    "@resk/core": "^1.0.0",
+    "@resk/core": "^1.0.1",
     "react": "^18.3.1"
   }
 }

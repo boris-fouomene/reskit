@@ -18,11 +18,12 @@
     "test1": "npm run build-test && npm run start-test",
     "test": "npm run build && npx vitest",
     "start-test": "node ./dist/test/index",
-    "build-test": "tsc --project tsconfig.test.json && tsc-alias -p tsconfig.test.json",
-    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json && copyfiles -u 1 src/**/*.* dist && npx rimraf dist/src",
+    "build-test": "npx tsc --project tsconfig.test.json && tsc-alias -p tsconfig.test.json",
+    "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json && copyfiles -u 1 src/**/*.* dist && npx rimraf dist/src",
     "build1": "npm run clean && npx tsc -p tsconfig.declaration.json && npx tsc -p tsconfig.json",
     "prestart1": "npm run build",
-    "start": "node dist/test/index"
+    "start": "node dist/test/index",
+    "build-docs": "npx tsdoc --config tsdoc.config.json --out docs"
   },
   "keywords": [
     "TypeScript",
@@ -66,7 +67,6 @@
     "reflect-metadata": "^0.2.2",
     "ts-jest": "^29.2.5",
     "tsc-alias": "^1.8.10",
-    "typescript": "^5.6.2",
     "vite-tsconfig-paths": "^5.0.1",
     "vitest": "^2.1.2"
   },

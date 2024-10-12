@@ -1,0 +1,7 @@
+{
+    "out": "docs/",
+    "mode": "file",
+    "includeDeclarations": true,
+    "exclude": ["**/node_modules/**"],
+    "readme": "README.md"
+}

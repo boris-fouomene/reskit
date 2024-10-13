@@ -1,7 +1,4 @@
-import { isElement} from "react-is";
 import { IDict } from "../types";
-import {isDateObj } from "./date";
-import isRegExp from "./isRegex";
 import { isPlainObject,merge } from "lodash";
 
 /**
@@ -65,10 +62,6 @@ export function cloneObject(source: any): IDict | Array<any> {
  * @returns {boolean} True if the variable is an object, false otherwise.
  */
 export function isObj(obj: any): boolean {
-    /**
-     * If the object is null or undefined, return false.
-     */
-    if (!obj) return false;
     return isPlainObject(obj);
 };
 

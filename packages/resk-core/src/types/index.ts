@@ -518,3 +518,30 @@ export interface IResourceInstance<DataType=any> extends IResource<DataType> {
  * A type that represents a constructor function that can be instantiated with any number of arguments.
  */
 export type IConstructor = new (...args: any[]) => {};
+
+
+/**
+ * A renderer function type that renders a given value of type `InputType` into a value of type `OutputType`.
+ * 
+ * This type is used to define renderers for different value types (e.g., number, string)
+ * within various components (e.g., `datagridCell`, `formField`). The renderer function
+ * receives a value and returns an HTML string or a ReactNode or other content representing that value.
+ * 
+ * @template InputType - The type of the value to be rendered.
+   @template OutputType - The type of the rendered value.
+ * @param {InputType} value - The value to render.
+ * @returns {OutputType} - The content representation of the rendered value.
+ * 
+ * ## Example:
+ * 
+ * ```typescript
+ * const numberRenderer: ITypeRegistryRenderer<number,string> = (value: number) => {
+ *   return `<div class="cell number">${value}</div>`;
+ * };
+ * console.log(numberRenderer(123)); // Output: <div class="cell number">123</div>
+ * ```
+ */
+export type ITypeRegistryRenderer<InputType = any,OutputType = any> = (value: InputType) => OutputType;
+
+
+

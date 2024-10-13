@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { IDict, IResourcesNames, IResource, IField,IResourceInstance } from '../types';
+import { IDict, IResourcesNames, IField,IResourceInstance, IResource } from '../types';
 import { getFields } from '../fields';
 import { isEmpty } from '@utils/index';
 import { IConstructor } from '../types/index';

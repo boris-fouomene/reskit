@@ -1,67 +1,251 @@
 /**
-  @interface
- * IFieldBase interface represents a base field with optional type, label, and name properties.
+ * Represents a base field with optional type, label, and name properties.
  * The type property defaults to "text" if not specified.
  * 
  * @template FieldType - The type of the field, defaults to "text"
+ * 
+ * @description
+ * This interface serves as a base for all field types, providing common properties such as type, label, and name.
+ * 
+ * @example
+ * ```typescript
+ * const textField: IFieldBase = {
+ *   type: 'text',
+ *   label: 'Text Field',
+ *   name: 'textField'
+ * };
+ * ```
  */
-export interface IFieldBase<FieldType = "text"> extends IFieldBaseExtends<FieldType> {
-    /**
-     * The type of the field
-     */
-    type?: FieldType;
-    /**
-     * The label of the field
-     */
-    label?: string;
-    /**
-     * The name of the field
-     */
-    name?: string;
-    
-    /***
-    * The name of the field in datatable
-    */
-    databaseName ?: string;
-    
-    /*** the name of the field in her table or collection in datatabse */
-    databaseTableName?: string;
+export interface IFieldBase<FieldType = "text"> {
+  /**
+   * The type of the field.
+   * 
+   * @description
+   * This property specifies the type of the field, such as "text", "number", or "date".
+   * 
+   * @default "text"
+   * 
+   * @example
+   * ```typescript
+   * const textField: IFieldBase = {
+   *   type: 'text'
+   * };
+   * ```
+   */
+  type?: FieldType;
+
+  /**
+   * The label of the field.
+   * 
+   * @description
+   * This property specifies the label or display text for the field.
+   * 
+   * @example
+   * ```typescript
+   * const textField: IFieldBase = {
+   *   label: 'Text Field'
+   * };
+   * ```
+   */
+  label?: string;
+
+  /**
+   * The name of the field.
+   * 
+   * @description
+   * This property specifies the unique name or identifier for the field.
+   * 
+   * @example
+   * ```typescript
+   * const textField: IFieldBase = {
+   *   name: 'textField'
+   * };
+   * ```
+   */
+  name?: string;
+
+  /**
+   * The name of the field in the database table.
+   * 
+   * @description
+   * This property specifies the name of the field as it appears in the database table.
+   * 
+   * @example
+   * ```typescript
+   * const textField: IFieldBase = {
+   *   databaseName: 'text_field'
+   * };
+   * ```
+   */
+  databaseName?: string;
+
+  /**
+   * The name of the field's table or collection in the database.
+   * 
+   * @description
+   * This property specifies the name of the table or collection that contains the field in the database.
+   * 
+   * @example
+   * ```typescript
+   * const textField: IFieldBase = {
+   *   databaseTableName: 'text_fields'
+   * };
+   * ```
+   */
+  databaseTableName?: string;
 }
 
+
 /**
-  @interface
- * IFieldMapExtends interface represents a map of field types to their corresponding IFieldBase instances.
+ * Represents a map of field types to their corresponding IFieldBase instances.
+ * 
+ * @description
+ * This interface serves as a mapping of field types to their respective IFieldBase instances, providing a way to access and manipulate fields of different types.
+ * 
+ * @example
+ * ```typescript
+ * const fieldMap: IFieldMap = {
+ *   text: {
+ *     type: 'text',
+ *     label: 'Text Field',
+ *     name: 'textField'
+ *   },
+ *   number: {
+ *     type: 'number',
+ *     label: 'Number Field',
+ *     name: 'numberField'
+ *   },
+ *   // ...
+ * };
+ * ```
+  @example 
+  ```ts
+      declare module "@resk/core" {
+      interface IResourcesNamesMap {
+          users?:string;
+      }
+      interface IFieldMap {
+          select : IFieldBase<"select"> & {
+              items : string[]
+          }
+      }
+  }
+  ```
  */
-export interface IFieldMap extends IFieldMapExtends {
+export interface IFieldMap {
   /**
-   * A text field
+   * A text field.
+   * 
+   * @description
+   * This property represents a text field, with a type of "text".
+   * 
+   * @example
+   * ```typescript
+   * const textField: IFieldBase<"text"> = {
+   *   type: 'text',
+   *   label: 'Text Field',
+   *   name: 'textField'
+   * };
+   * ```
    */
-  text: IFieldBase<string>;
+  text: IFieldBase<"text">;
+
   /**
-   * A number field
+   * A number field.
+   * 
+   * @description
+   * This property represents a number field, with a type of "number".
+   * 
+   * @example
+   * ```typescript
+   * const numberField: IFieldBase<"number"> = {
+   *   type: 'number',
+   *   label: 'Number Field',
+   *   name: 'numberField'
+   * };
+   * ```
    */
-  number: IFieldBase<number>;
+  number: IFieldBase<"number">;
+
   /**
-   * A date field
+   * A date field.
+   * 
+   * @description
+   * This property represents a date field, with a type of "date".
+   * 
+   * @example
+   * ```typescript
+   * const dateField: IFieldBase<"date"> = {
+   *   type: 'date',
+   *   label: 'Date Field',
+   *   name: 'dateField'
+   * };
+   * ```
    */
   date: IFieldBase<"date">;
+
   /**
-   * A datetime field
+   * A datetime field.
+   * 
+   * @description
+   * This property represents a datetime field, with a type of "datetime".
+   * 
+   * @example
+   * ```typescript
+   * const datetimeField: IFieldBase<"datetime"> = {
+   *   type: 'datetime',
+   *   label: 'Datetime Field',
+   *   name: 'datetimeField'
+   * };
+   * ```
    */
   datetime: IFieldBase<"datetime">;
-  
-  /***
-  * A time field
-  */
-  time : IFieldBase<"time">;
+
+  /**
+   * A time field.
+   * 
+   * @description
+   * This property represents a time field, with a type of "time".
+   * 
+   * @example
+   * ```typescript
+   * const timeField: IFieldBase<"time"> = {
+   *   type: 'time',
+   *   label: 'Time Field',
+   *   name: 'timeField'
+   * };
+   * ```
+   */
+  time: IFieldBase<"time">;
+
+  /**
+   * An email field.
+   * 
+   * @description
+   * This property represents an email field, with a type of "email".
+   * 
+   * @example
+   * ```typescript
+   * const emailField: IFieldBase<"email"> = {
+   *   type: 'email',
+   *   label: 'Email Field',
+   *   name: 'emailField'
+   * };
+   * ```
+   */
+  email: IFieldBase<"email">;
 }
 
 /**
- * The `IField` type represents a field with customizable properties.
+ * @interface 
+ The `IField` type represents a field with customizable properties.
  * 
  * It uses a conditional type to define the structure based on the generic type `T`.
  * 
  * @template T - The type of the field. Defaults to `any`.
+ * 
+ * @description
+ * This type allows for flexible field definitions by leveraging TypeScript's conditional types.
  * 
  * - If `T` is a key of `IFieldMap`, it constructs a type by omitting keys from `IFieldBase` 
  *   and merging with the mapped type from `IFieldMap`, ensuring the `type` field is included.
@@ -76,12 +260,19 @@ export interface IFieldMap extends IFieldMapExtends {
  * 
  * // For custom field types, it can accept objects:
  * const customField: IField<{ label: string; required: boolean }> = { label: 'Name', required: true };
-  @interface
  */
-export type IField<T extends (keyof IFieldMap | object)  = "text"> = T extends keyof IFieldMap 
-    ? (Omit<IFieldBase, keyof IFieldMap[T] | "type"> & Omit<IFieldMap[T], 'type'> & { type: T })
-    : (Omit<IFieldBase, keyof T> & T);
-    
+export type IField<T extends IFieldMapKeys = "text"> = T extends keyof IFieldMap ? (Omit<IFieldBase, keyof IFieldMap[T] | "type"> & Omit<IFieldMap[T], 'type'> & { type: T }) : (Omit<IFieldBase, keyof T> & T);
+      
+      
+/**
+   @interface
+ * Represents the keys of the `IFieldMap` or `IFieldBase`.
+ * 
+ * @description
+ * This type is a union of all possible keys that can be used to define fields,
+ * allowing for a flexible and extensible field mapping.
+ */
+export type IFieldMapKeys = keyof IFieldMap | object;
 
 /**
 * @interface
@@ -142,24 +333,55 @@ export type IDict<K extends keyof any = any, T = any> = Record<K, T>;
 /**
  * @interface
   Represents a type for all resource names.
- *  This type is a union of all possible resource names.
- * ```typescript
-   declare module "@resk/core"{
-      type IResourcesNamesExtends = 'resource1' | 'resource2' | 'resource3';
-   }
- * ```
- * This means that any variable or property with type `IResourcesNames` can only hold 
- * one of the values 'resource1', 'resource2', or 'resource3'.
+  The IResourcesNames type is defined as the union of all keys in the IResourcesNamesMap object. 
+  This means that IResourcesNames can only take on values that are present as keys in IResourcesNamesMap.
  * Here are some examples of using this type:
- * 
- * ```typescript
+ *```ts
+  import "@resk/core";
+  declare module "@resk/core"{
+      interface IResourcesNamesMap {
+        resource1: any;
+        resource2: any;
+        resource3: any;
+      }
+  }
  * let resourceName: IResourcesNames = 'resource1'; // valid
  * let anotherResourceName: IResourcesNames = 'resource2'; // valid
  * let invalidResourceName: IResourcesNames = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourcesNames'.
+ ```
+ */
+export type IResourcesNames = keyof IResourcesNamesMap;
+
+/**
+ * A global declaration for all resource names. This is the exported name of the IResourcesNames type.
+ * Represents a type for all resource names.
+ * This type is a union of all possible resource names.
+ * 
+ * @description
+ * This interface serves as a map for all resource names.
+ * 
+ * @example
+ * ```typescript
+  import "@resk/core";
+ * declare module "@resk/core" {
+ *   interface IResourcesNamesMap {
+ *     users?: string;
+       roles?:any;
+       sales?:any;
+ *   }
+ * }
+ * ```
+ * This means that any variable or property with type `IResourcesNames` can only hold 
+ * one of the values 'users', 'roles', or 'sales'.
+ * 
+ * @example
+ * ```typescript
+ * let resourceName: IResourcesNames = 'users'; // valid
+ * let anotherResourceName: IResourcesNames = 'roles'; // valid
+ * let invalidResourceName: IResourcesNames = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourcesNames'.
  * ```
  */
-export type IResourcesNames = IResourcesNamesExtends;
-
+export interface IResourcesNamesMap {}
 
 /**
    @interface The IResource interface represents the base structure for a resource in the application. 
@@ -175,7 +397,7 @@ export type IResourcesNames = IResourcesNamesExtends;
  *
  * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
  */
-  export interface IResource<Datatype = any> extends IResourceExtends<Datatype> {
+  export interface IResource<Datatype = any> {
       /**
        * The internal name of the resource.
        *
@@ -296,88 +518,3 @@ export interface IResourceInstance<DataType=any> extends IResource<DataType> {
  * A type that represents a constructor function that can be instantiated with any number of arguments.
  */
 export type IConstructor = new (...args: any[]) => {};
-
-
-/**
- * @namespace @resk/core
- * This namespace encapsulates exported types and interfaces related to the ResKit library.
- * The exported types and interfaces can be used externally to extend the ResKit library.
- *
- * @example
- * ```typescript
- * declare module "@resk/core" {
- *   // Extends resources names types
- *   type IResourcesNamesExtends = 'users' | 'roles' | 'sales';
- *
- *   // Extends IFieldMapExtends with custom field types
- *   interface IFieldMapExtends<FieldType = "text"> {
- *     select: IFieldBase<"select"> & {
- *       // An array of strings representing the select field items
- *       items: string[];
- *     };
- *   }
- * }
- * ```
- */
-declare global {
-  /**
-    @interface
-   * The global exported alias of the IFieldBase interface. 
-   * IFieldBase interface represents a base field with optional type, label, and name properties.
-   * The type property defaults to "text" if not specified.
-   * 
-   * @template FieldType - The type of the field, defaults to "text".
-   */
-  export interface IFieldBaseExtends<FieldType = "text"> {}
-
-  /**
-    @interface
-   * A global declaration for all resource names. This is the exported name of the IResourcesNames type.
-   * Represents a type for all resource names.
-   * This type is a union of all possible resource names.
-   *
-   * @example
-   * ```typescript
-   * declare module "@resk/core" {
-   *   type IAllResourcesNames = 'resource1' | 'resource2' | 'resource3';
-   * }
-   * ```
-   * This means that any variable or property with type `IResourcesNames` can only hold 
-   * one of the values 'resource1', 'resource2', or 'resource3'.
-   *
-   * @example
-   * ```typescript
-   * let resourceName: IResourcesNames = 'resource1'; // valid
-   * let anotherResourceName: IResourcesNames = 'resource2'; // valid
-   * let invalidResourceName: IResourcesNames = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourcesNames'.
-   * ```
-   */
-  export type IResourcesNamesExtends = never;
-
-  /**
-    @interface
-   * Global declaration of the IResource interface, used to extend the IResource interface externally.
-   * The IResource interface represents the base structure for a resource in the application. 
-   * A resource is a fundamental concept often used to describe an entity or object that can be managed, manipulated, or stored within 
-   * the system. It typically refers to data objects like database tables, API endpoints, or any entities (like users, posts, or products) that the application deals with. 
-   * Each resource usually has attributes such as a name, label, or title.
-   *
-   * A **resource** can also be seen as an entity that contains data and can be referenced, displayed, or manipulated
-   * by the system.
-   *
-   * This is a base interface for defining a resource in the application.
-   * Common examples of resources are users, products, or database tables.
-   * This interface provides the basic structure for a resource by defining key properties
-   * such as `name`, `label`, and `title`, which are used for internal reference and UI display.
-   *
-   * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
-   */
-  export interface IResourceExtends<Datatype = any> {}
-
-  /**
-    @interface
-   * A global exported IFieldMap interface alias. 
-   * The IFieldMap interface represents a map of field types to their corresponding IFieldBase instances.
-   */
-  export interface IFieldMapExtends {}
-}

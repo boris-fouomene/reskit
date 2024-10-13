@@ -1,15 +1,16 @@
-import "reflect-metadata";
+import "reflect-metadata";  
 import { Resource, Field, ResourcesManager} from "@resk/core";
 
-@Resource({name:""})
+
+//@Resource({name:"users"})
 class User {
-    @Field<"select">({anima:"",sddd:""})
+    @Field<"select">({type:"select",items:[]})
     name?: string;
 
     @Field({ type: "number" })
     age?: number;
 
-    @Field({ type: "email" })
+    @Field<{test?:string;label?:number}>({ type: "text", test:" a test",label:12})
     email?: string;
 }
 console.log(ResourcesManager.getResource("users")," is reeee")

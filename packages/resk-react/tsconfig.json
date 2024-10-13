@@ -5,9 +5,6 @@
     "rootDir": ".", // TypeScript source directory
     "outDir": "./build",
     "paths": {
-      "@reskit/*": [
-        "@resk/core/*"
-      ],
       "@utils/*": [
         "src/utils/*"
       ],
@@ -28,9 +25,8 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-  ],
-  "exclude": [
     "tests/**/*.tsx",
     "tests/**/*.ts"
-  ]
+  ],
+  "exclude": []
 }

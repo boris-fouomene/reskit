@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { IField, IFieldMap } from '../types';
+import { IField, IFieldBase, IFieldMapKeys } from '../types';
 export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**
@@ -30,7 +30,7 @@ export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
  * }
  * ```
  */
-export function Field<T extends (keyof IFieldMap | object) = "text">(options: IField<T>): PropertyDecorator {
+export function Field<T extends IFieldMapKeys = "text">(options: IField<T>): PropertyDecorator {
   /**
    * Returns a decorator function that sets metadata on the target property.
    */
@@ -55,7 +55,7 @@ export function Field<T extends (keyof IFieldMap | object) = "text">(options: IF
     /**
      * Store the options in the fields object using propertyKey as the key.
      */
-    fields[propertyKey] = { name: propertyKey, ...options };
+    fields[propertyKey] = { name: propertyKey, ...Object.assign({},options) as IFieldBase };
 
     /**
      * Define the updated metadata on the target constructor.

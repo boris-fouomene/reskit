@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoney } from '@utils';
+import { formatMoney } from '@utils/index';
 
 describe('formatMoney', () => {
   it('should format positive numbers correctly', () => {

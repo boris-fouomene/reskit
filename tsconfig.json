@@ -10,8 +10,10 @@
     "emitDecoratorMetadata": true, // Enable emitting design:type metadata
     "strict": true, // Enable all strict type checking options
     "resolveJsonModule": true,
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "Node",
+    //"module": "NodeNext",
+    //"moduleResolution": "NodeNext", // Change this to 'node16', 'nodenext', or 'bundler'
     "esModuleInterop": true, // Compatibility with ES module imports
     //"sourceMap": true,
     "declaration": true,

@@ -1,4 +1,4 @@
-import { Field, getFields } from '@fields';
+import { Field, getFields } from '@fields/index';
 import { describe, it,expect} from 'vitest';
 
 describe('Field Decorator', () => {

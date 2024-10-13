@@ -2,6 +2,7 @@ import { isElement} from "react-is";
 import { IDict } from "../types";
 import {isDateObj } from "./date";
 import isRegExp from "./isRegex";
+import { isPlainObject,merge } from "lodash";
 
 /**
  * Checks if the given variable is a plain object.
@@ -16,60 +17,7 @@ import isRegExp from "./isRegex";
  * ```
  */
 export const isPlainObj = function (obj: any): boolean {
-    /**
-     * If the object is null, a primitive value, or a date, return false.
-     */
-    if (!obj || typeof obj === 'boolean' || typeof obj === 'number' || typeof obj === 'string' || isDateObj(obj)) {
-      return false;
-    }
-  
-    /**
-     * If the object is an element, return false.
-     */
-    if (isElement(obj)) {
-      return false;
-    }
-  
-    /**
-     * Get the string representation of the object's type.
-     */
-    const tStr = Object.prototype.toString.call(obj);
-  
-    /**
-     * If the object's type is not "[object Object]" or if it's the global object or window, return false.
-     */
-    if (tStr !== "[object Object]" || obj === global || obj === window || isRegExp(obj)) {
-      return false;
-    }
-  
-    /**
-     * Get the object's prototype.
-     */
-    let proto = Object.getPrototypeOf(obj);
-  
-    /**
-     * If the object has no prototype, it's a plain object.
-     */
-    if (!proto) {
-      return true;
-    }
-  
-    /**
-     * Get the hasOwnProperty function and the Object function's string representation.
-     */
-    const hasOwn = Object.prototype.hasOwnProperty;
-    const fnToString = hasOwn.toString;
-    const ObjectFunctionString = fnToString.call(Object);
-  
-    /**
-     * Get the object's constructor.
-     */
-    const Ctor = hasOwn.call(proto, "constructor") && proto.constructor;
-  
-    /**
-     * Check if the object's constructor is a function and if its string representation matches the Object function's string representation.
-     */
-    return typeof Ctor === "function" && fnToString.call(Ctor) === ObjectFunctionString;
+    return isPlainObject(obj);
 };
 
 
@@ -121,11 +69,7 @@ export function isObj(obj: any): boolean {
      * If the object is null or undefined, return false.
      */
     if (!obj) return false;
-  
-    /**
-     * Check if the object is an instance of Object and not an instance of RegExp.
-     */
-    return obj && Object.prototype.toString.call(obj) === '[object Object]' && !(obj instanceof RegExp);
+    return isPlainObject(obj);
 };
 
 
@@ -265,49 +209,7 @@ declare global {
  * @returns {any} The extended target object.
  */
 export function extendObj(target: any, ...sources: any[]): any {
-    /**
-     * If there are no source objects, return the target object as is.
-     */
-    if (!sources.length) return target;
-  
-    /**
-     * Get the first source object.
-     */
-    const source = sources.shift();
-  
-    /**
-     * If both the target and source objects are plain objects, merge their properties.
-     */
-    if (isPlainObj(target) && isPlainObj(source)) {
-      /**
-       * Iterate over the source object's properties.
-       */
-      for (const key in source) {
-        /**
-         * If the source property is a plain object, recursively extend the target object's property.
-         */
-        if (isPlainObj(source[key])) {
-          /**
-           * If the target object doesn't have the property, create it as an empty object.
-           */
-          if (!target[key]) Object.assign(target, { [key]: {} });
-          /**
-           * Recursively extend the target object's property.
-           */
-          extendObj(target[key], source[key]);
-        } else {
-          /**
-           * Otherwise, simply assign the source property to the target object.
-           */
-          Object.assign(target, { [key]: source[key] });
-        }
-      }
-    }
-  
-    /**
-     * Recursively extend the target object with the remaining source objects.
-     */
-    return extendObj(target, ...sources);
+    return merge(target,...sources);
 };
 
 Object.clone = cloneObject;

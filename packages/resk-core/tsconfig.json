@@ -2,29 +2,17 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "rootDir": ".", // TypeScript source directory
-    "outDir": "./dist",
+    "rootDir": ".",
+    "outDir": "./build",
     "paths": {
       "@utils/*": [
         "src/utils/*"
       ],
-      "@utils": [
-        "src/utils"
-      ],
       "@react/*": [
         "src/react/*"
       ],
-      "@react": [
-        "src/react"
-      ],
-      "@session": [
-        "src/session"
-      ],
       "@session/*": [
         "src/session/*"
-      ],
-      "@types": [
-        "src/types"
       ],
       "@types/*": [
         "src/types/*"
@@ -32,30 +20,20 @@
       "@fields/*": [
         "src/fields/*"
       ],
-      "@fields": [
-        "src/fields"
-      ],
       "@resources/*": [
         "src/resources/*"
-      ],
-      "@resources": [
-        "src/resources"
-      ],
-      "@types*": [
-        "src/types*"
       ],
       "@/*": [
         "src/*"
       ],
-      "@": [
-        "src"
-      ]
     }
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
+    "src/**/*.tsx"
+  ],
+  "exclude": [
     "tests/**/*.tsx",
     "tests/**/*.ts"
-  ],
+  ]
 }

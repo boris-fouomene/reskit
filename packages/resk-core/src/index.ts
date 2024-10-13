@@ -17,4 +17,3 @@ export * as Platform from "./platform";
 
 export * from "./fields";
 export * from "./resources";
-export * from "./types";

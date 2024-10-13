@@ -1,4 +1,4 @@
-import { IDict } from "@types";
+import { IDict } from "../../types";
 import  "../string";
 import queryString, { IParseBaseOptions, IStringifyBaseOptions } from 'qs';
 /**

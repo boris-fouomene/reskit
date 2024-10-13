@@ -4,14 +4,13 @@
     "access": "public"
   },
   "version": "1.0.0",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
   "scripts": {
-    "build-all": "npx lerna run build",
     "clear-npx-cache": "npx clear-npx-cache",
-    "test": "npm run build && npx vitest",
-    "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "start": "node dist/test/index",
+    "test": "npm run build-test && npx vitest",
+    "build": "npx tsc --project tsconfig.json && npx tsc-alias -p tsconfig.json",
+    "start": "node build/test/index",
     "build-doc": "npx typedoc",
     "prepublish": "npm run build"
   },

@@ -1,4 +1,4 @@
-import { IDict, IMerge } from "@types";
+import { IDict, IMerge } from "../types";
 import { isObj } from "./object";
 
 /**

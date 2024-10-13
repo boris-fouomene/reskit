@@ -2,22 +2,21 @@
   "name": "reskit",
   "version": "1.0.1",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "build-all": "npx lerna run build",
-    "clean": "npx rimraf dist",
-    "build-publish": "npm run build && npm publish --access public",
+    "clean": "npx rimraf build",
     "publish": "lerna publish --yes",
     "clear-npx-cache": "npx clear-npx-cache",
     "publish-all": "lerna publish",
     "test": "npm run build && npx vitest",
-    "build1": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json && copyfiles -u 1 dist/src/**/*.* dist && npx rimraf dist/src",
-    "build": "npx tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "start": "node dist/test/index",
+    "build": "npx ts-alias -p tsconfig.json",
+    "prepublish": "npm run build",
+    "start": "node build/test/index",
     "build-doc": "npx typedoc",
     "document": "npx ts-node ./generate-typedoc.ts"
   },
@@ -51,5 +50,12 @@
   ],
   "author": "Boris Fouomene",
   "npmClient": "npm",
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "devDependencies": {
+    "ts-alias": "^0.0.7",
+    "ts-patch": "^3.2.1",
+    "tsconfig-paths": "^4.2.0",
+    "ttypescript": "^1.5.15",
+    "typescript": "^5.6.3"
+  }
 }

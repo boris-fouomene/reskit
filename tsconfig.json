@@ -5,74 +5,32 @@
     "outDir": "./dist",
     "target": "es6",
     "forceConsistentCasingInFileNames": true,
-    "module": "commonjs", // Use commonjs module system
+    "module": "CommonJS", // Use commonjs module system
     "experimentalDecorators": true, // Enable experimental support for decorators
     "emitDecoratorMetadata": true, // Enable emitting design:type metadata
     "strict": true, // Enable all strict type checking options
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "Node",
     "esModuleInterop": true, // Compatibility with ES module imports
-    "skipLibCheck": true, // Skip type checking of all declaration files
-    "sourceMap": true,
+    //"sourceMap": true,
     "declaration": true,
-    "paths": {
-      "@utils/*": [
-        "src/utils/*"
-      ],
-      "@utils": [
-        "src/utils"
-      ],
-      "@react/*": [
-        "src/react/*"
-      ],
-      "@react": [
-        "src/react"
-      ],
-      "@session": [
-        "src/session"
-      ],
-      "@session/*": [
-        "src/session/*"
-      ],
-      "@types": [
-        "src/types"
-      ],
-      "@types/*": [
-        "src/types/*"
-      ],
-      "@fields/*": [
-        "src/fields/*"
-      ],
-      "@fields": [
-        "src/fields"
-      ],
-      "@resources/*": [
-        "src/resources/*"
-      ],
-      "@resources": [
-        "src/resources"
-      ],
-      "@types*": [
-        "src/types*"
-      ],
-      "@/*": [
-        "src/*"
-      ],
-      "@": [
-        "src"
-      ]
-    }
+    "declarationMap": true, // Generates .d.ts.map files (optional)
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths"
+      }
+    ],
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx"
-    //"src/**/*.ts",
-    //"src/**/*.tsx",
-    //"tests/**/*.tsx",
-    //"tests/**/*.ts"
+    "**/*.tsx",
+    "ts-paths-to-vite-alias.mjs"
   ],
   "exclude": [
     "**/node_modules/*",
     "**/dist/*",
-    "**/*.spec.ts"
-  ],
+    "**/*.spec.ts",
+    "**/build/**/*"
+  ]
 }

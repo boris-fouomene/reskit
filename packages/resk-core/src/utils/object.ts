@@ -1,5 +1,5 @@
 import { isElement} from "react-is";
-import { IDict } from "@types";
+import { IDict } from "../types";
 import {isDateObj } from "./date";
 import isRegExp from "./isRegex";
 

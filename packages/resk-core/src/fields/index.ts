@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import {IField,IFieldMap} from '@types';
+import { IField, IFieldMap } from '../types';
 export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**

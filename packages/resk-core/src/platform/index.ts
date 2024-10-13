@@ -1,4 +1,4 @@
-import { IDict } from '@types';
+import { IDict } from '../types';
 
 /**
   @group Platform 

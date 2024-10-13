@@ -1,4 +1,4 @@
-import session from "@session";
+import session from "@session/index";
 import currencies,{ICurrency, isValidCurrency} from "./currencies";
 import isNotEmptyString from "@utils/isNotEmptyString";
 

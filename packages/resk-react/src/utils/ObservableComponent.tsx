@@ -1,0 +1,117 @@
+import ReactComponent from "./Component";
+import { IObservable, observableFactory, IObservableEvent, IObservableCallbackOptions } from "@resk/core";
+/**
+ * Extends the React component by defining an observable component.
+ * This class integrates observable functionality into a React component, 
+ * allowing it to handle events and callbacks in an observable manner.
+ * 
+ * @template IProps - The type of the component's props.
+ * @template IState - The type of the component's state.
+ */
+export default class Component<IProps, IState> extends ReactComponent<IProps, IState> {
+  /** An observable factory instance. */
+  readonly _observable = observableFactory();
+
+  /** A flag indicating if the component is observable. */
+  readonly _____isObservable?: boolean | undefined = true;
+
+  /**
+   * Subscribes a callback function to a specific event.
+   * 
+   * @param event - The event name to listen for.
+   * @param fn - The callback function to be invoked when the event is triggered.
+   * @returns An object containing a remove method to unsubscribe from the event.
+   * 
+   * ### Usage Example:
+   * ```typescript
+   * const unsubscribe = this.on('eventName', () => {
+   *   console.log('Event triggered!');
+   * });
+   * 
+   * // To remove the event listener
+   * unsubscribe.remove();
+   * ```
+   */
+  on(event: IObservableEvent, fn: IObservableCallbackOptions): { remove: () => any } {
+    return this._observable.on.call(this, event, fn);
+  }
+
+  /**
+   * Registers a callback to be invoked finally when an event is triggered.
+   * 
+   * @param event - The event name.
+   * @param fn - The callback function to be invoked.
+   * @returns The observable instance.
+   */
+  finally(event: IObservableEvent, fn: IObservableCallbackOptions): IObservable {
+    return this._observable.finally.call(this, event, fn);
+  }
+
+  /**
+   * Unsubscribes a callback from a specific event.
+   * 
+   * @param event - The event name.
+   * @param fn - The callback function to remove.
+   * @returns The observable instance.
+   */
+  off(event: IObservableEvent, fn: IObservableCallbackOptions): IObservable {
+    return this._observable.off.call(this, event, fn);
+  }
+
+  /**
+   * Triggers a specific event with optional arguments.
+   * 
+   * @param event - The event name to trigger.
+   * @param args - Optional arguments to pass to the event callbacks.
+   * @returns The observable instance.
+   */
+  trigger(event: IObservableEvent, ...args: any[]): IObservable {
+    return this._observable.trigger.call(this, event, ...args);
+  }
+
+  /**
+   * Unsubscribes all event callbacks for this component.
+   * 
+   * @returns The observable instance.
+   */
+  offAll(): IObservable {
+    return this._observable.offAll.call(this);
+  }
+
+  /**
+   * Subscribes a callback function to be triggered once for a specific event.
+   * 
+   * @param event - The event name.
+   * @param fn - The callback function to be invoked.
+   * @returns An object containing a remove method to unsubscribe from the event.
+   */
+  one(event: string, fn: IObservableCallbackOptions): { remove: () => any } {
+    return this._observable.one.call(this, event, fn);
+  }
+
+  /**
+   * Retrieves all registered event callbacks.
+   * 
+   * @returns An object mapping event names to their respective callback functions.
+   */
+  getEventCallBacks(): { [key: string]: IObservableCallbackOptions[] } {
+    return this._observable.getEventCallBacks.call(this);
+  }
+
+  /**
+   * Lifecycle method called when the component is about to unmount.
+   * Cleans up all event subscriptions to prevent memory leaks.
+   */
+  componentWillUnmount(): void {
+    super.componentWillUnmount();
+    this._observable.offAll.call(this);
+  }
+
+  /**
+   * Lifecycle method called when the component is mounted.
+   * You can add additional setup here if necessary.
+   */
+  componentDidMount(): void {
+    super.componentDidMount();
+  }
+}

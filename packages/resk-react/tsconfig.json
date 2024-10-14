@@ -4,23 +4,13 @@
     "baseUrl": ".",
     "rootDir": ".", // TypeScript source directory
     "outDir": "./build",
-    "paths": {
-      "@utils/*": [
-        "src/utils/*"
-      ],
-      "@react/*": [
-        "src/react/*"
-      ],
-      "@session/*": [
-        "src/session/*"
-      ],
-      "@types/*": [
-        "src/types/*"
-      ],
-      "@/*": [
-        "src/*"
-      ],
-    }
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ], // Include library files
+    "allowJs": true,
+    "paths": {}
   },
   "include": [
     "src/**/*.ts",

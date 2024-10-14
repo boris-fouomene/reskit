@@ -18,6 +18,7 @@
     //"sourceMap": true,
     "declaration": true,
     "declarationMap": true, // Generates .d.ts.map files (optional)
+    "jsx": "react-jsx", // Set the JSX code generation
     "plugins": [
       {
         "transform": "typescript-transform-paths"

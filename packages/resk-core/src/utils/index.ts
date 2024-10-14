@@ -19,6 +19,7 @@ export * from "./object";
 
 export * from "./string";
 export * from "./uri";
+export * from "./observable";
 
 /***
  * Cée un objet enum à partir d'un type union

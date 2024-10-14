@@ -1,6 +1,4 @@
-import { IDict, IMerge } from "../types";
-import { isObj } from "./object";
-
+import { IMerge } from "../types";
 /**
  * Represents an observable event, which can be a string, null, or undefined.
  */
@@ -87,14 +85,14 @@ export type IObservable<T extends unknown = unknown> = IMerge<{
 /**
  * Returns an instance of the IObservable interface.
  * 
- * This factory function creates a new observable object with the specified methods.
+ * This observableFactory function creates a new observable object with the specified methods.
  * 
  * Example:
  * ```typescript
- * const observable = factory();
+ * const observable = observableFactory();
  * ```
  */
-export const factory = function (): IObservable {
+export const observableFactory = function (): IObservable {
   /**
    * Private variables
    */
@@ -190,7 +188,7 @@ export const factory = function (): IObservable {
      * ```
      * \nExample:
      * ```typescript
-     * const observable = factory();
+     * const observable = observableFactory();
      * observable.on("event", (arg1, arg2) => {
      *   console.log(arg1, arg2);
      * });
@@ -200,7 +198,7 @@ export const factory = function (): IObservable {
      * ```
      * \nExample with multiple callbacks:
      * ```typescript
-     * const observable = factory();
+     * const observable = observableFactory();
      * observable.on("event", (arg1, arg2) => {
      *   console.log("Callback 1:", arg1, arg2);
      * });
@@ -213,7 +211,7 @@ export const factory = function (): IObservable {
      * ```
      * \nExample with wildcard event:
      * ```typescript
-     * const observable = factory();
+     * const observable = observableFactory();
      * observable.on("*", (arg1, arg2) => {
      *   console.log("Wildcard callback:", arg1, arg2);
      * });
@@ -266,7 +264,7 @@ export const factory = function (): IObservable {
    * 
    * Example:
    * ```typescript
-   * const observable = factory();
+   * const observable = observableFactory();
    * observable.on("event", () => {
    *   console.log("Callback");
    * });
@@ -289,7 +287,7 @@ export const factory = function (): IObservable {
    * 
    * Example:
    * ```typescript
-   * const observable = factory();
+   * const observable = observableFactory();
    * observable.on("event", () => {
    *   console.log("Callback");
    * });
@@ -332,9 +330,9 @@ export const observable = function (element: any): IObservable {
   const context = element || {};
 
   /**
-   * Create a new observable instance using the factory function.
+   * Create a new observable instance using the observableFactory function.
    */
-  const obj = factory();
+  const obj = observableFactory();
 
   /**
    * Extend the context object with the observable methods.
@@ -440,7 +438,7 @@ export class Observable implements IObservable {
   /**
    * The internal observable object that provides the observable functionality.
    */
-  readonly _observable = factory();
+  readonly _observable = observableFactory();
 
   /**
    * Listen to the given `event` and execute the `callback` each time an event is triggered.
@@ -535,7 +533,7 @@ export class Observable implements IObservable {
  * 
  * Example:
  * ```typescript
- * const observable = factory();
+ * const observable = observableFactory();
  * console.log(isObservable(observable)); // true
  * 
  * const nonObservable = {};
@@ -561,5 +559,3 @@ export function isObservable(obj: any): boolean {
   }
   return false;
 }
-
-export default observable;

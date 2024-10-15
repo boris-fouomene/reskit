@@ -10,7 +10,11 @@
       "esnext"
     ], // Include library files
     "allowJs": true,
-    "paths": {}
+    "paths": {
+      "@components/*": [
+        "src/components/*"
+      ],
+    }
   },
   "include": [
     "src/**/*.ts",

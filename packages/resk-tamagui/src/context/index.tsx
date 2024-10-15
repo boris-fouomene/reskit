@@ -40,24 +40,40 @@ import { TamaguiProvider, TamaguiProviderProps, createTamagui } from '@tamagui/c
  * @returns {JSX.Element} A `TamaguiProvider` component with the extended or merged configuration.
  */
 export function ReskTamaguiProvider({ config: customConfig, ...rest }: IReskTamaguiProviderProps) {
-    /**
-     * Memoizes the merged configuration between the default Tamagui configuration
-     * and the custom configuration provided by the user. If no custom configuration is provided,
-     * the default configuration will be used instead.
-     *
-     * @type {typeof defaultConfig}
-     */
-    const config = useMemo(() => {
-        if (isObj(customConfig)) return extendObj({}, defaultConfig, customConfig) as typeof defaultConfig;
-        return defaultConfig;
-    }, [customConfig, defaultConfig]);
-
-    /**
-     * Renders the `TamaguiProvider` with the calculated configuration.
-     * 
-     * @returns {JSX.Element} The rendered `TamaguiProvider` component.
-     */
-    return <TamaguiProvider config={createTamagui(config)} {...rest} />;
+  /**
+   * Memoizes the merged configuration between the default Tamagui configuration
+   * and the custom configuration provided by the user. If no custom configuration is provided,
+   * the default configuration will be used instead.
+   *
+   * @type {typeof defaultConfig}
+   */
+  const config = useMemo(() => {
+    if (isObj(customConfig)) return extendObj({}, {
+      themes: {
+        // Define your themes here
+        // Define your themes here
+        light: {
+          colors: {
+            background: '#ffffff',
+            text: '#000000',
+          },
+        },
+        dark: {
+          colors: {
+            background: '#000000',
+            text: '#ffffff',
+          },
+        },
+      },
+    }, defaultConfig, customConfig) as typeof defaultConfig;
+    return defaultConfig;
+  }, [customConfig, defaultConfig]);
+  /**
+   * Renders the `TamaguiProvider` with the calculated configuration.
+   * 
+   * @returns {JSX.Element} The rendered `TamaguiProvider` component.
+   */
+  return <TamaguiProvider config={createTamagui(config)} {...rest} />;
 }
 
 /**
@@ -85,6 +101,6 @@ export function ReskTamaguiProvider({ config: customConfig, ...rest }: IReskTama
  * ```
  */
 export type IReskTamaguiProviderProps = Omit<TamaguiProviderProps, 'config'> & {
-    /** The configuration to override the default Tamagui configuration */
-    config?: typeof defaultConfig;
+  /** The configuration to override the default Tamagui configuration */
+  config?: typeof defaultConfig;
 };

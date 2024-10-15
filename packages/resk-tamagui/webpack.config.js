@@ -1,8 +1,8 @@
 // webpack.config.js
 const path = require('path');
-const { TamaguiPlugin } = require('tamagui-loader')
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { TamaguiPlugin } = require('tamagui-loader')
 
 module.exports = {
   mode: 'development', // Change to 'production' for production builds
@@ -49,6 +49,10 @@ module.exports = {
     historyApiFallback: true,
   },
   plugins : [
+    new TamaguiPlugin({
+      config: './tamagui.config.ts',
+      components: ['tamagui'],
+    }),
     new webpack.DefinePlugin({
       process: {
         env: {

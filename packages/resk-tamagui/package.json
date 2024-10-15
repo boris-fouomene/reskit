@@ -1,5 +1,5 @@
 {
-  "name": "@resk/react",
+  "name": "@resk/tamagui",
   "publishConfig": {
     "access": "public"
   },

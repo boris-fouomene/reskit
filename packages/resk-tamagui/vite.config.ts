@@ -9,7 +9,7 @@ export default {
         react(),
         tamaguiPlugin({
             // points to your tamagui config file
-            config: 'tamagui.config.ts',
+            config: './tamagui.config.ts',
             // points to any linked packages or node_modules
             // that have tamagui components to optimize
             components: ['tamagui'],
@@ -18,10 +18,23 @@ export default {
         }),
         //tsconfigPaths()  // This plugin automatically reads your tsconfig.json for paths
     ].filter(Boolean),
+    define: {
+        'process.env': {},
+    },
+    optimizeDeps: {
+        include: ['@tamagui/core'],
+    },
     build: {
         outDir: '../dist', // Output folder for the build files
         rollupOptions: {
             input: path.resolve(__dirname, 'App.tsx'), // Path to your App.tsx entry point
+        },
+    },
+    resolve: {
+        alias: {
+            '@resk-core': path.resolve(__dirname, '..', 'resk-core', "build", "src", "index"), // alias '@' to 'src'
+            '@components': path.resolve(__dirname, 'src/components'), // alias '@components' to 'src/components'
+            '@utils': path.resolve(__dirname, 'src/utils'), // alias '@utils' to 'src/utils'
         },
     },
 }

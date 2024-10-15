@@ -10,9 +10,11 @@
     "clear-npx-cache": "npx clear-npx-cache",
     "test": "npm run build-test && npx vitest",
     "build": "npx tsc --project tsconfig.json && npx tsc-alias -p tsconfig.json",
-    "start": "cd ../resk-core && npm run build && cd ../ && npx vite serve",
+    "start": "cd ../resk-core && npm run build && cd ../resk-tamagui && npx vite serve",
     "build-doc": "npx typedoc",
-    "prepublish1": "npm run build"
+    "prepublish1": "npm run build",
+    "start-web": "webpack serve --open",
+    "build-web": "webpack --mode production"
   },
   "keywords": [],
   "author": "",
@@ -29,7 +31,15 @@
     "@tamagui/vite-plugin": "^1.115.2",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.2",
     "@vitejs/plugin-react-swc": "^3.7.1",
-    "npm": "^10.9.0"
+    "html-webpack-plugin": "^5.6.0",
+    "npm": "^10.9.0",
+    "tamagui": "^1.115.4",
+    "tamagui-loader": "^1.115.4",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
   }
 }

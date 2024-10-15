@@ -1,5 +1,6 @@
-import defaultConfig from '@tamagui/config/v3';
+import { config as defaultConfig } from '@tamagui/config/v3';
 import { useMemo } from 'react';
+import * as reskCore from "@resk/core";
 import { extendObj, isObj } from '@resk/core';
 import { TamaguiProvider, TamaguiProviderProps, createTamagui } from '@tamagui/core';
 

@@ -16,7 +16,6 @@
     },
     "devDependencies": {},
     "dependencies": {
-        "@resk/tamagui" : "latest"
     },
     "publishConfig": {
         "access": "public"

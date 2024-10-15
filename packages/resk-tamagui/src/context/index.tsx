@@ -1,7 +1,7 @@
 import defaultConfig from '@tamagui/config/v3';
 import { useMemo } from 'react';
 import { extendObj, isObj } from '@resk/core';
-import { TamaguiProvider, TamaguiProviderProps, createTamagui } from 'tamagui';
+import { TamaguiProvider, TamaguiProviderProps, createTamagui } from '@tamagui/core';
 
 
 /**
@@ -38,7 +38,7 @@ import { TamaguiProvider, TamaguiProviderProps, createTamagui } from 'tamagui';
  * 
  * @returns {JSX.Element} A `TamaguiProvider` component with the extended or merged configuration.
  */
-export default function ReskTamaguiProvider({ config: customConfig, ...rest }: Omit<TamaguiProviderProps, 'config'> & { config: typeof defaultConfig }) {
+export function ReskTamaguiProvider({ config: customConfig, ...rest }: IReskTamaguiProviderProps) {
     /**
      * Memoizes the merged configuration between the default Tamagui configuration
      * and the custom configuration provided by the user. If no custom configuration is provided,
@@ -59,3 +59,31 @@ export default function ReskTamaguiProvider({ config: customConfig, ...rest }: O
     return <TamaguiProvider config={createTamagui(config)} {...rest} />;
 }
 
+/**
+ * Properties for the `ReskTamaguiProvider` component.
+ * 
+ * This type extends `TamaguiProviderProps`, omitting the `config` property and
+ * replacing it with a custom `config` that should match the type of the default configuration from Tamagui.
+ * 
+ * The custom configuration allows you to modify the default settings of the Tamagui provider
+ * while passing the remaining props from `TamaguiProviderProps`.
+ * 
+ * @typeParam T - The type of the Tamagui configuration. It defaults to the type of `defaultConfig`.
+ * 
+ * @example
+ * ```tsx
+ * const customConfig = {
+ *   theme: 'dark',
+ *   animations: { duration: 200 }
+ * };
+ * 
+ * const props: IReskTamaguiProviderProps = {
+ *   config: customConfig,
+ *   disableRootThemeClass: true
+ * };
+ * ```
+ */
+export type IReskTamaguiProviderProps = Omit<TamaguiProviderProps, 'config'> & {
+    /** The configuration to override the default Tamagui configuration */
+    config?: typeof defaultConfig;
+};

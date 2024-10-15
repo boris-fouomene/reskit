@@ -10,7 +10,7 @@
     "clear-npx-cache": "npx clear-npx-cache",
     "test": "npm run build-test && npx vitest",
     "build": "npx tsc --project tsconfig.json && npx tsc-alias -p tsconfig.json",
-    "start": "node build/test/index",
+    "start": "npx vite serve",
     "build-doc": "npx typedoc",
     "prepublish1": "npm run build"
   },
@@ -21,12 +21,15 @@
   "dependencies": {
     "@resk/core": "^1.0.3",
     "@tamagui/config": "^1.115.2",
+    "@tamagui/core": "^1.115.2",
     "react": "^18.3.1",
-    "react-fast-compare": "^3.2.2",
-    "tamagui": "^1.115.2"
+    "react-fast-compare": "^3.2.2"
   },
   "devDependencies": {
+    "@tamagui/vite-plugin": "^1.115.2",
     "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.1"
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react-swc": "^3.7.1",
+    "npm": "^10.9.0"
   }
 }

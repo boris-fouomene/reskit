@@ -20,8 +20,10 @@
   "description": "",
   "dependencies": {
     "@resk/core": "^1.0.3",
+    "@tamagui/config": "^1.115.2",
     "react": "^18.3.1",
-    "react-fast-compare": "^3.2.2"
+    "react-fast-compare": "^3.2.2",
+    "tamagui": "^1.115.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.11",

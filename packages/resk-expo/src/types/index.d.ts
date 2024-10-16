@@ -74,3 +74,22 @@ export type IReactRef<T extends unknown = unknown> = React.MutableRefObject<T> |
  * ```
  */
 export type IReactComponent<IProps = {}, IState = {}> = React.ComponentType<IProps> | React.ComponentClass<IProps, IState>;
+
+
+/***
+ * les style définis directement en objet, les styles plats quoi
+ * définis de la forme d'objet, ie les paramètres à la fonction StyleSheet.create de react-native
+ * exemple : {
+ *  paddingHorizontal : 1,
+ *  fontSize : 12, .....
+ * }
+ */
+export type IFlatStyle = ViewStyle | TextStyle | ImageStyle;
+
+
+export type IStyle =
+  | StyleProp<ViewStyle>
+  | StyleProp<TextStyle>
+  | StyleProp<ImageStyle>
+  | undefined
+  | null;

@@ -15,9 +15,6 @@
       "@resk/core/*": [
         "../resk-core/*"
       ],
-      "@/*": [
-        "./*"
-      ],
       "@hooks/*": [
         "./src/hooks/*"
       ],

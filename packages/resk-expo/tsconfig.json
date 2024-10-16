@@ -9,8 +9,23 @@
     "rootDir": ".",
     "outDir": "./build",
     "paths": {
+      "@resk/core": [
+        "../resk-core"
+      ],
+      "@resk/core/*": [
+        "../resk-core/*"
+      ],
       "@/*": [
         "./*"
+      ],
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@constants/*": [
+        "./src/constants/*"
       ],
       "@src/*": [
         "./src/*"

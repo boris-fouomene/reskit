@@ -1,16 +1,26 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": [
+    "expo/tsconfig.base",
+    "../../tsconfig.json"
+  ],
   "compilerOptions": {
+    "strict": true,
     "baseUrl": ".",
     "rootDir": ".",
     "outDir": "./build",
-    "paths": {}
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@src/*": [
+        "./src/*"
+      ],
+    }
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "tests/**/*.tsx",
-    "tests/**/*.ts"
-  ],
-  "exclude": []
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+  ]
 }

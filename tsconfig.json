@@ -28,7 +28,8 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "ts-paths-to-vite-alias.mjs"
+    "ts-paths-to-vite-alias.mjs",
+    "packages/resk-tamagui/vite.config.mjs"
   ],
   "exclude": [
     "**/node_modules/*",

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "resk-expo",
+    "name": "@resk/expo",
     "slug": "resk-expo",
     "version": "1.0.0",
     "orientation": "portrait",

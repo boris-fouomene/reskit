@@ -42,30 +42,11 @@ module.exports = function () {
     ]
   }
   config.watchFolders = Array.isArray(config.watchFolders) ? config.watchFolders : [];
-  const expoUIP = require("./expo-ui-path")(projectRoot);
-  const cPath = require("./common-path")(projectRoot);
-  if (!config.watchFolders.includes(expoUIP)) {
-    config.watchFolders.push(expoUIP);
-  }
-  if (cPath && !config.watchFolders.includes(cPath)) {
-    config.watchFolders.push(cPath);
-  }
-  let hasFTO = false;
-  for (let i in config.watchFolders) {
-    if (typeof config.watchFolders[i] === "string" && config.watchFolders[i].includes("@fto-consult")) {
-      hasFTO = true;
-    }
-  }
-  if (!hasFTO) {
-    config.watchFolders.push(path.resolve(projectRoot, "node_modules", "@fto-consult"))
-  }
   // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
   config.resolver.disableHierarchicalLookup = true;
 
   // Remove all console logs in production...
   config.transformer.minifierConfig.compress.drop_console = false;
-
-  require(path.resolve(__dirname, "bin/find-licenses"))(projectRoot);
 
   return config;
 }

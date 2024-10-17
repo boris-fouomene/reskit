@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import { isNotEmptyString, ltrim } from "@resk/core";
+import { isNonNullString, ltrim } from "@resk/core";
 import { GestureResponderEvent, Pressable, PressableProps } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -129,7 +129,7 @@ export type IFontIconProps = ITooltipProps & {
  * @returns {boolean} Returns `true` if the icon belongs to the specified icon set, otherwise `false`.
  */
 export const isIcon = (name: string, iconSetName: string): boolean => {
-    if (!isNotEmptyString(name) || !isNotEmptyString(iconSetName)) return false;
+    if (!isNonNullString(name) || !isNonNullString(iconSetName)) return false;
     name = name.toLowerCase();
     iconSetName = iconSetName.toLowerCase().trim();
     return name.startsWith(iconSetName + "-");
@@ -246,7 +246,7 @@ export function loadFonts(): Promise<any[]> {
         const iconSetName = fontsByIndex[index];
         const fontName = Object.keys(font)[0]?.toLowerCase();
         const iconSetNameLower = iconSetName.toLocaleLowerCase();
-        if (!isNotEmptyString(fontName) || (!iconSetNameLower.toLowerCase().includes("material"))) return Promise.resolve({
+        if (!isNonNullString(fontName) || (!iconSetNameLower.toLowerCase().includes("material"))) return Promise.resolve({
             status: false,
             message: `Font {0} not found ${fontName}`
         });

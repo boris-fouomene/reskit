@@ -1,6 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { Session } from "@resk/core";
 import * as FileSystem from 'expo-file-system';
+import { packageName } from '@utils/index';
 
 const { sanitizeKey: cSanitizeKey, handleGetValue, handleSetValue } = Session;
 
@@ -181,6 +182,8 @@ export function initSQLite() {
 }
 
 const sqliteSession = new SQLiteSession();
+Session.SessionManager.allKeyPrefix = `${packageName}-session`;
+sessionStorage.storage = sqliteSession;
 sqliteSession.init();
 initSQLite();
 

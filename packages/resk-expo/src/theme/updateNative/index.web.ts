@@ -1,25 +1,62 @@
-
-import { uniqid, Platform, IDict, isObj } from "@resk/core";
+import { uniqid, Platform, isObj } from "@resk/core";
 import { TIPPY_THEME } from "./utils";
+import { ITheme } from "@theme/types";
+
 const themeDomId = uniqid("web-theme-id");
 
-/*** met à jour le theme en environnement web
- * Cette fonction permet d'appliquer le styling en environnement web. 
- * Elle permet notement de styler le scroll bar et autres éléments dom dont nécessitant à forcer le styling
+/**
+ * Updates the web theme by injecting custom CSS into the DOM for styling web elements.
  * 
+ * This function specifically targets the web environment. It applies a custom styling to
+ * elements like the scrollbar, scroll track, and Tippy.js tooltips, ensuring a consistent 
+ * appearance based on the provided theme colors. Additionally, it supports adding custom CSS 
+ * properties that can be passed via the `theme.customCSS`.
+ * 
+ * @param {ITheme} theme - The theme object containing the color scheme and optional custom CSS.
+ * @returns {void | null} Returns null if not in a web environment or if the theme is invalid.
+ * 
+ * @example
+ * ```ts
+ * const theme: ITheme = {
+ *   colors: {
+ *     primary: "#6200EE",
+ *     onPrimary: "#FFFFFF",
+ *     background: "#F5F5F5",
+ *     surface: "#121212"
+ *   },
+ *   customCSS: `
+ *     body { font-family: Arial, sans-serif; }
+ *   `
+ * };
+ * updateWebTheme(theme);
+ * ```
+ * 
+ * @remarks
+ * The function first checks if the platform is a web environment and if the theme object is valid.
+ * It creates a `<style>` element in the document body if it doesn't exist, and populates it with 
+ * styles based on the theme's color palette.
+ * 
+ * ### Features:
+ * - Sets global styles for `body` and `html` elements, like overflow behavior and background colors.
+ * - Styles the scrollbar and its track based on the theme colors.
+ * - Applies specific styles to Tippy.js tooltips, ensuring the tooltip's appearance matches the theme.
+ * - Handles both desktop and non-touch devices for scrollbar styling.
+ * - Merges any custom CSS passed in the `theme.customCSS` property.
  */
-export default function updateWebTheme(theme: IDict) {
-    if (!Platform.isWeb() || !isObj(theme)) return null;
+export default function updateWebTheme(theme: ITheme) {
+    if (!Platform.isWeb() || !isObj(theme)) return null; // Return early if not in a web environment or if theme is invalid
+
     let style = document.querySelector(`#${themeDomId}`);
     if (!style) {
         style = document.createElement("style");
         document.body.appendChild(style);
     }
     style.id = themeDomId;
+
     const primary = theme.colors.primary;
-    //const isWhite = Colors.getContrast(primary) =="white"? true : false;
-    const trackBG = theme.colors.surface//isWhite ? "#F5F5F5" : "#121212";
+    const trackBG = theme.colors.surface;
     const scrollbarColor = theme.colors.primary;
+
     style.textContent = `
         body,html { 
             -ms-overflow-style: none !important; 
@@ -45,30 +82,16 @@ export default function updateWebTheme(theme: IDict) {
             border-radius: 10px;
             background-color: ${trackBG};
         }
-
-        body.desktop ::-webkit-scrollbar-track
-        {
-            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-            background-color: ${trackBG};
-        }
-
         body.desktop ::-webkit-scrollbar
         {
             width: 10px;
             height:10px;
             background-color: ${trackBG};
         }
-
         body.desktop ::-webkit-scrollbar-thumb
         {
             background-color: ${theme.colors.primary};
         }
-
-        body.desktop.theme-primary-white ::-webkit-scrollbar-thumb
-        {
-            background-color: ${theme.colors.secondary};
-        }
-
         body.not-touch-device ::-webkit-scrollbar-track
         {
             -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -76,14 +99,6 @@ export default function updateWebTheme(theme: IDict) {
             background-color: ${trackBG};
             border:0px!important;
         }
-
-        body.not-touch-device ::-webkit-scrollbar-track
-        {
-            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-            background-color: ${trackBG};
-            border:0px!important;
-        }
-
         body.not-touch-device ::-webkit-scrollbar
         {
             width: 10px;
@@ -91,12 +106,10 @@ export default function updateWebTheme(theme: IDict) {
             background-color: ${trackBG};
             border:0px!important;
         }
-
         body.not-touch-device ::-webkit-scrollbar-thumb
         {
             background-color: ${scrollbarColor};
         }
-
         .tippy-box[data-theme~='${TIPPY_THEME}'] {
             background-color: ${theme.colors.primary};
             color: ${theme.colors.onPrimary};
@@ -105,7 +118,6 @@ export default function updateWebTheme(theme: IDict) {
             -webkit-box-shadow: none;
             -moz-box-shadow: none;
             box-shadow: none;
-            font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Fira Sans",Ubuntu,Oxygen,"Oxygen Sans",Cantarell,"Droid Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Emoji","Segoe UI Symbol","Lucida Grande",Helvetica,Arial,sans-serif;
         }
         .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='top'] > .tippy-arrow::before {
             border-top-color: ${primary};
@@ -119,18 +131,6 @@ export default function updateWebTheme(theme: IDict) {
         .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right'] > .tippy-arrow::before {
             border-right-color: ${primary};
         }
-        .tippy-box[data-theme~='${TIPPY_THEME}'] > .tippy-svg-arrow {
-            fill: ${primary};
-        }
-        .tippy-box[data-theme~='${TIPPY_THEME}'] > .tippy-backdrop {
-            background-color: ${primary};
-        }
-        body > iframe {
-            z-index : 1!important;
-            width : 0px!important;
-            height : 0px!important;
-        }
-        :focus { outline: none!important; }
         ${theme.customCSS || ''}
     `;
 }

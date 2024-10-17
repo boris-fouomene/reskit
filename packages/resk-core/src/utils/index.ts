@@ -5,7 +5,7 @@ export { default as isRegex } from "./isRegex";
 export { default as uniqid } from "./uniqid";
 export * from "./dom";
 export { default as defaultStr } from "./defaultStr";
-export { default as isNotEmptyString } from "./isNotEmptyString";
+export { default as isNonNullString } from "./isNonNullString";
 export * from "./date";
 export { default as isPromise } from "./isPromise";
 export { default as stringify } from "./stringify";

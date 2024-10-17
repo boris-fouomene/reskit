@@ -12,7 +12,8 @@
         "build:watch": "tsc && (concurrently \"tsc -w\" \"npx tsc-alias -w\")",
         "start": "node build/test/index",
         "prepublish": "npm run build",
-        "build-doc": "npx typedoc"
+        "build-doc": "npx typedoc",
+        "dev": "npx concurrently \"tsc --watch\" \"npx tsc-alias -p tsconfig.json\""
     },
     "devDependencies": {
         "@types/dotenv": "^6.1.1",

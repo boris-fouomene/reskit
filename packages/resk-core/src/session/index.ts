@@ -1,7 +1,7 @@
 import { isClientSide } from "../platform";
 import { parseJSON, stringify } from "../utils/json";
 import { IDict } from '../types/index';
-import isNotEmptyString from '../utils/isNotEmptyString';
+import isNonNullString from '../utils/isNonNullString';
 
 /**
  * Session manager class.
@@ -64,7 +64,13 @@ class SessionManager {
    * @returns {string} The prefix to use for all keys in the session storage.
    */
   public static get allKeyPrefix(): string {
-    return this._allKeyPrefix && isNotEmptyString(this._allKeyPrefix) ? this._allKeyPrefix : "";
+    return this._allKeyPrefix && isNonNullString(this._allKeyPrefix) ? this._allKeyPrefix : "";
+  }
+
+  public static set allKeyPrefix(prefix: string) {
+    if (isNonNullString(prefix)) {
+      this._allKeyPrefix = prefix;
+    }
   }
 
   /**
@@ -74,9 +80,9 @@ class SessionManager {
    * @returns {string} The sanitized key.
    */
   public static sanitizeKey(key?: string): string {
-    if (!key || !isNotEmptyString(key)) return "";
+    if (!key || !isNonNullString(key)) return "";
     key = key.trim().replace(/\s+/g, "").replace(/ /gi, "");
-    const keyPrefix = isNotEmptyString(this.allKeyPrefix) && this._allKeyPrefix || "";
+    const keyPrefix = isNonNullString(this.allKeyPrefix) && this._allKeyPrefix || "";
     if (keyPrefix) return `${keyPrefix}-${key}`;
     return key;
   }

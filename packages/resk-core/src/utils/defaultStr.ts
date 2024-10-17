@@ -1,11 +1,11 @@
-import isNotEmptyString from "./isNotEmptyString";
+import isNonNullString from "./isNonNullString";
 
 
 /**
  * Returns the first non-null string value among the provided arguments.
  *
  * This function takes a variable number of arguments and returns the first one that is a non-null string.
- * It iterates through the arguments and checks each one using the `isNotEmptyString` function.
+ * It iterates through the arguments and checks each one using the `isNonNullString` function.
  * If a non-null string is found, it is returned immediately. If no non-null string is found, an empty string is returned.
  *
  * @param {...any[]} args The values to check for a non-null string.
@@ -27,7 +27,7 @@ export default function defaultStr(...args: any[]): string {
     /**
      * Check if the current argument is a non-null string.
      */
-    if (typeof v === "string" && isNotEmptyString(v)) {
+    if (typeof v === "string" && isNonNullString(v)) {
       /**
        * If a non-null string is found, return it immediately.
        */

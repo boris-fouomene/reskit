@@ -1,4 +1,4 @@
-import isNotEmptyString from "./isNotEmptyString";
+import isNonNullString from "./isNonNullString";
 
 /**
  * Removes all occurrences of the specified string from the left side of the current string.
@@ -199,21 +199,21 @@ declare global {
 }
 
 
-String.prototype.ltrim = function(str? : string) : string {
-  return ltrim(this.toString(),str);
+String.prototype.ltrim = function (str?: string): string {
+  return ltrim(this.toString(), str);
 }
 
-String.prototype.rtrim = function(str? : string) : string {
-  return rtrim(this.toString(),str);
+String.prototype.rtrim = function (str?: string): string {
+  return rtrim(this.toString(), str);
 }
 
 
-String.prototype.isNumber = function(withDecimal = true){
-  return isStringNumber(this.toString(),withDecimal);
+String.prototype.isNumber = function (withDecimal = true) {
+  return isStringNumber(this.toString(), withDecimal);
 }
 
-String.prototype.replaceAll = function(find, replace) {
-  if(!isNotEmptyString(find) || !isNotEmptyString(replace)) return this.toString();
+String.prototype.replaceAll = function (find, replace) {
+  if (!isNonNullString(find) || !isNonNullString(replace)) return this.toString();
   return this.toString().split(find).join(replace)
 }
 
@@ -236,7 +236,7 @@ export const toSnakeCase = (text: string): string => {
   /**
    * If the input string is empty, return an empty string.
    */
-  if (!isNotEmptyString(text)) return '';
+  if (!isNonNullString(text)) return '';
 
   /**
    * Trim the input string to remove any leading or trailing whitespace.
@@ -251,7 +251,7 @@ export const toSnakeCase = (text: string): string => {
   return text.replace(/(.)([A-Z][a-z]+)/, '$1_$2').replace(/([a-z0-9])([A-Z])/, '$1_$2').toUpperCase();
 }
 
-String.prototype.toSnakeCase = function(){
+String.prototype.toSnakeCase = function () {
   return toSnakeCase(this.toString());
 }
 /**
@@ -273,7 +273,7 @@ export const toCamelCase = (text: string): string => {
   /**
    * If the input string is empty, return an empty string.
    */
-  if (!isNotEmptyString(text)) return '';
+  if (!isNonNullString(text)) return '';
 
   /**
    * Trim the input string to remove any leading or trailing whitespace.
@@ -286,8 +286,8 @@ export const toCamelCase = (text: string): string => {
    * The replacement string k => k[1].toUpperCase() converts the matched character to uppercase.
    */
   return text.charAt(0) + text.replace(/(_\w)/g, k => k[1].toUpperCase()).substring(1);
-} 
-String.prototype.toCamelCase = function(){
+}
+String.prototype.toCamelCase = function () {
   return toCamelCase(this.toString());
 }
 
@@ -326,7 +326,7 @@ export const upperFirst = function (str: string): string {
   met en majuscule le premier caractère de la chaine string
   @return {string} la chaine de caractère modifiée
 */
-String.prototype.upperFirst = function(){
+String.prototype.upperFirst = function () {
   return upperFirst(this.toString());
 }
 /**
@@ -363,7 +363,7 @@ export const lowerFirst = function (str: string): string {
  * met en miniscule le premier caractère de de la chaine string
  * @returns {string}, la chaine de caractère modifiée
  */
-String.prototype.lowerFirst = function(){
+String.prototype.lowerFirst = function () {
   return lowerFirst(this.toString());
 };
 

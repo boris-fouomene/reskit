@@ -7,14 +7,14 @@
  * @returns {boolean} True if the value is a non-empty string, false otherwise.
  * @example
  * ```typescript
- * console.log(isNotEmptyString('hello')); // Output: true
- * console.log(isNotEmptyString('')); // Output: false
- * console.log(isNotEmptyString(null)); // Output: false
- * console.log(isNotEmptyString(undefined)); // Output: false
- * console.log(isNotEmptyString(123)); // Output: false
+ * console.log(isNonNullString('hello')); // Output: true
+ * console.log(isNonNullString('')); // Output: false
+ * console.log(isNonNullString(null)); // Output: false
+ * console.log(isNonNullString(undefined)); // Output: false
+ * console.log(isNonNullString(123)); // Output: false
  * ```
  */
-export default function isNotEmptyString(val: any): boolean {
+export default function isNonNullString(val: any): boolean {
   /**
    * Check if the value is not null and is a string.
    */

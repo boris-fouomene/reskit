@@ -1,6 +1,6 @@
 import session from "@session/index";
 import currencies, { ICurrency, isValidCurrency } from "./currencies";
-import isNotEmptyString from "@utils/isNotEmptyString";
+import isNonNullString from "@utils/isNonNullString";
 
 /**
  * The default format for displaying currency values.
@@ -150,7 +150,7 @@ export const getCurrency: () => ICurrency = (): ICurrency => {
   /**
    * If the currency code is valid, merge the corresponding currency object with the existing currency object.
    */
-  if (isNotEmptyString(currencyCode) && isValidCurrency(currencies[currencyCode.trim().toUpperCase() as keyof typeof currencies])) {
+  if (isNonNullString(currencyCode) && isValidCurrency(currencies[currencyCode.trim().toUpperCase() as keyof typeof currencies])) {
     currency = { ...currencies[currencyCode.trim().toUpperCase() as keyof typeof currencies], ...currency };
   }
 
@@ -162,7 +162,7 @@ export const getCurrency: () => ICurrency = (): ICurrency => {
   /**
    * If a format is found and includes the %v placeholder, set it on the currency object.
    */
-  if (isNotEmptyString(format) && format.includes("%v")) {
+  if (isNonNullString(format) && format.includes("%v")) {
     currency.format = format;
   }
 

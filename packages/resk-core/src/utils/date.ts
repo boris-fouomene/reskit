@@ -1,5 +1,5 @@
 import { isBoolean, isNumber } from "lodash";
-import isNotEmptyString from "./isNotEmptyString";
+import isNonNullString from "./isNonNullString";
 import moment from 'moment';
 
 import isEmpty from "./isEmpty";
@@ -460,7 +460,7 @@ export function isSQLDateTimeString(dateTimeString: string): boolean {
    * 
    * This check ensures that the function returns a consistent result for empty inputs.
    */
-  if (!isNotEmptyString(dateTimeString)) return false;
+  if (!isNonNullString(dateTimeString)) return false;
 
   /**
    * Regular expression to match SQL datetime format: YYYY-MM-DD HH:mm:ss.
@@ -527,7 +527,7 @@ export function isSQLDateString(dateString: string): boolean {
    * 
    * This check ensures that the function returns a consistent result for empty inputs.
    */
-  if (!isNotEmptyString(dateString)) return false;
+  if (!isNonNullString(dateString)) return false;
 
   /**
    * Regular expression to match SQL date format: YYYY-MM-DD.
@@ -727,7 +727,7 @@ export function addToDate(days: number, date?: any, setFunction?: string): Date 
    * 
    * This check allows the function to accept date strings as input.
    */
-  if (isValidDate(date) && isNotEmptyString(date)) {
+  if (isValidDate(date) && isNonNullString(date)) {
     date = new Date(date);
   }
 
@@ -737,7 +737,7 @@ export function addToDate(days: number, date?: any, setFunction?: string): Date 
    * This check ensures that the function returns a consistent result for invalid date inputs.
    */
   if (!isValidDate(date)) {
-    date = isNotEmptyString(date) ? new Date(date) : new Date();
+    date = isNonNullString(date) ? new Date(date) : new Date();
   }
 
   /**
@@ -745,7 +745,7 @@ export function addToDate(days: number, date?: any, setFunction?: string): Date 
    * 
    * This check allows the function to add days to specific date components (e.g. year, month, day, etc.).
    */
-  if (isNotEmptyString(setFunction) && typeof date['set' + setFunction] === "function" && typeof date['get' + setFunction] === "function") {
+  if (isNonNullString(setFunction) && typeof date['set' + setFunction] === "function" && typeof date['get' + setFunction] === "function") {
     const set = 'set' + setFunction;
     const get = 'get' + setFunction;
     date = date[set](date[get]() + days);
@@ -907,7 +907,7 @@ export const isValidDate = function (sDate: any, format?: IMomentFormat): boolea
   /**
    * If the input is a non-empty string, try to parse it as a date.
    */
-  if (isNotEmptyString(sDate)) {
+  if (isNonNullString(sDate)) {
     /**
      * If the date can be parsed successfully, it's a valid date.
      */

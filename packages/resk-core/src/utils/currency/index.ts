@@ -1,7 +1,7 @@
 
 import currencies, { ICurrency, isValidCurrency } from "./currencies";
 import defaultStr from "../defaultStr";
-import isNotEmptyString from "../isNotEmptyString"
+import isNonNullString from "../isNonNullString"
 import { getCurrency } from "./session";
 
 const isObj = (x: any) => x && typeof x == 'object';
@@ -37,7 +37,7 @@ export function prepareOptions(options?: ICurrency): ICurrency {
 	/**
 	 * If the format property is a non-empty string, parse it to extract decimal digits and format.
 	 */
-	if (isNotEmptyString(object.format)) {
+	if (isNonNullString(object.format)) {
 		const p = parseFormat(object.format);
 		if (p.format) {
 			object.format = p.format;

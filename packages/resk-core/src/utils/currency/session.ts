@@ -1,5 +1,5 @@
 import session from "@session/index";
-import currencies,{ICurrency, isValidCurrency} from "./currencies";
+import currencies, { ICurrency, isValidCurrency } from "./currencies";
 import isNotEmptyString from "@utils/isNotEmptyString";
 
 /**
@@ -69,7 +69,7 @@ export const setCurrencyFormat = (format: string): any => {
  * setCurrency({ code: "EUR", symbol: "€" }); // Persists the EUR currency in the database
  * ```
  */
-export const setCurrency =  (currency: ICurrency | string): ICurrency => {
+export const setCurrency = (currency: ICurrency | string): ICurrency => {
   /**
    * Check if the provided currency is valid.
    */
@@ -88,15 +88,15 @@ export const setCurrency =  (currency: ICurrency | string): ICurrency => {
     /**
      * If the currency code is valid, use the corresponding currency object.
      */
-    if (cCode && isValidCurrency(currencies[cCode])) {
-      currency = currencies[cCode];
+    if (cCode && isValidCurrency(currencies[cCode as keyof typeof currencies])) {
+      currency = currencies[cCode as keyof typeof currencies];
     } else if (typeof currency === "string") {
       /**
        * If the provided value is a string, try to use it as a currency code.
        */
       cCode = currency.trim().toUpperCase();
-      if (isValidCurrency(currencies[cCode])) {
-        currency = currencies[cCode];
+      if (isValidCurrency(currencies[cCode as keyof typeof currencies])) {
+        currency = currencies[cCode as keyof typeof currencies];
       }
     }
   }
@@ -150,8 +150,8 @@ export const getCurrency: () => ICurrency = (): ICurrency => {
   /**
    * If the currency code is valid, merge the corresponding currency object with the existing currency object.
    */
-  if (isNotEmptyString(currencyCode) && isValidCurrency(currencies[currencyCode.trim().toUpperCase()])) {
-    currency = { ...currencies[currencyCode.trim().toUpperCase()], ...currency };
+  if (isNotEmptyString(currencyCode) && isValidCurrency(currencies[currencyCode.trim().toUpperCase() as keyof typeof currencies])) {
+    currency = { ...currencies[currencyCode.trim().toUpperCase() as keyof typeof currencies], ...currency };
   }
 
   /**
@@ -187,8 +187,8 @@ export const getCurrency: () => ICurrency = (): ICurrency => {
 }
 
 export default {
-    getFormat : getCurrencyFormat,
-    setFormat : setCurrencyFormat,
-    set : setCurrency,
-    get : getCurrency
+  getFormat: getCurrencyFormat,
+  setFormat: setCurrencyFormat,
+  set: setCurrency,
+  get: getCurrency
 }

@@ -10,10 +10,10 @@
     "outDir": "./build",
     "paths": {
       "@resk/core": [
-        "../resk-core"
+        "../resk-core/build/src"
       ],
       "@resk/core/*": [
-        "../resk-core/*"
+        "../resk-core/build/src/*"
       ],
       "@types/*": [
         "src/types/*"

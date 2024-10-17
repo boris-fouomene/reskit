@@ -1,81 +1,10 @@
-/**
- * Represents a currency object with various properties for formatting and display.
- */
-export type ICurrency = {
-    /**
-     * The symbol of the currency (e.g., "$", "FCFA").
-     * 
-     * Example: `$` or `FCFA`
-     */
-    symbol: string;
-  
-    /**
-     * The full name of the currency (e.g., "Euro", "United States Dollar").
-     * 
-     * Example: `Euro`
-     */
-    name: string;
-  
-    /**
-     * The native symbol of the currency (e.g., "€" for Euro).
-     * 
-     * Example: `€`
-     */
-    symbolNative: string;
-  
-    /**
-     * The number of decimal places for the currency (e.g., 2 for most currencies, 0 for some).
-     * 
-     * Example: `2`
-     */
-    decimalDigits: number;
-  
-    /**
-     * The rounding value for the currency (e.g., 2 for rounding to 2 decimal places).
-     * 
-     * Example: `2`
-     */
-    rounding: number;
-  
-    /**
-     * The ISO 4217 code for the currency (e.g., "USD" for United States Dollar).
-     * 
-     * Example: `USD`
-     */
-    code: string;
-  
-    /**
-     * The plural name of the currency (e.g., "US dollars").
-     * 
-     * Example: `US dollars`
-     */
-    namePlural: string;
-  
-    /**
-     * The display format for the currency (e.g., `%v %s` for "123.45 USD").
-     * 
-     * Example: `%v %s`
-     */
-    format?: string;
-  
-    /**
-     * The decimal separator for the currency (e.g., "." for most currencies).
-     * 
-     * Example: `.`
-     */
-    decimalSeparator?: string;
-  
-    /**
-     * The thousands separator for the currency (e.g., " " for some European currencies).
-     * 
-     * Example: ` `
-     */
-    thousandSeparator?: string;
-}
+import { ICurrencies } from "./types";
+
+export * from "./types";
 
 /*** list of available currencies */
-const currencies : {[code:string]:ICurrency} = {
-    USD : {
+const currencies: ICurrencies = {
+    USD: {
         "symbol": "$",
         "name": "US Dollar",
         "symbolNative": "$",
@@ -84,7 +13,7 @@ const currencies : {[code:string]:ICurrency} = {
         "code": "USD",
         "namePlural": "US dollars"
     },
-    CAD : {
+    CAD: {
         "symbol": "CA$",
         "name": "Canadian Dollar",
         "symbolNative": "$",
@@ -94,7 +23,7 @@ const currencies : {[code:string]:ICurrency} = {
         "code": "CAD",
         "namePlural": "Canadian dollars"
     },
-    EUR : {
+    EUR: {
         "symbol": "€",
         "name": "Euro",
         "symbolNative": "€",
@@ -1140,6 +1069,8 @@ const currencies : {[code:string]:ICurrency} = {
     }
 };
 
+console.log(Object.keys(currencies));
+
 export default currencies;
 
 
@@ -1148,4 +1079,4 @@ export default currencies;
  * @param {any} objet, l'objet sur lequel verifier
  * @return {boolean} true if object is valid currency
  */
-export const isValidCurrency = (obj:any)=> obj && typeof obj =='object' && !Array.isArray(obj) && obj.name && typeof obj.name =="string" && obj.symbol && typeof obj.symbol =="string" && true || false;
+export const isValidCurrency = (obj: any) => obj && typeof obj == 'object' && !Array.isArray(obj) && obj.name && typeof obj.name == "string" && obj.symbol && typeof obj.symbol == "string" && true || false;

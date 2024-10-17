@@ -4,6 +4,7 @@ import moment from 'moment';
 
 import isEmpty from "./isEmpty";
 import defaultStr from "./defaultStr";
+import { IMomentFormat } from "../types";
 
 /**
  * Global interface extension for the Date object.
@@ -213,9 +214,9 @@ declare global {
      * console.log(date.toFormat("YYYY-MM-DD HH:mm:ss")); // Output: Formatted date string
      * ```
      */
-    toFormat: (format: string) => string;
+    toFormat: (format: IMomentFormat) => string;
   }
-} 
+}
 
 
 /**
@@ -396,10 +397,10 @@ export function toSQLTimeFormat(datetime: Date): string {
  * ```
  */
 Date.prototype.toSQLDateTimeFormat = function (): string {
-    /**
-     * Use the dateToSQLDateTimeFormat function to convert the current date to a SQL datetime string.
-     */
-    return dateToSQLDateTimeFormat(this);
+  /**
+   * Use the dateToSQLDateTimeFormat function to convert the current date to a SQL datetime string.
+   */
+  return dateToSQLDateTimeFormat(this);
 };
 
 
@@ -415,10 +416,10 @@ Date.prototype.toSQLDateTimeFormat = function (): string {
  * ```
  */
 Date.prototype.toSQLDateFormat = function (): string {
-    /**
-     * Use the dateToSQLFormat function to convert the current date to a SQL date string.
-     */
-    return dateToSQLFormat(this);
+  /**
+   * Use the dateToSQLFormat function to convert the current date to a SQL date string.
+   */
+  return dateToSQLFormat(this);
 };
 
 
@@ -434,10 +435,10 @@ Date.prototype.toSQLDateFormat = function (): string {
  * ```
  */
 Date.prototype.toSQLTimeFormat = function (): string {
-    /**
-     * Use the toSQLTimeFormat function to convert the current date to a SQL time string.
-     */
-    return toSQLTimeFormat(this);
+  /**
+   * Use the toSQLTimeFormat function to convert the current date to a SQL time string.
+   */
+  return toSQLTimeFormat(this);
 };
 
 /**
@@ -577,7 +578,7 @@ export function isSQLDateString(dateString: string): boolean {
  * @description The format used to represent dates in SQL, as defined by the Moment.js library.
  * @see https://momentjs.com/docs/#/parsing/string-format/
  */
-export const SQL_DATE_FORMAT = "YYYY-MM-DD";
+export const SQL_DATE_FORMAT: IMomentFormat = "YYYY-MM-DD";
 
 
 /**
@@ -585,7 +586,7 @@ export const SQL_DATE_FORMAT = "YYYY-MM-DD";
  *
  * @description The format used to represent dates by default.
  */
-export const DEFAULT_DATE_FORMAT = "DD/MM/YYYY";
+export const DEFAULT_DATE_FORMAT: IMomentFormat = "DD/MM/YYYY";
 
 
 /**
@@ -594,7 +595,7 @@ export const DEFAULT_DATE_FORMAT = "DD/MM/YYYY";
  * @description The format used to represent dates and times in SQL, as defined by the Moment.js library.
  * @see https://momentjs.com/docs/#/parsing/
  */
-export const SQL_DATE_TIME_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
+export const SQL_DATE_TIME_FORMAT: IMomentFormat = "YYYY-MM-DD HH:mm:ss";
 
 
 /**
@@ -603,7 +604,7 @@ export const SQL_DATE_TIME_FORMAT: string = "YYYY-MM-DD HH:mm:ss";
  * @description The format used to represent dates and times by default, as defined by the Moment.js library.
  * @see https://momentjs.com/docs/#/parsing/string-format/
  */
-export const DEFAULT_DATE_TIME_FORMAT: string = "DD/MM/YYYY HH:mm:ss";
+export const DEFAULT_DATE_TIME_FORMAT: IMomentFormat = "DD/MM/YYYY HH:mm:ss";
 
 
 /**
@@ -612,7 +613,7 @@ export const DEFAULT_DATE_TIME_FORMAT: string = "DD/MM/YYYY HH:mm:ss";
  * @description The format used to represent times in SQL, as defined by the Moment.js library.
  * @see https://momentjs.com/docs/#/parsing/string-format/
  */
-export const SQL_TIME_FORMAT: string = "HH:mm:ss";
+export const SQL_TIME_FORMAT: IMomentFormat = "HH:mm:ss";
 
 
 /**
@@ -621,7 +622,7 @@ export const SQL_TIME_FORMAT: string = "HH:mm:ss";
  * @description The format used to represent times by default, as defined by the Moment.js library.
  * @see https://momentjs.com/docs/#/parsing/string-format/
  */
-export const DEFAULT_TIME_FORMAT: string = "HH:mm:ss";
+export const DEFAULT_TIME_FORMAT: IMomentFormat = "HH:mm:ss";
 
 /**
  * Resets the hours of the date to 0.
@@ -635,8 +636,8 @@ export const DEFAULT_TIME_FORMAT: string = "HH:mm:ss";
  * ```
  */
 Date.prototype.resetHours = function () {
-    this.setHours(0);
-    return this;
+  this.setHours(0);
+  return this;
 }
 
 /**
@@ -651,8 +652,8 @@ Date.prototype.resetHours = function () {
  * ```
  */
 Date.prototype.resetMinutes = function () {
-    this.setMinutes(0);
-    return this;
+  this.setMinutes(0);
+  return this;
 }
 
 /**
@@ -667,8 +668,8 @@ Date.prototype.resetMinutes = function () {
  * ```
  */
 Date.prototype.resetSeconds = function () {
-    this.setSeconds(0);
-    return this;
+  this.setSeconds(0);
+  return this;
 }
 /**
  * Resets the hours, minutes, and seconds of the date to 0.
@@ -682,11 +683,11 @@ Date.prototype.resetSeconds = function () {
  * ```
  */
 Date.prototype.resetHours2Minutes2Seconds = function () {
-    this.setHours(0);
-    this.setMinutes(0);
-    this.setSeconds(0);
-    this.setMilliseconds(0);
-    return this;
+  this.setHours(0);
+  this.setMinutes(0);
+  this.setSeconds(0);
+  this.setMilliseconds(0);
+  return this;
 }
 
 /**
@@ -760,27 +761,27 @@ export function addToDate(days: number, date?: any, setFunction?: string): Date 
  * @returns {Date} The updated date object with the added milliseconds.
  */
 export function addMilliseconds(milliseconds: number, dateObj?: Date): Date {
-    /**
-     * If the number of milliseconds is not a number, default to 0.
-     */
-    if (!isNumber(milliseconds)) milliseconds = 0;
-  
-    /**
-     * If no date object is provided, use the current date.
-     */
-    if (!isDateObj(dateObj)) {
-      dateObj = new Date();
-    }
-  
-    /**
-     * Ensure a valid date object is used.
-     */
-    dateObj = dateObj || new Date();
-  
-    /**
-     * Add the milliseconds to the date object.
-     */
-    return new Date(dateObj.getTime() + milliseconds);
+  /**
+   * If the number of milliseconds is not a number, default to 0.
+   */
+  if (!isNumber(milliseconds)) milliseconds = 0;
+
+  /**
+   * If no date object is provided, use the current date.
+   */
+  if (!isDateObj(dateObj)) {
+    dateObj = new Date();
+  }
+
+  /**
+   * Ensure a valid date object is used.
+   */
+  dateObj = dateObj || new Date();
+
+  /**
+   * Add the milliseconds to the date object.
+   */
+  return new Date(dateObj.getTime() + milliseconds);
 }
 
 /**
@@ -791,17 +792,17 @@ export function addMilliseconds(milliseconds: number, dateObj?: Date): Date {
  * @returns {Date} The updated date object with the added seconds.
  */
 export function addSeconds(seconds: number, dateObj?: any): Date {
-    /**
-     * If the number of seconds is not a number, default to 0.
-     */
-    if (!isNumber(seconds)) {
-      seconds = 0;
-    }
-  
-    /**
-     * Convert the seconds to milliseconds and add to the date object.
-     */
-    return addMilliseconds(seconds * 1000, dateObj);
+  /**
+   * If the number of seconds is not a number, default to 0.
+   */
+  if (!isNumber(seconds)) {
+    seconds = 0;
+  }
+
+  /**
+   * Convert the seconds to milliseconds and add to the date object.
+   */
+  return addMilliseconds(seconds * 1000, dateObj);
 }
 
 /**
@@ -812,17 +813,17 @@ export function addSeconds(seconds: number, dateObj?: any): Date {
  * @returns {Date|string} The updated date object with the added minutes, or a string in the specified format.
  */
 export function addMinutes(minutes: number, dateObj?: any): Date {
-    /**
-     * If the number of minutes is not a number, default to 0.
-     */
-    if (!isNumber(minutes)) {
-      minutes = 0;
-    }
-  
-    /**
-     * Convert the minutes to milliseconds and add to the date object.
-     */
-    return addMilliseconds(minutes * 60000, dateObj);
+  /**
+   * If the number of minutes is not a number, default to 0.
+   */
+  if (!isNumber(minutes)) {
+    minutes = 0;
+  }
+
+  /**
+   * Convert the minutes to milliseconds and add to the date object.
+   */
+  return addMilliseconds(minutes * 60000, dateObj);
 }
 
 /**
@@ -833,17 +834,17 @@ export function addMinutes(minutes: number, dateObj?: any): Date {
  * @returns {Date} The updated date object with the added hours.
  */
 export function addHours(hours: number, dateObj?: any): Date {
-    /**
-     * If the number of hours is not a number, default to 0.
-     */
-    if (!isNumber(hours)) {
-      hours = 0;
-    }
-  
-    /**
-     * Convert the hours to milliseconds and add to the date object.
-     */
-    return addMilliseconds(hours * 3600000, dateObj);
+  /**
+   * If the number of hours is not a number, default to 0.
+   */
+  if (!isNumber(hours)) {
+    hours = 0;
+  }
+
+  /**
+   * Convert the hours to milliseconds and add to the date object.
+   */
+  return addMilliseconds(hours * 3600000, dateObj);
 }
 
 /**
@@ -853,36 +854,36 @@ export function addHours(hours: number, dateObj?: any): Date {
  * @param {string} [format] The format of the date, using Moment.js format. See https://momentjs.com/docs/#/parsing/string-format/
  * @returns {Date|null} The parsed date, or null if the input is not a valid date.
  */
-export function parseDate(date: any, format?: string): Date | null {
+export function parseDate(date: any, format?: IMomentFormat): Date | null {
+  /**
+   * If the date is already a Date object, return it as is.
+   */
+  if (isDateObj(date)) return date as Date;
+
+  /**
+   * If the date is empty or null, return null.
+   */
+  if (isEmpty(date)) return null;
+
+  /**
+   * Attempt to parse the date using the Moment.js library.
+   */
+  const parsedDate = moment(date, format);
+
+  /**
+   * Check if the parsed date is valid.
+   */
+  if (parsedDate?.isValid()) {
     /**
-     * If the date is already a Date object, return it as is.
+     * If the date is valid, return it as a Date object.
      */
-    if (isDateObj(date)) return date as Date;
-  
+    return parsedDate.toDate();
+  } else {
     /**
-     * If the date is empty or null, return null.
+     * If the date is not valid, return null.
      */
-    if (isEmpty(date)) return null;
-  
-    /**
-     * Attempt to parse the date using the Moment.js library.
-     */
-    const parsedDate = moment(date, format);
-  
-    /**
-     * Check if the parsed date is valid.
-     */
-    if (parsedDate?.isValid()) {
-      /**
-       * If the date is valid, return it as a Date object.
-       */
-      return parsedDate.toDate();
-    } else {
-      /**
-       * If the date is not valid, return null.
-       */
-      return null;
-    }
+    return null;
+  }
 }
 
 /**
@@ -892,41 +893,41 @@ export function parseDate(date: any, format?: string): Date | null {
  * @param {string} [format] The format of the date, using Moment.js format. See https://momentjs.com/docs/#/parsing/string-format/
  * @returns {boolean} True if the date is valid, false otherwise.
  */
-export const isValidDate = function (sDate: any, format?: string): boolean {
+export const isValidDate = function (sDate: any, format?: IMomentFormat): boolean {
+  /**
+   * If the input is a boolean, it's not a valid date.
+   */
+  if (isBoolean(sDate)) return false;
+
+  /**
+   * If the input is already a Date object, it's a valid date.
+   */
+  if (isDateObj(sDate)) return true;
+
+  /**
+   * If the input is a non-empty string, try to parse it as a date.
+   */
+  if (isNotEmptyString(sDate)) {
     /**
-     * If the input is a boolean, it's not a valid date.
+     * If the date can be parsed successfully, it's a valid date.
      */
-    if (isBoolean(sDate)) return false;
-  
-    /**
-     * If the input is already a Date object, it's a valid date.
-     */
-    if (isDateObj(sDate)) return true;
-  
-    /**
-     * If the input is a non-empty string, try to parse it as a date.
-     */
-    if (isNotEmptyString(sDate)) {
-      /**
-       * If the date can be parsed successfully, it's a valid date.
-       */
-      return !!parseDate(sDate, format);
-    }
-  
-    /**
-     * If the input is a number that can be converted to a string, it's not a valid date.
-     */
-    if (sDate?.toString && sDate?.toString() == parseInt(sDate).toString()) return false;
-  
-    /**
-     * Try to create a new Date object from the input.
-     */
-    const tryDate = new Date(sDate);
-  
-    /**
-     * If the resulting Date object is valid, the input is a valid date.
-     */
-    return (isDateObj(tryDate));
+    return !!parseDate(sDate, format);
+  }
+
+  /**
+   * If the input is a number that can be converted to a string, it's not a valid date.
+   */
+  if (sDate?.toString && sDate?.toString() == parseInt(sDate).toString()) return false;
+
+  /**
+   * Try to create a new Date object from the input.
+   */
+  const tryDate = new Date(sDate);
+
+  /**
+   * If the resulting Date object is valid, the input is a valid date.
+   */
+  return (isDateObj(tryDate));
 }
 /**
  * Adds the specified number of days to the date object.
@@ -935,11 +936,11 @@ export const isValidDate = function (sDate: any, format?: string): boolean {
  * @param {Date|string} [date] The date object to add days to. If not provided, the current date is used.
  * @returns {Date} The updated date.
  */
-export function addDays(days: number, date?: any): Date{
-    /**
-     * Delegate to the addToDate function with the 'Date' set function.
-     */
-    return addToDate(days, date, 'Date');
+export function addDays(days: number, date?: any): Date {
+  /**
+   * Delegate to the addToDate function with the 'Date' set function.
+   */
+  return addToDate(days, date, 'Date');
 }
 
 
@@ -950,11 +951,11 @@ export function addDays(days: number, date?: any): Date{
  * @param {Date|string} [date] The date object to add months to. If not provided, the current date is used.
  * @returns {Date|string} The updated date, either as a Date object or a string in the specified format.
  */
-export function addMonths(months: number, date?: any, format?: string): Date {
-    /**
-     * Delegate to the addToDate function with the 'Month' set function.
-     */
-    return addToDate(months, date, 'Month');
+export function addMonths(months: number, date?: any, format?: IMomentFormat): Date {
+  /**
+   * Delegate to the addToDate function with the 'Month' set function.
+   */
+  return addToDate(months, date, 'Month');
 }
 
 /**
@@ -965,15 +966,15 @@ export function addMonths(months: number, date?: any, format?: string): Date {
  * @returns {Date|string} The updated date, either as a Date object or a string in the specified format.
  */
 export function addWeeks(weeks: number, date?: any): Date {
-    /**
-     * If the number of weeks is not a number, default to 0.
-     */
-    weeks = (!isNumber(weeks) ? 0 : weeks) * 7;
-  
-    /**
-     * Delegate to the addToDate function with the 'Date' set function.
-     */
-    return addToDate(weeks, date, 'Date');
+  /**
+   * If the number of weeks is not a number, default to 0.
+   */
+  weeks = (!isNumber(weeks) ? 0 : weeks) * 7;
+
+  /**
+   * Delegate to the addToDate function with the 'Date' set function.
+   */
+  return addToDate(weeks, date, 'Date');
 }
 
 /**
@@ -984,33 +985,33 @@ export function addWeeks(weeks: number, date?: any): Date {
  * @returns {Date} The updated date.
  */
 export function addYears(years: number, date?: any): Date {
-    /**
-     * If the number of years is not a number, default to 0.
-     */
-    if (!isNumber(years)) years = 0;
-  
-    /**
-     * Ensure the date is a valid Date object.
-     */
-    date = new Date(addDays(0, date));
-  
-    /**
-     * Get the current year of the date.
-     */
-    const year = date.getFullYear();
-  
-    /**
-     * Prevent the year from going below 0.
-     */
-    if ((year + years) < 0) years = 0;
-    else years += year;
-  
-    /**
-     * Set the new year of the date.
-     */
-    date = date.setFullYear(years);
-  
-    return new Date(date);
+  /**
+   * If the number of years is not a number, default to 0.
+   */
+  if (!isNumber(years)) years = 0;
+
+  /**
+   * Ensure the date is a valid Date object.
+   */
+  date = new Date(addDays(0, date));
+
+  /**
+   * Get the current year of the date.
+   */
+  const year = date.getFullYear();
+
+  /**
+   * Prevent the year from going below 0.
+   */
+  if ((year + years) < 0) years = 0;
+  else years += year;
+
+  /**
+   * Set the new year of the date.
+   */
+  date = date.setFullYear(years);
+
+  return new Date(date);
 }
 
 /**
@@ -1026,7 +1027,7 @@ export function addYears(years: number, date?: any): Date {
  * ```
  */
 Date.prototype.addYears = function (years: number) {
-    return addYears(years, this);
+  return addYears(years, this);
 }
 
 /**
@@ -1042,7 +1043,7 @@ Date.prototype.addYears = function (years: number) {
  * ```
  */
 Date.prototype.addMonths = function (months: number) {
-    return addMonths(months, this);
+  return addMonths(months, this);
 }
 
 /**
@@ -1058,7 +1059,7 @@ Date.prototype.addMonths = function (months: number) {
  * ```
  */
 Date.prototype.addMinutes = function (minutes: number) {
-    return addMinutes(minutes, this);
+  return addMinutes(minutes, this);
 }
 
 /**
@@ -1074,7 +1075,7 @@ Example:
  * ```
  */
 Date.prototype.addSeconds = function (seconds: number) {
-    return addSeconds(seconds, this);
+  return addSeconds(seconds, this);
 }
 
 /**
@@ -1090,7 +1091,7 @@ Date.prototype.addSeconds = function (seconds: number) {
  * ```
  */
 Date.prototype.addDays = function (days: number) {
-    return addDays(days, this);
+  return addDays(days, this);
 }
 
 /**
@@ -1106,7 +1107,7 @@ Date.prototype.addDays = function (days: number) {
  * ```
  */
 Date.prototype.addWeeks = function (weeks: number) {
-    return addWeeks(weeks, this);
+  return addWeeks(weeks, this);
 }
 
 /**
@@ -1122,7 +1123,7 @@ Date.prototype.addWeeks = function (weeks: number) {
  * ```
  */
 Date.prototype.addHours = function (hours: number) {
-    return addHours(hours, this);
+  return addHours(hours, this);
 }
 
 
@@ -1300,20 +1301,13 @@ export const currentWeekDaysLimits = (date?: any) => {
  * console.log(formatDate("2022-01-15", "YYYY-MM-DD")); // Output: Formatted date in YYYY-MM-DD format
  * ```
  */
-export const formatDate = (date?: any, format?: string): string => {
+export const formatDate = (date?: any, format?: IMomentFormat): string => {
   /**
    * Parse the input date using moment.
    * 
    * This allows us to handle various date formats and invalid dates.
    */
-  const parsedDate = isDateObj(date)? date : moment(date);
-
-  /**
-   * Set the default format if not provided.
-   * 
-   * This ensures that the function returns a consistent result for missing formats.
-   */
-  format = defaultStr(format, DEFAULT_DATE_TIME_FORMAT);
+  const parsedDate = isDateObj(date) ? date : moment(date);
 
   /**
    * Check if the parsed date is valid.
@@ -1326,7 +1320,7 @@ export const formatDate = (date?: any, format?: string): string => {
      * 
      * This returns the formatted date string.
      */
-    return parsedDate.format(format);
+    return parsedDate.format((defaultStr(format, DEFAULT_DATE_TIME_FORMAT) as unknown) as IMomentFormat);
   } else {
     /**
      * Return the original date string if it's a valid date, otherwise return an empty string.
@@ -1349,6 +1343,6 @@ export const formatDate = (date?: any, format?: string): string => {
  * console.log(date.toFormat("YYYY-MM-DD HH:mm:ss")); // Output: Formatted date string
  * ```
  */
-Date.prototype.toFormat = function (format: string) {
-    return formatDate(this, format);
+Date.prototype.toFormat = function (format: IMomentFormat) {
+  return formatDate(this, format);
 }

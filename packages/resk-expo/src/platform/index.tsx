@@ -1,1 +1,1 @@
-export * from "@resk/core"
+export const t111 = {};

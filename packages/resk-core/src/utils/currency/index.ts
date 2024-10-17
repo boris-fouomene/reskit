@@ -4,7 +4,7 @@ import defaultStr from "../defaultStr";
 import isNotEmptyString from "../isNotEmptyString"
 import { getCurrency } from "./session";
 
-const isObj = (x:any) => x && typeof x =='object';
+const isObj = (x: any) => x && typeof x == 'object';
 
 
 /**
@@ -19,34 +19,34 @@ export function prepareOptions(options?: ICurrency): ICurrency {
 	 * Create a new ICurrency object with default values.
 	 */
 	const object: ICurrency = Object.assign({}, getCurrency());
-  
+
 	/**
 	 * If options are provided, merge them with the default object.
 	 */
 	if (options && isObj(options)) {
-	  /**
-	   * Iterate over the options object and assign its properties to the default object.
-	   */
-	  for (let i in options) {
-		if (options.hasOwnProperty(i) && options[i as keyof ICurrency] !== undefined) {
-		  (object as { [key: string]: any })[i] = options[i as keyof ICurrency];
+		/**
+		 * Iterate over the options object and assign its properties to the default object.
+		 */
+		for (let i in options) {
+			if (options.hasOwnProperty(i) && options[i as keyof ICurrency] !== undefined) {
+				(object as { [key: string]: any })[i] = options[i as keyof ICurrency];
+			}
 		}
-	  }
 	}
-  
+
 	/**
 	 * If the format property is a non-empty string, parse it to extract decimal digits and format.
 	 */
 	if (isNotEmptyString(object.format)) {
-	  const p = parseFormat(object.format);
-	  if (p.format) {
-		object.format = p.format;
-	  }
-	  if (typeof p.decimalDigits === "number") {
-		object.decimalDigits = p.decimalDigits;
-	  }
+		const p = parseFormat(object.format);
+		if (p.format) {
+			object.format = p.format;
+		}
+		if (typeof p.decimalDigits === "number") {
+			object.decimalDigits = p.decimalDigits;
+		}
 	}
-  
+
 	/**
 	 * Return the merged ICurrency object with default values.
 	 */
@@ -61,13 +61,13 @@ export function prepareOptions(options?: ICurrency): ICurrency {
  * @returns The normalized value of decimalDigits.
  */
 function checkPrecision(val?: number, base?: number): number {
-	val = typeof val =="number"? val : 0;
-	base = typeof base =="number"? base : 0;
+	val = typeof val == "number" ? val : 0;
+	base = typeof base == "number" ? base : 0;
 	/**
 	 * Ensure the value is a positive integer by taking the absolute value and rounding it.
 	 */
 	val = Math.round(Math.abs(val as number));
-  
+
 	/**
 	 * If the value is NaN, return the base value. Otherwise, return the normalized value.
 	 */
@@ -82,56 +82,56 @@ function checkPrecision(val?: number, base?: number): number {
  *   Either a string with the default (positive) format, or an object containing `pos` (required), `neg` and `zero` values (or a function returning either a string or object)
  * @returns {{ pos: string, neg: string, zero: string }} A format object containing positive, negative, and zero formats.
  */
-function checkCurrencyFormat(format: string | { pos: string, neg?: string, zero?: string } | (() => string | { pos: string, neg?: string, zero?: string })) : { pos: string, neg: string, zero: string } {
+function checkCurrencyFormat(format: string | { pos: string, neg?: string, zero?: string } | (() => string | { pos: string, neg?: string, zero?: string })): { pos: string, neg: string, zero: string } {
 	/**
 	 * Get the current currency settings.
 	 */
 	const setting = getCurrency();
-  
+
 	/**
 	 * Get the default format from the currency settings.
 	 */
 	const defaultFormat = (setting?.format as string).toLowerCase();
-  
+
 	/**
 	 * If the format is a string, convert it to lowercase.
 	 */
 	if (typeof format === "string") {
-	  format = format.toLowerCase();
+		format = format.toLowerCase();
 	}
-  
+
 	/**
 	 * If the format is not a string or does not contain "%v", use the default format.
 	 */
 	if (typeof format !== "string" || !format.match("%v")) {
-	  format = defaultFormat;
+		format = defaultFormat;
 	}
-  
+
 	/**
 	 * Create and return the positive, negative, and zero formats.
 	 */
 	return {
-	  /**
-	   * The positive format is the original format.
-	   */
-	  pos: format,
-  
-	  /**
-	   * The negative format is the original format with "-" removed and "-%v" inserted.
-	   */
-	  neg: format.replace("-", "").replace("%v", "-%v"),
-  
-	  /**
-	   * The zero format is the same as the positive format.
-	   */
-	  zero: format
+		/**
+		 * The positive format is the original format.
+		 */
+		pos: format,
+
+		/**
+		 * The negative format is the original format with "-" removed and "-%v" inserted.
+		 */
+		neg: format.replace("-", "").replace("%v", "-%v"),
+
+		/**
+		 * The zero format is the same as the positive format.
+		 */
+		zero: format
 	};
 }
 
 
 /**
  * Takes a string or array of strings, removes all formatting/cruft, and returns the raw float value.
-    The unformat function takes a formatted currency string and converts it back to a raw number. This is useful when you need to perform calculations on currency values that may have been stored or input as formatted strings.
+	The unformat function takes a formatted currency string and converts it back to a raw number. This is useful when you need to perform calculations on currency values that may have been stored or input as formatted strings.
  *
  * Alias: `accounting.parse(string)`
  *
@@ -152,39 +152,39 @@ export const unformat = (value: any, decimalSeparator?: string): number => {
 	 * Get the current currency settings.
 	 */
 	const settings = getCurrency();
-  
+
 	/**
 	 * Fails silently (need decent errors): if value is null or undefined, set it to 0.
 	 */
 	value = value || 0;
-  
+
 	/**
 	 * Return the value as-is if it's already a number.
 	 */
 	if (typeof value === "number") {
-	  return value;
+		return value;
 	}
-  
+
 	/**
 	 * Default decimalSeparator point comes from settings, but could be set to eg. "," in opts.
 	 */
 	decimalSeparator = decimalSeparator || settings.decimalSeparator;
-  
+
 	/**
 	 * Build regex to strip out everything except digits, decimalSeparator point, and minus sign.
 	 */
 	const regex = new RegExp("[^0-9-" + decimalSeparator + "]", "g");
-  
+
 	/**
 	 * Unformat the value by replacing bracketed values with negatives, stripping out cruft, and making sure decimalSeparator point is standard.
 	 */
 	const unformatted = parseFloat(
-	  ("" + value)
-		.replace(/\((?=\d+)(.*)\)/, "-$1") // replace bracketed values with negatives
-		.replace(regex, '') // strip out any cruft
-		.replace(decimalSeparator as string, '.') // make sure decimalSeparator point is standard
+		("" + value)
+			.replace(/\((?=\d+)(.*)\)/, "-$1") // replace bracketed values with negatives
+			.replace(regex, '') // strip out any cruft
+			.replace(decimalSeparator as string, '.') // make sure decimalSeparator point is standard
 	);
-  
+
 	/**
 	 * This will fail silently which may cause trouble, let's wait and see: return 0 if unformatted is NaN.
 	 */
@@ -208,27 +208,27 @@ export const toFixed: (value: number, decimalDigits?: number) => string = (value
 	 * Get the current currency settings.
 	 */
 	const settings = getCurrency();
-  
+
 	/**
 	 * Check and set the decimal digits to use (defaults to accounting.settings.decimalDigits).
 	 */
 	decimalDigits = checkPrecision(decimalDigits, settings.decimalDigits);
-  
+
 	/**
 	 * Convert the value to an exponential form with the specified decimal digits.
 	 */
 	const exponentialForm = Number(unformat(value) + 'e' + decimalDigits);
-  
+
 	/**
 	 * Round the exponential form to the nearest integer.
 	 */
 	const rounded = Math.round(exponentialForm);
-  
+
 	/**
 	 * Convert the rounded exponential form back to a decimal form with the specified decimal digits.
 	 */
 	const finalResult = Number(rounded + 'e-' + decimalDigits).toFixed(decimalDigits);
-  
+
 	/**
 	 * Return the formatted number as a string.
 	 */
@@ -256,54 +256,54 @@ export const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency |
 	 * Clean up the number by removing any formatting.
 	 */
 	number = unformat(number);
-  
+
 	/**
 	 * Prepare the options object from the second parameter (if an object) or all parameters, extending default options.
 	 */
 	const toPrepare: ICurrency = (isValidCurrency(optionsOrDecimalDigits) ? optionsOrDecimalDigits : {}) as ICurrency;
 	if (typeof optionsOrDecimalDigits === 'number') {
-	  toPrepare.decimalDigits = optionsOrDecimalDigits;
+		toPrepare.decimalDigits = optionsOrDecimalDigits;
 	}
 	if (thousandSeparator === undefined) {
-	  toPrepare.thousandSeparator = thousandSeparator;
+		toPrepare.thousandSeparator = thousandSeparator;
 	}
 	if (decimalSeparator === undefined) {
-	  toPrepare.decimalSeparator = decimalSeparator;
+		toPrepare.decimalSeparator = decimalSeparator;
 	}
-  
+
 	/**
 	 * Build the options object.
 	 */
 	const opts = prepareOptions(toPrepare);
-  
+
 	/**
 	 * Clean up the decimal digits.
 	 */
 	const usePrecision = checkPrecision(opts.decimalDigits);
-  
+
 	/**
 	 * Perform some calculations.
 	 */
 	const negative = number < 0 ? "-" : "";
 	const base = parseInt(toFixed(Math.abs(number || 0), usePrecision), 10) + "";
 	const mod = base.length > 3 ? base.length % 3 : 0;
-  
+
 	/**
 	 * Format the decimal part of the number.
 	 */
 	let decimalStr = "";
 	if (usePrecision) {
-	  const fNum = String(parseFloat(toFixed(Math.abs(number), usePrecision)) || 0);
-	  if (fNum.includes(".")) {
-		decimalStr = defaultStr(fNum.split(".")[1]).trim();
-	  }
+		const fNum = String(parseFloat(toFixed(Math.abs(number), usePrecision)) || 0);
+		if (fNum.includes(".")) {
+			decimalStr = defaultStr(fNum.split(".")[1]).trim();
+		}
 	}
-  
+
 	/**
 	 * Format the number.
 	 */
 	return negative + (mod ? base.substr(0, mod) + opts.thousandSeparator : "") + base.substr(mod).replace(/(\d{3})(?=\d)/g, "$1" + opts.thousandSeparator) + (usePrecision && decimalStr ? (opts.decimalSeparator + decimalStr) : "");
-  };
+};
 
 
 
@@ -333,65 +333,65 @@ export const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency |
 *   result: string,
 * }}
 */
-export const formatMoneyAsObject = (number?: number, symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string): ICurrency & {formattedValue: string,formattedNumber: string,usedFormat: string,result: string,} => {
- /**
-  * Clean up the number by removing any formatting.
-  */
- number = unformat(number);
+export const formatMoneyAsObject = (number?: number, symbol?: ICurrency | string, decimalDigits?: number, thousandSeparator?: string, decimalSeparator?: string, format?: string): ICurrency & { formattedValue: string, formattedNumber: string, usedFormat: string, result: string, } => {
+	/**
+	 * Clean up the number by removing any formatting.
+	 */
+	number = unformat(number);
 
- /**
-  * Prepare the options object from the second parameter (if an object) or all parameters, extending default options.
-  */
- const toPrepare: ICurrency = isValidCurrency(symbol) ? symbol as ICurrency : {} as ICurrency;
- if (symbol !== undefined && typeof symbol === 'string') {
-   toPrepare.symbol = symbol;
- }
- if (decimalDigits !== undefined) {
-   toPrepare.decimalDigits = decimalDigits;
- }
- if (thousandSeparator !== undefined) {
-   toPrepare.thousandSeparator = thousandSeparator;
- }
- if (decimalSeparator !== undefined) {
-   toPrepare.decimalSeparator = decimalSeparator;
- }
- if (format !== undefined) {
-   toPrepare.format = format;
- }
+	/**
+	 * Prepare the options object from the second parameter (if an object) or all parameters, extending default options.
+	 */
+	const toPrepare: ICurrency = isValidCurrency(symbol) ? symbol as ICurrency : {} as ICurrency;
+	if (symbol !== undefined && typeof symbol === 'string') {
+		toPrepare.symbol = symbol;
+	}
+	if (decimalDigits !== undefined) {
+		toPrepare.decimalDigits = decimalDigits;
+	}
+	if (thousandSeparator !== undefined) {
+		toPrepare.thousandSeparator = thousandSeparator;
+	}
+	if (decimalSeparator !== undefined) {
+		toPrepare.decimalSeparator = decimalSeparator;
+	}
+	if (format !== undefined) {
+		toPrepare.format = format;
+	}
 
- /**
-  * Build the options object.
-  */
- const opts = prepareOptions(toPrepare);
+	/**
+	 * Build the options object.
+	 */
+	const opts = prepareOptions(toPrepare);
 
- /**
-  * Check the format (returns an object with pos, neg, and zero).
-  */
- const formats = checkCurrencyFormat(opts.format as string);
+	/**
+	 * Check the format (returns an object with pos, neg, and zero).
+	 */
+	const formats = checkCurrencyFormat(opts.format as string);
 
- /**
-  * Choose which format to use for this value.
-  */
- const usedFormat = defaultStr(number > 0 ? formats.pos : number < 0 ? formats.neg : formats.zero);
+	/**
+	 * Choose which format to use for this value.
+	 */
+	const usedFormat = defaultStr(number > 0 ? formats.pos : number < 0 ? formats.neg : formats.zero);
 
- /**
-  * Format the value.
-  */
- const formattedValue = usedFormat.replace('%s', opts.symbol);
- const formattedNumber = formatNumber(Math.abs(number), checkPrecision(opts.decimalDigits), opts.thousandSeparator, opts.decimalSeparator);
- const result = formattedValue.replace('%v', formattedNumber);
+	/**
+	 * Format the value.
+	 */
+	const formattedValue = usedFormat.replace('%s', opts.symbol);
+	const formattedNumber = formatNumber(Math.abs(number), checkPrecision(opts.decimalDigits), opts.thousandSeparator, opts.decimalSeparator);
+	const result = formattedValue.replace('%v', formattedNumber);
 
- /**
-  * Return the formatted value as an object.
-  */
- return {
-   ...opts,
-   formattedValue,
-   formattedNumber,
-   symbol: opts.symbol,
-   usedFormat,
-   result,
- };
+	/**
+	 * Return the formatted value as an object.
+	 */
+	return {
+		...opts,
+		formattedValue,
+		formattedNumber,
+		symbol: opts.symbol,
+		usedFormat,
+		result,
+	};
 };
 
 /**
@@ -439,47 +439,47 @@ export const parseFormat: (format?: string) => ICurrency = (format?: string): IC
 	 * Trim the format string.
 	 */
 	format = defaultStr(format).trim();
-  
+
 	/**
 	 * Initialize the return object.
 	 */
 	const ret: ICurrency = {} as ICurrency;
-  
+
 	/**
 	 * Check if the format string is not empty.
 	 */
 	if (format) {
-	  /**
-	   * Regular expression to match the decimal digits specification.
-	   */
-	  const reg = /(\.)(\#{0,9}\s*$)/;
-  
-	  /**
-	   * Match the decimal digits specification in the format string.
-	   */
-	  const m = format.match(reg);
-  
-	  /**
-	   * If a match is found, extract the decimal digits.
-	   */
-	  if (Array.isArray(m) && m.length === 3) {
 		/**
-		 * Extract the decimal digits from the match.
+		 * Regular expression to match the decimal digits specification.
 		 */
-		ret.decimalDigits = defaultStr(m[2]).trim().length;
-	  }
-  
-	  /**
-	   * Remove the decimal digits specification from the format string.
-	   */
-	  format = format.replace(reg, "");
+		const reg = /(\.)(\#{0,9}\s*$)/;
+
+		/**
+		 * Match the decimal digits specification in the format string.
+		 */
+		const m = format.match(reg);
+
+		/**
+		 * If a match is found, extract the decimal digits.
+		 */
+		if (Array.isArray(m) && m.length === 3) {
+			/**
+			 * Extract the decimal digits from the match.
+			 */
+			ret.decimalDigits = defaultStr(m[2]).trim().length;
+		}
+
+		/**
+		 * Remove the decimal digits specification from the format string.
+		 */
+		format = format.replace(reg, "");
 	}
-  
+
 	/**
 	 * Set the parsed format.
 	 */
 	ret.format = format;
-  
+
 	/**
 	 * Return the parsed format and decimal digits.
 	 */
@@ -506,23 +506,11 @@ export const formatDescription: string = `Display format for numerical values: a
 `;
 
 
-/**
- * Format a number in the Canadian dollar (CAD) format.
- *
- * @param {number} number The number to format.
- * @returns {string} The formatted number as a string.
- */
-export const formatCAD: (number: number) => string = (number: number): string => {
-	/**
-	 * Format the number using the formatMoney function with the CAD currency settings.
-	 */
-	return formatMoney(number, currencies.CAD);
-};
 
-export {currencies};
+export { currencies };
 
 export * from "./currencies";
 export * from "./session";
-export {default as session} from "./session";
+export { default as session } from "./session";
 
-export default {parse:unformat,formatMoney,formatNumber,formatMoneyAsObject,unformat,formatDescription,prepareOptions}
+export default { parse: unformat, formatMoney, formatNumber, formatMoneyAsObject, unformat, formatDescription, prepareOptions }

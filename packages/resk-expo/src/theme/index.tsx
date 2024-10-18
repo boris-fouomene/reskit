@@ -1,12 +1,11 @@
-import { IColorSheme, ITheme, IThemeColors } from "./types";
+import { IColorSheme, ITheme, IThemeTokens } from "./types";
 import Colors from "./colors";
-import { IDict } from "@resk/core";
+import { IDict, isObservable } from "@resk/core";
 import { packageName } from "@utils/index";
 import session from "../session";
 import { StatusBarProps } from "expo-status-bar";
 import Color from "color";
 import updateNative from "./updateNative";
-import ThemeEvents from "./events";
 import Grid from "./grid";
 
 /**
@@ -20,15 +19,17 @@ import Grid from "./grid";
 const UPDATE_THEME = "UPDATE_THEME";
 
 /**
- * Prepares a theme object by adding utility functions such as `getColor` and `getColorScheme`.
+ * create a theme object by adding utility functions such as `getColor` and `getColorScheme`.
  * 
- * The `prepareTheme` function extends the given `theme` object by adding useful methods 
+ * The `createTheme` function extends the given `theme` object by adding useful methods 
  * that simplify working with colors in the theme. It includes methods to retrieve colors 
  * and to generate color schemes based on the theme configuration.
  *
  * @example
  * ```ts
  * const theme = {
+ *   name : "MyTheme",
+ *   dark : false,
  *   colors: {
  *     primary: "#6200ea",
  *     onPrimary: "#ffffff",
@@ -38,25 +39,24 @@ const UPDATE_THEME = "UPDATE_THEME";
  *   },
  * };
  * 
- * const preparedTheme = prepareTheme(theme);
+ * const newTheme = createTheme(theme);
  * 
  * // Get a color directly from the theme or provide default fallbacks.
- * const primaryColor = preparedTheme.getColor("primary"); // "#6200ea"
- * const unknownColor = preparedTheme.getColor("unknown", "secondary", "#ff0000"); // "#03dac6"
- * const fallbackColor = preparedTheme.getColor("invalidColor", "#ff0000"); // "#ff0000"
+ * const primaryColor = newTheme.getColor("primary"); // "#6200ea"
+ * const unknownColor = newTheme.getColor("unknown", "secondary", "#ff0000"); // "#03dac6"
+ * const fallbackColor = newTheme.getColor("invalidColor", "#ff0000"); // "#ff0000"
  * 
  * // Get a color scheme based on a theme color.
- * const primaryScheme = preparedTheme.getColorScheme("primary");
+ * const primaryScheme = newTheme.getColorScheme("primary");
  * // Result: { color: "#ffffff", backgroundColor: "#6200ea" }
  * ```
  *
  * @param {ITheme} theme - The base theme object that contains color definitions.
  * @returns {ITheme} - The theme object extended with utility methods.
  */
-export function prepareTheme(theme: ITheme): ITheme {
+export function createTheme(theme: ITheme): ICreatedTheme {
     return {
         ...Object.assign({}, theme),
-
         /**
          * Retrieves the color associated with the given color key or value.
          *
@@ -66,26 +66,23 @@ export function prepareTheme(theme: ITheme): ITheme {
          *
          * @example
          * ```ts
-         * const primaryColor = preparedTheme.getColor("primary"); // "#6200ea"
-         * const fallbackColor = preparedTheme.getColor("invalidColor", "#ff0000"); // "#ff0000"
-         * const secondaryOrDefault = preparedTheme.getColor("unknown", "secondary", "#ff0000"); // "#03dac6"
+         * const primaryColor = newTheme.getColor("primary"); // "#6200ea"
+         * const fallbackColor = newTheme.getColor("invalidColor", "#ff0000"); // "#ff0000"
+         * const secondaryOrDefault = newTheme.getColor("unknown", "secondary", "#ff0000"); // "#03dac6"
          * ```
          * 
          * @param {string} [color] - The color key or color value to retrieve.
          * @param {...string[]} [defaultColors] - Fallback color values if the provided color is invalid.
          * @returns {string | undefined} - The resolved color value or undefined if none is found.
          */
-        getColor(
-            color?: string | keyof IThemeColors,
-            ...defaultColors: any[]
-        ): string | undefined {
+        getColor(color?: keyof IThemeTokens, ...defaultColors: any[]): string | undefined {
             if (color && color in this.colors) {
                 return this.colors[color as keyof typeof this.colors] as string;
             }
             if (Colors.isValid(color)) return color as string;
             for (let i in defaultColors) {
                 if (typeof defaultColors[i] === "string") {
-                    const col = this.getColor(defaultColors[i] as string);
+                    const col = this.getColor(defaultColors[i] as keyof IThemeTokens);
                     if (col) return col as string;
                 }
             }
@@ -101,17 +98,17 @@ export function prepareTheme(theme: ITheme): ITheme {
          *
          * @example
          * ```ts
-         * const scheme = preparedTheme.getColorScheme("primary");
+         * const scheme = newTheme.getColorScheme("primary");
          * // Returns: { color: "#ffffff", backgroundColor: "#6200ea" }
          * 
-         * const onSurfaceScheme = preparedTheme.getColorScheme("onSurface");
+         * const onSurfaceScheme = newTheme.getColorScheme("onSurface");
          * // Returns: { color: "#000000", backgroundColor: "#f5f5f5" }
          * ```
          * 
-         * @param {keyof IThemeColors} [colorSheme] - The color key to generate a scheme for.
+         * @param {keyof IThemeTokens} [colorSheme] - The color key to generate a scheme for.
          * @returns {IColorSheme} - An object containing `color` and `backgroundColor` properties.
          */
-        getColorScheme(colorSheme?: keyof IThemeColors): IColorSheme {
+        getColorScheme(colorSheme?: keyof IThemeTokens): IColorSheme {
             if (
                 !colorSheme ||
                 typeof colorSheme != "string" ||
@@ -139,6 +136,12 @@ export function prepareTheme(theme: ITheme): ITheme {
             }
             return result;
         },
+        get grid() {
+            return Grid;
+        },
+        get addEventListener() {
+            return addEventListener;
+        }
     };
 }
 
@@ -147,18 +150,18 @@ const white = "white", black = "black";
  * Default dark theme configuration for the application.
  * 
  * This theme is used to define color schemes for dark mode. It contains properties like `background`, 
- * `surface`, and `primary` which are specific to dark themes. The `prepareTheme` function is used to 
+ * `surface`, and `primary` which are specific to dark themes. The `createTheme` function is used to 
  * enhance the theme with useful methods such as `getColor` and `getColorScheme`.
  * 
  * @example
  * ```ts
- * import { defaultDarkTheme } from './themes';
+ * import { DefaultDarkTheme } from './themes';
  * 
- * const backgroundColor = defaultDarkTheme.colors.background; // "#111b21"
- * const primaryColor = defaultDarkTheme.getColor("primary"); // "#5EBA6A"
+ * const backgroundColor = DefaultDarkTheme.colors.background; // "#111b21"
+ * const primaryColor = DefaultDarkTheme.getColor("primary"); // "#5EBA6A"
  * ```
  */
-export const defaultDarkTheme: ITheme = prepareTheme({
+export const DefaultDarkTheme: ITheme = createTheme({
     name: `${packageName}-dark`,
     dark: true,
     colors: {
@@ -169,30 +172,27 @@ export const defaultDarkTheme: ITheme = prepareTheme({
         backdrop: Colors.setAlpha(black, 0.5), // Backdrop overlay with semi-transparent black
         divider: Colors.setAlpha(white, 0.18), // Divider color between elements
         primary: "#5EBA6A", // Main action color for dark mode (used in buttons, etc.)
-        primaryLight: "#D3F0D9", // Lighter shade of the primary color
-        surfaceDown: "#1E282E", // Color for lower surfaces or layers
-        surfaceTop: "#202c33", // Color for the top surfaces
         success: "#5EBA6A", // Success message color
         warning: "#FFB547" // Warning message color
     },
-} as unknown as ITheme);
+});
 
 /***
  * Default light theme configuration for the application.
  * 
  * This theme is used to define color schemes for light mode. It contains properties like `background`, 
- * `surface`, and `primary` which are specific to light themes. The `prepareTheme` function is used to 
+ * `surface`, and `primary` which are specific to light themes. The `createTheme` function is used to 
  * enhance the theme with useful methods such as `getColor` and `getColorScheme`.
  * 
  * @example
  * ```ts
- * import { defaultLightTheme } from './themes';
+ * import { DefaultLightTheme } from './themes';
  * 
- * const backgroundColor = defaultLightTheme.colors.background; // "#F0F0F0"
- * const primaryColor = defaultLightTheme.getColor("primary"); // "#5EBA6A"
+ * const backgroundColor = DefaultLightTheme.colors.background; // "#F0F0F0"
+ * const primaryColor = DefaultLightTheme.getColor("primary"); // "#5EBA6A"
  * ```
  */
-export const defaultLightTheme: ITheme = prepareTheme({
+export const DefaultLightTheme: ITheme = createTheme({
     name: `${packageName}-light`,
     colors: {
         background: "#F0F0F0", // Light background color for the app
@@ -207,10 +207,6 @@ export const defaultLightTheme: ITheme = prepareTheme({
         neutral: "#606A71", // Neutral text color
         text: "black", // Main text color for light mode
         primary: "#5EBA6A", // Main action color for light mode
-        primaryLight: "#D3F0D9", // Lighter shade of the primary color
-        active: "#afddb5", // Color for active elements
-        surfaceDown: "#ebebeb", // Color for lower surfaces or layers
-        surfaceTop: "#d5d5d5", // Color for the top surfaces
     },
 } as unknown as ITheme);
 
@@ -237,7 +233,7 @@ export const getDefaultTheme = (): ITheme => {
     const themeName = session.get("theme");
 
     // Determines the active theme based on the saved theme name
-    const theme = themeName === defaultLightTheme.name ? defaultLightTheme : (defaultDarkTheme as ITheme);
+    const theme = themeName === DefaultLightTheme.name ? DefaultLightTheme : (DefaultDarkTheme as ITheme);
 
     // Ensures essential color properties are defined based on whether the theme is dark or light
     theme.colors.onSuccess = theme.colors.onSuccess || (theme.dark ? "black" : "white");
@@ -258,8 +254,8 @@ export const getDefaultTheme = (): ITheme => {
  * console.log(themeRef.current.name); // Logs the name of the current theme
  * ```
  */
-const themeRef: { current: ITheme } = {
-    current: getDefaultTheme(),
+const themeRef: { current: ICreatedTheme } = {
+    current: createTheme(getDefaultTheme()),
 };
 
 /**
@@ -286,13 +282,14 @@ export function updateTheme(theme: ITheme, trigger: boolean = true): ITheme {
     session.set("theme", theme.name);
 
     // Update the theme reference
-    themeRef.current = theme;
+    themeRef.current = createTheme(theme);
 
     // Apply the theme to native elements (like the status bar)
     updateNative(theme);
+
     // Optionally trigger a global theme update event
-    if (trigger) {
-        ThemeEvents.trigger(UPDATE_THEME, theme);
+    if (trigger && events.trigger) {
+        events.trigger(UPDATE_THEME, theme);
     }
     return theme;
 }
@@ -332,32 +329,42 @@ export const getStatusBarProps = (): StatusBarProps => {
     return statusBarStyle;
 };
 
-/****
- * Ajoute un évènement qui écoute les changements ou mises à jour du thème.
+/**
+ * Adds an event listener to track theme changes or updates.
  * 
- * Cette utilité permet d'écouter les mises à jour du thème pour les composants React non fonctionnels, 
- * comme les composants de classe, ou pour toute autre partie du code qui nécessite de réagir aux changements de thème.
+ * This utility allows you to listen to theme updates, particularly useful for non-functional React components, 
+ * such as class components, or any other part of the code that needs to react to theme changes.
  * 
- * @param {(theme: ITheme) => any} callstack - Une fonction de rappel qui sera exécutée à chaque mise à jour du thème.
- * La fonction recevra le nouveau thème comme paramètre.
+ * @param {(theme: ITheme) => any} callstack - A callback function that will be triggered every time the theme is updated. 
+ * The function receives the updated theme as its parameter.
  * 
- * @returns {{ remove: () => any }} - Un objet contenant une méthode `remove` qui permet de désactiver l'écouteur.
+ * @returns {{ remove: () => any }} - Returns an object containing a `remove` method. 
+ * The `remove` method can be used to stop listening to the theme updates when it is no longer needed.
  * 
  * @example
  * ```ts
- * const listener = addOnChangeListener((newTheme) => {
- *    console.log("Le thème a été mis à jour:", newTheme);
- *    // Mettre à jour l'UI ou effectuer une action spécifique ici
+ * const listener = addEventListener((newTheme) => {
+ *    console.log("The theme has been updated:", newTheme);
+ *    // Update the UI or perform a specific action here
  * });
  * 
- * // Pour supprimer l'écouteur quand il n'est plus nécessaire
+ * // To remove the listener when it's no longer needed
  * listener.remove();
  * ```
+ * 
+ * @remarks
+ * Ensure that the `callstack` is a function that handles the updated theme properly.
+ * The `remove` method is particularly useful when you want to avoid memory leaks or unnecessary event listeners.
+ * 
+ * @note
+ * This function depends on the `events` object, which needs to be observable. 
+ * If `events` is not observable, the function will make it so internally using the `observable` function.
  */
-export const addOnThemeChangeListener = (
-    callstack: (theme: ITheme) => any
-): { remove: () => any } => {
-    return ThemeEvents.on(UPDATE_THEME, callstack);
+const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => any } => {
+    if (!isObservable(events)) {
+        observable(events);
+    }
+    return events.on(UPDATE_THEME, callstack);
 };
 
 /**
@@ -369,9 +376,8 @@ export const addOnThemeChangeListener = (
  * @type {ITheme}
  * @returns {ITheme & { grid: typeof Grid } } The current theme object.
  */
-const defaultExport: ITheme = {
+export default {
     ...themeRef.current, // Spread the properties of the current theme
-
     get dark() {
         return themeRef.current.dark; // Check if the theme is dark
     },
@@ -381,11 +387,116 @@ const defaultExport: ITheme = {
     get colors() {
         return themeRef.current.colors; // Access the color palette
     },
-    get grid() {
-        return Grid;
-    }
-} as unknown as ITheme;
+};
 
-export default defaultExport;
+import { IObservable, isObj, observable } from "@resk/core";
 
-export * from "./types";
+
+const events: IObservable = {} as IObservable;
+if (!isObservable(events)) {
+    observable(events);
+}
+
+
+/***
+ * @interface ICreatedTheme
+ * 
+ * This is the result obtained by calling createTheme on an `ITheme`
+ * 
+ * @method getColor
+ * @description Retrieves a specific color from the theme based on the color key.
+ * @param {string | keyof IThemeTokens} [color] - The key of the color to retrieve (e.g., "primary", "warning").
+ * @param {...any[]} defaultColors - Default colors to return if the requested color is not found.
+ * @returns {string | undefined} The color string if found, otherwise one of the default colors.
+ * 
+ * @method getColorScheme
+ * @description Retrieves a color scheme with `color` and `backgroundColor` based on the provided color scheme key.
+ * @param {keyof IThemeTokens} [colorSheme] - The key of the color scheme to retrieve (e.g., "primary", "error").
+ * @returns {IColorSheme} An object containing `color` and `backgroundColor` properties.
+ * 
+ * @example 
+ * const theme: ICreatedTheme = createTheme({
+ *    name: "DarkTheme",
+ *    dark: true,
+ *    colors: {
+ *      primary: "#6200EE",
+ *      onPrimary: "#FFFFFF",
+ *      error: "#B00020",
+ *      onError: "#FFFFFF"
+ *    )
+ * });
+ * const primaryColorScheme = theme.getColorScheme("primary"); // { color: "#FFFFFF", backgroundColor: "#6200EE" }
+ * const primaryColor = theme.getColor("primary", "#000000"); // "#6200EE"
+ * const errorScheme = theme.getColorScheme("error"); // { color: "#B00020", backgroundColor: "#FFFFFF" }
+ * 
+* @method addEventListener
+* Adds an event listener to track theme changes or updates.
+* 
+* This utility allows you to listen to theme updates, particularly useful for non-functional React components, 
+* such as class components, or any other part of the code that needs to react to theme changes.
+* 
+* @param {(theme: ITheme) => any} callstack - A callback function that will be triggered every time the theme is updated. 
+* The function receives the updated theme as its parameter.
+* 
+* @returns {{ remove: () => any }} - Returns an object containing a `remove` method. 
+* The `remove` method can be used to stop listening to the theme updates when it is no longer needed.
+* 
+* @example
+* ```ts
+* const listener = addEventListener((newTheme) => {
+*    console.log("The theme has been updated:", newTheme);
+*    // Update the UI or perform a specific action here
+* });
+* 
+* // To remove the listener when it's no longer needed
+* listener.remove();
+* ```
+* 
+* @remarks
+* Ensure that the `callstack` is a function that handles the updated theme properly.
+* The `remove` method is particularly useful when you want to avoid memory leaks or unnecessary event listeners.
+* 
+* @note
+* This function depends on the `events` object, which needs to be observable. 
+* If `events` is not observable, the function will make it so internally using the `observable` function.
+ * ```
+ */
+export interface ICreatedTheme extends ITheme {
+    colors: IThemeTokens;
+    getColor(color?: keyof IThemeTokens, ...defaultColors: any[]): string | undefined;
+    getColorScheme(colorSheme?: keyof IThemeTokens): IColorSheme
+    grid: typeof Grid;
+    /**
+     * @method addEventListener
+     * Adds an event listener to track theme changes or updates.
+     * 
+     * This utility allows you to listen to theme updates, particularly useful for non-functional React components, 
+     * such as class components, or any other part of the code that needs to react to theme changes.
+     * 
+     * @param {(theme: ITheme) => any} callstack - A callback function that will be triggered every time the theme is updated. 
+     * The function receives the updated theme as its parameter.
+     * 
+     * @returns {{ remove: () => any }} - Returns an object containing a `remove` method. 
+     * The `remove` method can be used to stop listening to the theme updates when it is no longer needed.
+     * 
+     * @example
+     * ```ts
+     * const listener = addEventListener((newTheme) => {
+     *    console.log("The theme has been updated:", newTheme);
+     *    // Update the UI or perform a specific action here
+     * });
+     * 
+     * // To remove the listener when it's no longer needed
+     * listener.remove();
+     * ```
+     * 
+     * @remarks
+     * Ensure that the `callstack` is a function that handles the updated theme properly.
+     * The `remove` method is particularly useful when you want to avoid memory leaks or unnecessary event listeners.
+     * 
+     * @note
+     * This function depends on the `events` object, which needs to be observable. 
+     * If `events` is not observable, the function will make it so internally using the `observable` function.
+     */
+    addEventListener: (callstack: (theme: ITheme) => any) => { remove: () => any };
+};

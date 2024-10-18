@@ -1,12 +1,21 @@
-import { Material3Scheme } from '@pchmn/expo-material3-theme';
+import grid from "./grid";
 
 /**
- * @interface IThemeColors
- * Represents the colors available in a theme, extending the default `Material3Scheme`.
+ * @interface IThemeTokens
+ * Represents the default tokens available in a theme. You can extends this interface to add custom tokens.
  * 
  * This includes optional custom colors for various application states like warnings, success, info, etc.
  * 
- * @typedef {Object} IThemeColors
+ * @typedef {Object} IThemeTokens
+ * @property {string} [text] - The color applied on text elements
+ * @property {string} [primary] - The primary color of the application
+ * @property {string} [onPrimary] - The color applied on top of the primary background (e.g., text or icons).
+ * @property {string} [secondary] - The secondary color of the application.
+ * @property {string} [onSecondary] - The color applied on top of the secondary background.
+ * @property {string} [surface] - The color of surface component
+ * @property {string} [onSurface] - The color applied on top of the surface component
+ * @property {string} [background] - The application background color.
+ * @property {string} [onBackground] - The color applied on top of the background.
  * @property {string} [warning] - The color used for warnings.
  * @property {string} [onWarning] - The color applied on top of the warning background (e.g., text or icons).
  * @property {string} [statusBar] - The color of the status bar.
@@ -16,10 +25,14 @@ import { Material3Scheme } from '@pchmn/expo-material3-theme';
  * @property {string} [onSuccess] - The color applied on top of the success background.
  * @property {string} [error] - The color used for error states.
  * @property {string} [onError] - The color applied on top of the error background.
+ * @property {string} [placeholder] - The color used for placeholders.
+ * @property {string} [divider] - The color used for dividers.  
+ * @property {string} [backdrop] - The color used for modal's backdrop.
+ * @property {string} [disabled] - The color used for disabled elements.
  * 
  * @example
  * ```ts
- * const themeColors: IThemeColors = {
+ * const themeColors: IThemeTokens = {
  *    primary: "#6200EE",
  *    onPrimary: "#FFFFFF",
  *    warning: "#FFA726",
@@ -28,17 +41,29 @@ import { Material3Scheme } from '@pchmn/expo-material3-theme';
  * };
  * ```
  */
-export type IThemeColors = Material3Scheme & {
+export interface IThemeTokens {
     text?: string;
+    primary?: string;
+    onPrimary?: string;
+    secondary?: string;
+    onSecondary?: string;
+    surface?: string;
+    onSurface?: string;
+    background?: string;
+    onBackground?: string;
     warning?: string;
     onWarning?: string;
     statusBar?: string;
+    placeholder?: string;
+    divider?: string;
+    backdrop?: string;
     info?: string;
     onInfo?: string;
     success?: string;
     onSuccess?: string;
     error?: string;
     onError?: string;
+    disabled?: string;
 };
 
 /**
@@ -49,20 +74,10 @@ export type IThemeColors = Material3Scheme & {
  * 
  * @typedef {Object} ITheme
  * @property {string} [name] - The name of the theme.
- * @property {boolean | number} [dark] - Whether the theme is in dark mode (`true` for dark, `false` for light, or a number to indicate the intensity).
+ * @property {boolean | number} [dark] - Whether the theme is in dark mode (`true` for dark, `false` for light).
  * @property {string} [customCSS] - Custom CSS properties applied to the theme (mainly for web platforms).
- * @property {IThemeColors} colors - The set of colors associated with the theme.
+ * @property {IThemeTokens} colors - The set of colors associated with the theme.
  * 
- * @method getColor
- * @description Retrieves a specific color from the theme based on the color key.
- * @param {string | keyof IThemeColors} [color] - The key of the color to retrieve (e.g., "primary", "warning").
- * @param {...any[]} defaultColors - Default colors to return if the requested color is not found.
- * @returns {string | undefined} The color string if found, otherwise one of the default colors.
- * 
- * @method getColorScheme
- * @description Retrieves a color scheme with `color` and `backgroundColor` based on the provided color scheme key.
- * @param {keyof IThemeColors} [colorSheme] - The key of the color scheme to retrieve (e.g., "primary", "error").
- * @returns {IColorSheme} An object containing `color` and `backgroundColor` properties.
  * 
  * @example
  * ```ts
@@ -74,27 +89,15 @@ export type IThemeColors = Material3Scheme & {
  *      onPrimary: "#FFFFFF",
  *      error: "#B00020",
  *      onError: "#FFFFFF"
- *    },
- *    getColor: (color, ...defaultColors) => {
- *      return theme.colors[color] || defaultColors[0];
- *    },
- *    getColorScheme: (colorScheme) => ({
- *      color: theme.colors[colorScheme],
- *      backgroundColor: theme.colors.onPrimary,
- *    })
+ *    }
  * };
- * 
- * const primaryColor = theme.getColor("primary", "#000000"); // "#6200EE"
- * const errorScheme = theme.getColorScheme("error"); // { color: "#B00020", backgroundColor: "#FFFFFF" }
  * ```
  */
-export type ITheme = {
+export interface ITheme {
     name?: string;
-    dark?: boolean | number;
+    dark?: boolean;
     customCSS?: string;
-    colors: IThemeColors;
-    getColor(color?: string | keyof IThemeColors, ...defaultColors: any[]): string | undefined;
-    getColorScheme(colorSheme?: keyof IThemeColors): { color?: string, backgroundColor?: string }
+    colors: IThemeTokens;
 }
 
 /**

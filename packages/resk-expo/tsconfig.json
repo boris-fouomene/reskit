@@ -30,6 +30,12 @@
       "@theme": [
         "src/theme"
       ],
+      "@platform/*": [
+        "src/platform/*"
+      ],
+      "@platform": [
+        "src/platform"
+      ],
       "@hooks/*": [
         "./src/hooks/*"
       ],

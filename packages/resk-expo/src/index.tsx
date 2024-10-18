@@ -1,3 +1,10 @@
 export * from "./context";
-
-import Theme from "./theme";
+export * from "./theme";
+export { default as Breakpoints } from "./breakpoints";
+export { default as Dimensions } from "./dimensions";
+export * from "./dimensions/types";
+export * from "./breakpoints/types";
+export * from "./theme/types";
+export { default as Colors } from "./theme/colors";
+export * from "./theme";
+export { default as Theme } from "./theme";

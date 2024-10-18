@@ -1,9 +1,4 @@
-// Copyright 2022 @fto-consult/Boris Fouomene. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-import { getCurrentMedia } from '../dimensions';
-import breakpoints from "../dimensions/breakpoints";
+import Breakpoints from "../breakpoints";
 import { Dimensions } from 'react-native';
 import { IStyle } from '../types';
 import { isObj, IDict } from '@resk/core';
@@ -31,13 +26,13 @@ function rowCol(width?: number) {
     const winWidth = Dimensions.get("window").width;
     const hasWidth = isNumber(width) && Math.abs((width as number) - winWidth) > 10 && (width as number) > MIN_WIDTH ? true : false;
     width = hasWidth ? width : winWidth;
-    let cMedia = breakpoints.current && breakpoints.current.name ? breakpoints.current.name : undefined;
+    let cMedia = Breakpoints.getCurrentMedia();
     let currentMedia: string = "lg";
     if (cMedia == "xl") cMedia = "lg";
     if (!hasWidth && cMedia && medias[cMedia]) {
         currentMedia = cMedia;
     } else {
-        currentMedia = (hasWidth || !cMedia ? getCurrentMedia(width) : cMedia) || "lg";
+        currentMedia = (hasWidth || !cMedia ? Breakpoints.getCurrentMedia(width) : cMedia) || "lg";
     }
     let gutter = medias[currentMedia as keyof typeof medias];
     if (!isNumber(gutter)) {

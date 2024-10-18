@@ -17,9 +17,10 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@emotion/native": "^11.11.0",
+    "@emotion/react": "^11.13.3",
     "@expo/metro-runtime": "~3.2.3",
     "@expo/vector-icons": "^14.0.2",
-    "@pchmn/expo-material3-theme": "^1.3.2",
     "@react-navigation/native": "^6.0.2",
     "@resk/core": "latest",
     "color": "^4.2.3",

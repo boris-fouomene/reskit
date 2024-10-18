@@ -1,16 +1,15 @@
-import { ScaledSize } from "react-native";
-
 /**
  * @interface IBreakpoints
- * Defines the breakpoints for responsive design.
- *
- * The `IBreakpoints` interface allows you to specify various breakpoints for 
+ * Represents a collection of defined breakpoints for various device sizes used for responsive design. 
+ * The IBreakpoints interface contains multiple IBreakpoint objects, each
+ * corresponding to a specific device size category (e.g., small phones,
+ * tablets, desktops). It allows you to specify various breakpoints for 
  * different screen sizes. These breakpoints can be used to apply styles conditionally 
  * based on the dimensions of the user's device. This is particularly useful in 
  * responsive web design to ensure your layout adapts to different screen sizes.
  * 
- * @property {IBreakpoint} [sp] - Defines the breakpoint for small phones.
- * @property {IBreakpoint} [mp] - Defines the breakpoint for medium phones.
+ * @property {IBreakpoint} [sp] - Defines the breakpoint for small phones. (e.g., up to 320px)..
+ * @property {IBreakpoint} [mp] - Defines the breakpoint for medium phones.  (e.g., 321px to 480px)
  * @property {IBreakpoint} [xs] - Defines the breakpoint for extra small devices (landscape phones, 576px and up).
  * @property {IBreakpoint} [sm] - Defines the breakpoint for small devices (tablets, 768px and up).
  * @property {IBreakpoint} [md] - Defines the breakpoint for medium devices (laptops, 1024px and up).
@@ -57,6 +56,8 @@ export interface IBreakpoints {
  *
  * The `IBreakpoint` interface defines the properties of a responsive design breakpoint, 
  * including its minimum and maximum width, an optional name, and a descriptive label. 
+ * It defines the limits of screen sizes at which specific styles
+ * can be applied, allowing for tailored layouts across different devices.
  * These breakpoints are essential in creating media queries or adapting UI components 
  * based on different screen sizes.
  * 
@@ -171,3 +172,53 @@ export interface INormalizedBreakpoints {
      */
     current?: IBreakpoint | null;
 }
+
+/**
+ * @interface IMediaQueryTemplate
+ * Template for CSS media query strings.
+ * 
+ * This type represents the various formats of media queries that can be generated 
+ * based on defined breakpoints. It allows for both minimum and maximum width 
+ * specifications to create flexible, responsive styles.
+ * 
+ * @type IMediaQueryTemplate
+ * @example
+ * const mobileMediaQuery: IMediaQueryTemplate = '@media (max-width: 320px)'; 
+ * const tabletMediaQuery: IMediaQueryTemplate = '@media (min-width: 768px) and (max-width: 1024px)';
+ */
+export type IMediaQueryTemplate = | `@media (min-width: ${number}px)`   // Media query for minimum width
+    | `@media (max-width: ${number}px)`   // Media query for maximum width
+    | `@media (min-width: ${number}px) and (max-width: ${number}px)` // Combined min and max
+    | `@media (max-width: ${number}px) and (min-width: ${number}px)` // Order doesn't matter
+    | `@media (min-width: ${number}px) and (min-width: ${number}px)` // Two minimum widths
+    | `@media (max-width: ${number}px) and (max-width: ${number}px)`; // Two maximum widths
+
+/**
+ * @interface IBreakpointsMediaQueries
+ * Represents global styles including breakpoints and corresponding media queries.
+ * 
+ * The IBreakpointsMediaQueries interface encapsulates the defined breakpoints along with the
+ * generated media queries. This structure makes it easy to manage responsive styles
+ * in a centralized manner.
+ * 
+ * @interface IBreakpointsMediaQueries
+ * @property {IBreakpoints} breakpoints - The defined breakpoints for responsive design.
+ * @property {Record<string, MediaQueryTemplate>} mediaQueries - The generated media queries
+ *                                                             for each breakpoint.
+ * 
+ * @example
+ * // Creating global styles using defined breakpoints
+ * const breakpoints: IBreakpoints = {
+ *   sp: { max: 320 },
+ *   md: { min: 1024 },
+ * };
+ * 
+ * const globalStyles: IBreakpointsMediaQueries = {
+ *   breakpoints,
+ *   mediaQueries: createMediaQueries(breakpoints),
+ * };
+ */
+export type IBreakpointsMediaQueries = {
+    breakpoints: IBreakpoints;
+    mediaQueries: Record<string, IMediaQueryTemplate>;
+};

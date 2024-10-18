@@ -1,5 +1,5 @@
 import { Dimensions } from "react-native";
-import { IBreakpoints, IBreakpoint, INormalizedBreakpoints } from "./types";
+import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointsMediaQueries } from "./types";
 import { addClassName, IObservable, isDOMElement, isObj, Platform, removeClassName } from "@resk/core";
 
 
@@ -56,6 +56,50 @@ const setMinWidths = function (breakpoints: IBreakpoints, maxWidths: number[]): 
     }
 };
 
+/**
+ * Generates a collection of media query strings based on the defined breakpoints.
+ * 
+ * The createMediaQueries function takes an IBreakpoints object and returns an
+ * object where each key corresponds to a media query template. This allows for
+ * easy access to the appropriate media query for applying responsive styles.
+ * 
+ * @param breakpoints - An object containing the defined breakpoints.
+ * @returns An object with media query templates for each breakpoint key.
+ * 
+ * @example
+ * // Creating media queries from defined breakpoints
+ * const breakpoints: IBreakpoints = {
+ *   sp: { max: 320 },
+ *   md: { min: 1024 },
+ * };
+ * 
+ * const mediaQueries = createMediaQueries(breakpoints);
+ * console.log(mediaQueries.sp); // Output: '@media (max-width: 320px)'
+ * console.log(mediaQueries.md); // Output: '@media (min-width: 1024px)'
+ */
+const createMediaQueries = (breakpoints: IBreakpoints): Record<string, IMediaQueryTemplate> => {
+    const mediaQueries: Record<string, IMediaQueryTemplate> = {};
+    // Loop through each breakpoint and generate corresponding media query strings
+    for (const key in breakpoints) {
+        const breakpoint = breakpoints[key as keyof IBreakpoints];
+        if (breakpoint) {
+            // Generate media query for min-width if defined
+            if (breakpoint.min !== undefined) {
+                mediaQueries[key] = `@media (min-width: ${breakpoint.min}px)`;
+            }
+            // Generate media query for max-width if defined
+            if (breakpoint.max !== undefined) {
+                mediaQueries[key] = `@media (max-width: ${breakpoint.max}px)`;
+            }
+            // Generate combined media query for both min and max widths
+            if (breakpoint.min !== undefined && breakpoint.max !== undefined) {
+                mediaQueries[key] = `@media (min-width: ${breakpoint.min}px) and (max-width: ${breakpoint.max}px)`;
+            }
+        }
+    }
+    return mediaQueries; // Return the generated media queries
+};
+
 // Given a breakpointsRef.current object, will create a "max" breakpoint
 // going from the largest breakpoint's max value to infinity
 const addMaxBreakpoint = function (breakpoints: INormalizedBreakpoints, maxWidths: number[]) {
@@ -70,6 +114,43 @@ const addMaxBreakpoint = function (breakpoints: INormalizedBreakpoints, maxWidth
     };
 };
 
+const defaultBreakpoints: IBreakpoints = {
+    sp: {
+        max: 320,  // Small phone breakpoint (320px and below)
+        name: 'sp',
+        label: "Small phone",
+    },
+    mp: {
+        max: 399,  // Medium phone breakpoint (399px and below)
+        name: 'mp',
+        label: "Medium phone",
+    },
+    xs: {
+        max: 575,  // Small devices (landscape phones, 576px and up)
+        name: 'xs',
+        label: "Small devices (landscape phones, 576px and up)",
+    },
+    sm: {
+        max: 767,  // Medium devices (tablets, 768px and up)
+        name: 'sm',
+        label: "Medium devices (tablets, 768px and up)",
+    },
+    md: {
+        max: 1024,  // Medium devices (laptops, 1024px and up)
+        name: 'md',
+        label: "medium devices (laptops, 1024px and up)",
+    },
+    lg: {
+        max: 1199,  // Large devices (large desktops, 1200px and up)
+        name: 'lg',
+        label: "large devices (large desktops, 1200px and up)",
+    },
+    xl: {
+        max: Infinity,  // Extra large devices (large desktops and beyond)
+        name: 'xl',
+        label: "Extra large devices (large desktops)",
+    },
+};
 /**
  * @constant breakpointsRef
  * A reference object holding the current set of normalized breakpoints.
@@ -83,45 +164,10 @@ const addMaxBreakpoint = function (breakpoints: INormalizedBreakpoints, maxWidth
  * console.log(breakpointsRef.current.all.sp); // { max: 320, name: 'sp', label: 'Small phone' }
  * ```
  */
-const breakpointsRef: { current: INormalizedBreakpoints } = {
+const breakpointsRef: { current: INormalizedBreakpoints & { medias: Record<string, IMediaQueryTemplate> } } = {
     current: {
-        all: {
-            sp: {
-                max: 320,  // Small phone breakpoint (320px and below)
-                name: 'sp',
-                label: "Small phone",
-            },
-            mp: {
-                max: 399,  // Medium phone breakpoint (399px and below)
-                name: 'mp',
-                label: "Medium phone",
-            },
-            xs: {
-                max: 575,  // Small devices (landscape phones, 576px and up)
-                name: 'xs',
-                label: "Small devices (landscape phones, 576px and up)",
-            },
-            sm: {
-                max: 767,  // Medium devices (tablets, 768px and up)
-                name: 'sm',
-                label: "Medium devices (tablets, 768px and up)",
-            },
-            md: {
-                max: 1024,  // Medium devices (laptops, 1024px and up)
-                name: 'md',
-                label: "medium devices (laptops, 1024px and up)",
-            },
-            lg: {
-                max: 1199,  // Large devices (large desktops, 1200px and up)
-                name: 'lg',
-                label: "large devices (large desktops, 1200px and up)",
-            },
-            xl: {
-                max: Infinity,  // Extra large devices (large desktops and beyond)
-                name: 'xl',
-                label: "Extra large devices (large desktops)",
-            },
-        }
+        all: defaultBreakpoints,
+        medias: createMediaQueries(defaultBreakpoints)
     }
 };
 
@@ -157,11 +203,12 @@ const breakpointsRef: { current: INormalizedBreakpoints } = {
  */
 const normalize = function (breakpoints?: IBreakpoints): INormalizedBreakpoints {
     // Merge the incoming breakpoints with the current normalized breakpoints reference
+    const all: IBreakpoints = Object.assign({}, breakpointsRef.current.all, breakpoints);
     breakpointsRef.current = {
         ...breakpointsRef.current,
-        all: Object.assign({}, breakpointsRef.current.all, breakpoints),
+        all,
+        medias: createMediaQueries(all)
     };
-
     // Normalize the breakpoints object
     const maxWidths = setMaxWidths(breakpointsRef.current.all); // Calculate max widths for each breakpoint
     setMinWidths(breakpointsRef.current.all, maxWidths);        // Set min widths based on the next largest breakpoint
@@ -648,6 +695,8 @@ declare global {
     }
 }
 
+
+
 export default {
     getCurrentMedia,
     init,
@@ -666,6 +715,15 @@ export default {
     isTabletMedia,
     isDesktopMedia,
     isPortrait,
+    createMediaQueries,
     isMobileOrTabletMedia,
     isTabletOrDeskTopMedia,
+    /**
+     *It represents an object where each key corresponds to a media query template. This allows for
+    * easy access to the appropriate media query for applying responsive styles.
+     * 
+     */
+    get medias(): Record<string, IMediaQueryTemplate> {
+        return breakpointsRef.current.medias;
+    }
 }

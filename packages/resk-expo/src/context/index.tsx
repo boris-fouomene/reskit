@@ -1,18 +1,18 @@
 import React, { useMemo } from 'react';
 
-export function ReskTamaguiProvider({ children, ...rest }: IReskTamaguiProviderProps) {
-  return <ReskTamaguiContext.Provider value={{ ...rest }} children={children} />;
+export function ReskTamaguiProvider({ children, ...rest }: ReskExpoProviderProps) {
+  return <ReskExpoProvider.Provider value={{ ...rest }} children={children} />;
 }
 
-export type IReskTamaguiProviderProps = {
+export type ReskExpoProviderProps = {
   children?: React.ReactNode;
 }
 
-const ReskTamaguiContext = React.createContext<IReskTamaguiContext>({});
+const ReskExpoProvider = React.createContext<IReskExpoProvider>({});
 
-export const useReskTamaguiContext = () => {
+export const useReskExpoProvider = () => {
   return useMemo(() => {
-    return ReskTamaguiContext;
+    return ReskExpoProvider;
   }, []);
 };
-export type IReskTamaguiContext = IReskTamaguiProviderProps;
+export type IReskExpoProvider = ReskExpoProviderProps;

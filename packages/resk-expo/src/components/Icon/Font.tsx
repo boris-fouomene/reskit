@@ -1,6 +1,5 @@
-import React, { forwardRef } from "react";
-import { isNonNullString, ltrim } from "@resk/core";
-import { GestureResponderEvent, Pressable, PressableProps } from "react-native";
+import { forwardRef } from "react";
+import { isNonNullString } from "@resk/core";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AntDesign from "@expo/vector-icons/AntDesign";

@@ -689,67 +689,67 @@ const isTabletOrDeskTopMedia = (): boolean => {
 };
 
 /**
- * @function getMediaSizeCorners
- * Retrieves the minimum and maximum size corners from the provided media breakpoints.
+ * @function getBreakpointSizeCorners
+ * Retrieves the minimum and maximum size corners from the provided breakpoint Keys.
  * 
- * @param {Array<keyof IBreakpoints>} medias - An array of media breakpoint keys.
+ * @param {Array<keyof IBreakpoints>} breakpointKeys - An array of breakpoint Keys.
  * @returns {{max: number, min: number} | null} - An object containing the min and max sizes, or null if the input is invalid.
  * 
- * The function checks if the provided `medias` array is valid and non-empty. It then iterates through each media key,
+ * The function checks if the provided `breakpointKeys` array is valid and non-empty. It then iterates through each breakpoint key,
  * retrieving its associated breakpoint from the list of normalized breakpoints. If the breakpoint has valid `min` and `max`
  * properties, it updates the `min` and `max` values accordingly.
  * 
  * ### Example Usage:
  * 1. **Basic Usage**:
  *    ```typescript
- *    const breakpoints = getMediaSizeCorners(['sm', 'lg']);
- *    console.log(breakpoints); // Output: { min: 320, max: 768 }
+ *    const breakpoint = getBreakpointSizeCorners(['sm', 'lg']);
+ *    console.log(breakpoint); // Output: { min: 320, max: 768 }
  *    ```
- *    In this example, the function retrieves the min and max sizes for the 'sm' and 'lg' breakpoints.
+ *    In this example, the function retrieves the min and max sizes for the 'sm' and 'lg' breakpoint.
  *
  * 2. **Handling Empty Input**:
  *    ```typescript
- *    const breakpoints = getMediaSizeCorners([]);
- *    console.log(breakpoints); // Output: null
+ *    const breakpoint = getBreakpointSizeCorners([]);
+ *    console.log(breakpoint); // Output: null
  *    ```
- *    Here, an empty array is passed, resulting in a null output since no breakpoints were provided.
+ *    Here, an empty array is passed, resulting in a null output since no breakpoints keys were provided.
  *
  * 3. **Invalid Media Key**:
  *    ```typescript
- *    const breakpoints = getMediaSizeCorners(['sm', 'invalidKey']);
- *    console.log(breakpoints); // Output: { min: 320, max: 768 }
+ *    const breakpoint = getBreakpointSizeCorners(['sm', 'invalidKey']);
+ *    console.log(breakpoint); // Output: { min: 320, max: 768 }
  *    ```
- *    In this case, 'invalidKey' does not exist in the breakpoints, but the function still returns valid sizes from 'small'.
+ *    In this case, 'invalidKey' does not exist in the breakpoint, but the function still returns valid sizes from 'small'.
  *
  * 4. **Max Size Greater Than Min**:
  *    ```typescript
- *    const breakpoints = getMediaSizeCorners(['xs', 'lg']);
- *    console.log(breakpoints); // Output: { min: 768, max: 1200 }
+ *    const breakpoint = getBreakpointSizeCorners(['xs', 'lg']);
+ *    console.log(breakpoint); // Output: { min: 768, max: 1200 }
  *    ```
- *    This demonstrates that the max size can be greater than the min size, reflecting the range of available breakpoints.
+ *    This demonstrates that the max size can be greater than the min size, reflecting the range of available breakpoint.
  */
-export const getMediaSizeCorners = (medias: (keyof IBreakpoints)[]): { max: number; min: number } | null => {
+export const getBreakpointSizeCorners = (breakpointKeys: (keyof IBreakpoints)[]): { max: number; min: number } | null => {
     // Check if the input is a valid non-empty array
-    if (!Array.isArray(medias) || !medias.length) return null;
+    if (!Array.isArray(breakpointKeys) || !breakpointKeys.length) return null;
 
     let min = 0; // Initialize minimum size
     let max = 0; // Initialize maximum size
 
-    // Iterate through the provided media keys
-    medias.map((media) => {
-        // Validate the media key and ensure it exists in breakpointsRef
-        if (!media || !breakpointsRef.current?.all[media] || !isObj(breakpointsRef.current?.all[media])) return;
+    // Iterate through the provided breakpoint keys
+    breakpointKeys.map((breakpoint) => {
+        // Validate the breakpoint key and ensure it exists in breakpointKeysRef
+        if (!breakpoint || !breakpointsRef.current?.all[breakpoint] || !isObj(breakpointsRef.current?.all[breakpoint])) return;
 
-        const mediaQuery: IBreakpoint = breakpointsRef.current.all[media]; // Get the media query
+        const breakpointQuery: IBreakpoint = breakpointsRef.current.all[breakpoint]; // Get the breakpoint query
 
         // Update the minimum size if a valid min value is found
-        if (mediaQuery.min && isNumber(mediaQuery.min) && (min > mediaQuery.min || min === 0)) {
-            min = mediaQuery.min;
+        if (breakpointQuery.min && isNumber(breakpointQuery.min) && (min > breakpointQuery.min || min === 0)) {
+            min = breakpointQuery.min;
         }
 
         // Update the maximum size if a valid max value is found
-        if (mediaQuery.max && isNumber(mediaQuery.max) && (max < mediaQuery.max || max === 0)) {
-            max = mediaQuery.max;
+        if (breakpointQuery.max && isNumber(breakpointQuery.max) && (max < breakpointQuery.max || max === 0)) {
+            max = breakpointQuery.max;
         }
     });
 
@@ -776,7 +776,7 @@ export default {
     createMediaQueries,
     isMobileOrTabletMedia,
     isTabletOrDeskTopMedia,
-    getMediaSizeCorners,
+    getBreakpointSizeCorners,
     /**
      *It represents an object where each key corresponds to a media query template. This allows for
     * easy access to the appropriate media query for applying responsive styles.

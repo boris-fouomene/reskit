@@ -167,7 +167,7 @@ export const DefaultDarkTheme: ITheme = createTheme({
     name: `${packageName}-dark`,
     dark: true,
     colors: {
-        background: "#111b21", // Dark background color for the app
+        background: "#151718", // Dark background color for the app
         surface: "#202c33", // Surface color for cards and other components
         disabled: Colors.setAlpha(white, 0.5), // Semi-transparent white for disabled elements
         placeholder: Colors.setAlpha(white, 0.5), // Placeholder text color
@@ -175,7 +175,8 @@ export const DefaultDarkTheme: ITheme = createTheme({
         divider: Colors.setAlpha(white, 0.18), // Divider color between elements
         primary: "#5EBA6A", // Main action color for dark mode (used in buttons, etc.)
         success: "#5EBA6A", // Success message color
-        warning: "#FFB547" // Warning message color
+        warning: "#FFB547", // Warning message color
+        text: '#ECEDEE',
     },
 });
 
@@ -207,7 +208,7 @@ export const DefaultLightTheme: ITheme = createTheme({
         success: "#5EBA6A", // Success message color
         warning: "#BAAB5E", // Warning message color
         neutral: "#606A71", // Neutral text color
-        text: "black", // Main text color for light mode
+        text: "#11181C", // Main text color for light mode
         primary: "#5EBA6A", // Main action color for light mode
     },
 } as unknown as ITheme);
@@ -268,7 +269,7 @@ const themeRef: { current: ICreatedTheme } = {
  * other parts of the app that the theme has changed.
  * 
  * @param {ITheme} theme - The new theme to be applied to the application.
- * @param {boolean} [trigger=true] - Whether to trigger the theme update event (default is `true`).
+ * @param {boolean} [trigger=false] - Whether to trigger the theme update event (default is `false`).
  * 
  * @returns {ITheme} - The updated theme that has been applied.
  * 
@@ -279,7 +280,7 @@ const themeRef: { current: ICreatedTheme } = {
  * console.log(themeRef.current.name); // Logs the name of the updated theme
  * ```
  */
-export function updateTheme(theme: ITheme, trigger: boolean = true): ITheme {
+export function updateTheme(theme: ITheme, trigger: boolean = false): ITheme {
     // Save the theme name in the session
     session.set("theme", theme.name);
 
@@ -290,10 +291,33 @@ export function updateTheme(theme: ITheme, trigger: boolean = true): ITheme {
     updateNative(theme);
 
     // Optionally trigger a global theme update event
-    if (trigger && events.trigger) {
-        events.trigger(UPDATE_THEME, theme);
+    if (trigger) {
+        triggerThemeUpdate(theme);
     }
     return theme;
+}
+
+/**
+ * Triggers a theme update event with the provided theme object.
+ * This function checks if the provided theme is a valid object before triggering the event.
+ *
+ * @param {ITheme} theme - The theme object to be used for the update event.
+ * @returns {void} This function does not return a value.
+ *
+ * @example
+ * const newTheme = {
+ *   primaryColor: '#6200ee',
+ *   secondaryColor: '#03dac6',
+ *   // other theme properties...
+ * };
+ *
+ * triggerThemeUpdate(newTheme);
+ * // This will trigger the UPDATE_THEME event with the new theme.
+ */
+export const triggerThemeUpdate = (theme: ITheme): void => {
+    if (isObj(theme)) {
+        events?.trigger(UPDATE_THEME, theme);
+    }
 }
 
 /**

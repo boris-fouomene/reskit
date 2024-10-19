@@ -8,3 +8,4 @@ export * from "./theme/types";
 export { default as Colors } from "./theme/colors";
 export * from "./theme";
 export { default as Theme } from "./theme";
+export * from "./context";

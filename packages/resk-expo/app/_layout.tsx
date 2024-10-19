@@ -1,10 +1,10 @@
 import "@expo/metro-runtime";
 import 'react-native-reanimated';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { ReskExpoProvider } from "@src/context";
 
 
 import { useColorScheme } from '@hooks/useColorScheme';
@@ -29,10 +29,10 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ReskExpoProvider>
       <Stack>
         <Stack.Screen name="+not-found" />
       </Stack>
-    </ThemeProvider>
+    </ReskExpoProvider>
   );
 }

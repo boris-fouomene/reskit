@@ -4,7 +4,7 @@ import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
  * Type for a callback function that takes a value of type T.
  * @template T - The type of the value passed to the callback.
  */
-export type Callback<T = unknown> = (value: T) => any;
+export type Callback<T> = (value: T) => any;
 
 /***
  * Type for a dispatch function that updates the state with a callback.

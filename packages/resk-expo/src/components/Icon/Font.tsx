@@ -13,6 +13,8 @@ import Zocial from "@expo/vector-icons/Zocial";
 import { IStyle } from "../../types";
 import { ITooltipProps } from "@components/Tooltip/types";
 import Tooltip from "@components/Tooltip";
+import { useTheme } from "@hooks/useTheme";
+import Colors from "@colors";
 
 
 /***
@@ -57,6 +59,8 @@ import Tooltip from "@components/Tooltip";
  */
 const FontIcon = forwardRef(({ name, color, ...props }: IFontIconProps, ref) => {
     let IconSet: any = MaterialCommunityIcons, iconSetName: string = "", iconSetPrefix = "";
+    const theme = useTheme();
+    color = Colors.isValid(color) ? color : theme.colors.text;
     name = name.trim();
     for (let i in PREFIX_TO_ICONS_SET_NAMES) {
         if (isIcon(name, i)) {

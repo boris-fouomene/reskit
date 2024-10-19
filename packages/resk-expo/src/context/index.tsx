@@ -9,6 +9,7 @@ import stableHash from "stable-hash";
 import usePrevious from '@utils/usePrevious';
 import { ReskExpoProviderProps } from './types';
 import { ReskExpoContext } from './context';
+import { useColorScheme } from "@hooks/useColorScheme";
 
 export * from "./types";
 export * from "./context";
@@ -46,13 +47,14 @@ export * from "./context";
  * ```
  */
 export function ReskExpoProvider({ children, theme: customTheme, ...rest }: ReskExpoProviderProps) {
+  const isDark = useColorScheme() === 'dark';
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
    * to be executed once the theme state is updated.
    *
    * @type {[ITheme, Function]} The current theme and a function to update the theme.
    */
-  const [theme, setTheme] = useStateCallback<ITheme>(Object.assign({}, getDefaultTheme(), customTheme));
+  const [theme, setTheme] = useStateCallback<ITheme>(Object.assign({}, getDefaultTheme(isDark), customTheme));
 
   /**
    * Stores the previous custom theme to detect changes and avoid unnecessary theme updates.

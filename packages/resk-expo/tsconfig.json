@@ -27,6 +27,12 @@
       "@utils": [
         "src/utils"
       ],
+      "@colors/*": [
+        "src/theme/colors/*"
+      ],
+      "@colors": [
+        "src/theme/colors"
+      ],
       "@theme/*": [
         "src/theme/*"
       ],

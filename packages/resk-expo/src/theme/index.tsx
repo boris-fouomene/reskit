@@ -1,6 +1,6 @@
 import { IColorSheme, ITheme, IThemeTokens } from "./types";
 import Colors from "./colors";
-import { IDict, isObservable } from "@resk/core";
+import { extendObj, IDict, isObservable } from "@resk/core";
 import { packageName } from "@utils/index";
 import session from "../session";
 import { StatusBarProps } from "expo-status-bar";
@@ -273,16 +273,14 @@ export const DefaultLightTheme: ITheme = createTheme({
  * const currentTheme = getDefaultTheme();
  * console.log(currentTheme.colors.background); // Outputs the background color of the current theme
  * ```
- * 
+ * @param {boolean} isColorShemeDark - Optional parameter to specify if the color scheme is dark.
  * @returns {ITheme} The active theme (light or dark) based on session storage or the default theme.
  */
-export const getDefaultTheme = (): ITheme => {
+export const getDefaultTheme = (isColorShemeDark?: boolean): ITheme => {
     // Retrieves the saved theme from the session (if available)
-    const themeName = session.get("theme");
-
-    // Determines the active theme based on the saved theme name
-    const theme = themeName === DefaultLightTheme.name ? DefaultLightTheme : (DefaultDarkTheme as ITheme);
-
+    const themeNameObj = Object.assign({}, session.get("theme"));
+    themeNameObj.dark = !!(themeNameObj.dark !== undefined ? themeNameObj.dark : isColorShemeDark);
+    const theme = extendObj({}, themeNameObj?.dark ? DefaultDarkTheme : DefaultLightTheme, themeNameObj);
     // Ensures essential color properties are defined based on whether the theme is dark or light
     theme.colors.onSuccess = theme.colors.onSuccess || (theme.dark ? "black" : "white");
     theme.colors.onInfo = theme.colors.onInfo || (theme.dark ? "black" : "white");

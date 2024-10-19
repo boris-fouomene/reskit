@@ -20,6 +20,51 @@ export * from "./utils";
  */
 const UPDATE_THEME = "UPDATE_THEME";
 
+
+const events: IObservable = {} as IObservable;
+if (!isObservable(events)) {
+    observable(events);
+}
+
+
+/**
+ * Adds an event listener to track theme changes or updates.
+ * 
+ * This utility allows you to listen to theme updates, particularly useful for non-functional React components, 
+ * such as class components, or any other part of the code that needs to react to theme changes.
+ * 
+ * @param {(theme: ITheme) => any} callstack - A callback function that will be triggered every time the theme is updated. 
+ * The function receives the updated theme as its parameter.
+ * 
+ * @returns {{ remove: () => any }} - Returns an object containing a `remove` method. 
+ * The `remove` method can be used to stop listening to the theme updates when it is no longer needed.
+ * 
+ * @example
+ * ```ts
+ * const listener = addEventListener((newTheme) => {
+ *    console.log("The theme has been updated:", newTheme);
+ *    // Update the UI or perform a specific action here
+ * });
+ * 
+ * // To remove the listener when it's no longer needed
+ * listener.remove();
+ * ```
+ * 
+ * @remarks
+ * Ensure that the `callstack` is a function that handles the updated theme properly.
+ * The `remove` method is particularly useful when you want to avoid memory leaks or unnecessary event listeners.
+ * 
+ * @note
+ * This function depends on the `events` object, which needs to be observable. 
+ * If `events` is not observable, the function will make it so internally using the `observable` function.
+ */
+const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => any } => {
+    if (!isObservable(events)) {
+        observable(events);
+    }
+    return events.on(UPDATE_THEME, callstack);
+};
+
 /**
  * create a theme object by adding utility functions such as `getColor` and `getColorScheme`.
  * 
@@ -355,43 +400,7 @@ export const getStatusBarProps = (): StatusBarProps => {
     return statusBarStyle;
 };
 
-/**
- * Adds an event listener to track theme changes or updates.
- * 
- * This utility allows you to listen to theme updates, particularly useful for non-functional React components, 
- * such as class components, or any other part of the code that needs to react to theme changes.
- * 
- * @param {(theme: ITheme) => any} callstack - A callback function that will be triggered every time the theme is updated. 
- * The function receives the updated theme as its parameter.
- * 
- * @returns {{ remove: () => any }} - Returns an object containing a `remove` method. 
- * The `remove` method can be used to stop listening to the theme updates when it is no longer needed.
- * 
- * @example
- * ```ts
- * const listener = addEventListener((newTheme) => {
- *    console.log("The theme has been updated:", newTheme);
- *    // Update the UI or perform a specific action here
- * });
- * 
- * // To remove the listener when it's no longer needed
- * listener.remove();
- * ```
- * 
- * @remarks
- * Ensure that the `callstack` is a function that handles the updated theme properly.
- * The `remove` method is particularly useful when you want to avoid memory leaks or unnecessary event listeners.
- * 
- * @note
- * This function depends on the `events` object, which needs to be observable. 
- * If `events` is not observable, the function will make it so internally using the `observable` function.
- */
-const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => any } => {
-    if (!isObservable(events)) {
-        observable(events);
-    }
-    return events.on(UPDATE_THEME, callstack);
-};
+
 
 /**
  * The default export for the theme object, providing direct access to theme properties.
@@ -417,11 +426,6 @@ export default {
 
 import { IObservable, isObj, observable } from "@resk/core";
 
-
-const events: IObservable = {} as IObservable;
-if (!isObservable(events)) {
-    observable(events);
-}
 
 
 /***

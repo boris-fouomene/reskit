@@ -1,9 +1,8 @@
 import 'reflect-metadata';
-import { IDict, IResourcesNames, IField,IResourceInstance, IResource } from '../types';
+import { IDict, IResourcesNames, IField, IResourceInstance, IResource } from '../types';
 import { getFields } from '../fields';
-import { isEmpty } from '@utils/index';
+import { isEmpty, defaultStr } from '../utils/index';
 import { IConstructor } from '../types/index';
-import defaultStr from '@utils/defaultStr';
 
 
 /**
@@ -45,8 +44,8 @@ import defaultStr from '@utils/defaultStr';
  * console.log(dynamicResource.getFields()); 
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
-export class ResourceBase<DataType=any> implements IResourceInstance<DataType> {
-  
+export class ResourceBase<DataType = any> implements IResourceInstance<DataType> {
+
   /**
    * The internal name of the resource.
    *
@@ -72,7 +71,7 @@ export class ResourceBase<DataType=any> implements IResourceInstance<DataType> {
        * ```
        */
   label?: string;
-    
+
   /**
    * A descriptive title for the resource.
    *
@@ -85,7 +84,7 @@ export class ResourceBase<DataType=any> implements IResourceInstance<DataType> {
    * ```
    */
   title?: string;
-  
+
   /**
    * A short text that appears when the user hovers over the resource.
    * The tooltip provides additional context or information about the resource.
@@ -105,7 +104,7 @@ export class ResourceBase<DataType=any> implements IResourceInstance<DataType> {
    @description this is the list of fields that are part of the resource.It's a map where each key represents a field name, and the value contains field metadata.
    Fields are created using the @Field decorator when resources are defined.
   */
-   fields ?: Record<string,IField>;
+  fields?: Record<string, IField>;
 
   /**
    * Constructs a new `ResourceBase` instance.
@@ -198,7 +197,7 @@ export class ResourceBase<DataType=any> implements IResourceInstance<DataType> {
  * }
  */
 export class ResourcesManager {
-  
+
   /**
    * A global constant storing a record of all instantiated resources.
    * 
@@ -226,7 +225,7 @@ export class ResourcesManager {
   public static getResourceNames() {
     return Object.keys(this.resources);
   }
-  
+
   /**
    * Retrieves a resource instance by its name from the `resources` record.
    * 
@@ -264,7 +263,7 @@ export class ResourcesManager {
       (this.resources as IDict)[name] = resource;
     }
   }
-  
+
   /**
    * Removes a resource instance from the manager by its name.
    * 
@@ -292,7 +291,7 @@ export class ResourcesManager {
     return this.resources;
   }
 
-  
+
   /**
    * Retrieves all resource instances managed by the manager.
    * 
@@ -343,13 +342,13 @@ export const resourceMetaData = Symbol("resource");
  * 
  * ```
  */
-export function Resource<DataType=any>(options: IResource<DataType>) {
+export function Resource<DataType = any>(options: IResource<DataType>) {
   return function (target: Function) {
-    options = Object.assign({},options);
-    if(typeof target =="function"){
+    options = Object.assign({}, options);
+    if (typeof target == "function") {
       try {
-        ResourcesManager.addResource<DataType>((options.name as IResourcesNames),new (target as IConstructor)(options) as ResourceBase<DataType>);
-      } catch{}
+        ResourcesManager.addResource<DataType>((options.name as IResourcesNames), new (target as IConstructor)(options) as ResourceBase<DataType>);
+      } catch { }
     }
     Reflect.defineMetadata(resourceMetaData, options, target);
   };
@@ -364,6 +363,6 @@ export function Resource<DataType=any>(options: IResource<DataType>) {
  * @param {any} target - The target class or instance from which to retrieve the metadata.
  * @returns {ResourceBase} An object containing the resource metadata for the given target.
  */
-export const getResourceMetaData = <DataType=any>(target:any): ResourceBase<DataType> =>{
-   return Object.assign({}, Reflect.getMetadata(resourceMetaData, target));
+export const getResourceMetaData = <DataType = any>(target: any): ResourceBase<DataType> => {
+  return Object.assign({}, Reflect.getMetadata(resourceMetaData, target));
 }

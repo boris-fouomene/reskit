@@ -6,7 +6,9 @@ import session from "../session";
 import { StatusBarProps } from "expo-status-bar";
 import Color from "color";
 import updateNative from "./updateNative";
-import Grid from "./grid";
+import Grid from "../breakpoints/grid";
+
+export * from "./utils";
 
 /**
  * @constant UPDATE_THEME

@@ -47,13 +47,18 @@
       ],
       "@src/*": [
         "./src/*"
-      ],
+      ]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
+    "expo-env.d.ts"
+  ],
+  "references": [
+    {
+      "path": "../resk-core/tsconfig.json"
+    }
   ]
 }

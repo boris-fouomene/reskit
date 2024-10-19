@@ -1,7 +1,7 @@
 import { Dimensions } from "react-native";
-import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointsMediaQueries } from "./types";
-import { addClassName, IObservable, isDOMElement, isObj, Platform, removeClassName } from "@resk/core";
-
+import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate } from "./types";
+import { addClassName, isDOMElement, isObj, Platform, removeClassName } from "@resk/core";
+import { isNumber } from "lodash";
 
 // int comparer for sorts
 const compareInts = function compare(a: any, b: any): number {
@@ -11,7 +11,6 @@ const compareInts = function compare(a: any, b: any): number {
     if (a > b) {
         return 1;
     }
-
     return 0;
 };
 
@@ -24,9 +23,10 @@ const isNumeric = function (obj: any): boolean {
 // which can contain min, max, and name
 const setMaxWidths = function (breakpoints: IBreakpoints) {
     const maxWidths: number[] = [];
+    if (!isObj(breakpoints)) return [];
     for (let name in breakpoints) {
         const m = breakpoints[name as keyof IBreakpoints]?.max;
-        if (m) {
+        if (m && isNumber(m)) {
             maxWidths.push(m);
         }
     }
@@ -44,7 +44,7 @@ const setMinWidths = function (breakpoints: IBreakpoints, maxWidths: number[]): 
             continue;
         }
         for (let i = 0; i < maxWidths.length; i++) {
-            if (breakpoint?.max == maxWidths[i]) {
+            if (breakpoint?.max == maxWidths[i] && isNumber(maxWidths[i])) {
                 if (i === 0) {
                     breakpoint.min = 0;
                 } else {
@@ -82,7 +82,7 @@ const createMediaQueries = (breakpoints: IBreakpoints): Record<string, IMediaQue
     // Loop through each breakpoint and generate corresponding media query strings
     for (const key in breakpoints) {
         const breakpoint = breakpoints[key as keyof IBreakpoints];
-        if (breakpoint) {
+        if (isObj(breakpoint) && breakpoint) {
             // Generate media query for min-width if defined
             if (breakpoint.min !== undefined) {
                 mediaQueries[key] = `@media (min-width: ${breakpoint.min}px)`;
@@ -688,20 +688,10 @@ const isTabletOrDeskTopMedia = (): boolean => {
     return isTabletMedia() || isDesktopMedia();
 };
 
-
-declare global {
-    interface Window {
-        breakpointsEventObservableHandler: IObservable;
-    }
-}
-
-
-
 export default {
     getCurrentMedia,
     init,
     normalize,
-    breakpointsRef,
     smallPhoneBreakpoints,
     mobileBreakpoints,
     phoneBreakpoints,

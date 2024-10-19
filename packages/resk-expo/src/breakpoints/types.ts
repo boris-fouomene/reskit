@@ -1,4 +1,5 @@
 /**
+ * @group Breakpoints
  * @interface IBreakpoints
  * Represents a collection of defined breakpoints for various device sizes used for responsive design. 
  * The IBreakpoints interface contains multiple IBreakpoint objects, each
@@ -51,6 +52,7 @@ export interface IBreakpoints {
 
 
 /**
+ * @group Breakpoints
  * @interface IBreakpoint
  * Represents a single breakpoint definition.
  *
@@ -112,6 +114,7 @@ export interface IBreakpoint {
 
 
 /**
+ * @group Breakpoints
  * @interface INormalizedBreakpoints
  * Encapsulates all defined breakpoints, the current active breakpoint, and optional maximum size constraints.
  * 
@@ -174,6 +177,7 @@ export interface INormalizedBreakpoints {
 }
 
 /**
+ * @group Breakpoints
  * @interface IMediaQueryTemplate
  * Template for CSS media query strings.
  * 
@@ -194,6 +198,8 @@ export type IMediaQueryTemplate = | `@media (min-width: ${number}px)`   // Media
     | `@media (max-width: ${number}px) and (max-width: ${number}px)`; // Two maximum widths
 
 /**
+ * @group Breakpoints
+ * 
  * @interface IBreakpointsMediaQueries
  * Represents global styles including breakpoints and corresponding media queries.
  * 

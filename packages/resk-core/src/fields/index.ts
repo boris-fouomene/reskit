@@ -34,7 +34,7 @@ export function Field<T extends IFieldMapKeys = "text">(options: IField<T>): Pro
   /**
    * Returns a decorator function that sets metadata on the target property.
    */
-  return function(target: any, propertyKey: string | symbol){
+  return function (target: any, propertyKey: string | symbol) {
     /**
      * Get existing fields metadata or initialize an empty object.
      */
@@ -55,7 +55,7 @@ export function Field<T extends IFieldMapKeys = "text">(options: IField<T>): Pro
     /**
      * Store the options in the fields object using propertyKey as the key.
      */
-    fields[propertyKey] = { name: propertyKey, ...Object.assign({},options) as IFieldBase };
+    fields[propertyKey] = { name: propertyKey, ...Object.assign({}, options) as IFieldBase };
 
     /**
      * Define the updated metadata on the target constructor.

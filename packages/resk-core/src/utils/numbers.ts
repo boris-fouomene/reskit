@@ -1,4 +1,7 @@
-import { formatNumber, formatMoney, ICurrency, formatMoneyAsObject, currencies, isValidCurrency, ICurrencyFormatter, ICurrencyFormatters, ICurrencyFormatterKey } from "./currency";
+import Currency from "../currency";
+import { ICurrency, ICurrencyFormatterKey, ICurrencyFormatters } from "../currency/types";
+
+const { currencies } = Currency;
 
 /**
  * Extends the Number interface with additional methods for formatting and abbreviating numbers.
@@ -105,7 +108,7 @@ Number.prototype.formatNumber = function (optionsOrDecimalDigits?: ICurrency | n
   /**
    * Call the formatNumber function with the current number value and the specified options.
    */
-  return formatNumber(this.valueOf(), optionsOrDecimalDigits, thousandSeparator, decimalSeparator);
+  return Currency.formatNumber(this.valueOf(), optionsOrDecimalDigits, thousandSeparator, decimalSeparator);
 };
 
 /**
@@ -122,7 +125,7 @@ Number.prototype.formatMoney = function (symbol?: ICurrency | string, decimalDig
   /**
    * Call the formatMoney function with the current number value and the specified options.
    */
-  return formatMoney(this.valueOf(), symbol, decimalDigits, thousandSeparator, decimalSeparator, format);
+  return Currency.formatMoney(this.valueOf(), symbol, decimalDigits, thousandSeparator, decimalSeparator, format);
 };
 
 /**
@@ -312,12 +315,12 @@ export const abreviate2FormatMoney = (
   /**
    * Format the number as a monetary value.
    */
-  const { formattedValue: fVal } = formatMoneyAsObject(value, symbol, decimalDigits, thousandSeparator, decimalSeparator, format);
+  const { formattedValue: fVal } = Currency.formatMoneyAsObject(value, symbol, decimalDigits, thousandSeparator, decimalSeparator, format);
 
   /**
    * Replace the placeholder in the format string with the formatted number.
    */
-  return fVal.replace('%v', Math.abs(value).formatNumber(isValidCurrency(symbol) ? symbol as ICurrency : decimalDigits, thousandSeparator, decimalSeparator) + fStr);
+  return fVal.replace('%v', Math.abs(value).formatNumber(Currency.isValidCurrency(symbol) ? symbol as ICurrency : decimalDigits, thousandSeparator, decimalSeparator) + fStr);
 };
 
 /**
@@ -350,6 +353,6 @@ Object.keys(currencies).forEach((currencyKey) => {
     /**
      * Call the formatMoney function with the current number value and the specified options.
     */
-    return formatMoney(this.valueOf(), currency, decimalDigits, thousandSeparator, decimalSeparator, format);
+    return Currency.formatMoney(this.valueOf(), currency, decimalDigits, thousandSeparator, decimalSeparator, format);
   };
 });

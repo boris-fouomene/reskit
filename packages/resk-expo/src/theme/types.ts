@@ -1,4 +1,4 @@
-import grid from "./grid";
+import grid from "../breakpoints/grid";
 
 /**
  * @interface IThemeTokens

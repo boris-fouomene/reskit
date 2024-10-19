@@ -15,7 +15,15 @@ export { default as Session } from "./session";
  */
 export * as Platform from "./platform";
 
+/**
+  @namespace Currency 
+ * Exports the Currency namespace.
+ * This namespace provides a collection of all the functions needed for currency handling
+ */
+export { default as Currency } from "./currency";
+
 export * from "./fields";
 export * from "./resources";
 export * from "./types";
 export * from "./utils";
+export * from "./currency/types"

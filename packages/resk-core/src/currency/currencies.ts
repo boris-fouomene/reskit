@@ -1,8 +1,11 @@
 import { ICurrencies } from "./types";
 
-export * from "./types";
-
-/*** list of available currencies */
+/*** 
+ * @group Currency
+ * @description
+ * Represent the list of availables currencies
+ * 
+*/
 const currencies: ICurrencies = {
     USD: {
         "symbol": "$",
@@ -1069,14 +1072,4 @@ const currencies: ICurrencies = {
     }
 };
 
-console.log(Object.keys(currencies));
-
 export default currencies;
-
-
-/****
- * spécifie s'il s'agit d'un objet devise valide
- * @param {any} objet, l'objet sur lequel verifier
- * @return {boolean} true if object is valid currency
- */
-export const isValidCurrency = (obj: any) => obj && typeof obj == 'object' && !Array.isArray(obj) && obj.name && typeof obj.name == "string" && obj.symbol && typeof obj.symbol == "string" && true || false;

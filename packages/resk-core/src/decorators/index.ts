@@ -1,4 +1,4 @@
-import defaultStr from '@utils/defaultStr';
+import defaultStr from '../utils/defaultStr';
 import { ITypeRegistryRenderer } from '../types';
 import 'reflect-metadata';
 /**

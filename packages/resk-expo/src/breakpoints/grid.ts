@@ -1,4 +1,4 @@
-import Breakpoints from "../breakpoints";
+import Breakpoints from "./utils";
 import { Dimensions } from 'react-native';
 import { IStyle } from '../types';
 import { isObj, IDict } from '@resk/core';
@@ -56,6 +56,7 @@ const getWidth = (width?: number) => {
 
 
 /**
+ * @group Breakpoints
  * Determines the appropriate styles for a column based on the current screen dimensions.
  * This function interprets the provided media queries and calculates the column width accordingly.
  * 
@@ -119,9 +120,7 @@ function col(mediaQuery: string = "col-4 phone-12 tablet-6 desktop-4", width?: n
             }
         }
     });
-
     let hasFound = false, multiplicater = 12;
-
     // Calculate the multiplicater based on options found
     if (isObj(opts)) {
         for (let i in opts) {
@@ -142,28 +141,26 @@ function col(mediaQuery: string = "col-4 phone-12 tablet-6 desktop-4", width?: n
     if (!hasFound && isNumber(commonMultiplicater)) {
         multiplicater = commonMultiplicater;
     }
-
     // Return the computed styles for the column
     const ret = {
         ...rest,
         ...otherStyle,
         width: (colWidth * multiplicater).toFixed(8) + '%'
     } as IDict;
-
     if (withMultiplicater) {
         ret.multiplicater = multiplicater;
     }
-
     return ret;
 }
 
-/**
+/***
+ * @group Breakpoints
  * Returns the number of columns available in the current view.
  * This function calculates how many columns can fit based on the provided media query and width.
  * 
  * Example usage:
  * ```typescript
- * const numberOfCols = cols("md-5 xs-3 lg-8 sm-10");
+ * const numberOfCols = numColumns("md-5 xs-3 lg-8 sm-10");
  * console.log(numberOfCols); // Outputs the number of columns based on the screen size.
  * ```
  * 
@@ -173,19 +170,19 @@ function col(mediaQuery: string = "col-4 phone-12 tablet-6 desktop-4", width?: n
  * 
  * @returns {number} The number of columns currently available in the view, ensuring a minimum of 1 column.
  */
-function cols(mediaQuery?: string, width?: number) {
+function numColumns(mediaQuery?: string, width?: number) {
     const { multiplicater } = col(mediaQuery, width, true);
-    let cols = 1;
+    let numColumns = 1;
 
     if (multiplicater && multiplicater > 0) {
-        cols = Math.trunc(12 / multiplicater);
+        numColumns = Math.trunc(12 / multiplicater);
     }
 
-    return Math.max(cols, 1);
+    return Math.max(numColumns, 1);
 }
 
 
 export default {
-    numColumns: cols,
+    numColumns,
     col
 }

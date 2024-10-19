@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoney } from '@utils/index';
+import Currency from "../../src/currency";
+
+const { formatNumber, formatMoney } = Currency;
 
 describe('formatMoney', () => {
   it('should format positive numbers correctly', () => {

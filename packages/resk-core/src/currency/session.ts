@@ -1,6 +1,8 @@
-import session from "@session/index";
-import currencies, { ICurrency, isValidCurrency } from "./currencies";
-import isNonNullString from "@utils/isNonNullString";
+import session from "../session";
+import currencies from "./currencies";
+import { ICurrency } from "./types";
+import isNonNullString from "../utils/isNonNullString";
+import { isValidCurrency } from "./utils";
 
 /**
  * The default format for displaying currency values.
@@ -9,7 +11,7 @@ import isNonNullString from "@utils/isNonNullString";
  * 
  * Example: `%v %s`
  */
-export const defaultCurrencyFormat = "%v %s";
+const defaultCurrencyFormat = "%v %s";
 
 /**
  * Retrieves the persisted currency format from the session storage.
@@ -17,7 +19,7 @@ export const defaultCurrencyFormat = "%v %s";
  * @param force If true, returns the default currency format if the persisted format is not available.
  * @returns The persisted currency format if available, otherwise an empty string or the default format.
  */
-export const getCurrencyFormat = (force?: boolean): string => {
+const getCurrencyFormat = (force?: boolean): string => {
   /**
    * Retrieve the currency format from the session storage.
    */
@@ -44,7 +46,7 @@ export const getCurrencyFormat = (force?: boolean): string => {
  * setCurrencyFormat(null); // Sets an empty string as the currency format in the session storage
  * ```
  */
-export const setCurrencyFormat = (format: string): any => {
+const setCurrencyFormat = (format: string): any => {
   /**
    * Trim the format string to remove any unnecessary whitespace.
    * If the format is not a string, set it to an empty string.
@@ -69,7 +71,7 @@ export const setCurrencyFormat = (format: string): any => {
  * setCurrency({ code: "EUR", symbol: "€" }); // Persists the EUR currency in the database
  * ```
  */
-export const setCurrency = (currency: ICurrency | string): ICurrency => {
+const setCurrency = (currency: ICurrency | string): ICurrency => {
   /**
    * Check if the provided currency is valid.
    */
@@ -136,7 +138,7 @@ export const setCurrency = (currency: ICurrency | string): ICurrency => {
  * console.log(currentCurrency); // Output: ICurrency object with current currency values
  * ```
  */
-export const getCurrency: () => ICurrency = (): ICurrency => {
+const getCurrency: () => ICurrency = (): ICurrency => {
   /**
    * Get the currency object from the session.
    */
@@ -189,6 +191,7 @@ export const getCurrency: () => ICurrency = (): ICurrency => {
 export default {
   getFormat: getCurrencyFormat,
   setFormat: setCurrencyFormat,
-  set: setCurrency,
-  get: getCurrency
+  setCurrency: setCurrency,
+  getCurrency: getCurrency,
+  defaultCurrencyFormat,
 }

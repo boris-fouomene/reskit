@@ -1,5 +1,3 @@
-import { ICurrencyFormatterKey } from "@utils/currency";
-
 /**
  * Represents a base field with optional type, label, and name properties.
  * The type property defaults to "text" if not specified.

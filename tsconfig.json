@@ -11,6 +11,7 @@
     "strict": true, // Enable all strict type checking options
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "composite": true,
     "allowSyntheticDefaultImports": true,
     //"module": "NodeNext",
     //"moduleResolution": "NodeNext", // Change this to 'node16', 'nodenext', or 'bundler'

@@ -1,4 +1,6 @@
 /**
+ * @interface ICurrency
+ * @group Currency
  * Represents a currency with its associated properties for formatting and display.
  * 
  * This type provides essential details about a currency, including its symbol, 
@@ -127,7 +129,8 @@ export type ICurrency = {
 
 
 /**
- * @function
+ * @group Currency
+ * @interface ICurrencyFormatter
  * Dynamically formats a number into a string based on currency properties (like symbol and decimal places)
  * retrieved from a predefined currency object.
  *
@@ -181,6 +184,7 @@ export type ICurrencyFormatter = (decimalDigits?: number, thousandSeparator?: st
 
 
 /**
+ * @group Currency
  * @interface
  * A string template type representing the dynamic formatter function names.
  * 
@@ -197,6 +201,7 @@ export type ICurrencyFormatter = (decimalDigits?: number, thousandSeparator?: st
 export type ICurrencyFormatterKey = `format${keyof ICurrencies}`;
 
 /**
+ * @group Currency
  * Represents a collection of dynamically generated currency formatter functions.
  * 
  * Each key is a string formed by combining the `format` prefix with a currency code

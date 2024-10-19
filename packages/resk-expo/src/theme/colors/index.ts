@@ -1,15 +1,14 @@
-import { ALPHA } from "../styles";
 import Color from "color";
 
 /**
  * Sets the alpha (transparency) level for a given color.
  * 
  * This function takes a color string and applies an alpha value to it, returning the color with the new transparency. 
- * If no alpha value is provided, it defaults to the constant `ALPHA`.
+ * If no alpha value is provided, it defaults to  `0.6`.
  * 
  * @param {string} color - The base color to modify. This should be a valid CSS color string (e.g., `"#ff0000"`, `"rgb(255, 0, 0)"`).
- * @param {number} [alpha=ALPHA] - The alpha (transparency) value to apply. Should be a value between `0` (completely transparent) and `1` (completely opaque). 
- * Defaults to `ALPHA` if not provided.
+ * @param {number} [alpha=0.6] - The alpha (transparency) value to apply. Should be a value between `0` (completely transparent) and `1` (completely opaque). 
+ * Defaults to `0.6` if not provided.
  * 
  * @returns {(string | undefined)} The color string with the new alpha value if successful, or `undefined` if the input is invalid.
  * 
@@ -21,13 +20,13 @@ import Color from "color";
  * 
  * // Using the default alpha value
  * const defaultAlphaRed = setAlpha("#ff0000");
- * console.log(defaultAlphaRed); // "rgba(255, 0, 0, ALPHA)" (depending on the ALPHA constant value)
+ * console.log(defaultAlphaRed); // "rgba(255, 0, 0, 0.6)"
  * ```
  * 
  * @note
  * This function depends on the `Color` library, which should be available in your project for it to work.
  */
-const setAlpha = (color: string, alpha: number = ALPHA): string | undefined => {
+const setAlpha = (color?: string, alpha: number = 0.6): string | undefined => {
     return Color(color)?.alpha(alpha)?.toString();
 };
 

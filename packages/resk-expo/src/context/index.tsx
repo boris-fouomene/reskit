@@ -9,7 +9,7 @@ import stableHash from "stable-hash";
 import usePrevious from '@utils/usePrevious';
 import { ReskExpoProviderProps } from './types';
 import { ReskExpoContext } from './context';
-import { useColorScheme } from "@hooks/useColorScheme";
+import { useColorScheme } from "@theme/useColorScheme";
 
 export * from "./types";
 export * from "./context";

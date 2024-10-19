@@ -1,4 +1,4 @@
-import { IColorSheme, ITheme, IThemeTokens } from "./types";
+import { IColorSheme, ITheme, IThemeTokenKey, IThemeTokens } from "./types";
 import Colors from "./colors";
 import { extendObj, IDict, isObservable } from "@resk/core";
 import { packageName } from "@utils/index";
@@ -7,6 +7,7 @@ import { StatusBarProps } from "expo-status-bar";
 import Color from "color";
 import updateNative from "./updateNative";
 import Grid from "../breakpoints/grid";
+import styles from "./styles";
 
 export * from "./utils";
 
@@ -104,6 +105,9 @@ const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => an
 export function createTheme(theme: ITheme): ICreatedTheme {
     return {
         ...Object.assign({}, theme),
+        get styles() {
+            return styles;
+        },
         /**
          * Retrieves the color associated with the given color key or value.
          *
@@ -122,14 +126,14 @@ export function createTheme(theme: ITheme): ICreatedTheme {
          * @param {...string[]} [defaultColors] - Fallback color values if the provided color is invalid.
          * @returns {string | undefined} - The resolved color value or undefined if none is found.
          */
-        getColor(color?: keyof IThemeTokens, ...defaultColors: any[]): string | undefined {
+        getColor(color?: IThemeTokenKey, ...defaultColors: any[]): string | undefined {
             if (color && color in this.colors) {
                 return this.colors[color as keyof typeof this.colors] as string;
             }
             if (Colors.isValid(color)) return color as string;
             for (let i in defaultColors) {
                 if (typeof defaultColors[i] === "string") {
-                    const col = this.getColor(defaultColors[i] as keyof IThemeTokens);
+                    const col = this.getColor(defaultColors[i] as IThemeTokenKey);
                     if (col) return col as string;
                 }
             }
@@ -152,10 +156,10 @@ export function createTheme(theme: ITheme): ICreatedTheme {
          * // Returns: { color: "#000000", backgroundColor: "#f5f5f5" }
          * ```
          * 
-         * @param {keyof IThemeTokens} [colorSheme] - The color key to generate a scheme for.
+         * @param {IThemeTokenKey} [colorSheme] - The color key to generate a scheme for.
          * @returns {IColorSheme} - An object containing `color` and `backgroundColor` properties.
          */
-        getColorScheme(colorSheme?: keyof IThemeTokens): IColorSheme {
+        getColorScheme(colorSheme?: IThemeTokenKey): IColorSheme {
             if (
                 !colorSheme ||
                 typeof colorSheme != "string" ||
@@ -433,13 +437,13 @@ import { IObservable, isObj, observable } from "@resk/core";
  * 
  * @method getColor
  * @description Retrieves a specific color from the theme based on the color key.
- * @param {string | keyof IThemeTokens} [color] - The key of the color to retrieve (e.g., "primary", "warning").
+ * @param {string | IThemeTokenKey} [color] - The key of the color to retrieve (e.g., "primary", "warning").
  * @param {...any[]} defaultColors - Default colors to return if the requested color is not found.
  * @returns {string | undefined} The color string if found, otherwise one of the default colors.
  * 
  * @method getColorScheme
  * @description Retrieves a color scheme with `color` and `backgroundColor` based on the provided color scheme key.
- * @param {keyof IThemeTokens} [colorSheme] - The key of the color scheme to retrieve (e.g., "primary", "error").
+ * @param {IThemeTokenKey} [colorSheme] - The key of the color scheme to retrieve (e.g., "primary", "error").
  * @returns {IColorSheme} An object containing `color` and `backgroundColor` properties.
  * 
  * @example 
@@ -491,9 +495,10 @@ import { IObservable, isObj, observable } from "@resk/core";
  */
 export interface ICreatedTheme extends ITheme {
     colors: IThemeTokens;
-    getColor(color?: keyof IThemeTokens, ...defaultColors: any[]): string | undefined;
-    getColorScheme(colorSheme?: keyof IThemeTokens): IColorSheme
+    getColor(color?: IThemeTokenKey, ...defaultColors: any[]): string | undefined;
+    getColorScheme(colorSheme?: IThemeTokenKey): IColorSheme
     grid: typeof Grid;
+    styles: typeof styles;
     /**
      * @method addEventListener
      * Adds an event listener to track theme changes or updates.
@@ -528,3 +533,9 @@ export interface ICreatedTheme extends ITheme {
      */
     addEventListener: (callstack: (theme: ITheme) => any) => { remove: () => any };
 };
+
+export * from "./useTheme";
+
+export * from "./useColorScheme";
+
+export { default as Colors } from "./colors";

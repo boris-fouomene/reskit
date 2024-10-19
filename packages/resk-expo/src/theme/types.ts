@@ -1,5 +1,3 @@
-import grid from "../breakpoints/grid";
-
 /**
  * @interface IThemeTokens
  * Represents the default tokens available in a theme. You can extends this interface to add custom tokens.
@@ -65,6 +63,8 @@ export interface IThemeTokens {
     onError?: string;
     disabled?: string;
 };
+
+export type IThemeTokenKey = keyof IThemeTokens;
 
 /**
  * @interface  ITheme

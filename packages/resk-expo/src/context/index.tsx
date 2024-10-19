@@ -1,5 +1,6 @@
+import "@expo/metro-runtime";
+import "@session";
 import { useEffect } from 'react';
-import { ThemeProvider } from '@emotion/react';
 import { ITheme } from '@theme/types';
 import { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate } from '@theme/index';
 import useStateCallback from '@utils/stateCallback';
@@ -96,12 +97,12 @@ export function ReskExpoProvider({ children, theme: customTheme, ...rest }: Resk
 
   /**
    * Provides the current theme and the `updateTheme` function to all child components
-   * through the `ReskExpoContext`. Additionally, the `ThemeProvider` from `@emotion/react`
+   * through the `ReskExpoContext`.
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
     <ReskExpoContext.Provider value={{ theme, updateTheme, ...rest }}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <>{children}</>
     </ReskExpoContext.Provider>
   );
 }

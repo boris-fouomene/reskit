@@ -9,6 +9,9 @@
     "rootDir": ".",
     "outDir": "./build",
     "paths": {
+      "@session": [
+        "src/session"
+      ],
       "@resk/core": [
         "../resk-core/build/src"
       ],

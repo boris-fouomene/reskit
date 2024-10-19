@@ -1,4 +1,3 @@
-import "@expo/metro-runtime";
 import 'react-native-reanimated';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';

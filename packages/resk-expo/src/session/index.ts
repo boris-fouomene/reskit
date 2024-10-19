@@ -1,4 +1,3 @@
-import packageJSON from "package.json";
 import { Session } from "@resk/core";
 import { packageName } from "@utils/index";
 

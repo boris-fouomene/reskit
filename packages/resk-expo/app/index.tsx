@@ -6,7 +6,7 @@ const index = () => {
     return (
         <View>
             <Text>index</Text>
-            <TextInputComponent label='My Label' />
+            <TextInputComponent label='My Label11' />
             <FontIcon name={"camera"} title="A font icon" />
         </View>
     )

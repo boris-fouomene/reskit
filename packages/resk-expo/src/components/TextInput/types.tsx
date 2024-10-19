@@ -314,7 +314,7 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' |
      * @type (options: ITextInputCallbackOptions) => ReactNode
      * the Text input label, 
      */
-    label?: ((options: ITextInputCallbackOptions) => ReactNode);
+    label?: ((options: ITextInputCallbackOptions) => ReactNode) | ReactNode;
 
     /*** 
      * @type ILabelProps

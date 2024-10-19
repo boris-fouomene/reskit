@@ -149,11 +149,12 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, la
         }
         return <Label children={affContent} style={[styles.affix, props.multiline && styles.affixMultiline, { color: textColor }]} />;
     }, [focusedValue, canValueBeDecimal, error, props.multiline, affix, isPasswordField]);
+    const inputValue = focused ? focusedValue : formated.formattedValue || emptyValue;
     const label = useMemo(() => {
-        if (isLabelEmbeded && isValidElement(props.placeholder, true) && props.placeholder) return null;
+        if (isLabelEmbeded && isValidElement(props.placeholder, true) && props.placeholder && isEmpty(inputValue)) return null;
         const l = typeof customLabel == "function" ? customLabel(callOptions) : isValidElement(customLabel, true) ? customLabel : null;
         return isValidElement(l, true) ? l : null;
-    }, [customLabel, focused, error, disabled, isLabelEmbeded, canValueBeDecimal, props.placeholder]);
+    }, [customLabel, focused, inputValue, error, disabled, isLabelEmbeded, canValueBeDecimal, props.placeholder]);
     const { left, right } = getLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight }, callOptions);
     const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null];
     const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} name={isSecure ? "eye" : "eye-off"} /> : null;
@@ -184,7 +185,7 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, la
                 readOnly={editable === false}
                 secureTextEntry={isPasswordField ? isSecure : secureTextEntry}
                 style={[styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null), styles.input, inputStyle, props.style, disabledOrEditStyle]}
-                value={focused ? focusedValue : formated.formattedValue || emptyValue}
+                value={inputValue}
                 inputMode={inputMode}
                 ref={mergeRefs(innerRef, ref)}
                 onChange={(event: NativeSyntheticEvent<TextInputChangeEventData>) => {

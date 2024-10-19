@@ -1,33 +1,82 @@
 import Label from "@components/Label";
-import { isValidElement } from "@utils";
-import { InputModeOptions, NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData } from "react-native";
+import { isValidElement, mergeRefs } from "@utils";
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TouchableOpacity } from "react-native";
 import React, { ReactNode, useEffect, useMemo, useRef } from "react";
-import { isNonNullString, isStringNumber } from "@resk/core";
+import { formatValueToObject, Platform, IDict, isNonNullString, isStringNumber, parseDecimal, isEmpty } from "@resk/core";
 import _, { isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View, { IViewProps } from "@components/View";
 import { ILeftOrRightProps, getLeftOrRightProps } from "@hooks/index";
+import { ITextInputCallbackOptions, ITextInputProps, ITextInputType } from "./types";
 
-/***
- * Le composant TextInput, étend le composant TextInput de react-native-paper
- * @see https://callstack.github.io/react-native-paper/docs/components/TextInput
-    example : 
-    ```ts
-        import TextInput from "$components/TextInput";
-        export function MyTextInput(){
-            return <TexField {p as ITextInputProps}/>
-        }
-    ```
-*/
-const TextInput = React.forwardRef(({ defaultValue, testID, value: customValue, debounceTimeout, left, leftProps, leftChildrenCount, rightChildrenCount, rightProps, rightContainerProps, leftContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, right, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref: React.Ref<RNTextInput>) => {
+/**
+ * @description
+ * The `TextInput` component is an enhanced version of the standard TextInput from React Native.
+ * It is designed to be highly customizable and feature-rich, catering to various user input requirements.
+ *
+ * Key Features:
+ * - **Custom Formatting**: Automatically formats the input value based on the provided options, ensuring that the data adheres to the desired format.
+ * - **Affixes**: Allows for the addition of suffix elements (such as icons or labels) to the input field, enhancing its usability and aesthetic appeal.
+ * - **Secure Text Entry**: Supports secure text entry for sensitive information (like passwords), with a toggle feature to show or hide the input.
+ * - **Debouncing**: Implements a debouncing mechanism for input changes to optimize performance and reduce the frequency of change events being fired.
+ * - **Dynamic Input Modes**: Automatically adjusts the input mode (e.g., text, number, decimal) based on user interaction, improving the overall user experience.
+ * - **Accessibility Features**: Incorporates accessibility props to ensure that the component is usable for all users, including those using assistive technologies.
+ *
+ * Props:
+ * - `defaultValue`: The initial value displayed in the input field before any user interaction.
+ * - `testID`: A unique identifier for testing purposes, useful in automated tests.
+ * - `left` / `right`: Custom components that can be rendered on the left or right side of the input, such as icons or buttons.
+ * - `debounceTimeout`: The time (in milliseconds) to wait before firing the onChange event after the user stops typing.
+ * - `length`: The number of characters allowed in the input field.
+ * - `maxLength`: The maximum number of characters allowed in the input field.
+ * - `secureTextEntry`: A boolean that determines whether the input should be obscured (for passwords).
+ * - `onChange`: A callback function that is triggered whenever the input value changes, allowing for real-time updates.
+ * - `affix`: Can be a ReactNode of false or a function that returns a React element, used to display additional information alongside the input.
+ *
+ * Example Usage:
+ * ```ts
+ * import {TextInput} from "@resk/expo";
+ *
+ * export function MyTextInput() {
+ *     // Callback function to handle changes in the input
+ *     const handleInputChange = (input) => {
+ *         console.log("Input changed:", input);
+ *     };
+ *     return (
+ *         <TextInput
+ *             defaultValue="Enter your text here" // Initial value of the input
+ *             type="text" // Specifies the type of input
+ *             maxLength={100} // Limits the input to 100 characters
+ *             onChange={handleInputChange} // Callback for handling changes
+ *             affix={<Icon name="info" />} // Adds an info icon as an affix
+ *             secureTextEntry={false} // Indicates that the input does not require secure handling
+ *         />
+ *     );
+ * }
+ * ```
+ *
+ * In this example, the `MyTextInput` function demonstrates how to utilize the `TextInput` component:
+ * - The `defaultValue` prop initializes the input with placeholder text, guiding the user on what to enter.
+ * - The `type` prop specifies that the input is of type "text", meaning it will accept regular text input.
+ * - The `maxLength` prop restricts the user from entering more than 100 characters, ensuring data integrity.
+ * - The `onChange` prop is a function that logs the input value to the console whenever it changes, allowing for real-time data handling.
+ * - The `affix` prop adds an information icon next to the input, which can provide context or additional functionality.
+ * - The `secureTextEntry` prop is set to false, indicating that this input field is not for sensitive information.
+ *
+ * The `TextInput` component is designed to be versatile and reusable across various parts of an application, ensuring a consistent and engaging user experience. 
+ * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
+ */
+const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, labelEmbeded = true, error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, leftContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
     const [focused, setIsFocused] = React.useState(false);
+    const theme = useTheme();
+    contentContainerProps = Object.assign({}, contentContainerProps);
     rightContainerProps = Object.assign({}, rightContainerProps);
     leftContainerProps = Object.assign({}, leftContainerProps);
-    leftProps = Object.assign({}, leftProps);
-    rightProps = Object.assign({}, rightProps);
+    containerProps = Object.assign({}, containerProps);
     testID = testID || "RN_TextInputComponent";
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
+    const isLabelEmbeded = labelEmbeded !== false;
     const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
     useEffect(() => {
@@ -49,7 +98,7 @@ const TextInput = React.forwardRef(({ defaultValue, testID, value: customValue, 
         }
     }, [type, cInputMode, focused]);
     const emptyValue = cIsEmptyValue || (canValueBeDecimal ? "0" : "");
-    const toCase = (value: ITextInputValue): ITextInputValue => {
+    const toCase = (value: any): any => {
         if (canValueBeDecimal && focused && (value === '.' || value == '.')) {
             value = "0" + value;
         }
@@ -67,13 +116,13 @@ const TextInput = React.forwardRef(({ defaultValue, testID, value: customValue, 
     const [inputState, setInputState] = React.useState({
         value: toCase(defaultValue),
         event: null,
-    } as IDynamicObject);
+    } as IDict);
     /**
      * la valeur affichée est la valeur formattée
      */
     const formated = useMemo(() => {
-        return formatValue({ ...inputState, type, value: inputState.value, ...props }, true);
-    }, [inputState.value]) as IFieldFormatValueResult;
+        return formatValueToObject({ ...inputState, type, value: inputState.value, ...props });
+    }, [inputState.value]);
     const focusedValue = focused ? (formated.value == emptyValue ? '' : formated.value) : '';
     useEffect(() => {
         if (defaultValue === inputState.value) return;
@@ -82,10 +131,8 @@ const TextInput = React.forwardRef(({ defaultValue, testID, value: customValue, 
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
-    const textColor = props.error ? theme.colors.error : focused && editable ? theme.colors.primary : undefined;
-    const callOptions: ITextInputCallbackOptions = { ...formated, focused, color: textColor as string, editable, disabled };
-    const customRight = typeof right == "function" ? right(callOptions) : right;
-    const customLeft = typeof left == "function" ? left(callOptions) : left;
+    const textColor = error ? theme.colors.error : focused && editable ? theme.colors.primary : theme.colors.text;
+    const callOptions: ITextInputCallbackOptions = { ...formated, labelEmbeded: isLabelEmbeded, focused, color: textColor as string, editable, disabled };
     const affixContent = useMemo(() => {
         if (affix === false) return null;
         let affContent = typeof affix == "function" ? affix(callOptions) : isValidElement(affix, true) ? affix : null;
@@ -100,114 +147,133 @@ const TextInput = React.forwardRef(({ defaultValue, testID, value: customValue, 
         if (React.isValidElement(affContent)) {
             return affContent;
         }
-        return <Label children={affContent} style={[textFieldStyles.affix, props.multiline && textFieldStyles.affixMultiline, { color: textColor }]} />;
-    }, [focusedValue, canValueBeDecimal, props.multiline, affix, isPasswordField]);
-    const mLeft = React.isValidElement(customLeft) ? customLeft : null;
-    const mRight = React.isValidElement(customRight) ? customRight : null;
-    const SIZE = 40;
-    const { left: leftWidth, right: rightWidth } = useMemo<{ left: number, right: number }>(() => {
-        let right = (affixContent ? SIZE : 0) + (canToggleSecure ? SIZE : 0);
-        let left = typeof leftChildrenCount == "number" ? leftChildrenCount : 0;
-        if (typeof rightChildrenCount === 'number') {
-            right += rightChildrenCount * SIZE;
-        }
-        if (mRight) {
-            right += SIZE;
-        }
-        return { left: Math.max(SIZE, left), right: Math.max(SIZE, right) };
-    }, [affixContent, canToggleSecure, mRight]);
-    const disabledOrEditStyle = [!editable ? styles.readOnly : null, props.disabled ? styles.disabled : null];
+        return <Label children={affContent} style={[styles.affix, props.multiline && styles.affixMultiline, { color: textColor }]} />;
+    }, [focusedValue, canValueBeDecimal, error, props.multiline, affix, isPasswordField]);
+    const label = useMemo(() => {
+        if (isLabelEmbeded && isValidElement(props.placeholder, true) && props.placeholder) return null;
+        const l = typeof customLabel == "function" ? customLabel(callOptions) : isValidElement(customLabel, true) ? customLabel : null;
+        return isValidElement(l, true) ? l : null;
+    }, [customLabel, focused, error, disabled, isLabelEmbeded, canValueBeDecimal, props.placeholder]);
+    const { left, right } = getLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight }, callOptions);
+    const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null];
     const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} name={isSecure ? "eye" : "eye-off"} /> : null;
-    return <TextInput
-        mode={"outlined"}
-        textColor={textColor}
-        autoComplete="off"
-        {...props}
-        testID={testID}
-        editable={editable}
-        secureTextEntry={isPasswordField ? isSecure : secureTextEntry}
-        disabled={props.disabled}
-        style={[props.style, disabledOrEditStyle]}
-        value={focused ? focusedValue : formated.formattedValue || emptyValue}
-        inputMode={inputMode}
-        ref={ref}
-        onChange={(event: NativeSyntheticEvent<TextInputChangeEventData>) => {
-            const { nativeEvent: { target, text } } = event;
-            let textString = String(text);
-            if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
-                return;
-            }
-            const valCase = toCase(textString);
-            if (textString !== inputState.value && valCase !== inputState.value) {
-                const options = { ...inputState, value: valCase, text: textString, event };
-                setInputState(options);
-                if (typeof onChange == "function") {
-                    clearTimeout(debounceTimeoutRef.current);
-                    debounceTimeoutRef.current = setTimeout(() => {
-                        onChange({ ...options, ...inputState, focused, event, ...formatValue({ ...options, type }, true) as IFieldFormatValueResult });
-                    }, isNumber(debounceTimeout) && debounceTimeout || 0);
-                }
-            }
-        }}
-        onKeyPress={(event, ...rest) => {
-            if (props.onKeyPress) {
-                props.onKeyPress(event, ...rest);
-            }
-            if (!focused) {
-                setIsFocused(true);
-            }
-        }}
-        onBlur={(event: NativeSyntheticEvent<TextInputFocusEventData>, ...rest) => {
-            setIsFocused(false);
-            if (props.onBlur) {
-                props.onBlur(event, ...rest);
-            }
-        }}
-        onFocus={
-            (event: NativeSyntheticEvent<TextInputFocusEventData>, ...rest) => {
-                setIsFocused(true);
-                if (props.onFocus) {
-                    props.onFocus(event, ...rest);
-                }
-            }
+    const lContent = isValidElement(label) ? label : (label ? <Label color={textColor} testID={`${testID}_Label`} {...Object.assign({}, labelProps)}>{label}{isLabelEmbeded ? ` : ` : ""}</Label> : null);
+    const innerRef = useRef<RNTextInput | null>(null);
+    const labelContent = !isEmpty(lContent) && editable ? <TouchableOpacity onPress={(e) => {
+        if (innerRef?.current && typeof innerRef.current.focus === "function") {
+            innerRef.current.focus();
         }
-        left={mLeft ? <TextInput.Icon
-            size={leftWidth}
-            {...leftProps}
-            style={[{ width: leftWidth, height: '100%' }, disabledOrEditStyle, leftProps.style]}
-            icon={() => {
-                return <HStack testID={testID + "_LeftContainer"} {...leftContainerProps} style={[disabledOrEditStyle, textFieldStyles.leftOrRightContainer, leftContainerProps.style]}>
-                    {mLeft}
-                </HStack>
-            }}
-        /> : null}
-        right={mRight || canToggleSecure ? <TextInput.Icon
-            size={rightWidth}
-            {...rightProps}
-            style={[{ width: rightWidth, height: '100%' }, disabledOrEditStyle, rightProps.style]}
-            icon={() => {
-                return <HStack testID={testID + "_RightContainer"} {...rightContainerProps} style={[disabledOrEditStyle, textFieldStyles.leftOrRightContainer, rightContainerProps.style]}>
-                    {affixContent}
-                    {!editable || disabled && isPasswordField ? secureIcon : <Pressable children={secureIcon} onPress={(e) => setIsSecure(!isSecure)} />}
-                    {mRight}
-                </HStack>
-            }}
-        /> : null}
-    />
+    }}>{lContent}</TouchableOpacity> : lContent;
+    const containerStyle = isLabelEmbeded ? [
+        styles.containerLabelEmbeded,
+        { borderColor: focused || error ? textColor : theme.colors.divider },
+    ] : []
+    const inputStyle = [{ color: textColor }, labelEmbeded ? styles.inputLabelEmbeded : null];
+    return <View testID={`${testID}_Container`} {...containerProps} style={[styles.container, containerStyle, disabledOrEditStyle, containerProps.style]}>
+        {!isLabelEmbeded ? labelContent : null}
+        <View testID={`${testID}_ContentContainer`} {...contentContainerProps} style={[styles.contentContainer, contentContainerProps.style]}>
+            {left || isLabelEmbeded && !isEmpty(label) ? <View testID={`${testID}_LeftContainer`} {...leftContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, leftContainerProps.style]}>
+                {left}
+                {isLabelEmbeded !== false ? labelContent : null}
+            </View> : null}
+            <RNTextInput
+                autoComplete="off"
+                {...props}
+                underlineColorAndroid="transparent"
+                testID={testID}
+                readOnly={editable === false}
+                secureTextEntry={isPasswordField ? isSecure : secureTextEntry}
+                style={[styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null), styles.input, inputStyle, props.style, disabledOrEditStyle]}
+                value={focused ? focusedValue : formated.formattedValue || emptyValue}
+                inputMode={inputMode}
+                ref={mergeRefs(innerRef, ref)}
+                onChange={(event: NativeSyntheticEvent<TextInputChangeEventData>) => {
+                    const { nativeEvent: { target, text } } = event;
+                    let textString = String(text);
+                    if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
+                        return;
+                    }
+                    const valCase = toCase(textString);
+                    if (textString !== inputState.value && valCase !== inputState.value) {
+                        const options = { ...inputState, value: valCase, text: textString, event };
+                        setInputState(options);
+                        if (typeof onChange == "function") {
+                            clearTimeout(debounceTimeoutRef.current);
+                            debounceTimeoutRef.current = setTimeout(() => {
+                                onChange({ ...options, ...inputState, focused, event, ...formatValueToObject({ ...options, type }) });
+                            }, isNumber(debounceTimeout) && debounceTimeout || 0);
+                        }
+                    }
+                }}
+                onKeyPress={(event, ...rest) => {
+                    if (props.onKeyPress) {
+                        props.onKeyPress(event, ...rest);
+                    }
+                    if (!focused) {
+                        setIsFocused(true);
+                    }
+                }}
+                onBlur={(event: NativeSyntheticEvent<TextInputFocusEventData>, ...rest) => {
+                    setIsFocused(false);
+                    if (props.onBlur) {
+                        props.onBlur(event, ...rest);
+                    }
+                }}
+                onFocus={
+                    (event: NativeSyntheticEvent<TextInputFocusEventData>, ...rest) => {
+                        setIsFocused(true);
+                        if (props.onFocus) {
+                            props.onFocus(event, ...rest);
+                        }
+                    }
+                }
+            />
+            {right || canToggleSecure ? <View testID={`${testID}_RightContainer`} {...leftContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, rightContainerProps.style]}>
+                {affixContent}
+                {right}
+                {!editable || disabled && isPasswordField ? secureIcon : <Pressable children={secureIcon} onPress={(e) => setIsSecure(!isSecure)} />}
+            </View> : null}
+        </View>
+    </View>
 });
 
 TextInput.displayName = "TextInput";
 
 export default TextInput;
 
-export type ITextInputValue = string | number | undefined;
 
-const textFieldStyles = StyleSheet.create({
+const styles = StyleSheet.create({
     affix: {
         paddingHorizontal: 0,
         marginHorizontal: 0,
         marginLeft: 5,
         fontSize: 15
+    },
+    inputLabelEmbeded: {
+        paddingRight: 5,
+    },
+    input: {
+        borderColor: 'transparent', // No border
+        borderWidth: 0, // Remove border
+        borderBottomColor: "transparent",
+        borderBottomWidth: 0,
+        borderTopColor: "transparent",
+        borderTopWidth: 0,
+        borderLeftColor: "transparent",
+        borderLeftWidth: 0,
+        borderRightColor: "transparent",
+        borderRightWidth: 0,
+        borderRadius: 0,
+        backgroundColor: 'transparent',
+        paddingHorizontal: 2,
+    },
+    focusedInput: {
+        borderColor: 'transparent', // No border on focus
+        borderWidth: 0,
+    },
+    outlineNone: {},
+    containerLabelEmbeded: {
+        borderWidth: 1,
     },
     affixMultiline: {
         position: 'absolute',
@@ -218,75 +284,28 @@ const textFieldStyles = StyleSheet.create({
         justifyContent: "center",
     },
     container: {
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+        alignSelf: "flex-start",
+        borderRadius: 10,
+        paddingVertical: 2,
+        paddingHorizontal: 5,
+    },
+    contentContainer: {
         justifyContent: "space-between",
         flexWrap: "nowrap",
-        backgroundColor: "transparent"
+        backgroundColor: "transparent",
+        flexDirection: "row",
     },
     leftOrRightContainer: {
-        position: "relative",
-    }
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
 })
 
-export type ITextInputCallbackOptions = IFieldFormatValueResult & {
-    color?: string;
-    /***
-     * si le composant est focused
-     */
-    focused?: boolean;
-    editable?: boolean;
-    disabled?: boolean;
+const isDecimalType = (type: ITextInputType | string): boolean => {
+    return ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());
 }
-
-export const roundLayoutSize = (size: number): number => Math.round(size * 1000) / 1000;
-
-/***
- * cette interface étend celle du composant TextInput de react-native-paper
- * @see : https://github.com/callstack/react-native-paper/blob/main/src/components/TextInput/TextInput.tsx
- */
-export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' | 'left' | 'react'> & {
-    inputMode?: InputModeOptions | null;
-    left?: ReactNode | ((options?: ITextInputCallbackOptions) => ReactNode);
-    right?: ReactNode | ((options?: ITextInputCallbackOptions) => ReactNode);
-    /****
-     * spécifie la longueur de texte autorisée pour le champs. 
-     * cas des champs à longueur fixe
-     */
-    length?: number;
-    defaultValue?: ITextInputValue; //la valeur par défaut du champ
-    type?: ITextInputType,
-    /***
-     * les props du container parent aux élément right du composant
-     */
-    rightContainerProps?: IHStackProps;
-    /*
-        les props du container parent aux élément left du composant
-    */
-    leftContainerProps?: IHStackProps;
-
-    leftProps?: TextInputIconProps;
-    leftChildrenCount?: number; //le nombre d'enfants à gauche
-    rightProps?: TextInputIconProps;
-    rightChildrenCount?: number; //le nombre d'enfants à droite
-    /***
-     * permet d'afficher un texte ou une valeur en position affixe du composant
-     * utile pour afficher par exemple le nombre de caractère restant ou pour le composant
-     * Par défaut, affiche le nombre de caractère entrés dans le composant TextInput
-     * Afix peut être une fonction qui retourne un élément node ou un nombre ou une chaine de caractère
-     * si affix vaut false, alors aucun élément d'affixe ne sera affiché
-     */
-    affix?: ReactNode | ((options: ITextInputCallbackOptions) => ReactNode) | false;
-    onChange?: (options: ITextInputOnChangeOptions) => any;
-    /***
-     * la fonction toCase permet de formatter le rendu attendu
-     */
-    toCase?: (value: ITextInputValue) => ITextInputValue;
-    format?: IFieldFormatValue; //la fonction permettant de formatter la valeur à afficher à l'inputText
-    emptyValue?: ITextInputValue; //la valeur considérée nulle ou vide par défaut
-    /**
-     * permet de spécifier l'interval de temps d'écoute de la valeur débouncée
-     * si définit, alors en cas de changement de la valeur, la fonction qui handle le onChange sera appelée après ce temps découte
-     */
-    debounceTimeout?: number;
-}
-
-export type ITextInputEvent = NativeSyntheticEvent<TextInputChangeEventData> | null;

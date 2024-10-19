@@ -55,8 +55,8 @@ export const getLeftOrRightProps = <T = any>(props: ILeftOrRightProps, options: 
 
     // Validate and return the left and right properties, ensuring they are valid React elements
     return {
-        left: isValidElement(left, true) ? left : null,
-        right: isValidElement(right, true) ? right : null,
+        left: isValidElement(left) ? left : null,
+        right: isValidElement(right) ? right : null,
     };
 };
 

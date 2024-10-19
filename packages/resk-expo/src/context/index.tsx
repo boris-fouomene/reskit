@@ -1,4 +1,4 @@
-import "@expo/metro-runtime";
+//import "@expo/metro-runtime";
 import "@session";
 import { useEffect } from 'react';
 import { ITheme } from '@theme/types';

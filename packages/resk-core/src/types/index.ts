@@ -662,6 +662,7 @@ export interface IFieldFormatValueOptions {
 }
 
 /**
+ * @interface IFieldFormatValueResult
  * Represents the result of a formatted value obtained via the `formatValue` function.
  *
  * This interface extends the `IFieldFormatValueOptions` interface and contains 

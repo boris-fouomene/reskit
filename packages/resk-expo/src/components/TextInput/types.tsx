@@ -319,7 +319,7 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' |
     /***
      * the text input variant
      */
-    variant?: "labelEmbeded" | "outlined" | "flat" | "default",
+    variant?: "labelEmbeded" | "flat" | "default", // | "outlined" 
 
     /**
      * @type (options: ITextInputCallbackOptions) => ReactNode | false

@@ -80,7 +80,7 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
     testID = testID || "RN_TextInputComponent";
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
     const isLabelEmbededVariant = variant == "labelEmbeded";
-    const isFlatVariant = variant === "flat", isOutlinedVariant = variant == "outlined";
+    const isFlatVariant = variant === "flat", isOutlinedVariant = false;// variant == "outlined";
     const isDefaultVariant = !isFlatVariant && !isOutlinedVariant && !isOutlinedVariant;
     const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
@@ -219,6 +219,7 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
             </View> : null}
             <RNTextInput
                 autoComplete="off"
+                placeholderTextColor={focused || error ? undefined : theme.colors.placeholder}
                 {...props}
                 placeholder={!canHandleFloadingLabel || !labelContent ? placeholder : undefined}
                 underlineColorAndroid="transparent"
@@ -279,10 +280,10 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
     </View>
 });
 
-const getContainerAndContentStyle = ({ isLabelEmbededVariant, canHandleFloadingLabel, textColor, borderColor, theme, isFlatVariant, isOutlinedVariant, floatingLabelPosition, isDefaultVariant }: { isLabelEmbededVariant: boolean, floatingLabelPosition: SharedValue<number>, canRenderLabel: boolean, canHandleFloadingLabel: boolean, theme: ITheme, focused: boolean, textColor?: string, borderColor?: string, isFlatVariant: boolean, isOutlinedVariant: boolean, isDefaultVariant: boolean }) => {
+const getContainerAndContentStyle = ({ isLabelEmbededVariant, canHandleFloadingLabel, focused, textColor, borderColor, theme, isFlatVariant, isOutlinedVariant, floatingLabelPosition, isDefaultVariant }: { isLabelEmbededVariant: boolean, floatingLabelPosition: SharedValue<number>, canRenderLabel: boolean, canHandleFloadingLabel: boolean, theme: ITheme, focused: boolean, textColor?: string, borderColor?: string, isFlatVariant: boolean, isOutlinedVariant: boolean, isDefaultVariant: boolean }) => {
     const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [{ color: textColor }], labelStyle: IStyle = [{ color: textColor }];
     const borderedStyle = [
-        styles.containerLabelEmbeded,
+        focused && !isFlatVariant ? styles.focusedOutlineBorder : styles.containerLabelEmbeded,
         { borderColor, borderRadius: theme.roundness },
     ];
     const notEmbeededLabelStyle = [styles.notEmbededLabelStyle],
@@ -357,6 +358,9 @@ const styles = StyleSheet.create({
     containerLabelEmbeded: {
         borderWidth: 1,
     },
+    focusedOutlineBorder: {
+        borderWidth: 2,
+    },
     affixMultiline: {
         position: 'absolute',
         right: 0,
@@ -395,6 +399,7 @@ const styles = StyleSheet.create({
         borderRightWidth: 0,
         borderBottomWidth: 1,
         paddingHorizontal: 0,
+        paddingBottom: 5,
     },
     outlinedVarientContentContainer: {
 

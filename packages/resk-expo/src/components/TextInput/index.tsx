@@ -294,6 +294,7 @@ const getContainerAndContentStyle = ({ isLabelEmbededVariant, canHandleFloadingL
         inputStyle.push(styles.inputLabelEmbeded);
         containerStyle.push(borderedStyle);
         containerStyle.push(styles.labelEmbededVariantContainer);
+        labelStyle.push(styles.labelEmbededVariantLabel);
     } else {
         inputStyle.push(notEmbeededInputStyle);
         labelStyle.push(notEmbeededLabelStyle)
@@ -432,8 +433,11 @@ const styles = StyleSheet.create({
 
     },
     labelEmbededVariantContainer: {
-        padding: 5,
-    }
+        //padding: 0,
+    },
+    labelEmbededVariantLabel: {
+        paddingLeft: 3,
+    },
 })
 
 const isDecimalType = (type: ITextInputType | string): boolean => {

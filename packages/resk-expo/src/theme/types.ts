@@ -1,10 +1,10 @@
 /**
- * @interface IThemeTokens
+ * @interface IThemeColorTokens
  * Represents the default tokens available in a theme. You can extends this interface to add custom tokens.
  * 
  * This includes optional custom colors for various application states like warnings, success, info, etc.
  * 
- * @typedef {Object} IThemeTokens
+ * @typedef {Object} IThemeColorTokens
  * @property {string} [text] - The color applied on text elements
  * @property {string} [primary] - The primary color of the application
  * @property {string} [onPrimary] - The color applied on top of the primary background (e.g., text or icons).
@@ -27,10 +27,18 @@
  * @property {string} [divider] - The color used for dividers.  
  * @property {string} [backdrop] - The color used for modal's backdrop.
  * @property {string} [disabled] - The color used for disabled elements.
- * 
+ * @description 
+ * The theming system is designed on the basis of the latest version of Google’s open-source design system
+ * @see : https://m3.material.io/styles/color/roles for more information.
+ * The role of the different colors is described on the site as follows: 
+ * `Surface` – A role used for backgrounds and large, low-emphasis areas of the screen.
+ * `Primary`, Secondary, Tertiary – Accent color roles used to emphasize or de-emphasize foreground elements.
+ * `Container` – Roles used as a fill color for foreground elements like buttons. They should not be used for text or icons.
+ * `On` – Roles starting with this term indicate a color for text or icons on top of its paired parent color. For example, onPrimary is used for text and icons against the primary fill color.
+ * `Variant` – Roles ending with this term offer a lower emphasis alternative to its non-variant pair. For example, outline variant is a less emphasized version of the outline color.
  * @example
  * ```ts
- * const themeColors: IThemeTokens = {
+ * const themeColors: IThemeColorTokens = {
  *    primary: "#6200EE",
  *    onPrimary: "#FFFFFF",
  *    warning: "#FFA726",
@@ -39,7 +47,7 @@
  * };
  * ```
  */
-export interface IThemeTokens {
+export interface IThemeColorTokens {
     text?: string;
     primary?: string;
     onPrimary?: string;
@@ -64,7 +72,41 @@ export interface IThemeTokens {
     disabled?: string;
 };
 
-export type IThemeTokenKey = keyof IThemeTokens;
+/**
+ * @interface IThemeColorTokenKey
+ * Represents the keys of the `IThemeColorTokens` interface.
+ * 
+ * This type is a union of string literals that correspond to the property names 
+ * defined in the `IThemeColorTokens` interface. It is useful for ensuring that 
+ * only valid theme color token keys can be used in contexts where theme colors 
+ * are referenced or manipulated.
+ * 
+ * ## Usage Example
+ * 
+ * For instance, if `IThemeColorTokens` has properties like `primary`, `secondary`, 
+ * and `background`, then `IThemeColorTokenKey` will be equivalent to the union type 
+ * `"primary" | "secondary" | "background"`. This allows developers to use these 
+ * keys safely in their code without the risk of typos or invalid property names.
+ * 
+ * ### Example of Valid Usage
+ * 
+ * ```typescript
+ * const themeColor: IThemeColorTokenKey = 'primary'; // Valid
+ * const anotherColor: IThemeColorTokenKey = 'background'; // Valid
+ * 
+ * // The following would cause a TypeScript error:
+ * const invalidColor: IThemeColorTokenKey = 'invalidColor'; // Error: Type '"invalidColor"' is not assignable to type 'IThemeColorTokenKey'.
+ * ```
+ * 
+ * ## Notes
+ * 
+ * - This type is particularly useful in scenarios where theme customization 
+ *   is required, allowing for dynamic access to theme properties.
+ * - It helps in maintaining type safety and reducing runtime errors by leveraging 
+ *   TypeScript's type system.
+ */
+export type IThemeColorTokenKey = keyof IThemeColorTokens;
+
 
 /**
  * @interface  ITheme
@@ -76,7 +118,7 @@ export type IThemeTokenKey = keyof IThemeTokens;
  * @property {string} [name] - The name of the theme.
  * @property {boolean | number} [dark] - Whether the theme is in dark mode (`true` for dark, `false` for light).
  * @property {string} [customCSS] - Custom CSS properties applied to the theme (mainly for web platforms).
- * @property {IThemeTokens} colors - The set of colors associated with the theme.
+ * @property {IThemeColorTokens} colors - The set of colors associated with the theme.
  * 
  * 
  * @example
@@ -97,7 +139,7 @@ export interface ITheme {
     name?: string;
     dark?: boolean;
     customCSS?: string;
-    colors: IThemeTokens;
+    colors: IThemeColorTokens;
 }
 
 /**

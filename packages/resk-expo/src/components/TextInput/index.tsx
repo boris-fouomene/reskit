@@ -80,7 +80,8 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
     testID = testID || "RN_TextInputComponent";
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
     const isLabelEmbededVariant = variant == "labelEmbeded";
-    const isFlatVariant = variant === "flat", isOutlinedVariant = false;// variant == "outlined";
+    const isFlatVariant = false,//variant === "flat", 
+        isOutlinedVariant = false;// variant == "outlined";
     const isDefaultVariant = !isFlatVariant && !isOutlinedVariant && !isOutlinedVariant;
     const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
@@ -166,7 +167,7 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
     const textColor = error ? theme.colors.error : focused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
-    const callOptions: ITextInputCallbackOptions = { ...formated, variant, focused, color: textColor as string, editable, disabled };
+    const callOptions: ITextInputCallbackOptions = { ...formated, error: !!error, variant, focused, textColor: textColor as string, editable, disabled: disabled as boolean };
     const affixContent = useMemo(() => {
         if (affix === false) return null;
         let affContent = typeof affix == "function" ? affix(callOptions) : isValidElement(affix, true) ? affix : null;
@@ -207,16 +208,17 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
             innerRef.current.focus();
         }
     }}>{lContent}</TouchableOpacity> : lContent;
+    const floatingLabelContainer = canHandleFloadingLabel ? <Animated.Text testID={`${testID}_FloatingLabelContainer`} style={[styles.floatingLabel, floatingLabelAnimatedStyle, focused && styles.floatingLabelFocused]}>
+        {labelContent}
+    </Animated.Text> : null;
     return <View ref={containerRef} testID={`${testID}_Container`} {...containerProps} style={[styles.container, containerStyle, disabledOrEditStyle, containerProps.style]}>
-        {isLabelEmbededVariant ? null :
-            (canHandleFloadingLabel ? <Animated.Text testID={`${testID}_FloatingLabelContainer`} style={[styles.floatingLabel, floatingLabelAnimatedStyle, focused && styles.floatingLabelFocused]}>
-                {labelContent}
-            </Animated.Text> : labelContent)}
+        {(canHandleFloadingLabel ? (!isFlatVariant ? floatingLabelContainer : null) : (isLabelEmbededVariant ? null : labelContent))}
         <View ref={contentContainerRef} testID={`${testID}_ContentContainer`} {...contentContainerProps} style={[styles.contentContainer, contentContainerStyle, contentContainerProps.style]}>
             {left || isLabelEmbededVariant && !isEmpty(label) ? <View testID={`${testID}_LeftContainer`} {...leftContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, leftContainerProps.style]}>
                 {left}
-                {isLabelEmbededVariant !== false ? labelContent : null}
+                {isLabelEmbededVariant ? labelContent : null}
             </View> : null}
+            {canHandleFloadingLabel && isFlatVariant ? floatingLabelContainer : null}
             <RNTextInput
                 autoComplete="off"
                 placeholderTextColor={focused || error ? undefined : theme.colors.placeholder}
@@ -386,6 +388,8 @@ const styles = StyleSheet.create({
         flexWrap: "nowrap",
         backgroundColor: "transparent",
         flexDirection: "row",
+        alignItems: "center",
+        position: "relative",
     },
     leftOrRightContainer: {
         display: "flex",

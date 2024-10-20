@@ -110,15 +110,16 @@ export type ITextInputType = InputModeOptions | "number" | "password";
  * components, allowing for a more dynamic and responsive user interface.
  */
 export type ITextInputCallbackOptions = IFieldFormatValueResult & {
-    color?: string;
+    textColor: string;
     /**
      * Indicates if the component is focused.
      */
-    focused?: boolean;
-    editable?: boolean;
-    disabled?: boolean;
+    focused: boolean;
+    editable: boolean;
+    disabled: boolean;
     /** if label is embedded in the text input */
     variant: ITextInputProps["variant"];
+    error: boolean;
 };
 
 
@@ -319,7 +320,7 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' |
     /***
      * the text input variant
      */
-    variant?: "labelEmbeded" | "flat" | "default", // | "outlined" 
+    variant?: "labelEmbeded" | "default", // | "outlined" | "flat"
 
     /**
      * @type (options: ITextInputCallbackOptions) => ReactNode | false

@@ -19,12 +19,12 @@ import isValidElement from "@utils/isValidElement";
  */
 export type ILabelOrLeftOrRightProps<T = any> = {
     /**A ReactNode or a function that returns a ReactNode. This can be used to render the label for a component. */
-    label?: ReactNode | ((options?: T) => ReactNode);
+    label?: ReactNode | ((options: T) => ReactNode);
     /**A ReactNode or a function that returns a ReactNode. This can be used to render content on the left side of a component. */
-    left?: ReactNode | ((options?: T) => ReactNode);
+    left?: ReactNode | ((options: T) => ReactNode);
     /**A ReactNode or a function that returns a ReactNode. This can be used to render 
  *   content on the right side of a component. */
-    right?: ReactNode | ((options?: T) => ReactNode);
+    right?: ReactNode | ((options: T) => ReactNode);
 };
 
 /**

@@ -86,6 +86,9 @@ const FontIcon = forwardRef(({ name, color, ...props }: IFontIconProps, ref) => 
         name={iconName}
         {...props}
     />;
+    if (!props.title && !props.tooltip && !props.onPress && !props.onLongPress && !props.onPressIn && !props.onPressOut && !props.onKeyPress) {
+        return children;
+    }
     return <Tooltip
         {...props}
         children={children}

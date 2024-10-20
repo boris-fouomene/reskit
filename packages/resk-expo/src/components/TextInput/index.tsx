@@ -296,7 +296,7 @@ const getContainerAndContentStyle = ({ isLabelEmbededVariant, canHandleFloadingL
         inputStyle.push(notEmbeededInputStyle);
         labelStyle.push(notEmbeededLabelStyle)
         if (isFlatVariant) {
-            contentContainerStyle.push([styles.flatVariantContentContainer, { borderColor }])
+            contentContainerStyle.push([styles.flatVariantContentContainer, { borderColor }, !focused && styles.flatVariantContentContainerNotFocused])
             inputStyle.push(styles.flatVariantInput)
         } else if (isOutlinedVariant) {
             contentContainerStyle.push(borderedStyle);
@@ -393,13 +393,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "flex-start",
     },
+    flatVariantContentContainerNotFocused: {
+
+    },
     flatVariantContentContainer: {
         borderTopWidth: 0,
         borderLeftWidth: 0,
         borderRightWidth: 0,
         borderBottomWidth: 1,
         paddingHorizontal: 0,
-        paddingBottom: 5,
+        paddingBottom: 2,
     },
     outlinedVarientContentContainer: {
 

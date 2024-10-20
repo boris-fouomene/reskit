@@ -1,5 +1,5 @@
 import { IViewProps } from "@components/View";
-import { ILeftOrRightProps } from "@hooks/index";
+import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IFieldFormatValueResult, IFormatValueFormat } from "@resk/core";
 import { IOnChangeOptions } from "../../types";
 import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextInputProps } from "react-native";
@@ -118,7 +118,7 @@ export type ITextInputCallbackOptions = IFieldFormatValueResult & {
     editable?: boolean;
     disabled?: boolean;
     /** if label is embedded in the text input */
-    labelEmbeded: boolean;
+    variant: ITextInputProps["variant"];
 };
 
 
@@ -190,7 +190,7 @@ export type ITextInputOnChangeOptions = IFieldFormatValueResult & IOnChangeOptio
  * 
  * - `left?`: Optional properties for a left component, allowing for 
  *   additional UI elements (like icons) next to the left side of the 
- *   text input, defined by `ILeftOrRightProps<ITextInputCallbackOptions>`.
+ *   text input, defined by `ILabelOrLeftOrRightProps<ITextInputCallbackOptions>`.
  * 
  * - `right?`: Similar to `left`, but for components on the right side 
  *   of the text input.
@@ -259,7 +259,7 @@ export type ITextInputOnChangeOptions = IFieldFormatValueResult & IOnChangeOptio
  * input components that enhance user interaction and maintainability 
  * in React Native applications.
  */
-export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' | 'value'> & ILeftOrRightProps<ITextInputCallbackOptions> & {
+export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' | 'value'> & ILabelOrLeftOrRightProps<ITextInputCallbackOptions> & {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 
@@ -310,23 +310,16 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' |
      */
     leftContainerProps?: IViewProps;
 
-    /**
-     * @type (options: ITextInputCallbackOptions) => ReactNode
-     * the Text input label, 
-     */
-    label?: ((options: ITextInputCallbackOptions) => ReactNode) | ReactNode;
-
     /*** 
      * @type ILabelProps
      * the props used to render the label, when label  is not a react element but a string | number
      */
     labelProps?: ILabelProps;
 
-    /*** 
-     * specifies whether the label will be embedded in the text input
-     * default is to true
-    */
-    labelEmbeded?: boolean;
+    /***
+     * the text input variant
+     */
+    variant?: "labelEmbeded" | "outlined" | "flat" | "default",
 
     /**
      * @type (options: ITextInputCallbackOptions) => ReactNode | false

@@ -100,183 +100,183 @@
  * ```
  */
 export interface IThemeColorTokens {
-    /** 
-   * Primary color for elements that need to stand out. 
-   * @remarks
-   * The primary color is used for key components such as buttons, active states, and highlighted elements.
-   * Use this for interactive elements that need to be prominent.
-   * 
-   * **Example:**
-   * ```ts
-   * const buttonStyle = { backgroundColor: theme.primary };
-   * ```
+  /** 
+ * Primary color for elements that need to stand out. 
+ * @remarks
+ * The primary color is used for key components such as buttons, active states, and highlighted elements.
+ * Use this for interactive elements that need to be prominent.
+ * 
+ * **Example:**
+ * ```ts
+ * const buttonStyle = { backgroundColor: theme.primary };
+ * ```
+ */
+  primary?: string;
+  /** 
+ * Color to be used for text or icons placed on `primary` colored surfaces. 
+ * @remarks
+ * Use `onPrimary` for content (like text or icons) displayed on surfaces colored with the `primary` token.
+ * 
+ * **Example:**
+ * ```ts
+ * const buttonTextStyle = { color: theme.onPrimary };
+ * ```
+ */
+  onPrimary?: string;
+  /** 
+ * Primary container color, often used for surfaces that hold content. 
+ * @remarks
+ * Use `primaryContainer` for background colors in components like cards or containers. It provides a lighter, supporting tone of the primary color.
+ * 
+ * **Example:**
+ * ```ts
+ * const cardStyle = { backgroundColor: theme.primaryContainer };
+ * ```
+ */
+  primaryContainer?: string;
+  /** 
+* Color for text or icons on `primaryContainer` surfaces.
+* @remarks
+* Use this token for content placed on primary container surfaces, ensuring contrast and readability.
+* 
+* **Example:**
+* ```ts
+* const cardTextStyle = { color: theme.onPrimaryContainer };
+* ```
+*/
+  onPrimaryContainer?: string;
+  /** The secondary color, used for less prominent elements in the UI. */
+  secondary?: string;
+  /** The color used for text or icons placed on secondary-colored backgrounds. */
+  onSecondary?: string;
+  /** A container color associated with the secondary color, used for background areas. */
+  secondaryContainer?: string;
+  /** Text or icons placed on a secondary container background. */
+  onSecondaryContainer?: string;
+  /** Tertiary color, often used for accents or additional visual differentiation.
+   * tertiary and tertiaryContainer: Tertiary colors are often used as an accent color or for components like floating buttons or special UI elements that need attention without overwhelming the primary interface.
    */
-    primary?: string;
-    /** 
-   * Color to be used for text or icons placed on `primary` colored surfaces. 
-   * @remarks
-   * Use `onPrimary` for content (like text or icons) displayed on surfaces colored with the `primary` token.
-   * 
-   * **Example:**
-   * ```ts
-   * const buttonTextStyle = { color: theme.onPrimary };
-   * ```
-   */
-    onPrimary?: string;
-    /** 
-   * Primary container color, often used for surfaces that hold content. 
-   * @remarks
-   * Use `primaryContainer` for background colors in components like cards or containers. It provides a lighter, supporting tone of the primary color.
-   * 
-   * **Example:**
-   * ```ts
-   * const cardStyle = { backgroundColor: theme.primaryContainer };
-   * ```
-   */
-    primaryContainer?: string;
-    /** 
-  * Color for text or icons on `primaryContainer` surfaces.
+  tertiary?: string;
+  /** Text or icons placed on tertiary-colored backgrounds. */
+  onTertiary?: string;
+  /** Background or container color associated with the tertiary color. */
+  tertiaryContainer?: string;
+  /** Text or icons placed on a tertiary container background. */
+  onTertiaryContainer?: string;
+  /** 
+* Error color for error states and alerts. 
+* @remarks
+* Use this token for indicating errors in form fields, error messages, or any component needing an error state.
+* 
+* **Example:**
+* ```ts
+* const errorTextStyle = { color: theme.error };
+* ```
+*/
+  error?: string;
+  /** 
+* Text or icon color for content displayed on `error`-colored surfaces.
+* @remarks
+* Use `onError` for content displayed on surfaces that use the `error` token, ensuring visibility and contrast.
+* 
+* **Example:**
+* ```ts
+* const errorButtonTextStyle = { color: theme.onError };
+* ```
+*/
+  onError?: string;
+  /** Background or container color associated with error states. */
+  errorContainer?: string;
+  /** Text or icons placed on an error container background. */
+  onErrorContainer?: string;
+  /** Main background color for the application. */
+  background?: string;
+  /** Text or icons placed on the background. */
+  onBackground?: string;
+  /** 
+ * Background color for the main content surfaces. 
+ * @remarks
+ * The `surface` color is used as the background for surfaces like cards, sheets, and panels. It is designed to be neutral and less prominent.
+ * 
+ * **Example:**
+ * ```ts
+ * const viewStyle = { backgroundColor: theme.surface };
+ * ```
+ */
+  surface?: string;
+  /** 
+ * Text or icon color for content placed on surfaces that use the `surface` color.
+ * @remarks
+ * This token provides good contrast for text or icons on surface-colored backgrounds.
+ * 
+ * **Example:**
+ * ```ts
+ * const textStyle = { color: theme.onSurface };
+ * ```
+ */
+  onSurface?: string;
+  /** 
+  * Variant of the surface color, typically used for backgrounds or secondary containers.
   * @remarks
-  * Use this token for content placed on primary container surfaces, ensuring contrast and readability.
+  * Use `surfaceVariant` for less prominent surfaces, such as the background of dialogs or inactive elements.
   * 
   * **Example:**
   * ```ts
-  * const cardTextStyle = { color: theme.onPrimaryContainer };
+  * const dialogStyle = { backgroundColor: theme.surfaceVariant };
   * ```
   */
-    onPrimaryContainer?: string;
-    /** The secondary color, used for less prominent elements in the UI. */
-    secondary?: string;
-    /** The color used for text or icons placed on secondary-colored backgrounds. */
-    onSecondary?: string;
-    /** A container color associated with the secondary color, used for background areas. */
-    secondaryContainer?: string;
-    /** Text or icons placed on a secondary container background. */
-    onSecondaryContainer?: string;
-    /** Tertiary color, often used for accents or additional visual differentiation.
-     * tertiary and tertiaryContainer: Tertiary colors are often used as an accent color or for components like floating buttons or special UI elements that need attention without overwhelming the primary interface.
-     */
-    tertiary?: string;
-    /** Text or icons placed on tertiary-colored backgrounds. */
-    onTertiary?: string;
-    /** Background or container color associated with the tertiary color. */
-    tertiaryContainer?: string;
-    /** Text or icons placed on a tertiary container background. */
-    onTertiaryContainer?: string;
-    /** 
-  * Error color for error states and alerts. 
-  * @remarks
-  * Use this token for indicating errors in form fields, error messages, or any component needing an error state.
-  * 
-  * **Example:**
-  * ```ts
-  * const errorTextStyle = { color: theme.error };
-  * ```
+  surfaceVariant?: string;
+  /** 
+ * Color for text or icons on `surfaceVariant`-colored surfaces.
+ * @remarks
+ * This token ensures contrast for text or icons displayed on `surfaceVariant` surfaces.
+ * 
+ * **Example:**
+ * ```ts
+ * const dialogTextStyle = { color: theme.onSurfaceVariant };
+ * ```
+ */
+  onSurfaceVariant?: string;
+  /** 
+   * Used for borders or outlines of interactive elements like input fields or buttons.
+     Example: Use outline for the border of a TextInput or card component.
   */
-    error?: string;
-    /** 
-  * Text or icon color for content displayed on `error`-colored surfaces.
-  * @remarks
-  * Use `onError` for content displayed on surfaces that use the `error` token, ensuring visibility and contrast.
-  * 
-  * **Example:**
-  * ```ts
-  * const errorButtonTextStyle = { color: theme.onError };
-  * ```
+  outline?: string;
+  /** Inverse of the surface color, for use in dark/light modes. Background color for app bars, navigation bars, and other container surfaces.
+   * These are alternative surface colors, often used for elements like bottom sheets or snackbars, providing contrast to the main surface colors.
+     Example: Use inverseSurface as a snackbar background color, with inverseOnSurface for the snackbar text.
   */
-    onError?: string;
-    /** Background or container color associated with error states. */
-    errorContainer?: string;
-    /** Text or icons placed on an error container background. */
-    onErrorContainer?: string;
-    /** Main background color for the application. */
-    background?: string;
-    /** Text or icons placed on the background. */
-    onBackground?: string;
-    /** 
-   * Background color for the main content surfaces. 
-   * @remarks
-   * The `surface` color is used as the background for surfaces like cards, sheets, and panels. It is designed to be neutral and less prominent.
-   * 
-   * **Example:**
-   * ```ts
-   * const viewStyle = { backgroundColor: theme.surface };
-   * ```
-   */
-    surface?: string;
-    /** 
-   * Text or icon color for content placed on surfaces that use the `surface` color.
-   * @remarks
-   * This token provides good contrast for text or icons on surface-colored backgrounds.
-   * 
-   * **Example:**
-   * ```ts
-   * const textStyle = { color: theme.onSurface };
-   * ```
-   */
-    onSurface?: string;
-    /** 
-    * Variant of the surface color, typically used for backgrounds or secondary containers.
-    * @remarks
-    * Use `surfaceVariant` for less prominent surfaces, such as the background of dialogs or inactive elements.
-    * 
-    * **Example:**
-    * ```ts
-    * const dialogStyle = { backgroundColor: theme.surfaceVariant };
-    * ```
-    */
-    surfaceVariant?: string;
-    /** 
-   * Color for text or icons on `surfaceVariant`-colored surfaces.
-   * @remarks
-   * This token ensures contrast for text or icons displayed on `surfaceVariant` surfaces.
-   * 
-   * **Example:**
-   * ```ts
-   * const dialogTextStyle = { color: theme.onSurfaceVariant };
-   * ```
-   */
-    onSurfaceVariant?: string;
-    /** 
-     * Used for borders or outlines of interactive elements like input fields or buttons.
-       Example: Use outline for the border of a TextInput or card component.
-    */
-    outline?: string;
-    /** Inverse of the surface color, for use in dark/light modes. Background color for app bars, navigation bars, and other container surfaces.
-     * These are alternative surface colors, often used for elements like bottom sheets or snackbars, providing contrast to the main surface colors.
-       Example: Use inverseSurface as a snackbar background color, with inverseOnSurface for the snackbar text.
-    */
-    inverseSurface?: string;
-    /** Text or icon color used on `inverseSurface`-colored surfaces. */
-    inverseOnSurface?: string;
-    /** Inverse of the primary color, for contrast in dark or light themes. */
-    inversePrimary?: string;
-    /** Dynamic color for highlight or background tints. it's used for elevating components and creating depth. */
-    shadow?: string;
+  inverseSurface?: string;
+  /** Text or icon color used on `inverseSurface`-colored surfaces. */
+  inverseOnSurface?: string;
+  /** Inverse of the primary color, for contrast in dark or light themes. */
+  inversePrimary?: string;
+  /** Dynamic color for highlight or background tints. it's used for elevating components and creating depth. */
+  shadow?: string;
 
-    /** 
-    * Color used to indicate disabled state.
-    */
-    disabled?: string;
-    /**
-     * Overlay color used for elevated surfaces like modals or backdrops.
-     * Surface tint color for elements like hover or focus states.  
-     * For a backdrop or overlay, you can use the surfaceTint for a lighter, more subtle effect or inverseSurface for a contrasting, darker effect. This provides a visually distinct background for modals or other overlays.
-        Example: Apply surfaceTint to slightly elevated UI components to visually indicate depth. 
-    */
-    surfaceTint?: string;
-    /*** colors of text and icons elements */
-    text?: string;
+  /** 
+  * Color used to indicate disabled state.
+  */
+  disabled?: string;
+  /**
+   * Overlay color used for elevated surfaces like modals or backdrops.
+   * Surface tint color for elements like hover or focus states.  
+   * For a backdrop or overlay, you can use the surfaceTint for a lighter, more subtle effect or inverseSurface for a contrasting, darker effect. This provides a visually distinct background for modals or other overlays.
+      Example: Apply surfaceTint to slightly elevated UI components to visually indicate depth. 
+  */
+  surfaceTint?: string;
+  /*** colors of text and icons elements */
+  text?: string;
 
-    warning?: string;
-    onWarning?: string;
-    statusBar?: string;
-    placeholder?: string;
-    backdrop?: string;
-    info?: string;
-    onInfo?: string;
-    success?: string;
-    onSuccess?: string;
+  warning?: string;
+  onWarning?: string;
+  statusBar?: string;
+  placeholder?: string;
+  backdrop?: string;
+  info?: string;
+  onInfo?: string;
+  success?: string;
+  onSuccess?: string;
 
 };
 
@@ -326,9 +326,10 @@ export type IThemeColorTokenKey = keyof IThemeColorTokens;
  * @property {string} [name] - The name of the theme.
  * @property {boolean | number} [dark] - Whether the theme is in dark mode (`true` for dark, `false` for light).
  * @property {string} [customCSS] - Custom CSS properties applied to the theme (mainly for web platforms).
- * @property {IThemeColorTokens} colors - The set of colors associated with the theme.
- * 
- * 
+ * @property {number} [roundness] - The roundness value for the theme. It's used to adjust the border radius of components like buttons, cards, text inputs, and other UI elements. 
+     * This property influences how "rounded" the corners of these elements appear. 
+     * A low roundness value results in sharper corners, while a higher value makes the corners more rounded.
+ * @property {IThemeColorTokens} colors - The set of color tokens associated with the theme.
  * @example
  * ```ts
  * const theme: ITheme = {
@@ -344,10 +345,16 @@ export type IThemeColorTokenKey = keyof IThemeColorTokens;
  * ```
  */
 export interface ITheme {
-    name?: string;
-    dark?: boolean;
-    customCSS?: string;
-    colors: IThemeColorTokens;
+  name?: string;
+  dark?: boolean;
+  customCSS?: string;
+  roundness?: number;
+  /***
+   * The roundness value is used to adjust the border radius of components like buttons, cards, text inputs, and other UI elements. 
+   * This property influences how "rounded" the corners of these elements appear. 
+   * A low roundness value results in sharper corners, while a higher value makes the corners more rounded.
+   */
+  colors: IThemeColorTokens;
 }
 
 /**

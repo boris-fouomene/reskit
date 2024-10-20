@@ -2,59 +2,67 @@ import { ReactNode } from "react";
 import isValidElement from "@utils/isValidElement";
 
 /**
- * @interface ILeftOrRightProps
- * Type definition for props that can contain left and right elements.
+ * @interface ILabelOrLeftOrRightProps
+ * Type definition for props that can contain label, left and right elements.
  * 
  * This type allows for the specification of either a static ReactNode or a 
- * function that returns a ReactNode for both the `left` and `right` properties.
+ * function that returns a ReactNode for both the label, `left` and `right` properties.
  * 
  * @template T - Optional type parameter for the function options.
  * 
  * ### Props:
+ *  `label` : A ReactNode or a function that returns a ReactNode. This can be used to render the label for a component.
  * - `left`: A ReactNode or a function that returns a ReactNode. This can be used to render 
  *   content on the left side of a component.
  * - `right`: A ReactNode or a function that returns a ReactNode. This can be used to render 
  *   content on the right side of a component.
  */
-export type ILeftOrRightProps<T = any> = {
+export type ILabelOrLeftOrRightProps<T = any> = {
+    /**A ReactNode or a function that returns a ReactNode. This can be used to render the label for a component. */
+    label?: ReactNode | ((options?: T) => ReactNode);
+    /**A ReactNode or a function that returns a ReactNode. This can be used to render content on the left side of a component. */
     left?: ReactNode | ((options?: T) => ReactNode);
+    /**A ReactNode or a function that returns a ReactNode. This can be used to render 
+ *   content on the right side of a component. */
     right?: ReactNode | ((options?: T) => ReactNode);
 };
 
 /**
- * A utility function to extract left and right properties from the given props?.
+ * A utility function to extract label, left and right properties from the given props?.
  * 
- * This function evaluates the `left` and `right` properties from the provided props?.
+ * This function evaluates the label, `left` and `right` properties from the provided props?.
  * If the properties are functions, it calls them with the given options to obtain the 
  * resulting ReactNode. It also validates the resulting nodes to ensure they are valid 
  * React elements.
  * 
- * @param {ILeftOrRightProps<T>} props - The props containing the left and right elements.
+ * @param {ILabelOrLeftOrRightProps<T>} props - The props containing the label, left and right elements.
  * @param {T} options - Optional parameters to pass to the functions for dynamic rendering.
- * @returns {{ left: ReactNode, right: ReactNode }} - An object containing validated left and right nodes.
+ * @returns {{ label : : ReactNode, left: ReactNode, right: ReactNode }} - An object containing validated label, left and right nodes.
  * 
  * ### Example Usage:
  * 
  * ```typescript
- * const MyComponent = (props: ILeftOrRightProps) => {
- *     const { left, right } = getLeftOrRightProps(props, { //options });
+ * const MyComponent = (props: ILabelOrLeftOrRightProps) => {
+ *     const { label, left, right } = getLabelOrLeftOrRightProps(props, { //options });
  *     return (
  *         <div>
  *             <div>{left}</div>
+ *             <div>{label}></div>
  *             <div>{right}</div>
  *         </div>
  *     );
  * };
  * ```
  */
-export const getLeftOrRightProps = <T = any>(props: ILeftOrRightProps, options: T): { left: ReactNode; right: ReactNode } => {
+export const getLabelOrLeftOrRightProps = <T = any>(props: ILabelOrLeftOrRightProps, options: T): { label: ReactNode, left: ReactNode; right: ReactNode } => {
     // Evaluate the left property, calling it if it's a function
     const left = typeof props?.left === "function" ? props?.left(options) : props?.left;
     // Evaluate the right property, calling it if it's a function
     const right = typeof props?.right === "function" ? props?.right(options) : props?.right;
-
+    const label = typeof props?.label === "function" ? props?.label(options) : props?.label;
     // Validate and return the left and right properties, ensuring they are valid React elements
     return {
+        label: isValidElement(label, true) ? label : null,
         left: isValidElement(left) ? left : null,
         right: isValidElement(right) ? right : null,
     };

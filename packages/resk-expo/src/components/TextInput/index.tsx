@@ -1,14 +1,17 @@
 import Label from "@components/Label";
 import { isValidElement, mergeRefs } from "@utils";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TouchableOpacity } from "react-native";
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, Animated as RNAnimated, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TouchableOpacity } from "react-native";
 import React, { ReactNode, useEffect, useMemo, useRef } from "react";
 import { formatValueToObject, Platform, IDict, isNonNullString, isStringNumber, parseDecimal, isEmpty } from "@resk/core";
 import _, { isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View, { IViewProps } from "@components/View";
-import { ILeftOrRightProps, getLeftOrRightProps } from "@hooks/index";
+import { getLabelOrLeftOrRightProps } from "@hooks/index";
 import { ITextInputCallbackOptions, ITextInputProps, ITextInputType } from "./types";
+import { ITheme } from "@theme/types";
+import { IStyle } from "@src/types";
+import Animated, { Easing, useSharedValue, useAnimatedStyle, withTiming, SharedValue, useAnimatedRef, runOnUI, measure, MeasuredDimensions } from 'react-native-reanimated';
 
 /**
  * @description
@@ -67,7 +70,7 @@ import { ITextInputCallbackOptions, ITextInputProps, ITextInputType } from "./ty
  * The `TextInput` component is designed to be versatile and reusable across various parts of an application, ensuring a consistent and engaging user experience. 
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
-const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, labelEmbeded = true, error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, leftContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
+const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, leftContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
     const [focused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -76,9 +79,40 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, la
     containerProps = Object.assign({}, containerProps);
     testID = testID || "RN_TextInputComponent";
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
-    const isLabelEmbeded = labelEmbeded !== false;
+    const isLabelEmbededVariant = variant == "labelEmbeded";
+    const isFlatVariant = variant === "flat", isOutlinedVariant = variant == "outlined";
+    const isDefaultVariant = !isFlatVariant && !isOutlinedVariant && !isOutlinedVariant;
     const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
+    const floatingLabelPosition = useSharedValue(0);
+    // Create an animated reference for the input field
+    const containerRef = useAnimatedRef();
+    const contentContainerRef = useAnimatedRef();
+    const containerLayoutRef = useRef<MeasuredDimensions | null>(null);
+    const contentContainerLayoutRef = useRef<MeasuredDimensions | null>(null);
+    const placeholder = isEmpty(props.placeholder) ? "" : props.placeholder;
+    const canHandleFloadingLabel = isFlatVariant || isOutlinedVariant;
+    useEffect(() => {
+        // Run this on the UI thread (since `measure()` is a UI operation)
+        runOnUI(() => {
+            // Measure the height of the input field to position the label correctly
+            containerLayoutRef.current = measure(containerRef);
+            contentContainerLayoutRef.current = measure(contentContainerRef);
+        })();
+    }, [canHandleFloadingLabel]);
+    const containerLayout = containerLayoutRef.current;
+    const contentContainerLayout = containerLayoutRef.current;
+
+    const floatingLabelAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [
+            {
+                translateY: withTiming(floatingLabelPosition.value, {
+                    duration: 300,
+                    easing: Easing.out(Easing.ease),
+                }),
+            },
+        ],
+    }));
     useEffect(() => {
         return () => {
             clearTimeout(debounceTimeoutRef.current);
@@ -132,7 +166,7 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, la
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
     const textColor = error ? theme.colors.error : focused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
-    const callOptions: ITextInputCallbackOptions = { ...formated, labelEmbeded: isLabelEmbeded, focused, color: textColor as string, editable, disabled };
+    const callOptions: ITextInputCallbackOptions = { ...formated, variant, focused, color: textColor as string, editable, disabled };
     const affixContent = useMemo(() => {
         if (affix === false) return null;
         let affContent = typeof affix == "function" ? affix(callOptions) : isValidElement(affix, true) ? affix : null;
@@ -147,39 +181,46 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, la
         if (React.isValidElement(affContent)) {
             return affContent;
         }
-        return <Label children={affContent} style={[styles.affix, props.multiline && styles.affixMultiline, { color: textColor }]} />;
+        return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
     }, [focusedValue, canValueBeDecimal, error, props.multiline, affix, isPasswordField]);
-    const inputValue = focused ? focusedValue : formated.formattedValue || emptyValue;
-    const label = useMemo(() => {
-        if (isLabelEmbeded && isValidElement(props.placeholder, true) && props.placeholder && isEmpty(inputValue)) return null;
-        const l = typeof customLabel == "function" ? customLabel(callOptions) : isValidElement(customLabel, true) ? customLabel : null;
-        return isValidElement(l, true) ? l : null;
-    }, [customLabel, focused, inputValue, error, disabled, isLabelEmbeded, canValueBeDecimal, props.placeholder]);
-    const { left, right } = getLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight }, callOptions);
+    const inputValue = focused ? focusedValue : formated.formattedValue || emptyValue || "";
+    const isInputValueEmpty = isEmpty(inputValue);
+    const canRenderLabel = isDefaultVariant || (isLabelEmbededVariant && !placeholder && isInputValueEmpty || (canHandleFloadingLabel));
+    useMemo(() => {
+        if (!canHandleFloadingLabel) return;
+        const height = containerLayout?.height ? (containerLayout.height - 5) : 0;
+        if (focused || !isInputValueEmpty) {
+            floatingLabelPosition.value = -1 * height;
+        } else if (isEmpty(inputValue) && !isEmpty(props.placeholder)) {
+            floatingLabelPosition.value = 0;
+        }
+    }, [focused, containerLayout, contentContainerLayout, canHandleFloadingLabel, inputValue, canRenderLabel, isInputValueEmpty]);
+    const { left, right, label } = getLabelOrLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
     const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null];
     const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} name={isSecure ? "eye" : "eye-off"} /> : null;
-    const lContent = isValidElement(label) ? label : (label ? <Label color={textColor} testID={`${testID}_Label`} {...Object.assign({}, labelProps)}>{label}{isLabelEmbeded ? ` : ` : ""}</Label> : null);
+    const borderColor = focused || error ? textColor : theme.colors.outline;
+    const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ floatingLabelPosition, canHandleFloadingLabel, isLabelEmbededVariant, canRenderLabel, focused, theme, textColor, borderColor, isFlatVariant, isOutlinedVariant, isDefaultVariant })
+    const lContent = (label ? <Label color={textColor} testID={`${testID}_Label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null);
     const innerRef = useRef<RNTextInput | null>(null);
     const labelContent = !isEmpty(lContent) && editable ? <TouchableOpacity onPress={(e) => {
         if (innerRef?.current && typeof innerRef.current.focus === "function") {
             innerRef.current.focus();
         }
     }}>{lContent}</TouchableOpacity> : lContent;
-    const containerStyle = isLabelEmbeded ? [
-        styles.containerLabelEmbeded,
-        { borderColor: focused || error ? textColor : theme.colors.outline },
-    ] : []
-    const inputStyle = [{ color: textColor }, labelEmbeded ? styles.inputLabelEmbeded : null];
-    return <View testID={`${testID}_Container`} {...containerProps} style={[styles.container, containerStyle, disabledOrEditStyle, containerProps.style]}>
-        {!isLabelEmbeded ? labelContent : null}
-        <View testID={`${testID}_ContentContainer`} {...contentContainerProps} style={[styles.contentContainer, contentContainerProps.style]}>
-            {left || isLabelEmbeded && !isEmpty(label) ? <View testID={`${testID}_LeftContainer`} {...leftContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, leftContainerProps.style]}>
+    return <View ref={containerRef} testID={`${testID}_Container`} {...containerProps} style={[styles.container, containerStyle, disabledOrEditStyle, containerProps.style]}>
+        {isLabelEmbededVariant ? null :
+            (canHandleFloadingLabel ? <Animated.Text testID={`${testID}_FloatingLabelContainer`} style={[styles.floatingLabel, floatingLabelAnimatedStyle, focused && styles.floatingLabelFocused]}>
+                {labelContent}
+            </Animated.Text> : labelContent)}
+        <View ref={contentContainerRef} testID={`${testID}_ContentContainer`} {...contentContainerProps} style={[styles.contentContainer, contentContainerStyle, contentContainerProps.style]}>
+            {left || isLabelEmbededVariant && !isEmpty(label) ? <View testID={`${testID}_LeftContainer`} {...leftContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, leftContainerProps.style]}>
                 {left}
-                {isLabelEmbeded !== false ? labelContent : null}
+                {isLabelEmbededVariant !== false ? labelContent : null}
             </View> : null}
             <RNTextInput
                 autoComplete="off"
                 {...props}
+                placeholder={!canHandleFloadingLabel || !labelContent ? placeholder : undefined}
                 underlineColorAndroid="transparent"
                 testID={testID}
                 readOnly={editable === false}
@@ -238,6 +279,42 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, la
     </View>
 });
 
+const getContainerAndContentStyle = ({ isLabelEmbededVariant, canHandleFloadingLabel, textColor, borderColor, theme, isFlatVariant, isOutlinedVariant, floatingLabelPosition, isDefaultVariant }: { isLabelEmbededVariant: boolean, floatingLabelPosition: SharedValue<number>, canRenderLabel: boolean, canHandleFloadingLabel: boolean, theme: ITheme, focused: boolean, textColor?: string, borderColor?: string, isFlatVariant: boolean, isOutlinedVariant: boolean, isDefaultVariant: boolean }) => {
+    const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [{ color: textColor }], labelStyle: IStyle = [{ color: textColor }];
+    const borderedStyle = [
+        styles.containerLabelEmbeded,
+        { borderColor, borderRadius: theme.roundness },
+    ];
+    const notEmbeededLabelStyle = [styles.notEmbededLabelStyle],
+        notEmbeededInputStyle = [styles.inputNotEmbededLabelVariant]
+    if (isLabelEmbededVariant) {
+        inputStyle.push(styles.inputLabelEmbeded);
+        containerStyle.push(borderedStyle);
+        containerStyle.push(styles.labelEmbededVariantContainer);
+    } else {
+        inputStyle.push(notEmbeededInputStyle);
+        labelStyle.push(notEmbeededLabelStyle)
+        if (isFlatVariant) {
+            contentContainerStyle.push([styles.flatVariantContentContainer, { borderColor }])
+            inputStyle.push(styles.flatVariantInput)
+        } else if (isOutlinedVariant) {
+            contentContainerStyle.push(borderedStyle);
+            contentContainerStyle.push(styles.outlinedVarientContentContainer)
+        } else {
+            contentContainerStyle.push(borderedStyle);
+        }
+    }
+    if (isDefaultVariant) {
+        labelStyle.push(styles.defaultVariantLabel);
+    }
+    if (canHandleFloadingLabel) {
+        inputStyle.push(styles.floatingInput);
+        containerStyle.push(styles.containerWithFloatingLabel);
+    }
+
+    return { containerStyle, contentContainerStyle, inputStyle, labelStyle }
+}
+
 TextInput.displayName = "TextInput";
 
 export default TextInput;
@@ -268,6 +345,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         paddingHorizontal: 2,
     },
+    inputNotEmbededLabelVariant: {
+        paddingHorizontal: 5,
+        paddingVertical: 5,
+    },
     focusedInput: {
         borderColor: 'transparent', // No border on focus
         borderWidth: 0,
@@ -289,12 +370,15 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         alignItems: "flex-start",
         alignSelf: "flex-start",
-        borderRadius: 10,
-        paddingVertical: 2,
-        paddingHorizontal: 5,
+        position: 'relative',
+    },
+    containerWithFloatingLabel: {
+        marginTop: 10,
+        paddingBottom: 5,
     },
     contentContainer: {
         justifyContent: "space-between",
+        alignSelf: "flex-start",
         flexWrap: "nowrap",
         backgroundColor: "transparent",
         flexDirection: "row",
@@ -305,6 +389,39 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "flex-start",
     },
+    flatVariantContentContainer: {
+        borderTopWidth: 0,
+        borderLeftWidth: 0,
+        borderRightWidth: 0,
+        borderBottomWidth: 1,
+        paddingHorizontal: 0,
+    },
+    outlinedVarientContentContainer: {
+
+    },
+    notEmbededLabelStyle: {
+        fontWeight: "500",
+    },
+    flatVariantInput: {
+        paddingHorizontal: 0,
+    },
+    floatingLabel: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+    },
+    floatingLabelFocused: {
+        //position: "relative",
+    },
+    floatingInput: {
+        paddingVertical: 0,
+    },
+    defaultVariantLabel: {
+
+    },
+    labelEmbededVariantContainer: {
+        padding: 5,
+    }
 })
 
 const isDecimalType = (type: ITextInputType | string): boolean => {

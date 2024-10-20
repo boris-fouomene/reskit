@@ -298,6 +298,7 @@ export const darkColors: IThemeColorTokens = {
 export const DefaultDarkTheme: ITheme = createTheme({
     name: `${packageName}-dark`,
     dark: true,
+    roundness: 10,
     colors: {
         ...darkColors,
     },
@@ -319,6 +320,7 @@ export const DefaultDarkTheme: ITheme = createTheme({
  */
 export const DefaultLightTheme: ITheme = createTheme({
     name: `${packageName}-light`,
+    roundness: 10,
     colors: {
         ...lightColors
     },

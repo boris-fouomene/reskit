@@ -131,7 +131,7 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, la
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
-    const textColor = error ? theme.colors.error : focused && editable ? theme.colors.primary : theme.colors.text;
+    const textColor = error ? theme.colors.error : focused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
     const callOptions: ITextInputCallbackOptions = { ...formated, labelEmbeded: isLabelEmbeded, focused, color: textColor as string, editable, disabled };
     const affixContent = useMemo(() => {
         if (affix === false) return null;
@@ -167,7 +167,7 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, la
     }}>{lContent}</TouchableOpacity> : lContent;
     const containerStyle = isLabelEmbeded ? [
         styles.containerLabelEmbeded,
-        { borderColor: focused || error ? textColor : theme.colors.divider },
+        { borderColor: focused || error ? textColor : theme.colors.outline },
     ] : []
     const inputStyle = [{ color: textColor }, labelEmbeded ? styles.inputLabelEmbeded : null];
     return <View testID={`${testID}_Container`} {...containerProps} style={[styles.container, containerStyle, disabledOrEditStyle, containerProps.style]}>

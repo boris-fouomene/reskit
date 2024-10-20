@@ -13,7 +13,7 @@ import Zocial from "@expo/vector-icons/Zocial";
 import { IStyle } from "../../types";
 import { ITooltipProps } from "@components/Tooltip/types";
 import Tooltip from "@components/Tooltip";
-import { useTheme } from "@theme/useTheme";
+import { useTheme } from "@theme";
 import Colors from "@colors";
 
 

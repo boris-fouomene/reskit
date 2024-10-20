@@ -52,7 +52,7 @@ const Label = React.forwardRef(({
   const r1: IDict = {}, r2: IDict = {};
 
   // Set color based on the provided or default color scheme
-  color = Colors.isValid(color) ? color : colorScheme.backgroundColor || Colors.setAlpha(theme.colors.text);
+  color = Colors.isValid(color) ? color : colorScheme.backgroundColor || theme.colors.onSurfaceVariant;
 
   // Apply underlined style if specified
   if (underlined) {

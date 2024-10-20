@@ -8,6 +8,7 @@ import Color from "color";
 import updateNative from "./updateNative";
 import Grid from "../breakpoints/grid";
 import styles from "./styles";
+import { useReskExpoProvider } from "@src/context/context";
 
 export * from "./utils";
 
@@ -197,6 +198,88 @@ export function createTheme(theme: ITheme): ICreatedTheme {
 }
 
 const white = "white", black = "black";
+/*
+    Default Light Theme Tokens
+*/
+export const lightColors: IThemeColorTokens = {
+    primary: '#6750A4',
+    onPrimary: '#FFFFFF',
+    primaryContainer: '#EADDFF',
+    onPrimaryContainer: '#21005D',
+    secondary: '#625B71',
+    onSecondary: '#FFFFFF',
+    secondaryContainer: '#E8DEF8',
+    onSecondaryContainer: '#1D192B',
+    tertiary: '#7D5260',
+    onTertiary: '#FFFFFF',
+    tertiaryContainer: '#FFD8E4',
+    onTertiaryContainer: '#31111D',
+    error: '#B3261E',
+    onError: '#FFFFFF',
+    errorContainer: '#F9DEDC',
+    onErrorContainer: '#410E0B',
+    background: '#FFFBFE',
+    onBackground: '#1C1B1F',
+    surface: '#FFFBFE',
+    onSurface: '#1C1B1F',
+    surfaceVariant: '#E7E0EC',
+    onSurfaceVariant: '#49454F',
+    outline: '#79747E',
+    inverseOnSurface: '#F4EFF4',
+    inverseSurface: '#313033',
+    inversePrimary: '#D0BCFF',
+    shadow: '#000000',
+    surfaceTint: '#6750A4',
+
+    text: "#11181C", // Main text color for light mode
+    placeholder: Colors.setAlpha(black), // Placeholder text color
+    backdrop: Colors.setAlpha(black, 0.5), // Backdrop overlay with semi-transparent black
+    onInfo: "white", // Text color for info messages
+    onSuccess: "white", // Text color for success messages
+    success: "#5EBA6A", // Success message color
+    warning: "#BAAB5E", // Warning message color
+    disabled: Colors.setAlpha(black, 0.5), // Semi
+};
+
+/*
+  Default Dark Theme Tokens
+*/
+export const darkColors: IThemeColorTokens = {
+    primary: '#D0BCFF',
+    onPrimary: '#381E72',
+    primaryContainer: '#4F378B',
+    onPrimaryContainer: '#EADDFF',
+    secondary: '#CCC2DC',
+    onSecondary: '#332D41',
+    secondaryContainer: '#4A4458',
+    onSecondaryContainer: '#E8DEF8',
+    tertiary: '#EFB8C8',
+    onTertiary: '#492532',
+    tertiaryContainer: '#633B48',
+    onTertiaryContainer: '#FFD8E4',
+    error: '#F2B8B5',
+    onError: '#601410',
+    errorContainer: '#8C1D18',
+    onErrorContainer: '#F9DEDC',
+    background: '#1C1B1F',
+    onBackground: '#E6E1E5',
+    surface: '#1C1B1F',
+    onSurface: '#E6E1E5',
+    surfaceVariant: '#49454F',
+    onSurfaceVariant: '#CAC4D0',
+    outline: '#938F99',
+    inverseOnSurface: '#1C1B1F',
+    inverseSurface: '#E6E1E5',
+    inversePrimary: '#6750A4',
+    shadow: '#000000',
+    surfaceTint: '#D0BCFF',
+    placeholder: Colors.setAlpha(white, 0.5), // Placeholder text color
+    backdrop: Colors.setAlpha(black, 0.5), // Backdrop overlay with semi-transparent black
+    success: "#5EBA6A", // Success message color
+    warning: "#FFB547", // Warning message color
+    text: '#ECEDEE',
+    disabled: Colors.setAlpha(white, 0.5), // Semi
+};
 /***
  * Default dark theme configuration for the application.
  * 
@@ -216,19 +299,9 @@ export const DefaultDarkTheme: ITheme = createTheme({
     name: `${packageName}-dark`,
     dark: true,
     colors: {
-        background: "#151718", // Dark background color for the app
-        surface: "#202c33", // Surface color for cards and other components
-        disabled: Colors.setAlpha(white, 0.5), // Semi-transparent white for disabled elements
-        placeholder: Colors.setAlpha(white, 0.5), // Placeholder text color
-        backdrop: Colors.setAlpha(black, 0.5), // Backdrop overlay with semi-transparent black
-        divider: Colors.setAlpha(white, 0.18), // Divider color between elements
-        primary: "#5EBA6A", // Main action color for dark mode (used in buttons, etc.)
-        success: "#5EBA6A", // Success message color
-        warning: "#FFB547", // Warning message color
-        text: '#ECEDEE',
+        ...darkColors,
     },
 });
-
 /***
  * Default light theme configuration for the application.
  * 
@@ -247,18 +320,7 @@ export const DefaultDarkTheme: ITheme = createTheme({
 export const DefaultLightTheme: ITheme = createTheme({
     name: `${packageName}-light`,
     colors: {
-        background: "#F0F0F0", // Light background color for the app
-        placeholder: Colors.setAlpha(black), // Placeholder text color
-        backdrop: Colors.setAlpha(black, 0.5), // Backdrop overlay with semi-transparent black
-        divider: Colors.setAlpha(black, 0.18), // Divider color between elements
-        onInfo: "white", // Text color for info messages
-        onError: "white", // Text color for error messages
-        onSuccess: "white", // Text color for success messages
-        success: "#5EBA6A", // Success message color
-        warning: "#BAAB5E", // Warning message color
-        neutral: "#606A71", // Neutral text color
-        text: "#11181C", // Main text color for light mode
-        primary: "#5EBA6A", // Main action color for light mode
+        ...lightColors
     },
 } as unknown as ITheme);
 
@@ -284,7 +346,7 @@ export const getDefaultTheme = (isColorShemeDark?: boolean): ITheme => {
     // Retrieves the saved theme from the session (if available)
     const themeNameObj = Object.assign({}, session.get("theme"));
     themeNameObj.dark = !!(themeNameObj.dark !== undefined ? themeNameObj.dark : isColorShemeDark);
-    const theme = extendObj({}, themeNameObj?.dark ? DefaultDarkTheme : DefaultLightTheme, themeNameObj);
+    const theme = extendObj({}, (themeNameObj?.dark ? DefaultDarkTheme : DefaultLightTheme), themeNameObj);
     // Ensures essential color properties are defined based on whether the theme is dark or light
     theme.colors.onSuccess = theme.colors.onSuccess || (theme.dark ? "black" : "white");
     theme.colors.onInfo = theme.colors.onInfo || (theme.dark ? "black" : "white");
@@ -404,16 +466,7 @@ export const getStatusBarProps = (): StatusBarProps => {
 
 
 
-/**
- * The default export for the theme object, providing direct access to theme properties.
- *
- * This object exposes various properties of the current theme, including 
- * animation settings, color palette, font styles, and other configurations.
- *
- * @type {ITheme}
- * @returns {ITheme & { grid: typeof Grid } } The current theme object.
- */
-export default {
+const Theme = {
     ...themeRef.current, // Spread the properties of the current theme
     get dark() {
         return themeRef.current.dark; // Check if the theme is dark
@@ -425,6 +478,17 @@ export default {
         return themeRef.current.colors; // Access the color palette
     },
 };
+
+/**
+ * The default export for the theme object, providing direct access to theme properties.
+ *
+ * This object exposes various properties of the current theme, including 
+ * animation settings, color palette, font styles, and other configurations.
+ *
+ * @type {ITheme}
+ * @returns {ITheme & { grid: typeof Grid } } The current theme object.
+ */
+export default Theme;
 
 import { IObservable, isObj, observable } from "@resk/core";
 
@@ -534,8 +598,47 @@ export interface ICreatedTheme extends ITheme {
     addEventListener: (callstack: (theme: ITheme) => any) => { remove: () => any };
 };
 
-export * from "./useTheme";
-
 export * from "./useColorScheme";
 
 export { default as Colors } from "./colors";
+
+
+/**
+ * @group ReskExpoProvider
+ * @function useTheme
+ * `useTheme` is a custom hook that provides the current theme used in the application.
+ * 
+ * It fetches the theme from the `ReskExpoProvider` context. If no theme is provided 
+ * via the provider, it defaults to the base theme imported from `@theme`.
+ * 
+ * @returns {ITheme} The current theme object. If no theme is set in the context, it returns the default theme.
+ * 
+ * @example
+ * ```tsx
+ * import { useTheme } from './hooks/useTheme';
+ * 
+ * const MyComponent = () => {
+ *   const theme = useTheme();
+ *   
+ *   return (
+ *     <div style={{ backgroundColor: theme.colors.primary }}>
+ *       This component uses the primary color from the current theme.
+ *     </div>
+ *   );
+ * };
+ * ```
+ * 
+ * @remarks
+ * This hook is particularly useful in functional components that need access to the theme
+ * without directly passing it as a prop. It ensures that if no theme is provided through 
+ * the context, the default theme is always returned, making it safe to use throughout 
+ * the application.
+ */
+export const useTheme = (): ITheme => {
+    const { theme } = useReskExpoProvider();
+    /**
+     * Returns the current theme from `ReskExpoProvider` context.
+     * If no theme is found, it returns the default `Theme` from `@theme`.
+     */
+    return theme || Theme;
+};

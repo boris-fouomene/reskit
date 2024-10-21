@@ -1,6 +1,6 @@
 import Label from "@components/Label";
 import { isValidElement, mergeRefs } from "@utils";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, Animated as RNAnimated, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TouchableOpacity } from "react-native";
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, Animated as RNAnimated, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TouchableOpacity, TextInputKeyPressEventData } from "react-native";
 import React, { ReactNode, useEffect, useMemo, useRef } from "react";
 import { formatValueToObject, Platform, IDict, isNonNullString, isStringNumber, parseDecimal, isEmpty } from "@resk/core";
 import _, { isNumber } from "lodash";
@@ -8,7 +8,7 @@ import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View, { IViewProps } from "@components/View";
 import { getLabelOrLeftOrRightProps } from "@hooks/index";
-import { ITextInputCallbackOptions, ITextInputProps, ITextInputType } from "./types";
+import { ITextInputCallbackOptions, ITextInputProps, ITextInputType, IUseTextInputProps } from "./types";
 import { ITheme } from "@theme/types";
 import { IStyle } from "@src/types";
 import Animated, { Easing, useSharedValue, useAnimatedStyle, withTiming, SharedValue, useAnimatedRef, runOnUI, measure, MeasuredDimensions } from 'react-native-reanimated';
@@ -70,40 +70,18 @@ import Animated, { Easing, useSharedValue, useAnimatedStyle, withTiming, SharedV
  * The `TextInput` component is designed to be versatile and reusable across various parts of an application, ensuring a consistent and engaging user experience. 
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
-const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, leftContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
-    const [focused, setIsFocused] = React.useState(false);
-    const theme = useTheme();
-    contentContainerProps = Object.assign({}, contentContainerProps);
-    rightContainerProps = Object.assign({}, rightContainerProps);
-    leftContainerProps = Object.assign({}, leftContainerProps);
-    containerProps = Object.assign({}, containerProps);
-    testID = testID || "RN_TextInputComponent";
-    const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
-    const isLabelEmbededVariant = variant == "labelEmbeded";
-    const isFlatVariant = false,//variant === "flat", 
-        isOutlinedVariant = false;// variant == "outlined";
-    const isDefaultVariant = !isFlatVariant && !isOutlinedVariant && !isOutlinedVariant;
-    const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
-    const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
+const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
+    const { variant, value, containerProps, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, right, label, ...rest } = useTextInput(props);
     const floatingLabelPosition = useSharedValue(0);
+    const leftContainerProps = Object.assign({}, cLeftContainerProps);
+    const isFlatVariant = false,//variant === "flat", 
+        isOutlinedVariant = false//variant == "outlined";
+    const isLabelEmbededVariant = variant === "labelEmbeded";
+    const canHandleFloadingLabel = isFlatVariant || isOutlinedVariant;
     // Create an animated reference for the input field
     const containerRef = useAnimatedRef();
     const contentContainerRef = useAnimatedRef();
     const containerLayoutRef = useRef<MeasuredDimensions | null>(null);
-    const contentContainerLayoutRef = useRef<MeasuredDimensions | null>(null);
-    const placeholder = isEmpty(props.placeholder) ? "" : props.placeholder;
-    const canHandleFloadingLabel = isFlatVariant || isOutlinedVariant;
-    useEffect(() => {
-        // Run this on the UI thread (since `measure()` is a UI operation)
-        runOnUI(() => {
-            // Measure the height of the input field to position the label correctly
-            containerLayoutRef.current = measure(containerRef);
-            contentContainerLayoutRef.current = measure(contentContainerRef);
-        })();
-    }, [canHandleFloadingLabel]);
-    const containerLayout = containerLayoutRef.current;
-    const contentContainerLayout = containerLayoutRef.current;
-
     const floatingLabelAnimatedStyle = useAnimatedStyle(() => ({
         transform: [
             {
@@ -115,6 +93,226 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
         ],
     }));
     useEffect(() => {
+        runOnUI(() => {
+            containerLayoutRef.current = measure(containerRef);
+        })();
+    }, [canHandleFloadingLabel]);
+    const isInputValueEmpty = isEmpty(value);
+    const containerLayout = containerLayoutRef.current;
+    useMemo(() => {
+        if (!canHandleFloadingLabel) return;
+        const height = containerLayout?.height ? (containerLayout.height - 5) : 0;
+        if (isFocused || !isInputValueEmpty) {
+            floatingLabelPosition.value = -1 * height;
+        } else if (isInputValueEmpty && !isEmpty(props.placeholder)) {
+            floatingLabelPosition.value = 0;
+        }
+    }, [isFocused, containerLayout, canHandleFloadingLabel, canRenderLabel, isInputValueEmpty]);
+    const { testID } = rest;
+    const innerRef = useRef<RNTextInput | null>(null);
+    const labelContent = !isEmpty(label) && editable ? <TouchableOpacity onPress={(e) => {
+        if (innerRef?.current && typeof innerRef.current.focus === "function") {
+            innerRef.current.focus();
+        }
+    }}>{label}</TouchableOpacity> : label;
+    const floatingLabelContainer = canHandleFloadingLabel ? <Animated.Text testID={`${testID}_FloatingLabelContainer`} style={[styles.floatingLabel, floatingLabelAnimatedStyle, isFocused && styles.floatingLabelFocused]}>
+        {labelContent}
+    </Animated.Text> : null;
+    return <View ref={containerRef} {...containerProps}>
+        {(canHandleFloadingLabel ? (!isFlatVariant ? floatingLabelContainer : null) : (isLabelEmbededVariant ? null : labelContent))}
+        <View ref={contentContainerRef}  {...contentContainerProps}>
+            {left || isLabelEmbededVariant && !isEmpty(label) ? <View testID={`${testID}_LeftContainer`} {...leftContainerProps} style={[styles.leftOrRightContainer, leftContainerProps.style]}>
+                {left}
+                {isLabelEmbededVariant ? labelContent : null}
+            </View> : null}
+            {canHandleFloadingLabel && isFlatVariant ? floatingLabelContainer : null}
+            <RNTextInput
+                {...rest}
+                ref={mergeRefs(innerRef, ref)}
+            />
+            {right}
+        </View>
+    </View>
+});
+
+/**
+ * Function to determine the styles for the container and content based on the input state.
+ *
+ * @param {Object} params - The parameters for the function.
+ * @param {boolean} params.isLabelEmbededVariant - Indicates if the label is embedded within the input.
+ * @param {boolean} params.canHandleFloatingLabel - Indicates if the input can handle a floating label.
+ * @param {boolean} params.isFocused - Indicates if the input is currently isFocused.
+ * @param {string} [params.textColor] - The color of the text displayed in the input.
+ * @param {string} [params.borderColor] - The color of the input's border.
+ * @param {ITheme} params.theme - The theme object providing styling information.
+ * @param {boolean} params.isFlatVariant - Indicates if the input has a flat variant styling.
+ * @param {boolean} params.isOutlinedVariant - Indicates if the input has an outlined variant styling.
+ * @param {boolean} params.isDefaultVariant - Indicates if the input is in the default variant styling.
+ * @returns {Object} An object containing styles for the container, content, input, and label.
+ *
+ * @example
+ * const styles = getContainerAndContentStyle({
+ *   isLabelEmbededVariant: true,
+ *   canHandleFloatingLabel: true,
+ *   isFocused: false,
+ *   textColor: '#000',
+ *   borderColor: '#ccc',
+ *   theme: myTheme,
+ *   isFlatVariant: false,
+ *   isOutlinedVariant: false,
+ *   isDefaultVariant: true,
+ * });
+ * 
+ * console.log(styles); // { containerStyle: [...], contentContainerStyle: [...], inputStyle: [...], labelStyle: [...] }
+ */
+const getContainerAndContentStyle = ({ isLabelEmbededVariant, canHandleFloatingLabel, isFocused, textColor, borderColor, theme, isFlatVariant, isOutlinedVariant, isDefaultVariant }: { isLabelEmbededVariant: boolean, canRenderLabel: boolean, canHandleFloatingLabel: boolean, theme: ITheme, isFocused: boolean, textColor?: string, borderColor?: string, isFlatVariant: boolean, isOutlinedVariant: boolean, isDefaultVariant: boolean }) => {
+    const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [{ color: textColor }], labelStyle: IStyle = [{ color: textColor }];
+    const borderedStyle = [
+        isFocused && !isFlatVariant ? styles.focusedOutlineBorder : styles.containerLabelEmbeded,
+        { borderColor, borderRadius: theme.roundness },
+    ];
+    const notEmbeededLabelStyle = [styles.notEmbededLabelStyle],
+        notEmbeededInputStyle = [styles.inputNotEmbededLabelVariant]
+    if (isLabelEmbededVariant) {
+        inputStyle.push(styles.inputLabelEmbeded);
+        containerStyle.push(borderedStyle);
+        containerStyle.push(styles.labelEmbededVariantContainer);
+        labelStyle.push(styles.labelEmbededVariantLabel);
+    } else {
+        inputStyle.push(notEmbeededInputStyle);
+        labelStyle.push(notEmbeededLabelStyle)
+        if (isFlatVariant) {
+            contentContainerStyle.push([styles.flatVariantContentContainer, { borderColor }, !isFocused && styles.flatVariantContentContainerNotFocused])
+            inputStyle.push(styles.flatVariantInput)
+        } else if (isOutlinedVariant) {
+            contentContainerStyle.push(borderedStyle);
+            contentContainerStyle.push(styles.outlinedVarientContentContainer)
+        } else {
+            contentContainerStyle.push(borderedStyle);
+        }
+    }
+    if (isDefaultVariant) {
+        labelStyle.push(styles.defaultVariantLabel);
+    }
+    if (canHandleFloatingLabel) {
+        inputStyle.push(styles.floatingInput);
+        containerStyle.push(styles.containerWithFloatingLabel);
+    }
+
+    return { containerStyle, contentContainerStyle, inputStyle, labelStyle }
+}
+
+/***
+ * A custom hook for managing the state and behavior of a text input component.
+ * This hook encapsulates logic for handling focus, value formatting, and various
+ * properties related to the text input, such as error handling, secure text entry,
+ * and label rendering.
+ *
+ * @function useTextInput
+ * @param {ITextInputProps} props - The properties for configuring the text input behavior.
+ * 
+ * @param {string} [props.defaultValue] - The default value of the input, it's the initial value of the text input when it is rendered.
+ * 
+ * @param {string} [props.testID] - An optional identifier for testing purposes, useful for UI testing frameworks.
+ * 
+ * @param {string} [props.value] - The controlled value of the text input. This is omitted from the function's parameters.
+ * 
+ * @param {boolean} [props.withLabel] - A flag indicating whether to display a label with the input.
+ * 
+ * @param {ReactNode} [props.left] - Custom content to be rendered on the left side of the text input, such as an icon.
+ * 
+ * @param {string} [props.variant] - The variant of the text input, determining its style (e.g., "default", "flat", "outlined"). Defaults to "default".
+ * 
+ * @param {boolean} [props.error] - A flag indicating whether there is an error associated with the input.
+ * 
+ * @param {ReactNode} [props.label] - Custom label content for the text input.
+ * 
+ * @param {object} [props.labelProps] - Additional properties to customize the label's behavior or appearance.
+ * 
+ * @param {object} [props.containerProps] - Properties for customizing the container of the text input.
+ * 
+ * @param {ReactNode} [props.right] - Custom content to be rendered on the right side of the text input.
+ * 
+ * @param {object} [props.contentContainerProps] - Properties for customizing the content container of the text input.
+ * 
+ * @param {number} [props.debounceTimeout] - The debounce timeout in milliseconds for handling input changes.
+ * 
+ * @param {object} [props.rightContainerProps] - Properties for customizing the right container of the text input.
+ * 
+ * @param {object} [props.leftContainerProps] - Properties for customizing the left container of the text input.
+ * 
+ * @param {boolean} [props.emptyValue] - A flag indicating whether the input can be empty.
+ * 
+ * @param {number} [props.maxLength] - The maximum length of the input value.
+ * 
+ * @param {number} [props.length] - The current length of the input value.
+ * 
+ * @param {function} [props.affix] - A function or ReactNode to render additional content associated with the input.
+ * 
+ * @param {string} [props.type] - The type of the input (e.g., "text", "password", "number").
+ * 
+ * @param {boolean} [props.readOnly] - A flag indicating whether the input is read-only.
+ * 
+ * @param {boolean} [props.secureTextEntry] - A flag indicating whether the input should hide the text (for passwords).
+ * 
+ * @param {function} [props.toCase] - A function to transform the input value.
+ * 
+ * @param {string} [props.inputMode] - The input mode for the text input, which can affect the keyboard layout on mobile devices.
+ * 
+ * @param {function} [props.onChange] - A callback function that is invoked when the input value changes.
+ * 
+ * @returns {IUseTextInputProps} An object containing properties and methods to manage the text input state, including:
+ * 
+ * - `autoComplete`: The auto-complete behavior for the text input.
+ * - `placeholderTextColor`: The color of the placeholder text.
+ * - `underlineColorAndroid`: The underline color for Android (set to "transparent" for no underline).
+ * - `containerProps`: Properties for the container element.
+ * - `contentContainerProps`: Properties for the content container element.
+ * - `label`: The label element for the text input.
+ * - `placeholder`: The placeholder text for the input.
+ * - `testID`: The test ID for the input component.
+ * - `readOnly`: Whether the input is read-only.
+ * - `secureTextEntry`: Whether the input should hide the text.
+ * - `style`: The style for the text input.
+ * - `value`: The current value of the text input.
+ * - `inputMode`: The input mode for the text input.
+ * - `onChange`: A callback function for handling input changes.
+ * @example
+ * @example
+ * const { containerProps,label,left,right, contentContainerProps, value, onChange } = useTextInput({
+ *   defaultValue: "Hello",
+ *   testID: "myTextInput",
+ *   variant: "outlined",
+ *   onChange: ({value:newValue}) => console.log("Value changed:", newValue),
+ * });
+ * return (
+ *   <View {...containerProps}>
+ *     <View {...contentContainerProps}>
+ *      {left}
+ *      {label}
+ *      <TextInput {...props} value={value} onChange={onChange} />
+ *      {right}
+ *     </View>
+ *   </View>
+ * );
+ * 
+ */
+export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+    const [isFocused, setIsFocused] = React.useState(false);
+    const theme = useTheme();
+    contentContainerProps = Object.assign({}, contentContainerProps);
+    rightContainerProps = Object.assign({}, rightContainerProps);
+    containerProps = Object.assign({}, containerProps);
+    testID = testID || "RN_TextInputComponent";
+    const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
+    const isLabelEmbededVariant = variant == "labelEmbeded";
+    const isFlatVariant = false,//variant === "flat", 
+        isOutlinedVariant = false;// variant == "outlined";
+    const isDefaultVariant = !isFlatVariant && !isOutlinedVariant && !isOutlinedVariant;
+    const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
+    const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
+    const placeholder = isEmpty(props.placeholder) ? "" : props.placeholder;
+    useEffect(() => {
         return () => {
             clearTimeout(debounceTimeoutRef.current);
         }
@@ -125,19 +323,19 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
         }
     }, [secureTextEntry]);
     const { inputMode, isNumberType: canValueBeDecimal } = useMemo(() => {
-        const inputMode = !focused ? "text" : cInputMode || type == "number" ? "decimal" : type !== "password" ? type : "text";
+        const inputMode = !isFocused ? "text" : cInputMode || type == "number" ? "decimal" : type !== "password" ? type : "text";
         const isNumberType = isDecimalType(inputMode as string);
         return {
             inputMode,
             isNumberType
         }
-    }, [type, cInputMode, focused]);
+    }, [type, cInputMode, isFocused]);
     const emptyValue = cIsEmptyValue || (canValueBeDecimal ? "0" : "");
     const toCase = (value: any): any => {
-        if (canValueBeDecimal && focused && (value === '.' || value == '.')) {
+        if (canValueBeDecimal && isFocused && (value === '.' || value == '.')) {
             value = "0" + value;
         }
-        if (value === emptyValue && focused) {
+        if (value === emptyValue && isFocused) {
             value = "";
         }
         if (cToCase) return cToCase(value);
@@ -152,13 +350,10 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
         value: toCase(defaultValue),
         event: null,
     } as IDict);
-    /**
-     * la valeur affichée est la valeur formattée
-     */
     const formated = useMemo(() => {
         return formatValueToObject({ ...inputState, type, value: inputState.value, ...props });
     }, [inputState.value]);
-    const focusedValue = focused ? (formated.value == emptyValue ? '' : formated.value) : '';
+    const focusedValue = isFocused ? (formated.value == emptyValue ? '' : formated.value) : '';
     useEffect(() => {
         if (defaultValue === inputState.value) return;
         setInputState({ ...inputState, value: defaultValue, event: null });
@@ -166,8 +361,8 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
-    const textColor = error ? theme.colors.error : focused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
-    const callOptions: ITextInputCallbackOptions = { ...formated, error: !!error, variant, focused, textColor: textColor as string, editable, disabled: disabled as boolean };
+    const textColor = error ? theme.colors.error : isFocused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
+    const callOptions: ITextInputCallbackOptions = { ...formated, error: !!error, variant, isFocused, textColor: textColor as string, editable, disabled: disabled as boolean };
     const affixContent = useMemo(() => {
         if (affix === false) return null;
         let affContent = typeof affix == "function" ? affix(callOptions) : isValidElement(affix, true) ? affix : null;
@@ -184,139 +379,81 @@ const TextInput = React.forwardRef(({ defaultValue, testID, left: customLeft, va
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
     }, [focusedValue, canValueBeDecimal, error, props.multiline, affix, isPasswordField]);
-    const inputValue = focused ? focusedValue : formated.formattedValue || emptyValue || "";
+    const inputValue = isFocused ? focusedValue : formated.formattedValue || emptyValue || "";
     const isInputValueEmpty = isEmpty(inputValue);
-    const canRenderLabel = isDefaultVariant || (isLabelEmbededVariant && !placeholder && isInputValueEmpty || (canHandleFloadingLabel));
-    useMemo(() => {
-        if (!canHandleFloadingLabel) return;
-        const height = containerLayout?.height ? (containerLayout.height - 5) : 0;
-        if (focused || !isInputValueEmpty) {
-            floatingLabelPosition.value = -1 * height;
-        } else if (isEmpty(inputValue) && !isEmpty(props.placeholder)) {
-            floatingLabelPosition.value = 0;
-        }
-    }, [focused, containerLayout, contentContainerLayout, canHandleFloadingLabel, inputValue, canRenderLabel, isInputValueEmpty]);
+    const canHandleFloatingLabel = isFlatVariant || isOutlinedVariant;
+    const canRenderLabel = withLabel === false ? false : isDefaultVariant || (isLabelEmbededVariant && !placeholder && isInputValueEmpty || (canHandleFloatingLabel));
     const { left, right, label } = getLabelOrLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
     const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null];
     const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} name={isSecure ? "eye" : "eye-off"} /> : null;
-    const borderColor = focused || error ? textColor : theme.colors.outline;
-    const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ floatingLabelPosition, canHandleFloadingLabel, isLabelEmbededVariant, canRenderLabel, focused, theme, textColor, borderColor, isFlatVariant, isOutlinedVariant, isDefaultVariant })
-    const lContent = (label ? <Label color={textColor} testID={`${testID}_Label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null);
-    const innerRef = useRef<RNTextInput | null>(null);
-    const labelContent = !isEmpty(lContent) && editable ? <TouchableOpacity onPress={(e) => {
-        if (innerRef?.current && typeof innerRef.current.focus === "function") {
-            innerRef.current.focus();
-        }
-    }}>{lContent}</TouchableOpacity> : lContent;
-    const floatingLabelContainer = canHandleFloadingLabel ? <Animated.Text testID={`${testID}_FloatingLabelContainer`} style={[styles.floatingLabel, floatingLabelAnimatedStyle, focused && styles.floatingLabelFocused]}>
-        {labelContent}
-    </Animated.Text> : null;
-    return <View ref={containerRef} testID={`${testID}_Container`} {...containerProps} style={[styles.container, containerStyle, disabledOrEditStyle, containerProps.style]}>
-        {(canHandleFloadingLabel ? (!isFlatVariant ? floatingLabelContainer : null) : (isLabelEmbededVariant ? null : labelContent))}
-        <View ref={contentContainerRef} testID={`${testID}_ContentContainer`} {...contentContainerProps} style={[styles.contentContainer, contentContainerStyle, contentContainerProps.style]}>
-            {left || isLabelEmbededVariant && !isEmpty(label) ? <View testID={`${testID}_LeftContainer`} {...leftContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, leftContainerProps.style]}>
-                {left}
-                {isLabelEmbededVariant ? labelContent : null}
-            </View> : null}
-            {canHandleFloadingLabel && isFlatVariant ? floatingLabelContainer : null}
-            <RNTextInput
-                autoComplete="off"
-                placeholderTextColor={focused || error ? undefined : theme.colors.placeholder}
-                {...props}
-                placeholder={!canHandleFloadingLabel || !labelContent ? placeholder : undefined}
-                underlineColorAndroid="transparent"
-                testID={testID}
-                readOnly={editable === false}
-                secureTextEntry={isPasswordField ? isSecure : secureTextEntry}
-                style={[styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null), styles.input, inputStyle, props.style, disabledOrEditStyle]}
-                value={inputValue}
-                inputMode={inputMode}
-                ref={mergeRefs(innerRef, ref)}
-                onChange={(event: NativeSyntheticEvent<TextInputChangeEventData>) => {
-                    const { nativeEvent: { target, text } } = event;
-                    let textString = String(text);
-                    if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
-                        return;
-                    }
-                    const valCase = toCase(textString);
-                    if (textString !== inputState.value && valCase !== inputState.value) {
-                        const options = { ...inputState, value: valCase, text: textString, event };
-                        setInputState(options);
-                        if (typeof onChange == "function") {
-                            clearTimeout(debounceTimeoutRef.current);
-                            debounceTimeoutRef.current = setTimeout(() => {
-                                onChange({ ...options, ...inputState, focused, event, ...formatValueToObject({ ...options, type }) });
-                            }, isNumber(debounceTimeout) && debounceTimeout || 0);
-                        }
-                    }
-                }}
-                onKeyPress={(event, ...rest) => {
-                    if (props.onKeyPress) {
-                        props.onKeyPress(event, ...rest);
-                    }
-                    if (!focused) {
-                        setIsFocused(true);
-                    }
-                }}
-                onBlur={(event: NativeSyntheticEvent<TextInputFocusEventData>, ...rest) => {
-                    setIsFocused(false);
-                    if (props.onBlur) {
-                        props.onBlur(event, ...rest);
-                    }
-                }}
-                onFocus={
-                    (event: NativeSyntheticEvent<TextInputFocusEventData>, ...rest) => {
-                        setIsFocused(true);
-                        if (props.onFocus) {
-                            props.onFocus(event, ...rest);
-                        }
-                    }
+    const borderColor = isFocused || error ? textColor : theme.colors.outline;
+    const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ canHandleFloatingLabel, isLabelEmbededVariant, canRenderLabel, isFocused, theme, textColor, borderColor, isFlatVariant, isOutlinedVariant, isDefaultVariant })
+    return {
+        autoComplete: "off",
+        placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
+        underlineColorAndroid: "transparent",
+        ...props,
+        variant,
+        canRenderLabel,
+        error,
+        isFocused,
+        containerProps: Object.assign({}, { testID: `${testID}_Container` }, containerProps, { style: [styles.container, containerStyle, disabledOrEditStyle, containerProps.style] }),
+        contentContainerProps: Object.assign({}, { testID: `${testID}_ContentContainer` }, contentContainerProps, { style: [styles.contentContainer, contentContainerStyle, contentContainerProps.style] }),
+        label: (label ? <Label color={textColor} testID={`${testID}_Label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
+        withLabel,
+        placeholder: !canHandleFloatingLabel || !label ? placeholder : undefined,
+        testID: testID,
+        readOnly: editable === false,
+        editable,
+        secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
+        style: [styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null), styles.input, inputStyle, props.style, disabledOrEditStyle],
+        value: inputValue,
+        inputMode: inputMode,
+        onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
+            const { nativeEvent: { target, text } } = event;
+            let textString = String(text);
+            if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
+                return;
+            }
+            const valCase = toCase(textString);
+            if (textString !== inputState.value && valCase !== inputState.value) {
+                const options = { ...inputState, value: valCase, text: textString, event };
+                setInputState(options);
+                if (typeof onChange == "function") {
+                    clearTimeout(debounceTimeoutRef.current);
+                    debounceTimeoutRef.current = setTimeout(() => {
+                        onChange({ ...options, ...inputState, isFocused, event, ...formatValueToObject({ ...options, type }) });
+                    }, isNumber(debounceTimeout) && debounceTimeout || 0);
                 }
-            />
-            {right || canToggleSecure ? <View testID={`${testID}_RightContainer`} {...leftContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, rightContainerProps.style]}>
-                {affixContent}
-                {right}
-                {!editable || disabled && isPasswordField ? secureIcon : <Pressable children={secureIcon} onPress={(e) => setIsSecure(!isSecure)} />}
-            </View> : null}
-        </View>
-    </View>
-});
-
-const getContainerAndContentStyle = ({ isLabelEmbededVariant, canHandleFloadingLabel, focused, textColor, borderColor, theme, isFlatVariant, isOutlinedVariant, floatingLabelPosition, isDefaultVariant }: { isLabelEmbededVariant: boolean, floatingLabelPosition: SharedValue<number>, canRenderLabel: boolean, canHandleFloadingLabel: boolean, theme: ITheme, focused: boolean, textColor?: string, borderColor?: string, isFlatVariant: boolean, isOutlinedVariant: boolean, isDefaultVariant: boolean }) => {
-    const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [{ color: textColor }], labelStyle: IStyle = [{ color: textColor }];
-    const borderedStyle = [
-        focused && !isFlatVariant ? styles.focusedOutlineBorder : styles.containerLabelEmbeded,
-        { borderColor, borderRadius: theme.roundness },
-    ];
-    const notEmbeededLabelStyle = [styles.notEmbededLabelStyle],
-        notEmbeededInputStyle = [styles.inputNotEmbededLabelVariant]
-    if (isLabelEmbededVariant) {
-        inputStyle.push(styles.inputLabelEmbeded);
-        containerStyle.push(borderedStyle);
-        containerStyle.push(styles.labelEmbededVariantContainer);
-        labelStyle.push(styles.labelEmbededVariantLabel);
-    } else {
-        inputStyle.push(notEmbeededInputStyle);
-        labelStyle.push(notEmbeededLabelStyle)
-        if (isFlatVariant) {
-            contentContainerStyle.push([styles.flatVariantContentContainer, { borderColor }, !focused && styles.flatVariantContentContainerNotFocused])
-            inputStyle.push(styles.flatVariantInput)
-        } else if (isOutlinedVariant) {
-            contentContainerStyle.push(borderedStyle);
-            contentContainerStyle.push(styles.outlinedVarientContentContainer)
-        } else {
-            contentContainerStyle.push(borderedStyle);
-        }
+            }
+        },
+        onKeyPress: (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+            if (!isFocused) {
+                setIsFocused(true);
+            }
+            if (typeof props.onKeyPress == "function") {
+                props.onKeyPress(event);
+            }
+        },
+        onBlur: (event: NativeSyntheticEvent<TextInputFocusEventData>) => {
+            setIsFocused(false);
+            if (typeof props.onBlur == "function") {
+                props.onBlur(event);
+            }
+        },
+        onFocus: (event: NativeSyntheticEvent<TextInputFocusEventData>) => {
+            setIsFocused(true);
+            if (typeof props.onFocus == "function") {
+                props.onFocus(event);
+            }
+        },
+        left,
+        right: right || canToggleSecure ? <View testID={`${testID}_RightContainer`} {...rightContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, rightContainerProps.style]}>
+            {affixContent}
+            {right}
+            {editable || disabled !== false && isPasswordField ? secureIcon : null}
+        </View> : null
     }
-    if (isDefaultVariant) {
-        labelStyle.push(styles.defaultVariantLabel);
-    }
-    if (canHandleFloadingLabel) {
-        inputStyle.push(styles.floatingInput);
-        containerStyle.push(styles.containerWithFloatingLabel);
-    }
-
-    return { containerStyle, contentContainerStyle, inputStyle, labelStyle }
 }
 
 TextInput.displayName = "TextInput";
@@ -332,7 +469,8 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     inputLabelEmbeded: {
-        paddingRight: 5,
+        padding: 0,
+        margin: 0,
     },
     input: {
         borderColor: 'transparent', // No border
@@ -433,10 +571,11 @@ const styles = StyleSheet.create({
 
     },
     labelEmbededVariantContainer: {
-        //padding: 0,
+        paddingLeft: 3,
+        paddingVertical: 3,
     },
     labelEmbededVariantLabel: {
-        paddingLeft: 3,
+        //paddingLeft: 3,
     },
 })
 

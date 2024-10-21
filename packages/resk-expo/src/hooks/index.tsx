@@ -18,12 +18,33 @@ import isValidElement from "@utils/isValidElement";
  *   content on the right side of a component.
  */
 export type ILabelOrLeftOrRightProps<T = any> = {
-    /**A ReactNode or a function that returns a ReactNode. This can be used to render the label for a component. */
+    /**
+     * A ReactNode or a function that returns a ReactNode. This can be used to render the label for a component.
+     * It represent the label to be displayed alongside the text input.
+     * This could be a React element, such as a `Text` component, or any other custom label.
+     * @example
+     * ```ts
+     * label: <Text>Username</Text>
+     * ```
+     */
     label?: ReactNode | ((options: T) => ReactNode);
-    /**A ReactNode or a function that returns a ReactNode. This can be used to render content on the left side of a component. */
+    /**A ReactNode or a function that returns a ReactNode. This can be used to render content on the left side of a component.
+     * Typically used for icons or buttons.
+     * @example
+     * ```ts
+     * left: <Icon name="search" />
+     * ```
+     */
     left?: ReactNode | ((options: T) => ReactNode);
-    /**A ReactNode or a function that returns a ReactNode. This can be used to render 
- *   content on the right side of a component. */
+    /**
+     * A ReactNode or a function that returns a ReactNode. 
+     * This can be used to render  content on the right side of a component.
+     * Often used for actions such as clearing text or submitting.
+     * @example
+     * ```ts
+     * right: <Icon name="clear" />
+     * ```
+     */
     right?: ReactNode | ((options: T) => ReactNode);
 };
 

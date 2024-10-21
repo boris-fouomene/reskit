@@ -66,10 +66,10 @@ export type ITextInputType = InputModeOptions | "number" | "password";
  * 
  * - `color?`: An optional string that specifies the color of the text input. 
  *   This can be used to customize the appearance of the input field based on 
- *   its state (e.g., focused, error).
+ *   its state (e.g., isFocused, error).
  * 
- * - `focused?`: An optional boolean that indicates whether the text input 
- *   component is currently focused. This can be useful for triggering 
+ * - `isFocused?`: An optional boolean that indicates whether the text input 
+ *   component is currently isFocused. This can be useful for triggering 
  *   specific behaviors or styles when the input is active.
  * 
  * - `editable?`: An optional boolean that specifies whether the text input 
@@ -85,14 +85,14 @@ export type ITextInputType = InputModeOptions | "number" | "password";
  * ```typescript
  * const inputOptions: ITextInputCallbackOptions = {
  *   color: 'blue',
- *   focused: true,
+ *   isFocused: true,
  *   editable: true,
  *   disabled: false,
  * };
  * 
  * function handleInputChange(options: ITextInputCallbackOptions) {
- *   if (options.focused) {
- *     console.log("Input is focused");
+ *   if (options.isFocused) {
+ *     console.log("Input is isFocused");
  *   }
  *   if (options.disabled) {
  *     console.log("Input is disabled");
@@ -112,9 +112,9 @@ export type ITextInputType = InputModeOptions | "number" | "password";
 export type ITextInputCallbackOptions = IFieldFormatValueResult & {
     textColor: string;
     /**
-     * Indicates if the component is focused.
+     * Indicates if the component is isFocused.
      */
-    focused: boolean;
+    isFocused: boolean;
     editable: boolean;
     disabled: boolean;
     /** if label is embedded in the text input */
@@ -163,14 +163,14 @@ export type ITextInputOnChangeEvent = NativeSyntheticEvent<TextInputChangeEventD
  * @property {ITextInputOnChangeEvent} [event] - The event that triggered the change.
  * @property {any} [value] - The new value of the text field after the change.
  * @property {any} [previousValue] - The value of the text field before the change.
- * @property {boolean} [focused] - Indicates whether the text field is focused at the time of the change.
+ * @property {boolean} [isFocused] - Indicates whether the text field is isFocused at the time of the change.
  * @property {string} [fieldName] - The name of the field if it's part of a form.
  */
 export type ITextInputOnChangeOptions = IFieldFormatValueResult & IOnChangeOptions<any, ITextInputOnChangeEvent> & {
     event?: ITextInputOnChangeEvent;
     value?: any;
     previousValue?: any;
-    focused?: boolean;
+    isFocused?: boolean;
     fieldName?: string;
 }
 
@@ -260,7 +260,7 @@ export type ITextInputOnChangeOptions = IFieldFormatValueResult & IOnChangeOptio
  * input components that enhance user interaction and maintainability 
  * in React Native applications.
  */
-export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' | 'value'> & ILabelOrLeftOrRightProps<ITextInputCallbackOptions> & {
+export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> & ILabelOrLeftOrRightProps<ITextInputCallbackOptions> & {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 
@@ -313,7 +313,7 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' |
 
     /*** 
      * @type ILabelProps
-     * the props used to render the label, when label  is not a react element but a string | number
+     * the props used to render the label
      */
     labelProps?: ILabelProps;
 
@@ -321,6 +321,9 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' |
      * the text input variant
      */
     variant?: "labelEmbeded" | "default", // | "outlined" | "flat"
+
+    /*** A flag indicating whether to display a label with the input. */
+    withLabel?: boolean;
 
     /**
      * @type (options: ITextInputCallbackOptions) => ReactNode | false
@@ -378,3 +381,126 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue' |
      */
     error?: boolean;
 };
+
+/**
+ * @interface IUseTextInputProps
+ * Represents the properties for a customizable text input component.
+ * This type extends the `ITextInputProps` interface by omitting the `left`, `right`, 
+ * and `label` properties and adding additional properties that enhance the 
+ * functionality of the text input.
+ * 
+ * @type ITextInputProps
+ * @extends Omit<ITextInputProps, "left" | "right" | "label">
+ * 
+ * @property {ReactNode} left - A React node that can be rendered to the left of the text input. 
+ * This can be used for icons, labels, or any other custom component.
+ * 
+ * @example
+ * // Example usage of the `left` property
+ * const inputWithIcon = (
+ *   <TextInput left={<Icon name="search" />} />
+ * );
+ * 
+ * @property {ReactNode} right - A React node that can be rendered to the right of the text input. 
+ * Similar to `left`, this can be used for additional icons, buttons, or any other custom components.
+ * 
+ * @example
+ * // Example usage of the `right` property
+ * const inputWithButton = (
+ *   <TextInput right={<Button title="Submit" />} />
+ * );
+ * 
+ * @property {ReactNode} label - A React node that serves as the label for the text input. 
+ * This can be a string or any other React component that provides context to the user about 
+ * what to enter in the text field.
+ * 
+ * @example
+ * // Example usage of the `label` property
+ * const labeledInput = (
+ *   <TextInput label={<span>Email:</span>} />
+ * );
+ * 
+ * @property {boolean} isFocused - A boolean that indicates whether the text input is currently focused. 
+ * This can be used to apply specific styles or behaviors when the input is active.
+ * 
+ * @example
+ * // Example usage of the `isFocused` property
+ * const [isFocused, setIsFocused] = useState(false);
+ * const handleFocus = () => setIsFocused(true);
+ * const handleBlur = () => setIsFocused(false);
+ * 
+ * <TextInput
+ *   isFocused={isFocused}
+ *   onFocus={handleFocus}
+ *   onBlur={handleBlur}
+ * />
+ * 
+ * @property {boolean} canRenderLabel - A boolean that determines whether the label should be rendered. 
+ * This can be useful for conditionally displaying the label based on certain criteria.
+ * 
+ * @example
+ * // Example usage of the `canRenderLabel` property
+ * const shouldRenderLabel = true;
+ * 
+ * <TextInput
+ *   canRenderLabel={shouldRenderLabel}
+ *   label={<span>Username:</span>}
+ * />
+ */
+export type IUseTextInputProps = Omit<ITextInputProps, "left" | "right" | "label"> & {
+    /**
+     * The content to render on the left side of the text input.
+     * Typically used for icons or buttons.
+     * 
+     * @example
+     * ```ts
+     * left: <Icon name="search" />
+     * ```
+     */
+    left: ReactNode,
+
+    /**
+     * The content to render on the right side of the text input.
+     * Often used for actions such as clearing text or submitting.
+     * 
+     * @example
+     * ```ts
+     * right: <Icon name="clear" />
+     * ```
+     */
+    right: ReactNode,
+
+    /**
+     * The label to be displayed alongside the text input.
+     * This could be a React element, such as a `Text` component, or any other custom label.
+     * 
+     * @example
+     * ```ts
+     * label: <Text>Username</Text>
+     * ```
+     */
+    label: ReactNode,
+
+    /**
+    * Indicates whether the input field is currently focused.
+    * Use this property to customize the styling or behavior when the input is active.
+    * 
+    * @example
+    * ```ts
+    * isFocused: true
+    * ```
+   */
+    isFocused: boolean,
+
+    /**
+     * Determines if the label should be rendered.
+     * This property can be helpful for conditionally showing or hiding the label 
+     * based on the input's state or any other logic.
+     * 
+     * @example
+     * ```ts
+     * canRenderLabel: true
+     * ```
+     */
+    canRenderLabel: boolean,
+}

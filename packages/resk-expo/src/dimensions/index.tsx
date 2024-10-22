@@ -162,7 +162,7 @@ const addListener = (callback: (dimensions: IDimensions) => any, timeout: number
 // Defines the structure for style properties and breakpoints
 type IStyleProps = {
 	style?: IStyle; // The base style to apply
-	breakpointStyle?: (dimensions: IDimensions) => IStyle | (Record<keyof IBreakpoints | 'mobile' | 'phone' | 'tablet' | 'desktop', IStyle>);
+	breakpointStyle?: (Partial<Record<keyof IBreakpoints | 'mobile' | 'phone' | 'tablet' | 'desktop', IStyle>>) | ((dimensions: IDimensions) => IStyle);
 };
 
 /**
@@ -253,7 +253,7 @@ export function useBreakpointStyle<T extends IStyleProps = any>({ style, breakpo
 			if (breakpointStyle[currentMedia]) {
 				return StyleSheet.flatten([style, breakpointStyle[currentMedia]]);
 			}
-			const mQueries: Record<keyof IBreakpoints | 'mobile' | 'phone' | 'tablet' | 'desktop', IStyle> = breakpointStyle;
+			const mQueries: Partial<Record<keyof IBreakpoints | 'mobile' | 'phone' | 'tablet' | 'desktop', IStyle>> = breakpointStyle;
 			// Determine which style key to apply based on device type
 			const { isMobile, isDesktop, isPhone, isTablet } = dimensions;
 			const styleKey = isPhone && "phone" in mQueries ? "phone" :

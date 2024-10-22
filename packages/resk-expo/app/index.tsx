@@ -15,7 +15,17 @@ const index = () => {
                     <FontIcon size={20} name="antd-book" />
                     <FontIcon size={12} name="antd-API" />
                 </>} placeholder='Label embeded' variant="labelEmbeded" label='Embeded label' />
-                <Portal>
+                <Portal breakpointStyle={{
+                    phone: {
+                        backgroundColor: "red",
+                    },
+                    tablet: {
+                        backgroundColor: "yellow"
+                    },
+                    lg: {
+                        backgroundColor: "green"
+                    }
+                }}>
                     <Label>A portal rendered</Label>
                 </Portal>
             </HStack>

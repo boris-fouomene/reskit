@@ -362,7 +362,7 @@ function init(breakpoints?: IBreakpoints) {
  * If a match is found, the corresponding breakpoint key is returned. If no match is found, 
  * the function returns the name of the currently active breakpoint or an empty string.
  */
-const getCurrentMedia = (width?: number): keyof IBreakpoints | '' => {
+const getCurrentMedia = (width?: number): keyof IBreakpoints => {
     // If width is valid and greater than 300, use it; otherwise, get the current window width
     width = width && width > 300 ? width : Dimensions.get("window").width;
     // Iterate through defined breakpoints to find the current media type
@@ -373,7 +373,7 @@ const getCurrentMedia = (width?: number): keyof IBreakpoints | '' => {
         if (width <= breakpoint.max) return i as keyof IBreakpoints;
     }
     // Return the name of the current breakpoint or an empty string if none found
-    return breakpointsRef.current.current?.name || "";
+    return breakpointsRef.current.current?.name || "lg";
 }
 
 const getCurrentBreakpoint = (): IBreakpoint => {

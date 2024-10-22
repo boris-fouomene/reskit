@@ -27,7 +27,7 @@ import Colors from "@colors";
  * 
  * The following prefixes should be used to specify the icon set:
  *  - `fa` for FontAwesome5
- *  - `ant` for AntDesign
+ *  - `antd` for AntDesign
  *  - `fontisto` for Fontisto
  *  - `foundation` for Foundation
  *  - `ionic` for Ionicons
@@ -93,13 +93,13 @@ FontIcon.displayName = 'FontIcon';
 export default FontIcon;
 
 export type IFontAwesome5Name = keyof typeof FontAwesome5.glyphMap;
-export type IFontAntDesignName = keyof typeof AntDesign.glyphMap;
-export type IFontFontistoName = keyof typeof Fontisto.glyphMap;
-export type IFontIoniconsName = keyof typeof Ionicons.glyphMap;
-export type IFontMaterialIconsName = keyof typeof MaterialIcons.glyphMap;
-export type IFontOcticonsName = keyof typeof Octicons.glyphMap;
-export type IFontSimpleLineIconsName = keyof typeof SimpleLineIcons.glyphMap;
-export type IFontZocialName = keyof typeof Zocial.glyphMap;
+export type IFontAntDesignName = `antd-${keyof typeof AntDesign.glyphMap | 'book'}`;
+export type IFontFontistoName = `fontisto-${keyof typeof Fontisto.glyphMap}`;
+export type IFontIoniconsName = `ionic-${keyof typeof Ionicons.glyphMap}`;
+export type IFontMaterialIconsName = `material-${keyof typeof MaterialIcons.glyphMap}`;
+export type IFontOcticonsName = `octicons-${keyof typeof Octicons.glyphMap}`;
+export type IFontSimpleLineIconsName = `simple-line-${keyof typeof SimpleLineIcons.glyphMap}`;
+export type IFontZocialName = `zocial-${keyof typeof Zocial.glyphMap}`;
 export type IFontMaterialCommunityIconsName = keyof typeof MaterialCommunityIcons.glyphMap;
 ;
 
@@ -114,7 +114,9 @@ export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityI
     style?: IStyle;
 
     /** The name of the icon to display (including the prefix for icon set if necessary). */
-    name: IFontMaterialCommunityIconsName;
+    name: IFontMaterialCommunityIconsName | IFontAntDesignName | IFontFontistoName
+    | IFontIoniconsName | IFontOcticonsName | IFontSimpleLineIconsName |
+    IFontZocialName | IFontMaterialIconsName | IFontMaterialCommunityIconsName;
 
     /*** the icon size */
     size?: number;
@@ -180,7 +182,7 @@ export const fontsByIndex = Object.keys(fontsObjects);
 export interface IPrefixToIconsSetNames {
     material: string,
     fa: string,
-    ant: string,
+    antd: string,
     foundation: string,
     fontisto: string,
     ionic: string,
@@ -193,7 +195,7 @@ export interface IPrefixToIconsSetNames {
 export const PREFIX_TO_ICONS_SET_NAMES: IPrefixToIconsSetNames = {
     material: "MaterialIcons",
     fa: "FontAwesome5",
-    ant: "AntDesign",
+    antd: "AntDesign",
     foundation: "Foundation",
     fontisto: "Fontisto",
     ionic: "Ionicons",
@@ -223,7 +225,7 @@ export interface IIconsSetNamesToPrefix {
 export const ICONS_SET_NAMES_TO_PREFIX: IIconsSetNamesToPrefix = {
     MaterialIcons: "material",
     FontAwesome5: "fa",
-    AntDesign: "ant",
+    AntDesign: "antd",
     Foundation: "foundation",
     Fontisto: "fontisto",
     Ionicons: "ionic",

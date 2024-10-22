@@ -11,9 +11,10 @@ const index = () => {
             <HStack style={{ columnGap: 10 }}>
                 <TextInputComponent left={({ textColor, variant }) => <FontIcon color={textColor} name={"camera"} />} placeholder='Enter my label' label='Default variant' />
                 <TextInputComponent left={<Label>A left</Label>} right={<>
-                    <FontIcon name="asssss" />
+                    <FontIcon name="antd-book" />
+                    <FontIcon name="antd-API" />
                 </>} placeholder='Label embeded' variant="labelEmbeded" label='Embeded label' />
-                <FontIcon name="menu" />
+
             </HStack>
         </View>
     )

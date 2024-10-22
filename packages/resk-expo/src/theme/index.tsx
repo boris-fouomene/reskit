@@ -6,7 +6,6 @@ import session from "../session";
 import { StatusBarProps } from "expo-status-bar";
 import Color from "color";
 import updateNative from "./updateNative";
-import Grid from "../breakpoints/grid";
 import styles from "./styles";
 import { useReskExpoProvider } from "@src/context/context";
 
@@ -187,9 +186,6 @@ export function createTheme(theme: ITheme): ICreatedTheme {
                 }
             }
             return result;
-        },
-        get grid() {
-            return Grid;
         },
         get addEventListener() {
             return addEventListener;
@@ -488,7 +484,7 @@ const Theme = {
  * animation settings, color palette, font styles, and other configurations.
  *
  * @type {ITheme}
- * @returns {ITheme & { grid: typeof Grid } } The current theme object.
+ * @returns {ITheme } The current theme object.
  */
 export default Theme;
 
@@ -563,7 +559,6 @@ export interface ICreatedTheme extends ITheme {
     colors: IThemeColorTokens;
     getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined;
     getColorScheme(colorSheme?: IThemeColorTokenKey): IColorSheme
-    grid: typeof Grid;
     styles: typeof styles;
     /**
      * @method addEventListener

@@ -218,7 +218,7 @@ export type IOnChangeOptionsBase<
 }
 
 /**
- * @interface IOnChangeOptionsExtends
+ * @interface IOnChangeOptions
  * @description
  * Represents the extended options for onChange events, typically used in TextInput components.
  * This type allows for further customization and extension of the base onChange options.

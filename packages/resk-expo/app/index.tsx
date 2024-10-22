@@ -4,6 +4,7 @@ import FontIcon from '@components/Icon/Font';
 import { HStack } from '@components/Stack';
 import Label from '@components/Label';
 import { Portal } from '@components/Portal';
+import Switch from '@components/Switch';
 
 const index = () => {
     return (
@@ -29,6 +30,9 @@ const index = () => {
                     <Label>A portal rendered</Label>
                 </Portal>
             </HStack>
+            <Switch
+                label="Test of label"
+            />
         </View>
     )
 }

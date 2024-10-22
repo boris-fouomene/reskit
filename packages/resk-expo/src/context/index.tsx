@@ -10,6 +10,7 @@ import usePrevious from '@utils/usePrevious';
 import { ReskExpoProviderProps } from './types';
 import { ReskExpoContext } from './context';
 import { useColorScheme } from "@theme/useColorScheme";
+import { PortalProvider } from "@components/Portal";
 
 export * from "./types";
 export * from "./context";
@@ -104,7 +105,7 @@ export function ReskExpoProvider({ children, theme: customTheme, ...rest }: Resk
    */
   return (
     <ReskExpoContext.Provider value={{ theme, updateTheme, ...rest }}>
-      <>{children}</>
+      <PortalProvider>{children}</PortalProvider>
     </ReskExpoContext.Provider>
   );
 }

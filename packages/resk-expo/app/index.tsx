@@ -3,6 +3,7 @@ import TextInputComponent from '@components/TextInput';
 import FontIcon from '@components/Icon/Font';
 import { HStack } from '@components/Stack';
 import Label from '@components/Label';
+import { Portal } from '@components/Portal';
 
 const index = () => {
     return (
@@ -14,7 +15,9 @@ const index = () => {
                     <FontIcon size={20} name="antd-book" />
                     <FontIcon size={12} name="antd-API" />
                 </>} placeholder='Label embeded' variant="labelEmbeded" label='Embeded label' />
-
+                <Portal>
+                    <Label>A portal rendered</Label>
+                </Portal>
             </HStack>
         </View>
     )

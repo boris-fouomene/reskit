@@ -286,8 +286,9 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
 
     /**
      * @type IViewProps
-     * Properties for the parent container of the react native text input
-     * component.
+     * Properties for the parent container of the contentContainer View, displayed as a vertical flex box.
+     * It is also the direct parent of the Label component for the default variant
+     * Note that in the labelEmbeded variant, the label's parent component is the view parent direct to the left component.
      */
     containerProps?: IViewProps;
 
@@ -295,6 +296,8 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
      * @type IViewProps
      * Properties for the parent container, the container that wraps both the left and right fields and react-native TextInput itself
      * component.
+     * They are the properties of the parent container that directly wrap the react native TextInput component, the component to be rendered on the left and the component to be rendered on the right. 
+       the content container is displayed in a horizontal flex box, so that all its children are displayed on the same line. 
      */
     contentContainerProps?: IViewProps;
 

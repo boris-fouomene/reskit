@@ -1,5 +1,5 @@
-import { forwardRef } from "react";
-import { isNonNullString } from "@resk/core";
+import React, { forwardRef } from "react";
+import { isNonNullString, defaultStr } from "@resk/core";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -11,8 +11,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Zocial from "@expo/vector-icons/Zocial";
 import { IStyle } from "../../types";
-import { ITooltipProps } from "@components/Tooltip/types";
-import Tooltip from "@components/Tooltip";
+import { IconButtonProps, IconProps } from "@expo/vector-icons/build/createIconSet";
 import { useTheme } from "@theme";
 import Colors from "@colors";
 
@@ -57,13 +56,13 @@ import Colors from "@colors";
  * @param {React.Ref} ref The reference to the icon component.
  * @returns {JSX.Element | null} Returns the icon element, or null if the icon is not defined.
  */
-const FontIcon = forwardRef(({ name, color, ...props }: IFontIconProps, ref) => {
+const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, color, ...props }, ref) => {
     let IconSet: any = MaterialCommunityIcons, iconSetName: string = "", iconSetPrefix = "";
     const theme = useTheme();
     color = Colors.isValid(color) ? color : theme.colors.text;
-    name = name.trim();
+    const nameString = defaultStr(name).trim();
     for (let i in PREFIX_TO_ICONS_SET_NAMES) {
-        if (isIcon(name, i)) {
+        if (isIcon(nameString, i)) {
             iconSetPrefix = i;
             iconSetName = PREFIX_TO_ICONS_SET_NAMES[i as keyof IPrefixToIconsSetNames];
             IconSet = fontsObjects[iconSetName as keyof IFontsObject];
@@ -73,58 +72,52 @@ const FontIcon = forwardRef(({ name, color, ...props }: IFontIconProps, ref) => 
     if (iconSetPrefix) {
         iconSetPrefix += "-";
     }
-    if (!name || !IconSet || (iconSetPrefix && !IconSet)) {
-        console.warn(`Icon not defined for FontIcon component, icon [${name}], please specify a supported icon from https://github.com/expo/vector-icons/MaterialCommunityIcons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
+    if (!nameString || !IconSet || (iconSetPrefix && !IconSet)) {
+        console.warn(`Icon not defined for FontIcon component, icon [${nameString}], please specify a supported icon from https://github.com/expo/vector-icons/MaterialCommunityIcons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
-    const iconName = name.trim().ltrim(iconSetPrefix).ltrim("-").trim();
-    const children = <IconSet
-        size={24}
+    const iconName = nameString.trim().ltrim(iconSetPrefix).ltrim("-").trim();
+    return <IconSet
+        size={DEFAULT_FONT_ICON_SIZE}
         {...props}
         ref={ref}
         color={color}
         name={iconName}
-        {...props}
     />;
-    if (!props.title && !props.tooltip && !props.onPress && !props.onLongPress && !props.onPressIn && !props.onPressOut && !props.onKeyPress) {
-        return children;
-    }
-    return <Tooltip
-        {...props}
-        children={children}
-    />
 });
+
+export const DEFAULT_FONT_ICON_SIZE = 20;
 
 FontIcon.displayName = 'FontIcon';
 
 export default FontIcon;
+
+export type IFontAwesome5Name = keyof typeof FontAwesome5.glyphMap;
+export type IFontAntDesignName = keyof typeof AntDesign.glyphMap;
+export type IFontFontistoName = keyof typeof Fontisto.glyphMap;
+export type IFontIoniconsName = keyof typeof Ionicons.glyphMap;
+export type IFontMaterialIconsName = keyof typeof MaterialIcons.glyphMap;
+export type IFontOcticonsName = keyof typeof Octicons.glyphMap;
+export type IFontSimpleLineIconsName = keyof typeof SimpleLineIcons.glyphMap;
+export type IFontZocialName = keyof typeof Zocial.glyphMap;
+export type IFontMaterialCommunityIconsName = keyof typeof MaterialCommunityIcons.glyphMap;
+;
+
 
 /***
  * The props for the `FontIcon` component.
  * 
  * @interface IFontIconProps
  */
-export type IFontIconProps = ITooltipProps & {
-    /** The size of the icon. Default is 24. */
-    size?: number;
-
+export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityIcons>, 'name' | 'style' | 'size'> & {
     /** The style object for the icon. */
     style?: IStyle;
 
     /** The name of the icon to display (including the prefix for icon set if necessary). */
-    name: string;
+    name: IFontMaterialCommunityIconsName;
 
-    /** The color of the icon. Defaults to the theme's text color. */
-    color?: string;
-
-    /** The text direction (either 'rtl' or 'ltr'). */
-    direction: 'rtl' | 'ltr';
-
-    /** Whether to allow font scaling. */
-    allowFontScaling?: boolean;
-
-    /** The test ID used for testing. */
-    testID?: string;
+    /*** the icon size */
+    size?: number;
 }
 
 /***

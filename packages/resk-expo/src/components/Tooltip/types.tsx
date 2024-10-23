@@ -4,63 +4,103 @@
 import { IReactComponent } from "../../types";
 import { ReactNode } from "react"
 import { PressableProps } from "react-native";
-import { IMerge } from "@resk/core";
-
-export type ITooltipActions = "press" | "longpress" | "hover";
-export type ITooltipPositions = "top" | "right" | "bottom" | "left";
-
 
 /**
- * The props for the Tooltip component, extending the base PressableProps.
- * This type allows merging additional props dynamically.
+ * 
+ * @interface ITooltipBaseProps
+ * @description
+ * Represents the properties required for rendering a tooltip component.
+ * This interface provides flexibility in displaying additional information
+ * to users in a concise manner, enhancing user experience and interface
+ * interactivity.
  *
- * @template T - A generic type for extending or merging additional properties.
+ * @group Tooltip
+ * @example
+ * // Example usage of ITooltipBaseProps
+ * const tooltipProps: ITooltipBaseProps = {
+ *     tooltip: <span>This is a detailed tooltip content.</span>,
+ *     title: 'Tooltip Title',
+ *     disabled: false,
+ * };
  */
-export type ITooltipProps<T = any> = PressableProps & IMerge<{
+export type ITooltipBaseProps = {
     /**
      * The content to display inside the tooltip.
-     * It can be a ReactNode that supports complex structures like JSX elements.
-     *
+     * This can include any valid ReactNode, allowing for complex structures
+     * such as JSX elements, strings, or even other components.
+     * 
      * @type {React.ReactNode}
+     * @example
+     * // A simple tooltip with text
+     * tooltip: "Hover over me for more info!"
+     * 
+     * // A tooltip with JSX content
+     * tooltip: <div><strong>Important:</strong> This feature is in beta.</div>
      */
     tooltip?: ReactNode;
 
     /**
      * The title displayed within the tooltip, typically a brief label or description.
-     * Can be used as an alternative to the `tooltip` property.
-     *
+     * This property can be used as an alternative to the `tooltip` property,
+     * providing a succinct summary of the tooltip's purpose.
+     * 
      * @type {React.ReactNode}
+     * @example
+     * // Using a title for the tooltip
+     * title: "Click here to learn more"
+     * 
+     * // Title with JSX content
+     * title: <span style={{ color: 'blue' }}>Info</span>
      */
     title?: ReactNode;
 
     /**
-     * Optionally specify the element type to render the Tooltip with.
-     * By default, it uses `Pressable`, but can be changed to any custom component.
-     *
-     * @type {IReactComponent}
-     */
-    as?: IReactComponent;
-
-    /**
      * If true, disables the tooltip from being triggered and displayed.
-     *
+     * This is useful for scenarios where the tooltip should not show,
+     * such as when a component is in a loading state or when it is disabled.
+     * 
      * @type {boolean}
+     * @default false
+     * @example
+     * // Example of disabling the tooltip
+     * disabled: true
      */
     disabled?: boolean;
+};
 
+/**
+ * @group Tooltip
+ * @interface ITooltipProps
+ * @description
+ * The props for the Tooltip component, extending the base PressableProps.
+ * This type allows merging additional props dynamically, enabling 
+ * developers to customize the Tooltip component's behavior and appearance.
+ *
+ * @template AsProps - A generic type for extending or merging additional properties.
+ * This allows for flexibility in defining component-specific props while 
+ * still adhering to the base tooltip functionality.
+ *
+ * @example
+ * // Example usage of ITooltipProps with custom properties
+ * const customTooltipProps: ITooltipProps<{ customProp: string }> = {
+ *     customProp: "This is a custom property",
+ *     as: CustomComponent,
+ *     tooltip: <span>Custom Tooltip Content</span>,
+ *     title: "Custom Tooltip Title",
+ *     disabled: false,
+ * };
+ */
+export type ITooltipProps<AsProps extends object = any> = Omit<AsProps, keyof (PressableProps & ITooltipBaseProps & {
     /**
-     * Actions to perform on the Tooltip component.
-     * This is an array of action definitions that are specific to how the Tooltip should behave.
+     * Optionally specify the element type to render the Tooltip with.
+     * By default, it uses `Pressable`, but can be changed to any custom component.
+     * This provides flexibility in rendering, allowing developers to 
+     * choose the underlying element based on their needs.
      *
-     * @type {ITooltipActions[]}
+     * @type {IReactComponent}
+     * @example
+     * // Rendering the Tooltip with a custom component
+     * as: CustomTooltipComponent
      */
-    actions?: ITooltipActions[];
-
-    /**
-     * Positions where the tooltip can be displayed relative to the target element.
-     * This is an array of position values that define where the Tooltip should appear.
-     *
-     * @type {ITooltipPositions[]}
-     */
-    positions?: ITooltipPositions[];
-}, T>;
+    as?: IReactComponent<AsProps>;
+})> & AsProps;

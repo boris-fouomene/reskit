@@ -43,6 +43,7 @@ export const Switch = (props: ISwitchProps) => {
         value={checked}
         onValueChange={(e) => {
             console.log(e, " is value changedddd");
+            setChecked(e);
         }}
         onChange={(event) => {
             console.log(event, " is evvvvvvvvvvvvvvvv");

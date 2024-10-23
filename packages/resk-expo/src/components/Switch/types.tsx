@@ -1,9 +1,8 @@
 import { ILabelProps } from "@components/Label";
 import { ReactNode } from "react";
-import { GestureResponderEvent, PressableProps, SwitchProps } from "react-native";
-import { ITooltipProps } from "@components/Tooltip/types";
+import { GestureResponderEvent, PressableProps, SwitchChangeEvent, SwitchProps } from "react-native";
+import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip/types";
 import { IOnChangeOptions } from "@src/types";
-import { ILabelOrLeftOrRightProps } from "@hooks/index";
 
 
 /***
@@ -11,7 +10,7 @@ import { ILabelOrLeftOrRightProps } from "@hooks/index";
  * This type extends the generic IOnChangeOptions interface and includes
  * specific properties relevant to toggleable components.
  *
- * @template T - The type of additional options that can be specified.
+ * @template EventType - The type Onchange toggleable event type.
  * 
  * @property {GestureResponderEvent} [event] - An optional event object 
  * that represents the gesture event that triggered the onChange action. 
@@ -48,18 +47,17 @@ import { ILabelOrLeftOrRightProps } from "@hooks/index";
  * type, providing a clear structure for handling changes in a toggleable 
  * component's state.
  */
-export type IToggleableOnChangeOptions = IOnChangeOptions<{
-    event?: GestureResponderEvent;
+export type IToggleableOnChangeOptions<EventType = GestureResponderEvent> = IOnChangeOptions<{
     checked: boolean;
     setChecked: (value: boolean) => void;
     setValue: (value: any) => any;
-}>;
+}, EventType>;
 
 
 /**
  * Represents the props for a toggleable component, combining properties from 
  * ILabelOrLeftOrRightProps and additional specific properties for toggleable 
- * components. This type also extends ITooltipProps for tooltip functionality.
+ * components. This type also extends ITooltipBaseProps for tooltip functionality.
  *
  * @template T - The type of additional options that can be specified.
  * 
@@ -144,7 +142,7 @@ export type IToggleableOnChangeOptions = IOnChangeOptions<{
  * This example demonstrates how to implement the IToggleableProps type, 
  * providing a clear structure for configuring a toggleable component.
  */
-export type IToggleableProps = {
+export type IToggleableProps<EventType = GestureResponderEvent> = {
     checkedValue?: any;
     uncheckedValue?: any;
     defaultValue?: any;
@@ -157,10 +155,17 @@ export type IToggleableProps = {
     checkedTooltip?: ReactNode;
     uncheckedTooltip?: ReactNode;
     labelPosition?: "left " | "right";
+    /**
+     * Custom color for the toggleable component.
+     */
+    color?: string;
     error?: boolean;
     onPress?: (event: GestureResponderEvent, options: IToggleableOnChangeOptions) => boolean | void;
-    onChange?: (options: IToggleableOnChangeOptions) => void;
-} & ITooltipProps;
+    /**
+     * Callback called with the new value when it changes.
+    */
+    onChange?: (options: IToggleableOnChangeOptions<EventType>) => void;
+} & ITooltipBaseProps;
 
 
 /***
@@ -173,6 +178,8 @@ export type IToggleableProps = {
  * @extends IToggleableProps - This type inherits all properties 
  * from IToggleableProps, ensuring that the Switch component 
  * has access to all toggleable functionality.
+ * 
+ * @extends SwitchProps - The react native Switch Props.
  * 
  * @example
  * const switchProps: ISwitchProps = {
@@ -200,4 +207,4 @@ export type IToggleableProps = {
  * providing a clear structure for configuring a Switch component 
  * with toggleable properties.
  */
-export type ISwitchProps = IToggleableProps;
+export type ISwitchProps = IToggleableProps<SwitchChangeEvent> & SwitchProps;

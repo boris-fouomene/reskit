@@ -224,8 +224,8 @@ export type IOnChangeOptionsBase<
  * This type allows for further customization and extension of the base onChange options.
  * 
  * @template IOnChangeOptionsExtends Additional properties to extend the base options, defaults to any
- * @template IValueType The type of the value being changed, defaults to any
  * @template IEventType The type of the event object, defaults to React Native's text input event or null
+ * @template IValueType The type of the value being changed, defaults to any
  * 
  * @example
  * // Using IOnChangeOptions with custom extensions
@@ -257,6 +257,6 @@ export type IOnChangeOptionsBase<
  */
 export type IOnChangeOptions<
   IOnChangeOptionsExtends = any,
+  IEventType = NativeSyntheticEvent<TextInputChangeEventData> | null,
   IValueType = any,
-  IEventType = NativeSyntheticEvent<TextInputChangeEventData> | null
 > = Omit<IOnChangeOptionsBase<IValueType, IEventType>, keyof IOnChangeOptionsExtends> & IOnChangeOptionsExtends;

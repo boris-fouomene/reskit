@@ -45,7 +45,6 @@ const themeDomId = uniqid("web-theme-id");
  */
 export default function updateWebTheme(theme: ITheme) {
     if (!Platform.isWeb() || !isObj(theme)) return null; // Return early if not in a web environment or if theme is invalid
-
     let style = document.querySelector(`#${themeDomId}`);
     if (!style) {
         style = document.createElement("style");

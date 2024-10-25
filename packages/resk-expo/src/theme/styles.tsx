@@ -385,6 +385,7 @@ const styles = StyleSheet.create({
     disabled: {
         opacity: 0.6,
         pointerEvents: "none",
+        userSelect: "text",
     },
 
     /**
@@ -397,6 +398,7 @@ const styles = StyleSheet.create({
     readOnly: {
         opacity: 0.80,
         pointerEvents: "none",
+        userSelect: "text",
     },
 
 

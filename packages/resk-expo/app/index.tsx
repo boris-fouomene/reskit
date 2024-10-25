@@ -4,12 +4,16 @@ import FontIcon from '@components/Icon/Font';
 import { HStack } from '@components/Stack';
 import Label from '@components/Label';
 import { Portal } from '@components/Portal';
-import Switch from '@components/Switch';
+import { Switch } from '@components/Switch';
 
 const index = () => {
     return (
         <View style={{ padding: 20 }}>
             <Text>index</Text>
+            <Switch
+                label="Test of label"
+                title="A title"
+            />
             <HStack style={{ columnGap: 10 }}>
                 <TextInputComponent left={({ textColor, variant }) => <FontIcon size={18} color={textColor} name={"camera"} />} placeholder='Enter my label' label='Default variant' />
                 <TextInputComponent left={<Label>A left</Label>} right={<>
@@ -30,9 +34,6 @@ const index = () => {
                     <Label>A portal rendered</Label>
                 </Portal>
             </HStack>
-            <Switch
-                label="Test of label"
-            />
         </View>
     )
 }

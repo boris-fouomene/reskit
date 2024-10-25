@@ -351,6 +351,7 @@ export const getDefaultTheme = (isColorShemeDark?: boolean): ITheme => {
     theme.colors.onWarning = theme.colors.onWarning || (theme.dark ? "black" : "black");
     theme.colors.onError = theme.colors.onError || (theme.dark ? "black" : "white");
     theme.colors.text = theme.colors.text || (theme.dark ? "white" : "black");
+    updateNative(theme);
     // Returns the fully prepared theme
     return theme;
 };

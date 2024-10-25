@@ -82,6 +82,7 @@ const Tooltip = React.forwardRef(({
 
     // Return null if the children element is not valid
     if (!isValidElement(children)) {
+        console.log("is not valid children ", children);
         return null;
     }
 

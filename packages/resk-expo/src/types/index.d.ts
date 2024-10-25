@@ -176,35 +176,68 @@ export type IStyle =
   | undefined
   | null;
 
+
 /**
  * @interface IOnChangeOptionsBase
- * @description
- * Represents the base options for onChange events in form components.
- * This type is generic, allowing for customization of value and event types.
- * 
- * @template IValueType The type of the value being changed, defaults to any
- * @template IEventType The type of the event object, defaults to React Native's text input event
- * 
+ * Represents the base options for an onChange event handler.
+ * This type is generic, allowing for flexibility in the types of values
+ * and events that can be passed to the handler.
+ *
+ * @template IValueType - The type of the value being changed. Defaults to `any`.
+ * @template IEventType - The type of the event that triggered the change. 
+ *                        Defaults to React Native's text input event (`NativeSyntheticEvent<TextInputChangeEventData>) | null`.
+ *
+ * @property {IEventType} [event] - An optional event object that contains details
+ *                                   about the change event. This can be useful for 
+ *                                   accessing properties such as target value or 
+ *                                   other event-specific data.
+ *
+ * @property {IValueType} [value] - The current value after the change. This 
+ *                                   represents the new state of the input or field 
+ *                                   that has changed.
+ *
+ * @property {any} [previousValue] - The value before the change occurred. This 
+ *                                    can be useful for comparison or for undo 
+ *                                    functionalities.
+ *
+ * @property {boolean} [focused] - Indicates whether the input field was focused 
+ *                                 when the change occurred. This can help in 
+ *                                 determining if the change was user-initiated.
+ *
+ * @property {string} [fieldName] - The name of the field that triggered the 
+ *                                   change event. This is particularly useful in 
+ *                                   forms with multiple fields to identify 
+ *                                   which field's value has changed.
+ *
  * @example
- * // Using IOnChangeOptionsBase with default types
- * const handleChange = (options: IOnChangeOptionsBase) => {
- *   console.log('New value:', options.value);
- *   console.log('Field name:', options.fieldName);
+ * // Example usage of IOnChangeOptionsBase
+ * const handleChange = (options: IOnChangeOptionsBase<string>) => {
+ *   console.log(`Field: ${options.fieldName}`);
+ *   console.log(`Previous Value: ${options.previousValue}`);
+ *   console.log(`Current Value: ${options.value}`);
+ *   console.log(`Event Type: ${options.event?.type}`);
+ *   console.log(`Is Focused: ${options.focused}`);
  * };
+ *
+ * // Simulating a change event
+ * handleChange({
+ *   event: { type: 'change', target: { value: 'Hello World' } },
+ *   value: 'Hello World',
+ *   previousValue: 'Hello',
+ *   focused: true,
+ *   fieldName: 'greeting'
+ * });
  * 
- * @example
+ *  * @example
  * // Using IOnChangeOptionsBase with custom types
  * type CustomEvent = { target: { value: string } };
  * const handleCustomChange = (options: IOnChangeOptionsBase<string, CustomEvent>) => {
  *   console.log('New value:', options.value);
  *   console.log('Event type:', options.event?.target.value);
  * };
- * 
- * @property {IEventType} [event] - The event that triggered the change.
- * @property {IValueType} [value] - The new value after the change.
- * @property {any} [previousValue] - The value before the change occurred.
- * @property {boolean} [focused] - Indicates whether the component is focused at the time of the change.
- * @property {string} [fieldName] - The name of the field if it's part of a form.
+ *
+ * @returns {void} - This type does not return any value, as it is typically used 
+ *                   as an argument for an event handler function.
  */
 export type IOnChangeOptionsBase<
   IValueType = any,
@@ -215,19 +248,54 @@ export type IOnChangeOptionsBase<
   previousValue?: any;
   focused?: boolean;
   fieldName?: string;
-}
+};
 
 /**
  * @interface IOnChangeOptions
- * @description
- * Represents the extended options for onChange events, typically used in TextInput components.
+ * Represents the options for an onChange event handler with extended capabilities.
+ * It represents the extended options for onChange events, typically used in TextInput components.
  * This type allows for further customization and extension of the base onChange options.
- * 
- * @template IOnChangeOptionsExtends Additional properties to extend the base options, defaults to any
- * @template IEventType The type of the event object, defaults to React Native's text input event or null
- * @template IValueType The type of the value being changed, defaults to any
- * 
+ *
+ * @template IOnChangeOptionsType - Additional properties to extend the base options, defaults to any.
+ 
+ * @template IEventType - The type of the event that triggered the change. 
+ *                        Defaults to The type of the event object, defaults to React Native's text input event `NativeSyntheticEvent<TextInputChangeEventData> | null`.
+ * @template IValueType - The type of the value being changed. Defaults to `any`. 
+ *
+ * @extends {Omit<IOnChangeOptionsBase<IValueType, IEventType>, keyof IOnChangeOptionsType>} 
+ * This extends the base options by omitting any properties defined in
+ * `IOnChangeOptionsType`, allowing for a flexible structure where users can
+ * define their own additional fields.
+ *
  * @example
+ * // Example usage of IOnChangeOptions
+ * interface CustomOptions {
+ *   customField: string;
+ *   timestamp: number;
+ * }
+ *
+ * const handleChange = (options: IOnChangeOptions<CustomOptions>) => {
+ *   console.log(`Custom Field: ${options.customField}`);
+ *   console.log(`Timestamp: ${options.timestamp}`);
+ *   console.log(`Field: ${options.fieldName}`);
+ *   console.log(`Previous Value: ${options.previousValue}`);
+ *   console.log(`Current Value: ${options.value}`);
+ *   console.log(`Event Type: ${options.event?.type}`);
+ *   console.log(`Is Focused: ${options.focused}`);
+ * };
+ *
+ * // Simulating a change event with custom options
+ * handleChange({
+ *   customField: 'example',
+ *   timestamp: Date.now(),
+ *   event: { type: 'change', target: { value: 'Hello World' } },
+ *   value: 'Hello World',
+ *   previousValue: 'Hello',
+ *   focused: true,
+ *   fieldName: 'greeting'
+ * });
+ *
+ *  * @example
  * // Using IOnChangeOptions with custom extensions
  * interface CustomExtension {
  *   timestamp: number;
@@ -253,10 +321,11 @@ export type IOnChangeOptionsBase<
  *   return <input onChange={handleInputChange} />;
  * };
  * 
- * @typedef {Omit<IOnChangeOptionsBase<IValueType, IEventType>, keyof IOnChangeOptionsExtends> & IOnChangeOptionsExtends} IOnChangeOptions
+ * @returns {void} - This type does not return any value, as it is typically used 
+ *                   as an argument for an event handler function.
  */
 export type IOnChangeOptions<
-  IOnChangeOptionsExtends = any,
+  IOnChangeOptionsType = any,
   IEventType = NativeSyntheticEvent<TextInputChangeEventData> | null,
   IValueType = any,
-> = Omit<IOnChangeOptionsBase<IValueType, IEventType>, keyof IOnChangeOptionsExtends> & IOnChangeOptionsExtends;
+> = Omit<IOnChangeOptionsBase<IValueType, IEventType>, keyof IOnChangeOptionsType> & IOnChangeOptionsType;

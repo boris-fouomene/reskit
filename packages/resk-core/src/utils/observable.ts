@@ -1,4 +1,3 @@
-import { IMerge } from "../types";
 /**
  * @interface IObservableEvent
  * Represents an observable event, which can be a string, null, or undefined.

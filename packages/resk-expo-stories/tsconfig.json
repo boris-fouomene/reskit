@@ -1,0 +1,19 @@
+{
+  // This file is not used in compilation. It is here just for a nice editor experience.
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "target": "esnext",
+    "module": "commonjs",
+    "jsx": "react",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {}
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+}

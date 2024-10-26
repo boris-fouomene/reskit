@@ -1,6 +1,6 @@
 import { IColorSheme, ITheme, IThemeColorTokenKey, IThemeColorTokens } from "./types";
 import Colors from "./colors";
-import { extendObj, IDict, isObservable } from "@resk/core";
+import { extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
 import { packageName } from "@utils/index";
 import session from "../session";
 import { StatusBarProps } from "expo-status-bar";
@@ -488,10 +488,6 @@ const Theme = {
  * @returns {ITheme } The current theme object.
  */
 export default Theme;
-
-import { IObservable, isObj, observable } from "@resk/core";
-
-
 
 /***
  * @interface ICreatedTheme

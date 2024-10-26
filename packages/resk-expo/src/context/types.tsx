@@ -1,3 +1,4 @@
+import { IBreakpoints } from "@src/breakpoints/types";
 import { ITheme } from "@theme/types";
 
 /**
@@ -28,10 +29,12 @@ import { ITheme } from "@theme/types";
  *   <YourComponent />
  * </ReskExpoProvider>
  * ```
+ *  @property {IBreakpoints} [breakpoints] - An optional breakpoints object that defines the application breakpoints.
  */
 export type ReskExpoProviderProps = {
     children?: React.ReactNode;
     theme?: ITheme;
+    breakpoints?: IBreakpoints;
 }
 
 /**

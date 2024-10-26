@@ -1,6 +1,6 @@
 //import "@expo/metro-runtime";
 import "@session";
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ITheme } from '@theme/types';
 import { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate } from '@theme/index';
 import useStateCallback from '@utils/stateCallback';
@@ -11,6 +11,7 @@ import { ReskExpoProviderProps } from './types';
 import { ReskExpoContext } from './context';
 import { useColorScheme } from "@theme/useColorScheme";
 import { PortalProvider } from "@components/Portal";
+import Breakpoints from "@src/breakpoints";
 
 export * from "./types";
 export * from "./context";
@@ -47,7 +48,7 @@ export * from "./context";
  * }
  * ```
  */
-export function ReskExpoProvider({ children, theme: customTheme, ...rest }: ReskExpoProviderProps) {
+export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ...rest }: ReskExpoProviderProps) {
   const isDark = useColorScheme() === 'dark';
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
@@ -97,14 +98,23 @@ export function ReskExpoProvider({ children, theme: customTheme, ...rest }: Resk
     if (!isObj(customTheme) || prevCustomTheme == customTheme) return;
     updateTheme(uTheme(Object.assign({}, theme, customTheme)));
   }, [stableHash(customTheme)]);
-
+  useMemo(() => {
+    if (isObj(breakpoints)) {
+      return Breakpoints.init(breakpoints);
+    }
+  }, [breakpoints]);
+  useEffect(() => {
+    if (isObj(breakpoints)) {
+      Breakpoints.update();
+    }
+  }, [breakpoints]);
   /**
    * Provides the current theme and the `updateTheme` function to all child components
    * through the `ReskExpoContext`.
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
-    <ReskExpoContext.Provider value={{ theme, updateTheme, ...rest }}>
+    <ReskExpoContext.Provider value={{ theme, updateTheme, ...rest, breakpoints }}>
       <PortalProvider>{children}</PortalProvider>
     </ReskExpoContext.Provider>
   );

@@ -6,6 +6,7 @@
   "scripts": {
     "build-core": "cd ../resk-core && npm run build",
     "build-core-watch" : "cd ../resk-core && npm",
+    "build": "npm run build-core && npx tsc-alias -p tsconfig.json",
     "build-core:watch": "cd ../resk-core && npm run build:watch",
     "build:watch": "tsc && (concurrently \"npm run build:watch\" \"tsc -w\" \"tsc-alias -w\")"
   },

@@ -2,13 +2,15 @@ import ReactComponent from "./Component";
 import { IObservable, observableFactory, IObservableEvent, IObservableCallbackOptions } from "@resk/core";
 /**
  * Extends the React component by defining an observable component.
- * This class integrates observable functionality into a React component, 
- * allowing it to handle events and callbacks in an observable manner.
+ * 
+ * This class integrates observable functionality into a React component, allowing it 
+ * to handle events and callbacks in an observable manner. It provides methods for 
+ * subscribing to events, triggering events, and managing event listeners.
  * 
  * @template IProps - The type of the component's props.
  * @template IState - The type of the component's state.
  */
-export default class Component<IProps, IState> extends ReactComponent<IProps, IState> {
+export default class Component<IProps = unknown, IState = unknown> extends ReactComponent<IProps, IState> {
   /** An observable factory instance. */
   readonly _observable = observableFactory();
 

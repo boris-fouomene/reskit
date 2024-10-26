@@ -42,7 +42,7 @@ import { IBreakpoints } from '@src/breakpoints/types';
  * console.log(dimensionsProps.isPortrait); // Outputs: true if in portrait mode
  * ```
  */
-const getDimensions = (): IDimensions => {
+export const getDimensions = (): IDimensions => {
 	const screen = Dimensions.get("window");
 	return {
 		currentMedia: Breakpoints.getCurrentMedia(),
@@ -144,13 +144,13 @@ export const useDimensions = (responsive: boolean = true): IDimensions => {
  *   console.log("New screen dimensions:", dimensions);
  * };
  * 
- * const listener = addListener(updateStyles, 300);
+ * const listener = addDimensionsListener(updateStyles, 300);
  * 
  * // To remove the listener when necessary
  * listener?.remove();
  * ```
  */
-const addListener = (callback: (dimensions: IDimensions) => any, timeout: number = 200) => {
+export const addDimensionsListener = (callback: (dimensions: IDimensions) => any, timeout: number = 200) => {
 	if (typeof callback !== 'function') return null;
 	timeout = typeof timeout === 'number' ? timeout : 200;
 	return Dimensions.addEventListener("change", _.debounce(() => {
@@ -339,5 +339,3 @@ export function withBreakpointStyle<IProps extends IStyleProps = any, IState = a
 	}
 	return fn; // Return the enhanced component
 }
-
-export default { addListener, getDimensions };

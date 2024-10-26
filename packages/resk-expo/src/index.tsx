@@ -1,7 +1,7 @@
 export * from "./context";
 export * from "./theme";
 export { default as Breakpoints } from "./breakpoints";
-export { default as Dimensions } from "./dimensions";
+export * from "./dimensions";
 export * from "./dimensions/types";
 export * from "./dimensions";
 export * from "./breakpoints/types";

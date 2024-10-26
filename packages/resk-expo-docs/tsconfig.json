@@ -1,0 +1,27 @@
+{
+  // This file is not used in compilation. It is here just for a nice editor experience.
+  "extends": [
+    "expo/tsconfig.base",
+    "../../tsconfig.json"
+  ],
+  "compilerOptions": {
+    "baseUrl": "../",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "paths": {
+      "@resk-expo/*": [
+        "../resk-expo/src/*"
+      ],
+      "@resk-expo": [
+        "../resk-expo"
+      ],
+      "@resk-core": [
+        "../resk-core"
+      ],
+    }
+  },
+  "include": [
+    "../resk-expo/src/**/*",
+    "../resk-core/src/**/*"
+  ],
+}

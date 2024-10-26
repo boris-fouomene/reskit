@@ -717,16 +717,17 @@ export default class Breakpoints {
             // Validate the breakpoint key and ensure it exists in breakpointKeysRef
             if (!breakpoint || !this.breakpointsRef.current?.all[breakpoint] || !isObj(this.breakpointsRef.current?.all[breakpoint])) return;
 
-            const breakpointQuery: IBreakpoint = this.breakpointsRef.current.all[breakpoint]; // Get the breakpoint query
+            const breakpointQuery: IBreakpoint | undefined = this.breakpointsRef.current.all[breakpoint]; // Get the breakpoint query
+            if (isObj(breakpointQuery) && breakpointQuery) {
+                // Update the minimum size if a valid min value is found
+                if (breakpointQuery.min && isNumber(breakpointQuery.min) && (min > breakpointQuery.min || min === 0)) {
+                    min = breakpointQuery.min;
+                }
 
-            // Update the minimum size if a valid min value is found
-            if (breakpointQuery.min && isNumber(breakpointQuery.min) && (min > breakpointQuery.min || min === 0)) {
-                min = breakpointQuery.min;
-            }
-
-            // Update the maximum size if a valid max value is found
-            if (breakpointQuery.max && isNumber(breakpointQuery.max) && (max < breakpointQuery.max || max === 0)) {
-                max = breakpointQuery.max;
+                // Update the maximum size if a valid max value is found
+                if (breakpointQuery.max && isNumber(breakpointQuery.max) && (max < breakpointQuery.max || max === 0)) {
+                    max = breakpointQuery.max;
+                }
             }
         });
 

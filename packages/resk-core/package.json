@@ -9,10 +9,10 @@
         "test": "npm run build && npx vitest",
         "test-node": "npm run build && node ./build/test/index.js",
         "build": "tsc && npx tsc-alias -p tsconfig.json",
-        "build:watch": "tsc && (concurrently \"tsc -w\" \"npx tsc-alias -w\")",
         "start": "node build/test/index",
         "prepublish": "npm run build",
         "build-doc": "npx typedoc",
+        "build:watch": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
         "dev": "npx concurrently \"tsc --watch\" \"npx tsc-alias -p tsconfig.json\""
     },
     "devDependencies": {

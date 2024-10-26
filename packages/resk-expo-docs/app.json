@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "@resk/expo",
-    "slug": "resk-expo",
+    "name": "@resk/expo-docs",
+    "slug": "resk-expo-docs",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -26,7 +26,9 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [],
+    "plugins": [
+      "expo-font"
+    ],
     "experiments": {
       "typedRoutes": true
     }

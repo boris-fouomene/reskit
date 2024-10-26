@@ -73,7 +73,7 @@ export function isObj(obj: any): boolean {
  * @param {boolean} [breakonFirstElementFound=false] Whether to return immediately after the first element is found.
  * @returns {number} The size of the object or array.
  */
-export const objectSize = Object.size = function (obj: any, breakonFirstElementFound: boolean = false): number {
+export const objectSize = Object.getSize = function (obj: any, breakonFirstElementFound: boolean = false): number {
   /**
    * If the object is null or not an object, return 0.
    */
@@ -151,7 +151,7 @@ export const defaultObj = function (...args: any[]): object {
       /**
        * If the object is not empty, return it immediately.
        */
-      if (Object.size(x, true) > 0) return x;
+      if (Object.getSize(x, true) > 0) return x;
 
       /**
        * If the previous object is null, set it to the current object.
@@ -190,7 +190,7 @@ declare global {
 * @param {boolean} [breakonFirstElementFound=false] Whether to return immediately after the first element is found.
 * @returns {number} The size of the object or array.
 */
-    size: (obj: any, breakonFirstElementFound?: boolean) => number;
+    getSize: (obj: any, breakonFirstElementFound?: boolean) => number;
   }
 }
 

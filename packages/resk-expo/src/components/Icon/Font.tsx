@@ -78,8 +78,8 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, color, ...p
     }
     const iconName = nameString.trim().ltrim(iconSetPrefix).ltrim("-").trim();
     return <IconSet
-        size={DEFAULT_FONT_ICON_SIZE}
         {...props}
+        size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
         ref={ref}
         color={color}
         name={iconName}

@@ -10,5 +10,3 @@ function App() {
 }
 
 registerRootComponent(App);
-
-export * from "./src";

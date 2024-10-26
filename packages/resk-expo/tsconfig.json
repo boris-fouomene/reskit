@@ -9,11 +9,11 @@
       "@session": [
         "src/session"
       ],
-      "@resk/core": [
-        "../resk-core/build/src"
+      "@types/*": [
+        "src/types/*"
       ],
-      "@resk/core/*": [
-        "../resk-core/build/src/*"
+      "@types": [
+        "src/types"
       ],
       "@utils/*": [
         "src/utils/*"
@@ -56,10 +56,5 @@
   "include": [
     "**/*.ts",
     "**/*.tsx"
-  ],
-  "references": [
-    {
-      "path": "../resk-core/tsconfig.json"
-    }
   ]
 }

@@ -8,8 +8,6 @@ import { isValidCurrency } from "./utils";
 
 const isObj = (x: any) => x && typeof x == 'object';
 
-
-
 /**
  * @group Currency
  * Extends the default options with the provided ICurrency object to initialize default values.

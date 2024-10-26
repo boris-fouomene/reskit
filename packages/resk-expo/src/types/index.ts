@@ -1,3 +1,4 @@
+import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData } from "react-native";
 /**
    @interface
  * Represents a reference to a React component or DOM element.

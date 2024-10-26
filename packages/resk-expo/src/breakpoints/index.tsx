@@ -769,7 +769,7 @@ export default class Breakpoints {
     public static col(mediaQuery: string = "col-4 phone-12 tablet-6 desktop-4", width?: number, withMultiplicater?: boolean) {
         width = getWidth(width ? width : undefined);
         let { gutter, currentMedia, ...rest } = rowCol(width).col;
-        const otherStyle = {} as IStyle;
+        const otherStyle: IStyle = {} as IStyle;
         let commonMultiplicater: number = 0;
 
         // Split the media query string into an array
@@ -799,7 +799,7 @@ export default class Breakpoints {
                 // Determine the appropriate styles based on media queries
                 if (currentMedia === media && spSplit.length === 2) {
                     if (mediaValue === "hidden") {
-                        otherStyle.display = "none";
+                        (otherStyle as any).display = "none";
                     } else if (canBeNumber(mediaValue)) {
                         opts[currentMedia] = parseFloat(mediaValue);
                     }
@@ -835,7 +835,7 @@ export default class Breakpoints {
         // Return the computed styles for the column
         const ret = {
             ...rest,
-            ...otherStyle,
+            ...(otherStyle as object),
             width: (colWidth * multiplicater).toFixed(8) + '%'
         } as IDict;
         if (withMultiplicater) {

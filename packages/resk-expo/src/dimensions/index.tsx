@@ -5,7 +5,7 @@ import Breakpoints from '../breakpoints';
 import _ from "lodash";
 import { IObservable, isNonNullString, isObj, isObservable, observable } from '@resk/core';
 import useStableMemo from "@utils/useStableMemo";
-import { IReactComponent, IStyle } from "../types";
+import { IFlatStyle, IReactComponent, IStyle } from "../types";
 import { StyleSheet } from "react-native";
 import { IBreakpoints } from '@src/breakpoints/types';
 
@@ -237,7 +237,7 @@ export type IWithBreakpointStyle<T extends IStyleProps = any> =
  *    ```
  *    Here, different styles are applied based on the current breakpoint, allowing for more granular control.
  */
-export function useBreakpointStyle<T extends IStyleProps = any>({ style, breakpointStyle }: IWithBreakpointStyle<T>): IStyle {
+export function useBreakpointStyle<T extends IStyleProps = any>({ style, breakpointStyle }: IWithBreakpointStyle<T>) {
 	const dimensions = useDimensions(!!breakpointStyle); // Hook to get current dimensions
 	const currentMedia = Breakpoints.getCurrentMedia(); // Get the current breakpoint
 	// Use stable memoization to optimize performance

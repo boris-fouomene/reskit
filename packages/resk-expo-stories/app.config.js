@@ -6,6 +6,9 @@ export default ({ config }) => ({
   entryPoint: process.env.STORYBOOK_ENABLED ? "index.storybook.tsx" : "expo/AppEntry.js",
   orientation: "portrait",
   icon: "./assets/icon.png",
+  "plugins": [
+    "expo-router"
+  ],
   extra: {
     storybookEnabled: process.env.STORYBOOK_ENABLED,
   },

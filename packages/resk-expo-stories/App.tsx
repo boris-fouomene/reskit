@@ -1,29 +1,10 @@
-import "@expo/metro-runtime";
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import Constants from 'expo-constants';
 import React from 'react';
-import StoryBook from "./.storybook";
+import { ExpoRoot } from 'expo-router';
 
 function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  const ctx = (require as any).context('./app');
+  return <ExpoRoot context={ctx} >
+  </ExpoRoot>
 }
-let AppEntryPoint = App;
 
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
-console.log(Constants?.expoConfig?.extra?.storybookEnabled, " is consss ", Constants?.expoConfig)
-export default Constants?.expoConfig?.extra?.storybookEnabled ? StoryBook : AppEntryPoint;
+export default App;

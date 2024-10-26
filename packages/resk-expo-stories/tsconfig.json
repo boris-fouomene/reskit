@@ -6,7 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "target": "esnext",
     "module": "commonjs",
-    "jsx": "react",
+    //"jsx": "react",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "baseUrl": "./",

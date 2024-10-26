@@ -1,6 +1,6 @@
 import { ILabelProps } from "@components/Label";
 import { ReactNode } from "react";
-import { GestureResponderEvent, PressableProps, SwitchChangeEvent, SwitchProps } from "react-native";
+import { GestureResponderEvent, NativeSyntheticEvent, PressableProps, SwitchChangeEvent, SwitchProps } from "react-native";
 import { ITooltipBaseProps } from "@components/Tooltip/types";
 import { IOnChangeOptions } from "@src/types";
 
@@ -88,6 +88,7 @@ export type IToggleableOnChangeOptions<EventType = GestureResponderEvent> = IOnC
     checked: boolean;
     setChecked: (value: boolean) => void;
     setValue: (value: any) => any;
+    event?: EventType
 }, EventType>;
 
 
@@ -148,6 +149,8 @@ export type IToggleableOnChangeOptions<EventType = GestureResponderEvent> = IOnC
  * @property {boolean} [error] - Indicates whether there is an error state associated 
  *                                with the toggle. If true, this can trigger error 
  *                                styling or behavior.
+ * 
+ * @property {(value:boolean)=>void} [onValueChange] - Callback function called when the value of the toggle changes.
  *
  * @property {(options: IToggleableOnChangeOptions) => boolean | void} [beforeToggle] - 
  * - A callback function invoked before the toggleable component is pressed. the IToggleableOnChangeOptions 
@@ -314,6 +317,12 @@ export type IToggleableProps<EventType = GestureResponderEvent> = {
      * The container props that wrap the toggleable component. This is the parent view of both the toggleable component and the label.
      */
     containerProps?: PressableProps;
+
+    /***
+     * 
+    * Callback function called when the value of the toggle changes.
+     */
+    onValueChange?: (value: boolean) => void;
 } & ITooltipBaseProps;
 
 

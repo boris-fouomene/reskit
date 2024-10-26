@@ -1,6 +1,6 @@
 import { getTextContent, usePrevious, useStateCallback } from "@utils";
 import Theme, { useTheme } from "@theme";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { GestureResponderEvent } from "react-native";
 import { IToggleableProps } from "./types";
 import { getToggleableColor } from "./colors";
@@ -33,6 +33,7 @@ export * from "./types";
  * @param {ReactNode} [props.checkedLabel] - The label displayed when the toggle is checked.
  * @param {ReactNode} [props.uncheckedLabel] - The label displayed when the toggle is unchecked.
  * @param {ILabelProps} [props.labelProps] - Optional props for the label associated with the toggleable component.
+ * @param {(value:boolean)=>void} [onValueChange] - Callback function called when the value of the toggle changes.
  * 
  * @returns {object} An object containing the state and methods for managing the toggleable component.
  * 
@@ -86,9 +87,10 @@ export * from "./types";
  * the state and behavior of a toggleable component, including event handling 
  * and tooltip management.
  */
-export function useToggleable<EventType = GestureResponderEvent>({ disabled, checkedTooltip, uncheckedTooltip, tooltip, title, color, readOnly, labelPosition, beforeToggle, onChange, label, checkedLabel, uncheckedLabel, labelProps, containerProps, ...rest }: IToggleableProps<EventType>) {
+export function useToggleable<EventType = GestureResponderEvent>({ disabled, checkedTooltip, onValueChange, uncheckedTooltip, tooltip, title, color, readOnly, labelPosition, beforeToggle, onChange, label, checkedLabel, uncheckedLabel, labelProps, containerProps, ...rest }: IToggleableProps<EventType>) {
   const { checkedValue, uncheckedValue, defaultValue } = getToggleableDefaultValues(rest);
   const theme = useTheme();
+  const eventRef = useRef<EventType>();
   const [checked, setChecked] = useStateCallback(defaultValue === checkedValue ? true : false);
   const getValue = () => {
     return checked ? checkedValue : uncheckedValue;
@@ -104,8 +106,11 @@ export function useToggleable<EventType = GestureResponderEvent>({ disabled, che
     const isChecked = !checked;
     const value = checked ? uncheckedValue : checkedValue;
     setChecked(!checked, () => {
+      if (typeof onValueChange === "function") {
+        onValueChange(isChecked);
+      }
       if (onChange) {
-        onChange({ checked: isChecked, setValue, setChecked, value });
+        onChange({ checked: isChecked, event: eventRef.current, setValue, setChecked, value });
       }
     });
   };
@@ -124,9 +129,10 @@ export function useToggleable<EventType = GestureResponderEvent>({ disabled, che
   const readOnlyStyle = readOnly ? Theme.styles.readOnly : undefined;
   checkedTooltip = getTextContent(checkedTooltip) && checkedTooltip || title;
   uncheckedTooltip = getTextContent(uncheckedTooltip) && uncheckedTooltip || title;
+  const rColors = getToggleableColor({ ...rest, theme, value: defaultValue, color, disabled: !!(disabled || readOnly) });
   return {
     ...rest,
-    ...getToggleableColor({ ...rest, theme, value: defaultValue, color, disabled: !!(disabled || readOnly) }),
+    ...rColors,
     checked,
     labelProps,
     labelPosition,
@@ -136,6 +142,10 @@ export function useToggleable<EventType = GestureResponderEvent>({ disabled, che
     getValue,
     readOnly,
     setValue,
+    onChange: (event: EventType) => {
+      eventRef.current = event;
+    },
+    color: checked ? rColors?.checkedColor : undefined,
     label: checked ? checkedLabel || label : uncheckedLabel || label || null,
     isLabelOnLeftSide,
     disabledStyle,

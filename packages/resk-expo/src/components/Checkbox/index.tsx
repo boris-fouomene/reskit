@@ -1,15 +1,15 @@
-import { Platform, Pressable, StyleSheet, Switch as RNSwitch, SwitchChangeEvent, GestureResponderEvent } from "react-native";
-import { ISwitchProps } from "./types";
-import { useToggleable } from "./utils";
+import { Platform, Pressable, StyleSheet, GestureResponderEvent } from "react-native";
+import RNCheckbox from "expo-checkbox";
+import { ICheckboxEvent, ICheckboxProps } from "./types";
 import { useTheme } from "@theme/index";
 import Tooltip from "@components/Tooltip";
 import Label from "@components/Label";
+import { useToggleable } from "@components/Switch/utils";
 
 export * from "./types";
-export * from "./utils";
 
-export const Switch = ({ testID, ...props }: ISwitchProps) => {
-    const theme = useTheme();
+
+export const Checkbox = ({ testID, ...props }: ICheckboxProps) => {
     const {
         checked,
         tooltip,
@@ -33,21 +33,8 @@ export const Switch = ({ testID, ...props }: ISwitchProps) => {
         readOnly,
         containerProps,
         ...rest
-    } = useToggleable<SwitchChangeEvent>(props);
-    const switchProps = Platform.OS === 'web'
-        ? {
-            activeTrackColor: onTintColor,
-            thumbColor: thumbTintColor,
-            activeThumbColor: checkedColor,
-        }
-        : {
-            thumbColor: thumbTintColor,
-            trackColor: {
-                true: onTintColor,
-                false: onTintColor,
-            },
-        };
-    const MTestID = typeof testID === 'string' && testID || "RNSwitchComponent";
+    } = useToggleable<ICheckboxEvent>(props);
+    const MTestID = typeof testID === 'string' && testID || "RNCheckboxComponent";
     const labelContent = <Label testID={`${MTestID}_Label`} {...labelProps} style={[styles.label, labelProps.style]} children={label} />;
     return <Tooltip as={Pressable} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}_Container`} {...containerProps} style={[styles.container, disabledStyle, readOnlyStyle, containerProps.style]}
         onPress={(event: GestureResponderEvent) => {
@@ -58,11 +45,11 @@ export const Switch = ({ testID, ...props }: ISwitchProps) => {
         }}
     >
         {isLabelOnLeftSide ? labelContent : null}
-        <RNSwitch
+        <RNCheckbox
             {...rest}
             value={checked}
             onValueChange={toggleStatus}
-            {...switchProps}
+            color={color}
             testID={MTestID}
             disabled={disabled || readOnly}
         />
@@ -82,4 +69,4 @@ const styles = StyleSheet.create({
     }
 });
 
-Switch.displayName = "Switch"
+Checkbox.displayName = "Checkbox"

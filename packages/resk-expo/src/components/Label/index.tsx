@@ -42,7 +42,6 @@ const Label = React.forwardRef(({
   colorScheme: customColorScheme,
   ...rest
 }: ILabelProps, ref: React.ForwardedRef<Text>) => {
-
   const theme = useTheme();
   const colorScheme = Theme.getColorScheme(customColorScheme);
 

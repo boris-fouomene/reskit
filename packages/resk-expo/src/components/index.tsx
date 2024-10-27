@@ -14,3 +14,4 @@ export * from "./ActivityIndicator";
 export * from "./Divider";
 export * from "./HelperText";
 export * from "./Tooltip";
+export * from "./Swiper";

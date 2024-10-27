@@ -5,6 +5,7 @@
   "main": "index",
   "scripts": {
     "start": "npx expo start",
+    "build-web" : "cd ../resk-core && npm run build && cd ../resk-expo && npm run build && npx expo export -p web",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "build-storybook": "storybook build",

@@ -6,6 +6,7 @@ import { IViewProps } from '@components/View';
 import { IFlatStyle, IStyle } from '../../types';
 import Theme from "@theme";
 import { ISwiperProps, ISwiperState } from './types';
+import { isRTL } from '@utils/i18nManager';
 const WIDTH_HEIGHT = 250;
 
 const useNativeDriver = false; // because of RN #13377
@@ -206,7 +207,8 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
    * @method startAutoplay
    */
   startAutoplay() {
-    const { timeout } = this.props;
+    const { timeout, autoplay } = this.props;
+    if (autoplay === false) return;
     this.stopAutoplay();
     if (timeout) {
       this.autoplay = setTimeout(
@@ -382,14 +384,12 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
         const correction = vertical
           ? gesture.moveY - gesture.y0
           : gesture.moveX - gesture.x0;
-
-        if (
-          Math.abs(correction) <
-          (vertical ? height : width) * (typeof minDistanceForAction == "number" ? minDistanceForAction : 0.2)
-        ) {
+        const distance = (vertical ? height : width) * (typeof minDistanceForAction == "number" ? minDistanceForAction : 0.2);
+        const incrementIndex = correction > 0 ? (!vertical && isRTL ? 1 : -1) : (!vertical && isRTL ? -1 : 1);
+        if (Math.abs(Math.abs(correction) - distance) < 50) {
           this._spring({ x: 0, y: 0 });
         } else {
-          this._changeIndex(correction > 0 ? (!vertical && I18nManager.isRTL ? 1 : -1) : (!vertical && I18nManager.isRTL ? -1 : 1));
+          this._changeIndex(incrementIndex);
         }
       },
     };

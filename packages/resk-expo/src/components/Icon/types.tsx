@@ -11,6 +11,7 @@ import Zocial from "@expo/vector-icons/Zocial";
 import { IStyle } from "../../types";
 import { GestureResponderEvent, ImageProps, ImageSourcePropType } from "react-native";
 import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip";
+import { IconProps } from "@expo/vector-icons/build/createIconSet";
 /**
  * Represents the valid names of icons from the FontAwesome5 icon set.
  * 
@@ -450,20 +451,46 @@ export interface IFontIconsSetNamesToPrefix {
 /**
  * 
  *
- * @typedef {IIconSource}
+ * @typedef {IIconSourceBase}
  * @type {string | ImageSourcePropType}
  * 
  * @example
  * // Using a predefined icon name
- * const iconName: IIconSource = "home"; // From MaterialCommunityIcons
+ * const iconName: IIconSourceBase = "home"; // From MaterialCommunityIcons
  *
  * // Using a custom image source
- * const customIcon: IIconSource = require('./path/to/icon.png');
+ * const customIcon: IIconSourceBase = require('./path/to/icon.png');
  *
  * <Icon source={iconName} /> // Renders the predefined icon
  * <Icon source={customIcon} /> // Renders the custom image as an icon
  */
-export type IIconSource = string | ImageSourcePropType;
+export type IIconSourceBase = IFontIconProps["name"] | ImageSourcePropType;
+
+/***
+ * /**
+ * Represents the source for an icon, which can be either a predefined icon name 
+ * or a custom image source. Additionally, it can be a function that returns an 
+ * icon source based on the provided props.
+ * 
+ * @type {IIconSource}
+ * 
+ * @example
+ * // Using a predefined icon source
+ * const icon: IIconSource = "settings";
+ *
+ * // Using a custom image source
+ * const customIcon: IIconSource = require('./path/to/icon.png');
+ *
+ * // Using a function to dynamically determine the icon source
+ * const dynamicIcon: IIconSource = (props) => {
+ *   return props.color === 'red' ? "alert" : require('./path/to/default/icon.png');
+ * };
+ *
+ * <Icon source={icon} />
+ * <Icon source={customIcon} />
+ * <Icon source={dynamicIcon} color="red" />
+ */
+export type IIconSource = IIconSourceBase | ((props: IIconProps & { color: string }) => IIconSourceBase | JSX.Element);
 
 /**
  * @interface IIconProps
@@ -521,7 +548,7 @@ export type IIconSource = string | ImageSourcePropType;
  *   onError: () => console.error('Error loading image'),
  * };
  */
-export type IIconProps = IFontIconProps & ImageProps & ITooltipBaseProps & {
+export type IIconProps = Partial<IFontIconProps> & ImageProps & ITooltipBaseProps & {
     /***
      * Optional. Properties for the tooltip container,
     * allowing customization of the tooltip behavior and appearance when the icon is hovered or focused.

@@ -162,6 +162,11 @@ export interface ISwiperProps extends IViewProps {
 *                  ```
      */
     autoHeight?: boolean,
+
+    /***
+     * the swiper will auto play by default
+     */
+    autoplay?: boolean;
     /**
      * The currently active index of the swiper. 
     *This can be used to control the active slide programmatically.

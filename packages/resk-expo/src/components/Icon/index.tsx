@@ -1,14 +1,15 @@
-import React, { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
-import { IIconProps } from "./types";
-import { Image, ImageSourcePropType, Pressable } from "react-native";
+import React, { forwardRef, isValidElement, LegacyRef, ReactNode, useMemo } from "react";
+import { IFontIconProps, IIconProps, IIconSource } from "./types";
+import { Image, ImageSourcePropType, ImageStyle, Pressable } from "react-native";
 import { isImageSource } from "./utils";
-import { defaultStr } from "@resk/core";
-import Theme from "@theme/index";
+import { defaultStr, isObj } from "@resk/core";
+import Theme, { Colors, useTheme } from "@theme/index";
 import FontIcon, { DEFAULT_FONT_ICON_SIZE } from "./Font";
 import { Tooltip } from "@components/Tooltip";
 import { IStyle } from "../../types";
 import { StyleSheet } from "react-native";
 import { TouchableRipple } from "@components/TouchableRipple";
+import { ITheme } from "@theme/types";
 
 /**
  * The `Icon` component is a versatile icon renderer that can display both 
@@ -83,7 +84,18 @@ export const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ name, disa
             Component: isPressable ? Tooltip : React.Fragment,
             props: isPressable ? Object.assign({}, { onPress, testID: `${testID}_IconContainer`, disabled, title, tooltip }, containerProps, { style: [styles.container, containerProps?.style] }) : {}
         };
-    }, [title, tooltip, onPress, disabled, testID])
+    }, [title, tooltip, onPress, disabled, testID]);
+    const iconStyle = StyleSheet.flatten([
+        Theme.styles.RTL,
+        disabled && Theme.styles.disabled,
+        {
+            width: size,
+            height: size,
+            tintColor: color,
+            resizeMode: `contain`,
+        },
+        style,
+    ]);
     return <Component {...containerP}>
         {isSource ? <Image
             accessibilityIgnoresInvertColors
@@ -91,23 +103,14 @@ export const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ name, disa
             testID={testID}
             source={source}
             ref={ref as LegacyRef<Image>}
-            style={[
-                Theme.styles.RTL,
-                disabled && Theme.styles.disabled,
-                {
-                    width: size,
-                    height: size,
-                    tintColor: color,
-                    resizeMode: `contain`,
-                },
-                style,
-            ]}
+            style={iconStyle as ImageStyle}
         /> : <FontIcon
             testID={testID}
-            name={name}
+            name={name as IFontIconProps["name"]}
             size={size}
             {...props}
             color={color}
+            style={iconStyle}
             ref={ref}
         />}
     </Component>;
@@ -124,3 +127,62 @@ Icon.displayName = "Icon";
 export * from "./Font";
 export { default as FontIcon } from "./Font";
 export * from "./types";
+
+/***
+ * /**
+ * Retrieves an icon component based on the provided parameters.
+ * 
+ * This function can handle both predefined icon names and custom icon sources.
+ * It also supports dynamic icon generation through a function that returns an icon source.
+ * 
+ * @param {Object} params - The parameters for retrieving the icon.
+ * @param {IIconSource} params.icon - The source of the icon (string, ImageSource, or function).
+ * @param {string} [params.color] - Optional color for the icon.
+ * @param {ITheme} [params.theme] - Optional theme object to customize styles.
+ * @param {...any} rest - Additional properties to pass to the icon component.
+ * 
+ * @returns {ReactNode} The rendered icon component.
+ * 
+ * @example
+ * const myIcon = getIcon({ icon: "home", color: "blue", theme: customTheme });
+ */
+export const getIcon = ({ icon, color: col2, theme, ...rest }: { icon?: IIconSource } & { color?: string, theme?: ITheme }): ReactNode => {
+    theme = isObj(theme) && theme || Theme;
+    const color: string = (Colors.isValid(col2) ? col2 : theme.colors.text) as string;
+    const iconSource = typeof icon == "function" ? icon({ ...rest, color } as IIconProps & { color: string }) : icon;
+    if (isValidElement(iconSource)) return iconSource;
+    if (!iconSource) return null;
+    const iconProps: IIconProps = {
+        color
+        , ...rest,
+        name: typeof iconSource == "string" ? (iconSource as unknown as IFontIconProps["name"]) : undefined,
+        ...Object.assign({}, (isImageSource(iconSource) ? { source: iconSource as ImageSourcePropType } : isImageSource(Icon) ? { source: icon as ImageSourcePropType } : undefined)),
+    }
+    return <Icon
+        {...iconProps}
+    />
+}
+
+/**
+ * A custom hook that retrieves an icon component based on the provided parameters.
+ * 
+ * This hook utilizes the current theme from the theme provider and delegates the
+ * icon retrieval to the `getIcon` function.
+ * 
+ * @param {Object} params - The parameters for retrieving the icon.
+ * @param {IIconSource} params.icon - The source of the icon (string, ImageSource, or function).
+ * @param {string} [params.color] - Optional color for the icon.
+ * @param {...any} rest - Additional properties to pass to the icon component.
+ * 
+ * @returns {ReactNode} The rendered icon component.
+ * 
+ * @example
+ * const MyComponent = () => {
+ *   const icon = useGetIcon({ icon: "home", color: "blue" });
+ *   return <View>{icon}</View>;
+ * };
+ */
+export const useGetIcon = ({ icon, color: col2, ...rest }: { icon?: IIconSource } & { color?: string }) => {
+    const theme = useTheme();
+    return getIcon({ icon, color: col2, theme, ...rest });
+}

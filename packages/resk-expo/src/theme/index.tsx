@@ -8,6 +8,7 @@ import Color from "color";
 import updateNative from "./updateNative";
 import styles from "./styles";
 import { useReskExpoProvider } from "@src/context/context";
+import Elevations from "./Elevations";
 
 export * from "./utils";
 
@@ -102,11 +103,14 @@ const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => an
  * @param {ITheme} theme - The base theme object that contains color definitions.
  * @returns {ITheme} - The theme object extended with utility methods.
  */
-export function createTheme(theme: ITheme): ICreatedTheme {
+export function createTheme(theme: ITheme): IThemeManager {
     return {
         ...Object.assign({}, theme),
         get styles() {
             return styles;
+        },
+        get elevations() {
+            return Elevations;
         },
         /**
          * Retrieves the color associated with the given color key or value.
@@ -365,7 +369,7 @@ export const getDefaultTheme = (isColorShemeDark?: boolean): ITheme => {
  * console.log(themeRef.current.name); // Logs the name of the current theme
  * ```
  */
-const themeRef: { current: ICreatedTheme } = {
+const themeRef: { current: IThemeManager } = {
     current: createTheme(getDefaultTheme()),
 };
 
@@ -490,7 +494,7 @@ const Theme = {
 export default Theme;
 
 /***
- * @interface ICreatedTheme
+ * @interface IThemeManager
  * 
  * This is the result obtained by calling createTheme on an `ITheme`
  * 
@@ -506,7 +510,7 @@ export default Theme;
  * @returns {IColorSheme} An object containing `color` and `backgroundColor` properties.
  * 
  * @example 
- * const theme: ICreatedTheme = createTheme({
+ * const theme: IThemeManager = createTheme({
  *    name: "DarkTheme",
  *    dark: true,
  *    colors: {
@@ -552,11 +556,12 @@ export default Theme;
 * If `events` is not observable, the function will make it so internally using the `observable` function.
  * ```
  */
-export interface ICreatedTheme extends ITheme {
+export interface IThemeManager extends ITheme {
     colors: IThemeColorTokens;
     getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined;
     getColorScheme(colorSheme?: IThemeColorTokenKey): IColorSheme
     styles: typeof styles;
+    elevations: typeof Elevations;
     /**
      * @method addEventListener
      * Adds an event listener to track theme changes or updates.

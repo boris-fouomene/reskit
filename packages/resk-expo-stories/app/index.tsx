@@ -1,4 +1,4 @@
-import { FontIcon, Switch, Checkbox, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText } from "@resk/expo";
+import { FontIcon, Switch, Checkbox, Surface, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText } from "@resk/expo";
 
 import { View, Text } from 'react-native'
 import React from 'react'
@@ -38,11 +38,13 @@ const index = () => {
                 error
                 children={"A children helper"}
             />
-            <Swiper activeIndex={0} timeout={5} loop={true} contentProps={{ style: { backgroundColor: 'green' } }}>
-                <View><Text>Slide 1</Text></View>
-                <View><Text>Slide 2</Text></View>
-                <View><Text>Slide 3</Text></View>
-            </Swiper>
+            <Surface elevation={10} style={Theme.styles.ph5}>
+                <Swiper activeIndex={0} timeout={5} loop={true} contentProps={{ style: { backgroundColor: 'green', flex: 1, minHeight: 200 } }}>
+                    <View><Text>Slide 1</Text></View>
+                    <View><Text>Slide 2</Text></View>
+                    <View><Text>Slide 3</Text></View>
+                </Swiper>
+            </Surface>
         </View>
     )
 }

@@ -590,7 +590,7 @@ export default class Breakpoints {
      * - This function checks if the environment is a browser (i.e., `document` is available).
      * - It ensures the `<body>` element has the correct class representing the device type and touch capability.
      * 
-     * @note
+     * @remarks
      * - It depends on utility functions like `isDOMElement`, `isMobileMedia`, `isTabletMedia`, `removeClassName`, and `addClassName`.
      * - If no valid `<body>` element is found, or `document` is undefined (e.g., in a non-browser environment), 
      * the function returns `false`.

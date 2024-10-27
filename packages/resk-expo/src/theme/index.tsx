@@ -55,7 +55,7 @@ if (!isObservable(events)) {
  * Ensure that the `callstack` is a function that handles the updated theme properly.
  * The `remove` method is particularly useful when you want to avoid memory leaks or unnecessary event listeners.
  * 
- * @note
+ * @remarks
  * This function depends on the `events` object, which needs to be observable. 
  * If `events` is not observable, the function will make it so internally using the `observable` function.
  */
@@ -547,7 +547,7 @@ export default Theme;
 * Ensure that the `callstack` is a function that handles the updated theme properly.
 * The `remove` method is particularly useful when you want to avoid memory leaks or unnecessary event listeners.
 * 
-* @note
+* @remarks
 * This function depends on the `events` object, which needs to be observable. 
 * If `events` is not observable, the function will make it so internally using the `observable` function.
  * ```
@@ -585,7 +585,7 @@ export interface ICreatedTheme extends ITheme {
      * Ensure that the `callstack` is a function that handles the updated theme properly.
      * The `remove` method is particularly useful when you want to avoid memory leaks or unnecessary event listeners.
      * 
-     * @note
+     * @remarks
      * This function depends on the `events` object, which needs to be observable. 
      * If `events` is not observable, the function will make it so internally using the `observable` function.
      */

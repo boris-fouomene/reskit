@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import isValidElement from "@utils/isValidElement";
+import { isRTL } from "@utils/i18nManager";
 
 /**
  * @interface ILabelOrLeftOrRightProps
@@ -60,6 +61,8 @@ export type ILabelOrLeftOrRightProps<T = any> = {
  * @param {T} options - Optional parameters to pass to the functions for dynamic rendering.
  * @returns {{ label : : ReactNode, left: ReactNode, right: ReactNode }} - An object containing validated label, left and right nodes.
  * 
+ * @remarkss : Left and right element are inverted when the application layout direction is Right-To-Left (RTL : I18nManager.getConstants().isRTL).
+ * 
  * ### Example Usage:
  * 
  * ```typescript
@@ -81,11 +84,13 @@ export const getLabelOrLeftOrRightProps = <T = any>(props: ILabelOrLeftOrRightPr
     // Evaluate the right property, calling it if it's a function
     const right = typeof props?.right === "function" ? props?.right(options) : props?.right;
     const label = typeof props?.label === "function" ? props?.label(options) : props?.label;
+    const leftElement = isValidElement(left) ? left : null,
+        rightElement = isValidElement(right) ? right : null;
     // Validate and return the left and right properties, ensuring they are valid React elements
     return {
         label: isValidElement(label, true) ? label : null,
-        left: isValidElement(left) ? left : null,
-        right: isValidElement(right) ? right : null,
+        left: isRTL ? right : left,
+        right: isRTL ? left : right,
     };
 };
 

@@ -23,7 +23,7 @@ import Color from "color";
  * console.log(defaultAlphaRed); // "rgba(255, 0, 0, 0.6)"
  * ```
  * 
- * @note
+ * @remarks
  * This function depends on the `Color` library, which should be available in your project for it to work.
  */
 const setAlpha = (color?: string, alpha: number = 0.6): string | undefined => {

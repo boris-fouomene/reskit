@@ -11,7 +11,6 @@ import Octicons from "@expo/vector-icons/Octicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Zocial from "@expo/vector-icons/Zocial";
 import { IStyle } from "../../types";
-import { IconButtonProps, IconProps } from "@expo/vector-icons/build/createIconSet";
 import { useTheme } from "@theme";
 import Colors from "@colors";
 

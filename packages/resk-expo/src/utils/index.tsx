@@ -16,6 +16,7 @@ export { default as Component } from "./Component";
 export * from "./key";
 export { default as useForceRender } from "./useForceRender";
 export { default as setRef } from "./setRef";
+export * from "./i18nManager";
 
 /***
     vérifie si la variable node est un élément reactNode

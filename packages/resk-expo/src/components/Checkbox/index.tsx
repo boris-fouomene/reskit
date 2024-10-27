@@ -8,7 +8,55 @@ import { useToggleable } from "@components/Switch/utils";
 
 export * from "./types";
 
-
+/**
+ * A customizable Checkbox component that supports tooltip, labels, and toggle functionality.
+ *
+ * This component uses the `Checkbox` from the `expo-checkbox` library and provides an enhanced 
+ * user interface with optional tooltips and labels. It allows for easy integration into forms 
+ * and other UI elements while supporting various states such as checked, unchecked, disabled, 
+ * and read-only.
+ *
+ * @param {object} props - The properties for the Checkbox component.
+ * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "RNCheckboxComponent".
+ * @param {string} [props.tooltip] - Optional tooltip text displayed when the user hovers over the checkbox.
+ * @param {object} [props.labelProps] - Additional properties for the label component.
+ * @param {string} [props.color] - The color of the checkbox when checked.
+ * @param {string} [props.label] - The text label associated with the checkbox.
+ * @param {any} [props.checkedValue] - The value representing the checked state.
+ * @param {any} [props.uncheckedValue] - The value representing the unchecked state.
+ * @param {any} [props.defaultValue] - The default value of the checkbox.
+ * @param {boolean} [props.disabled] - Flag to indicate if the checkbox is disabled.
+ * @param {boolean} [props.readOnly] - Flag to indicate if the checkbox is read-only.
+ * @param {object} [props.containerProps] - Additional properties for the container component.
+ * @param {object} [rest] - Additional props passed to the RNCheckbox component.
+ *
+ * @returns {JSX.Element} - Returns a JSX element representing the Checkbox component.
+ *
+ * @example
+ * // Usage example of the Checkbox component
+ * import { Checkbox } from './path/to/Checkbox';
+ *
+ * const MyComponent = () => {
+ *   return (
+ *     <Checkbox
+ *       defaultValue={"checked"}
+ *       uncheckedValue="unchecked"
+ *       checkedValue={"checked"}
+ *       uncheckedValue={"unchecked"}
+ *       label="Enable Notifications"
+ *       tooltip="Toggle to receive notifications"
+ *       color="#4CAF50"
+ *       disabled={false}
+ *       onChange={({value,event,checked})=>{
+ *            console.log(value," is value");//display "checked" or "unchecked"
+ *       }}
+ *     />
+ *   );
+ * };
+ *
+ * @see [Expo Checkbox Documentation](https://docs.expo.dev/versions/latest/sdk/checkbox/) 
+ * for more information on the underlying RNCheckbox component.
+ */
 export const Checkbox = ({ testID, ...props }: ICheckboxProps) => {
     const {
         checked,

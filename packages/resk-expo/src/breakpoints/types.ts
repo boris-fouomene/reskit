@@ -37,7 +37,7 @@
  * - Breakpoints help in creating responsive designs where the layout adjusts to different screen sizes.
  * - Each breakpoint is defined by an optional `IBreakpoint` object, which can include `min` and `max` width values.
  * 
- * @note
+ * @remarks
  * Breakpoints provide a flexible way to handle various screen sizes, ensuring better user experience across devices.
  */
 export interface IBreakpoints {
@@ -100,7 +100,7 @@ export interface IBreakpoints {
  * - The `min` and `max` properties define the width range for the breakpoint.
  * - The `name` property should correspond to one of the defined breakpoints in `IBreakpoints`.
  * 
- * @note
+ * @remarks
  * Using descriptive labels for breakpoints helps in maintaining clarity in UI design and when debugging.
  * 
  * @see IBreakpoints
@@ -157,7 +157,7 @@ export interface IBreakpoint {
  * - The `current` property helps identify which breakpoint is active at a particular screen width.
  * - `max` defines optional limits on how the layout should adapt beyond certain sizes.
  * 
- * @note
+ * @remarks
  * Managing breakpoints with this interface makes it easy to keep track of the active breakpoint and handle screen constraints effectively.
  * 
  * @see IBreakpoints

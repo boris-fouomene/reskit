@@ -128,6 +128,65 @@ export * from "./Font";
 export { default as FontIcon } from "./Font";
 export * from "./types";
 
+/**
+ * Represents the options for retrieving an icon, extending the base icon properties
+ * while allowing for additional customization.
+ *
+ * @template T - An optional generic type that allows for extending the options with
+ *               additional properties specific to the implementation context.
+ *
+ * @interface IGetIconOptions
+ * @extends Omit<IIconProps, "name" | "source"> - Excludes the `name` and `source` properties
+ *                                                from the base icon properties, as they are
+ *                                                not needed for this context.
+ * 
+ * @property {IIconSource} [icon] - The source of the icon to be displayed. This can be 
+ *                                   an icon object or a reference to an icon in a library.
+ *                                   Example:
+ *                                   ```typescript
+ *                                   const options: IGetIconOptions = {
+ *                                       icon: {  icon details  },
+ *                                   };
+ *                                   ```
+ * 
+ * @property {string} [color] - Optional property to specify the color of the icon.
+ *                               This can be a named color, hex code, or RGB value.
+ *                               Example:
+ *                               ```typescript
+ *                               const options: IGetIconOptions = {
+ *                                   color: '#FF5733',
+ *                               };
+ *                               ```
+ * 
+ * @property {ITheme} [theme] - An optional property to define the theme context in which
+ *                               the icon will be rendered. This can influence styles such as
+ *                               background, border, or hover effects.
+ *                               Example:
+ *                               ```typescript
+ *                               const options: IGetIconOptions = {
+ *                                   theme: { theme details },
+ *                               };
+ *                               ```
+ *
+ * @example
+ * Here’s an example of how to create an object adhering to the `IGetIconOptions` type:
+ * ```typescript
+ * const myIconOptions: IGetIconOptions = {
+ *     icon: {icon source },
+ *     color: 'blue',
+ *     theme: { },
+ *     additionalProperty: 'value' // Example of extending with custom properties
+ * };
+ * ```
+ *
+ * @remarks 
+ * This type is particularly useful when working with icon components that require 
+ * customization options while ensuring that the core properties are managed correctly.
+ * 
+ * Ensure that the properties provided align with the expected types to avoid runtime errors.
+ */
+export type IGetIconOptions<T = any> = Omit<IIconProps, "name" | "source" | "color"> & { icon?: IIconSource, color?: string, theme?: ITheme } & T;
+
 /***
  * /**
  * Retrieves an icon component based on the provided parameters.
@@ -146,7 +205,7 @@ export * from "./types";
  * @example
  * const myIcon = getIcon({ icon: "home", color: "blue", theme: customTheme });
  */
-export const getIcon = ({ icon, color: col2, theme, ...rest }: { icon?: IIconSource } & { color?: string, theme?: ITheme }): ReactNode => {
+export function getIcon<T = any>({ icon, color: col2, theme, ...rest }: IGetIconOptions<T>): ReactNode {
     theme = isObj(theme) && theme || Theme;
     const color: string = (Colors.isValid(col2) ? col2 : theme.colors.text) as string;
     const iconSource = typeof icon == "function" ? icon({ ...rest, color } as IIconProps & { color: string }) : icon;
@@ -182,7 +241,7 @@ export const getIcon = ({ icon, color: col2, theme, ...rest }: { icon?: IIconSou
  *   return <View>{icon}</View>;
  * };
  */
-export const useGetIcon = ({ icon, color: col2, ...rest }: { icon?: IIconSource } & { color?: string }) => {
+export function useGetIcon<T = any>({ icon, color: col2, ...rest }: IGetIconOptions<T>) {
     const theme = useTheme();
     return getIcon({ icon, color: col2, theme, ...rest });
 }

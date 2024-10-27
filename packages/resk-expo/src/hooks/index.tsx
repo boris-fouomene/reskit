@@ -89,8 +89,8 @@ export const getLabelOrLeftOrRightProps = <T = any>(props: ILabelOrLeftOrRightPr
     // Validate and return the left and right properties, ensuring they are valid React elements
     return {
         label: isValidElement(label, true) ? label : null,
-        left: isRTL ? right : left,
-        right: isRTL ? left : right,
+        left: isRTL ? rightElement : leftElement,
+        right: isRTL ? leftElement : rightElement,
     };
 };
 

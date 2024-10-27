@@ -4,8 +4,7 @@
   "private": true,
   "main": "index",
   "scripts": {
-    "watch-resk-expo": "cd ../resk-expo && npm run build:watch",
-    "start": "npx expo start && npm run watch-resk-expo",
+    "start": "npx expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "build-storybook": "storybook build",

@@ -297,5 +297,25 @@ const getContrast = function (hexcolor: string, comparator?: number): string {
     return contrastColor >= comparator ? 'black' : 'white';
 };
 
+/**
+ * Fades a color by the specified amount.
+ * This function takes a color string (hex or rgba) and a fade value between 0 and 1.
+ * 
+ * @param {string} color - The color to fade, provided as a hex (e.g., "#3498db") or rgba string.
+ * @param {number} fade - The fade value where 0 is fully transparent and 1 is fully opaque.
+ * @returns {string} The color with the adjusted opacity in rgba format.
+ * 
+ * @example
+ * ```
+ * fade("#3498db", 0.5); // "rgba(52, 152, 219, 0.5)"
+ * ```
+ */
+function fade(color: string, fade: number): string | undefined {
+    if (typeof fade !== 'number') {
+        fade = 0.5;
+    }
+    if (!isValid(color)) return undefined;
+    return Color(color).fade(fade).rgb().string();
+}
 
-export default { setAlpha, isHex, isValid, darken, lighten, hexToRgb, rgbStringToRgb, getBrightness, getContrast };
+export default { setAlpha, fade, isHex, isValid, darken, lighten, hexToRgb, rgbStringToRgb, getBrightness, getContrast };

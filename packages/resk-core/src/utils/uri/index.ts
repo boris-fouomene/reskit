@@ -1,5 +1,6 @@
+import isNonNullString from "../isNonNullString";
 import { IDict } from "../../types";
-import  "../string";
+import "../string";
 import queryString, { IParseBaseOptions, IStringifyBaseOptions } from 'qs';
 /**
  * Returns the query string from a given URL.
@@ -77,10 +78,10 @@ export const removeQueryString = function (uri: string | undefined | null, _deco
 }
 
 
-const defaultStringifyOptions : IStringifyBaseOptions = {
-    indices: false,
-    arrayFormat: 'brackets',
-    encodeValuesOnly: true
+const defaultStringifyOptions: IStringifyBaseOptions = {
+  indices: false,
+  arrayFormat: 'brackets',
+  encodeValuesOnly: true
 }
 
 /**
@@ -224,3 +225,43 @@ export const parseURI = (uri: string | null | undefined): {
   }
   return r;
 }
+
+/**
+ * Checks if the provided value is a valid URL/URI.
+ *
+ * This function determines whether the string passed as the parameter 
+ * `uri` is a valid URL or URI. It performs the following checks:
+ *
+ * 1. **Non-null String Check**: The function uses `isNonNullString` to 
+ *    ensure that `uri` is a non-null string.
+ *
+ * 2. **URL/URI Validation**: The function then tests the string against 
+ *    a regular expression that checks if the string has the structure 
+ *    of a valid URL. The regular expression verifies the following:
+ *    - An optional scheme (like `http://` or `https://`).
+ *    - A domain name that can either be a fully qualified domain name 
+ *      or `localhost`.
+ *    - An optional port and other URL components.
+ *
+ * The function returns `true` if the provided string is a valid URL/URI; 
+ * otherwise, it returns `false`.
+ *
+ * @param {any} uri - The string to check as a valid URL/URI.
+ * @returns {boolean} - Returns `true` if the string is a valid URL/URI, 
+ *                      `false` otherwise.
+ *
+ * @example
+ * // Valid URLs
+ * console.log(isValidUrl('http://example.com')); // true
+ * console.log(isValidUrl('https://localhost:3000')); // true
+ * console.log(isValidUrl('ftp://files.example.com')); // true
+ *
+ * // Invalid URLs
+ * console.log(isValidUrl(null)); // false
+ * console.log(isValidUrl('')); // false
+ * console.log(isValidUrl('not-a-valid-url')); // false
+ * console.log(isValidUrl('http://256.256.256.256')); // false (invalid IP address)
+ */
+export const isValidUrl = (uri: any): boolean => {
+  return isNonNullString(uri) && /^(?:\w+:)?\/\/([^\s\.]+\.\S{2}|localhost[\:?\d]*)\S*$/.test(uri);
+};

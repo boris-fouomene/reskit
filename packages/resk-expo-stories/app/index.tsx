@@ -1,4 +1,4 @@
-import { FontIcon, Switch, Checkbox, Theme } from "@resk/expo";
+import { FontIcon, Switch, Checkbox, TouchableRipple, Theme, Label } from "@resk/expo";
 
 import { View, Text } from 'react-native'
 import React from 'react'
@@ -18,6 +18,12 @@ const index = () => {
             <Switch
                 label="A Switch"
             />
+
+            <TouchableRipple
+                onPress={() => console.log("Pressed")}
+            >
+                <Label>A ripple button</Label>
+            </TouchableRipple>
         </View>
     )
 }

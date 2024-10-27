@@ -7,3 +7,4 @@ export * from "./View";
 export { default as View } from "./View";
 export * from "./Icon";
 export * from "./Portal";
+export * from "./TouchableRipple";

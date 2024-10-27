@@ -1,6 +1,6 @@
 import { Platform } from "@resk/core";
 import { StyleSheet } from "react-native";
-
+import { isRTL } from "@utils/i18nManager";
 
 /**
  * @description
@@ -519,6 +519,10 @@ const styles = StyleSheet.create({
         marginTop: 0,
         marginBottom: 0,
     },
+    /***
+     * this style is used to make the text direction right to left depending on the application layout direction
+     */
+    RTL: { transform: [{ scaleX: isRTL ? -1 : 1 }] }
 });
 
 export default styles;

@@ -10,9 +10,9 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Zocial from "@expo/vector-icons/Zocial";
-import { IStyle } from "../../types";
-import { useTheme } from "@theme";
+import Theme, { useTheme } from "@theme";
 import Colors from "@colors";
+import { IFontIconProps, IPrefixToFontIconsSetNames } from "./types";
 
 
 /***
@@ -55,7 +55,7 @@ import Colors from "@colors";
  * @param {React.Ref} ref The reference to the icon component.
  * @returns {JSX.Element | null} Returns the icon element, or null if the icon is not defined.
  */
-const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, color, ...props }, ref) => {
+const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, style, color, ...props }, ref) => {
     let IconSet: any = MaterialCommunityIcons, iconSetName: string = "", iconSetPrefix = "";
     const theme = useTheme();
     color = Colors.isValid(color) ? color : theme.colors.text;
@@ -82,6 +82,7 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, color, ...p
         ref={ref}
         color={color}
         name={iconName}
+        style={[Theme.styles.RTL, style]}
     />;
 });
 
@@ -92,180 +93,6 @@ FontIcon.displayName = 'FontIcon';
 export default FontIcon;
 
 
-/**
- * Represents the valid names of icons from the FontAwesome5 icon set.
- * 
- * This type is derived from the glyph map of the FontAwesome5 icon set,
- * allowing developers to use autocomplete features in TypeScript for
- * icon names, ensuring that only valid names are used.
- * 
- * @example
- * const iconName: IFontAwesome5Name = "home"; // Valid
- * const iconName: IFontAwesome5Name = "invalid-icon"; // TypeScript error
- */
-export type IFontAwesome5Name = keyof typeof FontAwesome5.glyphMap;
-
-/**
- * Represents the valid names of icons from the AntDesign icon set.
- * 
- * This type includes all the keys from the AntDesign glyph map, prefixed
- * with 'antd-', ensuring that developers use valid icon names while 
- * providing a clear indication that these icons belong to the AntDesign set.
- * 
- * @example
- * const iconName: IFontAntDesignName = "antd-home"; // Valid
- * const iconName: IFontAntDesignName = "invalid-icon"; // TypeScript error
- */
-export type IFontAntDesignName = `antd-${keyof typeof AntDesign.glyphMap | 'book'}`;
-
-/**
- * Represents the valid names of icons from the Fontisto icon set.
- * 
- * This type is constructed from the Fontisto glyph map, allowing for
- * type-safe usage of icon names in the Fontisto library.
- * 
- * @example
- * const iconName: IFontFontistoName = "fontisto-home"; // Valid
- * const iconName: IFontFontistoName = "invalid-icon"; // TypeScript error
- */
-export type IFontFontistoName = `fontisto-${keyof typeof Fontisto.glyphMap}`;
-
-/**
- * Represents the valid names of icons from the Ionicons icon set.
- * 
- * This type provides a way to use Ionicons with type safety, ensuring that
- * only valid icon names are used throughout the application.
- * 
- * @example
- * const iconName: IFontIoniconsName = "ionic-home"; // Valid
- * const iconName: IFontIoniconsName = "invalid-icon"; // TypeScript error
- */
-export type IFontIoniconsName = `ionic-${keyof typeof Ionicons.glyphMap}`;
-
-/**
- * Represents the valid names of icons from the Material Icons set.
- * 
- * This type allows developers to reference Material Icons in a type-safe
- * manner, ensuring that the icon names used are valid according to the 
- * Material Icons glyph map.
- * 
- * @example
- * const iconName: IFontMaterialIconsName = "material-home"; // Valid
- * const iconName: IFontMaterialIconsName = "invalid-icon"; // TypeScript error
- */
-export type IFontMaterialIconsName = `material-${keyof typeof MaterialIcons.glyphMap}`;
-
-/**
- * Represents the valid names of icons from the Octicons icon set.
- * 
- * This type ensures that only valid Octicons icon names are used in the 
- * application, promoting type safety and reducing runtime errors.
- * 
- * @example
- * const iconName: IFontOcticonsName = "octicons-home"; // Valid
- * const iconName: IFontOcticonsName = "invalid-icon"; // TypeScript error
- */
-export type IFontOcticonsName = `octicons-${keyof typeof Octicons.glyphMap}`;
-
-/**
- * Represents the valid names of icons from the Simple Line Icons set.
- * 
- * This type provides a way to use Simple Line Icons with type safety, 
- * ensuring that only valid icon names are referenced in your code.
- * 
- * @example
- * const iconName: IFontSimpleLineIconsName = "simple-line-home"; // Valid
- * const iconName: IFontSimpleLineIconsName = "invalid-icon"; // TypeScript error
- */
-export type IFontSimpleLineIconsName = `simple-line-${keyof typeof SimpleLineIcons.glyphMap}`;
-
-/**
- * Represents the valid names of icons from the Zocial icon set.
- * 
- * This type allows developers to use Zocial icons in a type-safe manner,
- * ensuring that only valid icon names are used throughout the application.
- * 
- * @example
- * const iconName: IFontZocialName = "zocial-home"; // Valid
- * const iconName: IFontZocialName = "invalid-icon"; // TypeScript error
- */
-export type IFontZocialName = `zocial-${keyof typeof Zocial.glyphMap}`;
-
-/**
- * Represents the valid names of icons from the Material Community Icons set.
- * 
- * This type provides a way to use Material Community Icons with type safety,
- * ensuring that only valid icon names are referenced in your code.
- * 
- * @example
- * const iconName: IFontMaterialCommunityIconsName = "home"; // Valid
- * const iconName: IFontMaterialCommunityIconsName = "invalid-icon"; // TypeScript error
- */
-export type IFontMaterialCommunityIconsName = keyof typeof MaterialCommunityIcons.glyphMap;
-
-
-/**
- * The props for the `FontIcon` component.
- * 
- * This interface defines the properties that can be passed to the `FontIcon`
- * component, allowing for customization of the icon's appearance and behavior.
- * It extends the props of the `MaterialCommunityIcons` component while omitting
- * the `name`, `style`, and `size` properties to redefine them with more specific types.
- * 
- * @interface IFontIconProps
- * 
- * @extends React.ComponentProps<typeof MaterialCommunityIcons>
- * 
- * @example
- * // Example usage of the FontIcon component with props
- * const MyComponent = () => (
- *   <FontIcon name="home" size={24} style={{ color: 'blue' }} />
- * );
- */
-export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityIcons>, 'name' | 'style' | 'size'> & {
-    /**
-     * The style object for the icon.
-     * 
-     * This property allows you to customize the icon's appearance using
-     * standard React Native style properties. You can specify styles such as
-     * color, margin, padding, etc.
-     * 
-     * @example
-     * const customStyle: IStyle = { color: 'red', margin: 10 };
-     * <FontIcon name="home" style={customStyle} />;
-     */
-    style?: IStyle;
-
-    /**
-     * The name of the icon to display (including the prefix for icon set if necessary).
-     * 
-     * This property specifies which icon to render. It accepts a variety of icon
-     * names from different icon sets, ensuring that only valid names are passed.
-     * The name must correspond to one of the defined types for the various icon sets
-     * (e.g., MaterialCommunityIcons, AntDesign, etc.).
-     * 
-     * @example
-     * // Valid icon names
-     * const iconName: IFontIconProps['name'] = "home"; // From MaterialCommunityIcons
-     * const iconNameAnt: IFontIconProps['name'] = "antd-home"; // From AntDesign
-     * <FontIcon name={iconName} />;
-     */
-    name: IFontMaterialCommunityIconsName | IFontAntDesignName | IFontFontistoName
-    | IFontIoniconsName | IFontOcticonsName | IFontSimpleLineIconsName |
-    IFontZocialName | IFontMaterialIconsName | IFontMaterialCommunityIconsName;
-
-    /**
-     * The icon size.
-     * 
-     * This property defines the size of the icon in pixels. If not specified,
-     * a default size will be used. You can set this to any number to customize
-     * the icon's size according to your layout needs.
-     * 
-     * @example
-     * <FontIcon name="home" size={30} /> // Renders the icon with a size of 30 pixels
-     */
-    size?: number;
-};
 
 /**
  * Checks whether the provided icon belongs to a specific icon set.
@@ -362,112 +189,6 @@ const fonts = Object.values(fontsObjects).map(f => f.font);
 /** An array of font names indexed by their icon set names. */
 const fontsByIndex = Object.keys(fontsObjects);
 
-/**
- * Maps icon set prefixes to their respective icon set names.
- * 
- * This interface serves as a mapping between the prefix used in icon names
- * and the corresponding icon set names. It allows for easy reference and
- * organization of different icon sets by their prefixes, facilitating 
- * the usage of icons throughout the application.
- * 
- * @interface IPrefixToFontIconsSetNames
- * 
- * @example
- * // Example usage of the IPrefixToFontIconsSetNames interface
- * const iconSetMapping: IPrefixToFontIconsSetNames = {
- *   material: "MaterialCommunityIcons",
- *   fa: "FontAwesome5",
- *   antd: "AntDesign",
- *   foundation: "Foundation",
- *   fontisto: "Fontisto",
- *   ionic: "Ionicons",
- *   octicons: "Octicons",
- *   "simple-line": "SimpleLineIcons",
- *   zocial: "Zocial",
- * };
- */
-export interface IPrefixToFontIconsSetNames {
-    /**
-     * The prefix for Material Community Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Material
-     * Community Icons set. For example, an icon name like "material-home"
-     * would indicate it belongs to this set.
-     */
-    material: "MaterialIcons";
-
-    /**
-     * The prefix for Font Awesome 5 Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Font Awesome
-     * 5 set. For example, an icon name like "fa-home" indicates it belongs to
-     * the Font Awesome set.
-     */
-    fa: "FontAwesome5";
-
-    /**
-     * The prefix for Ant Design Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Ant Design
-     * set. For example, an icon name like "antd-home" indicates it belongs to
-     * the Ant Design set.
-     */
-    antd: "AntDesign";
-
-    /**
-     * The prefix for Foundation Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Foundation
-     * set. For example, an icon name like "foundation-home" indicates it belongs
-     * to the Foundation set.
-     */
-    foundation: "Foundation";
-
-    /**
-     * The prefix for Fontisto Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Fontisto
-     * set. For example, an icon name like "fontisto-home" indicates it belongs
-     * to the Fontisto set.
-     */
-    fontisto: "Fontisto";
-
-    /**
-     * The prefix for Ionicons.
-     * 
-     * This prefix is used in icon names to identify icons from the Ionicons
-     * set. For example, an icon name like "ionic-home" indicates it belongs
-     * to the Ionicons set.
-     */
-    ionic: "Ionicons";
-
-    /**
-     * The prefix for Octicons.
-     * 
-     * This prefix is used in icon names to identify icons from the Octicons
-     * set. For example, an icon name like "octicons-home" indicates it belongs
-     * to the Octicons set.
-     */
-    octicons: "Octicons";
-
-    /**
-     * The prefix for Simple Line Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Simple Line
-     * Icons set. For example, an icon name like "simple-line-home" indicates it
-     * belongs to the Simple Line Icons set.
-     */
-    "simple-line": "SimpleLineIcons";
-
-    /**
-     * The prefix for Zocial Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Zocial set.
-     * For example, an icon name like "zocial-home" indicates it belongs to the
-     * Zocial set.
-     */
-    zocial: "Zocial";
-}
 
 /** An object that maps icon set prefixes to their respective names. */
 const PREFIX_TO_ICONS_SET_NAMES: IPrefixToFontIconsSetNames = {
@@ -480,113 +201,6 @@ const PREFIX_TO_ICONS_SET_NAMES: IPrefixToFontIconsSetNames = {
     octicons: "Octicons",
     'simple-line': "SimpleLineIcons",
     zocial: "Zocial",
-}
-
-/**
- * Maps icon set names to their respective prefixes.
- * 
- * This interface serves as a mapping between the full names of icon sets
- * and their corresponding prefixes. It allows for easy reference and
- * organization of different icon sets by their full names, facilitating
- * the usage of icons throughout the application.
- * 
- * @interface IFontIconsSetNamesToPrefix
- * 
- * @example
- * // Example usage of the IFontIconsSetNamesToPrefix interface
- * const iconSetMapping: IFontIconsSetNamesToPrefix = {
- *   MaterialIcons: "material",
- *   FontAwesome5: "fa",
- *   AntDesign: "antd",
- *   Foundation: "foundation",
- *   Fontisto: "fontisto",
- *   Ionicons: "ionic",
- *   Octicons: "octicons",
- *   SimpleLineIcons: "simple-line",
- *   Zocial: "zocial",
- * };
- */
-export interface IFontIconsSetNamesToPrefix {
-    /**
-     * The prefix for Material Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Material
-     * Icons set. For example, an icon name like "material-home" would indicate
-     * it belongs to this set.
-     */
-    MaterialIcons: "material";
-
-    /**
-     * The prefix for Font Awesome 5 Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Font Awesome
-     * 5 set. For example, an icon name like "fa-home" indicates it belongs to
-     * the Font Awesome set.
-     */
-    FontAwesome5: "fa";
-
-    /**
-     * The prefix for Ant Design Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Ant Design
-     * set. For example, an icon name like "antd-home" indicates it belongs to
-     * the Ant Design set.
-     */
-    AntDesign: "antd";
-
-    /**
-     * The prefix for Foundation Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Foundation
-     * set. For example, an icon name like "foundation-home" indicates it belongs
-     * to the Foundation set.
-     */
-    Foundation: "foundation";
-
-    /**
-     * The prefix for Fontisto Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Fontisto
-     * set. For example, an icon name like "fontisto-home" indicates it belongs
-     * to the Fontisto set.
-     */
-    Fontisto: "fontisto";
-
-    /**
-     * The prefix for Ionicons.
-     * 
-     * This prefix is used in icon names to identify icons from the Ionicons
-     * set. For example, an icon name like "ionic-home" indicates it belongs
-     * to the Ionicons set.
-     */
-    Ionicons: "ionic";
-
-    /**
-     * The prefix for Octicons.
-     * 
-     * This prefix is used in icon names to identify icons from the Octicons
-     * set. For example, an icon name like "octicons-home" indicates it belongs
-     * to the Octicons set.
-     */
-    Octicons: "octicons";
-
-    /**
-     * The prefix for Simple Line Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Simple Line
-     * Icons set. For example, an icon name like "simple-line-home" indicates it
-     * belongs to the Simple Line Icons set.
-     */
-    "SimpleLineIcons": "simple-line";
-
-    /**
-     * The prefix for Zocial Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Zocial set.
-     * For example, an icon name like "zocial-home" indicates it belongs to the
-     * Zocial set.
-     */
-    Zocial: "zocial";
 }
 
 
@@ -645,3 +259,4 @@ export function loadFontIcons(): Promise<any[]> {
         });
     }));
 };
+

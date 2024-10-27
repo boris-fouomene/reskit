@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
-
+import { Platform } from "react-native";
 import Constants from 'expo-constants';
 import isValidElement from "./isValidElement";
-import { defaultStr } from "@resk/core";
+import { defaultStr, isObj } from "@resk/core";
 export { default as useStableMemo } from "./useStableMemo";
 export { default as isValidElement } from "./isValidElement";
 export { default as usePrevious } from "./usePrevious";

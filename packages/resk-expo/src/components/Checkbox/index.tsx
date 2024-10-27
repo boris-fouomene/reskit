@@ -1,8 +1,7 @@
 import { Platform, Pressable, StyleSheet, GestureResponderEvent } from "react-native";
 import RNCheckbox from "expo-checkbox";
 import { ICheckboxEvent, ICheckboxProps } from "./types";
-import { useTheme } from "@theme/index";
-import Tooltip from "@components/Tooltip";
+import { Tooltip } from "@components/Tooltip";
 import Label from "@components/Label";
 import { useToggleable } from "@components/Switch/utils";
 

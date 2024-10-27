@@ -4,6 +4,8 @@ import { ITooltipProps } from "./types";
 import { defaultStr, uniqid } from "@resk/core";
 import { useMergeRefs } from "@utils/mergeRefs";
 
+export * from "./types";
+
 const Tooltip = React.forwardRef(({
   children, title, tooltip, disabled, as, testID, id, ...rest
 }: ITooltipProps, ref) => {
@@ -24,6 +26,6 @@ const Tooltip = React.forwardRef(({
   );
 });
 
-export default Tooltip;
+export { Tooltip }
 
 Tooltip.displayName = "TooltipNative";

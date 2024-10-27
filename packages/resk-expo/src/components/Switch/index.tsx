@@ -2,7 +2,7 @@ import { Platform, Pressable, StyleSheet, Switch as RNSwitch, SwitchChangeEvent,
 import { ISwitchProps } from "./types";
 import { useToggleable } from "./utils";
 import { useTheme } from "@theme/index";
-import Tooltip from "@components/Tooltip";
+import { Tooltip } from "@components/Tooltip";
 import Label from "@components/Label";
 
 export * from "./types";

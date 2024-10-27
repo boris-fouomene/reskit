@@ -8,6 +8,8 @@ import { uniqid, defaultStr } from "@resk/core";
 import { Pressable } from "react-native";
 import { ITooltipProps } from './types';
 
+export * from "./types";
+
 /**
  * Tooltip component provides a hover or press-triggered tooltip for child elements, using Tippy.js for tooltips.
  * It supports dynamic content from the `tooltip` or `title` properties and can be customized with additional props.
@@ -99,4 +101,4 @@ const Tooltip = React.forwardRef(({
     );
 });
 
-export default Tooltip;
+export { Tooltip }

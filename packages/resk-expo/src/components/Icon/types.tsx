@@ -9,7 +9,8 @@ import Octicons from "@expo/vector-icons/Octicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Zocial from "@expo/vector-icons/Zocial";
 import { IStyle } from "../../types";
-import { ImageProps, ImageSourcePropType } from "react-native";
+import { GestureResponderEvent, ImageProps, ImageSourcePropType } from "react-native";
+import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip";
 /**
  * Represents the valid names of icons from the FontAwesome5 icon set.
  * 
@@ -469,8 +470,9 @@ export type IIconSource = string | ImageSourcePropType;
  * Represents the properties for an icon component that combines the icon-specific
  * properties from `IFontIconProps` with the standard image properties from React Native.
  *
- * This type allows for a versatile icon component that can render both font-based icons
- * and custom images, providing a unified interface for developers. It inherits all the
+ * This type allows for a versatile icon component that can render both font-based icons,
+ * custom images, and tooltip functionality, allowing for a versatile icon component that can display both font-based and image-based icons,
+ * as well as providing optional tooltip support, providing a unified interface for developers. It inherits all the
  * properties from both `IFontIconProps` and `ImageProps`, enabling the use of various
  * icon sources and additional image attributes.
  * 
@@ -495,6 +497,11 @@ export type IIconSource = string | ImageSourcePropType;
  *   - `resizeMode`: How to resize the image when the frame doesn't match the raw image dimensions.
  *   - `onLoad`: Callback function when the image loads successfully.
  *   - `onError`: Callback function when the image fails to load.
+ * 
+ * @extends ITooltipBaseProps
+ * 
+ * @property {ITooltipProps} [containerProps] - Optional. Properties for the tooltip container,
+ * allowing customization of the tooltip behavior and appearance when the icon is hovered or focused.
  *
  * @example
  * // Using IIconProps to render a font icon
@@ -514,6 +521,13 @@ export type IIconSource = string | ImageSourcePropType;
  *   onError: () => console.error('Error loading image'),
  * };
  */
-export type IIconProps = IFontIconProps & ImageProps & {
+export type IIconProps = IFontIconProps & ImageProps & ITooltipBaseProps & {
+    /***
+     * Optional. Properties for the tooltip container,
+    * allowing customization of the tooltip behavior and appearance when the icon is hovered or focused.
+     */
+    containerProps?: ITooltipProps;
+
+    onPress?: (event: GestureResponderEvent) => void;
 
 };

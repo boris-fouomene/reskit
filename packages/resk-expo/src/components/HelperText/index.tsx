@@ -4,6 +4,7 @@ import Theme, { useTheme } from "@theme";
 import Label, { ILabelProps } from '@components/Label';
 import isValidElement from '@utils/isValidElement';
 import { useEffect } from 'react';
+import platform from '@platform/index';
 
 
 /**
@@ -43,6 +44,7 @@ import { useEffect } from 'react';
  */
 export function HelperText({ visible = true, testID, color, style, error, ...rest }: IHelperTextProps) {
     const theme = useTheme();
+    const useNativeDriver = platform.isMobileNative();
     // Animation value for opacity
     const opacity = new Animated.Value(visible ? 1 : 0);
     testID = defaultStr(testID, "RNHelperText")
@@ -52,13 +54,13 @@ export function HelperText({ visible = true, testID, color, style, error, ...res
             Animated.timing(opacity, {
                 toValue: 1,
                 duration: 300,
-                useNativeDriver: true,
+                useNativeDriver,
             }).start();
         } else {
             Animated.timing(opacity, {
                 toValue: 0,
                 duration: 300,
-                useNativeDriver: true,
+                useNativeDriver,
             }).start();
         }
     }, [visible, opacity]);

@@ -112,18 +112,23 @@ const getSessionActiveIndex = (props: ITabProps) => {
  * );
  */
 const Tab = (props: ITabProps) => {
-    let { activeIndex: customActiveIndex, tabContentProps, testID, sessionName, style: customStyle, children, onChange, tabItemProps, tabItemsProps, disabled, ...rest } = props;
+    let { activeIndex: customActiveIndex, tabContentProps, testID, sessionName, style: customStyle, children, onChange, tabItemProps, tabItemsProps: customTabItemsProps, disabled, ...rest } = props;
     let activeIndex = getSessionActiveIndex(props);
     rest = Object.assign({}, rest);
-    tabItemsProps = Object.assign({}, tabItemsProps);
+    const { colorScheme, ...tabItemsProps } = Object.assign({}, customTabItemsProps);
     tabItemProps = Object.assign({}, tabItemProps);
     const style = StyleSheet.flatten([customStyle]);
     const theme = useTheme();
     const tabsItemsStyle = Object.assign({}, StyleSheet.flatten(tabItemsProps.style));
-    const hasTabColor = Colors.isValid(tabsItemsStyle.backgroundColor);
-    const defaultActiveTabItemTextColor = theme.dark ? theme.colors.onSurface : theme.colors.onPrimary;
-    const defaultTextColor = hasTabColor ? Colors.setAlpha(tabsItemsStyle.backgroundColor as string, 0.6) : Colors.setAlpha(defaultActiveTabItemTextColor, 0.6);
-    tabsItemsStyle.backgroundColor = Colors.isValid(tabsItemsStyle.backgroundColor) ? tabsItemsStyle.backgroundColor : theme.dark ? theme.colors.surface : theme.colors.primary;
+
+    const tabItemsColorScheme = Theme.getColorScheme(colorScheme);
+    const tabItemsBackgroundColor = Colors.isValid(tabItemsColorScheme.backgroundColor) ? tabItemsColorScheme.backgroundColor : Colors.isValid(tabsItemsStyle.backgroundColor) ? tabsItemsStyle.backgroundColor : undefined;
+    const tabItemsTextColor = Colors.isValid(tabItemsColorScheme.color) ? tabItemsColorScheme.color : Colors.isValid(tabsItemsStyle.backgroundColor) ? Colors.setAlpha(tabsItemsStyle.backgroundColor as string, 0.6) : undefined;
+
+    const defaultActiveTabItemTextColor = tabItemsTextColor || (theme.dark ? theme.colors.onSurface : theme.colors.onPrimary);
+    const backgroundColor = tabItemsBackgroundColor || (theme.dark ? theme.colors.surface : theme.colors.primary);
+    const defaultTextColor = Colors.setAlpha(defaultActiveTabItemTextColor, 0.6);
+    tabsItemsStyle.backgroundColor = backgroundColor;
     const indicatorStyle: IDict = Object.assign({}, StyleSheet.flatten(tabItemsProps.indicatorProps?.style));
     indicatorStyle.backgroundColor = Colors.isValid(indicatorStyle.backgroundColor) ? indicatorStyle.backgroundColor : defaultActiveTabItemTextColor;
 

@@ -79,6 +79,7 @@ const isHex = (color: string | null): boolean => {
 */
 const isValid = (color: any): boolean => {
     if (!color || typeof color !== 'string') return false;
+    if (["transparent"].includes(color)) return true;
     return isHex(color) || isHex(Color(color)?.hex()?.toString());
 };
 

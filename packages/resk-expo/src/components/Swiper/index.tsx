@@ -7,9 +7,10 @@ import { IFlatStyle, IStyle } from '../../types';
 import Theme from "@theme";
 import { ISwiperProps, ISwiperState } from './types';
 import { isRTL } from '@utils/i18nManager';
+import platform from '@platform/index';
 const WIDTH_HEIGHT = 250;
 
-const useNativeDriver = false; // because of RN #13377
+const useNativeDriver = platform.isMobileNative(); // because of RN #13377
 
 export * from "./types";
 /**

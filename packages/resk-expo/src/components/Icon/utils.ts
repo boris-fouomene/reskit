@@ -1,10 +1,5 @@
 import { isObj, isValidImageSrc } from "@resk/core";
 import { Platform } from "@resk/core";
-import { isWeb } from "@resk/core/build/src/platform";
-
-
-
-
 
 
 /**

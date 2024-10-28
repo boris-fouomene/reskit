@@ -11,7 +11,7 @@ import Zocial from "@expo/vector-icons/Zocial";
 import { IStyle } from "../../types";
 import { GestureResponderEvent, ImageProps, ImageSourcePropType } from "react-native";
 import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip";
-import { IconProps } from "@expo/vector-icons/build/createIconSet";
+import { ITheme } from "@theme/types";
 /**
  * Represents the valid names of icons from the FontAwesome5 icon set.
  * 
@@ -453,7 +453,7 @@ export interface IFontIconsSetNamesToPrefix {
  *
  * @typedef {IIconSourceBase}
  * @type {string | ImageSourcePropType}
- * 
+ * @see the name property of the {@link IIconProps} interface
  * @example
  * // Using a predefined icon name
  * const iconName: IIconSourceBase = "home"; // From MaterialCommunityIcons
@@ -473,6 +473,9 @@ export type IIconSourceBase = IFontIconProps["name"] | ImageSourcePropType;
  * icon source based on the provided props.
  * 
  * @type {IIconSource}
+ * @see {@link IIconSourceBase}  IIconSourceBase
+ * @see {@link IIconProps}
+
  * 
  * @example
  * // Using a predefined icon source
@@ -490,7 +493,7 @@ export type IIconSourceBase = IFontIconProps["name"] | ImageSourcePropType;
  * <Icon source={customIcon} />
  * <Icon source={dynamicIcon} color="red" />
  */
-export type IIconSource = IIconSourceBase | ((props: IIconProps & { color: string }) => IIconSourceBase | JSX.Element);
+export type IIconSource = IIconSourceBase | JSX.Element | ((props: IIconProps & { color: string }) => IIconSourceBase | JSX.Element);
 
 /**
  * @interface IIconProps
@@ -558,3 +561,134 @@ export type IIconProps = Partial<IFontIconProps> & ImageProps & ITooltipBaseProp
     onPress?: (event: GestureResponderEvent) => void;
 
 };
+
+
+
+/**
+ * Represents a comprehensive set of options for configuring icons, combining base icon options with additional properties.
+ * This type allows developers to specify a wide range of icon configurations while ensuring type safety.
+ * 
+ * @template T - An optional generic type that allows for extending the options with
+ *               additional properties specific to the implementation context.
+ *
+ * @interface IGetIconOptions
+ * @extends Omit<IIconProps, "name" | "source"> - Excludes the `name` and `source` properties
+ *                                                from the base icon properties, as they are
+ *                                                not needed for this context.
+ * 
+ * @property {IIconSource} [icon] - The source of the icon to be displayed. This can be 
+ *                                   an icon object or a reference to an icon in a library.
+ *                                   Example:
+ *                                   ```typescript
+ *                                   const options: IGetIconOptions = {
+ *                                       icon: {  icon details  },
+ *                                   };
+ *                                   ```
+ * 
+ * @property {string} [color] - Optional property to specify the color of the icon.
+ *                               This can be a named color, hex code, or RGB value.
+ *                               Example:
+ *                               ```typescript
+ *                               const options: IGetIconOptions = {
+ *                                   color: '#FF5733',
+ *                               };
+ *                               ```
+ * 
+ * @property {ITheme} [theme] - An optional property to define the theme context in which
+ *                               the icon will be rendered. This can influence styles such as
+ *                               background, border, or hover effects.
+ *                               Example:
+ *                               ```typescript
+ *                               const options: IGetIconOptions = {
+ *                                   theme: { theme details },
+ *                               };
+ *                               ```
+ *
+ * @typedef {Omit<T, keyof IGetIconOptionsBase> & IGetIconOptionsBase & { icon?: IIconSource, color?: string, theme?: ITheme }} IGetIconOptions
+ * 
+ * @description
+ * The `IGetIconOptions` type merges properties from a generic type `T` (excluding those defined in {@link IGetIconOptionsBase})
+ * with the base icon options and additional properties:
+ * - `icon`: An optional property that defines the icon source, which can be a predefined icon name or a custom image source.
+ * - `color`: An optional string property that specifies the color to apply to the icon.
+ * - `theme`: An optional property that allows for the application of a specific theme to the icon, enhancing its visual appearance.
+ * 
+ * @example
+ * // Basic usage of IGetIconOptions with default type
+ * const iconOptions: IGetIconOptions = {
+ *   size: 24,
+ *   style: { margin: 10 },
+ *   icon: "home" | { uri: string } | 'number',
+ *   color: "blue",
+ *   theme: { primary: "blue", secondary: "gray" }
+ * };
+ * 
+ * @example
+ * // Using IGetIconOptions with a custom type
+ * interface ICustomIconProps {
+ *   customLabel?: string;
+ * }
+ * 
+ * const customIconOptions: IGetIconOptions<ICustomIconProps> = {
+ *   size: 30,
+ *   icon: require('./path/to/custom/icon.png'),
+ *   customLabel: "My Custom Icon",
+ *   theme: { primary: "green", secondary: "lightgray" }
+ * };
+ * 
+ * @example
+ * // Function that accepts IGetIconOptions
+ * function renderIcon(options: IGetIconOptions) {
+ *   const { icon, color, size, style, theme } = options;
+ *   // Implementation to render the icon based on the provided options
+ * }
+ * 
+ * @see {@link IGetIconOptionsBase} For the base icon options
+ * @see {@link IIconSource} For information on icon sources
+ * @see {@link ITheme} For theme-related properties
+ * 
+* @remarks 
+ * This type is particularly useful when working with icon components that require 
+ * customization options while ensuring that the core properties are managed correctly.
+ * 
+ * Ensure that the properties provided align with the expected types to avoid runtime errors.
+  * 
+ * @beta
+ * @category Icons
+ * @since 1.0.0
+ */
+export type IGetIconOptions<T = any> = Omit<T, keyof IGetIconOptionsBase> & IGetIconOptionsBase & { icon?: IIconSource, color?: string, theme?: ITheme };
+/**
+ * Represents the base options for retrieving icons, excluding essential properties like name, source, and color.
+ * This type is used as a foundation for icon configuration options while allowing specific icon properties to be
+ * defined separately.
+ * 
+ * @typedef {Omit<IIconProps, "name" | "source" | "color">} IGetIconOptionsBase
+ * 
+ * @description
+ * This type omits the following properties from IIconProps:
+ * - 'name': The identifier of the icon
+ * - 'source': The react native source of the icon (e.g., {uri:"assets...",number})
+ * - 'color': The color to apply to the icon
+ * 
+ * @example
+ * // Basic usage of IGetIconOptionsBase
+ * const iconOptions: IGetIconOptionsBase = {
+ *   size: 24,
+ *   style: { marginRight: 10 },
+ *   onPress: () => console.log('Icon pressed')
+ * };
+ * 
+ * @example
+ * // Using in a function
+ * function createIcon(options: IGetIconOptionsBase & { name: string }) {
+ *   return {
+ *     ...options,
+ *     name: options.name,
+ *     color: 'default'
+ *   };
+ * }
+ * 
+ * @see {@link IIconProps} For the complete set of icon properties
+ */
+type IGetIconOptionsBase = Omit<IIconProps, "name" | "source" | "color">;

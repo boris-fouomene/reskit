@@ -20,6 +20,7 @@ const showScrollBarIndicator = !Platform.isMobileBrowser() && !Platform.isMobile
 import { ViewProps } from 'react-native';
 import { ITabItemsProps } from './types';
 import { userTabs } from './context';
+import platform from '@platform';
 
 const TabItems = ({
   children,
@@ -76,7 +77,7 @@ const TabItems = ({
   React.useEffect(() => {
     Animated.timing(animationRef.current, {
       toValue: activeIndex || 0,
-      useNativeDriver: true,
+      useNativeDriver: platform.isMobileNative(),
       duration: 170,
     }).start();
     scrollable && requestAnimationFrame(scrollHandler);

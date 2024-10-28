@@ -8,7 +8,9 @@ import {
     PressableProps
 } from 'react-native';
 import { Colors, useTheme } from '@theme';
+import platform from '@platform/index';
 
+const useNativeDriver = platform.isMobileNative();
 /**
  * Interface representing the props for the `TouchableRipple` component.
  * This interface extends the standard `PressableProps` from React Native,
@@ -171,14 +173,14 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
         RNAnimated.timing(animated, {
             toValue: 0.4,
             duration: 100,
-            useNativeDriver: true,
+            useNativeDriver,
         }).start();
     };
     const fadeOut = () => {
         RNAnimated.timing(animated, {
             toValue: 1,
             duration: 200,
-            useNativeDriver: true,
+            useNativeDriver,
         }).start();
     };
     const rippleContent = null;

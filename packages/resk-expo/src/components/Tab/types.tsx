@@ -6,6 +6,7 @@ import { IViewProps } from "@components/View";
 import { IStyle } from "../../types";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, ScrollViewProps, ViewProps } from "react-native";
+import { IThemeColorTokenKey } from "@theme/types";
 
 /**
  * Represents the properties for a Tab component.
@@ -178,7 +179,7 @@ export interface ITabItemsProps extends IViewProps {
      * @param {{ index: number, tabIndex: number }} options - An object containing the index of the pressed tab item and its tab index.
      * @returns {any} Returns any value (usually used for side effects).
      */
-    onPress: (event: GestureResponderEvent, options: { index: number, tabIndex: number }) => any;
+    onPress?: (event: GestureResponderEvent, options: { index: number, tabIndex: number }) => any;
 
     /**
      * Indicates whether the tabs should be scrollable.
@@ -221,6 +222,11 @@ export interface ITabItemsProps extends IViewProps {
      * @type {ScrollViewProps}
      */
     scrollViewProps?: ScrollViewProps;
+
+    /***
+     * tabItems color scheme
+     */
+    colorScheme?: IThemeColorTokenKey;
 }
 
 

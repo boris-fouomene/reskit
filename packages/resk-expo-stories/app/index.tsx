@@ -1,4 +1,4 @@
-import { FontIcon, Tab, Switch, Checkbox, Surface, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText } from "@resk/expo";
+import { FontIcon, Tab, Switch, Checkbox, Surface, Expandable, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText } from "@resk/expo";
 
 import { View, Text } from 'react-native'
 import React from 'react'
@@ -39,9 +39,9 @@ const index = () => {
                 error
                 children={"A children helper"}
             />
-            <Tab>
+            <Tab tabItemsProps={{ colorScheme: "secondary" }}>
                 <Tab.Item label="Tab 1" icon="account-circle">
-                    <Label style={{ height: 300 }}>First tab item</Label>
+                    <Label>First tab item</Label>
                 </Tab.Item>
                 <Tab.Item label="Second tab" icon="material-edit">
                     <Label>Second tab</Label>
@@ -50,13 +50,11 @@ const index = () => {
                     <Label>Third tab</Label>
                 </Tab.Item>
             </Tab>
-            <Surface elevation={10} style={Theme.styles.ph5}>
-                <Swiper activeIndex={0} timeout={5} loop={true} contentProps={{ style: { backgroundColor: 'green', flex: 1, minHeight: 200 } }}>
-                    <View><Text>Slide 1</Text></View>
-                    <View><Text>Slide 2</Text></View>
-                    <View><Text>Slide 3</Text></View>
-                </Swiper>
-            </Surface>
+            <Expandable label="My expanded">
+                <View>
+                    <Label>An expanded content</Label>
+                </View>
+            </Expandable>
         </View>
     )
 }

@@ -7,7 +7,7 @@ import _, { isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View, { IViewProps } from "@components/View";
-import { getLabelOrLeftOrRightProps } from "@hooks/index";
+import { getLabelOrLeftOrRight } from "@hooks/index";
 import { ITextInputCallbackOptions, ITextInputProps, ITextInputType, IUseTextInputProps } from "./types";
 import { ITheme } from "@theme/types";
 import { IStyle } from "@src/types";
@@ -328,7 +328,7 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
     const inputValue = isFocused ? focusedValue : formated.formattedValue || emptyValue || "";
     const isInputValueEmpty = isEmpty(inputValue);
     const canRenderLabel = withLabel !== false;
-    const { left, right, label } = getLabelOrLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
+    const { left, right, label } = getLabelOrLeftOrRight<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
     const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null];
     const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} name={isSecure ? "eye" : "eye-off"} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;

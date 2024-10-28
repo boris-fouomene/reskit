@@ -3,7 +3,7 @@ import isValidElement from "@utils/isValidElement";
 import { isRTL } from "@utils/i18nManager";
 
 /**
- * @interface ILabelOrLeftOrRightProps
+ * @interface ILabelOrLeftOrRightOptions
  * Type definition for props that can contain label, left and right elements.
  * 
  * This type allows for the specification of either a static ReactNode or a 
@@ -18,7 +18,7 @@ import { isRTL } from "@utils/i18nManager";
  * - `right`: A ReactNode or a function that returns a ReactNode. This can be used to render 
  *   content on the right side of a component.
  */
-export type ILabelOrLeftOrRightProps<T = any> = {
+export type ILabelOrLeftOrRightOptions<T = any> = {
     /**
      * A ReactNode or a function that returns a ReactNode. This can be used to render the label for a component.
      * It represent the label to be displayed alongside the text input.
@@ -57,7 +57,7 @@ export type ILabelOrLeftOrRightProps<T = any> = {
  * resulting ReactNode. It also validates the resulting nodes to ensure they are valid 
  * React elements.
  * 
- * @param {ILabelOrLeftOrRightProps<T>} props - The props containing the label, left and right elements.
+ * @param {ILabelOrLeftOrRightOptions<T>} props - The props containing the label, left and right elements.
  * @param {T} options - Optional parameters to pass to the functions for dynamic rendering.
  * @returns {{ label : : ReactNode, left: ReactNode, right: ReactNode }} - An object containing validated label, left and right nodes.
  * 
@@ -66,8 +66,8 @@ export type ILabelOrLeftOrRightProps<T = any> = {
  * ### Example Usage:
  * 
  * ```typescript
- * const MyComponent = (props: ILabelOrLeftOrRightProps) => {
- *     const { label, left, right } = getLabelOrLeftOrRightProps(props, { //options });
+ * const MyComponent = (props: ILabelOrLeftOrRightOptions) => {
+ *     const { label, left, right } = getLabelOrLeftOrRight(props, { //options });
  *     return (
  *         <div>
  *             <div>{left}</div>
@@ -78,7 +78,7 @@ export type ILabelOrLeftOrRightProps<T = any> = {
  * };
  * ```
  */
-export const getLabelOrLeftOrRightProps = <T = any>(props: ILabelOrLeftOrRightProps, options: T): { label: ReactNode, left: ReactNode; right: ReactNode } => {
+export const getLabelOrLeftOrRight = <T = any>(props: ILabelOrLeftOrRightOptions, options: T): { label: ReactNode, left: ReactNode; right: ReactNode } => {
     // Evaluate the left property, calling it if it's a function
     const left = typeof props?.left === "function" ? props?.left(options) : props?.left;
     // Evaluate the right property, calling it if it's a function

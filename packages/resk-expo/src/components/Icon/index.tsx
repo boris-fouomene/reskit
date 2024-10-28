@@ -1,6 +1,7 @@
-import React, { forwardRef, isValidElement, LegacyRef, ReactNode, useMemo } from "react";
-import { IFontIconProps, IIconProps, IIconSource } from "./types";
+import React, { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
+import { IFontIconProps, IGetIconOptions, IIconProps, IIconSource } from "./types";
 import { Image, ImageSourcePropType, ImageStyle, Pressable } from "react-native";
+import { isValidElement } from "@utils";
 import { isImageSource } from "./utils";
 import { defaultStr, isObj } from "@resk/core";
 import Theme, { Colors, useTheme } from "@theme/index";
@@ -127,65 +128,9 @@ Icon.displayName = "Icon";
 export * from "./Font";
 export { default as FontIcon } from "./Font";
 export * from "./types";
+export * from "./utils";
 
-/**
- * Represents the options for retrieving an icon, extending the base icon properties
- * while allowing for additional customization.
- *
- * @template T - An optional generic type that allows for extending the options with
- *               additional properties specific to the implementation context.
- *
- * @interface IGetIconOptions
- * @extends Omit<IIconProps, "name" | "source"> - Excludes the `name` and `source` properties
- *                                                from the base icon properties, as they are
- *                                                not needed for this context.
- * 
- * @property {IIconSource} [icon] - The source of the icon to be displayed. This can be 
- *                                   an icon object or a reference to an icon in a library.
- *                                   Example:
- *                                   ```typescript
- *                                   const options: IGetIconOptions = {
- *                                       icon: {  icon details  },
- *                                   };
- *                                   ```
- * 
- * @property {string} [color] - Optional property to specify the color of the icon.
- *                               This can be a named color, hex code, or RGB value.
- *                               Example:
- *                               ```typescript
- *                               const options: IGetIconOptions = {
- *                                   color: '#FF5733',
- *                               };
- *                               ```
- * 
- * @property {ITheme} [theme] - An optional property to define the theme context in which
- *                               the icon will be rendered. This can influence styles such as
- *                               background, border, or hover effects.
- *                               Example:
- *                               ```typescript
- *                               const options: IGetIconOptions = {
- *                                   theme: { theme details },
- *                               };
- *                               ```
- *
- * @example
- * Here’s an example of how to create an object adhering to the `IGetIconOptions` type:
- * ```typescript
- * const myIconOptions: IGetIconOptions = {
- *     icon: {icon source },
- *     color: 'blue',
- *     theme: { },
- *     additionalProperty: 'value' // Example of extending with custom properties
- * };
- * ```
- *
- * @remarks 
- * This type is particularly useful when working with icon components that require 
- * customization options while ensuring that the core properties are managed correctly.
- * 
- * Ensure that the properties provided align with the expected types to avoid runtime errors.
- */
-export type IGetIconOptions<T = any> = Omit<IIconProps, "name" | "source" | "color"> & { icon?: IIconSource, color?: string, theme?: ITheme } & T;
+
 
 /***
  * /**
@@ -201,15 +146,17 @@ export type IGetIconOptions<T = any> = Omit<IIconProps, "name" | "source" | "col
  * @param {...any} rest - Additional properties to pass to the icon component.
  * 
  * @returns {ReactNode} The rendered icon component.
+ * @see {@link IGetIconOptions} for the options of the function.
  * 
  * @example
- * const myIcon = getIcon({ icon: "home", color: "blue", theme: customTheme });
+ * const myIcon = getIcon({ icon: "material-home", color: "blue", theme: customTheme });
  */
 export function getIcon<T = any>({ icon, color: col2, theme, ...rest }: IGetIconOptions<T>): ReactNode {
+    if (isValidElement(icon)) return icon as ReactNode;
     theme = isObj(theme) && theme || Theme;
     const color: string = (Colors.isValid(col2) ? col2 : theme.colors.text) as string;
     const iconSource = typeof icon == "function" ? icon({ ...rest, color } as IIconProps & { color: string }) : icon;
-    if (isValidElement(iconSource)) return iconSource;
+    if (isValidElement(iconSource)) return iconSource as ReactNode;
     if (!iconSource) return null;
     const iconProps: IIconProps = {
         color
@@ -234,6 +181,8 @@ export function getIcon<T = any>({ icon, color: col2, theme, ...rest }: IGetIcon
  * @param {...any} rest - Additional properties to pass to the icon component.
  * 
  * @returns {ReactNode} The rendered icon component.
+ * @see {@link IGetIconOptions} for the options of the function.
+ * @see {@link getIcon} for the function that retrieves the icon.
  * 
  * @example
  * const MyComponent = () => {

@@ -1,267 +1,245 @@
-import React from "react";
+import React, { useMemo, useRef } from "react";
 import View, { IViewProps } from "@components/View";
-import { StyleSheet, View as RNView, Pressable, GestureResponderEvent, PressableProps } from "react-native";
+import { StyleSheet, View as RNView, Pressable, GestureResponderEvent, PressableProps, ViewProps, } from "react-native";
 import Label, { ILabelProps } from "@components/Label";
 import { Icon, IIconProps, IIconSource, useGetIcon } from "@components/Icon";
 import { defaultObj, isNonNullString, defaultStr } from "@resk/core";
-import { Surface } from "@components/Surface";
 import Theme, { useTheme, Colors } from "@theme";
 import useStateCallback from "@utils/stateCallback";
-import { getLabelOrLeftOrRightProps, ILabelOrLeftOrRightProps } from "@hooks/index";
-import { lab } from "color";
+import { getLabelOrLeftOrRight, ILabelOrLeftOrRightOptions } from "@hooks/index";
+import Animated, { AnimatedProps, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
 /**
- * Represents the properties for an expandable component, allowing for rich customization
- * of its behavior, appearance, and content.
- *
+ * Interface for Expandable component props that provides collapsible/expandable functionality with customizable icons and content.
+ * 
  * @interface IExpandableProps
- * @extends Omit<PressableProps, "children"> - Excludes the `children` property from the 
- *   PressableProps, as it is handled separately.
- * @extends ILabelOrLeftOrRightProps<IExpandableCallbackOptions> - Includes additional properties
- *                    related to label handling and options.
- *
- * @property {JSX.Element} [children] - Optional children to be displayed within the expandable
- *                  component. This is typically the content that will be
- *                  revealed when the component is expanded.
- *                  Example:
- *                  ```typescript
- *                  const MyExpandable: React.FC<IExpandableProps> = () => (
- * <ExpandableComponent>
- *     <Text>Expandable Content</Text>
- * </ExpandableComponent>
- *
- * @property {ILabelProps} [labelProps] - Properties useful for rendering the label of the
- *expandable component.
- *Example:
- *```typescript
- *const options: IExpandableProps = {
- *    labelProps: {},
- *};
- *```
- * @property {(options: { event: GestureResponderEvent; expanded?: boolean }) => any} [onToggleExpand] - 
- *Callback function triggered when the component is toggled.
- *It receives an event and the current expanded state.
- *Example:
- *```typescript
- *const options: IExpandableProps = {
- *    onToggleExpand: (options) => {
- *        console.log('Toggled:', options.expanded);
- *    },
- *};
- *```
- *
- * @property {boolean} [expanded] - Indicates whether the expandable component is currently expanded.
- *              Default is `false`.
- *              Example:
- *              ```typescript
- *              const options: IExpandableProps = {
- *                  expanded: true,
- *              };
- *              ```
- *
- * @property {any} [expandedIcon] - Icon to display when the component is expanded.
- *              Example:
- *              ```typescript
- *              const options: IExpandableProps = {
- *                  expandedIcon: <Icon name="chevron-up" />,
- *              };
- *              ```
- *
- * @property {boolean} [defaultExpanded] - If true, the component is expanded by default.
- *Example:
- *```typescript
- *const options: IExpandableProps = {
- *    defaultExpanded: true,
- *};
- *```
- *
- * @property {IIconProps} [expandIconProps] - Properties for the expanded icon.
- *   Example:
- *   ```typescript
- *   const options: IExpandableProps = {
- *       expandIconProps: { },
- *   };
- *   ```
- *
- * @property {any} [unexpandedIcon] - Icon to display when the component is not expanded.
- *                Example:
- *                ```typescript
- *                const options: IExpandableProps = {
- *                    unexpandedIcon: <Icon name="chevron-down" />,
- *                };
- *                ```
- *
- * @property {IIconProps} [unexpandedIconProps] - Properties for the unexpanded icon.
- *      Example:
- *      ```typescript
- *      const options: IExpandableProps = {
- *          unexpandedIconProps: {},
- *      };
- *      ```
- *
- * @property {IViewProps} [leftContainerProps] - Properties to pass to the view rendering the
- *     left content of the expandable.
- *     Example:
- *     ```typescript
- *     const options: IExpandableProps = {
- *         leftContainerProps: { },
- *     };
- *     ```
- *
- * @property {"left" | "right"} [expandIconPosition] - Specifies the position of the expand icon
- *            relative to the label. Defaults to "right".
- *            Example:
- *            ```typescript
- *            const options: IExpandableProps = {
- *                expandIconPosition: " left",
- *            };
- *            ```
- *
- * @property {IIconSource} [expandIcon] - The icon source for the expand icon.
- *                    Example:
- *                    ```typescript
- *                    const options: IExpandableProps = {
- *   expandIcon: {  },
- *                    };
- *                    ```
- *
- * @property {IViewProps} [labelProps] - Properties to pass to the view rendering the
- *       label of the expandable.
- *       Example:
- *       ```typescript
- *       const options: IExpandableProps = {
- *           labelProps: {},
- *       };
- *       ```
- *
- * @property {IViewProps} [contentProps] - Properties to pass to the view rendering the content
- *of the expandable.
- *Example:
- *```typescript
- *const options: IExpandableProps = {
- *    contentProps: { },
- *};
- *```
- *
- * @property {boolean} [autoMountChildren] - If true, the children of the expandable component
- * will be mounted but hidden, and when toggled, they
- * will be displayed.
- * Example:
- * ```typescript
- * const options: IExpandableProps = {
- *     autoMountChildren: true,
- * };
- * ```
- *
- * @property {IViewProps} [rightContainerProps] - Properties to pass to the view rendering the
- *       right content of the expandable.
- *       Example:
- *       ```typescript
- *       const options: IExpandableProps = {
- *           rightContainerProps: {},
- *       };
- *       ```
- *
- * @property {IViewProps} [contentContainerProps] - Properties to pass to the view rendering the
- *          content container of the expandable.
- *          Example:
- *          ```typescript
- *          const options: IExpandableProps = {
- *              contentContainerProps: {},
- *          };
- *          ```
- *
- * @property {boolean} [showExpandIcon] - If true, the expand icon will be visible.
- *                   Example:
- *                   ```typescript
- *                   const options: IExpandableProps = {
- *  showExpandIcon: false,
- *                   };
- *                   ```
- *
- * @property {IViewProps} [containerProps] - Properties to pass to the container component of
- *  the expandable.
- *  Example:
- *  ```typescript
- *  const options: IExpandableProps = {
- *      containerProps: {},
- *  };
- *  ```
- *
- * @property {boolean} [usePrimaryColorWhenExpended] - Specifies whether the primary color should
- *           be used as the text color when the item is expanded.
- *           Example:
- *           ```typescript
- *           const options: IExpandableProps = {
- *               usePrimaryColorWhenExpended: true,
- *           };
- *           ```
- *
- * @remarks 
- * This type provides a comprehensive set of properties to customize the behavior and appearance
- * of an expandable component. It is essential to understand each property's purpose and usage to
- * effectively utilize this type.
- */
-export type IExpandableProps = Omit<PressableProps, "children"> & ILabelOrLeftOrRightProps<IExpandableCallbackOptions> & {
-  children?: JSX.Element,
-  labelProps?: ILabelProps;
-  onToggleExpand?: (options: { event: GestureResponderEvent; expanded?: boolean }) => any;
-  expanded?: boolean;
-  expandedIcon?: any;
-  defaultExpanded?: boolean;
-  expandIconProps?: IIconProps;
-  unexpandedIcon?: any;
-  unexpandedIconProps?: IIconProps;
-  leftContainerProps?: IViewProps;
-  expandIconPosition?: "left" | "right";
-  expandIcon?: IIconSource;
-  contentProps?: IViewProps;
-  autoMountChildren?: boolean;
-  rightContainerProps?: IViewProps;
-  contentContainerProps?: IViewProps;
-  showExpandIcon?: boolean;
-  containerProps?: IViewProps;
-  usePrimaryColorWhenExpended?: boolean;
-}
-
-interface IExpandableCallbackOptions {
-  color?: string; //la couleur à l'instant t
-}
-
-/***
- * /**
- * A customizable expandable component that allows for toggling visibility of its content.
- * It supports various properties for customization including labels, icons, and styles.
- *
  * @component Expandable
  * @param {IExpandableProps} props - The properties for configuring the expandable component.
  * @param {React.ForwardedRef<RNView>} ref - A ref forwarded to the root view of the component.
  *
+ * 
  * @returns {JSX.Element} The rendered expandable component.
- *
+ * @extends {Omit<PressableProps, "children">}
+ * @extends {ILabelOrLeftOrRightOptions<IExpandableCallbackOptions>}
+ * 
+ * 
  * @example
- * Here's a simple example of how to use the Expandable component:
- * ```typescript
- * const MyExpandableComponent = () => {
- *     return (
- *         <Expandable
- *             label="Click to Expand"
- *             expandedIcon={<Icon name="chevron-up" />}
- *             unexpandedIcon={<Icon name="chevron-down" />}
- *             onToggleExpand={({ expanded }) => console.log('Expanded:', expanded)}
- *         >
- *             <Text>This content is revealed when expanded.</Text>
- *         </Expandable>
- *     );
+ * ```tsx
+ * <Expandable
+ *   label="Settings"
+ *   expandedIcon="chevron-up"
+ *   unexpandedIcon="chevron-down"
+ *   defaultExpanded={true}
+ *   expandIconPosition="right"
+ * >
+ *   <View>
+ *     <Text>Expanded Content</Text>
+ *   </View>
+ * </Expandable>
+ * ```
+ */
+export type IExpandableProps = Omit<PressableProps, "children"> & ILabelOrLeftOrRightOptions<IExpandableCallbackOptions> & {
+  /** 
+   * The content to be shown/hidden when expanding/collapsing
+   * @type {JSX.Element}
+   */
+  children?: JSX.Element;
+
+  /**
+   * Props to customize the label appearance and behavior
+   * @type {ILabelProps}
+   */
+  labelProps?: ILabelProps;
+
+  /**
+   * Callback fired when the expandable section is toggled
+   * @param {Object} options - Toggle event options
+   * @param {GestureResponderEvent} options.event - The native event
+   * @param {boolean} [options.expanded] - The new expanded state
+   */
+  onToggleExpand?: (options: { event: GestureResponderEvent; expanded?: boolean }) => any;
+
+  /**
+   * Controls the expanded state when used as a controlled component
+   * @type {boolean}
+   */
+  expanded?: boolean;
+
+  /**
+   * Icon to display when the section is expanded
+   * @type {IIconSource}
+   * @default "chevron-up"
+   */
+  expandedIcon?: IIconSource;
+
+  /**
+   * Initial expanded state when uncontrolled
+   * @type {boolean}
+   * @default false
+   */
+  defaultExpanded?: boolean;
+
+  /**
+   * Props applied to the expanded state icon
+   * @type {IIconProps}
+   */
+  expandedIconProps?: IIconProps;
+
+  /**
+   * Icon to display when the section is collapsed
+   * @type {IIconSource}
+   * @default "chevron-down"
+   */
+  unexpandedIcon?: IIconSource;
+
+  /**
+   * Props applied to the unexpanded state icon
+   * @type {IIconProps}
+   */
+  unexpandedIconProps?: IIconProps;
+
+  /**
+   * Props for the left container view
+   * @type {IViewProps}
+   */
+  leftContainerProps?: IViewProps;
+
+  /**
+   * Position of the expand/collapse icon
+   * @type {"left" | "right"}
+   * @default "right"
+   */
+  expandIconPosition?: "left" | "right";
+
+  /**
+   * Props for the content wrapper view
+   * @type {IViewProps}
+   */
+  contentProps?: AnimatedProps<ViewProps>;
+
+  /**
+   * Whether to mount children even when collapsed
+   * @type {boolean}
+   * @default false
+   */
+  autoMountChildren?: boolean;
+
+  /**
+   * Props for the right container view
+   * @type {IViewProps}
+   */
+  rightContainerProps?: IViewProps;
+
+  /**
+   * Props for the content container view
+   * @type {IViewProps}
+   */
+  contentContainerProps?: IViewProps;
+
+  /**
+   * Whether to show the expand/collapse icon
+   * @type {boolean}
+   * @default true
+   */
+  showExpandIcon?: boolean;
+
+  /**
+   * Props for the main container view
+   * @type {IViewProps}
+   */
+  containerProps?: IViewProps;
+
+  /**
+   * Whether to use primary color for expanded state
+   * @type {boolean}
+   * @default true
+   */
+  usePrimaryColorWhenExpended?: boolean;
+}
+
+/**
+ * Configuration options passed to callbacks when the expandable state changes
+ * 
+ * @interface IExpandableCallbackOptions
+ * 
+ * @property {string} [color] - The current color value at the time of callback
+ * @property {boolean} expanded - The current expanded state
+ * 
+ * @example
+ * ```tsx
+ * const handleToggle = ({ expanded, color }: IExpandableCallbackOptions) => {
+ *   console.log(`Expandable is now ${expanded ? 'open' : 'closed'}`);
+ *   console.log(`Current color: ${color}`);
  * };
  * ```
- *
- * @remarks
- * The Expandable component can be controlled externally through the `expanded` prop, or it can manage its own state internally.
- * The component's styles and behavior can be customized through various props, allowing for flexible integration into different UI designs.
  */
-export const Expandable = React.forwardRef(({ left: customLeft, right: customRight, expandIcon: customIcon, label: customLabel, usePrimaryColorWhenExpended, onToggleExpand, children, testID, onPress, expanded: expandedProp, expandedIcon, defaultExpanded, expandIconProps, unexpandedIcon, leftContainerProps, rightContainerProps, contentProps, labelProps, contentContainerProps, showExpandIcon, containerProps, autoMountChildren = false, style, expandIconPosition, ...props }: IExpandableProps, ref: React.ForwardedRef<RNView>) => {
+interface IExpandableCallbackOptions {
+  color?: string; //la couleur à l'instant t
+  expanded: boolean;
+}
+
+/**
+ * A highly customizable expandable/collapsible component that supports controlled and uncontrolled modes.
+ * 
+ * @component
+ * @param {IExpandableProps} props - Component properties
+ * @param {React.ForwardedRef<RNView>} ref - Forwarded ref for the root View component
+ * 
+ * @remarks
+ * The component supports both left and right content placement, custom icons, and extensive styling options.
+ * It can be used in both controlled and uncontrolled modes for expansion state management.
+ * 
+ * @example
+ * ```tsx
+ * // Basic uncontrolled usage
+ * <Expandable
+ *   label="Basic Settings"
+ *   defaultExpanded={true}
+ * >
+ *   <SettingsContent />
+ * </Expandable>
+ * 
+ * // Controlled usage with custom icons and callbacks
+ * <Expandable
+ *   label="Advanced Settings"
+ *   expanded={isExpanded}
+ *   expandedIcon="arrow-up"
+ *   unexpandedIcon="arrow-down"
+ *   expandIconPosition="left"
+ *   onToggleExpand={({ expanded, event }) => {
+ *     console.log('Expanded state:', expanded);
+ *     handleExpand(expanded);
+ *   }}
+ *   leftContainerProps={{
+ *     style: { backgroundColor: '#f5f5f5' }
+ *   }}
+ * >
+ *   <AdvancedSettings />
+ * </Expandable>
+ * 
+ * // With custom left/right content
+ * <Expandable
+ *   label="Custom Layout"
+ *   left={<Icon name="settings" />}
+ *   right={<Badge count={3} />}
+ *   usePrimaryColorWhenExpended={true}
+ * >
+ *   <ContentView />
+ * </Expandable>
+ * ```
+ * 
+ * @see {@link IExpandableProps} for complete props documentation
+ * @see {@link IExpandableCallbackOptions} for callback options
+ */
+
+export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProps, children: customChildren, unexpandedIconProps, right: customRight, label: customLabel, usePrimaryColorWhenExpended, onToggleExpand, testID, onPress, expanded: expandedProp, expandedIcon, defaultExpanded, unexpandedIcon, leftContainerProps, rightContainerProps, contentProps, labelProps, contentContainerProps, showExpandIcon, containerProps, autoMountChildren = false, style, expandIconPosition, ...props }: IExpandableProps, ref: React.ForwardedRef<RNView>) => {
   const theme = useTheme();
+  const children = useMemo(() => {
+    return customChildren;
+  }, [customChildren]);
+
+  const opacity = useSharedValue(0); // Starting opacity
+
   leftContainerProps = defaultObj(leftContainerProps);
   rightContainerProps = defaultObj(rightContainerProps);
   contentProps = defaultObj(contentProps);
@@ -272,17 +250,25 @@ export const Expandable = React.forwardRef(({ left: customLeft, right: customRig
   const isControlled = typeof expandedProp == "boolean" ? true : false;
   const [expanded, setExpanded] = useStateCallback<boolean>(isControlled ? (expandedProp as boolean) : !!defaultExpanded);
   const handlePressAction = (event: GestureResponderEvent) => {
+    // Collapse animation
+    opacity.value = withTiming(expanded ? 0 : 1, { duration: 300 });
     if (!isControlled) {
       setExpanded((expanded: boolean) => !expanded, (newExpanded) => {
         if (typeof onToggleExpand == "function") {
           onToggleExpand({ expanded: newExpanded as boolean, event });
         }
       });
-    };
+    } else if (typeof onToggleExpand == "function") {
+      onToggleExpand({ expanded: !expanded, event });
+    }
     if (typeof onPress == "function") {
       onPress?.(event);
     }
   };
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
 
   React.useEffect(() => {
     if (!isControlled) {
@@ -296,18 +282,20 @@ export const Expandable = React.forwardRef(({ left: customLeft, right: customRig
   const isExpanded = expanded ? true : false;
   const usePrimary = isExpanded && usePrimaryColorWhenExpended !== false ? true : false;
   const eProps = { color: usePrimary ? theme.colors.primary : labelColor };
-  const { left, right, label } = getLabelOrLeftOrRightProps({ label: customLabel, left: customLeft, right: customRight }, eProps)
+  const { left, right, label } = getLabelOrLeftOrRight({ label: customLabel, left: customLeft, right: customRight }, eProps)
   testID = defaultStr(testID, "RN_Expandable");
-  const icon = useGetIcon<{ expanded: boolean }>({ ...Object.assign({}, expandIconProps), ...eProps, size: 24, onPress: handlePressAction, icon: customIcon || isExpanded ? expandedIcon || "chevron-up" : unexpandedIcon || "chevron-down", expanded: isExpanded })
+  const iconProps = Object.assign({}, expanded ? expandedIconProps : unexpandedIconProps);
+  const icon = useGetIcon<{ expanded: boolean }>({ ...iconProps, ...eProps, size: 24, expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
   const expandIcon = showExpandIcon !== false ? icon : null;
+
   return (
-    <View testID={testID + "_ExpandableContainer"} {...containerProps}>
+    <View testID={testID + "_ExpandableContainer"} {...containerProps} style={[styles.container, containerProps.style]}>
       <Pressable
         ref={ref}
         {...props}
         testID={testID}
         style={(state) => {
-          return [styles.container, typeof style == "function" ? style(state) : style]
+          return [typeof style == "function" ? style(state) : style]
         }
         }
         onPress={handlePressAction}
@@ -330,9 +318,14 @@ export const Expandable = React.forwardRef(({ left: customLeft, right: customRig
         </View>
       </Pressable>
       {autoMountChildren !== false || isExpanded ? (
-        <View testID={testID + "_Content"} {...contentProps} style={[{ maxWidth: "100%" }, styles.children, contentProps?.style, !isExpanded && { opacity: 0, height: 0 }]}>
+        <Animated.View
+          style={[
+            styles.content,
+            styles.children, contentProps?.style,
+            animatedStyle,
+          ]} testID={testID + "_Content"} {...contentProps}>
           {children}
-        </View>
+        </Animated.View>
       ) : null}
     </View>
   );
@@ -375,6 +368,8 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: "center",
+    maxWidth: "100%",
+    paddingHorizontal: 7,
   },
   children: {
     marginLeft: 8,

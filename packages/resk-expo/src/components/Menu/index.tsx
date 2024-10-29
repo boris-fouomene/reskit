@@ -5,6 +5,7 @@
  */
 
 import { Portal } from '@components/Portal';
+import { useTheme } from '@theme/index';
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, TouchableOpacity, TouchableOpacityProps, StyleSheet, Dimensions, LayoutChangeEvent, ViewStyle, LayoutRectangle, Pressable } from 'react-native';
 import Animated, {
@@ -312,6 +313,7 @@ export const Menu: React.FC<MenuProps> = ({
     borderRadius = 8,
 }) => {
     // State for measurements
+    const theme = useTheme();
     const [anchorMeasurements, setAnchorMeasurements] = useState<AnchorMeasurements | null>(null);
     const [menuLayout, setMenuLayout] = useState<LayoutRectangle | null>(null);
 
@@ -411,6 +413,7 @@ export const Menu: React.FC<MenuProps> = ({
                 onLayout={onMenuLayout}
                 style={[
                     styles.menuContainer,
+                    { backgroundColor: theme.colors.surface },
                     {
                         borderRadius,
                         ...menuContainerStyle,

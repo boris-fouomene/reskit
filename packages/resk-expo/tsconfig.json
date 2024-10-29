@@ -9,6 +9,12 @@
       "@session": [
         "src/session"
       ],
+      "@dimensions/*": [
+        "src/dimensions/*"
+      ],
+      "@dimensions": [
+        "src/dimensions"
+      ],
       "@types/*": [
         "src/types/*"
       ],

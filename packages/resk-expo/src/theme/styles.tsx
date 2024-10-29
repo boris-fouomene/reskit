@@ -512,6 +512,9 @@ const styles = StyleSheet.create({
         paddingTop: 0,
         paddingBottom: 0,
     },
+    absoluteFill: {
+        ...StyleSheet.absoluteFillObject
+    },
     noMargin: {
         margin: 0,
         marginLeft: 0,

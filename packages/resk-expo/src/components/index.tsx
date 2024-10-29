@@ -18,3 +18,4 @@ export * from "./Swiper";
 export * from "./Surface";
 export * from "./Tab";
 export * from "./Expandable";
+export * from "./Menu";

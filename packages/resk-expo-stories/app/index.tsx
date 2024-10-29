@@ -1,12 +1,14 @@
-import { FontIcon, Tab, Switch, Checkbox, Surface, Expandable, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText } from "@resk/expo";
+import { FontIcon, Tab, Switch, Checkbox, Surface, Portal, Expandable, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu } from "@resk/expo";
 
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text, TouchableOpacity, Pressable } from 'react-native'
+import React, { useRef, useState } from 'react'
 
 
 const index = () => {
     return (
         <View style={[Theme.styles.p5]}>
+            <MenuExample />
+
             <Text>index</Text>
             <Icon
                 name="foundation-alert"
@@ -50,6 +52,9 @@ const index = () => {
                     <Label>Third tab</Label>
                 </Tab.Item>
             </Tab>
+            <Portal>
+                <Label>A portal content</Label>
+            </Portal>
             <Expandable label="My expanded">
                 <View>
                     <Label>An expanded content</Label>
@@ -57,6 +62,29 @@ const index = () => {
             </Expandable>
         </View>
     )
+}
+
+const MenuExample = () => {
+    const [menuVisible, setMenuVisible] = useState(false);
+    const anchorRef = useRef<TouchableOpacity>(null);
+
+    return (
+        <View>
+            <Pressable testID="ExampleAnchorPressable" style={[Theme.styles.m5]} ref={anchorRef} onPress={() => setMenuVisible(true)}>
+                <Text>Open Menu</Text>
+            </Pressable>
+
+            <Menu
+                isVisible={menuVisible}
+                anchor={anchorRef}
+                onClose={() => setMenuVisible(false)}
+            >
+                <View style={{ padding: 16 }}>
+                    <Text>Menu Content</Text>
+                </View>
+            </Menu>
+        </View>
+    );
 }
 
 export default index

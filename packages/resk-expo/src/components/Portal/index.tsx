@@ -1,8 +1,9 @@
 import View, { IViewProps } from '@components/View';
 import { uniqid } from '@resk/core';
 import React, { createContext, useRef, useContext, ReactNode, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ViewProps } from 'react-native';
 import { getMaxZindex, Platform } from '@resk/core';
+import { IReactComponent } from '../../types';
 
 /**
  * @interface IPortalItem
@@ -12,7 +13,7 @@ import { getMaxZindex, Platform } from '@resk/core';
  * A `IPortalItem` consists of a unique key and the React element to be rendered.
  * These items are used internally in the `PortalProvider` to manage portal entries.
  */
-export interface IPortalItem {
+interface IPortalItem<AsProps extends ViewProps = IViewProps> {
     /**
      * Unique key to identify each portal, ensuring that individual portals can be added or removed dynamically.
      */
@@ -27,8 +28,9 @@ export interface IPortalItem {
     /***
      * The props to be passed to the View component that wraps the portal content.
      */
-    props?: IViewProps;
+    props?: IPortalProps<AsProps>;
 }
+
 
 /**
  * @interface IPortalContextProps
@@ -137,15 +139,25 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         <PortalContext.Provider value={{ addPortal, removePortal }}>
             {children}
             {/* Dynamically render portal elements with a stacking order based on their position in the array */}
-            <View testID={`${testID}_Container`} style={StyleSheet.absoluteFillObject} pointerEvents="box-none">
+            <View testID={`${testID}_Container`} style={styles.absoluteFill} pointerEvents="box-none">
                 {portalRefs.current.map(({ key, element, props }, index) => (
-                    <View testID={`${testID}_${index}`} key={key} {...Object.assign({}, props)} style={[{ zIndex: index + startIndex }, props?.style]}>
-                        {element}
-                    </View>
+                    <RenderPortal
+                        testID={`${testID}_${index + 1}`}
+                        key={key}
+                        zIndex={startIndex + index + 1}
+                        children={element}
+                        {...Object.assign({}, props)}
+                    />
                 ))}
             </View>
         </PortalContext.Provider>
     );
+};
+
+function RenderPortal<AsProps extends ViewProps = IViewProps>({ children, absoluteFill, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
+    return <View  {...Object.assign({}, props)} style={[{ zIndex }, absoluteFill && styles.absoluteFill, props?.style]}>
+        {children}
+    </View>
 };
 
 /**
@@ -172,6 +184,26 @@ export const usePortal = (): IPortalContextProps => {
     return context;
 };
 
+export type IPortalProps<AsProps extends ViewProps = IViewProps> = AsProps & {
+    /**
+         * Optionally specify the element type to render the Tooltip with.
+         * By default, it uses `Pressable`, but can be changed to any custom component.
+         * This provides flexibility in rendering, allowing developers to 
+         * choose the underlying element based on their needs.
+         *
+         * @type {IReactComponent}
+         * @example
+         * // Rendering the Tooltip with a custom component
+         * as: CustomTooltipComponent
+         */
+    as?: IReactComponent<AsProps>;
+
+    /***
+     * 
+     */
+    absoluteFill?: boolean;
+}
+
 /**
  * The `Portal` component is used to render content dynamically on top of other components.
  * 
@@ -192,7 +224,7 @@ export const usePortal = (): IPortalContextProps => {
  * </Portal>
  * ```
  */
-export const Portal: React.FC<IViewProps> = ({ children, ...props }) => {
+export function Portal<AsProps extends ViewProps = IViewProps>({ children, ...props }: IPortalProps<AsProps>) {
     const { addPortal, removePortal } = usePortal();
     const key = useRef<string>(uniqid("portal-key")).current;
     useEffect(() => {
@@ -203,3 +235,10 @@ export const Portal: React.FC<IViewProps> = ({ children, ...props }) => {
     }, [key, children]);
     return null; // Nothing is rendered here; content is managed by the PortalProvider
 };
+
+
+const styles = StyleSheet.create({
+    absoluteFill: {
+        ...StyleSheet.absoluteFillObject
+    },
+})

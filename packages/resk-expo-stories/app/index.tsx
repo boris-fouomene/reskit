@@ -78,6 +78,7 @@ const MenuExample = () => {
                 isVisible={menuVisible}
                 anchor={anchorRef}
                 onClose={() => setMenuVisible(false)}
+                isFullScreen
             >
                 <View style={{ padding: 16 }}>
                     <Text>Menu Content</Text>

@@ -1,4 +1,4 @@
-import { FontIcon, Tab, Switch, Checkbox, Surface, Portal, Expandable, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu } from "@resk/expo";
+import { FontIcon, Tab, Switch, Checkbox, Surface, Portal, Expandable, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
 
 import { View, Text, TouchableOpacity, Pressable } from 'react-native'
 import React, { useRef, useState } from 'react'
@@ -7,7 +7,10 @@ import React, { useRef, useState } from 'react'
 const index = () => {
     return (
         <View style={[Theme.styles.p5]}>
-            <MenuExample />
+            <Menu
+                anchor={<Text>Open Menu</Text>}
+                children={<MenuExample />}
+            />
 
             <Text>index</Text>
             <Icon
@@ -65,40 +68,26 @@ const index = () => {
 }
 
 const MenuExample = () => {
-    const [menuVisible, setMenuVisible] = useState(false);
-    const anchorRef = useRef<TouchableOpacity>(null);
-
     return (
         <View>
-            <Pressable testID="ExampleAnchorPressable" style={[Theme.styles.m5]} ref={anchorRef} onPress={() => setMenuVisible(true)}>
-                <Text>Open Menu</Text>
-            </Pressable>
-
-            <Menu
-                isVisible={menuVisible}
-                anchor={anchorRef}
-                onClose={() => setMenuVisible(false)}
-                isFullScreen
-            >
-                <View style={{ padding: 16 }}>
-                    <Text>Menu Content</Text>
-                    <Text>Menu content 2</Text>
-                    <Text>Menu content 3</Text>
-                    <Text>Menu content 4</Text>
-                    <Text>Menu Content</Text>
-                    <Text>Menu content 2</Text>
-                    <Text>Menu content 3</Text>
-                    <Text>Menu content 4</Text>
-                    <Text>Menu Content</Text>
-                    <Text>Menu content 2</Text>
-                    <Text>Menu content 3</Text>
-                    <Text>Menu content 4</Text>
-                    <Text>Menu Content</Text>
-                    <Text>Menu content 2</Text>
-                    <Text>Menu content 3</Text>
-                    <Text>Menu content 4</Text>
-                </View>
-            </Menu>
+            <View style={{ padding: 16 }}>
+                <Text>Menu Content</Text>
+                <Text>Menu content 2</Text>
+                <Text>Menu content 3</Text>
+                <Text>Menu content 4</Text>
+                <Text>Menu Content</Text>
+                <Text>Menu content 2</Text>
+                <Text>Menu content 3</Text>
+                <Text>Menu content 4</Text>
+                <Text>Menu Content</Text>
+                <Text>Menu content 2</Text>
+                <Text>Menu content 3</Text>
+                <Text>Menu content 4</Text>
+                <Text>Menu Content</Text>
+                <Text>Menu content 2</Text>
+                <Text>Menu content 3</Text>
+                <Text>Menu content 4</Text>
+            </View>
         </View>
     );
 }

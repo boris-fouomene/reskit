@@ -5,7 +5,7 @@
  */
 
 import { Portal } from '@components/Portal';
-import { useDimensions } from '@dimensions/index';
+import { getDimensions, useDimensions } from '@dimensions/index';
 import { useTheme } from '@theme/index';
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { View, TouchableOpacity, TouchableOpacityProps, StyleSheet, Dimensions, LayoutChangeEvent, ViewStyle, LayoutRectangle, Pressable, GestureResponderEvent, PressableStateCallbackType } from 'react-native';
@@ -20,6 +20,8 @@ import { IMenuAnchorMeasurements, IMenuCalculatedPosition, IMenuPosition, IMenuP
 import usePrevious from '@utils/usePrevious';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
+import { MenuContext } from './context';
+import useStateCallback from '@utils/stateCallback';
 
 
 
@@ -56,7 +58,6 @@ import { defaultStr } from '@resk/core';
  *         menuHeight,
  *         padding: 10, // Optional padding
  *         position: 'bottom', // Optional forced position
- *         screenPadding: 16, // Padding from screen edges
  *         responsive: true, // Enable responsive behavior
  *         fullScreen: false, // Disable full-screen mode
  *     });
@@ -80,20 +81,19 @@ export const useMenuPosition = ({
     menuHeight,
     padding = 0,
     position,
-    screenPadding = 16,
     responsive,
     fullScreen: customFullScreen,
 }: IUseMenuPositionProps) => {
     const isValidPosition = ["top", "left", "bottom", "right"].includes(String(position));
     const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions(responsive === true && !isValidPosition);
-    const fullScreen = !!isMobileOrTablet && customFullScreen !== false;
+    const fullScreen = isFullScreen(customFullScreen, responsive, isMobileOrTablet);
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         // Handle null measurements or fullscreen mode
         if (!anchorMeasurements || fullScreen) {
             return {
                 position: 'bottom',
-                x: 0,//screenPadding,
-                y: 0//fullScreen ? screenPadding : 0,
+                x: 0,
+                y: 0,
             };
         }
         const { pageX, pageY, width, height } = anchorMeasurements;
@@ -123,18 +123,18 @@ export const useMenuPosition = ({
                     break;
             }
             // Ensure menu stays within screen bounds
-            //x = Math.max(screenPadding, Math.min(x, screenWidth - menuWidth - screenPadding));
-            //y = Math.max(screenPadding, Math.min(y, screenHeight - menuHeight - screenPadding));
+            x = Math.min(x, screenWidth - menuWidth);
+            y = Math.min(y, screenHeight - menuHeight);
 
             return { position, x, y };
         }
 
         // Calculate available space in each direction
         const spaces = {
-            top: pageY - screenPadding,
-            bottom: screenHeight - (pageY + height + screenPadding),
-            left: pageX - screenPadding,
-            right: screenWidth - (pageX + width + screenPadding),
+            top: pageY,
+            bottom: screenHeight - (pageY + height),
+            left: pageX,
+            right: screenWidth - (pageX + width),
         };
 
         // Find position with maximum available space
@@ -165,15 +165,17 @@ export const useMenuPosition = ({
         }
 
         // Ensure menu stays within screen bounds
-        x = Math.max(screenPadding, Math.min(x, screenWidth - menuWidth - screenPadding));
-        y = Math.max(screenPadding, Math.min(y, screenHeight - menuHeight - screenPadding));
+        x = Math.min(x, screenWidth - menuWidth);
+        y = Math.min(y, screenHeight - menuHeight);
         return { position: bestPosition, x, y };
     }, [anchorMeasurements, menuWidth, menuHeight, padding, position, fullScreen, screenWidth, screenHeight]);
 
     return calculatePosition;
 };
 
-
+const isFullScreen = (fullScreen?: boolean, responsive?: boolean, isMobileOrTablet?: boolean) => {
+    return !!fullScreen || responsive === true && !!isMobileOrTablet;
+}
 /**
  * Menu Component
  * 
@@ -258,18 +260,19 @@ export const Menu: React.FC<IMenuProps> = ({
     animated = true,
     anchor: customAnchor,
     position,
-    fullScreen = false,
-    screenPadding = 16,
+    fullScreen,
     borderRadius = 8,
     anchorContainerProps,
     onOpen,
     testID,
     onLayout,
+    beforeToggle,
+    responsive,
     ...props
 }) => {
     // State for measurements
     const theme = useTheme();
-    const [isVisible, setIsVisible] = useState(false);
+    const [isVisible, setIsVisible] = useStateCallback<boolean>(false);
     const [anchorMeasurements, setAnchorMeasurements] = useState<IMenuAnchorMeasurements | null>(null);
     const [menuLayout, setMenuLayout] = useState<LayoutRectangle | null>(null);
     const anchorRef = useRef<View>(null);
@@ -281,46 +284,8 @@ export const Menu: React.FC<IMenuProps> = ({
     const translateY = useSharedValue(0);
     const translateX = useSharedValue(0);
 
-    const eventRef = useRef<GestureResponderEvent | null>(null);
-    const callBackRef = useRef<Function | null>(null);
-    const prevSibible = usePrevious(isVisible);
-    const openMenu = (event?: GestureResponderEvent, callback?: Function) => {
-        if (typeof anchorContainerProps?.onPress === 'function' && anchorContainerProps?.onPress(event) === false) {
-            return;
-        }
-        eventRef.current = event || null;
-        callBackRef.current = callback || null;
-        if (prevSibible === isVisible && isVisible) return;
-        setIsVisible(true);
-    };
-    const closeMenu = (event?: GestureResponderEvent, callback?: Function) => {
-        eventRef.current = event || null;
-        callBackRef.current = callback || null;
-        setIsVisible(false);
-    };
+
     const isOpen = () => isVisible;
-    const context = { openMenu, closeMenu, visible: isVisible, isOpen };
-    useEffect(() => {
-        if (isVisible) {
-            if (typeof onOpen === "function") {
-                onOpen();
-            }
-        } else if (onClose) {
-            onClose();
-        }
-    }, [isVisible, onOpen, onClose])
-    const anchor = useMemo(() => {
-        if (typeof customAnchor === 'function') {
-            return (state: PressableStateCallbackType) => {
-                const a = customAnchor({ ...state, ...context });
-                if (!isValidElement(a)) return null;
-                return a;
-            }
-        }
-        return isValidElement(customAnchor) ? customAnchor : null;
-    }, [customAnchor, context, isVisible]);
-
-
     // Measure anchor element position
     const measureAnchor = useCallback(() => {
         if (anchorRef.current) {
@@ -335,7 +300,8 @@ export const Menu: React.FC<IMenuProps> = ({
         const { width, height } = event.nativeEvent.layout;
         setMenuLayout({ width, height, x: 0, y: 0 });
     }, []);
-
+    const { isMobileOrTablet, width: screenWidth, height: screenHeight } = getDimensions();
+    const _isFullScreen = isFullScreen(fullScreen, responsive, isMobileOrTablet);
     // Get position calculation from custom hook
     const calculatePosition = useMenuPosition({
         anchorMeasurements,
@@ -343,9 +309,42 @@ export const Menu: React.FC<IMenuProps> = ({
         menuHeight: menuLayout?.height || 0,
         position,
         fullScreen,
-        screenPadding,
+        responsive,
     });
-
+    const context1 = { animated, responsive, testID, borderRadius, fullScreen: _isFullScreen, ...props, isOpen, visible: isVisible, calculatePosition }
+    const openMenu = (callback?: Function) => {
+        if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
+        setIsVisible(true, () => {
+            if (typeof callback === "function") {
+                callback();
+            }
+            if (typeof onOpen === "function") {
+                onOpen();
+            }
+        });
+    };
+    const closeMenu = (callback?: Function) => {
+        if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
+        setIsVisible(false, () => {
+            if (typeof callback === "function") {
+                callback();
+            }
+            if (typeof onClose === "function") {
+                onClose();
+            }
+        });
+    };
+    const context = { ...context1, visible: isVisible, isOpen, openMenu, closeMenu };
+    const anchor = useMemo(() => {
+        if (typeof customAnchor === 'function') {
+            return (state: PressableStateCallbackType) => {
+                const a = customAnchor({ ...state, ...context });
+                if (!isValidElement(a)) return null;
+                return a;
+            }
+        }
+        return isValidElement(customAnchor) ? customAnchor : null;
+    }, [customAnchor, calculatePosition, isVisible]);
     // Update position when visibility changes
     useEffect(() => {
         if (isVisible) {
@@ -357,7 +356,6 @@ export const Menu: React.FC<IMenuProps> = ({
     useEffect(() => {
         if (anchorMeasurements && menuLayout) {
             const { x, y } = calculatePosition();
-
             if (animated) {
                 translateX.value = withSpring(x);
                 translateY.value = withSpring(y);
@@ -394,9 +392,9 @@ export const Menu: React.FC<IMenuProps> = ({
     }));
 
     // Full screen styles
-    const menuContainerStyle = fullScreen ? {
-        width: Dimensions.get('window').width - (screenPadding * 2),
-        height: Dimensions.get('window').height - (screenPadding * 2),
+    const menuContainerStyle = _isFullScreen ? {
+        width: screenWidth,
+        height: screenHeight,
     } : {};
 
     //React.setRef(ref,context);
@@ -407,38 +405,47 @@ export const Menu: React.FC<IMenuProps> = ({
         return children;
     }, [children, context, isVisible]);
     return <>
-        <Pressable testID={testID + "_AnchorContainer"} ref={anchorRef} {...anchorContainerProps}>
-            {anchor}
-        </Pressable>
+        <MenuContext.Provider value={context}>
+            <Pressable testID={testID + "_AnchorContainer"} ref={anchorRef} {...anchorContainerProps} onPress={(event) => {
+                if (typeof anchorContainerProps?.onPress === 'function') {
+                    anchorContainerProps?.onPress(event)
+                }
+                openMenu();
+            }}>
+                {anchor}
+            </Pressable>
+        </MenuContext.Provider>
         {isVisible ? <Portal absoluteFill>
             <Pressable
-                onPress={onClose}
+                onPress={(e) => { closeMenu() }}
                 style={styles.portalBackdrop}
             />
-            <Animated.View
-                testID={testID}
-                {...props}
-                onLayout={(event) => {
-                    if (typeof onLayout === 'function') {
-                        onLayout(event);
-                    }
-                    onMenuLayout(event);
-                }}
-                style={[
-                    styles.menuContainer,
-                    { backgroundColor: theme.colors.surface },
-                    {
-                        borderRadius,
-                        ...menuContainerStyle,
-                    },
-                    props.style,
-                    animatedStyle,
-                ]}
-            >
-                <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
-                    <> {child}</>
-                </TouchableOpacity>
-            </Animated.View>
+            <MenuContext.Provider value={context}>
+                <Animated.View
+                    testID={testID}
+                    {...props}
+                    onLayout={(event) => {
+                        if (typeof onLayout === 'function') {
+                            onLayout(event);
+                        }
+                        onMenuLayout(event);
+                    }}
+                    style={[
+                        styles.menuContainer,
+                        { backgroundColor: theme.colors.surface },
+                        {
+                            borderRadius,
+                            ...menuContainerStyle,
+                        },
+                        props.style,
+                        animatedStyle,
+                    ]}
+                >
+                    <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
+                        <> {child}</>
+                    </TouchableOpacity>
+                </Animated.View>
+            </MenuContext.Provider>
         </Portal> : null}
     </>
 };
@@ -471,3 +478,6 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
 });
+
+export * from "./context";
+export * from "./types";

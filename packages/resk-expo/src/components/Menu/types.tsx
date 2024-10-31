@@ -1,6 +1,6 @@
 
 import { ReactNode } from "react";
-import { GestureResponderEvent, PressableProps, ViewProps } from "react-native";
+import { GestureResponderEvent, LayoutRectangle, PressableProps, ViewProps } from "react-native";
 import { PressableStateCallbackType } from "react-native";
 import { AnimatedProps } from "react-native-reanimated";
 
@@ -175,6 +175,7 @@ export interface IMenuCalculatedPosition {
  *         an optional event parameter and an optional callback function. This provides 
  *         flexibility in handling menu closure and executing follow-up actions.
  * 
+
  * @example
  * // Example of using IMenuContext in a React component
  * const MyMenuComponent: React.FC = () => {
@@ -203,15 +204,15 @@ export interface IMenuCalculatedPosition {
  *     );
  * };
  */
-export interface IMenuContext {
+export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "anchorContainerProps"> {
     /** Indicates whether the menu is currently visible */
     visible?: boolean;
     /** Function to check if the menu is open */
     isOpen?: () => boolean;
     /** Method to open the menu, with optional event and callback */
-    openMenu: (event?: GestureResponderEvent, callback?: Function) => any;
+    openMenu: (callback?: Function) => any;
     /** Method to close the menu, with optional event and callback */
-    closeMenu: (event?: GestureResponderEvent, callback?: Function) => any;
+    closeMenu: (callback?: Function) => any;
 }
 
 
@@ -258,10 +259,6 @@ export interface IMenuContext {
  *         set to true, the menu will take up the entire screen, which 
  *         can be useful for mobile or immersive experiences.
  * 
- * @property {number} [screenPadding] - 
- *         Optional padding from the edges of the screen in pixels. This 
- *         ensures that the menu does not get too close to the screen 
- *         edges, improving usability and aesthetics.
  * 
  * @property {boolean} [responsive] - 
  *         Optional flag to enable responsive behavior for the menu. 
@@ -284,7 +281,6 @@ export interface IMenuContext {
  *     padding: 10,                // 10 pixels of padding
  *     position: 'bottom',         // Force menu to appear below the anchor
  *     fullScreen: false,        // Menu is not in full-screen mode
- *     screenPadding: 20,          // 20 pixels of padding from screen edges
  *     responsive: true,           // Enable responsive behavior
  * };
  * 
@@ -304,9 +300,6 @@ export interface IUseMenuPositionProps {
     position?: IMenuPosition;
     /** Enable full-screen mode */
     fullScreen?: boolean;
-    /** Padding from screen edges */
-    screenPadding?: number;
-
     responsive?: boolean;
 }
 
@@ -352,11 +345,6 @@ export interface IUseMenuPositionProps {
  *         or immersive experiences.
  * 
  * 
- * @property {number} [screenPadding] - 
- *         Optional padding in pixels from the edges of the screen. This ensures 
- *         that the menu does not get too close to the screen edges, improving 
- *         usability and aesthetics.
- * 
  *  * 
  * @property {number} [borderRadius] - 
  *         Optional border radius for the menu. This allows for rounded corners, 
@@ -372,14 +360,21 @@ export interface IUseMenuPositionProps {
  * @property {Omit<PressableProps, 'children'>} [anchorContainerProps] - 
  * @property {Omit<PressableProps, 'children' | 'onPress'>} [anchorContainerProps] - Props for the pressable component parent of the anchor element.
  * @property {Element | ((options: IMenuContext) => Element)} [children] - Menu content, either as static JSX or a function returning JSX based on the menu context.
- *
+ * @property {(menuContext:IMenuContext) => any} beforeToggle - 
+ *         Method called before the menu is toggled. If this method returns false, the menu will not be toggled.
+ * @property {boolean} [responsive] - 
+ *         Optional flag to enable responsive behavior for the menu. 
+ *         When set to true, the menu will adjust its position and size 
+ *         based on the viewport dimensions, ensuring a good user experience 
+ *         across different screen sizes. Ii's mostly used when the fullScreen props is not false to ensure the menu fit  the screen in mobile or tablet device.
+
+ * 
  * @example
  * // Example of using IMenuProps in a functional Menu component
  * const MyMenu: React.FC<IMenuProps> = ({
  *     animated = true,
  *     position,
  *     fullScreen,
- *     screenPadding = 16,
  *     borderRadius = 8,
  *     onOpen,
  *     onClose,
@@ -388,7 +383,7 @@ export interface IUseMenuPositionProps {
  *     children,
  * }) => {
  *     return (
- *         <View style={{ padding: screenPadding, borderRadius }}>
+ *         <View style={{orderRadius }}>
  *             {typeof anchor === 'function' ? anchor({ openMenu: onOpen }) : anchor}
  *             {isVisible && (
  *                 <Animated.View style={{ position: fullScreen ? 'absolute' : 'relative' }}>
@@ -428,10 +423,6 @@ export type IMenuProps = Omit<AnimatedProps<ViewProps>, "children"> & {
 
     /** When true, the menu occupies the entire screen. */
     fullScreen?: boolean;
-
-    /** Defines padding from the screen edges. */
-    screenPadding?: number;
-
     /** Sets the border radius for the menu, allowing for rounded corners. */
     borderRadius?: number;
 
@@ -439,18 +430,29 @@ export type IMenuProps = Omit<AnimatedProps<ViewProps>, "children"> & {
     onOpen?: () => void;
 
     /** Required callback that is invoked when the menu closes. */
-    onClose: () => void;
+    onClose?: () => void;
 
     /** The anchor element or function associated with the Menu component. */
     anchor: IMenuAnchor;
 
     /** Props for the touchable component when the anchor is a ReactNode. */
-    anchorContainerProps?: Omit<PressableProps, 'children' | "onPress"> & {
-        onPress?: (event?: GestureResponderEvent) => any
-    };
+    anchorContainerProps?: Omit<PressableProps, 'children'>;
 
     /** Menu content, either as static JSX or a function returning JSX based on the menu context. */
-    children?: Element | ((options: IMenuContext) => Element);
+    children?: JSX.Element | ((options: IMenuContext) => JSX.Element);
+
+    /** Method called before the menu is toggled. if this method returns false, the menu will not be toggled */
+    beforeToggle?: (menuContext: IMenuContext) => any;
+
+    /**
+    *     Optional flag to enable responsive behavior for the menu. 
+    *        When set to true, the menu will adjust its position and size 
+    *        based on the viewport dimensions, ensuring a good user experience 
+    *        across different screen sizes. Ii's mostly used when the fullScreen props is not false to ensure the menu fit  the screen in mobile or tablet device.
+
+     */
+
+    responsive?: boolean;
 }
 
 /**

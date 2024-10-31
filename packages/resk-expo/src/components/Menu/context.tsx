@@ -103,7 +103,7 @@ export const MenuContext = createContext<IMenuContext | null>(null);
  *     );
  * };
  */
-export const useMenu = () => {
-    const context = useContext(MenuContext) || { openMenu: () => { }, closeMenu: () => { }, isOpen: () => undefined };
+export const useMenu = (): IMenuContext | undefined => {
+    const context = useContext(MenuContext);
     return context as IMenuContext;
 };

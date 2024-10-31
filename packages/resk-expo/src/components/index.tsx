@@ -19,3 +19,5 @@ export * from "./Surface";
 export * from "./Tab";
 export * from "./Expandable";
 export * from "./Menu";
+export * from "./Modal";
+export * from "./ReanimatedView";

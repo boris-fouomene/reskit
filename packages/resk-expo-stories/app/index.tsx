@@ -1,6 +1,6 @@
-import { FontIcon, Tab, Switch, Checkbox, Surface, Portal, Expandable, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
+import { FontIcon, Tab, Switch, Checkbox, Modal, Portal, Expandable, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
 
-import { View, Text, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, TouchableOpacity, Pressable, Button } from 'react-native'
 import React, { useRef, useState } from 'react'
 
 
@@ -66,7 +66,26 @@ const index = () => {
         </View>
     )
 }
-
+const ModalExample = () => {
+    const [visible, setVisible] = useState(false);
+    const openModal = () => {
+        setVisible(true);
+    };
+    const closeModal = () => {
+        setVisible(false);
+    };
+    return (
+        <View>
+            <Button title="Open Modal" onPress={openModal} />
+            <Modal visible={visible} onDismiss={closeModal}>
+                <View>
+                    <Text>Modal Content</Text>
+                    <Text onPress={closeModal}>Close Modal</Text>
+                </View>
+            </Modal>
+        </View>
+    )
+}
 const MenuExample = () => {
     return (
         <View>

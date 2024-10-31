@@ -63,6 +63,7 @@ const index = () => {
                     <Label>An expanded content</Label>
                 </View>
             </Expandable>
+            <ModalExample />
         </View>
     )
 }

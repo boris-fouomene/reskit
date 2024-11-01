@@ -20,7 +20,7 @@ const ANIMATION_DURATION = 300;
  *                                                           for the animation 
  *                                                           (e.g., "up", "down", 
  *                                                           "left", "right").
- * @param {number} [props.duration] - Optional duration of the animation in 
+ * @param {number} [props.animationDuration] - Optional duration of the animation in 
  *                                     milliseconds. Defaults to 300ms.
  * @param {function} [props.enteringCallback] - Optional callback that is 
  *                                               invoked when the entering 
@@ -36,32 +36,31 @@ const ANIMATION_DURATION = 300;
  *
  * @example
  * <ReanimatedView
- *   type="fade"
- *   direction="up"
- *   duration={500}
+ *   animationTtype="fade"
+ *   animationDirection="up"
+ *   animationDuration={500}
  *   enteringCallback={(e) => console.log("Entering:", e)}
  *   exitingCallback={(e) => console.log("Exiting:", e)}
  * >
  *   <Text>Hello, World!</Text>
  * </ReanimatedView>
  */
-export const ReanimatedView = React.forwardRef(({ type, direction, enteringCallback, exitingCallback, ...rest }: IReanimatedViewProp, ref: React.Ref<any>) => {
-  const duration = typeof rest.duration === "number" ? rest.duration : ANIMATION_DURATION;
-  let animations: any = getReanimatedAnimations(type, direction);
-  const style = useAnimatedStyle(() => {
-    return {};
-  });
-
+export const ReanimatedView = React.forwardRef(({ animationType, animationDirection, enteringCallback, exitingCallback, ...rest }: IReanimatedViewProp, ref: React.Ref<any>) => {
+  const animationDuration = typeof rest.animationDuration === "number" ? rest.animationDuration : ANIMATION_DURATION;
+  if (animationType !== "fade" && !animationDirection) {
+    animationDirection = "up";
+  }
+  let animations: any = getReanimatedAnimations(animationType, animationDirection);
   // Default callback functions for entering and exiting animations
-  enteringCallback = enteringCallback || function () { console.log(" is entering"); };
-  exitingCallback = exitingCallback || function () { console.log(" is animation exiting"); };
+  enteringCallback = typeof enteringCallback == "function" ? enteringCallback : function () { };
+  exitingCallback = typeof exitingCallback == "function" ? exitingCallback : function () { };
 
-  // Configure animations with duration and callbacks
+  // Configure animations with animationDuration and callbacks
   if (animations.entering && animations.exiting) {
-    animations.entering.duration(duration).withCallback(enteringCallback);
-    animations.exiting.duration(duration).withCallback(exitingCallback);
+    animations.entering.duration(animationDuration).withCallback(enteringCallback);
+    animations.exiting.duration(animationDuration).withCallback(exitingCallback);
   } else {
-    animations = getDefaultReanimatedAnimation({ duration, enteringCallback, exitingCallback });
+    animations = getDefaultReanimatedAnimation({ duration: animationDuration, enteringCallback, exitingCallback });
   }
 
   return (
@@ -69,7 +68,6 @@ export const ReanimatedView = React.forwardRef(({ type, direction, enteringCallb
       testID={'RN_AnimationComponent'}
       ref={ref}
       {...rest}
-      style={[rest.style, style]}
       {...animations}
     />
   );
@@ -89,7 +87,7 @@ export default ReanimatedView;
  * callbacks for entering and exiting animations, and other animation 
  * related properties.
  *
- * @property {number | undefined} duration - Optional duration of the 
+ * @property {number | undefined} animationDuration - Optional duration of the 
  *                                            animation in milliseconds. Default to 300ms.
  * @property {React.ReactNode | undefined} children - Optional children 
  *                                                    elements to be rendered 
@@ -100,10 +98,10 @@ export default ReanimatedView;
  * @property {((e: any) => void) | undefined} exitingCallback - 
  *        Optional callback function that is invoked when the exiting 
  *        animation completes. Receives an event object.
- * @property {IReanimatedAnimationType | undefined} type - Optional type of 
+ * @property {IReanimatedAnimationType | undefined} animationType - Optional type of 
  *                                                         animation (e.g., 
  *                                                         "fade", "slide").
- * @property {IReanimatedAnimationDirection | undefined} direction - 
+ * @property {IReanimatedAnimationDirection | undefined} animationDirection - 
  *        Optional direction for the animation (e.g., "up", "down", 
  *        "left", "right").
  * @property {number | undefined} animationDelay - Optional delay before 
@@ -111,12 +109,12 @@ export default ReanimatedView;
  *                                                in milliseconds.
  */
 export type IReanimatedViewProp = React.ComponentProps<typeof Animated.View> & {
-  duration?: number;
+  animationDuration?: number;
   children?: any;
   enteringCallback?: (e: any) => void;
   exitingCallback?: (e: any) => void;
-  type?: IReanimatedAnimationType;
-  direction?: IReanimatedAnimationDirection;
+  animationType?: IReanimatedAnimationType;
+  animationDirection?: IReanimatedAnimationDirection;
   animationDelay?: number;
 };
 

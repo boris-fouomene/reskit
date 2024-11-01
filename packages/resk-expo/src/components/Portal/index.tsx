@@ -100,7 +100,7 @@ export const PortalContext = createContext<IPortalContextProps | undefined>(unde
 export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     // Stores the list of active portals using a ref to avoid unnecessary re-renders.
     const portalRefs = useRef<IPortalItem[]>([]);
-    const startIndex = useRef<number>(Platform.isWeb() ? getMaxZindex() : 1000).current;
+    const startIndex = useRef<number>(Math.max(Platform.isWeb() ? getMaxZindex() : 1000, 1000)).current;
     /**
      * Adds a portal with a unique key and a JSX component to be rendered.
      * 
@@ -239,6 +239,7 @@ export function Portal<AsProps extends ViewProps = IViewProps>({ children, ...pr
 
 const styles = StyleSheet.create({
     absoluteFill: {
-        ...StyleSheet.absoluteFillObject
+        ...StyleSheet.absoluteFillObject,
+        flex: 1,
     },
 })

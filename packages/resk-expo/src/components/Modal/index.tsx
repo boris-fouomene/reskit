@@ -3,7 +3,7 @@ import { useStableMemo, usePrevious } from "@utils";
 import Platform from "@platform";
 import { StyleSheet, ViewProps, Pressable, GestureResponderEvent, PressableProps } from "react-native";
 import View, { IViewProps } from "@components/View";
-import { useTheme } from "@theme";
+import Theme, { useTheme } from "@theme";
 import { Portal } from "@components/Portal";
 import { MAX_WIDTH, MIN_WIDTH, MIN_HEIGHT } from "./utils";
 import BackHandler from "@components/BackHandler";
@@ -20,20 +20,20 @@ import { useDimensions } from "@dimensions";
 export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 
-export const Modal = ({ visible, testID, type = "fade", contentContainerProps, duration = 300, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: backgroundOpacityP, contentProps, ...props }: IModalProps) => {
+export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContainerProps, animationDuration, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: backgroundOpacityP, contentProps, ...props }: IModalProps) => {
   backgroundOpacityP = typeof backgroundOpacityP === "number" ? backgroundOpacityP : 0.5;
   contentProps = Object.assign({}, contentProps);
-  duration = typeof duration === "number" ? duration : 300;
-  const { height, width, isMobileOrTablet } = useDimensions(responsive !== false);
-  const prevVisible = usePrevious(visible);
-  const isHidden = prevVisible === visible && !visible;
+  animationDuration = typeof animationDuration === "number" ? animationDuration : 300;
+  const { height, width, isMobileOrTablet } = useDimensions(responsive !== false && visible);
   const theme = useTheme();
   const { maxHeight, maxWidth } = useMemo(() => {
+    customMaxWidth = typeof customMaxWidth === "number" ? customMaxWidth : MAX_WIDTH;
+    customMaxWidth = Math.min(width, Math.max(customMaxWidth, MAX_WIDTH));
     return {
-      maxHeight: Math.min(MAX_WIDTH, 80 * width / 100),
+      maxHeight: Math.min(customMaxWidth, 80 * width / 100),
       maxWidth: Math.max((height > 600 ? (50) : 70) * height / 100, MIN_HEIGHT)
     }
-  }, [width, height]);
+  }, [width, height, customMaxWidth]);
   const { fullScreen, modalStyle, contentStyle } = useMemo(() => {
     const fullScreen = customFullScreen !== undefined ? customFullScreen : responsive !== false ? isMobileOrTablet : false;
     return {
@@ -53,7 +53,7 @@ export const Modal = ({ visible, testID, type = "fade", contentContainerProps, d
   const generateBackgroundOpacity = (value?: number) => {
     const val = typeof value == "number" ? value : visible ? backgroundOpacityP : 0;
     backgroundOpacity.value = withTiming(val as number, {
-      duration,
+      duration: animationDuration,
       easing: Easing.inOut(Easing.ease),
     });
   };
@@ -62,7 +62,6 @@ export const Modal = ({ visible, testID, type = "fade", contentContainerProps, d
     generateBackgroundOpacity(!visible ? 0 : undefined);
   }, [visible]);
   hiddenRef.current = false;
-  const animatedStyle = null;
 
   const backgroundAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -85,19 +84,16 @@ export const Modal = ({ visible, testID, type = "fade", contentContainerProps, d
     );
     return () => backHandler?.remove();
   }, []);
-
+  if (!visible) return null;
   return (
-    <Portal>
-      <ReanimatedView
-        testID={testID}
-        {...props}
+    <Portal style={styles.absoluteFill} testID={testID + "_ModalPortal"}>
+      <Animated.View
+        testID={testID + "_ModalBackdrop"}
         style={[
           { backgroundColor: theme.colors.backdrop },
           styles.backdrop,
           styles.absoluteFill,
           backgroundAnimatedStyle,
-          !visible && styles.hidden,
-          props.style,
         ]}
         pointerEvents="none"
       />
@@ -107,29 +103,30 @@ export const Modal = ({ visible, testID, type = "fade", contentContainerProps, d
         style={[
           styles.content, styles.absoluteFill,
           modalStyle, props.style,
-          isHidden && styles.hidden || styles.notHidden,
+          styles.notHidden,
           contentContainerProps.style,
-          !visible && styles.hidden,
         ]}
         onPress={(e: GestureResponderEvent) => {
           if (fullScreen || dismissable === false) return;
           handleDismiss(e);
         }}
       >
-        <View
-          testID={testID + "_ModalContent"}
-          {...contentProps}
+        <ReanimatedView
+          testID={testID}
+          animationType="fade"
+          {...props}
+          animationDuration={animationDuration}
           style={[
             styles.content,
             { backgroundColor: theme.colors.background },
             contentStyle,
-            contentProps.style,
+            props.style,
           ]}
         >
           <ModalContext.Provider value={{ ...props, modalVisible: visible as boolean, isModalClosed: () => !!!visible, isModalOpened: () => !!visible, maxWidth: !fullScreen ? maxWidth : undefined, maxHeight: !fullScreen ? maxHeight : undefined, handleDismiss, onDismiss, dismissable, backgroundOpacity: backgroundOpacityP, visible, responsive, fullScreen }}>
             {children}
           </ModalContext.Provider>
-        </View>
+        </ReanimatedView>
       </AnimatedPressable>
     </Portal>
   );
@@ -173,23 +170,19 @@ export const Modal = ({ visible, testID, type = "fade", contentContainerProps, d
  * @example
  * <Modal animations={{ fade: true }} />
  *
- * @property {"top" | "bottom" | "left" | "right"} animations.from - The direction from 
- * which the modal will be animated. Can be one of: "top", "bottom", "left", or "right".
+ * @property {"up" | "right" | "left" | "down"} animationDirection - The direction from 
+ * which the modal will be animated.  up - Represents an upward animation direction,
+ *   right - Represents a rightward animation direction,left - Represents a leftward animation direction,
+ *  down - Represents a downward animation direction.
  * 
  * @example
- * <Modal animations={{ from: "bottom" }} />
+ * <Modal animationDirection="bottom" />
  *
- * @property {boolean} [animations.damping] - Indicates whether the animation should 
- * be damped. If true, the animation will have a damping effect.
- * 
- * @example
- * <Modal animations={{ damping: true }} />
- *
- * @property {number} [animations.duration] - The duration of the animation in milliseconds. 
+ * @property {number} [animations.animationDuration] - The animationDuration of the animation in milliseconds. 
  * Defaults to 300 milliseconds if not specified.
  * 
  * @example
- * <Modal animations={{ duration: 500 }} />
+ * <Modal animations={{ animationDuration: 500 }} />
  *
  * @property {(event?: GestureResponderEvent | KeyboardEvent) => any} [onDismiss] - 
  * A callback function that is called when an attempt is made to close the modal. 
@@ -271,16 +264,17 @@ export interface IModalProps extends IReanimatedViewProp {
    * Properties for the content wrapper component that wraps the children of the modal. This allows for further customization of the modal's content.
    */
   contentContainerProps?: AnimatedProps<PressableProps>;
+
+  /***
+   * the maximum width of the modal. This is particularly useful when the modal is not displayed in full-screen mode, allowing for better layout control.
+   */
+  maxWidth?: number;
 }
 const styles = StyleSheet.create({
   absoluteFill: {
     ...StyleSheet.absoluteFillObject,
     width: "100%",
     height: "100%",
-  },
-  container: {
-    ...StyleSheet.absoluteFillObject,
-
   },
   hidden: {
     opacity: 0,

@@ -18,7 +18,7 @@ import { isRTL } from "@utils/i18nManager";
  * import StyleHelper from './StyleHelper';
  * 
  * const WelcomeCard = () => (
- *   <View style={[StyleHelper.p4, StyleHelper.bgWhite, StyleHelper.rounded, StyleHelper.shadow]}>
+ *   <View style={[StyleHelper.p4, StyleHelper.bgWhite, StyleHelper.rounded]}>
  *     <Text style={[StyleHelper.textXl, StyleHelper.textDark, StyleHelper.fontBold]}>
  *       Welcome aboard!
  *     </Text>
@@ -400,32 +400,6 @@ const styles = StyleSheet.create({
         pointerEvents: "none",
         userSelect: "text",
     },
-
-
-
-    /**
-         * Style for box shadow.
-         * Provides shadow properties for elevation and depth effect.
-         * 
-         * @property {string} shadowColor - Color of the shadow.
-         * @property {object} shadowOffset - Offset for the shadow.
-         * @property {number} shadowOpacity - Opacity of the shadow.
-         * @property {number} shadowRadius - Radius of the shadow blur.
-         * @property {number} elevation - Android-specific shadow elevation.
-         * 
-         * @example
-         * <View style={styles.boxShadow}>
-         *   <Text>Shadowed Box</Text>
-         * </View>
-         */
-    boxShadow: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 2,
-        elevation: 2,
-    },
-
 
     /**
      * Pointer cursor style for web platforms.

@@ -319,11 +319,13 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
       </Pressable>
       {autoMountChildren !== false || isExpanded ? (
         <Animated.View
+          testID={testID + "_Content"} {...contentProps}
           style={[
             styles.content,
             styles.children, contentProps?.style,
             animatedStyle,
-          ]} testID={testID + "_Content"} {...contentProps}>
+          ]} 
+        >
           {children}
         </Animated.View>
       ) : null}

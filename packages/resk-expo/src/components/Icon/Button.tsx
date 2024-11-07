@@ -84,6 +84,8 @@ const PADDING = 4;
  * 
  * @property {ISurfaceProps} [containerProps] - Properties for the container 
  * view of the button, allowing further customization of the layout and style.
+ * 
+ * @property {number} [containerSize] - Size of the button container. If not provided, it will be calculated based on the size of the icon.
  *
  * @example
  * // Customizing the container view
@@ -128,6 +130,13 @@ export type IIconButtonProps = IIconProps & {
      * Props for the container view.
      */
     containerProps?: ISurfaceProps;
+
+    /**
+     * Size of the button container.
+        If not provided, it will be calculated based on the size of the icon.
+    *
+     */
+    containerSize?: number;
 };
 
 /**
@@ -198,6 +207,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
             name,
             source,
             containerProps,
+            containerSize,
             ...rest
         },
         ref
@@ -216,15 +226,15 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
         });
         size = typeof size == "number" ? size : DEFAULT_FONT_ICON_SIZE;
         const iconColor = Colors.isValid(color) ? color : theme.colors.text;
-        const buttonSize = size + 2 * PADDING;
+        containerSize = typeof containerSize == "number" ? containerSize : (size + 2 * PADDING);
         const {
             borderWidth = isLoading ? 0 : 1,
-            borderRadius = buttonSize / 2,
+            borderRadius = containerSize / 2,
             borderColor = isLoading ? undefined : theme.colors.outline,
         } = (StyleSheet.flatten(style) || {}) as ViewStyle;
         const butonSizeStyle = {
-            width: buttonSize,
-            height: buttonSize
+            width: containerSize,
+            height: containerSize
         }
         const icon = useGetIcon<IIconProps>({
             as: TouchableRipple,

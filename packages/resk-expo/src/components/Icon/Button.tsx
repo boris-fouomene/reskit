@@ -15,7 +15,7 @@ import { DEFAULT_FONT_ICON_SIZE } from "./Font";
 import { ITheme } from '@theme/types';
 import { defaultStr } from '@resk/core';
 
-const PADDING = 4;
+const PADDING = 8;
 
 /**
  * Represents the properties for an IconButton component.

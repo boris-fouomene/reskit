@@ -21,3 +21,4 @@ export * from "./Expandable";
 export * from "./Menu";
 export * from "./Modal";
 export * from "./ReanimatedView";
+export * from "./Appbar";

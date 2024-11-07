@@ -29,7 +29,8 @@ const Surface = React.forwardRef((props: ISurfaceProps, ref: React.ForwardedRef<
     const { style, elevation, ...rest } = props;
     return <View testID={'RN_SurfaceComponent'} {...rest} ref={ref}
         style={[{ backgroundColor: theme.colors.surface },
-            style, elevation && typeof elevation == 'number' && Theme.elevations[elevation] ? Theme.elevations[elevation] : null
+        elevation && typeof elevation == 'number' && Theme.elevations[elevation] ? Theme.elevations[elevation] : null,
+            style
         ]} />
 });
 /**

@@ -1,88 +1,20 @@
 import { defaultStr } from '@resk/core';
-import React from 'react';
+import React, { useMemo, useRef } from 'react';
+import { useAnimations } from './animations';
 import {
-    Animated as RNAnimated,
     StyleSheet,
     Pressable,
     View,
-    PressableProps
 } from 'react-native';
 import { Colors, useTheme } from '@theme';
-import platform from '@platform/index';
+import Platform from '@platform/index';
+import { ITouchableRippleProps } from './types';
+import { getColors } from './utils';
 
-const useNativeDriver = platform.isMobileNative();
-/**
- * Interface representing the props for the `TouchableRipple` component.
- * This interface extends the standard `PressableProps` from React Native,
- * allowing for all standard pressable properties alongside custom props specific 
- * to the ripple effect functionality.
- *
- * @interface ITouchableRippleProps
- * 
- * @extends PressableProps
- * 
- * @property {string} [rippleColor] - Specifies the color of the ripple effect. 
- * If not provided, it defaults to a semi-transparent black color 
- * ('rgba(0, 0, 0, 0.12)'). This property allows for customization 
- * of the ripple effect to match the application's theme.
- * 
- * @example
- * ```tsx
- * <TouchableRipple 
- *   onPress={() => console.log('Pressed!')}
- *   rippleColor="rgba(0, 0, 0, 0.12)"
- *   hoverColor="#ffffff"
- * >
- *   <Text>Click me!</Text>
- * </TouchableRipple>
- * ```
- * 
- * @property {string} [hoverColor] - Defines the background color of the 
- * component when it is hovered over. The default value is 'transparent'.
- * This property can be used to provide visual feedback to the user 
- * when the component is interacted with.
- * 
- * @example
- * ```tsx
- * <TouchableRipple 
- *   onPress={() => {}}
- *   rippleColor="rgba(255, 0, 0, 0.12)"
- *   hoverColor="#f5f5f5"
- *   style={{ borderRadius: 8 }}
- * >
- *   <Text>Styled Button</Text>
- * </TouchableRipple>
- * ```
- * 
- * @example
- * Here’s an example of how to use the `TouchableRipple` component with 
- * both ripple and hover colors customized:
- * 
- * ```tsx
- * const MyButton = () => (
- *   <TouchableRipple 
- *     onPress={() => alert('Button Pressed!')}
- *     rippleColor="rgba(0, 150, 136, 0.6)"
- *     hoverColor="#e0f7fa"
- *     style={{ padding: 10, borderRadius: 5 }}
- *   >
- *     <Text style={{ color: '#00796b' }}>Press Me!</Text>
- *   </TouchableRipple>
- * );
- * ```
- * 
- * @note 
- * The `TouchableRipple` component is designed to provide a visually appealing 
- * interaction experience by implementing a ripple effect. Ensure that the 
- * colors used for `rippleColor` and `hoverColor` maintain good contrast 
- * with the text and background for accessibility purposes.
- */
-export interface ITouchableRippleProps extends PressableProps {
-    /** Color of the ripple effect. Default is 'rgba(0, 0, 0, 0.12)' */
-    rippleColor?: string;
-    /** Background color of the component. Default is 'transparent' */
-    hoverColor?: string;
-}
+export * from "./types";
+
+const isAndroid = Platform.isAndroid();
+
 
 /**
  * A custom `TouchableRipple` component that implements Material Design's ripple effect 
@@ -162,27 +94,19 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
     style,
     disabled = false,
     testID,
+    borderless,
+    borderRadius,
     ...props
 }, ref) => {
     const theme = useTheme();
+    const { rippleColor, hoverColor } = getColors({ rippleColor: customRippleColor, hoverColor: customHoverColor, theme });
     testID = defaultStr(testID, "RNTouchableRipple");
-    const rippleColor = Colors.isValid(customRippleColor) ? customRippleColor : Colors.setAlpha(theme.colors.onSurface, 0.12)
-    const hoverColor = Colors.isValid(customHoverColor) ? customHoverColor : Colors.fade(rippleColor as string, 0.5);
-    const animated = new RNAnimated.Value(1);
-    const fadeIn = () => {
-        RNAnimated.timing(animated, {
-            toValue: 0.4,
-            duration: 100,
-            useNativeDriver,
-        }).start();
-    };
-    const fadeOut = () => {
-        RNAnimated.timing(animated, {
-            toValue: 1,
-            duration: 200,
-            useNativeDriver,
-        }).start();
-    };
+    const { fadeIn, fadeOut, animatedRef } = useAnimations();
+    const { webStyle } = useMemo(() => {
+        return {
+            webStyle: !isAndroid ? [typeof borderRadius === "number" && { borderRadius } || null] : null
+        }
+    }, [borderRadius, isAndroid])
     const rippleContent = null;
     return (
         <Pressable
@@ -190,9 +114,14 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
             disabled={disabled}
             ref={ref}
             {...props}
+            android_ripple={Object.assign({
+                color: rippleColor,
+                borderless,
+                radius: borderRadius,
+            }, props.android_ripple)}
             onPressOut={(event) => {
                 if (disabled) return;
-                fadeOut();
+                typeof fadeOut == "function" && fadeOut();
                 //handlePressOut(event);
                 if (typeof props.onPressOut == "function") {
                     props.onPressOut(event);
@@ -200,19 +129,22 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
             }}
             onPressIn={(event) => {
                 if (disabled) return;
-                fadeIn();
+                typeof fadeIn == "function" && fadeIn();
                 //handlePressIn(event);
                 if (typeof props.onPressIn == "function") {
                     props.onPressIn(event);
                 }
             }}
             testID={testID}
-            style={(state) => [
-                typeof style === 'function' ? style(state) : style,
-                styles.container,
-                (state as any)?.hovered && !disabled && hoverColor && { backgroundColor: hoverColor },
-                state.pressed && !disabled && rippleColor && { backgroundColor: rippleColor },
-            ]}
+            style={(state) => {
+                return ([
+                    styles.container,
+                    (state as any)?.hovered && !disabled && hoverColor && { backgroundColor: hoverColor },
+                    state.pressed && !disabled && rippleColor && { backgroundColor: rippleColor },
+                    webStyle,
+                    typeof style === 'function' ? style(state) : style
+                ]);
+            }}
         >
             {typeof children === "function" ? (state) => {
                 return <>

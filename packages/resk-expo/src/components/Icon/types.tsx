@@ -560,6 +560,7 @@ export type IIconProps = Partial<IFontIconProps> & ImageProps & ITooltipBaseProp
 
     onPress?: (event: GestureResponderEvent) => void;
 
+    as?: ITooltipProps['as'];
 };
 
 

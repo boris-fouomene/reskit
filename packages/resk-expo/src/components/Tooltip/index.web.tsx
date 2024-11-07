@@ -36,7 +36,7 @@ const Tooltip = React.forwardRef(({
     children, title, tooltip, disabled, as, testID, id, ...rest
 }: ITooltipProps, ref) => {
     // Set a default testID if none is provided
-    testID = defaultStr(testID, "RN_TooltipTooltipComponent");
+    testID = defaultStr(testID, "RN_TooltipTooltip");
 
     // Reference for instance ID or generate a unique one
     const instanceIdRef = React.useRef(id || uniqid("tippy-instance-id"));
@@ -84,7 +84,7 @@ const Tooltip = React.forwardRef(({
 
     // Return null if the children element is not valid
     if (!isValidElement(children)) {
-        console.log("is not valid children ", children);
+        console.warn("is not valid children ", children);
         return null;
     }
 
@@ -92,7 +92,6 @@ const Tooltip = React.forwardRef(({
     const Component = useMemo(() => {
         return as || Pressable;
     }, [as]);
-
     // Render the Tooltip component, passing down props and attaching the inner reference
     return (
         <Component {...rest} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>
@@ -101,4 +100,5 @@ const Tooltip = React.forwardRef(({
     );
 });
 
+Tooltip.displayName = "Tooltip";
 export { Tooltip }

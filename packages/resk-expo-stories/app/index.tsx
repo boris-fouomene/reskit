@@ -1,4 +1,4 @@
-import { FontIcon, Tab, Switch, Checkbox, Modal, Portal, Expandable, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
+import { FontIcon, Tab, Switch, Checkbox, Modal, Portal, Expandable, TouchableRipple, IconButton, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
 import { View, Text, TouchableOpacity, Pressable, ScrollView, Button } from 'react-native'
 import React, { useRef, useState } from 'react'
 
@@ -55,9 +55,11 @@ const index = () => {
                         <Label>Third tab</Label>
                     </Tab.Item>
                 </Tab>
-                <Portal>
-                    <Label>A portal content</Label>
-                </Portal>
+                <IconButton
+                    name="home"
+                    title="Home"
+                    size={30}
+                />
                 <Expandable label="My expanded">
                     <View>
                         <Label>An expanded content</Label>

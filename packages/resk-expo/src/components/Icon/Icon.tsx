@@ -22,7 +22,7 @@ import { ITheme } from "@theme/types";
  * `FontIcon` component based on the type of `source` provided.
  *
  * @param {IIconProps} props - The properties for the `Icon` component.
- * @param {string} props.name - The name of the font icon (used if `source` is not provided).
+ * @param {string} props.iconName - The name of the font icon (used if `source` is not provided).
  * @param {function} [props.onPress] - Optional. Function to call when the icon is pressed.
  * @param {ITooltipProps} [props.containerProps] - Optional. Properties for the tooltip container.
  * @param {ReactNode} [props.title] - Optional. Tooltip text to display on hover.
@@ -54,7 +54,7 @@ import { ITheme } from "@theme/types";
  *   return (
  *     <View>
  *       <Icon
- *         name="home"
+ *         iconName="home"
  *         size={24}
  *         color="blue"
  *         onPress={() => console.log('Icon pressed!')}
@@ -72,10 +72,10 @@ import { ITheme } from "@theme/types";
  * <Icon source={require('./path/to/icon.png')} size={24}  />
  *
  * // Rendering a font icon
- * <Icon name="material-home" size={24} color="#000" />
+ * <Icon iconName="material-home" size={24} color="#000" />
  */
 
-const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ name, as, disabled, onPress, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
+const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, disabled, onPress, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
     const isSource = isImageSource(source);
     testID = defaultStr(testID, isSource ? "RNImage" : "RNFontIcon");
     size = typeof size == "number" && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
@@ -113,7 +113,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ name, as, disable
             style={iconStyle as ImageStyle}
         /> : <FontIcon
             testID={testID}
-            name={name as IFontIconProps["name"]}
+            iconName={iconName as IFontIconProps["iconName"]}
             size={size}
             {...props}
             color={color}
@@ -156,7 +156,7 @@ export function getIcon<T = any>({ icon, color: col2, theme, ...rest }: IGetIcon
     const iconProps: IIconProps = {
         color
         , ...rest,
-        name: typeof iconSource == "string" ? (iconSource as unknown as IFontIconProps["name"]) : undefined,
+        iconName: typeof iconSource == "string" ? (iconSource as unknown as IFontIconProps["iconName"]) : undefined,
         ...Object.assign({}, (isImageSource(iconSource) ? { source: iconSource as ImageSourcePropType } : isImageSource(Icon) ? { source: icon as ImageSourcePropType } : undefined)),
     }
     return <Icon

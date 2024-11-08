@@ -18,12 +18,12 @@ const index = () => {
                 />
                 <>
                     <Appbar.Action
-                        icon={<Icon name="menu" />}
+                        icon={<Icon iconName="menu" />}
                         onPress={() => console.log('Action')}
                         color="red"
                     />
                     <Appbar.Action
-                        icon={<Icon name="material-edit" />}
+                        icon={<Icon iconName="material-edit" />}
                         onPress={() => console.log('Action')}
                         color="white"
                     />
@@ -37,7 +37,7 @@ const index = () => {
 
                 <Text>index</Text>
                 <Icon
-                    name="foundation-alert"
+                    iconName="foundation-alert"
                     color={"red"}
                     size={40}
                     title="Display title for me"
@@ -79,7 +79,7 @@ const index = () => {
                     </Tab.Item>
                 </Tab>
                 <IconButton
-                    name="home"
+                    iconName="home"
                     title="Home"
                     size={30}
                 />

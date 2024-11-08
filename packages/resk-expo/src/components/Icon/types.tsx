@@ -183,7 +183,7 @@ export type IFontMaterialCommunityIconsName = keyof typeof MaterialCommunityIcon
 * the icon's size according to your layout needs.
 * 
 * @example
-* <FontIcon name="home" size={30} /> // Renders the icon with a size of 30 pixels
+* <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
 export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityIcons>, 'name' | 'style' | 'size'> & {
@@ -196,7 +196,7 @@ export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityI
      * 
      * @example
      * const customStyle: IStyle = { color: 'red', margin: 10 };
-     * <FontIcon name="home" style={customStyle} />;
+     * <FontIcon iconName="home" style={customStyle} />;
      */
     style?: IStyle;
 
@@ -205,16 +205,16 @@ export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityI
      * 
      * This property specifies which icon to render. It accepts a variety of icon
      * names from different icon sets, ensuring that only valid names are passed.
-     * The name must correspond to one of the defined types for the various icon sets
+     * The iconName must correspond to one of the defined types for the various icon sets
      * (e.g., MaterialCommunityIcons, AntDesign, etc.).
      * 
      * @example
      * // Valid icon names
-     * const iconName: IFontIconProps['name'] = "home"; // From MaterialCommunityIcons
-     * const iconNameAnt: IFontIconProps['name'] = "antd-home"; // From AntDesign
-     * <FontIcon name={iconName} />;
+     * const iconName: IFontIconProps['iconName'] = "home"; // From MaterialCommunityIcons
+     * const iconNameAnt: IFontIconProps['iconName'] = "antd-home"; // From AntDesign
+     * <FontIcon iconName={iconName} />;
      */
-    name: IFontMaterialCommunityIconsName | IFontAntDesignName | IFontFontistoName
+    iconName: IFontMaterialCommunityIconsName | IFontAntDesignName | IFontFontistoName
     | IFontIoniconsName | IFontOcticonsName | IFontSimpleLineIconsName |
     IFontZocialName | IFontMaterialIconsName | IFontMaterialCommunityIconsName | IFontFoundationIconsName;
 
@@ -226,7 +226,7 @@ export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityI
      * the icon's size according to your layout needs.
      * 
      * @example
-     * <FontIcon name="home" size={30} /> // Renders the icon with a size of 30 pixels
+     * <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
      */
     size?: number;
 };
@@ -453,7 +453,7 @@ export interface IFontIconsSetNamesToPrefix {
  *
  * @typedef {IIconSourceBase}
  * @type {string | ImageSourcePropType}
- * @see the name property of the {@link IIconProps} interface
+ * @see the iconName property of the {@link IIconProps} interface
  * @example
  * // Using a predefined icon name
  * const iconName: IIconSourceBase = "home"; // From MaterialCommunityIcons
@@ -464,7 +464,7 @@ export interface IFontIconsSetNamesToPrefix {
  * <Icon source={iconName} /> // Renders the predefined icon
  * <Icon source={customIcon} /> // Renders the custom image as an icon
  */
-export type IIconSourceBase = IFontIconProps["name"] | ImageSourcePropType;
+export type IIconSourceBase = IFontIconProps["iconName"] | ImageSourcePropType;
 
 /***
  * /**
@@ -518,7 +518,7 @@ export type IIconSource = IIconSourceBase | JSX.Element | ((props: IIconProps & 
  * @typedef {IIconProps}
  * 
  * @extends {IFontIconProps} - All properties related to font icons, including:
- *   - `name`: The name of the icon to display.
+ *   - `iconName`: The name of the icon to display.
  *   - `style`: The style object for the icon.
  *   - `size`: The size of the icon.
  * 
@@ -536,7 +536,7 @@ export type IIconSource = IIconSourceBase | JSX.Element | ((props: IIconProps & 
  * @example
  * // Using IIconProps to render a font icon
  * const iconProps: IIconProps = {
- *   name: "home" | "material-home",
+ *   iconName : "home" | "material-home",
  *   style: { color: 'blue', fontSize: 24 },
  *   size: 30,
  *   resizeMode: 'contain',
@@ -573,7 +573,7 @@ export type IIconProps = Partial<IFontIconProps> & ImageProps & ITooltipBaseProp
  *               additional properties specific to the implementation context.
  *
  * @interface IGetIconOptions
- * @extends Omit<IIconProps, "name" | "source"> - Excludes the `name` and `source` properties
+ * @extends Omit<IIconProps, "iconName" | "source"> - Excludes the `iconName` and `source` properties
  *                                                from the base icon properties, as they are
  *                                                not needed for this context.
  * 
@@ -682,14 +682,14 @@ export type IGetIconOptions<T = any> = Omit<T, keyof IGetIconOptionsBase> & IGet
  * 
  * @example
  * // Using in a function
- * function createIcon(options: IGetIconOptionsBase & { name: string }) {
+ * function createIcon(options: IGetIconOptionsBase & { iconName: string }) {
  *   return {
  *     ...options,
- *     name: options.name,
+ *     iconName : options.iconName,
  *     color: 'default'
  *   };
  * }
  * 
  * @see {@link IIconProps} For the complete set of icon properties
  */
-type IGetIconOptionsBase = Omit<IIconProps, "name" | "source" | "color">;
+type IGetIconOptionsBase = Omit<IIconProps, "iconName" | "source" | "color">;

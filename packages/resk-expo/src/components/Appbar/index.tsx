@@ -53,12 +53,12 @@ export const Appbar: React.FC<IAppbarProps> & {
   BackAction: typeof BackAction;
 } = ({ children, style, elevation = 4, statusBarHeight, backgroundColor, ...rest }) => {
   const theme = useTheme();
-  backgroundColor = Colors.isValid(backgroundColor) ? backgroundColor : theme.colors.surface;
+  backgroundColor = Colors.isValid(backgroundColor) ? backgroundColor : theme.colors.primaryContainer;
   const { top, left, right } = useSafeAreaInsets();
   //statusBarHeight = Platform.OS === 'ios' ? StatusBar.currentHeight || 0 : 0
   const containerStyle = {
     paddingTop: typeof statusBarHeight === "number" ? statusBarHeight : top,
-    paddingHorizontal: Math.max(left, right),
+    paddingHorizontal: Math.max(left, right, 7),
   }
   return (
     <Surface
@@ -69,7 +69,6 @@ export const Appbar: React.FC<IAppbarProps> & {
         {
           backgroundColor,
           elevation,
-          shadowOpacity: elevation / 20,
         },
         containerStyle,
         style,
@@ -86,7 +85,7 @@ const AppbarContent: React.FC<AppbarContentProps> = ({
   subtitle,
   titleStyle,
   subtitleStyle,
-  color = '#000000',
+  color,
 }) => {
   return (
     <View style={styles.content}>
@@ -144,6 +143,7 @@ const styles = StyleSheet.create({
     height: DEFAULT_APPBAR_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 7,
     zIndex: 1,
   },
   content: {

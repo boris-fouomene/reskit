@@ -46,8 +46,8 @@ const isIos = Platform.isIos();
  * export default function MyApp() {
  *   return (
  *     <>
- *       <FontIcon name="camera" />  // Defaults to MaterialCommunityIcons
- *       <FontIcon name="fa-camera" />  // Uses FontAwesome5 icon set
+ *       <FontIcon iconName="camera" />  // Defaults to MaterialCommunityIcons
+ *       <FontIcon iconName="fa-camera" />  // Uses FontAwesome5 icon set
  *     </>
  *   );
  * }
@@ -57,7 +57,7 @@ const isIos = Platform.isIos();
  * @param {React.Ref} ref The reference to the icon component.
  * @returns {JSX.Element | null} Returns the icon element, or null if the icon is not defined.
  */
-const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, style, color, ...props }, ref) => {
+const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ iconName: name, style, color, ...props }, ref) => {
     let IconSet: any = MaterialCommunityIcons, iconSetName: string = "", iconSetPrefix = "";
     const theme = useTheme();
     color = Colors.isValid(color) ? color : theme.colors.text;
@@ -271,7 +271,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * import { FontIcon } from '@resk/expo';
      * 
      * const BackButton = () => (
-     *   <Icon name={FontIcon.BACK} size={24} color="#000" />
+     *   <Icon iconName={FontIcon.BACK} size={24} color="#000" />
      * );
      * 
      * @remarks
@@ -303,7 +303,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * import { FontIcon } from '@resk/expo';
      * 
      * const MenuButton = () => (
-     *   <Icon name={FontIcon.MENU} size={24} color="#000" />
+     *   <Icon iconName={FontIcon.MENU} size={24} color="#000" />
      * );
      * 
      * @remarks
@@ -337,7 +337,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * 
      * const CopyButton = () => (
      *   <Button onPress={handleCopy}>
-     *     <Icon name={FontIcon.COPY} size={24} color="#000" />
+     *     <Icon iconName={FontIcon.COPY} size={24} color="#000" />
      *     <Text>Copy</Text>
      *   </Button>
      * );
@@ -370,7 +370,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * import {FontIcon} from '@resk/expo';
      * 
      * const MoreOptionsButton = () => (
-     *   <Icon name={FontIcon.MORE} size={24} color="#000" />
+     *   <Icon iconName={FontIcon.MORE} size={24} color="#000" />
      * );
      * 
      * @remarks
@@ -405,7 +405,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * 
      * const PrintButton = () => (
      *   <Button onPress={handlePrint}>
-     *     <Icon name={FontIcon.PRINT} size={24} color="#000" />
+     *     <Icon iconName={FontIcon.PRINT} size={24} color="#000" />
      *     <Text>Print</Text>
      *   </Button>
      * );
@@ -439,7 +439,7 @@ const FontWithCustomIcons = FontIcon as unknown as IFontWithCustomIcons;
  * import { BACK_ICON } from '@resk/expo';
  * 
  * const BackButton = () => (
- *   <Icon name={BACK_ICON} size={24} color="#000" />
+ *   <Icon iconName={BACK_ICON} size={24} color="#000" />
  * );
  * 
  * @remarks
@@ -471,7 +471,7 @@ FontWithCustomIcons.BACK = isIos ? "chevron-left" : "arrow-left";
  * import { FontIcon } from '@resk/expo';
  * 
  * const MenuButton = () => (
- *   <Icon name={FontIcon.MENU} size={24} color="#000" />
+ *   <Icon iconName={FontIcon.MENU} size={24} color="#000" />
  * );
  * 
  * @remarks
@@ -505,7 +505,7 @@ FontWithCustomIcons.MENU = "menu";
  * 
  * const CopyButton = () => (
  *   <Button onPress={handleCopy}>
- *     <Icon name={FontIcon.COPY} size={24} color="#000" />
+ *     <Icon iconName={FontIcon.COPY} size={24} color="#000" />
  *     <Text>Copy</Text>
  *   </Button>
  * );
@@ -539,7 +539,7 @@ FontWithCustomIcons.COPY = "content-copy";
  * import {FontIcon} from '@resk/expo';
  * 
  * const MoreOptionsButton = () => (
- *   <Icon name={FontIcon.MORE} size={24} color="#000" />
+ *   <Icon iconName={FontIcon.MORE} size={24} color="#000" />
  * );
  * 
  * @remarks
@@ -573,7 +573,7 @@ FontWithCustomIcons.MORE = isIos ? "dots-horizontal" : "dots-vertical";
  * 
  * const PrintButton = () => (
  *   <Button onPress={handlePrint}>
- *     <Icon name={FontIcon.PRINT} size={24} color="#000" />
+ *     <Icon iconName={FontIcon.PRINT} size={24} color="#000" />
  *     <Text>Print</Text>
  *   </Button>
  * );

@@ -50,8 +50,8 @@
  * 
  * @typedef {Object} IThemeColorTokens
  * @property {string} [text] - The color applied on text elements
- * @property {string} [primary] - The primary color of the application. It's used to highlight important elements like buttons or icons. 
- * @property {string} [onPrimary] - The color applied on top of the primary background (e.g., text or icons).
+ * @property {string} [primary] - The primary color of the application. It's used to highlight important elements like buttons or icons. Primary color tokens representing the most prominent color in the app. Used for key UI elements like FABs, prominent buttons, active states.
+ * @property {string} [onPrimary] - The color applied on top of the primary background (e.g., text or icons).Secondary color tokens for less prominent UI elements.Provides complementary accents to your primary color.
  * @property {string} [primaryContainer] - A container color associated with the primary color, typically used for background areas. 
  * @property {string} [onPrimaryContainer] - Color used for text or icons placed on a primary container. 
  * @property {string} [secondary] - The secondary color, used for less prominent elements in the UI. 

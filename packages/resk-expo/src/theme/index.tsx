@@ -9,6 +9,7 @@ import updateNative from "./updateNative";
 import styles from "./styles";
 import { useReskExpoProvider } from "@src/context/context";
 import Elevations from "./Elevations";
+import iosLightColors from "./ios/light";
 
 export * from "./utils";
 
@@ -322,7 +323,8 @@ export const DefaultLightTheme: ITheme = createTheme({
     name: `${packageName}-light`,
     roundness: 10,
     colors: {
-        ...lightColors
+        ...lightColors,
+        ...iosLightColors,
     },
 } as unknown as ITheme);
 

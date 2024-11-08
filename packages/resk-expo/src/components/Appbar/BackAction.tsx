@@ -30,7 +30,7 @@ export const BackAction = forwardRef(
     return (
       <IconButton
         accessibilityLabel={accessibilityLabel}
-        name={FontIcon.BACK}
+        iconName={FontIcon.BACK}
         {...rest}
         ref={ref}
       />

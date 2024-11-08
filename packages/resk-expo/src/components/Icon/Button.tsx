@@ -156,7 +156,7 @@ export type IIconButtonProps = IIconProps & {
  * const App = () => {
  *   return (
  *     <IconButton
- *       name="check"
+ *       iconName="check"
  *       backgroundColor="#4CAF50"
  *       rippleColor="#ffffff"
  *       accessibilityLabel="Confirm"
@@ -172,7 +172,7 @@ export type IIconButtonProps = IIconProps & {
  * const App = () => {
  *   return (
  *     <IconButton
- *       name="loading"
+ *       iconName="loading"
  *       isLoading={true}
  *       accessibilityLabel="Loading"
  *       onPress={() => console.log('Button Pressed')}
@@ -204,7 +204,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
             isLoading = false,
             color,
             rippleProps,
-            name,
+            iconName,
             source,
             containerProps,
             containerSize,
@@ -238,7 +238,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
         }
         const icon = useGetIcon<IIconProps>({
             as: TouchableRipple,
-            ...rest, icon: name || source || undefined, testID,
+            ...rest, icon: iconName || source || undefined, testID,
             disabled, size,
             containerProps: {
                 hitSplot: { top: 10, left: 10, bottom: 10, right: 10 },

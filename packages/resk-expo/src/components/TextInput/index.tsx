@@ -52,7 +52,7 @@ import Animated, { Easing, useSharedValue, useAnimatedStyle, withTiming, SharedV
  *             type="text" // Specifies the type of input
  *             maxLength={100} // Limits the input to 100 characters
  *             onChange={handleInputChange} // Callback for handling changes
- *             affix={<Icon name="info" />} // Adds an info icon as an affix
+ *             affix={<Icon iconName="info" />} // Adds an info icon as an affix
  *             secureTextEntry={false} // Indicates that the input does not require secure handling
  *         />
  *     );
@@ -330,7 +330,7 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
     const canRenderLabel = withLabel !== false;
     const { left, right, label } = getLabelOrLeftOrRight<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
     const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null];
-    const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} name={isSecure ? "eye" : "eye-off"} /> : null;
+    const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} iconName={isSecure ? "eye" : "eye-off"} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     return {

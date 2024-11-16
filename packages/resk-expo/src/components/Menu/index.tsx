@@ -277,7 +277,7 @@ export const Menu: React.FC<IMenuProps> = ({
     const [menuLayout, setMenuLayout] = useState<LayoutRectangle | null>(null);
     const anchorRef = useRef<View>(null);
     anchorContainerProps = Object.assign({}, anchorContainerProps);
-    testID = defaultStr(testID, "RNMenu");
+    testID = defaultStr(testID, "rn-menu");
     // Animation values
     const opacity = useSharedValue(0);
     const scale = useSharedValue(0.8);
@@ -406,7 +406,7 @@ export const Menu: React.FC<IMenuProps> = ({
     }, [children, context, isVisible]);
     return <>
         <MenuContext.Provider value={context}>
-            <Pressable testID={testID + "_AnchorContainer"} ref={anchorRef} {...anchorContainerProps} onPress={(event) => {
+            <Pressable testID={testID + "-anchor-container"} ref={anchorRef} {...anchorContainerProps} onPress={(event) => {
                 if (typeof anchorContainerProps?.onPress === 'function') {
                     anchorContainerProps?.onPress(event)
                 }

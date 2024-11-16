@@ -41,7 +41,7 @@ import { useTheme } from "@theme";
  */
 export function ActivityIndicator(props: IActivityIndicatorProps) {
   const theme = useTheme();
-  return <RNPActivityIndicator testID="RN_ActivityIndicator" color={theme.colors.primary} {...props} />;
+  return <RNPActivityIndicator testID="rn-activity-indicator" color={theme.colors.primary} {...props} />;
 }
 
 /**

@@ -16,7 +16,7 @@ export * from "./utils";
  * easily, making it suitable for various applications such as settings, forms, and toggle controls.
  *
  * @param {object} props - The properties for the Switch component.
- * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "RNSwitchComponent".
+ * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "rn-switch".
  * @param {boolean} props.checked - Indicates whether the switch is in the checked state.
  * @param {string} [props.tooltip] - Optional tooltip text displayed when the user hovers over the switch.
  * @param {object} [props.labelProps] - Additional properties for the label component.
@@ -97,9 +97,9 @@ export const Switch = ({ testID, ...props }: ISwitchProps) => {
                 false: onTintColor,
             },
         };
-    const MTestID = typeof testID === 'string' && testID || "RNSwitchComponent";
-    const labelContent = <Label testID={`${MTestID}_Label`} {...labelProps} style={[styles.label, labelProps.style]} children={label} />;
-    return <Tooltip as={Pressable} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}_Container`} {...containerProps} style={[styles.container, disabledStyle, readOnlyStyle, containerProps.style]}
+    const MTestID = typeof testID === 'string' && testID || "rn-switch";
+    const labelContent = <Label testID={`${MTestID}-label`} {...labelProps} style={[styles.label, labelProps.style]} children={label} />;
+    return <Tooltip as={Pressable} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`} {...containerProps} style={[styles.container, disabledStyle, readOnlyStyle, containerProps.style]}
         onPress={(event: GestureResponderEvent) => {
             if (typeof containerProps.onPress == "function") {
                 containerProps.onPress(event);

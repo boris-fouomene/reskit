@@ -49,6 +49,6 @@ View.displayName = "ViewComponent";
  * - `mediaQueries`: A function or an object that defines styles based on device dimensions.
  * - Other standard `ViewProps` from React Native's `View`.
  */
-export type IViewProps = IWithBreakpointStyle<ViewProps> & {
+export type IViewProps = Omit<typeof View, "style"> & IWithBreakpointStyle<ViewProps> & {
     // Additional props can be defined here if needed
 };

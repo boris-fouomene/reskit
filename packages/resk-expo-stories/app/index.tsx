@@ -6,7 +6,7 @@ import React, { useRef, useState } from 'react'
 const index = () => {
     return (
         <ScrollView>
-            <Appbar backgroundColor="#6200ee">
+            <Appbar>
                 <Appbar.BackAction
                     onPress={() => console.log('Back')}
                     color="#ffffff"
@@ -14,7 +14,6 @@ const index = () => {
                 <Appbar.Content
                     title="My App is very a long appp heeein marno maaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
                     subtitle="Screen Title aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa long scrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-                    color="#ffffff"
                 />
                 <>
                     <Appbar.Action
@@ -38,6 +37,9 @@ const index = () => {
                 <Text>index</Text>
                 <Icon
                     iconName="foundation-alert"
+                    source={{
+                        uri: "https://picsum.photos/200",
+                    }}
                     color={"red"}
                     size={40}
                     title="Display title for me"

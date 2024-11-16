@@ -74,9 +74,9 @@ const TabItem = ({
   const backgroundColor: string = Colors.isValid(style.backgroundColor) ? style.backgroundColor : 'transparent';
   const color = Colors.isValid(customColor) ? customColor : Colors.isValid(style.color) ? style.color : isActive ? defaultActiveTabItemTextColor : backgroundColor !== "transparent" ? Colors.getContrast(backgroundColor) : defaultTextColor;
   rippleColor = Colors.isValid(rippleColor) ? rippleColor : Colors.setAlpha(color as string, 0.32);
-  testID = defaultStr(testID, "RN_TabItem");
+  testID = defaultStr(testID, "rn-tab-item");;
   iconProps = Object.assign({}, iconProps);
-  iconProps = { testID: testID + "_Icon", ...iconProps, color, style: [iconProps.style] }
+  iconProps = { testID: testID + "-icon", ...iconProps, color, style: [iconProps.style] }
   labelProps = Object.assign({}, labelProps);
   const icon = useGetIcon({ ...Object.assign({}, iconProps, { style: [styles.icon, iconProps?.style] }), icon: customIcon, color })
   const isIconTop = iconPosition == 'top' ? true : false;
@@ -91,9 +91,9 @@ const TabItem = ({
     style={[styles.button, { backgroundColor }, activeStyle(style)]}
     testID={testID}
   >
-    <View testID={testID + '_ContentContainer'} style={[style.contentContainer]}>
+    <View testID={testID + '-content-container'} style={[style.contentContainer]}>
       {isIconTop && icon ? icon : null}
-      <Label upperCase  {...labelProps} color={color} testID={testID + "_Label"} style={[[styles.label, { color, paddingVertical: !icon ? 8 : 2, }, activeStyle(labelProps.style)]]}>
+      <Label upperCase  {...labelProps} color={color} testID={testID + "-label"} style={[[styles.label, { color, paddingVertical: !icon ? 8 : 2, }, activeStyle(labelProps.style)]]}>
         {label}
       </Label>
       {!isIconTop && icon ? icon : null}

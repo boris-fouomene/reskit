@@ -1,4 +1,4 @@
-import { IColorSheme, ITheme, IThemeColorTokenKey, IThemeColorTokens } from "./types";
+import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorTokens } from "./types";
 import Colors from "./colors";
 import { extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
 import { packageName } from "@utils/index";
@@ -162,9 +162,9 @@ export function createTheme(theme: ITheme): IThemeManager {
          * ```
          * 
          * @param {IThemeColorTokenKey} [colorSheme] - The color key to generate a scheme for.
-         * @returns {IColorSheme} - An object containing `color` and `backgroundColor` properties.
+         * @returns {IThemeColorSheme} - An object containing `color` and `backgroundColor` properties.
          */
-        getColorScheme(colorSheme?: IThemeColorTokenKey): IColorSheme {
+        getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme {
             if (
                 !colorSheme ||
                 typeof colorSheme != "string" ||
@@ -509,7 +509,7 @@ export default Theme;
  * @method getColorScheme
  * @description Retrieves a color scheme with `color` and `backgroundColor` based on the provided color scheme key.
  * @param {IThemeColorTokenKey} [colorSheme] - The key of the color scheme to retrieve (e.g., "primary", "error").
- * @returns {IColorSheme} An object containing `color` and `backgroundColor` properties.
+ * @returns {IThemeColorSheme} An object containing `color` and `backgroundColor` properties.
  * 
  * @example 
  * const theme: IThemeManager = createTheme({
@@ -561,7 +561,7 @@ export default Theme;
 export interface IThemeManager extends ITheme {
     colors: IThemeColorTokens;
     getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined;
-    getColorScheme(colorSheme?: IThemeColorTokenKey): IColorSheme
+    getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme
     styles: typeof styles;
     elevations: typeof Elevations;
     /**

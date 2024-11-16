@@ -6,6 +6,7 @@ export default ({ config }) => ({
   entryPoint: "index",
   orientation: "portrait",
   icon: "./assets/icon.png",
+  newArchEnabled : true,
   "plugins": [
     "expo-router"
   ],

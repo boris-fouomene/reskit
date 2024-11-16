@@ -215,7 +215,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
         const theme = useTheme();
         containerProps = Object.assign({}, containerProps);
         rippleProps = Object.assign({}, rippleProps);
-        testID = defaultStr(testID, "RNIconButton");
+        testID = defaultStr(testID, "rn-icon-button");
         const containerStyle = StyleSheet.flatten([containerProps?.style]);
         const backgroundColor = getBackgroundColor({ theme, customBackgroundColor: Colors.isValid(customBackgroundColor) ? customBackgroundColor : Colors.isValid(containerStyle?.backgroundColor) ? containerStyle.backgroundColor : undefined });
         customRippleColor = Colors.isValid(customRippleColor) ? customRippleColor : Colors.isValid(rippleProps?.rippleColor) ? rippleProps.rippleColor : undefined;
@@ -228,7 +228,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
         const iconColor = Colors.isValid(color) ? color : theme.colors.text;
         containerSize = typeof containerSize == "number" ? containerSize : (size + 2 * PADDING);
         const {
-            borderWidth = isLoading ? 0 : 1,
+            borderWidth = isLoading ? 0 : 0,
             borderRadius = containerSize / 2,
             borderColor = isLoading ? undefined : theme.colors.outline,
         } = (StyleSheet.flatten(style) || {}) as ViewStyle;
@@ -238,11 +238,11 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
         }
         const icon = useGetIcon<IIconProps>({
             as: TouchableRipple,
-            ...rest, icon: iconName || source || undefined, testID,
+            ...rest, icon: source || iconName || undefined, testID,
             disabled, size,
             containerProps: {
                 hitSplot: { top: 10, left: 10, bottom: 10, right: 10 },
-                testID: `${testID}_Tooltip`,
+                testID: `${testID}-tooltip`,
                 accessibilityLabel,
                 centered: true,
                 disabled,
@@ -317,5 +317,5 @@ const getBackgroundColor = ({
     if (Colors.isValid(customBackgroundColor)) {
         return customBackgroundColor;
     }
-    return theme.colors.surfaceVariant;
+    return undefined;
 };

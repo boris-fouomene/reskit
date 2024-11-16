@@ -358,21 +358,21 @@ export interface ITheme {
 }
 
 /**
- * @interface IColorSheme
+ * @interface IThemeColorSheme
  * Represents a color scheme containing both `color` and `backgroundColor`.
  * 
  * This type is used to define foreground and background colors for various theme elements.
  * 
- * @typedef {Object} IColorSheme
+ * @typedef {Object} IThemeColorSheme
  * @property {string} [color] - The foreground color.
  * @property {string} [backgroundColor] - The background color.
  * 
  * @example
  * ```ts
- * const colorScheme: IColorSheme = {
+ * const colorScheme: IThemeColorSheme = {
  *    color: "#FFFFFF",
  *    backgroundColor: "#6200EE"
  * };
  * ```
  */
-export type IColorSheme = { color?: string; backgroundColor?: string };
+export type IThemeColorSheme = { color?: string; backgroundColor?: string };

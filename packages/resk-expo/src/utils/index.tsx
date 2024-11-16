@@ -52,3 +52,6 @@ export function isReactNode(node: any): node is ReactNode {
  * @returns {string | undefined} The name of the app from the manifest or expoConfig, or `undefined` if not found.
  */
 export const packageName = defaultStr(Constants.expoConfig?.name);
+
+
+export * from "./hasTouchHandler";

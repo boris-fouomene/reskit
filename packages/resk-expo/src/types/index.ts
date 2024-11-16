@@ -1,4 +1,4 @@
-import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData } from "react-native";
+import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent } from "react-native";
 /**
    @interface
  * Represents a reference to a React component or DOM element.
@@ -330,3 +330,86 @@ export type IOnChangeOptions<
   IEventType = NativeSyntheticEvent<TextInputChangeEventData> | null,
   IValueType = any,
 > = Omit<IOnChangeOptionsBase<IValueType, IEventType>, keyof IOnChangeOptionsType> & IOnChangeOptionsType;
+
+
+
+/**
+ * @interface ITouchableEventNames
+ * A union type representing the available touchable event names.
+ * 
+ * This type includes the standard touch events that can be used in
+ * touchable components, allowing developers to specify which events
+ * they want to handle in their applications.
+ * 
+ * The following events are included:
+ * - `'onPress'`: Triggered when the user taps the component.
+ * - `'onLongPress'`: Triggered when the user presses and holds the component.
+ * - `'onPressIn'`: Triggered when the user touches the component.
+ * - `'onPressOut'`: Triggered when the user releases the touch from the component.
+ * 
+ * @example
+ * // Example usage of ITouchableEventNames
+ * const handleEvent = (event: ITouchableEventNames) => {
+ *   switch (event) {
+ *     case 'onPress':
+ *       console.log('Component was pressed.');
+ *       break;
+ *     case 'onLongPress':
+ *       console.log('Component was long pressed.');
+ *       break;
+ *     case 'onPressIn':
+ *       console.log('Touch started on the component.');
+ *       break;
+ *     case 'onPressOut':
+ *       console.log('Touch ended on the component.');
+ *       break;
+ *   }
+ * };
+ * 
+ * // Simulating an event
+ * handleEvent('onPress'); // Output: Component was pressed.
+ */
+export type ITouchableEventNames = 'onPress' | 'onLongPress' | 'onPressIn' | 'onPressOut';
+
+
+/**
+ * @interface ITouchableEvents
+ * A type representing an object that can contain optional touch event handlers.
+ *
+ * The `ITouchableEventObject` type is a partial record where the keys are 
+ * the touchable event names defined in `ITouchableEventNames`, and the values 
+ * are functions that handle the respective events. Each function receives 
+ * a `GestureResponderEvent` as an argument, which contains information 
+ * about the touch event.
+ *
+ * This type allows developers to specify only the event handlers they 
+ * need for their components, making it flexible and convenient for use 
+ * in touchable components.
+ *
+ * @typedef {Object} ITouchableEventObject
+ * @property {(event: GestureResponderEvent) => any} [onPress] - Optional handler for the press event.
+ * @property {(event: GestureResponderEvent) => any} [onLongPress] - Optional handler for the long press event.
+ * @property {(event: GestureResponderEvent) => any} [onPressIn] - Optional handler for the press-in event.
+ * @property {(event: GestureResponderEvent) => any} [onPressOut] - Optional handler for the press-out event.
+ *
+ * @example
+ * // Example usage of ITouchableEventObject
+ * const touchableHandlers: ITouchableEventObject = {
+ *   onPress: (event) => { console.log('Pressed!', event); },
+ *   onLongPress: (event) => { console.log('Long Pressed!', event); },
+ * };
+ *
+ * // Simulating an event handler call
+ * const simulatePress = (handler: ITouchableEventObject['onPress']) => {
+ *   const mockEvent: GestureResponderEvent = { } as GestureResponderEvent;
+ *   handler(mockEvent); // This would log 'Pressed!' to the console.
+ * };
+ *
+ * simulatePress(touchableHandlers.onPress); // Output: Pressed!
+ */
+export type ITouchableEvents = Partial<
+  Record<
+    ITouchableEventNames,
+    (event: GestureResponderEvent) => any
+  >
+>;

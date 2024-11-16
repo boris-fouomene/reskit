@@ -47,7 +47,7 @@ export function HelperText({ visible = true, testID, color, style, error, ...res
     const useNativeDriver = platform.isMobileNative();
     // Animation value for opacity
     const opacity = new Animated.Value(visible ? 1 : 0);
-    testID = defaultStr(testID, "RNHelperText")
+    testID = defaultStr(testID, "rn-helper-text");
     useEffect(() => {
         // Animate fade in/out based on visibility
         if (visible) {
@@ -64,7 +64,7 @@ export function HelperText({ visible = true, testID, color, style, error, ...res
             }).start();
         }
     }, [visible, opacity]);
-    return <Animated.View testID={testID + "_Container"} style={[{ opacity }, !visible && Theme.styles.hidden]}>
+    return <Animated.View testID={testID + "-container"} style={[{ opacity }, !visible && Theme.styles.hidden]}>
         <Label
             {...rest}
             testID={testID}

@@ -65,8 +65,8 @@ export * from "./types";
  * to 80 for iOS to account for any navigation bars or headers.
  */
 const KeyboardAvoidingViewComponent = React.forwardRef(({ children, style, testID, ...props }: IKeyboardAvoidingView, ref: React.Ref<RNView>) => {
-  testID = testID || 'RNKeyboardAvoidingView';
-  return <View  {...props} ref={ref} style={[styles.main, style]} children={children} testID={isNonNullString(testID) ? `${testID}_KeyboardAvoidingView` : "RN_KeyboardAvoidingView"} />
+  testID = testID || 'rn-keyboard-avoiding-view';
+  return <View  {...props} ref={ref} style={[styles.main, style]} children={children} testID={isNonNullString(testID) ? `${testID}_keyboard-avoiding-view` : "rn-keyboard-avoiding-view"} />
 });
 
 const styles = {

@@ -1,0 +1,128 @@
+import { StyleSheet } from 'react-native';
+import { Colors } from "@theme";
+import color from 'color';
+import { IButtonProps, IButtonMode } from './types';
+import { ITheme } from '@theme/types';
+
+
+const isDark = ({ dark, backgroundColor }: { dark?: boolean; backgroundColor?: string; }) => {
+  if (typeof dark === 'boolean') {
+    return dark;
+  }
+
+  if (backgroundColor === 'transparent') {
+    return false;
+  }
+
+  if (backgroundColor !== 'transparent') {
+    return !color(backgroundColor).isLight();
+  }
+  return false;
+};
+
+const getButtonBackgroundColor = ({
+  isMode,
+  customBackgroundColor,
+  theme,
+}: IButtonGetBackgroundColorProps) => {
+  if (Colors.isValid(customBackgroundColor)) {
+    return customBackgroundColor;
+  }
+  if (isMode('outlined') || isMode('text')) {
+    return 'transparent';
+  }
+  if (isMode('contained')) {
+    return theme.colors.primary;
+  }
+  return 'transparent';
+};
+
+const getButtonTextColor = ({ isMode, customTextColor, backgroundColor, dark, theme }: IButtonGetBackgroundColorProps & {
+  customTextColor?: string;
+  dark?: boolean;
+}) => {
+  if (Colors.isValid(customTextColor)) {
+    return customTextColor;
+  }
+  if (typeof dark === 'boolean') {
+    if (isMode('contained')) {
+      return isDark({ dark, backgroundColor }) ? "white" : "black";
+    }
+  }
+  if (isMode('outlined') || isMode('text')) {
+    return theme.colors.primary;
+  }
+  if (isMode('contained')) {
+    return theme.colors.onPrimary;
+  }
+  return theme.colors.primary;
+};
+
+const getButtonBorderColor = ({ isMode, theme }: IButtonGetBackgroundColorProps) => {
+  if (isMode('outlined')) {
+    return theme.colors.outline;
+  }
+  if (isMode('outlined')) {
+    return Colors.setAlpha(theme.dark ? "white" : "black", 0.29);
+  }
+  return 'transparent';
+};
+
+const getButtonBorderWidth = ({ isMode }: IButtonGetBackgroundColorProps) => {
+  if (isMode('outlined')) {
+    return 1;
+  }
+  if (isMode('outlined')) {
+    return StyleSheet.hairlineWidth;
+  }
+  return 0;
+};
+
+export const getButtonColors = ({
+  mode,
+  customBackgroundColor,
+  customTextColor,
+  dark,
+  theme,
+}: {
+  mode: IButtonMode;
+  customBackgroundColor?: string;
+  customTextColor?: string;
+  dark?: boolean;
+  theme: ITheme;
+}) => {
+  dark = dark !== undefined ? dark : !!theme.dark;
+  const isMode = (modeToCompare: IButtonMode) => {
+    return mode === modeToCompare;
+  };
+  const backgroundColor = getButtonBackgroundColor({
+    isMode,
+    customBackgroundColor,
+    theme,
+  });
+
+  const textColor = getButtonTextColor({
+    isMode,
+    customTextColor,
+    backgroundColor,
+    dark,
+    theme
+  });
+
+  const borderColor = getButtonBorderColor({ isMode, theme });
+
+  const borderWidth = getButtonBorderWidth({ isMode, theme });
+
+  return {
+    backgroundColor,
+    borderColor,
+    textColor,
+    borderWidth,
+  };
+};
+
+type IButtonGetBackgroundColorProps = Partial<IButtonProps> & {
+  customBackgroundColor?: string;
+  theme: ITheme;
+  isMode: (mode: IButtonMode) => boolean
+}

@@ -98,7 +98,7 @@ const TabItems = ({
     return left;
   }, [activeIndex])
   indicatorStyle.left = getLeftPosition();
-  testID = defaultStr(testID, "RNE_TabComponent");
+  testID = defaultStr(testID, "rn-tab");
   scrollViewProps = Object.assign({}, scrollViewProps)
   const childrenContent = React.useMemo(() => {
     return React.Children.map(children, (child, index) => {
@@ -124,7 +124,7 @@ const TabItems = ({
           activeIndex,
           index,
           active,
-          testID: testID + '_Children_' + index
+          testID: testID + '-children-' + index
         }
       );
     })
@@ -147,14 +147,14 @@ const TabItems = ({
       scrollEventThrottle={0}
       horizontal
       ref={scrollViewRef}
-      testID={testID + "_ScrollView"}
+      testID={testID + "-scroll-view"}
       onScroll={onScrollHandler}
     >
       {childrenContent}
       {!disableIndicator && (
         <Animated.View
           {...indicatorProps}
-          testID={testID + '_Indicator'}
+          testID={testID + '-indicator'}
           style={[
             styles.indicator,
             {
@@ -166,7 +166,7 @@ const TabItems = ({
       )}
     </ScrollView>
     <Animated.View
-      testID={testID + "_Shadow"}
+      testID={testID + "-shadow"}
       style={[
         styles.removeTopShadow,
         {

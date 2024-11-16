@@ -148,7 +148,7 @@ const Tab = (props: ITabProps) => {
             setActiveIndex(activeIndex);
         }
     }, [children, activeIndex]);
-    testID = defaultStr(testID, "RNTab");
+    testID = defaultStr(testID, "rn-tab");
     const { tabs, contents } = React.useMemo(() => {
         const tabs: React.ReactNode[] = [], contents: React.ReactNode[] = [];
         React.Children.map(children, (child, index) => {
@@ -165,7 +165,7 @@ const Tab = (props: ITabProps) => {
                 {...rest}
                 label={label}
                 style={[tabItemProps?.style, rest.style]}
-                testID={defaultStr(testID, tabItemProps?.testID) + "_TabItem"}
+                testID={defaultStr(testID, tabItemProps?.testID) + "-tab-item-" + index}
             />);
             contents.push(<React.Fragment key={key}>
                 {childChildren}
@@ -176,10 +176,10 @@ const Tab = (props: ITabProps) => {
     if (!tabs.length) return null;
     return <TabContext.Provider value={{ ...props, setActiveIndex, defaultTextColor, defaultActiveTabItemTextColor, activeIndex: index }}>
         <View {...rest} testID={testID} style={[styles.container, style, disabled && Theme.styles.disabled]}>
-            <TabItems testID={testID + "_TabItems"} {...tabItemsProps} style={tabsItemsStyle} indicatorProps={Object.assign({}, tabItemsProps.indicatorProps, { style: indicatorStyle })}>
+            <TabItems testID={testID + "-tab-items"} {...tabItemsProps} style={tabsItemsStyle} indicatorProps={Object.assign({}, tabItemsProps.indicatorProps, { style: indicatorStyle })}>
                 {tabs}
             </TabItems>
-            <TabContent testID={testID + "_TabContent"}
+            <TabContent testID={testID + "-tab-content"}
                 {...tabContentProps} disabled={tabContentProps.disabled || disabled} activeIndex={index} style={[styles.container, tabContentProps.style]}>
                 {contents}
             </TabContent>

@@ -283,7 +283,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
   const usePrimary = isExpanded && usePrimaryColorWhenExpended !== false ? true : false;
   const eProps = { color: usePrimary ? theme.colors.primary : labelColor };
   const { left, right, label } = getLabelOrLeftOrRight({ label: customLabel, left: customLeft, right: customRight }, eProps)
-  testID = defaultStr(testID, "RN_Expandable");
+  testID = defaultStr(testID, "rn-expandable");
   const iconProps = Object.assign({}, expanded ? expandedIconProps : unexpandedIconProps);
   const icon = useGetIcon<{ expanded: boolean }>({ ...iconProps, ...eProps, size: 24, expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
   const expandIcon = showExpandIcon !== false ? icon : null;
@@ -301,17 +301,17 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
         onPress={handlePressAction}
         accessibilityState={{ expanded: isExpanded }}
       >
-        <View testID={testID + "_ContentContainer"} {...contentContainerProps} style={[styles.row, Theme.styles.cursorPointer, contentContainerProps?.style]}>
+        <View testID={testID + "-content-container"} {...contentContainerProps} style={[styles.row, Theme.styles.cursorPointer, contentContainerProps?.style]}>
           {left || (expandIcon && isIconPositionLeft) ? (
-            <View testID={testID + "_Left"} {...leftContainerProps} style={[styles.left]}>
+            <View testID={testID + "-left"} {...leftContainerProps} style={[styles.left]}>
               {isIconPositionLeft ? expandIcon : null}
               {left}
             </View>
           ) : null}
-          <Label testID={testID + "_Label"} {...labelProps} style={[styles.item, styles.content, styles.center, labelProps?.style]}>
+          <Label testID={testID + "-label"} {...labelProps} style={[styles.item, styles.content, styles.center, labelProps?.style]}>
             {label}
           </Label>
-          <View testID={testID + "_Right"} {...rightContainerProps} style={[styles.item, styles.row, rightContainerProps?.style]}>
+          <View testID={testID + "-right"} {...rightContainerProps} style={[styles.item, styles.row, rightContainerProps?.style]}>
             {right}
             {!isIconPositionLeft ? expandIcon : null}
           </View>
@@ -319,12 +319,12 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
       </Pressable>
       {autoMountChildren !== false || isExpanded ? (
         <Animated.View
-          testID={testID + "_Content"} {...contentProps}
+          testID={testID + "-content"} {...contentProps}
           style={[
             styles.content,
             styles.children, contentProps?.style,
             animatedStyle,
-          ]} 
+          ]}
         >
           {children}
         </Animated.View>

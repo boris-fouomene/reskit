@@ -16,7 +16,7 @@ export * from "./types";
  * and read-only.
  *
  * @param {object} props - The properties for the Checkbox component.
- * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "RNCheckboxComponent".
+ * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "rn-checkbox".
  * @param {string} [props.tooltip] - Optional tooltip text displayed when the user hovers over the checkbox.
  * @param {object} [props.labelProps] - Additional properties for the label component.
  * @param {string} [props.color] - The color of the checkbox when checked.
@@ -81,9 +81,9 @@ export const Checkbox = ({ testID, ...props }: ICheckboxProps) => {
         containerProps,
         ...rest
     } = useToggleable<ICheckboxEvent>(props);
-    const MTestID = typeof testID === 'string' && testID || "RNCheckboxComponent";
-    const labelContent = <Label testID={`${MTestID}_Label`} {...labelProps} style={[styles.label, labelProps.style]} children={label} />;
-    return <Tooltip as={Pressable} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}_Container`} {...containerProps} style={[styles.container, disabledStyle, readOnlyStyle, containerProps.style]}
+    const MTestID = typeof testID === 'string' && testID || "rn-checkbox";
+    const labelContent = <Label testID={`${MTestID}-label`} {...labelProps} style={[styles.label, labelProps.style]} children={label} />;
+    return <Tooltip as={Pressable} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`} {...containerProps} style={[styles.container, disabledStyle, readOnlyStyle, containerProps.style]}
         onPress={(event: GestureResponderEvent) => {
             if (typeof containerProps.onPress == "function") {
                 containerProps.onPress(event);

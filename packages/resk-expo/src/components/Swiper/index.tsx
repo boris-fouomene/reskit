@@ -528,7 +528,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
             </View>
         ) : null}
         <View
-          testID={testID + "_ContentContainer"}
+          testID={testID + "-content-container"}
           {...contentContainerProps}
           style={[styles.container(positionFixed, x, y, width, height, autoHeight), contentContainerProps.style, disabledStyle]}
         >
@@ -548,7 +548,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
                 <View
                   key={i}
                   {...contentProps}
-                  testID={testID + "_ContentContainerContent_" + i}
+                  testID={testID + "-content-containerContent_" + i}
                   style={[
                     { width },
                     autoHeight && { height, maxHeight: height },

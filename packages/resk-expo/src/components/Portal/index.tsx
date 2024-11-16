@@ -139,7 +139,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         <PortalContext.Provider value={{ addPortal, removePortal }}>
             {children}
             {/* Dynamically render portal elements with a stacking order based on their position in the array */}
-            <View testID={`${testID}_Container`} style={styles.absoluteFill} pointerEvents="box-none">
+            <View testID={`${testID}-container`} style={styles.absoluteFill} pointerEvents="box-none">
                 {portalRefs.current.map(({ key, element, props }, index) => (
                     <RenderPortal
                         testID={`${testID}_${index + 1}`}

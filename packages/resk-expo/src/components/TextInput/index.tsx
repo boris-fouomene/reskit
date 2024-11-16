@@ -84,7 +84,7 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
     return <View  {...containerProps}>
         {isLabelEmbededVariant ? null : labelContent}
         <View {...contentContainerProps}>
-            {left || isLabelEmbededVariant && !isEmpty(label) ? <View testID={`${testID}_LeftContainer`} {...leftContainerProps} style={[styles.leftOrRightContainer, leftContainerProps.style]}>
+            {left || isLabelEmbededVariant && !isEmpty(label) ? <View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, leftContainerProps.style]}>
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
             </View> : null}
@@ -251,7 +251,7 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
     contentContainerProps = Object.assign({}, contentContainerProps);
     rightContainerProps = Object.assign({}, rightContainerProps);
     containerProps = Object.assign({}, containerProps);
-    testID = testID || "RN_TextInputComponent";
+    testID = testID || "rn-text-input";
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
     const isLabelEmbededVariant = variant == "labelEmbeded";
     const isDefaultVariant = !isLabelEmbededVariant;
@@ -330,7 +330,7 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
     const canRenderLabel = withLabel !== false;
     const { left, right, label } = getLabelOrLeftOrRight<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
     const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null];
-    const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} iconName={isSecure ? "eye" : "eye-off"} /> : null;
+    const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} name={isSecure ? "eye" : "eye-off"} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     return {
@@ -342,9 +342,9 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
         canRenderLabel,
         error,
         isFocused,
-        containerProps: Object.assign({}, { testID: `${testID}_Container` }, containerProps, { style: [styles.container, containerStyle, disabledOrEditStyle, containerProps.style] }),
-        contentContainerProps: Object.assign({}, { testID: `${testID}_ContentContainer` }, contentContainerProps, { style: [styles.contentContainer, contentContainerStyle, contentContainerProps.style] }),
-        label: (label ? <Label color={textColor} testID={`${testID}_Label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
+        containerProps: Object.assign({}, { testID: `${testID}-container` }, containerProps, { style: [styles.container, containerStyle, disabledOrEditStyle, containerProps.style] }),
+        contentContainerProps: Object.assign({}, { testID: `${testID}-content-container` }, contentContainerProps, { style: [styles.contentContainer, contentContainerStyle, contentContainerProps.style] }),
+        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
         placeholder: placeholder,
         testID: testID,
@@ -393,7 +393,7 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
             }
         },
         left,
-        right: right || canToggleSecure ? <View testID={`${testID}_RightContainer`} {...rightContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, rightContainerProps.style]}>
+        right: right || canToggleSecure ? <View testID={`${testID}-right-container`} {...rightContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, rightContainerProps.style]}>
             {affixContent}
             {right}
             {editable || disabled !== false && isPasswordField ? secureIcon : null}

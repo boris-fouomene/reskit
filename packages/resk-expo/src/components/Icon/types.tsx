@@ -8,7 +8,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Zocial from "@expo/vector-icons/Zocial";
-import { IStyle } from "../../types";
+import { IStyle, ITouchableEvents } from "../../types";
 import { GestureResponderEvent, ImageProps, ImageSourcePropType } from "react-native";
 import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip";
 import { ITheme } from "@theme/types";
@@ -196,7 +196,7 @@ export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityI
      * 
      * @example
      * const customStyle: IStyle = { color: 'red', margin: 10 };
-     * <FontIcon iconName="home" style={customStyle} />;
+     * <FontIcon name="home" style={customStyle} />;
      */
     style?: IStyle;
 
@@ -205,16 +205,16 @@ export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityI
      * 
      * This property specifies which icon to render. It accepts a variety of icon
      * names from different icon sets, ensuring that only valid names are passed.
-     * The iconName must correspond to one of the defined types for the various icon sets
+     * The name must correspond to one of the defined types for the various icon sets
      * (e.g., MaterialCommunityIcons, AntDesign, etc.).
      * 
      * @example
      * // Valid icon names
-     * const iconName: IFontIconProps['iconName'] = "home"; // From MaterialCommunityIcons
-     * const iconNameAnt: IFontIconProps['iconName'] = "antd-home"; // From AntDesign
-     * <FontIcon iconName={iconName} />;
+     * const name: IFontIconProps['name'] = "home"; // From MaterialCommunityIcons
+     * const nameAnt: IFontIconProps['name'] = "antd-home"; // From AntDesign
+     * <FontIcon name={name} />;
      */
-    iconName: IFontMaterialCommunityIconsName | IFontAntDesignName | IFontFontistoName
+    name: IFontMaterialCommunityIconsName | IFontAntDesignName | IFontFontistoName
     | IFontIoniconsName | IFontOcticonsName | IFontSimpleLineIconsName |
     IFontZocialName | IFontMaterialIconsName | IFontMaterialCommunityIconsName | IFontFoundationIconsName;
 
@@ -226,7 +226,7 @@ export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityI
      * the icon's size according to your layout needs.
      * 
      * @example
-     * <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
+     * <FontIcon name="home" size={30} /> // Renders the icon with a size of 30 pixels
      */
     size?: number;
 };
@@ -453,18 +453,18 @@ export interface IFontIconsSetNamesToPrefix {
  *
  * @typedef {IIconSourceBase}
  * @type {string | ImageSourcePropType}
- * @see the iconName property of the {@link IIconProps} interface
+ * @see the name property of the {@link IIconProps} interface
  * @example
  * // Using a predefined icon name
- * const iconName: IIconSourceBase = "home"; // From MaterialCommunityIcons
+ * const name: IIconSourceBase = "home"; // From MaterialCommunityIcons
  *
  * // Using a custom image source
  * const customIcon: IIconSourceBase = require('./path/to/icon.png');
  *
- * <Icon source={iconName} /> // Renders the predefined icon
+ * <Icon source={{uri:"...an icon uri"}} /> // Renders the predefined icon
  * <Icon source={customIcon} /> // Renders the custom image as an icon
  */
-export type IIconSourceBase = IFontIconProps["iconName"] | ImageSourcePropType;
+export type IIconSourceBase = IFontIconProps["name"] | ImageSourcePropType;
 
 /***
  * /**
@@ -551,16 +551,22 @@ export type IIconSource = IIconSourceBase | JSX.Element | ((props: IIconProps & 
  *   onError: () => console.error('Error loading image'),
  * };
  */
-export type IIconProps = Partial<IFontIconProps> & ImageProps & ITooltipBaseProps & {
+export type IIconProps = Partial<Omit<IFontIconProps, "name">> & ImageProps & ITooltipBaseProps & ITouchableEvents & {
     /***
      * Optional. Properties for the tooltip container,
     * allowing customization of the tooltip behavior and appearance when the icon is hovered or focused.
      */
     containerProps?: ITooltipProps;
 
-    onPress?: (event: GestureResponderEvent) => void;
-
     as?: ITooltipProps['as'];
+
+    /****
+     * the name of the icon to display (including the prefix for icon set if necessary).
+     * It accepts a variety of icon names from different icon libraries such as 
+     * MaterialCommunityIcons, AntDesign, Fontisto, Ionicons, Octicons, SimpleLineIcons, 
+     * Zocial, MaterialIcons, and FoundationIcons.
+     */
+    iconName?: IFontIconProps["name"];
 };
 
 

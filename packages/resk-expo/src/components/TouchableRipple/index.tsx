@@ -41,7 +41,7 @@ const isAndroid = Platform.isAndroid();
  * 
  * @param {boolean} [props.disabled=false] - If true, disables the button, preventing any interaction.
  * 
- * @param {string} [props.testID] - Optional test ID used for testing purposes, defaults to "RNTouchableRipple".
+ * @param {string} [props.testID] - Optional test ID used for testing purposes, defaults to "rn-touchable-ripple".
  * 
  * @param {React.Ref} ref - A ref that can be used to access the underlying Pressable component.
  * 
@@ -100,7 +100,7 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
 }, ref) => {
     const theme = useTheme();
     const { rippleColor, hoverColor } = getColors({ rippleColor: customRippleColor, hoverColor: customHoverColor, theme });
-    testID = defaultStr(testID, "RNTouchableRipple");
+    testID = defaultStr(testID, "rn-touchable-ripple");;
     const { fadeIn, fadeOut, animatedRef } = useAnimations();
     const { webStyle } = useMemo(() => {
         return {

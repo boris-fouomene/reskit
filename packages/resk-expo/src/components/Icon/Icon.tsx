@@ -1,7 +1,7 @@
 import React, { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
 import { IFontIconProps, IGetIconOptions, IIconProps, IIconSource } from "./types";
 import { Image, ImageSourcePropType, ImageStyle, Pressable } from "react-native";
-import { isValidElement } from "@utils";
+import { hasTouchHandler, isValidElement, pickTouchEventHandlers } from "@utils";
 import { isImageSource } from "./utils";
 import { defaultStr, isObj } from "@resk/core";
 import Theme, { Colors, useTheme } from "@theme/index";
@@ -75,23 +75,24 @@ import { ITheme } from "@theme/types";
  * <Icon iconName="material-home" size={24} color="#000" />
  */
 
-const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, disabled, onPress, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
+const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, disabled, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
     const isSource = isImageSource(source);
-    testID = defaultStr(testID, isSource ? "RNImage" : "RNFontIcon");
+    testID = defaultStr(testID, isSource ? "rn-image" : "rn-font-icon");
     size = typeof size == "number" && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
+    const touchableEvents = pickTouchEventHandlers(props);
     const { Component, props: containerP } = useMemo(() => {
-        const isPressable = !disabled && (title || tooltip || onPress);
-        const isTooltip = as || isPressable;
-        const props = isTooltip ? Object.assign({}, { onPress, testID: `${testID}_IconContainer`, disabled, title, tooltip }, containerProps) : {};
+        const isPressable = !disabled && (title || tooltip);
+        const isTooltip = as || isPressable || touchableEvents;
+        const _props = isTooltip ? Object.assign({}, { ...Object.assign({}, touchableEvents), testID: `${testID}-icon-container`, disabled, title, tooltip }, containerProps) : {};
         if (isTooltip) {
-            props.style = StyleSheet.flatten([styles.container, containerProps?.style]);
-            props.as = as;
+            _props.style = StyleSheet.flatten([styles.container, containerProps?.style]);
+            _props.as = as;
         }
         return {
             Component: isTooltip ? Tooltip : React.Fragment,
             props,
         };
-    }, [title, tooltip, onPress, disabled, testID, as, containerProps]);
+    }, [title, tooltip, touchableEvents, disabled, testID, as, containerProps]);
     const iconStyle = StyleSheet.flatten([
         Theme.styles.RTL,
         disabled && Theme.styles.disabled,
@@ -113,7 +114,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, dis
             style={iconStyle as ImageStyle}
         /> : <FontIcon
             testID={testID}
-            iconName={iconName as IFontIconProps["iconName"]}
+            name={iconName as IFontIconProps["name"]}
             size={size}
             {...props}
             color={color}
@@ -156,7 +157,7 @@ export function getIcon<T = any>({ icon, color: col2, theme, ...rest }: IGetIcon
     const iconProps: IIconProps = {
         color
         , ...rest,
-        iconName: typeof iconSource == "string" ? (iconSource as unknown as IFontIconProps["iconName"]) : undefined,
+        iconName: typeof iconSource == "string" ? (iconSource as unknown as IFontIconProps["name"]) : undefined,
         ...Object.assign({}, (isImageSource(iconSource) ? { source: iconSource as ImageSourcePropType } : isImageSource(Icon) ? { source: icon as ImageSourcePropType } : undefined)),
     }
     return <Icon

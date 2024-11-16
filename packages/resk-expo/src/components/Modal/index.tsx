@@ -46,7 +46,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContai
     return props.children;
   }, [props.children]) as React.ReactNode;
   contentContainerProps = Object.assign({}, contentContainerProps);
-  testID = testID || "RNModal";
+  testID = testID || "rn-modal";
 
   const backgroundOpacity = useSharedValue(visible ? 1 : 0);
   const hiddenRef = useRef<boolean>(false);
@@ -88,7 +88,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContai
   return (
     <Portal style={styles.absoluteFill} testID={testID + "_ModalPortal"}>
       <Animated.View
-        testID={testID + "_ModalBackdrop"}
+        testID={testID + "-modal-backdrop"}
         style={[
           { backgroundColor: theme.colors.backdrop },
           styles.backdrop,
@@ -98,7 +98,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContai
         pointerEvents="none"
       />
       <AnimatedPressable
-        testID={testID + "_ModalContentContainer"}
+        testID={testID + "-modal-content-container"}
         {...contentContainerProps}
         style={[
           styles.content, styles.absoluteFill,

@@ -60,7 +60,7 @@ const Label = React.forwardRef(({
 
   r1.color = color;
   style = StyleSheet.flatten([style]);
-  testID = testID || "RN_Label";
+  testID = testID || "rn-label";
 
   const restProps: ILabelProps = { id };
 

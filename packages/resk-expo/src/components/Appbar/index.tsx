@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { BackAction } from './BackAction';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -11,39 +11,21 @@ import {
   TextStyle,
   ColorValue,
 } from 'react-native';
-import Label from '@components/Label';
+import Label, { ILabelProps } from '@components/Label';
 import { ISurfaceProps, Surface } from '@components/Surface';
 import { Colors, useTheme } from '@theme/index';
+import { IAppbarProps } from './types';
 
 // Types for the Appbar components
-export interface IAppbarProps extends ISurfaceProps {
-  backgroundColor?: ColorValue;
-  /**
-   * Extra padding to add at the top of header to account for translucent status bar.
-   * This is automatically handled on iOS >= 11 including iPhone X using `SafeAreaView`.
-   * If you are using Expo, we assume translucent status bar and set a height for status bar automatically.
-   * Pass `0` or a custom value to disable the default behaviour, and customize the height.
-   */
-  statusBarHeight?: number;
-}
+
 
 interface AppbarContentProps {
-  title: string;
-  subtitle?: string;
   titleStyle?: StyleProp<TextStyle>;
   subtitleStyle?: StyleProp<TextStyle>;
   color?: ColorValue;
 }
 
-interface IAppbarActionProps {
-  icon: React.ReactNode;
-  onPress?: () => void;
-  color?: ColorValue;
-  size?: number;
-  disabled?: boolean;
-  style?: StyleProp<ViewStyle>;
-  testID?: string;
-}
+
 
 
 // Main Appbar component
@@ -53,7 +35,7 @@ export const Appbar: React.FC<IAppbarProps> & {
   BackAction: typeof BackAction;
 } = ({ children, style, elevation = 4, statusBarHeight, backgroundColor, ...rest }) => {
   const theme = useTheme();
-  backgroundColor = Colors.isValid(backgroundColor) ? backgroundColor : theme.colors.primaryContainer;
+  backgroundColor = Colors.isValid(backgroundColor) ? backgroundColor : theme.colors.surface;
   const { top, left, right } = useSafeAreaInsets();
   //statusBarHeight = Platform.OS === 'ios' ? StatusBar.currentHeight || 0 : 0
   const containerStyle = {

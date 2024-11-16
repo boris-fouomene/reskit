@@ -46,8 +46,8 @@ const isIos = Platform.isIos();
  * export default function MyApp() {
  *   return (
  *     <>
- *       <FontIcon iconName="camera" />  // Defaults to MaterialCommunityIcons
- *       <FontIcon iconName="fa-camera" />  // Uses FontAwesome5 icon set
+ *       <FontIcon name="camera" />  // Defaults to MaterialCommunityIcons
+ *       <FontIcon name="fa-camera" />  // Uses FontAwesome5 icon set
  *     </>
  *   );
  * }
@@ -57,7 +57,7 @@ const isIos = Platform.isIos();
  * @param {React.Ref} ref The reference to the icon component.
  * @returns {JSX.Element | null} Returns the icon element, or null if the icon is not defined.
  */
-const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ iconName: name, style, color, ...props }, ref) => {
+const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, style, color, ...props }, ref) => {
     let IconSet: any = MaterialCommunityIcons, iconSetName: string = "", iconSetPrefix = "";
     const theme = useTheme();
     color = Colors.isValid(color) ? color : theme.colors.text;
@@ -77,13 +77,12 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ iconName: name, s
         console.warn(`Icon not defined for FontIcon component, icon [${nameString}], please specify a supported icon from https://github.com/expo/vector-icons/MaterialCommunityIcons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
-    const iconName = nameString.trim().ltrim(iconSetPrefix).ltrim("-").trim();
     return <IconSet
         {...props}
         size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
         ref={ref}
         color={color}
-        name={iconName}
+        name={nameString.trim().ltrim(iconSetPrefix).ltrim("-").trim()}
         style={[Theme.styles.RTL, style]}
     />;
 });
@@ -105,8 +104,8 @@ export const DEFAULT_FONT_ICON_SIZE = 20;
  * @description The icon name to verify. It should be a string and is case-insensitive.
  * 
  * @example
- * const iconName = "material-home";
- * const isValid = isFontIconName(iconName, "material"); // Returns true
+ * const name = "material-home";
+ * const isValid = isFontIconName(name, "material"); // Returns true
  * 
  * @param {string} iconSetName The name of the icon set to check within.
  * 
@@ -271,7 +270,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * import { FontIcon } from '@resk/expo';
      * 
      * const BackButton = () => (
-     *   <Icon iconName={FontIcon.BACK} size={24} color="#000" />
+     *   <Icon name={FontIcon.BACK} size={24} color="#000" />
      * );
      * 
      * @remarks
@@ -303,7 +302,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * import { FontIcon } from '@resk/expo';
      * 
      * const MenuButton = () => (
-     *   <Icon iconName={FontIcon.MENU} size={24} color="#000" />
+     *   <Icon name={FontIcon.MENU} size={24} color="#000" />
      * );
      * 
      * @remarks
@@ -337,7 +336,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * 
      * const CopyButton = () => (
      *   <Button onPress={handleCopy}>
-     *     <Icon iconName={FontIcon.COPY} size={24} color="#000" />
+     *     <Icon name={FontIcon.COPY} size={24} color="#000" />
      *     <Text>Copy</Text>
      *   </Button>
      * );
@@ -370,7 +369,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * import {FontIcon} from '@resk/expo';
      * 
      * const MoreOptionsButton = () => (
-     *   <Icon iconName={FontIcon.MORE} size={24} color="#000" />
+     *   <Icon name={FontIcon.MORE} size={24} color="#000" />
      * );
      * 
      * @remarks
@@ -405,7 +404,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * 
      * const PrintButton = () => (
      *   <Button onPress={handlePrint}>
-     *     <Icon iconName={FontIcon.PRINT} size={24} color="#000" />
+     *     <Icon name={FontIcon.PRINT} size={24} color="#000" />
      *     <Text>Print</Text>
      *   </Button>
      * );
@@ -439,7 +438,7 @@ const FontWithCustomIcons = FontIcon as unknown as IFontWithCustomIcons;
  * import { BACK_ICON } from '@resk/expo';
  * 
  * const BackButton = () => (
- *   <Icon iconName={BACK_ICON} size={24} color="#000" />
+ *   <Icon name={BACK_ICON} size={24} color="#000" />
  * );
  * 
  * @remarks
@@ -471,7 +470,7 @@ FontWithCustomIcons.BACK = isIos ? "chevron-left" : "arrow-left";
  * import { FontIcon } from '@resk/expo';
  * 
  * const MenuButton = () => (
- *   <Icon iconName={FontIcon.MENU} size={24} color="#000" />
+ *   <Icon name={FontIcon.MENU} size={24} color="#000" />
  * );
  * 
  * @remarks
@@ -505,7 +504,7 @@ FontWithCustomIcons.MENU = "menu";
  * 
  * const CopyButton = () => (
  *   <Button onPress={handleCopy}>
- *     <Icon iconName={FontIcon.COPY} size={24} color="#000" />
+ *     <Icon name={FontIcon.COPY} size={24} color="#000" />
  *     <Text>Copy</Text>
  *   </Button>
  * );
@@ -539,7 +538,7 @@ FontWithCustomIcons.COPY = "content-copy";
  * import {FontIcon} from '@resk/expo';
  * 
  * const MoreOptionsButton = () => (
- *   <Icon iconName={FontIcon.MORE} size={24} color="#000" />
+ *   <Icon name={FontIcon.MORE} size={24} color="#000" />
  * );
  * 
  * @remarks
@@ -573,7 +572,7 @@ FontWithCustomIcons.MORE = isIos ? "dots-horizontal" : "dots-vertical";
  * 
  * const PrintButton = () => (
  *   <Button onPress={handlePrint}>
- *     <Icon iconName={FontIcon.PRINT} size={24} color="#000" />
+ *     <Icon name={FontIcon.PRINT} size={24} color="#000" />
  *     <Text>Print</Text>
  *   </Button>
  * );

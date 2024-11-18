@@ -1,5 +1,5 @@
 import { IViewProps } from "@components/View";
-import { ILabelOrLeftOrRightOptions } from "@hooks/index";
+import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IFieldFormatValueResult, IFormatValueFormat } from "@resk/core";
 import { IOnChangeOptions } from "../../types";
 import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextInputProps } from "react-native";
@@ -191,7 +191,7 @@ export type ITextInputOnChangeOptions = IFieldFormatValueResult & IOnChangeOptio
  * 
  * - `left?`: Optional properties for a left component, allowing for 
  *   additional UI elements (like icons) next to the left side of the 
- *   text input, defined by `ILabelOrLeftOrRightOptions<ITextInputCallbackOptions>`.
+ *   text input, defined by `ILabelOrLeftOrRightProps<ITextInputCallbackOptions>`.
  * 
  * - `right?`: Similar to `left`, but for components on the right side 
  *   of the text input.
@@ -260,7 +260,7 @@ export type ITextInputOnChangeOptions = IFieldFormatValueResult & IOnChangeOptio
  * input components that enhance user interaction and maintainability 
  * in React Native applications.
  */
-export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> & ILabelOrLeftOrRightOptions<ITextInputCallbackOptions> & {
+export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> & ILabelOrLeftOrRightProps<ITextInputCallbackOptions> & {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 

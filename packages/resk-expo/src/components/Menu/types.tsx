@@ -1,4 +1,6 @@
 
+import { IButtonProps } from "@components/Button/types";
+import { IExpandableProps } from "@components/Expandable";
 import { ReactNode } from "react";
 import { GestureResponderEvent, LayoutRectangle, PressableProps, ViewProps } from "react-native";
 import { PressableStateCallbackType } from "react-native";
@@ -499,3 +501,228 @@ export type IMenuProps = Omit<AnimatedProps<ViewProps>, "children"> & {
  * };
  */
 export type IMenuAnchor = ReactNode | ((menuState: IMenuContext & PressableStateCallbackType) => ReactNode);
+
+
+
+/**
+ * @typedef IMenuItem
+ * 
+ * Represents the properties for a menu item component, extending the button properties 
+ * and allowing for additional custom properties and a hierarchical structure of menu items.
+ * 
+ * This type is particularly useful for creating complex menu structures where each 
+ * menu item may contain sub-items, enabling a nested menu system.
+ * 
+ * @template IMenuItemAdditionalProps - A generic type that allows the inclusion of additional properties 
+ *               specific to the menu item implementation. This can be any object type, 
+ *               allowing for extensibility of the menu item's functionality.
+ * 
+ * @template IMenuItemExtendContext - A generic type that allows the inclusion of additional context properties 
+ *               specific to the menu item's context implementation. This can be any object type, 
+ *               allowing for extensibility of the menu item's contextual behavior.
+ * 
+ * @property {IMenuItem<IMenuItemAdditionalProps, IMenuItemExtendContext>[]} [items] - An optional property 
+ *               that defines an array of sub-menu items. Each sub-menu item is also of type `IMenuItem`, 
+ *               allowing for recursive nesting of menu items.
+ * 
+ * @example
+ * // Example of using IMenuItem to create a nested menu structure
+ * interface MyMenuItemProps {
+ *     icon?: string; // Example of an additional property for the menu item
+ * }
+ * 
+ * const MenuItem: React.FC<IMenuItem<MyMenuItemProps>> = ({ label, items, icon }) => {
+ *     return (
+ *         <div>
+ *             {icon && <img src={icon} alt={`${label} icon`} />} {}
+ *             <span>{label}</span>
+ *             {items && items.length > 0 && (
+ *                 <ul>
+ *                     {items.map((item, index) => (
+ *                         <li key={index}>
+ *                             <MenuItem {...item} /> {
+ *                                  //Render sub-menu items recursively
+ *                             }    
+ *                         </li>
+ *                     ))}
+ *                 </ul>
+ *             )}
+ *         </div>
+ *     );
+ * };
+ * 
+ * // Usage of MenuItem with nested items
+ * const menuData: IMenuItem<MyMenuItemProps>[] = [
+ *     {
+ *         label: 'File',
+ *         items: [
+ *             { label: 'New', icon: 'new-icon.png' },
+ *             { label: 'Open', icon: 'open-icon.png' },
+ *         ],
+ *     },
+ *     {
+ *         label: 'Edit',
+ *         items: [
+ *             { label: 'Undo', icon: 'undo-icon.png' },
+ *             { label: 'Redo', icon: 'redo-icon.png' },
+ *         ],
+ *     },
+ * ];
+ * 
+ * const App: React.FC = () => {
+ *     return (
+ *         <div>
+ *             {menuData.map((item, index) => (
+ *                 <MenuItem key={index} {...item} />
+ *             ))}
+ *         </div>
+ *     );
+ * };
+ */
+export type IMenuItem<IMenuItemAdditionalProps extends object = any, IMenuItemExtendContext = any> = IButtonProps<IMenuItemAdditionalProps & {
+    items?: IMenuItem<IMenuItemAdditionalProps, IMenuItemExtendContext>[];
+}, IMenuItemExtendContext>;
+
+/**
+ * @typedef IMenuItemProps
+ * 
+ * Represents the properties for a menu item component that extends the base menu item 
+ * type with additional context from the menu context. This type is designed to facilitate 
+ * the integration of menu items within a broader menu system that manages visibility 
+ * and behavior through context.
+ * 
+ * @template IMenuItemAdditionalProps - A generic type that allows the inclusion of additional properties 
+ *               specific to the menu item implementation. This can be any object type, 
+ *               allowing for extensibility of the menu item's functionality.
+ * 
+ * @template IMenuItemExtendContext - A generic type that allows the inclusion of additional context properties 
+ *               specific to the menu item's context implementation. This can be any object type, 
+ *               allowing for extensibility of the menu item's contextual behavior.
+ * 
+ * @extends IMenuItem<IMenuItemAdditionalProps, IMenuItemExtendContext & IMenuContext>
+ * 
+ * @example
+ * // Example of using IMenuItemProps to create a menu item with context
+ * interface MyMenuItemProps {
+ *     icon?: string; // Example of an additional property for the menu item
+ * }
+ * 
+ * const MenuItem: React.FC<IMenuItemProps<MyMenuItemProps>> = ({ label, items, icon, visible, openMenu }) => {
+ *     return (
+ *         <div>
+ *             {icon && <img src={icon} alt={`${label} icon`} />} {
+ *                 //Render icon if provided    
+ *             }
+ *             <span>{label}</span>
+ *             <button onClick={openMenu}>{visible ? 'Close' : 'Open'} Submenu</button>
+ *             {items && items.length > 0 && (
+ *                 <ul>
+ *                     {items.map((item, index) => (
+ *                         <li key={index}>
+ *                             <MenuItem {...item} /> {
+ *                                  //Render sub-menu items recursively    
+ *                             }
+ *                         </li>
+ *                     ))}
+ *                 </ul>
+ *             )}
+ *         </div>
+ *     );
+ * };
+ * 
+ * // Usage of MenuItem with context
+ * const menuData: IMenuItemProps<MyMenuItemProps>[] = [
+ *     {
+ *         label: 'File',
+ *         items: [
+ *             { label: 'New', icon: 'new-icon.png' },
+ *             { label: 'Open', icon: 'open-icon.png' },
+ *         ],
+ *     },
+ *     {
+ *         label: 'Edit',
+ *         items: [
+ *             { label: 'Undo', icon: 'undo-icon.png' },
+ *             { label: 'Redo', icon: 'redo-icon.png' },
+ *         ],
+ *     },
+ * ];
+ * 
+ * const App: React.FC = () => {
+ *     return (
+ *         <div>
+ *             {menuData.map((item, index) => (
+ *                 <MenuItem key={index} {...item} />
+ *             ))}
+ *         </div>
+ *     );
+ * };
+ */
+export type IMenuItemProps<IMenuItemAdditionalProps extends object = any, IMenuItemExtendContext = any> = IMenuItem<IMenuItemAdditionalProps, IMenuItemContext<IMenuItemExtendContext>>;
+
+
+/**
+ * @typedef IMenuItemContext
+ * Represents the context for a menu item, which combines the properties 
+ * of the base menu context with any additional properties defined by the user. 
+ * This type is particularly useful in scenarios where you want to extend 
+ * the functionality of a menu item with custom properties or behaviors, 
+ * enabling a more flexible and dynamic menu system.
+ * 
+ * @template IMenuItemExtendContext - An optional generic type parameter that allows 
+ * you to extend the base menu context with additional properties specific to your 
+ * application. By default, this parameter is set to `any`, meaning you can 
+ * pass any type of context extension. This flexibility allows for the 
+ * incorporation of various custom properties that can be utilized within 
+ * the menu item.
+ * 
+ * @example
+ * // Defining a custom menu item context with additional properties
+ * interface CustomMenuItemContext {
+ *   isActive: boolean; // Indicates if the menu item is currently active
+ *   onClick: () => void; // Function to be executed when the menu item is clicked
+ * }
+ * 
+ * // Creating a menu item context that includes the custom properties
+ * const menuItemContext: IMenuItemContext<CustomMenuItemContext> = {
+ *   // Properties from the base IMenuContext would go here
+ *   isOpen: true, // Example property from IMenuContext
+ *   isActive: true,
+ *   onClick: () => console.log('Menu item clicked!'),
+ * };
+ * 
+ * // Usage in a menu item component
+ * const MenuItem: React.FC<IMenuItemContext<CustomMenuItemContext>> = ({ isActive, onClick }) => {
+ *   return (
+ *     <div onClick={onClick} style={{ fontWeight: isActive ? 'bold' : 'normal' }}>
+ *       Menu Item
+ *     </div>
+ *   );
+ * };
+ * 
+ * @returns A read-only context object that merges the base menu context 
+ * with any additional properties defined in `IMenuItemExtendContext`. 
+ * This ensures that the context is immutable, preventing accidental 
+ * modifications during runtime and maintaining the integrity of the menu state.
+ * 
+ * @remarks
+ * - This type is particularly useful in scenarios where menu items need 
+ *   to share common properties while also allowing for specific, 
+ *   customizable behavior.
+ * - Using `Readonly` ensures that the context cannot be altered, which 
+ *   helps maintain the integrity of the menu state throughout the 
+ *   application.
+ * - This approach promotes better type safety and clarity in your code, 
+ *   making it easier to understand the relationship between menu items 
+ *   and their context.
+ */
+export type IMenuItemContext<IMenuItemExtendContext = any> = Readonly<IMenuContext & IMenuItemExtendContext>;
+
+
+/***
+ * la props ExpandableMenuItem étends les props du composant MenuItemProps
+ */
+export type IExpandableMenuItemProps = IMenuItem<{
+    expandableProps?: IExpandableProps;
+    onToggleExpand?: (event: GestureResponderEvent) => any; //lorsqu'on modifie la valeur expanded
+}>;

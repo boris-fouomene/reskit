@@ -22,6 +22,7 @@ import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
 import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
+import { MenuItem } from './Item';
 
 
 
@@ -254,7 +255,7 @@ const isFullScreen = (fullScreen?: boolean, responsive?: boolean, isMobileOrTabl
  * };
  * ```
  */
-export const Menu: React.FC<IMenuProps> = ({
+const Menu: React.FC<IMenuProps> = ({
     onClose,
     children,
     animated = true,
@@ -479,5 +480,15 @@ const styles = StyleSheet.create({
     },
 });
 
+type IMenu = typeof Menu & {
+    Item: typeof MenuItem;
+};
 export * from "./context";
 export * from "./types";
+
+const MenuWithItem = Menu as unknown as IMenu;
+MenuWithItem.Item = MenuItem;
+MenuWithItem.displayName = 'Menu.Item';
+MenuWithItem.displayName = 'Menu';
+
+export { MenuWithItem as Menu, MenuItem };

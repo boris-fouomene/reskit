@@ -154,11 +154,12 @@ export function getIcon<T = any>({ icon, color: col2, theme, ...rest }: IGetIcon
     const iconSource = typeof icon == "function" ? icon({ ...rest, color } as IIconProps & { color: string }) : icon;
     if (isValidElement(iconSource)) return iconSource as ReactNode;
     if (!iconSource) return null;
+    const isSource = isImageSource(iconSource);
     const iconProps: IIconProps = {
         color
         , ...rest,
-        iconName: typeof iconSource == "string" ? (iconSource as unknown as IFontIconProps["name"]) : undefined,
-        ...Object.assign({}, (isImageSource(iconSource) ? { source: iconSource as ImageSourcePropType } : isImageSource(Icon) ? { source: icon as ImageSourcePropType } : undefined)),
+        iconName: typeof iconSource == "string" && !isSource ? (iconSource as unknown as IFontIconProps["name"]) : undefined,
+        ...Object.assign({}, (isSource ? { source: iconSource as ImageSourcePropType } : isImageSource(Icon) ? { source: icon as ImageSourcePropType } : undefined)),
     }
     return <Icon
         {...iconProps}

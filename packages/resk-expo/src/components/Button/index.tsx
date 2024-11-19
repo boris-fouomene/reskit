@@ -22,6 +22,7 @@ import { Tooltip } from '@components/Tooltip';
 import isValidElement from '@utils/isValidElement';
 import View from '@components/View';
 import { getLabelOrLeftOrRightProps } from '@hooks/index';
+import { Divider } from '@components/Divider';
 
 /**
  * A customizable button component that supports various styles, states, and accessibility features.
@@ -144,6 +145,8 @@ export const Button = //forwardRef(
             id,
             left: customLeft,
             right: customRight,
+            dividerProps,
+            divider: customDivider,
             context: extendContext,
             ...rest
         }: IButtonProps<IButtonAdditionalProps, IButtonExtendContext>,
@@ -154,6 +157,7 @@ export const Button = //forwardRef(
         const [isDisabled, setIsDisabled] = React.useState(typeof customDisabled == "boolean" ? customDisabled : false);
         const idRef = React.useRef<string>(id || uniqid("menu-item-id-"));
         const disabled: boolean = isDisabled || isLoading;
+        const divider = customDivider === true;
         const disable = () => {
             setIsDisabled(true);
         },
@@ -244,7 +248,7 @@ export const Button = //forwardRef(
             borderWidth,
             ...touchableStyle,
         };
-
+        dividerProps = Object.assign({}, dividerProps);
         labelProps = Object.assign({}, labelProps);
         contentProps = Object.assign({}, contentProps);
         const { color: customLabelColor, fontSize: customLabelSize } = (StyleSheet.flatten([labelProps.style]) || {}) as TextStyle;
@@ -347,6 +351,7 @@ export const Button = //forwardRef(
                     </View>
                 </Tooltip>
             </Surface>
+            {divider ? <Divider id={idRef.current + "-divider"} testID={testID + "-divider"} {...dividerProps} style={[dividerProps.style, Theme.styles.w100]} /> : null}
         </ButtonContext.Provider>);
     }
 //);

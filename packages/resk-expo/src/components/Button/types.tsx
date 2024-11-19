@@ -10,6 +10,7 @@ import { AccessibilityRole, View } from "react-native";
 import { ILabelProps } from "@components/Label";
 import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
+import { IDividerProps } from "@components/Divider";
 
 
 /**
@@ -264,6 +265,17 @@ export type IButtonBaseProps = Omit<ITouchableRippleProps, "style" | "children">
      * This property can be used to control the rounded corners of the button.
      */
     borderRadius?: number;
+
+    /***
+     * if true, the button will have a divider line below it.
+     * The divider line is added only when button mode is not outlined.
+     */
+    divider?: boolean;
+
+    /***
+     * Props for the divider line below the button.
+     */
+    dividerProps?: IDividerProps;
 }
 
 /**

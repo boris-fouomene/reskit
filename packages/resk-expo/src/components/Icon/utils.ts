@@ -46,4 +46,6 @@ export const isImageSource = (source: any) =>
   // source is an object with uri
   (source && isObj(source) && source !== null && Object.prototype.hasOwnProperty.call(source, 'uri') && typeof source.uri === 'string') ||
   // source is a module, e.g. - require('image')
-  typeof source === 'number' || Platform.isWeb() && isValidImageSrc(source);
+  typeof source === 'number' ||
+  //Platform.isWeb() && 
+  isValidImageSrc(source);

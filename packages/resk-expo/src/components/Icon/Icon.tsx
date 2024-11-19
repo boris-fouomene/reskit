@@ -155,15 +155,20 @@ export function getIcon<T = any>({ icon, color: col2, theme, ...rest }: IGetIcon
     if (isValidElement(iconSource)) return iconSource as ReactNode;
     if (!iconSource) return null;
     const isSource = isImageSource(iconSource);
+    const iconName = typeof iconSource == "string" && !isSource ? (iconSource as unknown as IFontIconProps["name"]) : undefined;
     const iconProps: IIconProps = {
         color
         , ...rest,
-        iconName: typeof iconSource == "string" && !isSource ? (iconSource as unknown as IFontIconProps["name"]) : undefined,
-        ...Object.assign({}, (isSource ? { source: iconSource as ImageSourcePropType } : isImageSource(Icon) ? { source: icon as ImageSourcePropType } : undefined)),
+        iconName,
+        ...Object.assign({}, !iconName ? (getIconSource(iconSource)) : undefined),
     }
     return <Icon
         {...iconProps}
     />
+}
+const getIconSource = (icon: any) => {
+    if (!isImageSource(icon)) return null;
+    return isObj(icon) ? icon : { source: icon };
 }
 
 /**

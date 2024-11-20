@@ -9,9 +9,10 @@ import {
 
 const useNativeDriver = Platform.isMobileNative();
 
-export const useAnimations = () => {
+export const useAnimations = (disableRipple?: boolean) => {
     const animatedRef = useRef(new Animated.Value(1));
     const fadeIn = () => {
+        if (disableRipple) return;
         Animated.timing(animatedRef.current, {
             toValue: 0.4,
             duration: 100,
@@ -19,6 +20,7 @@ export const useAnimations = () => {
         }).start();
     };
     const fadeOut = () => {
+        if (disableRipple) return;
         Animated.timing(animatedRef.current, {
             toValue: 1,
             duration: 200,

@@ -108,253 +108,250 @@ import { Divider } from '@components/Divider';
  *     Submit
  * </Button>
  */
-export const Button = //forwardRef(
-    function ButtonInternal<IButtonAdditionalProps extends object = any, IButtonExtendContext = any>(
-        {
-            disabled: customDisabled,
-            compact,
-            mode = 'text',
-            dark,
-            isLoading: customIsLoading,
-            icon: iconProp,
-            backgroundColor: customBackgroundColor,
-            textColor: customTextColor,
-            rippleColor: customRippleColor,
-            children,
-            accessibilityLabel,
-            accessibilityHint,
-            accessibilityRole = 'button',
-            onPress,
-            onPressIn,
-            onPressOut,
-            onLongPress,
-            style,
-            uppercase = true,
-            testID,
-            accessible,
-            containerRef,
-            labelProps,
-            contentProps,
-            iconPosition,
-            iconProps,
-            containerProps,
-            label: customLabel,
-            colorScheme,
-            disableRipple,
-            borderRadius,
-            id,
-            left: customLeft,
-            right: customRight,
-            dividerProps,
-            divider: customDivider,
-            context: extendContext,
-            ...rest
-        }: IButtonProps<IButtonAdditionalProps, IButtonExtendContext>,
-        ref: React.ForwardedRef<IButtonContext<IButtonExtendContext>>) {
-        testID = defaultStr(testID, "rn-button");
-        const theme = useTheme();
-        const [isLoading, _setIsLoading] = React.useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
-        const [isDisabled, setIsDisabled] = React.useState(typeof customDisabled == "boolean" ? customDisabled : false);
-        const idRef = React.useRef<string>(id || uniqid("menu-item-id-"));
-        const disabled: boolean = isDisabled || isLoading;
-        const divider = customDivider === true;
-        const disable = () => {
-            setIsDisabled(true);
+export const Button = forwardRef<any, any>(function Button<IButtonExtendContext = any>({
+    disabled: customDisabled,
+    compact,
+    mode = 'text',
+    dark,
+    isLoading: customIsLoading,
+    icon: iconProp,
+    backgroundColor: customBackgroundColor,
+    textColor: customTextColor,
+    rippleColor: customRippleColor,
+    children,
+    accessibilityLabel,
+    accessibilityHint,
+    accessibilityRole = 'button',
+    onPress,
+    onPressIn,
+    onPressOut,
+    onLongPress,
+    style,
+    uppercase = true,
+    testID,
+    accessible,
+    containerRef,
+    labelProps,
+    contentProps,
+    iconPosition,
+    iconProps,
+    containerProps,
+    label: customLabel,
+    colorScheme,
+    disableRipple,
+    borderRadius,
+    id,
+    left: customLeft,
+    right: customRight,
+    dividerProps,
+    divider: customDivider,
+    context: extendContext,
+    ...rest
+}: IButtonProps<IButtonExtendContext>, ref: React.ForwardedRef<IButtonContext<IButtonExtendContext>>) {
+    testID = defaultStr(testID, "rn-button");
+    const theme = useTheme();
+    const [isLoading, _setIsLoading] = React.useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
+    const [isDisabled, setIsDisabled] = React.useState(typeof customDisabled == "boolean" ? customDisabled : false);
+    const idRef = React.useRef<string>(id || uniqid("menu-item-id-"));
+    const disabled: boolean = isDisabled || isLoading;
+    const divider = customDivider === true;
+    const disable = () => {
+        setIsDisabled(true);
+    },
+        enable = () => {
+            setIsDisabled(false);
         },
-            enable = () => {
-                setIsDisabled(false);
-            },
-            isEnabled = () => {
-                return !!!isDisabled;
-            },
-            setIsLoading = (customIsLoading: boolean) => {
-                if (typeof customIsLoading === "boolean") {
-                    _setIsLoading(customIsLoading);
-                }
-            };
-        React.useEffect(() => {
-            if (typeof customDisabled == "boolean") {
-                setIsDisabled(customDisabled);
+        isEnabled = () => {
+            return !!!isDisabled;
+        },
+        setIsLoading = (customIsLoading: boolean) => {
+            if (typeof customIsLoading === "boolean") {
+                _setIsLoading(customIsLoading);
             }
-        }, [customDisabled]);
-        React.useEffect(() => {
-            if (typeof customIsLoading == "boolean") {
-                setIsLoading(customIsLoading);
-            }
-        }, [customIsLoading]);
-        const { color: colorSchemeColor, backgroundColor: colorSchemeBackgroundColor } = Theme.getColorScheme(colorScheme);
-        dark = dark ?? theme.dark;
-        const isMode = React.useCallback(
-            (modeToCompare: IButtonMode) => {
-                return mode === modeToCompare;
-            },
-            [mode]
-        );
-        const innerRef = React.useRef<RNView>(null);
-        const context = {
-            enable,
-            disable,
-            isEnabled,
-            get id() { return idRef.current },
-            setIsLoading,
-            get ref() {
-                return innerRef.current;
-            },
-            ...Object.assign({}, extendContext)
+        };
+    React.useEffect(() => {
+        if (typeof customDisabled == "boolean") {
+            setIsDisabled(customDisabled);
         }
-        // Expose methods using useImperativeHandle
-        React.useImperativeHandle(ref, () => (context as IButtonContext<IButtonExtendContext>));
-        const { roundness } = theme;
-        containerProps = Object.assign({}, containerProps);
-
-        const isElevationEntitled = !disabled;
-        const initialElevation = 1;
-
-        const { current: elevation } = React.useRef<Animated.Value>(
-            new Animated.Value(isElevationEntitled ? initialElevation : 0)
-        );
-
-        React.useEffect(() => {
-            elevation.setValue(isElevationEntitled ? initialElevation : 0);
-        }, [isElevationEntitled, elevation, initialElevation]);
-
-        const flattenedStyles = (StyleSheet.flatten(style) || {}) as ViewStyle;
-        const [, borderRadiusStyles] = splitStyles(
-            flattenedStyles,
-            (style) => style.startsWith('border') && style.endsWith('Radius')
-        );
-        borderRadius = typeof (borderRadius) === 'number' ? borderRadius : 5 * (roundness || 4);
-        const { backgroundColor, borderColor, textColor, borderWidth } =
-            getButtonColors({
-                customBackgroundColor: Colors.isValid(customBackgroundColor) ? customBackgroundColor : colorSchemeBackgroundColor,
-                customTextColor: Colors.isValid(customTextColor) ? customTextColor : colorSchemeColor,
-                theme,
-                mode,
-                dark,
-            });
-
-        const rippleColor = Colors.isValid(customRippleColor) ? customRippleColor : Colors.setAlpha(textColor, 0.12);
-
-        const touchableStyle = {
-            ...borderRadiusStyles,
-            borderRadius: borderRadiusStyles.borderRadius ?? borderRadius,
-        };
-        const iconSize = 18;
-        iconProps = Object.assign({}, iconProps);
-
-        const buttonStyle = {
-            backgroundColor,
-            borderColor,
-            borderWidth,
-            ...touchableStyle,
-        };
-        dividerProps = Object.assign({}, dividerProps);
-        labelProps = Object.assign({}, labelProps);
-        contentProps = Object.assign({}, contentProps);
-        const { color: customLabelColor, fontSize: customLabelSize } = (StyleSheet.flatten([labelProps.style]) || {}) as TextStyle;
-        const textStyle = {
-            color: textColor,
-        };
-        const { left, right, label } = getLabelOrLeftOrRightProps({ label: customLabel, left: customLeft, right: customRight }, { color: textColor, context })
-        const iconColor: string = (Colors.isValid(customLabelColor) ? customLabelColor : Colors.isValid(iconProps?.color) ? iconProps.color : textColor) as string;
-        const icon = useGetIcon<IButtonAdditionalProps>({ ...(rest as IButtonAdditionalProps), icon: iconProp, size: iconSize, ...iconProps, color: iconColor as unknown as string, theme });
-        const iconContent = icon && isLoading !== true ? icon : null;
-        const contentStyle = StyleSheet.flatten([contentProps.style]) as IFlatStyle;
-        const iconStyle =
-            StyleSheet.flatten(contentStyle)?.flexDirection === 'row-reverse'
-                ? [
-                    styles.iconReverse,
-                    styles[`md3IconReverse${compact ? 'Compact' : ''}`],
-                    isMode('text') && styles[`md3IconReverseTextMode${compact ? 'Compact' : ''}`],
-                ]
-                : [
-                    styles.icon,
-                    styles[`md3Icon${compact ? 'Compact' : ''}`],
-                    isMode('text') &&
-                    styles[`md3IconTextMode${compact ? 'Compact' : ''}`],
-                ];
-
-        return (<ButtonContext.Provider value={context}>
-            <Surface
-                id={`${idRef.current}-container`}
-                {...containerProps}
-                ref={containerRef}
-                testID={`${testID}-container`}
-                style={
-                    [
-                        styles.button,
-                        compact && styles.compact,
-                        buttonStyle,
-                        style,
-                        !!disabled && { elevation },
-                    ] as ViewStyle
-                }
-            >
-                <Tooltip
-                    as={TouchableRipple}
-                    borderless
-                    onPress={onPress}
-                    onLongPress={onLongPress}
-                    onPressIn={onPressIn}
-                    onPressOut={onPressOut}
-                    accessibilityLabel={accessibilityLabel}
-                    accessibilityHint={accessibilityHint}
-                    accessibilityRole={accessibilityRole}
-                    accessibilityState={{ disabled }}
-                    accessible={accessible}
-                    disabled={disabled || disableRipple}
-                    rippleColor={rippleColor}
-                    style={touchableStyle}
-                    testID={testID}
-                    ref={innerRef}
-                    id={idRef.current}
-                    {...rest}
-                >
-                    <View id={`${idRef.current}-content`} testID={testID + "-content"} {...contentProps} style={[styles.content, contentStyle]}>
-                        {iconPosition != "right" ? iconContent : null}
-                        {isLoading ? (
-                            <ActivityIndicator
-                                size={customLabelSize ?? iconSize}
-                                color={
-                                    typeof customLabelColor === 'string'
-                                        ? customLabelColor
-                                        : textColor
-                                }
-                                style={iconStyle}
-                            />
-                        ) : null}
-                        {left}
-                        <Label
-                            id={`${idRef.current}-label`}
-                            selectable={false}
-                            numberOfLines={1}
-                            testID={`${testID}-label`}
-                            {...labelProps}
-                            style={[
-                                styles.label,
-                                !styles.md2Label,
-                                (isMode('text')
-                                    ? icon || isLoading
-                                        ? styles.md3LabelTextAddons
-                                        : styles.md3LabelText
-                                    : styles.md3Label),
-                                compact && styles.compactLabel,
-                                uppercase && styles.uppercaseLabel,
-                                textStyle,
-                                labelProps.style,
-                            ]}
-                        >
-                            {isValidElement(children, true) && children || label}
-                        </Label>
-                        {iconPosition == "right" ? iconContent : null}
-                        {right}
-                    </View>
-                </Tooltip>
-            </Surface>
-            {divider ? <Divider id={idRef.current + "-divider"} testID={testID + "-divider"} {...dividerProps} style={[dividerProps.style, Theme.styles.w100]} /> : null}
-        </ButtonContext.Provider>);
+    }, [customDisabled]);
+    React.useEffect(() => {
+        if (typeof customIsLoading == "boolean") {
+            setIsLoading(customIsLoading);
+        }
+    }, [customIsLoading]);
+    const { color: colorSchemeColor, backgroundColor: colorSchemeBackgroundColor } = Theme.getColorScheme(colorScheme);
+    dark = dark ?? theme.dark;
+    const isMode = React.useCallback(
+        (modeToCompare: IButtonMode) => {
+            return mode === modeToCompare;
+        },
+        [mode]
+    );
+    const innerRef = React.useRef<RNView>(null);
+    const context = {
+        enable,
+        disable,
+        isEnabled,
+        get id() { return idRef.current },
+        setIsLoading,
+        get ref() {
+            return innerRef.current;
+        },
+        ...Object.assign({}, extendContext)
     }
-//);
+    // Expose methods using useImperativeHandle
+    React.useImperativeHandle(ref, () => (context as IButtonContext<IButtonExtendContext>));
+    const { roundness } = theme;
+    containerProps = Object.assign({}, containerProps);
+
+    const isElevationEntitled = !disabled;
+    const initialElevation = 1;
+
+    const { current: elevation } = React.useRef<Animated.Value>(
+        new Animated.Value(isElevationEntitled ? initialElevation : 0)
+    );
+
+    React.useEffect(() => {
+        elevation.setValue(isElevationEntitled ? initialElevation : 0);
+    }, [isElevationEntitled, elevation, initialElevation]);
+
+    const flattenedStyles = (StyleSheet.flatten(style) || {}) as ViewStyle;
+    const [, borderRadiusStyles] = splitStyles(
+        flattenedStyles,
+        (style) => style.startsWith('border') && style.endsWith('Radius')
+    );
+    borderRadius = typeof (borderRadius) === 'number' ? borderRadius : 5 * (roundness || 4);
+    const { backgroundColor, borderColor, textColor, borderWidth } =
+        getButtonColors({
+            customBackgroundColor: Colors.isValid(customBackgroundColor) ? customBackgroundColor : colorSchemeBackgroundColor,
+            customTextColor: Colors.isValid(customTextColor) ? customTextColor : colorSchemeColor,
+            theme,
+            mode,
+            dark,
+        });
+
+    const rippleColor = Colors.isValid(customRippleColor) ? customRippleColor : Colors.setAlpha(textColor, 0.12);
+
+    const touchableStyle = {
+        ...borderRadiusStyles,
+        borderRadius: borderRadiusStyles.borderRadius ?? borderRadius,
+    };
+    const iconSize = 18;
+    iconProps = Object.assign({}, iconProps);
+
+    const buttonStyle = {
+        backgroundColor,
+        borderColor,
+        borderWidth,
+        ...touchableStyle,
+    };
+    dividerProps = Object.assign({}, dividerProps);
+    labelProps = Object.assign({}, labelProps);
+    contentProps = Object.assign({}, contentProps);
+    const { color: customLabelColor, fontSize: customLabelSize } = (StyleSheet.flatten([labelProps.style]) || {}) as TextStyle;
+    const textStyle = {
+        color: textColor,
+    };
+    const { left, right, label } = getLabelOrLeftOrRightProps({ label: customLabel, left: customLeft, right: customRight }, { color: textColor, context })
+    const iconColor: string = (Colors.isValid(customLabelColor) ? customLabelColor : Colors.isValid(iconProps?.color) ? iconProps.color : textColor) as string;
+    const icon = useGetIcon({ icon: iconProp, size: iconSize, ...iconProps, color: iconColor as unknown as string, theme });
+    const iconContent = icon && isLoading !== true ? icon : null;
+    const contentStyle = StyleSheet.flatten([contentProps.style]) as IFlatStyle;
+    const iconStyle =
+        StyleSheet.flatten(contentStyle)?.flexDirection === 'row-reverse'
+            ? [
+                styles.iconReverse,
+                styles[`md3IconReverse${compact ? 'Compact' : ''}`],
+                isMode('text') && styles[`md3IconReverseTextMode${compact ? 'Compact' : ''}`],
+            ]
+            : [
+                styles.icon,
+                styles[`md3Icon${compact ? 'Compact' : ''}`],
+                isMode('text') &&
+                styles[`md3IconTextMode${compact ? 'Compact' : ''}`],
+            ];
+
+    return (<ButtonContext.Provider value={context}>
+        <Surface
+            id={`${idRef.current}-container`}
+            {...containerProps}
+            ref={containerRef}
+            testID={`${testID}-container`}
+            style={
+                [
+                    styles.button,
+                    compact && styles.compact,
+                    buttonStyle,
+                    style,
+                    !!disabled && { elevation },
+                ] as ViewStyle
+            }
+        >
+            <Tooltip
+                as={TouchableRipple}
+                borderless
+                onPress={onPress}
+                onLongPress={onLongPress}
+                onPressIn={onPressIn}
+                onPressOut={onPressOut}
+                accessibilityLabel={accessibilityLabel}
+                accessibilityHint={accessibilityHint}
+                accessibilityRole={accessibilityRole}
+                accessibilityState={{ disabled }}
+                accessible={accessible}
+                disabled={disabled}
+                disabledRipple={disableRipple}
+                rippleColor={rippleColor}
+                style={touchableStyle}
+                testID={testID}
+                ref={innerRef}
+                id={idRef.current}
+                {...rest}
+            >
+                <View id={`${idRef.current}-content`} testID={testID + "-content"} {...contentProps} style={[styles.content, contentStyle]}>
+                    {iconPosition != "right" ? iconContent : null}
+                    {isLoading ? (
+                        <ActivityIndicator
+                            size={customLabelSize ?? iconSize}
+                            color={
+                                typeof customLabelColor === 'string'
+                                    ? customLabelColor
+                                    : textColor
+                            }
+                            style={iconStyle}
+                        />
+                    ) : null}
+                    {left}
+                    <Label
+                        id={`${idRef.current}-label`}
+                        selectable={false}
+                        numberOfLines={1}
+                        testID={`${testID}-label`}
+                        {...labelProps}
+                        style={[
+                            styles.label,
+                            !styles.md2Label,
+                            (isMode('text')
+                                ? icon || isLoading
+                                    ? styles.md3LabelTextAddons
+                                    : styles.md3LabelText
+                                : styles.md3Label),
+                            compact && styles.compactLabel,
+                            uppercase && styles.uppercaseLabel,
+                            textStyle,
+                            labelProps.style,
+                        ]}
+                    >
+                        {isValidElement(children, true) && children || label}
+                    </Label>
+                    {iconPosition == "right" ? iconContent : null}
+                    {right}
+                </View>
+            </Tooltip>
+        </Surface>
+        {divider ? <Divider id={idRef.current + "-divider"} testID={testID + "-divider"} {...dividerProps} style={[dividerProps.style, Theme.styles.w100]} /> : null}
+    </ButtonContext.Provider>);
+});
 
 const styles = StyleSheet.create({
     button: {

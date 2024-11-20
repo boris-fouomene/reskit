@@ -17,7 +17,6 @@ import Animated, {
     Easing,
 } from 'react-native-reanimated';
 import { IMenuAnchorMeasurements, IMenuCalculatedPosition, IMenuPosition, IMenuProps, IUseMenuPositionProps } from './types';
-import usePrevious from '@utils/usePrevious';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
 import { MenuContext } from './context';

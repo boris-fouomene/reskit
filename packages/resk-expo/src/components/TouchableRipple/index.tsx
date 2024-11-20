@@ -93,6 +93,7 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
     hoverColor: customHoverColor,
     style,
     disabled = false,
+    disableRipple,
     testID,
     borderless,
     borderRadius,
@@ -101,7 +102,7 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
     const theme = useTheme();
     const { rippleColor, hoverColor } = getColors({ rippleColor: customRippleColor, hoverColor: customHoverColor, theme });
     testID = defaultStr(testID, "rn-touchable-ripple");;
-    const { fadeIn, fadeOut, animatedRef } = useAnimations();
+    const { fadeIn, fadeOut } = useAnimations(disableRipple);
     const { webStyle } = useMemo(() => {
         return {
             webStyle: !isAndroid ? [typeof borderRadius === "number" && { borderRadius } || null] : null
@@ -114,7 +115,7 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
             disabled={disabled}
             ref={ref}
             {...props}
-            android_ripple={Object.assign({
+            android_ripple={disableRipple ? undefined : Object.assign({
                 color: rippleColor,
                 borderless,
                 radius: borderRadius,
@@ -122,7 +123,6 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
             onPressOut={(event) => {
                 if (disabled) return;
                 typeof fadeOut == "function" && fadeOut();
-                //handlePressOut(event);
                 if (typeof props.onPressOut == "function") {
                     props.onPressOut(event);
                 }
@@ -130,7 +130,6 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
             onPressIn={(event) => {
                 if (disabled) return;
                 typeof fadeIn == "function" && fadeIn();
-                //handlePressIn(event);
                 if (typeof props.onPressIn == "function") {
                     props.onPressIn(event);
                 }

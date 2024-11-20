@@ -6,7 +6,7 @@ import {
 
 const useNativeDriver = Platform.isMobileNative();
 
-export const useAnimations = () => {
+export const useAnimations = (disableRipple?: boolean) => {
     const animatedRef = useRef(new Animated.Value(1));
     return { fadeIn: null, fadeOut: null, animatedRef };
 }

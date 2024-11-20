@@ -13,28 +13,73 @@ import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IDividerProps } from "@components/Divider";
 
 
+
 /**
- * Represents the properties for a base button component.
- * This type extends the properties of TouchableRipple and includes additional
- * customization options for styling, behavior, and accessibility.
+ * @interface IButtonMode
+ * Represents the mode of a button, which affects its visual style and emphasis.
+ * You can change the mode to adjust the button's appearance, making it suitable 
+ * for various contexts and importance levels of actions.
  * 
- * @extends ITouchableRippleProps
- * @extends ITooltipBaseProps
+ * - `text`: A flat button without background or outline, ideal for low-priority actions,
+ *   particularly when presenting multiple options. It blends well with the UI, making it less 
+ *   visually intrusive.
+ * 
+ * - `outlined`: A button with an outline but no background, typically used for significant 
+ *   actions that are not primary. This mode provides a medium level of emphasis and 
+ *   distinguishes the button without overwhelming the design.
+ * 
+ * - `contained`: A button with a solid background color, used for crucial actions that 
+ *   require the most visual impact. This mode signifies high emphasis and is often used 
+ *   for primary actions that need immediate attention.
  * 
  * @example
- * // Example usage of IButtonBaseProps in a button component
- * const MyButton: React.FC<IButtonBaseProps> = (props) => {
+ * // Example of using IButtonMode
+ * const buttonMode: IButtonMode = 'contained'; // This will create a button with high emphasis
+ */
+export type IButtonMode = | 'text' | 'outlined' | 'contained';
+
+
+
+
+/**
+ * @typedef IButtonProps
+ * 
+ * Represents the properties for a button component
+ * This type extends the properties of TouchableRipple and includes additional
+ * customization options for styling, behavior, and accessibility.
+ * while allowing for additional custom properties through a generic type parameter.
+ * 
+ * This type is particularly useful for creating button components that require specific 
+ * props beyond the standard button functionalities
+ * 
+ * @template IButtonExtendContext - A generic type that allows the inclusion of additional context properties
+ *               specific to the button's context implementation. This can be any object type, 
+ *               allowing for extensibility of the button's functionality.
+ * 
+ * @property {function(IButtonContext): IButtonExtendContext} [context] - An optional function that allows 
+ *               the button to extend its reference context. This function receives the button's context object
+ *               and can return a partial set of additional properties that can be merged with the existing props.
+ * 
+ * @example
+ * // Example of using IButtonProps with additional custom properties
+ * interface MyCustomButtonContext {
+ *     customAction : ()=>{}; // An example of a custom method specific to the context of this button implementation
+ * }
+ * 
+ * const MyButton: React.FC<IButtonProps<MyCustomButtonContext>> = (props) => {
+ *     const ref = useRef<IButtonContext<MyCustomButtonContext>>(null);
  *     return (
  *         <Button
  *             {...props}
- *             onPress={() => console.log("Button pressed!")}
+ *             ref = {ref}
+ *             onPress={() => console.log("Button pressed with custom action :", ref.current?.context?.customAction())}
  *         >
- *             {props.label || props.children}
+ *             {props.label}
  *         </Button>
  *     );
  * };
  */
-export type IButtonBaseProps = Omit<ITouchableRippleProps, "style" | "children"> & Omit<ITooltipBaseProps, 'disabled'> & {
+export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, color: string }> & Omit<ITouchableRippleProps, "style" | "children"> & Omit<ITooltipBaseProps, 'disabled'> & {
     /**
      * Optional style for the button component.
      * Can be used to customize the appearance of the button.
@@ -276,99 +321,12 @@ export type IButtonBaseProps = Omit<ITouchableRippleProps, "style" | "children">
      * Props for the divider line below the button.
      */
     dividerProps?: IDividerProps;
-}
 
-/**
- * @interface IButtonMode
- * Represents the mode of a button, which affects its visual style and emphasis.
- * You can change the mode to adjust the button's appearance, making it suitable 
- * for various contexts and importance levels of actions.
- * 
- * - `text`: A flat button without background or outline, ideal for low-priority actions,
- *   particularly when presenting multiple options. It blends well with the UI, making it less 
- *   visually intrusive.
- * 
- * - `outlined`: A button with an outline but no background, typically used for significant 
- *   actions that are not primary. This mode provides a medium level of emphasis and 
- *   distinguishes the button without overwhelming the design.
- * 
- * - `contained`: A button with a solid background color, used for crucial actions that 
- *   require the most visual impact. This mode signifies high emphasis and is often used 
- *   for primary actions that need immediate attention.
- * 
- * @example
- * // Example of using IButtonMode
- * const buttonMode: IButtonMode = 'contained'; // This will create a button with high emphasis
- */
-export type IButtonMode = | 'text' | 'outlined' | 'contained';
-
-
-
-
-/**
- * @typedef IButtonProps
- * @extends IButtonBaseProps
- * 
- * Represents the properties for a button component, extending the base button properties
- * while allowing for additional custom properties through a generic type parameter.
- * 
- * This type is particularly useful for creating button components that require specific 
- * props beyond the standard button functionalities defined in `IButtonBaseProps`.
- * 
- * @template IButtonAdditionalProps - A generic type that allows the inclusion of additional properties
- *               specific to the button implementation. This can be any type, 
- *               and the button will inherit properties from it.
- * 
- * @template IButtonExtendContext - A generic type that allows the inclusion of additional context properties
- *               specific to the button's context implementation. This can be any object type, 
- *               allowing for extensibility of the button's functionality.
- * 
- * @property {function(IButtonContext): IButtonExtendContext} [context] - An optional function that allows 
- *               the button to extend its reference context. This function receives the button's context object
- *               and can return a partial set of additional properties that can be merged with the existing props.
- * 
- * @example
- * // Example of using IButtonProps with additional custom properties
- * interface MyCustomButtonProps {
- *     customLabel: string; // An example of a custom property specific to this button implementation
- * }
- * 
- * const MyButton: React.FC<IButtonProps<MyCustomButtonProps>> = (props) => {
- *     return (
- *         <Button
- *             {...props}
- *             onPress={() => console.log("Button pressed with customLabel:", props.customLabel)}
- *         >
- *             {props.label || props.customLabel} // Rendering label or customLabel passed to the button
- *         </Button>
- *     );
- * };
- * 
- * // Usage of MyButton with custom properties
- * <MyButton customLabel="Click Me!" label="Default Label" />
- * // This creates a button that can display either "Click Me!" or "Default Label" based on props.
- * 
- * @example
- * // Example of extending the button reference context
- * interface MyButtonContext {
- *     isActive: boolean; // Custom property indicating if the button is active
- * }
- 
- * const MyButtonWithContext: React.FC<IButtonProps<{}, MyButtonContext>> = (props) => {
- *     const context = props.context ? props.context({}) : {};
- *     return (
- *         <Button
- *             {...props}
- *             onPress={() => console.log("Button active status:", context.isActive)}
- *         >
- *             {props.label}
- *         </Button>
- *     );
- * };
- */
-export type IButtonProps<IButtonAdditionalProps extends object = any, IButtonExtendContext = any> = IButtonBaseProps & IButtonAdditionalProps & ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, color: string }> & {
+    /***
+     * Optional context for the button component.
+     */
     context?: IButtonExtendContext;
-};
+}
 
 /**
  * @typedef IButtonContext

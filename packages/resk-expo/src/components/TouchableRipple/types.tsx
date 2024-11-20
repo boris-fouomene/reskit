@@ -76,4 +76,8 @@ export interface ITouchableRippleProps extends PressableProps {
     centered?: boolean;
     underlayColor?: string;
     borderRadius?: number;
+    /***
+     * Disables the ripple effect.
+     */
+    disableRipple?: boolean;
 }

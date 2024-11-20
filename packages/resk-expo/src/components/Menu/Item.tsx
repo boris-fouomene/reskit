@@ -57,9 +57,9 @@ import { IButtonContext } from "@components/Button/types";
  *   the underlying button context, providing additional flexibility 
  *   in managing button states and behaviors.
  */
-export const MenuItem = forwardRef(function MenuItem<IMenuItemAdditionalProps extends object = any, IMenuItemExtendContext extends object = any>(props: IMenuItemProps<IMenuItemAdditionalProps, IMenuItemExtendContext>, ref?: React.ForwardedRef<IButtonContext<IMenuItemContext<IMenuItemExtendContext>>>) {
+export const MenuItem = forwardRef<any, any>(function MenuItem<IMenuItemExtendContext extends object = any>({ expandableProps, items, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref?: React.ForwardedRef<IButtonContext<IMenuItemContext<IMenuItemExtendContext>>>) {
     const menuContext = useMenu();
-    return <Button<IMenuItemAdditionalProps, IMenuItemContext<IMenuItemExtendContext>>
+    return <Button
         testID="menu-item"
         borderRadius={0}
         {...props}

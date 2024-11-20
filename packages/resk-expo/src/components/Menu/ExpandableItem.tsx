@@ -1,25 +1,22 @@
-import { GestureResponderEvent } from "react-native";
 import { defaultStr } from "@resk/core";
 import { MenuItem } from "./Item";
-import { Expandable, IExpandableProps } from "@components/Expandable";
-import { IExpandableMenuItemProps, IMenuItem } from "./types";
-import { useMenu } from "./context";
+import { Expandable } from "@components/Expandable";
+import { IMenuItemProps } from "./types";
+import { Divider } from "@components/Divider";
 
 /***
  * le composant ExpandableMenuItem, affiche un item du drawer de type expandable. 
  * la props children en principe doit contenir la liste des sous items de l'item en question
  */
-export default function ExpandableMenuItem({ testID, ...props }: IExpandableMenuItemProps) {
-    testID = defaultStr(testID, "RN_ExpandableMenuItemComponent")
-    const menuContext = useMenu();
-    /**
-     * return <ExpandableMenuItemComponent
-        as={MenuItem}
-        expandIconSize={15}
-        testID={testID}
-        {...props}
+export default function ExpandableMenuItem<IMenuItemExtendContext>({ testID, dividerProps, divider, expandableProps, children, ...props }: IMenuItemProps<IMenuItemExtendContext>) {
+    testID = defaultStr(testID, "rn-menu-item-expandable");
+    return <Expandable
+        testID={testID + "-expandable"}
+        {...Object.assign({}, expandableProps)}
+        label={<MenuItem {...props} testID={testID} />}
+        children={<>
+            {children}
+            {divider && <Divider testID={testID + "-divider"} {...Object.assign({}, dividerProps)} />}
+        </>}
     />
-     */
-    return null;
 }
-

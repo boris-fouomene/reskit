@@ -1,9 +1,7 @@
-/**
- * @fileoverview  Menu Component with Auto-positioning
- * @package @your-org/dynamic-menu
- * @version 1.0.0
- */
 
+
+import ExpandableMenuItem from './ExpandableItem';
+import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { getDimensions, useDimensions } from '@dimensions/index';
 import { useTheme } from '@theme/index';
@@ -479,15 +477,56 @@ const styles = StyleSheet.create({
     },
 });
 
-type IMenu = typeof Menu & {
-    Item: typeof MenuItem;
-};
 export * from "./context";
 export * from "./types";
+export * from "./utils";
 
-const MenuWithItem = Menu as unknown as IMenu;
-MenuWithItem.Item = MenuItem;
-MenuWithItem.displayName = 'Menu.Item';
-MenuWithItem.displayName = 'Menu';
 
-export { MenuWithItem as Menu, MenuItem };
+/**
+ * Type definition for a Menu component that includes nested Item components,
+ * a collection of items, and expandable items. This type extends the base
+ * Menu component type to provide a structured API for rendering menus and
+ * their various item types.
+ *
+ * @type IMenu
+ * @extends {typeof Menu} - Inherits the properties and methods of the base Menu component.
+ * 
+ * @property {typeof MenuItem} Item - A reference to the MenuItem component,
+ * allowing it to be used as a nested component within the Menu.
+ *
+ * @property {typeof MenuItems} Items - A reference to the MenuItems component,
+ * which can be used to render a collection of menu items.
+ *
+ * @property {typeof ExpandableMenuItem} ExpandableItem - A reference to the
+ * ExpandableMenuItem component, allowing for items that can expand to show
+ * additional content.
+ */
+type IMenu = typeof Menu & {
+    Item: typeof MenuItem;
+    Items: typeof MenuItems;
+    ExpandableItem: typeof ExpandableMenuItem;
+};
+
+/**
+ * Enhances the Menu component by adding references to Item, Items, and
+ * ExpandableItem components. This allows developers to use the Menu in a
+ * structured way, improving the organization of the code and the clarity
+ * of the API.
+ *
+ * The MenuExported constant is created by casting the Menu to the IMenu type,
+ * and then the Item, Items, and ExpandableItem properties are assigned to
+ * their respective components. The displayName properties are set for better
+ * debugging and identification in React DevTools.
+ */
+const MenuExported = Menu as unknown as IMenu;
+MenuExported.Item = MenuItem;
+MenuExported.displayName = 'Menu.Item';
+MenuExported.displayName = 'Menu';
+
+MenuExported.Items = MenuItems;
+MenuExported.Items.displayName = 'Menu.Items';
+
+MenuExported.ExpandableItem = ExpandableMenuItem;
+MenuExported.ExpandableItem.displayName = 'Menu.ExpandableItem';
+
+export { MenuExported as Menu };

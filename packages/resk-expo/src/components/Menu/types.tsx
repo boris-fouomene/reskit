@@ -1,8 +1,9 @@
 
 import { IButtonProps } from "@components/Button/types";
 import { IExpandableProps } from "@components/Expandable";
+import { IViewProps } from "@components/View";
 import { ReactNode } from "react";
-import { GestureResponderEvent, LayoutRectangle, PressableProps, ViewProps } from "react-native";
+import { PressableProps, ViewProps } from "react-native";
 import { PressableStateCallbackType } from "react-native";
 import { AnimatedProps } from "react-native-reanimated";
 
@@ -664,3 +665,30 @@ export type IMenuItemProps<IMenuItemExtendContext = any> = IButtonProps<IMenuIte
  *   and their context.
  */
 export type IMenuItemContext<IMenuItemExtendContext = any> = Readonly<IMenuContext & IMenuItemExtendContext>;
+
+
+/**
+ * Interface representing the properties of the MenuItems component.
+ *
+ * @template IMenuItemExtendContext - A generic type parameter that allows extending the
+ * context for menu items.
+ *
+ * @extends IViewProps - Inherits properties from the IViewProps interface, allowing for
+ * additional view-related props.
+ *
+ * @property {IMenuItemProps<IMenuItemExtendContext>[] | undefined | null} [items] - An optional array
+ * of menu item properties. Each item can either be a valid menu item object or undefined/null.
+ *
+ * @example
+ * ```tsx
+ * const items: IMenuItemsProps = {
+ *   items: [
+ *     { title: "Profile", onPress: () => console.log("Profile pressed") },
+ *     { title: "Logout", onPress: () => console.log("Logout pressed") }
+ *   ]
+ * };
+ * ```
+ */
+export type IMenuItemsProps<IMenuItemExtendContext = any> = IViewProps & {
+    items?: (IMenuItemProps<IMenuItemExtendContext> | undefined | null)[]
+}

@@ -266,6 +266,8 @@ const Menu: React.FC<IMenuProps> = ({
     onLayout,
     beforeToggle,
     responsive,
+    items,
+    itemsProps,
     ...props
 }) => {
     // State for measurements
@@ -276,6 +278,7 @@ const Menu: React.FC<IMenuProps> = ({
     const anchorRef = useRef<View>(null);
     anchorContainerProps = Object.assign({}, anchorContainerProps);
     testID = defaultStr(testID, "rn-menu");
+    itemsProps = Object.assign({}, itemsProps);
     // Animation values
     const opacity = useSharedValue(0);
     const scale = useSharedValue(0.8);
@@ -440,7 +443,10 @@ const Menu: React.FC<IMenuProps> = ({
                     ]}
                 >
                     <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
-                        <> {child}</>
+                        <>
+                            {items ? <MenuItems items={items} {...itemsProps} /> : null}
+                            {child}
+                        </>
                     </TouchableOpacity>
                 </Animated.View>
             </MenuContext.Provider>

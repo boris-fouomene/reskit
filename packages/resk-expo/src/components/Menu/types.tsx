@@ -323,15 +323,20 @@ export interface IUseMenuPositionProps {
 
 
 /**
+ * @typedef IMenuItemsProps
+ * @description
  * Props for the Menu component.
- * 
  * This interface defines the properties required for the Menu component, which 
  * is used to display a contextual menu that can be anchored to a specific element 
  * in the UI. The Menu can be shown or hidden based on user interactions, and 
  * it can be customized with various styles and behaviors.
- *
- * @interface IMenuProps
- *  * 
+ * 
+ * @template IMenuItemExtendContext - A generic type parameter that allows extending
+ * the context for menu items. This enables customization of the properties passed
+ * to menu items within the Menu.
+ * 
+ * @property {Omit<AnimatedProps<ViewProps>, "children">} - Inherits properties from AnimatedProps and ViewProps, excluding the 'children' property.
+ * 
  * @property {IViewProps} [menuProps] - Optional properties for customizing the menu's content layout and styling.
  * @property {boolean} [animated] - 
  *         Optional flag to enable or disable animations when the menu appears or 
@@ -370,8 +375,16 @@ export interface IUseMenuPositionProps {
  *         When set to true, the menu will adjust its position and size 
  *         based on the viewport dimensions, ensuring a good user experience 
  *         across different screen sizes. Ii's mostly used when the fullScreen props is not false to ensure the menu fit  the screen in mobile or tablet device.
+ *
+ * @property {IMenuItemsProps<IMenuItemExtendContext>["items"]} [items] - An optional
+ * property that defines an array of menu items. Each item can either be a valid menu
+ * item object or undefined/null.
+ *
+ * @property {IMenuItemsProps<IMenuItemExtendContext>} [itemsProps] - Props for the
+ * menu items component. This allows for additional customization of the items rendered within
+ * the menu.
+ *    
 
- * 
  * @example
  * // Example of using IMenuProps in a functional Menu component
  * const MyMenu: React.FC<IMenuProps> = ({
@@ -417,7 +430,7 @@ export interface IUseMenuPositionProps {
  *     );
  * };
  */
-export type IMenuProps = Omit<AnimatedProps<ViewProps>, "children"> & {
+export type IMenuProps<IMenuItemExtendContext = any> = Omit<AnimatedProps<ViewProps>, "children"> & {
     /** Enables or disables animations for opening and closing the menu. */
     animated?: boolean;
 
@@ -456,6 +469,17 @@ export type IMenuProps = Omit<AnimatedProps<ViewProps>, "children"> & {
      */
 
     responsive?: boolean;
+
+    /**
+     * An optional property that defines an array of menu items. Each item can either be a valid menu item object or undefined/null.
+     */
+    items?: IMenuItemsProps<IMenuItemExtendContext>["items"];
+
+    /***
+     * Props for the menu items component. This allows for additional customization of the items rendered within
+     * the menu.
+     */
+    itemsProps?: Omit<IMenuItemsProps<IMenuItemExtendContext>, "items">;
 }
 
 /**

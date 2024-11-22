@@ -413,3 +413,20 @@ export type ITouchableEvents = Partial<
     (event: GestureResponderEvent) => any
   >
 >;
+
+/**
+ * Represents a React element that can either be a valid React element or null.
+ * This type is useful for defining props or return types where a component
+ * may conditionally render a React element or nothing at all.
+ *
+ * @example
+ * const MyComponent: React.FC = () => {
+ *   const shouldRender = true; // Condition to determine rendering
+ *   return (
+ *     <div>
+ *       {shouldRender ? <span>Hello, World!</span> : null}
+ *     </div>
+ *   );
+ * };
+ */
+export type IReactNullableElement = React.ReactElement | null;

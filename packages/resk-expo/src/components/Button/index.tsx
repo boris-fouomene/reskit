@@ -469,3 +469,5 @@ export const ButtonContext = React.createContext<IButtonContext>({} as IButtonCo
  * };
  */
 export const useButton = () => React.useContext(ButtonContext);
+
+export * from "./types";

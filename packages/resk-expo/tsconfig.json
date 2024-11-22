@@ -15,12 +15,6 @@
       "@dimensions": [
         "src/dimensions"
       ],
-      "@types/*": [
-        "src/types/*"
-      ],
-      "@types": [
-        "src/types"
-      ],
       "@utils/*": [
         "src/utils/*"
       ],

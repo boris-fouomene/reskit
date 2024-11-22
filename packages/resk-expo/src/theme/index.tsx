@@ -3,7 +3,6 @@ import Colors from "./colors";
 import { extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
 import { packageName } from "@utils/index";
 import session from "../session";
-import { StatusBarProps } from "expo-status-bar";
 import Color from "color";
 import updateNative from "./updateNative";
 import styles from "./styles";
@@ -12,6 +11,7 @@ import Elevations from "./Elevations";
 import iosLightColors from "./ios/light";
 
 export * from "./utils";
+export * from "./types";
 
 /**
  * @constant UPDATE_THEME
@@ -443,7 +443,7 @@ export const triggerThemeUpdate = (theme: ITheme): void => {
  * 
  * @see https://docs.expo.dev/versions/latest/sdk/status-bar/#statusbarstyle
  * 
- * @returns {StatusBarProps} - The status bar properties including the style and background color.
+ * @returns {animated?:boolean, backgroundColor?:string, style?:"light" | "dark"} - The status bar properties including the style and background color.
  * 
  * @example
  * ```ts
@@ -451,9 +451,9 @@ export const triggerThemeUpdate = (theme: ITheme): void => {
  * console.log(statusBarProps.style); // Logs "light" or "dark" based on the current theme's status bar color
  * ```
  */
-export const getStatusBarProps = (): StatusBarProps => {
+export const getStatusBarProps = (): { animated?: boolean, backgroundColor?: string, style?: "light" | "dark" } => {
     // Initialize default status bar properties
-    const statusBarStyle: StatusBarProps = {
+    const statusBarStyle: { animated?: boolean, backgroundColor?: string, style?: "light" | "dark" } = {
         animated: true,
     };
 

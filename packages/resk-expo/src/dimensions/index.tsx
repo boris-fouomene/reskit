@@ -203,7 +203,7 @@ type IStyleProps = {
  * };
  * ```
  */
-export type IWithBreakpointStyle<T extends IStyleProps = any> =
+export type IWithBreakpointStyle<T = any> =
 	Omit<T, keyof IStyleProps> & IStyleProps;
 /**
  * @function useBreakpointStyle

@@ -286,7 +286,7 @@ const Menu: React.FC<IMenuProps> = ({
     const translateX = useSharedValue(0);
 
 
-    const isOpen = () => isVisible;
+    const isMenuOpen = () => isVisible;
     // Measure anchor element position
     const measureAnchor = useCallback(() => {
         if (anchorRef.current) {
@@ -312,7 +312,7 @@ const Menu: React.FC<IMenuProps> = ({
         fullScreen,
         responsive,
     });
-    const context1 = { animated, responsive, testID, borderRadius, fullScreen: _isFullScreen, ...props, isOpen, visible: isVisible, calculatePosition }
+    const context1 = { animated, responsive, testID, borderRadius, fullScreen: _isFullScreen, ...props, isMenu: true, isMenuOpen, isMenuVisible: isVisible, calculatePosition }
     const openMenu = (callback?: Function) => {
         if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
         setIsVisible(true, () => {
@@ -335,7 +335,7 @@ const Menu: React.FC<IMenuProps> = ({
             }
         });
     };
-    const context = { ...context1, visible: isVisible, isOpen, openMenu, closeMenu };
+    const context = { ...context1, isMenuVisible: isVisible, isMenuOpen, openMenu, closeMenu };
     const anchor = useMemo(() => {
         if (typeof customAnchor === 'function') {
             return (state: PressableStateCallbackType) => {

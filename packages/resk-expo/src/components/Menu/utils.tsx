@@ -1,85 +1,95 @@
-import { ReactNode } from "react";
+import { useMemo } from "react";
 import { Divider } from "@components/Divider";
-import { IMenuItemContext, IMenuItemProps } from "./types";
+import { IMenuItemBase, IMenuRenderItemOptions, IMenuItemsBase, IMenuRenderItemsOptions } from "./types";
+import { useTheme } from "@theme/index";
+import { IReactNullableElement } from "../../types";
+import stableHash from "stable-hash";
 
 const isAllowed = (p: any) => true;
 
-
 /**
- * Renders either an expandable menu item or a section based on the provided item properties.
- * If the item is a section, it uses the render function to display it; otherwise, it renders
- * the item as expandable.
+ * Renders either an expandable menu item or a section based on the provided properties.
+ * This function determines whether the item is a section or a standard menu item and
+ * invokes the appropriate rendering function accordingly.
  *
- * @template ItemExtendContext - A generic type parameter that allows extending the context
- * for menu items.
+ * @template MenuItemContext - A generic type parameter that allows extending the context
+ * for menu items, enabling customization of properties specific to the application.
  *
- * @param {object} props - The properties for the component.
- * @param {IMenuItemProps<ItemExtendContext>} props.item - The menu item to render.
- * @param {ReactNode[]} props.itemsNodes - The child nodes of the current item, rendered
- * using the renderMenuItem method applied to each child item.
- * @param {IMenuItemProps<ItemExtendContext>[]} props.subItems - The sub-items of the parent
- * item, obtained by looping over the item's properties.
- * @param {number} [props.index] - The index of the item in the list.
- * @param {function} props.render - The function used to render a standard menu item.
- * @param {function} props.renderExpandable - The function used to render expandable items.
- * @param {number} [props.level] - The current level of the menu item in the hierarchy.
- * @param {IMenuItemContext<ItemExtendContext>} [props.context] - Additional context options for rendering.
- * @returns {ReactNode | null} Returns a ReactNode representing the rendered item or null
- * if the item is not allowed.
+ * @param {object} props - The properties for rendering the menu item or section.
+ * @param {IMenuItemBase<MenuItemContext>} props.item - The menu item to render, which includes
+ * all relevant data required to display the item, such as its label, icon, and any action handlers.
+ * 
+ * @param {IReactNullableElement[]} props.itemsNodes - The child nodes to be rendered for expandable items.
+ * 
+ * @param {number} props.index - The index of the item in the list, useful for applying specific styles.
+ * 
+ * @param {MenuItemContext} props.context - Additional context options for rendering, which can include
+ * state or configuration options that influence how the item is rendered.
+ * 
+ * @param {IMenuItemRenderFunc<MenuItemContext>} props.render - The function used to render a standard menu item.
+ * 
+ * @param {IMenuItemRenderFunc<MenuItemContext>} props.renderExpandable - The function used to render expandable menu items.
+ * 
+ * @param {number} [props.level] - An optional property indicating the current level of the menu item in the hierarchy.
+ *
+ * @returns {IReactNullableElement | null} Returns a IReactNullableElement representing the rendered menu item or section, or null if not allowed.
  *
  * @example
- * ```tsx
- * const expandableItem = renderExpandableMenuItemOrSection({
- *   item: myMenuItem,
- *   itemsNodes: childItems,
+ * const renderedItem = renderExpandableMenuItemOrSection({
+ *   item: { label: "Settings", section: true },
+ *   itemsNodes: [],
  *   index: 0,
- *   render: renderMenuItem,
- *   renderExpandable: renderExpandableMenuItem,
+ *   context: {},
+ *   render: (props) => <MenuItem {...props} />,
+ *   renderExpandable: (props) => <ExpandableMenuItem {...props} />,
  *   level: 1,
  * });
- * ```
  */
-export const renderExpandableMenuItemOrSection = function <ItemExtendContext = any>({ item, itemsNodes, index, context, render, renderExpandable, level }: { item: IMenuItemProps<ItemExtendContext>, itemsNodes: ReactNode[], index?: number, render: IMenuItemRenderFunc<ItemExtendContext>, renderExpandable: IMenuItemRenderFunc<ItemExtendContext>, level?: number, context?: IMenuItemContext<ItemExtendContext> }) {
+const renderExpandableMenuItemOrSection = function <MenuItemContext = any>({ item, itemsNodes, index, context, render, renderExpandable, level }: IMenuRenderItemOptions<MenuItemContext>) {
   level = typeof level == "number" && level || 0;
   if (!isAllowed(item)) return null;
   const { section, ...rest } = item;
   if (section) {
-    return render({ level, ...rest, context: { ...Object.assign({}, rest.context), ...Object.assign({}, context) } } as IMenuItemProps<ItemExtendContext>, index);
+    return render({ level, ...rest, context: { ...Object.assign({}, rest.context), ...Object.assign({}, context) } } as IMenuItemBase<MenuItemContext>, index);
   } else {
-    return renderExpandable({ level, ...rest as IMenuItemProps<ItemExtendContext>, children: itemsNodes as ReactNode, context: { ...Object.assign({}, rest.context), ...Object.assign({}, context) } }, index);
+    return renderExpandable({ level, ...rest as IMenuItemBase<MenuItemContext>, children: itemsNodes, context: { ...Object.assign({}, rest.context), ...Object.assign({}, context) } }, index);
   }
 }
 
 /**
- * Renders a menu item based on its properties and the provided rendering functions.
- * This function handles the rendering of standard items, dividers, and expandable
- * items, ensuring that the correct rendering logic is applied based on the item type.
+ * Renders a menu item based on the provided properties and rendering functions.
+ * This function processes each item, applying the appropriate rendering logic
+ * for standard and expandable items, and returns the rendered React node.
  *
- * @template ItemExtendContext - A generic type parameter that allows extending the context
- * for menu items.
+ * @template MenuItemContext - A generic type parameter that allows extending the context
+ * for menu items, enabling customization of properties specific to the application.
  *
- * @param {object} props - The properties for the component.
- * @param {IMenuItemProps<ItemExtendContext>} props.item - The menu item to render.
- * @param {number} props.index - The index of the item in the list.
- * @param {function} props.render - The function used to render a standard menu item.
- * @param {function} props.renderExpandable - The function used to render expandable items.
- * @param {number} [props.level] - The current level of the menu item in the hierarchy.
- * @param {IMenuItemContext<ItemExtendContext>} [props.context] - Additional context options for rendering.
- * @returns {ReactNode | null} Returns a ReactNode representing the rendered item or null
- * if the item is not allowed.
+ * @param {object} props - The properties for rendering the menu item.
+ * @param {IMenuItemBase<MenuItemContext>} props.item - The menu item to render, which includes
+ * all relevant data required to display the item, such as its label, icon, and any action handlers.
  *
- ```typescript
+ * @param {number} props.index - The index of the item in the list, useful for applying specific styles.
+ *
+ * @param {IMenuItemRenderFunc<MenuItemContext>} props.render - The function used to render a standard menu item.
+ *
+ * @param {IMenuItemRenderFunc<MenuItemContext>} props.renderExpandable - The function used to render expandable menu items.
+ *
+ * @param {number} [props.level] - An optional property indicating the current level of the menu item in the hierarchy.
+ *
+ * @param {MenuItemContext} [props.context] - Additional context options for rendering, which can include
+ * state or configuration options that influence how the item is rendered.
+ *
+ * @returns {IReactNullableElement | null} Returns a IReactNullableElement representing the rendered menu item, or null if not allowed.
+ *
  * @example
- * ```tsx
- * const menuItem = renderMenuItem({
- *   item: myMenuItem,
+ * const renderedItem = renderMenuItem({
+ *   item: { label: "Settings", items: [{ label: "Profile" }] },
  *   index: 0,
- *   render: renderStandardMenuItem,
- *   renderExpandable: renderExpandableMenuItem,
+ *   render: (props) => <MenuItem {...props} />,
+ *   renderExpandable: (props) => <ExpandableMenuItem {...props} />,
  * });
- * ```
  */
-export function renderMenuItem<ItemExtendContext = any>({ item, index, render, renderExpandable, level, context }: { item: IMenuItemProps<ItemExtendContext>, index: number, render: IMenuItemRenderFunc<ItemExtendContext>, renderExpandable: IMenuItemRenderFunc<ItemExtendContext>, level?: number, context?: IMenuItemContext<ItemExtendContext> }): ReactNode {
+export function renderMenuItem<MenuItemContext = any>({ item, index, render, renderExpandable, level, context }: IMenuRenderItemOptions<MenuItemContext>): IReactNullableElement {
   level = level || 0;
   if (!item) return null;
   item.level = level;
@@ -92,13 +102,13 @@ export function renderMenuItem<ItemExtendContext = any>({ item, index, render, r
     return null;
   }
   if (Array.isArray(item.items)) {
-    const itemsNodes: ReactNode[] = [];
-    const subItems: IMenuItemProps<ItemExtendContext>[] = [];
+    const itemsNodes: IReactNullableElement[] = [];
+    const subItems: IMenuItemBase<MenuItemContext>[] = [];
     item.items.map((it, i) => {
       if (!it) return null;
       it.level = level + 1;
-      subItems.push(it as IMenuItemProps<ItemExtendContext>);
-      itemsNodes.push(renderMenuItem({ level: level + 1, item: it as IMenuItemProps<ItemExtendContext>, context, index: i, render, renderExpandable }));
+      subItems.push(it as IMenuItemBase<MenuItemContext>);
+      itemsNodes.push(renderMenuItem({ level: level + 1, item: it as IMenuItemBase<MenuItemContext>, context, index: i, render, renderExpandable }));
     });
     if (itemsNodes.length) {
       return renderExpandableMenuItemOrSection({ level, itemsNodes: itemsNodes, index, item, render, renderExpandable, context })
@@ -107,37 +117,38 @@ export function renderMenuItem<ItemExtendContext = any>({ item, index, render, r
   return render({ ...item, level, context: { ...Object.assign({}, item.context), ...Object.assign({}, context) } }, index);
 }
 
+
 /**
+ * 
  * Renders a list of menu items based on the provided properties and rendering functions.
  * This function processes each item in the list, applying the appropriate rendering logic
  * for standard and expandable items, and returns an array of React nodes representing the
  * rendered menu items.
  *
- * @template ItemExtendContext - A generic type parameter that allows extending the context
+ * @template MenuItemContext - A generic type parameter that allows extending the context
  * for menu items, enabling customization of properties specific to the application.
  *
  * @param {object} props - The properties for the function.
- * @param {(IMenuItemProps<ItemExtendContext> | null | undefined)[]} [props.items] - An optional array
+ * @param {(IMenuItemBase<MenuItemContext> | null | undefined)[]} [props.items] - An optional array
  * of menu item properties. Each item can either be a valid menu item object, null, or undefined.
  * This array is used to render the individual menu items.
  *
- * @param {IMenuItemRenderFunc<ItemExtendContext>} props.render - The function used to render a
+ * @param {IMenuItemRenderFunc<MenuItemContext>} props.render - The function used to render a
  * standard menu item. This function receives the item properties and is responsible for generating
  * the corresponding JSX.
  *
- * @param {IMenuItemRenderFunc<ItemExtendContext>} props.renderExpandable - The function used to
+ * @param {IMenuItemRenderFunc<MenuItemContext>} props.renderExpandable - The function used to
  * render expandable menu items. Similar to the render function, this handles the rendering of
  * items that can expand to show additional content.
  *
- * @param {IMenuItemContext<ItemExtendContext>} [props.context] - Additional context options to pass to the rendering functions.
+ * @param {MenuItemContext} [props.context] - Additional context options to pass to the rendering functions.
  * This can include properties such as state or configuration options that influence how the items
  * are rendered.
  *
- * @returns {ReactNode[]} Returns an array of ReactNode representing the rendered items. If no items
+ * @returns {IReactNullableElement[]} Returns an array of IReactNullableElement representing the rendered items. If no items
  * are provided, an empty array is returned.
  *
  * @example
- * ```tsx
  * const items = [
  *   { title: "Home", onPress: () => console.log("Home pressed") },
  *   { title: "Settings", items: [{ title: "Profile", onPress: () => console.log("Profile pressed") }] },
@@ -145,22 +156,12 @@ export function renderMenuItem<ItemExtendContext = any>({ item, index, render, r
  *
  * const renderedItems = renderMenuItems({
  *   items,
- *   render: renderStandardMenuItem,
- *   renderExpandable: renderExpandableMenuItem,
+ *   render: (props) => <MenuItem {...props} />,
+ *   renderExpandable: (props) => <ExpandableMenuItem {...props} />,
  * });
- * ```
- *
- * In the example above, a list of menu items is defined, including a nested item under "Settings".
- * The `renderMenuItems` function is called to generate the rendered items, which can then be used
- * in a component's JSX.
- *
- * @remarks
- * This function is particularly useful for creating hierarchical menu structures, such as
- * side navigation or dropdown menus, where items can have sub-items that are displayed
- * when expanded.
  */
-export function renderMenuItems<ItemExtendContext = any>({ items, render, renderExpandable, context }: { items?: (IMenuItemProps<ItemExtendContext> | null | undefined)[], render: IMenuItemRenderFunc<ItemExtendContext>, renderExpandable: IMenuItemRenderFunc<ItemExtendContext>, level?: number, context?: IMenuItemContext<ItemExtendContext> }): ReactNode[] {
-  const _items: ReactNode[] = [];
+export function renderMenuItems<MenuItemContext = any>({ items, render, renderExpandable, context }: IMenuRenderItemsOptions<MenuItemContext>): IReactNullableElement[] {
+  const _items: IReactNullableElement[] = [];
   const level = 0;
   if (Array.isArray(items)) {
     items.map((item, index) => {
@@ -171,43 +172,18 @@ export function renderMenuItems<ItemExtendContext = any>({ items, render, render
       }
     });
   }
-  return _items as ReactNode[];
+  return _items as IReactNullableElement[];
 }
 
-/**
- * Type definition for a function that renders a menu item.
- * This function receives the properties of the menu item and an optional index,
- * and returns a ReactNode representing the rendered item.
- *
- * @template IExtendContext - A generic type parameter that allows extending the context
- * for menu items. This enables customization of the properties passed to the menu item
- * render function, allowing for additional context-specific data to be included.
- *
- * @param {IMenuItemProps<IExtendContext>} props - The properties of the menu item to render.
- * This includes all relevant data required to display the item, such as its label, icon,
- * and any action handlers.
- *
- * @param {number} [index] - An optional index indicating the position of the item in the
- * list of menu items. This can be useful for applying specific styles or behaviors based
- * on the item's position within the menu.
- *
- * @returns {ReactNode} Returns a ReactNode representing the rendered menu item. This can
- * be any valid React element, including custom components, JSX, or null if the item should
- * not be rendered.
- *
- * @example
- * ```tsx
- * const renderMenuItem: IMenuItemRenderFunc = (props, index) => {
- *   return (
- *     <div key={index} onClick={props.onPress}>
- *       {props.label}
- *     </div>
- *   );
- * };
- * ```
- *
- * In the example above, the `renderMenuItem` function takes menu item properties and an
- * index, returning a JSX element that displays the item's label and attaches an onClick
- * handler to it.
- */
-type IMenuItemRenderFunc<IExtendContext = any> = (props: IMenuItemProps<IExtendContext>, index?: number) => ReactNode;
+
+export function useRenderMenuItems<MenuItemContext = any>({ items, context, render, renderExpandable }: IMenuRenderItemsOptions<MenuItemContext>): IReactNullableElement[] {
+  const theme = useTheme();
+  return useMemo(() => {
+    return renderMenuItems<MenuItemContext>({
+      items: (Array.isArray(items) ? items : []),
+      context,
+      render,
+      renderExpandable,
+    });
+  }, [items, theme, context, stableHash(render), stableHash(renderExpandable)]);
+}

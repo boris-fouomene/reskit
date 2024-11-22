@@ -2,6 +2,7 @@
 import { IButtonProps } from "@components/Button/types";
 import { IExpandableProps } from "@components/Expandable";
 import { IViewProps } from "@components/View";
+import { IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
 import { PressableProps, ViewProps } from "react-native";
 import { PressableStateCallbackType } from "react-native";
@@ -162,7 +163,7 @@ export interface IMenuCalculatedPosition {
  *         This can be used to conditionally render the menu or perform actions 
  *         based on its visibility state.
  * 
- * @property {() => boolean} [isOpen] - 
+ * @property {() => boolean} [isMenuOpen] - 
  *         Optional method that returns a boolean indicating whether the menu is open. 
  *         This can be useful for checking the menu state without directly accessing 
  *         the visibility property.
@@ -209,13 +210,17 @@ export interface IMenuCalculatedPosition {
  */
 export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "anchorContainerProps"> {
     /** Indicates whether the menu is currently visible */
-    visible?: boolean;
+    isMenuVisible?: boolean;
     /** Function to check if the menu is open */
-    isOpen?: () => boolean;
+    isMenuOpen?: () => boolean;
     /** Method to open the menu, with optional event and callback */
     openMenu: (callback?: Function) => any;
     /** Method to close the menu, with optional event and callback */
     closeMenu: (callback?: Function) => any;
+    /***
+     * this is a flag to know if the menu is a menu or not
+     */
+    isMenu: boolean;
 }
 
 
@@ -323,7 +328,7 @@ export interface IUseMenuPositionProps {
 
 
 /**
- * @typedef IMenuItemsProps
+ * @typedef IMenuItemsBase
  * @description
  * Props for the Menu component.
  * This interface defines the properties required for the Menu component, which 
@@ -376,11 +381,11 @@ export interface IUseMenuPositionProps {
  *         based on the viewport dimensions, ensuring a good user experience 
  *         across different screen sizes. Ii's mostly used when the fullScreen props is not false to ensure the menu fit  the screen in mobile or tablet device.
  *
- * @property {IMenuItemsProps<IMenuItemExtendContext>["items"]} [items] - An optional
+ * @property {IMenuItemsBase<IMenuItemExtendContext>["items"]} [items] - An optional
  * property that defines an array of menu items. Each item can either be a valid menu
  * item object or undefined/null.
  *
- * @property {IMenuItemsProps<IMenuItemExtendContext>} [itemsProps] - Props for the
+ * @property {IMenuItemsBase<IMenuItemExtendContext>} [itemsProps] - Props for the
  * menu items component. This allows for additional customization of the items rendered within
  * the menu.
  *    
@@ -473,13 +478,13 @@ export type IMenuProps<IMenuItemExtendContext = any> = Omit<AnimatedProps<ViewPr
     /**
      * An optional property that defines an array of menu items. Each item can either be a valid menu item object or undefined/null.
      */
-    items?: IMenuItemsProps<IMenuItemExtendContext>["items"];
+    items?: IMenuItemsBase<IMenuItemExtendContext>["items"];
 
     /***
      * Props for the menu items component. This allows for additional customization of the items rendered within
      * the menu.
      */
-    itemsProps?: Omit<IMenuItemsProps<IMenuItemExtendContext>, "items">;
+    itemsProps?: Omit<IMenuItemsBase<IMenuItemExtendContext>, "items">;
 }
 
 /**
@@ -529,12 +534,9 @@ export type IMenuAnchor = ReactNode | ((menuState: IMenuContext & PressableState
 
 
 
-
 /**
- * 
- * @typedef IMenuItemProps
- * @description
- * Represents the properties for a menu item component, extending the button properties 
+ * @typedef IMenuItemBase
+ * Represents the base properties for a menu item component, extending the button properties 
  * and allowing for additional context from the menu context and a hierarchical structure of menu items.
  * This type is particularly useful for creating complex menu structures where each 
  * menu item may contain sub-items, enabling a nested menu system.
@@ -542,75 +544,65 @@ export type IMenuAnchor = ReactNode | ((menuState: IMenuContext & PressableState
  * the integration of menu items within a broader menu system that manages visibility 
  * and behavior through context.
  * 
- *  * 
  * @template IMenuItemExtendContext - A generic type that allows the inclusion of additional context properties 
  *               specific to the menu item's context implementation. This can be any object type, 
  *               allowing for extensibility of the menu item's contextual behavior.
  * 
- * @property {IMenuItemProps<IMenuItemExtendContext>[]} [items] - An optional property 
- *               that defines an array of sub-menu items. Each sub-menu item is also of type `IMenuItemProps`, 
+ * @property {IMenuItemBase<IMenuItemExtendContext>[]} [items] - An optional property 
+ *               that defines an array of sub-menu items. Each sub-menu item is also of type `IMenuItemBase`, 
  *               allowing for recursive nesting of menu items.
- * 
- * 
+ *
+ * @property {boolean} [section] - Optional flag indicating whether the menu item should be rendered as a section.
+ * When set to true, the menu item is treated as a section, which may affect its styling and behavior.
+ * If false or omitted, the menu item is rendered as a standard item.
  * 
  * @example
- * // Example of using IMenuItemProps to create a menu item with context
- * interface MyMenuCustomContext {
- *     icon?: string; // Example of an additional property for the menu item
- * }
- * 
- * const MenuItem: React.FC<IMenuItemProps<MyMenuCustomContext>> = ({ label, items, icon, visible, openMenu }) => {
- *     return (
- *         <div>
- *             {icon && <img src={icon} alt={`${label} icon`} />} {
- *                 //Render icon if provided    
- *             }
- *             <span>{label}</span>
- *             <button onClick={openMenu}>{visible ? 'Close' : 'Open'} Submenu</button>
- *             {items && items.length > 0 && (
- *                 <ul>
- *                     {items.map((item, index) => (
- *                         <li key={index}>
- *                             <MenuItem {...item} /> {
- *                                  //Render sub-menu items recursively    
- *                             }
- *                         </li>
- *                     ))}
- *                 </ul>
- *             )}
- *         </div>
- *     );
+ * const menuItem: IMenuItemBase = {
+ *   label: "Settings",
+ *   section: true, // This item will be rendered as a section
+ *   onPress: () => console.log("Settings clicked"),
  * };
- * 
- * // Usage of MenuItem with context
- * const menuData: IMenuItemProps<MyMenuCustomContext>[] = [
+ *
+ * @property {IMenuItemBase<IMenuItemExtendContext>[]} [items] - Optional property that defines an array of sub-menu items.
+ * Each sub-menu item can be of the same type, allowing for recursive nesting of menu items.
+ * If provided, the menu item will be expandable, enabling users to reveal additional options or information.
+ *
+ * @example
+ * const expandableMenuItem: IMenuItemBase = {
+ *   label: "Profile",
+ *   items: [
+ *     { label: "View Profile", onPress: () => console.log("View Profile clicked") },
+ *     { label: "Edit Profile", onPress: () => console.log("Edit Profile clicked") },
+ *   ],
+ * };
+ *
+ * @property {IExpandableProps} [expandableProps] - Optional properties for the expandable component.
+ * This allows for further customization of the expand/collapse behavior of the menu item.
+ * This can include animations, styling, and any other relevant properties for the expandable behavior.
+ *
+ * @example
+ * const expandableProps: IExpandableProps = {
+ *   onExpand: () => console.log("Menu expanded"),
+ *   onCollapse: () => console.log("Menu collapsed"),
+ * };
+ *
+ * @property {number} [level] - Optional property that indicates the level of the menu item in the hierarchy.
+ * This value is used to determine the indentation of the menu item and is auto-calculated by the menu items component.
+ * A higher level indicates a deeper nesting within the menu structure.
+ *
+ * @example
+ * const nestedMenuItem: IMenuItemBase = {
+ *   label: "Settings",
+ *   level: 1, // Indicates that this item is one level deep in the menu hierarchy
+ *   items: [
  *     {
- *         label: 'File',
- *         items: [
- *             { label: 'New', icon: 'new-icon.png' },
- *             { label: 'Open', icon: 'open-icon.png' },
- *         ],
+ *       label: "Account",
+ *       level: 2, // This item is two levels deep
  *     },
- *     {
- *         label: 'Edit',
- *         items: [
- *             { label: 'Undo', icon: 'undo-icon.png' },
- *             { label: 'Redo', icon: 'redo-icon.png' },
- *         ],
- *     },
- * ];
- * 
- * const App: React.FC = () => {
- *     return (
- *         <div>
- *             {menuData.map((item, index) => (
- *                 <MenuItem key={index} {...item} />
- *             ))}
- *         </div>
- *     );
+ *   ],
  * };
  */
-export type IMenuItemProps<IMenuItemExtendContext = any> = IButtonProps<IMenuItemContext<IMenuItemExtendContext>> & {
+export type IMenuItemBase<IMenuItemExtendContext = any> = IButtonProps<IMenuItemExtendContext> & {
     /***
      * if true, the menu item will be rendered as a section, if false, it will be rendered as an item
      */
@@ -618,7 +610,7 @@ export type IMenuItemProps<IMenuItemExtendContext = any> = IButtonProps<IMenuIte
     /***
      * Props for the sub items. In case of existance of sub items.  If provided, the menu item will be expandable.
      */
-    items?: IMenuItemProps<IMenuItemExtendContext>[];
+    items?: IMenuItemBase<IMenuItemExtendContext>[];
     /**
      * Props for the expandable component that will be used to expand the menu item. In case of existance of sub items.
      */
@@ -632,9 +624,42 @@ export type IMenuItemProps<IMenuItemExtendContext = any> = IButtonProps<IMenuIte
     level?: number;
 };
 
+/**
+ * @typedef IMenuItemProps
+ * Represents the properties required for a menu item component, extending the base menu item type.
+ * This type is specifically designed to include context-specific properties, allowing for enhanced
+ * functionality and behavior within the menu item.
+ *
+ * @template IMenuItemExtendContext - A generic type parameter that allows the inclusion of additional
+ * context properties specific to the menu item's implementation. This can be any object type, enabling
+ * customization of the properties passed to the menu item.
+ *
+ * @extends IMenuItemBase<IMenuItemContext<IMenuItemExtendContext>> - This type extends the base
+ * menu item type, incorporating the context properties defined in `MenuItemContext`. This ensures
+ * that the menu item has access to both its base properties and any additional context-specific data.
+ * @see {@link IMenuItemBase} for more information on the base menu item type.
+ *
+ * @example
+ * // Example of using IMenuItemProps to create a menu item with extended context
+ * interface CustomMenuItemContext {
+ *   isActive: boolean; // Indicates if the menu item is currently active
+ *   onClick: () => void; // Function to be executed when the menu item is clicked
+ * }
+ * 
+ * const menuItem: IMenuItemProps<CustomMenuItemContext> = {
+ *   label: "Dashboard",
+ *   onPress: () => console.log("Dashboard clicked"),
+ *   context: {
+ *     isActive: true,
+ *     onClick: () => console.log("Dashboard item clicked"),
+ *   },
+ * };
+ */
+export type IMenuItemProps<IMenuItemExtendContext = any> = IMenuItemBase<IMenuItemContext<IMenuItemExtendContext>>;
+
 
 /**
- * @typedef IMenuItemContext
+ * @typedef MenuItemContext
  * Represents the context for a menu item, which combines the properties 
  * of the base menu context with any additional properties defined by the user. 
  * This type is particularly useful in scenarios where you want to extend 
@@ -658,7 +683,7 @@ export type IMenuItemProps<IMenuItemExtendContext = any> = IButtonProps<IMenuIte
  * // Creating a menu item context that includes the custom properties
  * const menuItemContext: IMenuItemContext<CustomMenuItemContext> = {
  *   // Properties from the base IMenuContext would go here
- *   isOpen: true, // Example property from IMenuContext
+ *   isMenuOpen: true, // Example property from IMenuContext
  *   isActive: true,
  *   onClick: () => console.log('Menu item clicked!'),
  * };
@@ -691,28 +716,267 @@ export type IMenuItemProps<IMenuItemExtendContext = any> = IButtonProps<IMenuIte
 export type IMenuItemContext<IMenuItemExtendContext = any> = Readonly<IMenuContext & IMenuItemExtendContext>;
 
 
+
 /**
- * Interface representing the properties of the MenuItems component.
+ * Represents the base properties for a collection of menu items, extending the view properties.
+ * This type is designed to facilitate the rendering of multiple menu items within a menu component,
+ * allowing for customization of the layout and behavior of the items.
  *
- * @template IMenuItemExtendContext - A generic type parameter that allows extending the
- * context for menu items.
+ * @template IMenuItemExtendContext - A generic type parameter that allows the inclusion of additional
+ * context properties specific to the menu items. This can be any object type, enabling extensibility
+ * of the menu item's contextual behavior.
  *
- * @extends IViewProps - Inherits properties from the IViewProps interface, allowing for
- * additional view-related props.
+ * @extends IViewProps - This type extends the properties of a view, allowing for additional layout and
+ * styling options that are applicable to the container of the menu items.
  *
- * @property {IMenuItemProps<IMenuItemExtendContext>[] | undefined | null} [items] - An optional array
- * of menu item properties. Each item can either be a valid menu item object or undefined/null.
+ * @property {Array<IMenuItemBase<IMenuItemExtendContext> | undefined | null>} [items] - Optional property
+ * that defines an array of menu items. Each item can either be a valid menu item object, null, or undefined.
+ * This array is utilized to render the individual menu items within the menu component.
+ *
+ * @example
+ * const menuItems: IMenuItemsBase = {
+ *   items: [
+ *     { label: "Home", onPress: () => console.log("Home pressed") },
+ *     { label: "Settings", onPress: () => console.log("Settings pressed") },
+ *     { label: "Help", items: [{ label: "FAQ", onPress: () => console.log("FAQ pressed") }] },
+ *   ],
+ * };
+ *
+ * // Rendering the menu items in a component
+ * const MyMenu = () => {
+ *   return (
+ *     <View>
+ *       <MenuItems items={menuItems.items} />
+ *     </View>
+ *   );
+ * };
+ */
+export type IMenuItemsBase<IMenuItemExtendContext = any> = IViewProps & {
+    items?: (IMenuItemBase<IMenuItemExtendContext> | undefined | null)[]
+}
+
+/**
+ * @typedef IMenuItemsProps
+ * @description
+ * Represents the properties required for a collection of menu items, extending the base menu items type.
+ * This type is specifically designed to include context-specific properties, allowing for enhanced
+ * functionality and behavior within the collection of menu items.
+ *
+ * @template IMenuItemExtendContext - A generic type parameter that allows the inclusion of additional
+ * context properties specific to the menu items. This can be any object type, enabling customization
+ * of the properties passed to the menu items.
+ *
+ * @extends IMenuItemsBase<IMenuItemContext<IMenuItemExtendContext>> - This type extends the base
+ * menu items type, incorporating the context properties defined in `IMenuItemContext`. This ensures
+ * that the collection of menu items has access to both its base properties and any additional context-specific data.
+ *
+ * @example
+ * // Example of using IMenuItemsProps to create a collection of menu items with extended context
+ * interface CustomMenuItemContext {
+ *   isActive: boolean; // Indicates if the menu item is currently active
+ *   onClick: () => void; // Function to be executed when the menu item is clicked
+ * }
+ * 
+ * const menuItemsProps: IMenuItemsProps<CustomMenuItemContext> = {
+ *   items: [
+ *     {
+ *       label: "Dashboard",
+ *       onPress: () => console.log("Dashboard clicked"),
+ *       context: {
+ *         isActive: true,
+ *         onClick: () => console.log("Dashboard item clicked"),
+ *       },
+ *     },
+ *     {
+ *       label: "Reports",
+ *       onPress: () => console.log("Reports clicked"),
+ *       context: {
+ *         isActive: false,
+ *         onClick: () => console.log("Reports item clicked"),
+ *       },
+ *     },
+ *   ],
+ * };
+ *
+ * // Rendering the menu items in a component
+ * const MyMenuItems = () => {
+ *   return (
+ *     <View>
+ *       <MenuItems {...menuItemsProps} />
+ *     </View>
+ *   );
+ * };
+ */
+export type IMenuItemsProps<IMenuItemExtendContext = any> = IMenuItemsBase<IMenuItemContext<IMenuItemExtendContext>> & {
+    /**
+     * Additional context options to pass to the rendering functions.
+    * for menu items. This enables customization of the properties passed to the menu item
+    * render function, allowing for additional context-specific data to be included.
+     */
+    context?: IMenuItemExtendContext;
+};
+
+/**
+ * Type definition for a function that renders a menu item.
+ * This function receives the properties of the menu item and an optional index,
+ * and returns a IReactNullableElement representing the rendered item.
+ *
+ * @template IMenuItemExtendContext - A generic type parameter that allows extending the context
+ * for menu items. This enables customization of the properties passed to the menu item
+ * render function, allowing for additional context-specific data to be included.
+ *
+ * @param {IMenuItemBase<IMenuItemExtendContext>} props - The properties of the menu item to render.
+ * This includes all relevant data required to display the item, such as its label, icon,
+ * and any action handlers.
+ *
+ * @param {number} [index] - An optional index indicating the position of the item in the
+ * list of menu items. This can be useful for applying specific styles or behaviors based
+ * on the item's position within the menu.
+ *
+ * @returns {IReactNullableElement} Returns a IReactNullableElement representing the rendered menu item. This can
+ * be any valid React element, including custom components, JSX, or null if the item should
+ * not be rendered.
  *
  * @example
  * ```tsx
- * const items: IMenuItemsProps = {
- *   items: [
- *     { title: "Profile", onPress: () => console.log("Profile pressed") },
- *     { title: "Logout", onPress: () => console.log("Logout pressed") }
- *   ]
+ * const renderMenuItem: IMenuItemRenderFunc = (props, index) => {
+ *   return (
+ *     <div key={index} onClick={props.onPress}>
+ *       {props.label}
+ *     </div>
+ *   );
  * };
  * ```
+ *
+ * In the example above, the `renderMenuItem` function takes menu item properties and an
+ * index, returning a JSX element that displays the item's label and attaches an onClick
+ * handler to it.
  */
-export type IMenuItemsProps<IMenuItemExtendContext = any> = IViewProps & {
-    items?: (IMenuItemProps<IMenuItemExtendContext> | undefined | null)[]
+export type IMenuItemRenderFunc<IMenuItemExtendContext = any> = (props: IMenuItemBase<IMenuItemExtendContext>, index: number) => IReactNullableElement;
+
+
+type IMenuRenderItemsOptionsBase<MenuItemContext = any> = {
+    /**
+     * The function used to render a
+    * standard menu item. This function receives the item properties and is responsible for generating
+    * the corresponding JSX.
+     */
+    render: IMenuItemRenderFunc<MenuItemContext>,
+
+    /**
+     * The function used to
+    * render expandable menu items. Similar to the render function, this handles the rendering of
+    * items that can expand to show additional content.
+     */
+    renderExpandable: IMenuItemRenderFunc<MenuItemContext>,
+
+    /**
+     * additioonal parameters that allows extending the context
+    * for menu items. This enables customization of the properties passed to the menu item
+    * render function, allowing for additional context-specific data to be included.
+    *
+    */
+    context?: MenuItemContext;
+}
+/**
+ * Represents the options for rendering each menu item, providing the necessary properties
+ * to customize the rendering process for each item in a menu. it represents the options to be passed to the renderMenuItem function.
+ *
+ * @template MenuItemContext - A generic type parameter that allows extending the context
+ * for menu items. This enables customization of the properties passed to the menu item
+ * render function, allowing for additional context-specific data to be included.
+ *
+ * @property {IMenuItemBase<MenuItemContext>} item - The menu item to render. This includes
+ * all relevant data required to display the item, such as its label, icon, and any action handlers.
+ *
+ * @property {number} index - The index of the item in the list. This can be useful for applying
+ * specific styles or behaviors based on the item's position within the menu.
+ *
+ * @property {IMenuItemRenderFunc<MenuItemContext>} render - The function used to render a
+ * standard menu item. This function receives the item properties and is responsible for generating
+ * the corresponding JSX.
+ *
+ * @property {IMenuItemRenderFunc<MenuItemContext>} renderExpandable - The function used to
+ * render expandable menu items. Similar to the render function, this handles the rendering of
+ * items that can expand to show additional content.
+ *
+ * @property {number} [level] - An optional property indicating the current level of the menu item
+ * in the hierarchy. This value can be used to determine the indentation of the menu item.
+ *
+ * @property {IMenuItemContext<MenuItemContext>} [context] - additioonal parameters that allows extending the context
+ * for menu items. This enables customization of the properties passed to the menu item
+ * render function, allowing for additional context-specific data to be included.
+ *
+ * 
+ * @property {IReactNullableElement[]} itemsNodes - The child nodes of the current item, rendered
+ * using the renderMenuItem method applied to each child item.
+ *
+ * @example
+ * const renderOptions: IMenuRenderItemOptions<CustomMenuItemContext> = {
+ *   item: {
+ *     label: "Settings",
+ *     onPress: () => console.log("Settings clicked"),
+ *   },
+ *   index: 0,
+ *   render: (props) => <MenuItem {...props} />,
+ *   renderExpandable: (props) => <ExpandableMenuItem {...props} />,
+ *   level: 1,
+ *   context: {
+ *     isMenuOpen: true,
+ *   },
+ * };
+ */
+export type IMenuRenderItemOptions<MenuItemContext = any> = IMenuRenderItemsOptionsBase<MenuItemContext> & {
+    /**
+     * The menu item to render. This includes
+    * all relevant data required to display the item, such as its label, icon, and any action handlers.
+     */
+    item: IMenuItemBase<MenuItemContext>,
+    /**
+     * The index of the item in the list. This can be useful for applying
+    * specific styles or behaviors based on the item's position within the menu.
+     */
+    index: number,
+
+
+
+    /**
+     * An optional property indicating the current level of the menu item
+        * in the hierarchy. This value can be used to determine the indentation of the menu item.
+     */
+    level?: number,
+
+
+    /**
+     * The child nodes of the current item, rendered
+    * using the renderMenuItem method applied to each child item.
+     */
+    itemsNodes?: IReactNullableElement[];
+};
+
+/**
+ * @typedef IMenuRenderItemsOptions
+ * Represents the options for rendering a collection of menu items, extending the base render items options.
+ * This type is designed to facilitate the customization of the rendering process for each item in a menu.
+ *
+ * @template MenuItemContext - A generic type parameter that allows extending the context
+ * for menu items, enabling customization of properties specific to the application.
+ *
+ * @property {IMenuItemsBase<MenuItemContext>["items"]} [items] - An optional property that defines
+ * an array of menu items. Each item can either be a valid menu item object or undefined/null.
+ * This array is utilized to render the individual menu items within the menu component.
+ * 
+ * @see {@link IMenuItemsBase} for more information on the `items` property.
+ * @see {@link IMenuRenderItemOptions} for more information on the base render item options.
+ *
+ * @example
+ * const menuRenderOptions: IMenuRenderItemsOptions<CustomMenuItemContext> = {
+ *   items: [
+ *     { label: "Home", onPress: () => console.log("Home pressed") },
+ *     { label: "Settings", onPress: () => console.log("Settings pressed") },
+ *   ],
+ * };
+ */
+export type IMenuRenderItemsOptions<MenuItemContext = any> = IMenuRenderItemsOptionsBase<MenuItemContext> & {
+    items?: IMenuItemsBase<MenuItemContext>["items"];
 }

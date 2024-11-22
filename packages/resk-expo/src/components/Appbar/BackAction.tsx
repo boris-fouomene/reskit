@@ -2,6 +2,7 @@ import { IconButton, IIconButtonProps, FontIcon } from "@components/Icon";
 import { forwardRef } from 'react';
 import React from "react";
 import { View } from "react-native";
+import { IBackActionProps } from "./types";
 
 /**
  * A BackAction component that renders a back navigation button using the 
@@ -25,27 +26,14 @@ import { View } from "react-native";
  *   );
  * };
  */
-export const BackAction = forwardRef(
-  ({ accessibilityLabel = 'Back', ...rest }: IBackActionProps, ref: React.Ref<View>) => {
-    return (
-      <IconButton
-        accessibilityLabel={accessibilityLabel}
-        iconName={FontIcon.BACK}
-        {...rest}
-        ref={ref}
-      />
-    );
-  }
-);
+export const BackAction = forwardRef<View, IBackActionProps>(({ accessibilityLabel = 'Appbar.BackAction', ...rest }: IBackActionProps, ref: React.Ref<View>) => {
+  return <IconButton
+    accessibilityLabel={accessibilityLabel}
+    iconName={FontIcon.BACK}
+    {...rest}
+    ref={ref}
+  />;
+});
 
 BackAction.displayName = 'AppBar.BackAction';
 
-/**
- * Interface representing the properties for the BackAction component.
- * This interface extends the IIconButtonProps interface to inherit all 
- * the properties of the IconButton, allowing for additional customization.
- *
- * @interface IBackActionProps
- * @extends IIconButtonProps
- */
-export interface IBackActionProps extends IIconButtonProps { }

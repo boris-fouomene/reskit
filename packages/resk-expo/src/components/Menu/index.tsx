@@ -100,7 +100,6 @@ export const useMenuPosition = ({
         if (isValidPosition && position) {
             let x = pageX;
             let y = pageY;
-
             // Calculate position based on forced direction
             switch (position) {
                 case 'top':
@@ -123,7 +122,6 @@ export const useMenuPosition = ({
             // Ensure menu stays within screen bounds
             x = Math.min(x, screenWidth - menuWidth);
             y = Math.min(y, screenHeight - menuHeight);
-
             return { position, x, y };
         }
 
@@ -134,15 +132,18 @@ export const useMenuPosition = ({
             left: pageX,
             right: screenWidth - (pageX + width),
         };
-
         // Find position with maximum available space
-        const bestPosition = Object.entries(spaces).reduce((max, [pos, space]) =>
+        let bestPosition: keyof typeof spaces = Object.entries(spaces).reduce((max, [pos, space]) =>
             space > spaces[max as IMenuPosition] ? pos as IMenuPosition : max
             , 'bottom' as IMenuPosition);
 
+        if (bestPosition !== 'bottom' && Math.abs(spaces.bottom - spaces[bestPosition]) < 250) {
+            bestPosition = 'bottom';
+        };
         // Calculate final coordinates
         let x = pageX;
         let y = pageY;
+        const isRightBigh = Math.abs(x - screenWidth - menuWidth) >= 100;
         switch (bestPosition) {
             case 'top':
                 x = pageX //+ width / 2 - menuWidth / 2;
@@ -161,10 +162,10 @@ export const useMenuPosition = ({
                 y = pageY //+ height / 2 - menuHeight / 2;
                 break;
         }
-
         // Ensure menu stays within screen bounds
         x = Math.min(x, screenWidth - menuWidth);
         y = Math.min(y, screenHeight - menuHeight);
+        //console.log(bestPosition, x, "= x, ", pageX, "=pageX", " data ", screenWidth, " screen width ", menuWidth, " menu width ", spaces, " spaces");
         return { position: bestPosition, x, y };
     }, [anchorMeasurements, menuWidth, menuHeight, padding, position, fullScreen, screenWidth, screenHeight]);
 
@@ -294,7 +295,7 @@ const Menu: React.FC<IMenuProps> = ({
                 setAnchorMeasurements({ pageX: x, pageY: y, width, height });
             });
         }
-    }, [anchorRef]);
+    }, [anchorRef, isVisible]);
 
     // Handle menu layout changes
     const onMenuLayout = useCallback((event: LayoutChangeEvent) => {
@@ -313,6 +314,26 @@ const Menu: React.FC<IMenuProps> = ({
         responsive,
     });
     const context1 = { animated, responsive, testID, borderRadius, fullScreen: _isFullScreen, ...props, isMenu: true, isMenuOpen, isMenuVisible: isVisible, calculatePosition }
+    // Update position when measurements change
+    useEffect(() => {
+        if (anchorMeasurements) {
+            const { x, y } = calculatePosition();
+            if (animated) {
+                translateX.value = withSpring(x);
+                translateY.value = withSpring(y);
+                opacity.value = withTiming(1, {
+                    duration: 200,
+                    easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+                });
+                scale.value = withSpring(1);
+            } else {
+                translateX.value = x;
+                translateY.value = y;
+                opacity.value = 1;
+                scale.value = 1;
+            }
+        }
+    }, [anchorMeasurements, menuLayout, isVisible]);
     const openMenu = (callback?: Function) => {
         if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
         setIsVisible(true, () => {
@@ -346,33 +367,11 @@ const Menu: React.FC<IMenuProps> = ({
         }
         return isValidElement(customAnchor) ? customAnchor : null;
     }, [customAnchor, calculatePosition, isVisible]);
-    // Update position when visibility changes
     useEffect(() => {
-        if (isVisible) {
-            measureAnchor();
-        }
+        measureAnchor();
     }, [isVisible, measureAnchor]);
 
-    // Update position when measurements change
-    useEffect(() => {
-        if (anchorMeasurements && menuLayout) {
-            const { x, y } = calculatePosition();
-            if (animated) {
-                translateX.value = withSpring(x);
-                translateY.value = withSpring(y);
-                opacity.value = withTiming(1, {
-                    duration: 200,
-                    easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-                });
-                scale.value = withSpring(1);
-            } else {
-                translateX.value = x;
-                translateY.value = y;
-                opacity.value = 1;
-                scale.value = 1;
-            }
-        }
-    }, [anchorMeasurements, menuLayout]);
+
 
     // Handle closing animations
     useEffect(() => {

@@ -309,6 +309,7 @@ export interface IUseMenuPositionProps {
     /** Enable full-screen mode */
     fullScreen?: boolean;
     responsive?: boolean;
+    visible?: boolean;
 }
 
 

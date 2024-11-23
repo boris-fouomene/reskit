@@ -1,13 +1,13 @@
 import 'react-native-reanimated';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { IViewProps, ReskExpoProvider, Theme, useTheme, View } from "@resk/expo";
+import { ITheme, IViewProps, ReskExpoProvider, Theme, useTheme, View } from "@resk/expo";
 import { Slot } from 'expo-router';
 import React from 'react';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
-    return (<ReskExpoProvider>
+    return (<ReskExpoProvider theme={{ dark: true } as ITheme}>
         <Children><Slot /></Children>
     </ReskExpoProvider>);
 }

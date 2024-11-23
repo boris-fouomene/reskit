@@ -56,7 +56,7 @@ export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ..
    *
    * @type {[ITheme, Function]} The current theme and a function to update the theme.
    */
-  const [theme, setTheme] = useStateCallback<ITheme>(Object.assign({}, getDefaultTheme(isDark), customTheme));
+  const [theme, setTheme] = useStateCallback<ITheme>(Object.assign({}, getDefaultTheme(Object.assign({}, { dark: isDark }, customTheme)), { isDark }));
 
   /**
    * Stores the previous custom theme to detect changes and avoid unnecessary theme updates.
@@ -95,7 +95,6 @@ export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ..
    * @param {string} stableHash(customTheme) - Memoized hash value of the custom theme.
    */
   useEffect(() => {
-    if (!isObj(customTheme) || prevCustomTheme == customTheme) return;
     updateTheme(uTheme(Object.assign({}, theme, customTheme)));
   }, [stableHash(customTheme)]);
   useMemo(() => {

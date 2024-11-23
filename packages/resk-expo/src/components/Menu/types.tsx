@@ -486,6 +486,13 @@ export type IMenuProps<IMenuItemExtendContext = any> = Omit<AnimatedProps<ViewPr
      * the menu.
      */
     itemsProps?: Omit<IMenuItemsBase<IMenuItemExtendContext>, "items">;
+
+    /**
+     * The elevation of the menu. This property is used to adjust the shadow and
+     * depth of the menu, providing a visual cue to the user that the menu is
+     * part of the application's interface.
+     */
+    elevation?: number;
 }
 
 /**

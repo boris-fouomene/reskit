@@ -4,7 +4,7 @@ import ExpandableMenuItem from './ExpandableItem';
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { getDimensions, useDimensions } from '@dimensions/index';
-import { useTheme } from '@theme/index';
+import Theme, { useTheme } from '@theme/index';
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { View, TouchableOpacity, TouchableOpacityProps, StyleSheet, Dimensions, LayoutChangeEvent, ViewStyle, LayoutRectangle, Pressable, GestureResponderEvent, PressableStateCallbackType } from 'react-native';
 import Animated, {
@@ -269,6 +269,7 @@ const Menu: React.FC<IMenuProps> = ({
     responsive,
     items,
     itemsProps,
+    elevation = 10,
     ...props
 }) => {
     // State for measurements
@@ -437,6 +438,7 @@ const Menu: React.FC<IMenuProps> = ({
                             borderRadius,
                             ...menuContainerStyle,
                         },
+                        typeof elevation === 'number' ? Theme.elevations[elevation] : null,
                         props.style,
                         animatedStyle,
                     ]}
@@ -478,7 +480,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-        elevation: 5,
+        elevation: 10,
     },
 });
 

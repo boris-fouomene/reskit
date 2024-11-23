@@ -262,10 +262,11 @@ export const darkColors: IThemeColorTokens = {
     onError: '#601410',
     errorContainer: '#8C1D18',
     onErrorContainer: '#F9DEDC',
-    background: '#1C1B1F',
+    background: '#343a40',
     onBackground: '#E6E1E5',
-    surface: '#1C1B1F',
+    surface: '#111b21',
     onSurface: '#E6E1E5',
+
     surfaceVariant: '#49454F',
     onSurfaceVariant: '#CAC4D0',
     outline: '#938F99',
@@ -346,10 +347,9 @@ export const DefaultLightTheme: ITheme = createTheme({
  * @param {boolean} isColorShemeDark - Optional parameter to specify if the color scheme is dark.
  * @returns {ITheme} The active theme (light or dark) based on session storage or the default theme.
  */
-export const getDefaultTheme = (isColorShemeDark?: boolean): ITheme => {
+export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
     // Retrieves the saved theme from the session (if available)
-    const themeNameObj = Object.assign({}, session.get("theme"));
-    themeNameObj.dark = !!(themeNameObj.dark !== undefined ? themeNameObj.dark : isColorShemeDark);
+    const themeNameObj = extendObj({}, customTheme, session.get("theme"));
     const theme = extendObj({}, (themeNameObj?.dark ? DefaultDarkTheme : DefaultLightTheme), themeNameObj);
     // Ensures essential color properties are defined based on whether the theme is dark or light
     theme.colors.onSuccess = theme.colors.onSuccess || (theme.dark ? "black" : "white");

@@ -78,7 +78,7 @@ const index = () => {
                     error
                     children={"A children helper"}
                 />
-                <Tab tabItemsProps={{ colorScheme: "secondary" }}>
+                <Tab>
                     <Tab.Item label="Tab 1" icon="account-circle">
                         <Label>First tab item</Label>
                     </Tab.Item>

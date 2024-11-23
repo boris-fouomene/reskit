@@ -1,1 +1,0 @@
-@see : https://storybook.js.org/tutorials/intro-to-storybook/react-native/en/get-started/

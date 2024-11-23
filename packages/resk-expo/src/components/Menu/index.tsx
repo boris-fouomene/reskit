@@ -83,7 +83,7 @@ export const useMenuPosition = ({
     fullScreen: customFullScreen,
 }: IUseMenuPositionProps) => {
     const isValidPosition = ["top", "left", "bottom", "right"].includes(String(position));
-    const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions(responsive === true && !isValidPosition);
+    const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions(responsive !== false && !isValidPosition);
     const fullScreen = isFullScreen(customFullScreen, responsive, isMobileOrTablet);
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         // Handle null measurements or fullscreen mode

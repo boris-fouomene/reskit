@@ -1,14 +1,16 @@
+const packageJson = require("./package.json");
 export default ({ config }) => ({
   ...config,
-  name: "@resk/expo-stories",
+  name: packageJson.name,
   slug: "resk-expo-stories",
-  version: "1.0.0",
+  version: packageJson.version,
   entryPoint: "index",
   orientation: "portrait",
   icon: "./assets/icon.png",
   newArchEnabled : true,
-  "plugins": [
-    "expo-router"
+  plugins : [
+    "expo-router",
+    "expo-sqlite"
   ],
   extra: {
     storybookEnabled: process.env.STORYBOOK_ENABLED,
@@ -33,7 +35,7 @@ export default ({ config }) => ({
   },
   web: {
     favicon: "./assets/favicon.png",
-    "bundler": "metro",
-    "output": "single"
+    bundler : "metro",
+    output : "single"
   },
 });

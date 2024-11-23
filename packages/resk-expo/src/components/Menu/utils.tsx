@@ -106,9 +106,9 @@ export function renderMenuItem<MenuItemContext = any>({ item, index, render, ren
     const subItems: IMenuItemBase<MenuItemContext>[] = [];
     item.items.map((it, i) => {
       if (!it) return null;
-      it.level = level + 1;
+      it.level = (level as number) + 1;
       subItems.push(it as IMenuItemBase<MenuItemContext>);
-      itemsNodes.push(renderMenuItem({ level: level + 1, item: it as IMenuItemBase<MenuItemContext>, context, index: i, render, renderExpandable }));
+      itemsNodes.push(renderMenuItem({ level: (level as number) + 1, item: it as IMenuItemBase<MenuItemContext>, context, index: i, render, renderExpandable }));
     });
     if (itemsNodes.length) {
       return renderExpandableMenuItemOrSection({ level, itemsNodes: itemsNodes, index, item, render, renderExpandable, context })

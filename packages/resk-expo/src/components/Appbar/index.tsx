@@ -5,26 +5,22 @@ import getThemeColors from './getThemeColor';
 import {
   View,
   StyleSheet,
-  TouchableOpacity,
   Platform,
-  StyleProp,
-  TextStyle,
-  ColorValue,
   GestureResponderEvent,
 } from 'react-native';
 import Label from '@components/Label';
 import { Surface } from '@components/Surface';
-import Theme, { Colors, ITheme, IThemeColorSheme, IThemeColorTokenKey, useTheme } from '@theme/index';
+import Theme, { Colors, IThemeColorTokenKey, useTheme } from '@theme/index';
 import { IAppBarProps } from './types';
 import { getLabelOrLeftOrRightProps } from '@hooks/index';
 import { useDimensions } from '@dimensions/index';
-import { defaultStr } from '@resk/core';
 import { splitAppBarActions } from './utils';
 import Action from './Action';
 import isValidElement from '@utils/isValidElement';
 import { Menu } from '@components/Menu';
 import { FontIcon, IconButton } from '@components/Icon';
 import ExpandableAppBarAction from './ExpandableAction';
+import AppBarAction from './Action';
 
 
 
@@ -192,3 +188,19 @@ const styles = StyleSheet.create({
 });
 
 AppBar.displayName = 'AppBar';
+
+type IAppBar = typeof AppBar & {
+  Action: typeof AppBarAction;
+  BackAction: typeof AppBarAction;
+  ExpandableAction: typeof ExpandableAppBarAction;
+};
+
+const AppBarExported = AppBar as unknown as IAppBar;
+AppBarExported.Action = AppBarAction;
+AppBarExported.BackAction = AppBarAction;
+AppBarExported.ExpandableAction = ExpandableAppBarAction;
+
+export { AppBarExported as AppBar };
+
+export * from "./types";
+export * from "./utils";

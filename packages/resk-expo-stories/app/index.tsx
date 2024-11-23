@@ -1,4 +1,4 @@
-import { FontIcon, Tab, Switch, Checkbox, Modal, Portal, Expandable, Appbar, TouchableRipple, IconButton, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
+import { FontIcon, Tab, Switch, Checkbox, Modal, Portal, Expandable, AppBar, TouchableRipple, IconButton, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
 import { View, Text, TouchableOpacity, Pressable, ScrollView, Button } from 'react-native'
 import React, { useRef, useState } from 'react'
 
@@ -6,28 +6,16 @@ import React, { useRef, useState } from 'react'
 const index = () => {
     return (
         <ScrollView>
-            <Appbar>
-                <Appbar.BackAction
+            <AppBar
+                title="My App is very a long appp heeein marno maaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+                subtitle="Screen Title aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa long scrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+
+            >
+                <AppBar.BackAction
                     onPress={() => console.log('Back')}
-                    color="#ffffff"
+                    textColor="#ffffff"
                 />
-                <Appbar.Content
-                    title="My App is very a long appp heeein marno maaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-                    subtitle="Screen Title aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa long scrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-                />
-                <>
-                    <Appbar.Action
-                        icon={<Icon iconName="menu" />}
-                        onPress={() => console.log('Action')}
-                        color="red"
-                    />
-                    <Appbar.Action
-                        icon={<Icon iconName="material-edit" />}
-                        onPress={() => console.log('Action')}
-                        color="white"
-                    />
-                </>
-            </Appbar>
+            </AppBar>
             <View style={[Theme.styles.p5]}>
                 <Menu
                     anchor={<Text>Open Menu</Text>}

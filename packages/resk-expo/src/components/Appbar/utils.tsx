@@ -84,13 +84,13 @@ export function splitAppBarActions<IAppBarActionContext = any>({
   const menus: IAppBarAction[] = [];
   const actionCounter = { current: 0 };
   context = Object.assign({}, context);
-  maxActions = typeof maxActions === "number" && maxActions ? Math.trunc(maxActions) : getAppBarMaxActions(windowWidth);
+  const mAction: number = typeof maxActions === "number" && maxActions ? Math.trunc(maxActions) : getAppBarMaxActions(windowWidth);
   color = Colors.isValid(color) ? color : Theme.getColor(color as IThemeColorTokenKey);
   backgroundColor = Colors.isValid(backgroundColor) ? backgroundColor : Theme.getColor(backgroundColor as IThemeColorTokenKey);
   const renderedActions = [];
   const canRenderAction = (level?: number) => {
     if (level) return false;
-    return (actionCounter.current <= maxActions && maxActions > 1) || items?.length === 1 || !renderedActions.length;
+    return (actionCounter.current <= mAction && mAction > 1) || items?.length === 1 || !renderedActions.length;
   };
   const pushAction = (action: IReactNullableElement, item: IAppBarAction<IAppBarActionContext>, level?: number) => {
     if (canRenderAction(level)) {
@@ -103,7 +103,7 @@ export function splitAppBarActions<IAppBarActionContext = any>({
     return null;
   };
   const _render = function (renderCb: IAppBarProps<IAppBarActionContext>["renderAction"], props: IAppBarAction<IAppBarContext<IAppBarActionContext>>, index: number): IReactNullableElement {
-    if (!props?.level && actionCounter.current <= maxActions + 1) {
+    if (!props?.level && actionCounter.current <= mAction + 1) {
       actionCounter.current++;
     }
     const canrAction = canRenderAction(props?.level);

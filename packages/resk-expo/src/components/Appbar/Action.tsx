@@ -35,7 +35,9 @@ const AppBarAction = (props: IAppBarActionProps) => {
  * for customization of the AppBarAction button's behavior 
  * and appearance.
  */
-export interface IAppBarActionProps extends IButtonProps { }
+export type IAppBarActionProps = Omit<IButtonProps, "children"> & {
+  children?: IButtonProps["children"];
+}
 export default AppBarAction
 
 const styles = StyleSheet.create({

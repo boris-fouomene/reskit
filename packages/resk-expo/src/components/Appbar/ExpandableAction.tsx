@@ -35,11 +35,11 @@ const ExpandableAppBarAction = ({ items, children, ...rest }: IAppBarAction) => 
     return <Menu
         anchor={({ openMenu }) => {
             return (
-                <Button testID='RN_App' {...rest}
+                <Button testID='rn-expandable-appbar-action-anchor' {...rest}
                     onPress={(event: GestureResponderEvent) => {
                         openMenu();
-                        if (rest.onPress) {
-                            return rest.onPress(event);
+                        if (typeof rest.onPress == "function") {
+                            rest.onPress(event);
                         }
                     }}
                 />

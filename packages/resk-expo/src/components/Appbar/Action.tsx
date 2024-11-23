@@ -26,7 +26,13 @@ import { forwardRef } from 'react';
  */
 const AppBarAction = forwardRef((props: IAppBarActionProps, ref) => {
   const appBarContext = useAppBar();
-  return <Button ref={ref} color={appBarContext.textColor} backgroundColor={appBarContext.backgroundColor} mode={"contained"} borderRadius={0} {...props} style={[styles.buttonAction, props.style]} />
+  return <Button
+    ref={ref}
+    textColor={appBarContext.textColor}
+    backgroundColor={appBarContext.backgroundColor}
+    mode={"contained"} borderRadius={0} {...props}
+    style={[styles.buttonAction, props.style]}
+  />
 });
 AppBarAction.displayName = 'AppBarAction';
 /**
@@ -38,7 +44,7 @@ AppBarAction.displayName = 'AppBarAction';
  * for customization of the AppBarAction button's behavior 
  * and appearance.
  */
-export type IAppBarActionProps = Omit<IButtonProps, "children"> & {
+export type IAppBarActionProps<IAppBarActionContext = any> = Omit<IButtonProps<IAppBarActionContext>, "children"> & {
   children?: IButtonProps["children"];
 }
 export default AppBarAction

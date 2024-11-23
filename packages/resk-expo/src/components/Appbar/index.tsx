@@ -64,13 +64,15 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
     if (onBackActionPress) onBackActionPress(e);
   }
   const backAction = typeof customBackAction == "function" ? customBackAction(backActionProps) : customBackAction;
-  const { actions, menus } = splitAppBarActions<AppBarActionContext>({
+  const appBarContext = Object.assign({}, context, { backgroundColor, isAppBar: true, textColor: color });
+  const { actions, menuItems } = splitAppBarActions<AppBarActionContext>({
     textColor: color,
     backgroundColor,
     actions: customActions,
     isAppBarAction: true,
     maxActions,
     windowWidth,
+    context: appBarContext,
     renderAction: function (props, index) {
       if (typeof renderAction === 'function') return renderAction(props, index);
       return <Action {...props} key={index} />;
@@ -91,7 +93,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   }
   const { left: leftContent, right: rightContent } = getLabelOrLeftOrRightProps({ left: customLeft, right: customRight }, { color, backgroundColor, context })
   return (
-    <AppBarContext.Provider value={Object.assign({}, context, { backgroundColor, textColor: color })}>
+    <AppBarContext.Provider value={appBarContext}>
       <Surface
         {...appBarProps}
         testID={testID}
@@ -138,7 +140,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
         </View>
         {isValidElement(children) ? children : null}
         {actions}
-        {menus.length ? <Menu
+        {menuItems.length ? <Menu
           testID={`${testID}-menu`}
           anchor={({ closeMenu, openMenu }) => {
             return <IconButton
@@ -150,7 +152,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
               }}
             />
           }}
-          items={menus}
+          items={menuItems}
         /> : null}
         {isValidElement(rightContent) ? rightContent : null}
       </Surface>

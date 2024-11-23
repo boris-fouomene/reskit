@@ -56,7 +56,7 @@ import { IReactNullableElement } from "@src/types";
  * the maximum number of actions to display. This field allows for dynamic adjustment
  * of displayed actions based on the AppBar's size.
  *
- * @property {(event: GestureResponderEvent) => any} [onBackActionPress] - Callback
+ * @property {(event: GestureResponderEvent) => void} [onBackActionPress] - Callback
  * invoked when the back action button is pressed, allowing for custom back navigation.
  *
  * @property {boolean} [bindResizeEvent] - Indicates if the AppBar content should 

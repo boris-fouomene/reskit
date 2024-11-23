@@ -1,4 +1,4 @@
-import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent } from "react-native";
+import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent, PressableProps } from "react-native";
 /**
    @interface
  * Represents a reference to a React component or DOM element.
@@ -369,7 +369,7 @@ export type IOnChangeOptions<
  * // Simulating an event
  * handleEvent('onPress'); // Output: Component was pressed.
  */
-export type ITouchableEventNames = 'onPress' | 'onLongPress' | 'onPressIn' | 'onPressOut';
+export type ITouchableEventNames = keyof ITouchableEvents;
 
 
 /**
@@ -387,10 +387,10 @@ export type ITouchableEventNames = 'onPress' | 'onLongPress' | 'onPressIn' | 'on
  * in touchable components.
  *
  * @typedef {Object} ITouchableEventObject
- * @property {(event: GestureResponderEvent) => any} [onPress] - Optional handler for the press event.
- * @property {(event: GestureResponderEvent) => any} [onLongPress] - Optional handler for the long press event.
- * @property {(event: GestureResponderEvent) => any} [onPressIn] - Optional handler for the press-in event.
- * @property {(event: GestureResponderEvent) => any} [onPressOut] - Optional handler for the press-out event.
+ * @property {(event: GestureResponderEvent) => void} [onPress] - Optional handler for the press event.
+ * @property {(event: GestureResponderEvent) => void} [onLongPress] - Optional handler for the long press event.
+ * @property {(event: GestureResponderEvent) => void} [onPressIn] - Optional handler for the press-in event.
+ * @property {(event: GestureResponderEvent) => void} [onPressOut] - Optional handler for the press-out event.
  *
  * @example
  * // Example usage of ITouchableEventObject
@@ -407,12 +407,12 @@ export type ITouchableEventNames = 'onPress' | 'onLongPress' | 'onPressIn' | 'on
  *
  * simulatePress(touchableHandlers.onPress); // Output: Pressed!
  */
-export type ITouchableEvents = Partial<
-  Record<
-    ITouchableEventNames,
-    (event: GestureResponderEvent) => any
-  >
->;
+export type ITouchableEvents = {
+  onPress?: PressableProps['onPress'];
+  onLongPress?: PressableProps['onLongPress'];
+  onPressIn?: PressableProps['onPressIn'];
+  onPressOut?: PressableProps['onPressOut'];
+};
 
 /**
  * Represents a React element that can either be a valid React element or null.

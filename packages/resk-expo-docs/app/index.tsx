@@ -9,12 +9,33 @@ const index = () => {
             <AppBar
                 title="My App is very a long appp heeein marno maaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
                 subtitle="Screen Title aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa long scrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-
+                actions={[
+                    {
+                        label: "actin 1",
+                        onPress: () => {
+                            console.log("Back")
+                        },
+                    },
+                    {
+                        label: "actin 2",
+                        onPress: () => {
+                            console.log("action2")
+                        },
+                    },
+                    {
+                        label: "actin 3",
+                        onPress: () => {
+                            console.log("action3")
+                        },
+                    },
+                    {
+                        label: "actin 4",
+                        onPress: () => {
+                            console.log("action4")
+                        },
+                    },
+                ]}
             >
-                <AppBar.BackAction
-                    onPress={() => console.log('Back')}
-                    color="red"
-                />
             </AppBar>
             <View style={[Theme.styles.p5]}>
                 <Menu

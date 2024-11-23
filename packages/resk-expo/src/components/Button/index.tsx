@@ -16,7 +16,7 @@ import { TouchableRipple } from '@components/TouchableRipple';
 import Label from '@components/Label';
 import { IButtonMode, IButtonProps, IButtonContext } from './types';
 import { IFlatStyle } from '../../types/index';
-import { useGetIcon } from '@components/Icon';
+import { IIconButtonProps, useGetIcon } from '@components/Icon';
 import { defaultStr, uniqid } from '@resk/core';
 import { Tooltip } from '@components/Tooltip';
 import isValidElement from '@utils/isValidElement';
@@ -108,7 +108,7 @@ import { Divider } from '@components/Divider';
  *     Submit
  * </Button>
  */
-export const Button = forwardRef<any, any>(function Button<IButtonExtendContext = any>({
+export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExtendContext = any>({
     disabled: customDisabled,
     compact,
     mode = 'text',

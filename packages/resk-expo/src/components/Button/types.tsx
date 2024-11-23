@@ -79,7 +79,7 @@ export type IButtonMode = | 'text' | 'outlined' | 'contained';
  *     );
  * };
  */
-export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, color: string }> & Omit<ITouchableRippleProps, "style" | "children"> & Omit<ITooltipBaseProps, 'disabled'> & {
+export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, textColor: string }> & Omit<ITouchableRippleProps, "style" | "children"> & Omit<ITooltipBaseProps, 'disabled'> & {
     /**
      * Optional style for the button component.
      * Can be used to customize the appearance of the button.
@@ -96,7 +96,7 @@ export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<
      * @example
      * <Button children="Submit" />
      */
-    children: React.ReactNode;
+    children?: React.ReactNode;
 
     /**
      * Props for the button label.

@@ -106,8 +106,8 @@ const TabItems = ({
       return React.cloneElement(child as any,
         {
           onPress: (e: GestureResponderEvent) => {
-            if (typeof onPress == "function" && onPress(e, { index, tabIndex: index }) === false) {
-              return;
+            if (typeof onPress == "function") {
+              onPress(e);
             }
             typeof setActiveIndex == "function" && setActiveIndex({ index, prevIndex: activeIndex as number });
           },

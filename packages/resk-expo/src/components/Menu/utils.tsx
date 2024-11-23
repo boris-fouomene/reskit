@@ -175,7 +175,59 @@ export function renderMenuItems<MenuItemContext = any>({ items, render, renderEx
   return _items as IReactNullableElement[];
 }
 
-
+/**
+ * Custom React hook that renders a list of menu items based on the provided properties and rendering functions.
+ * This hook leverages the theme context to ensure that the rendered menu items are styled consistently according
+ * to the application's design system. It utilizes memoization to optimize performance by preventing unnecessary
+ * re-renders when the input parameters do not change.
+ * 
+ * @template MenuItemContext - A generic type parameter that allows extending the context for menu items. 
+ * This enables customization of the properties passed to the menu item render function, allowing for additional 
+ * context-specific data to be included.
+ * 
+ * @param {object} props - The properties for rendering menu items.
+ * @param {(IMenuItemBase<MenuItemContext> | null | undefined)[]} [props.items] - An optional array of menu item properties. 
+ * Each item can either be a valid menu item object, null, or undefined. This array is used to render the individual menu items.
+ * 
+ * @param {MenuItemContext} [props.context] - Additional context options to pass to the rendering functions. 
+ * This can include properties such as state or configuration options that influence how the items are rendered.
+ * 
+ * @param {IMenuItemRenderFunc<MenuItemContext>} props.render - The function used to render a standard menu item. 
+ * This function receives the item properties and is responsible for generating the corresponding JSX.
+ * 
+ * @param {IMenuItemRenderFunc<MenuItemContext>} props.renderExpandable - The function used to render expandable menu items. 
+ * Similar to the render function, this handles the rendering of items that can expand to show additional content.
+ * 
+ * @returns {IReactNullableElement[]} Returns an array of IReactNullableElement representing the rendered menu items. 
+ * If no items are provided, an empty array is returned.
+ * 
+ * @example
+ * const items = [
+ *   { label: "Home", onPress: () => console.log("Home pressed") },
+ *   { label: "Settings", onPress: () => console.log("Settings pressed") },
+ *   { label: "Help", items: [{ label: "FAQ", onPress: () => console.log("FAQ pressed") }] },
+ * ];
+ * 
+ * const renderedItems = useRenderMenuItems({
+ *   items,
+ *   render: (props) => <MenuItem {...props} />,
+ *   renderExpandable: (props) => <ExpandableMenuItem {...props} />,
+ * });
+ * 
+ * // Usage in a component
+ * const MyMenu = () => {
+ *   return (
+ *     <View>
+ *       {renderedItems}
+ *     </View>
+ *   );
+ * };
+ * 
+ * @remarks
+ * This hook is particularly useful in scenarios where the menu items need to be dynamically generated or updated 
+ * based on user interactions or application state. By using this hook, developers can ensure that the menu items 
+ * are rendered efficiently and correctly according to the specified rendering logic.
+ */
 export function useRenderMenuItems<MenuItemContext = any>({ items, context, render, renderExpandable }: IMenuRenderItemsOptions<MenuItemContext>): IReactNullableElement[] {
   const theme = useTheme();
   return useMemo(() => {

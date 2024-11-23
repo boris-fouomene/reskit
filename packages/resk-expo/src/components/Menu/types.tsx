@@ -622,6 +622,11 @@ export type IMenuItemBase<IMenuItemExtendContext = any> = IButtonProps<IMenuItem
      * this value is auto calculated by the menu items component.
      */
     level?: number;
+
+    /***
+     * if true, the menu will be closed when the button is pressed.
+     */
+    closeOnPress?: boolean;
 };
 
 /**

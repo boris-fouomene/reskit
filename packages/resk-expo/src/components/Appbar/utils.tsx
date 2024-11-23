@@ -37,7 +37,7 @@ const getAppBarMaxActions = (windowWidth?: number): number => {
 
 
 /**
- * Splits the actions for the AppBar into directly rendered actions and expandable menus.
+ * Splits the actions for the AppBar into directly rendered actions and expandable menuItems.
  * This function helps manage how many actions can be displayed based on the available space,
  * and it renders the actions accordingly, either as buttons or as expandable menu items.
  *
@@ -55,10 +55,10 @@ const getAppBarMaxActions = (windowWidth?: number): number => {
  * @param {number} [params.maxActions] - The maximum number of actions to display.
  * @param {IAppBarActionContext} [params.context] - The context to pass to each action.
  *
- * @returns {{ actions: IReactNullableElement[]; menus: IAppBarAction[] }} An object containing the rendered actions and any menus.
+ * @returns {{ actions: IReactNullableElement[]; menuItems: IAppBarAction[] }} An object containing the rendered actions and any menuItems.
  *
  * @example
- * const { actions, menus } = splitAppBarActions({
+ * const { actions, menuItems } = splitAppBarActions({
  *   actions: myActions,
  *   render: myRenderFunction,
  *   windowWidth: 800,
@@ -77,11 +77,11 @@ export function splitAppBarActions<IAppBarActionContext = any>({
   context,
 }: IAppBarProps<IAppBarActionContext> & {
   isAppBarAction?: boolean /*** s'il s'agit des actions qui seront affiché sous l'AppBar */;
-}): { actions: IReactNullableElement[]; menus: IAppBarAction[] } {
+}): { actions: IReactNullableElement[]; menuItems: IAppBarAction[] } {
   const { isMobileOrTablet, window } = getDimensions();
   const isMobile = isMobileOrTablet || (typeof windowWidth == "number" && windowWidth < window.width);
   isAppBarAction = isAppBarAction && isMobile ? true : false;
-  const menus: IAppBarAction[] = [];
+  const menuItems: IAppBarAction[] = [];
   const actionCounter = { current: 0 };
   context = Object.assign({}, context);
   const mAction: number = typeof maxActions === "number" && maxActions ? Math.trunc(maxActions) : getAppBarMaxActions(windowWidth);
@@ -98,7 +98,7 @@ export function splitAppBarActions<IAppBarActionContext = any>({
       return action;
     }
     if (!level) {
-      menus.push(item);
+      menuItems.push(item);
     }
     return null;
   };
@@ -107,9 +107,6 @@ export function splitAppBarActions<IAppBarActionContext = any>({
       actionCounter.current++;
     }
     const canrAction = canRenderAction(props?.level);
-    if (isAppBarAction && !props.icon) {
-      //console.warn("not icon found for appbar action ",props," you must specity icon for this action");
-    }
     const r2 = (canrAction ? { color, backgroundColor } : {}) as IThemeColorSheme;
     if (canrAction) {
       if (color) {
@@ -120,7 +117,7 @@ export function splitAppBarActions<IAppBarActionContext = any>({
       }
     }
     const itx: IAppBarAction<IAppBarActionContext> = { ...r2, ...props };
-    return pushAction(typeof renderCb != "function" ? null : renderCb(itx, index), (itx as IDict)?.level);
+    return pushAction(typeof renderCb != "function" ? null : renderCb(itx, index), itx);
   };
   const actions = renderMenuItems<IAppBarContext<IAppBarActionContext>>({
     context: Object.assign({}, { isAppBar: true }, context),
@@ -134,6 +131,6 @@ export function splitAppBarActions<IAppBarActionContext = any>({
   });
   return {
     actions,
-    menus,
+    menuItems,
   };
 }

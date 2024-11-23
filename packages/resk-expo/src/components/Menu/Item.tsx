@@ -1,9 +1,10 @@
 import { Button } from "@components/Button";
 import { useMenu } from "./context";
 import { IMenuItemContext, IMenuItemProps } from "./types";
-import { StyleSheet } from "react-native";
+import { GestureResponderEvent, StyleSheet } from "react-native";
 import { forwardRef } from "react";
 import { IButtonContext } from "@components/Button/types";
+import { useTheme } from "@theme/index";
 
 /**
  * MenuItem component that renders a button as a menu item within a menu context. 
@@ -57,15 +58,25 @@ import { IButtonContext } from "@components/Button/types";
  *   the underlying button context, providing additional flexibility 
  *   in managing button states and behaviors.
  */
-export const MenuItem = forwardRef<any, any>(function MenuItem<IMenuItemExtendContext extends object = any>({ expandableProps, items, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref?: React.ForwardedRef<IButtonContext<IMenuItemContext<IMenuItemExtendContext>>>) {
+export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<IMenuItemExtendContext extends object = any>({ expandableProps, closeOnPress, items, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref?: React.ForwardedRef<IButtonContext<IMenuItemContext<IMenuItemExtendContext>>>) {
     const menuContext = useMenu();
+    const theme = useTheme();
     return <Button
         testID="menu-item"
         borderRadius={0}
+        textColor={theme.colors.text}
         {...props}
         labelProps={{ ...Object.assign({}, props.labelProps), style: [styles.label, props?.labelProps?.style] }}
         iconProps={{ ...Object.assign({}, props.iconProps), style: [styles.icon, props?.iconProps?.style] }}
         context={Object.assign({}, props.context, menuContext)}
+        onPress={(event: GestureResponderEvent) => {
+            if (typeof props.onPress == "function") {
+                props.onPress(event);
+            }
+            if (closeOnPress !== false && typeof menuContext?.closeMenu == "function") {
+                menuContext.closeMenu();
+            }
+        }}
         ref={ref}
     />
 });

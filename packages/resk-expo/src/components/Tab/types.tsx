@@ -176,10 +176,9 @@ export interface ITabItemsProps extends IViewProps {
      * Callback function that is called when a tab item is pressed.
      * 
      * @param {GestureResponderEvent} event - The event object for the press action.
-     * @param {{ index: number, tabIndex: number }} options - An object containing the index of the pressed tab item and its tab index.
      * @returns {any} Returns any value (usually used for side effects).
      */
-    onPress?: (event: GestureResponderEvent, options: { index: number, tabIndex: number }) => any;
+    onPress?: (event: GestureResponderEvent) => void;
 
     /**
      * Indicates whether the tabs should be scrollable.

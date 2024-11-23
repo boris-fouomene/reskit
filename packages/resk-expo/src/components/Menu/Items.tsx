@@ -52,7 +52,7 @@ import { useMenu } from './context';
  * across the menu items. The `renderMenuItems` utility function is used to generate
  * the appropriate JSX for each item based on its properties.
  */
-export const MenuItems = React.forwardRef<any, any>(function <IMenuItemExtendContext = any>({ items: customItems, context, testID, ...rest }: IMenuItemsProps<IMenuItemExtendContext>, ref?: React.ForwardedRef<RNView>) {
+export const MenuItems = React.forwardRef<any, IMenuItemsProps<any>>(function <IMenuItemExtendContext = any>({ items: customItems, context, testID, ...rest }: IMenuItemsProps<IMenuItemExtendContext>, ref?: React.ForwardedRef<RNView>) {
   testID = testID || "RN_MenuItemsComponent";
   const menuContext = useMenu();
   const items = useRenderMenuItems<IMenuItemContext<IMenuItemExtendContext>>({

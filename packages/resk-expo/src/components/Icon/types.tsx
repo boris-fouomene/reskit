@@ -9,7 +9,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Zocial from "@expo/vector-icons/Zocial";
 import { IStyle, ITouchableEvents } from "../../types";
-import { GestureResponderEvent, ImageProps, ImageSourcePropType, View } from "react-native";
+import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip";
 import { ITheme } from "@theme/types";
 import { ITouchableRippleProps } from "@components/TouchableRipple/types";

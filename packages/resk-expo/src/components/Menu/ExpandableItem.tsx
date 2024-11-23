@@ -63,7 +63,7 @@ const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMen
     return <Expandable
         testID={testID + "-expandable"}
         {...Object.assign({}, expandableProps)}
-        label={<MenuItem ref={ref} {...props} testID={testID} />}
+        label={<MenuItem closeOnPress={!!!children} ref={ref} {...props} testID={testID} />}
         children={<>
             {children}
             {divider && <Divider testID={testID + "-divider"} {...Object.assign({}, dividerProps)} />}

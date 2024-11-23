@@ -24,7 +24,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContai
   backgroundOpacityP = typeof backgroundOpacityP === "number" ? backgroundOpacityP : 0.5;
   contentProps = Object.assign({}, contentProps);
   animationDuration = typeof animationDuration === "number" ? animationDuration : 300;
-  const { height, width, isMobileOrTablet } = useDimensions(responsive !== false && visible);
+  const { height, width, isMobileOrTablet } = useDimensions(responsive !== false);
   const theme = useTheme();
   const { maxHeight, maxWidth } = useMemo(() => {
     customMaxWidth = typeof customMaxWidth === "number" ? customMaxWidth : MAX_WIDTH;
@@ -41,7 +41,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContai
       contentStyle: fullScreen ? [styles.modalFullScreen] : [{ maxWidth, maxHeight }],
       modalStyle: fullScreen ? [styles.modalFullScreen] : [styles.modalNotFullScreen, Platform.isWeb() ? { cursor: "default" } : null],
     };
-  }, [isMobileOrTablet, responsive, visible, customFullScreen]);
+  }, [isMobileOrTablet, width, height, responsive, visible, customFullScreen]);
   const children = useStableMemo(() => {
     return props.children;
   }, [props.children]) as React.ReactNode;

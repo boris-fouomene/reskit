@@ -1,5 +1,5 @@
 import { FontIcon, Tab, Switch, Checkbox, Modal, Portal, Expandable, AppBar, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
-import { View, Text, TouchableOpacity, Pressable, ScrollView, Button } from 'react-native'
+import { View, TouchableOpacity, Pressable, ScrollView, Button } from 'react-native'
 import React, { useRef, useState } from 'react'
 
 
@@ -12,24 +12,28 @@ const index = () => {
                 actions={[
                     {
                         label: "actin 1",
+                        icon: "material-edit",
                         onPress: () => {
                             console.log("Back")
                         },
                     },
                     {
                         label: "actin 2",
+                        icon: "check",
                         onPress: () => {
                             console.log("action2")
                         },
                     },
                     {
                         label: "actin 3",
+                        icon: "camera",
                         onPress: () => {
                             console.log("action3")
                         },
                     },
                     {
                         label: "actin 4",
+                        icon: "account-circle",
                         onPress: () => {
                             console.log("action4")
                         },
@@ -39,11 +43,11 @@ const index = () => {
             </AppBar>
             <View style={[Theme.styles.p5]}>
                 <Menu
-                    anchor={<Text>Open Menu</Text>}
+                    anchor={<Label>Open Menu</Label>}
                     children={<MenuExample />}
                 />
 
-                <Text>index</Text>
+                <Label>index</Label>
                 <Icon
                     iconName="foundation-alert"
                     source={{
@@ -117,8 +121,8 @@ const ModalExample = () => {
             <Button title="Open Modal" onPress={openModal} />
             <Modal visible={visible} onDismiss={closeModal} animationType="fade">
                 <View>
-                    <Text>Modal Content</Text>
-                    <Text onPress={closeModal}>Close Modal</Text>
+                    <Label>Modal Content</Label>
+                    <Label onPress={closeModal}>Close Modal</Label>
                 </View>
             </Modal>
         </View>
@@ -128,22 +132,22 @@ const MenuExample = () => {
     return (
         <View>
             <View style={{ padding: 16 }}>
-                <Text>Menu Content</Text>
-                <Text>Menu content 2</Text>
-                <Text>Menu content 3</Text>
-                <Text>Menu content 4</Text>
-                <Text>Menu Content</Text>
-                <Text>Menu content 2</Text>
-                <Text>Menu content 3</Text>
-                <Text>Menu content 4</Text>
-                <Text>Menu Content</Text>
-                <Text>Menu content 2</Text>
-                <Text>Menu content 3</Text>
-                <Text>Menu content 4</Text>
-                <Text>Menu Content</Text>
-                <Text>Menu content 2</Text>
-                <Text>Menu content 3</Text>
-                <Text>Menu content 4</Text>
+                <Label>Menu Content</Label>
+                <Label>Menu content 2</Label>
+                <Label>Menu content 3</Label>
+                <Label>Menu content 4</Label>
+                <Label>Menu Content</Label>
+                <Label>Menu content 2</Label>
+                <Label>Menu content 3</Label>
+                <Label>Menu content 4</Label>
+                <Label>Menu Content</Label>
+                <Label>Menu content 2</Label>
+                <Label>Menu content 3</Label>
+                <Label>Menu content 4</Label>
+                <Label>Menu Content</Label>
+                <Label>Menu content 2</Label>
+                <Label>Menu content 3</Label>
+                <Label>Menu content 4</Label>
             </View>
         </View>
     );

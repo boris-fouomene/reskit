@@ -358,16 +358,17 @@ const styles = StyleSheet.create({
         borderStyle: 'solid',
     },
     compact: {
-        minWidth: 'auto',
+
     },
     content: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        paddingHorizontal: 5,
     },
     icon: {
-        marginLeft: 12,
-        marginRight: -4,
+        marginLeft: 7,
+        marginRight: 7,
     },
     iconReverse: {
         marginRight: 12,
@@ -383,8 +384,8 @@ const styles = StyleSheet.create({
         marginRight: 0,
     },
     md3IconReverse: {
-        marginLeft: -16,
-        marginRight: 16,
+        marginLeft: -7,
+        marginRight: 7,
     },
     md3IconReverseCompact: {
         marginLeft: 0,
@@ -409,8 +410,8 @@ const styles = StyleSheet.create({
     /* eslint-enable react-native/no-unused-styles */
     label: {
         textAlign: 'center',
-        marginVertical: 9,
-        marginHorizontal: 16,
+        marginVertical: 7,
+        marginHorizontal: 7,
     },
     md2Label: {
         letterSpacing: 1,
@@ -423,13 +424,13 @@ const styles = StyleSheet.create({
     },
     md3Label: {
         marginVertical: 10,
-        marginHorizontal: 24,
+        marginHorizontal: 7,
     },
     md3LabelText: {
-        marginHorizontal: 12,
+        marginHorizontal: 6,
     },
     md3LabelTextAddons: {
-        marginHorizontal: 16,
+        marginHorizontal: 7,
     },
 });
 Button.displayName = "Button";

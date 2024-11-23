@@ -30,7 +30,7 @@ const AppBarAction = forwardRef((props: IAppBarActionProps, ref) => {
     ref={ref}
     textColor={appBarContext.textColor}
     backgroundColor={appBarContext.backgroundColor}
-    mode={"contained"} borderRadius={0} {...props}
+    mode={"contained"}  {...props}
     style={[styles.buttonAction, props.style]}
   />
 });

@@ -137,7 +137,7 @@ export const useMenuPosition = ({
             space > spaces[max as IMenuPosition] ? pos as IMenuPosition : max
             , 'bottom' as IMenuPosition);
 
-        if (bestPosition !== 'bottom' && Math.abs(spaces.bottom - spaces[bestPosition]) < 250) {
+        if (bestPosition !== 'bottom' && (Math.abs(spaces.bottom - spaces[bestPosition]) < 250 || spaces.bottom >= 300)) {
             bestPosition = 'bottom';
         };
         // Calculate final coordinates

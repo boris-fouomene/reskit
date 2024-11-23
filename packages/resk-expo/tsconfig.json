@@ -51,12 +51,6 @@
       "@src/*": [
         "./src/*"
       ],
-      "@expo-sqlite/*": [
-        "../resk-expo-stories/node_modules/expo-sqlite/*"
-      ],
-      "@resk-stories-packages/*": [
-        "../resk-expo-stories/node_modules/*"
-      ]
     }
   },
   "include": [

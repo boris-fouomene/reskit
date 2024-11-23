@@ -1,9 +1,7 @@
-import { Session } from "@resk/core";
-import { packageName } from '@utils/index';
-import Storage from '@expo-sqlite/kv-store';
+import { Session } from "@resk/expo";
+import Storage from 'expo-sqlite/kv-store';
 
-Session.SessionManager.allKeyPrefix = `${packageName}-session`;
-Session.SessionManager.storage = {
+Session.storage = {
   get: (key: string) => {
     return Storage.getItemSync(key);
   },
@@ -14,7 +12,6 @@ Session.SessionManager.storage = {
     Storage.removeItemAsync(key);
   },
   removeAll: () => {
-    //window.localStorage.clear()
     return undefined;
   }
 };

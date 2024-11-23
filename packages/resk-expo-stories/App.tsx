@@ -1,3 +1,4 @@
+import "./session";
 import React from 'react';
 import { ExpoRoot } from 'expo-router';
 

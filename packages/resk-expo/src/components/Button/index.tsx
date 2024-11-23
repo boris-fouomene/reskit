@@ -283,8 +283,7 @@ export const Button = forwardRef<any, any>(function Button<IButtonExtendContext 
                     compact && styles.compact,
                     buttonStyle,
                     style,
-                    !!disabled && { elevation },
-                ] as ViewStyle
+                ]
             }
         >
             <Tooltip

@@ -1,6 +1,4 @@
 
-import { IFontMaterialCommunityIconsName } from "@components/Icon";
-import Platform from "@platform";
 import { isObj, isValidImageSrc } from "@resk/core";
 
 /**

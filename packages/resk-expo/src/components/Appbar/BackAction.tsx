@@ -1,8 +1,10 @@
-import { IconButton, IIconButtonProps, FontIcon } from "@components/Icon";
+import FontIcon from "@components/Icon/Font";
+import IconButton from "@components/Icon/Button";
 import { forwardRef } from 'react';
 import React from "react";
 import { View } from "react-native";
 import { IBackActionProps } from "./types";
+import { useAppBar } from "./hooks";
 
 /**
  * A BackAction component that renders a back navigation button using the 
@@ -27,13 +29,17 @@ import { IBackActionProps } from "./types";
  * };
  */
 export const BackAction = forwardRef<View, IBackActionProps>(({ accessibilityLabel = 'Appbar.BackAction', ...rest }: IBackActionProps, ref: React.Ref<View>) => {
+  const appBarContext = useAppBar();
   return <IconButton
     accessibilityLabel={accessibilityLabel}
     iconName={FontIcon.BACK}
+    color={appBarContext.textColor}
+    backgroundColor={appBarContext.backgroundColor}
+    size={30}
     {...rest}
     ref={ref}
   />;
 });
 
-BackAction.displayName = 'AppBar.BackAction';
+BackAction.displayName = 'AppBarBackAction';
 

@@ -6,6 +6,7 @@ import { GestureResponderEvent, ViewProps } from "react-native";
 import { IIconButtonProps } from "@components/Icon";
 import { IMenuItemBase, IMenuItemRenderFunc, IMenuItemsProps, IMenuRenderItemsOptions } from "@components/Menu";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
+import { IReactNullableElement } from "@src/types";
 
 
 /**
@@ -30,7 +31,7 @@ import { ILabelOrLeftOrRightProps } from "@hooks/index";
  *
  * @property {string} [backgroundColor] - The background color of the AppBar.
  *
- * @property {string} [color] - The color of the text elements in the AppBar component.
+ * @property {string} [textColor] - The color of the text elements in the AppBar component.
  *
  * @property {number} [statusBarHeight] - Extra padding to add at the top of the header
  * to account for a translucent status bar. This is automatically handled on iOS >= 11
@@ -112,7 +113,7 @@ import { ILabelOrLeftOrRightProps } from "@hooks/index";
 export type IAppBarProps<IAppBarActionContext = any> = ISurfaceProps & {
     backgroundColor?: string;
     /** The color of the text elements in the AppBar component. */
-    color?: string;
+    textColor?: string;
     /**
      * Extra padding to add at the top of header to account for translucent status bar.
      * This is automatically handled on iOS >= 11 including iPhone X using `SafeAreaView`.
@@ -145,7 +146,7 @@ export type IAppBarProps<IAppBarActionContext = any> = ISurfaceProps & {
     elevation?: number;
 
     /** If backAction is a string, it is the name of the FontIcon to render for the back action. */
-    backAction?: React.ReactNode | false | null | ((props: IBackActionProps) => ReactNode);
+    backAction?: IReactNullableElement | false | ((props: IBackActionProps) => ReactNode);
     /** Properties for the BackAction component when rendered. */
     backActionProps?: IBackActionProps;
     /** The context to pass to each action, used to extend the context for the actions. */
@@ -246,4 +247,6 @@ export interface IBackActionProps extends IIconButtonProps { }
  */
 export type IAppBarContext<IAppBarActionContext = any> = IAppBarActionContext & {
     isAppBar: boolean;
+    textColor: string;
+    backgroundColor: string;
 };

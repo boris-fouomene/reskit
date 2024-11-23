@@ -1,16 +1,13 @@
 import React, { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
-import { IFontIconProps, IGetIconOptions, IIconProps, IIconSource } from "./types";
-import { Image, ImageSourcePropType, ImageStyle, Pressable } from "react-native";
-import { hasTouchHandler, isValidElement, pickTouchEventHandlers } from "@utils";
+import { IFontIconProps, IGetIconOptions, IIconProps } from "./types";
+import { Image, ImageStyle } from "react-native";
+import { isValidElement, pickTouchEventHandlers } from "@utils";
 import { isImageSource } from "./utils";
 import { defaultStr, isObj } from "@resk/core";
 import Theme, { Colors, useTheme } from "@theme/index";
 import FontIcon, { DEFAULT_FONT_ICON_SIZE } from "./Font";
 import { Tooltip } from "@components/Tooltip";
-import { IStyle } from "../../types";
 import { StyleSheet } from "react-native";
-import { TouchableRipple } from "@components/TouchableRipple";
-import { ITheme } from "@theme/types";
 
 /**
  * The `Icon` component is a versatile icon renderer that can display both 
@@ -90,7 +87,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, dis
         }
         return {
             Component: isTooltip ? Tooltip : React.Fragment,
-            props,
+            props: _props,
         };
     }, [title, tooltip, touchableEvents, disabled, testID, as, containerProps]);
     const iconStyle = StyleSheet.flatten([

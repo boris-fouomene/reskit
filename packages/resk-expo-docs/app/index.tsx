@@ -1,4 +1,4 @@
-import { FontIcon, Tab, Switch, Checkbox, Modal, Portal, Expandable, AppBar, TouchableRipple, IconButton, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
+import { FontIcon, Tab, Switch, Checkbox, Modal, Portal, Expandable, AppBar, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
 import { View, Text, TouchableOpacity, Pressable, ScrollView, Button } from 'react-native'
 import React, { useRef, useState } from 'react'
 
@@ -13,7 +13,7 @@ const index = () => {
             >
                 <AppBar.BackAction
                     onPress={() => console.log('Back')}
-                    textColor="#ffffff"
+                    color="red"
                 />
             </AppBar>
             <View style={[Theme.styles.p5]}>
@@ -68,7 +68,7 @@ const index = () => {
                         <Label>Third tab</Label>
                     </Tab.Item>
                 </Tab>
-                <IconButton
+                <Icon.Button
                     iconName="home"
                     title="Home"
                     size={30}

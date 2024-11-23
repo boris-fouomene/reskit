@@ -68,7 +68,7 @@ const getAppBarMaxActions = (windowWidth?: number): number => {
 export function splitAppBarActions<IAppBarActionContext = any>({
   actions: items,
   renderAction: render,
-  color,
+  textColor: color,
   backgroundColor,
   renderExpandableAction: renderExpandable,
   windowWidth,

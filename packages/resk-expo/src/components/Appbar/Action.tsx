@@ -1,5 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { Button, IButtonProps } from "@components/Button";
+import { useAppBar } from './hooks';
+import { forwardRef } from 'react';
 
 /**
  * AppBarAction component that renders a button for the AppBar.
@@ -22,10 +24,11 @@ import { Button, IButtonProps } from "@components/Button";
  *   );
  * };
  */
-const AppBarAction = (props: IAppBarActionProps) => {
-  return <Button mode={"contained"} borderRadius={0} {...props} style={[styles.buttonAction, props.style]} />
-}
-
+const AppBarAction = forwardRef((props: IAppBarActionProps, ref) => {
+  const appBarContext = useAppBar();
+  return <Button ref={ref} color={appBarContext.textColor} backgroundColor={appBarContext.backgroundColor} mode={"contained"} borderRadius={0} {...props} style={[styles.buttonAction, props.style]} />
+});
+AppBarAction.displayName = 'AppBarAction';
 /**
  * @interface IAppBarActionProps
  * Interface for the properties of the AppBarAction component.

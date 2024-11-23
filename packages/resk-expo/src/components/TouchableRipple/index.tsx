@@ -136,12 +136,14 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
             }}
             testID={testID}
             style={(state) => {
+                const cStyle = typeof style === 'function' ? style(state) : style;
+                const isHover = (state as any)?.hovered && !disabled;
                 return ([
                     styles.container,
-                    (state as any)?.hovered && !disabled && hoverColor && { backgroundColor: hoverColor },
                     state.pressed && !disabled && rippleColor && { backgroundColor: rippleColor },
                     webStyle,
-                    typeof style === 'function' ? style(state) : style
+                    cStyle,
+                    isHover && hoverColor && { backgroundColor: hoverColor },
                 ]);
             }}
         >

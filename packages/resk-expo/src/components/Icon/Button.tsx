@@ -5,10 +5,10 @@ import {
     View,
     ActivityIndicator,
 } from 'react-native';
-import { ISurfaceProps, Surface } from '@components/Surface';
-import { ITouchableRippleProps, TouchableRipple } from '@components/TouchableRipple';
+import { Surface } from '@components/Surface';
+import { TouchableRipple } from '@components/TouchableRipple';
 import { getColors } from "@components/TouchableRipple/utils";
-import { IIconProps, IIconSource } from './types';
+import { IIconButtonProps, IIconProps, IIconSource } from './types';
 import { Colors, useTheme } from '@theme/index';
 import { useGetIcon } from "./Icon";
 import { DEFAULT_FONT_ICON_SIZE } from "./Font";
@@ -17,127 +17,7 @@ import { defaultStr } from '@resk/core';
 
 const PADDING = 8;
 
-/**
- * Represents the properties for an IconButton component.
- * This type extends the IIconProps interface to include additional
- * functionality and customization options for the button.
- *
- * @interface IIconButtonProps
- * @extends IIconProps
- *
- * @property {string} [backgroundColor] - The background color of the icon container.
- * This property allows customization of the button's appearance.
- * 
- * @example
- * // Setting a custom background color
- * const buttonProps: IIconButtonProps = {
- *   backgroundColor: '#ff5722',
- * };
- *
- * @property {string} [rippleColor] - The color of the ripple effect that appears 
- * when the button is pressed. This enhances the user experience by providing 
- * visual feedback.
- * 
- * @example
- * // Customizing the ripple effect color
- * const buttonProps: IIconButtonProps = {
- *   rippleColor: '#ffffff',
- * };
- *
- * @property {boolean} [disabled] - Indicates whether the button is disabled. 
- * A disabled button is visually greyed out, and the `onPress` event will not 
- * trigger when the button is touched.
- * 
- * @example
- * // Disabling the button
- * const buttonProps: IIconButtonProps = {
- *   disabled: true,
- * };
- *
- * @property {string} [accessibilityLabel] - An accessibility label for the button, 
- * which is read by screen readers when the user taps the button. This is important 
- * for making the application more accessible to users with disabilities.
- * 
- * @example
- * // Providing an accessibility label
- * const buttonProps: IIconButtonProps = {
- *   accessibilityLabel: 'Submit your response',
- * };
- *
- * @property {React.RefObject<View>} [ref] - A reference to the View component 
- * that wraps the button. This can be used for imperative actions or accessing 
- * the component's methods.
- * 
- * @property {boolean} [isLoading] - A flag indicating whether to show a loading 
- * indicator on the button. This is useful for indicating to the user that an 
- * action is in progress.
- * 
- * @example
- * // Showing a loading indicator
- * const buttonProps: IIconButtonProps = {
- *   isLoading: true,
- * };
- *
- * @property {ITouchableRippleProps} [rippleProps] - Additional properties 
- * for customizing the ripple effect behavior. This can include settings such 
- * as duration, borderless effect, etc.
- * 
- * @property {ISurfaceProps} [containerProps] - Properties for the container 
- * view of the button, allowing further customization of the layout and style.
- * 
- * @property {number} [containerSize] - Size of the button container. If not provided, it will be calculated based on the size of the icon.
- *
- * @example
- * // Customizing the container view
- * const buttonProps: IIconButtonProps = {
- *   containerProps: {
- *     elevation: 4,
- *     style: { padding: 10 },
- *   },
- * };
- */
-export type IIconButtonProps = IIconProps & {
-    /**
-     * Background color of the icon container.
-     */
-    backgroundColor?: string;
-    /**
-     * Color of the ripple effect.
-     */
-    rippleColor?: string;
 
-    /**
-     * Whether the button is disabled. A disabled button is greyed out and `onPress` is not called on touch.
-     */
-    disabled?: boolean;
-    /**
-     * Accessibility label for the button. This is read by the screen reader when the user taps the button.
-     */
-    accessibilityLabel?: string;
-
-    ref?: React.RefObject<View>;
-    /**
-     * Whether to show a isLoading indicator.
-     */
-    isLoading?: boolean;
-
-    /**
-     * Props for the ripple effect.
-     */
-    rippleProps?: ITouchableRippleProps;
-
-    /**
-     * Props for the container view.
-     */
-    containerProps?: ISurfaceProps;
-
-    /**
-     * Size of the button container.
-        If not provided, it will be calculated based on the size of the icon.
-    *
-     */
-    containerSize?: number;
-};
 
 /**
  * A customizable IconButton component that renders an icon button with various 
@@ -239,6 +119,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
         const icon = useGetIcon<IIconProps>({
             as: TouchableRipple,
             ...rest, icon: source || iconName || undefined, testID,
+            color: iconColor,
             disabled, size,
             containerProps: {
                 hitSplot: { top: 10, left: 10, bottom: 10, right: 10 },
@@ -248,6 +129,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
                 disabled,
                 borderRadius,
                 accessibilityRole: "button",
+                backgroundColor,
                 ...rippleProps,
                 style: [styles.touchable, butonSizeStyle, rippleProps?.style],
                 rippleColor,

@@ -1,4 +1,5 @@
 import Button from "./Button";
+import FontIcon from "./Font";
 import Icon from "./Icon";
 export * from "./Font";
 export * from "./Icon";
@@ -8,11 +9,12 @@ export * from "./utils";
 
 type IIcon = typeof Icon & {
     Button: typeof Button
+    Font: typeof FontIcon
 };
 const IconWithButton = Icon as unknown as IIcon;
 IconWithButton.Button = Button;
 IconWithButton.displayName = 'Icon.Buttton';
-export { IconWithButton as Icon };
-export { Button as IconButton }
+IconWithButton.Font = FontIcon;
+IconWithButton.Font.displayName = 'Icon.Font';
 
-export * from "./Button";
+export { IconWithButton as Icon };

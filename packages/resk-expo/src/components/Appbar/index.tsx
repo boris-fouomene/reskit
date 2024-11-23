@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { BackAction } from './BackAction';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getThemeColors from './getThemeColor';
+import { AppBarContext, useAppBar } from './hooks';
 import {
   View,
   StyleSheet,
@@ -11,14 +12,15 @@ import {
 import Label from '@components/Label';
 import { Surface } from '@components/Surface';
 import Theme, { Colors, IThemeColorTokenKey, useTheme } from '@theme/index';
-import { IAppBarProps } from './types';
+import { IAppBarContext, IAppBarProps } from './types';
 import { getLabelOrLeftOrRightProps } from '@hooks/index';
 import { useDimensions } from '@dimensions/index';
 import { splitAppBarActions } from './utils';
 import Action from './Action';
 import isValidElement from '@utils/isValidElement';
 import { Menu } from '@components/Menu';
-import { FontIcon, IconButton } from '@components/Icon';
+import FontIcon from '@components/Icon/Font';
+import IconButton from '@components/Icon/Button';
 import ExpandableAppBarAction from './ExpandableAction';
 import AppBarAction from './Action';
 
@@ -26,7 +28,7 @@ import AppBarAction from './Action';
 
 // Main AppBar component
 const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionContext = any>({
-  bindResizeEvent, color, backgroundColor, context, colorScheme: customColorScheme,
+  bindResizeEvent, textColor: color, backgroundColor, context, colorScheme: customColorScheme,
   renderAction, renderExpandableAction, maxActions,
   actions: customActions, title, subtitle, titleProps, subtitleProps, windowWidth, onBackActionPress, testID,
   backAction: customBackAction,
@@ -63,7 +65,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   }
   const backAction = typeof customBackAction == "function" ? customBackAction(backActionProps) : customBackAction;
   const { actions, menus } = splitAppBarActions<AppBarActionContext>({
-    color,
+    textColor: color,
     backgroundColor,
     actions: customActions,
     isAppBarAction: true,
@@ -88,69 +90,71 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
     paddingHorizontal: Math.max(left, right, 7),
   }
   const { left: leftContent, right: rightContent } = getLabelOrLeftOrRightProps({ left: customLeft, right: customRight }, { color, backgroundColor, context })
-
   return (
-    <Surface
-      {...appBarProps}
-      testID={testID}
-      elevation={typeof elevation == "number" ? elevation : 0}
-      style={[
-        styles.appbar,
-        {
-          backgroundColor,
-          elevation,
-        },
-        containerStyle,
-        style,
-      ]}
-    >
-      {backAction != false ? isValidElement(backAction) ? backAction : <BackAction testID={`${testID}-back-action`} color={color} {...backActionProps} /> : null}
-      {isValidElement(leftContent) ? leftContent : null}
-      <View testID={`${testID}-content`} {...contentProps} style={[styles.content, contentProps?.style]}>
-        <Label
-          numberOfLines={1}
-          splitText
-          testID={`${testID}-title`}
-          {...titleProps}
-          style={[styles.title, { color },
-          titleTextColor ? {
-            color: titleTextColor,
-          } : undefined,
-            webStyle,
-          titleProps.style
-          ]}
-        >
-          {title}
-        </Label>
-        {subtitle ? (
+    <AppBarContext.Provider value={Object.assign({}, context, { backgroundColor, textColor: color })}>
+      <Surface
+        {...appBarProps}
+        testID={testID}
+        elevation={typeof elevation == "number" ? elevation : 0}
+        style={[
+          styles.appbar,
+          {
+            backgroundColor,
+            elevation,
+          },
+          containerStyle,
+          style,
+        ]}
+      >
+        {backAction != false ? isValidElement(backAction) ? backAction : <BackAction testID={`${testID}-back-action`} color={color} {...backActionProps} /> : null}
+        {isValidElement(leftContent) ? leftContent : null}
+        <View testID={`${testID}-content`} {...contentProps} style={[styles.content, contentProps?.style]}>
           <Label
             numberOfLines={1}
             splitText
-            testID={`${testID}-subtitle`}
-            {...subtitleProps}
-            style={[styles.subtitle, subtitleColor && { color: subtitleColor } || undefined, webStyle, subtitleProps?.style]}
+            testID={`${testID}-title`}
+            {...titleProps}
+            style={[styles.title, { color },
+            titleTextColor ? {
+              color: titleTextColor,
+            } : undefined,
+              webStyle,
+            titleProps.style
+            ]}
           >
-            {subtitle}
+            {title}
           </Label>
-        ) : null}
-      </View>
-      {actions}
-      {menus.length ? <Menu
-        testID={`${testID}-menu`}
-        anchor={({ closeMenu, openMenu }) => {
-          return <IconButton
-            size={24}
-            iconName={FontIcon.MORE}
-            color={color}
-            onPress={(event) => {
-              openMenu();
-            }}
-          />
-        }}
-        items={menus}
-      /> : null}
-      {isValidElement(right) ? right : null}
-    </Surface>
+          {subtitle ? (
+            <Label
+              numberOfLines={1}
+              splitText
+              testID={`${testID}-subtitle`}
+              {...subtitleProps}
+              style={[styles.subtitle, subtitleColor && { color: subtitleColor } || undefined, webStyle, subtitleProps?.style]}
+            >
+              {subtitle}
+            </Label>
+          ) : null}
+        </View>
+        {isValidElement(children) ? children : null}
+        {actions}
+        {menus.length ? <Menu
+          testID={`${testID}-menu`}
+          anchor={({ closeMenu, openMenu }) => {
+            return <IconButton
+              size={24}
+              iconName={FontIcon.MORE}
+              color={color}
+              onPress={(event) => {
+                openMenu();
+              }}
+            />
+          }}
+          items={menus}
+        /> : null}
+        {isValidElement(rightContent) ? rightContent : null}
+      </Surface>
+    </AppBarContext.Provider>
   );
 });
 
@@ -191,16 +195,21 @@ AppBar.displayName = 'AppBar';
 
 type IAppBar = typeof AppBar & {
   Action: typeof AppBarAction;
-  BackAction: typeof AppBarAction;
+  BackAction: typeof BackAction;
   ExpandableAction: typeof ExpandableAppBarAction;
 };
 
 const AppBarExported = AppBar as unknown as IAppBar;
+AppBarExported.displayName = 'AppBar';
 AppBarExported.Action = AppBarAction;
-AppBarExported.BackAction = AppBarAction;
+AppBarExported.Action.displayName = 'AppBar.Action';
+
+AppBarExported.BackAction = BackAction;
+AppBarExported.BackAction.displayName = 'AppBar.BackAction';
 AppBarExported.ExpandableAction = ExpandableAppBarAction;
 
 export { AppBarExported as AppBar };
 
 export * from "./types";
 export * from "./utils";
+export { useAppBar };

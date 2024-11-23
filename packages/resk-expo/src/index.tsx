@@ -11,5 +11,3 @@ export { default as Theme } from "./theme";
 export * from "./context";
 export { default as Session } from "./session";
 export * from "./components";
-export * from "./components/Checkbox";
-export * from "./components/Switch";

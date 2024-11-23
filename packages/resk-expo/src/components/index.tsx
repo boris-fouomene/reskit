@@ -22,3 +22,6 @@ export * from "./Menu";
 export * from "./Modal";
 export * from "./ReanimatedView";
 export * from "./AppBar";
+export * from "./Checkbox";
+export * from "./Switch";
+export * from "./Button";

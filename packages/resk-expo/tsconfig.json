@@ -3,7 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": ".",
-    "rootDir": ".",
+    "rootDir": "./src",
     "outDir": "./build",
     "paths": {
       "@session": [
@@ -40,16 +40,16 @@
         "src/platform"
       ],
       "@hooks/*": [
-        "./src/hooks/*"
+        "src/hooks/*"
       ],
       "@components/*": [
-        "./src/components/*"
+        "src/components/*"
       ],
       "@constants/*": [
-        "./src/constants/*"
+        "src/constants/*"
       ],
       "@src/*": [
-        "./src/*"
+        "src/*"
       ],
     }
   },

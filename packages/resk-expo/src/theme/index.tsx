@@ -246,8 +246,8 @@ export const lightColors: IThemeColorTokens = {
   Default Dark Theme Tokens
 */
 export const darkColors: IThemeColorTokens = {
-    primary: '#D0BCFF',
-    onPrimary: '#381E72',
+    primary: '#6750A4',
+    onPrimary: '#FFFFFF',
     primaryContainer: '#4F378B',
     onPrimaryContainer: '#EADDFF',
     secondary: '#CCC2DC',

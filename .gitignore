@@ -18,6 +18,7 @@ rad.json
 *.g.xlf
 #License-file
 *.flf
+*.tsconfig.tsbuildinfo
 #Test results file
 TestResults.xml
 package-lock.json

@@ -3,9 +3,10 @@
     "baseUrl": ".",
     "rootDir": ".", // TypeScript source directory
     "outDir": "./build",
-    "target": "es6",
+    "target": "ES6", // Specifies the ECMAScript target version
+    "module": "ES6", // Use ES6 module syntax (e.g., `import`/`export`)
+    "moduleResolution": "node", // Resolve modules using Node.js style
     "forceConsistentCasingInFileNames": true,
-    "module": "CommonJS", // Use commonjs module system
     "experimentalDecorators": true, // Enable experimental support for decorators
     "emitDecoratorMetadata": true, // Enable emitting design:type metadata
     "strict": true, // Enable all strict type checking options
@@ -14,7 +15,6 @@
     "composite": true,
     "allowSyntheticDefaultImports": true,
     //"module": "NodeNext",
-    //"moduleResolution": "NodeNext", // Change this to 'node16', 'nodenext', or 'bundler'
     "esModuleInterop": true, // Compatibility with ES module imports
     //"sourceMap": true,
     "declaration": true,

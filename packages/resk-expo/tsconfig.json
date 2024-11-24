@@ -42,6 +42,9 @@
       "@hooks/*": [
         "src/hooks/*"
       ],
+      "@layouts/*": [
+        "src/layouts/*"
+      ],
       "@components/*": [
         "src/components/*"
       ],

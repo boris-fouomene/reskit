@@ -123,7 +123,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContai
             props.style,
           ]}
         >
-          <ModalContext.Provider value={{ ...props, modalVisible: visible as boolean, isModalClosed: () => !!!visible, isModalOpened: () => !!visible, maxWidth: !fullScreen ? maxWidth : undefined, maxHeight: !fullScreen ? maxHeight : undefined, handleDismiss, onDismiss, dismissable, backgroundOpacity: backgroundOpacityP, visible, responsive, fullScreen }}>
+          <ModalContext.Provider value={{ ...props, isModal: true, modalVisible: visible as boolean, isModalClosed: () => !!!visible, isModalOpen: () => !!visible, modalMaxWidth: !fullScreen ? maxWidth : undefined, modalMaxHeight: !fullScreen ? maxHeight : undefined, handleDismiss, onDismiss, dismissable, backgroundOpacity: backgroundOpacityP, visible, responsive, fullScreen }}>
             {children}
           </ModalContext.Provider>
         </ReanimatedView>
@@ -316,14 +316,14 @@ const styles = StyleSheet.create({
  * @interface IModalContext
  * @extends IModalProps
  *
- * @property {() => boolean} [isModalOpened] - A function that determines if the modal 
+ * @property {() => boolean} [isModalOpen] - A function that determines if the modal 
  * is currently opened. Returns true if the modal is open, otherwise false.
  * 
  * @example
  * const modalContext: IModalContext = {
- *   isModalOpened: () => true,
+ *   isModalOpen: () => true,
  * };
- * console.log(modalContext.isModalOpened()); // Output: true
+ * console.log(modalContext.isModalOpen()); // Output: true
  *
  * @property {() => boolean} [isModalClosed] - A function that determines if the modal 
  * is currently closed. Returns true if the modal is closed, otherwise false.
@@ -343,17 +343,17 @@ const styles = StyleSheet.create({
  * };
  * console.log(modalContext.modalVisible); // Output: true
  *
- * @property {number} [maxWidth] - The maximum width of the modal. This is particularly 
+ * @property {number} [modalMaxWidth] - The maximum width of the modal. This is particularly 
  * useful when the modal is not displayed in full-screen mode, allowing for better 
  * layout control.
  * 
  * @example
  * const modalContext: IModalContext = {
- *   maxWidth: 500,
+ *   modalMaxWidth: 500,
  * };
- * console.log(modalContext.maxWidth); // Output: 500
+ * console.log(modalContext.modalMaxWidth); // Output: 500
  *
- * @property {number} [maxHeight] - The maximum height of the modal. This property 
+ * @property {number} [modalMaxHeight] - The maximum height of the modal. This property 
  * is utilized when the modal is not in full-screen mode, providing constraints on 
  * its height.
  * 
@@ -378,11 +378,12 @@ const styles = StyleSheet.create({
  * modalContext.handleDismiss(new KeyboardEvent("keydown")); // Output: Modal dismissed [KeyboardEvent]
  */
 export interface IModalContext extends IModalProps {
-  isModalOpened?: () => boolean;
+  isModalOpen?: () => boolean;
   isModalClosed?: () => boolean;
+  isModal: boolean;
   modalVisible?: boolean;
-  maxWidth?: number;
-  maxHeight?: number;
+  modalMaxWidth?: number;
+  modalMaxHeight?: number;
   handleDismiss?: (e: GestureResponderEvent | KeyboardEvent) => any;
 }
 
@@ -406,12 +407,12 @@ export interface IModalContext extends IModalProps {
  *     return <div>No Modal Context available</div>;
  *   }
  *   
- *   const { isModalOpened, handleDismiss } = modalContext;
+ *   const { isModalOpen, handleDismiss } = modalContext;
  *   
  *   return (
  *     <div>
  *       <button onClick={handleDismiss}>Dismiss Modal</button>
- *       <p>Is Modal Opened: {isModalOpened() ? "Yes" : "No"}</p>
+ *       <p>Is Modal Opened: {isModalOpen() ? "Yes" : "No"}</p>
  *     </div>
  *   );
  * };

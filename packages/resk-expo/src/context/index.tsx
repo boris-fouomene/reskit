@@ -12,6 +12,7 @@ import { ReskExpoContext } from './context';
 import { useColorScheme } from "@theme/useColorScheme";
 import { PortalProvider } from "@components/Portal";
 import Breakpoints from "@src/breakpoints";
+import { Preloader, Dialog } from "@components/Dialog";
 
 export * from "./types";
 export * from "./context";
@@ -114,7 +115,11 @@ export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ..
    */
   return (
     <ReskExpoContext.Provider value={{ theme, updateTheme, ...rest, breakpoints }}>
-      <PortalProvider>{children}</PortalProvider>
+      <PortalProvider>
+        <Preloader.Provider />
+        <Dialog.Provider.Provider />
+        {children}
+      </PortalProvider>
     </ReskExpoContext.Provider>
   );
 }

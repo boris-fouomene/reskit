@@ -25,3 +25,4 @@ export * from "./AppBar";
 export * from "./Checkbox";
 export * from "./Switch";
 export * from "./Button";
+export * from "./Dialog";

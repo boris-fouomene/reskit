@@ -1,9 +1,12 @@
-import { FontIcon, Tab, Switch, Checkbox, Modal, Portal, Expandable, AppBar, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
-import { View, TouchableOpacity, Pressable, ScrollView, Button } from 'react-native'
-import React, { useRef, useState } from 'react'
+import { FontIcon, Tab, Switch, Checkbox, Modal, Button, Dialog, Preloader, Portal, Expandable, AppBar, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
+import { View, TouchableOpacity, Pressable, ScrollView } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 
 
 const index = () => {
+    useEffect(() => {
+        //Preloader.open();
+    }, [])
     return (
         <ScrollView>
             <AppBar
@@ -109,22 +112,43 @@ const index = () => {
     )
 }
 const ModalExample = () => {
-    const [visible, setVisible] = useState(false);
     const openModal = () => {
-        setVisible(true);
+        Dialog.Provider.open({
+            title: "Dialog Title",
+            fullScreenAppBarProps: {
+                subtitle: "Dialog subtitle",
+            },
+            children: <View>
+                <View>
+                    <Label>Dialog Content</Label>
+                    <Label onPress={closeModal}>Close Modal</Label>
+                </View>
+            </View>,
+            actions: [
+                {
+                    label: "Cancel",
+                    colorScheme: "error",
+                    onPress: () => {
+                        console.log("Cancel")
+                    },
+                },
+                {
+                    label: "Ok",
+                    colorScheme: "primary",
+                    closeOnPress: false,
+                    onPress: () => {
+                        console.log("Ok")
+                    },
+                },
+            ]
+        })
     };
     const closeModal = () => {
-        setVisible(false);
+        Dialog.Provider.close();
     };
     return (
         <View>
-            <Button title="Open Modal" onPress={openModal} />
-            <Modal visible={visible} onDismiss={closeModal} animationType="fade">
-                <View>
-                    <Label>Modal Content</Label>
-                    <Label onPress={closeModal}>Close Modal</Label>
-                </View>
-            </Modal>
+            <Button label="Open Modal" onPress={openModal} />
         </View>
     )
 }

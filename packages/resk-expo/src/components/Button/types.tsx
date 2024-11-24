@@ -453,3 +453,39 @@ export type IButtonContext<IButtonExtendContext = any> = Readonly<{
      */
     ref: View | null;
 } & IButtonExtendContext>;
+
+
+/**
+ * Type definition for a forwarded reference to a Button component.
+ * 
+ * This type encapsulates the reference that can be used to access 
+ * the underlying Button component's context. It allows for the 
+ * extension of button context properties through a generic type 
+ * parameter, enabling developers to create more specialized 
+ * button contexts as needed.
+ * 
+ * @template IButtonExtendContext - A generic type parameter that allows 
+ * extending the context for the Button component. This enables 
+ * customization of the properties passed to the button context.
+ * 
+ * @typedef {React.ForwardedRef<IButtonContext<IButtonExtendContext>>} IButtonRef
+ * 
+ * @example
+ * // Example usage of IButtonRef in a functional component
+ * const MyButton = React.forwardRef<IButtonContext, ButtonProps>((props, ref) => {
+ *     return (
+ *         <Button ref={ref} {...props}>
+ *             Click Me
+ *         </Button>
+ *     );
+ * });
+ * 
+ * // Using the IButtonRef type to create a reference
+ * const buttonRef: IButtonRef = React.createRef();
+ * 
+ * @remarks
+ * Utilizing the IButtonRef type allows for type-safe handling of 
+ * button references, making it easier to manage button states 
+ * and actions in a React application.
+ */
+export type IButtonRef<IButtonExtendContext = any> = React.ForwardedRef<IButtonContext<IButtonExtendContext>>;

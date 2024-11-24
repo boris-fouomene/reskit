@@ -12,7 +12,7 @@ import {
 import Label from '@components/Label';
 import { Surface } from '@components/Surface';
 import Theme, { Colors, IThemeColorTokenKey, useTheme } from '@theme/index';
-import { IAppBarContext, IAppBarProps } from './types';
+import { IAppBarProps } from './types';
 import { getLabelOrLeftOrRightProps } from '@hooks/index';
 import { useDimensions } from '@dimensions/index';
 import { splitAppBarActions } from './utils';
@@ -25,8 +25,49 @@ import ExpandableAppBarAction from './ExpandableAction';
 import AppBarAction from './Action';
 
 
-
-// Main AppBar component
+/**
+ * AppBar component that serves as a top navigation bar for the application.
+ * 
+ * This component provides a customizable AppBar that can display a title,
+ * subtitle, actions, and handle back navigation. It is designed to provide 
+ * a consistent user interface across the application and adapts to various 
+ * screen sizes and themes.
+ * 
+ * @template AppBarActionContext - A generic type parameter that allows 
+ * extending the context for AppBar actions. This enables customization of 
+ * the properties passed to action items within the AppBar.
+ * 
+ * @param {IAppBarProps<AppBarActionContext>} props - The properties for 
+ * configuring the AppBar, including title, subtitle, actions, and styles.
+ * 
+ * @param {React.ForwardedRef<View>} ref - A forwarded reference to the 
+ * underlying View component, allowing parent components to access it.
+ * 
+ * @returns {JSX.Element} The rendered AppBar component, which includes 
+ * title, subtitle, actions, and other customizable elements.
+ * 
+ * @example
+ * // Example usage of the AppBar component
+ * const MyScreen = () => {
+ *   return (
+ *     <AppBar
+ *       title="My Application"
+ *       subtitle="Welcome to the app"
+ *       onBackActionPress={() => console.log('Back pressed')}
+ *       actions={[
+ *         { label: 'Settings', onPress: () => console.log('Settings pressed') },
+ *         { label: 'Profile', onPress: () => console.log('Profile pressed') },
+ *       ]}
+ *     />
+ *   );
+ * };
+ * 
+ * @remarks
+ * The AppBar component automatically handles responsiveness and adapts 
+ * to different screen sizes. It also integrates with the application's 
+ * theme, allowing for consistent styling across the app. The AppBar can 
+ * include custom actions and can be extended with additional props as needed.
+ */
 const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionContext = any>({
   bindResizeEvent, textColor: color, backgroundColor, context, colorScheme: customColorScheme,
   renderAction, renderExpandableAction, maxActions,

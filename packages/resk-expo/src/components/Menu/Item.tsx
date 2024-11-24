@@ -3,7 +3,7 @@ import { useMenu } from "./context";
 import { IMenuItemContext, IMenuItemProps } from "./types";
 import { GestureResponderEvent, StyleSheet } from "react-native";
 import { forwardRef } from "react";
-import { IButtonContext } from "@components/Button/types";
+import { IButtonRef } from "@components/Button/types";
 import { useTheme } from "@theme/index";
 
 /**
@@ -58,7 +58,7 @@ import { useTheme } from "@theme/index";
  *   the underlying button context, providing additional flexibility 
  *   in managing button states and behaviors.
  */
-export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<IMenuItemExtendContext extends object = any>({ expandableProps, closeOnPress, items, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref?: React.ForwardedRef<IButtonContext<IMenuItemContext<IMenuItemExtendContext>>>) {
+export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<IMenuItemExtendContext extends object = any>({ expandableProps, closeOnPress, items, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref?: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
     const menuContext = useMenu();
     const theme = useTheme();
     return <Button

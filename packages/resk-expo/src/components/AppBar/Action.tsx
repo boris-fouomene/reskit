@@ -1,30 +1,45 @@
 import { StyleSheet } from 'react-native'
-import { Button, IButtonProps } from "@components/Button";
+import { Button, IButtonRef } from "@components/Button";
 import { useAppBar } from './hooks';
 import { forwardRef } from 'react';
+import { IAppBarContext, IAppBarAction } from './types';
+
 
 /**
- * AppBarAction component that renders a button for the AppBar.
+ * AppBarAction component that renders a button specifically designed for use within an AppBar.
  * 
- * This component utilizes the Button component from the UI library
- * and is styled specifically for use within the AppBar. It allows
- * customization through props, including style and button properties.
- *
- * @param {IAppBarActionProps} props - The properties for configuring the AppBarAction.
+ * This component leverages the Button component from the UI library and is styled to fit seamlessly 
+ * into the AppBar layout. It allows for customization through various props, enabling developers 
+ * to tailor the button's appearance and behavior according to their application's needs.
  * 
- * @returns {JSX.Element} The rendered AppBarAction component.
- *
+ * @param {IAppBarAction<IAppBarActionContext>} props - The properties for configuring the AppBarAction.
+ * 
+ * @param {React.ForwardedRef<IButtonContext<IAppBarContext<IAppBarActionContext>>>} ref - A ref for 
+ * accessing the underlying Button component. This allows parent components to interact with the 
+ * button, such as focusing or measuring its dimensions.
+ * 
+ * @returns {JSX.Element} The rendered AppBarAction component, which is a button styled for the AppBar.
+ * 
  * @example
- * // Example usage of the AppBarAction component
+ * // Example usage of the AppBarAction component within an AppBar
  * const MyAppBar = () => {
  *   return (
  *     <AppBar>
- *       <AppBarAction onPress={() => console.log('Action pressed')} label="Action" />
+ *       <AppBarAction 
+ *         onPress={() => console.log('Action pressed')} 
+ *         label="Action" 
+ *         style={{ marginRight: 10 }} 
+ *       />
  *     </AppBar>
  *   );
  * };
+ * 
+ * @remarks
+ * The AppBarAction component automatically inherits the text color and background color from 
+ * the AppBar context, ensuring consistent styling across the application. It is designed to 
+ * work well with the AppBar's layout and can be easily integrated with other AppBar components.
  */
-const AppBarAction = forwardRef((props: IAppBarActionProps, ref) => {
+const AppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionContext = any>(props: IAppBarAction<IAppBarActionContext>, ref: IButtonRef<IAppBarContext<IAppBarActionContext>>) {
   const appBarContext = useAppBar();
   return <Button
     ref={ref}
@@ -35,18 +50,7 @@ const AppBarAction = forwardRef((props: IAppBarActionProps, ref) => {
   />
 });
 AppBarAction.displayName = 'AppBarAction';
-/**
- * @interface IAppBarActionProps
- * Interface for the properties of the AppBarAction component.
- * 
- * This interface extends the IButtonProps to include all 
- * properties available for the Button component, allowing 
- * for customization of the AppBarAction button's behavior 
- * and appearance.
- */
-export type IAppBarActionProps<IAppBarActionContext = any> = Omit<IButtonProps<IAppBarActionContext>, "children"> & {
-  children?: IButtonProps["children"];
-}
+
 export default AppBarAction
 
 const styles = StyleSheet.create({

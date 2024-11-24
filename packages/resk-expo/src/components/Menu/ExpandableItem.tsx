@@ -4,6 +4,7 @@ import { Expandable } from "@components/Expandable";
 import { IMenuItemContext, IMenuItemProps } from "./types";
 import { Divider } from "@components/Divider";
 import { forwardRef } from "react";
+import { IButtonRef } from "@components/Button";
 
 /**
  * A functional component that renders an expandable menu item within a navigation menu.
@@ -58,7 +59,7 @@ import { forwardRef } from "react";
  * The use of generics allows for flexibility in extending the component's functionality
  * based on specific requirements.
  */
-const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, dividerProps, divider, expandableProps, children, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref?: React.ForwardedRef<IMenuItemContext<IMenuItemExtendContext>>) {
+const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, dividerProps, divider, expandableProps, children, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
     testID = defaultStr(testID, "rn-menu-item-expandable");
     return <Expandable
         testID={testID + "-expandable"}

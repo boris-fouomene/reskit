@@ -14,7 +14,7 @@ import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import { TouchableRipple } from '@components/TouchableRipple';
 import Label from '@components/Label';
-import { IButtonMode, IButtonProps, IButtonContext } from './types';
+import { IButtonMode, IButtonProps, IButtonContext, IButtonRef } from './types';
 import { IFlatStyle } from '../../types/index';
 import { IIconButtonProps, useGetIcon } from '@components/Icon';
 import { defaultStr, uniqid } from '@resk/core';
@@ -147,7 +147,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     divider: customDivider,
     context: extendContext,
     ...rest
-}: IButtonProps<IButtonExtendContext>, ref: React.ForwardedRef<IButtonContext<IButtonExtendContext>>) {
+}: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
     testID = defaultStr(testID, "rn-button");
     const theme = useTheme();
     const [isLoading, _setIsLoading] = React.useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
@@ -351,6 +351,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
         {divider ? <Divider id={idRef.current + "-divider"} testID={testID + "-divider"} {...dividerProps} style={[dividerProps.style, Theme.styles.w100]} /> : null}
     </ButtonContext.Provider>);
 });
+
 
 const styles = StyleSheet.create({
     button: {

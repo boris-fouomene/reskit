@@ -1,6 +1,15 @@
 {
   "extends": "expo/tsconfig.base",
+  "files.associations": {
+    "*.tsx": "typescriptreact",
+    "*.ts": "typescriptreact"
+  },
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx", // Use the new JSX transform
+    "module": "ESNext", // Ensure module syntax is ESNext
+    "target": "ES6", // Target modern ECMAScript version
+    "skipLibCheck": true
   }
 }

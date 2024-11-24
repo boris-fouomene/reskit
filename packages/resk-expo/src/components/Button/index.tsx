@@ -122,10 +122,6 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     accessibilityLabel,
     accessibilityHint,
     accessibilityRole = 'button',
-    onPress,
-    onPressIn,
-    onPressOut,
-    onLongPress,
     style,
     uppercase = true,
     testID,
@@ -289,10 +285,6 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             <Tooltip
                 as={TouchableRipple}
                 borderless
-                onPress={onPress}
-                onLongPress={onLongPress}
-                onPressIn={onPressIn}
-                onPressOut={onPressOut}
                 accessibilityLabel={accessibilityLabel}
                 accessibilityHint={accessibilityHint}
                 accessibilityRole={accessibilityRole}

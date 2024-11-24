@@ -6,7 +6,6 @@ import {
 
 const useNativeDriver = Platform.isMobileNative();
 
-export const useAnimations = (disableRipple?: boolean) => {
-    const animatedRef = useRef(new Animated.Value(1));
-    return { fadeIn: null, fadeOut: null, animatedRef };
+export const useAnimations = ({ disableRipple, rippleColor }: { disableRipple?: boolean, rippleColor?: string }) => {
+    return { fadeIn: null, fadeOut: null, rippleContent: null };
 }

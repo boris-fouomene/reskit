@@ -10,6 +10,7 @@ import { Colors, useTheme } from '@theme';
 import Platform from '@platform/index';
 import { ITouchableRippleProps } from './types';
 import { getColors } from './utils';
+import { Animated } from 'react-native';
 
 export * from "./types";
 
@@ -102,13 +103,12 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
     const theme = useTheme();
     const { rippleColor, hoverColor } = getColors({ rippleColor: customRippleColor, hoverColor: customHoverColor, theme });
     testID = defaultStr(testID, "rn-touchable-ripple");;
-    const { fadeIn, fadeOut } = useAnimations(disableRipple);
+    const { fadeIn, fadeOut, rippleContent } = useAnimations({ disableRipple, rippleColor, testID: testID + "-ripple-effect" });
     const { webStyle } = useMemo(() => {
         return {
             webStyle: !isAndroid ? [typeof borderRadius === "number" && { borderRadius } || null] : null
         }
     }, [borderRadius, isAndroid])
-    const rippleContent = null;
     return (
         <Pressable
             onPress={onPress}
@@ -168,6 +168,8 @@ const styles = StyleSheet.create({
     },
     ripple: {
         ...StyleSheet.absoluteFillObject,
+        width: '100%',
+        height: '100%',
     },
 });
 

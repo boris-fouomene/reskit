@@ -3,29 +3,48 @@ import Platform from "@platform";
 import {
     Animated,
     StyleSheet,
-    Pressable,
-    View,
+    Easing,
 } from 'react-native';
 
 const useNativeDriver = Platform.isMobileNative();
 
-export const useAnimations = (disableRipple?: boolean) => {
-    const animatedRef = useRef(new Animated.Value(1));
+export const useAnimations = ({ disableRipple, rippleColor, testID }: { disableRipple?: boolean, rippleColor?: string, testID?: string }) => {
+    const rippleOpacity = useRef(new Animated.Value(0)).current;
     const fadeIn = () => {
         if (disableRipple) return;
-        Animated.timing(animatedRef.current, {
-            toValue: 0.4,
-            duration: 100,
+        Animated.timing(rippleOpacity, {
+            toValue: 1,
+            duration: 200,
+            easing: Easing.out(Easing.ease),
             useNativeDriver,
         }).start();
     };
     const fadeOut = () => {
         if (disableRipple) return;
-        Animated.timing(animatedRef.current, {
-            toValue: 1,
-            duration: 200,
+        Animated.timing(rippleOpacity, {
+            toValue: 0,
+            duration: 300,
+            easing: Easing.out(Easing.ease),
             useNativeDriver,
         }).start();
     };
-    return { fadeIn, fadeOut, animatedRef };
+    return {
+        fadeIn, fadeOut, rippleContent: disableRipple ? null : <Animated.View
+            testID={testID}
+            style={[
+                StyleSheet.absoluteFillObject,
+                styles.ripple,
+                { backgroundColor: rippleColor, opacity: rippleOpacity },
+            ]}
+        />
+    };
 }
+
+
+const styles = StyleSheet.create({
+    ripple: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+    },
+});

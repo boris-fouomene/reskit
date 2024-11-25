@@ -8,7 +8,6 @@ import updateNative from "./updateNative";
 import styles from "./styles";
 import { useReskExpoProvider } from "@src/context/context";
 import Elevations from "./Elevations";
-import iosLightColors from "./ios/light";
 
 export * from "./utils";
 export * from "./types";
@@ -105,6 +104,7 @@ const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => an
  * @returns {ITheme} - The theme object extended with utility methods.
  */
 export function createTheme(theme: ITheme): IThemeManager {
+    const context = theme;
     return {
         ...Object.assign({}, theme),
         get styles() {
@@ -132,8 +132,8 @@ export function createTheme(theme: ITheme): IThemeManager {
          * @returns {string | undefined} - The resolved color value or undefined if none is found.
          */
         getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined {
-            if (color && color in this.colors) {
-                return this.colors[color as keyof typeof this.colors] as string;
+            if (color && color in context.colors) {
+                return context.colors[color as keyof typeof context.colors] as string;
             }
             if (Colors.isValid(color)) return color as string;
             for (let i in defaultColors) {
@@ -165,29 +165,25 @@ export function createTheme(theme: ITheme): IThemeManager {
          * @returns {IThemeColorSheme} - An object containing `color` and `backgroundColor` properties.
          */
         getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme {
-            if (
-                !colorSheme ||
-                typeof colorSheme != "string" ||
-                !(colorSheme in this.colors)
-            )
+            if (!colorSheme || typeof colorSheme != "string" || !(colorSheme in context.colors)) {
                 return {};
+            }
             const result: { color?: string; backgroundColor?: string } = {};
             // Handle "on" prefixed colors (e.g., "onPrimary")
             if ((colorSheme as string).startsWith("on")) {
-                (result as IDict).color = this.colors[colorSheme];
+                (result as IDict).color = context.colors[colorSheme];
                 let bgColorKey = colorSheme.slice(2);
                 if (bgColorKey) {
                     bgColorKey = bgColorKey.charAt(0).toLowerCase() + bgColorKey.slice(1);
-                    if (bgColorKey in this.colors) {
-                        (result as IDict).backgroundColor = this.colors[bgColorKey as keyof typeof this.colors];
+                    if (bgColorKey in context.colors) {
+                        (result as IDict).backgroundColor = context.colors[bgColorKey as keyof typeof context.colors];
                     }
                 }
             } else {
-                (result as IDict).backgroundColor = this.colors[colorSheme];
-                const bgColorKey =
-                    "on" + colorSheme.charAt(0).toUpperCase() + colorSheme.slice(1);
-                if (bgColorKey in this.colors) {
-                    (result as IDict).color = this.colors[bgColorKey as keyof typeof this.colors];
+                (result as IDict).backgroundColor = context.colors[colorSheme];
+                const bgColorKey = "on" + colorSheme.charAt(0).toUpperCase() + colorSheme.slice(1);
+                if (bgColorKey in context.colors) {
+                    (result as IDict).color = context.colors[bgColorKey as keyof typeof context.colors];
                 }
             }
             return result;
@@ -202,7 +198,7 @@ const white = "white", black = "black";
 /*
     Default Light Theme Tokens
 */
-export const lightColors: IThemeColorTokens = {
+const lightColors: IThemeColorTokens = {
     primary: '#6750A4',
     onPrimary: '#FFFFFF',
     primaryContainer: '#EADDFF',
@@ -297,10 +293,10 @@ export const darkColors: IThemeColorTokens = {
  * const primaryColor = DefaultDarkTheme.getColor("primary"); // "#5EBA6A"
  * ```
  */
-export const DefaultDarkTheme: ITheme = createTheme({
+export const DefaultDarkTheme: IThemeManager = createTheme({
     name: `${packageName}-dark`,
     dark: true,
-    roundness: 10,
+    roundness: 8,
     colors: {
         ...darkColors,
     },
@@ -320,12 +316,11 @@ export const DefaultDarkTheme: ITheme = createTheme({
  * const primaryColor = DefaultLightTheme.getColor("primary"); // "#5EBA6A"
  * ```
  */
-export const DefaultLightTheme: ITheme = createTheme({
+export const DefaultLightTheme: IThemeManager = createTheme({
     name: `${packageName}-light`,
-    roundness: 10,
+    roundness: 8,
     colors: {
         ...lightColors,
-        ...iosLightColors,
     },
 } as unknown as ITheme);
 
@@ -362,17 +357,41 @@ export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
     return theme;
 };
 
-/** 
- * An object that holds a reference to the current application theme.
- * 
- * This reference is updated dynamically whenever the theme changes.
- * @example
- * ```ts
- * console.log(themeRef.current.name); // Logs the name of the current theme
- * ```
- */
-const themeRef: { current: IThemeManager } = {
-    current: createTheme(getDefaultTheme()),
+class Theme {
+    private static defaultTheme: IThemeManager = createTheme(getDefaultTheme());
+    static setTheme(theme: IThemeManager) {
+        this.defaultTheme = theme;
+    }
+    static get dark() {
+        return this.defaultTheme?.dark; // Check if the theme is dark
+    }
+    static getName() {
+        return this.defaultTheme?.name; // Get the theme name
+    }
+    static get colors() {
+        return this.defaultTheme?.colors; // Access the color palette
+    }
+    static getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined {
+        return this.defaultTheme?.getColor(color, ...defaultColors);
+    }
+    static getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme {
+        return this.defaultTheme?.getColorScheme(colorSheme);
+    }
+    static get styles() {
+        return this.defaultTheme?.styles;
+    }
+    static get elevations() {
+        return this.defaultTheme?.elevations;
+    }
+    static get customCSS() {
+        return this.defaultTheme?.customCSS;
+    }
+    static get roundness() {
+        return this.defaultTheme?.roundness;
+    }
+    static get get() {
+        return this.defaultTheme;
+    }
 };
 
 /**
@@ -394,21 +413,22 @@ const themeRef: { current: IThemeManager } = {
  * console.log(themeRef.current.name); // Logs the name of the updated theme
  * ```
  */
-export function updateTheme(theme: ITheme, trigger: boolean = false): ITheme {
+export function updateTheme(theme: ITheme, trigger: boolean = false): IThemeManager {
     // Save the theme name in the session
     session.set("theme", theme.name);
 
     // Update the theme reference
-    themeRef.current = createTheme(theme);
+    const newTheme = createTheme(theme);
+    Theme.setTheme(newTheme);
 
     // Apply the theme to native elements (like the status bar)
     updateNative(theme);
 
     // Optionally trigger a global theme update event
     if (trigger) {
-        triggerThemeUpdate(theme);
+        triggerThemeUpdate(newTheme);
     }
-    return theme;
+    return newTheme;
 }
 
 /**
@@ -458,9 +478,9 @@ export const getStatusBarProps = (): { animated?: boolean, backgroundColor?: str
     };
 
     // If the current theme has a statusBar color, set the background color and style
-    if (themeRef.current.colors.statusBar) {
-        const color = Color(themeRef.current.colors.statusBar);
-        statusBarStyle.backgroundColor = themeRef.current.colors.statusBar;
+    if (Theme.colors.statusBar) {
+        const color = Color(Theme.colors.statusBar);
+        statusBarStyle.backgroundColor = Theme.colors.statusBar;
 
         // Set the status bar style to 'light' or 'dark' based on the lightness of the color
         statusBarStyle.style = color.isLight() ? "dark" : "light";
@@ -469,20 +489,6 @@ export const getStatusBarProps = (): { animated?: boolean, backgroundColor?: str
     return statusBarStyle;
 };
 
-
-
-const Theme = {
-    ...themeRef.current, // Spread the properties of the current theme
-    get dark() {
-        return themeRef.current.dark; // Check if the theme is dark
-    },
-    get name() {
-        return themeRef.current?.name; // Get the theme name
-    },
-    get colors() {
-        return themeRef.current.colors; // Access the color palette
-    },
-};
 
 /**
  * The default export for the theme object, providing direct access to theme properties.
@@ -635,11 +641,11 @@ export { default as Colors } from "./colors";
  * the context, the default theme is always returned, making it safe to use throughout 
  * the application.
  */
-export const useTheme = (): ITheme => {
+export const useTheme = (): IThemeManager => {
     const { theme } = useReskExpoProvider();
     /**
      * Returns the current theme from `ReskExpoProvider` context.
      * If no theme is found, it returns the default `Theme` from `@theme`.
      */
-    return theme || Theme;
+    return (theme || Theme) as IThemeManager;
 };

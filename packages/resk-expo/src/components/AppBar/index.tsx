@@ -85,19 +85,19 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   contentProps = Object.assign({}, contentProps);
   const { color: tColor, backgroundColor: tBackgroundColor } = getThemeColors(theme);
   testID = testID || 'rn-appbar';
-  const colorScheme = Theme.getColorScheme(customColorScheme as IThemeColorTokenKey);
+  const colorScheme = theme.getColorScheme(customColorScheme as IThemeColorTokenKey);
   const flattenStyle = (StyleSheet.flatten(style) || {});
   backgroundColor = (
-    Colors.isValid(backgroundColor) ? backgroundColor : Theme.getColor(backgroundColor as IThemeColorTokenKey)
+    Colors.isValid(backgroundColor) ? backgroundColor : theme.getColor(backgroundColor as IThemeColorTokenKey)
       || colorScheme.backgroundColor || flattenStyle?.backgroundColor || tBackgroundColor || theme.colors.surface
   ) as string;
-  color = (Colors.isValid(color) ? color : Theme.getColor(color as IThemeColorTokenKey) || colorScheme.color || (flattenStyle as any)?.color || tColor) as string;
+  color = (Colors.isValid(color) ? color : theme.getColor(color as IThemeColorTokenKey) || colorScheme.color || (flattenStyle as any)?.color || tColor) as string;
   const titleTextColor = Colors.isValid(color) ? color : undefined;
   titleProps = Object.assign({}, titleProps);
   subtitleProps = Object.assign({}, subtitleProps);
   subtitle = subtitle === false ? null : subtitle;
   const subtitleColor = titleTextColor ? Colors.setAlpha(titleTextColor, 0.7) : undefined;
-  const webStyle = Theme.styles.webFontFamily;
+  const webStyle = theme.styles.webFontFamily;
   backActionProps = Object.assign({}, backActionProps);
   const { onPress } = backActionProps;
   backActionProps.onPress = (e: GestureResponderEvent) => {

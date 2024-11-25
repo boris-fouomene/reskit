@@ -216,7 +216,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
         flattenedStyles,
         (style) => style.startsWith('border') && style.endsWith('Radius')
     );
-    borderRadius = typeof (borderRadius) === 'number' ? borderRadius : 5 * (roundness || 4);
+    borderRadius = typeof (borderRadius) === 'number' ? borderRadius : 1 * (roundness || 8);
     const { backgroundColor, borderColor, textColor, borderWidth } =
         getButtonColors({
             customBackgroundColor: Colors.isValid(customBackgroundColor) ? customBackgroundColor : colorSchemeBackgroundColor,
@@ -257,14 +257,11 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
         StyleSheet.flatten(contentStyle)?.flexDirection === 'row-reverse'
             ? [
                 styles.iconReverse,
-                styles[`md3IconReverse${compact ? 'Compact' : ''}`],
-                isMode('text') && styles[`md3IconReverseTextMode${compact ? 'Compact' : ''}`],
+                styles[`iconReverse${compact ? 'Compact' : ''}`],
             ]
             : [
                 styles.icon,
-                styles[`md3Icon${compact ? 'Compact' : ''}`],
-                isMode('text') &&
-                styles[`md3IconTextMode${compact ? 'Compact' : ''}`],
+                styles[`icon${compact ? 'Compact' : ''}`],
             ];
 
     return (<ButtonContext.Provider value={context}>
@@ -293,7 +290,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 disabled={disabled}
                 disabledRipple={disableRipple}
                 rippleColor={rippleColor}
-                style={touchableStyle}
+                style={[styles.touchable, touchableStyle]}
                 testID={testID}
                 ref={innerRef}
                 id={idRef.current}
@@ -347,8 +344,10 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
 
 const styles = StyleSheet.create({
     button: {
-        minWidth: 64,
         borderStyle: 'solid',
+    },
+    touchable: {
+        minWidth: 64,
     },
     compact: {
 
@@ -357,48 +356,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 5,
+        paddingHorizontal: 7,
+        paddingVertical: 2,
     },
     icon: {
-        marginLeft: 7,
-        marginRight: 7,
+        marginHorizontal: 7,
+    },
+    iconCompact: {
+        marginHorizontal: 3,
     },
     iconReverse: {
-        marginRight: 12,
-        marginLeft: -4,
+        marginHorizontal: 7,
     },
-    /* eslint-disable react-native/no-unused-styles */
-    md3Icon: {
-        marginLeft: 16,
-        marginRight: -16,
-    },
-    md3IconCompact: {
-        marginLeft: 8,
-        marginRight: 0,
-    },
-    md3IconReverse: {
-        marginLeft: -7,
-        marginRight: 7,
-    },
-    md3IconReverseCompact: {
-        marginLeft: 0,
-        marginRight: 8,
-    },
-    md3IconTextMode: {
-        marginLeft: 12,
-        marginRight: -8,
-    },
-    md3IconTextModeCompact: {
-        marginLeft: 6,
-        marginRight: 0,
-    },
-    md3IconReverseTextMode: {
-        marginLeft: -8,
-        marginRight: 12,
-    },
-    md3IconReverseTextModeCompact: {
-        marginLeft: 0,
-        marginRight: 6,
+    iconReverseCompact: {
+        marginHorizontal: 3,
     },
     /* eslint-enable react-native/no-unused-styles */
     label: {
@@ -416,7 +387,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     md3Label: {
-        marginVertical: 10,
+        marginVertical: 7,
         marginHorizontal: 7,
     },
     md3LabelText: {

@@ -27,7 +27,7 @@ import { defaultStr } from "@resk/core";
  * @param props - The properties for the Dialog component.
  * @param props.fullScreenAppBarProps - Properties for the app bar when dialog is full-screen.
  * @param props.context - Additional context for the dialog.
- * @param props.modalActionsProps - Properties for modal actions.
+ * @param props.actionsProps - Properties for modal actions.
  * @param props.actions - Actions to display in the dialog.
  * @param props.dialogContentProps - Properties for the dialog content area.
  * @param props.footerProps - Properties for the dialog footer.
@@ -46,7 +46,7 @@ import { defaultStr } from "@resk/core";
 export default function Dialog<DialogContextExtend = any>({
   fullScreenAppBarProps,
   context,
-  modalActionsProps,
+  actionsProps,
   actions,
   dialogContentProps,
   footerProps,
@@ -56,7 +56,7 @@ export default function Dialog<DialogContextExtend = any>({
   testID,
   ...props
 }: IDialogProps<DialogContextExtend>) {
-  testID = testID || "RNDialogComponent";
+  testID = testID || "rn-dialog";
   return (
     <Modal {...props} testID={testID}>
       <ModalWrapper
@@ -65,7 +65,7 @@ export default function Dialog<DialogContextExtend = any>({
           isPreloader: props.isPreloader,
           context,
           fullScreenAppBarProps,
-          modalActionsProps,
+          actionsProps,
           actions,
           dialogContentProps,
           footerProps,
@@ -87,7 +87,7 @@ export default function Dialog<DialogContextExtend = any>({
  * @param props - The properties for the ModalWrapper component.
  * @param props.fullScreenAppBarProps - Properties for the full-screen app bar.
  * @param props.context - Additional context for the dialog.
- * @param props.modalActionsProps - Properties for modal actions.
+ * @param props.actionsProps - Properties for modal actions.
  * @param props.actions - Actions to display in the dialog.
  * @param props.testID - Optional test identifier for testing purposes.
  * @param props.dialogContentProps - Properties for the dialog content area.
@@ -102,7 +102,7 @@ export default function Dialog<DialogContextExtend = any>({
 function ModalWrapper<DialogContextExtend = any>({
   fullScreenAppBarProps,
   context,
-  modalActionsProps,
+  actionsProps,
   actions,
   testID,
   dialogContentProps,
@@ -116,7 +116,7 @@ function ModalWrapper<DialogContextExtend = any>({
   fullScreenAppBarProps = Object.assign({}, fullScreenAppBarProps);
   titleProps = Object.assign({}, titleProps);
   dialogContentProps = Object.assign({}, dialogContentProps);
-  modalActionsProps = Object.assign({}, modalActionsProps);
+  actionsProps = Object.assign({}, actionsProps);
   context = Object.assign({}, context);
   const modalContext = useModal();
   const children = useMemo(() => {
@@ -139,7 +139,7 @@ function ModalWrapper<DialogContextExtend = any>({
     setOnPressAction(props);
     return (
       <AppBar.Action
-        testID={testID + "-dialog-action-"}
+        testID={testID + "-dialog-action-" + index}
         {...props}
         key={index}
       />
@@ -149,7 +149,7 @@ function ModalWrapper<DialogContextExtend = any>({
       setOnPressAction(props);
       return (
         <AppBar.ExpandableAction
-          testID={testID + "-dialog-expandable-action"}
+          testID={testID + "-dialog-expandable-action-" + index}
           {...props}
           key={index}
         />
@@ -175,7 +175,7 @@ function ModalWrapper<DialogContextExtend = any>({
   return (
     <>
       <DialogAppBar
-        testID={testID + "_DialogAppBar"}
+        testID={testID + "-dialog-app-bar"}
         {...getAppBarProps(fullScreenAppBarProps, { colorScheme: undefined })}
         title={fullScreenAppBarProps.title || title}
         titleProps={{
@@ -195,7 +195,7 @@ function ModalWrapper<DialogContextExtend = any>({
       >
         {children}
       </View>
-      <DialogActions statusBarHeight={0} {...getAppBarProps(modalActionsProps)} />
+      <DialogActions statusBarHeight={0} {...getAppBarProps(actionsProps)} />
       <DialogFooter
         testID={testID + "dialog-footer"}
         {...Object.assign({}, footerProps)}

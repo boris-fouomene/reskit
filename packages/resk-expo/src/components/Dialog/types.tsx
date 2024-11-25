@@ -33,7 +33,7 @@ import { ILabelProps } from "@components/Label";
  * This can be used to customize the layout and styling of the footer area, which may contain
  * buttons or other interactive elements.
  * 
- * @property {IAppBarProps} [modalActionsProps] - Properties for the app bar actions within the
+ * @property {IAppBarProps} [actionsProps] - Properties for the app bar actions within the
  * dialog. This allows for customization of the app bar's appearance and behavior.
  * 
  * @property {IDialogActionsProps<DialogContextExtend>} [fullScreenAppBarProps] - Properties for
@@ -74,7 +74,7 @@ export interface IDialogProps<DialogContextExtend = any> extends IModalProps {
   titleProps?: IDialogTitleProps;
   title?: string | React.ReactNode;
   footerProps?: IViewProps;
-  modalActionsProps?: IAppBarProps;
+  actionsProps?: IAppBarProps;
   fullScreenAppBarProps?: IDialogActionsProps<DialogContextExtend>;
   context?: DialogContextExtend;
 }

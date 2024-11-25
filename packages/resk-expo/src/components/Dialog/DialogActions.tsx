@@ -2,6 +2,7 @@ import { AppBar } from '@components/AppBar';
 import { StyleSheet } from 'react-native';
 import { IDialogActionsProps } from './types';
 import { useCanRender } from './utils';
+import Theme from '@theme/index';
 
 /**
  * Functional component that renders the actions for a dialog within an AppBar.
@@ -53,6 +54,7 @@ export default function DialogActions<DialogContextExtend = any>({ testID, actio
         subtitle={null}
         backAction={false}
         windowWidth={context.maxWidth}
+        statusBarHeight={0}
         {...props}
         context={Object.assign({}, context, props.context)}
         style={[styles.header, props.style]}

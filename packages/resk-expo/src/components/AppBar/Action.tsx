@@ -3,6 +3,7 @@ import { Button, IButtonRef } from "@components/Button";
 import { useAppBar } from './hooks';
 import { forwardRef } from 'react';
 import { IAppBarContext, IAppBarAction } from './types';
+import Theme, { useTheme } from '@theme/index';
 
 
 /**
@@ -39,12 +40,13 @@ import { IAppBarContext, IAppBarAction } from './types';
  * the AppBar context, ensuring consistent styling across the application. It is designed to 
  * work well with the AppBar's layout and can be easily integrated with other AppBar components.
  */
-const AppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionContext = any>(props: IAppBarAction<IAppBarActionContext>, ref: IButtonRef<IAppBarContext<IAppBarActionContext>>) {
+const AppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionContext = any>({ colorScheme, ...props }: IAppBarAction<IAppBarActionContext>, ref: IButtonRef<IAppBarContext<IAppBarActionContext>>) {
   const appBarContext = useAppBar();
+  const colorSchemeColor = useTheme().getColorScheme(colorScheme);
   return <Button
     ref={ref}
-    textColor={appBarContext.textColor}
-    backgroundColor={appBarContext.backgroundColor}
+    textColor={colorSchemeColor.color || appBarContext.textColor}
+    backgroundColor={colorSchemeColor.backgroundColor || appBarContext.backgroundColor}
     mode={"contained"}  {...props}
     style={[styles.buttonAction, props.style]}
   />

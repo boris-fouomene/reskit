@@ -47,7 +47,7 @@ const getAppBarMaxActions = (windowWidth?: number): number => {
  * @param {Object} params - The parameters for the function.
  * @param {IAppBarAction<IAppBarActionContext>[]} params.actions - The array of actions to be rendered.
  * @param {IMenuItemRenderFunc<IAppBarActionContext>} params.render - The function used to render an action.
- * @param {string} [params.color] - The color for the text elements in the AppBar.
+ * @param {string} [params.textColor] - The color for the text elements in the AppBar.
  * @param {string} [params.backgroundColor] - The background color of the AppBar.
  * @param {IMenuItemRenderFunc<IAppBarActionContext>} [params.renderExpandable] - The function used to render expandable actions.
  * @param {number} [params.windowWidth] - The width of the window, used to determine the maximum number of actions.
@@ -68,8 +68,8 @@ const getAppBarMaxActions = (windowWidth?: number): number => {
 export function splitAppBarActions<IAppBarActionContext = any>({
   actions: items,
   renderAction: render,
-  textColor: color,
-  backgroundColor,
+  //textColor: color,
+  //backgroundColor,
   renderExpandableAction: renderExpandable,
   windowWidth,
   isAppBarAction,
@@ -85,8 +85,8 @@ export function splitAppBarActions<IAppBarActionContext = any>({
   const actionCounter = { current: 0 };
   context = Object.assign({}, context);
   const mAction: number = typeof maxActions === "number" && maxActions ? Math.trunc(maxActions) : getAppBarMaxActions(windowWidth);
-  color = Colors.isValid(color) ? color : Theme.getColor(color as IThemeColorTokenKey);
-  backgroundColor = Colors.isValid(backgroundColor) ? backgroundColor : Theme.getColor(backgroundColor as IThemeColorTokenKey);
+  //color = Colors.isValid(color) ? color : Theme.getColor(color as IThemeColorTokenKey);
+  //backgroundColor = Colors.isValid(backgroundColor) ? backgroundColor : Theme.getColor(backgroundColor as IThemeColorTokenKey);
   const renderedActions = [];
   const canRenderAction = (level?: number) => {
     if (level) return false;
@@ -107,16 +107,7 @@ export function splitAppBarActions<IAppBarActionContext = any>({
       actionCounter.current++;
     }
     const canrAction = canRenderAction(props?.level);
-    const r2 = (canrAction ? { color, backgroundColor } : {}) as IThemeColorSheme;
-    if (canrAction) {
-      if (color) {
-        r2.color = color;
-      }
-      if (backgroundColor) {
-        r2.backgroundColor = backgroundColor;
-      }
-    }
-    const itx: IAppBarAction<IAppBarActionContext> = { ...r2, ...props };
+    const itx: IAppBarAction<IAppBarActionContext> = props;
     return pushAction(typeof renderCb != "function" ? null : renderCb(itx, index), itx);
   };
   const actions = renderMenuItems<IAppBarContext<IAppBarActionContext>>({

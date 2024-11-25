@@ -43,7 +43,7 @@ const Label = React.forwardRef(({
   ...rest
 }: ILabelProps, ref: React.ForwardedRef<Text>) => {
   const theme = useTheme();
-  const colorScheme = Theme.getColorScheme(customColorScheme);
+  const colorScheme = theme.getColorScheme(customColorScheme);
 
   // Return null if no valid children are provided
   if (!children || !isValidElement(children, true)) return null;

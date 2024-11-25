@@ -64,13 +64,13 @@ export function HelperText({ visible = true, testID, color, style, error, ...res
             }).start();
         }
     }, [visible, opacity]);
-    return <Animated.View testID={testID + "-container"} style={[{ opacity }, !visible && Theme.styles.hidden]}>
+    return <Animated.View testID={testID + "-container"} style={[{ opacity }, !visible && theme.styles.hidden]}>
         <Label
             {...rest}
             testID={testID}
             color={error ? theme.colors.error : color}
             style={[styles.padding, error && { color: theme.colors.error }, style,
-            rest.disabled ? Theme.styles.disabled : undefined]}
+            rest.disabled ? theme.styles.disabled : undefined]}
         />
     </Animated.View>
 }

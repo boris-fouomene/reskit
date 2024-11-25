@@ -83,7 +83,7 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, style, colo
         ref={ref}
         color={color}
         name={nameString.trim().ltrim(iconSetPrefix).ltrim("-").trim()}
-        style={[Theme.styles.RTL, style]}
+        style={[theme.styles.RTL, style]}
     />;
 });
 

@@ -136,7 +136,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
         onPress={handlePressAction}
         accessibilityState={{ expanded: isExpanded }}
       >
-        <View testID={testID + "-content-container"} {...contentContainerProps} style={[styles.row, Theme.styles.cursorPointer, contentContainerProps?.style]}>
+        <View testID={testID + "-content-container"} {...contentContainerProps} style={[styles.row, theme.styles.cursorPointer, contentContainerProps?.style]}>
           {left || (expandIcon && isIconPositionLeft) ? (
             <View testID={testID + "-left"} {...leftContainerProps} style={[styles.left]}>
               {isIconPositionLeft ? expandIcon : null}

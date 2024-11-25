@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, View as RNView } from 'react-native';
-import Theme, { useTheme } from '@theme';
+import { useTheme } from '@theme';
 import View, { IViewProps } from '@components/View';
 
 /**
@@ -52,7 +52,7 @@ const Divider = React.forwardRef(({ disabled, style, ...rest }: IDividerProps, r
         styles.main,
         { backgroundColor: theme.colors.outline },
         style,
-        disabled && Theme.styles.disabled,
+        disabled && theme.styles.disabled,
       ]}
     />
   );

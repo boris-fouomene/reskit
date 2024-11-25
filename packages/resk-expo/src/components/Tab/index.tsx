@@ -121,7 +121,7 @@ const Tab = (props: ITabProps) => {
     const theme = useTheme();
     const tabsItemsStyle = Object.assign({}, StyleSheet.flatten(tabItemsProps.style));
 
-    const tabItemsColorScheme = Theme.getColorScheme(colorScheme);
+    const tabItemsColorScheme = theme.getColorScheme(colorScheme);
     const tabItemsBackgroundColor = Colors.isValid(tabItemsColorScheme.backgroundColor) ? tabItemsColorScheme.backgroundColor : Colors.isValid(tabsItemsStyle.backgroundColor) ? tabsItemsStyle.backgroundColor : undefined;
     const tabItemsTextColor = Colors.isValid(tabItemsColorScheme.color) ? tabItemsColorScheme.color : Colors.isValid(tabsItemsStyle.backgroundColor) ? Colors.setAlpha(tabsItemsStyle.backgroundColor as string, 0.6) : undefined;
 

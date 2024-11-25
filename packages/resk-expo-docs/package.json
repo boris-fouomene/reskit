@@ -9,7 +9,7 @@
     "web": "expo start --web",
     "ladle": "ladle serve",
     "ladle:build": "ladle build",
-    "build": "expo build:web",
+    "build": "cd ../resk-expo && npm run build && cd ../resk-expo-docs && npx expo export -p web",
     "test": "jest"
   },
   "dependencies": {

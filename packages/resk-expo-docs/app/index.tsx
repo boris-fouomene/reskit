@@ -56,9 +56,8 @@ const index = () => {
                     source={{
                         uri: "https://picsum.photos/200",
                     }}
-                    color={"red"}
                     size={40}
-                    title="Display title for me"
+                    title="An image with icon source"
                     onPress={(ev) => {
                         console.log(ev, " is pressed")
                     }}
@@ -83,6 +82,7 @@ const index = () => {
                 <HelperText
                     visible
                     error
+                    disabled
                     children={"A children helper"}
                 />
                 <Tab>

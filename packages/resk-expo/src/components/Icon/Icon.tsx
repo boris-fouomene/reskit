@@ -8,6 +8,7 @@ import Theme, { Colors, useTheme } from "@theme/index";
 import FontIcon, { DEFAULT_FONT_ICON_SIZE } from "./Font";
 import { Tooltip } from "@components/Tooltip";
 import { StyleSheet } from "react-native";
+import { TouchableRipple } from "@components/TouchableRipple";
 
 /**
  * The `Icon` component is a versatile icon renderer that can display both 
@@ -83,7 +84,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, dis
         const _props = isTooltip ? Object.assign({}, { ...Object.assign({}, touchableEvents), testID: `${testID}-icon-container`, disabled, title, tooltip }, containerProps) : {};
         if (isTooltip) {
             _props.style = StyleSheet.flatten([styles.container, containerProps?.style]);
-            _props.as = as;
+            _props.as = as || TouchableRipple;
         }
         return {
             Component: isTooltip ? Tooltip : React.Fragment,

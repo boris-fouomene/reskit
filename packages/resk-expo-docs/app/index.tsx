@@ -26,17 +26,17 @@ const index = () => {
                         onPress: () => {
                             console.log("action2")
                         },
-                        items : [
+                        items: [
                             {
-                                label : "Sub action2"
+                                label: "Sub action2"
                             },
                             {
-                                label : "Sub action22"
+                                label: "Sub action22"
                             },
                             {
-                                label : "Sub action23"
+                                label: "Sub action23"
                             },
-                            
+
                         ]
                     },
                     {
@@ -60,6 +60,54 @@ const index = () => {
                 <Menu
                     anchor={<Label>Open Menu</Label>}
                     children={<MenuExample />}
+                    items={[
+                        {
+                            label: "Item 1",
+                            onPress: () => {
+                                console.log("Item 1")
+                            },
+                        },
+                        {
+                            label: "Item 2",
+                            onPress: () => {
+                                console.log("Item 2")
+                            },
+                            items: [
+                                {
+                                    label: "Sub item 2",
+                                    items: [
+                                        {
+                                            label: "Sub item 21"
+                                        },
+                                        {
+                                            label: "Sub item 22"
+                                        },
+                                        {
+                                            label: "Sub item 23"
+                                        },
+                                    ]
+                                },
+                                {
+                                    label: "Sub item 22"
+                                },
+                                {
+                                    label: "Sub item 23"
+                                },
+                            ]
+                        },
+                        {
+                            label: "Item 3",
+                            onPress: () => {
+                                console.log("Item 3")
+                            },
+                        },
+                        {
+                            label: "Item 4",
+                            onPress: () => {
+                                console.log("Item 4")
+                            },
+                        },
+                    ]}
                 />
 
                 <Label>index</Label>

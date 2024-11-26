@@ -212,11 +212,11 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     }, [isElevationEntitled, elevation, initialElevation]);
 
     const flattenedStyles = (StyleSheet.flatten(style) || {}) as ViewStyle;
-    const [, borderRadiusStyles] = splitStyles(
+    const [restButtonStyle, borderRadiusStyles] = splitStyles(
         flattenedStyles,
         (style) => style.startsWith('border') && style.endsWith('Radius')
     );
-    borderRadius = typeof (borderRadius) === 'number' ? borderRadius : 1 * (roundness || 8);
+    borderRadius = typeof borderRadiusStyles?.borderRadius === "number" ? borderRadiusStyles.borderRadius : typeof (borderRadius) === 'number' ? borderRadius : 1 * (roundness || 8);
     const { backgroundColor, borderColor, textColor, borderWidth } =
         getButtonColors({
             customBackgroundColor: Colors.isValid(customBackgroundColor) ? customBackgroundColor : colorSchemeBackgroundColor,
@@ -230,7 +230,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
 
     const touchableStyle = {
         ...borderRadiusStyles,
-        borderRadius: borderRadiusStyles.borderRadius ?? borderRadius,
+        borderRadius,
     };
     const iconSize = 18;
     iconProps = Object.assign({}, iconProps);
@@ -269,13 +269,13 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             id={`${idRef.current}-container`}
             {...containerProps}
             ref={containerRef}
-            testID={`${testID}-container`}
+            testID={`${testID}-button-container`}
             style={
                 [
                     styles.button,
                     compact && styles.compact,
                     buttonStyle,
-                    style,
+                    containerProps?.style,
                 ]
             }
         >
@@ -290,13 +290,13 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 disabled={disabled}
                 disabledRipple={disableRipple}
                 rippleColor={rippleColor}
-                style={[styles.touchable, touchableStyle]}
+                style={[styles.touchable, restButtonStyle, touchableStyle]}
                 testID={testID}
                 ref={innerRef}
                 id={idRef.current}
                 {...rest}
             >
-                <View id={`${idRef.current}-content`} testID={testID + "-content"} {...contentProps} style={[styles.content, contentStyle]}>
+                <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, contentStyle]}>
                     {iconPosition != "right" ? iconContent : null}
                     {isLoading ? (
                         <ActivityIndicator
@@ -314,7 +314,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                         id={`${idRef.current}-label`}
                         selectable={false}
                         numberOfLines={1}
-                        testID={`${testID}-label`}
+                        testID={`${testID}-button-label`}
                         {...labelProps}
                         style={[
                             styles.label,
@@ -337,7 +337,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 </View>
             </Tooltip>
         </Surface>
-        {divider ? <Divider id={idRef.current + "-divider"} testID={testID + "-divider"} {...dividerProps} style={[dividerProps.style, Theme.styles.w100]} /> : null}
+        {divider ? <Divider id={idRef.current + "-divider"} testID={testID + "-button-divider"} {...dividerProps} style={[dividerProps.style, Theme.styles.w100]} /> : null}
     </ButtonContext.Provider>);
 });
 

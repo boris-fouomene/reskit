@@ -4,6 +4,7 @@ import { IMenuItemBase, IMenuRenderItemOptions, IMenuItemsBase, IMenuRenderItems
 import { useTheme } from "@theme/index";
 import { IReactNullableElement } from "../../types";
 import stableHash from "stable-hash";
+import { cloneObject, isObj } from "@resk/core";
 
 const isAllowed = (p: any) => true;
 
@@ -48,7 +49,7 @@ const isAllowed = (p: any) => true;
 const renderExpandableMenuItemOrSection = function <MenuItemContext = any>({ item, itemsNodes, index, context, render, renderExpandable, level }: IMenuRenderItemOptions<MenuItemContext>) {
   level = typeof level == "number" && level || 0;
   if (!isAllowed(item)) return null;
-  const { section, ...rest } = item;
+  const { section, items, ...rest } = item;
   if (section) {
     return render({ level, ...rest, context: { ...Object.assign({}, rest.context), ...Object.assign({}, context) } } as IMenuItemBase<MenuItemContext>, index);
   } else {
@@ -89,25 +90,20 @@ const renderExpandableMenuItemOrSection = function <MenuItemContext = any>({ ite
  *   renderExpandable: (props) => <ExpandableMenuItem {...props} />,
  * });
  */
-export function renderMenuItem<MenuItemContext = any>({ item, index, render, renderExpandable, level, context }: IMenuRenderItemOptions<MenuItemContext>): IReactNullableElement {
-  level = level || 0;
+function renderMenuItem<MenuItemContext = any>({ item, index, render, renderExpandable, level, context }: IMenuRenderItemOptions<MenuItemContext>): IReactNullableElement {
+  level = typeof level == "number" && level || 0;
   if (!item) return null;
   item.level = level;
   if (!isAllowed(item)) return null;
-  if (!item.label && !item.icon) {
-    if (item.divider === true) {
-      const { dividerProps } = item;
-      return (<Divider key={index} {...Object.assign({}, dividerProps)} />)
-    }
-    return null;
+  if (!item.label && !item.icon && !item.children && item.divider === true) {
+    const { dividerProps } = item;
+    return (<Divider key={index} {...Object.assign({}, dividerProps)} />)
   }
   if (Array.isArray(item.items)) {
     const itemsNodes: IReactNullableElement[] = [];
-    const subItems: IMenuItemBase<MenuItemContext>[] = [];
     item.items.map((it, i) => {
       if (!it) return null;
       it.level = (level as number) + 1;
-      subItems.push(it as IMenuItemBase<MenuItemContext>);
       itemsNodes.push(renderMenuItem({ level: (level as number) + 1, item: it as IMenuItemBase<MenuItemContext>, context, index: i, render, renderExpandable }));
     });
     if (itemsNodes.length) {
@@ -165,14 +161,16 @@ export function renderMenuItems<MenuItemContext = any>({ items, render, renderEx
   const level = 0;
   if (Array.isArray(items)) {
     items.map((item, index) => {
-      if (!item) return null;
-      const r = renderMenuItem({ item, index, render, renderExpandable, level, context });
+      if (!item || !isObj(item)) return null;
+      const clonedItem = cloneObject(item);
+      clonedItem.level = level;
+      const r = renderMenuItem({ item: clonedItem, index, render, renderExpandable, level, context });
       if (r) {
         _items.push(r);
       }
     });
   }
-  return _items as IReactNullableElement[];
+  return _items;
 }
 
 /**

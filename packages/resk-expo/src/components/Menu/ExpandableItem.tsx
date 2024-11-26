@@ -5,6 +5,8 @@ import { IMenuItemContext, IMenuItemProps } from "./types";
 import { Divider } from "@components/Divider";
 import { forwardRef } from "react";
 import { IButtonRef } from "@components/Button";
+import { StyleSheet } from "react-native";
+import Theme from "@theme/index";
 
 /**
  * A functional component that renders an expandable menu item within a navigation menu.
@@ -59,12 +61,26 @@ import { IButtonRef } from "@components/Button";
  * The use of generics allows for flexibility in extending the component's functionality
  * based on specific requirements.
  */
-const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, dividerProps, divider, expandableProps, children, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
+const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, dividerProps, items, divider, expandableProps, children, contentProps, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
     testID = defaultStr(testID, "rn-menu-item-expandable");
+    expandableProps = Object.assign({}, expandableProps);
+    const containerProps = Object.assign({}, expandableProps.containerProps);
+    const expandableLabelProps = Object.assign({}, expandableProps.labelProps);
+    const buttonContainerProps = Object.assign({}, props.containerProps);
+    contentProps = Object.assign({}, contentProps);
     return <Expandable
-        testID={testID + "-expandable"}
-        {...Object.assign({}, expandableProps)}
-        label={<MenuItem closeOnPress={!!!children} ref={ref} {...props} testID={testID} />}
+        testID={testID + "-expandable-menu-item"}
+        {...expandableProps}
+        labelProps={{ ...expandableLabelProps, style: [Theme.styles.noMargin, Theme.styles.noPadding, expandableLabelProps.style] }}
+        containerProps={{ ...containerProps, style: [styles.expandable, containerProps.style] }}
+        label={<MenuItem
+            //closeOnPress={!(Array.isArray(children) && children.length)}
+            ref={ref} {...props}
+            style={[styles.menu, props.style]}
+            containerProps={{ ...buttonContainerProps, style: [styles.buttonContainer, buttonContainerProps.style] }}
+            contentProps={{ ...contentProps, style: [styles.buttonContent, contentProps.style] }}
+            testID={testID}
+        />}
         children={<>
             {children}
             {divider && <Divider testID={testID + "-divider"} {...Object.assign({}, dividerProps)} />}
@@ -73,3 +89,25 @@ const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMen
 });
 ExpandableMenuItem.displayName = "ExpandableMenuItem";
 export default ExpandableMenuItem;
+
+const styles = StyleSheet.create({
+    expandable: {
+        paddingVertical: 0,
+        paddingHorizontal: 0,
+        marginRight: 5,
+    },
+    menu: {
+        paddingVertical: 0,
+        paddingHorizontal: 0,
+        width: "100%",
+    },
+    buttonContainer: {
+        width: "100%",
+    },
+    buttonContent: {
+        paddingHorizontal: 0,
+        justifyContent: "flex-start",
+        paddingLeft: 7,
+        width: "100%",
+    }
+});

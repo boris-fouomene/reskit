@@ -461,7 +461,7 @@ export type IMenuProps<IMenuItemExtendContext = any> = Omit<AnimatedProps<ViewPr
     anchorContainerProps?: Omit<PressableProps, 'children'>;
 
     /** Menu content, either as static JSX or a function returning JSX based on the menu context. */
-    children?: JSX.Element | ((options: IMenuContext) => JSX.Element);
+    children?: IReactNullableElement | ((options: IMenuContext) => IReactNullableElement);
 
     /** Method called before the menu is toggled. if this method returns false, the menu will not be toggled */
     beforeToggle?: (menuContext: IMenuContext) => any;

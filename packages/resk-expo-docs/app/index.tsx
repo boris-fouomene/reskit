@@ -26,6 +26,18 @@ const index = () => {
                         onPress: () => {
                             console.log("action2")
                         },
+                        items : [
+                            {
+                                label : "Sub action2"
+                            },
+                            {
+                                label : "Sub action22"
+                            },
+                            {
+                                label : "Sub action23"
+                            },
+                            
+                        ]
                     },
                     {
                         label: "actin 3",

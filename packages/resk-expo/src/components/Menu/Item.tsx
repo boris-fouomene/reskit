@@ -58,14 +58,19 @@ import { useTheme } from "@theme/index";
  *   the underlying button context, providing additional flexibility 
  *   in managing button states and behaviors.
  */
-export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<IMenuItemExtendContext extends object = any>({ expandableProps, closeOnPress, items, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref?: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
+export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<IMenuItemExtendContext extends object = any>({ expandableProps, containerProps, contentProps, closeOnPress, items, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref?: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
     const menuContext = useMenu();
     const theme = useTheme();
+    containerProps = Object.assign({}, containerProps);
+    contentProps = Object.assign({}, contentProps);
     return <Button
         testID="menu-item"
         borderRadius={0}
         textColor={theme.colors.text}
         {...props}
+        style={[styles.menu, props.style]}
+        containerProps={{ ...containerProps, style: [styles.buttonContainer, containerProps.style] }}
+        contentProps={{ ...contentProps, style: [styles.buttonContent, contentProps.style] }}
         labelProps={{ ...Object.assign({}, props.labelProps), style: [styles.label, props?.labelProps?.style] }}
         iconProps={{ ...Object.assign({}, props.iconProps), style: [styles.icon, props?.iconProps?.style] }}
         context={Object.assign({}, props.context, menuContext)}
@@ -90,5 +95,19 @@ const styles = StyleSheet.create({
     },
     label: {
         paddingVertical: 3,
+    },
+    menu: {
+        paddingVertical: 0,
+        paddingHorizontal: 0,
+        width: "100%",
+    },
+    buttonContainer: {
+        width: "100%",
+    },
+    buttonContent: {
+        paddingHorizontal: 0,
+        justifyContent: "flex-start",
+        paddingLeft: 7,
+        width: "100%",
     }
 });

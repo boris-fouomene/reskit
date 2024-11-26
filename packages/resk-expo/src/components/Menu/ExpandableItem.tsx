@@ -66,7 +66,6 @@ const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMen
     expandableProps = Object.assign({}, expandableProps);
     const containerProps = Object.assign({}, expandableProps.containerProps);
     const expandableLabelProps = Object.assign({}, expandableProps.labelProps);
-    const buttonContainerProps = Object.assign({}, props.containerProps);
     contentProps = Object.assign({}, contentProps);
     return <Expandable
         testID={testID + "-expandable-menu-item"}
@@ -76,9 +75,6 @@ const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMen
         label={<MenuItem
             //closeOnPress={!(Array.isArray(children) && children.length)}
             ref={ref} {...props}
-            style={[styles.menu, props.style]}
-            containerProps={{ ...buttonContainerProps, style: [styles.buttonContainer, buttonContainerProps.style] }}
-            contentProps={{ ...contentProps, style: [styles.buttonContent, contentProps.style] }}
             testID={testID}
         />}
         children={<>
@@ -96,18 +92,5 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
         marginRight: 5,
     },
-    menu: {
-        paddingVertical: 0,
-        paddingHorizontal: 0,
-        width: "100%",
-    },
-    buttonContainer: {
-        width: "100%",
-    },
-    buttonContent: {
-        paddingHorizontal: 0,
-        justifyContent: "flex-start",
-        paddingLeft: 7,
-        width: "100%",
-    }
+
 });

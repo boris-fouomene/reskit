@@ -188,6 +188,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
               size={24}
               iconName={FontIcon.MORE}
               color={color}
+              style={styles.menuContainer}
               onPress={(event) => {
                 openMenu();
               }}
@@ -232,6 +233,8 @@ const styles = StyleSheet.create({
   backAction: {
     marginLeft: 4,
   },
+  menuContainer: {
+  }
 });
 
 AppBar.displayName = 'AppBar';

@@ -2,7 +2,6 @@ import { AppBar } from '@components/AppBar';
 import { StyleSheet } from 'react-native';
 import { IDialogActionsProps } from './types';
 import { useCanRender } from './utils';
-import Theme from '@theme/index';
 
 /**
  * Functional component that renders the actions for a dialog within an AppBar.

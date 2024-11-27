@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { Button, IButtonRef } from "@components/Button";
+import { Button, ButtonContext, IButtonRef } from "@components/Button";
 import { useAppBar } from './hooks';
 import { forwardRef } from 'react';
 import { IAppBarContext, IAppBarAction } from './types';
@@ -40,17 +40,21 @@ import { useTheme } from '@theme/index';
  * the AppBar context, ensuring consistent styling across the application. It is designed to 
  * work well with the AppBar's layout and can be easily integrated with other AppBar components.
  */
-const AppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionContext = any>({ colorScheme, ...props }: IAppBarAction<IAppBarActionContext>, ref: IButtonRef<IAppBarContext<IAppBarActionContext>>) {
+const AppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionContext = any>({ colorScheme, containerProps, ...props }: IAppBarAction<IAppBarActionContext>, ref: IButtonRef<IAppBarContext<IAppBarActionContext>>) {
   const appBarContext = useAppBar();
   const colorSchemeColor = useTheme().getColorScheme(colorScheme);
+  containerProps = Object.assign({}, containerProps);
   return <Button
     ref={ref}
     textColor={colorSchemeColor.color || appBarContext.textColor || props.context?.textColor}
-    borderRadius={0}
+    borderRadius={props.level ? 0 : undefined}
     backgroundColor={colorSchemeColor.backgroundColor || appBarContext.backgroundColor || props.context?.backgroundColor}
     mode={"contained"}
+    containerProps={{
+      ...containerProps,
+      style: [containerProps?.style, styles.buttonContainer]
+    }}
     {...props}
-    style={[styles.buttonAction, props.style]}
   />
 });
 AppBarAction.displayName = 'AppBarAction';
@@ -58,7 +62,7 @@ AppBarAction.displayName = 'AppBarAction';
 export default AppBarAction
 
 const styles = StyleSheet.create({
-  buttonAction: {
-    marginRight: 5,
+  buttonContainer: {
+    marginRight: 7,
   },
 });

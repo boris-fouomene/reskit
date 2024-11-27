@@ -508,7 +508,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
     contentContainerProps = Object.assign({}, contentContainerProps);
     swipeAreaProps = Object.assign({}, swipeAreaProps);
     contentProps = Object.assign({}, contentProps);
-    testID = testID || 'RN_SwiperComponent';
+    testID = testID || 'rn-swiper';
     const isReady = customHeight > 40 ? true : false;
     const autoHeight = !!this.props.autoHeight;
     const height = autoHeight ? this.state.height : !isReady ? WIDTH_HEIGHT : customHeight;
@@ -523,8 +523,8 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
       >
         {!isReady ? (
           React.isValidElement(placeholder) ? placeholder :
-            <View testID={testID + '_PreloaderContainer'} style={styles.preloaderContainer as IStyle}>
-              {<ActivityIndicator testID={testID + "_Preloader"} size={'large'} />}
+            <View testID={testID + '-preloader-container'} style={styles.preloaderContainer as IStyle}>
+              {<ActivityIndicator testID={testID + "-preloader"} size={'large'} />}
             </View>
         ) : null}
         <View
@@ -533,7 +533,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
           style={[styles.container(positionFixed, x, y, width, height, autoHeight), contentContainerProps.style, disabledStyle]}
         >
           <Animated.View
-            testID={testID + "_AnimatedContent"}
+            testID={testID + "-animated-content-container"}
             style={[
               styles.swipeArea(vertical, this.count, width, height, autoHeight),
               swipeAreaProps.style,
@@ -548,7 +548,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
                 <View
                   key={i}
                   {...contentProps}
-                  testID={testID + "-content-containerContent_" + i}
+                  testID={testID + "-content-container-" + i}
                   style={[
                     { width },
                     autoHeight && { height, maxHeight: height },

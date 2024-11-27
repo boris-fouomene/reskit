@@ -67,7 +67,7 @@ const ExpandableAppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarA
                 />
             )
         }}
-        children={<>{children}</>}
+        items={items}
     />
 });
 

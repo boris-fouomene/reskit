@@ -21,7 +21,7 @@ import { useMenu } from './context';
  * @param {object} props - The properties for the component.
  * @param {string} [props.testID] - An optional identifier for testing purposes. This can be
  * used in automated tests to locate the component. If not provided, a default value of
- * "RN_MenuItemsComponent" will be used.
+ * "rn-menu-item" will be used.
  * 
  * @param {IMenuItemProps<IMenuItemExtendContext>[]} [props.items] - An optional array of
  * menu item properties. Each item can either be a valid menu item object or undefined/null.
@@ -53,7 +53,7 @@ import { useMenu } from './context';
  * the appropriate JSX for each item based on its properties.
  */
 export const MenuItems = React.forwardRef<any, IMenuItemsProps<any>>(function <IMenuItemExtendContext = any>({ items: customItems, context, testID, ...rest }: IMenuItemsProps<IMenuItemExtendContext>, ref: React.ForwardedRef<RNView>) {
-  testID = testID || "RN_MenuItemsComponent";
+  testID = testID || "rn-menu-item";
   const menuContext = useMenu();
   const items = useRenderMenuItems<IMenuItemContext<IMenuItemExtendContext>>({
     items: (Array.isArray(customItems) ? customItems : []),

@@ -120,8 +120,8 @@ export const useMenuPosition = ({
                     break;
             }
             // Ensure menu stays within screen bounds
-            x = Math.min(x, screenWidth - menuWidth);
-            y = Math.min(y, screenHeight - menuHeight);
+            x = Math.max(Math.min(x, screenWidth - menuWidth), 0);
+            y = Math.max(Math.min(y, screenHeight - menuHeight), 0);
             return { position, x, y };
         }
 
@@ -163,8 +163,8 @@ export const useMenuPosition = ({
                 break;
         }
         // Ensure menu stays within screen bounds
-        x = Math.min(x, screenWidth - menuWidth);
-        y = Math.min(y, screenHeight - menuHeight);
+        x = Math.max(Math.min(x, screenWidth - menuWidth), 0);
+        y = Math.max(Math.min(y, screenHeight - menuHeight), 0);
         //console.log(bestPosition, x, "= x, ", pageX, "=pageX", " data ", screenWidth, " screen width ", menuWidth, " menu width ", spaces, " spaces");
         return { position: bestPosition, x, y };
     }, [anchorMeasurements, menuWidth, menuHeight, padding, position, fullScreen, screenWidth, screenHeight]);
@@ -413,6 +413,22 @@ const Menu: React.FC<IMenuProps> = ({
         }
         return children;
     }, [children, context, isVisible]);
+    const touchableBackdropStyle = useMemo(() => {
+        return {
+            maxWidth: screenWidth - 100,
+            maxHeight: screenHeight - 100,
+        }
+        if (_isFullScreen) {
+            return {
+                maxWidth: screenWidth,
+                maxHeight: screenHeight,
+            }
+        }
+        return {
+            maxWidth: menuLayout?.width || "100%",
+            maxHeight: menuLayout?.height || "100%",
+        }
+    }, [menuLayout, _isFullScreen, screenWidth, screenHeight]);
     const { Wrapper, wrapperProps } = useMemo(() => {
         if (!withScrollView) {
             return { Wrapper: React.Fragment, wrapperProps: {} }
@@ -437,6 +453,7 @@ const Menu: React.FC<IMenuProps> = ({
             <Pressable
                 onPress={(e) => { closeMenu() }}
                 style={styles.portalBackdrop}
+                testID={testID + "-menu-backdrop"}
             />
             <MenuContext.Provider value={context}>
                 <Animated.View
@@ -458,15 +475,14 @@ const Menu: React.FC<IMenuProps> = ({
                         },
                         typeof elevation === 'number' ? Theme.elevations[elevation] : null,
                         props.style,
+                        touchableBackdropStyle,
                         animatedStyle,
                     ]}
                 >
-                    <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
-                        <Wrapper {...wrapperProps}>
-                            {items ? <MenuItems items={items} {...itemsProps} /> : null}
-                            {child}
-                        </Wrapper>
-                    </TouchableOpacity>
+                    <Wrapper {...wrapperProps}>
+                        {items ? <MenuItems items={items} {...itemsProps} /> : null}
+                        {child}
+                    </Wrapper>
                 </Animated.View>
             </MenuContext.Provider>
         </Portal> : null}
@@ -491,15 +507,12 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         position: 'absolute',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 10,
         paddingVertical: 7,
+        justifyContent: 'flex-start',
+        alignItems: "flex-start",
+        maxHeight: '100%',
+        maxWidth: '100%',
+        paddingBottom: 10,
     },
 });
 

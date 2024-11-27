@@ -45,7 +45,7 @@ const TabContent = ({
       autoplay={false}
       {...rest}
       children={children}
-      testID={defaultStr(testID, 'RN_SwiperTabComponent')}
+      testID={defaultStr(testID, 'rn-tab-content')}
       activeIndex={activeIndex}
       onChange={setActiveIndex}
     />

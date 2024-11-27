@@ -6,7 +6,7 @@ import { Portal } from '@components/Portal';
 import { getDimensions, useDimensions } from '@dimensions/index';
 import Theme, { useTheme } from '@theme/index';
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { View, TouchableOpacity, TouchableOpacityProps, StyleSheet, Dimensions, LayoutChangeEvent, ViewStyle, LayoutRectangle, Pressable, GestureResponderEvent, PressableStateCallbackType } from 'react-native';
+import { View, TouchableOpacity, TouchableOpacityProps, StyleSheet, Dimensions, LayoutChangeEvent, ViewStyle, LayoutRectangle, Pressable, GestureResponderEvent, PressableStateCallbackType, ScrollView } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     withSpring,
@@ -270,6 +270,8 @@ const Menu: React.FC<IMenuProps> = ({
     items,
     itemsProps,
     sameWidth,
+    withScrollView = true,
+    scrollViewProps,
     elevation = 10,
     ...props
 }) => {
@@ -401,7 +403,7 @@ const Menu: React.FC<IMenuProps> = ({
     const menuAnchorStyle = useMemo(() => {
         if (typeof anchorMeasurements?.width != "number") return {};
         const { width } = anchorMeasurements;
-        return sameWidth ? { width } : { minWidth: width };
+        return sameWidth ? { width } : null;//{ minWidth: width };
     }, [anchorMeasurements, sameWidth]);
 
     //React.setRef(ref,context);
@@ -411,6 +413,15 @@ const Menu: React.FC<IMenuProps> = ({
         }
         return children;
     }, [children, context, isVisible]);
+    const { Wrapper, wrapperProps } = useMemo(() => {
+        if (!withScrollView) {
+            return { Wrapper: React.Fragment, wrapperProps: {} }
+        }
+        return {
+            Wrapper: ScrollView,
+            wrapperProps: Object.assign({}, { testID: testID + "-scroll-view" }, scrollViewProps)
+        }
+    }, [withScrollView, testID, scrollViewProps]);
     return <>
         <MenuContext.Provider value={context}>
             <Pressable testID={testID + "-anchor-container"} ref={anchorRef} {...anchorContainerProps} onPress={(event) => {
@@ -451,10 +462,10 @@ const Menu: React.FC<IMenuProps> = ({
                     ]}
                 >
                     <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
-                        <>
+                        <Wrapper {...wrapperProps}>
                             {items ? <MenuItems items={items} {...itemsProps} /> : null}
                             {child}
-                        </>
+                        </Wrapper>
                     </TouchableOpacity>
                 </Animated.View>
             </MenuContext.Provider>

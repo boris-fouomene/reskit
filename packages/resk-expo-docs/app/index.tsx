@@ -28,13 +28,16 @@ const index = () => {
                         },
                         items: [
                             {
-                                label: "Sub action2"
+                                label: "Sub action2",
+                                icon: "check",
                             },
                             {
-                                label: "Sub action22"
+                                label: "Sub action22",
+                                icon: "radio-off",
                             },
                             {
-                                label: "Sub action23"
+                                label: "Sub action23",
+                                icon: "radioactive"
                             },
 
                         ]

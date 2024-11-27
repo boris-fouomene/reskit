@@ -4,7 +4,7 @@ import { IExpandableProps } from "@components/Expandable";
 import { IViewProps } from "@components/View";
 import { IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
-import { PressableProps, ViewProps } from "react-native";
+import { PressableProps, ScrollViewProps, ViewProps } from "react-native";
 import { PressableStateCallbackType } from "react-native";
 import { AnimatedProps } from "react-native-reanimated";
 
@@ -350,8 +350,15 @@ export interface IUseMenuPositionProps {
  *         transitions.
  * @property {boolean} [sameWidth] - 
  *         Optional flag to determine if the menu width should be the same as the anchor element width.
- *         If set to false, the menu width will be at least the width of the anchor element.
  *         Default is false.
+ * @property {boolean} [withScrollView] - 
+ *         Optional flag to determine if the menu content should be wrapped in a ScrollView.
+ *         If set to false, the menu content will be rendered directly.
+ *         Default is true.
+ * @property {ScrollViewProps} [scrollViewProps] - 
+ *         Optional props for the scrollView component that wraps the menu content.
+ *         This allows for customization of the scrollView's appearance and behavior.
+ *
  * @property {IMenuPosition} [position] - 
  *         Optional property to force the menu to a specific position (e.g., 'top', 
  *         'bottom', 'left', or 'right') relative to the anchor. This can be useful 
@@ -447,9 +454,21 @@ export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "
     /***
      * Default false
      * if true, the menu will be the same width as the anchor element
-     * if false, the menu width will be at least the width of the anchor element
      */
     sameWidth?: boolean;
+
+    /***
+     * Default true
+     * if true, the menu content will be wrapped in a ScrollView
+     * if false, the menu content will be rendered directly
+     */
+    withScrollView?: boolean;
+
+    /***
+     * Props for the scrollView component that wraps the menu content.
+     * This allows for customization of the scrollView's appearance and behavior.
+     */
+    scrollViewProps?: ScrollViewProps;
 
     /** Specifies a fixed position for the menu on the screen. */
     position?: IMenuPosition;

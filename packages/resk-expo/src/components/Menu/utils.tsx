@@ -50,11 +50,8 @@ const renderExpandableMenuItemOrSection = function <MenuItemContext = any>({ ite
   level = typeof level == "number" && level || 0;
   if (!isAllowed(item)) return null;
   const { section, items, ...rest } = item;
-  if (section) {
-    return render({ level, ...rest, context: { ...Object.assign({}, rest.context), ...Object.assign({}, context) } } as IMenuItemBase<MenuItemContext>, index);
-  } else {
-    return renderExpandable({ level, ...rest as IMenuItemBase<MenuItemContext>, children: itemsNodes, context: { ...Object.assign({}, rest.context), ...Object.assign({}, context) } }, index);
-  }
+  context = { ...Object.assign({}, rest.context), ...Object.assign({}, context) };
+  return (section ? render : renderExpandable)({ level, items, ...rest, children: itemsNodes, context }, index);
 }
 
 /**

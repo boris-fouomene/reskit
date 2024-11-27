@@ -3,7 +3,7 @@ import { Button, IButtonRef } from "@components/Button";
 import { useAppBar } from './hooks';
 import { forwardRef } from 'react';
 import { IAppBarContext, IAppBarAction } from './types';
-import Theme, { useTheme } from '@theme/index';
+import { useTheme } from '@theme/index';
 
 
 /**
@@ -45,9 +45,11 @@ const AppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionConte
   const colorSchemeColor = useTheme().getColorScheme(colorScheme);
   return <Button
     ref={ref}
-    textColor={colorSchemeColor.color || appBarContext.textColor}
-    backgroundColor={colorSchemeColor.backgroundColor || appBarContext.backgroundColor}
-    mode={"contained"}  {...props}
+    textColor={colorSchemeColor.color || appBarContext.textColor || props.context?.textColor}
+    borderRadius={0}
+    backgroundColor={colorSchemeColor.backgroundColor || appBarContext.backgroundColor || props.context?.backgroundColor}
+    mode={"contained"}
+    {...props}
     style={[styles.buttonAction, props.style]}
   />
 });

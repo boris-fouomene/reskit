@@ -269,6 +269,7 @@ const Menu: React.FC<IMenuProps> = ({
     responsive,
     items,
     itemsProps,
+    sameWidth,
     elevation = 10,
     ...props
 }) => {
@@ -397,6 +398,11 @@ const Menu: React.FC<IMenuProps> = ({
         width: screenWidth,
         height: screenHeight,
     } : {};
+    const menuAnchorStyle = useMemo(() => {
+        if (typeof anchorMeasurements?.width != "number") return {};
+        const { width } = anchorMeasurements;
+        return sameWidth ? { width } : { minWidth: width };
+    }, [anchorMeasurements, sameWidth]);
 
     //React.setRef(ref,context);
     const child = useMemo(() => {
@@ -434,6 +440,7 @@ const Menu: React.FC<IMenuProps> = ({
                     style={[
                         styles.menuContainer,
                         { backgroundColor: theme.colors.surface },
+                        menuAnchorStyle,
                         {
                             borderRadius,
                             ...menuContainerStyle,

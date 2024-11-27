@@ -21,7 +21,7 @@ const index = () => {
                         },
                     },
                     {
-                        label: "actin 2",
+                        label: "An expandable",
                         icon: "check",
                         onPress: () => {
                             console.log("action2")

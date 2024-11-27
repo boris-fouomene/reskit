@@ -3,6 +3,7 @@ import { Button, IButtonContext, IButtonRef } from "@components/Button";
 import { IAppBarAction, IAppBarContext } from './types';
 import { GestureResponderEvent } from "react-native";
 import { forwardRef } from "react";
+import Action from "./Action";
 
 
 /**
@@ -54,7 +55,7 @@ const ExpandableAppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarA
     return <Menu
         anchor={({ openMenu }) => {
             return (
-                <Button testID='rn-expandable-appbar-action-anchor'
+                <Action testID='rn-expandable-appbar-action-anchor'
                     ref={ref}
                     {...rest}
                     onPress={(event: GestureResponderEvent) => {
@@ -66,7 +67,7 @@ const ExpandableAppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarA
                 />
             )
         }}
-        items={items}
+        children={<>{children}</>}
     />
 });
 

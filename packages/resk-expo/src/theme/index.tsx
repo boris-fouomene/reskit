@@ -186,6 +186,9 @@ export function createTheme(theme: ITheme): IThemeManager {
                     (result as IDict).color = context.colors[bgColorKey as keyof typeof context.colors];
                 }
             }
+            if (!result.color || !result.backgroundColor) {
+                return {};
+            }
             return result;
         },
         get addEventListener() {

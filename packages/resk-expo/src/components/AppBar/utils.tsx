@@ -106,9 +106,8 @@ export function splitAppBarActions<IAppBarActionContext = any>({
     if (!props?.level && actionCounter.current <= mAction + 1) {
       actionCounter.current++;
     }
-    const canrAction = canRenderAction(props?.level);
     const itx: IAppBarAction<IAppBarActionContext> = props;
-    return pushAction(typeof renderCb != "function" ? null : renderCb(itx, index), itx);
+    return pushAction(typeof renderCb != "function" ? null : renderCb(itx, index), itx, props.level);
   };
   const actions = renderMenuItems<IAppBarContext<IAppBarActionContext>>({
     context: Object.assign({}, { isAppBar: true }, context),
@@ -117,7 +116,7 @@ export function splitAppBarActions<IAppBarActionContext = any>({
       return _render(render, props, index);
     },
     renderExpandable: function (props, index) {
-      return _render(renderExpandable, { ...props }, index);
+      return _render(renderExpandable, props, index);
     },
   });
   return {

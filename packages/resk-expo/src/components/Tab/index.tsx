@@ -148,7 +148,7 @@ const Tab = (props: ITabProps) => {
             setActiveIndex(activeIndex);
         }
     }, [children, activeIndex]);
-    testID = defaultStr(testID, "rn-tab");
+    testID = defaultStr(testID, "resk-tab");
     const { tabs, contents } = React.useMemo(() => {
         const tabs: React.ReactNode[] = [], contents: React.ReactNode[] = [];
         React.Children.map(children, (child, index) => {

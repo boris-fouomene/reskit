@@ -56,7 +56,7 @@ export default function Dialog<DialogContextExtend = any>({
   testID,
   ...props
 }: IDialogProps<DialogContextExtend>) {
-  testID = testID || "rn-dialog";
+  testID = testID || "resk-dialog";
   return (
     <Modal {...props} testID={testID}>
       <ModalWrapper
@@ -112,7 +112,7 @@ function ModalWrapper<DialogContextExtend = any>({
   titleProps,
   isPreloader
 }: IDialogProps<DialogContextExtend>) {
-  testID = defaultStr(testID, "rn-dialog");
+  testID = defaultStr(testID, "resk-dialog");
   fullScreenAppBarProps = Object.assign({}, fullScreenAppBarProps);
   titleProps = Object.assign({}, titleProps);
   dialogContentProps = Object.assign({}, dialogContentProps);

@@ -47,7 +47,7 @@ export function HelperText({ visible = true, testID, color, style, error, ...res
     const useNativeDriver = platform.isMobileNative();
     // Animation value for opacity
     const opacity = new Animated.Value(visible ? 1 : 0);
-    testID = defaultStr(testID, "rn-helper-text");
+    testID = defaultStr(testID, "resk-helper-text");
     useEffect(() => {
         // Animate fade in/out based on visibility
         if (visible) {

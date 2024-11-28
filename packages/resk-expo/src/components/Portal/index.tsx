@@ -134,7 +134,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
      * Reducer function used to force a re-render of the portal container, without affecting the previously rendered portals.
      */
     const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
-    const testID = "rn-portal";
+    const testID = "resk-portal";
     return (
         <PortalContext.Provider value={{ addPortal, removePortal }}>
             {children}

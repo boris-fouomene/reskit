@@ -23,7 +23,7 @@ import { IDialogTitleProps } from "./types";
 export default function DialogTitle(props: IDialogTitleProps) {
     const { context: modalContext, canRender } = useCanRender(true);
     if (!canRender || !modalContext || modalContext.fullScreen) return null;
-    return <Label testID="rn-dialog-title" textBold {...props} style={[styles.container, props.style]} />
+    return <Label testID="resk-dialog-title" textBold {...props} style={[styles.container, props.style]} />
 };
 
 

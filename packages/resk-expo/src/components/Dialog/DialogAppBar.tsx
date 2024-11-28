@@ -43,7 +43,7 @@ export default function DialogAppBar<DialogContextExtend = any>(props: IDialogAc
     if (!canRender || !modalContext || !modalContext.fullScreen) return null;
     const { responsive } = modalContext;
     return <AppBar
-        testID="rn-dialog-appbar"
+        testID="resk-dialog-appbar"
         {...props}
         context={Object.assign({}, modalContext, props.context)}
         onBackActionPress={(event: GestureResponderEvent) => {

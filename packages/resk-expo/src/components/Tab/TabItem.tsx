@@ -74,7 +74,7 @@ const TabItem = ({
   const backgroundColor: string = Colors.isValid(style.backgroundColor) ? style.backgroundColor : 'transparent';
   const color = Colors.isValid(customColor) ? customColor : Colors.isValid(style.color) ? style.color : isActive ? defaultActiveTabItemTextColor : backgroundColor !== "transparent" ? Colors.getContrast(backgroundColor) : defaultTextColor;
   rippleColor = Colors.isValid(rippleColor) ? rippleColor : Colors.setAlpha(color as string, 0.32);
-  testID = defaultStr(testID, "rn-tab-item");;
+  testID = defaultStr(testID, "resk-tab-item");;
   iconProps = Object.assign({}, iconProps);
   iconProps = { testID: testID + "-icon", ...iconProps, color, style: [iconProps.style] }
   labelProps = Object.assign({}, labelProps);

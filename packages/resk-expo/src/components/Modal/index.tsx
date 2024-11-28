@@ -46,7 +46,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContai
     return props.children;
   }, [props.children]) as React.ReactNode;
   contentContainerProps = Object.assign({}, contentContainerProps);
-  testID = testID || "rn-modal";
+  testID = testID || "resk-modal";
 
   const backgroundOpacity = useSharedValue(visible ? 1 : 0);
   const hiddenRef = useRef<boolean>(false);

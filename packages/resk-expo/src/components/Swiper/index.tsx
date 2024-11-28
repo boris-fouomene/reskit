@@ -508,7 +508,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
     contentContainerProps = Object.assign({}, contentContainerProps);
     swipeAreaProps = Object.assign({}, swipeAreaProps);
     contentProps = Object.assign({}, contentProps);
-    testID = testID || 'rn-swiper';
+    testID = testID || 'resk-swiper';
     const isReady = customHeight > 40 ? true : false;
     const autoHeight = !!this.props.autoHeight;
     const height = autoHeight ? this.state.height : !isReady ? WIDTH_HEIGHT : customHeight;

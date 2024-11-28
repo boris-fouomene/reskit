@@ -130,7 +130,7 @@ export default class DialogControlled extends React.Component<IDialogControlledP
      * @returns The test ID string for the dialog.
      */
     getTestID(): string {
-        return this.isPreloader() ? "rn-dialog-preloader" : this.isProvider() ? "rn-dialog-provider" : "rn-dialog";
+        return this.isPreloader() ? "resk-dialog-preloader" : this.isProvider() ? "resk-dialog-provider" : "resk-dialog";
     }
     render() {
         const { children, indicatorOnRight, indicatorProps, testID: cTestID, onDismiss, ...props } = this.getProps();

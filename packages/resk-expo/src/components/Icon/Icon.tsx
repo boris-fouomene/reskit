@@ -75,7 +75,7 @@ import { TouchableRipple } from "@components/TouchableRipple";
 
 const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, disabled, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
     const isSource = isImageSource(source);
-    testID = defaultStr(testID, isSource ? "rn-image" : "rn-font-icon");
+    testID = defaultStr(testID, isSource ? "resk-image" : "resk-font-icon");
     size = typeof size == "number" && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const touchableEvents = pickTouchEventHandlers(props);
     const { Component, props: containerP } = useMemo(() => {

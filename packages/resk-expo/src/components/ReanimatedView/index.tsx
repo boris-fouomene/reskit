@@ -65,7 +65,7 @@ export const ReanimatedView = React.forwardRef(({ animationType, animationDirect
 
   return (
     <Animated.View
-      testID={'rn-animated'}
+      testID={'resk-animated'}
       ref={ref}
       {...rest}
       {...animations}

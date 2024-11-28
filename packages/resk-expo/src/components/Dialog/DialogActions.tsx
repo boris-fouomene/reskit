@@ -47,7 +47,7 @@ export default function DialogActions<DialogContextExtend = any>({ testID, actio
     }
     return <AppBar
         colorScheme={"background"}
-        testID={"rn-dialog-actions"}
+        testID={"resk-dialog-actions"}
         maxActions={2}
         title={null}
         subtitle={null}

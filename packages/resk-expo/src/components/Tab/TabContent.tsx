@@ -45,7 +45,7 @@ const TabContent = ({
       autoplay={false}
       {...rest}
       children={children}
-      testID={defaultStr(testID, 'rn-tab-content')}
+      testID={defaultStr(testID, 'resk-tab-content')}
       activeIndex={activeIndex}
       onChange={setActiveIndex}
     />

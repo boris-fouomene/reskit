@@ -282,7 +282,7 @@ const Menu: React.FC<IMenuProps> = ({
     const [menuLayout, setMenuLayout] = useState<LayoutRectangle | null>(null);
     const anchorRef = useRef<View>(null);
     anchorContainerProps = Object.assign({}, anchorContainerProps);
-    testID = defaultStr(testID, "rn-menu");
+    testID = defaultStr(testID, "resk-menu");
     itemsProps = Object.assign({}, itemsProps);
     // Animation values
     const opacity = useSharedValue(0);

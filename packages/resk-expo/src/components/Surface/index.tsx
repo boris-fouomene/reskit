@@ -27,7 +27,7 @@ import { View as RNView } from 'react-native';
 const Surface = React.forwardRef((props: ISurfaceProps, ref: React.ForwardedRef<RNView>) => {
     const theme = useTheme();
     const { style, elevation, ...rest } = props;
-    return <View testID={'rn-surface'} {...rest} ref={ref}
+    return <View testID={'resk-surface'} {...rest} ref={ref}
         style={[{ backgroundColor: theme.colors.surface },
         elevation && typeof elevation == 'number' && Theme.elevations[elevation] ? Theme.elevations[elevation] : null,
             style

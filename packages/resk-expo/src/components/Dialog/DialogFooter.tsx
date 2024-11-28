@@ -37,7 +37,7 @@ import isValidElement from "@utils/isValidElement";
 export default function DialogFooter(props: IViewProps) {
     const { context: modalContext, canRender } = useCanRender(isValidElement(props.children));
     if (!modalContext || modalContext.fullScreen || !canRender) return null;
-    return <View testID="rn-dialog-footer" {...props} style={[styles.container, props.style]} />
+    return <View testID="resk-dialog-footer" {...props} style={[styles.container, props.style]} />
 };
 
 

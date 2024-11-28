@@ -98,7 +98,7 @@ const TabItems = ({
     return left;
   }, [activeIndex])
   indicatorStyle.left = getLeftPosition();
-  testID = defaultStr(testID, "rn-tab");
+  testID = defaultStr(testID, "resk-tab");
   scrollViewProps = Object.assign({}, scrollViewProps)
   const childrenContent = React.useMemo(() => {
     return React.Children.map(children, (child, index) => {

@@ -21,7 +21,7 @@ import Theme from "@theme/index";
  * @param {object} props - The properties for the component.
  * @param {string} [props.testID] - An optional identifier for testing purposes. This can be
  * used in automated tests to locate the component. If not provided, a default value of
- * "rn-menu-item-expandable" will be used.
+ * "resk-menu-item-expandable" will be used.
  * 
  * @param {object} [props.dividerProps] - Optional properties to customize the divider's
  * appearance. This allows for flexibility in styling the divider that separates the menu item
@@ -62,7 +62,7 @@ import Theme from "@theme/index";
  * based on specific requirements.
  */
 const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, dividerProps, items, divider, expandableProps, children, contentProps, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
-    testID = defaultStr(testID, "rn-menu-item-expandable");
+    testID = defaultStr(testID, "resk-menu-item-expandable");
     expandableProps = Object.assign({}, expandableProps);
     const containerProps = Object.assign({}, expandableProps.containerProps);
     const expandableLabelProps = Object.assign({}, expandableProps.labelProps);

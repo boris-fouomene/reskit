@@ -9,7 +9,7 @@ export * from "./types";
 const Tooltip = React.forwardRef(({
   children, title, tooltip, disabled, as, testID, id, ...rest
 }: ITooltipProps, ref) => {
-  testID = defaultStr(testID, "rn-tooltip");
+  testID = defaultStr(testID, "resk-tooltip");
   // Reference for instance ID or generate a unique one
   const instanceIdRef = React.useRef(id || uniqid("tippy-instance-id"));
   // Reference for the child element (e.g., button)

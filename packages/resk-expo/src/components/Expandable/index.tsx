@@ -118,7 +118,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
   const usePrimary = isExpanded && usePrimaryColorWhenExpended !== false ? true : false;
   const eProps = { color: usePrimary ? theme.colors.primary : labelColor, expanded };
   const { left, right, label } = getLabelOrLeftOrRightProps({ label: customLabel, left: customLeft, right: customRight }, eProps)
-  testID = defaultStr(testID, "rn-expandable");
+  testID = defaultStr(testID, "resk-expandable");
   const iconProps = Object.assign({}, expanded ? expandedIconProps : unexpandedIconProps);
   const icon = useGetIcon<{ expanded: boolean }>({ ...iconProps, ...eProps, size: 24, expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
   const expandIcon = showExpandIcon !== false ? icon : null;

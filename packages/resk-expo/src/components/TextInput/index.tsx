@@ -251,7 +251,7 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
     contentContainerProps = Object.assign({}, contentContainerProps);
     rightContainerProps = Object.assign({}, rightContainerProps);
     containerProps = Object.assign({}, containerProps);
-    testID = testID || "rn-text-input";
+    testID = testID || "resk-text-input";
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
     const isLabelEmbededVariant = variant == "labelEmbeded";
     const isDefaultVariant = !isLabelEmbededVariant;

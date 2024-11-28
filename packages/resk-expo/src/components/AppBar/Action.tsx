@@ -63,6 +63,6 @@ export default AppBarAction
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    marginRight: 7,
+    marginHorizontal: 7,
   },
 });

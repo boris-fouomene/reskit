@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         width: "100%",
+        marginVertical : 7
     },
     buttonContent: {
         paddingHorizontal: 0,

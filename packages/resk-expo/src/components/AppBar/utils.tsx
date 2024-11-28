@@ -90,7 +90,7 @@ export function splitAppBarActions<IAppBarActionContext = any>({
   const renderedActions = [];
   const canRenderAction = (level?: number) => {
     if (level) return false;
-    return (actionCounter.current <= mAction && mAction > 1) || items?.length === 1 || !renderedActions.length;
+    return (actionCounter.current <= mAction && mAction > 1) || items?.length === 1 //|| !renderedActions.length;
   };
   const pushAction = (action: IReactNullableElement, item: IAppBarAction<IAppBarActionContext>, level?: number) => {
     if (canRenderAction(level)) {

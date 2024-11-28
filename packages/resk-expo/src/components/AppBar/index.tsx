@@ -185,7 +185,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
           testID={`${testID}-menu`}
           anchor={({ closeMenu, openMenu }) => {
             return <IconButton
-              size={24}
+              size={28}
               iconName={FontIcon.MORE}
               color={color}
               style={styles.menuContainer}

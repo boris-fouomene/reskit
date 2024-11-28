@@ -2,20 +2,21 @@
 import "@session";
 import { useEffect, useMemo } from 'react';
 import { ITheme } from '@theme/types';
-import { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate } from '@theme/index';
+import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate } from '@theme/index';
 import useStateCallback from '@utils/stateCallback';
 import { isObj } from '@resk/core';
 import stableHash from "stable-hash";
 import usePrevious from '@utils/usePrevious';
 import { ReskExpoProviderProps } from './types';
-import { ReskExpoContext } from './context';
+import { ReskExpoContext } from './hooks';
 import { useColorScheme } from "@theme/useColorScheme";
 import { PortalProvider } from "@components/Portal";
 import Breakpoints from "@src/breakpoints";
 import { Preloader, Dialog } from "@components/Dialog";
+import { useSafeAreaInsets, SafeAreaProvider } from 'react-native-safe-area-context';
 
 export * from "./types";
-export * from "./context";
+export * from "./hooks";
 
 /**
  * @group ReskExpoProvider
@@ -51,6 +52,7 @@ export * from "./context";
  */
 export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ...rest }: ReskExpoProviderProps) {
   const isDark = useColorScheme() === 'dark';
+  const safeAreaInsets = useSafeAreaInsets();
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
    * to be executed once the theme state is updated.
@@ -114,12 +116,16 @@ export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ..
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
-    <ReskExpoContext.Provider value={{ theme, updateTheme, ...rest, breakpoints }}>
-      <PortalProvider>
-        <Preloader.Provider />
-        <Dialog.Provider.Provider />
-        {children}
-      </PortalProvider>
-    </ReskExpoContext.Provider>
+    <SafeAreaProvider testID="resk-expo-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
+      <ReskExpoContext.Provider value={{ theme, updateTheme, ...rest, safeAreaInsets, breakpoints }}>
+        <PortalProvider>
+          <>
+            <Preloader.Provider />
+            <Dialog.Provider.Provider />
+            {children}
+          </>
+        </PortalProvider>
+      </ReskExpoContext.Provider>
+    </SafeAreaProvider>
   );
 }

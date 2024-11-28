@@ -86,7 +86,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContai
   }, []);
   if (!visible) return null;
   return (
-    <Portal style={styles.absoluteFill} testID={testID + "_ModalPortal"}>
+    <Portal style={styles.absoluteFill} testID={testID + "-modal-portal"}>
       <Animated.View
         testID={testID + "-modal-backdrop"}
         style={[

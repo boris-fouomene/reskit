@@ -6,7 +6,7 @@ import session from "../session";
 import Color from "color";
 import updateNative from "./updateNative";
 import styles from "./styles";
-import { useReskExpoProvider } from "@src/context/context";
+import { useReskExpo } from "@src/context/hooks";
 import Elevations from "./Elevations";
 
 export * from "./utils";
@@ -645,7 +645,7 @@ export { default as Colors } from "./colors";
  * the application.
  */
 export const useTheme = (): IThemeManager => {
-    const { theme } = useReskExpoProvider();
+    const { theme } = useReskExpo();
     /**
      * Returns the current theme from `ReskExpoProvider` context.
      * If no theme is found, it returns the default `Theme` from `@theme`.

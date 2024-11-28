@@ -1,5 +1,6 @@
 import { IBreakpoints } from "@src/breakpoints/types";
 import { ITheme } from "@theme/types";
+import { EdgeInsets } from 'react-native-safe-area-context';
 
 /**
  * @group ReskExpoProvider
@@ -73,4 +74,9 @@ export type ReskExpoProviderProps = {
 export type IReskExpoProvider = Omit<ReskExpoProviderProps, "type"> & {
     theme: ITheme;
     updateTheme: (theme: ITheme) => any;
+
+    /***
+     * SafeAreaInsets
+     */
+    safeAreaInsets: EdgeInsets
 }

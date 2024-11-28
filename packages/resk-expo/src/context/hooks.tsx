@@ -34,7 +34,7 @@ export const ReskExpoContext = React.createContext<IReskExpoProvider>({} as IRes
  * **Example**:
  * ```tsx
  * const YourComponent: React.FC = () => {
- *   const { theme, updateTheme } = useReskExpoProvider();
+ *   const { theme, updateTheme } = useReskExpo();
  * 
  *   return (
  *     <div style={{ backgroundColor: theme.primaryColor }}>
@@ -47,7 +47,7 @@ export const ReskExpoContext = React.createContext<IReskExpoProvider>({} as IRes
  * };
  * ```
  */
-export const useReskExpoProvider = () => {
+export const useReskExpo = () => {
     return useContext(ReskExpoContext);
 };
 

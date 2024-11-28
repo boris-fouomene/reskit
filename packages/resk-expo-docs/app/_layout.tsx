@@ -8,13 +8,6 @@ import React from 'react';
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
     return (<ReskExpoProvider theme={{ dark: true } as ITheme}>
-        <Children><Slot /></Children>
+        <Slot />
     </ReskExpoProvider>);
-}
-
-const Children = ({ children }: IViewProps) => {
-    const theme = useTheme();
-    return <View style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
-        {children}
-    </View>
 }

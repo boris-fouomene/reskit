@@ -1,6 +1,5 @@
 import React, { forwardRef } from 'react';
 import { BackAction } from './BackAction';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import getThemeColors from './getThemeColor';
 import { AppBarContext, useAppBar } from './hooks';
 import {
@@ -23,6 +22,7 @@ import FontIcon from '@components/Icon/Font';
 import IconButton from '@components/Icon/Button';
 import ExpandableAppBarAction from './ExpandableAction';
 import AppBarAction from './Action';
+import { useReskExpo } from '@src/context/hooks';
 
 
 /**
@@ -126,7 +126,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
       />;
     }
   });
-  const { top, left, right } = useSafeAreaInsets();
+  const { top, left, right } = useReskExpo().safeAreaInsets;
   //statusBarHeight = Platform.OS === 'ios' ? StatusBar.currentHeight || 0 : 0
   const containerStyle = {
     paddingTop: typeof statusBarHeight === "number" ? statusBarHeight : top,
@@ -190,7 +190,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
               color={color}
               style={styles.menuContainer}
               containerProps={{
-                style : styles.menuAnchorContainer
+                style: styles.menuAnchorContainer
               }}
               onPress={(event) => {
                 openMenu();
@@ -238,8 +238,8 @@ const styles = StyleSheet.create({
   },
   menuContainer: {
   },
-  menuAnchorContainer : {
-    marginHorizontal:7
+  menuAnchorContainer: {
+    marginHorizontal: 7
   }
 });
 

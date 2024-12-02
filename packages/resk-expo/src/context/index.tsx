@@ -2,7 +2,7 @@
 import "@session";
 import { useEffect, useMemo } from 'react';
 import { ITheme } from '@theme/types';
-import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate } from '@theme/index';
+import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, useGetMaterial3Theme, createTheme } from '@theme/index';
 import useStateCallback from '@utils/stateCallback';
 import { isObj } from '@resk/core';
 import stableHash from "stable-hash";
@@ -14,6 +14,7 @@ import { PortalProvider } from "@components/Portal";
 import Breakpoints from "@src/breakpoints";
 import { Preloader, Dialog } from "@components/Dialog";
 import { useSafeAreaInsets, SafeAreaProvider } from 'react-native-safe-area-context';
+import { getMaterial3Theme } from "@pchmn/expo-material3-theme";
 
 export * from "./types";
 export * from "./hooks";
@@ -51,7 +52,6 @@ export * from "./hooks";
  * ```
  */
 export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ...rest }: ReskExpoProviderProps) {
-  const isDark = useColorScheme() === 'dark';
   const safeAreaInsets = useSafeAreaInsets();
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
@@ -59,14 +59,7 @@ export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ..
    *
    * @type {[ITheme, Function]} The current theme and a function to update the theme.
    */
-  const [theme, setTheme] = useStateCallback<ITheme>(Object.assign({}, getDefaultTheme(Object.assign({}, { dark: isDark }, customTheme)), { isDark }));
-
-  /**
-   * Stores the previous custom theme to detect changes and avoid unnecessary theme updates.
-   * 
-   * @type {ITheme | undefined} The previous theme state.
-   */
-  const prevCustomTheme = usePrevious(customTheme);
+  const [theme, setTheme] = useStateCallback<ITheme>(createTheme(getDefaultTheme(Object.assign({}, customTheme))));
 
   /**
    * Updates the current theme.

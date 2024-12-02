@@ -1,6 +1,6 @@
-import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorTokens } from "./types";
+import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorsScheme } from "./types";
 import Colors from "./colors";
-import { extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
+import { defaultStr, extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
 import { packageName } from "@utils/index";
 import session from "../session";
 import Color from "color";
@@ -8,9 +8,76 @@ import updateNative from "./updateNative";
 import styles from "./styles";
 import { useReskExpo } from "@src/context/hooks";
 import Elevations from "./Elevations";
+import { useColorScheme } from "react-native";
+import { useMaterial3Theme, isDynamicThemeSupported, getMaterial3Theme, createMaterial3Theme } from '@pchmn/expo-material3-theme';
 
 export * from "./utils";
 export * from "./types";
+
+
+/**
+ * Retrieves a set of light and dark themes based on the Material Design 3 specification.
+ * 
+ * This function utilizes the Material 3 theme system to generate light and dark theme color palettes
+ * based on an optional fallback source color. It also determines if dynamic theme support is available.
+ * 
+ * @param {string} [fallbackSourceColor] - An optional fallback color to use as the source for theme generation.
+ * 
+ * @returns {Object} An object containing:
+ * - `light`: An object representing the light theme with color properties.
+ * - `dark`: An object representing the dark theme with color properties.
+ * - `isSupported`: A boolean indicating whether dynamic theme support is available.
+ * 
+ * @example
+ * ```ts
+ * const themes = getLight2DarkMaterial3Theme("#6200EE");
+ * console.log(themes.light.colors.primary); // Outputs the primary color for the light theme
+ * console.log(themes.dark.colors.primary); // Outputs the primary color for the dark theme
+ * ```
+ */
+
+export const getLight2DarkMaterial3Theme = (fallbackSourceColor?: string) => {
+    const { light, dark } = getMaterial3Theme(fallbackSourceColor);
+    const isSupported = isDynamicThemeSupported.valueOf();
+    return {
+        light: { colors: light, dark: false },
+        dark: { colors: dark, dark: true },
+        isSupported,
+    }
+}
+
+
+
+/**
+ * Creates a theme object with light and dark variants based on the given source color.
+ * 
+ * The method creates a Material 3 theme based on the given source color and then creates
+ * a theme object with light and dark variants. The theme object also includes a boolean
+ * property `isSupported` to indicate if the current platform supports dynamic theme
+ * changes.
+ * 
+ * @param {string} sourceColor - The source color for theme generation.
+ * 
+ * @returns {Object} - An object containing light and dark themes with color properties and
+ * a boolean property `isSupported` to indicate if dynamic theme support is available.
+ * @returns {ITheme} returns.light - The light theme with color properties.
+ * @returns {ITheme} returns.dark - The dark theme with color properties.
+ * @returns {boolean} returns.isSupported - Whether dynamic theme support is available.
+ * 
+ * @example
+ * const themes = createLight2DarkMaterial3Theme("#6200EE");
+ * console.log(themes.light.colors.primary); // Outputs the primary color for the light theme
+ * console.log(themes.dark.colors.primary); // Outputs the primary color for the dark theme
+ */
+export const createLight2DarkMaterial3Theme = (sourceColor: string) => {
+    const { light, dark } = createMaterial3Theme(sourceColor);
+    const isSupported = isDynamicThemeSupported.valueOf();
+    return {
+        light: { colors: light, dark: false },
+        dark: { colors: dark, dark: true },
+        isSupported,
+    }
+}
 
 /**
  * @constant UPDATE_THEME
@@ -197,140 +264,12 @@ export function createTheme(theme: ITheme): IThemeManager {
     };
 }
 
-const white = "white", black = "black";
-/*
-    Default Light Theme Tokens
-*/
-const lightColors: IThemeColorTokens = {
-    primary: '#6750A4',
-    onPrimary: '#FFFFFF',
-    primaryContainer: '#EADDFF',
-    onPrimaryContainer: '#21005D',
-    secondary: '#625B71',
-    onSecondary: '#FFFFFF',
-    secondaryContainer: '#E8DEF8',
-    onSecondaryContainer: '#1D192B',
-    tertiary: '#7D5260',
-    onTertiary: '#FFFFFF',
-    tertiaryContainer: '#FFD8E4',
-    onTertiaryContainer: '#31111D',
-    error: '#B3261E',
-    onError: '#FFFFFF',
-    errorContainer: '#F9DEDC',
-    onErrorContainer: '#410E0B',
-    background: '#FFFBFE',
-    onBackground: '#1C1B1F',
-    surface: '#FFFBFE',
-    onSurface: '#1C1B1F',
-    surfaceVariant: '#E7E0EC',
-    onSurfaceVariant: '#49454F',
-    outline: '#79747E',
-    inverseOnSurface: '#F4EFF4',
-    inverseSurface: '#313033',
-    inversePrimary: '#D0BCFF',
-    shadow: '#000000',
-    surfaceTint: '#6750A4',
 
-    text: "#11181C", // Main text color for light mode
-    placeholder: Colors.setAlpha(black), // Placeholder text color
-    backdrop: Colors.setAlpha(black, 0.5), // Backdrop overlay with semi-transparent black
-    onInfo: "white", // Text color for info messages
-    onSuccess: "white", // Text color for success messages
-    success: "#5EBA6A", // Success message color
-    warning: "#BAAB5E", // Warning message color
-    disabled: Colors.setAlpha(black, 0.5), // Semi
-};
-
-/*
-  Default Dark Theme Tokens
-*/
-export const darkColors: IThemeColorTokens = {
-    primary: '#6750A4',
-    onPrimary: '#FFFFFF',
-    primaryContainer: '#4F378B',
-    onPrimaryContainer: '#EADDFF',
-    secondary: '#CCC2DC',
-    onSecondary: '#332D41',
-    secondaryContainer: '#4A4458',
-    onSecondaryContainer: '#E8DEF8',
-    tertiary: '#EFB8C8',
-    onTertiary: '#492532',
-    tertiaryContainer: '#633B48',
-    onTertiaryContainer: '#FFD8E4',
-    error: '#F2B8B5',
-    onError: '#601410',
-    errorContainer: '#8C1D18',
-    onErrorContainer: '#F9DEDC',
-    background: '#343a40',
-    onBackground: '#E6E1E5',
-    surface: '#111b21',
-    onSurface: '#E6E1E5',
-
-    surfaceVariant: '#49454F',
-    onSurfaceVariant: '#CAC4D0',
-    outline: '#938F99',
-    inverseOnSurface: '#1C1B1F',
-    inverseSurface: '#E6E1E5',
-    inversePrimary: '#6750A4',
-    shadow: '#000000',
-    surfaceTint: '#D0BCFF',
-    placeholder: Colors.setAlpha(white, 0.5), // Placeholder text color
-    backdrop: Colors.setAlpha(black, 0.5), // Backdrop overlay with semi-transparent black
-    success: "#5EBA6A", // Success message color
-    warning: "#FFB547", // Warning message color
-    text: '#ECEDEE',
-    disabled: Colors.setAlpha(white, 0.5), // Semi
-};
-/***
- * Default dark theme configuration for the application.
- * 
- * This theme is used to define color schemes for dark mode. It contains properties like `background`, 
- * `surface`, and `primary` which are specific to dark themes. The `createTheme` function is used to 
- * enhance the theme with useful methods such as `getColor` and `getColorScheme`.
- * 
- * @example
- * ```ts
- * import { DefaultDarkTheme } from './themes';
- * 
- * const backgroundColor = DefaultDarkTheme.colors.background; // "#111b21"
- * const primaryColor = DefaultDarkTheme.getColor("primary"); // "#5EBA6A"
- * ```
- */
-export const DefaultDarkTheme: IThemeManager = createTheme({
-    name: `${packageName}-dark`,
-    dark: true,
-    roundness: 8,
-    colors: {
-        ...darkColors,
-    },
-});
-/***
- * Default light theme configuration for the application.
- * 
- * This theme is used to define color schemes for light mode. It contains properties like `background`, 
- * `surface`, and `primary` which are specific to light themes. The `createTheme` function is used to 
- * enhance the theme with useful methods such as `getColor` and `getColorScheme`.
- * 
- * @example
- * ```ts
- * import { DefaultLightTheme } from './themes';
- * 
- * const backgroundColor = DefaultLightTheme.colors.background; // "#F0F0F0"
- * const primaryColor = DefaultLightTheme.getColor("primary"); // "#5EBA6A"
- * ```
- */
-export const DefaultLightTheme: IThemeManager = createTheme({
-    name: `${packageName}-light`,
-    roundness: 8,
-    colors: {
-        ...lightColors,
-    },
-} as unknown as ITheme);
 
 
 /***
  * Returns the default theme for the application based on the stored theme in session.
- * 
+ * By default, the text color is set to the onSurface color because it offers high contrast on most backgrounds, and it aligns with MD3’s focus on adaptability across light and dark modes.
  * This function retrieves the currently saved theme from session storage and returns the corresponding theme object.
  * If no theme is stored, it defaults to the dark theme. Additionally, this function ensures that certain key color
  * properties (`onSuccess`, `onInfo`, `onWarning`, `onError`, and `text`) are defined based on whether the theme is dark or light.
@@ -348,17 +287,25 @@ export const DefaultLightTheme: IThemeManager = createTheme({
 export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
     // Retrieves the saved theme from the session (if available)
     const themeNameObj = extendObj({}, customTheme, session.get("theme"));
-    const theme = extendObj({}, (themeNameObj?.dark ? DefaultDarkTheme : DefaultLightTheme), themeNameObj);
-    // Ensures essential color properties are defined based on whether the theme is dark or light
-    theme.colors.onSuccess = theme.colors.onSuccess || (theme.dark ? "black" : "white");
-    theme.colors.onInfo = theme.colors.onInfo || (theme.dark ? "black" : "white");
-    theme.colors.onWarning = theme.colors.onWarning || (theme.dark ? "black" : "black");
-    theme.colors.onError = theme.colors.onError || (theme.dark ? "black" : "white");
-    theme.colors.text = theme.colors.text || (theme.dark ? "white" : "black");
+    const { light: lightTheme, dark: darkTheme } = getLight2DarkMaterial3Theme(themeNameObj?.colors?.primary);
+    const isDark = !!themeNameObj.dark;
+    themeNameObj.name = defaultStr(themeNameObj.name, `${packageName}-${themeNameObj.dark ? "dark" : "light"}`);
+    const theme = extendObj({}, (isDark ? darkTheme : lightTheme), themeNameObj);
+    sanitizeTheme(theme);
     updateNative(theme);
     // Returns the fully prepared theme
     return theme;
 };
+
+const sanitizeTheme = (theme: IThemeManager) => {
+    theme.roundness = typeof theme.roundness == "number" ? theme.roundness : 8;
+    theme.colors = theme.colors || {};
+    const isDark = !!theme.dark;
+    theme.colors.placeholder = theme.colors.placeholder || Colors.setAlpha(isDark ? "black" : "white", 0.5);
+    theme.colors.text = theme.colors.text || theme.colors.onSurface;
+    theme.colors.backdrop = (theme.colors.backdrop || Colors.setAlpha(isDark ? "black" : "white", 0.5)) as string;
+    return theme;
+}
 
 class Theme {
     private static defaultTheme: IThemeManager = createTheme(getDefaultTheme());
@@ -419,9 +366,9 @@ class Theme {
 export function updateTheme(theme: ITheme, trigger: boolean = false): IThemeManager {
     // Save the theme name in the session
     session.set("theme", theme.name);
-
     // Update the theme reference
     const newTheme = createTheme(theme);
+    sanitizeTheme(newTheme);
     Theme.setTheme(newTheme);
 
     // Apply the theme to native elements (like the status bar)
@@ -568,7 +515,7 @@ export default Theme;
  * ```
  */
 export interface IThemeManager extends ITheme {
-    colors: IThemeColorTokens;
+    colors: IThemeColorsScheme;
     getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined;
     getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme
     styles: typeof styles;
@@ -652,3 +599,37 @@ export const useTheme = (): IThemeManager => {
      */
     return (theme || Theme) as IThemeManager;
 };
+/**
+ * Retrieves the default theme based on the Material Design 3 theme and current color scheme.
+ * 
+ * This hook utilizes the Material Design 3 theme system to obtain the default theme.
+ * It considers the dynamic theme support and the current platform's color scheme
+ * to determine the dark mode setting.
+ * 
+ * @param {Object} [params] - Optional parameters to customize the theme.
+ * @param {string} [params.fallbackSourceColor] - The fallback source color for the theme.
+ * @param {string} [params.sourceColor] - The primary source color for the theme.
+ * 
+ * @returns {Object} - An object containing the default theme, whether dynamic theme support is available, and the current color scheme.
+ * @returns {ITheme} returns.theme - The default theme object.
+ * @returns {boolean} returns.isSupported - Whether dynamic theme support is available for the current platform.
+ * @returns {string} returns.colorScheme - The current color scheme (dark or light).
+ * @returns {ITheme | null} - The default theme object or null if not supported.
+ * 
+ * @example
+ * 
+ * ```tsx
+ * const defaultTheme = useGetDefaultTheme();
+ * console.log(defaultTheme?.dark); // Outputs true or false based on the current color scheme
+ * ```
+ */
+export const useGetMaterial3Theme = (params?: { fallbackSourceColor?: string; sourceColor?: string; }) => {
+    const { theme: cTheme } = useMaterial3Theme(params);
+    const colorScheme = useColorScheme();
+    const isSupported = isDynamicThemeSupported.valueOf();
+    const colors = (colorScheme ? (cTheme as any)[colorScheme] ?? {} : {}) as IThemeColorsScheme;
+    const theme = { colors } as ITheme;
+    theme.dark = colorScheme === 'dark';
+    return { theme: theme, isSupported, colorScheme };
+}
+

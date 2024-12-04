@@ -270,7 +270,7 @@ const Menu: React.FC<IMenuProps> = ({
     items,
     itemsProps,
     sameWidth,
-    withScrollView = false,
+    withScrollView = true,
     scrollViewProps,
     elevation = 10,
     ...props

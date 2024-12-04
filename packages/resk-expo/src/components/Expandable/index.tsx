@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     maxWidth: "100%",
-    paddingHorizontal: 7,
+    paddingLeft: 7,
   },
   children: {
     marginLeft: 8,

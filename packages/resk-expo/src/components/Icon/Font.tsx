@@ -14,6 +14,7 @@ import Theme, { useTheme } from "@theme";
 import Colors from "@colors";
 import { IFontIconProps, IPrefixToFontIconsSetNames } from "./types";
 import Platform from "@platform/index";
+import { isRTL } from "@utils/i18nManager";
 const isIos = Platform.isIos();
 
 
@@ -281,7 +282,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * - Consider using this constant in conjunction with other navigation-related icons 
      *   to provide a cohesive user experience.
      */
-    BACK: "chevron-left" | "arrow-left";
+    BACK: "chevron-left" | "arrow-left" | "chevron-right" | "arrow-right";
 
 
     /**
@@ -449,7 +450,7 @@ const FontWithCustomIcons = FontIcon as unknown as IFontWithCustomIcons;
  * - Consider using this constant in conjunction with other navigation-related icons 
  *   to provide a cohesive user experience.
  */
-FontWithCustomIcons.BACK = isIos ? "chevron-left" : "arrow-left";
+FontWithCustomIcons.BACK = isIos ? (isRTL ? "chevron-right" : "chevron-left") : (isRTL ? "arrow-right" : "arrow-left");
 
 
 /**

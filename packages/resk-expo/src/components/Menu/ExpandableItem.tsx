@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     expandable: {
         paddingVertical: 0,
         paddingHorizontal: 0,
-        marginRight: 5,
+        //marginRight: 5,
     },
 
 });

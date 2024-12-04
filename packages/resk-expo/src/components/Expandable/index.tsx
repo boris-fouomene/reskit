@@ -9,6 +9,7 @@ import useStateCallback from "@utils/stateCallback";
 import { getLabelOrLeftOrRightProps } from "@hooks/index";
 import Animated, { AnimatedProps, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { IExpandableProps } from "./types";
+import { isRTL } from "@utils/i18nManager";
 
 
 
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   child: {
-    paddingLeft: 64,
+    [isRTL ? "paddingRight" : "paddingLeft"]: 64,
   },
   content: {
     flex: 1,

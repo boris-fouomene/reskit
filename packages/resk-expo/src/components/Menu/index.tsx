@@ -480,7 +480,7 @@ const Menu: React.FC<IMenuProps> = ({
                     ]}
                 >
                     <Wrapper {...wrapperProps}>
-                        {items ? <MenuItems items={items} {...itemsProps} /> : null}
+                        {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
                         {child}
                     </Wrapper>
                 </Animated.View>
@@ -493,12 +493,6 @@ const Menu: React.FC<IMenuProps> = ({
  * Default styles for the menu container
  */
 const styles = StyleSheet.create({
-    portalContainer: {
-        ...StyleSheet.absoluteFillObject,
-        flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: "flex-start",
-    },
     portalBackdrop: {
         ...StyleSheet.absoluteFillObject,
         flex: 1,
@@ -507,12 +501,12 @@ const styles = StyleSheet.create({
     },
     menuContainer: {
         position: 'absolute',
-        paddingVertical: 7,
+        paddingVertical: 10,
+        paddingHorizontal: 2,
         justifyContent: 'flex-start',
         alignItems: "flex-start",
         maxHeight: '100%',
         maxWidth: '100%',
-        paddingBottom: 10,
     },
 });
 

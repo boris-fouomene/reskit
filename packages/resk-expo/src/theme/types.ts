@@ -3,7 +3,7 @@ import { Material3Scheme } from "@pchmn/expo-material3-theme";
 
 
 /**
- * @interface IThemeColorsScheme
+ * @interface IThemeColorsTokens
  * Represents the default tokens available in a theme. You can extends this interface to add custom tokens.
  * It's designed on the basis of the latest version of Google’s open-source design system
  * It's defines the full set of color tokens that are part of the Material Design 3 color system.
@@ -52,7 +52,7 @@ import { Material3Scheme } from "@pchmn/expo-material3-theme";
  *   },
  * };
  * 
- * @typedef {Object} IThemeColorsScheme
+ * @typedef {Object} IThemeColorsTokens
  * @property {string} [text] - The color applied on text elements
  * @property {string} [primary] - The primary color of the application. It's used to highlight important elements like buttons or icons. Primary color tokens representing the most prominent color in the app. Used for key UI elements like FABs, prominent buttons, active states.
  * @property {string} [onPrimary] - The color applied on top of the primary background (e.g., text or icons).Secondary color tokens for less prominent UI elements.Provides complementary accents to your primary color.
@@ -94,7 +94,7 @@ import { Material3Scheme } from "@pchmn/expo-material3-theme";
  * @property {string} [backdrop] - The color used for modal's backdrop.
  * @example
  * ```ts
- * const themeColors: IThemeColorsScheme = {
+ * const themeColors: IThemeColorsTokens = {
  *    primary: "#6200EE",
  *    onPrimary: "#FFFFFF",
  *    warning: "#FFA726",
@@ -103,7 +103,7 @@ import { Material3Scheme } from "@pchmn/expo-material3-theme";
  * };
  * ```
  */
-export interface IThemeColorsScheme extends Material3Scheme {
+export interface IThemeColorsTokens extends Material3Scheme {
   statusBar?: string;
   /*** colors of text and icons elements */
   text?: string;
@@ -116,16 +116,16 @@ export interface IThemeColorsScheme extends Material3Scheme {
 
 /**
  * @interface IThemeColorTokenKey
- * Represents the keys of the `IThemeColorsScheme` interface.
+ * Represents the keys of the `IThemeColorsTokens` interface.
  * 
  * This type is a union of string literals that correspond to the property names 
- * defined in the `IThemeColorsScheme` interface. It is useful for ensuring that 
+ * defined in the `IThemeColorsTokens` interface. It is useful for ensuring that 
  * only valid theme color token keys can be used in contexts where theme colors 
  * are referenced or manipulated.
  * 
  * ## Usage Example
  * 
- * For instance, if `IThemeColorsScheme` has properties like `primary`, `secondary`, 
+ * For instance, if `IThemeColorsTokens` has properties like `primary`, `secondary`, 
  * and `background`, then `IThemeColorTokenKey` will be equivalent to the union type 
  * `"primary" | "secondary" | "background"`. This allows developers to use these 
  * keys safely in their code without the risk of typos or invalid property names.
@@ -147,7 +147,7 @@ export interface IThemeColorsScheme extends Material3Scheme {
  * - It helps in maintaining type safety and reducing runtime errors by leveraging 
  *   TypeScript's type system.
  */
-export type IThemeColorTokenKey = keyof IThemeColorsScheme;
+export type IThemeColorTokenKey = keyof IThemeColorsTokens;
 
 
 /**
@@ -163,7 +163,7 @@ export type IThemeColorTokenKey = keyof IThemeColorsScheme;
  * @property {number} [roundness] - The roundness value for the theme. It's used to adjust the border radius of components like buttons, cards, text inputs, and other UI elements. 
      * This property influences how "rounded" the corners of these elements appear. 
      * A low roundness value results in sharper corners, while a higher value makes the corners more rounded.
- * @property {IThemeColorsScheme} colors - The set of color tokens associated with the theme.
+ * @property {IThemeColorsTokens} colors - The set of color tokens associated with the theme.
  * @example
  * ```ts
  * const theme: ITheme = {
@@ -188,7 +188,7 @@ export interface ITheme {
    * This property influences how "rounded" the corners of these elements appear. 
    * A low roundness value results in sharper corners, while a higher value makes the corners more rounded.
    */
-  colors: IThemeColorsScheme;
+  colors: IThemeColorsTokens;
 }
 
 /**

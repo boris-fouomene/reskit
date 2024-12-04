@@ -89,7 +89,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   const flattenStyle = (StyleSheet.flatten(style) || {});
   backgroundColor = (
     Colors.isValid(backgroundColor) ? backgroundColor : theme.getColor(backgroundColor as IThemeColorTokenKey)
-      || colorScheme.backgroundColor || flattenStyle?.backgroundColor || tBackgroundColor || theme.colors.surface
+      || colorScheme.backgroundColor || flattenStyle?.backgroundColor || tBackgroundColor
   ) as string;
   color = (Colors.isValid(color) ? color : theme.getColor(color as IThemeColorTokenKey) || colorScheme.color || (flattenStyle as any)?.color || tColor) as string;
   const titleTextColor = Colors.isValid(color) ? color : undefined;

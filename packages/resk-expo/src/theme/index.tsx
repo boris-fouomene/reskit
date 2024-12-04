@@ -1,4 +1,4 @@
-import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorsScheme } from "./types";
+import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorsTokens } from "./types";
 import Colors from "./colors";
 import { defaultStr, extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
 import { packageName } from "@utils/index";
@@ -515,7 +515,7 @@ export default Theme;
  * ```
  */
 export interface IThemeManager extends ITheme {
-    colors: IThemeColorsScheme;
+    colors: IThemeColorsTokens;
     getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined;
     getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme
     styles: typeof styles;
@@ -627,7 +627,7 @@ export const useGetMaterial3Theme = (params?: { fallbackSourceColor?: string; so
     const { theme: cTheme } = useMaterial3Theme(params);
     const colorScheme = useColorScheme();
     const isSupported = isDynamicThemeSupported.valueOf();
-    const colors = (colorScheme ? (cTheme as any)[colorScheme] ?? {} : {}) as IThemeColorsScheme;
+    const colors = (colorScheme ? (cTheme as any)[colorScheme] ?? {} : {}) as IThemeColorsTokens;
     const theme = { colors } as ITheme;
     theme.dark = colorScheme === 'dark';
     return { theme: theme, isSupported, colorScheme };

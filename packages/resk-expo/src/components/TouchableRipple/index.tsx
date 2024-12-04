@@ -10,7 +10,6 @@ import { Colors, useTheme } from '@theme';
 import Platform from '@platform/index';
 import { ITouchableRippleProps } from './types';
 import { getColors } from './utils';
-import { Animated } from 'react-native';
 
 export * from "./types";
 

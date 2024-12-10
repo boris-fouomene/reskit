@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Divider } from "@components/Divider";
-import { IMenuItemBase, IMenuRenderItemOptions, IMenuItemsBase, IMenuRenderItemsOptions } from "./types";
+import { IMenuItemBase, IMenuRenderItemOptions, IMenuRenderItemsOptions } from "./types";
 import { useTheme } from "@theme/index";
 import { IReactNullableElement } from "../../types";
 import stableHash from "stable-hash";

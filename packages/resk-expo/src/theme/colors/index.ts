@@ -290,12 +290,16 @@ const getBrightness = (color: string): number | null => {
 * console.log(invalidColorContrast); // "black"
 * ```
 */
-const getContrast = function (hexcolor: string, comparator?: number): string {
-    const contrastColor = getBrightness(hexcolor);
-    if (!contrastColor) return 'black'; // return black if invalid color
+const getContrast = function (hexcolor: string, comparator?: number): string | undefined {
+    try {
+        const contrastColor = getBrightness(hexcolor);
+        if (!contrastColor) return 'black'; // return black if invalid color
 
-    comparator = typeof comparator === 'number' && comparator > 10 ? comparator : 170;
-    return contrastColor >= comparator ? 'black' : 'white';
+        comparator = typeof comparator === 'number' && comparator > 10 ? comparator : 170;
+        return contrastColor >= comparator ? 'black' : 'white';
+    } catch (error) {
+        return undefined;
+    }
 };
 
 /**

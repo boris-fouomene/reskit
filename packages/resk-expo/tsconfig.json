@@ -9,6 +9,12 @@
       "@session": [
         "src/session"
       ],
+      "@breakpoints/*": [
+        "src/breakpoints/*"
+      ],
+      "@breakpoints": [
+        "src/breakpoints"
+      ],
       "@dimensions/*": [
         "src/dimensions/*"
       ],

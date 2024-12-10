@@ -94,3 +94,4 @@ export function getLabelOrLeftOrRightProps<T = any>(props: ILabelOrLeftOrRightPr
     };
 };
 
+export * from "./withHOC";

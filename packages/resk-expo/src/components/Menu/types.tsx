@@ -329,7 +329,7 @@ export interface IUseMenuPositionProps {
 
 
 /**
- * @typedef IMenuItemsBase
+ * @typedef IMenuItems
  * @description
  * Props for the Menu component.
  * This interface defines the properties required for the Menu component, which 
@@ -393,11 +393,11 @@ export interface IUseMenuPositionProps {
  *         based on the viewport dimensions, ensuring a good user experience 
  *         across different screen sizes. Ii's mostly used when the fullScreen props is not false to ensure the menu fit  the screen in mobile or tablet device.
  *
- * @property {IMenuItemsBase<MenuItemContext>["items"]} [items] - An optional
+ * @property {IMenuItems<MenuItemContext>["items"]} [items] - An optional
  * property that defines an array of menu items. Each item can either be a valid menu
  * item object or undefined/null.
  *
- * @property {IMenuItemsBase<MenuItemContext>} [itemsProps] - Props for the
+ * @property {IMenuItems<MenuItemContext>} [itemsProps] - Props for the
  * menu items component. This allows for additional customization of the items rendered within
  * the menu.
  *    
@@ -509,13 +509,13 @@ export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "
     /**
      * An optional property that defines an array of menu items. Each item can either be a valid menu item object or undefined/null.
      */
-    items?: IMenuItemsBase<MenuItemContext>["items"];
+    items?: IMenuItems<MenuItemContext>["items"];
 
     /***
      * Props for the menu items component. This allows for additional customization of the items rendered within
      * the menu.
      */
-    itemsProps?: Omit<IMenuItemsBase<MenuItemContext>, "items">;
+    itemsProps?: Omit<IMenuItems<MenuItemContext>, "items">;
 
     /**
      * The elevation of the menu. This property is used to adjust the shadow and
@@ -777,7 +777,7 @@ export type IMenuItemContext<MenuItemContext = any> = Readonly<IMenuContext & Me
  * This array is utilized to render the individual menu items within the menu component.
  *
  * @example
- * const menuItems: IMenuItemsBase = {
+ * const menuItems: IMenuItems = {
  *   items: [
  *     { label: "Home", onPress: () => console.log("Home pressed") },
  *     { label: "Settings", onPress: () => console.log("Settings pressed") },
@@ -794,7 +794,7 @@ export type IMenuItemContext<MenuItemContext = any> = Readonly<IMenuContext & Me
  *   );
  * };
  */
-export type IMenuItemsBase<MenuItemContext = any> = IViewProps & {
+export type IMenuItems<MenuItemContext = any> = IViewProps & {
     items?: (IMenuItemBase<MenuItemContext> | undefined | null)[]
 }
 
@@ -809,7 +809,7 @@ export type IMenuItemsBase<MenuItemContext = any> = IViewProps & {
  * context properties specific to the menu items. This can be any object type, enabling customization
  * of the properties passed to the menu items.
  *
- * @extends IMenuItemsBase<IMenuItemContext<MenuItemContext>> - This type extends the base
+ * @extends IMenuItems<IMenuItemContext<MenuItemContext>> - This type extends the base
  * menu items type, incorporating the context properties defined in `IMenuItemContext`. This ensures
  * that the collection of menu items has access to both its base properties and any additional context-specific data.
  *
@@ -850,7 +850,7 @@ export type IMenuItemsBase<MenuItemContext = any> = IViewProps & {
  *   );
  * };
  */
-export type IMenuItemsProps<MenuItemContext = any> = IMenuItemsBase<IMenuItemContext<MenuItemContext>> & {
+export type IMenuItemsProps<MenuItemContext = any> = IMenuItems<IMenuItemContext<MenuItemContext>> & {
     /**
      * Additional context options to pass to the rendering functions.
     * for menu items. This enables customization of the properties passed to the menu item
@@ -1005,11 +1005,11 @@ export type IMenuRenderItemOptions<MenuItemContext = any> = IMenuRenderItemsOpti
  * @template MenuItemContext - A generic type parameter that allows extending the context
  * for menu items, enabling customization of properties specific to the application.
  *
- * @property {IMenuItemsBase<MenuItemContext>["items"]} [items] - An optional property that defines
+ * @property {IMenuItems<MenuItemContext>["items"]} [items] - An optional property that defines
  * an array of menu items. Each item can either be a valid menu item object or undefined/null.
  * This array is utilized to render the individual menu items within the menu component.
  * 
- * @see {@link IMenuItemsBase} for more information on the `items` property.
+ * @see {@link IMenuItems} for more information on the `items` property.
  * @see {@link IMenuRenderItemOptions} for more information on the base render item options.
  *
  * @example
@@ -1021,5 +1021,5 @@ export type IMenuRenderItemOptions<MenuItemContext = any> = IMenuRenderItemsOpti
  * };
  */
 export type IMenuRenderItemsOptions<MenuItemContext = any> = IMenuRenderItemsOptionsBase<MenuItemContext> & {
-    items?: IMenuItemsBase<MenuItemContext>["items"];
+    items?: IMenuItems<MenuItemContext>["items"];
 }

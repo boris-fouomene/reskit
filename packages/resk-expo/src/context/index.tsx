@@ -2,19 +2,16 @@
 import "@session";
 import { useEffect, useMemo } from 'react';
 import { ITheme } from '@theme/types';
-import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, useGetMaterial3Theme, createTheme } from '@theme/index';
+import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
 import useStateCallback from '@utils/stateCallback';
 import { isObj } from '@resk/core';
 import stableHash from "stable-hash";
-import usePrevious from '@utils/usePrevious';
 import { ReskExpoProviderProps } from './types';
 import { ReskExpoContext } from './hooks';
-import { useColorScheme } from "@theme/useColorScheme";
 import { PortalProvider } from "@components/Portal";
 import Breakpoints from "@src/breakpoints";
 import { Preloader, Dialog } from "@components/Dialog";
 import { useSafeAreaInsets, SafeAreaProvider } from 'react-native-safe-area-context';
-import { getMaterial3Theme } from "@pchmn/expo-material3-theme";
 
 export * from "./types";
 export * from "./hooks";

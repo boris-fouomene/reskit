@@ -4,10 +4,10 @@ import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";
 import { IDict, IObservable, IObservableEvent, uniqid } from "@resk/core";
-import { canBeMinimizedOrPermanent } from "./utils";
+import { canDrawerBeMinimizedOrPermanent } from "./utils";
 import { isValidElement } from "@utils";
 import Breakpoints from "@breakpoints";
-import { Animated, Dimensions, Keyboard, PanResponder, StyleSheet, TouchableWithoutFeedback, GestureResponderEvent, PanResponderGestureState, I18nManager } from "react-native";
+import { Animated, Dimensions, Keyboard, PanResponder, StyleSheet, TouchableWithoutFeedback, GestureResponderEvent, PanResponderGestureState, I18nManager, Pressable } from "react-native";
 import { Portal } from "@components/Portal";
 import View from "@components/View";
 import { Colors, useTheme } from "@theme";
@@ -109,7 +109,7 @@ const SETTLING = "Settling";
  * @method renderNavigationView - Renders the navigation view of the drawer.
  * @returns {ReactNode | null} - The navigation view or null.
  *
- * @method canPin - Checks if the drawer can be pinned.
+ * @method canBePinned - Checks if the drawer can be pinned.
  * @returns {boolean} - True if the drawer can be pinned, false otherwise.
  *
  * @method getProps - Gets the properties of the drawer.
@@ -166,7 +166,7 @@ const SETTLING = "Settling";
  *
  * @method open - Opens the drawer.
  * @param {IDrawerProviderProps} [options] - Optional options for opening the drawer.
- * @param {boolean | Function} [resetProviderProps] - Optional flag or function to reset provider properties.
+ * @param {boolean | Function} [callback] - Optional flag or function to reset provider properties.
  *
  * @method close - Closes the drawer.
  * @param {IDrawerProviderProps} [options] - Optional options for closing the drawer.
@@ -281,8 +281,8 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     super(props);
     const isProvider = !!props.isProvider;
     const permSession = this.getSession("permanent");
-    let permanent = typeof props.permanent == "boolean" ? props.permanent : typeof permSession === "boolean" ? permSession : !this.isProvider() && canBeMinimizedOrPermanent();
-    if (!canBeMinimizedOrPermanent()) {
+    let permanent = typeof props.permanent == "boolean" ? props.permanent : typeof permSession === "boolean" ? permSession : !this.isProvider() && canDrawerBeMinimizedOrPermanent();
+    if (!canDrawerBeMinimizedOrPermanent()) {
       permanent = false;
     }
     const drawerShown = !isProvider && permanent ? true : false;
@@ -299,11 +299,21 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       permanent,
     };
   }
+  /**
+   * Determines if the drawer component is minimizable.
+   *
+   * @returns {boolean} True if the drawer can be minimized, false otherwise.
+   */
   isMinimizable(): boolean {
     return !!this.getProps().minimizable;
   }
-  /***
-   * override de la fonction trigger définie dans l'overvateur d'évènement
+
+  /**
+   * Triggers an observable event with the provided arguments.
+   *
+   * @param event - The observable event to trigger.
+   * @param args - Additional arguments to pass to the event handler.
+   * @returns The observable instance or null if the event is not handled.
    */
   trigger(event: IObservableEvent, ...args: any[]): IObservable | null {
     return super.trigger(event, {
@@ -311,20 +321,50 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       eventName: event,
     });
   }
+  /**
+   * Sets the drawer to be permanent.
+   *
+   * @param callback - An optional callback function that receives the drawer state options after the permanent state is set.
+   */
   pin(callback?: (options: IDrawerStateOptions) => any): void {
     this.setPermanent(true, callback);
   }
+
+  /**
+   * Sets the drawer to be non-permanent.
+   *
+   * @param callback - An optional callback function that receives the drawer state options after the permanent state is set.
+   */
   unpin(callback?: (options: IDrawerStateOptions) => any): void {
     this.setPermanent(false, callback);
   }
+  /**
+   * Checks if the drawer is pinned (is permanent).
+   * 
+   * @returns {boolean} - Returns true if the drawer is permanent, otherwise false.
+   */
   isPinned() {
     return this.isPermanent();
   }
-  /***
-   * fait passer le drawer en mode permanentement
+
+  /**
+   * Sets the drawer to be permanent or not.
+   *
+   * @param permanent - A boolean indicating whether the drawer should be permanent.
+   * @param callback - An optional callback function that receives the drawer state options.
+   *
+   * If the drawer cannot be pinned and is not currently permanent, or if the drawer's
+   * permanent state is already the same as the provided value, the callback is invoked
+   * immediately with the current state options.
+   *
+   * If the drawer is to be made permanent, it opens the drawer and then sets the permanent
+   * state, triggering the appropriate events and setting the session state.
+   *
+   * If the drawer is to be made non-permanent, it directly sets the permanent state,
+   * triggering the appropriate events and setting the session state.
    */
   setPermanent(permanent: boolean, callback?: (options: IDrawerStateOptions) => any): void {
-    if ((!this.canPin() && !this.isPermanent()) || this.isPermanent() === permanent) {
+    if ((!this.canBePinned() && !this.isPermanent()) || this.isPermanent() === permanent) {
       if (callback) callback(this.getStateOptions());
       return;
     }
@@ -344,12 +384,16 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       cb2();
     }
   }
-  /***
-   * permet de minimiser le drawer
+
+  /**
+   * Sets the minimized state of the drawer.
+   *
+   * @param minimized - A boolean indicating whether the drawer should be minimized.
+   * @param callback - An optional callback function that will be called with the drawer state options after the state is set.
    */
   setMinimized(minimized: boolean, callback?: (options: IDrawerStateOptions) => any) {
     const options = this.getStateOptions();
-    if (!canBeMinimizedOrPermanent()) {
+    if (!canDrawerBeMinimizedOrPermanent()) {
       if (callback) callback(options);
       return;
     }
@@ -361,13 +405,29 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       }
     });
   }
+  /**
+   * Determines if the drawer is minimized.
+   *
+   * @returns {boolean} - Returns `true` if the drawer is minimized, otherwise `false`.
+   */
   isMinimized(): boolean {
-    if (!this.isProvider() && !canBeMinimizedOrPermanent()) return false;
+    if (!this.isProvider() && !canDrawerBeMinimizedOrPermanent()) return false;
     return this.isMinimizable() && !!(this.isProvider() ? this.state.providerProps.minimized : this.state.minimized);
   }
+  /**
+   * Determines if the drawer should be permanent.
+   *
+   * @returns {boolean} - Returns `true` if the drawer is permanent, otherwise `false`.
+   */
   isPermanent(): boolean {
     return this.isProvider() ? false : this.getProps().permanent || false;
   }
+  /**
+   * Generates and returns the state options for the drawer component.
+   *
+   * @param {IDrawerStateOptions} [drawerState] - Optional initial state options to be merged.
+   * @returns {IDrawerStateOptions} The complete state options for the drawer.
+   */
   getStateOptions(drawerState?: IDrawerStateOptions): IDrawerStateOptions {
     drawerState = Object.assign({}, drawerState);
     return {
@@ -379,11 +439,16 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       isPermanent: this.isPermanent(),
       isPinned: this.isPinned(),
       isTemporary: !this.isPermanent(),
-      canPin: this.canPin(),
+      canBePinned: this.canBePinned(),
     };
   }
-  /***
-   * cette méthode permet d'ouvrir et de fermer le drawer
+  /**
+   * Toggles the drawer state between open and closed.
+   * 
+   * If the drawer is permanent, it will immediately trigger the toggle event.
+   * Otherwise, it will either open or close the drawer and then trigger the toggle event.
+   * 
+   * @param callback - An optional callback function that will be called with the drawer state options after the toggle event is triggered.
    */
   toggle(callback?: (options: IDrawerStateOptions) => void) {
     const cb = () => {
@@ -403,13 +468,29 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       this.open({ callback: cb });
     }
   }
+  /**
+   * Checks if the drawer is a provider.
+  * @returns True if the drawer is a provider, false otherwise.
+  */
   isProvider() {
     return !!this.state?.isProvider;
   }
+  /**
+   * Returns the width of the device's window, ensuring a minimum width of 280.
+   *
+   * @returns {number} The width of the device's window or 280, whichever is greater.
+   */
   getDeviceWidth(): number {
     return Math.max(Dimensions.get("window").width, 280);
   }
-  getDrawerPosition() {
+
+  /**
+   * Determines the position of the drawer based on the current language direction (RTL or LTR)
+   * and the provided position prop.
+   *
+   * @returns {IDrawerPosition} The position of the drawer, either "left" or "right".
+   */
+  getDrawerPosition(): IDrawerPosition {
     const rtl = I18nManager.isRTL;
     let position: IDrawerPosition = this.getProps()?.position;
     if (position !== "left" && position !== "right") {
@@ -421,14 +502,27 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
         : "left" // invert it
       : position;
   }
-  isPositionRight() {
+  /**
+   * Determines if the drawer position is set to "right".
+   *
+   * @returns {boolean} True if the drawer position is "right", otherwise false.
+   */
+  isPositionRight(): boolean {
     return this.getDrawerPosition() === "right";
   }
-  isOpen() {
+  /**
+   * Checks if the drawer is open.
+   *
+   * @returns {boolean} True if the drawer is open, otherwise false.
+   */
+  isOpen(): boolean {
     return this.state.drawerShown;
   }
-
-  isClosed() {
+  /**
+   * Checks if the drawer is closed.
+   * @returns {boolean} True if the drawer is closed, otherwise false.
+   */
+  isClosed(): boolean {
     return !this.state.drawerShown;
   }
 
@@ -452,31 +546,80 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       }
     });
   }
+  /**
+   * Renders the navigation view of the drawer.
+   *
+   * @returns The navigation view or null if no renderNavigationView prop is provided.
+   */
   renderNavigationView() {
     if (this.props.renderNavigationView) {
       return this.props.renderNavigationView(this.getStateOptions());
     }
     return null;
   }
-  /***
-   * si le mode du drawer petu passer de permanent à temporaire et vice verça
+
+  /**
+   * Determines if the drawer can be pinned (minimized or set to permanent mode.).
+   * The function checks if the current media matches the desktop breakpoint.
+   * @returns {boolean} - Returns true if the drawer can be minimized or set to permanent, otherwise false.
    */
-  canPin() {
-    return canBeMinimizedOrPermanent();
+  canBePinned(): boolean {
+    return canDrawerBeMinimizedOrPermanent();
   }
+
+  /**
+   * Retrieves the properties for the Drawer component.
+   * 
+   * @returns {Partial<IDrawerProps & IDrawerState>} A partial object containing either the provider properties 
+   * if the component is a provider, or a combination of the component's props and state.
+   */
   getProps(): Partial<IDrawerProps & IDrawerState> {
     return this.isProvider() ? this.state.providerProps || {} : { ...this.props, ...this.state };
   }
-  getTestID() {
+
+  /**
+   * Retrieves the test ID for the drawer component.
+   *
+   * @returns {string} The test ID for the drawer component. If the component is a provider, 
+   * it returns "resk-drawer-provider", otherwise it returns "resk-drawer".
+   */
+  getTestID(): string {
     return this.getProps()?.testID || this.isProvider() ? "resk-drawer-provider" : "resk-drawer";
   }
-  isFullScreen() {
+
+  /**
+   * Checks if the drawer is in full-screen mode.
+   *
+   * @returns {boolean} Returns `true` if the drawer is in full-screen mode, otherwise `false`.
+   */
+  isFullScreen(): boolean {
     return !!this.state.fullScreen;
   }
-  canToggleFullScren() {
+
+  /**
+   * Determines if the full screen mode can be toggled.
+   *
+   * @returns {boolean} - Returns `true` if the device is not in mobile media mode, otherwise `false`.
+   */
+  canToggleFullScren(): boolean {
     return !Breakpoints.isMobileMedia();
   }
-  toggleFullScreen() {
+  /**
+   * Toggles the full-screen mode of the drawer component.
+   * 
+   * This method animates the `openValue` state using a spring animation to transition
+   * to the full-screen mode. The animation configuration includes properties such as
+   * `bounciness`, `restSpeedThreshold`, and `useNativeDriver`. The `useNativeDriver`
+   * property is determined based on the `useNativeAnimations` prop.
+   * 
+   * Once the animation completes, the `fullScreen` state is toggled, and the `_isTogglingFullScreen`
+   * flag is reset to `false`.
+   * 
+   * @remarks
+   * This method sets the `_isTogglingFullScreen` flag to `true` at the start to indicate
+   * that the full-screen toggle process is in progress.
+   */
+  toggleFullScreen(): void {
     this._isTogglingFullScreen = true;
     Animated.spring(this.state.openValue, {
       toValue: 1,
@@ -489,7 +632,19 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       });
     });
   }
-  getProviderAppBarProps(handleDrawerWidth?: boolean) {
+  /**
+   * Retrieves the properties for the provider's AppBar component.
+   *
+   * @param {boolean} [handleDrawerWidth] - Optional flag to determine if the drawer width should be handled.
+   * @returns {IAppBarProps} The properties for the AppBar component.
+   *
+   * @remarks
+   * - The `testID` is generated by appending "drawer-title-container" to the component's test ID.
+   * - The `windowWidth` is set based on the drawer width if `handleDrawerWidth` is not explicitly set to false.
+   * - The `onBackActionPress` function closes the drawer and returns false.
+   * - The `backAction` function returns a combination of the provided back action element and a toggle for full screen mode if applicable.
+   */
+  getProviderAppBarProps(handleDrawerWidth?: boolean): IAppBarProps {
     const testID = this.getTestID();
     const appBarProps = Object.assign({}, this.state.providerProps.appBarProps);
     return Object.assign(
@@ -539,13 +694,28 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       </View>
     );
   }
-  getSessionName() {
+
+  /**
+   * Retrieves the session name for the drawer component.
+   * 
+   * @returns {string} The session name. If the component has a `sessionName` prop, it returns that value.
+   * Otherwise, if the component is a provider, it returns "drawer-provider". If neither condition is met,
+   * it returns "drawer".
+   */
+  getSessionName(): string {
     return this.getProps()?.sessionName || this.isProvider() ? "drawer-provider" : "drawer";
   }
-  /***
-   * retourne le min entre la dimension de l'écran et la prop drawerWidth passée en paramètre
+
+  /**
+   * Calculates and returns the width of the drawer.
+   *
+   * @param {boolean} [fullScreen] - Optional parameter to specify if the drawer should be full screen.
+   * If not provided, it defaults to the component's state value.
+   * @returns {number} - The width of the drawer. If the drawer is in full screen mode or if the device
+   * is a mobile device and the component is a provider, it returns the window width. Otherwise, it returns
+   * the drawer width specified in the component's props or a default value.
    */
-  getDrawerWidth(fullScreen?: boolean) {
+  getDrawerWidth(fullScreen?: boolean): number {
     fullScreen = fullScreen || this.state.fullScreen;
     if (fullScreen || (this.isProvider() && Breakpoints.isMobileMedia())) {
       return Dimensions.get("window").width;
@@ -553,12 +723,30 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     const props = this.getProps();
     return Math.min(typeof props?.drawerWidth == "number" ? props?.drawerWidth : getDrawerWidth(this.isProvider()));
   }
+  /**
+   * Retrieves the current authentication session storage.
+   *
+   * @returns {IAuthSessionStorage} The authentication session storage associated with the current session name.
+   */
   get session(): IAuthSessionStorage {
     return getAuthSessionStorage(this.getSessionName());
   }
+  /**
+   * Retrieves a session value associated with the given key.
+   *
+   * @param {string} [key] - The key of the session value to retrieve. If no key is provided, the entire session is returned.
+   * @returns {any} The session value associated with the provided key, or the entire session if no key is provided.
+   */
   getSession(key?: string): any {
     return this.session.get(key);
   }
+  /**
+   * Sets a session value for the given key.
+   *
+   * @param {string} key - The key for the session value.
+   * @param {any} [value] - The value to be set for the session key. If not provided, the value will be undefined.
+   * @returns {any} The result of setting the session value.
+   */
   setSession(key: string, value?: any): any {
     return this.session.set(key, value);
   }
@@ -582,10 +770,16 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     //this.trigger(E_DRAWER_EVENTS.STATE_CHANGED, this.getStateOptions());
   }
 
-  /***
+
+  /**
+   * Opens the drawer with the specified options.
    *
+   * @param {IDrawerProviderProps} [options={}] - The options for opening the drawer.
+   * @param {boolean | Function} [callback=false] - Determines whether to reset provider props or a function that is call after the drawer is opened.
+   *
+   * @returns {void}
    */
-  open(options: IDrawerProviderProps = {}, resetProviderProps: boolean | Function = false): void {
+  open(options: IDrawerProviderProps = {}, callback: boolean | Function = false): void {
     options = Object.assign({}, options);
     const cb = () => {
       this._emitStateChanged(SETTLING);
@@ -598,8 +792,8 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       }).start(() => {
         this._emitStateChanged(IDLE);
         this.trigger(E_DRAWER_EVENTS.OPENED, this.getStateOptions());
-        if (typeof resetProviderProps == "function") {
-          resetProviderProps = resetProviderProps(this.getStateOptions());
+        if (typeof callback == "function") {
+          callback = callback(this.getStateOptions());
         }
         if (typeof options.callback == "function") {
           options.callback(this.getStateOptions());
@@ -615,15 +809,15 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     };
 
     if (this.isProvider()) {
-      resetProviderProps = options?.resetProvider !== false || resetProviderProps;
+      callback = options?.resetProvider !== false || callback;
       this.setState(
         {
-          providerProps: resetProviderProps
-            ? Object.assign({}, options, { resetProvider: resetProviderProps })
+          providerProps: callback
+            ? Object.assign({}, options, { resetProvider: callback })
             : {
               ...Object.assign({}, this.state.providerProps),
               ...options,
-              resetProvider: resetProviderProps,
+              resetProvider: callback,
             },
         },
         cb
@@ -633,8 +827,25 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     }
   }
 
-  /***
-   * permet de fermer le drawer en cours d'exécution
+
+  /**
+   * Closes the drawer with optional settings and a callback function.
+   * 
+   * @param {IDrawerProviderProps} [options] - Optional settings for closing the drawer.
+   * @param {Function} [callback] - Optional callback function to be called after the drawer is closed.
+   * 
+   * The function performs the following actions:
+   * - Merges the provided options with default options.
+   * - Emits a state change event indicating the drawer is settling.
+   * - Defines an `end` function that:
+   *   - Calls the provided callback function, if any, with the current state options.
+   *   - Calls the `options.callback` function, if any, with the current state options.
+   *   - If the drawer is a provider, calls the `onDrawerClose` function from `providerProps`, if defined.
+   *   - Otherwise, calls the `onDrawerClose` function from `props`, if defined.
+   *   - Emits a state change event indicating the drawer is idle.
+   *   - Triggers the `CLOSED` event with the current state options.
+   * - If the drawer is not permanent and is currently open, animates the drawer to a closed state and then calls the `end` function.
+   * - If the drawer is already closed or permanent, directly calls the `end` function.
    */
   close(options?: IDrawerProviderProps, callback?: Function): void {
     options = Object.assign({}, options);
@@ -841,6 +1052,9 @@ const styles = StyleSheet.create({
   toggleFullScreenIcon: {
     marginLeft: -5,
   },
+  permanentBackdrop: {
+    backgroundColor: "transparent",
+  }
 });
 
 
@@ -898,7 +1112,7 @@ export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
       <DrawerContext.Provider value={{ drawer }}>
         <View id={drawer.id} testID={testID} style={[{ flex: (canRender && 1) || 0, backgroundColor: "transparent", flexDirection: permanent ? "row" : "column" }, canRender ? styles.providerVisibleContainer : styles.providerNotVisibleContainer]} {...drawer._panResponder.panHandlers}>
           {!permanent ? (
-            <TouchableWithoutFeedback style={{ pointerEvents }} testID={testID + "-backdrop-container"} onPress={drawer._onOverlayClick.bind(drawer)}>
+            <TouchableWithoutFeedback style={[{ pointerEvents }, styles.permanentBackdrop]} testID={testID + "-backdrop-container"} onPress={drawer._onOverlayClick.bind(drawer)}>
               <Animated.View testID={testID + "-backdrop"} ref={drawer._backdropRef} style={[styles.overlay, { backgroundColor: theme.colors.backdrop }, { pointerEvents }, animatedOverlayStyles]} />
             </TouchableWithoutFeedback>
           ) : null}

@@ -36,9 +36,7 @@ export const ICON_SIZE = 24;
 
 export type IDRAWER_POSITIONS = 'left' | 'right';
 
-/***
- * liste des évènements supportés par le drawer, la liste des évènements observable dont le composant génère
- */
+
 export enum E_DRAWER_EVENTS {
     MINIMIZED = "minimized",
     PERMANENT = "permanent",
@@ -48,11 +46,14 @@ export enum E_DRAWER_EVENTS {
     CLOSED = "closed",
 }
 
-
-export type IDRAWER_TYPES = 'front' | 'back' | 'slide';
-
-
-export const canBeMinimizedOrPermanent = () => Breakpoints.isDesktopMedia();
+/**
+ * Determines if the drawer can be minimized or set to permanent mode.
+ *
+ * This function checks if the current media matches the desktop breakpoint.
+ *
+ * @returns {boolean} True if the current media is desktop, otherwise false.
+ */
+export const canDrawerBeMinimizedOrPermanent = () => Breakpoints.isDesktopMedia();
 
 export const getBackgroundColor = ({ active, theme }: { active?: boolean, theme: ITheme }): string => {
     return active ? Colors.setAlpha(theme.colors.primary, 0.12) as string : 'transparent';

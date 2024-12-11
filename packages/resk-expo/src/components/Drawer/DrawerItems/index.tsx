@@ -9,8 +9,25 @@ import { useRenderMenuItems } from '@components/Menu';
 import { IDrawerContext, IDrawerItemProps, IDrawerItemsProps } from '../types';
 
 
-/****
- * Permet de render une liste des drawer items en side bar
+/**
+ * DrawerItems component renders a list of drawer items, including expandable items.
+ * 
+ * @component
+ * @param {IDrawerItemsProps} props - The props for the DrawerItems component.
+ * @param {string} [props.testID] - Optional test ID for the component.
+ * @param {IDrawerItemProps[]} [props.items] - Custom items to be rendered in the drawer.
+ * @param {React.ForwardedRef<RNView>} ref - Forwarded ref to the underlying RNView component.
+ * @returns {JSX.Element} The rendered DrawerItems component.
+ * 
+ * @example
+ * <DrawerItems
+ *   testID="customDrawerItems"
+ *   items={[{ label: 'Item 1' }, { label: 'Item 2', expandable: true }]}
+ * />
+ * 
+ * @see {@link useDrawer} for drawer context.
+ * @see {@link useTheme} for theme context.
+ * @see {@link useRenderMenuItems} for rendering menu items.
  */
 const DrawerItems = React.forwardRef(({ testID, items: customItems, ...rest }: IDrawerItemsProps, ref: React.ForwardedRef<RNView>) => {
   const { drawer } = useDrawer();

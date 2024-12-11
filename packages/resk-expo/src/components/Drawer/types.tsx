@@ -6,34 +6,168 @@ import { IDict, IObservable } from "@resk/core";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, PanResponderInstance } from "react-native";
 
+/**
+ * Interface representing a Drawer component with observable properties.
+ */
 export interface IDrawer extends IObservable {
+    /**
+     * The last open value of the drawer.
+     */
     _lastOpenValue: any;
+
+    /**
+     * Unique identifier for the drawer.
+     */
     id: string;
+
+    /**
+     * PanResponder instance for handling gesture interactions.
+     */
     _panResponder: PanResponderInstance;
+
+    /**
+     * Indicates if the drawer is in the process of closing.
+     */
     _isClosing: boolean;
+
+    /**
+     * The anchor value used when closing the drawer.
+     */
     _closingAnchorValue: number;
+
+    /**
+     * Reference to the navigation view component.
+     */
     _navigationViewRef: any;
+
+    /**
+     * Reference to the backdrop component.
+     */
     _backdropRef: any;
+
+    /**
+     * Renders the content of the drawer.
+     * @returns The content to be rendered inside the drawer.
+     */
     renderContent(): React.ReactNode;
+
+    /**
+     * Retrieves the session name associated with the drawer.
+     * @returns The session name.
+     */
     getSessionName(): string;
+
+    /**
+     * Retrieves a session value by key.
+     * @param key - The key of the session value to retrieve.
+     * @returns The session value associated with the key.
+     */
     getSession(key?: string): any;
+
+    /**
+     * Sets a session value by key.
+     * @param key - The key of the session value to set.
+     * @param value - The value to set for the session key.
+     * @returns The updated session value.
+     */
     setSession(key: string, value?: any): any;
+
+    /**
+     * Checks if the drawer is minimizable.
+     * @returns True if the drawer is minimizable, false otherwise.
+     */
     isMinimizable(): boolean;
+
+    /**
+     * Checks if the drawer is permanent.
+     * @returns True if the drawer is permanent, false otherwise.
+     */
     isPermanent(): boolean;
+
+    /**
+     * Retrieves the state options for the drawer.
+     * @param drawerState - Optional state options to retrieve.
+     * @returns The state options for the drawer.
+     */
     getStateOptions(drawerState?: IDrawerStateOptions | undefined | null): IDrawerStateOptions;
+
+    /**
+     * Checks if the drawer can be pinned.
+     * @returns True if the drawer can be pinned, false otherwise.
+     */
     canPin(): boolean;
+
+    /**
+     * Retrieves the properties of the drawer.
+     * @returns Partial properties of the drawer.
+     */
     getProps(): Partial<IDrawerProps & IDrawerState>;
+
+    /**
+     * Retrieves the test ID for the drawer.
+     * @returns The test ID.
+     */
     getTestID(): string;
+
+    /**
+     * Checks if the drawer is in full-screen mode.
+     * @returns True if the drawer is in full-screen mode, false otherwise.
+     */
     isFullScreen(): boolean;
+
+    /**
+     * Checks if the drawer can toggle full-screen mode.
+     * @returns True if the drawer can toggle full-screen mode, false otherwise.
+     */
     canToggleFullScren(): boolean;
+
+    /**
+     * Toggles the full-screen mode of the drawer.
+     */
     toggleFullScreen(): void;
+
+    /**
+     * Retrieves the AppBar properties for the provider.
+     * @param handleDrawerWidth - Optional flag to handle drawer width.
+     * @returns The AppBar properties.
+     */
     getProviderAppBarProps(handleDrawerWidth?: boolean): IAppBarProps;
+
+    /**
+     * Renders the title for the provider.
+     * @returns The title to be rendered for the provider.
+     */
     renderProviderTitle(): React.ReactNode;
+
+    /**
+     * Renders the children for the provider.
+     * @returns The children to be rendered for the provider.
+     */
     renderProviderChildren(): React.ReactNode;
 }
 
 
 
+/**
+ * Interface representing the options for the drawer state.
+ * 
+ * @interface IDrawerStateOptions
+ * @extends {IDict}
+ * 
+ * @property {IDrawer} context - The context, the drawer layout itself.
+ * @property {string} [eventName] - The name of the event triggered at the time of option execution.
+ * @property {string} [id] - Represents the ID of the drawer layout.
+ * @property {GestureResponderEvent} [event] - The gesture responder event.
+ * @property {string} [newState] - The new state of the drawer.
+ * @property {boolean} [minimized] - Indicates if the drawer is minimized.
+ * @property {boolean} [isPermanent] - Indicates if the drawer state is permanent.
+ * @property {boolean} [isPinned] - Indicates if the drawer state is pinned, alias to isPermanent.
+ * @property {boolean} [isMinimizable] - Indicates if the drawer can be minimized.
+ * @property {boolean} [canPin] - Indicates if the drawer can be pinned.
+ * @property {boolean} [isTemporary] - Indicates if the drawer is temporary at the current moment.
+ * @property {Object} [nativeEvent] - The native event object.
+ * @property {number} [nativeEvent.offset] - The offset value in the native event.
+ */
 export interface IDrawerStateOptions extends IDict {
     context: IDrawer; //le contexte, le drawer layout même
     eventName?: string; //le nom de l'évènement qui est déclanché au moment de l'exécution de l'option
@@ -50,31 +184,120 @@ export interface IDrawerStateOptions extends IDict {
         offset?: number;
     };
 }
-/***
- * l'interface du state du drawer layout
+
+/**
+ * Interface representing the state of a drawer component.
+ * @interface IDrawerState
  */
 export interface IDrawerState {
+    /**
+     * Indicates if the drawer's accessibility view is modal.
+     */
     accessibilityViewIsModal: boolean;
+
+    /**
+     * Indicates if the drawer is currently shown.
+     */
     drawerShown: boolean;
+
+    /**
+     * Indicates if the drawer is permanent.
+     * Optional.
+     */
     permanent?: boolean;
-    minimized?: boolean; //si le drawer est minimisé
+
+    /**
+     * Indicates if the drawer is minimized.
+     * Optional.
+     */
+    minimized?: boolean;
+
+    /**
+     * Indicates if the drawer is provided by a provider.
+     */
     isProvider: boolean;
+
+    /**
+     * Properties of the drawer provider.
+     */
     providerProps: IDrawerProviderProps;
+
+    /**
+     * Animated value representing the open state of the drawer.
+     */
     openValue: Animated.Value;
-    drawerWidth?: number; //la largeur du drawer
+
+    /**
+     * Width of the drawer.
+     * Optional.
+     */
+    drawerWidth?: number;
+
+    /**
+     * Mode for dismissing the keyboard when interacting with the drawer.
+     * Can be "none" or "on-drag".
+     * Optional.
+     */
     keyboardDismissMode?: "none" | "on-drag";
+
+    /**
+     * Callback function called when the drawer is closed.
+     * Optional.
+     */
     onDrawerClose?: (options: IDrawerStateOptions) => any;
+
+    /**
+     * Callback function called when the drawer is opened.
+     * Optional.
+     */
     onDrawerOpen?: (options: IDrawerStateOptions) => any;
+
+    /**
+     * Callback function called when the drawer is sliding.
+     * Optional.
+     */
     onDrawerSlide?: (options: IDrawerStateOptions) => any;
-    /*** si le drawer est en plein écran */
+
+    /**
+     * Indicates if the drawer is in full screen mode.
+     * Optional.
+     */
     fullScreen?: boolean;
 }
-/***
- * les différentes positions du drawer layout
+
+
+/**
+ * Represents the position of the drawer component.
+ * 
+ * @typedef {("left" | "right" | undefined)} IDrawerPosition
+ * 
+ * @property {"left"} left - The drawer is positioned on the left side.
+ * @property {"right"} right - The drawer is positioned on the right side.
+ * @property {undefined} undefined - The drawer position is not defined.
  */
 export type IDrawerPosition = "left" | "right" | undefined;
-/***
- * les props lorsque le composant est de type provider
+
+
+/**
+ * Props for the DrawerProvider component.
+ * 
+ * @extends IDrawerToggleOptions
+ * 
+ * @property {IDrawerPosition} [position] - The position of the drawer.
+ * @property {boolean} [minimizable] - Indicates if the drawer is minimizable.
+ * @property {boolean} [minimized] - Indicates if the drawer is minimized.
+ * @property {string} [sessionName] - The name of the session to use for persisting the drawer state.
+ * @property {string} [testID] - The test ID of the provider.
+ * @property {any} [children] - The child elements.
+ * @property {boolean} [closeOnOverlayClick] - Indicates if the drawer will close when clicking on the overlay. This is only applicable when the drawer is in temporary mode.
+ * @property {IAppBarProps | null} [appBarProps] - The props for the AppBar component, useful for rendering the AppBar.
+ * @property {boolean} [permanent] - Indicates if the provider is permanent.
+ * @property {(options: IDrawerStateOptions) => any} [onDrawerOpen] - Callback when the drawer is opened.
+ * @property {(options: IDrawerStateOptions) => any} [onDrawerClose] - Callback when the drawer is closed.
+ * @property {(options: IDrawerStateOptions) => any} [onOverlayClick] - Callback when clicking on the overlay.
+ * @property {number} [drawerWidth] - The width of the drawer.
+ * @property {boolean} [resetProvider] - Indicates if the drawer should be reset.
+ * @property {ReactNode | ((options: IDrawerContext & { appBarProps: IAppBarProps }) => ReactNode)} [appBar] - The AppBar component to render within the DrawerProvider. This can be a ReactNode or a function that returns a ReactNode when used.
  */
 export interface IDrawerProviderProps extends IDrawerToggleOptions {
     position?: IDrawerPosition;
@@ -97,68 +320,292 @@ export interface IDrawerProviderProps extends IDrawerToggleOptions {
     appBar?: ReactNode | ((options: IDrawerContext & { appBarProps: IAppBarProps }) => ReactNode);
 }
 
+
 /***
- * interface du contexte lié au drawer à l'instant t
+ * Interface representing the context of the drawer.
  */
 export interface IDrawerContext {
-    drawer: IDrawer; //le contexte lié au drawer
+    drawer: IDrawer;
 }
 
 
+/**
+ * Options for toggling the drawer.
+ * 
+ * This type extends `Animated.SpringAnimationConfig` excluding the `toValue` and `useNativeDriver` properties.
+ * 
+ * @property {function} [callback] - Optional callback function that receives `IDrawerStateOptions` as an argument.
+ */
 export type IDrawerToggleOptions = Omit<Animated.SpringAnimationConfig, "toValue" | "useNativeDriver"> & {
     callback?: (options: IDrawerStateOptions) => void;
 };
 
-/***
- * les props du composant Drawer
+
+/**
+ * @interface IDrawerProps
+ * @extends IViewProps
+ * Interface representing the properties for the Drawer component.
+ * Extends the properties of IViewProps.
+ * @see {@link IViewProps} for more details.
  */
 export interface IDrawerProps extends IViewProps {
+    /**
+     * Indicates if the drawer is a provider.
+     * @default false
+     */
     isProvider?: boolean;
-    minimizable?: boolean; //si le drawer est minimizable
-    minimized?: boolean; // si le drawer est minimisé
-    sessionName?: string; //le nom de la session à utiliser pour persister l'état du drawer
+
+    /**
+     * Determines if the drawer can be minimized.
+     * @default false
+     */
+    minimizable?: boolean;
+
+    /**
+     * Indicates if the drawer is currently minimized.
+     * @default false
+     */
+    minimized?: boolean;
+
+    /**
+     * The name of the session used to persist the drawer's state.
+     */
+    sessionName?: string;
+
+    /**
+     * Specifies the lock mode of the drawer.
+     * - "unlocked": The drawer can be opened and closed freely.
+     * - "locked-closed": The drawer is locked in the closed position.
+     * - "locked-open": The drawer is locked in the open position.
+     */
     drawerLockMode?: "unlocked" | "locked-closed" | "locked-open" | undefined;
+
+    /**
+     * The position of the drawer.
+     */
     position?: IDrawerPosition;
+
+    /**
+     * The width of the drawer.
+     */
     drawerWidth?: number;
+
+    /**
+     * Function to get the state options of the drawer.
+     * @param drawerState - The current state options of the drawer.
+     * @returns The updated state options of the drawer.
+     */
     getStateOptions?(drawerState?: IDrawerStateOptions): IDrawerStateOptions;
-    closeOnOverlayClick?: boolean; // si le drawer sera fermé lorsqu'on clique sur l'espace vide. c'est valable seulement lorsque le drawer est en mode temporaire
+
+    /**
+     * Determines if the drawer should close when clicking on the overlay.
+     * This is only applicable when the drawer is in temporary mode.
+     * @default false
+     */
+    closeOnOverlayClick?: boolean;
+
+    /**
+     * Specifies the keyboard dismiss mode.
+     * - "none": The keyboard will not be dismissed.
+     * - "on-drag": The keyboard will be dismissed when dragging the drawer.
+     */
     keyboardDismissMode?: "none" | "on-drag";
+
+    /**
+     * Callback function triggered when the drawer is closed.
+     * @param options - The state options of the drawer.
+     */
     onDrawerClose?: (options: IDrawerStateOptions) => any;
+
+    /**
+     * Callback function triggered when the drawer is opened.
+     * @param options - The state options of the drawer.
+     */
     onDrawerOpen?: (options: IDrawerStateOptions) => any;
-    onOverlayClick?: (options: IDrawerStateOptions) => any; //lorsque l'on clique sur l'espace autre que le drawer (overlay)
+
+    /**
+     * Callback function triggered when clicking on the overlay.
+     * @param options - The state options of the drawer.
+     */
+    onOverlayClick?: (options: IDrawerStateOptions) => any;
+
+    /**
+     * Callback function triggered when the drawer is sliding.
+     * @param options - The state options of the drawer.
+     */
     onDrawerSlide?: (options: IDrawerStateOptions) => any;
+
+    /**
+     * Callback function triggered when the drawer state changes.
+     * @param drawerState - The new state options of the drawer.
+     */
     onDrawerStateChanged?: (drawerState: IDrawerStateOptions) => any;
+
+    /**
+     * Function to render the navigation view of the drawer.
+     * @param drawerState - The current state options of the drawer.
+     * @returns The React node to be rendered as the navigation view.
+     */
     renderNavigationView?: (drawerState?: IDrawerStateOptions) => React.ReactNode;
+
+    /**
+     * The background color of the status bar.
+     */
     statusBarBackgroundColor?: string;
+
+    /**
+     * Indicates if native animations should be used.
+     * @default false
+     */
     useNativeAnimations?: boolean;
 
+    /**
+     * Determines if gestures are enabled for the drawer.
+     * @default true
+     */
     gesturesEnabled?: boolean;
+
+    /**
+     * Properties for the drawer provider.
+     */
     providerProps?: IDrawerProviderProps;
+
+    /**
+     * The background color of the drawer.
+     */
     backgroundColor?: string;
+
+    /**
+     * The elevation of the drawer.
+     */
     elevation?: number;
+
+    /**
+     * Indicates if the drawer is permanent.
+     * @default false
+     */
     permanent?: boolean;
+
+    /**
+     * Reference to the navigation view.
+     */
     navigationViewRef?: any;
 }
 
 
+/**
+ * Interface representing a drawer session.
+ */
 export interface IDrawerSession {
+    /**
+     * Optional name of the session.
+     */
     sessionName?: string;
+
+    /**
+     * Gets the name of the session.
+     */
     get name(): string;
-    get: (a: string) => any,
-    set: (a: string | object, b: any) => any,
+
+    /**
+     * Retrieves a value associated with the given key.
+     * @param a - The key to retrieve the value for.
+     * @returns The value associated with the key.
+     */
+    get: (a: string) => any;
+
+    /**
+     * Sets a value for the given key or updates multiple values.
+     * @param a - The key to set the value for, or an object containing multiple key-value pairs to update.
+     * @param b - The value to set for the given key.
+     * @returns The result of the set operation.
+     */
+    set: (a: string | object, b: any) => any;
 };
 
-/***
- * les porps du composant IDrawerItems
+
+/**
+ * Interface representing the properties for Drawer items.
+ * 
+ * @extends IMenuItems<IDrawerContext>
+ * 
+ * @example
+ * // Example usage of IDrawerItemsProps
+ * const drawerItems: IDrawerItemsProps = {
+ *   items: [
+ *     { id: 'home', label: 'Home', context: { isActive: true } },
+ *     { id: 'settings', label: 'Settings', context: { isActive: false } }
+ *   ],
+ *   onItemSelect: (item) => console.log(`Selected item: ${item.label}`)
+ * };
+ * 
+ * @remarks
+ * This interface extends the `IMenuItems` interface with a generic type `IDrawerContext`.
+ * It is used to define the properties required for rendering drawer items in a component.
+ * 
+ * @see {@link IMenuItems}
+ * @see {@link IDrawerContext}
  */
 export interface IDrawerItemsProps extends IMenuItems<IDrawerContext> {
 
 }
 
 
+/**
+ * Represents the properties for a drawer item component.
+ * 
+ * @template IDrawerContext - The context type for the drawer.
+ * 
+ * @property {boolean | (() => boolean)} [active] - Specifies whether the item is active or not. 
+ * Can be a boolean value or a function that returns a boolean.
+ * 
+ * @example
+ * // Example of using a boolean value
+ * const drawerItemProps: IDrawerItemProps = {
+ *   active: true,
+ *   routePath: '/home',
+ *   routeParams: { userId: 123 },
+ *   isRendable: true
+ * };
+ * 
+ * @example
+ * // Example of using a function
+ * const drawerItemProps: IDrawerItemProps = {
+ *   active: () => checkIfActive(),
+ *   routePath: '/profile',
+ *   routeParams: { userId: 456 },
+ *   isRendable: false
+ * };
+ * 
+ * @property {string} [routePath] - The route path to navigate to when the drawer item is clicked. 
+ * This route is called when the `onPress` prop does not return false.
+ * 
+ * @example
+ * const drawerItemProps: IDrawerItemProps = {
+ *   routePath: '/settings',
+ *   routeParams: { theme: 'dark' },
+ *   isRendable: true
+ * };
+ * 
+ * @property {IDict} [routeParams] - The parameters for the route.
+ * 
+ * @example
+ * const drawerItemProps: IDrawerItemProps = {
+ *   routePath: '/details',
+ *   routeParams: { itemId: 789 },
+ *   isRendable: true
+ * };
+ * 
+ * @property {boolean} [isRendable] - Specifies whether the item should be rendered or not.
+ * 
+ * @example
+ * const drawerItemProps: IDrawerItemProps = {
+ *   isRendable: false
+ * };
+ */
 export type IDrawerItemProps = IMenuItemBase<IDrawerContext> & {
-    active?: boolean | (() => boolean); //specifie si l'item est actif où pas
-    routePath?: string;//le chemin de route vers lequel naviguer lorsqu'on clique sur le drawer; cette route est appelée lorsque la props onPress ne retourne pas false
-    routeParams?: IDict; //les paramètres de la route
+    active?: boolean | (() => boolean);
+    routePath?: string;
+    routeParams?: IDict;
     isRendable?: boolean;
 }

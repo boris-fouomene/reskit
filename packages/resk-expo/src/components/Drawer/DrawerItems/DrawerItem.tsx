@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { GestureResponderEvent, StyleSheet, TextStyle, } from 'react-native';
 import { Colors } from "@theme";
@@ -10,8 +11,25 @@ import { Button } from '@components/Button';
 
 
 
-/** 
- * update by @borisFouomene. for usage, @see : https://callstack.github.io/react-native-paper/drawer-item.html
+/**
+ * DrawerItem component renders a button with customizable properties for use in a drawer navigation.
+ * It supports various states such as active, minimized, and sectioned, and allows for custom styling and behavior.
+ *
+ * @param {boolean | (() => boolean)} customActive - Custom active state or a function returning the active state.
+ * @param {string} testID - Test identifier for the component.
+ * @param {string} routePath - Path of the route associated with the drawer item.
+ * @param {object} routeParams - Parameters for the route.
+ * @param {boolean} section - Indicates if the item is a section header.
+ * @param {string} color - Custom text color for the item.
+ * @param {object} style - Custom style for the item.
+ * @param {object} labelProps - Properties for the label.
+ * @param {object} iconProps - Properties for the icon.
+ * @param {number} borderRadius - Border radius for the item.
+ * @param {function} customOnPress - Custom onPress handler.
+ * @param {boolean} closeOnPress - Indicates if the drawer should close on press.
+ * @param {object} rest - Additional properties.
+ *
+ * @returns {JSX.Element} The rendered DrawerItem component.
  */
 const DrawerItem = ({
   active: customActive,

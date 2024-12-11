@@ -7,6 +7,12 @@ const DESKTOP_DRAWER_WIDTH = 280;
 const PROVIDER_DRAWER_WIDTH = 400;
 
 
+/**
+ * Calculates the width of the drawer based on the device type and whether the user is a provider.
+ *
+ * @param {boolean} [isProvider=false] - Indicates if the user is a provider.
+ * @returns {number} - The calculated width of the drawer.
+ */
 export const getDrawerWidth = (isProvider: boolean = false): number => {
     const isDesk = Breakpoints.isDesktopMedia();
     if (isDesk) {

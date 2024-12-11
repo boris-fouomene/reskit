@@ -1,3 +1,4 @@
+
 import React, { Fragment, ReactNode, useMemo } from "react";
 import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
@@ -26,10 +27,218 @@ const VX_MAX = 0.1;
 const IDLE = "Idle";
 const DRAGGING = "Dragging";
 const SETTLING = "Settling";
-
+/**
+ * Drawer component that extends ObservableComponent and implements IDrawer interface.
+ * It provides functionality for a drawer that can be opened, closed, pinned, unpinned, minimized, and toggled.
+ * It also supports gestures for opening and closing the drawer.
+ *
+ * @class Drawer
+ * @extends {ObservableComponent<IDrawerProps, IDrawerState>}
+ * @implements {IDrawer}
+ *
+ * @property {any} _lastOpenValue - The last open value of the drawer.
+ * @property {string} id - The unique identifier for the drawer.
+ * @property {PanResponderInstance} _panResponder - The PanResponder instance for handling gestures.
+ * @property {boolean} _isClosing - Indicates if the drawer is in the process of closing.
+ * @property {boolean} _isTogglingFullScreen - Indicates if the drawer is toggling full screen mode.
+ * @property {number} _closingAnchorValue - The anchor value for closing the drawer.
+ * @property {React.RefObject<any>} _navigationViewRef - Reference to the navigation view.
+ * @property {React.RefObject<any>} _backdropRef - Reference to the backdrop view.
+ *
+ * @constructor
+ * @param {IDrawerProps} props - The properties for the drawer component.
+ *
+ * @method isMinimizable - Checks if the drawer is minimizable.
+ * @returns {boolean} - True if the drawer is minimizable, false otherwise.
+ *
+ * @method trigger - Overrides the trigger function defined in the event observer.
+ * @param {IObservableEvent} event - The event to trigger.
+ * @param {...any[]} args - Additional arguments for the event.
+ * @returns {IObservable | null} - The observable instance or null.
+ *
+ * @method pin - Pins the drawer, making it permanent.
+ * @param {Function} [callback] - Optional callback function to execute after pinning.
+ *
+ * @method unpin - Unpins the drawer, making it temporary.
+ * @param {Function} [callback] - Optional callback function to execute after unpinning.
+ *
+ * @method isPinned - Checks if the drawer is pinned.
+ * @returns {boolean} - True if the drawer is pinned, false otherwise.
+ *
+ * @method setPermanent - Sets the drawer to permanent or temporary mode.
+ * @param {boolean} permanent - True to set the drawer to permanent mode, false to set it to temporary mode.
+ * @param {Function} [callback] - Optional callback function to execute after setting the mode.
+ *
+ * @method setMinimized - Minimizes or restores the drawer.
+ * @param {boolean} minimized - True to minimize the drawer, false to restore it.
+ * @param {Function} [callback] - Optional callback function to execute after minimizing or restoring.
+ *
+ * @method isMinimized - Checks if the drawer is minimized.
+ * @returns {boolean} - True if the drawer is minimized, false otherwise.
+ *
+ * @method isPermanent - Checks if the drawer is permanent.
+ * @returns {boolean} - True if the drawer is permanent, false otherwise.
+ *
+ * @method getStateOptions - Gets the state options for the drawer.
+ * @param {IDrawerStateOptions} [drawerState] - Optional drawer state options to merge.
+ * @returns {IDrawerStateOptions} - The merged drawer state options.
+ *
+ * @method toggle - Toggles the drawer open or closed.
+ * @param {Function} [callback] - Optional callback function to execute after toggling.
+ *
+ * @method isProvider - Checks if the drawer is a provider.
+ * @returns {boolean} - True if the drawer is a provider, false otherwise.
+ *
+ * @method getDeviceWidth - Gets the device width.
+ * @returns {number} - The device width.
+ *
+ * @method getDrawerPosition - Gets the position of the drawer (left or right).
+ * @returns {IDrawerPosition} - The position of the drawer.
+ *
+ * @method isPositionRight - Checks if the drawer position is right.
+ * @returns {boolean} - True if the drawer position is right, false otherwise.
+ *
+ * @method isOpen - Checks if the drawer is open.
+ * @returns {boolean} - True if the drawer is open, false otherwise.
+ *
+ * @method isClosed - Checks if the drawer is closed.
+ * @returns {boolean} - True if the drawer is closed, false otherwise.
+ *
+ * @method componentDidMount - Lifecycle method called after the component is mounted.
+ *
+ * @method renderNavigationView - Renders the navigation view of the drawer.
+ * @returns {ReactNode | null} - The navigation view or null.
+ *
+ * @method canPin - Checks if the drawer can be pinned.
+ * @returns {boolean} - True if the drawer can be pinned, false otherwise.
+ *
+ * @method getProps - Gets the properties of the drawer.
+ * @returns {Partial<IDrawerProps & IDrawerState>} - The properties of the drawer.
+ *
+ * @method getTestID - Gets the test ID of the drawer.
+ * @returns {string} - The test ID of the drawer.
+ *
+ * @method isFullScreen - Checks if the drawer is in full screen mode.
+ * @returns {boolean} - True if the drawer is in full screen mode, false otherwise.
+ *
+ * @method canToggleFullScren - Checks if the drawer can toggle full screen mode.
+ * @returns {boolean} - True if the drawer can toggle full screen mode, false otherwise.
+ *
+ * @method toggleFullScreen - Toggles the drawer full screen mode.
+ *
+ * @method getProviderAppBarProps - Gets the app bar properties for the provider.
+ * @param {boolean} [handleDrawerWidth] - Optional flag to handle drawer width.
+ * @returns {IAppBarProps} - The app bar properties.
+ *
+ * @method renderProviderTitle - Renders the provider title.
+ * @returns {ReactNode} - The provider title.
+ *
+ * @method renderProviderChildren - Renders the provider children.
+ * @returns {ReactNode} - The provider children.
+ *
+ * @method renderContent - Renders the content of the drawer.
+ * @returns {ReactNode} - The content of the drawer.
+ *
+ * @method getSessionName - Gets the session name of the drawer.
+ * @returns {string} - The session name of the drawer.
+ *
+ * @method getDrawerWidth - Gets the width of the drawer.
+ * @param {boolean} [fullScreen] - Optional flag to get the width in full screen mode.
+ * @returns {number} - The width of the drawer.
+ *
+ * @method getSession - Gets the session value for a given key.
+ * @param {string} [key] - The key to get the session value for.
+ * @returns {any} - The session value.
+ *
+ * @method setSession - Sets the session value for a given key.
+ * @param {string} key - The key to set the session value for.
+ * @param {any} [value] - The value to set in the session.
+ * @returns {any} - The set session value.
+ *
+ * @method render - Renders the drawer component.
+ * @returns {ReactNode} - The rendered drawer component.
+ *
+ * @method _onOverlayClick - Handles the overlay click event.
+ * @param {GestureResponderEvent} e - The gesture responder event.
+ *
+ * @method _emitStateChanged - Emits the state changed event.
+ * @param {string} newState - The new state of the drawer.
+ *
+ * @method open - Opens the drawer.
+ * @param {IDrawerProviderProps} [options] - Optional options for opening the drawer.
+ * @param {boolean | Function} [resetProviderProps] - Optional flag or function to reset provider properties.
+ *
+ * @method close - Closes the drawer.
+ * @param {IDrawerProviderProps} [options] - Optional options for closing the drawer.
+ * @param {Function} [callback] - Optional callback function to execute after closing.
+ *
+ * @method _handleDrawerOpen - Handles the drawer open event.
+ *
+ * @method _handleDrawerClose - Handles the drawer close event.
+ *
+ * @method _shouldSetPanResponder - Determines if the pan responder should be set.
+ * @param {GestureResponderEvent} e - The gesture responder event.
+ * @param {PanResponderGestureState} gestureState - The gesture state.
+ * @returns {boolean} - True if the pan responder should be set, false otherwise.
+ *
+ * @method _panResponderGrant - Handles the pan responder grant event.
+ *
+ * @method _panResponderMove - Handles the pan responder move event.
+ * @param {GestureResponderEvent} e - The gesture responder event.
+ * @param {PanResponderGestureState} gestureState - The gesture state.
+ *
+ * @method getThreshold - Gets the threshold value for the drawer.
+ * @returns {number} - The threshold value.
+ *
+ * @method _panResponderRelease - Handles the pan responder release event.
+ * @param {GestureResponderEvent} e - The gesture responder event.
+ * @param {PanResponderGestureState} gestureState - The gesture state.
+ *
+ * @method _isLockedClosed - Checks if the drawer is locked closed.
+ * @returns {boolean} - True if the drawer is locked closed, false otherwise.
+ *
+ * @method _isLockedOpen - Checks if the drawer is locked open.
+ * @returns {boolean} - True if the drawer is locked open, false otherwise.
+ *
+ * @method _getOpenValueForX - Gets the open value for a given x position.
+ * @param {number} x - The x position.
+ * @example : 
+ * import {Drawer} from '@resk/expo';
+  const MyComponent = () => {
+    return (
+      <Drawer
+        isProvider={false}
+        drawerWidth={300}
+        onDrawerOpen={(options) => console.log('Drawer opened', options)}
+        onDrawerClose={(options) => console.log('Drawer closed', options)}
+      >
+        <View>
+          <Text>Drawer Content</Text>
+        </View>
+      </Drawer>
+    );
+  };
+ * 
+ * @returns {number} - The open value.
+ */
 export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerState> implements IDrawer {
+  /**
+   * Stores the last open value of the drawer.
+   * @type {any}
+   * @private
+   */
   _lastOpenValue: any = null;
+  /**
+   * Unique identifier for the drawer instance.
+   * @type {string}
+   * @readonly
+   */
   readonly id = uniqid(this.isProvider() ? "drawerProviderId-" : "drawerId-");
+  /**
+   * PanResponder instance to handle gesture interactions.
+   * @type {PanResponderInstance}
+   * @readonly
+   */
   readonly _panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: this._shouldSetPanResponder.bind(this),
     onPanResponderGrant: this._panResponderGrant.bind(this),
@@ -38,10 +247,35 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     onPanResponderRelease: this._panResponderRelease.bind(this),
     onPanResponderTerminate: () => { },
   });
+  /**
+   * Indicates whether the drawer is in the process of closing.
+   * @type {boolean}
+   * @private
+   */
   _isClosing: boolean = false;
+  /**
+   * Indicates whether the drawer is toggling full screen mode.
+   * @type {boolean}
+   * @private
+   */
   _isTogglingFullScreen: boolean = false;
+  /**
+   * Stores the anchor value when the drawer is closing.
+   * @type {number}
+   * @private
+   */
   _closingAnchorValue: number = 0;
+  /**
+   * Reference to the navigation view element.
+   * @type {React.RefObject<any>}
+   * @private
+   */
   _navigationViewRef: any = React.createRef();
+  /**
+   * Reference to the backdrop element.
+   * @type {React.RefObject<any>}
+   * @private
+   */
   _backdropRef: any = React.createRef();
   constructor(props: IDrawerProps) {
     super(props);

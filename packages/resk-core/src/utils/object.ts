@@ -1,4 +1,5 @@
-import { isPlainObject, merge, cloneDeep } from "lodash";
+import { IDict } from "../types";
+import { isPlainObject, merge } from "lodash";
 
 /**
  * Checks if the given variable is a plain object.
@@ -76,7 +77,23 @@ export const isPlainObj = function (obj: any): boolean {
  * ```
  */
 export function cloneObject(source: any): any {
-  return cloneDeep(source);
+  if (Array.isArray(source)) {
+    const clone = [];
+    for (var i = 0; i < source.length; i++) {
+      clone[i] = cloneObject(source[i]);
+    }
+    return clone;
+  } else if (isPlainObj(source)) {
+    const clone: IDict = {};
+    for (var prop in source) {
+      if (source.hasOwnProperty(prop)) {
+        clone[prop] = cloneObject(source[prop]);
+      }
+    }
+    return clone;
+  } else {
+    return source;
+  }
 };
 
 /**

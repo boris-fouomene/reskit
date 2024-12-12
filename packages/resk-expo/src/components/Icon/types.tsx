@@ -339,6 +339,12 @@ export interface IPrefixToFontIconsSetNames {
      * Zocial set.
      */
     zocial: "Zocial";
+
+    /**
+     * The prefix for Material Community Icons.
+     * Material Community Icons is the default icon set.
+     */
+    "": "MaterialCommunityIcons";
 }
 
 

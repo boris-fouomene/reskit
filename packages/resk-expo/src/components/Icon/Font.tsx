@@ -1,4 +1,4 @@
-import React, { ComponentProps, forwardRef } from "react";
+import React, { forwardRef } from "react";
 import { isNonNullString, defaultStr } from "@resk/core";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -10,7 +10,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import Zocial from "@expo/vector-icons/Zocial";
-import Theme, { useTheme } from "@theme";
+import { useTheme } from "@theme";
 import Colors from "@colors";
 import { IFontIconProps, IPrefixToFontIconsSetNames } from "./types";
 import Platform from "@platform/index";
@@ -59,23 +59,11 @@ const isIos = Platform.isIos();
  * @returns {JSX.Element | null} Returns the icon element, or null if the icon is not defined.
  */
 const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, style, color, ...props }, ref) => {
-    let IconSet: any = MaterialCommunityIcons, iconSetName: string = "", iconSetPrefix = "";
     const theme = useTheme();
     color = Colors.isValid(color) ? color : theme.colors.text;
-    const nameString = defaultStr(name).trim();
-    for (let i in PREFIX_TO_ICONS_SET_NAMES) {
-        if (isFontIconName(nameString, i)) {
-            iconSetPrefix = i;
-            iconSetName = PREFIX_TO_ICONS_SET_NAMES[i as keyof IPrefixToFontIconsSetNames];
-            IconSet = fontsObjects[iconSetName as keyof IFontsObject];
-            break;
-        }
-    }
-    if (iconSetPrefix) {
-        iconSetPrefix += "-";
-    }
-    if (!nameString || !IconSet || (iconSetPrefix && !IconSet)) {
-        console.warn(`Icon not defined for FontIcon component, icon [${nameString}], please specify a supported icon from https://github.com/expo/vector-icons/MaterialCommunityIcons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
+    let { iconSetName, iconSetPrefix, iconSet: IconSet, iconName } = getFontIconSet(name);
+    if (!iconSetName || !IconSet || !iconName) {
+        console.warn(`Icon not defined for FontIcon component, icon [${name}], please specify a supported icon from https://github.com/expo/vector-icons/MaterialCommunityIcons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
     return <IconSet
@@ -83,10 +71,94 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, style, colo
         size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
         ref={ref}
         color={color}
-        name={nameString.trim().ltrim(iconSetPrefix).ltrim("-").trim()}
+        name={iconName}
         style={[theme.styles.RTL, style]}
     />;
 });
+
+
+/**
+ * Retrieves the font icon set details based on the provided icon name.
+ *
+ * @param name - The name of the icon to retrieve the set details for.
+ * @returns An object containing the icon set name, icon set prefix, icon name, and the icon set itself.
+ *
+ * @remarks
+ * This function checks if the provided icon name is non-null and non-empty. It then iterates through the
+ * `PREFIX_TO_ICONS_SET_NAMES` to find a matching icon set prefix. If a match is found, it constructs and
+ * returns an object with the icon set details. If no match is found, it returns an object with empty strings
+ * and `null` for the icon set.
+ *
+ * @example
+ * ```typescript
+ * const iconDetails = getFontIconSet("fa-solid-home");
+ * console.log(iconDetails);
+ * // Output:
+ * // {
+ * //   iconSetName: "FontAwesome",
+ * //   iconSetPrefix: "fa-solid",
+ * //   iconName: "home",
+ * //   iconSet: FontAwesomeIcons
+ * // }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * const iconDetails = getFontIconSet("material-account");
+ * console.log(iconDetails);
+ * // Output:
+ * // {
+ * //   iconSetName: "MaterialDesignIcons",
+ * //   iconSetPrefix: "material",
+ * //   iconName: "account",
+ * //   iconSet: MaterialDesignIcons
+ * // }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * const iconDetails = getFontIconSet("unknown-icon");
+ * console.log(iconDetails);
+ * // Output:
+ * // {
+ * //   iconSetName: "",
+ * //   iconSetPrefix: "",
+ * //   iconName: "",
+ * //   iconSet: null
+ * // }
+ * ```
+ */
+const getFontIconSet = (name: string): { iconSetName: string, iconSetPrefix: string, iconName: string, iconSet: IFontIconSet | null } => {
+    if (isNonNullString(name)) {
+        const nameString = defaultStr(name).trim();
+        for (let iconSetPrefix in PREFIX_TO_ICONS_SET_NAMES) {
+            if (!iconSetPrefix || (isFontIconName(nameString, iconSetPrefix))) {
+                const iconPrefix = iconSetPrefix ? (iconSetPrefix.rtrim("-") + "-") : "";
+                const iconSetName = PREFIX_TO_ICONS_SET_NAMES[iconSetPrefix as keyof IPrefixToFontIconsSetNames];
+                const iconName = nameString.trim().ltrim(iconPrefix).trim().ltrim("-").trim();
+                const iconSet = fontsObjects[iconSetName];
+                if (iconSet && iconSet.glyphMap[iconName]) {
+                    return {
+                        iconSetName,
+                        iconSetPrefix,
+                        iconSet,
+                        iconName
+                    };
+                }
+            }
+        }
+    }
+    return { iconSetName: "", iconName: "", iconSetPrefix: "", iconSet: null };
+}
+/**
+ * Checks if the provided font icon name is valid.
+ *
+ * @param name - The name of the font icon to validate.
+ * @returns `true` if the font icon name is valid, otherwise `false`.
+ */
+export const isValidFontIconName = (name: string): boolean => {
+    return getFontIconSet(name).iconSet !== null;
+}
 
 
 export const DEFAULT_FONT_ICON_SIZE = 20;
@@ -128,7 +200,7 @@ export const DEFAULT_FONT_ICON_SIZE = 20;
  * const isValid = isFontIconName("material-home", "material"); // Returns true
  * const isValid = isFontIconName("material-home", "antdesign"); // Returns false
  */
-export const isFontIconName = (name: string, iconSetName: string): boolean => {
+const isFontIconName = (name: string, iconSetName: string): boolean => {
     /**
      * Checks if both the icon name and icon set name are non-null and non-empty strings.
      * 
@@ -141,35 +213,87 @@ export const isFontIconName = (name: string, iconSetName: string): boolean => {
      */
     name = name.toLowerCase();
     iconSetName = iconSetName.toLowerCase().trim();
-
+    if (iconSetName) {
+        iconSetName = iconSetName.rtrim("-") + "-";
+    }
     /**
      * Checks if the icon name starts with the icon set name followed by a hyphen.
      * 
      * If the icon name matches the specified pattern, the function returns `true`. Otherwise, it returns `false`.
      */
-    return name.startsWith(iconSetName + "-");
+    return name.startsWith(iconSetName);
 };
 
-/***
- * Defines the supported font icon sets.
- * 
- * @interface IFontsObject
- */
-type IFontsObject = {
-    MaterialCommunityIcons: any;
-    FontAwesome5: any;
-    AntDesign: any;
-    Fontisto: any;
-    Foundation: any;
-    Ionicons: any;
-    MaterialIcons: any;
-    Octicons: any;
-    SimpleLineIcons: any;
-    Zocial: any;
-}
 
-/** An object containing all the available font icon sets. */
-const fontsObjects: IFontsObject = {
+/**
+ * Represents a type that can be any of the specified icon sets.
+ * 
+ * This type is a union of the following icon sets:
+ * - MaterialCommunityIcons
+ * - FontAwesome5
+ * - AntDesign
+ * - Fontisto
+ * - Foundation
+ * - Ionicons
+ * - Octicons
+ * - SimpleLineIcons
+ * - Zocial
+ * - MaterialIcons
+ */
+export type IFontIconSet = typeof MaterialCommunityIcons | typeof FontAwesome5 | typeof AntDesign | typeof Fontisto | typeof Foundation | typeof Ionicons | typeof Octicons | typeof SimpleLineIcons | typeof Zocial | typeof MaterialIcons;
+
+
+/**
+ * Represents the set of possible icon font names that can be used in the application.
+ * 
+ * @typedef {("MaterialCommunityIcons" | "FontAwesome5" | "AntDesign" | "Fontisto" | "Foundation" | "Ionicons" | "Octicons" | "SimpleLineIcons" | "Zocial" | "MaterialIcons")} IFontIconSetName
+ * 
+ * @property {"MaterialCommunityIcons"} MaterialCommunityIcons - Icon set from Material Community Icons.
+ * @property {"FontAwesome5"} FontAwesome5 - Icon set from Font Awesome 5.
+ * @property {"AntDesign"} AntDesign - Icon set from Ant Design.
+ * @property {"Fontisto"} Fontisto - Icon set from Fontisto.
+ * @property {"Foundation"} Foundation - Icon set from Foundation.
+ * @property {"Ionicons"} Ionicons - Icon set from Ionicons.
+ * @property {"Octicons"} Octicons - Icon set from Octicons.
+ * @property {"SimpleLineIcons"} SimpleLineIcons - Icon set from Simple Line Icons.
+ * @property {"Zocial"} Zocial - Icon set from Zocial.
+ * @property {"MaterialIcons"} MaterialIcons - Icon set from Material Icons.
+ */
+export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome5" | "AntDesign" | "Fontisto" | "Foundation" | "Ionicons" | "Octicons" | "SimpleLineIcons" | "Zocial" | "MaterialIcons";
+
+/**
+ * Represents an object containing various icon font types.
+ * 
+ * @typedef {Object} IFontIconSets
+ * @property {typeof MaterialCommunityIcons} MaterialCommunityIcons - The MaterialCommunityIcons font type.
+ * @property {typeof FontAwesome5} FontAwesome5 - The FontAwesome5 font type.
+ * @property {typeof AntDesign} AntDesign - The AntDesign font type.
+ * @property {typeof Fontisto} Fontisto - The Fontisto font type.
+ * @property {typeof Foundation} Foundation - The Foundation font type.
+ * @property {typeof Ionicons} Ionicons - The Ionicons font type.
+ * @property {typeof MaterialIcons} MaterialIcons - The MaterialIcons font type.
+ * @property {typeof Octicons} Octicons - The Octicons font type.
+ * @property {typeof SimpleLineIcons} SimpleLineIcons - The SimpleLineIcons font type.
+ * @property {typeof Zocial} Zocial - The Zocial font type.
+ */
+export type IFontIconSets = Record<IFontIconSetName, IFontIconSet>;
+
+/**
+ * An object containing various font icon libraries.
+ * 
+ * @type {IFontIconSets}
+ * @property {typeof MaterialCommunityIcons} MaterialCommunityIcons - The Material Community Icons library.
+ * @property {typeof FontAwesome5} FontAwesome5 - The FontAwesome 5 Icons library.
+ * @property {typeof AntDesign} AntDesign - The AntDesign Icons library.
+ * @property {typeof Fontisto} Fontisto - The Fontisto Icons library.
+ * @property {typeof Foundation} Foundation - The Foundation Icons library.
+ * @property {typeof Ionicons} Ionicons - The Ionicons library.
+ * @property {typeof MaterialIcons} MaterialIcons - The Material Icons library.
+ * @property {typeof Octicons} Octicons - The Octicons library.
+ * @property {typeof SimpleLineIcons} SimpleLineIcons - The Simple Line Icons library.
+ * @property {typeof Zocial} Zocial - The Zocial Icons library.
+ */
+const fontsObjects: IFontIconSets = {
     MaterialCommunityIcons,
     FontAwesome5,
     AntDesign,
@@ -200,6 +324,7 @@ const PREFIX_TO_ICONS_SET_NAMES: IPrefixToFontIconsSetNames = {
     octicons: "Octicons",
     'simple-line': "SimpleLineIcons",
     zocial: "Zocial",
+    "": "MaterialCommunityIcons"
 }
 
 /**
@@ -226,7 +351,7 @@ const PREFIX_TO_ICONS_SET_NAMES: IPrefixToFontIconsSetNames = {
  *     });
  * });
  */
-export function loadFontIcons(): Promise<any[]> {
+function loadFontIcons(): Promise<any[]> {
     return Promise.all(fonts.map((font, index) => {
         const iconSetName = fontsByIndex[index];
         const fontName = Object.keys(font)[0]?.toLowerCase();
@@ -421,8 +546,99 @@ type IFontWithCustomIcons = typeof FontIcon & {
     */
     PRINT: "printer";
 
+    /**
+     * Checks if the provided font icon name is valid.
+     *
+     * @param name - The name of the font icon to validate.
+     * @returns `true` if the font icon name is valid, otherwise `false`.
+     */
+    isValidName: (name: string) => boolean;
+
+
+    /**
+     * Loads the fonts for the application.
+     * 
+     * This function is responsible for loading all the font icons defined in the
+     * `fonts` array. It returns a promise that resolves when all fonts have been
+     * successfully loaded. If any font fails to load, it resolves with an error 
+     * message indicating which font could not be found.
+     * 
+     * @returns {Promise<any[]>} A promise that resolves when all fonts are loaded.
+     * 
+     * @description The promise resolves with an array of results, each containing
+     * the status and message of the font loading process. If all fonts load 
+     * successfully, the status will be true for each entry; otherwise, it will be 
+     * false for any failed loads.
+     * 
+     * @example
+     * loadFontIcons().then(results => {
+     *     results.forEach(result => {
+     *         if (!result.status) {
+     *             console.error(result.message);
+     *         }
+     *     });
+     * });
+     */
+    loadFonts: () => Promise<any[]>;
+
+    /**
+     * Retrieves the font icon set details based on the provided icon name.
+     *
+     * @param name - The name of the icon to retrieve the set details for.
+     * @returns An object containing the icon set name, icon set prefix, icon name, and the icon set itself.
+     *
+     * @remarks
+     * This function checks if the provided icon name is non-null and non-empty. It then iterates through the
+     * `PREFIX_TO_ICONS_SET_NAMES` to find a matching icon set prefix. If a match is found, it constructs and
+     * returns an object with the icon set details. If no match is found, it returns an object with empty strings
+     * and `null` for the icon set.
+     *
+     * @example
+     * ```typescript
+     * const iconDetails = getFontIconSet("fa-solid-home");
+     * console.log(iconDetails);
+     * // Output:
+     * // {
+     * //   iconSetName: "FontAwesome",
+     * //   iconSetPrefix: "fa-solid",
+     * //   iconName: "home",
+     * //   iconSet: FontAwesomeIcons
+     * // }
+     * ```
+     *
+     * @example
+     * ```typescript
+     * const iconDetails = getIconSet("material-account");
+     * console.log(iconDetails);
+     * // Output:
+     * // {
+     * //   iconSetName: "MaterialDesignIcons",
+     * //   iconSetPrefix: "material",
+     * //   iconName: "account",
+     * //   iconSet: MaterialDesignIcons
+     * // }
+     * ```
+     *
+     * @example
+     * ```typescript
+     * const iconDetails = getIconSet("unknown-icon");
+     * console.log(iconDetails);
+     * // Output:
+     * // {
+     * //   iconSetName: "",
+     * //   iconSetPrefix: "",
+     * //   iconName: "",
+     * //   iconSet: null
+     * // }
+     * ```
+     */
+    getIconSet: (name: string) => { iconSetName: string, iconSetPrefix: string, iconName: string, iconSet: IFontIconSet | null };
 };
 const FontWithCustomIcons = FontIcon as unknown as IFontWithCustomIcons;
+
+FontWithCustomIcons.isValidName = isValidFontIconName;
+FontWithCustomIcons.loadFonts = loadFontIcons;
+FontWithCustomIcons.getIconSet = getFontIconSet;
 
 /**
  * Represents the icon name used for the back navigation button in the application.

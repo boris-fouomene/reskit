@@ -1,6 +1,5 @@
 import { createContext, useContext } from "react";
-import { E_DRAWER_EVENTS } from "./utils";
-import { IDrawerContext, IDrawerStateOptions } from "./types";
+import { IDrawerContext, IDrawerCurrentState, IDrawerEvent } from "./types";
 
 
 
@@ -30,12 +29,13 @@ export const useDrawer = () => {
 
 
 /**
+ * @function useDrawerCurrentState
  * Custom hook to get the current state options of the drawer.
  *
- * @param {E_DRAWER_EVENTS | E_DRAWER_EVENTS[]} [event] - Optional event or array of events to filter the drawer state.
- * @returns {IDrawerStateOptions | null} The current state options of the drawer, or null if not available.
+ * @param {IDrawerEvent | IDrawerEvent[]} [event] - Optional event or array of events to filter the drawer state.
+ * @returns {IDrawerCurrentState | null} The current state options of the drawer, or null if not available.
  */
-export const useGetDrawerState = (event?: E_DRAWER_EVENTS | E_DRAWER_EVENTS[]): IDrawerStateOptions | null => {
+export const useDrawerCurrentState = (event?: IDrawerEvent | IDrawerEvent[]): IDrawerCurrentState | null => {
   const { drawer } = useDrawer();
   return drawer?.getStateOptions() || null;
 }

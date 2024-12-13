@@ -89,7 +89,7 @@ export interface IDrawer extends IObservable {
      * @param drawerState - Optional state options to retrieve.
      * @returns The state options for the drawer.
      */
-    getStateOptions(drawerState?: IDrawerStateOptions | undefined | null): IDrawerStateOptions;
+    getStateOptions(drawerState?: IDrawerCurrentState | undefined | null): IDrawerCurrentState;
 
     /**
      * Checks if the drawer can be pinned.
@@ -160,7 +160,7 @@ export interface IDrawer extends IObservable {
    * 
    * @param callback - An optional callback function that will be called with the drawer state options after the toggle event is triggered.
    */
-    toggle(callback?: (options: IDrawerStateOptions) => void): void;
+    toggle(callback?: (options: IDrawerCurrentState) => void): void;
 
     /**
      * Sets the minimized state of the drawer.
@@ -168,7 +168,7 @@ export interface IDrawer extends IObservable {
      * @param minimized - A boolean indicating whether the drawer should be minimized.
      * @param callback - An optional callback function that will be called with the drawer state options after the state is set.
      */
-    setMinimized: (minimized: boolean, callback?: (options: IDrawerStateOptions) => any) => void;
+    setMinimized: (minimized: boolean, callback?: (options: IDrawerCurrentState) => any) => void;
 
 
     /**
@@ -187,7 +187,7 @@ export interface IDrawer extends IObservable {
     * If the drawer is to be made non-permanent, it directly sets the permanent state,
     * triggering the appropriate events and setting the session state.
     */
-    setPermanent(permanent: boolean, callback?: (options: IDrawerStateOptions) => any): void;
+    setPermanent(permanent: boolean, callback?: (options: IDrawerCurrentState) => any): void;
 
 
     /**
@@ -211,14 +211,14 @@ export interface IDrawer extends IObservable {
      *
      * @param callback - An optional callback function that receives the drawer state options after the permanent state is set.
      */
-    pin(callback?: (options: IDrawerStateOptions) => any): void;
+    pin(callback?: (options: IDrawerCurrentState) => any): void;
 
     /**
      * Sets the drawer to be non-permanent.
      *
      * @param callback - An optional callback function that receives the drawer state options after the permanent state is set.
      */
-    unpin(callback?: (options: IDrawerStateOptions) => any): void;
+    unpin(callback?: (options: IDrawerCurrentState) => any): void;
 
     /**
      * Checks if the drawer is pinned (is permanent).
@@ -415,7 +415,7 @@ export interface IDrawer extends IObservable {
 /**
  * Interface representing the options for the drawer state.
  * 
- * @interface IDrawerStateOptions
+ * @interface IDrawerCurrentState
  * @extends {IDict}
  * 
  * @property {IDrawer} context - The context, the drawer layout itself.
@@ -432,13 +432,14 @@ export interface IDrawer extends IObservable {
  * @property {Object} [nativeEvent] - The native event object.
  * @property {number} [nativeEvent.offset] - The offset value in the native event.
  */
-export interface IDrawerStateOptions extends IDict {
-    context: IDrawer; //le contexte, le drawer layout même
-    eventName?: string; //le nom de l'évènement qui est déclanché au moment de l'exécution de l'option
-    id?: string; //represente l'id du drawer layout
+export interface IDrawerCurrentState {
+    context: IDrawer;
+    eventName?: string;
+    id?: string;
     event?: GestureResponderEvent;
     newState?: string;
     minimized?: boolean;
+    minimizable?: boolean;
     isPermanent?: boolean;
     isPinned?: boolean; //si le drawer state est épinglé, alias à isPermanant
     isMinimizable?: boolean;
@@ -508,19 +509,19 @@ export interface IDrawerState {
      * Callback function called when the drawer is closed.
      * Optional.
      */
-    onDrawerClose?: (options: IDrawerStateOptions) => any;
+    onDrawerClose?: (options: IDrawerCurrentState) => any;
 
     /**
      * Callback function called when the drawer is opened.
      * Optional.
      */
-    onDrawerOpen?: (options: IDrawerStateOptions) => any;
+    onDrawerOpen?: (options: IDrawerCurrentState) => any;
 
     /**
      * Callback function called when the drawer is sliding.
      * Optional.
      */
-    onDrawerSlide?: (options: IDrawerStateOptions) => any;
+    onDrawerSlide?: (options: IDrawerCurrentState) => any;
 
     /**
      * Indicates if the drawer is in full screen mode.
@@ -556,9 +557,9 @@ export type IDrawerPosition = "left" | "right" | undefined;
  * @property {boolean} [closeOnOverlayClick] - Indicates if the drawer will close when clicking on the overlay. This is only applicable when the drawer is in temporary mode.
  * @property {IAppBarProps | null} [appBarProps] - The props for the AppBar component, useful for rendering the AppBar.
  * @property {boolean} [permanent] - Indicates if the provider is permanent.
- * @property {(options: IDrawerStateOptions) => any} [onDrawerOpen] - Callback when the drawer is opened.
- * @property {(options: IDrawerStateOptions) => any} [onDrawerClose] - Callback when the drawer is closed.
- * @property {(options: IDrawerStateOptions) => any} [onOverlayClick] - Callback when clicking on the overlay.
+ * @property {(options: IDrawerCurrentState) => any} [onDrawerOpen] - Callback when the drawer is opened.
+ * @property {(options: IDrawerCurrentState) => any} [onDrawerClose] - Callback when the drawer is closed.
+ * @property {(options: IDrawerCurrentState) => any} [onOverlayClick] - Callback when clicking on the overlay.
  * @property {number} [drawerWidth] - The width of the drawer.
  * @property {boolean} [resetProvider] - Indicates if the drawer should be reset.
  * @property {ReactNode | ((options: IDrawerContext & { appBarProps: IAppBarProps }) => ReactNode)} [appBar] - The AppBar component to render within the DrawerProvider. This can be a ReactNode or a function that returns a ReactNode when used.
@@ -573,9 +574,9 @@ export interface IDrawerProviderProps extends IDrawerToggleOptions {
     closeOnOverlayClick?: boolean; // si le drawer sera fermé lorsqu'on clique sur l'espace vide. c'est valable seulement lorsque le drawer est en mode temporaire
     appBarProps?: IAppBarProps | null; //les pross du composant AppBar, utiles pour le rendu du appBar
     permanent?: boolean; //su le provider est permanent
-    onDrawerOpen?: (options: IDrawerStateOptions) => any; //lorsque le drawer est open
-    onDrawerClose?: (options: IDrawerStateOptions) => any; //lorsque le drawer est closed
-    onOverlayClick?: (options: IDrawerStateOptions) => any; //lorsque l'on clique sur l'espace autre que le drawer (overlay)
+    onDrawerOpen?: (options: IDrawerCurrentState) => any; //lorsque le drawer est open
+    onDrawerClose?: (options: IDrawerCurrentState) => any; //lorsque le drawer est closed
+    onOverlayClick?: (options: IDrawerCurrentState) => any; //lorsque l'on clique sur l'espace autre que le drawer (overlay)
     drawerWidth?: number; //la largeur du drawer
     resetProvider?: boolean; //si le drawer  doit être réinitialisé
     /****l'on peut directement décider de render l'appBar au composant Drawer provider
@@ -598,10 +599,10 @@ export interface IDrawerContext {
  * 
  * This type extends `Animated.SpringAnimationConfig` excluding the `toValue` and `useNativeDriver` properties.
  * 
- * @property {function} [callback] - Optional callback function that receives `IDrawerStateOptions` as an argument.
+ * @property {function} [callback] - Optional callback function that receives `IDrawerCurrentState` as an argument.
  */
 export type IDrawerToggleOptions = Omit<Animated.SpringAnimationConfig, "toValue" | "useNativeDriver"> & {
-    callback?: (options: IDrawerStateOptions) => void;
+    callback?: (options: IDrawerCurrentState) => void;
 };
 
 
@@ -659,7 +660,7 @@ export interface IDrawerProps extends IViewProps {
      * @param drawerState - The current state options of the drawer.
      * @returns The updated state options of the drawer.
      */
-    getStateOptions?(drawerState?: IDrawerStateOptions): IDrawerStateOptions;
+    getStateOptions?(drawerState?: IDrawerCurrentState): IDrawerCurrentState;
 
     /**
      * Determines if the drawer should close when clicking on the overlay.
@@ -679,38 +680,38 @@ export interface IDrawerProps extends IViewProps {
      * Callback function triggered when the drawer is closed.
      * @param options - The state options of the drawer.
      */
-    onDrawerClose?: (options: IDrawerStateOptions) => any;
+    onDrawerClose?: (options: IDrawerCurrentState) => any;
 
     /**
      * Callback function triggered when the drawer is opened.
      * @param options - The state options of the drawer.
      */
-    onDrawerOpen?: (options: IDrawerStateOptions) => any;
+    onDrawerOpen?: (options: IDrawerCurrentState) => any;
 
     /**
      * Callback function triggered when clicking on the overlay.
      * @param options - The state options of the drawer.
      */
-    onOverlayClick?: (options: IDrawerStateOptions) => any;
+    onOverlayClick?: (options: IDrawerCurrentState) => any;
 
     /**
      * Callback function triggered when the drawer is sliding.
      * @param options - The state options of the drawer.
      */
-    onDrawerSlide?: (options: IDrawerStateOptions) => any;
+    onDrawerSlide?: (options: IDrawerCurrentState) => any;
 
     /**
      * Callback function triggered when the drawer state changes.
      * @param drawerState - The new state options of the drawer.
      */
-    onDrawerStateChanged?: (drawerState: IDrawerStateOptions) => any;
+    onDrawerStateChanged?: (drawerState: IDrawerCurrentState) => any;
 
     /**
      * Function to render the navigation view of the drawer.
      * @param drawerState - The current state options of the drawer.
      * @returns The React node to be rendered as the navigation view.
      */
-    renderNavigationView?: (drawerState: IDrawerStateOptions) => React.ReactNode;
+    renderNavigationView?: (drawerState: IDrawerCurrentState) => React.ReactNode;
 
     /**
      * The background color of the status bar.
@@ -873,3 +874,65 @@ export type IDrawerItemProps = IMenuItemBase<IDrawerContext> & {
     routeParams?: IDict;
     isRendable?: boolean;
 }
+
+/**
+ * Represents the various events that can occur in a drawer component.
+ * 
+ * The `IDrawerEvent` type is a union of string literals that define the 
+ * different states or actions that a drawer can undergo. This type is 
+ * particularly useful for event handling in UI components where 
+ * a drawer is used to show or hide content.
+ * 
+ * ### Possible Values:
+ * - `"minimized"`: Indicates that the drawer has been minimized, 
+ *   typically reducing its size to show only a handle or icon.
+ * - `"permanent"`: Indicates that the drawer is in a permanent state, 
+ *   meaning it is always visible and does not toggle.
+ * - `"toggle"`: Represents an action where the drawer's visibility 
+ *   is toggled between open and closed states.
+ * - `"state_changed"`: Signifies that the state of the drawer has 
+ *   changed, which could be due to user interaction or programmatic 
+ *   changes.
+ * - `"opened"`: Indicates that the drawer has been opened, making 
+ *   its contents visible to the user.
+ * - `"closed"`: Indicates that the drawer has been closed, hiding 
+ *   its contents from the user.
+ * 
+ * ### Example Usage:
+ * 
+ * Here is an example of how you might use the `IDrawerEvent` type 
+ * in a function that handles drawer events:
+ * 
+ * ```typescript
+ * function handleDrawerEvent(event: IDrawerEvent): void {
+ *     switch (event) {
+ *         case "minimized":
+ *             console.log("The drawer has been minimized.");
+ *             break;
+ *         case "permanent":
+ *             console.log("The drawer is in a permanent state.");
+ *             break;
+ *         case "toggle":
+ *             console.log("Toggling the drawer state.");
+ *             break;
+ *         case "state_changed":
+ *             console.log("The drawer state has changed.");
+ *             break;
+ *         case "opened":
+ *             console.log("The drawer is now opened.");
+ *             break;
+ *         case "closed":
+ *             console.log("The drawer is now closed.");
+ *             break;
+ *         default:
+ *             console.error("Unknown drawer event.");
+ *     }
+ * }
+ * ```
+ * 
+ * In this example, the `handleDrawerEvent` function takes an event 
+ * of type `IDrawerEvent` and logs a message based on the event type. 
+ * This demonstrates how to effectively utilize the `IDrawerEvent` 
+ * type in event handling scenarios.
+ */
+export type IDrawerEvent = "minimized" | "permanent" | "toggle" | "state_changed" | "opened" | "closed";

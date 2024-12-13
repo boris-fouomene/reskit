@@ -1,10 +1,11 @@
 import { IBreakpoints } from "@src/breakpoints/types";
 import { ITheme } from "@theme/types";
 import { EdgeInsets } from 'react-native-safe-area-context';
+import { IDrawerNavigationViewProps } from "@layouts/DrawerNavigationView";
 
 /**
  * @group ReskExpoProvider
- * @interface ReskExpoProviderProps
+ * @interface IReskExpoProviderProps
  * Type definition for the props of the ReskExpoProvider component.
  * This type includes the properties that can be passed to the provider.
  * 
@@ -31,18 +32,21 @@ import { EdgeInsets } from 'react-native-safe-area-context';
  * </ReskExpoProvider>
  * ```
  *  @property {IBreakpoints} [breakpoints] - An optional breakpoints object that defines the application breakpoints.
+ * 
+ *  @property {IDrawerNavigationViewProps} [drawerNavigationViewProps] - An optional object that defines the properties for the drawer navigation view.
  */
-export type ReskExpoProviderProps = {
+export type IReskExpoProviderProps = {
     children?: React.ReactNode;
     theme?: ITheme;
     breakpoints?: IBreakpoints;
+    drawerNavigationViewProps?: IDrawerNavigationViewProps;
 }
 
 /**
  * @group ReskExpoProvider
  * @interface IReskExpoProvider
  * Type definition for the ReskExpoProvider interface (the provider itself).
- * This type extends the ReskExpoProviderProps type and adds additional properties and methods.
+ * This type extends the IReskExpoProviderProps type and adds additional properties and methods.
  * 
  * @property {ITheme} theme - The theme object that is required for the provider.
  * 
@@ -71,7 +75,7 @@ export type ReskExpoProviderProps = {
  * });
  * ```
  */
-export type IReskExpoProvider = Omit<ReskExpoProviderProps, "type"> & {
+export type IReskExpoProvider = Omit<IReskExpoProviderProps, "type"> & {
     theme: ITheme;
     updateTheme: (theme: ITheme) => any;
 

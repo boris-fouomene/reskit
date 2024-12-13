@@ -1,6 +1,6 @@
 import { getTextContent, usePrevious, useStateCallback } from "@utils";
 import Theme, { useTheme } from "@theme";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { GestureResponderEvent } from "react-native";
 import { IToggleableProps } from "./types";
 import { getToggleableColor } from "./colors";

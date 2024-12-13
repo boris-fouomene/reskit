@@ -1,6 +1,6 @@
 import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
-import { IFieldFormatValueResult, IFormatValueFormat } from "@resk/core";
+import { IFormatValueResult, IFormatValueFormat } from "@resk/core";
 import { IOnChangeOptions } from "../../types";
 import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextInputProps } from "react-native";
 import { ReactNode } from "react";
@@ -56,7 +56,7 @@ export type ITextInputType = InputModeOptions | "number" | "password";
  * @interface ITextInputCallbackOptions
  * @description
  * Defines the options for callback functions related to text input fields. like functions used to render left, right component in text input
- * The `ITextInputCallbackOptions` type extends the `IFieldFormatValueResult` 
+ * The `ITextInputCallbackOptions` type extends the `IFormatValueResult` 
  * type and includes additional properties that provide context about the 
  * state of the text input component. This type is particularly useful for 
  * handling various input scenarios and customizing the behavior of text 
@@ -109,7 +109,7 @@ export type ITextInputType = InputModeOptions | "number" | "password";
  * This type is beneficial for managing complex interactions with text input 
  * components, allowing for a more dynamic and responsive user interface.
  */
-export type ITextInputCallbackOptions = IFieldFormatValueResult & {
+export type ITextInputCallbackOptions = IFormatValueResult & {
     textColor: string;
     /**
      * Indicates if the component is isFocused.
@@ -149,7 +149,7 @@ export type ITextInputOnChangeEvent = NativeSyntheticEvent<TextInputChangeEventD
  * specific to text field changes.
  * 
  * @interface ITextInputOnChangeOptions
- * @extends {IFieldFormatValueResult} Represents the result of a formatted value obtained via the `formatValue` function in the @resk/core package.
+ * @extends {IFormatValueResult} Represents the result of a formatted value obtained via the `formatValue` function in the @resk/core package.
  * @extends {IOnChangeOptions<any, ITextInputOnChangeEvent>}
  * 
  * @example
@@ -166,7 +166,7 @@ export type ITextInputOnChangeEvent = NativeSyntheticEvent<TextInputChangeEventD
  * @property {boolean} [isFocused] - Indicates whether the text field is isFocused at the time of the change.
  * @property {string} [fieldName] - The name of the field if it's part of a form.
  */
-export type ITextInputOnChangeOptions = IFieldFormatValueResult & IOnChangeOptions<any, ITextInputOnChangeEvent> & {
+export type ITextInputOnChangeOptions = IFormatValueResult & IOnChangeOptions<any, ITextInputOnChangeEvent> & {
     event?: ITextInputOnChangeEvent;
     value?: any;
     previousValue?: any;

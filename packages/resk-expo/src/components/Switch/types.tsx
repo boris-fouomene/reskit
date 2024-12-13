@@ -1,6 +1,6 @@
 import { ILabelProps } from "@components/Label";
 import { ReactNode } from "react";
-import { GestureResponderEvent, NativeSyntheticEvent, PressableProps, SwitchChangeEvent, SwitchProps } from "react-native";
+import { GestureResponderEvent, PressableProps, SwitchChangeEvent, SwitchProps } from "react-native";
 import { ITooltipBaseProps } from "@components/Tooltip/types";
 import { IOnChangeOptions } from "@src/types";
 

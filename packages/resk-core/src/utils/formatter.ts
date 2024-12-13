@@ -1,4 +1,4 @@
-import { IFieldFormatValueOptions, IFieldFormatValueResult } from "../types";
+import { IFormatValueOptions, IFormatValueResult } from "../types";
 import { DEFAULT_DATE_FORMAT, DEFAULT_DATE_TIME_FORMAT, DEFAULT_TIME_FORMAT, formatDate, isDateObj, isValidDate } from "./date";
 
 /**
@@ -12,7 +12,7 @@ import { DEFAULT_DATE_FORMAT, DEFAULT_DATE_TIME_FORMAT, DEFAULT_TIME_FORMAT, for
  * @param {IFormatValueOptions} options - The options for formatting, adhering to the IFormatValueOptions interface.
  * @param {boolean} returnObject - Optional. If true, the function will return an object instead of a formatted string.
  * 
- * @returns {IFieldFormatValueResult} - An object containing:
+ * @returns {IFormatValueResult} - An object containing:
  *   - formattedValue: The formatted output based on the provided options.
  *   - isDecimalType: A boolean indicating if the value can be treated as a decimal.
  *   - value: The original input value.
@@ -39,7 +39,7 @@ import { DEFAULT_DATE_FORMAT, DEFAULT_DATE_TIME_FORMAT, DEFAULT_TIME_FORMAT, for
  * // }
  * ```
  */
-export const formatValueToObject = ({ value, type, format, dateFormat, ...rest }: IFieldFormatValueOptions): IFieldFormatValueResult => {
+export const formatValueToObject = ({ value, type, format, dateFormat, ...rest }: IFormatValueOptions): IFormatValueResult => {
     const canValueBeDecimal = type && ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());
     let parsedValue = value;
 
@@ -99,7 +99,7 @@ export const formatValueToObject = ({ value, type, format, dateFormat, ...rest }
  * the `formatValueToObject` function to obtain the formatted value and then returns it 
  * as a string. This is useful for scenarios where only the formatted string is needed.
  *
- * @param options - The options for formatting, adhering to the IFieldFormatValueOptions interface.
+ * @param options - The options for formatting, adhering to the IFormatValueOptions interface.
  * @ param returnObject - Optional. If true, the function will return an object instead of a formatted string.
  * 
  * @returns {string} - The formatted value as a string.
@@ -116,7 +116,7 @@ export const formatValueToObject = ({ value, type, format, dateFormat, ...rest }
  * // Output: "123.45 formatted"
  * ```
  */
-export const formatValue = (options: IFieldFormatValueOptions, returnObject: boolean = false): string => {
+export const formatValue = (options: IFormatValueOptions, returnObject: boolean = false): string => {
     const { formattedValue, parsedValue } = formatValueToObject(options);
     // Return the formatted value as a string.
     return formattedValue;

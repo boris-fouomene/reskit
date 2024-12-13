@@ -1,5 +1,5 @@
 import { withHOC, IWithHOCOptions } from "@hooks/withHOC";
-import { useDrawer, useGetDrawerState } from "./hooks";
+import { useDrawer, useDrawerCurrentState } from "./hooks";
 import _Drawer from "./Drawer";
 import { IDrawerProps } from "./types";
 import { IReactComponent } from "@src/types";
@@ -61,6 +61,6 @@ Drawer.ExpandableItem = ExpandableDrawerItem;
 
 
 
-export { Drawer, useDrawer, useGetDrawerState };
+export { Drawer, useDrawer, useDrawerCurrentState };
 export * from "./types";
 

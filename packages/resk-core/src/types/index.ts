@@ -554,7 +554,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: I
  *
  * ### Parameters:
  * - `options`: 
- *   - **Type**: `IFieldFormatValueOptions`
+ *   - **Type**: `IFormatValueOptions`
  *   - An object containing options for formatting the value. The options may 
  *     include the value to be formatted, the expected type of the value, 
  *     and a custom format specification.
@@ -580,7 +580,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: I
  * console.log(formattedValue); // Outputs: "$1234.57"
  * ```
  */
-export type IFormatValueFunc = ((options: IFieldFormatValueOptions) => string);
+export type IFormatValueFunc = ((options: IFormatValueOptions) => string);
 
 
 
@@ -629,7 +629,7 @@ export type IFormatValueFormat = "number" | "money" | "custom" | IFormatValueFun
  *
  * ### Example Usage:
  * ```typescript
- * const options: IFieldFormatValueOptions = {
+ * const options: IFormatValueOptions = {
  *   value: 1234.56,
  *   type: "number",
  *   format: "money" // Example format for monetary values
@@ -640,7 +640,7 @@ export type IFormatValueFormat = "number" | "money" | "custom" | IFormatValueFun
  * ```
  * 
  *  * ```typescript
- * const options: IFieldFormatValueOptions = {
+ * const options: IFormatValueOptions = {
  *   value: 1234.56,
  *   type: "number",
  *   format: "formatUSD" // Example format for monetary values in $USD
@@ -650,7 +650,7 @@ export type IFormatValueFormat = "number" | "money" | "custom" | IFormatValueFun
  * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
  * ```
  */
-export interface IFieldFormatValueOptions {
+export interface IFormatValueOptions {
   value?: any; // The value to be formatted
   type?: any; // The expected type of the value
   /**
@@ -662,10 +662,10 @@ export interface IFieldFormatValueOptions {
 }
 
 /**
- * @interface IFieldFormatValueResult
+ * @interface IFormatValueResult
  * Represents the result of a formatted value obtained via the `formatValue` function.
  *
- * This interface extends the `IFieldFormatValueOptions` interface and contains 
+ * This interface extends the `IFormatValueOptions` interface and contains 
  * properties that provide information about the formatted value, its type, 
  * and the parsed representation.
  *
@@ -693,7 +693,7 @@ export interface IFieldFormatValueOptions {
  *
  * ### Example Usage:
  * ```typescript
- * const result: IFieldFormatValueResult = {
+ * const result: IFormatValueResult = {
  *   formattedValue: "$1,234.56",
  *   isDecimalType: true,
  *   parsedValue: 1234.56,
@@ -703,7 +703,7 @@ export interface IFieldFormatValueOptions {
  * console.log(result.isDecimalType);   // Outputs: true
  * ```
  */
-export interface IFieldFormatValueResult extends IFieldFormatValueOptions {
+export interface IFormatValueResult extends IFormatValueOptions {
   formattedValue: string; // The value to be formatted
   isDecimalType: boolean; //if the type linked to the function supports decimal values
   parsedValue: any; //defaults to a number when it is a number

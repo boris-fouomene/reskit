@@ -11,7 +11,6 @@ import { getLabelOrLeftOrRightProps } from "@hooks/index";
 import { ITextInputCallbackOptions, ITextInputProps, ITextInputType, IUseTextInputProps } from "./types";
 import { ITheme } from "@theme/types";
 import { IStyle } from "@src/types";
-import Animated, { Easing, useSharedValue, useAnimatedStyle, withTiming, SharedValue, useAnimatedRef, runOnUI, measure, MeasuredDimensions } from 'react-native-reanimated';
 
 /**
  * @description
@@ -76,11 +75,11 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
     const isLabelEmbededVariant = variant === "labelEmbeded";
     const { testID } = rest;
     const innerRef = useRef<RNTextInput | null>(null);
-    const labelContent = !isEmpty(label) && editable ? <TouchableOpacity onPress={(e) => {
+    const labelContent = !isEmpty(label) && editable ? <Pressable testID={testID + "-text-input-pressable-container"} onPress={(e) => {
         if (innerRef?.current && typeof innerRef.current.focus === "function") {
             innerRef.current.focus();
         }
-    }}>{label}</TouchableOpacity> : label;
+    }}>{label}</Pressable> : label;
     return <View  {...containerProps}>
         {isLabelEmbededVariant ? null : labelContent}
         <View {...contentContainerProps}>

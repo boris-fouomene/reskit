@@ -11,10 +11,10 @@ import { Animated, Dimensions, Keyboard, PanResponder, StyleSheet, TouchableWith
 import { Portal } from "@components/Portal";
 import View from "@components/View";
 import { Colors, useTheme } from "@theme";
-import { getDrawerWidth, E_DRAWER_EVENTS } from "./utils";
+import { getDrawerWidth } from "./utils";
 import FontIcon from "@components/Icon/Font";
 import { Tooltip } from "@components/Tooltip";
-import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProviderProps, IDrawerState, IDrawerStateOptions } from "./types";
+import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProviderProps, IDrawerState, IDrawerCurrentState } from "./types";
 import { DrawerContext } from "./hooks";
 import { ISessionStorage } from "@resk/core/build/session";
 import { IAuthSessionStorage } from "@src/auth/types";
@@ -80,8 +80,8 @@ const SETTLING = "Settling";
  * @returns {boolean} - True if the drawer is permanent, false otherwise.
  *
  * @method getStateOptions - Gets the state options for the drawer.
- * @param {IDrawerStateOptions} [drawerState] - Optional drawer state options to merge.
- * @returns {IDrawerStateOptions} - The merged drawer state options.
+ * @param {IDrawerCurrentState} [drawerState] - Optional drawer state options to merge.
+ * @returns {IDrawerCurrentState} - The merged drawer state options.
  *
  * @method toggle - Toggles the drawer open or closed.
  * @param {Function} [callback] - Optional callback function to execute after toggling.
@@ -326,7 +326,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    *
    * @param callback - An optional callback function that receives the drawer state options after the permanent state is set.
    */
-  pin(callback?: (options: IDrawerStateOptions) => any): void {
+  pin(callback?: (options: IDrawerCurrentState) => any): void {
     this.setPermanent(true, callback);
   }
 
@@ -335,7 +335,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    *
    * @param callback - An optional callback function that receives the drawer state options after the permanent state is set.
    */
-  unpin(callback?: (options: IDrawerStateOptions) => any): void {
+  unpin(callback?: (options: IDrawerCurrentState) => any): void {
     this.setPermanent(false, callback);
   }
   /**
@@ -363,7 +363,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * If the drawer is to be made non-permanent, it directly sets the permanent state,
    * triggering the appropriate events and setting the session state.
    */
-  setPermanent(permanent: boolean, callback?: (options: IDrawerStateOptions) => any): void {
+  setPermanent(permanent: boolean, callback?: (options: IDrawerCurrentState) => any): void {
     if ((!this.canBePinned() && !this.isPermanent()) || this.isPermanent() === permanent) {
       if (callback) callback(this.getStateOptions());
       return;
@@ -371,8 +371,8 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     const cb2 = () => {
       this.setState({ permanent }, () => {
         const options = this.getStateOptions();
-        this.trigger(E_DRAWER_EVENTS.PERMANENT, options);
-        this.setSession(E_DRAWER_EVENTS.PERMANENT, permanent);
+        this.trigger("permanent", options);
+        this.setSession("permanent", permanent);
         if (callback) {
           callback(options);
         }
@@ -391,15 +391,15 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * @param minimized - A boolean indicating whether the drawer should be minimized.
    * @param callback - An optional callback function that will be called with the drawer state options after the state is set.
    */
-  setMinimized(minimized: boolean, callback?: (options: IDrawerStateOptions) => any) {
+  setMinimized(minimized: boolean, callback?: (options: IDrawerCurrentState) => any) {
     const options = this.getStateOptions();
     if (!canDrawerBeMinimizedOrPermanent()) {
       if (callback) callback(options);
       return;
     }
     this.setState({ minimized }, () => {
-      this.trigger(E_DRAWER_EVENTS.MINIMIZED, options);
-      this.setSession(E_DRAWER_EVENTS.MINIMIZED, minimized);
+      this.trigger("minimized", options);
+      this.setSession("minimized", minimized);
       if (callback) {
         callback(options);
       }
@@ -425,10 +425,10 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
   /**
    * Generates and returns the state options for the drawer component.
    *
-   * @param {IDrawerStateOptions} [drawerState] - Optional initial state options to be merged.
-   * @returns {IDrawerStateOptions} The complete state options for the drawer.
+   * @param {IDrawerCurrentState} [drawerState] - Optional initial state options to be merged.
+   * @returns {IDrawerCurrentState} The complete state options for the drawer.
    */
-  getStateOptions(drawerState?: IDrawerStateOptions): IDrawerStateOptions {
+  getStateOptions(drawerState?: IDrawerCurrentState): IDrawerCurrentState {
     drawerState = Object.assign({}, drawerState);
     return {
       ...drawerState,
@@ -450,10 +450,10 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * 
    * @param callback - An optional callback function that will be called with the drawer state options after the toggle event is triggered.
    */
-  toggle(callback?: (options: IDrawerStateOptions) => void) {
+  toggle(callback?: (options: IDrawerCurrentState) => void) {
     const cb = () => {
       const options = this.getStateOptions();
-      this.trigger(E_DRAWER_EVENTS.TOGGLE, options);
+      this.trigger("toggle", options);
       if (callback) {
         callback(options);
       }
@@ -542,7 +542,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
 
       this._lastOpenValue = value;
       if (this.props.onDrawerSlide) {
-        this.props.onDrawerSlide(this.getStateOptions({ nativeEvent: { offset: value } } as IDrawerStateOptions));
+        this.props.onDrawerSlide(this.getStateOptions({ nativeEvent: { offset: value } } as IDrawerCurrentState));
       }
     });
   }
@@ -767,7 +767,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     if (this.props.onDrawerStateChanged) {
       this.props.onDrawerStateChanged({ newState, context: this });
     }
-    //this.trigger(E_DRAWER_EVENTS.STATE_CHANGED, this.getStateOptions());
+    this.trigger("state_changed", this.getStateOptions());
   }
 
 
@@ -791,7 +791,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
         ...options,
       }).start(() => {
         this._emitStateChanged(IDLE);
-        this.trigger(E_DRAWER_EVENTS.OPENED, this.getStateOptions());
+        this.trigger("opened", this.getStateOptions());
         if (typeof callback == "function") {
           callback = callback(this.getStateOptions());
         }
@@ -854,7 +854,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     /*************  ✨ Codeium Command ⭐  *************/
     /**
      * A callback function that is called when the drawer is closed. It is used to cleanup and emit the CLOSED event.
-     * @param {IDrawerStateOptions} options - The options passed to the drawer.
+     * @param {IDrawerCurrentState} options - The options passed to the drawer.
      */
     /******  f1cf9943-958c-4b60-8b76-104ac1d2c950  *******/
     const end = () => {
@@ -872,7 +872,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
         this.props.onDrawerClose(this.getStateOptions());
       }
       this._emitStateChanged(IDLE);
-      this.trigger(E_DRAWER_EVENTS.CLOSED, this.getStateOptions());
+      this.trigger("closed", this.getStateOptions());
     };
     if (!this.isPermanent() && this.isOpen()) {
       Animated.spring(this.state.openValue, {

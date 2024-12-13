@@ -6,12 +6,14 @@ import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, crea
 import useStateCallback from '@utils/stateCallback';
 import { isObj } from '@resk/core';
 import stableHash from "stable-hash";
-import { ReskExpoProviderProps } from './types';
+import { IReskExpoProviderProps } from './types';
 import { ReskExpoContext } from './hooks';
 import { PortalProvider } from "@components/Portal";
 import Breakpoints from "@src/breakpoints";
 import { Preloader, Dialog } from "@components/Dialog";
 import { useSafeAreaInsets, SafeAreaProvider } from 'react-native-safe-area-context';
+import { Drawer } from "@components/Drawer";
+import { DrawerNavigationView } from "@layouts/DrawerNavigationView";
 
 export * from "./types";
 export * from "./hooks";
@@ -25,7 +27,7 @@ export * from "./hooks";
  * available to all child components through React's Context API. The provider also handles
  * theme changes via the `useEffect` hook to ensure the theme is updated when the custom theme changes.
  *
- * @param {ReskExpoProviderProps} props - The properties passed to the provider.
+ * @param {IReskExpoProviderProps} props - The properties passed to the provider.
  * @param {React.ReactNode} [props.children] - The components that will be wrapped by the provider.
  * @param {ITheme} [props.theme] - A custom theme to override or extend the default theme.
  * @param {any} rest - Additional properties passed to the provider for customization.
@@ -48,8 +50,9 @@ export * from "./hooks";
  * }
  * ```
  */
-export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ...rest }: ReskExpoProviderProps) {
+export function ReskExpoProvider({ children, theme: customTheme, breakpoints, drawerNavigationViewProps, ...rest }: IReskExpoProviderProps) {
   const safeAreaInsets = useSafeAreaInsets();
+  drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
    * to be executed once the theme state is updated.
@@ -112,7 +115,9 @@ export function ReskExpoProvider({ children, theme: customTheme, breakpoints, ..
           <>
             <Preloader.Provider />
             <Dialog.Provider.Provider />
-            {children}
+            <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>
+              {children}
+            </Drawer>
           </>
         </PortalProvider>
       </ReskExpoContext.Provider>

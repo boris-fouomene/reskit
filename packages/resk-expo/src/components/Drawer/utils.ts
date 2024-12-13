@@ -34,18 +34,6 @@ export const MINIMIZED_ICON_SIZE = 32;
 
 export const ICON_SIZE = 24;
 
-export type IDRAWER_POSITIONS = 'left' | 'right';
-
-
-export enum E_DRAWER_EVENTS {
-    MINIMIZED = "minimized",
-    PERMANENT = "permanent",
-    TOGGLE = "toggle",
-    STATE_CHANGED = "state_changed",
-    OPENED = "opened",
-    CLOSED = "closed",
-}
-
 /**
  * Determines if the drawer can be minimized or set to permanent mode.
  *

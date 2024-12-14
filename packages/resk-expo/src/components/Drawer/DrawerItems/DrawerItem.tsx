@@ -112,11 +112,11 @@ const styles = StyleSheet.create({
   },
   content: {
     justifyContent: "flex-start",
-    paddingVertical: 7,
     width: '100%',
   },
   container: {
     width: '100%',
+    paddingVertical: 7,
   },
   hidden: {
     opacity: 0,

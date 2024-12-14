@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 7,
-        paddingVertical: 7,
+        paddingVertical: 10,
         width: '100%',
     },
     icon: {

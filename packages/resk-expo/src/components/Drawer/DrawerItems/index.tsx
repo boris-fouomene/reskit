@@ -7,7 +7,7 @@ import { View as RNView } from "react-native";
 import { useTheme } from '@theme';
 import { useRenderMenuItems } from '@components/Menu';
 import { IDrawerContext, IDrawerItemProps, IDrawerItemsProps } from '../types';
-
+import { StyleSheet } from 'react-native';
 
 /**
  * DrawerItems component renders a list of drawer items, including expandable items.
@@ -29,7 +29,7 @@ import { IDrawerContext, IDrawerItemProps, IDrawerItemsProps } from '../types';
  * @see {@link useTheme} for theme context.
  * @see {@link useRenderMenuItems} for rendering menu items.
  */
-const DrawerItems = React.forwardRef(({ testID, items: customItems, ...rest }: IDrawerItemsProps, ref: React.ForwardedRef<RNView>) => {
+const DrawerItems = React.forwardRef(({ testID, style, items: customItems, ...rest }: IDrawerItemsProps, ref: React.ForwardedRef<RNView>) => {
   const { drawer } = useDrawer();
   testID = testID || "RN_DrawerItems";
   const theme = useTheme();
@@ -39,7 +39,7 @@ const DrawerItems = React.forwardRef(({ testID, items: customItems, ...rest }: I
     render: renderItem,
     renderExpandable,
   });
-  return <View testID={testID} ref={ref} {...rest} key={theme.name + '-' + theme.dark}>
+  return <View testID={testID} ref={ref} {...rest} style={[styles.container, style]} key={theme.name + '-' + theme.dark}>
     {items}
     <View testID={testID + "_DrawerItemsPaddingSeparator"} style={{ height: 30 }}></View>
   </View>
@@ -56,6 +56,12 @@ function renderItem(props: IDrawerItemProps, index: number) {
 export default DrawerItems;
 
 DrawerItems.displayName = "DrawerItems";
+
+const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 10,
+  },
+});
 
 
 

@@ -126,12 +126,12 @@ function ModalWrapper<DialogContextExtend = any>({
   }, [dialogChildren]);
   const setOnPressAction = (props: IAppBarAction<DialogContextExtend>): any => {
     const { onPress } = props;
-    props.onPress = (event) => {
+    props.onPress = (event, context) => {
+      if (typeof onPress == "function" && onPress(event, context) === false) {
+        return;
+      }
       if (modalContext?.handleDismiss && props.closeOnPress !== false) {
         modalContext.handleDismiss(event);
-      }
-      if (typeof onPress == "function") {
-        onPress(event);
       }
     };
   };

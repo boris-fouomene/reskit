@@ -58,10 +58,10 @@ const ExpandableAppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarA
                 <Action testID='resk-expandable-appbar-action-anchor'
                     ref={ref}
                     {...rest}
-                    onPress={(event: GestureResponderEvent) => {
+                    onPress={(event, context) => {
                         openMenu();
                         if (typeof rest.onPress == "function") {
-                            rest.onPress(event);
+                            rest.onPress(event, context);
                         }
                     }}
                 />

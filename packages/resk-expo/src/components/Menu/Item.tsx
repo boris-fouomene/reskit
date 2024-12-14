@@ -63,6 +63,7 @@ export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<I
     const theme = useTheme();
     containerProps = Object.assign({}, containerProps);
     contentProps = Object.assign({}, contentProps);
+    const itemContext = Object.assign({}, props.context, menuContext);
     return <Button
         testID="menu-item"
         borderRadius={0}
@@ -73,10 +74,10 @@ export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<I
         contentProps={{ ...contentProps, style: [styles.buttonContent, contentProps.style] }}
         labelProps={{ ...Object.assign({}, props.labelProps), style: [styles.label, props?.labelProps?.style] }}
         iconProps={{ ...Object.assign({}, props.iconProps), style: [styles.icon, props?.iconProps?.style] }}
-        context={Object.assign({}, props.context, menuContext)}
-        onPress={(event: GestureResponderEvent) => {
-            if (typeof props.onPress == "function") {
-                props.onPress(event);
+        context={itemContext}
+        onPress={(event, context) => {
+            if (typeof props.onPress == "function" && props.onPress(event, Object.assign({}, itemContext, context)) === false) {
+                return;
             }
             if (closeOnPress !== false && typeof menuContext?.closeMenu == "function") {
                 menuContext.closeMenu();
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         width: "100%",
-        marginVertical : 5
+        marginVertical: 5
     },
     buttonContent: {
         paddingHorizontal: 0,

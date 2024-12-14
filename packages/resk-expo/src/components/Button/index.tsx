@@ -5,6 +5,7 @@ import {
     TextStyle,
     View as RNView,
     ViewStyle,
+    GestureResponderEvent,
 } from 'react-native';
 
 import Theme, { useTheme, splitStyles, Colors } from '@theme/index';
@@ -142,6 +143,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     dividerProps,
     divider: customDivider,
     context: extendContext,
+    onPress,
     ...rest
 }: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
@@ -294,6 +296,11 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 testID={testID}
                 ref={innerRef}
                 id={idRef.current}
+                onPress={(event: GestureResponderEvent) => {
+                    if (typeof onPress === 'function') {
+                        onPress(event, context);
+                    }
+                }}
                 {...rest}
             >
                 <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, contentStyle]}>

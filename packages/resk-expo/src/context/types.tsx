@@ -39,7 +39,7 @@ export type IReskExpoProviderProps = {
     children?: React.ReactNode;
     theme?: ITheme;
     breakpoints?: IBreakpoints;
-    drawerNavigationViewProps?: IDrawerNavigationViewProps;
+    drawerNavigationViewProps?: Omit<IDrawerNavigationViewProps, 'drawerState'>;
 }
 
 /**

@@ -5,7 +5,20 @@ import { Slot } from 'expo-router';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
-    return (<ReskExpoProvider theme={{ dark: true } as ITheme}>
+    return (<ReskExpoProvider
+        drawerNavigationViewProps={{
+            items: [
+                {
+                    label: 'Home', icon: 'home', onPress: (event) => {
+                        console.log('Home pressed', event);
+                    }
+                },
+                { label: 'Settings', icon: 'camera', onPress: () => console.log('Settings pressed') },
+                { label: 'Profile', icon: 'account-circle', onPress: () => console.log('Profile pressed') },
+            ]
+        }}
+        theme={{ dark: true } as ITheme
+        }>
         <Slot />
     </ReskExpoProvider>);
 }

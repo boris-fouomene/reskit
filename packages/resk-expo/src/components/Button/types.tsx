@@ -6,7 +6,7 @@ import { ITouchableRippleProps } from "@components/TouchableRipple";
 import { IThemeColorTokenKey } from "@theme/types";
 import { IStyle } from "../../types";
 import React from "react";
-import { AccessibilityRole, View } from "react-native";
+import { AccessibilityRole, GestureResponderEvent, View } from "react-native";
 import { ILabelProps } from "@components/Label";
 import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
@@ -79,7 +79,7 @@ export type IButtonMode = | 'text' | 'outlined' | 'contained';
  *     );
  * };
  */
-export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, textColor: string }> & Omit<ITouchableRippleProps, "style" | "children"> & Omit<ITooltipBaseProps, 'disabled'> & {
+export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, textColor: string }> & Omit<ITouchableRippleProps, "style" | 'onPress' | "children"> & Omit<ITooltipBaseProps, 'disabled'> & {
     /**
      * Optional style for the button component.
      * Can be used to customize the appearance of the button.
@@ -326,6 +326,8 @@ export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<
      * Optional context for the button component.
      */
     context?: IButtonExtendContext;
+
+    onPress?: (event: GestureResponderEvent, context: IButtonContext<IButtonExtendContext>) => any;
 }
 
 /**

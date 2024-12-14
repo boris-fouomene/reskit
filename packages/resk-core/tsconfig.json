@@ -34,5 +34,8 @@
     //"tests/**/*.tsx",
     //"tests/**/*.ts"
   ],
-  "exclude": []
+  "exclude": [
+    "build/**/*",
+    "node_modules/**/*"
+  ]
 }

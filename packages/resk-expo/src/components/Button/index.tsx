@@ -18,7 +18,7 @@ import Label from '@components/Label';
 import { IButtonMode, IButtonProps, IButtonContext, IButtonRef } from './types';
 import { IFlatStyle } from '../../types/index';
 import { IIconButtonProps, useGetIcon } from '@components/Icon';
-import { defaultStr, uniqid } from '@resk/core';
+import { defaultStr, IResourceName, isNonNullString, isObj, uniqid, Auth, IAuthUser, IAuthPerm } from '@resk/core';
 import { Tooltip } from '@components/Tooltip';
 import isValidElement from '@utils/isValidElement';
 import View from '@components/View';
@@ -91,6 +91,11 @@ import { Divider } from '@components/Divider';
  * @param props.disableRipple - If true, the ripple effect will be disabled on button press.
  * 
  * @param props.borderRadius - The border radius of the button. This property can be used to control the rounded corners of the button.
+ * 
+ * @param props.resourceName - The name of the resource associated with the button.
+ * 
+ * @param props.perm - The permission associated with the button. This permission is used to determine if the button will be rendered or not.
+ * If not provided, the button will be rendered regardless of the user's permissions.
  * 
  * @returns A React component representing a button.
  * 
@@ -265,7 +270,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 styles.icon,
                 styles[`icon${compact ? 'Compact' : ''}`],
             ];
-
+    if (!isAllowed(rest)) return null;
     return (<ButtonContext.Provider value={context}>
         <Surface
             id={`${idRef.current}-container`}
@@ -440,6 +445,18 @@ export const ButtonContext = React.createContext<IButtonContext>({} as IButtonCo
  *     );
  * };
  */
-export const useButton = () => React.useContext(ButtonContext);
+export const useButton = () => React.useContext(ButtonContext) || {};
+
+
+const isAllowed = (options: { perm?: IAuthPerm, resourceName?: IResourceName }, user?: IAuthUser): boolean => {
+    if (!isObj(options)) return false;
+    if (options?.resourceName && isNonNullString(options?.resourceName)) {
+        /* const resource = getResource(options?.resourceName);
+        if (resource) {
+            return resource.isAllowed(options?.perm as IPerm, user);
+        } */
+    }
+    return Auth.isAllowed(options?.perm, user);
+}
 
 export * from "./types";

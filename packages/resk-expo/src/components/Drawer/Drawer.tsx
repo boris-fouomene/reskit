@@ -3,7 +3,7 @@ import React, { Fragment, ReactNode, useMemo } from "react";
 import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";
-import { IDict, IObservable, IObservableEvent, uniqid } from "@resk/core";
+import { IDict, IObservable, IObservableEvent, uniqid, IAuthSessionStorage, Auth } from "@resk/core";
 import { canDrawerBeMinimizedOrPermanent } from "./utils";
 import { isValidElement } from "@utils";
 import Breakpoints from "@breakpoints";
@@ -17,8 +17,6 @@ import { Tooltip } from "@components/Tooltip";
 import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProviderProps, IDrawerState, IDrawerCurrentState } from "./types";
 import { DrawerContext } from "./hooks";
 import { addDimensionsListener } from "@dimensions";
-import { IAuthSessionStorage } from "@src/auth/types";
-import { getAuthSessionStorage } from "@src/auth/session";
 import { IDimensions } from "@dimensions/types";
 
 const MIN_SWIPE_DISTANCE = 3;
@@ -734,7 +732,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * @returns {IAuthSessionStorage} The authentication session storage associated with the current session name.
    */
   get session(): IAuthSessionStorage {
-    return getAuthSessionStorage(this.getSessionName());
+    return Auth.Session.getStorage(this.getSessionName());
   }
   /**
    * Retrieves a session value associated with the given key.

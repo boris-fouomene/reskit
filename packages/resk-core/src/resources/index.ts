@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { IDict, IResourcesNames, IField, IResourceInstance, IResource } from '../types';
+import { IDict, IResourceName, IField, IResourceInstance, IResource } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr } from '../utils/index';
 import { IConstructor } from '../types/index';
@@ -57,7 +57,7 @@ export class ResourceBase<DataType = any> implements IResourceInstance<DataType>
    * const userResource: IResource = { name: "user" };
    * ```
   */
-  name?: IResourcesNames;
+  name?: IResourceName;
 
   /**
        * A user-friendly label for the resource.
@@ -179,7 +179,7 @@ export class ResourceBase<DataType = any> implements IResourceInstance<DataType>
  * 
  * The `ResourcesManager` class provides static methods to store, retrieve, and manage resource instances.
  * It maintains a global record of all instantiated resources, allowing for easy access and management.
- * Each resource is identified by a unique name, which is derived from the `IResourcesNames` type.
+ * Each resource is identified by a unique name, which is derived from the `IResourceName` type.
  * 
  * @example
  * // Instantiate and add resources to the manager
@@ -201,7 +201,7 @@ export class ResourcesManager {
   /**
    * A global constant storing a record of all instantiated resources.
    * 
-   * This represents a record of all resources, where the keys are derived from `IResourcesNames`
+   * This represents a record of all resources, where the keys are derived from `IResourceName`
    * and the values are instances of `ResourceBase`.
    * 
    * @example
@@ -209,7 +209,7 @@ export class ResourcesManager {
    *   userResource: new UserResource()
    * };
    */
-  private static resources: Record<IResourcesNames, ResourceBase> = {} as Record<IResourcesNames, ResourceBase>;
+  private static resources: Record<IResourceName, ResourceBase> = {} as Record<IResourceName, ResourceBase>;
 
   /**
    * Retrieves the names of all registered resources.
@@ -230,7 +230,7 @@ export class ResourcesManager {
    * Retrieves a resource instance by its name from the `resources` record.
    * 
    * @template ResourceInstanceType The type extending `ResourceBase` for the resource being returned.
-   * @param {IResourcesNames} name - The name of the resource to retrieve, as defined in `IResourcesNames`.
+   * @param {IResourceName} name - The name of the resource to retrieve, as defined in `IResourceName`.
    * @returns {(ResourceInstanceType | null)} The resource instance if it exists, or `null` if the resource is not found.
    * 
    * @example
@@ -239,7 +239,7 @@ export class ResourcesManager {
    *   console.log(userResource.getLabel()); // Output: The label of the user resource
    * }
    */
-  public static getResource<ResourceInstanceType extends ResourceBase = ResourceBase>(name: IResourcesNames): ResourceInstanceType | null {
+  public static getResource<ResourceInstanceType extends ResourceBase = ResourceBase>(name: IResourceName): ResourceInstanceType | null {
     if (typeof name === "string" && name) {
       return this.resources[name] as ResourceInstanceType;
     }
@@ -249,7 +249,7 @@ export class ResourcesManager {
   /**
    * Adds a new resource instance to the manager.
    * 
-   * @param {IResourcesNames} name - The unique name of the resource to add.
+   * @param {IResourceName} name - The unique name of the resource to add.
    * @param {ResourceBase<DataType>} resource - The resource instance to be added.
    * @template DataType The type of data associated with the resource.
    * 
@@ -258,7 +258,7 @@ export class ResourcesManager {
    * ResourcesManager.addResource('productResource', productResource);
    * console.log(ResourcesManager.getResourceNames()); // Output: ['userResource', 'productResource']
    */
-  public static addResource<DataType = any>(name: IResourcesNames, resource: ResourceBase<DataType>) {
+  public static addResource<DataType = any>(name: IResourceName, resource: ResourceBase<DataType>) {
     if (typeof name === "string" && name && resource && resource instanceof ResourceBase) {
       (this.resources as IDict)[name] = resource;
     }
@@ -270,9 +270,9 @@ export class ResourcesManager {
    * This method deletes the specified resource from the `resources` record. 
    * If the resource exists, it will be removed, and the updated list of resources will be returned.
    * 
-   * @param {IResourcesNames} name - The name of the resource to be removed from the manager.
+   * @param {IResourceName} name - The name of the resource to be removed from the manager.
    * 
-   * @returns {Record<IResourcesNames, ResourceBase>} The updated record of all remaining resources after the removal.
+   * @returns {Record<IResourceName, ResourceBase>} The updated record of all remaining resources after the removal.
    * 
    * @example
    * // Assuming a resource named 'userResource' has been previously added
@@ -284,7 +284,7 @@ export class ResourcesManager {
    * // Check the remaining resources
    * console.log(ResourcesManager.getResourceNames()); // Output: ['productResource']
    */
-  public static removeResource(name: IResourcesNames): Record<IResourcesNames, ResourceBase> {
+  public static removeResource(name: IResourceName): Record<IResourceName, ResourceBase> {
     if (typeof name === "string") {
       delete (this.resources as IDict)[name];
     }
@@ -296,10 +296,10 @@ export class ResourcesManager {
    * Retrieves all resource instances managed by the manager.
    * 
    * This method returns a record of all resources currently stored in the `ResourcesManager`.
-   * The keys are derived from `IResourcesNames`, and the values are instances of `ResourceBase`.
+   * The keys are derived from `IResourceName`, and the values are instances of `ResourceBase`.
    * This allows for easy access to all registered resources.
    * 
-   * @returns {Record<IResourcesNames, ResourceBase>} A record containing all resource instances, where each key is a resource name.
+   * @returns {Record<IResourceName, ResourceBase>} A record containing all resource instances, where each key is a resource name.
    * 
    * @example
    * // Retrieve all registered resources
@@ -311,7 +311,7 @@ export class ResourcesManager {
    * //   productResource: ProductResourceInstance
    * // }
    */
-  public static getResources(): Record<IResourcesNames, ResourceBase> {
+  public static getResources(): Record<IResourceName, ResourceBase> {
     return this.resources;
   }
 }
@@ -347,7 +347,7 @@ export function Resource<DataType = any>(options: IResource<DataType>) {
     options = Object.assign({}, options);
     if (typeof target == "function") {
       try {
-        ResourcesManager.addResource<DataType>((options.name as IResourcesNames), new (target as IConstructor)(options) as ResourceBase<DataType>);
+        ResourcesManager.addResource<DataType>((options.name as IResourceName), new (target as IConstructor)(options) as ResourceBase<DataType>);
       } catch { }
     }
     Reflect.defineMetadata(resourceMetaData, options, target);

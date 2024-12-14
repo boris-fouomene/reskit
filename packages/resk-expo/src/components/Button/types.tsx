@@ -11,7 +11,7 @@ import { ILabelProps } from "@components/Label";
 import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IDividerProps } from "@components/Divider";
-
+import { IResourceName, IAuthPerm } from "@resk/core";
 
 
 /**
@@ -328,6 +328,18 @@ export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<
     context?: IButtonExtendContext;
 
     onPress?: (event: GestureResponderEvent, context: IButtonContext<IButtonExtendContext>) => any;
+
+
+    /**
+     * The name of the resource associated with the button.
+     */
+    resourceName?: IResourceName;
+    /**
+     * The permission associated with the button.
+     * This permission is used to determine if the button will be rendered or not.
+     * If not provided, the button will be rendered regardless of the user's permissions.
+     */
+    perm?: IAuthPerm;
 }
 
 /**

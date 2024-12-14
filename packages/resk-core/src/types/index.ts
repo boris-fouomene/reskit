@@ -121,7 +121,7 @@ export interface IFieldBase<FieldType = "text"> {
   @example 
   ```ts
       declare module "@resk/core" {
-      interface IResourcesNamesMap {
+      interface IResourceNameMap {
           users?:string;
       }
       interface IFieldMap {
@@ -333,27 +333,27 @@ export type IDict<K extends keyof any = any, T = any> = Record<K, T>;
 /**
  * @interface
   Represents a type for all resource names.
-  The IResourcesNames type is defined as the union of all keys in the IResourcesNamesMap object. 
-  This means that IResourcesNames can only take on values that are present as keys in IResourcesNamesMap.
+  The IResourceName type is defined as the union of all keys in the IResourceNameMap object. 
+  This means that IResourceName can only take on values that are present as keys in IResourceNameMap.
  * Here are some examples of using this type:
  *```ts
   import "@resk/core";
   declare module "@resk/core"{
-      interface IResourcesNamesMap {
+      interface IResourceNameMap {
         resource1: any;
         resource2: any;
         resource3: any;
       }
   }
- * let resourceName: IResourcesNames = 'resource1'; // valid
- * let anotherResourceName: IResourcesNames = 'resource2'; // valid
- * let invalidResourceName: IResourcesNames = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourcesNames'.
+ * let resourceName: IResourceName = 'resource1'; // valid
+ * let anotherResourceName: IResourceName = 'resource2'; // valid
+ * let invalidResourceName: IResourceName = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourceName'.
  ```
  */
-export type IResourcesNames = keyof IResourcesNamesMap;
+export type IResourceName = keyof IResourceNameMap;
 
 /**
- * A global declaration for all resource names. This is the exported name of the IResourcesNames type.
+ * A global declaration for all resource names. This is the exported name of the IResourceName type.
  * Represents a type for all resource names.
  * This type is a union of all possible resource names.
  * 
@@ -364,24 +364,103 @@ export type IResourcesNames = keyof IResourcesNamesMap;
  * ```typescript
   import "@resk/core";
  * declare module "@resk/core" {
- *   interface IResourcesNamesMap {
+ *   interface IResourceNameMap {
  *     users?: string;
        roles?:any;
        sales?:any;
  *   }
  * }
  * ```
- * This means that any variable or property with type `IResourcesNames` can only hold 
+ * This means that any variable or property with type `IResourceName` can only hold 
  * one of the values 'users', 'roles', or 'sales'.
  * 
  * @example
  * ```typescript
- * let resourceName: IResourcesNames = 'users'; // valid
- * let anotherResourceName: IResourcesNames = 'roles'; // valid
- * let invalidResourceName: IResourcesNames = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourcesNames'.
+ * let resourceName: IResourceName = 'users'; // valid
+ * let anotherResourceName: IResourceName = 'roles'; // valid
+ * let invalidResourceName: IResourceName = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourceName'.
  * ```
  */
-export interface IResourcesNamesMap { }
+export interface IResourceNameMap { }
+
+/**
+ * @interface IResourceActionMap
+ * Represents a mapping of resource actions to their corresponding string values.
+ * 
+ * The `IResourceActionMap` interface defines a set of actions that can be 
+ * performed on resources within the application. Each action is represented 
+ * as a key-value pair, where the key is the action name and the value is 
+ * the corresponding string that represents that action.
+ * 
+ * ### Properties
+ * 
+ * - `read`: Represents the action to read or view a resource. The value is 
+ *   the string `"read"`.
+ * - `create`: Represents the action to create a new resource. The value is 
+ *   the string `"create"`.
+ * - `update`: Represents the action to modify or update an existing resource. 
+ *   The value is the string `"update"`.
+ * - `delete`: Represents the action to remove or delete a resource. The value 
+ *   is the string `"delete"`.
+ * - `details`: Represents the action to retrieve detailed information about a 
+ *   resource. The value is the string `"details"`.
+ * - `all`: Represents the action to perform all available actions on a resource.
+ */
+export interface IResourceActionMap {
+  read: "read";
+  create: "create";
+  update: "update";
+  delete: "delete";
+  details: "details";
+  all: "all";
+}
+
+/**
+ * Represents the type of resource actions.
+ * 
+ * The `IResourceAction` type is derived from the keys of the `IResourceActionMap` 
+ * interface. This type can be used to specify the allowed actions that can be 
+ * performed on resources, ensuring type safety and consistency throughout the 
+ * application.
+ * 
+ * ### Example Usage
+ * 
+ * Here are some examples of how the `IResourceAction` type can be used:
+ * 
+ * ```typescript
+ * // Example of a function that accepts a resource action
+ * function performAction(action: IResourceAction) {
+ *     switch (action) {
+ *         case "read":
+ *             console.log("Reading resource...");
+ *             break;
+ *         case "create":
+ *             console.log("Creating resource...");
+ *             break;
+ *         case "update":
+ *             console.log("Updating resource...");
+ *             break;
+ *         case "delete":
+ *             console.log("Deleting resource...");
+ *             break;
+ *         case "details":
+ *             console.log("Fetching resource details...");
+ *             break;
+ *         default:
+ *             console.error("Unknown action");
+ *     }
+ * }
+ * 
+ * // Example of using the performAction function
+ * performAction("create"); // Output: Creating resource...
+ * ```
+ * 
+ * In this example, the `IResourceAction` type is used to ensure that only 
+ * valid resource actions can be passed to the `performAction` function, 
+ * demonstrating its utility in enforcing type safety.
+ */
+export type IResourceAction = keyof IResourceActionMap;
+
 
 /**
    @interface The IResource interface represents the base structure for a resource in the application. 
@@ -409,7 +488,7 @@ export interface IResource<Datatype = any> {
    * const userResource: IResource = { name: "user" };
    * ```
    */
-  name?: IResourcesNames;
+  name?: IResourceName;
 
   /**
    * A user-friendly label for the resource.

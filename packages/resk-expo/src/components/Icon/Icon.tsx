@@ -9,6 +9,7 @@ import FontIcon, { DEFAULT_FONT_ICON_SIZE } from "./Font";
 import { Tooltip } from "@components/Tooltip";
 import { StyleSheet } from "react-native";
 import { TouchableRipple } from "@components/TouchableRipple";
+import Button from "./Button";
 
 /**
  * The `Icon` component is a versatile icon renderer that can display both 
@@ -146,7 +147,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, dis
  * @example
  * const myIcon = getIcon({ icon: "material-home", color: "blue", theme: customTheme });
  */
-export function getIcon<T = any>({ icon, color: col2, theme, ...rest }: IGetIconOptions<T>): ReactNode {
+export function getIcon<T = any>({ icon, color: col2, iconButton, theme, ...rest }: IGetIconOptions<T>): ReactNode {
     if (isValidElement(icon)) return icon as ReactNode;
     theme = isObj(theme) && theme || Theme;
     const color: string = (Colors.isValid(col2) ? col2 : theme.colors.text) as string;
@@ -161,7 +162,7 @@ export function getIcon<T = any>({ icon, color: col2, theme, ...rest }: IGetIcon
         iconName,
         ...Object.assign({}, !iconName ? (getIconSource(iconSource)) : undefined),
     }
-    return <Icon
+    return iconButton ? <Button {...iconProps} /> : <Icon
         {...iconProps}
     />
 }

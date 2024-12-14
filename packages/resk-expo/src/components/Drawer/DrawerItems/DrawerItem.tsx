@@ -45,11 +45,13 @@ const DrawerItem = ({
   onPress: customOnPress,
   closeOnPress,
   contentProps,
+  containerProps,
   ...rest
 }: IDrawerItemProps) => {
   const theme = useTheme();
   const { drawer } = useDrawer();
   contentProps = Object.assign({}, contentProps);
+  containerProps = Object.assign({}, containerProps);
   borderRadius = typeof borderRadius == 'number' ? borderRadius : 18;
   style = StyleSheet.flatten(style) || {};
   labelProps = Object.assign({}, labelProps);
@@ -83,6 +85,7 @@ const DrawerItem = ({
     iconProps={{ ...iconProps, size: minimized ? MINIMIZED_ICON_SIZE : iconProps.size || ICON_SIZE, style: [minimized ? styles.iconMinimized : styles.icon, iconProps.style] }}
     {...rest}
     label={minimized ? undefined : rest.label}
+    containerProps={{ ...containerProps, style: [styles.container, containerProps.style] }}
     contentProps={{ ...contentProps, style: [styles.content, contentProps.style] }}
     textColor={contentColor as string}
     backgroundColor={backgroundColor}
@@ -109,7 +112,11 @@ const styles = StyleSheet.create({
   },
   content: {
     justifyContent: "flex-start",
-    paddingVertical: 7
+    paddingVertical: 7,
+    width: '100%',
+  },
+  container: {
+    width: '100%',
   },
   hidden: {
     opacity: 0,
@@ -125,7 +132,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start'
   },
   ripple: {
-    marginRight: 5,
+    width: '100%',
   }
 });
 

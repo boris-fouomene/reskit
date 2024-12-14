@@ -121,7 +121,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
   const { left, right, label } = getLabelOrLeftOrRightProps({ label: customLabel, left: customLeft, right: customRight }, eProps)
   testID = defaultStr(testID, "resk-expandable");
   const iconProps = Object.assign({}, expanded ? expandedIconProps : unexpandedIconProps);
-  const icon = useGetIcon<{ expanded: boolean }>({ ...iconProps, ...eProps, size: 24, expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
+  const icon = useGetIcon<{ expanded: boolean }>({ iconButton: true, ...iconProps, ...eProps, size: 24, style: [styles.expandableIcon, iconProps.style], expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
   const expandIcon = showExpandIcon !== false ? icon : null;
 
   return (
@@ -201,6 +201,9 @@ const styles = StyleSheet.create({
   },
   child: {
     [isRTL ? "paddingRight" : "paddingLeft"]: 64,
+  },
+  expandableIcon: {
+    marginHorizontal: 7,
   },
   content: {
     flex: 1,

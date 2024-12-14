@@ -676,7 +676,7 @@ export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Image
  * @category Icons
  * @since 1.0.0
  */
-export type IGetIconOptions<T = any> = Omit<T, keyof IGetIconOptionsBase> & IGetIconOptionsBase & { icon?: IIconSource, color?: string, theme?: ITheme };
+export type IGetIconOptions<T = any> = Omit<T, keyof IGetIconOptionsBase> & IGetIconOptionsBase & { icon?: IIconSource, iconButton?: boolean, color?: string, theme?: ITheme };
 /**
  * Represents the base options for retrieving icons, excluding essential properties like name, source, and color.
  * This type is used as a foundation for icon configuration options while allowing specific icon properties to be

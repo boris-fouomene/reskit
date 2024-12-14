@@ -802,7 +802,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
         if (typeof callback == "function") {
           callback = callback(this.getStateOptions());
         }
-        if (typeof options.callback == "function") {
+        if (typeof options.callback == "function" && options.callback !== callback) {
           options.callback(this.getStateOptions());
         }
         if (this.isProvider()) {
@@ -857,7 +857,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
   close(options?: IDrawerProviderProps, callback?: Function): void {
     options = Object.assign({}, options);
     this._emitStateChanged(SETTLING);
-    callback = typeof callback == "function" ? callback : options?.callback;
+    callback = typeof callback == "function" ? callback : undefined;
     /*************  ✨ Codeium Command ⭐  *************/
     /**
      * A callback function that is called when the drawer is closed. It is used to cleanup and emit the CLOSED event.
@@ -868,7 +868,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       if (typeof callback == "function") {
         callback(this.getStateOptions());
       }
-      if (typeof options?.callback == "function") {
+      if (typeof options?.callback == "function" && options.callback !== callback) {
         options.callback(this.getStateOptions());
       }
       if (this.isProvider()) {

@@ -1,64 +1,15 @@
 import { FontIcon, Tab, Switch, Checkbox, Modal, Button, Dialog, Preloader, Portal, Expandable, AppBar, TouchableRipple, Swiper, Icon, Theme, Label, Divider, HelperText, Menu, useMenu } from "@resk/expo";
 import { View, TouchableOpacity, Pressable, ScrollView } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
+import { withAppBar } from "@resk/expo/build/hooks";
 
 
-const index = () => {
+const index = withAppBar(() => {
     useEffect(() => {
         //Preloader.open();
     }, [])
     return (
         <ScrollView>
-            <AppBar
-                title="My App is very a long appp heeein marno maaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-                subtitle="Screen Title aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa long scrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-                actions={[
-                    {
-                        label: "actin 1",
-                        icon: "material-edit",
-                        onPress: () => {
-                            console.log("Back")
-                        },
-                    },
-                    {
-                        label: "An expandable",
-                        icon: "check",
-                        onPress: () => {
-                            console.log("action2")
-                        },
-                        items: [
-                            {
-                                label: "Sub action2",
-                                icon: "check",
-                            },
-                            {
-                                label: "Sub action22",
-                                icon: "radio-off",
-                            },
-                            {
-                                label: "Sub action23",
-                                icon: "radioactive"
-                            },
-
-                        ]
-                    },
-                    {
-                        label: "actin 3",
-                        icon: "camera",
-                        onPress: () => {
-                            console.log("action3")
-                        },
-                    },
-                    {
-                        label: "actin 4",
-                        icon: "account-circle",
-                        onPress: () => {
-                            console.log("action4")
-                        },
-                    },
-                ]}
-            >
-            </AppBar>
             <View style={[Theme.styles.p5]}>
                 <Menu
                     anchor={<Label>Open Menu</Label>}
@@ -173,7 +124,55 @@ const index = () => {
             </View>
         </ScrollView>
     )
-}
+}, {
+    title: "My App is very a long appp heeein marno maaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    subtitle: "Screen Title aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa long scrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    actions: [
+        {
+            label: "actin 1",
+            icon: "material-edit",
+            onPress: () => {
+                console.log("Back")
+            },
+        },
+        {
+            label: "An expandable",
+            icon: "check",
+            onPress: () => {
+                console.log("action2")
+            },
+            items: [
+                {
+                    label: "Sub action2",
+                    icon: "check",
+                },
+                {
+                    label: "Sub action22",
+                    icon: "radio-off",
+                },
+                {
+                    label: "Sub action23",
+                    icon: "radioactive"
+                },
+
+            ]
+        },
+        {
+            label: "actin 3",
+            icon: "camera",
+            onPress: () => {
+                console.log("action3")
+            },
+        },
+        {
+            label: "actin 4",
+            icon: "account-circle",
+            onPress: () => {
+                console.log("action4")
+            },
+        },
+    ],
+});
 const ModalExample = () => {
     const openModal = () => {
         Dialog.Provider.open({

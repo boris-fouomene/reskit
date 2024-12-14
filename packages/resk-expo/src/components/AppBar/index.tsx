@@ -12,7 +12,7 @@ import Label from '@components/Label';
 import { Surface } from '@components/Surface';
 import Theme, { Colors, IThemeColorTokenKey, useTheme } from '@theme/index';
 import { IAppBarProps } from './types';
-import { getLabelOrLeftOrRightProps } from '@hooks/index';
+import { getLabelOrLeftOrRightProps } from '@hooks/label2left2right';
 import { useDimensions } from '@dimensions/index';
 import { splitAppBarActions } from './utils';
 import Action from './Action';

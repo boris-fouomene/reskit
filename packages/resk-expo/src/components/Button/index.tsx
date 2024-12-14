@@ -21,7 +21,7 @@ import { defaultStr, uniqid } from '@resk/core';
 import { Tooltip } from '@components/Tooltip';
 import isValidElement from '@utils/isValidElement';
 import View from '@components/View';
-import { getLabelOrLeftOrRightProps } from '@hooks/index';
+import { getLabelOrLeftOrRightProps } from '@hooks/label2left2right';
 import { Divider } from '@components/Divider';
 
 /**

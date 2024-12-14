@@ -16,9 +16,10 @@ import FontIcon from "@components/Icon/Font";
 import { Tooltip } from "@components/Tooltip";
 import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProviderProps, IDrawerState, IDrawerCurrentState } from "./types";
 import { DrawerContext } from "./hooks";
-import { ISessionStorage } from "@resk/core/build/session";
+import { addDimensionsListener } from "@dimensions";
 import { IAuthSessionStorage } from "@src/auth/types";
 import { getAuthSessionStorage } from "@src/auth/session";
+import { IDimensions } from "@dimensions/types";
 
 const MIN_SWIPE_DISTANCE = 3;
 
@@ -277,6 +278,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * @private
    */
   _backdropRef: any = React.createRef();
+  readonly _dimensionChangedListener = addDimensionsListener(this._onDimensionsChanged.bind(this));
   constructor(props: IDrawerProps) {
     super(props);
     const isProvider = !!props.isProvider;
@@ -525,7 +527,10 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
   isClosed(): boolean {
     return !this.state.drawerShown;
   }
-
+  componentWillUnmount(): void {
+    super.componentWillUnmount();
+    this._dimensionChangedListener?.remove();
+  }
   componentDidMount() {
     super.componentDidMount();
     const { openValue } = this.state;
@@ -762,7 +767,11 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       this.close();
     }
   }
-
+  _onDimensionsChanged(dimensions: IDimensions) {
+    if (this.props.bindResizeEvent !== false && dimensions?.isMobileOrTablet && this.isPermanent()) {
+      this.unpin();
+    }
+  }
   _emitStateChanged(newState: string): void {
     if (this.props.onDrawerStateChanged) {
       this.props.onDrawerStateChanged({ newState, context: this });

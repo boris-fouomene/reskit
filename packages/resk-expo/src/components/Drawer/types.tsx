@@ -755,6 +755,12 @@ export interface IDrawerProps extends IViewProps {
      * Reference to the navigation view.
      */
     navigationViewRef?: any;
+
+    /***
+     * make the drawer update its state when the window is resized.
+     * @default true
+     */
+    bindResizeEvent?: boolean;
 }
 
 

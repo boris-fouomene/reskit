@@ -2,7 +2,7 @@ import { View } from "react-native";
 import { IDrawerItemsProps, IDrawerProps, IDrawerCurrentState } from "@components/Drawer";
 import { StyleSheet } from "react-native";
 import Label from "@components/Label";
-import { DrawerNavigationViewMenuIcon, IDrawerNavigationViewMenuIconProps } from "./MenuIcon";
+import { DrawerMenuIcon, IDrawerMenuIconProps } from "./DrawerMenuIcon";
 import { HStack } from "@components/Stack";
 import { useTheme } from "@theme";
 import { ScrollView } from "react-native";
@@ -49,31 +49,31 @@ import DrawerItems from "@components/Drawer/DrawerItems";
  * </DrawerNavigationView>
  */
 export const DrawerNavigationView = ({ children, testID, header, items, drawerItemsProps, drawerState }: IDrawerNavigationViewProps) => {
-  testID = defaultStr(testID, "resk-drawer-layout");
-  const theme = useTheme();
-  drawerItemsProps = Object.assign({}, drawerItemsProps);
-  const menuIconProps: IDrawerNavigationViewMenuIconProps = {
-    size: 25,
-    testID: `${testID}-back-action-layout`,
-    color: theme.colors.onSurface,
-    icon: (drawerState) => {
-      if (drawerState?.canBePinned) {
-        return drawerState?.isPinned ? "pin-off" : "pin";
-      }
-      return "close";
-    },
-    onPress: (event, drawerState) => {
-      if (!drawerState?.canBePinned) return;
-      drawerState?.isPermanent ? drawerState?.context?.unpin() : drawerState?.context?.pin();
-    }
-  };
-  const menuIcon = <DrawerNavigationViewMenuIcon {...menuIconProps} />;
-  return <ScrollView>
-    <DrawerNavigationHeader drawerState={drawerState} children={header} testID={testID} menuIcon={menuIcon} menuIconProps={menuIconProps} />
-    <Divider />
-    <DrawerItems testID={testID + "-drawer-items"} items={items} {...drawerItemsProps} />
-    {isValidElement(children) ? children : null}
-  </ScrollView>
+    testID = defaultStr(testID, "resk-drawer-layout");
+    const theme = useTheme();
+    drawerItemsProps = Object.assign({}, drawerItemsProps);
+    const menuIconProps: IDrawerMenuIconProps = {
+        size: 25,
+        testID: `${testID}-back-action-layout`,
+        color: theme.colors.onSurface,
+        icon: (drawerState) => {
+            if (drawerState?.canBePinned) {
+                return drawerState?.isPinned ? "pin-off" : "pin";
+            }
+            return "close";
+        },
+        onPress: (event, drawerState) => {
+            if (!drawerState?.canBePinned) return;
+            drawerState?.isPermanent ? drawerState?.context?.unpin() : drawerState?.context?.pin();
+        }
+    };
+    const menuIcon = <DrawerMenuIcon {...menuIconProps} />;
+    return <ScrollView>
+        <DrawerNavigationHeader drawerState={drawerState} children={header} testID={testID} menuIcon={menuIcon} menuIconProps={menuIconProps} />
+        <Divider />
+        <DrawerItems testID={testID + "-drawer-items"} items={items} {...drawerItemsProps} />
+        {isValidElement(children) ? children : null}
+    </ScrollView>
 };
 
 
@@ -92,7 +92,7 @@ export const DrawerNavigationView = ({ children, testID, header, items, drawerIt
  *        a JSX element based on the current drawer state.
  * @param {JSX.Element} props.menuIcon - The drawer navigation view menu icon to be displayed.
  *        to be displayed in the header.
- * @param {IDrawerNavigationViewMenuIconProps} props.menuIconProps - Properties to customize 
+ * @param {IDrawerMenuIconProps} props.menuIconProps - Properties to customize 
  *        the drawer navigation menu icon.
  * 
  * @returns {React.ReactNode} Returns a JSX element representing the drawer navigation 
@@ -120,48 +120,48 @@ export const DrawerNavigationView = ({ children, testID, header, items, drawerIt
  *     )}
  * </DrawerNavigationHeader>
  */
-const DrawerNavigationHeader: React.FC<{ testID: string, children?: IDrawerNavigationViewHeader, drawerState: IDrawerCurrentState, menuIcon: JSX.Element; menuIconProps: IDrawerNavigationViewMenuIconProps }> = ({ children, menuIcon, menuIconProps, testID, drawerState }): React.ReactNode => {
-  if (isValidElement(children)) {
-    return children as ReactNode;
-  }
-  if (typeof children == "function") {
-    const h = children({ drawerState, testID: testID + "-header", menuIcon, menuIconProps });
-    return isValidElement(h) ? h : null;
-  }
-  const left = <>
-    <Label textBold style={styles.logoText}>
-      {packageName}
-    </Label>
-  </>, right = isValidElement(menuIcon) ? menuIcon : null;
-  return <View testID={testID + "-header-container"} style={styles.headerContainer}>
-    <HStack testID={testID + "-header-left"} style={styles.header}>
-      {isRTL ? <>{right}{left}</> : <>{left}{right}</>}
-    </HStack>
-  </View>;
+const DrawerNavigationHeader: React.FC<{ testID: string, children?: IDrawerNavigationViewHeader, drawerState: IDrawerCurrentState, menuIcon: JSX.Element; menuIconProps: IDrawerMenuIconProps }> = ({ children, menuIcon, menuIconProps, testID, drawerState }): React.ReactNode => {
+    if (isValidElement(children)) {
+        return children as ReactNode;
+    }
+    if (typeof children == "function") {
+        const h = children({ drawerState, testID: testID + "-header", menuIcon, menuIconProps });
+        return isValidElement(h) ? h : null;
+    }
+    const left = <>
+        <Label textBold style={styles.logoText}>
+            {packageName}
+        </Label>
+    </>, right = isValidElement(menuIcon) ? menuIcon : null;
+    return <View testID={testID + "-header-container"} style={styles.headerContainer}>
+        <HStack testID={testID + "-header-left"} style={styles.header}>
+            {isRTL ? <>{right}{left}</> : <>{left}{right}</>}
+        </HStack>
+    </View>;
 };
 DrawerNavigationHeader.displayName = "DrawerNavigationViewHeader";
 const styles = StyleSheet.create({
-  logoContainer: {
-    paddingTop: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerContainer: {
-    paddingBottom: 5,
-  },
-  logoText: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  header: {
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingLeft: 10,
-    paddingTop: 5,
-  },
-  headerLeft: {
-    alignItems: "center",
-  },
+    logoContainer: {
+        paddingTop: 16,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    headerContainer: {
+        paddingBottom: 5,
+    },
+    logoText: {
+        fontSize: 24,
+        fontWeight: "bold",
+    },
+    header: {
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 10,
+        paddingTop: 5,
+    },
+    headerLeft: {
+        alignItems: "center",
+    },
 });
 
 /**
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
  * JSX element. This allows for flexible rendering of the drawer navigation header based on 
  * the current state of the drawer and other relevant properties.
  * 
- * @type {JSX.Element | ((options: { drawerState: IDrawerCurrentState | null, menuIcon: JSX.Element, menuIconProps: IDrawerNavigationViewMenuIconProps, testID: string }) => JSX.Element)}
+ * @type {JSX.Element | ((options: { drawerState: IDrawerCurrentState | null, menuIcon: JSX.Element, menuIconProps: IDrawerMenuIconProps, testID: string }) => JSX.Element)}
  * 
  * @example
  * // Using a static JSX element as the drawer navigation header
@@ -188,10 +188,10 @@ const styles = StyleSheet.create({
  * };
  */
 type IDrawerNavigationViewHeader = JSX.Element | ((options: {
-  drawerState: IDrawerCurrentState | null,
-  menuIcon: JSX.Element;
-  menuIconProps: IDrawerNavigationViewMenuIconProps;
-  testID: string;
+    drawerState: IDrawerCurrentState | null,
+    menuIcon: JSX.Element;
+    menuIconProps: IDrawerMenuIconProps;
+    testID: string;
 }) => JSX.Element);
 
 /**
@@ -246,10 +246,8 @@ type IDrawerNavigationViewHeader = JSX.Element | ((options: {
  * };
  */
 export interface IDrawerNavigationViewProps extends IDrawerProps {
-  header?: IDrawerNavigationViewHeader;
-  items?: IDrawerItemsProps["items"];
-  drawerItemsProps?: Partial<Omit<IDrawerItemsProps, "items">>;
-  drawerState: IDrawerCurrentState;
+    header?: IDrawerNavigationViewHeader;
+    items?: IDrawerItemsProps["items"];
+    drawerItemsProps?: Partial<Omit<IDrawerItemsProps, "items">>;
+    drawerState: IDrawerCurrentState;
 };
-
-export * from "./MenuIcon";

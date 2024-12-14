@@ -1,13 +1,13 @@
 import Label from "@components/Label";
 import { isValidElement, mergeRefs } from "@utils";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, Animated as RNAnimated, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TouchableOpacity, TextInputKeyPressEventData } from "react-native";
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from "react-native";
 import React, { ReactNode, useEffect, useMemo, useRef } from "react";
 import { formatValueToObject, Platform, IDict, isNonNullString, isStringNumber, parseDecimal, isEmpty } from "@resk/core";
 import _, { isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
-import View, { IViewProps } from "@components/View";
-import { getLabelOrLeftOrRightProps } from "@hooks/index";
+import View from "@components/View";
+import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import { ITextInputCallbackOptions, ITextInputProps, ITextInputType, IUseTextInputProps } from "./types";
 import { ITheme } from "@theme/types";
 import { IStyle } from "@src/types";

@@ -1,97 +1,97 @@
-import { ReactNode } from "react";
-import isValidElement from "@utils/isValidElement";
-import { isRTL } from "@utils/i18nManager";
+import { IReactComponent } from "@src/types";
+import { IAppBarProps } from "@components/AppBar";
+import { IWithHOCOptions, withHOC } from "./withHOC";
+import AppBarLayout from "@layouts/AppBarLayout";
+
+
 
 /**
- * @interface ILabelOrLeftOrRightProps
- * Type definition for props that can contain label, left and right elements.
+ * @function withAppBar
+ * A Higher-Order Component (HOC) that wraps a given component with an AppBar.
  * 
- * This type allows for the specification of either a static ReactNode or a 
- * function that returns a ReactNode for both the label, `left` and `right` properties.
+ * The `withAppBar` function enhances a React component by adding an 
+ * AppBar layout above it. This is useful for creating consistent 
+ * navigation headers across different screens in an application. 
+ * The AppBar can be customized through the `appBarProps` parameter, 
+ * allowing developers to specify titles, actions, and other properties 
+ * for the AppBar.
  * 
- * @template T - Optional type parameter for the function options.
+ * ### Type Parameters
  * 
- * ### Props:
- *  `label` : A ReactNode or a function that returns a ReactNode. This can be used to render the label for a component.
- * - `left`: A ReactNode or a function that returns a ReactNode. This can be used to render 
- *   content on the left side of a component.
- * - `right`: A ReactNode or a function that returns a ReactNode. This can be used to render 
- *   content on the right side of a component.
- */
-export type ILabelOrLeftOrRightProps<T = any> = {
-    /**
-     * A ReactNode or a function that returns a ReactNode. This can be used to render the label for a component.
-     * It represent the label to be displayed alongside the text input.
-     * This could be a React element, such as a `Text` component, or any other custom label.
-     * @example
-     * ```ts
-     * label: <Text>Username</Text>
-     * ```
-     */
-    label?: ReactNode | ((options: T) => ReactNode);
-    /**A ReactNode or a function that returns a ReactNode. This can be used to render content on the left side of a component.
-     * Typically used for icons or buttons.
-     * @example
-     * ```ts
-     * left: <Icon name="search" />
-     * ```
-     */
-    left?: ReactNode | ((options: T) => ReactNode);
-    /**
-     * A ReactNode or a function that returns a ReactNode. 
-     * This can be used to render  content on the right side of a component.
-     * Often used for actions such as clearing text or submitting.
-     * @example
-     * ```ts
-     * right: <Icon name="clear" />
-     * ```
-     */
-    right?: ReactNode | ((options: T) => ReactNode);
-};
-
-/**
- * A utility function to extract label, left and right properties from the given props?.
+ * - `T`: The type of the props for the component being wrapped. This 
+ *   allows for type safety and ensures that the wrapped component 
+ *   receives the correct props.
  * 
- * This function evaluates the label, `left` and `right` properties from the provided props?.
- * If the properties are functions, it calls them with the given options to obtain the 
- * resulting ReactNode. It also validates the resulting nodes to ensure they are valid 
- * React elements.
+ * - `TState`: The type of the state for the component being wrapped (if that component is a class component).
  * 
- * @param {ILabelOrLeftOrRightProps<T>} props - The props containing the label, left and right elements.
- * @param {T} options - Optional parameters to pass to the functions for dynamic rendering.
- * @returns {{ label : : ReactNode, left: ReactNode, right: ReactNode }} - An object containing validated label, left and right nodes.
+ * ### Parameters
  * 
- * @remarkss : Left and right element are inverted when the application layout direction is Right-To-Left (RTL : I18nManager.getConstants().isRTL).
+ * - `Component` (IReactComponent<T>): The React component to be wrapped 
+ *   with the AppBar. This component will be rendered below the AppBar.
  * 
- * ### Example Usage:
+ * - `appBarProps` (IAppBarProps): Optional properties to customize the 
+ *   AppBar. This includes settings like title, subtitle, actions, and 
+ *   back action properties.
+ * 
+ * - `options` (IWithHOCOptions): Optional settings for the HOC, such as 
+ *   display name and fallback rendering options.
+ * 
+ * ### Example Usage
+ * 
+ * Here is an example of how you might use the `withAppBar` function to 
+ * create a new component with an AppBar:
  * 
  * ```typescript
- * const MyComponent = (props: ILabelOrLeftOrRightProps) => {
- *     const { label, left, right } = getLabelOrLeftOrRightProps(props, { //options });
- *     return (
- *         <div>
- *             <div>{left}</div>
- *             <div>{label}></div>
- *             <div>{right}</div>
- *         </div>
- *     );
+ * import React from 'react';
+ * import { withAppBar } from '@resk/expo';
+ * 
+ * const MyComponent: React.FC<{ message: string }> = ({ message }) => {
+ *     return <div>{message}</div>;
+ * };
+ * 
+ * const MyComponentWithAppBar = withAppBar(MyComponent, {
+ *     title: "My App",
+ *     subtitle: "Welcome to my application",
+ *     actions: [
+ *         { label: 'Settings', onPress: () => console.log('Settings pressed') },
+ *         { label: 'Profile', onPress: () => console.log('Profile pressed') },
+ *     ],
+ * });
+ * 
+ * const App = () => {
+ *     return <MyComponentWithAppBar />;
  * };
  * ```
+ * 
+ * In this example, `MyComponent` is wrapped with an AppBar that has a 
+ * title and actions. The resulting `MyComponentWithAppBar` can be used 
+ * in the application, providing a consistent AppBar layout.
+ * 
+ * @see {@link IAppBarProps} for more information on the AppBar properties.
+ * @see {@link IReactComponent} for more information on the React component type.
+ * @see {@link IWithHOCOptions} for more information on the HOC options.
+ * @see {@link withHOC} for a higher-order component that can be used to enhance a component.
+ * @see {@link IReactComponent} for more information on the React component type.
+ * ### Return Value
+ * 
+ * The function returns a new component that includes the AppBar and the 
+ * wrapped component. This new component can be rendered like any other 
+ * React component.
+ * 
+ * @returns {React.FC<T>} A new React component that renders the AppBar 
+ * and the wrapped component.
  */
-export function getLabelOrLeftOrRightProps<T = any>(props: ILabelOrLeftOrRightProps, options: T): { label: ReactNode, left: ReactNode; right: ReactNode } {
-    // Evaluate the left property, calling it if it's a function
-    const left = typeof props?.left === "function" ? props?.left(options) : props?.left;
-    // Evaluate the right property, calling it if it's a function
-    const right = typeof props?.right === "function" ? props?.right(options) : props?.right;
-    const label = typeof props?.label === "function" ? props?.label(options) : props?.label;
-    const leftElement = isValidElement(left) ? left : null,
-        rightElement = isValidElement(right) ? right : null;
-    // Validate and return the left and right properties, ensuring they are valid React elements
-    return {
-        label: isValidElement(label, true) ? label : null,
-        left: isRTL ? rightElement : leftElement,
-        right: isRTL ? leftElement : rightElement,
-    };
-};
+export function withAppBar<T extends object, TState extends object = any>(Component: IReactComponent<T, TState>, appBarProps?: IAppBarProps, options?: IWithHOCOptions) {
+    options = options || {};
+    appBarProps = Object.assign({}, appBarProps) as IAppBarProps;
+    options.displayName = options.displayName || Component?.displayName || "RN_WithAppBarComponent";
+    return withHOC<T>(function (props: T) {
+        return <>
+            <AppBarLayout {...appBarProps} />
+            <Component {...(props)} />
+        </>
+    }, options);
+}
 
 export * from "./withHOC";
+export * from "./label2left2right";

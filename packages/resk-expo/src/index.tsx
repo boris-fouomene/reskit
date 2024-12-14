@@ -3,7 +3,6 @@ export * from "./theme";
 export { default as Breakpoints } from "./breakpoints";
 export * from "./dimensions";
 export * from "./dimensions/types";
-export * from "./dimensions";
 export * from "./breakpoints/types";
 export * from "./theme/types";
 export * from "./theme";

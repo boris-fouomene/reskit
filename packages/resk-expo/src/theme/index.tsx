@@ -9,7 +9,7 @@ import styles from "./styles";
 import { useReskExpo } from "@src/context/hooks";
 import Elevations from "./Elevations";
 import { useColorScheme } from "react-native";
-import { useMaterial3Theme, isDynamicThemeSupported, getMaterial3Theme, createMaterial3Theme } from '@pchmn/expo-material3-theme';
+import { useMaterial3Theme, isDynamicThemeSupported, getMaterial3Theme as _getMaterial3Theme, createMaterial3Theme as _createMaterial3Theme, Material3Theme } from '@pchmn/expo-material3-theme';
 
 export * from "./utils";
 export * from "./types";
@@ -30,18 +30,18 @@ export * from "./types";
  * 
  * @example
  * ```ts
- * const themes = getLight2DarkMaterial3Theme("#6200EE");
+ * const themes = getMaterial3Theme("#6200EE");
  * console.log(themes.light.colors.primary); // Outputs the primary color for the light theme
  * console.log(themes.dark.colors.primary); // Outputs the primary color for the dark theme
  * ```
  */
 
-export const getLight2DarkMaterial3Theme = (fallbackSourceColor?: string) => {
-    const { light, dark } = getMaterial3Theme(fallbackSourceColor);
+export const getMaterial3Theme = (fallbackSourceColor?: string) => {
+    const { light, dark } = _getMaterial3Theme(fallbackSourceColor);
     const isSupported = isDynamicThemeSupported.valueOf();
     return {
-        light: { colors: light, dark: false },
-        dark: { colors: dark, dark: true },
+        light: { colors: prepareMaterial3Theme(light, false), dark: false },
+        dark: { colors: prepareMaterial3Theme(dark, true), dark: true },
         isSupported,
     }
 }
@@ -65,18 +65,25 @@ export const getLight2DarkMaterial3Theme = (fallbackSourceColor?: string) => {
  * @returns {boolean} returns.isSupported - Whether dynamic theme support is available.
  * 
  * @example
- * const themes = createLight2DarkMaterial3Theme("#6200EE");
+ * const themes = createMaterial3Theme("#6200EE");
  * console.log(themes.light.colors.primary); // Outputs the primary color for the light theme
  * console.log(themes.dark.colors.primary); // Outputs the primary color for the dark theme
  */
-export const createLight2DarkMaterial3Theme = (sourceColor: string) => {
-    const { light, dark } = createMaterial3Theme(sourceColor);
+export const createMaterial3Theme = (sourceColor: string): { light: ITheme, dark: ITheme, isSupported: boolean } => {
+    const { light, dark } = _createMaterial3Theme(sourceColor);
     const isSupported = isDynamicThemeSupported.valueOf();
     return {
-        light: { colors: light, dark: false },
-        dark: { colors: dark, dark: true },
+        light: { colors: prepareMaterial3Theme(light, false), dark: false },
+        dark: { colors: prepareMaterial3Theme(dark, true), dark: true },
         isSupported,
     }
+}
+const prepareMaterial3Theme = (colors: IThemeColorsTokens, dark: boolean): IThemeColorsTokens => {
+    const isSupported = isDynamicThemeSupported.valueOf();
+    if (Colors.isValid(colors?.background) && colors?.background === colors?.surface) {
+        colors.background = (dark ? Colors.lighten : Colors.darken)(colors.background, 0.4) as string;
+    }
+    return colors;
 }
 
 /**
@@ -287,7 +294,7 @@ export function createTheme(theme: ITheme): IThemeManager {
 export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
     // Retrieves the saved theme from the session (if available)
     const themeNameObj = extendObj({}, customTheme, session.get("theme"));
-    const { light: lightTheme, dark: darkTheme } = getLight2DarkMaterial3Theme(themeNameObj?.colors?.primary);
+    const { light: lightTheme, dark: darkTheme } = getMaterial3Theme(themeNameObj?.colors?.primary);
     const isDark = !!themeNameObj.dark;
     themeNameObj.name = defaultStr(themeNameObj.name, `${packageName}-${themeNameObj.dark ? "dark" : "light"}`);
     const theme = extendObj({}, (isDark ? darkTheme : lightTheme), themeNameObj);
@@ -630,6 +637,7 @@ export const useGetMaterial3Theme = (params?: { fallbackSourceColor?: string; so
     const colors = (colorScheme ? (cTheme as any)[colorScheme] ?? {} : {}) as IThemeColorsTokens;
     const theme = { colors } as ITheme;
     theme.dark = colorScheme === 'dark';
+    theme.colors = prepareMaterial3Theme(theme.colors, !!theme.dark);
     return { theme: theme, isSupported, colorScheme };
 }
 

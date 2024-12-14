@@ -6,7 +6,7 @@ import { IIconProps, IIconSource, useGetIcon } from "@components/Icon";
 import { defaultStr } from "@resk/core";
 import Theme, { useTheme, Colors } from "@theme";
 import useStateCallback from "@utils/stateCallback";
-import { getLabelOrLeftOrRightProps } from "@hooks/index";
+import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import Animated, { AnimatedProps, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { IExpandableProps } from "./types";
 import { isRTL } from "@utils/i18nManager";

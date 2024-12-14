@@ -159,6 +159,11 @@ export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<
      */
     contentProps?: IViewProps;
 
+    /***
+     * Props for the content container of the button.
+     * This can include styles and other properties for the view.
+     */
+    contentContainerProps?: IViewProps;
 
     /**
      * @see {@link IButtonMode} for the available button modes.

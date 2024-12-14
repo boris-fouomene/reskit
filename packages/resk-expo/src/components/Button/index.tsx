@@ -135,6 +135,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     containerRef,
     labelProps,
     contentProps,
+    contentContainerProps,
     iconPosition,
     iconProps,
     containerProps,
@@ -152,6 +153,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     ...rest
 }: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
+    contentContainerProps = Object.assign({}, contentContainerProps);
     const theme = useTheme();
     const [isLoading, _setIsLoading] = React.useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
     const [isDisabled, setIsDisabled] = React.useState(typeof customDisabled == "boolean" ? customDisabled : false);
@@ -309,41 +311,48 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 {...rest}
             >
                 <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, contentStyle]}>
-                    {iconPosition != "right" ? iconContent : null}
-                    {isLoading ? (
-                        <ActivityIndicator
-                            size={customLabelSize ?? iconSize}
-                            color={
-                                typeof customLabelColor === 'string'
-                                    ? customLabelColor
-                                    : textColor
-                            }
-                            style={iconStyle}
-                        />
-                    ) : null}
-                    {left}
-                    <Label
-                        id={`${idRef.current}-label`}
-                        selectable={false}
-                        numberOfLines={1}
-                        testID={`${testID}-button-label`}
-                        {...labelProps}
-                        style={[
-                            styles.label,
-                            !styles.md2Label,
-                            (isMode('text')
-                                ? icon || isLoading
-                                    ? styles.md3LabelTextAddons
-                                    : styles.md3LabelText
-                                : styles.md3Label),
-                            compact && styles.compactLabel,
-                            uppercase && styles.uppercaseLabel,
-                            textStyle,
-                            labelProps.style,
-                        ]}
+                    <View
+                        id={`${idRef.current}-content-container`}
+                        testID={testID + "-content-container"}
+                        {...contentContainerProps}
+                        style={[styles.contentContainer, contentContainerProps?.style]}
                     >
-                        {isValidElement(children, true) && children || label}
-                    </Label>
+                        {iconPosition != "right" ? iconContent : null}
+                        {isLoading ? (
+                            <ActivityIndicator
+                                size={customLabelSize ?? iconSize}
+                                color={
+                                    typeof customLabelColor === 'string'
+                                        ? customLabelColor
+                                        : textColor
+                                }
+                                style={iconStyle}
+                            />
+                        ) : null}
+                        {left}
+                        <Label
+                            id={`${idRef.current}-label`}
+                            selectable={false}
+                            numberOfLines={1}
+                            testID={`${testID}-button-label`}
+                            {...labelProps}
+                            style={[
+                                styles.label,
+                                !styles.md2Label,
+                                (isMode('text')
+                                    ? icon || isLoading
+                                        ? styles.md3LabelTextAddons
+                                        : styles.md3LabelText
+                                    : styles.md3Label),
+                                compact && styles.compactLabel,
+                                uppercase && styles.uppercaseLabel,
+                                textStyle,
+                                labelProps.style,
+                            ]}
+                        >
+                            {isValidElement(children, true) && children || label}
+                        </Label>
+                    </View>
                     {iconPosition == "right" ? iconContent : null}
                     {right}
                 </View>
@@ -365,12 +374,18 @@ const styles = StyleSheet.create({
     compact: {
 
     },
+    contentContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+    },
     content: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 7,
         paddingVertical: 2,
+        width: '100%',
     },
     icon: {
         marginHorizontal: 7,
@@ -387,7 +402,7 @@ const styles = StyleSheet.create({
     /* eslint-enable react-native/no-unused-styles */
     label: {
         textAlign: 'center',
-        marginVertical: 7,
+        marginVertical: 0,
         marginHorizontal: 7,
     },
     md2Label: {

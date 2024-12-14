@@ -8,7 +8,7 @@ import Theme, { useTheme, Colors } from "@theme";
 import useStateCallback from "@utils/stateCallback";
 import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import Animated, { AnimatedProps, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { IExpandableProps } from "./types";
+import { IExpandableContext, IExpandableProps } from "./types";
 import { isRTL } from "@utils/i18nManager";
 
 
@@ -85,7 +85,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
   const isIconPositionLeft = expandIconPosition == "left" ? true : false;
   const isControlled = typeof expandedProp == "boolean" ? true : false;
   const [expanded, setExpanded] = useStateCallback<boolean>(isControlled ? (expandedProp as boolean) : !!defaultExpanded);
-  const handlePressAction = (event: GestureResponderEvent) => {
+  const toggleExpand = (event?: GestureResponderEvent, callback?: (newExpanded: boolean) => void) => {
     // Collapse animation
     opacity.value = withTiming(expanded ? 0 : 1, { duration: 300 });
     if (!isControlled) {
@@ -93,10 +93,20 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
         if (typeof onToggleExpand == "function") {
           onToggleExpand({ expanded: newExpanded as boolean, event });
         }
+        if (typeof callback == "function") {
+          callback(newExpanded as boolean);
+        }
       });
     } else if (typeof onToggleExpand == "function") {
-      onToggleExpand({ expanded: !expanded, event });
+      const newExpanded = !expanded;
+      onToggleExpand({ expanded: newExpanded, event });
+      if (typeof callback == "function") {
+        callback(newExpanded);
+      }
     }
+  };
+  const handlePressAction = (event: GestureResponderEvent) => {
+    toggleExpand(event);
     if (typeof onPress == "function") {
       onPress?.(event);
     }
@@ -123,52 +133,115 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
   const iconProps = Object.assign({}, expanded ? expandedIconProps : unexpandedIconProps);
   const icon = useGetIcon<{ expanded: boolean }>({ iconButton: true, ...iconProps, ...eProps, size: 24, style: [styles.expandableIcon, iconProps.style], expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
   const expandIcon = showExpandIcon !== false ? icon : null;
-
   return (
-    <View testID={testID + "_ExpandableContainer"} {...containerProps} style={[styles.container, containerProps.style]}>
-      <Pressable
-        ref={ref}
-        {...props}
-        testID={testID}
-        style={(state) => {
-          return [typeof style == "function" ? style(state) : style]
-        }}
-        onPress={handlePressAction}
-        accessibilityState={{ expanded: isExpanded }}
-      >
-        <View testID={testID + "-content-container"} {...contentContainerProps} style={[styles.row, theme.styles.cursorPointer, contentContainerProps?.style]}>
-          {left || (expandIcon && isIconPositionLeft) ? (
-            <View testID={testID + "-left"} {...leftContainerProps} style={[styles.left, leftContainerProps?.style]}>
-              {isIconPositionLeft ? expandIcon : null}
-              {left}
-            </View>
-          ) : null}
-          <Label testID={testID + "-label"} {...labelProps} style={[styles.item, styles.content, styles.center, labelProps?.style]}>
-            {label}
-          </Label>
-          <View testID={testID + "-right"} {...rightContainerProps} style={[styles.item, styles.row, rightContainerProps?.style]}>
-            {right}
-            {!isIconPositionLeft ? expandIcon : null}
-          </View>
-        </View>
-      </Pressable>
-      {autoMountChildren !== false || isExpanded ? (
-        <Animated.View
-          testID={testID + "-content"} {...contentProps}
-          style={[
-            styles.content,
-            styles.children, contentProps?.style,
-            animatedStyle,
-          ]}
+    <ExpandableContext.Provider value={{ expanded, toggleExpand, expandIcon: icon }}>
+      <View testID={testID + "_ExpandableContainer"} {...containerProps} style={[styles.container, containerProps.style]}>
+        <Pressable
+          ref={ref}
+          {...props}
+          testID={testID}
+          style={(state) => {
+            return [typeof style == "function" ? style(state) : style]
+          }}
+          onPress={handlePressAction}
+          accessibilityState={{ expanded: isExpanded }}
         >
-          {children}
-        </Animated.View>
-      ) : null}
-    </View>
+          <View testID={testID + "-content-container"} {...contentContainerProps} style={[styles.row, theme.styles.cursorPointer, contentContainerProps?.style]}>
+            {left || (expandIcon && isIconPositionLeft) ? (
+              <View testID={testID + "-left"} {...leftContainerProps} style={[styles.left, leftContainerProps?.style]}>
+                {isIconPositionLeft ? expandIcon : null}
+                {left}
+              </View>
+            ) : null}
+            <Label testID={testID + "-label"} {...labelProps} style={[styles.item, styles.content, styles.center, labelProps?.style]}>
+              {label}
+            </Label>
+            <View testID={testID + "-right"} {...rightContainerProps} style={[styles.item, styles.row, rightContainerProps?.style]}>
+              {right}
+              {!isIconPositionLeft ? expandIcon : null}
+            </View>
+          </View>
+        </Pressable>
+        {autoMountChildren !== false || isExpanded ? (
+          <Animated.View
+            testID={testID + "-content"} {...contentProps}
+            style={[
+              styles.content,
+              styles.children, contentProps?.style,
+              animatedStyle,
+            ]}
+          >
+            {children}
+          </Animated.View>
+        ) : null}
+      </View>
+    </ExpandableContext.Provider>
   );
 });
 
 Expandable.displayName = "Expandable";
+
+/**
+ * Creates a context for managing the expanded/collapsed state of an expandable component.
+ * 
+ * The `ExpandableContext` provides a way to share the expanded state and the function to toggle
+ * that state across different components in the application. It is initialized with an empty object
+ * cast to `IExpandableContext`, which should be properly provided by a context provider higher in the component tree.
+ * 
+ * @constant ExpandableContext
+ * @type {React.Context<IExpandableContext>}
+ * 
+ * @remarks
+ * This context is typically used in conjunction with the `IExpandableContext` interface to manage
+ * the state of expandable components. Ensure that a provider is used to wrap components that need access
+ * to this context.
+ * 
+ * @example
+ * // Example of providing the ExpandableContext in a component
+ * 
+ * import React, { useState } from 'react';
+ * import { ExpandableContext } from './ExpandableContext';
+ * 
+ * const ExpandableProvider: React.FC = ({ children }) => {
+ *   const [expanded, setExpanded] = useState(false);
+ * 
+ *   return (
+ *     <ExpandableContext.Provider value={{ expanded, setExpanded }}>
+ *       {children}
+ *     </ExpandableContext.Provider>
+ *   );
+ * };
+ */
+const ExpandableContext = React.createContext<IExpandableContext>({} as IExpandableContext);
+
+/**
+ * A custom hook that provides access to the `ExpandableContext`.
+ * 
+ * This hook allows components to easily access the current expanded state and the function to toggle
+ * that state without needing to use the `useContext` hook directly.
+ * 
+ * @returns {IExpandableContext} The current context value, which includes the `expanded` state and
+ * the `setExpanded` function.
+ * 
+ * @example
+ * // Example of using the useExpandable hook in a component
+ * 
+ * import React from 'react';
+ * import { useExpandable } from './ExpandableContext';
+ * 
+ * const MyExpandableComponent: React.FC = () => {
+ *   const { expanded, toggleExpand } = useExpandable();
+ *   return (
+ *     <div>
+ *       <button onPress={(event) => toggleExpand(event)}>
+ *         {expanded ? 'Collapse' : 'Expand'}
+ *       </button>
+ *       {expanded && <div>Here is the expandable content!</div>}
+ *     </div>
+ *   );
+ * };
+ */
+export const useExpandable = () => React.useContext(ExpandableContext);
 
 const styles = StyleSheet.create({
   center: {

@@ -2,6 +2,7 @@ import { IIconProps, IIconSource } from "@components/Icon/types";
 import { ILabelProps } from "@components/Label";
 import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
+import { ReactNode } from "react";
 import { GestureResponderEvent, PressableProps, ViewProps } from "react-native";
 import { AnimatedProps } from "react-native-reanimated";
 /**
@@ -52,7 +53,7 @@ export type IExpandableProps = Omit<PressableProps, "children"> & ILabelOrLeftOr
      * @param {GestureResponderEvent} options.event - The native event
      * @param {boolean} [options.expanded] - The new expanded state
      */
-    onToggleExpand?: (options: { event: GestureResponderEvent; expanded?: boolean }) => any;
+    onToggleExpand?: (options: { event?: GestureResponderEvent; expanded: boolean }) => any;
 
     /**
      * Controls the expanded state when used as a controlled component
@@ -172,3 +173,59 @@ export interface IExpandableCallbackOptions {
     color?: string; //la couleur à l'instant t
     expanded: boolean;
 }
+
+/**
+ * Represents the context for an expandable component, providing state management
+ * for its expanded/collapsed state.
+ * 
+ * @interface IExpandableContext
+ * 
+ * @property {boolean} expanded - Indicates whether the expandable component is currently expanded.
+ * This property is crucial for determining the visibility of the content within the expandable component.
+ * 
+ * @property {function} toggleExpand - A function to update the expanded state of the component.
+ * 
+ * @param {boolean} expanded - The new expanded state to set. Pass `true` to expand the component,
+ * or `false` to collapse it.
+ * 
+ * @param {function} [callback] - An optional callback function that is invoked after the expanded state is updated.
+ * This can be useful for performing additional actions or side effects based on the new state.
+ * 
+ * @example
+ * // Example of using IExpandableContext in a functional component
+ * 
+ * import React, { useContext } from 'react';
+ * import { IExpandableContext, useExpandable } from './ExpandableContext';
+ * 
+ * const MyExpandableComponent: React.FC = () => {
+ *   const { expanded, toggleExpand } = useContext<IExpandableContext>(useExpandable());
+ * 
+ *   const toggleExpand = () => {
+ *     toggleExpand(!expanded, (newExpanded) => {
+ *       console.log('The component is now', newExpanded ? 'expanded' : 'collapsed');
+ *     });
+ *   };
+ * 
+ *   return (
+ *     <div>
+ *       <button onClick={toggleExpand}>
+ *         {expanded ? 'Collapse' : 'Expand'}
+ *       </button>
+ *       {expanded && <div>Here is the expandable content!</div>}
+ *     </div>
+ *   );
+ * };
+ * 
+ * @remarks
+ * This context is typically used in conjunction with an expandable component to manage its state
+ * in a controlled manner. By using this context, you can easily share the expanded state across
+ * different components or parts of your application.
+ */
+export type IExpandableContext = {
+    expanded: boolean;
+    toggleExpand: (event?: GestureResponderEvent, callback?: (newExpanded: boolean) => void) => void;
+    /***
+     * The icon to display to toggle the expandable state.
+     */
+    expandIcon: ReactNode;
+};

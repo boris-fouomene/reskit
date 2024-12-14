@@ -10,7 +10,13 @@ declare module "@resk/core" {
 }
 
 export class ResourceBase<DataType = any> extends _ResourceBase<DataType> {
-
+    actions: Record<string, IResourceActionButton> = {};
+    getActions(): Record<string, IResourceActionButton> {
+        if (!isObj(this.actions) || !this.actions) {
+            this.actions = {};
+        }
+        return this.actions;
+    }
     isAllowed(perm?: any, user?: any): boolean {
         return true;
     }

@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
   content: {
     justifyContent: "flex-start",
-    paddingVertical: 10
+    paddingVertical: 7
   },
   hidden: {
     opacity: 0,

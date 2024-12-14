@@ -98,8 +98,6 @@ const styles = StyleSheet.create({
         paddingVertical: 3,
     },
     menu: {
-        paddingVertical: 0,
-        paddingHorizontal: 0,
         width: "100%",
     },
     buttonContainer: {
@@ -107,9 +105,7 @@ const styles = StyleSheet.create({
         marginVertical: 5
     },
     buttonContent: {
-        paddingHorizontal: 0,
         justifyContent: "flex-start",
-        paddingLeft: 7,
         width: "100%",
     }
 });

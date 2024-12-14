@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 7,
-        paddingVertical: 2,
+        paddingVertical: 7,
         width: '100%',
     },
     icon: {
@@ -402,8 +402,6 @@ const styles = StyleSheet.create({
     /* eslint-enable react-native/no-unused-styles */
     label: {
         textAlign: 'center',
-        marginVertical: 0,
-        marginHorizontal: 7,
     },
     md2Label: {
         letterSpacing: 1,

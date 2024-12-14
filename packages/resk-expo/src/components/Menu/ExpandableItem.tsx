@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
     },
     expandableItemContent: {
         justifyContent: "space-between",
+        paddingVertical: 0,
     }
 });
 

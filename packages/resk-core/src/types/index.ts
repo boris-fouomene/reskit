@@ -1,3 +1,5 @@
+import { IAuthPerm, IAuthUser } from "@/auth/types";
+
 /**
  * Represents a base field with optional type, label, and name properties.
  * The type property defaults to "text" if not specified.
@@ -385,51 +387,178 @@ export interface IResourceNameMap { }
 
 /**
  * @interface IResourceActionMap
- * Represents a mapping of resource actions to their corresponding string values.
  * 
- * The `IResourceActionMap` interface defines a set of actions that can be 
- * performed on resources within the application. Each action is represented 
- * as a key-value pair, where the key is the action name and the value is 
- * the corresponding string that represents that action.
+ * Represents a mapping of resource actions to their corresponding action definitions.
+ * This interface serves as a structured way to define the various actions that can be 
+ * performed on resources within the application, ensuring consistency and type safety 
+ * when managing resource interactions.
  * 
  * ### Properties
  * 
- * - `read`: Represents the action to read or view a resource. The value is 
- *   the string `"read"`.
- * - `create`: Represents the action to create a new resource. The value is 
- *   the string `"create"`.
- * - `update`: Represents the action to modify or update an existing resource. 
- *   The value is the string `"update"`.
- * - `delete`: Represents the action to remove or delete a resource. The value 
- *   is the string `"delete"`.
- * - `details`: Represents the action to retrieve detailed information about a 
- *   resource. The value is the string `"details"`.
- * - `all`: Represents the action to perform all available actions on a resource.
- */
-export interface IResourceActionMap {
-  read: "read";
-  create: "create";
-  update: "update";
-  delete: "delete";
-  details: "details";
-  all: "all";
-}
-
-/**
- * Represents the type of resource actions.
+ * - `read`: Represents the action to read or view a resource. This action is typically 
+ *   used to retrieve data from the resource.
  * 
- * The `IResourceAction` type is derived from the keys of the `IResourceActionMap` 
- * interface. This type can be used to specify the allowed actions that can be 
- * performed on resources, ensuring type safety and consistency throughout the 
- * application.
+ * - `create`: Represents the action to create a new resource. This action is used 
+ *   when a new instance of the resource needs to be added to the system.
+ * 
+ * - `update`: Represents the action to modify or update an existing resource. This 
+ *   action is used when changes need to be applied to a resource that already exists.
+ * 
+ * - `delete`: Represents the action to remove or delete a resource. This action is 
+ *   used when a resource needs to be permanently removed from the system.
+ * 
+ * - `details`: Represents the action to retrieve detailed information about a 
+ *   resource. This action is useful for obtaining more in-depth data about a 
+ *   specific resource instance.
+ * 
+ * - `all`: Represents the action that encompasses all available actions on a 
+ *   resource. This action can be used to perform batch operations or to indicate 
+ *   that all actions are permitted.
  * 
  * ### Example Usage
  * 
- * Here are some examples of how the `IResourceAction` type can be used:
+ * Here is an example of how the `IResourceActionMap` interface can be utilized:
  * 
  * ```typescript
- * // Example of a function that accepts a resource action
- * function performAction(action: IResourceAction) {
+ * // Define a resource action map for a "documents" resource
+ * const documentActions: IResourceActionMap = {
+ *     read: { label: "Read Document", tooltip: "Retrieve the document details." },
+ *     create: { label: "Create Document", tooltip: "Add a new document to the system." },
+ *     update: { label: "Update Document", tooltip: "Modify the existing document." },
+ *     delete: { label: "Delete Document", tooltip: "Remove the document from the system." },
+ *     details: { label: "Document Details", tooltip: "View detailed information about the document." },
+ *     all: { label: "All Actions", tooltip: "Perform all actions on the document." }
+ * };
+ * 
+ * // Function to perform an action on a resource
+ * function performAction(action: keyof IResourceActionMap) {
+ *     switch (action) {
+ *         case "read":
+ *             console.log("Reading document...");
+ *             break;
+ *         case "create":
+ *             console.log("Creating document...");
+ *             break;
+ *         case "update":
+ *             console.log("Updating document...");
+ *             break;
+ *         case "delete":
+ *             console.log("Deleting document...");
+ *             break;
+ *         case "details":
+ *             console.log("Fetching document details...");
+ *             break;
+ *         case "all":
+ *             console.log("Performing all actions on the document...");
+ *             break;
+ *         default:
+ *             console.error("Unknown action");
+ *     }
+ * }
+ * 
+ * // Example of performing a specific action
+ * performAction("create"); // Output: Creating document...
+ * ```
+ * 
+ * ### Notes
+ * 
+ * - This interface is particularly useful in applications that require a clear 
+ *   definition of actions associated with resources, allowing for better 
+ *   organization and management of resource-related operations.
+ * - Each action can be further customized with additional properties, such as 
+ *   labels and tooltips, to enhance user experience and provide context in the UI.
+ */
+export interface IResourceActionMap {
+  read: IResourceAction;
+  create: IResourceAction;
+  update: IResourceAction;
+  delete: IResourceAction;
+  details: IResourceAction;
+  all: IResourceAction;
+}
+
+/**
+ * @interface IResourceAction
+ * 
+ * Represents the structure of an action that can be performed on a resource within the application.
+ * This interface defines the essential properties that describe the action, allowing for a 
+ * consistent representation of actions across different resources.
+ * 
+ * ### Properties
+ * 
+ * - `label` (optional): A user-friendly label for the action. This label is typically 
+ *   displayed in the user interface (UI) to help users understand what the action does. 
+ *   It should be concise and descriptive.
+ * 
+ * - `title` (optional): A more detailed title for the action. This title can provide 
+ *   additional context or information about the action and may be displayed in UI elements 
+ *   such as tooltips or headers.
+ * 
+ * - `tooltip` (optional): A short text that appears when the user hovers over the action 
+ *   in the UI. The tooltip provides extra information about the action, helping users 
+ *   understand its purpose without cluttering the interface.
+ * 
+ * ### Example Usage
+ * 
+ * Here is an example of how the `IResourceAction` interface can be utilized:
+ * 
+ * ```typescript
+ * // Define a resource action for creating a new document
+ * const createDocumentAction: IResourceAction = {
+ *     label: "Create Document",
+ *     title: "Create a new document in the system",
+ *     tooltip: "Click to add a new document."
+ * };
+ * 
+ * // Function to display action information
+ * function displayActionInfo(action: IResourceAction) {
+ *     console.log(`Action: ${action.label}`);
+ *     console.log(`Title: ${action.title}`);
+ *     console.log(`Tooltip: ${action.tooltip}`);
+ * }
+ * 
+ * // Example of displaying action information
+ * displayActionInfo(createDocumentAction);
+ * // Output:
+ * // Action: Create Document
+ * // Title: Create a new document in the system
+ * // Tooltip: Click to add a new document.
+ * ```
+ * 
+ * ### Notes
+ * 
+ * - The `IResourceAction` interface is designed to be flexible, allowing developers to 
+ *   define actions with varying levels of detail based on the needs of their application.
+ * - By providing clear labels, titles, and tooltips, developers can enhance the user 
+ *   experience and make the application more intuitive.
+ */
+export interface IResourceAction {
+  label?: string;
+  title?: string;
+  tooltip?: string;
+}
+
+/**
+ * @type IResourceActionName
+ * 
+ * Represents the type of resource actions that can be performed within the application.
+ * This type is derived from the keys of the `IResourceActionMap` interface, ensuring that 
+ * only valid action names can be used when referencing actions associated with resources.
+ * 
+ * ### Description
+ * 
+ * The `IResourceActionName` type is a union of string literals that correspond to the 
+ * defined actions in the `IResourceActionMap`. This provides type safety and consistency 
+ * when working with resource actions, preventing errors that may arise from using 
+ * invalid action names.
+ * 
+ * ### Example Usage
+ * 
+ * Here is an example of how the `IResourceActionName` type can be utilized:
+ * 
+ * ```typescript
+ * // Function to perform an action on a resource
+ * function performAction(action: IResourceActionName) {
  *     switch (action) {
  *         case "read":
  *             console.log("Reading resource...");
@@ -446,6 +575,9 @@ export interface IResourceActionMap {
  *         case "details":
  *             console.log("Fetching resource details...");
  *             break;
+ *         case "all":
+ *             console.log("Performing all actions on the resource...");
+ *             break;
  *         default:
  *             console.error("Unknown action");
  *     }
@@ -455,11 +587,15 @@ export interface IResourceActionMap {
  * performAction("create"); // Output: Creating resource...
  * ```
  * 
- * In this example, the `IResourceAction` type is used to ensure that only 
- * valid resource actions can be passed to the `performAction` function, 
- * demonstrating its utility in enforcing type safety.
+ * ### Notes
+ * 
+ * - The use of `IResourceActionName` enhances type safety by ensuring that only 
+ *   predefined action names can be passed to functions that require an action parameter.
+ * - This type can be particularly useful in scenarios where actions are dynamically 
+ *   determined or when implementing features that require strict adherence to defined 
+ *   action names.
  */
-export type IResourceAction = keyof IResourceActionMap;
+export type IResourceActionName = keyof IResourceActionMap;
 
 
 /**
@@ -529,6 +665,12 @@ export interface IResource<Datatype = any> {
    * ```
    */
   tooltip?: string;
+
+  /**
+   * Returns the actions associated with the resource.
+   * @returns {IResourceActionMap} The actions associated with the resource.
+   */
+  actions?: IResourceActionMap;
 }
 
 /**
@@ -591,6 +733,132 @@ export interface IResourceInstance<DataType = any> extends IResource<DataType> {
     @returns {string} The tooltip of the resource
   */
   getTooltip: () => string;
+
+
+  /**
+   * Retrieves the actions associated with the resource.
+   * If the actions are not already defined or not an object, 
+   * it initializes them as an empty object of type `IResourceActionMap`.
+   *
+   * @returns {IResourceActionMap} The map of resource actions.
+   */
+  getActions: () => IResourceActionMap;
+
+  /**
+   * Determines if the given permission is allowed for the specified user.
+   *
+   * @param perm - The permission to check. It can be a string or an object implementing the IAuthPerm interface.
+   * @param user - The user for whom the permission is being checked. It can be an object implementing the IAuthUser interface.
+   * @returns A boolean indicating whether the permission is allowed for the user.
+   *
+   * The method performs the following steps:
+   * 1. Constructs a prefix using the resource name.
+   * 2. If the permission is a string, it trims and processes it to ensure it has the correct prefix.
+   * 3. Checks if the permission string has the correct prefix.
+   * 4. Extracts the action part of the permission and checks if it is a valid action.
+   * 5. If the action is "all" or matches any of the resource's actions, it returns true.
+   * 6. Otherwise, it delegates the permission check to the Auth.isAllowed method.
+   */
+  isAllowed(perm?: IAuthPerm, user?: IAuthUser): boolean;
+
+  /**
+   * Retrieves the name of the resource.
+   *
+   * @returns {IResourceName} The name of the resource, cast to the IResourceName type.
+   */
+  getName(): IResourceName;
+
+  /**
+   * Initializes the resource with the provided options.
+   * 
+   * @param options - An object implementing the IResource interface, containing the data to initialize the resource with.
+   * 
+   * This method assigns the provided options to the resource, ensuring that any empty properties
+   * on the resource are filled with the corresponding values from the options object. It skips
+   * properties that are functions. After assigning the options, it calls the `getFields` method
+   * to further process the resource.
+   */
+  init(options: IResource<DataType>): void;
+
+  /**
+   * Formats a string by replacing placeholders with corresponding values from a parameters object.
+   *
+   * @param text - The string containing placeholders in the format `{key}` to be replaced.
+   * @param params - An object containing key-value pairs where the key corresponds to the placeholder in the text and the value is the replacement.
+   * @returns The formatted string with placeholders replaced by corresponding values from the params object.
+   */
+  sprintf(text?: string, params?: Record<string, any>): string;
+  /**
+   * Retrieves the label for a specified action, optionally formatting it with provided parameters.
+   *
+   * @param actionName - The name of the action for which to get the label.
+   * @param params - Optional parameters to format the label.
+   * @returns The formatted action label.
+   */
+  getActionLabel(actionName: IResourceActionName, params?: Record<string, any>): string;
+  /**
+   * Retrieves the title of a specified action, optionally formatting it with provided parameters.
+   *
+   * @param actionName - The name of the action for which the title is to be retrieved.
+   * @param params - An optional record of parameters to format the title.
+   * @returns The formatted title of the specified action.
+   */
+  getActionTitle(actionName: IResourceActionName, params?: Record<string, any>): string;
+
+  /**
+   * Retrieves the tooltip for a specified action.
+   *
+   * @param actionName - The name of the action for which to get the tooltip.
+   * @param params - Optional parameters to format the tooltip string.
+   * @returns The formatted tooltip string for the specified action.
+   */
+  getActionTooltip(actionName: IResourceActionName, params?: Record<string, any>): string;
+
+  /**
+   * Retrieves a specific action by its name.
+   *
+   * @param {IResourceActionName} actionName - The name of the action to retrieve.
+   * @returns {IResourceAction} The action object if found, otherwise an empty object.
+   */
+  getAction(actionName: IResourceActionName): IResourceAction;
+
+  /**
+  * Determines if the specified user has read access.
+  *
+  * @param user - The user whose read access is being checked. If no user is provided, the method will use default permissions.
+  * @returns A boolean indicating whether the user has read access.
+  */
+  canUserRead(user?: IAuthUser): boolean;
+  /**
+   * Determines if the user has permission to create a resource.
+   *
+   * @param user - The user whose permissions are being checked. If not provided, the method will use the default user.
+   * @returns A boolean indicating whether the user is allowed to create the resource.
+   */
+  canUserCreate(user?: IAuthUser): boolean;
+
+  /**
+   * Determines if the specified user has permission to update the resource.
+   *
+   * @param user - The user whose update permissions are being checked. If no user is provided, the method will use default permissions.
+   * @returns A boolean indicating whether the user has permission to update the resource.
+   */
+  canUserUpdate(user?: IAuthUser): boolean;
+  /**
+   * Determines if the user has permission to delete.
+   *
+   * @param user - The authenticated user whose permissions are being checked. Optional.
+   * @returns A boolean indicating whether the user is allowed to delete.
+   */
+  canUserDelete(user?: IAuthUser): boolean;
+
+  /**
+   * Determines if the user has permission to view details.
+   *
+   * @param user - The authenticated user object. Optional.
+   * @returns A boolean indicating whether the user is allowed to view details.
+   */
+  canUserViewDetails(user?: IAuthUser): boolean;
 };
 
 /**

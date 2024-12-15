@@ -1,8 +1,10 @@
 import 'reflect-metadata';
-import { IDict, IResourceName, IField, IResourceInstance, IResource } from '../types';
+import { IDict, IResourceName, IField, IResourceInstance, IResource, IResourceActionMap, IResourceActionName, IResourceAction } from '../types';
 import { getFields } from '../fields';
-import { isEmpty, defaultStr } from '../utils/index';
+import { isEmpty, defaultStr, isObj, isNonNullString, stringify } from '../utils/index';
 import { IConstructor } from '../types/index';
+import { IAuthPerm, IAuthUser } from '@/auth/types';
+import { isAllowed } from '../auth/perms';
 
 
 /**
@@ -45,7 +47,7 @@ import { IConstructor } from '../types/index';
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
 export class ResourceBase<DataType = any> implements IResourceInstance<DataType> {
-
+  actions?: IResourceActionMap;
   /**
    * The internal name of the resource.
    *
@@ -116,6 +118,20 @@ export class ResourceBase<DataType = any> implements IResourceInstance<DataType>
    * @param {...any[]} args - Additional arguments that can be passed for further customization.
    */
   constructor(options: IResource<DataType>, ...args: any[]) {
+    this.init(options);
+  }
+
+  /**
+   * Initializes the resource with the provided options.
+   * 
+   * @param options - An object implementing the IResource interface, containing the data to initialize the resource with.
+   * 
+   * This method assigns the provided options to the resource, ensuring that any empty properties
+   * on the resource are filled with the corresponding values from the options object. It skips
+   * properties that are functions. After assigning the options, it calls the `getFields` method
+   * to further process the resource.
+   */
+  init(options: IResource<DataType>) {
     options = Object.assign({}, options);
     for (let i in options) {
       if (isEmpty((this as IDict)[i]) && typeof (this as IDict)[i] !== "function") {
@@ -127,6 +143,130 @@ export class ResourceBase<DataType = any> implements IResourceInstance<DataType>
     this.getFields();
   }
 
+  /**
+   * Retrieves the name of the resource.
+   *
+   * @returns {IResourceName} The name of the resource, cast to the IResourceName type.
+   */
+  getName(): IResourceName {
+    return defaultStr(this.name) as IResourceName;
+  }
+
+  /**
+   * Retrieves the actions associated with the resource.
+   * If the actions are not already defined or not an object, 
+   * it initializes them as an empty object of type `IResourceActionMap`.
+   *
+   * @returns {IResourceActionMap} The map of resource actions.
+   */
+  getActions(): IResourceActionMap {
+    if (!isObj(this.actions) || !this.actions) {
+      this.actions = {} as IResourceActionMap;
+    }
+    return this.actions;
+  }
+
+  /**
+   * Determines if the given permission is allowed for the specified user.
+   *
+   * @param perm - The permission to check. It can be a string or an object implementing the IAuthPerm interface.
+
+   * @param user - The user for whom the permission is being checked. It can be an object implementing the IAuthUser interface.The user object for whom the permission.If not provided, the function will attempt 
+   *   to retrieve the signed user from the session.
+   * @returns A boolean indicating whether the permission is allowed for the user.
+   *
+   * The method performs the following steps:
+   * 1. Constructs a prefix using the resource name.
+   * 2. If the permission is a string, it trims and processes it to ensure it has the correct prefix.
+   * 3. Checks if the permission string has the correct prefix.
+   * 4. Extracts the action part of the permission and checks if it is a valid action.
+   * 5. If the action is "all" or matches any of the resource's actions, it returns true.
+   * 6. Otherwise, it delegates the permission check to the Auth.isAllowed method.
+   */
+  isAllowed(perm?: IAuthPerm, user?: IAuthUser): boolean {
+    if (!this.getName()) return false;
+    let prefix = `${String(this.getName()).trim().rtrim(":")}:`;
+    let permStr: any = perm;
+    if (typeof perm === "string") {
+      permStr = perm.trim();
+      let hasPrefix = true;
+      if (!permStr.includes(":")) {
+        permStr = `${prefix}${permStr}`;
+      } else {
+        const permStplit = permStr.toLowerCase().trim().split(":");
+        hasPrefix = String(this.getName()).toLowerCase().trim() === permStplit[0]?.trim();
+      }
+      if (hasPrefix) {
+        const action = permStr.trim().split(":")[1];
+        if (isNonNullString(action)) {
+          const actionSplit = action.toLowerCase().trim().split("|");
+          let hasAction = actionSplit.includes("all");
+          const actions = this.getActions();
+          if (!hasAction) {
+            for (let actionName in actions) {
+              actionName = String(actionName).toLowerCase().trim();
+              if (actionSplit.includes(actionName)) {
+                hasAction = true;
+                break;
+              }
+            }
+          }
+          if (!hasAction) {
+            return false;
+          }
+        }
+      }
+    }
+    return isAllowed(permStr as IAuthPerm, user);
+  }
+  /**
+   * Determines if the specified user has read access.
+   *
+   * @param user - The user whose read access is being checked. If no user is provided, the method will use default permissions.
+   * @returns A boolean indicating whether the user has read access.
+   */
+  canUserRead(user?: IAuthUser): boolean {
+    return this.isAllowed(`read`, user);
+  }
+
+  /**
+   * Determines if the user has permission to create a resource.
+   *
+   * @param user - The user whose permissions are being checked. If not provided, the method will use the default user.
+   * @returns A boolean indicating whether the user is allowed to create the resource.
+   */
+  canUserCreate(user?: IAuthUser): boolean {
+    return this.isAllowed(`create`, user);
+  }
+  /**
+   * Determines if the specified user has permission to update the resource.
+   *
+   * @param user - The user whose update permissions are being checked. If no user is provided, the method will use default permissions.
+   * @returns A boolean indicating whether the user has permission to update the resource.
+   */
+  canUserUpdate(user?: IAuthUser): boolean {
+    return this.isAllowed(`update`, user);
+  }
+
+  /**
+   * Determines if the user has permission to delete.
+   *
+   * @param user - The authenticated user whose permissions are being checked. Optional.
+   * @returns A boolean indicating whether the user is allowed to delete.
+   */
+  canUserDelete(user?: IAuthUser): boolean {
+    return this.isAllowed(`delete`, user);
+  }
+
+  /**
+   * Determines if the user has permission to view details.
+   *
+   * @param user - The authenticated user object. Optional.
+   * @returns A boolean indicating whether the user is allowed to view details.
+   */
+  canUserViewDetails(user?: IAuthUser): boolean {
+    return this.isAllowed(`details`, user);
+  }
   /**
    * Retrieves the label of the resource.
    * 
@@ -171,6 +311,66 @@ export class ResourceBase<DataType = any> implements IResourceInstance<DataType>
   getFields(): Record<string, IField> {
     this.fields = getFields(this);
     return this.fields;
+  }
+
+  /**
+   * Formats a string by replacing placeholders with corresponding values from a parameters object.
+   *
+   * @param text - The string containing placeholders in the format `{key}` to be replaced.
+   * @param params - An object containing key-value pairs where the key corresponds to the placeholder in the text and the value is the replacement.
+   * @returns The formatted string with placeholders replaced by corresponding values from the params object.
+   */
+  sprintf(text?: string, params?: Record<string, any>): string {
+    let t: string = defaultStr(text);
+    if (text && isObj(params) && params) {
+      for (let i in params) {
+        if (!isEmpty(params[i])) {
+          t = t.replaceAll(`{${i}}`, stringify(params[i]));
+        }
+      }
+    }
+    return t;
+  }
+  /**
+   * Retrieves the label for a specified action, optionally formatting it with provided parameters.
+   *
+   * @param actionName - The name of the action for which to get the label.
+   * @param params - Optional parameters to format the label.
+   * @returns The formatted action label.
+   */
+  getActionLabel(actionName: IResourceActionName, params?: Record<string, any>) {
+    return this.sprintf(this.getAction(actionName)?.label, params);
+  }
+  /**
+   * Retrieves the title of a specified action, optionally formatting it with provided parameters.
+   *
+   * @param actionName - The name of the action for which the title is to be retrieved.
+   * @param params - An optional record of parameters to format the title.
+   * @returns The formatted title of the specified action.
+   */
+  getActionTitle(actionName: IResourceActionName, params?: Record<string, any>) {
+    return this.sprintf(this.getAction(actionName)?.title, params);
+  }
+  /**
+   * Retrieves the tooltip for a specified action.
+   *
+   * @param actionName - The name of the action for which to get the tooltip.
+   * @param params - Optional parameters to format the tooltip string.
+   * @returns The formatted tooltip string for the specified action.
+   */
+  getActionTooltip(actionName: IResourceActionName, params?: Record<string, any>) {
+    return this.sprintf(this.getAction(actionName)?.tooltip, params);
+  }
+  /**
+   * Retrieves a specific action by its name.
+   *
+   * @param {IResourceActionName} actionName - The name of the action to retrieve.
+   * @returns {IResourceAction} The action object if found, otherwise an empty object.
+   */
+  getAction(actionName: IResourceActionName): IResourceAction {
+    if (!isNonNullString(actionName)) return {};
+    const actions = this.getActions();
+    return (isObj(actions[actionName]) && actions[actionName]) || {};
   }
 }
 

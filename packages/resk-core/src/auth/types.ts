@@ -1,4 +1,4 @@
-import { IDict, IResourceName, IResourceAction } from "../types";
+import { IDict, IResourceName, IResourceActionName } from "../types";
 /**
  * @interface IAuthUser
  * Represents an authenticated user in the application.
@@ -40,7 +40,7 @@ import { IDict, IResourceName, IResourceAction } from "../types";
  * };
  * 
  * // Function to check if a user has permission to perform an action
- * function hasPermission(user: IAuthUser , resource: IResourceName, action: IResourceAction): boolean {
+ * function hasPermission(user: IAuthUser , resource: IResourceName, action: IResourceActionName): boolean {
  *     return user.perms?.[resource]?.includes(action) ?? false;
  * }
  * 
@@ -55,7 +55,7 @@ import { IDict, IResourceName, IResourceAction } from "../types";
  * permission for a given resource, demonstrating how the `perms` 
  * property can be utilized in permission management.
  * @see {@link IResourceName} for the `IResourceName` type.
- * @see {@link IResourceAction} for the `IResourceAction` type.
+ * @see {@link IResourceActionName} for the `IResourceActionName` type.
  * @see {@link IAuthPerms} for the `IAuthPerms` type.
  */
 export interface IAuthUser {
@@ -233,7 +233,7 @@ export type IAuthPerm = IAuthPermStr | ((user: IAuthUser) => boolean) | false;
  * The `IAuthPerms` type is defined as a `Record` where:
  * - The keys are of type `IResourceName`, representing the names of 
  *   the resources (e.g., "documents", "users").
- * - The values are arrays of `IResourceAction`, representing the 
+ * - The values are arrays of `IResourceActionName`, representing the 
  *   actions that can be performed on the corresponding resource (e.g., 
  *   ["read", "create", "update"]).
  * 
@@ -250,7 +250,7 @@ export type IAuthPerm = IAuthPermStr | ((user: IAuthUser) => boolean) | false;
  * };
  * 
  * // Function to check if a specific action is permitted on a resource
- * function isActionPermitted(perms: IAuthPerms, resource: IResourceName, action: IResourceAction): boolean {
+ * function isActionPermitted(perms: IAuthPerms, resource: IResourceName, action: IResourceActionName): boolean {
  *     return perms[resource]?.includes(action) ?? false;
  * }
  * 
@@ -266,7 +266,7 @@ export type IAuthPerm = IAuthPermStr | ((user: IAuthUser) => boolean) | false;
  * action is permitted on a given resource, demonstrating how the 
  * `IAuthPerms` type can be utilized in permission management.
  */
-export type IAuthPerms = Record<IResourceName, IResourceAction[]>;
+export type IAuthPerms = Record<IResourceName, IResourceActionName[]>;
 
 
 /**
@@ -343,20 +343,20 @@ export type IAuthPermStr = `${IResourceName}:${IAuthPermAction}` | IAuthPermActi
  * The `IAuthPermAction` type can take on several forms:
  * 
  * - **Single Action**: A single action represented by the 
- *   `${IResourceAction}` template literal (e.g., `"read"`).
+ *   `${IResourceActionName}` template literal (e.g., `"read"`).
  * 
  * - **Multiple Actions**: A combination of actions separated by the 
  *   `|` character, allowing for up to six actions to be specified 
  *   together. For example:
- *   - Two actions: `${IResourceAction}|${IResourceAction}` (e.g., 
+ *   - Two actions: `${IResourceActionName}|${IResourceActionName}` (e.g., 
  *     `"read|update"`).
- *   - Three actions: `${IResourceAction}|${IResourceAction}|${IResourceAction}` 
+ *   - Three actions: `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}` 
  *     (e.g., `"read|update|delete"`).
- *   - Four actions: `${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}` 
+ *   - Four actions: `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}` 
  *     (e.g., `"read|update|delete|create"`).
- *   - Five actions: `${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}` 
+ *   - Five actions: `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}` 
  *     (e.g., `"read|update|delete|create|details"`).
- *   - Six actions: `${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}` 
+ *   - Six actions: `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}` 
  *     (e.g., `"read|update|delete|create|details|archive"`).
  * 
  * This structure allows for a flexible definition of permissions, 
@@ -392,9 +392,9 @@ export type IAuthPermStr = `${IResourceName}:${IAuthPermAction}` | IAuthPermActi
  * and utility in permission management.
  */
 export type IAuthPermAction =
-  | `${IResourceAction}`
-  | `${IResourceAction}|${IResourceAction}`
-  | `${IResourceAction}|${IResourceAction}|${IResourceAction}`
-  | `${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}`
-  | `${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}`
-  | `${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}|${IResourceAction}`;
+  | `${IResourceActionName}`
+  | `${IResourceActionName}|${IResourceActionName}`
+  | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`
+  | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`
+  | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`
+  | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`;

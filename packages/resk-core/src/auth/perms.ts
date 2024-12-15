@@ -1,6 +1,6 @@
 import { isNonNullString, isObj } from "../utils";
 import { getSignedUser } from "./session";
-import { IResourceAction, IResourceName } from "../types";
+import { IResourceActionName, IResourceName } from "../types";
 import { IAuthPerm, IAuthPermAction, IAuthPerms, IAuthUser } from "./types";
 
 /**
@@ -123,7 +123,7 @@ export function checkPermission(perms: IAuthPerms, resource: IResourceName, acti
   }
   const resourceStr = String(resource).trim().toLowerCase();
   action = isNonNullString(action) ? action : "read";
-  let userActions: IResourceAction[] = [];
+  let userActions: IResourceActionName[] = [];
   for (let i in perms) {
     if (String(i).toLowerCase().trim() === resourceStr && Array.isArray(perms[i as keyof IAuthPerms])) {
       userActions = perms[i as keyof IAuthPerms];
@@ -152,7 +152,7 @@ export function checkPermission(perms: IAuthPerms, resource: IResourceName, acti
  * 
  * ### Parameters
  * 
- * - `permission` (IResourceAction): The permission to check.
+ * - `permission` (IResourceActionName): The permission to check.
  * - `action` (IAuthPermAction): The action to check against the 
  *   provided permission.
  * 
@@ -164,18 +164,18 @@ export function checkPermission(perms: IAuthPerms, resource: IResourceName, acti
  * ### Example Usage
  * 
  * ```typescript
- * const permission: IResourceAction = "update";
+ * const permission: IResourceActionName = "update";
  * const action: IAuthPermAction = "read|update";
  * 
  * const canUpdate = isAllowedForAction(permission, action); // true
  * const canDelete = isAllowedForAction(permission, "delete"); // false
  * ```
- * @see {@link IResourceAction} for the `IResourceAction` type.
+ * @see {@link IResourceActionName} for the `IResourceActionName` type.
  * @see {@link IAuthPermAction} for the `IAuthPermAction` type.
  * @see {@link isAllowed} for the `isAllowed` function.
  * @see {@link checkPermission} for the `checkPermission` function.
  */
-export function isAllowedForAction(permission: IResourceAction, action: IAuthPermAction) {
+export function isAllowedForAction(permission: IResourceActionName, action: IAuthPermAction) {
   if (!isNonNullString(action) || !isNonNullString(permission)) {
     return false;
   }
@@ -187,7 +187,7 @@ export function isAllowedForAction(permission: IResourceAction, action: IAuthPer
   const actionSplit = action.split("|"); //à supposer que plusieurs actions ont été proposées
   if (actionSplit.length > 1) {
     for (let s in actionSplit) {
-      if (isAllowedForAction(permission, actionSplit[s] as IResourceAction)) {
+      if (isAllowedForAction(permission, actionSplit[s] as IResourceActionName)) {
         return true;
       }
     }

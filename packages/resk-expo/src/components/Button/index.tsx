@@ -338,12 +338,6 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                             {...labelProps}
                             style={[
                                 styles.label,
-                                !styles.md2Label,
-                                (isMode('text')
-                                    ? icon || isLoading
-                                        ? styles.md3LabelTextAddons
-                                        : styles.md3LabelText
-                                    : styles.md3Label),
                                 compact && styles.compactLabel,
                                 uppercase && styles.uppercaseLabel,
                                 textStyle,
@@ -367,12 +361,16 @@ const styles = StyleSheet.create({
     button: {
         borderStyle: 'solid',
         minWidth: 64,
+        width: '100%',
     },
     touchable: {
-        width: "100%"
+        width: "100%",
+        paddingHorizontal: 7,
+        paddingVertical: 7,
     },
     compact: {
-
+        paddingVertical: 0,
+        paddingHorizontal: 0,
     },
     contentContainer: {
         flexDirection: 'row',
@@ -383,8 +381,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 7,
-        paddingVertical: 10,
         width: '100%',
     },
     icon: {
@@ -402,25 +398,15 @@ const styles = StyleSheet.create({
     /* eslint-enable react-native/no-unused-styles */
     label: {
         textAlign: 'center',
-    },
-    md2Label: {
         letterSpacing: 1,
+        marginHorizontal: 7,
+        marginVertical: 7,
     },
     compactLabel: {
         marginHorizontal: 8,
     },
     uppercaseLabel: {
         textTransform: 'uppercase',
-    },
-    md3Label: {
-        marginVertical: 7,
-        marginHorizontal: 7,
-    },
-    md3LabelText: {
-        marginHorizontal: 6,
-    },
-    md3LabelTextAddons: {
-        marginHorizontal: 7,
     },
 });
 Button.displayName = "Button";

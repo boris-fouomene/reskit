@@ -69,10 +69,8 @@ export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<I
         borderRadius={0}
         textColor={theme.colors.text}
         {...props}
-        style={[styles.menu, props.style]}
-        containerProps={{ ...containerProps, style: [styles.buttonContainer, containerProps.style] }}
+        containerProps={containerProps}
         contentProps={{ ...contentProps, style: [styles.buttonContent, contentProps.style] }}
-        labelProps={{ ...Object.assign({}, props.labelProps), style: [styles.label, props?.labelProps?.style] }}
         iconProps={{ ...Object.assign({}, props.iconProps), style: [styles.icon, props?.iconProps?.style] }}
         context={itemContext}
         onPress={(event, context) => {
@@ -94,18 +92,7 @@ const styles = StyleSheet.create({
     icon: {
         alignItems: "center",
     },
-    label: {
-        paddingVertical: 3,
-    },
-    menu: {
-        width: "100%",
-    },
-    buttonContainer: {
-        width: "100%",
-        marginVertical: 5
-    },
     buttonContent: {
         justifyContent: "flex-start",
-        width: "100%",
     }
 });

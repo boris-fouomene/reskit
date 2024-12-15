@@ -85,7 +85,7 @@ const DrawerItem = ({
     iconProps={{ ...iconProps, size: minimized ? MINIMIZED_ICON_SIZE : iconProps.size || ICON_SIZE, style: [minimized ? styles.iconMinimized : styles.icon, iconProps.style] }}
     {...rest}
     label={minimized ? undefined : rest.label}
-    containerProps={{ ...containerProps, style: [styles.container, containerProps.style] }}
+    containerProps={containerProps}
     contentProps={{ ...contentProps, style: [styles.content, contentProps.style] }}
     textColor={contentColor as string}
     backgroundColor={backgroundColor}
@@ -112,11 +112,6 @@ const styles = StyleSheet.create({
   },
   content: {
     justifyContent: "flex-start",
-    width: '100%',
-  },
-  container: {
-    width: '100%',
-    paddingVertical: 7,
   },
   hidden: {
     opacity: 0,

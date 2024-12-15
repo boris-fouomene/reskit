@@ -135,7 +135,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
   const expandIcon = showExpandIcon !== false ? icon : null;
   return (
     <ExpandableContext.Provider value={{ expanded, toggleExpand, expandIcon: icon }}>
-      <View testID={testID + "_ExpandableContainer"} {...containerProps} style={[styles.container, containerProps.style]}>
+      <View testID={testID + "-container"} {...containerProps} style={[styles.container, containerProps.style]}>
         <Pressable
           ref={ref}
           {...props}

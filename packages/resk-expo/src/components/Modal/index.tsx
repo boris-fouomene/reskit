@@ -95,7 +95,6 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContai
           styles.absoluteFill,
           backgroundAnimatedStyle,
         ]}
-        pointerEvents="none"
       />
       <AnimatedPressable
         testID={testID + "-modal-content-container"}
@@ -290,6 +289,7 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     flex: 1,
+    pointerEvents: "none",
   },
   backdropContent: {
     flex: 1,

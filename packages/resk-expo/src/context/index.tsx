@@ -14,6 +14,7 @@ import { Preloader, Dialog } from "@components/Dialog";
 import { useSafeAreaInsets, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Drawer } from "@components/Drawer";
 import { DrawerNavigationView } from "@layouts/DrawerNavigationView";
+import { FontIcon } from "@components/Icon";
 
 export * from "./types";
 export * from "./hooks";
@@ -80,7 +81,9 @@ export function ReskExpoProvider({ children, theme: customTheme, breakpoints, dr
       triggerThemeUpdate(t as ITheme);
     });
   }
-
+  useEffect(() => {
+    FontIcon.loadFonts();
+  }, []);
   /**
    * `useEffect` is used to detect changes in the custom theme prop and apply updates accordingly.
    * It compares the current custom theme with the previous one and updates the theme if necessary.

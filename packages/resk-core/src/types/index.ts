@@ -95,6 +95,11 @@ export interface IFieldBase<FieldType = "text"> {
    * ```
    */
   databaseTableName?: string;
+
+  /***
+   * weatherr the field is a primary key or not
+   */
+  primaryKey?: boolean;
 }
 
 
@@ -859,6 +864,13 @@ export interface IResourceInstance<DataType = any> extends IResource<DataType> {
    * @returns A boolean indicating whether the user is allowed to view details.
    */
   canUserViewDetails(user?: IAuthUser): boolean;
+
+  /**
+   * Retrieves the primary key fields from the current object's fields.
+   *
+   * @returns {IField[]} An array of fields that are marked as primary keys.
+   */
+  getPrimaryKeys(): IField[];
 };
 
 /**

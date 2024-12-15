@@ -70,7 +70,6 @@ export default function updateWebTheme(theme: ITheme) {
             overflow:hidden!important;
             margin:0!important;
             padding:0!important;
-            background-color : ${theme.colors.background};
         }
         body > div {
             background-color : transparent;

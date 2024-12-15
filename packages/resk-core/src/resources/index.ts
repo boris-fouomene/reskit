@@ -372,6 +372,23 @@ export class ResourceBase<DataType = any> implements IResourceInstance<DataType>
     const actions = this.getActions();
     return (isObj(actions[actionName]) && actions[actionName]) || {};
   }
+
+  /**
+   * Retrieves the primary key fields from the current object's fields.
+   *
+   * @returns {IField[]} An array of fields that are marked as primary keys.
+   */
+  getPrimaryKeys(): IField[] {
+    const primaryKeys: IField[] = [];
+    if (isObj(this.fields)) {
+      for (let i in this.fields) {
+        if (isObj(this.fields[i]) && this.fields[i].primaryKey) {
+          primaryKeys.push(this.fields[i]);
+        }
+      }
+    }
+    return primaryKeys;
+  }
 }
 
 /**

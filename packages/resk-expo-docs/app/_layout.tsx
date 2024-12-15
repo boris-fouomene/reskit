@@ -1,9 +1,9 @@
 import 'react-native-reanimated';
 import * as SplashScreen from 'expo-splash-screen';
-import { Icon, ITheme, ReskExpoProvider, useDrawer } from "@resk/expo";
+import { ITheme, ReskExpoProvider, useDrawer } from "@resk/expo";
 import { Slot } from 'expo-router';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+//SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
     return (<ReskExpoProvider
         drawerNavigationViewProps={{
@@ -27,8 +27,7 @@ export default function RootLayout() {
                 { label: 'Logout', icon: 'logout', onPress: () => console.log('Logout pressed') },
             ]
         }}
-        theme={{ dark: true } as ITheme
-        }>
+        theme={{ dark: true } as ITheme}>
         <Slot />
     </ReskExpoProvider>);
 }

@@ -55,3 +55,4 @@ export const packageName = defaultStr(Constants.expoConfig?.name);
 
 
 export * from "./hasTouchHandler";
+export * from "./isComponent";

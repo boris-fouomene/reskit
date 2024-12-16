@@ -18,7 +18,7 @@ import Label from '@components/Label';
 import { IButtonMode, IButtonProps, IButtonContext, IButtonRef } from './types';
 import { IFlatStyle } from '../../types/index';
 import { IIconButtonProps, useGetIcon } from '@components/Icon';
-import { defaultStr, IResourceName, isNonNullString, isObj, uniqid, Auth, IAuthUser, IAuthPerm } from '@resk/core';
+import { defaultStr, IResourceName, isNonNullString, isObj, uniqid, Auth, IAuthUser, IAuthPerm, ResourcesManager } from '@resk/core';
 import { Tooltip } from '@components/Tooltip';
 import isValidElement from '@utils/isValidElement';
 import View from '@components/View';
@@ -450,10 +450,10 @@ export const useButton = () => React.useContext(ButtonContext) || {};
 const isAllowed = (options: { perm?: IAuthPerm, resourceName?: IResourceName }, user?: IAuthUser): boolean => {
     if (!isObj(options)) return false;
     if (options?.resourceName && isNonNullString(options?.resourceName)) {
-        /* const resource = getResource(options?.resourceName);
+        const resource = ResourcesManager.getResource(options?.resourceName);
         if (resource) {
-            return resource.isAllowed(options?.perm as IPerm, user);
-        } */
+            return resource.isAllowed(options?.perm as IAuthPerm, user);
+        }
     }
     return Auth.isAllowed(options?.perm, user);
 }

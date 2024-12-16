@@ -1,4 +1,5 @@
 import { IAuthPerm, IAuthUser } from "@/auth/types";
+import { IFilterQuery } from "./filters";
 
 /**
  * Represents a base field with optional type, label, and name properties.
@@ -533,7 +534,7 @@ export interface IResourceActionMap {
  * ### Notes
  * 
  * - The `IResourceAction` interface is designed to be flexible, allowing developers to 
- *   define actions with varying levels of detail based on the needs of their application.
+ *   define actions with varying levels of getDetails based on the needs of their application.
  * - By providing clear labels, titles, and tooltips, developers can enhance the user 
  *   experience and make the application more intuitive.
  */
@@ -615,9 +616,22 @@ export type IResourceActionName = keyof IResourceActionMap;
  * This interface provides the basic structure for a resource by defining key properties
  * such as `name`, `label`, and `title`, which are used for internal reference and UI display.
  *
- * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
+ * @typeParam DataType - An optional type representing the data that this resource holds. Defaults to `any`.
  */
-export interface IResource<Datatype = any> {
+/**
+ * Represents a resource with a data provider and various metadata properties.
+ *
+ * @template DataType - The type of data the resource handles.
+ * @template PrimaryKeyType - The type of the primary key for the resource.
+ *
+ * @property {IResourceDataProvider<DataType, PrimaryKeyType>} dataProvider - The data provider for the resource.
+ * @property {IResourceName} [name] - The internal name of the resource used for programmatic referencing.
+ * @property {string} [label] - A user-friendly label for the resource, typically used in UI elements.
+ * @property {string} [title] - A descriptive title for the resource, often displayed in prominent places.
+ * @property {string} [tooltip] - A short text that appears when the user hovers over the resource, providing additional context.
+ * @property {IResourceActionMap} [actions] - The actions associated with the resource.
+ */
+export interface IResource<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
   /**
    * The internal name of the resource.
    *
@@ -699,7 +713,16 @@ export interface IResource<Datatype = any> {
  *   // ...
  * }
  */
-export interface IResourceInstance<DataType = any> extends IResource<DataType> {
+export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends IResource<DataType, PrimaryKeyType> {
+  /*
+  The data provider for the resource.
+  */
+  dataProvider: IResourceDataProvider<DataType, PrimaryKeyType>;
+  /**
+   * retrieves the data provider for the resource.
+   * @returns {IResourceDataProvider<DataType, PrimaryKeyType>} The data provider for the resource.
+  */
+  getDataProvider: () => IResourceDataProvider<DataType, PrimaryKeyType>;
   /**
   * A type that represents a map of field names to their corresponding IField instances.
     @description this is the list of fields that are part of the resource.  Fields are created using the @Field decorator when resources are defined.
@@ -871,6 +894,50 @@ export interface IResourceInstance<DataType = any> extends IResource<DataType> {
    * @returns {IField[]} An array of fields that are marked as primary keys.
    */
   getPrimaryKeys(): IField[];
+
+  /***
+   * Creates a new record in the resource.
+   * @param {DataType} record - The data for the new record.
+   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
+   */
+  create(record: DataType): Promise<IResourceOperationResult<DataType>>;
+
+  /***
+   * Fetches all records from the resource.
+   * @param {IResourceFetchOptions<DataType, PrimaryKeyType>} options - Optional options for fetching resources.
+   * @returns {Promise<IResourceOperationResult<DataType[]>>} A promise that resolves to the result of the fetch operation.
+   */
+  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType[]>>;
+
+  /***
+   * Fetches a single record from the resource.
+   * @param {PrimaryKeyType} key - The primary key of the resource.
+   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the fetch operation.
+   */
+  getOne(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
+
+  /**
+   * Fetch detailed information about a specific resource.
+   * This can include related or associated data.
+   * @param key - The primary key of the resource.
+   * @returns The detailed resource information or an error message.
+   */
+  getDetails(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
+
+  /***
+   * Updates a single record in the resource.
+   * @param {PrimaryKeyType} key - The primary key of the resource to update.
+   * @param {Partial<DataType>} updatedData - The updated data for the resource.
+   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the update operation.
+   */
+  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
+
+  /**
+   * 
+   * @param key - The primary key of the resource to delete.
+   * @returns {Promise<IResourceOperationResult<null>>} A promise that resolves to the result of the delete operation.
+   */
+  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<null>>;
 };
 
 /**
@@ -1322,3 +1389,297 @@ export type IDictPrefixWithKey<Prefix extends string, Dict extends Record<string
  * @template T The dictionary (object type) whose keys are to be converted.
  */
 export type IDictKeysAsString<T> = keyof T extends string ? keyof T : never;
+
+/**
+ * @type IResourcePrimaryKey
+ * 
+ * Represents the type of primary keys that can be utilized in a resource.
+ * This type is a union that provides flexibility in defining unique identifiers
+ * for resources, accommodating various data structures and use cases.
+ * 
+ * ### Possible Forms:
+ * 
+ * - **String**: A simple string value that can represent a unique identifier.
+ *   - **Example**: 
+ *     ```typescript
+ *     const userId: IResourcePrimaryKey = "user123"; // A unique username
+ *     ```
+ * 
+ * - **Number**: A numeric value that can also serve as a unique identifier.
+ *   - **Example**: 
+ *     ```typescript
+ *     const orderId: IResourcePrimaryKey = 456; // An auto-incremented order ID
+ *     ```
+ * 
+ * - **Record<string, string | number>**: An object where the keys are strings
+ *   and the values can be either strings or numbers. This allows for composite keys
+ *   that consist of multiple fields.
+ *   - **Example**: 
+ *     ```typescript
+ *     const compositeKey: IResourcePrimaryKey = { userId: "user123", orderId: 456 }; 
+ *     // A composite key representing a user and their order
+ *     ```
+ * 
+ * ### Notes:
+ * - This type is particularly useful in scenarios where resources may have 
+ *   different types of identifiers, such as in databases or APIs.
+ * - Using a `Record` allows for more complex primary key structures, which can 
+ *   be beneficial in applications that require composite keys.
+ * 
+ * ### Use Cases:
+ * - Defining primary keys in database models.
+ * - Creating unique identifiers for API resources.
+ * - Handling composite keys in data structures.
+ * 
+ * ### Related Types:
+ * - Consider using `IResource` for defining the overall structure of a resource
+ *   that utilizes this primary key type.
+ * 
+ * ### Example Usage:
+ * Here’s how you might use the `IResourcePrimaryKey` type in a function that
+ * retrieves a resource by its primary key:
+ * 
+ * ```typescript
+ * function getResourceById(id: IResourcePrimaryKey): Resource {
+ *     // Implementation to fetch the resource based on the provided primary key
+ * }
+ * 
+ * const resource = getResourceById("user123"); // Fetching by string ID
+ * const anotherResource = getResourceById(456); // Fetching by numeric ID
+ * const compositeResource = getResourceById({ userId: "user123", orderId: 456 }); // Fetching by composite key
+ * ```
+ * 
+ * ### Summary:
+ * The `IResourcePrimaryKey` type provides a versatile way to define primary keys
+ * for resources, supporting simple and complex identifiers. This flexibility is
+ * essential for applications that manage diverse data structures and require
+ * unique identification of resources.
+ */
+export type IResourcePrimaryKey = string | number | Record<string, string | number>;
+
+/**
+ * @interface IResourceOperationResult
+ * 
+ * Represents the result of an operation performed on a resource.
+ * This interface provides a structured way to convey the outcome of 
+ * operations, including success status, returned data, and error messages.
+ * 
+ * @template DataType - The type of data that may be returned as part of the 
+ * operation result. Defaults to `any`, allowing for flexibility in the 
+ * type of data returned.
+ * 
+ * ### Properties:
+ * 
+ * - **success**: A boolean indicating whether the operation was successful.
+ *   - **Example**: 
+ *     ```typescript
+ *     const result: IResourceOperationResult = { success: true };
+ *     ```
+ * 
+ * - **data**: An optional property that holds the data returned from the 
+ * operation if it was successful. The type of this data is defined by 
+ * the `DataType` template parameter.
+ *   - **Example**: 
+ *     ```typescript
+ *     const result: IResourceOperationResult<User> = { 
+ *         success: true, 
+ *         data: { id: 1, name: "John Doe" } 
+ *     };
+ *     ```
+ * 
+ * - **error**: An optional string that contains an error message if the 
+ * operation was not successful. This property provides context on what 
+ * went wrong during the operation.
+ *   - **Example**: 
+ *     ```typescript
+ *     const result: IResourceOperationResult = { 
+ *         success: false, 
+ *         error: "User  not found." 
+ *     };
+ *     ```
+ * 
+ * ### Notes:
+ * - This interface is useful for standardizing the response format of 
+ *   resource operations, making it easier to handle success and error 
+ *   cases consistently across the application.
+ * - The `DataType` parameter allows for strong typing of the returned 
+ *   data, enhancing type safety and reducing runtime errors.
+ * 
+ * ### Example Usage:
+ * Here’s how you might use the `IResourceOperationResult` interface 
+ * in a function that performs a resource operation:
+ * 
+ * ```typescript
+ * function createUser (userData: User): IResourceOperationResult<User> {
+ *     try {
+ *         // Logic to create a user
+ *         const newUser  = { id: 1, ...userData }; // Simulated created user
+ *         return { success: true, data: newUser  };
+ *     } catch (error) {
+ *         return { success: false, error: error.message };
+ *     }
+ * }
+ * 
+ * const result = createUser ({ name: "John Doe" });
+ * if (result.success) {
+ *     console.log("User  created:", result.data);
+ * } else {
+ *     console.error("Error creating user:", result.error);
+ * }
+ * ```
+ * 
+ * ### Summary:
+ * The `IResourceOperationResult` interface provides a clear and 
+ * consistent structure for representing the outcome of resource 
+ * operations, facilitating better error handling and data management 
+ * in applications.
+ */
+export interface IResourceOperationResult<DataType = any> {
+  success: boolean; // Indicates if the operation was successful
+  data?: DataType; // Optional data returned from the operation
+  error?: string; // Optional error message if the operation failed
+}
+
+/**
+ * @interface IResourceDataProvider
+ * 
+ * Represents a data provider interface for managing resources.
+ * This interface defines methods for performing CRUD (Create, Read, Update, Delete)
+ * operations on resources, allowing for flexible data management.
+ * 
+ * @template DataType - The type of the resource data being managed. Defaults to `any`,
+ * allowing for flexibility in the type of data handled by the provider.
+ * 
+ * @template PrimaryKeyType - The type of the primary key used to identify resources. 
+ * It extends `IResourcePrimaryKey`, which can be a string, number, or a composite key.
+ * Defaults to `string | number`.
+ * 
+ * ### Methods:
+ * 
+ * - **create(record: DataType)**: Creates a new resource record.
+ *   - **Parameters**:
+ *     - `record`: The data for the new resource to be created.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
+ *     indicating the success or failure of the operation.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.create({ name: "New Resource" });
+ *     ```
+ * 
+ * - **fetch()**: Retrieves all resource records.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+ *     containing an array of resource records.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.fetch();
+ *     console.log(result.data); // Array of resource records
+ *     ```
+ * 
+ * - **getOne(key: K)**: Retrieves a single resource record by its primary key.
+ *   - **Parameters**:
+ *     - `key`: The primary key of the resource to retrieve.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
+ *     containing the requested resource record.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.getOne("resourceId");
+ *     ```
+ * 
+ * - **getDetails(key: K)**: Retrieves detailed information about a single resource record.
+ *   - **Parameters**:
+ *     - `key`: The primary key of the resource to retrieve details for.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
+ *     containing detailed information about the resource.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.getDetails("resourceId");
+ *     ```
+ * 
+ * - **update(key: K, updatedData: Partial<DataType>)**: Updates an existing resource record.
+ *   - **Parameters**:
+ *     - `key`: The primary key of the resource to update.
+ *     - `updatedData`: An object containing the updated data for the resource.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
+ *     indicating the success or failure of the update operation.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.update("resourceId", { name: "Updated Resource" });
+ *     ```
+ * 
+ * - **delete(key: K)**: Deletes a resource record by its primary key.
+ *   - **Parameters**:
+ *     - `key`: The primary key of the resource to delete.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<null>`, 
+ *     indicating the success or failure of the delete operation.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.delete("resourceId");
+ *     ```
+ * 
+ * ### Notes:
+ * - This interface provides a standard way to interact with resource data,
+ *   ensuring that all operations return consistent results.
+ * - The use of promises allows for asynchronous operations, making it suitable
+ *   for use in modern web applications.
+ * 
+ * ### Example Usage:
+ * Here’s how you might implement the `IResourceDataProvider` interface:
+ * 
+ * ```typescript
+ * class MyDataProvider implements IResourceDataProvider<MyResourceType> {
+ *     async create(record: MyResourceType): Promise<IResourceOperationResult<MyResourceType>> {
+ *         // Implementation for creating a resource
+ *     }
+ * 
+ *     async fetch(): Promise<IResourceOperationResult<MyResourceType[]>> {
+ *         // Implementation for fetching resources
+ *     }
+ * 
+ *     // Implement other methods...
+ * }
+ * ```
+ * 
+ * ### Summary:
+ * The `IResourceDataProvider` interface defines a comprehensive set of methods
+ * for managing resources, facilitating CRUD operations and ensuring a consistent
+ * approach to data handling in applications.
+ */
+export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+  create(record: DataType): Promise<IResourceOperationResult<DataType>>;
+  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType[]>>;
+  getOne(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
+  getDetails(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
+  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
+  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<null>>;
+}
+
+/**
+ * Interface representing options for fetching resources.
+ * 
+ * This interface allows you to specify various options when retrieving resources,
+ * including filters to narrow down the results based on specific criteria.
+ * 
+ * @template DataType - The type of data being fetched. Defaults to 'any'.
+ * @template PrimaryKeyType - The type of the primary key for the resource. 
+ *                            Defaults to IResourcePrimaryKey.
+ * 
+ * @example
+ * // Example of using IResourceFetchOptions
+ * const fetchOptions: IResourceFetchOptions<MyDataType, string> = {
+ *     filters: {
+ *         selector: {
+ *             status: { $eq: "active" }, // Filter for active resources
+ *             category: { $in: ["A", "B"] } // Filter for categories A or B
+ *         },
+ *         sort: { createdAt: 'desc' }, // Sort by creation date descending
+ *         limit: 20, // Limit results to 20
+ *         skip: 0 // Do not skip any results
+ *     }
+ * };
+ */
+export interface IResourceFetchOptions<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+  filters?: IFilterQuery; // Optional filters to apply when fetching resources
+}
+
+
+export * from "./filters";

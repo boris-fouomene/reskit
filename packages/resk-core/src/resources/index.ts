@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { IDict, IResourceName, IField, IResourceInstance, IResource, IResourceActionMap, IResourceActionName, IResourceAction } from '../types';
+import { IDict, IResourceName, IField, IResourceInstance, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceFetchOptions } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify } from '../utils/index';
 import { IConstructor } from '../types/index';
@@ -46,7 +46,7 @@ import { isAllowed } from '../auth/perms';
  * console.log(dynamicResource.getFields()); 
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
-export class ResourceBase<DataType = any> implements IResourceInstance<DataType> {
+export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> implements IResourceInstance<DataType, PrimaryKeyType> {
   actions?: IResourceActionMap;
   /**
    * The internal name of the resource.
@@ -119,6 +119,61 @@ export class ResourceBase<DataType = any> implements IResourceInstance<DataType>
    */
   constructor(options: IResource<DataType>, ...args: any[]) {
     this.init(options);
+  }
+  /**
+   * The data provider for the resource.
+   */
+  dataProvider: IResourceDataProvider<DataType, PrimaryKeyType> = null as unknown as IResourceDataProvider<DataType, PrimaryKeyType>;
+  /**
+   * get the data provider for the resource.
+   * @returns {IResourceDataProvider<DataType, PrimaryKeyType>} The data provider for the resource.
+   */
+  getDataProvider(): IResourceDataProvider<DataType, PrimaryKeyType> {
+    return this.dataProvider;
+  };
+  /***
+   * creates a new record in the resource.
+   * @param {DataType} record - The data for the new record.
+   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
+   */
+  create(record: DataType): Promise<IResourceOperationResult<DataType>> {
+    return this.getDataProvider()?.create(record);
+  }
+  /***
+   * Fetches all records from the resource.
+   * @param {IResourceFetchOptions<DataType, PrimaryKeyType>} options - Optional options for fetching resources.
+   * @returns {Promise<IResourceOperationResult<DataType[]>>} A promise that resolves to the result of the fetch operation.
+   */
+  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType[]>> {
+    return this.getDataProvider()?.fetch(options);
+  }
+  /***
+   * fetches a single record from the resource.
+   * @param {PrimaryKeyType} key - The primary key of the resource.
+   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the fetch operation.
+   */
+  getOne(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>> {
+    return this.getDataProvider()?.getOne(key);
+  }
+  /**
+   * gets the details of a record from the resource.
+   * @param key - The primary key of the resource.
+   * @returns {Promise<IResourceOperationResult<DataType>} A promise that resolves to the result of the fetch operation.
+   */
+  getDetails(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>> {
+    return this.getDataProvider()?.getDetails(key);
+  }
+  /**
+   * updates a record in the resource.
+   * @param key {PrimaryKeyType} The primary key of the resource to update.
+   * @param updatedData 
+   * @returns 
+   */
+  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
+    return this.getDataProvider()?.update(key, updatedData);
+  }
+  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<null>> {
+    return this.getDataProvider()?.delete(key);
   }
 
   /**

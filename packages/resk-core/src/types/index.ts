@@ -920,9 +920,9 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
   /***
    * Fetches all records from the resource.
    * @param {IResourceFetchOptions<DataType, PrimaryKeyType>} options - Optional options for fetching resources.
-   * @returns {Promise<IResourceOperationResult<DataType[]>>} A promise that resolves to the result of the fetch operation.
+   * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the fetch operation.
    */
-  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType[]>>;
+  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
 
   /***
    * Fetches a single record from the resource.
@@ -1554,6 +1554,7 @@ export type IResourcePrimaryKey = string | number | Record<string, string | numb
  * in applications.
  */
 export interface IResourceOperationResult<DataType = any> {
+  statusCode?: number; // HTTP status code for the operation
   success: boolean; // Indicates if the operation was successful
   data?: DataType; // Optional data returned from the operation
   error?: string | Error; // Optional error message if the operation failed
@@ -1669,7 +1670,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   delete(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any>>;
   getOne(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
   details(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
-  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType[]>>;
+  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
 }
 
 /**
@@ -1724,6 +1725,117 @@ export interface IResourceFetchOptions<DataType = any, PrimaryKeyType extends IR
 
   /** Time-to-Live for cache, in seconds. */
   cacheTTL?: number;
+}
+
+/**
+ * @interface IResourcePaginatedResult
+ * 
+ * Represents the result of a paginated resource fetch operation.
+ * This interface encapsulates the data retrieved from a paginated API response,
+ * along with metadata about the pagination state and navigation links.
+ * 
+ * @template DataType - The type of the resources being fetched. Defaults to `any`.
+ * 
+ * ### Properties:
+ * 
+ * - **data**: An array of fetched resources.
+ *   - **Type**: `DataType[]`
+ *   - **Description**: This property contains the list of resources retrieved from the API.
+ *   - **Example**:
+ *     ```typescript
+ *     const result: IResourcePaginatedResult<User> = {
+ *         data: [
+ *             { id: 1, name: "John Doe" },
+ *             { id: 2, name: "Jane Smith" }
+ *         ],
+ *         meta: { totalItems: 100, currentPage: 1, pageSize: 10, totalPages: 10 },
+ *         links: { first: null, previous: null, next: "http://api.example.com/users?page=2", last: "http://api.example.com/users?page=10" }
+ *     };
+ *     ```
+ * 
+ * - **meta**: Metadata about the pagination state.
+ *   - **Type**: `Object`
+ *   - **Description**: This property provides information about the total number of items, the current page, the page size, and the total number of pages.
+ *   - **Properties**:
+ *     - **totalItems**: The total number of items available across all pages.
+ *       - **Type**: `number`
+ *       - **Example**: `100` indicates there are 100 items in total.
+ *     - **currentPage**: The current page number being viewed.
+ *       - **Type**: `number`
+ *       - **Example**: `1` indicates the first page.
+ *     - **pageSize**: The number of items displayed per page.
+ *       - **Type**: `number`
+ *       - **Example**: `10` indicates that 10 items are shown per page.
+ *     - **totalPages**: The total number of pages available.
+ *       - **Type**: `number`
+ *       - **Example**: `10` indicates there are 10 pages in total.
+ * 
+ * - **links**: Navigation links for paginated results.
+ *   - **Type**: `Object`
+ *   - **Description**: This property contains URLs for navigating through the paginated results.
+ *   - **Properties**:
+ *     - **first**: URL to the first page of results.
+ *       - **Type**: `string | null`
+ *       - **Example**: `"http://api.example.com/users?page=1"` or `null` if there is no first page.
+ *     - **previous**: URL to the previous page of results.
+ *       - **Type**: `string | null`
+ *       - **Example**: `"http://api.example.com/users?page=1"` or `null` if there is no previous page.
+ *     - **next**: URL to the next page of results.
+ *       - **Type**: `string | null`
+ *       - **Example**: `"http://api.example.com/users?page=2"` or `null` if there is no next page.
+ *     - **last**: URL to the last page of results.
+ *       - **Type**: `string | null`
+ *       - **Example**: `"http://api.example.com/users?page=10"` or `null` if there is no last page.
+ * 
+ * ### Example Usage:
+ * Here’s how you might use the `IResourcePaginatedResult` interface in a function that fetches paginated user data:
+ * 
+ * ```typescript
+ * async function fetchUsers(page: number): Promise<IResourcePaginatedResult<User>> {
+ *     const response = await fetch(`http://api.example.com/users?page=${page}`);
+ *     const result: IResourcePaginatedResult<User> = await response.json();
+ *     return result;
+ * }
+ * 
+ * fetchUsers(1).then(result => {
+ *     console.log(`Total Users: ${result.meta.totalItems}`);
+ *     console.log(`Current Page: ${result.meta.currentPage}`);
+ *     console.log(`Users on this page:`, result.data);
+ * });
+ * ```
+ * 
+ * ### Notes:
+ * - This interface is particularly useful for APIs that return large datasets,
+ *   allowing clients to retrieve data in manageable chunks.
+ * - The `links` property facilitates easy navigation between pages, enhancing user experience.
+ */
+export interface IResourcePaginatedResult<DataType = any> extends IResourceOperationResult<DataType[]> {
+  /** List of fetched resources. */
+  data: DataType[];
+
+  /** Pagination metadata. */
+  meta?: {
+    /** The total number of items available. */
+    totalItems: number;
+    /** The current page number. */
+    currentPage: number;
+    /** The number of items per page. */
+    pageSize: number;
+    /** The total number of pages. */
+    totalPages: number;
+  };
+
+  /** Links for navigation in paginated results. */
+  links?: {
+    /** URL or index to the first page. */
+    first?: string | number;
+    /** URL or index to the previous page. */
+    previous?: string | number;
+    /** URL or index to the next page. */
+    next?: string | number;
+    /** URL or index to the last page. */
+    last?: string | number;
+  };
 }
 
 export * from "./filters";

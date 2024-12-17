@@ -10,7 +10,10 @@
  * const translations: II18nDictionary = {
  *     en: {
  *         greeting: "Hello",
- *         farewell: "Goodbye"
+ *         farewell: "Goodbye",
+ *         nested: {
+                example: "This is a nested translation.",
+ *         }
  *     },
  *     es: {
  *         greeting: "Hola",
@@ -34,7 +37,7 @@ export interface II18nDictionary {
          * @example
          * const greeting = translations[locale].greeting; // "Hello" for English
          */
-        [key: string]: string | II18nDictionary;
+        [key: string]: (string | II18nDictionary | Record<string, string>);
     };
 }
 

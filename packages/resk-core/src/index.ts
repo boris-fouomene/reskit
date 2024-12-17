@@ -1,4 +1,4 @@
-
+import "./translations";
 
 /**
  * Exports the Session namespace.

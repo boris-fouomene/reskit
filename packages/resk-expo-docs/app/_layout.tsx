@@ -2,6 +2,7 @@ import 'react-native-reanimated';
 import * as SplashScreen from 'expo-splash-screen';
 import { ITheme, ReskExpoProvider, useDrawer } from "@resk/expo";
 import { Slot } from 'expo-router';
+import "../src/i18n/translations";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 //SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {

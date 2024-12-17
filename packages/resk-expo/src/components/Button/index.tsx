@@ -365,7 +365,6 @@ const styles = StyleSheet.create({
     button: {
         borderStyle: 'solid',
         minWidth: 64,
-        width: '100%',
     },
     touchable: {
         width: "100%",

@@ -2,6 +2,7 @@ import { FontIcon, Tab, Switch, Checkbox, Modal, Button, Dialog, Preloader, Port
 import { View, TouchableOpacity, Pressable, ScrollView } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { withAppBar } from "@resk/expo/build/hooks";
+import { i18n } from "@resk/core";
 
 
 const index = withAppBar(() => {
@@ -125,8 +126,8 @@ const index = withAppBar(() => {
         </ScrollView>
     )
 }, {
-    title: "My App is very a long appp heeein marno maaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    subtitle: "Screen Title aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa long scrreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    title: i18n.t("appBar.title"),
+    subtitle: i18n.t("appBar.subtitle"),
     actions: [
         {
             label: "actin 1",

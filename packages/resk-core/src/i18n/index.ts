@@ -47,12 +47,11 @@ export class I18n extends ObservableClass {
      */
     public static defaultFormatter: I18nFormatter = (value: string, params?: Record<string, any>) => {
         if (value === undefined || value === null) return "";
-        if (["number", "boolean", "string"].includes(typeof value)) {
+        if (!["number", "boolean", "string"].includes(typeof value)) {
             return stringify(value);
         }
         value = String(value);
-        if (!isObj(params)) return value;
-        if (!params) return value;
+        if (!isObj(params) || !params) return value;
         return value.replace(/{(.*?)}/g, (_, key) => stringify(params[key]));
     }
 
@@ -87,6 +86,22 @@ export class I18n extends ObservableClass {
         return (target: Object, propertyKey: string | symbol) => {
             Reflect.defineMetadata(TRANSLATION_KEY, key, target, propertyKey);
         };
+    }
+
+    /**
+     * static function to attach a dictionary to the I18n default instance.
+        @example : 
+        // --- Usage as a decorator ---
+        I18n.RegisterDictionary({
+            de: {
+                greeting: "Hallo, {name}!",
+                farewell: "Auf Wiedersehen!",
+            },
+        })
+    * @param dictionary The language dictionary.
+    */
+    static RegisterDictionary(dictionary: II18nDictionary): II18nDictionary {
+        return I18n.getInstance().registerDictionary(dictionary);
     }
 
     /**
@@ -146,11 +161,13 @@ export class I18n extends ObservableClass {
     public t(key: string, params?: Record<string, any>): string {
         const locale = this.getLocale();
         const value = this.getNestedTranslation(locale, key);
-        if (value) {
-            return this.format(value, params);
-        } else if (this.options.fallbackLocale && isNonNullString(this.options.fallbackLocale) && locale !== this.options.fallbackLocale) {
-            const fallbackValue = this.getNestedTranslation(this.options.fallbackLocale, key);
-            return this.format(fallbackValue || key, params);
+        if (isNonNullString(value) && value) {
+            if (isNonNullString(locale) && locale) {
+                return this.format(value, params);
+            } else if (this.options.fallbackLocale && isNonNullString(this.options.fallbackLocale) && locale !== this.options.fallbackLocale) {
+                const fallbackValue = this.getNestedTranslation(this.options.fallbackLocale, key);
+                return this.format(fallbackValue || key, params);
+            }
         }
         return key; // Return the key itself if not found.
     }
@@ -165,7 +182,7 @@ export class I18n extends ObservableClass {
         const keys = key.split(".");
         let result: any = this.dictionary[locale];
         for (const k of keys) {
-            if (result && typeof result === "object") {
+            if (result && isObj(result)) {
                 result = result[k];
             } else {
                 return undefined;

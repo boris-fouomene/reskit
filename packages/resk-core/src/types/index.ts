@@ -1727,3 +1727,4 @@ export interface IResourceFetchOptions<DataType = any, PrimaryKeyType extends IR
 }
 
 export * from "./filters";
+export * from "./i18n";

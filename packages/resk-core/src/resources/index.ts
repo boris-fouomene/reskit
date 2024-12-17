@@ -62,16 +62,16 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   name?: IResourceName;
 
   /**
-       * A user-friendly label for the resource.
-       *
-       * This is typically a shorter name intended for display in UI elements, such as dropdowns or buttons.
-       * It helps users identify the resource within the user interface.
-       *
-       * @example
-       * ```typescript
-       * const productResource: IResource = { label: "Product" };
-       * ```
-       */
+   * A user-friendly label for the resource.
+   *
+   * This is typically a shorter name intended for display in UI elements, such as dropdowns or buttons.
+   * It helps users identify the resource within the user interface.
+   *
+   * @example
+   * ```typescript
+   * const productResource: IResource = { label: "Product" };
+   * ```
+   */
   label?: string;
 
   /**

@@ -1,5 +1,5 @@
 import { IAuthPerm, IAuthUser } from "@/auth/types";
-import { IFilterQuery } from "./filters";
+import { IFilterQuery, IFilterSort } from "./filters";
 
 /**
  * Represents a base field with optional type, label, and name properties.
@@ -260,7 +260,7 @@ export interface IFieldMap {
  * 
  * - If `T` is an object, it omits overlapping keys from `IFieldBase` and merges the object type `T`.
  * 
- * - If none of the above conditions apply, it defaults to `IFieldBase<T>`.
+ * - If none of the above conditions apply, it defaults to `IFieldBase<DataType>`.
  * 
  * @example
  * // For a field type 'text', it uses the mapped type in `IFieldMap`:
@@ -534,7 +534,7 @@ export interface IResourceActionMap {
  * ### Notes
  * 
  * - The `IResourceAction` interface is designed to be flexible, allowing developers to 
- *   define actions with varying levels of getDetails based on the needs of their application.
+ *   define actions with varying levels of details based on the needs of their application.
  * - By providing clear labels, titles, and tooltips, developers can enhance the user 
  *   experience and make the application more intuitive.
  */
@@ -693,12 +693,16 @@ export interface IResource<DataType = any, PrimaryKeyType extends IResourcePrima
 }
 
 /**
- * A type representing an instance of a class that extends `IResource`.\n
- * This allows us to dynamically handle resource instances with generic types.
+ * @type IResourceInstance
+ * Represents a standardized base class for managing resources.
+ *
+ * This class provides common CRUD (Create, Read, Update, Delete) methods
+ * and advanced options for filtering, sorting, and fetching resources.
  *
  * @typedef {Object} IResourceInstance
  *
  * @template DataType - The specific data's type of `IResource` being instantiated (defaults to `IResource`).
+ * @template PrimaryKeyType - The type of the primary key for the resource. Defaults to `IResourcePrimaryKey`.
  * @example
  * const userResourceInstance: IResourceInstance<UserDataType> = new UserResource({name:"users",label:"List of users"});
  *
@@ -735,7 +739,7 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
   * @returns {Record<string, IField>} An object mapping property names to their corresponding field declaration
   * @example
   * ```typescript
-  * class MyClass extends ResourceBase<DataType> {
+  * class MyClass extends ResourceBase<DataType,number> {
   *   @Field({ type: 'string' }) myField: string;
   * }
   * const fields = new MyClass().getFields();
@@ -898,9 +902,20 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
   /***
    * Creates a new record in the resource.
    * @param {DataType} record - The data for the new record.
+   * @param options - Optional settings for the creation process.
+   * @returns A promise that resolves to the result of the operation.
+   * 
+   * @example
+   * ```typescript
+   * const result = await resource.create({ name: "Product A", price: 100 }, {
+   *   returnFields: ['id', 'name'],
+   *   include: ['category']
+   * });
+   * console.log(result.data); // { id: 1, name: "Product A" }
+   * ```
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
-  create(record: DataType): Promise<IResourceOperationResult<DataType>>;
+  create(record: DataType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
 
   /***
    * Fetches all records from the resource.
@@ -912,32 +927,36 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
   /***
    * Fetches a single record from the resource.
    * @param {PrimaryKeyType} key - The primary key of the resource.
+   * @param options - Optional settings for the fetch operation.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the fetch operation.
    */
-  getOne(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
+  getOne(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
 
   /**
    * Fetch detailed information about a specific resource.
    * This can include related or associated data.
    * @param key - The primary key of the resource.
+   * @param options - Optional settings for the fetch operation.
    * @returns The detailed resource information or an error message.
    */
-  getDetails(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
+  details(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
 
   /***
    * Updates a single record in the resource.
    * @param {PrimaryKeyType} key - The primary key of the resource to update.
    * @param {Partial<DataType>} updatedData - The updated data for the resource.
+   * @param options - Optional settings for the update process.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the update operation.
    */
-  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
+  update(key: PrimaryKeyType, updatedData: Partial<DataType>, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
 
   /**
    * 
    * @param key - The primary key of the resource to delete.
-   * @returns {Promise<IResourceOperationResult<null>>} A promise that resolves to the result of the delete operation.
+   * @param options - Optional settings for the deletion process.
+   * @returns {Promise<IResourceOperationResult<any>>} A promise that resolves to the result of the delete operation.
    */
-  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<null>>;
+  delete(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any>>;
 };
 
 /**
@@ -1537,7 +1556,7 @@ export type IResourcePrimaryKey = string | number | Record<string, string | numb
 export interface IResourceOperationResult<DataType = any> {
   success: boolean; // Indicates if the operation was successful
   data?: DataType; // Optional data returned from the operation
-  error?: string; // Optional error message if the operation failed
+  error?: string | Error; // Optional error message if the operation failed
 }
 
 /**
@@ -1585,14 +1604,14 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.getOne("resourceId");
  *     ```
  * 
- * - **getDetails(key: K)**: Retrieves detailed information about a single resource record.
+ * - **details(key: K)**: Retrieves detailed information about a single resource record.
  *   - **Parameters**:
  *     - `key`: The primary key of the resource to retrieve details for.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
  *     containing detailed information about the resource.
  *   - **Example**:
  *     ```typescript
- *     const result = await dataProvider.getDetails("resourceId");
+ *     const result = await dataProvider.details("resourceId");
  *     ```
  * 
  * - **update(key: K, updatedData: Partial<DataType>)**: Updates an existing resource record.
@@ -1609,7 +1628,7 @@ export interface IResourceOperationResult<DataType = any> {
  * - **delete(key: K)**: Deletes a resource record by its primary key.
  *   - **Parameters**:
  *     - `key`: The primary key of the resource to delete.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<null>`, 
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<any>`, 
  *     indicating the success or failure of the delete operation.
  *   - **Example**:
  *     ```typescript
@@ -1645,12 +1664,12 @@ export interface IResourceOperationResult<DataType = any> {
  * approach to data handling in applications.
  */
 export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
-  create(record: DataType): Promise<IResourceOperationResult<DataType>>;
+  create(record: DataType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
+  update(key: PrimaryKeyType, updatedData: Partial<DataType>, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
+  delete(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any>>;
+  getOne(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
+  details(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
   fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType[]>>;
-  getOne(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
-  getDetails(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
-  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
-  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<null>>;
 }
 
 /**
@@ -1667,19 +1686,44 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
  * // Example of using IResourceFetchOptions
  * const fetchOptions: IResourceFetchOptions<MyDataType, string> = {
  *     filters: {
- *         selector: {
  *             status: { $eq: "active" }, // Filter for active resources
  *             category: { $in: ["A", "B"] } // Filter for categories A or B
- *         },
- *         sort: { createdAt: 'desc' }, // Sort by creation date descending
- *         limit: 20, // Limit results to 20
- *         skip: 0 // Do not skip any results
- *     }
+*      },
+*      sort: { createdAt: 'desc' }, // Sort by creation date descending
+*      limit: 20, // Limit results to 20
+*      skip: 0 // Do not skip any results
  * };
  */
 export interface IResourceFetchOptions<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
-  filters?: IFilterQuery; // Optional filters to apply when fetching resources
-}
+  filters: IFilterQuery; // The filter criteria to apply to the query
+  /** Fields to include in the response. */
+  fields?: Array<keyof DataType>;
+  sort?: IFilterSort;        // Optional sorting criteria for the results
+  limit?: number;            // Optional limit on the number of results to return
+  skip?: number;             // Optional number of results to skip before returning
 
+  /** Pagination settings for the fetched resources. */
+  pagination?: {
+    /** The current page number (starting from 1). */
+    page?: number;
+    /** The number of items per page. */
+    pageSize?: number;
+  };
+
+  /** Include relationships or nested resources. */
+  include?: IResourceName[];
+
+  /** Include only distinct results or specific fields for distinct values. */
+  distinct?: boolean | Array<keyof DataType>;
+
+  /** Include soft-deleted resources. */
+  includeDeleted?: boolean;
+
+  /** Cache the results for performance optimization. */
+  cache?: boolean;
+
+  /** Time-to-Live for cache, in seconds. */
+  cacheTTL?: number;
+}
 
 export * from "./filters";

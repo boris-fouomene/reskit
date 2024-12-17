@@ -135,7 +135,8 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     containerRef,
     labelProps,
     contentProps,
-    contentContainerProps,
+    leftContentWrapperProps,
+    rightContentWrapperProps,
     iconPosition,
     iconProps,
     containerProps,
@@ -153,7 +154,8 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     ...rest
 }: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
-    contentContainerProps = Object.assign({}, contentContainerProps);
+    leftContentWrapperProps = Object.assign({}, leftContentWrapperProps);
+    rightContentWrapperProps = Object.assign({}, rightContentWrapperProps);
     const theme = useTheme();
     const [isLoading, _setIsLoading] = React.useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
     const [isDisabled, setIsDisabled] = React.useState(typeof customDisabled == "boolean" ? customDisabled : false);
@@ -312,10 +314,10 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             >
                 <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, contentStyle]}>
                     <View
-                        id={`${idRef.current}-content-container`}
-                        testID={testID + "-content-container"}
-                        {...contentContainerProps}
-                        style={[styles.contentContainer, contentContainerProps?.style]}
+                        id={`${idRef.current}-left-content-wrapper`}
+                        testID={testID + "-left-content-wrapper"}
+                        {...leftContentWrapperProps}
+                        style={[styles.leftContentWrapper, leftContentWrapperProps?.style]}
                     >
                         {iconPosition != "right" ? iconContent : null}
                         {isLoading ? (
@@ -347,8 +349,10 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                             {isValidElement(children, true) && children || label}
                         </Label>
                     </View>
-                    {iconPosition == "right" ? iconContent : null}
-                    {right}
+                    {((iconPosition == "right" && iconContent) || (isValidElement(right) && right)) ? <View testID={testID + "-right-content-wrapper"} id={`${idRef.current}-right-content-wrapper`} {...rightContentWrapperProps} style={[styles.rightContentWrapper, rightContentWrapperProps?.style]}>
+                        {iconPosition == "right" ? iconContent : null}
+                        {right}
+                    </View> : null}
                 </View>
             </Tooltip>
         </Surface>
@@ -372,16 +376,24 @@ const styles = StyleSheet.create({
         paddingVertical: 0,
         paddingHorizontal: 0,
     },
-    contentContainer: {
+    leftContentWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        justifyContent: 'flex-start',
+    },
+    rightContentWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
+        alignSelf: 'flex-start',
     },
     content: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
+        alignSelf: "center",
     },
     icon: {
         marginHorizontal: 7,

@@ -134,10 +134,11 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   /***
    * creates a new record in the resource.
    * @param {DataType} record - The data for the new record.
+   * @param options - Optional settings for the creation process.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
-  create(record: DataType): Promise<IResourceOperationResult<DataType>> {
-    return this.getDataProvider()?.create(record);
+  create(record: DataType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
+    return this.getDataProvider()?.create(record, options);
   }
   /***
    * Fetches all records from the resource.
@@ -150,30 +151,39 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   /***
    * fetches a single record from the resource.
    * @param {PrimaryKeyType} key - The primary key of the resource.
+   * @param options - Optional settings for the fetch operation.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the fetch operation.
    */
-  getOne(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>> {
-    return this.getDataProvider()?.getOne(key);
+  getOne(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
+    return this.getDataProvider()?.getOne(key, options);
   }
   /**
    * gets the details of a record from the resource.
    * @param key - The primary key of the resource.
+   * @param options - Optional settings for the fetch operation.
    * @returns {Promise<IResourceOperationResult<DataType>} A promise that resolves to the result of the fetch operation.
    */
-  getDetails(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType>> {
-    return this.getDataProvider()?.getDetails(key);
+  details(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
+    return this.getDataProvider()?.details(key, options);
   }
   /**
    * updates a record in the resource.
    * @param key {PrimaryKeyType} The primary key of the resource to update.
-   * @param updatedData 
+   * @param updatedData
+   * @param options - Optional settings for the update process.
    * @returns 
    */
-  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
-    return this.getDataProvider()?.update(key, updatedData);
+  update(key: PrimaryKeyType, updatedData: Partial<DataType>, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
+    return this.getDataProvider()?.update(key, updatedData, options);
   }
-  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<null>> {
-    return this.getDataProvider()?.delete(key);
+  /***
+   * deletes a record from the resource.
+   * @param key {PrimaryKeyType} The primary key of the resource to delete.
+   * @param options - Optional settings for the deletion process.
+   * @returns Promise<IResourceOperationResult<any>> A promise that resolves to the result of the delete operation.
+   */
+  delete(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any>> {
+    return this.getDataProvider()?.delete(key, options);
   }
 
   /**

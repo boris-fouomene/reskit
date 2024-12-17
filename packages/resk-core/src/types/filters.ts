@@ -52,8 +52,8 @@ export type IFilterValue = IFilterScalarValue | IFilterScalarValue[] | object;
  * };
  */
 export interface IFilterRegexOptions {
-    $regex: string;
-    $options?: string; // Valid options: 'i' (case insensitive), 'm' (multiline), 's' (dotall), 'x' (extended)
+  $regex: string;
+  $options?: string; // Valid options: 'i' (case insensitive), 'm' (multiline), 's' (dotall), 'x' (extended)
 }
 
 /**
@@ -89,21 +89,21 @@ export interface IFilterRegexOptions {
  * };
  */
 export interface IFilterComparisonOperators {
-    $eq?: IFilterValue;              // equals
-    $ne?: IFilterValue;              // not equals
-    $gt?: IFilterValue;              // greater than
-    $gte?: IFilterValue;             // greater than or equal
-    $lt?: IFilterValue;              // less than
-    $lte?: IFilterValue;             // less than or equal
-    $in?: IFilterValue[];            // in array
-    $nin?: IFilterValue[];           // not in array
-    $exists?: boolean;               // field exists
-    $type?: string;                  // type check
-    $regex?: string | IFilterRegexOptions; // regular expression
-    $size?: number;                  // array size
-    $mod?: [number, number];         // modulo
-    $all?: IFilterValue[];           // array contains all
-    $elemMatch?: IFilterSelector;    // element match
+  $eq?: IFilterValue;              // equals
+  $ne?: IFilterValue;              // not equals
+  $gt?: IFilterValue;              // greater than
+  $gte?: IFilterValue;             // greater than or equal
+  $lt?: IFilterValue;              // less than
+  $lte?: IFilterValue;             // less than or equal
+  $in?: IFilterValue[];            // in array
+  $nin?: IFilterValue[];           // not in array
+  $exists?: boolean;               // field exists
+  $type?: string;                  // type check
+  $regex?: string | IFilterRegexOptions; // regular expression
+  $size?: number;                  // array size
+  $mod?: [number, number];         // modulo
+  $all?: IFilterValue[];           // array contains all
+  $elemMatch?: IFilterQuery;    // element match
 }
 
 /**
@@ -133,10 +133,10 @@ export interface IFilterComparisonOperators {
  * };
  */
 export interface IFilterLogicalOperator {
-    $and?: IFilterSelector[]; // An array of filter selectors that must all match
-    $or?: IFilterSelector[];  // An array of filter selectors where at least one must match
-    $nor?: IFilterSelector[]; // An array of filter selectors where none must match
-    $not?: IFilterSelector | IFilterComparisonOperators; // A filter selector or comparison operator that must not match
+  $and?: IFilterQuery[]; // An array of filter selectors that must all match
+  $or?: IFilterQuery[];  // An array of filter selectors where at least one must match
+  $nor?: IFilterQuery[]; // An array of filter selectors where none must match
+  $not?: IFilterQuery | IFilterComparisonOperators; // A filter selector or comparison operator that must not match
 }
 
 /**
@@ -156,8 +156,8 @@ export interface IFilterLogicalOperator {
  * };
  */
 export interface IFilterArrayOperators {
-    $all?: IFilterValue[];       // Matches documents where the array contains all specified values
-    $elemMatch?: IFilterSelector; // Matches documents where at least one element in the array matches the criteria
+  $all?: IFilterValue[];       // Matches documents where the array contains all specified values
+  $elemMatch?: IFilterQuery; // Matches documents where at least one element in the array matches the criteria
 }
 
 /**
@@ -169,8 +169,8 @@ export interface IFilterArrayOperators {
  * and array operators, enabling complex query constructions.
  * 
  * @example
- * // Example of using IFilterSelector
- * const filter: IFilterSelector = {
+ * // Example of using IFilterQuery
+ * const filter: IFilterQuery = {
  *     name: { $eq: "John Doe" }, // Matches documents where the name equals "John Doe"
  *     age: { $gte: 18 },         // Matches documents where age is greater than or equal to 18
  *     status: { $in: ["active", "pending"] }, // Matches documents where status is either "active" or "pending"
@@ -183,13 +183,13 @@ export interface IFilterArrayOperators {
  *     }
  * };
  */
-export type IFilterSelector = {
-    [field: string]:
-    | IFilterValue
-    | IFilterComparisonOperators
-    | IFilterLogicalOperator
-    | IFilterArrayOperators
-    & { [field: string]: IFilterSelector }; // Allows nesting of filter selectors
+export type IFilterQuery = {
+  [field: string]:
+  | IFilterValue
+  | IFilterComparisonOperators
+  | IFilterLogicalOperator
+  | IFilterArrayOperators
+  & { [field: string]: IFilterQuery }; // Allows nesting of filter selectors
 } & Partial<IFilterLogicalOperator>; // Allows inclusion of logical operators
 
 /**
@@ -218,63 +218,3 @@ export type IFilterSortDirection = 'asc' | 'desc';
  * const arraySort: IFilterSort = [{ age: 'asc' }, { name: 'desc' }]; // Sort by 'age' ascending and 'name' descending using an array
  */
 export type IFilterSort = string | { [field: string]: IFilterSortDirection } | Array<{ [field: string]: IFilterSortDirection }>;
-
-/**
- * Interface representing a filter query for data retrieval operations.
- * 
- * This interface defines the structure of a query that can be used to filter,
- * sort, and limit the results returned from a data source. It allows for
- * flexible querying based on various criteria.
- * 
- * @example
- * // Example of using IFilterQuery
- * const query: IFilterQuery = {
- *     selector: {
- *         age: { $gte: 18 }, // Filter for documents where age is greater than or equal to 18
- *         status: { $in: ["active", "pending"] }, // Filter for documents with status "active" or "pending"
- *     },
- *     fields: ["name", "age"], // Specify which fields to return in the results
- *     sort: { age: 'asc', name: 'desc' }, // Sort results by age ascending and name descending
- *     limit: 10, // Limit the results to 10 documents
- *     skip: 5 // Skip the first 5 documents in the results
- * };
- * @example
- * const exampleQuery: MangoQuery = {
-  selector: {
-    $and: [
-      {
-        status: { $eq: "active" },
-        age: { $gte: 21 },
-        tags: { $all: ["premium", "verified"] },
-        "address.country": { $in: ["USA", "Canada"] },
-        location: {
-          $near: {
-            $geometry: { lon: -122.27652, lat: 37.80574 },
-            $maxDistance: 5000
-          }
-        }
-      },
-      {
-        $or: [
-          { premium: { $exists: true } },
-          { referrals: { $size: 5 } }
-        ]
-      }
-    ]
-  },
-  fields: ["_id", "name", "email", "status"],
-  sort: [
-    { created_at: "desc" },
-    { name: "asc" }
-  ],
-  limit: 20,
-  skip: 0,
-};
- */
-export interface IFilterQuery {
-    selector: IFilterSelector; // The filter criteria to apply to the query
-    fields?: string[];         // Optional array of fields to include in the results
-    sort?: IFilterSort;        // Optional sorting criteria for the results
-    limit?: number;            // Optional limit on the number of results to return
-    skip?: number;             // Optional number of results to skip before returning
-}

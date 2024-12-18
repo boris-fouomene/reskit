@@ -68,6 +68,7 @@ export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<I
         testID="menu-item"
         borderRadius={0}
         textColor={theme.colors.text}
+        fullWidth
         {...props}
         containerProps={containerProps}
         contentProps={{ ...contentProps, style: [styles.buttonContent, contentProps.style] }}

@@ -384,14 +384,14 @@ const styles = StyleSheet.create({
     leftContentWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
-        alignSelf: 'flex-start',
+        alignSelf: 'center',
         justifyContent: 'flex-start',
     },
     rightContentWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        alignSelf: 'flex-start',
+        alignSelf: 'center',
     },
     content: {
         flexDirection: 'row',

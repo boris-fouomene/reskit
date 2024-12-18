@@ -3,7 +3,7 @@ import React, { Fragment, ReactNode, useMemo } from "react";
 import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";
-import { IDict, IObservable, IObservableEvent, uniqid, IAuthSessionStorage, Auth } from "@resk/core";
+import { IDict, IObservable, uniqid, IAuthSessionStorage, Auth, IObservableAllEventType } from "@resk/core";
 import { canDrawerBeMinimizedOrPermanent } from "./utils";
 import { isValidElement } from "@utils";
 import Breakpoints from "@breakpoints";
@@ -14,7 +14,7 @@ import { Colors, useTheme } from "@theme";
 import { getDrawerWidth } from "./utils";
 import FontIcon from "@components/Icon/Font";
 import { Tooltip } from "@components/Tooltip";
-import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProviderProps, IDrawerState, IDrawerCurrentState } from "./types";
+import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProviderProps, IDrawerState, IDrawerCurrentState, IDrawerEvent } from "./types";
 import { DrawerContext } from "./hooks";
 import { addDimensionsListener } from "@dimensions";
 import { IDimensions } from "@dimensions/types";
@@ -51,7 +51,7 @@ const SETTLING = "Settling";
  * @returns {boolean} - True if the drawer is minimizable, false otherwise.
  *
  * @method trigger - Overrides the trigger function defined in the event observer.
- * @param {IObservableEvent} event - The event to trigger.
+ * @param {IDrawerEvent|IObservableAllEventType} event - The event to trigger.
  * @param {...any[]} args - Additional arguments for the event.
  * @returns {IObservable | null} - The observable instance or null.
  *
@@ -220,7 +220,7 @@ const SETTLING = "Settling";
  * 
  * @returns {number} - The open value.
  */
-export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerState> implements IDrawer {
+export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDrawerEvent> implements IDrawer {
   /**
    * Stores the last open value of the drawer.
    * @type {any}
@@ -308,19 +308,6 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     return !!this.getProps().minimizable;
   }
 
-  /**
-   * Triggers an observable event with the provided arguments.
-   *
-   * @param event - The observable event to trigger.
-   * @param args - Additional arguments to pass to the event handler.
-   * @returns The observable instance or null if the event is not handled.
-   */
-  trigger(event: IObservableEvent, ...args: any[]): IObservable | null {
-    return super.trigger(event, {
-      ...this.getStateOptions(),
-      eventName: event,
-    });
-  }
   /**
    * Sets the drawer to be permanent.
    *

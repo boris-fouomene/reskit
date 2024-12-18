@@ -83,6 +83,7 @@ const DrawerItem = ({
     labelProps={{ ...labelProps, style: [{ fontWeight }, minimized && styles.hidden, minimized && section && styles.drawerSectionLabelMinimized, labelProps.style] }}
     accessibilityState={{ selected: active }}
     iconProps={{ ...iconProps, size: minimized ? MINIMIZED_ICON_SIZE : iconProps.size || ICON_SIZE, style: [minimized ? styles.iconMinimized : styles.icon, iconProps.style] }}
+    fullWidth
     {...rest}
     label={minimized ? undefined : rest.label}
     containerProps={containerProps}

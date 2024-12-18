@@ -1,5 +1,5 @@
 import ReactComponent from "./Component";
-import { IObservable, observableFactory, IObservableEvent, IObservableCallbackOptions } from "@resk/core";
+import { IObservable, observableFactory, IObservableAllEventType, IObservableCallback, IObservableCallbacks } from "@resk/core";
 /**
  * Extends the React component by defining an observable component.
  * 
@@ -9,10 +9,11 @@ import { IObservable, observableFactory, IObservableEvent, IObservableCallbackOp
  * 
  * @template IProps - The type of the component's props.
  * @template IState - The type of the component's state.
+ * @template ObservableEventType - The type of the observable events.
  */
-export default class Component<IProps = unknown, IState = unknown> extends ReactComponent<IProps, IState> {
+export default class Component<IProps = unknown, IState = unknown, ObservableEventType extends string = string> extends ReactComponent<IProps, IState> implements IObservable<ObservableEventType> {
   /** An observable factory instance. */
-  readonly _observable = observableFactory();
+  readonly _observable = observableFactory<ObservableEventType>();
 
   /** A flag indicating if the component is observable. */
   readonly _____isObservable?: boolean | undefined = true;
@@ -34,7 +35,7 @@ export default class Component<IProps = unknown, IState = unknown> extends React
    * unsubscribe.remove();
    * ```
    */
-  on(event: IObservableEvent, fn: IObservableCallbackOptions): { remove: () => any } {
+  on(event: ObservableEventType, fn: IObservableCallback): { remove: () => any } {
     return this._observable.on.call(this, event, fn);
   }
 
@@ -45,7 +46,7 @@ export default class Component<IProps = unknown, IState = unknown> extends React
    * @param fn - The callback function to be invoked.
    * @returns The observable instance.
    */
-  finally(event: IObservableEvent, fn: IObservableCallbackOptions): IObservable {
+  finally(event: ObservableEventType, fn: IObservableCallback): IObservable<ObservableEventType> {
     return this._observable.finally.call(this, event, fn);
   }
 
@@ -56,7 +57,7 @@ export default class Component<IProps = unknown, IState = unknown> extends React
    * @param fn - The callback function to remove.
    * @returns The observable instance.
    */
-  off(event: IObservableEvent, fn: IObservableCallbackOptions): IObservable {
+  off(event: ObservableEventType, fn: IObservableCallback): IObservable<ObservableEventType> {
     return this._observable.off.call(this, event, fn);
   }
 
@@ -67,7 +68,7 @@ export default class Component<IProps = unknown, IState = unknown> extends React
    * @param args - Optional arguments to pass to the event callbacks.
    * @returns The observable instance.
    */
-  trigger(event: IObservableEvent, ...args: any[]): IObservable {
+  trigger(event: ObservableEventType | IObservableAllEventType, ...args: any[]): IObservable<ObservableEventType> {
     return this._observable.trigger.call(this, event, ...args);
   }
 
@@ -76,7 +77,7 @@ export default class Component<IProps = unknown, IState = unknown> extends React
    * 
    * @returns The observable instance.
    */
-  offAll(): IObservable {
+  offAll(): IObservable<ObservableEventType> {
     return this._observable.offAll.call(this);
   }
 
@@ -87,7 +88,7 @@ export default class Component<IProps = unknown, IState = unknown> extends React
    * @param fn - The callback function to be invoked.
    * @returns An object containing a remove method to unsubscribe from the event.
    */
-  one(event: string, fn: IObservableCallbackOptions): { remove: () => any } {
+  one(event: ObservableEventType, fn: IObservableCallback): { remove: () => any } {
     return this._observable.one.call(this, event, fn);
   }
 
@@ -96,7 +97,7 @@ export default class Component<IProps = unknown, IState = unknown> extends React
    * 
    * @returns An object mapping event names to their respective callback functions.
    */
-  getEventCallBacks(): { [key: string]: IObservableCallbackOptions[] } {
+  getEventCallBacks(): IObservableCallbacks<ObservableEventType> {
     return this._observable.getEventCallBacks.call(this);
   }
 

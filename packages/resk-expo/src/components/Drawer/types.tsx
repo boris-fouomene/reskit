@@ -1,14 +1,15 @@
 import { IAppBarProps } from "@components/AppBar";
 import { IMenuItemBase, IMenuItems } from "@components/Menu/types";
 import { IViewProps } from "@components/View";
-import { IDict, IObservable, IObservableEvent, IAuthSessionStorage } from "@resk/core";
+import { IDict, IObservable, IAuthSessionStorage } from "@resk/core";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, PanResponderInstance } from "react-native";
+
 
 /**
  * Interface representing a Drawer component with observable properties.
  */
-export interface IDrawer extends IObservable {
+export interface IDrawer extends IObservable<IDrawerEvent>, React.PureComponent<IDrawerProps, IDrawerState> {
     /**
      * The last open value of the drawer.
      */
@@ -76,6 +77,11 @@ export interface IDrawer extends IObservable {
      * @returns True if the drawer is minimizable, false otherwise.
      */
     isMinimizable(): boolean;
+
+    /**
+     * Checks if the drawer is minimized.   
+     */
+    isMinimized(): boolean;
 
     /**
      * Checks if the drawer is permanent.
@@ -196,14 +202,6 @@ export interface IDrawer extends IObservable {
     */
     isMinimizable(): boolean
 
-    /**
-     * Triggers an observable event with the provided arguments.
-     *
-     * @param event - The observable event to trigger.
-     * @param args - Additional arguments to pass to the event handler.
-     * @returns The observable instance or null if the event is not handled.
-     */
-    trigger(event: IObservableEvent, ...args: any[]): IObservable | null
 
     /**
      * Sets the drawer to be permanent.
@@ -407,6 +405,15 @@ export interface IDrawer extends IObservable {
      * - If the drawer is already closed or permanent, directly calls the `end` function.
      */
     close(options?: IDrawerProviderProps, callback?: Function): void;
+
+    /**
+     * Function to render the navigation view of the drawer.
+     * @param drawerState - The current state options of the drawer.
+     * @returns The React node to be rendered as the navigation view.
+     */
+    renderNavigationView: () => React.ReactNode;
+
+    _onOverlayClick(e: GestureResponderEvent): void;
 }
 
 

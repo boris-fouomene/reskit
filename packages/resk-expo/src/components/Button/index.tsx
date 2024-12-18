@@ -151,6 +151,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     divider: customDivider,
     context: extendContext,
     onPress,
+    fullWidth,
     ...rest
 }: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
@@ -275,6 +276,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 styles[`icon${compact ? 'Compact' : ''}`],
             ];
     if (!isAllowed(rest)) return null;
+    const fullWidthStyle = fullWidth ? styles.fullWidth : null;
     return (<ButtonContext.Provider value={context}>
         <Surface
             id={`${idRef.current}-container`}
@@ -283,9 +285,10 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             testID={`${testID}-button-container`}
             style={
                 [
-                    styles.button,
+                    styles.buttonContainer,
                     compact && styles.compact,
                     buttonStyle,
+                    fullWidthStyle,
                     containerProps?.style,
                 ]
             }
@@ -301,7 +304,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 disabled={disabled}
                 disabledRipple={disableRipple}
                 rippleColor={rippleColor}
-                style={[styles.touchable, restButtonStyle, touchableStyle]}
+                style={[styles.touchable, fullWidthStyle, restButtonStyle, touchableStyle]}
                 testID={testID}
                 ref={innerRef}
                 id={idRef.current}
@@ -312,7 +315,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 }}
                 {...rest}
             >
-                <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, contentStyle]}>
+                <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, fullWidthStyle, contentStyle]}>
                     <View
                         id={`${idRef.current}-left-content-wrapper`}
                         testID={testID + "-left-content-wrapper"}
@@ -362,9 +365,12 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
 
 
 const styles = StyleSheet.create({
-    button: {
+    buttonContainer: {
         borderStyle: 'solid',
         minWidth: 64,
+    },
+    fullWidth: {
+        width: "100%",
     },
     touchable: {
         width: "100%",

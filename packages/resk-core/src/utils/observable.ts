@@ -1,30 +1,5 @@
 /**
- * @interface IObservableEvent
- * Represents an observable event, which can be a string, null, or undefined.
- *
- * This type is used to define events that can be emitted or observed within a system.
- * 
- * - A string value represents a specific event identifier or name.
- * - A null value indicates that there is no event to observe or that the event is not applicable.
- * - An undefined value suggests that the event has not been initialized or is any.
- *
- * This type can be useful in scenarios where events may not always have a clear identifier,
- * allowing for flexibility in event handling and observation.
- *
- * @example
- * ```ts
- * let eventName: IObservableEvent;
- * 
- * eventName = "dataLoaded"; // valid
- * eventName = null;         // valid
- * eventName = undefined;    // valid
- * eventName = 42;          // TypeScript error: Type 'number' is not assignable to type 'IObservableEvent'.
- * ```
- */
-export type IObservableEvent = string | null | undefined;
-
-/**
- * @interface IObservableCallbackOptions
+ * @interface IObservableCallback
  * Represents the callback options for observable events.
  * 
  * This type defines a function that can be used as a callback for observable events.
@@ -35,7 +10,7 @@ export type IObservableEvent = string | null | undefined;
  * 
  * @example
  * ```typescript
- * const callback: IObservableCallbackOptions = (arg1: string, arg2: number) => {
+ * const callback: IObservableCallback = (arg1: string, arg2: number) => {
  *   console.log(arg1, arg2); // Outputs the string and number passed to the callback
  * };
  * 
@@ -44,155 +19,83 @@ export type IObservableEvent = string | null | undefined;
  * callback("Another event", 100);   // Outputs: Another event 100
  * ```
  */
-export type IObservableCallbackOptions = (...args: any[]) => any;
-
-
+export type IObservableCallback = (...args: any[]) => any;
 
 /**
- * Represents the base interface for an observable object.
+ * Represents a collection of observable callbacks mapped to their respective event types,
+ * allowing for optional event handling.
  * 
- * The `IObservableBase` type defines the structure of an observable object, which can 
- * manage event listeners, trigger events, and provide callback functionalities. 
- * This interface includes methods to add, remove, and trigger event callbacks, 
- * as well as to manage event subscriptions.
+ * This type defines a record structure where each key corresponds to a specific event type,
+ * and the value is an array of callback functions associated with that event. The use of 
+ * `Partial` allows for flexibility, meaning that not all event types need to have registered 
+ * callbacks, making it suitable for scenarios where some events may not be utilized.
  * 
- * @property {boolean} [_____isObservable] - An optional property that indicates whether the object is observable.
- * 
- * @method on - Registers an event listener for a specific event.
- * @param {IObservableEvent} event - The event to listen for.
- * @param {IObservableCallbackOptions} fn - The callback function to execute when the event is triggered.
- * @returns {{ remove: () => any }} An object containing a `remove` method to unregister the listener.
- * 
- * @method finally - Registers an event listener that will be invoked once the event is triggered.
- * @param {IObservableEvent} event - The event to listen for.
- * @param {IObservableCallbackOptions} fn - The callback function to execute when the event is triggered.
- * @returns {IObservable} The observable instance.
- * 
- * @method off - Unregisters an event listener for a specific event.
- * @param {IObservableEvent} event - The event to stop listening for.
- * @param {IObservableCallbackOptions} fn - The callback function to remove.
- * @returns {IObservable} The observable instance.
- * 
- * @method trigger - Triggers an event, invoking all registered listeners for that event.
- * @param {IObservableEvent} event - The event to trigger.
- * @param {...any[]} args - Additional arguments to pass to the callback functions.
- * @returns {IObservable} The observable instance.
- * 
- * @method offAll - Unregisters all event listeners from the observable.
- * @returns {IObservable} The observable instance.
- * 
- * @method one - Registers a one-time event listener for a specific event.
- * @param {string} event - The event to listen for.
- * @param {IObservableCallbackOptions} fn - The callback function to execute when the event is triggered.
- * @returns {{ remove: () => any }} An object containing a `remove` method to unregister the listener.
- * 
- * @method getEventCallBacks - Retrieves all registered callbacks for each event.
- * @returns {{ [key: string]: IObservableCallbackOptions[] }} An object mapping event names to their respective callback functions.
- * 
- * Example:
- * ```typescript
- * interface MyObservable extends IObservableBase {
- *   foo: string;
- * }
- *  * const observable: MyObservable = {
- *   foo: 'bar',
- *   on(event: IObservableEvent, fn: IObservableCallbackOptions) {
- *     // implementation
- *   },
- *   finally(event: IObservableEvent, fn: IObservableCallbackOptions) {
- *     // implementation
- *   },
- *   off(event: IObservableEvent, fn: IObservableCallbackOptions) {
- *     // implementation
- *   },
- *   trigger(event: IObservableEvent, ...args: any[]) {
- *     // implementation
- *   },
- *   offAll() {
- *     // implementation
- *   },
- *   one(event: string, fn: IObservableCallbackOptions) {
- *     // implementation
- *   },
- *   getEventCallBacks() {
- *     // implementation
- *   }
- * };
- * ```
- */
-export type IObservableBase = {
-  _____isObservable?: boolean;
-  on: (event: IObservableEvent, fn: IObservableCallbackOptions) => { remove: () => any };
-  finally: (event: IObservableEvent, fn: IObservableCallbackOptions) => IObservable;
-  off: (event: IObservableEvent, fn: IObservableCallbackOptions) => IObservable;
-  trigger: (event: IObservableEvent, ...args: any[]) => IObservable;
-  offAll: () => IObservable;
-  one: (event: string, fn: IObservableCallbackOptions) => { remove: () => any };
-  getEventCallBacks: () => { [key: string]: IObservableCallbackOptions[] };
-}
-
-
-/**
- * @interface IObservable
- * Represents a generic observable interface that extends the base observable functionality.
- * 
- * The `IObservable` type allows for the creation of observable objects that can include
- * additional properties and methods beyond those defined in the `IObservableBase`.
- * It uses TypeScript's generics to enable developers to specify custom types for the 
- * observable's additional properties while retaining the core event management capabilities.
- * 
- * The `Omit` utility type is used to exclude properties defined in the generic type `T`
- * from the base `IObservableBase`, allowing for a clean extension of the observable's 
- * functionality without conflicts.
- * 
- * @template T - An optional generic type parameter that allows for additional properties 
- *                or methods to be defined on the observable.
+ * @template EventType - A generic type parameter that extends from `string`, representing 
+ *                      the event types. By default, it is set to `string`, allowing for 
+ *                      any string-based event name.
  * 
  * @example
- * ```typescript
- * interface MyObservableProps {
- *   customProperty: string;
- *   anotherMethod: (arg: number) => void;
+ * // Defining specific event types
+ * type MyEvent = 'click' | 'hover' | 'scroll';
+ * 
+ * // Creating a record of callbacks for the defined events
+ * const callbacks: IObservableCallbacks<MyEvent> = {
+ *   click: [
+ *     (event) => console.log('Click event handler 1', event),
+ *     (event) => console.log('Click event handler 2', event),
+ *   ],
+ *   hover: [
+ *     (event) => console.log('Hover event handler', event),
+ *   ],
+ *   // 'scroll' event has no callbacks registered
+ * };
+ * 
+ * // Accessing the callbacks for a specific event
+ * const clickHandlers = callbacks.click;
+ * if (clickHandlers) {
+ *   clickHandlers.forEach(handler => handler('click')); // Logs: Click event handler 1 click
+ *   // Logs: Click event handler 2 click
  * }
  * 
- * const myObservable: IObservable<MyObservableProps> = {
- *   _____isObservable: true,
- *   on(event, fn) {
- *     // implementation
- *     return { remove: () => {} };
- *   },
- *   finally(event, fn) {
- *     // implementation
- *     return this;
- *   },
- *   off(event, fn) {
- *     // implementation
- *     return this;
- *   },
- *   trigger(event, ...args) {
- *     // implementation
- *     return this;
- *   },
- *   offAll() {
- *     // implementation
- *     return this;
- *   },
- *   one(event, fn) {
- *     // implementation
- *     return { remove: () => {} };
- *   },
- *   getEventCallBacks() {
- *     // implementation
- *     return {};
- *   },
- *   customProperty: "Hello",
- *   anotherMethod(arg) {
- *     console.log(arg);
- *   },
- * };
- * ```
+ * @remarks
+ * This type is particularly useful in event-driven architectures where multiple callbacks
+ * need to be associated with different events. The use of `Partial` allows for a more 
+ * flexible design, enabling developers to define only the events they are interested in 
+ * without requiring all possible events to be present.
  */
-export type IObservable<T = any> = Omit<IObservableBase, keyof T> & T;
+export type IObservableCallbacks<EventType extends string = string> = Partial<Record<EventType | IObservableAllEventType, IObservableCallback[]>>;
+
+/**
+ * Represents a wildcard event type for observable systems.
+ * 
+ * This type is used to signify that a callback should be triggered for all events within
+ * an observable system. It acts as a catch-all for any event, allowing developers to 
+ * register handlers that respond to every event emitted by the observable.
+ * 
+ * @example
+ * // Using the wildcard event type to listen for all events
+ * observable.on('*', (event, ...args) => {
+ *   console.log(`An event occurred: ${event}`, 'Arguments:', args);
+ * });
+ * 
+ * @remarks
+ * The use of a wildcard event type can be useful for logging, debugging, or handling 
+ * global events that are not specific to a single event type. However, it should be used 
+ * judiciously, as it may lead to performance concerns if many events are emitted frequently.
+ */
+export type IObservableAllEventType = '*';
+
+export interface IObservable<EventType extends string = string> {
+  _____isObservable?: boolean;
+  on: (event: EventType, fn: IObservableCallback) => { remove: () => any };
+  finally: (event: EventType, fn: IObservableCallback) => IObservable<EventType>;
+  off: (event: EventType, fn: IObservableCallback) => IObservable<EventType>;
+  trigger: (event: EventType | IObservableAllEventType, ...args: any[]) => IObservable<EventType>;
+  offAll: () => IObservable<EventType>;
+  one: (event: EventType, fn: IObservableCallback) => { remove: () => any };
+  getEventCallBacks: () => IObservableCallbacks<EventType>;
+}
+
 
 /**
  * Returns an instance of the IObservable interface.
@@ -201,7 +104,7 @@ export type IObservable<T = any> = Omit<IObservableBase, keyof T> & T;
  * removing, and triggering event callbacks, as well as managing final callbacks that execute 
  * after all other callbacks for an event.
  * 
- * @returns {IObservable} A new instance of the observable object.
+ * @returns {IObservable<EventType>} A new instance of the observable object.
  * 
  * @example
  * ```typescript
@@ -214,24 +117,28 @@ export type IObservable<T = any> = Omit<IObservableBase, keyof T> & T;
  *  console.log("event triggered");
  * })
  * ```
+ * @see {@link IObservable} for more information on the observable interface.
+ * @see {@link IObservableCallbacks} for more information on the observable callbacks interface.
+ * @see {@link IObservableAllEventType} for more information on the observable all event type.
+ * @see {@link isObservable} for more information on the observable check function.
  */
-export const observableFactory = function (): IObservable {
+export const observableFactory = function <EventType extends string = string>(): IObservable<EventType> {
   /**
    * Private variables
    */
-  let callbacks: { [key: string]: IObservableCallbackOptions[] } = {},
-    finallyCallback: { [key: string]: IObservableCallbackOptions[] } = {},
+  let callbacks: IObservableCallbacks<EventType> = {},
+    finallyCallback: { [key: string]: IObservableCallback[] } = {},
     slice = Array.prototype.slice;
 
   return {
     /**
      * Listen to the given `event` and execute the `callback` each time an event is triggered.
      * 
-     * @param {IObservableEvent} event - The event to listen to.
-     * @param {IObservableCallbackOptions} fn - The callback function to execute.
+     * @param {EventType} event - The event to listen to.
+     * @param {IObservableCallback} fn - The callback function to execute.
      * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
      */
-    on: function (event: IObservableEvent, fn: IObservableCallbackOptions): { remove: () => any } {
+    on: function (event: EventType, fn: IObservableCallback): { remove: () => any } {
       if (fn && event) {
         (callbacks[event] = callbacks[event] || []).push(fn);
       }
@@ -244,11 +151,11 @@ export const observableFactory = function (): IObservable {
     /**
      * Add a finally callback function to an event that will be triggered. this callback is called  after all other callbacks have been called.
      * 
-     * @param {IObservableEvent} event - The event to listen to.
-     * @param {IObservableCallbackOptions} fn - The callback function to execute.
-     * @returns {IObservable} The observable object.
+     * @param {EventType} event - The event to listen to.
+     * @param {IObservableCallback} fn - The callback function to execute.
+     * @returns {IObservable<EventType>} The observable object.
      */
-    finally: function (event: IObservableEvent, fn: IObservableCallbackOptions): IObservable {
+    finally: function (event: EventType, fn: IObservableCallback): IObservable<EventType> {
       if (fn && event) {
         (finallyCallback[event] = finallyCallback[event] || []).push(fn);
         return this;
@@ -261,11 +168,11 @@ export const observableFactory = function (): IObservable {
      * If `fn` is provided, removes the specific callback function from the event.
      * If `fn` is not provided, removes all callback functions from the event.
      * 
-     * @param {IObservableEvent} event - The event to remove the listener from.
-     * @param {IObservableCallbackOptions} [fn] - The callback function to remove.
-     * @returns {IObservable} The observable object.
+     * @param {EventType} event - The event to remove the listener from.
+     * @param {IObservableCallback} [fn] - The callback function to remove.
+     * @returns {IObservable<EventType>} The observable object.
      */
-    off: function (event: IObservableEvent, fn: IObservableCallbackOptions): IObservable {
+    off: function (event: EventType, fn: IObservableCallback): IObservable<EventType> {
       if (!event) return this;
       if (event == "*" && !fn) callbacks = {};
       else {
@@ -287,11 +194,11 @@ export const observableFactory = function (): IObservable {
     /**
      * Listen to the given `event` and execute the `callback` at most once.
      * 
-     * @param {string} event - The event to listen to.
-     * @param {IObservableCallbackOptions} fn - The callback function to execute.
+     * @param {EventType} event - The event to listen to.
+     * @param {IObservableCallback} fn - The callback function to execute.
      * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
      */
-    one: function (event: string, fn: IObservableCallbackOptions) {
+    one: function (event: EventType, fn: IObservableCallback) {
       const on = (...args: any[]) => {
         this.off(event, on);
         fn.apply(this, args);
@@ -340,11 +247,11 @@ export const observableFactory = function (): IObservable {
      * });
      * observable.trigger("event", "arg1", "arg2");
      * ```
-     * @param {IObservableEvent} event - The event to trigger.
+     * @param {EventType} event - The event to trigger.
      * @param {...any[]} args - The arguments to pass to the callback functions.
-     * @returns {IObservable} The observable object.
+     * @returns {IObservable<EventType>} The observable object.
      */
-    trigger: function (event: IObservableEvent, ...args: any[]): IObservable {
+    trigger: function (event: EventType | IObservableAllEventType, ...args: any[]): IObservable<EventType> {
       if (!event) return this;
       // getting the arguments
       let fns, fn, i;
@@ -359,7 +266,7 @@ export const observableFactory = function (): IObservable {
           fnsReturns.push(fn.apply(this, args));
         }
       }
-      if (callbacks["*"] && event != "*") {
+      if (typeof callbacks["*"] == "function" && event != "*") {
         this.trigger(event, ...args);
         this.trigger("*", ...args);
       }
@@ -383,7 +290,7 @@ export const observableFactory = function (): IObservable {
      * 
      * This method removes all callback functions from all events.
      * 
-     * @returns {IObservable} The observable object.
+     * @returns {IObservable<EventType>} The observable object.
      * 
      * Example:
      * ```typescript
@@ -395,7 +302,7 @@ export const observableFactory = function (): IObservable {
      * observable.trigger("event"); // No callback will be executed
      * ```
      */
-    offAll: function (): IObservable {
+    offAll: function (): IObservable<EventType> {
       callbacks = {};
       finallyCallback = {};
       return this;
@@ -406,7 +313,7 @@ export const observableFactory = function (): IObservable {
      * 
      * This method returns an object containing all callback functions for all events.
      * 
-     * @returns {{ [key: string]: IObservableCallbackOptions[] }} An object with event names as keys and arrays of callback functions as values.
+     * @returns {IObservableCallbacks<EventType>} An object with event names as keys and arrays of callback functions as values.
      * 
      * Example:
      * ```typescript
@@ -418,7 +325,7 @@ export const observableFactory = function (): IObservable {
      * console.log(callbacks); // { event: [ [Function] ] }
      * ```
      */
-    getEventCallBacks: function (): { [key: string]: IObservableCallbackOptions[] } {
+    getEventCallBacks: function (): IObservableCallbacks<EventType> {
       return callbacks;
     },
   };
@@ -432,8 +339,9 @@ export const observableFactory = function (): IObservable {
  * instance and extends the provided element with observable methods. This allows the element 
  * to listen for events, trigger callbacks, and manage event listeners.
  * 
+ * @template EventType - The type of the event. This can be any string or a custom type.
  * @param {any} element - The element to make observable. This can be any object or value.
- * @returns {IObservable} The observable object, which includes methods for event handling.
+ * @returns {IObservable<EventType>} The observable object, which includes methods for event handling.
  * 
  * @example
  * ```typescript
@@ -445,8 +353,12 @@ export const observableFactory = function (): IObservable {
  * context.off("test", testCb);
  * context.offAll();
  * ```
+ * @see {@link IObservable} for more information on the observable interface.
+ * @see {@link IObservableCallbacks} for more information on the observable callbacks interface.
+ * @see {@link IObservableAllEventType} for more information on the observable all event type.
+ * @see {@link isObservable} for more information on the observable check function.
  */
-export const observable = function (element: any): IObservable {
+export const observable = function <EventType extends string = string>(element: any): IObservable<EventType> {
   /**
    * Check if the element is already observable.
    * 
@@ -462,7 +374,7 @@ export const observable = function (element: any): IObservable {
   /**
    * Create a new observable instance using the observableFactory function.
    */
-  const obj = observableFactory();
+  const obj = observableFactory<EventType>();
 
   /**
    * Extend the context object with the observable methods.
@@ -476,8 +388,8 @@ export const observable = function (element: any): IObservable {
     /**
      * Listen to the given `event` and execute the `callback` each time an event is triggered.
      * 
-     * @param {IObservableEvent} event - The event to listen to.
-     * @param {IObservableCallbackOptions} fn - The callback function to execute.
+     * @param {EventType} event - The event to listen to.
+     * @param {IObservableCallback} fn - The callback function to execute.
      * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
      */
     on: {
@@ -487,9 +399,9 @@ export const observable = function (element: any): IObservable {
     /**
      * Add a callback function to an event that will be triggered once.
      * 
-     * @param {IObservableEvent} event - The event to listen to.
-     * @param {IObservableCallbackOptions} fn - The callback function to execute.
-     * @returns {IObservable} The observable object.
+     * @param {EventType} event - The event to listen to.
+     * @param {IObservableCallback} fn - The callback function to execute.
+     * @returns {IObservable<EventType>} The observable object.
      */
     finally: {
       value: obj.finally.bind(context),
@@ -501,9 +413,9 @@ export const observable = function (element: any): IObservable {
      * If `fn` is provided, removes the specific callback function from the event.
      * If `fn` is not provided, removes all callback functions from the event.
      * 
-     * @param {IObservableEvent} event - The event to remove the listener from.
-     * @param {IObservableCallbackOptions} [fn] - The callback function to remove.
-     * @returns {IObservable} The observable object.
+     * @param {EventType} event - The event to remove the listener from.
+     * @param {IObservableCallback} [fn] - The callback function to remove.
+     * @returns {IObservable<EventType>} The observable object.
      */
     off: {
       value: obj.off.bind(context),
@@ -512,7 +424,7 @@ export const observable = function (element: any): IObservable {
     /**
      * Remove all event bindings.
      * 
-     * @returns {IObservable} The observable object.
+     * @returns {IObservable<EventType>} The observable object.
      */
     offAll: {
       value: obj.offAll.bind(context),
@@ -522,7 +434,7 @@ export const observable = function (element: any): IObservable {
      * Listen to the given `event` and execute the `callback` at most once.
      * 
      * @param {string} event - The event to listen to.
-     * @param {IObservableCallbackOptions} fn - The callback function to execute.
+     * @param {IObservableCallback} fn - The callback function to execute.
      * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
      */
     one: {
@@ -532,7 +444,7 @@ export const observable = function (element: any): IObservable {
     /**
      * Get all event callbacks.
      * 
-     * @returns {{ [key: string]: IObservableCallbackOptions[] }} An object with event names as keys and arrays of callback functions as values.
+     * @returns {{ [key: string]: IObservableCallback[] }} An object with event names as keys and arrays of callback functions as values.
      */
     getEventCallBacks: {
       value: obj.getEventCallBacks.bind(context),
@@ -543,9 +455,9 @@ export const observable = function (element: any): IObservable {
      * 
      * If the last argument is a function, it will be considered as the final callback function to be executed after all callbacks' execution.
      * 
-     * @param {IObservableEvent} event - The event to trigger.
+     * @param {EventType} event - The event to trigger.
      * @param {...any[]} args - The arguments to pass to the callback functions.
-     * @returns {IObservable} The observable object.
+     * @returns {IObservable<EventType>} The observable object.
      */
     trigger: {
       value: obj.trigger.bind(context),
@@ -564,8 +476,9 @@ export const observable = function (element: any): IObservable {
  * The ObservableClass is particularly useful in scenarios where you need to implement 
  * an event-driven architecture, enabling decoupled communication between different parts 
  * of an application.
+ * @template EventType - The type of the event. This can be any string or a custom type.
  */
-export class ObservableClass implements IObservable {
+export class ObservableClass<EventType extends string = string> implements IObservable<EventType> {
   /**
    * Flag indicating whether the object is observable.
    * 
@@ -580,13 +493,13 @@ export class ObservableClass implements IObservable {
    * This object is created using the observableFactory function and contains 
    * the core methods for managing event listeners and triggering events.
    */
-  readonly _observable = observableFactory();
+  readonly _observable = observableFactory<EventType>();
 
   /**
    * Listen to the given `event` and execute the `callback` each time an event is triggered.
    * 
-   * @param {IObservableEvent} event - The event to listen to.
-   * @param {IObservableCallbackOptions} fn - The callback function to execute.
+   * @param {EventType} event - The event to listen to.
+   * @param {IObservableCallback} fn - The callback function to execute.
    * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
    * 
    * @example
@@ -597,7 +510,7 @@ export class ObservableClass implements IObservable {
    * });
    * ```
    */
-  on(event: IObservableEvent, fn: IObservableCallbackOptions): { remove: () => any } {
+  on(event: EventType, fn: IObservableCallback): { remove: () => any } {
     return this._observable.on.call(this, event, fn);
   }
 
@@ -606,9 +519,9 @@ export class ObservableClass implements IObservable {
    * 
    * This method ensures that the callback is executed only the first time the event is triggered.
    * 
-   * @param {IObservableEvent} event - The event to listen to.
-   * @param {IObservableCallbackOptions} fn - The callback function to execute.
-   * @returns {IObservable} The observable object.
+   * @param {EventType} event - The event to listen to.
+   * @param {IObservableCallback} fn - The callback function to execute.
+   * @returns {IObservable<EventType>} The observable object.
    * 
    * @example
    * ```typescript
@@ -617,7 +530,7 @@ export class ObservableClass implements IObservable {
    * });
    * ```
    */
-  finally(event: IObservableEvent, fn: IObservableCallbackOptions): IObservable {
+  finally(event: EventType, fn: IObservableCallback): IObservable<EventType> {
     return this._observable.finally.call(this, event, fn);
   }
 
@@ -627,16 +540,16 @@ export class ObservableClass implements IObservable {
    * If `fn` is provided, this method removes the specific callback function from the event.
    * If `fn` is not provided, it removes all callback functions associated with the event.
    * 
-   * @param {IObservableEvent} event - The event to remove the listener from.
-   * @param {IObservableCallbackOptions} [fn] - The callback function to remove.
-   * @returns {IObservable} The observable object.
+   * @param {EventType} event - The event to remove the listener from.
+   * @param {IObservableCallback} [fn] - The callback function to remove.
+   * @returns {IObservable<EventType>} The observable object.
    * 
    * @example
    * ```typescript
    * observable.off("dataReceived", subscription.remove);
    * ```
    */
-  off(event: IObservableEvent, fn?: IObservableCallbackOptions): IObservable {
+  off(event: EventType, fn: IObservableCallback): IObservable<EventType> {
     return this._observable.off.call(this, event, fn);
   }
 
@@ -646,16 +559,16 @@ export class ObservableClass implements IObservable {
    * If the last argument is a function, it will be treated as the final callback function 
    * to be executed after all other callbacks.
    * 
-   * @param {IObservableEvent} event - The event to trigger.
+   * @param {EventType} event - The event to trigger.
    * @param {...any[]} args - The arguments to pass to the callback functions.
-   * @returns {IObservable} The observable object.
+   * @returns {IObservable<EventType>} The observable object.
    * 
    * @example
    * ```typescript
    * observable.trigger("dataReceived", { id: 1, value: "Hello" });
    * ```
    */
-  trigger(event: IObservableEvent, ...args: any[]): IObservable {
+  trigger(event: EventType | IObservableAllEventType, ...args: any[]): IObservable<EventType> {
     return this._observable.trigger.call(this, event, ...args);
   }
 
@@ -664,14 +577,14 @@ export class ObservableClass implements IObservable {
    * 
    * This method clears all event listeners for the observable object.
    * 
-   * @returns {IObservable} The observable object.
+   * @returns {IObservable<EventType>} The observable object.
    * 
    * @example
    * ```typescript
    * observable.offAll();
    * ```
    */
-  offAll(): IObservable {
+  offAll(): IObservable<EventType> {
     return this._observable.offAll.call(this);
   }
 
@@ -680,8 +593,8 @@ export class ObservableClass implements IObservable {
    * 
    * This method ensures that the callback is executed only once, even if the event is triggered multiple times.
    * 
-   * @param {string} event - The event to listen to.
-   * @param {IObservableCallbackOptions} fn - The callback function to execute.
+   * @param {EventType} event - The event to listen to.
+   * @param {IObservableCallback} fn - The callback function to execute.
    * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
    * 
    * @example
@@ -691,7 +604,7 @@ export class ObservableClass implements IObservable {
    * });
    * ```
    */
-  one(event: string, fn: IObservableCallbackOptions): { remove: () => any } {
+  one(event: EventType, fn: IObservableCallback): { remove: () => any } {
     return this._observable.one.call(this, event, fn);
   }
 
@@ -700,7 +613,7 @@ export class ObservableClass implements IObservable {
    * 
    * This method returns an object with event names as keys and arrays of callback functions as values.
    * 
-   * @returns {{ [key: string]: IObservableCallbackOptions[] }} An object with event names as keys and arrays of callback functions as values.
+   * @returns {IObservableCallbacks<EventType>} An object with event names as keys and arrays of callback functions as values.
    * 
    * @example
    * ```typescript
@@ -708,7 +621,7 @@ export class ObservableClass implements IObservable {
    * console.log(callbacks);
    * ```
    */
-  getEventCallBacks(): { [key: string]: IObservableCallbackOptions[] } {
+  getEventCallBacks(): IObservableCallbacks<EventType> {
     return this._observable.getEventCallBacks.call(this);
   }
 }

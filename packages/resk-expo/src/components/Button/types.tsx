@@ -226,6 +226,12 @@ export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<
     rippleColor?: string;
 
     /**
+     * If true, the button will take up the full width of its container.
+     * This can be useful for creating buttons that span the entire width of the screen.
+     */
+    fullWidth?: boolean;
+
+    /**
      * Indicates whether to show a loading indicator on the button.
      * When true, a loading spinner will be displayed instead of the button label.
      * 

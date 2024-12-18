@@ -1,3 +1,5 @@
+import { IDict } from ".";
+
 /**
  * @interface II18nDictionary
  * Represents a dictionary for internationalization (i18n) strings.
@@ -21,24 +23,8 @@
  *     }
  * };
  */
-export interface II18nDictionary {
-    /**
-     * A mapping of locale strings to their corresponding translation dictionaries.
-     * 
-     * @type {string}
-     * @example
-     * const locale = "en"; // English locale
-     */
-    [locale: string]: {
-        /**
-         * A mapping of translation keys to their localized string values or nested dictionaries.
-         * 
-         * @type {string | II18nDictionary}
-         * @example
-         * const greeting = translations[locale].greeting; // "Hello" for English
-         */
-        [key: string]: (string | II18nDictionary | Record<string, string>);
-    };
+export interface II18nDictionary extends IDict {
+
 }
 
 /**
@@ -62,7 +48,7 @@ export interface II18nDictionary {
  *     }
  * }
  */
-export type I18nEvent = "dictionary-loaded" | "dictionary-changed" | "locale-changed";
+export type I18nEvent = "dictionary-loaded" | "dictionary-changed" | "locale-changed" | "namespace-loaded" | "namespaces-loaded";
 
 /**
  * A formatter function for internationalization (i18n) strings.

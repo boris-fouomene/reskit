@@ -186,6 +186,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
         //marginRight: 5,
     },
+    expandableItem: {
+        paddingVertical: 2,
+    },
     expandableItemContent: {
         justifyContent: "space-between",
         paddingVertical: 0,
@@ -252,6 +255,7 @@ function useGetExpandableItemProps<IMenuItemExtendContext = any>({ testID, right
         role: "tree",
         ...rest,
         testID,
+        style: [styles.expandableItem, rest.style],
         contentProps: { ...contentProps, style: [styles.expandableItemContent, contentProps.style] },
         right: (options) => {
             const r = typeof right == "function" ? right(options) : right;

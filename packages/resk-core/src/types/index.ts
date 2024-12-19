@@ -1,5 +1,6 @@
 import { IAuthPerm, IAuthUser } from "@/auth/types";
 import { IFilterQuery, IFilterSort } from "./filters";
+import { TranslateOptions } from "i18n-js";
 
 /**
  * Represents a base field with optional type, label, and name properties.
@@ -128,16 +129,17 @@ export interface IFieldBase<FieldType = "text"> {
  * ```
   @example 
   ```ts
+      import "@resk/core";
       declare module "@resk/core" {
-      interface IResourceNameMap {
-          users?:string;
-      }
-      interface IFieldMap {
-          select : IFieldBase<"select"> & {
-              items : string[]
-          }
-      }
-  }
+        interface IResourceNameMap {
+            users?:string;
+        }
+        interface IFieldMap {
+            select : IFieldBase<"select"> & {
+                items : string[]
+            }
+        }
+    }
   ```
  */
 export interface IFieldMap {
@@ -957,6 +959,50 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
    * @returns {Promise<IResourceOperationResult<any>>} A promise that resolves to the result of the delete operation.
    */
   delete(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any>>;
+
+  /**
+   * An optional array of property names that should be automatically translated.
+   * The values corresponding to these properties in the translations dictionary
+   * will be of the form "resources.[resourceName].[propertyName]".
+   * @type {string[]}
+   * @default ["label","title","tooltip"]
+   */
+  translatableProperties?: string[];
+  /***
+   * returns the properties of the resource that will be translated automatically.
+   * returns an array of strings representing the properties that will be translated.
+   * this implies that, in the translations dictionary, the value corresponding to these properties will be of the form : [resources][resourceName].[propertyName]
+   * and example of a translation dictionary is: {
+   *    "en" : {
+   *      "resources" : {
+   *        "user" : {
+   *          "label" : "User",
+   *          "email" : "Email" 
+   *        }
+   *      }
+   *    },
+    * "fr" : {
+    *      "resources" : {
+    *        "user" : {
+    *          "label" : "Utilisateur",
+    *          "email" : "Email"
+    *        }
+    *    }
+   * }
+   * label and email properties will be translated to "Utilisateur" and "Email" in french using the i18n.t function with the key : "resources.user.label" and "resources.user.email"
+   * @returns {string[]} An array of strings representing the properties that will be translated.
+   * @default ["label","title","tooltip"]
+   */
+  getTranslatableProperties(): string[];
+
+  /***
+   * translates a property of the resource using the translate function from the default I18n instance.
+   * @param propertyName - The name of the property to translate.
+   * @param fallbackValue - The fallback value to use if the translation is not found.
+   * @param options - The options for the translation.
+   * @returns The translated property value.
+   */
+  translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string;
 };
 
 /**

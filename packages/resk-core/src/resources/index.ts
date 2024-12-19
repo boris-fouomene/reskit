@@ -5,7 +5,8 @@ import { isEmpty, defaultStr, isObj, isNonNullString, stringify } from '../utils
 import { IConstructor } from '../types/index';
 import { IAuthPerm, IAuthUser } from '@/auth/types';
 import { isAllowed } from '../auth/perms';
-import { i18n } from '@/i18n';
+import { i18n, I18n } from '@/i18n';
+import { TranslateOptions } from 'i18n-js';
 
 
 /**
@@ -49,6 +50,7 @@ import { i18n } from '@/i18n';
  */
 export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> implements IResourceInstance<DataType, PrimaryKeyType> {
   actions?: IResourceActionMap;
+  private _resourceOptions?: IResource<DataType>;
   /**
    * The internal name of the resource.
    *
@@ -109,6 +111,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   */
   fields?: Record<string, IField>;
   private _onDictionaryChangedListener?: { remove: () => any };
+  private _onLocaleChangeListener?: { remove: () => any };
   /**
    * Constructs a new `ResourceBase` instance.
    * 
@@ -119,11 +122,28 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @param {...any[]} args - Additional arguments that can be passed for further customization.
    */
   constructor(options: IResource<DataType>, ...args: any[]) {
-    i18n.resolveTranslations(this);
-    this._onDictionaryChangedListener = i18n.on("dictionary-changed", () => {
-      i18n.resolveTranslations(this);
-    });
+    this._onDictionaryChangedListener = i18n.on("dictionary-changed", this.onI18nChange.bind(this));
+    this._onLocaleChangeListener = i18n.on("locale-changed", this.onI18nChange.bind(this));
     this.init(options);
+  }
+  onI18nChange() {
+    this.resolveTranslations();
+  }
+  resolveTranslations() {
+    i18n.resolveTranslations(this);
+    const properties = this.getTranslatableProperties();
+    if (Array.isArray(properties) && properties.length > 0) {
+      properties.forEach(property => {
+        if (property && isNonNullString(property) && typeof this[property as keyof typeof this] === "string") {
+          const v = this.translateProperty(property);
+          if (v !== property && isNonNullString(v)) {
+            try {
+              (this as IDict)[property as keyof typeof this] = v;
+            } catch { }
+          }
+        }
+      });
+    }
   }
   /**
    * returns the i18n params for the resource. this is used to translate the error messages.
@@ -261,6 +281,8 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    */
   init(options: IResource<DataType>) {
     options = Object.assign({}, options);
+    this._resourceOptions = options;
+    this.resolveTranslations();
     for (let i in options) {
       if (isEmpty((this as IDict)[i]) && typeof (this as IDict)[i] !== "function") {
         try {
@@ -271,6 +293,50 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     this.getFields();
   }
 
+  /**
+   * The properties of the resource that will be translated automatically.
+   * @type {string[]}
+   * @default ["label","title","tooltip"]
+   */
+  translatableProperties?: string[] = [];
+  /***
+   * returns the properties of the resource that will be translated automatically.
+   * returns an array of strings representing the properties that will be translated.
+   * this implies that, in the translations dictionary, the value corresponding to these properties will be of the form : [resources][resourceName].[propertyName]
+   * and example of a translation dictionary is: {
+   *    "en" : {
+   *      "resources" : {
+   *        "user" : {
+   *          "label" : "User",
+   *          "email" : "Email" 
+   *        }
+   *      }
+   *    },
+    * "fr" : {
+    *      "resources" : {
+    *        "user" : {
+    *          "label" : "Utilisateur",
+    *          "email" : "Email"
+    *        }
+    *    }
+   * }
+   * label and email properties will be translated to "Utilisateur" and "Email" in french using the i18n.t function with the key : "resources.user.label" and "resources.user.email"
+   * @returns {string[]} An array of strings representing the properties that will be translated.
+   * @default ["label","title","tooltip"]
+   */
+  getTranslatableProperties() {
+    return Array.isArray(this.translatableProperties) ? this.translatableProperties : ["label", "title", "tooltip"];
+  }
+  translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string {
+    propertyName = defaultStr(propertyName).trim();
+    const key = `resources.${this.getName()}.${propertyName}`;
+    options = Object.assign({}, { resourceName: this.getName() }, options);
+    const translatedValue = i18n.t(key, options);
+    if (isNonNullString(translatedValue) && translatedValue !== key) {
+      return translatedValue;
+    }
+    return defaultStr(fallbackValue, propertyName);
+  }
   /**
    * Retrieves the name of the resource.
    *
@@ -403,7 +469,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @returns {string} The label of the resource.
    */
   getLabel(): string {
-    return defaultStr(this.label);
+    return this.translateProperty("label", defaultStr(this.label, this.getName()));
   }
 
   /**
@@ -414,7 +480,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @returns {string} The title of the resource.
    */
   getTitle(): string {
-    return defaultStr(this.title);
+    return this.translateProperty("title", defaultStr(this.title, this.getLabel()));
   }
 
   /**
@@ -425,7 +491,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @returns {string} The tooltip of the resource.
    */
   getTooltip(): string {
-    return defaultStr(this.tooltip);
+    return this.translateProperty("tooltip", defaultStr(this.tooltip));
   }
 
   /**
@@ -437,7 +503,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @returns {Record<string, IField>} A record containing all the fields of the resource.
    */
   getFields(): Record<string, IField> {
-    i18n.resolveTranslations(this);
+    this.resolveTranslations();
     this.fields = getFields(this);
     return this.fields;
   }

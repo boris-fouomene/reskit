@@ -13,6 +13,33 @@ import stringify from "@utils/stringify";
 const TRANSLATION_KEY = Symbol("TRANSLATION_KEY");
 
 /**
+* A decorator to attach metadata to properties or methods for translation.
+* @param key The translation key in the dictionary.
+* @returns A property and method decorator.
+* @example 
+* ```ts
+*   // Class with translations using the decorator
+    class MyComponent {
+        @Translate("greeting")
+        public greeting: string;
+
+        @Translate("nested.example")
+        public nestedExample: string;
+
+        @Translate("farewell")
+        public sayGoodbye(): string {
+            return "";
+        }
+    }
+* ```
+*/
+export function Translate(key: string): PropertyDecorator & MethodDecorator {
+    return (target: Object, propertyKey: string | symbol) => {
+        Reflect.defineMetadata(TRANSLATION_KEY, key, target, propertyKey);
+    };
+}
+
+/**
  * The I18n class extends the i18n-js library to provide internationalization (i18n) 
  * functionality with observable capabilities. It manages translations, allows for 
  * dynamic loading of language dictionaries, and supports event-driven architecture 
@@ -129,18 +156,6 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         }
         return I18n.instance;
     }
-
-    /**
-     * A decorator to attach metadata to properties or methods for translation.
-     * @param key The translation key in the dictionary.
-     * @returns A property and method decorator.
-     */
-    static Translate(key: string): PropertyDecorator & MethodDecorator {
-        return (target: Object, propertyKey: string | symbol) => {
-            Reflect.defineMetadata(TRANSLATION_KEY, key, target, propertyKey);
-        };
-    }
-
     /**
      * static function to attach a dictionary to the I18n default instance.
         @example : 

@@ -5,6 +5,7 @@ import { useTheme } from "@theme/index";
 import { IReactNullableElement } from "../../types";
 import stableHash from "stable-hash";
 import { cloneObject, isObj } from "@resk/core";
+import { i18n } from "@resk/core";
 
 const isAllowed = (p: any) => true;
 
@@ -232,5 +233,5 @@ export function useRenderMenuItems<MenuItemContext = any>({ items, context, rend
       render,
       renderExpandable,
     });
-  }, [items, theme, context, stableHash(render), stableHash(renderExpandable)]);
+  }, [items, theme, context, stableHash(render), stableHash(renderExpandable), i18n.getLocale()]);
 }

@@ -239,6 +239,20 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
             console.error(error, " resolving translations for target : ", target);
         }
     }
+
+    /***
+     * returns the missing placeholder string for the given placeholder and message.
+     * @param placeholder - The placeholder to be replaced.
+     * @param message - The message to be displayed.
+     * @param options - The options for the missing placeholder string.
+     * @returns The missing placeholder string.
+     */
+    getMissingPlaceholderString(placeholder: string, message?: string, options?: II18nDictionary) {
+        if (typeof this.missingPlaceholder == "function") {
+            return this.missingPlaceholder(this, placeholder, defaultStr(message), Object.assign({}, options));
+        }
+        return placeholder;
+    }
     getLocale() {
         return this.locale;
     }

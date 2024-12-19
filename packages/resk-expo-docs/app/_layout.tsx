@@ -3,9 +3,13 @@ import * as SplashScreen from 'expo-splash-screen';
 import { ITheme, ReskExpoProvider, useDrawer } from "@resk/expo";
 import { Slot } from 'expo-router';
 import "../src/i18n/translations";
+import "../src/resources";
+import { ResourcesManager } from '@resk/core';
+import { Users } from '../src/resources';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 //SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
+    const users = ResourcesManager.getResource<Users>("users");
     return (<ReskExpoProvider
         drawerNavigationViewProps={{
             items: [
@@ -15,7 +19,7 @@ export default function RootLayout() {
                     }
                 },
                 {
-                    label: 'Search', icon: 'material-search',
+                    label: users?.getLabel(), icon: 'material-search',
                     onPress: () => console.log('Search pressed'),
                     items: [
                         { label: 'Search 1', icon: 'material-sell', onPress: () => console.log('Search 1 pressed') },

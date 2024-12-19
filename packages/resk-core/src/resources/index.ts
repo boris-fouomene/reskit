@@ -129,13 +129,13 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   onI18nChange() {
     this.resolveTranslations();
   }
-  resolveTranslations() {
+  resolveTranslations(options?: TranslateOptions) {
     i18n.resolveTranslations(this);
     const properties = this.getTranslatableProperties();
     if (Array.isArray(properties) && properties.length > 0) {
       properties.forEach(property => {
         if (property && isNonNullString(property) && typeof this[property as keyof typeof this] === "string") {
-          const v = this.translateProperty(property);
+          const v = this.translateProperty(property, undefined, options);
           if (v !== property && isNonNullString(v)) {
             try {
               (this as IDict)[property as keyof typeof this] = v;
@@ -327,13 +327,24 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   getTranslatableProperties() {
     return Array.isArray(this.translatableProperties) ? this.translatableProperties : ["label", "title", "tooltip"];
   }
+  /***
+  * translates a property of the resource using the translate function from the default I18n instance.
+  * @param propertyName - The name of the property to translate.
+  * @param fallbackValue - The fallback value to use if the translation is not found.
+  * @param options - The options for the translation.
+  * @returns The translated property value.
+  */
   translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string {
     propertyName = defaultStr(propertyName).trim();
-    const key = `resources.${this.getName()}.${propertyName}`;
+    const nameStr = String(this.getName()).trim();
     options = Object.assign({}, { resourceName: this.getName() }, options);
-    const translatedValue = i18n.t(key, options);
-    if (isNonNullString(translatedValue) && translatedValue !== key) {
-      return translatedValue;
+    const dictionary = i18n.getDictionary()[i18n.getLocale()];
+    if (isObj(dictionary) && isObj(dictionary.resources) && isObj(dictionary.resources[nameStr]) && isNonNullString(dictionary.resources[nameStr][propertyName])) {
+      const key = `resources.${nameStr}.${propertyName}`;
+      const translatedValue = i18n.t(key, options);
+      if (isNonNullString(translatedValue) && translatedValue !== key) {
+        return translatedValue;
+      }
     }
     return defaultStr(fallbackValue, propertyName);
   }

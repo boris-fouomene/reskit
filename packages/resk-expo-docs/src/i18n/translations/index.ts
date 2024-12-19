@@ -1,4 +1,5 @@
 import { I18n } from "@resk/core";
+import "./resources";
 
 I18n.RegisterDictionary(({
     en: {

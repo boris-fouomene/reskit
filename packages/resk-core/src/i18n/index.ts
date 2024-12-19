@@ -1,9 +1,11 @@
 import isNonNullString from "@utils/isNonNullString";
-import { I18nEvent, II18nDictionary } from "../types/i18n";
+import { I18nEvent, I18nFormatter, II18nDictionary } from "../types/i18n";
 import { extendObj, isObj } from "@utils/object";
 import { IObservable, IObservableCallback, observableFactory } from "@utils/observable";
 import "reflect-metadata";
 import { I18n as I18nJs, OnChangeHandler } from "i18n-js";
+import defaultStr from "@utils/defaultStr";
+import stringify from "@utils/stringify";
 
 /**
  * A key to store metadata for translations.
@@ -29,6 +31,7 @@ const TRANSLATION_KEY = Symbol("TRANSLATION_KEY");
  *   },
  * });
  * console.log(i18nInstance.t("greeting", { name: "John" })); // Outputs: Hello, John!
+ * @see https://www.npmjs.com/package/i18n-js?activeTab=readme for more information on i18n-js library.
  */
 export class I18n extends I18nJs implements IObservable<I18nEvent> {
     /**
@@ -50,6 +53,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      */
     constructor(...args: any[]) {
         super(...args);
+        this.onChangeHandlers.unshift(this._onChangeHandler.bind(this));
+    }
+    private _onChangeHandler(i18n: I18nJs) {
+        this.trigger("locale-changed", i18n.locale, this.getDictionary());
     }
     readonly _observableFactory = observableFactory<I18nEvent>();
     readonly _____isObservable?: boolean | undefined = true;
@@ -157,10 +164,8 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      */
     static createInstance(...args: any[]): I18n {
         const i18n = new I18n(...args);
-        i18n.resolveTranslations(i18n);
         return i18n;
     }
-
 
     /**
      * Retrieves the current dictionary of translations.
@@ -222,9 +227,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     getLocale() {
         return this.locale;
     }
-    onChange(callback: OnChangeHandler): () => void {
-        this.trigger("locale-changed", this.getLocale(), this.getDictionary());
-        return super.onChange(callback);
+    setLocale(locale: string) {
+        this.locale = locale;
+        return this.loadNamespaces().then(() => {
+        })
     }
     /**
      * Register a namespace resolver.
@@ -263,16 +269,17 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     /***
      * Load a namespace for the current locale.
      * @param namespace The namespace to load.
+     * @param locale optional locale to load the namespace for
      * @example
      * // Load the "common" namespace for the current locale. 
      * i18n.loadNamespace("common");      
      * @returns A promise that resolves to the loaded namespace.
      */
-    loadNamespace(namespace: string): Promise<II18nDictionary> {
+    loadNamespace(namespace: string, locale?: string): Promise<II18nDictionary> {
         if (!isNonNullString(namespace) || !this.namespaceResolvers[namespace]) {
             return Promise.reject(new Error(`Invalid namespace or resolver for namespace "${namespace}".`));
         }
-        const locale = this.getLocale();
+        locale = defaultStr(locale, this.getLocale());
         if (!isNonNullString(locale)) {
             return Promise.reject(new Error(`Locale is not set. Cannot load namespace "${namespace}".`));
         }
@@ -287,15 +294,17 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     }
     /**
      * load a namespace for the current locale on the I18n default instance.
-     * @param namespace 
+     * @param namespace, namespace to load
+     * @param locale, optional locale to load the namespace for
      * @returns 
      */
-    static loadNamespace(namespace: string): Promise<II18nDictionary> {
-        return I18n.getInstance().loadNamespace(namespace);
+    static loadNamespace(namespace: string, locale?: string): Promise<II18nDictionary> {
+        return I18n.getInstance().loadNamespace(namespace, locale);
     }
 
     /**
      * Loads all registered namespaces for the current locale and returns the combined translations as an II18nDictionary.
+     * @param locale optional locale to load the namespaces for
      * @returns {Promise<II18nDictionary>} A promise that resolves to the combined translations for the current locale.
      * @example
      * // Load all namespaces for the current locale and return the combined translations.
@@ -303,10 +312,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      *   console.log(translations);
      * });
      */
-    loadNamespaces(): Promise<II18nDictionary> {
+    loadNamespaces(locale?: string): Promise<II18nDictionary> {
         const namespaces = [];
         const dictionary: II18nDictionary = {};
-        const locale = this.getLocale();
+        locale = defaultStr(locale, this.getLocale());
         for (const namespace in this.namespaceResolvers) {
             if (this.namespaceResolvers.hasOwnProperty(namespace) && typeof this.namespaceResolvers[namespace] === "function") {
                 namespaces.push(this.namespaceResolvers[namespace](locale).then((translations) => {
@@ -323,10 +332,22 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     }
     /***
      * Load all registered namespaces for the current locale on the I18n default instance.
+     * @param locale optional locale to load the namespaces for
      * @returns {Promise<II18nDictionary>} A promise that resolves to the combined translations for the current local
      */
-    static loadNamespaces(): Promise<II18nDictionary> {
-        return I18n.getInstance().loadNamespaces();
+    static loadNamespaces(locale?: string): Promise<II18nDictionary> {
+        return I18n.getInstance().loadNamespaces(locale);
+    }
+    private static defaultFormatter(value: string, params?: Record<string, any>) {
+        if (value === undefined || value === null) return "";
+        if (!["number", "boolean", "string"].includes(typeof value)) {
+            return stringify(value);
+        }
+        value = String(value);
+        if (!isObj(params)) return value;
+        if (!params) return value;
+        if (!isObj(params) || !params) return value;
+        return value.replace(/{(.*?)}/g, (_, key) => stringify(params[key]));
     }
 }
 

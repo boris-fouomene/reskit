@@ -84,7 +84,6 @@ export const ExpandableItem = forwardRef<any, any>(function ExpandableMenuItem<I
     const containerProps = Object.assign({}, expandableProps.containerProps);
     const expandableLabelProps = Object.assign({}, expandableProps.labelProps);
     contentProps = Object.assign({}, contentProps);
-
     return <Expandable
         testID={testID + "-expandable-item"}
         {...expandableProps}
@@ -187,7 +186,7 @@ const styles = StyleSheet.create({
         //marginRight: 5,
     },
     expandableItem: {
-        paddingVertical: 2,
+        //paddingVertical: 4,
     },
     expandableItemContent: {
         justifyContent: "space-between",
@@ -248,7 +247,7 @@ const styles = StyleSheet.create({
  * leverages the `ExpandableContext` to access the expand icon, enhancing the integration of
  * expandable items within the menu structure.
  */
-function useGetExpandableItemProps<IMenuItemExtendContext = any>({ testID, right, contentProps, ...rest }: IMenuItemBase<IMenuItemExtendContext>) {
+function useGetExpandableItemProps<IMenuItemExtendContext = any>({ testID, expandableProps, right, contentProps, ...rest }: IMenuItemBase<IMenuItemExtendContext>) {
     const ExpandableContext = useExpandable();
     contentProps = Object.assign({}, contentProps);
     return {
@@ -257,6 +256,7 @@ function useGetExpandableItemProps<IMenuItemExtendContext = any>({ testID, right
         testID,
         style: [styles.expandableItem, rest.style],
         contentProps: { ...contentProps, style: [styles.expandableItemContent, contentProps.style] },
+        expandableProps: expandableProps,
         right: (options) => {
             const r = typeof right == "function" ? right(options) : right;
             return <>

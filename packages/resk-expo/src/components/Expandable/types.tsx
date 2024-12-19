@@ -151,6 +151,13 @@ export type IExpandableProps = Omit<PressableProps, "children"> & ILabelOrLeftOr
      * @default true
      */
     usePrimaryColorWhenExpended?: boolean;
+
+    /**
+     * Size of the expand/collapse icon
+     * @type {number}
+     * @default 20
+     */
+    expandIconSize?: number;
 }
 
 /**

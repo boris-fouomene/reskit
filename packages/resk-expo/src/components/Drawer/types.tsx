@@ -848,7 +848,7 @@ export interface IDrawerItemsProps extends IMenuItems<IDrawerContext> {
  * @example
  * // Example of using a function
  * const drawerItemProps: IDrawerItemProps = {
- *   active: () => checkIfActive(),
+ *   active: ({drawer}) => checkIfActive(drawer),
  *   routePath: '/profile',
  *   routeParams: { userId: 456 },
  *   isRendable: false
@@ -881,7 +881,7 @@ export interface IDrawerItemsProps extends IMenuItems<IDrawerContext> {
  * };
  */
 export type IDrawerItemProps = IMenuItemBase<IDrawerContext> & {
-    active?: boolean | (() => boolean);
+    active?: boolean | ((options: IDrawerContext) => boolean);
     routePath?: string;
     routeParams?: IDict;
     isRendable?: boolean;

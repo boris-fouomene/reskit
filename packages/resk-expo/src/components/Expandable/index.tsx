@@ -4,7 +4,7 @@ import { StyleSheet, View as RNView, Pressable, GestureResponderEvent, ViewProps
 import Label, { ILabelProps } from "@components/Label";
 import { Icon, IIconProps, IIconSource, useGetIcon } from "@components/Icon";
 import { defaultStr } from "@resk/core";
-import Theme, { useTheme, Colors } from "@theme";
+import { useTheme, Colors } from "@theme";
 import useStateCallback from "@utils/stateCallback";
 import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import Animated, { AnimatedProps, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
@@ -68,7 +68,7 @@ import { isRTL } from "@utils/i18nManager";
  * @see {@link IExpandableCallbackOptions} for callback options
  */
 
-export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProps, children: customChildren, unexpandedIconProps, right: customRight, label: customLabel, usePrimaryColorWhenExpended, onToggleExpand, testID, onPress, expanded: expandedProp, expandedIcon, defaultExpanded, unexpandedIcon, leftContainerProps, rightContainerProps, contentProps, labelProps, contentContainerProps, showExpandIcon, containerProps, autoMountChildren = false, style, expandIconPosition, ...props }: IExpandableProps, ref: React.ForwardedRef<RNView>) => {
+export const Expandable = React.forwardRef(({ left: customLeft, expandIconSize, expandedIconProps, children: customChildren, unexpandedIconProps, right: customRight, label: customLabel, usePrimaryColorWhenExpended, onToggleExpand, testID, onPress, expanded: expandedProp, expandedIcon, defaultExpanded, unexpandedIcon, leftContainerProps, rightContainerProps, contentProps, labelProps, contentContainerProps, showExpandIcon, containerProps, autoMountChildren = false, style, expandIconPosition, ...props }: IExpandableProps, ref: React.ForwardedRef<RNView>) => {
   const theme = useTheme();
   const children = useMemo(() => {
     return customChildren;
@@ -131,7 +131,8 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandedIconProp
   const { left, right, label } = getLabelOrLeftOrRightProps({ label: customLabel, left: customLeft, right: customRight }, eProps)
   testID = defaultStr(testID, "resk-expandable");
   const iconProps = Object.assign({}, expanded ? expandedIconProps : unexpandedIconProps);
-  const icon = useGetIcon<{ expanded: boolean }>({ iconComponent: Icon.Button, ...iconProps, ...eProps, size: 24, style: [styles.expandableIcon, iconProps.style], expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
+  const iconSize = useMemo(() => typeof expandIconSize == "number" ? expandIconSize : 20, [expandIconSize]);
+  const icon = useGetIcon<{ expanded: boolean }>({ iconComponent: Icon.Button, size: iconSize, ...iconProps, ...eProps, style: [styles.expandableIcon, iconProps.style], expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
   const expandIcon = showExpandIcon !== false ? icon : null;
   return (
     <ExpandableContext.Provider value={{ expanded, toggleExpand, expandIcon: icon }}>

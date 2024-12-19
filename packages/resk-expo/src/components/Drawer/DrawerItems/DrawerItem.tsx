@@ -49,7 +49,8 @@ const DrawerItem = ({
   ...rest
 }: IDrawerItemProps) => {
   const theme = useTheme();
-  const { drawer } = useDrawer();
+  const drawerContext = useDrawer();
+  const { drawer } = drawerContext;
   contentProps = Object.assign({}, contentProps);
   containerProps = Object.assign({}, containerProps);
   borderRadius = typeof borderRadius == 'number' ? borderRadius : 18;
@@ -60,11 +61,11 @@ const DrawerItem = ({
   testID = defaultStr(testID, section ? "resk-drawer-item-section" : "resk-drawer-item");
   const active: boolean = useMemo(() => {
     if (typeof customActive == 'function') {
-      return typeof customActive == 'function' ? !!customActive() : customActive as boolean
+      return typeof customActive == 'function' ? !!customActive(drawerContext) : customActive as boolean
     }
     if (typeof customActive == 'boolean') return !!customActive;
     return false;
-  }, [customActive, routePath, theme]) as boolean;
+  }, [customActive, routePath, theme, drawerContext?.drawer]) as boolean;
   const contentColor = active ? theme.colors.primary : Colors.isValid(color) ? color : Colors.isValid((style as TextStyle).color) ? (style as TextStyle).color : section ? theme.colors.text : Colors.setAlpha(theme.colors.text);
   const backgroundColor = getBackgroundColor({ active, theme });
   const fontWeight = section ? "bold" : active ? '400' : 'normal';
@@ -129,6 +130,7 @@ const styles = StyleSheet.create({
   },
   ripple: {
     width: '100%',
+    //paddingVertical: 7,
   }
 });
 

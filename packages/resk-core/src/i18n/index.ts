@@ -66,6 +66,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * alias for translate method of i18n-js
      */
     readonly t: typeof this.translate = this.translate;
+    /***
+     * locales that are superted by the i18n instance
+     */
+    private _locales: string[] = [];
     /**
      * Namespace resolvers for loading translations.
      */
@@ -283,28 +287,68 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     get locale() {
         return super.locale;
     }
+    /**
+     * Gets the current locale for the i18n instance.
+     * @returns {string} The current locale.
+     */
     getLocale() {
         return super.locale;
     }
+
     /**
-     * Returns the list of locales available in the translations.
-     * @returns the list of locales available in the translations.
+     * Sets the list of supported locales for the i18n instance.
+     * @param locales - An array of locale strings to set as the supported locales.
+     * @returns The list of all locales supported by the i18n instance, including both the locales for which translations are available and the locales explicitly set as supported.
      */
-    getLocales() {
-        return Object.keys(this.getTranslations());
+    public setLocales(locales: string[]) {
+        this._locales = Array.isArray(locales) ? locales : ["en"];
+        return this.getLocales();
     }
+
+    /**
+     * Gets the list of all locales supported by the i18n instance, including both the locales for which translations are available and the locales explicitly set as supported.
+     * @returns {string[]} The list of all supported locales.
+     */
+    getLocales(): string[] {
+        const translations = Object.keys(this.getTranslations());
+        const suportedLocales = Array.isArray(this._locales) ? this._locales : ["en"];
+        return [...translations, ...suportedLocales.filter((locale) => !translations.includes(locale))];
+    }
+    /***
+     * returns true if the locale is supported by the i18n instance.
+     * @param locale - The locale to check.
+     * @returns true if the locale is supported, false otherwise.
+     */
+    isLocaleSupported(locale: string): boolean {
+        if (!isNonNullString(locale)) return false;
+        return this.getLocales().includes(locale);
+    }
+    /**
+     * Sets the locale for the i18n instance.
+     * If the provided locale is the same as the current locale, this method will return without doing anything.
+     * Otherwise, it will load the translations for the new locale and trigger a "locale-changed" event.
+     * If this is the default i18n instance, it will also set the locale in the session.
+     * @param locale - The new locale to set.
+     */
     set locale(locale: string) {
         if (this.locale == locale) {
             return;
         }
         this.loadNamespaces(locale).then((translations) => {
-            if (this.isDefaultInstance()) {
+            if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {
                 I18n.setLocaleToSession(locale);
             }
             super.locale = locale;
             this.trigger("locale-changed", locale, translations);
         });
     }
+    /**
+     * Sets the locale for the i18n instance.
+     * If the provided locale is the same as the current locale, this method will return without doing anything.
+     * Otherwise, it will load the translations for the new locale and trigger a "locale-changed" event.
+     * If this is the default i18n instance, it will also set the locale in the session.
+     * @param locale - The new locale to set.
+     */
     setLocale(locale: string) {
         this.locale = locale;
     }

@@ -41,6 +41,16 @@ export type IReskExpoProviderProps = {
     theme?: ITheme;
     breakpoints?: IBreakpoints;
     drawerNavigationViewProps?: Omit<IDrawerNavigationViewProps, 'drawerState'>;
+    /***
+     * options to pass to useI18n hook
+     * @property {boolean} [useLocaleFromDevice] - A flag indicating whether the locale should be set from the device's locale if it matches the supported locales.
+     */
+    i18nOptions?: {
+        /**
+         * A flag indicating whether the locale should be set from the device's locale if it matches the supported locales.
+         */
+        useLocaleFromDevice?: boolean;
+    }
 }
 
 /**

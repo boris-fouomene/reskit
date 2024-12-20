@@ -1,6 +1,6 @@
 import defaultStr from "./defaultStr";
 
-function escapeString(str:string) : string {
+function escapeString(str: string): string {
   return defaultStr(str)
     .replace(/\\/g, '\\\\')
     .replace(/'/g, "\\'")
@@ -12,7 +12,7 @@ function escapeString(str:string) : string {
     .replace(/\f/g, '\\f')
 }
 
-function isType(obj:any, type:string) : boolean {
+function isType(obj: any, type: string): boolean {
   var t = Object.prototype.toString.call(obj)
   return t === '[object ' + type + ']'
 }
@@ -36,6 +36,9 @@ function isType(obj:any, type:string) : boolean {
  * ```
  */
 export default function stringify(obj: any, options?: { parenthesis: boolean }): string {
+  if (["string", "number", "boolean"].includes(typeof obj)) {
+    return String(obj);
+  }
   /**
    * If the input is an Error object, return its string representation.
    */

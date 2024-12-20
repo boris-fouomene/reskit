@@ -49,7 +49,6 @@ export const useI18n = (i18n?: I18n): I18n => {
     const [locale, setLocale] = useState(instance.getLocale());
     useEffect(() => {
         const onChangeListener = instance.on("locale-changed", (newLocale, dictionary) => {
-            console.log("locale-changed", newLocale, dictionary);
             if (locale != newLocale) {
                 setLocale(newLocale);
             }

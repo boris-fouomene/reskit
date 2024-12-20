@@ -481,6 +481,7 @@ export interface IResourceActionMap {
   create: IResourceAction;
   update: IResourceAction;
   delete: IResourceAction;
+  list: IResourceAction;
   details: IResourceAction;
   all: IResourceAction;
 }
@@ -863,6 +864,14 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
   * @returns A boolean indicating whether the user has read access.
   */
   canUserRead(user?: IAuthUser): boolean;
+
+  /**
+   * Determines if the specified user has list access.
+   *
+   * @param user - The user whose list access is being checked. If no user is provided, the method will use default permissions.
+   * @returns A boolean indicating whether the user has list access.
+   */
+  canUserList(user?: IAuthUser): boolean;
   /**
    * Determines if the user has permission to create a resource.
    *
@@ -1003,6 +1012,97 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
    * @returns The translated property value.
    */
   translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string;
+  /***
+   * adds the prefix "resources.${resourceName}." to the property name if it doesn't already have it.
+   * @param propertyName - The name of the property to prefix.
+   * @returns The prefixed property name.
+   */
+  setI18nPropertyPrefix(propertyName: string): string;
+
+  /**
+   * Adds the prefix "resources.${resourceName}.actions." to the action name if it doesn't already have it.
+   * This is used to construct the i18n key for translating the action name.
+   * 
+   * @param {IResourceActionName} actionName - The name of the action to prefix.
+   * @returns The prefixed action name.
+   */
+  setI18nActionPrefix(actionName: IResourceActionName): string;
+
+  /***
+  * translates a property of the resource using the translate function from the default I18n instance.
+  * @param propertyName - The name of the property to translate.
+  * @param fallbackValue - The fallback value to use if the translation is not found.
+  * @param options - The options for the translation.
+  * @returns The translated property value.
+  * @exports
+  * this.translateProperty("label") // returns "Label"
+  * this.translateProperty("label", "Users") // returns "Label"
+  * this.translateProperty("label", "Label", { resourceName: "users" }) // returns "Label"
+  * this.translateProperty("title", "Title", { resourceName: "users" }) // returns "Title"
+  */
+  translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string;
+
+
+  /**
+   * Translates the name of a resource action using the default I18n instance.
+   *
+   * @param actionName - The name of the action to translate.
+   * @param fallbackValue - The fallback value to use if the translation is not found.
+   * @param options - The options for the translation, including the resource name.
+   * @returns The translated action name.
+   * @exports
+   *  this.translateAction("read") // returns "Read"
+   *  this.translateAction("read", "Read") // returns "Read"
+   *  this.translateAction("read", "Read", { resourceName: "users" }) // returns "Read"
+   *  this.translateAction("update", "Update", { resourceName: "users" }) // returns "Update"
+   */
+  translateAction(actionName: IResourceActionName, fallbackValue?: string, options?: TranslateOptions): string;
+
+  /***
+   * return the translated label for the read action.
+   * @param fallbackValue - The fallback value to use if the translation is not found.
+   * @param options - The options for the translation, including the resource name.
+   * @returns The translated label for the read action.
+   */
+  getReadActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
+  /***
+   * return the translated label for the create action.
+   *  @param fallbackValue - The fallback value to use if the translation is not found.
+   * @param options - The options for the translation, including the resource name.
+   * @returns The translated label for the create action.
+   */
+  getCreateActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
+  /***
+   * return the translated label for the update action.
+  *  @param fallbackValue - The fallback value to use if the translation is not found.
+   * @param options - The options for the translation, including the resource name.
+   * @returns The translated label for the update action.
+   */
+  getUpdateActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
+  /***
+   * return the translated label for the delete action.
+   * @param fallbackValue - The fallback value to use if the translation is not found.
+   * @param options - The options for the translation, including the resource name.
+   * @returns The translated label for the delete action.
+   */
+  getDeleteActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
+  /***
+   * return the translated tooltip for the details action.
+  *  @param fallbackValue - The fallback value to use if the translation is not found.
+   * @param options - The options for the translation, including the resource name.
+   * @returns The translated tooltip for the details action.
+   */
+  getDetailsActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
+
+
+  /***
+   * return the translated label for the list action.
+   * @param fallbackValue - The fallback value to use if the translation is not found.
+   * @param options - The options for the translation, including the resource name.
+   * @returns The translated label for the list action.
+   */
+  getListActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
+
 };
 
 /**

@@ -396,5 +396,4 @@ export type IAuthPermAction =
   | `${IResourceActionName}|${IResourceActionName}`
   | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`
   | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`
-  | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`
-  | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`;
+  | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`;

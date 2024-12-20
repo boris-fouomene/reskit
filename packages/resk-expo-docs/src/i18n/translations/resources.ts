@@ -6,7 +6,15 @@ I18n.RegisterTranslations({
             "users": {
                 "label": "Users",
                 "title": "Users",
-                "tooltip": "Manage users"
+                "tooltip": "Manage users",
+                "actions": {
+                    "create": "Create a User",
+                    "read": "Read a User",
+                    "update": "Update a User",
+                    "delete": "Delete a User",
+                    "details": "View Details",
+                    "list": "List Users"
+                }
             },
         }
     },

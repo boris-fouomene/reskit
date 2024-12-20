@@ -14,6 +14,7 @@ I18n.RegisterTranslations({
             "deleteForbiddenError": "You are not authorized to delete a {resourceLabel} resource",
             "detailsForbiddenError": "You are not authorized to view details of a {resourceLabel} resource",
             "invalidDataProvider": "Invalid data provider for {resourceLabel} resource",
+            "listForbiddenError": "You are not authorized to list {resourceLabel} resources",
         }
     }
 });

@@ -3,6 +3,7 @@ import { ITheme } from "@theme/types";
 import { EdgeInsets } from 'react-native-safe-area-context';
 import { IDrawerNavigationViewProps } from "@layouts/DrawerNavigationView";
 import { I18n } from "@resk/core";
+import { IUseI18nOptions } from "@src/types";
 
 /**
  * @group ReskExpoProvider
@@ -45,12 +46,7 @@ export type IReskExpoProviderProps = {
      * options to pass to useI18n hook
      * @property {boolean} [useLocaleFromDevice] - A flag indicating whether the locale should be set from the device's locale if it matches the supported locales.
      */
-    i18nOptions?: {
-        /**
-         * A flag indicating whether the locale should be set from the device's locale if it matches the supported locales.
-         */
-        useLocaleFromDevice?: boolean;
-    }
+    i18nOptions?: IUseI18nOptions;
 }
 
 /**

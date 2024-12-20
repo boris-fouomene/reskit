@@ -431,3 +431,47 @@ export type ITouchableEvents = {
  */
 export type IReactNullableElement = React.ReactElement | null;
 
+
+/**
+ * @group i18n
+ * @interface IUseI18nOptions
+ * 
+ * An interface that defines options for configuring the internationalization (i18n) instance.
+ * This interface allows developers to specify how the i18n library should handle locale settings,
+ * including the option to use the device's locale and the ability to set a specific locale.
+ * 
+ * @property {boolean} [useLocaleFromDevice] - 
+ * A flag indicating whether the locale should be automatically set from the device's locale.
+ * If this flag is set to `true`, the i18n instance will attempt to match the device's locale
+ * with the supported locales. If a match is found, it will use that locale; otherwise, it will fall back to the default locale.
+ * 
+ * @property {string} [locale] - 
+ * The specific locale to use for the i18n instance. If this property is not provided, the i18n instance will use the default locale.
+ * This allows for explicit control over the locale used in the application, regardless of the device settings.
+ * 
+ * @example
+ * // Example of using IUseI18nOptions to configure i18n
+ * const i18nOptions: IUseI18nOptions = {
+ *   useLocaleFromDevice: true, // Automatically use the device's locale
+ *   locale: 'fr-FR', // Explicitly set the locale to French (France)
+ * };
+ * 
+ * // Example of using IUseI18nOptions with only the device locale option
+ * const deviceLocaleOptions: IUseI18nOptions = {
+ *   useLocaleFromDevice: true, // Use the device's locale if supported
+ * };
+ * 
+ * @note This interface is particularly useful for applications that require localization support,
+ * allowing for flexible configuration of locale settings based on user preferences or device settings.
+ */
+export interface IUseI18nOptions {
+  /**
+   * A flag indicating whether the locale should be set from the device's locale if it matches the supported locales.
+   */
+  useLocaleFromDevice?: boolean;
+
+  /**
+   * The locale to use for the i18n instance. If not provided, the default locale will be used.
+   */
+  locale?: string;
+}

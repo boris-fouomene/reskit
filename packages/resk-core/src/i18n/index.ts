@@ -3,9 +3,10 @@ import { I18nEvent, II18nTranslation } from "../types/i18n";
 import { extendObj, isObj } from "@utils/object";
 import { IObservable, IObservableCallback, observableFactory } from "@utils/observable";
 import "reflect-metadata";
-import { Dict, I18n as I18nJs } from "i18n-js";
+import { Dict, I18n as I18nJs, I18nOptions } from "i18n-js";
 import defaultStr from "@utils/defaultStr";
 import stringify from "@utils/stringify";
+import session from "@session/index";
 
 /**
  * A key to store metadata for translations.
@@ -78,8 +79,8 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * Creates an instance of the I18n class.
      * @param options Optional configuration options for the I18n instance.
      */
-    constructor(...args: any[]) {
-        super(...args);
+    constructor(translations: II18nTranslation = {}, options: Partial<I18nOptions> = {}) {
+        super(translations, options);
         this.onChangeHandlers.unshift(this._onChangeHandler.bind(this));
         this.loadNamespaces();
     }
@@ -155,9 +156,24 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      */
     static getInstance(): I18n {
         if (!I18n.instance) {
-            I18n.instance = new I18n();
+            const locale = I18n.getLocaleFromSession();
+            const options = locale ? { locale } : undefined;
+            I18n.instance = new I18n({}, options);
         }
         return I18n.instance;
+    }
+    /***
+     * returns true if the instance is the default instance.
+     * @returns true if the instance is the default instance.
+     */
+    isDefaultInstance() {
+        return this === I18n.instance;
+    }
+    private static setLocaleToSession(locale: string) {
+        session.set("i18n.locale", locale);
+    }
+    private static getLocaleFromSession() {
+        return session.get("i18n.locale") as string;
     }
     /**
      * static function to attach translations to the I18n default instance.
@@ -270,11 +286,21 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     getLocale() {
         return super.locale;
     }
+    /**
+     * Returns the list of locales available in the translations.
+     * @returns the list of locales available in the translations.
+     */
+    getLocales() {
+        return Object.keys(this.getTranslations());
+    }
     set locale(locale: string) {
         if (this.locale == locale) {
             return;
         }
         this.loadNamespaces(locale).then((translations) => {
+            if (this.isDefaultInstance()) {
+                I18n.setLocaleToSession(locale);
+            }
             super.locale = locale;
             this.trigger("locale-changed", locale, translations);
         });

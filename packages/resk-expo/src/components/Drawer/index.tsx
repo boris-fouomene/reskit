@@ -8,11 +8,49 @@ import DrawerItems from "./DrawerItems";
 import Provider from "./Provider";
 import DrawerItem from "./DrawerItems/DrawerItem";
 import ExpandableDrawerItem from "./DrawerItems/ExpandableItem";
+import { IReskExpoContextCallback } from "@src/context/types";
+import { useReskExpo } from "@src/context/hooks";
 
 
-
+/**
+ * @group DrawerOptions
+ * @interface IWithDrawerOptions
+ * 
+ * An interface that defines options for components that can utilize a drawer navigation system.
+ * This interface allows for the specification of drawer properties, which can either be provided directly
+ * or through a callback function that receives the context from the `ReskExpoProvider`.
+ * 
+ * @property {IReskExpoContextCallback<IDrawerProps> | IDrawerProps} [drawerProps] - 
+ * An optional property that can either be:
+ * - A callback function of type `IReskExpoContextCallback<IDrawerProps>`, which receives the `IReskExpoContext` 
+ *   and returns an `IDrawerProps` object. This allows for dynamic configuration of drawer properties based on the context.
+ * - An object of type `IDrawerProps`, which directly specifies the properties for the drawer navigation.
+ * 
+ * @example
+ * // Example of using IWithDrawerOptions with a callback function
+ * const drawerOptions: IWithDrawerOptions = {
+ *   drawerProps: (context) => {
+ *     // Accessing theme from the context to customize drawer properties
+ *     return {
+ *       drawerStyle: { backgroundColor: context.theme.primaryColor },
+ *       drawerContentOptions: { activeTintColor: context.theme.secondaryColor },
+ *     };
+ *   },
+ * };
+ * 
+ * // Example of using IWithDrawerOptions with static drawer properties
+ * const staticDrawerOptions: IWithDrawerOptions = {
+ *   drawerProps: {
+ *     drawerStyle: { backgroundColor: '#ffffff' },
+ *     drawerContentOptions: { activeTintColor: '#6200ee' },
+ *   },
+ * };
+ * 
+ * @note This interface is particularly useful for components that need to integrate with a drawer navigation system,
+ * allowing for both static and dynamic configurations based on the application's context.
+ */
 interface IWithDrawerOptions {
-  drawerProps?: IDrawerProps;
+  drawerProps?: IReskExpoContextCallback<IDrawerProps> | IDrawerProps;
 }
 
 
@@ -27,9 +65,11 @@ interface IWithDrawerOptions {
  */
 export function withDrawer<T extends object>(Component: IReactComponent<T>, props?: IWithDrawerOptions, options?: IWithHOCOptions) {
   options = defaultObj(options);
-  const { drawerProps } = Object.assign({}, props) as IWithDrawerOptions;
+  const { drawerProps: _drawerProps } = Object.assign({}, props) as IWithDrawerOptions;
   options.displayName = options.displayName || Component?.displayName || "RN_WithDrawerComponent";
   return withHOC<T>(function (props: T) {
+    const reskExpoContext = useReskExpo();
+    const drawerProps = Object.assign({}, (typeof _drawerProps === "function" ? _drawerProps(reskExpoContext) : _drawerProps)) as IDrawerProps;
     return (<Drawer {...Object.assign({}, drawerProps)}>
       <Component {...props} />
     </Drawer>);

@@ -1,6 +1,6 @@
 import 'react-native-reanimated';
 import * as SplashScreen from 'expo-splash-screen';
-import { ITheme, ReskExpoProvider, useDrawer } from "@resk/expo";
+import { ITheme, ReskExpoProvider, useDrawer, useI18n } from "@resk/expo";
 import { Slot } from 'expo-router';
 import "../src/i18n/translations";
 import "../src/resources";
@@ -10,6 +10,7 @@ import { Users } from '../src/resources';
 //SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
     const users = ResourcesManager.getResource<Users>("users");
+    const i18n = useI18n();
     return (<ReskExpoProvider
         drawerNavigationViewProps={{
             items: [

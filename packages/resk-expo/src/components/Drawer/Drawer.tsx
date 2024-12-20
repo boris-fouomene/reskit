@@ -18,6 +18,7 @@ import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProvider
 import { DrawerContext } from "./hooks";
 import { addDimensionsListener } from "@dimensions";
 import { IDimensions } from "@dimensions/types";
+import { useReskExpo } from "@src/context/hooks";
 
 const MIN_SWIPE_DISTANCE = 3;
 
@@ -1055,12 +1056,14 @@ const styles = StyleSheet.create({
 
 export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
   const theme = useTheme();
+  const { i18n } = useReskExpo();
+  const locale = i18n.getLocale();
   const children = useMemo(() => {
     return drawer.isProvider() ? drawer.renderProviderChildren() : drawer.renderNavigationView();
-  }, [drawer.isProvider(), drawer.state?.providerProps, drawer?.state?.providerProps?.appBarProps, theme, drawer.props.renderNavigationView]);
+  }, [drawer.isProvider(), locale, drawer.state?.providerProps, drawer?.state?.providerProps?.appBarProps, theme, drawer.props.renderNavigationView]);
   const content = useMemo(() => {
     return drawer.renderContent();
-  }, [theme, drawer.props.children]);
+  }, [theme, drawer.props.children, locale]);
   const { accessibilityViewIsModal, drawerShown, openValue } = drawer.state;
   const elevation = typeof drawer.props.elevation == "number" ? drawer.props.elevation : 5;
   const elev = drawer.isPermanent() ? (theme.elevations[elevation] ?? null) : null;

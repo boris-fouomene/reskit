@@ -5,7 +5,7 @@ import { useTheme } from "@theme/index";
 import { IReactNullableElement } from "../../types";
 import stableHash from "stable-hash";
 import { cloneObject, isObj } from "@resk/core";
-import { i18n } from "@resk/core";
+import { useReskExpo } from "@src/context/hooks";
 
 const isAllowed = (p: any) => true;
 
@@ -226,6 +226,7 @@ export function renderMenuItems<MenuItemContext = any>({ items, render, renderEx
  */
 export function useRenderMenuItems<MenuItemContext = any>({ items, context, render, renderExpandable }: IMenuRenderItemsOptions<MenuItemContext>): IReactNullableElement[] {
   const theme = useTheme();
+  const { i18n } = useReskExpo();
   return useMemo(() => {
     return renderMenuItems<MenuItemContext>({
       items: (Array.isArray(items) ? items : []),

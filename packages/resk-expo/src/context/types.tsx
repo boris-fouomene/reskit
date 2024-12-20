@@ -90,3 +90,46 @@ export interface IReskExpoContext extends Omit<IReskExpoProviderProps, "type"> {
      */
     i18n: I18n;
 }
+
+
+/**
+ * @group ReskExpoContext
+ * @typedef IReskExpoContextCallback
+ * 
+ * A callback type that takes an `IReskExpoContext` as an argument and returns a value of type `ReturnType`.
+ * This type is designed for functions that need to interact with the context provided by the `ReskExpoProvider`.
+ * 
+ * @template ReturnType - The type of the value returned by the callback. Defaults to `any` if not specified.
+ * 
+ * @param {IReskExpoContext} reskExpoContext - The context object provided by the `ReskExpoProvider`.
+ * This object contains essential properties and methods that can be utilized within the callback, such as theme settings, safe area insets, and internationalization (i18n) functionalities.
+ * 
+ * @returns {ReturnType} The value returned by the callback function, which can be of any type specified by `ReturnType`.
+ * 
+ * @example
+ * // Example of a callback function that utilizes the IReskExpoContext
+ * const myCallback: IReskExpoContextCallback<number> = (context) => {
+ *   // Accessing the safe area insets from the context
+ *   const insets = context.safeAreaInsets;
+ *   // Calculating a value based on the insets and returning it
+ *   return insets.top + insets.bottom; // Returns the total vertical safe area insets
+ * };
+ * 
+ * // Example of using the callback in a function
+ * const executeCallback = (callback: IReskExpoContextCallback<number>) => {
+ *   const context: IReskExpoContext = {
+ *     theme: { primaryColor: '#6200ee', secondaryColor: '#03dac6' },
+ *     updateTheme: (newTheme) => {  },
+ *     safeAreaInsets: { top: 20, bottom: 20, left: 0, right: 0 },
+ *     i18n: {  },
+ *   };
+ *   const result = callback(context);
+ *   console.log(`Total safe area insets: ${result}`); // Output: "Total safe area insets: 40"
+ * };
+ * 
+ * // Invoking the function with the callback
+ * executeCallback(myCallback);
+ * 
+ * @note This type is particularly useful in scenarios where you need to pass the context to various components or functions that require access to the `ReskExpoProvider` context, allowing for flexible and type-safe interactions.
+ */
+export type IReskExpoContextCallback<ReturnType = any> = ((reskExpoContext: IReskExpoContext) => ReturnType);

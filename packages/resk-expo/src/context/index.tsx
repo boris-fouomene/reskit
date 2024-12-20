@@ -54,8 +54,8 @@ export * from "./hooks";
  */
 export function ReskExpoProvider({ children, theme: customTheme, breakpoints, drawerNavigationViewProps, ...rest }: IReskExpoProviderProps) {
   const safeAreaInsets = useSafeAreaInsets();
-  drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
   const i18n = useI18n();
+  drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
    * to be executed once the theme state is updated.

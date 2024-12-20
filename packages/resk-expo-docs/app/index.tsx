@@ -1,4 +1,4 @@
-import { Tab, Switch, Checkbox, Button, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu } from "@resk/expo";
+import { Tab, Switch, Checkbox, Button, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
 import { useEffect } from 'react'
 import { withAppBar } from "@resk/expo/build/hooks";
@@ -124,7 +124,7 @@ const index = withAppBar(() => {
             </View>
         </ScrollView>
     )
-}, ({ i18n }) => {
+}, ({ i18n, updateTheme, theme }) => {
     return ({
         title: i18n.t("appBar.title"),
         subtitle: i18n.t("appBar.subtitle"),
@@ -133,6 +133,13 @@ const index = withAppBar(() => {
                 label: "Language [" + i18n.getLocale() + "]",
                 onPress: () => {
                     i18n.setLocale(i18n.getLocale() == "en" ? "fr" : "en");
+                }
+            },
+            {
+                label: theme.dark ? "Light Mode" : "Dark Mode",
+                icon: theme.dark ? "lightbulb-outline" : "lightbulb",
+                onPress: () => {
+                    updateTheme({ dark: theme.dark ? false : true } as ITheme);
                 }
             },
             {

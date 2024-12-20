@@ -178,6 +178,8 @@ const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => an
  * @returns {ITheme} - The theme object extended with utility methods.
  */
 export function createTheme(theme: ITheme): IThemeManager {
+    const Material3Theme = getMaterial3Theme(theme?.colors?.primary);
+    theme = Object.assign({}, theme?.dark ? Material3Theme.dark : Material3Theme.light, theme);
     const context = theme;
     return {
         ...Object.assign({}, theme),
@@ -306,7 +308,7 @@ export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
 
 const sanitizeTheme = (theme: IThemeManager) => {
     theme.roundness = typeof theme.roundness == "number" ? theme.roundness : 8;
-    theme.colors = theme.colors || {};
+    theme.colors = Object.assign({}, theme.colors);
     const isDark = !!theme.dark;
     theme.colors.placeholder = theme.colors.placeholder || Colors.setAlpha(isDark ? "black" : "white", 0.5);
     theme.colors.text = theme.colors.text || theme.colors.onSurface;
@@ -374,12 +376,11 @@ export function updateTheme(theme: ITheme, trigger: boolean = false): IThemeMana
     // Save the theme name in the session
     session.set("theme", theme.name);
     // Update the theme reference
-    const newTheme = createTheme(theme);
-    sanitizeTheme(newTheme);
+    const newTheme = sanitizeTheme(createTheme(theme));
     Theme.setTheme(newTheme);
 
     // Apply the theme to native elements (like the status bar)
-    updateNative(theme);
+    updateNative(newTheme);
 
     // Optionally trigger a global theme update event
     if (trigger) {

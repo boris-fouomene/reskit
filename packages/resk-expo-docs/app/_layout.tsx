@@ -4,7 +4,7 @@ import { ITheme, ReskExpoProvider, useDrawer } from "@resk/expo";
 import { Slot } from 'expo-router';
 import "../src/i18n/translations";
 import "../src/resources";
-import { ResourcesManager } from '@resk/core';
+import { I18n, ResourcesManager } from '@resk/core';
 import { Users } from '../src/resources';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 //SplashScreen.preventAutoHideAsync();

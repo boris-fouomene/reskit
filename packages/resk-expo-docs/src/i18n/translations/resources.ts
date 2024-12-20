@@ -1,6 +1,6 @@
 import { I18n } from "@resk/core";
 
-I18n.RegisterDictionary({
+I18n.RegisterTranslations({
     "en": {
         "resources": {
             "users": {

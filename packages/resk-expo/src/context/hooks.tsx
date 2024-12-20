@@ -1,15 +1,15 @@
 import React, { useContext } from "react";
-import { IReskExpoProvider } from "./types";
+import { IReskExpoContext } from "./types";
 /**
  * @group ReskExpoProvider
  * Creates a context for the ReskExpoProvider.
  * This context will hold the current theme and the method to update it.
  * 
- * @type {React.Context<IReskExpoProvider>} 
+ * @type {React.Context<IReskExpoContext>} 
  * 
  * **Example**:
  * ```tsx
- * const contextValue: IReskExpoProvider = {
+ * const contextValue: IReskExpoContext = {
  *   theme: {
  *     primaryColor: '#6200ee',
  *     secondaryColor: '#03dac6',
@@ -22,14 +22,14 @@ import { IReskExpoProvider } from "./types";
  * </ReskExpoContext.Provider>
  * ```
  */
-export const ReskExpoContext = React.createContext<IReskExpoProvider>({} as IReskExpoProvider);
+export const ReskExpoContext = React.createContext<IReskExpoContext>({} as IReskExpoContext);
 
 /**
  * @group ReskExpoProvider
  * Custom hook to access the ReskExpoProvider context.
  * This hook allows components to consume the context value easily.
  * 
- * @returns {IReskExpoProvider} The current context value, which includes the theme and updateTheme method.
+ * @returns {IReskExpoContext} The current context value, which includes the theme and updateTheme method.
  * 
  * **Example**:
  * ```tsx

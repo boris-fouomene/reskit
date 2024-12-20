@@ -1,5 +1,5 @@
-import { II18nDictionary, I18n } from "@resk/core";
-I18n.RegisterDictionary({
+import { I18n } from "@resk/core";
+I18n.RegisterTranslations({
     "en": {
         "auth": {}
     }

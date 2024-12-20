@@ -1,6 +1,6 @@
 import { I18n } from "@/i18n";
 
-I18n.RegisterDictionary({
+I18n.RegisterTranslations({
     "en": {
         /***
          * @param {string} resourceLabel - The label of the resource.

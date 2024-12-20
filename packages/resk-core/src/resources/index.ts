@@ -122,7 +122,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @param {...any[]} args - Additional arguments that can be passed for further customization.
    */
   constructor(options: IResource<DataType>, ...args: any[]) {
-    this._onDictionaryChangedListener = i18n.on("dictionary-changed", this.onI18nChange.bind(this));
+    this._onDictionaryChangedListener = i18n.on("translations-changed", this.onI18nChange.bind(this));
     this._onLocaleChangeListener = i18n.on("locale-changed", this.onI18nChange.bind(this));
     this.init(options);
   }
@@ -338,7 +338,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     propertyName = defaultStr(propertyName).trim();
     const nameStr = String(this.getName()).trim();
     options = Object.assign({}, { resourceName: this.getName() }, options);
-    const dictionary = i18n.getDictionary()[i18n.getLocale()];
+    const dictionary = i18n.getTranslations()[i18n.getLocale()];
     if (isObj(dictionary) && isObj(dictionary.resources) && isObj(dictionary.resources[nameStr]) && isNonNullString(dictionary.resources[nameStr][propertyName])) {
       const key = `resources.${nameStr}.${propertyName}`;
       const translatedValue = i18n.t(key, options);

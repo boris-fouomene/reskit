@@ -1,7 +1,7 @@
 import { IDict } from ".";
 
 /**
- * @interface II18nDictionary
+ * @interface II18nTranslation
  * Represents a dictionary for internationalization (i18n) strings.
  * 
  * This interface defines a structure for storing localized strings
@@ -9,7 +9,7 @@ import { IDict } from ".";
  * associated with a string or another dictionary for nested translations.
  * 
  * @example
- * const translations: II18nDictionary = {
+ * const translations: II18nTranslation = {
  *     en: {
  *         greeting: "Hello",
  *         farewell: "Goodbye",
@@ -23,7 +23,7 @@ import { IDict } from ".";
  *     }
  * };
  */
-export interface II18nDictionary extends IDict {
+export interface II18nTranslation extends IDict {
 
 }
 
@@ -36,10 +36,10 @@ export interface II18nDictionary extends IDict {
  * @example
  * function onI18nEvent(event: I18nEvent) {
  *     switch (event) {
- *         case "dictionary-loaded":
+ *         case "translations-loaded":
  *             console.log("Translation dictionary has been loaded.");
  *             break;
- *         case "dictionary-changed":
+ *         case "translations-changed":
  *             console.log("Translation dictionary has been updated.");
  *             break;
  *         case "locale-changed":
@@ -48,7 +48,7 @@ export interface II18nDictionary extends IDict {
  *     }
  * }
  */
-export type I18nEvent = "dictionary-loaded" | "dictionary-changed" | "locale-changed" | "namespace-loaded" | "namespaces-loaded";
+export type I18nEvent = "translations-loaded" | "translations-changed" | "locale-changed" | "namespace-loaded" | "namespaces-loaded";
 
 /**
  * A formatter function for internationalization (i18n) strings.

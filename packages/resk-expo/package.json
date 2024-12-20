@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "color": "^4.2.3",
-    "crypto-es": "^2.1.0",
     "react-fast-compare": "^3.2.2",
     "react-is": "^18.3.1",
     "tippy.js": "^6.3.7"

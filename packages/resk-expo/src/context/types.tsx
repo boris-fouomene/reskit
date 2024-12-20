@@ -2,6 +2,7 @@ import { IBreakpoints } from "@src/breakpoints/types";
 import { ITheme } from "@theme/types";
 import { EdgeInsets } from 'react-native-safe-area-context';
 import { IDrawerNavigationViewProps } from "@layouts/DrawerNavigationView";
+import { I18n } from "@resk/core";
 
 /**
  * @group ReskExpoProvider
@@ -44,7 +45,7 @@ export type IReskExpoProviderProps = {
 
 /**
  * @group ReskExpoProvider
- * @interface IReskExpoProvider
+ * @interface IReskExpoContext
  * Type definition for the ReskExpoProvider interface (the provider itself).
  * This type extends the IReskExpoProviderProps type and adds additional properties and methods.
  * 
@@ -52,7 +53,7 @@ export type IReskExpoProviderProps = {
  * 
  * **Example**:
  * ```tsx
- * const providerProps: IReskExpoProvider = {
+ * const providerProps: IReskExpoContext = {
  *   theme: {
  *     primaryColor: '#ff5722',
  *     secondaryColor: '#ffc107',
@@ -75,12 +76,17 @@ export type IReskExpoProviderProps = {
  * });
  * ```
  */
-export type IReskExpoProvider = Omit<IReskExpoProviderProps, "type"> & {
+export interface IReskExpoContext extends Omit<IReskExpoProviderProps, "type"> {
     theme: ITheme;
     updateTheme: (theme: ITheme) => any;
 
     /***
      * SafeAreaInsets
      */
-    safeAreaInsets: EdgeInsets
+    safeAreaInsets: EdgeInsets;
+
+    /***
+     * i18n instance library
+     */
+    i18n: I18n;
 }

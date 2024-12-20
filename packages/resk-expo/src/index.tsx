@@ -1,4 +1,4 @@
-import "./i18n";
+export * from "./i18n";
 export * from "./context";
 export * from "./theme";
 export { default as Breakpoints } from "./breakpoints";

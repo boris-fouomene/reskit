@@ -3,6 +3,4 @@ import { ResourceBase } from "./base";
 @Resource({
     name: "users",
 })
-export class Users extends ResourceBase {
-
-}
+export class Users extends ResourceBase { }

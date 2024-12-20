@@ -15,6 +15,7 @@ import { useSafeAreaInsets, SafeAreaProvider } from 'react-native-safe-area-cont
 import { Drawer } from "@components/Drawer";
 import { DrawerNavigationView } from "@layouts/DrawerNavigationView";
 import { FontIcon } from "@components/Icon";
+import { useI18n } from "@src/i18n/hooks";
 
 export * from "./types";
 export * from "./hooks";
@@ -54,6 +55,7 @@ export * from "./hooks";
 export function ReskExpoProvider({ children, theme: customTheme, breakpoints, drawerNavigationViewProps, ...rest }: IReskExpoProviderProps) {
   const safeAreaInsets = useSafeAreaInsets();
   drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
+  const i18n = useI18n();
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
    * to be executed once the theme state is updated.
@@ -113,7 +115,7 @@ export function ReskExpoProvider({ children, theme: customTheme, breakpoints, dr
    */
   return (
     <SafeAreaProvider testID="resk-expo-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
-      <ReskExpoContext.Provider value={{ theme, updateTheme, ...rest, safeAreaInsets, breakpoints }}>
+      <ReskExpoContext.Provider value={{ theme, i18n, updateTheme, ...rest, safeAreaInsets, breakpoints }}>
         <PortalProvider>
           <>
             <Preloader.Provider />

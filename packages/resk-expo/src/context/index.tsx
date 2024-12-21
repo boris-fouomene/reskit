@@ -16,6 +16,7 @@ import { Drawer } from "@components/Drawer";
 import { DrawerNavigationView } from "@layouts/DrawerNavigationView";
 import { FontIcon } from "@components/Icon";
 import { useI18n } from "@src/i18n/hooks";
+import Default from "@auth/hooks";
 
 export * from "./types";
 export * from "./hooks";
@@ -52,10 +53,11 @@ export * from "./hooks";
  * }
  * ```
  */
-export function ReskExpoProvider({ children, theme: customTheme, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskExpoProviderProps) {
+export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskExpoProviderProps) {
   i18nOptions = Object.assign({}, i18nOptions);
   const safeAreaInsets = useSafeAreaInsets();
   const i18n = useI18n(undefined, i18nOptions);
+  auth = Object.assign({}, auth);
   drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
@@ -118,14 +120,14 @@ export function ReskExpoProvider({ children, theme: customTheme, breakpoints, i1
     <SafeAreaProvider testID="resk-expo-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
       <ReskExpoContext.Provider value={{ theme, i18n, updateTheme, ...rest, safeAreaInsets, breakpoints }}>
         <PortalProvider>
-          <>
+          <Default.AuthContext.Provider value={auth}>
             <Preloader.Provider />
             <Dialog.Provider.Provider />
             <Drawer.Provider.Provider />
             <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>
               {children}
             </Drawer>
-          </>
+          </Default.AuthContext.Provider>
         </PortalProvider>
       </ReskExpoContext.Provider>
     </SafeAreaProvider>

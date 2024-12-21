@@ -4,6 +4,7 @@ import { EdgeInsets } from 'react-native-safe-area-context';
 import { IDrawerNavigationViewProps } from "@layouts/DrawerNavigationView";
 import { I18n } from "@resk/core";
 import { IUseI18nOptions } from "@src/types";
+import { IAuthProviderProps } from "@auth/types";
 
 /**
  * @group ReskExpoProvider
@@ -47,6 +48,16 @@ export type IReskExpoProviderProps = {
      * @property {boolean} [useLocaleFromDevice] - A flag indicating whether the locale should be set from the device's locale if it matches the supported locales.
      */
     i18nOptions?: IUseI18nOptions;
+
+    /**
+     * An optional property that defines the props for the AuthProvider component.
+     * @example
+     * ```tsx
+     * <ReskExpoProvider auth={{ Login: MyLoginComponent }}>
+     *     <MyApp />
+     * </ReskExpoProvider>
+     */
+    auth?: Partial<IAuthProviderProps>;
 }
 
 /**

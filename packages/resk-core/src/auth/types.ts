@@ -397,3 +397,109 @@ export type IAuthPermAction =
   | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`
   | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`
   | `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}`;
+
+
+
+
+
+/**
+ * Interface representing a mapping of authentication-related events.
+ * 
+ * This interface defines the various events that can occur during the 
+ * authentication process, allowing for event-driven handling of user 
+ * authentication actions.
+ * 
+ * @example
+ * // Example of using IAuthEventMap
+ * const authEvents: IAuthEventMap = {
+ *     SIGN_IN: 'User  has signed in.',
+ *     SIGN_OUT: 'User  has signed out.',
+ *     SIGN_UP: 'User  has signed up.'
+ * };
+ * 
+ * // Triggering an event
+ * function triggerAuthEvent(event: IAuthEvent) {
+ *     console.log(authEvents[event]); // Outputs the corresponding event message
+ * }
+ * 
+ * triggerAuthEvent('SIGN_IN'); // Outputs: User has signed in.
+ * @example 
+ * // Example of augmenting IAuthEventMap with additional events
+ * declare module "@resk/core" {
+ *     interface IAuthEventMap {
+ *         SOME_OTHER_EVENT: string;
+ *     }
+ * }
+   const testAuthEvent : IAuthEvent = 'SOME_OTHER_EVENT';
+ */
+export interface IAuthEventMap {
+  /**
+   * Event triggered when a user signs in.
+   * 
+   * This event is emitted when a user successfully logs into the system.
+   * It can be used to trigger actions such as updating the user interface
+   * or logging the sign-in activity.
+   * 
+   * @example
+   * // Example of handling the SIGN_IN event
+   * eventEmitter.on('SIGN_IN', () => {
+   *     console.log('User  signed in, updating UI...');
+   * });
+   */
+  SIGN_IN: string;
+
+  /**
+   * Event triggered when a user signs out.
+   * 
+   * This event is emitted when a user successfully logs out of the system.
+   * It can be used to trigger actions such as clearing user data or 
+   * redirecting to the login page.
+   * 
+   * @example
+   * // Example of handling the SIGN_OUT event
+   * eventEmitter.on('SIGN_OUT', () => {
+   *     console.log('User  signed out, redirecting to login...');
+   * });
+   */
+  SIGN_OUT: string;
+
+  /**
+   * Event triggered when a user signs up.
+   * 
+   * This event is emitted when a new user successfully registers for an account.
+   * It can be used to trigger actions such as sending a welcome email or 
+   * redirecting the user to a confirmation page.
+   * 
+   * @example
+   * // Example of handling the SIGN_UP event
+   * eventEmitter.on('SIGN_UP', () => {
+   *     console.log('New user signed up, sending welcome email...');
+   * });
+   */
+  SIGN_UP: string;
+}
+
+/**
+* Type representing the keys of the IAuthEventMap interface.
+* 
+* This type is a union of string literals corresponding to the event names
+* defined in the IAuthEventMap interface. It allows for type-safe handling
+* of authentication events throughout the application.
+* 
+* @example
+* // Example of using IAuthEvent
+* function handleAuthEvent(event: IAuthEvent) {
+*     switch (event) {
+*         case 'SIGN_IN':
+*             console.log('Handling sign-in event...');
+*             break;
+*         case 'SIGN_OUT':
+*             console.log('Handling sign-out event...');
+*             break;
+*         case 'SIGN_UP':
+*             console.log('Handling sign-up event...');
+*             break;
+*     }
+* }
+*/
+export type IAuthEvent = keyof IAuthEventMap;

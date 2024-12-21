@@ -115,6 +115,7 @@ const Label = React.forwardRef(({
         r1,
         disabled && Theme.styles.disabled,
         style,
+        fontSize && typeof fontSize === "number" ? { fontSize } : null,
       ]}
     >
       {children}

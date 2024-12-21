@@ -3,6 +3,7 @@ import { IDict } from "../types";
 import { isObj, parseJSON, isNonNullString } from "../utils";
 import CryptoES from 'crypto-es';
 import { IAuthSessionStorage, IAuthUser } from "./types";
+import EVENTS from "./events";
 
 const encrypt = CryptoES.AES.encrypt;
 
@@ -68,6 +69,7 @@ export const getSignedUser = (): IAuthUser | null => {
  * 
  * @param u - The authenticated user object to be set. This can be an object conforming to the 
  *            `IAuthUser ` interface or `null` if there is no authenticated user.
+ * @param triggerEvent - A boolean indicating whether to trigger the SIGN_IN|SING_OUT event depending on the value of u param. If set to true, the event will be triggered with the updated user object.
  * 
  * @returns A promise that resolves to the result of setting the encrypted user data in the session storage.
  *          If the user object is null, it will save a null value.
@@ -97,18 +99,22 @@ export const getSignedUser = (): IAuthUser | null => {
  * - The `encrypt` function is assumed to be a utility function that handles the encryption of the user data.
  * - The `USER_SESSION_KEY` is a constant that defines the key under which the user session data is stored in session storage.
  */
-export const setSignedUser = (u: IAuthUser | null) => {
+export const setSignedUser = (u: IAuthUser | null, triggerEvent?: boolean) => {
     localUserRef.current = u;
     const uToSave = u as IAuthUser;
     let encrypted = null;
     try {
-        if (uToSave) {
+        if (isObj(uToSave)) {
             uToSave.authSessionCreatedAt = new Date().getTime();
         }
         encrypted = uToSave ? encrypt(JSON.stringify(uToSave), SESSION_ENCRYPT_KEY).toString() : null;
     } catch (e) {
         localUserRef.current = null;
         console.log(e, " setting local user");
+    }
+    if (triggerEvent) {
+        const event = isObj(uToSave) && isObj(encrypted) ? "SIGN_IN" : "SIGN_OUT";
+        EVENTS.trigger(event, uToSave);
     }
     return $session.set(USER_SESSION_KEY, encrypted)
 }
@@ -318,5 +324,4 @@ export default class Session {
             },
         };
     }
-
 }

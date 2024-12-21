@@ -1,6 +1,6 @@
 import 'react-native-reanimated';
 import * as SplashScreen from 'expo-splash-screen';
-import { ITheme, ReskExpoProvider, useDrawer, useI18n } from "@resk/expo";
+import { ITheme, Label, ReskExpoProvider, Theme, useDrawer, useI18n, View } from "@resk/expo";
 import { Slot } from 'expo-router';
 import "../src/i18n/translations";
 import "../src/resources";
@@ -13,7 +13,17 @@ export default function RootLayout() {
     useI18n();
     return (<ReskExpoProvider
         drawerNavigationViewProps={{}}
-        theme={{ dark: true } as ITheme}>
+        theme={{ dark: true } as ITheme}
+        auth={{
+            Login: function ({ signIn }) {
+                return <View style={[Theme.styles.h100, Theme.styles.w100]} testID="my-container">
+                    <View>
+                        <Label colorScheme="error" fontSize={20} textBold>This is the login component.</Label>
+                    </View>
+                </View>
+            }
+        }}
+    >
         <Slot />
     </ReskExpoProvider>);
 }

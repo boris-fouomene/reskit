@@ -12,3 +12,4 @@ export * from "./context";
 export { default as Session } from "./session";
 export * from "./components";
 export * from "./layouts";
+export * from "./auth";

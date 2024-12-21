@@ -1,4 +1,4 @@
-import { Tab, Switch, Checkbox, Button, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme } from "@resk/expo";
+import { Tab, Switch, Checkbox, Button, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
 import { useEffect } from 'react'
 import { withAppBar } from "@resk/expo/build/hooks";
@@ -292,4 +292,4 @@ const MenuExample = () => {
     );
 }
 
-export default index
+export default index;// withAuth(index);

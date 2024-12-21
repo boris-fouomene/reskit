@@ -1103,6 +1103,13 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
    */
   getListActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
 
+  /**
+   * checks if the resource has the action
+   * @param action - The action to check
+   * @returns true if the action exists, false otherwise
+   */
+  hasAction(action: IResourceActionName): boolean;
+
 };
 
 /**

@@ -497,6 +497,16 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     }
     return this.actions;
   }
+  /**
+   * checks if the resource has the action
+   * @param action - The action to check
+   * @returns true if the action exists, false otherwise
+   */
+  hasAction(action: IResourceActionName): boolean {
+    if (!isNonNullString(action)) return false;
+    const actions = this.getActions();
+    return isObj(actions[action]);
+  }
 
   /**
    * Determines if the given permission is allowed for the specified user.

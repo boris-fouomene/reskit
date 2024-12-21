@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Icon, IIconSource, FontIcon, IIconProps, IIconSourceBase } from "@components/Icon";
 import { GestureResponderEvent } from "react-native";
 import { isNonNullString } from "@resk/core";
+import { useAppBar } from "@components/AppBar";
 
 /**
  * Props for the `DrawerMenuIcon` component.
@@ -107,6 +108,7 @@ export interface IDrawerMenuIconProps extends Omit<IBackActionProps, 'onPress' |
  */
 export const DrawerMenuIcon = ({ drawerMode, icon, ...props }: IDrawerMenuIconProps) => {
     const drawerState = useDrawerCurrentState();
+    const appBarContext = useAppBar();
     const canRender = useMemo(() => {
         if (!drawerState) return false;
         if (!drawerMode) return true;
@@ -121,6 +123,7 @@ export const DrawerMenuIcon = ({ drawerMode, icon, ...props }: IDrawerMenuIconPr
     const rProps: IIconProps = (isIconName || !iconSource ? { iconName: (iconSource || "menu") } : { source: iconSource as React.ReactNode }) as IIconProps;
     return <Icon.Button
         size={30}
+        color={appBarContext?.textColor}
         {...props}
         onPress={(e: GestureResponderEvent) => {
             if (props.onPress) {

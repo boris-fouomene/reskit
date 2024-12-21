@@ -370,6 +370,13 @@ export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<
      * This can be used to create buttons that can be expanded or collapsed.
      */
     isExpandable?: boolean;
+
+    /***
+     * If true, the button will have a space between the left (container) and right  content alignment, ensuring equal spacing between them
+     In this case, the component will wrap the left part in a view customizable with the `leftContentWrapperProps` props.
+    * This can be useful for creating buttons with a left icon and a label.
+     */
+    spaceBetweenContent?: boolean;
 }
 
 /**

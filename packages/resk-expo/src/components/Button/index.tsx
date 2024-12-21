@@ -153,6 +153,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     onPress,
     centered,
     fullWidth,
+    spaceBetweenContent,
     isExpandable,
     ...rest
 }: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
@@ -267,9 +268,9 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     const icon = useGetIcon({ icon: iconProp, size: iconSize, ...iconProps, color: iconColor as unknown as string, theme });
     const iconContent = icon && isLoading !== true ? icon : null;
     const contentStyle = StyleSheet.flatten([contentProps.style]) as IFlatStyle;
-    const hasLeftContentWrapper = !!isExpandable;
+    const hasLeftContentWrapper = !!isExpandable || !!spaceBetweenContent;
     const LeftContentWrapper = hasLeftContentWrapper ? View : React.Fragment;
-    const letContentWrapperProps = isExpandable ? {
+    const letContentWrapperProps = hasLeftContentWrapper ? {
         id: `${idRef.current}-left-content-wrapper`,
         testID: testID + "-left-content-wrapper",
         ...leftContentWrapperProps,
@@ -327,7 +328,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 }}
                 {...rest}
             >
-                <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, hasLeftContentWrapper && styles.contentHasLeftContentWrapper, fullWidthStyle, contentStyle]}>
+                <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, fullWidthStyle, contentStyle, hasLeftContentWrapper && styles.contentHasLeftContentWrapper]}>
                     <LeftContentWrapper {...letContentWrapperProps}>
                         {iconPosition != "right" ? iconContent : null}
                         {isLoading ? (

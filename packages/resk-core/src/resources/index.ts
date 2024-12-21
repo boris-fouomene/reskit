@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { IDict, IResourceName, IField, IResourceInstance, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceFetchOptions, IResourcePaginatedResult, II18nTranslation } from '../types';
 import { getFields } from '../fields';
-import { isEmpty, defaultStr, isObj, isNonNullString, stringify } from '../utils/index';
+import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory } from '../utils/index';
 import { IConstructor } from '../types/index';
 import { IAuthPerm, IAuthUser } from '@/auth/types';
 import { isAllowed } from '../auth/perms';
@@ -19,6 +19,10 @@ import { TranslateOptions } from 'i18n-js';
  * the constructor with the instance properties. It also retrieves and manages resource fields using the `getFields` method.
  * 
  * @template DataType - The type of data the resource is expected to handle. By default, it accepts any type (`DataType=any`).
+ * @template PrimaryKeyType - The type of the primary key for the resource. Defaults to `IResourcePrimaryKey`.
+ * @template EventType - The type of event that the resource can emit. Defaults to `IResourceActionName`.
+ * 
+ * @extends ObservableClass<EventType> - Extends the `ObservableClass` to enable event-based communication.
  * 
  * @implements IResourceInstance<DataType> - Ensures that the class follows the `IResourceInstance` interface for consistency.
  * 
@@ -48,9 +52,9 @@ import { TranslateOptions } from 'i18n-js';
  * console.log(dynamicResource.getFields()); 
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
-export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> implements IResourceInstance<DataType, PrimaryKeyType> {
+export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceActionName> = IResourceActionName> extends ObservableClass<EventType> implements IResourceInstance<DataType, PrimaryKeyType, EventType> {
   actions?: IResourceActionMap;
-  private _resourceOptions?: IResource<DataType>;
+  static EVENTS = observableFactory<IResourceActionName | "string">();
   /**
    * The internal name of the resource.
    *
@@ -122,6 +126,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @param {...any[]} args - Additional arguments that can be passed for further customization.
    */
   constructor(options: IResource<DataType>, ...args: any[]) {
+    super();
     this._onDictionaryChangedListener = i18n.on("translations-changed", this.onI18nChange.bind(this));
     this._onLocaleChangeListener = i18n.on("locale-changed", this.onI18nChange.bind(this));
     this.init(options);
@@ -165,7 +170,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     return i18n.t("resources.invalidDataProvider", this.getI18TranslateParams());
   }
   hasDataProvider(): boolean {
-    return this.dataProvider != null && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.create === "function" && typeof this.dataProvider?.fetch === "function" && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.delete === "function";
+    return this.dataProvider != null && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.create === "function" && typeof this.dataProvider?.list === "function" && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.delete === "function";
   }
   /**
    * The data provider for the resource.
@@ -179,6 +184,16 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     return this.dataProvider;
   };
   /***
+   * trigger the event
+   * @param event - The event to trigger.
+   * When the event is triggered, the EVENTS observable is also triggered.
+   * @param args - The arguments to pass to the event.
+   */
+  _trigger(event: EventType, ...args: any[]) {
+    ResourceBase.EVENTS.trigger(event, Object.assign({}, this.getI18TranslateParams()), ...args);
+    return this.trigger(event, ...args);
+  }
+  /***
    * creates a new record in the resource.
    * @param {DataType} record - The data for the new record.
    * @param options - Optional settings for the creation process.
@@ -191,45 +206,51 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     if (!this.canUserCreate()) {
       return Promise.reject(new Error(i18n.t("resources.createForbiddenError", this.getI18TranslateParams())));
     }
-    return this.getDataProvider()?.create(record, options);
+    return this.getDataProvider()?.create(record, options).then((result) => {
+      this._trigger("create" as EventType, result);
+      return result;
+    });
   }
   /***
    * Fetches all records from the resource.
    * @param {IResourceFetchOptions<DataType, PrimaryKeyType>} options - Optional options for fetching resources.
-   * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the fetch operation.
+   * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
+  list(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
     if (!this.hasDataProvider()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserRead()) {
-      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getI18TranslateParams())));
     }
     if (!this.canUserList()) {
       return Promise.reject(new Error(i18n.t("resources.listForbiddenError", this.getI18TranslateParams())));
     }
-    return this.getDataProvider()?.fetch(options);
+    return this.getDataProvider()?.list(options).then((result) => {
+      this._trigger("list" as EventType, result);
+      return result;
+    });
   }
   /***
    * fetches a single record from the resource.
    * @param {PrimaryKeyType} key - The primary key of the resource.
-   * @param options - Optional settings for the fetch operation.
-   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the fetch operation.
+   * @param options - Optional settings for the list operation.
+   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  getOne(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
+  read(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
     if (!this.hasDataProvider()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserRead()) {
       return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getI18TranslateParams())));
     }
-    return this.getDataProvider()?.getOne(key, options);
+    return this.getDataProvider()?.read(key, options).then((result) => {
+      this._trigger("read" as EventType, result);
+      return result;
+    });
   }
   /**
    * gets the details of a record from the resource.
    * @param key - The primary key of the resource.
-   * @param options - Optional settings for the fetch operation.
-   * @returns {Promise<IResourceOperationResult<DataType>} A promise that resolves to the result of the fetch operation.
+   * @param options - Optional settings for the list operation.
+   * @returns {Promise<IResourceOperationResult<DataType>} A promise that resolves to the result of the list operation.
    */
   details(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
     if (!this.hasDataProvider()) {
@@ -238,7 +259,10 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     if (!this.canUserViewDetails()) {
       return Promise.reject(new Error(i18n.t("resources.detailsForbiddenError", this.getI18TranslateParams())));
     }
-    return this.getDataProvider()?.details(key, options);
+    return this.getDataProvider()?.details(key, options).then((result) => {
+      this._trigger("details" as EventType, result);
+      return result;
+    });
   }
   /**
    * updates a record in the resource.
@@ -254,7 +278,10 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     if (!this.canUserUpdate()) {
       return Promise.reject(new Error(i18n.t("resources.updateForbiddenError", this.getI18TranslateParams())));
     }
-    return this.getDataProvider()?.update(key, updatedData, options);
+    return this.getDataProvider()?.update(key, updatedData, options).then((result) => {
+      this._trigger("update" as EventType, result);
+      return result;
+    });
   }
   /***
    * deletes a record from the resource.
@@ -269,7 +296,10 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     if (!this.canUserDelete()) {
       return Promise.reject(new Error(i18n.t("resources.deleteForbiddenError", this.getI18TranslateParams())));
     }
-    return this.getDataProvider()?.delete(key, options);
+    return this.getDataProvider()?.delete(key, options).then((result) => {
+      this._trigger("delete" as EventType, result);
+      return result;
+    });
   }
 
   /**
@@ -284,7 +314,6 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    */
   init(options: IResource<DataType>) {
     options = Object.assign({}, options);
-    this._resourceOptions = options;
     this.resolveTranslations();
     for (let i in options) {
       if (isEmpty((this as IDict)[i]) && typeof (this as IDict)[i] !== "function") {

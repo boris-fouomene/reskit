@@ -39,6 +39,12 @@
       "@theme": [
         "src/theme"
       ],
+      "@auth/*": [
+        "src/auth/*"
+      ],
+      "@auth": [
+        "src/auth"
+      ],
       "@platform/*": [
         "src/platform/*"
       ],

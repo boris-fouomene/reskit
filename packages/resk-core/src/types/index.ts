@@ -1,6 +1,7 @@
 import { IAuthPerm, IAuthUser } from "@/auth/types";
 import { IFilterQuery, IFilterSort } from "./filters";
 import { TranslateOptions } from "i18n-js";
+import { IObservable } from "@utils/observable";
 
 /**
  * Represents a base field with optional type, label, and name properties.
@@ -706,6 +707,7 @@ export interface IResource<DataType = any, PrimaryKeyType extends IResourcePrima
  *
  * @template DataType - The specific data's type of `IResource` being instantiated (defaults to `IResource`).
  * @template PrimaryKeyType - The type of the primary key for the resource. Defaults to `IResourcePrimaryKey`.
+ * @template EventType - The type of the event triggered by the resource. Defaults to `IResourceActionName`.
  * @example
  * const userResourceInstance: IResourceInstance<UserDataType> = new UserResource({name:"users",label:"List of users"});
  *
@@ -720,7 +722,7 @@ export interface IResource<DataType = any, PrimaryKeyType extends IResourcePrima
  *   // ...
  * }
  */
-export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends IResource<DataType, PrimaryKeyType> {
+export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceActionName> = IResourceActionName> extends IResource<DataType, PrimaryKeyType>, IObservable<EventType> {
   /*
   The data provider for the resource.
   */
@@ -931,23 +933,23 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
   /***
    * Fetches all records from the resource.
    * @param {IResourceFetchOptions<DataType, PrimaryKeyType>} options - Optional options for fetching resources.
-   * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the fetch operation.
+   * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
+  list(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
 
   /***
    * Fetches a single record from the resource.
    * @param {PrimaryKeyType} key - The primary key of the resource.
-   * @param options - Optional settings for the fetch operation.
-   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the fetch operation.
+   * @param options - Optional settings for the list operation.
+   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  getOne(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
+  read(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
 
   /**
    * Fetch detailed information about a specific resource.
    * This can include related or associated data.
    * @param key - The primary key of the resource.
-   * @param options - Optional settings for the fetch operation.
+   * @param options - Optional settings for the list operation.
    * @returns The detailed resource information or an error message.
    */
   details(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
@@ -1613,7 +1615,7 @@ export type IDictKeysAsString<T> = keyof T extends string ? keyof T : never;
  * 
  * ```typescript
  * function getResourceById(id: IResourcePrimaryKey): Resource {
- *     // Implementation to fetch the resource based on the provided primary key
+ *     // Implementation to list the resource based on the provided primary key
  * }
  * 
  * const resource = getResourceById("user123"); // Fetching by string ID
@@ -1739,23 +1741,23 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.create({ name: "New Resource" });
  *     ```
  * 
- * - **fetch()**: Retrieves all resource records.
+ * - **list()**: Retrieves all resource records.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
  *     containing an array of resource records.
  *   - **Example**:
  *     ```typescript
- *     const result = await dataProvider.fetch();
+ *     const result = await dataProvider.list();
  *     console.log(result.data); // Array of resource records
  *     ```
  * 
- * - **getOne(key: K)**: Retrieves a single resource record by its primary key.
+ * - **read(key: K)**: Retrieves a single resource record by its primary key.
  *   - **Parameters**:
  *     - `key`: The primary key of the resource to retrieve.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
  *     containing the requested resource record.
  *   - **Example**:
  *     ```typescript
- *     const result = await dataProvider.getOne("resourceId");
+ *     const result = await dataProvider.read("resourceId");
  *     ```
  * 
  * - **details(key: K)**: Retrieves detailed information about a single resource record.
@@ -1804,7 +1806,7 @@ export interface IResourceOperationResult<DataType = any> {
  *         // Implementation for creating a resource
  *     }
  * 
- *     async fetch(): Promise<IResourceOperationResult<MyResourceType[]>> {
+ *     async list(): Promise<IResourceOperationResult<MyResourceType[]>> {
  *         // Implementation for fetching resources
  *     }
  * 
@@ -1821,9 +1823,9 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   create(record: DataType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
   update(key: PrimaryKeyType, updatedData: Partial<DataType>, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
   delete(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any>>;
-  getOne(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
+  read(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
   details(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
-  fetch(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
+  list(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
 }
 
 /**
@@ -1883,7 +1885,7 @@ export interface IResourceFetchOptions<DataType = any, PrimaryKeyType extends IR
 /**
  * @interface IResourcePaginatedResult
  * 
- * Represents the result of a paginated resource fetch operation.
+ * Represents the result of a paginated resource list operation.
  * This interface encapsulates the data retrieved from a paginated API response,
  * along with metadata about the pagination state and navigation links.
  * 
@@ -1945,7 +1947,7 @@ export interface IResourceFetchOptions<DataType = any, PrimaryKeyType extends IR
  * 
  * ```typescript
  * async function fetchUsers(page: number): Promise<IResourcePaginatedResult<User>> {
- *     const response = await fetch(`http://api.example.com/users?page=${page}`);
+ *     const response = await list(`http://api.example.com/users?page=${page}`);
  *     const result: IResourcePaginatedResult<User> = await response.json();
  *     return result;
  * }

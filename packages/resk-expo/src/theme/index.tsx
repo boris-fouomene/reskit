@@ -179,7 +179,7 @@ const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => an
  */
 export function createTheme(theme: ITheme): IThemeManager {
     const Material3Theme = getMaterial3Theme(theme?.colors?.primary);
-    theme = Object.assign({}, theme?.dark ? Material3Theme.dark : Material3Theme.light, theme);
+    theme = extendObj({}, theme?.dark ? Material3Theme.dark : Material3Theme.light, theme);
     const context = theme;
     return {
         ...Object.assign({}, theme),
@@ -298,7 +298,6 @@ export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
     const themeNameObj = extendObj({}, customTheme, session.get("theme"));
     const { light: lightTheme, dark: darkTheme } = getMaterial3Theme(themeNameObj?.colors?.primary);
     const isDark = !!themeNameObj.dark;
-    themeNameObj.name = defaultStr(themeNameObj.name, `${packageName}-${themeNameObj.dark ? "dark" : "light"}`);
     const theme = extendObj({}, (isDark ? darkTheme : lightTheme), themeNameObj);
     sanitizeTheme(theme);
     updateNative(theme);
@@ -307,6 +306,7 @@ export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
 };
 
 const sanitizeTheme = (theme: IThemeManager) => {
+    theme.name = defaultStr(theme.name, `${packageName}-${theme.dark ? "dark" : "light"}`);
     theme.roundness = typeof theme.roundness == "number" ? theme.roundness : 8;
     theme.colors = Object.assign({}, theme.colors);
     const isDark = !!theme.dark;

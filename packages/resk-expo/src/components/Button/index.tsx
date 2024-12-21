@@ -151,7 +151,9 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     divider: customDivider,
     context: extendContext,
     onPress,
+    centered,
     fullWidth,
+    isExpandable,
     ...rest
 }: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
@@ -265,6 +267,14 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     const icon = useGetIcon({ icon: iconProp, size: iconSize, ...iconProps, color: iconColor as unknown as string, theme });
     const iconContent = icon && isLoading !== true ? icon : null;
     const contentStyle = StyleSheet.flatten([contentProps.style]) as IFlatStyle;
+    const hasLeftContentWrapper = !!isExpandable;
+    const LeftContentWrapper = hasLeftContentWrapper ? View : React.Fragment;
+    const letContentWrapperProps = isExpandable ? {
+        id: `${idRef.current}-left-content-wrapper`,
+        testID: testID + "-left-content-wrapper",
+        ...leftContentWrapperProps,
+        style: [styles.leftContentWrapper, leftContentWrapperProps?.style],
+    } : {};
     const iconStyle =
         StyleSheet.flatten(contentStyle)?.flexDirection === 'row-reverse'
             ? [
@@ -277,6 +287,8 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             ];
     if (!isAllowed(rest)) return null;
     const fullWidthStyle = fullWidth ? styles.fullWidth : null;
+    const compactStyle = compact ? styles.compact : null;
+    const hasRightContent = (iconPosition == "right" && iconContent) || (isValidElement(right) && right);
     return (<ButtonContext.Provider value={context}>
         <Surface
             id={`${idRef.current}-container`}
@@ -286,7 +298,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             style={
                 [
                     styles.buttonContainer,
-                    compact && styles.compact,
+                    compactStyle,
                     buttonStyle,
                     fullWidthStyle,
                     containerProps?.style,
@@ -304,7 +316,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 disabled={disabled}
                 disabledRipple={disableRipple}
                 rippleColor={rippleColor}
-                style={[styles.touchable, fullWidthStyle, restButtonStyle, touchableStyle]}
+                style={[styles.touchable, compactStyle, fullWidthStyle, restButtonStyle, touchableStyle]}
                 testID={testID}
                 ref={innerRef}
                 id={idRef.current}
@@ -315,13 +327,8 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 }}
                 {...rest}
             >
-                <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, fullWidthStyle, contentStyle]}>
-                    <View
-                        id={`${idRef.current}-left-content-wrapper`}
-                        testID={testID + "-left-content-wrapper"}
-                        {...leftContentWrapperProps}
-                        style={[styles.leftContentWrapper, leftContentWrapperProps?.style]}
-                    >
+                <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, hasLeftContentWrapper && styles.contentHasLeftContentWrapper, fullWidthStyle, contentStyle]}>
+                    <LeftContentWrapper {...letContentWrapperProps}>
                         {iconPosition != "right" ? iconContent : null}
                         {isLoading ? (
                             <ActivityIndicator
@@ -351,8 +358,8 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                         >
                             {isValidElement(children, true) && children || label}
                         </Label>
-                    </View>
-                    {((iconPosition == "right" && iconContent) || (isValidElement(right) && right)) ? <View testID={testID + "-right-content-wrapper"} id={`${idRef.current}-right-content-wrapper`} {...rightContentWrapperProps} style={[styles.rightContentWrapper, rightContentWrapperProps?.style]}>
+                    </LeftContentWrapper>
+                    {(hasRightContent) ? <View testID={testID + "-right-content-wrapper"} id={`${idRef.current}-right-content-wrapper`} {...rightContentWrapperProps} style={[styles.rightContentWrapper, rightContentWrapperProps?.style]}>
                         {iconPosition == "right" ? iconContent : null}
                         {right}
                     </View> : null}
@@ -380,6 +387,8 @@ const styles = StyleSheet.create({
     compact: {
         paddingVertical: 0,
         paddingHorizontal: 0,
+        marginVertical: 0,
+        marginHorizontal: 0,
     },
     leftContentWrapper: {
         flexDirection: 'row',
@@ -396,8 +405,19 @@ const styles = StyleSheet.create({
     content: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
+        justifyContent: 'flex-start',
+        alignSelf: "center",
+    },
+    contentHasLeftContentWrapper: {
+        justifyContent: "space-between",
+        width: "100%",
+    },
+    contentNotRightContent: {
+        width: undefined,
+        textAlign: 'center',
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         alignSelf: "center",
     },
     icon: {

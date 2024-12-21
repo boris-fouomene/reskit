@@ -107,6 +107,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   const backAction = typeof customBackAction == "function" ? customBackAction(backActionProps) : customBackAction;
   const appBarContext = Object.assign({}, context, { backgroundColor, isAppBar: true, textColor: color });
   const { actions, menuItems } = splitAppBarActions<AppBarActionContext>({
+    ...appBarProps,
     textColor: color,
     backgroundColor,
     actions: customActions,

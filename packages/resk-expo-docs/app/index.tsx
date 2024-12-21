@@ -1,4 +1,4 @@
-import { Tab, Switch, Checkbox, Button, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens } from "@resk/expo";
+import { Tab, Switch, Checkbox, Button, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
 import { useEffect } from 'react'
 import { withAppBar } from "@resk/expo/build/hooks";
@@ -139,7 +139,9 @@ const index = withAppBar(() => {
                 label: theme.dark ? "Light Mode" : "Dark Mode",
                 icon: theme.dark ? "lightbulb-outline" : "lightbulb",
                 onPress: () => {
-                    updateTheme({ dark: theme.dark ? false : true } as ITheme);
+                    const dark = theme.dark ? false : true;
+                    const nTheme = getDefaultTheme({ dark: dark, colors: (dark ? {} : { background: "#fff", onBackground: "#000" }) } as ITheme);
+                    updateTheme(nTheme);
                 }
             },
             {

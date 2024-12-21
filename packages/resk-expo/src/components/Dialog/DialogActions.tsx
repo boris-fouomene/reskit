@@ -38,13 +38,14 @@ import { useCanRender } from './utils';
  *     );
  * };
  */
-export default function DialogActions<DialogContextExtend = any>({ testID, actions, ...props }: IDialogActionsProps<DialogContextExtend>) {
+export default function DialogActions<DialogContextExtend = any>({ testID, actions, actionProps, ...props }: IDialogActionsProps<DialogContextExtend>) {
     const { context, canRender } = useCanRender(!!(Array.isArray(actions) && actions.length));
     if (!canRender || !context) return null;
     const { fullScreen } = context;
     if (fullScreen) {
         return null;
     }
+    actionProps = Object.assign({}, actionProps);
     return <AppBar
         colorScheme={"background"}
         testID={"resk-dialog-actions"}
@@ -54,6 +55,7 @@ export default function DialogActions<DialogContextExtend = any>({ testID, actio
         backAction={false}
         windowWidth={context.maxWidth}
         statusBarHeight={0}
+        actionProps={{ compact: true, ...actionProps, }}
         {...props}
         context={Object.assign({}, context, props.context)}
         style={[styles.header, props.style]}
@@ -67,5 +69,17 @@ DialogActions.displayName = "DialogActions";
 const styles = StyleSheet.create({
     header: {
         justifyContent: "flex-end",
+    },
+    actionContainer: {
+        paddingVertical: 0,
+        paddingHorizontal: 0,
+        marginVertical: 0,
+        marginHorizontal: 0,
+    },
+    action: {
+        paddingVertical: 0,
+        paddingHorizontal: 0,
+        marginVertical: 0,
+        marginHorizontal: 0,
     }
 });

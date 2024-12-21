@@ -164,6 +164,12 @@ export type IAppBarProps<IAppBarActionContext = any> = ISurfaceProps & {
      */
     renderExpandableAction?: IMenuRenderItemsOptions<IAppBarContext<IAppBarActionContext>>["renderExpandable"];
 
+
+    /***
+     * Additional props for each action.
+     */
+    actionProps?: IAppBarAction<IAppBarActionContext>;
+
     /**
      * Additional props for the content of the AppBar.
      */

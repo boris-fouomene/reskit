@@ -75,10 +75,12 @@ export function splitAppBarActions<IAppBarActionContext = any>({
   isAppBarAction,
   maxActions,
   context,
+  actionProps,
 }: IAppBarProps<IAppBarActionContext> & {
   isAppBarAction?: boolean /*** s'il s'agit des actions qui seront affiché sous l'AppBar */;
 }): { actions: IReactNullableElement[]; menuItems: IAppBarAction[] } {
   const { isMobileOrTablet, window } = getDimensions();
+  actionProps = Object.assign({}, actionProps);
   const isMobile = isMobileOrTablet || (typeof windowWidth == "number" && windowWidth < window.width);
   isAppBarAction = isAppBarAction && isMobile ? true : false;
   const menuItems: IAppBarAction[] = [];
@@ -103,6 +105,8 @@ export function splitAppBarActions<IAppBarActionContext = any>({
     return null;
   };
   const _render = function (renderCb: IAppBarProps<IAppBarActionContext>["renderAction"], props: IAppBarAction<IAppBarContext<IAppBarActionContext>>, index: number): IReactNullableElement {
+    props = Object.assign({}, actionProps, props);
+    props.style = [actionProps?.style, props.style];
     if (!props?.level && actionCounter.current <= mAction + 1) {
       actionCounter.current++;
     }

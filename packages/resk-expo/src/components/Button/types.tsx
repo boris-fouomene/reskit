@@ -357,6 +357,19 @@ export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<
      * If not provided, the button will be rendered regardless of the user's permissions.
      */
     perm?: IAuthPerm;
+
+    /**
+     * If true, the button will be centered horizontally within its container.
+     * This can be useful for creating buttons that are centered on the screen.
+     */
+    centered?: boolean;
+
+
+    /***
+     * If true, the button will be expandable.
+     * This can be used to create buttons that can be expanded or collapsed.
+     */
+    isExpandable?: boolean;
 }
 
 /**

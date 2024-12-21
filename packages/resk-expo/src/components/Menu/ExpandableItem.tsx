@@ -105,6 +105,7 @@ const ExpandableItemLabel = forwardRef<any, any>(function ExpandableMenuItem<IMe
     const props = useGetExpandableItemProps<IMenuItemExtendContext>(rest);
     return <Component
         ref={ref}
+        isExpandable
         {...props}
     />
 });
@@ -189,7 +190,6 @@ const styles = StyleSheet.create({
         //paddingVertical: 4,
     },
     expandableItemContent: {
-        justifyContent: "space-between",
         paddingVertical: 0,
     }
 });

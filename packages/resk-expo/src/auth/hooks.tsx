@@ -190,8 +190,8 @@ export function withAuth<T extends any = any>(Component: React.FC<IWithAuthProps
       if (typeof fallback === "function") {
         return fallback();
       }
-      if (fallback !== undefined) return fallback;
-      return <Login children={isValidElement(fallback) ? fallback : null} />;
+      if (fallback !== undefined && isValidElement(fallback)) return fallback;
+      return <Login />;
     }
     return <Component {...props} user={user} />;
   };
@@ -220,18 +220,15 @@ export function withAuth<T extends any = any>(Component: React.FC<IWithAuthProps
  * 
  * @example
  * // Usage of the Login component
- * <Login>
- *     <div>Please log in to access this content.</div>
- * </Login>
+ * <Login/>
  */
-const Login: React.FC<{ children?: ReactNode }> = function ({ children }) {
+const Login: React.FC<{ }> = function ({ }) {
   const authContext = useAuth();
   const Component = authContext?.Login;
   const theme = useTheme();
   return <Portal testID="resk-auth-login-portal" absoluteFill>
     <View testID="resk-auth-login-container" style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {!Component || typeof Component !== "function" ? <View style={[styles.container, Theme.styles.centered, , Theme.styles.h100, Theme.styles.w100]} testID="resk-auth-login-container">
-        {isValidElement(children) ? children : null}
         <View>
           <Label colorScheme="error" fontSize={20} textBold>AuthProvider must have a Login component using the `Login` prop from resk-expo  provider auth options.</Label>
         </View>

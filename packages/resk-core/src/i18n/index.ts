@@ -415,7 +415,8 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
             return Promise.reject(new Error(`Locale is not set. Cannot load namespace "${namespace}".`));
         }
         return this.namespaceResolvers[namespace](locale).then(((translations) => {
-            const dict = { [locale]: Object.assign({}, translations) };
+            const dict: II18nTranslation = {};
+            dict[locale as string] = Object.assign({}, translations);
             if (isObj(translations)) {
                 if (updateTranslations !== false) {
                     this.store(dict);
@@ -460,7 +461,8 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
             }
         }
         return Promise.all(namespaces).then(() => {
-            const dict = { [locale]: translations };
+            const dict: II18nTranslation = {};
+            dict[locale as string] = translations;
             if (updateTranslations !== false) {
                 this.store(dict);
             }

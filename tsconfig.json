@@ -3,14 +3,21 @@
     "baseUrl": ".",
     "rootDir": ".", // TypeScript source directory
     "outDir": "./build",
-    "target": "ES6", // Specifies the ECMAScript target version
-    "module": "ES6", // Use ES6 module syntax (e.g., `import`/`export`)
+    "target": "ES6", // Or the desired target
+    "module": "ES6", // Output CommonJS modules
     "moduleResolution": "node", // Resolve modules using Node.js style
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true, // Enable experimental support for decorators
     "emitDecoratorMetadata": true, // Enable emitting design:type metadata
     "strict": true, // Enable all strict type checking options
     "resolveJsonModule": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ], // Ensure Jest typings are included
+    "types": [
+      "jest",
+      "node"
+    ],
     "skipLibCheck": true,
     "composite": true,
     "allowSyntheticDefaultImports": true,
@@ -30,12 +37,24 @@
     "**/*.ts",
     "**/*.tsx",
     "ts-paths-to-vite-alias.mjs",
-    "packages/resk-tamagui/vite.config.mjs"
+    "packages/resk-tamagui/vite.config.mjs",
+    "jest.config.js",
+    "packages/resk-core/jest.config.js"
   ],
   "exclude": [
     "**/node_modules/*",
     "**/dist/*",
     "**/*.spec.ts",
-    "**/build/**/*"
+    "**/build/**/*",
+    "jest.config.*",
+    "generate-typedoc",
+    "**.test.ts",
+    "**/*.test.tsx",
+    "**/*.test.js",
+    "**/*.test.jsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.spec.js",
+    "**/*.spec.jsx",
   ]
 }

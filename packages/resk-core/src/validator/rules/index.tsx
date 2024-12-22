@@ -29,14 +29,15 @@ import { i18n } from "../../i18n";
  */
 function compareNumer(compare: (value: any, toCompare: any) => boolean, translateKey: string, { value, ruleParams, ...rest }: IValidatorRuleOptions): IValidatorResult {
     ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
+    const rParams = ruleParams ? ruleParams : [];
     translateKey = defaultStr(translateKey);
     const message = i18n.t(translateKey, { ...rest, value, ruleParams });
     value = typeof value === 'number' ? value : parseFloat(value);
     return new Promise((resolve, reject) => {
-        if (isNaN(value) || ruleParams[0] === undefined) {
+        if (isNaN(value) || rParams[0] === undefined) {
             return resolve(message);
         }
-        const toCompare = typeof ruleParams[0] === 'number' ? ruleParams[0] : parseFloat(ruleParams[0]);
+        const toCompare = typeof rParams[0] === 'number' ? rParams[0] : parseFloat(rParams[0]);
         if (!isNaN(toCompare)) {
             return reject(message);
         }

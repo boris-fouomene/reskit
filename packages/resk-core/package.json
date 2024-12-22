@@ -6,9 +6,11 @@
     "types": "build/index",
     "scripts": {
         "clear-npx-cache": "npx clear-npx-cache",
-        "test": "npm run build && npx vitest",
+        "pretest": "npm run build-test",
+        "test": "npx jest",
         "test-node": "npm run build && node ./build/test/index.js",
-        "build": "tsc && npx tsc-alias -p tsconfig.json",
+        "build": "tsc  && npx tsc-alias -p tsconfig.json",
+        "build-test": "tsc --project ./tsconfig.test.json && npx tsc-alias -p tsconfig.test.json",
         "start": "node build/test/index",
         "prepublish": "npm run build",
         "build-doc": "npx typedoc",
@@ -29,8 +31,7 @@
         "ts-jest": "^29.2.5",
         "typedoc": "^0.26.9",
         "typescript": "^5.6.3",
-        "vite-tsconfig-paths": "^5.0.1",
-        "vitest": "^2.1.2"
+        "vite-tsconfig-paths": "^5.0.1"
     },
     "dependencies": {
         "crypto-es": "^2.1.0",

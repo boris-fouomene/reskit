@@ -1,9 +1,11 @@
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
-  testMatch: ['./build/tests/**/*.js'],
-  moduleDirectories: ['node_modules', 'build'],
-  moduleFileExtensions: ['js', 'json'],
-  rootDir: './',
-};
-  
+  // Point Jest to look in the dist directory
+  roots: ['<rootDir>/dist'],
+  // Tell Jest to process .js files
+  testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).js'],
+  // Optional: if you need to map module paths
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/dist/$1'
+  }
+}

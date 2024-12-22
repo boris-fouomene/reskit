@@ -11,8 +11,10 @@ export default defineConfig(async ({ command, mode }) => {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
     },
     plugins: [tsconfigPaths.default()],
+    globals: true, // Enables global `describe`, `test`, etc.
+    environment: 'node', // Change to 'jsdom' if testing browser-like environments
     test: {
-      include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+      //include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     },
   }
 });

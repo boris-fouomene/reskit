@@ -183,7 +183,7 @@ export class Validator {
           if (index >= rulesLength) {
             return resolve({ value, rules, ...extra });
           }
-          const rule = rules[index];
+          const rule = (rules as any)[index];
           const ruleParams: any[] = [];
           let ruleFunc: IValidatorRule | undefined = typeof rule === "function" ? rule : undefined;
           if (typeof rule === "string") {

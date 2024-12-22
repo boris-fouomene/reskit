@@ -1,5 +1,5 @@
-import { Validator } from "./validator";
-import { IValidatorRuleFunction, IValidatorRuleName } from "./types";
+import { Validator } from "../validator";
+import { IValidatorRuleFunction, IValidatorRuleName } from "../types";
 
 describe("Validator", () => {
     beforeEach(() => {

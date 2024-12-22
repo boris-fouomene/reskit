@@ -1,17 +1,19 @@
-import { IFormValidationRule, IFormValidationRuleOptions, IFormValidationRules, IFormValidationRuleSeparator } from "./types";
-import { i18n, isNonNullString, isObj, isPromise, stringify } from "@resk/core";
-
-const RULE_SEPARATOR: IFormValidationRuleSeparator = "|";
+import { IValidatorRule, IValidatorRuleOptions, IValidatorRulesOptions, IValidatorRuleSeparator, IValidatorRulesMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult } from "./types";
+import { isNonNullString, isObj, isPromise, stringify } from "@utils/index";
+import { i18n } from "../i18n";
+const RULE_SEPARATOR: IValidatorRuleSeparator = "|";
 
 
 /**
  * A decorator function for registering a validation rule.
  * 
  * This function can be used to annotate methods in a class as validation rules.
- * When applied, it registers the method with the specified name in the `FormValidation` class,
+ * When applied, it registers the method with the specified name in the `Validator` class,
  * allowing it to be used as a validation rule in form validation scenarios.
  * 
- * @param {string} name - The name of the validation rule to register. This name will be used
+ * @template ParamType The type of the parameters that the rule function accepts.
+ * 
+ * @param {IValidatorRuleName} name - The name of the validation rule to register. This name will be used
  *                        to reference the rule when performing validation.
  * 
  * @returns {MethodDecorator} A method decorator that registers the method as a validation rule.
@@ -19,70 +21,82 @@ const RULE_SEPARATOR: IFormValidationRuleSeparator = "|";
  * ### Example:
  * 
  * ```typescript
- * import { FormValidation, FormValidationRule } from "@resk/expo";
- * @FormValidationRule("isEven")
+ * import { Validator, ValidatorRule } from "@resk/expo";
+ * @ValidatorRule("isEven")
  * const validateEven({ value }: { value: number }): boolean | string {
  *      return value % 2 === 0 || "The number must be even.";
  * }
  * 
  * // Usage in validation
- * const rules = FormValidation.getValidationRule("isEven");
+ * const rules = Validator.getValidationRule("isEven");
  * const result = rules({ value: 4 }); // Returns true
  * ```
  * 
  * In this example, the `validateEven` method is registered as a validation rule named "isEven".
  * When the rule is called, it checks if the provided value is even and returns an appropriate message if not.
  */
-export function FormValidationRule(name: string): MethodDecorator {
+export function ValidatorRule<ParamType = Array<any>>(name: IValidatorRuleName): MethodDecorator {
   return (target, propertyKey, descriptor) => {
+    let handler: IValidatorRuleFunction<ParamType> | undefined = undefined;
     if (descriptor?.value instanceof Function) {
-      FormValidation.registerRule(name, descriptor.value as IFormValidationRule);
+      // If applied to a class method
+      handler = descriptor.value as IValidatorRuleFunction<ParamType>;
+    } else if (target instanceof Function) {
+      // If applied to a standalone function
+      handler = target as IValidatorRuleFunction<ParamType>;
+    }
+    if (handler && handler instanceof Function) {
+      Validator.registerRule(name, handler as IValidatorRuleFunction<ParamType>);
     }
   };
 }
 
 /**
- * @class FormValidation
- * A class that provides methods for validating form fields based on defined rules.
+ * @class Validator
+ * A class that provides methods for validating elements based on defined rules.
  * 
- * The `FormValidation` class allows you to define validation rules, sanitize them,
+ * The `Validator` class allows you to define validation rules, sanitize them,
  * and validate values against those rules. It supports both synchronous and asynchronous
  * validation, making it flexible for various use cases.
  */
-export class FormValidation {
+export class Validator {
   // Metadata key for storing validation rules
   private static readonly RULES_METADATA_KEY = Symbol("validationRules");
 
   /**
    * Register a new validation rule.
+   * @template ParamType The type of the parameters that the rule function accepts.
    * @param name The name of the rule.
    * @param handler The validation function.
    */
-  static registerRule(name: string, handler: IFormValidationRule): void {
+  static registerRule<ParamType = Array<any>>(name: IValidatorRuleName, handler: IValidatorRuleFunction<ParamType>): void {
     const rules = this.validationRules;
+    if (typeof handler == "function") {
+      (rules as any)[name] = handler as IValidatorRuleFunction<ParamType>;
+    }
     Reflect.defineMetadata(this.RULES_METADATA_KEY, rules, this);
   }
-  static getRules(): Record<string, IFormValidationRule> {
+  static getRules(): IValidatorRulesMap {
     return this.validationRules;
   }
   /**
    * A static getter that returns a record of validation rules.
    * 
-   * @returns {Record<string, IFormValidationRule>} An object containing validation rules.
+   * @returns {IValidatorRulesMap} An object containing validation rules.
    */
-  static get validationRules(): Record<string, IFormValidationRule> {
+  static get validationRules(): IValidatorRulesMap {
     const rules = Reflect.getMetadata(this.RULES_METADATA_KEY, this);
     return isObj(rules) ? rules : {};
   }
   /**
    * Retrieves a validation rule by its name.
    * 
-   * @param {string} rulesName - The name of the validation rule to retrieve.
-   * @returns {IFormValidationRule | undefined} The validation rule if found, otherwise undefined.
+   * @param {IValidatorRuleName} rulesName - The name of the validation rule to retrieve.
+   * @returns {IValidatorRuleFunction | undefined} The validation rule if found, otherwise undefined.
    */
-  static getRule(rulesName: string): IFormValidationRule | undefined {
+  static getRule<ParamType = Array<any>>(rulesName: IValidatorRuleName): IValidatorRuleFunction<ParamType> | undefined {
     if (!isNonNullString(rulesName)) return undefined;
-    return this.validationRules[rulesName];
+    return this.validationRules[rulesName] as IValidatorRuleFunction<ParamType> | undefined;
   }
   /**
    * Sanitizes a set of validation rules and returns an array of rules.
@@ -90,15 +104,15 @@ export class FormValidation {
    * This method takes a list of validation rules, which can be in various formats,
    * and returns an array of sanitized rules ready for validation.
    * 
-   * @param {IFormValidationRules} rules - The list of validation rules. The rules can be:
+   * @param {IValidatorRulesOptions} rules - The list of validation rules. The rules can be:
    * - A string (e.g., "required|minLength[2]|maxLength[10]") with multiple rules separated by `|`.
    * - An array of rules (e.g., ["required", "minLength[2]", "maxLength[10]"]).
    * - A function that performs validation.
    * 
-   * @returns {IFormValidationRule[]} An array of sanitized validation rules.
+   * @returns {IValidatorRule[]} An array of sanitized validation rules.
    */
-  static sanitizeRules(rules?: IFormValidationRules): IFormValidationRule[] {
-    const result: IFormValidationRule[] = [];
+  static sanitizeRules(rules?: IValidatorRulesOptions): IValidatorRule[] {
+    const result: IValidatorRule[] = [];
     (typeof rules === "function"
       ? [rules]
       : typeof rules === "string" && rules
@@ -133,7 +147,7 @@ export class FormValidation {
    * It returns a promise that resolves if the validation passes, or rejects with an error
    * message if the validation fails.
    * 
-   * @param {IFormValidationRuleOptions} options - The options for validation, including:
+   * @param {IValidatorRuleOptions} options - The options for validation, including:
    * - `value`: The value to validate.
    * - `rules`: An array of validation rules to apply.
    * - `...extra`: Any additional options that may be applied.
@@ -142,7 +156,7 @@ export class FormValidation {
    * 
    * ### Example:
    * ```typescript
-   * FormValidation.validate({
+   * Validator.validate({
    *     rules: "minLength[5]|maxLength[10]",
    *     value: "test",
    * }).then(result => {
@@ -152,7 +166,7 @@ export class FormValidation {
    * });
    * ```
    */
-  static validate({ rules, value, ...extra }: IFormValidationRuleOptions) {
+  static validate({ rules, value, ...extra }: IValidatorRuleOptions) {
     rules = this.sanitizeRules(rules);
     if (!rules.length) return Promise.resolve(true);
     const i18nRulesOptions = {
@@ -171,7 +185,7 @@ export class FormValidation {
           }
           const rule = rules[index];
           const ruleParams: any[] = [];
-          let ruleFunc: IFormValidationRule | undefined = typeof rule === "function" ? rule : undefined;
+          let ruleFunc: IValidatorRule | undefined = typeof rule === "function" ? rule : undefined;
           if (typeof rule === "string") {
             if (!rule) {
               return next();
@@ -185,12 +199,12 @@ export class FormValidation {
                 ruleParams.push(spl[t].replace("]", "").trim());
               }
             }
-            ruleFunc = FormValidation.getRule(vRule);
+            ruleFunc = Validator.getRule(vRule as IValidatorRuleName);
           }
           const valResult = { value, rule, rules, ...extra };
           const i18nRuleOptions = { ...i18nRulesOptions, rule: stringify(rule) };
           if (typeof ruleFunc !== "function") {
-            return reject({ ...valResult, message: i18n.t("form.validation.invalidRule", i18nRuleOptions) });
+            return reject({ ...valResult, message: i18n.t("validator.invalidRule", i18nRuleOptions) });
           }
           let r = undefined;
           try {
@@ -199,7 +213,7 @@ export class FormValidation {
             r = typeof e === "string" ? e : (e as any)?.message || e?.toString() || stringify(e);
           }
           if (typeof r === "string" || r === false) {
-            return reject({ ...valResult, message: r ? String(r) : i18n.t("form.validation.invalidValidationMessage", i18nRuleOptions), value, rules, rule });
+            return reject({ ...valResult, message: r ? String(r) : i18n.t("validator.invalidMessage", i18nRuleOptions), value, rules, rule });
           } else if (isPromise(r)) {
             return Promise.resolve(r)
               .then((a: any) => {

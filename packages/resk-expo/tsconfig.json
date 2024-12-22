@@ -66,6 +66,9 @@
       "@src/*": [
         "src/*"
       ],
+      "@resk/core": [
+        "../resk-core/build"
+      ]
     }
   },
   "include": [

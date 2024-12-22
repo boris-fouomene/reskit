@@ -30,3 +30,4 @@ export * from "./currency/types"
 export * from "./auth/types";
 export * as Auth from "./auth";
 export * from "./i18n";
+export * from "./validator";

@@ -1,13 +1,12 @@
 import { createContext, useContext, useEffect, useState, ReactNode, isValidElement } from "react";
 import { IAuthContext, IAuthProviderProps } from "./types";
-import { Auth, IAuthUser, isObj } from "@resk/core";
+import { Auth, isObj } from "@resk/core";
 import { IWithHOCOptions } from "@hooks/withHOC";
 import View from "@components/View";
 import Label from "@components/Label";
 import Theme, { useTheme } from "@theme/index";
 import { StyleSheet } from "react-native";
 import { Portal } from "@components/Portal";
-import { Surface } from "@components/Surface";
 
 // Create an authentication context with a default value of null.
 const AuthContext = createContext<IAuthContext | null>(null);

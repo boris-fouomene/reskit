@@ -20,6 +20,7 @@ export * from "./object";
 
 export * from "./string";
 export * from "./uri";
+export * from "./isValidEmail";
 export * from "./observable";
 
 /***

@@ -307,7 +307,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     getLocales(): string[] {
         const translations = Object.keys(this.getTranslations());
         const suportedLocales = Array.isArray(this._locales) ? this._locales : ["en"];
-        return [...translations, ...suportedLocales.filter((locale) => !translations.includes(locale))];
+        const r = [...translations, ...suportedLocales.filter((locale) => !translations.includes(locale))];
+        if (!r.includes("en")) {
+            r.push("en");
+        }
+        return r;
     }
     /***
      * returns true if the locale is supported by the i18n instance.

@@ -9,6 +9,7 @@ declare global {
 }
 
 /**
+ * Authentication event handler.
  * Initializes an observable event handler for authentication events.
  * 
  * This constant `events` is assigned an instance of `IObservable<IAuthEvent>`, which is used to manage 
@@ -22,6 +23,7 @@ declare global {
  * @type {IObservable<IAuthEvent>}
  * 
  * @example
+ * import {Auth} from '@resk/core';
  * // Example of subscribing to an authentication event
  * events.on('SIGN_IN', (user) => {
  *     console.log(`User  signed in: ${user.username}`);

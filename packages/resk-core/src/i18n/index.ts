@@ -66,6 +66,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * alias for translate method of i18n-js
      */
     readonly t: typeof this.translate = this.translate;
+    private _isLoading: boolean = false;
     /***
      * locales that are superted by the i18n instance
      */
@@ -85,13 +86,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      */
     constructor(translations: II18nTranslation = {}, options: Partial<I18nOptions> = {}) {
         super(translations, options);
-        this.onChangeHandlers.unshift(this._onChangeHandler.bind(this));
         this.loadNamespaces();
-    }
-    private _onChangeHandler(i18n: I18nJs) {
-        if (i18n.locale == this.getLocale()) {
-            return;
-        }
     }
     readonly _observableFactory = observableFactory<I18nEvent>();
     readonly _____isObservable?: boolean | undefined = true;
@@ -323,6 +318,16 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         if (!isNonNullString(locale)) return false;
         return this.getLocales().includes(locale);
     }
+    /***
+     * returns true if the instance is loading translations.
+     * @returns true if the instance is loading translations, false otherwise.
+     * @example
+     * // Check if the instance is loading translations.
+     * i18n.isLoading();
+     */
+    isLoading() {
+        return this._isLoading;
+    }
     /**
      * Sets the locale for the i18n instance.
      * If the provided locale is the same as the current locale, this method will return without doing anything.
@@ -334,6 +339,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         if (this.locale == locale) {
             return;
         }
+        this._isLoading = true;
         this.loadNamespaces(locale).then((translations) => {
             if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {
                 I18n.setLocaleToSession(locale);
@@ -441,6 +447,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         const namespaces = [];
         const translations: II18nTranslation = {};
         locale = defaultStr(locale, this.getLocale());
+        this._isLoading = true;
         for (const namespace in this.namespaceResolvers) {
             if (this.namespaceResolvers.hasOwnProperty(namespace) && typeof this.namespaceResolvers[namespace] === "function") {
                 namespaces.push(this.namespaceResolvers[namespace](locale).then((translations) => {
@@ -455,6 +462,8 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
             }
             this.trigger("namespaces-loaded", locale, dict);
             return dict;
+        }).finally(() => {
+            this._isLoading = false;
         });
     }
     /***

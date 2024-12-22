@@ -79,10 +79,10 @@ export function AuthProvider(props: IAuthProviderProps) {
 export const useGetSignedUser = (): IAuthContext["user"] => {
   const [user, setUser] = useState(Auth.getSignedUser());
   useEffect(() => {
-    const onSignIn = Auth.EVENTS.on("SIGN_IN", () => {
+    const onSignIn = Auth.events.on("SIGN_IN", () => {
       setUser(Auth.getSignedUser());
     });
-    const onSignOut = Auth.EVENTS.on("SIGN_OUT", () => {
+    const onSignOut = Auth.events.on("SIGN_OUT", () => {
       setUser(null);
     });
     return () => {
@@ -222,7 +222,7 @@ export function withAuth<T extends any = any>(Component: React.FC<IWithAuthProps
  * // Usage of the Login component
  * <Login/>
  */
-const Login: React.FC<{ }> = function ({ }) {
+const Login: React.FC<{}> = function ({ }) {
   const authContext = useAuth();
   const Component = authContext?.Login;
   const theme = useTheme();
@@ -232,16 +232,7 @@ const Login: React.FC<{ }> = function ({ }) {
         <View>
           <Label colorScheme="error" fontSize={20} textBold>AuthProvider must have a Login component using the `Login` prop from resk-expo  provider auth options.</Label>
         </View>
-      </View> : <Component signIn={(user: IAuthUser) => {
-        return new Promise((resolve, reject) => {
-          if (!user) {
-            reject(new Error("No user provided to sign in"));
-            return;
-          }
-          Auth.setSignedUser(user, true);
-          resolve(user);
-        });
-      }} />}
+      </View> : <Component signIn={Auth.signIn} />}
     </View>
   </Portal>;
 }

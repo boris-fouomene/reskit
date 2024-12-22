@@ -3,7 +3,7 @@ import { IDict } from "../types";
 import { isObj, parseJSON, isNonNullString } from "../utils";
 import CryptoES from 'crypto-es';
 import { IAuthSessionStorage, IAuthUser } from "./types";
-import EVENTS from "./events";
+import events from "./events";
 
 const encrypt = CryptoES.AES.encrypt;
 
@@ -114,7 +114,7 @@ export const setSignedUser = (u: IAuthUser | null, triggerEvent?: boolean) => {
     }
     if (triggerEvent) {
         const event = isObj(uToSave) && isObj(encrypted) ? "SIGN_IN" : "SIGN_OUT";
-        EVENTS.trigger(event, uToSave);
+        events.trigger(event, uToSave);
     }
     return $session.set(USER_SESSION_KEY, encrypted)
 }

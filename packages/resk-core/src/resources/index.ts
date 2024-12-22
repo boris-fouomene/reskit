@@ -54,7 +54,7 @@ import { TranslateOptions } from 'i18n-js';
  */
 export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceActionName> = IResourceActionName> extends ObservableClass<EventType> implements IResourceInstance<DataType, PrimaryKeyType, EventType> {
   actions?: IResourceActionMap;
-  static EVENTS = observableFactory<IResourceActionName | "string">();
+  static events = observableFactory<IResourceActionName | "string">();
   /**
    * The internal name of the resource.
    *
@@ -186,11 +186,11 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   /***
    * trigger the event
    * @param event - The event to trigger.
-   * When the event is triggered, the EVENTS observable is also triggered.
+   * When the event is triggered, the events observable is also triggered.
    * @param args - The arguments to pass to the event.
    */
   _trigger(event: EventType, ...args: any[]) {
-    ResourceBase.EVENTS.trigger(event, Object.assign({}, this.getI18TranslateParams()), ...args);
+    ResourceBase.events.trigger(event, Object.assign({}, this.getI18TranslateParams()), ...args);
     return this.trigger(event, ...args);
   }
   /***

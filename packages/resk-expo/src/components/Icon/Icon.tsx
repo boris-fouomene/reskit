@@ -74,7 +74,7 @@ import { isReactComponent } from "@utils/isComponent";
  * <Icon iconName="material-home" size={24} color="#000" />
  */
 
-const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, disabled, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
+const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, resizeMode, as, disabled, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
     const isSource = isImageSource(source);
     //const isValidIconName = iconName && FontIcon.isValidName(iconName);
     testID = defaultStr(testID, isSource ? "resk-image" : "resk-font-icon");
@@ -100,13 +100,13 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, as, dis
             width: size,
             height: size,
             tintColor: color,
-            resizeMode: `contain`,
         },
         style,
     ]);
     return <Component {...containerP}>
         {isSource ? <Image
             accessibilityIgnoresInvertColors
+            resizeMode={resizeMode || "contain"}
             {...props}
             testID={testID}
             source={source}

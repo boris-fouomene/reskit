@@ -192,7 +192,7 @@ export interface IValidatorRulesMap {
      * ```typescript
      * ```
      */
-    numberLessThanOrEquals: IValidatorRuleFunction<number>;
+    numberLessThanOrEquals: IValidatorRuleFunction;
 
     /**
      * @function numberLessThan
@@ -225,7 +225,7 @@ export interface IValidatorRulesMap {
      * - This rule is useful for scenarios where you need to ensure that a numeric input is strictly less than a specified limit.
      * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
      */
-    numberLessThan: IValidatorRuleFunction<number>;
+    numberLessThan: IValidatorRuleFunction;
 
     /**
      * @function numberGreaterThanOrEquals
@@ -258,7 +258,7 @@ export interface IValidatorRulesMap {
      * - This rule is useful for scenarios where you need to ensure that a numeric input meets or exceeds a specified limit.
      * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
      */
-    numberGreaterThanOrEquals: IValidatorRuleFunction<number>;
+    numberGreaterThanOrEquals: IValidatorRuleFunction;
 
     /**
      * @function numberGreaterThan
@@ -290,7 +290,7 @@ export interface IValidatorRulesMap {
      * - This rule is useful for scenarios where you need to ensure that a numeric input exceeds a specified limit.
      * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
      */
-    numberGreaterThan: IValidatorRuleFunction<number>;
+    numberGreaterThan: IValidatorRuleFunction;
 
     /**
      * @function numberEquals
@@ -323,7 +323,7 @@ export interface IValidatorRulesMap {
      * - This rule is useful for scenarios where you need to ensure that a numeric input matches a specified value exactly.
      * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
      */
-    numberEquals: IValidatorRuleFunction<number>;
+    numberEquals: IValidatorRuleFunction;
 
     /**
      * @function numberNotEquals
@@ -356,7 +356,7 @@ export interface IValidatorRulesMap {
      * - This rule is useful for scenarios where you need to ensure that a numeric input does not match a specified value.
      * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
      */
-    numberNotEquals: IValidatorRuleFunction<number>;
+    numberNotEquals: IValidatorRuleFunction;
 
     /**
      * @function required
@@ -726,7 +726,7 @@ export interface IValidatorRuleOptions<ParamType = Array<any>> {
      * };
      * ```
      */
-    rules: IValidatorRulesOptions;
+    rules?: IValidatorRulesOptions;
 
     /**
      * An optional specific validation rule to apply.

@@ -31,6 +31,9 @@ I18n.RegisterTranslations({
             "numberLessThan": "This field must be less than %{ruleParams[0]}",
             "numberGreaterThanOrEquals": "This field must be greater than or equal to %{ruleParams[0]}",
             "numberGreaterThan": "This field must be greater than %{ruleParams[0]}",
+            "noteEquals": "This field must be different from %{ruleParams[0]}",
+            "numberNotEquals": "This field must be different from %{ruleParams[0]}",
+            "numberEquals": "This field must be equal to %{ruleParams[0]}",
         }
     }
 });

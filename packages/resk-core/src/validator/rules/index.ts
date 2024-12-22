@@ -38,7 +38,7 @@ function compareNumer(compare: (value: any, toCompare: any) => boolean, translat
             return resolve(message);
         }
         const toCompare = typeof rParams[0] === 'number' ? rParams[0] : parseFloat(rParams[0]);
-        if (!isNaN(toCompare)) {
+        if (isNaN(toCompare)) {
             return reject(message);
         }
         if (compare(value, toCompare)) {
@@ -251,7 +251,7 @@ Validator.registerRule("numberEquals", function numberEqualsTo(options) {
 Validator.registerRule("numberNotEquals", function numberNotEqualsTo(options) {
     return compareNumer((value, toCompare) => {
         return value !== toCompare;
-    }, "validate.notEquals", options)
+    }, "validator.numberNotEquals", options)
 });
 
 

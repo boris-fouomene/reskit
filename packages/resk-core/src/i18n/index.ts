@@ -65,7 +65,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     /**
      * alias for translate method of i18n-js
      */
-    readonly t: typeof this.translate = this.translate;
+    readonly t: typeof this.translate = this.translate.bind(this);
     private _isLoading: boolean = false;
     /***
      * locales that are superted by the i18n instance

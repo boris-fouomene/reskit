@@ -7,10 +7,10 @@
     "scripts": {
         "clear-npx-cache": "npx clear-npx-cache",
         "pretest": "npm run build-test",
-        "test": "npx jest",
-        "test-node": "npm run build && node ./build/test/index.js",
-        "build": "tsc  && npx tsc-alias -p tsconfig.json",
         "build-test": "tsc --project ./tsconfig.test.json && npx tsc-alias -p tsconfig.test.json",
+        "test": "npx jest",
+        "build": "tsc  && npx tsc-alias -p tsconfig.json",
+        "test-node": "npm run build && node ./build/test/index.js",
         "start": "node build/test/index",
         "prepublish": "npm run build",
         "build-doc": "npx typedoc",

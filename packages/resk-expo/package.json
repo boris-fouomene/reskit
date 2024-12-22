@@ -7,10 +7,12 @@
     "build-core": "cd ../resk-core && npm run build",
     "build-core-watch": "cd ../resk-core && npm",
     "build": "npm run build-core && cd ../resk-expo && tsc && tsc-alias -p tsconfig.json",
-    "build-test": "npm run build-core && cd ../resk-expo && tsc && tsc-alias -p tsconfig.test.json",
     "build-core:watch": "cd ../resk-core && npm run build:watch",
     "build:watch": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
-    "build:watch1": "tsc && (concurrently \"cd ../resk-core && npm run build:watch\" \"tsc -w\" \"tsc-alias -w\")"
+    "build:watch1": "tsc && (concurrently \"cd ../resk-core && npm run build:watch\" \"tsc -w\" \"tsc-alias -w\")",
+    "pretest": "npm run build-test",
+    "build-test": "npm run build-core && cd ../resk-expo && tsc --project ./tsconfig.test.json && npx tsc-alias -p tsconfig.test.json",
+    "test": "npx jest"
   },
   "jest": {
     "preset": "jest-expo"

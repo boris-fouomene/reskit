@@ -127,7 +127,7 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
  * console.log(styles); // { containerStyle: [...], contentContainerStyle: [...], inputStyle: [...], labelStyle: [...] }
  */
 const getContainerAndContentStyle = ({ isFocused, isLabelEmbededVariant, textColor, borderColor, theme, isDefaultVariant }: { isLabelEmbededVariant: boolean, canRenderLabel: boolean, theme: ITheme, isFocused: boolean, textColor?: string, borderColor?: string, isDefaultVariant: boolean }) => {
-    const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [{ color: textColor }], labelStyle: IStyle = [{ color: textColor }];
+    const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [styles.input, { color: textColor }], labelStyle: IStyle = [{ color: textColor }];
     const borderedStyle = [
         isFocused ? styles.focusedOutlineBorder : styles.containerLabelEmbeded,
         { borderColor, borderRadius: theme.roundness },
@@ -392,7 +392,7 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
             }
         },
         left,
-        right: right || canToggleSecure ? <View testID={`${testID}-right-container`} {...rightContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, rightContainerProps.style]}>
+        right: (right || canToggleSecure || affixContent) ? <View testID={`${testID}-right-container`} {...rightContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, rightContainerProps.style]}>
             {affixContent}
             {right}
             {editable || disabled !== false && isPasswordField ? secureIcon : null}
@@ -408,8 +408,7 @@ export default TextInput;
 const styles = StyleSheet.create({
     affix: {
         paddingHorizontal: 0,
-        marginHorizontal: 0,
-        marginLeft: 5,
+        marginHorizontal: 5,
         fontSize: 15
     },
     inputLabelEmbeded: {
@@ -430,6 +429,7 @@ const styles = StyleSheet.create({
         borderRadius: 0,
         backgroundColor: 'transparent',
         paddingHorizontal: 2,
+        overflow: 'hidden',
     },
     inputNotEmbededLabelVariant: {
         paddingHorizontal: 5,

@@ -139,10 +139,21 @@ const index = withAppBar(() => {
                 />
                 <TextInput
                     label="Text Input Default"
+                    left={<>
+                        <Icon iconName="account-circle" />
+                        <Icon iconName="check" />
+                    </>
+                    }
                     onChange={(event) => {
                         console.log(event, " changed heeein")
                     }}
+
+                    right={<>
+                        <Icon iconName="check" />
+                        <Icon iconName="close" />
+                    </>}
                 />
+                <TextInput multiline label="Text Input Multiline" />
             </View>
         </ScrollView>
     )

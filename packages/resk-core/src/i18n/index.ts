@@ -199,15 +199,15 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         const { interpolate: i18nInterpolate, ...restOptions } = Object.assign({}, options);
         const i18n = new I18n(translations, restOptions);
         i18n.interpolate = (i18n: I18nJs, str: string, params: Record<string, any>) => {
-            const p = params;
-            params = I18n.flattenObject(params);
-            if (isObj(params) && String(str).includes("This field must be less than or equal ")) {
-                console.log(i18n.placeholder, " is interpolatettttt ", params, str, " is pararrrrrrrrrrrrrrrrr", p);
+            const flattenParams = I18n.flattenObject(params);
+            const formattedValue = this.defaultInterpolator(i18n, str, flattenParams);
+            if (isNonNullString(formattedValue) && formattedValue !== str) {
+                str = formattedValue;
             }
             if (typeof i18nInterpolate == "function") {
-                return i18nInterpolate(i18n, str, params);
+                return i18nInterpolate(i18n, str, flattenParams);
             }
-            return interpolate(i18n, str, params);
+            return str;
         }
         return i18n;
     }
@@ -518,7 +518,21 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         if (!isObj(obj)) return obj;
         return Object.flatten(obj);
     }
-    private static defaultFormatter(value: string, params?: Record<string, any>) {
+
+    /**
+     * Provides a default interpolation function for the I18n instance.
+     * 
+     * If the input `value` is `undefined` or `null`, an empty string is returned.
+     * If the input `value` is not a number, boolean, or string, it is converted to a string using `stringify`.
+     * If the input `params` is not an object, the `value` is returned as-is.
+     * If the input `params` is an object, the `value` is replaced with any matching placeholders in the format `%{key}` using the corresponding values from the `params` object.
+     * 
+     * @param i18n The I18n instance.
+     * @param value The input value to be interpolated.
+     * @param params Optional object containing replacement values for placeholders in the `value`.
+     * @returns The interpolated string.
+     */
+    private static defaultInterpolator(i18n: I18nJs, value: string, params?: Record<string, any>) {
         if (value === undefined || value === null) return "";
         if (!["number", "boolean", "string"].includes(typeof value)) {
             return stringify(value);
@@ -527,79 +541,9 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         if (!isObj(params)) return value;
         if (!params) return value;
         if (!isObj(params) || !params) return value;
-        return value.replace(/{(.*?)}/g, (_, key) => stringify(params[key]));
+        return value.replace(/%{(.*?)}/g, (_, key) => stringify(params[key]));
     }
 
 }
 
 export const i18n = I18n.getInstance();
-
-
-
-function isIterableStructure(value: any): boolean {
-    return (
-        Array.isArray(value) ||
-        value instanceof Set ||
-        value instanceof Map ||
-        value instanceof WeakMap ||
-        value instanceof WeakSet
-    );
-}
-
-function isPrimitive(value: any): value is IPrimitive {
-    return (
-        value === null ||
-        value === undefined ||
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean'
-    );
-}
-
-
-/**
- * This function interpolates the all variables in the given message.
- *
- * @private
- *
- * @param {I18n} i18n The I18n instance.
- *
- * @param {string} message The string containing the placeholders.
- *
- * @param {object} options The source object that will be used as the
- * placeholders' source.
- *
- * @returns {string} The interpolated string.
- */
-function interpolate(
-    i18n: I18nJs,
-    message: string,
-    options: TranslateOptions,
-): string {
-    options = Object.keys(options).reduce((buffer, key) => {
-        buffer[i18n.transformKey(key)] = options[key];
-        return buffer;
-    }, {} as TranslateOptions);
-    const matches = message.match(i18n.placeholder);
-    if (!matches) {
-        return message;
-    }
-    while (matches.length) {
-        let value: string;
-        const placeholder = matches.shift() as string;
-        const name = placeholder.replace(i18n.placeholder, "$1");
-        if ((options[name]) !== undefined && (options[name] !== null)) {
-            value = options[name].toString().replace(/\$/gm, "_#$#_");
-        } else if (name in options) {
-            value = i18n.nullPlaceholder(i18n, placeholder, message, options);
-        } else {
-            value = i18n.missingPlaceholder(i18n, placeholder, message, options);
-        }
-        const regex = new RegExp(
-            placeholder.replace(/\{/gm, "\\{").replace(/\}/gm, "\\}"),
-            "g",
-        );
-        message = message.replace(regex, value);
-    }
-    return message.replace(/_#\$#_/g, "$");
-}

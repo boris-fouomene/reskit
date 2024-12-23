@@ -205,7 +205,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
                 str = formattedValue;
             }
             if (typeof i18nInterpolate == "function") {
-                return i18nInterpolate(i18n, str, flattenParams);
+                return i18nInterpolate(i18n, str, params);
             }
             return str;
         }

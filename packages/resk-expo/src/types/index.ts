@@ -1,3 +1,4 @@
+import { IFormatValueResult } from "@resk/core";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent, PressableProps } from "react-native";
 /**
    @interface
@@ -184,16 +185,17 @@ export type IStyle =
  * This type is generic, allowing for flexibility in the types of values
  * and events that can be passed to the handler.
  *
- * @template IValueType - The type of the value being changed. Defaults to `any`.
- * @template IEventType - The type of the event that triggered the change. 
+ * @extends {Partial<IFormatValueResult>} This extends the `IFormatValueResult` interface, providing additional properties for formatting and parsing values. This includes properties such as `formatValue`
+ * @template ValueType - The type of the value being changed. Defaults to `any`.
+ * @template OnChangeEventType - The type of the event that triggered the change. 
  *                        Defaults to React Native's text input event (`NativeSyntheticEvent<TextInputChangeEventData>) | null`.
  *
- * @property {IEventType} [event] - An optional event object that contains details
+ * @property {OnChangeEventType} [event] - An optional event object that contains details
  *                                   about the change event. This can be useful for 
  *                                   accessing properties such as target value or 
  *                                   other event-specific data.
  *
- * @property {IValueType} [value] - The current value after the change. This 
+ * @property {ValueType} [value] - The current value after the change. This 
  *                                   represents the new state of the input or field 
  *                                   that has changed.
  *
@@ -236,16 +238,16 @@ export type IStyle =
  *   console.log('New value:', options.value);
  *   console.log('Event type:', options.event?.target.value);
  * };
- *
+ * @see {@link IFormatValueResult} for more information on the `IFormatValueResult` interface.
  * @returns {void} - This type does not return any value, as it is typically used 
  *                   as an argument for an event handler function.
  */
 export type IOnChangeOptionsBase<
-  IValueType = any,
-  IEventType = NativeSyntheticEvent<TextInputChangeEventData> | null
-> = {
-  event?: IEventType;
-  value?: IValueType;
+  OnChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null,
+  ValueType = any
+> = Partial<IFormatValueResult> & {
+  event?: OnChangeEventType;
+  value?: ValueType;
   previousValue?: any;
   focused?: boolean;
   fieldName?: string;
@@ -256,17 +258,13 @@ export type IOnChangeOptionsBase<
  * Represents the options for an onChange event handler with extended capabilities.
  * It represents the extended options for onChange events, typically used in TextInput components.
  * This type allows for further customization and extension of the base onChange options.
- *
- * @template IOnChangeOptionsType - Additional properties to extend the base options, defaults to any.
- 
- * @template IEventType - The type of the event that triggered the change. 
+
+ * @template OnChangeEventType - The type of the event that triggered the change. 
  *                        Defaults to The type of the event object, defaults to React Native's text input event `NativeSyntheticEvent<TextInputChangeEventData> | null`.
- * @template IValueType - The type of the value being changed. Defaults to `any`. 
+ * @template ValueType - The type of the value being changed. Defaults to `any`. 
  *
- * @extends {Omit<IOnChangeOptionsBase<IValueType, IEventType>, keyof IOnChangeOptionsType>} 
- * This extends the base options by omitting any properties defined in
- * `IOnChangeOptionsType`, allowing for a flexible structure where users can
- * define their own additional fields.
+ * @extends {IOnChangeOptionsBase<ValueType, OnChangeEventType>} 
+ * This extends the base options
  *
  * @example
  * // Example usage of IOnChangeOptions
@@ -326,10 +324,9 @@ export type IOnChangeOptionsBase<
  *                   as an argument for an event handler function.
  */
 export type IOnChangeOptions<
-  IOnChangeOptionsType = any,
-  IEventType = NativeSyntheticEvent<TextInputChangeEventData> | null,
-  IValueType = any,
-> = Omit<IOnChangeOptionsBase<IValueType, IEventType>, keyof IOnChangeOptionsType> & IOnChangeOptionsType;
+  OnChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null,
+  ValueType = any,
+> = IOnChangeOptionsBase<OnChangeEventType, ValueType>;
 
 
 

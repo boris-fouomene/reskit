@@ -166,7 +166,7 @@ export type ITextInputOnChangeEvent = NativeSyntheticEvent<TextInputChangeEventD
  * @property {boolean} [isFocused] - Indicates whether the text field is isFocused at the time of the change.
  * @property {string} [fieldName] - The name of the field if it's part of a form.
  */
-export type ITextInputOnChangeOptions = IFormatValueResult & IOnChangeOptions<any, ITextInputOnChangeEvent> & {
+export type ITextInputOnChangeOptions = Omit<IOnChangeOptions<ITextInputOnChangeEvent>, "event"> & {
     event?: ITextInputOnChangeEvent;
     value?: any;
     previousValue?: any;
@@ -450,7 +450,7 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
  *   label={<span>Username:</span>}
  * />
  */
-export type IUseTextInputProps = Omit<ITextInputProps, "left" | "right" | "label"> & {
+export type IUseTextInputProps = Omit<Omit<ITextInputProps, "left" | "right" | "label">, "onChange"> & {
     /**
      * The content to render on the left side of the text input.
      * Typically used for icons or buttons.
@@ -506,4 +506,11 @@ export type IUseTextInputProps = Omit<ITextInputProps, "left" | "right" | "label
      * ```
      */
     canRenderLabel: boolean,
+
+    /**
+     * the function called when the text input change
+     * @param event 
+     * @returns 
+     */
+    onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => void
 }

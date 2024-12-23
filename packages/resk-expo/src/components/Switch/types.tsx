@@ -36,11 +36,7 @@ import { IOnChangeOptions } from "@src/types";
  * allows for updating the value of the toggleable component. This function 
  * can accept any type of value, making it versatile for various use cases.
  *
- * @extends {IOnChangeOptions<{
-*   checked: boolean; // A boolean value indicating whether the toggleable component is currently checked (true) or unchecked (false). This property is crucial for determining the current state of the toggleable component.
-*   setChecked: (value: boolean) => void; // A callback function that updates the checked state of the toggleable component. It takes a boolean value as a parameter, where `true` sets the component to checked, and `false` sets it to unchecked.
-*   setValue: (value: any) => any; // A callback function that allows for updating the value of the toggleable component. This function can accept any type of value, making it versatile for various use cases.
-* }>} 
+ * @extends {IOnChangeOptions} 
 * This type extends the `IOnChangeOptions` with specific properties for toggleable inputs.
 *
 * @example
@@ -84,12 +80,12 @@ import { IOnChangeOptions } from "@src/types";
 * @returns {void} - This type does not return any value, as it is typically used 
 *                   as an argument for an event handler function.
 */
-export type IToggleableOnChangeOptions<EventType = GestureResponderEvent> = IOnChangeOptions<{
+export type IToggleableOnChangeOptions<EventType = GestureResponderEvent> = IOnChangeOptions<EventType> & {
     checked: boolean;
     setChecked: (value: boolean) => void;
     setValue: (value: any) => any;
     event?: EventType
-}, EventType>;
+};
 
 
 /**

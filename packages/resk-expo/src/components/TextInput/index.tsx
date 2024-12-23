@@ -483,8 +483,8 @@ const styles = StyleSheet.create({
 
     },
     labelEmbededVariantContainer: {
-        paddingLeft: 3,
-        paddingVertical: 3,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
     },
     labelEmbededVariantLabel: {
         //paddingLeft: 3,

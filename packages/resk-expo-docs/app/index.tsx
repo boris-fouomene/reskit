@@ -1,4 +1,4 @@
-import { Tab, Switch, Checkbox, Button, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
+import { Tab, TextInput, Switch, Checkbox, Button, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
 import { useEffect } from 'react'
 import { withAppBar } from "@resk/expo/build/hooks";
@@ -121,6 +121,28 @@ const index = withAppBar(() => {
                     </View>
                 </Expandable>
                 <ModalExample />
+
+                <TextInput
+                    label="Text Input Label embeded"
+                    variant="labelEmbeded"
+                    left={<>
+                        <Icon iconName="account-circle" />
+                        <Icon iconName="check" />
+                    </>}
+                    right={<>
+                        <Icon iconName="check" />
+                        <Icon iconName="close" />
+                    </>}
+                    onChange={({ value, event }) => {
+                        console.log(value, event, " changed heeein")
+                    }}
+                />
+                <TextInput
+                    label="Text Input Default"
+                    onChange={(event) => {
+                        console.log(event, " changed heeein")
+                    }}
+                />
             </View>
         </ScrollView>
     )

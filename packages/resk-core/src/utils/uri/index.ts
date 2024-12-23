@@ -262,6 +262,6 @@ export const parseURI = (uri: string | null | undefined): {
  * console.log(isValidUrl('not-a-valid-url')); // false
  * console.log(isValidUrl('http://256.256.256.256')); // false (invalid IP address)
  */
-export const isValidUrl = (uri: any): boolean => {
+export const isValidUrl = (uri: any): uri is string => {
   return isNonNullString(uri) && /^(?:\w+:)?\/\/([^\s\.]+\.\S{2}|localhost[\:?\d]*)\S*$/.test(uri);
 };

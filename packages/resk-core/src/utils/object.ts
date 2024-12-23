@@ -1,5 +1,8 @@
-import { IDict } from "../types";
-import { isPlainObject, merge } from "lodash";
+import { IDict, IPrimitive } from "../types";
+import { isPlainObject, isRegExp, merge } from "lodash";
+import isPrimitive from "./isPrimitive";
+import { isDateObj } from "./date";
+import stringify from "./stringify";
 
 /**
  * Checks if the given variable is a plain object.
@@ -354,6 +357,72 @@ declare global {
      * ```
      */
     getSize: (obj: any, breakOnFirstElementFound?: boolean) => number;
+
+    /**
+    * Flattens a nested object structure into a single-level object with dot/bracket notation keys.
+    * Handles various data structures including Arrays, Sets, Maps, and plain objects.
+    * Skips non-primitive values like functions, class instances.
+    * 
+    * @param {any} obj - The object to flatten
+    * @param {string} [prefix=''] - The prefix to use for nested keys
+    * @returns {Record<string, Primitive>} A flattened object with primitive values
+    * 
+    * @example
+    * // Basic object flattening
+    * _flattenObject({
+    *   a: {
+    *     b: 'value',
+    *     c: 42
+    *   }
+    * })
+    * // Returns: { 'a.b': 'value', 'a.c': 42 }
+    * 
+    * @example
+    * // Array handling
+    * _flattenObject({
+    *   items: ['a', 'b', { nested: 'value' }]
+    * })
+    * // Returns: { 'items[0]': 'a', 'items[1]': 'b', 'items[2].nested': 'value' }
+    * 
+    * @example
+    * // Map handling
+    * _flattenObject({
+    *   map: new Map([
+    *     ['key1', 'value1'],
+    *     ['key2', { nested: 'value2' }]
+    *   ])
+    * })
+    * // Returns: { 'map[key1]': 'value1', 'map[key2].nested': 'value2' }
+    * 
+    * @example
+    * // Complex nested structure
+    * _flattenObject({
+    *   array: [1, { a: 2 }],
+    *   set: new Set(['x', { b: 'y' }]),
+    *   map: new Map([['k', { c: 'v' }]]),
+    *   obj: { 
+    *     deep: { 
+    *       nested: 'value',
+    *       fn: () => {}, // Will be skipped
+    *       date: new Date() // Will be skipped
+    *     }
+    *   }
+    * })
+    * // Returns: {
+    * //   'array[0]': 1,
+    * //   'array[1].a': 2,
+    * //   'set[0]': 'x',
+    * //   'set[1].b': 'y',
+    * //   'map[k].c': 'v',
+    * //   'obj.deep.nested': 'value'
+    * // }
+    * 
+    * @throws {Error} Will not throw errors, but silently skips non-primitive values
+    * 
+    * @category Utilities
+    * @since 1.0.0
+    */
+    flatten(obj: any): Record<string, IPrimitive>
   }
 }
 
@@ -383,4 +452,148 @@ export function extendObj(target: any, ...sources: any[]): any {
   return merge(target, ...sources);
 };
 
+
+/**
+     * Flattens a nested object structure into a single-level object with dot/bracket notation keys.
+     * Handles various data structures including Arrays, Sets, Maps, and plain objects.
+     * Skips non-primitive values like functions, class instances.
+     * 
+     * @param {any} obj - The object to flatten
+     * @param {string} [prefix=''] - The prefix to use for nested keys
+     * @returns {Record<string, Primitive>} A flattened object with primitive values
+     * 
+     * @example
+     * // Basic object flattening
+     * _flattenObject({
+     *   a: {
+     *     b: 'value',
+     *     c: 42
+     *   }
+     * })
+     * // Returns: { 'a.b': 'value', 'a.c': 42 }
+     * 
+     * @example
+     * // Array handling
+     * _flattenObject({
+     *   items: ['a', 'b', { nested: 'value' }]
+     * })
+     * // Returns: { 'items[0]': 'a', 'items[1]': 'b', 'items[2].nested': 'value' }
+     * 
+     * @example
+     * // Map handling
+     * _flattenObject({
+     *   map: new Map([
+     *     ['key1', 'value1'],
+     *     ['key2', { nested: 'value2' }]
+     *   ])
+     * })
+     * // Returns: { 'map[key1]': 'value1', 'map[key2].nested': 'value2' }
+     * 
+     * @example
+     * // Complex nested structure
+     * _flattenObject({
+     *   array: [1, { a: 2 }],
+     *   set: new Set(['x', { b: 'y' }]),
+     *   map: new Map([['k', { c: 'v' }]]),
+     *   obj: { 
+     *     deep: { 
+     *       nested: 'value',
+     *       fn: () => {}, // Will be skipped
+     *       date: new Date() // Will be skipped
+     *     }
+     *   }
+     * })
+     * // Returns: {
+     * //   'array[0]': 1,
+     * //   'array[1].a': 2,
+     * //   'set[0]': 'x',
+     * //   'set[1].b': 'y',
+     * //   'map[k].c': 'v',
+     * //   'obj.deep.nested': 'value'
+     * // }
+     * 
+     * @throws {Error} Will not throw errors, but silently skips non-primitive values
+     * 
+     * @category Utilities
+     * @since 1.0.0
+     */
+export function flattenObject(obj: any): Record<string, IPrimitive> {
+  return _flattenObject(obj);
+}
+function _flattenObject(obj: any, prefix: string = '', flattened: Record<string, IPrimitive> = {}): Record<string, IPrimitive> {
+  flattened = isObj(flattened) ? flattened : {};
+  // Handle null/undefined early
+  if (isPrimitive(obj) || isDateObj(obj) || isRegExp(obj)) {
+    if (prefix) {
+      flattened[prefix] = stringify(obj);
+    }
+    return flattened;
+  }
+
+  // Skip if it's a function or a class instance (but not a plain object)
+  if (typeof obj === 'function' || (typeof obj === 'object' && !isObj(obj) && !isIterableStructure(obj))) {
+    return flattened;
+  }
+
+  // Handle Map and WeakMap
+  if (obj instanceof Map || obj instanceof WeakMap) {
+    Array.from((obj as Map<any, any>).entries()).forEach(([mapKey, value]) => {
+      const newKey = prefix
+        ? `${prefix}[${String(mapKey)}]`
+        : String(mapKey);
+      _flattenObject(value, newKey, flattened);
+    });
+    return flattened;
+  }
+
+  // Handle Array, Set, and WeakSet
+  if (Array.isArray(obj) || obj instanceof Set || obj instanceof WeakSet) {
+    const array = Array.isArray(obj) ? obj : Array.from(obj as any);
+    array.forEach((value, index) => {
+      const newKey = prefix
+        ? `${prefix}[${index}]`
+        : String(index);
+      _flattenObject(value, newKey, flattened);
+    });
+    return flattened;
+  }
+
+  // Handle plain objects
+  if (isObj(obj)) {
+    for (const key in obj) {
+      if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+      const value = obj[key];
+      const newKey = prefix
+        ? (prefix.endsWith(']') ? `${prefix}${key}` : `${prefix}.${key}`)
+        : key;
+      _flattenObject(value, newKey, flattened);
+    }
+  }
+  return flattened;
+}
+
+/**
+ * Checks if a value is an iterable data structure (Array, Set, Map, WeakMap, WeakSet).
+ * 
+ * @param {any} value - The value to check
+ * @returns {boolean} True if the value is an iterable structure, false otherwise
+ * 
+ * @example
+ * isIterableStructure([1, 2, 3])           // returns true
+ * isIterableStructure(new Set([1, 2, 3]))  // returns true
+ * isIterableStructure(new Map())           // returns true
+ * isIterableStructure({})                  // returns false
+ */
+export function isIterableStructure(value: any): boolean {
+  return (
+    Array.isArray(value) ||
+    value instanceof Set ||
+    value instanceof Map ||
+    value instanceof WeakMap ||
+    value instanceof WeakSet
+  );
+}
+
+
+Object.flatten = flattenObject;
 Object.clone = cloneObject;

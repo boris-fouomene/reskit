@@ -3,6 +3,42 @@ import { IFilterQuery, IFilterSort } from "./filters";
 import { TranslateOptions } from "i18n-js";
 import { IObservable } from "@utils/observable";
 
+
+/**
+ * @typedef IPrimitive
+ * @description
+ * The `IPrimitive` type represents a union of the basic primitive data types in TypeScript.
+ * It can be one of the following types:
+ * - `string`: Represents textual data.
+ * - `number`: Represents numeric values, both integers and floating-point numbers.
+ * - `boolean`: Represents a logical entity that can have two values: `true` or `false`.
+ *
+ * This type is useful when you want to define a variable or a function parameter that can accept
+ * any of these primitive types, providing flexibility in your code.
+ *
+ * @example
+ * // Example of using IPrimitive in a function
+ * function logValue(value: IPrimitive): void {
+ *     console.log(`The value is: ${value}`);
+ * }
+ *
+ * logValue("Hello, World!"); // Logs: The value is: Hello, World!
+ * logValue(42);               // Logs: The value is: 42
+ * logValue(true);             // Logs: The value is: true
+ *
+ * @example
+ * // Example of using IPrimitive in a variable
+ * let myValue: IPrimitive;
+ * myValue = "A string"; // Valid
+ * myValue = 100;        // Valid
+ * myValue = false;      // Valid
+ * 
+ * // myValue = [];      // Error: Type 'never[]' is not assignable to type 'IPrimitive'.
+ *
+ * @see {@link https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#primitive-types} for more information on primitive types in TypeScript.
+ */
+export type IPrimitive = string | number | boolean;
+
 /**
  * Represents a base field with optional type, label, and name properties.
  * The type property defaults to "text" if not specified.

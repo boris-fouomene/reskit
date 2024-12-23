@@ -14,9 +14,6 @@
       "@session/*": [
         "src/session/*"
       ],
-      "@types/*": [
-        "src/types/*"
-      ],
       "@fields/*": [
         "src/fields/*"
       ],

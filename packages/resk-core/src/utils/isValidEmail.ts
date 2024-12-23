@@ -26,7 +26,7 @@ import isNonNullString from "./isNonNullString";
  * - The regular expression used in this function checks for a variety of valid email formats, including those with special characters and domain specifications.
  * - This function is useful for form validation where email input is required, ensuring that users provide a correctly formatted email address.
  */
-export function isValidEmail(value: any): boolean {
+export function isValidEmail(value: any): value is string {
     if (!isNonNullString(value)) {
         return false;
     }

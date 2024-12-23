@@ -214,7 +214,7 @@ declare global {
      * console.log(date.toFormat("YYYY-MM-DD HH:mm:ss")); // Output: Formatted date string
      * ```
      */
-    toFormat: (format: IMomentFormat) => string;
+    toFormat: (format?: IMomentFormat) => string;
   }
 }
 
@@ -232,7 +232,7 @@ declare global {
  * console.log(isDateObj("2022-01-01")); // Output: false
  * ```
  */
-export function isDateObj(dateObj: any): boolean {
+export function isDateObj(dateObj: any): dateObj is Date {
   /**
    * If the object is null or not an object, return false.
    * 
@@ -1307,7 +1307,7 @@ export const formatDate = (date?: any, format?: IMomentFormat): string => {
    * 
    * This allows us to handle various date formats and invalid dates.
    */
-  const parsedDate = isDateObj(date) ? date : moment(date);
+  const parsedDate = moment(date);
 
   /**
    * Check if the parsed date is valid.
@@ -1343,6 +1343,6 @@ export const formatDate = (date?: any, format?: IMomentFormat): string => {
  * console.log(date.toFormat("YYYY-MM-DD HH:mm:ss")); // Output: Formatted date string
  * ```
  */
-Date.prototype.toFormat = function (format: IMomentFormat) {
+Date.prototype.toFormat = function (format?: IMomentFormat) {
   return formatDate(this, format);
 }

@@ -92,7 +92,7 @@ export interface IObservable<EventType extends string = string> {
   off: (event: EventType, fn: IObservableCallback) => IObservable<EventType>;
   trigger: (event: EventType | IObservableAllEventType, ...args: any[]) => IObservable<EventType>;
   offAll: () => IObservable<EventType>;
-  one: (event: EventType, fn: IObservableCallback) => { remove: () => any };
+  once: (event: EventType, fn: IObservableCallback) => { remove: () => any };
   getEventCallBacks: () => IObservableCallbacks<EventType>;
 }
 
@@ -198,7 +198,7 @@ export const observableFactory = function <EventType extends string = string>():
      * @param {IObservableCallback} fn - The callback function to execute.
      * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
      */
-    one: function (event: EventType, fn: IObservableCallback) {
+    once: function (event: EventType, fn: IObservableCallback) {
       const on = (...args: any[]) => {
         this.off(event, on);
         fn.apply(this, args);
@@ -437,8 +437,8 @@ export const observable = function <EventType extends string = string>(element: 
      * @param {IObservableCallback} fn - The callback function to execute.
      * @returns {{ remove: () => any }} An object with a `remove` method to remove the callback.
      */
-    one: {
-      value: obj.one.bind(context),
+    once: {
+      value: obj.once.bind(context),
     },
 
     /**
@@ -599,13 +599,13 @@ export class ObservableClass<EventType extends string = string> implements IObse
    * 
    * @example
    * ```typescript
-   * const subscription = observable.one("dataLoaded", () => {
+   * const subscription = observable.once("dataLoaded", () => {
    *   console.log("Data has been loaded.");
    * });
    * ```
    */
-  one(event: EventType, fn: IObservableCallback): { remove: () => any } {
-    return this._observable.one.call(this, event, fn);
+  once(event: EventType, fn: IObservableCallback): { remove: () => any } {
+    return this._observable.once.call(this, event, fn);
   }
 
   /**

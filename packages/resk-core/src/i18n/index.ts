@@ -3,10 +3,11 @@ import { I18nEvent, II18nTranslation } from "../types/i18n";
 import { extendObj, isObj } from "@utils/object";
 import { IObservable, IObservableCallback, observableFactory } from "@utils/observable";
 import "reflect-metadata";
-import { Dict, I18n as I18nJs, I18nOptions } from "i18n-js";
+import { Dict, I18n as I18nJs, I18nOptions, TranslateOptions } from "i18n-js";
 import defaultStr from "@utils/defaultStr";
 import stringify from "@utils/stringify";
 import session from "@session/index";
+import { IPrimitive } from "../types/index";
 
 /**
  * A key to store metadata for translations.
@@ -139,8 +140,8 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     * @param fn The callback function to be invoked.
     * @returns An object containing a remove method to unsubscribe from the event.
     */
-    one(event: I18nEvent, fn: IObservableCallback) {
-        return this._observableFactory?.one.call(this, event, fn);
+    once(event: I18nEvent, fn: IObservableCallback) {
+        return this._observableFactory?.once.call(this, event, fn);
     }
     /**
      * Retrieves all registered event callbacks.
@@ -153,11 +154,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * Retrieves the singleton instance of the I18n class.
      * @returns The singleton I18n instance.
      */
-    static getInstance(): I18n {
+    static getInstance(options?: I18nOptions): I18n {
         if (!I18n.instance) {
             const locale = I18n.getLocaleFromSession();
-            const options = locale ? { locale } : undefined;
-            I18n.instance = new I18n({}, options);
+            I18n.instance = this.createInstance({}, Object.assign({}, locale ? { locale } : {}, options));
         }
         return I18n.instance;
     }
@@ -195,8 +195,20 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * @param options Optional configuration options for the I18n instance.
      * @returns A new I18n instance.
      */
-    static createInstance(...args: any[]): I18n {
-        const i18n = new I18n(...args);
+    static createInstance(translations: II18nTranslation = {}, options: Partial<I18nOptions> & { interpolate?: (i18n: I18nJs, str: string, params: Record<string, any>) => string } = {}): I18n {
+        const { interpolate: i18nInterpolate, ...restOptions } = Object.assign({}, options);
+        const i18n = new I18n(translations, restOptions);
+        i18n.interpolate = (i18n: I18nJs, str: string, params: Record<string, any>) => {
+            const p = params;
+            params = I18n.flattenObject(params);
+            if (isObj(params) && String(str).includes("This field must be less than or equal ")) {
+                console.log(i18n.placeholder, " is interpolatettttt ", params, str, " is pararrrrrrrrrrrrrrrrr", p);
+            }
+            if (typeof i18nInterpolate == "function") {
+                return i18nInterpolate(i18n, str, params);
+            }
+            return interpolate(i18n, str, params);
+        }
         return i18n;
     }
 
@@ -359,8 +371,27 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * If this is the default i18n instance, it will also set the locale in the session.
      * @param locale - The new locale to set.
      */
-    setLocale(locale: string) {
+    setLocale(locale: string): Promise<II18nTranslation> {
         this.locale = locale;
+        return new Promise((resolve, reject) => {
+            let hasResolved = false;
+            const _resolve = (translations: II18nTranslation) => {
+                if (!hasResolved) {
+                    hasResolved = true;
+                    resolve(this.getTranslations());
+                }
+            };
+            if (!this.isLoading()) {
+                resolve(this.getTranslations());
+            } else {
+                this.once("locale-changed", (locale, translations) => {
+                    _resolve(translations);
+                });
+                this.once("namespace-loaded", (namespace, locale, translations) => {
+                    _resolve(translations);
+                });
+            };
+        });
     }
     /**
      * Register a namespace resolver.
@@ -455,8 +486,8 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         this._isLoading = true;
         for (const namespace in this.namespaceResolvers) {
             if (this.namespaceResolvers.hasOwnProperty(namespace) && typeof this.namespaceResolvers[namespace] === "function") {
-                namespaces.push(this.namespaceResolvers[namespace](locale).then((translations) => {
-                    extendObj(translations, translations);
+                namespaces.push(this.namespaceResolvers[namespace](locale).then((trs) => {
+                    extendObj(translations, trs);
                 }));
             }
         }
@@ -466,7 +497,9 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
             if (updateTranslations !== false) {
                 this.store(dict);
             }
-            this.trigger("namespaces-loaded", locale, dict);
+            setTimeout(() => {
+                this.trigger("namespaces-loaded", locale, dict);
+            }, 100);
             return dict;
         }).finally(() => {
             this._isLoading = false;
@@ -481,6 +514,10 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     static LoadNamespaces(locale?: string, updateTranslations: boolean = true): Promise<II18nTranslation> {
         return I18n.getInstance().loadNamespaces(locale, updateTranslations);
     }
+    static flattenObject(obj: any): TranslateOptions {
+        if (!isObj(obj)) return obj;
+        return Object.flatten(obj);
+    }
     private static defaultFormatter(value: string, params?: Record<string, any>) {
         if (value === undefined || value === null) return "";
         if (!["number", "boolean", "string"].includes(typeof value)) {
@@ -492,6 +529,77 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         if (!isObj(params) || !params) return value;
         return value.replace(/{(.*?)}/g, (_, key) => stringify(params[key]));
     }
+
 }
 
 export const i18n = I18n.getInstance();
+
+
+
+function isIterableStructure(value: any): boolean {
+    return (
+        Array.isArray(value) ||
+        value instanceof Set ||
+        value instanceof Map ||
+        value instanceof WeakMap ||
+        value instanceof WeakSet
+    );
+}
+
+function isPrimitive(value: any): value is IPrimitive {
+    return (
+        value === null ||
+        value === undefined ||
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean'
+    );
+}
+
+
+/**
+ * This function interpolates the all variables in the given message.
+ *
+ * @private
+ *
+ * @param {I18n} i18n The I18n instance.
+ *
+ * @param {string} message The string containing the placeholders.
+ *
+ * @param {object} options The source object that will be used as the
+ * placeholders' source.
+ *
+ * @returns {string} The interpolated string.
+ */
+function interpolate(
+    i18n: I18nJs,
+    message: string,
+    options: TranslateOptions,
+): string {
+    options = Object.keys(options).reduce((buffer, key) => {
+        buffer[i18n.transformKey(key)] = options[key];
+        return buffer;
+    }, {} as TranslateOptions);
+    const matches = message.match(i18n.placeholder);
+    if (!matches) {
+        return message;
+    }
+    while (matches.length) {
+        let value: string;
+        const placeholder = matches.shift() as string;
+        const name = placeholder.replace(i18n.placeholder, "$1");
+        if ((options[name]) !== undefined && (options[name] !== null)) {
+            value = options[name].toString().replace(/\$/gm, "_#$#_");
+        } else if (name in options) {
+            value = i18n.nullPlaceholder(i18n, placeholder, message, options);
+        } else {
+            value = i18n.missingPlaceholder(i18n, placeholder, message, options);
+        }
+        const regex = new RegExp(
+            placeholder.replace(/\{/gm, "\\{").replace(/\}/gm, "\\}"),
+            "g",
+        );
+        message = message.replace(regex, value);
+    }
+    return message.replace(/_#\$#_/g, "$");
+}

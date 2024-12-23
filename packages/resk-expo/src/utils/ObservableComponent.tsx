@@ -88,8 +88,8 @@ export default class Component<IProps = unknown, IState = unknown, ObservableEve
    * @param fn - The callback function to be invoked.
    * @returns An object containing a remove method to unsubscribe from the event.
    */
-  one(event: ObservableEventType, fn: IObservableCallback): { remove: () => any } {
-    return this._observable.one.call(this, event, fn);
+  once(event: ObservableEventType, fn: IObservableCallback): { remove: () => any } {
+    return this._observable.once.call(this, event, fn);
   }
 
   /**

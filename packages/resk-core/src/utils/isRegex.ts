@@ -14,7 +14,7 @@ import { isRegExp as _isRegexP } from "lodash";
  * console.log(isRegExp({})); // Output: false
  * ```
  */
-export default function isRegExp(regExp: any): boolean {
+export default function isRegExp(regExp: any): regExp is RegExp {
   /**
    * If the value is an instance of the RegExp constructor, it's a regular expression.
    */

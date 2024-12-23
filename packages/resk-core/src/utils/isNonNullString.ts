@@ -18,5 +18,5 @@ export default function isNonNullString(val: any): val is string {
   /**
    * Check if the value is not null and is a string.
    */
-  return val && typeof val === 'string';
+  return val && typeof val === 'string' ? true : false;
 }

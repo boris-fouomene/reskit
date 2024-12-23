@@ -517,15 +517,15 @@ export function extendObj(target: any, ...sources: any[]): any {
      * @category Utilities
      * @since 1.0.0
      */
-export function flattenObject(obj: any): Record<string, IPrimitive> {
+export function flattenObject(obj: any): Record<string, any> {
   return _flattenObject(obj);
 }
-function _flattenObject(obj: any, prefix: string = '', flattened: Record<string, IPrimitive> = {}): Record<string, IPrimitive> {
+function _flattenObject(obj: any, prefix: string = '', flattened: Record<string, any> = {}): Record<string, IPrimitive> {
   flattened = isObj(flattened) ? flattened : {};
   // Handle null/undefined early
   if (isPrimitive(obj) || isDateObj(obj) || isRegExp(obj)) {
     if (prefix) {
-      flattened[prefix] = stringify(obj);
+      flattened[prefix] = obj;
     }
     return flattened;
   }
@@ -564,7 +564,7 @@ function _flattenObject(obj: any, prefix: string = '', flattened: Record<string,
       if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
       const value = obj[key];
       const newKey = prefix
-        ? (prefix.endsWith(']') ? `${prefix}${key}` : `${prefix}.${key}`)
+        ? (prefix.endsWith(']') ? `${prefix}.${key}` : `${prefix}.${key}`)
         : key;
       _flattenObject(value, newKey, flattened);
     }

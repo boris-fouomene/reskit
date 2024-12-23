@@ -748,7 +748,7 @@ export function addToDate(days: number, date?: any, setFunction?: string): Date 
   if (isNonNullString(setFunction) && typeof date['set' + setFunction] === "function" && typeof date['get' + setFunction] === "function") {
     const set = 'set' + setFunction;
     const get = 'get' + setFunction;
-    date = date[set](date[get]() + days);
+    date = new Date(date[set](date[get]() + days));
   }
   return date;
 }
@@ -865,25 +865,24 @@ export function parseDate(date: any, format?: IMomentFormat): Date | null {
    */
   if (isEmpty(date)) return null;
 
-  /**
-   * Attempt to parse the date using the Moment.js library.
-   */
-  const parsedDate = moment(date, format);
-
-  /**
-   * Check if the parsed date is valid.
-   */
-  if (parsedDate?.isValid()) {
+  try {
     /**
-     * If the date is valid, return it as a Date object.
+     * Attempt to parse the date using the Moment.js library.
      */
-    return parsedDate.toDate();
-  } else {
-    /**
-     * If the date is not valid, return null.
-     */
-    return null;
+    const parsedDate = moment(date, format);
+    /* Check if the parsed date is valid.
+    */
+    if (parsedDate?.isValid()) {
+      /**
+        * If the date is valid, return it as a Date object.
+        */
+      return parsedDate.toDate();
+    }
+  } catch (error) {
+    console.error(error, " parsing date with moment : ", date, " format is : ", format);
   }
+  return null;
+
 }
 
 /**
@@ -894,6 +893,7 @@ export function parseDate(date: any, format?: IMomentFormat): Date | null {
  * @returns {boolean} True if the date is valid, false otherwise.
  */
 export const isValidDate = function (sDate: any, format?: IMomentFormat): boolean {
+  if (sDate === null || sDate === undefined) return false;
   /**
    * If the input is a boolean, it's not a valid date.
    */

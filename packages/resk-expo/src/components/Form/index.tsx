@@ -1,3 +1,4 @@
-import { FormBase } from "./FormBase";
+import { Form } from "./Form";
+import { FormsManager } from "./FormsManager";
 
-export class Form extends FormBase { }
+export { Form, FormsManager };

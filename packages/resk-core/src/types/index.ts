@@ -727,9 +727,9 @@ export interface IResource<DataType = any, PrimaryKeyType extends IResourcePrima
 
   /**
    * Returns the actions associated with the resource.
-   * @returns {IResourceActionMap} The actions associated with the resource.
+   * @returns {Partial<IResourceActionMap>} The actions associated with the resource.
    */
-  actions?: IResourceActionMap;
+  actions?: Partial<IResourceActionMap>;
 }
 
 /**
@@ -813,9 +813,9 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
    * If the actions are not already defined or not an object, 
    * it initializes them as an empty object of type `IResourceActionMap`.
    *
-   * @returns {IResourceActionMap} The map of resource actions.
+   * @returns {Partial<IResourceActionMap>} The map of resource actions.
    */
-  getActions: () => IResourceActionMap;
+  getActions: () => Partial<IResourceActionMap>;
 
   /**
    * Determines if the given permission is allowed for the specified user.

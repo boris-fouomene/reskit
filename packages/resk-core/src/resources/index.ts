@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { IDict, IResourceName, IField, IResourceInstance, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceFetchOptions, IResourcePaginatedResult, II18nTranslation } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory } from '../utils/index';

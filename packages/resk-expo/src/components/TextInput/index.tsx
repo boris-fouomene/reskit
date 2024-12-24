@@ -83,7 +83,7 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
     return <View  {...containerProps}>
         {isLabelEmbededVariant ? null : labelContent}
         <View {...contentContainerProps}>
-            {left || isLabelEmbededVariant && !isEmpty(label) ? <View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, leftContainerProps.style]}>
+            {left || isLabelEmbededVariant && !isEmpty(label) ? <View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, leftContainerProps.style]}>
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
             </View> : null}
@@ -392,7 +392,7 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
             }
         },
         left,
-        right: (right || canToggleSecure || affixContent) ? <View testID={`${testID}-right-container`} {...rightContainerProps} style={[styles.leftOrRightContainer, disabledOrEditStyle, rightContainerProps.style]}>
+        right: (right || canToggleSecure || affixContent) ? <View testID={`${testID}-right-container`} {...rightContainerProps} style={[styles.leftOrRightContainer, styles.rightContainer, disabledOrEditStyle, rightContainerProps.style]}>
             {affixContent}
             {right}
             {editable || disabled !== false && isPasswordField ? secureIcon : null}
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
         top: 0,
     },
     rightContainer: {
-        justifyContent: "center",
+        paddingRight: 5,
     },
     container: {
         flexDirection: "column",
@@ -469,6 +469,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         position: "relative",
+    },
+    leftContainer: {
+        paddingLeft: 5,
     },
     leftOrRightContainer: {
         display: "flex",

@@ -14,22 +14,24 @@
  * ```
  */
 export default function isClass(variable: any): boolean {
-  /**
-   * Check if the value is a function.
-   */
-  if (typeof variable !== 'function') {
+  if (variable === null || variable === undefined) {
     return false;
   }
-
-  /**
-   * Check if the value has a prototype.
-   */
-  if (!variable.prototype) {
-    return false;
+  // Handle class constructors
+  if (typeof variable === 'function') {
+    const str = variable.toString();
+    return str.startsWith('class') || str.includes('_classCallCheck');
   }
+  // Handle class instances
+  if (typeof variable === 'object') {
+    const proto = Object.getPrototypeOf(variable);
+    if (!proto || proto === Object.prototype) return false;
 
-  /**
-   * Check if the prototype's constructor is the same as the value itself.
-   */
-  return variable.prototype.constructor === variable;
+    const constructor = proto.constructor;
+    if (!constructor) return false;
+
+    const str = constructor.toString();
+    return str.startsWith('class') || str.includes('_classCallCheck');
+  }
+  return false;
 }

@@ -1,5 +1,5 @@
 import { IValidatorRule, IValidatorRuleOptions, IValidatorRulesOptions, IValidatorRuleSeparator, IValidatorRulesMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult } from "./types";
-import { isNonNullString, isObj, isPromise, stringify } from "@utils/index";
+import { isNonNullString, isObj, stringify } from "@utils/index";
 import { i18n } from "../i18n";
 const RULE_SEPARATOR: IValidatorRuleSeparator = "|";
 
@@ -70,24 +70,22 @@ export class Validator {
    * @param handler The validation function.
    */
   static registerRule<ParamType = Array<any>>(name: IValidatorRuleName, handler: IValidatorRuleFunction<ParamType>): void {
-    const rules = this.validationRules;
+    const rules = Validator.getRules();
     if (typeof handler == "function") {
       (rules as any)[name] = handler as IValidatorRuleFunction<ParamType>;
     }
-    Reflect.defineMetadata(this.RULES_METADATA_KEY, rules, this);
-  }
-  static getRules(): IValidatorRulesMap {
-    return this.validationRules;
+    Reflect.defineMetadata(Validator.RULES_METADATA_KEY, rules, Validator);
   }
   /**
    * A static getter that returns a record of validation rules.
    * 
    * @returns {IValidatorRulesMap} An object containing validation rules.
    */
-  static get validationRules(): IValidatorRulesMap {
-    const rules = Reflect.getMetadata(this.RULES_METADATA_KEY, this);
+  static getRules(): IValidatorRulesMap {
+    const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
     return isObj(rules) ? rules : {};
   }
+
   /**
    * Retrieves a validation rule by its name.
    * 
@@ -96,7 +94,8 @@ export class Validator {
    */
   static getRule<ParamType = Array<any>>(rulesName: IValidatorRuleName): IValidatorRuleFunction<ParamType> | undefined {
     if (!isNonNullString(rulesName)) return undefined;
-    return this.validationRules[rulesName] as IValidatorRuleFunction<ParamType> | undefined;
+    const rules = Validator.getRules();
+    return rules[rulesName] as IValidatorRuleFunction<ParamType> | undefined;
   }
   /**
    * Sanitizes a set of validation rules and returns an array of rules.
@@ -167,8 +166,9 @@ export class Validator {
    * ```
    */
   static validate({ rules, value, ...extra }: IValidatorRuleOptions) {
-    rules = this.sanitizeRules(rules);
+    rules = Validator.sanitizeRules(rules);
     if (!rules.length) return Promise.resolve(true);
+    const mainRuleParams = Array.isArray(extra.ruleParams) ? extra.ruleParams : [];
     const i18nRulesOptions = {
       ...extra,
       value,
@@ -178,13 +178,13 @@ export class Validator {
       setTimeout(() => {
         let index = -1;
         const rulesLength = rules.length;
-        const next = function (): any {
+        const next = async function (): Promise<any> {
           index++;
           if (index >= rulesLength) {
             return resolve({ value, rules, ...extra });
           }
           const rule = (rules as any)[index];
-          const ruleParams: any[] = [];
+          const ruleParams: any[] = [...mainRuleParams];
           let ruleFunc: IValidatorRule | undefined = typeof rule === "function" ? rule : undefined;
           if (typeof rule === "string") {
             if (!rule) {
@@ -206,28 +206,20 @@ export class Validator {
           if (typeof ruleFunc !== "function") {
             return reject({ ...valResult, message: i18n.t("validator.invalidRule", i18nRuleOptions) });
           }
-          let r = undefined;
-          try {
-            r = ruleFunc({ ...extra, rule, rules, ruleParams, value });
-          } catch (e) {
-            r = typeof e === "string" ? e : (e as any)?.message || e?.toString() || stringify(e);
-          }
-          if (typeof r === "string" || r === false) {
-            return reject({ ...valResult, message: r ? String(r) : i18n.t("validator.invalidMessage", i18nRuleOptions), value, rules, rule });
-          } else if (isPromise(r)) {
-            return Promise.resolve(r)
-              .then((a: any) => {
-                return next();
-              })
-              .catch((e: any) => {
-                return reject({
-                  ...valResult,
-                  message: typeof e === "string" ? e : e?.message || e?.toString() || stringify(e),
-                  error: e,
-                });
-              });
-          } else {
+          const handleResult = (result: any) => {
+            result = typeof result === "string" ? (isNonNullString(result) ? result : i18n.t("validator.invalidMessage", i18nRuleOptions)) : result;
+            if (result === false) {
+              return reject({ ...valResult, message: i18n.t("validator.invalidMessage", i18nRuleOptions) });
+            } else if (isNonNullString(result)) {
+              return reject({ ...valResult, message: result });
+            }
             return next();
+          };
+          try {
+            const result = await ruleFunc({ ...extra, rule, rules, ruleParams, value });
+            return handleResult(result);
+          } catch (e) {
+            return handleResult(typeof e === "string" ? e : (e as any)?.message || e?.toString() || stringify(e));
           }
         };
         return next();

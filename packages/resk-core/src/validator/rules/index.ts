@@ -1,7 +1,7 @@
 
 import { isNumber } from "lodash";
 import { IValidatorResult, IValidatorRuleOptions } from "../types";
-import { defaultStr, isEmpty, isNonNullString, isValidUrl, isValidEmail } from "@utils/index";
+import { defaultStr, isEmpty, isNonNullString, isValidUrl, isValidEmail, isStringNumber } from "@utils/index";
 import { Validator } from "../validator";
 import { i18n } from "../../i18n";
 
@@ -32,12 +32,12 @@ function compareNumer(compare: (value: any, toCompare: any) => boolean, translat
     const rParams = ruleParams ? ruleParams : [];
     translateKey = defaultStr(translateKey);
     const message = i18n.t(translateKey, { ...rest, value, ruleParams });
-    value = typeof value === 'number' ? value : parseFloat(value);
+    value = typeof value === 'number' ? value : isStringNumber(value) ? parseFloat(value) : NaN;
     return new Promise((resolve, reject) => {
         if (isNaN(value) || rParams[0] === undefined) {
             return resolve(message);
         }
-        const toCompare = typeof rParams[0] === 'number' ? rParams[0] : parseFloat(rParams[0]);
+        const toCompare = typeof rParams[0] === 'number' ? rParams[0] : isStringNumber(rParams[0]) ? parseFloat(rParams[0]) : NaN;
         if (isNaN(toCompare)) {
             return reject(message);
         }

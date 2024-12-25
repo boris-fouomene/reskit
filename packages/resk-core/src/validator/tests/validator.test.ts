@@ -1,12 +1,9 @@
-import { Validator } from "../validator";
 import { IValidatorRuleFunction, IValidatorRuleName } from "../types";
+import { i18n } from "../../i18n";
+import "../../translations";
+import { Validator } from "../index";
 
 describe("Validator", () => {
-    beforeEach(() => {
-        // Clear all registered rules before each test
-        Reflect.defineMetadata(Validator["RULES_METADATA_KEY"], {}, Validator);
-    });
-
     describe("registerRule", () => {
         it("should register a new validation rule", () => {
             const ruleName = "isEven";
@@ -106,6 +103,80 @@ describe("Validator", () => {
             });
 
             expect(result).toBe(true);
+        });
+    });
+
+    describe("validator invalid rules", () => {
+        it("should throw an error for an invalid rule", async () => {
+            await expect(
+                Validator.validate({
+                    rules: "invalidRule",
+                    value: "test",
+                })
+            ).rejects.toMatchObject({ message: i18n.t("validator.invalidRule", { rule: "invalidRule" }) });
+        });
+        it("should throw an error for invalid numberLessThanOrEquals rule", async () => {
+            const options = {
+                rules: "numberLessThanOrEquals",
+                value: "test",
+                ruleParams: [10],
+            };
+            await expect(
+                Validator.validate(options)
+            ).rejects.toMatchObject({ message: i18n.t("validator.numberLessThanOrEquals", options) });
+        });
+        it("should throw an error for invalid numberLessThan rule", async () => {
+            await expect(
+                Validator.validate({
+                    rules: "numberLessThan",
+                    value: "test",
+                    ruleParams: [10],
+                })
+            ).rejects.toMatchObject({ message: "This field must be less than 10" });
+        });
+        it("should throw an error for invalid numberGreaterThanOrEquals rule", async () => {
+            await expect(
+                Validator.validate({
+                    rules: "numberGreaterThanOrEquals",
+                    value: "test",
+                    ruleParams: [10],
+                })
+            ).rejects.toMatchObject({ message: "This field must be greater than or equal to 10" });
+        });
+        it("should throw an error for invalid numberGreaterThan rule", async () => {
+            await expect(
+                Validator.validate({
+                    rules: "numberGreaterThan",
+                    value: "test",
+                    ruleParams: [10],
+                })
+            ).rejects.toMatchObject({ message: "This field must be greater than 10" });
+        });
+        it("should throw an error for invalid numberEquals rule", async () => {
+            await expect(
+                Validator.validate({
+                    rules: "numberEquals",
+                    value: "test",
+                    ruleParams: [10],
+                })
+            ).rejects.toMatchObject({ message: "This field must be equal to 10" });
+        });
+        it("Sould reject from a promise", async () => {
+            const errorMessage = "This is an example of a promise rejection";
+            Validator.registerRule("promise" as IValidatorRuleName, async () => {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        reject(errorMessage);
+                    }, 100);
+                });
+            });
+            await expect(
+                Validator.validate({
+                    rules: "promise" as IValidatorRuleName,
+                    value: "test",
+                    ruleParams: [10],
+                })
+            ).rejects.toMatchObject({ message: errorMessage });
         });
     });
 });

@@ -1,7 +1,7 @@
 import { IDict, IResourceName, IField, IResourceInstance, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceFetchOptions, IResourcePaginatedResult, II18nTranslation } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory } from '../utils/index';
-import { IConstructor } from '../types/index';
+import { IConstructor, IProtectedResource } from '../types/index';
 import { IAuthPerm, IAuthUser } from '@/auth/types';
 import { isAllowed } from '../auth/perms';
 import { i18n, I18n } from '@/i18n';
@@ -903,6 +903,35 @@ export class ResourcesManager {
    */
   public static getResources(): Record<IResourceName, ResourceBase> {
     return this.resources;
+  }
+
+  /**
+ * Checks if a resource is allowed for the given user and permissions.
+ *
+ * This static method retrieves the resource based on the provided `resourceName` and checks if the
+ * user is allowed to perform the specified `perm` action on the resource. If the resource is not
+ * found or the user is not allowed, the method returns `false`.
+ *
+ * @param options - An object containing the resource name and the required permission.
+ * @param user - An optional user object to check the permissions against.
+ * @returns `true` if the user is allowed to perform the specified action on the resource, `false` otherwise.
+ * @example
+ * // Example usage of the isAllowed method
+ * const user = { id: 1, perms: { documents: ['read', 'create'] } };
+ * const resourceName = 'documents';
+ * const perm = 'read';
+ * const isAllowed = ResourcesManager.isAllowed({ resourceName, perm }, user);
+ * console.log(isAllowed); // Output: true
+ */
+  static isAllowed(options: IProtectedResource, user?: IAuthUser): boolean {
+    if (!isObj(options)) return false;
+    if (options?.resourceName && isNonNullString(options?.resourceName)) {
+      const resource = ResourcesManager.getResource(options?.resourceName);
+      if (resource) {
+        return resource.isAllowed(options?.perm as IAuthPerm, user);
+      }
+    }
+    return isAllowed(options?.perm, user);
   }
 }
 

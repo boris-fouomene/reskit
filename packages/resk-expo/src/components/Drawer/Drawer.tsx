@@ -16,7 +16,7 @@ import FontIcon from "@components/Icon/Font";
 import { Tooltip } from "@components/Tooltip";
 import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProviderProps, IDrawerState, IDrawerCurrentState, IDrawerEvent } from "./types";
 import { DrawerContext } from "./hooks";
-import { addDimensionsListener } from "@dimensions";
+import { dimentionAddListener } from "@dimensions";
 import { IDimensions } from "@dimensions/types";
 import { useReskExpo } from "@src/context/hooks";
 
@@ -277,7 +277,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * @private
    */
   _backdropRef: any = React.createRef();
-  readonly _dimensionChangedListener = addDimensionsListener(this._onDimensionsChanged.bind(this));
+  readonly _dimensionChangedListener = dimentionAddListener(this._onDimensionsChanged.bind(this));
   constructor(props: IDrawerProps) {
     super(props);
     const isProvider = !!props.isProvider;

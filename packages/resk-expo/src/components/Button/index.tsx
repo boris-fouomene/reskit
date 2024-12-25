@@ -286,7 +286,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 styles.icon,
                 styles[`icon${compact ? 'Compact' : ''}`],
             ];
-    if (!isAllowed(rest)) return null;
+    if (!ResourcesManager.isAllowed(rest)) return null;
     const fullWidthStyle = fullWidth ? styles.fullWidth : null;
     const compactStyle = compact ? styles.compact : null;
     const hasRightContent = (iconPosition == "right" && iconContent) || (isValidElement(right) && right);
@@ -484,16 +484,5 @@ export const ButtonContext = React.createContext<IButtonContext>({} as IButtonCo
  */
 export const useButton = () => React.useContext(ButtonContext) || {};
 
-
-const isAllowed = (options: { perm?: IAuthPerm, resourceName?: IResourceName }, user?: IAuthUser): boolean => {
-    if (!isObj(options)) return false;
-    if (options?.resourceName && isNonNullString(options?.resourceName)) {
-        const resource = ResourcesManager.getResource(options?.resourceName);
-        if (resource) {
-            return resource.isAllowed(options?.perm as IAuthPerm, user);
-        }
-    }
-    return Auth.isAllowed(options?.perm, user);
-}
 
 export * from "./types";

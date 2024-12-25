@@ -7,6 +7,7 @@ import { IStyle } from "../../types";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, ScrollViewProps, ViewProps } from "react-native";
 import { IThemeColorTokenKey } from "@theme/types";
+import { IProtectedResource } from "@resk/core";
 
 /**
  * Represents the properties for a Tab component.
@@ -57,6 +58,7 @@ export type ITabProps = Omit<ISwiperProps, "onChange"> & {
 
 
 /**
+ * @interface ITabItemProps
  * Interface representing the properties for the TabItem component.
  * 
  * The `ITabItemProps` type extends the properties of the `ITouchableRippleProps`
@@ -64,18 +66,12 @@ export type ITabProps = Omit<ISwiperProps, "onChange"> & {
  * structure of the props that can be passed to the `TabItem` component, allowing
  * for customization of its appearance and behavior.
  * 
- * @interface ITabItemProps
  * @extends ITouchableRippleProps
+ * @extends IProtectedResource
+ * @see {@link ITouchableRippleProps} for the `ITouchableRippleProps` type.
+ * @see {@link IProtectedResource} for the `IProtectedResource` type.
  */
-export type ITabItemProps = Omit<ITouchableRippleProps, "children" | "style"> & {
-    /**
-     * Function to determine if the TabItem should be rendered based on the provided options.
-     * 
-     * @param {ITabItemProps} options - The options for determining renderability.
-     * @returns {boolean} Returns true if the TabItem should be rendered, false otherwise.
-     */
-    renderable?: ((options: ITabItemProps) => boolean) | false;
-
+export type ITabItemProps = Omit<ITouchableRippleProps, "children" | "style"> & IProtectedResource & {
     /**
      * Additional properties for customizing the label component.
      */
@@ -157,6 +153,11 @@ export type ITabItemProps = Omit<ITouchableRippleProps, "children" | "style"> & 
      * @type {IStyle}
      */
     style?: IStyle;
+
+    /***
+     * The key of the tab item
+     */
+    tabItemKey?: string;
 }
 
 

@@ -165,9 +165,9 @@ export class Validator {
    * });
    * ```
    */
-  static validate({ rules, value, ...extra }: IValidatorRuleOptions) {
+  static validate({ rules, value, ...extra }: IValidatorRuleOptions): Promise<IValidatorRuleOptions> {
     rules = Validator.sanitizeRules(rules);
-    if (!rules.length) return Promise.resolve(true);
+    if (!rules.length) return Promise.resolve({ rules, value, ...extra });
     const mainRuleParams = Array.isArray(extra.ruleParams) ? extra.ruleParams : [];
     const i18nRulesOptions = {
       ...extra,

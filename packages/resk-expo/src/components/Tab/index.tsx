@@ -6,7 +6,7 @@ import TabItem from "./TabItem";
 import TabContent from "./TabContent";
 import Session from "@session";
 import isValidElement from "@utils/isValidElement";
-import { isNonNullString, defaultStr, isObj, IDict } from "@resk/core";
+import { isNonNullString, defaultStr, isObj, IDict, ResourcesManager } from "@resk/core";
 import { isNumber } from "lodash";
 import Theme, { Colors, useTheme } from "@theme/index";
 import { ITabItemProps, ITabProps } from "./types";
@@ -154,11 +154,11 @@ const Tab = (props: ITabProps) => {
         React.Children.map(children, (child, index) => {
             if (!isObj(child)) return null;
             const _child: React.ReactElement = child as React.ReactElement;
-            const { label, tabKey, children: childChildren, renderable, ...rest } = isObj(_child.props) ? _child.props : child;
-            if (!isValidElement(label, true) || (typeof renderable === "function" ? !renderable({ ...rest, label, tabKey }) : renderable === false)) {
+            const { label, tabItemKey, children: childChildren, ...rest } = (isObj(_child.props) ? _child.props : child) as ITabItemProps;
+            if (!isValidElement(label, true) || (!ResourcesManager.isAllowed(rest))) {
                 return null;
             }
-            const key = String((typeof tabKey == 'string' && tabKey ? tabKey : typeof label == 'string' && label ? label : index)) + index;
+            const key = String((typeof tabItemKey == 'string' && tabItemKey ? tabItemKey : typeof label == 'string' && label ? label : index)) + index;
             tabs.push(<TabItem
                 key={key}
                 {...tabItemProps}

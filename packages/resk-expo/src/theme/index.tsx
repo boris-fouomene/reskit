@@ -351,6 +351,9 @@ class Theme {
     static get get() {
         return this.defaultTheme;
     }
+    static get addEventListener() {
+        return addEventListener;
+    }
 };
 
 /**

@@ -35,7 +35,6 @@ import { IObservable } from "@utils/observable";
  * 
  * // myValue = [];      // Error: Type 'never[]' is not assignable to type 'IPrimitive'.
  *
- * @see {@link https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#primitive-types} for more information on primitive types in TypeScript.
  */
 export type IPrimitive = string | number | boolean;
 
@@ -44,6 +43,7 @@ export type IPrimitive = string | number | boolean;
  * The type property defaults to "text" if not specified.
  * 
  * @template FieldType - The type of the field, defaults to "text"
+ * @extends IProtectedResource
  * 
  * @description
  * This interface serves as a base for all field types, providing common properties such as type, label, and name.
@@ -56,8 +56,9 @@ export type IPrimitive = string | number | boolean;
  *   name: 'textField'
  * };
  * ```
+ * @see {@link IProtectedResource} for the `IProtectedResource` type.
  */
-export interface IFieldBase<FieldType = "text"> {
+export interface IFieldBase<FieldType = "text"> extends IProtectedResource {
   /**
    * The type of the field.
    * 
@@ -139,6 +140,47 @@ export interface IFieldBase<FieldType = "text"> {
    * weatherr the field is a primary key or not
    */
   primaryKey?: boolean;
+
+  /**
+   * weatherr the field is rendable or not
+   * It is used to determine if the field should be rendered or not.
+   */
+  rendable?: boolean;
+
+  /***
+   * weatherr the field is readonly or not
+   */
+  readOnly?: boolean;
+
+  /**
+   * weatherr the field is disabled or not
+   */
+  disabled?: boolean;
+
+  /***
+   * weatherr the field is unique for the resource or not
+   */
+  unique?: boolean;
+
+  /**
+   * weatherr the field is required or not
+   */
+  required?: boolean;
+
+  /***
+   * the min length of the field
+   */
+  minLength?: number;
+  /**
+   * the max length of the field
+   */
+  maxLength?: number;
+
+  /**
+   * the length of the field
+   */
+  length?: number;
+
 }
 
 
@@ -307,9 +349,66 @@ export interface IFieldMap {
  * 
  * // For custom field types, it can accept objects:
  * const customField: IField<{ label: string; required: boolean }> = { label: 'Name', required: true };
+ * 
+ * @remarks
+ * This type is particularly useful in applications that require dynamic form generation or 
+ * data structure definitions, allowing developers to create fields with varying properties 
+ * based on the context in which they are used.
+ * 
+ * The `form` and `filter` properties allow for nesting of fields, enabling complex data 
+ * structures that can represent forms with multiple layers of fields or filters.
  */
-export type IField<T extends IFieldMapKeys = "text"> = T extends keyof IFieldMap ? (Omit<IFieldBase, keyof IFieldMap[T] | "type"> & Omit<IFieldMap[T], 'type'> & { type: T }) : (Omit<IFieldBase, keyof T> & T);
+export type IField<T extends IFieldMapKeys = "text"> = (T extends keyof IFieldMap ? (Omit<IFieldBase, keyof IFieldMap[T] | "type"> & Omit<IFieldMap[T], 'type'> & { type: T }) : (Omit<IFieldBase, keyof T> & T)) & Record<IResourceActionName, IFieldBase> & {
 
+  form?: IField;
+
+  filter?: IField;
+};
+
+/**
+ * Represents a protected resource that can be associated with a button in the user interface.
+ * This type is used to define the conditions under which a button should be rendered based on user permissions.
+ *
+ * @type IProtectedResource
+ * 
+ * @property {IResourceName} [resourceName] - The name of the resource associated with the button.
+ * This property can be used to identify the specific resource that the button interacts with.
+ * 
+ * @property {IAuthPerm} [perm] - The permission associated with the button.
+ * This permission is used to determine if the button will be rendered or not.
+ * If this property is not provided, the button will be rendered regardless of the user's permissions.
+ * 
+ * @example
+ * // Example of a protected resource with a specific permission
+ * const deleteButton: IProtectedResource = {
+ *   resourceName: 'Delete User',
+ *   perm: 'user:delete'
+ * };
+ * 
+ * // Example of a protected resource without a specific permission
+ * const saveButton: IProtectedResource = {
+ *   resourceName: 'Save Changes'
+ * };
+ * 
+ * // In the above example, the 'deleteButton' will only be rendered if the user has the 'user:delete' permission,
+ * // while the 'saveButton' will always be rendered since no permission is specified.
+ * 
+ * @remarks
+ * This type is particularly useful in applications where user roles and permissions dictate the visibility of UI elements.
+ * By using this type, developers can easily manage which buttons should be displayed based on the user's access rights.
+ */
+export type IProtectedResource = {
+  /**
+    * The name of the resource associated with the button.
+    */
+  resourceName?: IResourceName;
+  /**
+   * The permission associated with the button.
+   * This permission is used to determine if the button will be rendered or not.
+   * If not provided, the button will be rendered regardless of the user's permissions.
+   */
+  perm?: IAuthPerm;
+}
 
 /**
    @interface
@@ -318,8 +417,40 @@ export type IField<T extends IFieldMapKeys = "text"> = T extends keyof IFieldMap
  * @description
  * This type is a union of all possible keys that can be used to define fields,
  * allowing for a flexible and extensible field mapping.
+ * @extends IFieldType
+ * @see {@link IFieldType} for the `IFieldType` type.
  */
-export type IFieldMapKeys = keyof IFieldMap | object;
+export type IFieldMapKeys = IFieldType | object;
+
+
+/**
+ * Represents the type of field keys that can be used within the `IFieldMap`.
+ * This type is derived from the keys of the `IFieldMap` interface, ensuring that 
+ * only valid field types can be referenced when defining fields in forms or data structures.
+ *
+ * @type IFieldType
+ * 
+ * @description
+ * The `IFieldType` type serves as a union of string literals that correspond to the 
+ * defined field types in the `IFieldMap`. This provides type safety and consistency 
+ * when working with field definitions, preventing errors that may arise from using 
+ * invalid field types.
+ * 
+ * @example
+ * // Example of using IFieldType to define a field
+ * const textFieldType: IFieldType = 'text'; // Valid
+ * const numberFieldType: IFieldType = 'number'; // Valid
+ * 
+ * // Attempting to assign an invalid field type will result in a TypeScript error
+ * // const invalidFieldType: IFieldType = 'invalidType'; // Error: Type '"invalidType"' is not assignable to type 'IFieldType'.
+ * 
+ * @remarks
+ * This type is particularly useful in scenarios where fields are dynamically defined 
+ * or when implementing features that require strict adherence to defined field types.
+ * By using `IFieldType`, developers can ensure that only valid field types are used 
+ * throughout the application, enhancing type safety and reducing runtime errors.
+ */
+export type IFieldType = keyof IFieldMap;
 
 /**
 * @interface

@@ -144,13 +144,13 @@ export const useDimensions = (responsive: boolean = true): IDimensions => {
  *   console.log("New screen dimensions:", dimensions);
  * };
  * 
- * const listener = addDimensionsListener(updateStyles, 300);
+ * const listener = dimentionAddListener(updateStyles, 300);
  * 
  * // To remove the listener when necessary
  * listener?.remove();
  * ```
  */
-export const addDimensionsListener = (callback: (dimensions: IDimensions) => any, timeout: number = 200) => {
+export const dimentionAddListener = (callback: (dimensions: IDimensions) => any, timeout: number = 200) => {
 	if (typeof callback !== 'function') return null;
 	timeout = typeof timeout === 'number' ? timeout : 200;
 	return Dimensions.addEventListener("change", _.debounce(() => {

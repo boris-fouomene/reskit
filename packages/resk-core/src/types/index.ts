@@ -58,7 +58,7 @@ export type IPrimitive = string | number | boolean;
  * ```
  * @see {@link IProtectedResource} for the `IProtectedResource` type.
  */
-export interface IFieldBase<FieldType = "text"> extends IProtectedResource {
+export interface IFieldBase<FieldType = any> extends IProtectedResource {
   /**
    * The type of the field.
    * 
@@ -226,7 +226,7 @@ export interface IFieldBase<FieldType = "text"> extends IProtectedResource {
     }
   ```
  */
-export interface IFieldMap {
+export interface IFieldMap extends Record<string, IFieldBase> {
   /**
    * A text field.
    * 
@@ -243,7 +243,6 @@ export interface IFieldMap {
    * ```
    */
   text: IFieldBase<"text">;
-
   /**
    * A number field.
    * 
@@ -332,7 +331,7 @@ export interface IFieldMap {
 
 
 /**
- * @type IField<T extends IFieldType = "text">
+ * @type IField<T extends IFieldType = any>
  * @extends IFieldBase<T>
  * 
  * Represents a field with customizable properties in a form or data structure.
@@ -414,14 +413,14 @@ export interface IFieldMap {
  * - The `form` and `filter` properties allow for nesting of fields, enabling complex data 
  *   structures that can represent forms with multiple layers of fields or filters.
  * @see {@link IFieldBase} for the `IFieldBase` type.
+ * @see {@link IFieldMap} for the `IFieldMap` type.
  */
-export type IField<T extends IFieldType = "text"> = IFieldBase<T> & Omit<IFieldMap[T], "type"> & Record<IResourceActionName, IFieldBase> & {
-
+export type IField<T extends IFieldType = any> = Omit<IFieldMap[T], "type"> & {
   type: T;
 
-  form?: IField<any>;
+  form?: Partial<IField<any>>;
 
-  filter?: IField<any>;
+  filter?: Partial<IField<any>>;
 };
 
 /**

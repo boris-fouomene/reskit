@@ -11,46 +11,32 @@ const index = withAppBar(() => {
     return (
         <ScrollView>
             <Form fields={{
-                /*  name : {
-                     label: "Name",
-                     type: "text",
-                     required: true,
-                     rules: {
-                         minLength: 3,
-                         maxLength: 10,
-                         pattern: /^[a-zA-Z0-9]+$/,
-                     },
-                 },
-                 "email": {
-                     label: "Email",
-                     type: "email",
-                     required: true,
-                     rules: {
-                         minLength: 3,
-                         maxLength: 10,
-                         pattern: /^[a-zA-Z0-9]+$/,
-                     },
-                 },
-                 "password": {
-                     label: "Password",
-                     type: "password",
-                     required: true,
-                     rules: {
-                         minLength: 3,
-                         maxLength: 10,
-                         pattern: /^[a-zA-Z0-9]+$/,
-                     },
-                 },
-                 "password2": {
-                     label: "Password",
-                     type: "password",
-                     required: true,
-                     rules: {
-                         minLength: 3,
-                         maxLength: 10,
-                         pattern: /^[a-zA-Z0-9]+$/,
-                     },
-                 }, */
+                name: {
+                    label: "Name",
+                    type: "text",
+                    required: true,
+                },
+                "email": {
+                    label: "Email",
+                    type: "email",
+                    required: true,
+                    minLength: 3,
+                    maxLength: 10,
+                },
+                "password": {
+                    label: "Password",
+                    type: "password",
+                    required: true,
+                    minLength: 3,
+                    maxLength: 10,
+                },
+                "password2": {
+                    label: "Password",
+                    type: "password",
+                    required: true,
+                    minLength: 3,
+                    maxLength: 10,
+                },
             }}>
 
             </Form>

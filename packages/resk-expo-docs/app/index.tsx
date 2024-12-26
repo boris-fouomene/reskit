@@ -1,4 +1,4 @@
-import { Tab, TextInput, Switch, Checkbox, Button, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
+import { Tab, TextInput, Switch, Checkbox, Button, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
 import { useEffect } from 'react'
 import { withAppBar } from "@resk/expo/build/hooks";
@@ -10,6 +10,50 @@ const index = withAppBar(() => {
     }, [])
     return (
         <ScrollView>
+            <Form fields={{
+                /*  name : {
+                     label: "Name",
+                     type: "text",
+                     required: true,
+                     rules: {
+                         minLength: 3,
+                         maxLength: 10,
+                         pattern: /^[a-zA-Z0-9]+$/,
+                     },
+                 },
+                 "email": {
+                     label: "Email",
+                     type: "email",
+                     required: true,
+                     rules: {
+                         minLength: 3,
+                         maxLength: 10,
+                         pattern: /^[a-zA-Z0-9]+$/,
+                     },
+                 },
+                 "password": {
+                     label: "Password",
+                     type: "password",
+                     required: true,
+                     rules: {
+                         minLength: 3,
+                         maxLength: 10,
+                         pattern: /^[a-zA-Z0-9]+$/,
+                     },
+                 },
+                 "password2": {
+                     label: "Password",
+                     type: "password",
+                     required: true,
+                     rules: {
+                         minLength: 3,
+                         maxLength: 10,
+                         pattern: /^[a-zA-Z0-9]+$/,
+                     },
+                 }, */
+            }}>
+
+            </Form>
             <View style={[Theme.styles.p5]}>
                 <Menu
                     anchor={<Label>Open Menu</Label>}

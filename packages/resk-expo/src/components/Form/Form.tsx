@@ -3,7 +3,7 @@ import { defaultStr, extendObj, IFieldType, IResourceName, isEmpty, isNonNullStr
 import { isValidElement, ObservableComponent } from "@utils";
 import { FormsManager } from "./FormsManager";
 import { IFormField, IForm, IFormFieldsProp, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormTabItemProp, IFormFieldProps, IFormAction, IFormOnSubmitOptions, IFormContext } from "./types";
-import React, { ElementType, ReactElement, ReactNode, useMemo } from "react";
+import React, { ReactElement, ReactNode, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 import Breakpoints from "@breakpoints/index";

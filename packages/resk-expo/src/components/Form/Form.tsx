@@ -1,5 +1,5 @@
 import View from "@components/View";
-import { defaultStr, extendObj, IResourceName, isEmpty, isNonNullString, isObj, ResourcesManager, uniqid } from "@resk/core";
+import { defaultStr, extendObj, IFieldType, IResourceName, isEmpty, isNonNullString, isObj, ResourcesManager, uniqid } from "@resk/core";
 import { isValidElement, ObservableComponent } from "@utils";
 import { FormsManager } from "./FormsManager";
 import { IFormField, IForm, IFormFieldsProp, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormTabItemProp, IFormFieldProps, IFormAction, IFormOnSubmitOptions, IFormContext } from "./types";
@@ -571,7 +571,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                 const field = fields[i];
                 if (!isObj(field)) continue;
                 const name = defaultStr(field?.name, i);
-                const type = defaultStr(field?.type, "text").trim();
+                const type = field?.type || "text" as IFieldType;
                 let defaultValue = undefined;
                 if (isObj(data)) {
                     if (!isEmpty((data as any)[name])) {
@@ -599,7 +599,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                 }
                 const drawerWidth = drawer?.getDrawerWidth();
                 fieldProps.windowWidth = fieldProps.windowWidth || windowWidth || drawerWidth || undefined;
-                const Component = Field.getRegisteredComponent(type) || Field.getRegisteredComponent("text") || Field;
+                const Component = Field.getRegisteredComponent(type as IFieldType) || Field.getRegisteredComponent("text") || Field;
                 content.push(<Component isFormLoading={isLoading} isFormSubmitting={isSubmitting} {...fieldProps} key={name} />);
             }
             return content;

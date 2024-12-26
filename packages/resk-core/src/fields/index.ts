@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { IField, IFieldBase, IFieldMapKeys } from '../types';
+import { IField, IFieldBase, IFieldType } from '../types';
 export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**
@@ -30,7 +30,7 @@ export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
  * }
  * ```
  */
-export function Field<T extends IFieldMapKeys = "text">(options: IField<T>): PropertyDecorator {
+export function Field<T extends IFieldType = "text">(options: IField<T>): PropertyDecorator {
   /**
    * Returns a decorator function that sets metadata on the target property.
    */

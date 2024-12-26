@@ -181,6 +181,11 @@ export interface IFieldBase<FieldType = "text"> extends IProtectedResource {
    */
   length?: number;
 
+  /***
+   * whether the field is visible or not
+   */
+  visible?: boolean;
+
 }
 
 
@@ -325,44 +330,98 @@ export interface IFieldMap {
   email: IFieldBase<"email">;
 }
 
+
 /**
- * @interface 
- The `IField` type represents a field with customizable properties.
+ * @type IField<T extends IFieldType = "text">
+ * @extends IFieldBase<T>
  * 
- * It uses a conditional type to define the structure based on the generic type `T`.
- * 
- * @template T - The type of the field. Defaults to `any`.
- * 
- * @description
+ * Represents a field with customizable properties in a form or data structure.
  * This type allows for flexible field definitions by leveraging TypeScript's conditional types.
  * 
- * - If `T` is a key of `IFieldMap`, it constructs a type by omitting keys from `IFieldBase` 
- *   and merging with the mapped type from `IFieldMap`, ensuring the `type` field is included.
+ * ### Type Parameters
+ * - **T**: The type of the field. Defaults to `"text"`. This parameter determines the specific field type 
+ *   being defined, which can be one of the types specified in the `IFieldMap`.
  * 
- * - If `T` is an object, it omits overlapping keys from `IFieldBase` and merges the object type `T`.
+ * ### Description
+ * The `IField` type constructs a field definition by combining properties from the base field interface 
+ * (`IFieldBase`) and the specific field type defined in the `IFieldMap`. It ensures that the `type` field 
+ * is included and allows for additional properties such as `form` and `filter` to be specified.
  * 
- * - If none of the above conditions apply, it defaults to `IFieldBase<DataType>`.
+ * ### Properties
+ * - **form**: An optional property that allows nesting of fields, enabling complex data structures 
+ *   that can represent forms with multiple layers of fields.
+ *   - **Type**: `IField<any>`
+ *   - **Example**:
+ *     ```typescript
+ *     const nestedField: IField<'text'> = {
+ *         type: 'text',
+ *         label: 'Nested Field',
+ *         form: {
+ *             type: 'number',
+ *             label: 'Nested Number Field',
+ *         }
+ *     };
+ *     ```
  * 
- * @example
- * // For a field type 'text', it uses the mapped type in `IFieldMap`:
- * const textField: IField<'text'> = { type: 'text', label: 'Name' };
+ * - **filter**: An optional property that allows for defining filter criteria for the field, 
+ *   enabling dynamic filtering capabilities in data queries.
+ *   - **Type**: `IField<any>`
+ *   - **Example**:
+ *     ```typescript
+ *     const filterField: IField<'select'> = {
+ *         type: 'select',
+ *         label: 'Select Filter',
+ *         filter: {
+ *             type: 'text',
+ *             label: 'Filter by Name',
+ *         }
+ *     };
+ *     ```
  * 
- * // For custom field types, it can accept objects:
- * const customField: IField<{ label: string; required: boolean }> = { label: 'Name', required: true };
+ * ### Example Usage
+ * Here’s how you might define a text field and a number field using the `IField` type:
+ * 
+ * ```typescript
+ * const textField: IField<'text'> = {
+ *     type: 'text',
+ *     label: 'Username',
+ *     required: true,
+ *     minLength: 3,
+ *     maxLength: 20,
+ *     form: {
+ *         type: 'text',
+ *         label: 'Enter your username',
+ *     }
+ * };
+ * 
+ * const numberField: IField<'number'> = {
+ *     type: 'number',
+ *     label: 'Age',
+ *     required: true,
+ *     min: 0,
+ *     max: 120,
+ *     filter: {
+ *         type: 'number',
+ *         label: 'Filter by Age',
+ *     }
+ * };
+ * ```
  * 
  * @remarks
- * This type is particularly useful in applications that require dynamic form generation or 
- * data structure definitions, allowing developers to create fields with varying properties 
- * based on the context in which they are used.
- * 
- * The `form` and `filter` properties allow for nesting of fields, enabling complex data 
- * structures that can represent forms with multiple layers of fields or filters.
+ * - This type is particularly useful in applications that require dynamic form generation or 
+ *   data structure definitions, allowing developers to create fields with varying properties 
+ *   based on the context in which they are used.
+ * - The `form` and `filter` properties allow for nesting of fields, enabling complex data 
+ *   structures that can represent forms with multiple layers of fields or filters.
+ * @see {@link IFieldBase} for the `IFieldBase` type.
  */
-export type IField<T extends IFieldMapKeys = "text"> = (T extends keyof IFieldMap ? (Omit<IFieldBase, keyof IFieldMap[T] | "type"> & Omit<IFieldMap[T], 'type'> & { type: T }) : (Omit<IFieldBase, keyof T> & T)) & Record<IResourceActionName, IFieldBase> & {
+export type IField<T extends IFieldType = "text"> = IFieldBase<T> & Omit<IFieldMap[T], "type"> & Record<IResourceActionName, IFieldBase> & {
 
-  form?: IField;
+  type: T;
 
-  filter?: IField;
+  form?: IField<any>;
+
+  filter?: IField<any>;
 };
 
 /**
@@ -409,18 +468,6 @@ export type IProtectedResource = {
    */
   perm?: IAuthPerm;
 }
-
-/**
-   @interface
- * Represents the keys of the `IFieldMap` or `IFieldBase`.
- * 
- * @description
- * This type is a union of all possible keys that can be used to define fields,
- * allowing for a flexible and extensible field mapping.
- * @extends IFieldType
- * @see {@link IFieldType} for the `IFieldType` type.
- */
-export type IFieldMapKeys = IFieldType | object;
 
 
 /**

@@ -4,7 +4,7 @@ import { IKeyboardEventHandlerKey } from "@components/KeyboardEventHandler/keyEv
 import { ITabItemProps, ITabProps } from "@components/Tab";
 import { IViewProps } from "@components/View";
 import { IDimensions } from "@dimensions/types";
-import { IAuthPerm, IDict, IField, IFieldMapKeys, IResourceName, IValidatorRule, IValidatorRuleOptions } from "@resk/core";
+import { IAuthPerm, IDict, IField, IFieldType, IResourceName, IValidatorRule, IValidatorRuleOptions } from "@resk/core";
 import { IOnChangeOptions, IStyle } from "@src/types";
 import { ObservableComponent } from "@utils/index";
 import { ReactElement, ReactNode } from "react";
@@ -1294,7 +1294,7 @@ export type IFormFieldOnChangeOptions<onChangeEventType = NativeSyntheticEvent<T
  *     },
  * };
  */
-export type IFormFieldProps<T extends IFieldMapKeys = "text", onChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null, ValueType = any> = IField<T> & {
+export type IFormFieldProps<T extends IFieldType = "text", onChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null, ValueType = any> = IField<T> & {
     getValidValue?: (options: { value: any; context: IFormField; data: IFormData }) => any;
     isFilter?: boolean;
 
@@ -1420,7 +1420,7 @@ export interface IFormKeyboardEventHandlerOptions extends IFormContext {
  *     formTriedTobeSubmitted: false,
  * };
  */
-export type IFormFieldState<T extends IFieldMapKeys = "text"> = IField<T> & {
+export type IFormFieldState<T extends IFieldType = "text"> = IField<T> & {
     error: boolean;
     isFieldEditable: boolean;
     isFieldDisabled: boolean;

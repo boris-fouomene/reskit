@@ -1022,7 +1022,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
             form,
             responsive,
             isFilter: cIsFilter,
-            //visible,
+            visible,
             ...rest
         } = this.getComponentProps(this.props);
         const isFilter = this.isFilter() || cIsFilter;
@@ -1030,7 +1030,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
             if (rest.rendable === false) return null;
         }
         const wrapperProps = Object.assign({}, keyboardEventHandlerProps);
-        const visibleStyle = null; //visible === false && styles.hidden;
+        const visibleStyle = !this.isFilter() && visible === false && styles.hidden;
         const disabled = rest.disabled || this.isDisabled();
         const readOnly = rest.readOnly || this.isFormSubmitting();
         const errorText = this.getErrorText();
@@ -1064,7 +1064,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
                                     ...rest,
                                     data,
                                     responsive,
-                                    //visible,
+                                    visible: this.isFilter() ? true : visible,
                                     disabled,
                                     readOnly,
                                 } as IFormFieldProps)
@@ -1169,13 +1169,13 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
      * with their corresponding field types.
      * 
      * @static
-     * @returns { { [key: string]: typeof Field } } - An object mapping field types to their registered components.
+     * @returns {Record<IFieldType, typeof Field>} - An object mapping field types to their registered components.
      * 
      * @example
      * const registeredComponents = Field.getRegisteredComponents();
      * console.log(registeredComponents); // Logs all registered field components
      */
-    static getRegisteredComponents() {
+    static getRegisteredComponents(): Record<IFieldType, typeof Field> {
         const components = Reflect.getMetadata(Field.FIELDS_COMPONENTS_METADATA_KEY, Field);
         return isObj(components) ? components : {};
     }
@@ -1184,7 +1184,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
      * This method allows developers to access a specific field component based on its type.
      * 
      * @static
-     * @param {string} name - The name of the field type to retrieve the component for.
+     * @param {IFieldType} type - The name of the field type to retrieve the component for.
      * @returns {typeof Field | null} - The registered field component if found, otherwise null.
      * 
      * @example
@@ -1193,11 +1193,11 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
      *     // Use the retrieved text field component
      * }
      */
-    static getRegisteredComponent(name: string): typeof Field | null {
-        if (!isNonNullString(name)) return null;
+    static getRegisteredComponent(type: IFieldType): typeof Field | null {
+        if (!isNonNullString(type)) return null;
         const components = Field.getRegisteredComponents();
         if (!components) return null;
-        return components[name];
+        return components[type];
     }
 }
 

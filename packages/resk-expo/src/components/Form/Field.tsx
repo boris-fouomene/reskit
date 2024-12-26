@@ -1222,8 +1222,8 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
  * @see {@link IFormFieldProps} for the `IFormFieldProps` type.
  * @see {@link IFormFieldState} for the `IFormFieldState` type.
  */
-export function FormField(type: IFieldType): PropertyDecorator & MethodDecorator {
-    return (target: Object, propertyKey: string | symbol) => {
+export function FormField(type: IFieldType) {
+    return (target: typeof Field) => {
         Field.registerComponent(type, target as typeof Field);
     };
 }

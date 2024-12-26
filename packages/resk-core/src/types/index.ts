@@ -763,6 +763,145 @@ export interface IResourceAction {
 }
 
 /**
+ * @type IResourceActionKey
+ * 
+ * Represents the keys of the actions that can be performed on a resource within the application.
+ * This type is derived from the keys of the `IResourceAction` interface, ensuring that 
+ * only valid action names can be used when referencing actions associated with resources.
+ * 
+ * ### Description
+ * The `IResourceActionKey` type serves as a union of string literals that correspond to the 
+ * defined actions in the `IResourceAction` interface. This provides type safety and consistency 
+ * when working with resource actions, preventing errors that may arise from using 
+ * invalid action names.
+ * 
+ * ### Example Usage
+ * Here is an example of how the `IResourceActionKey` type can be utilized:
+ * 
+ * ```typescript
+ * // Function to perform an action on a resource
+ * function performAction(action: IResourceActionKey) {
+ *     switch (action) {
+ *         case "read":
+ *             console.log("Reading resource...");
+ *             break;
+ *         case "create":
+ *             console.log("Creating resource...");
+ *             break;
+ *         case "update":
+ *             console.log("Updating resource...");
+ *             break;
+ *         case "delete":
+ *             console.log("Deleting resource...");
+ *             break;
+ *         case "details":
+ *             console.log("Fetching resource details...");
+ *             break;
+ *         case "all":
+ *             console.log("Performing all actions on the resource...");
+ *             break;
+ *         default:
+ *             console.error("Unknown action");
+ *     }
+ * }
+ * 
+ * // Example of using the performAction function
+ * performAction("create"); // Output: Creating resource...
+ * ```
+ * 
+ * ### Notes
+ * - The use of `IResourceActionKey` enhances type safety by ensuring that only 
+ *   predefined action names can be passed to functions that require an action parameter.
+ * - This type can be particularly useful in scenarios where actions are dynamically 
+ *   determined or when implementing features that require strict adherence to defined 
+ *   action names.
+ */
+export type IResourceActionKey = keyof IResourceAction;
+
+
+/**
+ * @type IResourceTranslateActionKey
+ * 
+ * Represents the keys used for translating actions associated with resources in the application.
+ * This type allows for both simple resource names and more complex keys that combine 
+ * resource names with specific action keys, facilitating localization and internationalization.
+ * 
+ * ### Description
+ * The `IResourceTranslateActionKey` type is a union type that can either be:
+ * - A simple resource name (e.g., `"user"`).
+ * - A combination of a resource name and an action key, formatted as a template literal (e.g., `"user.create"`).
+ * 
+ * This structure allows for flexible and organized translation keys, making it easier to manage 
+ * localization for various actions associated with different resources.
+ * 
+ * ### Example Usage
+ * Here’s how you might use the `IResourceTranslateActionKey` type in a function that retrieves 
+ * translation strings for resource actions:
+ * 
+ * ```typescript
+ * i18n.registerTranslations({
+ *     en: {
+ *         resources: {
+ *             user: {
+ *                 create: {
+ *                    label: "Create User",
+ *                    title: "Create a new user",
+ *                    tooltip: "Click to add a new user.",
+ *                 },
+ *                 read: {
+ *                    label: "View User",
+ *                    title: "View a specific user",
+ *                    tooltip: "Click to view a specific user.",
+ *                 },    
+ *                 update: {
+ *                    label: "Update User",
+ *                    title: "Update a specific user",
+ *                    tooltip: "Click to update a specific user.",
+ *                    zero: "No users to update.",
+ *                    one: "Updated one user.",
+ *                    other: "Updated %{count} users.",
+ *                },
+ *                delete : {
+ *                    label: "Delete User",
+ *                    title: "Delete a specific user",
+ *                    tooltip: "Click to delete a specific user.",
+ *                    zero: "No users to delete.",
+ *                    one: "Deleted one user.",
+ *                    other: "Deleted %{count} users.", 
+ *                },
+ *                list : {
+ *                    label: "List Users",
+ *                    title: "List all users",
+ *                    tooltip: "Click to list all users.",
+ *                    zero: "No users to list.",
+ *                    one: "Listed one user.",
+ *                    other: "Listed %{count} users.",
+ *                },
+ *                details : {
+ *                    label: "View User Details",
+ *                    title: "View user details", 
+ *                    tooltip: "Click to view user details.",
+ *                    zero: "No user details to view.",
+ *                    one: "Viewed one user details.",  
+ *                    other: "Viewed %{count} user details.",
+ *                }
+ *             }
+ *         }
+ *     }
+ * });
+ * ```
+ * 
+ * ### Notes
+ * - This type is particularly useful in applications that require localization for various 
+ *   actions associated with resources, allowing developers to easily manage and retrieve 
+ *   translation strings based on resource and action keys.
+ * - By using template literals, it enforces a consistent naming convention for translation keys, 
+ *   reducing the likelihood of errors when referencing them.
+ */
+export type IResourceTranslateActionKey = IResourceName | `${IResourceName}.${IResourceActionKey}`;
+
+
+/**
  * @type IResourceActionName
  * 
  * Represents the type of resource actions that can be performed within the application.
@@ -1185,41 +1324,6 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
    */
   delete(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any>>;
 
-  /**
-   * An optional array of property names that should be automatically translated.
-   * The values corresponding to these properties in the translations dictionary
-   * will be of the form "resources.[resourceName].[propertyName]".
-   * @type {string[]}
-   * @default ["label","title","tooltip"]
-   */
-  translatableProperties?: string[];
-  /***
-   * returns the properties of the resource that will be translated automatically.
-   * returns an array of strings representing the properties that will be translated.
-   * this implies that, in the translations dictionary, the value corresponding to these properties will be of the form : [resources][resourceName].[propertyName]
-   * and example of a translation dictionary is: {
-   *    "en" : {
-   *      "resources" : {
-   *        "user" : {
-   *          "label" : "User",
-   *          "email" : "Email" 
-   *        }
-   *      }
-   *    },
-    * "fr" : {
-    *      "resources" : {
-    *        "user" : {
-    *          "label" : "Utilisateur",
-    *          "email" : "Email"
-    *        }
-    *    }
-   * }
-   * label and email properties will be translated to "Utilisateur" and "Email" in french using the i18n.t function with the key : "resources.user.label" and "resources.user.email"
-   * @returns {string[]} An array of strings representing the properties that will be translated.
-   * @default ["label","title","tooltip"]
-   */
-  getTranslatableProperties(): string[];
-
   /***
    * translates a property of the resource using the translate function from the default I18n instance.
    * @param propertyName - The name of the property to translate.
@@ -1228,96 +1332,39 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
    * @returns The translated property value.
    */
   translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string;
-  /***
-   * adds the prefix "resources.${resourceName}." to the property name if it doesn't already have it.
-   * @param propertyName - The name of the property to prefix.
-   * @returns The prefixed property name.
-   */
-  setI18nPropertyPrefix(propertyName: string): string;
 
   /**
-   * Adds the prefix "resources.${resourceName}.actions." to the action name if it doesn't already have it.
-   * This is used to construct the i18n key for translating the action name.
-   * 
-   * @param {IResourceActionName} actionName - The name of the action to prefix.
-   * @returns The prefixed action name.
-   */
-  setI18nActionPrefix(actionName: IResourceActionName): string;
-
-  /***
-  * translates a property of the resource using the translate function from the default I18n instance.
-  * @param propertyName - The name of the property to translate.
-  * @param fallbackValue - The fallback value to use if the translation is not found.
-  * @param options - The options for the translation.
-  * @returns The translated property value.
-  * @exports
-  * this.translateProperty("label") // returns "Label"
-  * this.translateProperty("label", "Users") // returns "Label"
-  * this.translateProperty("label", "Label", { resourceName: "users" }) // returns "Label"
-  * this.translateProperty("title", "Title", { resourceName: "users" }) // returns "Title"
+  * Retrieves the i18n (default instance) translations for the resource.
+  * 
+  * @param {string} [locale] - The locale to use for the translations. If not provided, the default locale from the i18n instance will be used.
+  * @returns {IDict} - An object containing the translations for the resource, keyed by the property names.
+  * @example
+  * // Register translations for the "en" locale.
+  * i18n.registerTranslations({
+  *   en: {
+  *     resources: {
+  *       user: {  // The resource name
+  *         label: "User",  // The label property
+  *         title: "User Information",  // The title property
+  *         tooltip: "Manage user data"  // The tooltip setI18nPropertyPrefix  property
+  *       }
+  *     }
+  *   }
+  * });
+  * 
+  * // Retrieve the translations for the "user" resource.  
+  * import {ResourceManager} from "@resk/core";
+  * const userResource = ResourceManager.getResource("user");
+  * const userTranslations = userResource.getTranslations();
+  * console.log(userTranslations);
+  * // Output:
+  * // {
+  * //   label: "User",
+  * //   title: "User Information",
+  * //   tooltip: "Manage user data"   
+  * // }
   */
-  translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string;
-
-
-  /**
-   * Translates the name of a resource action using the default I18n instance.
-   *
-   * @param actionName - The name of the action to translate.
-   * @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated action name.
-   * @exports
-   *  this.translateAction("read") // returns "Read"
-   *  this.translateAction("read", "Read") // returns "Read"
-   *  this.translateAction("read", "Read", { resourceName: "users" }) // returns "Read"
-   *  this.translateAction("update", "Update", { resourceName: "users" }) // returns "Update"
-   */
-  translateAction(actionName: IResourceActionName, fallbackValue?: string, options?: TranslateOptions): string;
-
-  /***
-   * return the translated label for the read action.
-   * @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the read action.
-   */
-  getReadActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
-  /***
-   * return the translated label for the create action.
-   *  @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the create action.
-   */
-  getCreateActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
-  /***
-   * return the translated label for the update action.
-  *  @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the update action.
-   */
-  getUpdateActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
-  /***
-   * return the translated label for the delete action.
-   * @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the delete action.
-   */
-  getDeleteActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
-  /***
-   * return the translated tooltip for the details action.
-  *  @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated tooltip for the details action.
-   */
-  getDetailsActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
-
-
-  /***
-   * return the translated label for the list action.
-   * @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the list action.
-   */
-  getListActionLabel(fallbackValue?: string, options?: TranslateOptions): string;
+  getTranslations(locale?: string): IDict;
 
   /**
    * checks if the resource has the action
@@ -1326,6 +1373,7 @@ export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResou
    */
   hasAction(action: IResourceActionName): boolean;
 
+  getTranslateParams(params?: Record<string, any>): Record<string, any>;
 };
 
 /**

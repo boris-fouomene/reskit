@@ -1,11 +1,12 @@
-import { IDict, IResourceName, IField, IResourceInstance, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceFetchOptions, IResourcePaginatedResult, II18nTranslation } from '../types';
+import { IDict, IResourceName, IField, IResourceInstance, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceFetchOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory } from '../utils/index';
 import { IConstructor, IProtectedResource } from '../types/index';
 import { IAuthPerm, IAuthUser } from '@/auth/types';
 import { isAllowed } from '../auth/perms';
 import { i18n, I18n } from '@/i18n';
-import { TranslateOptions } from 'i18n-js';
+import { Scope, TranslateOptions } from 'i18n-js';
+import { property } from 'lodash';
 
 
 /**
@@ -134,27 +135,14 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     this.resolveTranslations();
   }
   resolveTranslations(options?: TranslateOptions) {
-    i18n.resolveTranslations(this);
-    const properties = this.getTranslatableProperties();
-    if (Array.isArray(properties) && properties.length > 0) {
-      properties.forEach(property => {
-        if (property && isNonNullString(property) && typeof this[property as keyof typeof this] === "string") {
-          const v = this.translateProperty(property, undefined, options);
-          if (v !== property && isNonNullString(v)) {
-            try {
-              (this as IDict)[property as keyof typeof this] = v;
-            } catch { }
-          }
-        }
-      });
-    }
+    return i18n.resolveTranslations(this);
   }
   /**
    * returns the i18n params for the resource. this is used to translate the error messages.
    * @param params - The options object containing the properties to initialize the resource with.
    * @returns 
    */
-  getI18TranslateParams(params?: Record<string, any>): Record<string, any> {
+  getTranslateParams(params?: Record<string, any>): Record<string, any> {
     return {
       resourceLabel: this.getLabel(),
       resourceName: this.getName(),
@@ -166,7 +154,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @returns {string} the message to display when the DataProvider for the resource is invalid
    */
   get INVALID_DATA_PROVIDER_ERROR(): string {
-    return i18n.t("resources.invalidDataProvider", this.getI18TranslateParams());
+    return i18n.t("resources.invalidDataProvider", this.getTranslateParams());
   }
   hasDataProvider(): boolean {
     return this.dataProvider != null && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.create === "function" && typeof this.dataProvider?.list === "function" && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.delete === "function";
@@ -189,7 +177,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @param args - The arguments to pass to the event.
    */
   _trigger(event: EventType, ...args: any[]) {
-    ResourceBase.events.trigger(event, Object.assign({}, this.getI18TranslateParams()), ...args);
+    ResourceBase.events.trigger(event, Object.assign({}, this.getTranslateParams()), ...args);
     return this.trigger(event, ...args);
   }
   /***
@@ -203,7 +191,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserCreate()) {
-      return Promise.reject(new Error(i18n.t("resources.createForbiddenError", this.getI18TranslateParams())));
+      return Promise.reject(new Error(i18n.t("resources.createForbiddenError", this.getTranslateParams())));
     }
     return this.getDataProvider()?.create(record, options).then((result) => {
       this._trigger("create" as EventType, result);
@@ -220,7 +208,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserList()) {
-      return Promise.reject(new Error(i18n.t("resources.listForbiddenError", this.getI18TranslateParams())));
+      return Promise.reject(new Error(i18n.t("resources.listForbiddenError", this.getTranslateParams())));
     }
     return this.getDataProvider()?.list(options).then((result) => {
       this._trigger("list" as EventType, result);
@@ -238,7 +226,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserRead()) {
-      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getI18TranslateParams())));
+      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getTranslateParams())));
     }
     return this.getDataProvider()?.read(key, options).then((result) => {
       this._trigger("read" as EventType, result);
@@ -256,7 +244,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserViewDetails()) {
-      return Promise.reject(new Error(i18n.t("resources.detailsForbiddenError", this.getI18TranslateParams())));
+      return Promise.reject(new Error(i18n.t("resources.detailsForbiddenError", this.getTranslateParams())));
     }
     return this.getDataProvider()?.details(key, options).then((result) => {
       this._trigger("details" as EventType, result);
@@ -275,7 +263,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserUpdate()) {
-      return Promise.reject(new Error(i18n.t("resources.updateForbiddenError", this.getI18TranslateParams())));
+      return Promise.reject(new Error(i18n.t("resources.updateForbiddenError", this.getTranslateParams())));
     }
     return this.getDataProvider()?.update(key, updatedData, options).then((result) => {
       this._trigger("update" as EventType, result);
@@ -293,7 +281,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserDelete()) {
-      return Promise.reject(new Error(i18n.t("resources.deleteForbiddenError", this.getI18TranslateParams())));
+      return Promise.reject(new Error(i18n.t("resources.deleteForbiddenError", this.getTranslateParams())));
     }
     return this.getDataProvider()?.delete(key, options).then((result) => {
       this._trigger("delete" as EventType, result);
@@ -323,186 +311,89 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     }
     this.getFields();
   }
-
   /**
-   * The properties of the resource that will be translated automatically.
-   * @type {string[]}
-   * @default ["label","title","tooltip"]
-   */
-  translatableProperties?: string[] = [];
-  /***
-   * returns the properties of the resource that will be translated automatically.
-   * returns an array of strings representing the properties that will be translated.
-   * this implies that, in the translations dictionary, the value corresponding to these properties will be of the form : [resources][resourceName].[propertyName]
-   * and example of a translation dictionary is: {
-   *    "en" : {
-   *      "resources" : {
-   *        "user" : {
-   *          "label" : "User",
-   *          "email" : "Email" 
-   *        }
-   *      }
-   *    },
-    * "fr" : {
-    *      "resources" : {
-    *        "user" : {
-    *          "label" : "Utilisateur",
-    *          "email" : "Email"
-    *        }
-    *    }
-   * }
-   * label and email properties will be translated to "Utilisateur" and "Email" in french using the i18n.t function with the key : "resources.user.label" and "resources.user.email"
-   * @returns {string[]} An array of strings representing the properties that will be translated.
-   * @default ["label","title","tooltip"]
-   */
-  getTranslatableProperties() {
-    return Array.isArray(this.translatableProperties) ? this.translatableProperties : ["label", "title", "tooltip"];
-  }
-  /**
-   * retrieves the translations for the resource.
-   * @param {string} [locale] - The locale for which to retrieve the translations.
-   * @returns {II18nTranslation} An object containing the translations for the resource.
-   */
-  getI18nTranslations(locale?: string): II18nTranslation {
-    locale = defaultStr(locale, i18n.getLocale());
-    const dictionary = i18n.getTranslations()[locale];
-    const nameStr = String(this.getName()).trim();
-    if (isObj(dictionary) && isObj(dictionary.resources) && isObj(dictionary.resources[nameStr])) {
-      return dictionary.resources[nameStr];
-    }
-    return {};
-  }
-  /***
-   * adds the prefix "resources.${resourceName}." to the property name if it doesn't already have it.
-   * @param propertyName - The name of the property to prefix.
-   * @returns The prefixed property name.
-   */
-  setI18nPropertyPrefix(propertyName: string): string {
-    if (!isNonNullString(propertyName)) return "";
-    const nameStr = String(this.getName()).trim();
-    const prefix = `resources.${nameStr}.`;
-    return prefix + propertyName.ltrim(prefix);
-  }
-  /**
-   * Adds the prefix "resources.${resourceName}.actions." to the action name if it doesn't already have it.
-   * This is used to construct the i18n key for translating the action name.
+   * Retrieves the i18n translations for the resource.
    * 
-   * @param {IResourceActionName} actionName - The name of the action to prefix.
-   * @returns The prefixed action name.
+   * @param {string} [locale] - The locale to use for the translations. If not provided, the default locale from the i18n instance will be used.
+   * @returns {IDict} - An object containing the translations for the resource, keyed by the property names.
+   * @example
+   * // Register translations for the "en" locale.
+   * i18n.registerTranslations({
+   *   en: {
+   *     resources: {
+   *       user: {  // The resource name
+   *         label: "User",  // The label property
+   *         title: "User Information",  // The title property
+   *         tooltip: "Manage user data"  // The tooltip setI18nPropertyPrefix  property
+   *       }
+   *     }
+   *   }
+   * });
+   * 
+   * // Retrieve the translations for the "user" resource.  
+   * import {ResourceManager} from "@resk/core";
+   * const userResource = ResourceManager.getResource("user");
+   * const userTranslations = userResource.getTranslations();
+   * console.log(userTranslations);
+   * // Output:
+   * // {
+   * //   label: "User",
+   * //   title: "User Information",
+   * //   tooltip: "Manage user data"   
+   * // }
    */
-  setI18nActionPrefix(actionName: IResourceActionName): string {
-    const actionNameStr = String(actionName).trim();
-    if (!isNonNullString(actionNameStr)) return "";
+  getTranslations(locale?: string): IDict {
+    locale = defaultStr(locale, i18n.getLocale());
     const nameStr = String(this.getName()).trim();
-    const prefix = `resources.${nameStr}.actions.`;
-    return prefix + actionNameStr.ltrim(prefix);
-  }
-  /***
-  * translates a property of the resource using the translate function from the default I18n instance.
-  * @param propertyName - The name of the property to translate.
-  * @param fallbackValue - The fallback value to use if the translation is not found.
-  * @param options - The options for the translation.
-  * @returns The translated property value.
-  * @exports
-  * this.translateProperty("label") // returns "Label"
-  * this.translateProperty("label", "Users") // returns "Label"
-  * this.translateProperty("label", "Label", { resourceName: "users" }) // returns "Label"
-  * this.translateProperty("title", "Title", { resourceName: "users" }) // returns "Title"
-  */
-  translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string {
-    propertyName = defaultStr(propertyName).trim();
-    options = Object.assign({}, { resourceName: this.getName() }, options);
-    const key = this.setI18nPropertyPrefix(propertyName);
-    const translations = this.getI18nTranslations();
-    if (key && translations[propertyName]) {
-      const translatedValue = stringify(i18n.t(key, options));
-      if (isNonNullString(translatedValue) && translatedValue !== key) {
-        return translatedValue;
-      }
-    }
-    return defaultStr(fallbackValue, propertyName);
-  }
-  /**
-   * Translates the name of a resource action using the default I18n instance.
-   *
-   * @param actionName - The name of the action to translate.
-   * @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated action name.
-   * @exports
-   *  this.translateAction("read") // returns "Read"
-   *  this.translateAction("read", "Read") // returns "Read"
-   *  this.translateAction("read", "Read", { resourceName: "users" }) // returns "Read"
-   *  this.translateAction("update", "Update", { resourceName: "users" }) // returns "Update"
-   */
-  translateAction(actionName: IResourceActionName, fallbackValue?: string, options?: TranslateOptions): string {
-    const actionNameStr = String(actionName).trim();
-    options = Object.assign({}, this.getI18TranslateParams({ resourceName: this.getName() }), options);
-    const key = this.setI18nActionPrefix(actionName);
-    const translations = this.getI18nTranslations();
-    if (key && translations[actionNameStr]) {
-      const translatedValue = stringify(i18n.t(key, options));
-      if (isNonNullString(translatedValue) && translatedValue !== key) {
-        return translatedValue;
-      }
-    }
-    return defaultStr(fallbackValue, actionNameStr);
+    if (!isNonNullString(nameStr)) return {};
+    const t = i18n.getNestedTranslation(["resources", nameStr], locale) as IDict;
+    return isObj(t) && t ? t : {};
   }
 
-  /***
-   * return the translated label for the read action.
-   * @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the read action.
+  /**
+   *Translates the given scope using the i18n default instance, ensuring that the resource name is prefixed correctly.
+   *
+   * @param {Scope} scope - The scope to use for the translation. This can be a string or an array of strings.
+   * @param {TranslateOptions} [options] - Optional options to pass to the translation function.
+   * @returns {string | T} - The translated string, or the translated value of type T if the scope returns a non-string value.
+   * @example
+   * // Register translations for the "en" locale.
+   * i18n.registerTranslations({
+   *   en: {
+   *     resources: {
+   *       user: {  // The resource name
+   *         label: "User",  // The label property
+   *         title: "User Information",  // The title property
+   *         tooltip: "Manage user data"  // The tooltip setI18nPropertyPrefix  property,
+   *         create: {
+   *            label: "Create User",
+   *            title: "Create a new user", 
+   *            tooltip: "Click to add a new user."
+   *         },
+   *         read: {
+   *            label: "View User",
+   *            title: "View a specific user",
+   *            tooltip: "Click to view a specific user.",  
+   *         },
+   *       }   
+   *     }
+   *   }
+   * });
+   * // Translate the "label" property of the "user" resource.
+   * const userResource = ResourcesManager.getResource("user");
+   * const label = userResource.translate("label"); // "User"
+   * 
+   * // Translate the "tooltip" property of the "user" resource.
+   * const tooltip = userResource.translate("tooltip"); // "Manage user data"
    */
-  getReadActionLabel(fallbackValue?: string, options?: TranslateOptions): string {
-    return this.translateAction("read", fallbackValue, options);
+  translate<T = string>(scope: Scope, options?: TranslateOptions): string | T {
+    const scopeArray = isNonNullString(scope) ? scope.trim().split(".") : Array.isArray(scope) ? scope : [];
+    if (scopeArray[0] !== "resources" && !ResourcesManager.hasResource(scopeArray[1] as IResourceName)) {
+      scopeArray.unshift(this.getName(), "resources");
+    }
+    return i18n.translate<T>(scopeArray, options);
   }
-  /***
-   * return the translated label for the create action.
-   *  @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the create action.
-   */
-  getCreateActionLabel(fallbackValue?: string, options?: TranslateOptions): string {
-    return this.translateAction("create", fallbackValue, options);
-  }
-  /***
-   * return the translated label for the update action.
-  *  @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the update action.
-   */
-  getUpdateActionLabel(fallbackValue?: string, options?: TranslateOptions): string {
-    return this.translateAction("update", fallbackValue, options);
-  }
-  /***
-   * return the translated label for the delete action.
-   * @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the delete action.
-   */
-  getDeleteActionLabel(fallbackValue?: string, options?: TranslateOptions): string {
-    return this.translateAction("delete", fallbackValue, options);
-  }
-  /***
-   * return the translated tooltip for the details action.
-  *  @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated tooltip for the details action.
-   */
-  getDetailsActionLabel(fallbackValue?: string, options?: TranslateOptions): string {
-    return this.translateAction("details", fallbackValue, options);
-  }
-  /***
-   * return the translated label for the list action.
-   * @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation, including the resource name.
-   * @returns The translated label for the list action.
-   */
-  getListActionLabel(fallbackValue?: string, options?: TranslateOptions): string {
-    return this.translateAction("list", fallbackValue, options);
-  }
+
   /**
    * Retrieves the name of the resource.
    *
@@ -628,6 +519,30 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    */
   canUserDelete(user?: IAuthUser): boolean {
     return this.isAllowed(`delete`, user);
+  }
+
+
+
+  /**
+   * Retrieves the translated value of the specified property, using the resource's translations.
+   * If the property is not found in the translations, it returns the fallback value or the property name.
+   *
+   * @param propertyName - The name of the property to translate.
+   * @param fallbackValue - The fallback value to use if the property is not found in the translations.
+   * @param options - Additional options to pass to the translation function.
+   * @returns The translated value of the property.
+   */
+  translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string {
+    propertyName = defaultStr(propertyName).trim();
+    options = Object.assign({}, { resourceName: this.getName() }, options);
+    const translations = this.getTranslations();
+    if (isNonNullString(propertyName) && translations[propertyName]) {
+      const translatedValue = stringify(i18n.t(propertyName, options));
+      if (isNonNullString(translatedValue) && translatedValue.includes("." + propertyName.ltrim("."))) {
+        return translatedValue;
+      }
+    }
+    return defaultStr(fallbackValue, propertyName);
   }
 
   /**
@@ -836,6 +751,15 @@ export class ResourcesManager {
     return null;
   }
 
+  /**
+   * Checks if a resource with the given name exists in the `ResourcesManager`.
+   *
+   * @param {IResourceName} name - The name of the resource to check.
+   * @returns {boolean} `true` if the resource exists, `false` otherwise.
+   */
+  public static hasResource(name: IResourceName) {
+    return !!this.getResource(name);
+  }
   /**
    * Adds a new resource instance to the manager.
    * 

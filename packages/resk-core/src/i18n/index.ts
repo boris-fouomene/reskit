@@ -3,11 +3,11 @@ import { I18nEvent, II18nTranslation } from "../types/i18n";
 import { extendObj, isObj } from "@utils/object";
 import { IObservable, IObservableCallback, observableFactory } from "@utils/observable";
 import "reflect-metadata";
-import { Dict, I18n as I18nJs, I18nOptions, TranslateOptions } from "i18n-js";
+import { Dict, I18n as I18nJs, I18nOptions, Scope, TranslateOptions } from "i18n-js";
 import defaultStr from "@utils/defaultStr";
 import stringify from "@utils/stringify";
 import session from "@session/index";
-import { IPrimitive } from "../types/index";
+import { IDict, IPrimitive } from "../types/index";
 
 /**
  * A key to store metadata for translations.
@@ -63,10 +63,41 @@ export function Translate(key: string): PropertyDecorator & MethodDecorator {
  * @see https://www.npmjs.com/package/i18n-js?activeTab=readme for more information on i18n-js library.
  */
 export class I18n extends I18nJs implements IObservable<I18nEvent> {
+
     /**
-     * alias for translate method of i18n-js
+     * Translates the given scope with the provided options.
+     * If the scope is a string and the options include pluralization, the method will pluralize the translation.
+     * Otherwise, it will call the parent `translate` method.
+     * @param scope The translation scope.
+     * @param options The translation options, including pluralization.
+     * @returns The translated string or the type specified in the generic parameter.
+     * @example
+     * // Register translations for the "en" locale.
+     * i18n.registerTranslations({
+     *   en: {
+     *     greeting: {
+     *       one: "Hello, %{name}!",
+     *       other: "Hello, %{name}s!",
+     *       zero: "Hello, %{name}s!"
+     *     },
+     *     farewell: "Goodbye!"
+     *   }
+     * });
+     * 
+     * // Translate the "greeting" scope with pluralization.
+     * i18n.translate("greeting", { count: 1 }); // "Hello, John!"
+     * i18n.translate("greeting", { count: 2 }); // "Hello, Johns!"
+     * i18n.translate("greeting", { count: 0 }); // "Hello, Johns!"
+     * 
+     * // Translate the "farewell" scope.
+     * i18n.translate("farewell"); // "Goodbye!"    
      */
-    readonly t: typeof this.translate = this.translate.bind(this);
+    translate<T = string>(scope: Scope, options?: TranslateOptions): string | T {
+        if (this.isPluralizeOptions(options) && this.canPluralize(scope)) {
+            return this.pluralize(options.count as number, scope, options);
+        }
+        return super.translate(scope, options);
+    }
     private _isLoading: boolean = false;
     /***
      * locales that are superted by the i18n instance
@@ -175,6 +206,93 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         return session.get("i18n.locale") as string;
     }
     /**
+     * Checks if the provided translation key can be pluralized for the given locale.
+     * @param scope The translation scope to check.
+     * @param locale The locale to use for the check. If not provided, the current locale is used.
+     * @returns `true` if the translation key can be pluralized, `false` otherwise.
+     * @note This method is useful for determining if a translation key can be pluralized for a specific locale.
+     * A translation key can be pluralized if it has pluralization rules defined in the translation dictionary.
+     * The pluralization rules are defined in the `one`, `other`, and `zero` properties of the translation dictionary.
+     * @example
+     * //register a translation dictionary for the "en" locale.
+     * i18n.registerTranslations({
+     *   en: {
+     *     greeting: {
+     *       one: "Hello, {name}!",
+     *       other: "Hello, {name}s!",
+     *       zero: "Hello, {name}s!"
+     *     },
+     *     farewell: "Goodbye!"
+     *   }
+     * );
+     * });
+     * // Check if the translation key "greeting" can be pluralized for the current locale.
+     * i18n.canPluralize("greeting");
+     * 
+     * // Check if the translation key "greeting" can be pluralized for the "en" locale.    
+     * i18n.canPluralize("greeting", "en"); 
+     * i18n.canPluralize("greeting", "fr"); // returns false
+     * i18n.canPluralize("farewell", "en"); // returns false
+     */
+    canPluralize(scope: Scope, locale?: string) {
+        locale = defaultStr(locale, this.getLocale());
+        const r = this.getNestedTranslation(scope, locale) as IDict;
+        if (!isObj(r) || !r) return false;
+        return isNonNullString(r?.one) && isNonNullString(r?.other) && isNonNullString(r?.zero);
+    }
+    /**
+     * Resolves translation for nested keys.
+     * @param scope {Scope} The translation scope.
+     * @param locale The locale to use for translation.
+     * @returns The translated string or undefined if not found.
+     * @example
+     * // Register translations for the "en" locale.
+     * i18n.registerTranslations({
+     *   en: {
+     *     greeting: {
+     *       one: "Hello, {name}!",
+     *       other: "Hello, {name}s!",
+     *       zero: "Hello, {name}s!"
+     *     },
+     *     farewell: "Goodbye!"
+     *   }
+     * });
+     * 
+     * // Resolve translation for the "greeting" key.
+     * i18n.resolveTranslation("greeting.one", "en");
+     * 
+     * // Resolve translation for the "greeting" key.
+     * i18n.resolveTranslation("greeting.other", "en");
+     * 
+     * // Resolve translation for the "greeting" key.
+     * i18n.resolveTranslation("en", "greeting.zero", 0);
+     * 
+     * // Resolve translation for the "farewell" key.
+     * i18n.resolveTranslation("en", "farewell");
+     */
+    getNestedTranslation(scope: Scope, locale: string): string | IDict | undefined {
+        const scopeArray = isNonNullString(scope) ? scope.trim().split(".") : Array.isArray(scope) ? scope : [];
+        if (!scopeArray.length) return undefined;
+        let result: any = this.getTranslations(locale);
+        for (const k of scopeArray) {
+            if (isObj(result)) {
+                result = result[k];
+            } else {
+                return undefined;
+            }
+        }
+        return result;
+    }
+    /**
+     * Checks if the provided `TranslateOptions` object has a `count` property of type `number`.
+     * This is used to determine if the translation should be pluralized based on the provided count.
+     * @param options The `TranslateOptions` object to check.
+     * @returns `true` if the `options` object has a `count` property of type `number`, `false` otherwise.
+     */
+    isPluralizeOptions(options?: TranslateOptions): options is TranslateOptions {
+        return !!(isObj(options) && options && typeof (options.count) === "number");
+    }
+    /**
      * static function to attach translations to the I18n default instance.
         @example : 
         // --- Usage as a decorator ---
@@ -212,12 +330,26 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         return i18n;
     }
 
+
     /**
-     * Retrieves the current locale translations.
-     * @returns The current locale translations.
+     * Gets the translations for the specified locale, or all translations if no locale is provided.
+     * @param locale The locale to get translations for. If not provided, returns all translations.
+     * @returns The translations for the specified locale, or all translations if no locale is provided.
+     * @example
+     * // Get all translations
+     * const translations = i18n.getTranslations();
+     * console.log(translations);
+     * 
+     * // Get translations for the "en" locale
+     * const enTranslations = i18n.getTranslations("en");
+     * console.log(enTranslations);
      */
-    getTranslations() {
-        return isObj(this.translations) ? this.translations : {};
+    getTranslations(locale?: string) {
+        const r = isObj(this.translations) ? this.translations : {};
+        if (isNonNullString(locale)) {
+            return isObj(r[locale]) ? r[locale] : {};
+        }
+        return r;
     }
 
     /**

@@ -1,4 +1,4 @@
-import { IValidatorRule, IValidatorRuleOptions, IValidatorRulesOptions, IValidatorRuleSeparator, IValidatorRulesMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult } from "./types";
+import { IValidatorRule, IValidatorRuleOptions, IValidatorRulesOptions, IValidatorRuleSeparator, IValidatorRuleMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult } from "./types";
 import { isNonNullString, isObj, stringify } from "@utils/index";
 import { i18n } from "../i18n";
 const RULE_SEPARATOR: IValidatorRuleSeparator = "|";
@@ -79,9 +79,9 @@ export class Validator {
   /**
    * A static getter that returns a record of validation rules.
    * 
-   * @returns {IValidatorRulesMap} An object containing validation rules.
+   * @returns {IValidatorRuleMap} An object containing validation rules.
    */
-  static getRules(): IValidatorRulesMap {
+  static getRules(): IValidatorRuleMap {
     const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
     return isObj(rules) ? rules : {};
   }

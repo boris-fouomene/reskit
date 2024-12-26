@@ -116,15 +116,15 @@ export type IValidatorRuleFunction<ParamType = Array<any>> = (options: IValidato
 
 /**
  * @interface IValidatorRuleName
- * Represents the name of a validation rule as defined in the `IValidatorRulesMap`.
+ * Represents the name of a validation rule as defined in the `IValidatorRuleMap`.
  * 
  * The `IValidatorRuleName` type is a union of string literal types that correspond to the keys
- * of the `IValidatorRulesMap` interface. This allows for type-safe access to the names of
+ * of the `IValidatorRuleMap` interface. This allows for type-safe access to the names of
  * validation rules, ensuring that only valid rule names can be used in contexts where a rule name
  * is required.
  * 
  * ### Structure:
- * - The type is derived from the keys of the `IValidatorRulesMap`, meaning it will include
+ * - The type is derived from the keys of the `IValidatorRuleMap`, meaning it will include
  *   all the rule names defined in that map.
  * 
  * ### Example:
@@ -145,12 +145,12 @@ export type IValidatorRuleFunction<ParamType = Array<any>> = (options: IValidato
  * This type enhances type safety in your code by ensuring that only valid validation rule names
  * can be used, reducing the risk of runtime errors due to typos or invalid rule names.
  */
-export type IValidatorRuleName = keyof IValidatorRulesMap;
+export type IValidatorRuleName = keyof IValidatorRuleMap;
 
 /**
  * Represents a mapping of validation rule names to their corresponding validation rules.
  * 
- * The `IValidatorRulesMap` interface defines an object where each key is a string
+ * The `IValidatorRuleMap` interface defines an object where each key is a string
  * representing the name of a validation rule, and the value is the corresponding validation rule
  * of type `IValidatorRule`. This allows for easy retrieval and management of validation rules
  * by name.
@@ -162,7 +162,7 @@ export type IValidatorRuleName = keyof IValidatorRulesMap;
  * ### Example:
  * 
  * ```typescript
- * const validationRules: IValidatorRulesMap = {
+ * const validationRules: IValidatorRuleMap = {
  *     required: "required",
  *     minLength: ({ value }) => value.length >= 5 || "Minimum length is 5 characters.",
  *     maxLength: ({ value }) => value.length <= 10 || "Maximum length is 10 characters.",
@@ -176,7 +176,7 @@ export type IValidatorRuleName = keyof IValidatorRulesMap;
  * This interface is useful for organizing and managing validation rules in a structured way,
  * making it easier to apply and reference them in  validation scenarios.
  */
-export interface IValidatorRulesMap {
+export interface IValidatorRuleMap {
     /**
      * @function numberLessThanOrEquals
      * 
@@ -772,6 +772,26 @@ export interface IValidatorRuleOptions<ParamType = Array<any>> {
      * ```
      */
     ruleParams?: ParamType;
+
+    /**
+    * The error message to display in case of validation failure.
+    * 
+    * This optional property allows for custom error messages to be provided
+    * when validation does not pass, enhancing user feedback and experience.
+    * 
+    * @type {string}
+    * 
+    * @example
+    * const options: IFormFieldValidatorOptions = {
+    *     message: 'Please enter a valid email address.',
+    * };
+    * 
+    * // Use the message in validation logic
+    * if (!isValidEmail(options.context.value)) {
+    *     console.log(options.message);
+    * }
+    */
+    message?: string;
 }
 
 /**

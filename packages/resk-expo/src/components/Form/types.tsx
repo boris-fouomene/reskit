@@ -242,7 +242,7 @@ export interface IForm extends ObservableComponent<IFormProps, IFormState, IForm
     /** Returns the name of the form. */
     getName(): string;
     /** Checks if the document is being edited. */
-    isDocEditing(props?: IFormProps): boolean;
+    isDataEditing(props?: IFormProps): boolean;
     /** Retrieves the data from the form. */
     getData(options?: IFormGetDataOptions): IFormData;
     /** Retrieves a specific field by name. */
@@ -327,13 +327,14 @@ export interface IForm extends ObservableComponent<IFormProps, IFormState, IForm
  *
  * @interface IFormField
  * @extends ObservableComponent<IFormFieldProps, IFormFieldState, IFormEvent>
+ * @template  Type - The type of the field.
  * 
  * @remarks
  * This interface is designed to be implemented by various field components within a form,
  * providing a consistent API for managing field behavior and interactions. It includes methods
  * for validation, value management, and rendering, making it easier to create dynamic forms.
  */
-export interface IFormField extends ObservableComponent<IFormFieldProps, IFormFieldState, IFormEvent> {
+export interface IFormField<Type extends IFieldType = any> extends ObservableComponent<IFormFieldProps<Type>, IFormFieldState, IFormEvent> {
     /**
      * Retrieves the name of the field.
      * 
@@ -395,9 +396,9 @@ export interface IFormField extends ObservableComponent<IFormFieldProps, IFormFi
      * The component properties for the field.
      * 
      * @readonly
-     * @type {IFormFieldProps}
+     * @type {IFormFieldProps<Type>}
      */
-    componentProps: IFormFieldProps;
+    componentProps: IFormFieldProps<Type>;
     /**
      * Checks if validation has been performed on the field.
      * 
@@ -429,12 +430,12 @@ export interface IFormField extends ObservableComponent<IFormFieldProps, IFormFi
      * Sets the value of the field and triggers validation.
      * 
      * @param {any} value - The new value for the field.
-     * @returns {Promise<IFormFieldValidatorOptions>} - A promise that resolves with validation options.
+     * @returns {Promise<IFormFieldValidatorOptions<Type>>} - A promise that resolves with validation options.
      * 
      * @example
      * this.setValue("new value"); // Sets the field value
      */
-    setValue(value: any): Promise<IFormFieldValidatorOptions>;
+    setValue(value: any): Promise<IFormFieldValidatorOptions<Type>>;
     /**
      * Retrieves a field by its name /**
      * Retrieves a field by its name.
@@ -445,28 +446,28 @@ export interface IFormField extends ObservableComponent<IFormFieldProps, IFormFi
      * @example
      * const field = this.getField("username"); // Retrieves the username field
      */
-    getField(fieldName: string): IFormField | null;
+    getField<T extends IFieldType = any>(fieldName: string): IFormField<T> | null;
     /**
      * Validates the field with the provided options.
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
      * @param {boolean} [force] - Whether to force validation.
-     * @returns {Promise<IFormFieldValidatorOptions>} - A promise that resolves with validation options.
+     * @returns {Promise<IFormFieldValidatorOptions<Type>>} - A promise that resolves with validation options.
      * 
      * @example
      * this.validate({ required: true }); // Validates the field
      */
-    validate(options: IFormFieldValidatorOptions, force?: boolean): Promise<IFormFieldValidatorOptions>;
+    validate(options: IFormFieldValidatorOptions<Type>, force?: boolean): Promise<IFormFieldValidatorOptions<Type>>;
     /**
      * Validates the field on change with the provided options.
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
-     * @returns {Promise<IFormFieldValidatorOptions>} - A promise that resolves with validation options.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
+     * @returns {Promise<IFormFieldValidatorOptions<Type>>} - A promise that resolves with validation options.
      * 
      * @example
      * this.validateOnChange({ required: true }); // Validates on change
      */
-    validateOnChange(options: IFormFieldValidatorOptions): Promise<IFormFieldValidatorOptions>;
+    validateOnChange(options: IFormFieldValidatorOptions<Type>): Promise<IFormFieldValidatorOptions<Type>>;
     /**
      * Determines if the field can validate on blur.
      * 
@@ -516,42 +517,42 @@ export interface IFormField extends ObservableComponent<IFormFieldProps, IFormFi
     /**
      * Prepares the field for validation with the provided options.
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
      * @returns {any} - The prepared options for validation.
      * 
      * @example
      * const preparedOptions = this.beforeValidate(options); // Prepares for validation
      */
-    beforeValidate(options: IFormFieldValidatorOptions): any;
+    beforeValidate(options: IFormFieldValidatorOptions<Type>): any;
     /**
      * Calls the onChange handler with the provided options.
      * 
-     * @param {IFormFieldValidatorOptions} options - The options to pass to the onChange handler.
+     * @param {IFormFieldValidatorOptions<Type>} options - The options to pass to the onChange handler.
      * 
      * @example
      * this.callOnChange(options); // Calls the onChange handler
      */
-    callOnChange(options: IFormFieldValidatorOptions): void;
+    callOnChange(options: IFormFieldValidatorOptions<Type>): void;
     /**
      * Handles validation for the field with the provided options.
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
      * @returns {Promise<any>} - A promise that resolves with the validation result.
      * 
      * @example
      * this.onValidate(options); // Handles validation
      */
-    onValidate(options: IFormFieldValidatorOptions): Promise<any>;
+    onValidate(options: IFormFieldValidatorOptions<Type>): Promise<any>;
     /**
      * Handles the case where validation is not performed.
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
      * @returns {Promise<any>} - A promise that resolves with the result of no validation.
      * 
      * @example
      * this.onNoValidate(options); // Handles no validation
      */
-    onNoValidate(options: IFormFieldValidatorOptions): Promise<any>;
+    onNoValidate(options: IFormFieldValidatorOptions<Type>): Promise<any>;
     /**
      * Checks if the field is in its raw state.
      * 
@@ -797,141 +798,582 @@ export interface IFormField extends ObservableComponent<IFormFieldProps, IFormFi
 }
 
 
+/**
+ * Interface representing the options available when submitting a form.
+ * 
+ * This interface extends the IFormContext and includes additional properties
+ * that provide context about the form submission, such as the form data
+ * being submitted and whether the submission is for an update or a new entry.
+ * 
+ * @interface IFormOnSubmitOptions
+ * 
+ * @example
+ * const submitOptions: IFormOnSubmitOptions = {
+ *     data: {
+ *         name: 'John Doe',
+ *         email: 'john.doe@example.com',
+ *     },
+ *     isUpdate: false,
+ *     // Additional properties from IFormContext can be included here
+ * };
+ * 
+ * // Function to handle form submission
+ * function handleSubmit(options: IFormOnSubmitOptions) {
+ *     if (options.isUpdate) {
+ *         console.log('Updating user data:', options.data);
+ *     } else {
+ *         console.log('Creating new user with data:', options.data);
+ *     }
+ * }
+ * @see {@link IFormContext} for additional properties available in the context.
+ */
 export interface IFormOnSubmitOptions extends IFormContext {
+    /**
+     * The data being submitted through the form.
+     * 
+     * This property contains the structured data that the user has filled out
+     * in the form. It is essential for processing the submission, whether it
+     * is for creating a new entry or updating an existing one.
+     * 
+     * @type {IFormData}
+     * 
+     * @example
+     * const formData: IFormData = {
+     *     name: 'Jane Doe',
+     *     email: 'jane.doe@example.com',
+     * };
+     * 
+     * const options: IFormOnSubmitOptions = {
+     *     data: formData,
+     *     isUpdate: true,
+     *     // Other context properties
+     * };
+     */
     data: IFormData;
+
+    /**
+     * Indicates whether the form submission is for an update.
+     * 
+     * This boolean flag helps determine the context of the submission.
+     * If true, the submission is intended to update an existing record;
+     * if false, it is for creating a new record.
+     * 
+     * @type {boolean}
+     * 
+     * @example
+     * const options: IFormOnSubmitOptions = {
+     *     data: {
+     *         name: 'Alice Smith',
+     *         email: 'alice.smith@example.com',
+     *     },
+     *     isUpdate: false,
+     * };
+     * 
+     * // Check if the submission is an update
+     * if (options.isUpdate) {
+     *     console.log('Updating existing record.');
+     * } else {
+     *     console.log('Creating a new record.');
+     * }
+     */
     isUpdate: boolean;
 };
 
-export type IFormFieldValidatorOptions = IValidatorRuleOptions & {
-    /**** la valeur précédemment affectée au champ */
+/**
+ * Interface representing the options available for validating a form field.
+ * 
+ * This interface extends the IValidatorRuleOptions and includes additional properties
+ * that provide context and information necessary for validating a specific form field.
+ * It allows for the inclusion of previous values, validation messages, and field context.
+ * 
+ * @interface IFormFieldValidatorOptions
+ * 
+ * @example
+ * const validatorOptions: IFormFieldValidatorOptions = {
+ *     prevValue: 'oldValue',
+ *     context: formFieldInstance,
+ *     message: 'This field is required.',
+ *     fieldName: 'username',
+ * };
+ * 
+ * // Function to validate a form field
+ * function validateField(options: IFormFieldValidatorOptions) {
+ *     if (!options.context.value) {
+ *         return options.message || 'Validation failed.';
+ *     }
+ *     return 'Validation passed.';
+ * }
+ */
+export interface IFormFieldValidatorOptions<Type extends IFieldType = any> extends IValidatorRuleOptions {
+    /**
+     * The previously assigned value to the field.
+     * 
+     * This property can be used to compare the current value with the previous one,
+     * which is useful in scenarios where the validation logic depends on changes
+     * made to the field's value.
+     * 
+     * @type {any}
+     * 
+     * @example
+     * const options: IFormFieldValidatorOptions = {
+     *     prevValue: 'initialValue',
+     *     context: formFieldInstance,
+     * };
+     * 
+     * // Check if the value has changed
+     * if (options.context.value !== options.prevValue) {
+     *     console.log('Value has changed.');
+     * }
+     */
     prevValue?: any;
-    /**** le contexte lié à la form field */
-    context: IFormField;
-
-    /**le message d'erreur en cas d'erreur de validation */
-    message?: string;
+    /**
+     * The context related to the form field.
+     * 
+     * This property provides access to the form field instance, allowing
+     * validators to access the current value, state, and other relevant
+     * information about the field being validated.
+     * 
+     * @type {IFormField<Type>}
+     * 
+     * @example
+     * const options: IFormFieldValidatorOptions = {
+     *     context: {
+     *         value: 'currentValue',
+     *         // Other properties of IFormField
+     *     },
+     * };
+     * 
+     * // Access the current value of the field
+     * console.log('Current field value:', options.context.value);
+     */
+    context: IFormField<Type>;
 
     /**
-     * the name of the field that is being validated
+     * The name of the field that is being validated.
+     * 
+     * This property can be useful for identifying the field in error messages
+     * or logging, making it easier to track which field has failed validation.
+     * 
+     * @type {string}
+     * 
+     * @example
+     * const options: IFormFieldValidatorOptions = {
+     *     fieldName: 'email',
+     * };
+     * 
+     * // Log the field name during validation
+     * console.log(`Validating field: ${options.fieldName}`);
      */
     fieldName?: string;
 };
 
-export interface IFormCallbackOptions extends IFormProps, IFormContext {
+/**
+ * Interface representing the options available for form callbacks.
+ * 
+ * This interface extends both `IFormProps` and `IFormContext`, combining properties
+ * that define the form's configuration and its current context. It is designed
+ * to provide a comprehensive set of options for handling form-related callbacks,
+ * such as submission, validation, and reset actions.
+ * 
+ * @interface IFormCallbackOptions
+ * 
+ * @example
+ * const callbackOptions: IFormCallbackOptions = {
+ *     // Properties from IFormProps
+ *     onSubmit: (data) => {
+ *         console.log('Form submitted with data:', data);
+ *     },
+ *     onReset: () => {
+ *         console.log('Form has been reset.');
+ *     },
+ *     // Properties from IFormContext
+ *     currentField: 'username',
+ *     isValid: true,
+ * };
+ * 
+ * // Function to handle form submission
+ * function handleFormSubmission(options: IFormCallbackOptions) {
+ *     if (options.isValid) {
+ *         options.onSubmit({ username: 'user123' });
+ *     } else {
+ *         console.log('Form is not valid.');
+ *     }
+ * }
+ */
+export interface IFormCallbackOptions extends IFormProps, IFormContext { }
 
-}
-
+/**
+ * Interface representing the options available for retrieving form data.
+ * 
+ * This interface provides configuration options for the `getData` function,
+ * which is responsible for returning the current state of the form data.
+ * The behavior of the data retrieval can be controlled using the `handleChange`
+ * property, allowing for flexibility in how data is accessed.
+ * 
+ * @interface IFormGetDataOptions
+ * 
+ * @example
+ * const getDataOptions: IFormGetDataOptions = {
+ *     handleChange: true,
+ * };
+ * 
+ * // Function to retrieve form data based on options
+ * function retrieveFormData(options: IFormGetDataOptions) {
+ *     if (options.handleChange) {
+ *         // Logic to get both initial and current field data
+ *         console.log('Retrieving all form data, including changes.');
+ *     } else {
+ *         // Logic to get only the initial data
+ *         console.log('Retrieving only initial form data.');
+ *     }
+ * }
+ * @remarks
+*  When `handleChange` is set to false, the `getData` function will return
+*  only the initial data, i.e., the data passed as a parameter to the
+*  `Form` component by its parent.
+* 
+*  If `handleChange` is not set to false, in addition to the initial data
+*  provided by the parent of the `Form` component, the data from the
+*  various fields will also be retrieved.
+ */
 export interface IFormGetDataOptions {
     /**
-     * lorsque handleChanges  est à false, alors la fonction getData retournera uniquement les données initialises, ie celles passées en paramètre au composant FormBase par son parent.
-     * Si handleChanges n'est pas à false, alors en plus des données initialises passées par le parent du composant FormBase, les données des différents champs seront récupérées
+     * When `handleChange` is set to false, the `getData` function will return
+     * only the initial data, i.e., the data passed as a parameter to the
+     * `Form` component by its parent.
+     * 
+     * If `handleChange` is not set to false, in addition to the initial data
+     * provided by the parent of the `Form` component, the data from the
+     * various fields will also be retrieved.
+     * 
+     * @type {boolean}
+     * 
+     * @default true
+     * 
+     * @example
+     * const options: IFormGetDataOptions = {
+     *     handleChange: false, // Only retrieve initial data
+     * };
+     * 
+     * // Example usage in a function
+     * const data = getData(options);
+     * console.log(data); // Outputs only the initial data
      */
     handleChange?: boolean;
 };
 
-export type IFormProps = IViewProps & {
-
+/**
+ * Interface representing the properties for a form component.
+ * 
+ * This interface extends `IViewProps` (excluding the `children` property) and
+ * includes various options for configuring the behavior and appearance of the form.
+ * It provides hooks for handling form submission, validation, and rendering options,
+ * making it a comprehensive interface for form management.
+ * 
+ * @interface IFormProps
+ * 
+ * @example
+ * const formProps: IFormProps = {
+ *     data: { username: 'user123', email: 'user@example.com' },
+ *     beforeSubmit: (options) => {
+ *         console.log('Preparing to submit:', options);
+ *         return true; // or return a promise
+ *     },
+ *     onSubmit: (options) => {
+ *         console.log('Form submitted with data:', options.data);
+ *     },
+ *     name: 'userForm',
+ *     isLoading: false,
+ *     disabled: false,
+ * };
+ */
+export interface IFormProps extends Omit<IViewProps, "children"> {
+    /**
+     * The initial data for the form.
+     * 
+     * This property allows you to pass initial values to the form fields.
+     * 
+     * @type {IFormData}
+     * 
+     * @example
+     * const formData: IFormData = {
+     *     username: 'user123',
+     *     email: 'user@example.com',
+     * };
+     */
     data?: IFormData;
 
-    perm?: IAuthPerm;
     /**
-     * la fonction appelée immédiatement avant l'envoie des données du formulaire. cette fonction peut retourner une promesse ou générer une exception pour interdire l'envoie du formulaire
-     * la function onSubmit est appelée si la promesse est résolue.
-     * Il est important et très recommandé de faire muter les données dans la prop beforeSubmit, plutôt que la prop onSubmit.
-     * @param options
-     * @returns {boolean | string | Promise}
+     * Permissions associated with the form.
+     * 
+     * This property can be used to define access control for the form.
+     * 
+     * @type {IAuthPerm}
+     */
+    perm?: IAuthPerm;
+
+    /**
+     * Function called immediately before the form data is submitted.
+     * 
+     * This function can return a promise or throw an exception to prevent
+     * the form from being submitted. It is recommended to mutate the data
+     * in this function rather than in the `onSubmit` function.
+     * 
+     * @param options - Options for the submission process.
+     * @returns {boolean | string | Promise} - Return true to proceed, or a string for an error message.
+     * 
+     * @example
+     * beforeSubmit: (options) => {
+     *     if (!options.data.username) {
+     *         return 'Username is required.';
+     *     }
+     *     return true;
+     * }
      */
     beforeSubmit?: (options: IFormOnSubmitOptions) => any;
-    /**** cette fonction est appelée lorsque l'envoie des données du formulaire est déclenchée.
-     *  \n- Le processu d'envoie des données du formulaire est le suivant :
-     *  -1. la fonction beforeSubmit est appelée si la promesse lié à cette fonction est résolue, alors,\n
-     *  -2. Le status de la form est mis à jour à l'état isSubmitting, et la fonction onSubmit est appelée.
-     *  -3. En cas d'échec ou de succès de la fonction onSubmit, le status isSubmitting de la form est réinitialisé à false
-     *  Cette fonction peut être appeler à partir du composant Field, lorsque le formulaire est valide et que le bouton Entrée à été cliqué
-     *  ou si l'on clique sur une action du formulaire, (bouton ou item de menu ayant la props formName égale au nom du formulaire)
-     *  onSubmit ({data,context,field})
-     *  la fonction peut retourner une promesse ou générer une exception afin d'interdire l'envoie des données
-     *  la props field : représente le champ qui est à l'origine de l'envoie du formulaire
+
+    /**
+     * Function called when the form data submission is triggered.
+     * 
+     * The submission process follows these steps:
+     * 1. The `beforeSubmit` function is called. If the promise resolves, 
+     * 2. The form status is updated to `isSubmitting`, and the `onSubmit` function is called.
+     * 3. After success or failure of the `onSubmit` function, the `isSubmitting` status is reset to false.
+     * 
+     * This function can be called from the Field component when the form is valid
+     * and the Enter key is pressed, or if an action (button or menu item) with the
+     * `formName` prop equal to the form's name is clicked.
+     * 
+     * @param options - Options for the submission process.
+     * @returns {boolean | string | Promise} - Return true to proceed, or a string for an error message.
+     * 
+     * @example
+     * onSubmit: (options) => {
+     *     console.log('Submitting form with data:', options.data);
+     *     return true; // or return a promise
+     * }
      */
     onSubmit?: (options: IFormOnSubmitOptions) => any;
 
     /**
-     * le nom de la form
+     * The name of the form.
+     * 
+     * This property can be used to identify the form in various contexts.
+     * 
+     * @type {string}
+     * 
+     * @example
+     * name: 'userForm',
      */
     name?: string;
+
     /**
-     * méthode de rappel appelée lorsque tous les champs de la form sont valides
+     * Callback method called when all fields in the form are valid.
+     * 
+     * @param options - Options related to field validation.
+     * @returns {any} - Return value can be used for further processing.
+     * 
+     * @example
+     * onValidate: (options) => {
+     *     console.log('All fields are valid:', options);
+     * }
      */
     onValidate?: (options: IFormFieldValidatorOptions) => any;
 
-    /*** Cette fonction est appelée lorsque au moins un champ de la form n'est pas valide :
-     * elle prend en paramètre :
-     *      -name : le nom du champ,
-     *      -value : la valeur qui n'a pas été validée pour le champ,
-     *      -msg : Le message d'erreur correspondant
-     *      -validRule : La règle de validation,
-     *      -validParams : Les paramètres de validation,
-     *      -event : L'évènement utilisée qui a déclanché la validation du formulaire
+    /**
+     * Callback method called when at least one field in the form is not valid.
+     * * This function takes parameters including:
+     * - `name`: The name of the field.
+     * - `value`: The value that failed validation for the field.
+     * - `msg`: The corresponding error message.
+     * - `validRule`: The validation rule.
+     * - `validParams`: The validation parameters.
+     * - `event`: The event that triggered the form validation.
+     * 
+     * @param options - Options related to field validation.
+     * @returns {any} - Return value can be used for further processing.
+     * 
+     * @example
+     * onNoValidate: (options) => {
+     *     console.log('Field not valid:', options.name, options.msg);
+     * }
      */
     onNoValidate?: (options: IFormFieldValidatorOptions) => any;
-    /***
-     * méthode de rappel appélée lorsqu'un champ de la form est valide
+
+    /**
+     * Callback method called when a field in the form is valid.
+     * 
+     * @param options - Options related to field validation.
+     * @returns {any} - Return value can be used for further processing.
+     * 
+     * @example
+     * onValidateField: (options) => {
+     *     console.log('Field valid:', options.fieldName);
+     * }
      */
     onValidateField?: (options: IFormFieldValidatorOptions) => any;
-    /***
-     * méthode appélée lorsqu'un champ de la form n'est pas valide
+
+    /**
+     * Callback method called when a field in the form is not valid.
+     * 
+     * @param options - Options related to field validation.
+     * @returns {any} - Return value can be used for further processing.
+     * 
+     * @example
+     * onNoValidateField: (options) => {
+     *     console.log('Field not valid:', options.fieldName);
+     * }
      */
     onNoValidateField?: (options: IFormFieldValidatorOptions) => any;
 
-    /*** objet de la forme : 
-   *  {
-
-   *      eventName : handler 
-          avec eventName   le nom de l'évènement et hanbler la fonction de rappel à appeler
-   *  }
-   */
+    /**
+     * Object representing keyboard event handlers.
+     * 
+     * This property allows you to define custom handlers for keyboard events
+     * associated with the form fields.
+     * 
+     * @type {IKeyboardEventHandlerKey[]}
+     * 
+     * @example
+     * keyboardEvents: [
+     *     { eventName: 'keydown', handler: (event) => console.log('Key down:', event) },
+     * ]
+     */
     keyboardEvents?: IKeyboardEventHandlerKey[];
-    /***
-     * Lorsque l'utilisateur clique sur la touche Enter du clavier
-     * Si cette fonction retourne false alors la fonction submit de IForm ne sera pas appelée ou encore la props onSubmit de form ne sera pas appelée si elle est définie
-     * @return {boolean|any} si false, alors la fonction submit de form ne sera pas appelée
+    /**
+     * Callback method called when the Enter key is pressed.
+     * 
+     * If this function returns false, the form's submit function will not be called.
+     * 
+     * @param options - Options related to keyboard events.
+     * @returns {boolean | any} - Return false to prevent submission.
+     * 
+     * @example
+     * onEnterKeyPress: (options) => {
+     *     if (options.fieldName === 'username') {
+     *         return false; // Prevent submission if username field is focused
+     *     }
+     * }
      */
     onEnterKeyPress?: (options: IFormKeyboardEventHandlerOptions) => any;
-    /***
-     * lorsqu'un évènement de clavier est écouté sur l'un des champs du formulaire
+
+    /**
+     * Callback method called when a keyboard event is detected on any form field.
+     * 
+     * @param options - Options related to keyboard events.
+     * @returns {any} - Return value can be used for further processing.
+     * 
+     * @example
+     * onKeyboardEvent: (options) => {
+     *     console.log('Keyboard event:', options.event);
+     * }
      */
     onKeyboardEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
 
+    /**
+     * The fields of the form.
+     * 
+     * This property allows you to define the fields that will be included in the form.
+     * 
+     * @type {IFormFieldsProp}
+     * 
+     * @example
+     * fields: {
+     *     username: { type: 'text', required: true },
+     *     email: { type: 'email', required: true },
+     * }
+     */
     fields?: IFormFieldsProp;
 
-    /***
-     * cette props prend en paramèter l'objet data et détermine s'il s'agit d'une modification de la donnée en cours où non
+    /**
+     * Function to determine if the current data is being edited.
+     * 
+     * This property takes the data object as a parameter and returns a boolean
+     * indicating whether the data is currently being edited.
+     * 
+     * @param options - Options related to data editing.
+     * @returns {boolean} - Return true if data is being edited.
+     * 
+     * @example
+     * isDataEditing: (options) => {
+     *     return options.data.id !== undefined; // Check if editing existing data
+     * }
      */
-    isDocEditing?: (options: IFormCallbackOptions) => boolean;
+    isDataEditing?: (options: IFormCallbackOptions) => boolean;
 
-    /*** permet de désactiver tous les champs du form. lorsque ce champ est true alors tous les champs du form sont disabled */
+    /**
+     * Disable all fields in the form.
+     * 
+     * When this property is true, all fields in the form will be disabled.
+     * 
+     * @type ```typescript
+     * @type {boolean}
+     * 
+     * @example
+     * disabled: true, // All fields will be disabled
+     */
     disabled?: boolean;
 
-    /*** permet de rendre readOnly tous les champs du form. lorsque ce champ est true alors tous les champs du form sont readOnly*/
+    /**
+     * Make all fields in the form read-only.
+     * 
+     * When this property is true, all fields in the form will be read-only.
+     * 
+     * @type {boolean}
+     * 
+     * @example
+     * readonly: true, // All fields will be read-only
+     */
     readonly?: boolean;
 
-    /** permet de spécifier si les données sont en cours de modification
-     * par défaut, elle est overwrite avec le retour de la fonction isDocEditing
+    /**
+     * Specify if the data is currently being updated.
+     * 
+     * By default, this is overwritten with the return value of the `isDataEditing` function.
+     * 
+     * @type {boolean}
+     * 
+     * @example
+     * isUpdate: true, // Indicates that the form is in update mode
      */
     isUpdate?: boolean;
 
-    /*** spécifie si les items du formulaire seront responsive */
+    /**
+     * Specify if the form items will be responsive.
+     * 
+     * When this property is true, the form will adjust its layout based on the screen size.
+     * 
+     * @type {boolean}
+     * 
+     * @example
+     * responsive: true, // Form items will be responsive
+     */
     responsive?: boolean;
 
-    /***
-     * les noms des champs qui seront rendu par le formulaire, au cas où l'on souhaite par défaut ne render que certains champ
-     * alors il faudra spécifier le nom des dits champs dans cette prop\n
-     * il s'agira la de spécifier la liste des nom des champs qui seront rendu par le formulaire
+    /**
+     * Names of the fields that will be rendered by the form.
+     * 
+     * This property allows you to specify which fields should be rendered by default.
+     * 
+     * @type {string[]}
+     * 
+     * @example
+     * renderableFieldsNames: ['username', 'email'], // Only these fields will be rendered
      */
     renderableFieldsNames?: string[];
 
-    /***
-     * Cette prop permet de retourner un booléan, spécifiant si le champ sera oui ou non rendu par le formulaire
+    /**
+     * Function to determine if a field should be rendered by the form.
+     * 
+     * This property returns a boolean indicating whether the field will be rendered.
+     * 
+     * @param options - Options related to rendering fields.
+     * @returns {boolean} - Return true if the field should be rendered.
+     * 
+     * @example
+     * canRenderField: (options) => {
+     *     return options.isUpdate; // Render field only if in update mode
+     * }
      */
     canRenderField?(
         options: IFormProps & {
@@ -942,51 +1384,128 @@ export type IFormProps = IViewProps & {
     ): boolean;
 
     /**
-     * permet de renseigner sur le comportement en cours de chargement du form
+     * Indicates the loading state of the form.
+     * 
+     * This property can be used to show a loading indicator while the form is being processed.
+     * 
+     * @type {boolean}
+     * 
+     * @example
+     * isLoading: true, // Form is currently loading
      */
     isLoading?: boolean;
 
-    /***
-     * si le formulaire est en cours d'envoie
+    /**
+     * Indicates if the form is currently being submitted.
+     * 
+     * This property can be used to show a loading indicator or disable the form during submission.
+     * 
+     * @type {boolean}
+     * 
+     * @example
+     * isSubmitting: true, // Form is currently submitting
      */
     isSubmitting?: boolean;
 
-    /***
-     * le noeud react qui fera office de header pour le formulare
+    /**
+     * React node that serves as the header for the form.
+     * 
+     * This property allows you to customize the header of the form.
+     * 
+     * @type {((options: IFormProps) => ReactElement) | ReactElement}
+     * 
+     * @example
+     * header: <h1>User Form</h1>, // Custom header for the form
      */
     header?: ((options: IFormProps) => ReactElement) | ReactElement;
 
-    /*** l'élement node qui sera rendu en children ou enfant du formulaire */
+    /**
+     * Element node that will be rendered as children of the form.
+     * 
+     * This property allows you to pass additional content to be rendered within the form.
+     * 
+     * @type {((options: IFormProps) => ReactElement) | ReactElement}
+     * 
+     * @example
+     * children: <p>Please fill out the form below:</p>, // Additional content
+     */
     children?: ((options: IFormProps) => ReactElement) | ReactElement;
 
-    /***
-     * les props représentant le coposants à render pour afficher le contenu en Tab du formulaire
+    /**
+     * Props representing the components to render for displaying tab content in the form.
+     * 
+     * This property allows you to define tab items for the form.
+     * 
+     * @type {IFormTabItemsProp}
+     * 
+     * @example
+     * tabItems: [{ title: 'Tab 1', content: <Tab1Content /> }, { title: 'Tab 2', content: <Tab2Content /> }],
      */
     tabItems?: IFormTabItemsProp;
 
-    /*** le nom de la session, pour la persistance des données */
+    /**
+     * Props representing the components to render for displaying tab content in the form.
+     * 
+     * This property allows you to define tab items for the form.
+     * 
+     * @type {IFormTabItemsProp}
+     * 
+     * @example
+     * tabItems: [{ title: 'Tab 1', content: <Tab1Content /> }, { title: 'Tab 2', content: <Tab2Content /> }],
+     */
     sessionName?: string;
 
-    /***
-     * les props à passer au composant Tab, lorsque les tabItems sont passés comme paramètre au form
+    /**
+     * Props to pass to the Tab component when tabItems are provided to the form.
+     * 
+     * This property allows you to customize the behavior and appearance of the tabs.
+     * 
+     * @type {ITabProps}
+     * 
+     * @example
+     * tabsProps: { activeTab: 0, onTabChange: (index) => console.log('Tab changed to:', index) },
      */
     tabsProps?: ITabProps;
 
-    /***
-     * la taille de la fenêtre window, pour éviter que les champs soient responsives dans les petis écrans ou les boîtes de dialogues
+    /**
+     * The width of the window, used to prevent fields from being responsive on small screens or dialog boxes.
+     * 
+     * @type {number}
+     * 
+     * @example
+     * windowWidth: 768, // Width threshold for responsive behavior
      */
     windowWidth?: number;
 
-    /***
-     * les props à passer au TabItem main, lorsque la prop renderTabType est à mobile, où encore lorsque les tabItems seront rendu en environnement mobile
-     */
+    /**
+    * Props to pass to the main TabItem when the renderTabType is set to mobile,
+    * or when tabItems are rendered in a mobile environment.
+    * 
+    * @type {ITabItemProps}
+    * 
+    * @example
+    * mainTabItemProps: { style: { padding: '10px' } },
+    */
     mainTabItemProps?: ITabItemProps;
 
-    /***
-     * spécifie si les messages d'erreur seronts affichés par les champs du formulaire ou pas
+    /**
+     * Specifies whether error messages will be displayed by the form fields.
+     * 
+     * @type {boolean}
+     * 
+     * @example
+     * displayErrors: true, // Error messages will be displayed
      */
     displayErrors?: boolean;
 
+    /**
+     * Specifies the type of rendering for the tabs in the form.
+     * 
+     * @type {IFormRenderTabProp}
+     * 
+     * @example
+     * renderTabType: 'desktop', // Render tabs for desktop view
+     */
     renderTabType?: IFormRenderTabProp;
 };
 
@@ -1294,8 +1813,8 @@ export type IFormFieldOnChangeOptions<onChangeEventType = NativeSyntheticEvent<T
  *     },
  * };
  */
-export type IFormFieldProps<T extends IFieldType = "text", onChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null, ValueType = any> = IField<T> & {
-    getValidValue?: (options: { value: any; context: IFormField; data: IFormData }) => any;
+export type IFormFieldProps<T extends IFieldType = any, onChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null, ValueType = any> = IField<T> & {
+    getValidValue?: (options: { value: any; context: IFormField<T>; data: IFormData }) => any;
     isFilter?: boolean;
 
     validateOnMount?: boolean;
@@ -1333,9 +1852,9 @@ export type IFormFieldProps<T extends IFieldType = "text", onChangeEventType = N
 
     ref?: any;
 
-    onMount?: (context: IFormField) => any;
+    onMount?: (context: IFormField<T>) => any;
 
-    onUnmount?: (context: IFormField) => any;
+    onUnmount?: (context: IFormField<T>) => any;
 
     displayErrors?: boolean;
 
@@ -1420,7 +1939,7 @@ export interface IFormKeyboardEventHandlerOptions extends IFormContext {
  *     formTriedTobeSubmitted: false,
  * };
  */
-export type IFormFieldState<T extends IFieldType = "text"> = IField<T> & {
+export type IFormFieldState = Partial<IField<any>> & {
     error: boolean;
     isFieldEditable: boolean;
     isFieldDisabled: boolean;
@@ -1459,6 +1978,4 @@ export type IFormFieldState<T extends IFieldType = "text"> = IField<T> & {
  *     tooltip: "Submit the form",
  * };
  */
-export interface IFormAction extends IButtonProps<IFormContext> {
-
-}
+export interface IFormAction extends IButtonProps<IFormContext> { }

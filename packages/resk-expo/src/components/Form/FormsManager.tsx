@@ -1,4 +1,4 @@
-import { IDict, isClass, isNonNullString, isObj, isObservable, observableFactory } from "@resk/core";
+import { IDict, IFieldType, isClass, isNonNullString, isObj, isObservable, observableFactory } from "@resk/core";
 import { IForm, IFormAction, IFormCallbackOptions, IFormData, IFormField, IFormFieldProps, IFormFields, IFormFieldsProp, IFormGetDataOptions, IFormManagerEvent } from "./types";
 
 /**
@@ -183,7 +183,7 @@ export class FormsManager {
      * @example
      * const field = FormsManager.getField("myForm", "myField"); // Retrieves the specified field
      */
-    static getField(formName?: string, fieldName?: string) {
+    static getField<T extends IFieldType = any>(formName?: string, fieldName?: string): IFormField<T> | null {
         if (!isNonNullString(formName) || !isNonNullString(fieldName)) return null;
         const fields = this.getFields(formName);
         if (isObj(fields) && fieldName) {
@@ -269,9 +269,9 @@ export class FormsManager {
      * @returns {boolean} - Returns true if the document is editable, otherwise false.
      * 
      * @example
-     * const isEditable = FormsManager.isDocEditing({ id: 1 }, [{ name: "id", primaryKey: true }]); // true or false
+     * const isEditable = FormsManager.isDataEditing({ id: 1 }, [{ name: "id", primaryKey: true }]); // true or false
      */
-    static isDocEditing({
+    static isDataEditing({
         data,
         fields,
         checkPrimaryKey,

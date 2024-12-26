@@ -157,7 +157,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
     getForm(name: string): Form | undefined {
         return FormsManager.getForm(name) as Form;
     }
-    isDocEditing(props?: IFormProps): boolean {
+    isDataEditing(props?: IFormProps): boolean {
         const p: IFormCallbackOptions = {
             ...this.props,
             ...Object.assign({}, props),
@@ -165,10 +165,10 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             form: this
         };
         p.fields = Object.assign({}, p.fields);
-        if (this.props.isDocEditing) {
-            return this.props.isDocEditing(p);
+        if (this.props.isDataEditing) {
+            return this.props.isDataEditing(p);
         }
-        return FormsManager.isDocEditing(p);
+        return FormsManager.isDataEditing(p);
     }
     isSubmitting(): boolean {
         return !!this.state?.isSubmitting || !!this.props.isSubmitting || false;
@@ -226,7 +226,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         props = props || this.props;
         Object.assign(this.componentProps, {
             ...Object.assign({}, props),
-            isUpdate: this.isDocEditing(props),
+            isUpdate: this.isDataEditing(props),
         });
         return this.componentProps;
     }
@@ -277,7 +277,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         p.data = p?.data || {};
         const { responsive } = p;
         const preparedFields: IFormFieldsProp = {};
-        const isUpdate = this.isDocEditing(p);
+        const isUpdate = this.isDataEditing(p);
         this.componentProps.isUpdate = isUpdate;
         for (let i in this.primaryKeyFields) {
             delete this.primaryKeyFields[i];
@@ -439,7 +439,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         if (options) {
             options.isUpdate =
                 !!options.isUpdate ||
-                this.isDocEditing({ ...this.componentProps, ...Object.assign({}, options) });
+                this.isDataEditing({ ...this.componentProps, ...Object.assign({}, options) });
         }
         return new Promise<any>((resolve, reject) => {
             const callback = this.componentProps?.onSubmit;
@@ -492,7 +492,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         return new Promise((resolve, reject) => {
             const data = this.getData();
             const isUpdate =
-                !!this.componentProps?.isUpdate || this.isDocEditing({ ...this.componentProps, data });
+                !!this.componentProps?.isUpdate || this.isDataEditing({ ...this.componentProps, data });
             const options = { data, isUpdate, form: this };
             return this.beforeSubmit(options).then(() => {
                 this.toggleIsSubmitting(true, () => {

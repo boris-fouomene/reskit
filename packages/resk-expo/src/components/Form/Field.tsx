@@ -23,19 +23,19 @@ import { IReactComponent, IStyle } from "@src/types";
  * providing functionality for validation, state management, and rendering.
  *
  * @class Field
- * @extends ObservableComponent<IFormFieldProps, IFormFieldState, IFormEvent>
+ * @extends ObservableComponent<IFormFieldProps<Type>, IFormFieldState, IFormEvent>
  * 
  * @remarks
  * This class is designed to be flexible and reusable, allowing developers to create various types of fields
  * (e.g., text inputs, checkboxes) that can be integrated into forms. It handles validation, state management,
  * and rendering logic, making it easier to build complex forms with dynamic behavior.
- * @see {@link IFormField} for the `IFormField` interface.
- * @see {@link IFormFieldProps} for the `IFormFieldProps` interface.
+ * @see {@link IFormField<Type>} for the `IFormField<Type>` interface.
+ * @see {@link IFormFieldProps<Type>} for the `IFormFieldProps<Type>` interface.
  * @see {@link IFormFieldState} for the `IFormFieldState` interface.
  * @see {@link IFormEvent} for the `IFormEvent` type.
- * @see {@link IFormFieldValidatorOptions} for the `IFormFieldValidatorOptions` interface.
+ * @see {@link IFormFieldValidatorOptions<Type>} for the `IFormFieldValidatorOptions<Type>` interface.
  */
-export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState, IFormEvent> implements IFormField {
+export class Field<Type extends IFieldType = any> extends ObservableComponent<IFormFieldProps, IFormFieldState, IFormEvent> implements IFormField<Type> {
     /** 
      * The current state of the field.
      * 
@@ -44,13 +44,15 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
      */
     readonly state = {} as IFormFieldState;
 
+    readonly props: IFormFieldProps<Type> = {} as IFormFieldProps<Type>;
+
     /**
     * The component properties for the field.
     * 
     * @private
     * @type {IFormFieldProps}
     */
-    private _componentProps: IFormFieldProps = {} as IFormFieldProps;
+    private _componentProps: IFormFieldProps<Type> = {} as IFormFieldProps<Type>;
 
     /** 
      * Symbol used to indicate if the field is editable.
@@ -119,10 +121,10 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
         } as IFormFieldState;
         this.validate({ value: this.state.value, context: this });
     }
-    UNSAFE_componentWillReceiveProps(nextProps: Readonly<IFormFieldProps>, nextContext: any): void {
+    UNSAFE_componentWillReceiveProps(nextProps: IFormFieldProps<Type>, nextContext: any): void {
         this.setState({ wrapperStyle: this.getBreakpointStyle(nextProps) }, () => {
             if ("defaultValue" in nextProps) {
-                this.validate({ value: nextProps.defaultValue } as IFormFieldValidatorOptions, true);
+                this.validate({ value: nextProps.defaultValue } as IFormFieldValidatorOptions<Type>, true);
             } else {
                 this.validate({ value: this.state.value, context: this }, true);
             }
@@ -149,7 +151,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
      * @example
      * const props = this.componentProps; // Accessing the component properties
      */
-    get componentProps(): IFormFieldProps {
+    get componentProps(): IFormFieldProps<Type> {
         if (!Object.getSize(this._componentProps, true)) {
             this._componentProps = this.getComponentProps(this.props);
         }
@@ -199,39 +201,39 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
      * Sets the value of the field and triggers validation.
      * 
      * @param {any} value - The new value for the field.
-     * @returns {Promise<IFormFieldValidatorOptions>} - A promise that resolves with validation options.
+     * @returns {Promise<IFormFieldValidatorOptions<Type>>} - A promise that resolves with validation options.
      * 
      * @example
      * this.setValue("new value"); // Sets the field value
      */
     setValue(value: any) {
-        return this.validate({ value } as IFormFieldValidatorOptions);
+        return this.validate({ value } as IFormFieldValidatorOptions<Type>);
     }
     /**
      * Retrieves a field by its name from the form.
      * 
      * @param {string} fieldName - The name of the field to retrieve.
-     * @returns {IFormField | null} - The field if found, otherwise null.
+     * @returns {IFormField<Type> | null} - The field if found, otherwise null.
      * 
      * @example
      * const field = this.getField("username"); // Retrieves the username field
      */
-    getField(fieldName: string): IFormField | null {
-        return FormsManager.getField(this.getFormName(), fieldName);
+    getField<T extends IFieldType = any>(fieldName: string): IFormField<T> | null {
+        return FormsManager.getField<T>(this.getFormName(), fieldName);
     }
     /**
      * Validates the field based on the provided options.
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
      * @param {boolean} [force=false] - Whether to force validation.
-     * @returns {Promise<IFormFieldValidatorOptions>} - A promise that resolves with validation options.
+     * @returns {Promise<IFormFieldValidatorOptions<Type>>} - A promise that resolves with validation options.
      * 
      * @example
      * this.validate({ value: "test" }); // Validates the field with the value "test"
      */
-    validate(options: IFormFieldValidatorOptions, force: boolean = false): Promise<IFormFieldValidatorOptions> {
+    validate(options: IFormFieldValidatorOptions<Type>, force: boolean = false): Promise<IFormFieldValidatorOptions<Type>> {
         options = Object.assign({}, options);
-        options.fieldName = options.fieldName || this.getName();
+        options.fieldName = defaultStr(options.fieldName, this.getName());
         options.context = this;
         options.value = this.sanitizeValue(options.value);
         options.prevValue = "prevValue" in options ? options.prevValue : this.state.prevValue;
@@ -350,7 +352,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
             rules.unshift("required");
         }
         ["minLength", "length", "maxLength"].map((r: string) => {
-            const k: keyof IFormFieldProps = r as keyof IFormFieldProps;
+            const k: keyof IFormFieldProps<Type> = r as keyof IFormFieldProps<Type>;
             const rValue = typeof this.componentProps[k] === "number" ? this.componentProps[k] : undefined;
             if (rValue !== undefined) {
                 rules.push(`${r}[${rValue}]`);
@@ -406,24 +408,24 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
      * 
      ```typescript
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
-     * @returns {IFormFieldValidatorOptions} - The options after any pre-validation logic.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
+     * @returns {IFormFieldValidatorOptions<Type>} - The options after any pre-validation logic.
      * 
      * @example
      * const preValidatedOptions = this.beforeValidate(options); // Executes pre-validation logic
      */
-    beforeValidate(options: IFormFieldValidatorOptions) {
+    beforeValidate(options: IFormFieldValidatorOptions<Type>) {
         return options;
     }
     /**
     * Calls the onChange handler for the field.
     * 
-    * @param {IFormFieldValidatorOptions} options - The validation options.
+    * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
     * 
     * @example
     * this.callOnChange(options); // Calls the onChange handler
     */
-    callOnChange(options: IFormFieldValidatorOptions) {
+    callOnChange(options: IFormFieldValidatorOptions<Type>) {
         if (this.compareValues(this.state.value, this.state.prevValue)) {
             return;
         }
@@ -437,14 +439,14 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
     /**
      * This function is called when the field is validated.
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
      * @returns {boolean} - Returns true if validation is successful, otherwise throws an error.
      * 
      * @example
      * this.onValidate(options); // Validates the field
      * 
      */
-    onValidate(options: IFormFieldValidatorOptions) {
+    onValidate(options: IFormFieldValidatorOptions<Type>) {
         options.context = this;
         const cb = () => {
             if (!this.isFilter()) {
@@ -491,14 +493,14 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
     /**
      * Handles the case where validation does not occur.
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
      * @returns {boolean} - Returns false if no validation occurred.
      * 
      * @example
      * this.onNoValidate(options); // Handles no validation case
      * this function is called when the field is not validated
      */
-    onNoValidate(options: IFormFieldValidatorOptions) {
+    onNoValidate(options: IFormFieldValidatorOptions<Type>) {
         options.context = this;
         if (!this.isFilter()) {
             const form = this.getForm();
@@ -613,14 +615,14 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
     /**
      * Retrieves the specific properties for the field.
      * 
-     * @param {IFormFieldProps} [props] - Optional properties to use for rendering.
-     * @returns {IFormFieldProps} - The properties to use for rendering the field.
+     * @param {IFormFieldProps<Type>} [props] - Optional properties to use for rendering.
+     * @returns {IFormFieldProps<Type>} - The properties to use for rendering the field.
      * 
      * @example
      * const fieldProps = this.getComponentProps(); // Retrieves the component properties
      */
-    getComponentProps(props?: IFormFieldProps): IFormFieldProps {
-        this._componentProps = { ...Object.assign({}, props || this.props), name: this.getName() };
+    getComponentProps(props?: IFormFieldProps<Type>): IFormFieldProps<Type> {
+        this._componentProps = { ...Object.assign({}, props || this.props), name: this.getName() } as unknown as IFormFieldProps<Type>;
         if (this.isFilter() && isObj(this.componentProps.filter)) {
             extendObj(this.componentProps, this.componentProps.filter);
         }
@@ -691,29 +693,29 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
     /**
      * Validates the field on change.
      * 
-     * @param {IFormFieldValidatorOptions} options - The validation options.
-     * @returns {Promise<IFormFieldValidatorOptions>} - A promise that resolves with validation options.
+     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
+     * @returns {Promise<IFormFieldValidatorOptions<Type>>} - A promise that resolves with validation options.
      * 
      * @example
      * this.validateOnChange({ value: "new value" }); // Validates the field on change
      */
-    validateOnChange(options: IFormFieldValidatorOptions) {
+    validateOnChange(options: IFormFieldValidatorOptions<Type>) {
         return this.validate(options);
     }
     /**
      * Renders the field component.
      * 
-     * @param {IFormFieldProps} props - The properties for the field component.
+     * @param {IFormFieldProps<Type>} props - The properties for the field component.
      * @param {any} innerRef - A reference to the inner component.
      * @returns {ReactNode} - The rendered field component.
      * 
      * @example
      * const renderedField = this._render(props, innerRef); // Renders the field component
-     * @see {@link IFormFieldProps} for the `IFormFieldProps` type.
+     * @see {@link IFormFieldProps<Type>} for the `IFormFieldProps<Type>` type.
      * @see {@link ITextInputProps} for the `ITextInputProps` type.
      * @see {@link React.LegacyRef} for the `React.LegacyRef` type.
      */
-    _render(props: IFormFieldProps, innerRef?: any): ReactNode {
+    _render(props: IFormFieldProps<Type>, innerRef?: any): ReactNode {
         return (<TextInput ref={innerRef as React.LegacyRef<RNTextInput>} {...(props as ITextInputProps)} />);
     }
     /**
@@ -867,13 +869,13 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
     /**
      * Checks if the field can handle responsive styles.
      * 
-     * @param {IFormFieldProps} [props] - Optional properties to check.
+     * @param {IFormFieldProps<Type>} [props] - Optional properties to check.
      * @returns {boolean} - Returns true if the field can handle responsive styles, otherwise false.
      * 
      * @example
      * const canHandleResponsive = this.canHandleBreakpointStyle(); // Checks for responsive styles
      */
-    canHandleBreakpointStyle(props?: IFormFieldProps): boolean {
+    canHandleBreakpointStyle(props?: IFormFieldProps<Type>): boolean {
         const responsive = (props || this.props).responsive;
         return !!responsive || (!this.isFilter() && responsive !== false);
     }
@@ -893,13 +895,13 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
     /**
      * Retrieves the breakpoint style for the field.
      * 
-     * @param {IFormFieldProps} [props] - Optional properties to use for style calculation.
+     * @param {IFormFieldProps<Type>} [props] - Optional properties to use for style calculation.
      * @returns {IStyle} - The calculated style for the field.
      * 
      * @example
      * const style = this.getBreakpointStyle(); // Retrieves the breakpoint style
      */
-    getBreakpointStyle(props?: IFormFieldProps): IStyle {
+    getBreakpointStyle(props?: IFormFieldProps<Type>): IStyle {
         if (!this.canHandleBreakpointStyle(props)) return null;
         const windowWidth = (props || this.props).windowWidth;
         return StyleSheet.flatten([Breakpoints.col(undefined, windowWidth)]);
@@ -971,13 +973,13 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
     /**
      * Renders a loading state for the field.
      * 
-     * @param {IFormFieldProps} props - The properties for the field component.
+     * @param {IFormFieldProps<Type>} props - The properties for the field component.
      * @returns {ReactNode} - The rendered loading state.
      * 
      * @example
      * const loadingState = this.renderLoading(props); // Renders the loading state
      */
-    renderLoading(props: IFormFieldProps): ReactNode {
+    renderLoading(props: IFormFieldProps<Type>): ReactNode {
         let width: number | string = "100%";
         const wrapStyle = isObj(this.state.wrapperStyle) && this.state.wrapperStyle && "width" in this.state.wrapperStyle
             ? this.state.wrapperStyle
@@ -1014,7 +1016,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
      * const renderedField = this.render(); // Renders the field component
      */
     render() {
-        this._componentProps = {} as IFormFieldProps;
+        this._componentProps = {} as IFormFieldProps<Type>;
         let {
             data,
             keyboardEventHandlerProps,
@@ -1067,7 +1069,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
                                     visible: this.isFilter() ? true : visible,
                                     disabled,
                                     readOnly,
-                                } as IFormFieldProps)
+                                } as IFormFieldProps<Type>)
                                 : null}
                             {!isLoading
                                 ? this._render(
@@ -1090,7 +1092,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
                                                     if (this.canValidateOnBlur()) {
                                                         this.validateOnChange({
                                                             value: this.getValue(),
-                                                        } as IFormFieldValidatorOptions);
+                                                        } as IFormFieldValidatorOptions<Type>);
                                                     }
                                                 },
                                         disabled,
@@ -1098,7 +1100,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
                                         error: canShowErrors,
                                         ...kProps,
                                         defaultValue: this.state.value,
-                                    } as IFormFieldProps,
+                                    } as IFormFieldProps<Type>,
                                     this.setRef.bind(this)
                                 )
                                 : null}
@@ -1219,7 +1221,7 @@ export class Field extends ObservableComponent<IFormFieldProps, IFormFieldState,
  * 
  * // The above code registers the MyForm class's myTextField property as a text field component.
  * @see {@link IForm} for the `IForm` type.
- * @see {@link IFormFieldProps} for the `IFormFieldProps` type.
+ * @see {@link IFormFieldProps<Type>} for the `IFormFieldProps` type.
  * @see {@link IFormFieldState} for the `IFormFieldState` type.
  */
 export function FormField(type: IFieldType) {

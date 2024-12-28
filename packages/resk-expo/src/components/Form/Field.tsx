@@ -1045,7 +1045,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
         const canShowErrors = this.canDisplayError();
         return (
             <KeyboardEventHandler
-                testID={"RN_FormField_Container_" + this.getName()}
+                testID={"resk-form-field-container-" + this.getName()}
                 innerRef={this.wrapperRef}
                 {...wrapperProps}
                 handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(wrapperProps)}

@@ -1,9 +1,12 @@
+import "./types";
 import { getToggleableDefaultValues, ISwitchProps, IToggleableProps, Switch } from "@components/Switch";
 import { IFormFieldProps } from "../types";
 import { Field, FormField } from "../Field";
+import { StyleSheet } from "react-native";
+import { IFieldType } from "@resk/core";
 
 @FormField<"switch">("switch")
-class FormFieldSwitch extends Field<"switch"> {
+export class FormFieldSwitch<Type extends IFieldType = "switch"> extends Field<Type> {
     isTextField(): boolean {
         return false;
     }
@@ -14,7 +17,18 @@ class FormFieldSwitch extends Field<"switch"> {
         const { checkedValue, uncheckedValue } = this.getDefaultValues(this.props as IToggleableProps);
         return value === checkedValue ? checkedValue : uncheckedValue;
     }
-    _render(props: IFormFieldProps<"switch">, innerRef: any) {
-        return <Switch {...(props as ISwitchProps)} />;
+    getComponentProps(props?: IFormFieldProps<Type> | undefined): IFormFieldProps<Type> {
+        const p = super.getComponentProps(props);
+        p.keyboardEventHandlerProps = Object.assign({}, p.keyboardEventHandlerProps);
+        p.keyboardEventHandlerProps.style = [styles.keyboardEventHandler, p.keyboardEventHandlerProps.style];
+        return p;
+    }
+    _render({ keyboardEventHandlerProps, ...props }: IFormFieldProps<Type>, innerRef: any) {
+        return <Switch  {...(props as ISwitchProps)} />;
     }
 }
+const styles = StyleSheet.create({
+    keyboardEventHandler: {
+        justifyContent: "center",
+    },
+});

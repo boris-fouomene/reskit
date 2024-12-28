@@ -31,6 +31,12 @@ const index = withAppBar(() => {
                         checkedValue: true,
                         uncheckedValue: false,
                     } as IField<"switch">,
+                    checkbox: {
+                        type: "checkbox",
+                        label: "Checkbox",
+                        checkedLabel: "Checked",
+                        uncheckedLabel: "Unchecked",
+                    } as IField<"checkbox">,
                     "email": {
                         label: "Email",
                         type: "email",

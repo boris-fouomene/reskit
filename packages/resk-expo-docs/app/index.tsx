@@ -10,35 +10,42 @@ const index = withAppBar(() => {
     }, [])
     return (
         <ScrollView>
-            <Form fields={{
-                name: {
-                    label: "Name",
-                    type: "text",
-                    required: true,
-                },
-                "email": {
-                    label: "Email",
-                    type: "email",
-                    required: true,
-                    minLength: 3,
-                    maxLength: 10,
-                },
-                "password": {
-                    label: "Password",
-                    type: "password",
-                    required: true,
-                    minLength: 3,
-                    maxLength: 10,
-                },
-                "password2": {
-                    label: "Password",
-                    type: "password",
-                    required: true,
-                    minLength: 3,
-                    maxLength: 10,
-                },
-            }}>
-
+            <Form
+                name="my-form"
+                onSubmit={({ data }) => {
+                    console.log(data, " is datata")
+                }}
+                fields={{
+                    name: {
+                        label: "Name",
+                        type: "text",
+                        required: true,
+                    },
+                    "email": {
+                        label: "Email",
+                        type: "email",
+                        required: true,
+                        minLength: 3,
+                        maxLength: 10,
+                    },
+                    "password": {
+                        label: "Password",
+                        type: "password",
+                        required: true,
+                        minLength: 3,
+                        maxLength: 10,
+                    },
+                    "password2": {
+                        label: "Password2",
+                        type: "password",
+                        required: true,
+                        variant: "labelEmbeded",
+                        minLength: 3,
+                        maxLength: 10,
+                    },
+                }}
+            >
+                <Button formName="my-form">Submit</Button>
             </Form>
             <View style={[Theme.styles.p5]}>
                 <Menu

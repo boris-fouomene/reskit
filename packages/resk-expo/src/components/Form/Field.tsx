@@ -44,7 +44,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
      */
     readonly state = {} as IFormFieldState;
 
-    readonly props: IFormFieldProps<Type> = {} as IFormFieldProps<Type>;
+    //readonly props: IFormFieldProps<Type> = {} as IFormFieldProps<Type>;
 
     /**
     * The component properties for the field.
@@ -153,7 +153,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
      */
     get componentProps(): IFormFieldProps<Type> {
         if (!Object.getSize(this._componentProps, true)) {
-            this._componentProps = this.getComponentProps(this.props);
+            this._componentProps = this.getComponentProps(this.props as IFormFieldProps<Type>);
         }
         return this._componentProps;
     }
@@ -1026,7 +1026,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
             isFilter: cIsFilter,
             visible,
             ...rest
-        } = this.getComponentProps(this.props);
+        } = this.getComponentProps(this.props as IFormFieldProps<Type>);
         const isFilter = this.isFilter() || cIsFilter;
         if (isFilter) {
             if (rest.rendable === false) return null;

@@ -6,7 +6,7 @@ import {
     Pressable,
     View,
 } from 'react-native';
-import { Colors, useTheme } from '@theme';
+import Theme, { Colors, useTheme } from '@theme';
 import Platform from '@platform/index';
 import { ITouchableRippleProps } from './types';
 import { getColors } from './utils';
@@ -140,6 +140,7 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
                 return ([
                     styles.container,
                     state.pressed && !disabled && rippleColor && { backgroundColor: rippleColor },
+                    disabled && Theme.styles.disabled,
                     webStyle,
                     cStyle,
                     isHover && hoverColor && { backgroundColor: hoverColor },

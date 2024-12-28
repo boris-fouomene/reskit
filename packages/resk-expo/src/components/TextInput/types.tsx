@@ -5,6 +5,8 @@ import { IOnChangeOptions } from "../../types";
 import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextInputProps } from "react-native";
 import { ReactNode } from "react";
 import { ILabelProps } from "@components/Label";
+import { IFontIconProps } from "@components/Icon/types";
+import { IField } from "@resk/core";
 
 
 /**
@@ -383,6 +385,14 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
      * Specifies whether the text input has erroneous values
      */
     error?: boolean;
+
+    /***
+     * a function that returns the icon props for the  icon to be displayed when the password is visible or not
+     * This function is called for password fields and should return the icon props to be displayed. The 
+     * returned icon props will be used to render the icon. The goal of that icon is to toggle the visibility of the password.
+     * @param {boolean} options.isPasswordVisible - true if the password is visible, false otherwise
+     */
+    secureTextEntryGetToggleIconProps?: (options: { isPasswordVisible: boolean }) => Partial<IFontIconProps>;
 };
 
 /**

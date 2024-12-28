@@ -329,7 +329,6 @@ export interface IFieldMap extends Record<string, IFieldBase> {
   email: IFieldBase<"email">;
 }
 
-
 /**
  * @type IField<T extends IFieldType = any>
  * @extends IFieldBase<T>
@@ -421,7 +420,7 @@ export type IField<T extends IFieldType = any> = Omit<IFieldMap[T], "type"> & {
   form?: Partial<IField<any>>;
 
   filter?: Partial<IField<any>>;
-};
+} & { [key in IResourceActionName]?: Partial<IField<any>>; };
 
 /**
  * Represents a protected resource that can be associated with a button in the user interface.

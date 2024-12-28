@@ -11,6 +11,7 @@ import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import { ITextInputCallbackOptions, ITextInputProps, ITextInputType, IUseTextInputProps } from "./types";
 import { ITheme } from "@theme/types";
 import { IStyle } from "@src/types";
+import { IFontIconProps } from "@components/Icon";
 
 /**
  * @description
@@ -83,14 +84,14 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
     return <View  {...containerProps}>
         {isLabelEmbededVariant ? null : labelContent}
         <View {...contentContainerProps}>
-            {left || isLabelEmbededVariant && !isEmpty(label) ? <View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, leftContainerProps.style]}>
+            {<View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, leftContainerProps.style]}>
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
-            </View> : null}
-            <RNTextInput
-                {...rest}
-                ref={mergeRefs(innerRef, ref)}
-            />
+                <RNTextInput
+                    {...rest}
+                    ref={mergeRefs(innerRef, ref)}
+                />
+            </View>}
             {right}
         </View>
     </View>
@@ -244,7 +245,7 @@ const getContainerAndContentStyle = ({ isFocused, isLabelEmbededVariant, textCol
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -323,13 +324,19 @@ export const useTextInput = ({ defaultValue, testID, value: omittedValue, withLa
             return affContent;
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
-    }, [focusedValue, canValueBeDecimal, error, props.multiline, affix, isPasswordField]);
+    }, [focusedValue, canValueBeDecimal, error, props.multiline, textColor, affix, isPasswordField]);
     const inputValue = isFocused ? focusedValue : formated.formattedValue || emptyValue || "";
-    const isInputValueEmpty = isEmpty(inputValue);
     const canRenderLabel = withLabel !== false;
     const { left, right, label } = getLabelOrLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
     const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null];
-    const secureIcon = isPasswordField ? <FontIcon color={textColor} size={25} name={isSecure ? "eye" : "eye-off"} /> : null;
+    const secureIconProps: Partial<IFontIconProps> = React.useMemo(() => {
+        if (!isPasswordField) return {} as IFontIconProps;
+        if (typeof secureTextEntryGetToggleIconProps == "function") {
+            return Object.assign({}, secureTextEntryGetToggleIconProps({ isPasswordVisible: isSecure }));
+        }
+        return {} as IFontIconProps;
+    }, [isPasswordField, secureTextEntryGetToggleIconProps, isSecure]);
+    const secureIcon = isPasswordField ? <FontIcon size={25}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure) }} color={textColor} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     return {
@@ -411,6 +418,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         fontSize: 15
     },
+    hidden: { display: "none", opacity: 0 },
     inputLabelEmbeded: {
         padding: 0,
         margin: 0,
@@ -429,6 +437,7 @@ const styles = StyleSheet.create({
         borderRadius: 0,
         backgroundColor: 'transparent',
         paddingHorizontal: 2,
+        flexGrow: 1,
         overflow: 'hidden',
     },
     inputNotEmbededLabelVariant: {
@@ -453,6 +462,7 @@ const styles = StyleSheet.create({
     },
     rightContainer: {
         paddingRight: 5,
+        alignSelf: "center",
     },
     container: {
         flexDirection: "column",
@@ -460,6 +470,7 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
         alignSelf: "flex-start",
         position: 'relative',
+        width: "100%",
     },
     contentContainer: {
         justifyContent: "space-between",
@@ -469,15 +480,18 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         position: "relative",
+        width: "100%",
     },
     leftContainer: {
         paddingLeft: 5,
+        flexGrow: 1,
     },
     leftOrRightContainer: {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-start",
+        alignSelf: "flex-start",
     },
     notEmbededLabelStyle: {
         fontWeight: "500",

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FormsManager } from '@components/Form/FormsManager';
 import {
     Animated,
     StyleSheet,
@@ -152,9 +153,11 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     context: extendContext,
     onPress,
     centered,
+    submitFormOnPress,
     fullWidth,
     spaceBetweenContent,
     isExpandable,
+    formName,
     ...rest
 }: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
@@ -286,6 +289,14 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 styles.icon,
                 styles[`icon${compact ? 'Compact' : ''}`],
             ];
+    React.useEffect(() => {
+        if (isNonNullString(formName)) {
+            FormsManager.mountAction(context, formName);
+        }
+        return () => {
+            FormsManager.unmountAction(context.id, formName);
+        };
+    }, [formName, idRef.current, context.id]);
     if (!ResourcesManager.isAllowed(rest)) return null;
     const fullWidthStyle = fullWidth ? styles.fullWidth : null;
     const compactStyle = compact ? styles.compact : null;
@@ -302,6 +313,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                     compactStyle,
                     buttonStyle,
                     fullWidthStyle,
+                    disabled && Theme.styles.disabled,
                     containerProps?.style,
                 ]
             }
@@ -322,9 +334,18 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 ref={innerRef}
                 id={idRef.current}
                 onPress={(event: GestureResponderEvent) => {
-                    if (typeof onPress === 'function') {
-                        onPress(event, context);
+                    const form = formName ? FormsManager.getForm(formName) : null;
+                    const hasForm = form && form.isValid();
+                    const context2: IButtonContext<IButtonExtendContext> = context as IButtonContext<IButtonExtendContext>;
+                    if (hasForm) {
+                        (context2 as any).formData = form?.getData();
                     }
+                    const r = typeof onPress === 'function' ? onPress(event, context2) : true;
+                    if (r === false || submitFormOnPress === false) return;
+                    if (form) {
+                        form.submit();
+                    }
+                    return r
                 }}
                 {...rest}
             >

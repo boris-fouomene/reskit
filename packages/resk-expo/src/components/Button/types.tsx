@@ -12,6 +12,7 @@ import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IDividerProps } from "@components/Divider";
 import { IResourceName, IAuthPerm, IProtectedResource } from "@resk/core";
+import { IFormData } from "@components/Form/types";
 
 
 /**
@@ -375,6 +376,18 @@ export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<
     * This can be useful for creating buttons with a left icon and a label.
      */
     spaceBetweenContent?: boolean;
+
+    /***
+     * The name of the form associated with the button in case of button representing a form action.
+     * when this property is set, the button listens dynamically to the state of the form and is activated or deactivated according to the validated state or name of the form. 
+     */
+    formName?: string;
+
+    /***
+     * If true, the button will submit the form when pressed in case the formName is set.
+     * This can be useful for creating buttons that submit the form when pressed if the form is valid.
+     */
+    submitFormOnPress?: boolean;
 }
 
 /**
@@ -501,6 +514,11 @@ export type IButtonContext<IButtonExtendContext = any> = Readonly<{
      * A reference to the underlying View component that wraps the button. This can be used for direct manipulation or animations.
      */
     ref: View | null;
+
+    /***
+     * The data associated with the form if the button is representing a form action.
+     */
+    formData: IFormData;
 } & IButtonExtendContext>;
 
 

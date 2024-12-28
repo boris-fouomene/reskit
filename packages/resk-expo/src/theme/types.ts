@@ -112,6 +112,35 @@ export interface IThemeColorsTokens extends Material3Scheme {
    * The color applied on placeholder text.
    */
   placeholder?: string;
+
+  /**
+   * The color used for informational messages.
+   */
+  info?: string;
+
+  /***
+   * The color applied on top of the info background.
+   */
+  onInfo?: string;
+
+  /**
+   * The color used for success states.
+   */
+  success?: string;
+
+  /**
+   * The color applied on top of the success background.
+   */
+  onSuccess?: string;
+  /***
+   * The color used for warnings.
+   */
+  warning?: string;
+
+  /**
+   * The color applied on top of the warning background (e.g., text or icons).
+   */
+  onWarning?: string;
 };
 
 /**

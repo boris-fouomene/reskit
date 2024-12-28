@@ -415,7 +415,7 @@ export interface IFieldMap extends Record<string, IFieldBase> {
  * @see {@link IFieldMap} for the `IFieldMap` type.
  */
 export type IField<T extends IFieldType = any> = Omit<IFieldMap[T], "type"> & {
-  [key in (IResourceActionName | "form" | "filter")]?: Partial<IField<any>>;
+  [key in (IResourceActionName | "form" | "filter")]?: Partial<IField>;
 } & {
   type: T;
 };

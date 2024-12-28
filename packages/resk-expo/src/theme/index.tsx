@@ -313,6 +313,12 @@ const sanitizeTheme = (theme: IThemeManager) => {
     theme.colors.placeholder = theme.colors.placeholder || Colors.setAlpha(isDark ? "black" : "white", 0.5);
     theme.colors.text = theme.colors.text || theme.colors.onSurface;
     theme.colors.backdrop = (theme.colors.backdrop || Colors.setAlpha(isDark ? "black" : "white", 0.5)) as string;
+    theme.colors.info = Colors.isValid(theme.colors.info) ? theme.colors.info : "#2B73B6";
+    theme.colors.onInfo = Colors.isValid(theme.colors.onInfo) ? theme.colors.onInfo : "white";
+    theme.colors.success = Colors.isValid(theme.colors.success) ? theme.colors.success : "#5EBA6A";
+    theme.colors.onSuccess = Colors.isValid(theme.colors.onSuccess) ? theme.colors.onSuccess : "white";
+    theme.colors.warning = Colors.isValid(theme.colors.warning) ? theme.colors.warning : (isDark ? "#FFB547" : "#BAAB5E");
+    theme.colors.onWarning = Colors.isValid(theme.colors.onWarning) ? theme.colors.onWarning : "black";
     return theme;
 }
 

@@ -13,6 +13,7 @@ import Theme, { useTheme } from "@theme/index";
 import { Field } from "./Field";
 import { IStyle } from "@src/types";
 import { FormContext } from "./context";
+import { INotifyMessage, Notify } from "@notify/index";
 
 
 /**
@@ -446,7 +447,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             try {
                 resolve(callback ? callback(options) : options);
             } catch (err) {
-                //notify.error(err as INotifyMessage);
+                Notify.error(err as INotifyMessage);
                 reject(err);
             }
         });
@@ -462,7 +463,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             try {
                 resolve(callback ? callback(options) : options);
             } catch (err) {
-                //notify.error(err as INotifyMessage);
+                Notify.error(err as INotifyMessage);
                 reject(err);
             }
         });
@@ -479,7 +480,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             this.setHasTriedTobeSubmitted(true);
             this.toggleValidationStatus(false);
             const message = this.getErrorText();
-            //notify.error(message);
+            Notify.error(message);
             const fields = this.getFields();
             for (let i in fields) {
                 const field = fields[i];

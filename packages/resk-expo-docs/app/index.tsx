@@ -39,7 +39,6 @@ const index = withAppBar(() => {
                         label: "Password2",
                         type: "password",
                         required: true,
-                        variant: "labelEmbeded",
                         minLength: 3,
                         maxLength: 10,
                     },
@@ -158,39 +157,6 @@ const index = withAppBar(() => {
                     </View>
                 </Expandable>
                 <ModalExample />
-
-                <TextInput
-                    label="Text Input Label embeded"
-                    variant="labelEmbeded"
-                    left={<>
-                        <Icon iconName="account-circle" />
-                        <Icon iconName="check" />
-                    </>}
-                    right={<>
-                        <Icon iconName="check" />
-                        <Icon iconName="close" />
-                    </>}
-                    onChange={({ value, event }) => {
-                        console.log(value, event, " changed heeein")
-                    }}
-                />
-                <TextInput
-                    label="Text Input Default"
-                    left={<>
-                        <Icon iconName="account-circle" />
-                        <Icon iconName="check" />
-                    </>
-                    }
-                    onChange={(event) => {
-                        console.log(event, " changed heeein")
-                    }}
-
-                    right={<>
-                        <Icon iconName="check" />
-                        <Icon iconName="close" />
-                    </>}
-                />
-                <TextInput multiline label="Text Input Multiline" />
             </View>
         </ScrollView>
     )

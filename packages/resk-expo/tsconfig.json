@@ -51,6 +51,12 @@
       "@platform": [
         "src/platform"
       ],
+      "@notify/*": [
+        "src/notify/*"
+      ],
+      "@notify": [
+        "src/notify"
+      ],
       "@hooks/*": [
         "src/hooks/*"
       ],

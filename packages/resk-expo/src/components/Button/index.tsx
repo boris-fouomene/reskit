@@ -313,7 +313,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                     compactStyle,
                     buttonStyle,
                     fullWidthStyle,
-                    disabled && Theme.styles.disabled,
+                    disabled && styles.disabled,
                     containerProps?.style,
                 ]
             }
@@ -467,6 +467,10 @@ const styles = StyleSheet.create({
     uppercaseLabel: {
         textTransform: 'uppercase',
     },
+    disabled: {
+        pointerEvents: "none",
+        opacity: 0.92,
+    }
 });
 Button.displayName = "Button";
 /**

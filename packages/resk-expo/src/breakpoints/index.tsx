@@ -70,9 +70,9 @@ export default class Breakpoints {
             label: "Medium phone",
         },
         xs: {
-            max: 575,  // Small devices (landscape phones, 576px and up)
+            max: 600,  // Small devices (landscape phones, 576px and up)
             name: 'xs',
-            label: "Small devices (landscape phones, 576px and up)",
+            label: "Small devices (landscape phones, 600px and up)",
         },
         sm: {
             max: 767,  // Medium devices (tablets, 768px and up)

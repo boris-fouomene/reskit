@@ -597,8 +597,8 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                 } else if (isObj(data) && name in (data as any)) {
                     fieldProps.defaultValue = (data as any)[name];
                 }
-                const drawerWidth = drawer?.getDrawerWidth();
-                fieldProps.windowWidth = fieldProps.windowWidth || windowWidth || drawerWidth || undefined;
+                const drawerWidth = drawer?.isProvider() && drawer?.getDrawerWidth() || undefined;
+                fieldProps.windowWidth = fieldProps.windowWidth || windowWidth || typeof drawerWidth === "number" && drawerWidth || undefined;
                 const Component = Field.getRegisteredComponent(type as IFieldType) || Field.getRegisteredComponent("text") || Field;
                 content.push(<Component isFormLoading={isLoading} isFormSubmitting={isSubmitting} {...fieldProps} key={name} />);
             }

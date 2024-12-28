@@ -904,7 +904,8 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
     getBreakpointStyle(props?: IFormFieldProps<Type>): IStyle {
         if (!this.canHandleBreakpointStyle(props)) return null;
         const windowWidth = (props || this.props).windowWidth;
-        return StyleSheet.flatten([Breakpoints.col(undefined, windowWidth)]);
+        const b = Breakpoints.col(undefined, windowWidth);
+        return StyleSheet.flatten([b]);
     }
     /**
      * Triggers the mount lifecycle for the field.

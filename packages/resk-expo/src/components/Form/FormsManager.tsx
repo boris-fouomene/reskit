@@ -40,6 +40,8 @@ export class FormsManager {
             [actionId: string]: IFormAction;
         };
     } = {};
+    static isFieldInstance?: (field: any) => boolean;
+    static isFormInstance?: (form: any) => boolean;
     /**
      * Checks if the provided variable is an instance of `IFormField`.
      * 
@@ -51,6 +53,10 @@ export class FormsManager {
      * const isField = FormsManager.isField(fieldInstance); // true
      */
     static isField(field: any): field is IFormField {
+        if (!isClass(field)) return false;
+        if (typeof this.isFieldInstance == "function" && this.isFieldInstance(field)) {
+            return true;
+        }
         return isClass(field) && isObservable(field) && typeof field?.getName === "function" && typeof field?.getForm === "function" && typeof field?.isValid === "function";
     }
     /**
@@ -64,6 +70,9 @@ export class FormsManager {
      * const isForm = FormsManager.isForm(formInstance); // true
      */
     static isForm(form: any): boolean {
+        if (typeof this.isFormInstance == "function" && this.isFormInstance(form)) {
+            return true;
+        }
         return isClass(form) && isObservable(form) && typeof form?.getName === "function" && typeof form?.isValid === "function" && typeof form?.getData === "function" && typeof form?.getFields === "function";
         //return form instanceof IForm;
     }

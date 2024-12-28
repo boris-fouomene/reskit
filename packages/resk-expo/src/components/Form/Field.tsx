@@ -1,5 +1,5 @@
-import { getTextContent, ObservableComponent } from "@utils/index";
-import { defaultStr, extendObj, IFieldType, isEmpty, isNonNullString, isObj, IValidatorResult, IValidatorRule, stringify, Validator } from "@resk/core";
+import { getTextContent, isReactClassComponent, ObservableComponent } from "@utils/index";
+import { defaultStr, extendObj, IFieldType, isClass, isEmpty, isNonNullString, isObj, IValidatorResult, IValidatorRule, stringify, Validator } from "@resk/core";
 import { IForm, IFormData, IFormEvent, IFormField, IFormFieldProps, IFormFieldState, IFormFieldValidatorOptions, IFormProps } from "./types";
 import React, { ReactNode } from "react";
 import { Dimensions, View as RNView, TextInput as RNTextInput, NativeSyntheticEvent, TextInputFocusEventData, StyleSheet } from "react-native";
@@ -35,7 +35,7 @@ import { IReactComponent, IStyle } from "@src/types";
  * @see {@link IFormEvent} for the `IFormEvent` type.
  * @see {@link IFormFieldValidatorOptions<Type>} for the `IFormFieldValidatorOptions<Type>` interface.
  */
-export class Field<Type extends IFieldType = any> extends ObservableComponent<IFormFieldProps, IFormFieldState, IFormEvent> implements IFormField<Type> {
+export class Field<Type extends IFieldType = any> extends ObservableComponent<IFormFieldProps<Type>, IFormFieldState, IFormEvent> implements IFormField<Type> {
     /** 
      * The current state of the field.
      * 
@@ -1161,7 +1161,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
      * Field.registerComponent("text", MyTextField);
      */
     static registerComponent(type: IFieldType, component: typeof Field) {
-        if (!isNonNullString(type) || !FormsManager.isField(component)) return;
+        if (!isNonNullString(type) || !isClass(component) || !isReactClassComponent(component)) return;
         const components = Field.getRegisteredComponents();
         components[type] = component;
         Reflect.defineMetadata(Field.FIELDS_COMPONENTS_METADATA_KEY, components, Field);
@@ -1225,8 +1225,8 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
  * @see {@link IFormFieldProps<Type>} for the `IFormFieldProps` type.
  * @see {@link IFormFieldState} for the `IFormFieldState` type.
  */
-export function FormField(type: IFieldType) {
-    return (target: typeof Field) => {
+export function FormField<Type extends IFieldType = any>(type: Type) {
+    return (target: typeof Field<Type>) => {
         Field.registerComponent(type, target as typeof Field);
     };
 }
@@ -1251,3 +1251,8 @@ const styles = StyleSheet.create({
         padding: 10,
     },
 });
+
+
+FormsManager.isFieldInstance = (field: any) => {
+    return field instanceof Field;
+}

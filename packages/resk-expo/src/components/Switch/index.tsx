@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     },
     label: {
         userSelect: "text",
+        marginHorizontal: 7,
     }
 });
 

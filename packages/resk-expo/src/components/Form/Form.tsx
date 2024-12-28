@@ -293,10 +293,10 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                 if (field.form) {
                     //on override l'objet field par les propriété personnalisées définis dans le form
                     extendObj(field, field.form);
-                    if (isUpdate && field.form.update) {
-                        extendObj(field, field.form.update);
-                    } else if (!isUpdate && field.form.create) {
-                        extendObj(field, field.form.create);
+                    if (isUpdate && (field.form as any).update) {
+                        extendObj(field, (field.form as any).update);
+                    } else if (!isUpdate && (field.form as any).create) {
+                        extendObj(field, (field.form as any).create);
                     }
                 }
                 if (field.rendable === false) continue;
@@ -599,7 +599,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                     fieldProps.defaultValue = (data as any)[name];
                 }
                 const drawerWidth = drawer?.isProvider() && drawer?.getDrawerWidth() || undefined;
-                fieldProps.windowWidth = fieldProps.windowWidth || windowWidth || typeof drawerWidth === "number" && drawerWidth || undefined;
+                fieldProps.windowWidth = fieldProps.windowWidth || windowWidth || typeof drawerWidth === "number" && drawerWidth || undefined
                 const Component = Field.getRegisteredComponent(type as IFieldType) || Field.getRegisteredComponent("text") || Field;
                 content.push(<Component isFormLoading={isLoading} isFormSubmitting={isSubmitting} {...fieldProps} key={name} />);
             }
@@ -736,3 +736,8 @@ const styles = StyleSheet.create({
         paddingVertical: 0,
     },
 });
+
+
+FormsManager.isFormInstance = (form: any) => {
+    return form instanceof Form;
+}

@@ -2,6 +2,7 @@ import { Tab, TextInput, Switch, Checkbox, Button, Form, Dialog, Expandable, Tou
 import { View, ScrollView } from 'react-native'
 import { useEffect } from 'react'
 import { withAppBar } from "@resk/expo/build/hooks";
+import { IField } from "@resk/core";
 
 
 const index = withAppBar(() => {
@@ -21,6 +22,15 @@ const index = withAppBar(() => {
                         type: "text",
                         required: true,
                     },
+                    switch: {
+                        label: "Switch",
+                        type: "switch",
+                        required: true,
+                        checkedLabel: "Checked",
+                        uncheckedLabel: "Unchecked",
+                        checkedValue: true,
+                        uncheckedValue: false,
+                    } as IField<"switch">,
                     "email": {
                         label: "Email",
                         type: "email",
@@ -30,13 +40,6 @@ const index = withAppBar(() => {
                     },
                     "password": {
                         label: "Password",
-                        type: "password",
-                        required: true,
-                        minLength: 3,
-                        maxLength: 10,
-                    },
-                    "password2": {
-                        label: "Password2",
                         type: "password",
                         required: true,
                         minLength: 3,

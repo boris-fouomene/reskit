@@ -1,4 +1,4 @@
-import { Tab, TextInput, Switch, Checkbox, Button, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
+import { Tab, TextInput, Switch, Checkbox, Button, Dropdown, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
 import { useEffect } from 'react'
 import { withAppBar } from "@resk/expo/build/hooks";
@@ -55,6 +55,14 @@ const index = withAppBar(() => {
             >
                 <Button formName="my-form">Submit</Button>
             </Form>
+            <Dropdown
+                label="My Dropdown"
+                items={[
+                    { label: "Item 1", value: "1" },
+                    { label: "Item 2", value: "2" },
+                    { label: "Item 3", value: "3" },
+                ]}
+            />
             <View style={[Theme.styles.p5]}>
                 <Menu
                     anchor={<Label>Open Menu</Label>}
@@ -109,35 +117,6 @@ const index = withAppBar(() => {
                     ]}
                 />
 
-                <Label>index</Label>
-                <Icon
-                    iconName="foundation-alert"
-                    source={{
-                        uri: "https://picsum.photos/200",
-                    }}
-                    size={40}
-                    title="An image with icon source"
-                    onPress={(ev) => {
-                        console.log(ev, " is pressed")
-                    }}
-                />
-                <Checkbox
-                    label="My label"
-                    defaultValue={0}
-                />
-                <Switch
-                    label="A Switch"
-                />
-                <Divider
-                    breakpointStyle={{
-                        desktop: Theme.styles.hidden,
-                    }}
-                />
-                <TouchableRipple
-                    onPress={() => console.log("Pressed")}
-                >
-                    <Label>A ripple button</Label>
-                </TouchableRipple>
                 <HelperText
                     visible
                     error

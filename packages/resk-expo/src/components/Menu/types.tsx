@@ -221,6 +221,11 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
      * this is a flag to know if the menu is a menu or not
      */
     isMenu: boolean;
+
+    /***
+     * function to measure the anchor element
+     */
+    measureAnchor: (callback?: Function) => void;
 }
 
 
@@ -523,6 +528,11 @@ export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "
      * part of the application's interface.
      */
     elevation?: number;
+
+    /**
+     * The visibility of the menu. This property is used to control the visibility of the menu.
+     */
+    visible?: boolean;
 }
 
 /**

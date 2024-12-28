@@ -71,7 +71,7 @@ import { IFontIconProps } from "@components/Icon";
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
 const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
-    const { variant, value, containerProps, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, right, label, ...rest } = useTextInput(props);
+    const { variant, containerProps, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, right, label, ...rest } = useTextInput(props);
     const leftContainerProps = Object.assign({}, cLeftContainerProps);
     const isLabelEmbededVariant = variant === "labelEmbeded";
     const { testID } = rest;
@@ -303,7 +303,7 @@ export const useTextInput = ({ defaultValue, secureTextEntryGetToggleIconProps, 
     useEffect(() => {
         if (defaultValue === inputState.value) return;
         setInputState({ ...inputState, value: defaultValue, event: null });
-    }, [defaultValue]);
+    }, [defaultValue, inputState.value]);
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;

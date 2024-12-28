@@ -14,12 +14,13 @@ import Animated, {
     withTiming,
     Easing,
 } from 'react-native-reanimated';
-import { IMenuAnchorMeasurements, IMenuCalculatedPosition, IMenuPosition, IMenuProps, IUseMenuPositionProps } from './types';
+import { IMenuAnchorMeasurements, IMenuCalculatedPosition, IMenuContext, IMenuPosition, IMenuProps, IUseMenuPositionProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
 import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
 import { MenuItem } from './Item';
+import usePrevious from '@utils/usePrevious';
 
 
 
@@ -273,12 +274,14 @@ const Menu: React.FC<IMenuProps> = ({
     withScrollView = true,
     scrollViewProps,
     elevation = 10,
+    visible,
     ...props
 }) => {
     // State for measurements
     const theme = useTheme();
-    const [isVisible, setIsVisible] = useStateCallback<boolean>(false);
-    const [anchorMeasurements, setAnchorMeasurements] = useState<IMenuAnchorMeasurements | null>(null);
+    const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
+    const [isVisible, setIsVisible] = useStateCallback<boolean>(isControlled ? !!visible : false);
+    const [anchorMeasurements, setAnchorMeasurements] = useStateCallback<IMenuAnchorMeasurements | null>(null);
     const [menuLayout, setMenuLayout] = useState<LayoutRectangle | null>(null);
     const anchorRef = useRef<View>(null);
     anchorContainerProps = Object.assign({}, anchorContainerProps);
@@ -289,17 +292,33 @@ const Menu: React.FC<IMenuProps> = ({
     const scale = useSharedValue(0.8);
     const translateY = useSharedValue(0);
     const translateX = useSharedValue(0);
-
-
+    const callbackRef = useRef<Function | null | undefined>(null);
+    const prevIsVisible = usePrevious(isVisible);
+    useEffect(() => {
+        if (!isControlled || prevIsVisible === isVisible || typeof callbackRef.current !== "function") {
+            return;
+        }
+        if (typeof callbackRef.current === "function") {
+            callbackRef.current();
+        }
+    }, [visible, isVisible, isControlled, callbackRef, prevIsVisible]);
+    callbackRef.current = null;
     const isMenuOpen = () => isVisible;
     // Measure anchor element position
-    const measureAnchor = useCallback(() => {
+    const measureAnchor = useCallback((callback?: Function) => {
         if (anchorRef.current) {
             anchorRef.current.measureInWindow((x, y, width, height) => {
-                setAnchorMeasurements({ pageX: x, pageY: y, width, height });
+                setAnchorMeasurements({ pageX: x, pageY: y, width, height }, () => {
+                    if (typeof callback === "function") callback();
+                });
             });
         }
     }, [anchorRef, isVisible]);
+    useEffect(() => {
+        if (isControlled && isVisible !== visible) {
+            setIsVisible(!!visible);
+        }
+    }, [visible, isVisible, isControlled]);
 
     // Handle menu layout changes
     const onMenuLayout = useCallback((event: LayoutChangeEvent) => {
@@ -317,7 +336,7 @@ const Menu: React.FC<IMenuProps> = ({
         fullScreen,
         responsive,
     });
-    const context1 = { animated, responsive, testID, borderRadius, fullScreen: _isFullScreen, ...props, isMenu: true, isMenuOpen, isMenuVisible: isVisible, calculatePosition }
+    const context1 = { animated, measureAnchor, responsive, testID, borderRadius, fullScreen: _isFullScreen, ...props, isMenu: true, isMenuOpen, isMenuVisible: isVisible }
     // Update position when measurements change
     useEffect(() => {
         if (anchorMeasurements) {
@@ -340,6 +359,13 @@ const Menu: React.FC<IMenuProps> = ({
     }, [anchorMeasurements, menuLayout, isVisible]);
     const openMenu = (callback?: Function) => {
         if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
+        if (isControlled) {
+            callbackRef.current = callback;
+            if (typeof onOpen === "function") {
+                onOpen();
+            }
+            return;
+        }
         setIsVisible(true, () => {
             if (typeof callback === "function") {
                 callback();
@@ -351,6 +377,13 @@ const Menu: React.FC<IMenuProps> = ({
     };
     const closeMenu = (callback?: Function) => {
         if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
+        if (isControlled) {
+            callbackRef.current = callback;
+            if (typeof onClose === "function") {
+                onClose();
+            }
+            return;
+        }
         setIsVisible(false, () => {
             if (typeof callback === "function") {
                 callback();
@@ -370,7 +403,7 @@ const Menu: React.FC<IMenuProps> = ({
             }
         }
         return isValidElement(customAnchor) ? customAnchor : null;
-    }, [customAnchor, calculatePosition, isVisible]);
+    }, [customAnchor, calculatePosition, isVisible, _isFullScreen, context]);
     useEffect(() => {
         measureAnchor();
     }, [isVisible, measureAnchor]);
@@ -415,18 +448,8 @@ const Menu: React.FC<IMenuProps> = ({
     }, [children, context, isVisible]);
     const touchableBackdropStyle = useMemo(() => {
         return {
-            maxWidth: screenWidth - 100,
-            maxHeight: screenHeight - 100,
-        }
-        if (_isFullScreen) {
-            return {
-                maxWidth: screenWidth,
-                maxHeight: screenHeight,
-            }
-        }
-        return {
-            maxWidth: menuLayout?.width || "100%",
-            maxHeight: menuLayout?.height || "100%",
+            maxWidth: screenWidth - (_isFullScreen ? 0 : 10),
+            maxHeight: screenHeight - (_isFullScreen ? 0 : 10),
         }
     }, [menuLayout, _isFullScreen, screenWidth, screenHeight]);
     const { Wrapper, wrapperProps } = useMemo(() => {

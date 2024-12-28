@@ -10,7 +10,7 @@ import { useTheme } from "@theme/index";
 import { Animated, Pressable, View as RNView } from "react-native";
 import TextInput from "@components/TextInput";
 import { Portal } from "@components/Portal";
-import { FlashList } from "@shopify/flash-list";
+import { ContentStyle, FlashList } from "@shopify/flash-list";
 import { Menu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { TouchableRipple } from "@components/TouchableRipple";
@@ -306,16 +306,19 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             </Pressable>}
             responsive
             children={<DropdownContext.Provider value={context}>
-                <FlashList<IDropdownPreparedItem>
-                    testID={testID + "-dropdown-list"}
-                    estimatedItemSize={100}
-                    {...listProps}
-                    data={filteredItems}
-                    keyExtractor={({ hashKey }) => hashKey}
-                    renderItem={({ item, index }) => {
-                        return <DropdownLabel {...item} index={index} />;
-                    }}
-                />
+                <View testID={testID + "-dropdown-list-container"} style={styles.dropdownListContainer}>
+                    <FlashList<IDropdownPreparedItem>
+                        testID={testID + "-dropdown-list"}
+                        estimatedItemSize={100}
+                        {...listProps}
+                        style={undefined}
+                        data={filteredItems}
+                        keyExtractor={({ hashKey }) => hashKey}
+                        renderItem={({ item, index }) => {
+                            return <DropdownLabel {...item} index={index} />;
+                        }}
+                    />
+                </View>
             </DropdownContext.Provider>}
         />
     </DropdownContext.Provider>;
@@ -356,7 +359,7 @@ const DropdownLabel = (preparedItem: IDropdownPreparedItem & { index: number }) 
             style={[styles.itemContainer, { borderBottomColor: theme.colors.outline }]}
             testID={testID + "-label-tooltip-" + hashKey}
         >
-            <View style={styles.container} testID={testID + "-label-container-" + hashKey}>
+            <View style={styles.labelContainer} testID={testID + "-label-container-" + hashKey}>
                 {isSelected ? <FontIcon name={multiple ? "check" : "check-circle"} size={20} color={theme.colors.primary} /> : null}
                 {<Label ref={labelRef} fontSize={15} color={isSelected ? theme.colors.primary : undefined}>{label}</Label>}
             </View>
@@ -367,7 +370,7 @@ const DropdownLabel = (preparedItem: IDropdownPreparedItem & { index: number }) 
 DropdownLabel.displayName = "DropdownLabel";
 
 const styles = StyleSheet.create({
-    container: {
+    labelContainer: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -390,6 +393,7 @@ const styles = StyleSheet.create({
         paddingVertical: 7,
         borderBottomWidth: 1,
         height: "100%",
+        width: "100%",
         justifyContent: "center",
     },
     searchInput: {
@@ -411,27 +415,16 @@ const styles = StyleSheet.create({
         height: "100%",
         width: "100%",
     },
-    dropdownContainer: {
-        position: "absolute",
-        paddingBottom: 10,
+    listContentContainer: {
+        flex: 1,
     },
-    flashListContainer: {
+    dropdownListContainer: {
         width: "100%",
         height: "100%",
+    },
+    list: {
         flex: 1,
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
-        flexDirection: "column",
     },
-    backdropHidden: {
-        opacity: 0,
-        height: 0,
-        width: 0,
-    },
-    hidden: {
-        display: "none",
-        opacity: 0,
-    }
 });
 
 export * from "./types";

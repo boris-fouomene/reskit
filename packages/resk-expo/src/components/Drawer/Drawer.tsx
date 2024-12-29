@@ -1104,7 +1104,7 @@ export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
   const pointerEvents = drawerShown || permanent ? "auto" : "none";
   const Wrapper = drawer.isProvider() ? Portal : React.Fragment;
   const canRender = drawer.isProvider() ? drawer.isOpen() : true;
-  const wrapperProps = drawer.isProvider() ? { absoluteFill: true, testID: testID + "-portal" } : {};
+  const wrapperProps = drawer.isProvider() ? { absoluteFill: canRender, testID: testID + "-portal" } : {};
   return (
     <Wrapper {...wrapperProps}>
       <DrawerContext.Provider value={{ drawer }}>

@@ -303,7 +303,7 @@ export const useTextInput = ({ defaultValue, secureTextEntryGetToggleIconProps, 
     useEffect(() => {
         if (defaultValue === inputState.value) return;
         setInputState({ ...inputState, value: defaultValue, event: null });
-    }, [defaultValue, inputState.value]);
+    }, [defaultValue]);
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;

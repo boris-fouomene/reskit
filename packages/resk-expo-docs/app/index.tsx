@@ -1,4 +1,4 @@
-import { Tab, TextInput, Switch, Checkbox, Button, Dropdown, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
+import { Tab, TextInput, Switch, Checkbox, Drawer, Button, Dropdown, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
 import { useEffect } from 'react'
 import { withAppBar } from "@resk/expo/build/hooks";
@@ -170,6 +170,31 @@ const index = withAppBar(() => {
                     const dark = theme.dark ? false : true;
                     const nTheme = getDefaultTheme({ dark: dark, colors: (dark ? {} : { background: "#fff", onBackground: "#000" }) } as ITheme);
                     updateTheme(nTheme);
+                }
+            },
+            {
+                label: "Open Drawer provider",
+                onPress: () => {
+                    Drawer.Provider.open({
+                        appBarProps: {
+                            title: "Drawer Title",
+                            subtitle: "Drawer subtitle",
+                            actions: [
+                                {
+                                    label: "Settings",
+                                    onPress: () => {
+                                        console.log("Settings pressed")
+                                    },
+                                },
+                                {
+                                    label: "Profile",
+                                    onPress: () => {
+                                        console.log("Profile pressed")
+                                    },
+                                },
+                            ],
+                        }
+                    });
                 }
             },
             {

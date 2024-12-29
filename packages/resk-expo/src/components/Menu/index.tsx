@@ -493,6 +493,7 @@ const Menu: React.FC<IMenuProps> = ({
                     style={[
                         styles.menuContainer,
                         { backgroundColor: theme.colors.surface },
+                        _isFullScreen ? styles.menuContainerFullScreen : null,
                         menuAnchorStyle,
                         {
                             borderRadius,
@@ -532,6 +533,10 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
         maxHeight: '100%',
         maxWidth: '100%',
+    },
+    menuContainerFullScreen: {
+        paddingVertical: 0,
+        paddingHorizontal: 0,
     },
 });
 

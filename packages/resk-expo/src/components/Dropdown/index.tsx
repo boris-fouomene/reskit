@@ -24,6 +24,22 @@ import { useI18n } from "@src/i18n/hooks";
 import { AppBar } from "@components/AppBar";
 import { Divider } from "@components/Divider";
 
+/**
+ * Represents a dropdown component that allows users to select one or more items from a list.
+ * 
+ * This class extends the `Component` class and implements the `IDropdownContext` interface, 
+ * providing methods and state management for dropdown interactions. It manages the visibility, 
+ * selection, and filtering of items within the dropdown.
+ * 
+ * @class Dropdown
+ * @template ItemType - The type of the items in the dropdown.
+ * @template ValueType - The type of the value associated with the items.
+ * 
+ * @extends Component<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>>
+ * @implements IDropdownContext<ItemType, ValueType>
+ * 
+ * @param {IDropdownProps<ItemType, ValueType>} props - The properties for the dropdown component.
+ */
 export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>> implements IDropdownContext<ItemType, ValueType> {
     constructor(props: IDropdownProps<ItemType, ValueType>) {
         super(props);
@@ -395,6 +411,7 @@ const DropdownListItems = () => {
                 title={getTextContent(label)}
                 elevation={5}
                 {...fullScreenAppBarProps}
+                style={[styles.appBar, fullScreenAppBarProps?.style]}
                 backActionProps={{
                     ...Object.assign({}, fullScreenAppBarProps.backActionProps),
                     onPress: (...args) => {
@@ -409,7 +426,7 @@ const DropdownListItems = () => {
                 subtitle={defaultStr(context.anchorSelectedText, i18n.t("components.dropdown.noneSelected"))}
             />
         ) : null}
-        <DropdownSearch />
+        <DropdownSearch isFullScreen={isFullScreen} />
         <FlashList<IDropdownPreparedItem>
             testID={testID + "-dropdown-list"}
             estimatedItemSize={100}
@@ -431,7 +448,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
     const itemsByHashKey = context.itemsByHashKey;
     const labelRef = useRef(null);
-    const { multiple } = context.props;
+    const { multiple, selectedIconName } = context.props;
     const testID = context.getTestID();
     const isSelected = useMemo(() => {
         return context.isSelectedByHashKey(hashKey);
@@ -460,7 +477,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
             testID={testID + "-item-container-" + hashKey}
         >
             <View style={styles.itemContent} testID={testID + "-item-content-" + hashKey}>
-                {isSelected ? <FontIcon name={!multiple ? "check" : "check-circle"} size={20} color={theme.colors.primary} /> : null}
+                {isSelected ? <FontIcon name={isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked"} size={20} color={theme.colors.primary} /> : null}
                 {<Label ref={labelRef} fontSize={15} color={isSelected ? theme.colors.primary : undefined}>{label}</Label>}
             </View>
         </Tooltip>
@@ -470,6 +487,9 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
 DropdownItem.displayName = "DropdownItem";
 
 const styles = StyleSheet.create({
+    appBar: {
+        marginBottom: 7,
+    },
     itemContent: {
         flexDirection: "row",
         alignItems: "center",
@@ -480,30 +500,28 @@ const styles = StyleSheet.create({
     },
     searchDivider: {
         width: "100%",
-        marginVertical: 5,
+        marginTop: 5,
         overflow: "hidden",
     },
     disabled: {
         pointerEvents: "none",
         opacity: 0.9,
     },
-    searchContainer: {
-        flexDirection: "column",
-        alignItems: "flex-start",
-        justifyContent: "flex-start",
-        width: "100%",
-    },
     loading: {},
     itemContainer: {
-        paddingVertical: 7,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
         borderBottomWidth: 1,
         height: "100%",
         width: "100%",
         justifyContent: "center",
     },
     searchInput: {
-        backgroundColor: "transparent",
         width: "100%",
+    },
+    searchInputContainer: {
+        width: "100%",
+        paddingHorizontal: 7,
     },
     listContainer: {
         paddingHorizontal: 10,
@@ -518,13 +536,21 @@ const styles = StyleSheet.create({
     dropdownListContainer: {
         width: "100%",
         height: "100%",
+        paddingHorizontal: 0,
+        paddingVertical: 0,
+    },
+    dropdownListContentContainer: {
+        width: "100%",
+        flex: 1,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
     },
     list: {
         flex: 1,
     },
 });
 
-const DropdownSearch = () => {
+const DropdownSearch = ({ isFullScreen }: { isFullScreen?: boolean }) => {
     const context = useDropdown();
     const filteredItems = Array.isArray(context.filteredItems) ? context.filteredItems : [];
     const searchText = defaultStr(context.searchText);
@@ -549,6 +575,7 @@ const DropdownSearch = () => {
                 defaultValue={searchText}
                 onChangeText={onSearch}
                 style={[styles.searchInput, props.style]}
+                containerProps={Object.assign({}, props.containerProps, { style: [styles.searchInputContainer, props.containerProps?.style] })}
                 placeholder={i18n.t("components.dropdown.searchPlaceholder", { countStr: filteredItems.length.formatNumber() })}
                 right={!actions?.length ? null : (
                     <Menu

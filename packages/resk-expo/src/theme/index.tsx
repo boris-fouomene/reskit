@@ -310,7 +310,7 @@ const sanitizeTheme = (theme: IThemeManager) => {
     theme.roundness = typeof theme.roundness == "number" ? theme.roundness : 8;
     theme.colors = Object.assign({}, theme.colors);
     const isDark = !!theme.dark;
-    theme.colors.placeholder = theme.colors.placeholder || Colors.setAlpha(isDark ? "black" : "white", 0.5);
+    theme.colors.placeholder = theme.colors.placeholder || Colors.setAlpha(isDark ? "white" : "black", 0.5);
     theme.colors.text = theme.colors.text || theme.colors.onSurface;
     theme.colors.backdrop = (theme.colors.backdrop || Colors.setAlpha(isDark ? "black" : "white", 0.5)) as string;
     theme.colors.info = Colors.isValid(theme.colors.info) ? theme.colors.info : "#2B73B6";

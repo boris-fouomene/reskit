@@ -1,5 +1,5 @@
 import { getTextContent, isReactClassComponent, ObservableComponent } from "@utils/index";
-import { defaultStr, extendObj, IFieldType, isClass, isEmpty, isNonNullString, isObj, IValidatorResult, IValidatorRule, stringify, Validator } from "@resk/core";
+import { defaultStr, extendObj, IFieldType, isClass, isEmpty, isNonNullString, isObj, IValidatorResult, IValidatorRule, IValidatorValidateOptions, stringify, Validator } from "@resk/core";
 import { IForm, IFormData, IFormEvent, IFormField, IFormFieldProps, IFormFieldState, IFormFieldValidatorOptions, IFormProps } from "./types";
 import React, { ReactNode } from "react";
 import { Dimensions, View as RNView, TextInput as RNTextInput, NativeSyntheticEvent, TextInputFocusEventData, StyleSheet } from "react-native";
@@ -262,19 +262,12 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
                 return options;
             });
         }
-        options.rules = options.rules ? Validator.sanitizeRules(options.rules) : this.getValidationRules();
-        if (Array.isArray(options.rules)) {
-            if (
-                this.getType() == "email" &&
-                this.componentProps.validateEmail !== false &&
-                isNonNullString(options.value) &&
-                !options.rules.includes("email")
-            ) {
-                options.rules.push("email");
-            }
-            if (this.getType() == "url" && options.value && !options.rules.includes("url")) {
-                options.rules.push("url");
-            }
+        options.rules = Array.isArray(options.rules) && options.rules.length ? options.rules : this.getValidationRules();
+        if (this.getType() == "email" && this.componentProps.validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("email")) {
+            options.rules.push("email");
+        }
+        if (this.getType() == "url" && options.value && !options.rules.includes("url")) {
+            options.rules.push("url");
         }
         const hasPerformedValidation = true;
         return Promise.resolve(this.beforeValidate(options)).then(() => {
@@ -347,7 +340,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
      * const rules = this.getValidationRules(); // Retrieves the validation rules
      */
     getValidationRules(): IValidatorRule[] {
-        const rules = Validator.sanitizeRules(this.componentProps.validationRules);
+        const rules: IValidatorRule[] = Array.isArray(this.componentProps.validationRules) ? this.componentProps.validationRules : [];
         if (this.componentProps?.required) {
             rules.unshift("required");
         }
@@ -355,7 +348,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
             const k: keyof IFormFieldProps<Type> = r as keyof IFormFieldProps<Type>;
             const rValue = typeof this.componentProps[k] === "number" ? this.componentProps[k] : undefined;
             if (rValue !== undefined) {
-                rules.push(`${r}[${rValue}]`);
+                rules.push(`${r}[${rValue}]` as IValidatorRule);
             }
         });
         return rules;

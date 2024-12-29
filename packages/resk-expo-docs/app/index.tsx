@@ -113,7 +113,7 @@ const index = withAppBar(() => {
                         },
                     ]}
                 />
-                <TextInput label="My text input" />
+                <TextInput label="My text input" variant="labelEmbeded" />
                 <HelperText
                     visible
                     error

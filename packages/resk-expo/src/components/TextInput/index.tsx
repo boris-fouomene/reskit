@@ -136,7 +136,7 @@ const getContainerAndContentStyle = ({ isFocused, isLabelEmbededVariant, textCol
     const notEmbeededLabelStyle = [styles.notEmbededLabelStyle],
         notEmbeededInputStyle = [styles.inputNotEmbededLabelVariant]
     if (isLabelEmbededVariant) {
-        inputStyle.push(styles.inputLabelEmbeded);
+        inputStyle.push(styles.inputLabelEmbededVariant);
         containerStyle.push(borderedStyle);
         containerStyle.push(styles.labelEmbededVariantContainer);
         labelStyle.push(styles.labelEmbededVariantLabel);
@@ -419,10 +419,6 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     hidden: { display: "none", opacity: 0 },
-    inputLabelEmbeded: {
-        padding: 0,
-        margin: 0,
-    },
     input: {
         borderColor: 'transparent', // No border
         borderWidth: 0, // Remove border
@@ -441,10 +437,12 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         paddingVertical: 8,
     },
-    inputNotEmbededLabelVariant: {
-        paddingHorizontal: 5,
-        //paddingVertical: 5,
+    inputLabelEmbededVariant: {
+        paddingVertical: 3,
+        paddingHorizontal: 0,
+        margin: 0,
     },
+    inputNotEmbededLabelVariant: {},
     focusedInput: {
         borderColor: 'transparent', // No border on focus
         borderWidth: 0,

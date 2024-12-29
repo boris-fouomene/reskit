@@ -17,9 +17,9 @@ import { TouchableRipple } from "@components/TouchableRipple";
 import { StyleSheet } from "react-native";
 import View from "@components/View";
 import { FontIcon } from "@components/Icon";
+import { Icon } from "@components/Icon";
 import Label from "@components/Label";
 import { IStyle } from "@src/types";
-import { ITextInputProps } from "@components/TextInput/types";
 import { useI18n } from "@src/i18n/hooks";
 import { AppBar } from "@components/AppBar";
 import { Divider } from "@components/Divider";
@@ -340,7 +340,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
                             ...Object.assign({}, act.context),
                             dropdownContext: context
                         }
-                    } as IDropdownAction);
+                    });
                 });
             }
         }
@@ -581,11 +581,13 @@ const DropdownSearch = ({ isFullScreen }: { isFullScreen?: boolean }) => {
                     <Menu
                         items={actions}
                         testID={`${testID}-dropdown-menu-actions`}
-                        anchor={({ openMenu, closeMenu }) => {
+                        anchor={({ openMenu }) => {
                             return (
-                                <Pressable onPress={() => openMenu()}>
-                                    <FontIcon color={error ? theme.colors.error : undefined} name={FontIcon.MORE} size={24} />
-                                </Pressable>
+                                <Icon.Button
+                                    iconName={FontIcon.MORE}
+                                    size={24}
+                                    onPress={() => openMenu()}
+                                />
                             );
                         }}
                     />

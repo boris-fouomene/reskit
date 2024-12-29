@@ -65,6 +65,7 @@ export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<I
     contentProps = Object.assign({}, contentProps);
     const itemContext = Object.assign({}, props.context, menuContext);
     return <Button
+        uppercase={false}
         testID="menu-item"
         borderRadius={0}
         textColor={theme.colors.text}

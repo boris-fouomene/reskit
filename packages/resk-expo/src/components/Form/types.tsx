@@ -8,7 +8,6 @@ import { IAuthPerm, IDict, IField, IFieldType, IResourceName, IValidatorRule, IV
 import { IOnChangeOptions, IStyle } from "@src/types";
 import { ObservableComponent } from "@utils/index";
 import { ReactElement, ReactNode } from "react";
-import { NativeSyntheticEvent, TextInputChangeEventData } from "react-native";
 
 /**
  * @interface IFormFieldsProp
@@ -334,7 +333,7 @@ export interface IForm extends ObservableComponent<IFormProps, IFormState, IForm
  * providing a consistent API for managing field behavior and interactions. It includes methods
  * for validation, value management, and rendering, making it easier to create dynamic forms.
  */
-export interface IFormField<Type extends IFieldType = any> extends ObservableComponent<IFormFieldProps<Type>, IFormFieldState, IFormEvent> {
+export interface IFormField<Type extends IFieldType = any, OnChangeOptionsType = any> extends ObservableComponent<IFormFieldProps<Type, OnChangeOptionsType>, IFormFieldState, IFormEvent> {
     /**
      * Retrieves the name of the field.
      * 
@@ -396,9 +395,9 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
      * The component properties for the field.
      * 
      * @readonly
-     * @type {IFormFieldProps<Type>}
+     * @type {IFormFieldProps<Type,OnChangeOptionsType>}
      */
-    componentProps: IFormFieldProps<Type>;
+    componentProps: IFormFieldProps<Type, OnChangeOptionsType>;
     /**
      * Checks if validation has been performed on the field.
      * 
@@ -532,7 +531,7 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
      * @example
      * this.callOnChange(options); // Calls the onChange handler
      */
-    callOnChange(options: IFormFieldValidatorOptions<Type>): void;
+    callOnChange(options: IFormFieldOnChangeOptions<OnChangeOptionsType>): void;
     /**
      * Handles validation for the field with the provided options.
      * 
@@ -566,12 +565,12 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
      * Retrieves the component properties for the field, optionally merging with provided props.
      * 
      * @param {IFormFieldProps} [props] - Optional additional properties to merge.
-     * @returns {IFormFieldProps} - The merged component properties.
+     * @returns {IFormFieldProps<Type,OnChangeOptionsType>} - The merged component properties.
      * 
      * @example
      * const props = this.getComponentProps({ additionalProp: true }); // Retrieves component props
      */
-    getComponentProps(props?: IFormFieldProps): IFormFieldProps;
+    getComponentProps(props?: IFormFieldProps<Type, OnChangeOptionsType>): IFormFieldProps<Type, OnChangeOptionsType>;
     /**
      * Checks if the form is currently loading.
      * 
@@ -593,13 +592,13 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
     /**
      * Renders a loading state for the field.
      * 
-     * @param {IFormFieldProps} props - The properties to use for rendering.
+     * @param {IFormFieldProps<Type,OnChangeOptionsType>} props - The properties to use for rendering.
      * @returns {ReactNode} - The rendered loading component.
      * 
      * @example
      * const loadingComponent = this.renderLoading(props); // Renders loading state
      */
-    renderLoading(props: IFormFieldProps): ReactNode;
+    renderLoading(props: IFormFieldProps<Type, OnChangeOptionsType>): ReactNode;
     /**
      * Registers the field with the form.
      * 
@@ -676,14 +675,14 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
     /**
      * Renders the field component.
      * 
-     * @param {IFormFieldProps} props - The properties to use for rendering.
+     * @param {IFormFieldProps<Type,OnChangeOptionsType>} props - The properties to use for rendering.
      * @param {any} [innerRef] - Optional reference to the inner component.
      * @returns {ReactNode} - The rendered field component.
      * 
      * @example
      * const renderedField = this._render(props); // Renders the field
      */
-    _render(props: IFormFieldProps, innerRef?: any): ReactNode;
+    _render(props: IFormFieldProps<Type, OnChangeOptionsType>, innerRef?: any): ReactNode;
     /**
      * Determines if the field can accept decimal values.
      * 
@@ -764,23 +763,23 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
     /**
      * Determines if the field can handle breakpoint styles.
      * 
-     * @param {IFormFieldProps} [props] - Optional properties to check against.
+     * @param {IFormFieldProps<Type,OnChangeOptionsType>} [props] - Optional properties to check against.
      * @returns {boolean} - Returns true if the field can handle breakpoint styles, otherwise false.
      * 
      * @example
      * const canHandle = this.canHandleBreakpointStyle(props); // true or false
      */
-    canHandleBreakpointStyle(props?: IFormFieldProps): boolean;
+    canHandleBreakpointStyle(props?: IFormFieldProps<Type, OnChangeOptionsType>): boolean;
     /**
      * Retrieves the breakpoint style for the field.
      * 
-     * @param {IFormFieldProps} [props] - Optional properties to use for retrieving styles.
+     * @param {IFormFieldProps<Type,OnChangeOptionsType>} [props] - Optional properties to use for retrieving styles.
      * @returns {IStyle} - The breakpoint style for the field.
      * 
      * @example
      * const style = this.getBreakpointStyle(props); // Retrieves the breakpoint style
      */
-    getBreakpointStyle(props?: IFormFieldProps): IStyle;
+    getBreakpointStyle(props?: IFormFieldProps<Type, OnChangeOptionsType>): IStyle;
     /**
      * Triggers the mount lifecycle for the field.
      * 
@@ -1729,43 +1728,49 @@ export interface IFormData extends IDict {
 }
 
 /**
- * Represents the options for the onChange event of a form field.
- * The `IFormFieldOnChangeOptions` type extends the base `IOnChangeOptions` type
- * and includes additional context specific to the form field.
+ * Represents the options available when a form field's value changes.
  * 
- * @type IFormFieldOnChangeOptions
- * @template onChangeEventType - The type of the change event, defaults to NativeSyntheticEvent<TextInputChangeEventData> | null.
- * @template ValueType - The type of the value for the field, defaults to any.
+ * This type extends the base options for handling changes and includes
+ * additional context related to the form field that triggered the change event.
  * 
- * @property {IFormField} context - The form field instance associated with the change event.
- * 
- * @remarks
- * This type is useful for providing additional context when handling change events
- * for form fields, allowing developers to access the field instance and its properties
- * during the event handling process.
+ * @template OnChangeOptionsType - The type extending the options to pass to the onChange handler.
  * 
  * @example
  * // Example of using IFormFieldOnChangeOptions in an onChange handler
- * const handleFieldChange = (options: IFormFieldOnChangeOptions) => {
- *     const { value, context } = options;
- *     console.log("Field value changed:", value);
- *     console.log("Field name:", context.getName());
+ * const handleFieldChange = (options: IFormFieldOnChangeOptions<{ customData: string }>) => {
+ *     const { context, customData } = options;
+ *     console.log(`Field ${context.getName()} changed. New value: ${context.value}`);
+ *     console.log(`Custom data: ${customData}`);
  * };
  */
-export type IFormFieldOnChangeOptions<onChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null, ValueType = any> = IOnChangeOptions<onChangeEventType, ValueType> & {
+export type IFormFieldOnChangeOptions<OnChangeOptionsType = any> = OnChangeOptionsType & IOnChangeOptions & {
+    /**
+     * The context of the form field that triggered the change event.
+     * 
+     * This property provides access to the form field instance, allowing
+     * handlers to interact with the field's properties and methods.
+     * 
+     * @type {IFormField}
+     * @example
+     * const fieldContext = options.context; // Access the form field context
+     * console.log(`Current value of the field: ${fieldContext.value}`);
+     */
     context: IFormField;
-};
 
+    /**
+     * The previous value of the field before the change.
+     */
+    prevValue: any;
+};
 /**
  * Represents the properties for a form field component.
  * This type extends the base field interface and includes additional properties
  * that control the behavior, validation, and rendering of the field within a form.
  *
  * @type IFormFieldProps
- * @template T - The type of the field, defaults to "text".
- * @template onChangeEventType - The type of the change event, defaults to NativeSyntheticEvent<TextInputChangeEventData> | null.
- * @template ValueType - The type of the value for the field, defaults to any.
- * 
+ * @template Type - The type of the field, defaults to "any".
+ * @template OnChangeOptionsType - The type extending the options to pass to the onChange props.
+
  * @interface IFormFieldProps
  * 
  * @property {function} [getValidValue] - A function to retrieve the valid value of the field based on the provided options.
@@ -1813,8 +1818,8 @@ export type IFormFieldOnChangeOptions<onChangeEventType = NativeSyntheticEvent<T
  *     },
  * };
  */
-export type IFormFieldProps<T extends IFieldType = any, onChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null, ValueType = any> = IField<T> & {
-    getValidValue?: (options: { value: any; context: IFormField<T>; data: IFormData }) => any;
+export type IFormFieldProps<Type extends IFieldType = any, OnChangeOptionsType = any> = IField<Type> & {
+    getValidValue?: (options: { value: any; context: IFormField<Type>; data: IFormData }) => any;
     isFilter?: boolean;
 
     validateOnMount?: boolean;
@@ -1826,15 +1831,15 @@ export type IFormFieldProps<T extends IFieldType = any, onChangeEventType = Nati
 
     responsive?: boolean;
 
-    onValidate?: (options: IFormFieldOnChangeOptions<onChangeEventType, ValueType>) => any;
+    onValidate?: (options: IFormFieldValidatorOptions<any>) => any;
 
-    onNoValidate?: (options: IFormFieldOnChangeOptions<onChangeEventType, ValueType>) => any;
+    onNoValidate?: (options: IFormFieldValidatorOptions<any>) => any;
 
     keyboardEventHandlerProps?: IKeyboardEventHandlerProps;
 
     formName?: string;
 
-    onChange?: (options: IFormFieldOnChangeOptions<onChangeEventType, ValueType>) => any;
+    onChange?: (options: IFormFieldOnChangeOptions<OnChangeOptionsType>) => void;
 
     errorText?: string;
 
@@ -1845,16 +1850,16 @@ export type IFormFieldProps<T extends IFieldType = any, onChangeEventType = Nati
 
     isFormSubmitting?: boolean;
     renderLoading?: (
-        options: IFormFieldProps<T> & {
+        options: IFormFieldProps<Type, OnChangeOptionsType> & {
             width: string | number; //la largeur occupée par le champ en cas de responsive design
         }
     ) => ReactNode;
 
     ref?: any;
 
-    onMount?: (context: IFormField<T>) => any;
+    onMount?: (context: IFormField<Type>) => any;
 
-    onUnmount?: (context: IFormField<T>) => any;
+    onUnmount?: (context: IFormField<Type>) => any;
 
     displayErrors?: boolean;
 
@@ -1863,6 +1868,8 @@ export type IFormFieldProps<T extends IFieldType = any, onChangeEventType = Nati
     validateEmail?: boolean;
 
     windowWidth?: number;
+
+    label?: ReactNode;
 }
 /**
  * Represents the options for handling keyboard events in a form.

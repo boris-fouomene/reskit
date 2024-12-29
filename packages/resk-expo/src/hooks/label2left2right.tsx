@@ -12,7 +12,7 @@ import { ReactNode } from "react";
  * @template T - Optional type parameter for the function options.
  * 
  * ### Props:
- *  `label` : A ReactNode or a function that returns a ReactNode. This can be used to render the label for a component.
+ *  `label` : A ReactNode. This can be used to render the label for a component.
  * - `left`: A ReactNode or a function that returns a ReactNode. This can be used to render 
  *   content on the left side of a component.
  * - `right`: A ReactNode or a function that returns a ReactNode. This can be used to render 
@@ -28,7 +28,7 @@ export type ILabelOrLeftOrRightProps<T = any> = {
      * label: <Text>Username</Text>
      * ```
      */
-    label?: ReactNode | ((options: T) => ReactNode);
+    label?: ReactNode;
     /**A ReactNode or a function that returns a ReactNode. This can be used to render content on the left side of a component.
      * Typically used for icons or buttons.
      * @example
@@ -83,7 +83,7 @@ export function getLabelOrLeftOrRightProps<T = any>(props: ILabelOrLeftOrRightPr
     const left = typeof props?.left === "function" ? props?.left(options) : props?.left;
     // Evaluate the right property, calling it if it's a function
     const right = typeof props?.right === "function" ? props?.right(options) : props?.right;
-    const label = typeof props?.label === "function" ? props?.label(options) : props?.label;
+    const label = props?.label;
     const leftElement = isValidElement(left) ? left : null,
         rightElement = isValidElement(right) ? right : null;
     // Validate and return the left and right properties, ensuring they are valid React elements

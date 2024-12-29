@@ -77,21 +77,6 @@ export interface IFieldBase<FieldType = any> extends IProtectedResource {
   type?: FieldType;
 
   /**
-   * The label of the field.
-   * 
-   * @description
-   * This property specifies the label or display text for the field.
-   * 
-   * @example
-   * ```typescript
-   * const textField: IFieldBase = {
-   *   label: 'Text Field'
-   * };
-   * ```
-   */
-  label?: string;
-
-  /**
    * The name of the field.
    * 
    * @description
@@ -242,7 +227,7 @@ export interface IFieldMap extends Record<string, IFieldBase> {
    * };
    * ```
    */
-  text: IFieldBase<"text">;
+  //text: IFieldBase<"text">;
   /**
    * A number field.
    * 
@@ -258,7 +243,7 @@ export interface IFieldMap extends Record<string, IFieldBase> {
    * };
    * ```
    */
-  number: IFieldBase<"number">;
+  //number: IFieldBase<"number">;
 
   /**
    * A date field.
@@ -275,7 +260,7 @@ export interface IFieldMap extends Record<string, IFieldBase> {
    * };
    * ```
    */
-  date: IFieldBase<"date">;
+  //date: IFieldBase<"date">;
 
   /**
    * A datetime field.
@@ -292,7 +277,7 @@ export interface IFieldMap extends Record<string, IFieldBase> {
    * };
    * ```
    */
-  datetime: IFieldBase<"datetime">;
+  //datetime: IFieldBase<"datetime">;
 
   /**
    * A time field.
@@ -309,7 +294,7 @@ export interface IFieldMap extends Record<string, IFieldBase> {
    * };
    * ```
    */
-  time: IFieldBase<"time">;
+  //time: IFieldBase<"time">;
 
   /**
    * An email field.
@@ -326,7 +311,7 @@ export interface IFieldMap extends Record<string, IFieldBase> {
    * };
    * ```
    */
-  email: IFieldBase<"email">;
+  //email: IFieldBase<"email">;
 }
 
 /**

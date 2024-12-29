@@ -323,10 +323,7 @@ export type IOnChangeOptionsBase<
  * @returns {void} - This type does not return any value, as it is typically used 
  *                   as an argument for an event handler function.
  */
-export type IOnChangeOptions<
-  OnChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null,
-  ValueType = any,
-> = IOnChangeOptionsBase<OnChangeEventType, ValueType>;
+export type IOnChangeOptions<OnChangeEventType = any | null, ValueType = any> = IOnChangeOptionsBase<OnChangeEventType, ValueType>;
 
 
 

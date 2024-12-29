@@ -43,6 +43,12 @@ import { Divider } from "@components/Divider";
 export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>> implements IDropdownContext<ItemType, ValueType> {
     constructor(props: IDropdownProps<ItemType, ValueType>) {
         super(props);
+        this.isSelectedByHashKey = this.isSelectedByHashKey.bind(this);
+        this.isSelected = this.isSelected.bind(this);
+        this.getHashKey = this.getHashKey.bind(this);
+        this.getItemLabel = this.getItemLabel.bind(this);
+        this.getItemValue = this.getItemValue.bind(this);
+        this.getSelectedItemsByHashKey = this.getSelectedItemsByHashKey.bind(this);
         this.state = {
             ...this.prepareState(props),
         };
@@ -148,6 +154,9 @@ export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdo
         return { selectedItemsByHashKey: sItemsByKeys, selectedValues };
     };
     isSelectedByHashKey = (hasKey: string) => {
+        if (this.props.multiple) {
+            console.log("checking seletion by hash key ", hasKey, this.state.selectedItemsByHashKey);
+        }
         return !isEmpty(hasKey) && !!this.state.selectedItemsByHashKey[hasKey];
     };
     get itemsByHashKey() {
@@ -451,6 +460,9 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
     const { multiple, selectedIconName } = context.props;
     const testID = context.getTestID();
     const isSelected = useMemo(() => {
+        if (multiple) {
+            console.log("checking gggggggggggggg ", context.state.selectedItemsByHashKey, context.state);
+        }
         return context.isSelectedByHashKey(hashKey);
     }, [selectedItemsByHashKey, hashKey]);
     if (!label) {

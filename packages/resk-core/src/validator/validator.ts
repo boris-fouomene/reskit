@@ -1,7 +1,7 @@
-import { IValidatorRule, IValidatorRuleOptions, IValidatorRulesOptions, IValidatorRuleSeparator, IValidatorRuleMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult } from "./types";
-import { isNonNullString, isObj, stringify } from "@utils/index";
+import { IValidatorRule, IValidatorValidateOptions, IValidatorRuleMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult, IValidatorSanitizedRules } from "./types";
+import { defaultStr, isNonNullString, isObj, stringify } from "@utils/index";
 import { i18n } from "../i18n";
-const RULE_SEPARATOR: IValidatorRuleSeparator = "|";
+import { isEmpty } from "lodash";
 
 
 /**
@@ -103,40 +103,60 @@ export class Validator {
    * This method takes a list of validation rules, which can be in various formats,
    * and returns an array of sanitized rules ready for validation.
    * 
-   * @param {IValidatorRulesOptions} rules - The list of validation rules. The rules can be:
-   * - A string (e.g., "required|minLength[2]|maxLength[10]") with multiple rules separated by `|`.
+   * @param {IValidatorValidateOptions["rules"]} rules - The list of validation rules. The rules can be:
    * - An array of rules (e.g., ["required", "minLength[2]", "maxLength[10]"]).
-   * - A function that performs validation.
    * 
-   * @returns {IValidatorRule[]} An array of sanitized validation rules.
+   * @returns {{sanitizedRules:IValidatorSanitizedRules,invalidRules:IValidatorRule[]}}
    */
-  static sanitizeRules(rules?: IValidatorRulesOptions): IValidatorRule[] {
-    const result: IValidatorRule[] = [];
-    (typeof rules === "function"
-      ? [rules]
-      : typeof rules === "string" && rules
-        ? (rules as string)
-          .trim()
-          .split(RULE_SEPARATOR)
-          .filter((rule) => !!rule?.trim()?.ltrim(RULE_SEPARATOR)?.rtrim(RULE_SEPARATOR))
-        : Array.isArray(rules)
-          ? rules
-          : []
-    ).map((rule) => {
-      if (typeof rule == "function") {
-        result.push(rule);
-      } else if (typeof rule === "string") {
-        rule = rule.trim().ltrim(RULE_SEPARATOR).rtrim(RULE_SEPARATOR);
-        if (rule) {
-          rule.split(RULE_SEPARATOR).map((rr) => {
-            if (["function", "string"].includes(typeof rr) && rr.trim()) {
-              result.push(rr.trim());
-            }
+  static sanitizeRules(rules?: IValidatorValidateOptions["rules"]): { sanitizedRules: IValidatorSanitizedRules, invalidRules: IValidatorRule[] } {
+    const result: IValidatorSanitizedRules = [];
+    const allRules = this.getRules();
+    const invalidRules: IValidatorRule[] = [];
+    (Array.isArray(rules) ? rules : []).map((rule) => {
+      if (typeof rule === "function") {
+        result.push(rule as IValidatorRuleFunction);
+      } else if (isNonNullString(rule)) {
+        let ruleName = String(rule).trim();
+        const ruleParams: string[] = [];
+        if (ruleName.indexOf("[") > -1) {
+          const rulesSplit = ruleName.rtrim("]").split("[");
+          ruleName = rulesSplit[0].trim();
+          const spl = String(rulesSplit[1]).split(",");
+          for (let t in spl) {
+            ruleParams.push(spl[t].replace("]", "").trim());
+          }
+        }
+        if (typeof allRules[ruleName as IValidatorRuleName] === "function") {
+          result.push({
+            ruleName: ruleName as unknown as IValidatorRuleName,
+            params: ruleParams,
+            ruleFunction: allRules[ruleName as IValidatorRuleName] as IValidatorRuleFunction,
+            rawRuleName: String(rule)
           });
+        } else {
+          invalidRules.push(rule);
+        }
+      } else if (isObj(rule) && typeof rule == "object") {
+        const rulesObj: Record<IValidatorRuleName, any> = rule;
+        for (let key in rulesObj) {
+          if (Object.hasOwnProperty.call(rulesObj, key)) {
+            const rulesParams = rulesObj[key as IValidatorRuleName];
+            const ruleFunction = allRules[key as IValidatorRuleName] as IValidatorRuleFunction;
+            if (typeof ruleFunction === "function") {
+              result.push({
+                ruleName: key as unknown as IValidatorRuleName,
+                params: Array.isArray(rulesParams) ? rulesParams : [],
+                ruleFunction: ruleFunction,
+                rawRuleName: String(key)
+              });
+            } else {
+              invalidRules.push(key as IValidatorRule);
+            }
+          }
         }
       }
     });
-    return result;
+    return { sanitizedRules: result, invalidRules };
   }
 
   /**
@@ -146,7 +166,7 @@ export class Validator {
    * It returns a promise that resolves if the validation passes, or rejects with an error
    * message if the validation fails.
    * 
-   * @param {IValidatorRuleOptions} options - The options for validation, including:
+   * @param {IValidatorValidateOptions} options - The options for validation, including:
    * - `value`: The value to validate.
    * - `rules`: An array of validation rules to apply.
    * - `...extra`: Any additional options that may be applied.
@@ -165,10 +185,13 @@ export class Validator {
    * });
    * ```
    */
-  static validate({ rules, value, ...extra }: IValidatorRuleOptions): Promise<IValidatorRuleOptions> {
-    rules = Validator.sanitizeRules(rules);
-    if (!rules.length) return Promise.resolve({ rules, value, ...extra });
-    const mainRuleParams = Array.isArray(extra.ruleParams) ? extra.ruleParams : [];
+  static validate({ rules, value, ...extra }: IValidatorValidateOptions): Promise<IValidatorValidateOptions> {
+    const { sanitizedRules, invalidRules } = Validator.sanitizeRules(rules);
+    if (invalidRules.length) {
+      const message = invalidRules.map(rule => i18n.t("validator.invalidRule", { rule: isNonNullString(rule) ? rule : "unamed rule" })).join(", ");
+      return Promise.reject({ rules, value, ...extra, message });
+    }
+    if (!sanitizedRules.length) return Promise.resolve({ rules, value, ...extra });
     const i18nRulesOptions = {
       ...extra,
       value,
@@ -177,35 +200,25 @@ export class Validator {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         let index = -1;
-        const rulesLength = rules.length;
+        const rulesLength = sanitizedRules.length;
         const next = async function (): Promise<any> {
           index++;
           if (index >= rulesLength) {
             return resolve({ value, rules, ...extra });
           }
-          const rule = (rules as any)[index];
-          const ruleParams: any[] = [...mainRuleParams];
+          const rule = sanitizedRules[index];
+          let ruleName = undefined;
+          let rawRuleName = undefined;
+          let ruleParams: any[] = [];
           let ruleFunc: IValidatorRule | undefined = typeof rule === "function" ? rule : undefined;
-          if (typeof rule === "string") {
-            if (!rule) {
-              return next();
-            }
-            let vRule = String(rule).trim();
-            if (vRule.indexOf("[") > -1) {
-              const _sp = vRule.trim().split("[");
-              vRule = _sp[0];
-              const spl = _sp[1].split(",");
-              for (let t in spl) {
-                ruleParams.push(spl[t].replace("]", "").trim());
-              }
-            }
-            ruleFunc = Validator.getRule(vRule as IValidatorRuleName);
+          if (typeof rule === "object" && isObj(rule)) {
+            ruleFunc = rule.ruleFunction;
+            ruleParams = Array.isArray(rule.params) ? rule.params : [];
+            ruleName = rule.ruleName;
+            rawRuleName = rule.rawRuleName;
           }
-          const valResult = { value, rule, rules, ...extra };
-          const i18nRuleOptions = { ...i18nRulesOptions, rule: stringify(rule) };
-          if (typeof ruleFunc !== "function") {
-            return reject({ ...valResult, message: i18n.t("validator.invalidRule", i18nRuleOptions) });
-          }
+          const valResult = { value, rule, ruleName, rawRuleName, ruleParams, rules, ...extra };
+          const i18nRuleOptions = { ...i18nRulesOptions, rule: defaultStr(ruleName), ruleName, rawRuleName, ruleParams };
           const handleResult = (result: any) => {
             result = typeof result === "string" ? (isNonNullString(result) ? result : i18n.t("validator.invalidMessage", i18nRuleOptions)) : result;
             if (result === false) {
@@ -215,8 +228,11 @@ export class Validator {
             }
             return next();
           };
+          if (typeof ruleFunc !== "function") {
+            return reject({ ...valResult, message: i18n.t("validator.invalidRule", i18nRuleOptions) });
+          }
           try {
-            const result = await ruleFunc({ ...extra, rule, rules, ruleParams, value });
+            const result = await ruleFunc({ ...extra, ruleName, rawRuleName, rules, ruleParams, value });
             return handleResult(result);
           } catch (e) {
             return handleResult(typeof e === "string" ? e : (e as any)?.message || e?.toString() || stringify(e));

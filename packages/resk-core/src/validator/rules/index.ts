@@ -1,6 +1,6 @@
 
 import { isNumber } from "lodash";
-import { IValidatorResult, IValidatorRuleOptions } from "../types";
+import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { defaultStr, isEmpty, isNonNullString, isValidUrl, isValidEmail, isStringNumber } from "@utils/index";
 import { Validator } from "../validator";
 import { i18n } from "../../i18n";
@@ -15,7 +15,7 @@ import { i18n } from "../../i18n";
  * ### Parameters:
  * - **compare**: `(value: any, toCompare: any) => boolean` - A comparison function that defines the comparison logic.
  * - **message**: `string` - The error message to return if the validation fails.
- * - **options**: `IValidatorRuleOptions` - An object containing the value to validate and any rule parameters.
+ * - **options**: `IValidatorValidateOptions` - An object containing the value to validate and any rule parameters.
  * 
  * ### Return Value:
  * - `IValidatorResult`: A promise that resolves to `true` if the comparison is valid, or rejects with an error message if it is not.
@@ -27,7 +27,7 @@ import { i18n } from "../../i18n";
  *     .catch(error => console.error(error)); // Output: "Value must be less than 10"
  * ```
  */
-function compareNumer(compare: (value: any, toCompare: any) => boolean, translateKey: string, { value, ruleParams, ...rest }: IValidatorRuleOptions): IValidatorResult {
+function compareNumer(compare: (value: any, toCompare: any) => boolean, translateKey: string, { value, ruleParams, ...rest }: IValidatorValidateOptions): IValidatorResult {
     ruleParams = Array.isArray(ruleParams) ? ruleParams : [];
     const rParams = ruleParams ? ruleParams : [];
     translateKey = defaultStr(translateKey);
@@ -54,7 +54,7 @@ function compareNumer(compare: (value: any, toCompare: any) => boolean, translat
  * Validator rule that checks if a number is less than or equal to a specified value.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - Contains the value to validate and the rule parameters.
+ * - **options**: `IValidatorValidateOptions` - Contains the value to validate and the rule parameters.
  * 
  * ### Return Value:
  * - `IValidatorResult`: Resolves to `true` if the value is less than or equal to the specified value, otherwise rejects with an error message.
@@ -77,7 +77,7 @@ Validator.registerRule("numberLessThanOrEquals", function numberLessThanOrEquals
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The number to validate.
  *   - `ruleParams`: An array where the first element is the value to compare against.
  * 
@@ -114,7 +114,7 @@ Validator.registerRule("numberLessThan", function numberLessThan(options) {
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The number to validate.
  *   - `ruleParams`: An array where the first element is the value to compare against.
  * 
@@ -151,7 +151,7 @@ Validator.registerRule("numberGreaterThanOrEquals", function numberGreaterThanOr
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The number to validate.
  *   - `ruleParams`: An array where the first element is the value to compare against.
  * 
@@ -187,7 +187,7 @@ Validator.registerRule("numberGreaterThan", function numberGreaterThan(options) 
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The number to validate.
  *   - `ruleParams`: An array where the first element is the value to compare against.
  * 
@@ -224,7 +224,7 @@ Validator.registerRule("numberEquals", function numberEqualsTo(options) {
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The number to validate.
  *   - `ruleParams`: An array where the first element is the value to compare against.
  * 
@@ -262,7 +262,7 @@ Validator.registerRule("numberNotEquals", function numberNotEqualsTo(options) {
  * This rule ensures that a field is filled out before submission.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The value to validate for presence.
  * 
  * ### Return Value:
@@ -296,7 +296,7 @@ Validator.registerRule("required", function required(options) {
  * falls within a specified range or matches a specific length.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The string value to validate.
  *   - `ruleParams`: An array where:
  *     - The first element specifies the minimum length (optional).
@@ -358,7 +358,7 @@ Validator.registerRule("length", function length({ value, ruleParams }) {
  * This rule utilizes the `isValidEmail` utility function to perform the validation.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The value to validate as an email address.
  * 
  * ### Return Value:
@@ -400,7 +400,7 @@ Validator.registerRule("email", function email(options) {
  * This rule utilizes the `isValidUrl` utility function to perform the validation.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The value to validate as a URL.
  * 
  * ### Return Value:
@@ -437,7 +437,7 @@ Validator.registerRule("url", function url(options) {
  * This rule ensures that the input string has at least the specified number of characters.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The string value to validate.
  *   - `ruleParams`: An array where the first element specifies the minimum length required.
  * 
@@ -480,7 +480,7 @@ Validator.registerRule("minLength", function minLength(options) {
  * This rule ensures that the input string has at most the specified number of characters.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The string value to validate.
  *   - `ruleParams`: An array where the first element specifies the maximum length allowed.
  * 
@@ -522,7 +522,7 @@ Validator.registerRule("maxLength", function maxLength(options) {
  * does not start with a dot, and is not a reserved file name.
  * 
  * ### Parameters:
- * - **options**: `IValidatorRuleOptions` - An object containing:
+ * - **options**: `IValidatorValidateOptions` - An object containing:
  *   - `value`: The file name to validate.
  * 
  * ### Return Value:

@@ -2,7 +2,7 @@
  * @interface IValidatorRule
  * Represents a validation  rule that can be used within the validation system.
  * This type can either be a function that implements custom validation logic or a string
- * that specifies a predefined validation rule.
+ * that specifies a predefined validation rule or a dictionary where the key is the rule name and the value is the parameters.
  * 
  * A validation rule can be one of the following:
  * 
@@ -27,7 +27,8 @@
  *       "required",
  *       "maxLength[50]",
  *       "minLength[10]",
- *       ({ value }) => boolean | string | Promise<IValidatorResult>
+ *       ({ value }) => boolean | string | Promise<IValidatorResult>,
+ *      
  *   ]
  *   ```
  * 
@@ -52,6 +53,8 @@
  *       "required",
  *       "minLength[2]",
  *       "maxLength[10]",
+ *       { minLength: [2] },
+ *       { maxLength: [10] },
  *       ({ value }) => value?.length === 2 || "This field must have exactly two characters"
  *   ];
  *   ```
@@ -60,8 +63,98 @@
  * or it can throw an exception of type string or return an object of the form `{ message: string }`.
  */
 
-export type IValidatorRule<ParamType = Array<any>> = IValidatorRuleFunction<ParamType> | string;
+export type IValidatorRule<ParamType = Array<any>> = IValidatorRuleFunction<ParamType> | IValidatorRuleName | `${IValidatorRuleName}[${string}]` | Record<IValidatorRuleName, ParamType>;
 
+
+/**
+ * @typedef IValidatorSanitizedRule
+ * Represents a sanitized validation rule.
+ * 
+ * This type can either be a validation rule function or an object that contains
+ * detailed information about a validation rule, including its name, parameters,
+ * and the function that implements the validation logic.
+ * 
+ * @example
+ * // Example of a validation rule function
+ * const minLengthRule: IValidatorSanitizedRule = ({ value }) => {
+ *     return value.length >= 5 || "Minimum length is 5 characters.";
+ * };
+ * 
+ * // Example of a sanitized rule object
+ * const sanitizedRule: IValidatorSanitizedRule = {
+ *     ruleName: "minLength",
+ *     params: [5],
+ *     ruleFunction: minLengthRule,
+ * };
+ */
+export type IValidatorSanitizedRule =
+    IValidatorRuleFunction |
+    {
+        /**
+         * The name of the validation rule.
+         * 
+         * This property specifies the rule's identifier, which can be used
+         * to reference the rule in validation scenarios.
+         * 
+         * @type {IValidatorRuleName}
+         * @example
+         * const ruleName = sanitizedRule.ruleName; // 'minLength'
+         */
+        ruleName: IValidatorRuleName;
+
+        /**
+         * The parameters required for the validation rule.
+         * 
+         * This array contains the values that are necessary for the rule's
+         * execution, such as minimum or maximum lengths, or other criteria.
+         * 
+         * @type {Array<any>}
+         * @example
+         * const params = sanitizedRule.params; // [5]
+         */
+        params: Array<any>;
+
+        /**
+         * The function that implements the validation logic.
+         * 
+         * This function is called to perform the actual validation based on
+         * the provided parameters and the value being validated.
+         * 
+         * @type {IValidatorRuleFunction}
+         * @example
+         * const ruleFunction = ``sanitizedRule``.ruleFunction; // Function reference
+         */
+        ruleFunction: IValidatorRuleFunction;
+
+        /***
+         * The rule with parameters.    
+         * it represents the rule with parameters, for example "minLength[5]" that has been passed to the validator.
+         */
+        rawRuleName: string;
+    }
+
+/**
+ * @typedef IValidatorSanitizedRules
+ * Represents an array of sanitized validation rules.
+ * 
+ * This type is a collection of sanitized rules, allowing for multiple
+ * validation rules to be applied in a structured manner.
+ * 
+ * @example
+ * const sanitizedRules: IValidatorSanitizedRules = [
+ *     {
+ *         ruleName: "required",
+ *         params: [],
+ *         ruleFunction: ({ value }) => !!value || "This field is required.",
+ *     },
+ *     {
+ *         ruleName: "minLength",
+ *         params: [5],
+ *         ruleFunction: ({ value }) => value.length >= 5 || "Minimum length is 5 characters.",
+ *     },
+ * ];
+ */
+export type IValidatorSanitizedRules = IValidatorSanitizedRule[];
 
 /**
  * @typedef IValidatorRuleFunction
@@ -74,10 +167,10 @@ export type IValidatorRule<ParamType = Array<any>> = IValidatorRuleFunction<Para
  * 
  * ### Structure:
  * - The function accepts a single parameter:
- *   - `options` (IValidatorRuleOptions): An object containing the necessary parameters for validation.
+ *   - `options` (IValidatorValidateOptions): An object containing the necessary parameters for validation.
  * 
  * ### Parameters:
- * - **options**: An object of type `IValidatorRuleOptions` which includes:
+ * - **options**: An object of type `IValidatorValidateOptions` which includes:
  *   - `rules`: A collection of validation rules to apply. This can be a single rule or an array of rules.
  *   - `rule`: An optional specific validation rule to apply, overriding the rules defined in the `rules` property.
  *   - `value`: The actual value that needs to be validated against the specified rules.
@@ -112,7 +205,7 @@ export type IValidatorRule<ParamType = Array<any>> = IValidatorRuleFunction<Para
  * - This type is essential for defining custom validation logic in forms, allowing developers to create reusable and flexible validation rules.
  * - The function can be synchronous or asynchronous, depending on the validation logic implemented.
  */
-export type IValidatorRuleFunction<ParamType = Array<any>> = (options: IValidatorRuleOptions<ParamType>) => IValidatorResult;
+export type IValidatorRuleFunction<ParamType = Array<any>> = (options: IValidatorValidateOptions<ParamType>) => IValidatorResult;
 
 /**
  * @interface IValidatorRuleName
@@ -183,7 +276,7 @@ export interface IValidatorRuleMap {
      * Validator rule that checks if a number is less than or equal to a specified value.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - Contains the value to validate and the rule parameters.
+     * - **options**: `IValidatorValidateOptions` - Contains the value to validate and the rule parameters.
      * 
      * ### Return Value:
      * - `IValidatorResult`: Resolves to `true` if the value is less than or equal to the specified value, otherwise rejects with an error message.
@@ -201,7 +294,7 @@ export interface IValidatorRuleMap {
      * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The number to validate.
      *   - `ruleParams`: An array where the first element is the value to compare against.
      * 
@@ -234,7 +327,7 @@ export interface IValidatorRuleMap {
      * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The number to validate.
      *   - `ruleParams`: An array where the first element is the value to compare against.
      * 
@@ -267,7 +360,7 @@ export interface IValidatorRuleMap {
      * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The number to validate.
      *   - `ruleParams`: An array where the first element is the value to compare against.
      * 
@@ -299,7 +392,7 @@ export interface IValidatorRuleMap {
      * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The number to validate.
      *   - `ruleParams`: An array where the first element is the value to compare against.
      * 
@@ -332,7 +425,7 @@ export interface IValidatorRuleMap {
      * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The number to validate.
      *   - `ruleParams`: An array where the first element is the value to compare against.
      * 
@@ -365,7 +458,7 @@ export interface IValidatorRuleMap {
      * This rule ensures that a field is filled out before submission.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The value to validate for presence.
      * 
      * ### Return Value:
@@ -396,7 +489,7 @@ export interface IValidatorRuleMap {
      * falls within a specified range or matches a specific length.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The string value to validate.
      *   - `ruleParams`: An array where:
      *     - The first element specifies the minimum length (optional).
@@ -437,7 +530,7 @@ export interface IValidatorRuleMap {
      * This rule ensures that the input string has at least the specified number of characters.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The string value to validate.
      *   - `ruleParams`: An array where the first element specifies the minimum length required.
      * 
@@ -473,7 +566,7 @@ export interface IValidatorRuleMap {
      * This rule ensures that the input string has at most the specified number of characters.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The string value to validate.
      *   - `ruleParams`: An array where the first element specifies the maximum length allowed.
      * 
@@ -508,7 +601,7 @@ export interface IValidatorRuleMap {
      * This rule utilizes the `isValidEmail` utility function to perform the validation.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The value to validate as an email address.
      * 
      * ### Return Value:
@@ -543,7 +636,7 @@ export interface IValidatorRuleMap {
      * This rule utilizes the `isValidUrl` utility function to perform the validation.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The value to validate as a URL.
      * 
      * ### Return Value:
@@ -578,7 +671,7 @@ export interface IValidatorRuleMap {
      * does not start with a dot, and is not a reserved file name.
      * 
      * ### Parameters:
-     * - **options**: `IValidatorRuleOptions` - An object containing:
+     * - **options**: `IValidatorValidateOptions` - An object containing:
      *   - `value`: The file name to validate.
      * 
      * ### Return Value:
@@ -610,46 +703,9 @@ export interface IValidatorRuleMap {
     fileName: IValidatorRuleFunction;
 }
 
-/**
- * @interface IValidatorRulesOptions
- * Represents a collection of validation rules for  fields.
- * 
- * The `IValidatorRulesOptions` type can be either a single validation rule or an array of validation rules.
- * This allows for flexible validation configurations, enabling developers to define multiple rules
- * for a single form field or to use a single rule as needed.
- * 
- * ### Possible Values:
- * 
- * - A single validation rule of type `IValidatorRule`, which can be:
- *   - A string representing a validation rule (e.g., `"required"`).
- *   - A function that performs validation and returns a result.
- * 
- * - An array of validation rules, where each element can be of type `IValidatorRule`.
- * 
- * @template ParamType The type of the parameters that the rule function accepts.
- * ### Examples:
- * 
- * - A single validation rule:
- *   ```typescript
- *   const rules: IValidatorRulesOptions = "required";
- *   ```
- * 
- * - An array of validation rules:
- *   ```typescript
- *   const rules: IValidatorRulesOptions = [
- *       "required",
- *       "minLength[5]",
- *       ({ value }) => value?.length <= 10 || "Value must be 10 characters or less"
- *   ];
- *   ```
- * 
- * This type provides a convenient way to manage validation logic in forms, allowing for both simple and complex validation scenarios.
- */
-export type IValidatorRulesOptions<ParamType = Array<any>> = IValidatorRule<ParamType> | IValidatorRule<ParamType>[];
-
 
 /**
- * @interface IValidatorRuleOptions
+ * @interface IValidatorValidateOptions
  * Represents the result of a form validation.
  * 
  * The validation result can be one of the following:
@@ -700,8 +756,8 @@ export type IValidatorResult = Promise<boolean | string> | string | boolean;
 
 
 /**
- * @interface IValidatorRuleOptions
- * Represents the options for defining a form validation rule.
+ * @interface IValidatorValidateOptions
+ * Represents the options that are passed to the `Validator.validate` method.
  * 
  * This interface is used to specify the rules and parameters for validating a form field.
  * It includes the validation rules to apply, the value to validate, and any additional parameters
@@ -710,14 +766,13 @@ export type IValidatorResult = Promise<boolean | string> | string | boolean;
  * 
  * @template ParamType The type of the parameters that the rule function accepts.
  */
-export interface IValidatorRuleOptions<ParamType = Array<any>> {
+export interface IValidatorValidateOptions<ParamType = Array<any>> {
     /** 
-     * The list of validation rules to apply.
-     * This should conform to the `IValidatorRulesOptions` type, which defines the available rules.
+     * The list of validation rules to apply that have been passed through the `Validator.validate` method.
      * 
      * @example
      * ```typescript
-     * const options: IValidatorRuleOptions = {
+     * const options: IValidatorValidateOptions = {
      *     rules: {
      *         required: true,
      *         minLength: 5,
@@ -726,15 +781,17 @@ export interface IValidatorRuleOptions<ParamType = Array<any>> {
      * };
      * ```
      */
-    rules?: IValidatorRulesOptions;
+    rules?: IValidatorRule[];
+
+    sanitizedRules?: IValidatorSanitizedRules;
 
     /**
-     * An optional specific validation rule to apply.
+     * The current validation rule to apply.
      * This can be used to override or specify a particular rule from the `rules` property.
      * 
      * @example
      * ```typescript
-     * const options: IValidatorRuleOptions = {
+     * const options: IValidatorValidateOptions = {
      *     rules: { required: true },
      *     rule: 'minLength',
      *     value: "test",
@@ -749,7 +806,7 @@ export interface IValidatorRuleOptions<ParamType = Array<any>> {
      * 
      * @example
      * ```typescript
-     * const options: IValidatorRuleOptions = {
+     * const options: IValidatorValidateOptions = {
      *     rules: { required: true },
      *     value: "some input",
      * };
@@ -764,7 +821,7 @@ export interface IValidatorRuleOptions<ParamType = Array<any>> {
      * 
      * @example
      * ```typescript
-     * const options: IValidatorRuleOptions = {
+     * const options: IValidatorValidateOptions = {
      *     rules: { numberGreaterThan: true },
      *     value: 10,
      *     ruleParams: [5], // Validates if the value is greater than 5
@@ -772,6 +829,18 @@ export interface IValidatorRuleOptions<ParamType = Array<any>> {
      * ```
      */
     ruleParams?: ParamType;
+
+    /***
+     * The rule name.    
+     * it represents the rule name, for example "minLength" that has been passed to the validator.
+     */
+    ruleName?: IValidatorRuleName;
+
+    /**
+     * The raw rule name.    
+     * it represents the raw rule name, for example "minLength[5]" that has been passed to the validator.
+     */
+    rawRuleName?: string;
 
     /**
     * The error message to display in case of validation failure.
@@ -793,25 +862,3 @@ export interface IValidatorRuleOptions<ParamType = Array<any>> {
     */
     message?: string;
 }
-
-/**
- * @interface IValidatorRuleSeparator
- * Represents the separator used to define multiple validation rules in a string format.
- * 
- * The `IValidatorRuleSeparator` type is a string literal type that specifies the character
- * used to separate different validation rules when they are defined as a single string.
- * 
- * In this case, the separator is the pipe character (`|`), which allows for the specification
- * of multiple rules in a concise format.
- * 
- * ### Example:
- * 
- * When defining validation rules as a string, you can use the separator to combine multiple rules:
- * ```typescript
- * const validationRules: string = `required|minLength[5]|maxLength[10]`;
- * ```
- * 
- * In this example, the rules `required`, `minLength[5]`, and `maxLength[10]` are separated by the `|` character,
- * indicating that all these rules should be applied for validation.
- */
-export type IValidatorRuleSeparator = "|";

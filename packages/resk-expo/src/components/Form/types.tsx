@@ -4,7 +4,7 @@ import { IKeyboardEventHandlerKey } from "@components/KeyboardEventHandler/keyEv
 import { ITabItemProps, ITabProps } from "@components/Tab";
 import { IViewProps } from "@components/View";
 import { IDimensions } from "@dimensions/types";
-import { IAuthPerm, IDict, IField, IFieldType, IResourceName, IValidatorRule, IValidatorRuleOptions } from "@resk/core";
+import { IAuthPerm, IDict, IField, IFieldType, IResourceName, IValidatorRule, IValidatorValidateOptions } from "@resk/core";
 import { IOnChangeOptions, IStyle } from "@src/types";
 import { ObservableComponent } from "@utils/index";
 import { ReactElement, ReactNode } from "react";
@@ -882,7 +882,7 @@ export interface IFormOnSubmitOptions extends IFormContext {
 /**
  * Interface representing the options available for validating a form field.
  * 
- * This interface extends the IValidatorRuleOptions and includes additional properties
+ * This interface extends the IValidatorValidateOptions and includes additional properties
  * that provide context and information necessary for validating a specific form field.
  * It allows for the inclusion of previous values, validation messages, and field context.
  * 
@@ -904,7 +904,7 @@ export interface IFormOnSubmitOptions extends IFormContext {
  *     return 'Validation passed.';
  * }
  */
-export interface IFormFieldValidatorOptions<Type extends IFieldType = any> extends IValidatorRuleOptions {
+export interface IFormFieldValidatorOptions<Type extends IFieldType = any> extends IValidatorValidateOptions {
     /**
      * The previously assigned value to the field.
      * 

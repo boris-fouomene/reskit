@@ -3,7 +3,7 @@ import React, { Fragment, ReactNode, useMemo } from "react";
 import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";
-import { IDict, IObservable, uniqid, IAuthSessionStorage, Auth, IObservableAllEventType } from "@resk/core";
+import { IDict, IObservable, uniqid, IAuthSessionStorage, Auth, IObservableAllEventType, i18n } from "@resk/core";
 import { canDrawerBeMinimizedOrPermanent } from "./utils";
 import { isValidElement } from "@utils";
 import Breakpoints from "@breakpoints";
@@ -19,6 +19,7 @@ import { DrawerContext } from "./hooks";
 import { dimentionAddListener } from "@dimensions";
 import { IDimensions } from "@dimensions/types";
 import { useReskExpo } from "@src/context/hooks";
+import { I18n } from "@resk/core";
 
 const MIN_SWIPE_DISTANCE = 3;
 
@@ -652,7 +653,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
           return (
             <>
               {isValidElement(elt) ? elt : <AppBar.BackAction size={25} {...backActionProps} iconName={appBarProps.backActionProps?.iconName || this.getDrawerPosition() == "left" ? "chevron-left" : "chevron-right"} />}
-              {this.canToggleFullScren() ? <Tooltip onPress={this.toggleFullScreen.bind(this)} tooltip={this.isFullScreen() ? "Cliquez pour sortir du mode plein écran" : "Cliquez pour basculer en plein écran "} children={<FontIcon color={backActionProps?.color} style={styles.toggleFullScreenIcon} name={this.isFullScreen() ? "fullscreen-exit" : "fullscreen"} size={20} />} /> : null}
+              {this.canToggleFullScren() ? <Tooltip onPress={this.toggleFullScreen.bind(this)} tooltip={i18n.t("components.drawer.toggleFullScreen")} children={<FontIcon color={backActionProps?.color} style={styles.toggleFullScreenIcon} name={this.isFullScreen() ? "fullscreen-exit" : "fullscreen"} size={20} />} /> : null}
             </>
           );
         },
@@ -1045,7 +1046,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   toggleFullScreenIcon: {
-    marginLeft: -5,
+    //marginLeft: 0,
   },
   permanentBackdrop: {
     backgroundColor: "transparent",

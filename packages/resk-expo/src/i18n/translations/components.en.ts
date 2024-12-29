@@ -14,6 +14,12 @@ I18n.RegisterTranslations({
                  */
                 "searchPlaceholder": "Search %{countStr}",
                 "noneSelected": "None selected",
+            },
+            "drawer": {
+                "close": "Close",
+                "open": "Open",
+                "toggle": "Toggle",
+                "toggleFullScreen": "Toggle Drawer Full Screen",
             }
         }
     }

@@ -1,8 +1,8 @@
 import Component from "@utils/Component";
-import { IDropdownCallbackOptions, IDropdownContext, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
+import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
-import { defaultStr, IDict, isEmpty, isNonNullString, isObj } from "@resk/core";
+import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj } from "@resk/core";
 import { getTextContent, isReactNode } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import areEquals from "@utils/areEquals";
@@ -11,7 +11,7 @@ import { Animated, Pressable, View as RNView } from "react-native";
 import TextInput from "@components/TextInput";
 import { Portal } from "@components/Portal";
 import { ContentStyle, FlashList } from "@shopify/flash-list";
-import { Menu } from "@components/Menu";
+import { Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { TouchableRipple } from "@components/TouchableRipple";
 import { StyleSheet } from "react-native";
@@ -19,6 +19,10 @@ import View from "@components/View";
 import { FontIcon } from "@components/Icon";
 import Label from "@components/Label";
 import { IStyle } from "@src/types";
+import { ITextInputProps } from "@components/TextInput/types";
+import { useI18n } from "@src/i18n/hooks";
+import { AppBar } from "@components/AppBar";
+import { Divider } from "@components/Divider";
 
 export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>> implements IDropdownContext<ItemType, ValueType> {
     constructor(props: IDropdownProps<ItemType, ValueType>) {
@@ -142,6 +146,9 @@ export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdo
     isSelected(value: ValueType) {
         return this.isSelectedByHashKey(this.getHashKey(value));
     }
+    getPreparedItems(): IDropdownPreparedItem<ItemType, ValueType>[] {
+        return Array.isArray(this.state.preparedItems) ? this.state.preparedItems : [];
+    }
     callOnChange(preparedItem?: IDropdownPreparedItem<ItemType, ValueType>) {
         const { onChange, multiple } = this.props;
         if (typeof onChange == "function") {
@@ -237,11 +244,18 @@ export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdo
     getTestID(): string {
         return defaultStr(this.props.testID, "resk-dropdown");
     }
+    get Item() {
+        return DropdownItem;
+    }
+    get Search() {
+        return DropdownSearch;
+    }
 }
 
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
     const theme = useTheme();
-    let { anchorContainerProps, defaultValue, disabled, readOnly, editable, testID, multiple, listProps, fullScreenAppBarProps, value, ...props } = Object.assign({}, context.props);
+    const i18n = useI18n();
+    let { anchorContainerProps, error, defaultValue, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
     const anchorRef = useRef<RNView>(null);
     const isLoading = !!props.isLoading;
     const disabledStyle = isLoading && styles.disabled || null;
@@ -293,9 +307,60 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         }
         return { selectedText, title };
     }, [selectedItemsByHashKey]);
+    context.anchorSelectedText = anchorSelectedText;
+    const actions = useMemo<IDropdownAction[]>(() => {
+        const actions: IDropdownAction[] = [];
+        if (dropdownActions) {
+            const actProps: IDropdownAction[] = typeof dropdownActions === "function" ? dropdownActions(context) : dropdownActions;
+            if (Array.isArray(actProps)) {
+                actProps.map((act) => {
+                    if (!act || !isObj(act)) {
+                        return;
+                    }
+                    actions.push({
+                        uppercase: false,
+                        ...act,
+                        context: {
+                            ...Object.assign({}, act.context),
+                            dropdownContext: context
+                        }
+                    } as IDropdownAction);
+                });
+            }
+        }
+        if (multiple) {
+            return [
+                ...actions,
+                actions?.length ? { divider: true } : undefined,
+                {
+                    label: i18n.t("components.dropdown.selectAll"),
+                    icon: "checkbox-multiple-marked",
+                    onPress: context.selectAll.bind(context),
+                },
+                {
+                    label: i18n.t("components.dropdown.unselectAll"),
+                    icon: "checkbox-multiple-blank-outline",
+                    onPress: context.unselectAll.bind(context),
+                },
+            ];
+        } else if (anchorSelectedText) {
+            return [
+                ...actions,
+                actions?.length ? { divider: true } : undefined,
+                {
+                    label: i18n.t("components.dropdown.unselectSingle"),
+                    icon: "checkbox-blank-circle-outline",
+                    onPress: context.unselectAll.bind(context),
+                },
+            ];
+        }
+        return actions;
+    }, [dropdownActions, multiple, context?.isOpen(), context, anchorSelectedText]);
+    context.dropdownActions = actions;
     const loadingContent = null;///isLoading ? <ProgressBar color={theme.colors.secondary} indeterminate testID={testID + "_DropdownProgressBar"} /> : null;
     return <DropdownContext.Provider value={context}>
         <Menu
+            testID={testID + "-dropdown-menu"}
             visible={visible}
             sameWidth
             withScrollView={false}
@@ -307,24 +372,59 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             responsive
             children={<DropdownContext.Provider value={context}>
                 <View testID={testID + "-dropdown-list-container"} style={[styles.dropdownListContainer, !isEditabled && Theme.styles.disabled]}>
-                    <FlashList<IDropdownPreparedItem>
-                        testID={testID + "-dropdown-list"}
-                        estimatedItemSize={100}
-                        {...listProps}
-                        style={undefined}
-                        data={filteredItems}
-                        keyExtractor={({ hashKey }) => hashKey}
-                        renderItem={({ item, index }) => {
-                            return <DropdownLabel {...item} index={index} />;
-                        }}
-                    />
+                    <DropdownListItems />
                 </View>
             </DropdownContext.Provider>}
         />
     </DropdownContext.Provider>;
 }
 
-const DropdownLabel = (preparedItem: IDropdownPreparedItem & { index: number }) => {
+const DropdownListItems = () => {
+    const context = useDropdown();
+    const menu = useMenu();
+    const testID = defaultStr(context?.getTestID());
+    const listProps = Object.assign({}, context?.props?.listProps);
+    const filteredItems = Array.isArray(context.filteredItems) ? context.filteredItems : [];
+    const isFullScreen = menu?.fullScreen;
+    const fullScreenAppBarProps = Object.assign({}, context?.props?.fullScreenAppBarProps);
+    const i18n = useI18n();
+    let { label } = Object.assign({}, context?.props);
+    return <>
+        {isFullScreen ? (
+            <AppBar
+                title={getTextContent(label)}
+                elevation={5}
+                {...fullScreenAppBarProps}
+                backActionProps={{
+                    ...Object.assign({}, fullScreenAppBarProps.backActionProps),
+                    onPress: (...args) => {
+                        if (typeof fullScreenAppBarProps.backActionProps?.onPress === "function") {
+                            fullScreenAppBarProps.backActionProps?.onPress(...args);
+                        }
+                        if (typeof context?.close === "function") {
+                            context.close();
+                        }
+                    },
+                }}
+                subtitle={defaultStr(context.anchorSelectedText, i18n.t("components.dropdown.noneSelected"))}
+            />
+        ) : null}
+        <DropdownSearch />
+        <FlashList<IDropdownPreparedItem>
+            testID={testID + "-dropdown-list"}
+            estimatedItemSize={100}
+            {...listProps}
+            style={undefined}
+            data={filteredItems}
+            keyExtractor={({ hashKey }) => hashKey}
+            renderItem={({ item, index }) => {
+                return <DropdownItem {...item} index={index} />;
+            }}
+        />
+    </>
+}
+
+const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) => {
     const { item, label, value, hashKey, labelText } = preparedItem;
     const context = useDropdown();
     const theme = useTheme();
@@ -357,20 +457,20 @@ const DropdownLabel = (preparedItem: IDropdownPreparedItem & { index: number }) 
                 context.toggleItem(preparedItem);
             }}
             style={[styles.itemContainer, { borderBottomColor: theme.colors.outline }]}
-            testID={testID + "-label-tooltip-" + hashKey}
+            testID={testID + "-item-container-" + hashKey}
         >
-            <View style={styles.labelContainer} testID={testID + "-label-container-" + hashKey}>
-                {isSelected ? <FontIcon name={multiple ? "check" : "check-circle"} size={20} color={theme.colors.primary} /> : null}
+            <View style={styles.itemContent} testID={testID + "-item-content-" + hashKey}>
+                {isSelected ? <FontIcon name={!multiple ? "check" : "check-circle"} size={20} color={theme.colors.primary} /> : null}
                 {<Label ref={labelRef} fontSize={15} color={isSelected ? theme.colors.primary : undefined}>{label}</Label>}
             </View>
         </Tooltip>
     );
 }
 
-DropdownLabel.displayName = "DropdownLabel";
+DropdownItem.displayName = "DropdownItem";
 
 const styles = StyleSheet.create({
-    labelContainer: {
+    itemContent: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -378,13 +478,18 @@ const styles = StyleSheet.create({
         flexWrap: "nowrap",
         paddingHorizontal: 10,
     },
+    searchDivider: {
+        width: "100%",
+        marginVertical: 5,
+        overflow: "hidden",
+    },
     disabled: {
         pointerEvents: "none",
         opacity: 0.9,
     },
-    filterContainer: {
-        flexDirection: "row",
-        alignItems: "center",
+    searchContainer: {
+        flexDirection: "column",
+        alignItems: "flex-start",
         justifyContent: "flex-start",
         width: "100%",
     },
@@ -398,14 +503,6 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         backgroundColor: "transparent",
-        paddingVertical: 0,
-        maxHeight: 47,
-        width: "100%",
-    },
-    searchInputContent: {
-        paddingVertical: 0,
-        marginVertical: 0,
-        maxHeight: 47,
         width: "100%",
     },
     listContainer: {
@@ -426,6 +523,52 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 });
+
+const DropdownSearch = () => {
+    const context = useDropdown();
+    const filteredItems = Array.isArray(context.filteredItems) ? context.filteredItems : [];
+    const searchText = defaultStr(context.searchText);
+    const testID = context?.getTestID();
+    const onSearch = typeof context.onSearch == "function" ? context.onSearch : undefined;
+    const pItem = context?.getPreparedItems();
+    const preparedItems = Array.isArray(pItem) ? pItem : [];
+    const { showSearch, error, searchProps } = Object.assign({}, context.props);
+    const props = Object.assign({}, searchProps, { error: error || searchProps?.error });
+    const visible = context?.isOpen();
+    const actions: IDropdownAction[] = Array.isArray(context.dropdownActions) ? context.dropdownActions : [];
+    const theme = useTheme();
+    if (showSearch === false || showSearch !== true && preparedItems?.length <= 5) {
+        return null;
+    }
+    return (
+        <>
+            <TextInput
+                testID={`${testID}_dropdown-search`}
+                autoFocus={visible}
+                {...props}
+                defaultValue={searchText}
+                onChangeText={onSearch}
+                style={[styles.searchInput, props.style]}
+                placeholder={i18n.t("components.dropdown.searchPlaceholder", { countStr: filteredItems.length.formatNumber() })}
+                right={!actions?.length ? null : (
+                    <Menu
+                        items={actions}
+                        testID={`${testID}-dropdown-menu-actions`}
+                        anchor={({ openMenu, closeMenu }) => {
+                            return (
+                                <Pressable onPress={() => openMenu()}>
+                                    <FontIcon color={error ? theme.colors.error : undefined} name={FontIcon.MORE} size={24} />
+                                </Pressable>
+                            );
+                        }}
+                    />
+                )
+                }
+            />
+            <Divider testID={`${testID}-divider`} style={[styles.searchDivider]} />
+        </>
+    );
+};
 
 export * from "./types";
 export { useDropdown } from "./hooks";

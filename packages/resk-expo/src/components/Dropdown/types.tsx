@@ -1,6 +1,6 @@
 import { IAppBarAction, IAppBarProps } from "@components/AppBar/types";
 import { ITextInputProps } from "@components/TextInput/types";
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import { FlashListProps } from "@shopify/flash-list";
 import { IViewProps } from "@components/View";
 import { PressableProps } from "react-native";
@@ -12,6 +12,7 @@ export interface IDropdownContext<ItemType = any, ValueType = any> extends Compo
     visible: boolean;
     getHashKey: (value: ValueType) => string;
     getSelectedItemsByHashKey: () => Record<string, IDropdownPreparedItem<ItemType, ValueType>>;
+    getPreparedItems: () => IDropdownPreparedItem<ItemType, ValueType>[];
     isSelected: (value: ValueType) => boolean;
     searchText?: string;
     onSearch?: (text: string) => any;
@@ -26,6 +27,11 @@ export interface IDropdownContext<ItemType = any, ValueType = any> extends Compo
     selectAll: () => void;
     unselectAll: () => void;
     prepareState(props?: IDropdownProps<ItemType, ValueType>): IDropdownState<ItemType, ValueType>;
+    dropdownActions?: IDropdownAction[];
+    /***
+     * the corresponding selected text calculated from selected items
+     */
+    anchorSelectedText?: string;
     getSelectedValuesAndHashKey(defaultValue?: ValueType | ValueType[], itemsByHashKey?: IDropdownPreparedItems<ItemType, ValueType>): { selectedValues: ValueType[], selectedItemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>> };
 }
 
@@ -37,7 +43,7 @@ export interface IDropdownState<ItemType = any, ValueType = any> {
     preparedItems: IDropdownPreparedItem<ItemType, ValueType>[];
 };
 
-export type IDropdownAction = IAppBarAction | null | undefined;
+export type IDropdownAction = IAppBarAction<{ dropdownContext: IDropdownContext }> | null | undefined;
 
 /*** la preops actions représentant les actions du composant Dropdown */
 export type IDropdownActions = IDropdownAction[] | ((options: IDropdownContext<any, any>) => IDropdownAction[]);
@@ -65,7 +71,16 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     getHashKey?: (value: ValueType) => string;
     filter?: (preparedItem: IDropdownPreparedItem<ItemType, ValueType>, index: number) => boolean;
     listProps?: FlashListProps<IDropdownPreparedItem<ItemType, ValueType>>;
+
+    /**
+     * wheather the dropdown should display a search input
+     */
     showSearch?: boolean;
+    /***
+     * the props of the search input
+     */
+    searchProps?: Omit<ITextInputProps, "value" | "defaultValue">;
+
     /**** spécifie si le dropdown est en charge de charger les items */
     isLoading?: boolean;
     isFullScreen?: boolean;
@@ -73,10 +88,14 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     listContainerProps?: IViewProps;
     /*** les props à passer au composant Tooltip qui wrap l'anchor */
     anchorContainerProps?: PressableProps;
+
+    /***
+     * The props of the AppBar component that wraps the dropdown.
+     * when the dropdown is display in full screen mode.
+     */
     fullScreenAppBarProps?: IAppBarProps;
 
     dropdownActions?: IDropdownActions;
-    elevation?: number;
 };
 
 export interface IDropdownPreparedItem<ItemType = any, ValueType = any> {

@@ -116,7 +116,7 @@ const index = withAppBar(() => {
                         },
                     ]}
                 />
-<TexInput label="My text input"/>
+                <TextInput label="My text input" />
                 <HelperText
                     visible
                     error

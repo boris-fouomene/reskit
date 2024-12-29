@@ -3,7 +3,7 @@ import { createProvider } from "@utils";
 import { IDrawerProps, IDrawerCurrentState, IDrawerProviderProps } from "./types";
 
 
-export default class DrawerProvider extends createProvider<IDrawerProviderProps, Drawer>(Drawer, { permanent: false }) {
+export default class DrawerProvider extends createProvider<IDrawerProps, Drawer>(Drawer, { permanent: false, isProvider: true }) {
     static open(props: IDrawerProviderProps, innerProviderRef?: any, callback?: (options: IDrawerCurrentState) => void) {
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.open !== "function") return;

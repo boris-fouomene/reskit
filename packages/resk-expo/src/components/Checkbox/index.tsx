@@ -1,9 +1,11 @@
-import { Platform, Pressable, StyleSheet, GestureResponderEvent } from "react-native";
-import RNCheckbox from "expo-checkbox";
-import { ICheckboxEvent, ICheckboxProps } from "./types";
+import { TouchableOpacity, Pressable, StyleSheet, Image, GestureResponderEvent } from "react-native";
+import { ICheckboxProps } from "./types";
 import { Tooltip } from "@components/Tooltip";
 import Label from "@components/Label";
 import { useToggleable } from "@components/Switch/utils";
+import FontIcon from "@components/Icon/Font";
+import { isNonNullString } from "@resk/core";
+import { Colors, useTheme } from "@theme/index";
 
 export * from "./types";
 
@@ -26,7 +28,6 @@ export * from "./types";
  * @param {any} [props.defaultValue] - The default value of the checkbox.
  * @param {boolean} [props.disabled] - Flag to indicate if the checkbox is disabled.
  * @param {boolean} [props.readOnly] - Flag to indicate if the checkbox is read-only.
- * @param {object} [props.containerProps] - Additional properties for the container component.
  * @param {object} [rest] - Additional props passed to the RNCheckbox component.
  *
  * @returns {JSX.Element} - Returns a JSX element representing the Checkbox component.
@@ -56,7 +57,7 @@ export * from "./types";
  * @see [Expo Checkbox Documentation](https://docs.expo.dev/versions/latest/sdk/checkbox/) 
  * for more information on the underlying RNCheckbox component.
  */
-export const Checkbox = ({ testID, ...props }: ICheckboxProps) => {
+export const Checkbox = ({ testID, size, checkedIcon, uncheckedColor, uncheckedIcon, iconProps, style, ...props }: ICheckboxProps) => {
     const {
         checked,
         tooltip,
@@ -80,29 +81,41 @@ export const Checkbox = ({ testID, ...props }: ICheckboxProps) => {
         readOnly,
         containerProps,
         ...rest
-    } = useToggleable<ICheckboxEvent>(props);
+    } = useToggleable<GestureResponderEvent>(props);
+    const handleOnPress = (event: GestureResponderEvent) => {
+        toggleStatus();
+    };
+    const theme = useTheme();
+    checkedIcon = isNonNullString(checkedIcon) ? checkedIcon : FontIcon.CHECKED;
+    uncheckedIcon = isNonNullString(uncheckedIcon) ? uncheckedIcon : FontIcon.UNCHECKED;
+    size = typeof size === 'number' && size ? size : 25;
+    iconProps = Object.assign({}, iconProps);
     const MTestID = typeof testID === 'string' && testID || "resk-checkbox";
     const labelContent = <Label testID={`${MTestID}-label`} {...labelProps} style={[styles.label, labelProps.style]} children={label} />;
-    return <Tooltip as={Pressable} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`} {...containerProps} style={[styles.container, disabledStyle, readOnlyStyle, containerProps.style]}
-        onPress={(event: GestureResponderEvent) => {
-            if (typeof containerProps.onPress == "function") {
-                containerProps.onPress(event);
-            }
-            toggleStatus();
-        }}
+    uncheckedColor = Colors.isValid(uncheckedColor) ? uncheckedColor : theme.colors.secondary;
+    return <Tooltip
+        as={TouchableOpacity} disabled={disabled || readOnly}
+        tooltip={tooltip} testID={`${MTestID}`}
+        accessibilityRole="checkbox"
+        accessibilityState={{ disabled, checked }}
+        {...rest}
+        style={[styles.container, disabledStyle, readOnlyStyle, style]}
+        onPress={handleOnPress}
     >
         {isLabelOnLeftSide ? labelContent : null}
-        <RNCheckbox
-            {...rest}
-            value={checked}
-            onValueChange={toggleStatus}
-            color={color}
-            testID={MTestID}
-            disabled={disabled || readOnly}
+        <FontIcon
+            disabled={disabled}
+            accessibilityRole="checkbox"
+            {...iconProps}
+            name={(checked ? checkedIcon : uncheckedIcon as any)}
+            size={size}
+            color={checked ? color : uncheckedColor}
         />
         {!isLabelOnLeftSide ? labelContent : null}
     </Tooltip>
 }
+
+
 
 const styles = StyleSheet.create({
     container: {
@@ -114,7 +127,7 @@ const styles = StyleSheet.create({
     label: {
         userSelect: "text",
         marginHorizontal: 7,
-    }
+    },
 });
 
 Checkbox.displayName = "Checkbox"

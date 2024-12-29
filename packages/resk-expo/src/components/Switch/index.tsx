@@ -101,9 +101,6 @@ export const Switch = ({ testID, ...props }: ISwitchProps) => {
     const labelContent = <Label testID={`${MTestID}-label`} {...labelProps} style={[styles.label, labelProps.style]} children={label} />;
     return <Tooltip as={Pressable} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`} {...containerProps} style={[styles.container, disabledStyle, readOnlyStyle, containerProps.style]}
         onPress={(event: GestureResponderEvent) => {
-            if (typeof containerProps.onPress == "function") {
-                containerProps.onPress(event);
-            }
             toggleStatus();
         }}
     >

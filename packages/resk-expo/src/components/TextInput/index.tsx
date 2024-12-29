@@ -245,7 +245,7 @@ const getContainerAndContentStyle = ({ isFocused, isLabelEmbededVariant, textCol
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, opacity, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -328,7 +328,7 @@ export const useTextInput = ({ defaultValue, secureTextEntryGetToggleIconProps, 
     const inputValue = isFocused ? focusedValue : formated.formattedValue || emptyValue || "";
     const canRenderLabel = withLabel !== false;
     const { left, right, label } = getLabelOrLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
-    const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null];
+    const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null, typeof opacity === "number" ? { opacity } : null];
     const secureIconProps: Partial<IFontIconProps> = React.useMemo(() => {
         if (!isPasswordField) return {} as IFontIconProps;
         if (typeof secureTextEntryGetToggleIconProps == "function") {

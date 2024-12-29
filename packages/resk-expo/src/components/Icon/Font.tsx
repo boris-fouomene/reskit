@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import { isNonNullString, defaultStr } from "@resk/core";
+import { isNonNullString, defaultStr, isObj } from "@resk/core";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -633,6 +633,63 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * ```
      */
     getIconSet: (name: string) => { iconSetName: string, iconSetPrefix: string, iconName: string, iconSet: IFontIconSet | null };
+
+    /**
+     * Represents the icon name used for the checked state of a checkbox in the application.
+     * 
+     * The value of this property is determined based on the platform the application is running on:
+     * - On iOS, the icon is set to `'check'`, which visually represents a checked checkbox.
+     * - On Android or other platforms, the icon is set to `'checkbox-marked'`, which also indicates a checked state.
+     * 
+     * This property allows for a consistent and platform-appropriate user interface, ensuring that 
+     * users have a familiar experience regardless of the device they are using.
+     * 
+     * @constant {string}
+     * @example
+     * // Example usage of the CHECKED property
+     * 
+     * function renderCheckbox(isChecked: boolean): string {
+     *     return isChecked ? FontWithCustomIcons.CHECKED : FontWithCustomIcons.UNCHECKED;
+     * }
+     * 
+     * // Rendering a checked checkbox
+     * const checkboxIcon = renderCheckbox(true);
+     * console.log(checkboxIcon); // Output: 'check' (on iOS) or 'checkbox-marked' (on Android)
+     * 
+     * @remarks
+     * - This property is particularly useful in applications that need to display checkboxes 
+     *   or toggle buttons, providing a clear visual indication of the checked state.
+     * - Ensure that the icon library you are using supports both 'check' and 'checkbox-marked' 
+     *   icons for proper rendering across platforms.
+     */
+    CHECKED: 'check' | "checkbox-marked";
+
+    /**
+     * Represents the icon name used for the unchecked state of a checkbox in the application.
+     * 
+     * This property is consistently set to `'checkbox-blank-outline'`, which visually represents 
+     * an unchecked checkbox across all platforms. This provides a clear indication to users that 
+     * the checkbox is not selected.
+     * 
+     * @constant {string}
+     * @example
+     * // Example usage of the UNCHECKED property
+     * 
+     * function renderCheckbox(isChecked: boolean): string {
+     *     return isChecked ? FontWithCustomIcons.CHECKED : FontWithCustomIcons.UNCHECKED;
+     * }
+     * 
+     * // Rendering an unchecked checkbox
+     * const checkboxIcon = renderCheckbox(false);
+     * console.log(checkboxIcon); // Output: 'checkbox-blank-outline'
+     * 
+     * @remarks
+     * - This property is essential for applications that implement forms or settings where 
+     *   users can select or deselect options.
+     * - Consider using this icon in conjunction with accessibility features, such as 
+     *   screen reader labels, to enhance usability for all users.
+     */
+    UNCHECKED: "checkbox-blank-outline";
 };
 const FontWithCustomIcons = FontIcon as unknown as IFontWithCustomIcons;
 
@@ -804,6 +861,63 @@ FontWithCustomIcons.MORE = isIos ? "dots-horizontal" : "dots-vertical";
  *   to configure print settings.
 */
 FontWithCustomIcons.PRINT = "printer";
+
+/**
+ * Represents the icon name used for the checked state of a checkbox in the application.
+ * 
+ * The value of this property is determined based on the platform the application is running on:
+ * - On iOS, the icon is set to `'check'`, which visually represents a checked checkbox.
+ * - On Android or other platforms, the icon is set to `'checkbox-marked'`, which also indicates a checked state.
+ * 
+ * This property allows for a consistent and platform-appropriate user interface, ensuring that 
+ * users have a familiar experience regardless of the device they are using.
+ * 
+ * @constant {string}
+ * @example
+ * // Example usage of the CHECKED property
+ * 
+ * function renderCheckbox(isChecked: boolean): string {
+ *     return isChecked ? FontWithCustomIcons.CHECKED : FontWithCustomIcons.UNCHECKED;
+ * }
+ * 
+ * // Rendering a checked checkbox
+ * const checkboxIcon = renderCheckbox(true);
+ * console.log(checkboxIcon); // Output: 'check' (on iOS) or 'checkbox-marked' (on Android)
+ * 
+ * @remarks
+ * - This property is particularly useful in applications that need to display checkboxes 
+ *   or toggle buttons, providing a clear visual indication of the checked state.
+ * - Ensure that the icon library you are using supports both 'check' and 'checkbox-marked' 
+ *   icons for proper rendering across platforms.
+ */
+FontWithCustomIcons.CHECKED = isIos ? 'check' : "checkbox-marked";
+
+/**
+ * Represents the icon name used for the unchecked state of a checkbox in the application.
+ * 
+ * This property is consistently set to `'checkbox-blank-outline'`, which visually represents 
+ * an unchecked checkbox across all platforms. This provides a clear indication to users that 
+ * the checkbox is not selected.
+ * 
+ * @constant {string}
+ * @example
+ * // Example usage of the UNCHECKED property
+ * 
+ * function renderCheckbox(isChecked: boolean): string {
+ *     return isChecked ? FontWithCustomIcons.CHECKED : FontWithCustomIcons.UNCHECKED;
+ * }
+ * 
+ * // Rendering an unchecked checkbox
+ * const checkboxIcon = renderCheckbox(false);
+ * console.log(checkboxIcon); // Output: 'checkbox-blank-outline'
+ * 
+ * @remarks
+ * - This property is essential for applications that implement forms or settings where 
+ *   users can select or deselect options.
+ * - Consider using this icon in conjunction with accessibility features, such as 
+ *   screen reader labels, to enhance usability for all users.
+ */
+FontWithCustomIcons.UNCHECKED = "checkbox-blank-outline";
 
 export default FontWithCustomIcons;
 

@@ -393,6 +393,11 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
      * @param {boolean} options.isPasswordVisible - true if the password is visible, false otherwise
      */
     secureTextEntryGetToggleIconProps?: (options: { isPasswordVisible: boolean }) => Partial<IFontIconProps>;
+
+    /***
+     * The opacity of the text input.
+     */
+    opacity?: number;
 };
 
 /**

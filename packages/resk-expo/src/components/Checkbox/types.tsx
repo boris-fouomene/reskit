@@ -1,10 +1,8 @@
+import { IFontIconProps } from '@components/Icon/types';
 import { IToggleableProps } from '@components/Switch/types';
-import Checkbox, { CheckboxProps, CheckboxEvent } from 'expo-checkbox';
+import { ITooltipBaseProps } from '@components/Tooltip';
 import { SyntheticEvent } from 'react';
-import { NativeSyntheticEvent } from "react-native";
-
-
-
+import { ColorValue, GestureResponderEvent, NativeSyntheticEvent, PressableProps, TouchableOpacityProps, ViewProps } from "react-native";
 
 /**
  * @interface ICheckboxProps
@@ -19,8 +17,9 @@ import { NativeSyntheticEvent } from "react-native";
  *                                                switch components. It inherits all properties from IToggleableProps, ensuring that the Checkbox component has access to all toggleable functionality.
  * 
  *
- * @extends {CheckboxProps} - This extends the expo-checkbox `CheckboxProps` type, which includes 
- *                          additional properties and events specific to switch components.
+ * @extends {TouchableOpacityProps} - This extends the `TouchableOpacityProps` type, which includes 
+ *                          additional properties and events specific to checkbox components.
+ * @extends {ITooltipBaseProps} - This extends the `ITooltipBaseProps` type, which includes title,tootltip, props.
  *
  * @example
  * // Example usage of ICheckboxProps
@@ -70,6 +69,66 @@ import { NativeSyntheticEvent } from "react-native";
  * @returns {void} - This type does not return any value, as it is typically used 
  *                   as a set of properties for a switch component.
  */
-export type ICheckboxProps = IToggleableProps<ICheckboxEvent> & CheckboxProps;
+export type ICheckboxProps = IToggleableProps<GestureResponderEvent> & ITooltipBaseProps & TouchableOpacityProps & {
+    /**
+     * Value indicating if the checkbox should be rendered as checked or not.
+     * @default false
+     */
+    value?: boolean;
 
-export type ICheckboxEvent = NativeSyntheticEvent<CheckboxEvent> | SyntheticEvent<HTMLInputElement, CheckboxEvent>;
+    /**
+     * The tint or color of the checkbox when it is checked. This overrides the disabled opaque style.
+     */
+    color?: ColorValue;
+    /**
+     * Callback that is invoked when the user presses the checkbox.
+     * @param event A native event containing the checkbox change.
+     */
+    onChange?: (
+        event: NativeSyntheticEvent<CheckboxEvent> | SyntheticEvent<HTMLInputElement, CheckboxEvent>
+    ) => void;
+    /**
+     * Callback that is invoked when the user presses the checkbox.
+     * @param value A boolean indicating the new checked state of the checkbox.
+     */
+    onValueChange?: (value: boolean) => void;
+
+    /**
+     * The size of the checkbox in pixels.
+     * Default is to 25
+     */
+    size?: number;
+
+    /**
+     * The icon name to display when the checkbox is checked.
+     */
+    checkedIcon?: IFontIconProps["name"];
+    /***
+     * The icon name to display when the checkbox is unchecked.
+     */
+    uncheckedIcon?: IFontIconProps["name"];
+
+    /***
+     * The props of the icon to display as the checkbox.
+     */
+    iconProps?: Omit<IFontIconProps, "name" | "color" | "size">;
+
+    /***
+     * The color of the checkbox when it's unchecked.
+     */
+    uncheckedColor?: string;
+}
+
+
+
+export type CheckboxEvent = {
+    /**
+     * On native platforms, a `NodeHandle` for the element on which the event has occurred.
+     * On web, a DOM node on which the event has occurred.
+     */
+    target: any;
+    /**
+     * A boolean representing checkbox current value.
+     */
+    value: boolean;
+};

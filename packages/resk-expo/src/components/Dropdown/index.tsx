@@ -6,7 +6,7 @@ import { defaultStr, IDict, isEmpty, isNonNullString, isObj } from "@resk/core";
 import { getTextContent, isReactNode } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import areEquals from "@utils/areEquals";
-import { useTheme } from "@theme/index";
+import Theme, { useTheme } from "@theme/index";
 import { Animated, Pressable, View as RNView } from "react-native";
 import TextInput from "@components/TextInput";
 import { Portal } from "@components/Portal";
@@ -241,8 +241,10 @@ export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdo
 
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
     const theme = useTheme();
-    let { anchorContainerProps, defaultValue, testID, multiple, listProps, fullScreenAppBarProps, value, ...props } = Object.assign({}, context.props);
+    let { anchorContainerProps, defaultValue, disabled, readOnly, editable, testID, multiple, listProps, fullScreenAppBarProps, value, ...props } = Object.assign({}, context.props);
     const anchorRef = useRef<RNView>(null);
+    const isLoading = !!props.isLoading;
+    const disabledStyle = isLoading && styles.disabled || null;
     anchorContainerProps = Object.assign({}, anchorContainerProps);
     testID = context.getTestID();
     const [searchText, setSearchText] = useState("");
@@ -265,6 +267,8 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     context.searchText = searchText;
     context.onSearch = onSearch;
     context.filteredItems = filteredItems;
+    disabled = disabled || isLoading;
+    const isEditabled = editable !== false && !disabled && !readOnly;
     const { selectedText: anchorSelectedText, title: anchorTitle } = useMemo(() => {
         let selectedText = "";
         let title = "";
@@ -289,10 +293,6 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         }
         return { selectedText, title };
     }, [selectedItemsByHashKey]);
-    const canHandle = !!context.isOpen();
-
-    const isLoading = !!props.isLoading;
-    const disabledStyle = isLoading && styles.disabled || null;
     const loadingContent = null;///isLoading ? <ProgressBar color={theme.colors.secondary} indeterminate testID={testID + "_DropdownProgressBar"} /> : null;
     return <DropdownContext.Provider value={context}>
         <Menu
@@ -300,13 +300,13 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             sameWidth
             withScrollView={false}
             onClose={context.close.bind(context)}
-            anchor={<Pressable ref={anchorRef} testID={`${testID}-dropdown-anchor-container`} {...Object.assign({}, anchorContainerProps)} disabled={props.disabled || isLoading} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IStyle} onPress={isLoading ? undefined : context.toggle.bind(context)}>
-                <TextInput {...props} onChange={undefined} testID={testID} defaultValue={anchorSelectedText} readOnly={true} />
+            anchor={<Pressable disabled={disabled} ref={anchorRef} testID={`${testID}-dropdown-anchor-container`} {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IStyle} onPress={isLoading ? undefined : context.toggle.bind(context)}>
+                <TextInput opacity={!isEditabled ? undefined : 0.95} {...props} disabled={disabled} onChange={undefined} testID={testID} defaultValue={anchorSelectedText} readOnly={true} />
                 {loadingContent}
             </Pressable>}
             responsive
             children={<DropdownContext.Provider value={context}>
-                <View testID={testID + "-dropdown-list-container"} style={styles.dropdownListContainer}>
+                <View testID={testID + "-dropdown-list-container"} style={[styles.dropdownListContainer, !isEditabled && Theme.styles.disabled]}>
                     <FlashList<IDropdownPreparedItem>
                         testID={testID + "-dropdown-list"}
                         estimatedItemSize={100}

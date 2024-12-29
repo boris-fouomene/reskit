@@ -312,7 +312,7 @@ export type IToggleableProps<EventType = GestureResponderEvent> = {
     /**
      * The container props that wrap the toggleable component. This is the parent view of both the toggleable component and the label.
      */
-    containerProps?: PressableProps;
+    containerProps?: Omit<PressableProps, "onPress">;
 
     /***
      * 

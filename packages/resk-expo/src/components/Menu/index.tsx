@@ -358,21 +358,23 @@ const Menu: React.FC<IMenuProps> = ({
         }
     }, [anchorMeasurements, menuLayout, isVisible]);
     const openMenu = (callback?: Function) => {
-        if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
-        if (isControlled) {
-            callbackRef.current = callback;
-            if (typeof onOpen === "function") {
-                onOpen();
+        measureAnchor(() => {
+            if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
+            if (isControlled) {
+                callbackRef.current = callback;
+                if (typeof onOpen === "function") {
+                    onOpen();
+                }
+                return;
             }
-            return;
-        }
-        setIsVisible(true, () => {
-            if (typeof callback === "function") {
-                callback();
-            }
-            if (typeof onOpen === "function") {
-                onOpen();
-            }
+            setIsVisible(true, () => {
+                if (typeof callback === "function") {
+                    callback();
+                }
+                if (typeof onOpen === "function") {
+                    onOpen();
+                }
+            });
         });
     };
     const closeMenu = (callback?: Function) => {

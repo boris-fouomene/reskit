@@ -6,9 +6,6 @@ import { IField } from "@resk/core";
 
 
 const index = withAppBar(() => {
-    useEffect(() => {
-        //Preloader.open();
-    }, [])
     return (
         <ScrollView>
             <Form

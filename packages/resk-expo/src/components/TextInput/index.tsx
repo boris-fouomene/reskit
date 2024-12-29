@@ -439,10 +439,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 2,
         flexGrow: 1,
         overflow: 'hidden',
+        paddingVertical: 8,
     },
     inputNotEmbededLabelVariant: {
         paddingHorizontal: 5,
-        paddingVertical: 5,
+        //paddingVertical: 5,
     },
     focusedInput: {
         borderColor: 'transparent', // No border on focus

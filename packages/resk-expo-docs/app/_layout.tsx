@@ -6,11 +6,16 @@ import "../src/i18n/translations";
 import "../src/resources";
 import { ResourcesManager } from '@resk/core';
 import { Users } from '../src/resources';
+import { useEffect } from 'react';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-//SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
     const users = ResourcesManager.getResource<Users>("users");
     useI18n();
+    useEffect(() => {
+        SplashScreen.hideAsync();
+        console.log("splaqsh hidden");
+    }, [])
     return (<ReskExpoProvider
         drawerNavigationViewProps={{}}
         theme={{ dark: true } as ITheme}

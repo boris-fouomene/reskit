@@ -1104,8 +1104,9 @@ export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
   const pointerEvents = drawerShown || permanent ? "auto" : "none";
   const Wrapper = drawer.isProvider() ? Portal : React.Fragment;
   const canRender = drawer.isProvider() ? drawer.isOpen() : true;
+  const wrapperProps = drawer.isProvider() ? { absoluteFill: true, testID: testID + "-portal" } : {};
   return (
-    <Wrapper>
+    <Wrapper {...wrapperProps}>
       <DrawerContext.Provider value={{ drawer }}>
         <View id={drawer.id} testID={testID} style={[{ flex: (canRender && 1) || 0, backgroundColor: "transparent", flexDirection: permanent ? "row" : "column" }, canRender ? styles.providerVisibleContainer : styles.providerNotVisibleContainer]} {...drawer._panResponder.panHandlers}>
           {!permanent ? (

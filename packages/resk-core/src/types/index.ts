@@ -405,7 +405,7 @@ export type IField<T extends IFieldType = any> = Omit<IFieldMap[T], "type"> & {
   type: T;
 };
 
-export type IFields<T extends IField> = {
+export type IFields<T extends IField = any> = {
   [K in keyof T]: Extract<IField<T[K]["type"]>, T[K]>;
 };
 

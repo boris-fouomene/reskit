@@ -477,7 +477,7 @@ export type IField<T extends IFieldType = any> = IFieldMap[T] & {
  * - **`IField`**: Represents a field with customizable properties in a form or data structure.
  */
 export type IFields<T extends IFieldMap = any> = {
-  [K in keyof T]: Extract<IFieldMap[T[K]["type"]], IField<T[K]["type"]>>;
+  [K in keyof T]: IFieldMap[T[K]["type"]];
 };
 
 /**

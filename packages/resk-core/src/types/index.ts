@@ -58,7 +58,7 @@ export type IPrimitive = string | number | boolean;
  * ```
  * @see {@link IProtectedResource} for the `IProtectedResource` type.
  */
-export interface IFieldBase<FieldType = any> extends IProtectedResource {
+export interface IFieldBase<FieldType extends IFieldType = any> extends IProtectedResource {
   /**
    * The type of the field.
    * 
@@ -74,7 +74,7 @@ export interface IFieldBase<FieldType = any> extends IProtectedResource {
    * };
    * ```
    */
-  type?: FieldType;
+  type: FieldType;
 
   /**
    * The name of the field.
@@ -211,7 +211,7 @@ export interface IFieldBase<FieldType = any> extends IProtectedResource {
     }
   ```
  */
-export interface IFieldMap extends Record<string, IFieldBase> {
+export interface IFieldMap<Type extends string = any> extends Record<string, IFieldBase<Type>> {
   /**
    * A text field.
    * 
@@ -399,14 +399,85 @@ export interface IFieldMap extends Record<string, IFieldBase> {
  * @see {@link IFieldBase} for the `IFieldBase` type.
  * @see {@link IFieldMap} for the `IFieldMap` type.
  */
-export type IField<T extends IFieldType = any> = Omit<IFieldMap[T], "type"> & {
+export type IField<T extends IFieldType = any> = IFieldMap[T] & {
   [key in (IResourceActionName | "form" | "filter")]?: Partial<IField>;
-} & {
-  type: T;
-};
+}
 
-export type IFields<T extends IField = any> = {
-  [K in keyof T]: Extract<IFieldMap<T[K]["type"]>, T[K]>;
+/**
+ * @type IFields<T extends IFieldMap = any>
+ * 
+ * Represents a mapping of field definitions to their corresponding field details.
+ * This type allows for the extraction of field types from a given field map, ensuring 
+ * that each field is correctly typed according to its definition.
+ * 
+ * ### Type Parameters
+ * - **T**: The type of the field map. Defaults to `IFieldMap`. This parameter determines 
+ *   the specific mapping of field types to their definitions.
+ * 
+ * ### Structure
+ * The `IFields` type constructs a new type by iterating over the keys of the provided 
+ * field map `T`. For each key, it extracts the corresponding field type from `IFieldMap` 
+ * and ensures that it matches the expected field instance type.
+ * 
+ * ### Properties
+ * - **`[K in keyof T]`**: Iterates over each key `K` in the field map `T`.
+ * - **`Extract<IFieldMap[T[K]["type"]], IField<T[K]["type"]>>`**: This expression extracts 
+ *   the field type from `IFieldMap` based on the type defined in `T[K]`, ensuring that 
+ *   the resulting type is compatible with the `IField` type for that specific field.
+ * 
+ * ### Example Usage
+ * Here’s an example of how to define a fields mapping using the `IFields` type:
+ * 
+ * ```typescript
+ * // Example field map definition
+ * const fieldMap: IFieldMap = {
+ *     text: {
+ *         type: 'text',
+ *         label: 'Username',
+ *         name: 'username',
+ *         required: true,
+ *     },
+ *     number: {
+ *         type: 'number',
+ *         label: 'Age',
+ *         name: 'age',
+ *         required: true,
+ *     }
+ * };
+ * 
+ * // Using the IFields type to create a strongly typed fields mapping
+ * type MyFields = IFields<typeof fieldMap>;
+ * 
+ * // Example of using the MyFields type
+ * const fields: MyFields = {
+ *     text: {
+ *         type: 'text',
+ *         label: 'Username',
+ *         name: 'username',
+ *         required: true,
+ *     },
+ *     number: {
+ *         type: 'number',
+ *         label: 'Age',
+ *         name: 'age',
+ *         required: true,
+ *     }
+ * };
+ * ```
+ * 
+ * ### Notes
+ * - The `IFields` type is particularly useful for ensuring type safety when working with 
+ *   collections of fields, allowing developers to define and manipulate fields in a 
+ *   structured manner.
+ * - By leveraging TypeScript's utility types, `IFields` provides a way to enforce 
+ *   consistency across field definitions and their corresponding instances.
+ * 
+ * ### Related Types
+ * - **`IFieldMap`**: The mapping of field types to their corresponding field definitions.
+ * - **`IField`**: Represents a field with customizable properties in a form or data structure.
+ */
+export type IFields<T extends IFieldMap = any> = {
+  [K in keyof T]: Extract<IFieldMap[T[K]["type"]], IField<T[K]["type"]>>;
 };
 
 /**

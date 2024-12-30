@@ -1,5 +1,5 @@
-import { IDict, IFieldType, isClass, isNonNullString, isObj, isObservable, observableFactory } from "@resk/core";
-import { IForm, IFormAction, IFormCallbackOptions, IFormData, IFormField, IFormFieldProps, IFormFields, IFormFieldsProp, IFormGetDataOptions, IFormManagerEvent } from "./types";
+import { IDict, IField, IFieldType, isClass, isNonNullString, isObj, isObservable, observableFactory } from "@resk/core";
+import { IForm, IFormAction, IFormCallbackOptions, IFormData, IFormField, IFormFields, IFormGetDataOptions, IFormManagerEvent } from "./types";
 
 /**
  * @group Forms
@@ -259,7 +259,7 @@ export class FormsManager {
     static hasPrimaryKeyValue({
         data,
         field,
-    }: IFormCallbackOptions & { data: IFormData; field: IFormFieldProps }): boolean {
+    }: IFormCallbackOptions & { data: IFormData; field: IField }): boolean {
         const fieldName = field?.name || "";
         if (!fieldName || field?.primaryKey !== true) return false;
         if (!data || !fieldName) return false;
@@ -287,7 +287,7 @@ export class FormsManager {
         ...rest
     }: IFormCallbackOptions & {
         checkPrimaryKey?: (
-            options: IFormCallbackOptions & { data: IFormData; field: IFormFieldProps }
+            options: IFormCallbackOptions & { data: IFormData; field: IField }
         ) => boolean;
     }) {
         if (!isObj(data) || !fields) {

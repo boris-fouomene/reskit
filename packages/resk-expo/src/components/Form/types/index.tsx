@@ -1,15 +1,16 @@
-import { IFieldBase } from "@resk/core";
+import "@resk/core";
 import { ITextInputProps } from "@components/TextInput/types";
 import { IDropdownOnChangeOptions, IDropdownProps } from "@components/Dropdown/types";
-import { ISwitchProps } from "@components/Switch/types";
-import { ICheckboxProps } from "@components/Checkbox/types";
-import { IFormFieldOnChangeOptions, IFormFieldProps } from "../types";
+import { ISwitchProps, IToggleableOnChangeOptions } from "@components/Switch/types";
+import { IFormFieldOnChangeOptions } from "./types";
+import { ICheckboxProps } from "@components/Checkbox";
+
 
 declare module "@resk/core" {
     interface IFieldMap {
-        switch: IFormFieldProps<any, ISwitchProps> & { type: "switch" };
-        checkbox: IFormFieldProps<any, ICheckboxProps> & { type: "checkbox" };
-        select: Omit<IDropdownProps, "onChange"> & IFormFieldProps<any, IDropdownOnChangeOptions>;
+        switch: Omit<ISwitchProps, "onChange" | "type"> & { onChange?: (options: IFormFieldOnChangeOptions<"switch"> & IToggleableOnChangeOptions) => void; type: "switch" };
+        checkbox: Omit<ICheckboxProps, "onChange" | "type"> & { onChange?: (options: IFormFieldOnChangeOptions<"checkbox"> & IToggleableOnChangeOptions) => void; type: "checkbox" };
+        select: Omit<IDropdownProps, "onChange"> & { onChange?: (options: IFormFieldOnChangeOptions<"select"> & IDropdownOnChangeOptions) => void; type: "select" };
         /**
          * A text field.
          * 
@@ -112,3 +113,6 @@ declare module "@resk/core" {
         email: Omit<ITextInputProps, "type"> & { type: "email" };
     }
 }
+
+
+export * from "./types";

@@ -1,8 +1,8 @@
 import View from "@components/View";
-import { defaultStr, extendObj, IFieldType, IResourceName, isEmpty, isNonNullString, isObj, ResourcesManager, uniqid } from "@resk/core";
+import { defaultStr, extendObj, IFieldType, IFields, IField, IResourceName, isEmpty, isNonNullString, isObj, ResourcesManager, uniqid } from "@resk/core";
 import { isValidElement, ObservableComponent } from "@utils";
 import { FormsManager } from "./FormsManager";
-import { IFormField, IForm, IFormFieldsProp, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormTabItemProp, IFormFieldProps, IFormAction, IFormOnSubmitOptions, IFormContext } from "./types";
+import { IFormField, IForm, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormOnSubmitOptions, IFormContext, IFormTabItemProp, IFormAction } from "./types";
 import React, { ReactElement, ReactNode, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { ActivityIndicator } from "@components/ActivityIndicator";
@@ -52,7 +52,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
     private validationStatus = false;
     private readonly fields: IFormFields = {};
     private errors: string[] = [];
-    readonly primaryKeyFields: IFormFieldsProp = {};
+    readonly primaryKeyFields: IFields = {};
     componentProps: IFormProps = {} as IFormProps;
     constructor(props: IFormProps) {
         super(props);
@@ -273,11 +273,11 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         return undefined;
     }
 
-    prepareFields(props?: IFormProps): IFormFieldsProp {
+    prepareFields(props?: IFormProps): IFields {
         const p = Object.assign({}, props || this.props) as IFormProps;
         p.data = p?.data || {};
         const { responsive } = p;
-        const preparedFields: IFormFieldsProp = {};
+        const preparedFields: IFields = {};
         const isUpdate = this.isDataEditing(p);
         this.componentProps.isUpdate = isUpdate;
         for (let i in this.primaryKeyFields) {
@@ -285,7 +285,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         }
         if (p.fields) {
             for (let i in p.fields) {
-                const field: IFormFieldProps | undefined =
+                const field: IField | undefined =
                     (p.fields[i] && Object.clone(p.fields[i])) || undefined;
                 if (!field || !ResourcesManager.isAllowed(field)) continue;
                 if (field.rendable === false) continue;
@@ -338,26 +338,26 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                                 ? preparedField.displayErrors
                                 : undefined;
                     const { onMount, onUnmount } = preparedField;
-                    preparedField.onMount = (formField) => {
+                    preparedField.onMount = (formField: IFormField<any>) => {
                         this.mountField(formField);
                         if (onMount) {
                             onMount(formField);
                         }
                     };
-                    preparedField.onUnmount = (formField) => {
+                    preparedField.onUnmount = (formField: IFormField<any>) => {
                         this.unmountField(formField);
                         if (onUnmount) {
                             onUnmount(formField);
                         }
                     };
-                    preparedFields[name] = preparedField as IFormFieldProps;
+                    preparedFields[name] = preparedField as IField;
                 }
             }
         }
         return preparedFields;
     }
 
-    canRenderField(options: IFormProps & { field: IFormFieldProps; fieldName: string; isUpdate: boolean; }): boolean {
+    canRenderField(options: IFormProps & { field: IField; fieldName: string; isUpdate: boolean; }): boolean {
         if (options?.field?.rendable === false) return false;
         if (options?.canRenderField && !options?.canRenderField(options)) return false;
         else if (options?.canRenderField != this.props.canRenderField) {
@@ -380,7 +380,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         }
         return true;
     }
-    prepareField(options: IFormProps & { field: IFormFieldProps; fieldName: string; isUpdate: boolean; }): IFormFieldProps | null {
+    prepareField(options: IFormProps & { field: IField; fieldName: string; isUpdate: boolean; }): IField | null {
         return options?.field;
     }
     setHasTriedTobeSubmitted(hasTriedTobeSubmitted: boolean) {

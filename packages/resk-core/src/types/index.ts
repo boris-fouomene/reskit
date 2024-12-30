@@ -405,6 +405,10 @@ export type IField<T extends IFieldType = any> = Omit<IFieldMap[T], "type"> & {
   type: T;
 };
 
+export type IFields<T extends IField> = {
+  [K in keyof T]: Extract<IField<T[K]["type"]>, T[K]>;
+};
+
 /**
  * Represents a protected resource that can be associated with a button in the user interface.
  * This type is used to define the conditions under which a button should be rendered based on user permissions.

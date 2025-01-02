@@ -9,7 +9,7 @@ declare module "@resk/core" {
     export interface IFieldMap {
         switch: Omit<ISwitchProps, "onChange" | "type"> & { onChange?: (options: IFormFieldOnChangeOptions<"switch"> & Partial<IToggleableOnChangeOptions>) => void; type: "switch" };
         checkbox: Omit<ICheckboxProps, "onChange" | "type"> & { onChange?: (options: IFormFieldOnChangeOptions<"checkbox"> & Partial<IToggleableOnChangeOptions>) => void; type: "checkbox" };
-        select: Omit<IDropdownProps, "onChange"> & { onChange?: (options: IFormFieldOnChangeOptions<"select"> & IDropdownOnChangeOptions) => void; type: "select" };
+        select: Omit<IDropdownProps, "onChange"> & { onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; type: "select" };
         /**
          * A text field.
          * 

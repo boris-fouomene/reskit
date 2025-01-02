@@ -1,13 +1,13 @@
 import Component from "@utils/Component";
-import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
+import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownEvent, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
 import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj } from "@resk/core";
-import { getTextContent, isReactNode } from "@utils/index";
+import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import areEquals from "@utils/areEquals";
 import Theme, { useTheme } from "@theme/index";
-import { Animated, Pressable, View as RNView } from "react-native";
+import { Animated, Pressable, View as RNView, TextInput as RNTextInput, TextInputProps } from "react-native";
 import TextInput from "@components/TextInput";
 import { Portal } from "@components/Portal";
 import { ContentStyle, FlashList } from "@shopify/flash-list";
@@ -40,7 +40,7 @@ import { Divider } from "@components/Divider";
  * 
  * @param {IDropdownProps<ItemType, ValueType>} props - The properties for the dropdown component.
  */
-export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>> implements IDropdownContext<ItemType, ValueType> {
+export class Dropdown<ItemType = any, ValueType = any> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
     constructor(props: IDropdownProps<ItemType, ValueType>) {
         super(props);
         this.isSelectedByHashKey = this.isSelectedByHashKey.bind(this);
@@ -154,9 +154,6 @@ export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdo
         return { selectedItemsByHashKey: sItemsByKeys, selectedValues };
     };
     isSelectedByHashKey = (hasKey: string) => {
-        if (this.props.multiple) {
-            console.log("checking seletion by hash key ", hasKey, this.state.selectedItemsByHashKey);
-        }
         return !isEmpty(hasKey) && !!this.state.selectedItemsByHashKey[hasKey];
     };
     get itemsByHashKey() {
@@ -206,19 +203,31 @@ export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdo
         }
         this.setState(newState, () => {
             this.callOnChange(preparedItem);
+            const triggerCallOptions = { ...preparedItem, dropdownContext: this };
+            this.trigger("toggleItem", triggerCallOptions);
+            if (newItemStatus) {
+                this.trigger("selectItem", triggerCallOptions);
+            } else {
+                this.trigger("unselectItem", triggerCallOptions);
+            }
         });
     }
     open() {
         const { isLoading, readOnly, disabled, multiple } = this.props;
         if (isLoading || readOnly || disabled || this.state.visible) return;
-        this.setState({ visible: true }, () => { });
+        this.setState({ visible: true }, () => {
+            this.trigger("open", this);
+            this.trigger("toggleVisibility", this);
+        });
     }
     close() {
         if (this.state.visible) {
-            this.setState({ visible: false });
+            this.setState({ visible: false }, () => {
+                this.trigger("open", this);
+                this.trigger("toggleVisibility", this);
+            });
         }
     }
-
     selectAll() {
         const itByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>> = {};
         const newValues: ValueType[] = [];
@@ -229,6 +238,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdo
         const newState = { selectedItemsByHashKey: itByHashKey, selectedValues: newValues };
         this.setState(newState, () => {
             this.callOnChange();
+            this.trigger("selectAll", this);
         });
     }
 
@@ -240,6 +250,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends Component<IDropdo
         }
         this.setState(nState as IDropdownState<ItemType, ValueType>, () => {
             this.callOnChange();
+            this.trigger("unselectAll", this);
         });
     }
 
@@ -328,7 +339,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             counter++;
         }
         if (nextItemCounter) {
-            selectedText += `, ${nextItemCounter.formatNumber()}...`;
+            selectedText += `, [${nextItemCounter.formatNumber()}...]`;
         }
         return { selectedText, title };
     }, [selectedItemsByHashKey]);
@@ -390,10 +401,18 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             sameWidth
             withScrollView={false}
             onClose={context.close.bind(context)}
-            anchor={<Pressable disabled={disabled} ref={anchorRef} testID={`${testID}-dropdown-anchor-container`} {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IStyle} onPress={isLoading ? undefined : context.toggle.bind(context)}>
-                <TextInput opacity={!isEditabled ? undefined : 0.95} {...props} disabled={disabled} onChange={undefined} testID={testID} defaultValue={anchorSelectedText} readOnly={true} />
+            anchor={<View disabled={disabled} ref={anchorRef} testID={`${testID}-dropdown-anchor-container`} {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IStyle}>
+                <TextInput
+                    isDropdownAnchor
+                    {...props}
+                    disabled={disabled}
+                    onChange={undefined}
+                    testID={testID}
+                    defaultValue={anchorSelectedText}
+                    onPress={isLoading ? undefined : context.toggle.bind(context)}
+                />
                 {loadingContent}
-            </Pressable>}
+            </View>}
             responsive
             children={<DropdownContext.Provider value={context}>
                 <View testID={testID + "-dropdown-list-container"} style={[styles.dropdownListContainer, !isEditabled && Theme.styles.disabled]}>
@@ -452,6 +471,7 @@ const DropdownListItems = () => {
 
 const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) => {
     const { item, label, value, hashKey, labelText } = preparedItem;
+    const forceRender = useForceRender();
     const context = useDropdown();
     const theme = useTheme();
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
@@ -460,14 +480,8 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
     const { multiple, selectedIconName } = context.props;
     const testID = context.getTestID();
     const isSelected = useMemo(() => {
-        if (multiple) {
-            console.log("checking gggggggggggggg ", context.state.selectedItemsByHashKey, context.state);
-        }
         return context.isSelectedByHashKey(hashKey);
     }, [selectedItemsByHashKey, hashKey]);
-    if (!label) {
-        return null;
-    }
     useEffect(() => {
         if (!labelText) {
             const text = getTextContent(labelRef?.current);
@@ -477,7 +491,30 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
             }
         }
     }, [label, labelText, itemsByHashKey]);
-
+    useEffect(() => {
+        if (typeof context?.on !== "function") {
+            return;
+        }
+        const bindedOn = context.on("toggleItem", (options) => {
+            if (options?.hashKey === hashKey) {
+                forceRender();
+            }
+        });
+        const bindOnSelectAll = context.on("selectAll", (options) => {
+            forceRender();
+        });
+        const bindOnUnselectAll = context.on("unselectAll", (options) => {
+            forceRender();
+        });
+        return () => {
+            bindedOn?.remove();
+            bindOnSelectAll?.remove();
+            bindOnUnselectAll?.remove();
+        }
+    }, [hashKey, context]);
+    if (!label) {
+        return null;
+    }
     return (
         <Tooltip
             title={label}
@@ -489,7 +526,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
             testID={testID + "-item-container-" + hashKey}
         >
             <View style={styles.itemContent} testID={testID + "-item-content-" + hashKey}>
-                {isSelected ? <FontIcon name={isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked"} size={20} color={theme.colors.primary} /> : null}
+                {isSelected ? <FontIcon style={[styles.selectedIcon]} name={isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked"} size={20} color={theme.colors.primary} /> : null}
                 {<Label ref={labelRef} fontSize={15} color={isSelected ? theme.colors.primary : undefined}>{label}</Label>}
             </View>
         </Tooltip>
@@ -501,6 +538,9 @@ DropdownItem.displayName = "DropdownItem";
 const styles = StyleSheet.create({
     appBar: {
         marginBottom: 7,
+    },
+    selectedIcon: {
+        marginRight: 5,
     },
     itemContent: {
         flexDirection: "row",

@@ -12,6 +12,7 @@ import { ITextInputCallbackOptions, ITextInputProps, ITextInputType, IUseTextInp
 import { ITheme } from "@theme/types";
 import { IStyle } from "@src/types";
 import { IFontIconProps } from "@components/Icon";
+import { TouchableRipple } from "@components/TouchableRipple";
 
 /**
  * @description
@@ -70,8 +71,8 @@ import { IFontIconProps } from "@components/Icon";
  * The `TextInput` component is designed to be versatile and reusable across various parts of an application, ensuring a consistent and engaging user experience. 
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
-const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
-    const { variant, containerProps, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, right, label, ...rest } = useTextInput(props);
+const TextInput = React.forwardRef(({ isDropdownAnchor, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
+    const { variant, containerProps, onPress, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, right, label, ...rest } = useTextInput(props);
     const leftContainerProps = Object.assign({}, cLeftContainerProps);
     const isLabelEmbededVariant = variant === "labelEmbeded";
     const { testID } = rest;
@@ -81,16 +82,24 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
             innerRef.current.focus();
         }
     }}>{label}</Pressable> : label;
+    const canWrapWithTouchable = isDropdownAnchor && editable;
+    const Wrapper = canWrapWithTouchable ? TouchableRipple : React.Fragment;
+    const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
+    const wrapperProps = canWrapWithTouchable ? pressableProps : undefined;
     return <View  {...containerProps}>
         {isLabelEmbededVariant ? null : labelContent}
         <View {...contentContainerProps}>
-            {<View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, leftContainerProps.style]}>
+            {<View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
-                <RNTextInput
-                    {...rest}
-                    ref={mergeRefs(innerRef, ref)}
-                />
+                <Wrapper {...wrapperProps}>
+                    <RNTextInput
+                        {...(!canWrapWithTouchable ? pressableProps : {})}
+                        {...rest}
+                        editable={canWrapWithTouchable ? false : editable}
+                        ref={mergeRefs(innerRef, ref)}
+                    />
+                </Wrapper>
             </View>}
             {right}
         </View>
@@ -418,6 +427,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         fontSize: 15
     },
+    dropdownAnchorContainer: {
+        flexGrow: 1,
+        paddingHorizontal: 5,
+    },
     hidden: { display: "none", opacity: 0 },
     input: {
         borderColor: 'transparent', // No border
@@ -491,6 +504,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "flex-start",
         alignSelf: "flex-start",
+    },
+    leftContainerWrappedWithTouchable: {
+        paddingLeft: 0,
+        paddingRight: 0,
     },
     notEmbededLabelStyle: {
         fontWeight: "500",

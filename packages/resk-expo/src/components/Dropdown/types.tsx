@@ -6,6 +6,7 @@ import { IViewProps } from "@components/View";
 import { PressableProps } from "react-native";
 import Component from "@utils/Component";
 import { IFontIconProps } from "@components/Icon";
+import { ObservableComponent } from "@utils/index";
 
 /**
  * Represents the context for a dropdown component, providing methods and state 
@@ -194,7 +195,7 @@ import { IFontIconProps } from "@components/Icon";
  * - Ensure that the methods and properties are implemented correctly to maintain 
  *   a smooth user experience within the dropdown.
  */
-export interface IDropdownContext<ItemType = any, ValueType = any> extends Component<Omit<IDropdownProps<ItemType, ValueType>, "items" | "getHashKey">, IDropdownState<ItemType, ValueType>> {
+export interface IDropdownContext<ItemType = any, ValueType = any> extends ObservableComponent<Omit<IDropdownProps<ItemType, ValueType>, "items" | "getHashKey">, IDropdownState<ItemType, ValueType>, IDropdownEvent> {
     filteredItems?: IDropdownPreparedItem<ItemType, ValueType>[];
     itemsByHashKey: IDropdownPreparedItems<ItemType, ValueType>;
     visible: boolean;
@@ -746,3 +747,52 @@ export interface IDropdownPreparedItem<ItemType = any, ValueType = any> {
     label: ReactNode; // The label to be displayed for the item
     labelText: string; // Plain text representation of the label
 };
+
+
+/**
+ * Represents the possible events that can be triggered within a dropdown component.
+ * 
+ * This type defines a set of string literals that represent various events that can occur
+ * during the lifecycle of a dropdown. These events are useful for tracking user interactions
+ * and managing the state of the dropdown component.
+ * 
+ * @type IDropdownEvent
+ * 
+ * @example
+ * // Example usage of the IDropdownEvent type
+ * 
+ * const handleDropdownEvent = (event: IDropdownEvent) => {
+ *     switch (event) {
+ *         case "toggleVisibility":
+ *             console.log("Dropdown visibility toggled");
+ *             break;
+ *         case "selectItem":
+ *             console.log("Item selected in dropdown");
+ *             break;
+ *         case "open":
+ *             console.log("Dropdown opened");
+ *             break;
+ *         case "close":
+ *             console.log("Dropdown closed");
+ *             break;
+ *         case "toggleItem":
+ *             console.log("Item selection toggled");
+ *             break;
+ *         case "unselectItem":
+ *             console.log("Item unselected");
+ *             break;
+ *         default:
+ *             console.log("Unknown dropdown event");
+ *     }
+ * };
+ * 
+ * // Simulating a dropdown event
+ * handleDropdownEvent("open"); // Output: "Dropdown opened"
+ * 
+ * @remarks
+ * - This type is particularly useful for event handling in dropdown components, allowing
+ *   developers to respond to specific user actions.
+ * - Ensure that event handlers are properly implemented to manage the state and behavior
+ *   of the dropdown based on these events.
+ */
+export type IDropdownEvent = "toggleVisibility" | "selectItem" | "open" | "close" | "toggleItem" | "unselectItem" | "selectAll" | "unselectAll";

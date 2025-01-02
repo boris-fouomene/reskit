@@ -398,6 +398,11 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
      * The opacity of the text input.
      */
     opacity?: number;
+
+    /***
+     * A flag indicating whether the text input is an anchor for a dropdown.
+     */
+    isDropdownAnchor?: boolean;
 };
 
 /**

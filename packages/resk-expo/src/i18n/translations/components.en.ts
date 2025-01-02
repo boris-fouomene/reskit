@@ -12,12 +12,16 @@ I18n.RegisterTranslations({
                  * @param {string} countStr - The string representation of number of items in the dropdown list.
                  * @example "Search in 10 items"
                  */
-                "searchPlaceholder": "Search %{countStr}",
+                "searchPlaceholder": {
+                    "zero": "Search ...",
+                    "one": "Search in %{count} item...",
+                    "other": "Search in %{count} items...",
+                },
                 "noneSelected": "None selected",
                 "andMoreItemSelected": {
                     "zero": "",
-                    "one": ", and one item selected.",
-                    "other": ", and %{count} items selected.",
+                    "one": ", and one selected.",
+                    "other": ", and %{count} selected.",
                 },
             },
             "drawer": {

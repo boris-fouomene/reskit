@@ -628,7 +628,7 @@ const DropdownSearch = ({ isFullScreen }: { isFullScreen?: boolean }) => {
                 onChangeText={onSearch}
                 style={[styles.searchInput, props.style]}
                 containerProps={Object.assign({}, props.containerProps, { style: [styles.searchInputContainer, props.containerProps?.style] })}
-                placeholder={i18n.t("components.dropdown.searchPlaceholder", { countStr: filteredItems.length.formatNumber() })}
+                placeholder={i18n.t("components.dropdown.searchPlaceholder", { count: filteredItems.length })}
                 right={!actions?.length ? null : (
                     <Menu
                         items={actions}

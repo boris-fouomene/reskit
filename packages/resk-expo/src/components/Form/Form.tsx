@@ -13,6 +13,7 @@ import Theme, { useTheme } from "@theme/index";
 import { Field } from "./Field";
 import { IStyle } from "@src/types";
 import { FormContext } from "./context";
+import "./types/augmented";
 import { INotifyMessage, Notify } from "@notify/index";
 
 
@@ -52,7 +53,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
     private validationStatus = false;
     private readonly fields: IFormFields = {};
     private errors: string[] = [];
-    readonly primaryKeyFields: IFields = {};
+    readonly primaryKeyFields: IFields = {} as IFields;
     componentProps: IFormProps = {} as IFormProps;
     constructor(props: IFormProps) {
         super(props);
@@ -277,16 +278,16 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         const p = Object.assign({}, props || this.props) as IFormProps;
         p.data = p?.data || {};
         const { responsive } = p;
-        const preparedFields: IFields = {};
+        const preparedFields: IFields = {} as IFields;
         const isUpdate = this.isDataEditing(p);
         this.componentProps.isUpdate = isUpdate;
         for (let i in this.primaryKeyFields) {
-            delete this.primaryKeyFields[i];
+            delete this.primaryKeyFields[i as keyof IFields];
         }
         if (p.fields) {
             for (let i in p.fields) {
                 const field: IField | undefined =
-                    (p.fields[i] && Object.clone(p.fields[i])) || undefined;
+                    (p.fields[i as keyof IFields] && Object.clone(p.fields[i as keyof IFields])) || undefined;
                 if (!field || !ResourcesManager.isAllowed(field)) continue;
                 if (field.rendable === false) continue;
                 delete field.rendable;
@@ -329,7 +330,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                         preparedField.disabled = true;
                     }
                     if (preparedField.primaryKey) {
-                        this.primaryKeyFields[name] = field;
+                        this.primaryKeyFields[name as keyof IFields] = field;
                     }
                     preparedField.displayErrors =
                         typeof preparedField.displayErrors === "boolean"
@@ -350,13 +351,14 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                             onUnmount(formField);
                         }
                     };
-                    preparedFields[name] = preparedField as IField;
+
+                    preparedFields[name as keyof IFields] = preparedField as IField<any>;
                 }
             }
         }
         return preparedFields;
-    }
 
+    }
     canRenderField(options: IFormProps & { field: IField; fieldName: string; isUpdate: boolean; }): boolean {
         if (options?.field?.rendable === false) return false;
         if (options?.canRenderField && !options?.canRenderField(options)) return false;

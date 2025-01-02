@@ -16,6 +16,7 @@ import { dimentionAddListener } from "@dimensions/index";
 import TextInput from "@components/TextInput";
 import { IKeyboardEventHandlerKey } from "@components/KeyboardEventHandler/keyEvents";
 import { IStyle } from "@src/types";
+import "./types/augmented";
 
 /**
  * Represents a form field component that can be used within a form.

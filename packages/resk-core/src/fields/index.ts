@@ -30,7 +30,7 @@ export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
  * }
  * ```
  */
-export function Field<T extends IFieldType = "text">(options: IField<T>): PropertyDecorator {
+export function Field<T extends IFieldType = any>(options: IField<T>): PropertyDecorator {
   /**
    * Returns a decorator function that sets metadata on the target property.
    */

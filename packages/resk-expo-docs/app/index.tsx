@@ -1,9 +1,6 @@
-import { Tab, TextInput, Switch, Checkbox, Drawer, Button, Dropdown, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
+import { Tab, TextInput, Switch, withAppBar, Checkbox, Drawer, Button, Dropdown, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
-import { useEffect } from 'react'
-import { withAppBar } from "@resk/expo/build/hooks";
-import { IField } from "@resk/core";
-
+import { IField, IFieldMap } from "@resk/core";
 
 const index = withAppBar(() => {
     return (
@@ -27,6 +24,9 @@ const index = withAppBar(() => {
                         uncheckedLabel: "Unchecked",
                         checkedValue: true,
                         uncheckedValue: false,
+                        onChange: (options) => {
+                            console.log("switch", options);
+                        },
                     } as IField<"switch">,
                     checkbox: {
                         type: "checkbox",

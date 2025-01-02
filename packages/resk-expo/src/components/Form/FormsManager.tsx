@@ -1,6 +1,6 @@
 import { IDict, IField, IFieldType, isClass, isNonNullString, isObj, isObservable, observableFactory } from "@resk/core";
 import { IForm, IFormAction, IFormCallbackOptions, IFormData, IFormField, IFormFields, IFormGetDataOptions, IFormManagerEvent } from "./types";
-
+import "./types/augmented";
 /**
  * @group Forms
  * Manages the lifecycle and state of forms within the application.

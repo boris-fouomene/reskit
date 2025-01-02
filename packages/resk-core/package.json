@@ -30,7 +30,6 @@
         "ts-alias": "^0.0.7",
         "ts-jest": "^29.2.5",
         "typedoc": "^0.26.9",
-        "typescript": "^5.6.3",
         "vite-tsconfig-paths": "^5.0.1"
     },
     "dependencies": {

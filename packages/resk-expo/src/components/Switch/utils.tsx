@@ -100,7 +100,7 @@ export function useToggleable<EventType = GestureResponderEvent>({ disabled, che
    */
   const toggleStatus = () => {
     if (disabled || readOnly) return;
-    if (typeof beforeToggle === "function" && beforeToggle({ checked, setChecked, setValue, value: getValue() }) === false) {
+    if (typeof beforeToggle === "function" && beforeToggle({ checked, checkedValue, uncheckedValue, value: getValue() }) === false) {
       return;
     }
     const isChecked = !checked;
@@ -109,8 +109,8 @@ export function useToggleable<EventType = GestureResponderEvent>({ disabled, che
       if (typeof onValueChange === "function") {
         onValueChange(isChecked);
       }
-      if (onChange) {
-        onChange({ checked: isChecked, event: eventRef.current, setValue, setChecked, value });
+      if (typeof onChange === "function") {
+        onChange({ checked: isChecked, checkedValue, uncheckedValue, event: eventRef.current, value });
       }
     });
   };

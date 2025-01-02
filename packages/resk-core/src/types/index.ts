@@ -211,108 +211,7 @@ export interface IFieldBase<FieldType extends IFieldType = any> extends IProtect
     }
   ```
  */
-export interface IFieldMap<Type extends string = any> extends Record<string, IFieldBase<Type>> {
-  /**
-   * A text field.
-   * 
-   * @description
-   * This property represents a text field, with a type of "text".
-   * 
-   * @example
-   * ```typescript
-   * const textField: IFieldBase<"text"> = {
-   *   type: 'text',
-   *   label: 'Text Field',
-   *   name: 'textField'
-   * };
-   * ```
-   */
-  //text: IFieldBase<"text">;
-  /**
-   * A number field.
-   * 
-   * @description
-   * This property represents a number field, with a type of "number".
-   * 
-   * @example
-   * ```typescript
-   * const numberField: IFieldBase<"number"> = {
-   *   type: 'number',
-   *   label: 'Number Field',
-   *   name: 'numberField'
-   * };
-   * ```
-   */
-  //number: IFieldBase<"number">;
-
-  /**
-   * A date field.
-   * 
-   * @description
-   * This property represents a date field, with a type of "date".
-   * 
-   * @example
-   * ```typescript
-   * const dateField: IFieldBase<"date"> = {
-   *   type: 'date',
-   *   label: 'Date Field',
-   *   name: 'dateField'
-   * };
-   * ```
-   */
-  //date: IFieldBase<"date">;
-
-  /**
-   * A datetime field.
-   * 
-   * @description
-   * This property represents a datetime field, with a type of "datetime".
-   * 
-   * @example
-   * ```typescript
-   * const datetimeField: IFieldBase<"datetime"> = {
-   *   type: 'datetime',
-   *   label: 'Datetime Field',
-   *   name: 'datetimeField'
-   * };
-   * ```
-   */
-  //datetime: IFieldBase<"datetime">;
-
-  /**
-   * A time field.
-   * 
-   * @description
-   * This property represents a time field, with a type of "time".
-   * 
-   * @example
-   * ```typescript
-   * const timeField: IFieldBase<"time"> = {
-   *   type: 'time',
-   *   label: 'Time Field',
-   *   name: 'timeField'
-   * };
-   * ```
-   */
-  //time: IFieldBase<"time">;
-
-  /**
-   * An email field.
-   * 
-   * @description
-   * This property represents an email field, with a type of "email".
-   * 
-   * @example
-   * ```typescript
-   * const emailField: IFieldBase<"email"> = {
-   *   type: 'email',
-   *   label: 'Email Field',
-   *   name: 'emailField'
-   * };
-   * ```
-   */
-  //email: IFieldBase<"email">;
-}
+export interface IFieldMap extends Record<string, IFieldBase> { }
 
 /**
  * @type IField<T extends IFieldType = any>
@@ -476,9 +375,9 @@ export type IField<T extends IFieldType = any> = IFieldMap[T] & {
  * - **`IFieldMap`**: The mapping of field types to their corresponding field definitions.
  * - **`IField`**: Represents a field with customizable properties in a form or data structure.
  */
-export type IFields<T extends IFieldMap = any> = {
-  [K in keyof T]: IFieldMap[T[K]["type"]];
-};
+export interface IFields extends Record<string, IField<keyof IFieldMap>> { }
+
+
 
 /**
  * Represents a protected resource that can be associated with a button in the user interface.

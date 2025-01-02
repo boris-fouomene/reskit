@@ -339,7 +339,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             counter++;
         }
         if (nextItemCounter) {
-            selectedText += `, [${nextItemCounter.formatNumber()}...]`;
+            selectedText += `${i18n.t("components.dropdown.andMoreItemSelected", { count: nextItemCounter })}`;
         }
         return { selectedText, title };
     }, [selectedItemsByHashKey]);

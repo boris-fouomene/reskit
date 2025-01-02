@@ -1,13 +1,14 @@
+import "reflect-metadata";
 import isNonNullString from "@utils/isNonNullString";
 import { I18nEvent, II18nTranslation } from "../types/i18n";
 import { extendObj, isObj } from "@utils/object";
 import { IObservable, IObservableCallback, observableFactory } from "@utils/observable";
-import "reflect-metadata";
 import { Dict, I18n as I18nJs, I18nOptions, Scope, TranslateOptions } from "i18n-js";
 import defaultStr from "@utils/defaultStr";
 import stringify from "@utils/stringify";
 import session from "@session/index";
-import { IDict, IPrimitive } from "../types/index";
+import { IDict } from "../types/index";
+import { isString } from "lodash";
 
 /**
  * A key to store metadata for translations.
@@ -94,6 +95,9 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      */
     translate<T = string>(scope: Scope, options?: TranslateOptions): string | T {
         if (this.isPluralizeOptions(options) && this.canPluralize(scope)) {
+            if (typeof options.count === "number") {
+                options.countStr = (options.count).formatNumber();
+            }
             return this.pluralize(options.count as number, scope, options);
         }
         return super.translate(scope, options);
@@ -238,7 +242,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         locale = defaultStr(locale, this.getLocale());
         const r = this.getNestedTranslation(scope, locale) as IDict;
         if (!isObj(r) || !r) return false;
-        return isNonNullString(r?.one) && isNonNullString(r?.other) && isNonNullString(r?.zero);
+        return isString(r?.one) && isString(r?.other) //&& isNonNullString(r?.zero);
     }
     /**
      * Resolves translation for nested keys.

@@ -14,6 +14,11 @@ I18n.RegisterTranslations({
                  */
                 "searchPlaceholder": "Search %{countStr}",
                 "noneSelected": "None selected",
+                "andMoreItemSelected": {
+                    "zero": "",
+                    "one": ", and one item selected.",
+                    "other": ", and %{count} items selected.",
+                },
             },
             "drawer": {
                 "close": "Close",

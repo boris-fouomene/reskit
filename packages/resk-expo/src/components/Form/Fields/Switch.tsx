@@ -1,4 +1,3 @@
-import "./types";
 import { getToggleableDefaultValues, ISwitchProps, IToggleableProps, Switch } from "@components/Switch";
 import { Field, FormField } from "../Field";
 import { StyleSheet } from "react-native";

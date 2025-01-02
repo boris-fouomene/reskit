@@ -1,4 +1,4 @@
-import { Platform, Pressable, StyleSheet, Switch as RNSwitch, SwitchChangeEvent, GestureResponderEvent } from "react-native";
+import {TouchableOpacity, Platform, Pressable, StyleSheet, Switch as RNSwitch, SwitchChangeEvent, GestureResponderEvent } from "react-native";
 import { ISwitchProps } from "./types";
 import { useToggleable } from "./utils";
 import { useTheme } from "@theme/index";
@@ -99,7 +99,7 @@ export const Switch = ({ testID, ...props }: ISwitchProps) => {
         };
     const MTestID = typeof testID === 'string' && testID || "resk-switch";
     const labelContent = <Label testID={`${MTestID}-label`} {...labelProps} style={[styles.label, labelProps.style]} children={label} />;
-    return <Tooltip as={Pressable} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`} {...containerProps} style={[styles.container, disabledStyle, readOnlyStyle, containerProps.style]}
+    return <Tooltip as={TouchableOpacity} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`} {...containerProps} style={[styles.container, disabledStyle, readOnlyStyle, containerProps.style]}
         onPress={(event: GestureResponderEvent) => {
             toggleStatus();
         }}

@@ -1,10 +1,11 @@
-import { Tab, TextInput, Switch, withAppBar, Checkbox, Drawer, Button, Dropdown, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
+import { Tab, TextInput, Switch, withAppBar, Calendar, Checkbox, Drawer, Button, Dropdown, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
 import { IField, IFieldMap } from "@resk/core";
 
 const index = withAppBar(() => {
     return (
         <ScrollView>
+            <Calendar />
             <Form
                 name="my-form"
                 onSubmit={({ data }) => {

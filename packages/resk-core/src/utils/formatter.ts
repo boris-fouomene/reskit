@@ -1,5 +1,5 @@
 import { IFormatValueOptions, IFormatValueResult } from "../types";
-import { DEFAULT_DATE_FORMAT, DEFAULT_DATE_TIME_FORMAT, DEFAULT_TIME_FORMAT, formatDate, isDateObj, isValidDate } from "./date";
+import { DEFAULT_DATE_FORMATS, formatDate, isDateObj, isValidDate } from "./date";
 
 /**
  * @description
@@ -43,6 +43,7 @@ export const formatValueToObject = ({ value, type, format, dateFormat, ...rest }
     const canValueBeDecimal = type && ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());
     let parsedValue = value;
 
+
     // Normalize the value: if it's undefined, null, or empty, set it to an empty string.
     value = value === undefined || value === null || !value ? "" : value;
     if (!value) {
@@ -65,7 +66,7 @@ export const formatValueToObject = ({ value, type, format, dateFormat, ...rest }
 
         // Format dates if the value is a valid date object.
         if (isDateObj(value) && (dateFormat || (["time", "date", "datetime"].includes(typeText) && isValidDate(value)))) {
-            formattedValue = formatDate(value, dateFormat || typeText === "time" ? DEFAULT_TIME_FORMAT : typeText === "date" ? DEFAULT_DATE_FORMAT : DEFAULT_DATE_TIME_FORMAT);
+            formattedValue = formatDate(value, dateFormat || typeText === "time" ? DEFAULT_DATE_FORMATS.time : typeText === "date" ? DEFAULT_DATE_FORMATS.dateTime : DEFAULT_DATE_FORMATS.date);
         }
         // Format numbers based on the specified format.
         else if (typeof parsedValue == 'number') {

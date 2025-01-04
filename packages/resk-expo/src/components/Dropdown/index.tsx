@@ -7,7 +7,7 @@ import { getTextContent, isReactNode, ObservableComponent, useForceRender } from
 import { DropdownContext, useDropdown } from "./hooks";
 import areEquals from "@utils/areEquals";
 import Theme, { useTheme } from "@theme/index";
-import { Animated, Pressable, View as RNView, TextInput as RNTextInput, TextInputProps } from "react-native";
+import { Animated, Pressable, View as RNView, TextInput as RNTextInput, TextInputProps, TouchableOpacity } from "react-native";
 import TextInput from "@components/TextInput";
 import { Portal } from "@components/Portal";
 import { ContentStyle, FlashList } from "@shopify/flash-list";
@@ -635,11 +635,12 @@ const DropdownSearch = ({ isFullScreen }: { isFullScreen?: boolean }) => {
                         testID={`${testID}-dropdown-menu-actions`}
                         anchor={({ openMenu }) => {
                             return (
-                                <Icon.Button
-                                    iconName={FontIcon.MORE}
-                                    size={24}
-                                    onPress={() => openMenu()}
-                                />
+                                <TouchableOpacity onPress={() => openMenu()}>
+                                    <FontIcon
+                                        name={FontIcon.MORE}
+                                        size={24}
+                                    />
+                                </TouchableOpacity>
                             );
                         }}
                     />

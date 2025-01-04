@@ -1676,7 +1676,7 @@ export type IMomentTimeSeparator = ':';
  * A union type representing the various combinations of date components in Moment.js.
  * This type allows for flexibility in formatting dates according to different structures.
  */
-export type IMomentDateFormat =
+export type IMomentDateFormat = IMomentDayToken | IMomentYearToken | IMomentMonthToken |
   `${IMomentYearToken}${IMomentDateSeparator}${IMomentMonthToken}${IMomentDateSeparator}${IMomentDayToken}` |
   `${IMomentMonthToken}${IMomentDateSeparator}${IMomentDayToken}${IMomentDateSeparator}${IMomentYearToken}` |
   `${IMomentDayToken}${IMomentDateSeparator}${IMomentMonthToken}${IMomentDateSeparator}${IMomentYearToken}`;

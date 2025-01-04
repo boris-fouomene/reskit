@@ -9,6 +9,7 @@ import stringify from "@utils/stringify";
 import session from "@session/index";
 import { IDict } from "../types/index";
 import { isString } from "lodash";
+import moment from "moment";
 
 /**
  * A key to store metadata for translations.
@@ -274,7 +275,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * // Resolve translation for the "farewell" key.
      * i18n.resolveTranslation("en", "farewell");
      */
-    getNestedTranslation(scope: Scope, locale: string): string | IDict | undefined {
+    getNestedTranslation(scope: Scope, locale?: string): string | IDict | undefined {
         const scopeArray = isNonNullString(scope) ? scope.trim().split(".") : Array.isArray(scope) ? scope : [];
         if (!scopeArray.length) return undefined;
         let result: any = this.getTranslations(locale);
@@ -492,6 +493,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
             return;
         }
         this._isLoading = true;
+        try {
+            moment.locale(locale);
+        } catch (error) {
+            console.error(error, " setting moment locale : ", locale);
+        }
         this.loadNamespaces(locale).then((translations) => {
             if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {
                 I18n.setLocaleToSession(locale);

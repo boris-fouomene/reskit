@@ -1,10 +1,11 @@
 import { isBoolean, isNumber } from "lodash";
 import isNonNullString from "./isNonNullString";
 import moment from 'moment';
+import { i18n } from "../i18n";
 
 import isEmpty from "./isEmpty";
 import defaultStr from "./defaultStr";
-import { IMomentFormat } from "../types";
+import { IMomentDateFormat, IMomentFormat } from "../types";
 
 /**
  * Global interface extension for the Date object.
@@ -572,6 +573,43 @@ export function isSQLDateString(dateString: string): boolean {
   );
 }
 
+/**
+ * Provides default date and time formats for the application.
+ * 
+ * The formats are retrieved from translations, with fallback to predefined default values.
+ * The formats are used to represent dates and times in the application.
+ */
+export const DEFAULT_DATE_FORMATS = {
+  /**
+   * Get the default datetime format, according to the Moment.js library.
+   * it firstly tries to retrieve the default date time format from the translations (key: dates.defaultDateTimeFormat), and if it fails, it returns the default value.
+   *
+   * @description The format used to represent dates and times by default, as defined by the Moment.js library.
+   * @see https://momentjs.com/docs/#/parsing/string-format/
+   */
+  get dateTime(): IMomentDateFormat {
+    return defaultStr(i18n.getNestedTranslation("dates.defaultDateTimeFormat"), "DD/MM/YYYY HH:mm:ss") as unknown as IMomentDateFormat;
+  },
+  /**
+   * Get the default date format.
+   * It firstly tries to retrieve the default date time format from the translations (key: dates.defaultDateFormat), and if it fails, it returns the default value.
+   *
+   * @description The format used to represent dates by default.
+   */
+  get date(): IMomentDateFormat {
+    return defaultStr(i18n.getNestedTranslation("dates.defaultDateFormat"), "DD/MM/YYYY HH:mm:ss") as unknown as IMomentDateFormat;
+  },
+  /**
+   * Get the default time format, according to the Moment.js library.
+   * It firstly tries to retrieve the default date time format from the translations (key: dates.defaultTimeFormat), and if it fails, it returns the default value.
+   *
+   * @description The format used to represent times by default, as defined by the Moment.js library.
+   * @see https://momentjs.com/docs/#/parsing/string-format/
+   */
+  get time(): IMomentDateFormat {
+    return defaultStr(i18n.getNestedTranslation("dates.defaultTimeFormat"), "HH:mm:ss") as unknown as IMomentDateFormat;
+  }
+}
 
 /**
  * The SQL date format, according to the Moment.js library.
@@ -579,14 +617,6 @@ export function isSQLDateString(dateString: string): boolean {
  * @see https://momentjs.com/docs/#/parsing/string-format/
  */
 export const SQL_DATE_FORMAT: IMomentFormat = "YYYY-MM-DD";
-
-
-/**
- * The default date format.
- *
- * @description The format used to represent dates by default.
- */
-export const DEFAULT_DATE_FORMAT: IMomentFormat = "DD/MM/YYYY";
 
 
 /**
@@ -598,13 +628,6 @@ export const DEFAULT_DATE_FORMAT: IMomentFormat = "DD/MM/YYYY";
 export const SQL_DATE_TIME_FORMAT: IMomentFormat = "YYYY-MM-DD HH:mm:ss";
 
 
-/**
- * The default datetime format, according to the Moment.js library.
- *
- * @description The format used to represent dates and times by default, as defined by the Moment.js library.
- * @see https://momentjs.com/docs/#/parsing/string-format/
- */
-export const DEFAULT_DATE_TIME_FORMAT: IMomentFormat = "DD/MM/YYYY HH:mm:ss";
 
 
 /**
@@ -614,15 +637,6 @@ export const DEFAULT_DATE_TIME_FORMAT: IMomentFormat = "DD/MM/YYYY HH:mm:ss";
  * @see https://momentjs.com/docs/#/parsing/string-format/
  */
 export const SQL_TIME_FORMAT: IMomentFormat = "HH:mm:ss";
-
-
-/**
- * The default time format, according to the Moment.js library.
- *
- * @description The format used to represent times by default, as defined by the Moment.js library.
- * @see https://momentjs.com/docs/#/parsing/string-format/
- */
-export const DEFAULT_TIME_FORMAT: IMomentFormat = "HH:mm:ss";
 
 /**
  * Resets the hours of the date to 0.
@@ -1320,7 +1334,7 @@ export const formatDate = (date?: any, format?: IMomentFormat): string => {
      * 
      * This returns the formatted date string.
      */
-    return parsedDate.format((defaultStr(format, DEFAULT_DATE_TIME_FORMAT) as unknown) as IMomentFormat);
+    return parsedDate.format((defaultStr(format, DEFAULT_DATE_FORMATS.dateTime) as unknown) as IMomentFormat);
   } else {
     /**
      * Return the original date string if it's a valid date, otherwise return an empty string.

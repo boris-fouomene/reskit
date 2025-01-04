@@ -6,7 +6,8 @@
   "scripts": {
     "build-core": "cd ../resk-core && npm run build",
     "build-core-watch": "cd ../resk-core && npm",
-    "build": "npm run build-core && cd ../resk-expo && tsc && tsc-alias -p tsconfig.json",
+    "build": "npm run build-core && cd ../resk-expo && npm run build-me",
+    "build-me":"tsc && tsc-alias -p tsconfig.json",
     "build-core:watch": "cd ../resk-core && npm run build:watch",
     "build:watch": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
     "build:watch1": "tsc && (concurrently \"cd ../resk-core && npm run build:watch\" \"tsc -w\" \"tsc-alias -w\")",

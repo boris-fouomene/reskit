@@ -441,9 +441,9 @@ const Styles = StyleSheet.create({
         borderRadius: 20,
     },
     calendarYearItem: {
-        height: 50,
-        width: 50,
-        borderRadius: 25,
+        height: 60,
+        width: 60,
+        borderRadius: 30,
     },
     footer: {
         width: "100%",

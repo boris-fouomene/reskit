@@ -198,6 +198,7 @@ export default class Calendar {
                     defaultValue={momentDefaultValue?.toDate()}
                     renderNavigationButtons={false}
                     renderToggleDisplayViewButton={false}
+                    elevation={0}
                     onChange={(data) => {
                         setState({
                             ...state,
@@ -212,6 +213,7 @@ export default class Calendar {
                         defaultValue={momentDefaultValue?.toDate()}
                         renderNavigationButtons={false}
                         renderToggleDisplayViewButton={false}
+                        elevation={0}
                         onChange={(data) => {
                             setState({
                                 ...state,
@@ -294,6 +296,7 @@ export default class Calendar {
                     defaultValue={momentDefaultValue?.toDate()}
                     renderNavigationButtons={false}
                     renderToggleDisplayViewButton={false}
+                    elevation={0}
                     onChange={(data) => {
                         setState({
                             ...state,
@@ -342,13 +345,13 @@ export default class Calendar {
         const currentYear = new Date().getFullYear();
         return Calendar.renderCalendar({
             testID,
+            ...props,
             navNextIconProps: {
                 onPress: navigateToNext,
             },
             navPrevIconProps: {
                 onPress: navigateToPrevious,
             },
-            ...props,
             displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
                 label: `${start} - ${end}`,
                 disabled: true,
@@ -410,17 +413,16 @@ export default class Calendar {
             </TouchableRipple>
         );
     }
-    static renderCalendar({ testID, children, borderRadius, renderNavigationButtons, footer, header, displayViewToggleButton, navNextIconProps, navPrevIconProps }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, borderRadius?: number, navNextIconProps?: IIconButtonProps, navPrevIconProps?: IIconButtonProps, footer?: JSX.Element }) {
+    static renderCalendar({ testID, children, renderNavigationButtons, footer, header, displayViewToggleButton, navNextIconProps, navPrevIconProps, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, navNextIconProps?: IIconButtonProps, navPrevIconProps?: IIconButtonProps, footer?: JSX.Element }) {
         testID = defaultStr(testID, "resk-calendar");
         navNextIconProps = Object.assign({}, navNextIconProps);
         navPrevIconProps = Object.assign({}, navPrevIconProps);
-        borderRadius = typeof borderRadius === "number" ? borderRadius : 0;
         const isValidHeader = isValidElement(header);
         const canDisplayHeader = isValidHeader || renderNavigationButtons !== false || displayViewToggleButton !== false;
         if (typeof displayViewToggleButton === "boolean") {
             displayViewToggleButton = {};
         }
-        return <Surface testID={testID} style={[Styles.calendar, { borderRadius }]}>
+        return <Surface elevation={5} {...props} testID={testID} style={[Styles.calendar, props.style]}>
             {canDisplayHeader ? <View testID={testID + "-header"} style={Styles.header}>
                 {isValidHeader ? <>
                     {header}

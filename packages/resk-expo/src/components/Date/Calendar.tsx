@@ -69,7 +69,7 @@ export default class Calendar {
      * Generate a 4x4 matrix of months for a given year.
      * @returns A matrix of months with their statuses.
      */
-    static generateMonthView(): ICalendarMonth[][] {
+    static generateMonthView(startDate?: ICalendarDate, endDate?: ICalendarDate): ICalendarMonth[][] {
         const allMonths = moment.monthsShort();//example : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         const monthMatrix: ICalendarMonth[][] = [];
         const rows = Math.ceil(16 / 4); // 4 columns, so calculate rows
@@ -99,7 +99,7 @@ export default class Calendar {
         }
     }
 
-    static generateYearView(startDate?: ICalendarDate): ICalendarYear[][] {
+    static generateYearView(startDate?: ICalendarDate, endDate?: ICalendarDate): ICalendarYear[][] {
         const { start: startYear, end: endYear } = Calendar.getYearsBoundaries(startDate);
         const years: ICalendarYear[][] = [];
         const numRows = 4; // Display 4 years per row
@@ -260,15 +260,15 @@ export default class Calendar {
     }
     static Month: React.FC<ICalendarMonthProps> = (props: ICalendarMonthProps) => {
         const theme = useTheme();
+        const { state, setState, momentEndDate, momentDefaultValue, navigateToNext, navigateToPrevious } = useCommon(props, "month");
         const monthView = useMemo(() => {
-            return Calendar.generateMonthView();
-        }, [props?.startDate]);
-        const { state, setState, momentStartDate, momentEndDate, momentDefaultValue, navigateToNext, navigateToPrevious } = useCommon(props, "month");
+            return Calendar.generateMonthView(state.startDate, state.endDate);
+        }, [state.startDate, state.endDate]);
         const { displayView } = state;
         const start = moment(state.startDate);
         const testID = defaultStr(props?.testID, "resk-calendar-month-view");
         const currentMonth = moment().month();
-        const isCurrentYear = moment().year() === new Date().getFullYear();
+        const isCurrentYear = moment().year() === start.year();
         const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(start.toDate()) : undefined;
         return Calendar.renderCalendar({
             testID,
@@ -333,17 +333,21 @@ export default class Calendar {
     };
     static Year: React.FC<ICalendarYearProps> = (props) => {
         const theme = useTheme();
+        const { setState, state, navigateToNext, navigateToPrevious } = useCommon(props, "year");
         const yearView = useMemo(() => {
-            return Calendar.generateYearView(props?.startDate);
-        }, [props?.startDate]);
-        const momentStartDate = moment(props?.startDate);
-        const { start, end } = Calendar.getYearsBoundaries(momentStartDate.toDate());
+            return Calendar.generateYearView(state?.startDate, state.endDate);
+        }, [state?.startDate, state.endDate]);
+        const { start, end } = Calendar.getYearsBoundaries(state.startDate);
         const testID = defaultStr(props?.testID, "resk-calendar-year-view");
         const currentYear = new Date().getFullYear();
         return Calendar.renderCalendar({
             testID,
-            navNextIconProps: {},
-            navPrevIconProps: {},
+            navNextIconProps: {
+                onPress: navigateToNext,
+            },
+            navPrevIconProps: {
+                onPress: navigateToPrevious,
+            },
             ...props,
             displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
                 label: `${start} - ${end}`,

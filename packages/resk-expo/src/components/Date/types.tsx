@@ -4,16 +4,30 @@ import { Moment } from "moment";
 
 export type ICalendarDate = Date | string;
 
-export interface ICalendarProps {
-    /***
-     * The view to display
-     * Default is "month"
-     */
-    displayView?: ICalendarView,
-    startDate?: Date | string;
-    endDate?: Date | string;
+
+export interface ICalendarBaseProps {
+    startDate?: ICalendarDate;
+    endDate?: ICalendarDate;
     dateFormat?: IMomentDateFormat,
+    testID?: string;
+    defaultValue?: ICalendarDate;
+    locale?: string;
+    renderNavigationButtons?: boolean;
+    renderToggleDisplayViewButton?: boolean;
+    header?: JSX.Element;
+}
+export interface ICalendarMonthProps extends ICalendarBaseProps {
+    onChange?: (data: ICalendarMonth) => void;
+}
+export interface ICalendarYearProps extends ICalendarBaseProps {
+    onChange?: (data: ICalendarYear) => void;
+}
+export interface ICalendarHourProps extends ICalendarBaseProps {
+    onChange?: (data: ICalendarHour) => void;
+}
+export interface ICalendarDayProps extends ICalendarBaseProps {
     onChange?: (data: ICalendarDay) => void;
+    weekStartDay?: number;
 }
 // Define hour structure
 export interface ICalendarHour {
@@ -65,16 +79,6 @@ export interface ICalendarMonth {
     monthIndex: number,
 };
 
-export type ICalendarState = {
-    arrowCount: number,
-    displayView: ICalendarView,
-    hourView: ICalendarHour[],
-    dayView: ICalendarDay[][],
-    monthView: ICalendarMonth[][],
-    yearView: ICalendarYear[][],
-    startDate: Moment,
-}
-
 
 // Define calendar views
-export type ICalendarView = 'year' | 'month' | 'day' | "hour";
+export type ICalendarDisplayView = 'year' | 'month' | 'day' | "hour";

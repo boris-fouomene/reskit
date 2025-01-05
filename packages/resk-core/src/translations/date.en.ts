@@ -14,6 +14,12 @@ I18n.RegisterTranslations({
             "invalidDate": "Invalid date",
             "invalidTime": "Invalid time",
             "invalidDateTime": "Invalid date and time",
+            "today": "Today",
+            "yesterday": "Yesterday",
+            "tomorrow": "Tomorrow",
+            "selectedDate": "Selected date",
+            "selectedTime": "Selected time",
+            "selectedDateTime": "Selected date and time",
         }
     }
 });

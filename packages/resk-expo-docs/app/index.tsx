@@ -5,7 +5,7 @@ import { IField, IFieldMap } from "@resk/core";
 const index = withAppBar(() => {
     return (
         <ScrollView>
-            <Calendar />
+            <Calendar.Day />
             <Form
                 name="my-form"
                 onSubmit={({ data }) => {

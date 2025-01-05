@@ -597,7 +597,7 @@ export const DEFAULT_DATE_FORMATS = {
    * @description The format used to represent dates by default.
    */
   get date(): IMomentDateFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultDateFormat"), "DD/MM/YYYY HH:mm:ss") as unknown as IMomentDateFormat;
+    return defaultStr(i18n.getNestedTranslation("dates.defaultDateFormat"), "DD/MM/YYYY") as unknown as IMomentDateFormat;
   },
   /**
    * Get the default time format, according to the Moment.js library.

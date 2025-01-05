@@ -276,9 +276,11 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * i18n.resolveTranslation("en", "farewell");
      */
     getNestedTranslation(scope: Scope, locale?: string): string | IDict | undefined {
+        locale = defaultStr(locale, this.getLocale());
         const scopeArray = isNonNullString(scope) ? scope.trim().split(".") : Array.isArray(scope) ? scope : [];
         if (!scopeArray.length) return undefined;
         let result: any = this.getTranslations(locale);
+        const canLog = scope === "dates.defaultDateFormat";
         for (const k of scopeArray) {
             if (isObj(result)) {
                 result = result[k];

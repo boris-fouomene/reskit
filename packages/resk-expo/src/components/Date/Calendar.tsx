@@ -1,63 +1,37 @@
-import React from "react";
-import Component from "@utils/Component";
-import { View, TouchableOpacity, StyleSheet, Image, GestureResponderEvent } from "react-native";
-import moment from "moment/min/moment-with-locales";
-import { defaultStr, i18n, IMomentDateFormat, isObj } from "@resk/core";
-import { ICalendarDate, ICalendarDay, ICalendarHour, ICalendarMonth, ICalendarProps, ICalendarState, ICalendarYear } from "./types";
-import { Icon } from "@components/Icon";
+import React, { isValidElement, useEffect, useMemo, useState } from "react";
+import { View, StyleSheet, GestureResponderEvent } from "react-native";
+import moment, { Moment } from "moment/min/moment-with-locales";
+import { defaultStr, IMomentDateFormat } from "@resk/core";
+import { ICalendarBaseProps, ICalendarDate, ICalendarDay, ICalendarDayProps, ICalendarDisplayView, ICalendarHour, ICalendarMonth, ICalendarMonthProps, ICalendarYear, ICalendarYearProps } from "./types";
+import { Icon, IIconButtonProps } from "@components/Icon";
 import Label from "@components/Label";
+import { useI18n } from "@src/i18n/hooks";
 import { DEFAULT_DATE_FORMATS } from "@resk/core";
-import { Moment } from "moment";
 import { TouchableRipple } from "@components/TouchableRipple";
-import Theme, { Colors } from "@theme/index";
-import { Button } from "@components/Button";
+import Theme, { Colors, ITheme, useTheme } from "@theme/index";
+import { Button, IButtonProps } from "@components/Button";
 import { IStyle } from "@src/types";
+import { Surface } from "@components/Surface";
+import { Divider } from "@components/Divider";
+import { Menu } from "@components/Menu";
+import useStateCallback from "@utils/stateCallback";
 
-
-const days = ["lun", "mar", "mer", "jeu", "vend", "sam", "dim"];
-
-
-export default class Calendar extends Component<ICalendarProps, ICalendarState> {
-    static defaultProps: ICalendarProps = {};
-    constructor(props: ICalendarProps) {
-        super(props);
-        this.state = this.prepareState(props);
+export default class Calendar {
+    static getDefaultDateFormat(dateFormat?: IMomentDateFormat): IMomentDateFormat {
+        return defaultStr(dateFormat, DEFAULT_DATE_FORMATS.date) as IMomentDateFormat;
     }
-    getDefaultDateFormat() {
-        return defaultStr(this.props.dateFormat, DEFAULT_DATE_FORMATS.date, "D") as IMomentDateFormat;
+    /**
+    * Generate the headers for a week based on the start day.
+    * @param weekStartDay - The day of the week to start on (0 for Sunday, 1 for Monday, etc.).
+    * @returns An array of 7 strings representing the week headers, e.g., ["Sun", "Mon", ...].
+    */
+    static generateWeekHeaders(weekStartDay: number = 0): string[] {
+        weekStartDay = typeof weekStartDay === 'number' && (weekStartDay >= 0 && weekStartDay <= 6) ? weekStartDay : 0;
+        const daysOfWeek = moment.weekdaysShort(); // ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+        return [...daysOfWeek.slice(weekStartDay), ...daysOfWeek.slice(0, weekStartDay)];
     }
-    UNSAFE_componentWillReceiveProps(nextProps: Readonly<ICalendarProps>, nextContext: any): void {
-        if (nextProps.startDate !== this.props.startDate || nextProps.displayView !== this.props.displayView) {
-            this.setState(this.prepareState(nextProps));
-        }
-    }
-    prepareState(props?: ICalendarProps): ICalendarState {
-        props = isObj(props) ? props : this.props;
-        const stateObj = Object.assign({}, this.state);
-        const newState: Partial<ICalendarState> = {
-            startDate: (props && "startDate" in props) ? moment(props?.startDate) : stateObj.startDate || moment(),
-            displayView: (props && "displayView" in props) ? props?.displayView : stateObj.displayView,
-        };
-        const date = newState.startDate?.toDate();
-        switch (newState?.displayView) {
-            case "year":
-                newState.yearView = Calendar.generateYearView(date);
-                break;
-            case "month":
-                newState.monthView = Calendar.generateMonthView();
-                break;
-            case "hour":
-                newState.hourView = Calendar.generateHourView(date);
-                break;
-            default:
-                newState.displayView = "day";
-                newState.dayView = Calendar.generateDayView(date);
-        }
-        return newState as ICalendarState;
-    }
-
     // Generate a calendar matrix for a month
-    static generateDayView(startDate?: ICalendarDate, weekStartDay: number = 0): ICalendarDay[][] {
+    static generateDayView(startDate?: ICalendarDate, weekStartDay: number = 0, endDate?: ICalendarDate): ICalendarDay[][] {
         const startOfMonth = moment(startDate).startOf('month');
         const endOfMonth = moment(startDate).endOf('month');
         const startDayOfWeek = startOfMonth.day();
@@ -65,7 +39,6 @@ export default class Calendar extends Component<ICalendarProps, ICalendarState> 
 
         const calendarMatrix: ICalendarDay[][] = [];
         const currentDate = matrixStartDate.clone();
-
         for (let week = 0; week < 6; week++) {
             const weekRow: ICalendarDay[] = [];
             for (let day = 0; day < 7; day++) {
@@ -90,7 +63,6 @@ export default class Calendar extends Component<ICalendarProps, ICalendarState> 
             }
             calendarMatrix.push(weekRow);
         }
-
         return calendarMatrix;
     }
     /**
@@ -160,92 +132,259 @@ export default class Calendar extends Component<ICalendarProps, ICalendarState> 
         }
         return hourView;
     }
-    // Navigation functions
-    navigateToMonth(monthOffset: number, stateOptions?: Partial<ICalendarState>): Moment {
-        const newStartDate = this.state.startDate.clone().add(monthOffset, 'months');
-        this.setState(this.prepareState({ ...Object.assign({}, stateOptions), startDate: newStartDate.toDate() }));
-        return this.state.startDate;
-    }
-
-    handleOnPressOnMonthView = async (data: ICalendarMonth) => {
-        this.setState(this.prepareState({ startDate: this.state.startDate.month(data.month).toDate(), displayView: "day" }));
-    };
-    handleOnPressOnYearView = async (data: ICalendarYear) => {
-        this.setState(this.prepareState({ startDate: this.state.startDate.year(data.year).toDate(), displayView: "month" }));
-    };
-    handleOnPressOnHourView = async (data: ICalendarHour) => {
-        console.log("handleOnPressOnHourView", data);
-    };
-    handleOnPressOnDayView = async (data: ICalendarDay) => {
-        if (typeof this.props.onChange === "function") {
-            this.props.onChange(data);
-        }
-    }
-
-    renderCalendarContent() {
-        switch (this.state.displayView) {
-            case "year":
-                return this.renderYearView();
-            case "month":
-                return this.renderMonthView();
-            case "hour":
-                return this.renderHourView();
-            default:
-                return this.renderDayView();
-        }
-    }
-    renderMonthView() {
-        const testID = this.getTestID();
-        const currentMonth = this.state.startDate.month();
-        const isCurrentYear = this.state.startDate.year() === new Date().getFullYear();
-        return this.state.monthView.map((months, index) => {
-            const cTestID = `${testID}-${index}`;
-            return <View testID={cTestID + "-container"} key={index} style={Styles.calendarItemsContainer}>
-                <View testID={cTestID} key={index} style={Styles.calendarItemContainer}>
-                    {months.map((data, index) => {
-                        return this.renderViewItem({
-                            isActive: isCurrentYear && data.month === currentMonth,
-                            disabled: false,
-                            testID: cTestID + "-month-" + index,
-                            label: String(data.monthName),
-                            key: data.month,
-                            style: [Styles.calendarYearItem, data.disabled && Styles.disabled],
-                            onPress: () => this.handleOnPressOnMonthView(data),
-                        });
-                    })}
+    static Day: React.FC<ICalendarDayProps> = ({ weekStartDay, header, ...props }) => {
+        const theme = useTheme();
+        const testID = defaultStr(props.testID, "resk-calendar-day-view");
+        const { momentEndDate, i18n, locale, setState, navigateToNext, navigateToPrevious, dateFormat, state, momentDefaultValue } = useCommon(props, "day");
+        const { displayView } = state;
+        const start = moment(state.startDate);
+        const { dayView, dayHeaders } = useMemo(() => {
+            return {
+                dayView: Calendar.generateDayView(state.startDate, weekStartDay, state.endDate),
+                dayHeaders: Calendar.generateWeekHeaders(weekStartDay)
+            };
+        }, [state.startDate, state.endDate, weekStartDay]);
+        const toDayStr = moment().format(dateFormat);
+        const defaultValueStr = momentDefaultValue?.format(dateFormat) || "";
+        const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(start.toDate()) : undefined;
+        return Calendar.renderCalendar({
+            ...props,
+            testID,
+            header: <>
+                {isValidElement(header) ? header : null}
+                <View testID={testID + "-header-title"} style={Styles.dayViewHeader}>
+                    <Button compact tooltip={`${i18n.t("dates.today")}: ${toDayStr}`}
+                        onPress={() => {
+                            setState({
+                                ...state,
+                                startDate: moment().toDate()
+                            });
+                        }}
+                    >
+                        {toDayStr}
+                    </Button>
+                    {defaultValueStr ? <Button compact tooltip={`${i18n.t("dates.selectedDate")}: ${defaultValueStr}`}
+                        right={<Icon.Font name="material-clear" size={20} color={theme.colors.error}
+                            onPress={(e) => {
+                                setState({
+                                    ...state,
+                                    defaultValue: undefined,
+                                });
+                            }}
+                        />}
+                    >
+                        {defaultValueStr}
+                    </Button> : null}
                 </View>
-            </View>;
+            </>,
+            displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
+                label: displayView == "year" ? `${yearBoundaries?.start} - ${yearBoundaries?.end}` : displayView == "month" ? start.format("YYYY") : start.format("MMMM YYYY"),
+                disabled: displayView === "year",
+                onPress: () => {
+                    setState({ ...state, displayView: displayView === "month" ? "year" : "month" })
+                },
+                right: <Icon.Font name="chevron-down" size={20} color={theme.colors.primary} />
+            },
+            navNextIconProps: {
+                onPress: navigateToNext,
+            },
+            navPrevIconProps: {
+                onPress: navigateToPrevious
+            },
+            children: <>
+                {displayView == "month" ? <Calendar.Month
+                    startDate={start.toDate()}
+                    endDate={momentEndDate?.toDate()}
+                    defaultValue={momentDefaultValue?.toDate()}
+                    renderNavigationButtons={false}
+                    renderToggleDisplayViewButton={false}
+                    onChange={(data) => {
+                        setState({
+                            ...state,
+                            startDate: start.month(data.month).toDate(),
+                            displayView: "day",
+                        });
+                    }}
+                />
+                    : displayView === "year" ? <Calendar.Year
+                        startDate={start.toDate()}
+                        endDate={momentEndDate?.toDate()}
+                        defaultValue={momentDefaultValue?.toDate()}
+                        renderNavigationButtons={false}
+                        renderToggleDisplayViewButton={false}
+                        onChange={(data) => {
+                            setState({
+                                ...state,
+                                displayView: "month",
+                                startDate: start.year(data.year).toDate()
+                            });
+                        }}
+                    />
+                        : <>
+                            <View testID={testID + "-headers-label-container"} style={Styles.calendarItemsContainer}>
+                                <View testID={testID + "-headers-label"} style={Styles.calendarItemContainer}>
+                                    {dayHeaders.map((day, index) => {
+                                        return <View key={index} style={[Styles.calendarItem, Styles.calendarDayHeader]}>
+                                            <Label style={Styles.calendarDayHeaderLabel} textBold>{day}</Label>
+                                        </View>
+                                    })}
+                                </View>
+                            </View>
+                            {dayView.map((week, index) => {
+                                const cTestID = `${testID}-${index}`;
+                                return <View testID={cTestID + "-container"} key={index} style={Styles.calendarItemsContainer}>
+                                    <View testID={cTestID} key={index} style={Styles.calendarItemContainer}>
+                                        {week.map((day, index) => {
+                                            //const isDefault = defaultToCheck && (day.day === defaultToCheck.date());
+                                            return this.renderViewItem({
+                                                isActive: day.isToday,
+                                                theme,
+                                                disabled: !!day.disabled,
+                                                testID: cTestID + "-day-" + index,
+                                                label: String(day.day),
+                                                key: day.day,
+                                                onPress: () => {
+                                                    if (typeof props.onChange === "function") {
+                                                        props.onChange(day);
+                                                    }
+                                                },
+                                            });
+                                        })}
+                                    </View>
+                                </View>;
+                            })}
+                        </>
+                }
+            </>
         });
     }
-    renderYearView() {
-        const testID = this.getTestID();
+    static Month: React.FC<ICalendarMonthProps> = (props: ICalendarMonthProps) => {
+        const theme = useTheme();
+        const monthView = useMemo(() => {
+            return Calendar.generateMonthView();
+        }, [props?.startDate]);
+        const { state, setState, momentStartDate, momentEndDate, momentDefaultValue, navigateToNext, navigateToPrevious } = useCommon(props, "month");
+        const { displayView } = state;
+        const start = moment(state.startDate);
+        const testID = defaultStr(props?.testID, "resk-calendar-month-view");
+        const currentMonth = moment().month();
+        const isCurrentYear = moment().year() === new Date().getFullYear();
+        const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(start.toDate()) : undefined;
+        return Calendar.renderCalendar({
+            testID,
+            navNextIconProps: {
+                onPress: navigateToNext,
+            },
+            navPrevIconProps: {
+                onPress: navigateToPrevious
+            },
+            ...props,
+            displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
+                label: displayView == "year" ? `${yearBoundaries?.start} - ${yearBoundaries?.end}` : start.format("YYYY"),
+                disabled: displayView === "year",
+                onPress: () => {
+                    setState({ ...state, displayView: displayView === "month" ? "year" : "month" })
+                },
+                right: <Icon.Font name="chevron-down" size={20} color={theme.colors.primary} />
+            },
+            children: <>
+                {displayView == "year" ? <Calendar.Year
+                    startDate={start.toDate()}
+                    endDate={momentEndDate?.toDate()}
+                    defaultValue={momentDefaultValue?.toDate()}
+                    renderNavigationButtons={false}
+                    renderToggleDisplayViewButton={false}
+                    onChange={(data) => {
+                        setState({
+                            ...state,
+                            displayView: "month",
+                            startDate: start.year(data.year).toDate()
+                        });
+                    }}
+                /> : <>
+                    {monthView.map((months, index) => {
+                        const cTestID = `${testID}-${index}`;
+                        return <View testID={cTestID + "-container"} key={index} style={Styles.calendarItemsContainer}>
+                            <View testID={cTestID} key={index} style={Styles.calendarItemContainer}>
+                                {months.map((data, index) => {
+                                    return this.renderViewItem({
+                                        isActive: isCurrentYear && data.month === currentMonth,
+                                        disabled: false,
+                                        theme,
+                                        testID: cTestID + "-month-" + index,
+                                        label: String(data.monthName),
+                                        size: 80,
+                                        margin: 9,
+                                        key: data.month,
+                                        style: [Styles.calendarYearItem, data.disabled && Styles.disabled],
+                                        onPress: () => {
+                                            if (typeof props?.onChange === "function") {
+                                                props?.onChange(data);
+                                            }
+                                        },
+                                    });
+                                })}
+                            </View>
+                        </View>;
+                    })}
+                </>}
+            </>
+        });
+    };
+    static Year: React.FC<ICalendarYearProps> = (props) => {
+        const theme = useTheme();
+        const yearView = useMemo(() => {
+            return Calendar.generateYearView(props?.startDate);
+        }, [props?.startDate]);
+        const momentStartDate = moment(props?.startDate);
+        const { start, end } = Calendar.getYearsBoundaries(momentStartDate.toDate());
+        const testID = defaultStr(props?.testID, "resk-calendar-year-view");
         const currentYear = new Date().getFullYear();
-        return this.state.yearView.map((years, index) => {
-            const cTestID = `${testID}-${index}`;
-            return <View testID={cTestID + "-container"} key={index} style={Styles.calendarItemsContainer}>
-                <View testID={cTestID} key={index} style={Styles.calendarItemContainer}>
-                    {years.map((data, index) => {
-                        return this.renderViewItem({
-                            isActive: currentYear === data.year,
-                            disabled: false,
-                            testID: cTestID + "-year-" + index,
-                            label: String(data.year),
-                            key: data.year,
-                            style: Styles.calendarYearItem,
-                            onPress: () => this.handleOnPressOnYearView(data),
-                        });
-                    })}
-                </View>
-            </View>;
+        return Calendar.renderCalendar({
+            testID,
+            navNextIconProps: {},
+            navPrevIconProps: {},
+            ...props,
+            displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
+                label: `${start} - ${end}`,
+                disabled: true,
+            },
+            children: <>
+                {yearView.map((years, index) => {
+                    const cTestID = `${testID}-${index}`;
+                    return <View testID={cTestID + "-container"} key={index} style={Styles.calendarItemsContainer}>
+                        <View testID={cTestID} key={index} style={Styles.calendarItemContainer}>
+                            {years.map((data, index) => {
+                                return this.renderViewItem({
+                                    isActive: currentYear === data.year,
+                                    disabled: false,
+                                    theme,
+                                    testID: cTestID + "-year-" + index,
+                                    label: String(data.year),
+                                    key: data.year,
+                                    size: 80,
+                                    margin: 9,
+                                    style: Styles.calendarYearItem,
+                                    onPress: () => {
+                                        if (typeof props?.onChange === "function") {
+                                            props?.onChange(data);
+                                        }
+                                    },
+                                });
+                            })}
+                        </View>
+                    </View>;
+                })}
+            </>,
         });
     }
-    getTestID(): string {
-        return `resk-calendar-${this.state.displayView}`;
-    }
-    getIconSize(): number {
+    static getIconSize(): number {
         return 24;
     }
-    renderViewItem({ isActive, disabled, onPress, label, testID, key, style }: { style?: IStyle, isActive: boolean, onPress: (e: GestureResponderEvent) => void, disabled: boolean, testID: string, label: string, key: number | string }) {
+    private static renderViewItem({ isActive, theme, size, margin, disabled, onPress, label, testID, key, style }: { style?: IStyle, margin?: number, isActive: boolean, onPress: (e: GestureResponderEvent) => void, disabled: boolean, theme?: ITheme, size?: number, testID: string, label: string, key: number | string }) {
+        theme = theme || Theme;
+        margin = typeof margin === "number" && margin || 8;
+        size = typeof size == "number" && size || 40;
         return (
             <TouchableRipple
                 testID={testID}
@@ -256,7 +395,9 @@ export default class Calendar extends Component<ICalendarProps, ICalendarState> 
                 style={[
                     Styles.calendarItem, isActive && {
                         backgroundColor: Theme.colors.primary
-                    }, style
+                    }
+                    , { width: size, height: size, marginHorizontal: margin, marginVertical: margin }
+                    , style,
                 ]}
             >
                 <Label textBold={isActive} color={isActive ? Theme.colors.onPrimary : undefined} disabled={disabled} testID={testID + "-label"}>
@@ -265,136 +406,68 @@ export default class Calendar extends Component<ICalendarProps, ICalendarState> 
             </TouchableRipple>
         );
     }
-    renderDayView() {
-        const testID = this.getTestID();
-        return this.state.dayView.map((week, index) => {
-            const cTestID = `${testID}-${index}`;
-            return <View testID={cTestID + "-container"} key={index} style={Styles.calendarItemsContainer}>
-                <View testID={cTestID} key={index} style={Styles.calendarItemContainer}>
-                    {week.map((day, index) => {
-                        return this.renderViewItem({
-                            isActive: day.isToday,
-                            disabled: !!day.disabled,
-                            testID: cTestID + "-day-" + index,
-                            label: String(day.day),
-                            key: day.day,
-                            onPress: () => this.handleOnPressOnDayView(day),
-                        });
-                    })}
-                </View>
-            </View>;
-        });
-    }
-    renderHourView() {
-        return this.state.hourView.map((hour, index) => {
-            return null;
-        });
-    }
-    renderHeaderText() {
-        const currentDate = this.state.startDate;
-        switch (this.state.displayView) {
-            case "year":
-                const { start, end } = Calendar.getYearsBoundaries(currentDate.toDate());
-                return `${start} - ${end}`;
-            case "month":
-                return currentDate.format("MMMM YYYY");
-            case "hour":
-                return currentDate.format("DD MMMM YYYY");
-            default:
-                return currentDate.format("MMMM YYYY");
+    static renderCalendar({ testID, children, borderRadius, renderNavigationButtons, footer, header, displayViewToggleButton, navNextIconProps, navPrevIconProps }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, borderRadius?: number, navNextIconProps?: IIconButtonProps, navPrevIconProps?: IIconButtonProps, footer?: JSX.Element }) {
+        testID = defaultStr(testID, "resk-calendar");
+        navNextIconProps = Object.assign({}, navNextIconProps);
+        navPrevIconProps = Object.assign({}, navPrevIconProps);
+        borderRadius = typeof borderRadius === "number" ? borderRadius : 0;
+        const isValidHeader = isValidElement(header);
+        const canDisplayHeader = isValidHeader || renderNavigationButtons !== false || displayViewToggleButton !== false;
+        if (typeof displayViewToggleButton === "boolean") {
+            displayViewToggleButton = {};
         }
-    }
-    handlePressOnHeaderLabel() {
-        switch (this.state.displayView) {
-            case "year":
-                //we change the view to month
-                break;
-            case "month":
-                //we change the view to year
-                this.setState(this.prepareState({ displayView: "year" }));
-                break;
-            case "day":
-                //we change the view to month
-                //we change the view to year
-                this.setState(this.prepareState({ displayView: "month" }));
-                break;
-            default:
-                break;
-        }
-    }
-    navigateToYear(amount: number) {
-        this.setState(this.prepareState({ startDate: this.state.startDate.add(amount, "years").toDate() }));
-    }
-    navigateToNext() {
-        switch (this.state.displayView) {
-            case "year":
-                const { end } = Calendar.getYearsBoundaries(this.state.startDate.toDate());
-                this.setState(this.prepareState({ startDate: this.state.startDate.year(end).toDate() }));
-                break;
-            case "month":
-                this.navigateToYear(1);
-                break;
-            default:
-                this.navigateToMonth(1);
-        }
-    }
-    navigateToPrevious() {
-        switch (this.state.displayView) {
-            case "year":
-                const { start, end } = Calendar.getYearsBoundaries(this.state.startDate.toDate());
-                this.setState(this.prepareState({ startDate: this.state.startDate.year(start).toDate() }));
-                break;
-            case "month":
-                this.navigateToYear(-1);
-                break;
-            default:
-                this.navigateToMonth(-1);
-                break;
-        }
-    }
-    render() {
-        const testID = this.getTestID();
-        return (
-            <View testID={testID} style={Styles.calendar}>
-                <View testID={testID + "-header"} style={Styles.header}>
-                    <View testID={`${testID}-header-content-container`} style={Styles.headerContentContainer}>
-                        <Button compact testID={testID + "-header-text"}
-                            onPress={this.handlePressOnHeaderLabel.bind(this)}
-                            style={Styles.headerText}
-                            containerProps={{ style: Styles.headerTextContainer }}
-                            disabled={this.state.displayView === "year"}
-                        >
-                            {this.renderHeaderText()}
-                        </Button>
-                        <View testID={testID + "-header-arrow-container"} style={Styles.headerArrowContainer}>
-                            <Icon.Button
-                                iconName="chevron-left"
-                                size={this.getIconSize()}
-                                onPress={this.navigateToPrevious.bind(this)}
-                                testID={testID + "-header-arrow-left"}
-                            />
-                            <Icon.Button
-                                iconName="chevron-right"
-                                size={this.getIconSize()}
-                                onPress={this.navigateToNext.bind(this)}
-                                testID={testID + "-header-arrow-right"}
-                            />
-                        </View>
-                    </View>
-                </View>
-                <View testID={testID + "-content"} style={Styles.content}>
-                    {this.renderCalendarContent()}
-                </View>
-                <View testID={testID + "-footer"} style={Styles.footer}>
-
-                </View>
+        return <Surface testID={testID} style={[Styles.calendar, { borderRadius }]}>
+            {canDisplayHeader ? <View testID={testID + "-header"} style={Styles.header}>
+                {isValidHeader ? <>
+                    {header}
+                    <Divider style={Styles.headerDivider} />
+                </> : null}
+                {<View testID={`${testID}-header-content-container`} style={Styles.headerContentContainer}>
+                    {isValidElement(displayViewToggleButton) ? displayViewToggleButton : <Button compact
+                        testID={testID + "-header-text"}
+                        {...Object.assign({}, displayViewToggleButton)}
+                        style={[Styles.displayViewToggleButton, (displayViewToggleButton as any)?.style]}
+                        containerProps={{ style: Styles.headerButtonContainer }}
+                    />}
+                    {renderNavigationButtons !== false ? <View testID={testID + "-header-arrow-container"} style={Styles.headerArrowContainer}>
+                        <Icon.Button
+                            iconName="chevron-left"
+                            size={Calendar.getIconSize()}
+                            testID={testID + "-header-arrow-left"}
+                            {...navPrevIconProps}
+                        />
+                        <Icon.Button
+                            iconName="chevron-right"
+                            size={Calendar.getIconSize()}
+                            testID={testID + "-header-arrow-right"}
+                            {...navNextIconProps}
+                        />
+                    </View> : null}
+                </View>}
+            </View> : null}
+            <View testID={testID + "-content"} style={Styles.content}>
+                {isValidElement(children) ? children : null}
             </View>
-        );
+            {footer ? <View testID={testID + "-footer"} style={Styles.footer}>
+                {footer}
+            </View> : null}
+        </Surface>
     }
 }
 
 
 const Styles = StyleSheet.create({
+    headerDivider: {
+        width: "100%",
+    },
+    dayViewHeader: {
+        width: "100%",
+        paddingHorizontal: 7,
+        paddingVertical: 7,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+    },
     disabled: {
         opacity: 0.65,
     },
@@ -405,12 +478,16 @@ const Styles = StyleSheet.create({
         flexDirection: "column",
         alignItems: "center",
     },
+    calendarDayHeader: {},
+    calendarDayHeaderLabel: {
+        fontSize: 15
+    },
     header: {
         width: "100%",
     },
-    headerText: {
+    displayViewToggleButton: {
     },
-    headerTextContainer: {
+    headerButtonContainer: {
         marginHorizontal: 7,
     },
     headerContentContainer: {
@@ -433,17 +510,20 @@ const Styles = StyleSheet.create({
         alignSelf: "center",
     },
     calendarItem: {
-        height: 40,
-        width: 40,
+        flexBasis: 0,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
         alignSelf: "center",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: 20,
+        borderRadius: "50%",
+        marginHorizontal: 8,
+        marginVertical: 8,
+        width: 40,
+        height: 40,
     },
     calendarYearItem: {
-        height: 60,
-        width: 60,
-        borderRadius: 30,
+
     },
     footer: {
         width: "100%",
@@ -453,6 +533,7 @@ const Styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: "center",
         alignSelf: "center",
+        padding: 10,
     },
     dateComponentYearText: {
         fontSize: 20
@@ -461,3 +542,96 @@ const Styles = StyleSheet.create({
         flex: 1, flexDirection: "row", marginTop: 10
     }
 })
+
+type ICalendarCommonState = { startDate?: ICalendarDate, endDate?: ICalendarDate, defaultValue?: ICalendarDate, displayView?: ICalendarDisplayView };
+function useCommon(props: ICalendarBaseProps, displayView?: ICalendarDisplayView) {
+    const i18n = useI18n();
+    const i18nLocale = i18n.getLocale();
+    const locale = defaultStr(props?.locale, i18n.getLocale());
+    const isDayView = displayView === "day", isMonthView = displayView === "month", isYearView = displayView === "year", isHourView = displayView === "hour";
+    const [state, setState] = useStateCallback<ICalendarCommonState>({
+        startDate: props.startDate,
+        endDate: props.endDate,
+        defaultValue: props.defaultValue,
+        displayView,
+    });
+    const start = moment(state.startDate);
+    useMemo(() => {
+        if (i18nLocale === locale) return;
+        moment.locale(locale);
+    }, [locale, i18nLocale]);
+    const momentStartDate = useMemo(() => {
+        return state?.startDate ? moment(state?.startDate) : undefined;
+    }, [state?.startDate]);
+    const momentEndDate = useMemo(() => {
+        return state?.endDate ? moment(state?.endDate) : undefined;
+    }, [state?.endDate]);
+    const momentDefaultValue = useMemo(() => {
+        return state?.defaultValue ? moment(state?.defaultValue) : undefined;
+    }, [state?.defaultValue]);
+    const dateFormat = defaultStr(props?.dateFormat, DEFAULT_DATE_FORMATS.date) as IMomentDateFormat;
+    useEffect(() => {
+        const newState = { ...state };
+        const hasUpdate = props?.startDate != newState.startDate || props?.endDate != newState.endDate || props?.defaultValue != state.defaultValue;
+        if (props?.startDate != state.startDate) {
+            newState.startDate = props?.startDate;
+        }
+        if (props?.endDate != state.endDate) {
+            newState.endDate = props?.endDate;
+        }
+        if (props?.defaultValue != state.defaultValue) {
+            newState.defaultValue = props?.defaultValue;
+        }
+        if (hasUpdate) {
+            setState(newState);
+        }
+    }, [props?.startDate, props?.endDate, state.defaultValue]);
+    return {
+        i18n,
+        locale,
+        dateFormat,
+        momentStartDate,
+        momentEndDate,
+        momentDefaultValue,
+        state,
+        setState,
+        navigateToNext: (event?: GestureResponderEvent) => {
+            let startDate: Date = start.toDate();
+            switch (state.displayView) {
+                case "year":
+                    const { end } = Calendar.getYearsBoundaries(start.toDate());
+                    startDate = start.clone().year(end).toDate();
+                    break;
+                case "month":
+                    startDate = start.clone().add(1, 'year').toDate();
+                    break;
+                default:
+                    startDate = start.clone().add(1, 'month').toDate();
+                    break;
+            }
+            setState({
+                ...state,
+                startDate
+            });
+        },
+        navigateToPrevious: (event?: GestureResponderEvent) => {
+            let startDate: Date = start.toDate();
+            switch (state.displayView) {
+                case "year":
+                    const { start: startBoundary } = Calendar.getYearsBoundaries(start.toDate());
+                    startDate = start.clone().year(startBoundary).toDate();
+                    break;
+                case "month":
+                    startDate = start.clone().subtract(1, 'year').toDate();
+                    break;
+                default:
+                    startDate = start.clone().subtract(1, 'month').toDate();
+                    break;
+            }
+            setState({
+                ...state,
+                startDate,
+            });
+        }
+    }
+}

@@ -474,7 +474,8 @@ const Styles = StyleSheet.create({
         width: "100%",
     },
     swiper: {
-        width: 392,
+        maxWidth: 392,
+        flexGrow : 0,
     },
     dayViewHeader: {
         width: "100%",

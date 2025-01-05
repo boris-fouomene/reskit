@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef} from "react";
 import Platform from "@platform";
 import {
     Animated,
@@ -9,24 +9,28 @@ import {
 const useNativeDriver = Platform.isMobileNative();
 
 export const useAnimations = ({ disableRipple, rippleColor, testID }: { disableRipple?: boolean, rippleColor?: string, testID?: string }) => {
-    const rippleOpacity = useRef(new Animated.Value(0)).current;
+    const rippleOpacity = useRef(new Animated.Value(0.12)).current;
+    const scaleValue = useRef(new Animated.Value(0.01)).current;
     const fadeIn = () => {
         if (disableRipple) return;
-        Animated.timing(rippleOpacity, {
+        Animated.timing(scaleValue, {
             toValue: 1,
-            duration: 200,
-            easing: Easing.out(Easing.ease),
+            duration: 300,
+            easing: Easing.bezier(0.0, 0.0, 0.2, 1),
             useNativeDriver,
         }).start();
     };
     const fadeOut = () => {
         if (disableRipple) return;
-        Animated.timing(rippleOpacity, {
+        Animated.timing(rippleOpacity,{
             toValue: 0,
             duration: 300,
             easing: Easing.out(Easing.ease),
             useNativeDriver,
-        }).start();
+        }).start(() => {
+            scaleValue.setValue(0.01);
+            rippleOpacity.setValue(0.12);
+        });
     };
     return {
         fadeIn, fadeOut, rippleContent: disableRipple ? null : <Animated.View
@@ -34,7 +38,9 @@ export const useAnimations = ({ disableRipple, rippleColor, testID }: { disableR
             style={[
                 StyleSheet.absoluteFillObject,
                 styles.ripple,
-                { backgroundColor: rippleColor, opacity: rippleOpacity },
+                { backgroundColor: rippleColor,
+                 transform: [{ scale: scaleValue }], 
+                 opacity: rippleOpacity },
             ]}
         />
     };

@@ -364,7 +364,7 @@ export const useTextInput = ({ defaultValue, opacity, isDropdownAnchor, secureTe
         placeholder: placeholder,
         testID: testID,
         readOnly: editable === false,
-        editable: isDropdownAnchor ? false : editable,
+        editable,
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: [
             styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null),

@@ -254,7 +254,7 @@ const getContainerAndContentStyle = ({ isFocused, isLabelEmbededVariant, textCol
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, opacity, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -364,14 +364,14 @@ export const useTextInput = ({ defaultValue, opacity, secureTextEntryGetToggleIc
         placeholder: placeholder,
         testID: testID,
         readOnly: editable === false,
-        editable,
+        editable: isDropdownAnchor ? false : editable,
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: [
             styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null),
             styles.input, inputStyle,
             props.style,
             disabledOrEditStyle,
-            props.isDropdownAnchor && editable && styles.dropdownAnchorInput,
+            isDropdownAnchor && editable && styles.dropdownAnchorInput,
         ],
         value: inputValue,
         inputMode: inputMode,

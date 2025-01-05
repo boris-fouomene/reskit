@@ -1,8 +1,7 @@
 import { IDict, IPrimitive } from "../types";
 import { isPlainObject, isRegExp, merge } from "lodash";
 import isPrimitive from "./isPrimitive";
-import { isDateObj } from "./date";
-import stringify from "./stringify";
+import isDateObj from "./isDateObj";
 
 /**
  * Checks if the given variable is a plain object.

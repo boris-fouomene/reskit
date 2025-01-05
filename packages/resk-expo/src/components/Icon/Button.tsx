@@ -118,6 +118,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
         }
         const icon = useGetIcon<IIconProps>({
             as: TouchableRipple,
+            rippleSize:size,
             ...rest, icon: source || iconName || undefined, testID,
             color: iconColor,
             disabled, size,

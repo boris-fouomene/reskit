@@ -68,6 +68,19 @@ import { PressableAndroidRippleConfig, PressableProps } from 'react-native';
 export interface ITouchableRippleProps extends PressableProps {
     /** Color of the ripple effect. Default is 'rgba(0, 0, 0, 0.12)' */
     rippleColor?: string;
+    /***
+     * Opacity of the ripple effect
+     */
+    rippleOpacity?: number;
+    /**
+     * Duration of the ripple effect
+     */
+    rippleDuration?: number;
+
+    /***
+     * Size of the ripple effect
+     */
+    rippleSize?: number;
     /** Background color of the component. Default is 'transparent' */
     hoverColor?: string;
 

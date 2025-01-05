@@ -5,11 +5,13 @@ import {
     StyleSheet,
     Pressable,
     View,
+    LayoutChangeEvent,
 } from 'react-native';
 import Theme, { Colors, useTheme } from '@theme';
 import Platform from '@platform/index';
 import { ITouchableRippleProps } from './types';
 import { getColors } from './utils';
+import { mergeRefs } from '@utils/mergeRefs';
 
 export * from "./types";
 
@@ -97,12 +99,17 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
     testID,
     borderless,
     borderRadius,
+    rippleDuration,
+    rippleSize,
+    rippleOpacity,
     ...props
 }, ref) => {
     const theme = useTheme();
+    const buttonRef = useRef<View>(null);
+    const buttonLayoutRef = useRef<LayoutChangeEvent>(null);
     const { rippleColor, hoverColor } = getColors({ rippleColor: customRippleColor, hoverColor: customHoverColor, theme });
     testID = defaultStr(testID, "resk-touchable-ripple");;
-    const { fadeIn, fadeOut, rippleContent } = useAnimations({ disableRipple, rippleColor, testID: testID + "-ripple-effect" });
+    const { fadeIn, startRipple, fadeOut, rippleContent } = useAnimations({ disableRipple, buttonRef, buttonLayoutRef, rippleDuration, rippleOpacity, rippleSize, rippleColor, testID: testID + "-ripple-effect" });
     const { webStyle } = useMemo(() => {
         return {
             webStyle: !isAndroid ? [typeof borderRadius === "number" && { borderRadius } || null] : null
@@ -112,23 +119,30 @@ export const TouchableRipple = React.forwardRef<View, ITouchableRippleProps>(({
         <Pressable
             onPress={onPress}
             disabled={disabled}
-            ref={ref}
+            ref={mergeRefs(ref, buttonRef)}
             {...props}
+            onLayout={(event) => {
+                (buttonLayoutRef as any).current = event;
+                if (typeof props.onLayout == "function") {
+                    props.onLayout(event);
+                }
+            }}
             android_ripple={disableRipple ? undefined : Object.assign({
                 color: rippleColor,
                 borderless,
                 radius: borderRadius,
+                duration: rippleDuration,
             }, props.android_ripple)}
             onPressOut={(event) => {
                 if (disabled) return;
-                typeof fadeOut == "function" && fadeOut();
+                !disableRipple && typeof fadeOut == "function" && fadeOut(event);
                 if (typeof props.onPressOut == "function") {
                     props.onPressOut(event);
                 }
             }}
             onPressIn={(event) => {
                 if (disabled) return;
-                typeof fadeIn == "function" && fadeIn();
+                !disableRipple && typeof fadeIn == "function" && fadeIn(event);
                 if (typeof props.onPressIn == "function") {
                     props.onPressIn(event);
                 }

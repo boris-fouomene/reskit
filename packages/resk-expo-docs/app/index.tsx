@@ -5,7 +5,9 @@ import { IField, IFieldMap } from "@resk/core";
 const index = withAppBar(() => {
     return (
         <ScrollView>
-            <Calendar.Day />
+            <Button>
+                Hello Button
+            </Button>
             <Form
                 name="my-form"
                 onSubmit={({ data }) => {
@@ -171,6 +173,8 @@ const index = withAppBar(() => {
                     </View>
                 </Expandable>
                 <ModalExample />
+
+                <Calendar.Day />
             </View>
         </ScrollView>
     )

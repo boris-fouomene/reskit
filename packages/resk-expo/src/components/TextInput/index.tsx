@@ -71,7 +71,7 @@ import { TouchableRipple } from "@components/TouchableRipple";
  * The `TextInput` component is designed to be versatile and reusable across various parts of an application, ensuring a consistent and engaging user experience. 
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
-const TextInput = React.forwardRef(({ isDropdownAnchor, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
+const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
     const { variant, containerProps, onPress, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, right, label, ...rest } = useTextInput(props);
     const leftContainerProps = Object.assign({}, cLeftContainerProps);
     const isLabelEmbededVariant = variant === "labelEmbeded";
@@ -82,7 +82,7 @@ const TextInput = React.forwardRef(({ isDropdownAnchor, ...props }: ITextInputPr
             innerRef.current.focus();
         }
     }}>{label}</Pressable> : label;
-    const canWrapWithTouchable = isDropdownAnchor && editable;
+    const canWrapWithTouchable = props.isDropdownAnchor && editable;
     const Wrapper = canWrapWithTouchable ? TouchableRipple : React.Fragment;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
     const wrapperProps = canWrapWithTouchable ? pressableProps : undefined;
@@ -366,7 +366,13 @@ export const useTextInput = ({ defaultValue, opacity, secureTextEntryGetToggleIc
         readOnly: editable === false,
         editable,
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
-        style: [styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null), styles.input, inputStyle, props.style, disabledOrEditStyle],
+        style: [
+            styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null),
+            styles.input, inputStyle,
+            props.style,
+            disabledOrEditStyle,
+            props.isDropdownAnchor && editable && styles.dropdownAnchorInput,
+        ],
         value: inputValue,
         inputMode: inputMode,
         onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
@@ -426,6 +432,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
         marginHorizontal: 5,
         fontSize: 15
+    },
+    dropdownAnchorInput: {
+        cursor: "pointer",
     },
     dropdownAnchorContainer: {
         flexGrow: 1,

@@ -1,6 +1,6 @@
 import { IViewProps } from "@components/View";
 import { ReactNode } from "react";
-import { Animated } from "react-native";
+import { Animated, GestureResponderEvent } from "react-native";
 
 /**
  * Represents the properties for the Swiper component.
@@ -281,6 +281,15 @@ export interface ISwiperProps extends IViewProps {
     *                 ```
      */
     onChange?: (options: { index: number, prevIndex: number }) => any,
+
+    /***
+     * Callback function that is called when the gesturee state changes.
+     */
+    onPanResponderRelease?: (options: {
+        event: GestureResponderEvent, gesture: any
+        distance: number, correction: number, incrementIndex: number,
+        swipePosition: "left" | "right" | "center",
+    } & ISwiperState) => void;
 
     /***
      *  When true, fixes vertical bounces in Safari.

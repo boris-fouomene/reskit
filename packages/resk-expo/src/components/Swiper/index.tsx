@@ -391,6 +391,10 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
           this._spring({ x: 0, y: 0 });
         } else {
           this._changeIndex(incrementIndex);
+          const swipePosition = correction > 0 ? "right" : correction < 0 ? "left" : "center";
+          if (typeof this.props.onPanResponderRelease === "function") {
+            this.props.onPanResponderRelease({ ...this.state, swipePosition, distance, correction, incrementIndex, event: e, gesture });
+          }
         }
       },
     };

@@ -15,6 +15,7 @@ import { Surface } from "@components/Surface";
 import { Divider } from "@components/Divider";
 import { Menu } from "@components/Menu";
 import useStateCallback from "@utils/stateCallback";
+import { Swiper } from "@components/Swiper";
 
 export default class Calendar {
     static getDefaultDateFormat(dateFormat?: IMomentDateFormat): IMomentDateFormat {
@@ -185,12 +186,8 @@ export default class Calendar {
                 },
                 right: <Icon.Font name="chevron-down" size={20} color={theme.colors.primary} />
             },
-            navNextIconProps: {
-                onPress: navigateToNext,
-            },
-            navPrevIconProps: {
-                onPress: navigateToPrevious
-            },
+            navigateToNext,
+            navigateToPrevious,
             children: <>
                 {displayView == "month" ? <Calendar.Month
                     startDate={start.toDate()}
@@ -274,12 +271,8 @@ export default class Calendar {
         const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(start.toDate()) : undefined;
         return Calendar.renderCalendar({
             testID,
-            navNextIconProps: {
-                onPress: navigateToNext,
-            },
-            navPrevIconProps: {
-                onPress: navigateToPrevious
-            },
+            navigateToNext,
+            navigateToPrevious,
             ...props,
             displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
                 label: displayView == "year" ? `${yearBoundaries?.start} - ${yearBoundaries?.end}` : start.format("YYYY"),
@@ -346,12 +339,8 @@ export default class Calendar {
         return Calendar.renderCalendar({
             testID,
             ...props,
-            navNextIconProps: {
-                onPress: navigateToNext,
-            },
-            navPrevIconProps: {
-                onPress: navigateToPrevious,
-            },
+            navigateToNext,
+            navigateToPrevious,
             displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
                 label: `${start} - ${end}`,
                 disabled: true,
@@ -413,15 +402,14 @@ export default class Calendar {
             </TouchableRipple>
         );
     }
-    static renderCalendar({ testID, children, renderNavigationButtons, footer, header, displayViewToggleButton, navNextIconProps, navPrevIconProps, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, navNextIconProps?: IIconButtonProps, navPrevIconProps?: IIconButtonProps, footer?: JSX.Element }) {
+    static renderCalendar({ testID, children, navigateToNext, navigateToPrevious, renderNavigationButtons, footer, header, displayViewToggleButton, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, footer?: JSX.Element, navigateToNext?: (event?: GestureResponderEvent) => void, navigateToPrevious?: (event?: GestureResponderEvent) => void, header?: JSX.Element }) {
         testID = defaultStr(testID, "resk-calendar");
-        navNextIconProps = Object.assign({}, navNextIconProps);
-        navPrevIconProps = Object.assign({}, navPrevIconProps);
         const isValidHeader = isValidElement(header);
         const canDisplayHeader = isValidHeader || renderNavigationButtons !== false || displayViewToggleButton !== false;
         if (typeof displayViewToggleButton === "boolean") {
             displayViewToggleButton = {};
         }
+        const canSwipe = typeof navigateToNext === "function" || typeof navigateToPrevious === "function";
         return <Surface elevation={5} {...props} testID={testID} style={[Styles.calendar, props.style]}>
             {canDisplayHeader ? <View testID={testID + "-header"} style={Styles.header}>
                 {isValidHeader ? <>
@@ -440,20 +428,39 @@ export default class Calendar {
                             iconName="chevron-left"
                             size={Calendar.getIconSize()}
                             testID={testID + "-header-arrow-left"}
-                            {...navPrevIconProps}
+                            onPress={(event) => {
+                                if (typeof navigateToPrevious === "function") {
+                                    navigateToPrevious(event);
+                                }
+                            }}
                         />
                         <Icon.Button
                             iconName="chevron-right"
                             size={Calendar.getIconSize()}
                             testID={testID + "-header-arrow-right"}
-                            {...navNextIconProps}
+                            onPress={(event) => {
+                                if (typeof navigateToNext === "function") {
+                                    navigateToNext(event);
+                                }
+                            }}
                         />
                     </View> : null}
                 </View>}
             </View> : null}
-            <View testID={testID + "-content"} style={Styles.content}>
-                {isValidElement(children) ? children : null}
-            </View>
+            <Swiper vertical={false} testID={testID + "-swiper"}
+                style={[Styles.swiper]}
+                gesturesEnabled={() => canSwipe}
+                onPanResponderRelease={({ event, gesture, swipePosition, correction, distance, incrementIndex, ...rest }) => {
+                    const cb = swipePosition == "left" ? navigateToPrevious : swipePosition == "right" ? navigateToNext : undefined;
+                    if (typeof cb === "function") {
+                        cb();
+                    }
+                }}
+            >
+                <View testID={testID + "-content"} style={Styles.content}>
+                    {isValidElement(children) ? children : null}
+                </View>
+            </Swiper>
             {footer ? <View testID={testID + "-footer"} style={Styles.footer}>
                 {footer}
             </View> : null}
@@ -465,6 +472,9 @@ export default class Calendar {
 const Styles = StyleSheet.create({
     headerDivider: {
         width: "100%",
+    },
+    swiper: {
+        width: 392,
     },
     dayViewHeader: {
         width: "100%",

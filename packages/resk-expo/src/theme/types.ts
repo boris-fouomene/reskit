@@ -218,6 +218,7 @@ export interface ITheme {
    * A low roundness value results in sharper corners, while a higher value makes the corners more rounded.
    */
   colors: IThemeColorsTokens;
+
 }
 
 /**

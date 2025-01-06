@@ -30,3 +30,4 @@ export * from "./Drawer";
 export * from "./Form";
 export * from "./Dropdown";
 export * from "./Date";
+export * from "./ProgressBar";

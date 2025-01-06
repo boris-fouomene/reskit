@@ -23,6 +23,7 @@ import { IStyle } from "@src/types";
 import { useI18n } from "@src/i18n/hooks";
 import { AppBar } from "@components/AppBar";
 import { Divider } from "@components/Divider";
+import { ProgressBar } from "@components/ProgressBar";
 
 /**
  * Represents a dropdown component that allows users to select one or more items from a list.
@@ -393,7 +394,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         return actions;
     }, [dropdownActions, multiple, context?.isOpen(), context, anchorSelectedText]);
     context.dropdownActions = actions;
-    const loadingContent = null;///isLoading ? <ProgressBar color={theme.colors.secondary} indeterminate testID={testID + "_DropdownProgressBar"} /> : null;
+    const loadingContent = isLoading ? <ProgressBar color={theme.colors.secondary} indeterminate testID={testID + "dropdown-progressbar"} /> : null;
     return <DropdownContext.Provider value={context}>
         <Menu
             testID={testID + "-dropdown-menu"}

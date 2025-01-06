@@ -107,6 +107,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
         size = typeof size == "number" ? size : DEFAULT_FONT_ICON_SIZE;
         const iconColor = Colors.isValid(color) ? color : theme.colors.text;
         containerSize = typeof containerSize == "number" ? containerSize : (size + 2 * PADDING);
+        rippleProps.rippleSize = typeof rippleProps.rippleSize == "number" ? rippleProps.rippleSize : containerSize;
         const {
             borderWidth = isLoading ? 0 : 0,
             borderRadius = containerSize / 2,
@@ -118,7 +119,6 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
         }
         const icon = useGetIcon<IIconProps>({
             as: TouchableRipple,
-            rippleSize:size,
             ...rest, icon: source || iconName || undefined, testID,
             color: iconColor,
             disabled, size,

@@ -1,5 +1,5 @@
-import React, { isValidElement, useEffect, useMemo, useState } from "react";
-import { View, StyleSheet, GestureResponderEvent } from "react-native";
+import React, { isValidElement, useEffect, useMemo, useRef, useState } from "react";
+import { View, StyleSheet, GestureResponderEvent, Animated, PanResponder } from "react-native";
 import moment, { Moment } from "moment/min/moment-with-locales";
 import { defaultStr, IMomentDateFormat } from "@resk/core";
 import { ICalendarBaseProps, ICalendarDate, ICalendarDay, ICalendarDayProps, ICalendarDisplayView, ICalendarHour, ICalendarMonth, ICalendarMonthProps, ICalendarYear, ICalendarYearProps } from "./types";
@@ -15,7 +15,7 @@ import { Surface } from "@components/Surface";
 import { Divider } from "@components/Divider";
 import { Menu } from "@components/Menu";
 import useStateCallback from "@utils/stateCallback";
-import { Swiper } from "@components/Swiper";
+import { SwipeGestureHandler } from "@components/Gesture";
 
 export default class Calendar {
     static getDefaultDateFormat(dateFormat?: IMomentDateFormat): IMomentDateFormat {
@@ -447,35 +447,33 @@ export default class Calendar {
                     </View> : null}
                 </View>}
             </View> : null}
-            <Swiper vertical={false} testID={testID + "-swiper"}
-                style={[Styles.swiper]}
-                gesturesEnabled={() => canSwipe}
-                onPanResponderRelease={({ event, gesture, swipePosition, correction, distance, incrementIndex, ...rest }) => {
-                    const cb = swipePosition == "left" ? navigateToPrevious : swipePosition == "right" ? navigateToNext : undefined;
+            <SwipeGestureHandler testID={testID + "-wipe-gesture"}
+                disabled={!canSwipe}
+                style={Styles.swipeGesture}
+                vertical={false}
+                onSwipe={({ direction, distance }) => {
+                    const cb = direction == "left" ? navigateToPrevious : direction == "right" ? navigateToNext : undefined;
                     if (typeof cb === "function") {
                         cb();
                     }
                 }}
             >
-                <View testID={testID + "-content"} style={Styles.content}>
+                <View testID={testID + "-content"} style={Styles.content} >
                     {isValidElement(children) ? children : null}
                 </View>
-            </Swiper>
+            </SwipeGestureHandler>
             {footer ? <View testID={testID + "-footer"} style={Styles.footer}>
                 {footer}
             </View> : null}
         </Surface>
     }
 }
-
-
 const Styles = StyleSheet.create({
     headerDivider: {
         width: "100%",
     },
-    swiper: {
-        maxWidth: 392,
-        flexGrow : 0,
+    swipeGesture: {
+
     },
     dayViewHeader: {
         width: "100%",

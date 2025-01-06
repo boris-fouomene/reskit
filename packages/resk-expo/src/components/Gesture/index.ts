@@ -1,0 +1,1 @@
+export { default as SwipeGestureHandler } from "./SwipeGesture";

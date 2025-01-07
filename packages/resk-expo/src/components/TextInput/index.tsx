@@ -160,7 +160,7 @@ const getContainerAndContentStyle = ({ isFocused, compact, isLabelEmbededVariant
     if (compact) {
         inputStyle.push(styles.compact);
         contentContainerStyle.push(styles.compact);
-        labelStyle.push(styles.compact);
+        //labelStyle.push(styles.compact);
     }
     return { containerStyle, contentContainerStyle, inputStyle, labelStyle }
 }
@@ -259,7 +259,7 @@ const getContainerAndContentStyle = ({ isFocused, compact, isLabelEmbededVariant
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -353,7 +353,7 @@ export const useTextInput = ({ defaultValue, opacity, isDropdownAnchor, secureTe
     }, [isPasswordField, secureTextEntryGetToggleIconProps, isSecure]);
     const secureIcon = isPasswordField ? <FontIcon size={25}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure) }} color={textColor} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
-    const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
+    const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     return {
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
@@ -376,6 +376,7 @@ export const useTextInput = ({ defaultValue, opacity, isDropdownAnchor, secureTe
             styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null),
             styles.input, { paddingVertical: padding },
             inputStyle,
+            compact && styles.compact,
             props.style,
             disabledOrEditStyle,
             isDropdownAnchor && editable && styles.dropdownAnchorInput,
@@ -461,11 +462,9 @@ const styles = StyleSheet.create({
         borderRightWidth: 0,
         borderRadius: 0,
         backgroundColor: 'transparent',
-        paddingHorizontal: 2,
+        paddingHorizontal: 5,
         flexGrow: 1,
         overflow: 'hidden',
-        paddingLeft: 5,
-        paddingRight: 5,
     },
     inputLabelEmbededVariant: {
 
@@ -493,7 +492,6 @@ const styles = StyleSheet.create({
         top: 0,
     },
     rightContainer: {
-        //paddingRight: 5,
         alignSelf: "center",
     },
     container: {
@@ -526,8 +524,7 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
     },
     leftContainerWrappedWithTouchable: {
-        paddingLeft: 0,
-        paddingRight: 0,
+        paddingHorizontal: 0,
     },
     notEmbededLabelStyle: {
         fontWeight: "500",

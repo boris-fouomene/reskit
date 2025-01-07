@@ -184,7 +184,7 @@ export function createTheme(theme: ITheme): IThemeManager {
     return {
         ...Object.assign({}, theme),
         get padding() {
-            return (typeof theme.padding == "number" ? theme.padding : Breakpoints.widthPercent(1));
+            return (typeof theme.padding == "number" ? theme.padding : Breakpoints.widthPercent(2));
         },
         get styles() {
             return styles;

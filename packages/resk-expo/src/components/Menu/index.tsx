@@ -407,7 +407,9 @@ const Menu: React.FC<IMenuProps> = ({
         return isValidElement(customAnchor) ? customAnchor : null;
     }, [customAnchor, calculatePosition, isVisible, _isFullScreen, context]);
     useEffect(() => {
-        measureAnchor();
+        measureAnchor(() => {
+            calculatePosition();
+        });
     }, [isVisible, measureAnchor]);
 
 

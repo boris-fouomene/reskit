@@ -48,7 +48,7 @@ export interface II18nTranslation extends IDict {
  *     }
  * }
  */
-export type I18nEvent = "translations-loaded" | "translations-changed" | "locale-changed" | "namespace-loaded" | "namespaces-loaded";
+export type I18nEvent = "translations-loaded" | "translations-changed" | "locale-changed" | "namespaces-before-load" | "namespace-loaded" | "namespaces-loaded";
 
 /**
  * A formatter function for internationalization (i18n) strings.

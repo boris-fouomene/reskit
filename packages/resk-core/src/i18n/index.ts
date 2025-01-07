@@ -500,6 +500,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         } catch (error) {
             console.error(error, " setting moment locale : ", locale);
         }
+        this.trigger("namespaces-before-load", locale);
         this.loadNamespaces(locale).then((translations) => {
             if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {
                 I18n.setLocaleToSession(locale);

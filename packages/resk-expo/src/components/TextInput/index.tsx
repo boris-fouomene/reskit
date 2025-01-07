@@ -3,7 +3,7 @@ import { isValidElement, mergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from "react-native";
 import React, { ReactNode, useEffect, useMemo, useRef } from "react";
 import { formatValueToObject, Platform, IDict, isNonNullString, isStringNumber, parseDecimal, isEmpty } from "@resk/core";
-import _, { isNumber } from "lodash";
+import _, { compact, isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View from "@components/View";
@@ -136,7 +136,7 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
  * 
  * console.log(styles); // { containerStyle: [...], contentContainerStyle: [...], inputStyle: [...], labelStyle: [...] }
  */
-const getContainerAndContentStyle = ({ isFocused, isLabelEmbededVariant, textColor, borderColor, theme, isDefaultVariant }: { isLabelEmbededVariant: boolean, canRenderLabel: boolean, theme: ITheme, isFocused: boolean, textColor?: string, borderColor?: string, isDefaultVariant: boolean }) => {
+const getContainerAndContentStyle = ({ isFocused, compact, isLabelEmbededVariant, textColor, borderColor, theme, isDefaultVariant }: { isLabelEmbededVariant: boolean, canRenderLabel: boolean, theme: ITheme, isFocused: boolean, textColor?: string, borderColor?: string, isDefaultVariant: boolean, compact?: boolean }) => {
     const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [styles.input, { color: textColor }], labelStyle: IStyle = [{ color: textColor }];
     const borderedStyle = [
         isFocused ? styles.focusedOutlineBorder : styles.containerLabelEmbeded,
@@ -156,6 +156,11 @@ const getContainerAndContentStyle = ({ isFocused, isLabelEmbededVariant, textCol
     }
     if (isDefaultVariant) {
         labelStyle.push(styles.defaultVariantLabel);
+    }
+    if (compact) {
+        inputStyle.push(styles.compact);
+        contentContainerStyle.push(styles.compact);
+        labelStyle.push(styles.compact);
     }
     return { containerStyle, contentContainerStyle, inputStyle, labelStyle }
 }
@@ -459,12 +464,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 2,
         flexGrow: 1,
         overflow: 'hidden',
-        //paddingVertical: 8,
+        paddingLeft: 5,
+        paddingRight: 5,
     },
     inputLabelEmbededVariant: {
-        paddingVertical: 3,
+
+    },
+    compact: {
+        padding: 0,
+        paddingVertical: 0,
         paddingHorizontal: 0,
-        margin: 0,
     },
     inputNotEmbededLabelVariant: {},
     focusedInput: {
@@ -484,7 +493,7 @@ const styles = StyleSheet.create({
         top: 0,
     },
     rightContainer: {
-        paddingRight: 5,
+        //paddingRight: 5,
         alignSelf: "center",
     },
     container: {
@@ -506,7 +515,7 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     leftContainer: {
-        paddingLeft: 5,
+        //paddingLeft: 5,
         flexGrow: 1,
     },
     leftOrRightContainer: {
@@ -528,8 +537,9 @@ const styles = StyleSheet.create({
 
     },
     labelEmbededVariantContainer: {
-        //paddingHorizontal: 5,
-        paddingVertical: 5,
+        paddingHorizontal: 5,
+        //paddingVertical: 2,
+        paddingLeft: 5,
     },
     labelEmbededVariantLabel: {
         //paddingLeft: 3,

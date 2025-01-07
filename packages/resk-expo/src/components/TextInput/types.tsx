@@ -403,6 +403,12 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
      * A flag indicating whether the text input is an anchor for a dropdown.
      */
     isDropdownAnchor?: boolean;
+
+    /**
+     * A flag indicating whether the text input should be compact.
+     * This property is useful for controlling the padding and spacing of the input.
+     */
+    compact?: boolean;
 };
 
 /**

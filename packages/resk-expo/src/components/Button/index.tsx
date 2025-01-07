@@ -412,6 +412,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 0,
         marginVertical: 0,
         marginHorizontal: 0,
+        padding: 0,
     },
     leftContentWrapper: {
         flexDirection: 'row',

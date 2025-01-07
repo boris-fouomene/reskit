@@ -132,42 +132,25 @@ const SwipeGestureHandler: React.FC<ISwipeGestureProps> = ({
     ...props
 }) => {
     const config = { ...DEFAULT_ANIMATION_CONFIG, ...Object.assign({}, animationConfig) };
+    const propsRef = useRef<Partial<ISwipeGestureProps>>({});
+    minSwipeDistance = typeof minSwipeDistance === 'number' ? minSwipeDistance : 50;
     horizontal = typeof horizontal === 'boolean' ? horizontal : true;
     vertical = typeof vertical === 'boolean' ? vertical : true;
     disabled = typeof disabled === 'boolean' ? disabled : false;
     if (!horizontal && !vertical) {
         disabled = true;
     }
-
-    // Animation values
-    const pan = useRef(new Animated.ValueXY()).current;
-    const scale = useRef(new Animated.Value(1)).current;
-    const opacity = useRef(new Animated.Value(1)).current;
+    const translateX = useRef(new Animated.Value(0)).current;
+    const translateY = useRef(new Animated.Value(0)).current;
+    propsRef.current = { onSwipeRight, onSwipeLeft, onSwipeTop, onSwipeBottom, onSwipe, horizontal, vertical, disabled, minSwipeDistance };
 
     /**
      * Resets all animations to their initial values
      */
     const resetAnimations = useCallback(() => {
-        Animated.parallel([
-            Animated.timing(pan, {
-                toValue: { x: 0, y: 0 },
-                duration: config.resetDuration,
-                useNativeDriver: true,
-            }),
-            Animated.spring(scale, {
-                toValue: 1,
-                tension: config.springTension,
-                friction: config.springFriction,
-                useNativeDriver: true,
-            }),
-            Animated.spring(opacity, {
-                toValue: 1,
-                tension: config.springTension,
-                friction: config.springFriction,
-                useNativeDriver: true,
-            }),
-        ]).start();
-    }, [config, pan, scale, opacity]);
+        translateX.setValue(0);
+        translateY.setValue(0);
+    }, [translateX, translateY]);
     /** References to track gesture state */
     const gestureState = useRef({
         dx: 0,
@@ -181,8 +164,9 @@ const SwipeGestureHandler: React.FC<ISwipeGestureProps> = ({
      * @returns Whether the gesture qualifies as a swipe
      */
     const isValidSwipe = (dx: number, dy: number): boolean => {
-        const horizontalSwipe = Math.abs(dx) >= minSwipeDistance;
-        const verticalSwipe = Math.abs(dy) >= minSwipeDistance;
+        const { disabled, horizontal, vertical, minSwipeDistance } = propsRef.current;
+        const horizontalSwipe = Math.abs(dx) >= (minSwipeDistance as number);
+        const verticalSwipe = Math.abs(dy) >= (minSwipeDistance as number);
         if (disabled) return false;
         if (!horizontal) return verticalSwipe;
         if (!vertical) return horizontalSwipe;
@@ -215,6 +199,7 @@ const SwipeGestureHandler: React.FC<ISwipeGestureProps> = ({
         const direction = getISwipeGestureDirection(dx, dy);
         const distance = Math.sqrt(dx * dx + dy * dy);
         const options = { dx, dy, distance, direction };
+        const { onSwipe, onSwipeLeft, onSwipeRight, onSwipeTop, onSwipeBottom, horizontal, vertical } = propsRef.current;
         // Trigger direction-specific callbacks
         switch (direction) {
             case 'left':
@@ -242,31 +227,19 @@ const SwipeGestureHandler: React.FC<ISwipeGestureProps> = ({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: (e: GestureResponderEvent, state: PanResponderGestureState) => {
                 if (disabled) return false;
-                if (!horizontal) return Math.abs(state.dy) > Math.abs(state.dx);
-                if (!vertical) return Math.abs(state.dx) > Math.abs(state.dy);
-                return true;
+                if (!horizontal) return Math.abs(state.dy) > 5//Math.abs(state.dx);
+                if (!vertical) return Math.abs(state.dx) > 5; //Math.abs(state.dy);
+                return false;
             },
-            onPanResponderGrant: () => {
-                // Start of gesture animations
-                Animated.parallel([
-                    Animated.spring(scale, {
-                        toValue: config.scaleEffect,
-                        tension: config.springTension,
-                        friction: config.springFriction,
-                        useNativeDriver: true,
-                    }),
-                    Animated.spring(opacity, {
-                        toValue: config.opacityEffect,
-                        tension: config.springTension,
-                        friction: config.springFriction,
-                        useNativeDriver: true,
-                    }),
-                ]).start();
+            onPanResponderMove: (e, state) => {
+                const { horizontal, vertical } = propsRef.current;
+                if (horizontal) {
+                    translateX.setValue(state.dx);
+                }
+                if (vertical) {
+                    translateY.setValue(state.dy);
+                }
             },
-            onPanResponderMove: Animated.event(
-                [null, { dx: pan.x, dy: pan.y }],
-                { useNativeDriver: false }
-            ),
             onPanResponderRelease: (e, state) => {
                 handleSwipe(state.dx, state.dy);
             },
@@ -277,12 +250,31 @@ const SwipeGestureHandler: React.FC<ISwipeGestureProps> = ({
     ).current;
     const animatedStyle = {
         transform: [
-            { translateX: pan.x },
-            { translateY: pan.y },
-            { scale },
+            { translateX },
+            { translateY },
         ],
-        opacity,
     };
+    /***
+     * Animated.parallel([
+            Animated.timing(pan, {
+                toValue: { x: 0, y: 0 },
+                duration: config.resetDuration,
+                useNativeDriver: true,
+            }),
+            Animated.spring(scale, {
+                toValue: 1,
+                tension: config.springTension,
+                friction: config.springFriction,
+                useNativeDriver: true,
+            }),
+            Animated.spring(opacity, {
+                toValue: 1,
+                tension: config.springTension,
+                friction: config.springFriction,
+                useNativeDriver: true,
+            }),
+        ]).start();
+     */
     return (
         <Animated.View testID={"resk-swipe-gesture"}
             {...props}

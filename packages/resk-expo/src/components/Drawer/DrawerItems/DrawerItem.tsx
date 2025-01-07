@@ -130,7 +130,6 @@ const styles = StyleSheet.create({
   },
   ripple: {
     width: '100%',
-    //paddingVertical: 7,
   }
 });
 

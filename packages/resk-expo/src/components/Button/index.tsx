@@ -297,6 +297,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             FormsManager.unmountAction(context.id, formName);
         };
     }, [formName, idRef.current, context.id]);
+    const { padding } = theme;
     if (!ResourcesManager.isAllowed(rest)) return null;
     const fullWidthStyle = fullWidth ? styles.fullWidth : null;
     const compactStyle = compact ? styles.compact : null;
@@ -329,7 +330,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 disabled={disabled}
                 disabledRipple={disableRipple}
                 rippleColor={rippleColor}
-                style={[styles.touchable, compactStyle, fullWidthStyle, restButtonStyle, touchableStyle]}
+                style={[styles.touchable, { padding }, compactStyle, fullWidthStyle, restButtonStyle, touchableStyle]}
                 testID={testID}
                 ref={innerRef}
                 id={idRef.current}
@@ -403,8 +404,8 @@ const styles = StyleSheet.create({
     },
     touchable: {
         width: "100%",
-        paddingHorizontal: 7,
-        paddingVertical: 7,
+        //paddingHorizontal: 7,
+        //paddingVertical: 7,
     },
     compact: {
         paddingVertical: 0,

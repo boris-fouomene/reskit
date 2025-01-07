@@ -264,6 +264,7 @@ export const useTextInput = ({ defaultValue, opacity, isDropdownAnchor, secureTe
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
     const isLabelEmbededVariant = variant == "labelEmbeded";
     const isDefaultVariant = !isLabelEmbededVariant;
+    const { padding } = theme;
     const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
     const placeholder = isEmpty(props.placeholder) ? "" : props.placeholder;
@@ -368,7 +369,8 @@ export const useTextInput = ({ defaultValue, opacity, isDropdownAnchor, secureTe
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: [
             styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null),
-            styles.input, inputStyle,
+            styles.input, { paddingVertical: padding },
+            inputStyle,
             props.style,
             disabledOrEditStyle,
             isDropdownAnchor && editable && styles.dropdownAnchorInput,
@@ -457,7 +459,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 2,
         flexGrow: 1,
         overflow: 'hidden',
-        paddingVertical: 8,
+        //paddingVertical: 8,
     },
     inputLabelEmbededVariant: {
         paddingVertical: 3,
@@ -520,6 +522,7 @@ const styles = StyleSheet.create({
     },
     notEmbededLabelStyle: {
         fontWeight: "500",
+        paddingBottom: 5,
     },
     defaultVariantLabel: {
 

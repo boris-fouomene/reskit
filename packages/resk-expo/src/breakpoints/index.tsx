@@ -1,4 +1,4 @@
-import { Dimensions } from "react-native";
+import { Dimensions, PixelRatio } from "react-native";
 import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate } from "./types";
 import { addClassName, IDict, isDOMElement, isObj, Platform, removeClassName } from "@resk/core";
 import { IStyle } from "@src/types";
@@ -871,6 +871,33 @@ export default class Breakpoints {
         return Math.max(numColumns, 1);
     }
 
+    /**
+     * Converts provided width percentage to independent pixel (dp).
+     * @param  {string} widthPercent The percentage of screen's width that UI element should cover
+     *                               along with the percentage symbol (%).
+     * @return {number}              The calculated dp depending on current device's screen width.
+     */
+    static widthPercent(widthPercent: number | string) {
+        // Parse string percentage input and convert it to number.
+        const elemWidth = typeof widthPercent === "number" ? widthPercent : parseFloat(widthPercent);
+        // Use PixelRatio.roundToNearestPixel method in order to round the layout
+        // size (dp) to the nearest one that correspons to an integer number of pixels.
+        return PixelRatio.roundToNearestPixel(Dimensions.get("window").width * elemWidth / 100);
+    };
+
+    /**
+     * Converts provided height percentage to independent pixel (dp).
+     * @param  {string} heightPercent The percentage of screen's height that UI element should cover
+     *                                along with the percentage symbol (%).
+     * @return {number}               The calculated dp depending on current device's screen height.
+     */
+    static heightPercent(heightPercent: string | number) {
+        // Parse string percentage input and convert it to number.
+        const elemHeight = typeof heightPercent === "number" ? heightPercent : parseFloat(heightPercent);
+        // Use PixelRatio.roundToNearestPixel method in order to round the layout
+        // size (dp) to the nearest one that correspons to an integer number of pixels.
+        return PixelRatio.roundToNearestPixel(Dimensions.get("window").height * elemHeight / 100);
+    };
 }
 
 
@@ -939,8 +966,5 @@ const getWidth = (width?: number) => {
     }
     return _width;
 }
-
-
-
 
 

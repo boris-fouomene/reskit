@@ -183,6 +183,9 @@ export function createTheme(theme: ITheme): IThemeManager {
     const context = theme;
     return {
         ...Object.assign({}, theme),
+        get padding() {
+            return (typeof theme.padding == "number" ? theme.padding : 10);
+        },
         get styles() {
             return styles;
         },
@@ -532,7 +535,6 @@ export default Theme;
  * ```
  */
 export interface IThemeManager extends ITheme {
-    colors: IThemeColorsTokens;
     getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined;
     getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme
     styles: typeof styles;
@@ -570,6 +572,13 @@ export interface IThemeManager extends ITheme {
      * If `events` is not observable, the function will make it so internally using the `observable` function.
      */
     addEventListener: (callstack: (theme: ITheme) => any) => { remove: () => any };
+
+    /***
+     * The padding value is used to adjust the padding of components like buttons, cards, text inputs, and other UI elements. 
+     * This property influences how much space is reserved around the edges of these elements. 
+     * A low padding value results in more space between the element and its surroundings, while a higher value makes the element more compact.
+     */
+    padding: number;
 };
 
 export * from "./useColorScheme";

@@ -219,6 +219,12 @@ export interface ITheme {
    */
   colors: IThemeColorsTokens;
 
+  /***
+   * The padding value is used to adjust the padding of components like buttons, cards, text inputs, and other UI elements. 
+   * This property influences how much space is reserved around the edges of these elements. 
+   * A low padding value results in more space between the element and its surroundings, while a higher value makes the element more compact.
+   */
+  padding?: number;
 }
 
 /**

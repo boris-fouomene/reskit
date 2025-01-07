@@ -10,7 +10,7 @@ import { useReskExpo } from "@src/context/hooks";
 import Elevations from "./Elevations";
 import { useColorScheme } from "react-native";
 import { useMaterial3Theme, isDynamicThemeSupported, getMaterial3Theme as _getMaterial3Theme, createMaterial3Theme as _createMaterial3Theme, Material3Theme } from '@pchmn/expo-material3-theme';
-
+import Breakpoints from "@breakpoints";
 export * from "./utils";
 export * from "./types";
 
@@ -184,7 +184,7 @@ export function createTheme(theme: ITheme): IThemeManager {
     return {
         ...Object.assign({}, theme),
         get padding() {
-            return (typeof theme.padding == "number" ? theme.padding : 10);
+            return (typeof theme.padding == "number" ? theme.padding : Breakpoints.widthPercent(1));
         },
         get styles() {
             return styles;

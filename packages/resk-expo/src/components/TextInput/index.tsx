@@ -86,10 +86,11 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
     const Wrapper = canWrapWithTouchable ? TouchableRipple : React.Fragment;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
     const wrapperProps = canWrapWithTouchable ? pressableProps : undefined;
+    const hasLeft = !!left;
     return <View  {...containerProps}>
         {isLabelEmbededVariant ? null : labelContent}
         <View {...contentContainerProps}>
-            {<View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
+            {<View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, hasLeft && styles.leftContainerHasLeft, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
                 <Wrapper {...wrapperProps}>
@@ -462,7 +463,7 @@ const styles = StyleSheet.create({
         borderRightWidth: 0,
         borderRadius: 0,
         backgroundColor: 'transparent',
-        //paddingHorizontal: 5,
+        paddingHorizontal: 5,
         flexGrow: 1,
         overflow: 'hidden',
     },
@@ -514,8 +515,10 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     leftContainer: {
-        paddingLeft: 5,
         flexGrow: 1,
+    },
+    leftContainerHasLeft: {
+        paddingLeft: 5,
     },
     leftOrRightContainer: {
         display: "flex",

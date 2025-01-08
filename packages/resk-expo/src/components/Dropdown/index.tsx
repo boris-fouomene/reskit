@@ -565,6 +565,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 10,
         borderBottomWidth: 1,
+        borderTopWidth: 0,
         height: "100%",
         width: "100%",
         justifyContent: "center",
@@ -624,6 +625,7 @@ const DropdownSearch = ({ isFullScreen }: { isFullScreen?: boolean }) => {
             <TextInput
                 testID={`${testID}_dropdown-search`}
                 autoFocus={visible}
+                affix={false}
                 {...props}
                 defaultValue={searchText}
                 onChangeText={onSearch}

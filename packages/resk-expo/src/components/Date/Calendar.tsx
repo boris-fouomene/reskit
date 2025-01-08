@@ -1,21 +1,21 @@
 import React, { isValidElement, useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, GestureResponderEvent, Animated, PanResponder } from "react-native";
 import moment, { Moment } from "moment/min/moment-with-locales";
-import { defaultStr, IMomentDateFormat } from "@resk/core";
+import { defaultStr, IMomentDateFormat, isEmpty } from "@resk/core";
 import { ICalendarBaseProps, ICalendarDate, ICalendarDay, ICalendarDayProps, ICalendarDisplayView, ICalendarHour, ICalendarMonth, ICalendarMonthProps, ICalendarYear, ICalendarYearProps } from "./types";
 import { Icon, IIconButtonProps } from "@components/Icon";
 import Label from "@components/Label";
 import { useI18n } from "@src/i18n/hooks";
 import { DEFAULT_DATE_FORMATS } from "@resk/core";
 import { TouchableRipple } from "@components/TouchableRipple";
-import Theme, { Colors, ITheme, useTheme } from "@theme/index";
+import Theme, { Colors, ITheme, IThemeManager, useTheme } from "@theme/index";
 import { Button, IButtonProps } from "@components/Button";
 import { IStyle } from "@src/types";
 import { Surface } from "@components/Surface";
 import { Divider } from "@components/Divider";
-import { Menu } from "@components/Menu";
 import useStateCallback from "@utils/stateCallback";
 import { SwipeGestureHandler } from "@components/Gesture";
+import { Notify } from "@notify";
 
 export default class Calendar {
     static getDefaultDateFormat(dateFormat?: IMomentDateFormat): IMomentDateFormat {
@@ -32,27 +32,33 @@ export default class Calendar {
         return [...daysOfWeek.slice(weekStartDay), ...daysOfWeek.slice(0, weekStartDay)];
     }
     // Generate a calendar matrix for a month
-    static generateDayView(startDate?: ICalendarDate, weekStartDay: number = 0, endDate?: ICalendarDate): ICalendarDay[][] {
-        const startOfMonth = moment(startDate).startOf('month');
-        const endOfMonth = moment(startDate).endOf('month');
+    static generateDayView(dateCursor?: ICalendarDate, weekStartDay: number = 0, minDate?: ICalendarDate, maxDate?: ICalendarDate, defaultValue?: ICalendarDate): ICalendarDay[][] {
+        const momentDateCursor = moment(dateCursor);
+        const startOfMonth = momentDateCursor.startOf('month');
+        const endOfMonth = moment(momentDateCursor).endOf('month');
         const startDayOfWeek = startOfMonth.day();
-        const matrixStartDate = moment(startOfMonth).subtract((startDayOfWeek - weekStartDay + 7) % 7, 'days');
-
+        const matrixDateCursor = moment(startOfMonth).subtract((startDayOfWeek - weekStartDay + 7) % 7, 'days');
+        const defaultValueMoment = defaultValue ? moment(defaultValue) : undefined;
         const calendarMatrix: ICalendarDay[][] = [];
-        const currentDate = matrixStartDate.clone();
+        const currentDate = matrixDateCursor.clone();
+        const momentMaxDate = maxDate ? moment(maxDate) : undefined;
+        const momentMinDate = minDate ? moment(minDate) : undefined;
         for (let week = 0; week < 6; week++) {
             const weekRow: ICalendarDay[] = [];
             for (let day = 0; day < 7; day++) {
+                const isCurrentDateValid = !(momentMinDate && momentMinDate.isAfter(currentDate, "day") || momentMaxDate && momentMaxDate.isBefore(currentDate, "day"))
+                const isDefaultValue = defaultValueMoment && defaultValueMoment.isSame(currentDate, 'day') || false;
                 const inCurrentMonth = currentDate.isSameOrAfter(startOfMonth, 'day') && currentDate.isSameOrBefore(endOfMonth, 'day');
                 weekRow.push({
                     day: currentDate.date(),
+                    isDefaultValue,
                     value: currentDate.toDate(),
                     isToday: currentDate.isSame(moment(), "day"),
                     date: currentDate.clone(),
                     dayStr: currentDate.format('DD'),
                     shortName: currentDate.format('ddd'),
                     longName: currentDate.format('dddd'),
-                    disabled: !inCurrentMonth,
+                    disabled: !inCurrentMonth || !isCurrentDateValid,
                     //dateStr: currentDate.format(this.props.dateFormat),
                     monthYear: currentDate.format("MMMM YYYY"),
                     month: currentDate.format("MM"),
@@ -70,11 +76,10 @@ export default class Calendar {
      * Generate a 4x4 matrix of months for a given year.
      * @returns A matrix of months with their statuses.
      */
-    static generateMonthView(startDate?: ICalendarDate, endDate?: ICalendarDate): ICalendarMonth[][] {
+    static generateMonthView(minDate?: ICalendarDate, maxDate?: ICalendarDate): ICalendarMonth[][] {
         const allMonths = moment.monthsShort();//example : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         const monthMatrix: ICalendarMonth[][] = [];
         const rows = Math.ceil(16 / 4); // 4 columns, so calculate rows
-
         for (let row = 0; row < rows; row++) {
             const monthRow: ICalendarMonth[] = [];
             for (let col = 0; col < 4; col++) {
@@ -91,8 +96,8 @@ export default class Calendar {
         }
         return monthMatrix;
     }
-    static getYearsBoundaries(startDate?: ICalendarDate): { start: number, end: number } {
-        const startYear = moment(startDate).toDate().getFullYear();
+    static getYearsBoundaries(minDate?: ICalendarDate): { start: number, end: number } {
+        const startYear = moment(minDate).toDate().getFullYear();
         const start = Math.max(startYear - 10, 0);
         return {
             start,
@@ -100,8 +105,8 @@ export default class Calendar {
         }
     }
 
-    static generateYearView(startDate?: ICalendarDate, endDate?: ICalendarDate): ICalendarYear[][] {
-        const { start: startYear, end: endYear } = Calendar.getYearsBoundaries(startDate);
+    static generateYearView(minDate?: ICalendarDate, maxDate?: ICalendarDate): ICalendarYear[][] {
+        const { start: startYear, end: endYear } = Calendar.getYearsBoundaries(minDate);
         const years: ICalendarYear[][] = [];
         const numRows = 4; // Display 4 years per row
         for (let row = 0; row < numRows; row++) {
@@ -136,18 +141,17 @@ export default class Calendar {
     static Day: React.FC<ICalendarDayProps> = ({ weekStartDay, header, ...props }) => {
         const theme = useTheme();
         const testID = defaultStr(props.testID, "resk-calendar-day-view");
-        const { momentEndDate, i18n, locale, setState, navigateToNext, navigateToPrevious, dateFormat, state, momentDefaultValue } = useCommon(props, "day");
+        const { momentMaxDate, momentMinDate, dateCursor, isValidSelection, i18n, locale, setState, navigateToNext, navigateToPrevious, dateFormat, state, momentDefaultValue } = useCommon(props, "day");
         const { displayView } = state;
-        const start = moment(state.startDate);
         const { dayView, dayHeaders } = useMemo(() => {
             return {
-                dayView: Calendar.generateDayView(state.startDate, weekStartDay, state.endDate),
+                dayView: Calendar.generateDayView(dateCursor.toDate(), weekStartDay, state.minDate, state.maxDate, state.defaultValue),
                 dayHeaders: Calendar.generateWeekHeaders(weekStartDay)
             };
-        }, [state.startDate, state.endDate, weekStartDay]);
+        }, [state.minDate, state.defaultValue, state.maxDate, weekStartDay, dateCursor]);
         const toDayStr = moment().format(dateFormat);
         const defaultValueStr = momentDefaultValue?.format(dateFormat) || "";
-        const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(start.toDate()) : undefined;
+        const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(dateCursor.toDate()) : undefined;
         return Calendar.renderCalendar({
             ...props,
             testID,
@@ -155,10 +159,11 @@ export default class Calendar {
                 {isValidElement(header) ? header : null}
                 <View testID={testID + "-header-title"} style={Styles.dayViewHeader}>
                     <Button compact tooltip={`${i18n.t("dates.today")}: ${toDayStr}`}
+                        disabled={!isValidSelection(moment().toDate())}
                         onPress={() => {
                             setState({
                                 ...state,
-                                startDate: moment().toDate()
+                                dateCursor: moment(),
                             });
                         }}
                     >
@@ -170,6 +175,7 @@ export default class Calendar {
                                 setState({
                                     ...state,
                                     defaultValue: undefined,
+                                    dateCursor: moment(),
                                 });
                             }}
                         />}
@@ -179,7 +185,7 @@ export default class Calendar {
                 </View>
             </>,
             displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
-                label: displayView == "year" ? `${yearBoundaries?.start} - ${yearBoundaries?.end}` : displayView == "month" ? start.format("YYYY") : start.format("MMMM YYYY"),
+                label: displayView == "year" ? `${yearBoundaries?.start} - ${yearBoundaries?.end}` : displayView == "month" ? dateCursor.format("YYYY") : dateCursor.format("MMMM YYYY"),
                 disabled: displayView === "year",
                 onPress: () => {
                     setState({ ...state, displayView: displayView === "month" ? "year" : "month" })
@@ -190,32 +196,42 @@ export default class Calendar {
             navigateToPrevious,
             children: <>
                 {displayView == "month" ? <Calendar.Month
-                    startDate={start.toDate()}
-                    endDate={momentEndDate?.toDate()}
-                    defaultValue={momentDefaultValue?.toDate()}
+                    minDate={momentMinDate?.toDate()}
+                    maxDate={momentMaxDate?.toDate()}
+                    defaultValue={dateCursor.toDate()}
                     renderNavigationButtons={false}
                     renderToggleDisplayViewButton={false}
                     elevation={0}
                     onChange={(data) => {
+                        const newDateCursor = moment(dateCursor).month(data.month);
+                        if (!isValidSelection(newDateCursor.toDate())) {
+                            Notify.error(i18n.t("outOfRange", { date: newDateCursor.toDate().toFormat(dateFormat) }));
+                            return;
+                        }
                         setState({
                             ...state,
-                            startDate: start.month(data.month).toDate(),
+                            dateCursor: newDateCursor.clone(),
                             displayView: "day",
                         });
                     }}
                 />
                     : displayView === "year" ? <Calendar.Year
-                        startDate={start.toDate()}
-                        endDate={momentEndDate?.toDate()}
-                        defaultValue={momentDefaultValue?.toDate()}
+                        minDate={momentMinDate?.toDate()}
+                        maxDate={momentMaxDate?.toDate()}
+                        defaultValue={dateCursor.toDate()}
                         renderNavigationButtons={false}
                         renderToggleDisplayViewButton={false}
                         elevation={0}
                         onChange={(data) => {
+                            const newDateCursor = dateCursor.year(data.year);
+                            if (!isValidSelection(newDateCursor.toDate())) {
+                                Notify.error(i18n.t("outOfRange", { date: newDateCursor.toDate().toFormat(dateFormat) }));
+                                return;
+                            }
                             setState({
                                 ...state,
                                 displayView: "month",
-                                startDate: start.year(data.year).toDate()
+                                dateCursor: newDateCursor.clone(),
                             });
                         }}
                     />
@@ -238,6 +254,7 @@ export default class Calendar {
                                             return this.renderViewItem({
                                                 isActive: day.isToday,
                                                 theme,
+                                                isDefaultValue: day.isDefaultValue,
                                                 disabled: !!day.disabled,
                                                 testID: cTestID + "-day-" + index,
                                                 label: String(day.day),
@@ -259,23 +276,22 @@ export default class Calendar {
     }
     static Month: React.FC<ICalendarMonthProps> = (props: ICalendarMonthProps) => {
         const theme = useTheme();
-        const { state, setState, momentEndDate, momentDefaultValue, navigateToNext, navigateToPrevious } = useCommon(props, "month");
+        const { state, setState, momentMinDate, dateCursor, momentMaxDate, momentDefaultValue, navigateToNext, navigateToPrevious } = useCommon(props, "month");
         const monthView = useMemo(() => {
-            return Calendar.generateMonthView(state.startDate, state.endDate);
-        }, [state.startDate, state.endDate]);
+            return Calendar.generateMonthView(state.minDate, state.maxDate);
+        }, [state.minDate, state.maxDate, state.dateCursor]);
         const { displayView } = state;
-        const start = moment(state.startDate);
         const testID = defaultStr(props?.testID, "resk-calendar-month-view");
         const currentMonth = moment().month();
-        const isCurrentYear = moment().year() === start.year();
-        const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(start.toDate()) : undefined;
+        const isCurrentYear = moment().year() === dateCursor.year();
+        const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(dateCursor.toDate()) : undefined;
         return Calendar.renderCalendar({
             testID,
             navigateToNext,
             navigateToPrevious,
             ...props,
             displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
-                label: displayView == "year" ? `${yearBoundaries?.start} - ${yearBoundaries?.end}` : start.format("YYYY"),
+                label: displayView == "year" ? `${yearBoundaries?.start} - ${yearBoundaries?.end}` : dateCursor.format("YYYY"),
                 disabled: displayView === "year",
                 onPress: () => {
                     setState({ ...state, displayView: displayView === "month" ? "year" : "month" })
@@ -284,9 +300,9 @@ export default class Calendar {
             },
             children: <>
                 {displayView == "year" ? <Calendar.Year
-                    startDate={start.toDate()}
-                    endDate={momentEndDate?.toDate()}
-                    defaultValue={momentDefaultValue?.toDate()}
+                    minDate={momentMinDate?.toDate()}
+                    maxDate={momentMaxDate?.toDate()}
+                    defaultValue={dateCursor.toDate()}
                     renderNavigationButtons={false}
                     renderToggleDisplayViewButton={false}
                     elevation={0}
@@ -294,7 +310,7 @@ export default class Calendar {
                         setState({
                             ...state,
                             displayView: "month",
-                            startDate: start.year(data.year).toDate()
+                            dateCursor: dateCursor.year(data.year).clone()
                         });
                     }}
                 /> : <>
@@ -331,9 +347,9 @@ export default class Calendar {
         const theme = useTheme();
         const { setState, state, navigateToNext, navigateToPrevious } = useCommon(props, "year");
         const yearView = useMemo(() => {
-            return Calendar.generateYearView(state?.startDate, state.endDate);
-        }, [state?.startDate, state.endDate]);
-        const { start, end } = Calendar.getYearsBoundaries(state.startDate);
+            return Calendar.generateYearView(state?.minDate, state.maxDate);
+        }, [state?.minDate, state.maxDate]);
+        const { start, end } = Calendar.getYearsBoundaries(state.minDate);
         const testID = defaultStr(props?.testID, "resk-calendar-year-view");
         const currentYear = new Date().getFullYear();
         return Calendar.renderCalendar({
@@ -377,26 +393,31 @@ export default class Calendar {
     static getIconSize(): number {
         return 24;
     }
-    private static renderViewItem({ isActive, theme, size, margin, disabled, onPress, label, testID, key, style }: { style?: IStyle, margin?: number, isActive: boolean, onPress: (e: GestureResponderEvent) => void, disabled: boolean, theme?: ITheme, size?: number, testID: string, label: string, key: number | string }) {
-        theme = theme || Theme;
+    private static renderViewItem({ isActive, isDefaultValue, theme, size, margin, disabled, onPress, label, testID, key, style }: { style?: IStyle, margin?: number, isActive: boolean, onPress: (e: GestureResponderEvent) => void, isDefaultValue?: boolean, disabled: boolean, theme?: IThemeManager, size?: number, testID: string, label: string, key: number | string }) {
+        theme = (theme || Theme) as IThemeManager;
         margin = typeof margin === "number" && margin || 8;
         size = typeof size == "number" && size || 40;
+        const color = isDefaultValue ? theme.colors.primary : isActive ? theme.colors.onPrimary : undefined;
+        const backgroundColor = isDefaultValue ? theme.colors.onPrimary : isActive ? theme.colors.primary : undefined;
+        const borderColor = isDefaultValue ? theme.colors.primary : undefined;
         return (
             <TouchableRipple
                 testID={testID}
                 key={key}
                 disabled={disabled}
                 onPress={onPress}
-                hoverColor={isActive ? Colors.setAlpha(Theme.colors.primary, 0.2) : undefined}
+                hoverColor={backgroundColor ? Colors.setAlpha(backgroundColor, 0.2) : undefined}
                 style={[
-                    Styles.calendarItem, isActive && {
-                        backgroundColor: Theme.colors.primary
-                    }
-                    , { width: size, height: size, marginHorizontal: margin, marginVertical: margin }
+                    Styles.calendarItem,
+                    color && { color },
+                    backgroundColor && { backgroundColor },
+                    borderColor && { borderColor, borderWidth: 1 },
+                    , { width: size, height: size, marginHorizontal: margin, marginVertical: margin },
+
                     , style,
                 ]}
             >
-                <Label textBold={isActive} color={isActive ? Theme.colors.onPrimary : undefined} disabled={disabled} testID={testID + "-label"}>
+                <Label textBold={isDefaultValue} color={color} disabled={disabled} testID={testID + "-label"}>
                     {label}
                 </Label>
             </TouchableRipple>
@@ -558,94 +579,112 @@ const Styles = StyleSheet.create({
     }
 })
 
-type ICalendarCommonState = { startDate?: ICalendarDate, endDate?: ICalendarDate, defaultValue?: ICalendarDate, displayView?: ICalendarDisplayView };
+const areEquals = (a: any, b: any) => {
+    const isAe = isEmpty(a), isBe = isEmpty(b);
+    if (isAe && isBe) return true;
+    if (isAe && !isBe) return false;
+    if (!isAe && isBe) return false;
+    return moment(a, "day").isSame(moment(b, "day"));
+}
+type ICalendarCommonState = {
+    minDate?: ICalendarDate, maxDate?: ICalendarDate, defaultValue?: ICalendarDate, displayView?: ICalendarDisplayView
+    dateCursor: Moment,
+};
 function useCommon(props: ICalendarBaseProps, displayView?: ICalendarDisplayView) {
     const i18n = useI18n();
     const i18nLocale = i18n.getLocale();
     const locale = defaultStr(props?.locale, i18n.getLocale());
-    const isDayView = displayView === "day", isMonthView = displayView === "month", isYearView = displayView === "year", isHourView = displayView === "hour";
     const [state, setState] = useStateCallback<ICalendarCommonState>({
-        startDate: props.startDate,
-        endDate: props.endDate,
+        minDate: props.minDate,
+        maxDate: props.maxDate,
         defaultValue: props.defaultValue,
         displayView,
+        dateCursor: moment(props.defaultValue),
     });
-    const start = moment(state.startDate);
     useMemo(() => {
         if (i18nLocale === locale) return;
         moment.locale(locale);
     }, [locale, i18nLocale]);
-    const momentStartDate = useMemo(() => {
-        return state?.startDate ? moment(state?.startDate) : undefined;
-    }, [state?.startDate]);
-    const momentEndDate = useMemo(() => {
-        return state?.endDate ? moment(state?.endDate) : undefined;
-    }, [state?.endDate]);
+    const momentMaxDate = useMemo(() => {
+        return state?.maxDate ? moment(state?.maxDate) : undefined;
+    }, [state?.maxDate]);
+    const momentMinDate = useMemo(() => {
+        return state?.minDate ? moment(state?.minDate) : undefined;
+    }, [state?.minDate]);
     const momentDefaultValue = useMemo(() => {
         return state?.defaultValue ? moment(state?.defaultValue) : undefined;
     }, [state?.defaultValue]);
     const dateFormat = defaultStr(props?.dateFormat, DEFAULT_DATE_FORMATS.date) as IMomentDateFormat;
     useEffect(() => {
         const newState = { ...state };
-        const hasUpdate = props?.startDate != newState.startDate || props?.endDate != newState.endDate || props?.defaultValue != state.defaultValue;
-        if (props?.startDate != state.startDate) {
-            newState.startDate = props?.startDate;
+        const hasUpdate = !areEquals(props?.minDate, newState.minDate) || !areEquals(props?.maxDate, newState.maxDate) || (!areEquals(props?.defaultValue, state.defaultValue));
+        if (!areEquals(props?.minDate, state.minDate)) {
+            newState.minDate = props?.minDate;
         }
-        if (props?.endDate != state.endDate) {
-            newState.endDate = props?.endDate;
+        if (!areEquals(props?.maxDate, state.maxDate)) {
+            newState.maxDate = props?.maxDate;
         }
-        if (props?.defaultValue != state.defaultValue) {
+        if (!areEquals(props?.defaultValue, state.defaultValue)) {
             newState.defaultValue = props?.defaultValue;
+            newState.dateCursor = moment(props?.defaultValue);
         }
         if (hasUpdate) {
             setState(newState);
         }
-    }, [props?.startDate, props?.endDate, state.defaultValue]);
+    }, [props?.minDate, props?.maxDate, props?.defaultValue]);
+    const { dateCursor } = state;
     return {
         i18n,
         locale,
         dateFormat,
-        momentStartDate,
-        momentEndDate,
+        momentMinDate,
+        momentMaxDate,
         momentDefaultValue,
+        dateCursor,
         state,
         setState,
+        isValidSelection: (date: Date) => {
+            const momentDate = moment(date);
+            if (momentMinDate && momentMinDate.isAfter(momentDate, "day")) return false;
+            if (momentMaxDate && momentMaxDate.isBefore(momentDate, "day")) return false;
+            return true;
+        },
         navigateToNext: (event?: GestureResponderEvent) => {
-            let startDate: Date = start.toDate();
+            let newDateCursor = dateCursor;
             switch (state.displayView) {
                 case "year":
-                    const { end } = Calendar.getYearsBoundaries(start.toDate());
-                    startDate = start.clone().year(end).toDate();
+                    const { end } = Calendar.getYearsBoundaries(dateCursor.toDate());
+                    newDateCursor = dateCursor.year(end);
                     break;
                 case "month":
-                    startDate = start.clone().add(1, 'year').toDate();
+                    newDateCursor = dateCursor.add(1, 'year');
                     break;
                 default:
-                    startDate = start.clone().add(1, 'month').toDate();
+                    newDateCursor = dateCursor.add(1, 'month');
                     break;
             }
             setState({
                 ...state,
-                startDate
+                dateCursor: newDateCursor.clone()
             });
         },
         navigateToPrevious: (event?: GestureResponderEvent) => {
-            let startDate: Date = start.toDate();
+            const newDateCursor = dateCursor.clone();
             switch (state.displayView) {
                 case "year":
-                    const { start: startBoundary } = Calendar.getYearsBoundaries(start.toDate());
-                    startDate = start.clone().year(startBoundary).toDate();
+                    const { start: startBoundary } = Calendar.getYearsBoundaries(dateCursor.toDate());
+                    newDateCursor.year(startBoundary);
                     break;
                 case "month":
-                    startDate = start.clone().subtract(1, 'year').toDate();
+                    newDateCursor.subtract(1, 'year');
                     break;
                 default:
-                    startDate = start.clone().subtract(1, 'month').toDate();
+                    newDateCursor.subtract(1, 'month');
                     break;
             }
             setState({
                 ...state,
-                startDate,
+                dateCursor: newDateCursor
             });
         }
     }

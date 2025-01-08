@@ -177,7 +177,9 @@ const index = withAppBar(() => {
                 </Expandable>
                 <ModalExample />
 
-                <Calendar.Day />
+                <Calendar.Day
+                    defaultValue={"2022-01-01"}
+                />
             </View>
         </ScrollView>
     )

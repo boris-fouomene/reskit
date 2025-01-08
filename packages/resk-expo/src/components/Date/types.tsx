@@ -7,8 +7,8 @@ export type ICalendarDate = Date | string;
 
 
 export interface ICalendarBaseProps extends ISurfaceProps {
-    startDate?: ICalendarDate;
-    endDate?: ICalendarDate;
+    minDate?: ICalendarDate;
+    maxDate?: ICalendarDate;
     dateFormat?: IMomentDateFormat,
     testID?: string;
     defaultValue?: ICalendarDate;
@@ -41,6 +41,10 @@ export interface ICalendarDay {
     day: number; // Day of the month*
     value: Date;
     isToday: boolean; // Indicates if the date is today
+    /**
+     * Indicates if the date is the default value
+     */
+    isDefaultValue: boolean;
     /***
      * the formatted date to format : "DD"
      * The string representation of the day of the month (e.g., "01", "02", "03", etc.)

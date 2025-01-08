@@ -297,8 +297,8 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             FormsManager.unmountAction(context.id, formName);
         };
     }, [formName, idRef.current, context.id]);
-    const { padding } = theme;
     if (!ResourcesManager.isAllowed(rest)) return null;
+    const padding = Math.max(7, theme.padding * 70 / 100);
     const fullWidthStyle = fullWidth ? styles.fullWidth : null;
     const compactStyle = compact ? styles.compact : null;
     const hasRightContent = (iconPosition == "right" && iconContent) || (isValidElement(right) && right);
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     touchable: {
-        width: "100%",
+        //width: "100%",
         //paddingHorizontal: 7,
         //paddingVertical: 7,
     },

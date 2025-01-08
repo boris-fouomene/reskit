@@ -8,6 +8,7 @@ const index = withAppBar(() => {
             <Button>
                 Hello Button
             </Button>
+            <Button compact>A compact button</Button>
             <Form
                 name="my-form"
                 onSubmit={({ data }) => {

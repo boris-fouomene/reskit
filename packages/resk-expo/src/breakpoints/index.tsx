@@ -2,6 +2,7 @@ import { Dimensions, PixelRatio } from "react-native";
 import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate } from "./types";
 import { addClassName, IDict, isDOMElement, isObj, Platform, removeClassName } from "@resk/core";
 import { IStyle } from "@src/types";
+import platform from "@platform/index";
 
 
 // int comparer for sorts
@@ -870,7 +871,9 @@ export default class Breakpoints {
 
         return Math.max(numColumns, 1);
     }
+    private static pixelRatioRoundToNearestPixel(value: number) {
 
+    }
     /**
      * Converts provided width percentage to independent pixel (dp).
      * @param  {string} widthPercent The percentage of screen's width that UI element should cover
@@ -879,10 +882,16 @@ export default class Breakpoints {
      */
     static widthPercent(widthPercent: number | string) {
         // Parse string percentage input and convert it to number.
-        const elemWidth = typeof widthPercent === "number" ? widthPercent : parseFloat(widthPercent);
+        const elemWidth = typeof widthPercent === "number" ? widthPercent : parseFloat(widthPercent) || 0;
+        let width = Dimensions.get("window").width;
+        if (this.isDesktopMedia()) {
+            width = width / 3;
+        } else if (this.isTabletMedia()) {
+            width = width / 2;
+        }
         // Use PixelRatio.roundToNearestPixel method in order to round the layout
         // size (dp) to the nearest one that correspons to an integer number of pixels.
-        return PixelRatio.roundToNearestPixel(Dimensions.get("window").width * elemWidth / 100);
+        return this.roundToNearestPixel(width * elemWidth / 100);
     };
 
     /**
@@ -894,12 +903,47 @@ export default class Breakpoints {
     static heightPercent(heightPercent: string | number) {
         // Parse string percentage input and convert it to number.
         const elemHeight = typeof heightPercent === "number" ? heightPercent : parseFloat(heightPercent);
+        let height = Dimensions.get("window").height;
+        if (height > 600 && height < 1000) {
+            height = height / 2;
+        } else if (height > 1000) {
+            height = height / 3;
+        }
         // Use PixelRatio.roundToNearestPixel method in order to round the layout
         // size (dp) to the nearest one that correspons to an integer number of pixels.
-        return PixelRatio.roundToNearestPixel(Dimensions.get("window").height * elemHeight / 100);
+        return this.roundToNearestPixel(height * elemHeight / 100);
     };
+    /**
+     * Rounds a number to the nearest pixel while maintaining consistent behavior across platforms.
+     * 
+     * @param size - The size in logical pixels to be rounded
+     * @param config - Optional configuration object to customize the behavior
+     * @returns {number}, the rounded value
+     * 
+     * @example
+     * ```typescript
+     * // Basic usage
+     * const result = roundToNearestPixel(16.7);
+     * console.log(result.value); // Rounded pixel value
+     * ```
+     * @remarks
+     * This function handles the disparity between web and native environments by normalizing
+     * the pixel ratio calculations. On web, it caps the maximum pixel ratio to avoid
+     * excessive scaling that can occur with high-DPI displays.
+     */
+    static roundToNearestPixel = (size: number) => {
+        size = typeof size === "number" ? size : 0;
+        // Check if we're running on web
+        if (platform.isWeb()) {
+            // For web, we need to account for the difference in pixel density
+            // Typical mobile devices have pixel ratios of 2-3, while web often reports much higher
+            // We'll normalize it to be closer to mobile values
+            const normalizedRatio = Math.min(isNumber(window.devicePixelRatio) ? window.devicePixelRatio : 3, PixelRatio.get(), 3);
+            return Math.round(size * normalizedRatio) / normalizedRatio;
+        }
+        return PixelRatio.roundToNearestPixel(size);
+    }
 }
-
 
 // Given a breakpointsRef.current object, will create a "max" breakpoint
 // going from the largest breakpoint's max value to infinity

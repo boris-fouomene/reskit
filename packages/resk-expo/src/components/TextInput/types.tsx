@@ -325,7 +325,7 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
     /***
      * the text input variant
      */
-    variant?: "labelEmbeded" | "default", // | "outlined" | "flat"
+    variant?: "labelEmbeded" | "default";//| "flat", // | "outlined" | "flat"
 
     /*** A flag indicating whether to display a label with the input. */
     withLabel?: boolean;

@@ -137,10 +137,11 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
  * 
  * console.log(styles); // { containerStyle: [...], contentContainerStyle: [...], inputStyle: [...], labelStyle: [...] }
  */
-const getContainerAndContentStyle = ({ isFocused, compact, isLabelEmbededVariant, textColor, borderColor, theme, isDefaultVariant }: { isLabelEmbededVariant: boolean, canRenderLabel: boolean, theme: ITheme, isFocused: boolean, textColor?: string, borderColor?: string, isDefaultVariant: boolean, compact?: boolean }) => {
+const getContainerAndContentStyle = ({ isFocused, variant, compact, isLabelEmbededVariant, textColor, borderColor, theme, isDefaultVariant }: { isLabelEmbededVariant: boolean, canRenderLabel: boolean, theme: ITheme, variant: ITextInputProps["variant"], isFocused: boolean, textColor?: string, borderColor?: string, isDefaultVariant: boolean, compact?: boolean }) => {
+    const isFlatVariant = false;//variant === "flat";
     const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [styles.input, { color: textColor }], labelStyle: IStyle = [{ color: textColor }];
     const borderedStyle = [
-        isFocused ? styles.focusedOutlineBorder : styles.containerLabelEmbeded,
+        isFocused ? styles.focusedOutlineBorder : styles.borderWidth1,
         { borderColor, borderRadius: theme.roundness },
     ];
     const notEmbeededLabelStyle = [styles.notEmbededLabelStyle],
@@ -150,6 +151,11 @@ const getContainerAndContentStyle = ({ isFocused, compact, isLabelEmbededVariant
         containerStyle.push(borderedStyle);
         containerStyle.push(styles.labelEmbededVariantContainer);
         labelStyle.push(styles.labelEmbededVariantLabel);
+    } else if (isFlatVariant) {
+        inputStyle.push(styles.flatVariantInput);
+        containerStyle.push(styles.flatVariantContainer);
+        contentContainerStyle.push(styles.flatVariantContentContainer);
+        labelStyle.push(styles.flatVariantLabel);
     } else {
         inputStyle.push(notEmbeededInputStyle);
         labelStyle.push(notEmbeededLabelStyle)
@@ -380,7 +386,7 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, onConte
     }, [isPasswordField, secureTextEntryGetToggleIconProps, isSecure]);
     const secureIcon = isPasswordField ? <FontIcon size={25}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure) }} color={textColor} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
-    const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
+    const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     return {
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
@@ -524,7 +530,7 @@ const styles = StyleSheet.create({
         borderWidth: 0,
     },
     outlineNone: {},
-    containerLabelEmbeded: {
+    borderWidth1: {
         borderWidth: 1,
     },
     focusedOutlineBorder: {
@@ -587,6 +593,19 @@ const styles = StyleSheet.create({
     },
     labelEmbededVariantLabel: {
         //paddingLeft: 3,
+    },
+
+    flatVariantContainer: {
+    },
+    flatVariantContentContainer: {
+        borderWidth: 0,
+        borderBottomWidth: 1,
+    },
+    flatVariantInput: {
+
+    },
+    flatVariantLabel: {
+
     },
 })
 

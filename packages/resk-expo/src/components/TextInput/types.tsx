@@ -409,6 +409,16 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
      * This property is useful for controlling the padding and spacing of the input.
      */
     compact?: boolean;
+
+    /**
+     * The minimum height of the text input in case of multiline.
+     */
+    minHeight?: number;
+
+    /***
+     * The maximum height of the text input in case of multiline.
+     */
+    maxHeight?: number;
 };
 
 /**

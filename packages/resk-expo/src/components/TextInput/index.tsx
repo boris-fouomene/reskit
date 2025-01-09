@@ -1,8 +1,8 @@
 import Label from "@components/Label";
 import { isValidElement, mergeRefs } from "@utils";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from "react-native";
-import React, { ReactNode, useEffect, useMemo, useRef } from "react";
-import { formatValueToObject, Platform, IDict, isNonNullString, isStringNumber, parseDecimal, isEmpty } from "@resk/core";
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputContentSizeChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from "react-native";
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
+import { formatValueToObject, Platform, IDict, isNonNullString, isStringNumber, parseDecimal, isEmpty, defaultStr } from "@resk/core";
 import _, { compact, isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
@@ -260,7 +260,7 @@ const getContainerAndContentStyle = ({ isFocused, compact, isLabelEmbededVariant
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -325,6 +325,18 @@ export const useTextInput = ({ defaultValue, compact, opacity, isDropdownAnchor,
     const canToggleSecure = isPasswordField;
     const textColor = error ? theme.colors.error : isFocused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
     const callOptions: ITextInputCallbackOptions = { ...formated, error: !!error, variant, isFocused, textColor: textColor as string, editable, disabled: disabled as boolean };
+    const multiline = !!props.multiline;
+    const minHeight = useMemo(() => {
+        return typeof customMinHeight === "number" ? customMinHeight : 40;
+    }, [customMinHeight]);
+    const maxHeight = useMemo(() => {
+        return typeof customMaxHeight === "number" ? customMaxHeight : 100;
+    }, [customMaxHeight]);
+    const countLines = (text: string) => {
+        return ((defaultStr(text).match(/\n/g) || []).length); // Count \n
+    }
+    const inputDimensionsRef = useRef<IDict>({ width: 0, height: minHeight });
+    const { width, height } = inputDimensionsRef.current;
     const affixContent = useMemo(() => {
         if (affix === false) return null;
         let affContent = typeof affix == "function" ? affix(callOptions) : isValidElement(affix, true) ? affix : null;
@@ -340,8 +352,22 @@ export const useTextInput = ({ defaultValue, compact, opacity, isDropdownAnchor,
             return affContent;
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
-    }, [focusedValue, canValueBeDecimal, error, props.multiline, textColor, affix, isPasswordField]);
+    }, [focusedValue, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
     const inputValue = isFocused ? focusedValue : formated.formattedValue || emptyValue || "";
+    const numberOfLines = useMemo(() => {
+        return countLines(inputValue);
+    }, [inputValue]);
+    const lineHeight = useMemo(() => {
+        return numberOfLines <= 1 ? minHeight : height / numberOfLines;
+    }, [numberOfLines, height]);
+    const inputHeight = useMemo(() => {
+        return !inputValue ? minHeight : height;
+    }, [height, inputValue]);
+    const calcHeight = (actualHeight: number, limit: number) => {
+        return limit
+            ? Math.max(Math.min(limit, actualHeight), minHeight)
+            : Math.max(minHeight, actualHeight, numberOfLines * lineHeight + padding);
+    }
     const canRenderLabel = withLabel !== false;
     const { left, right, label } = getLabelOrLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
     const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null, typeof opacity === "number" ? { opacity } : null];
@@ -360,12 +386,24 @@ export const useTextInput = ({ defaultValue, compact, opacity, isDropdownAnchor,
         placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
         underlineColorAndroid: "transparent",
         ...props,
+        onContentSizeChange: (event) => {
+            if (typeof onContentSizeChange == "function") {
+                onContentSizeChange(event);
+            }
+            const { contentSize } = event.nativeEvent;
+            const width = contentSize.width;
+            const height = calcHeight(contentSize.height, maxHeight);
+            inputDimensionsRef.current = { width, height };
+        },
         variant,
         canRenderLabel,
         error,
         isFocused,
         containerProps: Object.assign({}, { testID: `${testID}-container` }, containerProps, { style: [styles.container, containerStyle, disabledOrEditStyle, containerProps.style] }),
-        contentContainerProps: Object.assign({}, { testID: `${testID}-content-container` }, contentContainerProps, { style: [styles.contentContainer, contentContainerStyle, contentContainerProps.style] }),
+        contentContainerProps: Object.assign({}, { testID: `${testID}-content-container` }, contentContainerProps, {
+            style: [styles.contentContainer, contentContainerStyle,
+            contentContainerProps.style]
+        }),
         label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
         placeholder: placeholder,
@@ -378,6 +416,8 @@ export const useTextInput = ({ defaultValue, compact, opacity, isDropdownAnchor,
             styles.input, { paddingVertical: padding },
             inputStyle,
             compact && styles.compact,
+            multiline && { height: inputHeight },
+            multiline && styles.multilineInput,
             props.style,
             disabledOrEditStyle,
             isDropdownAnchor && editable && styles.dropdownAnchorInput,
@@ -474,6 +514,9 @@ const styles = StyleSheet.create({
         padding: 0,
         paddingVertical: 0,
         paddingHorizontal: 0,
+    },
+    multilineInput: {
+        paddingVertical: 5,
     },
     inputNotEmbededLabelVariant: {},
     focusedInput: {

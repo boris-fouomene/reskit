@@ -19,7 +19,10 @@ const index = withAppBar(() => {
                         label: "Name",
                         type: "text",
                         required: true,
-                    },
+                        multiline: true,
+                        left: <Icon iconName="account-circle" />,
+                        right: <Icon iconName="chevron-right" />,
+                    } as IField<"text">,
                     switch: {
                         label: "Switch",
                         type: "switch",

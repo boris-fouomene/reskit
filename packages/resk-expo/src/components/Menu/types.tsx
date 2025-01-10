@@ -222,10 +222,12 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
      */
     isMenu: boolean;
 
+    anchorMeasurements: IMenuAnchorMeasurements | null;
+
     /***
-     * function to measure the anchor element
+     * The current details on the position of the menu
      */
-    measureAnchor: (callback?: Function) => void;
+    menuPosition: IMenuCalculatedPosition;
 }
 
 
@@ -301,8 +303,6 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
  * const { menuPosition } = useMenuPosition(menuProps);
  */
 export interface IUseMenuPositionProps {
-    /** Measurements of the anchor element */
-    anchorMeasurements: IMenuAnchorMeasurements | null;
     /** Current width of the menu */
     menuWidth: number;
     /** Current height of the menu */

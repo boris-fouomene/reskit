@@ -95,6 +95,7 @@ const index = withAppBar(() => {
                     { label: "Item 8", value: "8" },
                     { label: "Item 9", value: "9" },
                     { label: "Item 10", value: "10" },
+                    ...Array.from({ length: 100 }, (_, i) => ({ label: `Item and ${i + 1}`, value: `${i + 1}` }))
                 ]}
             />
             <View style={[Theme.styles.p5]}>

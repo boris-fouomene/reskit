@@ -72,7 +72,7 @@ import Breakpoints from "@breakpoints/index";
  * The `TextInput` component is designed to be versatile and reusable across various parts of an application, ensuring a consistent and engaging user experience. 
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
-const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
+const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
     const { variant, containerProps, onPress, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, right, label, ...rest } = useTextInput(props);
     const leftContainerProps = Object.assign({}, cLeftContainerProps);
     const isLabelEmbededVariant = variant === "labelEmbeded";
@@ -88,6 +88,7 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
     const wrapperProps = canWrapWithTouchable ? pressableProps : undefined;
     const hasLeft = !!left;
+    const inputProps = { ...(!canWrapWithTouchable ? pressableProps : {}), ...rest, editable: canWrapWithTouchable ? false : editable }
     return <View  {...containerProps}>
         {isLabelEmbededVariant ? null : labelContent}
         <View {...contentContainerProps}>
@@ -95,12 +96,7 @@ const TextInput = React.forwardRef((props: ITextInputProps, ref?: React.Ref<RNTe
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
                 <Wrapper {...wrapperProps}>
-                    <RNTextInput
-                        {...(!canWrapWithTouchable ? pressableProps : {})}
-                        {...rest}
-                        editable={canWrapWithTouchable ? false : editable}
-                        ref={mergeRefs(innerRef, ref)}
-                    />
+                    {typeof render == "function" ? render(inputProps, ref) : <RNTextInput {...inputProps} ref={ref} />}
                 </Wrapper>
             </View>}
             {right}

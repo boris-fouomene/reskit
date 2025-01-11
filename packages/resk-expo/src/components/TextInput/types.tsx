@@ -2,7 +2,7 @@ import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IFormatValueResult, IFormatValueFormat } from "@resk/core";
 import { IOnChangeOptions } from "../../types";
-import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextInputProps } from "react-native";
+import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextInputProps, TextInput } from "react-native";
 import { ReactNode } from "react";
 import { ILabelProps } from "@components/Label";
 import { IFontIconProps } from "@components/Icon/types";
@@ -419,6 +419,15 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
      * The maximum height of the text input in case of multiline.
      */
     maxHeight?: number;
+
+
+    /***
+     * A function that allows for rendering the TextInput component.
+     * This can be useful for conditionally rendering the component based on certain conditions.
+     * @param {TextInputProps} props - The props passed to the TextInput component.
+     * @returns {React.ReactNode} The rendered component.
+     */
+    render?: (props: TextInputProps, ref?: React.Ref<TextInput>) => React.ReactNode;
 };
 
 /**

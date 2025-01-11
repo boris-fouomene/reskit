@@ -15,7 +15,7 @@ import Platform from "@platform";
 import { defaultStr, IDict, isObj } from "@resk/core";
 import stableHash from "stable-hash";
 import { ScrollView } from 'react-native';
-const showScrollBarIndicator = !Platform.isMobileBrowser() && !Platform.isMobileNative();
+const showScrollBarIndicator = !Platform.isMobileBrowser() && !Platform.isNative();
 
 import { ViewProps } from 'react-native';
 import { ITabItemsProps } from './types';
@@ -77,7 +77,7 @@ const TabItems = ({
   React.useEffect(() => {
     Animated.timing(animationRef.current, {
       toValue: activeIndex || 0,
-      useNativeDriver: platform.isMobileNative(),
+      useNativeDriver: platform.isNative(),
       duration: 170,
     }).start();
     scrollable && requestAnimationFrame(scrollHandler);

@@ -40,6 +40,23 @@ function isDev(): boolean {
 const isIos = (): boolean => Platform.OS === 'ios';
 
 /**
+ * Determines if the application is running on web.
+ *
+ * This function checks the `Platform.OS` property to see if it is equal to 
+ * the string `'web'`. It is useful for writing platform-specific code 
+ * or applying styles specific to iOS devices.
+ *
+ * @returns {boolean} - Returns `true` if the application is running on web, otherwise `false`.
+ *
+ * @example
+ * // Example usage:
+ * if (isWeb()) {
+ *   console.log("This app is running on iOS.");
+ * }
+ */
+const isWeb = (): boolean => Platform.OS === 'web' || ReskPlatform.isWeb();
+
+/**
  * Determines if the application is running on Android.
  *
  * This function checks the `Platform.OS` property to see if it is equal to 
@@ -67,12 +84,72 @@ const isAndroid = (): boolean => Platform.OS === 'android';
  *
  * @example
  * // Example usage:
- * if (isMobileNative()) {
+ * if (isNative()) {
  *   console.log("This app is running on a mobile native platform.");
  * }
  */
-const isMobileNative = (): boolean => isAndroid() || isIos();
+const isNative = (): boolean => isAndroid() || isIos();
 
 
+/**
+ * Identity function on web. Returns nothing on other platforms.
+ *
+ * Note: Platform splitting does not tree-shake away the other platforms,
+ * so don't do stuff like e.g. rely on platform-specific imports. Use
+ * platform-split files instead.
+ */
+export function web(value: any) {
+    if (isWeb()) {
+        return value
+    }
+}
 
-export default { ...ReskPlatform, isDev, isIos, isAndroid, isMobileNative };
+/**
+ * Identity function on iOS. Returns nothing on other platforms.
+ *
+ * Note: Platform splitting does not tree-shake away the other platforms,
+ * so don't do stuff like e.g. rely on platform-specific imports. Use
+ * platform-split files instead.
+ */
+function ios(value: any) {
+    if (isIos()) {
+        return value
+    }
+}
+
+/**
+ * Identity function on Android. Returns nothing on other platforms..
+ *
+ * Note: Platform splitting does not tree-shake away the other platforms,
+ * so don't do stuff like e.g. rely on platform-specific imports. Use
+ * platform-split files instead.
+ */
+function android(value: any) {
+    if (isAndroid()) {
+        return value
+    }
+}
+
+/**
+ * Identity function on iOS and Android. Returns nothing on web.
+ *
+ * Note: Platform splitting does not tree-shake away the other platforms,
+ * so don't do stuff like e.g. rely on platform-specific imports. Use
+ * platform-split files instead.
+ */
+function native(value: any) {
+    if (isNative()) {
+        return value
+    }
+}
+
+/***
+ * This function is used to determine if the native driver can be used for animations.
+ * It checks if the current environment is a mobile native application (Android or iOS).
+ * If it is, it returns true, otherwise it returns false.
+ * @returns {boolean} - Returns `true` if the native driver can be used for animations, otherwise `false`.
+ */
+const canUseNativeDriver: () => boolean = isNative;
+
+
+export default { ...ReskPlatform, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };

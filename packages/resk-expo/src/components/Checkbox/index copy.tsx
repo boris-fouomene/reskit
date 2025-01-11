@@ -98,7 +98,7 @@ export const Checkbox = ({ testID, size, checkedIcon, uncheckedColor, uncheckedI
         const newCheckedState = !checked;
         Animated.spring(scaleValue, {
             toValue: newCheckedState ? 1 : 0,
-            useNativeDriver: Platform.isMobileNative(),
+            useNativeDriver: Platform.isNative(),
         }).start();
     };
     const animatedStyle = {

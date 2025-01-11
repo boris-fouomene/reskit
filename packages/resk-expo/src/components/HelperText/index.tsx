@@ -44,7 +44,7 @@ import platform from '@platform/index';
  */
 export function HelperText({ visible = true, testID, color, style, error, ...rest }: IHelperTextProps) {
     const theme = useTheme();
-    const useNativeDriver = platform.isMobileNative();
+    const useNativeDriver = platform.isNative();
     // Animation value for opacity
     const opacity = new Animated.Value(visible ? 1 : 0);
     testID = defaultStr(testID, "resk-helper-text");

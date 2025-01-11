@@ -13,6 +13,7 @@ import { ITheme } from "@theme/types";
 import { IStyle } from "@src/types";
 import { IFontIconProps } from "@components/Icon";
 import { TouchableRipple } from "@components/TouchableRipple";
+import Breakpoints from "@breakpoints/index";
 
 /**
  * @description
@@ -276,7 +277,6 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, onConte
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
     const isLabelEmbededVariant = variant == "labelEmbeded";
     const isDefaultVariant = !isLabelEmbededVariant;
-    const { padding } = theme;
     const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
     const placeholder = isEmpty(props.placeholder) ? "" : props.placeholder;
@@ -332,9 +332,10 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, onConte
     const textColor = error ? theme.colors.error : isFocused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
     const callOptions: ITextInputCallbackOptions = { ...formated, error: !!error, variant, isFocused, textColor: textColor as string, editable, disabled: disabled as boolean };
     const multiline = !!props.multiline;
+    const isMobile = Breakpoints.isMobileMedia();
     const minHeight = useMemo(() => {
-        return typeof customMinHeight === "number" ? customMinHeight : 40;
-    }, [customMinHeight]);
+        return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbededVariant ? 30 : isMobile ? 56 : 46;
+    }, [customMinHeight, isLabelEmbededVariant, isMobile]);
     const maxHeight = useMemo(() => {
         return typeof customMaxHeight === "number" ? customMaxHeight : 100;
     }, [customMaxHeight]);
@@ -372,7 +373,7 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, onConte
     const calcHeight = (actualHeight: number, limit: number) => {
         return limit
             ? Math.max(Math.min(limit, actualHeight), minHeight)
-            : Math.max(minHeight, actualHeight, numberOfLines * lineHeight + padding);
+            : Math.max(minHeight, actualHeight, numberOfLines * lineHeight + 10);
     }
     const canRenderLabel = withLabel !== false;
     const { left, right, label } = getLabelOrLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
@@ -419,7 +420,7 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, onConte
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: [
             styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null),
-            styles.input, { paddingVertical: padding },
+            styles.input, minHeight > 0 && { minHeight },
             inputStyle,
             compact && styles.compact,
             multiline && { height: inputHeight },
@@ -511,6 +512,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         paddingHorizontal: 5,
         flexGrow: 1,
+        //paddingVertical:5,
         overflow: 'hidden',
     },
     inputLabelEmbededVariant: {

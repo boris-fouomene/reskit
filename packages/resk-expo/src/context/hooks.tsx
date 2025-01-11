@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { IReskExpoContext } from "./types";
+import { useDimensions } from "@dimensions/index";
 /**
  * @group ReskExpoProvider
  * Creates a context for the ReskExpoProvider.

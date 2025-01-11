@@ -1,5 +1,5 @@
 import { Dimensions, PixelRatio } from "react-native";
-import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate } from "./types";
+import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointNamePhone, IBreakpointNameSmallPhone, IBreakpointNameMobile, IBreakpointNameTablet, IBreakpointNameDesktop, IBreakpointNameMediumPhone, IBreakpointName } from "./types";
 import { addClassName, IDict, isDOMElement, isObj, Platform, removeClassName } from "@resk/core";
 import { IStyle } from "@src/types";
 import platform from "@platform/index";
@@ -71,14 +71,14 @@ export default class Breakpoints {
             label: "Medium phone",
         },
         xs: {
-            max: 600,  // Small devices (landscape phones, 576px and up)
+            max: 600,  // Small devices (landscape phones, 600px and below)
             name: 'xs',
-            label: "Small devices (landscape phones, 600px and up)",
+            label: "Phone : Small devices (landscape phones, 600 and bellow)",
         },
         sm: {
-            max: 767,  // Medium devices (tablets, 768px and up)
+            max: 767,  // Medium devices (tablets, 767px and below)
             name: 'sm',
-            label: "Medium devices (tablets, 768px and up)",
+            label: "Medium devices (tablets, 767px bellow)",
         },
         md: {
             max: 1024,  // Medium devices (laptops, 1024px and up)
@@ -404,6 +404,25 @@ export default class Breakpoints {
     }
 
     /***
+     * Determines if the current media is classified as a phone.
+     * 
+     * This function utilizes the `isMediaDevice` function to check if the current 
+     * device matches the predefined phone breakpoints.
+     * 
+     * @returns {boolean} - Returns true if the current device is a medium phone; otherwise, false.
+     * 
+     * @example
+     * ```ts
+     * const isPhone = isMediumPhoneMedia();
+     * console.log(isPhone); // Outputs: true or false based on the current breakpoint
+     * ```
+     */
+    public static isMediumPhoneMedia(): boolean {
+        return this.isMediaDevice(this.mediumPhoneBreakpoints);
+    }
+
+
+    /***
      * Determines if the current media is classified as a small phone.
      * 
      * This function utilizes the `isMediaDevice` function to check if the current 
@@ -495,6 +514,14 @@ export default class Breakpoints {
         return dim.height >= dim.width;
     }
 
+    /***
+     * The name of the breakpoint for small phones.
+     *  
+     * @remarks
+     * This constant is used to identify the breakpoint for small phones.
+     * It is used in the `smallPhoneBreakpoints` array to ensure consistency.
+     */
+    public static readonly smallPhoneBreakpoint = "sp";
     /**
      * @constant smallPhoneBreakpoints
      * An array representing the breakpoints for small phone devices.
@@ -508,22 +535,16 @@ export default class Breakpoints {
      * console.log(smallPhoneBreakpoints); // Outputs: ["sp"]
      * ```
      */
-    public static readonly smallPhoneBreakpoints = ["sp"];
+    public static readonly smallPhoneBreakpoints: IBreakpointNameSmallPhone[] = [this.smallPhoneBreakpoint, "smallPhone"];
 
-    /**
-     * @constant mobileBreakpoints
-     * An array representing the breakpoints for mobile devices.
-     *
-     * This array includes the key 'mobile' as well as keys for small phone
-     * breakpoints and other mobile-related breakpoints ('xs' and 'mp').
-     * It is useful for applying styles to a wider range of mobile devices.
+    /***
+     * The name of the breakpoint for phones.
      * 
-     * @example
-     * ```ts
-     * console.log(mobileBreakpoints); // Outputs: ["mobile", "sp", "xs", "mp"]
-     * ```
+     * @remarks
+     * This constant is used to identify the breakpoint for phones.
+     * It is used in the `phoneBreakpoints` array to ensure consistency.
      */
-    public static readonly mobileBreakpoints = ["mobile", ...this.smallPhoneBreakpoints, "xs", "mp"];
+    public static readonly phoneBreakpoint = "xs";
 
     /**
      * @constant phoneBreakpoints
@@ -538,7 +559,41 @@ export default class Breakpoints {
      * console.log(phoneBreakpoints); // Outputs: ["mobile", "sp", "xs", "mp"]
      * ```
      */
-    public static readonly phoneBreakpoints = this.mobileBreakpoints;
+    public static readonly phoneBreakpoints: IBreakpointNamePhone[] = [this.phoneBreakpoint, "phone"];
+
+    /***
+     * The name of the breakpoint for medium phones.
+     *  
+     * @remarks
+     * This constant is used to identify the breakpoint for medium phones.
+     * It is used in the `mediumPhoneBreakpoints` array to ensure consistency.
+     */
+    public static readonly mediumPhoneBreakpoint = "mp";
+
+    /**
+     * @constant mediumPhoneBreakpoints
+     * An array representing the breakpoints for medium phone devices.
+     * This array includes the key 'xs' and the generic 'mediumPhone'.
+     * It can be used in responsive design to apply styles specifically for
+     * medium phone screens.
+     */
+    public static readonly mediumPhoneBreakpoints: IBreakpointNameMediumPhone[] = [this.mediumPhoneBreakpoint, "mediumPhone"];
+
+    /**
+     * @constant mobileBreakpoints
+     * An array representing the breakpoints for mobile devices.
+     *
+     * This array includes the key 'mobile' as well as keys for small phone
+     * breakpoints and other mobile-related breakpoints ('xs' and 'mp').
+     * It is useful for applying styles to a wider range of mobile devices.
+     * 
+     * @example
+     * ```ts
+     * console.log(mobileBreakpoints); // Outputs: ["mobile", "sp", "xs", "mp"]
+     * ```
+     */
+    public static readonly mobileBreakpoints: IBreakpointNameMobile[] = ["mobile", ...this.smallPhoneBreakpoints, ...this.phoneBreakpoints, ...this.mediumPhoneBreakpoints];
+
 
     /**
      * @constant tabletBreakpoints
@@ -553,7 +608,7 @@ export default class Breakpoints {
      * console.log(tabletBreakpoints); // Outputs: ["tablet", "md", "sm"]
      * ```
      */
-    public static readonly tabletBreakpoints = ["tablet", "md", "sm"];
+    public static readonly tabletBreakpoints: IBreakpointNameTablet[] = ["tablet", "md", "sm"];
 
     /**
      * @constant desktopBreakpoints
@@ -567,7 +622,7 @@ export default class Breakpoints {
      * console.log(desktopBreakpoints); // Outputs: ["desktop", "xl", "lg"]
      * ```
      */
-    public static readonly desktopBreakpoints = ["desktop", "xl", "lg"];
+    public static readonly desktopBreakpoints: IBreakpointNameDesktop[] = ["desktop", "xl", "lg"];
 
 
     /**
@@ -613,7 +668,13 @@ export default class Breakpoints {
 
             // Determine the new device class based on media queries
             let className = this.isMobileMedia() ? "mobile" : this.isTabletMedia() ? "tablet" : "desktop";
-
+            if (this.isSmallPhoneMedia()) {
+                className += "small-phone";
+            } else if (this.isPhoneMedia()) {
+                className += "phone";
+            } else if (this.isMediumPhoneMedia()) {
+                className += "medium-phone";
+            }
             // Add the new device class to the body element
             addClassName(b, className);
             b.setAttribute(deviceKey, className);
@@ -1010,5 +1071,3 @@ const getWidth = (width?: number) => {
     }
     return _width;
 }
-
-

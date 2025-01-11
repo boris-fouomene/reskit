@@ -7,7 +7,7 @@ import { IObservable, isNonNullString, isObj, isObservable, observable } from '@
 import useStableMemo from "@utils/useStableMemo";
 import { IFlatStyle, IReactComponent, IStyle } from "../types";
 import { StyleSheet } from "react-native";
-import { IBreakpoints } from '@src/breakpoints/types';
+import { IBreakpointName, IBreakpoints } from '@src/breakpoints/types';
 
 
 
@@ -29,6 +29,7 @@ import { IBreakpoints } from '@src/breakpoints/types';
  * - `isMobileOrTablet`: A boolean indicating if the device is either mobile or tablet.
  * - `isTabletOrDeskTop`: A boolean indicating if the device is either tablet or desktop.
  * - `isPhone`: A boolean indicating if the device is classified as a phone.
+ * - `isMediumPhone`: A boolean indicating if the device is classified as a medium phone.
  * - `isSmallPhone`: A boolean indicating if the device is classified as a small phone.
  * - `window`: An object representing the dimensions of the window.
  * - `screen`: An object representing the dimensions of the screen.
@@ -52,6 +53,7 @@ export const getDimensions = (): IDimensions => {
 		isMobileOrTablet: Breakpoints.isMobileOrTabletMedia(),
 		isTabletOrDeskTop: Breakpoints.isTabletOrDeskTopMedia(),
 		isPhone: Breakpoints.isPhoneMedia(),
+		isMediumPhone: Breakpoints.isMediumPhoneMedia(),
 		isSmallPhone: Breakpoints.isSmallPhoneMedia(),
 		...screen,
 		window: Dimensions.get("window"),
@@ -159,10 +161,16 @@ export const dimentionAddListener = (callback: (dimensions: IDimensions) => any,
 };
 
 
-// Defines the structure for style properties and breakpoints
-type IStyleProps = {
+/**
+ * @interface IBreakpointStyleProps
+ * Type definition for a component's props that includes responsive styling capabilities.
+ * @typedef {Object} IBreakpointStyleProps
+ * @property {IStyle} [style] - The base style to apply.
+ * @property {(Partial<Record<IBreakpointName, IStyle>>) | ((dimensions: IDimensions) => IStyle)} [breakpointStyle] - The style to apply based on the current breakpoint.
+ */
+type IBreakpointStyleProps = {
 	style?: IStyle; // The base style to apply
-	breakpointStyle?: (Partial<Record<keyof IBreakpoints | 'mobile' | 'phone' | 'tablet' | 'desktop', IStyle>>) | ((dimensions: IDimensions) => IStyle);
+	breakpointStyle?: (Partial<Record<IBreakpointName, IStyle>>) | ((dimensions: IDimensions) => IStyle);
 };
 
 /**
@@ -170,16 +178,16 @@ type IStyleProps = {
  * Type definition for a component's props that includes responsive styling capabilities.
  * 
  * This type extends the base props `T` by omitting any properties that are already defined in 
- * the `IStyleProps` interface, while also ensuring that the component has all the properties 
- * defined in `IStyleProps`. This allows for a clean integration of responsive styles 
+ * the `IBreakpointStyleProps` interface, while also ensuring that the component has all the properties 
+ * defined in `IBreakpointStyleProps`. This allows for a clean integration of responsive styles 
  * without conflicting with existing props.
  * 
- * @template T - The base props type that extends `IStyleProps`. Defaults to `any`.
+ * @template T - The base props type that extends `IBreakpointStyleProps`. Defaults to `any`.
  * 
  * ### Key Features:
- * - **Omitted Properties**: By using `Omit<T, keyof IStyleProps>`, any properties from `T` that 
- *   overlap with `IStyleProps` are removed, preventing prop collisions.
- * - **Breakpoint Style Properties**: The resulting type includes all properties from `IStyleProps`, 
+ * - **Omitted Properties**: By using `Omit<T, keyof IBreakpointStyleProps>`, any properties from `T` that 
+ *   overlap with `IBreakpointStyleProps` are removed, preventing prop collisions.
+ * - **Breakpoint Style Properties**: The resulting type includes all properties from `IBreakpointStyleProps`, 
  *   ensuring that any component using this type will have access to responsive styling features.
  * 
  * ### Usage Example:
@@ -187,7 +195,7 @@ type IStyleProps = {
  * or styled components to define props that require responsive styling.
  * 
  * ```typescript
- * interface IStyleProps {
+ * interface IBreakpointStyleProps {
  *   style?: React.CSSProperties; // Base style prop
  *   breakpointStyle?: (dimensions: IDimensionsProps) => React.CSSProperties; // Function for responsive styles
  * }
@@ -204,7 +212,7 @@ type IStyleProps = {
  * ```
  */
 export type IWithBreakpointStyle<T = any> =
-	Omit<T, keyof IStyleProps> & IStyleProps;
+	Omit<T, keyof IBreakpointStyleProps> & IBreakpointStyleProps;
 /**
  * @function useBreakpointStyle
  * A custom hook that applies responsive styles based on breakpoints.
@@ -237,7 +245,7 @@ export type IWithBreakpointStyle<T = any> =
  *    ```
  *    Here, different styles are applied based on the current breakpoint, allowing for more granular control.
  */
-export function useBreakpointStyle<T extends IStyleProps = any>({ style, breakpointStyle }: IWithBreakpointStyle<T>) {
+export function useBreakpointStyle<T extends IBreakpointStyleProps = any>({ style, breakpointStyle }: IWithBreakpointStyle<T>) {
 	const dimensions = useDimensions(!!breakpointStyle); // Hook to get current dimensions
 	const currentMedia = Breakpoints.getCurrentMedia(); // Get the current breakpoint
 	// Use stable memoization to optimize performance
@@ -253,15 +261,17 @@ export function useBreakpointStyle<T extends IStyleProps = any>({ style, breakpo
 			if (breakpointStyle[currentMedia]) {
 				return StyleSheet.flatten([style, breakpointStyle[currentMedia]]);
 			}
-			const mQueries: Partial<Record<keyof IBreakpoints | 'mobile' | 'phone' | 'tablet' | 'desktop', IStyle>> = breakpointStyle;
+			const mQueries: Partial<Record<IBreakpointName, IStyle>> = breakpointStyle;
 			// Determine which style key to apply based on device type
-			const { isMobile, isDesktop, isPhone, isTablet } = dimensions;
-			const styleKey = isPhone && "phone" in mQueries ? "phone" :
-				isMobile && "mobile" in mQueries ? "mobile" :
-					isTablet && "tablet" in mQueries ? "tablet" :
-						isDesktop && "desktop" in mQueries ? "desktop" :
-							undefined;
-
+			const { isMobile, isDesktop, isPhone, isTablet, isSmallPhone, isMediumPhone } = dimensions;
+			const styleKey =
+				isSmallPhone && "sammPhone" in mQueries ? "smallPhone" :
+					isMediumPhone && "mediumPhone" in mQueries ? "mediumPhone" :
+						isPhone && "phone" in mQueries ? "phone" :
+							isMobile && "mobile" in mQueries ? "mobile" :
+								isTablet && "tablet" in mQueries ? "tablet" :
+									isDesktop && "desktop" in mQueries ? "desktop" :
+										undefined;
 			if (styleKey) return StyleSheet.flatten([style, mQueries[styleKey]]);
 			return StyleSheet.flatten([style]);
 		}
@@ -290,7 +300,7 @@ export function useBreakpointStyle<T extends IStyleProps = any>({ style, breakpo
  * 1. **Basic Usage**:
  *    Wrap a functional component to provide it with responsive styles:
  *    ```typescript
- *    const MyComponent: React.FC<IStyleProps> = ({ style }) => (
+ *    const MyComponent: React.FC<IBreakpointStyleProps> = ({ style }) => (
  *        <View style={style}>
  *            <Text>Hello, World!</Text>
  *        </View>
@@ -303,7 +313,7 @@ export function useBreakpointStyle<T extends IStyleProps = any>({ style, breakpo
  * 2. **Using with a Class Component**:
  *    Wrap a class component to enable responsive styling:
  *    ```typescript
- *    class MyClassComponent extends React.Component<IStyleProps,MyComponentState> {
+ *    class MyClassComponent extends React.Component<IBreakpointStyleProps,MyComponentState> {
  *        render() {
  *            return (
  *                <View style={this.props.style}>
@@ -324,7 +334,7 @@ export function useBreakpointStyle<T extends IStyleProps = any>({ style, breakpo
  *    ```
  *    This custom display name will appear in React DevTools, making it easier to identify the component.
  */
-export function withBreakpointStyle<IProps extends IStyleProps = any, IState = any>(Component: IReactComponent<IProps, IState>, displayName?: string) {
+export function withBreakpointStyle<IProps extends IBreakpointStyleProps = any, IState = any>(Component: IReactComponent<IProps, IState>, displayName?: string) {
 	// Define a functional component that wraps the provided component
 	const fn = React.forwardRef<any, IWithBreakpointStyle<IProps>>((props, ref): React.ReactNode => {
 		const style = useBreakpointStyle(props); // Get responsive styles using the custom hook

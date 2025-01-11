@@ -1,5 +1,5 @@
 import { Material3Scheme } from "@pchmn/expo-material3-theme";
-
+import { IBreakpointName } from "@breakpoints/types";
 
 
 /**
@@ -220,11 +220,25 @@ export interface ITheme {
   colors: IThemeColorsTokens;
 
   /***
-   * The padding value is used to adjust the padding of components like buttons, cards, text inputs, and other UI elements. 
-   * This property influences how much space is reserved around the edges of these elements. 
-   * A low padding value results in more space between the element and its surroundings, while a higher value makes the element more compact.
+   * The spacing value is used to adjust the spacing of components like buttons, cards, text inputs, and other UI elements.
+   * This property influences how much space is reserved around the edges of these elements.
+   * A low spacing value results in more space between the element and its surroundings, while a higher value makes the element more compact.
    */
-  padding?: number;
+  spaces?: IThemeSpaces;
+
+  /***
+   * The font sizes value is used to adjust the font sizes of components like buttons, cards, text inputs, and other UI elements.
+   * This property influences the size of the text within these elements.
+   * A low font size value results in smaller text, while a higher value makes the text more readable.
+   */
+  fontSizes?: IThemeFontSizes;
+
+  /***
+   * The border radius value is used to adjust the border radius of components like buttons, cards, text inputs, and other UI elements.
+   * This property influences the roundedness of the corners of these elements.
+   * A low border radius value results in sharper corners, while a higher value makes the corners more rounded.
+   */
+  borderRadius?: IThemeBorderRadius;
 }
 
 /**
@@ -246,3 +260,440 @@ export interface ITheme {
  * ```
  */
 export type IThemeColorSheme = { color?: string; backgroundColor?: string };
+
+
+/**
+ * Represents the theme's spacing configuration.
+ * 
+ * @remarks
+ * This interface defines the spacing values for different breakpoints and custom sizes.
+ * It uses a record type to allow for flexible key-value pairs, where keys are either breakpoint names or custom size breakpoints (e.g., `_12sm`).
+ * The interface also includes predefined spacing values for common breakpoints.
+ * 
+ * @example
+ * ```typescript
+ * const themeSpaces: IThemeSpaces = {
+ *   _2xs: 4,
+ *   xs: 8,
+ *   sm: 12,
+ *   md: 16,
+ *   lg: 20,
+ *   xl: 24,
+ *   _2xl: 28,
+ *   _3xl: 32,
+ *   _4xl: 36,
+ *   _5xl: 40,
+ *   '12sm': 20,
+ * };
+ * ```
+ */
+export interface IThemeSpaces extends Partial<Record<IBreakpointName | `_${number}${IBreakpointName}`, number>> {
+  /**
+   * The spacing value for the `_2xs` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the smallest spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   _2xs: 4,
+   * };
+   * ```
+   */
+  _2xs: number,
+
+  /**
+   * The spacing value for the `xs` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the extra small spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   xs: 8,
+   * };
+   * ```
+   */
+  xs: number,
+
+  /**
+   * The spacing value for the `sm` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the small spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   sm: 12,
+   * };
+   * ```
+   */
+  sm: number,
+
+  /**
+   * The spacing value for the `md` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the medium spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   md: 16,
+   * };
+   * ```
+   */
+  md: number,
+
+  /**
+   * The spacing value for the `lg` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the large spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   lg: 20,
+   * };
+   * ```
+   */
+  lg: number,
+
+  /**
+   * The spacing value for the `xl` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the extra large spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   xl: 24,
+   * };
+   * ```
+   */
+  xl: number,
+
+  /**
+   * The spacing value for the `_2xl` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the 2xl spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   _2xl: 28,
+   * };
+   * ```
+   */
+  _2xl: number,
+
+  /**
+   * The spacing value for the `_3xl` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the 3xl spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   _3xl: 32,
+   * };
+   * ```
+   */
+  _3xl: number,
+
+  /**
+   * The spacing value for the `_4xl` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the 4xl spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   _4xl: 36,
+   * };
+   * ```
+   */
+  _4xl: number,
+
+  /**
+   * The spacing value for the `_5xl` breakpoint.
+   * 
+   * @ remarks
+   * This value is used for the 5xl spacing size.
+   * 
+   * @example
+   * ```typescript
+   * const themeSpaces: IThemeSpaces = {
+   *   _5xl: 40,
+   * };
+   * ```
+   */
+  _5xl: number,
+}
+
+/**
+ * @interface IThemeFontSizes
+ * Represents the theme's font size configuration.
+ * 
+ * @remarks
+ * This interface defines the font sizes for different breakpoints and custom sizes.
+ * It uses a record type to allow for flexible key-value pairs, where keys are either breakpoint names or custom size breakpoints (e.g., `_12_sm`).
+ * The interface also includes predefined font sizes for common breakpoints.
+ * 
+ * @example
+ * ```typescript
+ * const themeFontSizes: IThemeFontSizes = {
+ *   _2xs: 10,
+ *   xs: 12,
+ *   sm: 14,
+ *   md: 16,
+ *   lg: 18,
+ *   xl: 20,
+ *   _2xl: 22,
+ *   _3xl: 24,
+ *   _4xl: 26,
+ *   _5xl: 28,
+ *   '12_sm': 15,
+ * };
+ * ```
+ */
+export interface IThemeFontSizes extends Partial<Record<IBreakpointName | `_${number}${IBreakpointName}`, number>> {
+  /**
+   * The font size for the `_2xs` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the smallest font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   _2xs: 10,
+   * };
+   * ```
+   */
+  _2xs: number,
+
+  /**
+   * The font size for the `xs` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the extra small font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   xs: 12,
+   * };
+   * ```
+   */
+  xs: number,
+
+  /**
+   * The font size for the `sm` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the small font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   sm: 14,
+   * };
+   * ```
+   */
+  sm: number,
+
+  /**
+   * The font size for the `md` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the medium font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   md: 16,
+   * };
+   * ```
+   */
+  md: number,
+
+  /**
+   * The font size for the `lg` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the large font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   lg: 18,
+   * };
+   * ```
+   */
+  lg: number,
+
+  /**
+   * The font size for the `xl` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the extra large font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   xl: 20,
+   * };
+   * ```
+   */
+  xl: number,
+
+  /**
+   * The font size for the `_2xl` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the 2xl font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   _2xl: 22,
+   * };
+   * ```
+   */
+  _2xl: number,
+
+  /**
+   * The font size for the `_3xl` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the 3xl font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   _3xl: 24,
+   * };
+   * ```
+   */
+  _3xl: number,
+
+  /**
+   * The font size for the `_4xl` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the 4xl font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   _4xl: 26,
+   * };
+   * ```
+   */
+  _4xl: number,
+
+  /**
+   * The font size for the `_5xl` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the 5xl font size.
+   * 
+   * @example
+   * ```typescript
+   * const themeFontSizes: IThemeFontSizes = {
+   *   _5xl: 28,
+   * };
+   * ```
+   */
+  _5xl: number,
+}
+/**
+ * @interface IThemeBorderRadius
+ * Represents the theme's border radius configuration.
+ * 
+ * @remarks
+ * This interface defines the border radius values for different breakpoints and custom sizes.
+ * It uses a record type to allow for flexible key-value pairs, where keys are either breakpoint names or custom size breakpoints (e.g., `_12_sm`).
+ * The interface also includes predefined border radius values for common breakpoints.
+ * 
+ * @example
+ * ```typescript
+ * const themeBorderRadius: IThemeBorderRadius = {
+ *   _2xs: 2,
+ *   xs: 4,
+ *   sm: 8,
+ *   md: 12,
+ *   '12_sm': 10,
+ * };
+ * ```
+ */
+export interface IThemeBorderRadius extends Partial<Record<IBreakpointName | `_${number}${IBreakpointName}`, number>> {
+  /**
+   * The border radius for the `_2xs` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the smallest border radius.
+   * 
+   * @example
+   * ```typescript
+   * const themeBorderRadius: IThemeBorderRadius = {
+   *   _2xs: 2,
+   * };
+   * ```
+   */
+  _2xs: 2,
+
+  /**
+   * The border radius for the `xs` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the extra small border radius.
+   * 
+   * @example
+   * ```typescript
+   * const themeBorderRadius: IThemeBorderRadius = {
+   *   xs: 4,
+   * };
+   * ```
+   */
+  xs: 4,
+
+  /**
+   * The border radius for the `sm` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the small border radius.
+   * 
+   * @example
+   * ```typescript
+   * const themeBorderRadius: IThemeBorderRadius = {
+   *   sm: 8,
+   * };
+   * ```
+   */
+  sm: 8,
+
+  /**
+   * The border radius for the `md` breakpoint.
+   * 
+   * @remarks
+   * This value is used for the medium border radius.
+   * 
+   * @example
+   * ```typescript
+   * const themeBorderRadius: IThemeBorderRadius = {
+   *   md: 12,
+   * };
+   * ```
+   */
+  md: 12,
+}

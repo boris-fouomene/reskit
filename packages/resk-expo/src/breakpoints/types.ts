@@ -42,8 +42,8 @@
  */
 export interface IBreakpoints {
     sp?: IBreakpoint; // Small phone breakpoint (e.g., up to 320px)
-    mp?: IBreakpoint; // Medium phone breakpoint (e.g., 321px to 480px)
-    xs?: IBreakpoint; // Extra small devices (e.g., landscape phones, 576px and up)
+    mp?: IBreakpoint; // Phone breakpoint (e.g., 321px to 480px)
+    xs?: IBreakpoint; // Medium Phone (Extra small devices (e.g., landscape phones, 576px and up)
     sm?: IBreakpoint; // Small devices (e.g., tablets, 768px and up)
     md?: IBreakpoint; // Medium devices (e.g., laptops, 1024px and up)
     lg?: IBreakpoint; // Large devices (e.g., desktops, 1200px and up)
@@ -112,6 +112,99 @@ export interface IBreakpoint {
     label?: string; // A label to describe the breakpoint (e.g., "Tablet", "Desktop")
 }
 
+/**
+ * Represents the name of a breakpoint for small phones.
+ * 
+ * @remarks
+ * This type is used to define the breakpoint name for small phones, typically with a maximum width of 320px.
+ * 
+ * @example
+ * ```typescript
+ * const smallPhoneBreakpoint: IBreakpointNameSmallPhone = "sp";
+ * ```
+ */
+export type IBreakpointNameSmallPhone = "sp" | "smallPhone";
+
+/**
+ * Represents the name of a breakpoint for medium phones.
+ * 
+ * @remarks
+ * This type is used to define the breakpoint name for medium phones, typically with a width up to 399.
+ * 
+ * @example
+ * ```typescript
+ * const mediumPhoneBreakpoint: IBreakpointNamePhone = "mp";
+ * ```
+ */
+export type IBreakpointNameMediumPhone = "mp" | "mediumPhone";
+
+/**
+ * Represents the name of a breakpoint for phones (extra small devices, medium phones and small phones).
+ * 
+ * @remarks
+ * This type is used to define the breakpoint name for medium phones, typically for landscape phones with a width up to 600.
+ * 
+ * @example
+ * ```typescript
+ * const mediumPhoneBreakpoint: IBreakpointNameMediumPhone = "xs";
+ * ```
+ */
+export type IBreakpointNamePhone = "xs" | "phone";
+
+/**
+ * Represents the name of a breakpoint for mobile devices.
+ * 
+ * @remarks
+ * This type is a union of breakpoint names for small phones (`sp`), medium phones (`mp`), extra small devices (`xs`), and the generic "mobile" keyword.
+ * It is used to categorize all mobile device breakpoints.
+ * 
+ * @example
+ * ```typescript
+ * const mobileBreakpoint: IBreakpointNameMobile = "sp"; // or "mp", "xs", "mobile"
+ * ```
+ */
+export type IBreakpointNameMobile = IBreakpointNameSmallPhone | IBreakpointNamePhone | IBreakpointNameMediumPhone | "mobile";
+
+/**
+ * Represents the name of a breakpoint for tablet devices.
+ * 
+ * @remarks
+ * This type is a union of breakpoint names for tablets, including the generic "tablet" keyword and specific breakpoints like `sm` (small devices) and `md` (medium devices).
+ * 
+ * @example
+ * ```typescript
+ * const tabletBreakpoint: IBreakpointNameTablet = "md"; // or "sm", "tablet"
+ * ```
+ */
+export type IBreakpointNameTablet = "tablet" | "md" | "sm";
+
+/**
+ * Represents the name of a breakpoint for desktop devices.
+ * 
+ * @remarks
+ * This type is a union of breakpoint names for desktops, including the generic "desktop" keyword and specific breakpoints like `lg` (large devices) and `xl` (extra-large devices).
+ * 
+ * @example
+ * ```typescript
+ * const desktopBreakpoint: IBreakpointNameDesktop = "lg"; // or "xl", "desktop"
+ * ```
+ */
+export type IBreakpointNameDesktop = "desktop" | "xl" | "lg";
+
+/**
+ * Represents the name of a breakpoint for all device types.
+ * 
+ * @remarks
+ * This type is a union of all possible breakpoint names, including:
+ * - Keys from the `IBreakpoints` interface (`sp`, `mp`, `xs`, `sm`, `md`, `lg`, `xl`).
+ * - Generic device types like "tablet", "desktop", "mobile", "phone", "mediumPhone" and "smallPhone".
+ *
+ * @example
+ * ```typescript
+ * const breakpointName: IBreakpointName = "sm"; // or "tablet", "desktop", "mobile", etc.
+ * ```
+ */
+export type IBreakpointName = keyof IBreakpoints | "tablet" | "desktop" | "mobile" | "phone" | "mediumPhone" | "smallPhone";
 
 /**
  * @group Breakpoints

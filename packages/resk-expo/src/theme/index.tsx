@@ -1,6 +1,6 @@
-import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorsTokens } from "./types";
+import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorsTokens, IThemeFontSizes, IThemeSpaces, IThemeBorderRadius } from "./types";
 import Colors from "./colors";
-import { defaultStr, extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
+import { defaultStr, extendObj, IDict, IObservable, isNonNullString, isObj, isObservable, observable } from "@resk/core";
 import { packageName } from "@utils/index";
 import session from "../session";
 import Color from "color";
@@ -10,6 +10,8 @@ import { useReskExpo } from "@src/context/hooks";
 import Elevations from "./Elevations";
 import { useColorScheme } from "react-native";
 import { useMaterial3Theme, isDynamicThemeSupported, getMaterial3Theme as _getMaterial3Theme, createMaterial3Theme as _createMaterial3Theme } from '@pchmn/expo-material3-theme';
+import { IBreakpointName } from "@breakpoints/types";
+import Breakpoints from "@breakpoints/index";
 export * from "./utils";
 export * from "./types";
 
@@ -180,11 +182,36 @@ export function createTheme(theme: ITheme): IThemeManager {
     const Material3Theme = getMaterial3Theme(theme?.colors?.primary);
     theme = extendObj({}, theme?.dark ? Material3Theme.dark : Material3Theme.light, theme);
     const context = theme;
+    const spaces = Object.assign({}, {
+        _2xs: 2,
+        xs: 4,
+        sm: 8,
+        md: 12,
+        lg: 16,
+        xl: 20,
+        _2xl: 24,
+        _3xl: 28,
+        _4xl: 32,
+        _5xl: 40,
+    }, context.spaces), fontSizes = Object.assign({}, {
+        _2xs: 10,
+        xs: 12,
+        sm: 14,
+        md: 16,
+        lg: 18,
+        xl: 20,
+        _2xl: 22,
+        _3xl: 26,
+        _4xl: 32,
+        _5xl: 40,
+    }, context.fontSizes), borderRadius = Object.assign({}, {
+        _2xs: 2,
+        xs: 4,
+        sm: 8,
+        md: 12,
+    }, context.borderRadius);
     return {
         ...Object.assign({}, theme),
-        get padding() {
-            return (typeof theme.padding == "number" ? theme.padding : 10)
-        },
         get styles() {
             return styles;
         },
@@ -269,13 +296,70 @@ export function createTheme(theme: ITheme): IThemeManager {
             }
             return result;
         },
+        get spaces() {
+            return spaces;
+        },
+        get fontSizes() {
+            return fontSizes;
+        },
+        get borderRadius() {
+            return borderRadius;
+        },
+        space(breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`): number | undefined {
+            return getBreakpointValue(spaces, breakpointName);
+        },
+        fontSize(breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`): number | undefined {
+            return getBreakpointValue(fontSizes, breakpointName);
+        },
+        bRadius(breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`): number | undefined {
+            return getBreakpointValue(borderRadius, breakpointName);
+        },
         get addEventListener() {
             return addEventListener;
-        }
+        },
     };
 }
 
-
+const getBreakpointValue = (values: Partial<Record<IBreakpointName | `_${number}${IBreakpointName}`, number>>, breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`): number | undefined => {
+    if (isNonNullString(breakpointName) && typeof values[breakpointName] == "number") {
+        return values[breakpointName];
+    }
+    let coef = 1;
+    if (Breakpoints.isSmallPhoneMedia()) {
+        const value = typeof values[Breakpoints.smallPhoneBreakpoint] == "number" ? values[Breakpoints.smallPhoneBreakpoint] :
+            typeof values.smallPhone == "number" ? (values.smallPhone as number) :
+                undefined;
+        if (value) {
+            return value * coef;
+        }
+        return undefined;
+    }
+    if (Breakpoints.isMediumPhoneMedia()) {
+        const value = typeof values[Breakpoints.mediumPhoneBreakpoint] == "number" ? values[Breakpoints.mediumPhoneBreakpoint] :
+            typeof values.mediumPhone == "number" ? values.mediumPhone :
+                undefined;
+        if (value) {
+            return value * coef;
+        }
+        return undefined;
+    }
+    if (Breakpoints.isPhoneMedia()) {
+        const value = typeof values[Breakpoints.phoneBreakpoint] == "number" ? values[Breakpoints.phoneBreakpoint] :
+            typeof values.phone == "number" ? values.phone :
+                undefined;
+        if (value) {
+            return value * coef;
+        }
+    }
+    coef = Breakpoints.isTabletMedia() ? 1 : 0.7;
+    const array = Breakpoints.isMobileMedia() ? Breakpoints.mobileBreakpoints : Breakpoints.isTabletMedia() ? Breakpoints.tabletBreakpoints : Breakpoints.desktopBreakpoints;
+    for (const b of array) {
+        if (typeof values[b] == "number") {
+            return values[b] * coef;
+        }
+    }
+    return undefined;
+}
 
 
 /***
@@ -572,12 +656,51 @@ export interface IThemeManager extends ITheme {
      */
     addEventListener: (callstack: (theme: ITheme) => any) => { remove: () => any };
 
+    fontSizes: IThemeFontSizes;
+    spaces: IThemeSpaces;
+    borderRadius: IThemeBorderRadius;
     /***
-     * The padding value is used to adjust the padding of components like buttons, cards, text inputs, and other UI elements. 
-     * This property influences how much space is reserved around the edges of these elements. 
-     * A low padding value results in more space between the element and its surroundings, while a higher value makes the element more compact.
+     * Retrieves the spacing value for the given breakpoint.
+     * 
+     * @param {IBreakpointName} [breakpointName] - The name of the breakpoint to retrieve the spacing value for.
+     * By default, the method returns the spacing value for the current breakpoint.
+     * @returns {number} The spacing value for the given breakpoint.
+     * 
+     * @example
+     * ```ts
+     * const spacing = space("md");
+     * console.log(spacing); // Outputs: 16
+     * ```
      */
-    padding: number;
+    space: (breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`) => number | undefined;
+    /***
+     * Retrieves the font size value for the given breakpoint.
+     * 
+     * @param {IBreakpointName} [breakpointName] - The name of the breakpoint to retrieve the font size value for.
+     * By default, the method returns the font size value for the current breakpoint.
+     * @returns {number} The font size value for the given breakpoint.
+     * 
+     * @example
+     * ```ts
+     * const fontSize = fontSize("md");
+     * console.log(fontSize); // Outputs: 16
+     * ```
+     */
+    fontSize: (breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`) => number | undefined;
+    /***
+     * Retrieves the border radius value for the given breakpoint.
+     * 
+     * @param {IBreakpointName} [breakpointName] - The name of the breakpoint to retrieve the border radius value for.
+     * by default, the method returns the border radius value for the current breakpoint.
+     * @returns {number} The border radius value for the given breakpoint.
+     * 
+     * @example
+     * ```ts
+     * const borderRadius = bRadius("md");
+     * console.log(borderRadius); // Outputs: 12
+     * ```
+     */
+    bRadius: (breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`) => number | undefined;
 };
 
 export * from "./useColorScheme";

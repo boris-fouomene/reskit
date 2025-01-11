@@ -24,6 +24,8 @@ export interface IDimensions extends ScaledSize {
     /**
      * @type isMobile
      * Indicates if the device is a mobile device. 
+     * A mobile device typically refers to a device with a screen size smaller than a tablet.
+     * It's a combination of the `small phone, phone and mediumPhone` properties.
      * Returns `true` if the device is classified as mobile based on the breakpoints.
      */
     isMobile: boolean;
@@ -70,8 +72,16 @@ export interface IDimensions extends ScaledSize {
      */
     isSmallPhone: boolean;
 
+
     /** 
-     * @type isLargePhone
+     * @type isMediumPhone
+     * Indicates if the device is a medium phone.
+     * Returns `true` if the device is classified as a medium phone based on the breakpoints.
+     */
+    isMediumPhone: boolean;
+
+    /** 
+     * @type isMediumPhone
      * The screen dimensions of the device as a `ScaledSize` object,
      * which includes width and height values.
      */

@@ -1,6 +1,6 @@
-import { Platform } from "@resk/core";
-import { StyleSheet } from "react-native";
+import { StyleProp, StyleSheet, ViewStyle } from "react-native";
 import { isRTL } from "@utils/i18nManager";
+import Platform from "@platform";
 
 /**
  * @description
@@ -237,6 +237,9 @@ const styles = StyleSheet.create({
     underline: { textDecorationLine: 'underline' },
     lineThrough: { textDecorationLine: 'line-through' },
 
+    flex0: {
+        flex: 0,
+    },
     /**
      * Applies flex properties to the component.
      * @example
@@ -303,19 +306,54 @@ const styles = StyleSheet.create({
     flexRow: { flexDirection: 'row' },
     flexCol: { flexDirection: 'column' },
     flexWrap: { flexWrap: 'wrap' },
+    flexColReverse: {
+        flexDirection: 'column-reverse',
+    },
+    flexRowReverse: {
+        flexDirection: 'row-reverse',
+    },
+    flexGrow: {
+        flexGrow: 1,
+    },
+    flexShrink: {
+        flexShrink: 1,
+    },
+    flexShrink0: {
+        flexShrink: 0,
+    },
     flexNowrap: { flexWrap: 'nowrap' },
-    justifyContentFlexStart: { justifyContent: 'flex-start' },
-    justifyContentFlexEnd: { justifyContent: 'flex-end' },
+    justifyContentStart: { justifyContent: 'flex-start' },
+    justifyContentEnd: { justifyContent: 'flex-end' },
     justifyContentCenter: { justifyContent: 'center' },
     justifyContentSpaceBetween: { justifyContent: 'space-between' },
     justifyContentSpaceAround: { justifyContent: 'space-around' },
     justifyContentSpaceEvenly: { justifyContent: 'space-evenly' },
-    alignItemsFlexStart: { alignItems: 'flex-start' },
-    alignItemsFlexEnd: { alignItems: 'flex-end' },
+    alignItemsStart: { alignItems: 'flex-start' },
+    alignItemsEnd: { alignItems: 'flex-end' },
     alignItemsCenter: { alignItems: 'center' },
     alignItemsBaseline: { alignItems: 'baseline' },
     alignItemsStretch: { alignItems: 'stretch' },
-
+    alignItemBaseline: {
+        alignItems: 'baseline',
+    },
+    alignSelfAuto: {
+        alignSelf: 'auto',
+    },
+    alignSelfStart: {
+        alignSelf: 'flex-start',
+    },
+    alignSelfEnd: {
+        alignSelf: 'flex-end',
+    },
+    alignSelfCenter: {
+        alignSelf: 'center',
+    },
+    alignSelfStretch: {
+        alignSelf: 'stretch',
+    },
+    alignSelfBaseline: {
+        alignSelf: 'baseline',
+    },
 
     /**
      * Sets the width and height of the component.
@@ -326,6 +364,8 @@ const styles = StyleSheet.create({
      */
     w100: { width: '100%' },
     h100: { height: '100%' },
+    hFullVh: Platform.web({ height: '100vh' }),
+    wFullVh: Platform.web({ width: '100vh' }),
     w50: { width: '50%' },
     h50: { height: '50%' },
     w25: { width: '25%' },
@@ -342,18 +382,7 @@ const styles = StyleSheet.create({
     opacity50: { opacity: 0.5 },
     opacity75: { opacity: 0.75 },
 
-    /**
-     * Applies border styles to the component.
-     * @example
-     * <View style={[StyleHelper.border, StyleHelper.rounded]}>
-     *   <Text>Bordered and rounded container</Text>
-     * </View>
-     */
-    border: { borderWidth: 1 },
-    borderTop: { borderTopWidth: 1 },
-    borderRight: { borderRightWidth: 1 },
-    borderBottom: { borderBottomWidth: 1 },
-    borderLeft: { borderLeftWidth: 1 },
+
 
     /**
      * Sets the overflow behavior of the component.
@@ -410,7 +439,7 @@ const styles = StyleSheet.create({
      *   ...
      * </View>
      */
-    cursorPointer: Platform.isWeb() ? { cursor: 'pointer' } : {},
+    cursorPointer: Platform.web({ cursor: 'pointer' }),
 
     /**
      * Row layout style.
@@ -499,7 +528,165 @@ const styles = StyleSheet.create({
     /***
      * this style is used to make the text direction right to left depending on the application layout direction
      */
-    RTL: { transform: [{ scaleX: isRTL ? -1 : 1 }] }
+    RTL: { transform: [{ scaleX: isRTL ? -1 : 1 }] },
+
+
+    /*
+   * Positioning
+   */
+    fixed: {
+        position: Platform.select({ web: 'fixed', native: 'absolute' }) as 'absolute',
+    },
+    absolute: {
+        position: 'absolute',
+    },
+    relative: {
+        position: 'relative',
+    },
+    sticky: Platform.web({
+        position: 'sticky',
+    }),
+    inset0: {
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    zIndex10: {
+        zIndex: 10,
+    },
+    zIndex20: {
+        zIndex: 20,
+    },
+    zIndex30: {
+        zIndex: 30,
+    },
+    zIndex40: {
+        zIndex: 40,
+    },
+    zIndex50: {
+        zIndex: 50,
+    },
+
+    bgTransparent: {
+        backgroundColor: 'transparent',
+    },
+
+
+    /**
+     * Applies border styles to the component.
+     * @example
+     * <View style={[StyleHelper.border, StyleHelper.rounded]}>
+     *   <Text>Bordered and rounded container</Text>
+     * </View>
+     */
+    borderTop1: { borderTopWidth: 1 },
+    borderRight1: { borderRightWidth: 1 },
+    borderBottom1: { borderBottomWidth: 1 },
+    borderLeft1: { borderLeftWidth: 1 },
+    border0: {
+        borderWidth: 0,
+    },
+    borderTop0: {
+        borderTopWidth: 0,
+    },
+    borderBottom0: {
+        borderBottomWidth: 0,
+    },
+    borderLeft0: {
+        borderLeftWidth: 0,
+    },
+    borderRight0: {
+        borderRightWidth: 0,
+    },
+    border: {
+        borderWidth: StyleSheet.hairlineWidth,
+    },
+    borderTop: {
+        borderTopWidth: StyleSheet.hairlineWidth,
+    },
+    borderBoottom: {
+        borderBottomWidth: StyleSheet.hairlineWidth,
+    },
+    borderLeft: {
+        borderLeftWidth: StyleSheet.hairlineWidth,
+    },
+    borderRight: {
+        borderRightWidth: StyleSheet.hairlineWidth,
+    },
+    curveCircular: Platform.ios({
+        borderCurve: 'circular',
+    }),
+    curveContinuous: Platform.ios({
+        borderCurve: 'continuous',
+    }),
+
+    /*
+   * Shadow
+   */
+    shadowMobile: {
+        shadowRadius: 8,
+        shadowOpacity: 0.1,
+        elevation: 8,
+    },
+    shadowTablet: {
+        shadowRadius: 16,
+        shadowOpacity: 0.1,
+        elevation: 16,
+    },
+    shadowDesktop: {
+        shadowRadius: 32,
+        shadowOpacity: 0.1,
+        elevation: 24,
+    },
+
+    /*
+  * Pointer events & user select
+  */
+    pointerEventsNone: {
+        pointerEvents: 'none',
+    },
+    pointerEventsAuto: {
+        pointerEvents: 'auto',
+    },
+    userSelectNone: {
+        userSelect: 'none',
+    },
+    userSelectText: {
+        userSelect: 'text',
+    },
+    userSelectAll: {
+        userSelect: 'all',
+    },
+
+
+    /*
+   * Transition
+   */
+    webTransitionNone: Platform.web({
+        transitionProperty: 'none',
+    }),
+    webTransitionAll: Platform.web({
+        transitionProperty: 'all',
+        transitionTimingFunction: 'cubic-bezier(0.17, 0.73, 0.14, 1)',
+        transitionDuration: '100ms',
+    }),
+    webTransitionColor: Platform.web({
+        transitionProperty:
+            'color, background-color, border-color, text-decoration-color, fill, stroke',
+        transitionTimingFunction: 'cubic-bezier(0.17, 0.73, 0.14, 1)',
+        transitionDuration: '100ms',
+    }),
+    webTransitionOpacity: Platform.web({
+        transitionProperty: 'opacity',
+        transitionTimingFunction: 'cubic-bezier(0.17, 0.73, 0.14, 1)',
+        transitionDuration: '100ms',
+    }),
+    webTransitionTransform: Platform.web({
+        transitionProperty: 'transform',
+        transitionTimingFunction: 'cubic-bezier(0.17, 0.73, 0.14, 1)',
+        transitionDuration: '100ms',
+    }),
 });
 
 export default styles;

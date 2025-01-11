@@ -330,7 +330,7 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, onConte
     const multiline = !!props.multiline;
     const isMobile = Breakpoints.isMobileMedia();
     const minHeight = useMemo(() => {
-        return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbededVariant ? 30 : isMobile ? 56 : 46;
+        return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbededVariant ? 30 : isMobile ? 50 : 46;
     }, [customMinHeight, isLabelEmbededVariant, isMobile]);
     const maxHeight = useMemo(() => {
         return typeof customMaxHeight === "number" ? customMaxHeight : 100;

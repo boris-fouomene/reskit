@@ -44,11 +44,11 @@ const getButtonTextColor = ({ isMode, customTextColor, backgroundColor, dark, th
   if (Colors.isValid(customTextColor)) {
     return customTextColor;
   }
-  if (typeof dark === 'boolean') {
-    if (isMode('contained')) {
-      return isDark({ dark, backgroundColor }) ? "white" : "black";
-    }
-  }
+  /*   if (typeof dark === 'boolean') {
+      if (isMode('contained')) {
+        return isDark({ dark, backgroundColor }) ? "white" : "black";
+      }
+    } */
   if (isMode('outlined') || isMode('text')) {
     return theme.colors.primary;
   }

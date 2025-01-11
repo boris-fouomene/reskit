@@ -195,12 +195,6 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     }, [customIsLoading]);
     const { color: colorSchemeColor, backgroundColor: colorSchemeBackgroundColor } = Theme.getColorScheme(colorScheme);
     dark = dark ?? theme.dark;
-    const isMode = React.useCallback(
-        (modeToCompare: IButtonMode) => {
-            return mode === modeToCompare;
-        },
-        [mode]
-    );
     const innerRef = React.useRef<RNView>(null);
     const context = {
         enable,
@@ -402,7 +396,7 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     touchable: {
-        //width: "100%",
+        width: "100%",
         paddingHorizontal: 7,
         paddingVertical: 7,
     },

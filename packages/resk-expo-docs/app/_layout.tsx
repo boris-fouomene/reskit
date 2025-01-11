@@ -18,7 +18,7 @@ export default function RootLayout() {
     }, [])
     return (<ReskExpoProvider
         drawerNavigationViewProps={{}}
-        theme={{ dark: true } as ITheme}
+        theme={{ dark: true, colors: { onPrimary: "black" } } as ITheme}
         auth={{
             Login: function ({ signIn }) {
                 return <View style={[Theme.styles.h100, Theme.styles.w100]} testID="my-container">

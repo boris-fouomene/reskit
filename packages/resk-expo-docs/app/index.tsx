@@ -5,7 +5,7 @@ import { IField, IFieldMap } from "@resk/core";
 const index = withAppBar(() => {
     return (
         <ScrollView>
-            <Button>
+            <Button mode="contained">
                 Hello Button
             </Button>
 

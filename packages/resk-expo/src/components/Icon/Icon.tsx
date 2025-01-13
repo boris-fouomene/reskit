@@ -162,9 +162,7 @@ export function getIcon<T = any>({ icon, color: col2, iconComponent, theme, ...r
         iconName,
         ...Object.assign({}, !iconName ? (getIconSource(iconSource)) : undefined),
     }
-    const Component = useMemo(() => {
-        return isReactComponent(iconComponent) && iconComponent || Icon;
-    }, [iconComponent]);
+    const Component = isReactComponent(iconComponent) && iconComponent || Icon;
     return <Component {...iconProps} />;
 }
 const getIconSource = (icon: any) => {

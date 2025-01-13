@@ -418,6 +418,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
 
 const DropdownListItems = () => {
     const context = useDropdown();
+    return null;
     const menu = useMenu();
     const testID = defaultStr(context?.getTestID());
     const listProps = Object.assign({}, context?.props?.listProps);

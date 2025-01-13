@@ -147,6 +147,10 @@ export interface IMenuCalculatedPosition {
     position: IMenuPosition;
     x: number;
     y: number;
+    /***
+     * The width of the menu.
+     */
+    menuWidth: number;
 }
 
 /***
@@ -315,6 +319,19 @@ export interface IUseMenuPositionProps {
     fullScreen?: boolean;
     responsive?: boolean;
     visible?: boolean;
+    animated?: boolean;
+    /**
+     * The minimum width of the menu.
+     * This property is used to set a minimum width for the menu.
+     * If the menu width is less than the specified value, it will be adjusted to match the anchor width.
+     */
+    minWidth?: number;
+
+    /**
+     * If true, the menu will be the same width as the anchor element.
+     * Default is false.
+     */
+    sameWidth?: boolean;
 }
 
 
@@ -533,6 +550,11 @@ export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "
      * The visibility of the menu. This property is used to control the visibility of the menu.
      */
     visible?: boolean;
+
+    /**
+     * The minimum width of the menu.
+     */
+    minWidth?: number;
 }
 
 /**

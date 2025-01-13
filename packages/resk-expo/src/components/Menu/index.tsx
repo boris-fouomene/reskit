@@ -82,102 +82,156 @@ export const useMenuPosition = (anchorRef: React.RefObject<any>, {
     responsive,
     visible,
     fullScreen: customFullScreen,
+    animated,
+    minWidth,
+    sameWidth,
 }: IUseMenuPositionProps) => {
-    const isValidPosition = ["top", "left", "bottom", "right"].includes(String(position));
-    const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions(responsive !== false && !isValidPosition);
+    const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
+    const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions(responsive !== false);
     const fullScreen = isFullScreen(customFullScreen, responsive, isMobileOrTablet);
     const anchorMeasurementsRef = useRef<IMenuAnchorMeasurements | null>(null);
-    const measureAnchor = useCallback((callback?: (anchorMeasurements: IMenuAnchorMeasurements) => void) => {
-        if (anchorRef?.current && typeof anchorRef.current?.measureInWindow === "function") {
-            anchorRef?.current.measureInWindow((x: number, y: number, width: number, height: number) => {
-                anchorMeasurementsRef.current = { pageX: x, pageY: y, width, height };
-                if (typeof callback === "function") callback({ pageX: x, pageY: y, width, height });
-            });
-        }
-    }, [anchorRef?.current, screenWidth, screenHeight]);
+    // Animation values
+    const opacity = useSharedValue(0);
+    const scale = useSharedValue(0.8);
+    const xAnimation = useSharedValue(0);
+    const yAnimation = useSharedValue(0);
+    const calculatedPositionRef = useRef<IMenuCalculatedPosition | null>(null);
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
+        let x = 0, y = 0;
         // Handle null measurements or fullscreen mode
         if (!isObj(anchorMeasurementsRef.current) || !anchorMeasurementsRef.current || fullScreen) {
-            return {
-                position: 'bottom',
-                x: 0,
-                y: 0,
-            };
-        }
-        const { pageX, pageY, width, height } = anchorMeasurementsRef.current;
-        let x = pageX;
-        let y = pageY;
-        // Handle forced position
-        if (isValidPosition && position) {
-            // Calculate position based on forced direction
-            switch (position) {
-                case 'top':
-                    x = pageX //+ width / 2 - menuWidth / 2;
-                    y = pageY - menuHeight - padding;
-                    break;
-                case 'bottom':
-                    x = pageX //+ width / 2 - menuWidth / 2;
-                    y = pageY + height + padding;
-                    break;
-                case 'left':
-                    x = pageX - menuWidth - padding;
-                    y = pageY + height / 2 - menuHeight / 2;
-                    break;
-                case 'right':
-                    x = pageX + width + padding;
-                    y = pageY + height / 2 - menuHeight / 2;
-                    break;
-            }
+            position = "top";
         } else {
+            const { pageX, pageY, width: anchorWidth, height: anchorHeight } = anchorMeasurementsRef.current;
+            minWidth = typeof minWidth == 'number' && minWidth > 0 ? minWidth : anchorWidth;
+            if (sameWidth) {
+                menuWidth = anchorWidth;
+            } else {
+                menuWidth = Math.max(minWidth, menuWidth);
+            }
+            menuWidth = Math.min(menuWidth, screenWidth > padding ? screenWidth - padding : screenWidth);
+            x = pageX;
+            y = pageY;
             // Calculate available space in each direction
             const spaces = {
                 top: pageY,
-                bottom: screenHeight - (pageY + height),
+                bottom: Math.max(0, screenHeight - (pageY + anchorHeight)),
                 left: pageX,
-                right: screenWidth - (pageX + width),
+                right: Math.max(0, screenWidth - (pageX + anchorWidth)),
             };
             // Find position with maximum available space
-            let bestPosition: keyof typeof spaces = Object.entries(spaces).reduce((max, [pos, space]) =>
+            let preferredPosition: IMenuPosition = isValidPosition && position ? position : Object.entries(spaces).reduce((max, [pos, space]) =>
                 space > spaces[max as IMenuPosition] ? pos as IMenuPosition : max
-                , 'bottom' as IMenuPosition);
-
-            if (bestPosition !== 'bottom' && (Math.abs(spaces.bottom - spaces[bestPosition]) < 100 || spaces.bottom >= 300)) {
-                bestPosition = 'bottom';
+                , 'bottom' as IMenuPosition) as IMenuPosition;
+            if (!isValidPosition && preferredPosition !== 'bottom' && (spaces.bottom >= 300 || (Math.abs(spaces.bottom - spaces[preferredPosition]) < 100))) {
+                preferredPosition = 'bottom';
             };
-            switch (bestPosition) {
-                case 'top':
-                    x = pageX //+ width / 2 - menuWidth / 2;
-                    y = pageY - menuHeight - padding;
-                    break;
-                case 'bottom':
-                    x = pageX //+ width / 2 - menuWidth / 2;
-                    y = pageY + height + padding;
-                    break;
-                case 'left':
-                    x = pageX - menuWidth - padding;
-                    y = pageY //+ height / 2 - menuHeight / 2;
-                    break;
-                case 'right':
-                    x = pageX + width + padding;
-                    y = pageY //+ height / 2 - menuHeight / 2;
-                    break;
+            const checkFits = (pos: IPosition) => ({
+                top: pos.top >= padding,
+                bottom: pos.top + menuHeight <= screenHeight - padding,
+                left: pos.left >= padding,
+                right: pos.left + menuWidth <= screenWidth - padding
+            });
+            const positions: Record<IMenuPosition, IPosition> = {
+                top: {
+                    top: pageY - menuHeight,
+                    left: pageX + (anchorWidth / 2),// - (menuWidth / 2),
+                    position: 'top'
+                },
+                bottom: {
+                    top: pageY + anchorHeight,
+                    left: pageX + (anchorWidth / 2),// - (menuWidth / 2),
+                    position: 'bottom'
+                },
+                left: {
+                    top: pageY + (anchorHeight / 2),// - (menuHeight / 2),
+                    left: pageX - menuWidth,
+                    position: 'left'
+                },
+                right: {
+                    top: pageY + (anchorHeight / 2),// - (menuHeight / 2),
+                    left: pageX + anchorWidth,
+                    position: 'right'
+                }
+            };
+            position = preferredPosition;
+            let bestPosition = positions[preferredPosition];
+
+            // Check if preferred position fits
+            const preferredFits = checkFits(bestPosition);
+            // If preferred position doesn't fit, try alternatives
+            if (preferredPosition !== 'bottom' && !Object.values(preferredFits).every(fit => fit)) {
+                const alternatives: IMenuPosition[] = ['bottom', 'top', 'right', 'left'];
+                for (const pos of alternatives) {
+                    const alternative = positions[pos];
+                    const altFits = checkFits(alternative);
+                    if (Object.values(altFits).every(fit => fit)) {
+                        bestPosition = alternative;
+                        break;
+                    }
+                }
             }
-            position = bestPosition;
+            // Final boundary adjustments
+            bestPosition.left = Math.max(
+                padding,
+                Math.min(screenWidth - menuWidth - padding, bestPosition.left)
+            );
+            bestPosition.top = Math.max(
+                padding,
+                Math.min(screenHeight - menuHeight - padding, bestPosition.top)
+            );
+            x = bestPosition.left;
+            y = bestPosition.top;
+            position = bestPosition.position;
         }
-        // Ensure menu stays within screen bounds
-        x = Math.max(Math.min(x, screenWidth - menuWidth), 0);
-        y = Math.max(Math.min(y, screenHeight - menuHeight), 0);
-        //console.log(bestPosition, x, "= x, ", pageX, "=pageX", " data ", screenWidth, " screen width ", menuWidth, " menu width ", spaces, " spaces");
-        return { position, x, y };
-    }, [anchorMeasurementsRef.current, visible, menuWidth, menuHeight, padding, position, fullScreen, screenWidth, screenHeight, anchorRef?.current]);
+        // Update position when measurements change
+        if (animated !== false) {
+            xAnimation.value = withSpring(x);
+            yAnimation.value = withSpring(y);
+            opacity.value = withTiming(1, {
+                duration: 200,
+                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+            });
+            scale.value = withSpring(1);
+        } else {
+            xAnimation.value = x;
+            xAnimation.value = y;
+            opacity.value = 1;
+            scale.value = 1;
+        }
+        calculatedPositionRef.current = { position, x, y, menuWidth };
+        return calculatedPositionRef.current;
+    }, [anchorMeasurementsRef.current, sameWidth, minWidth, visible, menuWidth, menuHeight, padding, position, fullScreen, screenWidth, screenHeight, anchorRef?.current]);
+    const measureAnchor = useCallback((callback?: (anchorMeasurements: IMenuAnchorMeasurements) => void) => {
+        if (anchorRef?.current && typeof anchorRef.current?.measureInWindow === "function") {
+            anchorRef?.current.measureInWindow((x: number, y: number, width: number, height: number) => {
+                const measures = { pageX: x, pageY: y, width, height };
+                anchorMeasurementsRef.current = measures;
+                calculatePosition();
+                if (typeof callback === "function") callback(measures);
+            });
+        }
+    }, [anchorRef?.current, screenWidth, screenHeight]);
     useEffect(() => {
-        measureAnchor(() => {
-            calculatePosition();
-        });
-    }, [anchorRef?.current, , screenWidth, screenHeight, visible]);
+        if (visible === false && animated) {
+            opacity.value = withTiming(0);
+            scale.value = withTiming(0.8);
+        }
+    }, [visible, animated]);
+    // Animated styles
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: opacity.value,
+        left: xAnimation.value,
+        top: yAnimation.value,
+        transform: [
+            { scale: scale.value },
+        ],
+    }));
     return {
         calculatePosition,
         measureAnchor,
+        fullScreen,
+        animatedStyle,
         get anchorMeasurements() {
             return anchorMeasurementsRef.current;
         },
@@ -271,7 +325,7 @@ const Menu: React.FC<IMenuProps> = ({
     animated = true,
     anchor: customAnchor,
     position: customPosition,
-    fullScreen,
+    fullScreen: customFullScreen,
     borderRadius = 8,
     anchorContainerProps,
     onOpen,
@@ -286,6 +340,7 @@ const Menu: React.FC<IMenuProps> = ({
     scrollViewProps,
     elevation = 10,
     visible,
+    minWidth,
     ...props
 }) => {
     // State for measurements
@@ -298,11 +353,6 @@ const Menu: React.FC<IMenuProps> = ({
     anchorContainerProps = Object.assign({}, anchorContainerProps);
     testID = defaultStr(testID, "resk-menu");
     itemsProps = Object.assign({}, itemsProps);
-    // Animation values
-    const opacity = useSharedValue(0);
-    const scale = useSharedValue(0.8);
-    const translateY = useSharedValue(0);
-    const translateX = useSharedValue(0);
     const callbackRef = useRef<Function | null | undefined>(null);
     useEffect(() => {
         if (!isControlled || prevIsVisible === isVisible || typeof callbackRef.current !== "function") {
@@ -319,48 +369,29 @@ const Menu: React.FC<IMenuProps> = ({
             setIsVisible(!!visible);
         }
     }, [visible, isVisible, isControlled]);
-
-    // Handle menu layout changes
-    const onMenuLayout = useCallback((event: LayoutChangeEvent) => {
-        const { width, height } = event.nativeEvent.layout;
-        setMenuLayout({ width, height, x: 0, y: 0 });
-    }, []);
-    const { isMobileOrTablet, width: screenWidth, height: screenHeight } = getDimensions();
-    const _isFullScreen = isFullScreen(fullScreen, responsive, isMobileOrTablet);
+    const { width: screenWidth, height: screenHeight } = getDimensions();
     // Get position calculation from custom hook
-    const { calculatePosition, anchorMeasurements, measureAnchor } = useMenuPosition(anchorRef, {
+    const { calculatePosition, fullScreen, anchorMeasurements, measureAnchor, animatedStyle } = useMenuPosition(anchorRef, {
         menuWidth: menuLayout?.width || 0,
         menuHeight: menuLayout?.height || 0,
         position: customPosition,
-        fullScreen,
-        visible,
+        fullScreen: customFullScreen,
+        visible: isVisible,
         responsive,
+        animated,
+        sameWidth,
+        minWidth,
     });
-    const menuPosition = useMemo(() => {
-        return calculatePosition();
-    }, [isVisible, anchorMeasurements, menuLayout?.width, menuLayout?.height]);
+    const menuPosition = calculatePosition();
     const { position } = menuPosition;
-    const context1 = { animated, anchorMeasurements, menuPosition, responsive, testID, borderRadius, fullScreen: _isFullScreen, ...props, isMenu: true, isMenuOpen, isMenuVisible: isVisible }
-    // Update position when measurements change
-    useEffect(() => {
-        const { x, y } = menuPosition;
-        if (animated) {
-            translateX.value = withSpring(x);
-            translateY.value = withSpring(y);
-            opacity.value = withTiming(1, {
-                duration: 200,
-                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-            });
-            scale.value = withSpring(1);
-        } else {
-            translateX.value = x;
-            translateY.value = y;
-            opacity.value = 1;
-            scale.value = 1;
-        }
-    }, [isVisible, menuPosition?.x, menuPosition?.y]);
+    // Handle menu layout changes
+    const onMenuLayout = (event: LayoutChangeEvent) => {
+        const { width, height } = event.nativeEvent.layout;
+        setMenuLayout({ width, height, x: 0, y: 0 });
+    }
+    const context1 = { animated, anchorMeasurements, menuPosition, responsive, testID, borderRadius, fullScreen: fullScreen, ...props, isMenu: true, isMenuOpen, isMenuVisible: isVisible }
     const openMenu = (callback?: Function) => {
-        measureAnchor(() => {
+        measureAnchor((measures) => {
             if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
             if (isControlled) {
                 callbackRef.current = callback;
@@ -407,40 +438,14 @@ const Menu: React.FC<IMenuProps> = ({
             }
         }
         return isValidElement(customAnchor) ? customAnchor : null;
-    }, [customAnchor, isVisible, _isFullScreen, context]);
-    useEffect(() => {
-        measureAnchor(() => {
-            calculatePosition();
-        });
-    }, [isVisible, measureAnchor]);
-
-
-
-    // Handle closing animations
-    useEffect(() => {
-        if (!isVisible && animated) {
-            opacity.value = withTiming(0);
-            scale.value = withTiming(0.8);
-        }
-    }, [isVisible]);
-
-    // Animated styles
-    const animatedStyle = useAnimatedStyle(() => ({
-        opacity: opacity.value,
-        transform: [
-            { translateX: translateX.value },
-            { translateY: translateY.value },
-            { scale: scale.value },
-        ],
-    }));
-
+    }, [customAnchor, isVisible, fullScreen, context]);
     // Full screen styles
     const menuContainerStyle = useMemo(() => {
-        return _isFullScreen ? {
+        return fullScreen ? {
             width: screenWidth,
             height: screenHeight,
         } : {};
-    }, [_isFullScreen, menuLayout?.height]);
+    }, [fullScreen, menuLayout?.height]);
     const menuAnchorStyle = useMemo(() => {
         if (typeof anchorMeasurements?.width != "number") return {};
         const { width } = anchorMeasurements;
@@ -462,10 +467,10 @@ const Menu: React.FC<IMenuProps> = ({
     }, [anchorMeasurements?.width, anchorMeasurements?.height, position, menuLayout]);
     const touchableBackdropStyle = useMemo(() => {
         return {
-            maxWidth: screenWidth - (_isFullScreen ? 0 : Math.max(sizeToRemove.width, 10)),
-            maxHeight: screenHeight - (_isFullScreen ? 0 : Math.max(sizeToRemove.height, 10)),
+            maxWidth: screenWidth - (fullScreen ? 0 : Math.max(sizeToRemove.width, 10)),
+            maxHeight: screenHeight - (fullScreen ? 0 : Math.max(sizeToRemove.height, 10)),
         }
-    }, [menuLayout, _isFullScreen, screenWidth, screenHeight, sizeToRemove.width, sizeToRemove.height]);
+    }, [menuLayout, fullScreen, screenWidth, screenHeight, sizeToRemove.width, sizeToRemove.height]);
     const { Wrapper, wrapperProps } = useMemo(() => {
         if (!withScrollView) {
             return { Wrapper: React.Fragment, wrapperProps: {} }
@@ -477,16 +482,28 @@ const Menu: React.FC<IMenuProps> = ({
     }, [withScrollView, testID, scrollViewProps]);
     return <>
         <MenuContext.Provider value={context}>
-            <Pressable testID={testID + "-anchor-container"} ref={anchorRef} {...anchorContainerProps} onPress={(event) => {
-                if (typeof anchorContainerProps?.onPress === 'function') {
-                    anchorContainerProps?.onPress(event)
-                }
-                openMenu();
-            }}>
+            <Pressable testID={testID + "-anchor-container"}
+                ref={anchorRef}
+                {...anchorContainerProps}
+                style={(state) => {
+                    return [Theme.styles.relative, typeof anchorContainerProps?.style === 'function' ? anchorContainerProps?.style(state) : anchorContainerProps?.style];
+                }}
+                onLayout={(event) => {
+                    if (typeof anchorContainerProps?.onLayout === 'function') {
+                        anchorContainerProps?.onLayout(event);
+                    }
+                    measureAnchor();
+                }}
+                onPress={(event) => {
+                    if (typeof anchorContainerProps?.onPress === 'function') {
+                        anchorContainerProps?.onPress(event)
+                    }
+                    openMenu();
+                }}>
                 {anchor}
             </Pressable>
         </MenuContext.Provider>
-        {isVisible ? <Portal absoluteFill>
+        {<Portal absoluteFill visible={isVisible}>
             <Pressable
                 onPress={(e) => { closeMenu() }}
                 style={styles.portalBackdrop}
@@ -505,7 +522,7 @@ const Menu: React.FC<IMenuProps> = ({
                     style={[
                         styles.menuContainer,
                         { backgroundColor: theme.colors.surface },
-                        _isFullScreen ? styles.menuContainerFullScreen : null,
+                        fullScreen ? styles.menuContainerFullScreen : null,
                         menuAnchorStyle,
                         {
                             borderRadius,
@@ -523,7 +540,7 @@ const Menu: React.FC<IMenuProps> = ({
                     </Wrapper>
                 </Animated.View>
             </MenuContext.Provider>
-        </Portal> : null}
+        </Portal>}
     </>
 };
 
@@ -603,5 +620,11 @@ MenuExported.Items.displayName = 'Menu.Items';
 
 MenuExported.ExpandableItem = ExpandableMenuItem;
 MenuExported.ExpandableItem.displayName = 'Menu.ExpandableItem';
+
+interface IPosition {
+    top: number;
+    left: number;
+    position: IMenuPosition;
+}
 
 export { MenuExported as Menu };

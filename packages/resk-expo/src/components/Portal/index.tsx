@@ -154,8 +154,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     );
 };
 
-function RenderPortal<AsProps extends ViewProps = IViewProps>({ children, absoluteFill, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
-    return <View  {...Object.assign({}, props)} style={[{ zIndex }, absoluteFill && styles.absoluteFill, props?.style]}>
+function RenderPortal<AsProps extends ViewProps = IViewProps>({ children, absoluteFill, visible, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
+    return <View  {...Object.assign({}, props)} style={[{ zIndex }, absoluteFill && styles.absoluteFill, visible === false && styles.hidden, props?.style]}>
         {children}
     </View>
 };
@@ -199,9 +199,16 @@ export type IPortalProps<AsProps extends ViewProps = IViewProps> = AsProps & {
     as?: IReactComponent<AsProps>;
 
     /***
-     * 
+     * An optional boolean flag to determine whether the portal should fill the entire screen.
+     * If set to true, the portal will take up the entire screen and cover the content below it.
      */
     absoluteFill?: boolean;
+
+    /**
+     * A boolean value indicating whether the portal should be visible or not.
+     * If not provided, the portal will be visible by default.
+     */
+    visible?: boolean;
 }
 
 /**
@@ -242,4 +249,8 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         flex: 1,
     },
+    hidden: {
+        display: "none",
+        opacity: 0,
+    }
 })

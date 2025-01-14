@@ -157,9 +157,12 @@ export const useMenuPosition = ({
                 right: isNumber(pos.left) && (pos.left + menuWidth <= screenWidth - padding) || isMaxHorizontalSpaceRight,// ,// && isMaxHorizontalSpaceRight,
             });
             const maxHeight = Math.max(spaces.top - 50, spaces.bottom - 50);
-            const rProps = !dynamicHeight && maxHeight > 50 ? {
+            const rProps: Partial<IMenuCalculatedPosition> = !dynamicHeight && maxHeight > 50 ? {
                 height: maxHeight,
             } : {};
+            if (sameWidth) {
+                rProps.width = anchorWidth;
+            }
             const positions: Record<IMenuPosition, IMenuCalculatedPosition> = {
                 top: {
                     ...rProps,

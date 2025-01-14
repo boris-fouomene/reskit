@@ -437,8 +437,10 @@ function DropdownMenu() {
     const fullScreen = !!menu?.fullScreen;
     const canReverse = isTopPosition && !fullScreen;
     const menuHeight = typeof menuPosition?.height === "number" && menuPosition.height > 50 ? menuPosition.height : undefined;
+    const menuWidth = typeof menuPosition?.width === "number" && menuPosition.width > 50 ? menuPosition.width : undefined;
     return <View testID={testID + "-dropdown-list-container"} style={[styles.dropdownListContainer,
     typeof menuHeight == "number" && { height: menuHeight },
+    typeof menuWidth == "number" && { width: menuWidth },
     canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}>
         {fullScreen ? (
             <AppBar

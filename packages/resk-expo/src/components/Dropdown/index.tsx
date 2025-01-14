@@ -438,10 +438,11 @@ function DropdownMenu() {
     const canReverse = isTopPosition && !fullScreen;
     const menuHeight = typeof menuPosition?.height === "number" && menuPosition.height > 50 ? menuPosition.height : undefined;
     const menuWidth = typeof menuPosition?.width === "number" && menuPosition.width > 50 ? menuPosition.width : undefined;
-    return <View testID={testID + "-dropdown-list-container"} style={[styles.dropdownListContainer,
-    typeof menuHeight == "number" && { height: menuHeight },
-    typeof menuWidth == "number" && { width: menuWidth },
-    canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}>
+    return <View testID={testID + "-dropdown-list-container"} style={[
+        styles.dropdownListContainer,
+        typeof menuHeight == "number" && { height: menuHeight },
+        typeof menuWidth == "number" && { width: menuWidth },
+        canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}>
         {fullScreen ? (
             <AppBar
                 title={getTextContent(label)}
@@ -594,15 +595,15 @@ const styles = StyleSheet.create({
     dropdownListContainer: {
         width: "100%",
         height: "100%",
-        flex: 1,
-        alignSelf: "flex-start",
         paddingHorizontal: 0,
         paddingVertical: 0,
+        paddingBottom: 10,
         flexDirection: "column",
     },
     dropdownListTopPosition: {
         flexDirection: "column-reverse",
         paddingTop: 10,
+        paddingBottom: 0,
     },
     dropdownListContentContainer: {
         width: "100%",

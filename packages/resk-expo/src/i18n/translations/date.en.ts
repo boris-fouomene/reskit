@@ -7,6 +7,7 @@ I18n.RegisterTranslations({
              * %date%
              */
             "outOfRange": "The date %date% is out of range",
+
         }
     }
 });

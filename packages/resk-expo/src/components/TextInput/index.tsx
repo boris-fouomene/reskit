@@ -504,9 +504,7 @@ const styles = StyleSheet.create({
         borderRightWidth: 0,
         borderRadius: 0,
         backgroundColor: 'transparent',
-        paddingHorizontal: 5,
         flexGrow: 1,
-        //paddingVertical:5,
         overflow: 'hidden',
     },
     inputLabelEmbededVariant: {
@@ -539,7 +537,6 @@ const styles = StyleSheet.create({
     },
     rightContainer: {
         alignSelf: "center",
-        paddingRight: 5,
     },
     container: {
         flexDirection: "column",

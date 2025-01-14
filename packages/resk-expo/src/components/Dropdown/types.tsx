@@ -1,12 +1,13 @@
 import { IAppBarAction, IAppBarProps } from "@components/AppBar/types";
 import { ITextInputProps } from "@components/TextInput/types";
-import { ReactElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { FlashListProps } from "@shopify/flash-list";
 import { IViewProps } from "@components/View";
 import { PressableProps } from "react-native";
 import Component from "@utils/Component";
 import { IFontIconProps } from "@components/Icon";
 import { ObservableComponent } from "@utils/index";
+import { IMenuProps } from "@components/Menu";
 
 /**
  * Represents the context for a dropdown component, providing methods and state 
@@ -682,6 +683,12 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
      * by default : it's value is 'check' form multiple selection and 'radiobox-marked' for single selection
      */
     selectedIconName?: IFontIconProps["name"];
+
+    /***
+     * Props for the menu component that wraps the dropdown.
+     * This allows for customization of the menu's appearance and behavior.
+     */
+    menuProps?: Omit<IMenuProps, "anchor">;
 };
 
 /**

@@ -183,6 +183,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
         {isValidElement(children) ? children : null}
         {actions}
         {menuItems.length ? <Menu
+          preferedPositionAxis='vertical'
           testID={`${testID}-menu`}
           anchor={({ closeMenu, openMenu }) => {
             return <IconButton

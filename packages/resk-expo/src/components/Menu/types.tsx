@@ -4,7 +4,7 @@ import { IExpandableProps } from "@components/Expandable";
 import { IViewProps } from "@components/View";
 import { IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
-import { PressableProps, ScrollViewProps, ViewProps } from "react-native";
+import { LayoutRectangle, PressableProps, ScrollViewProps, ViewProps } from "react-native";
 import { PressableStateCallbackType } from "react-native";
 import { AnimatedProps } from "react-native-reanimated";
 
@@ -144,13 +144,21 @@ export type IMenuAnchorMeasurements = {
  * renderMenu(calculatedPosition);
  */
 export interface IMenuCalculatedPosition {
-    position: IMenuPosition;
-    x: number;
-    y: number;
-    /***
-     * The width of the menu.
+    xPosition?: IMenuPosition;
+    yPosition?: IMenuPosition;
+    left?: number;
+    top?: number;
+    bottom?: number;
+    calculatedFromPosition: IMenuPosition;
+    right?: number;
+    /**
+     * The max width of the menu.
      */
-    menuWidth: number;
+    maxWidth?: number;
+    /**
+     * The max height of the menu.
+     */
+    maxHeight?: number;
 }
 
 /***
@@ -226,7 +234,7 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
      */
     isMenu: boolean;
 
-    anchorMeasurements: IMenuAnchorMeasurements | null;
+    anchorMeasurements?: IMenuAnchorMeasurements;
 
     /***
      * The current details on the position of the menu
@@ -246,7 +254,7 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
  * 
  * @interface IUseMenuPositionProps
  * 
- * @property {IMenuAnchorMeasurements | null} anchorMeasurements - 
+ * @property {IMenuAnchorMeasurements} anchorMeasurements - 
  *         Measurements of the anchor element, which include its position 
  *         and size. This is essential for calculating the menu's position 
  *         relative to the anchor. If the anchor is not available, this 
@@ -289,7 +297,7 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
  * @example
  * // Example usage of IUseMenuPositionProps with the useMenuPosition hook
  * const menuProps: IUseMenuPositionProps = {
- *     anchorMeasurements: {
+ *     anchor: {
  *         pageX: 100,
  *         pageY: 200,
  *         width: 50,
@@ -309,17 +317,34 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
 export interface IUseMenuPositionProps {
     /** Current width of the menu */
     menuWidth: number;
+
     /** Current height of the menu */
     menuHeight: number;
+
     /** Padding between menu and anchor */
     padding?: number;
-    /** Force menu to specific position */
-    position?: IMenuPosition;
-    /** Enable full-screen mode */
-    fullScreen?: boolean;
+
+    /**
+    *     Optional flag to enable responsive behavior for the menu. 
+    *        When set to true, the menu will adjust its position and size 
+    *        based on the viewport dimensions, ensuring a good user experience 
+    *        across different screen sizes. Ii's mostly used when the fullScreen props is not false to ensure the menu fit  the screen in mobile or tablet device.
+
+     */
+
     responsive?: boolean;
-    visible?: boolean;
+
+    /** Specifies a fixed position for the menu on the screen. */
+    position?: IMenuPosition;
+
+    /** When true, the menu occupies the entire screen. */
+    fullScreen?: boolean;
+
+
+    /** Enables or disables animations for opening and closing the menu. */
     animated?: boolean;
+
+
     /**
      * The minimum width of the menu.
      * This property is used to set a minimum width for the menu.
@@ -332,6 +357,49 @@ export interface IUseMenuPositionProps {
      * Default is false.
      */
     sameWidth?: boolean;
+
+    /***
+     * Optional border radius for the menu. This allows for rounded corners, 
+     * enhancing the visual appeal of the menu.
+     */
+    borderRadius?: number;
+
+    /***
+     * Optional elevation for the menu. This property is used to adjust the shadow and
+     * depth of the menu, providing a visual cue to the user that the menu is
+     * part of the application's interface.
+     */
+    elevation?: number;
+
+    /**
+     * Measurements of the anchor element, which include its position 
+*         and size. This is essential for calculating the menu's position 
+*         relative to the anchor. If the anchor is not available, this 
+*         can be set to null.
+     */
+    anchorMeasurements?: IMenuAnchorMeasurements;
+
+    /**
+     * The visibility of the menu. This property is used to control the visibility of the menu.
+     */
+    visible?: boolean;
+    /***
+     * Use to force the menu to be displayed in a specific axis.
+     * If specified, the menu position will be calculated based on the specified axis.
+     * Default is undefined, which means the menu will be displayed in the preferred axis.
+     */
+    preferedPositionAxis?: "horizontal" | "vertical";
+
+
+
+
+    /***
+    * Wheather the menu should be dynamic height or not.
+    * Default is true.
+    * 
+    */
+    dynamicHeight?: boolean;
+
 }
 
 
@@ -469,10 +537,7 @@ export interface IUseMenuPositionProps {
  *     );
  * };
  */
-export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "children"> & {
-    /** Enables or disables animations for opening and closing the menu. */
-    animated?: boolean;
-
+export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "children"> & Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> & {
     /***
      * Default false
      * if true, the menu will be the same width as the anchor element
@@ -491,14 +556,6 @@ export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "
      * This allows for customization of the scrollView's appearance and behavior.
      */
     scrollViewProps?: ScrollViewProps;
-
-    /** Specifies a fixed position for the menu on the screen. */
-    position?: IMenuPosition;
-
-    /** When true, the menu occupies the entire screen. */
-    fullScreen?: boolean;
-    /** Sets the border radius for the menu, allowing for rounded corners. */
-    borderRadius?: number;
 
     /** Optional callback that is invoked when the menu opens. */
     onOpen?: () => void;
@@ -519,16 +576,6 @@ export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "
     beforeToggle?: (menuContext: IMenuContext) => any;
 
     /**
-    *     Optional flag to enable responsive behavior for the menu. 
-    *        When set to true, the menu will adjust its position and size 
-    *        based on the viewport dimensions, ensuring a good user experience 
-    *        across different screen sizes. Ii's mostly used when the fullScreen props is not false to ensure the menu fit  the screen in mobile or tablet device.
-
-     */
-
-    responsive?: boolean;
-
-    /**
      * An optional property that defines an array of menu items. Each item can either be a valid menu item object or undefined/null.
      */
     items?: IMenuItems<MenuItemContext>["items"];
@@ -539,22 +586,6 @@ export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "
      */
     itemsProps?: Omit<IMenuItems<MenuItemContext>, "items">;
 
-    /**
-     * The elevation of the menu. This property is used to adjust the shadow and
-     * depth of the menu, providing a visual cue to the user that the menu is
-     * part of the application's interface.
-     */
-    elevation?: number;
-
-    /**
-     * The visibility of the menu. This property is used to control the visibility of the menu.
-     */
-    visible?: boolean;
-
-    /**
-     * The minimum width of the menu.
-     */
-    minWidth?: number;
 }
 
 /**

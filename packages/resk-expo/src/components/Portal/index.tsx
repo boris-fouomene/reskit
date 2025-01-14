@@ -1,6 +1,6 @@
 import View, { IViewProps } from '@components/View';
 import { uniqid } from '@resk/core';
-import React, { createContext, useRef, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useRef, useContext, ReactNode, useEffect, useMemo } from 'react';
 import { StyleSheet, ViewProps } from 'react-native';
 import { getMaxZindex, Platform } from '@resk/core';
 import { IReactComponent } from '../../types';
@@ -154,8 +154,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     );
 };
 
-function RenderPortal<AsProps extends ViewProps = IViewProps>({ children, absoluteFill, visible, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
-    return <View  {...Object.assign({}, props)} style={[{ zIndex }, absoluteFill && styles.absoluteFill, visible === false && styles.hidden, props?.style]}>
+function RenderPortal<AsProps extends ViewProps = IViewProps>({ children, absoluteFill, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
+    const visible = undefined;
+    return <View  {...Object.assign({}, props)} style={[{ zIndex: visible !== false ? zIndex : 0 }, absoluteFill && visible !== false && styles.absoluteFill, visible === false && styles.hidden, props?.style]}>
         {children}
     </View>
 };
@@ -199,16 +200,19 @@ export type IPortalProps<AsProps extends ViewProps = IViewProps> = AsProps & {
     as?: IReactComponent<AsProps>;
 
     /***
-     * An optional boolean flag to determine whether the portal should fill the entire screen.
-     * If set to true, the portal will take up the entire screen and cover the content below it.
+     * The `absoluteFill` prop determines whether the portal should fill the entire screen.
+     * If set to `true`, the portal will take up the entire screen, which can be useful for mobile
+     * or immersive experiences.
+     * Default is false.
      */
     absoluteFill?: boolean;
 
-    /**
-     * A boolean value indicating whether the portal should be visible or not.
-     * If not provided, the portal will be visible by default.
+    /***
+     * A boolean prop that determines whether the portal is visible or not.
+     * If set to `false`, the portal will not be rendered.
+     * Default is false.
      */
-    visible?: boolean;
+    //visible?: boolean;
 }
 
 /**
@@ -250,7 +254,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     hidden: {
-        display: "none",
+        flex: 0,
+        zIndex: 0,
+        display: 'none',
         opacity: 0,
     }
 })

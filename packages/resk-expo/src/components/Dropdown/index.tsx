@@ -1,23 +1,20 @@
-import Component from "@utils/Component";
 import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownEvent, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
 import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj } from "@resk/core";
-import { getTextContent, isReactNode, ObservableComponent, useForceRender, useStateCallback } from "@utils/index";
+import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import areEquals from "@utils/areEquals";
 import Theme, { useTheme } from "@theme/index";
-import { Animated, Pressable, View as RNView, TextInput as RNTextInput, TextInputProps, TouchableOpacity } from "react-native";
+import { View as RNView, TouchableOpacity } from "react-native";
 import TextInput from "@components/TextInput";
-import { Portal } from "@components/Portal";
 import { ContentStyle, FlashList } from "@shopify/flash-list";
-import { IMenuAnchorMeasurements, Menu, useMenu, useMenuPosition } from "@components/Menu";
+import { Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { TouchableRipple } from "@components/TouchableRipple";
 import { StyleSheet } from "react-native";
 import View from "@components/View";
 import { FontIcon } from "@components/Icon";
-import { Icon } from "@components/Icon";
 import Label from "@components/Label";
 import { IStyle } from "@src/types";
 import { useI18n } from "@src/i18n/hooks";
@@ -224,7 +221,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
     close() {
         if (this.state.visible) {
             this.setState({ visible: false }, () => {
-                this.trigger("open", this);
+                this.trigger("close", this);
                 this.trigger("toggleVisibility", this);
             });
         }
@@ -292,9 +289,8 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
     const theme = useTheme();
     const i18n = useI18n();
-    let { anchorContainerProps, error, defaultValue, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
-    const anchorRef = useRef<RNView>(null);
-    const { calculatePosition, measureAnchor, anchorMeasurements } = useMenuPosition(anchorRef, { menuWidth: 0, menuHeight: 0, padding: 0 });
+    let { anchorContainerProps, menuProps, error, defaultValue, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
+    const { visible, preparedItems } = context.state;
     const isLoading = !!props.isLoading;
     const disabledStyle = isLoading && styles.disabled || null;
     anchorContainerProps = Object.assign({}, anchorContainerProps);
@@ -307,7 +303,6 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         }
         setSearchText(text);
     }
-    const { visible, preparedItems } = context.state;
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
     const filteredItems = useMemo(() => {
         if (!isNonNullString(searchText)) {
@@ -396,76 +391,85 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     context.dropdownActions = actions;
     const loadingContent = isLoading ? <ProgressBar color={theme.colors.secondary} indeterminate testID={testID + "dropdown-progressbar"} /> : null;
     return <DropdownContext.Provider value={context}>
-        <View disabled={disabled} ref={anchorRef} testID={`${testID}-dropdown-anchor-container`} {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IStyle}>
-            <TextInput
-                isDropdownAnchor
-                {...props}
-                disabled={disabled}
-                onChange={undefined}
-                testID={testID}
-                defaultValue={anchorSelectedText}
-                onPress={isLoading ? undefined : context.toggle.bind(context)}
-            />
-            {loadingContent}
-        </View>
-        <Portal absoluteFill={visible} style={[!visible && Theme.styles.hidden]} testID={testID + "-portal"}>
+        <Menu
+            responsive
+            {...Object.assign({}, menuProps)}
+            visible={visible}
+            withScrollView={false}
+            sameWidth
+            dynamicHeight={false}
+            onClose={context.close.bind(context)}
+            minWidth={200}
+            anchor={<View disabled={disabled}
+                testID={`${testID}-dropdown-anchor-container`}
+                {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IStyle}
+            >
+                <TextInput
+                    isDropdownAnchor
+                    {...props}
+                    disabled={disabled}
+                    onChange={undefined}
+                    testID={testID}
+                    defaultValue={anchorSelectedText}
+                    onPress={isLoading ? undefined : context.toggle.bind(context)}
+                />
+                {loadingContent}
+            </View>}
+        >
             <DropdownContext.Provider value={context}>
-                <DropdownListItems />
+                <DropdownMenu />
             </DropdownContext.Provider>
-        </Portal>
+        </Menu>
     </DropdownContext.Provider>;
 }
 
-const DropdownListItems = () => {
+function DropdownMenu() {
     const context = useDropdown();
-    return null;
-    const menu = useMenu();
-    const testID = defaultStr(context?.getTestID());
-    const listProps = Object.assign({}, context?.props?.listProps);
-    const filteredItems = Array.isArray(context.filteredItems) ? context.filteredItems : [];
-    const isFullScreen = menu?.fullScreen;
-    const isTopPosition = menu?.menuPosition?.position === "top";
-    const fullScreenAppBarProps = Object.assign({}, context?.props?.fullScreenAppBarProps);
-    const i18n = useI18n();
-    let { label } = Object.assign({}, context?.props);
+    const filteredItems = Array.isArray(context?.filteredItems) ? context.filteredItems : [];
+    const label = context?.props?.label;
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
-    return <View testID={testID + "-dropdown-children-container"} style={[styles.dropdownChildrenContainer]}>
-        <View testID={testID + "-dropdown-list-container"} style={[styles.dropdownListContainer, isTopPosition && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}>
-            {isFullScreen ? (
-                <AppBar
-                    title={getTextContent(label)}
-                    elevation={5}
-                    {...fullScreenAppBarProps}
-                    style={[styles.appBar, fullScreenAppBarProps?.style]}
-                    backActionProps={{
-                        ...Object.assign({}, fullScreenAppBarProps.backActionProps),
-                        onPress: (...args) => {
-                            if (typeof fullScreenAppBarProps.backActionProps?.onPress === "function") {
-                                fullScreenAppBarProps.backActionProps?.onPress(...args);
-                            }
-                            if (typeof context?.close === "function") {
-                                context.close();
-                            }
-                        },
-                    }}
-                    subtitle={defaultStr(context.anchorSelectedText, i18n.t("components.dropdown.noneSelected"))}
-                />
-            ) : null}
-            <DropdownSearch isFullScreen={isFullScreen} />
-            <FlashList<IDropdownPreparedItem>
-                testID={testID + "-dropdown-list"}
-                estimatedItemSize={100}
-                {...listProps}
-                contentContainerStyle={(StyleSheet.flatten([isTopPosition && styles.dropdownListTopPosition || null, listProps?.contentContainerStyle]) as ContentStyle)}
-                style={undefined}
-                data={filteredItems}
-                keyExtractor={({ hashKey }) => hashKey}
-                renderItem={({ item, index }) => {
-                    return <DropdownItem {...item} index={index} />;
+    const fullScreenAppBarProps = Object.assign({}, context?.props?.fullScreenAppBarProps);
+    const listProps = Object.assign({}, context?.props?.listProps);
+    const testID = context?.getTestID();
+    const menu = useMenu();
+    const menuPosition = menu?.menuPosition;
+    const isTopPosition = menuPosition?.yPosition === "top";
+    const fullScreen = !!menu?.fullScreen;
+    const canReverse = isTopPosition && !fullScreen;
+    return <View testID={testID + "-dropdown-list-container"} style={[styles.dropdownListContainer, canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}>
+        {fullScreen ? (
+            <AppBar
+                title={getTextContent(label)}
+                elevation={5}
+                {...fullScreenAppBarProps}
+                style={[styles.appBar, fullScreenAppBarProps?.style]}
+                backActionProps={{
+                    ...Object.assign({}, fullScreenAppBarProps.backActionProps),
+                    onPress: (...args) => {
+                        if (typeof fullScreenAppBarProps.backActionProps?.onPress === "function") {
+                            fullScreenAppBarProps.backActionProps?.onPress(...args);
+                        }
+                        if (typeof context?.close === "function") {
+                            context.close();
+                        }
+                    },
                 }}
+                subtitle={defaultStr(context.anchorSelectedText, i18n.t("components.dropdown.noneSelected"))}
             />
-        </View>
-    </View>
+        ) : null}
+        <DropdownSearch isFullScreen={fullScreen} />
+        <FlashList<IDropdownPreparedItem>
+            testID={testID + "-dropdown-list"}
+            estimatedItemSize={100}
+            {...listProps}
+            inverted={canReverse}
+            data={filteredItems}
+            keyExtractor={({ hashKey }) => hashKey}
+            renderItem={({ item, index }) => {
+                return <DropdownItem {...item} index={index} />;
+            }}
+        />
+    </View>;
 }
 
 const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) => {
@@ -587,12 +591,11 @@ const styles = StyleSheet.create({
     },
     dropdownChildrenContainer: {
         flex: 1,
-        width: "100%",
-        height: "100%",
     },
     dropdownListContainer: {
         width: "100%",
         height: "100%",
+        flex: 1,
         maxWidth: "100%",
         maxHeight: "100%",
         paddingHorizontal: 0,
@@ -601,15 +604,27 @@ const styles = StyleSheet.create({
     },
     dropdownListTopPosition: {
         flexDirection: "column-reverse",
+        paddingTop: 10,
     },
     dropdownListContentContainer: {
         width: "100%",
-        flex: 1,
-        paddingVertical: 10,
-        paddingHorizontal: 10,
+        height: "100%",
+        alignSelf: "flex-start",
+        flexGrow: 0,
+        //paddingVertical: 10,
+        //paddingHorizontal: 10,
     },
     list: {
+
+    },
+    listContentContainerReverse: {
+        flexDirection: "column-reverse",
+    },
+    portalBackdrop: {
+        ...StyleSheet.absoluteFillObject,
         flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: "flex-start",
     },
 });
 

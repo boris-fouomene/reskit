@@ -85,7 +85,7 @@ const index = withAppBar(() => {
             <Dropdown
                 label="My Dropdown"
                 getItemValue={({ item }) => item.value}
-                items={Array.from({ length: 1000 }, (_, i) => ({ label: `Item and ${i + 1}`, value: `${i + 1}` }))}
+                items={Array.from({ length: 100000 }, (_, i) => ({ label: `Item and ${i + 1}`, value: `${i + 1}` }))}
             />
             <View style={[Theme.styles.p5]}>
                 <Menu

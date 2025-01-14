@@ -148,6 +148,8 @@ export interface IMenuCalculatedPosition {
     yPosition?: IMenuPosition;
     left?: number;
     top?: number;
+    height?: number;
+    width?: number;
     bottom?: number;
     calculatedFromPosition: IMenuPosition;
     right?: number;

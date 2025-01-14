@@ -436,7 +436,10 @@ function DropdownMenu() {
     const isTopPosition = menuPosition?.yPosition === "top";
     const fullScreen = !!menu?.fullScreen;
     const canReverse = isTopPosition && !fullScreen;
-    return <View testID={testID + "-dropdown-list-container"} style={[styles.dropdownListContainer, canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}>
+    const menuHeight = typeof menuPosition?.height === "number" && menuPosition.height > 50 ? menuPosition.height : undefined;
+    return <View testID={testID + "-dropdown-list-container"} style={[styles.dropdownListContainer,
+    typeof menuHeight == "number" && { height: menuHeight },
+    canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}>
         {fullScreen ? (
             <AppBar
                 title={getTextContent(label)}
@@ -586,18 +589,11 @@ const styles = StyleSheet.create({
         height: "100%",
         width: "100%",
     },
-    listContentContainer: {
-        flex: 1,
-    },
-    dropdownChildrenContainer: {
-        flex: 1,
-    },
     dropdownListContainer: {
         width: "100%",
         height: "100%",
         flex: 1,
-        maxWidth: "100%",
-        maxHeight: "100%",
+        alignSelf: "flex-start",
         paddingHorizontal: 0,
         paddingVertical: 0,
         flexDirection: "column",

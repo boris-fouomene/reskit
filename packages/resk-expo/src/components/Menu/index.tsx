@@ -87,7 +87,7 @@ export const useMenuPosition = ({
     minWidth,
     borderRadius = 0,
     sameWidth,
-    elevation,
+    elevation: customElevation,
     preferedPositionAxis,
     anchorMeasurements,
     dynamicHeight,
@@ -100,6 +100,7 @@ export const useMenuPosition = ({
     // Animation values
     const opacity = useSharedValue(0);
     const scale = useSharedValue(0.8);
+    const elevation = typeof customElevation === "number" ? customElevation : fullScreen ? 0 : 8;
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         let calculatedPosition: IMenuCalculatedPosition = {
             calculatedFromPosition: "bottom",
@@ -110,7 +111,8 @@ export const useMenuPosition = ({
         };
         // Handle null measurements or fullscreen mode
         if (!isObj(anchorMeasurements) || !anchorMeasurements || fullScreen) {
-            position = "top";
+            calculatedPosition.height = screenHeight;
+            calculatedPosition.width = screenWidth;
         } else {
             const { pageX, pageY, width: anchorWidth, height: anchorHeight } = anchorMeasurements;
             minWidth = typeof minWidth == 'number' && minWidth > 0 ? minWidth : anchorWidth;

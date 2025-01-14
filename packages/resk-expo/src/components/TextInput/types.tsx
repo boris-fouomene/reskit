@@ -428,6 +428,14 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
      * @returns {React.ReactNode} The rendered component.
      */
     render?: (props: TextInputProps, ref?: React.Ref<TextInput>) => React.ReactNode;
+
+    /***
+     * A boolean value indicating whether to render the TextInput with a background.
+     * This can be useful for styling the component.
+     * If true, the TextInput will have the `theme.colors.surfaceVariant` background color as its background.
+     * @default false
+     */
+    withBackground?: boolean;
 };
 
 /**

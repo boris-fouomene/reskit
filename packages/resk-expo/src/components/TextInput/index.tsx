@@ -4,7 +4,7 @@ import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, 
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { formatValueToObject, Platform, IDict, isNonNullString, isStringNumber, parseDecimal, isEmpty, defaultStr } from "@resk/core";
 import _, { compact, isNumber } from "lodash";
-import Theme, { useTheme } from "@theme";
+import Theme, { Colors, useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View from "@components/View";
 import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
@@ -84,23 +84,21 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
         }
     }}>{label}</Pressable> : label;
     const canWrapWithTouchable = props.isDropdownAnchor && editable;
-    const Wrapper = canWrapWithTouchable ? TouchableRipple : React.Fragment;
+    const Wrapper = canWrapWithTouchable ? TouchableRipple : View;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
-    const wrapperProps = canWrapWithTouchable ? pressableProps : undefined;
+    const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
     const hasLeft = !!left;
     const inputProps = { ...(!canWrapWithTouchable ? pressableProps : {}), ...rest, editable: canWrapWithTouchable ? false : editable }
-    return <View  {...containerProps}>
+    return <View {...containerProps} >
         {isLabelEmbededVariant ? null : labelContent}
-        <View {...contentContainerProps}>
-            {<View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, hasLeft && styles.leftContainerHasLeft, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
+        <Wrapper {...wrapperProps} {...contentContainerProps} style={[hasLeft && styles.leftContentContainer, contentContainerProps?.style]}>
+            {<View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
-                <Wrapper {...wrapperProps}>
-                    {typeof render == "function" ? render(inputProps, ref) : <RNTextInput {...inputProps} ref={ref} />}
-                </Wrapper>
+                {typeof render == "function" ? render(inputProps, ref) : <RNTextInput {...inputProps} ref={ref} />}
             </View>}
             {right}
-        </View>
+        </Wrapper>
     </View>
 });
 
@@ -134,8 +132,9 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
  * 
  * console.log(styles); // { containerStyle: [...], contentContainerStyle: [...], inputStyle: [...], labelStyle: [...] }
  */
-const getContainerAndContentStyle = ({ isFocused, variant, compact, isLabelEmbededVariant, textColor, borderColor, theme, isDefaultVariant }: { isLabelEmbededVariant: boolean, canRenderLabel: boolean, theme: ITheme, variant: ITextInputProps["variant"], isFocused: boolean, textColor?: string, borderColor?: string, isDefaultVariant: boolean, compact?: boolean }) => {
+const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compact, isLabelEmbededVariant, textColor, borderColor, theme, isDefaultVariant }: { isLabelEmbededVariant: boolean, canRenderLabel: boolean, theme: ITheme, variant: ITextInputProps["variant"], isFocused: boolean, textColor?: string, borderColor?: string, isDefaultVariant: boolean, compact?: boolean, withBackground?: boolean }) => {
     const isFlatVariant = false;//variant === "flat";
+    const backgroundColor = withBackground !== false ? theme.colors.surfaceVariant : undefined;
     const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [styles.input, { color: textColor }], labelStyle: IStyle = [{ color: textColor }];
     const borderedStyle = [
         isFocused ? styles.focusedOutlineBorder : styles.borderWidth1,
@@ -145,8 +144,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, compact, isLabelEmbed
         notEmbeededInputStyle = [styles.inputNotEmbededLabelVariant]
     if (isLabelEmbededVariant) {
         inputStyle.push(styles.inputLabelEmbededVariant);
-        containerStyle.push(borderedStyle);
-        containerStyle.push(styles.labelEmbededVariantContainer);
+        contentContainerStyle.push(borderedStyle);
         labelStyle.push(styles.labelEmbededVariantLabel);
     } else if (isFlatVariant) {
         inputStyle.push(styles.flatVariantInput);
@@ -158,8 +156,8 @@ const getContainerAndContentStyle = ({ isFocused, variant, compact, isLabelEmbed
         labelStyle.push(notEmbeededLabelStyle)
         contentContainerStyle.push(borderedStyle);
     }
-    if (isDefaultVariant) {
-        labelStyle.push(styles.defaultVariantLabel);
+    if (backgroundColor) {
+        contentContainerStyle.push({ backgroundColor });
     }
     if (compact) {
         inputStyle.push(styles.compact);
@@ -263,7 +261,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, compact, isLabelEmbed
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -383,7 +381,7 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, onConte
     }, [isPasswordField, secureTextEntryGetToggleIconProps, isSecure]);
     const secureIcon = isPasswordField ? <FontIcon size={25}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure) }} color={textColor} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
-    const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
+    const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, withBackground, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     return {
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
@@ -555,17 +553,17 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignSelf: "flex-start",
         flexWrap: "nowrap",
-        backgroundColor: "transparent",
+        //backgroundColor: "transparent",
         flexDirection: "row",
         alignItems: "center",
         position: "relative",
         width: "100%",
+        paddingHorizontal: 5,
     },
     leftContainer: {
         flexGrow: 1,
     },
-    leftContainerHasLeft: {
-        paddingLeft: 5,
+    leftContentContainer: {
     },
     leftOrRightContainer: {
         display: "flex",
@@ -580,14 +578,6 @@ const styles = StyleSheet.create({
     notEmbededLabelStyle: {
         fontWeight: "500",
         paddingBottom: 5,
-    },
-    defaultVariantLabel: {
-
-    },
-    labelEmbededVariantContainer: {
-        paddingHorizontal: 5,
-        //paddingVertical: 2,
-        paddingLeft: 5,
     },
     labelEmbededVariantLabel: {
         //paddingLeft: 3,

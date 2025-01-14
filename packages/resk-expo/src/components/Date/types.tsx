@@ -1,5 +1,5 @@
 import { ISurfaceProps } from "@components/Surface";
-import { IMomentDateFormat } from "@resk/core"
+import { IMomentFormat } from "@resk/core"
 import { Moment } from "moment";
 
 
@@ -9,7 +9,7 @@ export type ICalendarDate = Date | string;
 export interface ICalendarBaseProps extends ISurfaceProps {
     minDate?: ICalendarDate;
     maxDate?: ICalendarDate;
-    dateFormat?: IMomentDateFormat,
+    dateFormat?: IMomentFormat,
     testID?: string;
     defaultValue?: ICalendarDate;
     locale?: string;

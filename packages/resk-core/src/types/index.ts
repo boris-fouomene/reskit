@@ -1526,215 +1526,50 @@ export interface IFormatValueResult extends IFormatValueOptions {
   parsedValue: any; //defaults to a number when it is a number
   decimalValue: number; //the decimal value of the formatted value
 }
-
-
-
-/**
-* @type IMomentYearToken
-* @description
-* A union type representing the various formats for year tokens in Moment.js.
-* These tokens can be used to format or parse years in different representations.
-* 
-* ### Supported Tokens:
-* - **`'YYYY'`**: 4-digit year (e.g., `2024`).
-* - **`'YY'`**: 2-digit year (e.g., `24` for `2024`).
-*/
-export type IMomentYearToken = 'YYYY' | 'YY';
-
-/**
- * @type IMomentMonthToken
- * @description
- * A union type representing the various formats for month tokens in Moment.js.
- * These tokens allow for formatting or parsing months in various styles.
- * 
- * ### Supported Tokens:
- * - **`'MM'`**: 2-digit month (e.g., `10` for October).
- * - **`'MMM'`**: Abbreviated month name (e.g., `Oct` for October).
- * - **`'MMMM'`**: Full month name (e.g., `October`).
- */
-export type IMomentMonthToken = 'MM' | 'MMM' | 'MMMM';
-
-/**
- * @type IMomentDayToken
- * @description
- * A union type representing the various formats for day tokens in Moment.js.
- * These tokens can be used to format or parse days in different representations.
- * 
- * ### Supported Tokens:
- * - **`'DD'`**: 2-digit day of the month (e.g., `07`).
- * - **`'D'`**: Day of the month (1-31).
- */
-export type IMomentDayToken = 'DD' | 'D';
-
-/**
- * @type IMomentDayOfWeekToken
- * @description
- * A union type representing the various formats for day of the week tokens in Moment.js.
- * These tokens are useful for formatting or parsing days based on their position in the week.
- * 
- * ### Supported Tokens:
- * - **`'dd'`**: Abbreviated day of the week (e.g., `Mo` for Monday).
- * - **`'ddd'`**: 3-letter abbreviation for the day (e.g., `Mon`).
- * - **`'dddd'`**: Full name of the day (e.g., `Monday`).
- */
-export type IMomentDayOfWeekToken = 'dd' | 'ddd' | 'dddd';
-
-/**
- * @type IMomentHourToken
- * @description
- * A union type representing the various formats for hour tokens in Moment.js.
- * These tokens can be used to format or parse hours in both 12-hour and 24-hour formats.
- * 
- * ### Supported Tokens:
- * - **`'HH'`**: 24-hour format (e.g., `14`).
- * - **`'H'`**: 24-hour format (1-23).
- * - **`'hh'`**: 12-hour format (e.g., `02`).
- * - **`'h'`**: 12-hour format (1-12).
- */
-export type IMomentHourToken = 'HH' | 'H' | 'hh' | 'h';
-
-/**
- * @type IMomentMinuteToken
- * @description
- * A union type representing the various formats for minute tokens in Moment.js.
- * These tokens can be used to format or parse minutes in both 2-digit and 1-digit formats.
- * 
- * ### Supported Tokens:
- * - **`'mm'`**: 2-digit minutes (e.g., `30`).
- * - **`'m'`**: Minute (0-59).
- */
-export type IMomentMinuteToken = 'mm' | 'm';
-
-/**
- * @type IMomentSecondToken
- * @description
- * A union type representing the various formats for second tokens in Moment.js.
- * These tokens can be used to format or parse seconds in both 2-digit and 1-digit formats.
- * 
- * ### Supported Tokens:
- * - **`'ss'`**: 2-digit seconds (e.g., `45`).
- * - **`'s'`**: Second (0-59).
- */
-export type IMomentSecondToken = 'ss' | 's';
-
-/**
- * @type IMomentFractionToken
- * @description
- * A union type representing the various formats for fractional second tokens in Moment.js.
- * These tokens can be used to format or parse milliseconds and fractions of seconds.
- * 
- * ### Supported Tokens:
- * - **`'SSS'`**: 3-digit milliseconds (e.g., `500`).
- * - **`'SS'`**: 2-digit fractional seconds.
- * - **`'S'`**: 1-digit fractional seconds.
- */
-export type IMomentFractionToken = 'SSS' | 'SS' | 'S';
-
-/**
- * @type IMomentMeridiemToken
- * @description
- * A union type representing the formats for meridiem tokens in Moment.js.
- * These tokens are used to indicate AM or PM in time formatting.
- * 
- * ### Supported Tokens:
- * - **`'A'`**: Uppercase meridiem (e.g., `PM`).
- * - **`'a'`**: Lowercase meridiem (e.g., `pm`).
- */
-export type IMomentMeridiemToken = 'A' | 'a';
-
-/**
- * @type IMomentTimezoneToken
- * @description
- * A union type representing the formats for timezone tokens in Moment.js.
- * These tokens are used to represent timezone offsets in date/time formatting.
- * 
- * ### Supported Tokens:
- * - **`'Z'`**: Timezone offset (e.g., `-07:00`).
- * - **`'ZZ'`**: Compact timezone offset (e.g., `-0700`).
- */
-export type IMomentTimezoneToken = 'Z' | 'ZZ';
-
-/**
- * @type IMomentDateSeparator
- * @description
- * A union type representing the valid separators for date components in Moment.js.
- * These separators are used to format dates in various styles.
- */
-export type IMomentDateSeparator = '/' | '-' | '.';
-
-/**
- * @type IMomentTimeSeparator
- * @description
- * A union type representing the valid separators for time components in Moment.js.
- * This separator is used to format time in various styles.
- */
-export type IMomentTimeSeparator = ':';
-
-/**
- * @type IMomentDateFormat
- * @description
- * A union type representing the various combinations of date components in Moment.js.
- * This type allows for flexibility in formatting dates according to different structures.
- */
-export type IMomentDateFormat = IMomentDayToken | IMomentYearToken | IMomentMonthToken |
-  `${IMomentYearToken}${IMomentDateSeparator}${IMomentMonthToken}${IMomentDateSeparator}${IMomentDayToken}` |
-  `${IMomentMonthToken}${IMomentDateSeparator}${IMomentDayToken}${IMomentDateSeparator}${IMomentYearToken}` |
-  `${IMomentDayToken}${IMomentDateSeparator}${IMomentMonthToken}${IMomentDateSeparator}${IMomentYearToken}`;
-
-/**
- * @type IMomentTimeFormat
- * @description
- * A union type representing the various combinations of time components in Moment.js.
- * This type allows for flexibility in formatting times according to different structures.
- */
-export type IMomentTimeFormat =
-  `${IMomentHourToken}${IMomentTimeSeparator}${IMomentMinuteToken}` |
-  `${IMomentHourToken}${IMomentTimeSeparator}${IMomentMinuteToken}${IMomentTimeSeparator}${IMomentSecondToken}` |
-  `${IMomentHourToken}${IMomentTimeSeparator}${IMomentMinuteToken}${IMomentTimeSeparator}${IMomentSecondToken}.${IMomentFractionToken}`;
-
-/**
- * @type IMomentDateTimeFormat
- * @description
- * A union type representing the various combinations of date and time components in Moment.js.
- * This type allows for flexible formatting of date/time strings according to different structures.
- */
-export type IMomentDateTimeFormat =
-  `${IMomentDateFormat} ${IMomentTimeFormat}` |
-  `${IMomentDateFormat}T${IMomentTimeFormat}`;
-
-/**
- * @type IMomentFullFormatFormat
- * @description
- * A union type representing the various combinations of date/time components with meridiem
- * and timezone tokens in Moment.js. This type allows for comprehensive formatting of
- * date/time strings that include all relevant components.
- */
-export type IMomentFullFormatFormat =
-  `${IMomentDateTimeFormat}${IMomentMeridiemToken}` |
-  `${IMomentDateTimeFormat} ${IMomentMeridiemToken}` |
-  `${IMomentDateTimeFormat}${IMomentTimezoneToken}` |
-  `${IMomentDateTimeFormat} ${IMomentTimezoneToken}`
-
-
-/**
- * @type IMomentDayOfWeekFormat
- * @description
- * A union type representing the various combinations of day of the week components
- * in Moment.js. This type allows for flexible formatting of date/time strings
- * that include the day of the week.
- */
-export type IMomentDayOfWeekFormat = `${IMomentDayOfWeekToken}, ` | `${IMomentDayOfWeekToken} `;
-
 /**
  * @type IMomentFormat
  * @description
- * A comprehensive union type representing all valid Moment.js format strings.
+ * A comprehensive type representing all valid Moment.js format strings.
  * This type serves as a unified reference for various date/time formatting options,
  * accommodating various combinations of date, time, and day of the week components.
+ * ### Supported Tokens:
+ *  monts : 
+ *   M : Month number, without leading zeros (1-12).
+ * - **`'MM'`**: 2-digit month (e.g., `10` for October).
+ * - **`'MMM'`**: Abbreviated month name (e.g., `Oct` for October).
+ * - **`'MMMM'`**: Full month name (e.g., `October`).
+ * - **`'D'`**: Day of the month (e.g., `1` for the first day of the month... 2 ... 30 31).
+ * - **``Do'`**: Ordinal day of the month (e.g., `1st` for the first day of the month,1st 2nd ... 30th 31st).
+ * - **`'DD'`**: 2-digit day of the month (e.g., `01` for the first day of the month).
+ * - **`'DDD'`**: 3-digit day of the year (e.g., `001` for the first day of the year).
+ * - **`'DDDD'`**: 4-digit day of the year (e.g., `0001` for the first day of the year).
+ * - **``d'`**: Day of the week (e.g., `1` for Monday : 0 1 ... 5 6).
+ * - **``do'`**: Ordinal day of the week (e.g., `1st` for Monday).
+ * - **``dd'`**: Abbreviated day of the week (e.g., `Mon` for Monday).
+ * - **``ddd'`**: Full day of the week (e.g., `Monday`).
+ * - **``dddd'`**: Full day of the week (e.g., `Monday`).
+ * - **`'YY'`**: 2-digit year (e.g., `19` for the year 2019).
+ * - **`'YYYY'`**: 4-digit year (e.g., `2019`).
+ * - **`'YYYYY'`**: 5-digit year (e.g., `1999`).
+ * - **`'a'`**: Lowercase am/pm marker (e.g., `am` or `pm`).
+ * - **`'A'`**: Uppercase AM/PM marker (e.g., `AM` or `PM`).
+ * - **`'H'`**: 24-hour hour (e.g., `0` to `23`).
+ * - **`'HH'`**: 2-digit 24-hour hour (e.g., `00` to `23`).
+ * - **`'h'`**: 12-hour hour (e.g., `1` to `12`).
+ * - **`'hh'`**: 2-digit 12-hour hour (e.g., `01` to `12`).
+ * - **`'m'`**: Minutes (e.g., `0` to `59`).
+ * - **`'mm'`**: 2-digit minutes (e.g., `00` to `59`).
+ * - **`'s'`**: Seconds (e.g., `0` to `59`).
+ * - **`'ss'`**: 2-digit seconds (e.g., `00` to `59`).
+ * - **`'S'`**: Milliseconds (e.g., `0` to `999`).
+ * - **`'SS'`**: 3-digit milliseconds (e.g., `00` to `999`).
+ * - **`'SSS'`**: 4-digit milliseconds (e.g., `000` to `9999`). 
+ * - Q : Quarter of the year (1-4) : 1 2 3 4.
+ * - Qo : Quarter of the year (1-4) : 1st 2nd 3rd 4th.
+ * 
+   * @see https://momentjs.com/docs/#/displaying/format for more information about the supported tokens.
  */
-export type IMomentFormat = IMomentDateFormat | IMomentTimeFormat | IMomentDateTimeFormat | IMomentFullFormatFormat |
-  `${IMomentDayOfWeekFormat}${IMomentDateFormat}` | `${IMomentDayOfWeekFormat}${IMomentTimeFormat}`
-
+export type IMomentFormat = string;
 
 
 /**

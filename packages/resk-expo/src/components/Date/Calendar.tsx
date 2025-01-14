@@ -1,7 +1,7 @@
 import React, { isValidElement, useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, GestureResponderEvent, Animated, PanResponder } from "react-native";
 import moment, { Moment } from "moment/min/moment-with-locales";
-import { defaultStr, IMomentDateFormat, isEmpty } from "@resk/core";
+import { defaultStr, IMomentFormat, isEmpty } from "@resk/core";
 import { ICalendarBaseProps, ICalendarDate, ICalendarDay, ICalendarDayProps, ICalendarDisplayView, ICalendarHour, ICalendarMonth, ICalendarMonthProps, ICalendarYear, ICalendarYearProps } from "./types";
 import { Icon, IIconButtonProps } from "@components/Icon";
 import Label from "@components/Label";
@@ -18,8 +18,8 @@ import { SwipeGestureHandler } from "@components/Gesture";
 import { Notify } from "@notify";
 
 export default class Calendar {
-    static getDefaultDateFormat(dateFormat?: IMomentDateFormat): IMomentDateFormat {
-        return defaultStr(dateFormat, DEFAULT_DATE_FORMATS.date) as IMomentDateFormat;
+    static getDefaultDateFormat(dateFormat?: IMomentFormat): IMomentFormat {
+        return defaultStr(dateFormat, DEFAULT_DATE_FORMATS.date) as IMomentFormat;
     }
     /**
     * Generate the headers for a week based on the start day.
@@ -614,7 +614,7 @@ function useCommon(props: ICalendarBaseProps, displayView?: ICalendarDisplayView
     const momentDefaultValue = useMemo(() => {
         return state?.defaultValue ? moment(state?.defaultValue) : undefined;
     }, [state?.defaultValue]);
-    const dateFormat = defaultStr(props?.dateFormat, DEFAULT_DATE_FORMATS.date) as IMomentDateFormat;
+    const dateFormat = defaultStr(props?.dateFormat, DEFAULT_DATE_FORMATS.date) as IMomentFormat;
     useEffect(() => {
         const newState = { ...state };
         const hasUpdate = !areEquals(props?.minDate, newState.minDate) || !areEquals(props?.maxDate, newState.maxDate) || (!areEquals(props?.defaultValue, state.defaultValue));

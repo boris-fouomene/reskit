@@ -5,7 +5,7 @@ import { i18n } from "../i18n";
 import isDateObj from "./isDateObj";
 import isEmpty from "./isEmpty";
 import defaultStr from "./defaultStr";
-import { IMomentDateFormat, IMomentFormat } from "../types";
+import { IMomentFormat } from "../types";
 
 export { isDateObj };
 /**
@@ -544,8 +544,8 @@ export const DEFAULT_DATE_FORMATS = {
    * @description The format used to represent dates and times by default, as defined by the Moment.js library.
    * @see https://momentjs.com/docs/#/parsing/string-format/
    */
-  get dateTime(): IMomentDateFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultDateTimeFormat"), "DD/MM/YYYY HH:mm:ss") as unknown as IMomentDateFormat;
+  get dateTime(): IMomentFormat {
+    return defaultStr(i18n.getNestedTranslation("dates.defaultDateTimeFormat"), "DD/MM/YYYY HH:mm:ss") as unknown as IMomentFormat;
   },
   /**
    * Get the default date format.
@@ -553,8 +553,8 @@ export const DEFAULT_DATE_FORMATS = {
    *
    * @description The format used to represent dates by default.
    */
-  get date(): IMomentDateFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultDateFormat"), "DD/MM/YYYY") as unknown as IMomentDateFormat;
+  get date(): IMomentFormat {
+    return defaultStr(i18n.getNestedTranslation("dates.defaultDateFormat"), "DD/MM/YYYY") as unknown as IMomentFormat;
   },
   /**
    * Get the default time format, according to the Moment.js library.
@@ -563,8 +563,8 @@ export const DEFAULT_DATE_FORMATS = {
    * @description The format used to represent times by default, as defined by the Moment.js library.
    * @see https://momentjs.com/docs/#/parsing/string-format/
    */
-  get time(): IMomentDateFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultTimeFormat"), "HH:mm:ss") as unknown as IMomentDateFormat;
+  get time(): IMomentFormat {
+    return defaultStr(i18n.getNestedTranslation("dates.defaultTimeFormat"), "HH:mm:ss") as unknown as IMomentFormat;
   }
 }
 

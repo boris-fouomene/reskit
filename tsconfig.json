@@ -3,8 +3,9 @@
     "baseUrl": ".",
     "rootDir": ".", // TypeScript source directory
     "outDir": "./build",
-    "target": "ES6", // Or the desired target
+    "target": "ES2021", // Or the desired target
     "module": "ES6", // Output CommonJS modules
+    "removeComments": true,
     "moduleResolution": "node", // Resolve modules using Node.js style
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true, // Enable experimental support for decorators
@@ -21,6 +22,11 @@
     "skipLibCheck": true,
     "composite": true,
     "allowSyntheticDefaultImports": true,
+    "incremental": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    //"noFallthroughCasesInSwitch": false
     //"module": "NodeNext",
     "esModuleInterop": true, // Compatibility with ES module imports
     //"sourceMap": true,

@@ -1002,6 +1002,14 @@ export interface IResource<DataType = any, PrimaryKeyType extends IResourcePrima
    * @returns {Partial<IResourceActionMap>} The actions associated with the resource.
    */
   actions?: Partial<IResourceActionMap>;
+
+
+  /***
+   * The class name of the resource
+   * This information is used to identify the resource class in the application.
+   * It is retrieved from the target class passed to the @Resource decorator.
+   */
+  className?: string;
 }
 
 /**
@@ -1031,6 +1039,21 @@ export interface IResource<DataType = any, PrimaryKeyType extends IResourcePrima
  * }
  */
 export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceActionName> = IResourceActionName> extends IResource<DataType, PrimaryKeyType>, IObservable<EventType> {
+  /**
+   * The options for the resource.
+   * @type {IResource<DataType,PrimaryKeyType>}
+   * @description
+   * This property contains the options for the resource, which can be used to customize the behavior of the resource.
+   * The options are passed from the @Resource decorator.
+   */
+  options?: IResource<DataType, PrimaryKeyType>;
+
+  /***
+   * Returns the options for the resource.
+   * @returns {IResource<DataType,PrimaryKeyType>} The options for the resource.
+   */
+  getOptions(): IResource<DataType, PrimaryKeyType>;
+
   /*
   The data provider for the resource.
   */
@@ -1872,7 +1895,7 @@ export interface IResourceOperationResult<DataType = any> {
  * approach to data handling in applications.
  */
 export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
-  create(record: DataType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
+  create(record: Partial<DataType>, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
   update(key: PrimaryKeyType, updatedData: Partial<DataType>, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;
   delete(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any>>;
   read(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>>;

@@ -57,11 +57,11 @@ describe("ResourceBase", () => {
             ResourcesManager.addResource("test1" as IResourceName, resource1);
             ResourcesManager.addResource("test2" as IResourceName, resource2);
 
-            expect(ResourcesManager.getResourceNames()).toContain("test1");
-            expect(ResourcesManager.getResourceNames()).toContain("test2");
+            expect(ResourcesManager.getAllNames()).toContain("test1");
+            expect(ResourcesManager.getAllNames()).toContain("test2");
 
             ResourcesManager.removeResource("test1" as IResourceName);
-            expect(ResourcesManager.getResourceNames()).not.toContain("test1");
+            expect(ResourcesManager.getAllNames()).not.toContain("test1");
         });
     });
 

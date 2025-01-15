@@ -6,8 +6,16 @@ import { IAuthPerm, IAuthUser } from '@/auth/types';
 import { isAllowed } from '../auth/perms';
 import { i18n, I18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
-import { property } from 'lodash';
 
+
+
+
+/***
+    @interface The reflect metat key used to store resources metatdata
+*/
+const resourceMetaData = Symbol("resource");
+const resourcesMetaDataKey = Symbol('resources');
+const resourcesClassNameMetaData = Symbol('resourceByClassName');
 
 /**
  * Represents the base class for any resource.
@@ -54,6 +62,10 @@ import { property } from 'lodash';
  */
 export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceActionName> = IResourceActionName> extends ObservableClass<EventType> implements IResourceInstance<DataType, PrimaryKeyType, EventType> {
   actions?: IResourceActionMap;
+  options?: IResource<DataType, PrimaryKeyType>;
+  getOptions(): IResource<DataType, PrimaryKeyType> {
+    return Object.assign({}, this.options);
+  }
   static events = observableFactory<IResourceActionName | "string">();
   /**
    * The internal name of the resource.
@@ -122,14 +134,12 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * The constructor accepts an `options` object, which is used to populate the instance properties.
    * It automatically copies all the non-function properties from the `options` into the current instance.
    * 
-   * @param {IResource<DataType>} options - The initial configuration object for the resource, containing optional properties like `name`, `label`, `title`, and `tooltip`.
    * @param {...any[]} args - Additional arguments that can be passed for further customization.
    */
-  constructor(options: IResource<DataType>, ...args: any[]) {
+  constructor(...args: any[]) {
     super();
     this._onDictionaryChangedListener = i18n.on("translations-changed", this.onI18nChange.bind(this));
     this._onLocaleChangeListener = i18n.on("locale-changed", this.onI18nChange.bind(this));
-    this.init(options);
   }
   onI18nChange() {
     this.resolveTranslations();
@@ -301,6 +311,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    */
   init(options: IResource<DataType>) {
     options = Object.assign({}, options);
+    this.options = options;
     this.resolveTranslations();
     for (let i in options) {
       if (isEmpty((this as IDict)[i]) && typeof (this as IDict)[i] !== "function") {
@@ -692,7 +703,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
  * ResourcesManager.addResource('userResource', userResource);
  * 
  * // Retrieve the names of all resources
- * const resourceNames = ResourcesManager.getResourceNames(); 
+ * const resourceNames = ResourcesManager.getAllNames(); 
  * console.log(resourceNames); // Output: ['userResource']
  * 
  * // Retrieve a specific resource
@@ -717,6 +728,97 @@ export class ResourcesManager {
   private static resources: Record<IResourceName, ResourceBase> = {} as Record<IResourceName, ResourceBase>;
 
   /**
+   * Retrieves the global record of all resource options managed by the `ResourcesManager`.
+   * 
+   * This method returns a copy of the internal record of resource options, which can be used to access
+   * the configuration and settings for each registered resource.
+   * 
+   * @returns {Record<IResourceName, IResource<any,any>>} A copy of the resource options record.
+   */
+  public static getAllOptions(): Record<IResourceName, IResource<any, any>> {
+    return Object.assign({}, Reflect.getMetadata(resourcesMetaDataKey, ResourcesManager));
+  }
+  /**
+   * Adds resource options to the global record managed by the `ResourcesManager`.
+   * 
+   * This method updates the internal record of resource options with the provided `options` for the given `resourceName`.
+   * The updated record is then stored as metadata on the `ResourcesManager` class.
+   * 
+   * @param {IResourceName} resourceName - The unique name of the resource.
+   * @param {IResource<any>} options - The resource options to be associated with the given `resourceName`.
+   */
+  public static addOptions(resourceName: IResourceName, options: IResource<any>) {
+    const allOptions = this.getAllOptions();
+    if (!isNonNullString(resourceName) || !resourceName) return;
+    options = Object.assign({}, options);
+    options.name = isNonNullString(options?.name) ? options.name : resourceName;
+    (allOptions as any)[resourceName] = options;
+    Reflect.defineMetadata(resourcesMetaDataKey, allOptions, ResourcesManager);
+    if (isNonNullString(options.className)) {
+      const classNames = ResourcesManager.getAllClassNames();
+      (classNames as any)[options.className] = options.name;
+      Reflect.defineMetadata(resourcesClassNameMetaData, classNames, ResourcesManager);
+    }
+  }
+  /**
+   * Retrieves the global record of resource class names managed by the `ResourcesManager`.
+   * 
+   * This method returns a copy of the internal record of resource class names, which can be used to access
+   * the class name associated with each registered resource.
+   * 
+   * @returns {Record<string,IResourceName>} A copy of the resource class names record.
+   */
+  public static getAllClassNames(): Record<string, IResourceName> {
+    return Object.assign({}, Reflect.getMetadata(resourcesClassNameMetaData, ResourcesManager));
+  }
+  /**
+   * Retrieves the class name associated with the specified resource name.
+   *
+   * This method looks up the class name for the given `resourceName` in the global record of resource class names
+   * managed by the `ResourcesManager`. If the resource name is not found, or is not a valid non-null string, this
+   * method will return `undefined`.
+   *
+   * @param {IResourceName} resourceName - The unique name of the resource to retrieve the class name for.
+   * @returns {string | undefined} The class name associated with the specified resource name, or `undefined` if not found.
+   */
+  public static getNameByClassName(className: string): IResourceName | undefined {
+    if (!isNonNullString(className)) return undefined;
+    const classNames = this.getAllClassNames();
+    return classNames[className];
+  }
+  /**
+   * Retrieves the resource options for the specified resource name.
+   *
+   * This method retrieves the resource options associated with the given `resourceName` from the global
+   * record of resource options managed by the `ResourcesManager`. If the resource name is not a valid
+   * non-null string, or if the resource options are not found, this method will return `undefined`.
+   *
+   * @param {IResourceName} resourceName - The unique name of the resource to retrieve the options for.
+   * @returns {IResource<any,any> | undefined} The resource options for the specified resource name, or `undefined` if not found.
+   */
+  public static getOptions(resourceName: IResourceName): IResource<any, any> | undefined {
+    const allOptions = this.getAllOptions();
+    if (!isNonNullString(resourceName) || !resourceName) return;
+    return (allOptions as any)[resourceName];
+  }
+
+  /**
+   * Retrieves the resource options for the specified resource class name.
+   *
+   * This method first looks up the resource name associated with the given class name using the `getNameByClassName` method.
+   * If the resource name is found, it then retrieves the resource options for that resource name using the `getOptions` method.
+   * If the resource name is not found, or if the resource options are not found, this method will return `undefined`.
+   *
+   * @param {string} className - The class name of the resource to retrieve the options for.
+   * @returns {IResource<any, any> | undefined} The resource options for the specified resource class name, or `undefined` if not found.
+   */
+  public static getOptionsByClassName(className: string): IResource<any, any> | undefined {
+    const resourceName = this.getNameByClassName(className);
+    if (!resourceName) return undefined;
+    return this.getOptions(resourceName);
+  }
+
+  /**
    * Retrieves the names of all registered resources.
    * 
    * This method returns an array of resource names that are currently managed by the `ResourcesManager`.
@@ -724,10 +826,10 @@ export class ResourcesManager {
    * @returns {string[]} An array of resource names.
    * 
    * @example
-   * const names = ResourcesManager.getResourceNames();
+   * const names = ResourcesManager.getAllNames();
    * console.log(names); // Output: ['userResource', 'productResource']
    */
-  public static getResourceNames() {
+  public static getAllNames() {
     return Object.keys(this.resources);
   }
 
@@ -770,7 +872,7 @@ export class ResourcesManager {
    * @example
    * const productResource = new ProductResource();
    * ResourcesManager.addResource('productResource', productResource);
-   * console.log(ResourcesManager.getResourceNames()); // Output: ['userResource', 'productResource']
+   * console.log(ResourcesManager.getAllNames()); // Output: ['userResource', 'productResource']
    */
   public static addResource<DataType = any>(name: IResourceName, resource: ResourceBase<DataType>) {
     if (typeof name === "string" && name && resource && resource instanceof ResourceBase) {
@@ -790,13 +892,13 @@ export class ResourcesManager {
    * 
    * @example
    * // Assuming a resource named 'userResource' has been previously added
-   * console.log(ResourcesManager.getResourceNames()); // Output: ['userResource', 'productResource']
+   * console.log(ResourcesManager.getAllNames()); // Output: ['userResource', 'productResource']
    * 
    * // Remove the user resource
    * ResourcesManager.removeResource('userResource');
    * 
    * // Check the remaining resources
-   * console.log(ResourcesManager.getResourceNames()); // Output: ['productResource']
+   * console.log(ResourcesManager.getAllNames()); // Output: ['productResource']
    */
   public static removeResource(name: IResourceName): Record<IResourceName, ResourceBase> {
     if (typeof name === "string") {
@@ -859,12 +961,6 @@ export class ResourcesManager {
   }
 }
 
-
-/***
-    @interface The reflect metat key used to store resources metatdata
-*/
-export const resourceMetaData = Symbol("resource");
-
 /**
  * A decorator function that adds resource metadata to a class that implements `ResourceBase`
  * 
@@ -890,10 +986,14 @@ export function Resource<DataType = any>(options: IResource<DataType>) {
     options = Object.assign({}, options);
     if (typeof target == "function") {
       try {
-        ResourcesManager.addResource<DataType>((options.name as IResourceName), new (target as IConstructor)(options) as ResourceBase<DataType>);
+        options.className = defaultStr(options.className, target?.name);
+        const resource = new (target as IConstructor)() as ResourceBase<DataType>;
+        resource.init(options);
+        ResourcesManager.addResource<DataType>((options.name as IResourceName), resource);
       } catch { }
     }
     Reflect.defineMetadata(resourceMetaData, options, target);
+    ResourcesManager.addOptions(options.name as IResourceName, options);
   };
 }
 

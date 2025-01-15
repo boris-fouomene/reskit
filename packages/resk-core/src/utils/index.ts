@@ -23,6 +23,7 @@ export * from "./uri";
 export * from "./isValidEmail";
 export * from "./observable";
 export { default as isPrimitive } from "./isPrimitive";
+export { default as Global } from "./global";
 
 /***
  * Cée un objet enum à partir d'un type union

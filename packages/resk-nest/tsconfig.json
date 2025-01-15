@@ -5,6 +5,8 @@
     "baseUrl": "./",
     "rootDir": "./src",
     "module": "CommonJS",
+    "target": "ES2021",
+    "moduleResolution": "node",
   },
   "include": [
     "src/**/*",

@@ -1,4 +1,4 @@
-import { isObj } from "@utils/object";
+import { Global, isObj } from "@utils/index";
 import { IObservable, observable } from "@utils/observable";
 import { IAuthEvent } from "./types";
 
@@ -14,7 +14,7 @@ declare global {
  * 
  * This constant `events` is assigned an instance of `IObservable<IAuthEvent>`, which is used to manage 
  * authentication-related events in the application. The initialization checks if the global 
- * `window.eventsResourcesObservableHandler` exists and is an object. If it does, it assigns it to 
+ * `Global.eventsResourcesObservableHandler` exists and is an object. If it does, it assigns it to 
  * `events`; otherwise, it defaults to an empty object cast as `IObservable<IAuthEvent>`.
  * 
  * This pattern allows for flexible handling of events, ensuring that the application can respond 
@@ -42,14 +42,14 @@ declare global {
  * }
  */
 const events: IObservable<IAuthEvent> =
-    (isObj(window?.eventsResourcesObservableHandler) &&
-        typeof window?.eventsResourcesObservableHandler === "object" &&
-        window.eventsResourcesObservableHandler) ||
+    (isObj((Global as any)?.eventsResourcesObservableHandler) &&
+        typeof (Global as any)?.eventsResourcesObservableHandler === "object" &&
+        (Global as any)?.eventsResourcesObservableHandler) ||
     {} as IObservable<IAuthEvent>;
 
-if (!isObj(window?.eventsResourcesObservableHandler)) {
+if (!isObj((Global as any)?.eventsResourcesObservableHandler)) {
     observable<IAuthEvent>(events);
-    Object.defineProperties(window, {
+    Object.defineProperties((Global as any), {
         eventsResourcesObservableHandler: {
             value: events,
         },

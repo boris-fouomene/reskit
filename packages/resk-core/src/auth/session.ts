@@ -1,13 +1,13 @@
 import $session from "../session";
 import { IDict } from "../types";
 import { isObj, parseJSON, isNonNullString } from "../utils";
-import CryptoES from 'crypto-es';
 import { IAuthSessionStorage, IAuthUser } from "./types";
 import events from "./events";
+import CryptoJS from "crypto-js";
 
-const encrypt = CryptoES.AES.encrypt;
+const encrypt = CryptoJS.AES.encrypt;
 
-const decrypt = CryptoES.AES.decrypt;
+const decrypt = CryptoJS.AES.decrypt;
 
 
 type ILocalUserRef = {
@@ -49,7 +49,7 @@ export const getSignedUser = (): IAuthUser | null => {
         try {
             const ded = decrypt(encrypted, SESSION_ENCRYPT_KEY);
             if (ded && typeof ded?.toString == 'function') {
-                const decoded = ded.toString(CryptoES.enc.Utf8);
+                const decoded = ded.toString(CryptoJS.enc.Utf8);
                 localUserRef.current = parseJSON(decoded) as IAuthUser;
                 return localUserRef.current;
             }

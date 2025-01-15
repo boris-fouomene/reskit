@@ -2,14 +2,22 @@
     "name": "@resk/core",
     "version": "1.0.3",
     "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
-    "main": "build/index",
-    "types": "build/index",
+    "main": "build/esm/index",
+    "types": "build/esm/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./build/esm/index.js",
+            "require": "./build/cjs/index.js"
+        }
+    },
     "scripts": {
         "clear-npx-cache": "npx clear-npx-cache",
         "pretest": "npm run build-test",
         "build-test": "tsc --project ./tsconfig.test.json && npx tsc-alias -p tsconfig.test.json",
         "test": "npx jest",
-        "build": "tsc  && npx tsc-alias -p tsconfig.json",
+        "build": "npm run build:esm && npm run build:cjs",
+        "build:cjs": "tsc -p tsconfig.cjs.json && npx tsc-alias -p tsconfig.cjs.json",
+        "build:esm": "tsc -p tsconfig.esm.json && npx tsc-alias -p tsconfig.esm.json",
         "test-node": "npm run build && node ./build/test/index.js",
         "start": "node build/test/index",
         "prepublish": "npm run build",
@@ -18,6 +26,7 @@
         "dev": "npx concurrently \"tsc --watch\" \"npx tsc-alias -p tsconfig.json\""
     },
     "devDependencies": {
+        "@types/crypto-js": "^4.2.2",
         "@types/dotenv": "^6.1.1",
         "@types/lodash": "^4.17.10",
         "@types/node": "^22.7.5",
@@ -33,7 +42,7 @@
         "vite-tsconfig-paths": "^5.0.1"
     },
     "dependencies": {
-        "crypto-es": "^2.1.0",
+        "crypto-js": "^4.2.0",
         "i18n-js": "^4.5.1",
         "lodash": "^4.17.21",
         "moment": "^2.30.1",

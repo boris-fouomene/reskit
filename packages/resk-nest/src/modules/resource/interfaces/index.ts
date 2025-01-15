@@ -22,20 +22,20 @@ declare module "@resk/core" {
   export interface IResource {
     apiDescription?: IResourceApiDescription;
   }
-  export interface ResourcesManager {
+  export namespace ResourcesManager {
     /***
       build the Swagger operation id
      @param controllerKey, The name of the controller
      @param methodKey, The name of the method
    */
-    buildApiOperationId(controllerKey: string, methodKey: string): string;
+    export function buildApiOperationId(controllerKey: string, methodKey: string): string;
 
     /**
      * Parse a Swagger operation id into its component parts.
      * @param operationId, The operation id
      * @returns 
      */
-    parseApiOperationId(operationId: string): { controllerKey: string, methodKey: string };
+    export function parseApiOperationId(operationId: string): { controllerKey: string, methodKey: string };
 
     /***
      * Get the api description for a resource
@@ -43,8 +43,7 @@ declare module "@resk/core" {
      * @param method, The name of the method
      * @returns ApiOperationOptions, The api operation options
      */
-    getApiDescription(resourceName: IResourceName, method?: string): ApiOperationOptions | undefined;
-
+    export function getApiDescription(resourceName: IResourceName, method?: string): ApiOperationOptions | undefined;
 
     /***
      * Get the api description for a resource by class name
@@ -52,7 +51,7 @@ declare module "@resk/core" {
      * @param method, The name of the method
      * @returns ApiOperationOptions, The api operation options
      */
-    getApiDescriptionByClassName(className: string, method?: string): ApiOperationOptions | undefined;
+    export function getApiDescriptionByClassName(className: string, method?: string): ApiOperationOptions | undefined;
   }
 }
 
@@ -61,7 +60,7 @@ declare module "@resk/core" {
   @param controllerKey, The name of the controller
   @param methodKey, The name of the method
 */
-ResourcesManager.prototype.buildApiOperationId = function (controllerKey: string, methodKey: string) {
+ResourcesManager.buildApiOperationId = function (controllerKey: string, methodKey: string) {
   return `${controllerKey}::${methodKey}`;
 }
 
@@ -70,20 +69,20 @@ ResourcesManager.prototype.buildApiOperationId = function (controllerKey: string
  * @param operationId, The operation id
  * @returns 
  */
-ResourcesManager.prototype.parseApiOperationId = function (operationId: string): { controllerKey: string, methodKey: string } {
+ResourcesManager.parseApiOperationId = function (operationId: string): { controllerKey: string, methodKey: string } {
   if (!isNonNullString(operationId)) return { controllerKey: "", methodKey: "" };
   const [controllerKey, methodKey] = operationId.split("::");
   return { controllerKey, methodKey };
 }
 
-ResourcesManager.prototype.getApiDescription = function (resourceName: IResourceName, method?: string): ApiOperationOptions | undefined {
+ResourcesManager.getApiDescription = function (resourceName: IResourceName, method?: string): ApiOperationOptions | undefined {
   const resourceOptions = ResourcesManager.getOptions(resourceName);
   if (!isObj(resourceOptions) || !isObj(resourceOptions?.apiDescription) || !isNonNullString(method)) return;
   return (resourceOptions?.apiDescription as any)[method];
 }
 
-ResourcesManager.prototype.getApiDescriptionByClassName = function (className, method?: string): ApiOperationOptions | undefined {
+ResourcesManager.getApiDescriptionByClassName = function (className: string, method?: string): ApiOperationOptions | undefined {
   const resourceName = ResourcesManager.getNameByClassName(className);
   if (!resourceName) return;
-  return this.getApiDescription(resourceName, method);
+  return ResourcesManager.getApiDescription(resourceName, method);
 }

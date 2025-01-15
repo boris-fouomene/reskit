@@ -1,39 +1,37 @@
 {
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "rootDir": "./src",
-    "outDir": "./build",
-    "paths": {
-      "@utils/*": [
-        "src/utils/*"
-      ],
-      "@react/*": [
-        "src/react/*"
-      ],
-      "@session/*": [
-        "src/session/*"
-      ],
-      "@fields/*": [
-        "src/fields/*"
-      ],
-      "@resources/*": [
-        "src/resources/*"
-      ],
-      "@/*": [
-        "src/*"
-      ],
-    }
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    //"tests/**/*.tsx",
-    //"tests/**/*.ts"
-  ],
-  "exclude": [
-    "build/**/*",
-    "node_modules/**/*",
-    "jest.config.*"
-  ]
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "rootDir": "./src",
+        "outDir": "./build",
+        "paths": {
+            "@utils/*": [
+                "src/utils/*"
+            ],
+            "@react/*": [
+                "src/react/*"
+            ],
+            "@session/*": [
+                "src/session/*"
+            ],
+            "@fields/*": [
+                "src/fields/*"
+            ],
+            "@resources/*": [
+                "src/resources/*"
+            ],
+            "@/*": [
+                "src/*"
+            ],
+        }
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+    ],
+    "exclude": [
+        "build/**/*",
+        "node_modules/**/*",
+        "jest.config.*"
+    ]
 }

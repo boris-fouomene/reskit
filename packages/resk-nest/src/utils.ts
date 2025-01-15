@@ -15,9 +15,42 @@ const pathM = require("path");
 /**
  * Creates a NestJS application with optional Swagger documentation and versioning.
  *
- * @param module - The main application module.
- * @param options - Optional configuration options for the NestJS application and Swagger documentation.
- * @returns A Promise that resolves to the created NestJS application.
+ * This function initializes a NestJS application based on the provided module and options.
+ * It can set up Swagger documentation and enable versioning based on the configuration.
+ *
+ * @param {any} module - The main application module.
+ * @param {ICreateAppOptions} [options] - Optional configuration options for the NestJS application and Swagger documentation.
+ * @returns {Promise<INestApplication<T>>} A Promise that resolves to the created NestJS application.
+ *
+ * @example
+ * // Example of creating a NestJS application with Swagger and versioning
+ * import { createApp } from './utils/app';
+ * import { AppModule } from './app.module';
+ *
+ * async function bootstrap() {
+ *     const app = await createApp(AppModule, {
+ *         swaggerOptions: {
+ *             enabled: true,
+ *             path: '/api-docs',
+ *             title: 'My API',
+ *             description: 'API documentation for my application',
+ *             version: '1.0.0',
+ *         },
+ *         versioningOptions: {
+ *             enabled: true,
+ *         },
+ *     });
+ *     await app.listen(3000);
+ * }
+ * bootstrap();
+ *
+ * @example
+ * // Example of creating an application without Swagger
+ * const app = await createApp(AppModule, {
+ *     versioningOptions: {
+ *         enabled: true,
+ *     },
+ * });
  */
 export async function createApp<T extends INestApplication = INestApplication>(
     module: any,
@@ -56,9 +89,40 @@ export async function createApp<T extends INestApplication = INestApplication>(
 /**
  * Sets up Swagger documentation for a NestJS application.
  *
- * @param app - The NestJS application instance.
- * @param swaggerOptions - Optional configuration options for the Swagger documentation.
- * @returns Void.
+ * This function configures the Swagger UI and generates the API documentation
+ * based on the provided options. It allows customization of the Swagger UI
+ * and the API documentation.
+ *
+ * @param {INestApplication} app - The NestJS application instance.
+ * @param {ICreateAppOptions['swaggerOptions']} [swaggerOptions] - Optional configuration options for the Swagger documentation.
+ * @returns {void} This function does not return a value.
+ *
+ * @example
+ * // Example of setting up Swagger in a NestJS application
+ * import { NestFactory } from '@nestjs/core';
+ * import { AppModule } from './app.module';
+ * import { setupSwagger } from './utils/swagger';
+ *
+ * async function bootstrap() {
+ *     const app = await NestFactory.create(AppModule);
+ *     setupSwagger(app, {
+ *         enabled: true,
+ *         path: '/api-docs',
+ *         title: 'My API',
+ *         description: 'API documentation for my application',
+ *         version: '1.0.0',
+ *     });
+ *     await app.listen(3000);
+ * }
+ * bootstrap();
+ *
+ * @example
+ * // Example of using a custom configuration mutator
+ * setupSwagger(app, {
+ *     configMutator: (builder) => {
+ *         return builder.setTitle('Custom API Title');
+ *     },
+ * });
  */
 export const setupSwagger = (
     app: INestApplication,
@@ -157,52 +221,175 @@ export const setupSwagger = (
 
 
 
+/**
+ * Options for creating a Nest application.
+ * This interface extends the NestApplicationOptions and includes additional options
+ * for versioning and Swagger documentation.
+ *
+ * @interface ICreateAppOptions
+ * @extends {NestApplicationOptions}
+ */
 export interface ICreateAppOptions extends NestApplicationOptions {
-    /***
-      The versioning options for the application
-    */
+    /**
+     * The versioning options for the application.
+     * This allows you to configure how versioning is handled in the application.
+     *
+     * @type {Partial<VersioningOptions>}
+     * @memberof ICreateAppOptions
+     * @example
+     * const options: ICreateAppOptions = {
+     *     versioningOptions: {
+     *         enabled: true
+     *     }
+     * };
+     */
     versioningOptions?: Partial<VersioningOptions> & {
-        /***
-        Specify if you want to enable versioning
-        if set to false, it will disable versioning
-        if the value is not set, it will enable URI versioning
-      */
+        /**
+         * Specify if you want to enable versioning.
+         * If set to false, it will disable versioning.
+         * If the value is not set, it will enable URI versioning.
+         *
+         * @type {boolean}
+         * @memberof ICreateAppOptions.versioningOptions
+         * @default true
+         * @example
+         * const options: ICreateAppOptions = {
+         *     versioningOptions: {
+         *         enabled: false
+         *     }
+         * };
+         */
         enabled?: boolean;
     };
+
     /**
-     * Swagger document options
+     * Swagger document options for the application.
+     * This allows you to configure Swagger documentation settings.
+     *
+     * @type {SwaggerCustomOptions}
+     * @memberof ICreateAppOptions
+     * @example
+     * const options: ICreateAppOptions = {
+     *     swaggerOptions: {
+     *         enabled: true,
+     *         path: '/api-docs',
+     *         title: 'My API',
+     *         description: 'API documentation for my application',
+     *         version: '1.0.0'
+     *     }
+     * };
      */
     swaggerOptions?: SwaggerCustomOptions & {
-        /***
-            Enable swagger documentation
-        */
+        /**
+         * Enable Swagger documentation.
+         * If set to true, Swagger UI will be available for the application.
+         *
+         * @type {boolean}
+         * @memberof ICreateAppOptions.swaggerOptions
+         * @default false
+         * @example
+         * const options: ICreateAppOptions = {
+         *     swaggerOptions: {
+         *         enabled: true
+         *     }
+         * };
+         */
         enabled?: boolean;
 
         /**
-         * Path to the swagger documentation
+         * Path to the Swagger documentation.
+         * This is the URL path where the Swagger UI will be served.
+         *
+         * @type {string}
+         * @memberof ICreateAppOptions.swaggerOptions
+         * @example
+         * const options: ICreateAppOptions = {
+         *     swaggerOptions: {
+         *         path: '/api-docs'
+         *     }
+         * };
          */
         path?: string;
 
+        /**
+         * A function to mutate the Swagger document builder.
+         * This allows for custom configurations of the Swagger document.
+         *
+         * @param {DocumentBuilder} builder - The Swagger document builder.
+         * @returns {DocumentBuilder} The modified builder.
+         * @memberof ICreateAppOptions.swaggerOptions
+         * @example
+         * const options: ICreateAppOptions = {
+         *     swaggerOptions: {
+         *         configMutator: (builder) => {
+         *             return builder.setTitle('My API');
+         *         }
+         *     }
+         * };
+         */
         configMutator?: (builder: DocumentBuilder) => DocumentBuilder;
 
         /**
-         * Swagger document title
+         * Swagger document title.
+         * This is the title that will be displayed in the Swagger UI.
+         *
+         * @type {string}
+         * @memberof ICreateAppOptions.swaggerOptions
+         * @example
+         * const options: ICreateAppOptions = {
+         *     swaggerOptions: {
+         *         title: 'My API'
+         *     }
+         * };
          */
         title?: string;
 
         /**
-         * Swagger document description
+         * Swagger document description.
+         * This provides a description of the API that will be displayed in the Swagger UI.
+         *
+         * @type {string}
+         * @memberof ICreateAppOptions.swaggerOptions
+         * @example
+         * const options: ICreateAppOptions = {
+         *     swaggerOptions: {
+         *         description: 'API documentation for my application'
+         *     }
+         * };
          */
         description?: string;
 
-        /***
-            Swagger document version, default is 1.0, or retrived from the versioningOptions.defaultVersion
-        */
+        /**
+         * Swagger document version.
+         * The default is '1.0', or it can be retrieved from the versioningOptions.defaultVersion.
+         *
+         * @type {string}
+         * @memberof ICreateAppOptions.swaggerOptions
+         * @default '1.0'
+         * @example
+         * const options: ICreateAppOptions = {
+         *     swaggerOptions: {
+         *         version: '1.0.0'
+         *     }
+         * };
+         */
         version?: string;
 
-        /***
-          Swagger createDocument options
-        */
+        /**
+         * Swagger createDocument options.
+         * This allows for additional options when creating the Swagger document.
+         *
+         * @type {SwaggerDocumentOptions}
+         * @memberof ICreateAppOptions.swaggerOptions
+         * @example
+         * const options: ICreateAppOptions = {
+         *     swaggerOptions: {
+         *         documentOptions: {
+         *             // additional options here
+         *         }
+         *     }
+         * };
+         */
         documentOptions?: SwaggerDocumentOptions;
     };
 }

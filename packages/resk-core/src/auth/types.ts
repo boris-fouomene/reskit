@@ -355,9 +355,9 @@ export type IAuthPermStr = `${IResourceName}:${IAuthPermAction}` | IAuthPermActi
  *   - Four actions: `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}` 
  *     (e.g., `"read|update|delete|create"`).
  *   - Five actions: `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}` 
- *     (e.g., `"read|update|delete|create|details"`).
+ *     (e.g., `"read|update|delete|create"`).
  *   - Six actions: `${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}|${IResourceActionName}` 
- *     (e.g., `"read|update|delete|create|details|archive"`).
+ *     (e.g., `"read|update|delete|create|archive"`).
  * 
  * This structure allows for a flexible definition of permissions, 
  * enabling developers to specify exactly which actions are allowed 
@@ -381,10 +381,10 @@ export type IAuthPermStr = `${IResourceName}:${IAuthPermAction}` | IAuthPermActi
  * const fourActions: IAuthPermAction = "read|update|delete|create";
  * 
  * // Example of five actions
- * const fiveActions: IAuthPermAction = "read|update|delete|create|details";
+ * const fiveActions: IAuthPermAction = "read|update|delete|create";
  * 
  * // Example of six actions
- * const sixActions: IAuthPermAction = "read|update|delete|create|details|archive";
+ * const sixActions: IAuthPermAction = "read|update|delete|create|archive";
  * ```
  * 
  * In these examples, the `IAuthPermAction` type is used to define 

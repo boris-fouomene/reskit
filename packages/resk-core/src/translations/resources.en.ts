@@ -57,14 +57,6 @@ I18n.RegisterTranslations({
              *                    one: "Listed one user.",
              *                    other: "Listed %{count} users.",
              *                },
-             *                details : {
-             *                    label: "View User Details",
-             *                    title: "View user details", 
-             *                    tooltip: "Click to view user details.",
-             *                    zero: "No user details to view.",
-             *                    one: "Viewed one user details.",  
-             *                    other: "Viewed %{count} user details.",
-             *                }
             *             }
             */
         }

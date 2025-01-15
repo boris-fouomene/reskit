@@ -1,4 +1,4 @@
-import { IDict, IResourceName, IField, IResourceInstance, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceFetchOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey } from '../types';
+import { IDict, IResourceName, IField, IResourceInstance, IResourceDefaultEvent, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory } from '../utils/index';
 import { IConstructor, IProtectedResource } from '../types/index';
@@ -6,9 +6,6 @@ import { IAuthPerm, IAuthUser } from '@/auth/types';
 import { isAllowed } from '../auth/perms';
 import { i18n, I18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
-
-
-
 
 /***
     @interface The reflect metat key used to store resources metatdata
@@ -60,13 +57,13 @@ const resourcesClassNameMetaData = Symbol('resourceByClassName');
  * console.log(dynamicResource.getFields()); 
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
-export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceActionName> = IResourceActionName> extends ObservableClass<EventType> implements IResourceInstance<DataType, PrimaryKeyType, EventType> {
+export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> implements IResourceInstance<DataType, PrimaryKeyType, EventType> {
   actions?: IResourceActionMap;
   options?: IResource<DataType, PrimaryKeyType>;
   getOptions(): IResource<DataType, PrimaryKeyType> {
     return Object.assign({}, this.options);
   }
-  static events = observableFactory<IResourceActionName | "string">();
+  static events = observableFactory<IResourceDefaultEvent | "string">();
   /**
    * The internal name of the resource.
    *
@@ -167,7 +164,7 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     return i18n.t("resources.invalidDataProvider", this.getTranslateParams());
   }
   hasDataProvider(): boolean {
-    return this.dataProvider != null && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.create === "function" && typeof this.dataProvider?.list === "function" && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.delete === "function";
+    return this.dataProvider != null && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.create === "function" && typeof this.dataProvider?.find === "function" && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.delete === "function";
   }
   /**
    * The data provider for the resource.
@@ -193,71 +190,51 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   /***
    * creates a new record in the resource.
    * @param {DataType} record - The data for the new record.
-   * @param options - Optional settings for the creation process.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
-  create(record: DataType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
+  create(record: DataType): Promise<IResourceOperationResult<DataType>> {
     if (!this.hasDataProvider()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserCreate()) {
       return Promise.reject(new Error(i18n.t("resources.createForbiddenError", this.getTranslateParams())));
     }
-    return this.getDataProvider()?.create(record, options).then((result) => {
+    return this.getDataProvider()?.create(record).then((result) => {
       this._trigger("create" as EventType, result);
       return result;
     });
   }
   /***
    * Fetches all records from the resource.
-   * @param {IResourceFetchOptions<DataType, PrimaryKeyType>} options - Optional options for fetching resources.
+   * @param {IResourceQueryOptions<DataType, PrimaryKeyType>} options - Optional options for fetching resources.
    * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  list(options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
+  find(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
     if (!this.hasDataProvider()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserList()) {
       return Promise.reject(new Error(i18n.t("resources.listForbiddenError", this.getTranslateParams())));
     }
-    return this.getDataProvider()?.list(options).then((result) => {
-      this._trigger("list" as EventType, result);
+    return this.getDataProvider()?.find(options).then((result) => {
+      this._trigger("find" as EventType, result);
       return result;
     });
   }
   /***
    * fetches a single record from the resource.
    * @param {PrimaryKeyType} key - The primary key of the resource.
-   * @param options - Optional settings for the list operation.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  read(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
+  findOne(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType | null>> {
     if (!this.hasDataProvider()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserRead()) {
       return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getTranslateParams())));
     }
-    return this.getDataProvider()?.read(key, options).then((result) => {
-      this._trigger("read" as EventType, result);
-      return result;
-    });
-  }
-  /**
-   * gets the details of a record from the resource.
-   * @param key - The primary key of the resource.
-   * @param options - Optional settings for the list operation.
-   * @returns {Promise<IResourceOperationResult<DataType>} A promise that resolves to the result of the list operation.
-   */
-  details(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserViewDetails()) {
-      return Promise.reject(new Error(i18n.t("resources.detailsForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider()?.details(key, options).then((result) => {
-      this._trigger("details" as EventType, result);
+    return this.getDataProvider().findOne(key).then((result) => {
+      this._trigger("findOne" as EventType, result);
       return result;
     });
   }
@@ -265,17 +242,16 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * updates a record in the resource.
    * @param key {PrimaryKeyType} The primary key of the resource to update.
    * @param updatedData
-   * @param options - Optional settings for the update process.
    * @returns 
    */
-  update(key: PrimaryKeyType, updatedData: Partial<DataType>, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType>> {
+  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
     if (!this.hasDataProvider()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserUpdate()) {
       return Promise.reject(new Error(i18n.t("resources.updateForbiddenError", this.getTranslateParams())));
     }
-    return this.getDataProvider()?.update(key, updatedData, options).then((result) => {
+    return this.getDataProvider()?.update(key, updatedData).then((result) => {
       this._trigger("update" as EventType, result);
       return result;
     });
@@ -283,18 +259,90 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   /***
    * deletes a record from the resource.
    * @param key {PrimaryKeyType} The primary key of the resource to delete.
-   * @param options - Optional settings for the deletion process.
    * @returns Promise<IResourceOperationResult<any>> A promise that resolves to the result of the delete operation.
    */
-  delete(key: PrimaryKeyType, options?: IResourceFetchOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any>> {
+  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<any>> {
     if (!this.hasDataProvider()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!this.canUserDelete()) {
       return Promise.reject(new Error(i18n.t("resources.deleteForbiddenError", this.getTranslateParams())));
     }
-    return this.getDataProvider()?.delete(key, options).then((result) => {
+    return this.getDataProvider()?.delete(key).then((result) => {
       this._trigger("delete" as EventType, result);
+      return result;
+    });
+  }
+
+  findAndCount(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
+    if (!this.hasDataProvider()) {
+      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
+    }
+    if (!this.canUserRead()) {
+      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getTranslateParams())));
+    }
+    return this.getDataProvider().findAndCount(options).then((result) => {
+      this._trigger("findAndCount" as EventType, result);
+      return result;
+    });
+  }
+  createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>> {
+    if (!this.hasDataProvider()) {
+      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
+    }
+    if (!this.canUserCreate()) {
+      return Promise.reject(new Error(i18n.t("resources.createForbiddenError", this.getTranslateParams())));
+    }
+    return this.getDataProvider()?.createMany(data).then((result) => {
+      this._trigger("createMany" as EventType, result);
+      return result;
+    });
+  }
+  updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>> {
+    if (!this.hasDataProvider()) {
+      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
+    }
+    if (!this.canUserUpdate()) {
+      return Promise.reject(new Error(i18n.t("resources.updateForbiddenError", this.getTranslateParams())));
+    }
+    return this.getDataProvider()?.updateMany(data).then((result) => {
+      this._trigger("updateMany" as EventType, result);
+      return result;
+    });
+  }
+  deleteMany(criteria: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any[]>> {
+    if (!this.hasDataProvider()) {
+      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
+    }
+    if (!this.canUserDelete()) {
+      return Promise.reject(new Error(i18n.t("resources.deleteForbiddenError", this.getTranslateParams())));
+    }
+    return this.getDataProvider()?.deleteMany(criteria).then((result) => {
+      this._trigger("deleteMany" as EventType, result);
+      return result;
+    });
+  }
+  count(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<number>> {
+    if (!this.hasDataProvider()) {
+      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
+    }
+    if (!this.canUserRead()) {
+      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getTranslateParams())));
+    }
+    return this.getDataProvider().count(options).then((result) => {
+      this._trigger("read" as EventType, result);
+      return result;
+    });
+  }
+  exists(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<boolean>> {
+    if (!this.hasDataProvider()) {
+      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
+    }
+    if (!this.canUserRead()) {
+      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getTranslateParams())));
+    }
+    return this.getDataProvider().exists(primaryKey).then((result) => {
+      this._trigger("exits" as EventType, result);
       return result;
     });
   }
@@ -556,15 +604,6 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     return defaultStr(fallbackValue, propertyName);
   }
 
-  /**
-   * Determines if the user has permission to view details.
-   *
-   * @param user - The authenticated user object. Optional.
-   * @returns A boolean indicating whether the user is allowed to view details.
-   */
-  canUserViewDetails(user?: IAuthUser): boolean {
-    return this.isAllowed(`details`, user);
-  }
   /**
    * Retrieves the label of the resource.
    * 

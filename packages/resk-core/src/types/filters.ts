@@ -9,14 +9,14 @@
  * - A Date object (e.g., new Date())
  * 
  * @example
- * // Valid examples of IFilterScalarValue
- * const stringValue: IFilterScalarValue = "Hello, World!";
- * const numberValue: IFilterScalarValue = 100;
- * const booleanValue: IFilterScalarValue = true;
- * const nullValue: IFilterScalarValue = null;
- * const dateValue: IFilterScalarValue = new Date();
+ * // Valid examples of IMangoScalarValue
+ * const stringValue: IMangoScalarValue = "Hello, World!";
+ * const numberValue: IMangoScalarValue = 100;
+ * const booleanValue: IMangoScalarValue = true;
+ * const nullValue: IMangoScalarValue = null;
+ * const dateValue: IMangoScalarValue = new Date();
  */
-type IFilterScalarValue = string | number | boolean | null | Date;
+type IMangoScalarValue = string | number | boolean | null | Date;
 
 /**
  * Represents a value that can be used in filtering operations.
@@ -24,12 +24,12 @@ type IFilterScalarValue = string | number | boolean | null | Date;
  * This type can be a single scalar value, an array of scalar values, or an object.
  * 
  * @example
- * // Valid examples of IFilterValue
- * const singleValue: IFilterValue = "example";
- * const arrayValue: IFilterValue = [1, 2, 3];
- * const objectValue: IFilterValue = { key: "value" };
+ * // Valid examples of IMangoValue
+ * const singleValue: IMangoValue = "example";
+ * const arrayValue: IMangoValue = [1, 2, 3];
+ * const objectValue: IMangoValue = { key: "value" };
  */
-export type IFilterValue = IFilterScalarValue | IFilterScalarValue[] | object;
+export type IMangoValue = IMangoScalarValue | IMangoScalarValue[] | object;
 
 /**
  * Options for regular expression filtering.
@@ -45,13 +45,13 @@ export type IFilterValue = IFilterScalarValue | IFilterScalarValue[] | object;
  * - 'x' for extended syntax (allows whitespace and comments in the regex)
  * 
  * @example
- * // Example of using IFilterRegexOptions
- * const regexOptions: IFilterRegexOptions = {
+ * // Example of using IMangoRegexOptions
+ * const regexOptions: IMangoRegexOptions = {
  *     $regex: "^test.*",
  *     $options: "i" // Case insensitive match
  * };
  */
-export interface IFilterRegexOptions {
+export interface IMangoRegexOptions {
   $regex: string;
   $options?: string; // Valid options: 'i' (case insensitive), 'm' (multiline), 's' (dotall), 'x' (extended)
 }
@@ -64,8 +64,8 @@ export interface IFilterRegexOptions {
  * comparison operation that can be applied to filter results.
  * 
  * @example
- * // Example of using IFilterComparisonOperators
- * const filter: IFilterComparisonOperators = {
+ * // Example of using IMangoComparisonOperators
+ * const filter: IMangoComparisonOperators = {
  *     $eq: "example",          // Matches documents where the field equals "example"
  *     $ne: 42,                 // Matches documents where the field is not equal to 42
  *     $gt: 100,                // Matches documents where the field is greater than 100
@@ -88,22 +88,22 @@ export interface IFilterRegexOptions {
  *     }
  * };
  */
-export interface IFilterComparisonOperators {
-  $eq?: IFilterValue;              // equals
-  $ne?: IFilterValue;              // not equals
-  $gt?: IFilterValue;              // greater than
-  $gte?: IFilterValue;             // greater than or equal
-  $lt?: IFilterValue;              // less than
-  $lte?: IFilterValue;             // less than or equal
-  $in?: IFilterValue[];            // in array
-  $nin?: IFilterValue[];           // not in array
+export interface IMangoComparisonOperators {
+  $eq?: IMangoValue;              // equals
+  $ne?: IMangoValue;              // not equals
+  $gt?: IMangoValue;              // greater than
+  $gte?: IMangoValue;             // greater than or equal
+  $lt?: IMangoValue;              // less than
+  $lte?: IMangoValue;             // less than or equal
+  $in?: IMangoValue[];            // in array
+  $nin?: IMangoValue[];           // not in array
   $exists?: boolean;               // field exists
   $type?: string;                  // type check
-  $regex?: string | IFilterRegexOptions; // regular expression
+  $regex?: string | IMangoRegexOptions; // regular expression
   $size?: number;                  // array size
   $mod?: [number, number];         // modulo
-  $all?: IFilterValue[];           // array contains all
-  $elemMatch?: IFilterQuery;    // element match
+  $all?: IMangoValue[];           // array contains all
+  $elemMatch?: IMangoQuery;    // element match
 }
 
 /**
@@ -114,8 +114,8 @@ export interface IFilterComparisonOperators {
  * different conditions relate to each other.
  * 
  * @example
- * // Example of using IFilterLogicalOperator
- * const filter: IFilterLogicalOperator = {
+ * // Example of using IMangoLogicalOperator
+ * const filter: IMangoLogicalOperator = {
  *     $and: [
  *         { age: { $gte: 18 } }, // Must be 18 or older
  *         { status: "active" }   // Must be active
@@ -132,11 +132,11 @@ export interface IFilterComparisonOperators {
  *     }
  * };
  */
-export interface IFilterLogicalOperator {
-  $and?: IFilterQuery[]; // An array of filter selectors that must all match
-  $or?: IFilterQuery[];  // An array of filter selectors where at least one must match
-  $nor?: IFilterQuery[]; // An array of filter selectors where none must match
-  $not?: IFilterQuery | IFilterComparisonOperators; // A filter selector or comparison operator that must not match
+export interface IMangoLogicalOperator {
+  $and?: IMangoQuery[]; // An array of filter selectors that must all match
+  $or?: IMangoQuery[];  // An array of filter selectors where at least one must match
+  $nor?: IMangoQuery[]; // An array of filter selectors where none must match
+  $not?: IMangoQuery | IMangoComparisonOperators; // A filter selector or comparison operator that must not match
 }
 
 /**
@@ -147,17 +147,17 @@ export interface IFilterLogicalOperator {
  * and their elements.
  * 
  * @example
- * // Example of using IFilterArrayOperators
- * const filter: IFilterArrayOperators = {
+ * // Example of using IMangoArrayOperators
+ * const filter: IMangoArrayOperators = {
  *     $all: [1, 2, 3], // Matches documents where the array contains all specified values
  *     $elemMatch: {    // Matches documents where at least one element in the array matches the criteria
  *         field: { $gt: 10 } // At least one element must be greater than 10
  *     }
  * };
  */
-export interface IFilterArrayOperators {
-  $all?: IFilterValue[];       // Matches documents where the array contains all specified values
-  $elemMatch?: IFilterQuery; // Matches documents where at least one element in the array matches the criteria
+export interface IMangoArrayOperators {
+  $all?: IMangoValue[];       // Matches documents where the array contains all specified values
+  $elemMatch?: IMangoQuery; // Matches documents where at least one element in the array matches the criteria
 }
 
 /**
@@ -169,8 +169,8 @@ export interface IFilterArrayOperators {
  * and array operators, enabling complex query constructions.
  * 
  * @example
- * // Example of using IFilterQuery
- * const filter: IFilterQuery = {
+ * // Example of using IMangoQuery
+ * const filter: IMangoQuery = {
  *     name: { $eq: "John Doe" }, // Matches documents where the name equals "John Doe"
  *     age: { $gte: 18 },         // Matches documents where age is greater than or equal to 18
  *     status: { $in: ["active", "pending"] }, // Matches documents where status is either "active" or "pending"
@@ -183,14 +183,14 @@ export interface IFilterArrayOperators {
  *     }
  * };
  */
-export type IFilterQuery = {
+export type IMangoQuery = {
   [field: string]:
-  | IFilterValue
-  | IFilterComparisonOperators
-  | IFilterLogicalOperator
-  | IFilterArrayOperators
-  & { [field: string]: IFilterQuery }; // Allows nesting of filter selectors
-} & Partial<IFilterLogicalOperator>; // Allows inclusion of logical operators
+  | IMangoValue
+  | IMangoComparisonOperators
+  | IMangoLogicalOperator
+  | IMangoArrayOperators
+  & { [field: string]: IMangoQuery }; // Allows nesting of filter selectors
+} & Partial<IMangoLogicalOperator>; // Allows inclusion of logical operators
 
 /**
  * Type representing the direction of sorting operations.
@@ -198,11 +198,11 @@ export type IFilterQuery = {
  * This type can be either 'asc' for ascending order or 'desc' for descending order.
  * 
  * @example
- * // Valid examples of IFilterSortDirection
- * const ascending: IFilterSortDirection = 'asc';  // Ascending order
- * const descending: IFilterSortDirection = 'desc'; // Descending order
+ * // Valid examples of IMangoOrderByDirection
+ * const ascending: IMangoOrderByDirection = 'asc';  // Ascending order
+ * const descending: IMangoOrderByDirection = 'desc'; // Descending order
  */
-export type IFilterSortDirection = 'asc' | 'desc';
+export type IMangoOrderByDirection = 'asc' | 'desc';
 
 /**
  * Type representing the sorting criteria for filtering operations.
@@ -212,9 +212,9 @@ export type IFilterSortDirection = 'asc' | 'desc';
  * of such objects for multiple sorting criteria.
  * 
  * @example
- * // Valid examples of IFilterSort
- * const singleFieldSort: IFilterSort = 'name'; // Sort by the 'name' field
- * const objectSort: IFilterSort = { age: 'asc', name: 'desc' }; // Sort by 'age' ascending and 'name' descending
- * const arraySort: IFilterSort = [{ age: 'asc' }, { name: 'desc' }]; // Sort by 'age' ascending and 'name' descending using an array
+ * // Valid examples of IMangoOrderBy
+ * const singleFieldSort: IMangoOrderBy = 'name'; // Sort by the 'name' field
+ * const objectSort: IMangoOrderBy = { age: 'asc', name: 'desc' }; // Sort by 'age' ascending and 'name' descending
+ * const arraySort: IMangoOrderBy = [{ age: 'asc' }, { name: 'desc' }]; // Sort by 'age' ascending and 'name' descending using an array
  */
-export type IFilterSort = string | { [field: string]: IFilterSortDirection } | Array<{ [field: string]: IFilterSortDirection }>;
+export type IMangoOrderBy = string | { [field: string]: IMangoOrderByDirection } | Array<{ [field: string]: IMangoOrderByDirection }>;

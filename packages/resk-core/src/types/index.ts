@@ -1785,7 +1785,7 @@ export type IResourcePrimaryKey = string | number | Record<string, string | numb
  */
 export interface IResourceOperationResult<DataType = any> {
   statusCode?: number; // HTTP status code for the operation
-  success: boolean; // Indicates if the operation was successful
+  success?: boolean; // Indicates if the operation was successful
   data?: DataType; // Optional data returned from the operation
   error?: string | Error; // Optional error message if the operation failed
 }

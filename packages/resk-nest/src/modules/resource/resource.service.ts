@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { IResourceDataProvider, IResourceName, IResourcePaginatedResult, IResourcePrimaryKey } from '@resk/core';
+import { IResourceDataProvider, IResourceName, IResourcePrimaryKey } from '@resk/core';
 import { BaseService } from '../base/base.service';
 import { ResourceDto } from './dto';
-import { ResourceDataProviderService } from '../data-provider/data-provider.service';
+import { IResourceDataSource } from '../data-source';
 
 /**
  * The `ResourceService` class is an injectable service that extends the `BaseService` class.
@@ -22,25 +22,26 @@ import { ResourceDataProviderService } from '../data-provider/data-provider.serv
  *
  * @Injectable()
  * export class UserService extends ResourceService<UserDto> {
- *     constructor(dataProvider: ResourceDataProviderService<UserDto>) {
- *         super(dataProvider);
+ *     constructor(dataSource: IResourceDataSource) {
+ *         super(dataSource);
  *     }
- *
  *     // Additional methods for UserService can be added here
  * }
  */
 @Injectable()
 export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends BaseService<DataType> {
-  constructor(protected dataProvider: ResourceDataProviderService<DataType, PrimaryKeyType>) {
+  constructor(protected dataSource: IResourceDataSource) {
     super();
   }
-  /**
-   * Returns the `IResourceDataProvider` instance associated with the `ResourceService`.
-   *
-   * @returns {IResourceDataProvider<DataType, PrimaryKeyType>} The data provider instance.
+  /***
+   * Returns the data source associated with the `ResourceService` instance.
+   * The data source is used to interact with the underlying data storage or service.
    */
+  getDataSource(): IResourceDataSource {
+    return this.dataSource;
+  }
   getDataProvider(): IResourceDataProvider<DataType, PrimaryKeyType> {
-    return this.dataProvider;
+    return this.getDataSource().getDataProvider<DataType, PrimaryKeyType>(this.getResourceName());
   }
   /**
   * Returns the resource name associated with the `ResourceService` instance.
@@ -58,7 +59,7 @@ export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType 
    * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the paginated result.
    */
   getAll() {
-    return this.dataProvider.list();
+    return this.getDataProvider().list();
   }
   /**
    * Creates a new record in the data provider.
@@ -67,7 +68,7 @@ export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType 
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the operation result.
    */
   create(record: Partial<DataType>) {
-    return this.dataProvider.create(record);
+    return this.getDataProvider().create(record);
   }
   /**
    * Updates an existing record in the data provider.
@@ -77,7 +78,7 @@ export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType 
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the operation result.
    */
   update(id: PrimaryKeyType, record: Partial<DataType>) {
-    return this.dataProvider.update(id, record);
+    return this.getDataProvider().update(id, record);
   }
   /**
    * Deletes a record from the data provider.
@@ -86,7 +87,7 @@ export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType 
    * @returns {Promise<IResourceOperationResult<any>>} A promise that resolves to the operation result.
    */
   delete(id: PrimaryKeyType) {
-    return this.dataProvider.delete(id);
+    return this.getDataProvider().delete(id);
   }
   /**
    * Retrieves a single record from the data provider.
@@ -95,7 +96,7 @@ export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType 
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the operation result.
    */
   getOne(id: PrimaryKeyType) {
-    return this.dataProvider.read(id);
+    return this.getDataProvider().read(id);
   }
   /**
      * Retrieves detailed information about a record.
@@ -104,6 +105,6 @@ export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType 
      * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the operation result.
      */
   getDetails(id: PrimaryKeyType) {
-    return this.dataProvider.details(id);
+    return this.getDataProvider().details(id);
   }
 }

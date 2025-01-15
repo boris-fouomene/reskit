@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "target": "ES6", // Or the desired target
-    "module": "CommonJS", // Output CommonJS modules
-  },
-}

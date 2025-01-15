@@ -3,5 +3,15 @@
   "compilerOptions": {
     "outDir": "./dist",
     "baseUrl": "./",
-  }
+    "rootDir": "./src",
+    "module": "CommonJS",
+  },
+  "include": [
+    "src/**/*",
+  ],
+  "exclude": [
+    "../packages/resk-expo/**/*",
+    "../packages/resk-expo-docs/**/*",
+    "**/*.tsx"
+  ]
 }

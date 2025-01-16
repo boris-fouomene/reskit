@@ -1,7 +1,5 @@
-import { IAuthPerm, IAuthUser } from "@/auth/types";
+import { IAuthPerm } from "@/auth/types";
 import { IMangoQuery, IMangoOrderBy } from "./filters";
-import { TranslateOptions } from "i18n-js";
-import { IObservable } from "@utils/observable";
 
 export type IResourceDefaultEvent = IResourceActionName | keyof IResourceDataProvider;
 
@@ -990,341 +988,6 @@ export interface IResource<DataType = any, PrimaryKeyType extends IResourcePrima
 }
 
 /**
- * @type IResourceInstance
- * Represents a standardized base class for managing resources.
- *
- * This class provides common CRUD (Create, Read, Update, Delete) methods
- * and advanced options for filtering, sorting, and fetching resources.
- *
- * @typedef {Object} IResourceInstance
- *
- * @template DataType - The specific data's type of `IResource` being instantiated (defaults to `IResource`).
- * @template PrimaryKeyType - The type of the primary key for the resource. Defaults to `IResourcePrimaryKey`.
- * @template EventType - The type of the event triggered by the resource. Defaults to `IResourceActionName`.
- * @example
- * const userResourceInstance: IResourceInstance<UserDataType> = new UserResource({name:"users",label:"List of users"});
- *
- * @description
- * A type that represents a resource instance, which is a constructor function that returns an object.
- * The constructor function take  an options object as an argument, which is used to configure the resource instance.
- * If `DataType` is not specified, it defaults to `any`.
- *
- * @example
- * // Create a resource instance type that extends a custom resource base
- * class CustomIResource implement IResourceInstance<CustomIResource<CustomerDataType>> {
- *   // ...
- * }
- */
-export interface IResourceInstance<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends IResource<DataType, PrimaryKeyType>, IObservable<EventType> {
-  /**
-   * The options for the resource.
-   * @type {IResource<DataType,PrimaryKeyType>}
-   * @description
-   * This property contains the options for the resource, which can be used to customize the behavior of the resource.
-   * The options are passed from the @Resource decorator.
-   */
-  options?: IResource<DataType, PrimaryKeyType>;
-
-  /***
-   * Returns the options for the resource.
-   * @returns {IResource<DataType,PrimaryKeyType>} The options for the resource.
-   */
-  getOptions(): IResource<DataType, PrimaryKeyType>;
-
-  /*
-  The data provider for the resource.
-  */
-  dataProvider: IResourceDataProvider<DataType, PrimaryKeyType>;
-  /**
-   * retrieves the data provider for the resource.
-   * @returns {IResourceDataProvider<DataType, PrimaryKeyType>} The data provider for the resource.
-  */
-  getDataProvider: () => IResourceDataProvider<DataType, PrimaryKeyType>;
-  /**
-  * A type that represents a map of field names to their corresponding IField instances.
-    @description this is the list of fields that are part of the resource.  Fields are created using the @Field decorator when resources are defined.
-  */
-  fields?: Record<string, IField>;
-
-  /**
-  * Returns the list of fields for the resource.
-  *
-  * @returns {Record<string, IField>} An object mapping property names to their corresponding field declaration
-  * @example
-  * ```typescript
-  * class MyClass extends ResourceBase<DataType,number> {
-  *   @Field({ type: 'string' }) myField: string;
-  * }
-  * const fields = new MyClass().getFields();
-  * console.log(fields); // Output: { myField: { name: 'myField', type: 'string' } }
-  * ```
-  */
-  getFields: () => Record<string, IField>;
-
-  /**
-   * Returns the field label for the resource.
-     @returns  {string} The label of the resource.
-  */
-  getLabel: () => string;
-
-  /**
-   * Returns the field title for the resource;
-   * @returns {string} The title of the resource
-   */
-  getTitle: () => string;
-
-  /***
-    Returns the field tooltip for the resource;
-    @returns {string} The tooltip of the resource
-  */
-  getTooltip: () => string;
-
-
-  /**
-   * Retrieves the actions associated with the resource.
-   * If the actions are not already defined or not an object, 
-   * it initializes them as an empty object of type `IResourceActionMap`.
-   *
-   * @returns {Partial<IResourceActionMap>} The map of resource actions.
-   */
-  getActions: () => Partial<IResourceActionMap>;
-
-  /**
-   * Determines if the given permission is allowed for the specified user.
-   *
-   * @param perm - The permission to check. It can be a string or an object implementing the IAuthPerm interface.
-   * @param user - The user for whom the permission is being checked. It can be an object implementing the IAuthUser interface.
-   * @returns A boolean indicating whether the permission is allowed for the user.
-   *
-   * The method performs the following steps:
-   * 1. Constructs a prefix using the resource name.
-   * 2. If the permission is a string, it trims and processes it to ensure it has the correct prefix.
-   * 3. Checks if the permission string has the correct prefix.
-   * 4. Extracts the action part of the permission and checks if it is a valid action.
-   * 5. If the action is "all" or matches any of the resource's actions, it returns true.
-   * 6. Otherwise, it delegates the permission check to the Auth.isAllowed method.
-   */
-  isAllowed(perm?: IAuthPerm, user?: IAuthUser): boolean;
-
-  /**
-   * Retrieves the name of the resource.
-   *
-   * @returns {IResourceName} The name of the resource, cast to the IResourceName type.
-   */
-  getName(): IResourceName;
-
-  /**
-   * Initializes the resource with the provided options.
-   * 
-   * @param options - An object implementing the IResource interface, containing the data to initialize the resource with.
-   * 
-   * This method assigns the provided options to the resource, ensuring that any empty properties
-   * on the resource are filled with the corresponding values from the options object. It skips
-   * properties that are functions. After assigning the options, it calls the `getFields` method
-   * to further process the resource.
-   */
-  init(options: IResource<DataType>): void;
-
-  /**
-   * Formats a string by replacing placeholders with corresponding values from a parameters object.
-   *
-   * @param text - The string containing placeholders in the format `{key}` to be replaced.
-   * @param params - An object containing key-value pairs where the key corresponds to the placeholder in the text and the value is the replacement.
-   * @returns The formatted string with placeholders replaced by corresponding values from the params object.
-   */
-  sprintf(text?: string, params?: Record<string, any>): string;
-  /**
-   * Retrieves the label for a specified action, optionally formatting it with provided parameters.
-   *
-   * @param actionName - The name of the action for which to get the label.
-   * @param params - Optional parameters to format the label.
-   * @returns The formatted action label.
-   */
-  getActionLabel(actionName: IResourceActionName, params?: Record<string, any>): string;
-  /**
-   * Retrieves the title of a specified action, optionally formatting it with provided parameters.
-   *
-   * @param actionName - The name of the action for which the title is to be retrieved.
-   * @param params - An optional record of parameters to format the title.
-   * @returns The formatted title of the specified action.
-   */
-  getActionTitle(actionName: IResourceActionName, params?: Record<string, any>): string;
-
-  /**
-   * Retrieves the tooltip for a specified action.
-   *
-   * @param actionName - The name of the action for which to get the tooltip.
-   * @param params - Optional parameters to format the tooltip string.
-   * @returns The formatted tooltip string for the specified action.
-   */
-  getActionTooltip(actionName: IResourceActionName, params?: Record<string, any>): string;
-
-  /**
-   * Retrieves a specific action by its name.
-   *
-   * @param {IResourceActionName} actionName - The name of the action to retrieve.
-   * @returns {IResourceAction} The action object if found, otherwise an empty object.
-   */
-  getAction(actionName: IResourceActionName): IResourceAction;
-
-  /**
-  * Determines if the specified user has read access.
-  *
-  * @param user - The user whose read access is being checked. If no user is provided, the method will use default permissions.
-  * @returns A boolean indicating whether the user has read access.
-  */
-  canUserRead(user?: IAuthUser): boolean;
-
-  /**
-   * Determines if the specified user has list access.
-   *
-   * @param user - The user whose list access is being checked. If no user is provided, the method will use default permissions.
-   * @returns A boolean indicating whether the user has list access.
-   */
-  canUserList(user?: IAuthUser): boolean;
-  /**
-   * Determines if the user has permission to create a resource.
-   *
-   * @param user - The user whose permissions are being checked. If not provided, the method will use the default user.
-   * @returns A boolean indicating whether the user is allowed to create the resource.
-   */
-  canUserCreate(user?: IAuthUser): boolean;
-
-  /**
-   * Determines if the specified user has permission to update the resource.
-   *
-   * @param user - The user whose update permissions are being checked. If no user is provided, the method will use default permissions.
-   * @returns A boolean indicating whether the user has permission to update the resource.
-   */
-  canUserUpdate(user?: IAuthUser): boolean;
-  /**
-   * Determines if the user has permission to delete.
-   *
-   * @param user - The authenticated user whose permissions are being checked. Optional.
-   * @returns A boolean indicating whether the user is allowed to delete.
-   */
-  canUserDelete(user?: IAuthUser): boolean;
-
-  /**
-   * Retrieves the primary key fields from the current object's fields.
-   *
-   * @returns {IField[]} An array of fields that are marked as primary keys.
-   */
-  getPrimaryKeys(): IField[];
-
-  /***
-   * Creates a new record in the resource.
-   * @param {DataType} record - The data for the new record.
-   * @param options - Optional settings for the creation process.
-   * @returns A promise that resolves to the result of the operation.
-   * 
-   * @example
-   * ```typescript
-   * const result = await resource.create({ name: "Product A", price: 100 }, {
-   *   returnFields: ['id', 'name'],
-   *   include: ['category']
-   * });
-   * console.log(result.data); // { id: 1, name: "Product A" }
-   * ```
-   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
-   */
-  create(record: DataType): Promise<IResourceOperationResult<DataType>>;
-
-  /***
-   * Fetches all records from the resource.
-   * @param {IResourceQueryOptions<DataType, PrimaryKeyType>} options - Optional options for fetching resources.
-   * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
-   */
-  find(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
-
-  /***
-   * Fetches a single record from the resource.
-   * @param {PrimaryKeyType} key - The primary key of the resource.
-   * @param options - Optional settings for the list operation.
-   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
-   */
-  findOne(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType | null>>;
-
-  /***
-   * Updates a single record in the resource.
-   * @param {PrimaryKeyType} key - The primary key of the resource to update.
-   * @param {Partial<DataType>} updatedData - The updated data for the resource.
-   * @param options - Optional settings for the update process.
-   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the update operation.
-   */
-  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
-
-  /**
-   * 
-   * @param key - The primary key of the resource to delete.
-   * @param options - Optional settings for the deletion process.
-   * @returns {Promise<IResourceOperationResult<any>>} A promise that resolves to the result of the delete operation.
-   */
-  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<any>>;
-
-  find(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
-  findAndCount(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
-  createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>>;
-  updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>>;
-  deleteMany(criteria: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any[]>>;
-  count(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<number>>;
-  exists(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<boolean>>;
-  distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType[]>>;
-  aggregate?(pipeline: any[]): Promise<IResourceOperationResult<any[]>>;
-
-  /***
-   * translates a property of the resource using the translate function from the default I18n instance.
-   * @param propertyName - The name of the property to translate.
-   * @param fallbackValue - The fallback value to use if the translation is not found.
-   * @param options - The options for the translation.
-   * @returns The translated property value.
-   */
-  translateProperty(propertyName: string, fallbackValue?: string, options?: TranslateOptions): string;
-
-  /**
-  * Retrieves the i18n (default instance) translations for the resource.
-  * 
-  * @param {string} [locale] - The locale to use for the translations. If not provided, the default locale from the i18n instance will be used.
-  * @returns {IDict} - An object containing the translations for the resource, keyed by the property names.
-  * @example
-  * // Register translations for the "en" locale.
-  * i18n.registerTranslations({
-  *   en: {
-  *     resources: {
-  *       user: {  // The resource name
-  *         label: "User",  // The label property
-  *         title: "User Information",  // The title property
-  *         tooltip: "Manage user data"  // The tooltip setI18nPropertyPrefix  property
-  *       }
-  *     }
-  *   }
-  * });
-  * 
-  * // Retrieve the translations for the "user" resource.  
-  * import {ResourceManager} from "@resk/core";
-  * const userResource = ResourceManager.getResource("user");
-  * const userTranslations = userResource.getTranslations();
-  * console.log(userTranslations);
-  * // Output:
-  * // {
-  * //   label: "User",
-  * //   title: "User Information",
-  * //   tooltip: "Manage user data"   
-  * // }
-  */
-  getTranslations(locale?: string): IDict;
-
-  /**
-   * checks if the resource has the action
-   * @param action - The action to check
-   * @returns true if the action exists, false otherwise
-   */
-  hasAction(action: IResourceActionName): boolean;
-
-  getTranslateParams(params?: Record<string, any>): Record<string, any>;
-};
-
-/**
  * A type that represents a constructor function that can be instantiated with any number of arguments.
  */
 export type IConstructor = new (...args: any[]) => {};
@@ -1776,7 +1439,7 @@ export interface IResourceOperationResult<DataType = any> {
  * 
  * ### Methods:
  * 
- * - **create(record: DataType)**: Creates a new resource record.
+ * - **create(record: Partial<DataType>)**: Creates a new resource record.
  *   - **Parameters**:
  *     - `record`: The data for the new resource to be created.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
@@ -1786,27 +1449,9 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.create({ name: "New Resource" });
  *     ```
  * 
- * - **list()**: Retrieves all resource records.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
- *     containing an array of resource records.
- *   - **Example**:
- *     ```typescript
- *     const result = await dataProvider.list();
- *     console.log(result.data); // Array of resource records
- *     ```
- * 
- * - **read(key: K)**: Retrieves a single resource record by its primary key.
+ * - **update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>)**: Updates an existing resource record.
  *   - **Parameters**:
- *     - `key`: The primary key of the resource to retrieve.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
- *     containing the requested resource record.
- *   - **Example**:
- *     ```typescript
- *     const result = await dataProvider.read("resourceId");
- *     ```
- * - **update(key: K, updatedData: Partial<DataType>)**: Updates an existing resource record.
- *   - **Parameters**:
- *     - `key`: The primary key of the resource to update.
+ *     - `primaryKey`: The primary key of the resource to update.
  *     - `updatedData`: An object containing the updated data for the resource.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
  *     indicating the success or failure of the update operation.
@@ -1815,14 +1460,125 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.update("resourceId", { name: "Updated Resource" });
  *     ```
  * 
- * - **delete(key: K)**: Deletes a resource record by its primary key.
+ * - **delete(primaryKey: PrimaryKeyType)**: Deletes a resource record by its primary key.
  *   - **Parameters**:
- *     - `key`: The primary key of the resource to delete.
+ *     - `primaryKey`: The primary key of the resource to delete.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<any>`, 
  *     indicating the success or failure of the delete operation.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.delete("resourceId");
+ *     ```
+ * 
+ * - **findOne(primaryKey: PrimaryKeyType)**: Retrieves a single resource record by its primary key.
+ *   - **Parameters**:
+ *     - `primaryKey`: The primary key of the resource to retrieve.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType | null>`, 
+ *     containing the requested resource record or null if not found.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.findOne("resourceId");
+ *     ```
+ * 
+ * - **findOneOrFail(primaryKey: PrimaryKeyType)**: Retrieves a single resource record by its primary key or throws an error if not found.
+ *   - **Parameters**:
+ *     - `primaryKey`: The primary key of the resource to retrieve.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
+ *     containing the requested resource record.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.findOneOrFail("resourceId");
+ *     ```
+ * 
+ * - **find(options?: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Retrieves multiple resource records based on query options.
+ *   - **Parameters**:
+ *     - `options`: Optional query options to filter the results.
+ *   - **Returns**: A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
+ *     containing the list of resource records.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.find({ limit: 10, skip: 0 });
+ *     ```
+ * 
+ * - **findAndCount(options?: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Retrieves multiple resource records and the total count based on query options.
+ *   - **Parameters**:
+ *     - `options`: Optional query options to filter the results.
+ *   - **Returns**: A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
+ *     containing the list of resource records and the total count.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.findAndCount({ limit: 10, skip: 0 });
+ *     ```
+ * 
+ * - **createMany(data: Partial<DataType>[])**: Creates multiple resource records.
+ *   - **Parameters**:
+ *     - `data`: An array of data for the new resources to be created.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+ *     indicating the success or failure of the operation.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.createMany([{ name: "Resource 1" }, { name: "Resource 2" }]);
+ *     ```
+ * 
+ * - **updateMany(data: Partial<DataType>)**: Updates multiple resource records.
+ *   - **Parameters**:
+ *     - `data`: An object containing the updated data for the resources.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+ *     indicating the success or failure of the update operation.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.updateMany({ status: "active" });
+ *     ```
+ * 
+ * - **deleteMany(criteria: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Deletes multiple resource records based on criteria.
+ *   - **Parameters**:
+ *     - `criteria`: The criteria to filter which resources to delete.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<any[]>`, 
+ *     indicating the success or failure of the delete operation.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.deleteMany({ filters: { status: "inactive" } });
+ *     ```
+ * 
+ * - **count(options?: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Counts the total number of resource records based on query options.
+ *   - **Parameters**:
+ *     - `options`: Optional query options to filter the count.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<number>`, 
+ *     containing the total count of resource records.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.count({ filters: { status: "active" } });
+ *     ```
+ * 
+ * - **exists(primaryKey: PrimaryKeyType)**: Checks if a resource record exists by its primary key.
+ *   - **Parameters**:
+ *     - `primaryKey`: The primary key of the resource to check.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<boolean>`, 
+ *     indicating whether the resource exists.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.exists("resourceId");
+ *     ```
+ * 
+ * - **distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Retrieves distinct values for a specified field.
+ *   - **Parameters**:
+ *     - `field`: The field for which to retrieve distinct values.
+ *     - `options`: Optional query options to filter the results.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+ *     containing the distinct values.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.distinct("category");
+ *     ```
+ * 
+ * - **aggregate?(pipeline: any[])**: Performs aggregation operations on the resource data.
+ *   - **Parameters**:
+ *     - `pipeline`: An array representing the aggregation pipeline.
+ *   - **Returns**: A promise that resolves to an `IResourceOperationResult<any[]>`, 
+ *     containing the aggregated results.
+ *   - **Example**:
+ *     ```typescript
+ *     const result = await dataProvider.aggregate([{ $group: { _id: "$category", count: { $sum: 1 } } }]);
  *     ```
  * 
  * ### Notes:
@@ -1852,20 +1608,153 @@ export interface IResourceOperationResult<DataType = any> {
  * The `IResourceDataProvider` interface defines a comprehensive set of methods
  * for managing resources, facilitating CRUD operations and ensuring a consistent
  * approach to data handling in applications.
+
  */
 export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+  /***
+   * Creates a new resource record.
+   * @param record The data for the new resource to be created.
+   * @returns A promise that resolves to an `IResourceOperationResult<DataType>`, 
+   * indicating the success or failure of the operation.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.create({ name: "New Resource" });
+  *     ```
+   */
   create(record: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
-  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
-  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<any>>;
+  /***
+   * Updates an existing resource record.
+   * @param primaryKey The primary key of the resource to update.
+   * @param updatedData An object containing the updated data for the resource.
+   * @returns A promise that resolves to an `IResourceOperationResult<DataType>`, 
+   * indicating the success or failure of the update operation.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.update("resourceId", { name: "Updated Resource" });
+  *     ```
+   */
+  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
+  /***
+   * Deletes a resource record by its primary key.
+   * @param primaryKey The primary key of the resource to delete.
+   * @returns A promise that resolves to an `IResourceOperationResult<any>`, 
+   * indicating the success or failure of the delete operation.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.delete("resourceId");
+  *     ```
+   */
+  delete(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<any>>;
+  /***
+   * Retrieves a single resource record by its primary key.
+   * @param primaryKey The primary key of the resource to retrieve.
+   * @returns A promise that resolves to an `IResourceOperationResult<DataType | null>`, 
+   * containing the requested resource record or null if not found.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.findOne("resourceId");
+  *     ```
+   */
   findOne(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<DataType | null>>;
+  /***
+   * Retrieves a single resource record by its primary key or throws an error if not found.
+   * @param primaryKey The primary key of the resource to retrieve.
+   * @returns A promise that resolves to an `IResourceOperationResult<DataType>`, 
+   * containing the requested resource record.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.findOneOrFail("resourceId");
+  *     ```
+   */
+  findOneOrFail(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
+  /***
+   * Retrieves multiple resource records based on query options.
+   * @param options Optional query options to filter the results.
+   * @returns A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
+   * containing the list of resource records.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.find({ limit: 10, skip: 0 });
+  *     ```
+   */
   find(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
+  /***
+   * Retrieves multiple resource records and the total count based on query options.
+   * @param options Optional query options to filter the results.
+   * @returns A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
+   * containing the list of resource records and the total count.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.findAndCount({ limit: 10, skip: 0 });
+  *     ```
+   */
   findAndCount(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
+  /***
+   * Creates multiple resource records.
+   * @param data An array of data for the new resources to be created.
+   * @returns A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+   * indicating the success or failure of the operation.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.createMany([{ name: "Resource 1" }, { name: "Resource 2" }]);
+  *     ```
+   */
   createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>>;
+  /***
+   * Updates multiple resource records.
+   * @param data An object containing the updated data for the resources.
+   * @returns A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+   * indicating the success or failure of the update operation.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.updateMany({ status: "active" });
+  *     ```
+   */
   updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>>;
+  /**
+   * 
+   * @param criteria The criteria to filter which resources to delete.
+   * @returns A promise that resolves to an `IResourceOperationResult<any[]>`, 
+   * indicating the success or failure of the delete operation.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.deleteMany({ filters: { status: "inactive" } });
+  *     ```
+   */
   deleteMany(criteria: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any[]>>;
+  /***
+   * Counts the total number of resource records based on query options.
+   * @param options Optional query options to filter the count.
+   * @returns A promise that resolves to an `IResourceOperationResult<number>`, 
+   * containing the total count of resource records.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.count({ filters: { status: "active" } });
+  *     ```
+   */
   count(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<number>>;
+  /**
+   * 
+   * @param primaryKey The primary key of the resource to check.
+   * @returns A promise that resolves to an `IResourceOperationResult<boolean>`, 
+   * indicating whether the resource exists.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.exists("resourceId");
+  *     ```
+   */
   exists(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<boolean>>;
+  /**
+   * 
+   * @param field The field to check for distinct values.
+   * @param options 
+   */
   distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType[]>>;
+
+  /**
+   * Aggregates resources based on a pipeline.
+   * @param pipeline 
+   */
   aggregate?(pipeline: any[]): Promise<IResourceOperationResult<any[]>>;
 }
 
@@ -2028,6 +1917,14 @@ export interface IResourcePaginatedResult<DataType = any> extends Omit<IResource
     pageSize: number;
     /** The total number of pages. */
     totalPages: number;
+    /***
+     * Whether there is a next page.
+     */
+    hasNextPage?: boolean;
+    /***
+     * Whether there is a previous page.
+     */
+    hasPreviousPage?: boolean;
   };
 
   /** Links for navigation in paginated results. */

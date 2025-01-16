@@ -1,4 +1,4 @@
-import { IDict, IResourceName, IField, IResourceInstance, IResourceDefaultEvent, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey } from '../types';
+import { IDict, IResourceName, IField, IResourceDefaultEvent, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory } from '../utils/index';
 import { IConstructor, IProtectedResource } from '../types/index';
@@ -20,7 +20,7 @@ const resourcesClassNameMetaData = Symbol('resourceByClassName');
  * The `ResourceBase` class provides a flexible structure for defining resource instances with optional metadata such as 
  * `name`, `label`, `title`, and `tooltip`. Additionally, it manages dynamic fields associated with the resource.
  * 
- * This class can be extended to implement specific resources, and it automatically handles merging options passed into
+ * This class can be extended to implement specific resources, and it automatically handles merging metaData passed into
  * the constructor with the instance properties. It also retrieves and manages resource fields using the `getFields` method.
  * 
  * @template DataType - The type of data the resource is expected to handle. By default, it accepts any type (`DataType=any`).
@@ -28,8 +28,6 @@ const resourcesClassNameMetaData = Symbol('resourceByClassName');
  * @template EventType - The type of event that the resource can emit. Defaults to `IResourceActionName`.
  * 
  * @extends ObservableClass<EventType> - Extends the `ObservableClass` to enable event-based communication.
- * 
- * @implements IResourceInstance<DataType> - Ensures that the class follows the `IResourceInstance` interface for consistency.
  * 
  * @example
  * // Create a new resource with basic properties
@@ -57,11 +55,11 @@ const resourcesClassNameMetaData = Symbol('resourceByClassName');
  * console.log(dynamicResource.getFields()); 
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
-export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> implements IResourceInstance<DataType, PrimaryKeyType, EventType> {
+export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> {
   actions?: IResourceActionMap;
-  options?: IResource<DataType, PrimaryKeyType>;
-  getOptions(): IResource<DataType, PrimaryKeyType> {
-    return Object.assign({}, this.options);
+  metaData?: IResource<DataType, PrimaryKeyType>;
+  getMetaData(): IResource<DataType, PrimaryKeyType> {
+    return Object.assign({}, this.metaData);
   }
   static events = observableFactory<IResourceDefaultEvent | "string">();
   /**
@@ -125,24 +123,32 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
   fields?: Record<string, IField>;
   private _onDictionaryChangedListener?: { remove: () => any };
   private _onLocaleChangeListener?: { remove: () => any };
-  /**
-   * Constructs a new `ResourceBase` instance.
-   * 
-   * The constructor accepts an `options` object, which is used to populate the instance properties.
-   * It automatically copies all the non-function properties from the `options` into the current instance.
-   * 
-   * @param {...any[]} args - Additional arguments that can be passed for further customization.
-   */
-  constructor(...args: any[]) {
+  constructor() {
     super();
     this._onDictionaryChangedListener = i18n.on("translations-changed", this.onI18nChange.bind(this));
     this._onLocaleChangeListener = i18n.on("locale-changed", this.onI18nChange.bind(this));
   }
+  /**
+   * Resolves the translations for the resource when the i18n dictionary or locale changes.
+   * This method is called when the "translations-changed" or "locale-changed" events are triggered.
+   */
   onI18nChange() {
     this.resolveTranslations();
   }
+  /**
+   * Resolves the translations for the resource when the i18n dictionary or locale changes.
+   * This method is called when the "translations-changed" or "locale-changed" events are triggered.
+   */
   resolveTranslations(options?: TranslateOptions) {
     return i18n.resolveTranslations(this);
+  }
+  /**
+   * Removes the event listeners for the "translations-changed" and "locale-changed" events.
+   * This method is called when the resource is being destroyed to clean up the event listeners.
+   */
+  destroy() {
+    this._onDictionaryChangedListener?.remove();
+    this._onLocaleChangeListener?.remove();
   }
   /**
    * returns the i18n params for the resource. this is used to translate the error messages.
@@ -164,19 +170,14 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     return i18n.t("resources.invalidDataProvider", this.getTranslateParams());
   }
   hasDataProvider(): boolean {
-    return this.dataProvider != null && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.create === "function" && typeof this.dataProvider?.find === "function" && typeof this.dataProvider?.update === "function" && typeof this.dataProvider?.delete === "function";
+    const dataProvider = this.getDataProvider();
+    return dataProvider != null && typeof dataProvider?.update === "function" && typeof dataProvider?.create === "function" && typeof dataProvider?.find === "function" && typeof dataProvider?.update === "function" && typeof dataProvider?.delete === "function";
   }
-  /**
-   * The data provider for the resource.
-   */
-  dataProvider: IResourceDataProvider<DataType, PrimaryKeyType> = null as unknown as IResourceDataProvider<DataType, PrimaryKeyType>;
   /**
    * get the data provider for the resource.
    * @returns {IResourceDataProvider<DataType, PrimaryKeyType>} The data provider for the resource.
    */
-  getDataProvider(): IResourceDataProvider<DataType, PrimaryKeyType> {
-    return this.dataProvider;
-  };
+  abstract getDataProvider(): IResourceDataProvider<DataType, PrimaryKeyType>;
   /***
    * trigger the event
    * @param event - The event to trigger.
@@ -187,22 +188,37 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
     ResourceBase.events.trigger(event, Object.assign({}, this.getTranslateParams()), ...args);
     return this.trigger(event, ...args);
   }
+  /**
+   * Checks if the user has permission to perform the specified action.
+   * If the resource does not have a valid data provider, it rejects with an error.
+   * If the user does not have permission to perform the action, it rejects with an error message.
+   * Otherwise, it resolves with no value.
+   * @param actionPerm - A function that returns a boolean indicating whether the user has permission to perform the action.
+   * @param i18nActionKey - The key to use for translating the error message if the user does not have permission.
+   * @returns A promise that resolves if the user has permission, or rejects with an error if the user does not have permission or the data provider is invalid.
+   */
+  checkPermissionAction(actionPerm: () => boolean, i18nActionKey: string): Promise<any> {
+    if (!this.hasDataProvider()) {
+      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
+    }
+    if (!actionPerm()) {
+      return Promise.reject(new Error(i18n.t(i18nActionKey, this.getTranslateParams())));
+    }
+    return Promise.resolve();
+  }
   /***
    * creates a new record in the resource.
    * @param {DataType} record - The data for the new record.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
   create(record: DataType): Promise<IResourceOperationResult<DataType>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserCreate()) {
-      return Promise.reject(new Error(i18n.t("resources.createForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider()?.create(record).then((result) => {
-      this._trigger("create" as EventType, result);
-      return result;
-    });
+    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
+      .then(() => {
+        return this.getDataProvider()?.create(record).then((result) => {
+          this._trigger("create" as EventType, result);
+          return result;
+        });
+      });
   }
   /***
    * Fetches all records from the resource.
@@ -210,33 +226,38 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
    */
   find(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserList()) {
-      return Promise.reject(new Error(i18n.t("resources.listForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider()?.find(options).then((result) => {
-      this._trigger("find" as EventType, result);
-      return result;
-    });
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+      return this.getDataProvider()?.find(options).then((result) => {
+        this._trigger("find" as EventType, result);
+        return result;
+      });
+    })
   }
   /***
    * fetches a single record from the resource.
    * @param {PrimaryKeyType} key - The primary key of the resource.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  findOne(key: PrimaryKeyType): Promise<IResourceOperationResult<DataType | null>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
+  findOne(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<DataType | null>> {
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
+      .then(() => {
+        return this.getDataProvider().findOne(primaryKey).then((result) => {
+          this._trigger("findOne" as EventType, result);
+          return result;
+        });
+      })
+  }
+  /***
+   * fetches a single record from the resource.
+   * If the record is not found, it throws an error.
+   * @param {PrimaryKeyType} primaryKey - The primary key of the resource.
+   */
+  async findOneOrFail(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<DataType>> {
+    const result = await this.findOne(primaryKey);
+    if (!result?.data) {
+      throw new Error(i18n.t("resources.notFoundError", Object.assign({}, { primaryKey: JSON.stringify(primaryKey) }, this.getTranslateParams())));
     }
-    if (!this.canUserRead()) {
-      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider().findOne(key).then((result) => {
-      this._trigger("findOne" as EventType, result);
-      return result;
-    });
+    return result as Promise<IResourceOperationResult<DataType>>;
   }
   /**
    * updates a record in the resource.
@@ -244,127 +265,133 @@ export class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimar
    * @param updatedData
    * @returns 
    */
-  update(key: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserUpdate()) {
-      return Promise.reject(new Error(i18n.t("resources.updateForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider()?.update(key, updatedData).then((result) => {
-      this._trigger("update" as EventType, result);
-      return result;
-    });
+  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
+    return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
+      .then(() => {
+        return this.getDataProvider()?.update(primaryKey, updatedData).then((result) => {
+          this._trigger("update" as EventType, result);
+          return result;
+        });
+      })
   }
   /***
    * deletes a record from the resource.
-   * @param key {PrimaryKeyType} The primary key of the resource to delete.
+   * @param primaryKey {PrimaryKeyType} The primary key of the resource to delete.
    * @returns Promise<IResourceOperationResult<any>> A promise that resolves to the result of the delete operation.
    */
-  delete(key: PrimaryKeyType): Promise<IResourceOperationResult<any>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserDelete()) {
-      return Promise.reject(new Error(i18n.t("resources.deleteForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider()?.delete(key).then((result) => {
-      this._trigger("delete" as EventType, result);
-      return result;
-    });
-  }
-
-  findAndCount(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserRead()) {
-      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider().findAndCount(options).then((result) => {
-      this._trigger("findAndCount" as EventType, result);
-      return result;
-    });
-  }
-  createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserCreate()) {
-      return Promise.reject(new Error(i18n.t("resources.createForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider()?.createMany(data).then((result) => {
-      this._trigger("createMany" as EventType, result);
-      return result;
-    });
-  }
-  updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserUpdate()) {
-      return Promise.reject(new Error(i18n.t("resources.updateForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider()?.updateMany(data).then((result) => {
-      this._trigger("updateMany" as EventType, result);
-      return result;
-    });
-  }
-  deleteMany(criteria: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any[]>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserDelete()) {
-      return Promise.reject(new Error(i18n.t("resources.deleteForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider()?.deleteMany(criteria).then((result) => {
-      this._trigger("deleteMany" as EventType, result);
-      return result;
-    });
-  }
-  count(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<number>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserRead()) {
-      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider().count(options).then((result) => {
-      this._trigger("read" as EventType, result);
-      return result;
-    });
-  }
-  exists(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<boolean>> {
-    if (!this.hasDataProvider()) {
-      return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
-    }
-    if (!this.canUserRead()) {
-      return Promise.reject(new Error(i18n.t("resources.readForbiddenError", this.getTranslateParams())));
-    }
-    return this.getDataProvider().exists(primaryKey).then((result) => {
-      this._trigger("exits" as EventType, result);
-      return result;
-    });
+  delete(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<any>> {
+    return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
+      .then(() => {
+        return this.getDataProvider()?.delete(primaryKey).then((result) => {
+          this._trigger("delete" as EventType, result);
+          return result;
+        });
+      })
   }
 
   /**
-   * Initializes the resource with the provided options.
+   * Fetches a list of records from the resource and returns the total count.
+   * @param options - Optional query options to filter, sort, and paginate the results.
+   * @returns A promise that resolves to an object containing the list of records and the total count.
+   */
+  findAndCount(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
+      .then(() => {
+        return this.getDataProvider().findAndCount(options).then((result) => {
+          this._trigger("findAndCount" as EventType, result);
+          return result;
+        });
+      })
+  }
+  /**
+   * Creates multiple records in the resource.
+   * @param data - An array of partial data objects to create.
+   * @returns A promise that resolves to the result of the create operation.
+   */
+  createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>> {
+    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
+      .then(() => {
+        return this.getDataProvider().createMany(data).then((result) => {
+          this._trigger("createMany" as EventType, result);
+          return result;
+        });
+      });
+  }
+  /**
+   * Updates multiple records in the resource.
+   * @param data - An array of partial data objects to update.
+   * @returns A promise that resolves to the result of the update operation.
+   */
+  updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>> {
+    return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
+      .then(() => {
+        return this.getDataProvider().updateMany(data).then((result) => {
+          this._trigger("updateMany" as EventType, result);
+          return result;
+        });
+      });
+  }
+  /**
+   * Deletes multiple records from the resource based on the provided criteria.
+   * @param criteria - The query options to filter the records to be deleted.
+   * @returns A promise that resolves to the result of the delete operation.
+   */
+  deleteMany(criteria: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any[]>> {
+    return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
+      .then(() => {
+        return this.getDataProvider().deleteMany(criteria).then((result) => {
+          this._trigger("deleteMany" as EventType, result);
+          return result;
+        });
+      });
+  }
+  /**
+   * Counts the number of records in the resource.
+   * @param options - Optional query options to filter the results.
+   * @returns {Promise<IResourceOperationResult<number>>} A promise that resolves to the result of the count operation.
+   */
+  count(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<number>> {
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
+      .then(() => {
+        return this.getDataProvider().count(options).then((result) => {
+          this._trigger("read" as EventType, result);
+          return result;
+        });
+      })
+  }
+  /***
+   * checks if the resource has the record
+   * @param {PrimaryKeyType} primaryKey - The primary key of the record to check.
+   * @returns {Promise<IResourceOperationResult<boolean>>} A promise that resolves to the result of the exists operation.
+   */
+  exists(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<boolean>> {
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
+      .then(() => {
+        return this.getDataProvider().exists(primaryKey).then((result) => {
+          this._trigger("exits" as EventType, result);
+          return result;
+        });
+      });
+  }
+
+  /**
+   * Initializes the resource with the provided metaData.
    * 
-   * @param options - An object implementing the IResource interface, containing the data to initialize the resource with.
+   * @param metaData - An object implementing the IResource interface, containing the data to initialize the resource with.
    * 
-   * This method assigns the provided options to the resource, ensuring that any empty properties
-   * on the resource are filled with the corresponding values from the options object. It skips
-   * properties that are functions. After assigning the options, it calls the `getFields` method
+   * This method assigns the provided metaData to the resource, ensuring that any empty properties
+   * on the resource are filled with the corresponding values from the metaData object. It skips
+   * properties that are functions. After assigning the metaData, it calls the `getFields` method
    * to further process the resource.
    */
-  init(options: IResource<DataType>) {
-    options = Object.assign({}, options);
-    this.options = options;
+  init(metaData: IResource<DataType>) {
+    metaData = Object.assign({}, metaData);
+    this.metaData = metaData;
     this.resolveTranslations();
-    for (let i in options) {
+    for (let i in metaData) {
       if (isEmpty((this as IDict)[i]) && typeof (this as IDict)[i] !== "function") {
         try {
-          (this as IDict)[i] = options[i as keyof typeof options];
+          (this as IDict)[i] = metaData[i as keyof typeof metaData];
         } catch { }
       }
     }
@@ -767,35 +794,35 @@ export class ResourcesManager {
   private static resources: Record<IResourceName, ResourceBase> = {} as Record<IResourceName, ResourceBase>;
 
   /**
-   * Retrieves the global record of all resource options managed by the `ResourcesManager`.
+   * Retrieves the global record of all resource metaData managed by the `ResourcesManager`.
    * 
-   * This method returns a copy of the internal record of resource options, which can be used to access
+   * This method returns a copy of the internal record of resource metaData, which can be used to access
    * the configuration and settings for each registered resource.
    * 
-   * @returns {Record<IResourceName, IResource<any,any>>} A copy of the resource options record.
+   * @returns {Record<IResourceName, IResource<any,any>>} A copy of the resource metaData record.
    */
-  public static getAllOptions(): Record<IResourceName, IResource<any, any>> {
+  public static getAllMetaData(): Record<IResourceName, IResource<any, any>> {
     return Object.assign({}, Reflect.getMetadata(resourcesMetaDataKey, ResourcesManager));
   }
   /**
-   * Adds resource options to the global record managed by the `ResourcesManager`.
+   * Adds resource metaData to the global record managed by the `ResourcesManager`.
    * 
-   * This method updates the internal record of resource options with the provided `options` for the given `resourceName`.
+   * This method updates the internal record of resource metaData with the provided `metaData` for the given `resourceName`.
    * The updated record is then stored as metadata on the `ResourcesManager` class.
    * 
    * @param {IResourceName} resourceName - The unique name of the resource.
-   * @param {IResource<any>} options - The resource options to be associated with the given `resourceName`.
+   * @param {IResource<any>} metaData - The resource metaData to be associated with the given `resourceName`.
    */
-  public static addOptions(resourceName: IResourceName, options: IResource<any>) {
-    const allOptions = this.getAllOptions();
+  public static addMetaData(resourceName: IResourceName, metaData: IResource<any>) {
+    const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
-    options = Object.assign({}, options);
-    options.name = isNonNullString(options?.name) ? options.name : resourceName;
-    (allOptions as any)[resourceName] = options;
+    metaData = Object.assign({}, metaData);
+    metaData.name = isNonNullString(metaData?.name) ? metaData.name : resourceName;
+    (allOptions as any)[resourceName] = metaData;
     Reflect.defineMetadata(resourcesMetaDataKey, allOptions, ResourcesManager);
-    if (isNonNullString(options.className)) {
+    if (isNonNullString(metaData.className)) {
       const classNames = ResourcesManager.getAllClassNames();
-      (classNames as any)[options.className] = options.name;
+      (classNames as any)[metaData.className] = metaData.name;
       Reflect.defineMetadata(resourcesClassNameMetaData, classNames, ResourcesManager);
     }
   }
@@ -826,35 +853,35 @@ export class ResourcesManager {
     return classNames[className];
   }
   /**
-   * Retrieves the resource options for the specified resource name.
+   * Retrieves the resource metaData for the specified resource name.
    *
-   * This method retrieves the resource options associated with the given `resourceName` from the global
-   * record of resource options managed by the `ResourcesManager`. If the resource name is not a valid
-   * non-null string, or if the resource options are not found, this method will return `undefined`.
+   * This method retrieves the resource metaData associated with the given `resourceName` from the global
+   * record of resource metaData managed by the `ResourcesManager`. If the resource name is not a valid
+   * non-null string, or if the resource metaData are not found, this method will return `undefined`.
    *
-   * @param {IResourceName} resourceName - The unique name of the resource to retrieve the options for.
-   * @returns {IResource<any,any> | undefined} The resource options for the specified resource name, or `undefined` if not found.
+   * @param {IResourceName} resourceName - The unique name of the resource to retrieve the metaData for.
+   * @returns {IResource<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
    */
-  public static getOptions(resourceName: IResourceName): IResource<any, any> | undefined {
-    const allOptions = this.getAllOptions();
+  public static getMetaData(resourceName: IResourceName): IResource<any, any> | undefined {
+    const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     return (allOptions as any)[resourceName];
   }
 
   /**
-   * Retrieves the resource options for the specified resource class name.
+   * Retrieves the resource metaData for the specified resource class name.
    *
    * This method first looks up the resource name associated with the given class name using the `getNameByClassName` method.
-   * If the resource name is found, it then retrieves the resource options for that resource name using the `getOptions` method.
-   * If the resource name is not found, or if the resource options are not found, this method will return `undefined`.
+   * If the resource name is found, it then retrieves the resource metaData for that resource name using the `getMetaData` method.
+   * If the resource name is not found, or if the resource metaData are not found, this method will return `undefined`.
    *
-   * @param {string} className - The class name of the resource to retrieve the options for.
-   * @returns {IResource<any, any> | undefined} The resource options for the specified resource class name, or `undefined` if not found.
+   * @param {string} className - The class name of the resource to retrieve the metaData for.
+   * @returns {IResource<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
    */
-  public static getOptionsByClassName(className: string): IResource<any, any> | undefined {
+  public static getMetaDataByClassName(className: string): IResource<any, any> | undefined {
     const resourceName = this.getNameByClassName(className);
     if (!resourceName) return undefined;
-    return this.getOptions(resourceName);
+    return this.getMetaData(resourceName);
   }
 
   /**
@@ -1006,7 +1033,7 @@ export class ResourcesManager {
  * This decorator stores the resource properties (`name`, `label`, `title`, `tooltip`) using Reflect metadata.
  *
  * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
- * @param options - The properties to be set as metadata on the class.
+ * @param metaData - The properties to be set as metadata on the class.
  * 
  * @example
  * ```typescript
@@ -1020,19 +1047,19 @@ export class ResourcesManager {
  * 
  * ```
  */
-export function Resource<DataType = any>(options: IResource<DataType>) {
+export function Resource<DataType = any>(metaData: IResource<DataType>) {
   return function (target: Function) {
-    options = Object.assign({}, options);
+    metaData = Object.assign({}, metaData);
     if (typeof target == "function") {
       try {
-        options.className = defaultStr(options.className, target?.name);
+        metaData.className = defaultStr(metaData.className, target?.name);
         const resource = new (target as IConstructor)() as ResourceBase<DataType>;
-        resource.init(options);
-        ResourcesManager.addResource<DataType>((options.name as IResourceName), resource);
+        resource.init(metaData);
+        ResourcesManager.addResource<DataType>((metaData.name as IResourceName), resource);
       } catch { }
     }
-    Reflect.defineMetadata(resourceMetaData, options, target);
-    ResourcesManager.addOptions(options.name as IResourceName, options);
+    Reflect.defineMetadata(resourceMetaData, metaData, target);
+    ResourcesManager.addMetaData(metaData.name as IResourceName, metaData);
   };
 }
 

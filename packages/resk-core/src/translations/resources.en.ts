@@ -15,7 +15,7 @@ I18n.RegisterTranslations({
             "detailsForbiddenError": "You are not authorized to view details of a %{resourceLabel} resource",
             "invalidDataProvider": "Invalid data provider for %{resourceLabel} resource",
             "listForbiddenError": "You are not authorized to list %{resourceLabel} resources",
-
+            "resourceNotFoundError": `Resource %{resourceLabel} not found with primary key: %{primaryKey}`,
             /***
              * resources actions translations structure : 
              * Here is an example of the structure of the translations for the "user" resource:

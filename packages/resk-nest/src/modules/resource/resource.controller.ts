@@ -23,7 +23,7 @@ export class ResourceController<DataType extends IResourceEntity = any, ServiceT
    * 
    * @param resourceService - The `ResourceService` instance to be used by the `ResourceController`.
    */
-  constructor(protected resourceService: ServiceType) {
+  constructor(protected readonly resourceService: ServiceType) {
     try {
       if (isNonNullString((resourceService.constructor as any).resourceName)) return;
       ///Set the resource name on the resource service constructor dynamically

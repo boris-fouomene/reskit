@@ -1,6 +1,6 @@
 import { IResourcePrimaryKey, IResourceOperationResult, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataProvider, isNonNullString, defaultStr } from "@resk/core";
-import { DynamicModule, Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { Repository } from "typeorm";
+import { DynamicModule, Inject, Injectable, NotFoundException, Provider } from "@nestjs/common";
+import { DataSourceOptions, Repository } from "typeorm";
 import { getRepositoryToken, TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { EntityClassOrSchema } from "@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type";
 
@@ -35,6 +35,41 @@ export abstract class ResourceRepository<DataType = any> implements IResourceDat
         return result as IResourceOperationResult<DataType>;
     }
 }
+export class ResourceBaseRepository<DataType extends IResourceEntity = any> extends ResourceRepository<DataType> {
+    create(record: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
+        throw new Error("Method not implemented.");
+    }
+    update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
+        throw new Error("Method not implemented.");
+    }
+    delete(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<any>> {
+        throw new Error("Method not implemented.");
+    }
+    findOne(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType | null>> {
+        throw new Error("Method not implemented.");
+    }
+    find(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
+        throw new Error("Method not implemented.");
+    }
+    findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
+        throw new Error("Method not implemented.");
+    }
+    createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>> {
+        throw new Error("Method not implemented.");
+    }
+    updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>> {
+        throw new Error("Method not implemented.");
+    }
+    deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<any[]>> {
+        throw new Error("Method not implemented.");
+    }
+    count(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourceOperationResult<number>> {
+        throw new Error("Method not implemented.");
+    }
+    exists(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<boolean>> {
+        throw new Error("Method not implemented.");
+    }
+}
 
 export interface IDataSourcesMap {
     typeorm?: any;
@@ -48,9 +83,9 @@ export type IDataSourceName = keyof IDataSourcesMap;
 
 export interface IDataSourceMetaData<EntityType = any> {
     name: IDataSourceName,
-    injectEntity: (Entity: EntityType, ...args: any[]) => any,
+    getRepositoryToken: (Entity: EntityType, ...args: any[]) => any,
     entities?: EntityType[];
-    forRoot: (...args: any[]) => Promise<DynamicModule>;
+    forRoot: <ModuleOptions = any, ModuleOptions2 = any, ModuleOptions3 = any>(options?: ModuleOptions, options2?: ModuleOptions2, options3?: ModuleOptions3, ...args: any[]) => Promise<DynamicModule>;
 }
 
 export class DataSourceManager {
@@ -59,6 +94,7 @@ export class DataSourceManager {
         return 'typeorm';
     }
     /***
+     * 
      * register a repository
      * @param {IDataSourceMetaData} options
      */
@@ -72,6 +108,16 @@ export class DataSourceManager {
         }
         return metadata;
     }
+    static registerEntities<EntityType = any>(entities: EntityType[], dataSourceName?: IDataSourceName,): Record<IDataSourceName, IDataSourceMetaData<EntityType>> {
+        const metaData = this.get(dataSourceName);
+        const allEnt = metaData.entities = Array.isArray(metaData.entities) ? metaData.entities : [];
+        (Array.isArray(entities) ? entities : []).forEach(entity => {
+            if (!allEnt.includes(entity) && entity && typeof entity === 'function') {
+                allEnt.push(entity);
+            }
+        });
+        return this.register(metaData);
+    }
     static getDataSourceEntities<EntityType = any>(dataSourceName: IDataSourceName): EntityType[] {
         const metaData = this.get(dataSourceName);
         return (Array.isArray(metaData?.entities) ? metaData.entities : []) as EntityType[];
@@ -79,25 +125,28 @@ export class DataSourceManager {
     static getAll(): Record<IDataSourceName, IDataSourceMetaData> {
         return Object.assign({}, Reflect.getMetadata(this.dataSourceMetaData, DataSourceManager));
     }
-    static get<EntityType = any>(dataSourceName: IDataSourceName): IDataSourceMetaData<EntityType> | undefined {
-        if (!isNonNullString(dataSourceName)) return undefined;
-        return this.getAll()[dataSourceName] || undefined;
-    }
-    static getDefault(): IDataSourceMetaData | undefined {
-        const defaultDataSourceName = this.getDefaultDataSourceName();
-        if (!defaultDataSourceName) return undefined;
-        return this.getAll()[defaultDataSourceName] || undefined;
-    }
-    static async forRoot(dataSourceName: IDataSourceName, ...args: any[]): Promise<DynamicModule | undefined> {
+    static get<EntityType = any>(dataSourceName?: IDataSourceName): IDataSourceMetaData<EntityType> {
         dataSourceName = defaultStr(dataSourceName, this.getDefaultDataSourceName()) as IDataSourceName;
-        return await this.get(dataSourceName)?.forRoot(...args);
+        return this.getAll()[dataSourceName];
     }
-    static inject(entity: IResourceRepositoryEntity, ...args: any[]): ReturnType<typeof Inject> {
-        const defaultRepository = this.getDefault();
-        if (!defaultRepository) {
+    static async forRoot<ModuleOptions = any, ModuleOptions2 = any, ModuleOptions3 = any>(dataSourceName: IDataSourceName, options?: ModuleOptions, options2?: ModuleOptions2, options3?: ModuleOptions3, ...args: any[]): Promise<DynamicModule> {
+        const dataSourceMeta = this.get(dataSourceName);
+        return await (dataSourceMeta.forRoot.bind(dataSourceMeta))<ModuleOptions, ModuleOptions2, ModuleOptions3>(options, options2, options3, ...args);
+    }
+    static getRepositoryToken(entity: IResourceRepositoryEntity, dataSourceName?: IDataSourceName, ...args: any[]): Parameters<typeof Inject>[0] {
+        dataSourceName = defaultStr(dataSourceName, DataSourceManager.getDefaultDataSourceName()) as IDataSourceName;
+        const dataSourceMeta = this.get(dataSourceName);
+        if (!dataSourceMeta) {
             throw new Error('No default repository found');
         }
-        return Inject(defaultRepository.injectEntity(entity, ...args));
+        dataSourceMeta.entities = Array.isArray(dataSourceMeta.entities) ? dataSourceMeta.entities : [];
+        if (!dataSourceMeta.entities.includes(entity)) {
+            dataSourceMeta.entities.push(entity);
+        }
+        const all = this.getAll();
+        all[dataSourceName] = dataSourceMeta;
+        Reflect.defineMetadata(this.dataSourceMetaData, all, DataSourceManager);
+        return dataSourceMeta.getRepositoryToken(entity, ...args);
     }
 }
 /**
@@ -105,9 +154,10 @@ export class DataSourceManager {
  * @param entity - The entity for which to inject the repository.
  * @returns The injected repository.
  */
-export function InjectEntity<EntityType extends IResourceRepositoryEntity = any>(entity: EntityType) {
-    console.log("injecting ", entity, " is entity")
-    return Inject(DataSourceManager.inject(entity));
+export function InjectRepository<EntityType extends IResourceRepositoryEntity = any>(entity: EntityType, dataSourceName?: IDataSourceName, ...args: any[]): PropertyDecorator & ParameterDecorator {
+    DataSourceManager.registerEntities([entity], dataSourceName);
+    const repositoryToken = DataSourceManager.getRepositoryToken(entity, dataSourceName, ...args);
+    return Inject(repositoryToken);
 };
 
 
@@ -120,16 +170,39 @@ export function DataSource<EntityType = any>(options: IDataSourceMetaData<Entity
 
 @DataSource<EntityClassOrSchema>({
     name: 'typeorm',
-    injectEntity: (Entity, ...args: any[]) => getRepositoryToken(Entity, ...args),
-    forRoot: async (options?: TypeOrmModuleOptions) => {
-        const r = await TypeOrmModule.forRoot(options);
+    getRepositoryToken: (Entity, ...args: any[]) => `${getRepositoryToken(Entity, ...args)}`,
+    forRoot: async function (options) {
+        const moduleOptions: TypeOrmModuleOptions = Object.assign({}, options) as TypeOrmModuleOptions;
+        const providers: Provider[] = [];
+        (Array.isArray(this.entities) ? this.entities : []).forEach(entity => {
+            providers.push({
+                provide: `${this.getRepositoryToken(entity)}TypeOrmRepository`,
+                useFactory: (repository: Repository<typeof entity>) => {
+                    return new TypeOrmRepository(repository);
+                },
+                inject: [getRepositoryToken(entity)],
+            });
+        });
+        const r = await TypeOrmModule.forRoot({
+            ...moduleOptions,
+            entities: this.entities,
+        });
+        const features = TypeOrmModule.forFeature(this.entities);
         return {
-            ...Object.assign({}, r),
-            imports: [TypeOrmModule, ...(Array.isArray(r.imports) ? r.imports : [])],
-        };
+            isGlobal: true,
+            ...r,
+            module: class _TypeOrm8module { },
+            imports: [features, ...(Array.isArray(r.imports) ? r.imports : [])],
+            exports: [...(Array.isArray(r.exports) ? r.exports : []), ...providers],
+            providers: [...(Array.isArray(r.providers) ? r.providers : []), ...providers],
+        }
     },
 })
+@Injectable()
 export class TypeOrmRepository<DataType extends IResourceEntity = any> extends ResourceRepository<DataType> {
+    constructor(readonly repository: Repository<DataType>) {
+        super();
+    }
     async create(data: Partial<DataType>) {
         const entity = this.repository.create();
         const result = await this.repository.save(entity, { data });
@@ -159,6 +232,7 @@ export class TypeOrmRepository<DataType extends IResourceEntity = any> extends R
             ...options,
             take: typeof options?.limit === 'number' ? options.limit : undefined,
         });
+        console.log(data, " is data found ");
         return { data, success: true };
     }
     async findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
@@ -181,9 +255,6 @@ export class TypeOrmRepository<DataType extends IResourceEntity = any> extends R
     async exists(primaryKey: IResourcePrimaryKey) {
         const data = await this.repository.exists(primaryKey);
         return { data, success: true };
-    }
-    constructor(private readonly repository: Repository<DataType>) {
-        super();
     }
     getRepository(): Repository<DataType> {
         return this.repository;

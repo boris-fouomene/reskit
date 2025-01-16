@@ -1,6 +1,6 @@
 import { IResourcePrimaryKey, IResourceOperationResult, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataProvider, isNonNullString, defaultStr, isObj, isPrimitive } from "@resk/core";
 import { DynamicModule, Inject, Injectable, NotFoundException, Provider } from "@nestjs/common";
-import { DataSourceOptions, Repository } from "typeorm";
+import { DataSourceOptions, EntityManager, Repository } from "typeorm";
 import { getRepositoryToken, TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { EntityClassOrSchema } from "@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type";
 import { getPrimaryKeys, PrimaryKeys } from "./decorators";
@@ -22,6 +22,7 @@ export abstract class ResourceRepository<DataType = any> implements IResourceDat
     abstract deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<any[]>>;
     abstract count(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourceOperationResult<number>>;
     abstract exists(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<boolean>>;
+    abstract executeInTransaction<R>(callback: (transaction: ITransaction) => Promise<R>): Promise<R>;
     distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourceOperationResult<DataType[]>> {
         throw new Error("Method distinct not implemented.");
     }
@@ -37,6 +38,9 @@ export abstract class ResourceRepository<DataType = any> implements IResourceDat
     }
 }
 export class ResourceBaseRepository<DataType extends IResourceEntity = any> extends ResourceRepository<DataType> {
+    executeInTransaction<R>(callback: (transaction: ITransaction) => Promise<R>): Promise<R> {
+        throw new Error("Method not implemented.");
+    }
     create(record: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
         throw new Error("Method not implemented.");
     }
@@ -204,6 +208,30 @@ export class TypeOrmRepository<DataType extends IResourceEntity = any> extends R
             this.columns[column.propertyName] = column;
         });
     }
+    async executeInTransaction<R>(callback: (transaction: ITransaction<DataType>) => Promise<R>): Promise<R> {
+        const dataSource = this.repository.manager.connection; // Get the DataSource from the repository
+        return new Promise(async (resolve, reject) => {
+            // Use the `transaction` method of the DataSource
+            await dataSource.transaction(async (manager: EntityManager) => {
+                try {
+                    // Execute the transactional operation using the EntityManager
+                    const result = await callback({
+                        getRepository: () => this,
+                        commit: async () => {
+                            resolve(result);
+                        },
+                        rollback: async (error) => {
+                            throw (error instanceof Error ? error : new Error(error || 'Transaction rollback'));
+                        },
+                    });
+                } catch (error) {
+                    console.error('Transaction failed, rolling back.', error);
+                    // Any error will automatically roll back the transaction
+                    throw error; // Rethrow to propagate the error
+                }
+            });
+        });
+    }
     async create(data: Partial<DataType>) {
         const entity = this.repository.create();
         const result = await this.repository.save(entity, { data });
@@ -276,4 +304,14 @@ export class TypeOrmRepository<DataType extends IResourceEntity = any> extends R
     getRepository(): Repository<DataType> {
         return this.repository;
     }
+}
+
+export interface ITransactionProvider {
+    startTransaction(): Promise<ITransaction>;
+}
+
+export interface ITransaction<DataType extends IResourceEntity = any> {
+    commit(): Promise<void>;
+    rollback(error?: any): Promise<void>;
+    getRepository(): ResourceRepository<DataType>;
 }

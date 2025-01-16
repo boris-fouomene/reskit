@@ -24,7 +24,6 @@ const resourcesClassNameMetaData = Symbol('resourceByClassName');
  * the constructor with the instance properties. It also retrieves and manages resource fields using the `getFields` method.
  * 
  * @template DataType - The type of data the resource is expected to handle. By default, it accepts any type (`DataType=any`).
- * @template PrimaryKeyType - The type of the primary key for the resource. Defaults to `IResourcePrimaryKey`.
  * @template EventType - The type of event that the resource can emit. Defaults to `IResourceActionName`.
  * 
  * @extends ObservableClass<EventType> - Extends the `ObservableClass` to enable event-based communication.
@@ -55,10 +54,10 @@ const resourcesClassNameMetaData = Symbol('resourceByClassName');
  * console.log(dynamicResource.getFields()); 
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
-export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> {
+export abstract class ResourceBase<DataType = any, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> {
   actions?: IResourceActionMap;
-  metaData?: IResource<DataType, PrimaryKeyType>;
-  getMetaData(): IResource<DataType, PrimaryKeyType> {
+  metaData?: IResource<DataType>;
+  getMetaData(): IResource<DataType> {
     return Object.assign({}, this.metaData);
   }
   static events = observableFactory<IResourceDefaultEvent | "string">();
@@ -174,9 +173,9 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
   }
   /**
    * get the data provider for the resource.
-   * @returns {IResourceDataProvider<DataType, PrimaryKeyType>} The data provider for the resource.
+   * @returns {IResourceDataProvider<DataType>} The data provider for the resource.
    */
-  abstract getDataProvider(): IResourceDataProvider<DataType, PrimaryKeyType>;
+  abstract getDataProvider(): IResourceDataProvider<DataType>;
   /***
    * trigger the event
    * @param event - The event to trigger.
@@ -221,10 +220,10 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
   }
   /***
    * Fetches all records from the resource.
-   * @param {IResourceQueryOptions<DataType, PrimaryKeyType>} options - Optional options for fetching resources.
+   * @param {IResourceQueryOptions<DataType>} options - Optional options for fetching resources.
    * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  find(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
+  find(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>> {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
       return this.getDataProvider()?.find(options).then((result) => {
         this._trigger("find" as EventType, result);
@@ -234,10 +233,10 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
   }
   /***
    * fetches a single record from the resource.
-   * @param {PrimaryKeyType} key - The primary key of the resource.
+   * @param {IResourcePrimaryKey} key - The primary key of the resource.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  findOne(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<DataType | null>> {
+  findOne(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType | null>> {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
       .then(() => {
         return this.getDataProvider().findOne(primaryKey).then((result) => {
@@ -249,22 +248,22 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
   /***
    * fetches a single record from the resource.
    * If the record is not found, it throws an error.
-   * @param {PrimaryKeyType} primaryKey - The primary key of the resource.
+   * @param {IResourcePrimaryKey} primaryKey - The primary key of the resource.
    */
-  async findOneOrFail(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<DataType>> {
+  async findOneOrFail(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType>> {
     const result = await this.findOne(primaryKey);
-    if (!result?.data) {
+    if (!isObj(result?.data)) {
       throw new Error(i18n.t("resources.notFoundError", Object.assign({}, { primaryKey: JSON.stringify(primaryKey) }, this.getTranslateParams())));
     }
-    return result as Promise<IResourceOperationResult<DataType>>;
+    return result as unknown as Promise<IResourceOperationResult<DataType>>;
   }
   /**
    * updates a record in the resource.
-   * @param key {PrimaryKeyType} The primary key of the resource to update.
+   * @param key {IResourcePrimaryKey} The primary key of the resource to update.
    * @param updatedData
    * @returns 
    */
-  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
+  update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
     return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
       .then(() => {
         return this.getDataProvider()?.update(primaryKey, updatedData).then((result) => {
@@ -275,10 +274,10 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
   }
   /***
    * deletes a record from the resource.
-   * @param primaryKey {PrimaryKeyType} The primary key of the resource to delete.
+   * @param primaryKey {IResourcePrimaryKey} The primary key of the resource to delete.
    * @returns Promise<IResourceOperationResult<any>> A promise that resolves to the result of the delete operation.
    */
-  delete(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<any>> {
+  delete(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<any>> {
     return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
       .then(() => {
         return this.getDataProvider()?.delete(primaryKey).then((result) => {
@@ -293,7 +292,7 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
    * @param options - Optional query options to filter, sort, and paginate the results.
    * @returns A promise that resolves to an object containing the list of records and the total count.
    */
-  findAndCount(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>> {
+  findAndCount(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>> {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
       .then(() => {
         return this.getDataProvider().findAndCount(options).then((result) => {
@@ -335,7 +334,7 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
    * @param criteria - The query options to filter the records to be deleted.
    * @returns A promise that resolves to the result of the delete operation.
    */
-  deleteMany(criteria: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any[]>> {
+  deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<any[]>> {
     return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
       .then(() => {
         return this.getDataProvider().deleteMany(criteria).then((result) => {
@@ -349,7 +348,7 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
    * @param options - Optional query options to filter the results.
    * @returns {Promise<IResourceOperationResult<number>>} A promise that resolves to the result of the count operation.
    */
-  count(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<number>> {
+  count(options?: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<number>> {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
       .then(() => {
         return this.getDataProvider().count(options).then((result) => {
@@ -360,10 +359,10 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
   }
   /***
    * checks if the resource has the record
-   * @param {PrimaryKeyType} primaryKey - The primary key of the record to check.
+   * @param {IResourcePrimaryKey} primaryKey - The primary key of the record to check.
    * @returns {Promise<IResourceOperationResult<boolean>>} A promise that resolves to the result of the exists operation.
    */
-  exists(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<boolean>> {
+  exists(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<boolean>> {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
       .then(() => {
         return this.getDataProvider().exists(primaryKey).then((result) => {
@@ -797,7 +796,7 @@ export class ResourcesManager {
    * 
    * @returns {Record<IResourceName, IResource<any,any>>} A copy of the resource metaData record.
    */
-  public static getAllMetaData(): Record<IResourceName, IResource<any, any>> {
+  public static getAllMetaData(): Record<IResourceName, IResource<any>> {
     return Object.assign({}, Reflect.getMetadata(resourcesMetaDataKey, ResourcesManager));
   }
   /**
@@ -858,7 +857,7 @@ export class ResourcesManager {
    * @param {IResourceName} resourceName - The unique name of the resource to retrieve the metaData for.
    * @returns {IResource<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
    */
-  public static getMetaData(resourceName: IResourceName): IResource<any, any> | undefined {
+  public static getMetaData(resourceName: IResourceName): IResource<any> | undefined {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     return (allOptions as any)[resourceName];
@@ -874,7 +873,7 @@ export class ResourcesManager {
    * @param {string} className - The class name of the resource to retrieve the metaData for.
    * @returns {IResource<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
    */
-  public static getMetaDataByClassName(className: string): IResource<any, any> | undefined {
+  public static getMetaDataByClassName(className: string): IResource<any> | undefined {
     const resourceName = this.getNameByClassName(className);
     if (!resourceName) return undefined;
     return this.getMetaData(resourceName);

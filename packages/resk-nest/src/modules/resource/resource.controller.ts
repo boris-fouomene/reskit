@@ -1,10 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ResourceService } from './resource.service';
-import { BaseController } from '../base/base.controller';
-import { ResourceDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { isNonNullString, IResourceName } from '@resk/core';
 import { ResourcesManager } from '@resk/core';
+import { IResourceEntity } from '../data-source';
 
 /**
  * The `ResourceController` class is a NestJS controller that provides CRUD operations for a resource.
@@ -16,7 +15,7 @@ import { ResourcesManager } from '@resk/core';
  */
 @Controller()
 @ApiTags('resource')
-export class ResourceController<DataType extends ResourceDto = ResourceDto, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> extends BaseController<ServiceType> {
+export class ResourceController<DataType extends IResourceEntity = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
   /**
    * Initializes the `ResourceController` instance with the provided `ResourceService`.
    * If the `resourceName` property is not set on the `ResourceService` constructor, it is set to the `resourceName` property of the `ResourceController` instance.
@@ -25,7 +24,6 @@ export class ResourceController<DataType extends ResourceDto = ResourceDto, Serv
    * @param resourceService - The `ResourceService` instance to be used by the `ResourceController`.
    */
   constructor(protected resourceService: ServiceType) {
-    super();
     try {
       if (isNonNullString((resourceService.constructor as any).resourceName)) return;
       ///Set the resource name on the resource service constructor dynamically

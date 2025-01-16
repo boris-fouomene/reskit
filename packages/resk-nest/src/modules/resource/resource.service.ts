@@ -1,19 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { defaultStr, IResourceDataProvider, IResourceName, IResourcePrimaryKey, ResourceBase } from '@resk/core';
-import { ResourceDto } from './dto';
-import { IResourceDataSource } from '../data-source/interfaces';
-
+import { defaultStr, IResourceDataProvider, IResourceName, ResourceBase } from '@resk/core';
+import { IResourceEntity, ResourceRepository } from '../data-source';
 /**
  * The `ResourceService` class is an injectable service that extends the `ResourceBase` class.
  * It provides a generic implementation for managing resources in a NestJS application.
  *
  * The `ResourceService` class is parameterized with two type parameters:
  * - `DataType`: Extends the `ResourceDto` class, representing the data type of the resource.
- * - `PrimaryKeyType`: Extends the `IResourcePrimaryKey` interface, representing the primary key type of the resource.
- *
  * @template DataType - The type of data that the service will handle. Defaults to `ResourceDto`.
- * @template PrimaryKeyType - The type of the primary key for the resource. Defaults to `IResourcePrimaryKey`.
- *
  * @example
  * // Example of extending the ResourceService for a specific resource
  * import { Injectable } from '@nestjs/common';
@@ -21,26 +15,26 @@ import { IResourceDataSource } from '../data-source/interfaces';
  *
  * @Injectable()
  * export class UserService extends ResourceService<UserDto> {
- *     constructor(dataSource: IResourceDataSource) {
- *         super(dataSource);
+ *     constructor(resourceRepository: ResourceDataSource) {
+ *         super(resourceRepository);
  *     }
  *     // Additional methods for UserService can be added here
  * }
  */
 @Injectable()
-export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceBase<DataType, PrimaryKeyType> {
-  constructor(protected dataSource: IResourceDataSource) {
+export class ResourceService<DataType extends IResourceEntity = any> extends ResourceBase<DataType> {
+  constructor(protected resourceRepository: ResourceRepository<DataType>) {
     super();
   }
   /***
    * Returns the data source associated with the `ResourceService` instance.
    * The data source is used to interact with the underlying data storage or service.
    */
-  getDataSource(): IResourceDataSource {
-    return this.dataSource;
+  getRespository(): ResourceRepository<DataType> {
+    return this.resourceRepository;
   }
-  getDataProvider(): IResourceDataProvider<DataType, PrimaryKeyType> {
-    return this.getDataSource().getDataProvider<DataType, PrimaryKeyType>(this.getResourceName());
+  getDataProvider(): IResourceDataProvider<DataType> {
+    return this.getRespository();
   }
   /**
   * Returns the resource name associated with the `ResourceService` instance.

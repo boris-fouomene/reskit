@@ -908,16 +908,15 @@ export type IResourceActionName = keyof IResourceActionMap;
  * Represents a resource with a data provider and various metadata properties.
  *
  * @template DataType - The type of data the resource handles.
- * @template PrimaryKeyType - The type of the primary key for the resource.
- *
- * @property {IResourceDataProvider<DataType, PrimaryKeyType>} dataProvider - The data provider for the resource.
+
+ * @property {IResourceDataProvider<DataType>} dataProvider - The data provider for the resource.
  * @property {IResourceName} [name] - The internal name of the resource used for programmatic referencing.
  * @property {string} [label] - A user-friendly label for the resource, typically used in UI elements.
  * @property {string} [title] - A descriptive title for the resource, often displayed in prominent places.
  * @property {string} [tooltip] - A short text that appears when the user hovers over the resource, providing additional context.
  * @property {IResourceActionMap} [actions] - The actions associated with the resource.
  */
-export interface IResource<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+export interface IResource<DataType = any> {
   /**
    * The internal name of the resource.
    *
@@ -1283,13 +1282,13 @@ export type IDictKeysAsString<T> = keyof T extends string ? keyof T : never;
  * - **String**: A simple string value that can represent a unique identifier.
  *   - **Example**: 
  *     ```typescript
- *     const userId: IResourcePrimaryKey = "user123"; // A unique username
+ *     const userId: IResourcePrimaryKey = { id: "user123" }; // A unique username
  *     ```
  * 
  * - **Number**: A numeric value that can also serve as a unique identifier.
  *   - **Example**: 
  *     ```typescript
- *     const orderId: IResourcePrimaryKey = 456; // An auto-incremented order ID
+ *     const orderId: IResourcePrimaryKey = { id: 456 }; // An auto-incremented order ID
  *     ```
  * 
  * - **Record<string, string | number>**: An object where the keys are strings
@@ -1336,7 +1335,7 @@ export type IDictKeysAsString<T> = keyof T extends string ? keyof T : never;
  * essential for applications that manage diverse data structures and require
  * unique identification of resources.
  */
-export type IResourcePrimaryKey = string | number | Record<string, any>;
+export type IResourcePrimaryKey = Record<string, any>;
 
 /**
  * @interface IResourceOperationResult
@@ -1418,8 +1417,11 @@ export type IResourcePrimaryKey = string | number | Record<string, any>;
 export interface IResourceOperationResult<DataType = any> {
   statusCode?: number; // HTTP status code for the operation
   success?: boolean; // Indicates if the operation was successful
-  data?: DataType; // Optional data returned from the operation
-  error?: string | Error; // Optional error message if the operation failed
+  data: DataType; // Optional data returned from the operation
+  error?: any; // Optional error message if the operation failed
+  message?: string; // Optional message for the operation
+  status?: string; // Optional status of the operation
+  errors?: string | Error[]; // Optional errors for the operation
 }
 
 /**
@@ -1432,9 +1434,6 @@ export interface IResourceOperationResult<DataType = any> {
  * @template DataType - The type of the resource data being managed. Defaults to `any`,
  * allowing for flexibility in the type of data handled by the provider.
  * 
- * @template PrimaryKeyType - The type of the primary key used to identify resources. 
- * It extends `IResourcePrimaryKey`, which can be a string, number, or a composite key.
- * Defaults to `string | number`.
  * 
  * ### Methods:
  * 
@@ -1448,7 +1447,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.create({ name: "New Resource" });
  *     ```
  * 
- * - **update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>)**: Updates an existing resource record.
+ * - **update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>)**: Updates an existing resource record.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to update.
  *     - `updatedData`: An object containing the updated data for the resource.
@@ -1459,7 +1458,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.update("resourceId", { name: "Updated Resource" });
  *     ```
  * 
- * - **delete(primaryKey: PrimaryKeyType)**: Deletes a resource record by its primary key.
+ * - **delete(primaryKey: IResourcePrimaryKey)**: Deletes a resource record by its primary key.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to delete.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<any>`, 
@@ -1469,7 +1468,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.delete("resourceId");
  *     ```
  * 
- * - **findOne(primaryKey: PrimaryKeyType)**: Retrieves a single resource record by its primary key.
+ * - **findOne(primaryKey: IResourcePrimaryKey)**: Retrieves a single resource record by its primary key.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to retrieve.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType | null>`, 
@@ -1479,7 +1478,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.findOne("resourceId");
  *     ```
  * 
- * - **findOneOrFail(primaryKey: PrimaryKeyType)**: Retrieves a single resource record by its primary key or throws an error if not found.
+ * - **findOneOrFail(primaryKey: IResourcePrimaryKey)**: Retrieves a single resource record by its primary key or throws an error if not found.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to retrieve.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
@@ -1489,7 +1488,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.findOneOrFail("resourceId");
  *     ```
  * 
- * - **find(options?: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Retrieves multiple resource records based on query options.
+ * - **find(options?: IResourceQueryOptions<DataType>)**: Retrieves multiple resource records based on query options.
  *   - **Parameters**:
  *     - `options`: Optional query options to filter the results.
  *   - **Returns**: A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
@@ -1499,7 +1498,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.find({ limit: 10, skip: 0 });
  *     ```
  * 
- * - **findAndCount(options?: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Retrieves multiple resource records and the total count based on query options.
+ * - **findAndCount(options?: IResourceQueryOptions<DataType>)**: Retrieves multiple resource records and the total count based on query options.
  *   - **Parameters**:
  *     - `options`: Optional query options to filter the results.
  *   - **Returns**: A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
@@ -1529,7 +1528,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.updateMany({ status: "active" });
  *     ```
  * 
- * - **deleteMany(criteria: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Deletes multiple resource records based on criteria.
+ * - **deleteMany(criteria: IResourceQueryOptions<DataType>)**: Deletes multiple resource records based on criteria.
  *   - **Parameters**:
  *     - `criteria`: The criteria to filter which resources to delete.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<any[]>`, 
@@ -1539,7 +1538,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.deleteMany({ filters: { status: "inactive" } });
  *     ```
  * 
- * - **count(options?: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Counts the total number of resource records based on query options.
+ * - **count(options?: IResourceQueryOptions<DataType>)**: Counts the total number of resource records based on query options.
  *   - **Parameters**:
  *     - `options`: Optional query options to filter the count.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<number>`, 
@@ -1549,7 +1548,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.count({ filters: { status: "active" } });
  *     ```
  * 
- * - **exists(primaryKey: PrimaryKeyType)**: Checks if a resource record exists by its primary key.
+ * - **exists(primaryKey: IResourcePrimaryKey)**: Checks if a resource record exists by its primary key.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to check.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<boolean>`, 
@@ -1559,7 +1558,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.exists("resourceId");
  *     ```
  * 
- * - **distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType, PrimaryKeyType>)**: Retrieves distinct values for a specified field.
+ * - **distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType>)**: Retrieves distinct values for a specified field.
  *   - **Parameters**:
  *     - `field`: The field for which to retrieve distinct values.
  *     - `options`: Optional query options to filter the results.
@@ -1609,7 +1608,7 @@ export interface IResourceOperationResult<DataType = any> {
  * approach to data handling in applications.
 
  */
-export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+export interface IResourceDataProvider<DataType = any> {
   /***
    * Creates a new resource record.
    * @param record The data for the new resource to be created.
@@ -1632,7 +1631,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   *   const result = await dataProvider.update("resourceId", { name: "Updated Resource" });
   *     ```
    */
-  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
+  update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
   /***
    * Deletes a resource record by its primary key.
    * @param primaryKey The primary key of the resource to delete.
@@ -1643,7 +1642,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   *   const result = await dataProvider.delete("resourceId");
   *     ```
    */
-  delete(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<any>>;
+  delete(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<any>>;
   /***
    * Retrieves a single resource record by its primary key.
    * @param primaryKey The primary key of the resource to retrieve.
@@ -1654,7 +1653,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   *   const result = await dataProvider.findOne("resourceId");
   *     ```
    */
-  findOne(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<DataType | null>>;
+  findOne(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType | null>>;
   /***
    * Retrieves a single resource record by its primary key or throws an error if not found.
    * @param primaryKey The primary key of the resource to retrieve.
@@ -1665,7 +1664,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   *   const result = await dataProvider.findOneOrFail("resourceId");
   *     ```
    */
-  findOneOrFail(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<DataType>>;
+  findOneOrFail(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType>>;
   /***
    * Retrieves multiple resource records based on query options.
    * @param options Optional query options to filter the results.
@@ -1676,7 +1675,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   *   const result = await dataProvider.find({ limit: 10, skip: 0 });
   *     ```
    */
-  find(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
+  find(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>>;
   /***
    * Retrieves multiple resource records and the total count based on query options.
    * @param options Optional query options to filter the results.
@@ -1687,7 +1686,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   *   const result = await dataProvider.findAndCount({ limit: 10, skip: 0 });
   *     ```
    */
-  findAndCount(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourcePaginatedResult<DataType>>;
+  findAndCount(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>>;
   /***
    * Creates multiple resource records.
    * @param data An array of data for the new resources to be created.
@@ -1720,7 +1719,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   *   const result = await dataProvider.deleteMany({ filters: { status: "inactive" } });
   *     ```
    */
-  deleteMany(criteria: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<any[]>>;
+  deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<any[]>>;
   /***
    * Counts the total number of resource records based on query options.
    * @param options Optional query options to filter the count.
@@ -1731,7 +1730,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   *   const result = await dataProvider.count({ filters: { status: "active" } });
   *     ```
    */
-  count(options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<number>>;
+  count(options?: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<number>>;
   /**
    * 
    * @param primaryKey The primary key of the resource to check.
@@ -1742,13 +1741,13 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
   *   const result = await dataProvider.exists("resourceId");
   *     ```
    */
-  exists(primaryKey: PrimaryKeyType): Promise<IResourceOperationResult<boolean>>;
+  exists(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<boolean>>;
   /**
    * 
    * @param field The field to check for distinct values.
    * @param options 
    */
-  distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType, PrimaryKeyType>): Promise<IResourceOperationResult<DataType[]>>;
+  distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<DataType[]>>;
 
   /**
    * Aggregates resources based on a pipeline.
@@ -1764,9 +1763,6 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
  * including filters to narrow down the results based on specific criteria.
  * 
  * @template DataType - The type of data being fetched. Defaults to 'any'.
- * @template PrimaryKeyType - The type of the primary key for the resource. 
- *                            Defaults to IResourcePrimaryKey.
- * 
  * @example
  * // Example of using IResourceQueryOptions
  * const fetchOptions: IResourceQueryOptions<MyDataType, string> = {
@@ -1779,7 +1775,7 @@ export interface IResourceDataProvider<DataType = any, PrimaryKeyType extends IR
 *      skip: 0 // Do not skip any results
  * };
  */
-export interface IResourceQueryOptions<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+export interface IResourceQueryOptions<DataType = any> {
   /***
    * The filter criteria to apply to the query using the Mango query language.
    */
@@ -1817,7 +1813,7 @@ export interface IResourceQueryOptions<DataType = any, PrimaryKeyType extends IR
   /**
    * Where clause to filter the results.
    */
-  where?: Record<string, any>;
+  where?: Record<keyof DataType, any>;
 }
 
 /**
@@ -1911,11 +1907,11 @@ export interface IResourcePaginatedResult<DataType = any> extends Omit<IResource
     /** The total number of items available. */
     total: number;
     /** The current page number. */
-    currentPage: number;
+    currentPage?: number;
     /** The number of items per page. */
-    pageSize: number;
+    pageSize?: number;
     /** The total number of pages. */
-    totalPages: number;
+    totalPages?: number;
     /***
      * Whether there is a next page.
      */

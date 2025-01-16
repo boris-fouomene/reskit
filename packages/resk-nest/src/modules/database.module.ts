@@ -2,6 +2,7 @@ import { Global, Module } from "@nestjs/common";
 import { DataSourceManager } from "./data-source";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { DataSourceOptions } from "typeorm";
+import { CustomersModule } from './customers/customers.module';
 
 @Global()
 @Module({
@@ -13,7 +14,8 @@ import { DataSourceOptions } from "typeorm";
             username: 'root',
             password: 'admin123',
             database: 'xpose-ftc',
-        })
+        }),
+        CustomersModule
     ],
 })
 export class DatabaseModule { }

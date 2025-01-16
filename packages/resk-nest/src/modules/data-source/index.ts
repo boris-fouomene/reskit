@@ -85,6 +85,7 @@ export interface IDataSourceMetaData<EntityType = any> {
     name: IDataSourceName,
     getRepositoryToken: (Entity: EntityType, ...args: any[]) => any,
     entities?: EntityType[];
+    createProviders: (...entities: EntityType[]) => Provider[];
     forRoot: <ModuleOptions = any, ModuleOptions2 = any, ModuleOptions3 = any>(options?: ModuleOptions, options2?: ModuleOptions2, options3?: ModuleOptions3, ...args: any[]) => Promise<DynamicModule>;
 }
 
@@ -170,32 +171,21 @@ export function DataSource<EntityType = any>(options: IDataSourceMetaData<Entity
 
 @DataSource<EntityClassOrSchema>({
     name: 'typeorm',
-    getRepositoryToken: (Entity, ...args: any[]) => `${getRepositoryToken(Entity, ...args)}`,
-    forRoot: async function (options) {
-        const moduleOptions: TypeOrmModuleOptions = Object.assign({}, options) as TypeOrmModuleOptions;
-        const providers: Provider[] = [];
-        (Array.isArray(this.entities) ? this.entities : []).forEach(entity => {
-            providers.push({
-                provide: `${this.getRepositoryToken(entity)}TypeOrmRepository`,
-                useFactory: (repository: Repository<typeof entity>) => {
-                    return new TypeOrmRepository(repository);
-                },
+    getRepositoryToken: (Entity, ...args: any[]) => `${getRepositoryToken(Entity, ...args)}TypeOrm`,
+    createProviders: function (...entities: EntityClassOrSchema[]) {
+        return entities.map(entity => {
+            return {
+                provide: this.getRepositoryToken(entity),
+                useFactory: (repository: Repository<typeof entity>) => new TypeOrmRepository(repository),
                 inject: [getRepositoryToken(entity)],
-            });
+            };
         });
-        const r = await TypeOrmModule.forRoot({
-            ...moduleOptions,
+    },
+    forRoot: async function (options) {
+        return await TypeOrmModule.forRoot({
+            ...Object.assign({}, options),
             entities: this.entities,
         });
-        const features = TypeOrmModule.forFeature(this.entities);
-        return {
-            isGlobal: true,
-            ...r,
-            module: class _TypeOrm8module { },
-            imports: [features, ...(Array.isArray(r.imports) ? r.imports : [])],
-            exports: [...(Array.isArray(r.exports) ? r.exports : []), ...providers],
-            providers: [...(Array.isArray(r.providers) ? r.providers : []), ...providers],
-        }
     },
 })
 @Injectable()

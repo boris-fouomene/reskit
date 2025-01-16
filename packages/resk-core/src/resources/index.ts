@@ -114,7 +114,6 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
    */
   tooltip?: string;
 
-
   /**
   * A type that represents a map of field names to their corresponding IField instances.
    @description this is the list of fields that are part of the resource.It's a map where each key represents a field name, and the value contains field metadata.

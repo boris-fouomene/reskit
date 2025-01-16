@@ -135,7 +135,7 @@ ResourcesManager.parseApiOperationId = function (operationId: string): { control
  * @returns {ApiOperationOptions | undefined} The API operation options or undefined if not found.
  */
 ResourcesManager.getApiDescription = function (resourceName: IResourceName, method?: string): ApiOperationOptions | undefined {
-  const resourceOptions = ResourcesManager.getOptions(resourceName);
+  const resourceOptions = ResourcesManager.getMetaData(resourceName);
   if (!isObj(resourceOptions) || !isObj(resourceOptions?.apiDescription) || !isNonNullString(method)) return;
   return (resourceOptions?.apiDescription as any)[method];
 }

@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { IResourceDataProvider, IResourceName, IResourcePrimaryKey } from '@resk/core';
-import { BaseService } from '../base/base.service';
+import { defaultStr, IResourceDataProvider, IResourceName, IResourcePrimaryKey, ResourceBase } from '@resk/core';
 import { ResourceDto } from './dto';
 import { IResourceDataSource } from '../data-source';
 
 /**
- * The `ResourceService` class is an injectable service that extends the `BaseService` class.
+ * The `ResourceService` class is an injectable service that extends the `ResourceBase` class.
  * It provides a generic implementation for managing resources in a NestJS application.
  *
  * The `ResourceService` class is parameterized with two type parameters:
@@ -29,7 +28,7 @@ import { IResourceDataSource } from '../data-source';
  * }
  */
 @Injectable()
-export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends BaseService<DataType> {
+export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceBase<DataType, PrimaryKeyType> {
   constructor(protected dataSource: IResourceDataSource) {
     super();
   }
@@ -51,60 +50,6 @@ export class ResourceService<DataType extends ResourceDto = any, PrimaryKeyType 
   * @returns {IResourceName} The resource name.
   */
   getResourceName(): IResourceName {
-    return ((this.constructor as any)["resourceName"] || 'resourceBase') as IResourceName;
-  }
-  /**
-   * Retrieves all records from the data provider.
-   *
-   * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the paginated result.
-   */
-  getAll() {
-    return this.getDataProvider().list();
-  }
-  /**
-   * Creates a new record in the data provider.
-   *
-   * @param {Partial<DataType>} record - The record to create.
-   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the operation result.
-   */
-  create(record: Partial<DataType>) {
-    return this.getDataProvider().create(record);
-  }
-  /**
-   * Updates an existing record in the data provider.
-   *
-   * @param {PrimaryKeyType} id - The primary key of the record to update.
-   * @param {Partial<DataType>} record - The updated data for the record.
-   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the operation result.
-   */
-  update(id: PrimaryKeyType, record: Partial<DataType>) {
-    return this.getDataProvider().update(id, record);
-  }
-  /**
-   * Deletes a record from the data provider.
-   *
-   * @param {PrimaryKeyType} id - The primary key of the record to delete.
-   * @returns {Promise<IResourceOperationResult<any>>} A promise that resolves to the operation result.
-   */
-  delete(id: PrimaryKeyType) {
-    return this.getDataProvider().delete(id);
-  }
-  /**
-   * Retrieves a single record from the data provider.
-   *
-   * @param {PrimaryKeyType} id - The primary key of the record to retrieve.
-   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the operation result.
-   */
-  getOne(id: PrimaryKeyType) {
-    return this.getDataProvider().read(id);
-  }
-  /**
-     * Retrieves detailed information about a record.
-     *
-     * @param {PrimaryKeyType} id - The primary key of the record to retrieve details for.
-     * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the operation result.
-     */
-  getDetails(id: PrimaryKeyType) {
-    return this.getDataProvider().details(id);
+    return (defaultStr((this.constructor as any)["resourceName"], 'resourceBase')) as IResourceName;
   }
 }

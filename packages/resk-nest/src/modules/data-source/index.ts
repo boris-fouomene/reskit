@@ -1,9 +1,10 @@
-import { IResourcePrimaryKey, IResourceOperationResult, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataProvider, isNonNullString, defaultStr } from "@resk/core";
+import { IResourcePrimaryKey, IResourceOperationResult, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataProvider, isNonNullString, defaultStr, isObj, isPrimitive } from "@resk/core";
 import { DynamicModule, Inject, Injectable, NotFoundException, Provider } from "@nestjs/common";
 import { DataSourceOptions, Repository } from "typeorm";
 import { getRepositoryToken, TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { EntityClassOrSchema } from "@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type";
-
+import { getPrimaryKeys, PrimaryKeys } from "./decorators";
+import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
 
 
 export interface IResourceEntity extends Record<string, any> { }
@@ -190,8 +191,18 @@ export function DataSource<EntityType = any>(options: IDataSourceMetaData<Entity
 })
 @Injectable()
 export class TypeOrmRepository<DataType extends IResourceEntity = any> extends ResourceRepository<DataType> {
+    private readonly primaryColumns: Record<string, ColumnMetadata> = {};
+    private readonly columns: Record<string, ColumnMetadata> = {};
+    private readonly primaryColumnsNames: string[] = [];
     constructor(readonly repository: Repository<DataType>) {
         super();
+        repository.metadata.columns.map((column) => {
+            if (column.isPrimary) {
+                this.primaryColumns[column.propertyName] = column;
+                this.primaryColumnsNames.push(column.propertyName);
+            }
+            this.columns[column.propertyName] = column;
+        });
     }
     async create(data: Partial<DataType>) {
         const entity = this.repository.create();
@@ -199,18 +210,33 @@ export class TypeOrmRepository<DataType extends IResourceEntity = any> extends R
         return { data: result, success: true };
     }
     async update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>) {
-        await this.repository.update(primaryKey, updatedData as any);
+        await this.repository.update(this.buildConditions(primaryKey), updatedData as any);
         return this.findOneOrFail(primaryKey);
     }
     async delete(primaryKey: IResourcePrimaryKey) {
-        const result = await this.repository.delete(primaryKey);
+        const result = await this.repository.delete(this.buildConditions(primaryKey));
         return {
             data: result,
         };
     }
+    buildConditions(primaryKey: IResourcePrimaryKey) {
+        const condiitons: Record<string, any> = {};
+        if (primaryKey && isPrimitive(primaryKey)) {
+            this.primaryColumnsNames.map((column) => {
+                condiitons[column] = primaryKey;
+            });
+        } else if (isObj(primaryKey)) {
+            Object.entries(primaryKey).map(([key, value]) => {
+                if (this.columns[key]) {
+                    condiitons[key] = value;
+                }
+            });
+        }
+        return condiitons;
+    }
     async findOne(primaryKey: IResourcePrimaryKey) {
         try {
-            const data = await this.repository.findOne(primaryKey);
+            const data = await this.repository.findOne({ where: this.buildConditions(primaryKey) });
             return { data, success: true };
         } catch (error) {
             return { error, data: null };
@@ -222,7 +248,6 @@ export class TypeOrmRepository<DataType extends IResourceEntity = any> extends R
             ...options,
             take: typeof options?.limit === 'number' ? options.limit : undefined,
         });
-        console.log(data, " is data found ");
         return { data, success: true };
     }
     async findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
@@ -243,7 +268,9 @@ export class TypeOrmRepository<DataType extends IResourceEntity = any> extends R
         return { data, success: true };
     }
     async exists(primaryKey: IResourcePrimaryKey) {
-        const data = await this.repository.exists(primaryKey);
+        const data = await this.repository.exists({
+            where: this.buildConditions(primaryKey),
+        });
         return { data, success: true };
     }
     getRepository(): Repository<DataType> {

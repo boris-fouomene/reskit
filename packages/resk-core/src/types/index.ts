@@ -1279,18 +1279,6 @@ export type IDictKeysAsString<T> = keyof T extends string ? keyof T : never;
  * 
  * ### Possible Forms:
  * 
- * - **String**: A simple string value that can represent a unique identifier.
- *   - **Example**: 
- *     ```typescript
- *     const userId: IResourcePrimaryKey = { id: "user123" }; // A unique username
- *     ```
- * 
- * - **Number**: A numeric value that can also serve as a unique identifier.
- *   - **Example**: 
- *     ```typescript
- *     const orderId: IResourcePrimaryKey = { id: 456 }; // An auto-incremented order ID
- *     ```
- * 
  * - **Record<string, string | number>**: An object where the keys are strings
  *   and the values can be either strings or numbers. This allows for composite keys
  *   that consist of multiple fields.

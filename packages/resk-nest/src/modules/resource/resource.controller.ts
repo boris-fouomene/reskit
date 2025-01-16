@@ -29,7 +29,7 @@ export class ResourceController<DataType extends ResourceDto = ResourceDto, Serv
     try {
       if (isNonNullString((resourceService.constructor as any).resourceName)) return;
       ///Set the resource name on the resource service constructor dynamically
-      (resourceService.constructor as any).resourceName = (this.constructor as any)['resourceName'];
+      (resourceService.constructor as any).resourceName = this.getResourceName();
     } catch (e) { }
   }
   /**

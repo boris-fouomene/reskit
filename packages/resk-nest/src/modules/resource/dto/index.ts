@@ -19,6 +19,4 @@ import { IResourcePrimaryKey } from "@resk/core";
  *     email?: string;
  * }
  */
-export class ResourceDto<PrimaryKeyType extends IResourcePrimaryKey = any> {
-  id?: PrimaryKeyType;
-}
+export class ResourceDto<PrimaryKeyType extends IResourcePrimaryKey = any> { }

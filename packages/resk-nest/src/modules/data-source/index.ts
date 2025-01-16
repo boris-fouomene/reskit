@@ -1,11 +1,7 @@
 import { DynamicModule, Injectable } from "@nestjs/common";
-import { defaultStr, IResourceDataProvider, IResourceName, IResourcePrimaryKey } from "@resk/core";
+import { defaultStr } from "@resk/core";
+import { IResourceDataSource } from "./interfaces";
 
-
-export interface IResourceDataSource {
-    getDataProvider<DataType extends object = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(resourceName: IResourceName): IResourceDataProvider<DataType, PrimaryKeyType>;
-    initialize(): Promise<void>;
-}
 
 export class DataSourceModule {
     static providerName: "DATA_SOURCE";

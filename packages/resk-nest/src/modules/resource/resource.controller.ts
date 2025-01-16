@@ -59,15 +59,15 @@ export class ResourceController<DataType extends ResourceDto = ResourceDto, Serv
   @ApiOperation({ summary: 'Get all resources' })
   @Get()
   async getAll(): Promise<any> {
-    return this.getResourceService().getAll();
+    return this.getResourceService().find();
   }
   @Get(':id')
   getOne(@Param() params: any) {
-    return this.getResourceService().getOne(params.id);
+    return this.getResourceService().findOne(params.id);
   }
   @Post()
   async create(@Body() createResourceDto: Partial<DataType>) {
-    this.getResourceService().create(createResourceDto);
+    return this.getResourceService().create(createResourceDto);
   }
   @Delete(':id')
   delete(@Param() params: any) {

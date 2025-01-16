@@ -210,7 +210,7 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
    * @param {DataType} record - The data for the new record.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
-  create(record: DataType): Promise<IResourceOperationResult<DataType>> {
+  create(record: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
     return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
       .then(() => {
         return this.getDataProvider()?.create(record).then((result) => {
@@ -573,9 +573,6 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
    */
   canUserRead(user?: IAuthUser): boolean {
     return this.isAllowed(`read`, user);
-  }
-  canUserList(user?: IAuthUser): boolean {
-    return this.isAllowed(`list`, user);
   }
   /**
    * Determines if the user has permission to create a resource.

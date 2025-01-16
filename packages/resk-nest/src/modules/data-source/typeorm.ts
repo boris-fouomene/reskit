@@ -1,7 +1,7 @@
 
-import { IResourceDataProvider, IResourceName, IResourcePrimaryKey } from '@resk/core';
-import { IResourceDataSource } from '.';
+import { IResourceName, IResourcePrimaryKey } from '@resk/core';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { IResourceDataProvider, IResourceDataSource } from './interfaces';
 
 export class TypeOrmDataSource {
     static factory(options: DataSourceOptions): IResourceDataSource {

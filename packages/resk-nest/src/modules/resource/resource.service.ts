@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { defaultStr, IResourceDataProvider, IResourceName, IResourcePrimaryKey, ResourceBase } from '@resk/core';
 import { ResourceDto } from './dto';
-import { IResourceDataSource } from '../data-source';
+import { IResourceDataSource } from '../data-source/interfaces';
 
 /**
  * The `ResourceService` class is an injectable service that extends the `ResourceBase` class.

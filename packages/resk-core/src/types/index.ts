@@ -641,7 +641,6 @@ export interface IResourceActionMap {
   create: IResourceAction;
   update: IResourceAction;
   delete: IResourceAction;
-  list: IResourceAction;
   all: IResourceAction;
 }
 

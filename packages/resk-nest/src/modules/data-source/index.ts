@@ -17,13 +17,34 @@ export abstract class ResourceDataService<DataType extends IResourceData = any, 
     abstract findOneOrFail(primaryKey: PrimaryKeyType): Promise<DataType>;
     abstract find(options?: IResourceQueryOptions<DataType> | undefined): Promise<DataType[]>;
     abstract findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]>;
-    abstract findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>>;
     abstract createMany(data: Partial<DataType>[]): Promise<DataType[]>;
     abstract updateMany(filter: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number>;
     abstract deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number>;
     abstract count(options?: IResourceQueryOptions<DataType> | undefined): Promise<number>;
     abstract exists(primaryKey: PrimaryKeyType): Promise<boolean>;
     abstract executeInTransaction<R>(callback: (transaction: ITransaction<DataType>) => Promise<R>): Promise<R>;
+    async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined) {
+        options = Object.assign({}, options);
+        const [data, count] = await this.findAndCount(options);
+        const meta: IResourcePaginatedResult<DataType>["meta"] = {
+            total: count,
+        }
+        if (typeof options?.skip === 'number' && options.skip > 0 && typeof options?.limit === 'number' && options.limit > 0) {
+            meta.currentPage = Math.ceil(options.skip / options.limit) + 1;
+            meta.pageSize = options.limit;
+            meta.totalPages = Math.ceil(count / options.limit);
+            meta.hasNextPage = meta.currentPage < meta.totalPages;
+            meta.hasPreviousPage = meta.currentPage > 1;
+            meta.nextPage = meta.currentPage + 1;
+            meta.previousPage = meta.currentPage - 1;
+            meta.lastPage = meta.totalPages;
+        }
+        return {
+            data,
+            toal: count,
+            meta,
+        }
+    }
     distinct?(field: keyof DataType): Promise<any[]> {
         throw new Error("Method distinct not implemented.");
     }
@@ -52,9 +73,6 @@ export class ResourceDataServiceBase<DataType extends IResourceEntity = any, Pri
         throw new Error("Method not implemented.");
     }
     findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]> {
-        throw new Error("Method not implemented.");
-    }
-    findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
         throw new Error("Method not implemented.");
     }
     createMany(data: Partial<DataType>[]): Promise<DataType[]> {
@@ -286,29 +304,6 @@ export class TypeOrmDataService<DataType extends IResourceEntity = any, PrimaryK
     async deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number> {
         const result = await this.repository.delete(criteria as FindOptionsWhere<DataType>);
         return typeof result.affected === 'number' && result.affected > 0 ? result.affected : 0;
-    }
-
-    async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined) {
-        options = Object.assign({}, options);
-        const [data, count] = await this.findAndCount(options);
-        const meta: IResourcePaginatedResult<DataType>["meta"] = {
-            total: count,
-        }
-        if (typeof options?.skip === 'number' && options.skip > 0 && typeof options?.limit === 'number' && options.limit > 0) {
-            meta.currentPage = Math.ceil(options.skip / options.limit) + 1;
-            meta.pageSize = options.limit;
-            meta.totalPages = Math.ceil(count / options.limit);
-            meta.hasNextPage = meta.currentPage < meta.totalPages;
-            meta.hasPreviousPage = meta.currentPage > 1;
-            meta.nextPage = meta.currentPage + 1;
-            meta.previousPage = meta.currentPage - 1;
-            meta.lastPage = meta.totalPages;
-        }
-        return {
-            data,
-            toal: count,
-            meta,
-        }
     }
     buildConditions(primaryKey: PrimaryKeyType) {
         const condiitons: Record<string, any> = {};

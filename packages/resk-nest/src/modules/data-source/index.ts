@@ -1,9 +1,8 @@
-import { IResourcePrimaryKey, IResourceOperationResult, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataService, isNonNullString, defaultStr, isObj, isPrimitive, IResourceManyCriteria } from "@resk/core";
-import { DynamicModule, Inject, Injectable, NotFoundException, Provider } from "@nestjs/common";
-import { DataSourceOptions, DeepPartial, EntityManager, FindOptionsWhere, Repository } from "typeorm";
-import { getRepositoryToken, TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { IResourcePrimaryKey, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataService, isNonNullString, defaultStr, isObj, isPrimitive, IResourceManyCriteria } from "@resk/core";
+import { DynamicModule, Inject, Injectable, Provider } from "@nestjs/common";
+import { DeepPartial, EntityManager, FindOptionsWhere, Repository } from "typeorm";
+import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { EntityClassOrSchema } from "@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type";
-import { getPrimaryKeys, PrimaryKeys } from "./decorators";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
 
 
@@ -79,7 +78,7 @@ export class ResourceDataServiceBase<DataType extends IResourceEntity = any, Pri
 
 }
 
-export interface IDataSourcesMap {
+export interface IDataServicesMap {
     typeorm?: any;
 }
 
@@ -87,10 +86,10 @@ export interface IResourceRepositoryEntity {
     name: string;
 }
 
-export type IDataSourceName = keyof IDataSourcesMap;
+export type IDataServiceName = keyof IDataServicesMap;
 
-export interface IDataSourceMetaData<EntityType = any> {
-    name: IDataSourceName,
+export interface IDataServiceMetaData<EntityType = any> {
+    name: IDataServiceName,
     getDataServiceToken: (Entity: EntityType, ...args: any[]) => any,
     entities?: EntityType[];
     createProviders: (...entities: EntityType[]) => Provider[];
@@ -98,27 +97,27 @@ export interface IDataSourceMetaData<EntityType = any> {
 }
 
 export class DataServiceManager {
-    private static dataSourceMetaData: symbol = Symbol('repositoriesMetaData');
-    static getDefaultDataSourceName(): IDataSourceName {
+    private static dataServiceMetaData: symbol = Symbol('repositoriesMetaData');
+    static getDefaultDataServiceName(): IDataServiceName {
         return 'typeorm';
     }
     /***
      * 
      * register a repository
-     * @param {IDataSourceMetaData} options
+     * @param {IDataServiceMetaData} options
      */
-    static register<EntityType = any>(metaData: IDataSourceMetaData<EntityType>): Record<IDataSourceName, IDataSourceMetaData<EntityType>> {
+    static register<EntityType = any>(metaData: IDataServiceMetaData<EntityType>): Record<IDataServiceName, IDataServiceMetaData<EntityType>> {
         metaData = Object.assign({}, metaData);
         metaData.entities = Array.isArray(metaData.entities) ? metaData.entities : [];
         const metadata = this.getAll();
         if (isNonNullString(metaData.name)) {
-            (metadata as any)[metaData.name as IDataSourceName] = metaData;
-            Reflect.defineMetadata(this.dataSourceMetaData, metadata, DataServiceManager);
+            (metadata as any)[metaData.name as IDataServiceName] = metaData;
+            Reflect.defineMetadata(this.dataServiceMetaData, metadata, DataServiceManager);
         }
         return metadata;
     }
-    static registerEntities<EntityType = any>(entities: EntityType[], dataSourceName?: IDataSourceName,): Record<IDataSourceName, IDataSourceMetaData<EntityType>> {
-        const metaData = this.get(dataSourceName);
+    static registerEntities<EntityType = any>(entities: EntityType[], dataServiceName?: IDataServiceName,): Record<IDataServiceName, IDataServiceMetaData<EntityType>> {
+        const metaData = this.get(dataServiceName);
         const allEnt = metaData.entities = Array.isArray(metaData.entities) ? metaData.entities : [];
         (Array.isArray(entities) ? entities : []).forEach(entity => {
             if (!allEnt.includes(entity) && entity && typeof entity === 'function') {
@@ -127,35 +126,35 @@ export class DataServiceManager {
         });
         return this.register(metaData);
     }
-    static getDataSourceEntities<EntityType = any>(dataSourceName: IDataSourceName): EntityType[] {
-        const metaData = this.get(dataSourceName);
+    static getDataServiceEntities<EntityType = any>(dataServiceName: IDataServiceName): EntityType[] {
+        const metaData = this.get(dataServiceName);
         return (Array.isArray(metaData?.entities) ? metaData.entities : []) as EntityType[];
     }
-    static getAll(): Record<IDataSourceName, IDataSourceMetaData> {
-        return Object.assign({}, Reflect.getMetadata(this.dataSourceMetaData, DataServiceManager));
+    static getAll(): Record<IDataServiceName, IDataServiceMetaData> {
+        return Object.assign({}, Reflect.getMetadata(this.dataServiceMetaData, DataServiceManager));
     }
-    static get<EntityType = any>(dataSourceName?: IDataSourceName): IDataSourceMetaData<EntityType> {
-        dataSourceName = defaultStr(dataSourceName, this.getDefaultDataSourceName()) as IDataSourceName;
-        return this.getAll()[dataSourceName];
+    static get<EntityType = any>(dataServiceName?: IDataServiceName): IDataServiceMetaData<EntityType> {
+        dataServiceName = defaultStr(dataServiceName, this.getDefaultDataServiceName()) as IDataServiceName;
+        return this.getAll()[dataServiceName];
     }
-    static async forRoot<ModuleOptions = any, ModuleOptions2 = any, ModuleOptions3 = any>(dataSourceName: IDataSourceName, options?: ModuleOptions, options2?: ModuleOptions2, options3?: ModuleOptions3, ...args: any[]): Promise<DynamicModule> {
-        const dataSourceMeta = this.get(dataSourceName);
-        return await (dataSourceMeta.forRoot.bind(dataSourceMeta))<ModuleOptions, ModuleOptions2, ModuleOptions3>(options, options2, options3, ...args);
+    static async forRoot<ModuleOptions = any, ModuleOptions2 = any, ModuleOptions3 = any>(dataServiceName: IDataServiceName, options?: ModuleOptions, options2?: ModuleOptions2, options3?: ModuleOptions3, ...args: any[]): Promise<DynamicModule> {
+        const dataServiceMeta = this.get(dataServiceName);
+        return await (dataServiceMeta.forRoot.bind(dataServiceMeta))<ModuleOptions, ModuleOptions2, ModuleOptions3>(options, options2, options3, ...args);
     }
-    static getDataServiceToken(entity: IResourceRepositoryEntity, dataSourceName?: IDataSourceName, ...args: any[]): Parameters<typeof Inject>[0] {
-        dataSourceName = defaultStr(dataSourceName, DataServiceManager.getDefaultDataSourceName()) as IDataSourceName;
-        const dataSourceMeta = this.get(dataSourceName);
-        if (!dataSourceMeta) {
+    static getDataServiceToken(entity: IResourceRepositoryEntity, dataServiceName?: IDataServiceName, ...args: any[]): Parameters<typeof Inject>[0] {
+        dataServiceName = defaultStr(dataServiceName, DataServiceManager.getDefaultDataServiceName()) as IDataServiceName;
+        const dataServiceMeta = this.get(dataServiceName);
+        if (!dataServiceMeta) {
             throw new Error('No default repository found');
         }
-        dataSourceMeta.entities = Array.isArray(dataSourceMeta.entities) ? dataSourceMeta.entities : [];
-        if (!dataSourceMeta.entities.includes(entity)) {
-            dataSourceMeta.entities.push(entity);
+        dataServiceMeta.entities = Array.isArray(dataServiceMeta.entities) ? dataServiceMeta.entities : [];
+        if (!dataServiceMeta.entities.includes(entity)) {
+            dataServiceMeta.entities.push(entity);
         }
         const all = this.getAll();
-        all[dataSourceName] = dataSourceMeta;
-        Reflect.defineMetadata(this.dataSourceMetaData, all, DataServiceManager);
-        return dataSourceMeta.getDataServiceToken(entity, ...args);
+        all[dataServiceName] = dataServiceMeta;
+        Reflect.defineMetadata(this.dataServiceMetaData, all, DataServiceManager);
+        return dataServiceMeta.getDataServiceToken(entity, ...args);
     }
 }
 /**
@@ -163,14 +162,14 @@ export class DataServiceManager {
  * @param entity - The entity for which to inject the repository.
  * @returns The injected repository.
  */
-export function InjectDataService<EntityType extends IResourceRepositoryEntity = any>(entity: EntityType, dataSourceName?: IDataSourceName, ...args: any[]): PropertyDecorator & ParameterDecorator {
-    DataServiceManager.registerEntities([entity], dataSourceName);
-    const repositoryToken = DataServiceManager.getDataServiceToken(entity, dataSourceName, ...args);
+export function InjectDataService<EntityType extends IResourceRepositoryEntity = any>(entity: EntityType, dataServiceName?: IDataServiceName, ...args: any[]): PropertyDecorator & ParameterDecorator {
+    DataServiceManager.registerEntities([entity], dataServiceName);
+    const repositoryToken = DataServiceManager.getDataServiceToken(entity, dataServiceName, ...args);
     return Inject(repositoryToken);
 };
 
 
-export function DataService<EntityType = any>(options: IDataSourceMetaData<EntityType>): ClassDecorator {
+export function DataService<EntityType = any>(options: IDataServiceMetaData<EntityType>): ClassDecorator {
     return (target: Function) => {
         DataServiceManager.register<EntityType>(options);
     };
@@ -212,10 +211,10 @@ export class TypeOrmDataService<DataType extends IResourceEntity = any, PrimaryK
         });
     }
     async executeInTransaction<R>(callback: (transaction: ITransaction<DataType>) => Promise<R>): Promise<R> {
-        const dataSource = this.repository.manager.connection; // Get the DataService from the repository
+        const dataService = this.repository.manager.connection; // Get the DataService from the repository
         return new Promise(async (resolve, reject) => {
             // Use the `transaction` method of the DataService
-            await dataSource.transaction(async (manager: EntityManager) => {
+            await dataService.transaction(async (manager: EntityManager) => {
                 try {
                     // Execute the transactional operation using the EntityManager
                     const result = await callback({

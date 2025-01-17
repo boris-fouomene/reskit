@@ -1,6 +1,6 @@
-import { IResourcePrimaryKey, IResourceOperationResult, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataProvider, isNonNullString, defaultStr, isObj, isPrimitive } from "@resk/core";
+import { IResourcePrimaryKey, IResourceOperationResult, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataService, isNonNullString, defaultStr, isObj, isPrimitive, IResourceManyCriteria } from "@resk/core";
 import { DynamicModule, Inject, Injectable, NotFoundException, Provider } from "@nestjs/common";
-import { DataSourceOptions, EntityManager, Repository } from "typeorm";
+import { DataSourceOptions, DeepPartial, EntityManager, FindOptionsWhere, Repository } from "typeorm";
 import { getRepositoryToken, TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { EntityClassOrSchema } from "@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type";
 import { getPrimaryKeys, PrimaryKeys } from "./decorators";
@@ -10,70 +10,72 @@ import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
 export interface IResourceEntity extends Record<string, any> { }
 
 @Injectable()
-export abstract class ResourceRepository<DataType = any> implements IResourceDataProvider<DataType> {
-    abstract create(record: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
-    abstract update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
-    abstract delete(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<any>>;
-    abstract findOne(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType | null>>;
-    abstract find(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>>;
-    abstract findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>>;
-    abstract createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>>;
-    abstract updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>>;
-    abstract deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<any[]>>;
-    abstract count(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourceOperationResult<number>>;
-    abstract exists(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<boolean>>;
-    abstract executeInTransaction<R>(callback: (transaction: ITransaction) => Promise<R>): Promise<R>;
-    distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourceOperationResult<DataType[]>> {
+export abstract class ResourceDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> implements IResourceDataService<DataType, PrimaryKeyType> {
+    abstract create(record: Partial<DataType>): Promise<DataType>;
+    abstract update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType>;
+    abstract delete(primaryKey: PrimaryKeyType): Promise<boolean>;
+    abstract findOne(primaryKey: PrimaryKeyType): Promise<DataType | null>;
+    abstract findOneOrFail(primaryKey: PrimaryKeyType): Promise<DataType>;
+    abstract find(options?: IResourceQueryOptions<DataType> | undefined): Promise<DataType[]>;
+    abstract findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]>;
+    abstract findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>>;
+    abstract createMany(data: Partial<DataType>[]): Promise<DataType[]>;
+    abstract updateMany(filter: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number>;
+    abstract deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number>;
+    abstract count(options?: IResourceQueryOptions<DataType> | undefined): Promise<number>;
+    abstract exists(primaryKey: PrimaryKeyType): Promise<boolean>;
+    distinct?(field: keyof DataType): Promise<any[]> {
         throw new Error("Method distinct not implemented.");
     }
-    aggregate?(pipeline: any[]): Promise<IResourceOperationResult<any[]>> {
+    aggregate?(pipeline: any[]): Promise<any[]> {
         throw new Error("Method aggregate not implemented.");
     }
-    async findOneOrFail(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType>> {
-        const result = await this.findOne(primaryKey);
-        if (!result) {
-            throw new NotFoundException(`Entity not found with primary key: ${JSON.stringify(primaryKey)}`);
-        }
-        return result as IResourceOperationResult<DataType>;
-    }
+
 }
-export class ResourceBaseRepository<DataType extends IResourceEntity = any> extends ResourceRepository<DataType> {
+export class ResourceDataServiceBase<DataType extends IResourceEntity = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceDataService<DataType, PrimaryKeyType> {
+    create(record: Partial<DataType>): Promise<DataType> {
+        throw new Error("Method not implemented.");
+    }
+    update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType> {
+        throw new Error("Method not implemented.");
+    }
+    delete(primaryKey: PrimaryKeyType): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
+    findOne(primaryKey: PrimaryKeyType): Promise<DataType | null> {
+        throw new Error("Method not implemented.");
+    }
+    findOneOrFail(primaryKey: PrimaryKeyType): Promise<DataType> {
+        throw new Error("Method not implemented.");
+    }
+    find(options?: IResourceQueryOptions<DataType> | undefined): Promise<DataType[]> {
+        throw new Error("Method not implemented.");
+    }
+    findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]> {
+        throw new Error("Method not implemented.");
+    }
+    findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
+        throw new Error("Method not implemented.");
+    }
+    createMany(data: Partial<DataType>[]): Promise<DataType[]> {
+        throw new Error("Method not implemented.");
+    }
+    updateMany(filter: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number> {
+        throw new Error("Method not implemented.");
+    }
+    deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number> {
+        throw new Error("Method not implemented.");
+    }
+    count(options?: IResourceQueryOptions<DataType> | undefined): Promise<number> {
+        throw new Error("Method not implemented.");
+    }
+    exists(primaryKey: PrimaryKeyType): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
     executeInTransaction<R>(callback: (transaction: ITransaction) => Promise<R>): Promise<R> {
         throw new Error("Method not implemented.");
     }
-    create(record: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
-        throw new Error("Method not implemented.");
-    }
-    update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
-        throw new Error("Method not implemented.");
-    }
-    delete(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<any>> {
-        throw new Error("Method not implemented.");
-    }
-    findOne(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType | null>> {
-        throw new Error("Method not implemented.");
-    }
-    find(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
-        throw new Error("Method not implemented.");
-    }
-    findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
-        throw new Error("Method not implemented.");
-    }
-    createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>> {
-        throw new Error("Method not implemented.");
-    }
-    updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>> {
-        throw new Error("Method not implemented.");
-    }
-    deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<any[]>> {
-        throw new Error("Method not implemented.");
-    }
-    count(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourceOperationResult<number>> {
-        throw new Error("Method not implemented.");
-    }
-    exists(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<boolean>> {
-        throw new Error("Method not implemented.");
-    }
+
 }
 
 export interface IDataSourcesMap {
@@ -194,7 +196,7 @@ export function DataSource<EntityType = any>(options: IDataSourceMetaData<Entity
     },
 })
 @Injectable()
-export class TypeOrmRepository<DataType extends IResourceEntity = any> extends ResourceRepository<DataType> {
+export class TypeOrmRepository<DataType extends IResourceEntity = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceDataService<DataType, PrimaryKeyType> {
     private readonly primaryColumns: Record<string, ColumnMetadata> = {};
     private readonly columns: Record<string, ColumnMetadata> = {};
     private readonly primaryColumnsNames: string[] = [];
@@ -234,20 +236,81 @@ export class TypeOrmRepository<DataType extends IResourceEntity = any> extends R
     }
     async create(data: Partial<DataType>) {
         const entity = this.repository.create();
-        const result = await this.repository.save(entity, { data });
-        return { data: result, success: true };
+        return await this.repository.save(entity, { data });
     }
-    async update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>) {
+    async update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>) {
         await this.repository.update(this.buildConditions(primaryKey), updatedData as any);
         return this.findOneOrFail(primaryKey);
     }
-    async delete(primaryKey: IResourcePrimaryKey) {
-        const result = await this.repository.delete(this.buildConditions(primaryKey));
-        return {
-            data: result,
-        };
+    async delete(primaryKey: PrimaryKeyType) {
+        const r = await this.repository.delete(this.buildConditions(primaryKey));
+        return (typeof r.affected === 'number' && r.affected > 0);
     }
-    buildConditions(primaryKey: IResourcePrimaryKey) {
+    findOneOrFail(primaryKey: PrimaryKeyType): Promise<DataType> {
+        throw new Error("Method not implemented.");
+    }
+    async findOne(primaryKey: PrimaryKeyType) {
+        try {
+            return await this.repository.findOne({ where: this.buildConditions(primaryKey) });
+        } catch (error) {
+            return null;
+        }
+    }
+    async find(options?: IResourceQueryOptions<DataType> | undefined) {
+        options = Object.assign({}, options);
+        return await this.repository.find({
+            ...options,
+            take: typeof options?.limit === 'number' && options.limit > 0 ? options.limit : undefined,
+            skip: typeof options?.skip === 'number' && options.skip > 0 ? options.skip : undefined,
+        });
+    }
+    async findAndCount(options?: IResourceQueryOptions<DataType>) {
+        return await this.repository.findAndCount(options);
+    }
+    async count(options?: IResourceQueryOptions<DataType>) {
+        return await this.repository.count(options);
+    }
+    async exists(primaryKey: PrimaryKeyType) {
+        return await this.repository.exists({
+            where: this.buildConditions(primaryKey),
+        });
+    }
+    async createMany(data: Partial<DataType>[]) {
+        const entities = this.repository.create(data as DeepPartial<DataType>[]);
+        return await this.repository.save(entities);
+    }
+    async updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number> {
+        const result = await this.repository.update(criteria as FindOptionsWhere<DataType>, data);
+        return typeof result.affected === 'number' && result.affected > 0 ? result.affected : 0;
+    }
+    async deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number> {
+        const result = await this.repository.delete(criteria as FindOptionsWhere<DataType>);
+        return typeof result.affected === 'number' && result.affected > 0 ? result.affected : 0;
+    }
+
+    async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined) {
+        options = Object.assign({}, options);
+        const [data, count] = await this.findAndCount(options);
+        const meta: IResourcePaginatedResult<DataType>["meta"] = {
+            total: count,
+        }
+        if (typeof options?.skip === 'number' && options.skip > 0 && typeof options?.limit === 'number' && options.limit > 0) {
+            meta.currentPage = Math.ceil(options.skip / options.limit) + 1;
+            meta.pageSize = options.limit;
+            meta.totalPages = Math.ceil(count / options.limit);
+            meta.hasNextPage = meta.currentPage < meta.totalPages;
+            meta.hasPreviousPage = meta.currentPage > 1;
+            meta.nextPage = meta.currentPage + 1;
+            meta.previousPage = meta.currentPage - 1;
+            meta.lastPage = meta.totalPages;
+        }
+        return {
+            data,
+            toal: count,
+            meta,
+        }
+    }
+    buildConditions(primaryKey: PrimaryKeyType) {
         const condiitons: Record<string, any> = {};
         if (primaryKey && isPrimitive(primaryKey)) {
             this.primaryColumnsNames.map((column) => {
@@ -262,45 +325,6 @@ export class TypeOrmRepository<DataType extends IResourceEntity = any> extends R
         }
         return condiitons;
     }
-    async findOne(primaryKey: IResourcePrimaryKey) {
-        try {
-            const data = await this.repository.findOne({ where: this.buildConditions(primaryKey) });
-            return { data, success: true };
-        } catch (error) {
-            return { error, data: null };
-        }
-    }
-    async find(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
-        options = Object.assign({}, options);
-        const data = await this.repository.find({
-            ...options,
-            take: typeof options?.limit === 'number' ? options.limit : undefined,
-        });
-        return { data, success: true };
-    }
-    async findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
-        const [data, count] = await this.repository.findAndCount(options);
-        return { data, success: true, meta: { total: count } };
-    }
-    createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>> {
-        throw new Error("Method not implemented.");
-    }
-    updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>> {
-        throw new Error("Method not implemented.");
-    }
-    deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<any[]>> {
-        throw new Error("Method not implemented.");
-    }
-    async count(options?: IResourceQueryOptions<DataType> | undefined) {
-        const data = await this.repository.count(options);
-        return { data, success: true };
-    }
-    async exists(primaryKey: IResourcePrimaryKey) {
-        const data = await this.repository.exists({
-            where: this.buildConditions(primaryKey),
-        });
-        return { data, success: true };
-    }
     getRepository(): Repository<DataType> {
         return this.repository;
     }
@@ -313,5 +337,5 @@ export interface ITransactionProvider {
 export interface ITransaction<DataType extends IResourceEntity = any> {
     commit(): Promise<void>;
     rollback(error?: any): Promise<void>;
-    getRepository(): ResourceRepository<DataType>;
+    getRepository(): ResourceDataService<DataType>;
 }

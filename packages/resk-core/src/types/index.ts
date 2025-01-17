@@ -3,6 +3,8 @@ import { IMangoQuery, IMangoOrderBy } from "./filters";
 
 export type IResourceDefaultEvent = IResourceActionName | keyof IResourceDataService;
 
+export interface IResourceData extends IDict { };
+
 /**
  * @typedef IPrimitive
  * @description
@@ -916,7 +918,7 @@ export type IResourceActionName = keyof IResourceActionMap;
  * @property {string} [tooltip] - A short text that appears when the user hovers over the resource, providing additional context.
  * @property {IResourceActionMap} [actions] - The actions associated with the resource.
  */
-export interface IResource<DataType = any> {
+export interface IResource<DataType extends IResourceData = any> {
   /**
    * The internal name of the resource.
    *
@@ -1402,7 +1404,7 @@ export type IResourcePrimaryKey = string | number | object;
  * operations, facilitating better error handling and data management 
  * in applications.
  */
-export interface IResourceOperationResult<DataType = any> {
+export interface IResourceOperationResult<DataType extends IResourceData = any> {
   statusCode?: number; // HTTP status code for the operation
   success?: boolean; // Indicates if the operation was successful
   data: DataType; // Optional data returned from the operation
@@ -1508,7 +1510,7 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.createMany([{ name: "Resource 1" }, { name: "Resource 2" }]);
  *     ```
  * 
- * - **updateMany(data: Partial<DataType>)**: Updates multiple resource records.
+ * - **updateMany(data: IResourceManyCriteria<PrimaryKeyType,DataType>)**: Updates multiple resource records.
  *   - **Parameters**:
  *     - `data`: An object containing the updated data for the resources.
  *   - **Returns**: A promise that resolves to an `DataType[]`, 
@@ -1598,7 +1600,7 @@ export interface IResourceOperationResult<DataType = any> {
  * approach to data handling in applications.
 
  */
-export interface IResourceDataService<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+export interface IResourceDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
   /***
    * Creates a new resource record.
    * @param record The data for the new resource to be created.
@@ -1702,7 +1704,7 @@ export interface IResourceDataService<DataType = any, PrimaryKeyType extends IRe
   createMany(data: Partial<DataType>[]): Promise<DataType[]>;
   /***
    * Updates multiple resource records.
-   * @param filter An object containing the filter criteria for the resources.
+   * @param criteria An object containing the filter criteria for the resources.
    * @param data An object containing the updated data for the resources.
    * @returns A promise that resolves to an `DataType[]`, 
    * indicating the success or failure of the update operation.
@@ -1711,7 +1713,7 @@ export interface IResourceDataService<DataType = any, PrimaryKeyType extends IRe
   *   const result = await dataProvider.updateMany({ status: "active" });
   *     ```
    */
-  updateMany(filter: IResourceQueryOptions, data: Partial<DataType>): Promise<number>;
+  updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number>;
   /**
    * 
    * @param criteria The criteria to filter which resources to delete.
@@ -1722,7 +1724,7 @@ export interface IResourceDataService<DataType = any, PrimaryKeyType extends IRe
   *   const result = await dataProvider.deleteMany({ filters: { status: "inactive" } });
   *     ```
    */
-  deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<number>;
+  deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number>;
   /***
    * Counts the total number of resource records based on query options.
    * @param options Optional query options to filter the count.
@@ -1761,6 +1763,77 @@ export interface IResourceDataService<DataType = any, PrimaryKeyType extends IRe
 }
 
 /**
+ * @type IResourceManyCriteria
+ * 
+ * Represents the criteria for updating a resource in the application.
+ * This type allows for flexible definitions of what constitutes an update,
+ * accommodating various scenarios based on the primary key or partial data.
+ * 
+ * ### Type Parameters
+ * - **PrimaryKeyType**: The type of the primary key used to identify resources. 
+ *   Defaults to `IResourcePrimaryKey`, which can be a string, number, or object.
+ * - **DataType**: The type of data associated with the resource. Defaults to `IDict`, 
+ *   which is a generic dictionary type allowing for any key-value pairs.
+ * 
+ * ### Possible Forms
+ * The `IResourceManyCriteria` can take one of the following forms:
+ * 
+ * 1. **Array of Primary Keys**: 
+ *    - An array of primary keys that uniquely identify the resources to be updated.
+ *    - **Example**: 
+ *      ```typescript
+ *      const updateCriteria: IResourceManyCriteria<string> = ["user123", "user456"];
+ *      ```
+ * 
+ * 2. **Partial Data Object**: 
+ *    - An object containing partial data that represents the fields to be updated.
+ *    - **Example**: 
+ *      ```typescript
+ *      const updateCriteria: IResourceManyCriteria<string, { name: string; age: number }> = {
+ *          name: "John Doe",
+ *          age: 30
+ *      };
+ *      ```
+ * 
+ * 3. **Record of Data Fields**: 
+ *    - A record where each key corresponds to a field in the resource, allowing for 
+ *      updates to specific fields.
+ *    - **Example**: 
+ *      ```typescript
+ *      const updateCriteria: IResourceManyCriteria<string, { name: string; age: number }> = {
+ *          name: "Jane Doe",
+ *          age: 25
+ *      };
+ *      ```
+ * 
+ * ### Notes
+ * - This type is particularly useful in scenarios where resources can be updated 
+ *   based on different criteria, such as updating multiple records at once or 
+ *   modifying specific fields of a resource.
+ * - By leveraging TypeScript's generics, this type provides strong typing and 
+ *   flexibility, ensuring that the criteria used for updates are well-defined and 
+ *   type-safe.
+ * 
+ * ### Example Usage
+ * Here’s how you might use the `IResourceManyCriteria` type in a function that 
+ * updates resources:
+ * 
+ * ```typescript
+ * function updateResources(criteria: IResourceManyCriteria<string, { name: string; age: number }>) {
+ *     // Implementation to update resources based on the provided criteria
+ * }
+ * 
+ * // Example of updating resources by primary keys
+ * updateResources(["user123", "user456"]);
+ * 
+ * // Example of updating resources with partial data
+ * updateResources({ name: "John Doe", age: 30 });
+ * ```
+ */
+export type IResourceManyCriteria<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>
+  = PrimaryKeyType[] | Partial<Record<keyof DataType, any>>;
+
+/**
  * Interface representing options for fetching resources.
  * 
  * This interface allows you to specify various options when retrieving resources,
@@ -1779,7 +1852,7 @@ export interface IResourceDataService<DataType = any, PrimaryKeyType extends IRe
 *      skip: 0 // Do not skip any results
  * };
  */
-export interface IResourceQueryOptions<DataType = any> {
+export interface IResourceQueryOptions<DataType extends IResourceData = any> {
   /***
    * The filter criteria to apply to the query using the Mango query language.
    */
@@ -1894,7 +1967,7 @@ export interface IResourceQueryOptions<DataType = any> {
  *   allowing clients to retrieve data in manageable chunks.
  * - The `links` property facilitates easy navigation between pages, enhancing user experience.
  */
-export interface IResourcePaginatedResult<DataType = any> extends Omit<IResourceOperationResult, "data"> {
+export interface IResourcePaginatedResult<DataType extends IResourceData = any> extends Omit<IResourceOperationResult, "data"> {
   /** List of fetched resources. */
   data: DataType[];
 
@@ -1908,6 +1981,9 @@ export interface IResourcePaginatedResult<DataType = any> extends Omit<IResource
     pageSize?: number;
     /** The total number of pages. */
     totalPages?: number;
+    nextPage?: number;
+    previousPage?: number;
+    lastPage?: number;
     /***
      * Whether there is a next page.
      */

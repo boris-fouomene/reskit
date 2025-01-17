@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { defaultStr, IResourceDataProvider, IResourceName, ResourceBase } from '@resk/core';
-import { IResourceEntity, ResourceBaseRepository, ResourceRepository } from '../data-source';
+import { defaultStr, IResourceDataService, IResourceName, IResourcePrimaryKey, ResourceBase } from '@resk/core';
+import { IResourceEntity, ResourceDataService, ResourceDataServiceBase } from '../data-source';
 import { error } from 'console';
 /**
  * The `ResourceService` class is an injectable service that extends the `ResourceBase` class.
@@ -16,15 +16,15 @@ import { error } from 'console';
  *
  * @Injectable()
  * export class UserService extends ResourceService<UserDto> {
- *     constructor(resourceRepository: ResourceDataSource) {
- *         super(resourceRepository);
+ *     constructor(dataService: ResourceDataSource) {
+ *         super(dataService);
  *     }
  *     // Additional methods for UserService can be added here
  * }
  */
 @Injectable()
-export class ResourceService<DataType extends IResourceEntity = any> extends ResourceBase<DataType> {
-  constructor(protected resourceRepository: ResourceBaseRepository<DataType>) {
+export class ResourceService<DataType extends IResourceEntity = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceBase<DataType, PrimaryKeyType> {
+  constructor(protected dataService: ResourceDataServiceBase<DataType, PrimaryKeyType>) {
     super();
   }
   checkPermissionAction(actionPerm: () => boolean, i18nActionKey: string): Promise<any> {
@@ -43,12 +43,10 @@ export class ResourceService<DataType extends IResourceEntity = any> extends Res
    * Returns the data source associated with the `ResourceService` instance.
    * The data source is used to interact with the underlying data storage or service.
    */
-  getRespository(): ResourceRepository<DataType> {
-    return this.resourceRepository;
+  getDataService(): ResourceDataService<DataType> {
+    return this.dataService;
   }
-  getDataProvider(): IResourceDataProvider<DataType> {
-    return this.getRespository();
-  }
+
   /**
   * Returns the resource name associated with the `ResourceService` instance.
   * The resource name is typically set on the `ResourceService` constructor, but if it is not set,

@@ -1,4 +1,4 @@
-import { IDict, IResourceName, IField, IResourceDefaultEvent, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey } from '../types';
+import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory } from '../utils/index';
 import { IConstructor, IProtectedResource } from '../types/index';
@@ -54,7 +54,7 @@ const resourcesClassNameMetaData = Symbol('resourceByClassName');
  * console.log(dynamicResource.getFields()); 
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
-export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> implements IResourceDataService<DataType, PrimaryKeyType> {
+export abstract class ResourceBase<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> implements IResourceDataService<DataType, PrimaryKeyType> {
   actions?: IResourceActionMap;
   metaData?: IResource<DataType>;
   getMetaData(): IResource<DataType> {
@@ -301,14 +301,26 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
         });
       })
   }
-  findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
-      .then(() => {
-        return this.getDataService().findAndPaginate(options).then((result) => {
-          this._trigger("findAndPaginate" as EventType, result);
-          return result;
-        });
-      })
+  async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
+    options = Object.assign({}, options);
+    const [data, count] = await this.findAndCount(options);
+    const meta: IResourcePaginatedResult<DataType>["meta"] = {
+      total: count,
+    }
+    if (typeof options.skip === 'number' && options.skip > 0 && typeof options.limit === 'number' && options.limit > 0) {
+      meta.currentPage = Math.ceil(options.skip / options.limit) + 1;
+      meta.pageSize = options.limit;
+      meta.totalPages = Math.ceil(count / options.limit);
+      meta.hasNextPage = meta.currentPage < meta.totalPages;
+      meta.hasPreviousPage = meta.currentPage > 1;
+      meta.nextPage = meta.currentPage + 1;
+      meta.previousPage = meta.currentPage - 1;
+      meta.lastPage = meta.totalPages;
+    }
+    return {
+      data,
+      meta,
+    }
   }
   /**
    * Creates multiple records in the resource.
@@ -326,14 +338,14 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
   }
   /**
    * Updates multiple records in the resource.
-   * @param filter - The query options to filter the records to be updated.
+   * @param criteria - The query options to filter the records to be updated.
    * @param data - An array of partial data objects to update.
    * @returns A promise that resolves to the result of the update operation.
    */
-  updateMany(filter: IResourceQueryOptions, data: Partial<DataType>) {
+  updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>) {
     return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
       .then(() => {
-        return this.getDataService().updateMany(filter, data).then((result) => {
+        return this.getDataService().updateMany(criteria, data).then((result) => {
           this._trigger("updateMany" as EventType, result);
           return result;
         });
@@ -344,7 +356,7 @@ export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResou
    * @param criteria - The query options to filter the records to be deleted.
    * @returns A promise that resolves to the result of the delete operation.
    */
-  deleteMany(criteria: IResourceQueryOptions<DataType>) {
+  deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) {
     return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
       .then(() => {
         return this.getDataService().deleteMany(criteria).then((result) => {
@@ -945,7 +957,7 @@ export class ResourcesManager {
    * ResourcesManager.addResource('productResource', productResource);
    * console.log(ResourcesManager.getAllNames()); // Output: ['userResource', 'productResource']
    */
-  public static addResource<DataType = any>(name: IResourceName, resource: ResourceBase<DataType>) {
+  public static addResource<DataType extends IResourceData = any>(name: IResourceName, resource: ResourceBase<DataType>) {
     if (typeof name === "string" && name && resource && resource instanceof ResourceBase) {
       (this.resources as IDict)[name] = resource;
     }
@@ -1052,7 +1064,7 @@ export class ResourcesManager {
  * 
  * ```
  */
-export function Resource<DataType = any>(metaData: IResource<DataType>) {
+export function Resource<DataType extends IResourceData = any>(metaData: IResource<DataType>) {
   return function (target: Function) {
     metaData = Object.assign({}, metaData);
     if (typeof target == "function") {
@@ -1077,6 +1089,6 @@ export function Resource<DataType = any>(metaData: IResource<DataType>) {
  * @param {any} target - The target class or instance from which to retrieve the metadata.
  * @returns {ResourceBase} An object containing the resource metadata for the given target.
  */
-export const getResourceMetaData = <DataType = any>(target: any): ResourceBase<DataType> => {
+export const getResourceMetaData = <DataType extends IResourceData = any>(target: any): ResourceBase<DataType> => {
   return Object.assign({}, Reflect.getMetadata(resourceMetaData, target));
 }

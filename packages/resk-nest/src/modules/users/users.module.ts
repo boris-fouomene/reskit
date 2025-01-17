@@ -4,7 +4,7 @@ import { ResourceModule } from '../resource';
 import { UsersService } from './users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { DataSourceManager } from '../data-source';
+import { DataServiceManager } from '../data-source';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { DataSourceManager } from '../data-source';
   ],
   controllers: [UsersController],
   providers: [
-    ...DataSourceManager.get().createProviders(User),
+    ...DataServiceManager.get().createProviders(User),
     UsersService,
   ],
 })

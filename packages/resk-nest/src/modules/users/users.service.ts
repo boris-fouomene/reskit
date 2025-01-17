@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ResourceService } from '../resource';
 import { User } from './entities/user.entity';
-import { InjectRepository, ResourceRepository } from '../data-source';
+import { InjectDataService, ResourceDataService } from '../data-source';
 
 @Injectable()
-export class UsersService extends ResourceService<User> {
+export class UsersService extends ResourceService<User, string> {
   constructor(
-    @InjectRepository(User)
-    resourceRepository: ResourceRepository<User>
+    @InjectDataService(User)
+    dataService: ResourceDataService<User, string>
   ) {
-    super(resourceRepository);
+    super(dataService);
   }
 }

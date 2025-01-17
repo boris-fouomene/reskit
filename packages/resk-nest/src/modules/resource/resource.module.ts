@@ -1,12 +1,12 @@
 import { Global, Module } from '@nestjs/common';
 import { ResourceService } from './resource.service';
-import { ResourceBaseRepository } from '../data-source';
+import { ResourceDataService, ResourceDataServiceBase } from '../data-source';
 @Global()
 @Module({
   providers: [
-    ResourceBaseRepository,
+    ResourceDataServiceBase,
     ResourceService,
   ],
-  exports: [ResourceBaseRepository, ResourceService],
+  exports: [ResourceDataServiceBase, ResourceService],
 })
 export class ResourceModule { }

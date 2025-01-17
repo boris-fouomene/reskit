@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { defaultStr, IResourceDataService, IResourceName, IResourcePrimaryKey, ResourceBase } from '@resk/core';
-import { IResourceEntity, ResourceDataService, ResourceDataServiceBase } from '../data-source';
+import { defaultStr, IResourceData, IResourceName, IResourcePrimaryKey, ResourceBase } from '@resk/core';
+import { IDataServiceRepository, ResourceDataService, ResourceDataServiceBase } from '../data-source';
 import { error } from 'console';
 /**
  * The `ResourceService` class is an injectable service that extends the `ResourceBase` class.
@@ -23,8 +23,8 @@ import { error } from 'console';
  * }
  */
 @Injectable()
-export class ResourceService<DataType extends IResourceEntity = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceBase<DataType, PrimaryKeyType> {
-  constructor(protected dataService: ResourceDataServiceBase<DataType, PrimaryKeyType>) {
+export class ResourceService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, RepositoryType extends IDataServiceRepository = any> extends ResourceBase<DataType, PrimaryKeyType> {
+  constructor(protected dataService: ResourceDataServiceBase<DataType, PrimaryKeyType, RepositoryType>) {
     super();
   }
   checkPermissionAction(actionPerm: () => boolean, i18nActionKey: string): Promise<any> {

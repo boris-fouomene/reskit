@@ -5,11 +5,22 @@ import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { EntityClassOrSchema } from "@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
 
+export interface IDataServiceRepositoryMap {
+    typeorm?: Repository<any>;
+}
 
-export interface IResourceEntity extends Record<string, any> { }
+export type IDataServiceRepositoryType<T extends keyof IDataServiceRepositoryMap = keyof IDataServiceRepositoryMap> = IDataServiceRepositoryMap[T];
+export type IDataServiceRepository = IDataServiceRepositoryType<keyof IDataServiceRepositoryMap>;
 
 @Injectable()
-export abstract class ResourceDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> implements IResourceDataService<DataType, PrimaryKeyType> {
+export abstract class ResourceDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, RepositoryType extends IDataServiceRepository = any> implements IResourceDataService<DataType, PrimaryKeyType> {
+    constructor(protected readonly repository: RepositoryType) { }
+    getRepository(): RepositoryType {
+        return this.repository;
+    }
+    getRepositoryAs<DataRepositoryType extends IDataServiceRepository = RepositoryType>(): DataRepositoryType {
+        return this.repository as unknown as DataRepositoryType;
+    }
     abstract create(record: Partial<DataType>): Promise<DataType>;
     abstract update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType>;
     abstract delete(primaryKey: PrimaryKeyType): Promise<boolean>;
@@ -53,7 +64,7 @@ export abstract class ResourceDataService<DataType extends IResourceData = any, 
     }
 
 }
-export class ResourceDataServiceBase<DataType extends IResourceEntity = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceDataService<DataType, PrimaryKeyType> {
+export class ResourceDataServiceBase<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, RepositoryType extends IDataServiceRepository = any> extends ResourceDataService<DataType, PrimaryKeyType, RepositoryType> {
     create(record: Partial<DataType>): Promise<DataType> {
         throw new Error("Method not implemented.");
     }
@@ -214,12 +225,12 @@ export function DataService<EntityType = any>(options: IDataServiceMetaData<Enti
     },
 })
 @Injectable()
-export class TypeOrmDataService<DataType extends IResourceEntity = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceDataService<DataType, PrimaryKeyType> {
+export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceDataService<DataType, PrimaryKeyType, Repository<DataType>> {
     private readonly primaryColumns: Record<string, ColumnMetadata> = {};
     private readonly columns: Record<string, ColumnMetadata> = {};
     private readonly primaryColumnsNames: string[] = [];
     constructor(readonly repository: Repository<DataType>) {
-        super();
+        super(repository);
         repository.metadata.columns.map((column) => {
             if (column.isPrimary) {
                 this.primaryColumns[column.propertyName] = column;
@@ -329,7 +340,7 @@ export interface ITransactionProvider {
     startTransaction(): Promise<ITransaction>;
 }
 
-export interface ITransaction<DataType extends IResourceEntity = any> {
+export interface ITransaction<DataType extends IResourceData = any> {
     commit(): Promise<void>;
     rollback(error?: any): Promise<void>;
     getRepository(): ResourceDataService<DataType>;

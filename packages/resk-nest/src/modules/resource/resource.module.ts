@@ -1,10 +1,15 @@
 import { Global, Module } from '@nestjs/common';
 import { ResourceService } from './resource.service';
-import { ResourceDataService, ResourceDataServiceBase } from '../data-source';
+import { ResourceDataServiceBase } from '../data-source';
 @Global()
 @Module({
   providers: [
-    ResourceDataServiceBase,
+    {
+      provide: ResourceDataServiceBase,
+      useFactory: () => {
+        return new ResourceDataServiceBase(null as any);
+      },
+    },
     ResourceService,
   ],
   exports: [ResourceDataServiceBase, ResourceService],

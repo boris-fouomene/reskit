@@ -3,7 +3,7 @@ import { ResourceService } from './resource.service';
 import { ApiExcludeController, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { isNonNullString, IResourceName } from '@resk/core';
 import { ResourcesManager } from '@resk/core';
-import { IResourceEntity } from '../data-source';
+import { IResourceData } from '@resk/core';
 
 /**
  * The `ResourceController` class is a NestJS controller that provides CRUD operations for a resource.
@@ -14,7 +14,7 @@ import { IResourceEntity } from '../data-source';
  * @template ServiceType - The type of the `ResourceService` implementation.
  */
 @Controller()
-export class ResourceController<DataType extends IResourceEntity = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
+export class ResourceController<DataType extends IResourceData = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
   /**
    * Initializes the `ResourceController` instance with the provided `ResourceService`.
    * If the `resourceName` property is not set on the `ResourceService` constructor, it is set to the `resourceName` property of the `ResourceController` instance.

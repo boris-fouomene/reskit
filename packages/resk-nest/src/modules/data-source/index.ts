@@ -5,16 +5,24 @@ import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { EntityClassOrSchema } from "@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
 
-export interface IDataServiceRepositoryMap {
+
+export interface IDataServicesMap {
     typeorm?: Repository<any>;
 }
 
-export type IDataServiceRepositoryType<T extends keyof IDataServiceRepositoryMap = keyof IDataServiceRepositoryMap> = IDataServiceRepositoryMap[T];
-export type IDataServiceRepository = IDataServiceRepositoryType<keyof IDataServiceRepositoryMap>;
+export interface IDataServiceEntity {
+    name: string;
+}
+
+export type IDataServiceName = keyof IDataServicesMap;
+
+export type IDataServiceRepositoryType<T extends IDataServiceName = IDataServiceName> = IDataServicesMap[T];
+export type IDataServiceRepository = IDataServiceRepositoryType<IDataServiceName>;
 
 @Injectable()
 export abstract class ResourceDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, RepositoryType extends IDataServiceRepository = any> implements IResourceDataService<DataType, PrimaryKeyType> {
     constructor(protected readonly repository: RepositoryType) { }
+    abstract getDataSeviceName(): IDataServiceName;
     getRepository(): RepositoryType {
         return this.repository;
     }
@@ -65,6 +73,9 @@ export abstract class ResourceDataService<DataType extends IResourceData = any, 
 
 }
 export class ResourceDataServiceBase<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, RepositoryType extends IDataServiceRepository = any> extends ResourceDataService<DataType, PrimaryKeyType, RepositoryType> {
+    getDataSeviceName(): IDataServiceName {
+        return "typeorm";
+    }
     create(record: Partial<DataType>): Promise<DataType> {
         throw new Error("Method not implemented.");
     }
@@ -107,15 +118,6 @@ export class ResourceDataServiceBase<DataType extends IResourceData = any, Prima
 
 }
 
-export interface IDataServicesMap {
-    typeorm?: any;
-}
-
-export interface IResourceRepositoryEntity {
-    name: string;
-}
-
-export type IDataServiceName = keyof IDataServicesMap;
 
 export interface IDataServiceMetaData<EntityType = any> {
     name: IDataServiceName,
@@ -170,7 +172,7 @@ export class DataServiceManager {
         const dataServiceMeta = this.get(dataServiceName);
         return await (dataServiceMeta.forRoot.bind(dataServiceMeta))<ModuleOptions, ModuleOptions2, ModuleOptions3>(options, options2, options3, ...args);
     }
-    static getDataServiceToken(entity: IResourceRepositoryEntity, dataServiceName?: IDataServiceName, ...args: any[]): Parameters<typeof Inject>[0] {
+    static getDataServiceToken(entity: IDataServiceEntity, dataServiceName?: IDataServiceName, ...args: any[]): Parameters<typeof Inject>[0] {
         dataServiceName = defaultStr(dataServiceName, DataServiceManager.getDefaultDataServiceName()) as IDataServiceName;
         const dataServiceMeta = this.get(dataServiceName);
         if (!dataServiceMeta) {
@@ -191,7 +193,7 @@ export class DataServiceManager {
  * @param entity - The entity for which to inject the repository.
  * @returns The injected repository.
  */
-export function InjectDataService<EntityType extends IResourceRepositoryEntity = any>(entity: EntityType, dataServiceName?: IDataServiceName, ...args: any[]): PropertyDecorator & ParameterDecorator {
+export function InjectDataService<EntityType extends IDataServiceEntity = any>(entity: EntityType, dataServiceName?: IDataServiceName, ...args: any[]): PropertyDecorator & ParameterDecorator {
     DataServiceManager.registerEntities([entity], dataServiceName);
     const repositoryToken = DataServiceManager.getDataServiceToken(entity, dataServiceName, ...args);
     return Inject(repositoryToken);
@@ -238,6 +240,9 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
             }
             this.columns[column.propertyName] = column;
         });
+    }
+    getDataSeviceName(): IDataServiceName {
+        return "typeorm";
     }
     async executeInTransaction<R>(callback: (transaction: ITransaction<DataType>) => Promise<R>): Promise<R> {
         const dataService = this.repository.manager.connection; // Get the DataService from the repository

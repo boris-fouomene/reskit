@@ -27,6 +27,13 @@ export class ResourceService<DataType extends IResourceData = any, PrimaryKeyTyp
   constructor(protected dataService: ResourceDataServiceBase<DataType, PrimaryKeyType, RepositoryType>) {
     super();
   }
+  getRepository(): RepositoryType {
+    return this.dataService.getRepository();
+  }
+  getRepositoryAs<DataServiceRepository extends IDataServiceRepository>(): DataServiceRepository {
+    return this.dataService.getRepositoryAs();
+  }
+
   checkPermissionAction(actionPerm: () => boolean, i18nActionKey: string): Promise<any> {
     return new Promise((resolve, reject) => {
       resolve(true);

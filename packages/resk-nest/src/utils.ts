@@ -189,12 +189,14 @@ export const setupSwagger = (
         typeof sOptions.swaggerOptions.persistAuthorization !== undefined
             ? sOptions.swaggerOptions.persistAuthorization
             : true;
-    (app as NestExpressApplication).useStaticAssets(
-        pathM.join(__dirname, '../dist', 'swagger-ui'),
-        {
-            prefix: `/${swaggerPath.trim().ltrim("/")}`,
-        },
-    );
+    if (typeof (app as NestExpressApplication).useStaticAssets === 'function') {
+        (app as NestExpressApplication).useStaticAssets(
+            pathM.join(__dirname, '../dist', 'swagger-ui'),
+            {
+                prefix: `/${swaggerPath.trim().ltrim("/")}`,
+            },
+        );
+    }
     // Set up the Swagger UI endpoint
     SwaggerModule.setup(swaggerPath, app, () => {
         const documents = SwaggerModule.createDocument(app, config, documentOptions);

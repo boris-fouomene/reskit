@@ -14,7 +14,6 @@ import { IResourceEntity } from '../data-source';
  * @template ServiceType - The type of the `ResourceService` implementation.
  */
 @Controller()
-@ApiTags('resource')
 export class ResourceController<DataType extends IResourceEntity = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
   /**
    * Initializes the `ResourceController` instance with the provided `ResourceService`.

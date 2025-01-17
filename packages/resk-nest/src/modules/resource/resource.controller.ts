@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ResourceService } from './resource.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { isNonNullString, IResourceName } from '@resk/core';
 import { ResourcesManager } from '@resk/core';
 import { IResourceEntity } from '../data-source';

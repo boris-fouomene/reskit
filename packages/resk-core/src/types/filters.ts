@@ -54,6 +54,9 @@ export type IMangoValue = IMangoScalarValue | IMangoScalarValue[] | object;
 export interface IMangoRegexOptions {
   $regex: string;
   $options?: string; // Valid options: 'i' (case insensitive), 'm' (multiline), 's' (dotall), 'x' (extended)
+  meta?: {
+
+  }
 }
 
 /**
@@ -99,7 +102,7 @@ export interface IMangoComparisonOperators {
   $nin?: IMangoValue[];           // not in array
   $exists?: boolean;               // field exists
   $type?: string;                  // type check
-  $regex?: string | IMangoRegexOptions; // regular expression
+  $regex?: IMangoRegexOptions; // regular expression
   $size?: number;                  // array size
   $mod?: [number, number];         // modulo
   $all?: IMangoValue[];           // array contains all
@@ -114,8 +117,8 @@ export interface IMangoComparisonOperators {
  * different conditions relate to each other.
  * 
  * @example
- * // Example of using IMangoLogicalOperator
- * const filter: IMangoLogicalOperator = {
+ * // Example of using IMangoLogicalOperators
+ * const filter: IMangoLogicalOperators = {
  *     $and: [
  *         { age: { $gte: 18 } }, // Must be 18 or older
  *         { status: "active" }   // Must be active
@@ -132,7 +135,7 @@ export interface IMangoComparisonOperators {
  *     }
  * };
  */
-export interface IMangoLogicalOperator {
+export interface IMangoLogicalOperators {
   $and?: IMangoQuery[]; // An array of filter selectors that must all match
   $or?: IMangoQuery[];  // An array of filter selectors where at least one must match
   $nor?: IMangoQuery[]; // An array of filter selectors where none must match
@@ -158,6 +161,8 @@ export interface IMangoLogicalOperator {
 export interface IMangoArrayOperators {
   $all?: IMangoValue[];       // Matches documents where the array contains all specified values
   $elemMatch?: IMangoQuery; // Matches documents where at least one element in the array matches the criteria
+  $in?: IMangoValue[];
+  $nin?: IMangoValue[];
 }
 
 /**
@@ -186,11 +191,79 @@ export interface IMangoArrayOperators {
 export type IMangoQuery = {
   [field: string]:
   | IMangoValue
-  | IMangoComparisonOperators
-  | IMangoLogicalOperator
-  | IMangoArrayOperators
+  | IMangoOPerators
   & { [field: string]: IMangoQuery }; // Allows nesting of filter selectors
-} & Partial<IMangoLogicalOperator>; // Allows inclusion of logical operators
+} & Partial<IMangoLogicalOperators>; // Allows inclusion of logical operators
+
+export type IMangoOPerators = (IMangoLogicalOperators | IMangoComparisonOperators);
+
+/**
+ * A type that represents the names of all available MongoDB operators
+ * from both comparison and logical operator interfaces.
+ * 
+ * This type is a union of the keys from the `IMangoComparisonOperators`
+ * and `IMangoLogicalOperators` interfaces. It allows for a concise way
+ * to refer to any operator name that can be used in MongoDB queries,
+ * ensuring type safety and reducing the risk of typos in operator names.
+ * 
+ * @type IMangoOperatorName
+ * @example
+ * // Example usage of IMangoOperatorName
+ * const operator1: IMangoOperatorName = "$eq"; // Valid, as $eq is a comparison operator
+ * const operator2: IMangoOperatorName = "$and"; // Valid, as $and is a logical operator
+ * 
+ * // The following would cause a TypeScript error, as "$invalid" is not a defined operator
+ * // const invalidOperator: IMangoOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'IMangoOperatorName'
+ * 
+ * @see {@link IMangoComparisonOperators} for a list of comparison operators.
+ * @see {@link IMangoLogicalOperators} for a list of logical operators.
+ */
+export type IMangoOperatorName = IMangoLogicalOperatorName | IMangoComparisonOperatorName;
+
+/**
+ * A type that represents the names of all available logical operators
+ * defined in the `IMangoLogicalOperators` interface.
+ * 
+ * This type is a union of the keys from the `IMangoLogicalOperators` interface,
+ * allowing for a concise way to refer to any logical operator name that can
+ * be used in MongoDB queries. It ensures type safety and reduces the risk
+ * of typos in operator names.
+ * 
+ * @type IMangoLogicalOperatorName
+ * @example
+ * // Example usage of IMangoLogicalOperatorName
+ * const logicalOperator1: IMangoLogicalOperatorName = "$and"; // Valid, as $and is a logical operator
+ * const logicalOperator2: IMangoLogicalOperatorName = "$or";  // Valid, as $or is a logical operator
+ * 
+ * // The following would cause a TypeScript error, as "$invalid" is not a defined logical operator
+ * // const invalidLogicalOperator: IMangoLogicalOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'IMangoLogicalOperatorName'
+ * 
+ * @see {@link IMangoLogicalOperators} for a list of logical operators.
+ */
+export type IMangoLogicalOperatorName = keyof IMangoLogicalOperators;
+
+
+/**
+ * A type that represents the names of all available comparison operators
+ * defined in the `IMangoComparisonOperators` interface.
+ * 
+ * This type is a union of the keys from the `IMangoComparisonOperators` interface,
+ * allowing for a concise way to refer to any comparison operator name that can
+ * be used in MongoDB queries. It ensures type safety and reduces the risk
+ * of typos in operator names.
+ * 
+ * @type IMangoComparisonOperatorName
+ * @example
+ * // Example usage of IMangoComparisonOperatorName
+ * const comparisonOperator1: IMangoComparisonOperatorName = "$eq"; // Valid, as $eq is a comparison operator
+ * const comparisonOperator2: IMangoComparisonOperatorName = "$gt"; // Valid, as $gt is a comparison operator
+ * 
+ * // The following would cause a TypeScript error, as "$invalid" is not a defined comparison operator
+ * // const invalidComparisonOperator: IMangoComparisonOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'IMangoComparisonOperatorName'
+ * 
+ * @see {@link IMangoComparisonOperators} for a list of comparison operators.
+ */
+export type IMangoComparisonOperatorName = keyof IMangoComparisonOperators;
 
 /**
  * Type representing the direction of sorting operations.
@@ -217,4 +290,70 @@ export type IMangoOrderByDirection = 'asc' | 'desc';
  * const objectSort: IMangoOrderBy = { age: 'asc', name: 'desc' }; // Sort by 'age' ascending and 'name' descending
  * const arraySort: IMangoOrderBy = [{ age: 'asc' }, { name: 'desc' }]; // Sort by 'age' ascending and 'name' descending using an array
  */
-export type IMangoOrderBy = string | { [field: string]: IMangoOrderByDirection } | Array<{ [field: string]: IMangoOrderByDirection }>;
+export type IMangoOrderBy<DataType = any> = string | { [field in keyof DataType]: IMangoOrderByDirection } | Array<{ [field in keyof DataType]: IMangoOrderByDirection }>;
+
+
+/**
+ * A collection of MongoDB operators categorized into logical, comparison, and array operators.
+ * 
+ * This constant provides a structured way to access various MongoDB operators that can be used
+ * in queries. Each category contains a list of operator keys that correspond to their respective
+ * types in MongoDB.
+ * 
+ * @constant
+ * @type {Object}
+ * @property {Array<keyof IMangoLogicalOperators>} LOGICAL - An array of logical operators.
+ *   - **Example**: 
+ *     - `$and`: Joins query clauses with a logical AND.
+ *     - `$or`: Joins query clauses with a logical OR.
+ *     - `$nor`: Joins query clauses with a logical NOR.
+ *     - `$not`: Inverts the effect of a query expression.
+ * 
+ * @property {Array<keyof IMangoComparisonOperators>} COMPARATOR - An array of comparison operators.
+ *   - **Example**: 
+ *     - `$eq`: Matches values that are equal to a specified value.
+ *     - `$ne`: Matches all values that are not equal to a specified value.
+ *     - `$gt`: Matches values that are greater than a specified value.
+ *     - `$gte`: Matches values that are greater than or equal to a specified value.
+ *     - `$lt`: Matches values that are less than a specified value.
+ *     - `$lte`: Matches values that are less than or equal to a specified value.
+ *     - `$in`: Matches any of the values specified in an array.
+ *     - `$nin`: Matches none of the values specified in an array.
+ *     - `$exists`: Matches documents that have the specified field.
+ *     - `$type`: Matches documents based on the type of the field.
+ *     - `$regex`: Matches documents where the field value matches a specified regular expression.
+ *     - `$size`: Matches any array with the number of elements specified.
+ *     - `$mod`: Matches documents where the value of a field is equal to the specified value when divided by a specified divisor.
+ *     - `$all`: Matches arrays that contain all elements specified in the query.
+ *     - `$elemMatch`: Matches documents that contain an array field with at least one element that matches all the specified query criteria.
+ * 
+ * @property {Array<keyof IMangoArrayOperators>} ARRAY - An array of array operators.
+ *   - **Example**: 
+ *     - `$all`: Matches arrays that contain all elements specified in the query.
+ *     - `$elemMatch`: Matches documents that contain an array field with at least one element that matches all the specified query criteria.
+ *     - `$in`: Matches any of the values specified in an array.
+ *     - `$nin`: Matches none of the values specified in an array.
+ * 
+ * @example
+ * // Example usage of MANGO_OPERATORS in a MongoDB query
+ * const query = {
+ *   $or: [
+ *     { age: { $gt: 18 } },
+ *     { name: { $regex: /John/i } }
+ *   ]
+ * };
+ * 
+ * // This query will find documents where the age is greater than 18
+ * // or the name matches the regex for "John".
+ * 
+ * @see {@link https://docs.mongodb.com/manual/reference/operator/|MongoDB Operators Documentation} for more details on each operator.
+ */
+export const MANGO_OPERATORS: {
+  LOGICAL: (keyof IMangoLogicalOperators)[],
+  COMPARATOR: (keyof IMangoComparisonOperators)[],
+  ARRAY: (keyof IMangoArrayOperators)[],
+} = {
+  LOGICAL: ["$and", "$or", "$nor", "$not"] as (keyof IMangoLogicalOperators)[],
+  COMPARATOR: ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$exists", "$type", "$regex", "$size", "$mod", "$all", "$elemMatch"] as (keyof IMangoComparisonOperators)[],
+  ARRAY: ["$all", "$elemMatch", "$in", "$nin"] as (keyof IMangoArrayOperators)[],
+}

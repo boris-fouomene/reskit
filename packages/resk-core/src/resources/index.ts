@@ -1,4 +1,4 @@
-import { IDict, IResourceName, IField, IResourceDefaultEvent, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataProvider, IResourceOperationResult, IResourcePrimaryKey, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey } from '../types';
+import { IDict, IResourceName, IField, IResourceDefaultEvent, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory } from '../utils/index';
 import { IConstructor, IProtectedResource } from '../types/index';
@@ -54,7 +54,7 @@ const resourcesClassNameMetaData = Symbol('resourceByClassName');
  * console.log(dynamicResource.getFields()); 
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
-export abstract class ResourceBase<DataType = any, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> {
+export abstract class ResourceBase<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> implements IResourceDataService<DataType, PrimaryKeyType> {
   actions?: IResourceActionMap;
   metaData?: IResource<DataType>;
   getMetaData(): IResource<DataType> {
@@ -167,15 +167,15 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
   get INVALID_DATA_PROVIDER_ERROR(): string {
     return i18n.t("resources.invalidDataProvider", this.getTranslateParams());
   }
-  hasDataProvider(): boolean {
-    const dataProvider = this.getDataProvider();
-    return dataProvider != null && typeof dataProvider?.update === "function" && typeof dataProvider?.create === "function" && typeof dataProvider?.find === "function" && typeof dataProvider?.update === "function" && typeof dataProvider?.delete === "function";
+  hasDataService(): boolean {
+    const dataService = this.getDataService();
+    return dataService != null && typeof dataService?.update === "function" && typeof dataService?.create === "function" && typeof dataService?.find === "function" && typeof dataService?.update === "function" && typeof dataService?.delete === "function";
   }
   /**
    * get the data provider for the resource.
-   * @returns {IResourceDataProvider<DataType>} The data provider for the resource.
+   * @returns {IResourceDataService<DataType>} The data provider for the resource.
    */
-  abstract getDataProvider(): IResourceDataProvider<DataType>;
+  abstract getDataService(): IResourceDataService<DataType>;
   /***
    * trigger the event
    * @param event - The event to trigger.
@@ -196,7 +196,7 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
    * @returns A promise that resolves if the user has permission, or rejects with an error if the user does not have permission or the data provider is invalid.
    */
   checkPermissionAction(actionPerm: () => boolean, i18nActionKey: string): Promise<any> {
-    if (!this.hasDataProvider()) {
+    if (!this.hasDataService()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
     if (!actionPerm()) {
@@ -209,10 +209,10 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
    * @param {DataType} record - The data for the new record.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
-  create(record: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
+  create(record: Partial<DataType>) {
     return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
       .then(() => {
-        return this.getDataProvider()?.create(record).then((result) => {
+        return this.getDataService().create(record).then((result) => {
           this._trigger("create" as EventType, result);
           return result;
         });
@@ -223,9 +223,9 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
    * @param {IResourceQueryOptions<DataType>} options - Optional options for fetching resources.
    * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  find(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>> {
+  find(options?: IResourceQueryOptions<DataType>) {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
-      return this.getDataProvider()?.find(options).then((result) => {
+      return this.getDataService()?.find(options).then((result) => {
         this._trigger("find" as EventType, result);
         return result;
       });
@@ -233,13 +233,13 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
   }
   /***
    * fetches a single record from the resource.
-   * @param {IResourcePrimaryKey} key - The primary key of the resource.
+   * @param {PrimaryKeyType} key - The primary key of the resource.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  findOne(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType | null>> {
+  findOne(primaryKey: PrimaryKeyType) {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
       .then(() => {
-        return this.getDataProvider().findOne(primaryKey).then((result) => {
+        return this.getDataService().findOne(primaryKey).then((result) => {
           this._trigger("findOne" as EventType, result);
           return result;
         });
@@ -248,25 +248,25 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
   /***
    * fetches a single record from the resource.
    * If the record is not found, it throws an error.
-   * @param {IResourcePrimaryKey} primaryKey - The primary key of the resource.
+   * @param {PrimaryKeyType} primaryKey - The primary key of the resource.
    */
-  async findOneOrFail(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType>> {
+  async findOneOrFail(primaryKey: PrimaryKeyType) {
     const result = await this.findOne(primaryKey);
-    if (!isObj(result?.data)) {
+    if (!isObj(result) || !result) {
       throw new Error(i18n.t("resources.notFoundError", Object.assign({}, { primaryKey: JSON.stringify(primaryKey) }, this.getTranslateParams())));
     }
-    return result as unknown as Promise<IResourceOperationResult<DataType>>;
+    return result;
   }
   /**
    * updates a record in the resource.
-   * @param key {IResourcePrimaryKey} The primary key of the resource to update.
+   * @param key {PrimaryKeyType} The primary key of the resource to update.
    * @param updatedData
    * @returns 
    */
-  update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>> {
+  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>) {
     return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
       .then(() => {
-        return this.getDataProvider()?.update(primaryKey, updatedData).then((result) => {
+        return this.getDataService()?.update(primaryKey, updatedData).then((result) => {
           this._trigger("update" as EventType, result);
           return result;
         });
@@ -274,13 +274,13 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
   }
   /***
    * deletes a record from the resource.
-   * @param primaryKey {IResourcePrimaryKey} The primary key of the resource to delete.
-   * @returns Promise<IResourceOperationResult<any>> A promise that resolves to the result of the delete operation.
+   * @param primaryKey {PrimaryKeyType} The primary key of the resource to delete.
+   * @returns Promise<number> A promise that resolves to the result of the delete operation.
    */
-  delete(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<any>> {
+  delete(primaryKey: PrimaryKeyType) {
     return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
       .then(() => {
-        return this.getDataProvider()?.delete(primaryKey).then((result) => {
+        return this.getDataService()?.delete(primaryKey).then((result) => {
           this._trigger("delete" as EventType, result);
           return result;
         });
@@ -292,11 +292,20 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
    * @param options - Optional query options to filter, sort, and paginate the results.
    * @returns A promise that resolves to an object containing the list of records and the total count.
    */
-  findAndCount(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>> {
+  findAndCount(options?: IResourceQueryOptions<DataType>) {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
       .then(() => {
-        return this.getDataProvider().findAndCount(options).then((result) => {
+        return this.getDataService().findAndCount(options).then((result) => {
           this._trigger("findAndCount" as EventType, result);
+          return result;
+        });
+      })
+  }
+  findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
+      .then(() => {
+        return this.getDataService().findAndPaginate(options).then((result) => {
+          this._trigger("findAndPaginate" as EventType, result);
           return result;
         });
       })
@@ -306,10 +315,10 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
    * @param data - An array of partial data objects to create.
    * @returns A promise that resolves to the result of the create operation.
    */
-  createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>> {
+  createMany(data: Partial<DataType>[]) {
     return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
       .then(() => {
-        return this.getDataProvider().createMany(data).then((result) => {
+        return this.getDataService().createMany(data).then((result) => {
           this._trigger("createMany" as EventType, result);
           return result;
         });
@@ -317,13 +326,14 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
   }
   /**
    * Updates multiple records in the resource.
+   * @param filter - The query options to filter the records to be updated.
    * @param data - An array of partial data objects to update.
    * @returns A promise that resolves to the result of the update operation.
    */
-  updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>> {
+  updateMany(filter: IResourceQueryOptions, data: Partial<DataType>) {
     return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
       .then(() => {
-        return this.getDataProvider().updateMany(data).then((result) => {
+        return this.getDataService().updateMany(filter, data).then((result) => {
           this._trigger("updateMany" as EventType, result);
           return result;
         });
@@ -334,10 +344,10 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
    * @param criteria - The query options to filter the records to be deleted.
    * @returns A promise that resolves to the result of the delete operation.
    */
-  deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<any[]>> {
+  deleteMany(criteria: IResourceQueryOptions<DataType>) {
     return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
       .then(() => {
-        return this.getDataProvider().deleteMany(criteria).then((result) => {
+        return this.getDataService().deleteMany(criteria).then((result) => {
           this._trigger("deleteMany" as EventType, result);
           return result;
         });
@@ -346,12 +356,12 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
   /**
    * Counts the number of records in the resource.
    * @param options - Optional query options to filter the results.
-   * @returns {Promise<IResourceOperationResult<number>>} A promise that resolves to the result of the count operation.
+   * @returns {Promise<number>} A promise that resolves to the result of the count operation.
    */
-  count(options?: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<number>> {
+  count(options?: IResourceQueryOptions<DataType>) {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
       .then(() => {
-        return this.getDataProvider().count(options).then((result) => {
+        return this.getDataService().count(options).then((result) => {
           this._trigger("read" as EventType, result);
           return result;
         });
@@ -359,13 +369,13 @@ export abstract class ResourceBase<DataType = any, EventType extends Partial<IRe
   }
   /***
    * checks if the resource has the record
-   * @param {IResourcePrimaryKey} primaryKey - The primary key of the record to check.
-   * @returns {Promise<IResourceOperationResult<boolean>>} A promise that resolves to the result of the exists operation.
+   * @param {PrimaryKeyType} primaryKey - The primary key of the record to check.
+   * @returns {Promise<boolean>} A promise that resolves to the result of the exists operation.
    */
-  exists(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<boolean>> {
+  exists(primaryKey: PrimaryKeyType): Promise<boolean> {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
       .then(() => {
-        return this.getDataProvider().exists(primaryKey).then((result) => {
+        return this.getDataService().exists(primaryKey).then((result) => {
           this._trigger("exits" as EventType, result);
           return result;
         });

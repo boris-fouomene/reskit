@@ -1,7 +1,7 @@
 import { IAuthPerm } from "@/auth/types";
 import { IMangoQuery, IMangoOrderBy } from "./filters";
 
-export type IResourceDefaultEvent = IResourceActionName | keyof IResourceDataProvider;
+export type IResourceDefaultEvent = IResourceActionName | keyof IResourceDataService;
 
 /**
  * @typedef IPrimitive
@@ -909,7 +909,7 @@ export type IResourceActionName = keyof IResourceActionMap;
  *
  * @template DataType - The type of data the resource handles.
 
- * @property {IResourceDataProvider<DataType>} dataProvider - The data provider for the resource.
+ * @property {IResourceDataService<DataType>} dataProvider - The data provider for the resource.
  * @property {IResourceName} [name] - The internal name of the resource used for programmatic referencing.
  * @property {string} [label] - A user-friendly label for the resource, typically used in UI elements.
  * @property {string} [title] - A descriptive title for the resource, often displayed in prominent places.
@@ -1284,7 +1284,7 @@ export type IDictKeysAsString<T> = keyof T extends string ? keyof T : never;
  *   that consist of multiple fields.
  *   - **Example**: 
  *     ```typescript
- *     const compositeKey: IResourcePrimaryKey = { userId: "user123", orderId: 456 }; 
+ *     const compositeKey: PrimaryKeyType = { userId: "user123", orderId: 456 }; 
  *     // A composite key representing a user and their order
  *     ```
  * 
@@ -1308,7 +1308,7 @@ export type IDictKeysAsString<T> = keyof T extends string ? keyof T : never;
  * retrieves a resource by its primary key:
  * 
  * ```typescript
- * function getResourceById(id: IResourcePrimaryKey): Resource {
+ * function getResourceById(id: PrimaryKeyType): Resource {
  *     // Implementation to list the resource based on the provided primary key
  * }
  * 
@@ -1323,7 +1323,7 @@ export type IDictKeysAsString<T> = keyof T extends string ? keyof T : never;
  * essential for applications that manage diverse data structures and require
  * unique identification of resources.
  */
-export type IResourcePrimaryKey = Record<string, any>;
+export type IResourcePrimaryKey = string | number | object;
 
 /**
  * @interface IResourceOperationResult
@@ -1413,7 +1413,7 @@ export interface IResourceOperationResult<DataType = any> {
 }
 
 /**
- * @interface IResourceDataProvider
+ * @interface IResourceDataService
  * 
  * Represents a data provider interface for managing resources.
  * This interface defines methods for performing CRUD (Create, Read, Update, Delete)
@@ -1422,31 +1422,33 @@ export interface IResourceOperationResult<DataType = any> {
  * @template DataType - The type of the resource data being managed. Defaults to `any`,
  * allowing for flexibility in the type of data handled by the provider.
  * 
+ * @template PrimaryKeyType - The type of the primary key used to identify resources.
+ * 
  * 
  * ### Methods:
  * 
  * - **create(record: Partial<DataType>)**: Creates a new resource record.
  *   - **Parameters**:
  *     - `record`: The data for the new resource to be created.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
+ *   - **Returns**: A promise that resolves to an `DataType`, 
  *     indicating the success or failure of the operation.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.create({ name: "New Resource" });
  *     ```
  * 
- * - **update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>)**: Updates an existing resource record.
+ * - **update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>)**: Updates an existing resource record.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to update.
  *     - `updatedData`: An object containing the updated data for the resource.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
+ *   - **Returns**: A promise that resolves to an `DataType`, 
  *     indicating the success or failure of the update operation.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.update("resourceId", { name: "Updated Resource" });
  *     ```
  * 
- * - **delete(primaryKey: IResourcePrimaryKey)**: Deletes a resource record by its primary key.
+ * - **delete(primaryKey: PrimaryKeyType)**: Deletes a resource record by its primary key.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to delete.
  *   - **Returns**: A promise that resolves to an `IResourceOperationResult<any>`, 
@@ -1456,20 +1458,20 @@ export interface IResourceOperationResult<DataType = any> {
  *     const result = await dataProvider.delete("resourceId");
  *     ```
  * 
- * - **findOne(primaryKey: IResourcePrimaryKey)**: Retrieves a single resource record by its primary key.
+ * - **findOne(primaryKey: PrimaryKeyType)**: Retrieves a single resource record by its primary key.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to retrieve.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType | null>`, 
+ *   - **Returns**: A promise that resolves to an `DataType | null`, 
  *     containing the requested resource record or null if not found.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.findOne("resourceId");
  *     ```
  * 
- * - **findOneOrFail(primaryKey: IResourcePrimaryKey)**: Retrieves a single resource record by its primary key or throws an error if not found.
+ * - **findOneOrFail(primaryKey: PrimaryKeyType)**: Retrieves a single resource record by its primary key or throws an error if not found.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to retrieve.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType>`, 
+ *   - **Returns**: A promise that resolves to an `DataType`, 
  *     containing the requested resource record.
  *   - **Example**:
  *     ```typescript
@@ -1499,7 +1501,7 @@ export interface IResourceOperationResult<DataType = any> {
  * - **createMany(data: Partial<DataType>[])**: Creates multiple resource records.
  *   - **Parameters**:
  *     - `data`: An array of data for the new resources to be created.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+ *   - **Returns**: A promise that resolves to an `DataType[]`, 
  *     indicating the success or failure of the operation.
  *   - **Example**:
  *     ```typescript
@@ -1509,7 +1511,7 @@ export interface IResourceOperationResult<DataType = any> {
  * - **updateMany(data: Partial<DataType>)**: Updates multiple resource records.
  *   - **Parameters**:
  *     - `data`: An object containing the updated data for the resources.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+ *   - **Returns**: A promise that resolves to an `DataType[]`, 
  *     indicating the success or failure of the update operation.
  *   - **Example**:
  *     ```typescript
@@ -1519,7 +1521,7 @@ export interface IResourceOperationResult<DataType = any> {
  * - **deleteMany(criteria: IResourceQueryOptions<DataType>)**: Deletes multiple resource records based on criteria.
  *   - **Parameters**:
  *     - `criteria`: The criteria to filter which resources to delete.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<any[]>`, 
+ *   - **Returns**: A promise that resolves to an `number`, 
  *     indicating the success or failure of the delete operation.
  *   - **Example**:
  *     ```typescript
@@ -1529,17 +1531,17 @@ export interface IResourceOperationResult<DataType = any> {
  * - **count(options?: IResourceQueryOptions<DataType>)**: Counts the total number of resource records based on query options.
  *   - **Parameters**:
  *     - `options`: Optional query options to filter the count.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<number>`, 
+ *   - **Returns**: A promise that resolves to an `number`, 
  *     containing the total count of resource records.
  *   - **Example**:
  *     ```typescript
  *     const result = await dataProvider.count({ filters: { status: "active" } });
  *     ```
  * 
- * - **exists(primaryKey: IResourcePrimaryKey)**: Checks if a resource record exists by its primary key.
+ * - **exists(primaryKey: PrimaryKeyType)**: Checks if a resource record exists by its primary key.
  *   - **Parameters**:
  *     - `primaryKey`: The primary key of the resource to check.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<boolean>`, 
+ *   - **Returns**: A promise that resolves to an `boolean`, 
  *     indicating whether the resource exists.
  *   - **Example**:
  *     ```typescript
@@ -1550,7 +1552,7 @@ export interface IResourceOperationResult<DataType = any> {
  *   - **Parameters**:
  *     - `field`: The field for which to retrieve distinct values.
  *     - `options`: Optional query options to filter the results.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+ *   - **Returns**: A promise that resolves to an `DataType[]`, 
  *     containing the distinct values.
  *   - **Example**:
  *     ```typescript
@@ -1560,7 +1562,7 @@ export interface IResourceOperationResult<DataType = any> {
  * - **aggregate?(pipeline: any[])**: Performs aggregation operations on the resource data.
  *   - **Parameters**:
  *     - `pipeline`: An array representing the aggregation pipeline.
- *   - **Returns**: A promise that resolves to an `IResourceOperationResult<any[]>`, 
+ *   - **Returns**: A promise that resolves to an `number`, 
  *     containing the aggregated results.
  *   - **Example**:
  *     ```typescript
@@ -1574,10 +1576,10 @@ export interface IResourceOperationResult<DataType = any> {
  *   for use in modern web applications.
  * 
  * ### Example Usage:
- * Here’s how you might implement the `IResourceDataProvider` interface:
+ * Here’s how you might implement the `IResourceDataService` interface:
  * 
  * ```typescript
- * class MyDataProvider implements IResourceDataProvider<MyResourceType> {
+ * class MyDataProvider implements IResourceDataService<MyResourceType> {
  *     async create(record: MyResourceType): Promise<IResourceOperationResult<MyResourceType>> {
  *         // Implementation for creating a resource
  *     }
@@ -1591,35 +1593,35 @@ export interface IResourceOperationResult<DataType = any> {
  * ```
  * 
  * ### Summary:
- * The `IResourceDataProvider` interface defines a comprehensive set of methods
+ * The `IResourceDataService` interface defines a comprehensive set of methods
  * for managing resources, facilitating CRUD operations and ensuring a consistent
  * approach to data handling in applications.
 
  */
-export interface IResourceDataProvider<DataType = any> {
+export interface IResourceDataService<DataType = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
   /***
    * Creates a new resource record.
    * @param record The data for the new resource to be created.
-   * @returns A promise that resolves to an `IResourceOperationResult<DataType>`, 
+   * @returns A promise that resolves to an `DataType`, 
    * indicating the success or failure of the operation.
    * @example
   *   ```typescript
   *   const result = await dataProvider.create({ name: "New Resource" });
   *     ```
    */
-  create(record: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
+  create(record: Partial<DataType>): Promise<DataType>;
   /***
    * Updates an existing resource record.
    * @param primaryKey The primary key of the resource to update.
    * @param updatedData An object containing the updated data for the resource.
-   * @returns A promise that resolves to an `IResourceOperationResult<DataType>`, 
+   * @returns A promise that resolves to an `DataType`, 
    * indicating the success or failure of the update operation.
    * @example
   *   ```typescript
   *   const result = await dataProvider.update("resourceId", { name: "Updated Resource" });
   *     ```
    */
-  update(primaryKey: IResourcePrimaryKey, updatedData: Partial<DataType>): Promise<IResourceOperationResult<DataType>>;
+  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType>;
   /***
    * Deletes a resource record by its primary key.
    * @param primaryKey The primary key of the resource to delete.
@@ -1630,118 +1632,132 @@ export interface IResourceDataProvider<DataType = any> {
   *   const result = await dataProvider.delete("resourceId");
   *     ```
    */
-  delete(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<any>>;
+  delete(primaryKey: PrimaryKeyType): Promise<boolean>;
   /***
    * Retrieves a single resource record by its primary key.
    * @param primaryKey The primary key of the resource to retrieve.
-   * @returns A promise that resolves to an `IResourceOperationResult<DataType | null>`, 
+   * @returns A promise that resolves to an `DataType | null`, 
    * containing the requested resource record or null if not found.
    * @example
   *   ```typescript
   *   const result = await dataProvider.findOne("resourceId");
   *     ```
    */
-  findOne(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType | null>>;
+  findOne(primaryKey: PrimaryKeyType): Promise<DataType | null>;
   /***
    * Retrieves a single resource record by its primary key or throws an error if not found.
    * @param primaryKey The primary key of the resource to retrieve.
-   * @returns A promise that resolves to an `IResourceOperationResult<DataType>`, 
+   * @returns A promise that resolves to an `DataType`, 
    * containing the requested resource record.
    * @example
   *   ```typescript
   *   const result = await dataProvider.findOneOrFail("resourceId");
   *     ```
    */
-  findOneOrFail(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<DataType>>;
+  findOneOrFail(primaryKey: PrimaryKeyType): Promise<DataType>;
   /***
    * Retrieves multiple resource records based on query options.
    * @param options Optional query options to filter the results.
-   * @returns A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
+   * @returns A promise that resolves to an `DataType[]`, 
    * containing the list of resource records.
    * @example
   *   ```typescript
   *   const result = await dataProvider.find({ limit: 10, skip: 0 });
   *     ```
    */
-  find(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>>;
+  find(options?: IResourceQueryOptions<DataType>): Promise<DataType[]>;
   /***
    * Retrieves multiple resource records and the total count based on query options.
    * @param options Optional query options to filter the results.
-   * @returns A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
+   * @returns A promise that resolves to an `DataType[]`, 
    * containing the list of resource records and the total count.
    * @example
   *   ```typescript
   *   const result = await dataProvider.findAndCount({ limit: 10, skip: 0 });
   *     ```
    */
-  findAndCount(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>>;
+  findAndCount(options?: IResourceQueryOptions<DataType>): Promise<[DataType[], number]>;
+
+  /***
+   * Retrieves multiple resource records and paginates the results.
+   * @param options Optional query options to filter the results.
+   * @returns A promise that resolves to an `IResourcePaginatedResult<DataType>`, 
+   * containing the list of resource records and the total count.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.findAndPaginate({ limit: 10, skip: 0 });
+   */
+  findAndPaginate(options?: IResourceQueryOptions<DataType>): Promise<IResourcePaginatedResult<DataType>>;
+
   /***
    * Creates multiple resource records.
    * @param data An array of data for the new resources to be created.
-   * @returns A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+   * @returns A promise that resolves to an `DataType[]`, 
    * indicating the success or failure of the operation.
    * @example
   *   ```typescript
   *   const result = await dataProvider.createMany([{ name: "Resource 1" }, { name: "Resource 2" }]);
   *     ```
    */
-  createMany(data: Partial<DataType>[]): Promise<IResourceOperationResult<DataType[]>>;
+  createMany(data: Partial<DataType>[]): Promise<DataType[]>;
   /***
    * Updates multiple resource records.
+   * @param filter An object containing the filter criteria for the resources.
    * @param data An object containing the updated data for the resources.
-   * @returns A promise that resolves to an `IResourceOperationResult<DataType[]>`, 
+   * @returns A promise that resolves to an `DataType[]`, 
    * indicating the success or failure of the update operation.
    * @example
   *   ```typescript
   *   const result = await dataProvider.updateMany({ status: "active" });
   *     ```
    */
-  updateMany(data: Partial<DataType>): Promise<IResourceOperationResult<DataType[]>>;
+  updateMany(filter: IResourceQueryOptions, data: Partial<DataType>): Promise<number>;
   /**
    * 
    * @param criteria The criteria to filter which resources to delete.
-   * @returns A promise that resolves to an `IResourceOperationResult<any[]>`, 
+   * @returns A promise that resolves to an `number`, 
    * indicating the success or failure of the delete operation.
    * @example
   *   ```typescript
   *   const result = await dataProvider.deleteMany({ filters: { status: "inactive" } });
   *     ```
    */
-  deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<any[]>>;
+  deleteMany(criteria: IResourceQueryOptions<DataType>): Promise<number>;
   /***
    * Counts the total number of resource records based on query options.
    * @param options Optional query options to filter the count.
-   * @returns A promise that resolves to an `IResourceOperationResult<number>`, 
+   * @returns A promise that resolves to an `number`, 
    * containing the total count of resource records.
    * @example
   *   ```typescript
   *   const result = await dataProvider.count({ filters: { status: "active" } });
   *     ```
    */
-  count(options?: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<number>>;
+  count(options?: IResourceQueryOptions<DataType>): Promise<number>;
   /**
    * 
    * @param primaryKey The primary key of the resource to check.
-   * @returns A promise that resolves to an `IResourceOperationResult<boolean>`, 
+   * @returns A promise that resolves to an `boolean`, 
    * indicating whether the resource exists.
    * @example
   *   ```typescript
   *   const result = await dataProvider.exists("resourceId");
   *     ```
    */
-  exists(primaryKey: IResourcePrimaryKey): Promise<IResourceOperationResult<boolean>>;
+  exists(primaryKey: PrimaryKeyType): Promise<boolean>;
   /**
-   * 
+   * Returns distinct values for a field
    * @param field The field to check for distinct values.
    * @param options 
    */
-  distinct?(field: keyof DataType, options?: IResourceQueryOptions<DataType>): Promise<IResourceOperationResult<DataType[]>>;
+  distinct?(field: keyof DataType): Promise<any[]>;
 
   /**
+   * // Supports MongoDB-style aggregation pipelines
    * Aggregates resources based on a pipeline.
    * @param pipeline 
    */
-  aggregate?(pipeline: any[]): Promise<IResourceOperationResult<any[]>>;
+  aggregate?(pipeline: any[]): Promise<any[]>;
 }
 
 /**
@@ -1775,14 +1791,6 @@ export interface IResourceQueryOptions<DataType = any> {
   limit?: number;            // Optional limit on the number of results to return
   skip?: number;             // Optional number of results to skip before returning
 
-  /** Pagination settings for the fetched resources. */
-  pagination?: {
-    /** The current page number (starting from 1). */
-    page?: number;
-    /** The number of items per page. */
-    pageSize?: number;
-  };
-
   /** Include relationships or nested resources. */
   include?: IResourceName[];
 
@@ -1801,7 +1809,7 @@ export interface IResourceQueryOptions<DataType = any> {
   /**
    * Where clause to filter the results.
    */
-  where?: Record<keyof DataType, any>;
+  where?: Partial<Record<keyof DataType, any>>;
 }
 
 /**

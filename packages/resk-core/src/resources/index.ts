@@ -233,13 +233,13 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
   }
   /***
    * fetches a single record from the resource.
-   * @param {PrimaryKeyType} key - The primary key of the resource.
+   * @param {PrimaryKeyType | IResourceQueryOptions<DataType>} options - The primary key or query options of the resource to retrieve.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
-  findOne(primaryKey: PrimaryKeyType) {
+  findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>) {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
       .then(() => {
-        return this.getDataService().findOne(primaryKey).then((result) => {
+        return this.getDataService().findOne(options).then((result) => {
           this._trigger("findOne" as EventType, result);
           return result;
         });
@@ -248,12 +248,12 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
   /***
    * fetches a single record from the resource.
    * If the record is not found, it throws an error.
-   * @param {PrimaryKeyType} primaryKey - The primary key of the resource.
+   * @param {PrimaryKeyType | IResourceQueryOptions<DataType>} options - The primary key or query options of the resource to retrieve.
    */
-  async findOneOrFail(primaryKey: PrimaryKeyType) {
-    const result = await this.findOne(primaryKey);
+  async findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>) {
+    const result = await this.findOne(options);
     if (!isObj(result) || !result) {
-      throw new Error(i18n.t("resources.notFoundError", Object.assign({}, { primaryKey: JSON.stringify(primaryKey) }, this.getTranslateParams())));
+      throw new Error(i18n.t("resources.notFoundError", Object.assign({}, { options: JSON.stringify(options) }, this.getTranslateParams())));
     }
     return result;
   }

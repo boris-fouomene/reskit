@@ -1,6 +1,6 @@
-import { IResourcePrimaryKey, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataService, isNonNullString, defaultStr, isObj, isPrimitive, IResourceManyCriteria, IMangoQuery, IMangoComparisonOperators, IMangoOPerators, IMangoLogicalOperators, MANGO_OPERATORS, IMangoOperatorName, IMangoLogicalOperatorName, isEmpty, IMangoOrderByDirection } from "@resk/core";
+import { IResourcePrimaryKey, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceDataService, isNonNullString, defaultStr, isObj, IResourceManyCriteria, IResourceFindWhereAndCondition, IResourceFindWhereCondition, IResourceFindWhereOrCondition } from "@resk/core";
 import { DynamicModule, Inject, Injectable, Provider } from "@nestjs/common";
-import { DeepPartial, EntityManager, FindOptionsWhere, Not, In, IsNull, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Repository, Like, Equal, FindManyOptions, FindOptionsOrder } from "typeorm";
+import { DeepPartial, EntityManager, FindOptionsWhere, Repository } from "typeorm";
 import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { EntityClassOrSchema } from "@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
@@ -13,8 +13,6 @@ export interface IDataServicesMap {
 export interface IDataServiceEntity {
     name: string;
 }
-export interface IDataServiceMangoResolveOptions { operator: IMangoOperatorName, field?: string, operand: any, context?: any, result: Record<string, any> }
-
 
 export type IDataServiceName = keyof IDataServicesMap;
 
@@ -33,8 +31,8 @@ export abstract class ResourceDataService<DataType extends IResourceData = any, 
     abstract create(record: Partial<DataType>): Promise<DataType>;
     abstract update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType>;
     abstract delete(primaryKey: PrimaryKeyType): Promise<boolean>;
-    abstract findOne(primaryKey: PrimaryKeyType): Promise<DataType | null>;
-    abstract findOneOrFail(primaryKey: PrimaryKeyType): Promise<DataType>;
+    abstract findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null>;
+    abstract findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType>;
     abstract find(options?: IResourceQueryOptions<DataType> | undefined): Promise<DataType[]>;
     abstract findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]>;
     abstract createMany(data: Partial<DataType>[]): Promise<DataType[]>;
@@ -43,6 +41,32 @@ export abstract class ResourceDataService<DataType extends IResourceData = any, 
     abstract count(options?: IResourceQueryOptions<DataType> | undefined): Promise<number>;
     abstract exists(primaryKey: PrimaryKeyType): Promise<boolean>;
     abstract executeInTransaction<R>(callback: (transaction: ITransaction<DataType>) => Promise<R>): Promise<R>;
+    /***
+     * Returns the names of the primary columns of the resource.
+     * @returns {(keyof DataType)[]} An array of primary column names.
+     */
+    abstract getPrimaryColumnNames(): (keyof DataType)[];
+    buildWhereCondition(options: PrimaryKeyType | PrimaryKeyType[] | IResourceQueryOptions<DataType>): Omit<IResourceQueryOptions<DataType>, "where"> & { where: IResourceFindWhereCondition<DataType> } {
+        const contitions: IResourceFindWhereAndCondition<DataType> = {};
+        const primaryColumns = this.getPrimaryColumnNames();
+        if (["number", "string"].includes(typeof options)) {
+            const primaryColumn: keyof DataType = this.getPrimaryColumnNames()[0];
+            contitions[primaryColumn] = options as (DataType[keyof DataType]);
+            options = { where: contitions };
+        }
+        if (Array.isArray(options)) {
+            const where: IResourceFindWhereOrCondition = [];
+            (options as PrimaryKeyType[]).map((primaryColumn: PrimaryKeyType) => {
+                where.push({ [primaryColumns[0]]: primaryColumn });
+            });
+            options = { where };
+        }
+        const result = Object.assign({}, options) as Omit<IResourceQueryOptions<DataType>, "where"> & { where: IResourceFindWhereCondition<DataType> };
+        if (Array.isArray(result.where) && !isObj(result.where) && typeof result.where[0] !== 'object') {
+            result.where = {};
+        }
+        return result;
+    }
     async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined) {
         options = Object.assign({}, options);
         const [data, count] = await this.findAndCount(options);
@@ -71,79 +95,6 @@ export abstract class ResourceDataService<DataType extends IResourceData = any, 
     aggregate?(pipeline: any[]): Promise<any[]> {
         throw new Error("Method aggregate not implemented.");
     }
-    isLogicalMangoOperator(operator: IMangoOperatorName): boolean {
-        return operator in MANGO_OPERATORS.LOGICAL;
-    }
-    isComparatorMangoOperator(operator: IMangoOperatorName): boolean {
-        return operator in MANGO_OPERATORS.COMPARATOR;
-    }
-    isArrayMangoOperator(operator: IMangoOperatorName): boolean {
-        return operator in MANGO_OPERATORS.ARRAY;
-    }
-    mangoResolveLogicalOperator(options: IDataServiceMangoResolveOptions): any {
-        throw new Error("Method mangoResolveLogicalOperator not implemented.");
-    }
-    mangoResolveValue(options: Required<IDataServiceMangoResolveOptions>): any {
-        throw new Error("Method mangoResolveValue not implemented.");
-    }
-    sanitizeQueryOptions(options?: IResourceQueryOptions<DataType>): IResourceQueryOptions<DataType> {
-        options = Object.assign({}, options);
-        if (isObj(options.mango) && options.mango) {
-            const mango = null;// this.convertMangoQuery(options.mango, this);
-            if (mango) {
-                options.where = mango;
-            }
-        }
-        return options;
-    }
-    convertMangoQuery(mango: IMangoQuery, context: any = {}, parentRelation?: string): any {
-        const result: Record<string, any> = {};
-        Object.entries(mango).forEach(([field, operand]) => {
-            if (!isNonNullString(field)) return;
-            if (typeof operand === 'object' && operand !== null && operand) {
-                const isLogicalOp = this.isLogicalMangoOperator(field as IMangoOperatorName);
-                if (isLogicalOp) {
-                    if (Array.isArray(operand) && operand.length) {
-                        const newValue = (operand as any[]).map((subQuery: IMangoQuery) =>
-                            this.convertMangoQuery(subQuery, context)
-                        );
-                        const logicalOperator = this.mangoResolveLogicalOperator({ operator: field as IMangoLogicalOperatorName, operand: newValue, context, result });
-                        if (logicalOperator) {
-                            result[logicalOperator] = newValue;
-                        }
-                    }
-                } else {
-                    Object.entries(operand).forEach(([operator, operandValue]) => {
-                        if (this.isLogicalMangoOperator(operator as IMangoLogicalOperatorName)) {
-                            if (Array.isArray(operandValue)) {
-                                const newValue = (operandValue as any[]).map((subQuery: IMangoQuery) =>
-                                    this.convertMangoQuery(subQuery, context)
-                                );
-                                const logicalOperator = this.mangoResolveLogicalOperator({ operator: field as IMangoLogicalOperatorName, operand: newValue, context, result });
-                                if (logicalOperator) {
-                                    result[logicalOperator] = newValue;
-                                }
-                            }
-                        } else if (operator.startsWith('$')) {
-                            const newValue = this.mangoResolveValue({ operand: operandValue, field, operator: operator as IMangoOperatorName, result, context });
-                            if (!isEmpty(newValue)) {
-                                result[field] = newValue;
-                            }
-                        }
-                    });
-                }
-            } else {
-                // Handle direct value assignment
-                if (!isEmpty(operand)) {
-                    const newValue = this.mangoResolveValue({ operand: operand, field, operator: "$eq", context, result });
-                    if (!isEmpty(newValue)) {
-                        result[field] = newValue;
-                    }
-                }
-            }
-        });
-        return result;
-    }
 }
 export class ResourceDataServiceBase<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, RepositoryType extends IDataServiceRepository = any> extends ResourceDataService<DataType, PrimaryKeyType, RepositoryType> {
     getDataSeviceName(): IDataServiceName {
@@ -158,10 +109,10 @@ export class ResourceDataServiceBase<DataType extends IResourceData = any, Prima
     delete(primaryKey: PrimaryKeyType): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-    findOne(primaryKey: PrimaryKeyType): Promise<DataType | null> {
+    findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null> {
         throw new Error("Method not implemented.");
     }
-    findOneOrFail(primaryKey: PrimaryKeyType): Promise<DataType> {
+    findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType> {
         throw new Error("Method not implemented.");
     }
     find(options?: IResourceQueryOptions<DataType> | undefined): Promise<DataType[]> {
@@ -188,7 +139,9 @@ export class ResourceDataServiceBase<DataType extends IResourceData = any, Prima
     executeInTransaction<R>(callback: (transaction: ITransaction) => Promise<R>): Promise<R> {
         throw new Error("Method not implemented.");
     }
-
+    getPrimaryColumnNames(): (keyof DataType)[] {
+        throw new Error("Method not implemented.");
+    }
 }
 
 
@@ -301,58 +254,6 @@ export function DataService<EntityType = any>(options: IDataServiceMetaData<Enti
 })
 @Injectable()
 export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceDataService<DataType, PrimaryKeyType, Repository<DataType>> {
-    convertMangoQuery(mango: IMangoQuery, context?: any, parentRelation?: string) {
-        const result = super.convertMangoQuery(mango, context, parentRelation);
-    }
-    mangoResolveLogicalOperator(options: IDataServiceMangoResolveOptions) {
-        throw new Error("Method not implemented.");
-    }
-    mangoResolveValue({ operator, operand, context, result }: IDataServiceMangoResolveOptions) {
-        switch (operator) {
-            case "$eq":
-                return Equal(operand);
-            case "$ne":
-                return Not(operand);
-            case "$gt":
-                return MoreThan(operand);
-            case "$gte":
-                return MoreThanOrEqual(operand);
-            case "$lt":
-                return LessThan(operand);
-            case "$lte":
-                return LessThanOrEqual(operand);
-            case "$in":
-                if (Array.isArray(operand)) {
-                    return In(operand);
-                }
-                break;
-            case "$nin":
-                if (Array.isArray(operand)) {
-                    return Not(In(operand));
-                }
-                break;
-            case "$exists":
-                return operand ? Not(IsNull()) : IsNull();
-            case "$type":
-                //Matches documents where the value of a field is of a specified BSON type.
-                return operand ? Not(IsNull()) : IsNull();
-            case "$regex":
-                return Like(operand);
-            case "$size":
-                break;
-            case "$mod":
-                //Matches documents where the field value divided by a divisor has a specified remainder.
-                break;
-            case "$all":
-                //Matches documents where all elements in an array match the specified conditions.
-                return Array.isArray(operand) ? In(operand) : operand;
-            case "$elemMatch":
-                if (Array.isArray(operand)) {
-                    return In(operand);
-                }
-                break;
-        }
-    }
     private readonly primaryColumns: Record<string, ColumnMetadata> = {};
     private readonly columns: Record<string, ColumnMetadata> = {};
     private readonly primaryColumnsNames: string[] = [];
@@ -366,6 +267,10 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
             this.columns[column.propertyName] = column;
         });
     }
+    getPrimaryColumnNames(): (keyof DataType)[] {
+        return Object.keys(this.primaryColumns);
+    }
+
     getDataSeviceName(): IDataServiceName {
         return "typeorm";
     }
@@ -398,68 +303,34 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
         return await this.repository.save(entity, { data });
     }
     async update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>) {
-        await this.repository.update(this.buildConditions(primaryKey), updatedData as any);
+        await this.repository.update(this.buildWhereCondition(primaryKey).where as FindOptionsWhere<DataType>, updatedData as any);
         return this.findOneOrFail(primaryKey);
     }
     async delete(primaryKey: PrimaryKeyType) {
-        const r = await this.repository.delete(this.buildConditions(primaryKey));
+        const r = await this.repository.delete(this.buildWhereCondition(primaryKey).where as FindOptionsWhere<DataType>);
         return (typeof r.affected === 'number' && r.affected > 0);
     }
-    findOneOrFail(primaryKey: PrimaryKeyType): Promise<DataType> {
+    findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType> {
         throw new Error("Method not implemented.");
     }
-    async findOne(primaryKey: PrimaryKeyType) {
+    async findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>) {
         try {
-            return await this.repository.findOne({ where: this.buildConditions(primaryKey) });
+            return await this.repository.findOne(this.buildWhereCondition(options));
         } catch (error) {
             return null;
         }
     }
-    sanitizeQueryOptions(options?: IResourceQueryOptions<DataType> | undefined): IResourceQueryOptions<DataType> {
-        options = super.sanitizeQueryOptions(options);
-        const optionsParams: FindManyOptions<DataType> = {
-            ...options,
-            take: typeof options?.limit === 'number' && options.limit > 0 ? options.limit : undefined,
-            skip: typeof options?.skip === 'number' && options.skip > 0 ? options.skip : undefined,
-        } as FindManyOptions<DataType>;
-        if (options.orderBy) {
-            if (isNonNullString(options.orderBy)) {
-                optionsParams.order = {
-                    [options.orderBy]: 'ASC'
-                } as FindOptionsOrder<DataType>;
-            } else {
-                const orderBy = {};
-                if (Array.isArray(options.orderBy)) {
-                    for (let i = 0; i < options.orderBy.length; i++) {
-                        if (Array.isArray(options.orderBy[i])) {
-                            const [field, order] = options.orderBy[i] as any;
-                            if (!isNonNullString(field)) continue;
-                            (orderBy as any)[field] = ["ASC", "DESC"].includes(order) ? order : "ASC";
-                        }
-                    }
-                } else if (isObj(orderBy)) {
-                    Object.entries(options.orderBy).map(([field, order]: [keyof DataType, IMangoOrderByDirection]) => {
-                        (orderBy as any)[field] = ["ASC", "DESC"].includes(order) ? order : "ASC";
-                    })
-                }
-                optionsParams.order = orderBy as FindOptionsOrder<DataType>;
-            }
-        }
-        return optionsParams as IResourceQueryOptions<DataType>;
-    }
     async find(options?: IResourceQueryOptions<DataType> | undefined) {
-        return await this.repository.find(this.sanitizeQueryOptions(options));
+        return await this.repository.find(options ? this.buildWhereCondition(options) : undefined);
     }
     async findAndCount(options?: IResourceQueryOptions<DataType>) {
-        return await this.repository.findAndCount(this.sanitizeQueryOptions(options));
+        return await this.repository.findAndCount(options ? this.buildWhereCondition(options) : undefined);
     }
     async count(options?: IResourceQueryOptions<DataType>) {
-        return await this.repository.count(this.sanitizeQueryOptions(options));
+        return await this.repository.count(options ? this.buildWhereCondition(options) : undefined);
     }
     async exists(primaryKey: PrimaryKeyType) {
-        return await this.repository.exists({
-            where: this.buildConditions(primaryKey),
-        });
+        return await this.repository.exists(this.buildWhereCondition(primaryKey));
     }
     async createMany(data: Partial<DataType>[]) {
         const entities = this.repository.create(data as DeepPartial<DataType>[]);
@@ -472,21 +343,6 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
     async deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number> {
         const result = await this.repository.delete(criteria as FindOptionsWhere<DataType>);
         return typeof result.affected === 'number' && result.affected > 0 ? result.affected : 0;
-    }
-    buildConditions(primaryKey: PrimaryKeyType) {
-        const condiitons: Record<string, any> = {};
-        if (primaryKey && isPrimitive(primaryKey)) {
-            this.primaryColumnsNames.map((column) => {
-                condiitons[column] = primaryKey;
-            });
-        } else if (isObj(primaryKey)) {
-            Object.entries(primaryKey).map(([key, value]) => {
-                if (this.columns[key]) {
-                    condiitons[key] = value;
-                }
-            });
-        }
-        return condiitons;
     }
     getRepository(): Repository<DataType> {
         return this.repository;

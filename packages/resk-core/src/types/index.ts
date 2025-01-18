@@ -1637,18 +1637,22 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
   delete(primaryKey: PrimaryKeyType): Promise<boolean>;
   /***
    * Retrieves a single resource record by its primary key.
-   * @param primaryKey The primary key of the resource to retrieve.
+   * @param options The primary key or query options of the resource to retrieve.
    * @returns A promise that resolves to an `DataType | null`, 
    * containing the requested resource record or null if not found.
    * @example
   *   ```typescript
   *   const result = await dataProvider.findOne("resourceId");
   *     ```
+  * @example
+  *   ```typescript
+  *   const result = await dataProvider.findOne({ firstName: 1 });
+  *     ```
    */
-  findOne(primaryKey: PrimaryKeyType): Promise<DataType | null>;
+  findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null>;
   /***
    * Retrieves a single resource record by its primary key or throws an error if not found.
-   * @param primaryKey The primary key of the resource to retrieve.
+   * @param primaryKey The primary key or query options of the resource to retrieve.
    * @returns A promise that resolves to an `DataType`, 
    * containing the requested resource record.
    * @example
@@ -1656,7 +1660,7 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
   *   const result = await dataProvider.findOneOrFail("resourceId");
   *     ```
    */
-  findOneOrFail(primaryKey: PrimaryKeyType): Promise<DataType>;
+  findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType>;
   /***
    * Retrieves multiple resource records based on query options.
    * @param options Optional query options to filter the results.
@@ -1668,6 +1672,19 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
   *     ```
    */
   find(options?: IResourceQueryOptions<DataType>): Promise<DataType[]>;
+
+  /***
+   * Retrieves multiple resource records based on query options with Mango query criteria.
+   * @param options query options to filter the results.
+   * @returns A promise that resolves to an `DataType[]`, 
+   * containing the list of resource records.
+   * @example
+  *   ```typescript
+  *   const result = await dataProvider.findWithMango({ limit: 10, skip: 0, selector: { id: 1 } });
+  *     ``` 
+   */
+  findWithMango?(options: IResourceQueryOptionsWithMango<DataType>): Promise<DataType[]>;
+
   /***
    * Retrieves multiple resource records and the total count based on query options.
    * @param options Optional query options to filter the results.
@@ -1829,9 +1846,27 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
  * // Example of updating resources with partial data
  * updateResources({ name: "John Doe", age: 30 });
  * ```
+ * @typeParam DataType - The type of data associated with the resource.
+ * @default any
+ * @typeParam PrimaryKeyType - The type of the primary key used to identify resources.
+ * @default IResourcePrimaryKey
+ * @see {@link IResourcePrimaryKey} for the `IResourcePrimaryKey` type.
+ * @see {@link IResourceFindWhereCondition} for the `IResourceFindWhereCondition` type.
+ * @example
+ * // Example of using IResourceManyCriteria
+ * const criteria: IResourceManyCriteria<string, { name: string; age: number }> = {
+ *   name: "John Doe",
+ *   age: 30
+ * };
+ * @Example 
+ * // Example of using IResourceManyCriteria with an array of primary keys
+ * const criteria: IResourceManyCriteria<string, { name: string; age: number }> = [
+ *   "user123",
+ *   "user456"
+ * ];
  */
 export type IResourceManyCriteria<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>
-  = PrimaryKeyType[] | Partial<Record<keyof DataType, any>>;
+  = PrimaryKeyType[] | IResourceFindWhereCondition<DataType>;
 
 /**
  * Interface representing options for fetching resources.
@@ -1853,10 +1888,6 @@ export type IResourceManyCriteria<DataType extends IResourceData = any, PrimaryK
  * };
  */
 export interface IResourceQueryOptions<DataType extends IResourceData = any> {
-  /***
-   * The filter criteria to apply to the query using the Mango query language.
-   */
-  mango?: IMangoQuery; // The filter criteria to apply to the query
   /** Fields to include in the response. */
   fields?: Array<keyof DataType>;
   relations?: string[];      // The relations to include in the response.
@@ -1882,8 +1913,166 @@ export interface IResourceQueryOptions<DataType extends IResourceData = any> {
   /**
    * Where clause to filter the results.
    */
-  where?: Partial<Record<keyof DataType, any>>;
+  where?: IResourceFindWhereCondition<DataType>;
 }
+
+
+/**
+ * @interface IResourceQueryOptionsWithMango
+ * Interface that extends `IResourceQueryOptions` by adding a `mango` property.
+ * The `mango` property represents the filter criteria to apply to the query.
+ * 
+ * This interface is useful when you need to perform more complex filtering on the
+ * resource data using the Mango query syntax.
+ * 
+ * @template DataType - The type of the resource data.
+ */
+/**
+ * Interface for specifying query options with Mango query criteria.
+ * 
+ * This interface extends the `IResourceQueryOptions` interface, but replaces the `where` property with a `mango` property.
+ * The `mango` property is used to specify the filter criteria to apply to the query using a Mango query.
+ * 
+ * @description
+ * This interface is used to define query options for resources, including filtering, sorting, and pagination.
+ * The `mango` property allows for more complex filtering using Mango queries.
+ * 
+ * @example
+ * const queryOptions: IResourceQueryOptionsWithMango<{ id: number, name: string }> = {
+ *   mango: {
+ *     selector: {
+ *       id: 1
+ *     }
+ *   },
+ *   orderBy: { name: 'asc' },
+ *   limit: 10,
+ *   skip: 0
+ * };
+ * 
+ * @typeParam DataType - The type of the resource data.
+ * @default any
+ */
+export interface IResourceQueryOptionsWithMango<DataType extends IResourceData = any> extends Omit<IResourceQueryOptions<DataType>, "where"> {
+  /**
+   * The filter criteria to apply to the query.
+   * 
+   * This property is used to specify a Mango query that will be used to filter the results of the query.
+   * 
+   * @description
+   * The Mango query is a JSON object that defines the filter criteria.
+   * It can include properties such as `selector`, `fields`, and `sort`.
+   * 
+   * @example
+   * const queryOptions: IResourceQueryOptionsWithMango<{ id: number, name: string }> = {
+   *   mango: {
+   *     selector: {
+   *       id: 1
+   *     }
+   *   }
+   * };
+   */
+  slector: IMangoQuery;
+}
+
+/**
+ * @interface IResourceFindWhereCondition
+ * Interface for specifying conditions to filter resources.
+ * 
+ * This type can be used to define conditions for finding resources. It supports both AND and OR conditions.
+ * @template DataType - The type of the resource data.
+ * 
+ * @example
+ * // AND condition
+ * const andCondition: IResourceFindWhereCondition<{ id: number, name: string }> = {
+ *   id: 1,
+ *   name: 'John Doe'
+ * };
+ * 
+ * @example
+ * // OR condition
+ * const orCondition: IResourceFindWhereCondition<{ id: number, name: string }> = [
+ *   { id: 1 },
+ *   { name: 'John Doe' }
+ * ];
+ * 
+ * @typeParam DataType - The type of the resource data.
+ * @default any
+ */
+export type IResourceFindWhereCondition<DataType extends IResourceData = any> =
+  /**
+   * Object for AND conditions.
+   * 
+   * Each key in the object corresponds to a property in the resource data.
+   * The value of each key is the value to match for that property.
+   * 
+   * @example
+   * const andCondition: IResourceFindWhereCondition<{ id: number, name: string }> = {
+   *   id: 1,
+   *   name: 'John Doe'
+   * };
+   */
+  | IResourceFindWhereAndCondition<DataType>
+  /**
+   * Array for OR conditions.
+   * 
+   * Each element in the array is an object that represents a condition.
+   * The conditions are combined using the OR operator.
+   * 
+   * @example
+   * const orCondition: IResourceFindWhereCondition<{ id: number, name: string }> = [
+   *   { id: 1 },
+   *   { name: 'John Doe' }
+   * ];
+   */
+  | IResourceFindWhereOrCondition<DataType>;
+
+
+/**
+ @interface IResourceFindWhereAndCondition
+* Interface for specifying AND conditions to filter resources.
+* 
+* This type can be used to define conditions for finding resources where all properties must match.
+* @template DataType - The type of the resource data.
+* @example
+* const andCondition: IResourceFindWhereAndCondition<{ id: number, name: string }> = {
+*   id: 1,
+*   name: 'John Doe'
+* };
+* 
+* @typeParam DataType - The type of the resource data.
+* @default any
+*/
+export type IResourceFindWhereAndCondition<DataType extends IResourceData = any> = {
+  /**
+   * Each key in the object corresponds to a property in the resource data.
+   * The value of each key is the value to match for that property.
+   * 
+   * @example
+   * const andCondition: IResourceFindWhereAndCondition<{ id: number, name: string }> = {
+   *   id: 1,
+   *   name: 'John Doe'
+   * };
+   */
+  [K in keyof DataType]?: DataType[K]
+};
+
+/**
+ * @interface IResourceFindWhereOrCondition
+ * Interface for specifying OR conditions to filter resources.
+ * 
+ * This type can be used to define conditions for finding resources where at least one property must match.
+ * @template DataType - The type of the resource data.
+ * @see {@link IResourceFindWhereAndCondition} for an example of using this type.
+ * @example
+ * const orCondition: IResourceFindWhereOrCondition<{ id: number, name: string }> = [
+ *   { id: 1 },
+ *   { name: 'John Doe' }
+ * ];
+ * 
+ * @typeParam DataType - The type of the resource data.
+ * @default any
+ */
+export type IResourceFindWhereOrCondition<DataType extends IResourceData = any> = IResourceFindWhereAndCondition<DataType>[];
 
 /**
  * @interface IResourcePaginatedResult

@@ -27,7 +27,7 @@ describe('I18n', () => {
                     "numberGreaterThanOrEquals": "This field must be greater than or equal to %{ruleParams[0]}",
                     "numberGreaterThan": "This field must be greater than %{ruleParams[0]}",
                     "noteEquals": "This field must be different from %{ruleParams[0]}",
-                    "numberNotEquals": "This field must be different from %{ruleParams[0]}",
+                    "numberIsDifferentFrom": "This field must be different from %{ruleParams[0]}",
                     "numberEquals": "This field must be equal to %{ruleParams[0]}",
                 }
             },
@@ -41,7 +41,7 @@ describe('I18n', () => {
         expect(i18n.t('validator.numberGreaterThanOrEquals', { ruleParams: [10] })).toBe("This field must be greater than or equal to 10");
         expect(i18n.t('validator.numberGreaterThan', { ruleParams: [10] })).toBe("This field must be greater than 10");
         expect(i18n.t('validator.noteEquals', { ruleParams: ['test'] })).toBe("This field must be different from test");
-        expect(i18n.t('validator.numberNotEquals', { ruleParams: [10] })).toBe("This field must be different from 10");
+        expect(i18n.t('validator.numberIsDifferentFrom', { ruleParams: [10] })).toBe("This field must be different from 10");
         expect(i18n.t('validator.numberEquals', { ruleParams: [10] })).toBe("This field must be equal to 10");
     })
     test("should return the correct translation for readForbiddenError", () => {
@@ -86,30 +86,38 @@ describe('I18n', () => {
         await expect(i18n.loadNamespace('invalid')).rejects.toThrow('Invalid namespace or resolver for namespace "invalid".');
     });
 
-    test('should resolve translations using decorator', () => {
-        class MyComponent {
-            @Translate('greeting')
-            greeting: string = "";
+    class MyComponent {
+        @Translate('greeting')
+        greeting: string = "";
 
-            @Translate('nested.example')
-            public nestedExample: string = "";
+        @Translate('nested.example')
+        public nestedExample: string = "";
 
-        }
+    }
 
-        const translations: II18nTranslation = {
-            en: {
-                greeting: 'Hello!',
-                nested: {
-                    example: 'Nested Example',
-                },
-                farewell: 'Goodbye!',
+    const translations: II18nTranslation = {
+        en: {
+            greeting: 'Hello!',
+            nested: {
+                example: 'Nested Example',
             },
-        };
+            farewell: 'Goodbye!',
+        },
+    };
+    test('should resolve translations using decorator', () => {
         i18n.registerTranslations(translations);
         const component = new MyComponent();
         i18n.resolveTranslations(component);
         expect(component.greeting).toBe('Hello!');
         expect(component.nestedExample).toBe('Nested Example');
+    });
+
+    it("Expect translated options of my component", () => {
+        const translatedOptions = i18n.translateTarget(MyComponent);
+        expect(translatedOptions).toEqual({
+            greeting: 'Hello!',
+            nestedExample: 'Nested Example',
+        });
     });
 
     test('should set and get locale', async () => {

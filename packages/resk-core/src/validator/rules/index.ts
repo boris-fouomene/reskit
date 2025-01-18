@@ -229,7 +229,7 @@ Validator.registerRule("numberEquals", numberEqualsTo);
 export const ValidatorIsNumberEquals = Validator.createDecorator<[param: number]>(numberEqualsTo);
 
 /**
- * @function numberNotEquals
+ * @function numberIsDifferentFrom
  * 
  * Validator rule that checks if a given number is not equal to a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -247,7 +247,7 @@ export const ValidatorIsNumberEquals = Validator.createDecorator<[param: number]
  * ```typescript
  * 
  * // Example of using the validation rule
- * const result = numberNotEquals({ value: 5, ruleParams: [10] });
+ * const result = numberIsDifferentFrom({ value: 5, ruleParams: [10] });
  * result.then(() => {
  *     console.log("Validation passed."); // Output: "Validation passed."
  * }).catch(error => {
@@ -259,14 +259,14 @@ export const ValidatorIsNumberEquals = Validator.createDecorator<[param: number]
  * - This rule is useful for scenarios where you need to ensure that a numeric input does not match a specified value.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-function numberNotEqualsTo(options: IValidatorValidateOptions) {
+function numberIsDifferentFromTo(options: IValidatorValidateOptions) {
     return compareNumer((value, toCompare) => {
         return value !== toCompare;
-    }, "validator.numberNotEquals", options)
+    }, "validator.numberIsDifferentFrom", options)
 }
-Validator.registerRule("numberNotEquals", numberNotEqualsTo);
+Validator.registerRule("numberIsDifferentFrom", numberIsDifferentFromTo);
 
-export const ValidatorNumberIsNotEquals = Validator.createDecorator<[param: number]>(numberNotEqualsTo)
+export const ValidatorNumberIsDifferentFrom = Validator.createDecorator<[param: number]>(numberIsDifferentFromTo)
 
 
 /**

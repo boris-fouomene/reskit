@@ -202,8 +202,12 @@ export class Validator {
    * @param 
    */
   static validateTarget<T extends { new(...args: any[]): {} }>(target: T, data: Partial<Record<keyof InstanceType<T>, any>>, options?: {
-    errorMessageBuilder?: (propertyName: keyof InstanceType<T>, error: string,
+    errorMessageBuilder?: (
+      translatedPropertyName: string,
+      error: string,
       builderOptions: {
+        propertyName: string,
+        translatedPropertyName: string,
         message: string,
         ruleName: string,
         ruleParams: any[],
@@ -216,22 +220,26 @@ export class Validator {
     const rulesObject = Validator.getTargetRules<T>(target);
     options = extendObj({}, Validator.getValidateTargetOptions(target), options);
     data = Object.assign({}, data);
-    const errorMessageBuilder = typeof options?.errorMessageBuilder === 'function' ? options.errorMessageBuilder : (field: (keyof InstanceType<T>), error: string) => `${String(field)} : ${error}`;
+    const errorMessageBuilder = typeof options?.errorMessageBuilder === 'function' ? options.errorMessageBuilder : (translatedPropertyName: string, error: string) => `[${String(translatedPropertyName)}] : ${error}`;
     const result: Record<keyof InstanceType<T>, any> = {} as Record<keyof InstanceType<T>, any>;
     const errors: string[] = [];
     const promises = [];
     const errorsResult: Record<keyof InstanceType<T>, string[]> = {} as Record<keyof InstanceType<T>, string[]>;
     const errorsByField: Record<keyof InstanceType<T>, string> = {} as Record<keyof InstanceType<T>, string>;
+    const translatedKeys = i18n.translateTarget(target, { data });
     for (let i in rulesObject) {
-      promises.push(Validator.validate({ value: data[i], fieldName: i, propertyName: i, rules: rulesObject[i] }).then((result) => {
+      const translatedPropertyName: string = (isNonNullString(translatedKeys[i]) ? translatedKeys[i] : i) as string;
+      promises.push(Validator.validate({ value: data[i], translatedPropertyName, fieldName: i, propertyName: i, rules: rulesObject[i] }).then((result) => {
         result[i as keyof typeof result] = result;
       }).catch((error) => {
         const errorField = stringify(defaultVal(error?.message, error));
         errorsByField[i as keyof typeof errorsByField] = errorField;
         errorsResult[i as keyof typeof errorsResult] = [errorField];
-        errors.push(errorMessageBuilder(i, errorField, {
+        errors.push(errorMessageBuilder(translatedPropertyName, errorField, {
           ...error,
           data,
+          propertyName: i,
+          translatedPropertyName: translatedPropertyName,
         }));
       }));
     }

@@ -419,7 +419,7 @@ export interface IValidatorRuleMap {
     numberEquals: IValidatorRuleFunction;
 
     /**
-     * @function numberNotEquals
+     * @function numberIsDifferentFrom
      * 
      * Validator rule that checks if a given number is not equal to a specified value.
      * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -437,7 +437,7 @@ export interface IValidatorRuleMap {
      * ```typescript
      * 
      * // Example of using the validation rule
-     * const result = numberNotEquals({ value: 5, ruleParams: [10] });
+     * const result = numberIsDifferentFrom({ value: 5, ruleParams: [10] });
      * result.then(() => {
      *     console.log("Validation passed."); // Output: "Validation passed."
      * }).catch(error => {
@@ -449,7 +449,7 @@ export interface IValidatorRuleMap {
      * - This rule is useful for scenarios where you need to ensure that a numeric input does not match a specified value.
      * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
      */
-    numberNotEquals: IValidatorRuleFunction;
+    numberIsDifferentFrom: IValidatorRuleFunction;
 
     /**
      * @function required
@@ -887,4 +887,12 @@ export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<
      * It is typically used to provide more context for the error message.
      */
     propertyName?: string;
+
+    /***
+     * The translated value of the propertyName
+     * This property is the property that is being validated.
+     * This property is populated by the translateTarget method.
+     * It is used to provide a clearer error message for the property.
+     */
+    translatedPropertyName?: string;
 }

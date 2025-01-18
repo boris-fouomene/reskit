@@ -39,6 +39,9 @@ const TRANSLATION_KEY = Symbol("TRANSLATION_KEY");
 */
 export function Translate(key: string): PropertyDecorator & MethodDecorator {
     return (target: Object, propertyKey: string | symbol) => {
+        const translationKeys = Object.assign({}, Reflect.getMetadata(TRANSLATION_KEY, target));
+        translationKeys[propertyKey] = key;
+        Reflect.defineMetadata(TRANSLATION_KEY, translationKeys, target);
         Reflect.defineMetadata(TRANSLATION_KEY, key, target, propertyKey);
     };
 }
@@ -102,6 +105,29 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
             return this.pluralize(options.count as number, scope, options);
         }
         return super.translate(scope, options);
+    }
+    /***
+     * Translates the keys of the given target class.
+     * @param target The target class.
+     * @param options The translation options.
+     * @returns The translated keys.
+     */
+    translateTarget<T extends { new(...args: any[]): {} } = any>(target: T, options?: TranslateOptions): Record<string, string> {
+        const translationKeys = I18n.getTargetTanslationKeys(target);
+        for (let i in translationKeys) {
+            if (isNonNullString(translationKeys[i])) {
+                translationKeys[i] = this.t(translationKeys[i], options);
+            }
+        }
+        return translationKeys;
+    }
+    /***
+     * returns the translation keys for the target class
+     * @param target the target class
+     * @returns the translation keys for the target class
+     */
+    static getTargetTanslationKeys<T extends { new(...args: any[]): {} } = any>(target: T): Record<keyof T, string> {
+        return Object.assign({}, Reflect.getMetadata(TRANSLATION_KEY, target?.prototype));
     }
     private _isLoading: boolean = false;
     /***
@@ -264,16 +290,16 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * });
      * 
      * // Resolve translation for the "greeting" key.
-     * i18n.resolveTranslation("greeting.one", "en");
+     * i18n.getNestedTranslation("greeting.one", "en");
      * 
      * // Resolve translation for the "greeting" key.
-     * i18n.resolveTranslation("greeting.other", "en");
+     * i18n.getNestedTranslation("greeting.other", "en");
      * 
      * // Resolve translation for the "greeting" key.
-     * i18n.resolveTranslation("en", "greeting.zero", 0);
+     * i18n.getNestedTranslation("en", "greeting.zero", 0);
      * 
      * // Resolve translation for the "farewell" key.
-     * i18n.resolveTranslation("en", "farewell");
+     * i18n.getNestedTranslation("en", "farewell");
      */
     getNestedTranslation(scope: Scope, locale?: string): string | IDict | undefined {
         locale = defaultStr(locale, this.getLocale());
@@ -379,18 +405,18 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     }
     /**
      * Automatically resolves translations using Reflect Metadata.
-     * Translations created using the @I18n.Translate decorator will be resolved.
+     * Translations created using the @Translate decorator will be resolved.
      * @param target The target class instance or object.
      * @example 
      * // Class with translations using the decorator
      * class MyComponent {
-     *     @I18n.Translate("greeting")
+     *     @Translate("greeting")
      *     public greeting: string;
      * 
-     *     @I18n.Translate("nested.example")
+     *     @Translate("nested.example")
      *     public nestedExample: string;
      * 
-     *     @I18n.Translate("farewell")
+     *     @Translate("farewell")
      *     public sayGoodbye(): string {
      *         return "";
      *     }

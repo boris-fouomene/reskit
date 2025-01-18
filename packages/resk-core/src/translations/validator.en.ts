@@ -34,8 +34,20 @@ I18n.RegisterTranslations({
             "numberGreaterThanOrEquals": "This field must be greater than or equal to %{ruleParams[0]}",
             "numberGreaterThan": "This field must be greater than %{ruleParams[0]}",
             "noteEquals": "This field must be different from %{ruleParams[0]}",
-            "numberNotEquals": "This field must be different from %{ruleParams[0]}",
+            "numberIsDifferentFrom": "This field must be different from %{ruleParams[0]}",
             "numberEquals": "This field must be equal to %{ruleParams[0]}",
+            "tests": {
+                "entity": {
+                    "name": "Name",
+                    "id": "Id",
+                    "email": "Email",
+                    "aString": "A String",
+                    "url": "Url",
+                    "note": "Note",
+                    "createdAt": "Created At",
+                    "updatedAt": "Updated At"
+                }
+            }
         }
     }
 });

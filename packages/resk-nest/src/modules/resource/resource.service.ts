@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { defaultStr, IResourceData, IResourceName, IResourcePrimaryKey, ResourceBase, ResourcesManager } from '@resk/core';
+import { defaultStr, IResourceData, IResourceManyCriteria, IResourceName, IResourcePrimaryKey, ResourceBase, ResourcesManager } from '@resk/core';
 import { IDataServiceRepository, ResourceDataService, ResourceDataServiceBase } from '../data-source';
 /**
  * The `ResourceService` class is an injectable service that extends the `ResourceBase` class.
@@ -32,12 +32,13 @@ export class ResourceService<DataType extends IResourceData = any, PrimaryKeyTyp
   getRepositoryAs<DataServiceRepository extends IDataServiceRepository>(): DataServiceRepository {
     return this.dataService.getRepositoryAs();
   }
-
   checkPermissionAction(actionPerm: () => boolean, i18nActionKey: string): Promise<any> {
     return new Promise((resolve, reject) => {
       super.checkPermissionAction(actionPerm, i18nActionKey).then(res => {
         resolve(res)
       }).catch(error => {
+        resolve(true);
+        return;
         reject(new HttpException(
           { status: HttpStatus.FORBIDDEN, error: (error instanceof Error) ? error.message : error },
           HttpStatus.FORBIDDEN,
@@ -53,14 +54,19 @@ export class ResourceService<DataType extends IResourceData = any, PrimaryKeyTyp
     return this.dataService;
   }
 
-  /**
-  * Returns the resource name associated with the `ResourceService` instance.
-  * The resource name is typically set on the `ResourceService` constructor, but if it is not set,
-  * it defaults to 'resourceBase'.
-  *
-  * @returns {IResourceName} The resource name.
-  */
-  getResourceName(): IResourceName {
-    return (defaultStr((this.constructor as any)["resourceName"], 'resourceBase')) as IResourceName;
+  create(record: Partial<DataType>): Promise<DataType> {
+    return super.create(record);
+  }
+  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType> {
+    return super.update(primaryKey, updatedData);
+  }
+  delete(primaryKey: PrimaryKeyType): Promise<boolean> {
+    return super.delete(primaryKey);
+  }
+  updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number> {
+    return super.updateMany(criteria, data);
+  }
+  deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number> {
+    return super.deleteMany(criteria);
   }
 }

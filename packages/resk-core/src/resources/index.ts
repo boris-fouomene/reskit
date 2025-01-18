@@ -494,13 +494,20 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
 
   /**
    * Retrieves the name of the resource.
-   *
+   * Alias for getResourceName
    * @returns {IResourceName} The name of the resource, cast to the IResourceName type.
    */
   getName(): IResourceName {
+    return this.getResourceName();
+  }
+  /**
+   * Retrieves the name of the resource.
+   *
+   * @returns {IResourceName} The name of the resource, cast to the IResourceName type.
+   */
+  getResourceName(): IResourceName {
     return defaultStr(this.getMetaData().name, this.name) as IResourceName;
   }
-
   /**
    * Retrieves the actions associated with the resource.
    * If the actions are not already defined or not an object, 

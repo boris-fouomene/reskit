@@ -1,55 +1,10 @@
 import { IValidatorRule, IValidatorValidateOptions, IValidatorRuleMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult, IValidatorSanitizedRules } from "./types";
-import { defaultStr, isNonNullString, isObj, stringify } from "@utils/index";
+import { defaultStr, defaultVal, extendObj, isNonNullString, isObj, stringify } from "@utils/index";
 import { i18n } from "../i18n";
-import { isEmpty } from "lodash";
 
 
-/**
- * A decorator function for registering a validation rule.
- * 
- * This function can be used to annotate methods in a class as validation rules.
- * When applied, it registers the method with the specified name in the `Validator` class,
- * allowing it to be used as a validation rule in form validation scenarios.
- * 
- * @template ParamType The type of the parameters that the rule function accepts.
- * 
- * @param {IValidatorRuleName} name - The name of the validation rule to register. This name will be used
- *                        to reference the rule when performing validation.
- * 
- * @returns {MethodDecorator} A method decorator that registers the method as a validation rule.
- * 
- * ### Example:
- * 
- * ```typescript
- * import { Validator, ValidatorRule } from "@resk/expo";
- * @ValidatorRule("isEven")
- * const validateEven({ value }: { value: number }): boolean | string {
- *      return value % 2 === 0 || "The number must be even.";
- * }
- * 
- * // Usage in validation
- * const rules = Validator.getValidationRule("isEven");
- * const result = rules({ value: 4 }); // Returns true
- * ```
- * 
- * In this example, the `validateEven` method is registered as a validation rule named "isEven".
- * When the rule is called, it checks if the provided value is even and returns an appropriate message if not.
- */
-export function ValidatorRule<ParamType = Array<any>>(name: IValidatorRuleName): MethodDecorator {
-  return (target, propertyKey, descriptor) => {
-    let handler: IValidatorRuleFunction<ParamType> | undefined = undefined;
-    if (descriptor?.value instanceof Function) {
-      // If applied to a class method
-      handler = descriptor.value as IValidatorRuleFunction<ParamType>;
-    } else if (target instanceof Function) {
-      // If applied to a standalone function
-      handler = target as IValidatorRuleFunction<ParamType>;
-    }
-    if (handler && handler instanceof Function) {
-      Validator.registerRule(name, handler as IValidatorRuleFunction<ParamType>);
-    }
-  };
-}
+const validatorTargetRulesMetaKey = Symbol("validatorIsMetaData");
+const validatorValidateTargetOptionsMetaKey = Symbol("validatorValidateTargetOptions");
 
 /**
  * @class Validator
@@ -69,7 +24,7 @@ export class Validator {
    * @param name The name of the rule.
    * @param handler The validation function.
    */
-  static registerRule<ParamType = Array<any>>(name: IValidatorRuleName, handler: IValidatorRuleFunction<ParamType>): void {
+  static registerRule<ParamType extends Array<any> = Array<any>>(name: IValidatorRuleName, handler: IValidatorRuleFunction<ParamType>): void {
     const rules = Validator.getRules();
     if (typeof handler == "function") {
       (rules as any)[name] = handler as IValidatorRuleFunction<ParamType>;
@@ -92,7 +47,7 @@ export class Validator {
    * @param {IValidatorRuleName} rulesName - The name of the validation rule to retrieve.
    * @returns {IValidatorRuleFunction | undefined} The validation rule if found, otherwise undefined.
    */
-  static getRule<ParamType = Array<any>>(rulesName: IValidatorRuleName): IValidatorRuleFunction<ParamType> | undefined {
+  static getRule<ParamType extends Array<any> = Array<any>>(rulesName: IValidatorRuleName): IValidatorRuleFunction<ParamType> | undefined {
     if (!isNonNullString(rulesName)) return undefined;
     const rules = Validator.getRules();
     return rules[rulesName] as IValidatorRuleFunction<ParamType> | undefined;
@@ -242,5 +197,91 @@ export class Validator {
       }, 0);
     });
   }
+  /***
+   * Validate a target decorated using the ValidatorDecorator. 
+   * @param 
+   */
+  static validateTarget<T extends { new(...args: any[]): {} }>(target: T, data: Partial<Record<keyof InstanceType<T>, any>>, options?: {
+    errorMessageBuilder?: (propertyName: keyof InstanceType<T>, error: string,
+      builderOptions: {
+        message: string,
+        ruleName: string,
+        ruleParams: any[],
+        value: any,
+        data: Partial<Record<keyof InstanceType<T>, any>>,
+      },
+    ) => string
+  }
+  ) {
+    const rulesObject = Validator.getTargetRules<T>(target);
+    options = extendObj({}, Validator.getValidateTargetOptions(target), options);
+    data = Object.assign({}, data);
+    const errorMessageBuilder = typeof options?.errorMessageBuilder === 'function' ? options.errorMessageBuilder : (field: (keyof InstanceType<T>), error: string) => `${String(field)} : ${error}`;
+    const result: Record<keyof InstanceType<T>, any> = {} as Record<keyof InstanceType<T>, any>;
+    const errors: string[] = [];
+    const promises = [];
+    const errorsResult: Record<keyof InstanceType<T>, string[]> = {} as Record<keyof InstanceType<T>, string[]>;
+    const errorsByField: Record<keyof InstanceType<T>, string> = {} as Record<keyof InstanceType<T>, string>;
+    for (let i in rulesObject) {
+      promises.push(Validator.validate({ value: data[i], fieldName: i, propertyName: i, rules: rulesObject[i] }).then((result) => {
+        result[i as keyof typeof result] = result;
+      }).catch((error) => {
+        const errorField = stringify(defaultVal(error?.message, error));
+        errorsByField[i as keyof typeof errorsByField] = errorField;
+        errorsResult[i as keyof typeof errorsResult] = [errorField];
+        errors.push(errorMessageBuilder(i, errorField, {
+          ...error,
+          data,
+        }));
+      }));
+    }
+    return Promise.all(promises).then(() => {
+      return {
+        rulesByField: rulesObject,
+        result,
+        errors,
+        success: !errors.length,
+        errorsByField,
+        errorsResult,
+      }
+    });
+  }
+  static getTargetRules<T extends { new(...args: any[]): {} } = any>(target: T): Record<keyof InstanceType<T>, IValidatorRule[]> {
+    return Object.assign({}, Reflect.getMetadata(validatorTargetRulesMetaKey, target.prototype));
+  }
+  public static getValidateTargetOptions<T extends { new(...args: any[]): {} } = any>(target: T): Parameters<typeof Validator.validateTarget>[2] {
+    return Object.assign({}, Reflect.getMetadata(validatorValidateTargetOptionsMetaKey, target) || {});
+  }
+  static createDecorator<RuleParamsType extends Array<any> = Array<any>>(ruleFunction: IValidatorRuleFunction<RuleParamsType>) {
+    return function (params: RuleParamsType) {
+      const validatorDynamicFunction: IValidatorRuleFunction<RuleParamsType> = function (options) {
+        const validationOptions: IValidatorValidateOptions<RuleParamsType> = Object.assign({}, options);
+        validationOptions.ruleParams = (Array.isArray(params) ? params : [params]) as RuleParamsType;
+        return ruleFunction(validationOptions)
+      }
+      return Validator.createPropertyDecorator<RuleParamsType>(validatorDynamicFunction);
+    }
+  }
+  static createPropertyDecorator<RuleParamsType extends Array<any> = Array<any>>(rule: IValidatorRule<RuleParamsType> | IValidatorRule[]): PropertyDecorator {
+    return function (target: any, propertyKey) {
+      const allRules = Object.assign({}, Reflect.getMetadata(validatorTargetRulesMetaKey, target));
+      allRules[propertyKey] = Array.isArray(allRules[propertyKey]) ? allRules[propertyKey] : [];
+      allRules[propertyKey].push(...(Array.isArray(rule) ? rule : [rule]) as any);
+      Reflect.defineMetadata(validatorTargetRulesMetaKey, allRules, target);
+      return allRules;
+    }
+  }
 }
 
+export const ValidatorIsNumber = Validator.createPropertyDecorator("number");
+export const ValidatorIsRequired = Validator.createPropertyDecorator("required");
+export const ValidatorIsEmail = Validator.createPropertyDecorator("email");
+export const ValidatorIsUrl = Validator.createPropertyDecorator("url");
+export const ValidatorIsFileName = Validator.createPropertyDecorator("fileName");
+export const ValidatorIsNonNullString = Validator.createPropertyDecorator("nonNullString");
+
+export function ValidatorValidateTargetOptions(options: Parameters<typeof Validator.validateTarget>[2]): ClassDecorator {
+  return function (target: Function) {
+    Reflect.defineMetadata(validatorValidateTargetOptionsMetaKey, options, target);
+  }
+}

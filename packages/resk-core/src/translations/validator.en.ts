@@ -25,6 +25,8 @@ I18n.RegisterTranslations({
             "integer": "This field must be a valid integer",
             "float": "This field must be a valid float",
             "fileName": "This field must be a valid file name",
+            "isNumber": "This field must be a valid number",
+            "isNonNullString": "This field must be a non null string",
             "length": "This field must be exactly %{length} characters long",
             "lengthRange": "This field must be between %{minLength} and %{maxLength} characters long",
             "numberLessThanOrEquals": "This field must be less than or equal to %{ruleParams[0]}",

@@ -63,7 +63,7 @@
  * or it can throw an exception of type string or return an object of the form `{ message: string }`.
  */
 
-export type IValidatorRule<ParamType = Array<any>> = IValidatorRuleFunction<ParamType> | IValidatorRuleName | `${IValidatorRuleName}[${string}]` | Record<IValidatorRuleName, ParamType>;
+export type IValidatorRule<ParamType extends Array<any> = Array<any>> = IValidatorRuleFunction<ParamType> | IValidatorRuleName | `${IValidatorRuleName}[${string}]` | Record<IValidatorRuleName, ParamType>;
 
 
 /**
@@ -205,7 +205,7 @@ export type IValidatorSanitizedRules = IValidatorSanitizedRule[];
  * - This type is essential for defining custom validation logic in forms, allowing developers to create reusable and flexible validation rules.
  * - The function can be synchronous or asynchronous, depending on the validation logic implemented.
  */
-export type IValidatorRuleFunction<ParamType = Array<any>> = (options: IValidatorValidateOptions<ParamType>) => IValidatorResult;
+export type IValidatorRuleFunction<ParamType extends Array<any> = Array<any>> = (options: IValidatorValidateOptions<ParamType>) => IValidatorResult;
 
 /**
  * @interface IValidatorRuleName
@@ -701,6 +701,16 @@ export interface IValidatorRuleMap {
      * - The `isNonNullString` utility function is used to check that the value is a non-null string before performing further validation.
      */
     fileName: IValidatorRuleFunction;
+
+    /***
+     * Validator rule that checks if a given value is a number
+     */
+    number: IValidatorRuleFunction;
+
+    /***
+     * Validator rule that checks if a given value is a non null string
+     */
+    nonNullString: IValidatorRuleFunction;
 }
 
 
@@ -766,7 +776,7 @@ export type IValidatorResult = Promise<boolean | string> | string | boolean;
  * 
  * @template ParamType The type of the parameters that the rule function accepts.
  */
-export interface IValidatorValidateOptions<ParamType = Array<any>> {
+export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<any>> {
     /** 
      * The list of validation rules to apply that have been passed through the `Validator.validate` method.
      * 
@@ -861,4 +871,20 @@ export interface IValidatorValidateOptions<ParamType = Array<any>> {
     * }
     */
     message?: string;
+
+    /***
+     * The name of the field associated with the error.
+     * This property is used to identify the field in the form or data structure.
+     * It is typically used to provide more context for the error message.
+     */
+    fieldName?: string;
+
+    /***
+     * Alias for fieldName
+     * The name of the property associated with the error.
+     * This property is the property that is being validated.
+     * It is used to identify the property in the form or data structure.
+     * It is typically used to provide more context for the error message.
+     */
+    propertyName?: string;
 }

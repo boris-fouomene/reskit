@@ -1,6 +1,14 @@
+import exp from "constants";
 import { i18n } from "../../i18n";
 import "../../translations";
-import { Validator } from "../index";
+import {
+    Validator, ValidatorHasLength, ValidatorIsEmail, ValidatorIsFileName, ValidatorIsNonNullString, ValidatorIsNumber,
+    ValidatorIsNumberGreaterThan,
+    ValidatorIsNumberLessThan,
+    ValidatorIsRequired,
+    ValidatorIsUrl,
+    ValidatorValidateTargetOptions
+} from "../index";
 
 
 describe("Validator Rules", () => {
@@ -133,4 +141,73 @@ describe("Validator Rules", () => {
             expect(result).not.toBe(true);
         });
     });
+
+    describe('Test valdidator rules with decorators ', () => {
+        @ValidatorValidateTargetOptions({
+            /* errorMessageBuilder: (propertyName: string, error: string) => {
+                return `property : ${propertyName},  error : ${error}`;
+            } */
+        })
+        class Entity {
+            constructor(options?: Entity) {
+                try {
+                    this.email = options?.email;
+                    this.id = options?.id;
+                    this.aString = options?.aString;
+                    this.name = options?.name;
+                    this.note = options?.note;
+                    this.url = options?.url;
+                } catch (error) {
+                    //console.log(error, " instance of Entity");
+                }
+            }
+            @ValidatorIsNumber
+            id?: number;
+
+            @ValidatorIsRequired
+            @ValidatorIsNonNullString
+            name?: string;
+
+            @ValidatorIsEmail
+            email?: string;
+
+            @ValidatorIsUrl
+            url?: string;
+
+            @ValidatorIsRequired
+            @ValidatorIsNumberLessThan([10])
+            @ValidatorIsNumberGreaterThan([5])
+            note?: number;
+
+            @ValidatorIsRequired
+            @ValidatorHasLength([10])
+            @ValidatorHasLength([5, 20])
+            aString?: string;
+        }
+
+        const allRules = Validator.getTargetRules(Entity);
+        it("Getting validation rules", async () => {
+            expect(allRules).toMatchObject({
+                id: ["number"],
+                name: expect.arrayContaining(["required", "nonNullString"]),
+                email: ["email"],
+                url: ["url"],
+                note: expect.arrayContaining(["required", expect.any(Function), expect.any(Function)]),
+                aString: expect.arrayContaining([expect.any(Function), expect.any(Function), "required"]),
+            });
+        })
+        it("Validate rules with decorators on entity", async () => {
+            const r = await Validator.validateTarget(Entity, {
+                id: 12,
+            });
+            expect(r).toMatchObject({
+                errors: expect.arrayContaining([
+                    "name : This field must be a non null string",
+                    "note : This field must be greater than 5",
+                    "aString : This field must be between 5 and 20 characters long",
+                ]),
+                success: false,
+            })
+        })
+    })
 });

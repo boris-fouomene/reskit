@@ -85,8 +85,7 @@ export function getFields(target: any): Record<string, ({ name: string } & IFiel
    * Use Reflect.getMetadata to retrieve the metadata stored under the fieldsMetaData key.
    * If no metadata is found, it will return undefined.
    */
-  const fields = Reflect.getMetadata(fieldsMetaData, target);
-
+  const fields = Reflect.getMetadata(fieldsMetaData, target.prototype);
   /**
    * Merge the retrieved metadata into a new object using Object.assign.
    * This creates a new object that contains the fields metadata, effectively cloning it.

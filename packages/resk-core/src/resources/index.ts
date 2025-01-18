@@ -1,18 +1,14 @@
 import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria } from '../types';
 import { getFields } from '../fields';
-import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory } from '../utils/index';
-import { IConstructor, IProtectedResource } from '../types/index';
+import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory, extendObj } from '../utils/index';
+import { IClassConstructor, IProtectedResource } from '../types/index';
 import { IAuthPerm, IAuthUser } from '@/auth/types';
 import { isAllowed } from '../auth/perms';
 import { i18n, I18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
 
-/***
-    @interface The reflect metat key used to store resources metatdata
-*/
-const resourceMetaData = Symbol("resource");
 const resourcesMetaDataKey = Symbol('resources');
-const resourcesClassNameMetaData = Symbol('resourceByClassName');
+const resourcesClassNameMetaData = Symbol('resourceFromClassName');
 
 /**
  * Represents the base class for any resource.
@@ -55,10 +51,17 @@ const resourcesClassNameMetaData = Symbol('resourceByClassName');
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
 export abstract class ResourceBase<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> implements IResourceDataService<DataType, PrimaryKeyType> {
+  private _onDictionaryChangedListener?: { remove: () => any };
+  private _onLocaleChangeListener?: { remove: () => any };
+  constructor() {
+    super();
+    this._onDictionaryChangedListener = i18n.on("translations-changed", this.onI18nChange.bind(this));
+    this._onLocaleChangeListener = i18n.on("locale-changed", this.onI18nChange.bind(this));
+    this.init();
+  }
   actions?: IResourceActionMap;
-  metaData?: IResource<DataType>;
   getMetaData(): IResource<DataType> {
-    return Object.assign({}, this.metaData);
+    return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, this.constructor));
   }
   static events = observableFactory<IResourceDefaultEvent | "string">();
   /**
@@ -119,13 +122,6 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    Fields are created using the @Field decorator when resources are defined.
   */
   fields?: Record<string, IField>;
-  private _onDictionaryChangedListener?: { remove: () => any };
-  private _onLocaleChangeListener?: { remove: () => any };
-  constructor() {
-    super();
-    this._onDictionaryChangedListener = i18n.on("translations-changed", this.onI18nChange.bind(this));
-    this._onLocaleChangeListener = i18n.on("locale-changed", this.onI18nChange.bind(this));
-  }
   /**
    * Resolves the translations for the resource when the i18n dictionary or locale changes.
    * This method is called when the "translations-changed" or "locale-changed" events are triggered.
@@ -393,7 +389,12 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
         });
       });
   }
-
+  updateMetadata(options: IResource<DataType>): IResource<DataType> {
+    options = Object.assign({}, options);
+    const metadata = extendObj({}, this.getMetaData(), options)
+    Reflect.defineMetadata(ResourcesManager.resourceMetaData, metadata, this.constructor);
+    return metadata;
+  }
   /**
    * Initializes the resource with the provided metaData.
    * 
@@ -404,17 +405,8 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * properties that are functions. After assigning the metaData, it calls the `getFields` method
    * to further process the resource.
    */
-  init(metaData: IResource<DataType>) {
-    metaData = Object.assign({}, metaData);
-    this.metaData = metaData;
+  init() {
     this.resolveTranslations();
-    for (let i in metaData) {
-      if (isEmpty((this as IDict)[i]) && typeof (this as IDict)[i] !== "function") {
-        try {
-          (this as IDict)[i] = metaData[i as keyof typeof metaData];
-        } catch { }
-      }
-    }
     this.getFields();
   }
   /**
@@ -506,7 +498,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * @returns {IResourceName} The name of the resource, cast to the IResourceName type.
    */
   getName(): IResourceName {
-    return defaultStr(this.name) as IResourceName;
+    return defaultStr(this.getMetaData().name, this.name) as IResourceName;
   }
 
   /**
@@ -656,7 +648,9 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * @returns {string} The label of the resource.
    */
   getLabel(): string {
-    return this.translateProperty("label", defaultStr(this.label, this.getName()));
+    const labelMetaData = this.getMetaData().label;
+    const label = this.translateProperty("label", defaultStr(labelMetaData, this.label, this.getName()));
+    return String(label).toLowerCase().trim() != "label" ? label : defaultStr(this.getName());
   }
 
   /**
@@ -667,7 +661,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * @returns {string} The title of the resource.
    */
   getTitle(): string {
-    return this.translateProperty("title", defaultStr(this.title, this.getLabel()));
+    return this.translateProperty("title", defaultStr(this.getMetaData().title, this.title, this.getLabel()));
   }
 
   /**
@@ -678,7 +672,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * @returns {string} The tooltip of the resource.
    */
   getTooltip(): string {
-    return this.translateProperty("tooltip", defaultStr(this.tooltip));
+    return this.translateProperty("tooltip", defaultStr(this.getMetaData().tooltip, this.tooltip));
   }
 
   /**
@@ -690,9 +684,14 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * @returns {Record<string, IField>} A record containing all the fields of the resource.
    */
   getFields(): Record<string, IField> {
-    this.resolveTranslations();
-    this.fields = getFields(this);
-    return this.fields;
+    try {
+      this.resolveTranslations();
+      this.fields = getFields(this);
+      return this.fields;
+    } catch (e) {
+      console.log(e, " getting resources fieldss");
+    }
+    return {};
   }
 
   /**
@@ -796,7 +795,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
  * }
  */
 export class ResourcesManager {
-
+  static resourceMetaData = Symbol("resource");
   /**
    * A global constant storing a record of all instantiated resources.
    * 
@@ -864,7 +863,7 @@ export class ResourcesManager {
    * @param {IResourceName} resourceName - The unique name of the resource to retrieve the class name for.
    * @returns {string | undefined} The class name associated with the specified resource name, or `undefined` if not found.
    */
-  public static getNameByClassName(className: string): IResourceName | undefined {
+  public static getNameFromClassName(className: string): IResourceName | undefined {
     if (!isNonNullString(className)) return undefined;
     const classNames = this.getAllClassNames();
     return classNames[className];
@@ -879,26 +878,39 @@ export class ResourcesManager {
    * @param {IResourceName} resourceName - The unique name of the resource to retrieve the metaData for.
    * @returns {IResource<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
    */
-  public static getMetaData(resourceName: IResourceName): IResource<any> | undefined {
+  public static getMetaDataFromName(resourceName: IResourceName): IResource<any> | undefined {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     return (allOptions as any)[resourceName];
   }
 
   /**
+ * Retrieves the resource metadata associated with the given target class.
+ *
+ * This function uses reflection to access the metadata stored on the target class using the `@Resource` decorator.
+ * It returns a new object that is a copy of the metadata, which includes properties like `name`, `label`, `title`, and `tooltip`.
+ *
+ * @param {any} target - The target class or instance from which to retrieve the metadata.
+ * @returns {ResourceBase} An object containing the resource metadata for the given target.
+ */
+  public static getMetaDataFromTarget(target: IClassConstructor): IResource<any> | undefined {
+    return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, target.prototype));
+  }
+
+  /**
    * Retrieves the resource metaData for the specified resource class name.
    *
-   * This method first looks up the resource name associated with the given class name using the `getNameByClassName` method.
+   * This method first looks up the resource name associated with the given class name using the `getNameFromClassName` method.
    * If the resource name is found, it then retrieves the resource metaData for that resource name using the `getMetaData` method.
    * If the resource name is not found, or if the resource metaData are not found, this method will return `undefined`.
    *
    * @param {string} className - The class name of the resource to retrieve the metaData for.
    * @returns {IResource<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
    */
-  public static getMetaDataByClassName(className: string): IResource<any> | undefined {
-    const resourceName = this.getNameByClassName(className);
+  public static getMetaDataFromClassName(className: string): IResource<any> | undefined {
+    const resourceName = this.getNameFromClassName(className);
     if (!resourceName) return undefined;
-    return this.getMetaData(resourceName);
+    return this.getMetaDataFromName(resourceName);
   }
 
   /**
@@ -1064,31 +1076,25 @@ export class ResourcesManager {
  * 
  * ```
  */
-export function Resource<DataType extends IResourceData = any>(metaData: IResource<DataType>) {
-  return function (target: Function) {
+export function Resource<DataType extends IResourceData = any>(metaData: IResource<DataType> & {
+  /***
+   * whether the resource should be instanciated or not
+   */
+  instanciate?: boolean;
+}) {
+  return function (target: IClassConstructor) {
     metaData = Object.assign({}, metaData);
     if (typeof target == "function") {
-      try {
-        metaData.className = defaultStr(metaData.className, target?.name);
-        const resource = new (target as IConstructor)() as ResourceBase<DataType>;
-        resource.init(metaData);
-        ResourcesManager.addResource<DataType>((metaData.name as IResourceName), resource);
-      } catch { }
+      metaData.className = defaultStr(metaData.className, target?.name);
+      if (metaData?.instanciate) {
+        try {
+          const resource = new (target as IClassConstructor)() as ResourceBase<DataType>;
+          resource.updateMetadata(metaData);
+          ResourcesManager.addResource<DataType>((metaData.name as IResourceName), resource);
+        } catch { }
+      }
     }
-    Reflect.defineMetadata(resourceMetaData, metaData, target);
+    Reflect.defineMetadata(ResourcesManager.resourceMetaData, metaData, target);
     ResourcesManager.addMetaData(metaData.name as IResourceName, metaData);
   };
-}
-
-/**
- * Retrieves the resource metadata associated with the given target class.
- *
- * This function uses reflection to access the metadata stored on the target class using the `@Resource` decorator.
- * It returns a new object that is a copy of the metadata, which includes properties like `name`, `label`, `title`, and `tooltip`.
- *
- * @param {any} target - The target class or instance from which to retrieve the metadata.
- * @returns {ResourceBase} An object containing the resource metadata for the given target.
- */
-export const getResourceMetaData = <DataType extends IResourceData = any>(target: any): ResourceBase<DataType> => {
-  return Object.assign({}, Reflect.getMetadata(resourceMetaData, target));
 }

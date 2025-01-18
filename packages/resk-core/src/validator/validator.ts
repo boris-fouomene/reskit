@@ -1,6 +1,7 @@
 import { IValidatorRule, IValidatorValidateOptions, IValidatorRuleMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult, IValidatorSanitizedRules } from "./types";
 import { defaultStr, defaultVal, extendObj, isNonNullString, isObj, stringify } from "@utils/index";
 import { i18n } from "../i18n";
+import { IClassConstructor } from "@/types";
 
 
 const validatorTargetRulesMetaKey = Symbol("validatorIsMetaData");
@@ -201,7 +202,7 @@ export class Validator {
    * Validate a target decorated using the ValidatorDecorator. 
    * @param 
    */
-  static validateTarget<T extends { new(...args: any[]): {} }>(target: T, data: Partial<Record<keyof InstanceType<T>, any>>, options?: {
+  static validateTarget<T extends IClassConstructor = any>(target: T, data: Partial<Record<keyof InstanceType<T>, any>>, options?: {
     errorMessageBuilder?: (
       translatedPropertyName: string,
       error: string,
@@ -254,10 +255,10 @@ export class Validator {
       }
     });
   }
-  static getTargetRules<T extends { new(...args: any[]): {} } = any>(target: T): Record<keyof InstanceType<T>, IValidatorRule[]> {
+  static getTargetRules<T extends IClassConstructor = any>(target: T): Record<keyof InstanceType<T>, IValidatorRule[]> {
     return Object.assign({}, Reflect.getMetadata(validatorTargetRulesMetaKey, target.prototype));
   }
-  public static getValidateTargetOptions<T extends { new(...args: any[]): {} } = any>(target: T): Parameters<typeof Validator.validateTarget>[2] {
+  public static getValidateTargetOptions<T extends IClassConstructor = any>(target: T): Parameters<typeof Validator.validateTarget>[2] {
     return Object.assign({}, Reflect.getMetadata(validatorValidateTargetOptionsMetaKey, target) || {});
   }
   static createDecorator<RuleParamsType extends Array<any> = Array<any>>(ruleFunction: IValidatorRuleFunction<RuleParamsType>) {

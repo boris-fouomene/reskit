@@ -9,13 +9,13 @@ I18n.RegisterTranslations({
          */
         "resources": {
             "createForbiddenError": "You are not authorized to create a %{resourceLabel} resource",
-            "readForbiddenError": "You are not authorized to read a %{resourceLabel} resource",
-            "updateForbiddenError": "You are not authorized to update a %{resourceLabel} resource",
-            "deleteForbiddenError": "You are not authorized to delete a %{resourceLabel} resource",
-            "detailsForbiddenError": "You are not authorized to view details of a %{resourceLabel} resource",
+            "readForbiddenError": "You are not authorized to read [%{resourceLabel}] resource",
+            "updateForbiddenError": "You are not authorized to update [%{resourceLabel}] resource",
+            "deleteForbiddenError": "You are not authorized to delete [%{resourceLabel}] resource",
+            "detailsForbiddenError": "You are not authorized to view details of [%{resourceLabel}] resource",
             "invalidDataProvider": "Invalid data provider for %{resourceLabel} resource",
             "listForbiddenError": "You are not authorized to list %{resourceLabel} resources",
-            "resourceNotFoundError": `Resource %{resourceLabel} not found with options : %{options}`,
+            "resourceNotFoundError": `Resource [%{resourceLabel}] not found with options : %{options}`,
             /***
              * resources actions translations structure : 
              * Here is an example of the structure of the translations for the "user" resource:

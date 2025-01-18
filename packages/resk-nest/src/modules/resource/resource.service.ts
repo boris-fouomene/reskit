@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { defaultStr, IResourceData, IResourceName, IResourcePrimaryKey, ResourceBase } from '@resk/core';
+import { defaultStr, IResourceData, IResourceName, IResourcePrimaryKey, ResourceBase, ResourcesManager } from '@resk/core';
 import { IDataServiceRepository, ResourceDataService, ResourceDataServiceBase } from '../data-source';
-import { error } from 'console';
 /**
  * The `ResourceService` class is an injectable service that extends the `ResourceBase` class.
  * It provides a generic implementation for managing resources in a NestJS application.
@@ -36,13 +35,13 @@ export class ResourceService<DataType extends IResourceData = any, PrimaryKeyTyp
 
   checkPermissionAction(actionPerm: () => boolean, i18nActionKey: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      resolve(true);
-      return;
       super.checkPermissionAction(actionPerm, i18nActionKey).then(res => {
         resolve(res)
-      }).catch(err => {
-        console.log(err, " is errrrrrrrrrrr");
-        throw new HttpException(error, HttpStatus.FORBIDDEN);
+      }).catch(error => {
+        reject(new HttpException(
+          { status: HttpStatus.FORBIDDEN, error: (error instanceof Error) ? error.message : error },
+          HttpStatus.FORBIDDEN,
+        ));
       })
     })
   }

@@ -201,7 +201,7 @@ export interface IFieldBase<FieldType extends IFieldType = any> extends IProtect
   ```ts
       import "@resk/core";
       declare module "@resk/core" {
-        interface IResourceNameMap {
+        interface IResourcesMap {
             users?:string;
         }
         interface IFieldMap {
@@ -514,13 +514,13 @@ export type IDict<K extends keyof any = any, T = any> = Record<K, T>;
 /**
  * @interface
   Represents a type for all resource names.
-  The IResourceName type is defined as the union of all keys in the IResourceNameMap object. 
-  This means that IResourceName can only take on values that are present as keys in IResourceNameMap.
+  The IResourceName type is defined as the union of all keys in the IResourcesMap object. 
+  This means that IResourceName can only take on values that are present as keys in IResourcesMap.
  * Here are some examples of using this type:
  *```ts
   import "@resk/core";
   declare module "@resk/core"{
-      interface IResourceNameMap {
+      interface IResourcesMap {
         resource1: any;
         resource2: any;
         resource3: any;
@@ -531,7 +531,7 @@ export type IDict<K extends keyof any = any, T = any> = Record<K, T>;
  * let invalidResourceName: IResourceName = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourceName'.
  ```
  */
-export type IResourceName = keyof IResourceNameMap;
+export type IResourceName = keyof IResourcesMap;
 
 /**
  * A global declaration for all resource names. This is the exported name of the IResourceName type.
@@ -545,7 +545,7 @@ export type IResourceName = keyof IResourceNameMap;
  * ```typescript
   import "@resk/core";
  * declare module "@resk/core" {
- *   interface IResourceNameMap {
+ *   interface IResourcesMap {
  *     users?: string;
        roles?:any;
        sales?:any;
@@ -562,7 +562,7 @@ export type IResourceName = keyof IResourceNameMap;
  * let invalidResourceName: IResourceName = 'unknownResource'; // error: Type '"unknownResource"' is not assignable to type 'IResourceName'.
  * ```
  */
-export interface IResourceNameMap { }
+export interface IResourcesMap { }
 
 /**
  * @interface IResourceActionMap
@@ -990,7 +990,7 @@ export interface IResource<DataType extends IResourceData = any> {
 /**
  * A type that represents a constructor function that can be instantiated with any number of arguments.
  */
-export type IConstructor = new (...args: any[]) => {};
+export type IClassConstructor = new (...args: any[]) => {};
 
 
 /**

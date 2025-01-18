@@ -3,8 +3,13 @@ import { ResourceService } from '../resource';
 import { User } from './entities/user.entity';
 import { InjectDataService, ResourceDataService } from '../data-source';
 import { Repository } from 'typeorm';
+import { Resource } from '@resk/core';
 
 @Injectable()
+@Resource({
+  name: 'users',
+  label: 'Users',
+})
 export class UsersService extends ResourceService<User, string, Repository<User>> {
   constructor(
     @InjectDataService(User)
@@ -14,7 +19,6 @@ export class UsersService extends ResourceService<User, string, Repository<User>
   }
   @Get('me')
   getMe() {
-    console.log(this.getRepository().metadata.columns, " are my me columns");
     return "me";
   }
 }

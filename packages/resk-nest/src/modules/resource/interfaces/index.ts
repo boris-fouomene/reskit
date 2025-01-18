@@ -135,7 +135,7 @@ ResourcesManager.parseApiOperationId = function (operationId: string): { control
  * @returns {ApiOperationOptions | undefined} The API operation options or undefined if not found.
  */
 ResourcesManager.getApiDescription = function (resourceName: IResourceName, method?: string): ApiOperationOptions | undefined {
-  const resourceOptions = ResourcesManager.getMetaData(resourceName);
+  const resourceOptions = ResourcesManager.getMetaDataFromName(resourceName);
   if (!isObj(resourceOptions) || !isObj(resourceOptions?.apiDescription) || !isNonNullString(method)) return;
   return (resourceOptions?.apiDescription as any)[method];
 }
@@ -148,7 +148,7 @@ ResourcesManager.getApiDescription = function (resourceName: IResourceName, meth
  * @returns {ApiOperationOptions | undefined} The API operation options or undefined if not found.
  */
 ResourcesManager.getApiDescriptionByClassName = function (className: string, method?: string): ApiOperationOptions | undefined {
-  const resourceName = ResourcesManager.getNameByClassName(className);
+  const resourceName = ResourcesManager.getMetaDataFromClassName(className)?.name;
   if (!resourceName) return;
   return ResourcesManager.getApiDescription(resourceName, method);
 }

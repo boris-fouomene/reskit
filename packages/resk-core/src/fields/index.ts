@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { IField, IFieldBase, IFieldType } from '../types';
+import { IClassConstructor, IField, IFieldBase, IFieldType } from '../types';
 export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**
@@ -80,12 +80,30 @@ export function Field<T extends IFieldType = any>(options: IField<T>): PropertyD
  * console.log(fields); // Output: { myField: { name: 'myField', type: 'string' } }
  * ```
  */
-export function getFields(target: any): Record<string, ({ name: string } & IField)> {
+export function getFieldsFromTarget(target: IClassConstructor): Record<string, ({ name: string } & IField)> {
   /**
    * Use Reflect.getMetadata to retrieve the metadata stored under the fieldsMetaData key.
    * If no metadata is found, it will return undefined.
    */
   const fields = Reflect.getMetadata(fieldsMetaData, target.prototype);
+  /**
+   * Merge the retrieved metadata into a new object using Object.assign.
+   * This creates a new object that contains the fields metadata, effectively cloning it.
+   */
+  return Object.assign({}, fields);
+}
+
+/***
+ * Retrieves the fields metadata from a class instance.
+ * @param {T} instance - The instance of the class from which to retrieve the metadata.
+ * @returns {Record<string, ({ name: string } & IField)>} An object mapping property names to their corresponding metadata, which includes the type and other options.
+ */
+export function getFields<T extends IClassConstructor = any>(instance: InstanceType<T>): Record<string, ({ name: string } & IField)> {
+  /**
+   * Use Reflect.getMetadata to retrieve the metadata stored under the fieldsMetaData key.
+   * If no metadata is found, it will return undefined.
+   */
+  const fields = Reflect.getMetadata(fieldsMetaData, instance.constructor);;
   /**
    * Merge the retrieved metadata into a new object using Object.assign.
    * This creates a new object that contains the fields metadata, effectively cloning it.

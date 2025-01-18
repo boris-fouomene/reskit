@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseFilters } from '@nestjs/common';
 import { ResourceService } from './resource.service';
 import { ApiExcludeController, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { isNonNullString, IResourceName } from '@resk/core';
 import { ResourcesManager } from '@resk/core';
 import { IResourceData } from '@resk/core';
+import { MainExceptionFilter } from './exceptions';
 
 /**
  * The `ResourceController` class is a NestJS controller that provides CRUD operations for a resource.
@@ -14,6 +15,7 @@ import { IResourceData } from '@resk/core';
  * @template ServiceType - The type of the `ResourceService` implementation.
  */
 @Controller()
+@UseFilters(MainExceptionFilter)
 export class ResourceController<DataType extends IResourceData = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
   /**
    * Initializes the `ResourceController` instance with the provided `ResourceService`.

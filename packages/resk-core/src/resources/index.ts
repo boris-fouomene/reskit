@@ -201,20 +201,6 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
     return Promise.resolve();
   }
   /***
-   * creates a new record in the resource.
-   * @param {DataType} record - The data for the new record.
-   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
-   */
-  create(record: Partial<DataType>) {
-    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
-      .then(() => {
-        return this.getDataService().create(record).then((result) => {
-          this._trigger("create" as EventType, result);
-          return result;
-        });
-      });
-  }
-  /***
    * Fetches all records from the resource.
    * @param {IResourceQueryOptions<DataType>} options - Optional options for fetching resources.
    * @returns {Promise<IResourcePaginatedResult<DataType>>} A promise that resolves to the result of the list operation.
@@ -254,17 +240,123 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
     return result;
   }
   /**
+   * trigger called before the create operation.
+   * @param record {Partial<DataType>} The record to be created.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async beforeCreate(record: Partial<DataType>): Promise<void> { }
+  /***
+   * trigger called after the create operation.
+   * @param {DataType} record - The created record.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async afterCreate(record: DataType): Promise<void> { }
+  /**
+   * Trigger called before the update operation.
+   * @param primaryKey {PrimaryKeyType}, the primary key of the record to be updated.
+   * @param dataToUpdate {Partial<DataType>} - The updated data for the record.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async beforeUpdate(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>): Promise<void> { }
+  /**
+   * Triggers called after the update operation.
+   * @param {DataType} updatedData  - The updated record.
+   * @param {PrimaryKeyType} primaryKey  - The primary key of the updated record.
+   * @param {Partial<DataType>} dataToUpdate - The data that was used to update the record.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async afterUpdate(updatedData: DataType, primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>): Promise<void> { }
+
+  /**
+   * Trigger called before the delete operation.
+   * @param primaryKey {PrimaryKeyType} - The primary key of the record to be deleted.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async beforeDelete(primaryKey: PrimaryKeyType): Promise<void> { }
+  /***
+   * Triggers called after the delete operation.
+   * @param {boolean} result - The result of the delete operation.
+   * @param {PrimaryKeyType} primaryKey - The primary key of the deleted record.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async afterDelete(result: boolean, primaryKey: PrimaryKeyType): Promise<void> { }
+
+  /***
+   * trigger called before the createMany operation.
+   * @param {Partial<DataType>[]} records - The records to be created.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async beforeCreateMany(records: Partial<DataType>[]) { }
+  /***
+   * trigger called after the createMany operation.
+   * @param {DataType[]} records - The created records.
+   * @param {Partial<DataType>[]} data - The data used to create the records.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async afterCreateMany(records: DataType[], data: Partial<DataType>[]) { }
+  /***
+   * Trigger called before the updateMany operation.
+   * @param {IResourceManyCriteria} criteria - The criteria for the update operation.
+   * @param {Partial<DataType>} data - The data for the update operation.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async beforeUpdateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>) { }
+  /**
+   * Triggers called after the updateMany operation.
+   * @param affectedRows {number} The number of records updated
+   * @param criteria {IResourceManyCriteria} The criteria used for the update operation.
+   * @param {Partial<DataType>[]} records The records updated
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async afterUpdateMany(affectedRows: number, criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, records: Partial<DataType>) { }
+  /***
+   * Trigger called before the deleteMany operation.
+   * @param {IResourceManyCriteria} criteria - The criteria for the delete operation.
+   * @return {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async beforeDeleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) { }
+
+  /**
+   * Trigger called after the deleteMany operation.
+   * @param {number} affectedRows The number of affected rows
+   * @param {IResourceManyCriteria<DataType,PrimaryKeyType>} criteria The criteria for the delete operation.
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   */
+  protected async afterDeleteMany(affectedRows: number, criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) { }
+  /***
+   * creates a new record in the resource.
+   * @param {DataType} record - The data for the new record.
+   * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
+   */
+  create(record: Partial<DataType>) {
+    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
+      .then(() => {
+        return this.beforeCreate(record).then(() => {
+          return this.getDataService().create(record).then((result) => {
+            return this.afterCreate(result).then(() => {
+              this._trigger("create" as EventType, result);
+              return result;
+            })
+          });
+        });
+      });
+  }
+  /**
    * updates a record in the resource.
    * @param key {PrimaryKeyType} The primary key of the resource to update.
-   * @param updatedData
+   * @param dataToUpdate
    * @returns 
    */
-  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>) {
+  update(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>) {
     return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
-      .then(() => {
-        return this.getDataService()?.update(primaryKey, updatedData).then((result) => {
-          this._trigger("update" as EventType, result);
-          return result;
+      .then(async () => {
+        return this.beforeUpdate(primaryKey, dataToUpdate).then(() => {
+          return this.getDataService()?.update(primaryKey, dataToUpdate).then((result) => {
+            return this.afterUpdate(result, primaryKey, dataToUpdate).then(() => {
+              this._trigger("update" as EventType, result, primaryKey, dataToUpdate);
+              return result;
+            })
+          });
         });
       })
   }
@@ -276,9 +368,13 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
   delete(primaryKey: PrimaryKeyType) {
     return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
       .then(() => {
-        return this.getDataService()?.delete(primaryKey).then((result) => {
-          this._trigger("delete" as EventType, result);
-          return result;
+        return this.beforeDelete(primaryKey).then(() => {
+          return this.getDataService()?.delete(primaryKey).then((result) => {
+            return this.afterDelete(result, primaryKey).then(() => {
+              this._trigger("delete" as EventType, result, primaryKey);
+              return result;
+            })
+          });
         });
       })
   }
@@ -326,9 +422,13 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
   createMany(data: Partial<DataType>[]) {
     return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
       .then(() => {
-        return this.getDataService().createMany(data).then((result) => {
-          this._trigger("createMany" as EventType, result);
-          return result;
+        return this.beforeCreateMany(data).then(() => {
+          return this.getDataService().createMany(data).then((result) => {
+            return this.afterCreateMany(result, data).then(() => {
+              this._trigger("createMany" as EventType, result, data);
+              return result;
+            })
+          });
         });
       });
   }
@@ -341,9 +441,13 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
   updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>) {
     return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
       .then(() => {
-        return this.getDataService().updateMany(criteria, data).then((result) => {
-          this._trigger("updateMany" as EventType, result);
-          return result;
+        return this.beforeUpdateMany(criteria, data).then(() => {
+          return this.getDataService().updateMany(criteria, data).then((affectedRows) => {
+            return this.afterUpdateMany(affectedRows, criteria, data).then(() => {
+              this._trigger("updateMany" as EventType, affectedRows, criteria, data);
+              return affectedRows;
+            })
+          });
         });
       });
   }
@@ -355,9 +459,13 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
   deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) {
     return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
       .then(() => {
-        return this.getDataService().deleteMany(criteria).then((result) => {
-          this._trigger("deleteMany" as EventType, result);
-          return result;
+        return this.beforeDeleteMany(criteria).then(() => {
+          return this.getDataService().deleteMany(criteria).then((affectedRows) => {
+            return this.afterDeleteMany(affectedRows, criteria).then(() => {
+              this._trigger("deleteMany" as EventType, affectedRows, criteria);
+              return affectedRows;
+            })
+          });
         });
       });
   }

@@ -53,20 +53,4 @@ export class ResourceService<DataType extends IResourceData = any, PrimaryKeyTyp
   getDataService(): ResourceDataService<DataType> {
     return this.dataService;
   }
-
-  create(record: Partial<DataType>): Promise<DataType> {
-    return super.create(record);
-  }
-  update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType> {
-    return super.update(primaryKey, updatedData);
-  }
-  delete(primaryKey: PrimaryKeyType): Promise<boolean> {
-    return super.delete(primaryKey);
-  }
-  updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number> {
-    return super.updateMany(criteria, data);
-  }
-  deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number> {
-    return super.deleteMany(criteria);
-  }
 }

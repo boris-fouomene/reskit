@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import "./modules/resource/interfaces";
-import { isNonNullString, isObj, extendObj, ResourcesManager } from "@resk/core";
+import { isNonNullString, isObj, extendObj, ResourcesManager, IResource, IResourceName } from "@resk/core";
 import { MainExceptionFilter } from './modules/resource';
 import {
     SwaggerModule,
@@ -201,6 +201,14 @@ export const setupSwagger = (
     // Set up the Swagger UI endpoint
     SwaggerModule.setup(swaggerPath, app, () => {
         const documents = SwaggerModule.createDocument(app, config, documentOptions);
+        const resourcesByControllersClassNames: Record<string, IResource> = {} as Record<string, IResource>;
+        const allResurces = ResourcesManager.getAllMetaData();
+        for (let resourceName in allResurces) {
+            if (isObj(allResurces[resourceName as IResourceName]) && isNonNullString(allResurces[resourceName as IResourceName].controllerName)) {
+                const controllerName = allResurces[resourceName as IResourceName].controllerName as string;
+                resourcesByControllersClassNames[controllerName] = allResurces[resourceName as IResourceName];
+            }
+        }
         //console.log(documents," are list of resources",ResourcesManager.getApiDescription("users")," are api descriptions");
         if (isObj(documents?.paths)) {
             for (let path in documents.paths) {
@@ -211,9 +219,14 @@ export const setupSwagger = (
                     if (!isObj(op) || !isNonNullString(op.operationId)) return;
                     const { operationId } = op;
                     const { controllerKey, methodKey } = ResourcesManager.parseApiOperationId(operationId);
-                    const apiDescription = ResourcesManager.getApiDescriptionByClassName(controllerKey, methodKey);
-                    if (isObj(apiDescription)) {
-                        extendObj(op, apiDescription);
+                    if (isNonNullString(controllerKey) && isNonNullString(methodKey)) {
+                        const parentDesk = resourcesByControllersClassNames[controllerKey];
+                        if (isObj(parentDesk) && parentDesk && isObj(parentDesk.apiDescription)) {
+                            const apiDescription = parentDesk.apiDescription;
+                            if (isObj(apiDescription)) {
+                                extendObj(op, apiDescription);
+                            }
+                        }
                     }
                 });
             }

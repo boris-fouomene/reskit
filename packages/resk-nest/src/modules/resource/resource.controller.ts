@@ -1,8 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseFilters } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseFilters, UsePipes, ExecutionContext, SetMetadata } from '@nestjs/common';
 import { ResourceService } from './resource.service';
 import { ApiOperation } from '@nestjs/swagger';
-import { IResourceData } from '@resk/core';
+import { IClassConstructor, IResourceData } from '@resk/core';
 import { MainExceptionFilter } from './exceptions';
+import { ValidatorGetDto, ValidatorPipe, ValidatorValidate } from './pipes';
+
+class ResourceDefaultDto { }
 
 /**
  * The `ResourceController` class is a NestJS controller that provides CRUD operations for a resource.
@@ -40,8 +43,10 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
   async getOne(@Param() params: any) {
     return await this.getResourceService().findOne(params.id);
   }
+  @ValidatorValidate<ResourceController>('getCreateDtoClass')
   @Post()
-  async create(@Body() createResourceDto: Partial<DataType>) {
+  async create(@Body(ValidatorPipe) createResourceDto: Partial<DataType>
+  ) {
     return this.getResourceService().create(createResourceDto);
   }
   @Delete(':id')
@@ -51,5 +56,20 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
   @Put(':id')
   update(@Param() params: any, @Body() updateResourceDto: Partial<DataType>) {
     return this.getResourceService().update(params.id, updateResourceDto);
+  }
+  /***
+   * Retrieve the dto class for create request
+   * @returns {T} The dto class for create request
+   */
+  getCreateDtoClass(): IClassConstructor<any> {
+    return ResourceDefaultDto;
+  }
+
+  /***
+   * Retrieve the dto class for update request
+   * @returns {T} The dto class for update request
+   */
+  getUpdateDtoClass<T extends IClassConstructor = any>(): T {
+    throw new Error('getUpdateDtoClass not implemented');
   }
 }

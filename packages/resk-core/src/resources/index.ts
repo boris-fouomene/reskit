@@ -1022,7 +1022,7 @@ export class ResourcesManager {
    * @param {string} className - The class name of the resource to retrieve the metaData for.
    * @returns {IResource<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
    */
-  public static getMetaDataFromClassName(className: string): IResource<any> | undefined {
+  public static getMetaDataByClassName(className: string): IResource<any> | undefined {
     const resourceName = this.getNameFromClassName(className);
     if (!resourceName) return undefined;
     return this.getMetaDataFromName(resourceName);
@@ -1191,7 +1191,7 @@ export class ResourcesManager {
  * 
  * ```
  */
-export function Resource<DataType extends IResourceData = any>(metaData: IResource<DataType> & {
+export function Resource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData: IResource<DataType, PrimaryKeyType> & {
   /***
    * whether the resource should be instanciated or not
    */
@@ -1199,8 +1199,8 @@ export function Resource<DataType extends IResourceData = any>(metaData: IResour
 }) {
   return function (target: IClassConstructor) {
     metaData = Object.assign({}, metaData);
+    metaData.className = defaultStr(metaData.className, target?.name);
     if (typeof target == "function") {
-      metaData.className = defaultStr(metaData.className, target?.name);
       if (metaData?.instanciate) {
         try {
           const resource = new (target as IClassConstructor)() as ResourceBase<DataType>;

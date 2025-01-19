@@ -1,5 +1,6 @@
 import { ApiOperationOptions } from '@nestjs/swagger';
-import { IResourceName, isNonNullString, isObj, ResourcesManager } from "@resk/core";
+import { IResourceData, IResourceName, IResourcePrimaryKey, isNonNullString, isObj, ResourcesManager } from "@resk/core";
+import { ResourceController } from '../resource.controller';
 
 /**
  * Represents an API operation for a resource.
@@ -19,31 +20,8 @@ export interface IResourceApiOperation extends ApiOperationOptions { }
  *
  * @interface IResourceApiDescription
  */
-export interface IResourceApiDescription {
-  /**
-   * Operation for retrieving a single resource.
-   */
-  getOne?: IResourceApiOperation;
-
-  /**
-   * Operation for retrieving all resources.
-   */
-  getAll?: IResourceApiOperation;
-
-  /**
-   * Operation for creating a new resource.
-   */
-  create?: IResourceApiOperation;
-
-  /**
-   * Operation for updating an existing resource.
-   */
-  update?: IResourceApiOperation;
-
-  /**
-   * Operation for deleting a resource.
-   */
-  delete?: IResourceApiOperation;
+export type IResourceApiDescription<ClassType extends ResourceController<any> = ResourceController> = {
+  [methodName in keyof ClassType]?: IResourceApiOperation;
 }
 
 /**
@@ -60,11 +38,16 @@ export interface IResourceApiDescriptions
 
 
 declare module "@resk/core" {
-  export interface IResource {
+  export interface IResource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, ClassType extends ResourceController<any> = ResourceController<any>> {
     /**
     * Optional API description for the resource.
     */
-    apiDescription?: IResourceApiDescription;
+    apiDescription?: IResourceApiDescription<ClassType>;
+
+    /***
+     * The name of the controller class for the resource service
+     */
+    controllerName?: string;
   }
   export namespace ResourcesManager {
     /**
@@ -92,15 +75,6 @@ declare module "@resk/core" {
      * @returns {ApiOperationOptions | undefined} The API operation options or undefined if not found.
      */
     export function getApiDescription(resourceName: IResourceName, method?: string): ApiOperationOptions | undefined;
-
-    /**
-     * Retrieves the API description for a resource by class name.
-     *
-     * @param {string} className - The name of the class of the resource.
-     * @param {string} [method] - The name of the method (optional).
-     * @returns {ApiOperationOptions | undefined} The API operation options or undefined if not found.
-     */
-    export function getApiDescriptionByClassName(className: string, method?: string): ApiOperationOptions | undefined;
   }
 }
 
@@ -138,17 +112,4 @@ ResourcesManager.getApiDescription = function (resourceName: IResourceName, meth
   const resourceOptions = ResourcesManager.getMetaDataFromName(resourceName);
   if (!isObj(resourceOptions) || !isObj(resourceOptions?.apiDescription) || !isNonNullString(method)) return;
   return (resourceOptions?.apiDescription as any)[method];
-}
-
-/**
- * Retrieves the API description for a resource by class name.
- *
- * @param {string} className - The name of the class of the resource.
- * @param {string} [method] - The name of the method (optional).
- * @returns {ApiOperationOptions | undefined} The API operation options or undefined if not found.
- */
-ResourcesManager.getApiDescriptionByClassName = function (className: string, method?: string): ApiOperationOptions | undefined {
-  const resourceName = ResourcesManager.getMetaDataFromClassName(className)?.name;
-  if (!resourceName) return;
-  return ResourcesManager.getApiDescription(resourceName, method);
 }

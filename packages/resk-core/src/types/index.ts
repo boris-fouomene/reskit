@@ -918,7 +918,7 @@ export type IResourceActionName = keyof IResourceActionMap;
  * @property {string} [tooltip] - A short text that appears when the user hovers over the resource, providing additional context.
  * @property {IResourceActionMap} [actions] - The actions associated with the resource.
  */
-export interface IResource<DataType extends IResourceData = any> {
+export interface IResource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
   /**
    * The internal name of the resource.
    *
@@ -989,8 +989,25 @@ export interface IResource<DataType extends IResourceData = any> {
 
 /**
  * A type that represents a constructor function that can be instantiated with any number of arguments.
+ * This is a generic type that represents a controller class.
+ * @template T - The type of the controller class.
+ * @template D -  A tuple representing the types of the constructor parameters.
+ * @example
+ * ```typescript
+ * // Example of using IClassConstructor
+ * class MyController {
+ *   constructor(private readonly service: MyService) { }
+ * }
+ * 
+ * const controllerClass: IClassConstructor<MyController> = MyController;
+ * ```
+ * type ExampleControllerType = IClassController<ExampleController, [ExampleService]>;
+ * const ExampleControllerClass: ExampleControllerType = ExampleController;
+  // Simulate dependency injection
+  const exampleService = new ExampleService();
+  const exampleController = new ExampleControllerClass(exampleService);
  */
-export type IClassConstructor = new (...args: any[]) => {};
+export type IClassConstructor<T = any, D extends any[] = any[]> = new (...args: D) => T;
 
 
 /**

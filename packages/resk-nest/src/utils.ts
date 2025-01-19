@@ -222,7 +222,7 @@ export const setupSwagger = (
                     if (isNonNullString(controllerKey) && isNonNullString(methodKey)) {
                         const parentDesk = resourcesByControllersClassNames[controllerKey];
                         if (isObj(parentDesk) && parentDesk && isObj(parentDesk.apiDescription)) {
-                            const apiDescription = parentDesk.apiDescription;
+                            const apiDescription = (parentDesk?.apiDescription as any)[methodKey];
                             if (isObj(apiDescription)) {
                                 extendObj(op, apiDescription);
                             }

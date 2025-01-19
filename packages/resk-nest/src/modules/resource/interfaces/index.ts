@@ -38,7 +38,7 @@ export interface IResourceApiDescriptions
 
 
 declare module "@resk/core" {
-  export interface IResource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, ClassType extends ResourceController<any> = ResourceController<any>> {
+  export interface IResourceMetaData<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, ClassType extends ResourceController<any> = ResourceController<any>> {
     /**
     * Optional API description for the resource.
     */

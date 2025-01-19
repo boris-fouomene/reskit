@@ -1,4 +1,4 @@
-import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria } from '../types';
+import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResourceMetaData, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory, extendObj } from '../utils/index';
 import { IClassConstructor, IProtectedResource } from '../types/index';
@@ -60,7 +60,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
     this.init();
   }
   actions?: IResourceActionMap;
-  getMetaData(): IResource<DataType> {
+  getMetaData(): IResourceMetaData<DataType> {
     return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, this.constructor));
   }
   static events = observableFactory<IResourceDefaultEvent | "string">();
@@ -72,7 +72,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * 
    * @example
    * ```typescript
-   * const userResource: IResource = { name: "user" };
+   * const userResource: IResourceMetaData = { name: "user" };
    * ```
   */
   name?: IResourceName;
@@ -85,7 +85,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    *
    * @example
    * ```typescript
-   * const productResource: IResource = { label: "Product" };
+   * const productResource: IResourceMetaData = { label: "Product" };
    * ```
    */
   label?: string;
@@ -98,7 +98,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    *
    * @example
    * ```typescript
-   * const orderResource: IResource = { title: "Order Management" };
+   * const orderResource: IResourceMetaData = { title: "Order Management" };
    * ```
    */
   title?: string;
@@ -111,7 +111,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    *
    * @example
    * ```typescript
-   * const userResource: IResource = { tooltip: "This resource manages user information." };
+   * const userResource: IResourceMetaData = { tooltip: "This resource manages user information." };
    * ```
    */
   tooltip?: string;
@@ -497,7 +497,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
         });
       });
   }
-  updateMetadata(options: IResource<DataType>): IResource<DataType> {
+  updateMetadata(options: IResourceMetaData<DataType>): IResourceMetaData<DataType> {
     options = Object.assign({}, options);
     const metadata = extendObj({}, this.getMetaData(), options)
     Reflect.defineMetadata(ResourcesManager.resourceMetaData, metadata, this.constructor);
@@ -506,7 +506,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
   /**
    * Initializes the resource with the provided metaData.
    * 
-   * @param metaData - An object implementing the IResource interface, containing the data to initialize the resource with.
+   * @param metaData - An object implementing the IResourceMetaData interface, containing the data to initialize the resource with.
    * 
    * This method assigns the provided metaData to the resource, ensuring that any empty properties
    * on the resource are filled with the corresponding values from the metaData object. It skips
@@ -930,9 +930,9 @@ export class ResourcesManager {
    * This method returns a copy of the internal record of resource metaData, which can be used to access
    * the configuration and settings for each registered resource.
    * 
-   * @returns {Record<IResourceName, IResource<any,any>>} A copy of the resource metaData record.
+   * @returns {Record<IResourceName, IResourceMetaData<any,any>>} A copy of the resource metaData record.
    */
-  public static getAllMetaData(): Record<IResourceName, IResource<any>> {
+  public static getAllMetaData(): Record<IResourceName, IResourceMetaData<any>> {
     return Object.assign({}, Reflect.getMetadata(resourcesMetaDataKey, ResourcesManager));
   }
   /**
@@ -942,9 +942,9 @@ export class ResourcesManager {
    * The updated record is then stored as metadata on the `ResourcesManager` class.
    * 
    * @param {IResourceName} resourceName - The unique name of the resource.
-   * @param {IResource<any>} metaData - The resource metaData to be associated with the given `resourceName`.
+   * @param {IResourceMetaData<any>} metaData - The resource metaData to be associated with the given `resourceName`.
    */
-  public static addMetaData(resourceName: IResourceName, metaData: IResource<any>) {
+  public static addMetaData(resourceName: IResourceName, metaData: IResourceMetaData<any>) {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     metaData = Object.assign({}, metaData);
@@ -991,9 +991,9 @@ export class ResourcesManager {
    * non-null string, or if the resource metaData are not found, this method will return `undefined`.
    *
    * @param {IResourceName} resourceName - The unique name of the resource to retrieve the metaData for.
-   * @returns {IResource<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
+   * @returns {IResourceMetaData<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
    */
-  public static getMetaDataFromName(resourceName: IResourceName): IResource<any> | undefined {
+  public static getMetaDataFromName(resourceName: IResourceName): IResourceMetaData<any> | undefined {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     return (allOptions as any)[resourceName];
@@ -1008,7 +1008,7 @@ export class ResourcesManager {
  * @param {any} target - The target class or instance from which to retrieve the metadata.
  * @returns {ResourceBase} An object containing the resource metadata for the given target.
  */
-  public static getMetaDataFromTarget(target: IClassConstructor): IResource<any> | undefined {
+  public static getMetaDataFromTarget(target: IClassConstructor): IResourceMetaData<any> | undefined {
     return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, target.prototype));
   }
 
@@ -1020,9 +1020,9 @@ export class ResourcesManager {
    * If the resource name is not found, or if the resource metaData are not found, this method will return `undefined`.
    *
    * @param {string} className - The class name of the resource to retrieve the metaData for.
-   * @returns {IResource<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
+   * @returns {IResourceMetaData<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
    */
-  public static getMetaDataByClassName(className: string): IResource<any> | undefined {
+  public static getMetaDataByClassName(className: string): IResourceMetaData<any> | undefined {
     const resourceName = this.getNameFromClassName(className);
     if (!resourceName) return undefined;
     return this.getMetaDataFromName(resourceName);
@@ -1191,7 +1191,7 @@ export class ResourcesManager {
  * 
  * ```
  */
-export function Resource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData: IResource<DataType, PrimaryKeyType> & {
+export function Resource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData: IResourceMetaData<DataType, PrimaryKeyType> & {
   /***
    * whether the resource should be instanciated or not
    */

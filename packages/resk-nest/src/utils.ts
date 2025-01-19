@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import "./modules/resource/interfaces";
-import { isNonNullString, isObj, extendObj, ResourcesManager, IResource, IResourceName } from "@resk/core";
+import { isNonNullString, isObj, extendObj, ResourcesManager, IResourceMetaData, IResourceName } from "@resk/core";
 import { MainExceptionFilter } from './modules/resource';
 import {
     SwaggerModule,
@@ -201,7 +201,7 @@ export const setupSwagger = (
     // Set up the Swagger UI endpoint
     SwaggerModule.setup(swaggerPath, app, () => {
         const documents = SwaggerModule.createDocument(app, config, documentOptions);
-        const resourcesByControllersClassNames: Record<string, IResource> = {} as Record<string, IResource>;
+        const resourcesByControllersClassNames: Record<string, IResourceMetaData> = {} as Record<string, IResourceMetaData>;
         const allResurces = ResourcesManager.getAllMetaData();
         for (let resourceName in allResurces) {
             if (isObj(allResurces[resourceName as IResourceName]) && isNonNullString(allResurces[resourceName as IResourceName].controllerName)) {

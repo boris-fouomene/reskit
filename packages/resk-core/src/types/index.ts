@@ -893,7 +893,7 @@ export type IResourceActionName = keyof IResourceActionMap;
 
 
 /**
-   @interface The IResource interface represents the base structure for a resource in the application. 
+   @interface The IResourceMetaData interface represents the base structure for a resource in the application. 
     A resource is a fundamental concept often used to describe an entity or object that can be managed, manipulated, or stored within 
     the system. It typically refers to data objects like database tables, API endpoints, or any entities (like users, posts, or products) that the application deals with. 
     Each resource usually has attributes such as a name, label, or title.
@@ -918,7 +918,7 @@ export type IResourceActionName = keyof IResourceActionMap;
  * @property {string} [tooltip] - A short text that appears when the user hovers over the resource, providing additional context.
  * @property {IResourceActionMap} [actions] - The actions associated with the resource.
  */
-export interface IResource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+export interface IResourceMetaData<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
   /**
    * The internal name of the resource.
    *
@@ -927,7 +927,7 @@ export interface IResource<DataType extends IResourceData = any, PrimaryKeyType 
    * 
    * @example
    * ```typescript
-   * const userResource: IResource = { name: "user" };
+   * const userResource: IResourceMetaData = { name: "user" };
    * ```
    */
   name?: IResourceName;
@@ -940,7 +940,7 @@ export interface IResource<DataType extends IResourceData = any, PrimaryKeyType 
    *
    * @example
    * ```typescript
-   * const productResource: IResource = { label: "Product" };
+   * const productResource: IResourceMetaData = { label: "Product" };
    * ```
    */
   label?: string;
@@ -953,7 +953,7 @@ export interface IResource<DataType extends IResourceData = any, PrimaryKeyType 
    *
    * @example
    * ```typescript
-   * const orderResource: IResource = { title: "Order Management" };
+   * const orderResource: IResourceMetaData = { title: "Order Management" };
    * ```
    */
   title?: string;
@@ -967,7 +967,7 @@ export interface IResource<DataType extends IResourceData = any, PrimaryKeyType 
    *
    * @example
    * ```typescript
-   * const userResource: IResource = { tooltip: "This resource manages user information." };
+   * const userResource: IResourceMetaData = { tooltip: "This resource manages user information." };
    * ```
    */
   tooltip?: string;
@@ -1319,7 +1319,7 @@ export type IDictKeysAsString<T> = keyof T extends string ? keyof T : never;
  * - Handling composite keys in data structures.
  * 
  * ### Related Types:
- * - Consider using `IResource` for defining the overall structure of a resource
+ * - Consider using `IResourceMetaData` for defining the overall structure of a resource
  *   that utilizes this primary key type.
  * 
  * ### Example Usage:

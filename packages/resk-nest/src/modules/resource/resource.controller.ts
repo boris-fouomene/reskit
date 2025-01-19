@@ -45,8 +45,7 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
   }
   @ValidatorValidate<ResourceController>('getCreateDtoClass')
   @Post()
-  async create(@Body(ValidatorPipe) createResourceDto: Partial<DataType>
-  ) {
+  async create(@Body(ValidatorPipe) createResourceDto: Partial<DataType>) {
     return this.getResourceService().create(createResourceDto);
   }
   @Delete(':id')

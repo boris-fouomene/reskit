@@ -25,6 +25,18 @@ import { Resource } from '@resk/core';
           },
         },
       ],
+    },
+    create: {
+      summary: 'Create a user',
+      description: 'Create a user',
+      tags: ['Users'],
+      requestBody: {
+        description: 'The user to create',
+        content: {
+          'application/json': {
+          },
+        }
+      },
     }
   }
 })

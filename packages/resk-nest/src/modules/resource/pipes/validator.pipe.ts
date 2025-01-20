@@ -189,7 +189,8 @@ export const ValidatorParam = createParamDecorator<IValidatorParamConfig, Execut
      * If the configuration is a function, calls it to get the data.
      */
     if (typeof config === "function") {
-        data = Object.assign({}, config({ ...inputData, req }));
+        const r = config({ ...inputData, req });
+        data = Array.isArray(r) ? r : Object.assign({}, r);
     }
     /**
      * If the configuration is a string, extracts the data from the request.

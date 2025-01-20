@@ -1,11 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseFilters, UsePipes, ExecutionContext, SetMetadata } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, UseFilters, UsePipes, ExecutionContext, SetMetadata, UseInterceptors } from '@nestjs/common';
 import { ResourceService } from './resource.service';
-import { ApiOperation } from '@nestjs/swagger';
 import { IClassConstructor, IResourceData } from '@resk/core';
 import { MainExceptionFilter } from './exceptions';
-import { ValidatorGetDto, ValidatorPipe, ValidatorValidate } from './pipes';
+import { UseValidatorPipe, ValidatorParam } from './pipes';
 
-class ResourceDefaultDto { }
 
 /**
  * The `ResourceController` class is a NestJS controller that provides CRUD operations for a resource.
@@ -17,7 +15,7 @@ class ResourceDefaultDto { }
  */
 @Controller()
 @UseFilters(MainExceptionFilter)
-export class ResourceController<DataType extends IResourceData = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
+export abstract class ResourceController<DataType extends IResourceData = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
   /**
    * Initializes the `ResourceController` instance with the provided `ResourceService`.
    * If the `resourceName` property is not set on the `ResourceService` constructor, it is set to the `resourceName` property of the `ResourceController` instance.
@@ -26,15 +24,6 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
    * @param resourceService - The `ResourceService` instance to be used by the `ResourceController`.
    */
   constructor(protected readonly resourceService: ServiceType) { }
-
-  /**
-   * Gets the `ResourceService` instance associated with the `ResourceController` instance.
-   * @returns {ServiceType} The `ResourceService` instance associated with the `ResourceController` instance.
-   */
-  getResourceService(): ServiceType {
-    return this.resourceService;
-  }
-  @ApiOperation({ summary: 'Get all resources' })
   @Get()
   async getAll(): Promise<any> {
     return this.getResourceService().find();
@@ -43,32 +32,39 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
   async getOne(@Param() params: any) {
     return await this.getResourceService().findOne(params.id);
   }
-  @ValidatorValidate<ResourceController>('getCreateDtoClass')
+  @UseValidatorPipe<ResourceController>('getCreateDtoClass')
   @Post()
-  async create(@Body(ValidatorPipe) createResourceDto: Partial<DataType>) {
+  async create(@ValidatorParam("body") createResourceDto: Partial<DataType>) {
+    console.log(createResourceDto, " is createResourceDto ddddddddddddddddddddddddddd11");
     return this.getResourceService().create(createResourceDto);
   }
   @Delete(':id')
   delete(@Param() params: any) {
     return this.getResourceService().delete(params.id);
   }
+  @UseValidatorPipe<ResourceController>('getUpdateDtoClass')
   @Put(':id')
-  update(@Param() params: any, @Body() updateResourceDto: Partial<DataType>) {
+  update(@Param() params: any, @ValidatorParam("body") updateResourceDto: Partial<DataType>) {
     return this.getResourceService().update(params.id, updateResourceDto);
   }
   /***
    * Retrieve the dto class for create request
    * @returns {T} The dto class for create request
    */
-  getCreateDtoClass(): IClassConstructor<any> {
-    return ResourceDefaultDto;
-  }
+  abstract getCreateDtoClass(): IClassConstructor<Partial<DataType>>;
 
   /***
    * Retrieve the dto class for update request
    * @returns {T} The dto class for update request
    */
-  getUpdateDtoClass<T extends IClassConstructor = any>(): T {
-    throw new Error('getUpdateDtoClass not implemented');
+  abstract getUpdateDtoClass(): IClassConstructor<Partial<DataType>>;
+
+
+  /**
+   * Gets the `ResourceService` instance associated with the `ResourceController` instance.
+   * @returns {ServiceType} The `ResourceService` instance associated with the `ResourceController` instance.
+   */
+  getResourceService(): ServiceType {
+    return this.resourceService;
   }
 }

@@ -325,7 +325,7 @@ export class ValidatorPipe implements PipeTransform<IValidatorParamResult, IVali
         if (errors.length > 0) {
             throw new BadRequestException({
                 errors,
-                data: value,
+                data,
                 message: errors.join("\n"),
                 errorsByField
             })

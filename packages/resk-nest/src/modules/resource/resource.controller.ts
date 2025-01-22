@@ -35,7 +35,6 @@ export abstract class ResourceController<DataType extends IResourceData = any, S
   @UseValidatorPipe<ResourceController>('getCreateDtoClass')
   @Post()
   async create(@ValidatorParam("body") createResourceDto: Partial<DataType>) {
-    console.log(createResourceDto, " is createResourceDto ddddddddddddddddddddddddddd11");
     return this.getResourceService().create(createResourceDto);
   }
   @Delete(':id')

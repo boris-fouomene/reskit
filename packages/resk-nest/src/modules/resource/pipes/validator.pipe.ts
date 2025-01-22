@@ -115,7 +115,7 @@ const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
  *   // Use the dtoClass and data properties
  * ```
  */
-export const ValidatorParam = createParamDecorator<IValidatorParamConfig, ExecutionContext, IValidatorParamResult>((config: IValidatorParamConfig, ctx: ExecutionContext) => {
+export const ValidatorParam = createParamDecorator<IValidatorParamConfig, IValidatorParamResult>((config: IValidatorParamConfig, ctx: ExecutionContext) => {
     /**
      * Gets the controller instance from the execution context.
      */
@@ -213,7 +213,7 @@ export const ValidatorParam = createParamDecorator<IValidatorParamConfig, Execut
             throw new BadRequestException("Invalid config data result for validator param : " + config + " in controller " + controllerName + " : " + errorDetails);
         }
     }
-
+    console.log("data : ", data, "is dtoclass", dtoClass);
     /**
      * Returns the DTO and data objects.
      */

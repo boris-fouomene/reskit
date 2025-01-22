@@ -1,4 +1,4 @@
-import { IDict } from ".";
+import { IDict } from "./dictionary";
 
 /**
  * @interface II18nTranslation

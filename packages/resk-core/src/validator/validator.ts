@@ -2,6 +2,7 @@ import { IValidatorRule, IValidatorValidateOptions, IValidatorRuleMap, IValidato
 import { defaultStr, defaultVal, extendObj, isNonNullString, isObj, stringify } from "@utils/index";
 import { i18n } from "../i18n";
 import { IClassConstructor } from "@/types";
+import { createPropertyDecorator, getDecoratedProperties } from "@/decorators";
 
 
 const validatorTargetRulesMetaKey = Symbol("validatorIsMetaData");
@@ -256,7 +257,7 @@ export class Validator {
     });
   }
   static getTargetRules<T extends IClassConstructor = any>(target: T): Record<keyof InstanceType<T>, IValidatorRule[]> {
-    return Object.assign({}, Reflect.getMetadata(validatorTargetRulesMetaKey, target.prototype));
+    return getDecoratedProperties(target, validatorTargetRulesMetaKey) as Record<keyof InstanceType<T>, IValidatorRule[]>;
   }
   public static getValidateTargetOptions<T extends IClassConstructor = any>(target: T): Parameters<typeof Validator.validateTarget>[2] {
     return Object.assign({}, Reflect.getMetadata(validatorValidateTargetOptionsMetaKey, target) || {});
@@ -271,14 +272,10 @@ export class Validator {
       return Validator.createPropertyDecorator<RuleParamsType>(validatorDynamicFunction);
     }
   }
-  static createPropertyDecorator<RuleParamsType extends Array<any> = Array<any>>(rule: IValidatorRule<RuleParamsType> | IValidatorRule[]): PropertyDecorator {
-    return function (target: any, propertyKey) {
-      const allRules = Object.assign({}, Reflect.getMetadata(validatorTargetRulesMetaKey, target));
-      allRules[propertyKey] = Array.isArray(allRules[propertyKey]) ? allRules[propertyKey] : [];
-      allRules[propertyKey].push(...(Array.isArray(rule) ? rule : [rule]) as any);
-      Reflect.defineMetadata(validatorTargetRulesMetaKey, allRules, target);
-      return allRules;
-    }
+  static createPropertyDecorator<RuleParamsType extends Array<any> = Array<any>>(rule: IValidatorRule<RuleParamsType> | IValidatorRule<RuleParamsType>[]): PropertyDecorator {
+    return createPropertyDecorator<IValidatorRule<RuleParamsType>[]>(validatorTargetRulesMetaKey, (oldRules) => {
+      return [...(Array.isArray(oldRules) ? oldRules : []), ...(Array.isArray(rule) ? rule : [rule])];
+    });
   }
 }
 

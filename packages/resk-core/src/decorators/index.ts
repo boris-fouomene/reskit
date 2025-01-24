@@ -1,188 +1,66 @@
+import "reflect-metadata";
 import defaultStr from '../utils/defaultStr';
-import { ITypeRegistryRenderer } from '../types';
-import 'reflect-metadata';
-/**
- * Creates a decorator that can be applied to class properties or methods.
- *
- * This function takes a key of type KeyType (defaulting to any) and returns a function that takes a value of type ValueType (defaulting to any).
- * The returned function is a decorator that can be applied to class properties or methods.
- *
- * @template KeyType - The type of the key used to store metadata.
- * @template ValueType - The type of the value associated with the key.
- * @param {KeyType} key - The key under which the metadata will be stored.
- * @returns {(value: ValueType) => (target: Object, propertyKey: string) => void} A function that takes a value and returns the decorator function.
- * @example
- * ```typescript
- * const myDecorator = createDecorator('myKey')('myValue');
- * class MyClass {
- *   @myDecorator
- *   myProperty: string;
- * }
- * ```
- */
-export function createDecorator<ValueType = any, KeyType = any>(key: KeyType) {
-  /**
-   * The function that takes a value to associate with the specified key.
-   *
-   * @param {ValueType} value - The value to be stored as metadata.
-   * @returns {(target: Object, propertyKey: string) => void} The actual decorator function.
-   */
-  return (value: ValueType) => {
-    /**
-     * The decorator function that will be called when the decorator is applied.
-     *
-     * @param {Object} target - The target object (class) containing the property being decorated.
-     * @param {string} propertyKey - The name of the property being decorated.
-     */
-    return (target: Object, propertyKey: string | symbol) => {
-      /**
-       * Define the metadata on the target object for the specified property key.
-       */
-      Reflect.defineMetadata(key, value, target, propertyKey);
-    }
-  }
-}
-
-/**
- * Creates a property decorator that can be applied to class properties.
- *
- * This function takes a key and an optional default value, and returns a decorator function that defines the metadata for the specified property.
- *
- * @template KeyType - The type of the key used to store metadata.
- * @template ValueType - The type of the default value associated with the key.
- * @param {KeyType} key - The key under which the metadata will be stored.
- * @param {ValueType} [defaultValue] - The default value to be associated with the key (optional).
- * @returns {(target: Object, propertyKey: string) => void} A function that defines the metadata for the specified property.
- * @example
- * ```typescript
- * const myDecorator = createPropertyDecorator('myKey', 'myDefaultValue');
- * class MyClass {
- *   @myDecorator
- *   myProperty: string;
- * }
- * ```
- */
-export function createPropertyDecorator<ValueType = any, KeyType = any>(key: KeyType, defaultValue?: ValueType) {
-  /**
-   * The property decorator function that will be called when the decorator is applied.
-   *
-   * @param {Object} target - The target object (class) containing the property being decorated.
-   * @param {string} propertyKey - The name of the property being decorated.
-   */
-  return (target: Object, propertyKey: string | symbol) => {
-    /**
-     * Define the metadata on the target object for the specified property key with the given default value.
-     */
-    Reflect.defineMetadata(key, defaultValue, target, propertyKey);
-  }
-}
+import { IClassConstructor, ITypeRegistryRenderer } from '../types';
+import { extendObj } from "@utils/object";
 
 
 /**
- * Creates a property decorator that associates a value with a specified key.
- *
- * This function returns a decorator function that can be used to set metadata on a target.
- * The metadata is stored in a dictionary with the specified name.
- *
- * @template ValueType The type of the value to be stored as metadata.
- * @param {string | symbol | number} dictionaryName The name of the dictionary to store the metadata in.
- * @returns {(value: ValueType, itemKey?: any) => PropertyDecorator} A decorator function that takes a key and a value, and returns a property decorator.
- *
- * @example
- * ```typescript
- * const MyDecorator = createDecoratorDict('myDictionary');
- *
-   @MyDecorator("key","value")
-   @MyDecorator("key2","value2")
-   @MyDecorator("key3","value3")
- * class MyClass { }
- * ```
+ * Creates a property decorator that stores metadata without making the property readonly
+   @template MetadataType - The type of the metadata
+   @template PropertyKeyType - The type of the property key
+ * @param metadataKey - The key to store the metadata under
+   @param metadata - The metadata to store, or a function that returns the metadata
+ * @returns PropertyDecorator
  */
-export function createDecoratorDict<ValueType = any>(dictionaryName: string | symbol | number) {
+export function createPropertyDecorator<MetadataType = any, PropertyKeyType extends string | symbol | number = any>(metadataKey: any,
   /**
-   * The function that takes a value to associate with the specified key.
-   *
-   * This function returns a decorator function that sets metadata on the target property.
-   *
-   * @param {any} [itemKey] The name of the property to save in the dictionary
-   * @param {ValueType} itemValue The value to be stored as metadata.
-   * @returns {(target: Function) => void} The actual decorator function.
-   */
-  return (itemKey: any, itemValue: ValueType) => {
-    /**
-     * Returns a decorator function that sets metadata on the target property.
-     *
-     * This function is called when the decorator is applied to a property.
-     * It retrieves the existing metadata dictionary or initializes a new one,
-     * stores the itemValue in the dictionary using the property key, and defines the updated metadata on the target constructor.
-     *
-     * @param {Object} target The target object (class) that the decorator is applied to.
-     * @param {string | symbol} propertyKey The name of the property that the decorator is applied to.
-     */
-    return function (target: Function) {
-      if (typeof dictionaryName !== "number" && !dictionaryName) return;
-      if (!itemKey && typeof itemKey !== "number") return;
-      /**
-       * Get existing fields metadata or initialize an empty object.
-       *
-       * This function retrieves the existing metadata dictionary from the target object,
-       * or initializes a new empty dictionary if none exists.
-       *
-       * @see getDecoratorDict
-       */
-      const dict: Record<any, ValueType> = getDecoratorDict(target, dictionaryName);
-
-      /**
-       * Store the options in the fields object using propertyKey as the key.
-       *
-       * This line stores the itemValue in the metadata dictionary using the property key.
-       */
-      dict[itemKey] = itemValue;
-
-      /**
-       * Define the updated metadata on the target constructor.
-       *
-       * This line defines the updated metadata dictionary on the target constructor using the Reflect API.
-       */
-      Reflect.defineMetadata(dictionaryName, dict, target);
-    };
-  }
+      Retrieves the metadata for a property
+      @param {Object} target - The class constructor
+      @param {PropertyKeyType} propertyKey - The property key
+      @param {MetadataType} existingMetaData - The existing metadata for the property
+      @param {Record<PropertyKeyType, MetadataType>} allExistingMetadata - All existing metadata for the class
+      @returns {MetadataType} The metadata for the property
+      
+  */
+  metadata: ((existingMetaData: MetadataType, allExistingMetadata: Record<PropertyKeyType, MetadataType>, target: Object, propertyKey: any) => MetadataType) | MetadataType
+): PropertyDecorator {
+  return (target: Object, propertyKey: any) => {
+    const constructor = target?.constructor;
+    const allExistingMetadata: Record<PropertyKeyType, MetadataType> = Object.assign({}, Reflect.getMetadata(metadataKey, constructor));
+    const existingMetaData: MetadataType | undefined = allExistingMetadata[propertyKey as keyof typeof allExistingMetadata];
+    const newMetatdata: MetadataType = typeof metadata === 'function' ? (metadata as any)(existingMetaData, allExistingMetadata, target, propertyKey) : metadata;
+    allExistingMetadata[propertyKey as keyof typeof allExistingMetadata] = newMetatdata;
+    // Update the metadata on the class
+    Reflect.defineMetadata(metadataKey, allExistingMetadata, constructor);
+    // Store additional metadata for this specific property if needed
+    Reflect.defineMetadata(metadataKey, metadata, target, propertyKey);
+  };
 }
 
 /**
- * Retrieves a metadata dictionary from a target object.
- *
- * This function returns a metadata dictionary associated with the specified name from the target object.
- * If no dictionary exists, it returns an empty object.
- *
- * @template ValueType The type of the values stored in the dictionary.
- * @param {Object} target The target object to retrieve the metadata dictionary from.
- * @param {string | symbol | number} dictionaryName The name of the metadata dictionary to retrieve.
- * @returns {Record<any, ValueType>} The metadata dictionary associated with the specified name.
- *
- * @example
- * ```typescript
-   const MyDecorator = createDecoratorDict('myDictionary');
-   @MyDecorator("key","value")
-   @MyDecorator("key2","value2")
-   @MyDecorator("key3","value3")
- * class MyClass { }
- *
- * console.log(getDecoratorDict(MyClass, 'myDictionary')); // output { key3: 'value3', key2: 'value2', key: 'value' }
- * ```
+ * Retrieves all properties of a class that have been decorated with a specific metadata key.
+   @template MetaDataType - The type of the metadata
+   @template PropertyKeyType - The type of the property key
+ * @param target The class to retrieve decorated properties from.
+ * @param metadataKey The metadata key.
+ * @returns Record of property names and their metadata
  */
-export function getDecoratorDict<ValueType = any>(target: any, dictionaryName: string | symbol | number): Record<any, ValueType> {
-  /**
-   * Retrieves the existing metadata dictionary from the target object,
-   * or initializes a new empty dictionary if none exists.
-   *
-   * This function uses the Reflect API to retrieve the metadata dictionary.
-   */
-  return Object.assign({}, Reflect.getMetadata(dictionaryName, target) || {});
+export function getDecoratedProperties<MetaDataType = any, PropertyKeyType extends string | symbol | number = any>(target: IClassConstructor, metadataKey: any): Record<PropertyKeyType, MetaDataType> {
+  return extendObj({}, Reflect.getMetadata(metadataKey, target), Reflect.getMetadata(metadataKey, target.prototype));
 }
 
+/**
+ * Retrieves metadata for a specific property.
+ * @template MetaDataType - The type of the metadata
+ * @param target - target The class or object containing the property.
+ * @param metadataKey - The key to retrieve metadata for
+  *@param propertyKey - The name of the propertyfor which metadata is being retrieved.
+ * @returns {MetaDataType} The metadata value for the property.
+ */
+export function getDecoratedProperty<MetaDataType = any>(target: IClassConstructor, metadataKey: any, propertyKey: any): MetaDataType {
+  return getDecoratedProperties(target, metadataKey)[propertyKey];
+}
 
-import 'reflect-metadata';
 
 /**
  * A key used for storing the component registry in the metadata.

@@ -10,6 +10,7 @@ import session from "@session/index";
 import { IDict } from "../types/index";
 import { isString } from "lodash";
 import moment from "moment";
+import { createPropertyDecorator, getDecoratedProperties } from "@/decorators";
 
 /**
  * A key to store metadata for translations.
@@ -38,12 +39,7 @@ const TRANSLATION_KEY = Symbol("TRANSLATION_KEY");
 * ```
 */
 export function Translate(key: string): PropertyDecorator & MethodDecorator {
-    return (target: Object, propertyKey: string | symbol) => {
-        const translationKeys = Object.assign({}, Reflect.getMetadata(TRANSLATION_KEY, target));
-        translationKeys[propertyKey] = key;
-        Reflect.defineMetadata(TRANSLATION_KEY, translationKeys, target);
-        Reflect.defineMetadata(TRANSLATION_KEY, key, target, propertyKey);
-    };
+    return createPropertyDecorator<string>(TRANSLATION_KEY, key);
 }
 
 /**
@@ -127,7 +123,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * @returns the translation keys for the target class
      */
     static getTargetTanslationKeys<T extends { new(...args: any[]): {} } = any>(target: T): Record<keyof T, string> {
-        return Object.assign({}, Reflect.getMetadata(TRANSLATION_KEY, target?.prototype));
+        return getDecoratedProperties(target, TRANSLATION_KEY);
     }
     private _isLoading: boolean = false;
     /***
@@ -404,7 +400,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         this.trigger("translations-changed", this.getLocale(), this.getTranslations());
     }
     /**
-     * Automatically resolves translations using Reflect Metadata.
+     * Automatically resolves translations using reflect Metadata.
      * Translations created using the @Translate decorator will be resolved.
      * @param target The target class instance or object.
      * @example 

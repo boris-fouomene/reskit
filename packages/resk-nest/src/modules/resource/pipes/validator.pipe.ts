@@ -1,4 +1,4 @@
-import { PipeTransform, Injectable, Request, ArgumentMetadata, BadRequestException, SetMetadata, ExecutionContext, createParamDecorator, UsePipes, applyDecorators } from '@nestjs/common';
+import { Injectable, ArgumentMetadata, BadRequestException, SetMetadata, ExecutionContext, createParamDecorator } from '@nestjs/common';
 import { IDict, isNonNullString, isObj, Validator } from '@resk/core';
 
 /**
@@ -89,6 +89,8 @@ export interface IValidatorParamResult<T extends IDict = IDict> {
     dtoClass: InstanceType<any>;
 }
 
+
+
 const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
 
 /**
@@ -115,7 +117,7 @@ const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
  *   // Use the dtoClass and data properties
  * ```
  */
-export const ValidatorParam = createParamDecorator<IValidatorParamConfig, IValidatorParamResult>((config: IValidatorParamConfig, ctx: ExecutionContext) => {
+export const ValidatorParam = createParamDecorator(async (config: IValidatorParamConfig, ctx: ExecutionContext) => {
     /**
      * Gets the controller instance from the execution context.
      */
@@ -213,7 +215,12 @@ export const ValidatorParam = createParamDecorator<IValidatorParamConfig, IValid
             throw new BadRequestException("Invalid config data result for validator param : " + config + " in controller " + controllerName + " : " + errorDetails);
         }
     }
-    console.log("data : ", data, "is dtoclass", dtoClass);
+    try {
+        return await ValidatorPipe.transform({ dtoClass, data });
+    } catch (e) {
+        console.log(e, " on bad requestt");
+        throw new BadRequestException(e)
+    }
     /**
      * Returns the DTO and data objects.
      */
@@ -252,7 +259,7 @@ export function UseValidatorPipe<T extends InstanceType<any> = any>(getDtoMethod
         /**
          * Applies the `ValidatorPipe` to the method to enable validation.
          */
-        UsePipes(ValidatorPipe)(target, propertyKey, descriptor);
+        //UsePipes(ValidatorPipe)(target, propertyKey, descriptor);
 
         /**
          * Sets the `validatorPipeDtoMetadataKey` metadata to specify the DTO method name.
@@ -277,7 +284,7 @@ export function UseValidatorPipe<T extends InstanceType<any> = any>(getDtoMethod
  * ```
  */
 @Injectable()
-export class ValidatorPipe implements PipeTransform<IValidatorParamResult, IValidatorParamResult['data']> {
+class ValidatorPipe {
     /**
      * Constructor.
      */
@@ -291,7 +298,7 @@ export class ValidatorPipe implements PipeTransform<IValidatorParamResult, IVali
      * @returns The validated data.
      * @throws {BadRequestException} If the validation fails.
      */
-    async transform(value: IValidatorParamResult, metadata: ArgumentMetadata) {
+    static async transform(value: IValidatorParamResult, metadata?: ArgumentMetadata) {
         /**
          * Checks if the input value is an object with a `dtoClass` property.
          */
@@ -308,10 +315,33 @@ export class ValidatorPipe implements PipeTransform<IValidatorParamResult, IVali
          * If the data is an array, validates each item in the array.
          */
         if (Array.isArray(data)) {
-            return await Promise.all(data.map(async (v: any) => {
-                await this.transform({ dtoClass, data: v }, metadata);
-                return v;
-            }));
+            return await new Promise((resolve, reject) => {
+                const errors: any[] = [], result: IDict[] = [];
+                const promises: Promise<any>[] = [];
+                data.map((v: any, index) => {
+                    promises.push(new Promise((resolve, reject) => {
+                        ValidatorPipe.transform({ dtoClass, data: v }, metadata).then((r) => result.push(r as IDict)).catch((err) => {
+                            if (isNonNullString(err?.message)) {
+                                errors.push(`Data-Index:${index + 1} errors : ${err?.message}`);
+                            }
+                            if (Array.isArray(err?.errors)) {
+                                errors.push(...err.errors);
+                            }
+                            resolve({ errors, result });
+                        })
+                    }))
+                })
+                return Promise.all(promises).then(() => {
+                    if (errors.length) {
+                        reject({
+                            message: errors.join("\n"),
+                            errors,
+                        });
+                    } else {
+                        resolve(result);
+                    }
+                })
+            });
         }
 
         /**

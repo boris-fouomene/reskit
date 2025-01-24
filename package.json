@@ -11,7 +11,7 @@
     "build-all": "npx lerna run build",
     "clean": "npx rimraf build",
     "publish": "lerna publish --yes",
-    "check-updates" : "npx npm-check-updates",
+    "check-updates": "npx npm-check-updates",
     "publish-all": "lerna publish",
     "document": "npx ts-node ./generate-typedoc.ts",
     "clear-npx-cache": "npx clear-npx-cache",

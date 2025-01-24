@@ -58,8 +58,8 @@ export class I18nModule {
     static forRoot(options: {
         namespaces: { [key: string]: Parameters<typeof I18n.RegisterNamespaceResolver>[1]; }
         /**
-         * Whether to create a new instance of the I18n class for each request.
-         * If set to `true`, the I18n class will be created once per request.
+         * Whether to create a new instance of the I18n class for the module.
+         * If set to `true`, the I18n class will be created once for the module.
          * If set to `false`, the I18n class will use the default instance, obtained by calling I18N.getInstance().
          * Default value is `false`.
          */

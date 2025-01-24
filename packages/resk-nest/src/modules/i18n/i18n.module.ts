@@ -1,4 +1,4 @@
-import { I18n } from '@resk/core';
+import { I18n, II18nTranslation, isObj } from '@resk/core';
 import { DynamicModule } from '@nestjs/common';
 
 
@@ -34,6 +34,18 @@ export class I18nModule {
      * @Module({
      *   imports: [
      *     I18nModule.forRoot({
+     *        translations: [
+     *          {
+     *            en: {
+     *              greeting: "Hello, {name}!",
+     *              farewell: "Goodbye!",
+     *            },
+     *            fr: {
+     *              greeting: "Bonjour, {name}!",
+     *              farewell: "Au revoir!",
+     *            },
+     *          },
+     *       ],
      *        namespaces : {
         *       'common': (locale:string) => import('./locales/common'),
         *       'auth': (locale:string) => import('./locales/auth'),
@@ -56,7 +68,16 @@ export class I18nModule {
      * export class AppModule {}
      */
     static forRoot(options: {
+        /***
+         * The namespaces to register for the module.
+         * If provided, the namespaces will be registered for the module.
+         */
         namespaces: { [key: string]: Parameters<typeof I18n.RegisterNamespaceResolver>[1]; }
+        /***
+         * The translations to load for the module.
+         * If provided, the translations will be loaded for the module.
+         */
+        translations?: II18nTranslation | II18nTranslation[];
         /**
          * Whether to create a new instance of the I18n class for the module.
          * If set to `true`, the I18n class will be created once for the module.
@@ -74,6 +95,10 @@ export class I18nModule {
         for (let namespace in namespacesToResolve) {
             i18n.registerNamespaceResolver(namespace, namespacesToResolve[namespace]);
         }
+        // Register the translations
+        (isObj(options.translations) ? [options.translations] : Array.isArray(options.translations) ? options.translations : []).map(translation => {
+            i18n.registerTranslations(translation);
+        });
         // Return the dynamic module configuration
         return {
             module: I18nModule,

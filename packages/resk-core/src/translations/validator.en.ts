@@ -8,12 +8,17 @@ I18n.RegisterTranslations({
             "separators": {
                 "multiple": ", ",
                 "single": ", ",
-                "and": " and ",
-                "or": " or "
             },
-            "failedForNFields": "Validation failed for %{count} fields",
+            //use for validating single data
+            "failedForNFields": {
+                one: "Validation failed for one field",
+                other: "Validation failed for %{count} fields",
+            },
             //use for validating multi data
-            "failedForNItems": "Validation failed for %{count} items",
+            "failedForNItems": {
+                one: "Validation failed for one item",
+                other: "Validation failed for %{count} items",
+            },
             "invalidRule": "Invalid validation rule: %{rule}",
             "invalidMessage": "Invalid validation message for rule %{rule}; error validating value %{value}",
             "required": "This field is required",

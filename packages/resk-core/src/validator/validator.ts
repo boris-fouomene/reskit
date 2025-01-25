@@ -46,13 +46,11 @@ export class Validator {
    * returns the separators for the validation errors.
    * @returns {IDict} the separators for the validation errors.
    */
-  static get separators(): { multiple: string, single: string, and: string, or: string } {
+  static get separators(): { multiple: string, single: string } {
     const translatedSeparator: IDict = (Object.assign({}, i18n.getNestedTranslation("validator.separators")) as IDict);
     return {
       multiple: defaultStr(translatedSeparator.multiple, ", "),
       single: defaultStr(translatedSeparator.single, ", "),
-      and: defaultStr(translatedSeparator.and, " and "),
-      or: defaultStr(translatedSeparator.or, " or "),
     }
   }
 
@@ -241,8 +239,6 @@ export class Validator {
         separators: {
           multiple: string,
           single: string,
-          and: string,
-          or: string
         }
         data: Partial<Record<keyof InstanceType<T>, any>>,
       },

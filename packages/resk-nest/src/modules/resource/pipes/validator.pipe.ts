@@ -2,6 +2,7 @@ import { Injectable, ArgumentMetadata, BadRequestException, SetMetadata, Executi
 import { IDict, isNonNullString, isObj, Validator } from '@resk/core';
 import "../translations";
 import { i18n } from "@resk/core";
+import { stringify } from 'querystring';
 
 /**
  * @interface IValidatorParamConfigMap
@@ -310,57 +311,37 @@ class ValidatorPipe {
          * If the data is an array, validates each item in the array.
          */
         if (Array.isArray(data)) {
-            try {
-                return await new Promise((resolve, reject) => {
-                    const errors: any[] = [], result: IDict[] = [];
-                    const promises: Promise<any>[] = [];
-                    data.map((v: any, index) => {
-                        promises.push(new Promise((resolve, reject) => {
-                            ValidatorPipe.transform({ dtoClass, data: v }, metadata).then((r) => result.push(r as IDict)).catch((err) => {
-                                if (isNonNullString(err?.message)) {
-                                    errors.push(`Index:${index + 1} : ${err?.message}`);
-                                }
-                                if (Array.isArray(err?.errors)) {
-                                    errors.push(...err.errors);
-                                }
-                                resolve({ errors, result });
-                            })
-                        }))
-                    })
-                    return Promise.all(promises).then(() => {
-                        if (errors.length) {
-                            reject({
-                                message: i18n.translate("validator.failedForNItems", { count: errors.length }),
-                                errors,
-                            });
-                        } else {
-                            resolve(result);
-                        }
-                    })
-                })
-            } catch (e) {
-                throw new BadRequestException(e)
-            }
-        }
-
-        /**
-         * Validates the data using the DTO class.
-         */
-        const { success, errors, message, rulesByField, ...rest } = await Validator.validateTarget(dtoClass, data);
-
-        /**
-         * If the validation fails, throws a `BadRequestException` with the validation errors.
-         */
-        if (errors.length > 0) {
-            throw new BadRequestException({
-                errors,
-                message,
+            const errors: any[] = [];
+            const promises: Promise<any>[] = data.map((v: any, index) => {
+                return new Promise((resolve, reject) => {
+                    Validator.validateTarget(dtoClass, v).then(resolve).catch((err: any) => {
+                        errors.push({
+                            message: isNonNullString(err?.message) ? err.message : stringify(err),
+                            data: v,
+                            index: index + 1,
+                            errors: Array.isArray(err?.errors) ? err.errors : [],
+                        });
+                        resolve(null);
+                    });
+                });
             })
+            await Promise.all(promises);
+            if (errors.length) {
+                throw new BadRequestException({
+                    message: i18n.translate("validator.failedForNItems", { count: errors.length }),
+                    errors,
+                })
+            }
+            return data;
         }
-
-        /**
-         * Returns the validated data.
-         */
-        return data;
+        try {
+            await Validator.validateTarget(dtoClass, data);
+            return data;
+        } catch (e) {
+            /**
+             * If the validation fails, throws a `BadRequestException` with the validation errors.
+             */
+            throw new BadRequestException(e)
+        }
     }
 }

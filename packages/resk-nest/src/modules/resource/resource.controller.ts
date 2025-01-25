@@ -14,7 +14,7 @@ import { UseValidatorPipe, ValidatorParam } from './pipes';
  * @template ServiceType - The type of the `ResourceService` implementation.
  */
 @Controller()
-@UseFilters(MainExceptionFilter)
+//@UseFilters(MainExceptionFilter)
 export abstract class ResourceController<DataType extends IResourceData = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
   /**
    * Initializes the `ResourceController` instance with the provided `ResourceService`.

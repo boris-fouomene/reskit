@@ -11,9 +11,9 @@ I18n.RegisterTranslations({
                 "and": " and ",
                 "or": " or "
             },
-            "failedForNFields": "Failed for %{count} fields",
+            "failedForNFields": "Validation failed for %{count} fields",
             //use for validating multi data
-            "failedForNItems": "Failed for %{count} items",
+            "failedForNItems": "Validation failed for %{count} items",
             "invalidRule": "Invalid validation rule: %{rule}",
             "invalidMessage": "Invalid validation message for rule %{rule}; error validating value %{value}",
             "required": "This field is required",

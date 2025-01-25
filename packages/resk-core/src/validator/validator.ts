@@ -248,44 +248,54 @@ export class Validator {
       },
     ) => string
   }
-  ) {
+  ): Promise<{ data: Partial<Record<keyof InstanceType<T>, any>> }> {
     const rulesObject = Validator.getTargetRules<T>(target);
     const separators = Validator.separators;
     options = extendObj({}, Validator.getValidateTargetOptions(target), options);
     data = Object.assign({}, data);
     const errorMessageBuilder = typeof options?.errorMessageBuilder === 'function' ? options.errorMessageBuilder : (translatedPropertyName: string, error: string) => `[${String(translatedPropertyName)}] : ${error}`;
-    const result: Record<keyof InstanceType<T>, any> = {} as Record<keyof InstanceType<T>, any>;
-    const errors: string[] = [];
-    const promises = [];
+    const errors: { fieldName: string, propertyName: string, message: string }[] = [];
+    const promises: Promise<any>[] = [];
     let count = 0;
     const errorsDetails: ({ translatedPropertyName: string, error: string, ruleName: string, ruleParams: any[], value: any, separators: { multiple: string, single: string, and: string, or: string }, data: Partial<Record<keyof InstanceType<T>, any>> })[] = [];
     const translatedKeys = i18n.translateTarget(target, { data });
     for (let i in rulesObject) {
       const translatedPropertyName: string = (isNonNullString(translatedKeys[i]) ? translatedKeys[i] : i) as string;
-      promises.push(Validator.validate({ value: data[i], translatedPropertyName, fieldName: i, propertyName: i, rules: rulesObject[i] }).then((result) => {
-        result[i as keyof typeof result] = result;
-      }).catch((error) => {
+      promises.push(Validator.validate({ value: data[i], translatedPropertyName, fieldName: i, propertyName: i, rules: rulesObject[i] }).catch((error) => {
         const errorField = stringify(defaultVal(error?.message, error));
         errorsDetails.push(error);
         count++;
-        errors.push(errorMessageBuilder(translatedPropertyName, errorField, {
+        const message = errorMessageBuilder(translatedPropertyName, errorField, {
           ...Object.assign({}, error),
           separators,
           data,
           propertyName: i,
           translatedPropertyName: translatedPropertyName,
-        }));
+        });
+        errors.push({
+          fieldName: i,
+          propertyName: i,
+          message: message,
+        });
       }));
     }
-    return Promise.all(promises).then(() => {
-      return {
-        rulesByField: rulesObject,
-        result,
-        message: i18n.translate("validator.failedForNFields", { count }),
-        errors,
-        success: !errors.length,
-        errorsDetails,
-      }
+    return new Promise<{ data: Partial<Record<keyof InstanceType<T>, any>> }>((resolve, reject) => {
+      return Promise.all(promises).then(() => {
+        const success = !errors.length;
+        if (success) {
+          resolve({ data })
+        } else {
+          reject({
+            //rulesByField: rulesObject,
+            //data,
+            status: "error",
+            message: i18n.translate("validator.failedForNFields", { count }),
+            errors,
+            success,
+            errorsDetails,
+          })
+        }
+      })
     });
   }
   static getTargetRules<T extends IClassConstructor = any>(target: T): Record<keyof InstanceType<T>, IValidatorRule[]> {

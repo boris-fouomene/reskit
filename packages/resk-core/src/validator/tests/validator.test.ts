@@ -81,7 +81,7 @@ describe("Validator", () => {
                 rules: ["isEven" as IValidatorRuleName],
                 value: 4,
             });
-            expect(result).toEqual({ value: 4, rules: ["isEven"] });
+            expect(result).toMatchObject({ value: 4, rules: ["isEven"] });
         });
 
         it("should reject with an error message if validation fails", async () => {

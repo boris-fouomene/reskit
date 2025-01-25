@@ -1,4 +1,4 @@
-import { ValidatorIsRequired } from "@resk/core";
+import { ValidatorHasMaxLength, ValidatorIsRequired } from "@resk/core";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 @Entity({
     name: "customers"

@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import "./modules/resource/interfaces";
 import { isNonNullString, isObj, extendObj, ResourcesManager, IResourceMetaData, IResourceName } from "@resk/core";
-import { MainExceptionFilter } from './modules/resource';
 import {
     SwaggerModule,
     DocumentBuilder,

@@ -299,8 +299,7 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
         });
     }
     async create(data: Partial<DataType>) {
-        const entity = this.repository.create();
-        return await this.repository.save(entity, { data });
+        return await this.repository.save(Array.isArray(data) ? data : [data]).then(([data]) => data);
     }
     async update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>) {
         await this.repository.update(this.buildWhereCondition(primaryKey).where as FindOptionsWhere<DataType>, updatedData as any);

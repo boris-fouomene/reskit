@@ -1,7 +1,6 @@
 import { Controller, Delete, Get, Param, Post, Put, UseFilters, UsePipes, ExecutionContext, SetMetadata, UseInterceptors } from '@nestjs/common';
 import { ResourceService } from './resource.service';
 import { IClassConstructor, IResourceData } from '@resk/core';
-import { MainExceptionFilter } from './exceptions';
 import { UseValidatorPipe, ValidatorParam } from './pipes';
 
 

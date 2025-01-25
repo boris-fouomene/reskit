@@ -1,7 +1,7 @@
 import { IValidatorRule, IValidatorValidateOptions, IValidatorRuleMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult, IValidatorSanitizedRules } from "./types";
 import { defaultStr, defaultVal, extendObj, isNonNullString, isObj, stringify } from "@utils/index";
 import { i18n } from "../i18n";
-import { IClassConstructor } from "@/types";
+import { IClassConstructor, IDict } from "@/types";
 import { createPropertyDecorator, getDecoratedProperties } from "@/decorators";
 
 
@@ -41,6 +41,19 @@ export class Validator {
   static getRules(): IValidatorRuleMap {
     const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
     return isObj(rules) ? rules : {};
+  }
+  /***
+   * returns the separators for the validation errors.
+   * @returns {IDict} the separators for the validation errors.
+   */
+  static get separators(): { multiple: string, single: string, and: string, or: string } {
+    const translatedSeparator: IDict = (Object.assign({}, i18n.getNestedTranslation("validator.separators")) as IDict);
+    return {
+      multiple: defaultStr(translatedSeparator.multiple, ", "),
+      single: defaultStr(translatedSeparator.single, ", "),
+      and: defaultStr(translatedSeparator.and, " and "),
+      or: defaultStr(translatedSeparator.or, " or "),
+    }
   }
 
   /**
@@ -144,11 +157,13 @@ export class Validator {
    */
   static validate({ rules, value, ...extra }: IValidatorValidateOptions): Promise<IValidatorValidateOptions> {
     const { sanitizedRules, invalidRules } = Validator.sanitizeRules(rules);
+    const separators = Validator.separators;
     if (invalidRules.length) {
-      const message = invalidRules.map(rule => i18n.t("validator.invalidRule", { rule: isNonNullString(rule) ? rule : "unamed rule" })).join(", ");
+      const message = invalidRules.map(rule => i18n.t("validator.invalidRule", { rule: isNonNullString(rule) ? rule : "unamed rule" })).join(separators.multiple);
       return Promise.reject({ rules, value, ...extra, message });
     }
     if (!sanitizedRules.length) return Promise.resolve({ rules, value, ...extra });
+    extra.fieldName = extra.propertyName = defaultStr(extra.fieldName, extra.propertyName);
     const i18nRulesOptions = {
       ...extra,
       value,
@@ -174,7 +189,7 @@ export class Validator {
             ruleName = rule.ruleName;
             rawRuleName = rule.rawRuleName;
           }
-          const valResult = { value, rule, ruleName, rawRuleName, ruleParams, rules, ...extra };
+          const valResult = { value, status: "error", rule, ruleName, rawRuleName, ruleParams, rules, ...extra };
           const i18nRuleOptions = { ...i18nRulesOptions, rule: defaultStr(ruleName), ruleName, rawRuleName, ruleParams };
           const handleResult = (result: any) => {
             result = typeof result === "string" ? (isNonNullString(result) ? result : i18n.t("validator.invalidMessage", i18nRuleOptions)) : result;
@@ -182,6 +197,8 @@ export class Validator {
               return reject({ ...valResult, message: i18n.t("validator.invalidMessage", i18nRuleOptions) });
             } else if (isNonNullString(result)) {
               return reject({ ...valResult, message: result });
+            } else if (result instanceof Error) {
+              return reject({ ...valResult, message: stringify(result) });
             }
             return next();
           };
@@ -201,7 +218,14 @@ export class Validator {
   }
   /***
    * Validate a target decorated using the ValidatorDecorator. 
-   * @param 
+   * @param {IClassConstructor} target - The target class.
+   * @param {Partial<Record<keyof InstanceType<T>, any>>} data - The data to validate.
+   * @param {IValidatorValidateTargetOptions} options - The options for validating the target.
+   * @returns {Promise<IValidatorValidateTargetOptions>} A promise that resolves with the validated data.
+   * @example
+   * // Validate a target decorated with the ValidatorDecorator.
+   * const validatedData = await Validator.validateTarget(MyClass, data);
+   * console.log(validatedData);
    */
   static validateTarget<T extends IClassConstructor = any>(target: T, data: Partial<Record<keyof InstanceType<T>, any>>, options?: {
     errorMessageBuilder?: (
@@ -214,20 +238,27 @@ export class Validator {
         ruleName: string,
         ruleParams: any[],
         value: any,
+        separators: {
+          multiple: string,
+          single: string,
+          and: string,
+          or: string
+        }
         data: Partial<Record<keyof InstanceType<T>, any>>,
       },
     ) => string
   }
   ) {
     const rulesObject = Validator.getTargetRules<T>(target);
+    const separators = Validator.separators;
     options = extendObj({}, Validator.getValidateTargetOptions(target), options);
     data = Object.assign({}, data);
     const errorMessageBuilder = typeof options?.errorMessageBuilder === 'function' ? options.errorMessageBuilder : (translatedPropertyName: string, error: string) => `[${String(translatedPropertyName)}] : ${error}`;
     const result: Record<keyof InstanceType<T>, any> = {} as Record<keyof InstanceType<T>, any>;
     const errors: string[] = [];
     const promises = [];
-    const errorsResult: Record<keyof InstanceType<T>, string[]> = {} as Record<keyof InstanceType<T>, string[]>;
-    const errorsByField: Record<keyof InstanceType<T>, string> = {} as Record<keyof InstanceType<T>, string>;
+    let count = 0;
+    const errorsDetails: ({ translatedPropertyName: string, error: string, ruleName: string, ruleParams: any[], value: any, separators: { multiple: string, single: string, and: string, or: string }, data: Partial<Record<keyof InstanceType<T>, any>> })[] = [];
     const translatedKeys = i18n.translateTarget(target, { data });
     for (let i in rulesObject) {
       const translatedPropertyName: string = (isNonNullString(translatedKeys[i]) ? translatedKeys[i] : i) as string;
@@ -235,10 +266,11 @@ export class Validator {
         result[i as keyof typeof result] = result;
       }).catch((error) => {
         const errorField = stringify(defaultVal(error?.message, error));
-        errorsByField[i as keyof typeof errorsByField] = errorField;
-        errorsResult[i as keyof typeof errorsResult] = [errorField];
+        errorsDetails.push(error);
+        count++;
         errors.push(errorMessageBuilder(translatedPropertyName, errorField, {
-          ...error,
+          ...Object.assign({}, error),
+          separators,
           data,
           propertyName: i,
           translatedPropertyName: translatedPropertyName,
@@ -249,10 +281,10 @@ export class Validator {
       return {
         rulesByField: rulesObject,
         result,
+        message: i18n.translate("validator.failedForNFields", { count }),
         errors,
         success: !errors.length,
-        errorsByField,
-        errorsResult,
+        errorsDetails,
       }
     });
   }

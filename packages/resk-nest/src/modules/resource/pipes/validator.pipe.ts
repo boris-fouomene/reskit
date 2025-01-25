@@ -1,5 +1,7 @@
 import { Injectable, ArgumentMetadata, BadRequestException, SetMetadata, ExecutionContext, createParamDecorator } from '@nestjs/common';
 import { IDict, isNonNullString, isObj, Validator } from '@resk/core';
+import "../translations";
+import { i18n } from "@resk/core";
 
 /**
  * @interface IValidatorParamConfigMap
@@ -117,7 +119,7 @@ const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
  *   // Use the dtoClass and data properties
  * ```
  */
-export const ValidatorParam = createParamDecorator(async (config: IValidatorParamConfig, ctx: ExecutionContext) => {
+export const ValidatorParam = createParamDecorator<IValidatorParamConfig, Promise<IValidatorParamResult["data"]>>(async (config: IValidatorParamConfig, ctx: ExecutionContext) => {
     /**
      * Gets the controller instance from the execution context.
      */
@@ -218,16 +220,8 @@ export const ValidatorParam = createParamDecorator(async (config: IValidatorPara
     try {
         return await ValidatorPipe.transform({ dtoClass, data });
     } catch (e) {
-        console.log(e, " on bad requestt");
         throw new BadRequestException(e)
     }
-    /**
-     * Returns the DTO and data objects.
-     */
-    return {
-        dtoClass,
-        data,
-    };
 },);
 
 /**
@@ -298,7 +292,8 @@ class ValidatorPipe {
      * @returns The validated data.
      * @throws {BadRequestException} If the validation fails.
      */
-    static async transform(value: IValidatorParamResult, metadata?: ArgumentMetadata) {
+    static async transform(value: IValidatorParamResult, metadata?: ArgumentMetadata): Promise<IValidatorParamResult["data"]> {
+        const separators = Validator.separators;
         /**
          * Checks if the input value is an object with a `dtoClass` property.
          */
@@ -315,39 +310,43 @@ class ValidatorPipe {
          * If the data is an array, validates each item in the array.
          */
         if (Array.isArray(data)) {
-            return await new Promise((resolve, reject) => {
-                const errors: any[] = [], result: IDict[] = [];
-                const promises: Promise<any>[] = [];
-                data.map((v: any, index) => {
-                    promises.push(new Promise((resolve, reject) => {
-                        ValidatorPipe.transform({ dtoClass, data: v }, metadata).then((r) => result.push(r as IDict)).catch((err) => {
-                            if (isNonNullString(err?.message)) {
-                                errors.push(`Data-Index:${index + 1} errors : ${err?.message}`);
-                            }
-                            if (Array.isArray(err?.errors)) {
-                                errors.push(...err.errors);
-                            }
-                            resolve({ errors, result });
-                        })
-                    }))
+            try {
+                return await new Promise((resolve, reject) => {
+                    const errors: any[] = [], result: IDict[] = [];
+                    const promises: Promise<any>[] = [];
+                    data.map((v: any, index) => {
+                        promises.push(new Promise((resolve, reject) => {
+                            ValidatorPipe.transform({ dtoClass, data: v }, metadata).then((r) => result.push(r as IDict)).catch((err) => {
+                                if (isNonNullString(err?.message)) {
+                                    errors.push(`Index:${index + 1} : ${err?.message}`);
+                                }
+                                if (Array.isArray(err?.errors)) {
+                                    errors.push(...err.errors);
+                                }
+                                resolve({ errors, result });
+                            })
+                        }))
+                    })
+                    return Promise.all(promises).then(() => {
+                        if (errors.length) {
+                            reject({
+                                message: i18n.translate("validator.failedForNItems", { count: errors.length }),
+                                errors,
+                            });
+                        } else {
+                            resolve(result);
+                        }
+                    })
                 })
-                return Promise.all(promises).then(() => {
-                    if (errors.length) {
-                        reject({
-                            message: errors.join("\n"),
-                            errors,
-                        });
-                    } else {
-                        resolve(result);
-                    }
-                })
-            });
+            } catch (e) {
+                throw new BadRequestException(e)
+            }
         }
 
         /**
          * Validates the data using the DTO class.
          */
-        const { success, errors, rulesByField, errorsByField, ...rest } = await Validator.validateTarget(dtoClass, data);
+        const { success, errors, message, rulesByField, ...rest } = await Validator.validateTarget(dtoClass, data);
 
         /**
          * If the validation fails, throws a `BadRequestException` with the validation errors.
@@ -355,9 +354,7 @@ class ValidatorPipe {
         if (errors.length > 0) {
             throw new BadRequestException({
                 errors,
-                data,
-                message: errors.join("\n"),
-                errorsByField
+                message,
             })
         }
 

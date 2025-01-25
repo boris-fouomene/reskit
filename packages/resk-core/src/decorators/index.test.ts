@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import { createPropertyDecorator, getDecoratedProperties, getDecoratedProperty } from ".";
-import { IClassConstructor } from "@/types";
 
 describe('Will test decorators functions', () => {
     const Required = createPropertyDecorator('required', true);
@@ -8,7 +7,7 @@ describe('Will test decorators functions', () => {
     class User {
         @Required
         @MaxLength(200)
-        name?: string;
+        name?: string = "";
 
         @Required
         email?: string;
@@ -16,7 +15,8 @@ describe('Will test decorators functions', () => {
 
     class PartialUser extends User {
         @MaxLength(300)
-        name?: string;
+        @Required
+        name?: string = "";
         @MaxLength(100)
         description?: string;
     }

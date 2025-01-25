@@ -5,6 +5,15 @@ I18n.RegisterTranslations({
          * @group Validator
          */
         "validator": {
+            "separators": {
+                "multiple": ", ",
+                "single": ", ",
+                "and": " and ",
+                "or": " or "
+            },
+            "failedForNFields": "Failed for %{count} fields",
+            //use for validating multi data
+            "failedForNItems": "Failed for %{count} items",
             "invalidRule": "Invalid validation rule: %{rule}",
             "invalidMessage": "Invalid validation message for rule %{rule}; error validating value %{value}",
             "required": "This field is required",

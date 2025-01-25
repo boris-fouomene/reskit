@@ -284,7 +284,7 @@ export default class Auth {
      */
     static isMasterAdmin: ((user?: IAuthUser) => boolean);
     private static _isMasterAdmin(user?: IAuthUser): boolean {
-        user = user || (Auth.getSignedUser() as IAuthUser);
+        user = isObj(user) ? user : (Auth.getSignedUser() as IAuthUser);
         return typeof Auth.isMasterAdmin == "function" ? Auth.isMasterAdmin(user) : false;
     }
     /**

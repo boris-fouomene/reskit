@@ -3,7 +3,7 @@ import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory, extendObj } from '../utils/index';
 import { IClassConstructor, IProtectedResource } from '../types/index';
 import { IAuthPerm, IAuthUser } from '@/auth/types';
-import { isAllowed } from '../auth/perms';
+import Auth from "../auth";
 import { i18n, I18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
 
@@ -658,40 +658,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * 6. Otherwise, it delegates the permission check to the Auth.isAllowed method.
    */
   isAllowed(perm?: IAuthPerm, user?: IAuthUser): boolean {
-    if (!this.getName()) return false;
-    let prefix = `${String(this.getName()).trim().rtrim(":")}:`;
-    let permStr: any = perm;
-    if (typeof perm === "string") {
-      permStr = perm.trim();
-      let hasPrefix = true;
-      if (!permStr.includes(":")) {
-        permStr = `${prefix}${permStr}`;
-      } else {
-        const permStplit = permStr.toLowerCase().trim().split(":");
-        hasPrefix = String(this.getName()).toLowerCase().trim() === permStplit[0]?.trim();
-      }
-      if (hasPrefix) {
-        const action = permStr.trim().split(":")[1];
-        if (isNonNullString(action)) {
-          const actionSplit = action.toLowerCase().trim().split("|");
-          let hasAction = actionSplit.includes("all");
-          const actions = this.getActions();
-          if (!hasAction) {
-            for (let actionName in actions) {
-              actionName = String(actionName).toLowerCase().trim();
-              if (actionSplit.includes(actionName)) {
-                hasAction = true;
-                break;
-              }
-            }
-          }
-          if (!hasAction) {
-            return false;
-          }
-        }
-      }
-    }
-    return isAllowed(permStr as IAuthPerm, user);
+    return ResourcesManager.isAllowed({ resourceName: this.getName(), perm }, user);
   }
   /**
    * Determines if the specified user has read access.
@@ -1070,6 +1037,9 @@ export class ResourcesManager {
    * @returns {boolean} `true` if the resource exists, `false` otherwise.
    */
   public static hasResource(name: IResourceName) {
+    if (!isNonNullString(name) || !name) return false;
+    const metaData = ResourcesManager.getMetaDataFromName(name);
+    if (isObj(metaData) && metaData?.name == name) return true;
     return !!this.getResource(name);
   }
   /**
@@ -1160,14 +1130,43 @@ export class ResourcesManager {
  * console.log(isAllowed); // Output: true
  */
   static isAllowed(options: IProtectedResource, user?: IAuthUser): boolean {
-    if (!isObj(options)) return false;
-    if (options?.resourceName && isNonNullString(options?.resourceName)) {
-      const resource = ResourcesManager.getResource(options?.resourceName);
-      if (resource) {
-        return resource.isAllowed(options?.perm as IAuthPerm, user);
+    options = Object.assign({}, options);
+    const { resourceName, perm } = options;
+    if (!resourceName || !isNonNullString(resourceName)) return Auth.isAllowed(perm as IAuthPerm, user);
+    let prefix = `${String(resourceName).trim().rtrim(":")}:`;
+    const metaData = ResourcesManager.getMetaDataFromName(resourceName as IResourceName);
+    const actions = Object.assign({}, metaData?.actions);
+    let permStr: any = perm;
+    if (typeof perm === "string") {
+      permStr = perm.trim();
+      let hasPrefix = true;
+      if (!permStr.includes(":")) {
+        permStr = `${prefix}${permStr}`;
+      } else {
+        const permStplit = permStr.toLowerCase().trim().split(":");
+        hasPrefix = String(resourceName).toLowerCase().trim() === permStplit[0]?.trim();
+      }
+      if (hasPrefix) {
+        const action = permStr.trim().split(":")[1];
+        if (isNonNullString(action)) {
+          const actionSplit = action.toLowerCase().trim().split("|");
+          let hasAction = actionSplit.includes("all");
+          if (!hasAction) {
+            for (let actionName in actions) {
+              actionName = String(actionName).toLowerCase().trim();
+              if (actionSplit.includes(actionName)) {
+                hasAction = true;
+                break;
+              }
+            }
+          }
+          if (!hasAction) {
+            return false;
+          }
+        }
       }
     }
-    return isAllowed(options?.perm, user);
+    return Auth.isAllowed(permStr as IAuthPerm, user);
   }
 }
 

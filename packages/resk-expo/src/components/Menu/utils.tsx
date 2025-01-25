@@ -6,8 +6,7 @@ import { IReactNullableElement } from "../../types";
 import stableHash from "stable-hash";
 import { cloneObject, isObj } from "@resk/core";
 import { useReskExpo } from "@src/context/hooks";
-
-const isAllowed = (p: any) => true;
+import { ResourcesManager } from "@resk/core";
 
 /**
  * Renders either an expandable menu item or a section based on the provided properties.
@@ -49,7 +48,7 @@ const isAllowed = (p: any) => true;
  */
 const renderExpandableMenuItemOrSection = function <MenuItemContext = any>({ item, itemsNodes, index, context, render, renderExpandable, level }: IMenuRenderItemOptions<MenuItemContext>) {
   level = typeof level == "number" && level || 0;
-  if (!isAllowed(item)) return null;
+  if (!ResourcesManager.isAllowed(item)) return null;
   const { section, items, ...rest } = item;
   context = { ...Object.assign({}, rest.context), ...Object.assign({}, context) };
   return (section ? render : renderExpandable)({ level, items, ...rest, children: itemsNodes, context }, index);
@@ -92,7 +91,7 @@ function renderMenuItem<MenuItemContext = any>({ item, index, render, renderExpa
   level = typeof level == "number" && level || 0;
   if (!item) return null;
   item.level = level;
-  if (!isAllowed(item)) return null;
+  if (!ResourcesManager.isAllowed(item)) return null;
   if (!item.label && !item.icon && !item.children && item.divider === true) {
     const { dividerProps } = item;
     return (<Divider key={index} {...Object.assign({}, dividerProps)} />)

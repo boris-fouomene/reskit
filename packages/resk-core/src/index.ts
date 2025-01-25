@@ -29,6 +29,6 @@ export * from "./types";
 export * from "./utils";
 export * from "./currency/types"
 export * from "./auth/types";
-export * as Auth from "./auth";
+export { default as Auth } from "./auth";
 export * from "./i18n";
 export * from "./validator";

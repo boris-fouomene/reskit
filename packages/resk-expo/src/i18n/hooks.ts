@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { I18n, isNonNullString, Currency } from "@resk/core";
+import { I18n, isNonNullString, Currency, IDict } from "@resk/core";
 import { getLocales, Locale } from 'expo-localization';
 import { IUseI18nOptions } from "@src/types";
 
@@ -74,7 +74,7 @@ export const useI18n = (i18n?: I18n, options?: IUseI18nOptions): I18n => {
     }, [instance, expoLocales]);
     const [locale, setLocale] = useState(instance.getLocale());
     useEffect(() => {
-        const onChangeListener = instance.on("locale-changed", (newLocale, dictionary) => {
+        const onChangeListener = instance.on("locale-changed", (newLocale: string) => {
             if (locale != newLocale) {
                 setLocale(newLocale);
             }

@@ -10,7 +10,6 @@ import {
 } from '@nestjs/swagger';
 import { INestApplication, VersioningType } from '@nestjs/common';
 import { VersioningOptions, NestApplicationOptions } from '@nestjs/common';
-import { NestExpressApplication } from '@nestjs/platform-express';
 const pathM = require("path");
 /**
  * Creates a NestJS application with optional Swagger documentation and versioning.
@@ -189,8 +188,8 @@ export const setupSwagger = (
         typeof sOptions.swaggerOptions.persistAuthorization !== undefined
             ? sOptions.swaggerOptions.persistAuthorization
             : true;
-    if (typeof (app as NestExpressApplication).useStaticAssets === 'function') {
-        (app as NestExpressApplication).useStaticAssets(
+    if (typeof (app as any).useStaticAssets === 'function') {
+        (app as any).useStaticAssets(
             pathM.join(__dirname, '../dist', 'swagger-ui'),
             {
                 prefix: `/${swaggerPath.trim().ltrim("/")}`,

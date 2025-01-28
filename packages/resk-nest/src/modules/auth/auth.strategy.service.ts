@@ -79,6 +79,8 @@ export class AuthGuard implements CanActivate {
         const strategy2Guard = AuthGuard.getStrategy(strategyName);
         // Pass the strategy name to the context for use in validate methods
         //request.strategy = strategy2Guard.name;
-        return new strategy2Guard.guard().canActivate(context) as Promise<boolean>;
+        const guardInstance = new strategy2Guard.guard();
+        console.log(guardInstance, " is qggggggggggg ", guardInstance.canActivate, guardInstance.constructor)
+        return guardInstance.canActivate(context) as Promise<boolean>;
     }
 }

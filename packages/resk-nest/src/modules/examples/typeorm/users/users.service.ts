@@ -3,6 +3,7 @@ import { TypeOrmResourceService } from 'src/modules/typeorm';
 import { User } from './entities/user.entity';
 import { Resource } from '@resk/core';
 import { DataSource } from 'typeorm';
+import { DatabaseModule } from '../database.module';
 @Injectable()
 @Resource({
   name: 'users',
@@ -40,7 +41,7 @@ import { DataSource } from 'typeorm';
   }
 })
 export class UsersService extends TypeOrmResourceService<User, string> {
-  constructor(@Inject("database") protected dataSource: DataSource) {
+  constructor(@Inject(DatabaseModule.name) protected dataSource: DataSource) {
     super(dataSource, User);
   }
   @Get('me')

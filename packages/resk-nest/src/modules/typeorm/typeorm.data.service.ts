@@ -3,11 +3,10 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { i18n, IClassConstructor, IResourceData, IResourceDataService, IResourceFindWhereAndCondition, IResourceFindWhereCondition, IResourceFindWhereOrCondition, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, isObj } from "@resk/core";
 import { DataSource, DeepPartial, EntityManager, QueryRunner, Repository } from "typeorm";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
-import { ResourceService } from "../resource/resource.service";
 
 
 /***
- * The `TypeOrmService` class is an implementation of the `ResourceService` interface that uses TypeORM as the underlying data storage. It provides methods for performing CRUD operations on entities within a transaction, ensuring atomicity and consistency of the database operations.
+ * The `TypeOrmDataService` class is an implementation of the `IResourceDataService` interface that uses TypeORM as the underlying data storage. It provides methods for performing CRUD operations on entities within a transaction, ensuring atomicity and consistency of the database operations.
 
 The class has the following key features:
 
@@ -22,12 +21,11 @@ The class has the following key features:
 - The `findAndPaginate()` method retrieves a paginated result set of entities based on the provided options.
  */
 @Injectable()
-export class TypeOrmService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceService<DataType, PrimaryKeyType> {
+export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> implements IResourceDataService<DataType, PrimaryKeyType> {
     private readonly primaryColumns: Record<string, ColumnMetadata> = {};
     private readonly columns: Record<string, ColumnMetadata> = {};
     private readonly primaryColumnsNames: string[] = [];
     constructor(protected readonly dataSource: DataSource, readonly entity: IClassConstructor<DataType>) {
-        super();
         const repository = this.getRepository();
         repository.metadata.columns.map((column) => {
             if (column.isPrimary) {
@@ -38,17 +36,17 @@ export class TypeOrmService<DataType extends IResourceData = any, PrimaryKeyType
         });
     }
     /***
-     * Returns the entity manager associated with the `ResourceService` instance.
+     * Returns the entity manager associated with the `IResourceDataService` instance.
      * The entity manager is used to interact with the underlying data storage or service.
-     * @returns {EntityManager} The entity manager associated with the `ResourceService` instance.
+     * @returns {EntityManager} The entity manager associated with the `IResourceDataService` instance.
      */
     getManager(): EntityManager {
         return this.getRepository().manager;
     }
     /***
-     * Returns the data source associated with the `ResourceService` instance.
+     * Returns the data source associated with the `IResourceDataService` instance.
      * The data source is used to interact with the underlying data storage or service.
-     * @returns {DataSource} The data source associated with the `ResourceService` instance.
+     * @returns {DataSource} The data source associated with the `IResourceDataService` instance.
      */
     getDataSource() {
         return this.dataSource;
@@ -316,8 +314,5 @@ export class TypeOrmService<DataType extends IResourceData = any, PrimaryKeyType
             toal: count,
             meta,
         }
-    }
-    getDataService(): IResourceDataService<DataType, IResourcePrimaryKey> {
-        return this;
     }
 }

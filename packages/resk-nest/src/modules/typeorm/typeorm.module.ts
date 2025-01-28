@@ -45,11 +45,11 @@ import { DataSource, DataSourceOptions } from "typeorm";
  *   synchronize: true,
  * });
  * ## user.service.ts
- * import {TypeOrmService} from '@resk/nest';
+ * import {TypeOrmResourceService} from '@resk/nest';
  * import {User} from './user.entity';
  * import {Inject, Injectable} from '@nestjs/common';
  * @Injectable()
- * export class UserService extends TypeOrmService<User, number> {
+ * export class UserService extends TypeOrmResourceService<User, number> {
  *   constructor(@Inject('myDataSource') private readonly dataSource: DataSource) {
  *     super(dataSource, User);
  *   }

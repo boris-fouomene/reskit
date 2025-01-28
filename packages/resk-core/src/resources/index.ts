@@ -143,6 +143,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
   destroy() {
     this._onDictionaryChangedListener?.remove();
     this._onLocaleChangeListener?.remove();
+    this.offAll();
   }
   /**
    * returns the i18n params for the resource. this is used to translate the error messages.

@@ -1,3 +1,4 @@
+import { DynamicModule } from '@nestjs/common';
 import { defaultStr } from '@resk/core';
 import * as mongoose from 'mongoose';
 
@@ -18,21 +19,22 @@ export type IMongooseModuleOptions = mongoose.ConnectOptions & {
     global?: boolean;
 };
 export class MongooseModule {
-    static PROVIDER_NAME = 'MONGOOSE_CONNECTION';
+    static DEFAULT_PROVIDER_NAME = 'MONGOOSE_CONNECTION';
     static createConnectionProvider = (uri: string, options?: IMongooseModuleOptions): any => {
         options = Object.assign({}, options);
         const { name, global, ...rest } = options;
         return {
-            provide: defaultStr(name, MongooseModule.PROVIDER_NAME),
+            provide: defaultStr(name, MongooseModule.DEFAULT_PROVIDER_NAME),
             useFactory: async () => {
                 return mongoose.connect(uri, rest);
             },
         }
     }
-    static forRoot(uri: string, options?: IMongooseModuleOptions): any {
+    static forRoot(uri: string, options?: IMongooseModuleOptions): DynamicModule & { name: string } {
         const provider = MongooseModule.createConnectionProvider(uri, options);
         return {
             global: typeof options?.global === 'boolean' ? options.global : true,
+            name: defaultStr(options?.name, MongooseModule.DEFAULT_PROVIDER_NAME),
             module: MongooseModule,
             providers: [provider],
             exports: [provider],

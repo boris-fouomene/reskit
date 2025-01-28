@@ -142,12 +142,13 @@ export class TypeOrmModule {
      * ```
      */
     static forRoot(
-        options: DataSourceOptions & { name?: string }
+        options: DataSourceOptions & { name?: string, global?: boolean }
     ): DynamicModule {
         // Create the data source provider
         const provider = TypeOrmModule.createDataSourceProvider(options);
         // Return the dynamic module configuration
         return {
+            global: typeof options?.global === 'boolean' ? options.global : true,
             module: TypeOrmModule,
             providers: [provider],
             exports: [provider],

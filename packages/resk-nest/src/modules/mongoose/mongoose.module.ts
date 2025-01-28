@@ -9,12 +9,19 @@ export type IMongooseModuleOptions = mongoose.ConnectOptions & {
      * @default 'MONGOOSE_CONNECTION'
      */
     name?: string;
+    /***
+     * Whether the connection provider should be global or not.
+     * If set to true, the connection provider will be registered as global for the application.
+     *
+     * @default true
+     */
+    global?: boolean;
 };
 export class MongooseModule {
     static PROVIDER_NAME = 'MONGOOSE_CONNECTION';
     static createConnectionProvider = (uri: string, options?: IMongooseModuleOptions): any => {
         options = Object.assign({}, options);
-        const { name, ...rest } = options;
+        const { name, global, ...rest } = options;
         return {
             provide: defaultStr(name, MongooseModule.PROVIDER_NAME),
             useFactory: async () => {
@@ -25,6 +32,7 @@ export class MongooseModule {
     static forRoot(uri: string, options?: IMongooseModuleOptions): any {
         const provider = MongooseModule.createConnectionProvider(uri, options);
         return {
+            global: typeof options?.global === 'boolean' ? options.global : true,
             module: MongooseModule,
             providers: [provider],
             exports: [provider],

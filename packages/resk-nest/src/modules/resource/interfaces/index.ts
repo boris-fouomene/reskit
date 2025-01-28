@@ -1,11 +1,10 @@
 import { ApiOperationOptions } from '@nestjs/swagger';
 import {
   IResourceData, IResourceName, IResourcePrimaryKey, isNonNullString, isObj, ResourcesManager
-  , IResourceQueryOptions, IResourceDataService, IResourceManyCriteria, IResourceFindWhereAndCondition, IResourceFindWhereCondition, IResourceFindWhereOrCondition,
-  IResourcePaginatedResult,
+  , IResourceQueryOptions, IResourceManyCriteria,
 } from "@resk/core";
 import { ResourceController } from '../resource.controller';
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 
 
 /**

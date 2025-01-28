@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IResourceData, IResourceDataService, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, IResourceQueryOptionsWithMango } from '@resk/core';
+import { IResourceData, IResourceDataService, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions } from '@resk/core';
 import { Model, ObjectId } from 'mongoose';
 import { Connection, Schema } from 'mongoose';
 
@@ -24,9 +24,6 @@ export class MongooseDataService<DataType extends IResourceData = any, PrimaryKe
     find(options?: IResourceQueryOptions<DataType> | undefined): Promise<DataType[]> {
         const { where } = Object.assign({}, options);
         return this.getModel().find(where as {}).exec();
-    }
-    findWithMango?(options: IResourceQueryOptionsWithMango<DataType>): Promise<DataType[]> {
-        throw new Error('Method not implemented.');
     }
     findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]> {
         throw new Error('Method not implemented.');

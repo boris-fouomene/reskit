@@ -1,6 +1,6 @@
 
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { i18n, IClassConstructor, IResourceData, IResourceDataService, IResourceFindWhereAndCondition, IResourceFindWhereCondition, IResourceFindWhereOrCondition, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, isObj } from "@resk/core";
+import { i18n, IClassConstructor, IResourceData, IResourceDataService, IResourceFindWhereCondition, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, isObj } from "@resk/core";
 import { DataSource, DeepPartial, EntityManager, QueryRunner, Repository } from "typeorm";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
 
@@ -273,19 +273,12 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
         return this.dataSource.getRepository(this.entity);
     }
     buildWhereCondition(options: PrimaryKeyType | PrimaryKeyType[] | IResourceQueryOptions<DataType>): Omit<IResourceQueryOptions<DataType>, "where"> & { where: IResourceFindWhereCondition<DataType> } {
-        const contitions: IResourceFindWhereAndCondition<DataType> = {};
+        const contitions: IResourceFindWhereCondition<DataType> = {};
         const primaryColumns = this.getPrimaryColumnNames();
         if (["number", "string"].includes(typeof options)) {
             const primaryColumn: keyof DataType = this.getPrimaryColumnNames()[0];
             contitions[primaryColumn] = options as (DataType[keyof DataType]);
             options = { where: contitions };
-        }
-        if (Array.isArray(options)) {
-            const where: IResourceFindWhereOrCondition = [];
-            (options as PrimaryKeyType[]).map((primaryColumn: PrimaryKeyType) => {
-                where.push({ [primaryColumns[0]]: primaryColumn });
-            });
-            options = { where };
         }
         const result = Object.assign({}, options) as Omit<IResourceQueryOptions<DataType>, "where"> & { where: IResourceFindWhereCondition<DataType> };
         if (Array.isArray(result.where) && !isObj(result.where) && typeof result.where[0] !== 'object') {

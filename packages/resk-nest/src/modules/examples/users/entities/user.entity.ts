@@ -1,12 +1,12 @@
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ValidatorIsRequired } from '@resk/core';
 @Entity({
-    name: "customers",
+    name: "users",
 })
 export class User {
     @PrimaryGeneratedColumn({
-        name: "cust_code",
+        name: "id",
     })
     @ValidatorIsRequired
-    code?: string;
+    id?: number;
 }

@@ -1,75 +1,84 @@
 
-import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { PassportStrategy, AuthGuard as PassportAuthGuard } from '@nestjs/passport';
-import { i18n, isNonNullString } from '@resk/core';
+import { Auth, defaultStr, i18n, IClassConstructor, isNonNullString, isObj } from '@resk/core';
 import 'reflect-metadata';
 
 const STRATEGIES_KEY = Symbol('auth:startegies-keys');
+const STRAGEGY_NAME = '@resk:nest-auth-strategy';
 
-export function AuthStrategy(name: string): ClassDecorator {
+type IStrategyName = string | string[];
+
+export function AuthStrategy(name: string | string[]): ClassDecorator {
     return (target) => {
-        AuthStrategyService.register(name, target);
+        AuthGuard.registerStrategy(name, target);
     };
 }
 
-
-@Injectable()
-export class AuthStrategyService {
-    private strategies: Map<string, typeof PassportStrategy> = new Map();
-    static STRAGEGY_NAME = 'resk-next-auth';
-    getStrategies(): Map<string, typeof PassportStrategy> {
-        if (this.strategies.size <= 0) {
-            this.strategies = AuthStrategyService.loadStrategies();
-        }
-        return this.strategies;
-    }
-    getStrategy(name: string): typeof PassportStrategy {
-        if (!isNonNullString(name)) throw new Error("Strategy name is not defined");
-        const strategies = this.getStrategies();
-        if (!strategies.has(name)) throw new UnauthorizedException(i18n.t("auth.tartegyNameNotFound", { strategyName: name }));
-        const strategy = strategies.get(name);
-        if (!strategy || typeof strategy !== 'function') {
-            throw new UnauthorizedException(i18n.t("auth.invalidStrategy", { strategyName: name }));
-        }
-        return strategy;
-    }
-    // Load loadedStrategies registered using the decorator
-    public static loadStrategies(): Map<string, typeof PassportStrategy> {
-        const registeredStrategies = AuthStrategyService.getDecoratedStrategies();
-        const loadedStrategies = new Map<string, typeof PassportStrategy>();
-        for (const name in registeredStrategies) {
-            try {
-                const target = registeredStrategies[name];
-                const strategyInstance = new (target as any)();
-                loadedStrategies.set(name, strategyInstance);
-            } catch (error) {
-                console.error(`Error loading strategy ${name}:`, error);
-            }
-        }
-        return loadedStrategies;
-    }
-    static register(name: string, target: Function): Record<string, typeof PassportStrategy> {
-        const loadedStrategies = Object.assign({}, Reflect.getMetadata(STRATEGIES_KEY, AuthStrategyService));
-        loadedStrategies[name] = target;
-        Reflect.defineMetadata(STRATEGIES_KEY, loadedStrategies, global);
-        return loadedStrategies;
-    }
-    static getDecoratedStrategies(): Record<string, typeof PassportStrategy> {
-        return Object.assign({}, Reflect.getMetadata(STRATEGIES_KEY, AuthStrategyService))
-    }
+export interface IAuthStrategy<T extends IClassConstructor = any, TUser = unknown, TValidationResult = TUser | false | null> extends ReturnType<typeof PassportStrategy<T, TUser, TValidationResult>> { }
+export interface IAuthGuard extends ReturnType<typeof PassportAuthGuard> { }
+export interface IAuthStrategyAndGuard<T extends IClassConstructor = any, TUser = unknown, TValidationResult = TUser | false | null> {
+    name: IStrategyName;
+    guard: IAuthGuard;
+    strategy: IAuthStrategy<T, TUser, TValidationResult>;
 }
-
 @Injectable()
-export class AuthGuard extends PassportAuthGuard(AuthStrategyService.STRAGEGY_NAME) {
-    constructor(private strategyManager: AuthStrategyService) {
-        super();
+export class AuthGuard implements CanActivate {
+    private static stringifyName(name: string | string[]): string {
+        if (Array.isArray(name)) {
+            return name.join(':::');
+        }
+        return defaultStr(name);
+    }
+    static isValidStrategy(strategyAndGuard?: IAuthStrategyAndGuard): boolean {
+        if (!strategyAndGuard || !isObj(strategyAndGuard)) return false;
+        if (!isNonNullString(strategyAndGuard.name) && (!Array.isArray(strategyAndGuard.name) || !strategyAndGuard.name.length)) return false;
+        const { guard, strategy } = strategyAndGuard;
+        return (typeof guard === "function");
+    }
+    static get STRAGEGY_NAME() {
+        return STRAGEGY_NAME;
+    };
+
+    public static getStrategy<T extends IClassConstructor = any, TUser = unknown, TValidationResult = TUser | false | null>(name?: IStrategyName): IAuthStrategyAndGuard<T, TUser, TValidationResult> {
+        const strategies = this.getStrategies();
+        const keys = Object.keys(strategies);
+        const nameStringify = this.stringifyName(name as string | string[]);
+        if (!nameStringify) {
+            if (keys.length === 1) {
+                const stragey2Guard = strategies[keys[0]];
+                if (this.isValidStrategy(stragey2Guard)) {
+                    return stragey2Guard;
+                }
+            }
+            throw new UnauthorizedException(i18n.t("auth.invalidStrategyName"));
+        }
+        const strategy2Guard = strategies[nameStringify];
+        if (!strategy2Guard) {
+            throw new UnauthorizedException(i18n.t("auth.strategyNameNotFound", { strategyName: nameStringify }));
+        }
+        return strategy2Guard;
+    }
+    static registerStrategy(name: string | string[], target: Function): IAuthStrategy {
+        const loadedStrategies = Object.assign({}, Reflect.getMetadata(STRATEGIES_KEY, AuthGuard));
+        const nameStringify = this.stringifyName(name);
+        loadedStrategies[nameStringify] = {
+            strategy: target,
+            name: name,
+            guard: PassportAuthGuard(name)
+        };
+        Reflect.defineMetadata(STRATEGIES_KEY, loadedStrategies, AuthGuard);
+        return loadedStrategies;
+    }
+    static getStrategies(): Record<string, IAuthStrategyAndGuard> {
+        return Object.assign({}, Reflect.getMetadata(STRATEGIES_KEY, AuthGuard))
     }
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
-        const strategyName = request.body.strategy || request.query.strategy;
-        this.strategyManager.getStrategy(strategyName);
+        const strategyName = defaultStr(request?.body?.strategy, request?.query?.strategy);
+        const strategy2Guard = AuthGuard.getStrategy(strategyName);
         // Pass the strategy name to the context for use in validate methods
-        request.strategy = strategyName;
-        return super.canActivate(context) as Promise<boolean>;
+        //request.strategy = strategy2Guard.name;
+        return new strategy2Guard.guard().canActivate(context) as Promise<boolean>;
     }
 }

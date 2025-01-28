@@ -1,6 +1,12 @@
 import { ApiOperationOptions } from '@nestjs/swagger';
-import { IResourceData, IResourceName, IResourcePrimaryKey, isNonNullString, isObj, ResourcesManager } from "@resk/core";
+import {
+  IResourceData, IResourceName, IResourcePrimaryKey, isNonNullString, isObj, ResourcesManager
+  , IResourceQueryOptions, IResourceDataService, IResourceManyCriteria, IResourceFindWhereAndCondition, IResourceFindWhereCondition, IResourceFindWhereOrCondition,
+  IResourcePaginatedResult,
+} from "@resk/core";
 import { ResourceController } from '../resource.controller';
+import { BadRequestException, Injectable } from "@nestjs/common";
+
 
 /**
  * Represents an API operation for a resource.
@@ -113,3 +119,34 @@ ResourcesManager.getApiDescription = function (resourceName: IResourceName, meth
   if (!isObj(resourceOptions) || !isObj(resourceOptions?.apiDescription) || !isNonNullString(method)) return;
   return (resourceOptions?.apiDescription as any)[method];
 }
+
+@Injectable()
+export abstract class ResourceDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, RepositoryType = any> {
+  constructor(protected readonly repository: RepositoryType) { }
+
+  abstract create(record: Partial<DataType>): Promise<DataType>;
+  abstract update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType>;
+  abstract delete(primaryKey: PrimaryKeyType): Promise<boolean>;
+  abstract findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null>;
+  abstract findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType>;
+  abstract find(options?: IResourceQueryOptions<DataType> | undefined): Promise<DataType[]>;
+  abstract findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]>;
+  abstract createMany(data: Partial<DataType>[]): Promise<DataType[]>;
+  abstract updateMany(filter: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number>;
+  abstract deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number>;
+  abstract count(options?: IResourceQueryOptions<DataType> | undefined): Promise<number>;
+  abstract exists(primaryKey: PrimaryKeyType): Promise<boolean>;
+  /***
+   * Returns the names of the primary columns of the resource.
+   * @returns {(keyof DataType)[]} An array of primary column names.
+   */
+  abstract getPrimaryColumnNames(): (keyof DataType)[];
+
+  distinct?(field: keyof DataType): Promise<any[]> {
+    throw new Error("Method distinct not implemented.");
+  }
+  aggregate?(pipeline: any[]): Promise<any[]> {
+    throw new Error("Method aggregate not implemented.");
+  }
+}
+

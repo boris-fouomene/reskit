@@ -195,6 +195,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
     if (!this.hasDataService()) {
       return Promise.reject(new Error(this.INVALID_DATA_PROVIDER_ERROR));
     }
+    return Promise.resolve();
     if (!actionPerm()) {
       return Promise.reject(new Error(i18n.t(i18nActionKey, this.getTranslateParams())));
     }

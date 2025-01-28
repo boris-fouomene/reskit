@@ -1008,7 +1008,9 @@ export interface IResourceMetaData<DataType extends IResourceData = any, Primary
   const exampleService = new ExampleService();
   const exampleController = new ExampleControllerClass(exampleService);
  */
-export type IClassConstructor<T = any, D extends any[] = any[]> = new (...args: D) => T;
+export interface IClassConstructor<T = any, D extends any[] = any[]> extends Function {
+  new(...args: D): T;
+}
 
 
 /**

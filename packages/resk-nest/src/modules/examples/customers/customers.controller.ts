@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { CustomersService } from './customers.service';
-import { ResourceController } from '../resource';
+import { ResourceController } from '../../resource';
 import { Customer } from './entities/customer.entity';
 import { IClassConstructor } from '@resk/core';
 

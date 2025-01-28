@@ -8,7 +8,19 @@ I18n.RegisterTranslations({
         },
         "auth": {
             "invalidStrategy": "Invalid Auth strategy  [%{strategyName}].",
-            "startegyNameNotFound": "Auth Strategy name  [%{strategyName}] not found",
+            "strategyNameNotFound": "Auth Strategy name  [%{strategyName}] not found",
+            "invalidStrategyName": "Invalid Auth strategy name.",
+        },
+        "typeorm": {
+            "entityWithPrimaryNotFound": "Entity with primary key %{primaryKey} not found",
+            "entityWithPrimaryAlreadyExists": "Entity with primary key %{primaryKey} already exists",
+            "invalidWhereConditionOnUpdate": "Invalid where condition, The where condition must contain at least one field. We are unable to update the data.",
+            "entityNotFound": "Entity with ID %{id} not found",
+            "invalidWhereConditionOnDelete": "Invalid where condition, The where condition must contain at least one field. We are unable to delete the data.",
+            "invalidDataProvider": "Invalid data provider",
+        },
+        "resources": {
+
         }
     },
 })

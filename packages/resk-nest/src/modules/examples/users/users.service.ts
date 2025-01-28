@@ -1,9 +1,8 @@
-import { Get, Injectable } from '@nestjs/common';
-import { ResourceService } from '../resource';
+import { Get, Inject, Injectable } from '@nestjs/common';
+import { TypeOrmService } from '../../resource';
 import { User } from './entities/user.entity';
-import { InjectDataService, ResourceDataService } from '../data-source';
-import { Repository } from 'typeorm';
 import { Resource } from '@resk/core';
+import { DataSource, Repository } from 'typeorm';
 @Injectable()
 @Resource({
   name: 'users',
@@ -40,12 +39,9 @@ import { Resource } from '@resk/core';
     }
   }
 })
-export class UsersService extends ResourceService<User, string, Repository<User>> {
-  constructor(
-    @InjectDataService(User)
-    dataService: ResourceDataService<User, string>
-  ) {
-    super(dataService);
+export class UsersService extends TypeOrmService<User, string> {
+  constructor(@Inject("database") protected dataSource: DataSource) {
+    super(dataSource, User);
   }
   @Get('me')
   getMe() {

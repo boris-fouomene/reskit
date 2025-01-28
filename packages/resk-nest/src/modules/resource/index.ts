@@ -5,3 +5,4 @@ export * from "./interfaces";
 export * from "./exceptions";
 export * from "./pipes";
 export * from "./translations";
+export * from "../typeorm";

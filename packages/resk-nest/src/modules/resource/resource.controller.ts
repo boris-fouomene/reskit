@@ -1,8 +1,7 @@
-import { Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Logger } from '@nestjs/common';
 import { ResourceService } from './resource.service';
 import { IClassConstructor, IResourceData } from '@resk/core';
 import { UseValidatorPipe, ValidatorParam } from './pipes';
-import { AuthGuard } from '../auth';
 
 
 /**
@@ -28,7 +27,6 @@ export abstract class ResourceController<DataType extends IResourceData = any, S
   async getAll(): Promise<any> {
     return this.getResourceService().find();
   }
-  @UseGuards(AuthGuard)
   @Get(':id')
   async getOne(@Param() params: any) {
     return await this.getResourceService().findOne(params.id);

@@ -1,4 +1,4 @@
-import { DynamicModule, Provider } from '@nestjs/common';
+import { DynamicModule } from '@nestjs/common';
 import { I18nModule } from '../i18n';
 /**
  * The `ResourceModule` is a global NestJS module that provides the `ResourceService` and a configurable `serviceProvider`.

@@ -1,4 +1,4 @@
-import { TypeOrmModule } from "../../typeorm";
+import { TypeOrmModule } from "../../modules/typeorm";
 import { User } from "./users/entities/user.entity";
 
 export const DatabaseModule = TypeOrmModule.forRoot({

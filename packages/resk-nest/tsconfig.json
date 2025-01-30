@@ -7,6 +7,44 @@
     "module": "CommonJS",
     "target": "ES2021",
     "moduleResolution": "node",
+    "paths": {
+      "@modules/*": [
+        "./src/modules/*"
+      ],
+      "@examples/*": [
+        "./src/examples/*"
+      ],
+      "@auth/*": [
+        "./src/modules/auth/*"
+      ],
+      "@auth": [
+        "./src/modules/auth"
+      ],
+      "@resources/*": [
+        "./src/modules/resource/*"
+      ],
+      "@resources": [
+        "./src/modules/resource"
+      ],
+      "@typeorm/*": [
+        "./src/modules/typeorm/*"
+      ],
+      "@typeorm": [
+        "./src/modules/typeorm"
+      ],
+      "@mongoose/*": [
+        "./src/modules/mongoose/*"
+      ],
+      "@mongoose": [
+        "./src/modules/mongoose"
+      ],
+      "@nestjs/*": [
+        "./node_modules/@nestjs/*"
+      ],
+      "@nestjs": [
+        "./node_modules/@nestjs"
+      ],
+    }
   },
   "include": [
     "src/**/*",
@@ -15,5 +53,5 @@
     "../packages/resk-expo/**/*",
     "../packages/resk-expo-docs/**/*",
     "**/*.tsx"
-  ]
+  ],
 }

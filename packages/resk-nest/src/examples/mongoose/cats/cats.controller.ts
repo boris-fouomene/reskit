@@ -1,5 +1,5 @@
 import { IClassConstructor } from "@resk/core";
-import { ResourceController } from "../../../resource/resource.controller";
+import { ResourceController } from "../../../modules/resource/resource.controller";
 import { CatDto } from "./cats.dto";
 import { Controller } from "@nestjs/common";
 import { CatsService } from "./cats.service";

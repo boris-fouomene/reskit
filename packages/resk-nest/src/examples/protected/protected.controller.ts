@@ -1,9 +1,9 @@
 import { IClassConstructor } from "@resk/core";
-import { User } from "src/modules/examples/typeorm/users/entities/user.entity";
+import { User } from "src/examples/typeorm/users/entities/user.entity";
 import { ResourceController } from "src/modules/resource";
 import { ProtectedService } from "./protected.service";
 import { Controller, Get, Post, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "../../auth";
+import { AuthGuard } from "../../modules/auth";
 
 @Controller('protected')
 export class ProtectedController extends ResourceController<User, ProtectedService> {

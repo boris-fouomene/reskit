@@ -8,11 +8,11 @@
     "target": "ES2021",
     "moduleResolution": "node",
     "paths": {
-      "@esource/*": [
-        "./src/modules/esource/*"
+      "@resource/*": [
+        "./src/modules/resource/*"
       ],
-      "@esource": [
-        "./src/modules/esource"
+      "@resource": [
+        "./src/modules/resource"
       ],
       "@i18n/*": [
         "./src/modules/i18n/*"
@@ -25,12 +25,6 @@
       ],
       "@auth": [
         "./src/modules/auth"
-      ],
-      "@resources/*": [
-        "./src/modules/resource/*"
-      ],
-      "@resources": [
-        "./src/modules/resource"
       ],
       "@typeorm/*": [
         "./src/modules/typeorm/*"

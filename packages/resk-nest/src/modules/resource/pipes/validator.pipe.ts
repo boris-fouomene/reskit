@@ -1,5 +1,5 @@
-import { Injectable, ArgumentMetadata, BadRequestException, SetMetadata, ExecutionContext, createParamDecorator } from '@nestjs/common';
-import { IDict, isNonNullString, isObj, Validator } from '@resk/core';
+import { Injectable, ArgumentMetadata, BadRequestException, SetMetadata, ExecutionContext, createParamDecorator, PipeTransform } from '@nestjs/common';
+import { IClassConstructor, IDict, isClass, isNonNullString, isObj, Validator } from '@resk/core';
 import "../translations";
 import { i18n } from "@resk/core";
 import { stringify } from 'querystring';
@@ -105,7 +105,7 @@ const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
  * 
  * The `data` property is an object containing the validator data extracted from the request based on the configuration.
  * 
- * @param {IValidatorParamConfig} config The validator configuration object.
+ * @param {[config: IValidatorParamConfig, dtoClassOrOptional : IClassConstructor<any> | boolean] | IValidatorParamConfig} options
  * @param {ExecutionContext} ctx The current execution context.
  * @throws {BadRequestException} If the DTO method name is invalid or the DTO class is not a function or the config is invalid (extracted data is not an object).
  * @returns An object with the `dtoClass` and `data` properties.
@@ -113,14 +113,34 @@ const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
  * @example
  * ```typescript
  * @UseValidatorPipe<UsersController>('getCreateUserDto')
- * async myHandler(@ValidatorParam('body') { dtoClass, data }: { dtoClass: InstanceType<any>, data: IDict }) {
+ * async myHandler(@ValidatorParam('body') myHandlerDto : IMyHandlerDto) {
  *   // Use the dtoClass and data properties
  * }
- * async myHandler(@ValidatorParam('body.user.files') { dtoClass, data }: { dtoClass: any, data: IDict }) {
+ * async myHandler(@ValidatorParam('body.user.files') myHandlerDto : IMyHandlerDto) {
  *   // Use the dtoClass and data properties
  * ```
+ * @example
+ * ## Example usage of the ValidatorParam decorator without the UseValidatorPipe decorator.
+ * In this example, the ValidatorParam decorator is use to retrieve a specific property from the request object.
+ * ```typescript
+ * class UsersController {
+ *   async myHandler(@ValidatorParam('body.user.files') myHandlerDto : IMyHandlerDto) {
+ *     // Use the dtoClass and data properties
+ *   }
+ * }
+ * ```
+ * @example
+ * ## Example usage of the ValidatorParam decorator with the a custom dtoClass.
+ * In this example, the ValidatorParam decorator is use to retrieve a specific property from the request object.
+ * ```typescript
+ * class UsersController {
+ *   async myHandler(@ValidatorParam(['body.user.files', CreateUserDto]) myHandlerDto : IMyHandlerDto) {
+ *     // Use the dtoClass and data properties
+ *   }
+ * }
+ * ```
  */
-export const ValidatorParam = createParamDecorator<IValidatorParamConfig, Promise<IValidatorParamResult["data"]>>(async (config: IValidatorParamConfig, ctx: ExecutionContext) => {
+export const ValidatorParam = createParamDecorator<([config: IValidatorParamConfig, dtoClassOrOptional: IClassConstructor<any> | boolean]) | IValidatorParamConfig, Promise<IValidatorParamResult["data"]>>(async (options, ctx: ExecutionContext) => {
     /**
      * Gets the controller instance from the execution context.
      */
@@ -137,45 +157,6 @@ export const ValidatorParam = createParamDecorator<IValidatorParamConfig, Promis
     const req = ctx.switchToHttp().getRequest();
 
     /**
-     * Gets the controller and handler names for error messages.
-     */
-    const controllerName = controller.name, handlerName = handler.name;
-
-    /**
-     * Creates an error message prefix with the controller and handler names.
-     */
-    const errorDetails = `[Controller] : ${controllerName}, [Handler] : ${handlerName}`;
-
-    /**
-     * Gets the DTO method name from the metadata.
-     */
-    const methodName = Reflect.getMetadata(validatorPipeDtoMetadataKey, handler);
-
-    /**
-     * Throws an error if the DTO method name is invalid.
-     */
-    if (!isNonNullString(methodName)) throw new BadRequestException("Invalid Dto method name for validator : " + errorDetails);
-
-    /**
-     * Throws an error if the DTO method is not a function.
-     */
-    if (typeof controller.prototype[methodName] !== "function") {
-        throw new BadRequestException("Invalid dtoClass method : The method " + methodName + " is not a function in controller " + controllerName + " : " + errorDetails);
-    }
-
-    /**
-     * Calls the DTO method to get the DTO instance.
-     */
-    const dtoClass = controller.prototype[methodName]();
-
-    /**
-     * Throws an error if the DTO instance is not a function.
-     */
-    if (typeof dtoClass !== "function") {
-        throw new BadRequestException("Invalid return type for dtoClass getter " + methodName + " is not a function in controller " + controllerName + " : " + errorDetails);
-    }
-
-    /**
      * Creates an object with the request data.
      */
     const inputData: IValidatorParamConfigMap = {
@@ -190,17 +171,17 @@ export const ValidatorParam = createParamDecorator<IValidatorParamConfig, Promis
      */
     let data: IDict = {};
 
+    const [config, dtoClassOrOptional] = Array.isArray(options) ? options : [options];
     /**
      * If the configuration is a function, calls it to get the data.
      */
     if (typeof config === "function") {
         const r = config({ ...inputData, req });
         data = Array.isArray(r) ? r : Object.assign({}, r);
-    }
-    /**
-     * If the configuration is a string, extracts the data from the request.
-     */
-    else if (isNonNullString(config)) {
+    } else if (isNonNullString(config)) {
+        /**
+         * If the configuration is a string, extracts the data from the request.
+         */
         const [key, ...subKeys] = config.split(".");
         data = inputData[key as keyof IValidatorParamConfigMap];
         for (const k of subKeys) {
@@ -215,15 +196,68 @@ export const ValidatorParam = createParamDecorator<IValidatorParamConfig, Promis
          * Throws an error if the data is invalid.
          */
         if (!Array.isArray(data) && !isObj(data)) {
-            throw new BadRequestException("Invalid config data result for validator param : " + config + " in controller " + controllerName + " : " + errorDetails);
+            //throw new BadRequestException("Invalid config data result for validator param : " + config + " in controller " + controllerName + " : " + errorDetails);
         }
     }
+    /**
+     * Gets the controller and handler names for error messages.
+     */
+    const controllerName = controller.name, handlerName = handler.name;
+
+    /**
+     * Creates an error message prefix with the controller and handler names.
+     */
+    const errorDetails = `[Controller] : ${controllerName}, [Handler] : ${handlerName}`;
+
+    /**
+     * Gets the DTO class or method name from the metadata.
+     */
+    const { dtoClassOrGetDtoMethodName, optional: cOptional } = Object.assign({}, Reflect.getMetadata(validatorPipeDtoMetadataKey, handler));
+    const optional = typeof dtoClassOrGetDtoMethodName == "boolean" ? dtoClassOrGetDtoMethodName : !!cOptional;
+    /***
+     * The validator params become optional when the dtoClassOrGetDtoMethodName is undefined or the optional is true
+     */
+    let cannotValidate = optional === true || dtoClassOrGetDtoMethodName === undefined;
+    let dtoClass: IClassConstructor | undefined = typeof dtoClassOrOptional !== "boolean" ? dtoClassOrOptional : undefined;
+    if (isClass(dtoClassOrGetDtoMethodName) || typeof dtoClassOrGetDtoMethodName === "function") {
+        dtoClass = dtoClassOrGetDtoMethodName;
+    } else {
+        if (!cannotValidate) {
+            /**
+             * Throws an error if the DTO method name is invalid.
+             */
+            if (!isNonNullString(dtoClassOrGetDtoMethodName)) throw new BadRequestException("Invalid Dto method name for validator : " + errorDetails);
+
+            /**
+             * Throws an error if the DTO method is not a function.
+             */
+            if (typeof controller.prototype[dtoClassOrGetDtoMethodName] !== "function") {
+                throw new BadRequestException("Invalid dtoClass method : The method " + dtoClassOrGetDtoMethodName + " is not a function in controller " + controllerName + " : " + errorDetails);
+            }
+        }
+        if (isNonNullString(dtoClassOrGetDtoMethodName) && typeof controller.prototype[dtoClassOrGetDtoMethodName] == "function") {
+            /**
+             * Calls the DTO method to get the DTO instance.
+             */
+            dtoClass = controller.prototype[dtoClassOrGetDtoMethodName]();
+        }
+    }
+    const hasDtoValid = isClass(dtoClass) || typeof dtoClass === "function";
+    if (!hasDtoValid && cannotValidate) {
+        return data;
+    }
+    /**
+     * Throws an error if the DTO instance is not a function.
+     */
+    if (!hasDtoValid) {
+        throw new BadRequestException("Invalid return type for dtoClass getter " + dtoClassOrGetDtoMethodName + " is not a function in controller " + controllerName + " : " + errorDetails);
+    }
     try {
-        return await ValidatorPipe.transform({ dtoClass, data });
+        return await ValidatorPipe.staticTransform({ dtoClass, data }, {} as any);
     } catch (e) {
         throw new BadRequestException(e)
     }
-},);
+});
 
 /**
  * Creates a method decorator that enables validation for a controller method.
@@ -231,18 +265,56 @@ export const ValidatorParam = createParamDecorator<IValidatorParamConfig, Promis
  * This decorator uses the `ValidatorPipe` to validate the request data and sets the `validatorPipeDtoMetadataKey` metadata to specify the DTO method name.
  * 
  * @template T The type of the controller class.
- * @param {keyof T} getDtoMethodName The name of the method that returns the DTO instance.
+ * @param {keyof T} dtoClassOrGetDtoMethodName The dto class or The name of the method that returns the DTO class.
+ * @param {boolean} optional Whether to make the method optional. Default is false. If set to true, the method validates the request data and returns the validated data only if the data and dtoClass are provided.
  * @returns A method decorator that enables validation for a controller method.
  * 
  * @example
+ * 
+ * ## Example usage with ValidatorParam decorator and @UseValidatorPipe decorator.
+ * In this example, the `getCreateUserDto` method returns the `CreateUserDto` class. The `CreateUserDto` class is used to validate the request data.
+ * This example is useful when you want to validate data based on dynamic DTO classes.
  * ```typescript
- * @UseValidatorPipe<UsersController>('getCreateUserDto')
- * async myMethod(@ValidatorParam('body') { dtoClass, data }: { dtoClass: InstanceType<any>, data: IDict }) {
- *   // Use the dtoClass and data properties
+ * class UsersController {
+ *      @UseValidatorPipe<UsersController>('getCreateUserDto')
+ *      async myMethod(@ValidatorParam('body') bodyData: IMyMethodDto) {
+*          // Use the dtoClass and data properties
+ *      }
+ *      getCreateUserDto(): IClassConstructor<Partial<User>> {
+ *          return CreateUserDto;
+ *      }
  * }
  * ```
+ * @example 
+ * ## Example usage without ValidatorParam decorator and @UseValidatorPipe decorator.
+ * ```typescript
+ * class UsersController {
+ *   async create(@Body(new ValidatorPide(CreateUserDto)) createUserDto: CreateUserDto) {}
+ * }
+ * ```
+ * @example
+ * ## Example usage with the UsePipes decorator.
+ * ```typescript
+ * import { UsePipes } from '@nestjs/common';
+ * class UsersController {
+ *   @UsePipes(new ValidatorPipe(CreateUserDto))
+ *   async create(@Body() createUserDto: CreateUserDto) {}
+ * }
+ * ```
+ * @example
+ * ## Example : Optional validation. In this example, the data are validated only if the getDtoClass method returns a valid dtoClass.
+ * ```typescript
+ * class UsersController {
+ *   @UseValidatorPipe<UsersController>('getCreateUserDto', true)
+ *   async myMethod(@ValidatorParam('body') bodyData: IMyMethodDto) {
+ *     // Use the dtoClass and data properties
+ *   }
+*   getCreateUserDto(): IClassConstructor<Partial<User>> {
+*     return undefined; //invalid dtoClass, The data are not validated, because the dtoClass is not valid and the optional parameter is set to true.
+*   }
+ * }
  */
-export function UseValidatorPipe<T extends InstanceType<any> = any>(getDtoMethodName: keyof T): MethodDecorator {
+export function UseValidatorPipe<T extends InstanceType<any> = any>(dtoClassOrGetDtoMethodName: (IClassConstructor<any> | keyof T), optional?: boolean): MethodDecorator {
     /**
      * Returns a method decorator that enables validation for a controller method.
      * 
@@ -259,31 +331,81 @@ export function UseValidatorPipe<T extends InstanceType<any> = any>(getDtoMethod
         /**
          * Sets the `validatorPipeDtoMetadataKey` metadata to specify the DTO method name.
          */
-        SetMetadata(validatorPipeDtoMetadataKey, getDtoMethodName)(target, propertyKey, descriptor);
+        SetMetadata(validatorPipeDtoMetadataKey, {
+            dtoClassOrGetDtoMethodName,
+            optional,
+        })(target, propertyKey, descriptor);
     };
 }
 
 /**
  * A pipe that validates the input data using a DTO class.
  * 
- * This pipe takes an object with a `dtoClass` property and a `data` property, and validates the `data` using the `dtoClass`.
- * 
+ *
  * If the validation fails, it throws a `BadRequestException` with the validation errors.
  * 
+ *  * 
  * @example
+ * 
+ * ## Example usage with ValidatorParam decorator and @UseValidatorPipe decorator.
+ * In this example, the `getCreateUserDto` method returns the `CreateUserDto` class. The `CreateUserDto` class is used to validate the request data.
+ * This example is useful when you want to validate data based on dynamic DTO classes.
  * ```typescript
- * @UseValidatorPipe<UsersController>('getCreateUserDto')
- * async myHandler(@ValidatorParam('body') createUserDto: CreateUserDto) {
- *   // Use the validated data
+ * class UsersController {
+ *      @UseValidatorPipe<UsersController>('getCreateUserDto')
+ *      async myMethod(@ValidatorParam('body') { dtoClass, data }: { dtoClass: InstanceType<any>, data: IDict }) {
+*          // Use the dtoClass and data properties
+ *      }
+ *      getCreateUserDto(): IClassConstructor<Partial<User>> {
+ *          return CreateUserDto;
+ *      }
+ * }
+ * ```
+ * @example 
+ * ## Example usage without ValidatorParam decorator and @UseValidatorPipe decorator.
+ * ```typescript
+ * class UsersController {
+ *   async create(@Body(new ValidatorPide(CreateUserDto)) createUserDto: CreateUserDto) {}
+ * }
+ * ```
+ * @example
+ * ## Example usage with the UsePipes decorator.
+ * ```typescript
+ * import { UsePipes } from '@nestjs/common';
+ * class UsersController {
+ *   @UsePipes(new ValidatorPipe(CreateUserDto))
+ *   async create(@Body() createUserDto: CreateUserDto) {}
  * }
  * ```
  */
 @Injectable()
-class ValidatorPipe {
+export class ValidatorPipe implements PipeTransform<IValidatorParamResult, Promise<IValidatorParamResult["data"]>> {
     /**
-     * Constructor.
+     * Constructs a new instance of the `ValidatorPipe` class.
+     * 
+     * @param dtoClass - An optional class constructor for the DTO class to be used for validation.
      */
-    constructor() { }
+    constructor(readonly dtoClass?: IClassConstructor<any>) { }
+    /**
+     * Transforms the input value by validating it using the DTO class.
+     *
+     * If the `dtoClass` property is a valid class constructor, it calls the `ValidatorPipe.staticTransform` method to validate the input data.
+     * If the `dtoClass` property is not a valid class constructor, it throws a `BadRequestException` with an error message.
+     *
+     * @param value The input value to be validated.
+     * @param metadata The metadata of the argument.
+     * @returns The validated data.
+     * @throws {BadRequestException} If the validation fails or the `dtoClass` is invalid.
+     */
+    async transform(value: IValidatorParamResult, metadata: ArgumentMetadata): Promise<IValidatorParamResult["data"]> {
+        if (isClass(this.dtoClass) || typeof this.dtoClass === "function") {
+            return ValidatorPipe.staticTransform({
+                dtoClass: this.dtoClass,
+                data: value,
+            }, metadata);
+        }
+        throw new BadRequestException("Invalid dtoClass for validator pipe " + this.constructor.name);
+    }
 
     /**
      * Transforms the input value by validating it using the DTO class.
@@ -293,8 +415,7 @@ class ValidatorPipe {
      * @returns The validated data.
      * @throws {BadRequestException} If the validation fails.
      */
-    static async transform(value: IValidatorParamResult, metadata?: ArgumentMetadata): Promise<IValidatorParamResult["data"]> {
-        const separators = Validator.separators;
+    static async staticTransform(value: IValidatorParamResult, metadata?: ArgumentMetadata): Promise<IValidatorParamResult["data"]> {
         /**
          * Checks if the input value is an object with a `dtoClass` property.
          */

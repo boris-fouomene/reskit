@@ -3,6 +3,7 @@ import { ResourceService } from './resource.service';
 import { IClassConstructor, IResourceData } from '@resk/core';
 import { UseValidatorPipe, ValidatorParam } from './pipes';
 
+class EmptyDtoClass { }
 
 /**
  * The `ResourceController` class is a NestJS controller that provides CRUD operations for a resource.
@@ -14,7 +15,7 @@ import { UseValidatorPipe, ValidatorParam } from './pipes';
  */
 @Controller()
 //@UseFilters(MainExceptionFilter)
-export abstract class ResourceController<DataType extends IResourceData = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
+export class ResourceController<DataType extends IResourceData = any, ServiceType extends ResourceService<DataType> = ResourceService<DataType>> {
   /**
    * Initializes the `ResourceController` instance with the provided `ResourceService`.
    * If the `resourceName` property is not set on the `ResourceService` constructor, it is set to the `resourceName` property of the `ResourceController` instance.
@@ -31,7 +32,7 @@ export abstract class ResourceController<DataType extends IResourceData = any, S
   async getOne(@Param() params: any) {
     return await this.getResourceService().findOne(params.id);
   }
-  @UseValidatorPipe<ResourceController>('getCreateDtoClass')
+  @UseValidatorPipe<ResourceController>('getCreateDtoClass', true)
   @Post()
   async create(@ValidatorParam("body") createResourceDto: Partial<DataType>) {
     return this.getResourceService().create(createResourceDto);
@@ -40,7 +41,7 @@ export abstract class ResourceController<DataType extends IResourceData = any, S
   delete(@Param() params: any) {
     return this.getResourceService().delete(params.id);
   }
-  @UseValidatorPipe<ResourceController>('getUpdateDtoClass')
+  @UseValidatorPipe<ResourceController>('getUpdateDtoClass', true)
   @Put(':id')
   update(@Param() params: any, @ValidatorParam("body") updateResourceDto: Partial<DataType>) {
     return this.getResourceService().update(params.id, updateResourceDto);
@@ -49,14 +50,17 @@ export abstract class ResourceController<DataType extends IResourceData = any, S
    * Retrieve the dto class for create request
    * @returns {T} The dto class for create request
    */
-  abstract getCreateDtoClass(): IClassConstructor<Partial<DataType>>;
+  getCreateDtoClass(): IClassConstructor<Partial<DataType>> {
+    return EmptyDtoClass;
+  }
 
   /***
    * Retrieve the dto class for update request
    * @returns {T} The dto class for update request
    */
-  abstract getUpdateDtoClass(): IClassConstructor<Partial<DataType>>;
-
+  getUpdateDtoClass(): IClassConstructor<Partial<DataType>> {
+    return EmptyDtoClass;
+  }
 
   /**
    * Gets the `ResourceService` instance associated with the `ResourceController` instance.

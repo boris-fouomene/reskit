@@ -8,11 +8,17 @@
     "target": "ES2021",
     "moduleResolution": "node",
     "paths": {
-      "@modules/*": [
-        "./src/modules/*"
+      "@esource/*": [
+        "./src/modules/esource/*"
       ],
-      "@examples/*": [
-        "./src/examples/*"
+      "@esource": [
+        "./src/modules/esource"
+      ],
+      "@i18n/*": [
+        "./src/modules/i18n/*"
+      ],
+      "@i18n": [
+        "./src/modules/i18n"
       ],
       "@auth/*": [
         "./src/modules/auth/*"
@@ -38,11 +44,11 @@
       "@mongoose": [
         "./src/modules/mongoose"
       ],
-      "@nestjs/*": [
-        "./node_modules/@nestjs/*"
+      "@modules/*": [
+        "./src/modules/*"
       ],
-      "@nestjs": [
-        "./node_modules/@nestjs"
+      "@examples/*": [
+        "./src/examples/*"
       ],
     }
   },

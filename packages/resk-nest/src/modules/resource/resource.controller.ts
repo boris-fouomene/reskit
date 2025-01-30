@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, Put, Logger } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ResourceService } from './resource.service';
 import { IClassConstructor, IResourceData } from '@resk/core';
 import { UseValidatorPipe, ValidatorParam } from './pipes';

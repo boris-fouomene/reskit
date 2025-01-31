@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ResourceController, ValidatorPipe } from '@resource';
 import { User } from './entities/user.entity'
@@ -14,6 +14,10 @@ export class UsersController extends ResourceController<User, UsersService> {
   }
   constructor(protected readonly resourceService: UsersService) {
     super(resourceService);
+  }
+  @Get('me')
+  getMe() {
+    return this.resourceService.getMe();
   }
 }
 

@@ -41,12 +41,11 @@ import { DatabaseModule } from '../database.module';
   }
 })
 export class UsersService extends TypeOrmResourceService<User, string> {
-  constructor(@Inject(DatabaseModule.name) protected dataSource: DataSource, @Inject("I18N") i18n: I18n) {
-    console.log(i18n.t('greeting', { name: 'John' }));
+  constructor(@Inject(DatabaseModule.name) protected dataSource: DataSource, @Inject("I18N") readonly i18n: I18n) {
     super(dataSource, User);
   }
   @Get('me')
   getMe() {
-    return "me";
+    return this.i18n.t('greeting', { name: 'John' });
   }
 }

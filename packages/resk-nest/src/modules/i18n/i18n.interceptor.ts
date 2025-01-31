@@ -96,7 +96,7 @@ export class I18nInterceptor implements NestInterceptor {
    * }
    * ```
    */
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  async intercept(context: ExecutionContext, next: CallHandler) {
     /**
      * Gets the incoming request from the ExecutionContext.
      */
@@ -109,10 +109,10 @@ export class I18nInterceptor implements NestInterceptor {
      */
     const lang = defaultStr(Object.assign({}, request.headers)['accept-language'], Object.assign({}, request.headers)['Accept-Language'], 'en');
 
-    /**
+    /** 
      * Sets the locale using the I18n instance.
      */
-    this.i18n.setLocale(lang);
+    await this.i18n.setLocale(lang);
 
     /**
      * Calls the next handler in the request pipeline.

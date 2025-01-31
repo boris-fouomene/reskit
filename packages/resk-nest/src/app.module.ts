@@ -7,20 +7,13 @@ import { ProtectedModule } from '@examples/protected/protected.module'
 import { DatabaseModule } from '@examples/typeorm/database.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { I18nInterceptor } from '@i18n/i18n.interceptor';
-import { I18n } from '@resk/core';
-import { I18nModule, I18nService } from '@i18n/i18n.module';
+import { I18nModule } from '@i18n/i18n.module';
 @Module({
   imports: [
     I18nModule.forRoot({
-      translations: {
-        en: {
-          greeting: "Hello, %{name}!",
-          farewell: "Goodbye!",
-        },
-        fr: {
-          greeting: "Bonjour, %{name}!",
-          farewell: "Au revoir!",
-        },
+      locales: ["en", "fr"],
+      namespaces: {
+        'common': async (locale) => await import(`./locales/common.${locale}.json`),
       }
     }),
     DatabaseModule,

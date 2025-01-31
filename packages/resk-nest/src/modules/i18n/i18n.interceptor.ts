@@ -5,7 +5,6 @@ import {
   CallHandler,
   Inject,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { defaultStr, I18n } from '@resk/core';
 
 /**
@@ -107,8 +106,10 @@ export class I18nInterceptor implements NestInterceptor {
      * 
      * If the 'Accept-Language' header is not present, it defaults to 'en'.
      */
-    const lang = defaultStr(Object.assign({}, request.headers)['accept-language'], Object.assign({}, request.headers)['Accept-Language'], 'en');
-
+    let lang = defaultStr(Object.assign({}, request.headers)['accept-language'], Object.assign({}, request.headers)['Accept-Language'], 'en');
+    if (!this.i18n.hasLocale(lang)) {
+      lang = "en";
+    }
     /** 
      * Sets the locale using the I18n instance.
      */

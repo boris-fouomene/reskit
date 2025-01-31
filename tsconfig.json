@@ -38,10 +38,12 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "**/*.json",
     "ts-paths-to-vite-alias.mjs",
     "packages/resk-tamagui/vite.config.mjs",
     "jest.config.js",
-    "packages/resk-core/jest.config.js"
+    "packages/resk-core/jest.config.js",
+    "packages/resk-nest/src/locales/common.js"
   ],
   "exclude": [
     "**/node_modules/*",

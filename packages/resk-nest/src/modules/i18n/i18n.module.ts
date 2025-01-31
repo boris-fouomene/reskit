@@ -90,6 +90,12 @@ export class I18nModule {
          * When "true", makes a module global-scoped.
          */
         global?: boolean;
+
+        /***
+         * The list of supported locales.
+         * This is used to determine whether a locale is supported or not.
+         */
+        locales?: string[];
     }): DynamicModule {
         options = Object.assign({}, options);
         // Create a copy of the namespacesToResolve object to avoid mutation
@@ -104,6 +110,9 @@ export class I18nModule {
         (isObj(options.translations) ? [options.translations] : Array.isArray(options.translations) ? options.translations : []).map(translation => {
             i18n.registerTranslations(translation);
         });
+        if (Array.isArray(options.locales) && options.locales.length > 0) {
+            i18n.setLocales(options.locales);
+        }
         // Return the dynamic module configuration
         return {
             module: I18nModule,

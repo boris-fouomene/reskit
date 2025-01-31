@@ -470,7 +470,18 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      */
     public setLocales(locales: string[]) {
         this._locales = Array.isArray(locales) ? locales : ["en"];
+        if (!this._locales.includes("en")) {
+            this._locales.push("en");
+        }
         return this.getLocales();
+    }
+    /***
+     * returns true if the locale is supported by a i18n instance.
+     * @param locale - The locale to check.
+     * @returns true if the locale is supported, false otherwise.
+     */
+    public hasLocale(locale: string) {
+        return isNonNullString(locale) && this.getLocales().includes(locale);
     }
 
     /**
@@ -512,7 +523,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * If this is the default i18n instance, it will also set the locale in the session.
      * @param locale - The new locale to set.
      */
-    set locale(locale: string) {
+    private set locale(locale: string) {
         if (this.locale == locale) {
             return;
         }
@@ -554,9 +565,9 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
                 this.once("locale-changed", (locale, translations) => {
                     _resolve(translations);
                 });
-                this.once("namespace-loaded", (namespace, locale, translations) => {
+                /* this.once("namespace-loaded", (namespace, locale, translations) => {
                     _resolve(translations);
-                });
+                }); */
             };
         });
     }
@@ -651,10 +662,15 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         const translations: II18nTranslation = {};
         locale = defaultStr(locale, this.getLocale());
         this._isLoading = true;
+        //const errors : any[] = [];
         for (const namespace in this.namespaceResolvers) {
             if (this.namespaceResolvers.hasOwnProperty(namespace) && typeof this.namespaceResolvers[namespace] === "function") {
-                namespaces.push(this.namespaceResolvers[namespace](locale).then((trs) => {
-                    extendObj(translations, trs);
+                namespaces.push(new Promise((resolve, reject) => {
+                    this.namespaceResolvers[namespace](locale).then((trs) => {
+                        extendObj(translations, trs);
+                    }).finally(() => {
+                        resolve(true);
+                    })
                 }));
             }
         }

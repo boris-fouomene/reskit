@@ -1,6 +1,5 @@
 import { I18n, II18nTranslation, isObj } from '@resk/core';
-import { DynamicModule } from '@nestjs/common';
-
+import { DynamicModule, Inject, Injectable } from '@nestjs/common';
 
 /**
  * A dynamic NestJS module for managing internationalization (i18n) within the application.
@@ -67,12 +66,12 @@ export class I18nModule {
      * })
      * export class AppModule {}
      */
-    static forRoot(options: {
+    static forRoot(options?: {
         /***
          * The namespaces to register for the module.
          * If provided, the namespaces will be registered for the module.
          */
-        namespaces: { [key: string]: Parameters<typeof I18n.RegisterNamespaceResolver>[1]; }
+        namespaces?: { [key: string]: Parameters<typeof I18n.RegisterNamespaceResolver>[1]; }
         /***
          * The translations to load for the module.
          * If provided, the translations will be loaded for the module.
@@ -85,6 +84,12 @@ export class I18nModule {
          * Default value is `false`.
          */
         createNewInstance?: boolean;
+
+
+        /***
+         * When "true", makes a module global-scoped.
+         */
+        global?: boolean;
     }): DynamicModule {
         options = Object.assign({}, options);
         // Create a copy of the namespacesToResolve object to avoid mutation
@@ -102,6 +107,7 @@ export class I18nModule {
         // Return the dynamic module configuration
         return {
             module: I18nModule,
+            global: typeof options.global === "boolean" ? options.global : true,
             imports: [],
             providers: [
                 {
@@ -116,4 +122,9 @@ export class I18nModule {
             exports: [I18nModule, "I18N"]
         }
     }
+}
+
+@Injectable()
+export class I18nService {
+
 }

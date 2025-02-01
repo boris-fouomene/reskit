@@ -4,10 +4,10 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common';
-import { defaultStr, IResourceData, IResourcePrimaryKey } from '@resk/core';
+import { defaultStr } from '@resk/core';
 import { ResourceController } from '@resource/resource.controller';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { IResourceControllerInferDataType } from '@resource/interfaces';
 
 
@@ -124,7 +124,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
     protected getHanlder(): keyof ControllerType {
         return (this.getRequest()?.getHandler()?.name as keyof ControllerType);
     }
-    protected getMethod(context: ExecutionContext): string {
+    getMethod(context: ExecutionContext): string {
         return defaultStr(context.switchToHttp()?.getRequest()?.method);
     }
     async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
@@ -139,7 +139,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
             return throwError(() => error); // Re-throw the caught exception
         }
         return next.handle().pipe(
-            tap(async (response) => {
+            map(async (response) => {
                 try {
                     // Perform async operation after the method execution, passing the response
                     const data = await this.performAfterAction(handler, context, response);
@@ -158,18 +158,21 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
             }),
         );
     }
-    protected async beforeUnknow(handler: keyof ControllerType, context: ExecutionContext): Promise<any> {
-        return Object.assign({}, context.switchToHttp().getRequest().body);
-    }
+    /***
+     * Hooks for `beforeUnknow` actions (to be overridden by subclasses)
+     * This hook is triggered when the method is not found in the controller.
+     * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
+     * @param {ExecutionContext} context - The execution context.
+     * @returns {Promise<any>}
+     */
+    async beforeUnknow(handler: keyof ControllerType, context: ExecutionContext): Promise<any> { }
     /***
      * Hooks for `before` actions (to be overridden by subclasses)
      * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
      * @param {ExecutionContext} context - The execution context.
-     * @param data - The data being processed.
-     * @param request - The request object.
-     * @returns The modified data.
+     * @returns {Promise<any>}
      */
-    protected async performBeforeAction(
+    async performBeforeAction(
         /***
          * The name of the method being executed from the controller.
          */
@@ -195,8 +198,14 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
         }
     }
 
-    // Define the `after` hooks
-    protected async performAfterAction(handler: keyof ControllerType, context: ExecutionContext, result: any) {
+    /***
+     * Hook for `after` actions (to be overridden by subclasses)
+     * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
+     * @param {ExecutionContext} context - The execution context.
+     * @param {IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>} result - The result of the method execution.
+     * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
+     */
+    async performAfterAction(handler: keyof ControllerType, context: ExecutionContext, result: any): Promise<any> {
         switch (handler) {
             case 'getMany':
                 return await this.afterGetMany(result, context);
@@ -215,19 +224,21 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
     /***
      * Hooks for `before` actions (to be overridden by subclasses)
      * @param {ExecutionContext} context - The execution context.
+     * @returns {Promise<any>}
      */
-    protected beforeGetMany(context: ExecutionContext) { }
+    async beforeGetMany(context: ExecutionContext): Promise<any> { }
     /***
      * Hooks for `before` actions (to be overridden by subclasses)
      * @param {ExecutionContext} context - The execution context.
+     * @return {Promise<any>}
      */
-    protected beforeGetOne(context: ExecutionContext) { }
+    async beforeGetOne(context: ExecutionContext): Promise<any> { }
     /***
      * Hooks for `before` actions (to be overridden by subclasses)
      * @param {ExecutionContext} context - The execution context.
      * @throws {BadRequestException}, if the data is invalid. Possible reason : The request data is invalid or doesn't meet the requirements for creating a resource. Example: Missing required fields, invalid data format, or duplicate resource creation.
      */
-    protected async beforeCreate(context: ExecutionContext) {
+    async beforeCreate(context: ExecutionContext): Promise<any> {
         return Object.assign({}, context.switchToHttp().getRequest().body);
     }
     /***
@@ -235,12 +246,12 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @param {ExecutionContext} context - The execution context.
      * @throws {BadRequestException|Error}, if the data is invalid. Possible reason : The request data is invalid or doesn't meet the requirements for creating a resource. Example: Missing required fields, invalid data format, or duplicate resource creation.
      */
-    protected async beforeUpdate(context: ExecutionContext) { }
+    async beforeUpdate(context: ExecutionContext): Promise<any> { }
     /***
      * Hooks for `before` actions (to be overridden by subclasses)
      * @param {ExecutionContext} context - The execution context.
      */
-    protected beforeDelete(context: ExecutionContext) { }
+    async beforeDelete(context: ExecutionContext): Promise<any> { }
 
     /***
      * Hooks for `after` actions (to be overridden by subclasses)
@@ -249,7 +260,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @param {IResourceControllerInferDataType<ControllerType>[]} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterGetMany(result: IResourceControllerInferDataType<ControllerType>[], context: ExecutionContext) {
+    async afterGetMany(result: IResourceControllerInferDataType<ControllerType>[], context: ExecutionContext): Promise<any> {
         return result;
     }
     /***
@@ -259,7 +270,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @param {IResourceControllerInferDataType<ControllerType>|null} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterGetOne(result: IResourceControllerInferDataType<ControllerType> | null, context: ExecutionContext) {
+    async afterGetOne(result: IResourceControllerInferDataType<ControllerType> | null, context: ExecutionContext): Promise<any> {
         return result;
     }
     /***
@@ -269,7 +280,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @param {IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterCreate(result: IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>, context: ExecutionContext) {
+    async afterCreate(result: IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>, context: ExecutionContext): Promise<any> {
         return result;
     }
     /***
@@ -279,7 +290,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @param {IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterUpdate(result: IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>, context: ExecutionContext) {
+    async afterUpdate(result: IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>, context: ExecutionContext): Promise<any> {
         return result;
     }
     /***
@@ -289,7 +300,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @param {boolean|number} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterDelete(result: boolean | number, context: ExecutionContext) {
+    async afterDelete(result: boolean | number, context: ExecutionContext): Promise<any> {
         return result;
     }
 
@@ -300,7 +311,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @param {ExecutionContext} context - The execution context.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterUnknow(result: any, handler: keyof ControllerType, context: ExecutionContext) {
+    async afterUnknow(result: any, handler: keyof ControllerType, context: ExecutionContext): Promise<any> {
         return result;
     }
 }

@@ -1,5 +1,6 @@
 import { DynamicModule } from '@nestjs/common';
-import { I18nModule } from '../i18n';
+import { I18nInterceptor, I18nModule } from '../i18n';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 /**
  * The `ResourceModule` is a global NestJS module that provides the `ResourceService` and a configurable `serviceProvider`.
  * It can be imported and configured using the `forRoot()` static method, which takes an object with a `serviceProvider` property.
@@ -29,8 +30,13 @@ export class ResourceModule {
     return {
       global: typeof options.global === 'boolean' ? options.global : true,
       module: ResourceModule,
-      imports: [I18nModule.forRoot({ namespaces: {} })],
-      providers: [],
+      imports: [I18nModule.forRoot()],
+      providers: [
+        {
+          provide: APP_INTERCEPTOR,
+          useClass: I18nInterceptor,
+        }
+      ],
       exports: []
     };
   }

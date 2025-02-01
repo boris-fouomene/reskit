@@ -1,4 +1,4 @@
-import { Body, Controller, ExecutionContext, Get, Injectable, Post, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, ExecutionContext, Get, HttpException, HttpStatus, Injectable, Post, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ResourceController, ValidatorPipe } from '@resource';
 import { User } from './entities/user.entity'
@@ -8,10 +8,12 @@ import { ResourceInterceptor } from '@resource/interceptors';
 @Injectable()
 class UsersInterceptor extends ResourceInterceptor<UsersController> {
   async afterGetMany(result: User[], context: ExecutionContext) {
-    console.log("afterGetMany ", result);
-    return result;
+    return {
+      data: result,
+      success: true,
+    }
   }
-  beforeGetMany(context: ExecutionContext): void {
+  async beforeGetMany(context: ExecutionContext) {
     console.log("beforeGetMany ", this.getRequest().params);
   }
 }
@@ -34,6 +36,7 @@ export class UsersController extends ResourceController<User, UsersService> {
   /***
    * Example of intercepted request
    */
+  @Get()
   getMany(): Promise<User[]> {
     return super.getMany();
   }

@@ -6,3 +6,4 @@ export * from "./exceptions";
 export * from "./pipes";
 export * from "./translations";
 export * from "../typeorm";
+export * from "./interceptors";

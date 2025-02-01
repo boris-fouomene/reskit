@@ -239,7 +239,6 @@ export class AuthGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const strategyName = defaultStr(request?.body?.strategy, request?.query?.strategy);
         const { name } = AuthGuard.getStrategy(strategyName);
-        const instance = new (PassportAuthGuard(name))();
-        return instance.canActivate(context);
+        return new (PassportAuthGuard(name))().canActivate(context);
     }
 }

@@ -266,18 +266,20 @@ export type IMangoLogicalOperatorName = keyof IMangoLogicalOperators;
 export type IMangoComparisonOperatorName = keyof IMangoComparisonOperators;
 
 /**
+ * @interface {IResourceQueryOptionsOrderDirection}
  * Type representing the direction of sorting operations.
  * 
- * This type can be either 'asc' for ascending order or 'desc' for descending order.
+ * This type can be either 'asc' |'ASC' for ascending order or 'desc' | 'DESC' for descending order.
  * 
  * @example
- * // Valid examples of IMangoOrderByDirection
- * const ascending: IMangoOrderByDirection = 'asc';  // Ascending order
- * const descending: IMangoOrderByDirection = 'desc'; // Descending order
+ * // Valid examples of IResourceQueryOptionsOrderDirection
+ * const ascending: IResourceQueryOptionsOrderDirection = 'asc';  // Ascending order
+ * const descending: IResourceQueryOptionsOrderDirection = 'desc'; // Descending order
  */
-export type IMangoOrderByDirection = 'asc' | 'desc';
+export type IResourceQueryOptionsOrderDirection = 'asc' | 'desc' | 'ASC' | 'DESC';;
 
 /**
+ * @interface IResourceQueryOptionsOrderBy
  * Type representing the sorting criteria for filtering operations.
  * 
  * This type can be a string representing a single field to sort by, an object
@@ -285,12 +287,12 @@ export type IMangoOrderByDirection = 'asc' | 'desc';
  * of such objects for multiple sorting criteria.
  * 
  * @example
- * // Valid examples of IMangoOrderBy
- * const singleFieldSort: IMangoOrderBy = 'name'; // Sort by the 'name' field
- * const objectSort: IMangoOrderBy = { age: 'asc', name: 'desc' }; // Sort by 'age' ascending and 'name' descending
- * const arraySort: IMangoOrderBy = [{ age: 'asc' }, { name: 'desc' }]; // Sort by 'age' ascending and 'name' descending using an array
+ * // Valid examples of IResourceQueryOptionsOrderBy
+ * const singleFieldSort: IResourceQueryOptionsOrderBy = 'name'; // Sort by the 'name' field
+ * const objectSort: IResourceQueryOptionsOrderBy = { age: 'asc', name: 'desc' }; // Sort by 'age' ascending and 'name' descending
+ * const arraySort: IResourceQueryOptionsOrderBy = [{ age: 'asc' }, { name: 'desc' }]; // Sort by 'age' ascending and 'name' descending using an array
  */
-export type IMangoOrderBy<DataType = any> = string | { [field in keyof DataType]: IMangoOrderByDirection } | Array<{ [field in keyof DataType]: IMangoOrderByDirection }>;
+export type IResourceQueryOptionsOrderBy<DataType = any> = string | { [field in keyof DataType]: IResourceQueryOptionsOrderDirection } | Array<{ [field in keyof DataType]: IResourceQueryOptionsOrderDirection }>;
 
 
 /**

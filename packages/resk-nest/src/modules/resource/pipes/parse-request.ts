@@ -1,5 +1,7 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
-import { flattenObject, IDict, isNonNullString, isObj } from "@resk/core";
+import { PaginationHelper } from "@resk/core";
+import { defaultBool, defaultObj, defaultVal, flattenObject, getQueryParams, IDict, IMangoQuery, IResourceData, IResourceQueryOptions, IResourceQueryOptionsOrderDirection, isNonNullString, isObj, isStringNumber, Resource } from "@resk/core";
+import { parse } from "path";
 
 /**
  * @interface IParseRequestConfigMap
@@ -64,6 +66,11 @@ export interface IParseRequestConfigMap<T extends IDict = IDict> {
      * console.log(requestHeaders); // Output: { 'Content-Type': 'application/json' }
      */
     headers: T;
+
+    /***
+     * An object containing the query options passed through the request
+     */
+    queryOptions: IResourceQueryOptions<T>
 }
 
 
@@ -97,90 +104,201 @@ export type IParseRequestConfig =
     | ((options: IParseRequestConfigMap, context: ExecutionContext) => any);
 
 
+
 /**
- * Parses the request based on the provided configuration and execution context.
- * 
- * @param {IParseRequestConfig} config - The configuration for parsing the request.
- * @param {ExecutionContext} ctx - The execution context containing the request information.
- * 
- * @returns {Promise<IDict>} - A promise that resolves to the parsed data.
+ * A class that provides methods for parsing request data from the request object.
  * 
  * @example
  * // Example usage:
- * const config: IParseRequestConfig = 'body.key';
- * const context: ExecutionContext = getContext();
- * parseRequest(config, context).then(parsedData => {
- *   console.log(parsedData); // Output: value of body.key
- * });
+ * const parsedData = await RequestParser.parseRequest(config, ctx);
  */
-export async function parseRequest(config: IParseRequestConfig, ctx: ExecutionContext): Promise<IDict> {
-
+export class RequestParser {
     /**
-     * Gets the request instance from the execution context.
+     * The query options parser function.
+     * This function is used to parse the query options from the request.
+     * It takes an {@link ExecutionContext} as an argument and returns an {@link IResourceQueryOptions} object.
+     * 
+     * @type {(ctx: ExecutionContext,parseResult: IResourceQueryOptions<any>,queryParams: IDict) => IResourceQueryOptions<any>}
+     * @memberof RequestParser
+     * @static
+     * @returns {IResourceQueryOptions<any>} The parsed query options.
+     * @example
+     * ## Example usage: 
+     * ## In this example, the queryOptionsParser function is set to a function that returns an object with a where property.
+     * ```typescript
+     * RequestParser.queryOptionsParser = (ctx) => {
+     *   return { where: { id: ctx.getRequest().params.id } };
+     * };
+     * ```
+     * // The parsed query options are used to filter the data from the database.
+     * // These options are used in methods of the resource service like:
+     * // findOne, find, findAndCount, findAndPaginate, createMany, updateMany, deleteMany
+     */
+    static queryOptionsParser?: (ctx: ExecutionContext, parseResult: IResourceQueryOptions<any>, queryParams: IDict) => IResourceQueryOptions<any>;
+    /**
+     * Parses the request based on the provided configuration and execution context.
+     * 
+     * @param {IParseRequestConfig} config - The configuration for parsing the request.
+     * @param {ExecutionContext} ctx - The execution context containing the request information.
+     * 
+     * @returns {Promise<IDict>} - A promise that resolves to the parsed data.
      * 
      * @example
-     * const req = ctx.switchToHttp().getRequest();
+     * // Example usage:
+     * const config: IParseRequestConfig = 'body.key';
+     * const context: ExecutionContext = getContext();
+     * parseRequest(config, context).then(parsedData => {
+     *   console.log(parsedData); // Output: value of body.key
+     * });
      */
-    const req = ctx.switchToHttp().getRequest();
-
-    const inputData: IParseRequestConfigMap = {
-        body: Array.isArray(req.body) ? req.body : Object.assign({}, req.body),
-        query: Object.assign({}, req.query),
-        params: Object.assign({}, req.params),
-        headers: Object.assign({}, req.headers),
-    };
-
-    let data: any = undefined;
-
-    /**
-     * If the configuration is a function, calls it to get the data.
-     * 
-     * @example
-     * if (typeof config === "function") {
-     *   return await config(inputData, ctx);
-     * }
-     */
-    if (typeof config === "function") {
-        return await config(inputData, ctx);
-    } else if (isNonNullString(config)) {
+    static async parseRequest(config: IParseRequestConfig, ctx: ExecutionContext): Promise<IDict> {
         /**
-         * If the configuration is a string, extracts the data from the request.
+         * Gets the request instance from the execution context.
          * 
          * @example
-         * const d = flattenObject(data);
-         * if (Object.hasOwnProperty.call(d, config)) {
-         *   return d[config];
-         * }
-         * const [key, ...subKeys] = config.split(".");
-         * data = inputData[key as keyof IParseRequestConfigMap];
-         * for (const k of subKeys) {
-         *   if (isObj(data)) {
-         *     data = data[k];
-         *   } else {
-         *     data = undefined as any;
-         *     break;
-         *   }
+         * const req = ctx.switchToHttp().getRequest();
+         */
+        const req = ctx.switchToHttp().getRequest();
+
+        const inputData: IParseRequestConfigMap = {
+            body: Array.isArray(req.body) ? req.body : Object.assign({}, req.body),
+            query: Object.assign({}, req.query),
+            params: Object.assign({}, req.params),
+            headers: Object.assign({}, req.headers),
+            queryOptions: typeof config == "string" && String(config).startsWith("queryOptions") ? RequestParser.parseQueryOptions(ctx) : {} as IResourceQueryOptions<any>
+        };
+
+        let data: any = undefined;
+
+        /**
+         * If the configuration is a function, calls it to get the data.
+         * 
+         * @example
+         * if (typeof config === "function") {
+         *   return await config(inputData, ctx);
          * }
          */
-        const d = flattenObject(data);
-        if (Object.hasOwnProperty.call(d, config)) {
-            return d[config];
-        }
-        const [key, ...subKeys] = config.split(".");
-        data = inputData[key as keyof IParseRequestConfigMap];
-        for (const k of subKeys) {
-            if (isObj(data)) {
-                data = data[k];
-            } else {
-                data = undefined as any;
-                break;
+        if (typeof config === "function") {
+            return await config(inputData, ctx);
+        } else if (isNonNullString(config)) {
+            const [key, ...subKeys] = config.split(".");
+            data = inputData[key as keyof IParseRequestConfigMap];
+            if (isObj(data) && subKeys.length) {
+                const d = flattenObject(data);
+                const subKey = subKeys.join(".");
+                if (Object.hasOwnProperty.call(d, subKey)) {
+                    return d[subKey];
+                }
+            }
+            for (const k of subKeys) {
+                if (isObj(data)) {
+                    data = data[k];
+                } else {
+                    data = undefined as any;
+                    break;
+                }
             }
         }
+        return data;
     }
-    return data;
+    /**
+   * Parses the query options from the request based on the provided configuration and execution context.
+   * 
+   * @param {ExecutionContext} ctx - The execution context containing the request information.
+   * 
+   * @returns {IResourceQueryOptions<T>} The parsed query options.
+   * 
+   * @example
+   * // Example usage:
+   * const queryOptions = RequestParser.parseQueryOptions(ctx);
+   * console.log(queryOptions); // Output: parsed query options
+   */
+    static parseQueryOptions<T extends IResourceData = IResourceData>(ctx: ExecutionContext): IResourceQueryOptions<T> {
+        const req = ctx.switchToHttp().getRequest();
+        const queryParams = Object.assign({}, getQueryParams(req.url));
+        const xFilters = Object.assign({}, req.headers["x-filters"]);
+        const limit = defaultVal(parseNumber(queryParams.limit), parseNumber(xFilters.limit));
+        const skip = defaultVal(parseNumber(queryParams.skip), parseNumber(xFilters.skip));
+        const page = defaultVal(parseNumber(queryParams.page), parseNumber(xFilters.page));
+        const result: IResourceQueryOptions<T> = PaginationHelper.normalizePagination({ limit, skip, page });
+        const distinct = defaultVal(queryParams.distinct, xFilters.distinct);
+        if (typeof distinct === "boolean" || Array.isArray(distinct) && distinct.length) {
+            result.distinct = distinct;
+        }
+        const defaultOrderBy = defaultVal(queryParams.orderBy, xFilters.orderBy);
+        const orderBy = PaginationHelper.normalizeOrderBy(defaultOrderBy);
+        if (orderBy) {
+            (result as any).orderBy = orderBy;
+        }
+        const include = defaultArray(queryParams.include, xFilters.include);
+        if (include.length) {
+            result.include = include;
+        }
+
+        const cache = defaultVal(queryParams.cach, xFilters.cache);
+        if (cache !== undefined) {
+            result.cache = !!cache;
+        }
+        const cacheTTL = defaultVal(queryParams.cacheTTL, xFilters.cacheTTL);
+        if (cacheTTL !== undefined) {
+            result.cacheTTL = cacheTTL;
+        }
+        const where = defaultArrayOrStringOrObject(queryParams.where, xFilters.where);
+        if (isObj(where) && Object.getSize(where, true)) {
+            result.where = where;
+        }
+        const mango = defaultObj(queryParams.mango, xFilters.mango);
+        if (Object.getSize(mango, true)) {
+            result.mango = mango as IMangoQuery;
+        }
+        const includeDeleted = defaultVal(queryParams.includeDeleted, xFilters.includeDeleted);
+        if (typeof includeDeleted === "boolean") {
+            result.includeDeleted = includeDeleted;
+        }
+        const relations = defaultArray(queryParams.relations, xFilters.relations);
+        if (relations.length) {
+            result.relations = relations;
+        }
+        if (typeof RequestParser.queryOptionsParser === "function") {
+            return RequestParser.queryOptionsParser(ctx, result, queryParams);
+        }
+        return result;
+    }
+
+
 }
-
-
+const defaultArrayOrStringOrObject = (...args: any[]) => {
+    for (const arg of args) {
+        if (Array.isArray(arg) && arg.length) {
+            return arg;
+        }
+        if (isNonNullString(arg)) {
+            return arg;
+        }
+        if (isObj(arg) && Object.getSize(arg, true)) {
+            return arg;
+        }
+    }
+    return undefined;
+};
+const defaultArray = (...args: any[]) => {
+    for (const arg of args) {
+        if (Array.isArray(arg) && arg.length) {
+            return arg;
+        }
+    }
+    return [];
+};
+const isNumber = (value: any): value is number => typeof value === "number";
+const parseNumber = (value: any) => {
+    if (isStringNumber(value)) {
+        return Number(value);
+    }
+    if (typeof value === "number") {
+        return value;
+    }
+    return undefined;
+}
 /**
  * Creates a parameter decorator that parse data from the request.
  * 
@@ -235,4 +353,4 @@ export async function parseRequest(config: IParseRequestConfig, ctx: ExecutionCo
  * } 
  * ```
  */
-export const ParseRequest = createParamDecorator<IParseRequestConfig>(parseRequest);
+export const ParseRequest = createParamDecorator<IParseRequestConfig>(RequestParser.parseRequest);

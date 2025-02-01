@@ -1,5 +1,5 @@
 import { IAuthPerm } from "@/auth/types";
-import { IMangoQuery, IMangoOrderBy } from "./filters";
+import { IMangoQuery, IResourceQueryOptionsOrderBy } from "./filters";
 import { IDict } from "./dictionary";
 
 export * from "./dictionary";
@@ -1856,9 +1856,10 @@ export interface IResourceQueryOptions<DataType extends IResourceData = any> {
   /** Fields to include in the response. */
   fields?: Array<keyof DataType>;
   relations?: string[];      // The relations to include in the response.
-  orderBy?: IMangoOrderBy<DataType>;        // Optional sorting criteria for the results
+  orderBy?: IResourceQueryOptionsOrderBy<DataType>;        // Optional sorting criteria for the results
   limit?: number;            // Optional limit on the number of results to return
   skip?: number;             // Optional number of results to skip before returning
+  page?: number; // Optional page number for pagination, We can use it instead of skip
 
   /** Include relationships or nested resources. */
   include?: IResourceName[];

@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { ResourceService } from './resource.service';
-import { IClassConstructor, IResourceData } from '@resk/core';
-import { UseValidatorParam, ValidatorParam } from './pipes';
+import { IClassConstructor, IResourceData, IResourceQueryOptions, PaginationHelper } from '@resk/core';
+import { ParseRequest, RequestParser, UseValidatorParam, ValidatorParam } from './pipes';
 
 class EmptyDtoClass { }
 
@@ -56,7 +56,11 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
    * // } 
    */
   @Get()
-  async getMany(): Promise<any> {
+  async getMany(@ParseRequest("queryOptions") queryOptions: IResourceQueryOptions<DataType>): Promise<any> {
+    const paginate = PaginationHelper.canPaginateResult(queryOptions);
+    if (paginate) {
+      return this.getResourceService().findAndPaginate(queryOptions);
+    }
     /* if (params?.paginate) {
       return this.getResourceService().findAndPaginate();
     } else if (params?.count) {

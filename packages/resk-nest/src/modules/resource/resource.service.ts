@@ -21,7 +21,7 @@ import { IResourceData, IResourceDataService, IResourcePrimaryKey, Resource } fr
  * }
  */
 @Injectable()
-export abstract class ResourceService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends Resource<DataType, PrimaryKeyType> implements OnModuleInit, OnModuleDestroy {
+export abstract class ResourceService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends Resource<DataType, PrimaryKeyType> implements OnModuleInit, OnModuleDestroy, IResourceDataService<DataType, PrimaryKeyType> {
     onModuleDestroy() {
         this.destroy();
     }

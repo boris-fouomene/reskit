@@ -3,7 +3,7 @@ import { IClassConstructor, IDict, isClass, isNonNullString, isObj, Validator } 
 import "../translations";
 import { i18n } from "@resk/core";
 import { stringify } from 'querystring';
-import { IParseRequestConfig, parseRequest } from './parse-request';
+import { IParseRequestConfig, RequestParser } from './parse-request';
 
 
 
@@ -83,7 +83,7 @@ export const ValidatorParam = createParamDecorator<([config: IParseRequestConfig
     const handler = ctx.getHandler();
 
     const [config, dtoClassParam] = Array.isArray(options) ? options : [options];
-    const data = await parseRequest(config, ctx);
+    const data = await RequestParser.parseRequest(config, ctx);
     /**
      * Gets the controller and handler names for error messages.
      */

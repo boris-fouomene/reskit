@@ -1,6 +1,7 @@
 
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { i18n, IClassConstructor, IResourceData, IResourceDataService, IResourceFindWhereCondition, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, isObj } from "@resk/core";
+import { BadRequestException, Injectable, Req } from "@nestjs/common";
+import { i18n, IClassConstructor, IResourceData, IResourceDataService, IResourceFindWhereCondition, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, IResourceQueryOptionsOrderBy, isNonNullString, isObj, PaginationHelper } from "@resk/core";
+import { RequestParser } from "@resource/pipes";
 import { And, DataSource, DeepPartial, EntityManager, In, QueryRunner, Repository } from "typeorm";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
 
@@ -272,6 +273,7 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
     getRepository(): Repository<DataType> {
         return this.dataSource.getRepository(this.entity);
     }
+
     buildWhereCondition(options: PrimaryKeyType | PrimaryKeyType[] | IResourceQueryOptions<DataType>): Omit<IResourceQueryOptions<DataType>, "where"> & { where: IResourceFindWhereCondition<DataType> } {
         const contitions: IResourceFindWhereCondition<DataType> = {};
         const primaryColumns = this.getPrimaryColumnNames();
@@ -285,6 +287,16 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
             options = { where: contitions };
         }
         const result = Object.assign({}, options) as Omit<IResourceQueryOptions<DataType>, "where"> & { where: IResourceFindWhereCondition<DataType> };
+        const queryOptions = options as IResourceQueryOptions<DataType>;
+        if (isObj(queryOptions) && queryOptions) {
+            if (typeof queryOptions.limit === "number" && queryOptions.limit > 0) {
+                (result as any).take = queryOptions.limit;
+            }
+            if (typeof queryOptions.skip === "number") {
+                result.skip = queryOptions.skip;
+            }
+        }
+        (result as any).order = isNonNullString(queryOptions.orderBy) ? [queryOptions.orderBy] : Array.isArray(queryOptions.orderBy) && queryOptions.orderBy.length ? queryOptions.orderBy : isObj(queryOptions.orderBy) ? queryOptions.orderBy : undefined;
         if (Array.isArray(result.where) && !isObj(result.where) && typeof result.where[0] !== 'object') {
             result.where = {};
         }
@@ -293,23 +305,6 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
     async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined) {
         options = Object.assign({}, options);
         const [data, count] = await this.findAndCount(options);
-        const meta: IResourcePaginatedResult<DataType>["meta"] = {
-            total: count,
-        }
-        if (typeof options?.skip === 'number' && options.skip > 0 && typeof options?.limit === 'number' && options.limit > 0) {
-            meta.currentPage = Math.ceil(options.skip / options.limit) + 1;
-            meta.pageSize = options.limit;
-            meta.totalPages = Math.ceil(count / options.limit);
-            meta.hasNextPage = meta.currentPage < meta.totalPages;
-            meta.hasPreviousPage = meta.currentPage > 1;
-            meta.nextPage = meta.currentPage + 1;
-            meta.previousPage = meta.currentPage - 1;
-            meta.lastPage = meta.totalPages;
-        }
-        return {
-            data,
-            toal: count,
-            meta,
-        }
+        return PaginationHelper.paginate(data, count, options);
     }
 }

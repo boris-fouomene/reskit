@@ -1,4 +1,4 @@
-import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResourceMetadata, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria } from '../types';
+import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResourceMetadata, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria, IResourceQueryOptionsOrderDirection } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory, extendObj } from '../utils/index';
 import { IClassConstructor, IProtectedResource } from '../types/index';
@@ -6,7 +6,9 @@ import { IAuthPerm, IAuthUser } from '@/auth/types';
 import Auth from "../auth";
 import { i18n, I18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
+import { PaginationHelper } from './PaginationHelper';
 
+export * from './PaginationHelper';
 const resourcesMetaDataKey = Symbol('resources');
 const resourcesClassNameMetaData = Symbol('resourceFromClassName');
 
@@ -398,23 +400,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
     options = Object.assign({}, options);
     const [data, count] = await this.findAndCount(options);
-    const meta: IResourcePaginatedResult<DataType>["meta"] = {
-      total: count,
-    }
-    if (typeof options.skip === 'number' && options.skip > 0 && typeof options.limit === 'number' && options.limit > 0) {
-      meta.currentPage = Math.ceil(options.skip / options.limit) + 1;
-      meta.pageSize = options.limit;
-      meta.totalPages = Math.ceil(count / options.limit);
-      meta.hasNextPage = meta.currentPage < meta.totalPages;
-      meta.hasPreviousPage = meta.currentPage > 1;
-      meta.nextPage = meta.currentPage + 1;
-      meta.previousPage = meta.currentPage - 1;
-      meta.lastPage = meta.totalPages;
-    }
-    return {
-      data,
-      meta,
-    }
+    return PaginationHelper.paginate(data, count, options);
   }
   /**
    * Creates multiple records in the resource.

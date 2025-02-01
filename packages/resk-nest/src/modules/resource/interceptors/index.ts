@@ -4,7 +4,7 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common';
-import { defaultStr } from '@resk/core';
+import { defaultStr, IResourcePaginatedResult } from '@resk/core';
 import { ResourceController } from '@resource/resource.controller';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
@@ -259,7 +259,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @param {IResourceControllerInferDataType<ControllerType>[]} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    async afterGetMany(result: IResourceControllerInferDataType<ControllerType>[], context: ExecutionContext): Promise<any> {
+    async afterGetMany(result: IResourceControllerInferDataType<ControllerType>[] | IResourcePaginatedResult<IResourceControllerInferDataType<ControllerType>>, context: ExecutionContext): Promise<any> {
         return result;
     }
     /***

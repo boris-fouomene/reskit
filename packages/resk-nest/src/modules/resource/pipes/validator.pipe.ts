@@ -3,116 +3,28 @@ import { IClassConstructor, IDict, isClass, isNonNullString, isObj, Validator } 
 import "../translations";
 import { i18n } from "@resk/core";
 import { stringify } from 'querystring';
-
-/**
- * @interface IValidatorParamConfigMap
- * Interface representing a map of validator parameter configurations.
- * 
- * This interface defines the structure of the validator parameter configurations, which includes the following properties:
- * 
- * @template T The type of the data in the map.
- * - `body`: An object containing the request body data.
- * - `query`: An object containing the request query parameters.
- * - `params`: An object containing the request route parameters.
- * - `headers`: An object containing the request headers.
- * 
- * @example
- * ```typescript
- * const validatorParamConfigMap: IValidatorParamConfigMap = {
- *   body: { name: 'John Doe', age: 30 },
- *   query: { page: 1, limit: 10 },
- *   params: { id: 123 },
- *   headers: { 'Content-Type': 'application/json' },
- * };
- * ```
- */
-export interface IValidatorParamConfigMap<T extends IDict = IDict> {
-    /**
-     * An object containing the request body data.
-     */
-    body: T;
-    /**
-     * An object containing the request query parameters.
-     */
-    query: T;
-    /**
-     * An object containing the request route parameters.
-     */
-    params: T;
-    /**
-     * An object containing the request headers.
-     */
-    headers: T;
-}
-
-/**
- * @interface IValidatorParamConfig
- * Type representing a validator parameter configuration.
- * 
- * This type can be one of the following:
- * 
- * - A key of the `IValidatorParamConfigMap` interface (e.g. `'body'`, `'query'`, `'params'`, or `'headers'`).
- * - A string in the format `'key.subkey'`, where `key` is a key of the `IValidatorParamConfigMap` interface and `subkey` is a property of the corresponding object.
- * - A function that takes an object with the `IValidatorParamConfigMap` properties and a `Request` object as arguments and returns an object with the validator parameter configuration.
- * 
- * @example
- * ```typescript
- * const validatorParamConfig: IValidatorParamConfig = 'body';
- * const validatorParamConfig: IValidatorParamConfig = 'body.user.files';
- * const validatorParamConfig: IValidatorParamConfig = (options) => ({ ...options.body, ...options.query });
- * ```
- */
-export type IValidatorParamConfig = keyof IValidatorParamConfigMap | `${keyof IValidatorParamConfigMap}.${string}` | ((options: IValidatorParamConfigMap & { req: Request }) => IDict);
-/**
- * @interface IValidatorParamResult
- * Interface representing the result of a validator parameter.
- * 
- * This interface defines the structure of the result, which includes the following properties:
- * 
- * - `data`: An object containing the validator data.
- * - `dtoClass`: An instance of the DTO class.
- * 
- * @example
- * ```typescript
- * const validatorParamResult: IValidatorParamResult = {
- *   data: { name: 'John Doe', age: 30 },
- *   dtoClass: CreateUserDto,
- * };
- * ```
- */
-export interface IValidatorParamResult<T extends IDict = IDict> {
-    /**
-     * An object containing the validator data.
-     */
-    data: T | T[];
-
-    /**
-     * An instance of the DTO class.
-     */
-    dtoClass: InstanceType<any>;
-}
+import { IParseRequestConfig, parseRequest } from './parse-request';
 
 
 
 const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
 
+
+
 /**
- * Creates a parameter decorator that extracts the validator configuration and data from the request.
+ * Creates a parameter decorator that validate data parsed from the request.
  * 
- * This decorator takes a configuration object of type `IValidatorParamConfig` and returns an object with the `dtoClass` and `data` properties.
+ * This decorator takes a configuration object of type `IParseRequestConfig` and validate the data parsed from the request based on the configuration.
  * 
- * The `dtoClass` property is an instance of the DTO class returned by the method specified in the `validatorPipeDtoMetadataKey` metadata.
  * 
- * The `data` property is an object containing the validator data extracted from the request based on the configuration.
- * 
- * @param {[config: IValidatorParamConfig, dtoClassOrOptional : IClassConstructor<any> | boolean] | IValidatorParamConfig} options
- * @param {ExecutionContext} ctx The current execution context.
- * @throws {BadRequestException} If the DTO method name is invalid or the DTO class is not a function or the config is invalid (extracted data is not an object).
- * @returns An object with the `dtoClass` and `data` properties.
+ * @param {IParseRequestConfig} options
+ * @throws {BadRequestException} If the validation fails.
+ * @returns a value parsed from the request based on the configuration.
  * 
  * @example
+ * In this example, the ValidatorParam decorator use the UseValidatorPie decorator to validate to retrieve the controller method used to get the dtoClass.
  * ```typescript
- * @UseValidatorPipe<UsersController>('getCreateUserDto')
+ * @UseValidatorParam<UsersController>('getCreateUserDto')
  * async myHandler(@ValidatorParam('body') myHandlerDto : IMyHandlerDto) {
  *   // Use the dtoClass and data properties
  * }
@@ -120,7 +32,7 @@ const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
  *   // Use the dtoClass and data properties
  * ```
  * @example
- * ## Example usage of the ValidatorParam decorator without the UseValidatorPipe decorator.
+ * ## Example usage of the ValidatorParam decorator without the UseValidatorParam decorator.
  * In this example, the ValidatorParam decorator is use to retrieve a specific property from the request object.
  * ```typescript
  * class UsersController {
@@ -130,17 +42,36 @@ const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
  * }
  * ```
  * @example
- * ## Example usage of the ValidatorParam decorator with the a custom dtoClass.
- * In this example, the ValidatorParam decorator is use to retrieve a specific property from the request object.
+ * In this example, the ValidatorParam decorator is use to retrieve body data from the request object.
  * ```typescript
  * class UsersController {
- *   async myHandler(@ValidatorParam(['body.user.files', CreateUserDto]) myHandlerDto : IMyHandlerDto) {
+ *   async myHandler(@ValidatorParam("body") myHandlerDto : IMyHandlerDto) {
  *     // Use the dtoClass and data properties
  *   }
  * }
  * ```
+ * @example
+ * In this example, the ValidatorParam decorator is use to retrieve query data from the request object.
+ * ```typescript
+ * class UsersController {
+ *   async myHandler(@ValidatorParam("query") myHandlerDto : IMyHandlerDto) {
+ *     // Use the dtoClass and data properties
+ *   }
+ * } 
+ * ```
+ * @example
+ * In this example, the ValidatorParam decorator is use to retrieve data from the request object by using a function.
+ * ```typescript
+ * class UsersController {
+ *   async myHandler(@ValidatorParam((options, context) => {
+ *     return { key: options.body.key, };
+ *   }) myHandlerDto : IMyHandlerDto) {
+ *     // Use the dtoClass and data properties
+ *   }
+ * } 
+ * ```
  */
-export const ValidatorParam = createParamDecorator<([config: IValidatorParamConfig, dtoClassOrOptional: IClassConstructor<any> | boolean]) | IValidatorParamConfig, Promise<IValidatorParamResult["data"]>>(async (options, ctx: ExecutionContext) => {
+export const ValidatorParam = createParamDecorator<([config: IParseRequestConfig, dtoClassParam: IClassConstructor<any>]) | IParseRequestConfig, Promise<IDict>>(async (options, ctx: ExecutionContext) => {
     /**
      * Gets the controller instance from the execution context.
      */
@@ -151,54 +82,8 @@ export const ValidatorParam = createParamDecorator<([config: IValidatorParamConf
      */
     const handler = ctx.getHandler();
 
-    /**
-     * Gets the request instance from the execution context.
-     */
-    const req = ctx.switchToHttp().getRequest();
-
-    /**
-     * Creates an object with the request data.
-     */
-    const inputData: IValidatorParamConfigMap = {
-        body: Array.isArray(req.body) ? req.body : Object.assign({}, req.body),
-        query: Object.assign({}, req.query),
-        params: Object.assign({}, req.params),
-        headers: Object.assign({}, req.headers),
-    };
-
-    /**
-     * Initializes the data object.
-     */
-    let data: IDict = {};
-
-    const [config, dtoClassOrOptional] = Array.isArray(options) ? options : [options];
-    /**
-     * If the configuration is a function, calls it to get the data.
-     */
-    if (typeof config === "function") {
-        const r = config({ ...inputData, req });
-        data = Array.isArray(r) ? r : Object.assign({}, r);
-    } else if (isNonNullString(config)) {
-        /**
-         * If the configuration is a string, extracts the data from the request.
-         */
-        const [key, ...subKeys] = config.split(".");
-        data = inputData[key as keyof IValidatorParamConfigMap];
-        for (const k of subKeys) {
-            if (isObj(data)) {
-                data = data[k];
-            } else {
-                data = undefined as any;
-                break;
-            }
-        }
-        /**
-         * Throws an error if the data is invalid.
-         */
-        if (!Array.isArray(data) && !isObj(data)) {
-            //throw new BadRequestException("Invalid config data result for validator param : " + config + " in controller " + controllerName + " : " + errorDetails);
-        }
-    }
+    const [config, dtoClassParam] = Array.isArray(options) ? options : [options];
+    const data = await parseRequest(config, ctx);
     /**
      * Gets the controller and handler names for error messages.
      */
@@ -212,13 +97,12 @@ export const ValidatorParam = createParamDecorator<([config: IValidatorParamConf
     /**
      * Gets the DTO class or method name from the metadata.
      */
-    const { dtoClassOrGetDtoMethodName, optional: cOptional } = Object.assign({}, Reflect.getMetadata(validatorPipeDtoMetadataKey, handler));
-    const optional = typeof dtoClassOrGetDtoMethodName == "boolean" ? dtoClassOrGetDtoMethodName : !!cOptional;
+    const { dtoClassOrGetDtoMethodName, optional } = Object.assign({}, Reflect.getMetadata(validatorPipeDtoMetadataKey, handler));
     /***
      * The validator params become optional when the dtoClassOrGetDtoMethodName is undefined or the optional is true
      */
     let cannotValidate = optional === true || dtoClassOrGetDtoMethodName === undefined;
-    let dtoClass: IClassConstructor | undefined = typeof dtoClassOrOptional !== "boolean" ? dtoClassOrOptional : undefined;
+    let dtoClass: IClassConstructor | undefined = typeof dtoClassParam !== "boolean" ? dtoClassParam : undefined;
     if (isClass(dtoClassOrGetDtoMethodName) || typeof dtoClassOrGetDtoMethodName === "function") {
         dtoClass = dtoClassOrGetDtoMethodName;
     } else {
@@ -260,7 +144,7 @@ export const ValidatorParam = createParamDecorator<([config: IValidatorParamConf
 });
 
 /**
- * Creates a method decorator that enables validation for a controller method.
+ * A method decorator that enables validation for a controller method.
  * 
  * This decorator uses the `ValidatorPipe` to validate the request data and sets the `validatorPipeDtoMetadataKey` metadata to specify the DTO method name.
  * 
@@ -271,12 +155,12 @@ export const ValidatorParam = createParamDecorator<([config: IValidatorParamConf
  * 
  * @example
  * 
- * ## Example usage with ValidatorParam decorator and @UseValidatorPipe decorator.
+ * ## Example usage with ValidatorParam decorator and @UseValidatorParam decorator.
  * In this example, the `getCreateUserDto` method returns the `CreateUserDto` class. The `CreateUserDto` class is used to validate the request data.
  * This example is useful when you want to validate data based on dynamic DTO classes.
  * ```typescript
  * class UsersController {
- *      @UseValidatorPipe<UsersController>('getCreateUserDto')
+ *      @UseValidatorParam<UsersController>('getCreateUserDto')
  *      async myMethod(@ValidatorParam('body') bodyData: IMyMethodDto) {
 *          // Use the dtoClass and data properties
  *      }
@@ -286,7 +170,7 @@ export const ValidatorParam = createParamDecorator<([config: IValidatorParamConf
  * }
  * ```
  * @example 
- * ## Example usage without ValidatorParam decorator and @UseValidatorPipe decorator.
+ * ## Example usage without ValidatorParam decorator and @UseValidatorParam decorator.
  * ```typescript
  * class UsersController {
  *   async create(@Body(new ValidatorPide(CreateUserDto)) createUserDto: CreateUserDto) {}
@@ -305,7 +189,7 @@ export const ValidatorParam = createParamDecorator<([config: IValidatorParamConf
  * ## Example : Optional validation. In this example, the data are validated only if the getDtoClass method returns a valid dtoClass.
  * ```typescript
  * class UsersController {
- *   @UseValidatorPipe<UsersController>('getCreateUserDto', true)
+ *   @UseValidatorParam<UsersController>('getCreateUserDto', true)
  *   async myMethod(@ValidatorParam('body') bodyData: IMyMethodDto) {
  *     // Use the dtoClass and data properties
  *   }
@@ -314,7 +198,7 @@ export const ValidatorParam = createParamDecorator<([config: IValidatorParamConf
 *   }
  * }
  */
-export function UseValidatorPipe<T extends InstanceType<any> = any>(dtoClassOrGetDtoMethodName: (IClassConstructor<any> | keyof T), optional?: boolean): MethodDecorator {
+export function UseValidatorParam<T extends InstanceType<any> = any>(dtoClassOrGetDtoMethodName: (IClassConstructor<any> | keyof T), optional?: boolean): MethodDecorator {
     /**
      * Returns a method decorator that enables validation for a controller method.
      * 
@@ -323,11 +207,6 @@ export function UseValidatorPipe<T extends InstanceType<any> = any>(dtoClassOrGe
      * @param descriptor The property descriptor of the method.
      */
     return (target: any, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<any>) => {
-        /**
-         * Applies the `ValidatorPipe` to the method to enable validation.
-         */
-        //UsePipes(ValidatorPipe)(target, propertyKey, descriptor);
-
         /**
          * Sets the `validatorPipeDtoMetadataKey` metadata to specify the DTO method name.
          */
@@ -347,12 +226,12 @@ export function UseValidatorPipe<T extends InstanceType<any> = any>(dtoClassOrGe
  *  * 
  * @example
  * 
- * ## Example usage with ValidatorParam decorator and @UseValidatorPipe decorator.
+ * ## Example usage with ValidatorParam decorator and @UseValidatorParam decorator.
  * In this example, the `getCreateUserDto` method returns the `CreateUserDto` class. The `CreateUserDto` class is used to validate the request data.
  * This example is useful when you want to validate data based on dynamic DTO classes.
  * ```typescript
  * class UsersController {
- *      @UseValidatorPipe<UsersController>('getCreateUserDto')
+ *      @UseValidatorParam<UsersController>('getCreateUserDto')
  *      async myMethod(@ValidatorParam('body') { dtoClass, data }: { dtoClass: InstanceType<any>, data: IDict }) {
 *          // Use the dtoClass and data properties
  *      }
@@ -362,7 +241,7 @@ export function UseValidatorPipe<T extends InstanceType<any> = any>(dtoClassOrGe
  * }
  * ```
  * @example 
- * ## Example usage without ValidatorParam decorator and @UseValidatorPipe decorator.
+ * ## Example usage without ValidatorParam decorator and @UseValidatorParam decorator.
  * ```typescript
  * class UsersController {
  *   async create(@Body(new ValidatorPide(CreateUserDto)) createUserDto: CreateUserDto) {}
@@ -379,7 +258,7 @@ export function UseValidatorPipe<T extends InstanceType<any> = any>(dtoClassOrGe
  * ```
  */
 @Injectable()
-export class ValidatorPipe implements PipeTransform<IValidatorParamResult, Promise<IValidatorParamResult["data"]>> {
+export class ValidatorPipe implements PipeTransform<IDict, Promise<IDict>> {
     /**
      * Constructs a new instance of the `ValidatorPipe` class.
      * 
@@ -397,7 +276,7 @@ export class ValidatorPipe implements PipeTransform<IValidatorParamResult, Promi
      * @returns The validated data.
      * @throws {BadRequestException} If the validation fails or the `dtoClass` is invalid.
      */
-    async transform(value: IValidatorParamResult, metadata: ArgumentMetadata): Promise<IValidatorParamResult["data"]> {
+    async transform(value: IDict, metadata: ArgumentMetadata): Promise<IDict> {
         if (isClass(this.dtoClass) || typeof this.dtoClass === "function") {
             return ValidatorPipe.staticTransform({
                 dtoClass: this.dtoClass,
@@ -415,18 +294,19 @@ export class ValidatorPipe implements PipeTransform<IValidatorParamResult, Promi
      * @returns The validated data.
      * @throws {BadRequestException} If the validation fails.
      */
-    static async staticTransform(value: IValidatorParamResult, metadata?: ArgumentMetadata): Promise<IValidatorParamResult["data"]> {
+    static async staticTransform(options: IValidatorConfig, metadata?: ArgumentMetadata): Promise<IDict> {
+        options = Object.assign({}, options);
         /**
          * Checks if the input value is an object with a `dtoClass` property.
          */
-        if (!isObj(value) || !value.dtoClass) {
-            throw new BadRequestException(`Invalid value type ${typeof value} input for Validator pipe line, data : ` + JSON.stringify(value?.data));
+        if (!options.dtoClass || typeof options.dtoClass !== "function") {
+            throw new BadRequestException(`Invalid value type ${typeof options.data} input for Validator pipe line, data : ` + JSON.stringify(options?.data));
         }
 
         /**
          * Destructures the input value into `dtoClass` and `data`.
          */
-        const { dtoClass, data } = value;
+        const { dtoClass, data } = options;
 
         /**
          * If the data is an array, validates each item in the array.
@@ -465,4 +345,65 @@ export class ValidatorPipe implements PipeTransform<IValidatorParamResult, Promi
             throw new BadRequestException(e)
         }
     }
+}
+
+
+
+
+/**
+ * @interface IValidatorConfig
+ * Interface representing the configuration for the validator pipe.
+ * @description This interface defines the structure of the result, which includes the following properties:
+ * - `data`: An object containing the validator data.
+ * - `dtoClass`: An instance of the DTO class.
+ * 
+ * @example
+ * ```typescript
+ * const validatorParamResult: IValidatorConfig = {
+ *   data: { name: 'John Doe', age: 30 },
+ *   dtoClass: CreateUserDto,
+ * };
+ * ```
+ * 
+ * @template T - The type of the dictionary object extending {@link IDict}.
+ * 
+ * @example
+ * // Example usage:
+ * const validatorConfig: IValidatorConfig<MyDict> = {
+ *   data: { key: 'value' },
+ *   dtoClass: MyDtoClass
+ * };
+ * console.log(validatorConfig.data.key); // Output: 'value'
+ */
+export interface IValidatorConfig<T extends IDict = IDict> {
+    /**
+     * An object containing the validator data.
+     * 
+     * @type {T | T[]}
+     * @memberof IValidatorConfig
+     * 
+     * @example
+     * // Example usage with a single object:
+     * const singleData = validatorConfig.data;
+     * console.log(singleData); // Output: { key: 'value' }
+     * 
+     * @example
+     * // Example usage with an array of objects:
+     * const arrayData = validatorConfig.data;
+     * console.log(arrayData); // Output: [{ key: 'value1' }, { key: 'value2' }]
+     */
+    data: T | T[];
+
+    /**
+     * An instance of the DTO class.
+     * 
+     * @type {InstanceType<any>}
+     * @memberof IValidatorConfig
+     * 
+     * @example
+     * // Example usage:
+     * const dtoInstance = validatorConfig.dtoClass;
+     * console.log(dtoInstance); // Output: MyDtoClass instance
+     */
+    dtoClass: InstanceType<any>;
 }

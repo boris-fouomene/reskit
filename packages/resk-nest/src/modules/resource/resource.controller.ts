@@ -1,7 +1,7 @@
-import { Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { ResourceService } from './resource.service';
 import { IClassConstructor, IResourceData } from '@resk/core';
-import { UseValidatorPipe, ValidatorParam } from './pipes';
+import { UseValidatorParam, ValidatorParam } from './pipes';
 
 class EmptyDtoClass { }
 
@@ -24,15 +24,51 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
    * @param resourceService - The `ResourceService` instance to be used by the `ResourceController`.
    */
   constructor(protected readonly resourceService: ServiceType) { }
+
+  /***
+   * Retrieves a list of resources based on the provided parameters.
+   * This method retrieves a list of resources from the resource service and returns the result.
+   * If the 'paginate' parameter is present, it retrieves a paginated result.
+   * If the 'count' parameter is present, it retrieves the count of resources.
+   * @param params - The parameters to be used for retrieving the resources.
+   * @returns A promise that resolves to the list of resources.
+   * @example
+   * // Example usage of getMany method
+   * const resources = await getMany({ paginate: true });
+   * console.log(resources);
+   * // Output:
+   * // {
+   * //   data: [
+   * //     { id: 1, name: 'John Doe' },
+   * //     { id: 2, name: 'Jane Smith' }
+   * //   ],
+   * //   meta: {
+   * //     currentPage: 1,
+   * //     pageSize: 10,
+   * //     total: 2,
+   * //     totalPages: 1,
+   * //     hasNextPage: false,
+   * //     hasPreviousPage: false,
+   * //     nextPage: 2,
+   * //     previousPage: 1,
+   * //     lastPage: 1
+   * //   }
+   * // } 
+   */
   @Get()
   async getMany(): Promise<any> {
+    /* if (params?.paginate) {
+      return this.getResourceService().findAndPaginate();
+    } else if (params?.count) {
+      return this.getResourceService().count();
+    } */
     return this.getResourceService().find();
   }
   @Get(':id')
   async getOne(@Param() params: any) {
     return await this.getResourceService().findOne(params.id);
   }
-  @UseValidatorPipe<ResourceController>('getCreateDtoClass', true)
+  @UseValidatorParam<ResourceController>('getCreateDtoClass', true)
   @Post()
   async create(@ValidatorParam("body") createResourceDto: Partial<DataType>) {
     return this.getResourceService().create(createResourceDto);
@@ -41,7 +77,7 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
   delete(@Param() params: any) {
     return this.getResourceService().delete(params.id);
   }
-  @UseValidatorPipe<ResourceController>('getUpdateDtoClass', true)
+  @UseValidatorParam<ResourceController>('getUpdateDtoClass', true)
   @Put(':id')
   update(@Param() params: any, @ValidatorParam("body") updateResourceDto: Partial<DataType>) {
     return this.getResourceService().update(params.id, updateResourceDto);

@@ -9,6 +9,7 @@ import { ResourceController } from '@resource/resource.controller';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { IResourceControllerInferDataType } from '@resource/interfaces';
+import { Request } from 'express';
 
 
 @Injectable()
@@ -99,7 +100,6 @@ import { IResourceControllerInferDataType } from '@resource/interfaces';
     }
  */
 export class ResourceInterceptor<ControllerType extends ResourceController<any, any> = ResourceController<any, any>> implements NestInterceptor {
-    private request: any;
     private context: ExecutionContext | undefined;
 
     /***
@@ -107,13 +107,13 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @returns {any} The request
      */
     protected getRequest() {
-        return this.request;
+        return this.getExecutionContext().switchToHttp().getRequest();
     }
     /***
      * Retrives the context from the interceptor
      * @returns {ExecutionContext} The context
      */
-    protected getContext(): ExecutionContext {
+    protected getExecutionContext(): ExecutionContext {
         return this.context as ExecutionContext;
     }
     /***
@@ -129,7 +129,6 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
     }
     async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
         this.context = context;
-        this.request = context.switchToHttp().getRequest();
         const handler: keyof ControllerType = (context.getHandler().name as keyof ControllerType);
         try {
             // Perform async operation before the method execution based on the route and method

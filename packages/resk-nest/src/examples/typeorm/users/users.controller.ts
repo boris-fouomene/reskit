@@ -22,7 +22,7 @@ class UsersInterceptor extends ResourceInterceptor<UsersController> {
 export class UsersController extends ResourceController<User, UsersService> {
   @Post()
   //@UsePipes(new ValidatorPipe(CreateUserDto))
-  //@UseValidatorPipe(CreateUserDto)
+  //@UseValidatorParam(CreateUserDto)
   create(@Body(new ValidatorPipe(CreateUserDto)) createUserDto: Partial<User>): Promise<User> {
     return super.create(createUserDto);
   }

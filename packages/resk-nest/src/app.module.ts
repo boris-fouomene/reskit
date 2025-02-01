@@ -13,7 +13,7 @@ import { I18nModule } from '@i18n/i18n.module';
     I18nModule.forRoot({
       locales: ["en", "fr"],
       namespaces: {
-        'common': async (locale) => await import(`./locales/common.${locale}.json`),
+        'common': async (locale) => await import(`./examples/locales/common.${locale}.json`),
       }
     }),
     DatabaseModule,

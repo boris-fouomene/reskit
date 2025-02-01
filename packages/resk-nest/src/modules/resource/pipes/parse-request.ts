@@ -1,6 +1,7 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 import { PaginationHelper } from "@resk/core";
 import { defaultBool, defaultObj, defaultVal, flattenObject, getQueryParams, IDict, IMangoQuery, IResourceData, IResourceQueryOptions, IResourceQueryOptionsOrderDirection, isNonNullString, isObj, isStringNumber, Resource } from "@resk/core";
+import { query } from "express";
 import { parse } from "path";
 
 /**
@@ -259,10 +260,9 @@ export class RequestParser {
         if (relations.length) {
             result.relations = relations;
         }
-        if (typeof RequestParser.queryOptionsParser === "function") {
-            return RequestParser.queryOptionsParser(ctx, result, queryParams);
-        }
-        return result;
+        const r = typeof RequestParser.queryOptionsParser === "function" ? RequestParser.queryOptionsParser(ctx, result, queryParams) : result;
+        Object.assign(req, { queryOptions: r });
+        return r;
     }
 
 
@@ -289,7 +289,6 @@ const defaultArray = (...args: any[]) => {
     }
     return [];
 };
-const isNumber = (value: any): value is number => typeof value === "number";
 const parseNumber = (value: any) => {
     if (isStringNumber(value)) {
         return Number(value);

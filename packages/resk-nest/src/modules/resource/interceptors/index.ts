@@ -4,9 +4,10 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common';
-import { isObj } from '@resk/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { defaultStr } from '@resk/core';
+import { ResourceController } from '@resource/resource.controller';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable()
 /***
@@ -32,133 +33,260 @@ import { map } from 'rxjs/operators';
     }
     @Injectable()
     class ProductInterceptor extends ResourceInterceptor {
-        beforeInsert(context, data) {
-            // Perform custom logic before inserting a product
-            return data;
+        beforeGetMany(context) {
+            // Perform custom logic before getting all products
+            return true;
         }
-        afterCreate(context, result) {
+        beforeGetOne(context) {
+            // Perform custom logic before getting a product
+            return true;
+        }
+        beforeCreate(context) {
+            // Perform custom logic before inserting a product
+            thow new BadRequestException("Error, could not create product");
+        }
+        beforeUpdate(context) {
+            // Perform custom logic before updating a product
+            return true;
+        }
+        beforeDelete(context) {
+            // Perform custom logic before deleting a product
+            return true;
+        }
+        beforeUnknow(context) {
+            // Perform custom logic before an unknown method
+            return true;
+        }
+        afterCreate(result, context) {
             // Perform custom logic after creating a product
+            result.name = "Updated name";
+            return result;
+        }  
+        afterUpdate(result, context) {
+            // Perform custom logic after updating a product
+            return result;
+        }
+        afterDelete(result, context) {
+            // Perform custom logic after deleting a product
+            return result;
+        }
+        afterGetAll(result, context) {
+            // Perform custom logic after getting all products
+            return result;
+        }
+        afterGetOne(result, context) {
+            // Perform custom logic after getting a product
+            return result;
+        }
+        afterUnknow(result, handler, context) {
+            // Perform custom logic after an unknown method
             return result;
         }
     }
+    @Injectable()
+    class ProductDataSource extends ResourceDataSource {
+        constructor(dataSource: DataSource) {
+            super(dataSource);
+        }
+    }
+    @Injectable()
+    class ProductDto extends ResourceDto {
+        constructor(data: any) {
+            super(data);
+        }
+    }
  */
-export class ResourceInterceptor implements NestInterceptor {
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-        const request = context.switchToHttp().getRequest();
-        const data = request.body;
-        const method = request.method.toLowerCase();
-        // Retrieve the controller method name
-        const methodName = context.getHandler().name;;
-        // Determine the action (e.g., 'create', 'update')
-        const action = this.getActionFromMethod(method, context);
+export class ResourceInterceptor<ControllerType extends ResourceController<any, any> = ResourceController<any, any>> implements NestInterceptor {
+    private request: any;
+    private context: ExecutionContext | undefined;
 
-        // Perform the `before` action
-        const modifiedData = this.performBeforeAction(action, context, data, methodName, request);
-        if (isObj(modifiedData)) {
-            request.body = modifiedData;
+    /***
+     * Retrives the request from the context
+     * @returns {any} The request
+     */
+    protected getRequest() {
+        return this.request;
+    }
+    /***
+     * Retrives the context from the interceptor
+     * @returns {ExecutionContext} The context
+     */
+    protected getContext(): ExecutionContext {
+        return this.context as ExecutionContext;
+    }
+    /***
+     * Retrives the handler name from the context
+     * @param context - The execution context
+     * @returns {keyof ControllerType} The handler name
+     */
+    protected getHanlder(): keyof ControllerType {
+        return (this.getRequest()?.getHandler()?.name as keyof ControllerType);
+    }
+    protected getMethod(context: ExecutionContext): string {
+        return defaultStr(context.switchToHttp()?.getRequest()?.method);
+    }
+    async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+        this.context = context;
+        this.request = context.switchToHttp().getRequest();
+        const handler: keyof ControllerType = (context.getHandler().name as keyof ControllerType);
+        try {
+            // Perform async operation before the method execution based on the route and method
+            await this.performBeforeAction(handler, context);
+        } catch (error) {
+            // Handle exception from beforeTrigger
+            return throwError(() => error); // Re-throw the caught exception
         }
         return next.handle().pipe(
-            map((result) => {
-                // Perform the `after` action
-                return this.performAfterAction(action, context, result, methodName, request);
+            tap(async (response) => {
+                try {
+                    // Perform async operation after the method execution, passing the response
+                    const data = await this.performAfterAction(handler, context, response);
+                    if (data !== undefined) {
+                        return data;
+                    }
+                    return response;
+                } catch (error) {
+                    // Handle exception from afterTrigger
+                    throw error; // Re-throw the caught exception
+                }
+            }),
+            catchError((error) => {
+                // Handle any other exceptions that occur during the method execution
+                return throwError(() => error); // Re-throw the caught exception
             }),
         );
     }
-
-    // Map HTTP methods to CRUD actions
-    private getActionFromMethod(method: string, context: ExecutionContext): string {
-        const route = context.switchToHttp().getRequest().route.path;
-        if (method === 'post') return 'insert';
-        if (method === 'put' || method === 'patch') return 'update';
-        if (method === 'delete') return 'delete';
-        if (method === 'get') return route.includes(':id') ? 'findOne' : 'findAll';
-        return 'unknown';
+    protected async beforeUnknow(handler: keyof ControllerType, context: ExecutionContext): Promise<any> {
+        return Object.assign({}, context.switchToHttp().getRequest().body);
     }
-
-    // Define the `before` hooks
-    protected performBeforeAction(
-        action: string,
-        context: ExecutionContext,
-        data: any,
-        /**
+    /***
+     * Hooks for `before` actions (to be overridden by subclasses)
+     * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
+     * @param {ExecutionContext} context - The execution context.
+     * @param data - The data being processed.
+     * @param request - The request object.
+     * @returns The modified data.
+     */
+    protected async performBeforeAction(
+        /***
          * The name of the method being executed from the controller.
          */
-        methodName: string,
-        request: any,
-    ): any {
-        switch (action) {
-            case 'insert':
-                return this.beforeInsert(context, data);
+        handler: keyof ControllerType,
+        /***
+         * The execution context.
+         */
+        context: ExecutionContext,
+    ) {
+        switch (handler) {
+            case 'getMany':
+                return await this.beforeGetAll(context);
+            case 'getOne':
+                return await this.beforeGetOne(context);
+            case 'create':
+                return await this.beforeCreate(context);
             case 'update':
-                return this.beforeUpdate(context, data);
+                return await this.beforeUpdate(context);
             case 'delete':
-                return this.beforeDelete(context, data);
-            case 'findOne':
-                return this.beforeFindOne(context, data);
-            case 'findAll':
-                return this.beforeFindAll(context, data);
+                return await this.beforeDelete(context);
             default:
-                return data;
+                return await this.beforeUnknow(handler, context);
         }
     }
 
     // Define the `after` hooks
-    protected performAfterAction(action: string, context: ExecutionContext, result: any, methodName: string, request: any): any {
-        switch (action) {
+    protected async performAfterAction(handler: keyof ControllerType, context: ExecutionContext, result: any) {
+        switch (handler) {
+            case 'getMany':
+                return await this.afterGetAll(result, context);
+            case 'getOne':
+                return await this.afterGetOne(result, context);
             case 'create':
-                return this.afterCreate(context, result);
+                return await this.afterCreate(result, context);
             case 'update':
-                return this.afterUpdate(context, result);
+                return await this.afterUpdate(result, context);
             case 'delete':
-                return this.afterDelete(context, result);
-            case 'findOne':
-                return this.afterFindOne(context, result);
-            case 'findAll':
-                return this.afterFindAll(context, result);
+                return await this.afterDelete(result, context);
             default:
-                return result;
+                return await this.afterUnknow(result, handler, context);
         }
     }
-
-    // Hooks for `before` actions (to be overridden by subclasses)
-    protected beforeInsert(context: ExecutionContext, data: any): any {
-        return data;
+    /***
+     * Hooks for `before` actions (to be overridden by subclasses)
+     * @param {ExecutionContext} context - The execution context.
+     */
+    protected beforeGetAll(context: ExecutionContext) { }
+    /***
+     * Hooks for `before` actions (to be overridden by subclasses)
+     * @param {ExecutionContext} context - The execution context.
+     */
+    protected beforeGetOne(context: ExecutionContext) { }
+    /***
+     * Hooks for `before` actions (to be overridden by subclasses)
+     * @param {ExecutionContext} context - The execution context.
+     * @throws {BadRequestException}, if the data is invalid. Possible reason : The request data is invalid or doesn't meet the requirements for creating a resource. Example: Missing required fields, invalid data format, or duplicate resource creation.
+     */
+    protected async beforeCreate(context: ExecutionContext) {
+        return Object.assign({}, context.switchToHttp().getRequest().body);
     }
+    /***
+     * Hooks for `before` actions (to be overridden by subclasses)
+     * @param {ExecutionContext} context - The execution context.
+     * @throws {BadRequestException|Error}, if the data is invalid. Possible reason : The request data is invalid or doesn't meet the requirements for creating a resource. Example: Missing required fields, invalid data format, or duplicate resource creation.
+     */
+    protected async beforeUpdate(context: ExecutionContext) { }
+    /***
+     * Hooks for `before` actions (to be overridden by subclasses)
+     * @param {ExecutionContext} context - The execution context.
+     */
+    protected beforeDelete(context: ExecutionContext) { }
 
-    protected beforeUpdate(context: ExecutionContext, data: any): any {
-        return data;
-    }
+    /***
+     * Hooks for `after` actions (to be overridden by subclasses)
+     * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
+     * @param {ExecutionContext} context - The execution context.
+     * @param result - The result of the method execution.
+     * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
+     */
+    protected async afterGetAll(result: any, context: ExecutionContext) { }
+    /***
+     * Hooks for `after` actions (to be overridden by subclasses)
+     * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
+     * @param {ExecutionContext} context - The execution context.
+     * @param result - The result of the method execution.
+     * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
+     */
+    protected async afterGetOne(result: any, context: ExecutionContext) { }
+    /***
+     * Hooks for `after` actions (to be overridden by subclasses)
+     * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
+     * @param {ExecutionContext} context - The execution context.
+     * @param result - The result of the method execution.
+     * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
+     */
+    protected async afterCreate(result: any, context: ExecutionContext) { }
+    /***
+     * Hooks for `after` actions (to be overridden by subclasses)
+     * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
+     * @param {ExecutionContext} context - The execution context.
+     * @param result - The result of the method execution.
+     * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
+     */
+    protected async afterUpdate(result: any, context: ExecutionContext) { }
+    /***
+     * Hooks for `after` actions (to be overridden by subclasses)
+     * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
+     * @param {ExecutionContext} context - The execution context.
+     * @param result - The result of the method execution.
+     * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
+     */
+    protected async afterDelete(result: any, context: ExecutionContext) { }
 
-    protected beforeDelete(context: ExecutionContext, data: any): any {
-        return data;
-    }
-
-    protected beforeFindOne(context: ExecutionContext, data: any): any {
-        return data;
-    }
-
-    protected beforeFindAll(context: ExecutionContext, data: any): any {
-        return data;
-    }
-
-    // Hooks for `after` actions (to be overridden by subclasses)
-    protected afterCreate(context: ExecutionContext, result: any): any {
-        return result;
-    }
-
-    protected afterUpdate(context: ExecutionContext, result: any): any {
-        return result;
-    }
-
-    protected afterDelete(context: ExecutionContext, result: any): any {
-        return result;
-    }
-
-    protected afterFindOne(context: ExecutionContext, result: any): any {
-        return result;
-    }
-
-    protected afterFindAll(context: ExecutionContext, result: any): any {
-        return result;
-    }
+    /***
+     * Hooks for `after` actions (to be overridden by subclasses).
+     * @param {any} result - The result of the method execution.
+     * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
+     * @param {ExecutionContext} context - The execution context.
+     * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
+     */
+    protected async afterUnknow(result: any, handler: keyof ControllerType, context: ExecutionContext) { }
 }

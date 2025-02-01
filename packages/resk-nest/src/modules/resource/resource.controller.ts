@@ -25,7 +25,7 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
    */
   constructor(protected readonly resourceService: ServiceType) { }
   @Get()
-  async getAll(): Promise<any> {
+  async getMany(): Promise<any> {
     return this.getResourceService().find();
   }
   @Get(':id')

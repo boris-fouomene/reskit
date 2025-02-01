@@ -5,7 +5,7 @@
 ## Key Features
 
 
-- **Decorator-Driven Resource Management**: Use decorators to intuitively define and manage resources, resulting in cleaner, more expressive code.
+- **Decorator-Driven ResourceMetadata Management**: Use decorators to intuitively define and manage resources, resulting in cleaner, more expressive code.
 - **Modular Architecture**: Treat every component as a resource, promoting reusability and better organization of application logic.
 - **Extensible Framework**: Effortlessly extend core functionalities by adding custom field types, decorators, and plugins tailored to specific project needs.
 - **Customizable Field Types**: Support for various built-in field types (such as number, dropdown, selectResource) that can be customized with specific properties for flexible data handling.

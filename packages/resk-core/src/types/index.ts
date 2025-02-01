@@ -28,7 +28,7 @@ export type IResourceDefaultEvent = IResourceActionName | keyof IResourceDataSer
  * ```typescript
  * const resourceData: IResourceData = {
  *   id: "123",
- *   name: "Example Resource",
+ *   name: "Example ResourceMetadata",
  *   description: "This is an example resource.",
  * };
  * ```
@@ -894,7 +894,7 @@ export type IResourceActionName = keyof IResourceActionMap;
 
 
 /**
-   @interface The IResourceMetaData interface represents the base structure for a resource in the application. 
+   @interface The IResourceMetadata interface represents the base structure for a resource in the application. 
     A resource is a fundamental concept often used to describe an entity or object that can be managed, manipulated, or stored within 
     the system. It typically refers to data objects like database tables, API endpoints, or any entities (like users, posts, or products) that the application deals with. 
     Each resource usually has attributes such as a name, label, or title.
@@ -919,7 +919,7 @@ export type IResourceActionName = keyof IResourceActionMap;
  * @property {string} [tooltip] - A short text that appears when the user hovers over the resource, providing additional context.
  * @property {IResourceActionMap} [actions] - The actions associated with the resource.
  */
-export interface IResourceMetaData<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
+export interface IResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
   /**
    * The internal name of the resource.
    *
@@ -928,7 +928,7 @@ export interface IResourceMetaData<DataType extends IResourceData = any, Primary
    * 
    * @example
    * ```typescript
-   * const userResource: IResourceMetaData = { name: "user" };
+   * const userResource: IResourceMetadata = { name: "user" };
    * ```
    */
   name?: IResourceName;
@@ -941,7 +941,7 @@ export interface IResourceMetaData<DataType extends IResourceData = any, Primary
    *
    * @example
    * ```typescript
-   * const productResource: IResourceMetaData = { label: "Product" };
+   * const productResource: IResourceMetadata = { label: "Product" };
    * ```
    */
   label?: string;
@@ -954,7 +954,7 @@ export interface IResourceMetaData<DataType extends IResourceData = any, Primary
    *
    * @example
    * ```typescript
-   * const orderResource: IResourceMetaData = { title: "Order Management" };
+   * const orderResource: IResourceMetadata = { title: "Order Management" };
    * ```
    */
   title?: string;
@@ -968,7 +968,7 @@ export interface IResourceMetaData<DataType extends IResourceData = any, Primary
    *
    * @example
    * ```typescript
-   * const userResource: IResourceMetaData = { tooltip: "This resource manages user information." };
+   * const userResource: IResourceMetadata = { tooltip: "This resource manages user information." };
    * ```
    */
   tooltip?: string;
@@ -983,7 +983,7 @@ export interface IResourceMetaData<DataType extends IResourceData = any, Primary
   /***
    * The class name of the resource
    * This information is used to identify the resource class in the application.
-   * It is retrieved from the target class passed to the @Resource decorator.
+   * It is retrieved from the target class passed to the @ResourceMetadata decorator.
    */
   className?: string;
 }
@@ -1279,7 +1279,7 @@ export type IMomentFormat = string;
  * - Handling composite keys in data structures.
  * 
  * ### Related Types:
- * - Consider using `IResourceMetaData` for defining the overall structure of a resource
+ * - Consider using `IResourceMetadata` for defining the overall structure of a resource
  *   that utilizes this primary key type.
  * 
  * ### Example Usage:
@@ -1287,7 +1287,7 @@ export type IMomentFormat = string;
  * retrieves a resource by its primary key:
  * 
  * ```typescript
- * function getResourceById(id: PrimaryKeyType): Resource {
+ * function getResourceById(id: PrimaryKeyType): ResourceMetadata {
  *     // Implementation to list the resource based on the provided primary key
  * }
  * 
@@ -1413,7 +1413,7 @@ export interface IResourceOperationResult<DataType extends IResourceData = any> 
  *     indicating the success or failure of the operation.
  *   - **Example**:
  *     ```typescript
- *     const result = await dataProvider.create({ name: "New Resource" });
+ *     const result = await dataProvider.create({ name: "New ResourceMetadata" });
  *     ```
  * 
  * - **update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>)**: Updates an existing resource record.
@@ -1424,7 +1424,7 @@ export interface IResourceOperationResult<DataType extends IResourceData = any> 
  *     indicating the success or failure of the update operation.
  *   - **Example**:
  *     ```typescript
- *     const result = await dataProvider.update("resourceId", { name: "Updated Resource" });
+ *     const result = await dataProvider.update("resourceId", { name: "Updated ResourceMetadata" });
  *     ```
  * 
  * - **delete(primaryKey: PrimaryKeyType)**: Deletes a resource record by its primary key.
@@ -1484,7 +1484,7 @@ export interface IResourceOperationResult<DataType extends IResourceData = any> 
  *     indicating the success or failure of the operation.
  *   - **Example**:
  *     ```typescript
- *     const result = await dataProvider.createMany([{ name: "Resource 1" }, { name: "Resource 2" }]);
+ *     const result = await dataProvider.createMany([{ name: "ResourceMetadata 1" }, { name: "ResourceMetadata 2" }]);
  *     ```
  * 
  * - **updateMany(data: IResourceManyCriteria<PrimaryKeyType,DataType>)**: Updates multiple resource records.
@@ -1585,7 +1585,7 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    * indicating the success or failure of the operation.
    * @example
   *   ```typescript
-  *   const result = await dataProvider.create({ name: "New Resource" });
+  *   const result = await dataProvider.create({ name: "New ResourceMetadata" });
   *     ```
    */
   create(record: Partial<DataType>): Promise<DataType>;
@@ -1597,7 +1597,7 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    * indicating the success or failure of the update operation.
    * @example
   *   ```typescript
-  *   const result = await dataProvider.update("resourceId", { name: "Updated Resource" });
+  *   const result = await dataProvider.update("resourceId", { name: "Updated ResourceMetadata" });
   *     ```
    */
   update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType>;
@@ -1680,7 +1680,7 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
    * indicating the success or failure of the operation.
    * @example
   *   ```typescript
-  *   const result = await dataProvider.createMany([{ name: "Resource 1" }, { name: "Resource 2" }]);
+  *   const result = await dataProvider.createMany([{ name: "ResourceMetadata 1" }, { name: "ResourceMetadata 2" }]);
   *     ```
    */
   createMany(data: Partial<DataType>[]): Promise<DataType[]>;

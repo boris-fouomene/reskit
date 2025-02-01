@@ -43,7 +43,7 @@ export interface IResourceApiDescriptions
 
 
 declare module "@resk/core" {
-  export interface IResourceMetaData<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, ClassType extends ResourceController<any> = ResourceController<any>> {
+  export interface IResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, ClassType extends ResourceController<any> = ResourceController<any>> {
     /**
     * Optional API description for the resource.
     */
@@ -149,3 +149,41 @@ export abstract class ResourceDataService<DataType extends IResourceData = any, 
   }
 }
 
+
+/**
+ * Infers the data type of a resource controller.
+ * 
+ * This type is used to extract the data type from a resource controller.
+ * It uses the `infer` keyword to infer the type of the data.
+ * 
+ * @template ControllerType The type of the resource controller.
+ * @example
+ * ```typescript
+ * class MyController extends ResourceController<MyData, MyPrimaryKey> {}
+ * 
+ * type MyDataType = IResourceControllerInferDataType<typeof MyController>;
+ * // MyDataType is now MyData
+ * ```
+ * 
+ * @returns The inferred data type of the resource controller.
+ */
+export type IResourceControllerInferDataType<ControllerType extends ResourceController<any, any>> = ControllerType extends ResourceController<infer D, any> ? D : IResourceData;
+
+/**
+ * Infers the primary key type of a resource controller.
+ * 
+ * This type is used to extract the primary key type from a resource controller.
+ * It uses the `infer` keyword to infer the type of the primary key.
+ * 
+ * @template ControllerType The type of the resource controller.
+ * @example
+ * ```typescript
+ * class MyController extends ResourceController<MyData, MyPrimaryKey> {}
+ * 
+ * type MyPrimaryKeyType = IResourceControllerInferPrimaryKey<typeof MyController>;
+ * // MyPrimaryKeyType is now MyPrimaryKey
+ * ```
+ * 
+ * @returns The inferred primary key type of the resource controller.
+ */
+export type IResourceControllerInferPrimaryKey<ControllerType extends ResourceController<any, any>> = ControllerType extends ResourceController<any, infer S> ? S : IResourcePrimaryKey;

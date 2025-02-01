@@ -4,10 +4,12 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common';
-import { defaultStr } from '@resk/core';
+import { defaultStr, IResourceData, IResourcePrimaryKey } from '@resk/core';
 import { ResourceController } from '@resource/resource.controller';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { IResourceControllerInferDataType } from '@resource/interfaces';
+
 
 @Injectable()
 /***
@@ -70,7 +72,7 @@ import { catchError, tap } from 'rxjs/operators';
             // Perform custom logic after deleting a product
             return result;
         }
-        afterGetAll(result, context) {
+        afterGetMany(result, context) {
             // Perform custom logic after getting all products
             return result;
         }
@@ -179,7 +181,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
     ) {
         switch (handler) {
             case 'getMany':
-                return await this.beforeGetAll(context);
+                return await this.beforeGetMany(context);
             case 'getOne':
                 return await this.beforeGetOne(context);
             case 'create':
@@ -197,7 +199,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
     protected async performAfterAction(handler: keyof ControllerType, context: ExecutionContext, result: any) {
         switch (handler) {
             case 'getMany':
-                return await this.afterGetAll(result, context);
+                return await this.afterGetMany(result, context);
             case 'getOne':
                 return await this.afterGetOne(result, context);
             case 'create':
@@ -214,7 +216,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * Hooks for `before` actions (to be overridden by subclasses)
      * @param {ExecutionContext} context - The execution context.
      */
-    protected beforeGetAll(context: ExecutionContext) { }
+    protected beforeGetMany(context: ExecutionContext) { }
     /***
      * Hooks for `before` actions (to be overridden by subclasses)
      * @param {ExecutionContext} context - The execution context.
@@ -244,42 +246,52 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * Hooks for `after` actions (to be overridden by subclasses)
      * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
      * @param {ExecutionContext} context - The execution context.
-     * @param result - The result of the method execution.
+     * @param {IResourceControllerInferDataType<ControllerType>[]} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterGetAll(result: any, context: ExecutionContext) { }
+    protected async afterGetMany(result: IResourceControllerInferDataType<ControllerType>[], context: ExecutionContext) {
+        return result;
+    }
     /***
      * Hooks for `after` actions (to be overridden by subclasses)
      * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
      * @param {ExecutionContext} context - The execution context.
-     * @param result - The result of the method execution.
+     * @param {IResourceControllerInferDataType<ControllerType>|null} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterGetOne(result: any, context: ExecutionContext) { }
+    protected async afterGetOne(result: IResourceControllerInferDataType<ControllerType> | null, context: ExecutionContext) {
+        return result;
+    }
     /***
      * Hooks for `after` actions (to be overridden by subclasses)
      * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
      * @param {ExecutionContext} context - The execution context.
-     * @param result - The result of the method execution.
+     * @param {IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterCreate(result: any, context: ExecutionContext) { }
+    protected async afterCreate(result: IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>, context: ExecutionContext) {
+        return result;
+    }
     /***
      * Hooks for `after` actions (to be overridden by subclasses)
      * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
      * @param {ExecutionContext} context - The execution context.
-     * @param result - The result of the method execution.
+     * @param {IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterUpdate(result: any, context: ExecutionContext) { }
+    protected async afterUpdate(result: IResourceControllerInferDataType<ControllerType>[] | IResourceControllerInferDataType<ControllerType>, context: ExecutionContext) {
+        return result;
+    }
     /***
      * Hooks for `after` actions (to be overridden by subclasses)
      * @param {keyof ControllerType} handler - The name of the method being executed from the controller.
      * @param {ExecutionContext} context - The execution context.
-     * @param result - The result of the method execution.
+     * @param {boolean|number} result - The result of the method execution.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterDelete(result: any, context: ExecutionContext) { }
+    protected async afterDelete(result: boolean | number, context: ExecutionContext) {
+        return result;
+    }
 
     /***
      * Hooks for `after` actions (to be overridden by subclasses).
@@ -288,5 +300,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
      * @param {ExecutionContext} context - The execution context.
      * @returns The modified result. That modified result will be returned to the client.That can be the same as the original result or a modified version of it. If nothing is returnded, The previous result is returned to the client.
      */
-    protected async afterUnknow(result: any, handler: keyof ControllerType, context: ExecutionContext) { }
+    protected async afterUnknow(result: any, handler: keyof ControllerType, context: ExecutionContext) {
+        return result;
+    }
 }

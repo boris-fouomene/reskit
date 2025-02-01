@@ -1,6 +1,6 @@
-import { I18n, Resource } from "@resk/core";
-import { ResourceBase } from "./base";
-@Resource({
+import { I18n, ResourceMetadata } from "@resk/core";
+import { Resource } from "./base";
+@ResourceMetadata({
     name: "users",
 })
-export class Users extends ResourceBase { }
+export class Users extends Resource { }

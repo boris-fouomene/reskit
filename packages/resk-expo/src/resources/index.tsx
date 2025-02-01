@@ -1,5 +1,5 @@
-import { isObj, ResourceBase as _ResourceBase } from "@resk/core";
+import { isObj, Resource as _ResourceBase } from "@resk/core";
 import { IResourceActionButton } from "./types";
-export default class ResourceBase {
+export default class Resource {
 
 }

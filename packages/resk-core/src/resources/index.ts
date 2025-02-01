@@ -1,4 +1,4 @@
-import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResourceMetaData, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria } from '../types';
+import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResourceMetadata, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory, extendObj } from '../utils/index';
 import { IClassConstructor, IProtectedResource } from '../types/index';
@@ -13,7 +13,7 @@ const resourcesClassNameMetaData = Symbol('resourceFromClassName');
 /**
  * Represents the base class for any resource.
  * 
- * The `ResourceBase` class provides a flexible structure for defining resource instances with optional metadata such as 
+ * The `Resource` class provides a flexible structure for defining resource instances with optional metadata such as 
  * `name`, `label`, `title`, and `tooltip`. Additionally, it manages dynamic fields associated with the resource.
  * 
  * This class can be extended to implement specific resources, and it automatically handles merging metaData passed into
@@ -26,7 +26,7 @@ const resourcesClassNameMetaData = Symbol('resourceFromClassName');
  * 
  * @example
  * // Create a new resource with basic properties
- * const resource = new ResourceBase({
+ * const resource = new Resource({
  *    name: 'user',
  *    label: 'User',
  *    title: 'User Information',
@@ -39,7 +39,7 @@ const resourcesClassNameMetaData = Symbol('resourceFromClassName');
  * 
  * @example
  * // Create a resource with dynamic fields
- * const dynamicResource = new ResourceBase({
+ * const dynamicResource = new Resource({
  *    name: 'product',
  *    fields: {
  *      name: { type: 'string', label: 'Product Name' },
@@ -50,7 +50,7 @@ const resourcesClassNameMetaData = Symbol('resourceFromClassName');
  * console.log(dynamicResource.getFields()); 
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
-export abstract class ResourceBase<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> implements IResourceDataService<DataType, PrimaryKeyType> {
+export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> {
   private _onDictionaryChangedListener?: { remove: () => any };
   private _onLocaleChangeListener?: { remove: () => any };
   constructor() {
@@ -60,7 +60,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
     this.init();
   }
   actions?: IResourceActionMap;
-  getMetaData(): IResourceMetaData<DataType> {
+  getMetaData(): IResourceMetadata<DataType> {
     return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, this.constructor));
   }
   static events = observableFactory<IResourceDefaultEvent | "string">();
@@ -72,7 +72,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * 
    * @example
    * ```typescript
-   * const userResource: IResourceMetaData = { name: "user" };
+   * const userResource: IResourceMetadata = { name: "user" };
    * ```
   */
   name?: IResourceName;
@@ -85,7 +85,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    *
    * @example
    * ```typescript
-   * const productResource: IResourceMetaData = { label: "Product" };
+   * const productResource: IResourceMetadata = { label: "Product" };
    * ```
    */
   label?: string;
@@ -98,7 +98,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    *
    * @example
    * ```typescript
-   * const orderResource: IResourceMetaData = { title: "Order Management" };
+   * const orderResource: IResourceMetadata = { title: "Order Management" };
    * ```
    */
   title?: string;
@@ -111,7 +111,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    *
    * @example
    * ```typescript
-   * const userResource: IResourceMetaData = { tooltip: "This resource manages user information." };
+   * const userResource: IResourceMetadata = { tooltip: "This resource manages user information." };
    * ```
    */
   tooltip?: string;
@@ -180,7 +180,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
    * @param args - The arguments to pass to the event.
    */
   _trigger(event: EventType, ...args: any[]) {
-    ResourceBase.events.trigger(event, Object.assign({}, this.getTranslateParams()), ...args);
+    Resource.events.trigger(event, Object.assign({}, this.getTranslateParams()), ...args);
     return this.trigger(event, ...args);
   }
   /**
@@ -499,7 +499,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
         });
       });
   }
-  updateMetadata(options: IResourceMetaData<DataType>): IResourceMetaData<DataType> {
+  updateMetadata(options: IResourceMetadata<DataType>): IResourceMetadata<DataType> {
     options = Object.assign({}, options);
     const metadata = extendObj({}, this.getMetaData(), options)
     Reflect.defineMetadata(ResourcesManager.resourceMetaData, metadata, this.constructor);
@@ -508,7 +508,7 @@ export abstract class ResourceBase<DataType extends IResourceData = any, Primary
   /**
    * Initializes the resource with the provided metaData.
    * 
-   * @param metaData - An object implementing the IResourceMetaData interface, containing the data to initialize the resource with.
+   * @param metaData - An object implementing the IResourceMetadata interface, containing the data to initialize the resource with.
    * 
    * This method assigns the provided metaData to the resource, ensuring that any empty properties
    * on the resource are filled with the corresponding values from the metaData object. It skips
@@ -884,14 +884,14 @@ export class ResourcesManager {
    * A global constant storing a record of all instantiated resources.
    * 
    * This represents a record of all resources, where the keys are derived from `IResourceName`
-   * and the values are instances of `ResourceBase`.
+   * and the values are instances of `Resource`.
    * 
    * @example
    * const allResources: IAllResource = {
    *   userResource: new UserResource()
    * };
    */
-  private static resources: Record<IResourceName, ResourceBase> = {} as Record<IResourceName, ResourceBase>;
+  private static resources: Record<IResourceName, Resource> = {} as Record<IResourceName, Resource>;
 
   /**
    * Retrieves the global record of all resource metaData managed by the `ResourcesManager`.
@@ -899,9 +899,9 @@ export class ResourcesManager {
    * This method returns a copy of the internal record of resource metaData, which can be used to access
    * the configuration and settings for each registered resource.
    * 
-   * @returns {Record<IResourceName, IResourceMetaData<any,any>>} A copy of the resource metaData record.
+   * @returns {Record<IResourceName, IResourceMetadata<any,any>>} A copy of the resource metaData record.
    */
-  public static getAllMetaData(): Record<IResourceName, IResourceMetaData<any>> {
+  public static getAllMetaData(): Record<IResourceName, IResourceMetadata<any>> {
     return Object.assign({}, Reflect.getMetadata(resourcesMetaDataKey, ResourcesManager));
   }
   /**
@@ -911,9 +911,9 @@ export class ResourcesManager {
    * The updated record is then stored as metadata on the `ResourcesManager` class.
    * 
    * @param {IResourceName} resourceName - The unique name of the resource.
-   * @param {IResourceMetaData<any>} metaData - The resource metaData to be associated with the given `resourceName`.
+   * @param {IResourceMetadata<any>} metaData - The resource metaData to be associated with the given `resourceName`.
    */
-  public static addMetaData(resourceName: IResourceName, metaData: IResourceMetaData<any>) {
+  public static addMetaData(resourceName: IResourceName, metaData: IResourceMetadata<any>) {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     metaData = Object.assign({}, metaData);
@@ -960,9 +960,9 @@ export class ResourcesManager {
    * non-null string, or if the resource metaData are not found, this method will return `undefined`.
    *
    * @param {IResourceName} resourceName - The unique name of the resource to retrieve the metaData for.
-   * @returns {IResourceMetaData<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
+   * @returns {IResourceMetadata<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
    */
-  public static getMetaDataFromName(resourceName: IResourceName): IResourceMetaData<any> | undefined {
+  public static getMetaDataFromName(resourceName: IResourceName): IResourceMetadata<any> | undefined {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     return (allOptions as any)[resourceName];
@@ -971,13 +971,13 @@ export class ResourcesManager {
   /**
  * Retrieves the resource metadata associated with the given target class.
  *
- * This function uses reflection to access the metadata stored on the target class using the `@Resource` decorator.
+ * This function uses reflection to access the metadata stored on the target class using the `@ResourceMetadata` decorator.
  * It returns a new object that is a copy of the metadata, which includes properties like `name`, `label`, `title`, and `tooltip`.
  *
  * @param {any} target - The target class or instance from which to retrieve the metadata.
- * @returns {ResourceBase} An object containing the resource metadata for the given target.
+ * @returns {Resource} An object containing the resource metadata for the given target.
  */
-  public static getMetaDataFromTarget(target: IClassConstructor): IResourceMetaData<any> | undefined {
+  public static getMetaDataFromTarget(target: IClassConstructor): IResourceMetadata<any> | undefined {
     return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, target.prototype));
   }
 
@@ -989,9 +989,9 @@ export class ResourcesManager {
    * If the resource name is not found, or if the resource metaData are not found, this method will return `undefined`.
    *
    * @param {string} className - The class name of the resource to retrieve the metaData for.
-   * @returns {IResourceMetaData<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
+   * @returns {IResourceMetadata<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
    */
-  public static getMetaDataByClassName(className: string): IResourceMetaData<any> | undefined {
+  public static getMetaDataByClassName(className: string): IResourceMetadata<any> | undefined {
     const resourceName = this.getNameFromClassName(className);
     if (!resourceName) return undefined;
     return this.getMetaDataFromName(resourceName);
@@ -1015,7 +1015,7 @@ export class ResourcesManager {
   /**
    * Retrieves a resource instance by its name from the `resources` record.
    * 
-   * @template ResourceInstanceType The type extending `ResourceBase` for the resource being returned.
+   * @template ResourceInstanceType The type extending `Resource` for the resource being returned.
    * @param {IResourceName} name - The name of the resource to retrieve, as defined in `IResourceName`.
    * @returns {(ResourceInstanceType | null)} The resource instance if it exists, or `null` if the resource is not found.
    * 
@@ -1025,7 +1025,7 @@ export class ResourcesManager {
    *   console.log(userResource.getLabel()); // Output: The label of the user resource
    * }
    */
-  public static getResource<ResourceInstanceType extends ResourceBase = ResourceBase>(name: IResourceName): ResourceInstanceType | null {
+  public static getResource<ResourceInstanceType extends Resource = Resource>(name: IResourceName): ResourceInstanceType | null {
     if (typeof name === "string" && name) {
       return this.resources[name] as ResourceInstanceType;
     }
@@ -1048,7 +1048,7 @@ export class ResourcesManager {
    * Adds a new resource instance to the manager.
    * 
    * @param {IResourceName} name - The unique name of the resource to add.
-   * @param {ResourceBase<DataType>} resource - The resource instance to be added.
+   * @param {Resource<DataType>} resource - The resource instance to be added.
    * @template DataType The type of data associated with the resource.
    * 
    * @example
@@ -1056,8 +1056,8 @@ export class ResourcesManager {
    * ResourcesManager.addResource('productResource', productResource);
    * console.log(ResourcesManager.getAllNames()); // Output: ['userResource', 'productResource']
    */
-  public static addResource<DataType extends IResourceData = any>(name: IResourceName, resource: ResourceBase<DataType>) {
-    if (typeof name === "string" && name && resource && resource instanceof ResourceBase) {
+  public static addResource<DataType extends IResourceData = any>(name: IResourceName, resource: Resource<DataType>) {
+    if (typeof name === "string" && name && resource && resource instanceof Resource) {
       (this.resources as IDict)[name] = resource;
     }
   }
@@ -1070,7 +1070,7 @@ export class ResourcesManager {
    * 
    * @param {IResourceName} name - The name of the resource to be removed from the manager.
    * 
-   * @returns {Record<IResourceName, ResourceBase>} The updated record of all remaining resources after the removal.
+   * @returns {Record<IResourceName, Resource>} The updated record of all remaining resources after the removal.
    * 
    * @example
    * // Assuming a resource named 'userResource' has been previously added
@@ -1082,7 +1082,7 @@ export class ResourcesManager {
    * // Check the remaining resources
    * console.log(ResourcesManager.getAllNames()); // Output: ['productResource']
    */
-  public static removeResource(name: IResourceName): Record<IResourceName, ResourceBase> {
+  public static removeResource(name: IResourceName): Record<IResourceName, Resource> {
     if (typeof name === "string") {
       delete (this.resources as IDict)[name];
     }
@@ -1094,10 +1094,10 @@ export class ResourcesManager {
    * Retrieves all resource instances managed by the manager.
    * 
    * This method returns a record of all resources currently stored in the `ResourcesManager`.
-   * The keys are derived from `IResourceName`, and the values are instances of `ResourceBase`.
+   * The keys are derived from `IResourceName`, and the values are instances of `Resource`.
    * This allows for easy access to all registered resources.
    * 
-   * @returns {Record<IResourceName, ResourceBase>} A record containing all resource instances, where each key is a resource name.
+   * @returns {Record<IResourceName, Resource>} A record containing all resource instances, where each key is a resource name.
    * 
    * @example
    * // Retrieve all registered resources
@@ -1109,7 +1109,7 @@ export class ResourcesManager {
    * //   productResource: ProductResourceInstance
    * // }
    */
-  public static getResources(): Record<IResourceName, ResourceBase> {
+  public static getResources(): Record<IResourceName, Resource> {
     return this.resources;
   }
 
@@ -1173,7 +1173,7 @@ export class ResourcesManager {
 }
 
 /**
- * A decorator function that adds resource metadata to a class that implements `ResourceBase`
+ * A decorator function that adds resource metadata to a class that implements `Resource`
  * 
  * This decorator stores the resource properties (`name`, `label`, `title`, `tooltip`) using Reflect metadata.
  *
@@ -1182,7 +1182,7 @@ export class ResourcesManager {
  * 
  * @example
  * ```typescript
- * @Resource({
+ * @ResourceMetadata({
  *   name: "user",
  *   label: "User",
  *   title: "User Management",
@@ -1192,7 +1192,7 @@ export class ResourcesManager {
  * 
  * ```
  */
-export function Resource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData: IResourceMetaData<DataType, PrimaryKeyType> & {
+export function ResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData: IResourceMetadata<DataType, PrimaryKeyType> & {
   /***
    * whether the resource should be instanciated or not
    */
@@ -1204,7 +1204,7 @@ export function Resource<DataType extends IResourceData = any, PrimaryKeyType ex
     if (typeof target == "function") {
       if (metaData?.instanciate) {
         try {
-          const resource = new (target as IClassConstructor)() as ResourceBase<DataType>;
+          const resource = new (target as IClassConstructor)() as Resource<DataType>;
           resource.updateMetadata(metaData);
           ResourcesManager.addResource<DataType>((metaData.name as IResourceName), resource);
         } catch { }
@@ -1214,3 +1214,51 @@ export function Resource<DataType extends IResourceData = any, PrimaryKeyType ex
     ResourcesManager.addMetaData(metaData.name as IResourceName, metaData);
   };
 }
+
+/**
+ * @interface {IResourceInferDataType}
+ * Infers the data type of a resource.
+ * 
+ * This type is used to extract the data type from a resource.
+ * It uses the `infer` keyword to infer the type of the data.
+ * 
+ * @template ResourceType The type of the resource.
+ * @description
+ * This type is useful when you need to access the data type of a resource
+ * without having to manually specify it.
+ * 
+ * @example
+ * ```typescript
+ * class MyResource extends Resource<MyData, MyPrimaryKey> {}
+ * 
+ * type MyDataType = IResourceInferDataType<typeof MyResource>;
+ * // MyDataType is now MyData
+ * ```
+ * 
+ * @returns The inferred data type of the resource.
+ */
+export type IResourceInferDataType<ResourceType extends Resource<any, any>> = ResourceType extends Resource<infer D, any> ? D : IResourceData;
+
+/**
+ * @interface {IResourceInferPrimaryKey}
+ * Infers the primary key type of a resource.
+ * 
+ * This type is used to extract the primary key type from a resource.
+ * It uses the `infer` keyword to infer the type of the primary key.
+ * 
+ * @template ResourceType The type of the resource.
+ * @description
+ * This type is useful when you need to access the primary key type of a resource
+ * without having to manually specify it.
+ * 
+ * @example
+ * ```typescript
+ * class MyResource extends Resource<MyData, MyPrimaryKey> {}
+ * 
+ * type MyPrimaryKeyType = IResourceInferPrimaryKey<typeof MyResource>;
+ * // MyPrimaryKeyType is now MyPrimaryKey
+ * ```
+ * 
+ * @returns The inferred primary key type of the resource.
+ */
+export type IResourceInferPrimaryKey<ResourceType extends Resource<any, any>> = ResourceType extends Resource<any, infer S> ? S : IResourcePrimaryKey;

@@ -1,7 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { IResourceData, IResourceDataService, IResourcePrimaryKey, ResourceBase } from '@resk/core';
+import { IResourceData, IResourceDataService, IResourcePrimaryKey, Resource } from '@resk/core';
 /**
- * The `ResourceService` class is an injectable service that extends the `ResourceBase` class.
+ * The `ResourceService` class is an injectable service that extends the `Resource` class.
  * It provides a generic implementation for managing resources in a NestJS application.
  *
  * The `ResourceService` class is parameterized with two type parameters:
@@ -21,7 +21,7 @@ import { IResourceData, IResourceDataService, IResourcePrimaryKey, ResourceBase 
  * }
  */
 @Injectable()
-export abstract class ResourceService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends ResourceBase<DataType, PrimaryKeyType> implements OnModuleInit, OnModuleDestroy {
+export abstract class ResourceService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> extends Resource<DataType, PrimaryKeyType> implements OnModuleInit, OnModuleDestroy {
     onModuleDestroy() {
         this.destroy();
     }

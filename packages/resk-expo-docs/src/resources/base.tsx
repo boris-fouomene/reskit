@@ -1,5 +1,7 @@
-import { ResourceBase as ResourceBaseCore } from "@resk/core";
+import { IResourceDataService, IResourcePrimaryKey, Resource as ResourceBaseCore } from "@resk/core";
 
-export class ResourceBase extends ResourceBaseCore {
-
+export class Resource extends ResourceBaseCore {
+    getDataService(): IResourceDataService<any, IResourcePrimaryKey> {
+        throw "Method getDataService not implemented.";
+    }
 }

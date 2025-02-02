@@ -37,10 +37,6 @@ export class ResourceModule {
           provide: APP_INTERCEPTOR,
           useClass: I18nInterceptor,
         },
-        {
-          provide: APP_GUARD,
-          useClass: PermissionsGuard,
-        }
       ],
       exports: []
     };

@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, SetMetadata, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Auth, i18n, IAuthPerm, IAuthPermAction, IResourceAction, IResourceName, isNonNullString, isObj, ResourceMetadata, ResourcesManager } from '@resk/core';
+import { Auth, defaultObj, i18n, IAuthPerm, IAuthPermAction, IResourceAction, IResourceName, isNonNullString, isObj, ResourceMetadata, ResourcesManager } from '@resk/core';
 
 
 /**
@@ -85,7 +85,6 @@ export class PermissionsGuard implements CanActivate {
             context.getHandler(),
             context.getClass(),
         ]);
-
         /**
          * If no required permissions are found, return true.
          * 
@@ -98,14 +97,16 @@ export class PermissionsGuard implements CanActivate {
          * 
          * The user is retrieved from the request using the switchToHttp method.
          */
-        const user = context.switchToHttp().getRequest().user;
+        const user = defaultObj(context.switchToHttp().getRequest().user, Auth.getSignedUser());
 
         /**
          * If the user is not an object, return false.
          * 
          * This means that the user is not authenticated or does not have the required permissions.
          */
-        if (!isObj(user)) return false;
+        if (!isObj(user) || !Object.getSize(user, true)) {
+            throw new UnauthorizedException(i18n.t('auth.unauthorized'));
+        }
 
         /**
          * Check if the user has any of the required permissions.

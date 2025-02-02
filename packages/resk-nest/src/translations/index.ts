@@ -10,6 +10,7 @@ I18n.RegisterTranslations({
             "invalidStrategy": "Invalid Auth strategy  [%{strategyName}].",
             "strategyNameNotFound": "Auth Strategy name  [%{strategyName}] not found",
             "invalidStrategyName": "Invalid Auth strategy name.",
+            "unauthorized": "Unauthorized. You are not authorized to access this resource.",
             "guards": {
                 "permissions": {
                     "forbiddenError": "You do not have permission to access this resource.",

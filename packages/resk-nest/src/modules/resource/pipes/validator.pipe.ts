@@ -1,6 +1,6 @@
 import { Injectable, ArgumentMetadata, BadRequestException, SetMetadata, ExecutionContext, createParamDecorator, PipeTransform } from '@nestjs/common';
 import { IClassConstructor, IDict, isClass, isNonNullString, isObj, Validator } from '@resk/core';
-import "../translations";
+import "../../../translations";
 import { i18n } from "@resk/core";
 import { stringify } from 'querystring';
 import { IParseRequestConfig, RequestParser } from './parse-request';

@@ -232,6 +232,7 @@ export const objectSize = Object.getSize = function (obj: any, breakOnFirstEleme
  * If no valid object is found among the arguments, it returns an empty object.
  *
  * @param {...any[]} args - The arguments to check for objects.
+ * @template T - The type of the object to return.
  * 
  * @returns {object} The first non-empty object found among the arguments, or an empty object if none is found.
  *
@@ -258,7 +259,7 @@ export const objectSize = Object.getSize = function (obj: any, breakOnFirstEleme
  * console.log(result5); // Outputs: {}
  * ```
  */
-export const defaultObj = function (...args: any[]): object {
+export function defaultObj<T extends object = any>(...args: any[]): T {
   /**
    * If there is only one argument, return it if it's an object, or an empty object if it's not.
    */

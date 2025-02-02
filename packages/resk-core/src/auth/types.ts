@@ -66,8 +66,52 @@ export interface IAuthUser {
    * The authentication token associated with the user.
    */
   token?: string;
+
+  roles?: IAuthRole[];
 }
 
+/**
+ * Interface representing an authorization role.
+ * 
+ * @description This interface defines the structure of an authorization role, 
+ *              which consists of a name and a set of permissions.
+ * 
+ * @example
+ * ```typescript
+ * const adminRole: IAuthRole = {
+ *   name: 'admin',
+ *   perms: {
+ *     // permissions for the admin role
+ *     "documents": ["read", "create", "update"],
+ *     "users": ["read", "delete"],
+ *     "posts": ["read", "create"],
+ *   }
+ * };
+ * ```
+ */
+export interface IAuthRole {
+  /**
+   * The name of the authorization role.
+   * 
+   * @description This property represents the unique identifier of the role.
+   * @example 'admin', 'moderator', 'user'
+   */
+  name: string;
+
+  /**
+   * The set of permissions associated with the role.
+   * 
+   * @description This property represents the permissions that are granted to the role.
+   * @see IAuthPerms
+   * @example
+   * ```typescript
+   * const perms: IAuthPerms = {
+   *   // permissions for the role
+   * };
+   * ```
+   */
+  perms: IAuthPerms;
+}
 /**
 * @interface IAuthSessionStorage
 * Interface for managing authentication session storage.

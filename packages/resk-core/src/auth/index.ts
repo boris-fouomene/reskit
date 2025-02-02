@@ -3,7 +3,7 @@ import { i18n } from "../i18n";
 import $session from "../session";
 import { IDict, IResourceActionName, IResourceName } from "../types";
 import { isObj, parseJSON, isNonNullString, IObservable, observable } from "../utils";
-import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPermAction, IAuthPerms, IAuthEvent } from "./types";
+import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPermAction, IAuthPerms, IAuthEvent, IAuthRole } from "./types";
 import { } from "../types";
 import { } from "./types";
 import CryptoJS from "crypto-js";
@@ -496,6 +496,10 @@ export default class Auth {
      * ```
      * @see {@link IAuthPerm} for the `IAuthPerm` type.
      * @see {@link IAuthPerms} for the `IAuthPerms` type.
+     * @see {@link IAuthUser} for the `IAuthUser` type.
+     * @see {@link IResourceName} for the `IResourceName` type.
+     * @see {@link IAuthPermAction} for the `IAuthPermAction` type.
+     * @see {@link IAuthRole} for the `IAuthRole` type.
      */
     static isAllowed = (perm?: IAuthPerm, user?: IAuthUser): boolean => {
         user = Object.assign({}, user || (Auth.getSignedUser() as IAuthUser));
@@ -503,15 +507,25 @@ export default class Auth {
         if (Auth._isMasterAdmin(user)) return true;
         if (!perm) return true;
         if (typeof perm === "function") return !!perm(user);
-        if (typeof perm === "string" && perm) {
+        if (isNonNullString(perm)) {
             const split = String(perm).trim().split(":");
-            return Auth.checkPermission(user?.perms || {}, split[0] as IResourceName, split[1] as IAuthPermAction);
+            const resourceName: IResourceName = split[0] as IResourceName;
+            const action = split[1] as IAuthPermAction;
+            if (Auth.checkPermission(user?.perms || {}, resourceName,)) {
+                return true;
+            }
+            if (Array.isArray(user?.roles)) {
+                for (let i in user.roles) {
+                    const role = user.roles[i];
+                    if (isObj(role) && isObj(role.perms) && Auth.checkPermission(role.perms, resourceName, action)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
         return true;
     }
-
-
-
 
     /**
      * Checks if a user has permission to perform a specific action on a resource.

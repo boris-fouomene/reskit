@@ -4,6 +4,8 @@ import { PassportStrategy, AuthGuard as PassportAuthGuard } from '@nestjs/passpo
 import { defaultStr, i18n, IClassConstructor, isNonNullString, isObj } from '@resk/core';
 import 'reflect-metadata';
 
+export * from "./permission.guard";
+
 const STRATEGIES_KEY = Symbol('auth:startegies-keys');
 
 /**

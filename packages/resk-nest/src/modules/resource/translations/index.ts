@@ -10,6 +10,11 @@ I18n.RegisterTranslations({
             "invalidStrategy": "Invalid Auth strategy  [%{strategyName}].",
             "strategyNameNotFound": "Auth Strategy name  [%{strategyName}] not found",
             "invalidStrategyName": "Invalid Auth strategy name.",
+            "guards": {
+                "permissions": {
+                    "forbiddenError": "You do not have permission to access this resource.",
+                },
+            }
         },
         "typeorm": {
             "entityWithPrimaryNotFound": "Entity with primary key %{primaryKey} not found",

@@ -7,7 +7,7 @@ import { IStyle } from "../../types";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, ScrollViewProps, ViewProps } from "react-native";
 import { IThemeColorTokenKey } from "@theme/types";
-import { IProtectedResource } from "@resk/core";
+import { IAuthPermResource } from "@resk/core";
 
 /**
  * Represents the properties for a Tab component.
@@ -67,11 +67,11 @@ export type ITabProps = Omit<ISwiperProps, "onChange"> & {
  * for customization of its appearance and behavior.
  * 
  * @extends ITouchableRippleProps
- * @extends IProtectedResource
+ * @extends IAuthPermResource
  * @see {@link ITouchableRippleProps} for the `ITouchableRippleProps` type.
- * @see {@link IProtectedResource} for the `IProtectedResource` type.
+ * @see {@link IAuthPermResource} for the `IAuthPermResource` type.
  */
-export type ITabItemProps = Omit<ITouchableRippleProps, "children" | "style"> & IProtectedResource & {
+export type ITabItemProps = Omit<ITouchableRippleProps, "children" | "style"> & IAuthPermResource & {
     /**
      * Additional properties for customizing the label component.
      */

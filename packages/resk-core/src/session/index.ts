@@ -220,21 +220,15 @@ const remove = (key: string) => {
 /**
  * Removes all values from the session storage.
  * 
- * This function sanitizes the key and removes all values from the session storage.
+ * This function removes all values from the session storage.
  * 
- * @param {string} key - The key to remove all values for (not used in this implementation).
  * @returns {any} The result of removing all values, or undefined if the key is invalid or the session storage is not available.
  */
-const removeAll = (key: string) => {
-  /**
-   * Sanitize the key to ensure it's valid for session storage.
-   */
-  key = sanitizeKey(key);
-
+const removeAll = () => {
   /**
    * Check if the session storage is available and the key is valid.
    */
-  if (SessionManager.storage && key && typeof key === 'string') {
+  if (SessionManager.storage) {
     /**
      * Remove all values from the session storage.
      */

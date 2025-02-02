@@ -77,7 +77,7 @@ export type IPrimitive = string | number | boolean;
  * The type property defaults to "text" if not specified.
  * 
  * @template FieldType - The type of the field, defaults to "text"
- * @extends IProtectedResource
+ * @extends IAuthPermResource
  * 
  * @description
  * This interface serves as a base for all field types, providing common properties such as type, label, and name.
@@ -90,9 +90,9 @@ export type IPrimitive = string | number | boolean;
  *   name: 'textField'
  * };
  * ```
- * @see {@link IProtectedResource} for the `IProtectedResource` type.
+ * @see {@link IAuthPermResource} for the `IAuthPermResource` type.
  */
-export interface IFieldBase<FieldType extends IFieldType = any> extends IProtectedResource {
+export interface IFieldBase<FieldType extends IFieldType = any> extends IAuthPermResource {
   /**
    * The type of the field.
    * 
@@ -411,13 +411,11 @@ export type IField<T extends IFieldType = any> = IFieldMap[T] & {
  */
 export interface IFields extends Record<string, IField<keyof IFieldMap>> { }
 
-
-
 /**
  * Represents a protected resource that can be associated with a button in the user interface.
  * This type is used to define the conditions under which a button should be rendered based on user permissions.
  *
- * @type IProtectedResource
+ * @type IAuthPermResource
  * 
  * @property {IResourceName} [resourceName] - The name of the resource associated with the button.
  * This property can be used to identify the specific resource that the button interacts with.
@@ -428,13 +426,13 @@ export interface IFields extends Record<string, IField<keyof IFieldMap>> { }
  * 
  * @example
  * // Example of a protected resource with a specific permission
- * const deleteButton: IProtectedResource = {
+ * const deleteButton: IAuthPermResource = {
  *   resourceName: 'Delete User',
  *   perm: 'user:delete'
  * };
  * 
  * // Example of a protected resource without a specific permission
- * const saveButton: IProtectedResource = {
+ * const saveButton: IAuthPermResource = {
  *   resourceName: 'Save Changes'
  * };
  * 
@@ -445,7 +443,7 @@ export interface IFields extends Record<string, IField<keyof IFieldMap>> { }
  * This type is particularly useful in applications where user roles and permissions dictate the visibility of UI elements.
  * By using this type, developers can easily manage which buttons should be displayed based on the user's access rights.
  */
-export type IProtectedResource = {
+export type IAuthPermResource = {
   /**
     * The name of the resource associated with the button.
     */
@@ -566,7 +564,7 @@ export type IResourceName = keyof IResourcesMap;
 export interface IResourcesMap { }
 
 /**
- * @interface IResourceActionMap
+ * @interface IResourceActionsMap
  * 
  * Represents a mapping of resource actions to their corresponding action definitions.
  * This interface serves as a structured way to define the various actions that can be 
@@ -592,11 +590,11 @@ export interface IResourcesMap { }
  * 
  * ### Example Usage
  * 
- * Here is an example of how the `IResourceActionMap` interface can be utilized:
+ * Here is an example of how the `IResourceActionsMap` interface can be utilized:
  * 
  * ```typescript
  * // Define a resource action map for a "documents" resource
- * const documentActions: IResourceActionMap = {
+ * const documentActions: IResourceActionsMap = {
  *     findOne: { label: "Read Document", tooltip: "Retrieve the document details." },
  *     create: { label: "Create Document", tooltip: "Add a new document to the system." },
  *     update: { label: "Update Document", tooltip: "Modify the existing document." },
@@ -605,7 +603,7 @@ export interface IResourcesMap { }
  * };
  * 
  * // Function to perform an action on a resource
- * function performAction(action: keyof IResourceActionMap) {
+ * function performAction(action: keyof IResourceActionsMap) {
  *     switch (action) {
  *         case "read":
  *             console.log("Reading document...");
@@ -639,7 +637,7 @@ export interface IResourcesMap { }
  * - Each action can be further customized with additional properties, such as 
  *   labels and tooltips, to enhance user experience and provide context in the UI.
  */
-export interface IResourceActionMap {
+export interface IResourceActionsMap {
   read: IResourceAction;
   create: IResourceAction;
   update: IResourceAction;
@@ -840,13 +838,13 @@ export type IResourceTranslateActionKey = IResourceName | `${IResourceName}.${IR
  * @type IResourceActionName
  * 
  * Represents the type of resource actions that can be performed within the application.
- * This type is derived from the keys of the `IResourceActionMap` interface, ensuring that 
+ * This type is derived from the keys of the `IResourceActionsMap` interface, ensuring that 
  * only valid action names can be used when referencing actions associated with resources.
  * 
  * ### Description
  * 
  * The `IResourceActionName` type is a union of string literals that correspond to the 
- * defined actions in the `IResourceActionMap`. This provides type safety and consistency 
+ * defined actions in the `IResourceActionsMap`. This provides type safety and consistency 
  * when working with resource actions, preventing errors that may arise from using 
  * invalid action names.
  * 
@@ -890,7 +888,7 @@ export type IResourceTranslateActionKey = IResourceName | `${IResourceName}.${IR
  *   determined or when implementing features that require strict adherence to defined 
  *   action names.
  */
-export type IResourceActionName = keyof IResourceActionMap;
+export type IResourceActionName = keyof IResourceActionsMap;
 
 
 /**
@@ -917,7 +915,7 @@ export type IResourceActionName = keyof IResourceActionMap;
  * @property {string} [label] - A user-friendly label for the resource, typically used in UI elements.
  * @property {string} [title] - A descriptive title for the resource, often displayed in prominent places.
  * @property {string} [tooltip] - A short text that appears when the user hovers over the resource, providing additional context.
- * @property {IResourceActionMap} [actions] - The actions associated with the resource.
+ * @property {IResourceActionsMap} [actions] - The actions associated with the resource.
  */
 export interface IResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
   /**
@@ -975,9 +973,9 @@ export interface IResourceMetadata<DataType extends IResourceData = any, Primary
 
   /**
    * Returns the actions associated with the resource.
-   * @returns {Partial<IResourceActionMap>} The actions associated with the resource.
+   * @returns {Partial<IResourceActionsMap>} The actions associated with the resource.
    */
-  actions?: Partial<IResourceActionMap>;
+  actions?: Partial<IResourceActionsMap>;
 
 
   /***

@@ -132,7 +132,7 @@ export function cloneObject(source: any): any {
  * ```
  */
 export function isObj(obj: any): boolean {
-  return isPlainObject(obj);
+  return obj && isPlainObject(obj);
 };
 
 

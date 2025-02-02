@@ -1,7 +1,7 @@
-import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResourceMetadata, IResourceActionMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria, IResourceQueryOptionsOrderDirection } from '../types';
+import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResourceMetadata, IResourceActionsMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria, IResourceQueryOptionsOrderDirection } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory, extendObj } from '../utils/index';
-import { IClassConstructor, IProtectedResource } from '../types/index';
+import { IClassConstructor, IAuthPermResource } from '../types/index';
 import { IAuthPerm, IAuthUser } from '@/auth/types';
 import Auth from "../auth";
 import { i18n, I18n } from '@/i18n';
@@ -61,7 +61,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
     this._onLocaleChangeListener = i18n.on("locale-changed", this.onI18nChange.bind(this));
     this.init();
   }
-  actions?: IResourceActionMap;
+  actions?: IResourceActionsMap;
   getMetaData(): IResourceMetadata<DataType> {
     return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, this.constructor));
   }
@@ -525,8 +525,8 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * });
    * 
    * // Retrieve the translations for the "user" resource.  
-   * import {ResourceManager} from "@resk/core";
-   * const userResource = ResourceManager.getResource("user");
+   * import {ResourcesManager} from "@resk/core";
+   * const userResource = ResourcesManager.getResource("user");
    * const userTranslations = userResource.getTranslations();
    * console.log(userTranslations);
    * // Output:
@@ -607,13 +607,13 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   /**
    * Retrieves the actions associated with the resource.
    * If the actions are not already defined or not an object, 
-   * it initializes them as an empty object of type `IResourceActionMap`.
+   * it initializes them as an empty object of type `IResourceActionsMap`.
    *
-   * @returns {IResourceActionMap} The map of resource actions.
+   * @returns {IResourceActionsMap} The map of resource actions.
    */
-  getActions(): IResourceActionMap {
+  getActions(): IResourceActionsMap {
     if (!isObj(this.actions) || !this.actions) {
-      this.actions = {} as IResourceActionMap;
+      this.actions = {} as IResourceActionsMap;
     }
     return this.actions;
   }
@@ -1117,7 +1117,7 @@ export class ResourcesManager {
  * const isAllowed = ResourcesManager.isAllowed({ resourceName, perm }, user);
  * console.log(isAllowed); // Output: true
  */
-  static isAllowed(options: IProtectedResource, user?: IAuthUser): boolean {
+  static isAllowed(options: IAuthPermResource, user?: IAuthUser): boolean {
     options = Object.assign({}, options);
     const { resourceName, perm } = options;
     if (!resourceName || !isNonNullString(resourceName)) return Auth.isAllowed(perm as IAuthPerm, user);

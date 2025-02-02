@@ -282,7 +282,7 @@ export default class Auth {
      * ```
      * @see {@link IAuthUser} for the `IAuthUser` type.
      */
-    static isMasterAdmin: ((user?: IAuthUser) => boolean);
+    static isMasterAdmin?: ((user?: IAuthUser) => boolean);
     private static _isMasterAdmin(user?: IAuthUser): boolean {
         user = isObj(user) ? user : (Auth.getSignedUser() as IAuthUser);
         return typeof Auth.isMasterAdmin == "function" ? Auth.isMasterAdmin(user) : false;
@@ -501,7 +501,7 @@ export default class Auth {
      * @see {@link IAuthPermAction} for the `IAuthPermAction` type.
      * @see {@link IAuthRole} for the `IAuthRole` type.
      */
-    static isAllowed = (perm?: IAuthPerm, user?: IAuthUser): boolean => {
+    static isAllowed = (perm: IAuthPerm, user?: IAuthUser): boolean => {
         user = Object.assign({}, user || (Auth.getSignedUser() as IAuthUser));
         if (typeof perm === "boolean") return perm;
         if (Auth._isMasterAdmin(user)) return true;
@@ -511,7 +511,8 @@ export default class Auth {
             const split = String(perm).trim().split(":");
             const resourceName: IResourceName = split[0] as IResourceName;
             const action = split[1] as IAuthPermAction;
-            if (Auth.checkPermission(user?.perms || {}, resourceName,)) {
+            if (!isNonNullString(resourceName) || !isNonNullString(action)) return false;
+            if (isObj(user?.perms) && user?.perms && Auth.checkPermission(user?.perms, resourceName, action)) {
                 return true;
             }
             if (Array.isArray(user?.roles)) {
@@ -524,7 +525,7 @@ export default class Auth {
                 return false;
             }
         }
-        return true;
+        return false;
     }
 
     /**
@@ -575,7 +576,7 @@ export default class Auth {
         let userActions: IResourceActionName[] = [];
         for (let i in perms) {
             if (String(i).toLowerCase().trim() === resourceStr && Array.isArray(perms[i as keyof IAuthPerms])) {
-                userActions = perms[i as keyof IAuthPerms];
+                userActions = perms[i as keyof IAuthPerms] as IResourceActionName[];
                 break;
             }
         }

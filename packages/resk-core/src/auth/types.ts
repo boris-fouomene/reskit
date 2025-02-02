@@ -1,4 +1,4 @@
-import { IDict, IResourceName, IResourceActionName } from "../types";
+import { IDict, IResourceName, IResourceActionName, IAuthPermResource } from "../types";
 /**
  * @interface IAuthUser
  * Represents an authenticated user in the application.
@@ -58,7 +58,7 @@ import { IDict, IResourceName, IResourceActionName } from "../types";
  * @see {@link IResourceActionName} for the `IResourceActionName` type.
  * @see {@link IAuthPerms} for the `IAuthPerms` type.
  */
-export interface IAuthUser {
+export interface IAuthUser extends Record<string, any> {
   id: string | number;
   authSessionCreatedAt?: number;
   perms?: IAuthPerms;
@@ -89,7 +89,7 @@ export interface IAuthUser {
  * };
  * ```
  */
-export interface IAuthRole {
+export interface IAuthRole extends Record<string, any> {
   /**
    * The name of the authorization role.
    * 
@@ -102,11 +102,14 @@ export interface IAuthRole {
    * The set of permissions associated with the role.
    * 
    * @description This property represents the permissions that are granted to the role.
-   * @see IAuthPerms
+   * @see {@link IAuthPerms} for the `IAuthPerms` type.
    * @example
    * ```typescript
    * const perms: IAuthPerms = {
    *   // permissions for the role
+   *   "documents": ["read", "create", "update"],
+   *   "users": ["read", "delete"],
+   *   "posts": ["read", "create"],
    * };
    * ```
    */
@@ -261,7 +264,6 @@ export interface IAuthSessionStorage {
  */
 export type IAuthPerm = IAuthPermStr | ((user: IAuthUser) => boolean) | false;
 
-
 /**
  * @interface IAuthPerms
  * Represents a mapping of authentication permissions for resources.
@@ -310,7 +312,7 @@ export type IAuthPerm = IAuthPermStr | ((user: IAuthUser) => boolean) | false;
  * action is permitted on a given resource, demonstrating how the 
  * `IAuthPerms` type can be utilized in permission management.
  */
-export type IAuthPerms = Record<IResourceName, IResourceActionName[]>;
+export type IAuthPerms = Partial<Record<IResourceName, IResourceActionName[]>>;
 
 
 /**

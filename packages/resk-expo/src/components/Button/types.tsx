@@ -11,7 +11,7 @@ import { ILabelProps } from "@components/Label";
 import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IDividerProps } from "@components/Divider";
-import { IResourceName, IAuthPerm, IProtectedResource } from "@resk/core";
+import { IResourceName, IAuthPerm, IAuthPermResource } from "@resk/core";
 import { IFormData } from "@components/Form/types";
 
 
@@ -61,7 +61,7 @@ export type IButtonMode = | 'text' | 'outlined' | 'contained';
  *               the button to extend its reference context. This function receives the button's context object
  *               and can return a partial set of additional properties that can be merged with the existing props.
  * 
- * @extends IProtectedResource
+ * @extends IAuthPermResource
  * @example
  * // Example of using IButtonProps with additional custom properties
  * interface MyCustomButtonContext {
@@ -80,8 +80,8 @@ export type IButtonMode = | 'text' | 'outlined' | 'contained';
  *         </Button>
  *     );
  * };
- * @see {@link IProtectedResource} for the `IProtectedResource` type.
- * @see {@link IProtectedResource} for the `IProtectedResource` type.
+ * @see {@link IAuthPermResource} for the `IAuthPermResource` type.
+ * @see {@link IAuthPermResource} for the `IAuthPermResource` type.
  * @see {@link IButtonContext} for the `IButtonContext` type.
  * @see {@link ITouchableRippleProps} for the `ITouchableRippleProps` type.
  * @see {@link ITooltipBaseProps} for the `ITooltipBaseProps` type.
@@ -90,7 +90,7 @@ export type IButtonMode = | 'text' | 'outlined' | 'contained';
  * @see {@link ISurfaceProps} for the `ISurfaceProps` type.
  * @see {@link ILabelProps} for the `ILabelProps` type.
  */
-export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, textColor: string }> & Omit<ITouchableRippleProps, "style" | 'onPress' | "children"> & Omit<ITooltipBaseProps, 'disabled'> & IProtectedResource & {
+export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, textColor: string }> & Omit<ITouchableRippleProps, "style" | 'onPress' | "children"> & Omit<ITooltipBaseProps, 'disabled'> & IAuthPermResource & {
     /**
      * Optional style for the button component.
      * Can be used to customize the appearance of the button.

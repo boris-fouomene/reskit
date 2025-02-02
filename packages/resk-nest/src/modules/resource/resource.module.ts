@@ -1,6 +1,7 @@
 import { DynamicModule } from '@nestjs/common';
 import { I18nInterceptor, I18nModule } from '../i18n';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { PermissionsGuard } from '@auth/permission.guard';
 /**
  * The `ResourceModule` is a global NestJS module that provides the `ResourceService` and a configurable `serviceProvider`.
  * It can be imported and configured using the `forRoot()` static method, which takes an object with a `serviceProvider` property.
@@ -35,6 +36,10 @@ export class ResourceModule {
         {
           provide: APP_INTERCEPTOR,
           useClass: I18nInterceptor,
+        },
+        {
+          provide: APP_GUARD,
+          useClass: PermissionsGuard,
         }
       ],
       exports: []

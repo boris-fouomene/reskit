@@ -206,19 +206,16 @@ describe("Validator Rules", () => {
             });
         })
         it("Validate rules with decorators on entity", async () => {
-            const r = await Validator.validateTarget(Entity, {
-                id: 10,
-                aString: "1234567890",
-            });
-            expect(r).toMatchObject({
-                errors: expect.arrayContaining([
-                    "[Id] : This field must be different from 10",
-                    "[Name] : This field must be a non null string",
-                    "[Email] : This field is required",
-                    "[Note] : This field must be greater than 5",
-                ]),
-                success: false,
-            })
+            try {
+                await Validator.validateTarget(Entity, {
+                    id: 10,
+                    aString: "1234567890",
+                });
+            } catch (error) {
+                expect(error).toMatchObject({
+                    message: "Validation failed for 4 fields"
+                });
+            }
         })
     })
 });

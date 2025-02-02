@@ -5,6 +5,7 @@ node_modules/
 test/
 src/
 docs/
+dist/
 # Ignore specific files
 .env
 *.log

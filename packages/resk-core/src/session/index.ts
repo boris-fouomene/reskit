@@ -1,7 +1,8 @@
 import { isClientSide } from "../platform";
 import { parseJSON, stringify } from "../utils/json";
-import { IDict } from '../types/index';
+import { IClassConstructor, IDict } from '../types/index';
 import isNonNullString from '../utils/isNonNullString';
+
 
 /**
  * Session manager class.
@@ -9,6 +10,7 @@ import isNonNullString from '../utils/isNonNullString';
  * This class provides a way to manage sessions using a storage object.
  */
 class SessionManager {
+  static sessionStorageMetaData = Symbol("sessionStorage");
   /**
    * The storage object used by the session manager.
    * 
@@ -28,9 +30,15 @@ class SessionManager {
    * 
    * If the storage object has not been initialized, it will be initialized using the `window.localStorage` object if available.
    * 
+   * If the storage object is not available, it will be initialized using an in-memory storage.
+   * 
    * @returns {ISessionStorage} The storage object used by the session manager.
    */
   public static get storage(): ISessionStorage {
+    const storage = Reflect.getMetadata(SessionManager.sessionStorageMetaData, SessionManager);
+    if (isValidStorage(storage)) {
+      this._storage = storage;
+    }
     if (this._storage) return this._storage;
     if (isClientSide() && typeof window !== 'undefined' && window.localStorage && window.localStorage?.getItem) {
       this._storage = {
@@ -38,6 +46,15 @@ class SessionManager {
         set: (key: string, value: any) => window.localStorage.setItem(key, value),
         remove: (key: string) => window.localStorage.removeItem(key),
         removeAll: () => window.localStorage.clear()
+      };
+    } else {
+      //in memory storage. When there is not a localStorage, we use an in memory storage
+      let InMemoryStorage: IDict = {};
+      this._storage = {
+        get: (key: string) => InMemoryStorage[key],
+        set: (key: string, value: any) => InMemoryStorage[key] = value,
+        remove: (key: string) => delete InMemoryStorage[key],
+        removeAll: () => InMemoryStorage = {},
       };
     }
     return this._storage as ISessionStorage;
@@ -52,7 +69,7 @@ class SessionManager {
    */
   public static set storage(storage: ISessionStorage) {
     if (isValidStorage(storage)) {
-      this._storage = storage;
+      Reflect.defineMetadata(SessionManager.sessionStorageMetaData, storage, SessionManager);
     }
   }
 
@@ -303,3 +320,56 @@ const isValidStorage = (storage?: ISessionStorage): boolean => {
 };
 
 export default { get, set, remove, handleGetValue, sanitizeKey, handleSetValue, isValidStorage, SessionManager, removeAll }
+
+
+
+/**
+ * Decorator to set the session storage object.
+ * 
+ * This decorator is used to set the session storage object for the SessionManager.
+ * It creates a new instance of the target class and assigns it to the SessionManager's storage property.
+ * 
+ * @example
+ * ```typescript
+ * @SessionStorage()
+ * class MySessionStorage implements ISessionStorage {
+    set (key: string, value: any, decycle?: boolean) {
+      console.log("set", key, value);
+    }
+    get (key: string){
+      return "get";
+    }
+    remove(key: string) {
+      console.log("remove", key);
+    }
+    removeAll(){
+      console.log("removeAll");
+    }
+  }
+ * ```
+ * 
+ * @param target The target class that implements the ISessionStorage interface.
+ * @throws {Error} If an error occurs while creating a new instance of the target class.
+ */
+export function SessionStorage() {
+  return function (target: IClassConstructor<ISessionStorage>) {
+    try {
+      /**
+       * Creates a new instance of the target class.
+       */
+      const storage = new target();
+      if (!isValidStorage(storage)) {
+        return;
+      }
+      /**
+       * Assigns the new instance to the SessionManager's storage property.
+       */
+      SessionManager.storage = storage;
+    } catch (error) {
+      /**
+       * Logs any errors that occur while creating a new instance of the target class.
+       */
+      console.error(error);
+    }
+  };
+}

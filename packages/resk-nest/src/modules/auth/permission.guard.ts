@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, SetMetadata, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Auth, defaultObj, i18n, IAuthPerm, IAuthPermAction, IResourceAction, IResourceName, isNonNullString, isObj, ResourceMetadata, ResourcesManager } from '@resk/core';
-
+import { Auth, defaultObj, i18n, IAuthPerm, IAuthPermAction, IResourceName, isNonNullString, isObj, ResourcesManager, createPropertyDecorator, getDecoratedProperty, getDecoratedProperties } from '@resk/core';
 
 /**
  * Unique symbol used as the key for storing permissions metadata.
@@ -25,7 +24,9 @@ const PERMISSIONS_KEY = Symbol('permissions');
  * @param  {(IAuthPerm|{ resourceName: IResourceName, action: IAuthPermAction })[]} permissions A variable number of IAuthPerm arguments, each representing a permission.
  * @returns A decorator that sets the permissions metadata on the target class or method.
  */
-export const Permissions = (...permissions: (IAuthPerm | { resourceName: IResourceName, action: IAuthPermAction })[]) => SetMetadata(PERMISSIONS_KEY, permissions);
+export const Permissions = (...permissions: (IAuthPerm | { resourceName: IResourceName, action: IAuthPermAction })[]) => {
+    return createPropertyDecorator<(IAuthPerm | { resourceName: IResourceName, action: IAuthPermAction })[]>(PERMISSIONS_KEY, permissions);
+};
 
 /**
  * Injectable guard that checks if a user has the required permissions to access a route.
@@ -55,14 +56,7 @@ export const Permissions = (...permissions: (IAuthPerm | { resourceName: IResour
  */
 @Injectable()
 export class PermissionsGuard implements CanActivate {
-    /**
-     * Constructor that injects the Reflector instance.
-     * 
-     * The Reflector is used to get the required permissions from the route's metadata.
-     * 
-     * @param reflector The Reflector instance.
-     */
-    constructor(private reflector: Reflector) { }
+    constructor() { }
 
     /**
      * Method that checks if a user has the required permissions to access a route.
@@ -81,10 +75,7 @@ export class PermissionsGuard implements CanActivate {
          * The getAllAndOverride method is used to get all the required permissions from the route's metadata,
          * including any overridden permissions.
          */
-        const requiredPermissions = this.reflector.getAllAndOverride<IAuthPerm[]>(PERMISSIONS_KEY, [
-            context.getHandler(),
-            context.getClass(),
-        ]);
+        const requiredPermissions = getDecoratedProperty<IAuthPerm[]>(context.getClass(), PERMISSIONS_KEY, context.getHandler().name);
         /**
          * If no required permissions are found, return true.
          * 

@@ -6,9 +6,8 @@ import { IAuthPerm, IAuthUser } from '@/auth/types';
 import Auth from "../auth";
 import { i18n, I18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
-import { PaginationHelper } from './PaginationHelper';
-
-export * from './PaginationHelper';
+import { ResourcePaginationHelper } from './ResourcePaginationHelper';
+export * from './ResourcePaginationHelper';
 const resourcesMetaDataKey = Symbol('resources');
 const resourcesClassNameMetaData = Symbol('resourceFromClassName');
 
@@ -400,7 +399,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
     options = Object.assign({}, options);
     const [data, count] = await this.findAndCount(options);
-    return PaginationHelper.paginate(data, count, options);
+    return ResourcePaginationHelper.paginate(data, count, options);
   }
   /**
    * Creates multiple records in the resource.

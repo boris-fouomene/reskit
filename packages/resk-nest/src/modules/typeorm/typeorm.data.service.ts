@@ -1,6 +1,6 @@
 
 import { BadRequestException, Injectable, Req } from "@nestjs/common";
-import { i18n, IClassConstructor, IResourceData, IResourceDataService, IResourceFindWhereCondition, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, IResourceQueryOptionsOrderBy, isNonNullString, isObj, PaginationHelper } from "@resk/core";
+import { i18n, IClassConstructor, IResourceData, IResourceDataService, IResourceFindWhereCondition, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, IResourceQueryOptionsOrderBy, isNonNullString, isObj, ResourcePaginationHelper } from "@resk/core";
 import { RequestParser } from "@resource/pipes";
 import { And, DataSource, DeepPartial, EntityManager, In, QueryRunner, Repository } from "typeorm";
 import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
@@ -305,6 +305,6 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
     async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined) {
         options = Object.assign({}, options);
         const [data, count] = await this.findAndCount(options);
-        return PaginationHelper.paginate(data, count, options);
+        return ResourcePaginationHelper.paginate(data, count, options);
     }
 }

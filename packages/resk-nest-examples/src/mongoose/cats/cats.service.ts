@@ -1,6 +1,6 @@
 import { ObjectId } from "typeorm";
 import { CatDto } from "./cats.dto";
-import { MongooseResourceService } from "src/modules/mongoose/mongoose.resource.service";
+import { MongooseResourceService } from "@resk/nest";
 import { CatSchema } from "./cats.schema";
 import { Connection } from "mongoose";
 import { Inject } from "@nestjs/common";

@@ -1,11 +1,9 @@
 import { Body, Controller, ExecutionContext, Get, HttpException, HttpStatus, Injectable, Post, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { ParseRequest, ResourceController, ValidatorPipe } from '@resource';
+import { ParseRequest, ResourceInterceptor, Permissions, ResourceController, ValidatorPipe } from '@resk/nest';
 import { User } from './entities/user.entity'
 import { CreateUserDto } from './dto/create-user.dto';
-import { ResourceInterceptor } from '@resource/interceptors';
 import { IResourcePaginatedResult, IResourceQueryOptions } from '@resk/core';
-import { Permissions } from '@auth/permission.guard';
 
 @Injectable()
 class UsersInterceptor extends ResourceInterceptor<UsersController> {

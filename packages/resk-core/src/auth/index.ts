@@ -367,7 +367,7 @@ export default class Auth {
     static setSignedUser(u: IAuthUser | null, triggerEvent?: boolean) {
         Auth.localUserRef.current = u;
         const uToSave = u as IAuthUser;
-        let encrypted = null;
+        let encrypted: any = null;
         try {
             if (isObj(uToSave)) {
                 uToSave.authSessionCreatedAt = new Date().getTime();

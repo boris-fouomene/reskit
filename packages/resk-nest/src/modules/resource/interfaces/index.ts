@@ -7,143 +7,156 @@ import { ResourceController } from '../resource.controller';
 import { Injectable } from "@nestjs/common";
 
 
-/**
- * Represents an API operation for a resource.
- *
- * This interface extends the ApiOperationOptions from NestJS Swagger
- * to include additional properties specific to resource operations.
- *
- * @interface IResourceApiOperation
- */
-export interface IResourceApiOperation extends ApiOperationOptions { }
-
-/**
- * Describes the API operations available for a resource.
- *
- * This interface defines the operations that can be performed on a resource,
- * including getting one, getting all, creating, updating, and deleting.
- *
- * @interface IResourceApiDescription
- */
-export type IResourceApiDescription<ClassType extends ResourceController<any> = ResourceController> = {
-  [methodName in keyof ClassType]?: IResourceApiOperation;
-}
-
-/**
- * A collection of API descriptions for multiple resources.
- *
- * This interface extends a record type where each key is a resource name
- * and the value is the corresponding API description.
- *
- * @interface IResourceApiDescriptions
- */
-export interface IResourceApiDescriptions
-  extends Record<IResourceName, IResourceApiDescription> { }
-
-
-
 declare module "@resk/core" {
   export interface IResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, ClassType extends ResourceController<any> = ResourceController<any>> {
-    /**
-    * Optional API description for the resource.
-    */
-    apiDescription?: IResourceApiDescription<ClassType>;
-
     /***
      * The name of the controller class for the resource service
      */
     controllerName?: string;
   }
-  export namespace ResourcesManager {
-    /**
-     * Builds the Swagger operation ID for a resource.
-     *
-     * @param {string} controllerKey - The name of the controller.
-     * @param {string} methodKey - The name of the method.
-     * @returns {string} The constructed operation ID.
-     */
-    export function buildApiOperationId(controllerKey: string, methodKey: string): string;
-
-    /**
-    * Parses a Swagger operation ID into its component parts.
-    *
-    * @param {string} operationId - The operation ID to parse.
-    * @returns {{ controllerKey: string, methodKey: string }} An object containing the controller and method keys.
-    */
-    export function parseApiOperationId(operationId: string): { controllerKey: string, methodKey: string };
-
-    /**
-     * Retrieves the API description for a resource.
-     *
-     * @param {IResourceName} resourceName - The name of the resource.
-     * @param {string} [method] - The name of the method (optional).
-     * @returns {ApiOperationOptions | undefined} The API operation options or undefined if not found.
-     */
-    export function getApiDescription(resourceName: IResourceName, method?: string): ApiOperationOptions | undefined;
-  }
 }
 
 /**
- * Builds the Swagger operation ID for a resource.
+ * Abstract class for resource data services.
+ * Provides a set of methods for creating, updating, deleting, and querying resources.
  *
- * @param {string} controllerKey - The name of the controller.
- * @param {string} methodKey - The name of the method.
- * @returns {string} The constructed operation ID.
+ * @template DataType The type of resource data.
+ * @template PrimaryKeyType The type of primary key for the resource.
+ * @template RepositoryType The type of repository for the resource.
  */
-ResourcesManager.buildApiOperationId = function (controllerKey: string, methodKey: string) {
-  return `${controllerKey}::${methodKey}`;
-}
-
-/**
- * Parses a Swagger operation ID into its component parts.
- *
- * @param {string} operationId - The operation ID to parse.
- * @returns {{ controllerKey: string, methodKey: string }} An object containing the controller and method keys.
- */
-ResourcesManager.parseApiOperationId = function (operationId: string): { controllerKey: string, methodKey: string } {
-  if (!isNonNullString(operationId)) return { controllerKey: "", methodKey: "" };
-  const [controllerKey, methodKey] = operationId.split("::");
-  return { controllerKey, methodKey };
-}
-
-/**
- * Retrieves the API description for a resource.
- *
- * @param {IResourceName} resourceName - The name of the resource.
- * @param {string} [method] - The name of the method (optional).
- * @returns {ApiOperationOptions | undefined} The API operation options or undefined if not found.
- */
-ResourcesManager.getApiDescription = function (resourceName: IResourceName, method?: string): ApiOperationOptions | undefined {
-  const resourceOptions = ResourcesManager.getMetaDataFromName(resourceName);
-  if (!isObj(resourceOptions) || !isObj(resourceOptions?.apiDescription) || !isNonNullString(method)) return;
-  return (resourceOptions?.apiDescription as any)[method];
-}
-
 @Injectable()
 export abstract class ResourceDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, RepositoryType = any> {
+  /**
+   * Constructor for the resource data service.
+   * Initializes the service with a repository instance.
+   *
+   * @param repository The repository instance for the resource.
+   */
   constructor(protected readonly repository: RepositoryType) { }
 
+  /**
+   * Creates a new resource record.
+   *
+   * @param record The partial data for the new resource record.
+   * @returns A promise that resolves to the created resource record.
+   */
   abstract create(record: Partial<DataType>): Promise<DataType>;
+
+  /**
+   * Updates an existing resource record.
+   *
+   * @param primaryKey The primary key of the resource record to update.
+   * @param updatedData The partial data for the updated resource record.
+   * @returns A promise that resolves to the updated resource record.
+   */
   abstract update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType>;
+
+  /**
+   * Deletes a resource record.
+   *
+   * @param primaryKey The primary key of the resource record to delete.
+   * @returns A promise that resolves to a boolean indicating whether the deletion was successful.
+   */
   abstract delete(primaryKey: PrimaryKeyType): Promise<boolean>;
+
+  /**
+   * Finds a single resource record by primary key or query options.
+   *
+   * @param options The primary key or query options for the resource record to find.
+   * @returns A promise that resolves to the found resource record, or null if not found.
+   */
   abstract findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null>;
+
+  /**
+   * Finds a single resource record by primary key or query options, throwing an error if not found.
+   *
+   * @param options The primary key or query options for the resource record to find.
+   * @returns A promise that resolves to the found resource record.
+   */
   abstract findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType>;
+
+  /**
+   * Finds multiple resource records by query options.
+   *
+   * @param options The query options for the resource records to find.
+   * @returns A promise that resolves to an array of found resource records.
+   */
   abstract find(options?: IResourceQueryOptions<DataType> | undefined): Promise<DataType[]>;
+
+  /**
+   * Finds multiple resource records by query options and returns the count of found records.
+   *
+   * @param options The query options for the resource records to find.
+   * @returns A promise that resolves to an array of found resource records and the count of found records.
+   */
   abstract findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]>;
+
+  /**
+   * Creates multiple resource records.
+   *
+   * @param data The partial data for the new resource records.
+   * @returns A promise that resolves to an array of created resource records.
+   */
   abstract createMany(data: Partial<DataType>[]): Promise<DataType[]>;
+
+  /**
+   * Updates multiple resource records.
+   *
+   * @param filter The criteria for the resource records to update.
+   * @param data The partial data for the updated resource records.
+   * @returns A promise that resolves to the count of updated resource records.
+   */
   abstract updateMany(filter: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number>;
+
+  /**
+   * Deletes multiple resource records.
+   *
+   * @param criteria The criteria for the resource records to delete.
+   * @returns A promise that resolves to the count of deleted resource records.
+   */
   abstract deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number>;
+
+  /**
+   * Counts the number of resource records by query options.
+   *
+   * @param options The query options for the resource records to count.
+   * @returns A promise that resolves to the count of resource records.
+   */
   abstract count(options?: IResourceQueryOptions<DataType> | undefined): Promise<number>;
+
+  /**
+   * Checks if a resource record exists by primary key.
+   *
+   * @param primaryKey The primary key of the resource record to check.
+   * @returns A promise that resolves to a boolean indicating whether the resource record exists.
+   */
   abstract exists(primaryKey: PrimaryKeyType): Promise<boolean>;
-  /***
+
+  /**
    * Returns the names of the primary columns of the resource.
-   * @returns {(keyof DataType)[]} An array of primary column names.
+   *
+   * @returns An array of primary column names.
    */
   abstract getPrimaryColumnNames(): (keyof DataType)[];
 
+  /**
+   * Retrieves distinct values for a specified field.
+   *
+   * @param field The field for which to retrieve distinct values.
+   * @returns A promise that resolves to an array of distinct values.
+   * @throws Will throw an error if the method is not implemented.
+   */
   distinct?(field: keyof DataType): Promise<any[]> {
     throw new Error("Method distinct not implemented.");
   }
+
+  /**
+   * Performs aggregation on the resource data using a specified pipeline.
+   *
+   * @param pipeline The aggregation pipeline to apply.
+   * @returns A promise that resolves to an array of aggregated results.
+   * @throws Will throw an error if the method is not implemented.
+   */
   aggregate?(pipeline: any[]): Promise<any[]> {
     throw new Error("Method aggregate not implemented.");
   }

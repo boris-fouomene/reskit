@@ -12,7 +12,7 @@ import { DataSource, DataSourceOptions } from "typeorm";
  * // Example usage in a NestJS application:
  * @Module({
  *   imports: [
- *     TypeOrmModule.forRoot({
+ *     TypeOrmResourceModule.forRoot({
  *       name: 'myDataSource',
  *       type: 'postgres',
  *       host: 'localhost',
@@ -33,7 +33,7 @@ import { DataSource, DataSourceOptions } from "typeorm";
  * Let's suppose you have a user module with a User entity. 
  * First, you need to create a data source module for your database:
  * ## database.module.ts
- * export const DatabaseModule = TypeOrmModule.forRoot({
+ * export const DatabaseModule = TypeOrmResourceModule.forRoot({
  *   name : 'myDataSource', //the name of the data source provider
  *   type: 'postgres',
  *   host: 'localhost',
@@ -65,7 +65,7 @@ import { DataSource, DataSourceOptions } from "typeorm";
  * export class UserModule {}
  * ```
  */
-export class TypeOrmModule {
+export class TypeOrmResourceModule {
     /**
      * The default provider name for the TypeORM data source.
      * This is used when no custom name is provided in the options.
@@ -88,7 +88,7 @@ export class TypeOrmModule {
      * @example
      * ```typescript
      * // Example of creating a custom data source provider:
-     * const provider = TypeOrmModule.createDataSourceProvider({
+     * const provider = TypeOrmResourceModule.createDataSourceProvider({
      *   name: 'myDataSource',
      *   type: 'mysql',
      *   host: 'localhost',
@@ -105,7 +105,7 @@ export class TypeOrmModule {
         const { name } = options;
         // Create a provider that initializes the data source
         const provider = {
-            provide: defaultStr(name, TypeOrmModule.DEFAULT_PROVIDER_NAME),
+            provide: defaultStr(name, TypeOrmResourceModule.DEFAULT_PROVIDER_NAME),
             useFactory: async () => {
                 const dataSource = new DataSource(options);
                 return dataSource.initialize();
@@ -129,7 +129,7 @@ export class TypeOrmModule {
      * // Example usage in a NestJS module:
      * @Module({
      *   imports: [
-     *     TypeOrmModule.forRoot({
+     *     TypeOrmResourceModule.forRoot({
      *       name: 'myDataSource',
      *       type: 'sqlite',
      *       database: 'database.sqlite',
@@ -145,12 +145,12 @@ export class TypeOrmModule {
         options: DataSourceOptions & { name?: string, global?: boolean }
     ): DynamicModule & { name: string } {
         // Create the data source provider
-        const provider = TypeOrmModule.createDataSourceProvider(options);
+        const provider = TypeOrmResourceModule.createDataSourceProvider(options);
         // Return the dynamic module configuration
         return {
             global: typeof options?.global === 'boolean' ? options.global : true,
-            name: defaultStr(options?.name, TypeOrmModule.DEFAULT_PROVIDER_NAME),
-            module: TypeOrmModule,
+            name: defaultStr(options?.name, TypeOrmResourceModule.DEFAULT_PROVIDER_NAME),
+            module: TypeOrmResourceModule,
             providers: [provider],
             exports: [provider],
         };

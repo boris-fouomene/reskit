@@ -1,10 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import "./modules/resource/interfaces";
-import { isNonNullString, isObj, extendObj, ResourcesManager, IResourceMetadata, IResourceName } from "@resk/core";
+import { isNonNullString, ResourcesManager } from "@resk/core";
 import {
     SwaggerModule,
     DocumentBuilder,
-    ApiOperationOptions,
     SwaggerCustomOptions,
     SwaggerDocumentOptions,
 } from '@nestjs/swagger';
@@ -18,7 +17,7 @@ const pathM = require("path");
  * It can set up Swagger documentation and enable versioning based on the configuration.
  *
  * @param {any} module - The main application module.
- * @param {ICreateAppOptions} [options] - Optional configuration options for the NestJS application and Swagger documentation.
+ * @param {ICreateNestAppOptions} [options] - Optional configuration options for the NestJS application and Swagger documentation.
  * @returns {Promise<INestApplication<T>>} A Promise that resolves to the created NestJS application.
  *
  * @example
@@ -53,7 +52,7 @@ const pathM = require("path");
  */
 export async function createApp<T extends INestApplication = INestApplication>(
     module: any,
-    options?: ICreateAppOptions,
+    options?: ICreateNestAppOptions,
 ): Promise<INestApplication<T>> {
     const { swaggerOptions, versioningOptions, ...nestAppOptions } =
         Object.assign({}, options);
@@ -93,7 +92,7 @@ export async function createApp<T extends INestApplication = INestApplication>(
  * and the API documentation.
  *
  * @param {INestApplication} app - The NestJS application instance.
- * @param {ICreateAppOptions['swaggerOptions']} [swaggerOptions] - Optional configuration options for the Swagger documentation.
+ * @param {ICreateNestAppOptions['swaggerOptions']} [swaggerOptions] - Optional configuration options for the Swagger documentation.
  * @returns {void} This function does not return a value.
  *
  * @example
@@ -125,7 +124,7 @@ export async function createApp<T extends INestApplication = INestApplication>(
  */
 export const setupSwagger = (
     app: INestApplication,
-    swaggerOptions?: ICreateAppOptions['swaggerOptions'],
+    swaggerOptions?: ICreateNestAppOptions['swaggerOptions'],
 ) => {
     const {
         configMutator,
@@ -138,12 +137,6 @@ export const setupSwagger = (
         ...sOptions
     } = Object.assign({}, swaggerOptions);
     const documentOptions = Object.assign({}, customOptions);
-    const { operationIdFactory } = documentOptions;
-    documentOptions.operationIdFactory = (controllerKey: string, methodKey: string) => {
-        const operatorId = ResourcesManager.buildApiOperationId(controllerKey, methodKey);
-        const str = typeof operationIdFactory === 'function' ? operationIdFactory(controllerKey, methodKey) : operatorId;
-        return isNonNullString(str) ? str : operatorId;
-    };
     const configBuilder = new DocumentBuilder();
     if (isNonNullString(title) && title) {
         configBuilder.setTitle(title);
@@ -199,36 +192,6 @@ export const setupSwagger = (
     // Set up the Swagger UI endpoint
     SwaggerModule.setup(swaggerPath, app, () => {
         const documents = SwaggerModule.createDocument(app, config, documentOptions);
-        const resourcesByControllersClassNames: Record<string, IResourceMetadata> = {} as Record<string, IResourceMetadata>;
-        const allResurces = ResourcesManager.getAllMetaData();
-        for (let resourceName in allResurces) {
-            if (isObj(allResurces[resourceName as IResourceName]) && isNonNullString(allResurces[resourceName as IResourceName].controllerName)) {
-                const controllerName = allResurces[resourceName as IResourceName].controllerName as string;
-                resourcesByControllersClassNames[controllerName] = allResurces[resourceName as IResourceName];
-            }
-        }
-        //console.log(documents," are list of resources",ResourcesManager.getApiDescription("users")," are api descriptions");
-        if (isObj(documents?.paths)) {
-            for (let path in documents.paths) {
-                const pathItem = documents.paths[path];
-                if (!isObj(pathItem)) continue;
-                Object.entries(pathItem).forEach(([method, operation]) => {
-                    const op: ApiOperationOptions = operation as ApiOperationOptions;
-                    if (!isObj(op) || !isNonNullString(op.operationId)) return;
-                    const { operationId } = op;
-                    const { controllerKey, methodKey } = ResourcesManager.parseApiOperationId(operationId);
-                    if (isNonNullString(controllerKey) && isNonNullString(methodKey)) {
-                        const parentDesk = resourcesByControllersClassNames[controllerKey];
-                        if (isObj(parentDesk) && parentDesk && isObj(parentDesk.apiDescription)) {
-                            const apiDescription = (parentDesk?.apiDescription as any)[methodKey];
-                            if (isObj(apiDescription)) {
-                                extendObj(op, apiDescription);
-                            }
-                        }
-                    }
-                });
-            }
-        }
         return documents;
     }, sOptions);
 };
@@ -240,18 +203,18 @@ export const setupSwagger = (
  * This interface extends the NestApplicationOptions and includes additional options
  * for versioning and Swagger documentation.
  *
- * @interface ICreateAppOptions
+ * @interface ICreateNestAppOptions
  * @extends {NestApplicationOptions}
  */
-export interface ICreateAppOptions extends NestApplicationOptions {
+export interface ICreateNestAppOptions extends NestApplicationOptions {
     /**
      * The versioning options for the application.
      * This allows you to configure how versioning is handled in the application.
      *
      * @type {Partial<VersioningOptions>}
-     * @memberof ICreateAppOptions
+     * @memberof ICreateNestAppOptions
      * @example
-     * const options: ICreateAppOptions = {
+     * const options: ICreateNestAppOptions = {
      *     versioningOptions: {
      *         enabled: true
      *     }
@@ -264,10 +227,10 @@ export interface ICreateAppOptions extends NestApplicationOptions {
          * If the value is not set, it will enable URI versioning.
          *
          * @type {boolean}
-         * @memberof ICreateAppOptions.versioningOptions
+         * @memberof ICreateNestAppOptions.versioningOptions
          * @default true
          * @example
-         * const options: ICreateAppOptions = {
+         * const options: ICreateNestAppOptions = {
          *     versioningOptions: {
          *         enabled: false
          *     }
@@ -281,9 +244,9 @@ export interface ICreateAppOptions extends NestApplicationOptions {
      * This allows you to configure Swagger documentation settings.
      *
      * @type {SwaggerCustomOptions}
-     * @memberof ICreateAppOptions
+     * @memberof ICreateNestAppOptions
      * @example
-     * const options: ICreateAppOptions = {
+     * const options: ICreateNestAppOptions = {
      *     swaggerOptions: {
      *         enabled: true,
      *         path: '/api-docs',
@@ -299,10 +262,10 @@ export interface ICreateAppOptions extends NestApplicationOptions {
          * If set to true, Swagger UI will be available for the application.
          *
          * @type {boolean}
-         * @memberof ICreateAppOptions.swaggerOptions
+         * @memberof ICreateNestAppOptions.swaggerOptions
          * @default false
          * @example
-         * const options: ICreateAppOptions = {
+         * const options: ICreateNestAppOptions = {
          *     swaggerOptions: {
          *         enabled: true
          *     }
@@ -315,9 +278,9 @@ export interface ICreateAppOptions extends NestApplicationOptions {
          * This is the URL path where the Swagger UI will be served.
          *
          * @type {string}
-         * @memberof ICreateAppOptions.swaggerOptions
+         * @memberof ICreateNestAppOptions.swaggerOptions
          * @example
-         * const options: ICreateAppOptions = {
+         * const options: ICreateNestAppOptions = {
          *     swaggerOptions: {
          *         path: '/api-docs'
          *     }
@@ -331,9 +294,9 @@ export interface ICreateAppOptions extends NestApplicationOptions {
          *
          * @param {DocumentBuilder} builder - The Swagger document builder.
          * @returns {DocumentBuilder} The modified builder.
-         * @memberof ICreateAppOptions.swaggerOptions
+         * @memberof ICreateNestAppOptions.swaggerOptions
          * @example
-         * const options: ICreateAppOptions = {
+         * const options: ICreateNestAppOptions = {
          *     swaggerOptions: {
          *         configMutator: (builder) => {
          *             return builder.setTitle('My API');
@@ -348,9 +311,9 @@ export interface ICreateAppOptions extends NestApplicationOptions {
          * This is the title that will be displayed in the Swagger UI.
          *
          * @type {string}
-         * @memberof ICreateAppOptions.swaggerOptions
+         * @memberof ICreateNestAppOptions.swaggerOptions
          * @example
-         * const options: ICreateAppOptions = {
+         * const options: ICreateNestAppOptions = {
          *     swaggerOptions: {
          *         title: 'My API'
          *     }
@@ -363,9 +326,9 @@ export interface ICreateAppOptions extends NestApplicationOptions {
          * This provides a description of the API that will be displayed in the Swagger UI.
          *
          * @type {string}
-         * @memberof ICreateAppOptions.swaggerOptions
+         * @memberof ICreateNestAppOptions.swaggerOptions
          * @example
-         * const options: ICreateAppOptions = {
+         * const options: ICreateNestAppOptions = {
          *     swaggerOptions: {
          *         description: 'API documentation for my application'
          *     }
@@ -378,10 +341,10 @@ export interface ICreateAppOptions extends NestApplicationOptions {
          * The default is '1.0', or it can be retrieved from the versioningOptions.defaultVersion.
          *
          * @type {string}
-         * @memberof ICreateAppOptions.swaggerOptions
+         * @memberof ICreateNestAppOptions.swaggerOptions
          * @default '1.0'
          * @example
-         * const options: ICreateAppOptions = {
+         * const options: ICreateNestAppOptions = {
          *     swaggerOptions: {
          *         version: '1.0.0'
          *     }
@@ -394,9 +357,9 @@ export interface ICreateAppOptions extends NestApplicationOptions {
          * This allows for additional options when creating the Swagger document.
          *
          * @type {SwaggerDocumentOptions}
-         * @memberof ICreateAppOptions.swaggerOptions
+         * @memberof ICreateNestAppOptions.swaggerOptions
          * @example
-         * const options: ICreateAppOptions = {
+         * const options: ICreateNestAppOptions = {
          *     swaggerOptions: {
          *         documentOptions: {
          *             // additional options here

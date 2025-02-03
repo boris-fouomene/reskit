@@ -4,9 +4,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "rootDir": "./src",
-    "module": "CommonJS",
-    "target": "ES2021",
-    "moduleResolution": "node",
+    "module": "commonjs",
     "paths": {
       "@resource/*": [
         "./src/modules/resource/*"

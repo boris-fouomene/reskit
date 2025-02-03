@@ -13,6 +13,8 @@
     "strict": true, // Enable all strict type checking options
     "resolveJsonModule": true,
     "incremental": true,
+    "noLib": false,
+    "sourceMap": false,
     "typeRoots": [
       "./node_modules/@types"
     ], // Ensure Jest typings are included

@@ -18,24 +18,24 @@ export type IMongooseModuleOptions = mongoose.ConnectOptions & {
      */
     global?: boolean;
 };
-export class MongooseModule {
+export class MongooseResourceModule {
     static DEFAULT_PROVIDER_NAME = 'MONGOOSE_CONNECTION';
     static createConnectionProvider = (uri: string, options?: IMongooseModuleOptions): any => {
         options = Object.assign({}, options);
         const { name, global, ...rest } = options;
         return {
-            provide: defaultStr(name, MongooseModule.DEFAULT_PROVIDER_NAME),
+            provide: defaultStr(name, MongooseResourceModule.DEFAULT_PROVIDER_NAME),
             useFactory: async () => {
                 return mongoose.connect(uri, rest);
             },
         }
     }
     static forRoot(uri: string, options?: IMongooseModuleOptions): DynamicModule & { name: string } {
-        const provider = MongooseModule.createConnectionProvider(uri, options);
+        const provider = MongooseResourceModule.createConnectionProvider(uri, options);
         return {
             global: typeof options?.global === 'boolean' ? options.global : true,
-            name: defaultStr(options?.name, MongooseModule.DEFAULT_PROVIDER_NAME),
-            module: MongooseModule,
+            name: defaultStr(options?.name, MongooseResourceModule.DEFAULT_PROVIDER_NAME),
+            module: MongooseResourceModule,
             providers: [provider],
             exports: [provider],
         }

@@ -1,8 +1,6 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
-import { PaginationHelper } from "@resk/core";
-import { defaultBool, defaultObj, defaultVal, flattenObject, getQueryParams, IDict, IMangoQuery, IResourceData, IResourceQueryOptions, IResourceQueryOptionsOrderDirection, isNonNullString, isObj, isStringNumber, Resource } from "@resk/core";
-import { query } from "express";
-import { parse } from "path";
+import { ResourcePaginationHelper } from "@resk/core";
+import { flattenObject, IDict, IResourceData, IResourceQueryOptions, isNonNullString, isObj } from "@resk/core";
 
 /**
  * @interface IParseRequestConfigMap
@@ -216,50 +214,7 @@ export class RequestParser {
    */
     static parseQueryOptions<T extends IResourceData = IResourceData>(ctx: ExecutionContext): IResourceQueryOptions<T> {
         const req = ctx.switchToHttp().getRequest();
-        const queryParams = Object.assign({}, getQueryParams(req.url));
-        const xFilters = Object.assign({}, req.headers["x-filters"]);
-        const limit = defaultVal(parseNumber(queryParams.limit), parseNumber(xFilters.limit));
-        const skip = defaultVal(parseNumber(queryParams.skip), parseNumber(xFilters.skip));
-        const page = defaultVal(parseNumber(queryParams.page), parseNumber(xFilters.page));
-        const result: IResourceQueryOptions<T> = PaginationHelper.normalizePagination({ limit, skip, page });
-        const distinct = defaultVal(queryParams.distinct, xFilters.distinct);
-        if (typeof distinct === "boolean" || Array.isArray(distinct) && distinct.length) {
-            result.distinct = distinct;
-        }
-        const defaultOrderBy = defaultVal(queryParams.orderBy, xFilters.orderBy);
-        const orderBy = PaginationHelper.normalizeOrderBy(defaultOrderBy);
-        if (orderBy) {
-            (result as any).orderBy = orderBy;
-        }
-        const include = defaultArray(queryParams.include, xFilters.include);
-        if (include.length) {
-            result.include = include;
-        }
-
-        const cache = defaultVal(queryParams.cach, xFilters.cache);
-        if (cache !== undefined) {
-            result.cache = !!cache;
-        }
-        const cacheTTL = defaultVal(queryParams.cacheTTL, xFilters.cacheTTL);
-        if (cacheTTL !== undefined) {
-            result.cacheTTL = cacheTTL;
-        }
-        const where = defaultArrayOrStringOrObject(queryParams.where, xFilters.where);
-        if (isObj(where) && Object.getSize(where, true)) {
-            result.where = where;
-        }
-        const mango = defaultObj(queryParams.mango, xFilters.mango);
-        if (Object.getSize(mango, true)) {
-            result.mango = mango as IMangoQuery;
-        }
-        const includeDeleted = defaultVal(queryParams.includeDeleted, xFilters.includeDeleted);
-        if (typeof includeDeleted === "boolean") {
-            result.includeDeleted = includeDeleted;
-        }
-        const relations = defaultArray(queryParams.relations, xFilters.relations);
-        if (relations.length) {
-            result.relations = relations;
-        }
+        const { queryParams, ...result } = ResourcePaginationHelper.parseQueryOptions(req);
         const r = typeof RequestParser.queryOptionsParser === "function" ? RequestParser.queryOptionsParser(ctx, result, queryParams) : result;
         Object.assign(req, { queryOptions: r });
         return r;
@@ -267,37 +222,7 @@ export class RequestParser {
 
 
 }
-const defaultArrayOrStringOrObject = (...args: any[]) => {
-    for (const arg of args) {
-        if (Array.isArray(arg) && arg.length) {
-            return arg;
-        }
-        if (isNonNullString(arg)) {
-            return arg;
-        }
-        if (isObj(arg) && Object.getSize(arg, true)) {
-            return arg;
-        }
-    }
-    return undefined;
-};
-const defaultArray = (...args: any[]) => {
-    for (const arg of args) {
-        if (Array.isArray(arg) && arg.length) {
-            return arg;
-        }
-    }
-    return [];
-};
-const parseNumber = (value: any) => {
-    if (isStringNumber(value)) {
-        return Number(value);
-    }
-    if (typeof value === "number") {
-        return value;
-    }
-    return undefined;
-}
+
 /**
  * Creates a parameter decorator that parse data from the request.
  * 

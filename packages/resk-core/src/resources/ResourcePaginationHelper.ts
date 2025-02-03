@@ -1,9 +1,13 @@
 import isNonNullString from "@utils/isNonNullString";
-import { IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderDirection } from "../types";
+import { IMangoQuery, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderDirection } from "../types";
 import { isNumber } from "lodash";
-import { isObj } from "@utils/object";
+import { defaultObj, isObj } from "@utils/object";
+import { getQueryParams } from "@utils/uri";
+import defaultVal from "@utils/defaultVal";
+import { isStringNumber } from "@utils/string";
+import { defaultArray } from "@utils/defaultArray";
 
-export class PaginationHelper {
+export class ResourcePaginationHelper {
     /**
      * Normalizes pagination parameters by calculating the `page` from `skip` if provided,
      * or calculating `skip` from `page` if only `page` is provided.
@@ -119,7 +123,7 @@ export class PaginationHelper {
      * @returns {IResourcePaginatedResult<DataType>} The paginated result.
      */
     static paginate<DataType extends IResourceData = any>(data: DataType[], count: number, options?: IResourceQueryOptions) {
-        const { limit, page, skip } = PaginationHelper.normalizePagination(options);
+        const { limit, page, skip } = ResourcePaginationHelper.normalizePagination(options);
         const meta: IResourcePaginatedResult<DataType>["meta"] = {
             total: count,
         }
@@ -139,4 +143,91 @@ export class PaginationHelper {
             meta,
         }
     }
+    /**
+     * Parses query options from the provided request object.
+     * It extracts query parameters, headers, and other relevant information to construct a query options object.
+     * @template T The type of resource data.
+     * @param req The request object containing the URL and headers.
+     * @returns {IResourceQueryOptions<T> & {queryParams: Record<string, any>}} The parsed query options object.
+     *
+     * @example
+     * const req = { url: '/api/resources?limit=10&skip=5', headers: { 'x-filters': { limit: 10, skip: 5 } } };
+     * const queryOptions = parseQueryOptions(req);
+     */
+    static parseQueryOptions<T extends IResourceData = IResourceData>(req: { url: string, headers: Record<string, any> }): IResourceQueryOptions<T> & { queryParams: Record<string, any>, } {
+        if (!isObj(req)) return {
+            queryParams: {},
+        } as any
+        const queryParams = Object.assign({}, getQueryParams(req.url));
+        const xFilters = Object.assign({}, req.headers["x-filters"]);
+        const limit = defaultVal(parseNumber(queryParams.limit), parseNumber(xFilters.limit));
+        const skip = defaultVal(parseNumber(queryParams.skip), parseNumber(xFilters.skip));
+        const page = defaultVal(parseNumber(queryParams.page), parseNumber(xFilters.page));
+        const result: IResourceQueryOptions<T> = ResourcePaginationHelper.normalizePagination({ limit, skip, page });
+        const distinct = defaultVal(queryParams.distinct, xFilters.distinct);
+        if (typeof distinct === "boolean" || Array.isArray(distinct) && distinct.length) {
+            result.distinct = distinct;
+        }
+        const defaultOrderBy = defaultVal(queryParams.orderBy, xFilters.orderBy);
+        const orderBy = ResourcePaginationHelper.normalizeOrderBy(defaultOrderBy);
+        if (orderBy) {
+            (result as any).orderBy = orderBy;
+        }
+        const include = defaultArray<any>(queryParams.include, xFilters.include);
+        if (include.length) {
+            result.include = include as any;
+        }
+        const cache = defaultVal(queryParams.cach, xFilters.cache);
+        if (cache !== undefined) {
+            result.cache = !!cache;
+        }
+        const cacheTTL = defaultVal(queryParams.cacheTTL, xFilters.cacheTTL);
+        if (cacheTTL !== undefined) {
+            result.cacheTTL = cacheTTL;
+        }
+        const where = defaultArrayOrStringOrObject(queryParams.where, xFilters.where);
+        if (isObj(where) && Object.getSize(where, true)) {
+            result.where = where;
+        }
+        const mango = defaultObj(queryParams.mango, xFilters.mango);
+        if (Object.getSize(mango, true)) {
+            result.mango = mango as IMangoQuery;
+        }
+        const includeDeleted = defaultVal(queryParams.includeDeleted, xFilters.includeDeleted);
+        if (typeof includeDeleted === "boolean") {
+            result.includeDeleted = includeDeleted;
+        }
+        const relations = defaultArray(queryParams.relations, xFilters.relations);
+        if (relations.length) {
+            result.relations = relations;
+        }
+        return { ...result, queryParams };
+    }
+
+}
+
+
+const defaultArrayOrStringOrObject = (...args: any[]) => {
+    for (const arg of args) {
+        if (Array.isArray(arg) && arg.length) {
+            return arg;
+        }
+        if (isNonNullString(arg)) {
+            return arg;
+        }
+        if (isObj(arg) && Object.getSize(arg, true)) {
+            return arg;
+        }
+    }
+    return undefined;
+};
+
+const parseNumber = (value: any) => {
+    if (isStringNumber(value)) {
+        return Number(value);
+    }
+    if (typeof value === "number") {
+        return value;
+    }
+    return undefined;
 }

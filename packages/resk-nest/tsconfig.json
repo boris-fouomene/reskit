@@ -5,6 +5,8 @@
     "baseUrl": "./",
     "rootDir": "./src",
     "module": "commonjs",
+    "composite": false, // Ensure composite is false
+    "incremental": false, // Ensure incremental is false
     "paths": {
       "@resource/*": [
         "./src/modules/resource/*"

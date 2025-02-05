@@ -1,5 +1,5 @@
 import isNonNullString from "@utils/isNonNullString";
-import { IMangoQuery, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderDirection } from "../types";
+import { IMongoQuery, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderDirection } from "../types";
 import { isNumber } from "lodash";
 import { defaultObj, isObj } from "@utils/object";
 import { getQueryParams } from "@utils/uri";
@@ -154,12 +154,9 @@ export class ResourcePaginationHelper {
      * const req = { url: '/api/resources?limit=10&skip=5', headers: { 'x-filters': { limit: 10, skip: 5 } } };
      * const queryOptions = parseQueryOptions(req);
      */
-    static parseQueryOptions<T extends IResourceData = IResourceData>(req: { url: string, headers: Record<string, any> }): IResourceQueryOptions<T> & { queryParams: Record<string, any>, } {
-        if (!isObj(req)) return {
-            queryParams: {},
-        } as any
-        const queryParams = Object.assign({}, getQueryParams(req.url));
-        const xFilters = Object.assign({}, req.headers["x-filters"]);
+    static parseQueryOptions<T extends IResourceData = IResourceData>(req: { url: string, headers: Record<string, any>, params: Record<string, any> }): IResourceQueryOptions<T> & { queryParams: Record<string, any>, } {
+        const queryParams = Object.assign({}, req?.params, getQueryParams(req?.url));
+        const xFilters = Object.assign({}, req?.headers["x-filters"]);
         const limit = defaultVal(parseNumber(queryParams.limit), parseNumber(xFilters.limit));
         const skip = defaultVal(parseNumber(queryParams.skip), parseNumber(xFilters.skip));
         const page = defaultVal(parseNumber(queryParams.page), parseNumber(xFilters.page));
@@ -189,10 +186,6 @@ export class ResourcePaginationHelper {
         if (isObj(where) && Object.getSize(where, true)) {
             result.where = where;
         }
-        const mango = defaultObj(queryParams.mango, xFilters.mango);
-        if (Object.getSize(mango, true)) {
-            result.mango = mango as IMangoQuery;
-        }
         const includeDeleted = defaultVal(queryParams.includeDeleted, xFilters.includeDeleted);
         if (typeof includeDeleted === "boolean") {
             result.includeDeleted = includeDeleted;
@@ -203,7 +196,6 @@ export class ResourcePaginationHelper {
         }
         return { ...result, queryParams };
     }
-
 }
 
 

@@ -164,7 +164,7 @@ export class RequestParser {
             query: Object.assign({}, req.query),
             params: Object.assign({}, req.params),
             headers: Object.assign({}, req.headers),
-            queryOptions: typeof config == "string" && String(config).startsWith("queryOptions") ? RequestParser.parseQueryOptions(ctx) : {} as IResourceQueryOptions<any>
+            queryOptions: typeof config == "string" && String(config).trim().startsWith("queryOptions") ? RequestParser.parseQueryOptions(ctx) : {} as IResourceQueryOptions<any>
         };
 
         let data: any = undefined;
@@ -217,7 +217,7 @@ export class RequestParser {
         const { queryParams, ...result } = ResourcePaginationHelper.parseQueryOptions(req);
         const r = typeof RequestParser.queryOptionsParser === "function" ? RequestParser.queryOptionsParser(ctx, result, queryParams) : result;
         Object.assign(req, { queryOptions: r });
-        return r;
+        return r as IResourceQueryOptions<T>;
     }
 
 

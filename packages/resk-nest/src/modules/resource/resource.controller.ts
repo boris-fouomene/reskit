@@ -61,12 +61,7 @@ export class ResourceController<DataType extends IResourceData = any, ServiceTyp
     if (paginate) {
       return this.getResourceService().findAndPaginate(queryOptions);
     }
-    /* if (params?.paginate) {
-      return this.getResourceService().findAndPaginate();
-    } else if (params?.count) {
-      return this.getResourceService().count();
-    } */
-    return this.getResourceService().find();
+    return this.getResourceService().find(queryOptions);
   }
   @Get(':id')
   async getOne(@Param() params: any) {

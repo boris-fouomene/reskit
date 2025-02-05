@@ -1,5 +1,5 @@
 import { IDict } from "./dictionary";
-import { IMangoQuery, IResourceQueryOptionsOrderBy } from "./filters";
+import { IMongoQuery, IResourceQueryOptionsOrderBy } from "./filters";
 
 /**
  * A global declaration for all resource names. This is the exported name of the IResourceName type.
@@ -1085,7 +1085,7 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
  * @typeParam PrimaryKeyType - The type of the primary key used to identify resources.
  * @default IResourcePrimaryKey
  * @see {@link IResourcePrimaryKey} for the `IResourcePrimaryKey` type.
- * @see {@link IResourceFindWhereCondition} for the `IResourceFindWhereCondition` type.
+ * @see {@link IMongoQuery} for the `IMongoQuery` type.
  * @example
  * // Example of using IResourceManyCriteria
  * const criteria: IResourceManyCriteria<string, { name: string; age: number }> = {
@@ -1100,7 +1100,7 @@ export interface IResourceDataService<DataType extends IResourceData = any, Prim
  * ];
  */
 export type IResourceManyCriteria<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>
-    = PrimaryKeyType[] | IResourceFindWhereCondition<DataType>;
+    = PrimaryKeyType[] | IMongoQuery<DataType>;
 
 /**
  * Interface representing options for fetching resources.
@@ -1147,7 +1147,22 @@ export interface IResourceQueryOptions<DataType extends IResourceData = any> {
 
     /**
      * Where clause to filter the results.
-     * @see {@link IResourceFindWhereCondition} for more information on where clauses.
+     * Resources are filtered using a MongoDB-like query syntax.
+     * This allows you to specify conditions for filtering resources based on various criteria.
+     * 
+     * @type {IMongoQuery}
+     * @see {@link https://www.mongodb.com/docs/manual/reference/operator/query/} for more information on MongoDB query operators.
+     * @example
+     * const queryOptions: IResourceQueryOptions<{ id: number, name: string }> = {
+     *   where: {
+     *     name : "John",
+     *     surname : "Doe"
+     *   },
+     *   orderBy: { name: 'asc' },
+     *   limit: 10,
+     *   skip: 0
+     * };
+     * @see {@link IMongoQuery} for more information on where clauses.
      * @example
      * const queryOptions: IResourceQueryOptions<{ id: number, name: string }> = {
      *   where: {
@@ -1159,55 +1174,8 @@ export interface IResourceQueryOptions<DataType extends IResourceData = any> {
      *   skip: 0
      * };
      */
-    where?: IResourceFindWhereCondition<DataType>;
-
-    /***
-        * The `mango` property allows for more complex filtering using Mango queries.
-        * If the `mango` property is present, the `where` property will be ignored.
-        * @type {IMangoQuery}
-        * @see {@link IMangoQuery} for more information on Mango queries.
-        * @example
-        * const queryOptions: IResourceQueryOptions<{ id: number, name: string }> = {
-        *   mango: {
-        *     id : 1,
-        *   },
-        *   orderBy: { name: 'asc' },
-        *   limit: 10,
-        *   skip: 0
-        * };
-      */
-    mango?: IMangoQuery;
+    where?: IMongoQuery<DataType>;
 }
-
-
-/**
- @interface IResourceFindWhereCondition
-* Interface for specifying AND conditions to filter resources.
-* 
-* This type can be used to define conditions for finding resources where all properties must match.
-* @template DataType - The type of the resource data.
-* @example
-* const andCondition: IResourceFindWhereCondition<{ id: number, name: string }> = {
-*   id: 1,
-*   name: 'John Doe'
-* };
-* 
-* @typeParam DataType - The type of the resource data.
-* @default any
-*/
-export type IResourceFindWhereCondition<DataType extends IResourceData = any> = {
-    /**
-     * Each key in the object corresponds to a property in the resource data.
-     * The value of each key is the value to match for that property.
-     * 
-     * @example
-     * const andCondition: IResourceFindWhereCondition<{ id: number, name: string }> = {
-     *   id: 1,
-     *   name: 'John Doe'
-     * };
-     */
-    [K in keyof DataType]?: DataType[K]
-};
 
 
 /**

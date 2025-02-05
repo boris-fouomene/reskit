@@ -1,9 +1,7 @@
 
-import { BadRequestException, Injectable, Req } from "@nestjs/common";
-import { i18n, IClassConstructor, IResourceData, IResourceDataService, IResourceFindWhereCondition, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, IResourceQueryOptionsOrderBy, isNonNullString, isObj, ResourcePaginationHelper } from "@resk/core";
-import { RequestParser } from "@resource/pipes";
-import { And, DataSource, DeepPartial, EntityManager, In, QueryRunner, Repository } from "typeorm";
-import { ColumnMetadata } from "typeorm/metadata/ColumnMetadata";
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { i18n, IClassConstructor, IMongoQuery, IResourceData, IResourceDataService, IResourceManyCriteria, IResourcePrimaryKey, IResourceQueryOptions, isNonNullString, isObj, ResourcePaginationHelper } from "@resk/core";
+import { DataSource, DeepPartial, EntityManager, In, QueryRunner, Repository, FindOptionsWhere, FindManyOptions, MoreThan, MoreThanOrEqual, LessThan, LessThanOrEqual, Not, ILike, IsNull, Like } from "typeorm";
 
 
 /***
@@ -18,13 +16,13 @@ The class has the following key features:
 - The `findOneOrFail()`, `findOne()`, `find()`, `findAndCount()`, `count()`, and `exists()` methods provide various ways to retrieve entities based on the provided options.
 - The `throwError()` method is a helper method that throws a `BadRequestException` with the specified error message.
 - The `getRepository()` and `getRepositoryAs()` methods provide access to the underlying `Repository` instance.
-- The `buildWhereCondition()` method is a helper method that constructs the appropriate `IResourceQueryOptions` object based on the provided options.
+- The `buildFindOptions()` method is a helper method that constructs the appropriate `IResourceQueryOptions` object based on the provided options.
 - The `findAndPaginate()` method retrieves a paginated result set of entities based on the provided options.
  */
 @Injectable()
 export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> implements IResourceDataService<DataType, PrimaryKeyType> {
-    private readonly primaryColumns: Record<string, ColumnMetadata> = {};
-    private readonly columns: Record<string, ColumnMetadata> = {};
+    private readonly primaryColumns: Record<string, any> = {};
+    private readonly columns: Record<string, any> = {};
     private readonly primaryColumnsNames: string[] = [];
     constructor(protected readonly dataSource: DataSource, readonly entity: IClassConstructor<DataType>) {
         const repository = this.getRepository();
@@ -147,8 +145,10 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
      * console.log('Updated Entity:', updatedEntity);
      */
     async update(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>) {
+        const findOptions = this.buildFindOptions(primaryKey);
+        if (!findOptions.where || !isObj(findOptions.where) || !Object.getSize(findOptions.where, true)) this.throwError(i18n.t("typeorm.invalidWhereConditionOnUpdate"));
         return this.executeInTransaction(async (queryRunner) => {
-            const entity = await this.getRepository().findOneBy(this.buildWhereCondition(primaryKey).where);
+            const entity = await this.getRepository().findOneBy(findOptions.where ?? {});
             if (!entity) {
                 this.throwError(i18n.t("typeorm.entityNotFound", { id: JSON.stringify(primaryKey) }));
             }
@@ -168,8 +168,10 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
      * console.log('Entity deleted successfully');
      */
     async delete(primaryKey: PrimaryKeyType) {
+        const findOptions = this.buildFindOptions(primaryKey);
+        if (!findOptions.where || !isObj(findOptions.where) || !Object.getSize(findOptions.where, true)) this.throwError(i18n.t("typeorm.invalidWhereConditionOnDelete"));
         return this.executeInTransaction(async (queryRunner) => {
-            const entity = await this.getRepository().findOneBy(this.buildWhereCondition(primaryKey).where);
+            const entity = await this.getRepository().findOneBy(findOptions.where ?? {});
             if (!entity) {
                 this.throwError(i18n.t("typeorm.entityNotFound", { id: JSON.stringify(primaryKey) }));
             }
@@ -177,26 +179,26 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
         });
     }
     findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType> {
-        return this.getRepository().findOneOrFail(this.buildWhereCondition(options));
+        return this.getRepository().findOneOrFail(this.buildFindOptions(options));
     }
     async findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>) {
         try {
-            return await this.getRepository().findOne(this.buildWhereCondition(options));
+            return await this.getRepository().findOne(this.buildFindOptions(options));
         } catch (error) {
             return null;
         }
     }
     async find(options?: IResourceQueryOptions<DataType> | undefined) {
-        return await this.getRepository().find(options ? this.buildWhereCondition(options) : undefined);
+        return await this.getRepository().find(options ? this.buildFindOptions(options) : undefined);
     }
     async findAndCount(options?: IResourceQueryOptions<DataType>) {
-        return await this.getRepository().findAndCount(options ? this.buildWhereCondition(options) : undefined);
+        return await this.getRepository().findAndCount(options ? this.buildFindOptions(options) : undefined);
     }
     async count(options?: IResourceQueryOptions<DataType>) {
-        return await this.getRepository().count(options ? this.buildWhereCondition(options) : undefined);
+        return await this.getRepository().count(options ? this.buildFindOptions(options) : undefined);
     }
     async exists(primaryKey: PrimaryKeyType) {
-        return await this.getRepository().exists(this.buildWhereCondition(primaryKey));
+        return await this.getRepository().exists(this.buildFindOptions(primaryKey));
     }
     /**
      * Creates multiple entities within a transaction.
@@ -230,11 +232,10 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
     * console.log('Updated Entities:', updatedEntities);
     */
     async updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number> {
+        const findOptions = this.buildFindOptions(criteria as any);
+        if (!findOptions.where || !isObj(findOptions.where) || !Object.getSize(findOptions.where, true)) this.throwError(i18n.t("typeorm.invalidWhereConditionOnUpdate"));
         return this.executeInTransaction(async (queryRunner) => {
-            const wereCondition = this.buildWhereCondition(criteria as any);
-            const keys = Object.keys(isObj(wereCondition.where) ? wereCondition.where : {});
-            if (!keys.length) this.throwError(i18n.t("typeorm.invalidWhereConditionOnUpdate"));
-            const entities = await this.getRepository().find(wereCondition);
+            const entities = await this.getRepository().find(findOptions);
             entities.forEach((entity) => Object.assign(entity, data));
             return (await queryRunner.manager.save(entities)).length;
         });
@@ -251,10 +252,9 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
     */
     async deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number> {
         return this.executeInTransaction(async (queryRunner) => {
-            const wereCondition = this.buildWhereCondition(criteria as any);
-            const keys = Object.keys(isObj(wereCondition.where) ? wereCondition.where : {});
-            if (!keys.length) this.throwError(i18n.t("typeorm.invalidWhereConditionOnDelete"));
-            const entities = await this.getRepository().find(this.buildWhereCondition(criteria as any));
+            const findOptions = this.buildFindOptions(criteria as any);
+            if (!findOptions.where || !isObj(findOptions.where) || !Object.getSize(findOptions.where, true)) this.throwError(i18n.t("typeorm.invalidWhereConditionOnDelete"));
+            const entities = await this.getRepository().find(findOptions);
             return (await queryRunner.manager.remove(entities)).length;
         });
     }
@@ -274,8 +274,27 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
         return this.dataSource.getRepository(this.entity);
     }
 
-    buildWhereCondition(options: PrimaryKeyType | PrimaryKeyType[] | IResourceQueryOptions<DataType>): Omit<IResourceQueryOptions<DataType>, "where"> & { where: IResourceFindWhereCondition<DataType> } {
-        const contitions: IResourceFindWhereCondition<DataType> = {};
+    /**
+     * Builds a TypeORM find options object from a given query options object.
+     * 
+     * This method takes a query options object and converts it into a TypeORM find options object.
+     * It supports various query options, including filtering, sorting, and pagination.
+     * 
+     * @param {PrimaryKeyType | PrimaryKeyType[] | IResourceQueryOptions<DataType>} options - The query options object.
+     * @returns {FindManyOptions<DataType>} - The TypeORM find options object.
+     * @example
+     * // Example usage of buildFindOptions
+     * const queryOptions: IResourceQueryOptions<DataType> = {
+     *   where: { name: 'John' },
+     *   skip: 10,
+     *   take: 20,
+     * };
+     * const findOptions = this.buildFindOptions(queryOptions);
+     * 
+     * // This would create a TypeORM find options object with the specified filtering, sorting, and pagination options.
+     */
+    buildFindOptions(options: PrimaryKeyType | PrimaryKeyType[] | IResourceQueryOptions<DataType>): FindManyOptions<DataType> {
+        const contitions: IResourceQueryOptions<DataType>["where"] = {};
         const primaryColumns = this.getPrimaryColumnNames();
         const primaryColumn = primaryColumns[0];
         if (Array.isArray(options)) {
@@ -286,7 +305,7 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
             contitions[primaryColumn] = options as (DataType[keyof DataType]);
             options = { where: contitions };
         }
-        const result = Object.assign({}, options) as Omit<IResourceQueryOptions<DataType>, "where"> & { where: IResourceFindWhereCondition<DataType> };
+        const result = Object.assign({}, options) as FindManyOptions<DataType>;
         const queryOptions = options as IResourceQueryOptions<DataType>;
         if (isObj(queryOptions) && queryOptions) {
             if (typeof queryOptions.limit === "number" && queryOptions.limit > 0) {
@@ -296,9 +315,17 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
                 result.skip = queryOptions.skip;
             }
         }
+        if (!isObj(result.where) || !Object.getSize(result.where, true)) {
+            delete result.where;
+        } else {
+            result.where = MongoToTypeOrmConverter.convert<DataType>(result.where);
+        }
         (result as any).order = isNonNullString(queryOptions.orderBy) ? [queryOptions.orderBy] : Array.isArray(queryOptions.orderBy) && queryOptions.orderBy.length ? queryOptions.orderBy : isObj(queryOptions.orderBy) ? queryOptions.orderBy : undefined;
-        if (Array.isArray(result.where) && !isObj(result.where) && typeof result.where[0] !== 'object') {
-            result.where = {};
+        if (typeof queryOptions.limit === "number" && queryOptions.limit > 0) {
+            (result as any).take = queryOptions.limit;
+        }
+        if (typeof queryOptions.skip === "number") {
+            result.skip = queryOptions.skip;
         }
         return result;
     }
@@ -306,5 +333,119 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
         options = Object.assign({}, options);
         const [data, count] = await this.findAndCount(options);
         return ResourcePaginationHelper.paginate(data, count, options);
+    }
+}
+
+
+
+class MongoToTypeOrmConverter {
+    /**
+     * Converts MongoDB query operators to TypeORM FindOperators
+     */
+    private static operatorMap = {
+        $eq: (value: any) => value,
+        $gt: (value: any) => MoreThan(value),
+        $gte: (value: any) => MoreThanOrEqual(value),
+        $lt: (value: any) => LessThan(value),
+        $lte: (value: any) => LessThanOrEqual(value),
+        $ne: (value: any) => Not(value),
+        $in: (value: any[]) => In(value),
+        $nin: (value: any[]) => Not(In(value)),
+        $regex: (value: string, options?: string) => {
+            const pattern = `%${value}%`;
+            return options?.includes('i') ? ILike(pattern) : Like(pattern);
+        },
+        $exists: (value: boolean) => value ? Not(IsNull()) : IsNull(),
+        $elemMatch: (value: any) => Array.isArray(value) ? In(value) : undefined,
+    };
+
+    /**
+     * Main conversion method
+     */
+    static convert<DataType = any>(mongoQuery: any): FindOptionsWhere<DataType> {
+        // Handle empty query
+        if (!isObj(mongoQuery) || Object.keys(mongoQuery).length === 0) {
+            return {};
+        }
+        const whereConditions: any[] = [];
+        const andConditions: any = {};
+        // Process each key in the query
+        for (const [key, value] of Object.entries(mongoQuery)) {
+            if (key === '$or') {
+                // Handle OR conditions
+                if (Array.isArray(value)) {
+                    const orConditions = value.map((condition: any) => {
+                        return this.processCondition(condition);
+                    }).filter((v) => v !== undefined);
+                    if (orConditions.length) {
+                        whereConditions.push(...orConditions);
+                    }
+                }
+            } else if (key === '$and') {
+                // Handle AND conditions
+                if (Array.isArray(value)) {
+                    (value as any).forEach((condition: any) => {
+                        const processed = this.processCondition(condition);
+                        if (processed !== undefined) {
+                            Object.assign(andConditions, processed);
+                        }
+                    });
+                }
+            } else {
+                // Handle regular field conditions
+                const processed = this.processCondition({ [key]: value });
+                if (processed !== undefined) {
+                    Object.assign(andConditions, processed);
+                }
+            }
+        }
+        // Combine AND conditions with OR conditions
+        if (Object.keys(andConditions).length > 0) {
+            whereConditions.push(andConditions);
+        }
+        // Return array for multiple conditions, object for single condition
+        return whereConditions.length > 1 ? whereConditions : whereConditions[0] || andConditions;
+    }
+
+    /**
+     * Process individual conditions
+     */
+    private static processCondition(condition: any): any {
+        const result: any = {};
+        for (const [field, value] of Object.entries(condition)) {
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                // Handle operator objects
+                const operators = Object.keys(value);
+                if (operators.some(op => op.startsWith('$'))) {
+                    const v = this.convertOperators(value);
+                    if (v !== undefined) {
+                        result[field] = v;
+                    }
+                } else {
+                    // Handle nested objects
+                    result[field] = value;
+                }
+            } else {
+                // Handle direct values
+                result[field] = value;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Convert MongoDB operators to TypeORM operators
+     */
+    private static convertOperators(operatorObj: any): any {
+        for (const [operator, value] of Object.entries(operatorObj)) {
+            if (operator in this.operatorMap) {
+                if (operator === '$regex') {
+                    return this.operatorMap[operator](value as any, operatorObj.$options);
+                }
+                return this.operatorMap[operator as keyof typeof this.operatorMap](value);
+            }
+        }
+        return operatorObj;
     }
 }

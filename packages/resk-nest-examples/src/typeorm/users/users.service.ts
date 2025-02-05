@@ -1,7 +1,7 @@
 import { Get, Inject, Injectable } from '@nestjs/common';
 import { TypeOrmResourceService } from '@resk/nest';
 import { User } from './entities/user.entity';
-import { I18n, IAuthPermStr, ResourceMetadata } from '@resk/core';
+import { I18n, ResourceMetadata } from '@resk/core';
 import { DataSource } from 'typeorm';
 import { DatabaseModule } from '../database.module';
 @Injectable()

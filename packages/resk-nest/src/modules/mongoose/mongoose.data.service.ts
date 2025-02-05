@@ -6,9 +6,6 @@ import { Connection, Schema } from 'mongoose';
 @Injectable()
 export class MongooseDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = ObjectId> implements IResourceDataService<DataType, PrimaryKeyType> {
     constructor(protected readonly connection: Connection, protected readonly schemaName: string, protected readonly schema: Schema) { }
-    buildWhereCondition(options: IResourceQueryOptions<DataType>): any {
-
-    }
     create(record: Partial<DataType>): Promise<DataType> {
         return this.getModel().create(record);
     }

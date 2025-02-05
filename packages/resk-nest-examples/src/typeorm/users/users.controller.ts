@@ -36,11 +36,6 @@ export class UsersController extends ResourceController<User, UsersService> {
   getMe() {
     return this.resourceService.getMe();
   }
-  @Permissions('users:read')
-  @Get()
-  getMany(@ParseRequest("queryOptions") queryOptions: IResourceQueryOptions<User>): Promise<User[]> {
-    return super.getMany(queryOptions);
-  }
 }
 
 declare module "@resk/core" {

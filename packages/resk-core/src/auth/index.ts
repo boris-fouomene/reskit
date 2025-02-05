@@ -1,9 +1,9 @@
 
 import { i18n } from "../i18n";
 import $session from "../session";
-import { IDict, IResourceActionName, IResourceName } from "../types";
+import { IDict, IResourceActionName, IResourceActionTuple, IResourceActionTupleArray, IResourceActionTupleObject, IResourceName } from "../types";
 import { isObj, parseJSON, isNonNullString, IObservable, observable } from "../utils";
-import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPermAction, IAuthPerms, IAuthEvent, IAuthRole } from "./types";
+import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPerms, IAuthEvent, IAuthRole } from "./types";
 import { } from "../types";
 import { } from "./types";
 import CryptoJS from "crypto-js";
@@ -464,8 +464,12 @@ export default class Auth {
         });
     }
 
-
-
+    static isResourceActionTupleArray<ResourceName extends IResourceName = IResourceName>(perm: IAuthPerm<ResourceName>): perm is IResourceActionTupleArray<ResourceName> {
+        return Array.isArray(perm) && perm.length === 2 && isNonNullString(perm[0]) && isNonNullString(perm[1]);
+    }
+    static isResourceActionTupleObject<ResourceName extends IResourceName = IResourceName>(perm: IAuthPerm<ResourceName>): perm is IResourceActionTupleObject<ResourceName> {
+        return !Array.isArray(perm) && typeof perm === "object" && isObj(perm) && isNonNullString(perm.resourceName) && isNonNullString(perm.action);
+    }
     /**
      * Checks if a user is allowed to perform a specific action based on the provided permission.
      * 
@@ -491,8 +495,9 @@ export default class Auth {
      * 
      * ```typescript
      * const user: IAuthUser  = { id: "user123", perms: { documents: ["read", "create"] } };
-     * const canRead = isAllowed("documents:read", user); // true
-     * const canDelete = isAllowed("documents:delete", user); // false
+     * const canRead = isAllowed(["documents", "read"], user); // true
+     * const canDelete = isAllowed(["documents", "delete"], user); // false
+     * const canReadDocs = isAllowed({ resourceName: "documents", action: "read" }, user); // true
      * ```
      * @see {@link IAuthPerm} for the `IAuthPerm` type.
      * @see {@link IAuthPerms} for the `IAuthPerms` type.
@@ -501,29 +506,49 @@ export default class Auth {
      * @see {@link IAuthPermAction} for the `IAuthPermAction` type.
      * @see {@link IAuthRole} for the `IAuthRole` type.
      */
-    static isAllowed = (perm: IAuthPerm, user?: IAuthUser): boolean => {
+    static isAllowed<ResourceName extends IResourceName = IResourceName>(perm: IAuthPerm<ResourceName>, user?: IAuthUser): boolean {
         user = Object.assign({}, user || (Auth.getSignedUser() as IAuthUser));
         if (typeof perm === "boolean") return perm;
         if (Auth._isMasterAdmin(user)) return true;
         if (!perm) return true;
         if (typeof perm === "function") return !!perm(user);
-        if (isNonNullString(perm)) {
-            const split = String(perm).trim().split(":");
-            const resourceName: IResourceName = split[0] as IResourceName;
-            const action = split[1] as IAuthPermAction;
-            if (!isNonNullString(resourceName) || !isNonNullString(action)) return false;
-            if (isObj(user?.perms) && user?.perms && Auth.checkPermission(user?.perms, resourceName, action)) {
+        if (Auth.isResourceActionTupleObject(perm)) {
+            if (Auth.checkUserPermission(user, perm.resourceName, perm.action as IResourceActionName)) {
                 return true;
             }
-            if (Array.isArray(user?.roles)) {
-                for (let i in user.roles) {
-                    const role = user.roles[i];
-                    if (isObj(role) && isObj(role.perms) && Auth.checkPermission(role.perms, resourceName, action)) {
+        } else if (Auth.isResourceActionTupleArray(perm)) {
+            if (Auth.checkUserPermission(user, perm[0], perm[1] as IResourceActionName)) {
+                return true;
+            }
+        } else if (Array.isArray(perm)) {
+            for (let i in perm) {
+                const p = perm[i] as IAuthPerm;
+                if (Auth.isResourceActionTupleArray(p)) {
+                    if (Auth.checkUserPermission(user, p[0], p[1])) {
+                        return true;
+                    }
+                } else if (Auth.isResourceActionTupleObject(p)) {
+                    if (Auth.checkUserPermission(user, p.resourceName, p.action)) {
                         return true;
                     }
                 }
-                return false;
             }
+        }
+        return false;
+    }
+    static checkUserPermission(user: IAuthUser, resource: IResourceName, action: IResourceActionName = "read") {
+        if (!isObj(user) || !user) return false;
+        if (isObj(user.perms) && user.perms && Auth.checkPermission(user.perms, resource, action)) {
+            return true;
+        }
+        if (Array.isArray(user?.roles)) {
+            for (let i in user.roles) {
+                const role = user.roles[i];
+                if (isObj(role) && isObj(role.perms) && Auth.checkPermission(role.perms, resource, action)) {
+                    return true;
+                }
+            }
+            return false;
         }
         return false;
     }
@@ -565,7 +590,7 @@ export default class Auth {
      * @see {@link IAuthPermAction} for the `IAuthPermAction` type.
      * @see {@link isAllowedForAction} for the `isAllowedForAction` function.
      */
-    static checkPermission(perms: IAuthPerms, resource: IResourceName, action: IAuthPermAction = "read") {
+    static checkPermission(perms: IAuthPerms, resource: IResourceName, action: IResourceActionName = "read") {
         perms = Object.assign({}, perms);
         resource = isNonNullString(resource) ? resource : "" as IResourceName;
         if (!isObj(perms) || !resource) {
@@ -625,25 +650,11 @@ export default class Auth {
      * @see {@link isAllowed} for the `isAllowed` function.
      * @see {@link checkPermission} for the `checkPermission` function.
      */
-    static isAllowedForAction(permission: IResourceActionName, action: IAuthPermAction) {
+    static isAllowedForAction<ResourceName extends IResourceName = IResourceName>(permission: IResourceActionName<ResourceName>, action: IResourceActionName<ResourceName>) {
         if (!isNonNullString(action) || !isNonNullString(permission)) {
             return false;
         }
-        const actionStr = String(action).trim().toLowerCase();
-        const permissionStr = String(permission).trim().toLowerCase();
-        if (actionStr === permissionStr) {
-            return true;
-        }
-        const actionSplit = action.split("|"); //à supposer que plusieurs actions ont été proposées
-        if (actionSplit.length > 1) {
-            for (let s in actionSplit) {
-                if (Auth.isAllowedForAction(permission, actionSplit[s] as IResourceActionName)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        return false;
+        return String(action).trim().toLowerCase() === String(permission).trim().toLowerCase();
     }
     static get Session() {
         return Session;

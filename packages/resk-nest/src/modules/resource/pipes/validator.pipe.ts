@@ -71,7 +71,7 @@ const validatorPipeDtoMetadataKey = Symbol('validatorPipeDtoMetadataKey');
  * } 
  * ```
  */
-export const ValidatorParam = createParamDecorator<([config: IParseRequestConfig, dtoClassParam: IClassConstructor<any>]) | IParseRequestConfig, Promise<IDict>>(async (options, ctx: ExecutionContext) => {
+export const ValidatorParam = createParamDecorator<([config: IParseRequestConfig, dtoClassParam: IClassConstructor<any>]) | IParseRequestConfig>(async (options, ctx: ExecutionContext) => {
     /**
      * Gets the controller instance from the execution context.
      */

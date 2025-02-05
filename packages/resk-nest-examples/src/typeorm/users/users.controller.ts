@@ -44,7 +44,7 @@ export class UsersController extends ResourceController<User, UsersService> {
 }
 
 declare module "@resk/core" {
-  interface IResourcesMap {
+  interface IResources {
     users: UsersController;
   }
 }

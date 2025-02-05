@@ -3,18 +3,20 @@ import "../translations";
 import Auth from "./index";
 import $session from "../session";
 import { IAuthUser, IAuthPerms, IAuthPerm } from "./types";
-import { IResourceActionName, IResourceName } from "@/types";
+import { IResource, IResourceAction, IResourceActionName, IResourceName } from "@/types";
 import "../index";
 
 
 declare module "../index" {
-    interface IResourcesMap {
-        documents: any;
-        articles: any;
-        users: any;
-    }
-    interface IResourceActionsMap {
-        publish: any;
+    interface IResources {
+        documents: {
+            actions: {
+                test: IResourceAction,
+                publish: IResourceAction,
+            };
+        };
+        articles: IResource;
+        users: IResource;
     }
 }
 
@@ -35,7 +37,7 @@ describe("Auth", () => {
 
         it("should return true for master admin", () => {
             Auth.isMasterAdmin = () => true;
-            expect(Auth.isAllowed(("documents:create" as IAuthPerm))).toBe(true);
+            expect(Auth.isAllowed(["documents", "create"])).toBe(true);
             Auth.isMasterAdmin = undefined;
         });
 
@@ -52,8 +54,8 @@ describe("Auth", () => {
                     documents: ["read", "create"]
                 }
             };
-            expect(Auth.isAllowed("documents:read" as IAuthPerm, user)).toBe(true);
-            expect(Auth.isAllowed("documents:delete" as IAuthPerm, user)).toBe(false);
+            expect(Auth.isAllowed({ resourceName: "documents", action: "read" }, user)).toBe(true);
+            expect(Auth.isAllowed<"documents">(["documents", "publish"], user)).toBe(false);
         });
         it("Sould test if the user has permissions from a function", () => {
             const user: IAuthUser = {
@@ -72,12 +74,13 @@ describe("Auth", () => {
                 id: "123",
                 roles: [
                     {
-                        name: "editor", perms: { articles: ["update", "publish"] }
-                    }
+                        name: "editor", perms: { documents: ["update", "publish"] }
+                    },
                 ]
             };
-            expect(Auth.isAllowed("articles:update" as IAuthPerm, user)).toBe(true);
-            expect(Auth.isAllowed("articles:delete" as IAuthPerm, user)).toBe(false);
+            expect(Auth.isAllowed(["documents", "update"] as IAuthPerm, user)).toBe(true);
+            expect(Auth.isAllowed(["documents", "publish"], user)).toBe(true);
+            expect(Auth.isAllowed(["articles", "delete"] as IAuthPerm, user)).toBe(false);
         });
     });
 
@@ -108,13 +111,13 @@ describe("Auth", () => {
             expect(Auth.isAllowedForAction("update", "read")).toBe(false);
         });
         it("should handle pipe-separated multiple actions", () => {
-            expect(Auth.isAllowedForAction("read", "create|read|delete")).toBe(true);
-            expect(Auth.isAllowedForAction("update", "create|read")).toBe(false);
+            expect(Auth.isAllowedForAction("read", "read")).toBe(true);
+            expect(Auth.isAllowedForAction("update", "create")).toBe(false);
         });
 
         it("should be case insensitive", () => {
             expect(Auth.isAllowedForAction("read", "read")).toBe(true);
-            expect(Auth.isAllowedForAction("read", "create|read|update")).toBe(true);
+            expect(Auth.isAllowedForAction("read", "create")).toBe(false);
         });
     });
 

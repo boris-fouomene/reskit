@@ -21,7 +21,7 @@
     "@nestjs/common": "^11.0.3",
     "@nestjs/core": "^11.0.3",
     "@nestjs/swagger": "^11.0.2",
-    "@resk/core": "^1.2.2",
+    "@resk/core": "^1.3.0",
     "mongoose": "^8.9.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",

@@ -1,12 +1,13 @@
-import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResourceMetadata, IResourceActionsMap, IResourceActionName, IResourceAction, IResourceDataService, IResourceOperationResult, IResourceQueryOptions, IResourcePaginatedResult, II18nTranslation, IResourceTranslateActionKey, IResourcePrimaryKey, IResourceManyCriteria, IResourceQueryOptionsOrderDirection } from '../types';
+import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionName, IResourceAction, IResourceDataService, IResourceQueryOptions, IResourcePaginatedResult, IResourcePrimaryKey, IResourceManyCriteria, IResourceActionTupleArray } from '../types';
 import { getFields } from '../fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory, extendObj } from '../utils/index';
-import { IClassConstructor, IAuthPermResource } from '../types/index';
+import { IClassConstructor } from '../types/index';
 import { IAuthPerm, IAuthUser } from '@/auth/types';
 import Auth from "../auth";
-import { i18n, I18n } from '@/i18n';
+import { i18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
 import { ResourcePaginationHelper } from './ResourcePaginationHelper';
+import { IResourceActions } from '../types/resources';
 export * from './ResourcePaginationHelper';
 const resourcesMetaDataKey = Symbol('resources');
 const resourcesClassNameMetaData = Symbol('resourceFromClassName');
@@ -60,8 +61,8 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
     this._onLocaleChangeListener = i18n.on("locale-changed", this.onI18nChange.bind(this));
     this.init();
   }
-  actions?: IResourceActionsMap;
-  getMetaData(): IResourceMetadata<DataType> {
+  actions?: Partial<IResourceActions>;
+  getMetaData(): IResource<DataType> {
     return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, this.constructor));
   }
   static events = observableFactory<IResourceDefaultEvent | "string">();
@@ -73,7 +74,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * 
    * @example
    * ```typescript
-   * const userResource: IResourceMetadata = { name: "user" };
+   * const userResource: IResource = { name: "user" };
    * ```
   */
   name?: IResourceName;
@@ -86,7 +87,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    *
    * @example
    * ```typescript
-   * const productResource: IResourceMetadata = { label: "Product" };
+   * const productResource: IResource = { label: "Product" };
    * ```
    */
   label?: string;
@@ -99,7 +100,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    *
    * @example
    * ```typescript
-   * const orderResource: IResourceMetadata = { title: "Order Management" };
+   * const orderResource: IResource = { title: "Order Management" };
    * ```
    */
   title?: string;
@@ -112,7 +113,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    *
    * @example
    * ```typescript
-   * const userResource: IResourceMetadata = { tooltip: "This resource manages user information." };
+   * const userResource: IResource = { tooltip: "This resource manages user information." };
    * ```
    */
   tooltip?: string;
@@ -484,7 +485,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
         });
       });
   }
-  updateMetadata(options: IResourceMetadata<DataType>): IResourceMetadata<DataType> {
+  updateMetadata(options: IResource<DataType>): IResource<DataType> {
     options = Object.assign({}, options);
     const metadata = extendObj({}, this.getMetaData(), options)
     Reflect.defineMetadata(ResourcesManager.resourceMetaData, metadata, this.constructor);
@@ -493,7 +494,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   /**
    * Initializes the resource with the provided metaData.
    * 
-   * @param metaData - An object implementing the IResourceMetadata interface, containing the data to initialize the resource with.
+   * @param metaData - An object implementing the IResource interface, containing the data to initialize the resource with.
    * 
    * This method assigns the provided metaData to the resource, ensuring that any empty properties
    * on the resource are filled with the corresponding values from the metaData object. It skips
@@ -606,13 +607,13 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   /**
    * Retrieves the actions associated with the resource.
    * If the actions are not already defined or not an object, 
-   * it initializes them as an empty object of type `IResourceActionsMap`.
+   * it initializes them as an empty object of type `IResourceActions`.
    *
-   * @returns {IResourceActionsMap} The map of resource actions.
+   * @returns  The map of resource actions.
    */
-  getActions(): IResourceActionsMap {
+  getActions(): Partial<IResourceActions> {
     if (!isObj(this.actions) || !this.actions) {
-      this.actions = {} as IResourceActionsMap;
+      this.actions = {};
     }
     return this.actions;
   }
@@ -624,13 +625,13 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   hasAction(action: IResourceActionName): boolean {
     if (!isNonNullString(action)) return false;
     const actions = this.getActions();
-    return isObj(actions[action]);
+    return isObj(actions[action as keyof typeof actions]) && actions[action as keyof typeof actions] !== undefined;
   }
 
   /**
    * Determines if the given permission is allowed for the specified user.
    *
-   * @param perm - The permission to check. It can be a string or an object implementing the IAuthPerm interface.
+   * @param action - The action to check. It can be a string or an array of strings representing the action name and the resource name.
 
    * @param user - The user for whom the permission is being checked. It can be an object implementing the IAuthUser interface.The user object for whom the permission.If not provided, the function will attempt 
    *   to retrieve the signed user from the session.
@@ -644,10 +645,19 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * 5. If the action is "all" or matches any of the resource's actions, it returns true.
    * 6. Otherwise, it delegates the permission check to the Auth.isAllowed method.
    */
-  isAllowed(perm?: IAuthPerm, user?: IAuthUser): boolean {
-    return ResourcesManager.isAllowed({ resourceName: this.getName(), perm }, user);
-  }
-  /**
+  isAllowed<ResourceName extends IResourceName = IResourceName>(action?: IResourceActionName<ResourceName> | IResourceActionName<ResourceName>[], user?: IAuthUser): boolean {
+    const perms: IResourceActionTupleArray[] = [];
+    if (isNonNullString(action)) {
+      perms.push([this.getName(), action as IResourceActionName<IResourceName>]);
+    } else if (Array.isArray(action)) {
+      action.forEach((a) => {
+        if (isNonNullString(a)) {
+          perms.push([this.getName(), a as IResourceActionName<IResourceName>]);
+        }
+      });
+    }
+    return Auth.isAllowed(perms, user);
+  }  /**
    * Determines if the specified user has read access.
    *
    * @param user - The user whose read access is being checked. If no user is provided, the method will use default permissions.
@@ -820,7 +830,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   getAction(actionName: IResourceActionName): IResourceAction {
     if (!isNonNullString(actionName)) return {};
     const actions = this.getActions();
-    return (isObj(actions[actionName]) && actions[actionName]) || {};
+    return (isObj(actions[actionName as keyof IResourceActions]) && actions[actionName as keyof IResourceActions]) || {};
   }
 
   /**
@@ -884,9 +894,9 @@ export class ResourcesManager {
    * This method returns a copy of the internal record of resource metaData, which can be used to access
    * the configuration and settings for each registered resource.
    * 
-   * @returns {Record<IResourceName, IResourceMetadata<any,any>>} A copy of the resource metaData record.
+   * @returns {Record<IResourceName, IResource<any,any>>} A copy of the resource metaData record.
    */
-  public static getAllMetaData(): Record<IResourceName, IResourceMetadata<any>> {
+  public static getAllMetaData(): Record<IResourceName, IResource<any>> {
     return Object.assign({}, Reflect.getMetadata(resourcesMetaDataKey, ResourcesManager));
   }
   /**
@@ -896,9 +906,9 @@ export class ResourcesManager {
    * The updated record is then stored as metadata on the `ResourcesManager` class.
    * 
    * @param {IResourceName} resourceName - The unique name of the resource.
-   * @param {IResourceMetadata<any>} metaData - The resource metaData to be associated with the given `resourceName`.
+   * @param {IResource<any>} metaData - The resource metaData to be associated with the given `resourceName`.
    */
-  public static addMetaData(resourceName: IResourceName, metaData: IResourceMetadata<any>) {
+  public static addMetaData(resourceName: IResourceName, metaData: IResource<any>) {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     metaData = Object.assign({}, metaData);
@@ -945,9 +955,9 @@ export class ResourcesManager {
    * non-null string, or if the resource metaData are not found, this method will return `undefined`.
    *
    * @param {IResourceName} resourceName - The unique name of the resource to retrieve the metaData for.
-   * @returns {IResourceMetadata<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
+   * @returns {IResource<any,any> | undefined} The resource metaData for the specified resource name, or `undefined` if not found.
    */
-  public static getMetaDataFromName(resourceName: IResourceName): IResourceMetadata<any> | undefined {
+  public static getMetaDataFromName(resourceName: IResourceName): IResource<any> | undefined {
     const allOptions = this.getAllMetaData();
     if (!isNonNullString(resourceName) || !resourceName) return;
     return (allOptions as any)[resourceName];
@@ -962,7 +972,7 @@ export class ResourcesManager {
  * @param {any} target - The target class or instance from which to retrieve the metadata.
  * @returns {Resource} An object containing the resource metadata for the given target.
  */
-  public static getMetaDataFromTarget(target: IClassConstructor): IResourceMetadata<any> | undefined {
+  public static getMetaDataFromTarget(target: IClassConstructor): IResource<any> | undefined {
     return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, target.prototype));
   }
 
@@ -974,9 +984,9 @@ export class ResourcesManager {
    * If the resource name is not found, or if the resource metaData are not found, this method will return `undefined`.
    *
    * @param {string} className - The class name of the resource to retrieve the metaData for.
-   * @returns {IResourceMetadata<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
+   * @returns {IResource<any, any> | undefined} The resource mata data for the specified resource class name, or `undefined` if not found.
    */
-  public static getMetaDataByClassName(className: string): IResourceMetadata<any> | undefined {
+  public static getMetaDataByClassName(className: string): IResource<any> | undefined {
     const resourceName = this.getNameFromClassName(className);
     if (!resourceName) return undefined;
     return this.getMetaDataFromName(resourceName);
@@ -1097,64 +1107,6 @@ export class ResourcesManager {
   public static getResources(): Record<IResourceName, Resource> {
     return this.resources;
   }
-
-  /**
- * Checks if a resource is allowed for the given user and permissions.
- *
- * This static method retrieves the resource based on the provided `resourceName` and checks if the
- * user is allowed to perform the specified `perm` action on the resource. If the resource is not
- * found or the user is not allowed, the method returns `false`.
- *
- * @param options - An object containing the resource name and the required permission.
- * @param user - An optional user object to check the permissions against.
- * @returns `true` if the user is allowed to perform the specified action on the resource, `false` otherwise.
- * @example
- * // Example usage of the isAllowed method
- * const user = { id: 1, perms: { documents: ['read', 'create'] } };
- * const resourceName = 'documents';
- * const perm = 'read';
- * const isAllowed = ResourcesManager.isAllowed({ resourceName, perm }, user);
- * console.log(isAllowed); // Output: true
- */
-  static isAllowed(options: IAuthPermResource, user?: IAuthUser): boolean {
-    options = Object.assign({}, options);
-    const { resourceName, perm } = options;
-    if (!resourceName || !isNonNullString(resourceName)) return Auth.isAllowed(perm as IAuthPerm, user);
-    let prefix = `${String(resourceName).trim().rtrim(":")}:`;
-    const metaData = ResourcesManager.getMetaDataFromName(resourceName as IResourceName);
-    const actions = Object.assign({}, metaData?.actions);
-    let permStr: any = perm;
-    if (typeof perm === "string") {
-      permStr = perm.trim();
-      let hasPrefix = true;
-      if (!permStr.includes(":")) {
-        permStr = `${prefix}${permStr}`;
-      } else {
-        const permStplit = permStr.toLowerCase().trim().split(":");
-        hasPrefix = String(resourceName).toLowerCase().trim() === permStplit[0]?.trim();
-      }
-      if (hasPrefix) {
-        const action = permStr.trim().split(":")[1];
-        if (isNonNullString(action)) {
-          const actionSplit = action.toLowerCase().trim().split("|");
-          let hasAction = actionSplit.includes("all");
-          if (!hasAction) {
-            for (let actionName in actions) {
-              actionName = String(actionName).toLowerCase().trim();
-              if (actionSplit.includes(actionName)) {
-                hasAction = true;
-                break;
-              }
-            }
-          }
-          if (!hasAction) {
-            return false;
-          }
-        }
-      }
-    }
-    return Auth.isAllowed(permStr as IAuthPerm, user);
-  }
 }
 
 /**
@@ -1177,7 +1129,7 @@ export class ResourcesManager {
  * 
  * ```
  */
-export function ResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData: IResourceMetadata<DataType, PrimaryKeyType> & {
+export function ResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData: IResource<DataType, PrimaryKeyType> & {
   /***
    * whether the resource should be instanciated or not
    */

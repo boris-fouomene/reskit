@@ -6,6 +6,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { defaultStr, I18n } from '@resk/core';
+import { applyLanguage } from './utils';
 
 /**
  * I18n Interceptor class that handles internationalization for incoming requests.
@@ -97,24 +98,11 @@ export class I18nInterceptor implements NestInterceptor {
    */
   async intercept(context: ExecutionContext, next: CallHandler) {
     /**
-     * Gets the incoming request from the ExecutionContext.
-     */
+       * Gets the incoming request from the ExecutionContext.
+       */
     const request = context.switchToHttp().getRequest();
 
-    /**
-     * Extracts the 'Accept-Language' header from the request and sets the locale accordingly.
-     * 
-     * If the 'Accept-Language' header is not present, it defaults to 'en'.
-     */
-    let lang = defaultStr(Object.assign({}, request.headers)['accept-language'], Object.assign({}, request.headers)['Accept-Language'], 'en');
-    if (!this.i18n.hasLocale(lang)) {
-      lang = "en";
-    }
-    /** 
-     * Sets the locale using the I18n instance.
-     */
-    await this.i18n.setLocale(lang);
-
+    await applyLanguage(this.i18n, request);
     /**
      * Calls the next handler in the request pipeline.
      */

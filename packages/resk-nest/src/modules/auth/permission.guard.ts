@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, SetMetadata, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Auth, defaultObj, i18n, IAuthPerm, IAuthPermAction, IResourceName, isNonNullString, isObj, ResourcesManager, createPropertyDecorator, getDecoratedProperty, getDecoratedProperties } from '@resk/core';
+import { Auth, defaultObj, i18n, IAuthPerm, IResourceName, isNonNullString, isObj, ResourcesManager, createPropertyDecorator, getDecoratedProperty, getDecoratedProperties } from '@resk/core';
 
 /**
  * Unique symbol used as the key for storing permissions metadata.
@@ -21,11 +21,11 @@ const PERMISSIONS_KEY = Symbol('permissions');
  * }
  * ```
  * 
- * @param  {(IAuthPerm|{ resourceName: IResourceName, action: IAuthPermAction })[]} permissions A variable number of IAuthPerm arguments, each representing a permission.
+ * @param  {IAuthPerm[]} permissions A variable number of IAuthPerm arguments, each representing a permission.
  * @returns A decorator that sets the permissions metadata on the target class or method.
  */
-export const Permissions = (...permissions: (IAuthPerm | { resourceName: IResourceName, action: IAuthPermAction })[]) => {
-    return createPropertyDecorator<(IAuthPerm | { resourceName: IResourceName, action: IAuthPermAction })[]>(PERMISSIONS_KEY, permissions);
+export const Permissions = (...permissions: IAuthPerm[]) => {
+    return createPropertyDecorator<IAuthPerm[]>(PERMISSIONS_KEY, permissions);
 };
 
 /**
@@ -98,29 +98,8 @@ export class PermissionsGuard implements CanActivate {
         if (!isObj(user) || !Object.getSize(user, true)) {
             throw new UnauthorizedException(i18n.t('auth.unauthorized'));
         }
-
-        /**
-         * Check if the user has any of the required permissions.
-         * 
-         * The some method is used to check if the user has any of the required permissions.
-         * The Auth.isAllowed method is used to check if the user has a specific permission.
-         */
         const canActivate = requiredPermissions.some(perm => {
-            if (isObj(perm) && typeof perm == "object") {
-                const { resourceName, action } = perm;
-                if (isNonNullString(resourceName) && isNonNullString(action)) {
-                    return ResourcesManager.isAllowed({ resourceName: resourceName, perm: action }, user);
-                }
-                return false;
-            } else {
-                const split = String(perm).trim().split(":");
-                const resourceName: IResourceName = split[0] as IResourceName;
-                const action = split[1] as IAuthPermAction;
-                if (isNonNullString(resourceName) && isNonNullString(action)) {
-                    return ResourcesManager.isAllowed({ resourceName, perm: action }, user);
-                }
-                return Auth.isAllowed(perm, user);
-            }
+            return Auth.isAllowed(perm, user);
         });
         if (!canActivate) {
             throw new ForbiddenException(i18n.t("auth.guards.permissions.forbiddenError"));

@@ -8,7 +8,7 @@ import { Injectable } from "@nestjs/common";
 
 
 declare module "@resk/core" {
-  export interface IResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, ClassType extends ResourceController<any> = ResourceController<any>> {
+  export interface IResource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, ClassType extends ResourceController<any> = ResourceController<any>> {
     /***
      * The name of the controller class for the resource service
      */

@@ -1,7 +1,7 @@
 import isNonNullString from "@utils/isNonNullString";
 import { IMongoQuery, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderDirection } from "../types";
 import { isNumber } from "lodash";
-import { defaultObj, isObj } from "@utils/object";
+import { defaultObj, extendObj, isObj } from "@utils/object";
 import { getQueryParams } from "@utils/uri";
 import defaultVal from "@utils/defaultVal";
 import { isStringNumber } from "@utils/string";
@@ -154,43 +154,46 @@ export class ResourcePaginationHelper {
      * const req = { url: '/api/resources?limit=10&skip=5', headers: { 'x-filters': { limit: 10, skip: 5 } } };
      * const queryOptions = parseQueryOptions(req);
      */
-    static parseQueryOptions<T extends IResourceData = IResourceData>(req: { url: string, headers: Record<string, any>, params: Record<string, any> }): IResourceQueryOptions<T> & { queryParams: Record<string, any>, } {
-        const queryParams = Object.assign({}, req?.params, getQueryParams(req?.url));
-        const xFilters = Object.assign({}, req?.headers["x-filters"]);
-        const limit = defaultVal(parseNumber(queryParams.limit), parseNumber(xFilters.limit));
-        const skip = defaultVal(parseNumber(queryParams.skip), parseNumber(xFilters.skip));
-        const page = defaultVal(parseNumber(queryParams.page), parseNumber(xFilters.page));
+    static parseQueryOptions<T extends IResourceData = IResourceData>(req: { url: string, headers: Record<string, any>, params?: Record<string, any>, filters?: Record<string, any> }): IResourceQueryOptions<T> & { queryParams: Record<string, any>, } {
+        const queryParams = extendObj({}, req?.params, getQueryParams(req?.url));
+        const xFilters = extendObj({}, queryParams, req?.headers?.["x-filters"], req?.filters);
+        const limit = parseNumber(xFilters.limit);
+        const skip = parseNumber(xFilters.skip);
+        const page = parseNumber(xFilters.page);
         const result: IResourceQueryOptions<T> = ResourcePaginationHelper.normalizePagination({ limit, skip, page });
-        const distinct = defaultVal(queryParams.distinct, xFilters.distinct);
+        let distinct = xFilters.distinct;
+        if (typeof distinct == "number") {
+            distinct = !!distinct;
+        }
         if (typeof distinct === "boolean" || Array.isArray(distinct) && distinct.length) {
             result.distinct = distinct;
         }
-        const defaultOrderBy = defaultVal(queryParams.orderBy, xFilters.orderBy);
+        const defaultOrderBy = xFilters.orderBy;
         const orderBy = ResourcePaginationHelper.normalizeOrderBy(defaultOrderBy);
         if (orderBy) {
             (result as any).orderBy = orderBy;
         }
-        const include = defaultArray<any>(queryParams.include, xFilters.include);
+        const include = defaultArray<any>(xFilters.include);
         if (include.length) {
             result.include = include as any;
         }
-        const cache = defaultVal(queryParams.cach, xFilters.cache);
+        const cache = xFilters.cache;
         if (cache !== undefined) {
             result.cache = !!cache;
         }
-        const cacheTTL = defaultVal(queryParams.cacheTTL, xFilters.cacheTTL);
+        const cacheTTL = xFilters.cacheTTL;
         if (cacheTTL !== undefined) {
             result.cacheTTL = cacheTTL;
         }
-        const where = defaultArrayOrStringOrObject(queryParams.where, xFilters.where);
+        const where = defaultArrayOrStringOrObject(xFilters.where);
         if (isObj(where) && Object.getSize(where, true)) {
             result.where = where;
         }
-        const includeDeleted = defaultVal(queryParams.includeDeleted, xFilters.includeDeleted);
+        const includeDeleted = xFilters.includeDeleted;
         if (typeof includeDeleted === "boolean") {
             result.includeDeleted = includeDeleted;
         }
-        const relations = defaultArray(queryParams.relations, xFilters.relations);
+        const relations = defaultArray(xFilters.relations);
         if (relations.length) {
             result.relations = relations;
         }

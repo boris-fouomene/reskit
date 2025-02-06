@@ -298,7 +298,7 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
         const primaryColumns = this.getPrimaryColumnNames();
         const primaryColumn = primaryColumns[0];
         if (Array.isArray(options)) {
-            (contitions as any)[primaryColumn] = In(options as any);
+            (contitions as any)[primaryColumn] = { $in: options };
             options = { where: contitions };
         } else if (["number", "string"].includes(typeof options)) {
             const primaryColumn: keyof DataType = primaryColumns[0];

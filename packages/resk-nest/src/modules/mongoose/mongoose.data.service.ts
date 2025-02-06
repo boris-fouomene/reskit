@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { IResourceData, IResourceDataService, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions } from '@resk/core';
-import mongoose, { ClientSession, FilterQuery, Model, ObjectId } from 'mongoose';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { i18n, IResourceData, IResourceDataService, IResourceManyCriteria, IResourcePaginatedResult, IResourcePrimaryKey, IResourceQueryOptions, isNonNullString, isObj, ResourcePaginationHelper } from '@resk/core';
+import mongoose, { ClientSession, FilterQuery, Model, ObjectId, QueryWithHelpers } from 'mongoose';
 import { Connection, Schema } from 'mongoose';
+import { stringify } from "@resk/core";
+import { cp } from 'fs';
 
+export interface IMongooseDataType extends IResourceData {
+    _id?: ObjectId;
+}
 @Injectable()
-export class MongooseDataService<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = ObjectId> implements IResourceDataService<DataType, PrimaryKeyType> {
+export class MongooseDataService<DataType extends IMongooseDataType = any, PrimaryKeyType extends IResourcePrimaryKey = ObjectId> implements IResourceDataService<DataType, PrimaryKeyType> {
     constructor(protected readonly connection: Connection, protected readonly schemaName: string, protected readonly schema: Schema) { }
     /***
      * Executes a set of database operations within a transaction.
@@ -37,13 +42,13 @@ export class MongooseDataService<DataType extends IResourceData = any, PrimaryKe
             await session.commitTransaction();
             await session.endSession();
             return r;
-        } catch (error) {
+        } catch (error: any) {
             await session.abortTransaction();
             await session.endSession();
-            throw error;
+            throw error instanceof HttpException ? error : new HttpException(stringify(error), error?.statusCode ?? 500);
         }
     }
-    buildFindOptions(options: PrimaryKeyType | PrimaryKeyType[] | IResourceQueryOptions<DataType>): FilterQuery<DataType> {
+    buildFindOptions(options: PrimaryKeyType | PrimaryKeyType[] | IResourceQueryOptions<DataType>): Omit<IResourceQueryOptions<DataType>, "where"> & { where?: FilterQuery<DataType> } {
         const contitions: IResourceQueryOptions<DataType>["where"] = {};
         const primaryColumn = "_id";
         if (Array.isArray(options)) {
@@ -56,14 +61,16 @@ export class MongooseDataService<DataType extends IResourceData = any, PrimaryKe
                 }
             };
         }
-        const result = Object.assign({}, options) as FilterQuery<DataType>;
-        /* (result as any).order = isNonNullString(queryOptions.orderBy) ? [queryOptions.orderBy] : Array.isArray(queryOptions.orderBy) && queryOptions.orderBy.length ? queryOptions.orderBy : isObj(queryOptions.orderBy) ? queryOptions.orderBy : undefined;
-        if (typeof queryOptions.limit === "number" && queryOptions.limit > 0) {
-            (result as any).take = queryOptions.limit;
+        const result = Object.assign({}, options) as IResourceQueryOptions<DataType>;
+        if (isObj(result.where)) {
+            const { limit, skip } = ResourcePaginationHelper.normalizePagination(options as IResourceQueryOptions<DataType>);
+            if (limit) {
+                (result as any).limit = limit;
+            }
+            if (skip) {
+                (result as any).skip = skip;
+            }
         }
-        if (typeof queryOptions.skip === "number") {
-            result.skip = queryOptions.skip;
-        }  */
         return result;
     }
     /***
@@ -81,51 +88,97 @@ export class MongooseDataService<DataType extends IResourceData = any, PrimaryKe
         return this.executeInTransaction(async (session) => new model(record).save({ session }));
     }
     update(primaryKey: PrimaryKeyType, updatedData: Partial<DataType>): Promise<DataType> {
-        //return this.getModel().findByIdAndUpdate(primaryKey, updatedData, { new: true }).exec();
-        throw new Error('Method not implemented.');
-    }
-    delete(primaryKey: PrimaryKeyType): Promise<boolean> {
-        const findOptions = this.buildFindOptions(primaryKey);
         return this.executeInTransaction(async (session) => {
-            return await !!this.getModel().findByIdAndDelete(findOptions).session(session);
+            const model = this.getModel();
+            const findOptions = this.buildFindOptions(primaryKey);
+            const result = await model.findOneAndUpdate(findOptions.where ?? {}, updatedData, { new: true, session });
+            if (!result) {
+                throw new NotFoundException(i18n.t("resources.notFoundError"));
+            }
+            return result;
         });
     }
+    delete(primaryKey: PrimaryKeyType): Promise<boolean> {
+        return this.executeInTransaction(async (session) => {
+            return await !!this.getModel().findByIdAndDelete(primaryKey).session(session);
+        });
+    }
+    performQuery<ResultType>(query: any, options: IResourceQueryOptions<DataType>): Promise<ResultType> {
+        const { orderBy } = options;
+        const { limit, skip } = ResourcePaginationHelper.normalizePagination(options);
+        if (typeof skip == "number" && skip && typeof query.skip == "function") {
+            query.skip(skip);
+        }
+        if (typeof limit == "number" && limit && typeof query.limit == "function") {
+            query.limit(limit);
+        }
+        if (isObj(orderBy) && Object.getSize(orderBy, true) > 0) {
+            const sortObj: Record<string, "asc" | "desc"> = {};
+            for (const [key, value] of Object.entries(orderBy as any)) {
+                const sortOrder = String(value).toLowerCase();
+                if (isNonNullString(key) && ["asc", "desc"].includes(sortOrder)) {
+                    sortObj[key] = sortOrder as "asc" | "desc";
+                }
+            }
+            if (Object.getSize(sortObj, true) > 0) {
+                query.sort(sortObj);
+            }
+        }
+        return query.exec();
+    }
     findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null> {
-        return this.getModel().findOne(this.buildFindOptions(options)).exec();
+        const findOptions = this.buildFindOptions(options);
+        return this.performQuery(this.getModel().findOne(findOptions.where), findOptions);
     }
     findOneOrFail(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType> {
-        throw new Error('Method not implemented.');
+        const d = this.findOne(options);
+        if (!d || d === null) {
+            throw new NotFoundException(i18n.t("resources.notFoundError"));
+        }
+        return d as Promise<DataType>;
     }
     find(options?: IResourceQueryOptions<DataType> | undefined): Promise<DataType[]> {
-        const { where } = Object.assign({}, options);
-        return this.getModel().find(where as {}).exec();
+        const opts = Object.assign({}, options);
+        const { where } = opts;
+        return this.performQuery(this.getModel().find(where ?? {}), opts);
     }
-    findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]> {
-        throw new Error('Method not implemented.');
+    async findAndCount(options?: IResourceQueryOptions<DataType> | undefined): Promise<[DataType[], number]> {
+        const findOptions = this.buildFindOptions(options ?? {});
+        const { where } = findOptions;
+        const data = await this.find(options);
+        return [data, await this.getModel().countDocuments(where ?? {})];
     }
-    findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
-        throw new Error('Method not implemented.');
+    async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
+        options = Object.assign({}, options);
+        const [data, count] = await this.findAndCount(options);
+        return ResourcePaginationHelper.paginate(data, count, options);
     }
     createMany(data: Partial<DataType>[]): Promise<DataType[]> {
-        throw new Error('Method not implemented.');
+        return this.executeInTransaction(async (session) => {
+            return this.getModel().insertMany(data, { session }) as unknown as Promise<DataType[]>;
+        });
     }
     updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>): Promise<number> {
-        throw new Error('Method not implemented.');
+        const findOptions = this.buildFindOptions(criteria as any);
+        return this.executeInTransaction(async (session) => {
+            const { where } = findOptions;
+            return (await this.getModel().updateMany(where, data, { session })).modifiedCount;
+        });
     }
     deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number> {
-        throw new Error('Method not implemented.');
+        return this.executeInTransaction(async (session) => {
+            const findOptions = this.buildFindOptions(criteria as any);
+            const { where } = findOptions;
+            return (await this.getModel().deleteMany(where, { session })).deletedCount;
+        });
     }
     count(options?: IResourceQueryOptions<DataType> | undefined): Promise<number> {
-        throw new Error('Method not implemented.');
+        const findOptions = this.buildFindOptions(options ?? {});
+        const { where } = findOptions;
+        return this.getModel().countDocuments(where ?? {});
     }
-    exists(primaryKey: PrimaryKeyType): Promise<boolean> {
-        throw new Error('Method not implemented.');
-    }
-    distinct?(field: keyof DataType): Promise<any[]> {
-        throw new Error('Method not implemented.');
-    }
-    aggregate?(pipeline: any[]): Promise<any[]> {
-        throw new Error('Method not implemented.');
+    async exists(primaryKey: PrimaryKeyType): Promise<boolean> {
+        return await this.count(primaryKey as any) > 0
     }
     getSchemaName(): string {
         return this.schemaName

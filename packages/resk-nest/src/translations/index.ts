@@ -26,7 +26,7 @@ I18n.RegisterTranslations({
             "invalidDataProvider": "Invalid data provider",
         },
         "resources": {
-
+            "notFoundError": "Resource not found",
         }
     },
 })

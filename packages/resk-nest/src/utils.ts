@@ -62,8 +62,7 @@ export async function createApp<T extends INestApplication = INestApplication>(
         defaultVersion: '1',
         ...Object.assign({}, versioningOptions),
     } as VersioningOptions;
-    const appVersion =
-        typeof vOptions.defaultVersion === 'string' ? vOptions.defaultVersion : '1';
+    const appVersion = typeof vOptions.defaultVersion === 'string' ? vOptions.defaultVersion : '1';
     if (swaggerOptions?.enabled !== false) {
         setupSwagger(
             app,
@@ -78,7 +77,7 @@ export async function createApp<T extends INestApplication = INestApplication>(
             ),
         );
     }
-    if (versioningOptions?.enabled !== false) {
+    if (versioningOptions?.enabled) {
         app.enableVersioning(vOptions as unknown as VersioningOptions);
     }
     return app;

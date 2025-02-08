@@ -103,7 +103,7 @@ export class MongooseDataService<DataType extends IMongooseDataType = any, Prima
             return await !!this.getModel().findByIdAndDelete(primaryKey).session(session);
         });
     }
-    performQuery<ResultType>(query: any, options: IResourceQueryOptions<DataType>): Promise<ResultType> {
+    async performQuery<ResultType>(query: any, options: IResourceQueryOptions<DataType>): Promise<ResultType> {
         const { orderBy } = options;
         const { limit, skip } = ResourcePaginationHelper.normalizePagination(options);
         if (typeof skip == "number" && skip && typeof query.skip == "function") {
@@ -124,7 +124,7 @@ export class MongooseDataService<DataType extends IMongooseDataType = any, Prima
                 query.sort(sortObj);
             }
         }
-        return query.lean().exec();
+        return await query.lean().exec();
     }
     findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null> {
         const findOptions = this.buildFindOptions(options);

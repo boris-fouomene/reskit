@@ -15,6 +15,7 @@
     "incremental": true,
     "noLib": false,
     "sourceMap": false,
+    "noEmitOnError": true,
     "typeRoots": [
       "./node_modules/@types"
     ], // Ensure Jest typings are included

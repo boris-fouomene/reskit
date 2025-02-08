@@ -124,7 +124,7 @@ export class MongooseDataService<DataType extends IMongooseDataType = any, Prima
                 query.sort(sortObj);
             }
         }
-        return query.exec();
+        return query.lean().exec();
     }
     findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>): Promise<DataType | null> {
         const findOptions = this.buildFindOptions(options);

@@ -5,11 +5,11 @@ import { Connection, Schema } from 'mongoose';
 import { stringify } from "@resk/core";
 import { cp } from 'fs';
 
-export interface IMongooseDataType extends IResourceData {
+export interface IDatabaseRecordType extends IResourceData {
     _id?: ObjectId;
 }
 @Injectable()
-export class MongooseDataService<DataType extends IMongooseDataType = any, PrimaryKeyType extends IResourcePrimaryKey = ObjectId> implements IResourceDataService<DataType, PrimaryKeyType> {
+export class MongooseDataService<DataType extends IDatabaseRecordType = any, PrimaryKeyType extends IResourcePrimaryKey = ObjectId> implements IResourceDataService<DataType, PrimaryKeyType> {
     constructor(protected readonly connection: Connection, protected readonly schemaName: string, protected readonly schema: Schema) { }
     /***
      * Executes a set of database operations within a transaction.

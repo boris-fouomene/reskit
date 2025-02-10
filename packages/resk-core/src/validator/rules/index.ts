@@ -4,6 +4,7 @@ import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { defaultStr, isEmpty, isNonNullString, isValidUrl, isValidEmail, isStringNumber } from "@utils/index";
 import { Validator } from "../validator";
 import { i18n } from "../../i18n";
+import { isValidPhoneNumber } from "@utils/isValidPhoneNumber";
 
 /**
  * @function compareNumer
@@ -842,3 +843,25 @@ Validator.registerRule("nonNullString", function nonNullString(options) {
     const { value } = options;
     return isNonNullString(value) || i18n.t("validator.isNonNullString", options);
 });
+
+
+function phoneNumber(options: IValidatorValidateOptions) {
+    const { value } = options;
+    return isValidPhoneNumber(value) || i18n.t("validator.phoneNumber", options);
+}
+Validator.registerRule("phoneNumber", phoneNumber);
+
+/**
+ * A validator decorator to check if a phone number is valid.
+ * 
+ * @param phoneNumber The phone number to validate.
+ * @returns A validator decorator that checks if the phone number is valid.
+ * @example
+ * ```typescript
+ * class User {
+ *   @ValidatorIsValidPhoneNumber
+ *   phoneNumber: string;
+ * }
+ * ```
+ */
+export const ValidatorIsValidPhoneNumber = Validator.createDecorator<[param: string]>(phoneNumber);

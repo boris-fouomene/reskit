@@ -711,6 +711,11 @@ export interface IValidatorRuleMap {
      * Validator rule that checks if a given value is a non null string
      */
     nonNullString: IValidatorRuleFunction;
+
+    /***
+     * Validator rule that checks if a given value is a valid phone number
+     */
+    phoneNumber: IValidatorRuleFunction;
 }
 
 

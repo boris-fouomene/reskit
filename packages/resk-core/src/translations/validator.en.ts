@@ -50,6 +50,7 @@ I18n.RegisterTranslations({
             "noteEquals": "This field must be different from %{ruleParams[0]}",
             "numberIsDifferentFrom": "This field must be different from %{ruleParams[0]}",
             "numberEquals": "This field must be equal to %{ruleParams[0]}",
+            "phoneNumber": "This field must be a valid phone number",
             "tests": {
                 "entity": {
                     "name": "Name",

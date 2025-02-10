@@ -11,6 +11,7 @@ I18n.RegisterTranslations({
             "strategyNameNotFound": "Auth Strategy name  [%{strategyName}] not found",
             "invalidStrategyName": "Invalid Auth strategy name.",
             "unauthorized": "Unauthorized. You are not authorized to access this resource.",
+            "specifyNonNullPassword": "You must specify a non null password",
             "guards": {
                 "permissions": {
                     "forbiddenError": "You do not have permission to access this resource.",

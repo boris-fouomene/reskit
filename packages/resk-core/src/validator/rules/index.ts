@@ -887,4 +887,4 @@ Validator.registerRule("emailOrPhoneNumber", emailOrPhoneNumber);
  * }
  * ```
  */
-export const ValidatorEmailOrPhoneNumber = Validator.createDecorator<[param: string]>(emailOrPhoneNumber);
+export const ValidatorIsEmailOrPhoneNumber = Validator.createDecorator<[param: string]>(emailOrPhoneNumber);

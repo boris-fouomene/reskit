@@ -18,7 +18,7 @@ import "./locales/common.en.json";
     }),
     DatabaseModule,
     UsersModule,
-    CatsModule,
+    //CatsModule,
   ],
   providers: [
     {

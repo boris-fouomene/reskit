@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import "./modules/resource/interfaces";
-import { isNonNullString, ResourcesManager } from "@resk/core";
+import { defaultStr, isNonNullString, ResourcesManager } from "@resk/core";
 import {
     SwaggerModule,
     DocumentBuilder,
@@ -54,7 +54,7 @@ export async function createApp<T extends INestApplication = INestApplication>(
     module: any,
     options?: ICreateNestAppOptions,
 ): Promise<INestApplication<T>> {
-    const { swaggerOptions, versioningOptions, ...nestAppOptions } =
+    const { swaggerOptions, versioningOptions, globalPrefix: nestAppGlobalPrefix, ...nestAppOptions } =
         Object.assign({}, options);
     const app = await NestFactory.create<T>(module, nestAppOptions);
     const vOptions: VersioningOptions = {
@@ -63,7 +63,14 @@ export async function createApp<T extends INestApplication = INestApplication>(
         ...Object.assign({}, versioningOptions),
     } as VersioningOptions;
     const appVersion = typeof vOptions.defaultVersion === 'string' ? vOptions.defaultVersion : '1';
+    // Capture the global prefix if set later
+    let globalPrefix = defaultStr(nestAppGlobalPrefix);
+    if (globalPrefix) {
+        app.setGlobalPrefix(globalPrefix);
+    }
     if (swaggerOptions?.enabled !== false) {
+        // Combine global prefix and version prefix
+        const combinedPrefix = `${globalPrefix ? globalPrefix + '/' : ''}v${appVersion}`;
         setupSwagger(
             app,
             Object.assign(
@@ -71,7 +78,7 @@ export async function createApp<T extends INestApplication = INestApplication>(
                     path:
                         typeof swaggerOptions?.path === 'string' && swaggerOptions?.path
                             ? swaggerOptions?.path.trim()
-                            : `v${appVersion}/${`swagger`}`,
+                            : `${combinedPrefix}/swagger`,
                 },
                 swaggerOptions,
             ),
@@ -206,6 +213,11 @@ export const setupSwagger = (
  * @extends {NestApplicationOptions}
  */
 export interface ICreateNestAppOptions extends NestApplicationOptions {
+    /***
+     * Global prefix for the application
+     * @default ''
+     */
+    globalPrefix?: string;
     /**
      * The versioning options for the application.
      * This allows you to configure how versioning is handled in the application.

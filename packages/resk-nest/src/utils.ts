@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import "./modules/resource/interfaces";
-import { defaultStr, isNonNullString, ResourcesManager } from "@resk/core";
+import { defaultStr, isNonNullString, ResourcesManager, uniqid } from "@resk/core";
+import { join } from 'path';
+import { existsSync } from 'fs';
 import {
     SwaggerModule,
     DocumentBuilder,
@@ -9,7 +11,7 @@ import {
 } from '@nestjs/swagger';
 import { INestApplication, VersioningType } from '@nestjs/common';
 import { VersioningOptions, NestApplicationOptions } from '@nestjs/common';
-const pathM = require("path");
+
 /**
  * Creates a NestJS application with optional Swagger documentation and versioning.
  *
@@ -64,13 +66,13 @@ export async function createApp<T extends INestApplication = INestApplication>(
     } as VersioningOptions;
     const appVersion = typeof vOptions.defaultVersion === 'string' ? vOptions.defaultVersion : '1';
     // Capture the global prefix if set later
-    let globalPrefix = defaultStr(nestAppGlobalPrefix);
+    const globalPrefix = defaultStr(nestAppGlobalPrefix);
     if (globalPrefix) {
         app.setGlobalPrefix(globalPrefix);
     }
     if (swaggerOptions?.enabled !== false) {
         // Combine global prefix and version prefix
-        const combinedPrefix = `${globalPrefix ? globalPrefix + '/' : ''}v${appVersion}`;
+        const combinedPrefix = `v${appVersion}`;
         setupSwagger(
             app,
             Object.assign(
@@ -153,7 +155,7 @@ export const setupSwagger = (
     if (isNonNullString(version)) {
         configBuilder.setVersion(version);
     }
-    const swaggerPath = typeof path === 'string' ? path : 'v1/swagger';
+    const swaggerPath = (typeof path === 'string' ? path : 'v1/swagger').ltrim("/").rtrim("/").trim();
     /***
           configBuilder.setBasePath(process.env.BASE_PATH ?? '/');
           configBuilder.setSchemes(['http','https']);
@@ -166,34 +168,40 @@ export const setupSwagger = (
     )
         //.addBearerAuth() // Optional: Add security options
         .build();
-    const customCssUrl = Array.isArray(sOptions.customCssUrl)
-        ? sOptions.customCssUrl
-        : isNonNullString(sOptions.customCssUrl)
-            ? sOptions.customCssUrl.split(',')
-            : [];
-    customCssUrl.push('./swagger-ui/swagger-ui.css');
-    sOptions.customCssUrl = customCssUrl;
-    sOptions.customJs = Array.isArray(sOptions.customJs)
-        ? sOptions.customJs
-        : isNonNullString(sOptions.customJs)
-            ? sOptions.customJs.split(',')
-            : [];
-    sOptions.customJs.push(
-        './swagger-ui-standalone-preset.js',
-        './swagger-ui-bundle.js',
-    );
+    sOptions.useGlobalPrefix = typeof sOptions.useGlobalPrefix === 'boolean' ? sOptions.useGlobalPrefix : true;
+    const appConfig = (app as any).config;
+    const globalPrefix = defaultStr(typeof appConfig?.getGlobalPrefix === 'function' ? appConfig.getGlobalPrefix() : "");
     sOptions.swaggerOptions = Object.assign({}, sOptions.swaggerOptions);
     sOptions.swaggerOptions.persistAuthorization =
         typeof sOptions.swaggerOptions.persistAuthorization !== undefined
             ? sOptions.swaggerOptions.persistAuthorization
             : true;
     if (typeof (app as any).useStaticAssets === 'function') {
-        (app as any).useStaticAssets(
-            pathM.join(__dirname, '../dist', 'swagger-ui'),
-            {
-                prefix: `/${swaggerPath.trim().ltrim("/")}`,
-            },
-        );
+        // Find the swagger-ui-dist path
+        const swaggerUIDistPath = findSwaggerUIDist();
+        if (swaggerUIDistPath) {
+            sOptions.customCssUrl = Array.isArray(sOptions.customCssUrl)
+                ? sOptions.customCssUrl
+                : isNonNullString(sOptions.customCssUrl)
+                    ? sOptions.customCssUrl.split(',')
+                    : [];
+            const dynamicCustomPath = `/my-dynamic-swagger-path`;
+            sOptions.customCssUrl.unshift(`${dynamicCustomPath}/swagger-ui.css`);
+            sOptions.customJs = Array.isArray(sOptions.customJs)
+                ? sOptions.customJs
+                : isNonNullString(sOptions.customJs)
+                    ? sOptions.customJs.split(',')
+                    : [];
+            sOptions.customJs.unshift(
+                `${dynamicCustomPath}/swagger-ui-standalone-preset.js`,
+                `${dynamicCustomPath}/swagger-ui-bundle.js`,
+            );
+            (app as any).useStaticAssets(swaggerUIDistPath, {
+                prefix: dynamicCustomPath,
+            });
+        } else {
+            console.warn('swagger-ui-dist not found in any node_modules directory.');
+        }
     }
     // Set up the Swagger UI endpoint
     SwaggerModule.setup(swaggerPath, app, () => {
@@ -201,6 +209,27 @@ export const setupSwagger = (
         return documents;
     }, sOptions);
 };
+
+// Function to recursively find swagger-ui-dist
+function findSwaggerUIDist(): string | null {
+    const startDir = process.cwd();
+    const current = join(startDir, 'node_modules', 'swagger-ui-dist');
+    if (existsSync(current)) {
+        return current;
+    }
+    let count = 0;
+    const parts = startDir.replaceAll("\\", "/").split('/');
+    for (let i = parts.length; i >= 0; i--) {
+        const currentPath = parts.slice(0, i).join('/') || '.';
+        const swaggerPath = join(currentPath, 'node_modules', 'swagger-ui-dist');
+        if (existsSync(swaggerPath)) {
+            return swaggerPath;
+        }
+        count++;
+        if (count >= 4) return null;
+    }
+    return null;
+}
 
 
 

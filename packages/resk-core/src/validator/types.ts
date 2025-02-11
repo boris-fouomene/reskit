@@ -716,6 +716,11 @@ export interface IValidatorRuleMap {
      * Validator rule that checks if a given value is a valid phone number
      */
     phoneNumber: IValidatorRuleFunction;
+
+    /**
+     * Validator rule that checks if a given value is a valid email or phone number
+     */
+    emailOrPhoneNumber: IValidatorRuleFunction;
 }
 
 

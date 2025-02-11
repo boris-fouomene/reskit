@@ -865,3 +865,26 @@ Validator.registerRule("phoneNumber", phoneNumber);
  * ```
  */
 export const ValidatorIsValidPhoneNumber = Validator.createDecorator<[param: string]>(phoneNumber);
+
+
+
+function emailOrPhoneNumber(options: IValidatorValidateOptions) {
+    const { value } = options;
+    return isValidEmail(value) || isValidPhoneNumber(value) || i18n.t("validator.emailOrPhoneNumber", options);
+}
+Validator.registerRule("emailOrPhoneNumber", emailOrPhoneNumber);
+
+/**
+ * A validator decorator to check if value is a valid email or phone number.
+ * 
+ * @param value The email or phone number to validate.
+ * @returns A validator decorator that checks if the email or phone number is valid.
+ * @example
+ * ```typescript
+ * class User {
+ *   @ValidatorIsEmailOrPhoneNumber
+ *   emailOrPhoneNumber : string;
+ * }
+ * ```
+ */
+export const ValidatorEmailOrPhoneNumber = Validator.createDecorator<[param: string]>(emailOrPhoneNumber);

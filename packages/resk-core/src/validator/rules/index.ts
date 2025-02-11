@@ -859,12 +859,12 @@ Validator.registerRule("phoneNumber", phoneNumber);
  * @example
  * ```typescript
  * class User {
- *   @ValidatorIsValidPhoneNumber
+ *   @ValidatorIsPhoneNumber
  *   phoneNumber: string;
  * }
  * ```
  */
-export const ValidatorIsValidPhoneNumber = Validator.createDecorator<[param: string]>(phoneNumber);
+export const ValidatorIsPhoneNumber = Validator.createPropertyDecorator("phoneNumber");
 
 
 
@@ -887,4 +887,4 @@ Validator.registerRule("emailOrPhoneNumber", emailOrPhoneNumber);
  * }
  * ```
  */
-export const ValidatorIsEmailOrPhoneNumber = Validator.createDecorator<[param: string]>(emailOrPhoneNumber);
+export const ValidatorIsEmailOrPhoneNumber = Validator.createPropertyDecorator("emailOrPhoneNumber");

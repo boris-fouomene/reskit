@@ -16,7 +16,8 @@ I18n.RegisterTranslations({
                 "permissions": {
                     "forbiddenError": "You do not have permission to access this resource.",
                 },
-            }
+                "httpsRequired": "HTTPS required"
+            },
         },
         "typeorm": {
             "entityWithPrimaryNotFound": "Entity with primary key %{primaryKey} not found",

@@ -5,8 +5,8 @@
     "baseUrl": "./",
     "rootDir": "./src",
     "module": "commonjs",
-    "composite": false, // Ensure composite is false
-    "incremental": false, // Ensure incremental is false
+    "composite": false,
+    "incremental": false,
     "paths": {
       "@resource/*": [
         "./src/modules/resource/*"
@@ -43,16 +43,16 @@
       ],
       "@examples/*": [
         "./src/examples/*"
-      ],
+      ]
     }
   },
   "include": [
     "src/**/*",
-    "src/**/*.json" // Add this to include JSON files
+    "src/**/*.json"
   ],
   "exclude": [
     "../packages/resk-expo/**/*",
     "../packages/resk-expo-docs/**/*",
     "**/*.tsx"
-  ],
+  ]
 }

@@ -12,6 +12,7 @@ import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IDividerProps } from "@components/Divider";
 import { IFormData } from "@components/Form/types";
+import { IAuthPerm, IResourceName } from "@resk/core";
 
 /**
  * @interface IButtonMode
@@ -77,8 +78,6 @@ export type IButtonMode = | 'text' | 'outlined' | 'contained';
  *         </Button>
  *     );
  * };
- * @see {@link IAuthPermResource} for the `IAuthPermResource` type.
- * @see {@link IAuthPermResource} for the `IAuthPermResource` type.
  * @see {@link IButtonContext} for the `IButtonContext` type.
  * @see {@link ITouchableRippleProps} for the `ITouchableRippleProps` type.
  * @see {@link ITooltipBaseProps} for the `ITooltipBaseProps` type.
@@ -87,7 +86,7 @@ export type IButtonMode = | 'text' | 'outlined' | 'contained';
  * @see {@link ISurfaceProps} for the `ISurfaceProps` type.
  * @see {@link ILabelProps} for the `ILabelProps` type.
  */
-export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, textColor: string }> & Omit<ITouchableRippleProps, "style" | 'onPress' | "children"> & Omit<ITooltipBaseProps, 'disabled'> & {
+export type IButtonProps<IButtonExtendContext = any, ResourceName extends IResourceName = IResourceName> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, textColor: string }> & Omit<ITouchableRippleProps, "style" | 'onPress' | "children"> & Omit<ITooltipBaseProps, 'disabled'> & {
     /**
      * Optional style for the button component.
      * Can be used to customize the appearance of the button.
@@ -385,6 +384,18 @@ export type IButtonProps<IButtonExtendContext = any> = ILabelOrLeftOrRightProps<
      * This can be useful for creating buttons that submit the form when pressed if the form is valid.
      */
     submitFormOnPress?: boolean;
+
+    /***
+     * The permission associated with the button. This permission is used to determine if the button will be rendered or not.
+     * If not provided, the button will be rendered regardless of the user's permissions.
+     */
+    perm?: IAuthPerm;
+
+    /***
+     * The name of the resource associated with the button.
+     * When this name is provided, button can be used as an actions for a form with that resource.
+     */
+    resourceName?: ResourceName;
 }
 
 /**

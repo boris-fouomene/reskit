@@ -1,5 +1,5 @@
 import View from "@components/View";
-import { defaultStr, extendObj, IFieldType, IFields, IField, IResourceName, isEmpty, isNonNullString, isObj, ResourcesManager, uniqid } from "@resk/core";
+import { defaultStr, extendObj, IFieldType, IFields, IField, IResourceName, isEmpty, isNonNullString, isObj, ResourcesManager, uniqid, Auth } from "@resk/core";
 import { isValidElement, ObservableComponent } from "@utils";
 import { FormsManager } from "./FormsManager";
 import { IFormField, IForm, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormOnSubmitOptions, IFormContext, IFormTabItemProp, IFormAction } from "./types";
@@ -118,7 +118,6 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                             }
                         </>}
                         {...rest}
-                        resourceName={isNonNullString(rest.resourceName) ? rest.resourceName : this.getResourceName()}
                     />
                 );
             });
@@ -288,7 +287,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             for (let i in p.fields) {
                 const field: IField | undefined =
                     (p.fields[i as keyof IFields] && Object.clone(p.fields[i as keyof IFields])) || undefined;
-                if (!field || !ResourcesManager.isAllowed(field)) continue;
+                if (!field || (field?.perm !== undefined && !Auth.isAllowed(field?.perm))) continue;
                 if (field.rendable === false) continue;
                 delete field.rendable;
                 if (field.form) {

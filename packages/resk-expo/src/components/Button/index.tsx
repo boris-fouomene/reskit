@@ -158,6 +158,8 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     spaceBetweenContent,
     isExpandable,
     formName,
+    resourceName,
+    perm,
     ...rest
 }: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
@@ -291,7 +293,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             FormsManager.unmountAction(context.id, formName);
         };
     }, [formName, idRef.current, context.id]);
-    if (!ResourcesManager.isAllowed(rest)) return null;
+    if (perm !== undefined && !Auth.isAllowed(perm)) return null;
     const fullWidthStyle = fullWidth ? styles.fullWidth : null;
     const compactStyle = compact ? styles.compact : null;
     const hasRightContent = (iconPosition == "right" && iconContent) || (isValidElement(right) && right);

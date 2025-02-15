@@ -1,3 +1,4 @@
+import { IAuthPerm } from "@/auth/types";
 import { IResourceActionName, IResourceActionTupleObject } from "./resources";
 
 /**
@@ -135,6 +136,10 @@ export interface IFieldBase<FieldType extends IFieldType = any> extends Partial<
      */
     visible?: boolean;
 
+    /***
+     * The permission associated with the field. This permission is used to determine if the field will be rendered or not.
+     */
+    perm?: IAuthPerm;
 }
 
 

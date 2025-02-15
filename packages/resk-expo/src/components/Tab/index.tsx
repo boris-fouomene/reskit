@@ -6,7 +6,7 @@ import TabItem from "./TabItem";
 import TabContent from "./TabContent";
 import Session from "@session";
 import isValidElement from "@utils/isValidElement";
-import { isNonNullString, defaultStr, isObj, IDict, ResourcesManager } from "@resk/core";
+import { isNonNullString, defaultStr, isObj, IDict, ResourcesManager, Auth } from "@resk/core";
 import { isNumber } from "lodash";
 import Theme, { Colors, useTheme } from "@theme/index";
 import { ITabItemProps, ITabProps } from "./types";
@@ -154,8 +154,8 @@ const Tab = (props: ITabProps) => {
         React.Children.map(children, (child, index) => {
             if (!isObj(child)) return null;
             const _child: React.ReactElement = child as React.ReactElement;
-            const { label, tabItemKey, children: childChildren, ...rest } = (isObj(_child.props) ? _child.props : child) as ITabItemProps;
-            if (!isValidElement(label, true) || (!ResourcesManager.isAllowed(rest))) {
+            const { label, tabItemKey, perm, children: childChildren, ...rest } = (isObj(_child.props) ? _child.props : child) as ITabItemProps;
+            if (!isValidElement(label, true) || (perm !== undefined && !Auth.isAllowed(perm))) {
                 return null;
             }
             const key = String((typeof tabItemKey == 'string' && tabItemKey ? tabItemKey : typeof label == 'string' && label ? label : index)) + index;

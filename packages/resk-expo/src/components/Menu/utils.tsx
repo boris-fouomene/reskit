@@ -4,7 +4,7 @@ import { IMenuItemBase, IMenuRenderItemOptions, IMenuRenderItemsOptions } from "
 import { useTheme } from "@theme/index";
 import { IReactNullableElement } from "../../types";
 import stableHash from "stable-hash";
-import { cloneObject, isObj } from "@resk/core";
+import { Auth, cloneObject, isObj } from "@resk/core";
 import { useReskExpo } from "@src/context/hooks";
 import { ResourcesManager } from "@resk/core";
 
@@ -48,7 +48,7 @@ import { ResourcesManager } from "@resk/core";
  */
 const renderExpandableMenuItemOrSection = function <MenuItemContext = any>({ item, itemsNodes, index, context, render, renderExpandable, level }: IMenuRenderItemOptions<MenuItemContext>) {
   level = typeof level == "number" && level || 0;
-  if (!ResourcesManager.isAllowed(item)) return null;
+  if (item?.perm !== undefined && !Auth.isAllowed(item?.perm)) return null;
   const { section, items, ...rest } = item;
   context = { ...Object.assign({}, rest.context), ...Object.assign({}, context) };
   return (section ? render : renderExpandable)({ level, items, ...rest, children: itemsNodes, context }, index);
@@ -91,7 +91,7 @@ function renderMenuItem<MenuItemContext = any>({ item, index, render, renderExpa
   level = typeof level == "number" && level || 0;
   if (!item) return null;
   item.level = level;
-  if (!ResourcesManager.isAllowed(item)) return null;
+  if (item.perm !== undefined && !Auth.isAllowed(item?.perm)) return null;
   if (!item.label && !item.icon && !item.children && item.divider === true) {
     const { dividerProps } = item;
     return (<Divider key={index} {...Object.assign({}, dividerProps)} />)

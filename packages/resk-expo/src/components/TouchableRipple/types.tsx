@@ -72,9 +72,8 @@ export interface ITouchableRippleProps extends PressableProps {
      * Opacity of the ripple effect
      */
     rippleOpacity?: number;
-    /**
-     * Duration of the ripple effect
-     */
+
+    /** Duration of the ripple effect, in milliseconds */
     rippleDuration?: number;
 
     /***
@@ -93,4 +92,24 @@ export interface ITouchableRippleProps extends PressableProps {
      * Disables the ripple effect.
      */
     disableRipple?: boolean;
+    /***
+    *   
+    * The location of the ripple effect,Hot-spot position of the ripple effect. Default is 'tapLocation'.
+    */
+    rippleLocation?: 'tapLocation' | 'center',
+
+    /** Border width TODO move to `style`? */
+    borderWidth?: number;
+
+    /** Border radius of the `Mask` layer */
+    maskBorderRadius?: number;
+
+    /** Border radius of the `Mask` layer, in percentage (of min(width, height)) */
+    maskBorderRadiusInPercent?: number;
+
+    /** Duration of the mask effect (alpha), in milliseconds */
+    maskDuration?: number;
+
+    /** Animating the shadow (on pressed/released) or not */
+    shadowAniEnabled?: boolean;
 }

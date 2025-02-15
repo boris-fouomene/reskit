@@ -157,6 +157,9 @@ export type ITabItemProps = Omit<ITouchableRippleProps, "children" | "style"> & 
      */
     tabItemKey?: string;
 
+    /***
+     * The permission associated with the tab item. This permission is used to determine if the tab item will be rendered or not.
+     */
     perm?: IAuthPerm;
 }
 

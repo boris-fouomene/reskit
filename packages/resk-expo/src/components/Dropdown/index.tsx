@@ -8,7 +8,7 @@ import areEquals from "@utils/areEquals";
 import Theme, { useTheme } from "@theme/index";
 import { View as RNView, TouchableOpacity } from "react-native";
 import TextInput from "@components/TextInput";
-import { ContentStyle, FlashList } from "@shopify/flash-list";
+import { FlashList } from "@shopify/flash-list";
 import { Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { TouchableRipple } from "@components/TouchableRipple";

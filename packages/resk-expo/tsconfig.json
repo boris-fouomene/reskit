@@ -4,6 +4,8 @@
     "baseUrl": ".",
     "rootDir": "./src",
     "outDir": "./build",
+    "composite": false,
+    "incremental": false,
     "paths": {
       "@session": [
         "src/session"
@@ -73,6 +75,9 @@
       ],
       "@resk/core": [
         "../resk-core/build"
+      ],
+      "@shopify/flash-list": [
+        "../../examples/resk-expo-docs/node_modules/@shopify/flash-list"
       ]
     }
   },

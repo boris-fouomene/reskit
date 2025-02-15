@@ -393,6 +393,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     return <DropdownContext.Provider value={context}>
         <Menu
             responsive
+            animated={false}
             {...Object.assign({}, menuProps)}
             visible={visible}
             withScrollView={false}

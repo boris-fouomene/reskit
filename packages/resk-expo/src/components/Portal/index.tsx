@@ -243,7 +243,7 @@ export function Portal<AsProps extends ViewProps = IViewProps>({ children, ...pr
         addPortal(key, children, props);
         // Cleanup and remove the portal when the component unmounts
         return () => removePortal(key);
-    }, [key, children]);
+    }, [key, children, props.absoluteFill]);
     return null; // Nothing is rendered here; content is managed by the PortalProvider
 };
 

@@ -76,15 +76,8 @@ export interface ITouchableRippleProps extends PressableProps {
     /** Duration of the ripple effect, in milliseconds */
     rippleDuration?: number;
 
-    /***
-     * Size of the ripple effect
-     */
-    rippleSize?: number;
     /** Background color of the component. Default is 'transparent' */
     hoverColor?: string;
-
-    borderless?: boolean;
-    background?: PressableAndroidRippleConfig;
     centered?: boolean;
     underlayColor?: string;
     borderRadius?: number;
@@ -101,15 +94,11 @@ export interface ITouchableRippleProps extends PressableProps {
     /** Border width TODO move to `style`? */
     borderWidth?: number;
 
-    /** Border radius of the `Mask` layer */
-    maskBorderRadius?: number;
-
-    /** Border radius of the `Mask` layer, in percentage (of min(width, height)) */
-    maskBorderRadiusInPercent?: number;
-
     /** Duration of the mask effect (alpha), in milliseconds */
     maskDuration?: number;
 
-    /** Animating the shadow (on pressed/released) or not */
-    shadowAniEnabled?: boolean;
+    /** Animating the shadow (on pressed/released) or not 
+     * Default is false
+    */
+    shadowEnabled?: boolean;
 }

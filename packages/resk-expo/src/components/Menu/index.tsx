@@ -7,7 +7,7 @@ import { isNumber } from "lodash";
 import { getDimensions, useDimensions } from '@dimensions/index';
 import Theme, { useTheme } from '@theme/index';
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { View, StyleSheet, LayoutChangeEvent, LayoutRectangle, Pressable, PressableStateCallbackType, ScrollView } from 'react-native';
+import { View, StyleSheet, LayoutChangeEvent, LayoutRectangle, Pressable, PressableStateCallbackType, ScrollView, Dimensions } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     withSpring,
@@ -98,8 +98,8 @@ export const useMenuPosition = ({
     const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions(responsive !== false);
     const fullScreen = isFullScreen(customFullScreen, responsive, isMobileOrTablet);
     // Animation values
-    const opacity = useSharedValue(0);
-    const scale = useSharedValue(0.8);
+    const opacity = useSharedValue(animated ? 0 : 1);
+    const scale = useSharedValue(animated ? 0.8 : 1);
     const elevation = typeof customElevation === "number" ? customElevation : fullScreen ? 0 : 8;
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         let calculatedPosition: IMenuCalculatedPosition = {
@@ -233,23 +233,16 @@ export const useMenuPosition = ({
             }
             calculatedPosition = bestPosition;
         }
-        if (animated !== false) {
-            opacity.value = withTiming(1, {
-                duration: 200,
-                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-            });
-            scale.value = withSpring(1);
-        } else {
-            opacity.value = 1;
-            scale.value = 1;
-        }
         return calculatedPosition;
     }, [anchorMeasurements?.width, anchorMeasurements?.height, anchorMeasurements?.pageX, anchorMeasurements?.pageY, sameWidth, minWidth, visible, menuWidth, menuHeight, padding, position, fullScreen, screenWidth, screenHeight]);
     const menuPosition = calculatePosition();
     useEffect(() => {
-        if (visible === false && animated) {
-            opacity.value = withTiming(0);
-            scale.value = withTiming(0.8);
+        if (animated) {
+            opacity.value = withTiming(visible ? 1 : 0, {
+                duration: 200,
+                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+            });
+            scale.value = withSpring(visible ? 1 : 0.8);
         }
     }, [visible, animated]);
     const menuAnchorStyle = useMemo(() => {
@@ -279,8 +272,6 @@ export const useMenuPosition = ({
     // Animated styles
     const animatedStyle = useAnimatedStyle(() => ({
         opacity: opacity.value,
-        ///left: xAnimation.value,
-        //top: yAnimation.value,
         transform: [
             { scale: scale.value },
         ],
@@ -429,6 +420,7 @@ const Menu: React.FC<IMenuProps> = ({
     anchorContainerProps = Object.assign({}, anchorContainerProps);
     testID = defaultStr(testID, "resk-menu");
     itemsProps = Object.assign({}, itemsProps);
+    const { width: windowWidth, height: screenHeight } = Dimensions.get("window");
     const callbackRef = useRef<Function | null | undefined>(null);
     useEffect(() => {
         if (!isControlled || prevIsVisible === isVisible || typeof callbackRef.current !== "function") {
@@ -570,7 +562,7 @@ const Menu: React.FC<IMenuProps> = ({
         {isVisible ? <Portal absoluteFill testID={testID + "-portal"}>
             <Pressable
                 onPress={(e) => { closeMenu() }}
-                style={styles.portalBackdrop}
+                style={[styles.portalBackdrop]}
                 testID={testID + "-menu-backdrop"}
             />
             <MenuContext.Provider value={context}>

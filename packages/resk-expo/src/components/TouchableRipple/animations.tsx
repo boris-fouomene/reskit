@@ -43,7 +43,7 @@ export const useAnimations = (props: ITouchableRippleProps): {
 const RippleEffect = forwardRef<{
     startRipple?: (event: GestureResponderEvent) => void;
     stopRipple?: (event: GestureResponderEvent) => void;
-}, ITouchableRippleProps>(({ disableRipple, testID, rippleColor, borderWidth, borderRadius, rippleOpacity, maskDuration, rippleDuration, rippleLocation, shadowEnabled }, ref) => {
+}, ITouchableRippleProps>(({ disableRipple, children, testID, rippleColor, borderWidth, borderRadius, rippleOpacity, maskDuration, rippleDuration, rippleLocation }, ref) => {
     const animatedOpacity = useRef<Animated.Value>(new Animated.Value(0));
     const animatedRippleScale = useRef<Animated.Value>(new Animated.Value(0));
     const rippleAni = useRef<Animated.CompositeAnimation>();
@@ -55,23 +55,16 @@ const RippleEffect = forwardRef<{
         height: 1,
         width: 1,
         ripple: { radii: 0, dia: 0, offset: { top: 0, left: 0 } },
-        shadowOffsetY: 1,
     });
-
     const showRipple = () => {
         animatedOpacity.current.setValue(1);
         animatedRippleScale.current.setValue(0.3);
-
         // scaling up the ripple layer
         (rippleAni).current = Animated.timing(animatedRippleScale.current, {
             duration: rippleDuration,
             toValue: 1,
             useNativeDriver
         });
-        // enlarge the shadow, if enabled
-        if (shadowEnabled) {
-            setRippleState({ ...rippleState, shadowOffsetY: 1.5 });
-        }
         rippleAni.current.start(() => {
             (rippleAni).current = undefined;
 
@@ -89,11 +82,6 @@ const RippleEffect = forwardRef<{
                 toValue: 0,
                 useNativeDriver,
             }).start();
-
-            // scale down the shadow
-            if (shadowEnabled) {
-                setRippleState({ ...rippleState, shadowOffsetY: 1 });
-            }
             pendingRippleAni.current = undefined;
         };
 
@@ -152,34 +140,30 @@ const RippleEffect = forwardRef<{
         stopRipple,
         onLayout,
     }));
-    return <>
-        {disableRipple ? null : <>
-            <Animated.View
-                testID={testID + "-animated-container"}
-                style={{
-                    height: rippleState.height,
-                    width: rippleState.width,
-                    left: -(borderWidth),
-                    top: -(borderWidth),
-                    opacity: animatedOpacity.current,
-                    position: 'absolute',
-                }}
-            >
-                <Animated.View
-                    testID={testID + "-animated-content"}
-                    style={{
-                        height: rippleState.ripple.dia,
-                        width: rippleState.ripple.dia,
+    return disableRipple ? null : <Animated.View
+        testID={testID + "-animated-container"}
+        style={{
+            height: rippleState.height,
+            width: rippleState.width,
+            left: -(borderWidth),
+            top: -(borderWidth),
+            opacity: animatedOpacity.current,
+            position: 'absolute',
+        }}
+    >
+        <Animated.View
+            testID={testID + "-animated-content"}
+            style={{
+                height: rippleState.ripple.dia,
+                width: rippleState.ripple.dia,
 
-                        ...rippleState.ripple.offset,
-                        backgroundColor: rippleColor,
-                        borderRadius: rippleState.ripple.radii,
-                        transform: [{ scale: animatedRippleScale.current }],
-                    }}
-                />
-            </Animated.View>
-        </>}
-    </>
+                ...rippleState.ripple.offset,
+                backgroundColor: rippleColor,
+                borderRadius: rippleState.ripple.radii,
+                transform: [{ scale: animatedRippleScale.current }],
+            }}
+        />
+    </Animated.View>
 });
 RippleEffect.displayName = "RippleEffect";
 const styles = StyleSheet.create({
@@ -196,7 +180,6 @@ const styles = StyleSheet.create({
 interface ITouchableRippleState {
     width: number;
     height: number;
-    shadowOffsetY: number;
     ripple: {
         radii: number;
         dia: number;

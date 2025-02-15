@@ -114,7 +114,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({ childr
     borderWidth = typeof borderWidth == "number" && borderWidth || 0;
     rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 300;
     maskDuration = typeof maskDuration == "number" && maskDuration > 0 ? maskDuration : 200;
-    shadowEnabled = typeof shadowEnabled == "boolean" ? shadowEnabled : true;
+    shadowEnabled = typeof shadowEnabled == "boolean" ? shadowEnabled : false;
     const { startRipple, stopRipple, onLayout: onRippleLayout, rippleContent } = useAnimations({ ...props, testID, disableRipple: isRippleDisabled, rippleColor, borderWidth, borderRadius, maskDuration, rippleDuration, shadowEnabled });
     const shadowStyle = useMemo(() => {
         return shadowEnabled !== false ? {

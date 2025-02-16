@@ -1,4 +1,4 @@
-import { isNonNullString, defaultStr, IDict, stringify, isObj } from "@resk/core";
+import { isNonNullString, defaultStr, IDict, stringify, isObj, i18n } from "@resk/core";
 import getTextContent from "@utils/getTextContent";
 import { INotifyMessage, INotifyType } from "./types";
 import _Notifiy, { INotifyOptions } from "./Notify";
@@ -84,10 +84,14 @@ export class Notify {
         }
         if (!title) {
             if (type === 'error') {
-                title = "Erreur";
+                title = i18n.t("notify.errorTitle");
             } else if (type == 'warn') {
-                title = "Alerte";
-            } else title = String(type).toUpperCase();
+                title = i18n.t("notify.warningTitle");
+            } else if (type == 'success') {
+                title = i18n.t("notify.successTitle");
+            } else if (type == 'info') {
+                title = i18n.t("notify.infoTitle");
+            } else title = String(type).toUpperCase()
         }
         let interval = settings.interval || defInterval;
         if (Math.abs(interval) <= 200) {

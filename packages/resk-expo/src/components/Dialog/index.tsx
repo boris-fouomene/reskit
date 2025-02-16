@@ -6,6 +6,7 @@ import DialogControlled from "./Controlled";
 //import DialogFooter from "./DialogFooter";
 import Provider from "./Provider";
 import Preloader from "./Preloader";
+import DialogAlert from "./DialogAlert";
 
 
 export * from "./types";
@@ -19,6 +20,7 @@ type DialogComponent = typeof Dialog & {
     //Footer: typeof DialogFooter;
     Provider: typeof Provider;
     Controlled: typeof DialogControlled;
+    Alert: typeof DialogAlert;
 }
 
 const DialogComponent = Dialog as DialogComponent;
@@ -27,5 +29,6 @@ const DialogComponent = Dialog as DialogComponent;
 DialogComponent.Provider = Provider;
 DialogComponent.Provider.displayName = "Dialog.Provider";
 DialogComponent.Controlled;
+DialogComponent.Alert = DialogAlert;
 export { DialogComponent as Dialog };
 

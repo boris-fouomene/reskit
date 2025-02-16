@@ -10,6 +10,16 @@ const index = withAppBar(() => {
                     left={({ textColor, context }) => {
                         return <Icon color={textColor} iconName="account-circle" />
                     }}
+                    onPress={(event, { dialogContext }) => {
+                        Dialog.Alert.open({
+                            title: "Alert",
+                            message: "Yes i'm alerting you",
+                            onOk: () => {
+                                Dialog.Alert.open({ title: "Etes vous sure de confirmer", message: "Voulez vous" });
+                                return false;
+                            }
+                        })
+                    }}
                 >
                     Hello Button
                 </Button>

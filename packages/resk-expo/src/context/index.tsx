@@ -126,6 +126,7 @@ export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoin
               }}
             />
             <Preloader.Provider />
+            <Dialog.Alert.Provider />
             <Dialog.Provider.Provider />
             <Drawer.Provider.Provider />
             <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>

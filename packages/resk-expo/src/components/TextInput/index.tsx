@@ -367,7 +367,7 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
     const calcHeight = (actualHeight: number, limit?: number) => {
         return typeof limit === "number" && limit > 10
             ? Math.max(Math.min(limit, actualHeight), minHeight)
-            : Math.max(minHeight, actualHeight, numberOfLines * lineHeight + 10);
+            : Math.max(minHeight, actualHeight);
     }
     const canRenderLabel = withLabel !== false;
     const { left, right, label } = getLabelOrLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);

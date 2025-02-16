@@ -53,18 +53,22 @@ export default class DialogControlled extends React.Component<IDialogControlledP
      * 
      * @param props - Optional properties to pass to the dialog.
      * @param callback - Optional callback function to execute after opening the dialog.
+     * @returns {DialogControlled}
      */
     open(props?: IDialogControlledProps, callback?: Function) {
         this.toggle(true, props, callback);
+        return this;
     }
     /**
      * Closes the dialog.
      * 
      * @param props - Optional properties to pass to the dialog.
      * @param callback - Optional callback function to execute after closing the dialog.
+     * @returns {DialogControlled}
      */
     close(props?: IDialogControlledProps, callback?: Function) {
         this.toggle(false, props, callback);
+        return this;
     }
     /**
      * Checks if the dialog is currently open.

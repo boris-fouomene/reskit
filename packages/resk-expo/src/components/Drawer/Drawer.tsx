@@ -773,9 +773,9 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * @param {IDrawerProviderProps} [options={}] - The options for opening the drawer.
    * @param {boolean | Function} [callback=false] - Determines whether to reset provider props or a function that is call after the drawer is opened.
    *
-   * @returns {void}
+   * @returns {Drawer}
    */
-  open(options: IDrawerProviderProps = {}, callback: boolean | Function = false): void {
+  open(options: IDrawerProviderProps = {}, callback: boolean | Function = false): Drawer {
     options = Object.assign({}, options);
     const cb = () => {
       this._emitStateChanged(SETTLING);
@@ -821,6 +821,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     } else {
       cb();
     }
+    return this;
   }
 
 
@@ -829,6 +830,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * 
    * @param {IDrawerProviderProps} [options] - Optional settings for closing the drawer.
    * @param {Function} [callback] - Optional callback function to be called after the drawer is closed.
+   * @returns {Drawer}, The drawer instance
    * 
    * The function performs the following actions:
    * - Merges the provided options with default options.
@@ -843,7 +845,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * - If the drawer is not permanent and is currently open, animates the drawer to a closed state and then calls the `end` function.
    * - If the drawer is already closed or permanent, directly calls the `end` function.
    */
-  close(options?: IDrawerProviderProps, callback?: Function): void {
+  close(options?: IDrawerProviderProps, callback?: Function): Drawer {
     options = Object.assign({}, options);
     this._emitStateChanged(SETTLING);
     callback = typeof callback == "function" ? callback : undefined;
@@ -879,6 +881,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
         ...options,
       }).start(end);
     } else end();
+    return this;
   }
 
   _handleDrawerOpen() {

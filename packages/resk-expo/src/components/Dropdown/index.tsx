@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
     dropdownListTopPosition: {
         flexDirection: "column-reverse",
         paddingTop: 10,
-        paddingBottom: 0,
+        paddingBottom: 10,
     },
     dropdownListContentContainer: {
         width: "100%",
@@ -628,7 +628,7 @@ const styles = StyleSheet.create({
     },
 });
 
-const DropdownSearch = ({ isFullScreen }: { isFullScreen?: boolean }) => {
+const DropdownSearch = ({ isFullScreen, canReverse }: { isFullScreen?: boolean, canReverse?: boolean }) => {
     const context = useDropdown();
     const filteredItems = Array.isArray(context.filteredItems) ? context.filteredItems : [];
     const searchText = defaultStr(context.searchText);
@@ -674,7 +674,7 @@ const DropdownSearch = ({ isFullScreen }: { isFullScreen?: boolean }) => {
                 )
                 }
             />
-            <Divider testID={`${testID}-divider`} style={[styles.searchDivider]} />
+            {!canReverse ? <Divider testID={`${testID}-divider`} style={[styles.searchDivider]} /> : null}
         </>
     );
 };

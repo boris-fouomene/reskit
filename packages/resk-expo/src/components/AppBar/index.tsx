@@ -98,7 +98,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   subtitle = subtitle === false ? null : subtitle;
   const subtitleColor = titleTextColor ? Colors.setAlpha(titleTextColor, 0.7) : undefined;
   const webStyle = theme.styles.webFontFamily;
-  backActionProps = Object.assign({}, backActionProps);
+  backActionProps = Object.assign({}, { color, backgroundColor }, backActionProps);
   const { onPress } = backActionProps;
   backActionProps.onPress = (e: GestureResponderEvent) => {
     if (onPress) onPress(e);

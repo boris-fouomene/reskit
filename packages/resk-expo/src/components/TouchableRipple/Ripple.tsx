@@ -110,7 +110,6 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     disableRipple,
     testID, borderRadius,
     rippleDuration,
-    rippleOpacity,
     shadowEnabled,
     borderWidth,
     maskDuration,
@@ -126,9 +125,16 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     const isRippleDisabled = useMemo(() => {
         return disableRipple || disabled || isAndroid;
     }, [disableRipple, disabled, isAndroid]);
-    const animatedOpacity = useRef<Animated.Value>(new Animated.Value(0));
-    const animatedRippleScale = useRef<Animated.Value>(new Animated.Value(0));
-    const rippleAni = useRef<Animated.CompositeAnimation>();
+
+    borderWidth = typeof borderWidth == "number" && borderWidth || 0;
+    rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 300;
+    maskDuration = typeof maskDuration == "number" && maskDuration > 0 ? maskDuration : 200;
+    shadowEnabled = typeof shadowEnabled == "boolean" ? shadowEnabled : false;
+    rippleLocation = typeof rippleLocation == "string" ? rippleLocation : "tapLocation";
+
+    const animatedOpacityRef = useRef<Animated.Value>(new Animated.Value(0.1));
+    const animatedRippleScaleRef = useRef<Animated.Value>(new Animated.Value(0));
+    const rippleAniRef = useRef<Animated.CompositeAnimation>();
     const pendingRippleAni = useRef<(() => void)>();
     const [rippleState, setRippleState] = useStateCallback<ITouchableRippleState>({
         height: 1,
@@ -137,19 +143,19 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     });
 
     const showRipple = () => {
-        animatedOpacity.current.setValue(1);
-        animatedRippleScale.current.setValue(0.3);
+        animatedOpacityRef.current.setValue(1);
+        animatedRippleScaleRef.current.setValue(0.3);
 
         // scaling up the ripple layer
-        (rippleAni).current = Animated.timing(animatedRippleScale.current, {
+        (rippleAniRef).current = Animated.timing(animatedRippleScaleRef.current, {
             duration: rippleDuration,
             toValue: 1,
             useNativeDriver: true,
         });
 
         // enlarge the shadow, if enabled
-        (rippleAni as any).current.start(() => {
-            (rippleAni).current = undefined;
+        (rippleAniRef as any).current.start(() => {
+            (rippleAniRef).current = undefined;
 
             // if any pending animation, do it
             if (pendingRippleAni.current) {
@@ -160,7 +166,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     const hideRipple = () => {
         pendingRippleAni.current = () => {
             // hide the ripple layer
-            Animated.timing(animatedOpacity.current, {
+            Animated.timing(animatedOpacityRef.current, {
                 duration: maskDuration,
                 toValue: 0,
                 useNativeDriver: true,
@@ -168,19 +174,12 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
             pendingRippleAni.current = undefined;
         };
 
-        if (!rippleAni.current && typeof pendingRippleAni.current == "function") {
+        if (!rippleAniRef.current && typeof pendingRippleAni.current == "function") {
             // previous ripple animation is done, good to go
             pendingRippleAni.current();
         }
     }
 
-
-    borderWidth = typeof borderWidth == "number" && borderWidth || 0;
-    rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 300;
-    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity >= 0 ? rippleOpacity : 0.3;
-    maskDuration = typeof maskDuration == "number" && maskDuration > 0 ? maskDuration : 200;
-    shadowEnabled = typeof shadowEnabled == "boolean" ? shadowEnabled : false;
-    rippleLocation = typeof rippleLocation == "string" ? rippleLocation : "tapLocation";
     const shadowStyle = useMemo(() => {
         return shadowEnabled ? {
             shadowOffset: {
@@ -197,7 +196,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
             width: rippleState.width,
             left: -(borderWidth),
             top: -(borderWidth),
-            opacity: animatedOpacity.current,
+            opacity: animatedOpacityRef.current,
         }}
     >
         <Animated.View
@@ -209,7 +208,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 ...rippleState.ripple.offset,
                 backgroundColor: rippleColor,
                 borderRadius: rippleState.ripple.radii,
-                transform: [{ scale: animatedRippleScale.current }],
+                transform: [{ scale: animatedRippleScaleRef.current }],
             }}
         />
     </Animated.View>;

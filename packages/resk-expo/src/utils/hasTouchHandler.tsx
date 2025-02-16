@@ -34,6 +34,10 @@ const touchableEvents: ITouchableEventNames[] = [
   'onLongPress',
   'onPressIn',
   'onPressOut',
+  'onTouchStart',
+  'onTouchEnd',
+  'onTouchCancel',
+  'onTouchMove',
 ];
 /**
  * Checks if the provided props object contains any touch event handlers.
@@ -61,9 +65,49 @@ export function hasTouchHandler(props: ITouchableEvents) {
   if (!isObj(props)) {
     return false;
   }
-  return touchableEvents.some((event) => {
-    return typeof (props[event]) === 'function';
+  for (const event of touchableEvents) {
+    if (typeof (props[event]) === 'function') {
+      return true;
+    }
+  }
+  return false;
+}
+
+/***
+ * Returns the touchable props from the provided props object.
+ *
+ * This function takes an object containing touch event handlers and returns
+ * a new object with only the handlers that are defined for the touchable events.
+ * If no valid handlers are found, the function returns an empty object.
+ *
+ * @param {@link ITouchableEvents} props - An object that may contain touch event handlers.
+ * @returns {@link ITouchableEvents | null} An object with the valid touch event handlers, or `null` if none are found.
+ *
+ * @example
+ * // Example usage of getTouchableProps
+ * const props = {
+ *   onPress: () => console.log('Pressed!'),
+ *   onLongPress: () => console.log('Long Pressed!'),
+ *   // onPressIn and onPressOut are not defined
+ * };
+ *
+ * const handlers = getTouchableProps(props);
+ * console.log(handlers);
+ * // Output: { onPress: [Function], onLongPress: [Function] }
+ *
+ * const emptyHandlers = getTouchableProps({});
+ * console.log(emptyHandlers);
+ */
+export const getTouchableProps = (props: ITouchableEvents) => {
+  const r: ITouchableEvents = {};
+  let hasTouchableEvents = false;
+  touchableEvents.forEach((event) => {
+    if (typeof (props[event]) === 'function') {
+      r[event] = props[event];
+      hasTouchableEvents = true;
+    }
   });
+  return hasTouchableEvents ? r : null;
 }
 
 

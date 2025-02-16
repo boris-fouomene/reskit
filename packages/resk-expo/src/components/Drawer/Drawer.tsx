@@ -1066,7 +1066,7 @@ export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
     return drawer.renderContent();
   }, [theme, drawer.props.children, locale]);
   const { accessibilityViewIsModal, drawerShown, openValue } = drawer.state;
-  const elevation = typeof drawer.props.elevation == "number" ? drawer.props.elevation : 5;
+  const elevation = typeof drawer.props.elevation == "number" ? drawer.props.elevation : 3;
   const elev = drawer.isPermanent() ? (theme.elevations[elevation] ?? null) : null;
   const testID = drawer.getTestID();
   const permanent = drawer.isPermanent();

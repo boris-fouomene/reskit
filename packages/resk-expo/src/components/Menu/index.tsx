@@ -95,12 +95,12 @@ export const useMenuPosition = ({
     dynamicHeight = dynamicHeight !== false;
     const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
     const theme = useTheme();
-    const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions(responsive !== false);
+    const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions();
     const fullScreen = isFullScreen(customFullScreen, responsive, isMobileOrTablet);
     // Animation values
     const opacity = useSharedValue(animated ? 0 : 1);
     const scale = useSharedValue(animated ? 0.8 : 1);
-    const elevation = typeof customElevation === "number" ? customElevation : fullScreen ? 0 : 8;
+    const elevation = typeof customElevation === "number" ? customElevation : fullScreen ? 0 : 10;
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         let calculatedPosition: IMenuCalculatedPosition = {
             calculatedFromPosition: "bottom",
@@ -420,7 +420,6 @@ const Menu: React.FC<IMenuProps> = ({
     anchorContainerProps = Object.assign({}, anchorContainerProps);
     testID = defaultStr(testID, "resk-menu");
     itemsProps = Object.assign({}, itemsProps);
-    const { width: windowWidth, height: screenHeight } = Dimensions.get("window");
     const callbackRef = useRef<Function | null | undefined>(null);
     useEffect(() => {
         if (!isControlled || prevIsVisible === isVisible || typeof callbackRef.current !== "function") {

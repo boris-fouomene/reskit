@@ -15,6 +15,8 @@ import Colors from "@colors";
 import { IFontIconProps, IPrefixToFontIconsSetNames } from "./types";
 import Platform from "@platform/index";
 import { isRTL } from "@utils/i18nManager";
+import { getTouchableProps } from "@utils/hasTouchHandler";
+import { TouchableOpacity } from "react-native";
 const isIos = Platform.isIos();
 
 
@@ -58,7 +60,8 @@ const isIos = Platform.isIos();
  * @param {React.Ref} ref The reference to the icon component.
  * @returns {JSX.Element | null} Returns the icon element, or null if the icon is not defined.
  */
-const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, style, color, ...props }, ref) => {
+const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, style, color, ...props }, ref) => {
+    const pressableProps = getTouchableProps(props);
     const theme = useTheme();
     color = Colors.isValid(color) ? color : theme.colors.text;
     let { iconSetName, iconSetPrefix, iconSet: IconSet, iconName } = getFontIconSet(name);
@@ -66,8 +69,25 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, style, colo
         console.warn(`Icon not defined for FontIcon component, icon [${name}], please specify a supported icon from https://github.com/expo/vector-icons/MaterialCommunityIcons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
+    if (pressableProps) {
+        for (let i in pressableProps) {
+            delete props[i as keyof typeof props];
+        }
+        return <TouchableOpacity disabled={disabled} {...pressableProps}>
+            <IconSet
+                disabled={disabled}
+                {...props}
+                size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
+                ref={ref}
+                color={color}
+                name={iconName}
+                style={[theme.styles.RTL, style]}
+            />
+        </TouchableOpacity>
+    }
     return <IconSet
         {...props}
+        disabled={disabled}
         size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
         ref={ref}
         color={color}

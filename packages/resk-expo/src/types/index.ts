@@ -1,5 +1,5 @@
 import { IFormatValueResult } from "@resk/core";
-import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent, PressableProps } from "react-native";
+import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent, PressableProps, TouchableWithoutFeedback, TouchableWithoutFeedbackProps } from "react-native";
 /**
    @interface
  * Represents a reference to a React component or DOM element.
@@ -385,6 +385,10 @@ export type ITouchableEventNames = keyof ITouchableEvents;
  * @property {(event: GestureResponderEvent) => void} [onLongPress] - Optional handler for the long press event.
  * @property {(event: GestureResponderEvent) => void} [onPressIn] - Optional handler for the press-in event.
  * @property {(event: GestureResponderEvent) => void} [onPressOut] - Optional handler for the press-out event.
+ * @property {(event: GestureResponderEvent) => void} [onTouchStart] - Optional handler for the touch start event.
+ * @property {(event: GestureResponderEvent) => void} [onTouchEnd] - Optional handler for the touch end event.
+ * @property {(event: GestureResponderEvent) => void} [onTouchCancel] - Optional handler for the touch cancel event.
+ * @property {(event: GestureResponderEvent) => void} [onTouchMove] - Optional handler for the touch move event.
  *
  * @example
  * // Example usage of ITouchableEventObject
@@ -402,10 +406,14 @@ export type ITouchableEventNames = keyof ITouchableEvents;
  * simulatePress(touchableHandlers.onPress); // Output: Pressed!
  */
 export type ITouchableEvents = {
-  onPress?: PressableProps['onPress'];
-  onLongPress?: PressableProps['onLongPress'];
-  onPressIn?: PressableProps['onPressIn'];
-  onPressOut?: PressableProps['onPressOut'];
+  onPress?: TouchableWithoutFeedbackProps['onPress'];
+  onLongPress?: TouchableWithoutFeedbackProps['onLongPress'];
+  onPressIn?: TouchableWithoutFeedbackProps['onPressIn'];
+  onPressOut?: TouchableWithoutFeedbackProps['onPressOut'];
+  onTouchStart?: PressableProps['onTouchStart'];
+  onTouchEnd?: PressableProps['onTouchEnd'];
+  onTouchCancel?: PressableProps['onTouchCancel'];
+  onTouchMove?: PressableProps['onTouchMove'];
 };
 
 /**

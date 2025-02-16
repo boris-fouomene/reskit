@@ -5,13 +5,15 @@ import { IField } from "@resk/core";
 const index = withAppBar(() => {
     return (
         <ScrollView>
-            <Button shadowEnabled mode="contained" rippleLocation="center"
-                left={({ textColor, context }) => {
-                    return <Icon color={textColor} iconName="account-circle" />
-                }}
-            >
-                Hello Button
-            </Button>
+            <View style={{ margin: 10 }}>
+                <Button mode="contained" rippleLocation="center"
+                    left={({ textColor, context }) => {
+                        return <Icon color={textColor} iconName="account-circle" />
+                    }}
+                >
+                    Hello Button
+                </Button>
+            </View>
 
             <TextInput label="Text input"
             />

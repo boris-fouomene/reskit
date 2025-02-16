@@ -331,7 +331,7 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
         return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbededVariant ? 30 : isMobile ? 50 : 46;
     }, [customMinHeight, isLabelEmbededVariant, isMobile]);
     const maxHeight = useMemo(() => {
-        return typeof customMaxHeight === "number" ? customMaxHeight : 100;
+        return typeof customMaxHeight === "number" ? customMaxHeight : undefined;
     }, [customMaxHeight]);
     const countLines = (text: string) => {
         return ((defaultStr(text).match(/\n/g) || []).length); // Count \n
@@ -364,8 +364,8 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
     }, [height, inputValue]);
-    const calcHeight = (actualHeight: number, limit: number) => {
-        return limit
+    const calcHeight = (actualHeight: number, limit?: number) => {
+        return typeof limit === "number" && limit > 10
             ? Math.max(Math.min(limit, actualHeight), minHeight)
             : Math.max(minHeight, actualHeight, numberOfLines * lineHeight + 10);
     }

@@ -461,7 +461,7 @@ function DropdownMenu() {
                         }
                     },
                 }}
-                subtitle={defaultStr(context.anchorSelectedText, i18n.t("components.dropdown.noneSelected"))}
+                subtitle={defaultStr(context.anchorSelectedText, i18n.t("components.dropdown.noneSelected")) + " [" + filteredItems.length.formatNumber() + "]"}
             />
         ) : null}
         <DropdownSearch isFullScreen={fullScreen} />

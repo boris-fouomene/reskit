@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
      * - `ph{size}` for horizontal padding
      * - `pv{size}` for vertical padding
      * 
-     * Where `size` ranges from 0 to 5, representing increments of 4 units (0, 4, 8, 12, 16, 20).
+     * Where `size` ranges from 0 to 10, representing increments of 10 units (0, 10, 20, 30, 40, 50).
      * 
      * @example
      * ```tsx
@@ -65,23 +65,33 @@ const styles = StyleSheet.create({
      * ```
      */
     p0: { padding: 0 },
-    p1: { padding: 4 },
-    p2: { padding: 8 },
-    p3: { padding: 12 },
-    p4: { padding: 16 },
-    p5: { padding: 20 },
+    //padding 5 px
+    p05: { padding: 5 },
+    /**
+     * padding 10 px
+     */
+    p1: { padding: 10 },
+    /**
+     * padding 20 px
+     */
+    p2: { padding: 20 },
+    p3: { padding: 30 },
+    p4: { padding: 40 },
+    p5: { padding: 50 },
     ph0: { paddingHorizontal: 0 },
-    ph1: { paddingHorizontal: 4 },
-    ph2: { paddingHorizontal: 8 },
-    ph3: { paddingHorizontal: 12 },
-    ph4: { paddingHorizontal: 16 },
-    ph5: { paddingHorizontal: 20 },
+    ph05: { paddingHorizontal: 5 },
+    ph1: { paddingHorizontal: 10 },
+    ph2: { paddingHorizontal: 20 },
+    ph3: { paddingHorizontal: 30 },
+    ph4: { paddingHorizontal: 40 },
+    ph5: { paddingHorizontal: 50 },
     pv0: { paddingVertical: 0 },
-    pv1: { paddingVertical: 4 },
-    pv2: { paddingVertical: 8 },
-    pv3: { paddingVertical: 12 },
-    pv4: { paddingVertical: 16 },
-    pv5: { paddingVertical: 20 },
+    pv05: { paddingVertical: 5 },
+    pv1: { paddingVertical: 10 },
+    pv2: { paddingVertical: 20 },
+    pv3: { paddingVertical: 30 },
+    pv4: { paddingVertical: 40 },
+    pv5: { paddingVertical: 50 },
 
     /**
      * Spacing Utilities: Margin
@@ -109,23 +119,26 @@ const styles = StyleSheet.create({
      * ```
      */
     m0: { margin: 0 },
-    m1: { margin: 4 },
-    m2: { margin: 8 },
-    m3: { margin: 12 },
-    m4: { margin: 16 },
-    m5: { margin: 20 },
+    m05: { margin: 5 },
+    m1: { margin: 10 },
+    m2: { margin: 20 },
+    m3: { margin: 30 },
+    m4: { margin: 40 },
+    m5: { margin: 50 },
     mh0: { marginHorizontal: 0 },
-    mh1: { marginHorizontal: 4 },
-    mh2: { marginHorizontal: 8 },
-    mh3: { marginHorizontal: 12 },
-    mh4: { marginHorizontal: 16 },
-    mh5: { marginHorizontal: 20 },
+    mh05: { marginHorizontal: 5 },
+    mh1: { marginHorizontal: 10 },
+    mh2: { marginHorizontal: 20 },
+    mh3: { marginHorizontal: 30 },
+    mh4: { marginHorizontal: 40 },
+    mh5: { marginHorizontal: 50 },
     mv0: { marginVertical: 0 },
-    mv1: { marginVertical: 4 },
-    mv2: { marginVertical: 8 },
-    mv3: { marginVertical: 12 },
-    mv4: { marginVertical: 16 },
-    mv5: { marginVertical: 20 },
+    mv05: { marginVertical: 5 },
+    mv1: { marginVertical: 10 },
+    mv2: { marginVertical: 20 },
+    mv3: { marginVertical: 30 },
+    mv4: { marginVertical: 40 },
+    mv5: { marginVertical: 50 },
 
     /**
      * Typography: Font Sizes

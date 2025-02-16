@@ -1,9 +1,10 @@
 import DialogControlled, { IDialogControlledProps } from "./Controlled";
-import { createProvider } from "@utils";
+import { createProvider, isValidElement } from "@utils";
 import { i18n, isNonNullString } from "@resk/core";
 import { IAppBarAction } from "@components/AppBar";
 import { ReactNode } from "react";
 import Label from "@components/Label";
+import Theme from "@theme/index";
 
 
 /**
@@ -38,32 +39,35 @@ export default class DialogAlert extends createProvider<IDialogControlledProps, 
      *   onCancel: () => console.log("Cancel button pressed"),
      * });
      */
-    static open<Context = any>(props: IDialogControlledProps & { message?: ReactNode, onOk?: IAppBarAction<Context>["onPress"], okButton?: IAppBarAction<Context>, cancelButton?: IAppBarAction<Context>, onCancel?: IAppBarAction<Context>["onPress"] }, innerProviderRef?: any, callback?: Function) {
+    static open<Context = any>(props: IDialogControlledProps & { message?: ReactNode, onOk?: IAppBarAction<Context>["onPress"], okButton?: false | IAppBarAction<Context>, cancelButtonBefore?: boolean, cancelButton?: false | IAppBarAction<Context>, onCancel?: IAppBarAction<Context>["onPress"] }, innerProviderRef?: any, callback?: Function) {
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.open !== "function") return;
-        const { okButton: oButton, message, cancelButton: cButton, onOk, onCancel, ...rest } = Object.assign({}, props);
-        const okButton = Object.assign({}, oButton);
-        const cancelButton = Object.assign({}, cButton);
-        const { onPress: onOkPress } = okButton;
-        okButton.onPress = async (event, context) => {
-            try {
-                const r = typeof onOkPress == "function" ? await onOkPress(event, context) : typeof onOk == "function" ? await onOk(event, context) : undefined;
-                if (r !== false) {
-                    instance.close();
-                }
-                return r;
-            } catch (e) { }
+        const { okButton: oButton, message, cancelButton: cButton, onOk, onCancel, cancelButtonBefore, children, ...rest } = Object.assign({}, props);
+        const okButton = oButton === false ? undefined : Object.assign({}, oButton);
+        if (okButton) {
+            const { onPress: onOkPress } = okButton;
+            okButton.onPress = async (event, context) => {
+                try {
+                    const r = typeof onOkPress == "function" ? await onOkPress(event, context) : typeof onOk == "function" ? await onOk(event, context) : undefined;
+                    if (r !== false) {
+                        instance.close();
+                    }
+                    return r;
+                } catch (e) { }
+            }
+            okButton.label = okButton.label || i18n.t("dialog.alertOkButton");
+            okButton.colorScheme = isNonNullString(okButton.colorScheme) ? okButton.colorScheme : "primary";
         }
-        okButton.label = okButton.label || i18n.t("dialog.alertOkButton");
-        okButton.colorScheme = isNonNullString(okButton.colorScheme) ? okButton.colorScheme : "primary";
-
-        cancelButton.label = cancelButton.label || i18n.t("dialog.alertCancelButton");
-        cancelButton.colorScheme = isNonNullString(cancelButton.colorScheme) ? cancelButton.colorScheme : "error";
-        if (typeof cancelButton.onPress !== "function" && typeof onCancel === "function") {
-            cancelButton.onPress = onCancel;
+        const cancelButton = cButton === false ? undefined : Object.assign({}, cButton);
+        if (cancelButton) {
+            cancelButton.label = cancelButton.label || i18n.t("dialog.alertCancelButton");
+            cancelButton.colorScheme = isNonNullString(cancelButton.colorScheme) ? cancelButton.colorScheme : "error";
+            if (typeof cancelButton.onPress !== "function" && typeof onCancel === "function") {
+                cancelButton.onPress = onCancel;
+            }
         }
-        const actions = Array.isArray(props?.actions) && props.actions.length ? props?.actions : [okButton, cancelButton];
-        return instance.open(Object.assign({}, { dismissable: false, children: <Label children={message} /> }, instance?.props, rest, { fullScreen: false, actions }), callback);
+        const actions = Array.isArray(props?.actions) && props.actions.length ? props?.actions : [cancelButtonBefore ? cancelButton : okButton, cancelButtonBefore ? okButton : cancelButton];
+        return instance.open(Object.assign({}, { dismissable: false, children: <Label testID="resk-dialog-alert-label" style={Theme.styles.ph1} children={isValidElement(children, true) && children || message} /> }, instance?.props, rest, { fullScreen: false, actions }), callback);
     };
 
     /**

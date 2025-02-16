@@ -11,6 +11,8 @@
   "scripts": {
     "build-all": "npx lerna run build",
     "clean": "npx rimraf build",
+    "install-vercel": "npm i && cd examples/resk-expo-docs && npm i && cd ../../packages/resk-core && npm i && cd ../resk-expo && npm i",
+    "build-vercel": "cd examples/resk-expo-docs && npm run build",
     "publish": "lerna publish --yes",
     "check-updates": "npx npm-check-updates",
     "publish-all": "lerna publish",

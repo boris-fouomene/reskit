@@ -2,6 +2,7 @@ import { IAppBarAction, IAppBarProps } from "@components/AppBar/types";
 import { IModalContext, IModalProps } from "@components/Modal";
 import { IViewProps } from "@components/View";
 import { ILabelProps } from "@components/Label";
+import { ScrollViewProps } from "react-native";
 
 /**
  * Interface representing the properties for the Dialog component.
@@ -77,6 +78,12 @@ export interface IDialogProps<DialogContextExtend = any> extends IModalProps {
   actionsProps?: IAppBarProps;
   fullScreenAppBarProps?: IDialogActionsProps<DialogContextExtend>;
   context?: DialogContextExtend;
+  /**
+   * If true, the dialog content will be wrapped in a ScrollView
+   */
+  withScrollView?: boolean;
+
+  scrollViewProps?: ScrollViewProps;
 }
 
 /**

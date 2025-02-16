@@ -7,11 +7,11 @@ import {
 } from "@components/AppBar";
 import DialogTitle from "./DialogTitle";
 import DialogFooter from "./DialogFooter";
-import { ReactNode, useMemo } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { isValidElement } from "@utils";
 import View from "@components/View";
 import DialogActions from "./DialogActions";
-import { StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { IDialogProps } from "./types";
 import { defaultStr } from "@resk/core";
 
@@ -110,7 +110,9 @@ function ModalWrapper<DialogContextExtend = any>({
   title,
   children: dialogChildren,
   titleProps,
-  isPreloader
+  isPreloader,
+  withScrollView,
+  scrollViewProps,
 }: IDialogProps<DialogContextExtend>) {
   testID = defaultStr(testID, "resk-dialog");
   fullScreenAppBarProps = Object.assign({}, fullScreenAppBarProps);
@@ -172,6 +174,13 @@ function ModalWrapper<DialogContextExtend = any>({
       context: Object.assign({}, modalContext, { isDialog: true }, context),
     };
   };
+  const { Component: Wrapper, props: wrapperProps } = useMemo(() => {
+    const canRenderScrollView = withScrollView !== false;
+    return {
+      Component: canRenderScrollView ? ScrollView : React.Fragment,
+      props: canRenderScrollView ? Object.assign({}, { testID: testID + "-scrollview" }, scrollViewProps) : {}
+    }
+  }, [withScrollView, scrollViewProps, testID]);
   return (
     <>
       <DialogAppBar
@@ -191,9 +200,11 @@ function ModalWrapper<DialogContextExtend = any>({
       <View
         testID={testID + "-dialog-content"}
         {...dialogContentProps}
-        style={[styles.content, isPreloader && styles.dialogContentPreloader, dialogContentProps.style]}
+        style={[styles.content, !modalContext?.fullScreen && styles.modalContent, isPreloader && styles.dialogContentPreloader, dialogContentProps.style]}
       >
-        {children}
+        <Wrapper {...wrapperProps}>
+          {children}
+        </Wrapper>
       </View>
       <DialogActions statusBarHeight={0} {...getAppBarProps(actionsProps)} />
       <DialogFooter
@@ -212,6 +223,9 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 5,
     paddingVertical: 5,
+  },
+  modalContent: {
+    flex: 1,
   },
   dialogContentPreloader: {
     paddingVertical: 10,

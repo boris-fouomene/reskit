@@ -262,7 +262,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     const textStyle = {
         color: textColor,
     };
-    const { left, right, label } = getLabelOrLeftOrRightProps({ label: customLabel, left: customLeft, right: customRight }, { color: textColor, context })
+    const { left, right, label } = getLabelOrLeftOrRightProps({ label: customLabel, left: customLeft, right: customRight }, { textColor, context })
     const iconColor: string = (Colors.isValid(customLabelColor) ? customLabelColor : Colors.isValid(iconProps?.color) ? iconProps.color : textColor) as string;
     const icon = useGetIcon({ icon: iconProp, size: iconSize, ...iconProps, color: iconColor as unknown as string, theme });
     const iconContent = icon && isLoading !== true ? icon : null;

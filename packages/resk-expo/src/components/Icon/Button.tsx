@@ -83,7 +83,6 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
             testID,
             isLoading = false,
             color,
-            rippleProps,
             iconName,
             source,
             containerProps,
@@ -94,11 +93,10 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
     ) => {
         const theme = useTheme();
         containerProps = Object.assign({}, containerProps);
-        rippleProps = Object.assign({}, rippleProps);
         testID = defaultStr(testID, "resk-icon-button");
         const containerStyle = StyleSheet.flatten([containerProps?.style]);
         const backgroundColor = getBackgroundColor({ theme, customBackgroundColor: Colors.isValid(customBackgroundColor) ? customBackgroundColor : Colors.isValid(containerStyle?.backgroundColor) ? containerStyle.backgroundColor : undefined });
-        customRippleColor = Colors.isValid(customRippleColor) ? customRippleColor : Colors.isValid(rippleProps?.rippleColor) ? rippleProps.rippleColor : undefined;
+        customRippleColor = Colors.isValid(customRippleColor) ? customRippleColor : undefined;
         const { rippleColor } = getColors({
             theme,
             disabled,
@@ -116,8 +114,9 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
             width: containerSize,
             height: containerSize
         }
-        const icon = useGetIcon<IIconProps>({
+        const icon = useGetIcon<IIconButtonProps>({
             as: TouchableRipple,
+            rippleColor,
             ...rest, icon: source || iconName || undefined, testID,
             color: iconColor,
             disabled, size,
@@ -130,9 +129,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
                 borderRadius,
                 accessibilityRole: "button",
                 backgroundColor,
-                ...rippleProps,
-                style: [styles.touchable, butonSizeStyle, rippleProps?.style],
-                rippleColor,
+                style: [styles.touchable, butonSizeStyle],
             }
         });
 

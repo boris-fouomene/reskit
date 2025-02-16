@@ -152,4 +152,4 @@ function native(value: any) {
 const canUseNativeDriver: () => boolean = isNative;
 
 
-export default { ...ReskPlatform, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };
+export default { ...ReskPlatform, ...Platform, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };

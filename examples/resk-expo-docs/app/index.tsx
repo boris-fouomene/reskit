@@ -1,11 +1,15 @@
-import { Tab, TextInput, Switch, withAppBar, Calendar, Checkbox, Drawer, Button, Dropdown, Form, Dialog, Expandable, TouchableRipple, Icon, Theme, Label, Divider, HelperText, Menu, ITheme, IThemeColorsTokens, getDefaultTheme, withAuth } from "@resk/expo";
+import { Tab, TextInput, withAppBar, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
-import { IField, IFieldMap } from "@resk/core";
+import { IField } from "@resk/core";
 
 const index = withAppBar(() => {
     return (
         <ScrollView>
-            <Button mode="contained">
+            <Button shadowEnabled mode="contained" rippleLocation="center"
+                left={({ textColor, context }) => {
+                    return <Icon color={textColor} iconName="account-circle" />
+                }}
+            >
                 Hello Button
             </Button>
 

@@ -792,35 +792,16 @@ type IGetIconOptionsBase = Omit<IIconProps, "iconName" | "source" | "color">;
  *   },
  * };
  */
-export type IIconButtonProps = IIconProps & {
+export type IIconButtonProps = Omit<ITouchableRippleProps, "children"> & IIconProps & {
     /**
      * Background color of the icon container.
      */
     backgroundColor?: string;
-    /**
-     * Color of the ripple effect.
-     */
-    rippleColor?: string;
 
-    /**
-     * Whether the button is disabled. A disabled button is greyed out and `onPress` is not called on touch.
-     */
-    disabled?: boolean;
-    /**
-     * Accessibility label for the button. This is read by the screen reader when the user taps the button.
-     */
-    accessibilityLabel?: string;
-
-    ref?: React.RefObject<View>;
     /**
      * Whether to show a isLoading indicator.
      */
     isLoading?: boolean;
-
-    /**
-     * Props for the ripple effect.
-     */
-    rippleProps?: ITouchableRippleProps;
 
     /**
      * Props for the container view.

@@ -15,7 +15,8 @@ import Theme, { useTheme } from '@theme/index';
 import Platform from "@platform";
 import useStateCallback from '@utils/stateCallback';
 
-const isAndroid = Platform.isAndroid();
+const version = parseInt(String(Platform.Version));
+const isAndroid = Platform.isAndroid() && (typeof version == "number" ? version >= 21 : true); //ANDROID_VERSION_LOLLIPOP;
 
 /** State of the {@link TouchableRipple} */
 interface ITouchableRippleState {
@@ -191,13 +192,12 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     const rippleContent = <Animated.View
         testID={testID + "-animated-container"}
         style={{
+            ...StyleSheet.absoluteFillObject,
             height: rippleState.height,
             width: rippleState.width,
-
             left: -(borderWidth),
             top: -(borderWidth),
             opacity: animatedOpacity.current,
-            position: 'absolute',
         }}
     >
         <Animated.View

@@ -20,20 +20,21 @@ import { useDimensions } from "@dimensions";
 export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 
-export const Modal = ({ visible, testID, maxWidth: customMaxWidth, contentContainerProps, animationDuration, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: backgroundOpacityP, contentProps, ...props }: IModalProps) => {
+export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: customMaxHeight, contentContainerProps, animationDuration, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: backgroundOpacityP, contentProps, ...props }: IModalProps) => {
   backgroundOpacityP = typeof backgroundOpacityP === "number" ? backgroundOpacityP : 0.5;
   contentProps = Object.assign({}, contentProps);
   animationDuration = typeof animationDuration === "number" ? animationDuration : 300;
-  const { height, width, isMobileOrTablet } = useDimensions(responsive !== false);
+  const { height, width, isMobileOrTablet } = useDimensions();
   const theme = useTheme();
   const { maxHeight, maxWidth } = useMemo(() => {
-    customMaxWidth = typeof customMaxWidth === "number" ? customMaxWidth : MAX_WIDTH;
-    customMaxWidth = Math.min(width, Math.max(customMaxWidth, MAX_WIDTH));
+    const mWidth = Math.min(width, Math.max(typeof customMaxWidth === "number" ? customMaxWidth : MAX_WIDTH, MAX_WIDTH));
+    const MAX_HEIGHT = (height > 600 ? (50) : 80) * height / 100;
+    const mHeight = Math.min(height, Math.max(typeof customMaxHeight === "number" ? customMaxHeight : MAX_HEIGHT, MAX_HEIGHT));
     return {
-      maxHeight: Math.min(customMaxWidth, 80 * width / 100),
-      maxWidth: Math.max((height > 600 ? (50) : 70) * height / 100, MIN_HEIGHT)
+      maxWidth: Math.min(mWidth, 80 * width / 100),
+      maxHeight: Math.min(Math.max(mHeight, MIN_HEIGHT), height)
     }
-  }, [width, height, customMaxWidth]);
+  }, [width, height, customMaxWidth, customMaxHeight]);
   const { fullScreen, modalStyle, contentStyle } = useMemo(() => {
     const fullScreen = customFullScreen !== undefined ? customFullScreen : responsive !== false ? isMobileOrTablet : false;
     return {
@@ -268,6 +269,11 @@ export interface IModalProps extends IReanimatedViewProp {
    * the maximum width of the modal. This is particularly useful when the modal is not displayed in full-screen mode, allowing for better layout control.
    */
   maxWidth?: number;
+
+  /***
+   * the maximum height of the modal. This is particularly useful when the modal is not displayed in full-screen mode, allowing for better layout control.
+   */
+  maxHeight?: number;
 }
 const styles = StyleSheet.create({
   absoluteFill: {

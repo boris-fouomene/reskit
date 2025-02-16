@@ -1,8 +1,23 @@
-import { Tab, TextInput, withAppBar, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme } from "@resk/expo";
+import { Tab, TextInput, withAppBar, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader } from "@resk/expo";
 import { View, ScrollView } from 'react-native'
 import { IField } from "@resk/core";
+import { useEffect } from "react";
 
 const index = withAppBar(() => {
+    useEffect(() => {
+        return () => { }
+        Preloader.open({
+            title: "Loading...",
+            children: "Please wait...",
+            actions: [{
+                label: "Cancel",
+                colorScheme: "error",
+                onPress: () => {
+                    Preloader.close();
+                },
+            }]
+        })
+    }, [])
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>

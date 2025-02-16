@@ -1,5 +1,5 @@
 
-export const MAX_WIDTH = 380;
+export const MAX_WIDTH = 500;
 
 export const MIN_WIDTH = 300;
 

@@ -175,12 +175,12 @@ function ModalWrapper<DialogContextExtend = any>({
     };
   };
   const { Component: Wrapper, props: wrapperProps } = useMemo(() => {
-    const canRenderScrollView = withScrollView !== false;
+    const canRenderScrollView = withScrollView !== false && !isPreloader;
     return {
       Component: canRenderScrollView ? ScrollView : React.Fragment,
       props: canRenderScrollView ? Object.assign({}, { testID: testID + "-scrollview" }, scrollViewProps) : {}
     }
-  }, [withScrollView, scrollViewProps, testID]);
+  }, [withScrollView, scrollViewProps, testID, isPreloader]);
   return (
     <>
       <DialogAppBar

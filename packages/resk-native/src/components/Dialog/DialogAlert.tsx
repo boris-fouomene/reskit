@@ -67,7 +67,7 @@ export default class DialogAlert extends createProvider<IDialogControlledProps, 
             }
         }
         const actions = Array.isArray(props?.actions) && props.actions.length ? props?.actions : [cancelButtonBefore ? cancelButton : okButton, cancelButtonBefore ? okButton : cancelButton];
-        return instance.open(Object.assign({}, { dismissable: false, children: <Label testID="resk-dialog-alert-label" style={Theme.styles.ph1} children={isValidElement(children, true) && children || message} /> }, instance?.props, rest, { fullScreen: false, actions }), callback);
+        return instance.open(Object.assign({}, { dismissable: false, children: <Label testID="resk-dialog-alert-label" style={Theme.styles.ph1} children={(isValidElement(children, true) && children || message) as ReactNode} /> }, instance?.props, rest, { fullScreen: false, actions }), callback);
     };
 
     /**

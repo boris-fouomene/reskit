@@ -1,24 +1,18 @@
 import React, { useEffect, useMemo, createContext, useContext, useRef } from "react";
-import { useStableMemo, usePrevious } from "@utils";
+import { useStableMemo } from "@utils";
 import Platform from "@platform";
-import { StyleSheet, ViewProps, Pressable, GestureResponderEvent, PressableProps } from "react-native";
-import View, { IViewProps } from "@components/View";
-import Theme, { useTheme } from "@theme";
+import { StyleSheet, ViewProps,Animated, Pressable, GestureResponderEvent, PressableProps, Easing } from "react-native";
+import { IViewProps } from "@components/View";
+import { useTheme } from "@theme";
 import { Portal } from "@components/Portal";
-import { MAX_WIDTH, MIN_WIDTH, MIN_HEIGHT } from "./utils";
+import { MAX_WIDTH, MIN_HEIGHT } from "./utils";
 import BackHandler from "@components/BackHandler";
-import { ReanimatedView, IReanimatedViewProp } from "@components/ReanimatedView";
-import Animated, {
-  Easing,
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  AnimatedProps,
-} from "react-native-reanimated";
+
+const useNativeDriver = Platform.canUseNativeDriver()
+
 import { useDimensions } from "@dimensions";
 
 export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
 
 export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: customMaxHeight, contentContainerProps, animationDuration, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: backgroundOpacityP, contentProps, ...props }: IModalProps) => {
   backgroundOpacityP = typeof backgroundOpacityP === "number" ? backgroundOpacityP : 0.5;
@@ -49,26 +43,23 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
   contentContainerProps = Object.assign({}, contentContainerProps);
   testID = testID || "resk-modal";
 
-  const backgroundOpacity = useSharedValue(visible ? 1 : 0);
+  const backgroundOpacity = useRef(new Animated.Value(visible ? 1 : 0)).current;
   const hiddenRef = useRef<boolean>(false);
-  const generateBackgroundOpacity = (value?: number) => {
+  const generateAnimation = (value?: number) => {
     const val = typeof value == "number" ? value : visible ? backgroundOpacityP : 0;
-    backgroundOpacity.value = withTiming(val as number, {
+    Animated.timing(backgroundOpacity, {
+      toValue: val as number,
       duration: animationDuration,
-      easing: Easing.inOut(Easing.ease),
-    });
+      easing: Easing.inOut(Easing.exp),
+      useNativeDriver, // Ensures smoother animation for supported props
+    }).start();
   };
   useEffect(() => {
     hiddenRef.current = true;
-    generateBackgroundOpacity(!visible ? 0 : undefined);
+    generateAnimation(!visible ? 0 : undefined);
   }, [visible]);
   hiddenRef.current = false;
 
-  const backgroundAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: backgroundOpacity.value,
-    };
-  });
   const handleDismiss = (e: GestureResponderEvent | KeyboardEvent): any => {
     if (onDismiss) {
       onDismiss(e);
@@ -94,7 +85,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
           { backgroundColor: theme.colors.backdrop },
           styles.backdrop,
           styles.absoluteFill,
-          backgroundAnimatedStyle,
+          { opacity: backgroundOpacity },
         ]}
       />
       <AnimatedPressable
@@ -102,7 +93,8 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
         {...contentContainerProps}
         style={[
           styles.content, styles.absoluteFill,
-          modalStyle, props.style,
+          modalStyle as any, 
+          props.style,
           styles.notHidden,
           contentContainerProps.style,
         ]}
@@ -111,11 +103,9 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
           handleDismiss(e);
         }}
       >
-        <ReanimatedView
+        <Animated.View
           testID={testID}
-          animationType="fade"
           {...props}
-          animationDuration={animationDuration}
           style={[
             styles.content,
             { backgroundColor: theme.colors.background },
@@ -126,7 +116,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
           <ModalContext.Provider value={{ ...props, isModal: true, modalVisible: visible as boolean, isModalClosed: () => !!!visible, isModalOpen: () => !!visible, modalMaxWidth: !fullScreen ? maxWidth : undefined, modalMaxHeight: !fullScreen ? maxHeight : undefined, handleDismiss, onDismiss, dismissable, backgroundOpacity: backgroundOpacityP, visible, responsive, fullScreen }}>
             {children}
           </ModalContext.Provider>
-        </ReanimatedView>
+        </Animated.View>
       </AnimatedPressable>
     </Portal>
   );
@@ -136,11 +126,11 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
  * Represents the properties for a Modal component, extending the default properties of 
  * the Animated.View component from React Native Reanimated.
  * 
- * This interface extends the `IReanimatedViewProp` type to include additional 
+ * This interface extends the `Animated.AnimatedProps<ViewProps>` type to include additional 
  * properties specific to modal functionality. It allows for customization of 
  * the modal's visibility, responsiveness, fullscreen behavior, and more.
  *
- * @extends IReanimatedViewProp
+ * @extends Animated.AnimatedProps<ViewProps>
  *
  * @interface IModalProps
  * @extends AnimatedProps<ViewProps>
@@ -219,11 +209,17 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
  * @example
  * <Modal isPreloader={true} />
  */
-export interface IModalProps extends IReanimatedViewProp {
+export interface IModalProps extends Animated.AnimatedProps<ViewProps> {
   /**
    * Indicates whether the modal is currently visible.
  * If set to true, the modal will be displayed; otherwise, it will be hidden. */
   visible?: boolean;
+  
+  /**
+   * The duration of the animation in milliseconds.
+   */
+  animationDuration?: number;
+  
   /**
    *  Determines if the modal should be responsive. 
   * When set to true, the modal will occupy the full screen in mobile or tablets environments 
@@ -263,7 +259,7 @@ export interface IModalProps extends IReanimatedViewProp {
   /***
    * Properties for the content wrapper component that wraps the children of the modal. This allows for further customization of the modal's content.
    */
-  contentContainerProps?: AnimatedProps<PressableProps>;
+  contentContainerProps?: Animated.AnimatedProps<PressableProps>;
 
   /***
    * the maximum width of the modal. This is particularly useful when the modal is not displayed in full-screen mode, allowing for better layout control.

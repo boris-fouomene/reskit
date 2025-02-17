@@ -9,7 +9,6 @@ export * from "./theme/types";
 export * from "./theme";
 export { default as Theme } from "./theme";
 export * from "./context";
-export { default as Session } from "./session";
 export * from "./components";
 export * from "./layouts";
 export * from "./auth";

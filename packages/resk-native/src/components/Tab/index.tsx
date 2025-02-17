@@ -4,7 +4,7 @@ import View from "@components/View";
 import TabItems from "./TabItems";
 import TabItem from "./TabItem";
 import TabContent from "./TabContent";
-import Session from "@session";
+import {Session} from "@resk/core";
 import isValidElement from "@utils/isValidElement";
 import { isNonNullString, defaultStr, isObj, IDict, ResourcesManager, Auth } from "@resk/core";
 import { isNumber } from "lodash";

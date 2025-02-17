@@ -1,7 +1,7 @@
-import "@session";
 import { useEffect, useMemo } from 'react';
 import { ITheme } from '@theme/types';
 import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
+import {SafeAreaView} from "react-native";
 import useStateCallback from '@utils/stateCallback';
 import { isObj } from '@resk/core';
 import stableHash from "stable-hash";
@@ -10,7 +10,6 @@ import { ReskExpoContext } from './hooks';
 import { PortalProvider } from "@components/Portal";
 import Breakpoints from "@src/breakpoints";
 import { Preloader, Dialog } from "@components/Dialog";
-import { useSafeAreaInsets, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Drawer } from "@components/Drawer";
 import { DrawerNavigationView } from "@layouts/DrawerNavigationView";
 import { FontIcon } from "@components/Icon";
@@ -54,7 +53,6 @@ export * from "./hooks";
  */
 export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskExpoProviderProps) {
   i18nOptions = Object.assign({}, i18nOptions);
-  const safeAreaInsets = useSafeAreaInsets();
   const i18n = useI18n(undefined, i18nOptions);
   auth = Object.assign({}, auth);
   drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
@@ -116,8 +114,8 @@ export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoin
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
-    <SafeAreaProvider testID="resk-native-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
-      <ReskExpoContext.Provider value={{ theme, i18n, updateTheme, ...rest, safeAreaInsets, breakpoints }}>
+    <SafeAreaView testID="resk-native-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
+      <ReskExpoContext.Provider value={{ theme, i18n, updateTheme, ...rest, breakpoints }}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
             <Notify.Component
@@ -135,6 +133,6 @@ export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoin
           </Default.AuthContext.Provider>
         </PortalProvider>
       </ReskExpoContext.Provider>
-    </SafeAreaProvider>
+    </SafeAreaView>
   );
 }

@@ -127,7 +127,11 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
       />;
     }
   });
-  const { top, left, right } = useReskExpo().safeAreaInsets;
+  const sInsets = useReskExpo().safeAreaInsets;
+  const insets =  Object.assign({},sInsets);;
+  const top = typeof insets.top == "number" ? insets.top : 0;
+  const left = typeof insets.left == "number" ? insets.left : 0;
+  const right = typeof insets.right == "number" ? insets.right : 0;
   //statusBarHeight = Platform.OS === 'ios' ? StatusBar.currentHeight || 0 : 0
   const containerStyle = {
     paddingTop: typeof statusBarHeight === "number" ? statusBarHeight : top,

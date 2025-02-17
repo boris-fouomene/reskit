@@ -1,6 +1,5 @@
 import { IBreakpoints } from "@src/breakpoints/types";
 import { ITheme } from "@theme/types";
-import { EdgeInsets } from 'react-native-safe-area-context';
 import { IDrawerNavigationViewProps } from "@layouts/DrawerNavigationView";
 import { I18n } from "@resk/core";
 import { IUseI18nOptions } from "@src/types";
@@ -100,7 +99,12 @@ export interface IReskExpoContext extends Omit<IReskExpoProviderProps, "type"> {
     /***
      * SafeAreaInsets
      */
-    safeAreaInsets: EdgeInsets;
+    safeAreaInsets ?: {
+        top: number;
+        bottom: number;
+        left: number;
+        right: number;
+    };
 
     /***
      * i18n instance library

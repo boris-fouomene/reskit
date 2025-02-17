@@ -1,10 +1,8 @@
 import { IAppBarAction, IAppBarProps } from "@components/AppBar/types";
 import { ITextInputProps } from "@components/TextInput/types";
 import { ReactNode } from "react";
-import { FlashListProps } from "@shopify/flash-list";
 import { IViewProps } from "@components/View";
-import { PressableProps } from "react-native";
-import Component from "@utils/Component";
+import { PressableProps,FlatListProps } from "react-native";
 import { IFontIconProps } from "@components/Icon";
 import { ObservableComponent } from "@utils/index";
 import { IMenuProps } from "@components/Menu";
@@ -575,7 +573,7 @@ export interface IDropdownCallbackOptions<ItemType = any, ValueType = any> {
  * @property {(preparedItem: IDropdownPreparedItem<ItemType, ValueType>, index: number) => boolean} [filter] - 
  * An optional function that determines whether a prepared item should be included in the dropdown based on filtering criteria.
  * 
- * @property {FlashListProps<IDropdownPreparedItem<ItemType, ValueType>>} [listProps] - 
+ * @property {FlatListProps<IDropdownPreparedItem<ItemType, ValueType>>} [listProps] - 
  * Optional properties for customizing the list of dropdown items.
  * 
  * @property {boolean} [showSearch] - An optional flag indicating whether the dropdown should display a search input.
@@ -650,7 +648,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     defaultValue?: ValueType | ValueType[]; // Default value(s) for the dropdown
     getHashKey?: (value: ValueType) => string; // Function to get unique hash key
     filter?: (preparedItem: IDropdownPreparedItem<ItemType, ValueType>, index: number) => boolean; // Function to filter items
-    listProps?: FlashListProps<IDropdownPreparedItem<ItemType, ValueType>>; // Props for the item list
+    listProps?: FlatListProps<IDropdownPreparedItem<ItemType, ValueType>>; // Props for the item list
 
     /**
      * Whether the dropdown should display a search input

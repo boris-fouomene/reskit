@@ -7,7 +7,7 @@ import { HStack } from "@components/Stack";
 import { useTheme } from "@theme";
 import { ScrollView } from "react-native";
 import { Divider } from "@components/Divider";
-import { isRTL, packageName } from "@utils/index";
+import { isRTL } from "@utils/index";
 import { defaultStr } from "@resk/core";
 import { isValidElement } from "@utils";
 import { ReactNode } from "react";
@@ -48,7 +48,7 @@ import DrawerItems from "@components/Drawer/DrawerItems";
  *     <Text>Additional Content</Text>
  * </DrawerNavigationView>
  */
-export const DrawerNavigationView = ({ children, testID, header, items, drawerItemsProps, drawerState }: IDrawerNavigationViewProps) => {
+export const DrawerNavigationView = ({ children, testID,navigationTitle, header, items, drawerItemsProps, drawerState }: IDrawerNavigationViewProps) => {
     testID = defaultStr(testID, "resk-drawer-layout");
     const theme = useTheme();
     drawerItemsProps = Object.assign({}, drawerItemsProps);
@@ -69,7 +69,7 @@ export const DrawerNavigationView = ({ children, testID, header, items, drawerIt
     };
     const menuIcon = <DrawerMenuIcon {...menuIconProps} />;
     return <ScrollView>
-        <DrawerNavigationHeader drawerState={drawerState} children={header} testID={testID} menuIcon={menuIcon} menuIconProps={menuIconProps} />
+        <DrawerNavigationHeader title={navigationTitle} drawerState={drawerState} children={header} testID={testID} menuIcon={menuIcon} menuIconProps={menuIconProps} />
         <Divider />
         <DrawerItems testID={testID + "-drawer-items"} items={items} {...drawerItemsProps} />
         {isValidElement(children) ? children : null}
@@ -120,7 +120,7 @@ export const DrawerNavigationView = ({ children, testID, header, items, drawerIt
  *     )}
  * </DrawerNavigationHeader>
  */
-const DrawerNavigationHeader: React.FC<{ testID: string, children?: IDrawerNavigationViewHeader, drawerState: IDrawerCurrentState, menuIcon: JSX.Element; menuIconProps: IDrawerMenuIconProps }> = ({ children, menuIcon, menuIconProps, testID, drawerState }): React.ReactNode => {
+const DrawerNavigationHeader: React.FC<{ testID: string,title?:ReactNode, children?: IDrawerNavigationViewHeader, drawerState: IDrawerCurrentState, menuIcon: JSX.Element; menuIconProps: IDrawerMenuIconProps }> = ({ children, menuIcon, menuIconProps, testID, drawerState,title }): React.ReactNode => {
     if (isValidElement(children)) {
         return children as ReactNode;
     }
@@ -130,7 +130,7 @@ const DrawerNavigationHeader: React.FC<{ testID: string, children?: IDrawerNavig
     }
     const left = <>
         <Label textBold style={styles.logoText}>
-            {packageName}
+            {title}
         </Label>
     </>, right = isValidElement(menuIcon) ? menuIcon : null;
     return <View testID={testID + "-header-container"} style={styles.headerContainer}>
@@ -247,6 +247,7 @@ type IDrawerNavigationViewHeader = JSX.Element | ((options: {
  */
 export interface IDrawerNavigationViewProps extends IDrawerProps {
     header?: IDrawerNavigationViewHeader;
+    navigationTitle?: ReactNode;
     items?: IDrawerItemsProps["items"];
     drawerItemsProps?: Partial<Omit<IDrawerItemsProps, "items">>;
     drawerState: IDrawerCurrentState;

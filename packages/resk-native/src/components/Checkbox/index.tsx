@@ -11,8 +11,6 @@ export * from "./types";
 
 /**
  * A customizable Checkbox component that supports tooltip, labels, and toggle functionality.
- *
- * This component uses the `Checkbox` from the `expo-checkbox` library and provides an enhanced 
  * user interface with optional tooltips and labels. It allows for easy integration into forms 
  * and other UI elements while supporting various states such as checked, unchecked, disabled, 
  * and read-only.

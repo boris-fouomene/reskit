@@ -7,9 +7,6 @@
     "composite": false,
     "incremental": false,
     "paths": {
-      "@session": [
-        "src/session"
-      ],
       "@breakpoints/*": [
         "src/breakpoints/*"
       ],

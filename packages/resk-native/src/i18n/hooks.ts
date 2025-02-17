@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { I18n, isNonNullString, Currency, IDict } from "@resk/core";
-import { getLocales, Locale } from 'expo-localization';
+import { I18n, isNonNullString } from "@resk/core";
+import { getLocales } from "react-native-localize";
 import { IUseI18nOptions } from "@src/types";
 
 

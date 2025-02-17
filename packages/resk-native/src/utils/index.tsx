@@ -1,8 +1,5 @@
 import { ReactNode } from "react";
-import { Platform } from "react-native";
-import Constants from 'expo-constants';
 import isValidElement from "./isValidElement";
-import { defaultStr, isObj } from "@resk/core";
 export { default as useStableMemo } from "./useStableMemo";
 export { default as isValidElement } from "./isValidElement";
 export { default as usePrevious } from "./usePrevious";
@@ -36,22 +33,6 @@ export function isReactNode(node: any): node is ReactNode {
   }
   return false;
 }
-
-/**
- * The name of the package as defined in the application's manifest or expoConfig.
- * 
- * This constant checks the `manifest` or `expoConfig` properties from Expo's `Constants` module 
- * to retrieve the application name from `expoConfig` file. 
- *
- * @example
- * ```ts
- * const packageName = Constants.expoConfig?.name;
- * console.log(packageName); // "MyApp" or undefined if not found
- * ```
- * 
- * @returns {string | undefined} The name of the app from the manifest or expoConfig, or `undefined` if not found.
- */
-export const packageName = defaultStr(Constants.expoConfig?.name);
 
 
 export * from "./hasTouchHandler";

@@ -6,9 +6,8 @@ import { getTextContent, isReactNode, ObservableComponent, useForceRender } from
 import { DropdownContext, useDropdown } from "./hooks";
 import areEquals from "@utils/areEquals";
 import Theme, { useTheme } from "@theme/index";
-import { View as RNView, TouchableOpacity } from "react-native";
+import { FlatList, TouchableOpacity } from "react-native";
 import TextInput from "@components/TextInput";
-import { FlashList } from "@shopify/flash-list";
 import { Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { TouchableRipple } from "@components/TouchableRipple";
@@ -465,9 +464,9 @@ function DropdownMenu() {
             />
         ) : null}
         <DropdownSearch isFullScreen={fullScreen} />
-        <FlashList<IDropdownPreparedItem>
+        <FlatList<IDropdownPreparedItem>
             testID={testID + "-dropdown-list"}
-            estimatedItemSize={100}
+            //estimatedItemSize={100}
             {...listProps}
             inverted={canReverse}
             data={filteredItems}

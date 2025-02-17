@@ -1,4 +1,3 @@
-import 'react-native-reanimated';
 import * as SplashScreen from 'expo-splash-screen';
 import { ITheme, Label, ReskExpoProvider, Theme, useDrawer, useI18n, View } from "@resk/native";
 import { Slot } from 'expo-router';

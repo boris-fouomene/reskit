@@ -1,8 +1,7 @@
 import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorsTokens, IThemeFontSizes, IThemeSpaces, IThemeBorderRadius } from "./types";
 import Colors from "./colors";
 import { defaultStr, extendObj, IDict, IObservable, isNonNullString, isObj, isObservable, observable } from "@resk/core";
-import { packageName } from "@utils/index";
-import session from "../session";
+import { Session } from "@resk/core";
 import Color from "color";
 import updateNative from "./updateNative";
 import styles from "./styles";
@@ -381,7 +380,7 @@ const getBreakpointValue = (values: Partial<Record<IBreakpointName | `_${number}
  */
 export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
     // Retrieves the saved theme from the session (if available)
-    const themeNameObj = extendObj({}, customTheme, session.get("theme"));
+    const themeNameObj = extendObj({}, customTheme, Session.get("theme"));
     const { light: lightTheme, dark: darkTheme } = getMaterial3Theme(themeNameObj?.colors?.primary);
     const isDark = !!themeNameObj.dark;
     const theme = extendObj({}, (isDark ? darkTheme : lightTheme), themeNameObj);
@@ -392,7 +391,7 @@ export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
 };
 
 const sanitizeTheme = (theme: IThemeManager) => {
-    theme.name = defaultStr(theme.name, `${packageName}-${theme.dark ? "dark" : "light"}`);
+    theme.name = defaultStr(theme.name, `theme-${theme.dark ? "dark" : "light"}`);
     theme.roundness = typeof theme.roundness == "number" ? theme.roundness : 8;
     theme.colors = Object.assign({}, theme.colors);
     const isDark = !!theme.dark;
@@ -469,7 +468,7 @@ class Theme {
  */
 export function updateTheme(theme: ITheme, trigger: boolean = false): IThemeManager {
     // Save the theme name in the session
-    session.set("theme", theme.name);
+    Session.set("theme", theme.name);
     // Update the theme reference
     const newTheme = sanitizeTheme(createTheme(theme));
     Theme.setTheme(newTheme);

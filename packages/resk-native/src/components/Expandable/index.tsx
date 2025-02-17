@@ -1,18 +1,14 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import View, { IViewProps } from "@components/View";
-import { StyleSheet, View as RNView, Pressable, GestureResponderEvent, ViewProps, } from "react-native";
+import { StyleSheet, View as RNView, Pressable,Animated, GestureResponderEvent, ViewProps, } from "react-native";
 import Label, { ILabelProps } from "@components/Label";
 import { Icon, IIconProps, IIconSource, useGetIcon } from "@components/Icon";
 import { defaultStr } from "@resk/core";
 import { useTheme, Colors } from "@theme";
 import useStateCallback from "@utils/stateCallback";
 import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
-import Animated, { AnimatedProps, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { IExpandableContext, IExpandableProps } from "./types";
 import { isRTL } from "@utils/i18nManager";
-
-
-
 
 /**
  * A highly customizable expandable/collapsible component that supports controlled and uncontrolled modes.
@@ -74,7 +70,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandIconSize, 
     return customChildren;
   }, [customChildren]);
 
-  const opacity = useSharedValue(0); // Starting opacity
+  const opacity = useRef(new Animated.Value(0)).current; // Starting opacity
 
   leftContainerProps = Object.assign({}, leftContainerProps);
   rightContainerProps = Object.assign({}, rightContainerProps);
@@ -87,7 +83,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandIconSize, 
   const [expanded, setExpanded] = useStateCallback<boolean>(isControlled ? (expandedProp as boolean) : !!defaultExpanded);
   const toggleExpand = (event?: GestureResponderEvent, callback?: (newExpanded: boolean) => void) => {
     // Collapse animation
-    opacity.value = withTiming(expanded ? 0 : 1, { duration: 300 });
+    opacity.setValue(expanded ? 0 : 1);
     if (!isControlled) {
       setExpanded((expanded: boolean) => !expanded, (newExpanded) => {
         if (typeof onToggleExpand == "function") {
@@ -111,10 +107,6 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandIconSize, 
       onPress?.(event);
     }
   };
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
 
   React.useEffect(() => {
     if (!isControlled) {
@@ -169,7 +161,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandIconSize, 
             style={[
               styles.content,
               styles.children, contentProps?.style,
-              animatedStyle,
+              { opacity },
             ]}
           >
             {children}

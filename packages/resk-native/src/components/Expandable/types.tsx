@@ -3,8 +3,7 @@ import { ILabelProps } from "@components/Label";
 import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { ReactNode } from "react";
-import { GestureResponderEvent, PressableProps, ViewProps } from "react-native";
-import { AnimatedProps } from "react-native-reanimated";
+import { Animated, GestureResponderEvent, PressableProps, View, ViewProps } from "react-native";
 /**
  * Interface for Expandable component props that provides collapsible/expandable functionality with customizable icons and content.
  * 
@@ -111,7 +110,7 @@ export type IExpandableProps = Omit<PressableProps, "children"> & ILabelOrLeftOr
      * Props for the content wrapper view
      * @type {IViewProps}
      */
-    contentProps?: AnimatedProps<ViewProps>;
+    contentProps?: Animated.AnimatedProps<ViewProps>;
 
     /**
      * Whether to mount children even when collapsed
@@ -203,6 +202,7 @@ export interface IExpandableCallbackOptions {
  * 
  * import React, { useContext } from 'react';
  * import { IExpandableContext, useExpandable } from './ExpandableContext';
+import View from '../../../build/components/View/index';
  * 
  * const MyExpandableComponent: React.FC = () => {
  *   const { expanded, toggleExpand } = useContext<IExpandableContext>(useExpandable());

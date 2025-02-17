@@ -96,12 +96,15 @@ export default class Calendar {
         }
         return monthMatrix;
     }
-    static getYearsBoundaries(minDate?: ICalendarDate): { start: number, end: number } {
+    static getYearsBoundaries(minDate?: ICalendarDate): { start: number, startDate: Date, end: number, endDate: Date } {
         const startYear = moment(minDate).toDate().getFullYear();
         const start = Math.max(startYear - 10, 0);
+        const end = start + 15;
         return {
             start,
-            end: start + 15,
+            startDate: moment(minDate).toDate(),
+            end,
+            endDate: moment(minDate).add(15, 'year').toDate()
         }
     }
 
@@ -148,7 +151,7 @@ export default class Calendar {
                 dayView: Calendar.generateDayView(dateCursor.toDate(), weekStartDay, state.minDate, state.maxDate, state.defaultValue),
                 dayHeaders: Calendar.generateWeekHeaders(weekStartDay)
             };
-        }, [state.minDate, state.defaultValue, state.maxDate, weekStartDay, dateCursor, locale]);
+        }, [state.minDate, state.defaultValue, state.maxDate, weekStartDay, state.dateCursor, dateCursor, locale]);
         const toDayStr = moment().format(dateFormat);
         const defaultValueStr = momentDefaultValue?.format(dateFormat) || "";
         const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(dateCursor.toDate()) : undefined;
@@ -279,7 +282,7 @@ export default class Calendar {
         const { state, setState, momentMinDate, dateCursor, momentMaxDate, locale, momentDefaultValue, navigateToNext, navigateToPrevious } = useCommon(props, "month");
         const monthView = useMemo(() => {
             return Calendar.generateMonthView(state.minDate, state.maxDate);
-        }, [state.minDate, state.maxDate, state.dateCursor, locale]);
+        }, [state.minDate, state.maxDate, state.dateCursor, dateCursor, locale]);
         const { displayView } = state;
         const testID = defaultStr(props?.testID, "resk-calendar-month-view");
         const currentMonth = moment().month();
@@ -345,10 +348,12 @@ export default class Calendar {
     };
     static Year: React.FC<ICalendarYearProps> = (props) => {
         const theme = useTheme();
-        const { setState, locale, state, navigateToNext, navigateToPrevious } = useCommon(props, "year");
+        const { locale, dateCursor, state, navigateToNext, navigateToPrevious } = useCommon(props, "year");
         const yearView = useMemo(() => {
-            return Calendar.generateYearView(state?.minDate, state.maxDate);
-        }, [state?.minDate, state.maxDate, locale]);
+            const { startDate, endDate } = Calendar.getYearsBoundaries(dateCursor.toDate());
+            const data = Calendar.generateYearView(startDate, endDate);
+            return data;
+        }, [state?.minDate, state.maxDate, locale, dateCursor]);
         const { start, end } = Calendar.getYearsBoundaries(state.minDate);
         const testID = defaultStr(props?.testID, "resk-calendar-year-view");
         const currentYear = new Date().getFullYear();
@@ -530,6 +535,7 @@ const Styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        paddingVertical: 5,
     },
     headerArrowContainer: {
         display: "flex",

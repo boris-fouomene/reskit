@@ -1,5 +1,5 @@
 import "@resk/core";
-import "@resk/expo";
+import "@resk/native";
 declare module "@resk/core" {
     interface IResources {
         users: string;

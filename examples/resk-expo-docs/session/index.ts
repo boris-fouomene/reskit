@@ -1,2 +1,2 @@
-import { Session } from "@resk/expo";
+import { Session } from "@resk/native";
 export default Session;

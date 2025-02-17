@@ -1,4 +1,4 @@
-import { Tab, TextInput, withAppBar, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader } from "@resk/expo";
+import { Tab, TextInput, withAppBar, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader } from "@resk/native";
 import { View, ScrollView } from 'react-native'
 import { IField } from "@resk/core";
 import { useEffect } from "react";

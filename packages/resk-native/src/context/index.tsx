@@ -116,7 +116,7 @@ export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoin
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
-    <SafeAreaProvider testID="resk-expo-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaProvider testID="resk-native-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
       <ReskExpoContext.Provider value={{ theme, i18n, updateTheme, ...rest, safeAreaInsets, breakpoints }}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>

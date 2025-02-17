@@ -1,4 +1,4 @@
-import { Session } from "@resk/expo";
+import { Session } from "@resk/native";
 import Storage from 'expo-sqlite/kv-store';
 
 Session.storage = {

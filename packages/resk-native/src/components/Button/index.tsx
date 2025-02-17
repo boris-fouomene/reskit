@@ -102,7 +102,7 @@ import { Divider } from '@components/Divider';
  * 
  * @example
  * // Example usage of the Button component
- * import { Button } from '@resk/expo';
+ * import { Button } from '@resk/native';
  * <Button
  *     mode="contained"
  *     isLoading={false}

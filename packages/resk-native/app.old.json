@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "@resk/expo",
-    "slug": "resk-expo",
+    "name": "@resk/native",
+    "slug": "resk-native",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

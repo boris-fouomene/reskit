@@ -41,7 +41,7 @@ import Breakpoints from "@breakpoints/index";
  *
  * Example Usage:
  * ```ts
- * import {TextInput} from "@resk/expo";
+ * import {TextInput} from "@resk/native";
  *
  * export function MyTextInput() {
  *     // Callback function to handle changes in the input

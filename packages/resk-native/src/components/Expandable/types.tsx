@@ -20,7 +20,7 @@ import { AnimatedProps } from "react-native-reanimated";
  * 
  * @example
  * ```tsx
- * import {Expandable} from "@resk/expo";
+ * import {Expandable} from "@resk/native";
  * <Expandable
  *   label="Settings"
  *   expandedIcon="chevron-up"

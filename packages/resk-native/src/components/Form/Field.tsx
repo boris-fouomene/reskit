@@ -1209,7 +1209,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
  * 
  * @example
  * // Using the FormField decorator to register a custom text field component
- * import {Form} from "@resk/expo"
+ * import {Form} from "@resk/native"
  * @FormField("text")
  * class MyForm extends Form.Field {
  *     

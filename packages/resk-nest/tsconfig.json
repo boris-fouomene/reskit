@@ -51,7 +51,7 @@
     "src/**/*.json"
   ],
   "exclude": [
-    "../packages/resk-expo/**/*",
+    "../packages/resk-native/**/*",
     "../packages/resk-expo-docs/**/*",
     "**/*.tsx"
   ]

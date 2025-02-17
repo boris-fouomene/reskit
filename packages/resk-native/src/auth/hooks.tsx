@@ -229,7 +229,7 @@ const Login: React.FC<{}> = function ({ }) {
     <View testID="resk-auth-login-container" style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {!Component || typeof Component !== "function" ? <View style={[styles.container, Theme.styles.centered, , Theme.styles.h100, Theme.styles.w100]} testID="resk-auth-login-container">
         <View>
-          <Label colorScheme="error" fontSize={20} textBold>AuthProvider must have a Login component using the `Login` prop from resk-expo  provider auth options.</Label>
+          <Label colorScheme="error" fontSize={20} textBold>AuthProvider must have a Login component using the `Login` prop from resk-native  provider auth options.</Label>
         </View>
       </View> : <Component signIn={Auth.signIn} />}
     </View>

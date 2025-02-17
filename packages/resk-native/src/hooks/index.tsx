@@ -45,7 +45,7 @@ import { useReskExpo } from "@src/context/hooks";
  * 
  * ```typescript
  * import React from 'react';
- * import { withAppBar } from '@resk/expo';
+ * import { withAppBar } from '@resk/native';
  * 
  * const MyComponent: React.FC<{ message: string }> = ({ message }) => {
  *     return <div>{message}</div>;

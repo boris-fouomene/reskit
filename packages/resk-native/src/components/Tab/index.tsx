@@ -96,7 +96,7 @@ const getSessionActiveIndex = (props: ITabProps) => {
  * 
  * @example
  * // Example usage of the Tab component
- * import {Tab} from "@resk/expo"
+ * import {Tab} from "@resk/native"
  * const MyTabs = () => (
  *   <Tab sessionName="userTabs" onChange={({ index }) => console.log(`Active Tab Index: ${index}`)}>
  *     <Tab.Item label="Home" tabKey="home">

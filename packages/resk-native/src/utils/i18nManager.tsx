@@ -13,7 +13,7 @@ import { I18nManager } from "react-native";
  *
  * @example
  * // Usage example in a React Native component
- * import {isRTL} from '@resk/expo';
+ * import {isRTL} from '@resk/native';
  *
  * const styles = {
  *   container: {

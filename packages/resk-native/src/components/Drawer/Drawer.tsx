@@ -204,7 +204,7 @@ const SETTLING = "Settling";
  * @method _getOpenValueForX - Gets the open value for a given x position.
  * @param {number} x - The x position.
  * @example : 
- * import {Drawer} from '@resk/expo';
+ * import {Drawer} from '@resk/native';
   const MyComponent = () => {
     return (
       <Drawer

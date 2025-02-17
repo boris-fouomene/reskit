@@ -413,7 +413,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * 
      * @example
      * // Usage in a React Native component
-     * import { FontIcon } from '@resk/expo';
+     * import { FontIcon } from '@resk/native';
      * 
      * const BackButton = () => (
      *   <Icon name={FontIcon.BACK} size={24} color="#000" />
@@ -445,7 +445,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * 
      * @example
      * // Usage in a React Native component
-     * import { FontIcon } from '@resk/expo';
+     * import { FontIcon } from '@resk/native';
      * 
      * const MenuButton = () => (
      *   <Icon name={FontIcon.MENU} size={24} color="#000" />
@@ -478,7 +478,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * 
      * @example
      * // Usage in a React Native component
-     * import { FontIcon } from '@resk/expo';
+     * import { FontIcon } from '@resk/native';
      * 
      * const CopyButton = () => (
      *   <Button onPress={handleCopy}>
@@ -512,7 +512,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * 
      * @example
      * // Usage in a React Native component
-     * import {FontIcon} from '@resk/expo';
+     * import {FontIcon} from '@resk/native';
      * 
      * const MoreOptionsButton = () => (
      *   <Icon name={FontIcon.MORE} size={24} color="#000" />
@@ -729,7 +729,7 @@ FontWithCustomIcons.getIconSet = getFontIconSet;
  * 
  * @example
  * // Usage in a React Native component
- * import { BACK_ICON } from '@resk/expo';
+ * import { BACK_ICON } from '@resk/native';
  * 
  * const BackButton = () => (
  *   <Icon name={BACK_ICON} size={24} color="#000" />
@@ -761,7 +761,7 @@ FontWithCustomIcons.BACK = isIos ? (isRTL ? "chevron-right" : "chevron-left") : 
  * 
  * @example
  * // Usage in a React Native component
- * import { FontIcon } from '@resk/expo';
+ * import { FontIcon } from '@resk/native';
  * 
  * const MenuButton = () => (
  *   <Icon name={FontIcon.MENU} size={24} color="#000" />
@@ -794,7 +794,7 @@ FontWithCustomIcons.MENU = "menu";
  * 
  * @example
  * // Usage in a React Native component
- * import { FontIcon } from '@resk/expo';
+ * import { FontIcon } from '@resk/native';
  * 
  * const CopyButton = () => (
  *   <Button onPress={handleCopy}>
@@ -829,7 +829,7 @@ FontWithCustomIcons.COPY = "content-copy";
  * 
  * @example
  * // Usage in a React Native component
- * import {FontIcon} from '@resk/expo';
+ * import {FontIcon} from '@resk/native';
  * 
  * const MoreOptionsButton = () => (
  *   <Icon name={FontIcon.MORE} size={24} color="#000" />

@@ -1,7 +1,7 @@
 import React, { isValidElement, useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, GestureResponderEvent, Animated, PanResponder } from "react-native";
-import moment, { Moment } from "moment/min/moment-with-locales";
-import { defaultStr, IMomentFormat, isEmpty } from "@resk/core";
+import moment, { Moment } from "moment";
+import { defaultStr, I18n, IMomentFormat, isEmpty } from "@resk/core";
 import { ICalendarBaseProps, ICalendarDate, ICalendarDay, ICalendarDayProps, ICalendarDisplayView, ICalendarHour, ICalendarMonth, ICalendarMonthProps, ICalendarYear, ICalendarYearProps } from "./types";
 import { Icon, IIconButtonProps } from "@components/Icon";
 import Label from "@components/Label";
@@ -148,7 +148,7 @@ export default class Calendar {
                 dayView: Calendar.generateDayView(dateCursor.toDate(), weekStartDay, state.minDate, state.maxDate, state.defaultValue),
                 dayHeaders: Calendar.generateWeekHeaders(weekStartDay)
             };
-        }, [state.minDate, state.defaultValue, state.maxDate, weekStartDay, dateCursor]);
+        }, [state.minDate, state.defaultValue, state.maxDate, weekStartDay, dateCursor, locale]);
         const toDayStr = moment().format(dateFormat);
         const defaultValueStr = momentDefaultValue?.format(dateFormat) || "";
         const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(dateCursor.toDate()) : undefined;
@@ -276,10 +276,10 @@ export default class Calendar {
     }
     static Month: React.FC<ICalendarMonthProps> = (props: ICalendarMonthProps) => {
         const theme = useTheme();
-        const { state, setState, momentMinDate, dateCursor, momentMaxDate, momentDefaultValue, navigateToNext, navigateToPrevious } = useCommon(props, "month");
+        const { state, setState, momentMinDate, dateCursor, momentMaxDate, locale, momentDefaultValue, navigateToNext, navigateToPrevious } = useCommon(props, "month");
         const monthView = useMemo(() => {
             return Calendar.generateMonthView(state.minDate, state.maxDate);
-        }, [state.minDate, state.maxDate, state.dateCursor]);
+        }, [state.minDate, state.maxDate, state.dateCursor, locale]);
         const { displayView } = state;
         const testID = defaultStr(props?.testID, "resk-calendar-month-view");
         const currentMonth = moment().month();
@@ -345,10 +345,10 @@ export default class Calendar {
     };
     static Year: React.FC<ICalendarYearProps> = (props) => {
         const theme = useTheme();
-        const { setState, state, navigateToNext, navigateToPrevious } = useCommon(props, "year");
+        const { setState, locale, state, navigateToNext, navigateToPrevious } = useCommon(props, "year");
         const yearView = useMemo(() => {
             return Calendar.generateYearView(state?.minDate, state.maxDate);
-        }, [state?.minDate, state.maxDate]);
+        }, [state?.minDate, state.maxDate, locale]);
         const { start, end } = Calendar.getYearsBoundaries(state.minDate);
         const testID = defaultStr(props?.testID, "resk-calendar-year-view");
         const currentYear = new Date().getFullYear();
@@ -602,8 +602,8 @@ function useCommon(props: ICalendarBaseProps, displayView?: ICalendarDisplayView
         dateCursor: moment(props.defaultValue),
     });
     useMemo(() => {
-        if (i18nLocale === locale) return;
-        moment.locale(locale);
+        I18n.setMomentLocale(locale);
+        //moment.locale(locale, I18n.getMomentLocale(locale));
     }, [locale, i18nLocale]);
     const momentMaxDate = useMemo(() => {
         return state?.maxDate ? moment(state?.maxDate) : undefined;

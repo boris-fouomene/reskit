@@ -388,6 +388,8 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * register a moment locale
      * @param {string} locale
      * @param {LocaleSpecification} momentLocale
+     * @see https://momentjs.com/docs/#/customization/ for more information on customizing moment locales
+     * @see https://momentjs.com/docs/#/i18n/ for more information on moment locales
      * @returns 
      */
     static registerMomentLocale(locale: string, momentLocale: LocaleSpecification): Record<string, LocaleSpecification> {
@@ -407,17 +409,15 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     /***
      * set a moment locale. the locale is picked from the momentLocales list
      * @param {string} locale
+     * @param {Moment} momentInstance, The moment instance to set the locale on
      * @returns {boolean}
      */
-    static setMomentLocale(locale: string) {
-        const momentLocale = this.getMomentLocale(locale);
-        if (isObj(momentLocale)) {
-            try {
-                moment.locale(locale, momentLocale);
-                return true;
-            } catch (error) {
-                console.error(error, " setting moment locale : ", locale);
-            }
+    static setMomentLocale(locale: string): boolean {
+        try {
+            moment.locale(locale, this.getMomentLocale(locale));
+            return true;
+        } catch (error) {
+            console.error(error, " setting moment locale : ", locale);
         }
         return false;
     }

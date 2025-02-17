@@ -358,9 +358,6 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
     const numberOfLines = useMemo(() => {
         return countLines(inputValue);
     }, [inputValue]);
-    const lineHeight = useMemo(() => {
-        return numberOfLines <= 1 ? minHeight : height / numberOfLines;
-    }, [numberOfLines, height]);
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
     }, [height, inputValue]);

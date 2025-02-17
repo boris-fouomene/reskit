@@ -9,9 +9,9 @@ import stringify from "@utils/stringify";
 import session from "@session/index";
 import { IDict } from "../types/index";
 import { isString } from "lodash";
-import moment from "moment";
+import moment, { LocaleSpecification } from "moment";
 import { createPropertyDecorator, getDecoratedProperties } from "@/decorators";
-
+import momentLocaleFr from "./locales/moment.locale.fr";
 /**
  * A key to store metadata for translations.
  */
@@ -380,7 +380,30 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         }
         return r;
     }
-
+    /***
+     * list of registered moment locales
+     */
+    private static momentLocales: Record<string, LocaleSpecification> = {};
+    /***
+     * register a moment locale
+     * @param {string} locale
+     * @param {LocaleSpecification} momentLocale
+     * @returns 
+     */
+    static registerMomentLocale(locale: string, momentLocale: LocaleSpecification): Record<string, LocaleSpecification> {
+        if (isNonNullString(locale) && isObj(momentLocale) && Array.isArray(momentLocale.months)) {
+            this.momentLocales[locale] = extendObj({}, this.momentLocales[locale], momentLocale);
+        }
+        return this.momentLocales;
+    }
+    /***
+     * get a moment locale
+     * @param {string} locale
+     * @returns {LocaleSpecification}
+     */
+    static getMomentLocale(locale: string): LocaleSpecification {
+        return this.momentLocales[locale];
+    }
     /**
      * Registers translations into the I18n manager.
      * @param translations The translations to register.
@@ -529,7 +552,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         }
         this._isLoading = true;
         try {
-            moment.locale(locale);
+            moment.locale(locale, I18n.getMomentLocale(locale));
         } catch (error) {
             console.error(error, " setting moment locale : ", locale);
         }
@@ -730,3 +753,5 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
 }
 
 export const i18n = I18n.getInstance();
+
+I18n.registerMomentLocale("fr", momentLocaleFr);

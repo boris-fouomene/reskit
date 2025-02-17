@@ -3,18 +3,11 @@
 import ExpandableMenuItem from './ExpandableItem';
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
-import { isNumber } from "lodash";
-import { getDimensions, useDimensions } from '@dimensions/index';
+import { isNumber, transform } from "lodash";
+import {useDimensions } from '@dimensions/index';
 import Theme, { useTheme } from '@theme/index';
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { View, StyleSheet, LayoutChangeEvent, LayoutRectangle, Pressable, PressableStateCallbackType, ScrollView, Dimensions } from 'react-native';
-import Animated, {
-    useAnimatedStyle,
-    withSpring,
-    useSharedValue,
-    withTiming,
-    Easing,
-} from 'react-native-reanimated';
+import { View,Animated, StyleSheet, LayoutChangeEvent, LayoutRectangle, Pressable, PressableStateCallbackType, ScrollView, Dimensions } from 'react-native';
 import { IMenuAnchorMeasurements, IMenuCalculatedPosition, IMenuPosition, IMenuProps, IUseMenuPositionProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr, isObj } from '@resk/core';
@@ -98,8 +91,8 @@ export const useMenuPosition = ({
     const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions();
     const fullScreen = isFullScreen(customFullScreen, responsive, isMobileOrTablet);
     // Animation values
-    const opacity = useSharedValue(animated ? 0 : 1);
-    const scale = useSharedValue(animated ? 0.8 : 1);
+    const opacity = useRef<Animated.Value>(new Animated.Value(animated ? 0 : 1)).current;
+    const scale = useRef(new Animated.Value(animated ? 0.8 : 1)).current;
     const elevation = typeof customElevation === "number" ? customElevation : fullScreen ? 0 : 10;
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         let calculatedPosition: IMenuCalculatedPosition = {
@@ -238,11 +231,8 @@ export const useMenuPosition = ({
     const menuPosition = calculatePosition();
     useEffect(() => {
         if (animated) {
-            opacity.value = withTiming(visible ? 1 : 0, {
-                duration: 200,
-                easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-            });
-            scale.value = withSpring(visible ? 1 : 0.8);
+            opacity.setValue(visible ? 1 : 0);
+            scale.setValue(visible ? 1 : 0.8);
         }
     }, [visible, animated]);
     const menuAnchorStyle = useMemo(() => {
@@ -269,18 +259,13 @@ export const useMenuPosition = ({
             maxHeight: screenHeight - (fullScreen ? 0 : Math.max(sizeToRemove.height, 10)),
         }
     }, [menuPosition, fullScreen, screenWidth, screenHeight, sizeToRemove.width, sizeToRemove.height]);
-    // Animated styles
-    const animatedStyle = useAnimatedStyle(() => ({
-        opacity: opacity.value,
-        transform: [
-            { scale: scale.value },
-        ],
-    }));
     const { xPosition, calculatedFromPosition, yPosition, ...positionStyle } = menuPosition;
     return {
         calculatePosition,
         fullScreen,
         menuPosition,
+        screenWidth,
+        screenHeight,
         animatedStyle: [
             styles.menuContainer,
             fullScreen ? styles.menuContainerFullScreen : null,
@@ -296,8 +281,9 @@ export const useMenuPosition = ({
             {
                 backgroundColor: theme.colors.surface,
                 position: "absolute",
+                opacity,
+                transform: [{ scale }],
             },
-            animatedStyle,
             positionStyle,
         ],
     };
@@ -438,7 +424,7 @@ const Menu: React.FC<IMenuProps> = ({
     }, [visible, isVisible, isControlled]);
     const [anchorMeasurements, setAnchorMeasurements] = useState<IMenuAnchorMeasurements | undefined>(undefined);
     // Get position calculation from custom hook
-    const { fullScreen, menuPosition, animatedStyle } = useMenuPosition({
+    const { fullScreen, menuPosition, animatedStyle,screenWidth,screenHeight } = useMenuPosition({
         menuWidth: menuLayout?.width || 0,
         menuHeight: menuLayout?.height || 0,
         dynamicHeight,
@@ -454,6 +440,11 @@ const Menu: React.FC<IMenuProps> = ({
         anchorMeasurements,
         preferedPositionAxis,
     });
+    useEffect(()=>{
+        measureAnchor(anchorRef, (measures) => {
+            setAnchorMeasurements(measures);
+        });
+    },[screenWidth,screenHeight]);
     // Handle menu layout changes
     const onMenuLayout = (event: LayoutChangeEvent) => {
         const { width, height } = event.nativeEvent.layout;

@@ -4,9 +4,8 @@ import { IExpandableProps } from "@components/Expandable";
 import { IViewProps } from "@components/View";
 import { IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
-import { LayoutRectangle, PressableProps, ScrollViewProps, ViewProps } from "react-native";
+import { PressableProps, ScrollViewProps, ViewProps,Animated} from "react-native";
 import { PressableStateCallbackType } from "react-native";
-import { AnimatedProps } from "react-native-reanimated";
 
 /**
  * Represents the possible positions where the menu can be displayed
@@ -539,7 +538,7 @@ export interface IUseMenuPositionProps {
  *     );
  * };
  */
-export type IMenuProps<MenuItemContext = any> = Omit<AnimatedProps<ViewProps>, "children"> & Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> & {
+export type IMenuProps<MenuItemContext = any> = Omit<Animated.AnimatedProps<ViewProps>, "children"> & Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> & {
     /***
      * Default false
      * if true, the menu will be the same width as the anchor element

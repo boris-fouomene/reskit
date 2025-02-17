@@ -397,12 +397,29 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         return this.momentLocales;
     }
     /***
-     * get a moment locale
+     * get a registered moment locale
      * @param {string} locale
      * @returns {LocaleSpecification}
      */
     static getMomentLocale(locale: string): LocaleSpecification {
         return this.momentLocales[locale];
+    }
+    /***
+     * set a moment locale. the locale is picked from the momentLocales list
+     * @param {string} locale
+     * @returns {boolean}
+     */
+    static setMomentLocale(locale: string) {
+        const momentLocale = this.getMomentLocale(locale);
+        if (isObj(momentLocale)) {
+            try {
+                moment.locale(locale, momentLocale);
+                return true;
+            } catch (error) {
+                console.error(error, " setting moment locale : ", locale);
+            }
+        }
+        return false;
     }
     /**
      * Registers translations into the I18n manager.
@@ -551,11 +568,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
             return;
         }
         this._isLoading = true;
-        try {
-            moment.locale(locale, I18n.getMomentLocale(locale));
-        } catch (error) {
-            console.error(error, " setting moment locale : ", locale);
-        }
+        I18n.setMomentLocale(locale);
         this.trigger("namespaces-before-load", locale);
         this.loadNamespaces(locale).then((translations) => {
             if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {

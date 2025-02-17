@@ -1,9 +1,6 @@
-import { Component, forwardRef, useMemo, useRef, useState } from 'react';
+import { forwardRef, useMemo, useRef } from 'react';
 import {
     Animated,
-    GestureResponderEvent,
-    LayoutChangeEvent,
-    LayoutRectangle,
     Pressable,
     StyleSheet,
     View,
@@ -15,6 +12,7 @@ import Theme, { useTheme } from '@theme/index';
 import Platform from "@platform";
 import useStateCallback from '@utils/stateCallback';
 
+const useNativeDriver = Platform.canUseNativeDriver();
 const version = parseInt(String(Platform.Version));
 const isAndroid = Platform.isAndroid() && (typeof version == "number" ? version >= 21 : true); //ANDROID_VERSION_LOLLIPOP;
 
@@ -150,7 +148,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
         (rippleAniRef).current = Animated.timing(animatedRippleScaleRef.current, {
             duration: rippleDuration,
             toValue: 1,
-            useNativeDriver: true,
+            useNativeDriver,
         });
 
         // enlarge the shadow, if enabled
@@ -169,7 +167,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
             Animated.timing(animatedOpacityRef.current, {
                 duration: maskDuration,
                 toValue: 0,
-                useNativeDriver: true,
+                useNativeDriver,
             }).start();
             pendingRippleAni.current = undefined;
         };

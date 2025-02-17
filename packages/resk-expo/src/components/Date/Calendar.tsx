@@ -1,5 +1,5 @@
 import React, { isValidElement, useEffect, useMemo, useRef, useState } from "react";
-import { View, StyleSheet, GestureResponderEvent, Animated, PanResponder } from "react-native";
+import { View, StyleSheet, GestureResponderEvent, Animated, PanResponder, TouchableOpacity } from "react-native";
 import moment, { Moment } from "moment";
 import { defaultStr, I18n, IMomentFormat, isEmpty } from "@resk/core";
 import { ICalendarBaseProps, ICalendarDate, ICalendarDay, ICalendarDayProps, ICalendarDisplayView, ICalendarHour, ICalendarMonth, ICalendarMonthProps, ICalendarYear, ICalendarYearProps } from "./types";
@@ -158,7 +158,7 @@ export default class Calendar {
             header: <>
                 {isValidElement(header) ? header : null}
                 <View testID={testID + "-header-title"} style={Styles.dayViewHeader}>
-                    <Button compact tooltip={`${i18n.t("dates.today")}: ${toDayStr}`}
+                    <Button uppercase={false} compact tooltip={`${i18n.t("dates.today")}: ${toDayStr}`}
                         disabled={!isValidSelection(moment().toDate())}
                         onPress={() => {
                             setState({
@@ -167,7 +167,7 @@ export default class Calendar {
                             });
                         }}
                     >
-                        {toDayStr}
+                        {`${toDayStr}`}
                     </Button>
                     {defaultValueStr ? <Button compact tooltip={`${i18n.t("dates.selectedDate")}: ${defaultValueStr}`}
                         right={<Icon.Font name="material-clear" size={20} color={theme.colors.error}
@@ -412,9 +412,8 @@ export default class Calendar {
                     color && { color },
                     backgroundColor && { backgroundColor },
                     borderColor && { borderColor, borderWidth: 1 },
-                    , { width: size, height: size, marginHorizontal: margin, marginVertical: margin },
-
-                    , style,
+                    { width: size, height: size, marginHorizontal: margin, marginVertical: margin },
+                    style,
                 ]}
             >
                 <Label textBold={isDefaultValue} color={color} disabled={disabled} testID={testID + "-label"}>

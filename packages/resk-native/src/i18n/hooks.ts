@@ -1,5 +1,6 @@
+"use client";
 import { useEffect, useMemo, useState } from "react";
-import { I18n, isNonNullString } from "@resk/core";
+import { I18n, isNonNullString,Platform } from "@resk/core";
 import { getLocales } from "react-native-localize";
 import { IUseI18nOptions } from "@src/types";
 
@@ -43,7 +44,7 @@ import { IUseI18nOptions } from "@src/types";
  * It also handles locale changes dynamically, ensuring that the application reflects the correct language and regional settings.
  */
 export const useI18n = (i18n?: I18n, options?: IUseI18nOptions): I18n => {
-    const expoLocales = getLocales();
+    const expoLocales = Platform.isClientSide() ? getLocales() : [];
     const { locale: i18nLocale, useLocaleFromDevice } = Object.assign({}, options);
     const instance = useMemo(() => {
         return i18n instanceof I18n ? i18n : I18n.getInstance();

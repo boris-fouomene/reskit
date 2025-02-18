@@ -16,18 +16,17 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    //"jsx": "preserve",
     "incremental": true,
+    "jsx": "react-jsx", // Set the JSX code generation
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@ccomponents/*": ["./src/clients/components/*"],
-      "@client/*": ["./src/client/*"],
-      "@scomponents/*": ["./src/server/components/*"],
-      "@server/*": ["./src/server/*"]
+      "@ui/*": ["./app/ui/*"],
+      "@lib/*": ["./app/lib/*"],
     }
   },
   "include": [

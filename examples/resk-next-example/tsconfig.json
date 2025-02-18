@@ -16,17 +16,20 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    //"jsx": "preserve",
+    "jsx": "preserve",
     "incremental": true,
-    "jsx": "react-jsx", // Set the JSX code generation
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@ui/*": ["./app/ui/*"],
-      "@lib/*": ["./app/lib/*"],
+      "@ui/*": [
+        "./app/ui/*"
+      ],
+      "@lib/*": [
+        "./app/lib/*"
+      ]
     }
   },
   "include": [

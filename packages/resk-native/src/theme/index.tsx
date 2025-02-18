@@ -37,7 +37,7 @@ export * from "./types";
  */
 
 export const getMaterial3Theme = (fallbackSourceColor?: string) => {
-    const { light, dark } = _createMaterial3Theme(fallbackSourceColor as string);
+    const { light, dark } = _createMaterial3Theme(defaultStr(fallbackSourceColor, "#007AFF"));
     return {
         light: { colors: prepareMaterial3Theme(light, false), dark: false },
         dark: { colors: prepareMaterial3Theme(dark, true), dark: true },

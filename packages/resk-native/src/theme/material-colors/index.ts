@@ -53,7 +53,7 @@ function generateMissingFields(scheme: IThemeColorsTokens, palettes: Palettes, c
     const customColors = {
         surfaceDisabled: color(scheme.onSurface).alpha(opacity.level2).rgb().string(),
         onSurfaceDisabled: color(scheme.onSurface).alpha(opacity.level4).rgb().string(),
-        backdrop: colorScheme == "dark" ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.3)",
+        backdrop: colorScheme == "dark" ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.5)",
         surfaceContainer: color(palettes.neutral.tone(colorScheme === 'dark' ? 12 : 94)).hex(),
         surfaceContainerLow: color(palettes.neutral.tone(colorScheme === 'dark' ? 10 : 96)).hex(),
         surfaceContainerLowest: color(palettes.neutral.tone(colorScheme === 'dark' ? 4 : 100)).hex(),

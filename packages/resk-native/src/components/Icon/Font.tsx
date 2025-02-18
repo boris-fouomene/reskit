@@ -17,6 +17,7 @@ import Platform from "@platform/index";
 import { isRTL } from "@utils/i18nManager";
 import { getTouchableProps } from "@utils/hasTouchHandler";
 import { TouchableOpacity } from "react-native";
+import { IconProps } from "react-native-vector-icons/Icon";
 const isIos = Platform.isIos();
 
 
@@ -67,12 +68,13 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
         console.warn(`Icon not defined for FontIcon component, icon [${name}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
+    const Component : React.FC<IconProps & {ref:any}> = IconSet as unknown as React.FC<IconProps>;
     if (pressableProps) {
         for (let i in pressableProps) {
             delete props[i as keyof typeof props];
         }
         return <TouchableOpacity disabled={disabled} {...pressableProps}>
-            <IconSet
+            <Component
                 disabled={disabled}
                 {...props}
                 size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
@@ -83,7 +85,7 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
             />
         </TouchableOpacity>
     }
-    return <IconSet
+    return <Component
         {...props}
         disabled={disabled}
         size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}

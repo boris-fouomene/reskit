@@ -73,10 +73,10 @@
       "@resk/core": [
         "../resk-core/build"
       ],
-      /*"react-native": [
+      "react-native": [
         "../../examples/resk-expo-docs/node_modules/react-native",
       ],
-      "react-native-vector-icons/*": [
+      /*"react-native-vector-icons/*": [
         "../../examples/resk-next-example/node_modules/react-native-vector-icons/*",
       ],
       "react-native-vector-icons": [

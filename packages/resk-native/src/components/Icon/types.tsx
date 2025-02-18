@@ -1,5 +1,4 @@
-import MaterialCommunityGlypmap from "react-native-vector-icons/dist/glyphmaps/MaterialCommunityIcons.json";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialCommunity from "react-native-vector-icons/dist/glyphmaps/MaterialCommunityIcons.json";
 import FontAwesome6 from "react-native-vector-icons/glyphmaps/FontAwesome6Free.json";
 import AntDesign from "react-native-vector-icons/glyphmaps/AntDesign.json";
 import Foundation from "react-native-vector-icons/glyphmaps/Foundation.json";
@@ -14,6 +13,7 @@ import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip";
 import { ITheme } from "@theme/types";
 import { ITouchableRippleProps } from "@components/TouchableRipple/types";
 import { ISurfaceProps } from "@components/Surface";
+import { IconProps } from "react-native-vector-icons/Icon";
 
 /**
  * Represents the valid names of icons from the FontAwesome6 icon set.
@@ -114,7 +114,7 @@ export type IFontIconOcticonsName = `octicons-${keyof typeof Octicons}`;
  * const iconName: IFontIconMaterialCommunityName = "home"; // Valid
  * const iconName: IFontIconMaterialCommunityName = "invalid-icon"; // TypeScript error
  */
-export type IFontIconMaterialCommunityName = keyof typeof MaterialCommunityGlypmap;
+export type IFontIconMaterialCommunityName = keyof typeof MaterialCommunity;
 
 
 /**
@@ -165,7 +165,7 @@ export type IFontIconMaterialCommunityName = keyof typeof MaterialCommunityGlypm
 * <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
-export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityIcons>, 'name' | 'style' | 'size'> & {
+export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size'> & {
     /**
      * The style object for the icon.
      * 

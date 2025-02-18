@@ -182,7 +182,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
     positionFixed: false,
   }
   autoplay: any;// Autoplay timer reference
-  children = (() => React.Children.toArray(this.props.children))()// Array of children passed to the swiper;
+  children = (() => React.Children.toArray(this.props.children as any))()// Array of children passed to the swiper;
   count = (() => this.children.length)();
   _panResponder?: PanResponderInstance; // PanResponder instance for handling gestures
   _animatedValueX: number = 0; // Current animated value for X axis
@@ -327,7 +327,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
    * @param {any} nextContext - The next context passed to the swiper component.
    */
   UNSAFE_componentWillReceiveProps(nextProps: Readonly<ISwiperProps>, nextContext: any): void {
-    this.children = (() => React.Children.toArray(nextProps.children))();
+    this.children = (() => React.Children.toArray(nextProps.children as any))();
     this.count = (() => this.children.length)();
     if (typeof nextProps.activeIndex == 'number' && nextProps.activeIndex !== this.state.activeIndex) {
       this.setState({ activeIndex: nextProps.activeIndex }, () => {

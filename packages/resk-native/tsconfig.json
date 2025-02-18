@@ -73,9 +73,15 @@
       "@resk/core": [
         "../resk-core/build"
       ],
-      "@shopify/flash-list": [
-        "../../examples/resk-expo-docs/node_modules/@shopify/flash-list"
-      ]
+      /*"react-native": [
+        "../../examples/resk-expo-docs/node_modules/react-native",
+      ],
+      "react-native-vector-icons/*": [
+        "../../examples/resk-next-example/node_modules/react-native-vector-icons/*",
+      ],
+      "react-native-vector-icons": [
+        "../../examples/resk-next-example/node_modules/react-native-vector-icons",
+      ],*/
     }
   },
   "include": [

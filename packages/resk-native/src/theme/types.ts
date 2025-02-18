@@ -1,4 +1,3 @@
-import { Material3Scheme } from "@pchmn/expo-material3-theme";
 import { IBreakpointName } from "@breakpoints/types";
 
 
@@ -103,7 +102,67 @@ import { IBreakpointName } from "@breakpoints/types";
  * };
  * ```
  */
-export interface IThemeColorsTokens extends Material3Scheme {
+export interface IThemeColorsTokens {
+  primary: string;
+  onPrimary: string;
+  primaryContainer: string;
+  onPrimaryContainer: string;
+
+  secondary: string;
+  onSecondary: string;
+  secondaryContainer: string;
+  onSecondaryContainer: string;
+
+  tertiary: string;
+  onTertiary: string;
+  tertiaryContainer: string;
+  onTertiaryContainer: string;
+
+  background: string;
+  onBackground: string;
+
+  surface: string;
+  onSurface: string;
+  surfaceVariant: string;
+  onSurfaceVariant: string;
+
+  outline: string;
+  outlineVariant: string;
+
+  inverseSurface: string;
+  inverseOnSurface: string;
+  inversePrimary: string;
+
+
+  error: string;
+  onError: string;
+  errorContainer: string;
+  onErrorContainer: string;
+
+  shadow: string;
+  scrim: string;
+  surfaceDisabled: string;
+  onSurfaceDisabled: string;
+  backdrop: string;
+
+  surfaceContainer: string;
+  surfaceContainerLow: string;
+  surfaceContainerLowest: string;
+  surfaceContainerHigh: string;
+  surfaceContainerHighest: string;
+  surfaceBright: string;
+  surfaceDim: string;
+  surfaceTint: string;
+
+  elevation?: {
+    level0: string;
+    level1: string;
+    level2: string;
+    level3: string;
+    level4: string;
+    level5: string;
+  };
+
   statusBar?: string;
   /*** colors of text and icons elements */
   text?: string;

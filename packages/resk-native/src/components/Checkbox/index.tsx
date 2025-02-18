@@ -1,4 +1,4 @@
-import { TouchableOpacity, Pressable, StyleSheet, Image, GestureResponderEvent } from "react-native";
+import { TouchableOpacity, StyleSheet, GestureResponderEvent } from "react-native";
 import { ICheckboxProps } from "./types";
 import { Tooltip } from "@components/Tooltip";
 import Label from "@components/Label";
@@ -52,7 +52,6 @@ export * from "./types";
  *   );
  * };
  *
- * @see [Expo Checkbox Documentation](https://docs.expo.dev/versions/latest/sdk/checkbox/) 
  * for more information on the underlying RNCheckbox component.
  */
 export const Checkbox = ({ testID, size, checkedIcon, uncheckedColor, uncheckedIcon, iconProps, style, ...props }: ICheckboxProps) => {

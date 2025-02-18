@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, createContext, useContext, useRef } from "react";
 import { useStableMemo } from "@utils";
 import Platform from "@platform";
-import { StyleSheet, ViewProps,Animated, Pressable, GestureResponderEvent, PressableProps, Easing } from "react-native";
+import { StyleSheet, ViewProps, Animated, Pressable, GestureResponderEvent, PressableProps, Easing } from "react-native";
 import { IViewProps } from "@components/View";
 import { useTheme } from "@theme";
 import { Portal } from "@components/Portal";
@@ -12,7 +12,7 @@ const useNativeDriver = Platform.canUseNativeDriver()
 
 import { useDimensions } from "@dimensions";
 
-export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+export const AnimatedPressable: React.FC<any> = Animated.createAnimatedComponent(Pressable);
 
 export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: customMaxHeight, contentContainerProps, animationDuration, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: backgroundOpacityP, contentProps, ...props }: IModalProps) => {
   backgroundOpacityP = typeof backgroundOpacityP === "number" ? backgroundOpacityP : 0.5;
@@ -93,7 +93,7 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
         {...contentContainerProps}
         style={[
           styles.content, styles.absoluteFill,
-          modalStyle as any, 
+          modalStyle as any,
           props.style,
           styles.notHidden,
           contentContainerProps.style,
@@ -214,12 +214,12 @@ export interface IModalProps extends Animated.AnimatedProps<ViewProps> {
    * Indicates whether the modal is currently visible.
  * If set to true, the modal will be displayed; otherwise, it will be hidden. */
   visible?: boolean;
-  
+
   /**
    * The duration of the animation in milliseconds.
    */
   animationDuration?: number;
-  
+
   /**
    *  Determines if the modal should be responsive. 
   * When set to true, the modal will occupy the full screen in mobile or tablets environments 

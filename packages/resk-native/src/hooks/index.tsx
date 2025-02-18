@@ -2,8 +2,8 @@ import { IReactComponent } from "@src/types";
 import { IAppBarProps } from "@components/AppBar";
 import { IWithHOCOptions, withHOC } from "./withHOC";
 import AppBarLayout from "@layouts/AppBarLayout";
-import { IReskExpoContextCallback } from "@src/context/types";
-import { useReskExpo } from "@src/context/hooks";
+import { IReskNativeContextCallback } from "@src/context/types";
+import { useReskNative } from "@src/context/hooks";
 
 
 
@@ -83,11 +83,11 @@ import { useReskExpo } from "@src/context/hooks";
  * @returns {React.FC<T>} A new React component that renders the AppBar 
  * and the wrapped component.
  */
-export function withAppBar<T extends object, TState extends object = any>(Component: IReactComponent<T, TState>, appBarProps?: IAppBarProps | IReskExpoContextCallback<IAppBarProps>, options?: IWithHOCOptions) {
+export function withAppBar<T extends object, TState extends object = any>(Component: IReactComponent<T, TState>, appBarProps?: IAppBarProps | IReskNativeContextCallback<IAppBarProps>, options?: IWithHOCOptions) {
     options = options || {};
     options.displayName = options.displayName || Component?.displayName || "RN_WithAppBarComponent";
     return withHOC<T>(function (props: T) {
-        const reskExpoContext = useReskExpo();
+        const reskExpoContext = useReskNative();
         const _appBarProps = Object.assign({}, (typeof appBarProps === "function" ? appBarProps(reskExpoContext) : appBarProps)) as IAppBarProps;
         return <>
             <AppBarLayout {..._appBarProps} />

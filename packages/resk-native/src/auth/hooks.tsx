@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   },
 })
 
-Login.displayName = "ReskExpoAuthLogin";
+Login.displayName = "ReskNativeAuthLogin";
 
 /**
  * Container component that conditionally renders its children based on the user's authentication status.
@@ -271,6 +271,6 @@ const Container: React.FC<{ children: JSX.Element }> = ({ children }: { children
   return user ? children : <Login />;
 }
 
-Container.displayName = "ReskExpoAuthContainer";
+Container.displayName = "ReskNativeAuthContainer";
 
 export default { Login, Container, AuthContext };

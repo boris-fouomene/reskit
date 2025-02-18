@@ -22,7 +22,7 @@ import FontIcon from '@components/Icon/Font';
 import IconButton from '@components/Icon/Button';
 import ExpandableAppBarAction from './ExpandableAction';
 import AppBarAction from './Action';
-import { useReskExpo } from '@src/context/hooks';
+import { useReskNative } from '@src/context/hooks';
 
 
 /**
@@ -127,8 +127,8 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
       />;
     }
   });
-  const sInsets = useReskExpo().safeAreaInsets;
-  const insets =  Object.assign({},sInsets);;
+  const sInsets = useReskNative().safeAreaInsets;
+  const insets = Object.assign({}, sInsets);;
   const top = typeof insets.top == "number" ? insets.top : 0;
   const left = typeof insets.left == "number" ? insets.left : 0;
   const right = typeof insets.right == "number" ? insets.right : 0;

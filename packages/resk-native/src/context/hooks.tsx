@@ -1,15 +1,15 @@
 import React, { useContext } from "react";
-import { IReskExpoContext } from "./types";
+import { IReskNativeContext } from "./types";
 /**
- * @group ReskExpoProvider
- * Creates a context for the ReskExpoProvider.
+ * @group ReskNativeProvider
+ * Creates a context for the ReskNativeProvider.
  * This context will hold the current theme and the method to update it.
  * 
- * @type {React.Context<IReskExpoContext>} 
+ * @type {React.Context<IReskNativeContext>} 
  * 
  * **Example**:
  * ```tsx
- * const contextValue: IReskExpoContext = {
+ * const contextValue: IReskNativeContext = {
  *   theme: {
  *     primaryColor: '#6200ee',
  *     secondaryColor: '#03dac6',
@@ -17,24 +17,24 @@ import { IReskExpoContext } from "./types";
  *   updateTheme: (newTheme) => { },
  * };
  * 
- * <ReskExpoContext.Provider value={contextValue}>
+ * <ReskNativeContext.Provider value={contextValue}>
  *   <YourComponent />
- * </ReskExpoContext.Provider>
+ * </ReskNativeContext.Provider>
  * ```
  */
-export const ReskExpoContext = React.createContext<IReskExpoContext>({} as IReskExpoContext);
+export const ReskNativeContext = React.createContext<IReskNativeContext>({} as IReskNativeContext);
 
 /**
- * @group ReskExpoProvider
- * Custom hook to access the ReskExpoProvider context.
+ * @group ReskNativeProvider
+ * Custom hook to access the ReskNativeProvider context.
  * This hook allows components to consume the context value easily.
  * 
- * @returns {IReskExpoContext} The current context value, which includes the theme and updateTheme method.
+ * @returns {IReskNativeContext} The current context value, which includes the theme and updateTheme method.
  * 
  * **Example**:
  * ```tsx
  * const YourComponent: React.FC = () => {
- *   const { theme, updateTheme } = useReskExpo();
+ *   const { theme, updateTheme } = useReskNative();
  * 
  *   return (
  *     <div style={{ backgroundColor: theme.primaryColor }}>
@@ -47,7 +47,7 @@ export const ReskExpoContext = React.createContext<IReskExpoContext>({} as IResk
  * };
  * ```
  */
-export const useReskExpo = () => {
-    return useContext(ReskExpoContext);
+export const useReskNative = () => {
+    return useContext(ReskNativeContext);
 };
 

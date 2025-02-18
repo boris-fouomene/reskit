@@ -1,31 +1,32 @@
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import Fontisto from "@expo/vector-icons/Fontisto";
-import Foundation from "@expo/vector-icons/Foundation";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import Octicons from "@expo/vector-icons/Octicons";
-import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import Zocial from "@expo/vector-icons/Zocial";
+import MaterialCommunityGlypmap from "react-native-vector-icons/dist/glyphmaps/MaterialCommunityIcons.json";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome6 from "react-native-vector-icons/glyphmaps/FontAwesome6Free.json";
+import AntDesign from "react-native-vector-icons/glyphmaps/AntDesign.json";
+import Foundation from "react-native-vector-icons/glyphmaps/Foundation.json";
+import Ionicons from "react-native-vector-icons/glyphmaps/Ionicons.json";
+import MaterialIcons from "react-native-vector-icons/glyphmaps/MaterialIcons.json";
+import Octicons from "react-native-vector-icons/glyphmaps/Octicons.json";
+import Feather from "react-native-vector-icons/glyphmaps/Feather.json";
+
 import { IReactComponent, IStyle, ITouchableEvents } from "../../types";
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip";
 import { ITheme } from "@theme/types";
 import { ITouchableRippleProps } from "@components/TouchableRipple/types";
 import { ISurfaceProps } from "@components/Surface";
+
 /**
- * Represents the valid names of icons from the FontAwesome5 icon set.
+ * Represents the valid names of icons from the FontAwesome6 icon set.
  * 
- * This type is derived from the glyph map of the FontAwesome5 icon set,
+ * This type is derived from the glyph map of the FontAwesome6 icon set,
  * allowing developers to use autocomplete features in TypeScript for
  * icon names, ensuring that only valid names are used.
  * 
  * @example
- * const iconName: IFontAwesome5Name = "home"; // Valid
- * const iconName: IFontAwesome5Name = "invalid-icon"; // TypeScript error
+ * const iconName: IFontIconAwesome6Name = "home"; // Valid
+ * const iconName: IFontIconAwesome6Name = "invalid-icon"; // TypeScript error
  */
-export type IFontAwesome5Name = keyof typeof FontAwesome5.glyphMap;
+export type IFontIconAwesome6Name = keyof typeof FontAwesome6;
 
 /**
  * Represents the valid names of icons from the AntDesign icon set.
@@ -38,19 +39,19 @@ export type IFontAwesome5Name = keyof typeof FontAwesome5.glyphMap;
  * const iconName: IFontAntDesignName = "antd-home"; // Valid
  * const iconName: IFontAntDesignName = "invalid-icon"; // TypeScript error
  */
-export type IFontAntDesignName = `antd-${keyof typeof AntDesign.glyphMap | 'book'}`;
+export type IFontAntDesignName = `antd-${keyof typeof AntDesign}`;
 
 /**
- * Represents the valid names of icons from the Fontisto icon set.
+ * Represents the valid names of icons from the Feather icon set.
  * 
- * This type is constructed from the Fontisto glyph map, allowing for
- * type-safe usage of icon names in the Fontisto library.
+ * This type is constructed from the Feather glyph map, allowing for
+ * type-safe usage of icon names in the Feather library.
  * 
  * @example
- * const iconName: IFontFontistoName = "fontisto-home"; // Valid
- * const iconName: IFontFontistoName = "invalid-icon"; // TypeScript error
+ * const iconName: IFontIconFeatherName = "feather-home"; // Valid
+ * const iconName: IFontIconFeatherName = "invalid-icon"; // TypeScript error
  */
-export type IFontFontistoName = `fontisto-${keyof typeof Fontisto.glyphMap}`;
+export type IFontIconFeatherName = `feather-${keyof typeof Feather}`;
 
 /**
  * Represents the valid names of icons from the Ionicons icon set.
@@ -59,10 +60,10 @@ export type IFontFontistoName = `fontisto-${keyof typeof Fontisto.glyphMap}`;
  * only valid icon names are used throughout the application.
  * 
  * @example
- * const iconName: IFontIoniconsName = "ionic-home"; // Valid
- * const iconName: IFontIoniconsName = "invalid-icon"; // TypeScript error
+ * const iconName: IFontIconIoniconsName = "ionic-home"; // Valid
+ * const iconName: IFontIconIoniconsName = "invalid-icon"; // TypeScript error
  */
-export type IFontIoniconsName = `ionic-${keyof typeof Ionicons.glyphMap}`;
+export type IFontIconIoniconsName = `ionic-${keyof typeof Ionicons}`;
 
 /**
  * Represents the valid names of icons from the Material Icons set.
@@ -72,10 +73,10 @@ export type IFontIoniconsName = `ionic-${keyof typeof Ionicons.glyphMap}`;
  * Material Icons glyph map.
  * 
  * @example
- * const iconName: IFontMaterialIconsName = "material-home"; // Valid
- * const iconName: IFontMaterialIconsName = "invalid-icon"; // TypeScript error
+ * const iconName: IFontIconMaterialName = "material-home"; // Valid
+ * const iconName: IFontIconMaterialName = "invalid-icon"; // TypeScript error
  */
-export type IFontMaterialIconsName = `material-${keyof typeof MaterialIcons.glyphMap}`;
+export type IFontIconMaterialName = `material-${keyof typeof MaterialIcons}`;
 
 /**
  * @interface IFontFoundationIconsName
@@ -89,7 +90,7 @@ export type IFontMaterialIconsName = `material-${keyof typeof MaterialIcons.glyp
  * const iconName: IFontFoundationIconsName = "foundation-home"; // Valid
  * const iconName: IFontFoundationIconsName = "invalid-icon"; // TypeScript error
  */
-export type IFontFoundationIconsName = `foundation-${keyof typeof Foundation.glyphMap}`;
+export type IFontFoundationIconsName = `foundation-${keyof typeof Foundation}`;
 
 /**
  * Represents the valid names of icons from the Octicons icon set.
@@ -98,34 +99,10 @@ export type IFontFoundationIconsName = `foundation-${keyof typeof Foundation.gly
  * application, promoting type safety and reducing runtime errors.
  * 
  * @example
- * const iconName: IFontOcticonsName = "octicons-home"; // Valid
- * const iconName: IFontOcticonsName = "invalid-icon"; // TypeScript error
+ * const iconName: IFontIconOcticonsName = "octicons-home"; // Valid
+ * const iconName: IFontIconOcticonsName = "invalid-icon"; // TypeScript error
  */
-export type IFontOcticonsName = `octicons-${keyof typeof Octicons.glyphMap}`;
-
-/**
- * Represents the valid names of icons from the Simple Line Icons set.
- * 
- * This type provides a way to use Simple Line Icons with type safety, 
- * ensuring that only valid icon names are referenced in your code.
- * 
- * @example
- * const iconName: IFontSimpleLineIconsName = "simple-line-home"; // Valid
- * const iconName: IFontSimpleLineIconsName = "invalid-icon"; // TypeScript error
- */
-export type IFontSimpleLineIconsName = `simple-line-${keyof typeof SimpleLineIcons.glyphMap}`;
-
-/**
- * Represents the valid names of icons from the Zocial icon set.
- * 
- * This type allows developers to use Zocial icons in a type-safe manner,
- * ensuring that only valid icon names are used throughout the application.
- * 
- * @example
- * const iconName: IFontZocialName = "zocial-home"; // Valid
- * const iconName: IFontZocialName = "invalid-icon"; // TypeScript error
- */
-export type IFontZocialName = `zocial-${keyof typeof Zocial.glyphMap}`;
+export type IFontIconOcticonsName = `octicons-${keyof typeof Octicons}`;
 
 /**
  * Represents the valid names of icons from the Material Community Icons set.
@@ -134,10 +111,10 @@ export type IFontZocialName = `zocial-${keyof typeof Zocial.glyphMap}`;
  * ensuring that only valid icon names are referenced in your code.
  * 
  * @example
- * const iconName: IFontMaterialCommunityIconsName = "home"; // Valid
- * const iconName: IFontMaterialCommunityIconsName = "invalid-icon"; // TypeScript error
+ * const iconName: IFontIconMaterialCommunityName = "home"; // Valid
+ * const iconName: IFontIconMaterialCommunityName = "invalid-icon"; // TypeScript error
  */
-export type IFontMaterialCommunityIconsName = keyof typeof MaterialCommunityIcons.glyphMap;
+export type IFontIconMaterialCommunityName = keyof typeof MaterialCommunityGlypmap;
 
 
 /**
@@ -160,9 +137,9 @@ export type IFontMaterialCommunityIconsName = keyof typeof MaterialCommunityIcon
  * const customStyle: IStyle = { color: 'red', margin: 10 };
  * <FontIcon name="home" style={customStyle} />;
  *
- * @property {IFontMaterialCommunityIconsName | IFontAntDesignName | IFontFontistoName | 
-*           IFontIoniconsName | IFontOcticonsName | IFontSimpleLineIconsName | 
-*           IFontZocialName | IFontMaterialIconsName | IFontMaterialCommunityIconsName | 
+ * @property {IFontIconMaterialCommunityName | IFontAntDesignName | IFontIconFeatherName | 
+*           IFontIconIoniconsName | IFontIconOcticonsName | IFontSimpleLineIconsName | 
+*           IFontZocialName | IFontIconMaterialName | IFontIconMaterialCommunityName | 
 *           IFontFoundationIconsName} name - The name of the icon to display.
 * 
 *
@@ -216,9 +193,8 @@ export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityI
      * const nameAnt: IFontIconProps['name'] = "antd-home"; // From AntDesign
      * <FontIcon name={name} />;
      */
-    name: IFontMaterialCommunityIconsName | IFontAntDesignName | IFontFontistoName
-    | IFontIoniconsName | IFontOcticonsName | IFontSimpleLineIconsName |
-    IFontZocialName | IFontMaterialIconsName | IFontMaterialCommunityIconsName | IFontFoundationIconsName;
+    name: IFontIconMaterialCommunityName | IFontAntDesignName | IFontIconFeatherName
+    | IFontIconIoniconsName | IFontIconOcticonsName | IFontIconMaterialName | IFontIconMaterialCommunityName | IFontFoundationIconsName;
 
     /**
      * The icon size.
@@ -248,14 +224,12 @@ export type IFontIconProps = Omit<React.ComponentProps<typeof MaterialCommunityI
  * // Example usage of the IPrefixToFontIconsSetNames interface
  * const iconSetMapping: IPrefixToFontIconsSetNames = {
  *   material: "MaterialCommunityIcons",
- *   fa: "FontAwesome5",
+ *   fa: "FontAwesome6",
  *   antd: "AntDesign",
  *   foundation: "Foundation",
- *   fontisto: "Fontisto",
+ *   feather: "Feather",
  *   ionic: "Ionicons",
  *   octicons: "Octicons",
- *   "simple-line": "SimpleLineIcons",
- *   zocial: "Zocial",
  * };
  */
 export interface IPrefixToFontIconsSetNames {
@@ -275,7 +249,7 @@ export interface IPrefixToFontIconsSetNames {
      * 5 set. For example, an icon name like "fa-home" indicates it belongs to
      * the Font Awesome set.
      */
-    fa: "FontAwesome5";
+    fa: "FontAwesome6";
 
     /**
      * The prefix for Ant Design Icons.
@@ -296,13 +270,13 @@ export interface IPrefixToFontIconsSetNames {
     foundation: "Foundation";
 
     /**
-     * The prefix for Fontisto Icons.
+     * The prefix for Feather Icons.
      * 
-     * This prefix is used in icon names to identify icons from the Fontisto
-     * set. For example, an icon name like "fontisto-home" indicates it belongs
-     * to the Fontisto set.
+     * This prefix is used in icon names to identify icons from the Feather
+     * set. For example, an icon name like "feather-home" indicates it belongs
+     * to the Feather set.
      */
-    fontisto: "Fontisto";
+    feather: "Feather";
 
     /**
      * The prefix for Ionicons.
@@ -321,24 +295,6 @@ export interface IPrefixToFontIconsSetNames {
      * to the Octicons set.
      */
     octicons: "Octicons";
-
-    /**
-     * The prefix for Simple Line Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Simple Line
-     * Icons set. For example, an icon name like "simple-line-home" indicates it
-     * belongs to the Simple Line Icons set.
-     */
-    "simple-line": "SimpleLineIcons";
-
-    /**
-     * The prefix for Zocial Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Zocial set.
-     * For example, an icon name like "zocial-home" indicates it belongs to the
-     * Zocial set.
-     */
-    zocial: "Zocial";
 
     /**
      * The prefix for Material Community Icons.
@@ -362,14 +318,12 @@ export interface IPrefixToFontIconsSetNames {
  * // Example usage of the IFontIconsSetNamesToPrefix interface
  * const iconSetMapping: IFontIconsSetNamesToPrefix = {
  *   MaterialIcons: "material",
- *   FontAwesome5: "fa",
+ *   FontAwesome6: "fa",
  *   AntDesign: "antd",
  *   Foundation: "foundation",
- *   Fontisto: "fontisto",
+ *   Feather: "feather",
  *   Ionicons: "ionic",
  *   Octicons: "octicons",
- *   SimpleLineIcons: "simple-line",
- *   Zocial: "zocial",
  * };
  */
 export interface IFontIconsSetNamesToPrefix {
@@ -389,7 +343,7 @@ export interface IFontIconsSetNamesToPrefix {
      * 5 set. For example, an icon name like "fa-home" indicates it belongs to
      * the Font Awesome set.
      */
-    FontAwesome5: "fa";
+    FontAwesome6: "fa";
 
     /**
      * The prefix for Ant Design Icons.
@@ -410,13 +364,13 @@ export interface IFontIconsSetNamesToPrefix {
     Foundation: "foundation";
 
     /**
-     * The prefix for Fontisto Icons.
+     * The prefix for Feather Icons.
      * 
-     * This prefix is used in icon names to identify icons from the Fontisto
-     * set. For example, an icon name like "fontisto-home" indicates it belongs
-     * to the Fontisto set.
+     * This prefix is used in icon names to identify icons from the Feather
+     * set. For example, an icon name like "feather-home" indicates it belongs
+     * to the Feather set.
      */
-    Fontisto: "fontisto";
+    Feather: "feather";
 
     /**
      * The prefix for Ionicons.
@@ -435,24 +389,6 @@ export interface IFontIconsSetNamesToPrefix {
      * to the Octicons set.
      */
     Octicons: "octicons";
-
-    /**
-     * The prefix for Simple Line Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Simple Line
-     * Icons set. For example, an icon name like "simple-line-home" indicates it
-     * belongs to the Simple Line Icons set.
-     */
-    "SimpleLineIcons": "simple-line";
-
-    /**
-     * The prefix for Zocial Icons.
-     * 
-     * This prefix is used in icon names to identify icons from the Zocial set.
-     * For example, an icon name like "zocial-home" indicates it belongs to the
-     * Zocial set.
-     */
-    Zocial: "zocial";
 }
 
 
@@ -517,7 +453,7 @@ export type IIconSource = IIconSourceBase | JSX.Element | ((props: IIconProps & 
  * This type allows flexibility in using icons within your application by supporting:
  * 
  * 1. **Predefined Icon Names**: You can use names from different icon libraries such as 
- *    MaterialCommunityIcons, AntDesign, Fontisto, Ionicons, Octicons, SimpleLineIcons, 
+ *    MaterialCommunityIcons, AntDesign, Feather, Ionicons, Octicons, SimpleLineIcons, 
  *    Zocial, MaterialIcons, and FoundationIcons.
  *
  * 2. **Custom Image Sources**: You can also provide an image source using the standard
@@ -575,7 +511,7 @@ export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Image
     /****
      * the name of the icon to display (including the prefix for icon set if necessary).
      * It accepts a variety of icon names from different icon libraries such as 
-     * MaterialCommunityIcons, AntDesign, Fontisto, Ionicons, Octicons, SimpleLineIcons, 
+     * MaterialCommunityIcons, AntDesign, Feather, Ionicons, Octicons, SimpleLineIcons, 
      * Zocial, MaterialIcons, and FoundationIcons.
      */
     iconName?: IFontIconProps["name"];

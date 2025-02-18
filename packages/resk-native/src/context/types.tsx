@@ -6,18 +6,18 @@ import { IUseI18nOptions } from "@src/types";
 import { IAuthProviderProps } from "@auth/types";
 
 /**
- * @group ReskExpoProvider
- * @interface IReskExpoProviderProps
- * Type definition for the props of the ReskExpoProvider component.
+ * @group ReskNativeProvider
+ * @interface IReskNativeProviderProps
+ * Type definition for the props of the ReskNativeProvider component.
  * This type includes the properties that can be passed to the provider.
  * 
  * @property {React.ReactNode} [children] - The child elements to be rendered within the provider.
  * 
  * **Example**:
  * ```tsx
- * <ReskExpoProvider>
+ * <ReskNativeProvider>
  *   <YourComponent />
- * </ReskExpoProvider>
+ * </ReskNativeProvider>
  * ```
  * 
  * @property {ITheme} [theme] - An optional theme object that defines the styling for the provider.
@@ -29,15 +29,15 @@ import { IAuthProviderProps } from "@auth/types";
  *   secondaryColor: '#03dac6',
  * };
  * 
- * <ReskExpoProvider theme={customTheme}>
+ * <ReskNativeProvider theme={customTheme}>
  *   <YourComponent />
- * </ReskExpoProvider>
+ * </ReskNativeProvider>
  * ```
  *  @property {IBreakpoints} [breakpoints] - An optional breakpoints object that defines the application breakpoints.
  * 
  *  @property {IDrawerNavigationViewProps} [drawerNavigationViewProps] - An optional object that defines the properties for the drawer navigation view.
  */
-export type IReskExpoProviderProps = {
+export type IReskNativeProviderProps = {
     children?: React.ReactNode;
     theme?: ITheme;
     breakpoints?: IBreakpoints;
@@ -52,24 +52,24 @@ export type IReskExpoProviderProps = {
      * An optional property that defines the props for the AuthProvider component.
      * @example
      * ```tsx
-     * <ReskExpoProvider auth={{ Login: MyLoginComponent }}>
+     * <ReskNativeProvider auth={{ Login: MyLoginComponent }}>
      *     <MyApp />
-     * </ReskExpoProvider>
+     * </ReskNativeProvider>
      */
     auth?: Partial<IAuthProviderProps>;
 }
 
 /**
- * @group ReskExpoProvider
- * @interface IReskExpoContext
- * Type definition for the ReskExpoProvider interface (the provider itself).
- * This type extends the IReskExpoProviderProps type and adds additional properties and methods.
+ * @group ReskNativeProvider
+ * @interface IReskNativeContext
+ * Type definition for the ReskNativeProvider interface (the provider itself).
+ * This type extends the IReskNativeProviderProps type and adds additional properties and methods.
  * 
  * @property {ITheme} theme - The theme object that is required for the provider.
  * 
  * **Example**:
  * ```tsx
- * const providerProps: IReskExpoContext = {
+ * const providerProps: IReskNativeContext = {
  *   theme: {
  *     primaryColor: '#ff5722',
  *     secondaryColor: '#ffc107',
@@ -92,14 +92,14 @@ export type IReskExpoProviderProps = {
  * });
  * ```
  */
-export interface IReskExpoContext extends Omit<IReskExpoProviderProps, "type"> {
+export interface IReskNativeContext extends Omit<IReskNativeProviderProps, "type"> {
     theme: ITheme;
     updateTheme: (theme: ITheme) => any;
 
     /***
      * SafeAreaInsets
      */
-    safeAreaInsets ?: {
+    safeAreaInsets?: {
         top: number;
         bottom: number;
         left: number;
@@ -114,22 +114,22 @@ export interface IReskExpoContext extends Omit<IReskExpoProviderProps, "type"> {
 
 
 /**
- * @group ReskExpoContext
- * @typedef IReskExpoContextCallback
+ * @group ReskNativeContext
+ * @typedef IReskNativeContextCallback
  * 
- * A callback type that takes an `IReskExpoContext` as an argument and returns a value of type `ReturnType`.
- * This type is designed for functions that need to interact with the context provided by the `ReskExpoProvider`.
+ * A callback type that takes an `IReskNativeContext` as an argument and returns a value of type `ReturnType`.
+ * This type is designed for functions that need to interact with the context provided by the `ReskNativeProvider`.
  * 
  * @template ReturnType - The type of the value returned by the callback. Defaults to `any` if not specified.
  * 
- * @param {IReskExpoContext} reskExpoContext - The context object provided by the `ReskExpoProvider`.
+ * @param {IReskNativeContext} reskExpoContext - The context object provided by the `ReskNativeProvider`.
  * This object contains essential properties and methods that can be utilized within the callback, such as theme settings, safe area insets, and internationalization (i18n) functionalities.
  * 
  * @returns {ReturnType} The value returned by the callback function, which can be of any type specified by `ReturnType`.
  * 
  * @example
- * // Example of a callback function that utilizes the IReskExpoContext
- * const myCallback: IReskExpoContextCallback<number> = (context) => {
+ * // Example of a callback function that utilizes the IReskNativeContext
+ * const myCallback: IReskNativeContextCallback<number> = (context) => {
  *   // Accessing the safe area insets from the context
  *   const insets = context.safeAreaInsets;
  *   // Calculating a value based on the insets and returning it
@@ -137,8 +137,8 @@ export interface IReskExpoContext extends Omit<IReskExpoProviderProps, "type"> {
  * };
  * 
  * // Example of using the callback in a function
- * const executeCallback = (callback: IReskExpoContextCallback<number>) => {
- *   const context: IReskExpoContext = {
+ * const executeCallback = (callback: IReskNativeContextCallback<number>) => {
+ *   const context: IReskNativeContext = {
  *     theme: { primaryColor: '#6200ee', secondaryColor: '#03dac6' },
  *     updateTheme: (newTheme) => {  },
  *     safeAreaInsets: { top: 20, bottom: 20, left: 0, right: 0 },
@@ -151,6 +151,6 @@ export interface IReskExpoContext extends Omit<IReskExpoProviderProps, "type"> {
  * // Invoking the function with the callback
  * executeCallback(myCallback);
  * 
- * @note This type is particularly useful in scenarios where you need to pass the context to various components or functions that require access to the `ReskExpoProvider` context, allowing for flexible and type-safe interactions.
+ * @note This type is particularly useful in scenarios where you need to pass the context to various components or functions that require access to the `ReskNativeProvider` context, allowing for flexible and type-safe interactions.
  */
-export type IReskExpoContextCallback<ReturnType = any> = ((reskExpoContext: IReskExpoContext) => ReturnType);
+export type IReskNativeContextCallback<ReturnType = any> = ((reskExpoContext: IReskNativeContext) => ReturnType);

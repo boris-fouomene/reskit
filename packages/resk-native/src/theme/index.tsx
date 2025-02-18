@@ -1,14 +1,14 @@
 import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorsTokens, IThemeFontSizes, IThemeSpaces, IThemeBorderRadius } from "./types";
 import Colors from "./colors";
 import { defaultStr, extendObj, IDict, IObservable, isNonNullString, isObj, isObservable, observable } from "@resk/core";
+import { createMaterial3Theme as _createMaterial3Theme } from "./material-colors";
 import { Session } from "@resk/core";
 import Color from "color";
 import updateNative from "./updateNative";
 import styles from "./styles";
-import { useReskExpo } from "@src/context/hooks";
+import { useReskNative } from "@src/context/hooks";
 import Elevations from "./Elevations";
 import { useColorScheme } from "react-native";
-import { useMaterial3Theme, isDynamicThemeSupported, getMaterial3Theme as _getMaterial3Theme, createMaterial3Theme as _createMaterial3Theme } from '@pchmn/expo-material3-theme';
 import { IBreakpointName } from "@breakpoints/types";
 import Breakpoints from "@breakpoints/index";
 export * from "./utils";
@@ -26,7 +26,7 @@ export * from "./types";
  * @returns {Object} An object containing:
  * - `light`: An object representing the light theme with color properties.
  * - `dark`: An object representing the dark theme with color properties.
- * - `isSupported`: A boolean indicating whether dynamic theme support is available.
+ * 
  * 
  * @example
  * ```ts
@@ -37,12 +37,10 @@ export * from "./types";
  */
 
 export const getMaterial3Theme = (fallbackSourceColor?: string) => {
-    const { light, dark } = _getMaterial3Theme(fallbackSourceColor);
-    const isSupported = isDynamicThemeSupported.valueOf();
+    const { light, dark } = _createMaterial3Theme(fallbackSourceColor as string);
     return {
         light: { colors: prepareMaterial3Theme(light, false), dark: false },
         dark: { colors: prepareMaterial3Theme(dark, true), dark: true },
-        isSupported,
     }
 }
 
@@ -53,33 +51,27 @@ export const getMaterial3Theme = (fallbackSourceColor?: string) => {
  * 
  * The method creates a Material 3 theme based on the given source color and then creates
  * a theme object with light and dark variants. The theme object also includes a boolean
- * property `isSupported` to indicate if the current platform supports dynamic theme
  * changes.
  * 
  * @param {string} sourceColor - The source color for theme generation.
  * 
  * @returns {Object} - An object containing light and dark themes with color properties and
- * a boolean property `isSupported` to indicate if dynamic theme support is available.
  * @returns {ITheme} returns.light - The light theme with color properties.
  * @returns {ITheme} returns.dark - The dark theme with color properties.
- * @returns {boolean} returns.isSupported - Whether dynamic theme support is available.
  * 
  * @example
  * const themes = createMaterial3Theme("#6200EE");
  * console.log(themes.light.colors.primary); // Outputs the primary color for the light theme
  * console.log(themes.dark.colors.primary); // Outputs the primary color for the dark theme
  */
-export const createMaterial3Theme = (sourceColor: string): { light: ITheme, dark: ITheme, isSupported: boolean } => {
+export const createMaterial3Theme = (sourceColor: string): { light: ITheme, dark: ITheme } => {
     const { light, dark } = _createMaterial3Theme(sourceColor);
-    const isSupported = isDynamicThemeSupported.valueOf();
     return {
         light: { colors: prepareMaterial3Theme(light, false), dark: false },
         dark: { colors: prepareMaterial3Theme(dark, true), dark: true },
-        isSupported,
     }
 }
 const prepareMaterial3Theme = (colors: IThemeColorsTokens, dark: boolean): IThemeColorsTokens => {
-    const isSupported = isDynamicThemeSupported.valueOf();
     if (Colors.isValid(colors?.background) && colors?.background === colors?.surface) {
         colors.background = (dark ? Colors.lighten : Colors.darken)(colors.background, 0.4) as string;
     }
@@ -513,7 +505,6 @@ export const triggerThemeUpdate = (theme: ITheme): void => {
  * If the theme includes a `statusBar` color, it uses that color to set the background and adjusts the 
  * status bar's style (light or dark) based on the lightness of the color.
  * 
- * @see https://docs.expo.dev/versions/latest/sdk/status-bar/#statusbarstyle
  * 
  * @returns {animated?:boolean, backgroundColor?:string, style?:"light" | "dark"} - The status bar properties including the style and background color.
  * 
@@ -708,11 +699,11 @@ export { default as Colors } from "./colors";
 
 
 /**
- * @group ReskExpoProvider
+ * @group ReskNativeProvider
  * @function useTheme
  * `useTheme` is a custom hook that provides the current theme used in the application.
  * 
- * It fetches the theme from the `ReskExpoProvider` context. If no theme is provided 
+ * It fetches the theme from the `ReskNativeProvider` context. If no theme is provided 
  * via the provider, it defaults to the base theme imported from `@theme`.
  * 
  * @returns {ITheme} The current theme object. If no theme is set in the context, it returns the default theme.
@@ -739,45 +730,12 @@ export { default as Colors } from "./colors";
  * the application.
  */
 export const useTheme = (): IThemeManager => {
-    const { theme } = useReskExpo();
+    const { theme } = useReskNative();
     /**
-     * Returns the current theme from `ReskExpoProvider` context.
+     * Returns the current theme from `ReskNativeProvider` context.
      * If no theme is found, it returns the default `Theme` from `@theme`.
      */
     return (theme || Theme) as IThemeManager;
 };
-/**
- * Retrieves the default theme based on the Material Design 3 theme and current color scheme.
- * 
- * This hook utilizes the Material Design 3 theme system to obtain the default theme.
- * It considers the dynamic theme support and the current platform's color scheme
- * to determine the dark mode setting.
- * 
- * @param {Object} [params] - Optional parameters to customize the theme.
- * @param {string} [params.fallbackSourceColor] - The fallback source color for the theme.
- * @param {string} [params.sourceColor] - The primary source color for the theme.
- * 
- * @returns {Object} - An object containing the default theme, whether dynamic theme support is available, and the current color scheme.
- * @returns {ITheme} returns.theme - The default theme object.
- * @returns {boolean} returns.isSupported - Whether dynamic theme support is available for the current platform.
- * @returns {string} returns.colorScheme - The current color scheme (dark or light).
- * @returns {ITheme | null} - The default theme object or null if not supported.
- * 
- * @example
- * 
- * ```tsx
- * const defaultTheme = useGetDefaultTheme();
- * console.log(defaultTheme?.dark); // Outputs true or false based on the current color scheme
- * ```
- */
-export const useGetMaterial3Theme = (params?: { fallbackSourceColor?: string; sourceColor?: string; }) => {
-    const { theme: cTheme } = useMaterial3Theme(params);
-    const colorScheme = useColorScheme();
-    const isSupported = isDynamicThemeSupported.valueOf();
-    const colors = (colorScheme ? (cTheme as any)[colorScheme] ?? {} : {}) as IThemeColorsTokens;
-    const theme = { colors } as ITheme;
-    theme.dark = colorScheme === 'dark';
-    theme.colors = prepareMaterial3Theme(theme.colors, !!theme.dark);
-    return { theme: theme, isSupported, colorScheme };
-}
 
+export * from "./material-colors";

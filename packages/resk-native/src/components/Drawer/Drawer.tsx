@@ -18,7 +18,7 @@ import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProvider
 import { DrawerContext } from "./hooks";
 import { dimentionAddListener } from "@dimensions";
 import { IDimensions } from "@dimensions/types";
-import { useReskExpo } from "@src/context/hooks";
+import { useReskNative } from "@src/context/hooks";
 import { I18n } from "@resk/core";
 
 const MIN_SWIPE_DISTANCE = 3;
@@ -1060,7 +1060,7 @@ const styles = StyleSheet.create({
 
 export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
   const theme = useTheme();
-  const { i18n } = useReskExpo();
+  const { i18n } = useReskNative();
   const locale = i18n.getLocale();
   const children = useMemo(() => {
     return drawer.isProvider() ? drawer.renderProviderChildren() : drawer.renderNavigationView();

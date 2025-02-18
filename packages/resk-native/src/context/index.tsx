@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react';
 import { ITheme } from '@theme/types';
 import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
-import {SafeAreaView} from "react-native";
+import { SafeAreaView } from "react-native";
 import useStateCallback from '@utils/stateCallback';
 import { isObj } from '@resk/core';
 import stableHash from "stable-hash";
-import { IReskExpoProviderProps } from './types';
-import { ReskExpoContext } from './hooks';
+import { IReskNativeProviderProps } from './types';
+import { ReskNativeContext } from './hooks';
 import { PortalProvider } from "@components/Portal";
 import Breakpoints from "@src/breakpoints";
 import { Preloader, Dialog } from "@components/Dialog";
@@ -20,22 +20,22 @@ export * from "./types";
 export * from "./hooks";
 
 /**
- * @group ReskExpoProvider
- * `ReskExpoProvider` is a context provider that manages the application's theme state,
+ * @group ReskNativeProvider
+ * `ReskNativeProvider` is a context provider that manages the application's theme state,
  * allowing dynamic theme updates and handling custom theme integration.
  *
  * It merges the default theme with any custom theme passed through props and makes it
  * available to all child components through React's Context API. The provider also handles
  * theme changes via the `useEffect` hook to ensure the theme is updated when the custom theme changes.
  *
- * @param {IReskExpoProviderProps} props - The properties passed to the provider.
+ * @param {IReskNativeProviderProps} props - The properties passed to the provider.
  * @param {React.ReactNode} [props.children] - The components that will be wrapped by the provider.
  * @param {ITheme} [props.theme] - A custom theme to override or extend the default theme.
  * @param {any} rest - Additional properties passed to the provider for customization.
  * 
  * @example
  * ```tsx
- * import { ReskExpoProvider } from './ReskExpoProvider';
+ * import { ReskNativeProvider } from './ReskNativeProvider';
  * 
  * const customTheme = {
  *   colors: { primary: '#123456', secondary: '#654321' },
@@ -44,14 +44,14 @@ export * from "./hooks";
  * 
  * function App() {
  *   return (
- *     <ReskExpoProvider theme={customTheme}>
+ *     <ReskNativeProvider theme={customTheme}>
  *       <MyComponent />
- *     </ReskExpoProvider>
+ *     </ReskNativeProvider>
  *   );
  * }
  * ```
  */
-export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskExpoProviderProps) {
+export function ReskNativeProvider({ children, theme: customTheme, auth, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskNativeProviderProps) {
   i18nOptions = Object.assign({}, i18nOptions);
   const i18n = useI18n(undefined, i18nOptions);
   auth = Object.assign({}, auth);
@@ -70,7 +70,7 @@ export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoin
    * @param {ITheme} theme - The new theme object that will replace the current theme.
    * @example
    * ```tsx
-   * const { updateTheme } = useReskExpoProvider();
+   * const { updateTheme } = useReskNativeProvider();
    * 
    * updateTheme({
    *   colors: { primary: '#FF5733', secondary: '#333' },
@@ -83,9 +83,6 @@ export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoin
       triggerThemeUpdate(t as ITheme);
     });
   }
-  useEffect(() => {
-    FontIcon.loadFonts();
-  }, []);
   /**
    * `useEffect` is used to detect changes in the custom theme prop and apply updates accordingly.
    * It compares the current custom theme with the previous one and updates the theme if necessary.
@@ -110,12 +107,12 @@ export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoin
   }, [breakpoints]);
   /**
    * Provides the current theme and the `updateTheme` function to all child components
-   * through the `ReskExpoContext`.
+   * through the `ReskNativeContext`.
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
     <SafeAreaView testID="resk-native-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
-      <ReskExpoContext.Provider value={{ theme, i18n, updateTheme, ...rest, breakpoints }}>
+      <ReskNativeContext.Provider value={{ theme, i18n, updateTheme, ...rest, breakpoints }}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
             <Notify.Component
@@ -132,7 +129,7 @@ export function ReskExpoProvider({ children, theme: customTheme, auth, breakpoin
             </Drawer>
           </Default.AuthContext.Provider>
         </PortalProvider>
-      </ReskExpoContext.Provider>
+      </ReskNativeContext.Provider>
     </SafeAreaView>
   );
 }

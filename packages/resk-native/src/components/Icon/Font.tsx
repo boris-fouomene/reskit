@@ -1,15 +1,15 @@
 import React, { forwardRef } from "react";
-import { isNonNullString, defaultStr, isObj } from "@resk/core";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import Fontisto from "@expo/vector-icons/Fontisto";
-import Foundation from "@expo/vector-icons/Foundation";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import Octicons from "@expo/vector-icons/Octicons";
-import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
-import Zocial from "@expo/vector-icons/Zocial";
+import { isNonNullString, defaultStr } from "@resk/core";
+
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import Foundation from "react-native-vector-icons/Foundation";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Octicons from "react-native-vector-icons/Octicons";
+import Feather from "react-native-vector-icons/Feather";
+
 import { useTheme } from "@theme";
 import Colors from "@colors";
 import { IFontIconProps, IPrefixToFontIconsSetNames } from "./types";
@@ -26,18 +26,16 @@ const isIos = Platform.isIos();
  * 
  * Icon sets are selected by prefixing the icon name with a specific key for each icon set. 
  * 
- * @see https://icons.expo.fyi/ for all supported icons
- * @see https://docs.expo.dev/guides/icons for application icons
+ * @see https://oblador.github.io/react-native-vector-icons/ for all supported icons
+ * @see https://www.npmjs.com/package/react-native-vector-icons for application icons
  * 
  * The following prefixes should be used to specify the icon set:
- *  - `fa` for FontAwesome5
+ *  - `fa` for FontAwesome6
  *  - `antd` for AntDesign
- *  - `fontisto` for Fontisto
+ *  - `feather` for Feather
  *  - `foundation` for Foundation
  *  - `ionic` for Ionicons
  *  - `octicons` for Octicons
- *  - `simple-line` for SimpleLineIcons
- *  - `zocial` for Zocial
  *  - `material` for MaterialIcons (default)
  * 
  * By default, the icon color is based on the app's theme text color.
@@ -50,7 +48,7 @@ const isIos = Platform.isIos();
  *   return (
  *     <>
  *       <FontIcon name="camera" />  // Defaults to MaterialCommunityIcons
- *       <FontIcon name="fa-camera" />  // Uses FontAwesome5 icon set
+ *       <FontIcon name="fa-camera" />  // Uses FontAwesome6 icon set
  *     </>
  *   );
  * }
@@ -66,7 +64,7 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
     color = Colors.isValid(color) ? color : theme.colors.text;
     let { iconSetName, iconSetPrefix, iconSet: IconSet, iconName } = getFontIconSet(name);
     if (!iconSetName || !IconSet || !iconName) {
-        console.warn(`Icon not defined for FontIcon component, icon [${name}], please specify a supported icon from https://github.com/expo/vector-icons/MaterialCommunityIcons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
+        console.warn(`Icon not defined for FontIcon component, icon [${name}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
     if (pressableProps) {
@@ -78,7 +76,7 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
                 disabled={disabled}
                 {...props}
                 size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
-                ref={ref}
+                ref={ref as any}
                 color={color}
                 name={iconName}
                 style={[theme.styles.RTL, style]}
@@ -89,7 +87,7 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
         {...props}
         disabled={disabled}
         size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
-        ref={ref}
+        ref={ref as any}
         color={color}
         name={iconName}
         style={[theme.styles.RTL, style]}
@@ -157,7 +155,7 @@ const getFontIconSet = (name: string): { iconSetName: string, iconSetPrefix: str
                 const iconSetName = PREFIX_TO_ICONS_SET_NAMES[iconSetPrefix as keyof IPrefixToFontIconsSetNames];
                 const iconName = nameString.trim().ltrim(iconPrefix).trim().ltrim("-").trim();
                 const iconSet = fontsObjects[iconSetName];
-                if (iconSet && iconSet.glyphMap[iconName]) {
+                if (iconSet) {
                     return {
                         iconSetName,
                         iconSetPrefix,
@@ -250,51 +248,45 @@ const isFontIconName = (name: string, iconSetName: string): boolean => {
  * 
  * This type is a union of the following icon sets:
  * - MaterialCommunityIcons
- * - FontAwesome5
+ * - FontAwesome6
  * - AntDesign
- * - Fontisto
+ * - Feather
  * - Foundation
  * - Ionicons
  * - Octicons
- * - SimpleLineIcons
- * - Zocial
  * - MaterialIcons
  */
-export type IFontIconSet = typeof MaterialCommunityIcons | typeof FontAwesome5 | typeof AntDesign | typeof Fontisto | typeof Foundation | typeof Ionicons | typeof Octicons | typeof SimpleLineIcons | typeof Zocial | typeof MaterialIcons;
+export type IFontIconSet = typeof MaterialCommunityIcons | typeof FontAwesome6 | typeof AntDesign | typeof Feather | typeof Foundation | typeof Ionicons | typeof Octicons | typeof MaterialIcons;
 
 
 /**
  * Represents the set of possible icon font names that can be used in the application.
  * 
- * @typedef {("MaterialCommunityIcons" | "FontAwesome5" | "AntDesign" | "Fontisto" | "Foundation" | "Ionicons" | "Octicons" | "SimpleLineIcons" | "Zocial" | "MaterialIcons")} IFontIconSetName
+ * @typedef {("MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "Feather" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons")} IFontIconSetName
  * 
  * @property {"MaterialCommunityIcons"} MaterialCommunityIcons - Icon set from Material Community Icons.
- * @property {"FontAwesome5"} FontAwesome5 - Icon set from Font Awesome 5.
+ * @property {"FontAwesome6"} FontAwesome6 - Icon set from Font Awesome 5.
  * @property {"AntDesign"} AntDesign - Icon set from Ant Design.
- * @property {"Fontisto"} Fontisto - Icon set from Fontisto.
+ * @property {"Feather"} Feather - Icon set from Feather.
  * @property {"Foundation"} Foundation - Icon set from Foundation.
  * @property {"Ionicons"} Ionicons - Icon set from Ionicons.
  * @property {"Octicons"} Octicons - Icon set from Octicons.
- * @property {"SimpleLineIcons"} SimpleLineIcons - Icon set from Simple Line Icons.
- * @property {"Zocial"} Zocial - Icon set from Zocial.
  * @property {"MaterialIcons"} MaterialIcons - Icon set from Material Icons.
  */
-export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome5" | "AntDesign" | "Fontisto" | "Foundation" | "Ionicons" | "Octicons" | "SimpleLineIcons" | "Zocial" | "MaterialIcons";
+export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "Feather" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons";
 
 /**
  * Represents an object containing various icon font types.
  * 
  * @typedef {Object} IFontIconSets
  * @property {typeof MaterialCommunityIcons} MaterialCommunityIcons - The MaterialCommunityIcons font type.
- * @property {typeof FontAwesome5} FontAwesome5 - The FontAwesome5 font type.
+ * @property {typeof FontAwesome6} FontAwesome6 - The FontAwesome6 font type.
  * @property {typeof AntDesign} AntDesign - The AntDesign font type.
- * @property {typeof Fontisto} Fontisto - The Fontisto font type.
+ * @property {typeof Feather} Feather - The Feather font type.
  * @property {typeof Foundation} Foundation - The Foundation font type.
  * @property {typeof Ionicons} Ionicons - The Ionicons font type.
  * @property {typeof MaterialIcons} MaterialIcons - The MaterialIcons font type.
  * @property {typeof Octicons} Octicons - The Octicons font type.
- * @property {typeof SimpleLineIcons} SimpleLineIcons - The SimpleLineIcons font type.
- * @property {typeof Zocial} Zocial - The Zocial font type.
  */
 export type IFontIconSets = Record<IFontIconSetName, IFontIconSet>;
 
@@ -303,102 +295,38 @@ export type IFontIconSets = Record<IFontIconSetName, IFontIconSet>;
  * 
  * @type {IFontIconSets}
  * @property {typeof MaterialCommunityIcons} MaterialCommunityIcons - The Material Community Icons library.
- * @property {typeof FontAwesome5} FontAwesome5 - The FontAwesome 5 Icons library.
+ * @property {typeof FontAwesome6} FontAwesome6 - The FontAwesome 5 Icons library.
  * @property {typeof AntDesign} AntDesign - The AntDesign Icons library.
- * @property {typeof Fontisto} Fontisto - The Fontisto Icons library.
+ * @property {typeof Feather} Feather - The Feather Icons library.
  * @property {typeof Foundation} Foundation - The Foundation Icons library.
  * @property {typeof Ionicons} Ionicons - The Ionicons library.
  * @property {typeof MaterialIcons} MaterialIcons - The Material Icons library.
  * @property {typeof Octicons} Octicons - The Octicons library.
- * @property {typeof SimpleLineIcons} SimpleLineIcons - The Simple Line Icons library.
- * @property {typeof Zocial} Zocial - The Zocial Icons library.
  */
 const fontsObjects: IFontIconSets = {
     MaterialCommunityIcons,
-    FontAwesome5,
+    FontAwesome6,
     AntDesign,
-    Fontisto,
+    Feather,
     Foundation,
     Ionicons,
     MaterialIcons,
     Octicons,
-    SimpleLineIcons,
-    Zocial,
 }
-
-/** An array of font objects. */
-const fonts = Object.values(fontsObjects).map(f => f.font);
-
-/** An array of font names indexed by their icon set names. */
-const fontsByIndex = Object.keys(fontsObjects);
 
 
 /** An object that maps icon set prefixes to their respective names. */
 const PREFIX_TO_ICONS_SET_NAMES: IPrefixToFontIconsSetNames = {
     material: "MaterialIcons",
-    fa: "FontAwesome5",
+    fa: "FontAwesome6",
     antd: "AntDesign",
     foundation: "Foundation",
-    fontisto: "Fontisto",
+    feather: "Feather",
     ionic: "Ionicons",
     octicons: "Octicons",
-    'simple-line': "SimpleLineIcons",
-    zocial: "Zocial",
     "": "MaterialCommunityIcons"
 }
 
-/**
- * Loads the fonts for the application.
- * 
- * This function is responsible for loading all the font icons defined in the
- * `fonts` array. It returns a promise that resolves when all fonts have been
- * successfully loaded. If any font fails to load, it resolves with an error 
- * message indicating which font could not be found.
- * 
- * @returns {Promise<any[]>} A promise that resolves when all fonts are loaded.
- * 
- * @description The promise resolves with an array of results, each containing
- * the status and message of the font loading process. If all fonts load 
- * successfully, the status will be true for each entry; otherwise, it will be 
- * false for any failed loads.
- * 
- * @example
- * loadFontIcons().then(results => {
- *     results.forEach(result => {
- *         if (!result.status) {
- *             console.error(result.message);
- *         }
- *     });
- * });
- */
-function loadFontIcons(): Promise<any[]> {
-    return Promise.all(fonts.map((font, index) => {
-        const iconSetName = fontsByIndex[index];
-        const fontName = Object.keys(font)[0]?.toLowerCase();
-        const iconSetNameLower = iconSetName.toLocaleLowerCase();
-
-        /**
-         * Checks if the font name is a valid string and if the icon set name
-         * includes "material". If not, it resolves with a message indicating
-         * the font was not found.
-         */
-        if (!isNonNullString(fontName) || (!iconSetNameLower.toLowerCase().includes("material"))) {
-            return Promise.resolve({
-                status: false,
-                message: `Font ${fontName} not found`
-            });
-        }
-
-        // Here you would typically load the font (e.g., using a font loading library)
-        // For example: return loadFont(fontName, iconSetNameLower);
-
-        // Placeholder for successful font loading
-        return Promise.resolve({
-            status: true,
-            message: `Font ${fontName} loaded successfully`
-        });
-    }));
-};
 
 type IFontWithCustomIcons = typeof FontIcon & {
     /**
@@ -420,7 +348,7 @@ type IFontWithCustomIcons = typeof FontIcon & {
      * );
      * 
      * @remarks
-     * - Ensure that the `IFontMaterialCommunityIconsName` interface is correctly defined 
+     * - Ensure that the `IFontIconMaterialCommunityName` interface is correctly defined 
      *   to include both "chevron-left" and "arrow-left" as valid values.
      * - This constant should be used wherever a back navigation button is required 
      *   to maintain consistency across the application.
@@ -574,33 +502,6 @@ type IFontWithCustomIcons = typeof FontIcon & {
      */
     isValidName: (name: string) => boolean;
 
-
-    /**
-     * Loads the fonts for the application.
-     * 
-     * This function is responsible for loading all the font icons defined in the
-     * `fonts` array. It returns a promise that resolves when all fonts have been
-     * successfully loaded. If any font fails to load, it resolves with an error 
-     * message indicating which font could not be found.
-     * 
-     * @returns {Promise<any[]>} A promise that resolves when all fonts are loaded.
-     * 
-     * @description The promise resolves with an array of results, each containing
-     * the status and message of the font loading process. If all fonts load 
-     * successfully, the status will be true for each entry; otherwise, it will be 
-     * false for any failed loads.
-     * 
-     * @example
-     * loadFontIcons().then(results => {
-     *     results.forEach(result => {
-     *         if (!result.status) {
-     *             console.error(result.message);
-     *         }
-     *     });
-     * });
-     */
-    loadFonts: () => Promise<any[]>;
-
     /**
      * Retrieves the font icon set details based on the provided icon name.
      *
@@ -714,7 +615,6 @@ type IFontWithCustomIcons = typeof FontIcon & {
 const FontWithCustomIcons = FontIcon as unknown as IFontWithCustomIcons;
 
 FontWithCustomIcons.isValidName = isValidFontIconName;
-FontWithCustomIcons.loadFonts = loadFontIcons;
 FontWithCustomIcons.getIconSet = getFontIconSet;
 
 /**
@@ -736,7 +636,7 @@ FontWithCustomIcons.getIconSet = getFontIconSet;
  * );
  * 
  * @remarks
- * - Ensure that the `IFontMaterialCommunityIconsName` interface is correctly defined 
+ * - Ensure that the `IFontIconMaterialCommunityName` interface is correctly defined 
  *   to include both "chevron-left" and "arrow-left" as valid values.
  * - This constant should be used wherever a back navigation button is required 
  *   to maintain consistency across the application.

@@ -1,5 +1,5 @@
 import * as SplashScreen from 'expo-splash-screen';
-import { ITheme, Label, ReskExpoProvider, Theme, useDrawer, useI18n, View } from "@resk/native";
+import { ITheme, Label, ReskNativeProvider, Theme, useDrawer, useI18n, View } from "@resk/native";
 import { Slot } from 'expo-router';
 import "../src/i18n/translations";
 import "../src/resources";
@@ -15,7 +15,7 @@ export default function RootLayout() {
         SplashScreen.hideAsync();
         console.log("splaqsh hidden");
     }, [])
-    return (<ReskExpoProvider
+    return (<ReskNativeProvider
         drawerNavigationViewProps={{}}
         theme={{ dark: true, colors: { onPrimary: "black" } } as ITheme}
         auth={{
@@ -29,5 +29,5 @@ export default function RootLayout() {
         }}
     >
         <Slot />
-    </ReskExpoProvider>);
+    </ReskNativeProvider>);
 }

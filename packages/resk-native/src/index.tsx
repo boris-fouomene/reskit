@@ -1,3 +1,4 @@
+"use client";
 export * from "./i18n";
 export * from "./context";
 export * from "./theme";

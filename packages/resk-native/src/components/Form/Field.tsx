@@ -17,7 +17,7 @@ import TextInput from "@components/TextInput";
 import { IKeyboardEventHandlerKey } from "@components/KeyboardEventHandler/keyEvents";
 import { IStyle } from "@src/types";
 import "./types/augmented";
-
+import stableHash from 'stable-hash';
 /**
  * Represents a form field component that can be used within a form.
  * The `Field` class extends `ObservableComponent` and implements the `IFormField` interface,
@@ -122,10 +122,12 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
         } as IFormFieldState;
         this.validate({ value: this.state.value, context: this });
     }
-    UNSAFE_componentWillReceiveProps(nextProps: IField<Type>, nextContext: any): void {
-        this.setState({ wrapperStyle: this.getBreakpointStyle(nextProps) }, () => {
-            if ("defaultValue" in nextProps) {
-                this.validate({ value: nextProps.defaultValue } as IFormFieldValidatorOptions<Type>, true);
+    componentDidUpdate(prevProps: IField<Type>): void {
+        const wrapperStyle = this.getBreakpointStyle(this.props);
+        if(stableHash(wrapperStyle) == stableHash(this.state.wrapperStyle)) return;
+        this.setState({ wrapperStyle: this.getBreakpointStyle(this.props) }, () => {
+            if ("defaultValue" in this.props) {
+                this.validate({ value: this.props.defaultValue } as IFormFieldValidatorOptions<Type>, true);
             } else {
                 this.validate({ value: this.state.value, context: this }, true);
             }
@@ -1210,6 +1212,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
  * @example
  * // Using the FormField decorator to register a custom text field component
  * import {Form} from "@resk/native"
+import stableHash from 'stable-hash';
  * @FormField("text")
  * class MyForm extends Form.Field {
  *     

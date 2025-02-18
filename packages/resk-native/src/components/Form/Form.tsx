@@ -15,6 +15,7 @@ import { IStyle } from "@src/types";
 import { FormContext } from "./context";
 import "./types/augmented";
 import { INotifyMessage, Notify } from "@notify/index";
+import areEquals from '@utils/areEquals';
 
 
 /**
@@ -83,8 +84,10 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             header: this.renderHeader(props),
         };
     }
-    UNSAFE_componentWillReceiveProps(nextProps: Readonly<IFormProps>, nextContext: any): void {
-        this.setState(this.prepareState(nextProps));
+    componentDidUpdate(prevProps: Readonly<IFormProps>){
+        if(!areEquals(this.props.data,prevProps.data) || !areEquals(this.props.fields,prevProps.fields) || this.props.children !== prevProps.children){	
+            this.setState(this.prepareState(this.props));
+        }
     }
     /**
      * Renders the tab items for the form based on the provided options.

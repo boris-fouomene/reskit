@@ -319,18 +319,10 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
     this.state.pan.x.removeAllListeners();
     this.state.pan.y.removeAllListeners();
   }
-  /**
-   * Handles the component update lifecycle event.
-   * 
-   * @method UNSAFE_componentWillReceiveProps
-   * @param {Readonly<ISwiperProps>} nextProps - The next props passed to the swiper component.
-   * @param {any} nextContext - The next context passed to the swiper component.
-   */
-  UNSAFE_componentWillReceiveProps(nextProps: Readonly<ISwiperProps>, nextContext: any): void {
-    this.children = (() => React.Children.toArray(nextProps.children as any))();
-    this.count = (() => this.children.length)();
-    if (typeof nextProps.activeIndex == 'number' && nextProps.activeIndex !== this.state.activeIndex) {
-      this.setState({ activeIndex: nextProps.activeIndex }, () => {
+
+  componentDidUpdate(prevProps: Readonly<ISwiperProps>): void {
+    if (typeof this.props.activeIndex == 'number' && this.props.activeIndex !== this.state.activeIndex) {
+      this.setState({ activeIndex: this.props.activeIndex }, () => {
         this._fixState();
       })
     }
@@ -518,6 +510,8 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
     const height = autoHeight ? this.state.height : !isReady ? WIDTH_HEIGHT : customHeight;
     contentContainerProps = Object.assign({}, contentContainerProps);
     const disabledStyle = disabled && Theme.styles.disabled;
+    this.children = (() => React.Children.toArray(this.props.children as any))();
+    this.count = (() => this.children.length)();
     return (
       <View
         testID={testID}

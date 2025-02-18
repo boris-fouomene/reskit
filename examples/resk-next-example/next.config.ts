@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 import path from "path";
 import fs from "fs";
-import withTM from 'next-transpile-modules';
 import { DefinePlugin } from "webpack";
 
 const nextConfig: NextConfig = {
@@ -10,10 +9,11 @@ const nextConfig: NextConfig = {
   webpack: (config, context) => {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
-      ...getAliasesFromTSConfig(),
+      "react": path.resolve(__dirname, "./node_modules/react"),
+      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
       "react-native$": "react-native-web", // Redirect React Native imports to React Native Web
     };
-    config.module.rules.unshift({
+    config.module.rules.push({
       test: /\.js$/,
       include: /node_modules\/react-native-vector-icons/,
       use: {
@@ -53,9 +53,8 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ["@resk/native", 'react-native-web', "react-native-vector-icons"],
 };
-export default nextConfig;
-//export default withTM(['react-native-web', "react-native-vector-icons", "@resk/native"])(nextConfig);
 
+export default nextConfig;
 
 function getAliasesFromTSConfig() {
   const tsconfigPath = path.resolve(process.cwd(), 'tsconfig.json');

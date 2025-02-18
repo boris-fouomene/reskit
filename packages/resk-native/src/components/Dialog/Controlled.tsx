@@ -86,7 +86,7 @@ export default class DialogControlled extends React.Component<IDialogControlledP
     isClosed() {
         return !this.state.visible;
     }
-    UNSAFE_componentWillReceiveProps(nextProps: Readonly<IDialogControlledProps>, nextContext: any): void {
+    static getDerivedStateFromProps(nextProps: Readonly<IDialogControlledProps>) {
         const nState: IDialogControlledState = {} as IDialogControlledState;
         let hasU = false;
         if (typeof nextProps.visible === 'boolean') {
@@ -100,9 +100,7 @@ export default class DialogControlled extends React.Component<IDialogControlledP
             nState.isProvider = nextProps.isProvider;
             hasU = true;
         }
-        if (hasU) {
-            this.setState(nState);
-        }
+        return hasU ? nState : null;
     }
     /**
      * Checks if the dialog is a preloader.

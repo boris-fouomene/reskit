@@ -1,12 +1,12 @@
 import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownEvent, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
 import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj } from "@resk/core";
 import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import areEquals from "@utils/areEquals";
 import Theme, { useTheme } from "@theme/index";
-import { FlatList, TouchableOpacity } from "react-native";
+import { FlatList, TouchableOpacity, FlatListProps } from 'react-native';
 import TextInput from "@components/TextInput";
 import { Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
@@ -15,7 +15,7 @@ import { StyleSheet } from "react-native";
 import View from "@components/View";
 import { FontIcon } from "@components/Icon";
 import Label from "@components/Label";
-import { IStyle } from "@src/types";
+import { IReactComponent, IStyle } from "@src/types";
 import { useI18n } from "@src/i18n/hooks";
 import { AppBar } from "@components/AppBar";
 import { Divider } from "@components/Divider";
@@ -50,6 +50,12 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             ...this.prepareState(props),
         };
     }
+    /***
+    * the component to use for the list
+    * it's a static property that can be overriden by the user
+    * This is useful for customizing the list component, when needed.
+    */
+    static List : IReactComponent<FlatListProps<IDropdownPreparedItem<any, any>>> = FlatList<IDropdownPreparedItem<any, any>>;
     getHashKey(value: ValueType): string {
         const { getHashKey } = this.props;
         if (typeof getHashKey === "function") {
@@ -266,12 +272,11 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         return <DropdownRenderer<ItemType, ValueType> context={this} />
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps: Readonly<IDropdownProps<ItemType, ValueType>>, nextContext: any): void {
-        const { defaultValue, items } = nextProps;
-        if (this.props.items !== items && !areEquals(this.props.items, items)) {
-            this.setState(this.prepareState(nextProps));
-        } else if (defaultValue !== this.props.defaultValue && !areEquals(this.props.defaultValue, defaultValue)) {
-            this.setState({ ...this.getSelectedValuesAndHashKey(defaultValue, this.state.itemsByHashKey) });
+    componentDidUpdate(prevProps: Readonly<IDropdownProps<ItemType, ValueType>>, nextContext: any): void {
+        if (this.props.items !== prevProps.items && !areEquals(this.props.items, prevProps.items)) {
+            this.setState(this.prepareState(this.props));
+        } else if (prevProps.defaultValue !== this.props.defaultValue && !areEquals(this.props.defaultValue, prevProps.defaultValue)) {
+            this.setState({ ...this.getSelectedValuesAndHashKey(this.props.defaultValue, this.state.itemsByHashKey) });
         }
     }
     getTestID(): string {
@@ -464,7 +469,7 @@ function DropdownMenu() {
             />
         ) : null}
         <DropdownSearch isFullScreen={fullScreen} />
-        <FlatList<IDropdownPreparedItem>
+        <Dropdown.List
             testID={testID + "-dropdown-list"}
             //estimatedItemSize={100}
             {...listProps}

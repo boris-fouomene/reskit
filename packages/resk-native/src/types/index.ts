@@ -1,4 +1,4 @@
-import { IFormatValueResult } from "@resk/core";
+import { IFormatHelperResult } from "@resk/core";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent, PressableProps, TouchableWithoutFeedback, TouchableWithoutFeedbackProps } from "react-native";
 /**
    @interface
@@ -185,7 +185,7 @@ export type IStyle =
  * This type is generic, allowing for flexibility in the types of values
  * and events that can be passed to the handler.
  *
- * @extends {Partial<IFormatValueResult>} This extends the `IFormatValueResult` interface, providing additional properties for formatting and parsing values. This includes properties such as `formatValue`
+ * @extends {Partial<IFormatHelperResult>} This extends the `IFormatHelperResult` interface, providing additional properties for formatting and parsing values. This includes properties such as `formatValue`
  * @template ValueType - The type of the value being changed. Defaults to `any`.
  * @template OnChangeEventType - The type of the event that triggered the change. 
  *                        Defaults to React Native's text input event (`NativeSyntheticEvent<TextInputChangeEventData>) | null`.
@@ -238,14 +238,14 @@ export type IStyle =
  *   console.log('New value:', options.value);
  *   console.log('Event type:', options.event?.target.value);
  * };
- * @see {@link IFormatValueResult} for more information on the `IFormatValueResult` interface.
+ * @see {@link IFormatHelperResult} for more information on the `IFormatHelperResult` interface.
  * @returns {void} - This type does not return any value, as it is typically used 
  *                   as an argument for an event handler function.
  */
 export type IOnChangeOptionsBase<
   OnChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null,
   ValueType = any
-> = Partial<IFormatValueResult> & {
+> = Partial<IFormatHelperResult> & {
   event?: OnChangeEventType;
   value?: ValueType;
   previousValue?: any;

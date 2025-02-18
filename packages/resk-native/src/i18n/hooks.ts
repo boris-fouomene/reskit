@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useMemo, useState } from "react";
 import { I18n, isNonNullString,Platform } from "@resk/core";
 import { getLocales } from "react-native-localize";

@@ -122,7 +122,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: I
  *
  * ### Parameters:
  * - `options`: 
- *   - **Type**: `IFormatValueOptions`
+ *   - **Type**: `IFormatHelperOptions`
  *   - An object containing options for formatting the value. The options may 
  *     include the value to be formatted, the expected type of the value, 
  *     and a custom format specification.
@@ -133,7 +133,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: I
  *
  * ### Example Usage:
  * ```typescript
- * const customFormatter: IFormatValueFunc = (options) => {
+ * const customFormatter: IFormatHelperValueFunc = (options) => {
  *     const { value, format } = options;
  *     if (format === 'money') {
  *         return `$${parseFloat(value).toFixed(2)}`; // Formats value as money
@@ -148,7 +148,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: I
  * console.log(formattedValue); // Outputs: "$1234.57"
  * ```
  */
-export type IFormatValueFunc = ((options: IFormatValueOptions) => string);
+export type IFormatHelperValueFunc = ((options: IFormatHelperOptions) => string);
 
 
 
@@ -169,16 +169,16 @@ export type IFormatValueFunc = ((options: IFormatValueOptions) => string);
  * ### Example Usage:
  * ```typescript
  * // Define a value with a money format
- * const moneyValue: IFormatValueFormat = "money";
+ * const moneyValue: IFormatHelperValueFormat = "money";
  *
  * // Define a custom format
- * const customValue: IFormatValueFormat = "custom";
+ * const customValue: IFormatHelperValueFormat = "custom";
  *
  * // Define a value using ICurrencyFormatterKey
- * const currencyValue: IFormatValueFormat = "formatUSD" | "formatCAD" | "formatEUR" | "formatAED" | "formatAFN" | "formatALL" | "formatAMD" | "formatARS" |;
+ * const currencyValue: IFormatHelperValueFormat = "formatUSD" | "formatCAD" | "formatEUR" | "formatAED" | "formatAFN" | "formatALL" | "formatAMD" | "formatARS" |;
  * ```
  */
-export type IFormatValueFormat = "number" | "money" | "custom" | IFormatValueFunc;
+export type IFormatHelperValueFormat = "number" | "money" | "custom" | IFormatHelperValueFunc;
 
 /**
  * Options for formatting a value into a string representation.
@@ -197,7 +197,7 @@ export type IFormatValueFormat = "number" | "money" | "custom" | IFormatValueFun
  *
  * ### Example Usage:
  * ```typescript
- * const options: IFormatValueOptions = {
+ * const options: IFormatHelperOptions = {
  *   value: 1234.56,
  *   type: "number",
  *   format: "money" // Example format for monetary values
@@ -208,7 +208,7 @@ export type IFormatValueFormat = "number" | "money" | "custom" | IFormatValueFun
  * ```
  * 
  *  * ```typescript
- * const options: IFormatValueOptions = {
+ * const options: IFormatHelperOptions = {
  *   value: 1234.56,
  *   type: "number",
  *   format: "formatUSD" // Example format for monetary values in $USD
@@ -218,22 +218,66 @@ export type IFormatValueFormat = "number" | "money" | "custom" | IFormatValueFun
  * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
  * ```
  */
-export interface IFormatValueOptions {
+export interface IFormatHelperOptions {
   value?: any; // The value to be formatted
   type?: any; // The expected type of the value
-  /**
+   /**
    * This function is used by default to format the parsed or custom value.
+   * In an input field, that function or a string used to format the value displayed in the input field.
+   * ```ts
+   *   format : "moneay", //will format the value to money format
+   *   format : ({value:any,type:ITextInputType,format?:"custom"}) => any; //will format the value to any format
+   * ```
    */
-  format?: IFormatValueFormat; // The format to be applied
+  format?: IFormatHelperValueFormat; // The format to be applied
 
   dateFormat?: IMomentFormat;
+  
+  mask?: IFormatHelperMask;
+  
+  maskOptions ?: {
+    /**
+     * Character to be used on the obfuscated characters. Defaults to `"*"`
+     */
+    obfuscationCharacter?: string;
+    
+    /***
+        Wheether or not the input is focused. Defaults to `false`
+    */
+    focused ?: boolean;
+    
+    
+    /** Whether or not to display the obfuscated value on the `TextInput`. Defaults to false */
+    showObfuscatedValue?: boolean;
+  
+    /** Character to be used as the "fill character" on the default placeholder */
+    placeholderFillCharacter?: string;
+  
+    /** Add next mask characters at the end of the value. Defaults to `false`.
+     *
+     * Example: In a date mask, a input value of `"15/10"` will result:
+     * - When set to false: `"15/10"`
+     * - When set to true: `"15/10/"`
+     */
+    maskAutoComplete?: boolean;
+  }
+
+  /***
+    whether or not the input is focused. Defaults to `false`
+  */
+  inputFocused?:boolean;
 }
 
+export type IFormatHelperMaskArray = Array<string | RegExp | [RegExp]>;
+
+export type IFormatHelperMask = IFormatHelperMaskArray | ((options:IFormatHelperOptions) => IFormatHelperMaskArray);
+
+
 /**
- * @interface IFormatValueResult
+ * @interface IFormatHelperResult
  * Represents the result of a formatted value obtained via the `formatValue` function.
  *
- * This interface extends the `IFormatValueOptions` interface and contains 
+ * This interface extends the `IFormatHelperOptions` interface and contains 
  * properties that provide information about the formatted value, its type, 
  * and the parsed representation.
  *
@@ -261,7 +305,7 @@ export interface IFormatValueOptions {
  *
  * ### Example Usage:
  * ```typescript
- * const result: IFormatValueResult = {
+ * const result: IFormatHelperResult = {
  *   formattedValue: "$1,234.56",
  *   isDecimalType: true,
  *   parsedValue: 1234.56,
@@ -271,11 +315,17 @@ export interface IFormatValueOptions {
  * console.log(result.isDecimalType);   // Outputs: true
  * ```
  */
-export interface IFormatValueResult extends IFormatValueOptions {
+export interface IFormatHelperResult extends IFormatHelperOptions, Partial<IFormatHelperWithMaskResult> {
   formattedValue: string; // The value to be formatted
   isDecimalType: boolean; //if the type linked to the function supports decimal values
   parsedValue: any; //defaults to a number when it is a number
   decimalValue: number; //the decimal value of the formatted value
+}
+
+export interface IFormatHelperWithMaskResult {
+  masked: string;
+  unmasked: string;
+  obfuscated: string;
 }
 /**
  * @type IMomentFormat

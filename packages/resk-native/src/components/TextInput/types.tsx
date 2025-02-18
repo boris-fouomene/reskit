@@ -1,12 +1,11 @@
 import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
-import { IFormatValueResult, IFormatValueFormat } from "@resk/core";
 import { IOnChangeOptions } from "../../types";
 import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextInputProps, TextInput } from "react-native";
 import { ReactNode } from "react";
 import { ILabelProps } from "@components/Label";
 import { IFontIconProps } from "@components/Icon/types";
-import { IField } from "@resk/core";
+import { IFormatHelperOptions, IFormatHelperResult } from "@resk/core";
 
 
 /**
@@ -58,7 +57,7 @@ export type ITextInputType = InputModeOptions | "number" | "password";
  * @interface ITextInputCallbackOptions
  * @description
  * Defines the options for callback functions related to text input fields. like functions used to render left, right component in text input
- * The `ITextInputCallbackOptions` type extends the `IFormatValueResult` 
+ * The `ITextInputCallbackOptions` type extends the `IFormatHelperResult` 
  * type and includes additional properties that provide context about the 
  * state of the text input component. This type is particularly useful for 
  * handling various input scenarios and customizing the behavior of text 
@@ -111,7 +110,7 @@ export type ITextInputType = InputModeOptions | "number" | "password";
  * This type is beneficial for managing complex interactions with text input 
  * components, allowing for a more dynamic and responsive user interface.
  */
-export type ITextInputCallbackOptions = IFormatValueResult & {
+export interface ITextInputCallbackOptions extends IFormatHelperResult{
     textColor: string;
     /**
      * Indicates if the component is isFocused.
@@ -151,7 +150,7 @@ export type ITextInputOnChangeEvent = NativeSyntheticEvent<TextInputChangeEventD
  * specific to text field changes.
  * 
  * @interface ITextInputOnChangeOptions
- * @extends {IFormatValueResult} Represents the result of a formatted value obtained via the `formatValue` function in the @resk/core package.
+ * @extends {IFormatHelperResult} Represents the result of a formatted value obtained via the `formatValue` function in the @resk/core package.
  * @extends {IOnChangeOptions<any, ITextInputOnChangeEvent>}
  * 
  * @example
@@ -262,7 +261,7 @@ export type ITextInputOnChangeOptions = Omit<IOnChangeOptions<ITextInputOnChange
  * input components that enhance user interaction and maintainability 
  * in React Native applications.
  */
-export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> & ILabelOrLeftOrRightProps<ITextInputCallbackOptions> & {
+export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defaultValue'> , ILabelOrLeftOrRightProps<ITextInputCallbackOptions>, Omit<IFormatHelperOptions,"value">  {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 
@@ -350,15 +349,6 @@ export type ITextInputProps = Omit<TextInputProps, 'onChange' | 'defaultValue'> 
      * of the text (e.g., converting to uppercase, converting to number).
      */
     toCase?: (value: any) => any;
-
-    /**
-     * A function or a string used to format the value displayed in the input field.
-     * ```ts
-     *   format : "moneay", //will format the value to money format
-     *   format : ({value:any,type:ITextInputType,format?:"custom"}) => any; //will format the value to any format
-     * ```
-     */
-    format?: IFormatValueFormat;
 
     /**
      * The value considered as null or empty. 

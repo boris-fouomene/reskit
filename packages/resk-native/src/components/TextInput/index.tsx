@@ -2,7 +2,7 @@ import Label from "@components/Label";
 import { isValidElement, mergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputContentSizeChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from "react-native";
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { formatValueToObject, Platform, IDict, isNonNullString, isStringNumber, parseDecimal, isEmpty, defaultStr } from "@resk/core";
+import { FormatHelper, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr } from "@resk/core";
 import _, { compact, isNumber } from "lodash";
 import Theme, { Colors, useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
@@ -14,6 +14,7 @@ import { IStyle } from "@src/types";
 import { IFontIconProps } from "@components/Icon";
 import { TouchableRipple } from "@components/TouchableRipple";
 import Breakpoints from "@breakpoints/index";
+
 
 /**
  * @description
@@ -261,7 +262,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue,mask,maskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -293,6 +294,9 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
         }
     }, [type, cInputMode, isFocused]);
     const emptyValue = cIsEmptyValue || (canValueBeDecimal ? "0" : "");
+    
+    ///mask handling
+    
     const toCase = (value: any): any => {
         if (canValueBeDecimal && isFocused && (value === '.' || value == '.')) {
             value = "0" + value;
@@ -304,7 +308,7 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
         if (value == undefined) value = '';
         if (isStringNumber(String(value))) value += "";
         if (canValueBeDecimal) {
-            return parseDecimal(value);
+            return FormatHelper.parseDecimal(value);
         }
         return value;
     };
@@ -312,9 +316,16 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
         value: toCase(defaultValue),
         event: null,
     } as IDict);
-    const formated = useMemo(() => {
-        return formatValueToObject({ ...inputState, type, value: inputState.value, ...props });
-    }, [inputState.value]);
+    const {formatted:formated,maskArray} = useMemo(() => {
+        maskOptions = Object.assign({},maskOptions);
+        const formatOptions = {...props,maskOptions,...inputState, type, value: inputState.value,inputFocused:isFocused };
+        const r = (typeof mask === 'function' ? mask(formatOptions) : mask);
+        const maskArray = Array.isArray(r) ? r : [];
+        return {
+            formatted : FormatHelper.formatValueToObject({...formatOptions,mask:maskArray}),
+            maskArray
+        };
+    }, [inputState.value,isFocused,maskOptions,mask]);
     const focusedValue = isFocused ? (formated.value == emptyValue ? '' : formated.value) : '';
     useEffect(() => {
         if (defaultValue === inputState.value) return;
@@ -333,9 +344,6 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
     const maxHeight = useMemo(() => {
         return typeof customMaxHeight === "number" ? customMaxHeight : undefined;
     }, [customMaxHeight]);
-    const countLines = (text: string) => {
-        return ((defaultStr(text).match(/\n/g) || []).length); // Count \n
-    }
     const inputDimensionsRef = useRef<IDict>({ width: 0, height: minHeight });
     const { width, height } = inputDimensionsRef.current;
     const affixContent = useMemo(() => {
@@ -355,9 +363,6 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
     }, [focusedValue, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
     const inputValue = isFocused ? focusedValue : formated.formattedValue || emptyValue || "";
-    const numberOfLines = useMemo(() => {
-        return countLines(inputValue);
-    }, [inputValue]);
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
     }, [height, inputValue]);
@@ -435,7 +440,7 @@ export const useTextInput = ({ defaultValue, maxHeight: customMaxHeight, withBac
                 if (typeof onChange == "function") {
                     clearTimeout(debounceTimeoutRef.current);
                     debounceTimeoutRef.current = setTimeout(() => {
-                        onChange({ ...options, ...inputState, isFocused, event, ...formatValueToObject({ ...options, type }) });
+                        onChange({ ...options, ...inputState, isFocused, event, /*...FormatHelper.formatValueToObject({ ...options,mask:maskArray,maskOptions:props.maskOptions, type }) */});
                     }, isNumber(debounceTimeout) && debounceTimeout || 0);
                 }
             }

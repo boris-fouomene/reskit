@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useMemo } from 'react';
 import { ITheme } from '@theme/types';
 import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';

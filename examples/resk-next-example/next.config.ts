@@ -9,7 +9,9 @@ const nextConfig: NextConfig = {
   webpack: (config, context) => {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
+      ...getAliasesFromTSConfig(),
       "react-native$": "react-native-web", // Redirect React Native imports to React Native Web
+      "react-dom$": path.resolve(__dirname, "./node_modules/react-dom"),
     };
     config.module.rules.push({
       test: /\.js$/,
@@ -70,7 +72,7 @@ function getAliasesFromTSConfig() {
     });
     return aliases;
   } catch (e) {
-    console.log(e, " getting aliases");
+    console.log(" gettinng aliases from tsconfig : ",tsconfigPath,e);
   }
   return {};
 }

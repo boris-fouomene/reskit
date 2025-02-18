@@ -23,6 +23,12 @@
         "name": "next"
       }
     ],
+    "paths": {
+      "@ccomponents/*": ["./src/clients/components/*"],
+      "@client/*": ["./src/client/*"],
+      "@scomponents/*": ["./src/server/components/*"],
+      "@server/*": ["./src/server/*"]
+    }
   },
   "include": [
     "next-env.d.ts",

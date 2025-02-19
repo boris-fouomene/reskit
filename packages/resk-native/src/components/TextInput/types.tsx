@@ -176,6 +176,7 @@ export interface ITextInputOnChangeOptions extends Omit<IOnChangeOptions<ITextIn
 }
 
 /**
+ * @interface ITextInputProps
  * Extends the TextInput component properties from react-native.
  *
  * The `ITextInputProps` type is an extension of the `TextInputProps` 
@@ -437,6 +438,11 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
         ```
      */
     mask?: IInputFormatterMask;
+    
+    /***
+        Suffix the label with the mask placeholder, when mask is provided and the variant is not labelEmbeded
+    */
+    suffixLabelWithMaskPlaceholder?: boolean;
 
     /***
      * Additionnal options to pass to the InputFormatter.formatWithMask method, when mask prop is provided to input field

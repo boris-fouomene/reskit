@@ -50,7 +50,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
             </View>
 
             <TextInput label="Text input"
-                mask={(InputFormatter.MASKS as any).DATE_TIME}
+                mask={[[/\d/,"D"],[/\d/,"D"],"/",[/\d/,"M"],[/\d/,"M"],"/",[/\d/,"Y"],[/\d/,"Y"],[/\d/,"Y"],[/\d/,"Y"]]}
             />
             <Form
                 name="my-form"

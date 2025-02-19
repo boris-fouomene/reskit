@@ -262,7 +262,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, mask: customMask,suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -298,7 +298,7 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
 
     const { mask, maskOptions } = useMemo(() => {
         return {
-            maskOptions: Object.assign({}, { placeholderFillCharacter: '_' }, customMaskOptions),
+            maskOptions: Object.assign({}, { placeholder: '_' }, customMaskOptions),
             mask: InputFormatter.isValidMask(customMask) ? customMask : undefined,
         }
     }, [customMask, customMaskOptions]);
@@ -332,33 +332,14 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
     }, [inputState.value, type]);
     const focusedValue = isFocused ? (formatted.value == emptyValue ? '' : formatted.value) : '';
     useEffect(() => {
-        if (valCase.value === inputState.value && valCase.masked === inputState.masked && valCase.unmasked === inputState.unmasked) return;
+        if (areCasesEquals(valCase,inputState)) return;
         setInputState({ ...inputState, ...valCase, event: null });
     }, [defaultValue, valCase]);
 
     //handle mask
-    const { maskArray } = inputState;
+    const { maskArray,maskHasObfuscation,placeholder:inputMaskPlaceholder } = inputState;
     const hasInputMask = Array.isArray(maskArray) && !!maskArray.length;
-    const maskHasObfuscation = React.useMemo(() => {
-        if (!hasInputMask) return false;
-        return !!maskArray.find((maskItem) => Array.isArray(maskItem))
-    }, [maskArray, hasInputMask]);
-    const isValueObfuscated = React.useMemo(() => {
-        //return !!maskHasObfuscation && !!maskOptions.showObfuscatedValue;
-        return false;
-    }, [maskHasObfuscation/*, maskOptions.showObfuscatedValue*/]);
-    const inputMaskPlaceholder = React.useMemo(() => {
-        if (!hasInputMask) return undefined;
-        return maskArray.map((maskChar) => {
-            if (typeof maskChar === 'string') {
-                return maskChar;
-            } else {
-                return maskOptions.placeholderFillCharacter;
-            }
-        }).join('');
-    }, [maskArray, hasInputMask, maskOptions.placeholderFillCharacter]);
-    const inputWithMaskValue = hasInputMask ? defaultStr(isValueObfuscated ? inputState.obfuscated : inputState.masked) : "";
-
+    
     const placeholder = hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : props.placeholder);
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
@@ -391,7 +372,7 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
     }, [focusedValue, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
-    const inputValue = hasInputMask ? inputWithMaskValue : (isFocused ? focusedValue : formatted.formattedValue || emptyValue || "");
+    const inputValue = hasInputMask ? defaultStr(maskHasObfuscation && !isFocused ? inputState.obfuscated : inputState.masked) : (isFocused ? focusedValue : formatted.formattedValue || emptyValue || "");
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
     }, [height, inputValue]);
@@ -413,12 +394,12 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
     const secureIcon = isPasswordField ? <FontIcon size={25}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure) }} color={textColor} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, withBackground, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
-    console.log(placeholder, " has place holder ", maskArray);
+    const labelSuffix = suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? <Label color={textColor}>{""}[{inputMaskPlaceholder}]</Label> : null;
     return {
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
         underlineColorAndroid: "transparent",
-        selection: !hasInputMask ? undefined : (isValueObfuscated ? { start: inputValue.length, end: inputValue.length } : undefined),
+        //selection: !hasInputMask ? undefined : (showObfuscatedValue ? { start: inputValue.length, end: inputValue.length } : undefined),
         ...props,
         onContentSizeChange: (event) => {
             if (typeof onContentSizeChange == "function") {
@@ -438,7 +419,7 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
             style: [styles.contentContainer, contentContainerStyle,
             contentContainerProps.style]
         }),
-        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
+        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
         placeholder,
         testID: testID,
@@ -463,10 +444,27 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
             let textString = String(text);
             if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
                 return;
-            }
+            }/* 
+            if (inputState.showObfuscatedValue && textString && inputState.obfuscated && inputState.masked) {
+                const ofuscatedLength = inputState.obfuscated.length;
+                const maskedLength = inputState.masked.length;
+                if(maskedLength === ofuscatedLength){
+                    let newTextString = "";
+                    for(let i=0;i<textString.length;i++){
+                        if(i>=ofuscatedLength) break;
+                        if(textString.charAt(i) == inputState.obfuscated.charAt(i)){
+                            newTextString += inputState.masked.charAt(i);
+                            break;
+                        }
+                    }
+                    console.log("new text string",newTextString," is in put state validdddd ",textString);
+                    textString = newTextString;
+                }
+            } */
             const valCase2 = toCase(textString);
-            if (textString !== inputState.value && valCase2.value !== inputState.value) {
-                const options = { ...inputState, isFocused, type, ...inputState, ...valCase2, text: textString, event };
+            const value = inputState.placeholder?valCase2.masked:valCase2.value;
+            if (textString !== inputState.value && inputState.value != value && !areCasesEquals(valCase2, inputState)) {
+                const options = { ...inputState, isFocused, type, ...valCase2,value, text: textString, event };
                 setInputState(options);
                 if (typeof onChange == "function") {
                     clearTimeout(debounceTimeoutRef.current);
@@ -503,6 +501,10 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
             {editable || disabled !== false && isPasswordField ? secureIcon : null}
         </View> : null
     }
+}
+
+const areCasesEquals = (case1:Partial<IInputFormatterMaskResult>,case2:Partial<IInputFormatterMaskResult>)=>{
+    return (case1 as any).value == (case2 as any).value && case1.masked === case2.masked && case1.unmasked === case2.unmasked && case1.obfuscated === case2.obfuscated;
 }
 
 TextInput.displayName = "TextInput";

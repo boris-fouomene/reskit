@@ -251,10 +251,9 @@ export interface IInputFormatterOptions {
  *   value: '12345',
  *   type: 'number',
  *   mask: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
- *   obfuscationCharacter: '*',
+ *   obfuscationCharacter: '*', // The character to be used for obfuscating the input value.
  *   focused: true,
- *   placeholderFillCharacter: '_',
- *   maskAutoComplete: true,
+ *   placeholder: '_',
  * };
  * ```
  */
@@ -297,6 +296,7 @@ export interface IInputFormatterMaskOptions {
 
   /**
    * The character to be used for obfuscating the input value.
+   * This property defaults to '*' if not specified. It must have a length of 1 not more than 1.
    *
    * This property defaults to '*' if not specified.
    *
@@ -310,30 +310,18 @@ export interface IInputFormatterMaskOptions {
   obfuscationCharacter?: string;
 
   /**
-   * Whether to display the obfuscated value in the input field.
-   *
-   * This property defaults to `false` if not specified.
-   *
-   * @example
-   * ```typescript
-   * const maskOptions: IInputFormatterMaskOptions = {
-   *   showObfuscatedValue: true,
-   * };
-   * ```
-   */
-  // showObfuscatedValue?: boolean;
-
-  /**
    * The character to be used as the fill character for the default placeholder.
+     The length of the character must be 1 not more than 1.
+     Default value is '_'
    *
    * @example
    * ```typescript
    * const maskOptions: IInputFormatterMaskOptions = {
-   *   placeholderFillCharacter: '_',
+   *   placeholderCharacter: '_',
    * };
    * ```
    */
-  placeholderFillCharacter?: string;
+  placeholderCharacter?: string;
 
 
   /**
@@ -348,7 +336,7 @@ export interface IInputFormatterMaskOptions {
  * };
  * ```
  */
-  maskAutoComplete?: boolean;
+  //maskAutoComplete?: boolean;
 }
 
 /**
@@ -476,18 +464,20 @@ export interface IInputFormatterDateTimeMaskOptions {
    */
   hourSeparator?: ":" | "H" | "." | string;
 }
+
 /**
  * @typedef IInputFormatterMaskArray
  * A type representing an array of mask elements.
  *
  * This type can be used to define a mask for an input field, where each element in the array represents a character or a pattern to be matched.
+ * When the placeholderCharacter is provided, the obfuscationCharacter is considered only if it is provided or the obfuscationCharacter is provided when calling the formatWithMask method.
  *
  * @example
  * ```typescript
  * const maskArray: IInputFormatterMaskArray = ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
  * ```
  */
-export type IInputFormatterMaskArray = Array<string | RegExp | [mask:RegExp|string, customObfuscationCharacter?:string]>;
+export type IInputFormatterMaskArray = Array<string | RegExp | [mask:RegExp|string, placeholderCharacter?:string,obfuscationCharacter?:string|false]>;
 
 /**
  * @typedef IInputFormatterMask
@@ -642,12 +632,36 @@ export interface IInputFormatterMaskResult {
    * };
    * ```
    * Obfuscation
-   * To mark a character as obfuscated, use the RegExp within an array, like this:
+   * To mark a character as obfuscated, use the RegExp within an array and the second element of the array is not false, like this:
    * ```typescript
    *  const creditCardMask = [/\d/, /\d/, /\d/, /\d/, " " [/\d/], [/\d/], [/\d/], [/\d/], " ", [/\d/], [/\d/], [/\d/], [/\d/], " ", /\d/, /\d/, /\d/, /\d/];
    * ```
    */
   maskArray: IInputFormatterMaskArray;
+  
+  /***
+    whether the mask has obfuscation
+  */
+  maskHasObfuscation : boolean;
+  
+  /**
+   * Whether to display the obfuscated value in the input field.
+   *
+   * This property defaults to `false` if not specified.
+   *
+   * @example
+   * ```typescript
+   * const maskOptions: IInputFormatterMaskOptions = {
+   *   showObfuscatedValue: true,
+   * };
+   * ```
+   */
+  //showObfuscatedValue : boolean;
+  
+  /***
+    The character to be used as the fill character for the default placeholder of the input field.
+  */
+  placeholder: string;
 }
 /**
  * @type IMomentFormat

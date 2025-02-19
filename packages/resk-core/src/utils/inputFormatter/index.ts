@@ -3,7 +3,8 @@ import { IInputFormatterNumberMaskOptions, IInputFormatterMask, IInputFormatterM
 import { DEFAULT_DATE_FORMATS, formatDate, isDateObj, isValidDate } from "../date";
 import defaultStr from "../defaultStr";
 import isNonNullString from "../isNonNullString";
-import { isRegExp } from "util/types";
+import isRegExp from "../isRegex";
+import { isObj } from "@utils/object";
 
 /***
     InputFormatter class is used to format the value to the desired format
@@ -188,7 +189,6 @@ export class InputFormatter {
    *   value: '12345',
    *   mask: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
    *   obfuscationCharacter: '*',
-   *   maskAutoComplete: true,
    * };
    * const result = formatWithMask(options);
    * console.log(result);
@@ -204,18 +204,25 @@ export class InputFormatter {
   */
   static formatWithMask(options: IInputFormatterMaskOptions): IInputFormatterMaskResult {
     options = Object.assign({}, options);
-    const { value: customValue, mask, obfuscationCharacter = '*', maskAutoComplete = false } = options;
+    const { value: customValue,placeholderCharacter:customPlaceholderCharacter, mask, obfuscationCharacter,/* maskAutoComplete = false*/ } = options;
     const stValue = customValue === undefined ? "" : ["number", "boolean", "string"].includes(typeof customValue) ? customValue.toString() : stringify(customValue);
     const value = defaultStr(stValue);
     const mArray = typeof mask === 'function' ? mask({ ...options, value }) : mask;
     const maskArray = Array.isArray(mArray) ? mArray : [];
+    const placeholderCharacter = defaultStr(customPlaceholderCharacter,"_").charAt(0);
+    let placeholder = "";
+    maskArray.map((mask)=>{
+      placeholder += String(isNonNullString(mask) ? mask : Array.isArray(mask) && isNonNullString(mask[1])? mask[1] : placeholderCharacter).charAt(0);
+    });
     // make sure it'll not break with null or undefined inputs
     if (!maskArray.length || !value) {
       return {
+        maskHasObfuscation: false,
         masked: value,
         unmasked: value,
         obfuscated: value,
         maskArray,
+        placeholder,
       };
     }
     let masked = '';
@@ -223,65 +230,44 @@ export class InputFormatter {
     let unmasked = '';
     let maskCharIndex = 0;
     let valueCharIndex = 0;
-
-    while (true) {
-      // if mask is ended, break.
-      if (maskCharIndex === maskArray.length) {
-        break;
-      }
+    let maskHasObfuscation = false;
+    while (maskCharIndex < maskArray.length) {
       const maskChar = maskArray[maskCharIndex];
       const valueChar = value[valueCharIndex];
-
-      // if value is ended, break.
-      if (valueCharIndex === value.length) {
-        if (typeof maskChar === 'string' && maskAutoComplete) {
-          masked += maskChar;
-          obfuscated += maskChar;
-          maskCharIndex += 1;
-          continue;
-        }
+      if(valueCharIndex === value.length){
         break;
       }
-
-      // value equals mask: add to masked result and advance on both mask and value indexes
-      if (maskChar === valueChar) {
-        masked += maskChar;
-        obfuscated += maskChar;
-        valueCharIndex += 1;
-        maskCharIndex += 1;
-        continue;
-      }
-
       const unmaskedValueChar = value[valueCharIndex];
       // it's a regex maskChar: let's advance on value index and validate the value within the regex
       if (typeof maskChar === 'object') {
+        const obfuscatedCharacter = defaultStr(Array.isArray(maskChar) ? maskChar[2]:undefined,obfuscationCharacter).charAt(0);
         // advance on value index
-        valueCharIndex += 1;
-        const shouldObsfucateChar = Array.isArray(maskChar);
+        const shouldObsfucateChar = Array.isArray(maskChar) && maskChar[2] !== false && obfuscatedCharacter;
+        if(shouldObsfucateChar){
+          maskHasObfuscation = true;
+        }
         const maskCharRegex = Array.isArray(maskChar) ? maskChar[0] : maskChar;
-        const maxRegexString = String(maskCharRegex)
+        const maskCharString = String(maskCharRegex);
         try {
-          const isRegex = isRegExp(maskCharRegex)
-          const matchRegex =  isRegex ? RegExp(maskCharRegex).test(valueChar) : maxRegexString === valueChar;
+          const isReg = isRegExp(maskCharRegex);
+          const matchRegex =  isReg ? RegExp(maskCharRegex).test(valueChar) : maskCharString === valueChar;
+          const valToAdd = isReg ? valueChar : maskCharString;
           // value match regex: add to masked and unmasked result and advance on mask index too
           if (matchRegex) {
-            const valToAdd = isRegex ? valueChar : maxRegexString;
             masked += valToAdd;
-            obfuscated += shouldObsfucateChar ? defaultStr(Array.isArray(maskChar) ? maskChar[1]:undefined,obfuscationCharacter) : valToAdd;
+            obfuscated += (shouldObsfucateChar ? obfuscatedCharacter : valToAdd);
             unmasked += unmaskedValueChar;
-            maskCharIndex += 1;
           }
         } catch(e){}
-        continue;
       } else if(isNonNullString(maskChar)) {
         // it's a fixed maskChar: add to maskedResult and advance on mask index
         masked += maskChar;
         obfuscated += maskChar;
-        maskCharIndex += 1;
-        continue;
       }
+      maskCharIndex += 1;
+      valueCharIndex += 1;
     }
-    return { masked, unmasked, obfuscated, maskArray };
+    return { masked,maskHasObfuscation,placeholder, unmasked, obfuscated, maskArray };
   }
 
   /**

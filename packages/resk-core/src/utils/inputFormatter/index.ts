@@ -1,3 +1,4 @@
+import stringify from "@utils/stringify";
 import { IInputFormatterNumberMaskOptions, IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterDateTimeMaskOptions } from "../../types";
 import { DEFAULT_DATE_FORMATS, formatDate, isDateObj, isValidDate } from "../date";
 import defaultStr from "../defaultStr";
@@ -203,16 +204,17 @@ export class InputFormatter {
   static formatWithMask(options: IInputFormatterMaskOptions): IInputFormatterMaskResult {
     options = Object.assign({}, options);
     const { value: customValue, mask, obfuscationCharacter = '*', maskAutoComplete = false } = options;
-    const value = customValue !== undefined && ["number", "boolean"].includes(typeof customValue) ? customValue.toString() : customValue;
+    const stValue = customValue === undefined ? "" : ["number", "boolean", "string"].includes(typeof customValue) ? customValue.toString() : stringify(customValue);
+    const value = defaultStr(stValue);
+    const mArray = typeof mask === 'function' ? mask({ ...options, value }) : mask;
+    const maskArray = Array.isArray(mArray) ? mArray : [];
     // make sure it'll not break with null or undefined inputs
-    if (!isNonNullString(value)) return { masked: '', unmasked: '', obfuscated: '', maskArray: [] };
-    const maskArray = typeof mask === 'function' ? mask({ ...options, value }) : mask;
-    if (!maskArray || !Array.isArray(maskArray) || !maskArray.length) {
+    if (!maskArray.length || !value) {
       return {
-        masked: defaultStr(value),
-        unmasked: defaultStr(value),
-        obfuscated: defaultStr(value),
-        maskArray: []
+        masked: value,
+        unmasked: value,
+        obfuscated: value,
+        maskArray,
       };
     }
     let masked = '';

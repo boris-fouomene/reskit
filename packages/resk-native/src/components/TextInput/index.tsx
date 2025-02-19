@@ -413,6 +413,7 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
     const secureIcon = isPasswordField ? <FontIcon size={25}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure) }} color={textColor} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, withBackground, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
+    console.log(placeholder, " has place holder ", maskArray);
     return {
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
@@ -439,7 +440,7 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
         }),
         label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
-        placeholder: placeholder,
+        placeholder,
         testID: testID,
         readOnly: editable === false,
         editable,

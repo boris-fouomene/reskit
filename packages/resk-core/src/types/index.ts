@@ -1,3 +1,5 @@
+import { ICurrency } from "@/currency/types";
+
 export * from "./dictionary";
 export * from "./filters";
 export * from "./i18n";
@@ -122,7 +124,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: I
  *
  * ### Parameters:
  * - `options`: 
- *   - **Type**: `IFormatHelperOptions`
+ *   - **Type**: `IInputFormatterOptions`
  *   - An object containing options for formatting the value. The options may 
  *     include the value to be formatted, the expected type of the value, 
  *     and a custom format specification.
@@ -133,7 +135,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: I
  *
  * ### Example Usage:
  * ```typescript
- * const customFormatter: IFormatHelperValueFunc = (options) => {
+ * const customFormatter: IInputFormatterValueFunc = (options) => {
  *     const { value, format } = options;
  *     if (format === 'money') {
  *         return `$${parseFloat(value).toFixed(2)}`; // Formats value as money
@@ -148,7 +150,7 @@ export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: I
  * console.log(formattedValue); // Outputs: "$1234.57"
  * ```
  */
-export type IFormatHelperValueFunc = ((options: IFormatHelperOptions) => string);
+export type IInputFormatterValueFunc = ((options: IInputFormatterOptions) => string);
 
 
 
@@ -169,16 +171,16 @@ export type IFormatHelperValueFunc = ((options: IFormatHelperOptions) => string)
  * ### Example Usage:
  * ```typescript
  * // Define a value with a money format
- * const moneyValue: IFormatHelperValueFormat = "money";
+ * const moneyValue: IInputFormatterValueFormat = "money";
  *
  * // Define a custom format
- * const customValue: IFormatHelperValueFormat = "custom";
+ * const customValue: IInputFormatterValueFormat = "custom";
  *
  * // Define a value using ICurrencyFormatterKey
- * const currencyValue: IFormatHelperValueFormat = "formatUSD" | "formatCAD" | "formatEUR" | "formatAED" | "formatAFN" | "formatALL" | "formatAMD" | "formatARS" |;
+ * const currencyValue: IInputFormatterValueFormat = "formatUSD" | "formatCAD" | "formatEUR" | "formatAED" | "formatAFN" | "formatALL" | "formatAMD" | "formatARS" |;
  * ```
  */
-export type IFormatHelperValueFormat = "number" | "money" | "custom" | IFormatHelperValueFunc;
+export type IInputFormatterValueFormat = "number" | "money" | "custom" | IInputFormatterValueFunc;
 
 /**
  * Options for formatting a value into a string representation.
@@ -197,7 +199,7 @@ export type IFormatHelperValueFormat = "number" | "money" | "custom" | IFormatHe
  *
  * ### Example Usage:
  * ```typescript
- * const options: IFormatHelperOptions = {
+ * const options: IInputFormatterOptions = {
  *   value: 1234.56,
  *   type: "number",
  *   format: "money" // Example format for monetary values
@@ -208,7 +210,7 @@ export type IFormatHelperValueFormat = "number" | "money" | "custom" | IFormatHe
  * ```
  * 
  *  * ```typescript
- * const options: IFormatHelperOptions = {
+ * const options: IInputFormatterOptions = {
  *   value: 1234.56,
  *   type: "number",
  *   format: "formatUSD" // Example format for monetary values in $USD
@@ -218,66 +220,187 @@ export type IFormatHelperValueFormat = "number" | "money" | "custom" | IFormatHe
  * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
  * ```
  */
-export interface IFormatHelperOptions {
+export interface IInputFormatterOptions {
   value?: any; // The value to be formatted
   type?: any; // The expected type of the value
-   /**
-   * This function is used by default to format the parsed or custom value.
-   * In an input field, that function or a string used to format the value displayed in the input field.
-   * ```ts
-   *   format : "moneay", //will format the value to money format
-   *   format : ({value:any,type:ITextInputType,format?:"custom"}) => any; //will format the value to any format
-   * ```
-   */
-  format?: IFormatHelperValueFormat; // The format to be applied
-
-  dateFormat?: IMomentFormat;
-  
-  mask?: IFormatHelperMask;
-  
-  maskOptions ?: {
-    /**
-     * Character to be used on the obfuscated characters. Defaults to `"*"`
-     */
-    obfuscationCharacter?: string;
-    
-    /***
-        Wheether or not the input is focused. Defaults to `false`
-    */
-    focused ?: boolean;
-    
-    
-    /** Whether or not to display the obfuscated value on the `TextInput`. Defaults to false */
-    showObfuscatedValue?: boolean;
-  
-    /** Character to be used as the "fill character" on the default placeholder */
-    placeholderFillCharacter?: string;
-  
-    /** Add next mask characters at the end of the value. Defaults to `false`.
-     *
-     * Example: In a date mask, a input value of `"15/10"` will result:
-     * - When set to false: `"15/10"`
-     * - When set to true: `"15/10/"`
-     */
-    maskAutoComplete?: boolean;
-  }
+  /**
+  * This function is used by default to format the parsed or custom value.
+  * In an input field, that function or a string used to format the value displayed in the input field.
+  * ```ts
+  *   format : "moneay", //will format the value to money format
+  *   format : ({value:any,type:ITextInputType,format?:"custom"}) => any; //will format the value to any format
+  * ```
+  */
+  format?: IInputFormatterValueFormat; // The format to be applied
 
   /***
-    whether or not the input is focused. Defaults to `false`
-  */
-  inputFocused?:boolean;
+   * Format for date types
+   */
+  dateFormat?: IMomentFormat;
 }
 
-export type IFormatHelperMaskArray = Array<string | RegExp | [RegExp]>;
+/**
+ * Options for formatting a masked input value.
+ *
+ * This interface provides a set of properties that can be used to customize the behavior of a masked input field.
+ * It includes options for specifying the input value, type, mask, and other formatting settings.
+ *
+ * @example
+ * ```typescript
+ * const maskOptions: IInputFormatterMaskOptions = {
+ *   value: '12345',
+ *   type: 'number',
+ *   mask: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
+ *   obfuscationCharacter: '*',
+ *   focused: true,
+ *   placeholderFillCharacter: '_',
+ *   maskAutoComplete: true,
+ * };
+ * ```
+ */
+export interface IInputFormatterMaskOptions {
+  /**
+   * The input value to be formatted.
+   *
+   * This property can be a string representing the value to be formatted.
+   *
+   * @example
+   * ```typescript
+   * const maskOptions: IInputFormatterMaskOptions = {
+   *   value: '12345',
+   * };
+   * ```
+   */
+  value?: string;
 
-export type IFormatHelperMask = IFormatHelperMaskArray | ((options:IFormatHelperOptions) => IFormatHelperMaskArray);
+  /**
+   * The type of the input value.
+   *
+   * This property can be a string representing the type of the input value, such as 'number', 'date', etc.
+   * ```
+   */
+  type?: string;
+
+  /**
+   * The mask to be applied to the input value.
+   *
+   * This property can be an instance of `IInputFormatterMask` or an array of strings or regular expressions.
+   *
+   * @example
+   * ```typescript
+   * const maskOptions: IInputFormatterMaskOptions = {
+   *   mask: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
+   * };
+   * ```
+   */
+  mask?: IInputFormatterMask;
+
+  /**
+   * The character to be used for obfuscating the input value.
+   *
+   * This property defaults to '*' if not specified.
+   *
+   * @example
+   * ```typescript
+   * const maskOptions: IInputFormatterMaskOptions = {
+   *   obfuscationCharacter: '*',
+   * };
+   * ```
+   */
+  obfuscationCharacter?: string;
+
+  /**
+   * Whether to display the obfuscated value in the input field.
+   *
+   * This property defaults to `false` if not specified.
+   *
+   * @example
+   * ```typescript
+   * const maskOptions: IInputFormatterMaskOptions = {
+   *   showObfuscatedValue: true,
+   * };
+   * ```
+   */
+  // showObfuscatedValue?: boolean;
+
+  /**
+   * The character to be used as the fill character for the default placeholder.
+   *
+   * @example
+   * ```typescript
+   * const maskOptions: IInputFormatterMaskOptions = {
+   *   placeholderFillCharacter: '_',
+   * };
+   * ```
+   */
+  placeholderFillCharacter?: string;
+
+
+  /**
+ * Whether to add the next mask characters to the end of the input value.
+ *
+ * This property defaults to `false` if not specified.
+ *
+ * @example
+ * ```typescript
+ * const maskOptions: IInputFormatterMaskOptions = {
+ *   maskAutoComplete: true,
+ * };
+ * ```
+ */
+  maskAutoComplete?: boolean;
+}
+
+export interface IInputFormatterCurrencyMaskOptions {
+  /** Character for thousands delimiter. Defaults to `"."` */
+  delimiter?: string;
+  /** Decimal precision. Defaults to `2` */
+  precision?: number;
+  /** Decimal separator character. Defaults to `","`  */
+  separator?: string;
+  /** ITextInputMask to be prefixed on the mask result */
+  prefix?: IInputFormatterMaskArray;
+};
+
+/**
+ * @typedef IInputFormatterMaskArray
+ * A type representing an array of mask elements.
+ *
+ * This type can be used to define a mask for an input field, where each element in the array represents a character or a pattern to be matched.
+ *
+ * @example
+ * ```typescript
+ * const maskArray: IInputFormatterMaskArray = ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+ * ```
+ */
+export type IInputFormatterMaskArray = Array<string | RegExp | [RegExp]>;
+
+/**
+ * @typedef IInputFormatterMask
+ * A type representing a mask for an input field.
+ *
+ * This type can be either a static array of mask elements or a function that returns a dynamic array of mask elements based on the provided options.
+ *
+ * @example
+ * ```typescript
+ * const staticMask: IInputFormatterMask = ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+ * const dynamicMask: IInputFormatterMask = (options: IInputFormatterOptions) => {
+ *   if (options.type === 'number') {
+ *     return ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+ *   } else {
+ *     return ['a', 'a', 'a', 'a', 'a'];
+ *   }
+ * };
+ * ```
+ */
+export type IInputFormatterMask = IInputFormatterMaskArray | ((options: IInputFormatterOptions) => IInputFormatterMaskArray);
 
 
 /**
- * @interface IFormatHelperResult
+ * @interface IInputFormatterResult
  * Represents the result of a formatted value obtained via the `formatValue` function.
  *
- * This interface extends the `IFormatHelperOptions` interface and contains 
+ * This interface extends the `IInputFormatterOptions` interface and contains 
  * properties that provide information about the formatted value, its type, 
  * and the parsed representation.
  *
@@ -305,7 +428,7 @@ export type IFormatHelperMask = IFormatHelperMaskArray | ((options:IFormatHelper
  *
  * ### Example Usage:
  * ```typescript
- * const result: IFormatHelperResult = {
+ * const result: IInputFormatterResult = {
  *   formattedValue: "$1,234.56",
  *   isDecimalType: true,
  *   parsedValue: 1234.56,
@@ -315,17 +438,84 @@ export type IFormatHelperMask = IFormatHelperMaskArray | ((options:IFormatHelper
  * console.log(result.isDecimalType);   // Outputs: true
  * ```
  */
-export interface IFormatHelperResult extends IFormatHelperOptions, Partial<IFormatHelperWithMaskResult> {
+export interface IInputFormatterResult extends IInputFormatterOptions, Partial<IInputFormatterMaskResult> {
   formattedValue: string; // The value to be formatted
   isDecimalType: boolean; //if the type linked to the function supports decimal values
   parsedValue: any; //defaults to a number when it is a number
   decimalValue: number; //the decimal value of the formatted value
 }
 
-export interface IFormatHelperWithMaskResult {
+/**
+ * Represents the result of a masked input value.
+ *
+ * This interface provides a set of properties that contain the masked, unmasked, and obfuscated values of the input field, as well as the original mask array.
+ *
+ * @example
+ * ```typescript
+ * const maskResult: IInputFormatterMaskResult = {
+ *   masked: '12345',
+ *   unmasked: '12345',
+ *   obfuscated: '*****',
+ *   maskArray: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
+ * };
+ * ```
+ */
+export interface IInputFormatterMaskResult {
+  /**
+   * The masked value of the input field.
+   *
+   * This property contains the value of the input field with the mask applied.
+   *
+   * @example
+   * ```typescript
+   * const maskResult: IInputFormatterMaskResult = {
+   *   masked: '12345',
+   * };
+   * ```
+   */
   masked: string;
+
+  /**
+   * The unmasked value of the input field.
+   *
+   * This property contains the original value of the input field without the mask applied.
+   *
+   * @example
+   * ```typescript
+   * const maskResult: IInputFormatterMaskResult = {
+   *   unmasked: '12345',
+   * };
+   * ```
+   */
   unmasked: string;
+
+  /**
+   * The obfuscated value of the input field.
+   *
+   * This property contains the value of the input field with all characters replaced with an obfuscation character (e.g. '*').
+   *
+   * @example
+   * ```typescript
+   * const maskResult: IInputFormatterMaskResult = {
+   *   obfuscated: '*****',
+   * };
+   * ```
+   */
   obfuscated: string;
+
+  /**
+   * The original mask array used to mask the input value.
+   *
+   * This property contains the array of mask elements that was used to mask the input value.
+   *
+   * @example
+   * ```typescript
+   * const maskResult: IInputFormatterMaskResult = {
+   *   maskArray: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
+   * };
+   * ```
+   */
+  maskArray: IInputFormatterMaskArray;
 }
 /**
  * @type IMomentFormat

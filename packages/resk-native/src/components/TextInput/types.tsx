@@ -5,7 +5,7 @@ import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextI
 import { ReactNode } from "react";
 import { ILabelProps } from "@components/Label";
 import { IFontIconProps } from "@components/Icon/types";
-import { IFormatHelperOptions, IFormatHelperResult } from "@resk/core";
+import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult } from "@resk/core";
 
 
 /**
@@ -57,7 +57,7 @@ export type ITextInputType = InputModeOptions | "number" | "password";
  * @interface ITextInputCallbackOptions
  * @description
  * Defines the options for callback functions related to text input fields. like functions used to render left, right component in text input
- * The `ITextInputCallbackOptions` type extends the `IFormatHelperResult` 
+ * The `ITextInputCallbackOptions` type extends the `IInputFormatterResult` 
  * type and includes additional properties that provide context about the 
  * state of the text input component. This type is particularly useful for 
  * handling various input scenarios and customizing the behavior of text 
@@ -110,7 +110,7 @@ export type ITextInputType = InputModeOptions | "number" | "password";
  * This type is beneficial for managing complex interactions with text input 
  * components, allowing for a more dynamic and responsive user interface.
  */
-export interface ITextInputCallbackOptions extends IFormatHelperResult{
+export interface ITextInputCallbackOptions extends IInputFormatterResult {
     textColor: string;
     /**
      * Indicates if the component is isFocused.
@@ -150,7 +150,7 @@ export type ITextInputOnChangeEvent = NativeSyntheticEvent<TextInputChangeEventD
  * specific to text field changes.
  * 
  * @interface ITextInputOnChangeOptions
- * @extends {IFormatHelperResult} Represents the result of a formatted value obtained via the `formatValue` function in the @resk/core package.
+ * @extends {IInputFormatterResult} Represents the result of a formatted value obtained via the `formatValue` function in the @resk/core package.
  * @extends {IOnChangeOptions<any, ITextInputOnChangeEvent>}
  * 
  * @example
@@ -167,7 +167,7 @@ export type ITextInputOnChangeEvent = NativeSyntheticEvent<TextInputChangeEventD
  * @property {boolean} [isFocused] - Indicates whether the text field is isFocused at the time of the change.
  * @property {string} [fieldName] - The name of the field if it's part of a form.
  */
-export type ITextInputOnChangeOptions = Omit<IOnChangeOptions<ITextInputOnChangeEvent>, "event"> & {
+export interface ITextInputOnChangeOptions extends Omit<IOnChangeOptions<ITextInputOnChangeEvent>, "event"> {
     event?: ITextInputOnChangeEvent;
     value?: any;
     previousValue?: any;
@@ -261,7 +261,7 @@ export type ITextInputOnChangeOptions = Omit<IOnChangeOptions<ITextInputOnChange
  * input components that enhance user interaction and maintainability 
  * in React Native applications.
  */
-export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defaultValue'> , ILabelOrLeftOrRightProps<ITextInputCallbackOptions>, Omit<IFormatHelperOptions,"value">  {
+export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defaultValue'>, ILabelOrLeftOrRightProps<ITextInputCallbackOptions>, Omit<IInputFormatterOptions, "value"> {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 
@@ -426,6 +426,22 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      * @default false
      */
     withBackground?: boolean;
+
+    /***
+     * Input mask, use to format input value to a given format, based on mask
+     * It can be a function or An array where each item defines one character of the value. If the item is a string, that string will be used, if it is an RegExp, it will validate the input on it.
+        To be clear: All the characters you want to be inputed by the user must be a RegExp in your mask.
+        @example 
+        ```typescript
+            const zipCodeMask = [/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/];
+        ```
+     */
+    mask?: IInputFormatterMask;
+
+    /***
+     * Additionnal options to pass to the InputFormatter.formatWithMask method, when mask prop is provided to input field
+     */
+    maskOptions?: Omit<IInputFormatterMaskOptions, "mask">
 };
 
 /**

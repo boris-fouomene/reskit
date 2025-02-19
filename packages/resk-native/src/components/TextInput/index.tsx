@@ -2,8 +2,8 @@ import Label from "@components/Label";
 import { isValidElement, mergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputContentSizeChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from "react-native";
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { FormatHelper, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr } from "@resk/core";
-import _, { compact, isNumber } from "lodash";
+import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskArray, IInputFormatterMaskResult } from "@resk/core";
+import _, { compact, hasIn, isNumber, values } from "lodash";
 import Theme, { Colors, useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View from "@components/View";
@@ -262,7 +262,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
  * );
  * 
  */
-export const useTextInput = ({ defaultValue,mask,maskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -274,7 +274,6 @@ export const useTextInput = ({ defaultValue,mask,maskOptions, maxHeight: customM
     const isDefaultVariant = !isLabelEmbededVariant;
     const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
-    const placeholder = isEmpty(props.placeholder) ? "" : props.placeholder;
     useEffect(() => {
         return () => {
             clearTimeout(debounceTimeoutRef.current);
@@ -294,10 +293,16 @@ export const useTextInput = ({ defaultValue,mask,maskOptions, maxHeight: customM
         }
     }, [type, cInputMode, isFocused]);
     const emptyValue = cIsEmptyValue || (canValueBeDecimal ? "0" : "");
-    
+
     ///mask handling
-    
-    const toCase = (value: any): any => {
+
+    const { mask, maskOptions } = useMemo(() => {
+        return {
+            maskOptions: Object.assign({}, customMaskOptions),
+            mask: InputFormatter.isValidMask(customMask) ? customMask : undefined,
+        }
+    }, [customMask, customMaskOptions]);
+    const toCase = (value: any): { value: string } & Partial<IInputFormatterMaskResult> => {
         if (canValueBeDecimal && isFocused && (value === '.' || value == '.')) {
             value = "0" + value;
         }
@@ -308,34 +313,58 @@ export const useTextInput = ({ defaultValue,mask,maskOptions, maxHeight: customM
         if (value == undefined) value = '';
         if (isStringNumber(String(value))) value += "";
         if (canValueBeDecimal) {
-            return FormatHelper.parseDecimal(value);
+            value = InputFormatter.parseDecimal(value);
         }
-        return value;
-    };
-    const [inputState, setInputState] = React.useState({
-        value: toCase(defaultValue),
-        event: null,
-    } as IDict);
-    const {formatted:formated,maskArray} = useMemo(() => {
-        maskOptions = Object.assign({},maskOptions);
-        const formatOptions = {...props,maskOptions,...inputState, type, value: inputState.value,inputFocused:isFocused };
-        const r = (typeof mask === 'function' ? mask(formatOptions) : mask);
-        const maskArray = Array.isArray(r) ? r : [];
         return {
-            formatted : FormatHelper.formatValueToObject({...formatOptions,mask:maskArray}),
-            maskArray
-        };
-    }, [inputState.value,isFocused,maskOptions,mask]);
-    const focusedValue = isFocused ? (formated.value == emptyValue ? '' : formated.value) : '';
+            ...(mask ? InputFormatter.formatWithMask({ ...maskOptions, value, mask, type }) : {}),
+            value,
+        }
+    };
+    const valCase = useMemo(() => {
+        return toCase(defaultValue);
+    }, [defaultValue, mask, maskOptions])
+    const [inputState, setInputState] = React.useState<{ value: any, event: any } & Partial<IInputFormatterMaskResult>>({
+        ...valCase,
+        event: null,
+    });
+    const formatted = useMemo(() => {
+        return InputFormatter.formatValueToObject({ ...props, ...inputState, type, value: inputState.value });
+    }, [inputState.value, type]);
+    const focusedValue = isFocused ? (formatted.value == emptyValue ? '' : formatted.value) : '';
     useEffect(() => {
-        if (defaultValue === inputState.value) return;
-        setInputState({ ...inputState, value: defaultValue, event: null });
-    }, [defaultValue]);
+        if (valCase.value === inputState.value && valCase.masked === inputState.masked && valCase.unmasked === inputState.unmasked) return;
+        setInputState({ ...inputState, ...valCase, event: null });
+    }, [defaultValue, valCase]);
+
+    //handle mask
+    const { maskArray } = inputState;
+    const hasInputMask = Array.isArray(maskArray) && !!maskArray.length;
+    const maskHasObfuscation = React.useMemo(() => {
+        if (!hasInputMask) return false;
+        return !!maskArray.find((maskItem) => Array.isArray(maskItem))
+    }, [maskArray, hasInputMask]);
+    const isValueObfuscated = React.useMemo(() => {
+        //return !!maskHasObfuscation && !!maskOptions.showObfuscatedValue;
+        return false;
+    }, [maskHasObfuscation/*, maskOptions.showObfuscatedValue*/]);
+    const inputMaskPlaceholder = React.useMemo(() => {
+        if (!hasInputMask) return undefined;
+        return maskArray.map((maskChar) => {
+            if (typeof maskChar === 'string') {
+                return maskChar;
+            } else {
+                return maskOptions.placeholderFillCharacter;
+            }
+        }).join('');
+    }, [maskArray, hasInputMask, maskOptions.placeholderFillCharacter]);
+    const inputWithMaskValue = hasInputMask ? defaultStr(isValueObfuscated ? inputState.obfuscated : inputState.masked) : "";
+
+    const placeholder = hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : props.placeholder);
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
     const textColor = error ? theme.colors.error : isFocused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
-    const callOptions: ITextInputCallbackOptions = { ...formated, error: !!error, variant, isFocused, textColor: textColor as string, editable, disabled: disabled as boolean };
+    const callOptions: ITextInputCallbackOptions = { ...formatted, error: !!error, variant, isFocused, textColor: textColor as string, editable, disabled: disabled as boolean };
     const multiline = !!props.multiline;
     const isMobile = Breakpoints.isMobileMedia();
     const minHeight = useMemo(() => {
@@ -362,7 +391,7 @@ export const useTextInput = ({ defaultValue,mask,maskOptions, maxHeight: customM
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
     }, [focusedValue, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
-    const inputValue = isFocused ? focusedValue : formated.formattedValue || emptyValue || "";
+    const inputValue = hasInputMask ? inputWithMaskValue : (isFocused ? focusedValue : formatted.formattedValue || emptyValue || "");
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
     }, [height, inputValue]);
@@ -388,6 +417,7 @@ export const useTextInput = ({ defaultValue,mask,maskOptions, maxHeight: customM
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
         underlineColorAndroid: "transparent",
+        selection: !hasInputMask ? undefined : (isValueObfuscated ? { start: inputValue.length, end: inputValue.length } : undefined),
         ...props,
         onContentSizeChange: (event) => {
             if (typeof onContentSizeChange == "function") {
@@ -433,14 +463,14 @@ export const useTextInput = ({ defaultValue,mask,maskOptions, maxHeight: customM
             if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
                 return;
             }
-            const valCase = toCase(textString);
-            if (textString !== inputState.value && valCase !== inputState.value) {
-                const options = { ...inputState, value: valCase, text: textString, event };
+            const valCase2 = toCase(textString);
+            if (textString !== inputState.value && valCase2.value !== inputState.value) {
+                const options = { ...inputState, isFocused, type, ...inputState, ...valCase2, text: textString, event };
                 setInputState(options);
                 if (typeof onChange == "function") {
                     clearTimeout(debounceTimeoutRef.current);
                     debounceTimeoutRef.current = setTimeout(() => {
-                        onChange({ ...options, ...inputState, isFocused, event, /*...FormatHelper.formatValueToObject({ ...options,mask:maskArray,maskOptions:props.maskOptions, type }) */});
+                        onChange({ ...options, ...InputFormatter.formatValueToObject(options) });
                     }, isNumber(debounceTimeout) && debounceTimeout || 0);
                 }
             }

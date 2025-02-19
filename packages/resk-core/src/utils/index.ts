@@ -12,7 +12,7 @@ export { default as stringify } from "./stringify";
 export { default as defaultVal } from "./defaultVal";
 export { default as defaultBool } from "./defaultBool";
 export * from "./image";
-export * from "./formatter";
+export * from "./inputFormatter";
 export * from "./date";
 export * from "./sort";
 export * from "./defaultArray";

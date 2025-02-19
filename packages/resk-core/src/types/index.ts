@@ -487,7 +487,7 @@ export interface IInputFormatterDateTimeMaskOptions {
  * const maskArray: IInputFormatterMaskArray = ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
  * ```
  */
-export type IInputFormatterMaskArray = Array<string | RegExp | [RegExp]>;
+export type IInputFormatterMaskArray = Array<string | RegExp | [mask:RegExp|string, customObfuscationCharacter?:string]>;
 
 /**
  * @typedef IInputFormatterMask
@@ -616,6 +616,19 @@ export interface IInputFormatterMaskResult {
    * ```
    */
   obfuscated: string;
+  
+  /***
+    The auto completed mask value.
+    
+    This property contains the value of the input field with all characters replaced with an obfuscation character (e.g. '*').
+    
+    @example
+    ```typescript
+    const maskResult: IInputFormatterMaskResult = {
+      maskedAutoCompleted: '*****',
+    };
+  */
+  maskedAutoCompleted?: string;
 
   /**
    * The original mask array used to mask the input value.
@@ -627,6 +640,11 @@ export interface IInputFormatterMaskResult {
    * const maskResult: IInputFormatterMaskResult = {
    *   maskArray: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
    * };
+   * ```
+   * Obfuscation
+   * To mark a character as obfuscated, use the RegExp within an array, like this:
+   * ```typescript
+   *  const creditCardMask = [/\d/, /\d/, /\d/, /\d/, " " [/\d/], [/\d/], [/\d/], [/\d/], " ", [/\d/], [/\d/], [/\d/], [/\d/], " ", /\d/, /\d/, /\d/, /\d/];
    * ```
    */
   maskArray: IInputFormatterMaskArray;

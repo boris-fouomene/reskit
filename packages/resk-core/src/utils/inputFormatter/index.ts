@@ -3,6 +3,7 @@ import { IInputFormatterNumberMaskOptions, IInputFormatterMask, IInputFormatterM
 import { DEFAULT_DATE_FORMATS, formatDate, isDateObj, isValidDate } from "../date";
 import defaultStr from "../defaultStr";
 import isNonNullString from "../isNonNullString";
+import { isRegExp } from "util/types";
 
 /***
     InputFormatter class is used to format the value to the desired format
@@ -228,8 +229,8 @@ export class InputFormatter {
       if (maskCharIndex === maskArray.length) {
         break;
       }
-      let maskChar = maskArray[maskCharIndex];
-      let valueChar = value[valueCharIndex];
+      const maskChar = maskArray[maskCharIndex];
+      const valueChar = value[valueCharIndex];
 
       // if value is ended, break.
       if (valueCharIndex === value.length) {
@@ -246,30 +247,33 @@ export class InputFormatter {
       if (maskChar === valueChar) {
         masked += maskChar;
         obfuscated += maskChar;
-
         valueCharIndex += 1;
         maskCharIndex += 1;
         continue;
       }
 
-      let unmaskedValueChar = value[valueCharIndex];
-
+      const unmaskedValueChar = value[valueCharIndex];
       // it's a regex maskChar: let's advance on value index and validate the value within the regex
       if (typeof maskChar === 'object') {
         // advance on value index
         valueCharIndex += 1;
         const shouldObsfucateChar = Array.isArray(maskChar);
         const maskCharRegex = Array.isArray(maskChar) ? maskChar[0] : maskChar;
-        const matchRegex = RegExp(maskCharRegex).test(valueChar);
-        // value match regex: add to masked and unmasked result and advance on mask index too
-        if (matchRegex) {
-          masked += valueChar;
-          obfuscated += shouldObsfucateChar ? obfuscationCharacter : valueChar;
-          unmasked += unmaskedValueChar;
-          maskCharIndex += 1;
-        }
+        const maxRegexString = String(maskCharRegex)
+        try {
+          const isRegex = isRegExp(maskCharRegex)
+          const matchRegex =  isRegex ? RegExp(maskCharRegex).test(valueChar) : maxRegexString === valueChar;
+          // value match regex: add to masked and unmasked result and advance on mask index too
+          if (matchRegex) {
+            const valToAdd = isRegex ? valueChar : maxRegexString;
+            masked += valToAdd;
+            obfuscated += shouldObsfucateChar ? defaultStr(Array.isArray(maskChar) ? maskChar[1]:undefined,obfuscationCharacter) : valToAdd;
+            unmasked += unmaskedValueChar;
+            maskCharIndex += 1;
+          }
+        } catch(e){}
         continue;
-      } else {
+      } else if(isNonNullString(maskChar)) {
         // it's a fixed maskChar: add to maskedResult and advance on mask index
         masked += maskChar;
         obfuscated += maskChar;

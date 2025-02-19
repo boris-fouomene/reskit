@@ -298,7 +298,7 @@ export const useTextInput = ({ defaultValue, mask: customMask, maskOptions: cust
 
     const { mask, maskOptions } = useMemo(() => {
         return {
-            maskOptions: Object.assign({}, customMaskOptions),
+            maskOptions: Object.assign({}, { placeholderFillCharacter: '_' }, customMaskOptions),
             mask: InputFormatter.isValidMask(customMask) ? customMask : undefined,
         }
     }, [customMask, customMaskOptions]);

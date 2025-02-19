@@ -1,7 +1,7 @@
-import { IInputFormatterCurrencyMaskOptions, IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult } from "../types";
-import { DEFAULT_DATE_FORMATS, formatDate, isDateObj, isValidDate } from "./date";
-import defaultStr from "./defaultStr";
-import isNonNullString from "./isNonNullString";
+import { IInputFormatterNumberMaskOptions, IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterDateTimeMaskOptions } from "../../types";
+import { DEFAULT_DATE_FORMATS, formatDate, isDateObj, isValidDate } from "../date";
+import defaultStr from "../defaultStr";
+import isNonNullString from "../isNonNullString";
 
 /***
     InputFormatter class is used to format the value to the desired format
@@ -279,30 +279,34 @@ export class InputFormatter {
   }
 
   /**
-   * Creates a currency mask.
+   * Creates a number mask.
    *
-   * This method takes an options object with settings for the currency mask, such as the delimiter, precision, prefix, and separator.
-   * It returns a function that takes an options object with a value, and returns a mask array for the currency.
+   * This method takes an options object with settings for the number mask, such as the delimiter, precision, prefix, and separator.
+   * It returns a function that takes an options object with a value, and returns a mask array for the number.
    *
-   * @param props The options object with settings for the currency mask.
-   * @returns A function that takes an options object with a value, and returns a mask array for the currency.
+   * @param options The options object with settings for the number mask.
+   * @returns A function that takes an options object with a value, and returns a mask array for the number.
    *
    * @example
    * ```typescript
-   * const currencyMask = createCurrencyMask({
+   * const numberMask = createNumberMask({
    *   delimiter: '.',
    *   precision: 2,
    *   prefix: ['$', ' '],
    *   separator: ',',
    * });
-   * const mask = currencyMask({ value: '123456.78' });
+   * const mask = numberMask({ value: '123456.78' });
    * console.log(mask);
    * // Output:
    * // ['$ ', '1', '2', '3', ',', '4', '5', '6', '.', '7', '8']
    * ```
+   * @license This code is adapted from [Original Repository Name] (https://github.com/CaioQuirinoMedeiros/react-native-mask-input).
+   * 
+   * Copyright (c) [2025] [CaioQuirinoMedeiros]
+   * Licensed under the MIT License (https://github.com/CaioQuirinoMedeiros/react-native-mask-input/blob/main/LICENSE) 
    */
-  static createCurrencyMask(props?: IInputFormatterCurrencyMaskOptions): IInputFormatterMask {
-    const { delimiter = '.', precision = 2, prefix = [], separator = ',' } = Object.assign({}, props);
+  static createNumberMask(options?: IInputFormatterNumberMaskOptions): IInputFormatterMask {
+    const { delimiter = '.', precision = 2, prefix = [], separator = ',' } = Object.assign({}, options);
     return ({ value }: IInputFormatterOptions) => {
       const numericValue = value?.replace(/\D+/g, '') || '';
       let mask: IInputFormatterMaskArray = numericValue.split('').map(() => /\d/);
@@ -325,8 +329,147 @@ export class InputFormatter {
       return [...prefix, ...mask];
     };
   }
-}
+  /**
+   * Creates a date mask function.
+   *
+   * This method takes an optional date separator parameter and returns a function that takes an options object with a value.
+   * The returned function returns a mask array for the date.
+   *
+   * @param dateSeparator The character to be used to separate date components (year, month, and day) in a date string.
+   * @returns A function that takes an options object with a value, and returns a mask array for the date.
+   *
+   * @example
+   * ```typescript
+   * const dateMaskFunc = createDateMaskFunc('/');
+   * const mask = dateMaskFunc({ value: '20241018' });
+   * console.log(mask);
+   * // Output:
+   * // [/[0-3]/, /[1-9]/, '/', /[0-1]/, /[012]/, '/', /\d/, /\d/, /\d/, /\d/]
+   * ```
+   */
+  static createDateMaskFunc(dateSeparator?: IInputFormatterDateTimeMaskOptions["dateSeparator"]): IInputFormatterMask {
+    dateSeparator = defaultStr(dateSeparator, "/");
+    return ({ value }) => {
+      const cleanText = defaultStr(value).replace(/\D+/g, '');
+      let secondDigitDayMask = /\d/;
+      if (cleanText.charAt(0) === '0') {
+        secondDigitDayMask = /[1-9]/;
+      }
+      if (cleanText.charAt(0) === '3') {
+        secondDigitDayMask = /[01]/;
+      }
+      let secondDigitMonthMask = /\d/;
+      if (cleanText.charAt(2) === '0') {
+        secondDigitMonthMask = /[1-9]/;
+      }
+      if (cleanText.charAt(2) === '1') {
+        secondDigitMonthMask = /[012]/;
+      }
+      return [
+        /[0-3]/,
+        secondDigitDayMask,
+        '/',
+        /[0-1]/,
+        secondDigitMonthMask,
+        dateSeparator,
+        /\d/,
+        /\d/,
+        /\d/,
+        /\d/,
+      ];
+    }
+  }
+  /**
+  * Predefined masks for common input formats.
+  *
+  * This object contains a set of predefined masks for common input formats such as date, time, date-time, and credit card numbers.
+  * Each mask is an array of regular expressions or strings that define the expected format of the input value.
+  *
+  * @example
+  * ```typescript
+  * const dateMask = MASKS.DATE;
+  * console.log(dateMask);
+  * // Output:
+  * // [
+  * //   /^[0-9]$/, // 'y' - First digit (0-9)
+  * //   /^[0-9]$/, // 'y' - Second digit (0-9)
+  * //   /^[0-9]$/, // 'y' - Third digit (0-9)
+  * //   /^[0-9]$/, // 'y' - Fourth digit (0-9)
+  * //   /^[-/.]$/, // Separator: Can be "-", "/", or "."
+  * //   /^[0-1]$/, // 'm' - First digit: 0-1 (valid month range 01-12)
+  * //   /^[0-9]$/, // 'm' - Second digit: 0-9
+  * //   /^[-/.]$/, // Separator: Can be "-", "/", or "."
+  * //   /^[0-3]$/, // 'd' - First digit: 0-3 (valid day range 01-31)
+  * //   /^[0-9]$/  // 'd' - Second digit: 0-9
+  * // ]
+  * ```
+  */
+  static MASKS: Record<string, IInputFormatterMaskArray> = {
+    /**
+     * Mask for date input format.
+     *
+     * This mask expects the input value to be in the format of `YYYY-MM-DD` or `YYYY/MM/DD` or `YYYY.MM.DD`.
+     */
+    DATE: [
+      /^[0-9]$/, // 'y' - First digit (0-9)
+      /^[0-9]$/, // 'y' - Second digit (0-9)
+      /^[0-9]$/, // 'y' - Third digit (0-9)
+      /^[0-9]$/, // 'y' - Fourth digit (0-9)
+      /^[-/.]$/, // Separator: Can be "-", "/", or "."
+      /^[0-1]$/, // 'm' - First digit: 0-1 (valid month range 01-12)
+      /^[0-9]$/, // 'm' - Second digit: 0-9
+      /^[-/.]$/, // Separator: Can be "-", "/", or "."
+      /^[0-3]$/, // 'd' - First digit: 0-3 (valid day range 01-31)
+      /^[0-9]$/  // 'd' - Second digit: 0-9
+    ],
+    /**
+     * Mask for time input format.
+     *
+     * This mask expects the input value to be in the format of `HH:MM:SS` or `HHHMMSS`.
+     */
+    TIME: [
+      /^[0-2]$/,   // 'h' - First digit: 0-2 (to cover 00-23)
+      /^[0-9]$/,   // 'h' - Second digit: 0-9 (valid range handled later)
+      /^[:H. ]$/,   // Separator: Can be ":", "H", or "."
+      /^[0-5]$/,   // 'm' - First digit: 0-5 (valid minute range 00-59)
+      /^[0-9]$/,   // 'm' - Second digit: 0-9
+      /^[:H.]$/,   // Separator: Can be ":", "H", or "."
+      /^[0-5]$/,   // 's' - First digit: 0-5 (valid second range 00-59)
+      /^[0-9]$/    // 's' - Second digit: 0-9
+    ],
+
+    CREDIT_CARD: [
+      /\d/,
+      /\d/,
+      /\d/,
+      /\d/,
+      ' ',
+      [/\d/],
+      [/\d/],
+      [/\d/],
+      [/\d/],
+      ' ',
+      [/\d/],
+      [/\d/],
+      [/\d/],
+      [/\d/],
+      ' ',
+      /\d/,
+      /\d/,
+      /\d/,
+      /\d/,
+    ] as IInputFormatterMaskArray,
+  }
+};
 
 
-
-
+/**
+* Mask for date-time input format.
+*
+* This mask expects the input value to be in the format of `YYYY-MM-DD HH:MM:SS` or `YYYY/MM/DD HH:MM:SS` or `YYYY.MM.DD HH:MM:SS`.
+*/
+InputFormatter.MASKS.DATE_TIME = [
+  ...InputFormatter.MASKS.DATE,
+  /^\s$/,    // Space separator between date and time
+  ...InputFormatter.MASKS.TIME,
+];

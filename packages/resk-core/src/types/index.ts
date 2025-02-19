@@ -351,17 +351,131 @@ export interface IInputFormatterMaskOptions {
   maskAutoComplete?: boolean;
 }
 
-export interface IInputFormatterCurrencyMaskOptions {
-  /** Character for thousands delimiter. Defaults to `"."` */
+/**
+ * @interface IInputFormatterNumberMaskOptions
+ * Options for formatting a number mask.
+ *
+ * This interface provides a set of properties that can be used to customize the behavior of a number mask.
+ * It includes options for specifying the thousands delimiter, decimal precision, decimal separator, and prefix.
+ *
+ * @example
+ * ```typescript
+ * const numberMaskOptions: IInputFormatterNumberMaskOptions = {
+ *   delimiter: '.',
+ *   precision: 2,
+ *   separator: ',',
+ *   prefix: ['$', ' '],
+ * };
+ * ```
+ */
+export interface IInputFormatterNumberMaskOptions {
+  /**
+   * The character to be used as the thousands delimiter.
+   *
+   * This property defaults to `"."` if not specified.
+   *
+   * @example
+   * ```typescript
+   * const numberMaskOptions: IInputFormatterNumberMaskOptions = {
+   *   delimiter: '.',
+   * };
+   * ```
+   */
   delimiter?: string;
-  /** Decimal precision. Defaults to `2` */
-  precision?: number;
-  /** Decimal separator character. Defaults to `","`  */
-  separator?: string;
-  /** ITextInputMask to be prefixed on the mask result */
-  prefix?: IInputFormatterMaskArray;
-};
 
+  /**
+   * The decimal precision.
+   *
+   * This property defaults to `2` if not specified.
+   *
+   * @example
+   * ```typescript
+   * const numberMaskOptions: IInputFormatterNumberMaskOptions = {
+   *   precision: 2,
+   * };
+   * ```
+   */
+  precision?: number;
+
+  /**
+   * The decimal separator character.
+   *
+   * This property defaults to `","` if not specified.
+   *
+   * @example
+   * ```typescript
+   * const numberMaskOptions: IInputFormatterNumberMaskOptions = {
+   *   separator: ',',
+   * };
+   * ```
+   */
+  separator?: string;
+
+  /**
+   * The prefix to be added to the mask result.
+   *
+   * This property can be an array of strings or regular expressions that will be added to the beginning of the mask result.
+   *
+   * @example
+   * ```typescript
+   * const numberMaskOptions: IInputFormatterNumberMaskOptions = {
+   *   prefix: ['$', ' '],
+   * };
+   * ```
+   */
+  prefix?: IInputFormatterMaskArray;
+}
+/**
+ * Options for formatting a date time mask.
+ *
+ * This interface provides a set of properties that can be used to customize the behavior of a date mask.
+ * It includes options for specifying the date separator and hour separator.
+ *
+ * @example
+ * ```typescript
+ * const dateMaskOptions: IInputFormatterDateMaskOptions = {
+ *   dateSeparator: '-',
+ *   hourSeparator: ':',
+ * };
+ * ```
+ */
+export interface IInputFormatterDateTimeMaskOptions {
+  /**
+   * The character to be used to separate date components (year, month, and day) in a date string.
+   *
+   * This property can be one of the following values:
+   * - `"-"` (e.g., `"2024-10-18"`)
+   * - `"/"` (e.g., `"2024/10/18"`)
+   * - `"."` (e.g., `"2024.10.18"`)
+   * - Any other string value
+   *
+   * @example
+   * ```typescript
+   * const dateMaskOptions: IInputFormatterDateMaskOptions = {
+   *   dateSeparator: '-',
+   * };
+   * ```
+   */
+  dateSeparator?: "-" | "/" | "." | string;
+
+  /**
+   * The character to be used to separate hours and minutes in a time string.
+   *
+   * This property can be one of the following values:
+   * - `":"` (e.g., `"12:11"`, `"23:45"`) - Standard separator.
+   * - `"H"` (e.g., `"12H11"`, `"23H45"`) - Often used in French time notation.
+   * - `"."` (e.g., `"12.11"`, `"23.45"`) - Less common but used in some formats.
+   * - Any other string value
+   *
+   * @example
+   * ```typescript
+   * const dateMaskOptions: IInputFormatterDateMaskOptions = {
+   *   hourSeparator: ':',
+   * };
+   * ```
+   */
+  hourSeparator?: ":" | "H" | "." | string;
+}
 /**
  * @typedef IInputFormatterMaskArray
  * A type representing an array of mask elements.

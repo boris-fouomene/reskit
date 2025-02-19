@@ -1,6 +1,6 @@
 import { Tab, TextInput, withAppBar, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader } from "@resk/native";
 import { View, ScrollView } from 'react-native'
-import { IField } from "@resk/core";
+import { IField, InputFormatter } from "@resk/core";
 import { useEffect } from "react";
 
 const index = withAppBar(() => {
@@ -50,7 +50,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
             </View>
 
             <TextInput label="Text input"
-                mask={["(", /\d/, ")", /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/]}
+                mask={(InputFormatter.MASKS as any).DATE_TIME}
             />
             <Form
                 name="my-form"

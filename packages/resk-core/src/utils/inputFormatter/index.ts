@@ -404,7 +404,7 @@ export class InputFormatter {
   * // ]
   * ```
   */
-  static MASKS: Record<string, IInputFormatterMaskArray> = {
+  static MASKS = {
     /**
      * Mask for date input format.
      *
@@ -468,7 +468,7 @@ export class InputFormatter {
 *
 * This mask expects the input value to be in the format of `YYYY-MM-DD HH:MM:SS` or `YYYY/MM/DD HH:MM:SS` or `YYYY.MM.DD HH:MM:SS`.
 */
-InputFormatter.MASKS.DATE_TIME = [
+(InputFormatter.MASKS as any).DATE_TIME = [
   ...InputFormatter.MASKS.DATE,
   /^\s$/,    // Space separator between date and time
   ...InputFormatter.MASKS.TIME,

@@ -464,7 +464,12 @@ describe('InputFormatter', () => {
             expect(InputFormatter.formatWithMask({ value: '2022-02-30', ...mask })).toMatchObject({ masked: '2022-02-30', unmasked: '2022-02-30', obfuscated: '2022-02-30', maskHasObfuscation: false, placeholder: 'YYYY-MM-DD', isValid: false });
         });
     });
-
+    describe("create cameroon phone number mask", () => {
+        it("should create a phone number mask with a country code", () => {
+            const mask = InputFormatter.createPhoneNumberMask("CM");
+            console.log(mask, " is camerron phonne number");
+        });
+    })
     describe('createPhoneNumberMask', () => {
         it('should create a phone number mask with a country code', () => {
             const mask = InputFormatter.createPhoneNumberMask('US');

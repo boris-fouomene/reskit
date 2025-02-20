@@ -6,7 +6,7 @@ import isNonNullString from "../isNonNullString";
 import isRegExp from "../isRegex";
 import moment from "moment";
 import "../numbers";
-import { AsYouType, CountryCode, getExampleNumber } from "libphonenumber-js";
+import { AsYouType, CountryCode, getExampleNumber, Examples } from "libphonenumber-js";
 import { isValidPhoneNumber } from "@utils/isValidPhoneNumber";
 import examples from 'libphonenumber-js/mobile/examples';
 import isEmpty from "@utils/isEmpty";
@@ -466,6 +466,10 @@ export class InputFormatter {
       }
     };
   };
+  /****
+   * The phone number examples, used to generate the phone number mask
+   */
+  static PHONE_NUMBER_EXAMPLES: Examples = Object.assign({}, examples) as Examples;
   /***
    * A mask for single facilitative space.
    * @description A mask for a single facilitative space.
@@ -474,13 +478,13 @@ export class InputFormatter {
   /**
    * Generates a phone number mask based on the country code.
    * @param countryCode - The country code (e.g., "US", "FR", "IN").
+   * @param numberExample - The number example to use for the mask. If not provided, the default example will be used.
    * @returns {IInputFormatterMaskWithValidation} The phone number mask, an array of mask elements (strings or regexes) representing the phone number format..
    */
 
-  static createPhoneNumberMask(countryCode: CountryCode): IInputFormatterMaskWithValidation {
+  static createPhoneNumberMask(countryCode: CountryCode, numberExample?: string): IInputFormatterMaskWithValidation {
     // Get an example phone number for the given country code
-    const exampleNumber = getExampleNumber(countryCode, examples);
-
+    const exampleNumber = getExampleNumber(countryCode, InputFormatter.PHONE_NUMBER_EXAMPLES);
     if (!exampleNumber) {
       //throw new Error(`No example number found for country code: ${countryCode}`);
       return {

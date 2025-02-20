@@ -2,7 +2,7 @@ import Label from "@components/Label";
 import { isValidElement, mergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputContentSizeChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from "react-native";
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskArray, IInputFormatterMaskResult, DEFAULT_DATE_FORMATS } from "@resk/core";
+import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskArray, IInputFormatterMaskResult, DEFAULT_DATE_FORMATS, defaultBool } from "@resk/core";
 import _, { compact, defaults, hasIn, isNumber, values } from "lodash";
 import Theme, { Colors, useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
@@ -359,9 +359,6 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         ...valCase,
         event: null,
     });
-    const error = useMemo(() => {
-        return !!customError || handleMaskValidationErrors !== false && inputState.isValid === false;
-    }, [inputState.isValid, customError,handleMaskValidationErrors])
     const formatted = useMemo(() => {
         return InputFormatter.formatValueToObject({ ...props, ...inputState, dateFormat, type, value: inputState.value });
     }, [inputState.value, type, dateFormat]);
@@ -374,6 +371,12 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     //handle mask
     const { maskArray, maskHasObfuscation, placeholder: inputMaskPlaceholder } = inputState;
     const hasInputMask = Array.isArray(maskArray) && !!maskArray.length;
+    
+    const inputValue = hasInputMask ? defaultStr(maskHasObfuscation && !isFocused ? inputState.obfuscated : inputState.masked) : (isFocused ? focusedValue : formatted.formattedValue || emptyValue || "");
+    const error = useMemo(() => {
+        return !!customError || defaultBool(handleMaskValidationErrors,!!inputValue) && inputState.isValid === false;
+    }, [inputState.isValid,inputValue, customError,handleMaskValidationErrors])
+    
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
@@ -405,7 +408,6 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
     }, [focusedValue, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
-    const inputValue = hasInputMask ? defaultStr(maskHasObfuscation && !isFocused ? inputState.obfuscated : inputState.masked) : (isFocused ? focusedValue : formatted.formattedValue || emptyValue || "");
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
     }, [height, inputValue]);

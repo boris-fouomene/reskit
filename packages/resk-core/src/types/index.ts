@@ -323,6 +323,15 @@ export interface IInputFormatterMaskOptions {
    */
   placeholderCharacter?: string;
 
+  /***
+   * A function to validate the input value.
+   *
+   * This function is called with the input value as an argument and should return `true` if the value is valid, and `false` otherwise.
+   * It's called only if the input value matches the specified mask.
+   * When this function is provided, the `isValid` property of the returned `IInputFormatterMaskResult` object will be the result of that function.
+   */
+  validate?: (value: string) => boolean;
+
 
   /**
  * Whether to add the next mask characters to the end of the input value.
@@ -413,57 +422,22 @@ export interface IInputFormatterNumberMaskOptions {
    */
   prefix?: IInputFormatterMaskArray;
 }
-/**
- * Options for formatting a date time mask.
+
+/***
+ * @typedef IInputFormatterMaskWithValidation
+ * A type representing a mask and a validation function.
  *
- * This interface provides a set of properties that can be used to customize the behavior of a date mask.
- * It includes options for specifying the date separator and hour separator.
+ * This type is used to define a mask and a validation function for an input field.
  *
  * @example
  * ```typescript
- * const dateMaskOptions: IInputFormatterDateMaskOptions = {
- *   dateSeparator: '-',
- *   hourSeparator: ':',
+ * const maskAndValidate: IInputFormatterMaskWithValidation = {
+ *   mask: ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
+ *   validate: (value: string) => value.length === 10,
  * };
  * ```
  */
-export interface IInputFormatterDateTimeMaskOptions {
-  /**
-   * The character to be used to separate date components (year, month, and day) in a date string.
-   *
-   * This property can be one of the following values:
-   * - `"-"` (e.g., `"2024-10-18"`)
-   * - `"/"` (e.g., `"2024/10/18"`)
-   * - `"."` (e.g., `"2024.10.18"`)
-   * - Any other string value
-   *
-   * @example
-   * ```typescript
-   * const dateMaskOptions: IInputFormatterDateMaskOptions = {
-   *   dateSeparator: '-',
-   * };
-   * ```
-   */
-  dateSeparator?: "-" | "/" | "." | string;
-
-  /**
-   * The character to be used to separate hours and minutes in a time string.
-   *
-   * This property can be one of the following values:
-   * - `":"` (e.g., `"12:11"`, `"23:45"`) - Standard separator.
-   * - `"H"` (e.g., `"12H11"`, `"23H45"`) - Often used in French time notation.
-   * - `"."` (e.g., `"12.11"`, `"23.45"`) - Less common but used in some formats.
-   * - Any other string value
-   *
-   * @example
-   * ```typescript
-   * const dateMaskOptions: IInputFormatterDateMaskOptions = {
-   *   hourSeparator: ':',
-   * };
-   * ```
-   */
-  hourSeparator?: ":" | "H" | "." | string;
-}
+export interface IInputFormatterMaskWithValidation { mask: IInputFormatterMaskArray, validate: (value: string) => boolean }
 
 /**
  * @typedef IInputFormatterMaskArray
@@ -477,7 +451,7 @@ export interface IInputFormatterDateTimeMaskOptions {
  * const maskArray: IInputFormatterMaskArray = ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
  * ```
  */
-export type IInputFormatterMaskArray = Array<string | RegExp | [mask:RegExp|string, placeholderCharacter?:string,obfuscationCharacter?:string|false]>;
+export type IInputFormatterMaskArray = Array<string | RegExp | [mask: RegExp | string, placeholderCharacter?: string, obfuscationCharacter?: string | false]>;
 
 /**
  * @typedef IInputFormatterMask
@@ -606,7 +580,7 @@ export interface IInputFormatterMaskResult {
    * ```
    */
   obfuscated: string;
-  
+
   /***
     The auto completed mask value.
     
@@ -638,12 +612,12 @@ export interface IInputFormatterMaskResult {
    * ```
    */
   maskArray: IInputFormatterMaskArray;
-  
+
   /***
     whether the mask has obfuscation
   */
-  maskHasObfuscation : boolean;
-  
+  maskHasObfuscation: boolean;
+
   /**
    * Whether to display the obfuscated value in the input field.
    *
@@ -657,11 +631,16 @@ export interface IInputFormatterMaskResult {
    * ```
    */
   //showObfuscatedValue : boolean;
-  
+
   /***
     The character to be used as the fill character for the default placeholder of the input field.
   */
   placeholder: string;
+
+  /***
+   * Whether the input value matches the specified mask.
+   */
+  isValid: boolean;
 }
 /**
  * @type IMomentFormat

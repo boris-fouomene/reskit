@@ -263,13 +263,15 @@ const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency | number
 	 * Clean up the number by removing any formatting.
 	 */
 	number = unformat(number);
-
 	/**
 	 * Prepare the options object from the second parameter (if an object) or all parameters, extending default options.
 	 */
 	const toPrepare: ICurrency = (isValidCurrency(optionsOrDecimalDigits) ? optionsOrDecimalDigits : {}) as ICurrency;
 	if (typeof optionsOrDecimalDigits === 'number') {
 		toPrepare.decimalDigits = optionsOrDecimalDigits;
+	}
+	if (typeof toPrepare.decimalDigits !== "number") {
+		toPrepare.decimalDigits = String(number).split(".")[1]?.length
 	}
 	if (thousandSeparator === undefined) {
 		toPrepare.thousandSeparator = thousandSeparator;

@@ -1,10 +1,18 @@
 import stringify from "@utils/stringify";
-import { IInputFormatterNumberMaskOptions, IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterDateTimeMaskOptions } from "../../types";
+import { IInputFormatterNumberMaskOptions, IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterMaskWithValidation } from "../../types";
 import { DEFAULT_DATE_FORMATS, formatDate, isDateObj, isValidDate } from "../date";
 import defaultStr from "../defaultStr";
 import isNonNullString from "../isNonNullString";
 import isRegExp from "../isRegex";
-import { isObj } from "@utils/object";
+import moment from "moment";
+import "../numbers";
+import { AsYouType, CountryCode, getExampleNumber } from "libphonenumber-js";
+import { isValidPhoneNumber } from "@utils/isValidPhoneNumber";
+import examples from 'libphonenumber-js/mobile/examples';
+import isEmpty from "@utils/isEmpty";
+
+const DIGIT_REGEX = /\d/;
+const LETTER_REGEX = /[a-zA-Z]/;
 
 /***
     InputFormatter class is used to format the value to the desired format
@@ -73,7 +81,7 @@ export class InputFormatter {
 
       // Format dates if the value is a valid date object.
       if (isDateObj(value) && (dateFormat || (["time", "date", "datetime"].includes(typeText) && isValidDate(value)))) {
-        formattedValue = formatDate(value, dateFormat || typeText === "time" ? DEFAULT_DATE_FORMATS.time : typeText === "date" ? DEFAULT_DATE_FORMATS.dateTime : DEFAULT_DATE_FORMATS.date);
+        formattedValue = formatDate(value, dateFormat || typeText === "time" ? DEFAULT_DATE_FORMATS.time : typeText === "date" ? DEFAULT_DATE_FORMATS.date : DEFAULT_DATE_FORMATS.dateTime);
       }
       // Format numbers based on the specified format.
       else if (typeof parsedValue == 'number') {
@@ -173,7 +181,8 @@ export class InputFormatter {
     if (!value.includes(".")) {
       value = value.replace(",", ".");
     }
-    return parseFloat(value.replaceAll(" ", ''));
+    const v = parseFloat(value.replaceAll(" ", ''));
+    return typeof v === "number" && v || 0;
   }
   /**
    * Formats a value with a mask.
@@ -204,16 +213,18 @@ export class InputFormatter {
   */
   static formatWithMask(options: IInputFormatterMaskOptions): IInputFormatterMaskResult {
     options = Object.assign({}, options);
-    const { value: customValue,placeholderCharacter:customPlaceholderCharacter, mask, obfuscationCharacter,/* maskAutoComplete = false*/ } = options;
-    const stValue = customValue === undefined ? "" : ["number", "boolean", "string"].includes(typeof customValue) ? customValue.toString() : stringify(customValue);
+    const { value: customValue, placeholderCharacter: customPlaceholderCharacter, mask, validate, obfuscationCharacter,/* maskAutoComplete = false*/ } = options;
+    const stValue = isEmpty(customValue) ? "" : customValue === undefined ? "" : ["number", "boolean", "string"].includes(typeof customValue) ? customValue.toString() : customValue === null ? "" : customValue?.toString() || String(customValue);
     const value = defaultStr(stValue);
     const mArray = typeof mask === 'function' ? mask({ ...options, value }) : mask;
     const maskArray = Array.isArray(mArray) ? mArray : [];
-    const placeholderCharacter = defaultStr(customPlaceholderCharacter,"_").charAt(0);
+    const placeholderCharacter = defaultStr(customPlaceholderCharacter, "_").charAt(0);
     let placeholder = "";
-    maskArray.map((mask)=>{
-      placeholder += String(isNonNullString(mask) ? mask : Array.isArray(mask) && isNonNullString(mask[1])? mask[1] : placeholderCharacter).charAt(0);
+    maskArray.map((mask) => {
+      placeholder += String(isNonNullString(mask) ? mask : Array.isArray(mask) && isNonNullString(mask[1]) ? mask[1] : placeholderCharacter).charAt(0);
     });
+    let isValid = true;
+    const calValidate = (value: string) => typeof validate === 'function' ? validate(value) : true;
     // make sure it'll not break with null or undefined inputs
     if (!maskArray.length || !value) {
       return {
@@ -223,6 +234,7 @@ export class InputFormatter {
         obfuscated: value,
         maskArray,
         placeholder,
+        isValid: isValid && calValidate(value),
       };
     }
     let masked = '';
@@ -234,40 +246,47 @@ export class InputFormatter {
     while (maskCharIndex < maskArray.length) {
       const maskChar = maskArray[maskCharIndex];
       const valueChar = value[valueCharIndex];
-      if(valueCharIndex === value.length){
+      if (valueCharIndex === value.length) {
         break;
       }
       const unmaskedValueChar = value[valueCharIndex];
+      unmasked += unmaskedValueChar;
       // it's a regex maskChar: let's advance on value index and validate the value within the regex
       if (typeof maskChar === 'object') {
-        const obfuscatedCharacter = defaultStr(Array.isArray(maskChar) ? maskChar[2]:undefined,obfuscationCharacter).charAt(0);
+        const obfuscatedCharacter = defaultStr(Array.isArray(maskChar) ? maskChar[2] : undefined, obfuscationCharacter).charAt(0);
         // advance on value index
         const shouldObsfucateChar = Array.isArray(maskChar) && maskChar[2] !== false && obfuscatedCharacter;
-        if(shouldObsfucateChar){
+        if (shouldObsfucateChar) {
           maskHasObfuscation = true;
         }
         const maskCharRegex = Array.isArray(maskChar) ? maskChar[0] : maskChar;
         const maskCharString = String(maskCharRegex);
         try {
           const isReg = isRegExp(maskCharRegex);
-          const matchRegex =  isReg ? RegExp(maskCharRegex).test(valueChar) : maskCharString === valueChar;
+          const matchRegex = isReg ? RegExp(maskCharRegex).test(valueChar) : maskCharString === valueChar;
           const valToAdd = isReg ? valueChar : maskCharString;
           // value match regex: add to masked and unmasked result and advance on mask index too
           if (matchRegex) {
             masked += valToAdd;
             obfuscated += (shouldObsfucateChar ? obfuscatedCharacter : valToAdd);
-            unmasked += unmaskedValueChar;
+          } else {
+            isValid = false;
           }
-        } catch(e){}
-      } else if(isNonNullString(maskChar)) {
+        } catch (e) { }
+      } else if (isNonNullString(maskChar)) {
+        if (maskChar !== valueChar) {
+          isValid = false;
+        }
         // it's a fixed maskChar: add to maskedResult and advance on mask index
         masked += maskChar;
         obfuscated += maskChar;
+      } else {
+        isValid = false;
       }
       maskCharIndex += 1;
       valueCharIndex += 1;
     }
-    return { masked,maskHasObfuscation,placeholder, unmasked, obfuscated, maskArray };
+    return { masked, isValid: isValid && calValidate(value), maskHasObfuscation, placeholder, unmasked, obfuscated, maskArray };
   }
 
   /**
@@ -321,147 +340,236 @@ export class InputFormatter {
       return [...prefix, ...mask];
     };
   }
-  /**
-   * Creates a date mask function.
-   *
-   * This method takes an optional date separator parameter and returns a function that takes an options object with a value.
-   * The returned function returns a mask array for the date.
-   *
-   * @param dateSeparator The character to be used to separate date components (year, month, and day) in a date string.
-   * @returns A function that takes an options object with a value, and returns a mask array for the date.
-   *
-   * @example
-   * ```typescript
-   * const dateMaskFunc = createDateMaskFunc('/');
-   * const mask = dateMaskFunc({ value: '20241018' });
-   * console.log(mask);
-   * // Output:
-   * // [/[0-3]/, /[1-9]/, '/', /[0-1]/, /[012]/, '/', /\d/, /\d/, /\d/, /\d/]
-   * ```
+  /***
+   * Predefined masks for common moment formats.
+   * The keys of the object are the moment format strings, and the values are arrays of regular expressions or strings that define the expected format of the input value.
    */
-  static createDateMaskFunc(dateSeparator?: IInputFormatterDateTimeMaskOptions["dateSeparator"]): IInputFormatterMask {
-    dateSeparator = defaultStr(dateSeparator, "/");
-    return ({ value }) => {
-      const cleanText = defaultStr(value).replace(/\D+/g, '');
-      let secondDigitDayMask = /\d/;
-      if (cleanText.charAt(0) === '0') {
-        secondDigitDayMask = /[1-9]/;
+  static MOMENT_MASKS_MAP = {
+    // Year tokens
+    YYYY: Array(4).fill([DIGIT_REGEX, 'Y']),
+    YY: Array(2).fill([DIGIT_REGEX, 'Y']),
+
+    // Month tokens
+    MM: Array(2).fill([DIGIT_REGEX, 'M']),
+    M: [[DIGIT_REGEX, 'M']],
+    MMMM: Array(9).fill([LETTER_REGEX, 'M']), // Longest month name (September)
+    MMM: Array(3).fill([LETTER_REGEX, 'M']),
+
+    // Day tokens
+    DD: Array(2).fill([DIGIT_REGEX, 'D']),
+    D: [[DIGIT_REGEX, 'D']],
+
+    // Hour tokens
+    HH: Array(2).fill([DIGIT_REGEX, 'H']), // 24-hour
+    H: [[DIGIT_REGEX, 'H']], // 24-hour
+    hh: Array(2).fill([DIGIT_REGEX, 'h']), // 12-hour
+    h: [[DIGIT_REGEX, 'h']], // 12-hour
+
+    // Minute tokens
+    mm: Array(2).fill([DIGIT_REGEX, 'm']),
+    m: [[DIGIT_REGEX, 'm']],
+
+    // Second tokens
+    ss: Array(2).fill([DIGIT_REGEX, 's']),
+    s: [[DIGIT_REGEX, 's']],
+
+    // Millisecond token
+    SSS: Array(3).fill([DIGIT_REGEX, 'S']),
+
+    // Timezone tokens
+    Z: [/[+-]/, DIGIT_REGEX, DIGIT_REGEX, DIGIT_REGEX, DIGIT_REGEX],
+    ZZ: [/[+-]/, DIGIT_REGEX, DIGIT_REGEX, DIGIT_REGEX, DIGIT_REGEX],
+
+    // AM/PM
+    A: ['A', 'M'],
+    a: ['a', 'm'],
+  };
+  /***
+   * A map of moment separators and their corresponding characters.
+   * The keys of the object are the separators, and the values are the corresponding characters.
+   */
+  static MOMENT_SEPARATOR_MAP = {
+    '/': '/',
+    '-': '-',
+    '.': '.',
+    ' ': ' ',
+    ':': ':',
+    'T': 'T',
+  };
+  /***
+   * Creates a date mask, based on the specified moment format.
+   * @param {string} momentDateFormat - The moment format string.
+   * @returns {IInputFormatterMaskWithValidation}} - An object containing the mask and a validation function.
+   */
+  static createDateMask(momentDateFormat: string): IInputFormatterMaskWithValidation {
+
+    momentDateFormat = defaultStr(momentDateFormat);
+
+    const maskMap = InputFormatter.MOMENT_MASKS_MAP;
+    const separatorMap = InputFormatter.MOMENT_SEPARATOR_MAP;
+
+    let result: IInputFormatterMaskArray = [];
+    let currentToken = '';
+    let i: number = 0;
+    while (i < momentDateFormat.length) {
+      // Handle separators
+      if (separatorMap[momentDateFormat[i] as keyof typeof separatorMap]) {
+        if (currentToken) {
+          result.push(...(maskMap[currentToken as keyof typeof maskMap] || []));
+          currentToken = '';
+        }
+        result.push(separatorMap[momentDateFormat[i] as keyof typeof separatorMap]);
+        i++;
+        continue;
       }
-      if (cleanText.charAt(0) === '3') {
-        secondDigitDayMask = /[01]/;
+
+      // Build token
+      currentToken += momentDateFormat[i];
+
+      // Check if we have a complete token
+      if (maskMap[currentToken as keyof typeof maskMap]) {
+        result.push(...maskMap[currentToken as keyof typeof maskMap]);
+        currentToken = '';
+        i++;
+        continue;
       }
-      let secondDigitMonthMask = /\d/;
-      if (cleanText.charAt(2) === '0') {
-        secondDigitMonthMask = /[1-9]/;
+
+      // Check if adding next character would make an invalid token
+      if (!Object.keys(maskMap).some(key => currentToken && key.startsWith(currentToken))) {
+        if (currentToken) {
+          // Handle unknown token as literal characters
+          result.push(...currentToken.split(''));
+          currentToken = '';
+        }
+        i++;
+      } else {
+        i++;
       }
-      if (cleanText.charAt(2) === '1') {
-        secondDigitMonthMask = /[012]/;
-      }
-      return [
-        /[0-3]/,
-        secondDigitDayMask,
-        '/',
-        /[0-1]/,
-        secondDigitMonthMask,
-        dateSeparator,
-        /\d/,
-        /\d/,
-        /\d/,
-        /\d/,
-      ];
     }
+
+    // Handle any remaining token
+    if (currentToken && maskMap[currentToken as keyof typeof maskMap]) {
+      result.push(...maskMap[currentToken as keyof typeof maskMap]);
+    }
+    return {
+      mask: result, validate: (value: string) => {
+        if (!momentDateFormat || !isNonNullString(value)) {
+          return false;
+        }
+        try {
+          const date = moment(value, momentDateFormat, true);
+          // Check if the parsed date matches the input exactly
+          // This ensures that the input is not only valid but also logically correct
+          return date.isValid() && date.format(momentDateFormat) === value;
+        } catch (e) { }
+        return false;
+      }
+    };
+  };
+  /***
+   * A mask for single facilitative space.
+   * @description A mask for a single facilitative space.
+   */
+  static SINGLE_SPACE_MASK = ' ';//:[mask: RegExp, placeholderCharacter: string] = [/^ ?$/, ' '];
+  /**
+   * Generates a phone number mask based on the country code.
+   * @param countryCode - The country code (e.g., "US", "FR", "IN").
+   * @returns {IInputFormatterMaskWithValidation} The phone number mask, an array of mask elements (strings or regexes) representing the phone number format..
+   */
+
+  static createPhoneNumberMask(countryCode: CountryCode): IInputFormatterMaskWithValidation {
+    // Get an example phone number for the given country code
+    const exampleNumber = getExampleNumber(countryCode, examples);
+
+    if (!exampleNumber) {
+      //throw new Error(`No example number found for country code: ${countryCode}`);
+      return {
+        mask: [],
+        validate: (value: string) => false,
+      }
+    }
+
+    // Format the example number using AsYouType
+    const formatter = new AsYouType(countryCode);
+    const formattedNumber = formatter.input(exampleNumber.nationalNumber);
+
+    // Convert the formatted number into a mask
+    const mask: IInputFormatterMaskArray = [];
+    for (const char of formattedNumber) {
+      if (/\d/.test(char)) {
+        mask.push(/\d/); // Replace digits with a regex for digits
+      } else if (char === ' ') {
+        mask.push(InputFormatter.SINGLE_SPACE_MASK); // Replace spaces with a regex for spaces
+      } else {
+        mask.push(char); // Keep separators (e.g., spaces, parentheses, hyphens)
+      }
+    }
+    return {
+      mask, validate: (value: string) => {
+        return isNonNullString(value) && !!isValidPhoneNumber(value, countryCode);
+      }
+    };
+  }
+  /**
+   * Sanitize a phone number by ensuring a space after the closing bracket.
+   *
+   * @param {string} phoneNumber - The phone number as a string.
+   * @returns The formatted phone number with a space after the closing bracket.
+   */
+  static sanitizePhoneNumber(phoneNumber: string): string {
+    if (!isNonNullString(phoneNumber)) return "";
+    return phoneNumber.replace(/\)\s*(\d)/, ") $1"); // Ensures exactly one space after ')'
   }
   /**
   * Predefined masks for common input formats.
   *
   * This object contains a set of predefined masks for common input formats such as date, time, date-time, and credit card numbers.
   * Each mask is an array of regular expressions or strings that define the expected format of the input value.
-  *
-  * @example
-  * ```typescript
-  * const dateMask = MASKS.DATE;
-  * console.log(dateMask);
-  * // Output:
-  * // [
-  * //   /^[0-9]$/, // 'y' - First digit (0-9)
-  * //   /^[0-9]$/, // 'y' - Second digit (0-9)
-  * //   /^[0-9]$/, // 'y' - Third digit (0-9)
-  * //   /^[0-9]$/, // 'y' - Fourth digit (0-9)
-  * //   /^[-/.]$/, // Separator: Can be "-", "/", or "."
-  * //   /^[0-1]$/, // 'm' - First digit: 0-1 (valid month range 01-12)
-  * //   /^[0-9]$/, // 'm' - Second digit: 0-9
-  * //   /^[-/.]$/, // Separator: Can be "-", "/", or "."
-  * //   /^[0-3]$/, // 'd' - First digit: 0-3 (valid day range 01-31)
-  * //   /^[0-9]$/  // 'd' - Second digit: 0-9
-  * // ]
   * ```
   */
-  static MASKS = {
+  static MASKS_WITH_VALIDATIONS = {
     /**
      * Mask for date input format.
      *
      * This mask expects the input value to be in the format of `YYYY-MM-DD` or `YYYY/MM/DD` or `YYYY.MM.DD`.
      */
-    DATE: [
-      /^[0-9]$/, // 'y' - First digit (0-9)
-      /^[0-9]$/, // 'y' - Second digit (0-9)
-      /^[0-9]$/, // 'y' - Third digit (0-9)
-      /^[0-9]$/, // 'y' - Fourth digit (0-9)
-      /^[-/.]$/, // Separator: Can be "-", "/", or "."
-      /^[0-1]$/, // 'm' - First digit: 0-1 (valid month range 01-12)
-      /^[0-9]$/, // 'm' - Second digit: 0-9
-      /^[-/.]$/, // Separator: Can be "-", "/", or "."
-      /^[0-3]$/, // 'd' - First digit: 0-3 (valid day range 01-31)
-      /^[0-9]$/  // 'd' - Second digit: 0-9
-    ],
+    get DATE() {
+      return InputFormatter.createDateMask(DEFAULT_DATE_FORMATS.date);
+    },
     /**
      * Mask for time input format.
      *
      * This mask expects the input value to be in the format of `HH:MM:SS` or `HHHMMSS`.
      */
-    TIME: [
-      /^[0-2]$/,   // 'h' - First digit: 0-2 (to cover 00-23)
-      /^[0-9]$/,   // 'h' - Second digit: 0-9 (valid range handled later)
-      /^[:H. ]$/,   // Separator: Can be ":", "H", or "."
-      /^[0-5]$/,   // 'm' - First digit: 0-5 (valid minute range 00-59)
-      /^[0-9]$/,   // 'm' - Second digit: 0-9
-      /^[:H.]$/,   // Separator: Can be ":", "H", or "."
-      /^[0-5]$/,   // 's' - First digit: 0-5 (valid second range 00-59)
-      /^[0-9]$/    // 's' - Second digit: 0-9
-    ],
-
-    CREDIT_CARD: [
-      /\d/,
-      /\d/,
-      /\d/,
-      /\d/,
-      ' ',
-      [/\d/],
-      [/\d/],
-      [/\d/],
-      [/\d/],
-      ' ',
-      [/\d/],
-      [/\d/],
-      [/\d/],
-      [/\d/],
-      ' ',
-      /\d/,
-      /\d/,
-      /\d/,
-      /\d/,
-    ] as IInputFormatterMaskArray,
+    get TIME() {
+      return InputFormatter.createDateMask(DEFAULT_DATE_FORMATS.time);
+    },
+    get DATE_TIME() {
+      return InputFormatter.createDateMask(DEFAULT_DATE_FORMATS.dateTime);
+    },
+    CREDIT_CARD: {
+      mask: [
+        /\d/,
+        /\d/,
+        /\d/,
+        /\d/,
+        ' ',
+        [/\d/],
+        [/\d/],
+        [/\d/],
+        [/\d/],
+        ' ',
+        [/\d/],
+        [/\d/],
+        [/\d/],
+        [/\d/],
+        ' ',
+        /\d/,
+        /\d/,
+        /\d/,
+        /\d/,
+      ] as IInputFormatterMaskArray,
+      validate: (value: string) => true,
+    }
   }
 };
-
-
-/**
-* Mask for date-time input format.
-*
-* This mask expects the input value to be in the format of `YYYY-MM-DD HH:MM:SS` or `YYYY/MM/DD HH:MM:SS` or `YYYY.MM.DD HH:MM:SS`.
-*/
-(InputFormatter.MASKS as any).DATE_TIME = [
-  ...InputFormatter.MASKS.DATE,
-  /^\s$/,    // Space separator between date and time
-  ...InputFormatter.MASKS.TIME,
-];

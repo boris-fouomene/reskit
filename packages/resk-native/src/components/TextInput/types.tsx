@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 import { ILabelProps } from "@components/Label";
 import { IFontIconProps } from "@components/Icon/types";
 import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult } from "@resk/core";
-
+import { CountryCode } from "libphonenumber-js";
 
 /**
  * @interface ITextInputType
@@ -50,7 +50,7 @@ import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterOptions
  * keyboard is presented based on the context of the input, thereby improving 
  * usability and accessibility in mobile applications.
  */
-export type ITextInputType = InputModeOptions | "number" | "password";
+export type ITextInputType = InputModeOptions | "number" | "password" | "time" | "date" | "datetime";
 
 
 /**
@@ -272,6 +272,12 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      */
     type?: ITextInputType;
 
+    /***
+     * The country code for phone number
+     * when type is telephone
+     */
+    phoneCountryCode?: CountryCode;
+
     /**
      * @type {number}
      * Specifies the maximum length of text allowed in the input field. 
@@ -438,7 +444,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
         ```
      */
     mask?: IInputFormatterMask;
-    
+
     /***
         Suffix the label with the mask placeholder, when mask is provided and the variant is not labelEmbeded
     */
@@ -515,7 +521,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
  *   label={<span>Username:</span>}
  * />
  */
-export type IUseTextInputProps = Omit<Omit<ITextInputProps, "left" | "right" | "label">, "onChange"> & {
+export interface IUseTextInputProps extends Omit<Omit<ITextInputProps, "left" | "right" | "label">, "onChange"> {
     /**
      * The content to render on the left side of the text input.
      * Typically used for icons or buttons.

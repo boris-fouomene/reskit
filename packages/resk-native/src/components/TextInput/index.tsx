@@ -2,8 +2,8 @@ import Label from "@components/Label";
 import { isValidElement, mergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputContentSizeChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from "react-native";
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskArray, IInputFormatterMaskResult } from "@resk/core";
-import _, { compact, hasIn, isNumber, values } from "lodash";
+import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskArray, IInputFormatterMaskResult, DEFAULT_DATE_FORMATS } from "@resk/core";
+import _, { compact, defaults, hasIn, isNumber, values } from "lodash";
 import Theme, { Colors, useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View from "@components/View";
@@ -262,7 +262,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, mask: customMask,suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -292,16 +292,48 @@ export const useTextInput = ({ defaultValue, mask: customMask,suffixLabelWithMas
             isNumberType
         }
     }, [type, cInputMode, isFocused]);
+    const { isPhone, isDateOrTime, typeString } = useMemo(() => {
+        const t = String(type).toLowerCase();
+        return {
+            isPhone: t == "tel",
+            typeString: t,
+            isDateOrTime: t == "datetime" || t == "date" || t == "time"
+        }
+    }, [type]);
     const emptyValue = cIsEmptyValue || (canValueBeDecimal ? "0" : "");
 
     ///mask handling
 
-    const { mask, maskOptions } = useMemo(() => {
-        return {
-            maskOptions: Object.assign({}, { placeholder: '_' }, customMaskOptions),
-            mask: InputFormatter.isValidMask(customMask) ? customMask : undefined,
+    const { mask, maskOptions, dateFormat } = useMemo(() => {
+        const maskOptions = Object.assign({}, { placeholder: '_' }, customMaskOptions);
+        let mask = InputFormatter.isValidMask(customMask) ? customMask : undefined;
+        let validate = (value: string) => true;
+        const isDate = typeString == "date", isTime = typeString == "time";
+        let dateFormat = !isDateOrTime ? defaultStr(customDateFormat) : defaultStr(customDateFormat, isDate ? DEFAULT_DATE_FORMATS.date : isTime ? DEFAULT_DATE_FORMATS.time : DEFAULT_DATE_FORMATS.dateTime);
+        if (!mask || !Array.isArray(mask) || !mask.length) {
+            if (isPhone) {
+                if (isNonNullString(phoneCountryCode)) {
+                    const m = InputFormatter.createPhoneNumberMask(phoneCountryCode);
+                    mask = m.mask;
+                    validate = m.validate;
+                }
+            } else if (isDateOrTime) {
+                const m2 = InputFormatter.createDateMask(dateFormat);
+                mask = m2.mask;
+                validate = m2.validate;
+            }
         }
-    }, [customMask, customMaskOptions]);
+        const { validate: maskOptionsValidate } = maskOptions;
+        (maskOptions as any).validate = (value: string) => {
+            return validate(value) && (typeof maskOptionsValidate == "function" ? maskOptionsValidate(value) : true);
+        }
+        return {
+            maskOptions,
+            mask,
+            validate,
+            dateFormat
+        }
+    }, [customMask, customMaskOptions, phoneCountryCode, typeString, customDateFormat, isDateOrTime]);
     const toCase = (value: any): { value: string } & Partial<IInputFormatterMaskResult> => {
         if (canValueBeDecimal && isFocused && (value === '.' || value == '.')) {
             value = "0" + value;
@@ -328,18 +360,18 @@ export const useTextInput = ({ defaultValue, mask: customMask,suffixLabelWithMas
         event: null,
     });
     const formatted = useMemo(() => {
-        return InputFormatter.formatValueToObject({ ...props, ...inputState, type, value: inputState.value });
-    }, [inputState.value, type]);
+        return InputFormatter.formatValueToObject({ ...props, ...inputState, dateFormat, type, value: inputState.value });
+    }, [inputState.value, type, dateFormat]);
     const focusedValue = isFocused ? (formatted.value == emptyValue ? '' : formatted.value) : '';
     useEffect(() => {
-        if (areCasesEquals(valCase,inputState)) return;
+        if (areCasesEquals(valCase, inputState)) return;
         setInputState({ ...inputState, ...valCase, event: null });
     }, [defaultValue, valCase]);
 
     //handle mask
-    const { maskArray,maskHasObfuscation,placeholder:inputMaskPlaceholder } = inputState;
+    const { maskArray, maskHasObfuscation, placeholder: inputMaskPlaceholder } = inputState;
     const hasInputMask = Array.isArray(maskArray) && !!maskArray.length;
-    
+
     const placeholder = hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : props.placeholder);
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
@@ -438,7 +470,7 @@ export const useTextInput = ({ defaultValue, mask: customMask,suffixLabelWithMas
             isDropdownAnchor && editable && styles.dropdownAnchorInput,
         ],
         value: inputValue,
-        inputMode: inputMode,
+        inputMode: inputMode as any,
         onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
             const { nativeEvent: { target, text } } = event;
             let textString = String(text);
@@ -462,9 +494,9 @@ export const useTextInput = ({ defaultValue, mask: customMask,suffixLabelWithMas
                 }
             } */
             const valCase2 = toCase(textString);
-            const value = inputState.placeholder?valCase2.masked:valCase2.value;
+            const value = inputState.placeholder ? valCase2.masked : valCase2.value;
             if (textString !== inputState.value && inputState.value != value && !areCasesEquals(valCase2, inputState)) {
-                const options = { ...inputState, isFocused, type, ...valCase2,value, text: textString, event };
+                const options = { ...inputState, isFocused, type, dateFormat, phoneCountryCode, ...valCase2, value, text: textString, event };
                 setInputState(options);
                 if (typeof onChange == "function") {
                     clearTimeout(debounceTimeoutRef.current);
@@ -503,7 +535,7 @@ export const useTextInput = ({ defaultValue, mask: customMask,suffixLabelWithMas
     }
 }
 
-const areCasesEquals = (case1:Partial<IInputFormatterMaskResult>,case2:Partial<IInputFormatterMaskResult>)=>{
+const areCasesEquals = (case1: Partial<IInputFormatterMaskResult>, case2: Partial<IInputFormatterMaskResult>) => {
     return (case1 as any).value == (case2 as any).value && case1.masked === case2.masked && case1.unmasked === case2.unmasked && case1.obfuscated === case2.obfuscated;
 }
 

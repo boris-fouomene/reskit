@@ -360,7 +360,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         event: null,
     });
     const error = useMemo(() => {
-        return !!customError || handleMaskValidationErrors && inputState.isValid === false;
+        return !!customError || handleMaskValidationErrors !== false && inputState.isValid === false;
     }, [inputState.isValid, customError,handleMaskValidationErrors])
     const formatted = useMemo(() => {
         return InputFormatter.formatValueToObject({ ...props, ...inputState, dateFormat, type, value: inputState.value });

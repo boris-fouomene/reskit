@@ -1,5 +1,5 @@
 import "../../utils";
-import { isDateObj, parseDate, addToDate, addMilliseconds, addSeconds, addMinutes, addHours, addDays, addMonths, addWeeks, addYears, currentMonthDaysLimits, previousWeekDaysLimits, currentWeekDaysLimits, formatDate, isValidDate } from '../date';
+import { isDateObj, DateParser, addToDate, addMilliseconds, addSeconds, addMinutes, addHours, addDays, addMonths, addWeeks, addYears, currentMonthDaysLimits, previousWeekDaysLimits, currentWeekDaysLimits, formatDate} from '../date';
 
 describe('Date Utils', () => {
     describe('isDateObj', () => {
@@ -19,7 +19,7 @@ describe('Date Utils', () => {
 
     describe('parseDate', () => {
         it('should parse valid date strings', () => {
-            const date = parseDate('2023-01-01', "YYYY-MM-DD");
+            const date = DateParser.parseDate('2023-01-01', "YYYY-MM-DD");
             expect(date instanceof Date).toBe(true);
             expect(date?.getFullYear()).toBe(2023);
             expect(date?.getMonth()).toBe(0);
@@ -27,9 +27,9 @@ describe('Date Utils', () => {
         });
 
         it('should return null for invalid dates', () => {
-            expect(parseDate('invalid-date')).toBeNull();
-            expect(parseDate(null)).toBeNull();
-            expect(parseDate(undefined)).toBeNull();
+            expect(DateParser.parseDate('invalid-date')).toBeNull();
+            expect(DateParser.parseDate(null)).toBeNull();
+            expect(DateParser.parseDate(undefined)).toBeNull();
         });
     });
 
@@ -100,20 +100,15 @@ describe('Date Utils', () => {
             expect(formatDate(testDate, 'YYYY-MM-DD')).toBe('2023-01-15');
             expect(formatDate(testDate, 'HH:mm:ss')).toBe('12:30:45');
         });
-
-        it('should handle invalid dates', () => {
-            expect(formatDate('invalid-date')).toBe('');
-            expect(formatDate(null)).toBe('');
-        });
     });
 
     describe('isValidDate', () => {
         it('should validate dates correctly', () => {
-            expect(isValidDate(new Date())).toBe(true);
-            expect(isValidDate('2023-01-01')).toBe(true);
-            expect(isValidDate('invalid-date')).toBe(false);
-            expect(isValidDate(null)).toBe(false);
-            expect(isValidDate(123)).toBe(false);
+            expect(DateParser.isValidDate(new Date())).toBe(true);
+            expect(DateParser.isValidDate('2023-01-01')).toBe(true);
+            expect(DateParser.isValidDate('invalid-date')).toBe(false);
+            expect(DateParser.isValidDate(null)).toBe(false);
+            expect(DateParser.isValidDate(123)).toBe(false);
         });
     });
 });

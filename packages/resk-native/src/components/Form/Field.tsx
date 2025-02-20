@@ -1096,6 +1096,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
                                         disabled,
                                         errorText,
                                         error: canShowErrors,
+                                        handleMaskValidationErrors : canShowErrors,
                                         ...kProps,
                                         defaultValue: this.state.value,
                                     } as IField<Type>,

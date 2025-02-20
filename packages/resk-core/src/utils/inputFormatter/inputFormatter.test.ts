@@ -466,7 +466,7 @@ describe('InputFormatter', () => {
     });
     describe("create cameroon phone number mask", () => {
         it("should create a phone number mask with a country code", () => {
-            const mask = InputFormatter.createPhoneNumberMask("CM");
+            const mask = InputFormatter.createPhoneNumberMaskFromExample("(237)69965076");
             console.log(mask, " is camerron phonne number");
         });
     })

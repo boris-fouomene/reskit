@@ -1,4 +1,4 @@
-import { isBoolean, isNumber } from "lodash";
+import { isNumber } from "lodash";
 import isNonNullString from "../isNonNullString";
 import moment from 'moment';
 import { i18n } from "../../i18n";
@@ -6,8 +6,11 @@ import isDateObj from "../isDateObj";
 import isEmpty from "../isEmpty";
 import defaultStr from "../defaultStr";
 import { IMomentFormat } from "../../types";
+import { DateParser } from "./dateParser";
 
-export { isDateObj };
+
+
+export { isDateObj,DateParser };
 /**
  * Global interface extension for the Date object.
  * 
@@ -698,7 +701,7 @@ export function addToDate(days: number, date?: any, setFunction?: string): Date 
      * 
      * This check allows the function to accept date strings as input.
      */
-    if (isValidDate(date) && isNonNullString(date)) {
+    if (DateParser.isValidDate(date) && isNonNullString(date)) {
         date = new Date(date);
     }
 
@@ -707,7 +710,7 @@ export function addToDate(days: number, date?: any, setFunction?: string): Date 
      * 
      * This check ensures that the function returns a consistent result for invalid date inputs.
      */
-    if (!isValidDate(date)) {
+    if (!DateParser.isValidDate(date)) {
         date = isNonNullString(date) ? new Date(date) : new Date();
     }
 
@@ -818,88 +821,6 @@ export function addHours(hours: number, dateObj?: any): Date {
     return addMilliseconds(hours * 3600000, dateObj);
 }
 
-/**
- * Parses a date using the Moment.js library.
- *
- * @param {Date|string|number} date The date to parse.
- * @param {string} [format] The format of the date, using Moment.js format. See https://momentjs.com/docs/#/parsing/string-format/
- * @returns {Date|null} The parsed date, or null if the input is not a valid date.
- */
-export function parseDate(date: any, format?: IMomentFormat): Date | null {
-    /**
-     * If the date is already a Date object, return it as is.
-     */
-    if (isDateObj(date)) return date as Date;
-
-    /**
-     * If the date is empty or null, return null.
-     */
-    if (isEmpty(date)) return null;
-
-    try {
-        /**
-         * Attempt to parse the date using the Moment.js library.
-         */
-        const parsedDate = moment(date, format);
-        /* Check if the parsed date is valid.
-        */
-        if (parsedDate?.isValid()) {
-            /**
-              * If the date is valid, return it as a Date object.
-              */
-            return parsedDate.toDate();
-        }
-    } catch (error) {
-        console.error(error, " parsing date with moment : ", date, " format is : ", format);
-    }
-    return null;
-
-}
-
-/**
- * Checks if the provided variable is a valid date, either in SQL format or as a Date object.
- *
- * @param {string|Date} sDate The date to test.
- * @param {string} [format] The format of the date, using Moment.js format. See https://momentjs.com/docs/#/parsing/string-format/
- * @returns {boolean} True if the date is valid, false otherwise.
- */
-export const isValidDate = function (sDate: any, format?: IMomentFormat): boolean {
-    if (sDate === null || sDate === undefined) return false;
-    /**
-     * If the input is a boolean, it's not a valid date.
-     */
-    if (isBoolean(sDate)) return false;
-
-    /**
-     * If the input is already a Date object, it's a valid date.
-     */
-    if (isDateObj(sDate)) return true;
-
-    /**
-     * If the input is a non-empty string, try to parse it as a date.
-     */
-    if (isNonNullString(sDate)) {
-        /**
-         * If the date can be parsed successfully, it's a valid date.
-         */
-        return !!parseDate(sDate, format);
-    }
-
-    /**
-     * If the input is a number that can be converted to a string, it's not a valid date.
-     */
-    if (sDate?.toString && sDate?.toString() == parseInt(sDate).toString()) return false;
-
-    /**
-     * Try to create a new Date object from the input.
-     */
-    const tryDate = new Date(sDate);
-
-    /**
-     * If the resulting Date object is valid, the input is a valid date.
-     */
-    return (isDateObj(tryDate));
-}
 /**
  * Adds the specified number of days to the date object.
  *
@@ -1116,7 +1037,7 @@ export const currentMonthDaysLimits = (date?: any): { first: Date, last: Date } 
      * 
      * This check ensures that the function returns a consistent result for missing inputs.
      */
-    const currentDate = isValidDate(date) ? new Date(date) : new Date().resetHours2Minutes2Seconds();
+    const currentDate = DateParser.isValidDate(date) ? new Date(date) : new Date().resetHours2Minutes2Seconds();
 
     /**
      * Calculate the first day of the month.
@@ -1153,7 +1074,7 @@ export const previousWeekDaysLimits = (date?: any): { first: Date, last: Date } 
      * 
      * This check ensures that the function returns a consistent result for missing inputs.
      */
-    const cDate = isValidDate(date) ? new Date(date) : new Date().resetHours2Minutes2Seconds();
+    const cDate = DateParser.isValidDate(date) ? new Date(date) : new Date().resetHours2Minutes2Seconds();
 
     /**
      * Calculate the date one week ago.
@@ -1218,7 +1139,7 @@ export const currentWeekDaysLimits = (date?: any) => {
      * 
      * This check ensures that the function returns a consistent result for missing inputs.
      */
-    const currentDate = isValidDate(date) ? new Date(date) : new Date().resetHours2Minutes2Seconds();
+    const currentDate = DateParser.isValidDate(date) ? new Date(date) : new Date().resetHours2Minutes2Seconds();
 
     /**
      * Get the day of the week (0 = Sunday, 1 = Monday, etc.).
@@ -1261,7 +1182,7 @@ export const currentWeekDaysLimits = (date?: any) => {
 /**
  * Formats a date to the specified moment format.
  * 
- * @param {Date|string} [date] The date to format. If not provided, the current date is used.
+ * @param {Date} [date] The date to format. If not provided, the current date is used.
  * @param {string} [format] The moment format to use. If not provided, the default format is used.
  * @returns {string} The formatted date string. If the input date is invalid, an empty string is returned.
  * 
@@ -1272,36 +1193,15 @@ export const currentWeekDaysLimits = (date?: any) => {
  * console.log(formatDate("2022-01-15", "YYYY-MM-DD")); // Output: Formatted date in YYYY-MM-DD format
  * ```
  */
-export const formatDate = (date?: any, format?: IMomentFormat): string => {
-    /**
-     * Parse the input date using moment.
-     * 
-     * This allows us to handle various date formats and invalid dates.
-     */
-    const parsedDate = moment(date);
-
-    /**
-     * Check if the parsed date is valid.
-     * 
-     * If the date is invalid, we return an empty string.
-     */
-    if (parsedDate.isValid()) {
-        /**
-         * Format the date using the specified format.
-         * 
-         * This returns the formatted date string.
-         */
-        return parsedDate.format((defaultStr(format, DEFAULT_DATE_FORMATS.dateTime) as unknown) as IMomentFormat);
-    } else {
-        /**
-         * Return the original date string if it's a valid date, otherwise return an empty string.
-         * 
-         * This ensures that the function returns a consistent result for invalid dates.
-         */
-        return defaultStr(isValidDate(date) ? date?.toString() : "");
-    }
+export const formatDate = (date?: Date, format?: IMomentFormat): string => {
+    try {
+        const parsedDate = moment(date);
+        if (parsedDate.isValid()) {
+            return parsedDate.format((defaultStr(format, DEFAULT_DATE_FORMATS.dateTime) as unknown) as IMomentFormat);
+        }
+    } catch (error) {}
+    return defaultStr(DateParser.isValidDate(date) ? date?.toString() : "");
 }
-
 /**
  * Formats the date according to a specified format string.
  * 

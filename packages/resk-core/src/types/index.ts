@@ -521,6 +521,14 @@ export interface IInputFormatterResult extends IInputFormatterOptions, Partial<I
   isDecimalType: boolean; //if the type linked to the function supports decimal values
   parsedValue: any; //defaults to a number when it is a number
   decimalValue: number; //the decimal value of the formatted value
+  /***
+    The date object corresponding to the input value, when the provided type is date, time or datetime
+  */
+  dateValue?:Date;
+  /****
+    there dateFormat used to format the value
+  */
+  dateFormat?:IMomentFormat;
 }
 
 /**

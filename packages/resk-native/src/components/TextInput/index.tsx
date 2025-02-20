@@ -262,7 +262,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask,handleMaskValidationErrors, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -360,8 +360,8 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         event: null,
     });
     const error = useMemo(() => {
-        return !!customError || inputState.isValid === false;
-    }, [inputState.isValid, customError])
+        return !!customError || handleMaskValidationErrors && inputState.isValid === false;
+    }, [inputState.isValid, customError,handleMaskValidationErrors])
     const formatted = useMemo(() => {
         return InputFormatter.formatValueToObject({ ...props, ...inputState, dateFormat, type, value: inputState.value });
     }, [inputState.value, type, dateFormat]);
@@ -374,8 +374,6 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     //handle mask
     const { maskArray, maskHasObfuscation, placeholder: inputMaskPlaceholder } = inputState;
     const hasInputMask = Array.isArray(maskArray) && !!maskArray.length;
-
-    const placeholder = hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : props.placeholder);
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
@@ -456,7 +454,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         }),
         label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
-        placeholder,
+        placeholder:hasInputMask  ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
         testID: testID,
         readOnly: editable === false,
         editable,
@@ -479,29 +477,13 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             let textString = String(text);
             if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
                 return;
-            }/* 
-            if (inputState.showObfuscatedValue && textString && inputState.obfuscated && inputState.masked) {
-                const ofuscatedLength = inputState.obfuscated.length;
-                const maskedLength = inputState.masked.length;
-                if(maskedLength === ofuscatedLength){
-                    let newTextString = "";
-                    for(let i=0;i<textString.length;i++){
-                        if(i>=ofuscatedLength) break;
-                        if(textString.charAt(i) == inputState.obfuscated.charAt(i)){
-                            newTextString += inputState.masked.charAt(i);
-                            break;
-                        }
-                    }
-                    console.log("new text string",newTextString," is in put state validdddd ",textString);
-                    textString = newTextString;
-                }
-            } */
+            }
             const valCase2 = toCase(textString);
             const value = inputState.placeholder ? valCase2.masked : valCase2.value;
             if (textString !== inputState.value && inputState.value != value && !areCasesEquals(valCase2, inputState)) {
                 const options = { ...inputState, isFocused, type, dateFormat, phoneCountryCode, ...valCase2, value, text: textString, event };
                 setInputState(options);
-                if (typeof onChange == "function") {
+                if (typeof onChange == "function" && valCase2.isValid !== false) {
                     clearTimeout(debounceTimeoutRef.current);
                     debounceTimeoutRef.current = setTimeout(() => {
                         onChange({ ...options, ...InputFormatter.formatValueToObject(options) });

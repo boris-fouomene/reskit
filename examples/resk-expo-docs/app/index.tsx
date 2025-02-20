@@ -50,10 +50,26 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
             </View>
 
             <HStack>
-                <TextInput label="Text input Date" type="date" />
-                <TextInput label="Text input Time" type="time" />
-                <TextInput label="Text input DateTime" type="datetime" />
-                <TextInput label="Text input Phone CM" type="tel" phoneCountryCode="CM" />
+                <TextInput label="Text input Date" type="date" 
+                    onChange = {(options)=>{
+                        console.log(options," is options date changeddddd")
+                    }}
+                />
+                <TextInput label="Text input Time" type="time" 
+                    onChange={(options)=>{
+                        console.log(options," is options time changeddddd")
+                    }}
+                />
+                <TextInput label="Text input DateTime" type="datetime"
+                    onChange={(options)=>{
+                        console.log(options," is options datetime changeddddd")
+                    }}
+                />
+                <TextInput label="Text input Phone CM" type="tel" phoneCountryCode="CM" 
+                    onChange={(options)=>{
+                        console.log(options," is options phone changeddddd")
+                    }}
+                />
             </HStack>
             <Form
                 name="my-form"

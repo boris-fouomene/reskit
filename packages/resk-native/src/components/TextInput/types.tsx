@@ -453,7 +453,15 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
     /***
      * Additionnal options to pass to the InputFormatter.formatWithMask method, when mask prop is provided to input field
      */
-    maskOptions?: Omit<IInputFormatterMaskOptions, "mask">
+    maskOptions?: Omit<IInputFormatterMaskOptions, "mask">;
+    
+    /***
+        A boolean that determines whether to handle validation errors for the mask, when mask is provided.
+        If set to true, the component will handle validation errors for the mask and display them to the user.
+        This is useful for handling errors related to the mask and providing feedback to the user.
+        When set to true, the component will override the `error` to true if the mask has validation errors.
+    */
+    handleMaskValidationErrors?: boolean;
 };
 
 /**
@@ -580,6 +588,7 @@ export interface IUseTextInputProps extends Omit<Omit<ITextInputProps, "left" | 
 
     /**
      * the function called when the text input change
+     * When mask is provided, the function is called only when the input matches the mask
      * @param event 
      * @returns 
      */

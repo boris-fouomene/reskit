@@ -1,6 +1,5 @@
-import stringify from "@utils/stringify";
 import { IInputFormatterNumberMaskOptions, IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterMaskWithValidation } from "../../types";
-import { DEFAULT_DATE_FORMATS, formatDate, isDateObj, isValidDate } from "../date";
+import { DEFAULT_DATE_FORMATS, formatDate, DateParser } from "../date";
 import defaultStr from "../defaultStr";
 import isNonNullString from "../isNonNullString";
 import isRegExp from "../isRegex";
@@ -59,6 +58,7 @@ export class InputFormatter {
   static formatValueToObject({ value, type, format, dateFormat, ...rest }: IInputFormatterOptions): IInputFormatterResult {
     const canValueBeDecimal = type && ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());
     let parsedValue = value;
+    const result:Partial<IInputFormatterResult> = {};
     // Normalize the value: if it's undefined, null, or empty, set it to an empty string.
     value = value === undefined || value === null || !value ? "" : value;
     if (!value) {
@@ -78,13 +78,21 @@ export class InputFormatter {
       formattedValue = format({ ...rest, type, value });
     } else {
       const typeText = String(type).toLowerCase();
-
+      let hasFoundDate = false;
       // Format dates if the value is a valid date object.
-      if (isDateObj(value) && (dateFormat || (["time", "date", "datetime"].includes(typeText) && isValidDate(value)))) {
-        formattedValue = formatDate(value, dateFormat || typeText === "time" ? DEFAULT_DATE_FORMATS.time : typeText === "date" ? DEFAULT_DATE_FORMATS.date : DEFAULT_DATE_FORMATS.dateTime);
+      if ((dateFormat || ["time", "date", "datetime"].includes(typeText))) {
+        dateFormat = defaultStr(dateFormat,typeText === "time" ? DEFAULT_DATE_FORMATS.time : typeText === "date" ? DEFAULT_DATE_FORMATS.date : DEFAULT_DATE_FORMATS.dateTime)
+        const parsedDate = DateParser.parseDate(value);
+        if(parsedDate){
+          hasFoundDate = true;
+          formattedValue = formatDate(parsedDate, dateFormat);
+          result.dateValue = parsedDate;
+        }
+        result.dateFormat = dateFormat;
       }
+      if(hasFoundDate){}
       // Format numbers based on the specified format.
-      else if (typeof parsedValue == 'number') {
+      else if(typeof parsedValue == 'number') {
         if (typeof (Number.prototype)[format as keyof Number] === 'function') {
           formattedValue = (parsedValue as number)[format as keyof Number]();
         } else {
@@ -103,6 +111,7 @@ export class InputFormatter {
       format,
       parsedValue,
       decimalValue: typeof parsedValue == 'number' ? parsedValue : 0,
+      ...result,
     };
   }
 
@@ -469,7 +478,7 @@ export class InputFormatter {
   /****
    * The phone number examples, used to generate the phone number mask
    */
-  static PHONE_NUMBER_EXAMPLES: Examples = Object.assign({}, examples) as Examples;
+  static PHONE_NUMBER_EXAMPLES: Record<CountryCode,string> = {} as Record<CountryCode,string>;
   /***
    * A mask for single facilitative space.
    * @description A mask for a single facilitative space.
@@ -478,13 +487,16 @@ export class InputFormatter {
   /**
    * Generates a phone number mask based on the country code.
    * @param countryCode - The country code (e.g., "US", "FR", "IN").
-   * @param numberExample - The number example to use for the mask. If not provided, the default example will be used.
    * @returns {IInputFormatterMaskWithValidation} The phone number mask, an array of mask elements (strings or regexes) representing the phone number format..
    */
 
-  static createPhoneNumberMask(countryCode: CountryCode, numberExample?: string): IInputFormatterMaskWithValidation {
+  static createPhoneNumberMask(countryCode: CountryCode): IInputFormatterMaskWithValidation {
+    const countryExample = isNonNullString(countryCode) ? InputFormatter.PHONE_NUMBER_EXAMPLES[countryCode] : undefined;
+    if(isNonNullString(countryExample)){  
+      return InputFormatter.createPhoneNumberMaskFromExample(countryExample,countryCode);
+    }
     // Get an example phone number for the given country code
-    const exampleNumber = getExampleNumber(countryCode, InputFormatter.PHONE_NUMBER_EXAMPLES);
+    const exampleNumber = getExampleNumber(countryCode, examples);
     if (!exampleNumber) {
       //throw new Error(`No example number found for country code: ${countryCode}`);
       return {
@@ -495,11 +507,39 @@ export class InputFormatter {
 
     // Format the example number using AsYouType
     const formatter = new AsYouType(countryCode);
-    const formattedNumber = formatter.input(exampleNumber.nationalNumber);
-
-    // Convert the formatted number into a mask
+    return InputFormatter.createPhoneNumberMaskFromExample(formatter.input(exampleNumber.nationalNumber),countryCode);
+  }
+  /***
+    Creates a phone number mask based on the provided phone number example and country code.
+    
+    This function takes a phone number example and an optional country code as input. It creates a mask based on the example number and the country code.
+    
+    The function returns an object with a mask and a validation function. The mask is an array of mask elements, where each element represents a character or a regex pattern. The validation function checks if the input value is a valid phone number based on the provided country code.
+    
+    If the country code is not provided, the default country code is used. If no example number is found for the provided country code, the function returns an empty mask and a validation function that always returns false.
+    
+    @param {string} phoneNumberExample - The phone number example to use for the mask.
+    @param {CountryCode} [countryCode] - The country code to use for the mask. If not provided, the default country code is used.
+    @returns {IInputFormatterMaskWithValidation} An object containing the mask and a validation function.
+    
+    @example
+    ```typescript
+    const phoneNumberMask = createPhoneNumberMaskFromExample('+1 202 555 0144');  // Returns a mask and a validation function for a phone number in the US
+    console.log(phoneNumberMask.mask);  // Output: [/(\d)/, /(\d)/, /(\d)/, /(\d)/, ' ', /(\d)/, /(\d)/, /(\d)/, /(\d)/]
+    console.log(phoneNumberMask.validate('+1 202 555 0144'));  // Output: true
+    ```
+  */
+  static createPhoneNumberMaskFromExample(phoneNumberExample: string, countryCode?:Parameters<typeof isValidPhoneNumber>[1]): IInputFormatterMaskWithValidation {
+    if (!isNonNullString(phoneNumberExample)) {
+      //throw new Error(`No example number found for country code: ${countryCode}`);
+      return {
+        mask: [],
+        validate: (value: string) => false,
+      }
+    }
     const mask: IInputFormatterMaskArray = [];
-    for (const char of formattedNumber) {
+    phoneNumberExample = InputFormatter.sanitizePhoneNumber(phoneNumberExample);
+    for (const char of phoneNumberExample) {
       if (/\d/.test(char)) {
         mask.push(/\d/); // Replace digits with a regex for digits
       } else if (char === ' ') {
@@ -510,7 +550,7 @@ export class InputFormatter {
     }
     return {
       mask, validate: (value: string) => {
-        return isNonNullString(value) && !!isValidPhoneNumber(value, countryCode);
+        return isNonNullString(value) && !!isValidPhoneNumber(value,countryCode);
       }
     };
   }

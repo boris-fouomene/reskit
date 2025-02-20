@@ -1,10 +1,10 @@
 import Label from "@components/Label";
-import { isValidElement, mergeRefs } from "@utils";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputContentSizeChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from "react-native";
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskArray, IInputFormatterMaskResult, DEFAULT_DATE_FORMATS, defaultBool } from "@resk/core";
-import _, { compact, defaults, hasIn, isNumber, values } from "lodash";
-import Theme, { Colors, useTheme } from "@theme";
+import { isValidElement } from "@utils";
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, ScrollView } from 'react-native';
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, DEFAULT_DATE_FORMATS, defaultBool } from "@resk/core";
+import _, { isNumber } from "lodash";
+import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View from "@components/View";
 import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
@@ -14,6 +14,9 @@ import { IStyle } from "@src/types";
 import { IFontIconProps } from "@components/Icon";
 import { TouchableRipple } from "@components/TouchableRipple";
 import Breakpoints from "@breakpoints/index";
+import { Calendar } from "@components/Date";
+import {Portal} from "@components/Portal";
+import {Animated} from "react-native";
 
 
 /**
@@ -167,7 +170,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
     }
     return { containerStyle, contentContainerStyle, inputStyle, labelStyle }
 }
-
+const iconSize = 25;
 /***
  * A custom hook for managing the state and behavior of a text input component.
  * This hook encapsulates logic for handling focus, value formatting, and various
@@ -262,9 +265,10 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask,handleMaskValidationErrors, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask,handleMaskValidationErrors, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length,calendarProps:customDateProps, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
+    const [calendarVisible,setCalendarVisible] = useState(false);
     contentContainerProps = Object.assign({}, contentContainerProps);
     rightContainerProps = Object.assign({}, rightContainerProps);
     containerProps = Object.assign({}, containerProps);
@@ -304,12 +308,13 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
 
     ///mask handling
 
-    const { mask, maskOptions, dateFormat } = useMemo(() => {
+    const { mask, maskOptions, dateFormat,calendarProps : {iconProps,...calendarProps},canRenderCalendar } = useMemo(() => {
         const maskOptions = Object.assign({}, { placeholder: '_' }, customMaskOptions);
         let mask = InputFormatter.isValidMask(customMask) ? customMask : undefined;
+        const calendarProps = Object.assign({}, customDateProps);
         let validate = (value: string) => true;
         const isDate = typeString == "date", isTime = typeString == "time";
-        let dateFormat = !isDateOrTime ? defaultStr(customDateFormat) : defaultStr(customDateFormat, isDate ? DEFAULT_DATE_FORMATS.date : isTime ? DEFAULT_DATE_FORMATS.time : DEFAULT_DATE_FORMATS.dateTime);
+        const dateFormat = calendarProps.dateFormat = !isDateOrTime ? defaultStr(calendarProps.dateFormat,customDateFormat) : defaultStr(calendarProps.dateFormat,customDateFormat, isDate ? DEFAULT_DATE_FORMATS.date : isTime ? DEFAULT_DATE_FORMATS.time : DEFAULT_DATE_FORMATS.dateTime);
         if (!mask || !Array.isArray(mask) || !mask.length) {
             if (isPhone) {
                 if (isNonNullString(phoneCountryCode)) {
@@ -331,9 +336,11 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             maskOptions,
             mask,
             validate,
-            dateFormat
+            dateFormat,
+            calendarProps,
+            canRenderCalendar : ["datetime", "date"].includes(typeString)
         }
-    }, [customMask, customMaskOptions, phoneCountryCode, typeString, customDateFormat, isDateOrTime]);
+    }, [customMask, customMaskOptions, phoneCountryCode, typeString, customDateFormat, isDateOrTime,customDateProps]);
     const toCase = (value: any): { value: string } & Partial<IInputFormatterMaskResult> => {
         if (canValueBeDecimal && isFocused && (value === '.' || value == '.')) {
             value = "0" + value;
@@ -391,9 +398,9 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         return typeof customMaxHeight === "number" ? customMaxHeight : undefined;
     }, [customMaxHeight]);
     const inputDimensionsRef = useRef<IDict>({ width: 0, height: minHeight });
-    const { width, height } = inputDimensionsRef.current;
+    const {height } = inputDimensionsRef.current;
     const affixContent = useMemo(() => {
-        if (affix === false) return null;
+        if (affix === false || (isDateOrTime && !affix)) return null;
         let affContent = typeof affix == "function" ? affix(callOptions) : isValidElement(affix, true) ? affix : null;
         if (!affContent && !isPasswordField) {
             if (!focusedValue || canValueBeDecimal) return null;
@@ -407,7 +414,63 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             return affContent;
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
-    }, [focusedValue, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
+    }, [focusedValue,isDateOrTime, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
+    const calendarIProps = Object.assign({}, iconProps);
+    const translateY = useRef(new Animated.Value(300)).current;
+    const backdropOpacity = useRef(new Animated.Value(0)).current;
+    const openCalendar = ()=>{
+        Animated.parallel([
+            Animated.timing(translateY, {
+              toValue: 0,
+              duration: 300,
+              useNativeDriver: true,
+            }),
+            Animated.timing(backdropOpacity, {
+              toValue: 1,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+        ]).start(()=>{
+            setCalendarVisible(true);
+        });
+    }, closeCalendar = ()=>{
+        Animated.parallel([
+            Animated.timing(translateY, {
+              toValue: 300,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.timing(backdropOpacity, {
+              toValue: 0,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+        ]).start(()=>{
+            setCalendarVisible(false);
+        });
+    }
+    const calendarFlag = canRenderCalendar && editable ? <>
+        <FontIcon
+            color={textColor}
+            testID={`${testID}-calendar-icon`}
+            {...calendarIProps}
+            size = {calendarIProps?.size || iconSize}
+            name = {calendarIProps?.name || "calendar"}
+            onPress={(event)=>{
+                openCalendar();
+            }}
+        />
+        {calendarVisible ? <Portal absoluteFill testID={`${testID}-calendar-modal`}>
+            <Pressable onPress={(e)=>closeCalendar()} testID={testID+"-calendar-modal-backdrop"} style={[styles.calendarModalBackdrop,{backgroundColor:theme.colors.backdrop}]}>
+                <Animated.View testID={`${testID}-calendar-modal-container`} style={[styles.calendarModalContainer,{opacity, transform: [{ translateY }] }]}>
+                    <Calendar.DayView
+                        testID={`${testID}-calendar-modal`}
+                        {...Object.assign({}, calendarProps)}
+                    />
+                </Animated.View>
+            </Pressable>
+        </Portal> : null}
+    </>: null;
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
     }, [height, inputValue]);
@@ -426,7 +489,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         }
         return {} as IFontIconProps;
     }, [isPasswordField, secureTextEntryGetToggleIconProps, isSecure]);
-    const secureIcon = isPasswordField ? <FontIcon size={25}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure) }} color={textColor} /> : null;
+    const secureIcon = isPasswordField ? <FontIcon size={iconSize}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure) }} color={textColor} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, withBackground, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     const labelSuffix = suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? <Label color={textColor}>{""}[{inputMaskPlaceholder}]</Label> : null;
@@ -514,10 +577,11 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             }
         },
         left,
-        right: (right || canToggleSecure || affixContent) ? <View testID={`${testID}-right-container`} {...rightContainerProps} style={[styles.leftOrRightContainer, styles.rightContainer, disabledOrEditStyle, rightContainerProps.style]}>
+        right: (right || canToggleSecure || affixContent || calendarFlag) ? <View testID={`${testID}-right-container`} {...rightContainerProps} style={[styles.leftOrRightContainer, styles.rightContainer, disabledOrEditStyle, rightContainerProps.style]}>
             {affixContent}
             {right}
             {editable || disabled !== false && isPasswordField ? secureIcon : null}
+            {calendarFlag}
         </View> : null
     }
 }
@@ -532,6 +596,17 @@ export default TextInput;
 
 
 const styles = StyleSheet.create({
+    calendarModalBackdrop : {
+        flex:1,
+        justifyContent:"center",
+        alignItems:"center",
+    },
+    calendarModalContainer : {
+        flex:1,
+        padding:10,
+        justifyContent:"center",
+        alignItems:"center",
+    },
     affix: {
         paddingHorizontal: 0,
         marginHorizontal: 5,

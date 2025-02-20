@@ -1,3 +1,4 @@
+import { IDialogControlledProps } from "@components/Dialog";
 import { ISurfaceProps } from "@components/Surface";
 import { IMomentFormat } from "@resk/core"
 import { Moment } from "moment";
@@ -40,7 +41,7 @@ export interface ICalendarBaseProps extends ISurfaceProps {
      * const dateFormat: IMomentFormat = 'YYYY-MM-DD';
      */
     dateFormat?: IMomentFormat;
-
+    
     /**
      * The test ID for the calendar component.
      * @default undefined
@@ -93,7 +94,7 @@ export interface ICalendarBaseProps extends ISurfaceProps {
  * Interface representing the properties of a calendar month component.
  * @extends ICalendarBaseProps
  */
-export interface ICalendarMonthProps extends ICalendarBaseProps {
+export interface ICalendarMonthViewProps extends ICalendarBaseProps {
     /**
      * Callback function to be called when a month is selected.
      * @param data The selected month data.
@@ -109,7 +110,7 @@ export interface ICalendarMonthProps extends ICalendarBaseProps {
  * Interface representing the properties of a calendar year component.
  * @extends ICalendarBaseProps
  */
-export interface ICalendarYearProps extends ICalendarBaseProps {
+export interface ICalendarYearViewProps extends ICalendarBaseProps {
     /**
      * Callback function to be called when a year is selected.
      * @param data The selected year data.
@@ -141,7 +142,7 @@ export interface ICalendarHourProps extends ICalendarBaseProps {
  * Interface representing the properties of a calendar day component.
  * @extends ICalendarBaseProps
  */
-export interface ICalendarDayProps extends ICalendarBaseProps {
+export interface ICalendarDayViewProps extends ICalendarBaseProps {
     /**
      * Callback function to be called when a day is selected.
      * @param data The selected day data.
@@ -159,6 +160,13 @@ export interface ICalendarDayProps extends ICalendarBaseProps {
      * const weekStartDay: number = 1; // Monday
      */
     weekStartDay?: number;
+}
+/****
+    Interface for the calendar modal day view props.
+    @extends ICalendarDayViewProps
+*/
+export interface ICalendarModalDayViewProps extends ICalendarDayViewProps {
+    modalProps?: IDialogControlledProps;
 }
 
 /**

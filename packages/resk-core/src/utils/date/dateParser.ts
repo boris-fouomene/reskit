@@ -1,10 +1,9 @@
 import moment from 'moment';
-import {isDateObj} from "../date";
+import isDateObj from "../isDateObj";
 import { IMomentFormat } from '@/types';
 import isEmpty from '@utils/isEmpty';
 import isNonNullString from '@utils/isNonNullString';
 import { isBoolean } from 'lodash';
-
 
 
 /**

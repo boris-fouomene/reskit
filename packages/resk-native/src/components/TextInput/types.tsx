@@ -7,6 +7,7 @@ import { ILabelProps } from "@components/Label";
 import { IFontIconProps } from "@components/Icon/types";
 import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult } from "@resk/core";
 import { CountryCode } from "libphonenumber-js";
+import { ICalendarDayViewProps, ICalendarModalDayViewProps } from '../Date/types';
 
 /**
  * @interface ITextInputType
@@ -462,6 +463,19 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
         When set to true, the component will override the `error` to true if the mask has validation errors.
     */
     handleMaskValidationErrors?: boolean;
+    
+    /***
+    * The props for the calendar component. These props are passed to the calendar component when the date picker is opened.
+    * This is useful for customizing the appearance and behavior of the calendar component.
+    * Those are only considered when the `type` is set to `date` or `datetime`. 
+    */
+    calendarProps?: ICalendarModalDayViewProps & {
+        /***
+            The props for the calendar icon. These props are passed to the calendar icon when the date picker is opened.
+            This is useful for customizing the appearance and behavior of the calendar icon.
+        */
+        iconProps?:IFontIconProps;
+    };
 };
 
 /**

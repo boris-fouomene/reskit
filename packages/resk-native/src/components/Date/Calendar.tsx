@@ -1,14 +1,14 @@
-import React, { isValidElement, useEffect, useMemo, useRef, useState } from "react";
-import { View, StyleSheet, GestureResponderEvent, Animated, PanResponder, TouchableOpacity } from "react-native";
+import React, { isValidElement, ReactNode, useEffect, useMemo } from "react";
+import { View, StyleSheet, GestureResponderEvent } from "react-native";
 import moment, { Moment } from "moment";
 import { defaultStr, I18n, IMomentFormat, isEmpty } from "@resk/core";
-import { ICalendarBaseProps, ICalendarDate, ICalendarDay, ICalendarDayProps, ICalendarDisplayView, ICalendarHour, ICalendarMonth, ICalendarMonthProps, ICalendarYear, ICalendarYearProps } from "./types";
-import { Icon, IIconButtonProps } from "@components/Icon";
+import { ICalendarBaseProps, ICalendarDate, ICalendarDay, ICalendarDayViewProps, ICalendarDisplayView, ICalendarHour, ICalendarModalDayViewProps, ICalendarMonth, ICalendarMonthViewProps, ICalendarYear, ICalendarYearViewProps } from "./types";
+import { Icon } from "@components/Icon";
 import Label from "@components/Label";
 import { useI18n } from "@src/i18n/hooks";
 import { DEFAULT_DATE_FORMATS } from "@resk/core";
 import { TouchableRipple } from "@components/TouchableRipple";
-import Theme, { Colors, ITheme, IThemeManager, useTheme } from "@theme/index";
+import Theme, { Colors, IThemeManager, useTheme } from "@theme/index";
 import { Button, IButtonProps } from "@components/Button";
 import { IStyle } from "@src/types";
 import { Surface } from "@components/Surface";
@@ -16,6 +16,9 @@ import { Divider } from "@components/Divider";
 import useStateCallback from "@utils/stateCallback";
 import { SwipeGestureHandler } from "@components/Gesture";
 import { Notify } from "@notify";
+import { IDialogControlledProps } from "@components/Dialog";
+import DialogControlled from "@components/Dialog/Controlled";
+import { useModal } from '../Modal/index';
 
 export default class Calendar {
     static getDefaultDateFormat(dateFormat?: IMomentFormat): IMomentFormat {
@@ -141,7 +144,12 @@ export default class Calendar {
         }
         return hourView;
     }
-    static Day: React.FC<ICalendarDayProps> = ({ weekStartDay, header, ...props }) => {
+    /***
+        Generate a 7x7 matrix of days for a given month.
+        @param {ICalendarDayViewProps} props - Props for the CalendarDay component.
+        @returns {ReactNode} A Calendar with a 7x7 matrix of days.
+    */
+    static DayView: React.FC<ICalendarDayViewProps> = ({ weekStartDay, header, ...props }) => {
         const theme = useTheme();
         const testID = defaultStr(props.testID, "resk-calendar-day-view");
         const { momentMaxDate, momentMinDate, dateCursor, isValidSelection, i18n, locale, setState, navigateToNext, navigateToPrevious, dateFormat, state, momentDefaultValue } = useCommon(props, "day");
@@ -198,7 +206,7 @@ export default class Calendar {
             navigateToNext,
             navigateToPrevious,
             children: <>
-                {displayView == "month" ? <Calendar.Month
+                {displayView == "month" ? <Calendar.MonthView
                     minDate={momentMinDate?.toDate()}
                     maxDate={momentMaxDate?.toDate()}
                     defaultValue={dateCursor.toDate()}
@@ -218,7 +226,7 @@ export default class Calendar {
                         });
                     }}
                 />
-                    : displayView === "year" ? <Calendar.Year
+                    : displayView === "year" ? <Calendar.YearView
                         minDate={momentMinDate?.toDate()}
                         maxDate={momentMaxDate?.toDate()}
                         defaultValue={dateCursor.toDate()}
@@ -277,7 +285,28 @@ export default class Calendar {
             </>
         });
     }
-    static Month: React.FC<ICalendarMonthProps> = (props: ICalendarMonthProps) => {
+    static ModalDayView  = React.forwardRef(({modalProps,testID, ...props}:ICalendarModalDayViewProps,ref:React.Ref<DialogControlled>) => {
+        testID = defaultStr(testID,"resk-calendar-modal-dayview");
+        modalProps = Object.assign({},modalProps);
+        return <Calendar.Modal
+            testID={testID+"-modal"}
+            responsive
+            dismissable = {false}
+            {...modalProps}
+            children={<Calendar.DayView {...props} testID={testID} />}
+            ref={ref}
+        />
+    });
+    private static ModalChildren: React.FC<{children?:ReactNode}> = ({children,...props})=>{
+        const modalContext = useModal();
+        return <>{children}</>
+    }
+    /***
+    * Generate a calendar matrix for a month
+    * @param {ICalendarMonthViewProps} props - The props for the calendar month view.
+    * @returns {React.ReactNode} - The rendered calendar month view.
+    */
+    static MonthView: React.FC<ICalendarMonthViewProps> = (props: ICalendarMonthViewProps) => {
         const theme = useTheme();
         const { state, setState, momentMinDate, dateCursor, momentMaxDate, locale, momentDefaultValue, navigateToNext, navigateToPrevious } = useCommon(props, "month");
         const monthView = useMemo(() => {
@@ -302,7 +331,7 @@ export default class Calendar {
                 right: <Icon.Font name="chevron-down" size={20} color={theme.colors.primary} />
             },
             children: <>
-                {displayView == "year" ? <Calendar.Year
+                {displayView == "year" ? <Calendar.YearView
                     minDate={momentMinDate?.toDate()}
                     maxDate={momentMaxDate?.toDate()}
                     defaultValue={dateCursor.toDate()}
@@ -346,7 +375,12 @@ export default class Calendar {
             </>
         });
     };
-    static Year: React.FC<ICalendarYearProps> = (props) => {
+    /****
+        Generate a calendar matrix for a year
+        @param {ICalendarYearViewProps} props - The props for the calendar year view.
+        @returns {React.ReactNode} - The rendered calendar year view.
+    */
+    static YearView: React.FC<ICalendarYearViewProps> = (props) => {
         const theme = useTheme();
         const { locale, dateCursor, state, navigateToNext, navigateToPrevious } = useCommon(props, "year");
         const yearView = useMemo(() => {
@@ -427,7 +461,14 @@ export default class Calendar {
             </TouchableRipple>
         );
     }
-    static renderCalendar({ testID, children, navigateToNext, navigateToPrevious, renderNavigationButtons, footer, header, displayViewToggleButton, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, footer?: JSX.Element, navigateToNext?: (event?: GestureResponderEvent) => void, navigateToPrevious?: (event?: GestureResponderEvent) => void, header?: JSX.Element }) {
+    static Modal  = React.forwardRef(({children,...props }:IDialogControlledProps,ref:React.Ref<DialogControlled>) => {
+        return <DialogControlled
+            {...props}
+            children = {<Calendar.ModalChildren {...props} children={children as ReactNode} />}
+            ref={ref}
+        />
+    });   
+    private static renderCalendar({ testID, children, navigateToNext, navigateToPrevious, renderNavigationButtons, footer, header, displayViewToggleButton, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, footer?: JSX.Element, navigateToNext?: (event?: GestureResponderEvent) => void, navigateToPrevious?: (event?: GestureResponderEvent) => void, header?: JSX.Element }) {
         testID = defaultStr(testID, "resk-calendar");
         const isValidHeader = isValidElement(header);
         const canDisplayHeader = isValidHeader || renderNavigationButtons !== false || displayViewToggleButton !== false;
@@ -694,3 +735,6 @@ function useCommon(props: ICalendarBaseProps, displayView?: ICalendarDisplayView
         }
     }
 }
+
+Calendar.Modal.displayName = "Calendar.Modal";
+Calendar.ModalDayView.displayName = "Calendar.ModalDayView";

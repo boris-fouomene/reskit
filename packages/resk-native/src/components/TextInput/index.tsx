@@ -262,7 +262,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
     contentContainerProps = Object.assign({}, contentContainerProps);
@@ -359,6 +359,9 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         ...valCase,
         event: null,
     });
+    const error = useMemo(() => {
+        return !!customError || inputState.isValid === false;
+    }, [inputState.isValid, customError])
     const formatted = useMemo(() => {
         return InputFormatter.formatValueToObject({ ...props, ...inputState, dateFormat, type, value: inputState.value });
     }, [inputState.value, type, dateFormat]);

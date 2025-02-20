@@ -1,4 +1,4 @@
-import { Tab, TextInput, withAppBar, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader } from "@resk/native";
+import { Tab, TextInput, withAppBar, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
 import { View, ScrollView } from 'react-native'
 import { IField, InputFormatter } from "@resk/core";
 import { useEffect } from "react";
@@ -49,9 +49,12 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                 </Button>
             </View>
 
-            <TextInput label="Text input"
-                mask={[[/\d/,"D"],[/\d/,"D"],"/",[/\d/,"M"],[/\d/,"M"],"/",[/\d/,"Y"],[/\d/,"Y"],[/\d/,"Y"],[/\d/,"Y"]]}
-            />
+            <HStack>
+                <TextInput label="Text input Date" type="date" />
+                <TextInput label="Text input Time" type="time" />
+                <TextInput label="Text input DateTime" type="datetime-local" />
+                <TextInput label="Text input Phone CM" type="tel" phoneCountryCode="CM" />
+            </HStack>
             <Form
                 name="my-form"
                 onSubmit={({ data }) => {

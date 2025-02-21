@@ -4,13 +4,13 @@ import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
  * Type for a callback function that takes a value of type T.
  * @template T - The type of the value passed to the callback.
  */
-export type Callback<T> = (value: T) => any;
+export type ICallback<T> = (value: T) => any;
 
 /***
  * Type for a dispatch function that updates the state with a callback.
  * @template T - The type of the value being set.
  */
-export type DispatchWithCallback<T> = (value: T, callback?: Callback<T>) => any;
+export type DispatchWithCallback<T> = (value: T, callback?: ICallback<T>) => any;
 
 
 /***
@@ -48,9 +48,9 @@ export type DispatchWithCallback<T> = (value: T, callback?: Callback<T>) => any;
 */
 export default function useStateCallback<T = unknown>(initialState: T | (() => T)): [T, DispatchWithCallback<SetStateAction<T>>] {
   const [state, _setState] = useState(initialState);
-  const callbackRef = useRef<Callback<T>>();
+  const callbackRef = useRef<ICallback<T>>();
   const isFirstCallbackCall = useRef<boolean>(true);
-  const setState = useCallback((setStateAction: SetStateAction<T>, callback?: Callback<T>): any => {
+  const setState = useCallback((setStateAction: SetStateAction<T>, callback?: ICallback<T>): any => {
     callbackRef.current = callback;
     _setState(setStateAction);
   }, []);

@@ -1,7 +1,9 @@
 import { IModalProps } from "@components/Modal";
 import { ISurfaceProps } from "@components/Surface";
-import { IMomentFormat } from "@resk/core"
+import { I18n, IMomentFormat } from "@resk/core"
+import useStateCallback from "@utils/stateCallback";
 import { Moment } from "moment";
+import { GestureResponderEvent } from "react-native";
 
 /**
  * @interface ICalendarDate
@@ -398,3 +400,60 @@ export type ICalendarDisplayView =
      * const displayView: ICalendarDisplayView = 'hour';
      */
     "hour";
+
+
+/****
+ * Interface for the calendar context
+ * @interface ICalendarContext
+ * Type representing the context for the calendar component.
+ * @extends ICalendarBaseProps
+ */
+export type ICalendarContext<T extends ICalendarBaseProps = ICalendarBaseProps> = T & {
+    /***
+     * The i18n instance for the calendar.
+     */
+    i18n: I18n;
+
+    /***
+     * The moment instance corresponding to the minDate prop.
+     */
+    momentMinDate?: Moment;
+    /***
+     * The moment instance corresponding to the maxDate prop.
+     */
+    momentMaxDate?: Moment;
+    /***
+     * The moment instance corresponding to the defaultValue prop.
+     */
+    momentDefaultValue?: Moment;
+
+    /***
+     * The momment instance corresponding to the current navigation date.
+     */
+    dateCursor: Moment;
+
+    /***
+     * The current state of the calendar.
+     */
+    state: ICalendarState;
+
+    /***
+     * A function to update the calendar state.
+     */
+    setState: ReturnType<typeof useStateCallback<ICalendarState>>[1];
+
+    /***
+     * A function to check if the current date, is valid or not.
+     * @param date - The date to be checked.
+     * @returns A boolean indicating whether the date is valid or not.
+     */
+    isValidItem: (date: Date) => boolean;
+    navigateToNext: (event?: GestureResponderEvent) => void;
+    navigateToPrevious: (event?: GestureResponderEvent) => void;
+}
+
+export interface ICalendarState {
+    minDate?: ICalendarDate, maxDate?: ICalendarDate, defaultValue?: ICalendarDate,
+    displayView: ICalendarDisplayView
+    dateCursor: Moment,
+};

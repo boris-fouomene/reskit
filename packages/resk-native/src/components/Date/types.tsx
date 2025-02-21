@@ -1,4 +1,4 @@
-import { IDialogControlledProps } from "@components/Dialog";
+import { IModalProps } from "@components/Modal";
 import { ISurfaceProps } from "@components/Surface";
 import { IMomentFormat } from "@resk/core"
 import { Moment } from "moment";
@@ -11,6 +11,11 @@ import { Moment } from "moment";
  * const date: ICalendarDate = '2022-01-01';
  */
 export type ICalendarDate = Date | string;
+
+export interface CalendarModalContext {
+    open: (cb?: () => void) => void;
+    close: (cb?: () => void) => void;
+}
 
 /**
  * @interface ICalendarBaseProps
@@ -41,7 +46,7 @@ export interface ICalendarBaseProps extends ISurfaceProps {
      * const dateFormat: IMomentFormat = 'YYYY-MM-DD';
      */
     dateFormat?: IMomentFormat;
-    
+
     /**
      * The test ID for the calendar component.
      * @default undefined
@@ -166,7 +171,7 @@ export interface ICalendarDayViewProps extends ICalendarBaseProps {
     @extends ICalendarDayViewProps
 */
 export interface ICalendarModalDayViewProps extends ICalendarDayViewProps {
-    modalProps?: IDialogControlledProps;
+    modalProps?: IModalProps;
 }
 
 /**

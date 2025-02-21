@@ -48,7 +48,7 @@ import DrawerItems from "@components/Drawer/DrawerItems";
  *     <Text>Additional Content</Text>
  * </DrawerNavigationView>
  */
-export const DrawerNavigationView = ({ children, testID,navigationTitle, header, items, drawerItemsProps, drawerState }: IDrawerNavigationViewProps) => {
+export const DrawerNavigationView = ({ children, testID, navigationTitle, header, items, drawerItemsProps, drawerState }: IDrawerNavigationViewProps) => {
     testID = defaultStr(testID, "resk-drawer-layout");
     const theme = useTheme();
     drawerItemsProps = Object.assign({}, drawerItemsProps);
@@ -120,7 +120,7 @@ export const DrawerNavigationView = ({ children, testID,navigationTitle, header,
  *     )}
  * </DrawerNavigationHeader>
  */
-const DrawerNavigationHeader: React.FC<{ testID: string,title?:ReactNode, children?: IDrawerNavigationViewHeader, drawerState: IDrawerCurrentState, menuIcon: JSX.Element; menuIconProps: IDrawerMenuIconProps }> = ({ children, menuIcon, menuIconProps, testID, drawerState,title }): React.ReactNode => {
+const DrawerNavigationHeader: React.FC<{ testID: string, title?: ReactNode, children?: IDrawerNavigationViewHeader, drawerState: IDrawerCurrentState, menuIcon: JSX.Element; menuIconProps: IDrawerMenuIconProps }> = ({ children, menuIcon, menuIconProps, testID, drawerState, title }): React.ReactNode => {
     if (isValidElement(children)) {
         return children as ReactNode;
     }
@@ -130,7 +130,7 @@ const DrawerNavigationHeader: React.FC<{ testID: string,title?:ReactNode, childr
     }
     const left = <>
         <Label textBold style={styles.logoText}>
-            {title}
+            {title || <View />}
         </Label>
     </>, right = isValidElement(menuIcon) ? menuIcon : null;
     return <View testID={testID + "-header-container"} style={styles.headerContainer}>

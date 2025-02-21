@@ -14,55 +14,182 @@ import { useDimensions } from "@dimensions";
 
 export const AnimatedPressable: React.FC<any> = Animated.createAnimatedComponent(Pressable);
 
-export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: customMaxHeight, contentContainerProps, animationDuration, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: backgroundOpacityP, contentProps, ...props }: IModalProps) => {
-  backgroundOpacityP = typeof backgroundOpacityP === "number" ? backgroundOpacityP : 0.5;
+export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: customMaxWidth, maxHeight: customMaxHeight, contentContainerProps, animationDuration, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: customBackgroundOpacity, contentProps, ...props }: IModalProps) => {
+  customBackgroundOpacity = typeof customBackgroundOpacity === "number" ? customBackgroundOpacity : 0.5;
   contentProps = Object.assign({}, contentProps);
   animationDuration = typeof animationDuration === "number" ? animationDuration : 300;
-  const { height, width, isMobileOrTablet } = useDimensions();
+  const { height: screenHeight, width: screenWidth, isMobileOrTablet } = useDimensions();
   const theme = useTheme();
   const { maxHeight, maxWidth } = useMemo(() => {
-    const mWidth = Math.min(width, Math.max(typeof customMaxWidth === "number" ? customMaxWidth : MAX_WIDTH, MAX_WIDTH));
-    const MAX_HEIGHT = (height > 600 ? (50) : 80) * height / 100;
-    const mHeight = Math.min(height, Math.max(typeof customMaxHeight === "number" ? customMaxHeight : MAX_HEIGHT, MAX_HEIGHT));
+    const mWidth = Math.min(screenWidth, Math.max(typeof customMaxWidth === "number" ? customMaxWidth : MAX_WIDTH, MAX_WIDTH));
+    const MAX_HEIGHT = (screenHeight > 600 ? (50) : 80) * screenHeight / 100;
+    const mHeight = Math.min(screenHeight, Math.max(typeof customMaxHeight === "number" ? customMaxHeight : MAX_HEIGHT, MAX_HEIGHT));
     return {
-      maxWidth: Math.min(mWidth, 80 * width / 100),
-      maxHeight: Math.min(Math.max(mHeight, MIN_HEIGHT), height)
+      maxWidth: pureModal ? undefined : Math.min(mWidth, 80 * screenWidth / 100),
+      maxHeight: pureModal ? undefined : Math.min(Math.max(mHeight, MIN_HEIGHT), screenHeight)
     }
-  }, [width, height, customMaxWidth, customMaxHeight]);
+  }, [screenWidth, screenHeight, customMaxWidth, customMaxHeight, pureModal]);
   const { fullScreen, modalStyle, contentStyle } = useMemo(() => {
-    const fullScreen = customFullScreen !== undefined ? customFullScreen : responsive !== false ? isMobileOrTablet : false;
+    const fullScreen = pureModal ? false : customFullScreen !== undefined ? customFullScreen : responsive !== false ? isMobileOrTablet : false;
     return {
       fullScreen,
       contentStyle: fullScreen ? [styles.modalFullScreen] : [{ maxWidth, maxHeight }],
-      modalStyle: fullScreen ? [styles.modalFullScreen] : [styles.modalNotFullScreen, Platform.isWeb() ? { cursor: "default" } : null],
+      modalStyle: fullScreen ? [styles.modalFullScreen, pureModal && styles.centeredContent] : [styles.centeredContent, Platform.isWeb() ? { cursor: "default" } : null],
     };
-  }, [isMobileOrTablet, width, height, responsive, visible, customFullScreen]);
+  }, [isMobileOrTablet, screenWidth, screenHeight, responsive, visible, customFullScreen, pureModal]);
   const children = useStableMemo(() => {
     return props.children;
   }, [props.children]) as React.ReactNode;
   contentContainerProps = Object.assign({}, contentContainerProps);
   testID = testID || "resk-modal";
 
-  const backgroundOpacity = useRef(new Animated.Value(visible ? 1 : 0)).current;
-  const hiddenRef = useRef<boolean>(false);
-  const generateAnimation = (value?: number) => {
-    const val = typeof value == "number" ? value : visible ? backgroundOpacityP : 0;
-    Animated.timing(backgroundOpacity, {
-      toValue: val as number,
-      duration: animationDuration,
-      easing: Easing.inOut(Easing.exp),
-      useNativeDriver, // Ensures smoother animation for supported props
-    }).start();
+  const backgroundOpacity = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(screenHeight)).current;
+  const rotate = useRef(new Animated.Value(0)).current;
+  const currentAnimation = useRef<Animated.CompositeAnimation | null>(null);
+  const stopCurrentAnimation = () => {
+    if (currentAnimation.current) {
+      currentAnimation.current.stop();
+    }
+  };
+  const setAnimation = (value: Animated.Value, visible: boolean) => {
+    const duration = Math.max(animationDuration, animationDuration, 0);
+    stopCurrentAnimation();
+    const opacityAnim = currentAnimation.current = Animated.timing(backgroundOpacity, {
+      toValue: visible ? customBackgroundOpacity : 0,
+      duration,
+      useNativeDriver,
+      easing: visible ? Easing.in(Easing.exp) : Easing.out(Easing.exp),
+    });
+    switch (animationType) {
+      case 'slide':
+        currentAnimation.current = Animated.parallel([
+          opacityAnim,
+          Animated.spring(value, {
+            toValue: visible ? 0 : screenHeight,
+            useNativeDriver,
+            friction: 8,
+            tension: 40,
+          }),
+        ]);
+        break;
+      case 'scale':
+        currentAnimation.current = Animated.parallel([
+          opacityAnim,
+          Animated.spring(scale, {
+            toValue: visible ? 1 : 0,
+            useNativeDriver,
+            friction: 8,
+            tension: 40,
+          }),
+        ]);
+        break;
+      case 'bounce':
+        currentAnimation.current = Animated.parallel([
+          opacityAnim,
+          Animated.spring(value, {
+            toValue: visible ? 0 : screenHeight,
+            useNativeDriver,
+            friction: !visible ? 12 : 3, // Higher friction for exit = less bounce
+            tension: !visible ? 80 : 40, // Higher tension for exit = faster movement
+          }),
+        ]);
+        break;
+      case 'rotate':
+        currentAnimation.current = Animated.parallel([
+          opacityAnim,
+          Animated.timing(value, {
+            toValue: visible ? 1 : 0,
+            duration,
+            useNativeDriver,
+            easing: !visible ? Easing.in(Easing.back(1.5)) : Easing.out(Easing.back(1.5)),
+          })
+        ]);
+        break;
+      default:
+        return opacityAnim;
+    }
+    return currentAnimation.current;
   };
   useEffect(() => {
-    hiddenRef.current = true;
-    generateAnimation(!visible ? 0 : undefined);
+    if (visible) {
+      switch (animationType) {
+        case 'slide':
+          setAnimation(translateY, true);
+          break;
+        case 'scale':
+          setAnimation(scale, true);
+          break;
+        case 'bounce':
+          setAnimation(translateY, true);
+          break;
+        case "rotate":
+          setAnimation(rotate, true);
+          break;
+        default:
+          setAnimation(backgroundOpacity, true);
+          break;
+      }
+      currentAnimation.current?.start();
+    }
+    return stopCurrentAnimation;
   }, [visible]);
-  hiddenRef.current = false;
+
+  const getAnimatedStyle = () => {
+    switch (animationType) {
+      case 'slide':
+      case 'bounce':
+        return {
+          transform: [{ translateY }],
+        };
+      case 'scale':
+        return {
+          transform: [{ scale }],
+        };
+      case 'rotate':
+        return {
+          transform: [
+            {
+              rotate: rotate.interpolate({
+                inputRange: [0, 1], // 0 -> No rotation, 1 -> Full rotation
+                outputRange: ["0deg", "360deg"],
+              })
+            },
+          ],
+        };
+      default:
+        return {};
+    }
+  };
 
   const handleDismiss = (e: GestureResponderEvent | KeyboardEvent): any => {
-    if (onDismiss) {
-      onDismiss(e);
+    let isDefault = false;
+    switch (animationType) {
+      case 'slide':
+        setAnimation(translateY, false);
+        break;
+      case 'scale':
+        setAnimation(scale, false);
+        break;
+      case 'bounce':
+        setAnimation(translateY, false);
+        break;
+      case "rotate":
+        setAnimation(rotate, false);
+      default:
+        setAnimation(backgroundOpacity, false);
+        isDefault = true;
+        break;
+    }
+    const cb = () => {
+      if (typeof onDismiss == "function") {
+        onDismiss(e);
+      }
+    };
+    currentAnimation.current?.start(isDefault ? undefined : cb);
+    if (isDefault) {
+      cb();
     }
     return true;
   }
@@ -85,14 +212,14 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
           { backgroundColor: theme.colors.backdrop },
           styles.backdrop,
           styles.absoluteFill,
-          { opacity: backgroundOpacity },
+          { opacity: backgroundOpacity }
         ]}
       />
       <AnimatedPressable
         testID={testID + "-modal-content-container"}
         {...contentContainerProps}
         style={[
-          styles.content, styles.absoluteFill,
+          styles.absoluteFill,
           modalStyle as any,
           props.style,
           styles.notHidden,
@@ -109,11 +236,13 @@ export const Modal = ({ visible, testID, maxWidth: customMaxWidth, maxHeight: cu
           style={[
             styles.content,
             { backgroundColor: theme.colors.background },
+            pureModal && styles.pureModalContent,
             contentStyle,
+            getAnimatedStyle(),
             props.style,
           ]}
         >
-          <ModalContext.Provider value={{ ...props, isModal: true, modalVisible: visible as boolean, isModalClosed: () => !!!visible, isModalOpen: () => !!visible, modalMaxWidth: !fullScreen ? maxWidth : undefined, modalMaxHeight: !fullScreen ? maxHeight : undefined, handleDismiss, onDismiss, dismissable, backgroundOpacity: backgroundOpacityP, visible, responsive, fullScreen }}>
+          <ModalContext.Provider value={{ ...props, isModal: true, isPureModal: !!pureModal, modalVisible: visible as boolean, isModalClosed: () => !!!visible, isModalOpen: () => !!visible, modalMaxWidth: !fullScreen ? maxWidth : undefined, modalMaxHeight: !fullScreen ? maxHeight : undefined, handleDismiss, onDismiss, dismissable, backgroundOpacity: customBackgroundOpacity, visible, responsive, fullScreen }}>
             {children}
           </ModalContext.Provider>
         </Animated.View>
@@ -228,8 +357,16 @@ export interface IModalProps extends Animated.AnimatedProps<ViewProps> {
   responsive?: boolean;
   /**
    * Specifies whether the modal should be rendered in full screen. If true, the modal will take up the entire screen space.
+   * Full screen is ignored when modal is set to true.
    */
   fullScreen?: boolean;
+
+  /***
+   * Specifies whether the modal should be rendered as a pure modal. If true, the modal will take up the entire screen space, and the content will be centered.
+   * fullScreen is ignored when this is set to true.
+   * Default is false.
+   */
+  pureModal?: boolean;
   /**
    * A callback function that is called when an attempt is made to close the modal. 
    * The event parameter can be either a GestureResponderEvent or a KeyboardEvent.
@@ -268,8 +405,13 @@ export interface IModalProps extends Animated.AnimatedProps<ViewProps> {
 
   /***
    * the maximum height of the modal. This is particularly useful when the modal is not displayed in full-screen mode, allowing for better layout control.
-   */
+  */
   maxHeight?: number;
+
+  /****
+   * Modal animation type, default is "fade"
+   */
+  animationType?: "fade" | "slide" | "scale" | "bounce" | "rotate";
 }
 const styles = StyleSheet.create({
   absoluteFill: {
@@ -303,11 +445,18 @@ const styles = StyleSheet.create({
     maxHeight: "100%",
     flex: 1,
   },
-  modalNotFullScreen: {
+  centeredContent: {
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
   },
+  pureModalContent: {
+    backgroundColor: "transparent",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    flexDirection: "column",
+  }
 });
 
 /**
@@ -383,6 +532,7 @@ export interface IModalContext extends IModalProps {
   isModalOpen?: () => boolean;
   isModalClosed?: () => boolean;
   isModal: boolean;
+  isPureModal?: boolean;
   modalVisible?: boolean;
   modalMaxWidth?: number;
   modalMaxHeight?: number;

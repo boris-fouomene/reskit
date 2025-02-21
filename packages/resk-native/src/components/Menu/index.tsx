@@ -4,10 +4,10 @@ import ExpandableMenuItem from './ExpandableItem';
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { isNumber, transform } from "lodash";
-import {useDimensions } from '@dimensions/index';
+import { useDimensions } from '@dimensions/index';
 import Theme, { useTheme } from '@theme/index';
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { View,Animated, StyleSheet, LayoutChangeEvent, LayoutRectangle, Pressable, PressableStateCallbackType, ScrollView, Dimensions } from 'react-native';
+import { View, Animated, StyleSheet, LayoutChangeEvent, LayoutRectangle, Pressable, PressableStateCallbackType, ScrollView, Dimensions } from 'react-native';
 import { IMenuAnchorMeasurements, IMenuCalculatedPosition, IMenuPosition, IMenuProps, IUseMenuPositionProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr, isObj } from '@resk/core';
@@ -86,7 +86,6 @@ export const useMenuPosition = ({
     dynamicHeight,
 }: IUseMenuPositionProps) => {
     dynamicHeight = dynamicHeight !== false;
-    const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
     const theme = useTheme();
     const { width: screenWidth, isMobileOrTablet, height: screenHeight } = useDimensions();
     const fullScreen = isFullScreen(customFullScreen, responsive, isMobileOrTablet);
@@ -95,6 +94,7 @@ export const useMenuPosition = ({
     const scale = useRef(new Animated.Value(animated ? 0.8 : 1)).current;
     const elevation = typeof customElevation === "number" ? customElevation : fullScreen ? 0 : 10;
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
+        const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
         let calculatedPosition: IMenuCalculatedPosition = {
             calculatedFromPosition: "bottom",
             xPosition: "left",
@@ -108,6 +108,7 @@ export const useMenuPosition = ({
             calculatedPosition.width = screenWidth;
         } else {
             const { pageX, pageY, width: anchorWidth, height: anchorHeight } = anchorMeasurements;
+
             minWidth = typeof minWidth == 'number' && minWidth > 0 ? minWidth : anchorWidth;
             menuHeight = !dynamicHeight ? (typeof menuHeight == 'number' && menuHeight > 0 ? menuHeight : 0) : 0;
             if (sameWidth) {
@@ -137,12 +138,9 @@ export const useMenuPosition = ({
             const defaultPreferedPosition = isPreferedHorizontal ? (isMaxHorizontalSpaceLeft ? "left" : "right") : (isPreferedVertical ? (isMaxVerticalSpaceTop ? "top" : "bottom") : ((hasMenuHeight || !isMaxVerticalSpaceTop ? "bottom" : "top")));
             const spacesPos = isPreferedHorizontal ? ["left", "right"] : isPreferedVertical ? ["bottom", "top"] : ["bottom", "left", "top", "right"];
             // Find position with maximum available space
-            let preferredPosition: IMenuPosition = isValidPosition && position ? position : spacesPos.reduce((max, pos) =>
+            const preferredPosition: IMenuPosition = isValidPosition && position ? position : spacesPos.reduce((max, pos) =>
                 spaces[pos as IMenuPosition] > spaces[max as IMenuPosition] ? pos as IMenuPosition : max
                 , defaultPreferedPosition as IMenuPosition) as IMenuPosition;
-            /*  if (!isPreferedHorizontal && !isPreferedVertical && !isValidPosition && preferredPosition !== 'bottom' && (spaces.bottom >= 300 || (Math.abs(spaces.bottom - spaces[preferredPosition]) < 100))) {
-                 preferredPosition = 'bottom';
-             }; */
             const checkFits = (pos: IMenuCalculatedPosition) => ({
                 top: isMaxVerticalSpaceTop,
                 bottom: hasMenuHeight && isNumber(pos.top) && (pos.top + menuHeight <= screenHeight - padding) || isMaxVerticalSpaceBottom,// (pos.top + menuHeight <= screenHeight - padding),
@@ -424,7 +422,7 @@ const Menu: React.FC<IMenuProps> = ({
     }, [visible, isVisible, isControlled]);
     const [anchorMeasurements, setAnchorMeasurements] = useState<IMenuAnchorMeasurements | undefined>(undefined);
     // Get position calculation from custom hook
-    const { fullScreen, menuPosition, animatedStyle,screenWidth,screenHeight } = useMenuPosition({
+    const { fullScreen, menuPosition, animatedStyle, screenWidth, screenHeight } = useMenuPosition({
         menuWidth: menuLayout?.width || 0,
         menuHeight: menuLayout?.height || 0,
         dynamicHeight,
@@ -440,11 +438,11 @@ const Menu: React.FC<IMenuProps> = ({
         anchorMeasurements,
         preferedPositionAxis,
     });
-    useEffect(()=>{
+    useEffect(() => {
         measureAnchor(anchorRef, (measures) => {
             setAnchorMeasurements(measures);
         });
-    },[screenWidth,screenHeight]);
+    }, [screenWidth, screenHeight]);
     // Handle menu layout changes
     const onMenuLayout = (event: LayoutChangeEvent) => {
         const { width, height } = event.nativeEvent.layout;

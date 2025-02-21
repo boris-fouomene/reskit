@@ -1,9 +1,9 @@
-import React, { isValidElement, ReactNode, useEffect, useMemo } from "react";
+import React, { isValidElement, ReactNode, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { View, StyleSheet, GestureResponderEvent } from "react-native";
 import moment, { Moment } from "moment";
 import { defaultStr, I18n, IMomentFormat, isEmpty } from "@resk/core";
-import { ICalendarBaseProps, ICalendarDate, ICalendarDay, ICalendarDayViewProps, ICalendarDisplayView, ICalendarHour, ICalendarModalDayViewProps, ICalendarMonth, ICalendarMonthViewProps, ICalendarYear, ICalendarYearViewProps } from "./types";
-import { Icon } from "@components/Icon";
+import { ICalendarBaseProps, ICalendarDate, CalendarModalContext, ICalendarDay, ICalendarDayViewProps, ICalendarDisplayView, ICalendarHour, ICalendarModalDayViewProps, ICalendarMonth, ICalendarMonthViewProps, ICalendarYear, ICalendarYearViewProps } from "./types";
+import { FontIcon, Icon } from "@components/Icon";
 import Label from "@components/Label";
 import { useI18n } from "@src/i18n/hooks";
 import { DEFAULT_DATE_FORMATS } from "@resk/core";
@@ -16,9 +16,8 @@ import { Divider } from "@components/Divider";
 import useStateCallback from "@utils/stateCallback";
 import { SwipeGestureHandler } from "@components/Gesture";
 import { Notify } from "@notify";
-import { IDialogControlledProps } from "@components/Dialog";
-import DialogControlled from "@components/Dialog/Controlled";
-import { useModal } from '../Modal/index';
+import { IModalProps, Modal, useModal } from '@components/Modal';
+import { Menu } from "@components/Menu";
 
 export default class Calendar {
     static getDefaultDateFormat(dateFormat?: IMomentFormat): IMomentFormat {
@@ -167,32 +166,41 @@ export default class Calendar {
             ...props,
             testID,
             header: <>
-                {isValidElement(header) ? header : null}
-                <View testID={testID + "-header-title"} style={Styles.dayViewHeader}>
-                    <Button uppercase={false} compact tooltip={`${i18n.t("dates.today")}: ${toDayStr}`}
-                        disabled={!isValidSelection(moment().toDate())}
-                        onPress={() => {
-                            setState({
-                                ...state,
-                                dateCursor: moment(),
-                            });
-                        }}
-                    >
-                        {`${toDayStr}`}
-                    </Button>
-                    {defaultValueStr ? <Button compact tooltip={`${i18n.t("dates.selectedDate")}: ${defaultValueStr}`}
-                        right={<Icon.Font name="material-clear" size={20} color={theme.colors.error}
-                            onPress={(e) => {
-                                setState({
-                                    ...state,
-                                    defaultValue: undefined,
-                                    dateCursor: moment(),
-                                });
-                            }}
+                <View testID={testID + "-header-container"} style={Styles.dayViewHeader}>
+                    <View testID={testID + "-header-wrapper"}>
+                        {isValidElement(header) ? header : <View />}
+                    </View>
+                    <Menu
+                        anchor={({ openMenu }) => <FontIcon
+                            name={FontIcon.MORE}
+                            onPress={() => openMenu()}
+                            size={25}
                         />}
-                    >
-                        {defaultValueStr}
-                    </Button> : null}
+                        position="bottom"
+                        items={[
+                            {
+                                label: i18n.t("dates.today"),
+                                onPress: () => {
+                                    setState({
+                                        ...state,
+                                        dateCursor: moment(),
+                                    });
+                                },
+                            },
+                            defaultValueStr ? {
+                                label: i18n.t("dates.selectedDate") + " [" + defaultValueStr + "]",
+                                icon: <Icon.Font name="material-clear" size={20} color={theme.colors.error}
+                                    onPress={(e) => {
+                                        setState({
+                                            ...state,
+                                            defaultValue: undefined,
+                                            dateCursor: moment(),
+                                        });
+                                    }}
+                                />
+                            } : null,
+                        ]}
+                    />
                 </View>
             </>,
             displayViewToggleButton: props.renderToggleDisplayViewButton === false ? false : {
@@ -271,9 +279,15 @@ export default class Calendar {
                                                 label: String(day.day),
                                                 key: day.day,
                                                 onPress: () => {
-                                                    if (typeof props.onChange === "function") {
-                                                        props.onChange(day);
-                                                    }
+                                                    setState({
+                                                        ...state,
+                                                        defaultValue: day.value,
+                                                        displayView: "day",
+                                                    }, () => {
+                                                        if (typeof props.onChange === "function") {
+                                                            props.onChange(day);
+                                                        }
+                                                    });
                                                 },
                                             });
                                         })}
@@ -285,22 +299,19 @@ export default class Calendar {
             </>
         });
     }
-    static ModalDayView  = React.forwardRef(({modalProps,testID, ...props}:ICalendarModalDayViewProps,ref:React.Ref<DialogControlled>) => {
-        testID = defaultStr(testID,"resk-calendar-modal-dayview");
-        modalProps = Object.assign({},modalProps);
+    static ModalDayView = React.forwardRef(({ modalProps, testID, ...props }: ICalendarModalDayViewProps, ref: React.ForwardedRef<CalendarModalContext>) => {
+        testID = defaultStr(testID, "resk-calendar-modal-dayview");
+        modalProps = Object.assign({}, modalProps);
         return <Calendar.Modal
-            testID={testID+"-modal"}
+            testID={testID + "-modal"}
             responsive
-            dismissable = {false}
+            dismissable={false}
+            pureModal
             {...modalProps}
             children={<Calendar.DayView {...props} testID={testID} />}
             ref={ref}
         />
     });
-    private static ModalChildren: React.FC<{children?:ReactNode}> = ({children,...props})=>{
-        const modalContext = useModal();
-        return <>{children}</>
-    }
     /***
     * Generate a calendar matrix for a month
     * @param {ICalendarMonthViewProps} props - The props for the calendar month view.
@@ -461,13 +472,25 @@ export default class Calendar {
             </TouchableRipple>
         );
     }
-    static Modal  = React.forwardRef(({children,...props }:IDialogControlledProps,ref:React.Ref<DialogControlled>) => {
-        return <DialogControlled
+    static Modal = React.forwardRef(({ children, ...props }: IModalProps, ref: React.Ref<CalendarModalContext>) => {
+        const [visible, setVisible] = useStateCallback(false);
+        const context = {
+            open: (cb?: () => void) => {
+                setVisible(true, cb);
+            },
+            close: (cb?: () => void) => {
+                setVisible(false, cb);
+            },
+        }
+        useImperativeHandle(ref, () => context);
+        return <Modal
+            fullScreen
+            dismissable={false}
             {...props}
-            children = {<Calendar.ModalChildren {...props} children={children as ReactNode} />}
-            ref={ref}
+            visible={visible}
+            children={<ModalChildren {...props} children={children as ReactNode} />}
         />
-    });   
+    });
     private static renderCalendar({ testID, children, navigateToNext, navigateToPrevious, renderNavigationButtons, footer, header, displayViewToggleButton, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, footer?: JSX.Element, navigateToNext?: (event?: GestureResponderEvent) => void, navigateToPrevious?: (event?: GestureResponderEvent) => void, header?: JSX.Element }) {
         testID = defaultStr(testID, "resk-calendar");
         const isValidHeader = isValidElement(header);
@@ -548,6 +571,7 @@ const Styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        position: "relative",
     },
     disabled: {
         opacity: 0.65,
@@ -735,6 +759,11 @@ function useCommon(props: ICalendarBaseProps, displayView?: ICalendarDisplayView
         }
     }
 }
+const ModalChildren: React.FC<{ children?: ReactNode }> = ({ children, ...props }) => {
+    const modalContext = useModal();
+    return <>{children}</>
+};
+ModalChildren.displayName = "Calendar.ModalChildren";
 
 Calendar.Modal.displayName = "Calendar.Modal";
 Calendar.ModalDayView.displayName = "Calendar.ModalDayView";

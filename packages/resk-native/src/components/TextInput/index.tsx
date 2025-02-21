@@ -14,9 +14,9 @@ import { IStyle } from "@src/types";
 import { IFontIconProps } from "@components/Icon";
 import { TouchableRipple } from "@components/TouchableRipple";
 import Breakpoints from "@breakpoints/index";
-import { Calendar } from "@components/Date";
-import {Portal} from "@components/Portal";
-import {Animated} from "react-native";
+import { Calendar, CalendarModalContext } from "@components/Date";
+import { Portal } from "@components/Portal";
+import { Animated } from "react-native";
 
 
 /**
@@ -265,10 +265,9 @@ const iconSize = 25;
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask,handleMaskValidationErrors, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length,calendarProps:customDateProps, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask, handleMaskValidationErrors, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const theme = useTheme();
-    const [calendarVisible,setCalendarVisible] = useState(false);
     contentContainerProps = Object.assign({}, contentContainerProps);
     rightContainerProps = Object.assign({}, rightContainerProps);
     containerProps = Object.assign({}, containerProps);
@@ -308,13 +307,13 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
 
     ///mask handling
 
-    const { mask, maskOptions, dateFormat,calendarProps : {iconProps,...calendarProps},canRenderCalendar } = useMemo(() => {
+    const { mask, maskOptions, dateFormat, calendarProps: { iconProps, ...calendarProps }, canRenderCalendar } = useMemo(() => {
         const maskOptions = Object.assign({}, { placeholder: '_' }, customMaskOptions);
         let mask = InputFormatter.isValidMask(customMask) ? customMask : undefined;
         const calendarProps = Object.assign({}, customDateProps);
         let validate = (value: string) => true;
         const isDate = typeString == "date", isTime = typeString == "time";
-        const dateFormat = calendarProps.dateFormat = !isDateOrTime ? defaultStr(calendarProps.dateFormat,customDateFormat) : defaultStr(calendarProps.dateFormat,customDateFormat, isDate ? DEFAULT_DATE_FORMATS.date : isTime ? DEFAULT_DATE_FORMATS.time : DEFAULT_DATE_FORMATS.dateTime);
+        const dateFormat = calendarProps.dateFormat = !isDateOrTime ? defaultStr(calendarProps.dateFormat, customDateFormat) : defaultStr(calendarProps.dateFormat, customDateFormat, isDate ? DEFAULT_DATE_FORMATS.date : isTime ? DEFAULT_DATE_FORMATS.time : DEFAULT_DATE_FORMATS.dateTime);
         if (!mask || !Array.isArray(mask) || !mask.length) {
             if (isPhone) {
                 if (isNonNullString(phoneCountryCode)) {
@@ -338,9 +337,9 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             validate,
             dateFormat,
             calendarProps,
-            canRenderCalendar : ["datetime", "date"].includes(typeString)
+            canRenderCalendar: ["datetime", "date"].includes(typeString)
         }
-    }, [customMask, customMaskOptions, phoneCountryCode, typeString, customDateFormat, isDateOrTime,customDateProps]);
+    }, [customMask, customMaskOptions, phoneCountryCode, typeString, customDateFormat, isDateOrTime, customDateProps]);
     const toCase = (value: any): { value: string } & Partial<IInputFormatterMaskResult> => {
         if (canValueBeDecimal && isFocused && (value === '.' || value == '.')) {
             value = "0" + value;
@@ -378,12 +377,12 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     //handle mask
     const { maskArray, maskHasObfuscation, placeholder: inputMaskPlaceholder } = inputState;
     const hasInputMask = Array.isArray(maskArray) && !!maskArray.length;
-    
+
     const inputValue = hasInputMask ? defaultStr(maskHasObfuscation && !isFocused ? inputState.obfuscated : inputState.masked) : (isFocused ? focusedValue : formatted.formattedValue || emptyValue || "");
     const error = useMemo(() => {
-        return !!customError || defaultBool(handleMaskValidationErrors,!!inputValue) && inputState.isValid === false;
-    }, [inputState.isValid,inputValue, customError,handleMaskValidationErrors])
-    
+        return !!customError || defaultBool(handleMaskValidationErrors, !!inputValue) && inputState.isValid === false;
+    }, [inputState.isValid, inputValue, customError, handleMaskValidationErrors])
+
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
@@ -398,7 +397,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         return typeof customMaxHeight === "number" ? customMaxHeight : undefined;
     }, [customMaxHeight]);
     const inputDimensionsRef = useRef<IDict>({ width: 0, height: minHeight });
-    const {height } = inputDimensionsRef.current;
+    const { height } = inputDimensionsRef.current;
     const affixContent = useMemo(() => {
         if (affix === false || (isDateOrTime && !affix)) return null;
         let affContent = typeof affix == "function" ? affix(callOptions) : isValidElement(affix, true) ? affix : null;
@@ -414,63 +413,26 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             return affContent;
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
-    }, [focusedValue,isDateOrTime, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
+    }, [focusedValue, isDateOrTime, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
     const calendarIProps = Object.assign({}, iconProps);
-    const translateY = useRef(new Animated.Value(300)).current;
-    const backdropOpacity = useRef(new Animated.Value(0)).current;
-    const openCalendar = ()=>{
-        Animated.parallel([
-            Animated.timing(translateY, {
-              toValue: 0,
-              duration: 300,
-              useNativeDriver: true,
-            }),
-            Animated.timing(backdropOpacity, {
-              toValue: 1,
-              duration: 200,
-              useNativeDriver: true,
-            }),
-        ]).start(()=>{
-            setCalendarVisible(true);
-        });
-    }, closeCalendar = ()=>{
-        Animated.parallel([
-            Animated.timing(translateY, {
-              toValue: 300,
-              duration: 200,
-              useNativeDriver: true,
-            }),
-            Animated.timing(backdropOpacity, {
-              toValue: 0,
-              duration: 200,
-              useNativeDriver: true,
-            }),
-        ]).start(()=>{
-            setCalendarVisible(false);
-        });
-    }
+    const calendarRef = useRef<CalendarModalContext>(null);
     const calendarFlag = canRenderCalendar && editable ? <>
         <FontIcon
             color={textColor}
             testID={`${testID}-calendar-icon`}
             {...calendarIProps}
-            size = {calendarIProps?.size || iconSize}
-            name = {calendarIProps?.name || "calendar"}
-            onPress={(event)=>{
-                openCalendar();
+            size={calendarIProps?.size || iconSize}
+            name={calendarIProps?.name || "calendar"}
+            onPress={(event) => {
+                calendarRef.current?.open(() => { });
             }}
         />
-        {calendarVisible ? <Portal absoluteFill testID={`${testID}-calendar-modal`}>
-            <Pressable onPress={(e)=>closeCalendar()} testID={testID+"-calendar-modal-backdrop"} style={[styles.calendarModalBackdrop,{backgroundColor:theme.colors.backdrop}]}>
-                <Animated.View testID={`${testID}-calendar-modal-container`} style={[styles.calendarModalContainer,{opacity, transform: [{ translateY }] }]}>
-                    <Calendar.DayView
-                        testID={`${testID}-calendar-modal`}
-                        {...Object.assign({}, calendarProps)}
-                    />
-                </Animated.View>
-            </Pressable>
-        </Portal> : null}
-    </>: null;
+        <Calendar.ModalDayView
+            testID={`${testID}-calendar-modal`}
+            {...calendarProps}
+            ref={calendarRef}
+        />
+    </> : null;
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
     }, [height, inputValue]);
@@ -519,7 +481,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         }),
         label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
-        placeholder:hasInputMask  ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
+        placeholder: hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
         testID: testID,
         readOnly: editable === false,
         editable,
@@ -596,16 +558,16 @@ export default TextInput;
 
 
 const styles = StyleSheet.create({
-    calendarModalBackdrop : {
-        flex:1,
-        justifyContent:"center",
-        alignItems:"center",
+    calendarModalBackdrop: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
     },
-    calendarModalContainer : {
-        flex:1,
-        padding:10,
-        justifyContent:"center",
-        alignItems:"center",
+    calendarModalContainer: {
+        flex: 1,
+        padding: 10,
+        justifyContent: "center",
+        alignItems: "center",
     },
     affix: {
         paddingHorizontal: 0,

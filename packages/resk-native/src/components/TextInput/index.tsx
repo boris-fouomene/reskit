@@ -2,7 +2,7 @@ import Label from "@components/Label";
 import { isValidElement } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, ScrollView } from 'react-native';
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, DEFAULT_DATE_FORMATS, defaultBool } from "@resk/core";
+import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper } from "@resk/core";
 import _, { isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
@@ -313,7 +313,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         const calendarProps = Object.assign({}, customDateProps);
         let validate = (value: string) => true;
         const isDate = typeString == "date", isTime = typeString == "time";
-        const dateFormat = calendarProps.dateFormat = !isDateOrTime ? defaultStr(calendarProps.dateFormat, customDateFormat) : defaultStr(calendarProps.dateFormat, customDateFormat, isDate ? DEFAULT_DATE_FORMATS.date : isTime ? DEFAULT_DATE_FORMATS.time : DEFAULT_DATE_FORMATS.dateTime);
+        const dateFormat = calendarProps.dateFormat = !isDateOrTime ? defaultStr(calendarProps.dateFormat, customDateFormat) : defaultStr(calendarProps.dateFormat, customDateFormat, isDate ? DateHelper.DEFAULT_DATE_FORMAT : isTime ? DateHelper.DEFAULT_TIME_FORMAT : DateHelper.DEFAULT_DATE_TIME_FORMAT);
         if (!mask || !Array.isArray(mask) || !mask.length) {
             if (isPhone) {
                 if (isNonNullString(phoneCountryCode)) {
@@ -414,25 +414,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
     }, [focusedValue, isDateOrTime, canValueBeDecimal, error, multiline, textColor, affix, isPasswordField]);
-    const calendarIProps = Object.assign({}, iconProps);
-    const calendarRef = useRef<CalendarModalContext>(null);
-    const calendarFlag = canRenderCalendar && editable ? <>
-        <FontIcon
-            color={textColor}
-            testID={`${testID}-calendar-icon`}
-            {...calendarIProps}
-            size={calendarIProps?.size || iconSize}
-            name={calendarIProps?.name || "calendar"}
-            onPress={(event) => {
-                calendarRef.current?.open(() => { });
-            }}
-        />
-        <Calendar.ModalDayView
-            testID={`${testID}-calendar-modal`}
-            {...calendarProps}
-            ref={calendarRef}
-        />
-    </> : null;
+
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
     }, [height, inputValue]);
@@ -455,6 +437,51 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, withBackground, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     const labelSuffix = suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? <Label color={textColor}>{""}[{inputMaskPlaceholder}]</Label> : null;
+
+    const calendarIProps = Object.assign({}, iconProps);
+    const calendarRef = useRef<CalendarModalContext>(null);
+    const calendarFlag = canRenderCalendar && editable ? <>
+        <FontIcon
+            color={textColor}
+            testID={`${testID}-calendar-icon`}
+            {...calendarIProps}
+            size={calendarIProps?.size || iconSize}
+            name={calendarIProps?.name || "calendar"}
+            onPress={(event) => {
+                calendarRef.current?.open(() => { });
+            }}
+        />
+        <Calendar.ModalDayView
+            testID={`${testID}-calendar-modal`}
+            {...calendarProps}
+            ref={calendarRef}
+            defaultValue={formatted.dateValue}
+            header={isValidElement(calendarProps.header) ? calendarProps.header : <Label color={textColor}>{label}</Label>}
+            onChange={({ value: date }) => {
+                const dateValue = formatted.dateValue;
+                const hasValidDate = DateHelper.isDateObj(dateValue);
+                const newDate = hasValidDate ? dateValue : new Date(date);
+                if (hasValidDate) {
+                    newDate.setDate(date.getDate());
+                    newDate.setMonth(date.getMonth());
+                    newDate.setFullYear(date.getFullYear());
+                } else {
+                    newDate.setMinutes(0);
+                    newDate.setSeconds(0);
+                    newDate.setMilliseconds(0);
+                }
+                const valCase = toCase(DateHelper.formatDate(newDate, dateFormat));
+                if (!areCasesEquals(valCase, inputState)) {
+                    const nState = { ...inputState, ...valCase };
+                    setInputState(nState);
+                    if (typeof onChange === "function") {
+                        onChange({ ...nState, dateValue: newDate });
+                    }
+                }
+            }}
+        />
+    </> : null;
+
     return {
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,

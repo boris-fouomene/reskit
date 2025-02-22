@@ -1,7 +1,7 @@
 import { IDict, IPrimitive } from "../types";
 import { isPlainObject, isRegExp, merge } from "lodash";
 import isPrimitive from "./isPrimitive";
-import isDateObj from "./isDateObj";
+import isDateObj from "./date/isDateObj";
 
 /**
  * Checks if the given variable is a plain object.
@@ -263,7 +263,7 @@ export function defaultObj<T extends object = any>(...args: any[]): T {
   /**
    * If there is only one argument, return it if it's an object, or an empty object if it's not.
    */
-  if (args.length === 1) return isObj(args[0]) ? args[0] : {};
+  if (args.length === 1) return isObj(args[0]) ? args[0] : {} as T;
 
   /**
    * Initialize the previous object to null.

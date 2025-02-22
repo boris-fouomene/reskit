@@ -3,6 +3,7 @@ import { ISurfaceProps } from "@components/Surface";
 import { I18n, IMomentFormat } from "@resk/core"
 import useStateCallback from "@utils/stateCallback";
 import { Moment } from "moment";
+import { ReactNode } from "react";
 import { GestureResponderEvent } from "react-native";
 
 /**
@@ -96,7 +97,82 @@ export interface ICalendarBaseProps extends ISurfaceProps {
      * const header: JSX.Element = <div>Calendar Header</div>;
      */
     header?: JSX.Element;
+
+
+    /***
+     * A function to determine if an item of the calendar is marked.
+     * @param {(ICalendarItem)} item - The item to check.
+     * @returns {boolean} - A boolean indicating whether the day is marked.
+     */
+    isItemMarked?: (item: (ICalendarItem)) => boolean;
+
+    /***
+     * The properties for the items container.
+     * Each items container represents a row of items or item headers in the calendar.
+     * @default undefined
+     */
+    itemsContainerProps?: Omit<ICalendarItemsContainerProps, "children">;
+
+    /**
+     * The current date cursor used for navigating the calendar. This value determines:
+     * - The currently displayed month in day view
+     * - The year range shown in year view (±5 years from cursor)
+     * - The highlighted month/year in their respective views
+     * 
+     * The cursor acts independently from the selected date, allowing users to browse
+     * through different time periods without changing their selection.
+     * 
+     * @type {moment.Moment} - Can be provided as:
+     * - moment.js object
+     * 
+     * @default moment() // Current date
+     */
+    dateCursor?: Moment;
+
+    /***
+     * The border radius of the surface containing the calendar.
+     * @default 0
+     */
+    borderRadius?: number;
 }
+/***
+ * Interface representing the properties of the calendar items container.
+ * An items container represents a row of items or item headers in the calendar.
+ * 
+ */
+export interface ICalendarItemsContainerProps {
+    /***
+     * Represents the width of the items container.
+     * @default 392
+     * The item container width is calculated dynamically based on the screen width, and represent the minimum between the provided width and 90% of the screen width.
+     */
+    width?: number;
+
+    /***
+     * The children of the items container.
+     * @default []
+     * Each child represents an item in the calendar or an item header.
+     */
+    children: ReactNode[];
+
+    /***
+     * The test ID for the items container.
+     * Note: The test ID is suffixed with "-items-container" and "-items-container-content" to ensure uniqueness.
+     * @default undefined
+     */
+    testID?: string;
+}
+/***
+ * Type representing an item of the calendar.
+ * @typedef {(ICalendarDayItem | ICalendarMonthItem | ICalendarYearItem | ICalendarHourItem)} ICalendarItem
+ * 
+ * @property {ICalendarDayItem | ICalendarMonthItem | ICalendarYearItem | ICalendarHourItem} displayView - The current display view of the calendar.
+   @see {@link ICalendarDayItem}, for more information about the day item.
+   @see {@link ICalendarMonthItem}, for more information about the month item.
+   @see {@link ICalendarYearItem}, for more information about the year item.
+   @see {@link ICalendarHourItem}, for more information about the hour item.
+ */
+export type ICalendarItem = (ICalendarDayItem | ICalendarMonthItem | ICalendarYearItem | ICalendarHourItem);
 /**
  * Interface representing the properties of a calendar month component.
  * @extends ICalendarBaseProps
@@ -106,11 +182,11 @@ export interface ICalendarMonthViewProps extends ICalendarBaseProps {
      * Callback function to be called when a month is selected.
      * @param data The selected month data.
      * @example
-     * const onChange: (data: ICalendarMonth) => void = (data) => {
+     * const onChange: (data: ICalendarMonthItem) => void = (data) => {
      *   console.log(data.monthName);
      * };
      */
-    onChange?: (data: ICalendarMonth) => void;
+    onChange?: (data: ICalendarMonthItem) => void;
 }
 
 /**
@@ -122,11 +198,11 @@ export interface ICalendarYearViewProps extends ICalendarBaseProps {
      * Callback function to be called when a year is selected.
      * @param data The selected year data.
      * @example
-     * const onChange: (data: ICalendarYear) => void = (data) => {
+     * const onChange: (data: ICalendarYearItem) => void = (data) => {
      *   console.log(data.year);
      * };
      */
-    onChange?: (data: ICalendarYear) => void;
+    onChange?: (data: ICalendarYearItem) => void;
 }
 
 /**
@@ -138,11 +214,11 @@ export interface ICalendarHourProps extends ICalendarBaseProps {
      * Callback function to be called when an hour is selected.
      * @param data The selected hour data.
      * @example
-     * const onChange: (data: ICalendarHour) => void = (data) => {
+     * const onChange: (data: ICalendarHourItem) => void = (data) => {
      *   console.log(data.hour);
      * };
      */
-    onChange?: (data: ICalendarHour) => void;
+    onChange?: (data: ICalendarHourItem) => void;
 }
 
 /**
@@ -154,11 +230,11 @@ export interface ICalendarDayViewProps extends ICalendarBaseProps {
      * Callback function to be called when a day is selected.
      * @param data The selected day data.
      * @example
-     * const onChange: (data: ICalendarDay) => void = (data) => {
+     * const onChange: (data: ICalendarDayItem) => void = (data) => {
      *   console.log(data.day);
      * };
      */
-    onChange?: (data: ICalendarDay) => void;
+    onChange?: (data: ICalendarDayItem) => void;
 
     /**
      * The day of the week to start the calendar week.
@@ -178,9 +254,9 @@ export interface ICalendarModalDayViewProps extends ICalendarDayViewProps {
 
 /**
  * Interface representing an hour in the calendar.
- * @interface ICalendarHour
+ * @interface ICalendarHourItem
  */
-export interface ICalendarHour {
+export interface ICalendarHourItem {
     /**
      * The hour of the day, ranging from 0 (12 AM) to 23 (11 PM).
      * @example
@@ -205,10 +281,10 @@ export interface ICalendarHour {
 }
 
 /**
- * @interface ICalendarDay
+ * @interface ICalendarDayItem
  * Interface representing a day in the calendar.
  */
-export interface ICalendarDay {
+export interface ICalendarDayItem {
     /**
      * The day of the month, ranging from 1 to 31.
      * @example
@@ -312,10 +388,10 @@ export interface ICalendarDay {
 }
 
 /**
- * @interface ICalendarYear
+ * @interface ICalendarYearItem
  * Interface representing a year in the calendar.
  */
-export interface ICalendarYear {
+export interface ICalendarYearItem {
     /**
      * The year value, represented as a number.
      * @example
@@ -330,10 +406,10 @@ export interface ICalendarYear {
     // dates: Moment
 }
 /**
- * @interface ICalendarMonth
+ * @interface ICalendarMonthItem
  * Interface representing a month in the calendar.
  */
-export interface ICalendarMonth {
+export interface ICalendarMonthItem {
     /**
      * The name of the month, represented as a string (e.g., "January", "February", etc.).
      * @example
@@ -341,10 +417,17 @@ export interface ICalendarMonth {
      */
     monthName: string;
 
-    /**
-     * The month value, represented as a number (1-12).
+    /***
+     * The short name of the month, represented as a string (e.g., "Jan", "Feb", etc.).
      * @example
-     * const month: number = 6; // June
+     * const monthNameShort: string = "Jun";
+     */
+    monthNameShort: string;
+
+    /**
+     * The month value, represented as a number in the range 0 to 11, where 0 corresponds to January and 11 to December. 
+     * @example
+     * const month: number = 5; // June
      */
     month: number;
 
@@ -428,11 +511,6 @@ export type ICalendarContext<T extends ICalendarBaseProps = ICalendarBaseProps> 
     momentDefaultValue?: Moment;
 
     /***
-     * The momment instance corresponding to the current navigation date.
-     */
-    dateCursor: Moment;
-
-    /***
      * The current state of the calendar.
      */
     state: ICalendarState;
@@ -452,8 +530,51 @@ export type ICalendarContext<T extends ICalendarBaseProps = ICalendarBaseProps> 
     navigateToPrevious: (event?: GestureResponderEvent) => void;
 }
 
+/***
+ * Interface representing the state of the calendar.
+ * @interface ICalendarState
+ */
 export interface ICalendarState {
-    minDate?: ICalendarDate, maxDate?: ICalendarDate, defaultValue?: ICalendarDate,
-    displayView: ICalendarDisplayView
+    /***
+     * The minimum date that can be selected in the calendar.
+     * @default undefined
+     * @example
+     * const minDate: ICalendarDate = new Date('2022-01-01');
+     */
+    minDate?: ICalendarDate,
+    /***
+     * The maximum date that can be selected in the calendar.
+     * @default undefined
+     * @example
+     * const maxDate: ICalendarDate = new Date('2022-12-31');
+     */
+    maxDate?: ICalendarDate,
+    /***
+     * The default date value to be displayed in the calendar.
+     * @default undefined
+     */
+    defaultValue?: ICalendarDate,
+    /***
+     * The current display view of the calendar.
+     * @default "day"
+     */
+    displayView: ICalendarDisplayView;
+
+    /**
+     * The current date cursor used for navigating the calendar. This value determines:
+     * - The currently displayed month in day view
+     * - The year range shown in year view (±5 years from cursor)
+     * - The highlighted month/year in their respective views
+     * 
+     * The cursor acts independently from the selected date, allowing users to browse
+     * through different time periods without changing their selection.
+     * 
+     * @type {moment.Moment} - Can be provided as:
+     * - moment.js object
+     * 
+     * @default moment() // Current date
+     * 
+     * When dateCursor is provided (either as a moment.js object or as undefined), it will be used, otherwise the defaultValue will be used.
+     */
     dateCursor: Moment,
 };

@@ -1,5 +1,5 @@
 import { IInputFormatterNumberMaskOptions, IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterMaskWithValidation } from "../../types";
-import { DEFAULT_DATE_FORMATS, formatDate, DateParser } from "../date";
+import { DateHelper } from "../date/dateHelper";
 import defaultStr from "../defaultStr";
 import isNonNullString from "../isNonNullString";
 import isRegExp from "../isRegex";
@@ -58,7 +58,7 @@ export class InputFormatter {
   static formatValueToObject({ value, type, format, dateFormat, ...rest }: IInputFormatterOptions): IInputFormatterResult {
     const canValueBeDecimal = type && ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());
     let parsedValue = value;
-    const result:Partial<IInputFormatterResult> = {};
+    const result: Partial<IInputFormatterResult> = {};
     // Normalize the value: if it's undefined, null, or empty, set it to an empty string.
     value = value === undefined || value === null || !value ? "" : value;
     if (!value) {
@@ -81,18 +81,18 @@ export class InputFormatter {
       let hasFoundDate = false;
       // Format dates if the value is a valid date object.
       if ((dateFormat || ["time", "date", "datetime"].includes(typeText))) {
-        dateFormat = defaultStr(dateFormat,typeText === "time" ? DEFAULT_DATE_FORMATS.time : typeText === "date" ? DEFAULT_DATE_FORMATS.date : DEFAULT_DATE_FORMATS.dateTime)
-        const parsedDate = DateParser.parseDate(value);
-        if(parsedDate){
+        dateFormat = defaultStr(dateFormat, typeText === "time" ? DateHelper.DEFAULT_TIME_FORMAT : typeText === "date" ? DateHelper.DEFAULT_DATE_FORMAT : DateHelper.DEFAULT_DATE_TIME_FORMAT)
+        const parsedDate = DateHelper.parseDate(value);
+        if (parsedDate) {
           hasFoundDate = true;
-          formattedValue = formatDate(parsedDate, dateFormat);
+          formattedValue = DateHelper.formatDate(parsedDate, dateFormat);
           result.dateValue = parsedDate;
         }
         result.dateFormat = dateFormat;
       }
-      if(hasFoundDate){}
+      if (hasFoundDate) { }
       // Format numbers based on the specified format.
-      else if(typeof parsedValue == 'number') {
+      else if (typeof parsedValue == 'number') {
         if (typeof (Number.prototype)[format as keyof Number] === 'function') {
           formattedValue = (parsedValue as number)[format as keyof Number]();
         } else {
@@ -478,7 +478,7 @@ export class InputFormatter {
   /****
    * The phone number examples, used to generate the phone number mask
    */
-  static PHONE_NUMBER_EXAMPLES: Record<CountryCode,string> = {} as Record<CountryCode,string>;
+  static PHONE_NUMBER_EXAMPLES: Record<CountryCode, string> = {} as Record<CountryCode, string>;
   /***
    * A mask for single facilitative space.
    * @description A mask for a single facilitative space.
@@ -492,8 +492,8 @@ export class InputFormatter {
 
   static createPhoneNumberMask(countryCode: CountryCode): IInputFormatterMaskWithValidation {
     const countryExample = isNonNullString(countryCode) ? InputFormatter.PHONE_NUMBER_EXAMPLES[countryCode] : undefined;
-    if(isNonNullString(countryExample)){  
-      return InputFormatter.createPhoneNumberMaskFromExample(countryExample,countryCode);
+    if (isNonNullString(countryExample)) {
+      return InputFormatter.createPhoneNumberMaskFromExample(countryExample, countryCode);
     }
     // Get an example phone number for the given country code
     const exampleNumber = getExampleNumber(countryCode, examples);
@@ -507,7 +507,7 @@ export class InputFormatter {
 
     // Format the example number using AsYouType
     const formatter = new AsYouType(countryCode);
-    return InputFormatter.createPhoneNumberMaskFromExample(formatter.input(exampleNumber.nationalNumber),countryCode);
+    return InputFormatter.createPhoneNumberMaskFromExample(formatter.input(exampleNumber.nationalNumber), countryCode);
   }
   /***
     Creates a phone number mask based on the provided phone number example and country code.
@@ -529,7 +529,7 @@ export class InputFormatter {
     console.log(phoneNumberMask.validate('+1 202 555 0144'));  // Output: true
     ```
   */
-  static createPhoneNumberMaskFromExample(phoneNumberExample: string, countryCode?:Parameters<typeof isValidPhoneNumber>[1]): IInputFormatterMaskWithValidation {
+  static createPhoneNumberMaskFromExample(phoneNumberExample: string, countryCode?: Parameters<typeof isValidPhoneNumber>[1]): IInputFormatterMaskWithValidation {
     if (!isNonNullString(phoneNumberExample)) {
       //throw new Error(`No example number found for country code: ${countryCode}`);
       return {
@@ -550,7 +550,7 @@ export class InputFormatter {
     }
     return {
       mask, validate: (value: string) => {
-        return isNonNullString(value) && !!isValidPhoneNumber(value,countryCode);
+        return isNonNullString(value) && !!isValidPhoneNumber(value, countryCode);
       }
     };
   }
@@ -578,7 +578,7 @@ export class InputFormatter {
      * This mask expects the input value to be in the format of `YYYY-MM-DD` or `YYYY/MM/DD` or `YYYY.MM.DD`.
      */
     get DATE() {
-      return InputFormatter.createDateMask(DEFAULT_DATE_FORMATS.date);
+      return InputFormatter.createDateMask(DateHelper.DEFAULT_DATE_FORMAT);
     },
     /**
      * Mask for time input format.
@@ -586,10 +586,10 @@ export class InputFormatter {
      * This mask expects the input value to be in the format of `HH:MM:SS` or `HHHMMSS`.
      */
     get TIME() {
-      return InputFormatter.createDateMask(DEFAULT_DATE_FORMATS.time);
+      return InputFormatter.createDateMask(DateHelper.DEFAULT_TIME_FORMAT);
     },
     get DATE_TIME() {
-      return InputFormatter.createDateMask(DEFAULT_DATE_FORMATS.dateTime);
+      return InputFormatter.createDateMask(DateHelper.DEFAULT_DATE_TIME_FORMAT);
     },
     CREDIT_CARD: {
       mask: [

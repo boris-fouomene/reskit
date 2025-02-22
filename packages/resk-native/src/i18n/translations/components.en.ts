@@ -2,6 +2,9 @@ import { I18n } from "@resk/core";
 I18n.RegisterTranslations({
     "en": {
         "components": {
+            "calendar": {
+                "closeModal": "Close Modal",
+            },
             "dropdown": {
                 "selectAll": "Select All",
                 "unselectAll": "Unselect All",

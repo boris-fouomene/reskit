@@ -1,12 +1,11 @@
-import React, { createContext, ReactNode, useContext, useEffect, useImperativeHandle, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useImperativeHandle, useMemo } from "react";
 import { View, StyleSheet, GestureResponderEvent } from "react-native";
-import moment from "moment";
-import { defaultStr, I18n, IMomentFormat, isEmpty } from "@resk/core";
-import { ICalendarBaseProps, ICalendarDate, CalendarModalContext, ICalendarDay, ICalendarDayViewProps, ICalendarDisplayView, ICalendarHour, ICalendarModalDayViewProps, ICalendarMonth, ICalendarMonthViewProps, ICalendarYear, ICalendarYearViewProps, ICalendarContext, ICalendarState } from "./types";
+import moment, { Moment } from "moment";
+import { DateHelper, defaultStr, I18n, IMomentFormat, isEmpty, isNonNullString } from "@resk/core";
+import { ICalendarBaseProps, ICalendarDate, CalendarModalContext, ICalendarDayItem, ICalendarDayViewProps, ICalendarDisplayView, ICalendarHourItem, ICalendarModalDayViewProps, ICalendarMonthItem, ICalendarMonthViewProps, ICalendarYearItem, ICalendarYearViewProps, ICalendarContext, ICalendarState, ICalendarItem, ICalendarItemsContainerProps } from "./types";
 import { Icon } from "@components/Icon";
 import Label from "@components/Label";
 import { useI18n } from "@src/i18n/hooks";
-import { DEFAULT_DATE_FORMATS } from "@resk/core";
 import { TouchableRipple } from "@components/TouchableRipple";
 import Theme, { Colors, IThemeManager, useTheme } from "@theme/index";
 import { IStyle } from "@src/types";
@@ -14,37 +13,62 @@ import useStateCallback from "@utils/stateCallback";
 import { Notify } from "@notify";
 import { IModalProps, Modal, useModal } from '@components/Modal';
 import { useDimensions } from "@dimensions/index";
-import { renderCalendar } from "./utils";
+import { ICON_SIZE, renderCalendar } from "./utils";
+import isValidElement from "@utils/isValidElement";
 
 export default class Calendar {
-    static Context: React.Context<ICalendarContext> = createContext<ICalendarContext>({} as ICalendarContext);
-    static getDefaultDateFormat(dateFormat?: IMomentFormat): IMomentFormat {
-        return defaultStr(dateFormat, DEFAULT_DATE_FORMATS.date) as IMomentFormat;
-    }
     /**
-    * Generate the headers for a week based on the start day.
-    * @param weekStartDay - The day of the week to start on (0 for Sunday, 1 for Monday, etc.).
-    * @returns An array of 7 strings representing the week headers, e.g., ["Sun", "Mon", ...].
-    */
+     * The context for the calendar component.
+     * 
+     * This context provides access to the calendar's state and props.
+     */
+    static Context: React.Context<ICalendarContext> = createContext<ICalendarContext>({} as ICalendarContext);
+    /**
+     * Generates the headers for a week based on the start day.
+     * 
+     * This method returns an array of 7 strings representing the week headers, e.g., ["Sun", "Mon", ...].
+     * 
+     * @param {number} [weekStartDay=0] - The day of the week to start on (0 for Sunday, 1 for Monday, etc.).
+     * @returns {string[]} - An array of 7 strings representing the week headers.
+     * 
+     * @example
+     * const weekHeaders = Calendar.generateWeekHeaders(1);
+     * console.log(weekHeaders); // Output: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+     */
     static generateWeekHeaders(weekStartDay: number = 0): string[] {
         weekStartDay = typeof weekStartDay === 'number' && (weekStartDay >= 0 && weekStartDay <= 6) ? weekStartDay : 0;
         const daysOfWeek = moment.weekdaysShort(); // ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
         return [...daysOfWeek.slice(weekStartDay), ...daysOfWeek.slice(0, weekStartDay)];
     }
-    // Generate a calendar matrix for a month
-    static generateDayView(dateCursor?: ICalendarDate, weekStartDay: number = 0, minDate?: ICalendarDate, maxDate?: ICalendarDate, defaultValue?: ICalendarDate): ICalendarDay[][] {
-        const momentDateCursor = moment(dateCursor);
+    /**
+     * Generates a 7x7 matrix of days for a given month.
+     * 
+     * This method creates a matrix of days, where each day is represented by an object containing its date, value, and other properties.
+     * 
+     * @param {ICalendarDate} [dateCursor] - The date cursor to use for generating the day view.
+     * @param {number} [weekStartDay=0] - The day of the week to start the calendar week (0 = Sunday, 1 = Monday, etc.).
+     * @param {ICalendarDate} [minDate] - The minimum date to be displayed in the calendar.
+     * @param {ICalendarDate} [maxDate] - The maximum date to be displayed in the calendar.
+     * @param {ICalendarDate} [defaultValue] - The default date value to be displayed in the calendar.
+     * @returns {ICalendarDayItem[][]} - A 2D array of ICalendarDayItem objects, representing the days in a 7x7 matrix.
+     * 
+     * @example
+     * const dayMatrix = Calendar.generateDayView(new Date('2022-06-01'), 1, new Date('2022-01-01'), new Date('2022-12-31'), new Date('2022-06-15'));
+     * console.log(dayMatrix); // Output: A 2D array of ICalendarDayItem objects
+     */
+    static generateDayView(dateCursor?: ICalendarDate, weekStartDay: number = 0, minDate?: ICalendarDate, maxDate?: ICalendarDate, defaultValue?: ICalendarDate): ICalendarDayItem[][] {
+        const momentDateCursor = getMomentDate(dateCursor);
         const startOfMonth = momentDateCursor.startOf('month');
-        const endOfMonth = moment(momentDateCursor).endOf('month');
+        const endOfMonth = getMomentDate(momentDateCursor).endOf('month');
         const startDayOfWeek = startOfMonth.day();
-        const matrixDateCursor = moment(startOfMonth).subtract((startDayOfWeek - weekStartDay + 7) % 7, 'days');
-        const defaultValueMoment = defaultValue ? moment(defaultValue) : undefined;
-        const calendarMatrix: ICalendarDay[][] = [];
+        const matrixDateCursor = getMomentDate(startOfMonth).subtract((startDayOfWeek - weekStartDay + 7) % 7, 'days');
+        const defaultValueMoment = defaultValue ? getMomentDate(defaultValue) : undefined;
+        const calendarMatrix: ICalendarDayItem[][] = [];
         const currentDate = matrixDateCursor.clone();
-        const momentMaxDate = maxDate ? moment(maxDate) : undefined;
-        const momentMinDate = minDate ? moment(minDate) : undefined;
+        const momentMaxDate = maxDate ? getMomentDate(maxDate) : undefined;
+        const momentMinDate = minDate ? getMomentDate(minDate) : undefined;
         for (let week = 0; week < 6; week++) {
-            const weekRow: ICalendarDay[] = [];
+            const weekRow: ICalendarDayItem[] = [];
             for (let day = 0; day < 7; day++) {
                 const isCurrentDateValid = !(momentMinDate && momentMinDate.isAfter(currentDate, "day") || momentMaxDate && momentMaxDate.isBefore(currentDate, "day"))
                 const isDefaultValue = defaultValueMoment && defaultValueMoment.isSame(currentDate, 'day') || false;
@@ -53,7 +77,7 @@ export default class Calendar {
                     day: currentDate.date(),
                     isDefaultValue,
                     value: currentDate.toDate(),
-                    isToday: currentDate.isSame(moment(), "day"),
+                    isToday: currentDate.isSame(getMomentDate(), "day"),
                     date: currentDate.clone(),
                     dayStr: currentDate.format('DD'),
                     shortName: currentDate.format('ddd'),
@@ -73,20 +97,32 @@ export default class Calendar {
         return calendarMatrix;
     }
     /**
-     * Generate a 4x4 matrix of months for a given year.
-     * @returns A matrix of months with their statuses.
+     * Generates a 4x4 matrix of months for a given year.
+     * 
+     * This method creates a matrix of months, where each month is represented by an object containing its name, short name, index, and disabled status.
+     * 
+     * @param {ICalendarDate} [minDate] - The minimum date to be displayed in the calendar.
+     * @param {ICalendarDate} [maxDate] - The maximum date to be displayed in the calendar.
+     * @returns {ICalendarMonthItem[][]} - A 2D array of ICalendarMonthItem objects, representing the months in a 4x4 matrix.
+     * 
+     * @example
+     * const monthMatrix = Calendar.generateMonthView(new Date('2022-01-01'), new Date('2022-12-31'));
+     * console.log(monthMatrix); // Output: A 2D array of ICalendarMonthItem objects
      */
-    static generateMonthView(minDate?: ICalendarDate, maxDate?: ICalendarDate): ICalendarMonth[][] {
-        const allMonths = moment.monthsShort();//example : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        const monthMatrix: ICalendarMonth[][] = [];
+    static generateMonthView(minDate?: ICalendarDate, maxDate?: ICalendarDate): ICalendarMonthItem[][] {
+        const allMonths = moment.months();//example : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        const allMonthsShort = moment.monthsShort();
+        const monthMatrix: ICalendarMonthItem[][] = [];
         const rows = Math.ceil(16 / 4); // 4 columns, so calculate rows
         for (let row = 0; row < rows; row++) {
-            const monthRow: ICalendarMonth[] = [];
+            const monthRow: ICalendarMonthItem[] = [];
             for (let col = 0; col < 4; col++) {
                 const monthIndex = row * 4 + col;
                 if (monthIndex >= 16) break;
+                const nameIndex = monthIndex % 12;
                 monthRow.push({
-                    monthName: allMonths[monthIndex % 12], // Use modulo for 16 months
+                    monthName: allMonths[nameIndex], // Use modulo for 16 months
+                    monthNameShort: allMonthsShort[nameIndex],
                     monthIndex,
                     disabled: row >= 3,
                     month: monthIndex
@@ -96,24 +132,54 @@ export default class Calendar {
         }
         return monthMatrix;
     }
+    /***
+     * Generate the boundaries for the years in the calendar.
+     * @param {ICalendarDate} minDate - The minimum date to be displayed in the calendar.
+     * @returns {object} An object containing the start and end years, as well as the start and end dates.
+     */
+    /**
+    * Calculates the boundaries for the years in the calendar.
+    * 
+    * This method determines the start and end years, as well as the start and end dates,
+    * based on the provided minimum date.
+    * 
+    * @param {ICalendarDate} [minDate] - The minimum date to be displayed in the calendar.
+    * @returns {{ start: number, startDate: Date, end: number, endDate: Date }} - An object containing the start and end years, as well as the start and end dates.
+    * 
+    * @example
+    * const boundaries = Calendar.getYearsBoundaries(new Date('2022-01-01'));
+    * console.log(boundaries); // Output: { start: 2012, startDate: 2022-01-01T00:00:00.000Z, end: 2027, endDate: 2037-01-01T00:00:00.000Z }
+    */
     static getYearsBoundaries(minDate?: ICalendarDate): { start: number, startDate: Date, end: number, endDate: Date } {
-        const startYear = moment(minDate).toDate().getFullYear();
+        const startYear = getMomentDate(minDate).toDate().getFullYear();
         const start = Math.max(startYear - 10, 0);
         const end = start + 15;
         return {
             start,
-            startDate: moment(minDate).toDate(),
+            startDate: getMomentDate(minDate).toDate(),
             end,
-            endDate: moment(minDate).add(15, 'year').toDate()
+            endDate: getMomentDate(minDate).add(15, 'year').toDate()
         }
     }
-
-    static generateYearView(minDate?: ICalendarDate, maxDate?: ICalendarDate): ICalendarYear[][] {
+    /**
+     * Generates a 4x4 matrix of years for a given date range.
+     * 
+     * This method creates a matrix of years, where each year is represented by an object containing its value.
+     * 
+     * @param {ICalendarDate} [minDate] - The minimum date to be displayed in the calendar.
+     * @param {ICalendarDate} [maxDate] - The maximum date to be displayed in the calendar.
+     * @returns {ICalendarYearItem[][]} - A 2D array of ICalendarYearItem objects, representing the years in a 4x4 matrix.
+     * 
+     * @example
+     * const yearMatrix = Calendar.generateYearView(new Date('2022-01-01'), new Date('2022-12-31'));
+     * console.log(yearMatrix); // Output: A 2D array of ICalendarYearItem objects
+     */
+    static generateYearView(minDate?: ICalendarDate, maxDate?: ICalendarDate): ICalendarYearItem[][] {
         const { start: startYear, end: endYear } = Calendar.getYearsBoundaries(minDate);
-        const years: ICalendarYear[][] = [];
+        const years: ICalendarYearItem[][] = [];
         const numRows = 4; // Display 4 years per row
         for (let row = 0; row < numRows; row++) {
-            const yearRow: ICalendarYear[] = [];
+            const yearRow: ICalendarYearItem[] = [];
             for (let col = 0; col < 4; col++) {
                 const year = startYear + row * 4 + col;
                 yearRow.push({
@@ -124,13 +190,48 @@ export default class Calendar {
         }
         return years;
     }
-
-    // Generate hour view for a specific day
-    static generateHourView(date?: ICalendarDate): ICalendarHour[] {
-        const currentDate = moment(); // Current time
-        const momentDate = moment(date);
+    /**
+     * A container component for calendar items.
+     * A container represent a row of items or item headers in the calendar.
+     * 
+     * This component provides a context for its children, which includes the number of items, screen width, and screen height.
+     * 
+     * @param {ICalendarItemsContainerProps} props - The props for the ItemsContainer component.
+     * @returns {JSX.Element} - The rendered ItemsContainer component.
+     */
+    static ItemsContainer: React.FC<ICalendarItemsContainerProps> = ({ children, testID, width: itemsContainerWidth }) => {
+        const { itemsContainerProps: cCalendarItemsContainerProps } = useCalendar();
+        const itemsContainerProps = Object.assign({}, cCalendarItemsContainerProps);
+        testID = defaultStr(testID, "resk-calendar");
+        itemsContainerWidth = typeof itemsContainerWidth == "number" && itemsContainerWidth > 10 ? itemsContainerWidth : itemsContainerProps.width;
+        const itemsCount = Array.isArray(children) ? children.length : 1;
+        const { width: screenWidth, height: screenHeight } = useDimensions();
+        const itemsSize = Math.min(screenWidth * 90 / 100, typeof itemsContainerWidth == "number" && itemsContainerWidth > 10 ? itemsContainerWidth : 392);
+        return <CalendarItemContainerContext.Provider value={{ itemsCount, screenWidth, screenHeight }}>
+            <View testID={testID + "-items-container"} style={[Styles.calendarItemsContainer]}>
+                <View testID={testID + "-items-container-content"} style={[Styles.calendarItemContainer, { width: itemsSize }]}>
+                    {children}
+                </View>
+            </View>
+        </CalendarItemContainerContext.Provider>
+    }
+    /**
+     * Generates a list of hours for a given date.
+     * 
+     * This method creates a list of hours, where each hour is represented by an object containing its value, label, and disabled status.
+     * 
+     * @param {ICalendarDate} [date] - The date to generate hours for.
+     * @returns {ICalendarHourItem[]} - A list of ICalendarHourItem objects, representing the hours.
+     * 
+     * @example
+     * const hourView = Calendar.generateHourView(new Date('2022-06-15'));
+     * console.log(hourView); // Output: A list of ICalendarHourItem objects
+     */
+    static generateHourView(date?: ICalendarDate): ICalendarHourItem[] {
+        const currentDate = getMomentDate(); // Current time
+        const momentDate = getMomentDate(date);
         const isToday = momentDate.isSame(currentDate, 'day');
-        const hourView: ICalendarHour[] = [];
+        const hourView: ICalendarHourItem[] = [];
         for (let i = 0; i < 24; i++) {
             const hourMoment = momentDate.clone().hour(i).minute(0).second(0);
             hourView.push({
@@ -141,16 +242,75 @@ export default class Calendar {
         }
         return hourView;
     }
-    /***
-        Generate a 7x7 matrix of days for a given month.
-        @param {ICalendarDayViewProps} props - Props for the CalendarDay component.
-        @returns {ReactNode} A Calendar with a 7x7 matrix of days.
-    */
+    /**
+     * A day view component for the calendar.
+     * 
+     * This component renders a day view of the calendar, with a grid of days and navigation buttons.
+     * 
+     * @param {ICalendarDayViewProps} props - The props for the DayView component.
+     * @returns {JSX.Element} - The rendered DayView component.
+     */
     static DayView(props: ICalendarDayViewProps) {
-        return <CalendarWithContext displayView="day" {...props}>
+        return <CalendarWithContext
+            displayView="day" {...props}
+        >
             <CalendarDayView />
         </CalendarWithContext>
     }
+
+    /**
+     * A modal content component for the calendar in a modal.
+     * 
+     * This component provides a container for the modal content, with access to the modal context.
+     * 
+     * @param {ICalendarBaseProps} props - The props for the ModalContent component.
+     * @returns {JSX.Element} - The rendered ModalContent component.
+     */
+    static ModalContent: React.FC<ICalendarBaseProps & { displayView: ICalendarDisplayView }> = ({ children, header, testID, displayView, ...props }) => {
+        testID = defaultStr(testID, "resk-calendar-modal");
+        const modalContext = useModal();
+        const i18n = useI18n();
+        const Component = useMemo(() => {
+            return displayView == "day" ? Calendar.DayView : Calendar.DayView;
+        }, [displayView])
+        return <Component
+            {...props}
+            onChange={(...args) => {
+                const { onChange } = props as any;
+                if (typeof onChange == "function") {
+                    onChange(...args);
+                }
+                if (typeof modalContext?.handleDismiss == "function") {
+                    modalContext.handleDismiss(undefined as any);
+                }
+            }}
+            header={<View style={[Styles.modalHeader]} testID={testID + "-modal-header"}>
+                {typeof modalContext?.handleDismiss === "function" ? <View testID={testID + "-close-modal-icon"} style={Styles.closeModalIcon}>
+                    <Icon.Button
+                        size={ICON_SIZE}
+                        iconName={"close"}
+                        title={i18n.t("components.calendar.closeModal")}
+                        onPress={(e) => {
+                            if (typeof modalContext?.handleDismiss === "function") {
+                                modalContext.handleDismiss(e);
+                            }
+                        }}
+                    />
+                </View> : null}
+                {isValidElement(header) ? header : null}
+            </View>}
+            testID={testID}
+        />
+    };
+    /**
+     * A modal day view component for the calendar.
+     * 
+     * This component provides a modal window for displaying the day view of the calendar.
+     * 
+     * @param {ICalendarModalDayViewProps} props - The props for the ModalDayView component.
+     * @param {React.ForwardedRef<CalendarModalContext>} ref - The reference to the modal context.
+     * @returns {JSX.Element} - The rendered ModalDayView component.
+     */
     static ModalDayView = React.forwardRef(({ modalProps, testID, ...props }: ICalendarModalDayViewProps, ref: React.ForwardedRef<CalendarModalContext>) => {
         testID = defaultStr(testID, "resk-calendar-modal-dayview");
         modalProps = Object.assign({}, modalProps);
@@ -160,34 +320,54 @@ export default class Calendar {
             dismissable={false}
             pureModal
             {...modalProps}
-            children={<Calendar.DayView {...props} testID={testID} />}
+            children={<Calendar.ModalContent
+                {...props}
+                displayView="day"
+            />}
             ref={ref}
         />
     });
-    /***
-    * Generate a calendar matrix for a month
-    * @param {ICalendarMonthViewProps} props - The props for the calendar month view.
-    * @returns {React.ReactNode} - The rendered calendar month view.
-    */
+    /**
+      * A month view component for the calendar.
+      * 
+      * This component renders a month view of the calendar, with a grid of months and navigation buttons.
+      * 
+      * @param {ICalendarMonthViewProps} props - The props for the MonthView component.
+      * @returns {JSX.Element} - The rendered MonthView component.
+      */
     static MonthView(props: ICalendarMonthViewProps) {
-        return <CalendarWithContext displayView="month" {...props}>
+        return <CalendarWithContext
+            displayView="month"
+            {...props}
+        >
             <CalendarMonthView />
         </CalendarWithContext>
     };
-    /****
-        Generate a calendar matrix for a year
-        @param {ICalendarYearViewProps} props - The props for the calendar year view.
-        @returns {React.ReactNode} - The rendered calendar year view.
-    */
+    /**
+     * A year view component for the calendar.
+     * 
+     * This component renders a year view of the calendar, with a grid of years and navigation buttons.
+     * 
+     * @param {ICalendarYearViewProps} props - The props for the YearView component.
+     * @returns {JSX.Element} - The rendered YearView component.
+     */
     static YearView(props: ICalendarYearViewProps) {
-        return <CalendarWithContext displayView="year" {...props}>
+        return <CalendarWithContext
+            displayView="year" {...props}
+        >
             <CalendarYearView />
         </CalendarWithContext>
     }
-    static getIconSize(): number {
-        return 24;
-    }
-    static Modal = React.forwardRef(({ children, ...props }: IModalProps, ref: React.Ref<CalendarModalContext>) => {
+    /**
+     * A modal component for the calendar.
+     * 
+     * This component provides a modal window for displaying the calendar.
+     * 
+     * @param {IModalProps} props - The props for the Modal component.
+     * @param {React.Ref<CalendarModalContext>} ref - The reference to the modal context.
+     * @returns {JSX.Element} - The rendered Modal component.
+     */
+    static Modal = React.forwardRef(({ onDismiss, ...props }: IModalProps, ref: React.Ref<CalendarModalContext>) => {
         const [visible, setVisible] = useStateCallback(false);
         const context = {
             open: (cb?: () => void) => {
@@ -202,14 +382,29 @@ export default class Calendar {
             fullScreen
             dismissable={false}
             {...props}
+            onDismiss={(e) => {
+                if (typeof onDismiss === "function") {
+                    onDismiss(e);
+                }
+                setVisible(false);
+            }}
             visible={visible}
-            children={<ModalChildren {...props} children={children as ReactNode} />}
         />
     });
 }
+Calendar.ModalContent.displayName = "Calendar.ModalContent";
 const Styles = StyleSheet.create({
     disabled: {
         opacity: 0.65,
+    },
+    modalHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        alignSelf: "flex-start",
+    },
+    closeModalIcon: {
+        marginRight: 5,
     },
     calendarItemsContainer: {
         flexDirection: "column",
@@ -241,6 +436,12 @@ const Styles = StyleSheet.create({
     calendarYearItem: {
 
     },
+    calendarItemMarked: {
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+        marginTop: 2,
+    }
 })
 
 const areEquals = (a: any, b: any) => {
@@ -256,31 +457,36 @@ export function useCalendar<T extends ICalendarBaseProps = ICalendarBaseProps>()
     return Object.assign({}, context) as ICalendarContext<T>;
 }
 
+const getMomentDate = (date?: ICalendarDate | Moment) => {
+    return moment(isNonNullString(date) ? DateHelper.parseDate(date) || undefined : date);
+}
 function CalendarWithContext<T extends ICalendarBaseProps = ICalendarBaseProps>({ children, displayView, ...props }: T & { displayView: ICalendarDisplayView }) {
     const i18n = useI18n();
     const i18nLocale = i18n.getLocale();
     const locale = defaultStr(props?.locale, i18n.getLocale());
+    //When dateCursor is provided, use it, otherwise use defaultValue
+    const customDateCursor = "dateCursor" in props ? props.dateCursor : props.defaultValue;
     const [state, setState] = useStateCallback<ICalendarState>({
         minDate: props.minDate,
         maxDate: props.maxDate,
         defaultValue: props.defaultValue,
         displayView,
-        dateCursor: moment(props.defaultValue),
+        dateCursor: getMomentDate(customDateCursor),
     });
     useMemo(() => {
         I18n.setMomentLocale(locale);
         //moment.locale(locale, I18n.getMomentLocale(locale));
     }, [locale, i18nLocale]);
     const momentMaxDate = useMemo(() => {
-        return state?.maxDate ? moment(state?.maxDate) : undefined;
+        return state?.maxDate ? getMomentDate(state?.maxDate) : undefined;
     }, [state?.maxDate]);
     const momentMinDate = useMemo(() => {
-        return state?.minDate ? moment(state?.minDate) : undefined;
+        return state?.minDate ? getMomentDate(state?.minDate) : undefined;
     }, [state?.minDate]);
     const momentDefaultValue = useMemo(() => {
-        return state?.defaultValue ? moment(state?.defaultValue) : undefined;
+        return state?.defaultValue ? getMomentDate(state?.defaultValue) : undefined;
     }, [state?.defaultValue]);
-    const dateFormat = defaultStr(props?.dateFormat, DEFAULT_DATE_FORMATS.date) as IMomentFormat;
+    const dateFormat = defaultStr(props?.dateFormat, DateHelper.DEFAULT_DATE_FORMAT) as IMomentFormat;
     useEffect(() => {
         const newState = { ...state };
         const hasUpdate = !areEquals(props?.minDate, newState.minDate) || !areEquals(props?.maxDate, newState.maxDate) || (!areEquals(props?.defaultValue, state.defaultValue));
@@ -290,14 +496,13 @@ function CalendarWithContext<T extends ICalendarBaseProps = ICalendarBaseProps>(
         if (!areEquals(props?.maxDate, state.maxDate)) {
             newState.maxDate = props?.maxDate;
         }
-        if (!areEquals(props?.defaultValue, state.defaultValue)) {
-            newState.defaultValue = props?.defaultValue;
-            newState.dateCursor = moment(props?.defaultValue);
+        if (!areEquals(customDateCursor, state.dateCursor)) {
+            newState.dateCursor = getMomentDate(customDateCursor);
         }
         if (hasUpdate) {
             setState(newState);
         }
-    }, [props?.minDate, props?.maxDate, props?.defaultValue]);
+    }, [props?.minDate, props?.maxDate, customDateCursor]);
     const { dateCursor } = state;
     return <Calendar.Context.Provider value={{
         ...props,
@@ -309,9 +514,10 @@ function CalendarWithContext<T extends ICalendarBaseProps = ICalendarBaseProps>(
         momentDefaultValue,
         dateCursor,
         state,
+        displayView: state.displayView,
         setState,
         isValidItem: (date: Date) => {
-            const momentDate = moment(date);
+            const momentDate = getMomentDate(date);
             if (momentMinDate && momentMinDate.isAfter(momentDate, "day")) return false;
             if (momentMaxDate && momentMaxDate.isBefore(momentDate, "day")) return false;
             return true;
@@ -360,7 +566,6 @@ function CalendarWithContext<T extends ICalendarBaseProps = ICalendarBaseProps>(
 }
 CalendarWithContext.displayName = "Calendar.WithContext";
 
-const CALENDAR_ITEMS_SIZE = 392;
 const CalendarItemContainerContext = createContext<{
     itemsCount: number;
     screenWidth: number;
@@ -371,26 +576,17 @@ const CalendarItemContainerContext = createContext<{
     screenHeight: 0,
 });
 
-const CalendarItemContainer = ({ children, testID }: { children: ReactNode, testID: string }) => {
-    const itemsCount = Array.isArray(children) ? children.length : 1;
-    const { width: screenWidth, height: screenHeight } = useDimensions();
-    const itemsSize = Math.min(screenWidth * 90 / 100, CALENDAR_ITEMS_SIZE);
-    return <CalendarItemContainerContext.Provider value={{ itemsCount, screenWidth, screenHeight }}>
-        <View testID={testID + "-container"} style={[Styles.calendarItemsContainer]}>
-            <View testID={testID + "-contentContainer"} style={[Styles.calendarItemContainer, { width: itemsSize }]}>
-                {children}
-            </View>
-        </View>
-    </CalendarItemContainerContext.Provider>
-}
-CalendarItemContainer.displayName = "Calendar.ItemContainer";
-interface ICalendarItemProps { style?: IStyle, isCurrent: boolean, onPress: (e: GestureResponderEvent) => void, isDefaultValue?: boolean, disabled: boolean, theme?: IThemeManager, testID: string, label: string }
-const CalendarItem = ({ isCurrent, isDefaultValue, theme, disabled, onPress, label, testID, style }: ICalendarItemProps) => {
+Calendar.ItemsContainer.displayName = "Calendar.ItemsContainer";
+interface ICalendarItemProps { item: ICalendarItem, style?: IStyle, isCurrent: boolean, onPress: (e: GestureResponderEvent) => void, isDefaultValue?: boolean, disabled: boolean, theme?: IThemeManager, testID: string, label: string }
+const CalendarItem = ({ isCurrent, item, isDefaultValue, theme, disabled, onPress, label, testID, style }: ICalendarItemProps) => {
+    const { isItemMarked } = useCalendar();
     theme = (theme || Theme) as IThemeManager;
+    const isMarked = typeof isItemMarked == "function" ? isItemMarked(item) : false;
     const selectedBackgroundColor = theme.colors.primary;
     const color = isDefaultValue ? theme.colors.onPrimary : undefined;
     const backgroundColor = isDefaultValue ? selectedBackgroundColor : undefined;
     const borderColor = isDefaultValue || isCurrent ? selectedBackgroundColor : undefined;
+    const markedBackgroundColor = isDefaultValue ? Colors.setAlpha(selectedBackgroundColor, 0.4) : theme.colors.primary;
     return (
         <TouchableRipple
             testID={testID}
@@ -408,6 +604,7 @@ const CalendarItem = ({ isCurrent, isDefaultValue, theme, disabled, onPress, lab
         >
             <Label textBold={isDefaultValue} color={color} disabled={disabled} testID={testID + "-label"}>
                 {label}
+                {isMarked ? <View style={[Styles.calendarItemMarked, { backgroundColor: markedBackgroundColor }]} /> : null}
             </Label>
         </TouchableRipple>
     );
@@ -416,18 +613,18 @@ CalendarItem.displayName = "Calendar.Item";
 
 const CalendarDayView: React.FC = () => {
     const theme = useTheme();
-    const { momentMaxDate, testID: customTestID, weekStartDay, header, momentMinDate, dateCursor, isValidItem, i18n, locale, setState, navigateToNext, navigateToPrevious, dateFormat, state, momentDefaultValue, ...props } = useCalendar<ICalendarDayViewProps>();
+    const { momentMaxDate, itemsContainerProps, testID: customTestID, weekStartDay, header, momentMinDate, isValidItem, i18n, locale, setState, navigateToNext, navigateToPrevious, dateFormat, state, momentDefaultValue, ...props } = useCalendar<ICalendarDayViewProps>();
     const testID = defaultStr(customTestID, "resk-calendar-day-view");
-
-    const { displayView } = state;
+    const itemsContainerTestId = defaultStr(itemsContainerProps?.testID, testID + "-items-container");
+    const { displayView, dateCursor } = state;
     const { dayView, dayHeaders } = useMemo(() => {
         return {
             dayView: Calendar.generateDayView(dateCursor.toDate(), weekStartDay, state.minDate, state.maxDate, state.defaultValue),
             dayHeaders: Calendar.generateWeekHeaders(weekStartDay)
         };
     }, [state.minDate, state.defaultValue, state.maxDate, weekStartDay, state.dateCursor, dateCursor, locale]);
-    const toDayStr = moment().format(dateFormat);
-    const defaultValueStr = momentDefaultValue?.format(dateFormat) || "";
+    //const toDayStr = getMomentDate().format(dateFormat);
+    //const defaultValueStr = momentDefaultValue?.format(dateFormat) || "";
     const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(dateCursor.toDate()) : undefined;
     return renderCalendar({
         ...props,
@@ -447,12 +644,13 @@ const CalendarDayView: React.FC = () => {
             {displayView == "month" ? <Calendar.MonthView
                 minDate={momentMinDate?.toDate()}
                 maxDate={momentMaxDate?.toDate()}
-                defaultValue={dateCursor.toDate()}
+                defaultValue={state.defaultValue}
+                dateCursor={dateCursor}
                 renderNavigationButtons={false}
                 renderToggleDisplayViewButton={false}
                 elevation={0}
                 onChange={(data) => {
-                    const newDateCursor = moment(dateCursor).month(data.month);
+                    const newDateCursor = getMomentDate(dateCursor).month(data.month);
                     if (!isValidItem(newDateCursor.toDate())) {
                         Notify.error(i18n.t("outOfRange", { date: newDateCursor.toDate().toFormat(dateFormat) }));
                         return;
@@ -467,7 +665,8 @@ const CalendarDayView: React.FC = () => {
                 : displayView === "year" ? <Calendar.YearView
                     minDate={momentMinDate?.toDate()}
                     maxDate={momentMaxDate?.toDate()}
-                    defaultValue={dateCursor.toDate()}
+                    dateCursor={dateCursor}
+                    defaultValue={state.defaultValue}
                     renderNavigationButtons={false}
                     renderToggleDisplayViewButton={false}
                     elevation={0}
@@ -485,19 +684,19 @@ const CalendarDayView: React.FC = () => {
                     }}
                 />
                     : <>
-                        <CalendarItemContainer testID={testID + "-headers-label"}>
+                        <Calendar.ItemsContainer testID={itemsContainerTestId + "-headers"}>
                             {dayHeaders.map((day, index) => {
                                 return <View key={index} style={[Styles.calendarItem, Styles.calendarDayHeader]}>
                                     <Label style={Styles.calendarDayHeaderLabel} textBold>{day}</Label>
                                 </View>
                             })}
-                        </CalendarItemContainer>
+                        </Calendar.ItemsContainer>
                         {dayView.map((week, index) => {
-                            const cTestID = `${testID}-${index}`;
-                            return <CalendarItemContainer testID={cTestID} key={index}>
+                            const cTestID = `${itemsContainerTestId}-${index}`;
+                            return <Calendar.ItemsContainer testID={cTestID} key={index}>
                                 {week.map((day, index) => {
-                                    //const isDefault = defaultToCheck && (day.day === defaultToCheck.date());
                                     return <CalendarItem
+                                        item={day}
                                         key={day.day}
                                         {...{
                                             isCurrent: day.isToday,
@@ -521,7 +720,7 @@ const CalendarDayView: React.FC = () => {
                                         }}
                                     />;
                                 })}
-                            </CalendarItemContainer>;
+                            </Calendar.ItemsContainer>;
                         })}
                     </>
             }
@@ -533,14 +732,15 @@ CalendarDayView.displayName = "Calendar.DayView";
 
 const CalendarMonthView: React.FC<ICalendarMonthViewProps> = () => {
     const theme = useTheme();
-    const { state, setState, defaultValue, momentDefaultValue, momentMinDate, dateCursor, momentMaxDate, locale, navigateToNext, navigateToPrevious, ...props } = useCalendar<ICalendarMonthViewProps>();
+    const { state, setState, defaultValue, momentDefaultValue, momentMinDate, momentMaxDate, locale, navigateToNext, navigateToPrevious, ...props } = useCalendar<ICalendarMonthViewProps>();
+    const { dateCursor } = state;
     const monthView = useMemo(() => {
         return Calendar.generateMonthView(state.minDate, state.maxDate);
     }, [state.minDate, state.maxDate, state.dateCursor, dateCursor, locale]);
     const { displayView } = state;
     const testID = defaultStr(props?.testID, "resk-calendar-month-view");
-    const currentMonth = moment().month();
-    const isCurrentYear = moment().year() === dateCursor.year();
+    const currentMonth = getMomentDate().month();
+    const isCurrentYear = getMomentDate().year() === dateCursor.year();
     const yearBoundaries = displayView === "year" ? Calendar.getYearsBoundaries(dateCursor.toDate()) : undefined;
     return renderCalendar({
         testID,
@@ -559,7 +759,8 @@ const CalendarMonthView: React.FC<ICalendarMonthViewProps> = () => {
             {displayView == "year" ? <Calendar.YearView
                 minDate={momentMinDate?.toDate()}
                 maxDate={momentMaxDate?.toDate()}
-                defaultValue={dateCursor.toDate()}
+                dateCursor={dateCursor}
+                defaultValue={state.defaultValue}
                 renderNavigationButtons={false}
                 renderToggleDisplayViewButton={false}
                 elevation={0}
@@ -573,18 +774,19 @@ const CalendarMonthView: React.FC<ICalendarMonthViewProps> = () => {
             /> : <>
                 {monthView.map((months, index) => {
                     const cTestID = `${testID}-${index}`;
-                    return <CalendarItemContainer testID={cTestID} key={index}>
+                    return <Calendar.ItemsContainer key={index}>
                         {months.map((data, index) => {
                             return <CalendarItem
                                 key={data.month}
+                                item={data}
                                 {...{
                                     itemsCount: months.length,
                                     isCurrent: isCurrentYear && data.month === currentMonth,
-                                    //isDefaultValue: data.month === momentDefaultValue?.month() && dateCursor.year() === momentDefaultValue?.year(),
+                                    isDefaultValue: data.month === momentDefaultValue?.month() && dateCursor.year() === momentDefaultValue?.year(),
                                     disabled: false,
                                     theme,
                                     testID: cTestID + "-month-" + index,
-                                    label: String(data.monthName),
+                                    label: String(data.monthNameShort),
                                     style: [Styles.calendarYearItem, data.disabled && Styles.disabled],
                                     onPress: () => {
                                         if (typeof props?.onChange === "function") {
@@ -594,7 +796,7 @@ const CalendarMonthView: React.FC<ICalendarMonthViewProps> = () => {
                                 }}
                             />;
                         })}
-                    </CalendarItemContainer>;
+                    </Calendar.ItemsContainer>;
                 })}
             </>}
         </>
@@ -604,7 +806,8 @@ CalendarMonthView.displayName = "Calendar.MonthView";
 
 const CalendarYearView: React.FC<ICalendarYearViewProps> = () => {
     const theme = useTheme();
-    const { locale, dateCursor, state, momentDefaultValue, navigateToNext, navigateToPrevious, ...props } = useCalendar<ICalendarYearViewProps>();
+    const { locale, state, momentDefaultValue, navigateToNext, navigateToPrevious, ...props } = useCalendar<ICalendarYearViewProps>();
+    const { dateCursor } = state;
     const yearView = useMemo(() => {
         const { startDate, endDate } = Calendar.getYearsBoundaries(dateCursor.toDate());
         const data = Calendar.generateYearView(startDate, endDate);
@@ -625,10 +828,11 @@ const CalendarYearView: React.FC<ICalendarYearViewProps> = () => {
         children: <>
             {yearView.map((years, index) => {
                 const cTestID = `${testID}-${index}`;
-                return <CalendarItemContainer testID={cTestID} key={index}>
+                return <Calendar.ItemsContainer testID={cTestID} key={index}>
                     {years.map((data, index) => {
                         return <CalendarItem
                             key={data.year}
+                            item={data}
                             {...{
                                 isCurrent: currentYear === data.year,
                                 isDefaultValue: data.year === momentDefaultValue?.year(),
@@ -646,19 +850,13 @@ const CalendarYearView: React.FC<ICalendarYearViewProps> = () => {
                             }}
                         />
                     })}
-                </CalendarItemContainer>;
+                </Calendar.ItemsContainer>;
             })}
         </>,
     });
 }
 
 CalendarYearView.displayName = "Calendar.YearView";
-
-const ModalChildren: React.FC<{ children?: ReactNode }> = ({ children, ...props }) => {
-    const modalContext = useModal();
-    return <>{children}</>
-};
-ModalChildren.displayName = "Calendar.ModalChildren";
 
 Calendar.Modal.displayName = "Calendar.Modal";
 Calendar.ModalDayView.displayName = "Calendar.ModalDayView";

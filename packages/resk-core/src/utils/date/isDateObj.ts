@@ -1,16 +1,16 @@
 /**
- * Checks if the given object is a valid date object.
- * 
- * @param {any} dateObj The object to check.
- * @returns {boolean} True if the object is a valid date object, false otherwise.
- * 
- * Example:
- * ```ts
- * console.log(isDateObj(new Date())); // Output: true
- * console.log(isDateObj({})); // Output: false
- * console.log(isDateObj("2022-01-01")); // Output: false
- * ```
- */
+   * Checks if the given object is a valid date object.
+   * 
+   * @param {any} dateObj The object to check.
+   * @returns {boolean} True if the object is a valid date object, false otherwise.
+   * 
+   * Example:
+   * ```ts
+   * console.log(DateHelper.DateHelper.isDateObj(new Date())); // Output: true
+   * console.log(DateHelper.DateHelper.isDateObj({})); // Output: false
+   * console.log(DateHelper.DateHelper.isDateObj("2022-01-01")); // Output: false
+   * ```
+   */
 export default function isDateObj(dateObj: any): dateObj is Date {
     /**
      * If the object is null or not an object, return false.

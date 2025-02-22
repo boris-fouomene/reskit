@@ -9,15 +9,16 @@ import { Divider } from "@components/Divider";
 import { SwipeGestureHandler } from "@components/Gesture";
 import { Icon } from "@components/Icon";
 
-export function renderCalendar({ testID, children, navigateToNext, navigateToPrevious, renderNavigationButtons, footer, header, displayViewToggleButton, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, footer?: JSX.Element, navigateToNext?: (event?: GestureResponderEvent) => void, navigateToPrevious?: (event?: GestureResponderEvent) => void, header?: JSX.Element }) {
+export function renderCalendar({ testID, children, navigateToNext, borderRadius, navigateToPrevious, renderNavigationButtons, footer, header, displayViewToggleButton, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, footer?: JSX.Element, navigateToNext?: (event?: GestureResponderEvent) => void, navigateToPrevious?: (event?: GestureResponderEvent) => void, header?: JSX.Element, }) {
     testID = defaultStr(testID, "resk-calendar");
     const isValidHeader = isValidElement(header);
     const canDisplayHeader = isValidHeader || renderNavigationButtons !== false || displayViewToggleButton !== false;
     if (typeof displayViewToggleButton === "boolean") {
         displayViewToggleButton = {};
     }
+    borderRadius = typeof borderRadius === "number" ? borderRadius : 0;
     const canSwipe = typeof navigateToNext === "function" || typeof navigateToPrevious === "function";
-    return <Surface elevation={5} {...props} testID={testID} style={[Styles.calendar, props.style]}>
+    return <Surface elevation={5} {...props} testID={testID} style={[Styles.calendar, { borderRadius }, props.style]}>
         {canDisplayHeader ? <View testID={testID + "-header"} style={Styles.header}>
             {isValidHeader ? <>
                 {header}

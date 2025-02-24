@@ -203,6 +203,30 @@ export class DateHelper {
   /**
  * [Previous interfaces remain the same]
  */
+  
+  /**
+   * Convert GMT to local time.
+   * @param {Date|string} gmtTime The GMT time to convert. if not provided, it will be the current time.
+   * @returns The local time or null if the input is not valid.
+   */
+  static utcToLocalTime(gmtTime?: string|Date): Date | null {
+    if(gmtTime ===null) return null;
+    const date = gmtTime ? DateHelper.parseDate(gmtTime) : new Date(new Date().toISOString());
+    if(!date) return null;
+    return moment.utc(date).local().toDate();
+  }
+  
+  /**
+   * Convert local time to GMT.
+   * @param {Date|string} localTime The local time to convert. If not provided, it will be the current time.
+   * @returns The GMT time or null if the input is not valid.
+   */
+  static localTimeToUtc(localTime?: string | Date): Date|null {
+    if(localTime ===null) return null;
+    const date = localTime ? DateHelper.parseDate(localTime) : new Date(new Date().toString());
+    if(!date) return null;
+    return moment(date).utc().toDate();
+  }
 
 
   /**

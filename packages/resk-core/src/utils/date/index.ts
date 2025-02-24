@@ -86,6 +86,20 @@ declare global {
          * ```
          */
         resetSeconds: () => Date;
+        
+        
+        /***
+            * Resets the milliseconds of the date to 0.
+            * 
+            * @returns The date with milliseconds reset to 0.
+            * 
+            * Example:
+            * ```ts
+            * const date = new Date();
+            * console.log(date.resetMilliseconds()); // Output: Date with milliseconds reset to 0
+            * ```
+        */
+        resetMilliseconds: () => Date;
 
         /**
          * Resets the hours, minutes, and seconds of the date to 0.
@@ -319,6 +333,10 @@ Date.prototype.resetSeconds = function () {
     this.setSeconds(0);
     return this;
 }
+Date.prototype.resetMilliseconds = function () {
+    this.setMilliseconds(0);
+    return this;
+}
 /**
  * Resets the hours, minutes, and seconds of the date to 0.
  * 
@@ -352,4 +370,32 @@ Date.prototype.resetHours2Minutes2Seconds = function () {
  */
 Date.prototype.toFormat = function (format?: IMomentFormat) {
     return DateHelper.formatDate(this, format);
+}
+
+Date.prototype.addYears = function (years: number) {
+    return DateHelper.addYears(years, this);
+}
+
+Date.prototype.addMonths = function (months: number) {
+    return DateHelper.addMonths(months, this);
+}
+
+Date.prototype.addMinutes = function (minutes: number) {
+    return DateHelper.addMinutes(minutes, this);
+}
+
+Date.prototype.addSeconds = function (seconds: number) {
+    return DateHelper.addSeconds(seconds, this);
+}
+
+Date.prototype.addDays = function (days: number) {
+    return DateHelper.addDays(days, this);
+}
+
+Date.prototype.addWeeks = function (weeks: number) {
+    return DateHelper.addWeeks(weeks, this);
+}
+
+Date.prototype.addHours = function (hours: number) {
+    return DateHelper.addHours(hours, this);
 }

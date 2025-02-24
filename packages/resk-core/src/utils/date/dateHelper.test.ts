@@ -1,16 +1,14 @@
-import moment from 'moment';
-import { DateHelper } from './dateHelper';
-
+import { DateHelper } from './index';
 describe('DateHelper.parseString', () => {
   // Helper function to create a date with time set to midnight
-  const createDate = (year: number, month: number, day: number): Date => {
+  const createDate = (year: number, month: number, day: number,hours?:number, minutes?:number, seconds?:number): Date => {
     const d = new Date();
     d.setFullYear(year);
     d.setMonth(month - 1);
     d.setDate(day);
-    d.setHours(0);
-    d.setMinutes(0);
-    d.setSeconds(0);
+    d.setHours(typeof hours === "number" ? hours : 0);
+    d.setMinutes(typeof minutes === "number" ? minutes : 0);
+    d.setSeconds(typeof seconds === "number" ? seconds : 0);
     d.setMilliseconds(0);
     return d;
   };
@@ -195,6 +193,40 @@ describe('DateHelper.parseString', () => {
 
       const result2 = DateHelper.parseString('9999-12-31');
       expect(result2.isValid).toBe(true);
+    });
+  });
+  
+  describe("Converting to local time", () => {
+    test("converts GMT time to local time", () => {
+      const gmtTime = DateHelper.parseDate("2024-02-20T15:30:45Z");
+      const localTime = DateHelper.utcToLocalTime(gmtTime as Date);
+      expect(localTime).toBeDefined();
+      expect(localTime).toEqual(createDate(2024, 2, 20, 15, 30, 45));
+    });
+
+    test("converts local time to GMT time", () => {
+      const localTime = DateHelper.parseDate("2024-02-20T15:30:45");
+      const gmtTime = DateHelper.localTimeToUtc(localTime as Date);
+      expect(gmtTime).toBeDefined();
+      expect(gmtTime).toEqual(createDate(2024, 2, 20, 15, 30, 45));
+    });
+
+    test("returns null for invalid input", () => {
+      const gmtTime = DateHelper.parseDate("invalid-date");
+      const localTime = DateHelper.utcToLocalTime(gmtTime as Date);
+      expect(localTime).toBeNull();
+
+      const gmtTime2 = DateHelper.parseDate("2024-02-20T15:30:45");
+      const localTime2 = DateHelper.localTimeToUtc(gmtTime2 as Date);
+      expect(localTime2).toEqual(createDate(2024, 2, 20, 15, 30, 45));
+    });
+    const now = DateHelper.utcToLocalTime()?.resetSeconds();
+    test ("Test current time", () => {
+      const gmtTime = DateHelper.localTimeToUtc(now)?.resetSeconds();
+      const localTime = DateHelper.utcToLocalTime(gmtTime)?.resetSeconds();
+      expect(localTime).toEqual(now);
+      console.log(now," is now",now?.toString()," is new date", localTime," is local time ",gmtTime," is gmt time ",new Date(gmtTime as Date).addHours(1));
+      expect(gmtTime?.addHours(1)).toEqual(now);
     });
   });
 });

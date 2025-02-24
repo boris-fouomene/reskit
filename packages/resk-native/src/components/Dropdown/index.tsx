@@ -440,6 +440,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
 function DropdownMenu() {
     const context = useDropdown();
     const filteredItems = Array.isArray(context?.filteredItems) ? context.filteredItems : [];
+    const preparedItems = context?.getPreparedItems() || [];
     const label = context?.props?.label;
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
     const fullScreenAppBarProps = Object.assign({}, context?.props?.fullScreenAppBarProps);
@@ -474,7 +475,7 @@ function DropdownMenu() {
                         }
                     },
                 }}
-                subtitle={defaultStr(context.anchorSelectedText, i18n.t("components.dropdown.noneSelected")) + " [" + filteredItems.length.formatNumber() + "]"}
+                subtitle={defaultStr(context.anchorSelectedText, i18n.t("components.dropdown.noneSelected")) + " [" + preparedItems.length.formatNumber() + "]"}
             />
         ) : null}
         <DropdownSearch isFullScreen={fullScreen} />

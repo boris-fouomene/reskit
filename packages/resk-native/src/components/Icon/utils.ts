@@ -1,5 +1,5 @@
 
-import { isObj, isValidImageSrc } from "@resk/core";
+import { isObj, isValidImageSrc, isValidUrl } from "@resk/core";
 
 /**
  * Determines if the provided source is a valid image source.
@@ -44,6 +44,14 @@ export const isImageSource = (source: any) =>
   // source is an object with uri
   (source && isObj(source) && source !== null && Object.prototype.hasOwnProperty.call(source, 'uri') && typeof source.uri === 'string') ||
   // source is a module, e.g. - require('image')
-  typeof source === 'number' ||
-  //Platform.isWeb() && 
-  isValidImageSrc(source);
+  typeof source === 'number' //||
+
+/***
+ * Checks if the provided source is a valid image URL.
+ * 
+ * @param {string} uri - The source to check.
+ * @returns {boolean} True if the source is a valid image URL, false otherwise.
+ */
+export const isImageUrl = (uri: string) => {
+  return isValidImageSrc(uri) || isValidUrl(uri);
+}

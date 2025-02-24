@@ -5,6 +5,12 @@
         "rootDir": "./src",
         "outDir": "./build",
         "paths": {
+            "@countries/*": [
+                "src/countries/*"
+            ],
+            "@countries": [
+                "src/countries"
+            ],
             "@utils/*": [
                 "src/utils/*"
             ],

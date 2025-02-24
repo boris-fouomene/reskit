@@ -390,57 +390,6 @@ describe('InputFormatter', () => {
         });
     });
 
-    describe.skip('createNumberMask', () => {
-        it('should create a number mask with default options', () => {
-            const mask = InputFormatter.createNumberMask();
-            console.log(mask, " is created number mask");
-            //expect(mask({ value: '12345' })).toEqual(['$', ' ', '1', ',', '2', '3', '4', '5']);
-        });
-
-        it('should create a number mask with custom options', () => {
-            const mask = InputFormatter.createNumberMask({
-                delimiter: '.',
-                precision: 2,
-                prefix: ['€', ' '],
-                separator: ',',
-            });
-            console.log(mask, " is created number custom options mask");
-            //expect(mask({ value: '12345.67' })).toEqual(['€', ' ', '1', '2', '3', ',', '4', '5', '.', '6', '7']);
-        });
-
-        it('should create a number mask with a custom prefix', () => {
-            const mask = InputFormatter.createNumberMask({
-                prefix: ['$', ' '],
-            });
-            console.log(mask, " is created number custom prefix mask");
-            //expect(mask({ value: '12345' })).toEqual(['$', ' ', '1', ',', '2', '3', '4', '5']);
-        });
-
-        it('should create a number mask with a custom separator', () => {
-            const mask = InputFormatter.createNumberMask({
-                separator: '.',
-            });
-            console.log(mask, " is created number custom separator mask");
-            //expect(mask({ value: '12345' })).toEqual(['$', ' ', '1', '.', '2', '3', '4', '5']);
-        });
-
-        it('should create a number mask with a custom delimiter', () => {
-            const mask = InputFormatter.createNumberMask({
-                delimiter: ',',
-            });
-            console.log(mask, " is created number custom delimiter mask");
-            //expect(mask({ value: '12345.67' })).toEqual(['$', ' ', '1', '2', '3', ',', '4', '5', ',', '6', '7']);
-        });
-
-        it('should create a number mask with a custom precision', () => {
-            const mask = InputFormatter.createNumberMask({
-                precision: 2,
-            });
-            console.log(mask, " is created number custom precision mask");
-            //expect(mask({ value: '12345.67' })).toEqual(['$', ' ', '1', ',', '2', '3', '4', '5', '.', '6', '7']);
-        });
-    });
-
     describe('createDateMask', () => {
         it('should create a date mask with a moment format', () => {
             const mask = InputFormatter.createDateMask('YYYY/MM/DD');
@@ -465,44 +414,29 @@ describe('InputFormatter', () => {
         });
     });
     describe("create cameroon phone number mask", () => {
-        it("should create a phone number mask with a country code", () => {
-            const mask = InputFormatter.createPhoneNumberMaskFromExample("(237)69965076");
-            console.log(mask, " is camerron phonne number");
+        it("should create a phone number mask with a CM country code", () => {
+            const mask = InputFormatter.createPhoneNumberMaskFromExample("+23769965076");
+            expect(mask).toMatchObject({
+                mask: [
+                    '+', '2', '3', '7',
+                    ' ', /\d/, /\d/, /\d/,
+                    /\d/, /\d/, /\d/, /\d/,
+                    /\d/
+                ],
+                countryCode: 'CM',
+                dialCode: '237',
+            })
         });
     })
     describe('createPhoneNumberMask', () => {
-        it('should create a phone number mask with a country code', () => {
+        it('should create a phone number mask with a US country code', () => {
             const mask = InputFormatter.createPhoneNumberMask('US');
             expect(mask.mask).toEqual([
-                '(',
-                /\d/,
-                /\d/,
-                /\d/,
-                ')',
-                InputFormatter.SINGLE_SPACE_MASK,
-                /\d/,
-                /\d/,
-                /\d/,
-                '-',
-                /\d/,
-                /\d/,
-                /\d/,
-                /\d/,
+                '+', '1', ' ', /\d/,
+                /\d/, /\d/, '-', /\d/,
+                /\d/, /\d/, '-', /\d/,
+                /\d/, /\d/, /\d/
             ]);
-        });
-        it("Should sanitize phone number", () => {
-            expect(InputFormatter.sanitizePhoneNumber('(212) 456-7890')).toBe('(212) 456-7890');
-            expect(InputFormatter.sanitizePhoneNumber('(212) 456-7890)')).toBe('(212) 456-7890)');
-            expect(InputFormatter.sanitizePhoneNumber('(212)456-7890)')).toBe('(212) 456-7890)');
-            expect(InputFormatter.sanitizePhoneNumber('(212)456-7890')).toBe('(212) 456-7890');
-            expect(InputFormatter.sanitizePhoneNumber('(212) 456-7890')).toBe('(212) 456-7890');
-        });
-
-        it('should create a phone number mask with a country code and validation', () => {
-            const mask = InputFormatter.createPhoneNumberMask('US');
-            expect(InputFormatter.formatWithMask({ value: '(212) 456-7890', ...mask })).toMatchObject({ masked: '(212) 456-7890', maskHasObfuscation: false, placeholder: '(___) ___-____', isValid: true });
-            expect(InputFormatter.formatWithMask({ value: '(212) 456-7891', ...mask })).toMatchObject({ masked: '(212) 456-7891', obfuscated: '(212) 456-7891', maskHasObfuscation: false, placeholder: '(___) ___-____', isValid: true });
-            expect(InputFormatter.formatWithMask({ value: InputFormatter.sanitizePhoneNumber('(212)246-7890'), ...mask })).toMatchObject({ masked: '(212) 246-7890', maskHasObfuscation: false, placeholder: '(___) ___-____', isValid: true });
         });
     });
 
@@ -561,6 +495,25 @@ describe('InputFormatter', () => {
 
         it('should have a credit card mask', () => {
 
+        });
+    });
+
+    describe('cleanPhoneNumber', () => {
+        it('should clean a phone number', () => {
+            expect(InputFormatter.cleanPhoneNumber('+1 (555) 123-4567')).toBe('+1(555)123-4567');
+            expect(InputFormatter.cleanPhoneNumber('+44 20 7123 4567')).toBe('+442071234567');
+            expect(InputFormatter.cleanPhoneNumber('+81 3-1234-5678')).toBe('+813-1234-5678');
+            expect(InputFormatter.cleanPhoneNumber('020 7183 8750')).toBe('02071838750');
+            expect(InputFormatter.cleanPhoneNumber('invalid-phone')).toBe('invalid-phone');
+        });
+    });
+    describe('extractDialCodeFromPhoneNumber', () => {
+        it('should extract dial code from phone number', () => {
+            expect(InputFormatter.extractDialCodeFromPhoneNumber('+1 (555) 123-4567')).toBe('1');
+            expect(InputFormatter.extractDialCodeFromPhoneNumber('+44 20 7123 4567')).toBe('44');
+            expect(InputFormatter.extractDialCodeFromPhoneNumber('+81 3-1234-5678')).toBe('81');
+            expect(InputFormatter.extractDialCodeFromPhoneNumber('020 7183 8750')).toBe('');
+            expect(InputFormatter.extractDialCodeFromPhoneNumber('invalid-phone')).toBe('');
         });
     });
 });

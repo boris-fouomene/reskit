@@ -5,9 +5,8 @@ import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextI
 import { ReactNode } from "react";
 import { ILabelProps } from "@components/Label";
 import { IFontIconProps } from "@components/Icon/types";
-import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult } from "@resk/core";
-import { CountryCode } from "libphonenumber-js";
-import { ICalendarDayViewProps, ICalendarModalDayViewProps } from '../Date/types';
+import { IInputFormatterMask, IInputFormatterMaskOptions, ICountryCode, IInputFormatterOptions, IInputFormatterResult } from "@resk/core";
+import { ICalendarModalDayViewProps } from '../Date/types';
 
 /**
  * @interface ITextInputType
@@ -277,7 +276,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      * The country code for phone number
      * when type is telephone
      */
-    phoneCountryCode?: CountryCode;
+    phoneCountryCode?: ICountryCode;
 
     /**
      * @type {number}
@@ -425,7 +424,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      * @param {TextInputProps} props - The props passed to the TextInput component.
      * @returns {React.ReactNode} The rendered component.
      */
-    render?: (props: TextInputProps, ref?: React.Ref<TextInput>) => React.ReactNode;
+    render?: (props: TextInputProps, ref: React.Ref<TextInput>) => React.ReactNode;
 
     /***
      * A boolean value indicating whether to render the TextInput with a background.
@@ -455,7 +454,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      * Additionnal options to pass to the InputFormatter.formatWithMask method, when mask prop is provided to input field
      */
     maskOptions?: Omit<IInputFormatterMaskOptions, "mask">;
-    
+
     /***
         A boolean that determines whether to handle validation errors for the mask, when mask is provided.
         If set to true, the component will handle validation errors for the mask and display them to the user.
@@ -463,7 +462,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
         When set to true, the component will override the `error` to true if the mask has validation errors.
     */
     handleMaskValidationErrors?: boolean;
-    
+
     /***
     * The props for the calendar component. These props are passed to the calendar component when the date picker is opened.
     * This is useful for customizing the appearance and behavior of the calendar component.
@@ -474,7 +473,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
             The props for the calendar icon. These props are passed to the calendar icon when the date picker is opened.
             This is useful for customizing the appearance and behavior of the calendar icon.
         */
-        iconProps?:IFontIconProps;
+        iconProps?: IFontIconProps;
     };
 };
 
@@ -607,4 +606,14 @@ export interface IUseTextInputProps extends Omit<Omit<ITextInputProps, "left" | 
      * @returns 
      */
     onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => void
+
+    /***
+     * The function called to focus the input
+     */
+    focus: () => void;
+
+    /***
+     * The ref of the input
+     */
+    inputRef: React.RefCallback<TextInput>;
 }

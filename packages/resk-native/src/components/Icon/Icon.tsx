@@ -2,8 +2,8 @@ import React, { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
 import { IFontIconProps, IGetIconOptions, IIconProps } from "./types";
 import { Image, ImageStyle } from "react-native";
 import { isValidElement, pickTouchEventHandlers } from "@utils";
-import { isImageSource } from "./utils";
-import { defaultStr, isObj } from "@resk/core";
+import { isImageSource, isImageUrl } from "./utils";
+import { defaultStr, isNonNullString, isObj } from "@resk/core";
 import Theme, { Colors, useTheme } from "@theme/index";
 import FontIcon, { DEFAULT_FONT_ICON_SIZE } from "./Font";
 import { Tooltip } from "@components/Tooltip";
@@ -109,7 +109,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, resizeM
             resizeMode={resizeMode || "contain"}
             {...props}
             testID={testID}
-            source={source}
+            source={["object", "number"].includes(typeof source) ? source : isNonNullString(source) ? { uri: source } : undefined}
             ref={ref as LegacyRef<Image>}
             style={iconStyle as ImageStyle}
         /> : <FontIcon
@@ -154,7 +154,7 @@ export function getIcon<T = any>({ icon, color: col2, iconComponent, theme, ...r
     const iconSource = typeof icon == "function" ? icon({ ...rest, color } as IIconProps & { color: string }) : icon;
     if (isValidElement(iconSource)) return iconSource as ReactNode;
     if (!iconSource) return null;
-    const isSource = isImageSource(iconSource);
+    const isSource = isImageSource(iconSource) || isNonNullString(iconSource) && isImageUrl(iconSource as string);
     const iconName = typeof iconSource == "string" && !isSource ? (iconSource as unknown as IFontIconProps["name"]) : undefined;
     const iconProps: IIconProps = {
         color
@@ -166,8 +166,7 @@ export function getIcon<T = any>({ icon, color: col2, iconComponent, theme, ...r
     return <Component {...iconProps} />;
 }
 const getIconSource = (icon: any) => {
-    if (!isImageSource(icon)) return null;
-    return isObj(icon) ? icon : { source: icon };
+    return { source: typeof icon == "number" ? icon : isObj(icon) ? icon : isNonNullString(icon) ? { uri: icon } : undefined };
 }
 
 /**

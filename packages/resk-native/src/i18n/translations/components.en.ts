@@ -5,6 +5,9 @@ I18n.RegisterTranslations({
             "calendar": {
                 "closeModal": "Close Modal",
             },
+            "textInput": {
+                "selectCountry": "Select Country",
+            },
             "dropdown": {
                 "selectAll": "Select All",
                 "unselectAll": "Unselect All",

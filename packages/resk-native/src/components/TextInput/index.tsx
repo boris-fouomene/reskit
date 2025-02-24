@@ -1,8 +1,8 @@
 import Label from "@components/Label";
-import { isValidElement } from "@utils";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, ScrollView } from 'react-native';
+import { isValidElement, useMergeRefs, usePrevious } from "@utils";
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { InputFormatter, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper } from "@resk/core";
+import { InputFormatter, ICountryCode, ICountry, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper } from "@resk/core";
 import _, { isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
@@ -15,8 +15,10 @@ import { IFontIconProps } from "@components/Icon";
 import { TouchableRipple } from "@components/TouchableRipple";
 import Breakpoints from "@breakpoints/index";
 import { Calendar, CalendarModalContext } from "@components/Date";
-import { Portal } from "@components/Portal";
-import { Animated } from "react-native";
+import { CountriesManager } from "@resk/core";
+import { Dropdown, IDropdownProps } from "@components/Dropdown";
+import { useI18n } from "@src/i18n";
+import { SelectCountry } from "@components/SelectCountry";
 
 
 /**
@@ -77,16 +79,11 @@ import { Animated } from "react-native";
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
 const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
-    const { variant, containerProps, onPress, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, right, label, ...rest } = useTextInput(props);
+    const { variant, containerProps, onPress, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, inputRef, right, label, ...rest } = useTextInput(props);
     const leftContainerProps = Object.assign({}, cLeftContainerProps);
     const isLabelEmbededVariant = variant === "labelEmbeded";
     const { testID } = rest;
-    const innerRef = useRef<RNTextInput | null>(null);
-    const labelContent = !isEmpty(label) && editable ? <Pressable testID={testID + "-text-input-pressable-container"} onPress={(e) => {
-        if (innerRef?.current && typeof innerRef.current.focus === "function") {
-            innerRef.current.focus();
-        }
-    }}>{label}</Pressable> : label;
+    const labelContent = !isEmpty(label) && editable ? <Pressable testID={testID + "-text-input-pressable-container"} onPress={focus}>{label}</Pressable> : label;
     const canWrapWithTouchable = props.isDropdownAnchor && editable;
     const Wrapper = canWrapWithTouchable ? TouchableRipple : View;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
@@ -99,7 +96,7 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
             {<View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
-                {typeof render == "function" ? render(inputProps, ref) : <RNTextInput {...inputProps} ref={ref} />}
+                {typeof render == "function" ? render(inputProps, inputRef) : <RNTextInput {...inputProps} ref={inputRef} />}
             </View>}
             {right}
         </Wrapper>
@@ -265,9 +262,23 @@ const iconSize = 25;
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask, handleMaskValidationErrors, phoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
+    const [phoneCountryCode, setPhoneCountryCode] = React.useState(customPhoneCountryCode);
+    const i18n = useI18n();
+    useMemo(() => {
+        if (customPhoneCountryCode !== phoneCountryCode) {
+            setPhoneCountryCode(customPhoneCountryCode);
+        }
+    }, [customPhoneCountryCode]);
     const theme = useTheme();
+    const innerRef = useRef<RNTextInput | null>(null);
+    const inputRef = useMergeRefs(ref, innerRef);
+    const focus = () => {
+        if (innerRef?.current && typeof innerRef.current.focus === "function") {
+            innerRef.current.focus();
+        }
+    };
     contentContainerProps = Object.assign({}, contentContainerProps);
     rightContainerProps = Object.assign({}, rightContainerProps);
     containerProps = Object.assign({}, containerProps);
@@ -305,6 +316,13 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     }, [type]);
     const emptyValue = cIsEmptyValue || (canValueBeDecimal ? "0" : "");
 
+    const PhoneMaskOrUndefined = useMemo(() => {
+        if (isPhone && isNonNullString(phoneCountryCode)) {
+            return InputFormatter.createPhoneNumberMask(phoneCountryCode);
+        }
+        return undefined;
+    }, [isPhone, phoneCountryCode])
+
     ///mask handling
 
     const { mask, maskOptions, dateFormat, calendarProps: { iconProps, ...calendarProps }, canRenderCalendar } = useMemo(() => {
@@ -315,16 +333,13 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         const isDate = typeString == "date", isTime = typeString == "time";
         const dateFormat = calendarProps.dateFormat = !isDateOrTime ? defaultStr(calendarProps.dateFormat, customDateFormat) : defaultStr(calendarProps.dateFormat, customDateFormat, isDate ? DateHelper.DEFAULT_DATE_FORMAT : isTime ? DateHelper.DEFAULT_TIME_FORMAT : DateHelper.DEFAULT_DATE_TIME_FORMAT);
         if (!mask || !Array.isArray(mask) || !mask.length) {
-            if (isPhone) {
-                if (isNonNullString(phoneCountryCode)) {
-                    const m = InputFormatter.createPhoneNumberMask(phoneCountryCode);
-                    mask = m.mask;
-                    validate = m.validate;
-                }
-            } else if (isDateOrTime) {
+            if (isDateOrTime) {
                 const m2 = InputFormatter.createDateMask(dateFormat);
                 mask = m2.mask;
                 validate = m2.validate;
+            } else if (PhoneMaskOrUndefined) {
+                mask = PhoneMaskOrUndefined.mask;
+                validate = PhoneMaskOrUndefined.validate;
             }
         }
         const { validate: maskOptionsValidate } = maskOptions;
@@ -337,9 +352,9 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             validate,
             dateFormat,
             calendarProps,
-            canRenderCalendar: ["datetime", "date"].includes(typeString)
+            canRenderCalendar: ["datetime", "date"].includes(typeString),
         }
-    }, [customMask, customMaskOptions, phoneCountryCode, typeString, customDateFormat, isDateOrTime, customDateProps]);
+    }, [customMask, customMaskOptions, PhoneMaskOrUndefined, typeString, customDateFormat, isDateOrTime, customDateProps]);
     const toCase = (value: any): { value: string } & Partial<IInputFormatterMaskResult> => {
         if (canValueBeDecimal && isFocused && (value === '.' || value == '.')) {
             value = "0" + value;
@@ -353,6 +368,9 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         if (canValueBeDecimal) {
             value = InputFormatter.parseDecimal(value);
         }
+        if (isPhone && PhoneMaskOrUndefined && isNonNullString(PhoneMaskOrUndefined?.dialCode)) {
+            value = InputFormatter.prefixPhoneNumberWithDialCode(value, PhoneMaskOrUndefined.dialCode);
+        }
         return {
             ...(mask ? InputFormatter.formatWithMask({ ...maskOptions, value, mask, type }) : {}),
             value,
@@ -361,7 +379,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     const valCase = useMemo(() => {
         return toCase(defaultValue);
     }, [defaultValue, mask, maskOptions])
-    const [inputState, setInputState] = React.useState<{ value: any, event: any } & Partial<IInputFormatterMaskResult>>({
+    const [inputState, setInputState] = React.useState<{ value: any, event: any; phoneCountryCode?: ICountryCode } & Partial<IInputFormatterMaskResult>>({
         ...valCase,
         event: null,
     });
@@ -380,8 +398,8 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
 
     const inputValue = hasInputMask ? defaultStr(maskHasObfuscation && !isFocused ? inputState.obfuscated : inputState.masked) : (isFocused ? focusedValue : formatted.formattedValue || emptyValue || "");
     const error = useMemo(() => {
-        return !!customError || defaultBool(handleMaskValidationErrors, !!inputValue) && inputState.isValid === false;
-    }, [inputState.isValid, inputValue, customError, handleMaskValidationErrors])
+        return !!customError || defaultBool(handleMaskValidationErrors, !!inputValue) && inputState.isValid === false && (!isPhone || String(inputState.value).trim() !== "+" + defaultStr(PhoneMaskOrUndefined?.dialCode).ltrim("+").trim());
+    }, [inputState.isValid, inputValue, customError, handleMaskValidationErrors, isPhone])
 
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
@@ -433,7 +451,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         }
         return {} as IFontIconProps;
     }, [isPasswordField, secureTextEntryGetToggleIconProps, isSecure]);
-    const secureIcon = isPasswordField ? <FontIcon size={iconSize}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure) }} color={textColor} /> : null;
+    const secureIcon = isPasswordField && editable ? <FontIcon size={iconSize}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure); focus(); }} color={textColor} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, withBackground, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     const labelSuffix = suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? <Label color={textColor}>{""}[{inputMaskPlaceholder}]</Label> : null;
@@ -481,13 +499,27 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             }}
         />
     </> : null;
-
+    const phoneCountryFlag = isPhone && editable ? <>
+        <SelectCountry
+            multiple={false}
+            defaultValue={phoneCountryCode}
+            onChange={({ value }) => {
+                if (value && value !== phoneCountryCode) {
+                    setPhoneCountryCode(Array.isArray(value) ? value[0] : value)
+                }
+            }}
+            textColor={textColor}
+            anchorProps={{ style: styles.selectCountryAnchor }}
+            fullScreenAppBarProps={{ title: i18n.t("components.textInput.selectCountry") + (isNonNullString(label) ? " [" + label + "]" : "") }}
+        />
+    </> : null;
     return {
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
         underlineColorAndroid: "transparent",
-        //selection: !hasInputMask ? undefined : (showObfuscatedValue ? { start: inputValue.length, end: inputValue.length } : undefined),
         ...props,
+        inputRef,
+        focus,
         onContentSizeChange: (event) => {
             if (typeof onContentSizeChange == "function") {
                 onContentSizeChange(event);
@@ -565,7 +597,10 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
                 props.onFocus(event);
             }
         },
-        left,
+        left: phoneCountryFlag ? <>
+            {phoneCountryFlag}
+            {left}
+        </> : left,
         right: (right || canToggleSecure || affixContent || calendarFlag) ? <View testID={`${testID}-right-container`} {...rightContainerProps} style={[styles.leftOrRightContainer, styles.rightContainer, disabledOrEditStyle, rightContainerProps.style]}>
             {affixContent}
             {right}
@@ -578,6 +613,8 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
 const areCasesEquals = (case1: Partial<IInputFormatterMaskResult>, case2: Partial<IInputFormatterMaskResult>) => {
     return (case1 as any).value == (case2 as any).value && case1.masked === case2.masked && case1.unmasked === case2.unmasked && case1.obfuscated === case2.obfuscated;
 }
+
+
 
 TextInput.displayName = "TextInput";
 
@@ -710,6 +747,14 @@ const styles = StyleSheet.create({
     flatVariantLabel: {
 
     },
+    countryFlagContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
+    selectCountryAnchor: {
+        marginRight: 5,
+    }
 })
 
 const isDecimalType = (type: ITextInputType | string): boolean => {

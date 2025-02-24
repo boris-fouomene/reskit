@@ -4,7 +4,7 @@ import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { defaultStr, isEmpty, isNonNullString, isValidUrl, isValidEmail, isStringNumber } from "@utils/index";
 import { Validator } from "../validator";
 import { i18n } from "../../i18n";
-import { isValidPhoneNumber } from "@utils/isValidPhoneNumber";
+import { InputFormatter } from "@utils/inputFormatter";
 
 /**
  * @function compareNumer
@@ -847,7 +847,7 @@ Validator.registerRule("nonNullString", function nonNullString(options) {
 
 function phoneNumber(options: IValidatorValidateOptions) {
     const { value } = options;
-    return isValidPhoneNumber(value) || i18n.t("validator.phoneNumber", options);
+    return InputFormatter.isValidPhoneNumber(value) || i18n.t("validator.phoneNumber", options);
 }
 Validator.registerRule("phoneNumber", phoneNumber);
 
@@ -870,7 +870,7 @@ export const ValidatorIsPhoneNumber = Validator.createPropertyDecorator("phoneNu
 
 function emailOrPhoneNumber(options: IValidatorValidateOptions) {
     const { value } = options;
-    return isValidEmail(value) || isValidPhoneNumber(value) || i18n.t("validator.emailOrPhoneNumber", options);
+    return isValidEmail(value) || InputFormatter.isValidPhoneNumber(value) || i18n.t("validator.emailOrPhoneNumber", options);
 }
 Validator.registerRule("emailOrPhoneNumber", emailOrPhoneNumber);
 

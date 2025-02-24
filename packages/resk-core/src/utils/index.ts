@@ -16,7 +16,6 @@ export * from "./inputFormatter";
 export * from "./date";
 export * from "./sort";
 export * from "./defaultArray";
-export * from "./isValidPhoneNumber";
 export * from "./object";
 
 export * from "./string";

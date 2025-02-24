@@ -5,13 +5,20 @@ import isNonNullString from "../isNonNullString";
 import isRegExp from "../isRegex";
 import moment from "moment";
 import "../numbers";
-import { AsYouType, CountryCode, getExampleNumber, Examples } from "libphonenumber-js";
-import { isValidPhoneNumber } from "@utils/isValidPhoneNumber";
-import examples from 'libphonenumber-js/mobile/examples';
+import _ from "lodash";
+
+import libPhoneNumber, { PhoneNumber, PhoneNumberFormat } from 'google-libphonenumber';
+
+
+const phoneUtil = libPhoneNumber.PhoneNumberUtil.getInstance();
+const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
+import { CountriesManager, ICountryCode } from "@countries/index";
 import isEmpty from "@utils/isEmpty";
 
 const DIGIT_REGEX = /\d/;
 const LETTER_REGEX = /[a-zA-Z]/;
+
+
 
 /***
     InputFormatter class is used to format the value to the desired format
@@ -232,12 +239,14 @@ export class InputFormatter {
     maskArray.map((mask) => {
       placeholder += String(isNonNullString(mask) ? mask : Array.isArray(mask) && isNonNullString(mask[1]) ? mask[1] : placeholderCharacter).charAt(0);
     });
+    let maskedPlaceholder = placeholder;
     let isValid = true;
     const calValidate = (value: string) => typeof validate === 'function' ? validate(value) : true;
     // make sure it'll not break with null or undefined inputs
     if (!maskArray.length || !value) {
       return {
         maskHasObfuscation: false,
+        maskedPlaceholder,
         masked: value,
         unmasked: value,
         obfuscated: value,
@@ -252,6 +261,7 @@ export class InputFormatter {
     let maskCharIndex = 0;
     let valueCharIndex = 0;
     let maskHasObfuscation = false;
+    const placeholderLength = placeholder.length;
     while (maskCharIndex < maskArray.length) {
       const maskChar = maskArray[maskCharIndex];
       const valueChar = value[valueCharIndex];
@@ -278,6 +288,9 @@ export class InputFormatter {
           if (matchRegex) {
             masked += valToAdd;
             obfuscated += (shouldObsfucateChar ? obfuscatedCharacter : valToAdd);
+            if (placeholderLength > valueCharIndex) {
+              maskedPlaceholder = maskedPlaceholder.substring(0, maskCharIndex) + valToAdd + maskedPlaceholder.substring(valueCharIndex + 1)
+            }
           } else {
             isValid = false;
           }
@@ -295,59 +308,7 @@ export class InputFormatter {
       maskCharIndex += 1;
       valueCharIndex += 1;
     }
-    return { masked, isValid: isValid && calValidate(value), maskHasObfuscation, placeholder, unmasked, obfuscated, maskArray };
-  }
-
-  /**
-   * Creates a number mask.
-   *
-   * This method takes an options object with settings for the number mask, such as the delimiter, precision, prefix, and separator.
-   * It returns a function that takes an options object with a value, and returns a mask array for the number.
-   *
-   * @param options The options object with settings for the number mask.
-   * @returns A function that takes an options object with a value, and returns a mask array for the number.
-   *
-   * @example
-   * ```typescript
-   * const numberMask = createNumberMask({
-   *   delimiter: '.',
-   *   precision: 2,
-   *   prefix: ['$', ' '],
-   *   separator: ',',
-   * });
-   * const mask = numberMask({ value: '123456.78' });
-   * console.log(mask);
-   * // Output:
-   * // ['$ ', '1', '2', '3', ',', '4', '5', '6', '.', '7', '8']
-   * ```
-   * @license This code is adapted from [Original Repository Name] (https://github.com/CaioQuirinoMedeiros/react-native-mask-input).
-   * 
-   * Copyright (c) [2025] [CaioQuirinoMedeiros]
-   * Licensed under the MIT License (https://github.com/CaioQuirinoMedeiros/react-native-mask-input/blob/main/LICENSE) 
-   */
-  static createNumberMask(options?: IInputFormatterNumberMaskOptions): IInputFormatterMask {
-    const { delimiter = '.', precision = 2, prefix = [], separator = ',' } = Object.assign({}, options);
-    return ({ value }: IInputFormatterOptions) => {
-      const numericValue = value?.replace(/\D+/g, '') || '';
-      let mask: IInputFormatterMaskArray = numericValue.split('').map(() => /\d/);
-      const shouldAddSeparatorOnMask = precision > 0 && !!separator;
-      if (mask.length > precision && shouldAddSeparatorOnMask) {
-        mask.splice(-precision, 0, separator);
-      }
-      const amountOfDelimiters = Math.ceil((numericValue.length - precision) / 3) - 1;
-      if (delimiter) {
-        for (let i = 0; i < amountOfDelimiters; i++) {
-          const precisionOffset = precision;
-          const separatorOffset = shouldAddSeparatorOnMask ? 1 : 0;
-          const thousandOffset = 3 + (delimiter ? 1 : 0);
-          const delimiterPosition =
-            -precisionOffset - separatorOffset - i * thousandOffset - 3;
-
-          mask.splice(delimiterPosition, 0, delimiter);
-        }
-      }
-      return [...prefix, ...mask];
-    };
+    return { masked, isValid: isValid && calValidate(value), maskHasObfuscation, placeholder, maskedPlaceholder, unmasked, obfuscated, maskArray };
   }
   /***
    * Predefined masks for common moment formats.
@@ -475,10 +436,6 @@ export class InputFormatter {
       }
     };
   };
-  /****
-   * The phone number examples, used to generate the phone number mask
-   */
-  static PHONE_NUMBER_EXAMPLES: Record<CountryCode, string> = {} as Record<CountryCode, string>;
   /***
    * A mask for single facilitative space.
    * @description A mask for a single facilitative space.
@@ -487,30 +444,53 @@ export class InputFormatter {
   /**
    * Generates a phone number mask based on the country code.
    * @param countryCode - The country code (e.g., "US", "FR", "IN").
+   * @param {PhoneNumberFormat} [format] - The format to use for the phone number mask. Defaults to PhoneNumberFormat.INTERNATIONAL.
    * @returns {IInputFormatterMaskWithValidation} The phone number mask, an array of mask elements (strings or regexes) representing the phone number format..
    */
 
-  static createPhoneNumberMask(countryCode: CountryCode): IInputFormatterMaskWithValidation {
-    const countryExample = isNonNullString(countryCode) ? InputFormatter.PHONE_NUMBER_EXAMPLES[countryCode] : undefined;
+  static createPhoneNumberMask(countryCode: ICountryCode, format?: PhoneNumberFormat): IInputFormatterMaskWithValidation {
+    const countryExample = CountriesManager.getPhoneNumberExample(countryCode);
     if (isNonNullString(countryExample)) {
       return InputFormatter.createPhoneNumberMaskFromExample(countryExample, countryCode);
     }
-    // Get an example phone number for the given country code
-    const exampleNumber = getExampleNumber(countryCode, examples);
-    if (!exampleNumber) {
-      //throw new Error(`No example number found for country code: ${countryCode}`);
+    if (!isNonNullString(countryCode)) {
       return {
         mask: [],
         validate: (value: string) => false,
       }
     }
-
-    // Format the example number using AsYouType
-    const formatter = new AsYouType(countryCode);
-    return InputFormatter.createPhoneNumberMaskFromExample(formatter.input(exampleNumber.nationalNumber), countryCode);
+    try {
+      // Get an example phone number for the given country code
+      const exampleNumber = phoneUtil.getExampleNumber(countryCode);
+      if (!exampleNumber) {
+        //throw new Error(`No example number found for country code: ${countryCode}`);
+        return {
+          mask: [],
+          validate: (value: string) => false,
+        }
+      }
+      const toFormat = format || PhoneNumberFormat.INTERNATIONAL;
+      // Get formatted version
+      const formattedNumber = phoneUtil.format(exampleNumber, toFormat);
+      // Get dial code
+      const dialCode = exampleNumber.getCountryCode() + "";
+      return {
+        dialCode,
+        mask: generatePhoneNumberMaskArray(formattedNumber, dialCode),
+        validate: (value: string) => InputFormatter.isValidPhoneNumber(value, countryCode),
+        countryCode
+      }
+    } catch (error) {
+      return {
+        mask: [],
+        validate: (value: string) => false,
+      }
+    }
   }
-  /***
-    Creates a phone number mask based on the provided phone number example and country code.
+
+  /**
+  *  Creates a phone number mask based on the provided phone number example and country code.
+  *  Uses google-libphonenumber to ensure accurate regional formatting
     
     This function takes a phone number example and an optional country code as input. It creates a mask based on the example number and the country code.
     
@@ -519,51 +499,46 @@ export class InputFormatter {
     If the country code is not provided, the default country code is used. If no example number is found for the provided country code, the function returns an empty mask and a validation function that always returns false.
     
     @param {string} phoneNumberExample - The phone number example to use for the mask.
-    @param {CountryCode} [countryCode] - The country code to use for the mask. If not provided, the default country code is used.
+    @param {ICountryCode} [countryCode] - The country code to use for the mask. If not provided, the default country code is used.
     @returns {IInputFormatterMaskWithValidation} An object containing the mask and a validation function.
-    
-    @example
-    ```typescript
-    const phoneNumberMask = createPhoneNumberMaskFromExample('+1 202 555 0144');  // Returns a mask and a validation function for a phone number in the US
-    console.log(phoneNumberMask.mask);  // Output: [/(\d)/, /(\d)/, /(\d)/, /(\d)/, ' ', /(\d)/, /(\d)/, /(\d)/, /(\d)/]
-    console.log(phoneNumberMask.validate('+1 202 555 0144'));  // Output: true
-    ```
   */
-  static createPhoneNumberMaskFromExample(phoneNumberExample: string, countryCode?: Parameters<typeof isValidPhoneNumber>[1]): IInputFormatterMaskWithValidation {
-    if (!isNonNullString(phoneNumberExample)) {
-      //throw new Error(`No example number found for country code: ${countryCode}`);
+  static createPhoneNumberMaskFromExample(phoneNumber: string, countryCode?: ICountryCode, format?: PhoneNumberFormat): IInputFormatterMaskWithValidation {
+    if (!isNonNullString(phoneNumber)) {
       return {
         mask: [],
-        validate: (value: string) => false,
-      }
+        validate: () => false
+      };
     }
-    const mask: IInputFormatterMaskArray = [];
-    phoneNumberExample = InputFormatter.sanitizePhoneNumber(phoneNumberExample);
-    for (const char of phoneNumberExample) {
-      if (/\d/.test(char)) {
-        mask.push(/\d/); // Replace digits with a regex for digits
-      } else if (char === ' ') {
-        mask.push(InputFormatter.SINGLE_SPACE_MASK); // Replace spaces with a regex for spaces
-      } else {
-        mask.push(char); // Keep separators (e.g., spaces, parentheses, hyphens)
+    try {
+      // Parse the phone number
+      const parsedNumber: PhoneNumber | null = InputFormatter.parsePhoneNumber(phoneNumber, countryCode);
+      if (parsedNumber) {
+        const toFormat = format || PhoneNumberFormat.INTERNATIONAL
+        // Get the formatted version to base the mask on
+        const formattedNumber = phoneUtil.format(parsedNumber, toFormat);
+        if (!isNonNullString(formattedNumber)) {
+          return {
+            mask: [],
+            validate: () => false
+          };
+        }
+        // Get region code
+        const regionCode = phoneUtil.getRegionCodeForNumber(parsedNumber);
+        const dialCode = parsedNumber.getCountryCode() + "";
+        return {
+          dialCode,
+          mask: generatePhoneNumberMaskArray(formattedNumber, dialCode),
+          validate: (value: string) => InputFormatter.isValidPhoneNumber(value, regionCode as ICountryCode),
+          countryCode: regionCode as ICountryCode
+        };
       }
-    }
+    } catch (error) { }
     return {
-      mask, validate: (value: string) => {
-        return isNonNullString(value) && !!isValidPhoneNumber(value, countryCode);
-      }
-    };
-  }
-  /**
-   * Sanitize a phone number by ensuring a space after the closing bracket.
-   *
-   * @param {string} phoneNumber - The phone number as a string.
-   * @returns The formatted phone number with a space after the closing bracket.
-   */
-  static sanitizePhoneNumber(phoneNumber: string): string {
-    if (!isNonNullString(phoneNumber)) return "";
-    return phoneNumber.replace(/\)\s*(\d)/, ") $1"); // Ensures exactly one space after ')'
-  }
+      mask: [],
+      validate: (value: string) => false,
+    }
+  };
+
   /**
   * Predefined masks for common input formats.
   *
@@ -616,4 +591,205 @@ export class InputFormatter {
       validate: (value: string) => true,
     }
   }
+  /***
+   * Parse a phone number using the google-libphonenumber library.
+   * @param {string} number - The phone number to parse.
+   * @param {ICountryCode} [countryCode] - The country code to use for parsing the phone number.
+   * @returns {PhoneNumber | null} The parsed phone number, or null if the parsing fails.
+   * @example
+   * // Parse a phone number
+   * const phoneNumber = InputFormatter.parsePhoneNumber('+1 (555) 123-4567');  
+   * console.log(phoneNumber); // Output: PhoneNumber { countryCode: 'US', nationalNumber: '5551234567', ...}
+   * 
+   */
+  static parsePhoneNumber(number: string, countryCode?: ICountryCode): PhoneNumber | null {
+    if (!isNonNullString(number)) {
+      return null;
+    }
+    try {
+      return phoneUtil.parse(number, defaultStr(countryCode).toLowerCase());
+    } catch (err) {
+      return null;
+    }
+  }
+  /***
+   * Prefix a phone number with a dial code.
+   * @param {string} phoneNumber - The phone number to prefix.
+   * @param {string} dialCode - The dial code to prefix the phone number with.
+   * @returns {string} The prefixed phone number.
+   * @example
+   * // Prefix a phone number with a dial code
+   * const prefixedPhoneNumber = InputFormatter.prefixPhoneNumberWithDialCode('5551234567', '+1');
+   * console.log(prefixedPhoneNumber); // Output: +15551234567
+   */
+  static prefixPhoneNumberWithDialCode(phoneNumber: string, dialCode: string): string {
+    if (typeof phoneNumber !== "string") return "";
+    if (!isNonNullString(dialCode)) return phoneNumber;
+    dialCode = "+" + dialCode.ltrim("+");
+    if (!(phoneNumber).startsWith(dialCode)) return dialCode.trim() + " " + phoneNumber.ltrim(" ");
+    return phoneNumber;
+  }
+
+  /**
+ * Validates a phone number using the google-libphonenumber library.
+ * 
+ * @param {string} phoneNumber The phone number to validate.
+ * @param {ICountryCode}, The country code to use for validation. If not provided, the default country code will be used.
+ * @returns True if the phone number is valid, false otherwise.
+ * @throws Error if there's an issue parsing the phone number.
+ * @example
+ * ```typescript
+ * const isValid = isValidPhoneNumber ('+1 202 555 0144');
+ * console.log(isValid); // Output: true
+ * ```
+ */
+  static isValidPhoneNumber(phoneNumber: string, countryCode?: ICountryCode): phoneNumber is string {
+    const phoneInfo = this.parsePhoneNumber(phoneNumber, countryCode);
+    if (phoneInfo) {
+      return phoneUtil.isValidNumber(phoneInfo);
+    }
+    return false;
+  }
+
+  /***
+   * Formats a phone number using the google-libphonenumber library.
+   * @param {string} phoneNumber The phone number to format.
+   * @param {ICountryCode}, The country code to use for formatting. If not provided, the default country code will be used.
+   * @returns The formatted phone number.
+   */
+  static formatPhoneNumber(phoneNumber: string, countryCode: ICountryCode) {
+    const formatter = new asYouTypeFormatter(defaultStr(countryCode).toLowerCase()); // eslint-disable-line new-cap
+    let formatted;
+    phoneNumber.replace(/-/g, '')
+      .replace(/ /g, '')
+      .replace(/\(/g, '')
+      .replace(/\)/g, '')
+      .split('')
+      .forEach((n) => {
+        formatted = formatter.inputDigit(n);
+      });
+
+    return formatted;
+  }
+  /***
+   * Cleans the phone number string by removing leading and trailing whitespace, 
+   * replacing dots and hyphens with empty strings, and trimming the string.
+   * 
+   * @param phoneNumber - The phone number string to Clean
+   * @returns The cleaned phone number string
+   */
+  static cleanPhoneNumber(phoneNumber: string): string {
+    if (!isNonNullString(phoneNumber)) return "";
+    return phoneNumber.trim().replace(/\s/g, '');
+  }
+  /**
+   * Extracts the country dial code from international phone numbers.
+   * Supports formats based on ITU-T E.164 and common regional variations.
+   * 
+   * Supported formats:
+   * 1. E.164 format: +[country code][area code][local number]
+   *    Example: +12125551234
+   * 
+   * 2. International format with spaces/separators:
+   *    - +[country code] [area code] [local number]
+   *    - +[country code].[area code].[local number]
+   *    - +[country code]-[area code]-[local number]
+   *    Examples: 
+   *    - +1 212 555 1234
+   *    - +44.20.7123.4567
+   *    - +81-3-1234-5678
+   * 
+   * 3. International format with parentheses:
+   *    - +[country code] ([area code]) [local number]
+   *    - ([country code]) [area code] [local number]
+   *    Examples:
+   *    - +1 (212) 555-1234
+   *    - (44) 20 7123 4567
+   * 
+   * 4. 00 prefix format (common in Europe):
+   *    - 00[country code][remainder]
+   *    Example: 00441234567890
+   * 
+   * 5. Regional formats:
+   *    - 011[country code] (US/Canada international prefix)
+   *    - 010[country code] (Japan international prefix)
+   * 
+   * @param phoneNumber - The phone number string to extract the dial code from
+   * @param countryCode - The country code to use for extracting the dial code
+   * @returns The dial code with + prefix, or null if no valid code is found
+   */
+  static extractDialCodeFromPhoneNumber(phoneNumber: string, countryCode?: ICountryCode): string {
+    try {
+      const parsedNumber = InputFormatter.parsePhoneNumber(phoneNumber, countryCode);
+      if (parsedNumber) {
+        // Get dial code
+        return parsedNumber.getCountryCode() + "";
+      }
+    } catch (e) { }
+    return "";
+  }
+
+  /***
+   * Check if the provided number is a valid numeric string.
+   * @param {string} n The number to check.
+   * @returns {boolean} True if the number is a valid numeric string, false otherwise.
+   * @example
+   * ```typescript
+   * console.log(isNumericString('123')); // Output: true
+   * console.log(isNumericString('abc')); // Output: false
+   * ```
+   */
+  static isNumericString(n: string) {
+    return isNonNullString(n) && !Number.isNaN(parseFloat(n)) && Number.isFinite(Number(n));
+  }
+  /***
+   * Extracts the numeric part of a phone number string.
+   * @param {string} str The phone number string.
+   * @returns {string} The numeric part of the phone number string.
+   * @example
+   * ```typescript
+   * console.log(extractNumbersFromString('+1 202 555 0144')); // Output: 2025550144
+   * console.log(extractNumbersFromString('+1 202 555 0144')); // Output: 2025550144
+   * console.log(extractNumbersFromString('2025550144')); // Output: 2025550144
+   * ```
+   */
+  static extractNumbersFromString(str: string) {
+    if (!isNonNullString(str)) return "";
+    return str.replace(/\D/g, '');
+  }
+
+  /***
+   * Gets the phone number type from a phone number string.
+   * @param {string} phoneNumber The phone number string.
+   * @param {ICountryCode} countryCode The country code to use for the phone number.
+   * @returns {string | undefined} The phone number type, or undefined if the phone number is not valid.
+   * @example
+   * ```typescript
+   * console.log(getPhoneNumberType('+1 202 555 0144')); // Output: undefined
+   * console.log(getPhoneNumberType('+1 202 555 0144', 'US')); // Output: undefined
+   * console.log(getPhoneNumberType('+1 202 555 0144', 'FR')); // Output: 'FIXED_LINE_OR_MOBILE'
+   * ```
+   */
+  static getPhoneNumberType(phoneNumber: string, countryCode?: ICountryCode): string | undefined {
+    const phoneInfo = this.parsePhoneNumber(phoneNumber, countryCode);
+    const typeIndex = phoneInfo ? phoneUtil.getNumberType(phoneInfo) : -1;
+    return _.findKey(phoneNumber, (noType) => noType === typeIndex);
+  }
 };
+
+
+const generatePhoneNumberMaskArray = (phoneNumber: string, dialCode: string): IInputFormatterMaskArray => {
+  dialCode = defaultStr(dialCode);
+  if (dialCode) {
+    dialCode = "+" + dialCode.ltrim("+");
+  }
+  if (!InputFormatter.cleanPhoneNumber(phoneNumber).startsWith(dialCode)) {
+    dialCode
+  }
+  const toSplit = dialCode ? phoneNumber.substring(dialCode.length) : phoneNumber;
+  const r = [...toSplit].map(char => (/\d/.test(char) ? /\d/ : char));
+  if (dialCode) {
+    return [...dialCode, ...r];
+  }
+  return r;
+}

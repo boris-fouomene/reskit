@@ -2,7 +2,7 @@ import { IAppBarAction, IAppBarProps } from "@components/AppBar/types";
 import { ITextInputProps } from "@components/TextInput/types";
 import { ReactNode } from "react";
 import { IViewProps } from "@components/View";
-import { PressableProps,FlatListProps } from "react-native";
+import { PressableProps, FlatListProps } from "react-native";
 import { IFontIconProps } from "@components/Icon";
 import { ObservableComponent } from "@utils/index";
 import { IMenuProps } from "@components/Menu";
@@ -195,31 +195,124 @@ import { IMenuProps } from "@components/Menu";
  *   a smooth user experience within the dropdown.
  */
 export interface IDropdownContext<ItemType = any, ValueType = any> extends ObservableComponent<Omit<IDropdownProps<ItemType, ValueType>, "items" | "getHashKey">, IDropdownState<ItemType, ValueType>, IDropdownEvent> {
+    /***
+     * The filtered items. based on the search text
+     */
     filteredItems?: IDropdownPreparedItem<ItemType, ValueType>[];
+
+    /**
+     * The items by hash key.
+     */
     itemsByHashKey: IDropdownPreparedItems<ItemType, ValueType>;
+
+    /***
+     * The visibility of the dropdown.
+     */
     visible: boolean;
     getHashKey: (value: ValueType) => string;
+    /***
+     * get the selected items by hash key
+     * Return a record of selected items indexed by their unique hash keys, allowing for quick access to the selected items.
+     * @returns {Record<string, IDropdownPreparedItem<ItemType, ValueType>>} A record of selected items, indexed by their unique hash keys.
+     */
     getSelectedItemsByHashKey: () => Record<string, IDropdownPreparedItem<ItemType, ValueType>>;
+    /***
+     * get the prepared items
+     * Return an array of prepared items that are ready to be displayed in the dropdown.
+     * @returns {IDropdownPreparedItem<ItemType, ValueType>[]} An array of prepared items.
+     */
     getPreparedItems: () => IDropdownPreparedItem<ItemType, ValueType>[];
+
+    /***
+     * Check if a given value is selected.
+     * 
+     * @param {ValueType} value - The value to check.
+     * @returns {boolean} True if the value is selected, false otherwise.
+     */
     isSelected: (value: ValueType) => boolean;
+
+    /***
+     * The search text.
+     */
     searchText?: string;
+    /***
+     * The onSearch callback function.
+     */
     onSearch?: (text: string) => any;
+    /***
+     * The state of the dropdown.
+     */
     state: IDropdownState<ItemType, ValueType>;
+    /***
+     * Toggle the selection of a prepared item.
+     * 
+     * @param {IDropdownPreparedItem<ItemType, ValueType> & { index: number }} preparedItem - The prepared item to toggle.
+     * @returns {void} This method does not return a value.
+     */
     toggleItem: (preparedItem: IDropdownPreparedItem<ItemType, ValueType> & { index: number }) => any;
+    /***
+     * Check if a given hash key is selected.
+     * 
+     * @param {string} hasKey - The hash key to check.
+     * @returns {boolean} True if the hash key is selected, false otherwise.
+     */
     isSelectedByHashKey: (hasKey: string) => boolean;
+
+    /***
+     * Open the dropdown.
+     * @returns {void} This method does not return a value.
+     */
     open: () => void;
+    /**
+     * Close the dropdown.
+     * @returns {void} This method does not return a value.
+     */
     close: () => void;
+    /***
+     * Toggle the visibility of the dropdown.
+     */
     toggle: () => void;
+    /***
+     * Check if the dropdown is open.
+     * @returns {boolean} True if the dropdown is open, false otherwise.
+     */
     isOpen: () => boolean;
+    /***
+     * Get the test ID for the dropdown.
+     * @returns {string} The test ID for the dropdown.
+     */
     getTestID: () => string;
+    /***
+     * Select all items in the dropdown.
+     * @returns {void} This method does not return a value.
+     */
     selectAll: () => void;
+    /***
+     * Unselect all items in the dropdown.
+     * @returns {void} This method does not return a value.
+     */
     unselectAll: () => void;
+    /**
+     * Prepare the state of the dropdown.
+     * @param {IDropdownProps<ItemType, ValueType>} props - The props for the dropdown.
+     */
     prepareState(props?: IDropdownProps<ItemType, ValueType>): IDropdownState<ItemType, ValueType>;
+
+    /***
+     * The dropdown actions.
+     */
     dropdownActions?: IDropdownAction[];
     /***
      * the corresponding selected text calculated from selected items
      */
     anchorSelectedText?: string;
+    /***
+     * get the selected values and hash key
+     * Return an object containing the selected values and their corresponding hash keys.
+     * @param {ValueType | ValueType[]} [defaultValue] - The default value to use if no value is selected.
+     * @param {IDropdownPreparedItems<ItemType, ValueType>} [itemsByHashKey] - An optional object of items indexed by their hash keys.
+     * @returns {selectedValues: ValueType[], selectedItemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>>} An object containing the selected values and their corresponding hash keys.
+     */
     getSelectedValuesAndHashKey(defaultValue?: ValueType | ValueType[], itemsByHashKey?: IDropdownPreparedItems<ItemType, ValueType>): { selectedValues: ValueType[], selectedItemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>> };
 }
 
@@ -687,6 +780,22 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
      * This allows for customization of the menu's appearance and behavior.
      */
     menuProps?: Omit<IMenuProps, "anchor">;
+
+    /***
+     * The props for the anchor component.
+     * This allows for customization of the anchor's appearance and behavior.
+     * By default, it's rendered as a TextInput component.
+     */
+    anchor?: (options: Omit<ITextInputProps, "onChange"> & {
+        dropdownContext: IDropdownContext<ItemType, ValueType>;
+        isLoading: boolean;
+        multiple: boolean;
+        /***
+         * The selected items.
+         */
+        selectedItems: ItemType[];
+        selectedValues: ValueType[];
+    }) => JSX.Element;
 };
 
 /**

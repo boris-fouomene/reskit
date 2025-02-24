@@ -1,4 +1,5 @@
 import { ICurrency } from "@/currency/types";
+import { ICountryCode } from "@countries/index";
 
 export * from "./dictionary";
 export * from "./filters";
@@ -437,7 +438,7 @@ export interface IInputFormatterNumberMaskOptions {
  * };
  * ```
  */
-export interface IInputFormatterMaskWithValidation { mask: IInputFormatterMaskArray, validate: (value: string) => boolean }
+export interface IInputFormatterMaskWithValidation extends Record<string, any> { mask: IInputFormatterMaskArray, validate: (value: string) => boolean; countryCode?: ICountryCode }
 
 /**
  * @typedef IInputFormatterMaskArray
@@ -524,11 +525,11 @@ export interface IInputFormatterResult extends IInputFormatterOptions, Partial<I
   /***
     The date object corresponding to the input value, when the provided type is date, time or datetime
   */
-  dateValue?:Date;
+  dateValue?: Date;
   /****
     there dateFormat used to format the value
   */
-  dateFormat?:IMomentFormat;
+  dateFormat?: IMomentFormat;
 }
 
 /**
@@ -644,6 +645,11 @@ export interface IInputFormatterMaskResult {
     The character to be used as the fill character for the default placeholder of the input field.
   */
   placeholder: string;
+
+  /***
+   * The masked placeholder
+   */
+  maskedPlaceholder: string;
 
   /***
    * Whether the input value matches the specified mask.

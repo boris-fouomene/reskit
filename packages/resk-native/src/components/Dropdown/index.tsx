@@ -20,6 +20,7 @@ import { useI18n } from "@src/i18n/hooks";
 import { AppBar } from "@components/AppBar";
 import { Divider } from "@components/Divider";
 import { ProgressBar } from "@components/ProgressBar";
+import { ITextInputProps } from "@components/TextInput/types";
 
 /**
  * Represents a dropdown component that allows users to select one or more items from a list.
@@ -55,7 +56,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
     * it's a static property that can be overriden by the user
     * This is useful for customizing the list component, when needed.
     */
-    static List : IReactComponent<FlatListProps<IDropdownPreparedItem<any, any>>> = FlatList<IDropdownPreparedItem<any, any>>;
+    static List: IReactComponent<FlatListProps<IDropdownPreparedItem<any, any>>> = FlatList<IDropdownPreparedItem<any, any>>;
     getHashKey(value: ValueType): string {
         const { getHashKey } = this.props;
         if (typeof getHashKey === "function") {
@@ -293,7 +294,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
     const theme = useTheme();
     const i18n = useI18n();
-    let { anchorContainerProps, menuProps, error, defaultValue, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
+    let { anchorContainerProps, menuProps, anchor, error, defaultValue, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
     const { visible, preparedItems } = context.state;
     const isLoading = !!props.isLoading;
     const disabledStyle = isLoading && styles.disabled || null;
@@ -319,12 +320,15 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     context.onSearch = onSearch;
     context.filteredItems = filteredItems;
     disabled = disabled || isLoading;
-    const { selectedText: anchorSelectedText, title: anchorTitle } = useMemo(() => {
+    const { selectedText: anchorSelectedText, title: anchorTitle, selectedItems, selectedValues } = useMemo(() => {
         let selectedText = "";
         let title = "";
         let counter = 0;
         let nextItemCounter = 0;
+        const selectedItems: ItemType[] = [], selectedValues: ValueType[] = [];
         for (let key in selectedItemsByHashKey) {
+            selectedItems.push(selectedItemsByHashKey[key].item);
+            selectedValues.push(selectedItemsByHashKey[key].value);
             const label = context.itemsByHashKey[key]?.labelText;
             if (!isNonNullString(label)) {
                 continue;
@@ -341,7 +345,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         if (nextItemCounter) {
             selectedText += `${i18n.t("components.dropdown.andMoreItemSelected", { count: nextItemCounter })}`;
         }
-        return { selectedText, title };
+        return { selectedText, title, selectedItems, selectedValues };
     }, [selectedItemsByHashKey]);
     context.anchorSelectedText = anchorSelectedText;
     const actions = useMemo<IDropdownAction[]>(() => {
@@ -394,6 +398,15 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     }, [dropdownActions, multiple, context?.isOpen(), context, anchorSelectedText]);
     context.dropdownActions = actions;
     const loadingContent = isLoading ? <ProgressBar color={theme.colors.secondary} indeterminate testID={testID + "dropdown-progressbar"} /> : null;
+    const anchorProps: ITextInputProps = {
+        ...props,
+        onChange: undefined,
+        testID,
+        isDropdownAnchor: true,
+        disabled,
+        defaultValue: anchorSelectedText,
+        onPress: isLoading ? undefined : context.toggle.bind(context),
+    }
     return <DropdownContext.Provider value={context}>
         <Menu
             responsive
@@ -409,15 +422,11 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
                 testID={`${testID}-dropdown-anchor-container`}
                 {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IStyle}
             >
-                <TextInput
-                    isDropdownAnchor
-                    {...props}
-                    disabled={disabled}
-                    onChange={undefined}
-                    testID={testID}
-                    defaultValue={anchorSelectedText}
-                    onPress={isLoading ? undefined : context.toggle.bind(context)}
-                />
+                {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdownContext: context })
+                    :
+                    <TextInput
+                        {...anchorProps}
+                    />}
                 {loadingContent}
             </View>}
         >

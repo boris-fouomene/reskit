@@ -749,7 +749,7 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
     },
     selectCountryAnchor: {
-        marginRight: 5,
+        //marginRight: 5,
     }
 })
 

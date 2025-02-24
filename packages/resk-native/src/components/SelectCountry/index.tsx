@@ -42,8 +42,8 @@ export function SelectCountry({ withLabel, label, anchorProps, textColor, iconSi
     iconSize = typeof iconSize == "number" ? iconSize : 24;
     return <Dropdown<ICountry, ICountryCode>
         items={countries}
-        label={undefined}
         multiple={false}
+        label={label}
         getItemValue={({ item }) => item.code}
         getItemLabel={({ item }) => {
             return <View style={styles.countryFlagContainer}>

@@ -1894,6 +1894,8 @@ declare module "@resk/core" {
         defaultValue?: any;
 
         validateEmail?: boolean;
+        
+        validatePhoneNumber?:boolean;
 
         windowWidth?: number;
 

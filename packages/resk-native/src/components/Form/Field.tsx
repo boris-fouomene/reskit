@@ -269,6 +269,9 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
         if (this.getType() == "email" && this.componentProps.validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("email")) {
             options.rules.push("email");
         }
+        if(this.getType() =="tel" && this.componentProps.validatePhoneNumber !== false && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("phoneNumber")) {
+            options.rules.push("phoneNumber");
+        }
         if (this.getType() == "url" && options.value && !options.rules.includes("url")) {
             options.rules.push("url");
         }

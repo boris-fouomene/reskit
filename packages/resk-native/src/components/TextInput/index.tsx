@@ -573,7 +573,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
                     clearTimeout(debounceTimeoutRef.current);
                     debounceTimeoutRef.current = setTimeout(() => {
                         onChange({ ...options, ...InputFormatter.formatValueToObject(options) });
-                    }, isNumber(debounceTimeout) && debounceTimeout || 0);
+                    }, isNumber(debounceTimeout) && debounceTimeout > 0 ? debounceTimeout : 0);
                 }
             }
         },

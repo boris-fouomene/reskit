@@ -1,8 +1,8 @@
 import Label from "@components/Label";
-import { isValidElement, useMergeRefs, usePrevious } from "@utils";
+import { isValidElement, useMergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
-import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { InputFormatter, ICountryCode, ICountry, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper } from "@resk/core";
+import React, { ReactNode, useEffect, useMemo, useRef } from "react";
+import { InputFormatter, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper } from "@resk/core";
 import _, { isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
@@ -15,8 +15,6 @@ import { IFontIconProps } from "@components/Icon";
 import { TouchableRipple } from "@components/TouchableRipple";
 import Breakpoints from "@breakpoints/index";
 import { Calendar, CalendarModalContext } from "@components/Date";
-import { CountriesManager } from "@resk/core";
-import { Dropdown, IDropdownProps } from "@components/Dropdown";
 import { useI18n } from "@src/i18n";
 import { SelectCountry } from "@components/SelectCountry";
 

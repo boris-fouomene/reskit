@@ -60,7 +60,7 @@ export function SelectCountry({ withLabel, label, anchorProps, textColor, iconSi
                         countryCode={item.code}
                         size={iconSize}
                         style={styles.countryFlag}
-                        fallback={<Label >[{item.code}]</Label>}
+                        fallback={<Label color={textColor} >[{item.code}]</Label>}
                     />
                 });
             }, [selectedItems]);

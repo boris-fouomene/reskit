@@ -313,16 +313,14 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         }
     }, [type]);
     const emptyValue = cIsEmptyValue || (canValueBeDecimal ? "0" : "");
-
     const PhoneMaskOrUndefined = useMemo(() => {
-        if (isPhone && isNonNullString(phoneCountryCode)) {
-            return InputFormatter.createPhoneNumberMask(phoneCountryCode);
+        if (isPhone) {
+            return InputFormatter.createPhoneNumberMaskFromExample(defaultValue,phoneCountryCode);
         }
         return undefined;
-    }, [isPhone, phoneCountryCode])
+    }, [isPhone, phoneCountryCode,defaultValue])
 
     ///mask handling
-
     const { mask, maskOptions, dateFormat, calendarProps: { iconProps, ...calendarProps }, canRenderCalendar } = useMemo(() => {
         const maskOptions = Object.assign({}, { placeholder: '_' }, customMaskOptions);
         let mask = InputFormatter.isValidMask(customMask) ? customMask : undefined;

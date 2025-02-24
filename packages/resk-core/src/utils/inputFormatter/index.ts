@@ -1,4 +1,4 @@
-import { IInputFormatterNumberMaskOptions, IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterMaskWithValidation } from "../../types";
+import { IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterMaskWithValidation } from "../../types";
 import { DateHelper } from "../date/dateHelper";
 import defaultStr from "../defaultStr";
 import isNonNullString from "../isNonNullString";
@@ -451,7 +451,10 @@ export class InputFormatter {
   static createPhoneNumberMask(countryCode: ICountryCode, format?: PhoneNumberFormat): IInputFormatterMaskWithValidation {
     const countryExample = CountriesManager.getPhoneNumberExample(countryCode);
     if (isNonNullString(countryExample)) {
-      return InputFormatter.createPhoneNumberMaskFromExample(countryExample, countryCode);
+      const r = InputFormatter.createPhoneNumberMaskFromExample(countryExample, countryCode);
+      if(r.mask.length){
+        return r;
+      }
     }
     if (!isNonNullString(countryCode)) {
       return {
@@ -461,7 +464,7 @@ export class InputFormatter {
     }
     try {
       // Get an example phone number for the given country code
-      const exampleNumber = phoneUtil.getExampleNumber(countryCode);
+      const exampleNumber = InputFormatter.getPhoneNumberExample(countryCode);
       if (!exampleNumber) {
         //throw new Error(`No example number found for country code: ${countryCode}`);
         return {
@@ -486,6 +489,25 @@ export class InputFormatter {
         validate: (value: string) => false,
       }
     }
+  } 
+  /****
+    * Gets the phone number example for the given country code.
+    * @param countryCode The country code.
+    * @returns {PhoneNumber|null} The phone number example for the given country code, or null if no example is found.
+  */
+  static getPhoneNumberExample(countryCode: ICountryCode): PhoneNumber|null {
+    if(!isNonNullString(countryCode)) {
+      return null;
+    }
+    const example = CountriesManager.getPhoneNumberExample(countryCode);
+    if(isNonNullString(example)){
+      return InputFormatter.parsePhoneNumber(example);
+    }
+    try {
+      return phoneUtil.getExampleNumber(countryCode);
+    } catch (error) {
+      return null;
+    }
   }
 
   /**
@@ -503,36 +525,13 @@ export class InputFormatter {
     @returns {IInputFormatterMaskWithValidation} An object containing the mask and a validation function.
   */
   static createPhoneNumberMaskFromExample(phoneNumber: string, countryCode?: ICountryCode, format?: PhoneNumberFormat): IInputFormatterMaskWithValidation {
-    if (!isNonNullString(phoneNumber)) {
-      return {
-        mask: [],
-        validate: () => false
-      };
+    const r = genPhoneNumberMask(InputFormatter.parsePhoneNumber(phoneNumber, countryCode),format);
+    if(r.mask.length > 0) {
+      return r;
     }
-    try {
-      // Parse the phone number
-      const parsedNumber: PhoneNumber | null = InputFormatter.parsePhoneNumber(phoneNumber, countryCode);
-      if (parsedNumber) {
-        const toFormat = format || PhoneNumberFormat.INTERNATIONAL
-        // Get the formatted version to base the mask on
-        const formattedNumber = phoneUtil.format(parsedNumber, toFormat);
-        if (!isNonNullString(formattedNumber)) {
-          return {
-            mask: [],
-            validate: () => false
-          };
-        }
-        // Get region code
-        const regionCode = phoneUtil.getRegionCodeForNumber(parsedNumber);
-        const dialCode = parsedNumber.getCountryCode() + "";
-        return {
-          dialCode,
-          mask: generatePhoneNumberMaskArray(formattedNumber, dialCode),
-          validate: (value: string) => InputFormatter.isValidPhoneNumber(value, regionCode as ICountryCode),
-          countryCode: regionCode as ICountryCode
-        };
-      }
-    } catch (error) { }
+    if(isNonNullString(countryCode)) {
+      return genPhoneNumberMask(InputFormatter.getPhoneNumberExample(countryCode),format);
+    }
     return {
       mask: [],
       validate: (value: string) => false,
@@ -792,4 +791,30 @@ const generatePhoneNumberMaskArray = (phoneNumber: string, dialCode: string): II
     return [...dialCode, ...r];
   }
   return r;
+}
+
+function genPhoneNumberMask (parsedNumber:PhoneNumber|null,format?:PhoneNumberFormat): IInputFormatterMaskWithValidation{
+  try {
+      // Parse the phone number
+      if (parsedNumber) {
+        const toFormat = format || PhoneNumberFormat.INTERNATIONAL
+        // Get the formatted version to base the mask on
+        const formattedNumber = phoneUtil.format(parsedNumber, toFormat);
+        if(isNonNullString(formattedNumber)) {
+          // Get region code
+          const regionCode = phoneUtil.getRegionCodeForNumber(parsedNumber);
+          const dialCode = parsedNumber.getCountryCode() + "";
+          return {
+            dialCode,
+            mask: generatePhoneNumberMaskArray(formattedNumber, dialCode),
+            validate: (value: string) => InputFormatter.isValidPhoneNumber(value, regionCode as ICountryCode),
+            countryCode: regionCode as ICountryCode
+          };
+        }
+      }
+  } catch (error) { }
+  return {
+    mask:[],
+    validate: ()=>false,
+  }
 }

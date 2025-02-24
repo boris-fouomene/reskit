@@ -65,7 +65,7 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps>(({ withL
                         fallback={<Label color={textColor} >[{item.code}]</Label>}
                     />
                 });
-            }, [selectedItems]);
+            }, [selectedItems,textColor]);
             return <TouchableOpacity
                 testID={defaultStr(dropdownContext?.getTestID()) + "-anchor"}
                 {...anchorProps}

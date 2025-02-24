@@ -454,7 +454,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     const secureIcon = isPasswordField && editable ? <FontIcon size={iconSize}  {...secureIconProps} name={secureIconProps?.name || (isSecure ? "eye" : "eye-off")} onPress={() => { setIsSecure(!isSecure); focus(); }} color={textColor} /> : null;
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, withBackground, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
-    const labelSuffix = suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? <Label color={textColor}>{""}[{inputMaskPlaceholder}]</Label> : null;
+    const labelSuffix = suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? <Label color={textColor}>{" "}[{inputMaskPlaceholder}]</Label> : null;
 
     const calendarIProps = Object.assign({}, iconProps);
     const calendarRef = useRef<CalendarModalContext>(null);

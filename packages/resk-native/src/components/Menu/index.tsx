@@ -108,15 +108,15 @@ export const useMenuPosition = ({
             calculatedPosition.width = screenWidth;
         } else {
             const { pageX, pageY, width: anchorWidth, height: anchorHeight } = anchorMeasurements;
-
             minWidth = typeof minWidth == 'number' && minWidth > 0 ? minWidth : anchorWidth;
             menuHeight = !dynamicHeight ? (typeof menuHeight == 'number' && menuHeight > 0 ? menuHeight : 0) : 0;
+            const minMenuWidth = Math.max(minWidth, anchorWidth);
             if (sameWidth) {
-                menuWidth = anchorWidth;
+                menuWidth = Math.max(minWidth, anchorWidth);
             } else {
                 menuWidth = Math.max(minWidth, menuWidth);
             }
-            menuWidth = Math.min(menuWidth, screenWidth > padding ? screenWidth - padding : screenWidth);
+            menuWidth = Math.max(minWidth, Math.min(menuWidth, screenWidth > padding ? screenWidth - padding : screenWidth));
             // Calculate available space in each direction
             const spaces = {
                 top: pageY,
@@ -152,7 +152,7 @@ export const useMenuPosition = ({
                 height: maxHeight,
             } : {};
             if (sameWidth) {
-                rProps.width = anchorWidth;
+                rProps.width = minMenuWidth;
             }
             const positions: Record<IMenuPosition, IMenuCalculatedPosition> = {
                 top: {
@@ -394,8 +394,6 @@ const Menu: React.FC<IMenuProps> = ({
     preferedPositionAxis,
     ...props
 }) => {
-    // State for measurements
-    const theme = useTheme();
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
     const [isVisible, setIsVisible] = useStateCallback<boolean>(isControlled ? !!visible : false);
     const prevIsVisible = usePrevious(isVisible);
@@ -445,7 +443,8 @@ const Menu: React.FC<IMenuProps> = ({
     }, [screenWidth, screenHeight]);
     // Handle menu layout changes
     const onMenuLayout = (event: LayoutChangeEvent) => {
-        const { width, height } = event.nativeEvent.layout;
+        const { width: mWidth, height } = event.nativeEvent.layout;
+        const width = Math.max(mWidth, typeof minWidth === "number" ? minWidth : 0);
         const minPadding = 30;
         if ((isNumber(menuLayout?.width) && Math.abs(width - menuLayout.width) <= minPadding) && (isNumber(menuLayout?.height) && Math.abs(height - menuLayout.height) <= minPadding)) {
             return;

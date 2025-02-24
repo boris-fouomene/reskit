@@ -4,20 +4,6 @@ import { IField, InputFormatter } from "@resk/core";
 import { useEffect } from "react";
 import { CountriesManager } from "@resk/core";
 
-CountriesManager.setCountries({
-    "CM": {
-        code: "CM",
-        dialCode: "+237",
-        phoneNumberExample: "(237)699965076",
-        name: "Cameroon"
-    },
-    "US": {
-        code: "US",
-        dialCode: "+1",
-        phoneNumberExample: "(123) 456-7890",
-        name: "United States",
-    }
-})
 const index = withAppBar(() => {
     useEffect(() => {
         return () => { }
@@ -153,6 +139,12 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                             { label: "Item 10", value: "10" },
                         ]
                     } as IField<"select">,
+                    selectCountry: {
+                        type: "selectCountry",
+                        label: "Select Country",
+                        multiple: true,
+                        required: true,
+                    } as IField<"selectCountry">,
                 }}
             >
                 <Button formName="my-form">Submit</Button>

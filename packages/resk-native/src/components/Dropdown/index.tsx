@@ -411,13 +411,13 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         <Menu
             responsive
             animated={false}
+            minWidth={180}
             {...Object.assign({}, menuProps)}
             visible={visible}
             withScrollView={false}
             sameWidth
             dynamicHeight={false}
             onClose={context.close.bind(context)}
-            minWidth={200}
             anchor={<View disabled={disabled}
                 testID={`${testID}-dropdown-anchor-container`}
                 {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IStyle}

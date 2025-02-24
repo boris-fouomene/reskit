@@ -5,7 +5,7 @@ import React, { useMemo } from "react";
 import { Icon } from "@components/Icon";
 import Label from "@components/Label";
 import View from "@components/View";
-import Theme from "@theme/index";
+import Theme, { Colors } from "@theme/index";
 
 /***
  * The props for the country selector component.
@@ -34,12 +34,13 @@ export interface ISelectCountryProps extends IDropdownProps<ICountry, ICountryCo
  * @param {ISelectCountryProps} props - The props for the country selector component.
  * @returns {JSX.Element} The rendered country selector component.
  */
-export const SelectCountry = React.forwardRef<any, ISelectCountryProps>(({ withLabel, label, anchorProps, textColor, iconSize, ...props }, ref) => {
+export const SelectCountry = React.forwardRef<any, ISelectCountryProps & {displayDialCode?:boolean}>(({ withLabel,displayDialCode, label, anchorProps, textColor, iconSize, ...props }, ref) => {
     const countries = useMemo(() => {
         return Object.values(CountriesManager.getCountries());
     }, []);
     anchorProps = Object.assign({}, anchorProps);
     iconSize = typeof iconSize == "number" ? iconSize : 24;
+    const canDisplayDialCode = displayDialCode !== false;
     return <Dropdown<ICountry, ICountryCode>
         ref={ref}
         items={countries}
@@ -49,9 +50,9 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps>(({ withL
         getItemValue={({ item }) => item.code}
         getItemLabel={({ item }) => {
             return <View style={styles.countryFlagContainer}>
-                <Icon.CountryFlag countryCode={item.code} size={iconSize} />
+                <Icon.CountryFlag  countryCode={item.code} size={iconSize} />
                 <Label>{item.name}</Label>
-                {isNonNullString(item.dialCode) && <Label>{"(+" + item.dialCode.ltrim("+") + ") "}</Label>}
+                {canDisplayDialCode && isNonNullString(item.dialCode) ? <Label style={styles.itemLabel}>{"(+" + item.dialCode.ltrim("+") + ") "}</Label> : null}
             </View>;
         }}
         anchor={({ dropdownContext, selectedItems, selectedValues, onPress, disabled }) => {
@@ -89,6 +90,7 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps>(({ withL
             </TouchableOpacity>;
         }}
         {...props}
+        menuProps={Object.assign({},{minWidth:canDisplayDialCode?280:260}, props.menuProps)}
     />
 });
 
@@ -108,6 +110,10 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         flexWrap: "wrap"
     },
-    chevronIcon: {}
+    chevronIcon: {},
+    itemLabel : {
+        fontSize:12,
+        opacity:0.8
+    }
 })
 SelectCountry.displayName = "SelectCountry";

@@ -12,9 +12,8 @@ class SelectCountryField extends Field<"selectCountry"> {
     _render(props: any, innerRef?: any) {
         return <SelectCountry
             ref={innerRef}
-            minWidth={300}
+            displayDialCode={false}
             anchor={undefined}
-            getItemLabel={({ item }) => `[${item.code}] - ${item.name}`}
             {...props}
         />;
     }

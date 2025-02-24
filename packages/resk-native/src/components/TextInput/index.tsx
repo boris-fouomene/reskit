@@ -16,8 +16,7 @@ import { TouchableRipple } from "@components/TouchableRipple";
 import Breakpoints from "@breakpoints/index";
 import { Calendar, CalendarModalContext } from "@components/Date";
 import { useI18n } from "@src/i18n";
-import { SelectCountry } from "@components/SelectCountry";
-
+import { SelectCountryRef } from "./SelectCountryRef";
 
 /**
  * @description
@@ -495,8 +494,11 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             }}
         />
     </> : null;
-    const phoneCountryFlag = isPhone && editable ? <>
-        <SelectCountry
+    const SelectCountryComponent = useMemo(()=>{
+        return SelectCountryRef.Component;
+    },[SelectCountryRef.Component]);
+    const phoneCountryFlag = isPhone && editable && SelectCountryComponent? <>
+        <SelectCountryComponent
             multiple={false}
             defaultValue={phoneCountryCode}
             onChange={({ value }) => {

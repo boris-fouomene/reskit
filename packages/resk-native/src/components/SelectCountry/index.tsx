@@ -6,26 +6,8 @@ import { Icon } from "@components/Icon";
 import Label from "@components/Label";
 import View from "@components/View";
 import Theme, { Colors } from "@theme/index";
-
-/***
- * The props for the country selector component.
- * 
- * @interface ISelectCountryProps
- * @extends IDropdownProps<ICountry, ICountryCode>
- */
-export interface ISelectCountryProps extends IDropdownProps<ICountry, ICountryCode> {
-    /***
-     * The color for text elements in the component.
-     */
-    textColor?: string;
-    iconSize?: number;
-
-    /***
-     * The props for the anchor component that wraps the dropdown anchor.
-     * This is an object that defines the props for the anchor component, which is a TouchableOpacity component.
-     */
-    anchorProps?: Omit<TouchableOpacityProps, "onPress" | "disabled">;
-}
+import { ISelectCountryProps } from "./types";
+import { SelectCountryRef } from "@components/TextInput/SelectCountryRef";
 
 /***
  * The country selector component.
@@ -117,3 +99,7 @@ const styles = StyleSheet.create({
     }
 })
 SelectCountry.displayName = "SelectCountry";
+
+SelectCountryRef.Component = SelectCountry;
+
+export * from "./types";

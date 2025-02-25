@@ -155,8 +155,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 };
 
 function RenderPortal<AsProps extends ViewProps = IViewProps>({ children, absoluteFill, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
-    const visible = undefined;
-    return <View  {...Object.assign({}, props)} style={[{ zIndex: visible !== false ? zIndex : 0 }, absoluteFill && visible !== false && styles.absoluteFill, visible === false && styles.hidden, props?.style]}>
+    return <View  {...Object.assign({}, props)} style={[{ zIndex : 0 }, absoluteFill && styles.absoluteFill, props?.style]}>
         {children}
     </View>
 };
@@ -206,13 +205,6 @@ export type IPortalProps<AsProps extends ViewProps = IViewProps> = AsProps & {
      * Default is false.
      */
     absoluteFill?: boolean;
-
-    /***
-     * A boolean prop that determines whether the portal is visible or not.
-     * If set to `false`, the portal will not be rendered.
-     * Default is false.
-     */
-    //visible?: boolean;
 }
 
 /**

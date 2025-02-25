@@ -1,3 +1,4 @@
+import { defaultStr, isNonNullString } from "@resk/core";
 import Color from "color";
 
 /**
@@ -239,11 +240,10 @@ const rgbStringToRgb = (rgb: string): [number, number, number] | null => {
 * ```
 */
 const getBrightness = (color: string): number | null => {
-    if (!color) return null;
+    if (!isNonNullString(color)) return null;
     if (!color.startsWith("#")) {
         color = Color(color).hex();
     }
-
     let rgb: [number, number, number] | null;
     if (color.startsWith('#')) {
         rgb = hexToRgb(color);
@@ -291,6 +291,11 @@ const getBrightness = (color: string): number | null => {
 * ```
 */
 const getContrast = function (hexcolor: string, comparator?: number): string | undefined {
+    if (comparator === undefined && isNonNullString(hexcolor)) {
+        try {
+            return Color(hexcolor).isLight() ? "black" : "white";
+        } catch (e) { }
+    }
     try {
         const contrastColor = getBrightness(hexcolor);
         if (!contrastColor) return 'black'; // return black if invalid color
@@ -301,6 +306,30 @@ const getContrast = function (hexcolor: string, comparator?: number): string | u
         return undefined;
     }
 };
+
+/**
+ * Returns the contrast color of the given input color.
+ * 
+ * @param inputColor The color to calculate the contrast for.
+ * @param options An object containing the dark and light colors to use for contrast.
+ * @param options.darkColor The dark color to use for contrast. Defaults to "black".
+ * @param options.lightColor The light color to use for contrast. Defaults to "white".
+ * 
+ * @returns The contrast color of the input color.
+ * 
+ * @example
+ * const contrastColor = getContrastingColor("#ffffff", { darkColor: "#000000", lightColor: "#ffffff" });
+ * console.log(contrastColor); // Output: "#000000"
+ */
+const getContrastingColor = (inputColor: string, { darkColor, lightColor }: { darkColor: string, lightColor: string }) => {
+    darkColor = defaultStr(darkColor, "black");
+    lightColor = defaultStr(lightColor, "white");
+    const contrastColor = getContrast(inputColor);
+    if (contrastColor === "black") {
+        return darkColor;
+    }
+    return lightColor;
+}
 
 /**
  * Fades a color by the specified amount.
@@ -323,4 +352,4 @@ function fade(color: string, fade: number): string | undefined {
     return Color(color).fade(fade).rgb().string();
 }
 
-export default { setAlpha, fade, isHex, isValid, darken, lighten, hexToRgb, rgbStringToRgb, getBrightness, getContrast };
+export default { setAlpha, fade, isHex, isValid, getContrastingColor, darken, lighten, hexToRgb, rgbStringToRgb, getBrightness, getContrast };

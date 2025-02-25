@@ -35,6 +35,14 @@ export class DateHelper {
     'YYYY-MM-DDTHH:mm:ss.SSSZ',
     "YYYY-MM-DDTHH:mm:ss[Z]",
     'YYYY-MM-DDTHH:mm:ss.SSS[Z]',
+    'YYYY-MM-DDTHH:mm:ss.SSSZ ',
+    'YYYY-MM-DDTHH:mm:ss.SSS',
+    'YYYY-MM-DD HH:mm:ss',
+    'YYYY-MM-DD HH:mm:ss.SSSZ',
+    "YYYY-MM-DDTHH:mm:ss.SSS[Z]",
+    'YYYY-MM-DD HH:mm:ssZ',
+    'YYYY-MM-DD HH:mmZ',
+    
     /** US formats */
     'MM/DD/YYYY',
     'MM-DD-YYYY',
@@ -50,6 +58,12 @@ export class DateHelper {
     'DD MMMM YYYY',
     'DD MMM YYYY',
     /** Time formats */
+    'HH:mm:ss.SSSZ',
+    'HH:mm:ssZ',
+    'HH:mmZ',
+    'YYYYMMDD',//20250225
+    'YYYYMMDDTHHMM', //20250225T1230
+    'YYYYMMDDTHHMMSS', //20250225T123045
     'HH:mm:ss',
     'HH:mm',
     'hh:mm A',
@@ -160,28 +174,18 @@ export class DateHelper {
       // First try preferred formats if provided
       if (Array.isArray(preferredFormats) && preferredFormats?.length) {
         for (const format of preferredFormats) {
-          const parsed = moment(dateString, format, true);
-          if (parsed.isValid() && (parsed.format(format) === dateString)) {
-            return {
-              date: parsed.toDate(),
-              matchedFormat: format,
-              isValid: true,
-            };
+          const r = parseDString(dateString, format);
+          if(r){
+            return r; 
           }
         }
       }
 
       // Try all format categories
       for (const format of DateHelper.DATE_FORMATS) {
-        const parsed = moment(dateString, format, true);
-        if (parsed.isValid()) {
-          if ((parsed.format(format) === dateString)) {
-            return {
-              date: parsed.toDate(),
-              matchedFormat: format,
-              isValid: true,
-            };
-          }
+        const r = parseDString(dateString, format);
+        if(r){
+          return r;
         }
       }
       return {
@@ -200,34 +204,28 @@ export class DateHelper {
       };
     }
   }
-  /**
- * [Previous interfaces remain the same]
- */
-  
-  /**
-   * Convert GMT to local time.
-   * @param {Date|string} gmtTime The GMT time to convert. if not provided, it will be the current time.
-   * @returns The local time or null if the input is not valid.
-   */
-  static utcToLocalTime(gmtTime?: string|Date): Date | null {
-    if(gmtTime ===null) return null;
-    const date = gmtTime ? DateHelper.parseDate(gmtTime) : new Date(new Date().toISOString());
-    if(!date) return null;
-    return moment.utc(date).local().toDate();
-  }
-  
-  /**
-   * Convert local time to GMT.
-   * @param {Date|string} localTime The local time to convert. If not provided, it will be the current time.
-   * @returns The GMT time or null if the input is not valid.
-   */
-  static localTimeToUtc(localTime?: string | Date): Date|null {
-    if(localTime ===null) return null;
-    const date = localTime ? DateHelper.parseDate(localTime) : new Date(new Date().toString());
-    if(!date) return null;
-    return moment(date).utc().toDate();
-  }
 
+  /**
+   * Converts a JavaScript Date object or string to ISO 8601 format in UTC (with 'Z' suffix).
+   * 
+   * @param localDate - JavaScript Date object in local time
+   * @returns ISO 8601 formatted string in UTC (with 'Z' suffix)
+   */
+  static toIsoString(localDate?: Date): string {
+    const date = !localDate ? new Date() : DateHelper.parseDate(localDate);
+    if(!date) return "";
+    return date.toISOString();
+  }
+  
+  /**
+   * Converts an ISO string (in UTC) to a JavaScript Date object
+   * 
+   * @param isoString - ISO 8601 formatted date string (e.g. "2025-02-25T12:00:00Z")
+   * @returns JavaScript Date object representing the specified time
+   */
+  static isoStringToDate(isoString: string): Date {
+    return new Date(isoString);
+  }
 
   /**
    * Parses a date using the Moment.js library.
@@ -835,4 +833,18 @@ export class DateHelper {
     return defaultStr(DateHelper.isValidDate(date) ? date?.toString() : "");
   }
   static isDateObj = isDateObj;
+}
+
+const parseDString = (dateString: string, format: string) => {
+  const parsed = moment(dateString, format, true);
+  try {
+    if (parsed.isValid() && parsed.format(format) === dateString || moment.utc(parsed,true).format(format) === dateString) {
+      return {
+        date: parsed.toDate(),
+        matchedFormat: format,
+        isValid: true,
+      };
+    }
+  } catch(e){}
+  return null;
 }

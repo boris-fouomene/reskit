@@ -6,8 +6,8 @@ import {
     TextStyle,
     useWindowDimensions,
 } from 'react-native';
-import { useTheme } from "@theme";
-import Label from '@components/Label';
+import { IThemeColorSheme, IThemeColorTokenKey, useTheme } from "@theme";
+import Label, { ILabelProps } from '@components/Label';
 import { defaultStr } from '@resk/core';
 
 const defaultSize = 20;
@@ -19,7 +19,7 @@ const AnimatedLabel = Animated.createAnimatedComponent(Label);
  * 
  * @extends React.ComponentProps<typeof AnimatedLabel>
  */
-export type IBadgeProps = React.ComponentProps<typeof AnimatedLabel> & {
+export type IBadgeProps = React.ComponentProps<typeof AnimatedLabel> & Omit<ILabelProps, "children"> & {
     /**
      * Whether the badge is visible
      */
@@ -68,11 +68,14 @@ export const Badge = ({
     animationDuration = 300,
     testID,
     borderRadius,
+    colorScheme,
     ...rest
 }: IBadgeProps) => {
     testID = defaultStr(testID, "resk-badge");
     animationDuration = typeof animationDuration === 'number' ? animationDuration : 300;
     const theme = useTheme();
+    const newColorSheme = colorScheme && theme?.colors?.[colorScheme as keyof typeof theme.colors] ? colorScheme : "error";
+    const { backgroundColor, color } = theme.getColorScheme(newColorSheme as IThemeColorTokenKey);
     const { current: opacity } = React.useRef<Animated.Value>(
         new Animated.Value(visible ? 1 : 0)
     );
@@ -108,6 +111,8 @@ export const Badge = ({
                     height: size,
                     minWidth: size,
                     borderRadius,
+                    backgroundColor,
+                    color,
                 },
                 styles.container,
                 style,

@@ -218,6 +218,13 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
       <AnimatedPressable
         testID={testID + "-modal-content-container"}
         {...contentContainerProps}
+        onAccessibilityEscape={() => {
+          if (typeof contentContainerProps.onAccessibilityEscape === "function") {
+            contentContainerProps.onAccessibilityEscape();
+          }
+          if (dismissable === false) return;
+          handleDismiss(undefined as any);
+        }}
         style={[
           styles.absoluteFill,
           modalStyle as any,

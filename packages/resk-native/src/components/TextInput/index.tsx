@@ -76,7 +76,7 @@ import { SelectCountryRef } from "./SelectCountryRef";
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
 const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
-    const { variant, containerProps, onPress, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, inputRef, right, label, ...rest } = useTextInput(props);
+    const { variant, containerProps, onPress, focus, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, inputRef, right, label, ...rest } = useTextInput(props);
     const leftContainerProps = Object.assign({}, cLeftContainerProps);
     const isLabelEmbededVariant = variant === "labelEmbeded";
     const { testID } = rest;
@@ -86,7 +86,7 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
     const hasLeft = !!left;
-    const inputProps = { ...(!canWrapWithTouchable ? pressableProps : {}), ...rest, editable: canWrapWithTouchable ? false : editable }
+    const inputProps = { ...(!canWrapWithTouchable ? pressableProps : {}), focus, ...rest, editable: canWrapWithTouchable ? false : editable }
     return <View {...containerProps} >
         {isLabelEmbededVariant ? null : labelContent}
         <Wrapper {...wrapperProps} {...contentContainerProps} style={[hasLeft && styles.leftContentContainer, contentContainerProps?.style]}>
@@ -314,10 +314,10 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     const emptyValue = cIsEmptyValue || (canValueBeDecimal ? "0" : "");
     const PhoneMaskOrUndefined = useMemo(() => {
         if (isPhone) {
-            return InputFormatter.createPhoneNumberMaskFromExample(defaultValue,phoneCountryCode);
+            return InputFormatter.createPhoneNumberMaskFromExample(defaultValue, phoneCountryCode);
         }
         return undefined;
-    }, [isPhone, phoneCountryCode,defaultValue])
+    }, [isPhone, phoneCountryCode, defaultValue])
 
     ///mask handling
     const { mask, maskOptions, dateFormat, calendarProps: { iconProps, ...calendarProps }, canRenderCalendar } = useMemo(() => {
@@ -494,10 +494,10 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             }}
         />
     </> : null;
-    const SelectCountryComponent = useMemo(()=>{
+    const SelectCountryComponent = useMemo(() => {
         return SelectCountryRef.Component;
-    },[SelectCountryRef.Component]);
-    const phoneCountryFlag = isPhone && editable && SelectCountryComponent? <>
+    }, [SelectCountryRef.Component]);
+    const phoneCountryFlag = isPhone && editable && SelectCountryComponent ? <>
         <SelectCountryComponent
             multiple={false}
             defaultValue={phoneCountryCode}

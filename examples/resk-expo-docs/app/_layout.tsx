@@ -1,3 +1,4 @@
+import "../src/session";
 import * as SplashScreen from 'expo-splash-screen';
 import { ITheme, Label, ReskNativeProvider, Theme, useDrawer, useI18n, View } from "@resk/native";
 import { Slot } from 'expo-router';

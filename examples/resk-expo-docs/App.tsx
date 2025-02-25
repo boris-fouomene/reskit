@@ -1,6 +1,4 @@
 import "@expo/metro-runtime";
-import "./session";
-import React from 'react';
 import { ExpoRoot } from 'expo-router';
 
 function App() {

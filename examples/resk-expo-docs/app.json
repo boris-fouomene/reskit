@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.borispipo.reskexpodocs"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -27,7 +28,16 @@
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite"
-    ]
+      "expo-sqlite",
+      "expo-localization"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c16c2337-9846-4d04-8bc4-bfcb39a54b01"
+      }
+    }
   }
 }

@@ -78,7 +78,10 @@
       ],
       "expo-localization": [
         "../../examples/resk-expo-docs/node_modules/expo-localization",
-      ]
+      ],
+      "react-native-svg": [
+        "../../examples/resk-expo-docs/node_modules/react-native-svg",
+      ],
       /*"react-native-vector-icons/*": [
         "../../examples/resk-next-example/node_modules/react-native-vector-icons/*",
       ],

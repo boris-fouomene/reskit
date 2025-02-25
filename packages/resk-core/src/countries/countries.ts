@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   "AF": {
     "code": "AF",
     "dialCode": "93",

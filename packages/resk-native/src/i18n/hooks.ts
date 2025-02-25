@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { I18n, isNonNullString,Platform } from "@resk/core";
-import { getLocales } from "react-native-localize";
+import { I18n, isNonNullString, Platform } from "@resk/core";
+import { getLocales } from "./locales";
+
 import { IUseI18nOptions } from "@src/types";
 
 

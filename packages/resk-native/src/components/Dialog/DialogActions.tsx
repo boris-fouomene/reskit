@@ -2,6 +2,8 @@ import { AppBar } from '@components/AppBar';
 import { StyleSheet } from 'react-native';
 import { IDialogActionsProps } from './types';
 import { useCanRender } from './utils';
+import { useMemo } from 'react';
+import { isObj } from '@resk/core';
 
 /**
  * Functional component that renders the actions for a dialog within an AppBar.
@@ -45,6 +47,15 @@ export default function DialogActions<DialogContextExtend = any>({ testID, actio
     if (fullScreen) {
         return null;
     }
+    const cActions = useMemo(() => {
+        return (actions)?.map((action) => {
+            if (isObj(action)) {
+                action.contentProps = Object.assign({}, action.contentProps, { style: [styles.actionContent, action?.contentProps?.style] });
+                return action;
+            }
+            return null;
+        })
+    }, [actions]);
     actionProps = Object.assign({}, actionProps);
     return <AppBar
         colorScheme={"background"}
@@ -70,16 +81,7 @@ const styles = StyleSheet.create({
     header: {
         justifyContent: "flex-end",
     },
-    actionContainer: {
-        paddingVertical: 0,
-        paddingHorizontal: 0,
-        marginVertical: 0,
-        marginHorizontal: 0,
-    },
-    action: {
-        paddingVertical: 0,
-        paddingHorizontal: 0,
-        marginVertical: 0,
-        marginHorizontal: 0,
+    actionContent: {
+        maxWidth: 150,
     }
 });

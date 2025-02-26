@@ -3,7 +3,7 @@ import { Colors, useTheme } from "@theme";
 
 export function StatusBar(props: StatusBarProps) {
     const theme = useTheme();
-    const statusBarColor = theme.dark ? theme.colors.surface : Colors.darken(theme.colors.primary);
+    const statusBarColor = theme.dark ? theme.colors.surface : theme.colors.primary;
     return <RNStatusBar
         animated={true}
         barStyle={Colors.isLight(statusBarColor as string) ? "dark-content" : "light-content"}

@@ -1,5 +1,5 @@
 import { isClientSide } from "../platform";
-import { parseJSON, stringify } from "../utils/json";
+import { JsonHelper } from "../utils/json";
 import { IClassConstructor, IDict } from '../types/index';
 import isNonNullString from '../utils/isNonNullString';
 
@@ -130,7 +130,7 @@ function sanitizeKey(key: string): string {
  * @return {string} sanitized value 
  */
 const handleSetValue = (value: any, decycle?: boolean) => {
-  value = value ? stringify(value, decycle) : value;
+  value = value ? JsonHelper.stringify(value, decycle) : value;
   if (value === null || value === undefined) value = "";
   return value;
 }
@@ -141,7 +141,7 @@ const handleSetValue = (value: any, decycle?: boolean) => {
  */
 const handleGetValue: any = (value: any) => {
   if (value !== null && value !== undefined) {
-    return parseJSON(value);
+    return JsonHelper.parse(value);
   }
   return undefined;
 }

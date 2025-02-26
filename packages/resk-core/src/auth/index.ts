@@ -2,7 +2,7 @@
 import { i18n } from "../i18n";
 import $session from "../session";
 import { IDict, IResourceActionName, IResourceActionTuple, IResourceActionTupleArray, IResourceActionTupleObject, IResourceName } from "../types";
-import { isObj, parseJSON, isNonNullString, IObservable, observable } from "../utils";
+import { isObj, JsonHelper, isNonNullString, IObservable, observable } from "../utils";
 import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPerms, IAuthEvent, IAuthRole } from "./types";
 import { } from "../types";
 import { } from "./types";
@@ -316,7 +316,7 @@ export default class Auth {
                 const ded = decrypt(encrypted, SESSION_ENCRYPT_KEY);
                 if (ded && typeof ded?.toString == 'function') {
                     const decoded = ded.toString(CryptoJS.enc.Utf8);
-                    Auth.localUserRef.current = parseJSON(decoded) as IAuthUser;
+                    Auth.localUserRef.current = JsonHelper.parse(decoded) as IAuthUser;
                     return Auth.localUserRef.current;
                 }
             } catch (e) {

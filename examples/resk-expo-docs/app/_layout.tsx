@@ -7,9 +7,10 @@ import "../src/resources";
 import { ResourcesManager } from '@resk/core';
 import { Users } from '../src/resources';
 import { useEffect } from 'react';
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
+    // Prevent the splash screen from auto-hiding before asset loading is complete.
+    SplashScreen.preventAutoHideAsync();
     const users = ResourcesManager.getResource<Users>("users");
     useI18n();
     useEffect(() => {

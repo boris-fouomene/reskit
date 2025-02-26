@@ -453,6 +453,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
 
     const calendarIProps = Object.assign({}, iconProps);
     const calendarRef = useRef<CalendarModalContext>(null);
+    const onChangeEventRef = useRef<NativeSyntheticEvent<TextInputChangeEventData>>();
     const calendarFlag = canRenderCalendar && editable ? <>
         <FontIcon
             color={textColor}
@@ -513,7 +514,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     </> : null;
     return {
         autoComplete: "off",
-        placeholderTextColor: isFocused || error ? undefined : theme.colors.placeholder,
+        placeholderTextColor: isFocused || error ? textColor : theme.colors.placeholder,
         underlineColorAndroid: "transparent",
         ...props,
         inputRef,
@@ -556,16 +557,25 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         ],
         value: inputValue,
         inputMode: inputMode as any,
-        onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
-            const { nativeEvent: { target, text } } = event;
+        autoCorrect: !mask?.length && props?.autoCorrect,
+        onChangeText: (text: string) => {
+            if (typeof props.onChangeText == "function") {
+                props.onChangeText(text);
+            }
             let textString = String(text);
             if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
                 return;
             }
+            const event = onChangeEventRef.current;
+            console.log(event?.nativeEvent?.text, " is text to changettttt ", textString);
             const valCase2 = toCase(textString);
             const value = inputState.placeholder ? valCase2.masked : valCase2.value;
+            if (event?.nativeEvent) {
+                event.nativeEvent.text = value as string;
+            }
             if (textString !== inputState.value && inputState.value != value && !areCasesEquals(valCase2, inputState)) {
                 const options = { ...inputState, isFocused, type, dateFormat, phoneCountryCode, ...valCase2, value, text: textString, event };
+                console.log(" settting value ", options.value, " is new value ", textString);
                 setInputState(options);
                 if (typeof onChange == "function" && valCase2.isValid !== false) {
                     clearTimeout(debounceTimeoutRef.current);
@@ -574,6 +584,9 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
                     }, isNumber(debounceTimeout) && debounceTimeout > 0 ? debounceTimeout : 0);
                 }
             }
+        },
+        onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
+            onChangeEventRef.current = event;
         },
         onKeyPress: (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
             if (!isFocused) {

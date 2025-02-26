@@ -14,7 +14,7 @@ import Label from "@components/Label";
 import Queue from "./Queue";
 import { DEFAULT_IMAGE_DIMENSIONS } from "./utils";
 import { IStyle } from "../types";
-import { IDict } from "@resk/core";
+import { IDict, stringify } from "@resk/core";
 import { IDimensions } from "@dimensions/types";
 
 const IS_ANDROID = Platform.isAndroid();
@@ -137,13 +137,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
   getStringValue = (value: any): string => {
     try {
       if (typeof value !== "string") {
-        if (Array.isArray(value)) {
-          return value.join(" ");
-        }
-        if (typeof value === "object") {
-          return `${JSON.stringify(value)}`;
-        }
-        return `${value}`;
+        return stringify(value);
       }
       return value;
     } catch (error: any) {

@@ -1,24 +1,8 @@
 import { Tab, TextInput, withAppBar, Badge, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
 import { View, ScrollView } from 'react-native'
 import { IField, InputFormatter } from "@resk/core";
-import { useEffect } from "react";
-import { CountriesManager } from "@resk/core";
 
 const index = withAppBar(() => {
-    useEffect(() => {
-        return () => { }
-        Preloader.open({
-            title: "Loading...",
-            children: "Please wait...",
-            actions: [{
-                label: "Cancel",
-                colorScheme: "error",
-                onPress: () => {
-                    Preloader.close();
-                },
-            }]
-        })
-    }, [])
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>
@@ -59,11 +43,10 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                     <Badge colorScheme="info">Info</Badge>
                 </HStack>
             </View>
-
             <HStack>
                 <TextInput label="Text input Date" type="date"
                     onChange={(options) => {
-                        console.log(options, " is options date changeddddd")
+                        console.log(options.value, " is options date changeddddd")
                     }}
                 />
                 <TextInput label="Text input Time" type="time"
@@ -82,178 +65,6 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                     }}
                 />
             </HStack>
-            <Form
-                name="my-form"
-                onSubmit={({ data }) => {
-                    console.log(data, " is datata")
-                }}
-                fields={{
-                    name: {
-                        label: "Name",
-                        type: "text",
-                        required: true,
-                        multiline: true,
-                        left: <Icon iconName="account-circle" />,
-                        right: <Icon iconName="chevron-right" />,
-                    } as IField<"text">,
-                    switch: {
-                        label: "Switch",
-                        type: "switch",
-                        required: true,
-                        checkedLabel: "Checked",
-                        uncheckedLabel: "Unchecked",
-                        checkedValue: true,
-                        uncheckedValue: false,
-                        onChange: (options) => {
-                            console.log("switch", options);
-                        },
-                    } as IField<"switch">,
-                    checkbox: {
-                        type: "checkbox",
-                        label: "Checkbox",
-                        checkedLabel: "Checked",
-                        uncheckedLabel: "Unchecked",
-                    } as IField<"checkbox">,
-                    "email": {
-                        label: "Email",
-                        type: "email",
-                        required: true,
-                        minLength: 3,
-                        maxLength: 10,
-                    },
-                    "password": {
-                        label: "Password",
-                        type: "password",
-                        required: true,
-                        minLength: 3,
-                        maxLength: 10,
-                    },
-                    select: {
-                        label: "Select",
-                        type: "select",
-                        required: true,
-                        multiple: true,
-                        onChange: (options) => {
-                            console.log(options.context, " is options", options)
-                        },
-                        items: [
-                            { label: "Item 1", value: "1" },
-                            { label: "Item 2", value: "2" },
-                            { label: "Item 3", value: "3" },
-                            { label: "Item 4", value: "4" },
-                            { label: "Item 5", value: "5" },
-                            { label: "Item 6", value: "6" },
-                            { label: "Item 7", value: "7" },
-                            { label: "Item 8", value: "8" },
-                            { label: "Item 9", value: "9" },
-                            { label: "Item 10", value: "10" },
-                        ]
-                    } as IField<"select">,
-                    selectCountry: {
-                        type: "selectCountry",
-                        label: "Select Country",
-                        multiple: true,
-                        required: true,
-                    } as IField<"selectCountry">,
-                }}
-            >
-                <Button formName="my-form">Submit</Button>
-            </Form>
-            <Dropdown
-                label="My Dropdown"
-                getItemValue={({ item }) => item.value}
-                items={Array.from({ length: 100000 }, (_, i) => ({ label: `Item and ${i + 1}`, value: `${i + 1}` }))}
-            />
-            <View style={[Theme.styles.p5]}>
-                <Menu
-                    anchor={<Label>Open Menu</Label>}
-                    children={<MenuExample />}
-                    items={[
-                        {
-                            label: "Item 1",
-                            onPress: () => {
-                                console.log("Item 1")
-                            },
-                        },
-                        {
-                            label: "Item 2",
-                            onPress: () => {
-                                console.log("Item 2")
-                            },
-                            items: [
-                                {
-                                    label: "Sub item 2",
-                                    items: [
-                                        {
-                                            label: "Sub item 21"
-                                        },
-                                        {
-                                            label: "Sub item 22"
-                                        },
-                                        {
-                                            label: "Sub item 23"
-                                        },
-                                    ]
-                                },
-                                {
-                                    label: "Sub item 22"
-                                },
-                                {
-                                    label: "Sub item 23"
-                                },
-                            ]
-                        },
-                        {
-                            label: "Item 3",
-                            onPress: () => {
-                                console.log("Item 3")
-                            },
-                        },
-                        {
-                            label: "Item 4",
-                            onPress: () => {
-                                console.log("Item 4")
-                            },
-                        },
-                    ]}
-                />
-                <TextInput label="My text input"
-                    variant="labelEmbeded"
-
-                />
-                <HelperText
-                    visible
-                    error
-                    disabled
-                    children={"A children helper"}
-                />
-                <Tab>
-                    <Tab.Item label="Tab 1" icon="account-circle">
-                        <Label>First tab item</Label>
-                    </Tab.Item>
-                    <Tab.Item label="Second tab" icon="material-edit">
-                        <Label>Second tab</Label>
-                    </Tab.Item>
-                    <Tab.Item label="Third tab" icon="material-edit">
-                        <Label>Third tab</Label>
-                    </Tab.Item>
-                </Tab>
-                <Icon.Button
-                    iconName="home"
-                    title="Home"
-                    size={30}
-                />
-                <Expandable label="My expanded">
-                    <View>
-                        <Label>An expanded content</Label>
-                    </View>
-                </Expandable>
-                <ModalExample />
-
-                <Calendar.DayView
-                    defaultValue={"2022-01-01"}
-                />
-            </View>
         </ScrollView>
     )
 }, ({ i18n, updateTheme, theme }) => {

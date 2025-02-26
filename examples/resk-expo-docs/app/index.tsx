@@ -77,7 +77,9 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         console.log(options.value, " is options phone changeddddd")
                     }}
                 />
-                <TextInput variant="labelEmbeded" label="Label Embeeded" type="datetime"/>
+                <TextInput left={({textColor})=><><Icon iconName="check"/><Icon iconName="youtube"/></>} 
+                    variant="labelEmbeded" label="Label Embeeded" type="datetime"
+                />
             </HStack>
             
             <Form

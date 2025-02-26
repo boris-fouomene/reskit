@@ -559,23 +559,21 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         inputMode: inputMode as any,
         autoCorrect: !mask?.length && props?.autoCorrect,
         onChangeText: (text: string) => {
-            if (typeof props.onChangeText == "function") {
-                props.onChangeText(text);
-            }
             let textString = String(text);
             if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
                 return;
             }
             const event = onChangeEventRef.current;
-            console.log(event?.nativeEvent?.text, " is text to changettttt ", textString);
             const valCase2 = toCase(textString);
             const value = inputState.placeholder ? valCase2.masked : valCase2.value;
             if (event?.nativeEvent) {
                 event.nativeEvent.text = value as string;
             }
+            if (typeof props.onChangeText == "function") {
+                props.onChangeText(text);
+            }
             if (textString !== inputState.value && inputState.value != value && !areCasesEquals(valCase2, inputState)) {
                 const options = { ...inputState, isFocused, type, dateFormat, phoneCountryCode, ...valCase2, value, text: textString, event };
-                console.log(" settting value ", options.value, " is new value ", textString);
                 setInputState(options);
                 if (typeof onChange == "function" && valCase2.isValid !== false) {
                     clearTimeout(debounceTimeoutRef.current);

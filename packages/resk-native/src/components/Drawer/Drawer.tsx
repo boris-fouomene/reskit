@@ -7,7 +7,7 @@ import { IDict, IObservable, uniqid, IAuthSessionStorage, Auth, IObservableAllEv
 import { canDrawerBeMinimizedOrPermanent } from "./utils";
 import { isValidElement } from "@utils";
 import Breakpoints from "@breakpoints";
-import { Animated, Dimensions, Keyboard, PanResponder, StyleSheet, TouchableWithoutFeedback, GestureResponderEvent, PanResponderGestureState, I18nManager, Pressable } from "react-native";
+import { Animated, Dimensions, Keyboard, PanResponder, StyleSheet, TouchableWithoutFeedback, GestureResponderEvent, PanResponderGestureState, I18nManager } from "react-native";
 import { Portal } from "@components/Portal";
 import View from "@components/View";
 import { Colors, useTheme } from "@theme";
@@ -19,8 +19,9 @@ import { DrawerContext } from "./hooks";
 import { dimentionAddListener } from "@dimensions";
 import { IDimensions } from "@dimensions/types";
 import { useReskNative } from "@src/context/hooks";
-import { I18n } from "@resk/core";
+import Platform from "@platform";
 
+const useNativeDriver = Platform.canUseNativeDriver();
 const MIN_SWIPE_DISTANCE = 3;
 
 const VX_MAX = 0.1;
@@ -601,8 +602,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * 
    * This method animates the `openValue` state using a spring animation to transition
    * to the full-screen mode. The animation configuration includes properties such as
-   * `bounciness`, `restSpeedThreshold`, and `useNativeDriver`. The `useNativeDriver`
-   * property is determined based on the `useNativeAnimations` prop.
+   * `bounciness`, `restSpeedThreshold`, and `useNativeDriver`.
    * 
    * Once the animation completes, the `fullScreen` state is toggled, and the `_isTogglingFullScreen`
    * flag is reset to `false`.
@@ -617,7 +617,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       toValue: 1,
       bounciness: 0,
       restSpeedThreshold: 0.1,
-      useNativeDriver: typeof this.props.useNativeAnimations == "boolean" ? this.props.useNativeAnimations : false,
+      useNativeDriver,
     }).start(() => {
       this.setState({ fullScreen: !this.state.fullScreen }, () => {
         this._isTogglingFullScreen = false;
@@ -783,7 +783,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
         toValue: 1,
         bounciness: 0,
         restSpeedThreshold: 0.1,
-        useNativeDriver: typeof this.props.useNativeAnimations == "boolean" ? this.props.useNativeAnimations : false,
+        useNativeDriver,
         ...options,
       }).start(() => {
         this._emitStateChanged(IDLE);
@@ -877,7 +877,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
         toValue: 0,
         bounciness: 0,
         restSpeedThreshold: 1,
-        useNativeDriver: typeof this.props.useNativeAnimations == "boolean" ? this.props.useNativeAnimations : false,
+        useNativeDriver,
         ...options,
       }).start(end);
     } else end();

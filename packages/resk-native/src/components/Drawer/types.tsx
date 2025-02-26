@@ -303,8 +303,7 @@ export interface IDrawer extends IObservable<IDrawerEvent>, React.PureComponent<
      * 
      * This method animates the `openValue` state using a spring animation to transition
      * to the full-screen mode. The animation configuration includes properties such as
-     * `bounciness`, `restSpeedThreshold`, and `useNativeDriver`. The `useNativeDriver`
-     * property is determined based on the `useNativeAnimations` prop.
+     * `bounciness`, `restSpeedThreshold`, and `useNativeDriver`.
      * 
      * Once the animation completes, the `fullScreen` state is toggled, and the `_isTogglingFullScreen`
      * flag is reset to `false`.
@@ -723,12 +722,6 @@ export interface IDrawerProps extends IViewProps {
      * The background color of the status bar.
      */
     statusBarBackgroundColor?: string;
-
-    /**
-     * Indicates if native animations should be used.
-     * @default false
-     */
-    useNativeAnimations?: boolean;
 
     /**
      * Determines if gestures are enabled for the drawer.

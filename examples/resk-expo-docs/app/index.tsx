@@ -51,17 +51,17 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                 />
                 <TextInput label="Text input Time" type="time"
                     onChange={(options) => {
-                        console.log(options, " is options time changeddddd")
+                        console.log(options.value, " is options time changeddddd")
                     }}
                 />
                 <TextInput label="Text input DateTime" type="datetime"
                     onChange={(options) => {
-                        console.log(options, " is options datetime changeddddd")
+                        console.log(options.value, " is options datetime changeddddd")
                     }}
                 />
                 <TextInput label="Text input Phone CM" type="tel" phoneCountryCode="CM"
                     onChange={(options) => {
-                        console.log(options, " is options phone changeddddd")
+                        console.log(options.value, " is options phone changeddddd")
                     }}
                 />
             </HStack>

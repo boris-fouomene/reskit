@@ -64,7 +64,23 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         console.log(options.value, " is options phone changeddddd")
                     }}
                 />
+                <TextInput variant="labelEmbeded" label="Text input DateTime" type="datetime"/>
             </HStack>
+            
+            <Form
+                fields={{
+                    name : {
+                        type:"text",
+                        label : "My Name",
+                        defaultValue : "myName"
+                    },
+                    checkbox: {
+                        type : "checkbox",
+                        label : "My Checkbox",
+                        defaultValue : true
+                    },
+                }}
+            />
         </ScrollView>
     )
 }, ({ i18n, updateTheme, theme }) => {

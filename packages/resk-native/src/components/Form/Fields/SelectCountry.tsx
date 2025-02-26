@@ -1,7 +1,7 @@
 import { Field, FormField } from "../Field";
 import { SelectCountry } from "@components/SelectCountry";
 
-@FormField("selectCountry")
+//@FormField("selectCountry")
 class SelectCountryField extends Field<"selectCountry"> {
     isTextField(): boolean {
         return false;

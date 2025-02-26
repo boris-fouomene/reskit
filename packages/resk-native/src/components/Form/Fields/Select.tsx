@@ -1,7 +1,7 @@
 import { Field, FormField } from "../Field";
 import { Dropdown } from "@components/Dropdown";
 
-@FormField("select")
+//@FormField("select")
 class SelectField extends Field<"select"> {
     isTextField(): boolean {
         return false;

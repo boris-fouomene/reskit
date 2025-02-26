@@ -1,4 +1,3 @@
-import "@expo/metro-runtime";
 import { ExpoRoot } from 'expo-router';
 
 function App() {

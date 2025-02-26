@@ -12,10 +12,11 @@ import Breakpoints from "@src/breakpoints";
 import { Preloader, Dialog } from "@components/Dialog";
 import { Drawer } from "@components/Drawer";
 import { DrawerNavigationView } from "@layouts/DrawerNavigationView";
-import { FontIcon } from "@components/Icon";
 import { useI18n } from "@src/i18n/hooks";
 import Default from "@auth/hooks";
 import { Notify } from "@notify/index";
+import { StatusBar } from '@components/StatusBar';
+
 export * from "./types";
 export * from "./hooks";
 
@@ -125,6 +126,7 @@ export function ReskNativeProvider({ children, theme: customTheme, auth, breakpo
             <Dialog.Provider.Provider />
             <Drawer.Provider.Provider />
             <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>
+              <StatusBar />
               {children}
             </Drawer>
           </Default.AuthContext.Provider>

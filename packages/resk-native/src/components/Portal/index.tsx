@@ -155,7 +155,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 };
 
 function RenderPortal<AsProps extends ViewProps = IViewProps>({ children, absoluteFill, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
-    return <View  {...Object.assign({}, props)} style={[{ zIndex : 0 }, absoluteFill && styles.absoluteFill, props?.style]}>
+    return <View  {...Object.assign({}, props)} style={[{ zIndex: 0 }, absoluteFill && styles.absoluteFill, props?.style]}>
         {children}
     </View>
 };

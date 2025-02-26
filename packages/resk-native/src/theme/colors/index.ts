@@ -351,5 +351,42 @@ function fade(color: string, fade: number): string | undefined {
     if (!isValid(color)) return undefined;
     return Color(color).fade(fade).rgb().string();
 }
+/***
+ * Checks if the given color is considered light.
+ * 
+ * @param {string} color - The color to check.
+ * @returns {boolean} Returns `true` if the color is considered light, otherwise returns `false`.
+ * 
+ * @example
+ * ```ts
+ * const isLightColor = isLight("#ffffff"); 
+ * console.log(isLightColor); // true
+ * 
+ * const isDarkColor = isLight("#000000"); 
+ * console.log(isDarkColor); // false
+ * ```
+ */
+export function isLight(color: string): boolean {
+    return Color(color).isLight();
+}
 
-export default { setAlpha, fade, isHex, isValid, getContrastingColor, darken, lighten, hexToRgb, rgbStringToRgb, getBrightness, getContrast };
+/***
+ * Checks if the given color is considered dark.
+ * 
+ * @param {string} color - The color to check.
+ * @returns {boolean} Returns `true` if the color is considered dark, otherwise returns `false`.
+ * 
+ * @example
+ * ```ts
+ * const isDarkColor = isDark("#ffffff"); 
+ * console.log(isDarkColor); // false
+ * 
+ * const isLightColor = isDark("#000000"); 
+ * console.log(isLightColor); // true
+ * ```
+ */
+export function isDark(color: string): boolean {
+    return Color(color).isDark();
+}
+
+export default { setAlpha, isLight, isDark, fade, isHex, isValid, getContrastingColor, darken, lighten, hexToRgb, rgbStringToRgb, getBrightness, getContrast };

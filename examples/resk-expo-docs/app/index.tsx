@@ -44,9 +44,22 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                 </HStack>
             </View>
             <HStack>
-                <TextInput label="Text input Date" type="date"
+                <TextInput 
+                    left={({ textColor}) => {
+                        return <>
+                            <Icon color={textColor} iconName="camera" />
+                            <Icon color={textColor} iconName="check" />
+                        </>
+                    }}
+                    label="Text input Date" type="date"
                     onChange={(options) => {
                         console.log(options.value, " is options date changeddddd")
+                    }}
+                    right={({ textColor}) => {
+                        return <>
+                            <Icon color={textColor} iconName="ring" />
+                            <Icon color={textColor} iconName="account-circle" />
+                        </>
                     }}
                 />
                 <TextInput label="Text input Time" type="time"
@@ -64,7 +77,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         console.log(options.value, " is options phone changeddddd")
                     }}
                 />
-                <TextInput variant="labelEmbeded" label="Text input DateTime" type="datetime"/>
+                <TextInput variant="labelEmbeded" label="Label Embeeded" type="datetime"/>
             </HStack>
             
             <Form

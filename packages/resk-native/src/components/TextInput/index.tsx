@@ -3,7 +3,7 @@ import { isValidElement, useMergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
 import React, { ReactNode, useEffect, useMemo, useRef } from "react";
 import { InputFormatter, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper } from "@resk/core";
-import _, { isNumber } from "lodash";
+import _, { isNumber, wrap } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View from "@components/View";
@@ -85,17 +85,21 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
     const Wrapper = canWrapWithTouchable ? TouchableRipple : View;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
-    const hasLeft = !!left;
     const inputProps = { ...(!canWrapWithTouchable ? pressableProps : {}), focus, ...rest, editable: canWrapWithTouchable ? false : editable }
+    const inputElement = typeof render == "function" ? render(inputProps, inputRef) : <RNTextInput {...inputProps} ref={inputRef} />;
     return <View {...containerProps} >
         {isLabelEmbededVariant ? null : labelContent}
-        <Wrapper {...wrapperProps} {...contentContainerProps} style={[hasLeft && styles.leftContentContainer, contentContainerProps?.style]}>
-            {<View testID={`${testID}-left-container`} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
+        <Wrapper {...wrapperProps} {...contentContainerProps} style={[styles.wrapper, contentContainerProps?.style]}>
+            <View testID={testID+"-left-content-container"} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContentContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
-                {typeof render == "function" ? render(inputProps, inputRef) : <RNTextInput {...inputProps} ref={inputRef} />}
-            </View>}
-            {right}
+           </View> 
+           <View testID={testID+"-input-container"} style={[styles.inputContainer,canWrapWithTouchable && styles.leftContainerWrappedWithTouchable]}>
+                 {inputElement}
+            </View>
+            {right ? (<View testID={testID+"-right-content-container"} style={[styles.leftOrRightContainer,styles.rightContentContainer]}>
+                {right}
+            </View>) : null}
         </Wrapper>
     </View>
 });
@@ -139,16 +143,11 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
         { borderColor, borderRadius: theme.roundness },
     ];
     const notEmbeededLabelStyle = [styles.notEmbededLabelStyle],
-        notEmbeededInputStyle = [styles.inputNotEmbededLabelVariant]
+        notEmbeededInputStyle : IStyle[]= []
     if (isLabelEmbededVariant) {
-        inputStyle.push(styles.inputLabelEmbededVariant);
         contentContainerStyle.push(borderedStyle);
-        labelStyle.push(styles.labelEmbededVariantLabel);
     } else if (isFlatVariant) {
-        inputStyle.push(styles.flatVariantInput);
-        containerStyle.push(styles.flatVariantContainer);
         contentContainerStyle.push(styles.flatVariantContentContainer);
-        labelStyle.push(styles.flatVariantLabel);
     } else {
         inputStyle.push(notEmbeededInputStyle);
         labelStyle.push(notEmbeededLabelStyle)
@@ -508,7 +507,6 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
                 }
             }}
             textColor={textColor}
-            anchorProps={{ style: styles.selectCountryAnchor }}
             fullScreenAppBarProps={{ title: i18n.t("components.textInput.selectCountry") + (isNonNullString(label) ? " [" + label + "]" : "") }}
         />
     </> : null;
@@ -545,7 +543,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         editable,
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: [
-            styles.outlineNone, Object.assign({}, Platform.isWeb() ? { outline: "none" } : null),
+            Object.assign({}, Platform.isWeb() ? { outline: "none" } : {}) as IStyle,
             styles.input, minHeight > 0 && { minHeight },
             inputStyle,
             compact && styles.compact,
@@ -631,17 +629,6 @@ export default TextInput;
 
 
 const styles = StyleSheet.create({
-    calendarModalBackdrop: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    calendarModalContainer: {
-        flex: 1,
-        padding: 10,
-        justifyContent: "center",
-        alignItems: "center",
-    },
     affix: {
         paddingHorizontal: 0,
         marginHorizontal: 5,
@@ -654,7 +641,6 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         paddingHorizontal: 5,
     },
-    hidden: { display: "none", opacity: 0 },
     input: {
         borderColor: 'transparent', // No border
         borderWidth: 0, // Remove border
@@ -671,9 +657,6 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         overflow: 'hidden',
     },
-    inputLabelEmbededVariant: {
-
-    },
     compact: {
         padding: 0,
         paddingVertical: 0,
@@ -682,22 +665,11 @@ const styles = StyleSheet.create({
     multilineInput: {
         paddingVertical: 5,
     },
-    inputNotEmbededLabelVariant: {},
-    focusedInput: {
-        borderColor: 'transparent', // No border on focus
-        borderWidth: 0,
-    },
-    outlineNone: {},
     borderWidth1: {
         borderWidth: 1,
     },
     focusedOutlineBorder: {
         borderWidth: 2,
-    },
-    affixMultiline: {
-        position: 'absolute',
-        right: 0,
-        top: 0,
     },
     rightContainer: {
         alignSelf: "center",
@@ -714,17 +686,32 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignSelf: "flex-start",
         flexWrap: "nowrap",
-        //backgroundColor: "transparent",
         flexDirection: "row",
         alignItems: "center",
         position: "relative",
         width: "100%",
         paddingHorizontal: 5,
     },
-    leftContainer: {
-        flexGrow: 1,
-    },
     leftContentContainer: {
+        flexGrow: 0,
+        alignSelf: "center",
+    },
+    wrapper: {
+        width : '100%',
+        flexDirection: "row",
+        position : 'relative',
+        justifyContent : 'center',
+        alignSelf : 'flex-start',
+        alignItems : 'flex-start',
+    },
+    inputContainer : {
+        flex:1,
+        flexGrow : 1,
+    },
+    rightContentContainer : {
+        flexGrow : 0,
+        alignSelf : 'center',
+        justifyContent : 'flex-end'
     },
     leftOrRightContainer: {
         display: "flex",
@@ -740,30 +727,10 @@ const styles = StyleSheet.create({
         fontWeight: "500",
         paddingBottom: 5,
     },
-    labelEmbededVariantLabel: {
-        //paddingLeft: 3,
-    },
-
-    flatVariantContainer: {
-    },
     flatVariantContentContainer: {
         borderWidth: 0,
         borderBottomWidth: 1,
     },
-    flatVariantInput: {
-
-    },
-    flatVariantLabel: {
-
-    },
-    countryFlagContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-    },
-    selectCountryAnchor: {
-        //marginRight: 5,
-    }
 })
 
 const isDecimalType = (type: ITextInputType | string): boolean => {

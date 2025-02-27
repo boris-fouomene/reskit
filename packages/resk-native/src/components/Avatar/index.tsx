@@ -69,7 +69,7 @@ export interface IAvatarProps<AsProps extends Partial<ITouchableProps> = ViewPro
 
   /** Makes the avatar circular.
    *
-   * @default false
+   * @default true
    */
   rounded?: boolean;
 
@@ -117,7 +117,7 @@ export function Avatar<AsProps extends Partial<ITouchableProps> = ViewProps>({
   icon,
   source,
   size = 'small',
-  rounded,
+  rounded:customRounded,
   text,
   children,
   iconProps,
@@ -130,6 +130,7 @@ export function Avatar<AsProps extends Partial<ITouchableProps> = ViewProps>({
   color,
   ...rest
 }: IAvatarProps<AsProps>) {
+  const rounded = typeof customRounded === 'boolean' ? customRounded : true;
   const avatarSize = typeof size === 'number' ? size : isNonNullString(size) && typeof avatarSizes[size] ==="number"
   && avatarSizes[size] || avatarSizes.small;
   const height = avatarSize, width = avatarSize;
@@ -146,7 +147,7 @@ export function Avatar<AsProps extends Partial<ITouchableProps> = ViewProps>({
         testID = {testID+"-text"}
         children ={text}
         {...Object.assign({},textProps)}
-        style = {[{fontSize:avatarSize},textProps?.style]}
+        style = {[{fontSize:avatarSize/1.8},textProps?.style]}
       />;
     }
     if(!icon) return null;

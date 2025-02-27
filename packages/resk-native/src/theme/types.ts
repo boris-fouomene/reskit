@@ -203,7 +203,7 @@ export interface IThemeColorsTokens {
 };
 
 /**
- * @interface IThemeColorTokenKey
+ * @interface IThemeColorsTokenName
  * Represents the keys of the `IThemeColorsTokens` interface.
  * 
  * This type is a union of string literals that correspond to the property names 
@@ -214,18 +214,18 @@ export interface IThemeColorsTokens {
  * ## Usage Example
  * 
  * For instance, if `IThemeColorsTokens` has properties like `primary`, `secondary`, 
- * and `background`, then `IThemeColorTokenKey` will be equivalent to the union type 
+ * and `background`, then `IThemeColorsTokenName` will be equivalent to the union type 
  * `"primary" | "secondary" | "background"`. This allows developers to use these 
  * keys safely in their code without the risk of typos or invalid property names.
  * 
  * ### Example of Valid Usage
  * 
  * ```typescript
- * const themeColor: IThemeColorTokenKey = 'primary'; // Valid
- * const anotherColor: IThemeColorTokenKey = 'background'; // Valid
+ * const themeColor: IThemeColorsTokenName = 'primary'; // Valid
+ * const anotherColor: IThemeColorsTokenName = 'background'; // Valid
  * 
  * // The following would cause a TypeScript error:
- * const invalidColor: IThemeColorTokenKey = 'invalidColor'; // Error: Type '"invalidColor"' is not assignable to type 'IThemeColorTokenKey'.
+ * const invalidColor: IThemeColorsTokenName = 'invalidColor'; // Error: Type '"invalidColor"' is not assignable to type 'IThemeColorsTokenName'.
  * ```
  * 
  * ## Notes
@@ -235,7 +235,7 @@ export interface IThemeColorsTokens {
  * - It helps in maintaining type safety and reducing runtime errors by leveraging 
  *   TypeScript's type system.
  */
-export type IThemeColorTokenKey = keyof IThemeColorsTokens;
+export type IThemeColorsTokenName = keyof IThemeColorsTokens;
 
 
 /**

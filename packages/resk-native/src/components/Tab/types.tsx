@@ -6,7 +6,7 @@ import { IViewProps } from "@components/View";
 import { IStyle } from "../../types";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, ScrollViewProps, ViewProps } from "react-native";
-import { IThemeColorTokenKey } from "@theme/types";
+import { IThemeColorsTokenName } from "@theme/types";
 import { IAuthPerm } from "@resk/core";
 
 /**
@@ -229,7 +229,7 @@ export interface ITabItemsProps extends IViewProps {
     /***
      * tabItems color scheme
      */
-    colorScheme?: IThemeColorTokenKey;
+    colorScheme?: IThemeColorsTokenName;
 }
 
 

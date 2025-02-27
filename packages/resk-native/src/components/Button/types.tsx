@@ -3,7 +3,7 @@ import { IIconProps, IIconSource } from "@components/Icon";
 import { ISurfaceProps } from "@components/Surface";
 import { ITooltipBaseProps } from "@components/Tooltip";
 import { ITouchableRippleProps } from "@components/TouchableRipple";
-import { IThemeColorTokenKey } from "@theme/types";
+import { IThemeColorsTokenName } from "@theme/types";
 import { IStyle } from "../../types";
 import React from "react";
 import { AccessibilityRole, GestureResponderEvent, View } from "react-native";
@@ -151,14 +151,14 @@ export type IButtonProps<IButtonExtendContext = any, ResourceName extends IResou
     loadingProps?: IActivityIndicatorProps;
 
     /**
-     * @see {@link IThemeColorTokenKey} for the available colorsSheme
+     * @see {@link IThemeColorsTokenName} for the available colorsSheme
      * Color scheme token key to apply a theme color to the button.
      * This allows for easy theming and consistency across the application.
      * 
      * @example
      * <Button colorScheme="primary" />
      */
-    colorScheme?: IThemeColorTokenKey;
+    colorScheme?: IThemeColorsTokenName;
 
     /**
      * Props for the content of the button.

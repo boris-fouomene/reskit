@@ -1,4 +1,4 @@
-import { IThemeColorSheme, ITheme, IThemeColorTokenKey, IThemeColorsTokens, IThemeFontSizes, IThemeSpaces, IThemeBorderRadius } from "./types";
+import { IThemeColorSheme, ITheme, IThemeColorsTokenName, IThemeColorsTokens, IThemeFontSizes, IThemeSpaces, IThemeBorderRadius } from "./types";
 import Colors from "./colors";
 import { defaultStr, extendObj, IDict, IObservable, isNonNullString, isObj, isObservable, observable } from "@resk/core";
 import { createMaterial3Theme as _createMaterial3Theme } from "./material-colors";
@@ -227,14 +227,14 @@ export function createTheme(theme: ITheme): IThemeManager {
          * @param {...string[]} [defaultColors] - Fallback color values if the provided color is invalid.
          * @returns {string | undefined} - The resolved color value or undefined if none is found.
          */
-        getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined {
+        getColor(color?: IThemeColorsTokenName, ...defaultColors: any[]): string | undefined {
             if (color && color in context.colors) {
                 return context.colors[color as keyof typeof context.colors] as string;
             }
             if (Colors.isValid(color)) return color as string;
             for (let i in defaultColors) {
                 if (typeof defaultColors[i] === "string") {
-                    const col = this.getColor(defaultColors[i] as IThemeColorTokenKey);
+                    const col = this.getColor(defaultColors[i] as IThemeColorsTokenName);
                     if (col) return col as string;
                 }
             }
@@ -257,10 +257,10 @@ export function createTheme(theme: ITheme): IThemeManager {
          * // Returns: { color: "#000000", backgroundColor: "#f5f5f5" }
          * ```
          * 
-         * @param {IThemeColorTokenKey} [colorSheme] - The color key to generate a scheme for.
+         * @param {IThemeColorsTokenName} [colorSheme] - The color key to generate a scheme for.
          * @returns {IThemeColorSheme} - An object containing `color` and `backgroundColor` properties.
          */
-        getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme {
+        getColorScheme(colorSheme?: IThemeColorsTokenName): IThemeColorSheme {
             if (!colorSheme || typeof colorSheme != "string" || !(colorSheme in context.colors)) {
                 return {};
             }
@@ -413,10 +413,10 @@ class Theme {
     static get colors() {
         return this.defaultTheme?.colors; // Access the color palette
     }
-    static getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined {
+    static getColor(color?: IThemeColorsTokenName, ...defaultColors: any[]): string | undefined {
         return this.defaultTheme?.getColor(color, ...defaultColors);
     }
-    static getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme {
+    static getColorScheme(colorSheme?: IThemeColorsTokenName): IThemeColorSheme {
         return this.defaultTheme?.getColorScheme(colorSheme);
     }
     static get styles() {
@@ -551,13 +551,13 @@ export default Theme;
  * 
  * @method getColor
  * @description Retrieves a specific color from the theme based on the color key.
- * @param {string | IThemeColorTokenKey} [color] - The key of the color to retrieve (e.g., "primary", "warning").
+ * @param {string | IThemeColorsTokenName} [color] - The key of the color to retrieve (e.g., "primary", "warning").
  * @param {...any[]} defaultColors - Default colors to return if the requested color is not found.
  * @returns {string | undefined} The color string if found, otherwise one of the default colors.
  * 
  * @method getColorScheme
  * @description Retrieves a color scheme with `color` and `backgroundColor` based on the provided color scheme key.
- * @param {IThemeColorTokenKey} [colorSheme] - The key of the color scheme to retrieve (e.g., "primary", "error").
+ * @param {IThemeColorsTokenName} [colorSheme] - The key of the color scheme to retrieve (e.g., "primary", "error").
  * @returns {IThemeColorSheme} An object containing `color` and `backgroundColor` properties.
  * 
  * @example 
@@ -608,8 +608,8 @@ export default Theme;
  * ```
  */
 export interface IThemeManager extends ITheme {
-    getColor(color?: IThemeColorTokenKey, ...defaultColors: any[]): string | undefined;
-    getColorScheme(colorSheme?: IThemeColorTokenKey): IThemeColorSheme
+    getColor(color?: IThemeColorsTokenName, ...defaultColors: any[]): string | undefined;
+    getColorScheme(colorSheme?: IThemeColorsTokenName): IThemeColorSheme
     styles: typeof styles;
     elevations: typeof Elevations;
     /**

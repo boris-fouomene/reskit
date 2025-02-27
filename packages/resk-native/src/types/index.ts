@@ -362,11 +362,11 @@ export interface IOnChangeOptions<OnChangeEventType = any | null, ValueType = an
  * // Simulating an event
  * handleEvent('onPress'); // Output: Component was pressed.
  */
-export type ITouchableEventNames = keyof ITouchableEvents;
+export type ITouchableEventNames = keyof ITouchableProps;
 
 
 /**
- * @interface ITouchableEvents
+ * @interface ITouchableProps
  * A type representing an object that can contain optional touch event handlers.
  *
  * The `ITouchableEventObject` type is a partial record where the keys are 
@@ -404,7 +404,7 @@ export type ITouchableEventNames = keyof ITouchableEvents;
  *
  * simulatePress(touchableHandlers.onPress); // Output: Pressed!
  */
-export type ITouchableEvents = {
+export type ITouchableProps = {
   onPress?: TouchableWithoutFeedbackProps['onPress'];
   onLongPress?: TouchableWithoutFeedbackProps['onLongPress'];
   onPressIn?: TouchableWithoutFeedbackProps['onPressIn'];

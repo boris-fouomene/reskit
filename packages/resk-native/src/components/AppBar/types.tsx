@@ -1,7 +1,7 @@
 import { ILabelProps } from "@components/Label";
 import { ISurfaceProps } from "@components/Surface";
 import { ReactNode } from "react";
-import { IThemeColorTokenKey } from "@theme/types";
+import { IThemeColorsTokenName } from "@theme/types";
 import { GestureResponderEvent, ViewProps } from "react-native";
 import { IIconButtonProps } from "@components/Icon";
 import { IMenuItemBase, IMenuItemRenderFunc, IMenuItemsProps, IMenuRenderItemsOptions } from "@components/Menu";
@@ -46,7 +46,7 @@ import { IReactNullableElement } from "@src/types";
  *
  * @property {ILabelProps} [subtitleProps] - Additional properties for the subtitle label.
  *
- * @property {IThemeColorTokenKey} [colorScheme] - The color scheme key for theming
+ * @property {IThemeColorsTokenName} [colorScheme] - The color scheme key for theming
  * the AppBar elements. This property is used to set the color of the title and subtitle and the background color of the AppBar.
  *
  * @property {number} [maxActions] - The maximum number of actions to display directly
@@ -131,7 +131,7 @@ export type IAppBarProps<IAppBarActionContext = any> = ISurfaceProps & {
     /** Additional properties for the subtitle label. */
     subtitleProps?: ILabelProps;
     /** The color scheme key for theming the AppBar elements. */
-    colorScheme?: IThemeColorTokenKey;
+    colorScheme?: IThemeColorsTokenName;
 
     /** The maximum number of actions to display directly on the AppBar. */
     maxActions?: number;

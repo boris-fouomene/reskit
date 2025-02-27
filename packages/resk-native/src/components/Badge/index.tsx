@@ -6,7 +6,7 @@ import {
     TextStyle,
     useWindowDimensions,
 } from 'react-native';
-import { IThemeColorSheme, IThemeColorTokenKey, useTheme } from "@theme";
+import { IThemeColorSheme, IThemeColorsTokenName, useTheme } from "@theme";
 import Label, { ILabelProps } from '@components/Label';
 import { defaultStr } from '@resk/core';
 
@@ -75,7 +75,7 @@ export const Badge = ({
     animationDuration = typeof animationDuration === 'number' ? animationDuration : 300;
     const theme = useTheme();
     const newColorSheme = colorScheme && theme?.colors?.[colorScheme as keyof typeof theme.colors] ? colorScheme : "error";
-    const { backgroundColor, color } = theme.getColorScheme(newColorSheme as IThemeColorTokenKey);
+    const { backgroundColor, color } = theme.getColorScheme(newColorSheme as IThemeColorsTokenName);
     const { current: opacity } = React.useRef<Animated.Value>(
         new Animated.Value(visible ? 1 : 0)
     );

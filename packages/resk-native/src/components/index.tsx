@@ -29,4 +29,5 @@ export * from "./Drawer";
 export * from "./Form";
 export * from "./Dropdown";
 export * from "./Date";
+export * from "./Avatar";
 export * from "./ProgressBar";

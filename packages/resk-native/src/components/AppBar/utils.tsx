@@ -1,6 +1,6 @@
 import { renderMenuItems } from "@components/Menu/utils";
 import { getDimensions } from "@dimensions";
-import { ITheme, IThemeColorSheme, IThemeColorTokenKey } from "@theme/types";
+import { ITheme, IThemeColorSheme, IThemeColorsTokenName } from "@theme/types";
 import { IMenuItemRenderFunc, IMenuRenderItemsOptions } from "@components/Menu/types";
 import { IAppBarAction, IAppBarContext, IAppBarProps } from "./types";
 import Theme, { Colors } from "@theme/index";
@@ -87,8 +87,8 @@ export function splitAppBarActions<IAppBarActionContext = any>({
   const actionCounter = { current: 0 };
   context = Object.assign({}, context);
   const mAction: number = typeof maxActions === "number" && maxActions ? Math.trunc(maxActions) : getAppBarMaxActions(windowWidth);
-  //color = Colors.isValid(color) ? color : Theme.getColor(color as IThemeColorTokenKey);
-  //backgroundColor = Colors.isValid(backgroundColor) ? backgroundColor : Theme.getColor(backgroundColor as IThemeColorTokenKey);
+  //color = Colors.isValid(color) ? color : Theme.getColor(color as IThemeColorsTokenName);
+  //backgroundColor = Colors.isValid(backgroundColor) ? backgroundColor : Theme.getColor(backgroundColor as IThemeColorsTokenName);
   const renderedActions = [];
   const canRenderAction = (level?: number) => {
     if (level) return false;

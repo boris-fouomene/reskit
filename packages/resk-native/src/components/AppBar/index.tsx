@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Label from '@components/Label';
 import { Surface } from '@components/Surface';
-import Theme, { Colors, IThemeColorTokenKey, useTheme } from '@theme/index';
+import Theme, { Colors, IThemeColorsTokenName, useTheme } from '@theme/index';
 import { IAppBarProps } from './types';
 import { getLabelOrLeftOrRightProps } from '@hooks/label2left2right';
 import { useDimensions } from '@dimensions/index';
@@ -85,13 +85,13 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   contentProps = Object.assign({}, contentProps);
   const { color: tColor, backgroundColor: tBackgroundColor } = getThemeColors(theme);
   testID = testID || 'resk-appbar';
-  const colorScheme = theme.getColorScheme(customColorScheme as IThemeColorTokenKey);
+  const colorScheme = theme.getColorScheme(customColorScheme as IThemeColorsTokenName);
   const flattenStyle = (StyleSheet.flatten(style) || {});
   backgroundColor = (
-    Colors.isValid(backgroundColor) ? backgroundColor : theme.getColor(backgroundColor as IThemeColorTokenKey)
+    Colors.isValid(backgroundColor) ? backgroundColor : theme.getColor(backgroundColor as IThemeColorsTokenName)
       || colorScheme.backgroundColor || flattenStyle?.backgroundColor || tBackgroundColor
   ) as string;
-  color = (Colors.isValid(color) ? color : theme.getColor(color as IThemeColorTokenKey) || colorScheme.color || (flattenStyle as any)?.color || tColor) as string;
+  color = (Colors.isValid(color) ? color : theme.getColor(color as IThemeColorsTokenName) || colorScheme.color || (flattenStyle as any)?.color || tColor) as string;
   const titleTextColor = Colors.isValid(color) ? color : undefined;
   titleProps = Object.assign({}, titleProps);
   subtitleProps = Object.assign({}, subtitleProps);

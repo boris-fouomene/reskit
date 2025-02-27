@@ -1,4 +1,4 @@
-import { Tab, TextInput, withAppBar, Badge, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
+import { Tab, TextInput, withAppBar,Avatar, Badge, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
 import { View, ScrollView } from 'react-native'
 import { IField, InputFormatter } from "@resk/core";
 
@@ -41,6 +41,22 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                     <Badge colorScheme="success">Success</Badge>
                     <Badge colorScheme="warning">Warning</Badge>
                     <Badge colorScheme="info">Info</Badge>
+                </HStack>
+                <HStack style={[Theme.styles.m2]}>
+                    <Avatar
+                        text="AV"
+                        size={"small"}
+                    />
+                    <Avatar
+                        icon="account-circle"
+                        size={"medium"}
+                        colorScheme="secondary"
+                    />
+                    <Avatar
+                        icon="account-circle"
+                        size={"large"}
+                        colorScheme="tertiary"
+                    />
                 </HStack>
             </View>
             <HStack>

@@ -7,7 +7,7 @@ import MaterialIcons from "react-native-vector-icons/glyphmaps/MaterialIcons.jso
 import Octicons from "react-native-vector-icons/glyphmaps/Octicons.json";
 import Feather from "react-native-vector-icons/glyphmaps/Feather.json";
 
-import { IReactComponent, IStyle, ITouchableEvents } from "../../types";
+import { IReactComponent, IStyle, ITouchableProps } from "../../types";
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip";
 import { ITheme } from "@theme/types";
@@ -495,7 +495,7 @@ export type IIconSource = IIconSourceBase | JSX.Element | ((props: IIconProps & 
  *   onError: () => console.error('Error loading image'),
  * };
  */
-export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & ImageProps & ITooltipBaseProps & ITouchableEvents & {
+export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & ImageProps & ITooltipBaseProps & ITouchableProps & {
     /***
      * Optional. Properties for the tooltip container,
     * allowing customization of the tooltip behavior and appearance when the icon is hovered or focused.

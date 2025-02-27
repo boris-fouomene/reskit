@@ -5,7 +5,7 @@ import React, { ReactNode } from "react";
 import { isValidElement } from "@utils";
 import { IStyle } from "../../types";
 import { IDict } from "@resk/core";
-import { IThemeColorTokenKey } from "@theme/types";
+import { IThemeColorsTokenName } from "@theme/types";
 
 /**
  * 
@@ -157,9 +157,9 @@ export type ILabelProps = Omit<TextProps, "role" | "children" | "style"> & {
    */
   color?: string;
   /***
-   * @type : IThemeColorTokenKey, Color scheme for the label, one of the theme's tokens keys
+   * @type : IThemeColorsTokenName, Color scheme for the label, one of the theme's tokens keys
    */
-  colorScheme?: IThemeColorTokenKey;
+  colorScheme?: IThemeColorsTokenName;
 
   /***
    * @type string,  Background color of the text

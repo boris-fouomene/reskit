@@ -1,5 +1,5 @@
 import { isObj } from '@resk/core';
-import { ITouchableEventNames, ITouchableEvents } from '../types';
+import { ITouchableEventNames, ITouchableProps } from '../types';
 
 /**
  * An array of touchable event names that can be used with touchable components.
@@ -46,7 +46,7 @@ const touchableEvents: ITouchableEventNames[] = [
  * if it contains any of the defined touchable event handlers. It returns
  * `true` if at least one handler is present, otherwise it returns `false`.
  * 
- * @param {ITouchableEvents} props - An object that may contain touch event handlers.
+ * @param {ITouchableProps} props - An object that may contain touch event handlers.
  * @returns {boolean} - Returns `true` if any touch event handler is defined; otherwise, `false`.
  * 
  * @example
@@ -61,7 +61,7 @@ const touchableEvents: ITouchableEventNames[] = [
  * const invalidInput = null;
  * const isInvalid = hasTouchHandler(invalidInput); // Returns false
  */
-export function hasTouchHandler(props: ITouchableEvents) {
+export function hasTouchHandler(props: ITouchableProps) {
   if (!isObj(props)) {
     return false;
   }
@@ -80,8 +80,8 @@ export function hasTouchHandler(props: ITouchableEvents) {
  * a new object with only the handlers that are defined for the touchable events.
  * If no valid handlers are found, the function returns an empty object.
  *
- * @param {@link ITouchableEvents} props - An object that may contain touch event handlers.
- * @returns {@link ITouchableEvents | null} An object with the valid touch event handlers, or `null` if none are found.
+ * @param {@link ITouchableProps} props - An object that may contain touch event handlers.
+ * @returns {@link ITouchableProps | null} An object with the valid touch event handlers, or `null` if none are found.
  *
  * @example
  * // Example usage of getTouchableProps
@@ -98,8 +98,8 @@ export function hasTouchHandler(props: ITouchableEvents) {
  * const emptyHandlers = getTouchableProps({});
  * console.log(emptyHandlers);
  */
-export const getTouchableProps = (props: ITouchableEvents) => {
-  const r: ITouchableEvents = {};
+export const getTouchableProps = (props: ITouchableProps) => {
+  const r: ITouchableProps = {};
   let hasTouchableEvents = false;
   touchableEvents.forEach((event) => {
     if (typeof (props[event]) === 'function') {
@@ -119,8 +119,8 @@ export const getTouchableProps = (props: ITouchableEvents) => {
  * that are defined for the touchable events. If no valid handlers are found, 
  * the function returns `null`.
  *
- * @param {@link ITouchableEvents} props - An object that may contain touch event handlers.
- * @returns {@link ITouchableEvents | null} An object with the valid touch event handlers, or `null` if none are found.
+ * @param {@link ITouchableProps} props - An object that may contain touch event handlers.
+ * @returns {@link ITouchableProps | null} An object with the valid touch event handlers, or `null` if none are found.
  *
  * @example
  * // Example usage of pickTouchEventHandlers
@@ -138,11 +138,11 @@ export const getTouchableProps = (props: ITouchableEvents) => {
  * console.log(emptyHandlers); 
  * // Output: null
  */
-export function pickTouchEventHandlers(props: ITouchableEvents): ITouchableEvents | null {
+export function pickTouchEventHandlers(props: ITouchableProps): ITouchableProps | null {
   if (!isObj(props)) {
     return null;
   }
-  const r: ITouchableEvents = {};
+  const r: ITouchableProps = {};
   let hasEvent = false;
   touchableEvents.forEach((event) => {
     if (typeof (props[event]) === 'function') {

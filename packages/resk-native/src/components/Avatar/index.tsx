@@ -178,6 +178,7 @@ export function Avatar<AsProps extends Partial<ITouchableProps> = ViewProps>({
         {source ? <Image
             testID={testID+"-image"}
             source={source}
+            accessibilityLabel={defaultStr(text)}
             borderRadius={rounded ? width / 2 : undefined}
             {...imageProps}
             style={StyleSheet.flatten([styles.avatar,{width,height},imageProps.style])}

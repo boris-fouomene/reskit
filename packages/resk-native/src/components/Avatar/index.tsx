@@ -178,6 +178,8 @@ export function Avatar<AsProps extends Partial<ITouchableProps> = ViewProps>({
         {source ? <Image
             testID={testID+"-image"}
             source={source}
+            height={height}
+            width={width}
             borderRadius={rounded ? width / 2 : undefined}
             {...imageProps}
             style={StyleSheet.flatten([styles.avatar,imageProps.style])}
@@ -199,6 +201,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   text: {
     textAlign: 'center',

@@ -45,7 +45,8 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                 <HStack style={[Theme.styles.m2]}>
                     <Avatar
                         text="AV"
-                        size={"small"}
+                        size={"large"}
+                        colorScheme="success"
                     />
                     <Avatar
                         icon="account-circle"
@@ -56,6 +57,10 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         icon="account-circle"
                         size={"large"}
                         colorScheme="tertiary"
+                    />
+                    <Avatar
+                        size="xlarge"
+                        source={{ uri: "https://picsum.photos/200" }}
                     />
                 </HStack>
             </View>

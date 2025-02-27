@@ -8,7 +8,6 @@ import updateNative from "./updateNative";
 import styles from "./styles";
 import { useReskNative } from "@src/context/hooks";
 import Elevations from "./Elevations";
-import { useColorScheme } from "react-native";
 import { IBreakpointName } from "@breakpoints/types";
 import Breakpoints from "@breakpoints/index";
 export * from "./utils";
@@ -267,14 +266,15 @@ export function createTheme(theme: ITheme): IThemeManager {
             const result: { color?: string; backgroundColor?: string } = {};
             // Handle "on" prefixed colors (e.g., "onPrimary")
             if ((colorSheme as string).startsWith("on")) {
-                (result as IDict).color = context.colors[colorSheme];
-                let bgColorKey = colorSheme.slice(2);
-                if (bgColorKey) {
-                    bgColorKey = bgColorKey.charAt(0).toLowerCase() + bgColorKey.slice(1);
-                    if (bgColorKey in context.colors) {
-                        (result as IDict).backgroundColor = context.colors[bgColorKey as keyof typeof context.colors];
+                (result as IDict).backgroundColor = context.colors[colorSheme];
+                let colorKey = colorSheme.slice(2);
+                if (colorKey) {
+                    colorKey = colorKey.charAt(0).toLowerCase() + colorKey.slice(1);
+                    if (colorKey in context.colors) {
+                        (result as IDict).color = context.colors[colorKey as keyof typeof context.colors];
                     }
                 }
+
             } else {
                 (result as IDict).backgroundColor = context.colors[colorSheme];
                 const bgColorKey = "on" + colorSheme.charAt(0).toUpperCase() + colorSheme.slice(1);

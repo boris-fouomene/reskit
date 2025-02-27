@@ -52,18 +52,25 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         }}
                     />
                     <Avatar
-                        icon="account-circle"
+                        icon="check"
                         size={"medium"}
                         colorScheme="secondary"
                     />
                     <Avatar
-                        icon="account-circle"
+                        icon="file-document"
                         size={"large"}
                         colorScheme="tertiary"
                     />
                     <Avatar
                         size="xlarge"
                         source={{ uri: "https://picsum.photos/200" }}
+                    />
+                    <Avatar
+                        size="small"
+                        colorScheme="onPrimary"
+                        icon = {({color})=>{
+                            return <Icon color={color} iconName="check" />
+                        }}
                     />
                 </HStack>
             </View>

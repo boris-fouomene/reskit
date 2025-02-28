@@ -412,6 +412,12 @@ describe('InputFormatter', () => {
             expect(InputFormatter.formatWithMask({ value: '2022-01-01', ...mask })).toMatchObject({ masked: '2022-01-01', unmasked: '2022-01-01', obfuscated: '2022-01-01', maskHasObfuscation: false, placeholder: 'YYYY-MM-DD', isValid: true });
             expect(InputFormatter.formatWithMask({ value: '2022-02-30', ...mask })).toMatchObject({ masked: '2022-02-30', unmasked: '2022-02-30', obfuscated: '2022-02-30', maskHasObfuscation: false, placeholder: 'YYYY-MM-DD', isValid: false });
         });
+
+        it("Should test Time format", () => {
+            const mask = InputFormatter.createDateMask('HH:mm:ss');
+            expect(InputFormatter.formatWithMask({ value: '12:00:00', ...mask })).toMatchObject({ masked: '12:00:00', unmasked: '12:00:00', obfuscated: '12:00:00', maskHasObfuscation: false, placeholder: 'HH:mm:ss', isValid: true });
+            expect(InputFormatter.formatWithMask({ value: '12:60:00', ...mask })).toMatchObject({ masked: '12:60:00', unmasked: '12:60:00', obfuscated: '12:60:00', maskHasObfuscation: false, placeholder: 'HH:mm:ss', isValid: false });
+        });
     });
     describe("create cameroon phone number mask", () => {
         it("should create a phone number mask with a CM country code", () => {

@@ -655,6 +655,20 @@ export interface IInputFormatterMaskResult {
    * Whether the input value matches the specified mask.
    */
   isValid: boolean;
+
+  /***
+   * Represent an array of replaced non regex mask char from the input value.
+   * index : the index of the replaced char in the value
+   * maskIndex : the index of the replaced char in the mask
+   * from : the char that was replaced. It represents the original char at index index in the value
+   * to : the char that was replaced with. It represents the original char at index maskIndex in the mask
+   */
+  nonRegexReplacedChars: {
+    index: number;
+    maskIndex: number;
+    from: string;
+    to: string;
+  }[]
 }
 /**
  * @type IMomentFormat

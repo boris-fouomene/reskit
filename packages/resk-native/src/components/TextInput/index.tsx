@@ -17,6 +17,9 @@ import Breakpoints from "@breakpoints/index";
 import { Calendar, CalendarModalContext } from "@components/Date";
 import { useI18n } from "@src/i18n";
 import { SelectCountryRef } from "./SelectCountryRef";
+import p from "@platform";
+
+const isNative = p.isNative();
 
 /**
  * @description
@@ -90,14 +93,14 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
     return <View {...containerProps} >
         {isLabelEmbededVariant ? null : labelContent}
         <Wrapper {...wrapperProps} {...contentContainerProps} style={[styles.wrapper, contentContainerProps?.style]}>
-            <View testID={testID+"-left-content-container"} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContentContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
+            <View testID={testID + "-left-content-container"} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContentContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
                 {left}
                 {isLabelEmbededVariant ? labelContent : null}
-           </View> 
-           <View testID={testID+"-input-container"} style={[styles.inputContainer,canWrapWithTouchable && styles.leftContainerWrappedWithTouchable]}>
-                 {inputElement}
             </View>
-            {right ? (<View testID={testID+"-right-content-container"} style={[styles.leftOrRightContainer,styles.rightContentContainer]}>
+            <View testID={testID + "-input-container"} style={[styles.inputContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable]}>
+                {inputElement}
+            </View>
+            {right ? (<View testID={testID + "-right-content-container"} style={[styles.leftOrRightContainer, styles.rightContentContainer]}>
                 {right}
             </View>) : null}
         </Wrapper>
@@ -143,7 +146,7 @@ const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compa
         { borderColor, borderRadius: theme.roundness },
     ];
     const notEmbeededLabelStyle = [styles.notEmbededLabelStyle],
-        notEmbeededInputStyle : IStyle[]= []
+        notEmbeededInputStyle: IStyle[] = []
     if (isLabelEmbededVariant) {
         contentContainerStyle.push(borderedStyle);
     } else if (isFlatVariant) {
@@ -294,14 +297,6 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             setIsSecure(secureTextEntry);
         }
     }, [secureTextEntry]);
-    const { inputMode, isNumberType: canValueBeDecimal } = useMemo(() => {
-        const inputMode = !isFocused ? "text" : cInputMode || type == "number" ? "decimal" : type !== "password" ? type : "text";
-        const isNumberType = isDecimalType(inputMode as string);
-        return {
-            inputMode,
-            isNumberType
-        }
-    }, [type, cInputMode, isFocused]);
     const { isPhone, isDateOrTime, typeString } = useMemo(() => {
         const t = String(type).toLowerCase();
         return {
@@ -310,6 +305,21 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             isDateOrTime: t == "datetime" || t == "date" || t == "time"
         }
     }, [type]);
+    const { inputMode, isNumberType: canValueBeDecimal } = useMemo(() => {
+        let inputMode = !isFocused ? "text" : cInputMode || type == "number" ? "decimal" : type !== "password" ? type : "text";
+        if (isPhone) {
+            inputMode = "tel";
+        } else if (isDateOrTime) {
+            inputMode = "datetime";
+        } else if (typeString === "email") {
+            inputMode = "email";
+        }
+        const isNumberType = isDecimalType(inputMode as string);
+        return {
+            inputMode,
+            isNumberType
+        }
+    }, [type, cInputMode, isFocused, isPhone, isDateOrTime, typeString]);
     const emptyValue = cIsEmptyValue || (canValueBeDecimal ? "0" : "");
     const PhoneMaskOrUndefined = useMemo(() => {
         if (isPhone) {
@@ -359,7 +369,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         if (cToCase) return cToCase(value);
         if (value == undefined) value = '';
         if (isStringNumber(String(value))) value += "";
-        if (canValueBeDecimal) {
+        if (canValueBeDecimal && !InputFormatter.doesValueEndsWithDecimalSeparator(value)) {
             value = InputFormatter.parseDecimal(value);
         }
         if (isPhone && PhoneMaskOrUndefined && isNonNullString(PhoneMaskOrUndefined?.dialCode)) {
@@ -380,7 +390,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     const formatted = useMemo(() => {
         return InputFormatter.formatValueToObject({ ...props, ...inputState, dateFormat, type, value: inputState.value });
     }, [inputState.value, type, dateFormat]);
-    const focusedValue = isFocused ? (formatted.value == emptyValue ? '' : formatted.value) : '';
+    const focusedValue = isFocused ? (formatted.value === emptyValue ? '' : formatted.value) : '';
     useEffect(() => {
         if (areCasesEquals(valCase, inputState)) return;
         setInputState({ ...inputState, ...valCase, event: null });
@@ -452,7 +462,6 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
 
     const calendarIProps = Object.assign({}, iconProps);
     const calendarRef = useRef<CalendarModalContext>(null);
-    const onChangeEventRef = useRef<NativeSyntheticEvent<TextInputChangeEventData>>();
     const calendarFlag = canRenderCalendar && editable ? <>
         <FontIcon
             color={textColor}
@@ -555,22 +564,24 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         ],
         value: inputValue,
         inputMode: inputMode as any,
-        autoCorrect: !mask?.length && props?.autoCorrect,
-        onChangeText: (text: string) => {
-            let textString = String(text);
+        autoCorrect: !maskArray?.length && props?.autoCorrect,
+        spellCheck: !maskArray?.length && props?.spellCheck,
+        importantForAutofill: maskArray?.length ? "no" : props?.importantForAutofill,
+        onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
+            const { text: textString } = event.nativeEvent;
             if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
                 return;
             }
-            const event = onChangeEventRef.current;
             const valCase2 = toCase(textString);
             const value = inputState.placeholder ? valCase2.masked : valCase2.value;
             if (event?.nativeEvent) {
                 event.nativeEvent.text = value as string;
             }
-            if (typeof props.onChangeText == "function") {
-                props.onChangeText(text);
-            }
             if (textString !== inputState.value && inputState.value != value && !areCasesEquals(valCase2, inputState)) {
+                //Fix repeated input, from native text input in animated mobile input
+                if (isNative && Array.isArray(valCase2.nonRegexReplacedChars) && valCase2.nonRegexReplacedChars?.length) {
+                    //return;
+                }
                 const options = { ...inputState, isFocused, type, dateFormat, phoneCountryCode, ...valCase2, value, text: textString, event };
                 setInputState(options);
                 if (typeof onChange == "function" && valCase2.isValid !== false) {
@@ -580,9 +591,6 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
                     }, isNumber(debounceTimeout) && debounceTimeout > 0 ? debounceTimeout : 0);
                 }
             }
-        },
-        onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
-            onChangeEventRef.current = event;
         },
         onKeyPress: (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
             if (!isFocused) {
@@ -697,21 +705,21 @@ const styles = StyleSheet.create({
         alignSelf: "center",
     },
     wrapper: {
-        width : '100%',
+        width: '100%',
         flexDirection: "row",
-        position : 'relative',
-        justifyContent : 'center',
-        alignSelf : 'flex-start',
-        alignItems : 'flex-start',
+        position: 'relative',
+        justifyContent: 'center',
+        alignSelf: 'flex-start',
+        alignItems: 'flex-start',
     },
-    inputContainer : {
-        flex:1,
-        flexGrow : 1,
+    inputContainer: {
+        flex: 1,
+        flexGrow: 1,
     },
-    rightContentContainer : {
-        flexGrow : 0,
-        alignSelf : 'center',
-        justifyContent : 'flex-end'
+    rightContentContainer: {
+        flexGrow: 0,
+        alignSelf: 'center',
+        justifyContent: 'flex-end'
     },
     leftOrRightContainer: {
         display: "flex",

@@ -1,4 +1,4 @@
-import { Tab, TextInput, withAppBar,Avatar, Badge, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
+import { Tab, TextInput, withAppBar, Avatar, Badge, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
 import { View, ScrollView } from 'react-native'
 import { IField, InputFormatter } from "@resk/core";
 
@@ -47,8 +47,8 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         text="AV"
                         size={"large"}
                         colorScheme="success"
-                        onPress={(event)=>{
-                            console.log(event," is pressed");
+                        onPress={(event) => {
+                            console.log(event, " is pressed");
                         }}
                     />
                     <Avatar
@@ -68,15 +68,16 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                     <Avatar
                         size="small"
                         colorScheme="onPrimary"
-                        icon = {({color})=>{
+                        elevation={5}
+                        icon={({ color }) => {
                             return <Icon color={color} iconName="check" />
                         }}
                     />
                 </HStack>
             </View>
             <HStack>
-                <TextInput 
-                    left={({ textColor}) => {
+                <TextInput
+                    left={({ textColor }) => {
                         return <>
                             <Icon color={textColor} iconName="camera" />
                             <Icon color={textColor} iconName="check" />
@@ -86,7 +87,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                     onChange={(options) => {
                         console.log(options.value, " is options date changeddddd")
                     }}
-                    right={({ textColor}) => {
+                    right={({ textColor }) => {
                         return <>
                             <Icon color={textColor} iconName="ring" />
                             <Icon color={textColor} iconName="account-circle" />
@@ -108,22 +109,23 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         console.log(options.value, " is options phone changeddddd")
                     }}
                 />
-                <TextInput left={({textColor})=><><Icon iconName="check"/><Icon iconName="youtube"/></>} 
+                <TextInput left={({ textColor }) => <><Icon color={textColor} iconName="check" /><Icon color={textColor} iconName="youtube" /></>}
                     variant="labelEmbeded" label="Label Embeeded" type="datetime"
                 />
+                <TextInput label="Number example" type="number" />
             </HStack>
-            
+
             <Form
                 fields={{
-                    name : {
-                        type:"text",
-                        label : "My Name",
-                        defaultValue : "myName"
+                    name: {
+                        type: "text",
+                        label: "My Name",
+                        defaultValue: "myName"
                     },
                     checkbox: {
-                        type : "checkbox",
-                        label : "My Checkbox",
-                        defaultValue : true
+                        type: "checkbox",
+                        label: "My Checkbox",
+                        defaultValue: true
                     },
                 }}
             />

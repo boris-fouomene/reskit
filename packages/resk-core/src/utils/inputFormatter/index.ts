@@ -193,12 +193,24 @@ export class InputFormatter {
     if (value == undefined || value == null || !value || typeof value !== 'string') {
       return 0;
     }
-    value = String(value).trim();
-    if (!value.includes(".")) {
-      value = value.replace(",", ".");
+    const decimalSeparator = ".";
+    const normalized = String(value).trim().replace(/\s/g, '').replace(/[,٫·]/g, decimalSeparator)
+    // Check if input ends with a decimal separator
+    //const endsWithSeparator = ignoreDecimalSeparator ? false : normalized.endsWith(decimalSeparator);
+    const v = parseFloat(value);
+    if (typeof v === "number") {
+      return v;
     }
-    const v = parseFloat(value.replaceAll(" ", ''));
-    return typeof v === "number" && v || 0;
+    return 0;
+  }
+  /***
+   * Check if the value ends with a decimal separator
+   * @param {any} value - The value to Check
+   * @returns {boolean} Whether the value ends with a decimal separator
+   */
+  static doesValueEndsWithDecimalSeparator = (value: any): boolean => {
+    const val = String(value).trim().replace(/\s/g, '');
+    return val.endsWith(".") || val.endsWith(",") || val.endsWith("٫");
   }
   /**
    * Formats a value with a mask.
@@ -253,6 +265,7 @@ export class InputFormatter {
         maskArray,
         placeholder,
         isValid: isValid && calValidate(value),
+        nonRegexReplacedChars: [],
       };
     }
     let masked = '';
@@ -262,6 +275,7 @@ export class InputFormatter {
     let valueCharIndex = 0;
     let maskHasObfuscation = false;
     const placeholderLength = placeholder.length;
+    const nonRegexReplacedChars = [];
     while (maskCharIndex < maskArray.length) {
       const maskChar = maskArray[maskCharIndex];
       const valueChar = value[valueCharIndex];
@@ -282,33 +296,54 @@ export class InputFormatter {
         const maskCharString = String(maskCharRegex);
         try {
           const isReg = isRegExp(maskCharRegex);
-          const matchRegex = isReg ? RegExp(maskCharRegex).test(valueChar) : maskCharString === valueChar;
+          const matchRegex = isReg && RegExp(maskCharRegex).test(valueChar);
+          const matchFixed = !isReg && maskCharString === valueChar;
+          const isMatch = matchRegex || matchFixed;
           const valToAdd = isReg ? valueChar : maskCharString;
-          // value match regex: add to masked and unmasked result and advance on mask index too
-          if (matchRegex) {
+          if (!isMatch) {
+            isValid = false;
+          }
+          if (matchRegex || !isReg) {
+            // value match regex: add to masked and unmasked result and advance on mask index too
             masked += valToAdd;
             obfuscated += (shouldObsfucateChar ? obfuscatedCharacter : valToAdd);
             if (placeholderLength > valueCharIndex) {
               maskedPlaceholder = maskedPlaceholder.substring(0, maskCharIndex) + valToAdd + maskedPlaceholder.substring(valueCharIndex + 1)
             }
-          } else {
-            isValid = false;
+            if (!isReg && !matchFixed) {
+              nonRegexReplacedChars.push({
+                index: valueCharIndex,
+                maskIndex: maskCharIndex,
+                from: valueChar,
+                to: maskCharString,
+                valueChar,
+                maskChar,
+              });
+            }
           }
         } catch (e) { }
       } else if (isNonNullString(maskChar)) {
-        if (maskChar !== valueChar) {
-          isValid = false;
-        }
         // it's a fixed maskChar: add to maskedResult and advance on mask index
         masked += maskChar;
         obfuscated += maskChar;
+        if (maskChar !== valueChar) {
+          isValid = false;
+          nonRegexReplacedChars.push({
+            index: valueCharIndex,
+            maskIndex: maskCharIndex,
+            from: valueChar,
+            to: maskChar,
+            valueChar,
+            maskChar,
+          });
+        }
       } else {
         isValid = false;
       }
       maskCharIndex += 1;
       valueCharIndex += 1;
     }
-    return { masked, isValid: isValid && calValidate(value), maskHasObfuscation, placeholder, maskedPlaceholder, unmasked, obfuscated, maskArray };
+    return { masked, nonRegexReplacedChars, isValid: isValid && calValidate(value), maskHasObfuscation, placeholder, maskedPlaceholder, unmasked, obfuscated, maskArray };
   }
   /***
    * Predefined masks for common moment formats.
@@ -452,7 +487,7 @@ export class InputFormatter {
     const countryExample = CountriesManager.getPhoneNumberExample(countryCode);
     if (isNonNullString(countryExample)) {
       const r = InputFormatter.createPhoneNumberMaskFromExample(countryExample, countryCode);
-      if(r.mask.length){
+      if (r.mask.length) {
         return r;
       }
     }
@@ -489,18 +524,18 @@ export class InputFormatter {
         validate: (value: string) => false,
       }
     }
-  } 
+  }
   /****
     * Gets the phone number example for the given country code.
     * @param countryCode The country code.
     * @returns {PhoneNumber|null} The phone number example for the given country code, or null if no example is found.
   */
-  static getPhoneNumberExample(countryCode: ICountryCode): PhoneNumber|null {
-    if(!isNonNullString(countryCode)) {
+  static getPhoneNumberExample(countryCode: ICountryCode): PhoneNumber | null {
+    if (!isNonNullString(countryCode)) {
       return null;
     }
     const example = CountriesManager.getPhoneNumberExample(countryCode);
-    if(isNonNullString(example)){
+    if (isNonNullString(example)) {
       return InputFormatter.parsePhoneNumber(example);
     }
     try {
@@ -525,12 +560,12 @@ export class InputFormatter {
     @returns {IInputFormatterMaskWithValidation} An object containing the mask and a validation function.
   */
   static createPhoneNumberMaskFromExample(phoneNumber: string, countryCode?: ICountryCode, format?: PhoneNumberFormat): IInputFormatterMaskWithValidation {
-    const r = genPhoneNumberMask(InputFormatter.parsePhoneNumber(phoneNumber, countryCode),format);
-    if(r.mask.length > 0) {
+    const r = genPhoneNumberMask(InputFormatter.parsePhoneNumber(phoneNumber, countryCode), format);
+    if (r.mask.length > 0) {
       return r;
     }
-    if(isNonNullString(countryCode)) {
-      return genPhoneNumberMask(InputFormatter.getPhoneNumberExample(countryCode),format);
+    if (isNonNullString(countryCode)) {
+      return genPhoneNumberMask(InputFormatter.getPhoneNumberExample(countryCode), format);
     }
     return {
       mask: [],
@@ -793,28 +828,28 @@ const generatePhoneNumberMaskArray = (phoneNumber: string, dialCode: string): II
   return r;
 }
 
-function genPhoneNumberMask (parsedNumber:PhoneNumber|null,format?:PhoneNumberFormat): IInputFormatterMaskWithValidation{
+function genPhoneNumberMask(parsedNumber: PhoneNumber | null, format?: PhoneNumberFormat): IInputFormatterMaskWithValidation {
   try {
-      // Parse the phone number
-      if (parsedNumber) {
-        const toFormat = format || PhoneNumberFormat.INTERNATIONAL
-        // Get the formatted version to base the mask on
-        const formattedNumber = phoneUtil.format(parsedNumber, toFormat);
-        if(isNonNullString(formattedNumber)) {
-          // Get region code
-          const regionCode = phoneUtil.getRegionCodeForNumber(parsedNumber);
-          const dialCode = parsedNumber.getCountryCode() + "";
-          return {
-            dialCode,
-            mask: generatePhoneNumberMaskArray(formattedNumber, dialCode),
-            validate: (value: string) => InputFormatter.isValidPhoneNumber(value, regionCode as ICountryCode),
-            countryCode: regionCode as ICountryCode
-          };
-        }
+    // Parse the phone number
+    if (parsedNumber) {
+      const toFormat = format || PhoneNumberFormat.INTERNATIONAL
+      // Get the formatted version to base the mask on
+      const formattedNumber = phoneUtil.format(parsedNumber, toFormat);
+      if (isNonNullString(formattedNumber)) {
+        // Get region code
+        const regionCode = phoneUtil.getRegionCodeForNumber(parsedNumber);
+        const dialCode = parsedNumber.getCountryCode() + "";
+        return {
+          dialCode,
+          mask: generatePhoneNumberMaskArray(formattedNumber, dialCode),
+          validate: (value: string) => InputFormatter.isValidPhoneNumber(value, regionCode as ICountryCode),
+          countryCode: regionCode as ICountryCode
+        };
       }
+    }
   } catch (error) { }
   return {
-    mask:[],
-    validate: ()=>false,
+    mask: [],
+    validate: () => false,
   }
 }

@@ -48,6 +48,7 @@ const isNative = p.isNative();
  * Example Usage:
  * ```ts
  * import {TextInput} from "@resk/native";
+import defaultVal from '../../../../../../frontend-dash/src/utils/defaultVal';
  *
  * export function MyTextInput() {
  *     // Callback function to handle changes in the input
@@ -526,6 +527,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         placeholderTextColor: isFocused || error ? textColor : theme.colors.placeholder,
         underlineColorAndroid: "transparent",
         ...props,
+        defaultValue : undefined,
         inputRef,
         focus,
         onContentSizeChange: (event) => {

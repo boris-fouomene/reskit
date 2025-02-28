@@ -193,15 +193,23 @@ export class InputFormatter {
     if (value == undefined || value == null || !value || typeof value !== 'string') {
       return 0;
     }
-    const decimalSeparator = ".";
-    const normalized = String(value).trim().replace(/\s/g, '').replace(/[,٫·]/g, decimalSeparator)
-    // Check if input ends with a decimal separator
-    //const endsWithSeparator = ignoreDecimalSeparator ? false : normalized.endsWith(decimalSeparator);
-    const v = parseFloat(value);
-    if (typeof v === "number") {
-      return v;
+    const v = parseFloat(InputFormatter.normalizeNumber(value));
+    return typeof v === "number" ? v : 0;
+  }
+  /***
+    Normalize a value to a string. 
+    This method takes a value and a facultative decimal separator. It removes leading and trailing
+    whitespace, commas. It also replaces the comma with the decimal separator.
+    If the value is a number, it will be converted to a string.
+    @param {any} value - The value to normalize
+    @param {string} decimalSeparator - The decimal separator to use
+  */
+  static normalizeNumber(value : any,decimalSeparator : string = "."){
+    if(typeof value == "number"){
+      return value.toString();
     }
-    return 0;
+    if(!value || value == undefined || value == null) return "0";
+    return String(value).trim().replace(/\s/g, '').replace(/[,٫·]/g, decimalSeparator)
   }
   /***
    * Check if the value ends with a decimal separator

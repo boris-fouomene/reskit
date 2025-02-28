@@ -360,7 +360,9 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         }
     }, [customMask, customMaskOptions, PhoneMaskOrUndefined, typeString, customDateFormat, isDateOrTime, customDateProps]);
     const toCase = (value: any): { value: string } & Partial<IInputFormatterMaskResult> => {
-        if (canValueBeDecimal && isFocused && (value === '.' || value == '.')) {
+        const valString = String(value);
+        const valEndsWithDecimal = InputFormatter.doesValueEndsWithDecimalSeparator(valString);
+        if (canValueBeDecimal && isFocused && (valString.length ==1 && valEndsWithDecimal)) {
             value = "0" + value;
         }
         if (value === emptyValue && isFocused) {
@@ -369,7 +371,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         if (cToCase) return cToCase(value);
         if (value == undefined) value = '';
         if (isStringNumber(String(value))) value += "";
-        if (canValueBeDecimal && !InputFormatter.doesValueEndsWithDecimalSeparator(value)) {
+        if (canValueBeDecimal && (!valEndsWithDecimal)) {
             value = InputFormatter.parseDecimal(value);
         }
         if (isPhone && PhoneMaskOrUndefined && isNonNullString(PhoneMaskOrUndefined?.dialCode)) {
@@ -459,7 +461,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     const borderColor = isFocused || error ? textColor : theme.colors.outline;
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, withBackground, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     const labelSuffix = suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? <Label color={textColor}>{" "}[{inputMaskPlaceholder}]</Label> : null;
-
+    const onChangeEventRef = useRef<NativeSyntheticEvent<TextInputChangeEventData>>(null);
     const calendarIProps = Object.assign({}, iconProps);
     const calendarRef = useRef<CalendarModalContext>(null);
     const calendarFlag = canRenderCalendar && editable ? <>
@@ -567,17 +569,20 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         autoCorrect: !maskArray?.length && props?.autoCorrect,
         spellCheck: !maskArray?.length && props?.spellCheck,
         importantForAutofill: maskArray?.length ? "no" : props?.importantForAutofill,
-        onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
-            const { text: textString } = event.nativeEvent;
-            if (canValueBeDecimal && (textString && !isStringNumber(textString) && !textString.endsWith(".") && !textString.endsWith(","))) {
-                return;
-            }
+        onChange : (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
+            (onChangeEventRef as any).current = event;
+        },
+        onChangeText : (textString: string) => {
             const valCase2 = toCase(textString);
+            const event = onChangeEventRef.current || undefined;
             const value = inputState.placeholder ? valCase2.masked : valCase2.value;
-            if (event?.nativeEvent) {
-                event.nativeEvent.text = value as string;
+            if (onChangeEventRef.current?.nativeEvent) {
+                onChangeEventRef.current.nativeEvent.text = value as string;
             }
-            if (textString !== inputState.value && inputState.value != value && !areCasesEquals(valCase2, inputState)) {
+            if(typeof props.onChangeText === "function") {
+                props.onChangeText(value as string);
+            }
+            if (textString !== inputState.value && inputState.value !== value && !areCasesEquals(valCase2, inputState)) {
                 //Fix repeated input, from native text input in animated mobile input
                 if (isNative && Array.isArray(valCase2.nonRegexReplacedChars) && valCase2.nonRegexReplacedChars?.length) {
                     //return;
@@ -626,7 +631,8 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
 }
 
 const areCasesEquals = (case1: Partial<IInputFormatterMaskResult>, case2: Partial<IInputFormatterMaskResult>) => {
-    return (case1 as any).value == (case2 as any).value && case1.masked === case2.masked && case1.unmasked === case2.unmasked && case1.obfuscated === case2.obfuscated;
+    return String((case1 as any).value) === String((case2 as any).value) 
+        && case1.masked === case2.masked && case1.unmasked === case2.unmasked && case1.obfuscated === case2.obfuscated;
 }
 
 

@@ -100,9 +100,11 @@ export class InputFormatter {
       } else if ("tel" === typeText) {
         const phoneNumber = InputFormatter.formatPhoneNumber(value, phoneCountryCode);
         formattedValue = defaultStr(phoneNumber, formattedValue);
-        const parsed = phoneNumber ? InputFormatter.parsePhoneNumber(phoneNumber, phoneCountryCode) : null;
+        const parsed = InputFormatter.parsePhoneNumber(phoneNumber as string, phoneCountryCode);
         if (parsed) {
           result.dialCode = parsed.getCountryCode() + "";
+        } else if (phoneCountryCode) {
+          result.dialCode = CountriesManager.getDialCode(phoneCountryCode);
         }
       }
       if (hasFoundDate) { }
@@ -126,7 +128,6 @@ export class InputFormatter {
       ...result,
     };
   }
-
   /**
    * @description
    * Formats a value based on the provided options and returns the formatted string.
@@ -650,9 +651,7 @@ export class InputFormatter {
    * 
    */
   static parsePhoneNumber(number: string, countryCode?: ICountryCode): PhoneNumber | null {
-    if (!isNonNullString(number)) {
-      return null;
-    }
+    number = defaultStr(number);
     try {
       return phoneUtil.parse(number, defaultStr(countryCode).toLowerCase());
     } catch (err) {
@@ -722,7 +721,7 @@ export class InputFormatter {
   * 
    */
   static formatPhoneNumber(phoneNumber: string, countryCode?: ICountryCode): string | null {
-    if (!isNonNullString(phoneNumber)) return "";
+    phoneNumber = defaultStr(phoneNumber);
     try {
       const formatter = new asYouTypeFormatter(defaultStr(countryCode).toLowerCase().trim()); // eslint-disable-line new-cap
       // Clear any previous state in the formatter

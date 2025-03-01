@@ -1,10 +1,10 @@
 import View, { IViewProps } from '@components/View';
 import { uniqid } from '@resk/core';
-import React, { createContext, useRef, useContext, ReactNode, useEffect, useMemo } from 'react';
+import React, { createContext, useRef, useContext, ReactNode, useEffect } from 'react';
 import { StyleSheet, ViewProps } from 'react-native';
 import { getMaxZindex, Platform } from '@resk/core';
 import { IReactComponent } from '../../types';
-
+import { SafeAreaView } from "react-native";
 /**
  * @interface IPortalItem
  * Interface defining the structure of a portal item.
@@ -139,7 +139,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         <PortalContext.Provider value={{ addPortal, removePortal }}>
             {children}
             {/* Dynamically render portal elements with a stacking order based on their position in the array */}
-            <View testID={`${testID}-container`} style={styles.absoluteFill} pointerEvents="box-none">
+            <SafeAreaView testID={`${testID}-container`} style={styles.absoluteFill} pointerEvents="box-none">
                 {portalRefs.current.map(({ key, element, props }, index) => (
                     <RenderPortal
                         testID={`${testID}_${index + 1}`}
@@ -149,7 +149,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                         {...Object.assign({}, props)}
                     />
                 ))}
-            </View>
+            </SafeAreaView>
         </PortalContext.Provider>
     );
 };
@@ -159,7 +159,7 @@ function RenderPortal<AsProps extends ViewProps = IViewProps>({ children, absolu
         {children}
     </View>
 };
-
+RenderPortal.displayName = "Portal.Rendered";
 /**
  * Custom hook to access the portal context and manage adding or removing portals.
  * 

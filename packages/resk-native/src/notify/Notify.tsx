@@ -14,7 +14,7 @@ import Label from "@components/Label";
 import Queue from "./Queue";
 import { DEFAULT_IMAGE_DIMENSIONS } from "./utils";
 import { IStyle } from "../types";
-import { IDict, stringify } from "@resk/core";
+import { defaultStr, IDict, stringify } from "@resk/core";
 import { IDimensions } from "@dimensions/types";
 
 const IS_ANDROID = Platform.isAndroid();
@@ -401,7 +401,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
     );
   };
   getTestID(testID?: string) {
-    return (this.props.testID || "RN_NotifyComponent") + (testID ? "_" + testID : "");
+    return defaultStr(this.props.testID, "resk-notify") + (testID ? "_" + testID : "");
   }
   _renderMessage = () => {
     const options = this.getRenderedCallbackArgs();
@@ -473,7 +473,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
       return null;
     }
     const { elevation, wrapperProps, tapToCloseEnabled, testID: customTestId, accessible, startDelta, endDelta, translucent, showCancel } = this.props;
-    const testID = customTestId || "RN_Notify";
+    const testID = defaultStr(customTestId, "resk-notify");
     const { animationValue, bottomValue, height } = this.state;
     const { type } = this.alertData;
     const style: IStyle = (IS_ANDROID && translucent) ? [this.getStyleForType(type), { paddingTop: StatusBar.currentHeight }, styles.border] : this.getStyleForType(type);

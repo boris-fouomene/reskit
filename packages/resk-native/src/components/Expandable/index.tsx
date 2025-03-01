@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from "react";
 import View, { IViewProps } from "@components/View";
-import { StyleSheet, View as RNView, Pressable,Animated, GestureResponderEvent, ViewProps, } from "react-native";
+import { StyleSheet, View as RNView, Pressable, Animated, GestureResponderEvent, ViewProps, } from "react-native";
 import Label, { ILabelProps } from "@components/Label";
 import { Icon, IIconProps, IIconSource, useGetIcon } from "@components/Icon";
 import { defaultStr } from "@resk/core";
@@ -124,7 +124,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandIconSize, 
   testID = defaultStr(testID, "resk-expandable");
   const iconProps = Object.assign({}, expanded ? expandedIconProps : unexpandedIconProps);
   const iconSize = useMemo(() => typeof expandIconSize == "number" ? expandIconSize : 20, [expandIconSize]);
-  const icon = useGetIcon<{ expanded: boolean }>({ iconComponent: Icon.Button, size: iconSize, ...iconProps, ...eProps, style: [styles.expandableIcon, iconProps.style], expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
+  const icon = useGetIcon<{ expanded: boolean }>({ IconComponent: Icon.Button, size: iconSize, ...iconProps, ...eProps, style: [styles.expandableIcon, iconProps.style], expanded: isExpanded, onPress: handlePressAction, icon: expanded ? (expandedIcon || "chevron-up") : (unexpandedIcon || "chevron-down") })
   const expandIcon = showExpandIcon !== false ? icon : null;
   return (
     <ExpandableContext.Provider value={{ expanded, toggleExpand, expandIcon: icon }}>

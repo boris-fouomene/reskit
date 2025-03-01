@@ -4,6 +4,7 @@ import { IWithHOCOptions, withHOC } from "./withHOC";
 import AppBarLayout from "@layouts/AppBarLayout";
 import { IReskNativeContextCallback } from "@src/context/types";
 import { useReskNative } from "@src/context/hooks";
+import { defaultStr } from "@resk/core";
 
 
 
@@ -85,7 +86,7 @@ import { useReskNative } from "@src/context/hooks";
  */
 export function withAppBar<T extends object, TState extends object = any>(Component: IReactComponent<T, TState>, appBarProps?: IAppBarProps | IReskNativeContextCallback<IAppBarProps>, options?: IWithHOCOptions) {
     options = options || {};
-    options.displayName = options.displayName || Component?.displayName || "RN_WithAppBarComponent";
+    options.displayName = defaultStr(options.displayName, Component?.displayName, "WithAppBarComponent");
     return withHOC<T>(function (props: T) {
         const reskExpoContext = useReskNative();
         const _appBarProps = Object.assign({}, (typeof appBarProps === "function" ? appBarProps(reskExpoContext) : appBarProps)) as IAppBarProps;

@@ -3,7 +3,7 @@ import { useDrawer, useDrawerCurrentState } from "./hooks";
 import _Drawer from "./Drawer";
 import { IDrawerProps } from "./types";
 import { IReactComponent } from "@src/types";
-import { defaultObj } from "@resk/core";
+import { defaultObj, defaultStr } from "@resk/core";
 import DrawerItems from "./DrawerItems";
 import Provider from "./Provider";
 import DrawerItem from "./DrawerItems/DrawerItem";
@@ -66,7 +66,7 @@ interface IWithDrawerOptions {
 export function withDrawer<T extends object>(Component: IReactComponent<T>, props?: IWithDrawerOptions, options?: IWithHOCOptions) {
   options = defaultObj(options);
   const { drawerProps: _drawerProps } = Object.assign({}, props) as IWithDrawerOptions;
-  options.displayName = options.displayName || Component?.displayName || "RN_WithDrawerComponent";
+  options.displayName = defaultStr(options.displayName, Component?.displayName, "WithDrawerComponent");
   return withHOC<T>(function (props: T) {
     const reskExpoContext = useReskNative();
     const drawerProps = Object.assign({}, (typeof _drawerProps === "function" ? _drawerProps(reskExpoContext) : _drawerProps)) as IDrawerProps;

@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { IReskNativeContext } from "./types";
+import { extendObj } from "@resk/core";
 /**
  * @group ReskNativeProvider
  * Creates a context for the ReskNativeProvider.
@@ -48,6 +49,10 @@ export const ReskNativeContext = React.createContext<IReskNativeContext>({} as I
  * ```
  */
 export const useReskNative = () => {
-    return useContext(ReskNativeContext);
+    const context = useContext(ReskNativeContext);
+    if (context) {
+        context.safeAreaInsets = extendObj({}, { top: 0, left: 0, right: 0, bottom: 0 }, context.safeAreaInsets);
+    }
+    return context;
 };
 

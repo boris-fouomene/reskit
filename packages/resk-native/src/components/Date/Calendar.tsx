@@ -206,7 +206,7 @@ export default class Calendar {
         itemsContainerWidth = typeof itemsContainerWidth == "number" && itemsContainerWidth > 10 ? itemsContainerWidth : itemsContainerProps.width;
         const itemsCount = Array.isArray(children) ? children.length : 1;
         const { width: screenWidth, height: screenHeight } = useDimensions();
-        const itemsSize = Math.min(screenWidth * 90 / 100, typeof itemsContainerWidth == "number" && itemsContainerWidth > 10 ? itemsContainerWidth : 392);
+        const itemsSize = Math.min(screenWidth, typeof itemsContainerWidth == "number" && itemsContainerWidth > 10 ? itemsContainerWidth : 392);
         return <CalendarItemContainerContext.Provider value={{ itemsCount, screenWidth, screenHeight }}>
             <View testID={testID + "-items-container"} style={[Styles.calendarItemsContainer]}>
                 <View testID={testID + "-items-container-content"} style={[Styles.calendarItemContainer, { width: itemsSize }]}>
@@ -284,20 +284,22 @@ export default class Calendar {
                     modalContext.handleDismiss(undefined as any);
                 }
             }}
-            header={<View style={[Styles.modalHeader]} testID={testID + "-modal-header"}>
-                {typeof modalContext?.handleDismiss === "function" ? <View testID={testID + "-close-modal-icon"} style={Styles.closeModalIcon}>
-                    <Icon.Button
-                        size={ICON_SIZE}
-                        iconName={"close"}
-                        title={i18n.t("components.calendar.closeModal")}
-                        onPress={(e) => {
-                            if (typeof modalContext?.handleDismiss === "function") {
-                                modalContext.handleDismiss(e);
-                            }
-                        }}
-                    />
-                </View> : null}
-                {isValidElement(header) ? header : null}
+            header={<View style={[Styles.modalHeaderContainer]} testID={testID + "-modal-header-container"}>
+                <View style={[Styles.modalHeader]} testID={testID + "-modal-header"}>
+                    {typeof modalContext?.handleDismiss === "function" ? <View testID={testID + "-close-modal-icon"} style={Styles.closeModalIcon}>
+                        <Icon.Button
+                            size={ICON_SIZE}
+                            iconName={"close"}
+                            title={i18n.t("components.calendar.closeModal")}
+                            onPress={(e) => {
+                                if (typeof modalContext?.handleDismiss === "function") {
+                                    modalContext.handleDismiss(e);
+                                }
+                            }}
+                        />
+                    </View> : null}
+                    {isValidElement(header) ? header : null}
+                </View>
             </View>}
             testID={testID}
         />
@@ -402,6 +404,14 @@ const Styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "flex-start",
         alignSelf: "flex-start",
+        flexGrow: 1,
+    },
+    modalHeaderContainer: {
+        flexDirection: "column",
+        flexGrow: 1,
+        width: "100%",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
     },
     closeModalIcon: {
         marginRight: 5,
@@ -409,6 +419,9 @@ const Styles = StyleSheet.create({
     calendarItemsContainer: {
         flexDirection: "column",
         alignItems: "center",
+        justifyContent: "flex-start",
+        width: "100%",
+        flexGrow: 1,
     },
     calendarDayHeader: {},
     calendarDayHeaderLabel: {

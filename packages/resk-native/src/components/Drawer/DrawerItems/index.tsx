@@ -8,6 +8,7 @@ import { useTheme } from '@theme';
 import { useRenderMenuItems } from '@components/Menu';
 import { IDrawerContext, IDrawerItemProps, IDrawerItemsProps } from '../types';
 import { StyleSheet } from 'react-native';
+import { defaultStr } from '@resk/core';
 
 /**
  * DrawerItems component renders a list of drawer items, including expandable items.
@@ -31,7 +32,7 @@ import { StyleSheet } from 'react-native';
  */
 const DrawerItems = React.forwardRef(({ testID, style, items: customItems, ...rest }: IDrawerItemsProps, ref: React.ForwardedRef<RNView>) => {
   const { drawer } = useDrawer();
-  testID = testID || "RN_DrawerItems";
+  testID = defaultStr(testID, "resk-draweritems")
   const theme = useTheme();
   const items = useRenderMenuItems<IDrawerContext>({
     items: (Array.isArray(customItems) ? customItems : []),

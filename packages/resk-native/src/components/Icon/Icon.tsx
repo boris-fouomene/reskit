@@ -147,7 +147,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, resizeM
  * @example
  * const myIcon = getIcon({ icon: "material-home", color: "blue", theme: customTheme });
  */
-export function getIcon<T = any>({ icon, color: col2, iconComponent, theme, ...rest }: IGetIconOptions<T>): ReactNode {
+export function getIcon<T = any>({ icon, color: col2, IconComponent, theme, ...rest }: IGetIconOptions<T>): ReactNode {
     if (isValidElement(icon)) return icon as ReactNode;
     theme = isObj(theme) && theme || Theme;
     const color: string = (Colors.isValid(col2) ? col2 : theme.colors.text) as string;
@@ -162,7 +162,7 @@ export function getIcon<T = any>({ icon, color: col2, iconComponent, theme, ...r
         iconName,
         ...Object.assign({}, !iconName ? (getIconSource(iconSource)) : undefined),
     }
-    const Component = isReactComponent(iconComponent) && iconComponent || Icon;
+    const Component = isReactComponent(IconComponent) && IconComponent || Icon;
     return <Component {...iconProps} />;
 }
 const getIconSource = (icon: any) => {

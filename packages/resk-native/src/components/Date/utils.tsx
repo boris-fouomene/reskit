@@ -18,43 +18,7 @@ export function renderCalendar({ testID, children, navigateToNext, borderRadius,
     }
     borderRadius = typeof borderRadius === "number" ? borderRadius : 0;
     const canSwipe = typeof navigateToNext === "function" || typeof navigateToPrevious === "function";
-    return <Surface elevation={5} {...props} testID={testID} style={[Styles.calendar, { borderRadius }, props.style]}>
-        {canDisplayHeader ? <View testID={testID + "-header"} style={Styles.header}>
-            {isValidHeader ? <>
-                {header}
-                <Divider style={Styles.headerDivider} />
-            </> : null}
-            {<View testID={`${testID}-header-content-container`} style={Styles.headerContentContainer}>
-                {isValidElement(displayViewToggleButton) ? displayViewToggleButton : <Button compact
-                    testID={testID + "-header-text"}
-                    {...Object.assign({}, displayViewToggleButton)}
-                    style={[Styles.displayViewToggleButton, (displayViewToggleButton as any)?.style]}
-                    containerProps={{ style: Styles.headerButtonContainer }}
-                /> as any}
-                {renderNavigationButtons !== false ? <View testID={testID + "-header-arrow-container"} style={Styles.headerArrowContainer}>
-                    <Icon.Button
-                        iconName="chevron-left"
-                        size={ICON_SIZE}
-                        testID={testID + "-header-arrow-left"}
-                        onPress={(event) => {
-                            if (typeof navigateToPrevious === "function") {
-                                navigateToPrevious(event);
-                            }
-                        }}
-                    />
-                    <Icon.Button
-                        iconName="chevron-right"
-                        size={ICON_SIZE}
-                        testID={testID + "-header-arrow-right"}
-                        onPress={(event) => {
-                            if (typeof navigateToNext === "function") {
-                                navigateToNext(event);
-                            }
-                        }}
-                    />
-                </View> : null}
-            </View>}
-        </View> : null}
+    return <Surface elevation={5} {...props} testID={testID} style={[styles.calendar, { borderRadius }, props.style]}>
         <SwipeGestureHandler testID={testID + "-wipe-gesture"}
             disabled={!canSwipe}
             vertical={false}
@@ -65,17 +29,55 @@ export function renderCalendar({ testID, children, navigateToNext, borderRadius,
                 }
             }}
         >
-            <View testID={testID + "-content"} style={Styles.content} >
-                {isValidElement(children) ? children : null}
+            <View testID={testID + "swipe-gesture-container"} style={[styles.headerOrFooter, styles.swipeContainer]} >
+                {canDisplayHeader ? <View testID={testID + "-header"} style={styles.headerOrFooter}>
+                    {isValidHeader ? <>
+                        {header}
+                        <Divider style={styles.headerDivider} />
+                    </> : null}
+                    {<View testID={`${testID}-header-content-container`} style={styles.headerContentContainer}>
+                        {isValidElement(displayViewToggleButton) ? displayViewToggleButton : <Button compact
+                            testID={testID + "-header-text"}
+                            {...Object.assign({}, displayViewToggleButton)}
+                            style={[styles.displayViewToggleButton, (displayViewToggleButton as any)?.style]}
+                            containerProps={{ style: styles.headerButtonContainer }}
+                        /> as any}
+                        {renderNavigationButtons !== false ? <View testID={testID + "-header-arrow-container"} style={styles.headerArrowContainer}>
+                            <Icon.Button
+                                iconName="chevron-left"
+                                size={ICON_SIZE}
+                                testID={testID + "-header-arrow-left"}
+                                onPress={(event) => {
+                                    if (typeof navigateToPrevious === "function") {
+                                        navigateToPrevious(event);
+                                    }
+                                }}
+                            />
+                            <Icon.Button
+                                iconName="chevron-right"
+                                size={ICON_SIZE}
+                                testID={testID + "-header-arrow-right"}
+                                onPress={(event) => {
+                                    if (typeof navigateToNext === "function") {
+                                        navigateToNext(event);
+                                    }
+                                }}
+                            />
+                        </View> : null}
+                    </View>}
+                </View> : null}
+                <View testID={testID + "-content"} style={[styles.headerOrFooter, styles.content]} >
+                    {isValidElement(children) ? children : null}
+                </View>
+                {footer ? <View testID={testID + "-footer"} style={styles.headerOrFooter}>
+                    {footer}
+                </View> : null}
             </View>
         </SwipeGestureHandler>
-        {footer ? <View testID={testID + "-footer"} style={Styles.footer}>
-            {footer}
-        </View> : null}
     </Surface>
 }
 
-const Styles = StyleSheet.create({
+const styles = StyleSheet.create({
     headerDivider: {
         width: "100%",
     },
@@ -83,10 +85,19 @@ const Styles = StyleSheet.create({
         opacity: 0.65,
     },
     content: {
-        flexDirection: "column",
+        flexGrow: 1,
     },
-    header: {
+    headerOrFooter: {
         width: "100%",
+        position: "relative",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        alignSelf: "flex-start",
+    },
+    swipeContainer: {
+        flex: 1,
+        flexGrow: 1,
     },
     displayViewToggleButton: {
     },
@@ -99,6 +110,7 @@ const Styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         paddingVertical: 5,
+        width: "100%",
     },
     headerArrowContainer: {
         display: "flex",
@@ -107,15 +119,14 @@ const Styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
     },
-    footer: {
-        width: "100%",
-    },
     calendar: {
         flexDirection: "column",
         alignItems: 'center',
         justifyContent: "center",
         alignSelf: "center",
         padding: 10,
+        flexGrow: 0,
+        position: "relative",
     },
 })
 

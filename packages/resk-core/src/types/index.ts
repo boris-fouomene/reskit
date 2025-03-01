@@ -238,6 +238,10 @@ export interface IInputFormatterOptions {
    * Format for date types
    */
   dateFormat?: IMomentFormat;
+  /***
+   * The phone country code, in case of formatting a phone number, type="tel"
+   */
+  phoneCountryCode?: ICountryCode;
 }
 
 /**
@@ -530,6 +534,10 @@ export interface IInputFormatterResult extends IInputFormatterOptions, Partial<I
     there dateFormat used to format the value
   */
   dateFormat?: IMomentFormat;
+  /***
+   * The dial code of the phone number in case of formatting a phone number
+   */
+  dialCode?: string;
 }
 
 /**

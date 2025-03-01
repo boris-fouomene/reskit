@@ -1,12 +1,12 @@
 import { InputFormatter } from './index';
 describe('InputFormatter', () => {
-    describe('formatValueToObject', () => {
+    describe('formatValue', () => {
         it('should format a decimal value', () => {
             const options = {
                 value: '123.45',
                 type: 'decimal',
             };
-            const result = InputFormatter.formatValueToObject(options);
+            const result = InputFormatter.formatValue(options);
             expect(result.formattedValue).toBe('123.45');
             expect(result.isDecimalType).toBe(true);
             expect(result.value).toBe('123.45');
@@ -19,7 +19,7 @@ describe('InputFormatter', () => {
                 value: '123',
                 type: 'numeric',
             };
-            const result = InputFormatter.formatValueToObject(options);
+            const result = InputFormatter.formatValue(options);
             expect(result.formattedValue).toBe('123');
             expect(result.isDecimalType).toBe(true);
             expect(result.value).toBe('123');
@@ -32,7 +32,7 @@ describe('InputFormatter', () => {
                 value: '123',
                 type: 'number',
             };
-            const result = InputFormatter.formatValueToObject(options);
+            const result = InputFormatter.formatValue(options);
             expect(result.formattedValue).toBe('123');
             expect(result.isDecimalType).toBe(true);
             expect(result.value).toBe('123');
@@ -45,7 +45,7 @@ describe('InputFormatter', () => {
                 value: new Date('2022-01-01'),
                 type: 'date',
             };
-            const result = InputFormatter.formatValueToObject(options);
+            const result = InputFormatter.formatValue(options);
             expect(result.formattedValue).toBe('01/01/2022');
             expect(result.isDecimalType).toBe(false);
             expect(result.value).toBeInstanceOf(Date);
@@ -58,7 +58,7 @@ describe('InputFormatter', () => {
                 value: new Date('2022-01-01T12:00:00'),
                 type: 'time',
             };
-            const result = InputFormatter.formatValueToObject(options);
+            const result = InputFormatter.formatValue(options);
             expect(result.formattedValue).toBe('12:00:00');
             expect(result.isDecimalType).toBe(false);
             expect(result.value).toBeInstanceOf(Date);
@@ -71,7 +71,7 @@ describe('InputFormatter', () => {
                 value: new Date('2022-01-01T12:00:00'),
                 type: 'datetime',
             };
-            const result = InputFormatter.formatValueToObject(options);
+            const result = InputFormatter.formatValue(options);
             expect(result.formattedValue).toBe('01/01/2022 12:00:00');
             expect(result.isDecimalType).toBe(false);
             expect(result.value).toBeInstanceOf(Date);
@@ -85,7 +85,7 @@ describe('InputFormatter', () => {
                 type: 'custom',
                 format: (opts: { value: string }) => `${opts.value} formatted`,
             };
-            const result = InputFormatter.formatValueToObject(options as any);
+            const result = InputFormatter.formatValue(options as any);
             expect(result.formattedValue).toBe('123 formatted');
             expect(result.isDecimalType).toBe(false);
             expect(result.value).toBe('123');
@@ -98,7 +98,7 @@ describe('InputFormatter', () => {
                 value: '',
                 type: 'decimal',
             };
-            const result = InputFormatter.formatValueToObject(options);
+            const result = InputFormatter.formatValue(options);
             expect(result.formattedValue).toBe('0');
             expect(result.isDecimalType).toBe(true);
             expect(result.value).toBe("");
@@ -111,7 +111,7 @@ describe('InputFormatter', () => {
                 value: null,
                 type: 'decimal',
             };
-            const result = InputFormatter.formatValueToObject(options);
+            const result = InputFormatter.formatValue(options);
             expect(result.formattedValue).toBe('0');
             expect(result.isDecimalType).toBe(true);
             expect(result.value).toBe("");
@@ -124,7 +124,7 @@ describe('InputFormatter', () => {
                 value: undefined,
                 type: 'decimal',
             };
-            const result = InputFormatter.formatValueToObject(options);
+            const result = InputFormatter.formatValue(options);
             expect(result.formattedValue).toBe('0');
             expect(result.isDecimalType).toBe(true);
             expect(result.value).toBe("");
@@ -133,13 +133,13 @@ describe('InputFormatter', () => {
         });
     });
 
-    describe('formatValue', () => {
+    describe('formatValueAsString', () => {
         it('should format a decimal value', () => {
             const options = {
                 value: '123.45',
                 type: 'decimal',
             };
-            const result = InputFormatter.formatValue(options);
+            const result = InputFormatter.formatValueAsString(options);
             expect(result).toBe('123.45');
         });
 
@@ -148,7 +148,7 @@ describe('InputFormatter', () => {
                 value: '123',
                 type: 'numeric',
             };
-            const result = InputFormatter.formatValue(options);
+            const result = InputFormatter.formatValueAsString(options);
             expect(result).toBe('123');
         });
 
@@ -157,7 +157,7 @@ describe('InputFormatter', () => {
                 value: '123',
                 type: 'number',
             };
-            const result = InputFormatter.formatValue(options);
+            const result = InputFormatter.formatValueAsString(options);
             expect(result).toBe('123');
         });
 
@@ -166,7 +166,7 @@ describe('InputFormatter', () => {
                 value: new Date('2022-01-01'),
                 type: 'date',
             };
-            const result = InputFormatter.formatValue(options);
+            const result = InputFormatter.formatValueAsString(options);
 
             expect(result).toBe('01/01/2022');
         });
@@ -176,7 +176,7 @@ describe('InputFormatter', () => {
                 value: new Date('2022-01-01T12:00:00'),
                 type: 'time',
             };
-            const result = InputFormatter.formatValue(options);
+            const result = InputFormatter.formatValueAsString(options);
             expect(result).toBe('12:00:00');
         });
 
@@ -185,7 +185,7 @@ describe('InputFormatter', () => {
                 value: new Date('2022-01-01T12:00:00'),
                 type: 'datetime',
             };
-            const result = InputFormatter.formatValue(options);
+            const result = InputFormatter.formatValueAsString(options);
             expect(result).toBe('01/01/2022 12:00:00');
         });
 
@@ -195,7 +195,7 @@ describe('InputFormatter', () => {
                 type: 'custom',
                 format: (opts: { value: string }) => `${opts.value} formatted`,
             };
-            const result = InputFormatter.formatValue(options as any);
+            const result = InputFormatter.formatValueAsString(options as any);
             expect(result).toBe('123 formatted');
         });
 
@@ -204,7 +204,7 @@ describe('InputFormatter', () => {
                 value: '',
                 type: 'decimal',
             };
-            const result = InputFormatter.formatValue(options);
+            const result = InputFormatter.formatValueAsString(options);
             expect(result).toBe('0');
         });
 
@@ -213,7 +213,7 @@ describe('InputFormatter', () => {
                 value: null,
                 type: 'decimal',
             };
-            const result = InputFormatter.formatValue(options);
+            const result = InputFormatter.formatValueAsString(options);
             expect(result).toBe('0');
         });
 
@@ -222,7 +222,7 @@ describe('InputFormatter', () => {
                 value: undefined,
                 type: 'decimal',
             };
-            const result = InputFormatter.formatValue(options);
+            const result = InputFormatter.formatValueAsString(options);
             expect(result).toBe('0');
         });
     });
@@ -520,6 +520,19 @@ describe('InputFormatter', () => {
             expect(InputFormatter.extractDialCodeFromPhoneNumber('+81 3-1234-5678')).toBe('81');
             expect(InputFormatter.extractDialCodeFromPhoneNumber('020 7183 8750')).toBe('');
             expect(InputFormatter.extractDialCodeFromPhoneNumber('invalid-phone')).toBe('');
+        });
+    });
+
+    describe("Formatting phone numbers", () => {
+        it("should format phone numbers", () => {
+            expect(InputFormatter.formatPhoneNumber('+1 (555) 123-4567')).toBe('+1 555-123-4567');
+            expect(InputFormatter.formatPhoneNumber('+44 20 7123 4567')).toBe('+44 20 7123 4567');
+            expect(InputFormatter.formatPhoneNumber('+81 3-1234-5678')).toBe('+81 3-1234-5678');
+            expect(InputFormatter.formatPhoneNumber('020 7183 8750')).toBe('02071838750');
+            expect(InputFormatter.formatPhoneNumber('invalid-phone')).toBe('invalidphone');
+            expect(InputFormatter.formatPhoneNumber("123")).toBe("123")
+            expect(InputFormatter.formatPhoneNumber("6 99 34 44 23", "CM")).toBe("6 99 34 44 23")
+            expect(InputFormatter.formatPhoneNumber("+237655334422")).toBe("+237 6 55 33 44 22")
         });
     });
 });

@@ -50,7 +50,7 @@ export class InputFormatter {
    *   type: "decimal",
    *   format: (opts) => `${opts.value} formatted`,
    * };
-   * const result = formatValueToObject(options);
+   * const result = formatValue(options);
    * console.log(result);
    * // Output: {
    * //   formattedValue: "123.45 formatted",
@@ -62,7 +62,7 @@ export class InputFormatter {
    * // }
    * ```
    */
-  static formatValueToObject({ value, type, format, dateFormat, ...rest }: IInputFormatterOptions): IInputFormatterResult {
+  static formatValue({ value, type, format, dateFormat, phoneCountryCode, ...rest }: IInputFormatterOptions): IInputFormatterResult {
     const canValueBeDecimal = type && ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());
     let parsedValue = value;
     const result: Partial<IInputFormatterResult> = {};
@@ -78,11 +78,12 @@ export class InputFormatter {
       parsedValue = InputFormatter.parseDecimal(value);
     }
 
-    let formattedValue = undefined;
+    // Convert non-string values to strings.
+    let formattedValue = typeof value == 'string' ? value : value?.toString() || '';
 
     // If a format function is provided, use it to format the value.
     if (typeof format === 'function') {
-      formattedValue = format({ ...rest, type, value });
+      formattedValue = format({ ...rest, dateFormat, phoneCountryCode, type, value });
     } else {
       const typeText = String(type).toLowerCase();
       let hasFoundDate = false;
@@ -96,6 +97,13 @@ export class InputFormatter {
           result.dateValue = parsedDate;
         }
         result.dateFormat = dateFormat;
+      } else if ("tel" === typeText) {
+        const phoneNumber = InputFormatter.formatPhoneNumber(value, phoneCountryCode);
+        formattedValue = defaultStr(phoneNumber, formattedValue);
+        const parsed = phoneNumber ? InputFormatter.parsePhoneNumber(phoneNumber, phoneCountryCode) : null;
+        if (parsed) {
+          result.dialCode = parsed.getCountryCode() + "";
+        }
       }
       if (hasFoundDate) { }
       // Format numbers based on the specified format.
@@ -105,9 +113,6 @@ export class InputFormatter {
         } else {
           formattedValue = (parsedValue as number).formatNumber();
         }
-      } else {
-        // Convert non-string values to strings.
-        formattedValue = typeof value == 'string' ? value : value?.toString() || '';
       }
     }
     // Return an object containing the formatted value and additional details.
@@ -127,7 +132,7 @@ export class InputFormatter {
    * Formats a value based on the provided options and returns the formatted string.
    *
    * This function serves as a simpler interface for formatting values. It internally calls 
-   * the `formatValueToObject` function to obtain the formatted value and then returns it 
+   * the `formatValue` function to obtain the formatted value and then returns it 
    * as a string. This is useful for scenarios where only the formatted string is needed.
    *
    * @param options - The options for formatting, adhering to the IInputFormatterOptions interface.
@@ -147,8 +152,8 @@ export class InputFormatter {
    * // Output: "123.45 formatted"
    * ```
    */
-  static formatValue(options: IInputFormatterOptions): string {
-    const { formattedValue, parsedValue } = InputFormatter.formatValueToObject(options);
+  static formatValueAsString(options: IInputFormatterOptions): string {
+    const { formattedValue, parsedValue } = InputFormatter.formatValue(options);
     // Return the formatted value as a string.
     return formattedValue;
   }
@@ -194,7 +199,7 @@ export class InputFormatter {
       return 0;
     }
     const v = parseFloat(InputFormatter.normalizeNumber(value));
-    return typeof v === "number" ? v : 0;
+    return typeof v === "number" && !Number.isNaN(v) ? v : 0;
   }
   /***
     Normalize a value to a string. 
@@ -204,11 +209,11 @@ export class InputFormatter {
     @param {any} value - The value to normalize
     @param {string} decimalSeparator - The decimal separator to use
   */
-  static normalizeNumber(value : any,decimalSeparator : string = "."){
-    if(typeof value == "number"){
+  static normalizeNumber(value: any, decimalSeparator: string = ".") {
+    if (typeof value == "number") {
       return value.toString();
     }
-    if(!value || value == undefined || value == null) return "0";
+    if (!value || value == undefined || value == null) return "0";
     return String(value).trim().replace(/\s/g, '').replace(/[,٫·]/g, decimalSeparator)
   }
   /***
@@ -694,24 +699,48 @@ export class InputFormatter {
   }
 
   /***
+  * An utility function that formats phone numbers using Google's libphonenumber library.
+  * @example
+  * // Returns "+1 650 253 0000"
+  * InputFormatter.formatPhoneNumber("6502530000", "US");
+  * 
+  * @example
+  * // Returns "+44 20 7031 3000" 
+  * InputFormatter.formatPhoneNumber("2070313000", "GB");
+  * 
+  * @example
+  * // Returns "+33 1 42 68 53 00"
+  * InputFormatter.formatPhoneNumber("+33142685300");
+  * 
+  * @example
+  * // Returns null (invalid phone number)
+  * InputFormatter.formatPhoneNumber("123", "US");
    * Formats a phone number using the google-libphonenumber library.
-   * @param {string} phoneNumber The phone number to format.
-   * @param {ICountryCode}, The country code to use for formatting. If not provided, the default country code will be used.
-   * @returns The formatted phone number.
+   * @param {string} phoneNumber - The phone number to format (can be in various formats)
+   * @param {ICountryCode}, - ISO 3166-1 alpha-2 country code to use if the phone number doesn't have a country code
+   * @returns The formatted international phone number or null if parsing fails
+  * 
    */
-  static formatPhoneNumber(phoneNumber: string, countryCode: ICountryCode) {
-    const formatter = new asYouTypeFormatter(defaultStr(countryCode).toLowerCase()); // eslint-disable-line new-cap
-    let formatted;
-    phoneNumber.replace(/-/g, '')
-      .replace(/ /g, '')
-      .replace(/\(/g, '')
-      .replace(/\)/g, '')
-      .split('')
-      .forEach((n) => {
-        formatted = formatter.inputDigit(n);
-      });
-
-    return formatted;
+  static formatPhoneNumber(phoneNumber: string, countryCode?: ICountryCode): string | null {
+    if (!isNonNullString(phoneNumber)) return "";
+    try {
+      const formatter = new asYouTypeFormatter(defaultStr(countryCode).toLowerCase().trim()); // eslint-disable-line new-cap
+      // Clear any previous state in the formatter
+      formatter.clear();
+      let formatted = "";
+      phoneNumber.replace(/-/g, '')
+        .replace(/ /g, '')
+        .replace(/\(/g, '')
+        .replace(/\)/g, '')
+        .split('')
+        .forEach((n) => {
+          formatted = formatter.inputDigit(n);
+        });
+      return formatted || null;
+    } catch (e) {
+      console.log(e, " input formatter formatting phone number phoneNumber =", phoneNumber, ", countryCode=", countryCode);
+      return null;
+    }
   }
   /***
    * Cleans the phone number string by removing leading and trailing whitespace, 

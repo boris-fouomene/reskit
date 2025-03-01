@@ -825,8 +825,7 @@ const CalendarYearView: React.FC<ICalendarYearViewProps> = () => {
     const { dateCursor } = state;
     const yearView = useMemo(() => {
         const { startDate, endDate } = Calendar.getYearsBoundaries(dateCursor.toDate());
-        const data = Calendar.generateYearView(startDate, endDate);
-        return data;
+        return Calendar.generateYearView(startDate, endDate);
     }, [state?.minDate, state.maxDate, locale, dateCursor]);
     const { start, end } = Calendar.getYearsBoundaries(state.minDate);
     const testID = defaultStr(props?.testID, "resk-calendar-year-view");

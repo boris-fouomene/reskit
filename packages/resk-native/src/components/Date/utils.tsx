@@ -22,6 +22,7 @@ export function renderCalendar({ testID, children, navigateToNext, borderRadius,
         <SwipeGestureHandler testID={testID + "-wipe-gesture"}
             disabled={!canSwipe}
             vertical={false}
+            style={[styles.headerOrFooter, styles.swipeContainer]}
             onSwipe={({ direction, distance }) => {
                 const cb = direction == "left" ? navigateToPrevious : direction == "right" ? navigateToNext : undefined;
                 if (typeof cb === "function") {
@@ -29,50 +30,48 @@ export function renderCalendar({ testID, children, navigateToNext, borderRadius,
                 }
             }}
         >
-            <View testID={testID + "swipe-gesture-container"} style={[styles.headerOrFooter, styles.swipeContainer]} >
-                {canDisplayHeader ? <View testID={testID + "-header"} style={styles.headerOrFooter}>
-                    {isValidHeader ? <>
-                        {header}
-                        <Divider style={styles.headerDivider} />
-                    </> : null}
-                    {<View testID={`${testID}-header-content-container`} style={styles.headerContentContainer}>
-                        {isValidElement(displayViewToggleButton) ? displayViewToggleButton : <Button compact
-                            testID={testID + "-header-text"}
-                            {...Object.assign({}, displayViewToggleButton)}
-                            style={[styles.displayViewToggleButton, (displayViewToggleButton as any)?.style]}
-                            containerProps={{ style: styles.headerButtonContainer }}
-                        /> as any}
-                        {renderNavigationButtons !== false ? <View testID={testID + "-header-arrow-container"} style={styles.headerArrowContainer}>
-                            <Icon.Button
-                                iconName="chevron-left"
-                                size={ICON_SIZE}
-                                testID={testID + "-header-arrow-left"}
-                                onPress={(event) => {
-                                    if (typeof navigateToPrevious === "function") {
-                                        navigateToPrevious(event);
-                                    }
-                                }}
-                            />
-                            <Icon.Button
-                                iconName="chevron-right"
-                                size={ICON_SIZE}
-                                testID={testID + "-header-arrow-right"}
-                                onPress={(event) => {
-                                    if (typeof navigateToNext === "function") {
-                                        navigateToNext(event);
-                                    }
-                                }}
-                            />
-                        </View> : null}
-                    </View>}
-                </View> : null}
-                <View testID={testID + "-content"} style={[styles.headerOrFooter, styles.content]} >
-                    {isValidElement(children) ? children : null}
-                </View>
-                {footer ? <View testID={testID + "-footer"} style={styles.headerOrFooter}>
-                    {footer}
-                </View> : null}
+            {canDisplayHeader ? <View testID={testID + "-header"} style={styles.headerOrFooter}>
+                {isValidHeader ? <>
+                    {header}
+                    <Divider style={styles.headerDivider} />
+                </> : null}
+                {<View testID={`${testID}-header-content-container`} style={styles.headerContentContainer}>
+                    {isValidElement(displayViewToggleButton) ? displayViewToggleButton : <Button compact
+                        testID={testID + "-header-text"}
+                        {...Object.assign({}, displayViewToggleButton)}
+                        style={[styles.displayViewToggleButton, (displayViewToggleButton as any)?.style]}
+                        containerProps={{ style: styles.headerButtonContainer }}
+                    /> as any}
+                    {renderNavigationButtons !== false ? <View testID={testID + "-header-arrow-container"} style={styles.headerArrowContainer}>
+                        <Icon.Button
+                            iconName="chevron-left"
+                            size={ICON_SIZE}
+                            testID={testID + "-header-arrow-left"}
+                            onPress={(event) => {
+                                if (typeof navigateToPrevious === "function") {
+                                    navigateToPrevious(event);
+                                }
+                            }}
+                        />
+                        <Icon.Button
+                            iconName="chevron-right"
+                            size={ICON_SIZE}
+                            testID={testID + "-header-arrow-right"}
+                            onPress={(event) => {
+                                if (typeof navigateToNext === "function") {
+                                    navigateToNext(event);
+                                }
+                            }}
+                        />
+                    </View> : null}
+                </View>}
+            </View> : null}
+            <View testID={testID + "-content"} style={[styles.headerOrFooter, styles.content]} >
+                {isValidElement(children) ? children : null}
             </View>
+            {footer ? <View testID={testID + "-footer"} style={styles.headerOrFooter}>
+                {footer}
+            </View> : null}
         </SwipeGestureHandler>
     </Surface>
 }

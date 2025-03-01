@@ -80,7 +80,7 @@ const DEFAULT_ANIMATION_CONFIG: Required<ISwipeGestureAnimationConfig> = {
  * Props interface for the SwipeGestureHandler component
  * @interface
  */
-export interface ISwipeGestureProps extends React.ComponentProps<typeof Animated.View> {
+export interface ISwipeGestureProps extends Animated.AnimatedProps<ViewProps> {
     /** Callback triggered when a swipe left gesture is detected */
     onSwipeLeft?: (options: ISwipeGestureCallbackOptions) => void;
     /** Callback triggered when a swipe right gesture is detected */

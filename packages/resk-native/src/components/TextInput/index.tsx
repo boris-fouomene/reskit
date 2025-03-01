@@ -580,9 +580,9 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             const value = inputState.placeholder ? valCase2.masked : valCase2.value;
             if (textString !== inputState.value && inputState.value !== value && !areCasesEquals(valCase2, inputState)) {
                 //Fix repeated input, from native text input in animated mobile input
-                /*  if (isNative && Array.isArray(valCase2.nonRegexReplacedChars) && valCase2.nonRegexReplacedChars?.length) {
-                     //return;
-                 } */
+                if (isNative && Array.isArray(valCase2.nonRegexReplacedChars) && valCase2.nonRegexReplacedChars?.length) {
+                    return;
+                }
                 const options = { ...inputState, isFocused, type, dateFormat, phoneCountryCode, ...valCase2, value, text: textString, event };
                 const isValid = (valCase2.isValid !== false) && (isPhone ? isPhoneValid(valCase2.value, phoneCountryCode) : true);
                 setInputState(options);

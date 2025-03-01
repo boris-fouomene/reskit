@@ -568,7 +568,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             disabledOrEditStyle,
             isDropdownAnchor && editable && styles.dropdownAnchorInput,
         ],
-        value: inputValue,
+        value: String(inputValue),
         inputMode: inputMode as any,
         autoCorrect: !maskArray?.length && props?.autoCorrect,
         spellCheck: !maskArray?.length && props?.spellCheck,

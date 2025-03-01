@@ -615,10 +615,12 @@ const CalendarItem = ({ isCurrent, item, isDefaultValue, theme, disabled, onPres
                 style,
             ]}
         >
-            <Label textBold={isDefaultValue} color={color} disabled={disabled} testID={testID + "-label"}>
-                {label}
+            <>
+                <Label textBold={isDefaultValue} color={color} disabled={disabled} testID={testID + "-label"}>
+                    {label}
+                </Label>
                 {isMarked ? <View style={[Styles.calendarItemMarked, { backgroundColor: markedBackgroundColor }]} /> : null}
-            </Label>
+            </>
         </TouchableRipple>
     );
 }

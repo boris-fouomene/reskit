@@ -26,12 +26,10 @@ export default function isClass(variable: any): boolean {
   if (typeof variable === 'object') {
     const proto = Object.getPrototypeOf(variable);
     if (!proto || proto === Object.prototype) return false;
-
     const constructor = proto.constructor;
-    if (!constructor) return false;
-
+    if (!constructor || !constructor?.toString) return false;
     const str = constructor.toString();
-    return str.startsWith('class') || str.includes('_classCallCheck');
+    return /^\s*class\s+/.test(str);
   }
   return false;
 }

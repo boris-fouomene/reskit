@@ -1,6 +1,7 @@
-import { IDict, IField, IFieldType, isClass, isNonNullString, isObj, isObservable, observableFactory } from "@resk/core";
+import { IDict, IField, IFieldType, isNonNullString, isObj, isObservable, observableFactory } from "@resk/core";
 import { IForm, IFormAction, IFormCallbackOptions, IFormData, IFormField, IFormFields, IFormGetDataOptions, IFormManagerEvent } from "./types";
 import "./types/augmented";
+import { isReactClassComponent } from "@utils/isComponent";
 /**
  * @group Forms
  * Manages the lifecycle and state of forms within the application.
@@ -53,11 +54,11 @@ export class FormsManager {
      * const isField = FormsManager.isField(fieldInstance); // true
      */
     static isField(field: any): field is IFormField {
-        if (!isClass(field)) return false;
+        if (!isReactClassComponent(field)) return false;
         if (typeof this.isFieldInstance == "function" && this.isFieldInstance(field)) {
             return true;
         }
-        return isClass(field) && isObservable(field) && typeof field?.getName === "function" && typeof field?.getForm === "function" && typeof field?.isValid === "function";
+        return isObservable(field) && typeof field?.getName === "function" && typeof field?.getForm === "function" && typeof field?.isValid === "function";
     }
     /**
      * Checks if the provided variable is an instance of `IForm`.
@@ -73,8 +74,7 @@ export class FormsManager {
         if (typeof this.isFormInstance == "function" && this.isFormInstance(form)) {
             return true;
         }
-        return isClass(form) && isObservable(form) && typeof form?.getName === "function" && typeof form?.isValid === "function" && typeof form?.getData === "function" && typeof form?.getFields === "function";
-        //return form instanceof IForm;
+        return isReactClassComponent(form) && isObservable(form) && typeof form?.getName === "function" && typeof form?.isValid === "function" && typeof form?.getData === "function" && typeof form?.getFields === "function";
     }
     /**
      * Checks if the specified form is valid.

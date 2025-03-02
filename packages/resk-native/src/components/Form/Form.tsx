@@ -84,8 +84,8 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             header: this.renderHeader(props),
         };
     }
-    componentDidUpdate(prevProps: Readonly<IFormProps>){
-        if(!areEquals(this.props.data,prevProps.data) || !areEquals(this.props.fields,prevProps.fields) || this.props.children !== prevProps.children){	
+    componentDidUpdate(prevProps: Readonly<IFormProps>) {
+        if (!areEquals(this.props.data, prevProps.data) || !areEquals(this.props.fields, prevProps.fields) || this.props.children !== prevProps.children) {
             this.setState(this.prepareState(this.props));
         }
     }
@@ -567,7 +567,8 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
 
     static Fields: React.FC<IFormProps & IFormContext> = (props) => {
         const theme = useTheme();
-        const { fields, data, name: formName, form, windowWidth, isLoading, isSubmitting } = props;
+        const { fields, data, name: formName, testID: cTestID, form, windowWidth, isLoading, isSubmitting } = props;
+        const testID = defaultStr(cTestID, "resk-form-fields");
         const { drawer } = useDrawer();
         return useMemo(() => {
             if (!Object.getSize(fields, true)) return null;
@@ -588,6 +589,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                 } else {
                 }
                 const fieldProps = {
+                    testID: `${testID}-field-${name}`,
                     ...field,
                     name,
                     type,

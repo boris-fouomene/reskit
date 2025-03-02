@@ -1,5 +1,5 @@
 import { Injectable, ArgumentMetadata, BadRequestException, SetMetadata, ExecutionContext, createParamDecorator, PipeTransform } from '@nestjs/common';
-import { IClassConstructor, IDict, isClass, isNonNullString, isObj, Validator } from '@resk/core';
+import { IClassConstructor, IDict, isNonNullString, Validator } from '@resk/core';
 import "../../../translations";
 import { i18n } from "@resk/core";
 import { stringify } from 'querystring';
@@ -103,7 +103,7 @@ export const ValidatorParam = createParamDecorator<([config: IParseRequestConfig
      */
     let cannotValidate = optional === true || dtoClassOrGetDtoMethodName === undefined;
     let dtoClass: IClassConstructor | undefined = typeof dtoClassParam !== "boolean" ? dtoClassParam : undefined;
-    if (isClass(dtoClassOrGetDtoMethodName) || typeof dtoClassOrGetDtoMethodName === "function") {
+    if (typeof dtoClassOrGetDtoMethodName === "function") {
         dtoClass = dtoClassOrGetDtoMethodName;
     } else {
         if (!cannotValidate) {
@@ -126,7 +126,7 @@ export const ValidatorParam = createParamDecorator<([config: IParseRequestConfig
             dtoClass = controller.prototype[dtoClassOrGetDtoMethodName]();
         }
     }
-    const hasDtoValid = isClass(dtoClass) || typeof dtoClass === "function";
+    const hasDtoValid = typeof dtoClass === "function";
     if (!hasDtoValid && cannotValidate) {
         return data;
     }
@@ -277,7 +277,7 @@ export class ValidatorPipe implements PipeTransform<IDict, Promise<IDict>> {
      * @throws {BadRequestException} If the validation fails or the `dtoClass` is invalid.
      */
     async transform(value: IDict, metadata: ArgumentMetadata): Promise<IDict> {
-        if (isClass(this.dtoClass) || typeof this.dtoClass === "function") {
+        if (typeof this.dtoClass === "function") {
             return ValidatorPipe.staticTransform({
                 dtoClass: this.dtoClass,
                 data: value,

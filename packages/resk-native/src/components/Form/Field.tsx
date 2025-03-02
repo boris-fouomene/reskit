@@ -1,5 +1,5 @@
 import { getTextContent, isReactClassComponent, ObservableComponent } from "@utils/index";
-import { defaultStr, extendObj, IFieldType, IField, isClass, isEmpty, isNonNullString, isObj, IValidatorRule, stringify, Validator } from "@resk/core";
+import { defaultStr, extendObj, IFieldType, IField, isEmpty, isNonNullString, isObj, IValidatorRule, stringify, Validator } from "@resk/core";
 import { IForm, IFormData, IFormEvent, IFormField, IFormFieldOnChangeOptions, IFormFieldState, IFormFieldValidatorOptions } from "./types";
 import React, { ReactNode } from "react";
 import { Dimensions, View as RNView, TextInput as RNTextInput, NativeSyntheticEvent, TextInputFocusEventData, StyleSheet } from "react-native";
@@ -124,7 +124,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
     }
     componentDidUpdate(prevProps: IField<Type>): void {
         const wrapperStyle = this.getBreakpointStyle(this.props);
-        if(stableHash(wrapperStyle) == stableHash(this.state.wrapperStyle)) return;
+        if (stableHash(wrapperStyle) == stableHash(this.state.wrapperStyle)) return;
         this.setState({ wrapperStyle: this.getBreakpointStyle(this.props) }, () => {
             if ("defaultValue" in this.props) {
                 this.validate({ value: this.props.defaultValue } as IFormFieldValidatorOptions<Type>, true);
@@ -269,7 +269,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
         if (this.getType() == "email" && this.componentProps.validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("email")) {
             options.rules.push("email");
         }
-        if(this.getType() =="tel" && this.componentProps.validatePhoneNumber !== false && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("phoneNumber")) {
+        if (this.getType() == "tel" && this.componentProps.validatePhoneNumber !== false && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("phoneNumber")) {
             options.rules.push("phoneNumber");
         }
         if (this.getType() == "url" && options.value && !options.rules.includes("url")) {
@@ -1099,7 +1099,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
                                         disabled,
                                         errorText,
                                         error: canShowErrors,
-                                        handleMaskValidationErrors : canShowErrors,
+                                        handleMaskValidationErrors: canShowErrors,
                                         ...kProps,
                                         defaultValue: this.state.value,
                                     } as IField<Type>,
@@ -1162,9 +1162,10 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
      * Field.registerComponent("text", MyTextField);
      */
     static registerComponent(type: IFieldType, component: typeof Field) {
-        if (!isNonNullString(type) || !isClass(component) || !isReactClassComponent(component)) return;
+        if (!isNonNullString(type) || !isReactClassComponent(component)) return;
         const components = Field.getRegisteredComponents();
         components[type] = component;
+        console.log("defining meta data ", type, " is typeeee ", Object.keys(components))
         Reflect.defineMetadata(Field.FIELDS_COMPONENTS_METADATA_KEY, components, Field);
     }
     /**

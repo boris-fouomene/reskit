@@ -15,4 +15,12 @@ describe("isClass", () => {
     it("should return false if the object is a function", () => {
         expect(isClass(function () { })).toBe(false);
     });
+    describe("Sould test inheritance", () => {
+        class A { }
+        class B extends A { }
+        it("B is a class", () => {
+            expect(isClass(B)).toBe(true);
+            expect(isClass(new B())).toBe(true);
+        })
+    })
 });

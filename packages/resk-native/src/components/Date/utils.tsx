@@ -19,6 +19,42 @@ export function renderCalendar({ testID, children, navigateToNext, borderRadius,
     borderRadius = typeof borderRadius === "number" ? borderRadius : 0;
     const canSwipe = typeof navigateToNext === "function" || typeof navigateToPrevious === "function";
     return <Surface elevation={5} {...props} testID={testID} style={[styles.calendar, { borderRadius }, props.style]}>
+        {canDisplayHeader ? <View testID={testID + "-header"} style={styles.headerOrFooter}>
+            {isValidHeader ? <>
+                {header}
+                <Divider style={styles.headerDivider} />
+            </> : null}
+            {<View testID={`${testID}-header-content-container`} style={styles.headerContentContainer}>
+                {isValidElement(displayViewToggleButton) ? displayViewToggleButton : <Button compact
+                    testID={testID + "-header-text"}
+                    {...Object.assign({}, displayViewToggleButton)}
+                    style={[styles.displayViewToggleButton, (displayViewToggleButton as any)?.style]}
+                    containerProps={{ style: styles.headerButtonContainer }}
+                /> as any}
+                {renderNavigationButtons !== false ? <View testID={testID + "-header-arrow-container"} style={styles.headerArrowContainer}>
+                    <Icon.Button
+                        iconName="chevron-left"
+                        size={ICON_SIZE}
+                        testID={testID + "-header-arrow-left"}
+                        onPress={(event) => {
+                            if (typeof navigateToPrevious === "function") {
+                                navigateToPrevious(event);
+                            }
+                        }}
+                    />
+                    <Icon.Button
+                        iconName="chevron-right"
+                        size={ICON_SIZE}
+                        testID={testID + "-header-arrow-right"}
+                        onPress={(event) => {
+                            if (typeof navigateToNext === "function") {
+                                navigateToNext(event);
+                            }
+                        }}
+                    />
+                </View> : null}
+            </View>}
+        </View> : null}
         <SwipeGestureHandler testID={testID + "-wipe-gesture"}
             disabled={!canSwipe}
             vertical={false}
@@ -30,49 +66,13 @@ export function renderCalendar({ testID, children, navigateToNext, borderRadius,
                 }
             }}
         >
-            {canDisplayHeader ? <View testID={testID + "-header"} style={styles.headerOrFooter}>
-                {isValidHeader ? <>
-                    {header}
-                    <Divider style={styles.headerDivider} />
-                </> : null}
-                {<View testID={`${testID}-header-content-container`} style={styles.headerContentContainer}>
-                    {isValidElement(displayViewToggleButton) ? displayViewToggleButton : <Button compact
-                        testID={testID + "-header-text"}
-                        {...Object.assign({}, displayViewToggleButton)}
-                        style={[styles.displayViewToggleButton, (displayViewToggleButton as any)?.style]}
-                        containerProps={{ style: styles.headerButtonContainer }}
-                    /> as any}
-                    {renderNavigationButtons !== false ? <View testID={testID + "-header-arrow-container"} style={styles.headerArrowContainer}>
-                        <Icon.Button
-                            iconName="chevron-left"
-                            size={ICON_SIZE}
-                            testID={testID + "-header-arrow-left"}
-                            onPress={(event) => {
-                                if (typeof navigateToPrevious === "function") {
-                                    navigateToPrevious(event);
-                                }
-                            }}
-                        />
-                        <Icon.Button
-                            iconName="chevron-right"
-                            size={ICON_SIZE}
-                            testID={testID + "-header-arrow-right"}
-                            onPress={(event) => {
-                                if (typeof navigateToNext === "function") {
-                                    navigateToNext(event);
-                                }
-                            }}
-                        />
-                    </View> : null}
-                </View>}
-            </View> : null}
             <View testID={testID + "-content"} style={[styles.headerOrFooter, styles.content]} >
-                {isValidElement(children) ? children : null}
+                {children}
             </View>
-            {footer ? <View testID={testID + "-footer"} style={styles.headerOrFooter}>
-                {footer}
-            </View> : null}
         </SwipeGestureHandler>
+        {footer ? <View testID={testID + "-footer"} style={styles.headerOrFooter}>
+            {footer}
+        </View> : null}
     </Surface>
 }
 

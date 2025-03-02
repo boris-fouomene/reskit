@@ -3,6 +3,7 @@ import React, { useMemo } from "react";
 import { ITooltipProps } from "./types";
 import { defaultStr, uniqid } from "@resk/core";
 import { useMergeRefs } from "@utils/mergeRefs";
+import { isValidElement } from "@utils";
 
 export * from "./types";
 
@@ -19,6 +20,12 @@ const Tooltip = React.forwardRef(({
   const Component = useMemo(() => {
     return as || Pressable;
   }, [as]);
+  const content = useMemo(() => {
+    return isValidElement(tooltip, true) ? tooltip : isValidElement(title, true) ? title : null;
+  }, [title, tooltip]);
+  if (false && content === "") {
+    console.log("content is empty", content);
+  }
   return (
     <Component {...rest} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>
       {children}

@@ -123,7 +123,6 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     const isRippleDisabled = useMemo(() => {
         return disableRipple || disabled || isAndroid;
     }, [disableRipple, disabled, isAndroid]);
-
     borderWidth = typeof borderWidth == "number" && borderWidth || 0;
     rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 300;
     maskDuration = typeof maskDuration == "number" && maskDuration > 0 ? maskDuration : 200;
@@ -185,8 +184,8 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 width: 0,
             }
         } : undefined;
-    }, [shadowEnabled]);
-    const rippleContent = <Animated.View
+    }, [shadowEnabled, isRippleDisabled]);
+    const rippleContent = !isRippleDisabled ? <Animated.View
         testID={testID + "-animated-container"}
         style={{
             ...StyleSheet.absoluteFillObject,
@@ -209,10 +208,11 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 transform: [{ scale: animatedRippleScaleRef.current }],
             }}
         />
-    </Animated.View>;
+    </Animated.View> : null;
     return <Pressable
         ref={ref}
         {...props}
+        disabled={disabled}
         onLayout={(evt) => {
             if (typeof onLayout == "function") onLayout(evt);
             if (isRippleDisabled) return;
@@ -263,19 +263,10 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
             }
             hideRipple();
         }}
-        android_ripple={
-            disableRipple ? undefined : Object.assign({
-                color: rippleColor,
-                borderless: borderWidth === 0,
-                radius: borderRadius,
-                duration: rippleDuration,
-            }, props.android_ripple)
-        }
-        testID={testID}
         style={(state) => {
             const cStyle = typeof style === 'function' ? style(state) : style;
             const isHover = (state as any)?.hovered && !disabled;
-            return ([
+            return StyleSheet.flatten([
                 styles.container,
                 state.pressed && !disabled && rippleColor && { backgroundColor: rippleColor },
                 shadowStyle,
@@ -285,14 +276,22 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 isHover && hoverColor && { backgroundColor: hoverColor },
             ]);
         }}
+        android_ripple={
+            disableRipple ? undefined : Object.assign({
+                color: rippleColor,
+                borderless: borderWidth === 0,
+                duration: rippleDuration,
+            }, props.android_ripple)
+        }
+        testID={testID}
     >
         {
             typeof children === "function" ? (state) => {
-                return <>
+                return isRippleDisabled ? children(state) : <>
                     {rippleContent}
                     {children(state)}
                 </>
-            } : <>
+            } : isRippleDisabled ? children : <>
                 {rippleContent}
                 {children}
             </>}

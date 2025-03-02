@@ -33,7 +33,6 @@ const Label = React.forwardRef(({
   upperCase,
   fontSize,
   testID,
-  id,
   wrapText,
   underlined,
   splitText,
@@ -62,7 +61,7 @@ const Label = React.forwardRef(({
   style = StyleSheet.flatten([style]);
   testID = testID || "resk-label";
 
-  const restProps: ILabelProps = { id };
+  const restProps: ILabelProps = {};
 
   // Handle split text properties
   if (splitText) {

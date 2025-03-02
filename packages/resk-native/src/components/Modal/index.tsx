@@ -37,7 +37,7 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
       modalStyle: fullScreen ? [styles.modalFullScreen, pureModal && styles.centeredContent] : [styles.centeredContent, Platform.isWeb() ? { cursor: "default" } : null],
     };
   }, [isMobileOrTablet, screenWidth, screenHeight, responsive, visible, customFullScreen, pureModal]);
-  const children = useStableMemo(() => {
+  const children = useMemo(() => {
     return props.children;
   }, [props.children]) as React.ReactNode;
   contentContainerProps = Object.assign({}, contentContainerProps);

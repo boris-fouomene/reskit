@@ -1165,7 +1165,6 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
         if (!isNonNullString(type) || !isReactClassComponent(component)) return;
         const components = Field.getRegisteredComponents();
         components[type] = component;
-        console.log("defining meta data ", type, " is typeeee ", Object.keys(components))
         Reflect.defineMetadata(Field.FIELDS_COMPONENTS_METADATA_KEY, components, Field);
     }
     /**

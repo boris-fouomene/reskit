@@ -18,7 +18,7 @@ import { IClassConstructor, IDict } from '../types/index';
  * Logger.error("This is an error message");
  * ```
  */
-class Logger {
+export class Logger {
   /**
    * Metadata key used to store logger information.
    * This is useful for dynamically registering a logger instance.

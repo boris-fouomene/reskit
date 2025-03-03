@@ -1,3 +1,5 @@
+import { Logger } from "@logger";
+
 /**
  * @interface IObservableCallback
  * Represents the callback options for observable events.
@@ -184,7 +186,7 @@ export const observableFactory = function <EventType extends string = string>():
             }
           }
         } else {
-          console.warn("observable, call off on event " + event + " with invalid function " + fn);
+          Logger.warn("observable, call off on event " + event + " with invalid function " + fn);
           //else delete callbacks[event], le bug qui supprime le callback des évènemenmts lorsque fn est à undefined
         }
       }

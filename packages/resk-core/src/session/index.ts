@@ -2,6 +2,7 @@ import { isClientSide } from "../platform";
 import { JsonHelper } from "../utils/json";
 import { IClassConstructor, IDict } from '../types/index';
 import isNonNullString from '../utils/isNonNullString';
+import { Logger } from "@logger";
 
 
 /**
@@ -354,7 +355,7 @@ export function SessionStorage() {
       }
       SessionManager.storage = storage;
     } catch (error) {
-      console.error(error, " registering session storage");
+      Logger.error(error, " registering session storage");
     }
   };
 }

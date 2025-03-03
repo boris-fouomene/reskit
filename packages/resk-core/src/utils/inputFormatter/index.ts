@@ -14,6 +14,7 @@ const phoneUtil = libPhoneNumber.PhoneNumberUtil.getInstance();
 const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
 import { CountriesManager, ICountryCode } from "@countries/index";
 import isEmpty from "@utils/isEmpty";
+import { Logger } from "@logger";
 
 const DIGIT_REGEX = /\d/;
 const LETTER_REGEX = /[a-zA-Z]/;
@@ -737,7 +738,7 @@ export class InputFormatter {
         });
       return formatted || null;
     } catch (e) {
-      console.log(e, " input formatter formatting phone number phoneNumber =", phoneNumber, ", countryCode=", countryCode);
+      Logger.log(e, " input formatter formatting phone number phoneNumber =", phoneNumber, ", countryCode=", countryCode);
       return null;
     }
   }

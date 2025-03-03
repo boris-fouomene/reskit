@@ -4,9 +4,9 @@ import $session from "../session";
 import { IDict, IResourceActionName, IResourceActionTuple, IResourceActionTupleArray, IResourceActionTupleObject, IResourceName } from "../types";
 import { isObj, JsonHelper, isNonNullString, IObservable, observable } from "../utils";
 import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPerms, IAuthEvent, IAuthRole } from "./types";
-import { } from "../types";
-import { } from "./types";
+import "./types";
 import CryptoJS from "crypto-js";
+import { Logger } from "../logger";
 
 const encrypt = CryptoJS.AES.encrypt;
 const decrypt = CryptoJS.AES.decrypt;
@@ -320,7 +320,7 @@ export default class Auth {
                     return Auth.localUserRef.current;
                 }
             } catch (e) {
-                console.log("getting local user ", e);
+                Logger.log("getting local user ", e);
             }
         }
         return null;
@@ -375,7 +375,7 @@ export default class Auth {
             encrypted = uToSave ? encrypt(JSON.stringify(uToSave), SESSION_ENCRYPT_KEY).toString() : null;
         } catch (e) {
             Auth.localUserRef.current = null;
-            console.log(e, " setting local user");
+            Logger.log(e, " setting local user");
         }
         if (triggerEvent) {
             const event = isObj(uToSave) && isObj(encrypted) ? "SIGN_IN" : "SIGN_OUT";

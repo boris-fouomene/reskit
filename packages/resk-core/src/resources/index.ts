@@ -8,6 +8,7 @@ import { i18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
 import { ResourcePaginationHelper } from './ResourcePaginationHelper';
 import { IResourceActions } from '../types/resources';
+import { Logger } from "../logger";
 export * from './ResourcePaginationHelper';
 const resourcesMetaDataKey = Symbol('resources');
 const resourcesClassNameMetaData = Symbol('resourceFromClassName');
@@ -768,7 +769,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
       this.fields = getFields(this);
       return this.fields;
     } catch (e) {
-      console.log(e, " getting resources fieldss");
+      Logger.log(e, " getting resources fieldss");
     }
     return {};
   }

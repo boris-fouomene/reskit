@@ -2,6 +2,8 @@ import 'reflect-metadata';
 import "./translations";
 import Session from "./session";
 
+export * from "./logger";
+
 /**
  * Exports the Session namespace.
  * This namespace provides a collection of functions and classes related to session management.

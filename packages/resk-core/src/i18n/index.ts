@@ -12,6 +12,7 @@ import { isString } from "lodash";
 import moment, { LocaleSpecification } from "moment";
 import { createPropertyDecorator, getDecoratedProperties } from "@/decorators";
 import momentLocaleFr from "./locales/moment.locale.fr";
+import { Logger } from "@logger";
 /**
  * A key to store metadata for translations.
  */
@@ -417,7 +418,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
             moment.locale(locale, this.getMomentLocale(locale));
             return true;
         } catch (error) {
-            console.error(error, " setting moment locale : ", locale);
+            Logger.error(error, " setting moment locale : ", locale);
         }
         return false;
     }
@@ -470,12 +471,12 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
                     try {
                         (target as any)[key] = this.t(metadataKey);
                     } catch (error) {
-                        console.error(error, " resolving translation for key : ", metadataKey);
+                        Logger.error(error, " resolving translation for key : ", metadataKey);
                     }
                 }
             }
         } catch (error) {
-            console.error(error, " resolving translations for target : ", target);
+            Logger.error(error, " resolving translations for target : ", target);
         }
     }
 
@@ -620,7 +621,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      */
     registerNamespaceResolver(namespace: string, resolver: (locale: string) => Promise<II18nTranslation>): void {
         if (!isNonNullString(namespace) || typeof resolver !== "function") {
-            console.warn("Invalid arguments for registerNamespaceResolver.", namespace, resolver);
+            Logger.warn("Invalid arguments for registerNamespaceResolver.", namespace, resolver);
             return;
         }
         this.namespaceResolvers[namespace] = resolver;

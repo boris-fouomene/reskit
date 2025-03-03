@@ -284,7 +284,7 @@ export interface ITheme {
    * By default, the fonts are set to the default font styles for each platform.
    */
   fontsConfig?: IThemeFontsConfig & {
-    variants?: Partial<IThemeTextStylesVariants>;
+    variants?: Partial<IThemeFontsWithVariants>;
   };
 }
 
@@ -550,7 +550,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
   * 
   * @example
   * ```typescript
-  * const textStyleVariant: IThemeTextStyleVariant = 'displayLarge';
+  * const fontVariant: IThemeFontVariant = 'displayLarge';
   * ```
   */
   displayLarge: TextStyle;
@@ -560,7 +560,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'displayMedium';
+   * const fontVariant: IThemeFontVariant = 'displayMedium';
    * ```
    */
   displayMedium: TextStyle;
@@ -569,7 +569,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
  * 
  * @example
  * ```typescript
- * const textStyleVariant: IThemeTextStyleVariant = 'displaySmall';
+ * const fontVariant: IThemeFontVariant = 'displaySmall';
  * ```
  */
   displaySmall: TextStyle;
@@ -580,7 +580,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'headlineLarge';
+   * const fontVariant: IThemeFontVariant = 'headlineLarge';
    * ```
    */
   headlineLarge: TextStyle;
@@ -590,7 +590,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'headlineMedium';
+   * const fontVariant: IThemeFontVariant = 'headlineMedium';
    * ```
    */
   headlineMedium: TextStyle;
@@ -600,7 +600,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'headlineSmall';
+   * const fontVariant: IThemeFontVariant = 'headlineSmall';
    * ```
    */
   headlineSmall: TextStyle;
@@ -610,7 +610,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'titleLarge';
+   * const fontVariant: IThemeFontVariant = 'titleLarge';
    * ```
    */
   titleLarge: TextStyle;
@@ -622,7 +622,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'titleMedium';
+   * const fontVariant: IThemeFontVariant = 'titleMedium';
    * ```
    */
   titleMedium: TextStyle;
@@ -632,7 +632,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'titleSmall';
+   * const fontVariant: IThemeFontVariant = 'titleSmall';
    * ```
    */
   titleSmall: TextStyle;
@@ -642,7 +642,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
   * 
   * @example
   * ```typescript
-  * const textStyleVariant: IThemeTextStyleVariant = 'labelLarge';
+  * const fontVariant: IThemeFontVariant = 'labelLarge';
   * ```
   */
   labelLarge: TextStyle;
@@ -652,7 +652,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'labelMedium';
+   * const fontVariant: IThemeFontVariant = 'labelMedium';
    * ```
    */
   labelMedium: TextStyle;
@@ -662,7 +662,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'labelSmall';
+   * const fontVariant: IThemeFontVariant = 'labelSmall';
    * ```
    */
   labelSmall: TextStyle;
@@ -673,7 +673,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'bodyLarge';
+   * const fontVariant: IThemeFontVariant = 'bodyLarge';
    * ```
    */
   bodyLarge: TextStyle;
@@ -683,7 +683,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'bodyMedium';
+   * const fontVariant: IThemeFontVariant = 'bodyMedium';
    * ```
    */
   bodyMedium: TextStyle;
@@ -693,7 +693,7 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
    * 
    * @example
    * ```typescript
-   * const textStyleVariant: IThemeTextStyleVariant = 'bodySmall';
+   * const fontVariant: IThemeFontVariant = 'bodySmall';
    * ```
    */
   bodySmall: TextStyle;
@@ -701,31 +701,14 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
 
 
 /**
- * @typedef {string} IThemeTextStyleVariant
+ * @typedef {string} IThemeFontVariant
  * Type representing a theme text style variant.
  * 
  * This type defines a set of predefined text style variants that can be used to style text in a theme.
  * 
  * @example
  * ```typescript
- * const textStyleVariant: IThemeTextStyleVariant = 'headlineLarge';
+ * const fontVariant: IThemeFontVariant = 'headlineLarge';
  * ```
  */
-export type IThemeTextStyleVariant = keyof IThemeTextStylesVariants;
-/**
- * Interface representing theme text styles variants.
- * 
- * This interface defines a record of text styles, where each key is a text style variant and the value is a TextStyle object.
- * 
- * @example
- * ```typescript
- * const textStylesVariants: IThemeTextStylesVariants = {
- *   displayLarge: { fontSize: 32, fontWeight: 'bold' },
- *   displayMedium: { fontSize: 24, fontWeight: 'bold' },
- *   // ... other text styles
- * };
- * ```
- */
-export interface IThemeTextStylesVariants extends Record<string, TextStyle> {
-
-}
+export type IThemeFontVariant = Omit<keyof IThemeFontsWithVariants,keyof IThemeFonts>;

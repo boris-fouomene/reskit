@@ -1,4 +1,4 @@
-import { IThemeColorSheme, ITheme, IThemeColorsTokenName, IThemeColorsTokens, IThemeFonts, IThemeFontsWithVariants } from "./types";
+import { IThemeColorSheme, ITheme, IThemeColorsTokenName, IThemeColorsTokens, IThemeFontsWithVariants } from "./types";
 import Colors from "./colors";
 import { defaultStr, extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
 import { Platform as RNPlatform } from "react-native";

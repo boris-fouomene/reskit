@@ -1,4 +1,4 @@
-import { IThemeFontsConfig, IThemeTextStylesVariants } from "./types";
+import { IThemeFontsConfig } from "./types";
 
 export const defaultFontsConfig: IThemeFontsConfig = {
     web: {
@@ -71,7 +71,7 @@ export const defaultFontsConfig: IThemeFontsConfig = {
     },
 };
 
-export const defaultTextStylesVariants: IThemeTextStylesVariants = {
+export const defaultTextStylesVariants= {
     displayLarge: {
         lineHeight: 64,
         letterSpacing: 0,

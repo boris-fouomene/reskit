@@ -97,7 +97,6 @@ const Label = React.forwardRef(({
       children = (children as string).toUpperCase();
     }
   }
-
   return (
     <Text
       allowFontScaling={true}

@@ -1,7 +1,7 @@
-import { IThemeColorSheme, ITheme, IThemeColorsTokenName, IThemeColorsTokens, IThemeFonts, IThemeTextStylesVariants, IThemeTextStyleVariant, IThemeFontsWithVariants } from "./types";
+import { IThemeColorSheme, ITheme, IThemeColorsTokenName, IThemeColorsTokens, IThemeFonts, IThemeFontsWithVariants } from "./types";
 import Colors from "./colors";
-import { defaultStr, extendObj, IDict, IObservable, isNonNullString, isObj, isObservable, observable } from "@resk/core";
-import { Platform as RNPlatform, TextStyle } from "react-native";
+import { defaultStr, extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
+import { Platform as RNPlatform } from "react-native";
 import { createMaterial3Theme as _createMaterial3Theme } from "./material-colors";
 import { Session } from "@resk/core";
 import Color from "color";
@@ -9,8 +9,6 @@ import updateNative from "./updateNative";
 import styles from "./styles";
 import { useReskNative } from "@src/context/hooks";
 import Elevations from "./Elevations";
-import { IBreakpointName } from "@breakpoints/types";
-import Breakpoints from "@breakpoints/index";
 import { defaultFontsConfig, defaultTextStylesVariants } from "./defaultFontsConfig";
 export * from "./utils";
 export * from "./types";
@@ -174,13 +172,15 @@ export function createTheme(theme: ITheme): IThemeManager {
     const Material3Theme = getMaterial3Theme(theme?.colors?.primary);
     theme = extendObj({}, theme?.dark ? Material3Theme.dark : Material3Theme.light, theme);
     const context = theme;
-    const _fonts = isObj(context?.fontsConfig) ? extendObj({}, defaultFontsConfig, context.fontsConfig) : defaultFontsConfig;
-    const font: IThemeFonts = _fonts[String(RNPlatform.OS).toLowerCase()] || _fonts.default;
-    Object.keys(defaultTextStylesVariants).map((key) => {
-        const variant = defaultTextStylesVariants[key as IThemeTextStyleVariant];
+    const { variants, ...restFonts } = Object.assign({}, context.fontsConfig);
+    const fontsConfig = extendObj({}, defaultFontsConfig, restFonts);
+    const fonts: IThemeFontsWithVariants = fontsConfig[String(RNPlatform.OS).toLowerCase()] || fontsConfig.default;
+    const textStylesVariants = extendObj({}, defaultTextStylesVariants, variants);
+    Object.keys(textStylesVariants).map((key) => {
+        const variant = textStylesVariants[key as any];
         if (variant) {
             const str = key.toLowerCase();
-            const cFont = (str.startsWith("label") || str.startsWith("title") || str.endsWith("medium")) ? font.medium : font.regular;
+            const cFont = (str.startsWith("label") || str.startsWith("title") || str.endsWith("medium")) ? fonts.medium : fonts.regular;
             if (cFont) {
                 if (cFont.fontFamily && !variant.fontFamily) {
                     variant.fontFamily = cFont.fontFamily;
@@ -189,10 +189,9 @@ export function createTheme(theme: ITheme): IThemeManager {
                     variant.fontWeight = cFont.fontWeight;
                 }
             }
+            fonts[variant] = extendObj({}, variant, fonts[variant]);
         }
     });
-    const fonts = extendObj({}, defaultTextStylesVariants, _fonts);
-    const textStylesVariants = extendObj({}, defaultTextStylesVariants, context.textStylesVariants);
     return {
         ...Object.assign({}, theme),
         get styles() {
@@ -643,5 +642,4 @@ export const useTheme = (): IThemeManager => {
      */
     return (theme || Theme) as IThemeManager;
 };
-
 export * from "./material-colors";

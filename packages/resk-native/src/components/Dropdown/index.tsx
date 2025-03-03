@@ -1,7 +1,7 @@
 import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownEvent, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
-import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj } from "@resk/core";
+import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj, Logger } from "@resk/core";
 import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import areEquals from "@utils/areEquals";
@@ -101,7 +101,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
                 return value;
             }
         }
-        console.warn("getItemValue is not a function", item, index);
+        Logger.warn("getItemValue is not a function", item, index);
         return undefined;
     }
     filterItem(options: IDropdownPreparedItem<ItemType, ValueType>, index: number): boolean {
@@ -118,7 +118,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         (Array.isArray(customItems) ? customItems : []).map((item, index) => {
             const value = this.getItemValue({ item, index, isDropdown: true });
             if (isEmpty(value) || !value) {
-                console.warn("invalid dropdown value ", value, " for item ", item, index, " with dropdown ", props);
+                Logger.warn("invalid dropdown value ", value, " for item ", item, index, " with dropdown ", props);
                 return;
             }
             const hashKey = this.getHashKey(value);

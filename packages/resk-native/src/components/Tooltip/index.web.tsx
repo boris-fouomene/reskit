@@ -2,7 +2,7 @@ import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import React, { useMemo } from "react";
 import { getTextContent, isValidElement, setRef, useMergeRefs } from '@utils';
-import { getMaxZindex, isDOMElement } from "@resk/core";
+import { getMaxZindex, isDOMElement, Logger } from "@resk/core";
 import { TIPPY_THEME } from '@theme/updateNative/utils';
 import { uniqid, defaultStr } from "@resk/core";
 import { Pressable } from "react-native";
@@ -84,7 +84,7 @@ const Tooltip = React.forwardRef(({
 
     // Return null if the children element is not valid
     if (!isValidElement(children)) {
-        console.warn("is not valid children ", children);
+        Logger.warn("is not valid tooltip children element ", children);
         return null;
     }
 

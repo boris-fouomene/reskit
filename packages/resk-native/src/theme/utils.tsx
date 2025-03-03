@@ -1,3 +1,4 @@
+import { Logger } from "@resk/core";
 import { ViewStyle } from "react-native";
 
 /**
@@ -70,7 +71,7 @@ export function splitStyles<Tuple extends FiltersArray>(
 ) {
     // Log an error in development mode if no filters are provided
     if (process.env.NODE_ENV !== 'production' && filters.length === 0) {
-        console.error('No filters were passed when calling splitStyles');
+        Logger.error('No filters were passed when calling splitStyles');
     }
 
     /**

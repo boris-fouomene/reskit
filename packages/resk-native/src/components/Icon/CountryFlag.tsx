@@ -26,7 +26,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 import Platform from "@platform";
-import { CountriesManager, defaultStr, ICountryCode, isNonNullString } from '@resk/core';
+import { CountriesManager, defaultStr, ICountryCode, isNonNullString, Logger } from '@resk/core';
 import { isClientSide, isWeb } from '@resk/core/build/esm/platform';
 import { IStyle } from '@src/types';
 import { isImageSource } from './utils';
@@ -173,7 +173,7 @@ const canRenderEmoji = (emoji?: string): boolean => {
     if (Platform.isNative()) return true;
     if (!isWeb()) return false;
     const flag = "🇨🇲"; // Example: Cameroon
-    console.log(flag, " is flag to test ", emoji);
+    Logger.log(flag, " is flag to test ", emoji);
     if (flag == "🇨🇲") return true;
     if (!isNonNullString(emoji)) return false;
     try {

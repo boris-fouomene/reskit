@@ -1,5 +1,5 @@
 import { getTextContent, isReactClassComponent, ObservableComponent } from "@utils/index";
-import { defaultStr, extendObj, IFieldType, IField, isEmpty, isNonNullString, isObj, IValidatorRule, stringify, Validator } from "@resk/core";
+import { defaultStr, extendObj, IFieldType, IField, isEmpty, isNonNullString, isObj, IValidatorRule, stringify, Validator, Logger } from "@resk/core";
 import { IForm, IFormData, IFormEvent, IFormField, IFormFieldOnChangeOptions, IFormFieldState, IFormFieldValidatorOptions } from "./types";
 import React, { ReactNode } from "react";
 import { Dimensions, View as RNView, TextInput as RNTextInput, NativeSyntheticEvent, TextInputFocusEventData, StyleSheet } from "react-native";
@@ -479,7 +479,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
             cb();
             return r;
         } else if (this.componentProps.onValidate) {
-            console.error(
+            Logger.error(
                 this.componentProps.onValidate,
                 " is not valid onValidate props (fonction) for form field  component ",
                 this.getName(),

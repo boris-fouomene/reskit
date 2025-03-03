@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import { isNonNullString, defaultStr } from "@resk/core";
+import { isNonNullString, defaultStr, Logger } from "@resk/core";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
@@ -65,10 +65,10 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
     color = Colors.isValid(color) ? color : theme.colors.text;
     let { iconSetName, iconSetPrefix, iconSet: IconSet, iconName } = getFontIconSet(name);
     if (!iconSetName || !IconSet || !iconName) {
-        console.warn(`Icon not defined for FontIcon component, icon [${name}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
+        Logger.warn(`Icon not defined for FontIcon component, icon [${name}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
-    const Component : React.FC<IconProps & {ref:any}> = IconSet as unknown as React.FC<IconProps>;
+    const Component: React.FC<IconProps & { ref: any }> = IconSet as unknown as React.FC<IconProps>;
     if (pressableProps) {
         for (let i in pressableProps) {
             delete props[i as keyof typeof props];

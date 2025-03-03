@@ -6,7 +6,6 @@ import { isBoolean, isNumber } from 'lodash';
 import defaultStr from '@utils/defaultStr';
 import { i18n } from '@/i18n';
 import isDateObj from "./isDateObj";
-import { Logger } from '@logger';
 /**
  * Result object returned by the date parser
  */
@@ -265,7 +264,7 @@ export class DateHelper {
         return parsedDate.toDate();
       }
     } catch (error) {
-      Logger.error(error, " parsing date with moment : ", date, " format is : ", format);
+      console.error(error, " parsing date with moment : ", date, " format is : ", format);
     }
     return null;
 
@@ -833,6 +832,79 @@ export class DateHelper {
     return defaultStr(DateHelper.isValidDate(date) ? date?.toString() : "");
   }
   static isDateObj = isDateObj;
+
+  /**
+ * Returns an object containing detailed information about a given date in UTC time.
+ * 
+ * @param {Date} [date] - The date to get details from. If not provided, the current date will be used.
+ * @returns {Object} An object containing the year, day, month, month string, hours, date, minutes, seconds, month name, day name, and day name short in UTC time.
+ * 
+ * @example
+ * const utcDateDetails = Logger.getUTCDateTimeDetails(new Date('2022-01-01'));
+ * console.log(utcDateDetails);
+ * // Output: { year: 2022, day: 6, month: 0, monthString: '01', hours: 0, date: 1, minutes: 0, seconds: 0, monthName: 'January', dayName: 'Saturday', dayNameShort: 'Sat' }
+ */
+  static getUTCDateTimeDetails(date?: Date): {
+    /**
+     * The year of the date in UTC time.
+     */
+    year: number;
+    /**
+     * The day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday) in UTC time.
+     */
+    day: number;
+    /**
+     * The month of the date (0 = January, 1 = February, ..., 11 = December) in UTC time.
+     */
+    month: number;
+    /**
+     * The month of the date in the format 'MM' in UTC time.
+     */
+    monthString: string;
+    /**
+     * The hours of the date in UTC time.
+     */
+    hours: number;
+    /**
+     * The day of the month (1-31) in UTC time.
+     */
+    date: number;
+    /**
+     * The minutes of the date in UTC time.
+     */
+    minutes: number;
+    /**
+     * The seconds of the date in UTC time.
+     */
+    seconds: number;
+    /**
+     * The full name of the month in UTC time.
+     */
+    monthName: string;
+    /**
+     * The full name of the day in UTC time.
+     */
+    dayName: string;
+    /**
+     * The short name of the day in UTC time.
+     */
+    dayNameShort: string;
+  } {
+    const m = date ? moment.utc(date) : moment.utc();
+    return {
+      year: m.year(),
+      day: m.day(),
+      month: m.month(),
+      monthString: m.format('MM'),
+      hours: m.hours(),
+      date: m.date(),
+      minutes: m.minutes(),
+      seconds: m.seconds(),
+      monthName: m.format('MMMM'),
+      dayName: m.format('dddd'),
+      dayNameShort: m.format('ddd')
+    };
+  }
 }
 
 const parseDString = (dateString: string, format: string) => {

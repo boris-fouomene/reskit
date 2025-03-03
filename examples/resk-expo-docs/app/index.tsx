@@ -1,8 +1,9 @@
 import { Tab, TextInput, withAppBar, Avatar, Badge, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
 import { View, ScrollView } from 'react-native'
-import { IField, InputFormatter } from "@resk/core";
+import { IField, Logger, InputFormatter } from "@resk/core";
 
 const index = withAppBar(() => {
+    Logger.error("Example of logg");
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>

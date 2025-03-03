@@ -10,7 +10,7 @@ import isNonNullString from '../utils/isNonNullString';
  * This class provides a way to manage sessions using a storage object.
  */
 class SessionManager {
-  static sessionStorageMetaData = Symbol("sessionStorage");
+  static readonly sessionStorageMetaData = Symbol("sessionStorage");
   /**
    * The storage object used by the session manager.
    * 
@@ -247,7 +247,7 @@ const removeAll = () => {
  * 
  * This interface defines the methods for setting, getting, and removing values from a session storage object.
  */
-export type ISessionStorage = {
+export interface ISessionStorage {
   /**
    * Sets a value in the session storage object.
    * 
@@ -348,22 +348,13 @@ export default { get, set, remove, handleGetValue, sanitizeKey, handleSetValue, 
 export function SessionStorage() {
   return function (target: IClassConstructor<ISessionStorage>) {
     try {
-      /**
-       * Creates a new instance of the target class.
-       */
       const storage = new target();
       if (!isValidStorage(storage)) {
         return;
       }
-      /**
-       * Assigns the new instance to the SessionManager's storage property.
-       */
       SessionManager.storage = storage;
     } catch (error) {
-      /**
-       * Logs any errors that occur while creating a new instance of the target class.
-       */
-      console.error(error);
+      console.error(error, " registering session storage");
     }
   };
 }

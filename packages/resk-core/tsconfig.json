@@ -5,6 +5,12 @@
         "rootDir": "./src",
         "outDir": "./build",
         "paths": {
+            "@logger/*": [
+                "src/logger/*"
+            ],
+            "@logger": [
+                "src/logger"
+            ],
             "@countries/*": [
                 "src/countries/*"
             ],

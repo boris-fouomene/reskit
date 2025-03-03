@@ -389,7 +389,7 @@ const sanitizeTheme = (theme: IThemeManager) => {
     const isDark = !!theme.dark;
     theme.colors.placeholder = theme.colors.placeholder || Colors.setAlpha(isDark ? "white" : "black", 0.5);
     theme.colors.text = theme.colors.text || theme.colors.onSurface;
-    theme.colors.backdrop = (theme.colors.backdrop || Colors.setAlpha(isDark ? "black" : "white", 0.5)) as string;
+    theme.colors.backdrop = Colors.isValid(theme.colors.backdrop) ? theme.colors.backdrop : Colors.setAlpha("rgba(50, 47, 55, 1)", 0.4) as string;
     theme.colors.info = Colors.isValid(theme.colors.info) ? theme.colors.info : "#2B73B6";
     theme.colors.onInfo = Colors.isValid(theme.colors.onInfo) ? theme.colors.onInfo : "white";
     theme.colors.success = Colors.isValid(theme.colors.success) ? theme.colors.success : "#5EBA6A";

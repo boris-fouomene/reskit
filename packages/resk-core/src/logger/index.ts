@@ -1,4 +1,6 @@
+import defaultStr from '@utils/defaultStr';
 import { IClassConstructor, IDict } from '../types/index';
+import moment from 'moment';
 
 /**
  * Represents a logger that provides logging functionalities with different log levels.
@@ -85,10 +87,98 @@ export class Logger {
    */
   static _log(level: ILoggerLevel, ...data: any[]) {
     const logger = Logger.logger;
-    if (typeof ((logger as any)[level] as any) === "function") {
-      (logger as any)[level](...data);
+    level = defaultStr(level);
+    if (level && typeof ((logger as any)[level] as any) === "function") {
+      (logger as any)[level](Logger.getDateTimeString(), ...data);
+    } else {
+      console.log("Logger level not found : [", level, "]", ...data);
     }
-    return this;
+  }
+  /**
+   * Returns an object containing detailed information about a given date.
+   * 
+   * @param {Date} [date] - The date to get details from. If not provided, the current date will be used.
+   * @returns {Object} An object containing the year, day, month, hours, minutes, seconds, month name, day name, and day name short.
+   * 
+   * @example
+   * const dateDetails = Logger.getDateTimeDetails(new Date('2022-01-01'));
+   * console.log(dateDetails);
+   * // Output: { year: 2022, day: '01', month: '01', hours: 0, date: Date, minutes: 0, seconds: 0, monthName: 'Jan', dayName: 'Sat', dayNameShort: 'Sat' }
+   */
+  static getDateTimeDetails(date?: Date): {
+    /**
+     * The year of the date.
+     */
+    year: number;
+    /**
+     * The day of the date in the format 'DD'.
+     */
+    day: string;
+    /**
+     * The month of the date in the format 'MM'.
+     */
+    month: string;
+    /**
+     * The hours of the date.
+     */
+    hours: number;
+    /**
+     * The date object.
+     */
+    date: Date;
+    /**
+     * The minutes of the date.
+     */
+    minutes: number;
+    /**
+     * The seconds of the date.
+     */
+    seconds: number;
+    /**
+     * The short name of the month.
+     */
+    monthName: string;
+    /**
+     * The full name of the day.
+     */
+    dayName: string;
+    /**
+     * The short name of the day.
+     */
+    dayNameShort: string;
+  } {
+    const daysNames = moment.weekdaysShort();
+    const monthsNames = moment.monthsShort();
+    let d = date ? new Date(date) : new Date(),
+      month = d.getMonth() + 1,
+      year = d.getFullYear();
+    const m = month <= 0 ? 0 : month - 1;
+    const dayName = daysNames[d.getDay()];
+    const dayNameShort = String(dayName).substring(0, 3);
+    const monthName = monthsNames[m];
+    let day = String(d.getDate()); let monthString = String(month);
+    if (monthString.length < 2) {
+      monthString = '0' + month;
+    }
+    if (day.length < 2) {
+      day = '0' + day;
+    }
+    return { year, day, month: monthString, hours: d.getHours(), date: d, minutes: d.getMinutes(), seconds: d.getSeconds(), monthName, dayName, dayNameShort };
+  }
+
+  /**
+   * Returns the current time in the format '[DayNameShort Day MonthName Year Hours:Minutes:Seconds]'.
+   * 
+   * @returns {string} The current time.
+   * 
+   * @example
+   * const currentTime = Logger.getDateTimeString();
+   * console.log(currentTime);
+   * // Output: '[Sat 01 Jan 2022 12:30:45]'
+   */
+  static getDateTimeString() {
+    const { day, year, hours, minutes, seconds, dayNameShort, monthName } = Logger.getDateTimeDetails();
+    return "[" + [dayNameShort, day, monthName, year].join(" ") + " " + [hours, minutes, seconds].join(":") + "]";
   }
 
   /**

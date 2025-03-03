@@ -1,9 +1,9 @@
 import Label from "@components/Label";
 import { isValidElement, useMergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, TextStyle } from 'react-native';
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { InputFormatter, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, CountriesManager, IInputFormatterResult } from "@resk/core";
-import _, { isNumber, wrap } from "lodash";
+import React, { ReactNode, useEffect, useMemo, useRef } from "react";
+import { InputFormatter, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, IInputFormatterResult } from "@resk/core";
+import _, { isNumber } from "lodash";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
 import View from "@components/View";

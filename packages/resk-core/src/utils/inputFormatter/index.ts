@@ -223,7 +223,7 @@ export class InputFormatter {
    * @param {any} value - The value to Check
    * @returns {boolean} Whether the value ends with a decimal separator
    */
-  static doesValueEndsWithDecimalSeparator = (value: any): boolean => {
+  static endsWithDecimalSeparator = (value: any): boolean => {
     const val = String(value).trim().replace(/\s/g, '');
     return val.endsWith(".") || val.endsWith(",") || val.endsWith("٫");
   }

@@ -349,7 +349,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     }, [customMask, customMaskOptions, typeString, customDateFormat, isDateOrTime, customDateProps]);
     const toCase = (value: any, phoneCountryCode?: ICountryCode): IInputFormatterResult & { phoneCountryCode?: ICountryCode } => {
         const valString = String(value);
-        const valEndsWithDecimal = InputFormatter.doesValueEndsWithDecimalSeparator(valString);
+        const valEndsWithDecimal = InputFormatter.endsWithDecimalSeparator(valString);
         if (canValueBeDecimal && isFocused && (valString.length == 1 && valEndsWithDecimal)) {
             value = "0" + value;
         }
@@ -359,7 +359,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         if (cToCase) return cToCase(value);
         if (value == undefined) value = '';
         if (isStringNumber(String(value))) value += "";
-        if (canValueBeDecimal && (!valEndsWithDecimal)) {
+        if (canValueBeDecimal && (!valEndsWithDecimal && (String(value).length <= 1 || !String(value).endsWith("0")))) {
             value = InputFormatter.parseDecimal(value);
         }
         if (isPhone && value) {

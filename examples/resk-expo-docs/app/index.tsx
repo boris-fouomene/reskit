@@ -1,6 +1,25 @@
 import { Tab, TextInput, withAppBar, Avatar, Badge, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
 import { View, ScrollView } from 'react-native'
-import { IField, Logger, InputFormatter } from "@resk/core";
+import { IField, Logger, InputFormatter, ILogger, AttachLogger } from "@resk/core";
+
+@AttachLogger()
+class LoggerExample implements ILogger {
+    log(...data: any[]): void {
+        console.log("yes an example of logging ", ...data)
+    }
+    info(...data: any[]): void {
+        console.log("yes an example of info ", ...data)
+    }
+    debug(...data: any[]): void {
+        console.log("yes an example of debug", ...data)
+    }
+    warn(...data: any[]): void {
+        console.log("yes an example of warning ", ...data)
+    }
+    error(...data: any[]): void {
+        console.log("yes an example of error ", ...data)
+    }
+}
 
 const index = withAppBar(() => {
     Logger.error("Example of logg");

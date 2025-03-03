@@ -1,6 +1,6 @@
 import Label from "@components/Label";
 import { isValidElement, useMergeRefs } from "@utils";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, TextStyle } from 'react-native';
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { InputFormatter, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, CountriesManager, IInputFormatterResult } from "@resk/core";
 import _, { isNumber, wrap } from "lodash";
@@ -524,7 +524,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         />
         {phoneDialCodeLabel}
     </> : null;
-
+    const labelPropStyle : TextStyle = StyleSheet.flatten(labelProps?.style) as TextStyle;
     return {
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? textColor : theme.colors.placeholder,
@@ -551,7 +551,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             style: [styles.contentContainer, contentContainerStyle,
             contentContainerProps.style]
         }),
-        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
+        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelPropStyle]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
         placeholder: hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
         testID: testID,
@@ -560,8 +560,10 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: [
             Object.assign({}, Platform.isWeb() ? { outline: "none" } : {}) as IStyle,
-            styles.input, minHeight > 0 && { minHeight },
+            styles.input, 
+            minHeight > 0 && { minHeight },
             inputStyle,
+            labelPropStyle?.fontSize ? { fontSize: labelPropStyle.fontSize } : null,
             compact && styles.compact,
             multiline && { height: inputHeight },
             multiline && styles.multilineInput,
@@ -673,6 +675,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         flexGrow: 1,
         overflow: 'hidden',
+        fontSize : 14,
     },
     compact: {
         padding: 0,

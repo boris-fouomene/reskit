@@ -273,10 +273,10 @@ const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency | number
 	if (typeof toPrepare.decimalDigits !== "number") {
 		toPrepare.decimalDigits = String(number).split(".")[1]?.length
 	}
-	if (thousandSeparator === undefined) {
+	if (thousandSeparator !== undefined) {
 		toPrepare.thousandSeparator = thousandSeparator;
 	}
-	if (decimalSeparator === undefined) {
+	if (decimalSeparator !== undefined) {
 		toPrepare.decimalSeparator = decimalSeparator;
 	}
 
@@ -311,7 +311,7 @@ const formatNumber: (number: number, optionsOrDecimalDigits?: ICurrency | number
 	/**
 	 * Format the number.
 	 */
-	return negative + (mod ? base.substr(0, mod) + opts.thousandSeparator : "") + base.substr(mod).replace(/(\d{3})(?=\d)/g, "$1" + opts.thousandSeparator) + (usePrecision && decimalStr ? (opts.decimalSeparator + decimalStr) : "");
+	return negative + (mod ? base.substring(0, mod) + opts.thousandSeparator : "") + base.substring(mod).replace(/(\d{3})(?=\d)/g, "$1" + opts.thousandSeparator) + (usePrecision && decimalStr ? (opts.decimalSeparator + decimalStr) : "");
 };
 
 
@@ -387,7 +387,8 @@ const formatMoneyAsObject = (number?: number, symbol?: ICurrency | string, decim
 	/**
 	 * Format the value.
 	 */
-	const formattedValue = usedFormat.replace('%s', opts.symbol);
+	const symbolStr = defaultStr(opts.symbol);
+	const formattedValue = usedFormat.replace(symbolStr?'%s':symbolStr, symbolStr);
 	const formattedNumber = formatNumber(Math.abs(number), checkPrecision(opts.decimalDigits), opts.thousandSeparator, opts.decimalSeparator);
 	const result = formattedValue.replace('%v', formattedNumber);
 

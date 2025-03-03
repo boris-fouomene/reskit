@@ -32,7 +32,7 @@ export type ICurrency = {
      * @example
      * `$` or `FCFA`
      */
-    symbol: string;
+    symbol?: string;
 
     /**
      * The full name of the currency (e.g., "Euro", "United States Dollar").
@@ -42,7 +42,7 @@ export type ICurrency = {
      * @example
      * `Euro`
      */
-    name: string;
+    name?: string;
 
     /**
      * The native symbol of the currency (e.g., "€" for Euro).
@@ -53,7 +53,7 @@ export type ICurrency = {
      * @example
      * `€`
      */
-    symbolNative: string;
+    symbolNative?: string;
 
     /**
      * The number of decimal places for the currency (e.g., 2 for most currencies, 0 for some).
@@ -63,7 +63,7 @@ export type ICurrency = {
      * @example
      * `2`
      */
-    decimalDigits: number;
+    decimalDigits?: number;
 
     /**
      * The rounding value for the currency (e.g., 2 for rounding to 2 decimal places).
@@ -73,7 +73,7 @@ export type ICurrency = {
      * @example
      * `2`
      */
-    rounding: number;
+    rounding?: number;
 
     /**
      * The ISO 4217 code for the currency (e.g., "USD" for United States Dollar).
@@ -83,7 +83,7 @@ export type ICurrency = {
      * @example
      * `USD`
      */
-    code: string;
+    code?: string;
 
     /**
      * The plural name of the currency (e.g., "US dollars").
@@ -93,7 +93,7 @@ export type ICurrency = {
      * @example
      * `US dollars`
      */
-    namePlural: string;
+    namePlural?: string;
 
     /**
      * The display format for the currency (e.g., `%v %s` for "123.45 USD").

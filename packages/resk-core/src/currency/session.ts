@@ -3,6 +3,7 @@ import currencies from "./currencies";
 import { ICurrency } from "./types";
 import isNonNullString from "../utils/isNonNullString";
 import { isValidCurrency } from "./utils";
+import {i18n} from "../i18n";
 
 /**
  * The default format for displaying currency values.
@@ -167,7 +168,6 @@ const getCurrency: () => ICurrency = (): ICurrency => {
   if (isNonNullString(format) && format.includes("%v")) {
     currency.format = format;
   }
-
   /**
    * Return the currency object with default values.
    * 
@@ -184,6 +184,7 @@ const getCurrency: () => ICurrency = (): ICurrency => {
     decimalSeparator: ".", // default decimal separator
     thousandSeparator: " ", // default thousands separator
     decimalDigits: 0, // default decimal digits
+    ...Object.assign({}, i18n.getNestedTranslation("currencies") as ICurrency),
     ...currency,
   } as ICurrency;
 }

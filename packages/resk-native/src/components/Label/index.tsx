@@ -198,7 +198,7 @@ export type ILabelProps = Omit<TextProps, "role" | "children" | "style"> & {
 
   /***
    * @type IThemeFontVariant
-   * The text style variant to use for the label
+   * The font variant to use for the label
    */
   fontVariant?: IThemeFontVariant;
 };

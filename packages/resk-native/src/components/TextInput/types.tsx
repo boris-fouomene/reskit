@@ -7,6 +7,7 @@ import { ILabelProps } from "@components/Label";
 import { IFontIconProps } from "@components/Icon/types";
 import { IInputFormatterMask, IInputFormatterMaskOptions, ICountryCode, IInputFormatterOptions, IInputFormatterResult } from "@resk/core";
 import { ICalendarModalDayViewProps } from '../Date/types';
+import { IKeyboardAvoidingViewProps } from "@components/KeyboardAvoidingView";
 
 /**
  * @interface ITextInputType
@@ -298,7 +299,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      * It is also the direct parent of the Label component for the default variant
      * Note that in the labelEmbeded variant, the label's parent component is the view parent direct to the left component.
      */
-    containerProps?: IViewProps;
+    containerProps?: IKeyboardAvoidingViewProps;
 
     /**
      * @type IViewProps

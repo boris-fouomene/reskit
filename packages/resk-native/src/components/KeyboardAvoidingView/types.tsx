@@ -5,7 +5,7 @@ import { KeyboardAvoidingViewProps } from "react-native";
  * This type extends the standard `KeyboardAvoidingViewProps` from React Native, 
  * adding an additional property to control the loading state of the component.
  * 
- * @typedef IKeyboardAvoidingView
+ * @typedef IKeyboardAvoidingViewProps
  * 
  * @extends KeyboardAvoidingViewProps
  * 
@@ -15,15 +15,15 @@ import { KeyboardAvoidingViewProps } from "react-native";
  * loading indicators.
  * 
  * @example
- * Here’s an example of how to use the `IKeyboardAvoidingView` type in a 
+ * Here’s an example of how to use the `IKeyboardAvoidingViewProps` type in a 
  * functional component:
  * 
  * ```tsx
  * import React from 'react';
  * import { KeyboardAvoidingView, TextInput, Button, ActivityIndicator } from 'react-native';
- * import { IKeyboardAvoidingView } from './types';
+ * import { IKeyboardAvoidingViewProps } from './types';
  * 
- * const MyForm: React.FC<IKeyboardAvoidingView> = ({ isPreloader }) => (
+ * const MyForm: React.FC<IKeyboardAvoidingViewProps> = ({ isPreloader }) => (
  *   <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
  *     {isPreloader ? (
  *       <ActivityIndicator size="large" color="#0000ff" />
@@ -43,6 +43,6 @@ import { KeyboardAvoidingViewProps } from "react-native";
  * while still benefiting from the keyboard management features 
  * provided by React Native.
  */
-export type IKeyboardAvoidingView = KeyboardAvoidingViewProps & {
+export type IKeyboardAvoidingViewProps = KeyboardAvoidingViewProps & {
     isPreloader?: boolean;
 }

@@ -1,6 +1,6 @@
-import { KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView as RNKeyboardAvoidingView, StyleSheet } from 'react-native';
 import React from "react";
-import { IKeyboardAvoidingView } from './types';
+import { IKeyboardAvoidingViewProps } from './types';
 import Platform from '@platform';
 
 export * from "./types";
@@ -13,7 +13,7 @@ export * from "./types";
  * 
  * @component
  * 
- * @param {IKeyboardAvoidingView} props - The properties for the component.
+ * @param {IKeyboardAvoidingViewProps} props - The properties for the component.
  * 
  * @param {React.ReactNode} props.children - The content to be rendered inside 
  * the `KeyboardAvoidingView`. This can include any valid React nodes, such as 
@@ -63,9 +63,9 @@ export * from "./types";
  * on Android, it uses 'height'. The `keyboardVerticalOffset` is set 
  * to 80 for iOS to account for any navigation bars or headers.
  */
-const KeyboardAvoidingViewComponent = React.forwardRef(({ children, isPreloader, ...rest }: IKeyboardAvoidingView, ref: React.Ref<KeyboardAvoidingView>) => {
+const KeyboardAvoidingView = React.forwardRef(({ children, isPreloader, ...rest }: IKeyboardAvoidingViewProps, ref: React.Ref<RNKeyboardAvoidingView>) => {
   return (
-    <KeyboardAvoidingView
+    <RNKeyboardAvoidingView
       ref={ref ? ref : x => x}
       behavior={Platform.isIos() ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.isAndroid() ? 0 : 80}
@@ -73,15 +73,13 @@ const KeyboardAvoidingViewComponent = React.forwardRef(({ children, isPreloader,
       style={[!isPreloader && styles.wrapper, rest.style]}
     >
       {children}
-    </KeyboardAvoidingView>
+    </RNKeyboardAvoidingView>
   );
 });
-KeyboardAvoidingViewComponent.displayName = "KeyboardAvoidingView";
+KeyboardAvoidingView.displayName = "KeyboardAvoidingView";
 export default KeyboardAvoidingView;
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-  },
+  wrapper: { },
 });
 
-export { KeyboardAvoidingViewComponent as KeyboardAvoidingView };
+export { KeyboardAvoidingView};

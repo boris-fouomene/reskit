@@ -1,8 +1,9 @@
 import View from "@components/View";
 import React from "react";
 import { isNonNullString } from "@resk/core";
-import { IKeyboardAvoidingView } from "./types";
+import { IKeyboardAvoidingViewProps } from "./types";
 import { View as RNView } from "react-native";
+import { defaultStr } from "@resk/core";
 
 export * from "./types";
 
@@ -14,7 +15,7 @@ export * from "./types";
  * 
  * @component
  * 
- * @param {IKeyboardAvoidingView} props - The properties for the component.
+ * @param {IKeyboardAvoidingViewProps} props - The properties for the component.
  * 
  * @param {React.ReactNode} props.children - The content to be rendered inside 
  * the `KeyboardAvoidingView`. This can include any valid React nodes, such as 
@@ -64,16 +65,14 @@ export * from "./types";
  * on Android, it uses 'height'. The `keyboardVerticalOffset` is set 
  * to 80 for iOS to account for any navigation bars or headers.
  */
-const KeyboardAvoidingViewComponent = React.forwardRef(({ children, style, testID, ...props }: IKeyboardAvoidingView, ref: React.Ref<RNView>) => {
-  testID = testID || 'resk-keyboard-avoiding-view';
-  return <View  {...props} ref={ref} style={[styles.main, style]} children={children} testID={isNonNullString(testID) ? `${testID}_keyboard-avoiding-view` : "resk-keyboard-avoiding-view"} />
+const IKeyboardAvoidingView = React.forwardRef(({ children, style, testID, ...props }: IKeyboardAvoidingViewProps, ref: React.Ref<RNView>) => {
+  testID = defaultStr(testID,'resk-keyboard-avoiding-view');
+  return <View  {...props} ref={ref} style={[styles.main, style]} children={children} testID={testID} />
 });
 
 const styles = {
-  main: {
-    flex: 1,
-  }
+  main: {}
 }
-KeyboardAvoidingViewComponent.displayName = "KeyboardAvoidingViewComponent";
+IKeyboardAvoidingView.displayName = "IKeyboardAvoidingView";
 
-export { KeyboardAvoidingViewComponent as KeyboardAvoidingView }
+export { IKeyboardAvoidingView as KeyboardAvoidingView }

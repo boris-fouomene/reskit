@@ -18,6 +18,7 @@ import { Calendar, CalendarModalContext } from "@components/Date";
 import { useI18n } from "@src/i18n";
 import { SelectCountryRef } from "./SelectCountryRef";
 import p from "@platform";
+import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
 
 const isNative = p.isNative();
 
@@ -91,7 +92,7 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
     const inputProps = { ...(!canWrapWithTouchable ? pressableProps : {}), focus, ...rest, editable: canWrapWithTouchable ? false : editable }
     const inputElement = typeof render == "function" ? render(inputProps, inputRef) : <RNTextInput {...inputProps} ref={inputRef} />;
-    return <View {...containerProps} >
+    return <KeyboardAvoidingView {...containerProps} >
         {isLabelEmbededVariant ? null : labelContent}
         <Wrapper {...wrapperProps} {...contentContainerProps} style={[styles.wrapper, contentContainerProps?.style]}>
             <View testID={testID + "-left-content-container"} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContentContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
@@ -105,7 +106,7 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
                 {right}
             </View>) : null}
         </Wrapper>
-    </View>
+    </KeyboardAvoidingView>
 });
 
 /**

@@ -840,7 +840,7 @@ export class DateHelper {
  * @returns {Object} An object containing the year, day, month, month string, hours, date, minutes, seconds, month name, day name, and day name short in UTC time.
  * 
  * @example
- * const utcDateDetails = Logger.getUTCDateTimeDetails(new Date('2022-01-01'));
+ * const utcDateDetails = DateHelper.getUTCDateTimeDetails(new Date('2022-01-01'));
  * console.log(utcDateDetails);
  * // Output: { year: 2022, day: 6, month: 0, monthString: '01', hours: 0, date: 1, minutes: 0, seconds: 0, monthName: 'January', dayName: 'Saturday', dayNameShort: 'Sat' }
  */

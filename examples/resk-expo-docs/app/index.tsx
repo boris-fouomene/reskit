@@ -1,7 +1,7 @@
 import { Tab, TextInput, withAppBar, Avatar, Badge, Calendar, Drawer, Button,List, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
 import { View, ScrollView, FlatList } from 'react-native'
 import { IField, Logger, InputFormatter, ILogger, AttachLogger } from "@resk/core";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 @AttachLogger()
 class LoggerExample implements ILogger {
@@ -24,7 +24,7 @@ class LoggerExample implements ILogger {
 
 const index = withAppBar(() => {
     Logger.error("Example of logg");
-    const listRef = useRef<FlatList<any>>();
+    const listRef = useRef<FlatList>(null);
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>
@@ -81,7 +81,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                           title: 'Third Item',
                         },
                       ]}
-                    //ref={listRef}
+                    ref = {(list)=> (listRef as any).current = list}
                     renderItem={({item}) => <Label children={item.title} fontVariant={"labelLarge"} />}
                     keyExtractor={item => item.id}
                 />

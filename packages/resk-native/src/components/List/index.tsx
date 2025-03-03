@@ -4,7 +4,7 @@ import { FlatListProps,FlatList } from 'react-native';
 
 class ListManager{
     static metaData = Symbol("ListManager");
-    static getList(){
+    static getComponent(){
         const component = Reflect.getMetadata(ListManager.metaData, ListManager);
         if(component){
             return component;
@@ -13,21 +13,18 @@ class ListManager{
     }
 }
 
-// Define the component with proper forwardRef typing
-function GenericList<ItemType = any>(
-    props: IListProps<ItemType>,
-    ref: React.ForwardedRef<FlatList<ItemType>>
-  ) {
+  
+export interface IListProps<ItemType= any> extends FlatListProps<ItemType>{}
+export const List = React.forwardRef(function GenericList<ItemType = any>(props: IListProps<ItemType>,ref: React.Ref<FlatList<ItemType>>) {
     const Component = useMemo(()=>{
-        return ListManager.getList();
+        return ListManager.getComponent();
     },[]);
     return <Component {...props} ref={ref} />
-}
-  
-export interface IListProps<ItemType= any> extends FlatListProps<ItemType>, React.RefAttributes<FlatList<ItemType>>{
-}
-export const List = React.forwardRef<FlatList<any>, IListProps>(GenericList) as <ItemType>(props: IListProps<ItemType> & { ref?: React.ForwardedRef<FlatList<ItemType>>}) => ReturnType<typeof GenericList>; 
+}) as <ItemType>(
+    props: IListProps<ItemType> & { ref?: React.Ref<FlatList<ItemType>> }
+  ) => JSX.Element;
 (List as any).displayName = "List";
+
 
 export function AttachListComponent() {
     return function (target: IClassConstructor<FlatListProps<any>>) {

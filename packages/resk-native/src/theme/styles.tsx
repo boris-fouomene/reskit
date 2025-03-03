@@ -506,21 +506,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
-
-    // ... (other styles)
-
-    /**
-     * Web font family style.
-     * Applies a specific font family for web platforms.
-     * 
-     * @property {string} fontFamily - Font family for web platforms.
-     * 
-     * @example
-     * <Text style={styles.webFontFamily}>Web font family</Text>
-     */
-    webFontFamily: Platform.isWeb() ? {
-        fontFamily: '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Fira Sans",Ubuntu,Oxygen,"Oxygen Sans",Cantarell,"Droid Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Emoji","Segoe UI Symbol","Lucida Grande",Helvetica,Arial,sans-serif',
-    } : {},
     noPadding: {
         padding: 0,
         paddingLeft: 0,

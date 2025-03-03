@@ -1,5 +1,4 @@
-import { IBreakpointName } from "@breakpoints/types";
-
+import { TextStyle } from "react-native";
 
 /**
  * @interface IThemeColorsTokens
@@ -278,26 +277,19 @@ export interface ITheme {
    */
   colors: IThemeColorsTokens;
 
-  /***
-   * The spacing value is used to adjust the spacing of components like buttons, cards, text inputs, and other UI elements.
-   * This property influences how much space is reserved around the edges of these elements.
-   * A low spacing value results in more space between the element and its surroundings, while a higher value makes the element more compact.
-   */
-  spaces?: IThemeSpaces;
 
   /***
-   * The font sizes value is used to adjust the font sizes of components like buttons, cards, text inputs, and other UI elements.
-   * This property influences the size of the text within these elements.
-   * A low font size value results in smaller text, while a higher value makes the text more readable.
+   * The fonts value is used to customize the fonts used in the application.
+   * This property allows you to define the font styles for different platforms and font weights.
+   * By default, the fonts are set to the default font styles for each platform.
    */
-  fontSizes?: IThemeFontSizes;
+  fontsConfig?: IThemeFontsConfig;
 
   /***
-   * The border radius value is used to adjust the border radius of components like buttons, cards, text inputs, and other UI elements.
-   * This property influences the roundedness of the corners of these elements.
-   * A low border radius value results in sharper corners, while a higher value makes the corners more rounded.
+   * The textStylesVariants value is used to customize the text styles for different platforms and font weights.
+   * By default, the textStylesVariants are set to the default text styles for each platform.
    */
-  borderRadius?: IThemeBorderRadius;
+  textStylesVariants?: Partial<IThemeTextStylesVariants>;
 }
 
 /**
@@ -322,437 +314,458 @@ export type IThemeColorSheme = { color?: string; backgroundColor?: string };
 
 
 /**
- * Represents the theme's spacing configuration.
+ * Interface representing a theme font configuration object.
  * 
- * @remarks
- * This interface defines the spacing values for different breakpoints and custom sizes.
- * It uses a record type to allow for flexible key-value pairs, where keys are either breakpoint names or custom size breakpoints (e.g., `_12sm`).
- * The interface also includes predefined spacing values for common breakpoints.
+ * This interface defines a record of theme fonts, where each key is a font style and the value is an TextStyle object.
  * 
  * @example
  * ```typescript
- * const themeSpaces: IThemeSpaces = {
- *   _2xs: 4,
- *   xs: 8,
- *   sm: 12,
- *   md: 16,
- *   lg: 20,
- *   xl: 24,
- *   _2xl: 28,
- *   _3xl: 32,
- *   _4xl: 36,
- *   _5xl: 40,
- *   '12sm': 20,
+ * const themeFontConfig: IThemeFonts = {
+ *   regular: {
+ *     fontSize: 16,
+ *     fontFamily: 'Arial',
+ *     fontWeight: 'normal',
+ *   },
+ *   medium: {
+ *     fontSize: 16,
+ *     fontFamily: 'Arial',
+ *     fontWeight: 'bold',
+ *   },
+ *   light: {
+ *     fontSize: 16,
+ *     fontFamily: 'Arial',
+ *     fontWeight: 'light',
+ *   },
+ *   thin: {
+ *     fontSize: 16,
+ *     fontFamily: 'Arial',
+ *     fontWeight: 'thin',
+ *   },
  * };
  * ```
  */
-export interface IThemeSpaces extends Partial<Record<IBreakpointName | `_${number}${IBreakpointName}`, number>> {
+export interface IThemeFonts extends Record<string, TextStyle> {
   /**
-   * The spacing value for the `_2xs` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the smallest spacing size.
+   * The regular font style configuration.
    * 
    * @example
    * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   _2xs: 4,
+   * const themeFontConfig: IThemeFonts = {
+   *   regular: {
+   *     fontFamily: 'Arial',
+   *     fontWeight: 'normal',
+   *   },
    * };
    * ```
    */
-  _2xs: number,
+  regular: TextStyle;
 
   /**
-   * The spacing value for the `xs` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the extra small spacing size.
+   * The medium font style configuration.
    * 
    * @example
    * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   xs: 8,
+   * const themeFontConfig: IThemeFonts = {
+   *   medium: {
+   *     fontFamily: 'Arial',
+   *     fontWeight: 'bold',
+   *   },
    * };
    * ```
    */
-  xs: number,
+  medium: TextStyle;
 
   /**
-   * The spacing value for the `sm` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the small spacing size.
+   * The light font style configuration.
    * 
    * @example
    * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   sm: 12,
+   * const themeFontConfig: IThemeFonts = {
+   *   light: {
+   *     fontFamily: 'Arial',
+   *     fontWeight: 'light',
+   *   },
    * };
    * ```
    */
-  sm: number,
+  light: TextStyle;
 
   /**
-   * The spacing value for the `md` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the medium spacing size.
+   * The thin font style configuration.
    * 
    * @example
    * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   md: 16,
+   * const themeFontConfig: IThemeFonts = {
+   *   thin: {
+   *     fontFamily: 'Arial',
+   *     fontWeight: 'thin',
+   *   },
    * };
    * ```
    */
-  md: number,
-
-  /**
-   * The spacing value for the `lg` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the large spacing size.
-   * 
-   * @example
-   * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   lg: 20,
-   * };
-   * ```
-   */
-  lg: number,
-
-  /**
-   * The spacing value for the `xl` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the extra large spacing size.
-   * 
-   * @example
-   * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   xl: 24,
-   * };
-   * ```
-   */
-  xl: number,
-
-  /**
-   * The spacing value for the `_2xl` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the 2xl spacing size.
-   * 
-   * @example
-   * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   _2xl: 28,
-   * };
-   * ```
-   */
-  _2xl: number,
-
-  /**
-   * The spacing value for the `_3xl` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the 3xl spacing size.
-   * 
-   * @example
-   * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   _3xl: 32,
-   * };
-   * ```
-   */
-  _3xl: number,
-
-  /**
-   * The spacing value for the `_4xl` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the 4xl spacing size.
-   * 
-   * @example
-   * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   _4xl: 36,
-   * };
-   * ```
-   */
-  _4xl: number,
-
-  /**
-   * The spacing value for the `_5xl` breakpoint.
-   * 
-   * @ remarks
-   * This value is used for the 5xl spacing size.
-   * 
-   * @example
-   * ```typescript
-   * const themeSpaces: IThemeSpaces = {
-   *   _5xl: 40,
-   * };
-   * ```
-   */
-  _5xl: number,
+  thin: TextStyle;
 }
 
 /**
- * @interface IThemeFontSizes
- * Represents the theme's font size configuration.
+ * Interface representing a theme fonts configuration object for different platforms.
  * 
- * @remarks
- * This interface defines the font sizes for different breakpoints and custom sizes.
- * It uses a record type to allow for flexible key-value pairs, where keys are either breakpoint names or custom size breakpoints (e.g., `_12_sm`).
- * The interface also includes predefined font sizes for common breakpoints.
- * 
+ * This interface defines a record of theme font configurations, where each key is a platform and the value is an IThemeFonts object.
+ * @extends {Record<string, IThemeFonts>}
+ * @see {@link IThemeFonts} for the `IThemeFonts` interface.
  * @example
  * ```typescript
- * const themeFontSizes: IThemeFontSizes = {
- *   _2xs: 10,
- *   xs: 12,
- *   sm: 14,
- *   md: 16,
- *   lg: 18,
- *   xl: 20,
- *   _2xl: 22,
- *   _3xl: 24,
- *   _4xl: 26,
- *   _5xl: 28,
- *   '12_sm': 15,
+ * const themeFontsConfig: IThemeFontsConfig = {
+ *   web: {
+ *     regular: {
+ *       fontSize: 16,
+ *       fontFamily: 'Arial',
+ *       fontWeight: 'normal',
+ *     },
+ *     medium: {
+ *       fontSize: 16,
+ *       fontFamily: 'Arial',
+ *       fontWeight: 'bold',
+ *     },
+ *     light: {
+ *       fontSize: 16,
+ *       fontFamily: 'Arial',
+ *       fontWeight: 'light',
+ *     },
+ *     thin: {
+ *       fontSize: 16,
+ *       fontFamily: 'Arial',
+ *       fontWeight: 'thin',
+ *     },
+ *   },
+ *   android: {
+ *     regular: {
+ *       fontSize: 16,
+ *       fontFamily: 'Roboto',
+ *       fontWeight: 'normal',
+ *     },
+ *     medium: {
+ *       fontSize: 16,
+ *       fontFamily: 'Roboto',
+ *       fontWeight: 'bold',
+ *     },
+ *     light: {
+ *       fontSize: 16,
+ *       fontFamily: 'Roboto',
+ *       fontWeight: 'light',
+ *     },
+ *     thin: {
+ *       fontSize: 16,
+ *       fontFamily: 'Roboto',
+ *       fontWeight: 'thin',
+ *     },
+ *   },
+ *   ios: {
+ *     regular: {
+ *       fontSize: 16,
+ *       fontFamily: 'San Francisco',
+ *       fontWeight: 'normal',
+ *     },
+ *     medium: {
+ *       fontSize: 16,
+ *       fontFamily: 'San Francisco',
+ *       fontWeight: 'bold',
+ *     },
+ *     light: {
+ *       fontSize: 16,
+ *       fontFamily: 'San Francisco',
+ *       fontWeight: 'light',
+ *     },
+ *     thin: {
+ *       fontSize: 16,
+ *       fontFamily: 'San Francisco',
+ *       fontWeight: 'thin',
+ *     },
+ *   },
  * };
  * ```
  */
-export interface IThemeFontSizes extends Partial<Record<IBreakpointName | `_${number}${IBreakpointName}`, number>> {
+export interface IThemeFontsConfig extends Partial<Record<string, IThemeFonts>> {
   /**
-   * The font size for the `_2xs` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the smallest font size.
+   * The theme font configuration for web platforms.
    * 
    * @example
    * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   _2xs: 10,
+   * const themeFontsConfig: IThemeFontsConfig = {
+   *   web: {
+   *     regular: {
+   *       fontSize: 16,
+   *       fontFamily: 'Arial',
+   *       fontWeight: 'normal',
+   *     },
+   *     // ... other font styles
+   *   },
    * };
    * ```
    */
-  _2xs: number,
+  web?: IThemeFonts;
 
   /**
-   * The font size for the `xs` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the extra small font size.
+   * The theme font configuration for Android platforms.
    * 
    * @example
    * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   xs: 12,
+   * const themeFontsConfig: IThemeFontsConfig = {
+   *   android: {
+   *     regular: {
+   *       fontSize: 16,
+   *       fontFamily: 'Roboto',
+   *       fontWeight: 'normal',
+   *     },
+   *     // ... other font styles
+   *   },
    * };
    * ```
    */
-  xs: number,
+  android?: IThemeFonts;
 
   /**
-   * The font size for the `sm` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the small font size.
+   * The theme font configuration for iOS platforms.
    * 
    * @example
    * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   sm: 14,
+   * const themeFontsConfig: IThemeFontsConfig = {
+   *   ios: {
+   *     regular: {
+   *       fontSize: 16,
+   *       fontFamily: 'San Francisco',
+   *       fontWeight: 'normal',
+   *     },
+   *     // ... other font styles
+   *   },
    * };
    * ```
    */
-  sm: number,
-
-  /**
-   * The font size for the `md` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the medium font size.
-   * 
-   * @example
-   * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   md: 16,
-   * };
-   * ```
-   */
-  md: number,
-
-  /**
-   * The font size for the `lg` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the large font size.
-   * 
-   * @example
-   * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   lg: 18,
-   * };
-   * ```
-   */
-  lg: number,
-
-  /**
-   * The font size for the `xl` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the extra large font size.
-   * 
-   * @example
-   * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   xl: 20,
-   * };
-   * ```
-   */
-  xl: number,
-
-  /**
-   * The font size for the `_2xl` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the 2xl font size.
-   * 
-   * @example
-   * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   _2xl: 22,
-   * };
-   * ```
-   */
-  _2xl: number,
-
-  /**
-   * The font size for the `_3xl` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the 3xl font size.
-   * 
-   * @example
-   * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   _3xl: 24,
-   * };
-   * ```
-   */
-  _3xl: number,
-
-  /**
-   * The font size for the `_4xl` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the 4xl font size.
-   * 
-   * @example
-   * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   _4xl: 26,
-   * };
-   * ```
-   */
-  _4xl: number,
-
-  /**
-   * The font size for the `_5xl` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the 5xl font size.
-   * 
-   * @example
-   * ```typescript
-   * const themeFontSizes: IThemeFontSizes = {
-   *   _5xl: 28,
-   * };
-   * ```
-   */
-  _5xl: number,
+  ios?: IThemeFonts;
 }
+
+
 /**
- * @interface IThemeBorderRadius
- * Represents the theme's border radius configuration.
+ * Type representing a theme text style variant.
  * 
- * @remarks
- * This interface defines the border radius values for different breakpoints and custom sizes.
- * It uses a record type to allow for flexible key-value pairs, where keys are either breakpoint names or custom size breakpoints (e.g., `_12_sm`).
- * The interface also includes predefined border radius values for common breakpoints.
+ * This type defines a set of predefined text style variants that can be used to style text in a theme.
  * 
  * @example
  * ```typescript
- * const themeBorderRadius: IThemeBorderRadius = {
- *   _2xs: 2,
- *   xs: 4,
- *   sm: 8,
- *   md: 12,
- *   '12_sm': 10,
+ * const textStyleVariant: IThemeTextStyleVariant = 'headlineLarge';
+ * ```
+ */
+/**
+ * Type representing a theme text style variant.
+ * 
+ * This type defines a set of predefined text style variants that can be used to style text in a theme.
+ * 
+ * @example
+ * ```typescript
+ * const textStyleVariant: IThemeTextStyleVariant = 'headlineLarge';
+ * ```
+ */
+export type IThemeTextStyleVariant =
+  /**
+   * The display large text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'displayLarge';
+   * ```
+   */
+  | 'displayLarge'
+
+  /**
+   * The display medium text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'displayMedium';
+   * ```
+   */
+  | 'displayMedium'
+
+  /**
+   * The display small text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'displaySmall';
+   * ```
+   */
+  | 'displaySmall'
+
+  /**
+   * The headline large text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'headlineLarge';
+   * ```
+   */
+  | 'headlineLarge'
+
+  /**
+   * The headline medium text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'headlineMedium';
+   * ```
+   */
+  | 'headlineMedium'
+
+  /**
+   * The headline small text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'headlineSmall';
+   * ```
+   */
+  | 'headlineSmall'
+
+  /**
+   * The title large text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'titleLarge';
+   * ```
+   */
+  | 'titleLarge'
+
+  /**
+   * The title medium text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'titleMedium';
+   * ```
+   */
+  | 'titleMedium'
+
+  /**
+   * The title small text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'titleSmall';
+   * ```
+   */
+  | 'titleSmall'
+
+  /**
+   * The label large text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'labelLarge';
+   * ```
+   */
+  | 'labelLarge'
+
+  /**
+   * The label medium text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'labelMedium';
+   * ```
+   */
+  | 'labelMedium'
+
+  /**
+   * The label small text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'labelSmall';
+   * ```
+   */
+  | 'labelSmall'
+
+  /**
+   * The body large text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'bodyLarge';
+   * ```
+   */
+  | 'bodyLarge'
+
+  /**
+   * The body medium text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'bodyMedium';
+   * ```
+   */
+  | 'bodyMedium'
+
+  /**
+   * The body small text style variant.
+   * 
+   * @example
+   * ```typescript
+   * const textStyleVariant: IThemeTextStyleVariant = 'bodySmall';
+   * ```
+   */
+  | 'bodySmall';
+
+/**
+ * Interface representing a theme font configuration with variants.
+ * 
+ * This interface defines a record of theme font configurations, where each key is a text style variant and the value is an IThemeFonts object.
+ */
+export interface IThemeFontsWithVariants extends IThemeFonts {
+  displayLarge: TextStyle;
+  displayMedium: TextStyle;
+  displaySmall: TextStyle;
+  headlineLarge: TextStyle;
+  headlineMedium: TextStyle;
+  headlineSmall: TextStyle;
+  titleLarge: TextStyle;
+  titleMedium: TextStyle;
+  titleSmall: TextStyle;
+  labelLarge: TextStyle;
+  labelMedium: TextStyle;
+  labelSmall: TextStyle;
+  bodyLarge: TextStyle;
+  bodyMedium: TextStyle;
+  bodySmall: TextStyle;
+}
+
+/**
+ * Interface representing theme text styles variants.
+ * 
+ * This interface defines a record of text styles, where each key is a text style variant and the value is a TextStyle object.
+ * 
+ * @example
+ * ```typescript
+ * const textStylesVariants: IThemeTextStylesVariants = {
+ *   displayLarge: { fontSize: 32, fontWeight: 'bold' },
+ *   displayMedium: { fontSize: 24, fontWeight: 'bold' },
+ *   // ... other text styles
  * };
  * ```
  */
-export interface IThemeBorderRadius extends Partial<Record<IBreakpointName | `_${number}${IBreakpointName}`, number>> {
-  /**
-   * The border radius for the `_2xs` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the smallest border radius.
-   * 
-   * @example
-   * ```typescript
-   * const themeBorderRadius: IThemeBorderRadius = {
-   *   _2xs: 2,
-   * };
-   * ```
-   */
-  _2xs: 2,
+export interface IThemeTextStylesVariants extends Record<IThemeTextStyleVariant, TextStyle> { }
 
-  /**
-   * The border radius for the `xs` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the extra small border radius.
-   * 
-   * @example
-   * ```typescript
-   * const themeBorderRadius: IThemeBorderRadius = {
-   *   xs: 4,
-   * };
-   * ```
-   */
-  xs: 4,
-
-  /**
-   * The border radius for the `sm` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the small border radius.
-   * 
-   * @example
-   * ```typescript
-   * const themeBorderRadius: IThemeBorderRadius = {
-   *   sm: 8,
-   * };
-   * ```
-   */
-  sm: 8,
-
-  /**
-   * The border radius for the `md` breakpoint.
-   * 
-   * @remarks
-   * This value is used for the medium border radius.
-   * 
-   * @example
-   * ```typescript
-   * const themeBorderRadius: IThemeBorderRadius = {
-   *   md: 12,
-   * };
-   * ```
-   */
-  md: 12,
-}
+/**
+ * Interface representing theme text styles variants.
+ * 
+ * This interface defines a record of text styles, where each key is a text style variant and the value is a TextStyle object.
+ * 
+ * @example
+ * ```typescript
+ * const textStylesVariants: IThemeTextStylesVariants = {
+ *   displayLarge: { fontSize: 32, fontWeight: 'bold' },
+ *   displayMedium: { fontSize: 24, fontWeight: 'bold' },
+ *   // ... other text styles
+ * };
+ * ```
+ */
+export interface IThemeTextStylesVariants extends Record<IThemeTextStyleVariant, TextStyle> { }

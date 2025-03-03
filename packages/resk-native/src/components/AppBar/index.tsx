@@ -97,7 +97,6 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   subtitleProps = Object.assign({}, subtitleProps);
   subtitle = subtitle === false ? null : subtitle;
   const subtitleColor = titleTextColor ? Colors.setAlpha(titleTextColor, 0.7) : undefined;
-  const webStyle = theme.styles.webFontFamily;
   backActionProps = Object.assign({}, { color, backgroundColor }, backActionProps);
   const { onPress } = backActionProps;
   backActionProps.onPress = (e: GestureResponderEvent) => {
@@ -166,7 +165,6 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
             titleTextColor ? {
               color: titleTextColor,
             } : undefined,
-              webStyle,
             titleProps.style
             ]}
           >
@@ -178,7 +176,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
               splitText
               testID={`${testID}-subtitle`}
               {...subtitleProps}
-              style={[styles.subtitle, subtitleColor && { color: subtitleColor } || undefined, webStyle, subtitleProps?.style]}
+              style={[styles.subtitle, subtitleColor && { color: subtitleColor } || undefined, subtitleProps?.style]}
             >
               {subtitle}
             </Label>

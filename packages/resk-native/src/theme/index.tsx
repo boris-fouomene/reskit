@@ -1,6 +1,7 @@
-import { IThemeColorSheme, ITheme, IThemeColorsTokenName, IThemeColorsTokens, IThemeFontSizes, IThemeSpaces, IThemeBorderRadius } from "./types";
+import { IThemeColorSheme, ITheme, IThemeColorsTokenName, IThemeColorsTokens, IThemeFonts, IThemeTextStylesVariants, IThemeTextStyleVariant, IThemeFontsWithVariants } from "./types";
 import Colors from "./colors";
 import { defaultStr, extendObj, IDict, IObservable, isNonNullString, isObj, isObservable, observable } from "@resk/core";
+import { Platform as RNPlatform, TextStyle } from "react-native";
 import { createMaterial3Theme as _createMaterial3Theme } from "./material-colors";
 import { Session } from "@resk/core";
 import Color from "color";
@@ -10,6 +11,7 @@ import { useReskNative } from "@src/context/hooks";
 import Elevations from "./Elevations";
 import { IBreakpointName } from "@breakpoints/types";
 import Breakpoints from "@breakpoints/index";
+import { defaultFontsConfig, defaultTextStylesVariants } from "./defaultFontsConfig";
 export * from "./utils";
 export * from "./types";
 
@@ -172,34 +174,25 @@ export function createTheme(theme: ITheme): IThemeManager {
     const Material3Theme = getMaterial3Theme(theme?.colors?.primary);
     theme = extendObj({}, theme?.dark ? Material3Theme.dark : Material3Theme.light, theme);
     const context = theme;
-    const spaces = Object.assign({}, {
-        _2xs: 2,
-        xs: 4,
-        sm: 8,
-        md: 12,
-        lg: 16,
-        xl: 20,
-        _2xl: 24,
-        _3xl: 28,
-        _4xl: 32,
-        _5xl: 40,
-    }, context.spaces), fontSizes = Object.assign({}, {
-        _2xs: 10,
-        xs: 12,
-        sm: 14,
-        md: 16,
-        lg: 18,
-        xl: 20,
-        _2xl: 22,
-        _3xl: 26,
-        _4xl: 32,
-        _5xl: 40,
-    }, context.fontSizes), borderRadius = Object.assign({}, {
-        _2xs: 2,
-        xs: 4,
-        sm: 8,
-        md: 12,
-    }, context.borderRadius);
+    const _fonts = isObj(context?.fontsConfig) ? extendObj({}, defaultFontsConfig, context.fontsConfig) : defaultFontsConfig;
+    const font: IThemeFonts = _fonts[String(RNPlatform.OS).toLowerCase()] || _fonts.default;
+    Object.keys(defaultTextStylesVariants).map((key) => {
+        const variant = defaultTextStylesVariants[key as IThemeTextStyleVariant];
+        if (variant) {
+            const str = key.toLowerCase();
+            const cFont = (str.startsWith("label") || str.startsWith("title") || str.endsWith("medium")) ? font.medium : font.regular;
+            if (cFont) {
+                if (cFont.fontFamily && !variant.fontFamily) {
+                    variant.fontFamily = cFont.fontFamily;
+                }
+                if (cFont.fontWeight && !variant.fontWeight) {
+                    variant.fontWeight = cFont.fontWeight;
+                }
+            }
+        }
+    });
+    const fonts = extendObj({}, defaultTextStylesVariants, _fonts);
+    const textStylesVariants = extendObj({}, defaultTextStylesVariants, context.textStylesVariants);
     return {
         ...Object.assign({}, theme),
         get styles() {
@@ -287,69 +280,23 @@ export function createTheme(theme: ITheme): IThemeManager {
             }
             return result;
         },
-        get spaces() {
-            return spaces;
-        },
-        get fontSizes() {
-            return fontSizes;
-        },
-        get borderRadius() {
-            return borderRadius;
-        },
-        space(breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`): number | undefined {
-            return getBreakpointValue(spaces, breakpointName);
-        },
-        fontSize(breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`): number | undefined {
-            return getBreakpointValue(fontSizes, breakpointName);
-        },
-        bRadius(breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`): number | undefined {
-            return getBreakpointValue(borderRadius, breakpointName);
-        },
         get addEventListener() {
             return addEventListener;
         },
+        /***
+         * Returns the fonts object for the current platform.
+         * 
+         * @returns {IThemeFonts} The fonts object for the current platform.
+         * 
+         * @example
+         * ```typescript
+         * const fonts = theme.fonts;
+         * console.log(fonts); // Output: The fonts object for the current Platform
+         */
+        get fonts() {
+            return fonts;
+        },
     };
-}
-
-const getBreakpointValue = (values: Partial<Record<IBreakpointName | `_${number}${IBreakpointName}`, number>>, breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`): number | undefined => {
-    if (isNonNullString(breakpointName) && typeof values[breakpointName] == "number") {
-        return values[breakpointName];
-    }
-    let coef = 1;
-    if (Breakpoints.isSmallPhoneMedia()) {
-        const value = typeof values[Breakpoints.smallPhoneBreakpoint] == "number" ? values[Breakpoints.smallPhoneBreakpoint] :
-            typeof values.smallPhone == "number" ? (values.smallPhone as number) :
-                undefined;
-        if (value) {
-            return value * coef;
-        }
-        return undefined;
-    }
-    if (Breakpoints.isMediumPhoneMedia()) {
-        const value = typeof values[Breakpoints.mediumPhoneBreakpoint] == "number" ? values[Breakpoints.mediumPhoneBreakpoint] :
-            typeof values.mediumPhone == "number" ? values.mediumPhone :
-                undefined;
-        if (value) {
-            return value * coef;
-        }
-        return undefined;
-    }
-    if (Breakpoints.isPhoneMedia()) {
-        const value = typeof values[Breakpoints.phoneBreakpoint] == "number" ? values[Breakpoints.phoneBreakpoint] :
-            typeof values.phone == "number" ? values.phone :
-                undefined;
-        if (value) {
-            return value * coef;
-        }
-    }
-    coef = Breakpoints.isTabletMedia() ? 1 : 0.7;
-    const array = Breakpoints.isMobileMedia() ? Breakpoints.mobileBreakpoints : Breakpoints.isTabletMedia() ? Breakpoints.tabletBreakpoints : Breakpoints.desktopBreakpoints;
-    for (const b of array) {
-        if (typeof values[b] == "number") {
-            return values[b] * coef;
-        }
-    }
-    return undefined;
 }
 
 
@@ -645,52 +592,11 @@ export interface IThemeManager extends ITheme {
      * If `events` is not observable, the function will make it so internally using the `observable` function.
      */
     addEventListener: (callstack: (theme: ITheme) => any) => { remove: () => any };
-
-    fontSizes: IThemeFontSizes;
-    spaces: IThemeSpaces;
-    borderRadius: IThemeBorderRadius;
     /***
-     * Retrieves the spacing value for the given breakpoint.
-     * 
-     * @param {IBreakpointName} [breakpointName] - The name of the breakpoint to retrieve the spacing value for.
-     * By default, the method returns the spacing value for the current breakpoint.
-     * @returns {number} The spacing value for the given breakpoint.
-     * 
-     * @example
-     * ```ts
-     * const spacing = space("md");
-     * console.log(spacing); // Outputs: 16
-     * ```
+     * The fonts value is used to customize the fonts used in the application.
+     * This property allows you to define the font styles for different platforms and font weights.
      */
-    space: (breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`) => number | undefined;
-    /***
-     * Retrieves the font size value for the given breakpoint.
-     * 
-     * @param {IBreakpointName} [breakpointName] - The name of the breakpoint to retrieve the font size value for.
-     * By default, the method returns the font size value for the current breakpoint.
-     * @returns {number} The font size value for the given breakpoint.
-     * 
-     * @example
-     * ```ts
-     * const fontSize = fontSize("md");
-     * console.log(fontSize); // Outputs: 16
-     * ```
-     */
-    fontSize: (breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`) => number | undefined;
-    /***
-     * Retrieves the border radius value for the given breakpoint.
-     * 
-     * @param {IBreakpointName} [breakpointName] - The name of the breakpoint to retrieve the border radius value for.
-     * by default, the method returns the border radius value for the current breakpoint.
-     * @returns {number} The border radius value for the given breakpoint.
-     * 
-     * @example
-     * ```ts
-     * const borderRadius = bRadius("md");
-     * console.log(borderRadius); // Outputs: 12
-     * ```
-     */
-    bRadius: (breakpointName?: IBreakpointName | `_${number}${IBreakpointName}`) => number | undefined;
+    fonts: IThemeFontsWithVariants;
 };
 
 export * from "./useColorScheme";

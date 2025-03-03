@@ -4,8 +4,8 @@ import Theme, { useTheme, Colors } from "@theme";
 import React, { ReactNode } from "react";
 import { isValidElement } from "@utils";
 import { IStyle } from "../../types";
-import { IDict } from "@resk/core";
-import { IThemeColorsTokenName } from "@theme/types";
+import { IDict, isNonNullString } from "@resk/core";
+import { IThemeColorsTokenName, IThemeTextStyleVariant } from "@theme/types";
 
 /**
  * 
@@ -38,6 +38,7 @@ const Label = React.forwardRef(({
   splitText,
   disabled,
   style,
+  textStyleVariant,
   colorScheme: customColorScheme,
   ...rest
 }: ILabelProps, ref: React.ForwardedRef<Text>) => {
@@ -106,13 +107,14 @@ const Label = React.forwardRef(({
       testID={testID}
       disabled={disabled}
       style={[
-        Theme.styles.webFontFamily,
         splitText ? Theme.styles.flexWrap : null,
         splitText ? Theme.styles.w100 : null,
         textBold ? Theme.styles.fontBold : null,
         r2,
         r1,
         disabled && Theme.styles.disabled,
+        theme.fonts.regular,
+        isNonNullString(textStyleVariant) && theme.fonts[textStyleVariant],
         style,
         fontSize && typeof fontSize === "number" ? { fontSize } : null,
       ]}
@@ -194,6 +196,12 @@ export type ILabelProps = Omit<TextProps, "role" | "children" | "style"> & {
    * @type ReactNode, Children elements or text content
    */
   children?: ReactNode;
+
+  /***
+   * @type IThemeTextStyleVariant
+   * The text style variant to use for the label
+   */
+  textStyleVariant?: IThemeTextStyleVariant;
 };
 
 export default Label;

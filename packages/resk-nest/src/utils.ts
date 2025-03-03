@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import "./modules/resource/interfaces";
-import { defaultStr, isNonNullString, ResourcesManager, uniqid } from "@resk/core";
+import { defaultStr, isNonNullString, Logger, ResourcesManager, uniqid } from "@resk/core";
 import { join } from 'path';
 import { existsSync } from 'fs';
 import {
@@ -200,7 +200,7 @@ export const setupSwagger = (
                 prefix: dynamicCustomPath,
             });
         } else {
-            console.warn('swagger-ui-dist not found in any node_modules directory.');
+            Logger.warn('swagger-ui-dist not found in any node_modules directory.');
         }
     }
     // Set up the Swagger UI endpoint

@@ -1,5 +1,5 @@
 import { Injectable, ArgumentMetadata, BadRequestException, SetMetadata, ExecutionContext, createParamDecorator, PipeTransform } from '@nestjs/common';
-import { IClassConstructor, IDict, isNonNullString, Validator } from '@resk/core';
+import { IClassConstructor, IDict, isNonNullString, Logger, Validator } from '@resk/core';
 import "../../../translations";
 import { i18n } from "@resk/core";
 import { stringify } from 'querystring';
@@ -139,6 +139,7 @@ export const ValidatorParam = createParamDecorator<([config: IParseRequestConfig
     try {
         return await ValidatorPipe.staticTransform({ dtoClass, data }, {} as any);
     } catch (e) {
+        Logger.error("Validation failed for controller " + controllerName + " and handler " + handlerName, e);
         throw new BadRequestException(e)
     }
 });

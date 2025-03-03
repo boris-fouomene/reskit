@@ -503,7 +503,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         if (String(inputValue).startsWith(dialCode)) {
             return null;
         }
-        return <Label color={textColor}>{dialCode}</Label>
+        return <Label color={textColor}>{dialCode.trim() + " "}</Label>
     }, [phoneDialCode, isPhone, textColor, inputValue]);
     const phoneCountryFlag = isPhone && SelectCountryComponent ? <>
         <SelectCountryComponent
@@ -550,7 +550,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             style: [styles.contentContainer, contentContainerStyle,
             contentContainerProps.style]
         }),
-        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` :` : ""}</Label> : null),
+        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
         placeholder: hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
         testID: testID,

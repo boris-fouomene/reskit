@@ -21,6 +21,7 @@ import { AppBar } from "@components/AppBar";
 import { Divider } from "@components/Divider";
 import { ProgressBar } from "@components/ProgressBar";
 import { ITextInputProps } from "@components/TextInput/types";
+import { List } from "@components/List";
 
 /**
  * Represents a dropdown component that allows users to select one or more items from a list.
@@ -51,12 +52,6 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             ...this.prepareState(props),
         };
     }
-    /***
-    * the component to use for the list
-    * it's a static property that can be overriden by the user
-    * This is useful for customizing the list component, when needed.
-    */
-    static List: IReactComponent<FlatListProps<IDropdownPreparedItem<any, any>>> = FlatList<IDropdownPreparedItem<any, any>>;
     getHashKey(value: ValueType): string {
         const { getHashKey } = this.props;
         if (typeof getHashKey === "function") {
@@ -431,13 +426,13 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             </View>}
         >
             <DropdownContext.Provider value={context}>
-                <DropdownMenu />
+                <DropdownMenu<ItemType,ValueType> />
             </DropdownContext.Provider>
         </Menu>
     </DropdownContext.Provider>;
 }
 
-function DropdownMenu() {
+function DropdownMenu<ItemType=any,ValueType=any>() {
     const context = useDropdown();
     const filteredItems = Array.isArray(context?.filteredItems) ? context.filteredItems : [];
     const preparedItems = context?.getPreparedItems() || [];
@@ -479,7 +474,7 @@ function DropdownMenu() {
             />
         ) : null}
         <DropdownSearch isFullScreen={fullScreen} />
-        <Dropdown.List
+        <List<IDropdownPreparedItem<ItemType,ValueType>>
             testID={testID + "-dropdown-list"}
             //estimatedItemSize={100}
             {...listProps}

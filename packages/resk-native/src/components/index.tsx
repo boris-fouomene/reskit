@@ -30,4 +30,5 @@ export * from "./Form";
 export * from "./Dropdown";
 export * from "./Date";
 export * from "./Avatar";
+export * from "./List";
 export * from "./ProgressBar";

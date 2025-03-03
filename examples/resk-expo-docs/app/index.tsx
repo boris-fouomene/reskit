@@ -1,6 +1,7 @@
-import { Tab, TextInput, withAppBar, Avatar, Badge, Calendar, Drawer, Button, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
-import { View, ScrollView } from 'react-native'
+import { Tab, TextInput, withAppBar, Avatar, Badge, Calendar, Drawer, Button,List, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
+import { View, ScrollView, FlatList } from 'react-native'
 import { IField, Logger, InputFormatter, ILogger, AttachLogger } from "@resk/core";
+import { useRef } from "react";
 
 @AttachLogger()
 class LoggerExample implements ILogger {
@@ -23,6 +24,7 @@ class LoggerExample implements ILogger {
 
 const index = withAppBar(() => {
     Logger.error("Example of logg");
+    const listRef = useRef<FlatList<any>>();
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>
@@ -62,6 +64,28 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                     <Badge colorScheme="warning">Warning</Badge>
                     <Badge colorScheme="info">Info</Badge>
                 </HStack>
+                <View>
+                    <Label>An example of List</Label>
+                    <List
+                    data={[
+                        {
+                          id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+                          title: 'First Item',
+                        },
+                        {
+                          id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
+                          title: 'Second Item',
+                        },
+                        {
+                          id: '58694a0f-3da1-471f-bd96-145571e29d72',
+                          title: 'Third Item',
+                        },
+                      ]}
+                    //ref={listRef}
+                    renderItem={({item}) => <Label children={item.title} fontVariant={"labelLarge"} />}
+                    keyExtractor={item => item.id}
+                />
+                </View>
                 <HStack style={[Theme.styles.m2]}>
                     <Avatar
                         text="AV"

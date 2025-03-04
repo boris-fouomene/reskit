@@ -173,6 +173,11 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                             },
                         ]
                     } as IField<"select">,
+                    selectCountry : {
+                        type : "selectCountry",
+                        label : "Example Select Country",
+                        defaultValue : "CM",
+                    } as IField<"selectCountry">
                 }}
             />
         </ScrollView>

@@ -489,7 +489,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
                     const nState = { ...inputState, ...valCase };
                     setInputState(nState);
                     if (typeof onChange === "function") {
-                        onChange({ ...nState, dateValue: newDate });
+                        onChange({ ...nState, dateValue: newDate,value:canValueBeDecimal?InputFormatter.parseDecimal(nState.value):nState.value });
                     }
                 }
             }}

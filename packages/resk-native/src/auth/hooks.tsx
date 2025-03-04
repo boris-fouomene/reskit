@@ -1,12 +1,33 @@
-import { createContext, useContext, useEffect, useState, ReactNode, isValidElement } from "react";
+import React, { createContext, useContext, useEffect, useState, ReactNode, isValidElement } from "react";
 import { IAuthContext, IAuthProviderProps } from "./types";
-import { Auth, isObj } from "@resk/core";
+import { Auth, IAuthUser, isObj } from "@resk/core";
 import { IWithHOCOptions } from "@hooks/withHOC";
 import View from "@components/View";
 import Label from "@components/Label";
 import Theme, { useTheme } from "@theme/index";
 import { StyleSheet } from "react-native";
 import { Portal } from "@components/Portal";
+import { IReactComponent } from "@src/types";
+
+class AuthLogin{
+  static metaData= Symbol("authLogin-metaadata");
+  static getComponent(){
+    const component = Reflect.getMetadata(AuthLogin.metaData,AuthLogin);
+      if(component){
+          return component;
+      }
+      return null;
+  }
+}
+export interface ILoginProps extends React.ComponentProps<any>{
+  signIn: (user: IAuthUser) => Promise<IAuthUser> 
+}
+
+export function AttachLoginComponent() {
+  return function (target: IReactComponent<ILoginProps>) {
+    Reflect.defineMetadata(AuthLogin.metaData, target, AuthLogin);
+  };
+}
 
 // Create an authentication context with a default value of null.
 const AuthContext = createContext<IAuthContext | null>(null);
@@ -222,14 +243,13 @@ export function withAuth<T extends any = any>(Component: React.FC<IWithAuthProps
  * <Login/>
  */
 const Login: React.FC<{}> = function ({ }) {
-  const authContext = useAuth();
-  const Component = authContext?.Login;
+  const Component = AuthLogin.getComponent();
   const theme = useTheme();
   return <Portal testID="resk-auth-login-portal" absoluteFill>
     <View testID="resk-auth-login-container" style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {!Component || typeof Component !== "function" ? <View style={[styles.container, Theme.styles.centered, , Theme.styles.h100, Theme.styles.w100]} testID="resk-auth-login-container">
         <View>
-          <Label colorScheme="error" fontSize={20} textBold>AuthProvider must have a Login component using the `Login` prop from resk-native  provider auth options.</Label>
+          <Label colorScheme="error" fontSize={20} textBold>You must attach a login component using the `AttachLoginComponent` decorator.</Label>
         </View>
       </View> : <Component signIn={Auth.signIn} />}
     </View>

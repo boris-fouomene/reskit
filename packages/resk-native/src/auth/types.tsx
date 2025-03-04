@@ -19,13 +19,11 @@ import { IReactComponent } from "@src/types";
  * @example
  * // Example of using IAuthContext
  * const authContext: IAuthContext = {
- *     user: { id: '123', username: 'JohnDoe' }, // Example user object
- *     Login: MyLoginComponent // A React component for login
+ *     user: { id: '123', username: 'JohnDoe' }
  * };
  */
 export interface IAuthContext {
     user?: IAuthUser | null;
-    Login?: IReactComponent<{ signIn: (user: IAuthUser) => Promise<IAuthUser> }>;
 }
 
 /**

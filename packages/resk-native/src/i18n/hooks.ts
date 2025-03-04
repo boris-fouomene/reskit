@@ -89,15 +89,6 @@ export const useI18n = (i18n?: I18n, options?: IUseI18nOptions): I18n => {
             const detectedLangCode = instance.isLocaleSupported(detectedLocale.languageTag) ? detectedLocale.languageTag : instance.isLocaleSupported(detectedLocale.languageCode as string) ? detectedLocale.languageCode as string : undefined;
             if (detectedLangCode != instance.getLocale()) {
                 instance.setLocale(detectedLangCode as string);
-                /* if(isNonNullString(detectedLocale.currencyCode) && isNonNullString(detectedLocale.currencySymbol)) {
-                    Currency.session.setCurrency({
-                        name : detectedLocale.currencyCode as string,
-                        symbol: detectedLocale.currencySymbol as string,
-                        symbolNative: detectedLocale.currencySymbol as string,
-                        code: detectedLocale.currencyCode as string,
-                        rounding:2,
-                    });
-                } */
             }
         }
     }, [detectedLocale, instance.getLocale(), useLocaleFromDevice]);

@@ -68,6 +68,9 @@ jspm_packages/
 packages/**/node_modules/
 packages/**/dist/
 packages/**/build/
+examples/**/node_modules/
+examples/**/dist/
+examples/**/build/
 /dist/
 
 # Snowpack dependency directory (https://snowpack.dev/)

@@ -1,5 +1,5 @@
 import View from "@components/View";
-import { defaultStr, extendObj, IFieldType, IFields, IField, IResourceName, isEmpty, isNonNullString, isObj, ResourcesManager, uniqid, Auth } from "@resk/core";
+import { defaultStr, extendObj, IFieldType, IFields, IField, IResourceName, isEmpty, isNonNullString, isObj, areEquals, uniqid, Auth } from "@resk/core";
 import { isValidElement, ObservableComponent } from "@utils";
 import { FormsManager } from "./FormsManager";
 import { IFormField, IForm, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormOnSubmitOptions, IFormContext, IFormTabItemProp, IFormAction } from "./types";
@@ -15,8 +15,6 @@ import { IStyle } from "@src/types";
 import { FormContext } from "./context";
 import "./types/augmented";
 import { INotifyMessage, Notify } from "@notify/index";
-import areEquals from '@utils/areEquals';
-
 
 /**
  * Represents a form component that manages its state, fields, and validation.

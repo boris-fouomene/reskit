@@ -1,3 +1,4 @@
 import "./translations";
 export * from "./hooks";
-export { getLocales } from "./locales";
+export * from "./locales";
+export * from "./types";

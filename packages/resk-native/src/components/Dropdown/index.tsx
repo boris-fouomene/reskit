@@ -1,10 +1,9 @@
 import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownEvent, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
-import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj, Logger } from "@resk/core";
+import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj, Logger, areEquals } from "@resk/core";
 import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
-import areEquals from "@utils/areEquals";
 import Theme, { useTheme } from "@theme/index";
 import { FlatList, TouchableOpacity, FlatListProps } from 'react-native';
 import TextInput from "@components/TextInput";
@@ -426,13 +425,13 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             </View>}
         >
             <DropdownContext.Provider value={context}>
-                <DropdownMenu<ItemType,ValueType> />
+                <DropdownMenu<ItemType, ValueType> />
             </DropdownContext.Provider>
         </Menu>
     </DropdownContext.Provider>;
 }
 
-function DropdownMenu<ItemType=any,ValueType=any>() {
+function DropdownMenu<ItemType = any, ValueType = any>() {
     const context = useDropdown();
     const filteredItems = Array.isArray(context?.filteredItems) ? context.filteredItems : [];
     const preparedItems = context?.getPreparedItems() || [];
@@ -474,7 +473,7 @@ function DropdownMenu<ItemType=any,ValueType=any>() {
             />
         ) : null}
         <DropdownSearch isFullScreen={fullScreen} />
-        <List<IDropdownPreparedItem<ItemType,ValueType>>
+        <List<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
             //estimatedItemSize={100}
             {...listProps}
@@ -585,7 +584,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderTopWidth: 0,
         alignSelf: "flex-start",
-        flexGrow : 0,
+        flexGrow: 0,
         overflow: "hidden",
         //height: "100%",
         width: "100%",

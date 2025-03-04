@@ -40,7 +40,7 @@ export class Validator {
    */
   static getRules(): IValidatorRuleMap {
     const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
-    return isObj(rules) ? rules : {};
+    return isObj(rules) ? rules : {} as IValidatorRuleMap;
   }
   /***
    * returns the separators for the validation errors.

@@ -44,3 +44,4 @@ export function isInteger(x: any) {
 export { default as isClass } from "./isClass";
 
 export { default as isEmpty } from "./isEmpty";
+export { default as areEquals } from "./areEquals";

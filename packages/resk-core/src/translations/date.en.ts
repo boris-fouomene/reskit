@@ -8,9 +8,9 @@ I18n.RegisterTranslations({
          * @returns {string} - The translated string.
          */
         "dates": {
-            "defaultDateFormat": "MM/DD/YYYY",
-            "defaultTimeFormat": "HH:mm:ss",
-            "defaultDateTimeFormat": "DD/MM/YYYY HH:mm:ss",
+            "defaultDateFormat": "YYYY-MM-DD",
+            "defaultTimeFormat": "HH:mm",
+            "defaultDateTimeFormat": "YYYY-MM-DD HH:mm",
             "invalidDate": "Invalid date",
             "invalidTime": "Invalid time",
             "invalidDateTime": "Invalid date and time",

@@ -321,7 +321,7 @@ export class DateHelper {
      * @see https://momentjs.com/docs/#/parsing/string-format/
      */
   static get DEFAULT_DATE_TIME_FORMAT(): IMomentFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultDateTimeFormat"), "DD/MM/YYYY HH:mm:ss") as unknown as IMomentFormat;
+    return defaultStr(i18n.getNestedTranslation("dates.defaultDateTimeFormat"), "YYYY-MM-DD HH:mm") as unknown as IMomentFormat;
   }
   /**
      * Get the default date format.
@@ -330,7 +330,7 @@ export class DateHelper {
      * @description The format used to represent dates by default.
      */
   static get DEFAULT_DATE_FORMAT(): IMomentFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultDateFormat"), "DD/MM/YYYY") as unknown as IMomentFormat;
+    return defaultStr(i18n.getNestedTranslation("dates.defaultDateFormat"), "YYYY-MM-DD") as unknown as IMomentFormat;
   }
   /**
    * Converts a date to SQL date format.
@@ -415,7 +415,7 @@ export class DateHelper {
      * @see https://momentjs.com/docs/#/parsing/string-format/
      */
   static get DEFAULT_TIME_FORMAT(): IMomentFormat {
-    return defaultStr(i18n.getNestedTranslation("dates.defaultTimeFormat"), "HH:mm:ss") as unknown as IMomentFormat;
+    return defaultStr(i18n.getNestedTranslation("dates.defaultTimeFormat"), "HH:mm") as unknown as IMomentFormat;
   }
 
   /**

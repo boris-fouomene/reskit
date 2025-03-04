@@ -16,6 +16,7 @@ import { useI18n } from "@src/i18n/hooks";
 import Default from "@auth/hooks";
 import { Notify } from "@notify/index";
 import { StatusBar } from '@components/StatusBar';
+import { KeyboardAvoidingView } from '@components/KeyboardAvoidingView';
 
 export * from "./types";
 export * from "./hooks";
@@ -114,23 +115,25 @@ export function ReskNativeProvider({ children, theme: customTheme, auth, breakpo
   return (
     <SafeAreaView testID="resk-native-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
       <ReskNativeContext.Provider value={{ theme, i18n, updateTheme, ...rest, breakpoints }}>
-        <PortalProvider>
-          <Default.AuthContext.Provider value={auth}>
-            <Notify.Component
-              ref={(el) => {
-                Notify.notifyRef = el;
-              }}
-            />
-            <Preloader.Provider />
-            <Dialog.Alert.Provider />
-            <Dialog.Provider.Provider />
-            <Drawer.Provider.Provider />
-            <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>
-              <StatusBar />
-              {children}
-            </Drawer>
-          </Default.AuthContext.Provider>
-        </PortalProvider>
+        <KeyboardAvoidingView testID={"resk-native-keyboard-avoiding-view-root"}>
+          <PortalProvider>
+            <Default.AuthContext.Provider value={auth}>
+              <Notify.Component
+                ref={(el) => {
+                  Notify.notifyRef = el;
+                }}
+              />
+              <Preloader.Provider />
+              <Dialog.Alert.Provider />
+              <Dialog.Provider.Provider />
+              <Drawer.Provider.Provider />
+              <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>
+                <StatusBar />
+                {children}
+              </Drawer>
+            </Default.AuthContext.Provider>
+          </PortalProvider>
+        </KeyboardAvoidingView>
       </ReskNativeContext.Provider>
     </SafeAreaView>
   );

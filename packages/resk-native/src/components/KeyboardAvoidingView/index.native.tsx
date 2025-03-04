@@ -79,7 +79,9 @@ const KeyboardAvoidingView = React.forwardRef(({ children, isPreloader, ...rest 
 KeyboardAvoidingView.displayName = "KeyboardAvoidingView";
 export default KeyboardAvoidingView;
 const styles = StyleSheet.create({
-  wrapper: { },
+  wrapper: { 
+    flex:1,
+  },
 });
 
 export { KeyboardAvoidingView};

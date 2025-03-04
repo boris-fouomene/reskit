@@ -651,7 +651,6 @@ const DropdownSearch = ({ isFullScreen, canReverse }: { isFullScreen?: boolean, 
     const props = Object.assign({}, searchProps, { error: error || searchProps?.error });
     const visible = context?.isOpen();
     const actions: IDropdownAction[] = Array.isArray(context.dropdownActions) ? context.dropdownActions : [];
-    const theme = useTheme();
     if (showSearch === false || showSearch !== true && preparedItems?.length <= 5) {
         return null;
     }

@@ -299,7 +299,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      * It is also the direct parent of the Label component for the default variant
      * Note that in the labelEmbeded variant, the label's parent component is the view parent direct to the left component.
      */
-    containerProps?: IKeyboardAvoidingViewProps;
+    containerProps?: IViewProps;
 
     /**
      * @type IViewProps

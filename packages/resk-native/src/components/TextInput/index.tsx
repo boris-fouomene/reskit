@@ -18,7 +18,7 @@ import { Calendar, CalendarModalContext } from "@components/Date";
 import { useI18n } from "@src/i18n";
 import { SelectCountryRef } from "./SelectCountryRef";
 import p from "@platform";
-import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
+import { TouchableOpacity } from "react-native";
 
 const isNative = p.isNative();
 
@@ -86,13 +86,13 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
     const isLabelEmbededVariant = variant === "labelEmbeded";
     const { testID } = rest;
     const labelContent = !isEmpty(label) && editable ? <Pressable testID={testID + "-text-input-pressable-container"} onPress={focus}>{label}</Pressable> : label;
-    const canWrapWithTouchable = props.isDropdownAnchor && editable;
-    const Wrapper = canWrapWithTouchable ? TouchableRipple : View;
+    const canWrapWithTouchable = props.isDropdownAnchor && editable && !props.readOnly;
+    const Wrapper = canWrapWithTouchable ? TouchableOpacity : View;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
-    const inputProps = { ...(!canWrapWithTouchable ? pressableProps : {}), focus, ...rest, editable: canWrapWithTouchable ? false : editable }
+    const inputProps = { ...(!canWrapWithTouchable && editable ? pressableProps : {}), focus, ...rest, editable: canWrapWithTouchable ? false : editable,readOnly:canWrapWithTouchable?true:props.readOnly}
     const inputElement = typeof render == "function" ? render(inputProps, inputRef) : <RNTextInput {...inputProps} ref={inputRef} />;
-    return <KeyboardAvoidingView {...containerProps} >
+    return <View {...containerProps} >
         {isLabelEmbededVariant ? null : labelContent}
         <Wrapper {...wrapperProps} {...contentContainerProps} style={[styles.wrapper, contentContainerProps?.style]}>
             <View testID={testID + "-left-content-container"} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContentContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
@@ -106,7 +106,7 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
                 {right}
             </View>) : null}
         </Wrapper>
-    </KeyboardAvoidingView>
+    </View>
 });
 
 /**

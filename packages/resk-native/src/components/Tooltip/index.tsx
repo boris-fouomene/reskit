@@ -17,15 +17,12 @@ const Tooltip = React.forwardRef(({
   const buttonRef = React.useRef(null);
   // Combine external ref with internal button reference
   const innerRef = useMergeRefs(ref, buttonRef);
-  const Component = useMemo(() => {
-    return as || Pressable;
-  }, [as]);
   const content = useMemo(() => {
     return isValidElement(tooltip, true) ? tooltip : isValidElement(title, true) ? title : null;
   }, [title, tooltip]);
-  if (false && content === "") {
-    console.log("content is empty", content);
-  }
+  const Component = useMemo(() => {
+    return as || Pressable;
+  }, [as]);
   return (
     <Component {...rest} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>
       {children}

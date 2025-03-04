@@ -71,7 +71,7 @@ const IKeyboardAvoidingView = React.forwardRef(({ children, style, testID, ...pr
 });
 
 const styles = {
-  main: {}
+  main: {flex:1}
 }
 IKeyboardAvoidingView.displayName = "IKeyboardAvoidingView";
 

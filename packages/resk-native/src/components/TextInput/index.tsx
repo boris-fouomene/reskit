@@ -512,7 +512,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             disabled={!editable}
             defaultValue={inputState.phoneCountryCode}
             onChange={!editable ? undefined : ({ value }) => {
-                if (value && value !== inputState.phoneCountryCode) {
+                if (isNonNullString(value) && value !== inputState.phoneCountryCode && String(value).toLowerCase() !=="undefined") {
                     setInputState({
                         ...inputState,
                         ...toCase("", Array.isArray(value) ? value[0] : value)

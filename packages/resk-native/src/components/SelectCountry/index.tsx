@@ -32,7 +32,7 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps & {displa
         getItemValue={({ item }) => item.code}
         getItemLabel={({ item }) => {
             return <View style={styles.countryFlagContainer}>
-                <Icon.CountryFlag  countryCode={item.code} size={iconSize} />
+                <Icon.CountryFlag  countryCode={item.code} size={iconSize} style={styles.countryFlagIcon} />
                 <Label>{item.name}</Label>
                 {canDisplayDialCode && isNonNullString(item.dialCode) ? <Label style={styles.itemLabel}>{"(+" + item.dialCode.ltrim("+") + ") "}</Label> : null}
             </View>;
@@ -86,6 +86,9 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
     },
     countryFlag: { pointerEvents: "box-none" },
+    countryFlagIcon:{
+        marginRight:5,
+    },
     labelContainer: {
         flexDirection: "row",
         alignItems: "center",

@@ -132,22 +132,23 @@ const CountryFlag: React.FC<IFlagEmojiProps> = ({
         return hasTouchable ? TouchableOpacity : View;
     }, [hasTouchHandler])
     const { flagEmoji, canRender, country, imageSource } = useMemo(() => {
-        const flagEmoji = defaultStr(countryCode);//createEmoji(countryCode);
+        const flagEmoji = createEmoji(countryCode);
         const country = CountriesManager.getCountry(countryCode);
         const imageSource = isImageSource(country?.flag) ? country?.flag : undefined;
         return { flagEmoji, canRender: !!flagEmoji, country, imageSource };
     }, [countryCode]);
     testID = defaultStr(testID, "resk-country-flag-emoji");
-    size = typeof size === "number" ? size : 24;
+    size = typeof size === "number" ? size : 20;
+    const isValidFallback = isValidElement(fallback);
+    const accessibleLabel = country?.name||countryCode;
     return (
         <Component testID={testID} {...props} style={[styles.container, style]}>
             {imageSource ?
-                <Icon size={size} testID={testID + "-image"} source={{ uri: imageSource }} /> :
-                isValidElement(fallback) ?
-                    fallback : canRender ?
-                        <Label testID={testID + "-text"} color={textColor} style={[{ fontSize: Math.min(size, 15) }]}>
-                            [{flagEmoji}]
-                        </Label> : undefined
+                <Icon accessibilityLabelledBy={accessibleLabel} accessibilityLabel={accessibleLabel} size={size} testID={testID + "-image"} source={{ uri: imageSource }} /> :
+                canRender || isValidFallback ? <Label accessibilityRole='image' accessibilityLabelledBy={accessibleLabel} role={canRender?"img":undefined} testID={testID + "-text"} accessibilityLabel={accessibleLabel} color={textColor} style={[{ fontSize: Math.max(size,15)}]}>
+                        {canRender? flagEmoji :`[${countryCode}]`}
+                </Label> :  
+                isValidFallback ? fallback :  undefined
             }
         </Component>
     );
@@ -172,9 +173,8 @@ const styles = StyleSheet.create({
 const canRenderEmoji = (emoji?: string): boolean => {
     if (Platform.isNative()) return true;
     if (!isWeb()) return false;
-    const flag = "🇨🇲"; // Example: Cameroon
-    Logger.log(flag, " is flag to test ", emoji);
-    if (flag == "🇨🇲") return true;
+    //const flag = "🇨🇲"; // Example: Cameroon
+    //if (flag == "🇨🇲") return true;
     if (!isNonNullString(emoji)) return false;
     try {
         const canvas = document.createElement('canvas');
@@ -191,12 +191,11 @@ const canRenderEmoji = (emoji?: string): boolean => {
     }
 };
 
-/* const FlagExported: typeof CountryFlag & { isEmojiSupported: typeof isEmojiSupported; canRenderEmoji: typeof canRenderEmoji; createEmoji: typeof createEmoji } = CountryFlag as any;
+const FlagExported: typeof CountryFlag & { isEmojiSupported: typeof isEmojiSupported; canRenderEmoji: typeof canRenderEmoji; createEmoji: typeof createEmoji } = CountryFlag as any;
 FlagExported.isEmojiSupported = isEmojiSupported;
 FlagExported.createEmoji = createEmoji;
 FlagExported.canRenderEmoji = canRenderEmoji;
 
 export default FlagExported;
- */
-export default CountryFlag;
+ 
 CountryFlag.displayName = "Country.CountryFlag";

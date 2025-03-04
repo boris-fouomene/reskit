@@ -101,9 +101,11 @@ export class InputFormatter {
       } else if ("tel" === typeText) {
         const phoneNumber = InputFormatter.formatPhoneNumber(value, phoneCountryCode);
         formattedValue = defaultStr(phoneNumber, formattedValue);
+        result.phoneCountryCode = defaultStr(phoneCountryCode) as ICountryCode;
         const parsed = InputFormatter.parsePhoneNumber(phoneNumber as string, phoneCountryCode);
         if (parsed) {
           result.dialCode = parsed.getCountryCode() + "";
+          result.phoneCountryCode = defaultStr(phoneUtil.getRegionCodeForNumber(parsed),phoneCountryCode) as ICountryCode;
         } else if (phoneCountryCode) {
           result.dialCode = CountriesManager.getDialCode(phoneCountryCode);
         }

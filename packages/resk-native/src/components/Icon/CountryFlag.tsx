@@ -34,6 +34,7 @@ import Icon from './Icon';
 import Label from "@components/Label";
 import { hasTouchHandler } from '@utils/hasTouchHandler';
 import isValidElement from '@utils/isValidElement';
+import { supportsEmoji } from './isEmojiSupported';
 /**
  * Converts a two-letter country code to its corresponding flag emoji using Unicode regional indicators.
  * 
@@ -132,7 +133,7 @@ const CountryFlag: React.FC<IFlagEmojiProps> = ({
         return hasTouchable ? TouchableOpacity : View;
     }, [hasTouchHandler])
     const { flagEmoji, canRender, country, imageSource } = useMemo(() => {
-        const flagEmoji = createEmoji(countryCode);
+        const flagEmoji = canRenderEmoji('US') ? createEmoji(countryCode) : null;
         const country = CountriesManager.getCountry(countryCode);
         const imageSource = isImageSource(country?.flag) ? country?.flag : undefined;
         return { flagEmoji, canRender: !!flagEmoji, country, imageSource };
@@ -145,10 +146,9 @@ const CountryFlag: React.FC<IFlagEmojiProps> = ({
         <Component testID={testID} {...props} style={[styles.container, style]}>
             {imageSource ?
                 <Icon accessibilityLabelledBy={accessibleLabel} accessibilityLabel={accessibleLabel} size={size} testID={testID + "-image"} source={{ uri: imageSource }} /> :
-                canRender || isValidFallback ? <Label accessibilityRole='image' accessibilityLabelledBy={accessibleLabel} role={canRender?"img":undefined} testID={testID + "-text"} accessibilityLabel={accessibleLabel} color={textColor} style={[{ fontSize: Math.max(size,15)}]}>
+                canRender || !isValidFallback ? <Label accessibilityRole={canRender?'image':"text"} accessibilityLabelledBy={accessibleLabel} role={canRender?"img":undefined} testID={testID + "-text"} accessibilityLabel={accessibleLabel} color={textColor} style={[{ fontSize: Math.max(size,15)*(canRender?1:0.5)}]}>
                         {canRender? flagEmoji :`[${countryCode}]`}
-                </Label> :  
-                isValidFallback ? fallback :  undefined
+                </Label> :  fallback
             }
         </Component>
     );
@@ -172,11 +172,11 @@ const styles = StyleSheet.create({
  */
 const canRenderEmoji = (emoji?: string): boolean => {
     if (Platform.isNative()) return true;
-    if (!isWeb()) return false;
+    if (!isWeb() || !isNonNullString(emoji)) return false;
+    return supportsEmoji(emoji);
     //const flag = "🇨🇲"; // Example: Cameroon
     //if (flag == "🇨🇲") return true;
-    if (!isNonNullString(emoji)) return false;
-    try {
+    /* try {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         if (!ctx) return false;
@@ -188,7 +188,7 @@ const canRenderEmoji = (emoji?: string): boolean => {
         return pixels.some(pixel => pixel !== 0);
     } catch (e) {
         return false;
-    }
+    } */
 };
 
 const FlagExported: typeof CountryFlag & { isEmojiSupported: typeof isEmojiSupported; canRenderEmoji: typeof canRenderEmoji; createEmoji: typeof createEmoji } = CountryFlag as any;

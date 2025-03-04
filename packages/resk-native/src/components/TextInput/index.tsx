@@ -366,9 +366,9 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             value = InputFormatter.formatPhoneNumber(value, phoneCountryCode);
         }
         return {
+            phoneCountryCode,
             ...(mask ? InputFormatter.formatWithMask({ ...maskOptions, value, mask, type }) : {}),
             ...InputFormatter.formatValue({ ...props, phoneCountryCode, dateFormat, type, value }),
-            phoneCountryCode,
             value,
         }
     };

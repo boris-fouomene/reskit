@@ -87,7 +87,7 @@ export const useI18n = (i18n?: I18n, options?: IUseI18nOptions): I18n => {
     useEffect(() => {
         if (useLocaleFromDevice && detectedLocale?.languageTag) {
             const detectedLangCode = instance.isLocaleSupported(detectedLocale.languageTag) ? detectedLocale.languageTag : instance.isLocaleSupported(detectedLocale.languageCode as string) ? detectedLocale.languageCode as string : undefined;
-            if (detectedLangCode != instance.getLocale() && !instance.getLocale()) {
+            if (instance.isDefaultInstance() && detectedLangCode != instance.getLocale() && !I18n.getLocaleFromSession()) {
                 instance.setLocale(detectedLangCode as string);
             }
         }

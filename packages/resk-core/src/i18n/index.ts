@@ -229,7 +229,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
     private static setLocaleToSession(locale: string) {
         session.set("i18n.locale", locale);
     }
-    private static getLocaleFromSession() {
+    static getLocaleFromSession() {
         return session.get("i18n.locale") as string;
     }
     /**

@@ -3,7 +3,7 @@ import { Field, FormField } from "../Field";
 import { StyleSheet } from "react-native";
 import { IFieldType, IField } from "@resk/core";
 
-//@FormField<"switch">("switch")
+@FormField<"switch">("switch")
 export class FormFieldSwitch<Type extends IFieldType = "switch"> extends Field<Type> {
     isTextField(): boolean {
         return false;

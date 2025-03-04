@@ -202,6 +202,7 @@ export interface ILogger {
    * This method is intended for general logging purposes and should be used for messages that do not fit into any other category.
    * 
    * @param data - The data to be logged. This can be any type of data, including strings, numbers, objects, etc.
+     @param {dateTimeString}, the current UTC time in the format '[DayNameShort Day MonthName Year Hours:Minutes:Seconds]'
    * @example
    * ```typescript
    * logger.log('Hello, world!');
@@ -209,7 +210,7 @@ export interface ILogger {
    * logger.log({ foo: 'bar' });
    * ```
    */
-  log(...data: any[]): void;
+  log(dateTimeString:string,...data: any[]): void;
 
   /**
    * Logs a message at the info level.
@@ -217,13 +218,14 @@ export interface ILogger {
    * This method is intended for logging informational messages that are not critical to the application's functionality.
    * 
    * @param data - The data to be logged. This can be any type of data, including strings, numbers, objects, etc.
+     @param {dateTimeString}, the current UTC time in the format '[DayNameShort Day MonthName Year Hours:Minutes:Seconds]'
    * @example
    * ```typescript
    * logger.info('Application started successfully.');
    * logger.info('User  logged in.');
    * ```
    */
-  info(...data: any[]): void;
+  info(dateTimeString:string,...data: any[]): void;
 
   /**
    * Logs a message at the debug level.
@@ -231,13 +233,14 @@ export interface ILogger {
    * This method is intended for logging debug messages that are used for troubleshooting purposes.
    * 
    * @param data - The data to be logged. This can be any type of data, including strings, numbers, objects, etc.
+     @param {dateTimeString}, the current UTC time in the format '[DayNameShort Day MonthName Year Hours:Minutes:Seconds]'
    * @example
    * ```typescript
    * logger.debug('Variable x has value 5.');
    * logger.debug('Function foo was called.');
    * ```
    */
-  debug(...data: any[]): void;
+  debug(dateTimeString:string,...data: any[]): void;
 
   /**
    * Logs a message at the warn level.
@@ -245,13 +248,14 @@ export interface ILogger {
    * This method is intended for logging warning messages that indicate potential issues with the application.
    * 
    * @param data - The data to be logged. This can be any type of data, including strings, numbers, objects, etc.
+   * @param {dateTimeString}, the current UTC time in the format '[DayNameShort Day MonthName Year Hours:Minutes:Seconds]'
    * @example
    * ```typescript
    * logger.warn('Low disk space detected.');
    * logger.warn('Invalid user input detected.');
    * ```
    */
-  warn(...data: any[]): void;
+  warn(dateTimeString:string,...data: any[]): void;
 
   /**
    * Logs a message at the error level.
@@ -259,13 +263,14 @@ export interface ILogger {
    * This method is intended for logging error messages that indicate critical issues with the application.
    * 
    * @param data - The data to be logged. This can be any type of data, including strings, numbers, objects, etc.
+     @param {dateTimeString}, the current UTC time in the format '[DayNameShort Day MonthName Year Hours:Minutes:Seconds]'
    * @example
    * ```typescript
    * logger.error('Database connection failed.');
    * logger.error('Invalid data detected.');
    * ```
    */
-  error(...data: any[]): void;
+  error(dateTimeString:string,...data: any[]): void;
 };
 
 /**

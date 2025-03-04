@@ -206,8 +206,13 @@ export function useToggleable<EventType = GestureResponderEvent>({ disabled, che
  * console.log(defaultValue); // true
  */
 export const getToggleableDefaultValues = (props: IToggleableProps) => {
-  const checkedValue = props?.checkedValue !== undefined ? props?.checkedValue : 1;
-  const uncheckedValue = props?.uncheckedValue !== undefined ? props?.uncheckedValue : 0;
+  let  checkedValue = props?.checkedValue, uncheckedValue = props?.uncheckedValue, defaultValue = props?.defaultValue;
+  if(checkedValue === undefined){
+    checkedValue = typeof defaultValue === 'boolean'? true : 1;
+  }
+  if(uncheckedValue === undefined){
+    uncheckedValue = typeof defaultValue === 'boolean'? false : 0;
+  }
   return {
     checkedValue,
     uncheckedValue,

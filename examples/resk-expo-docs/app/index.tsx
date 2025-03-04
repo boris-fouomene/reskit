@@ -169,8 +169,13 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                     checkbox: {
                         type: "checkbox",
                         label: "My Checkbox",
-                        defaultValue: true
-                    },
+                        defaultValue: true,
+                    } as IField<"checkbox">,
+                    switch : {
+                        label : "Example Switch",
+                        type : "switch",
+                        defaultValue : true
+                    }
                 }}
             />
         </ScrollView>

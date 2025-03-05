@@ -1,5 +1,5 @@
 import { getTextContent, isReactClassComponent, ObservableComponent } from "@utils/index";
-import { defaultStr, extendObj, areEquals, IFieldType, IField, isEmpty, isNonNullString, isObj, IValidatorRule, stringify, Validator, Logger } from "@resk/core";
+import { defaultStr, extendObj, areEquals, IFieldType, IField, isEmpty, isNonNullString, isObj, IValidatorRule, stringify, Validator, Logger, InputFormatter } from "@resk/core";
 import { IForm, IFormData, IFormEvent, IFormField, IFormFieldOnChangeOptions, IFormFieldState, IFormFieldValidatorOptions } from "./types";
 import React, { ReactNode } from "react";
 import { Dimensions, View as RNView, TextInput as RNTextInput, NativeSyntheticEvent, TextInputFocusEventData, StyleSheet } from "react-native";
@@ -243,6 +243,10 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
         options = Object.assign({}, options);
         options.fieldName = defaultStr(options.fieldName, this.getName());
         options.context = this;
+        if(this.isPhone() && isNonNullString(options.phoneNumber) && InputFormatter.isValidPhoneNumber(options.phoneNumber)){
+            (options as any).rawPhoneNumber = options.value;
+            options.value = options.phoneNumber;
+        }
         options.value = this.sanitizeValue(options.value);
         options.prevValue = "prevValue" in options ? options.prevValue : this.state.prevValue;
         const areValueEquals = this.compareValues(options.value, this.state.validatedValue);
@@ -274,14 +278,8 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
         if (this.isEmail() && this.componentProps.validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("email")) {
             options.rules.push("email");
         }
-        if(this.isPhone()){
-            if(isNonNullString(options.phoneNumber) && options.phoneNumber.length > 4){
-                (options as any).rawValue = options.value;
-                options.value = options.phoneNumber;
-            } 
-            if (this.componentProps.validatePhoneNumber !== false && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("phoneNumber")) {
-                options.rules.push("phoneNumber");
-            }
+        if (this.componentProps.validatePhoneNumber !== false && this.isPhone() && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("phoneNumber")) {
+            options.rules.push("phoneNumber");
         }
         if (this.getType() == "url" && options.value && !options.rules.includes("url")) {
             options.rules.push("url");

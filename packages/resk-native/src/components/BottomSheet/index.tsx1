@@ -1,5 +1,5 @@
 ///@see : https://github.com/nysamnang/react-native-raw-bottom-sheet
-import React, { ReactNode, useImperativeHandle, useRef } from "react"
+import React, { ReactNode, useImperativeHandle, useMemo, useRef } from "react"
 import theme,{Colors} from "@theme";
 import Label from "@components/Label";
 import {defaultVal,defaultObj,defaultStr,Platform as ReskPlatform} from "@resk/core";
@@ -16,16 +16,20 @@ import {
   PanResponder,
   Dimensions,
   StyleSheet,
-  Platform
+  useAnimatedValue
 } from "react-native";
 import { ScrollViewProps } from "react-native";
 import { IAppBarAction, IAppBarProps } from "@components/AppBar";
 import useIsMounted from "@utils/useIsMounted";
 import usePrevious from "@utils/usePrevious";
 import { useDimensions } from "@dimensions/index";
+import Platform from "@platform";
+import useStateCallback from "@utils/stateCallback";
+
+const useNativeDriver = Platform.canUseNativeDriver();
 export const defaultHeight = 300;
 
-const BottomSheet = React.forwardRef((props:IBottomSheetProps,ref)=> {
+const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheetProps>((props,ref)=> {
     let {
         animationType,
         animationDuration,
@@ -45,7 +49,6 @@ const BottomSheet = React.forwardRef((props:IBottomSheetProps,ref)=> {
         onClose,
         title,
         testID:customTestID,
-        actions,
         dismissable = true,
         onDismiss,
         withScrollView,
@@ -56,29 +59,45 @@ const BottomSheet = React.forwardRef((props:IBottomSheetProps,ref)=> {
     } = props;
     const {height:winHeight} = useDimensions();
     let height = typeof customHeight == 'number' && customHeight ? customHeight : 0;
-    if(height){
+    if(height >0){
         height = Math.max(height,defaultHeight);
     } else {
         height = Math.max(winHeight/3,defaultHeight);
     }
     const [pan] = React.useState(new Animated.ValueXY());
-    const [visible,setVisible] = React.useState(typeof customVisible === 'boolean'?customVisible : false);
+    const [visible,setVisible] = useStateCallback(typeof customVisible === 'boolean'?customVisible : false);
+    const isControlled = useMemo(()=>{
+        return typeof customVisible === 'boolean';
+    },[customVisible]);
     const heightRef = React.useRef(height);
     heightRef.current = height;
     const isMounted = useIsMounted();
     const prevVisible = usePrevious(visible);
-    const animatedHeightRef = useRef<Animated.Value>(new Animated.Value(0));
-    const hasCallCallbackRef = React.useState(false);
+    const animatedHeight = useAnimatedValue(0);
     const visibleRef = React.useRef(visible);
+    const animatedValueRef = React.useRef(0);
     visibleRef.current = visible;
     const open = ()=>{
-        if(!isMounted() || visible)return;
+        if(!isMounted() || visibleRef.current || isControlled)return;
         setVisible(true);
     };
+    const handleDismiss = ()=>{
+        const cb = ()=>{
+            if(typeof onDismiss === 'function'){
+                onDismiss();
+            }
+        }
+        if(!isMounted() || visibleRef.current || isControlled){
+            cb();
+            return;
+        }
+        setVisible(false,cb);
+    }
     const subscription = React.useRef<{remove:()=>void}>(null);
+    
     const handleBack = React.useCallback(()=>{
       if (dismissable) {
-        closeModal(true);
+        closeModal();
       }
       return true;
     },[dismissable])
@@ -90,66 +109,59 @@ const BottomSheet = React.forwardRef((props:IBottomSheetProps,ref)=> {
       }
     }
     
-    const closeModal = (cb)=>{
+    const animate = (options:Omit<Partial<Animated.TimingAnimationConfig>,"toValue"> & {toValue:number},callback?:Function)=>{
+        return Animated.timing(animatedHeight, Object.assign({},{useNativeDriver},options) as Animated.TimingAnimationConfig).start(()=>{
+           animatedValueRef.current = options.toValue;
+           if(typeof callback =="function"){
+               callback();
+           }
+        });
+    }
+    
+    const closeModal = ()=>{
         removeListeners();
         if(!isMounted()) return;
         pan.setValue({ x: 0, y: 0 });
-        const animatedHeight = animatedHeightRef.current;
-        const callback = ()=>{
-            if(hasCallCallbackRef.current) return;
-            if(visibleRef.current){
-                setVisible(false);
-            }
-            if(typeof cb =='function'){
-                cb();
-            }
-            hasCallCallbackRef.current = true;
-        };
-        hasCallCallbackRef.current = false;
-        if(animatedHeight.value != 0){
-            animatedHeight.value = animate(0,{
-                duration: closeDuration,
-                callback,
-            });
-            setTimeout(callback,closeDuration+100);
-        } else {
-            callback();
-        }
+        animate({toValue:0,duration:closeDuration},handleDismiss)
     }
-    const panResponder = useMemo(()=>{
+    const panStateResponder = useMemo(()=>{
         return PanResponder.create({
             onStartShouldSetPanResponder: () => !!closeOnDragDown,
             onPanResponderMove: (e, gestureState) => {
-                const diff = gestureState.dy > 0 ? animatedHeight.value - gestureState.dy : 
-                Math.min(heightRef.current,animatedHeight.value-gestureState.dy);
-                if(diff >0 && diff !== animatedHeight.value){
-                    animatedHeight.value = animate(diff,{duration:100});
+                const diff = gestureState.dy > 0 ? animatedValueRef.current - gestureState.dy : 
+                Math.min(heightRef.current,animatedValueRef.current-gestureState.dy);
+                if(diff >0 && diff !== animatedValueRef.current){
+                    animate({toValue:diff,duration:100});
                 }
             },
             onPanResponderRelease: (e, gestureState) => { 
-                const height = animatedHeight.value;
+                const height = animatedValueRef.current;
                 if (height/3 - gestureState.dy < 0) {
                     closeModal();
                 }
             }
         });
     },[]);
-    const [panResponder] = React.useState()
-    const animatedStyles = useAnimatedStyle(() => ({
-        height : animatedHeight.value,
+    const [panResponder] = React.useState(panStateResponder)
+    const animatedStyles = {
+        height : animatedHeight,
         transform :[{ translateX: 0 }],
-    }));
+    };
+    const prevCustomVisible = usePrevious(customVisible);
     React.useEffect(()=>{
-        if(typeof customVisible !=='boolean' || customVisible === visible) return;
+        if(typeof customVisible !=='boolean' || customVisible == prevCustomVisible || customVisible === visible) return;
         if(customVisible){
-            if(animatedHeight.value >0){
-                animatedHeight.value = animate(0);
-            }
-            setVisible(true);
+            Animated.timing(animatedHeight, {
+                toValue: 0,
+                duration: 0,
+                useNativeDriver,
+            }).start(()=>{
+                setVisible(true)
+            });
         } else {
             closeModal();
         }
-    },[props])
+    },[customVisible,visible,customVisible])
     React.useEffect(()=>{
         if(!visible){
             removeListeners();
@@ -159,53 +171,21 @@ const BottomSheet = React.forwardRef((props:IBottomSheetProps,ref)=> {
             removeListeners();
             (subscription as any).current = BackHandler.addEventListener('hardwareBackPress', handleBack);
             pan.setValue({ x: 0, y: 0 });
-            animatedHeight.value = animate(height,{
-                callback : ()=>{
-                    if (typeof onOpen === "function") onOpen(props)  
-                },
+            Animated.timing(animatedHeight, {
+                toValue: height,
                 duration: openDuration,
-            })
-        } else {
-            closeModal(()=>{
-                if (typeof onClose === "function") onClose(props);
-                else if(onDismiss){
-                    onDismiss(props);
-                }
+                useNativeDriver,
+            }).start(()=>{
+                if (typeof onOpen === "function") onOpen(props);    
             });
+        } else {
+            closeModal();
         }
     },[visible])    
 
     const panStyle = {
         transform: pan.getTranslateTransform()
     };
-    const actionProps = Object.assign({},rest.actionProps);
-    backdropProps = defaultObj(backdropProps);
-    //actionProps.size = actionProps.size || 25;
-    actionProps.style = [{marginVertical:0,paddingVertical:0},actionProps.style]
-    const aStyle = {color:theme.colors.primaryOnSurface};
-    actionProps.style = [actionProps.style,aStyle]
-    actionProps.color = Colors.isValid(actionProps.color)? actionProps.color : theme.colors.primaryOnSurface;
-    const splitedActions = !visible ? null : isObjOrArray(actions)? renderActions({...rest,actionProps,actionMutator:(aProps)=>{
-        const {action,key} = aProps;
-        let {onPress,...aRest} = action;
-        aRest = defaultObj(aRest);
-        /*** les actions du bottom sheet prennent en paramètre de la fonction close, les options closeBottomSheet et openBottomSheet permettant de fermer et ouvrir le BottomSheet*/
-        aRest.onPress = (opts)=>{
-            if(onPress){
-                onPress({...defaultObj(opts),closeBottomSheet:closeModal,openBottomSheet:open})
-            }
-        }
-        aRest.key = key;
-        if(typeof actionMutator ==='function') return actionMutator({...aProps,action:aRest,key});
-        return aRest;
-    },actions,fullScreen : isMobileOrTabletMedia(),isAppBarActionStyle:false}) : undefined;
-    const rActions = splitedActions ? renderSplitedActions(splitedActions,{
-        anchorProps : aStyle,
-        title:defaultVal(actionTitle,'Actions'),
-        withBottomSheet : true,
-        BottomSheet
-    }) : null;
-    const titleProps = defaultObj(_titleProps);
     const scrollViewProps = defaultObj(_scrollViewProps);
     scrollViewProps.contentContainerStyle = [styles.scrollViewContainer,scrollViewProps.contentContainerStyle]
     const contentProps = defaultObj(customChildrenContainerProps);
@@ -278,6 +258,11 @@ const BottomSheet = React.forwardRef((props:IBottomSheetProps,ref)=> {
     );
 });
 
+export interface IBottomSheetContext {
+    closeBottomSheet : ()=>void,
+    openBottomSheet : ()=>void,
+    isBottomSheetOpened : boolean,
+}
 export interface IBottomSheetProps extends IViewProps {
   animationType?: "slide" | "fade",
   height?: number,
@@ -285,10 +270,9 @@ export interface IBottomSheetProps extends IViewProps {
   minClosingHeight?: number,
   animationDuration?: number,
   title?:ReactNode,
-  actions?:IAppBarAction[];
   withScrollView?: boolean,
   containerProps?:IViewProps,
-  appBarProps?: IAppBarProps,
+  appBarProps?: IAppBarProps<IBottomSheetContext>,
   visible?: boolean,
   openDuration?: number,
   actionMutator : Function, ///Les mutateurs d'action de la bare d'outil appBar
@@ -391,9 +375,3 @@ const styles = StyleSheet.create({
   });
 
   BottomSheet.displayName = "BottomSheet";
-  
-  export const animate = (time,options)=>{
-    return withTiming(time,{
-        ...Object.assign({},options)
-    });
-  }

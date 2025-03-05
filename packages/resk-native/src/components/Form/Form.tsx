@@ -566,7 +566,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
     static Fields: React.FC<IFormProps & IFormContext> = (props) => {
         const theme = useTheme();
         const { fields, data, name: formName, testID: cTestID, form, windowWidth, isLoading, isSubmitting } = props;
-        const testID = defaultStr(cTestID, "resk-form-fields");
+        const testID = defaultStr(cTestID, "resk-form");
         const { drawer } = useDrawer();
         return useMemo(() => {
             if (!Object.getSize(fields, true)) return null;

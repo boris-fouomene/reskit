@@ -1,7 +1,6 @@
-import {TouchableOpacity, Platform, Pressable, StyleSheet, Switch as RNSwitch, SwitchChangeEvent, GestureResponderEvent } from "react-native";
+import {TouchableOpacity, Platform, StyleSheet, Switch as RNSwitch, SwitchChangeEvent, GestureResponderEvent } from "react-native";
 import { ISwitchProps } from "./types";
 import { useToggleable } from "./utils";
-import { useTheme } from "@theme/index";
 import { Tooltip } from "@components/Tooltip";
 import Label from "@components/Label";
 
@@ -59,7 +58,6 @@ export * from "./utils";
  * for more information on the underlying RNSwitch component.
  */
 export const Switch = ({ testID, ...props }: ISwitchProps) => {
-    const theme = useTheme();
     const {
         checked,
         tooltip,

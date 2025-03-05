@@ -563,7 +563,6 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             styles.input, 
             minHeight > 0 && { minHeight },
             inputStyle,
-            labelPropStyle?.fontSize ? { fontSize: labelPropStyle.fontSize } : null,
             compact && styles.compact,
             multiline && { height: inputHeight },
             multiline && styles.multilineInput,
@@ -675,7 +674,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         flexGrow: 1,
         overflow: 'hidden',
-        fontSize : 14,
+        fontSize : 16,
     },
     compact: {
         padding: 0,

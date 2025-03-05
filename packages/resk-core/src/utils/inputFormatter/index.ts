@@ -299,10 +299,8 @@ export class InputFormatter {
       }
       const maskChar = maskArray[maskCharIndex];
       const valueChar = value[valueCharIndex];
-      const { isValid: customIsValid, masked: customMasked, obfuscated: cusotmObfuscated, isMaskRegex } = handleMaskAtIndex({ maskChar, nonRegexReplacedChars, valueChar, obfuscationCharacter, valueCharIndex, maskCharIndex })
-      if (!customIsValid) {
-        isValid = false;
-      }
+      const customNonRegexReplacedChars : IInputFormatterMaskResult["nonRegexReplacedChars"] = [];
+      let { isValid: customIsValid, masked: customMasked, obfuscated: cusotmObfuscated, isMaskRegex } = handleMaskAtIndex({ maskChar, nonRegexReplacedChars:customNonRegexReplacedChars, valueChar, obfuscationCharacter, valueCharIndex, maskCharIndex })
       masked += customMasked;
       obfuscated += cusotmObfuscated;
       unmasked += valueChar;
@@ -316,8 +314,17 @@ export class InputFormatter {
         if (nextOpts.isMaskRegex && nextOpts.isValid && nextOpts.masked == valueChar) {
           masked += valueChar;
           obfuscated += nextOpts.obfuscated;
-          break;
+          maskCharIndex += 1;
+          valueCharIndex += 1;
+          customIsValid = true;
+          delete customNonRegexReplacedChars[0];
         }
+      }
+      if(customNonRegexReplacedChars[0]){
+        nonRegexReplacedChars.push(...customNonRegexReplacedChars);
+      }
+      if (!customIsValid) {
+        isValid = false;
       }
     }
     return { masked, nonRegexReplacedChars, isValid: isValid && calValidate(value), maskHasObfuscation, placeholder, maskedPlaceholder, unmasked, obfuscated, maskArray };

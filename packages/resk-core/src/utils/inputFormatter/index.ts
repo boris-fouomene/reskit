@@ -294,7 +294,7 @@ export class InputFormatter {
     const placeholderLength = placeholder.length;
     const nonRegexReplacedChars: IInputFormatterMaskResult["nonRegexReplacedChars"] = [];
     while (maskCharIndex < maskArray.length) {
-      if (valueCharIndex === value.length) {
+      if (valueCharIndex >= value.length) {
         break;
       }
       const maskChar = maskArray[maskCharIndex];
@@ -309,7 +309,8 @@ export class InputFormatter {
       }
       maskCharIndex += 1;
       valueCharIndex += 1;
-      if (maskAutoComplete && !isMaskRegex && valueCharIndex < maskArray.length && valueCharIndex == value.length && valueChar !== customMasked) {
+      let canBreak = false;
+      if (maskAutoComplete && !isMaskRegex && maskCharIndex< maskArray.length && valueCharIndex < maskArray.length && valueCharIndex == value.length && valueChar !== customMasked) {
         const nextOpts = handleMaskAtIndex({ maskChar: maskArray[maskCharIndex], nonRegexReplacedChars: [], valueChar, obfuscationCharacter, valueCharIndex, maskCharIndex });
         if (nextOpts.isMaskRegex && nextOpts.isValid && nextOpts.masked == valueChar) {
           masked += valueChar;
@@ -318,6 +319,7 @@ export class InputFormatter {
           valueCharIndex += 1;
           customIsValid = true;
           delete customNonRegexReplacedChars[0];
+          canBreak = true;
         }
       }
       if(customNonRegexReplacedChars[0]){
@@ -325,6 +327,9 @@ export class InputFormatter {
       }
       if (!customIsValid) {
         isValid = false;
+      }
+      if(canBreak){
+        break;
       }
     }
     return { masked, nonRegexReplacedChars, isValid: isValid && calValidate(value), maskHasObfuscation, placeholder, maskedPlaceholder, unmasked, obfuscated, maskArray };

@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Colors, useTheme } from '@theme';
+import { Colors } from '@theme';
 import { defaultStr, IDict } from "@resk/core";
-import { TouchableRipple, ITouchableRippleProps } from '@components/TouchableRipple';
+import { TouchableRipple } from '@components/TouchableRipple';
 import Label from "@components/Label";
 import { useGetIcon } from '@components/Icon';
 import { ITabItemProps } from './types';
@@ -62,7 +62,6 @@ const TabItem = ({
   style: customStyle,
   ...rest
 }: ITabItemProps) => {
-  const theme = useTheme();
   const tabContext = userTabs();
   const { defaultActiveTabItemTextColor, activeIndex, defaultTextColor } = Object.assign({}, tabContext);
   const isActive = index === activeIndex;

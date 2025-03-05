@@ -229,6 +229,13 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
     isPhone(){
         return ["tel","phone"].includes(defaultStr(this.getType()).toLowerCase().trim());
     }
+    /***
+        A mutator function that is called to mutate the options to use in the validation process.
+        @param {IFormFieldValidatorOptions<Type>} options - The validation options.
+    */
+    protected onChangeOptionsMutator(options: IFormFieldValidatorOptions<Type>){
+        return options;
+    }
     /**
      * Validates the field based on the provided options.
      * 
@@ -247,8 +254,9 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
             (options as any).rawPhoneNumber = options.value;
             options.value = options.phoneNumber;
         }
-        options.value = this.sanitizeValue(options.value);
         options.prevValue = "prevValue" in options ? options.prevValue : this.state.prevValue;
+        this.onChangeOptionsMutator(options);
+        options.value = this.sanitizeValue(options.value);
         const areValueEquals = this.compareValues(options.value, this.state.validatedValue);
         if (this.hasPerformedValidation() && force !== true && areValueEquals) {
             return Promise.resolve(options);

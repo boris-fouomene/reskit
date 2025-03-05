@@ -183,7 +183,14 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         type : "selectCountry",
                         label : "Example Select Country",
                         defaultValue : "CM",
-                    } as IField<"selectCountry">
+                    } as IField<"selectCountry">,
+                    tel : {
+                        type: "tel",
+                        label: "Example Tel",
+                        onChange : (options) => {
+                            console.log(options.value, " is options tel changeddddd")
+                        }
+                    },
                 }}
             />
         </ScrollView>

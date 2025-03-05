@@ -227,7 +227,7 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
         return defaultStr(this.getType()).toLowerCase().trim() === "email";
     }
     isPhone(){
-        return defaultStr(this.getType()).toLowerCase().trim() === "phone";
+        return ["tel","phone"].includes(defaultStr(this.getType()).toLowerCase().trim());
     }
     /**
      * Validates the field based on the provided options.

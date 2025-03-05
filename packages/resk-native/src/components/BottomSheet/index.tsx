@@ -1,10 +1,7 @@
 ///@see : https://github.com/nysamnang/react-native-raw-bottom-sheet
-import React, { ReactNode, useImperativeHandle, useMemo, useRef } from "react"
-import theme,{Colors} from "@theme";
-import Label from "@components/Label";
-import {defaultVal,defaultObj,defaultStr,Platform as ReskPlatform} from "@resk/core";
-import {Divider} from "@components/Divider";
-import Breakpoints from "@breakpoints";
+import React, { ReactNode, useImperativeHandle, useMemo } from "react"
+import theme from "@theme";
+import {defaultObj,defaultStr,Platform as ReskPlatform, isObj} from "@resk/core";
 import {KeyboardAvoidingView} from "@components/KeyboardAvoidingView";
 import View, { IViewProps } from "@components/View";
 import { Portal } from "@components/Portal";
@@ -14,12 +11,11 @@ import {
   Pressable,
   Animated,
   PanResponder,
-  Dimensions,
   StyleSheet,
   useAnimatedValue
 } from "react-native";
 import { ScrollViewProps } from "react-native";
-import { IAppBarAction, IAppBarProps } from "@components/AppBar";
+import { AppBar, IAppBarProps } from "@components/AppBar";
 import useIsMounted from "@utils/useIsMounted";
 import usePrevious from "@utils/usePrevious";
 import { useDimensions } from "@dimensions/index";
@@ -27,9 +23,10 @@ import Platform from "@platform";
 import useStateCallback from "@utils/stateCallback";
 
 const useNativeDriver = Platform.canUseNativeDriver();
-export const defaultHeight = 300;
 
-const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheetProps>((props,ref)=> {
+const defaultHeight = 300;
+
+export const BottomSheet = React.forwardRef<any,IBottomSheetProps>((props,ref)=> {
     let {
         animationType,
         animationDuration,
@@ -40,24 +37,25 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
         children,
         height:customHeight,
         visible : customVisible,
-        minClosingHeight,
         openDuration,
         actionMutator,
         closeDuration, 
         contentProps:customChildrenContainerProps,
         onOpen,
-        onClose,
-        title,
         testID:customTestID,
         dismissable = true,
         onDismiss,
         withScrollView,
+        elevation:customElevation,
         scrollViewProps : _scrollViewProps,
-        actionTitle,
         containerProps : customContainerProps,
+        appBarProps,
         ...rest
     } = props;
     const {height:winHeight} = useDimensions();
+    const hasAppBar = isObj(appBarProps);
+    appBarProps = Object.assign({},appBarProps);
+    const elevation = typeof customElevation == 'number' && customElevation ? customElevation : 5;
     let height = typeof customHeight == 'number' && customHeight ? customHeight : 0;
     if(height >0){
         height = Math.max(height,defaultHeight);
@@ -77,7 +75,7 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
     const visibleRef = React.useRef(visible);
     const animatedValueRef = React.useRef(0);
     visibleRef.current = visible;
-    const open = ()=>{
+    const openBottomSheet = ()=>{
         if(!isMounted() || visibleRef.current || isControlled)return;
         setVisible(true);
     };
@@ -97,7 +95,7 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
     
     const handleBack = React.useCallback(()=>{
       if (dismissable) {
-        closeModal();
+        closeBottomSheet();
       }
       return true;
     },[dismissable])
@@ -118,7 +116,7 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
         });
     }
     
-    const closeModal = ()=>{
+    const closeBottomSheet = ()=>{
         removeListeners();
         if(!isMounted()) return;
         pan.setValue({ x: 0, y: 0 });
@@ -137,7 +135,7 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
             onPanResponderRelease: (e, gestureState) => { 
                 const height = animatedValueRef.current;
                 if (height/3 - gestureState.dy < 0) {
-                    closeModal();
+                    closeBottomSheet();
                 }
             }
         });
@@ -159,7 +157,7 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
                 setVisible(true)
             });
         } else {
-            closeModal();
+            closeBottomSheet();
         }
     },[customVisible,visible,customVisible])
     React.useEffect(()=>{
@@ -179,7 +177,7 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
                 if (typeof onOpen === "function") onOpen(props);    
             });
         } else {
-            closeModal();
+            closeBottomSheet();
         }
     },[visible])    
 
@@ -187,17 +185,22 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
         transform: pan.getTranslateTransform()
     };
     const scrollViewProps = defaultObj(_scrollViewProps);
-    scrollViewProps.contentContainerStyle = [styles.scrollViewContainer,scrollViewProps.contentContainerStyle]
     const contentProps = defaultObj(customChildrenContainerProps);
-    
-    useImperativeHandle(ref,{close:closeModal,open})
+    const context: IBottomSheetContext = {
+        closeBottomSheet,
+        openBottomSheet,
+        get isBottomSheetOpened(){
+            return visibleRef.current;
+        }
+    }
+    useImperativeHandle(ref,()=>(context));
     React.useEffect(()=>{
         return ()=>{
             removeListeners();
             (ref as any).current = null;
         }
     },[]);
-    dragFromTopOnly = typeof dragFromTopOnly ==='boolean' ? dragFromTopOnly : withScrollView !== false ? true : isTouchDevice();
+    dragFromTopOnly = typeof dragFromTopOnly ==='boolean' ? dragFromTopOnly : withScrollView !== false ? true : Platform.isTouchDevice();
     const testID = defaultStr(customTestID,"RN_BottomSheet");
     const containerProps = defaultObj(customContainerProps);
     const bStyle = {backgroundColor:theme.colors.backdrop};
@@ -205,43 +208,35 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
     return !visible? null :  (
         <Portal>
             <View
-                testID = {testID+"_Modal"}
+                testID = {testID}
                 {...rest}
-                style = {[styles.modal,bStyle,mProps.style]}
+                style = {[styles.modal,bStyle,rest.style]}
             >
                 <Pressable
-                    testID={testID+"_Backdrop"}
-                    {...backdropProps}
-                    style={[styles.mask,backdropProps.style]}
-                    activeOpacity={1}
-                    onPress={() => (closeOnPressMask && dismissable !== false ? closeModal() : null)}
+                    testID={testID+"-backdrop"}
+                    style={[styles.mask]}
+                    onPress={() => (closeOnPressMask && dismissable !== false ? closeBottomSheet() : null)}
                 />
-                    <Reanimated.View
+                    <Animated.View
                         {...(!dragFromTopOnly && panResponder.panHandlers)}
-                        testID = {testID+"_Container"} {...containerProps} 
-                        style={[styles.container,containerProps.style,{borderTopWidth:borderWidth,borderTopColor:borderColor,backgroundColor:theme.colors.surface},Elevations[elevation],panStyle,styles.animated,animatedStyles]}
+                        testID = {testID+"-container"} {...containerProps} 
+                        style={[styles.container,containerProps.style,{borderTopWidth:borderWidth,borderTopColor:borderColor,backgroundColor:theme.colors.surface},theme.elevations[elevation],panStyle,animatedStyles]}
                     >
                         {closeOnDragDown && (
                             <View
                                 {...(dragFromTopOnly && panResponder.panHandlers)}
-                                style={[styles.draggableContainer,isWeb()?{cursor:'ns-resize'}:null]}
+                                style={[styles.draggableContainer,ReskPlatform.isWeb()?{cursor:'ns-resize'} as any:null]}
                                 testID = {testID+"_DraggableIconContainer"}
                             >
                             <View testID = {testID+"_DraggableIcon"} style={[styles.draggableIcon]} />
                             </View>
                         )}
                         <View testID = {testID+"_ContentContainer"} style={[styles.contentContainer]}>
-                            {title || rActions ? <>
-                                <View testID = {testID+"_titleContainer"} style={[styles.titleContainer]}>
-                                    {title ? <View testID = {testID+"_TitleContentContainer"} style={[styles.titleWrapper]}>
-                                            <Label testID = {testID+"_Title"} {...titleProps} style={[styles.title,titleProps.style]} primary bold>{title}</Label>    
-                                    </View> : null}
-                                    {rActions? <View testID = {testID+"_Actions"}style={styles.actionsContainer}>
-                                            {rActions}
-                                    </View> : null}
-                                </View>
-                                <Divider testID = {testID+"_Divider"} style={styles.divider}/>
-                            </>  : null}
+                            {hasAppBar?<AppBar
+                                colorScheme="background"
+                                {...appBarProps}
+                                context = {Object.assign({},context,appBarProps.context)}    
+                            />: null}
                             {withScrollView !== false ?
                                 <ScrollView testID = {testID+"_ScrollViewContent"}  contentProps = {{style:styles.scrollViewContent}} {...scrollViewProps} style={[styles.scrollView,scrollViewProps.style]} alwaysBounceVertical={false}
                                     contentContainerStyle={[{ flexGrow: 1,margin:0,paddingBottom:30},scrollViewProps.contentContainerStyle]}
@@ -252,7 +247,7 @@ const BottomSheet = React.forwardRef<React.Ref<IBottomSheetContext>,IBottomSheet
                                 <KeyboardAvoidingView testID={testID+"_KeyboardAvoidingView"}>{children}</KeyboardAvoidingView>  
                             </View>}
                         </View>
-                    </Reanimated.View>
+                    </Animated.View>
             </View>
         </Portal>
     );
@@ -266,10 +261,7 @@ export interface IBottomSheetContext {
 export interface IBottomSheetProps extends IViewProps {
   animationType?: "slide" | "fade",
   height?: number,
-  actionTitle? : ReactNode,
-  minClosingHeight?: number,
   animationDuration?: number,
-  title?:ReactNode,
   withScrollView?: boolean,
   containerProps?:IViewProps,
   appBarProps?: IAppBarProps<IBottomSheetContext>,
@@ -283,7 +275,7 @@ export interface IBottomSheetProps extends IViewProps {
   dragFromTopOnly?: boolean,
   closeOnPressBack?: boolean,
   keyboardAvoidingViewEnabled?: boolean,
-  onClose?: Function,
+  elevation?:number;
   onOpen?: Function,
   onDismiss?: Function,
   scrollViewProps : ScrollViewProps,
@@ -292,7 +284,7 @@ export interface IBottomSheetProps extends IViewProps {
   contentProps : IViewProps,
 };
 
-export default BottomSheet;
+BottomSheet.displayName = "BottomSheet";
 
 const styles = StyleSheet.create({
     modal : {

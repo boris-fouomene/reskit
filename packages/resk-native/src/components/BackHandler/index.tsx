@@ -1,3 +1,6 @@
+import { NativeEventSubscription } from "react-native";
+import { BackPressEventName } from "react-native";
+
 /**
  * A mock implementation of the `BackHandler` component used in Android environments 
  * to allow interoperability. This custom `BackHandler` provides methods to manage 
@@ -54,14 +57,16 @@
  */
 function emptyFunction() { }
 
-const BackHandler = {
-  exitApp: emptyFunction,
-  addEventListener(event?: string, callback?: Function) {
+class BackHandler {
+  static exitApp= emptyFunction;
+  static addEventListener(eventName: BackPressEventName,handler: () => boolean | null | undefined): NativeEventSubscription{
     return {
-      remove: emptyFunction
+      remove: emptyFunction,
     };
-  },
-  removeEventListener: emptyFunction
+  }
+  static removeEventListener(eventName: BackPressEventName,handler: () => boolean | null | undefined) {
+  
+  };
 };
 
 export default BackHandler;

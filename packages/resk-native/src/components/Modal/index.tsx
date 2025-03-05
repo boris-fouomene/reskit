@@ -163,7 +163,7 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
     }
   };
 
-  const handleDismiss = (e: GestureResponderEvent | KeyboardEvent): any => {
+  const handleDismiss = (e?: GestureResponderEvent | KeyboardEvent): any => {
     let isDefault = false;
     switch (animationType) {
       case 'slide':
@@ -195,10 +195,9 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
   }
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      function (event: KeyboardEvent) {
+      'hardwareBackPress',function() {
         if (dismissable === false) return true;
-        return handleDismiss(event);
+        return handleDismiss();
       },
     );
     return () => backHandler?.remove();

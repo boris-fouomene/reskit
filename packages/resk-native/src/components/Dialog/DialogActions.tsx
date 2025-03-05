@@ -47,15 +47,6 @@ export default function DialogActions<DialogContextExtend = any>({ testID, actio
     if (fullScreen) {
         return null;
     }
-    const cActions = useMemo(() => {
-        return (actions)?.map((action) => {
-            if (isObj(action)) {
-                action.contentProps = Object.assign({}, action.contentProps, { style: [styles.actionContent, action?.contentProps?.style] });
-                return action;
-            }
-            return null;
-        })
-    }, [actions]);
     actionProps = Object.assign({}, actionProps);
     return <AppBar
         colorScheme={"background"}

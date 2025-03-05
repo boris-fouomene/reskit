@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
         alignSelf: "flex-end",
         justifyContent: "space-between",
         alignItems: "center",
+        paddingHorizontal:5,
     },
     calendar: {
         flexDirection: "column",

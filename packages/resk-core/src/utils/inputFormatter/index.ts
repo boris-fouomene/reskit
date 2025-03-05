@@ -109,6 +109,7 @@ export class InputFormatter {
         } else if (phoneCountryCode) {
           result.dialCode = CountriesManager.getDialCode(phoneCountryCode);
         }
+        result.phoneNumber = InputFormatter.prefixPhoneNumberWithDialCode(formattedValue, result.dialCode as string).replace(/\s/g, '');
       }
       if (hasFoundDate) { }
       // Format numbers based on the specified format.
@@ -647,7 +648,7 @@ export class InputFormatter {
     if (typeof phoneNumber !== "string") return "";
     if (!isNonNullString(dialCode)) return phoneNumber;
     dialCode = "+" + dialCode.ltrim("+");
-    if (!(phoneNumber).startsWith(dialCode)) return dialCode.trim() + " " + phoneNumber.ltrim(" ");
+    if (!(phoneNumber).startsWith(dialCode) && !phoneNumber.trim().startsWith("+")) return dialCode.trim() + " " + phoneNumber.ltrim(" ");
     return phoneNumber;
   }
 

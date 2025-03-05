@@ -531,6 +531,11 @@ export interface IInputFormatterResult extends IInputFormatterOptions, Partial<I
    * The dial code of the phone number in case of formatting a phone number
    */
   dialCode?: string;
+  
+  /***
+    The international value of the phone number of the input value in case of formatting a phone number
+  */
+  phoneNumber?: string;
 }
 
 /**

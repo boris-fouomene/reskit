@@ -63,6 +63,8 @@
  * or it can throw an exception of type string or return an object of the form `{ message: string }`.
  */
 
+import { IInputFormatterResult } from "@/types";
+
 export type IValidatorRule<ParamType extends Array<any> = Array<any>> = IValidatorRuleFunction<ParamType> | IValidatorRuleName | `${IValidatorRuleName}[${string}]` | Record<IValidatorRuleName, ParamType>;
 
 
@@ -777,6 +779,7 @@ export type IValidatorResult = Promise<boolean | string> | string | boolean;
 
 /**
  * @interface IValidatorValidateOptions
+ * @extends Partial<IInputFormatterResult>
  * Represents the options that are passed to the `Validator.validate` method.
  * 
  * This interface is used to specify the rules and parameters for validating a form field.
@@ -786,7 +789,7 @@ export type IValidatorResult = Promise<boolean | string> | string | boolean;
  * 
  * @template ParamType The type of the parameters that the rule function accepts.
  */
-export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<any>> {
+export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<any>> extends Partial<IInputFormatterResult> {
     /** 
      * The list of validation rules to apply that have been passed through the `Validator.validate` method.
      * 

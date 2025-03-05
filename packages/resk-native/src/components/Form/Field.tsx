@@ -223,6 +223,12 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
     getField<T extends IFieldType = any>(fieldName: string): IFormField<T> | null {
         return FormsManager.getField<T>(this.getFormName(), fieldName);
     }
+    isEmail(){
+        return defaultStr(this.getType()).toLowerCase().trim() === "email";
+    }
+    isPhone(){
+        return defaultStr(this.getType()).toLowerCase().trim() === "phone";
+    }
     /**
      * Validates the field based on the provided options.
      * 
@@ -265,11 +271,17 @@ export class Field<Type extends IFieldType = any> extends ObservableComponent<IF
             });
         }
         options.rules = Array.isArray(options.rules) && options.rules.length ? options.rules : this.getValidationRules();
-        if (this.getType() == "email" && this.componentProps.validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("email")) {
+        if (this.isEmail() && this.componentProps.validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("email")) {
             options.rules.push("email");
         }
-        if (this.getType() == "tel" && this.componentProps.validatePhoneNumber !== false && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("phoneNumber")) {
-            options.rules.push("phoneNumber");
+        if(this.isPhone()){
+            if(isNonNullString(options.phoneNumber) && options.phoneNumber.length > 4){
+                (options as any).rawValue = options.value;
+                options.value = options.phoneNumber;
+            } 
+            if (this.componentProps.validatePhoneNumber !== false && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("phoneNumber")) {
+                options.rules.push("phoneNumber");
+            }
         }
         if (this.getType() == "url" && options.value && !options.rules.includes("url")) {
             options.rules.push("url");

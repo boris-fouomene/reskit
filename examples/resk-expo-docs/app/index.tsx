@@ -126,6 +126,12 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         console.log(options.value, " is options datetime changeddddd")
                     }}
                 />
+                <TextInput label="Text input FR Phone" type="tel"
+                    defaultValue={"+33142685300"}
+                    onChange={(options) => {
+                        console.log(options, " is options fr phone changeddddd")
+                    }}
+                />
                 <TextInput label="Text input Phone CM" type="tel" phoneCountryCode="CM"
                     onChange={(options) => {
                         console.log(options.value, " is options phone changeddddd")

@@ -105,7 +105,7 @@ export class InputFormatter {
         const parsed = InputFormatter.parsePhoneNumber(phoneNumber as string, phoneCountryCode);
         if (parsed) {
           result.dialCode = parsed.getCountryCode() + "";
-          result.phoneCountryCode = defaultStr(phoneUtil.getRegionCodeForNumber(parsed),phoneCountryCode) as ICountryCode;
+          result.phoneCountryCode = defaultStr(phoneUtil.getRegionCodeForNumber(parsed), phoneCountryCode) as ICountryCode;
         } else if (phoneCountryCode) {
           result.dialCode = CountriesManager.getDialCode(phoneCountryCode);
         }
@@ -258,7 +258,7 @@ export class InputFormatter {
   */
   static formatWithMask(options: IInputFormatterMaskOptions): IInputFormatterMaskResult {
     options = Object.assign({}, options);
-    const { value: customValue, placeholderCharacter: customPlaceholderCharacter, mask, validate, obfuscationCharacter,/* maskAutoComplete = false*/ } = options;
+    const { value: customValue, maskAutoComplete, placeholderCharacter: customPlaceholderCharacter, mask, validate, obfuscationCharacter,/* maskAutoComplete = false*/ } = options;
     const stValue = isEmpty(customValue) ? "" : customValue === undefined ? "" : ["number", "boolean", "string"].includes(typeof customValue) ? customValue.toString() : customValue === null ? "" : customValue?.toString() || String(customValue);
     const value = defaultStr(stValue);
     const mArray = typeof mask === 'function' ? mask({ ...options, value }) : mask;
@@ -292,73 +292,33 @@ export class InputFormatter {
     let valueCharIndex = 0;
     let maskHasObfuscation = false;
     const placeholderLength = placeholder.length;
-    const nonRegexReplacedChars = [];
+    const nonRegexReplacedChars: IInputFormatterMaskResult["nonRegexReplacedChars"] = [];
     while (maskCharIndex < maskArray.length) {
-      const maskChar = maskArray[maskCharIndex];
-      const valueChar = value[valueCharIndex];
       if (valueCharIndex === value.length) {
         break;
       }
-      const unmaskedValueChar = value[valueCharIndex];
-      unmasked += unmaskedValueChar;
-      // it's a regex maskChar: let's advance on value index and validate the value within the regex
-      if (typeof maskChar === 'object') {
-        const obfuscatedCharacter = defaultStr(Array.isArray(maskChar) ? maskChar[2] : undefined, obfuscationCharacter).charAt(0);
-        // advance on value index
-        const shouldObsfucateChar = Array.isArray(maskChar) && maskChar[2] !== false && obfuscatedCharacter;
-        if (shouldObsfucateChar) {
-          maskHasObfuscation = true;
-        }
-        const maskCharRegex = Array.isArray(maskChar) ? maskChar[0] : maskChar;
-        const maskCharString = String(maskCharRegex);
-        try {
-          const isReg = isRegExp(maskCharRegex);
-          const matchRegex = isReg && RegExp(maskCharRegex).test(valueChar);
-          const matchFixed = !isReg && maskCharString === valueChar;
-          const isMatch = matchRegex || matchFixed;
-          const valToAdd = isReg ? valueChar : maskCharString;
-          if (!isMatch) {
-            isValid = false;
-          }
-          if (matchRegex || !isReg) {
-            // value match regex: add to masked and unmasked result and advance on mask index too
-            masked += valToAdd;
-            obfuscated += (shouldObsfucateChar ? obfuscatedCharacter : valToAdd);
-            if (placeholderLength > valueCharIndex) {
-              maskedPlaceholder = maskedPlaceholder.substring(0, maskCharIndex) + valToAdd + maskedPlaceholder.substring(valueCharIndex + 1)
-            }
-            if (!isReg && !matchFixed) {
-              nonRegexReplacedChars.push({
-                index: valueCharIndex,
-                maskIndex: maskCharIndex,
-                from: valueChar,
-                to: maskCharString,
-                valueChar,
-                maskChar,
-              });
-            }
-          }
-        } catch (e) { }
-      } else if (isNonNullString(maskChar)) {
-        // it's a fixed maskChar: add to maskedResult and advance on mask index
-        masked += maskChar;
-        obfuscated += maskChar;
-        if (maskChar !== valueChar) {
-          isValid = false;
-          nonRegexReplacedChars.push({
-            index: valueCharIndex,
-            maskIndex: maskCharIndex,
-            from: valueChar,
-            to: maskChar,
-            valueChar,
-            maskChar,
-          });
-        }
-      } else {
+      const maskChar = maskArray[maskCharIndex];
+      const valueChar = value[valueCharIndex];
+      const { isValid: customIsValid, masked: customMasked, obfuscated: cusotmObfuscated, isMaskRegex } = handleMaskAtIndex({ maskChar, nonRegexReplacedChars, valueChar, obfuscationCharacter, valueCharIndex, maskCharIndex })
+      if (!customIsValid) {
         isValid = false;
+      }
+      masked += customMasked;
+      obfuscated += cusotmObfuscated;
+      unmasked += valueChar;
+      if (isMaskRegex && placeholderLength > valueCharIndex) {
+        maskedPlaceholder = maskedPlaceholder.substring(0, maskCharIndex) + customMasked + maskedPlaceholder.substring(valueCharIndex + 1)
       }
       maskCharIndex += 1;
       valueCharIndex += 1;
+      if (maskAutoComplete && !isMaskRegex && valueCharIndex < maskArray.length && valueCharIndex == value.length && valueChar !== customMasked) {
+        const nextOpts = handleMaskAtIndex({ maskChar: maskArray[maskCharIndex], nonRegexReplacedChars: [], valueChar, obfuscationCharacter, valueCharIndex, maskCharIndex });
+        if (nextOpts.isMaskRegex && nextOpts.isValid && nextOpts.masked == valueChar) {
+          masked += valueChar;
+          obfuscated += nextOpts.obfuscated;
+          break;
+        }
+      }
     }
     return { masked, nonRegexReplacedChars, isValid: isValid && calValidate(value), maskHasObfuscation, placeholder, maskedPlaceholder, unmasked, obfuscated, maskArray };
   }
@@ -866,7 +826,67 @@ const generatePhoneNumberMaskArray = (phoneNumber: string, dialCode: string): II
   }
   return r;
 }
-
+function handleMaskAtIndex({ maskChar, valueChar, nonRegexReplacedChars, obfuscationCharacter, valueCharIndex, maskCharIndex }: { maskChar: any, valueCharIndex: number, maskCharIndex: number, valueChar: string, obfuscationCharacter?: string, nonRegexReplacedChars: IInputFormatterMaskResult["nonRegexReplacedChars"] }) {
+  let maskHasObfuscation = false, isValid = true;
+  let masked = '', obfuscated = '';
+  let mask = maskChar, isMaskRegex = false;
+  // it's a regex maskChar: let's advance on value index and validate the value within the regex
+  if (typeof maskChar === 'object') {
+    const obfuscatedCharacter = defaultStr(Array.isArray(maskChar) ? maskChar[2] : undefined, obfuscationCharacter).charAt(0);
+    // advance on value index
+    const shouldObsfucateChar = Array.isArray(maskChar) && maskChar[2] !== false && obfuscatedCharacter;
+    if (shouldObsfucateChar) {
+      maskHasObfuscation = true;
+    }
+    const maskCharRegex = Array.isArray(maskChar) ? maskChar[0] : maskChar;
+    const maskCharString = String(maskCharRegex);
+    mask = maskCharRegex;
+    try {
+      const isReg = isRegExp(maskCharRegex);
+      isMaskRegex = isReg;
+      const matchRegex = isReg && RegExp(maskCharRegex).test(valueChar);
+      const matchFixed = !isReg && maskCharString === valueChar;
+      const isMatch = matchRegex || matchFixed;
+      const valToAdd = isReg ? valueChar : maskCharString;
+      if (!isMatch) {
+        isValid = false;
+      }
+      if (matchRegex || !isReg) {
+        // value match regex: add to masked and unmasked result and advance on mask index too
+        masked = valToAdd;
+        obfuscated = (shouldObsfucateChar ? obfuscatedCharacter : valToAdd);
+        if (!isReg && !matchFixed) {
+          nonRegexReplacedChars.push({
+            index: valueCharIndex,
+            maskIndex: maskCharIndex,
+            from: valueChar,
+            to: maskCharString,
+            valueChar,
+            maskChar,
+          });
+        }
+      }
+    } catch (e) { }
+  } else if (isNonNullString(maskChar)) {
+    // it's a fixed maskChar: add to maskedResult and advance on mask index
+    masked = maskChar;
+    obfuscated = maskChar;
+    if (maskChar !== valueChar) {
+      isValid = false;
+      nonRegexReplacedChars.push({
+        index: valueCharIndex,
+        maskIndex: maskCharIndex,
+        from: valueChar,
+        to: maskChar,
+        valueChar,
+        maskChar,
+      });
+    }
+  } else {
+    isValid = false;
+  }
+  return { maskHasObfuscation, isMaskRegex, mask, isValid, masked, obfuscated, nonRegexReplacedChars }
+}
 function genPhoneNumberMask(parsedNumber: PhoneNumber | null, format?: PhoneNumberFormat): IInputFormatterMaskWithValidation {
   try {
     // Parse the phone number

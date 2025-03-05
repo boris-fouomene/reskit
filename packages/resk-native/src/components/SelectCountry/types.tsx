@@ -1,4 +1,5 @@
 import { IDropdownProps } from "@components/Dropdown/types";
+import { ICountryFlagProps } from "@components/Icon";
 import { ICountry, ICountryCode } from "@resk/core";
 import { TouchableOpacityProps } from 'react-native';
 
@@ -10,10 +11,15 @@ import { TouchableOpacityProps } from 'react-native';
  */
 export interface ISelectCountryProps extends IDropdownProps<ICountry, ICountryCode> {
     /***
-     * The color for text elements in the component.
+     * The props for the country flag component.
+     * This is an object that defines the props for the country flag component.
      */
-    textColor?: string;
-    iconSize?: number;
+    countryFlagProps?: Omit<ICountryFlagProps, "countryCode">;
+    /***
+     * The font size of the text when the Label is rendered.
+     * This is a number that represents the font size of the text when the Label is rendered.
+     */
+    textFontSize?: number;
 
     /***
      * The props for the anchor component that wraps the dropdown anchor.

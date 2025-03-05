@@ -46,7 +46,7 @@ describe('InputFormatter', () => {
                 type: 'date',
             };
             const result = InputFormatter.formatValue(options);
-            expect(result.formattedValue).toBe('01/01/2022');
+            expect(result.formattedValue).toBe('2022-01-01');
             expect(result.isDecimalType).toBe(false);
             expect(result.value).toBeInstanceOf(Date);
             expect(result.parsedValue).toBeInstanceOf(Date);
@@ -59,7 +59,7 @@ describe('InputFormatter', () => {
                 type: 'time',
             };
             const result = InputFormatter.formatValue(options);
-            expect(result.formattedValue).toBe('12:00:00');
+            expect(result.formattedValue).toBe('12:00');
             expect(result.isDecimalType).toBe(false);
             expect(result.value).toBeInstanceOf(Date);
             expect(result.parsedValue).toBeInstanceOf(Date);
@@ -72,7 +72,7 @@ describe('InputFormatter', () => {
                 type: 'datetime',
             };
             const result = InputFormatter.formatValue(options);
-            expect(result.formattedValue).toBe('01/01/2022 12:00:00');
+            expect(result.formattedValue).toBe('2022-01-01 12:00');
             expect(result.isDecimalType).toBe(false);
             expect(result.value).toBeInstanceOf(Date);
             expect(result.parsedValue).toBeInstanceOf(Date);
@@ -168,7 +168,7 @@ describe('InputFormatter', () => {
             };
             const result = InputFormatter.formatValueAsString(options);
 
-            expect(result).toBe('01/01/2022');
+            expect(result).toBe('2022-01-01');
         });
 
         it('should format a time value', () => {
@@ -177,7 +177,7 @@ describe('InputFormatter', () => {
                 type: 'time',
             };
             const result = InputFormatter.formatValueAsString(options);
-            expect(result).toBe('12:00:00');
+            expect(result).toBe('12:00');
         });
 
         it('should format a datetime value', () => {
@@ -186,7 +186,7 @@ describe('InputFormatter', () => {
                 type: 'datetime',
             };
             const result = InputFormatter.formatValueAsString(options);
-            expect(result).toBe('01/01/2022 12:00:00');
+            expect(result).toBe('2022-01-01 12:00');
         });
 
         it('should format a value with a custom format function', () => {
@@ -449,16 +449,16 @@ describe('InputFormatter', () => {
     describe('MASKS_WITH_VALIDATIONS', () => {
         it('should have a date mask', () => {
             expect(InputFormatter.MASKS_WITH_VALIDATIONS.DATE.mask).toEqual([
-                [/\d/, "D"],
-                [/\d/, "D"],
-                "/",
+                [/\d/, "Y"],
+                [/\d/, "Y"],
+                [/\d/, "Y"],
+                [/\d/, "Y"],
+                "-",
                 [/\d/, "M"],
                 [/\d/, "M"],
-                '/',
-                [/\d/, "Y"],
-                [/\d/, "Y"],
-                [/\d/, "Y"],
-                [/\d/, "Y"],
+                '-',
+                [/\d/, "D"],
+                [/\d/, "D"],
             ]);
         });
 
@@ -469,33 +469,27 @@ describe('InputFormatter', () => {
                 ':',
                 [/\d/, "m"],
                 [/\d/, "m"],
-                ':',
-                [/\d/, "s"],
-                [/\d/, "s"],
             ]);
         });
 
         it('should have a datetime mask', () => {
             expect(InputFormatter.MASKS_WITH_VALIDATIONS.DATE_TIME.mask).toEqual([
-                [/\d/, "D"],
-                [/\d/, "D"],
-                "/",
+                [/\d/, "Y"],
+                [/\d/, "Y"],
+                [/\d/, "Y"],
+                [/\d/, "Y"],
+                '-',
                 [/\d/, "M"],
                 [/\d/, "M"],
-                '/',
-                [/\d/, "Y"],
-                [/\d/, "Y"],
-                [/\d/, "Y"],
-                [/\d/, "Y"],
+                "-",
+                [/\d/, "D"],
+                [/\d/, "D"],
                 ' ',
                 [/\d/, "H"],
                 [/\d/, "H"],
                 ":",
                 [/\d/, "m"],
                 [/\d/, "m"],
-                ':',
-                [/\d/, "s"],
-                [/\d/, "s"],
             ]);
         });
 

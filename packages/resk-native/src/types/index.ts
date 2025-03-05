@@ -1,4 +1,5 @@
 import { IInputFormatterResult } from "@resk/core";
+import { II18nLocale } from "@src/i18n";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent, PressableProps, TouchableWithoutFeedback, TouchableWithoutFeedbackProps } from "react-native";
 /**
    @interface
@@ -475,4 +476,9 @@ export interface IUseI18nOptions {
    * The locale to use for the i18n instance. If not provided, the default locale will be used.
    */
   locale?: string;
+
+  /***
+   * An array of supported languages for the i18n instance.
+   */
+  languages?: II18nLocale[];
 }

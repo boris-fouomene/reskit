@@ -339,18 +339,11 @@ export interface IInputFormatterMaskOptions {
 
 
   /**
- * Whether to add the next mask characters to the end of the input value.
- *
- * This property defaults to `false` if not specified.
- *
- * @example
- * ```typescript
- * const maskOptions: IInputFormatterMaskOptions = {
- *   maskAutoComplete: true,
- * };
- * ```
- */
-  //maskAutoComplete?: boolean;
+  * Whether to add the next mask characters to the end of the input value.
+  *
+  * This property defaults to `false` if not specified.
+  */
+  maskAutoComplete?: boolean;
 }
 
 /**
@@ -676,6 +669,8 @@ export interface IInputFormatterMaskResult {
     maskIndex: number;
     from: string;
     to: string;
+    valueChar: string;
+    maskChar: string;
   }[]
 }
 /**

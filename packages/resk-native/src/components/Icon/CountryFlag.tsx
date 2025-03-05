@@ -26,8 +26,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 import Platform from "@platform";
-import { CountriesManager, defaultStr, ICountryCode, isNonNullString, Logger } from '@resk/core';
-import { isClientSide, isWeb } from '@resk/core/build/esm/platform';
+import { CountriesManager, defaultStr, ICountryCode, Platform as ReskPlatform, isNonNullString, Logger } from '@resk/core';
 import { IStyle } from '@src/types';
 import { isImageSource } from './utils';
 import Icon from './Icon';
@@ -59,7 +58,7 @@ const createEmoji = (countryCode: string): string => {
  * @returns {boolean} True if the platform supports emoji flags
  */
 const isEmojiSupported = (): boolean => {
-    if (!isClientSide()) return false;
+    if (!ReskPlatform.isClientSide()) return false;
     if (Platform.isNative()) return true;
     if (typeof navigator === 'undefined' || !navigator) return false;
     // Use modern navigator.userAgentData if available
@@ -75,14 +74,14 @@ const isEmojiSupported = (): boolean => {
 /**
  * Props interface for the CountryFlag component.
  * 
- * @interface IFlagEmojiProps
+ * @interface ICountryFlagProps
  * @property {string} countryCode - Two-letter country code (ISO 3166-1 alpha-2)
  * @property {number} [size=24] - Size of the flag emoji in pixels
  * @property {any} [style] - Additional styles for the container
  * @property {React.ReactNode} [fallback] - Fallback component when flag cannot be displayed
  * @property {(error: string) => void} [onError] - Error callback function
  */
-export interface IFlagEmojiProps extends TouchableOpacityProps {
+export interface ICountryFlagProps extends TouchableOpacityProps {
     /***
      * The country code for the flag emoji.
      * This is a two-letter country code (ISO 3166-1 alpha-2) that represents the country.
@@ -94,6 +93,13 @@ export interface IFlagEmojiProps extends TouchableOpacityProps {
      * The default value is 24.
      */
     size?: number;
+
+    /***
+     * The font size of the text when the Label is rendered.
+     * This is a number that represents the font size of the text when the Label is rendered.
+     * The default value is 50% of the size of the flag emoji.
+     */
+    textFontSize?: number;
     /***
      * The style object for the flag emoji.
      * This is an object that defines the styling properties for the flag emoji.
@@ -116,12 +122,13 @@ export interface IFlagEmojiProps extends TouchableOpacityProps {
  * CountryFlag component that displays a country flag emoji.
  * 
  * @component
- * @param {IFlagEmojiProps} props - Component props
+ * @param {ICountryFlagProps} props - Component props
  * @returns {React.ReactNode} The rendered flag or fallback component
  */
-const CountryFlag: React.FC<IFlagEmojiProps> = ({
+const CountryFlag: React.FC<ICountryFlagProps> = ({
     countryCode,
     size,
+    textFontSize,
     style,
     testID,
     textColor,
@@ -140,15 +147,16 @@ const CountryFlag: React.FC<IFlagEmojiProps> = ({
     }, [countryCode]);
     testID = defaultStr(testID, "resk-country-flag-emoji");
     size = typeof size === "number" ? size : 20;
+    textFontSize = typeof textFontSize === "number" ? textFontSize : size * 0.5;
     const isValidFallback = isValidElement(fallback);
-    const accessibleLabel = country?.name||countryCode;
+    const accessibleLabel = country?.name || countryCode;
     return (
         <Component testID={testID} {...props} style={[styles.container, style]}>
             {imageSource ?
                 <Icon accessibilityLabelledBy={accessibleLabel} accessibilityLabel={accessibleLabel} size={size} testID={testID + "-image"} source={{ uri: imageSource }} /> :
-                canRender || !isValidFallback ? <Label accessibilityRole={canRender?'image':"text"} accessibilityLabelledBy={accessibleLabel} role={canRender?"img":undefined} testID={testID + "-text"} accessibilityLabel={accessibleLabel} color={textColor} style={[{ fontSize: Math.max(size,15)*(canRender?1:0.5)}]}>
-                        {canRender? flagEmoji :`[${countryCode}]`}
-                </Label> :  fallback
+                canRender || !isValidFallback ? <Label accessibilityRole={canRender ? 'image' : "text"} accessibilityLabelledBy={accessibleLabel} role={canRender ? "img" : undefined} testID={testID + "-text"} accessibilityLabel={accessibleLabel} color={textColor} style={[{ fontSize: canRender ? size : textFontSize }]}>
+                    {canRender ? flagEmoji : `[${countryCode}]`}
+                </Label> : fallback
             }
         </Component>
     );
@@ -172,11 +180,10 @@ const styles = StyleSheet.create({
  */
 const canRenderEmoji = (emoji?: string): boolean => {
     if (Platform.isNative()) return true;
-    if (!isWeb() || !isNonNullString(emoji)) return false;
-    return supportsEmoji(emoji);
+    if (!ReskPlatform.isWeb() || !isNonNullString(emoji) || !ReskPlatform.isTouchDevice()) return false;
     //const flag = "🇨🇲"; // Example: Cameroon
     //if (flag == "🇨🇲") return true;
-    /* try {
+    try {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         if (!ctx) return false;
@@ -188,7 +195,7 @@ const canRenderEmoji = (emoji?: string): boolean => {
         return pixels.some(pixel => pixel !== 0);
     } catch (e) {
         return false;
-    } */
+    }
 };
 
 const FlagExported: typeof CountryFlag & { isEmojiSupported: typeof isEmojiSupported; canRenderEmoji: typeof canRenderEmoji; createEmoji: typeof createEmoji } = CountryFlag as any;
@@ -197,5 +204,5 @@ FlagExported.createEmoji = createEmoji;
 FlagExported.canRenderEmoji = canRenderEmoji;
 
 export default FlagExported;
- 
+
 CountryFlag.displayName = "Country.CountryFlag";

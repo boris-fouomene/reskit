@@ -16,12 +16,14 @@ import { SelectCountryRef } from "@components/TextInput/SelectCountryRef";
  * @param {ISelectCountryProps} props - The props for the country selector component.
  * @returns {JSX.Element} The rendered country selector component.
  */
-export const SelectCountry = React.forwardRef<any, ISelectCountryProps & {displayDialCode?:boolean}>(({ withLabel,displayDialCode, label, anchorProps, textColor, iconSize, ...props }, ref) => {
+export const SelectCountry = React.forwardRef<any, ISelectCountryProps & { displayDialCode?: boolean }>(({ withLabel, countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }, ref) => {
     const countries = useMemo(() => {
         return Object.values(CountriesManager.getCountries());
     }, []);
+    const { textColor: customTextColor, ...countryFlagProps } = Object.assign({}, customCountryFlagProps);
     anchorProps = Object.assign({}, anchorProps);
-    iconSize = typeof iconSize == "number" ? iconSize : 24;
+    const iconSize = typeof countryFlagProps.size == "number" ? countryFlagProps.size : 24;
+    const textColor = customTextColor;
     const canDisplayDialCode = displayDialCode !== false;
     return <Dropdown<ICountry, ICountryCode>
         ref={ref}
@@ -32,7 +34,7 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps & {displa
         getItemValue={({ item }) => item.code}
         getItemLabel={({ item }) => {
             return <View style={styles.countryFlagContainer}>
-                <Icon.CountryFlag  countryCode={item.code} size={iconSize} style={styles.countryFlagIcon} />
+                <Icon.CountryFlag {...countryFlagProps} countryCode={item.code} size={iconSize} style={[styles.countryFlagIcon, countryFlagProps.style]} />
                 <Label>{item.name}</Label>
                 {canDisplayDialCode && isNonNullString(item.dialCode) ? <Label style={styles.itemLabel}>{"(+" + item.dialCode.ltrim("+") + ") "}</Label> : null}
             </View>;
@@ -42,13 +44,14 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps & {displa
                 return selectedItems.map((item) => {
                     return <Icon.CountryFlag
                         key={item.code}
+                        {...countryFlagProps}
                         countryCode={item.code}
                         size={iconSize}
                         style={styles.countryFlag}
                         fallback={<Label color={textColor} >[{item.code}]</Label>}
                     />
                 });
-            }, [selectedItems,textColor]);
+            }, [selectedItems, textColor, iconSize]);
             return <TouchableOpacity
                 testID={defaultStr(dropdownContext?.getTestID()) + "-anchor"}
                 {...anchorProps}
@@ -72,7 +75,7 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps & {displa
             </TouchableOpacity>;
         }}
         {...props}
-        menuProps={Object.assign({},{minWidth:canDisplayDialCode?280:260}, props.menuProps)}
+        menuProps={Object.assign({}, { minWidth: canDisplayDialCode ? 280 : 260 }, props.menuProps)}
     />
 });
 
@@ -86,8 +89,8 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
     },
     countryFlag: { pointerEvents: "box-none" },
-    countryFlagIcon:{
-        marginRight:5,
+    countryFlagIcon: {
+        marginRight: 5,
     },
     labelContainer: {
         flexDirection: "row",
@@ -96,9 +99,9 @@ const styles = StyleSheet.create({
         flexWrap: "wrap"
     },
     chevronIcon: {},
-    itemLabel : {
-        fontSize:12,
-        opacity:0.8
+    itemLabel: {
+        fontSize: 12,
+        opacity: 0.8
     }
 })
 SelectCountry.displayName = "SelectCountry";

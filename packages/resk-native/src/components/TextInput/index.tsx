@@ -1,6 +1,6 @@
 import Label from "@components/Label";
 import { isValidElement, useMergeRefs } from "@utils";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, TextStyle } from 'react-native';
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
 import React, { ReactNode, useEffect, useMemo, useRef } from "react";
 import { InputFormatter, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, IInputFormatterResult } from "@resk/core";
 import _, { isNumber } from "lodash";
@@ -12,13 +12,13 @@ import { ITextInputCallbackOptions, ITextInputProps, ITextInputType, IUseTextInp
 import { ITheme } from "@theme/types";
 import { IStyle } from "@src/types";
 import { IFontIconProps } from "@components/Icon";
-import { TouchableRipple } from "@components/TouchableRipple";
 import Breakpoints from "@breakpoints/index";
 import { Calendar, CalendarModalContext } from "@components/Date";
 import { useI18n } from "@src/i18n";
 import { SelectCountryRef } from "./SelectCountryRef";
 import p from "@platform";
 import { TouchableOpacity } from "react-native";
+import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
 
 const isNative = p.isNative();
 
@@ -90,9 +90,9 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
     const Wrapper = canWrapWithTouchable ? TouchableOpacity : View;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
-    const inputProps = { ...(!canWrapWithTouchable && editable ? pressableProps : {}), focus, ...rest, editable: canWrapWithTouchable ? false : editable,readOnly:canWrapWithTouchable?true:props.readOnly}
+    const inputProps = { ...(!canWrapWithTouchable && editable ? pressableProps : {}), focus, ...rest, editable: canWrapWithTouchable ? false : editable, readOnly: canWrapWithTouchable ? true : props.readOnly }
     const inputElement = typeof render == "function" ? render(inputProps, inputRef) : <RNTextInput {...inputProps} ref={inputRef} />;
-    return <View {...containerProps} >
+    return <KeyboardAvoidingView {...containerProps} >
         {isLabelEmbededVariant ? null : labelContent}
         <Wrapper {...wrapperProps} {...contentContainerProps} style={[styles.wrapper, contentContainerProps?.style]}>
             <View testID={testID + "-left-content-container"} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContentContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
@@ -106,7 +106,7 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
                 {right}
             </View>) : null}
         </Wrapper>
-    </View>
+    </KeyboardAvoidingView>
 });
 
 /**
@@ -263,8 +263,10 @@ const iconSize = 25;
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, style: customStyle, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
+    const style = StyleSheet.flatten([customStyle])
+    const fontSize = style.fontSize ?? 16;
     const { isPhone, isDateOrTime, typeString } = useMemo(() => {
         const t = String(type).toLowerCase();
         return {
@@ -367,7 +369,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         }
         return {
             phoneCountryCode,
-            ...(mask ? InputFormatter.formatWithMask({ ...maskOptions, value, mask, type }) : {}),
+            ...(mask ? InputFormatter.formatWithMask({ ...maskOptions, maskAutoComplete: true, value, mask, type }) : {}),
             ...InputFormatter.formatValue({ ...props, phoneCountryCode, dateFormat, type, value }),
             value,
         }
@@ -489,7 +491,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
                     const nState = { ...inputState, ...valCase };
                     setInputState(nState);
                     if (typeof onChange === "function") {
-                        onChange({ ...nState, dateValue: newDate,value:canValueBeDecimal?InputFormatter.parseDecimal(nState.value):nState.value });
+                        onChange({ ...nState, dateValue: newDate, value: canValueBeDecimal ? InputFormatter.parseDecimal(nState.value) : nState.value });
                     }
                 }
             }}
@@ -509,22 +511,22 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
     const phoneCountryFlag = isPhone && SelectCountryComponent ? <>
         <SelectCountryComponent
             multiple={false}
+            textFontSize={fontSize}
             disabled={!editable}
             defaultValue={inputState.phoneCountryCode}
             onChange={!editable ? undefined : ({ value }) => {
-                if (isNonNullString(value) && value !== inputState.phoneCountryCode && String(value).toLowerCase() !=="undefined") {
+                if (isNonNullString(value) && value !== inputState.phoneCountryCode && String(value).toLowerCase() !== "undefined") {
                     setInputState({
                         ...inputState,
                         ...toCase("", Array.isArray(value) ? value[0] : value)
                     });
                 }
             }}
-            textColor={textColor}
+            countryFlagProps={{ textColor, textFontSize: fontSize }}
             fullScreenAppBarProps={{ title: i18n.t("components.textInput.selectCountry") + (isNonNullString(label) ? " [" + label + "]" : "") }}
         />
         {phoneDialCodeLabel}
     </> : null;
-    const labelPropStyle : TextStyle = StyleSheet.flatten(labelProps?.style) as TextStyle;
     return {
         autoComplete: "off",
         placeholderTextColor: isFocused || error ? textColor : theme.colors.placeholder,
@@ -551,7 +553,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
             style: [styles.contentContainer, contentContainerStyle,
             contentContainerProps.style]
         }),
-        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelPropStyle]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
+        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
         placeholder: hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
         testID: testID,
@@ -560,13 +562,14 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, mask:
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: [
             Object.assign({}, Platform.isWeb() ? { outline: "none" } : {}) as IStyle,
-            styles.input, 
+            styles.input,
             minHeight > 0 && { minHeight },
             inputStyle,
             compact && styles.compact,
             multiline && { height: inputHeight },
             multiline && styles.multilineInput,
-            props.style,
+            style,
+            { fontSize },
             disabledOrEditStyle,
             isDropdownAnchor && editable && styles.dropdownAnchorInput,
         ],
@@ -674,7 +677,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         flexGrow: 1,
         overflow: 'hidden',
-        fontSize : 16,
+        fontSize: 16,
     },
     compact: {
         padding: 0,

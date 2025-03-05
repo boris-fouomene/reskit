@@ -24,6 +24,7 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps & { displ
     anchorProps = Object.assign({}, anchorProps);
     const iconSize = typeof countryFlagProps.size == "number" ? countryFlagProps.size : 24;
     const textColor = customTextColor;
+    const textFontSize = typeof countryFlagProps.textFontSize == "number" ? countryFlagProps.textFontSize : 16;
     const canDisplayDialCode = displayDialCode !== false;
     return <Dropdown<ICountry, ICountryCode>
         ref={ref}
@@ -36,7 +37,7 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps & { displ
             return <View style={styles.countryFlagContainer}>
                 <Icon.CountryFlag {...countryFlagProps} countryCode={item.code} size={iconSize} style={[styles.countryFlagIcon, countryFlagProps.style]} />
                 <Label>{item.name}</Label>
-                {canDisplayDialCode && isNonNullString(item.dialCode) ? <Label style={styles.itemLabel}>{"(+" + item.dialCode.ltrim("+") + ") "}</Label> : null}
+                {canDisplayDialCode && isNonNullString(item.dialCode) ? <Label style={[styles.itemLabel,{fontSize:textFontSize*0.75}]}>{"(+" + item.dialCode.ltrim("+") + ") "}</Label> : null}
             </View>;
         }}
         anchor={({ dropdownContext, selectedItems, selectedValues, onPress, disabled }) => {
@@ -100,7 +101,6 @@ const styles = StyleSheet.create({
     },
     chevronIcon: {},
     itemLabel: {
-        fontSize: 12,
         opacity: 0.8
     }
 })

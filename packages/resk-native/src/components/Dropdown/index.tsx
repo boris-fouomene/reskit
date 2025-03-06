@@ -65,7 +65,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         if (typeof getItemLabel === "function") {
             return getItemLabel(options);
         }
-        const { item, index } = options;
+        const { item } = options;
         if (item && isObj(item)) {
             const { label } = (item as IDict);
             if (isReactNode(label)) {
@@ -212,7 +212,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         });
     }
     open() {
-        const { isLoading, readOnly, disabled, multiple } = this.props;
+        const { isLoading, readOnly, disabled } = this.props;
         if (isLoading || readOnly || disabled || this.state.visible) return;
         this.setState({ visible: true }, () => {
             this.trigger("open", this);
@@ -315,7 +315,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     context.onSearch = onSearch;
     context.filteredItems = filteredItems;
     disabled = disabled || isLoading;
-    const { selectedText: anchorSelectedText, title: anchorTitle, selectedItems, selectedValues } = useMemo(() => {
+    const { selectedText: anchorSelectedText, selectedItems, selectedValues } = useMemo(() => {
         let selectedText = "";
         let title = "";
         let counter = 0;
@@ -488,7 +488,7 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
 }
 
 const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) => {
-    const { item, label, value, hashKey, labelText } = preparedItem;
+    const { label, hashKey, labelText } = preparedItem;
     const forceRender = useForceRender();
     const context = useDropdown();
     const theme = useTheme();
@@ -518,10 +518,10 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
                 forceRender();
             }
         });
-        const bindOnSelectAll = context.on("selectAll", (options) => {
+        const bindOnSelectAll = context.on("selectAll", () => {
             forceRender();
         });
-        const bindOnUnselectAll = context.on("unselectAll", (options) => {
+        const bindOnUnselectAll = context.on("unselectAll", () => {
             forceRender();
         });
         return () => {
@@ -584,9 +584,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderTopWidth: 0,
         alignSelf: "flex-start",
-        flexGrow: 0,
+        flexGrow: 1,
         overflow: "hidden",
-        //height: "100%",
         width: "100%",
         justifyContent: "center",
     },
@@ -639,7 +638,7 @@ const styles = StyleSheet.create({
     },
 });
 
-const DropdownSearch = ({ isFullScreen, canReverse }: { isFullScreen?: boolean, canReverse?: boolean }) => {
+const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: boolean }) => {
     const context = useDropdown();
     const filteredItems = Array.isArray(context.filteredItems) ? context.filteredItems : [];
     const searchText = defaultStr(context.searchText);

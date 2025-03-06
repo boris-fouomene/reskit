@@ -2,7 +2,7 @@
   "name": "@resk/native",
   "main": "build/index",
   "types": "build/index",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
   "scripts": {
     "build-core": "cd ../resk-core && npm run build",
@@ -20,14 +20,14 @@
     "tippy.js": "^6.3.7"
   },
   "peerDependencies": {
-    "@types/react": "*",
-    "@types/react-is": "*",
-    "@types/react-native-vector-icons": "*",
-    "react": "*",
-    "react-dom": "*",
-    "react-is": "*",
-    "react-native": "*",
-    "react-native-web": "*"
+    "@types/react": ">=18 <20",
+    "@types/react-is": ">=18 <20",
+    "@types/react-native-vector-icons": ">=6 <7",
+    "react": ">=18 <20",
+    "react-dom": ">=18 <20",
+    "react-is": ">=18 <20",
+    "react-native": ">=0.76 <0.78",
+    "react-native-web": ">=0.19 <0.20"
   },
   "devDependencies": {
     "@types/color": "^3.0.6"

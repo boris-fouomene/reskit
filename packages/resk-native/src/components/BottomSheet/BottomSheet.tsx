@@ -253,6 +253,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>((props, ref) => {
                                 elevation={0}
                                 backAction={false}
                                 {...appBarProps}
+                                titleProps={Object.assign({}, appBarProps.titleProps,{style:[styles.title, appBarProps.titleProps?.style]})}
                                 context={Object.assign({}, appBarProps.context, { bottomSheet: context })}
                             />
                             {dividerAfterAppBar !== false ? <Divider
@@ -691,8 +692,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     title: {
-        fontSize: 16,
-        marginHorizontal: 20,
+        fontSize: 15,
+        fontWeight:"400"
     },
     divider: {
         margin: 0,

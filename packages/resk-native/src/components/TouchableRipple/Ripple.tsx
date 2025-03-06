@@ -268,7 +268,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
             const isHover = (state as any)?.hovered && !disabled;
             return StyleSheet.flatten([
                 styles.container,
-                state.pressed && !disabled && rippleColor && { backgroundColor: rippleColor },
+                //state.pressed && !disabled && rippleColor && { backgroundColor: rippleColor },
                 shadowStyle,
                 disabled && Theme.styles.disabled,
                 typeof borderRadius == "number" && { borderRadius },
@@ -277,7 +277,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
             ]);
         }}
         android_ripple={
-            disableRipple ? undefined : Object.assign({
+            Object.assign({
                 color: rippleColor,
                 borderless: borderWidth === 0,
                 duration: rippleDuration,
@@ -302,9 +302,9 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
 
 const styles = StyleSheet.create({
     container: {
-        overflow: 'hidden',
+        //overflow: 'hidden',
         alignSelf: "flex-start",
-        userSelect: "none",
+        //userSelect: "none",
     },
 });
 

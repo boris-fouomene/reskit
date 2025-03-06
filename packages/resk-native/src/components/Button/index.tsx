@@ -344,6 +344,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                     return r
                 }}
                 {...rest}
+                androidRipple={Object.assign({},{radius:borderRadius}, rest.android_ripple)}
             >
                 <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, fullWidthStyle, contentStyle, hasLeftContentWrapper && styles.contentHasLeftContentWrapper]}>
                     <LeftContentWrapper {...letContentWrapperProps}>

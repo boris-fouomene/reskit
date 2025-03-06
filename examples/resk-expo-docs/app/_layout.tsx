@@ -20,15 +20,7 @@ export default function RootLayout() {
     return (<ReskNativeProvider
         drawerNavigationViewProps={{}}
         theme={{ dark: true, colors: { onPrimary: "black" } } as ITheme}
-        auth={{
-            Login: function ({ signIn }) {
-                return <View style={[Theme.styles.h100, Theme.styles.w100]} testID="my-container">
-                    <View>
-                        <Label colorScheme="error" fontSize={20} textBold>This is the login component.</Label>
-                    </View>
-                </View>
-            }
-        }}
+        auth={{ }}
     >
         <Slot />
     </ReskNativeProvider>);

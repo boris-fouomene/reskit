@@ -126,15 +126,9 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
       />;
     }
   });
-  const sInsets = useReskNative().safeAreaInsets;
-  const insets = Object.assign({}, sInsets);;
-  const top = typeof insets.top == "number" ? insets.top : 0;
-  const left = typeof insets.left == "number" ? insets.left : 0;
-  const right = typeof insets.right == "number" ? insets.right : 0;
-  //statusBarHeight = Platform.OS === 'ios' ? StatusBar.currentHeight || 0 : 0
   const containerStyle = {
     paddingTop: typeof statusBarHeight === "number" ? statusBarHeight : top,
-    paddingHorizontal: Math.max(left, right, 7),
+    paddingHorizontal: 7,
   }
   const { left: leftContent, right: rightContent } = getLabelOrLeftOrRightProps({ left: customLeft, right: customRight }, { color, backgroundColor, context })
   return (
@@ -147,9 +141,8 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
           styles.appbar,
           {
             backgroundColor,
-            elevation,
           },
-          containerStyle,
+          containerStyle as any,
           style,
         ]}
       >

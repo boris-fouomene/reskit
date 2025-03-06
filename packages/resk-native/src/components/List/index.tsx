@@ -41,7 +41,7 @@ class ListManager {
  * @template ItemType The type of the items in the list.
  * @see {@link FlatListProps} for more information on the `FlatListProps` type.
  */
-export interface IListProps<ItemType = any> extends FlatListProps<ItemType> { }
+export interface IListProps<ItemType = any> extends Partial<FlatListProps<ItemType>> { }
 
 /**
  * A React component that represents a list.

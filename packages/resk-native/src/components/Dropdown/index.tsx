@@ -21,6 +21,7 @@ import { Divider } from "@components/Divider";
 import { ProgressBar } from "@components/ProgressBar";
 import { ITextInputProps } from "@components/TextInput/types";
 import { List } from "@components/List";
+import BigList from "react-native-big-list";
 
 /**
  * Represents a dropdown component that allows users to select one or more items from a list.
@@ -473,9 +474,8 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
             />
         ) : null}
         <DropdownSearch isFullScreen={fullScreen} />
-        <List<IDropdownPreparedItem<ItemType, ValueType>>
+        <BigList<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
-            //estimatedItemSize={100}
             {...listProps}
             inverted={canReverse}
             data={filteredItems}

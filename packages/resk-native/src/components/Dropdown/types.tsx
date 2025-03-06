@@ -6,6 +6,7 @@ import { PressableProps, FlatListProps } from "react-native";
 import { IFontIconProps } from "@components/Icon";
 import { ObservableComponent } from "@utils/index";
 import { IMenuProps } from "@components/Menu";
+import { BigListProps } from "react-native-big-list";
 
 /**
  * Represents the context for a dropdown component, providing methods and state 
@@ -741,7 +742,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     defaultValue?: ValueType | ValueType[]; // Default value(s) for the dropdown
     getHashKey?: (value: ValueType) => string; // Function to get unique hash key
     filter?: (preparedItem: IDropdownPreparedItem<ItemType, ValueType>, index: number) => boolean; // Function to filter items
-    listProps?: FlatListProps<IDropdownPreparedItem<ItemType, ValueType>>; // Props for the item list
+    listProps?: BigListProps<IDropdownPreparedItem<ItemType, ValueType>>; // Props for the item list
 
     /**
      * Whether the dropdown should display a search input

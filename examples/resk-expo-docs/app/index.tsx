@@ -198,6 +198,14 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                     BottomSheet.Provider.open({
                         appBarProps: {
                             title: "Bottom Sheet",
+                            actions: [
+                                {
+                                    label: "Cancel",
+                                    onPress: (event, { bottomSheet }) => {
+                                        console.log("Cancel", bottomSheet.isOpened)
+                                    },
+                                },
+                            ]
                         },
                         items: [
                             {

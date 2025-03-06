@@ -253,7 +253,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>((props, ref) => {
                                 elevation={0}
                                 backAction={false}
                                 {...appBarProps}
-                                context={Object.assign({}, context, appBarProps.context)}
+                                context={Object.assign({}, appBarProps.context, { bottomSheet: context })}
                             />
                             {dividerAfterAppBar !== false ? <Divider
                                 testID={testID + "-divider"}
@@ -453,7 +453,7 @@ export interface IBottomSheetProps extends IViewProps {
      * <BottomSheet appBarProps={{ title: 'Bottom Sheet' }} />
      * ```
      */
-    appBarProps?: IAppBarProps<IBottomSheetContext>;
+    appBarProps?: IAppBarProps<IBottomSheetMenuItemContext>;
 
     /**
      * Whether the bottom sheet is visible.

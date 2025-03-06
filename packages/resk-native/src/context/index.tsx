@@ -16,6 +16,7 @@ import { useI18n } from "@src/i18n/hooks";
 import Default from "@auth/hooks";
 import { Notify } from "@notify/index";
 import { StatusBar } from '@components/StatusBar';
+import { BottomSheet } from '@components/BottomSheet';
 
 export * from "./types";
 export * from "./hooks";
@@ -125,6 +126,7 @@ export function ReskNativeProvider({ children, theme: customTheme, auth, breakpo
             <Dialog.Alert.Provider />
             <Dialog.Provider.Provider />
             <Drawer.Provider.Provider />
+            <BottomSheet.Provider.Provider />
             <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>
               <StatusBar />
               {children}

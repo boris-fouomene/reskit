@@ -1,7 +1,7 @@
-import { Tab, TextInput, withAppBar, Avatar, Badge, getLocales, Calendar, Drawer, Button, List, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
+import { Tab, TextInput, withAppBar, BottomSheet, Avatar, Badge, getLocales, Calendar, Drawer, Button, List, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
 import { View, ScrollView, FlatList } from 'react-native'
 import { IField, Logger, InputFormatter, ILogger, AttachLogger } from "@resk/core";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 @AttachLogger()
 class LoggerExample implements ILogger {
@@ -24,7 +24,6 @@ class LoggerExample implements ILogger {
 
 const index = withAppBar(() => {
     Logger.log("locales ", getLocales());
-    const listRef = useRef<FlatList>(null);
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>
@@ -155,42 +154,66 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
                         label: "My Checkbox",
                         defaultValue: true,
                     } as IField<"checkbox">,
-                    switch : {
-                        label : "Example Switch",
-                        type : "switch",
-                        defaultValue : true
+                    switch: {
+                        label: "Example Switch",
+                        type: "switch",
+                        defaultValue: true
                     },
-                    select : {
-                        type : "select",
-                        label : "Example Select",
-                        defaultValue : "1",
-                        items : [
+                    select: {
+                        type: "select",
+                        label: "Example Select",
+                        defaultValue: "1",
+                        items: [
                             {
-                                label : "Item 1",
-                                value : "1"
+                                label: "Item 1",
+                                value: "1"
                             },
                             {
-                                label : "Item 2",
-                                value : "2"
+                                label: "Item 2",
+                                value: "2"
                             },
                             {
-                                label : "Item 3",
-                                value : "3"
+                                label: "Item 3",
+                                value: "3"
                             },
                         ]
                     } as IField<"select">,
-                    selectCountry : {
-                        type : "selectCountry",
-                        label : "Example Select Country",
-                        defaultValue : "CM",
+                    selectCountry: {
+                        type: "selectCountry",
+                        label: "Example Select Country",
+                        defaultValue: "CM",
                     } as IField<"selectCountry">,
-                    tel : {
+                    tel: {
                         type: "tel",
                         label: "Example Tel",
-                        onChange : (options) => {
+                        onChange: (options) => {
                             console.log(options.value, " is options tel changeddddd")
                         }
                     },
+                }}
+            />
+            <Button
+                children="Open Bottom Sheet"
+                onPress={() => {
+                    BottomSheet.Provider.open({
+                        appBarProps: {
+                            title: "Bottom Sheet",
+                        },
+                        items: [
+                            {
+                                label: "Item 1",
+                                onPress: () => {
+                                    console.log("Item 1 pressed")
+                                },
+                            },
+                            {
+                                label: "Item 2",
+                                onPress: () => {
+                                    console.log("Item 2 pressed")
+                                },
+                            },
+                        ]
+                    });
                 }}
             />
         </ScrollView>
@@ -328,6 +351,7 @@ const ModalExample = () => {
         </View>
     )
 }
+
 const MenuExample = () => {
     return (
         <View>

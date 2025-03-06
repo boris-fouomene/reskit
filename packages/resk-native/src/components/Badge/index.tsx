@@ -1,12 +1,10 @@
 import * as React from 'react';
 import {
     Animated,
-    StyleProp,
     StyleSheet,
-    TextStyle,
     useWindowDimensions,
 } from 'react-native';
-import { IThemeColorSheme, IThemeColorsTokenName, useTheme } from "@theme";
+import { IThemeColorsTokenName, useTheme } from "@theme";
 import Label, { ILabelProps } from '@components/Label';
 import { defaultStr } from '@resk/core';
 

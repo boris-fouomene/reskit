@@ -33,7 +33,6 @@
     "@types/react": "~18.2.45",
     "tsc-alias": "^1.8.10"
   },
-  "private": true,
   "publishConfig": {
     "access": "public"
   },

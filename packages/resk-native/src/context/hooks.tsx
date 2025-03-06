@@ -50,9 +50,6 @@ export const ReskNativeContext = React.createContext<IReskNativeContext>({} as I
  */
 export const useReskNative = () => {
     const context = useContext(ReskNativeContext);
-    if (context) {
-        context.safeAreaInsets = extendObj({}, { top: 0, left: 0, right: 0, bottom: 0 }, context.safeAreaInsets);
-    }
     return context;
 };
 

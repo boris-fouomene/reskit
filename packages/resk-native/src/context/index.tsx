@@ -3,7 +3,7 @@ import { ITheme } from '@theme/types';
 import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
 import { SafeAreaView } from "react-native";
 import useStateCallback from '@utils/stateCallback';
-import { isObj } from '@resk/core';
+import { extendObj, isNumber, isObj } from '@resk/core';
 import stableHash from "stable-hash";
 import { IReskNativeProviderProps } from './types';
 import { ReskNativeContext } from './hooks';
@@ -38,6 +38,7 @@ export * from "./hooks";
  * @example
  * ```tsx
  * import { ReskNativeProvider } from './ReskNativeProvider';
+import { isNumber } from 'lodash';
  * 
  * const customTheme = {
  *   colors: { primary: '#123456', secondary: '#654321' },
@@ -53,11 +54,12 @@ export * from "./hooks";
  * }
  * ```
  */
-export function ReskNativeProvider({ children, theme: customTheme, auth, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskNativeProviderProps) {
+export function ReskNativeProvider({ children, theme: customTheme,safeAreaInsets, auth, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskNativeProviderProps) {
   i18nOptions = Object.assign({}, i18nOptions);
   const i18n = useI18n(undefined, i18nOptions);
   auth = Object.assign({}, auth);
   drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
+  safeAreaInsets = extendObj({}, { top: 0, left: 0, right: 0, bottom: 0}, safeAreaInsets);
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
    * to be executed once the theme state is updated.
@@ -107,14 +109,18 @@ export function ReskNativeProvider({ children, theme: customTheme, auth, breakpo
       Breakpoints.update();
     }
   }, [breakpoints]);
+  const style = useMemo(()=>{
+    const {top,bottom,right,left} = Object.assign({},safeAreaInsets);
+    return [isNumber(top) && {paddingTop: top},isNumber(bottom) && {paddingBottom: bottom},isNumber(right) && {paddingRight: right},isNumber(left) && {paddingLeft: left}];
+  },[safeAreaInsets]);
   /**
    * Provides the current theme and the `updateTheme` function to all child components
    * through the `ReskNativeContext`.
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
-    <SafeAreaView testID="resk-native-safe-area-provider" style={[Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
-      <ReskNativeContext.Provider value={{ theme, i18n, updateTheme, ...rest, breakpoints }}>
+    <SafeAreaView testID="resk-native-safe-area-provider" style={[style,Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
+      <ReskNativeContext.Provider value={{ theme, i18n,safeAreaInsets, updateTheme, ...rest, breakpoints }}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
             <Notify.Component

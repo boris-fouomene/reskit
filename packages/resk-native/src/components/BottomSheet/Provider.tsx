@@ -23,6 +23,7 @@ class BottomSheetClass extends PureComponent<IBottomSheetProps, IBottomSheetClas
     }
     open(props?: IBottomSheetProviderProps, callback?: () => {}) {
         this.setState({
+            appBarProps:undefined,
             ...Object.assign({}, props), visible: true,
         }, () => {
             typeof callback == "function" && callback();

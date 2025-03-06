@@ -57,6 +57,15 @@ export type IReskNativeProviderProps = {
      * </ReskNativeProvider>
      */
     auth?: Partial<IAuthProviderProps>;
+    /***
+     * SafeAreaInsets
+     */
+    safeAreaInsets?: {
+        top: number;
+        bottom: number;
+        left: number;
+        right: number;
+    };
 }
 
 /**
@@ -95,17 +104,6 @@ export type IReskNativeProviderProps = {
 export interface IReskNativeContext extends Omit<IReskNativeProviderProps, "type"> {
     theme: ITheme;
     updateTheme: (theme: ITheme) => any;
-
-    /***
-     * SafeAreaInsets
-     */
-    safeAreaInsets?: {
-        top: number;
-        bottom: number;
-        left: number;
-        right: number;
-    };
-
     /***
      * i18n instance library
      */

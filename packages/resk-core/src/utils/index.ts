@@ -17,6 +17,7 @@ export * from "./date";
 export * from "./sort";
 export * from "./defaultArray";
 export * from "./object";
+export * from "./isNumber";
 
 export * from "./string";
 export * from "./uri";

@@ -1,18 +1,19 @@
 import "@expo/metro-runtime";
 import  "@resk/native/build/session";
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { ReskNativeProvider,Button, TouchableRipple, Label } from '@resk/native';
+import { ReskNativeProvider,Button, TouchableRipple, Label,TextInput } from '@resk/native';
 
 
 export default function App() {
   return (
     <ReskNativeProvider>
       <View style={styles.container}>
+        <TextInput type="date" label="Date" />
         <Text>Open up App.tsx to start working on your app!</Text>
         <Button
           children="Click me"
         />
-        <TouchableRipple rippleColor="red" style={{backgroundColor:"blue"}}>
+        <TouchableRipple  style={{backgroundColor:"blue"}}>
           <View>
             <Label> A label, Ripple Me</Label>
           </View>

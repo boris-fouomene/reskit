@@ -118,6 +118,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
             as: TouchableRipple,
             rippleColor,
             ...rest, icon: source || iconName || undefined, testID,
+            android_ripple : Object.assign({},{radius:size*0.5}, rest.android_ripple),
             color: iconColor,
             disabled, size,
             containerProps: {

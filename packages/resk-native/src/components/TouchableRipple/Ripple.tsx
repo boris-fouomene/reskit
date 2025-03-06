@@ -279,7 +279,6 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
         android_ripple={
             disableRipple ? undefined : Object.assign({
                 color: rippleColor,
-                borderless: borderWidth === 0,
                 duration: rippleDuration,
             }, props.android_ripple)
         }

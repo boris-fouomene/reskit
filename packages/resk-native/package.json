@@ -2,7 +2,7 @@
   "name": "@resk/native",
   "main": "build/index",
   "types": "build/index",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
   "scripts": {
     "build-core": "cd ../resk-core && npm run build",

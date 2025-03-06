@@ -127,7 +127,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
     }
   });
   const containerStyle = {
-    paddingTop: typeof statusBarHeight === "number" ? statusBarHeight : top,
+    paddingTop: typeof statusBarHeight === "number" ? statusBarHeight : 0,
     paddingHorizontal: 7,
   }
   const { left: leftContent, right: rightContent } = getLabelOrLeftOrRightProps({ left: customLeft, right: customRight }, { color, backgroundColor, context })

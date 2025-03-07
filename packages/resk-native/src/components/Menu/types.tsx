@@ -4,7 +4,7 @@ import { IExpandableProps } from "@components/Expandable";
 import { IViewProps } from "@components/View";
 import { IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
-import { PressableProps, ScrollViewProps, ViewProps,Animated} from "react-native";
+import { PressableProps, ScrollViewProps, ViewProps, Animated } from "react-native";
 import { PressableStateCallbackType } from "react-native";
 
 /**
@@ -82,7 +82,7 @@ export type IMenuPosition = 'top' | 'bottom' | 'left' | 'right';
  * const menuPosition = calculateMenuPosition(anchorMeasurements);
  * // This will position the menu at (150, 200) based on the anchor's measurements
  */
-export type IMenuAnchorMeasurements = {
+export interface IMenuAnchorMeasurements {
     pageX: number;
     pageY: number;
     width: number;
@@ -241,6 +241,11 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
      * The current details on the position of the menu
      */
     menuPosition: IMenuCalculatedPosition;
+
+    /***
+     * Whether the menu is rendered as a bottom sheet
+     */
+    renderedAsBottomSheet: boolean;
 }
 
 
@@ -587,6 +592,24 @@ export type IMenuProps<MenuItemContext = any> = Omit<Animated.AnimatedProps<View
      */
     itemsProps?: Omit<IMenuItems<MenuItemContext>, "items">;
 
+
+    /**
+     * Determines whether the menu should be rendered as a bottom sheet on full-screen mode.
+     * When enabled (`true`), the menu will adapt to a bottom sheet layout on smaller screens
+     * instead of the default menu style. On larger screens, the standard menu layout is used.
+     * 
+     * This prop is useful for improving the mobile user experience by providing a more 
+     * intuitive and space-efficient navigation method.
+     * 
+     * @default false
+     */
+    useBottomSheetOnFullScreen?: boolean;
+
+
+    /***
+     * Whether the menu should be dismissable
+     */
+    dismissable?: boolean;
 }
 
 /**

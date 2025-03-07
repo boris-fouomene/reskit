@@ -26,14 +26,13 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 import Platform from "@platform";
-import { CountriesManager, defaultStr, ICountryCode, Platform as ReskPlatform, isNonNullString, Logger } from '@resk/core';
+import { CountriesManager, defaultStr, ICountryCode, isNonNullString, Logger } from '@resk/core';
 import { IStyle } from '@src/types';
 import { isImageSource } from './utils';
 import Icon from './Icon';
 import Label from "@components/Label";
 import { hasTouchHandler } from '@utils/hasTouchHandler';
 import isValidElement from '@utils/isValidElement';
-import { supportsEmoji } from './isEmojiSupported';
 /**
  * Converts a two-letter country code to its corresponding flag emoji using Unicode regional indicators.
  * 
@@ -58,7 +57,7 @@ const createEmoji = (countryCode: string): string => {
  * @returns {boolean} True if the platform supports emoji flags
  */
 const isEmojiSupported = (): boolean => {
-    if (!ReskPlatform.isClientSide()) return false;
+    if (!Platform.isClientSide()) return false;
     if (Platform.isNative()) return true;
     if (typeof navigator === 'undefined' || !navigator) return false;
     // Use modern navigator.userAgentData if available
@@ -180,7 +179,7 @@ const styles = StyleSheet.create({
  */
 const canRenderEmoji = (emoji?: string): boolean => {
     if (Platform.isNative()) return true;
-    if (!ReskPlatform.isWeb() || !isNonNullString(emoji) || !ReskPlatform.isTouchDevice()) return false;
+    if (!Platform.isWeb() || !isNonNullString(emoji) || !Platform.isTouchDevice()) return false;
     //const flag = "🇨🇲"; // Example: Cameroon
     //if (flag == "🇨🇲") return true;
     try {

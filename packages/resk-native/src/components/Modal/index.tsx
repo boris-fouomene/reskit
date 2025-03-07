@@ -1,12 +1,11 @@
-import React, { useEffect, useMemo, createContext, useContext, useRef } from "react";
-import { useStableMemo } from "@utils";
+import React, { useEffect, useMemo, createContext, useContext, useRef, useCallback } from "react";
 import Platform from "@platform";
 import { StyleSheet, ViewProps, Animated, Pressable, GestureResponderEvent, PressableProps, Easing } from "react-native";
 import { IViewProps } from "@components/View";
 import { useTheme } from "@theme";
 import { Portal } from "@components/Portal";
 import { MAX_WIDTH, MIN_HEIGHT } from "./utils";
-import BackHandler from "@components/BackHandler";
+import { useBackHandler } from "@components/BackHandler";
 
 const useNativeDriver = Platform.canUseNativeDriver()
 
@@ -193,15 +192,11 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
     }
     return true;
   }
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',function() {
-        if (dismissable === false) return true;
-        return handleDismiss();
-      },
-    );
-    return () => backHandler?.remove();
-  }, []);
+  const handleBack = useCallback(() => {
+    if (dismissable === false) return true;
+    return handleDismiss();
+  }, [dismissable]);
+  useBackHandler(handleBack);
   if (!visible) return null;
   return (
     <Portal style={styles.absoluteFill} testID={testID + "-modal-portal"}>

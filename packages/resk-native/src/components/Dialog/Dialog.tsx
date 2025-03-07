@@ -25,7 +25,7 @@ import { defaultStr } from "@resk/core";
  * @template DialogContextExtend - Optional type parameter for extending the dialog context.
  * 
  * @param props - The properties for the Dialog component.
- * @param props.fullScreenAppBarProps - Properties for the app bar when dialog is full-screen.
+ * @param props.appBarProps - Properties for the app bar when dialog is full-screen.
  * @param props.context - Additional context for the dialog.
  * @param props.actionsProps - Properties for modal actions.
  * @param props.actions - Actions to display in the dialog.
@@ -44,7 +44,7 @@ import { defaultStr } from "@resk/core";
  * </Dialog>
  */
 export default function Dialog<DialogContextExtend = any>({
-  fullScreenAppBarProps,
+  appBarProps,
   context,
   actionsProps,
   actions,
@@ -64,7 +64,7 @@ export default function Dialog<DialogContextExtend = any>({
         {...{
           isPreloader: props.isPreloader,
           context,
-          fullScreenAppBarProps,
+          appBarProps,
           actionsProps,
           actions,
           dialogContentProps,
@@ -85,7 +85,7 @@ export default function Dialog<DialogContextExtend = any>({
  * @template DialogContextExtend - Optional type parameter for extending the dialog context.
  * 
  * @param props - The properties for the ModalWrapper component.
- * @param props.fullScreenAppBarProps - Properties for the full-screen app bar.
+ * @param props.appBarProps - Properties for the full-screen app bar.
  * @param props.context - Additional context for the dialog.
  * @param props.actionsProps - Properties for modal actions.
  * @param props.actions - Actions to display in the dialog.
@@ -100,7 +100,7 @@ export default function Dialog<DialogContextExtend = any>({
  * @returns A React fragment containing the dialog structure.
  */
 function ModalWrapper<DialogContextExtend = any>({
-  fullScreenAppBarProps,
+  appBarProps,
   context,
   actionsProps,
   actions,
@@ -115,7 +115,7 @@ function ModalWrapper<DialogContextExtend = any>({
   scrollViewProps,
 }: IDialogProps<DialogContextExtend>) {
   testID = defaultStr(testID, "resk-dialog");
-  fullScreenAppBarProps = Object.assign({}, fullScreenAppBarProps);
+  appBarProps = Object.assign({}, appBarProps);
   titleProps = Object.assign({}, titleProps);
   dialogContentProps = Object.assign({}, dialogContentProps);
   actionsProps = Object.assign({}, actionsProps);
@@ -185,11 +185,11 @@ function ModalWrapper<DialogContextExtend = any>({
     <>
       <DialogAppBar
         testID={testID + "-dialog-app-bar"}
-        {...getAppBarProps(fullScreenAppBarProps, { colorScheme: undefined })}
-        title={fullScreenAppBarProps.title || title}
+        {...getAppBarProps(appBarProps, { colorScheme: undefined })}
+        title={appBarProps.title || title}
         titleProps={{
           ...titleProps,
-          ...Object.assign({}, fullScreenAppBarProps?.titleProps),
+          ...Object.assign({}, appBarProps?.titleProps),
         }}
       />
       <DialogTitle

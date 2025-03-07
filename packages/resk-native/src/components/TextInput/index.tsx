@@ -523,7 +523,6 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, style
                 }
             }}
             countryFlagProps={{ textColor, textFontSize: fontSize }}
-            fullScreenAppBarProps={{ title: i18n.t("components.textInput.selectCountry") + (isNonNullString(label) ? " [" + label + "]" : "") }}
         />
         {phoneDialCodeLabel}
     </> : null;

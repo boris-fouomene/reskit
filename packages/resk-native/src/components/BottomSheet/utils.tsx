@@ -5,8 +5,8 @@ import useStateCallback from "@utils/stateCallback";
 import usePrevious from "@utils/usePrevious";
 import { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { Animated, Dimensions, PanResponder, PanResponderInstance, ScrollViewProps, StyleProp, StyleSheet, View } from "react-native";
-import BackHandler from "@components/BackHandler";
 import { useTheme } from "@theme/index";
+import { useBackHandler } from "@components/BackHandler";
 
 const defaultHeight = 400;
 
@@ -76,40 +76,31 @@ export const usePrepareBottomSheet = ({
         },
         close: (cb?: () => void) => {
             pan.setValue({ x: 0, y: 0 });
-            const callback = () => {
-                if (typeof onDismiss === 'function') {
-                    onDismiss();
-                }
-                if (typeof cb === 'function') {
-                    cb();
-                }
-            }
             animate({ toValue: 0 }, () => {
                 if (isControlled) {
-                    callback();
+                    if (typeof onDismiss === 'function') {
+                        onDismiss();
+                    }
                     return;
                 }
-                setVisibleState(false, callback);
+                setVisibleState(false, () => {
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                });
             })
         },
         get isOpened() {
             return visibleRef.current;
         }
     });
-    const subscription = useRef<{ remove: () => void }>(null);
     const handleBackPress = useCallback(() => {
         if (dismissable) {
             context.close();
         }
         return true;
-    }, [dismissable, context])
-    const removeListeners = () => {
-        if (subscription.current?.remove) {
-            subscription.current.remove();
-        } else {
-            BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
-        }
-    }
+    }, [dismissable, context]);
+    useBackHandler(handleBackPress);
     const animate = (options: Omit<Partial<Animated.TimingAnimationConfig>, "toValue"> & { toValue: number }, callback?: Function) => {
         const options2 = Object.assign({}, { duration: animationDuration }, options, { useNativeDriver: false }) as Animated.TimingAnimationConfig;
         return Animated.timing(animatedHeight, options2).start(() => {
@@ -153,10 +144,8 @@ export const usePrepareBottomSheet = ({
         });
     }, []);
     useEffect(() => {
-        removeListeners();
         if (prevVisible == isVisible) return;
         if (isVisible) {
-            (subscription as any).current = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
             pan.setValue({ x: 0, y: 0 });
             animate({ toValue: heightRef.current }, onOpen);
         } else {
@@ -164,11 +153,6 @@ export const usePrepareBottomSheet = ({
             animate({ toValue: 0 });
         }
     }, [isVisible, prevVisible]);
-    useEffect(() => {
-        return () => {
-            removeListeners();
-        }
-    }, []);
     return {
         closeOnDragDown,
         dragFromTopOnly,

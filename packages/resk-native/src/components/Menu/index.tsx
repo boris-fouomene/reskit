@@ -8,15 +8,17 @@ import { useDimensions } from '@dimensions/index';
 import Theme, { useTheme } from '@theme/index';
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { View, Animated, StyleSheet, LayoutChangeEvent, LayoutRectangle, Pressable, PressableStateCallbackType, ScrollView, Dimensions } from 'react-native';
-import { IMenuAnchorMeasurements, IMenuCalculatedPosition, IMenuPosition, IMenuProps, IUseMenuPositionProps } from './types';
+import { IMenuAnchorMeasurements, IMenuCalculatedPosition, IMenuContext, IMenuPosition, IMenuProps, IUseMenuPositionProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr, isObj } from '@resk/core';
 import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
 import { MenuItem } from './Item';
 import usePrevious from '@utils/usePrevious';
-
-
+import { usePrepareBottomSheet } from '@components/BottomSheet/utils';
+import { measureContentHeight } from '@components/BottomSheet/measureContentHeight';
+import { useBackHandler } from '@components/BackHandler';
+import { KeyboardAvoidingView } from '@components/KeyboardAvoidingView';
 
 /**
  * Custom hook to calculate the optimal position for a menu based on the anchor element's measurements.
@@ -282,7 +284,7 @@ export const useMenuPosition = ({
                 opacity,
                 transform: [{ scale }],
             },
-            positionStyle,
+            !fullScreen && positionStyle
         ],
     };
 };
@@ -392,33 +394,27 @@ const Menu: React.FC<IMenuProps> = ({
     dynamicHeight,
     minWidth,
     preferedPositionAxis,
+    useBottomSheetOnFullScreen,
+    dismissable,
     ...props
 }) => {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
     const [isVisible, setIsVisible] = useStateCallback<boolean>(isControlled ? !!visible : false);
-    const prevIsVisible = usePrevious(isVisible);
     const [menuLayout, setMenuLayout] = useState<LayoutRectangle | null>(null);
     const anchorRef = useRef<View>(null);
     anchorContainerProps = Object.assign({}, anchorContainerProps);
     testID = defaultStr(testID, "resk-menu");
     itemsProps = Object.assign({}, itemsProps);
-    const callbackRef = useRef<Function | null | undefined>(null);
-    useEffect(() => {
-        if (!isControlled || prevIsVisible === isVisible || typeof callbackRef.current !== "function") {
-            return;
-        }
-        if (typeof callbackRef.current === "function") {
-            callbackRef.current();
-        }
-    }, [visible, isVisible, isControlled, callbackRef, prevIsVisible]);
-    callbackRef.current = null;
     const isMenuOpen = () => isVisible;
+    const [anchorMeasurements, setAnchorMeasurements] = useState<IMenuAnchorMeasurements & { contentHeight: number } | undefined>(undefined);
     useEffect(() => {
         if (isControlled && isVisible !== visible) {
+            if (visible) {
+                console.log(anchorMeasurements, " is anchor measurement");
+            }
             setIsVisible(!!visible);
         }
     }, [visible, isVisible, isControlled]);
-    const [anchorMeasurements, setAnchorMeasurements] = useState<IMenuAnchorMeasurements | undefined>(undefined);
     // Get position calculation from custom hook
     const { fullScreen, menuPosition, animatedStyle, screenWidth, screenHeight } = useMenuPosition({
         menuWidth: menuLayout?.width || 0,
@@ -455,11 +451,13 @@ const Menu: React.FC<IMenuProps> = ({
     const context1 = { animated, anchorMeasurements, menuPosition, responsive, testID, borderRadius, fullScreen: fullScreen, ...props, isMenu: true, isMenuOpen, isMenuVisible: isVisible }
     const openMenu = (callback?: Function) => {
         measureAnchor(anchorRef, (measures) => {
-            if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
+            if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu } as IMenuContext)) === false) return;
             if (isControlled) {
-                callbackRef.current = callback;
                 if (typeof onOpen === "function") {
                     onOpen();
+                }
+                if (typeof callback === "function") {
+                    callback();
                 }
                 return;
             }
@@ -474,11 +472,13 @@ const Menu: React.FC<IMenuProps> = ({
         })
     };
     const closeMenu = (callback?: Function) => {
-        if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu })) === false) return;
+        if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu } as IMenuContext)) === false) return;
         if (isControlled) {
-            callbackRef.current = callback;
             if (typeof onClose === "function") {
                 onClose();
+            }
+            if (typeof callback === "function") {
+                callback();
             }
             return;
         }
@@ -491,7 +491,10 @@ const Menu: React.FC<IMenuProps> = ({
             }
         });
     };
-    const context = { ...context1, isMenuVisible: isVisible, isMenuOpen, openMenu, closeMenu };
+    const preparedBottomSheet = usePrepareBottomSheet({ visible: isVisible, onDismiss: closeMenu, dismissable, height: anchorMeasurements?.contentHeight });
+    const renderedAsBottomSheet = fullScreen && true;//!!useBottomSheetOnFullScreen;
+
+    const context = { ...context1, useBottomSheetOnFullScreen, renderedAsBottomSheet, isMenuVisible: isVisible, isMenuOpen, openMenu, closeMenu };
     const anchor = useMemo(() => {
         if (typeof customAnchor === 'function') {
             return (state: PressableStateCallbackType) => {
@@ -502,8 +505,6 @@ const Menu: React.FC<IMenuProps> = ({
         }
         return isValidElement(customAnchor) ? customAnchor : null;
     }, [customAnchor, isVisible, fullScreen, context]);
-
-
 
     //React.setRef(ref,context);
     const child = useMemo(() => {
@@ -547,32 +548,36 @@ const Menu: React.FC<IMenuProps> = ({
             </Pressable>
         </MenuContext.Provider>
         {isVisible ? <Portal absoluteFill testID={testID + "-portal"}>
-            <Pressable
-                onPress={(e) => { closeMenu() }}
-                style={[styles.portalBackdrop]}
-                testID={testID + "-menu-backdrop"}
-            />
-            <MenuContext.Provider value={context}>
-                <Animated.View
-                    testID={testID}
-                    {...props}
-                    onLayout={(event) => {
-                        if (typeof onLayout === 'function') {
-                            onLayout(event);
-                        }
-                        onMenuLayout(event);
-                    }}
-                    style={[
-                        animatedStyle,
-                        props.style,
-                    ]}
-                >
-                    <Wrapper {...wrapperProps}>
-                        {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
-                        {child}
-                    </Wrapper>
-                </Animated.View>
-            </MenuContext.Provider>
+            <KeyboardAvoidingView testID={testID + "-keyboard-avoiding-view"} style={[styles.keyboardAvoidingView]}>
+                <Pressable
+                    onPress={(e) => { closeMenu() }}
+                    style={[styles.portalBackdrop]}
+                    testID={testID + "-menu-backdrop"}
+                />
+                <MenuContext.Provider value={context}>
+                    <Animated.View
+                        testID={testID}
+                        {...Object.assign({}, renderedAsBottomSheet && preparedBottomSheet.animatedProps, props)}
+                        {...props}
+                        onLayout={(event) => {
+                            if (typeof onLayout === 'function') {
+                                onLayout(event);
+                            }
+                            onMenuLayout(event);
+                        }}
+                        style={[
+                            animatedStyle,
+                            renderedAsBottomSheet && preparedBottomSheet.animatedProps?.style,
+                            props.style,
+                        ]}
+                    >
+                        <Wrapper {...wrapperProps}>
+                            {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
+                            {child}
+                        </Wrapper>
+                    </Animated.View>
+                </MenuContext.Provider>
+            </KeyboardAvoidingView>
         </Portal> : null}
     </>
 };
@@ -583,18 +588,25 @@ const Menu: React.FC<IMenuProps> = ({
  * @param {(anchorMeasurements: IMenuAnchorMeasurements) => void} callback - The callback function to be called with the measurements.
  * @returns void
  */
-export const measureAnchor = (anchorRef: React.RefObject<any>, callback?: (anchorMeasurements: IMenuAnchorMeasurements) => void) => {
-    if (anchorRef?.current && typeof anchorRef.current?.measureInWindow === "function") {
-        anchorRef?.current.measureInWindow((x: number, y: number, width: number, height: number) => {
-            if (typeof callback === "function") callback({ pageX: x, pageY: y, width, height });
+export const measureAnchor = (anchorRef: React.RefObject<any>, callback?: (anchorMeasurements: IMenuAnchorMeasurements & { contentHeight: number }) => void) => {
+    measureContentHeight(anchorRef).then(({ x, y, width, height, contentHeight }) => {
+        if (typeof callback === "function") callback({
+            pageX: x,
+            pageY: y,
+            width,
+            height,
+            contentHeight
         });
-    }
+    });
 }
 
 /**
  * Default styles for the menu container
  */
 const styles = StyleSheet.create({
+    keyboardAvoidingView: {
+        flex: 1,
+    },
     portalBackdrop: {
         ...StyleSheet.absoluteFillObject,
         flex: 1,

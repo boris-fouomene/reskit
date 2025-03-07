@@ -682,9 +682,6 @@ export interface IDropdownCallbackOptions<ItemType = any, ValueType = any> {
  * @property {IViewProps} [listContainerProps] - Optional properties for the container of the dropdown list.
  * 
  * @property {PressableProps} [anchorContainerProps] - Optional properties to pass to the Tooltip component that wraps the anchor.
- * 
- * @property {IAppBarProps} [fullScreenAppBarProps] - Optional properties for the AppBar component that wraps the dropdown when displayed in full screen mode.
- * 
  * @property {IDropdownActions} [dropdownActions] - An optional array of actions that can be performed within the dropdown.
  * 
  * @example
@@ -709,7 +706,6 @@ export interface IDropdownCallbackOptions<ItemType = any, ValueType = any> {
  *     listContainerProps: { style: { padding: 10 } ```typescript
  *     },
  *     anchorContainerProps: { onPress: () => console.log("Anchor pressed") },
- *     fullScreenAppBarProps: { title: "Select an Item" },
  *     dropdownActions: [
  *         {
  *             title: "Action 1",
@@ -760,12 +756,6 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     listContainerProps?: IViewProps; // Props for the list container
     /*** Props for the Tooltip component wrapping the anchor */
     anchorContainerProps?: PressableProps; // Props for the anchor container
-
-    /***
-     * The props of the AppBar component that wraps the dropdown.
-     * When the dropdown is displayed in full screen mode.
-     */
-    fullScreenAppBarProps?: IAppBarProps; // Props for the full screen AppBar
 
     dropdownActions?: IDropdownActions; // Optional actions for the dropdown
 

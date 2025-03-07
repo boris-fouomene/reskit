@@ -37,7 +37,7 @@ import { ScrollViewProps } from "react-native";
  * @property {IAppBarProps} [actionsProps] - Properties for the app bar actions within the
  * dialog. This allows for customization of the app bar's appearance and behavior.
  * 
- * @property {IDialogActionsProps<DialogContextExtend>} [fullScreenAppBarProps] - Properties for
+ * @property {IDialogActionsProps<DialogContextExtend>} [appBarProps] - Properties for
  * the full-screen app bar actions. This allows for customization of the app bar when the dialog
  * is in full-screen mode.
  * 
@@ -76,7 +76,7 @@ export interface IDialogProps<DialogContextExtend = any> extends IModalProps {
   title?: string | React.ReactNode;
   footerProps?: IViewProps;
   actionsProps?: IAppBarProps;
-  fullScreenAppBarProps?: IDialogActionsProps<DialogContextExtend>;
+  appBarProps?: IDialogActionsProps<DialogContextExtend>;
   context?: DialogContextExtend;
   /**
    * If true, the dialog content will be wrapped in a ScrollView

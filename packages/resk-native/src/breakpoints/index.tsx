@@ -1,8 +1,8 @@
 import { Dimensions, PixelRatio } from "react-native";
 import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointNamePhone, IBreakpointNameSmallPhone, IBreakpointNameMobile, IBreakpointNameTablet, IBreakpointNameDesktop, IBreakpointNameMediumPhone, IBreakpointName } from "./types";
-import { addClassName, IDict, isDOMElement, isObj, Platform, removeClassName } from "@resk/core";
+import { addClassName, IDict, isDOMElement, isObj, removeClassName } from "@resk/core";
 import { IStyle } from "@src/types";
-import platform from "@platform/index";
+import Platform from "@platform/index";
 
 
 // int comparer for sorts
@@ -995,7 +995,7 @@ export default class Breakpoints {
     static roundToNearestPixel = (size: number) => {
         size = typeof size === "number" ? size : 0;
         // Check if we're running on web
-        if (platform.isWeb()) {
+        if (Platform.isWeb()) {
             // For web, we need to account for the difference in pixel density
             // Typical mobile devices have pixel ratios of 2-3, while web often reports much higher
             // We'll normalize it to be closer to mobile values

@@ -1,11 +1,11 @@
 import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownEvent, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
-import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
 import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj, Logger, areEquals } from "@resk/core";
 import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import Theme, { useTheme } from "@theme/index";
-import { FlatList, TouchableOpacity, FlatListProps } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import TextInput from "@components/TextInput";
 import { Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
@@ -14,14 +14,15 @@ import { StyleSheet } from "react-native";
 import View from "@components/View";
 import { FontIcon } from "@components/Icon";
 import Label from "@components/Label";
-import { IReactComponent, IStyle } from "@src/types";
+import { IStyle } from "@src/types";
 import { useI18n } from "@src/i18n/hooks";
 import { AppBar } from "@components/AppBar";
 import { Divider } from "@components/Divider";
 import { ProgressBar } from "@components/ProgressBar";
 import { ITextInputProps } from "@components/TextInput/types";
-import { List } from "@components/List";
 import BigList from "react-native-big-list";
+import Platform from "@platform";
+import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
 
 /**
  * Represents a dropdown component that allows users to select one or more items from a list.
@@ -408,6 +409,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             animated={false}
             minWidth={180}
             {...Object.assign({}, menuProps)}
+            useBottomSheetOnFullScreen
             visible={visible}
             withScrollView={false}
             sameWidth
@@ -435,11 +437,9 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
 function DropdownMenu<ItemType = any, ValueType = any>() {
     const context = useDropdown();
     const filteredItems = Array.isArray(context?.filteredItems) ? context.filteredItems : [];
-    const preparedItems = context?.getPreparedItems() || [];
-    const label = context?.props?.label;
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
-    const fullScreenAppBarProps = Object.assign({}, context?.props?.fullScreenAppBarProps);
     const listProps = Object.assign({}, context?.props?.listProps);
+    const preparedItems = context?.getPreparedItems() || [];
     const testID = context?.getTestID();
     const menu = useMenu();
     const menuPosition = menu?.menuPosition;
@@ -448,42 +448,27 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
     const canReverse = isTopPosition && !fullScreen;
     const menuHeight = typeof menuPosition?.height === "number" && menuPosition.height > 50 ? menuPosition.height : undefined;
     const menuWidth = typeof menuPosition?.width === "number" && menuPosition.width > 50 ? menuPosition.width : undefined;
+    const canRenderDropdownSearch = !!!(context?.props?.showSearch === false || context?.props?.showSearch !== true && preparedItems?.length <= 5);
     return <View testID={testID + "-dropdown-list-container"} style={[
         styles.dropdownListContainer,
+        fullScreen && styles.dropdownListContainerFullScreen,
         typeof menuHeight == "number" && { height: menuHeight },
         typeof menuWidth == "number" && { width: menuWidth },
-        canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}>
-        {fullScreen ? (
-            <AppBar
-                title={getTextContent(label)}
-                elevation={5}
-                {...fullScreenAppBarProps}
-                style={[styles.appBar, fullScreenAppBarProps?.style]}
-                backActionProps={{
-                    ...Object.assign({}, fullScreenAppBarProps.backActionProps),
-                    onPress: (...args) => {
-                        if (typeof fullScreenAppBarProps.backActionProps?.onPress === "function") {
-                            fullScreenAppBarProps.backActionProps?.onPress(...args);
-                        }
-                        if (typeof context?.close === "function") {
-                            context.close();
-                        }
-                    },
+        canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}
+    >
+        <View testID={`${testID}-content-container`} style={[styles.contentContainer, fullScreen && styles.contentContainerFullScreen, canRenderDropdownSearch && styles.contentContainerFullScreenWithDropdownSearch]}>
+            {canRenderDropdownSearch ? <DropdownSearch isFullScreen={fullScreen} /> : null}
+            <BigList<IDropdownPreparedItem<ItemType, ValueType>>
+                testID={testID + "-dropdown-list"}
+                {...listProps}
+                inverted={canReverse}
+                data={filteredItems}
+                keyExtractor={({ hashKey }) => hashKey}
+                renderItem={({ item, index }) => {
+                    return <DropdownItem {...item} index={index} />;
                 }}
-                subtitle={defaultStr(context.anchorSelectedText, i18n.t("components.dropdown.noneSelected")) + " [" + preparedItems.length.formatNumber() + "]"}
             />
-        ) : null}
-        <DropdownSearch isFullScreen={fullScreen} />
-        <BigList<IDropdownPreparedItem<ItemType, ValueType>>
-            testID={testID + "-dropdown-list"}
-            {...listProps}
-            inverted={canReverse}
-            data={filteredItems}
-            keyExtractor={({ hashKey }) => hashKey}
-            renderItem={({ item, index }) => {
-                return <DropdownItem {...item} index={index} />;
-            }}
-        />
+        </View>
     </View>;
 }
 
@@ -603,6 +588,20 @@ const styles = StyleSheet.create({
         height: "100%",
         width: "100%",
     },
+    dropdownListContainerFullScreen: {
+        flex: 1,
+        flexGrow: 1
+    },
+    contentContainer: {
+        alignSelf: "flex-start",
+        width: "100%",
+    },
+    contentContainerFullScreen: {
+        flexGrow: 1,
+    },
+    contentContainerFullScreenWithDropdownSearch: {
+        paddingVertical: 10,
+    },
     dropdownListContainer: {
         width: "100%",
         height: "100%",
@@ -637,7 +636,6 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
     },
 });
-
 const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: boolean }) => {
     const context = useDropdown();
     const filteredItems = Array.isArray(context.filteredItems) ? context.filteredItems : [];
@@ -657,7 +655,7 @@ const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: b
         <>
             <TextInput
                 testID={`${testID}_dropdown-search`}
-                autoFocus={visible}
+                autoFocus={visible && !Platform.isTouchDevice()}
                 affix={false}
                 {...props}
                 defaultValue={searchText}

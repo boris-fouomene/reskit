@@ -151,5 +151,30 @@ function native(value: any) {
  */
 const canUseNativeDriver: () => boolean = isNative;
 
+/**
+  @group Platform
+ * Checks if the current device is a touch device.
+ *
+ * This function assesses the presence of touch event support in the browser to determine if the device is a touch device.
+ * It does this by attempting to create a `TouchEvent` and checking for specific properties in the `window` object.
+ *
+ * @returns {boolean} True if the device is a touch device, false otherwise.
+ *
+ * @example
+ * ```typescript
+ * if (isTouchDevice()) {
+ *   console.log("This device supports touch!");
+ * } else {
+ *   console.log("This device does not support touch.");
+ * }
+ * ```
+ */
+const isTouchDevice: () => boolean = (): boolean => {
+    if (isNative()) {
+        return true;
+    }
+    return ReskPlatform.isTouchDevice();
+}
 
-export default { ...ReskPlatform, ...Platform, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };
+
+export default { ...ReskPlatform, ...Platform, isTouchDevice, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };

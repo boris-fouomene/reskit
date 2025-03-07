@@ -322,7 +322,7 @@ const ModalExample = () => {
         Dialog.Provider.open({
             title: "Dialog Title",
             animationType: "slide",
-            fullScreenAppBarProps: {
+            appBarProps: {
                 subtitle: "Dialog subtitle",
             },
             children: <View>

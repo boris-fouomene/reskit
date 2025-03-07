@@ -337,11 +337,10 @@ export function useBreakpointStyle<T extends IBreakpointStyleProps = any>({ styl
 export function withBreakpointStyle<IProps extends IBreakpointStyleProps = any, IState = any>(Component: IReactComponent<IProps, IState>, displayName?: string) {
 	// Define a functional component that wraps the provided component
 	const fn = React.forwardRef<any, IWithBreakpointStyle<IProps>>((props, ref): React.ReactNode => {
-		const style = useBreakpointStyle(props); // Get responsive styles using the custom hook
-		const { breakpointStyle, ...rest } = props;
+		const style = useBreakpointStyle(props as any); // Get responsive styles using the custom hook
+		const { breakpointStyle, ...rest } = props as IWithBreakpointStyle<IProps> & { breakpointStyle?: any };
 		return <Component ref={ref} {...rest as IProps} style={style} />; // Render the wrapped component with props and responsive styles
-	});
-	// Set a display name for the wrapped component for better debugging
+	});	// Set a display name for the wrapped component for better debugging
 	if (isNonNullString(Component?.displayName)) {
 		fn.displayName = Component.displayName + "_WithBreakpointStyle"; // Append suffix to original display name
 	} else if (isNonNullString(displayName)) {

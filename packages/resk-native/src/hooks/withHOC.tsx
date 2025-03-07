@@ -33,7 +33,7 @@ export interface IWithHOCOptions {
 export function withHOC<T>(Component: IReactComponent<T>, options: IWithHOCOptions = {}) {
     options = Object.assign({}, options);
     const { displayName, fallback } = options;
-    const fn = React.forwardRef(function (props?: T, ref?): ReactNode {
+    const fn = React.forwardRef(function (props : T, ref?): ReactNode {
         props = (props || {}) as T;
         if (fallback !== undefined) {
             if (typeof fallback === "function") {
@@ -42,7 +42,7 @@ export function withHOC<T>(Component: IReactComponent<T>, options: IWithHOCOptio
             return fallback;
         }
         return <Component {...props} ref={ref} />;
-    });
+    } as React.ForwardRefRenderFunction<unknown, React.PropsWithoutRef<T>>);
     if (Component?.displayName) {
         fn.displayName = Component.displayName + "_WithAuth";
     } else if (displayName) {

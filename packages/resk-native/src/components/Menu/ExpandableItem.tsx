@@ -78,7 +78,7 @@ import { useMenu } from "./context";
  * @see {@link IMenuRenderItemsOptions} for the options of the menu render function.
  * @see {@link useGetExpandableItemProps} for the hook that retrieves the properties of the expandable item.
  */
-export const ExpandableItem = forwardRef<any, any>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, as, dividerProps, items, divider, expandableProps, children, contentProps, ...props }: IMenuItemBase<IMenuItemExtendContext> & { as: IReactComponent<IMenuItemBase<IMenuItemExtendContext> & { ref?: IButtonRef<IMenuItemExtendContext> }> }, ref: IButtonRef<IMenuItemExtendContext>) {
+export const ExpandableItem = forwardRef<any, IMenuItemBase<any> & { as?: IReactComponent<IMenuItemBase<any & { ref?: IButtonRef<any> }> > }>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, as, dividerProps, items, divider, expandableProps, children, contentProps, ...props }: IMenuItemBase<IMenuItemExtendContext> & { as?: IReactComponent<IMenuItemBase<IMenuItemExtendContext> & { ref?: IButtonRef<IMenuItemExtendContext> }> }, ref: IButtonRef<IMenuItemExtendContext>) {
     testID = defaultStr(testID, "resk-expandable-item");
     expandableProps = Object.assign({}, expandableProps);
     const containerProps = Object.assign({}, expandableProps.containerProps);
@@ -97,12 +97,11 @@ export const ExpandableItem = forwardRef<any, any>(function ExpandableMenuItem<I
         </>}
     />
 });
-
-const ExpandableItemLabel = forwardRef<any, any>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ as, ...rest }: IMenuItemBase<IMenuItemExtendContext> & { as: IReactComponent<IMenuItemBase<IMenuItemExtendContext> & { ref?: IButtonRef<IMenuItemExtendContext> }> }, ref: IButtonRef<IMenuItemExtendContext>) {
+const ExpandableItemLabel = forwardRef<any, IMenuItemBase<any> & { as?: IReactComponent<IMenuItemBase<any> & { ref?: IButtonRef<any> }> }>(function ExpandableMenuItem({ as, ...rest }, ref) {
     const Component = useMemo(() => {
         return as || MenuItem;
     }, [as]);
-    const props = useGetExpandableItemProps<IMenuItemExtendContext>(rest);
+    const props = useGetExpandableItemProps(rest);
     return <Component
         ref={ref}
         isExpandable
@@ -165,7 +164,7 @@ ExpandableItem.displayName = "ExpandableMenuItem";
  * The use of generics allows for flexibility in extending the component's functionality
  * based on specific requirements.
  */
-const ExpandableMenuItem = forwardRef<any, any>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, context, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
+const ExpandableMenuItem = forwardRef<any, IMenuItemProps>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, context, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
     const menuContext = useMenu();
     return <ExpandableItem
         context={Object.assign({}, context, menuContext)}

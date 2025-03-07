@@ -7,6 +7,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { Animated, Dimensions, PanResponder, PanResponderInstance, ScrollViewProps, StyleProp, StyleSheet, View } from "react-native";
 import { useTheme } from "@theme/index";
 import { useBackHandler } from "@components/BackHandler";
+import { isNumber, Platform } from "@resk/core";
 
 const defaultHeight = 400;
 
@@ -36,7 +37,9 @@ export const usePrepareBottomSheet = ({
     onDismiss,
     elevation: customElevation,
     onOpen,
+    minHeight,
     dragFromTopOnly,
+    fullScreen,
 }: IUsePrepareBottomSheetProps) => {
     const theme = useTheme();
     const elevation = typeof customElevation == "number" ? customElevation : 0;
@@ -48,6 +51,12 @@ export const usePrepareBottomSheet = ({
         height = Math.max(height, defaultHeight);
     } else {
         height = Math.max(winHeight / 3, defaultHeight);
+    }
+    if(isNumber(minHeight)) {
+        height = Math.max(minHeight, height);
+    }
+    if(fullScreen){
+        height = winHeight;
     }
     dragFromTopOnly = typeof dragFromTopOnly === 'boolean' ? dragFromTopOnly : false;
     const pan = useRef(new Animated.ValueXY()).current;
@@ -145,16 +154,19 @@ export const usePrepareBottomSheet = ({
     }, []);
     useEffect(() => {
         if (prevVisible == isVisible) return;
-        if (isVisible) {
-            pan.setValue({ x: 0, y: 0 });
-            animate({ toValue: heightRef.current }, onOpen);
-        } else {
-            pan.setValue({ x: 0, y: 0 });
-            animate({ toValue: 0 });
-        }
+        pan.setValue({ x: 0, y: 0 });
+        animate({ toValue: isVisible?heightRef.current:0 }, isVisible?onOpen:undefined);
     }, [isVisible, prevVisible]);
     return {
-        closeOnDragDown,
+        closeOnDragDownIcon : closeOnDragDown ? (
+            <View
+                {...(dragFromTopOnly && panResponder.panHandlers)}
+                style={[styles.draggableContainer, Platform.isWeb() ? { cursor: 'ns-resize' } as any : null]}
+                testID={"-draggable-icon-container"}
+            >
+                <View testID={"draggable-icon"} style={[styles.draggableIcon]} />
+            </View>
+        ) : null,
         dragFromTopOnly,
         panResponder,
         animate,
@@ -280,6 +292,17 @@ export interface IUsePrepareBottomSheetProps {
      * ```
      */
     onDismiss?: Function;
+    
+    /***
+        The minimum height of the bottom sheet.
+    */
+    minHeight?: number;
+    
+    
+    /***
+        Whether the Bottom sheet is full screen or not
+    */
+    fullScreen?: boolean;
 }
 
 /**
@@ -496,5 +519,22 @@ const styles = StyleSheet.create({
         width: "100%",
         overflow: "hidden",
         alignSelf: "flex-end",
+        borderTopRightRadius: 20,
+        borderTopLeftRadius: 20,
+        paddingVertical: 10,
+    },
+    draggableContainer: {
+        width: "100%",
+        alignItems: "center",
+        backgroundColor: "transparent",
+        flexGrow: 0,
+        alignSelf: "flex-start",
+    },
+    draggableIcon: {
+        width: 35,
+        height: 5,
+        borderRadius: 5,
+        margin: 10,
+        backgroundColor: "#ccc"
     },
 });

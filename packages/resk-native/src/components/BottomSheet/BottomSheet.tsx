@@ -40,7 +40,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
     items: customItems,
     contentProps: customChildrenContainerProps, appBarProps, dividerAfterAppBar, withScrollView, ...props }, ref) => {
     const {
-        closeOnDragDown,
+        closeOnDragDownIcon,
         dragFromTopOnly,
         context,
         handleBackPress,
@@ -57,17 +57,16 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
         render: renderItem,
         renderExpandable,
     });
-    const content = <>
+    const content = <KeyboardAvoidingView testID={testID + "-keyboard-avoiding-view"} style={[styles.keyboardAvoidingView]}>
         {items}
         {children}
-    </>;
+    </KeyboardAvoidingView>;
     const hasAppBar = isObj(appBarProps);
     appBarProps = Object.assign({}, appBarProps);
     const containerProps = defaultObj(customContainerProps);
     return !context.isOpened ? null : (
         <Portal absoluteFill>
             <BottomSheetContext.Provider value={context}>
-                <KeyboardAvoidingView testID={testID + "-keyboard-avoiding-view"} style={[styles.keyboardAvoidingView]}>
                     <Pressable
                         testID={testID + "-backdrop"}
                         style={[styles.backdrop, { backgroundColor: theme.colors.backdrop }]}
@@ -78,15 +77,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
                         testID={testID + "-container"} {...containerProps}
                         style={[styles.container, animatedProps.style, containerProps.style, { backgroundColor: theme.colors.surface }]}
                     >
-                        {closeOnDragDown && (
-                            <View
-                                {...(dragFromTopOnly && panResponder.panHandlers)}
-                                style={[styles.draggableContainer, ReskPlatform.isWeb() ? { cursor: 'ns-resize' } as any : null]}
-                                testID={testID + "-draggable-icon-container"}
-                            >
-                                <View testID={testID + "draggable-icon"} style={[styles.draggableIcon]} />
-                            </View>
-                        )}
+                        {closeOnDragDownIcon}
                         <View testID={testID} {...props} style={[styles.main, props.style]}>
                             {hasAppBar ? <>
                                 <AppBar
@@ -113,8 +104,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
                                     {content}
                                 </View>}
                         </View>
-                    </Animated.View>
-                </KeyboardAvoidingView>
+                    </Animated.View>$
             </BottomSheetContext.Provider>
         </Portal >
     );
@@ -132,7 +122,9 @@ BottomSheet.displayName = "BottomSheet";
 
 const styles = StyleSheet.create({
     keyboardAvoidingView: {
-        flex: 1,
+        width: '100%',
+        alignSelf: "flex-start",
+        flexGrow: 1,
     },
     backdrop: {
         ...StyleSheet.absoluteFillObject,
@@ -167,22 +159,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     container: {
-        borderTopRightRadius: 20,
-        borderTopLeftRadius: 20,
-    },
-    draggableContainer: {
-        width: "100%",
-        alignItems: "center",
-        backgroundColor: "transparent",
-        flexGrow: 0,
-        alignSelf: "flex-start",
-    },
-    draggableIcon: {
-        width: 35,
-        height: 5,
-        borderRadius: 5,
-        margin: 10,
-        backgroundColor: "#ccc"
     },
     actionsContainer: {
         alignSelf: 'flex-end',

@@ -8,6 +8,9 @@ I18n.RegisterTranslations({
             "textInput": {
                 "selectCountry": "Select Country",
             },
+            "bottomSheet": {
+                "close": "Close the bottom sheet",
+            },
             "dropdown": {
                 "selectAll": "Select All",
                 "unselectAll": "Unselect All",

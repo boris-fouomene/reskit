@@ -592,24 +592,26 @@ export type IMenuProps<MenuItemContext = any> = Omit<Animated.AnimatedProps<View
      */
     itemsProps?: Omit<IMenuItems<MenuItemContext>, "items">;
 
-
-    /**
-     * Determines whether the menu should be rendered as a bottom sheet on full-screen mode.
-     * When enabled (`true`), the menu will adapt to a bottom sheet layout on smaller screens
-     * instead of the default menu style. On larger screens, the standard menu layout is used.
-     * 
-     * This prop is useful for improving the mobile user experience by providing a more 
-     * intuitive and space-efficient navigation method.
-     * 
-     * @default false
-     */
-    useBottomSheetOnFullScreen?: boolean;
-
-
     /***
      * Whether the menu should be dismissable
      */
     dismissable?: boolean;
+    
+    /***
+        The minimum height of the bottom sheet. It's used when the menu is opened as a bottom sheet.
+    */
+    bottomSheetMinHeight?: number;
+    
+    /***
+        Whether the Bottom sheet is full screen or not
+    */
+    bottomSheetFullScreen?: boolean;
+    
+    /***
+        The callback function that is called when the menu is dismissed.
+        This is considered when the menu is controlled externally by providing the visible prop.
+    */
+    onDismiss?: ()=>void;
 }
 
 /**

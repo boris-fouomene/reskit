@@ -5,7 +5,7 @@ import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj, Logger, areEq
 import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import Theme, { useTheme } from "@theme/index";
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Dimensions } from 'react-native';
 import TextInput from "@components/TextInput";
 import { Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
@@ -408,9 +408,10 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             responsive
             animated={false}
             minWidth={180}
+            bottomSheetFullScreen
             {...Object.assign({}, menuProps)}
-            useBottomSheetOnFullScreen
             visible={visible}
+            onDismiss={context.close.bind(context)}
             withScrollView={false}
             sameWidth
             dynamicHeight={false}
@@ -450,25 +451,24 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
     const menuWidth = typeof menuPosition?.width === "number" && menuPosition.width > 50 ? menuPosition.width : undefined;
     const canRenderDropdownSearch = !!!(context?.props?.showSearch === false || context?.props?.showSearch !== true && preparedItems?.length <= 5);
     return <View testID={testID + "-dropdown-list-container"} style={[
-        styles.dropdownListContainer,
-        fullScreen && styles.dropdownListContainerFullScreen,
-        typeof menuHeight == "number" && { height: menuHeight },
-        typeof menuWidth == "number" && { width: menuWidth },
-        canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled]}
+            styles.dropdownListContainer,
+            fullScreen && styles.dropdownListContainerFullScreen,
+            typeof menuHeight == "number" && { height: menuHeight },
+            typeof menuWidth == "number" && { width: menuWidth },
+            canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled
+        ]}
     >
-        <View testID={`${testID}-content-container`} style={[styles.contentContainer, fullScreen && styles.contentContainerFullScreen, canRenderDropdownSearch && styles.contentContainerFullScreenWithDropdownSearch]}>
-            {canRenderDropdownSearch ? <DropdownSearch isFullScreen={fullScreen} /> : null}
-            <BigList<IDropdownPreparedItem<ItemType, ValueType>>
-                testID={testID + "-dropdown-list"}
-                {...listProps}
-                inverted={canReverse}
-                data={filteredItems}
-                keyExtractor={({ hashKey }) => hashKey}
-                renderItem={({ item, index }) => {
-                    return <DropdownItem {...item} index={index} />;
-                }}
-            />
-        </View>
+         {canRenderDropdownSearch ? <DropdownSearch isFullScreen={fullScreen} /> : null}
+        <BigList<IDropdownPreparedItem<ItemType, ValueType>>
+            testID={testID + "-dropdown-list"}
+            {...listProps}
+            inverted={canReverse}
+            data={filteredItems}
+            keyExtractor={({ hashKey }) => hashKey}
+            renderItem={({ item, index }) => {
+                return <DropdownItem {...item} index={index} />;
+            }}
+        />
     </View>;
 }
 
@@ -590,17 +590,11 @@ const styles = StyleSheet.create({
     },
     dropdownListContainerFullScreen: {
         flex: 1,
-        flexGrow: 1
+        flexGrow: 1,
     },
     contentContainer: {
         alignSelf: "flex-start",
         width: "100%",
-    },
-    contentContainerFullScreen: {
-        flexGrow: 1,
-    },
-    contentContainerFullScreenWithDropdownSearch: {
-        paddingVertical: 10,
     },
     dropdownListContainer: {
         width: "100%",

@@ -10,11 +10,11 @@ import { Dimensions, View } from "react-native";
  * @param {number} [screenIndent=20] - The screen indentation.
  * @returns {Promise<{ x: number, y: number, width: number, height: number, contentHeight: number }>} A promise that resolves with the layout coordinates and content height.
  */
-export function measureContentHeight(anchorRef: React.RefObject<View>, minContentHeight: number = 500) {
+export function measureContentHeight(anchorRef: React.RefObject<View>, minContentHeight: number = 400) {
     return measureInWindow(anchorRef).then((result) => {
         const { height, y } = result;
         const winHeight = Dimensions.get("window").height;
-        minContentHeight = typeof minContentHeight == "number" && minContentHeight > 0 ? minContentHeight : 500;
+        minContentHeight = typeof minContentHeight == "number" && minContentHeight > 0 ? minContentHeight : 400;
         const rHeight = winHeight - y - height;
         const contentHeight = Math.max(Math.min(rHeight, winHeight - 100), y - height - 10, minContentHeight);
         return {

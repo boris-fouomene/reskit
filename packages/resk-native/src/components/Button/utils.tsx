@@ -5,21 +5,6 @@ import { IButtonProps, IButtonMode } from './types';
 import { ITheme } from '@theme/types';
 
 
-const isDark = ({ dark, backgroundColor }: { dark?: boolean; backgroundColor?: string; }) => {
-  if (typeof dark === 'boolean') {
-    return dark;
-  }
-
-  if (backgroundColor === 'transparent') {
-    return false;
-  }
-
-  if (backgroundColor !== 'transparent') {
-    return !color(backgroundColor).isLight();
-  }
-  return false;
-};
-
 const getButtonBackgroundColor = ({
   isMode,
   customBackgroundColor,
@@ -44,11 +29,6 @@ const getButtonTextColor = ({ isMode, customTextColor, backgroundColor, dark, th
   if (Colors.isValid(customTextColor)) {
     return customTextColor;
   }
-  /*   if (typeof dark === 'boolean') {
-      if (isMode('contained')) {
-        return isDark({ dark, backgroundColor }) ? "white" : "black";
-      }
-    } */
   if (isMode('outlined') || isMode('text')) {
     return theme.colors.primary;
   }

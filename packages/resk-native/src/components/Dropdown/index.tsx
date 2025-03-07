@@ -5,7 +5,7 @@ import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj, Logger, areEq
 import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import Theme, { useTheme } from "@theme/index";
-import { TouchableOpacity, Dimensions } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import TextInput from "@components/TextInput";
 import { Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
@@ -16,13 +16,11 @@ import { FontIcon } from "@components/Icon";
 import Label from "@components/Label";
 import { IStyle } from "@src/types";
 import { useI18n } from "@src/i18n/hooks";
-import { AppBar } from "@components/AppBar";
 import { Divider } from "@components/Divider";
 import { ProgressBar } from "@components/ProgressBar";
 import { ITextInputProps } from "@components/TextInput/types";
-import BigList from "react-native-big-list";
 import Platform from "@platform";
-import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
+import { List } from "@components/List";
 
 /**
  * Represents a dropdown component that allows users to select one or more items from a list.
@@ -459,7 +457,7 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
         ]}
     >
          {canRenderDropdownSearch ? <DropdownSearch isFullScreen={fullScreen} /> : null}
-        <BigList<IDropdownPreparedItem<ItemType, ValueType>>
+        <List<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
             {...listProps}
             inverted={canReverse}

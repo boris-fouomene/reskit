@@ -1,29 +1,8 @@
 import { Tab, TextInput, withAppBar, BottomSheet, Avatar, Badge, getLocales, Calendar, Drawer, Button, List, Dropdown, Form, Dialog, Expandable, Icon, Theme, Label, HelperText, Menu, ITheme, getDefaultTheme, Preloader, HStack } from "@resk/native";
 import { View, ScrollView, FlatList } from 'react-native'
 import { IField, Logger, InputFormatter, ILogger, AttachLogger } from "@resk/core";
-import { useEffect, useRef, useState } from "react";
-
-@AttachLogger()
-class LoggerExample implements ILogger {
-    log(...data: any[]): void {
-        console.log("yes an example of logging ", ...data)
-    }
-    info(...data: any[]): void {
-        console.log("yes an example of info ", ...data)
-    }
-    debug(...data: any[]): void {
-        console.log("yes an example of debug", ...data)
-    }
-    warn(...data: any[]): void {
-        console.log("yes an example of warning ", ...data)
-    }
-    error(...data: any[]): void {
-        console.log("yes an example of error ", ...data)
-    }
-}
 
 const index = withAppBar(() => {
-    Logger.log("locales ", getLocales());
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>

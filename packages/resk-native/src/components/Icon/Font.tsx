@@ -63,9 +63,9 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
     const pressableProps = getTouchableProps(props);
     const theme = useTheme();
     color = Colors.isValid(color) ? color : theme.colors.text;
-    let { iconSetName, iconSetPrefix, iconSet: IconSet, iconName } = getFontIconSet(name);
+    let { iconSetName, iconSetPrefix, iconSet: IconSet, iconName } = getFontIconSet(name as string);
     if (!iconSetName || !IconSet || !iconName) {
-        Logger.warn(`Icon not defined for FontIcon component, icon [${name}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
+        Logger.warn(`Icon not defined for FontIcon component, icon [${name as string}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
     const Component: React.FC<IconProps & { ref: any }> = IconSet as unknown as React.FC<IconProps>;

@@ -16,7 +16,6 @@
     "@material/material-color-utilities": "^0.3.0",
     "@resk/core": "^1.5.0",
     "color": "^4.2.3",
-    "react-native-big-list": "^1.6.1",
     "tippy.js": "^6.3.7"
   },
   "peerDependencies1": {
@@ -26,7 +25,7 @@
     "react-native-web": ">=0.19.0"
   },
   "devDependencies": {
-    "@types/color": "^3.0.6",
+    "@types/color": "^4.2.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@types/react-is": "^18.0.0",

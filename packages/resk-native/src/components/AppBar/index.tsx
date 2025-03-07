@@ -189,7 +189,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
               containerProps={{
                 style: styles.menuAnchorContainer
               }}
-              onPress={(event) => {
+              onPress={() => {
                 openMenu();
               }}
             />

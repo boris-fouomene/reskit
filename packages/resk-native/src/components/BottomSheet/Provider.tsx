@@ -1,6 +1,6 @@
 import BottomSheet from "./BottomSheet";
 import { createProvider } from "@utils";
-import { IBottomSheetProps, IBottomSheetContext } from "./BottomSheet";
+import { IBottomSheetProps } from "./utils";
 import { PureComponent } from "react";
 
 interface IBottomSheetClasState extends Omit<Partial<IBottomSheetProps>, "visible"> { visible: boolean };
@@ -23,7 +23,7 @@ class BottomSheetClass extends PureComponent<IBottomSheetProps, IBottomSheetClas
     }
     open(props?: IBottomSheetProviderProps, callback?: () => {}) {
         this.setState({
-            appBarProps:undefined,
+            appBarProps: undefined,
             ...Object.assign({}, props), visible: true,
         }, () => {
             typeof callback == "function" && callback();

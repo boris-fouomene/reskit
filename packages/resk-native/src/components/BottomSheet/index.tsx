@@ -1,9 +1,11 @@
-import { Dimensions, MeasureInWindowOnSuccessCallback, View } from "react-native";
+import { Dimensions, View } from "react-native";
 import BottomSheet from "./BottomSheet";
 import BottomSheetProvider from "./Provider";
+import BottomSheetItem from "./Item";
 export * from "./BottomSheet";
 export * from "./Provider";
-
+export * from "./utils";
+export { useBottomSheet } from "./hooks";
 
 
 
@@ -17,7 +19,7 @@ export * from "./Provider";
  * @param {Function} cb A callback function to call with the measurement result.
  * @returns {Promise} A promise that resolves with the measurement result.
  */
-export const measureContentHeight = (innerRef: React.RefObject<View>, cb?: (height: number, layout: { x: number, y: number, width: number, height: number }) => void, errorCb?: () => void) => {
+const measureContentHeight = (innerRef: React.RefObject<View>, cb?: (height: number, layout: { x: number, y: number, width: number, height: number }) => void, errorCb?: () => void) => {
     /**
         * The reference to the component to measure.
         * 
@@ -65,16 +67,19 @@ export const measureContentHeight = (innerRef: React.RefObject<View>, cb?: (heig
     } else {
     }
 };
+
 const isNumber = (x: any) => typeof x === 'number';
 
 
 type IBottomSheetExported = typeof BottomSheet & {
     Provider: typeof BottomSheetProvider;
     measureContentHeight: typeof measureContentHeight;
+    Item: typeof BottomSheetItem;
 }
 
 const BottomSheetExported: IBottomSheetExported = BottomSheet as IBottomSheetExported;
 BottomSheetExported.Provider = BottomSheetProvider;
 BottomSheetExported.measureContentHeight = measureContentHeight;
+BottomSheetExported.Item = BottomSheetItem;
 
 export { BottomSheetExported as BottomSheet };

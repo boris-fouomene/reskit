@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { IReskNativeContext } from "./types";
-import { extendObj } from "@resk/core";
 /**
  * @group ReskNativeProvider
  * Creates a context for the ReskNativeProvider.

@@ -71,9 +71,7 @@ const IKeyboardAvoidingView = React.forwardRef(({ children, style, testID, ...pr
 });
 
 const styles = StyleSheet.create({
-  main: {
-    maxHeight: "100%",
-  }
+  main: { }
 });
 IKeyboardAvoidingView.displayName = "IKeyboardAvoidingView";
 

@@ -125,7 +125,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
      * @param props - The props to be passed to the View children that wraps the portal content.
      */
     const addPortal = (key: string, children: ReactNode, props?: IViewProps) => {
-        portalRefs.current = [...portalRefs.current, { key, children, props }];
+        portalRefs.current = [...portalRefs.current.filter(portal=>portal?.key !== key), { key, children, props }];
         updatePortalLayer();
         EventManager.events.trigger("add", key);
     };
@@ -267,9 +267,10 @@ export function Portal<AsProps extends ViewProps = IViewProps>({ children, ...pr
         // Register the portal when the component mounts
         if (props.visible !== false) {
             addPortal(key, children, props as any);
+        } 
+        return ()=>{
+            removePortal(key);
         }
-        // Cleanup and remove the portal when the component unmounts
-        return () => removePortal(key);
     }, [key, children, props.absoluteFill, props.visible]);
     useEffect(() => {
         return () => {
@@ -283,7 +284,7 @@ export function Portal<AsProps extends ViewProps = IViewProps>({ children, ...pr
 const styles = StyleSheet.create({
     absoluteFill: {
         ...StyleSheet.absoluteFillObject,
-        flex: 1,
+        flex: 1
     },
     hidden: {
         flex: 0,

@@ -3,15 +3,10 @@ import { IObservable, observable, uniqid } from '@resk/core';
 import React, { createContext, useRef, useContext, ReactNode, useEffect, useMemo } from 'react';
 import { StyleSheet, ViewProps } from 'react-native';
 import { getMaxZindex, Platform } from '@resk/core';
-import { IReactComponent, IStyle } from '../../types';
 
 type IPortalEvent = "add" | "remove";
 class EventManager {
     static events: IObservable<IPortalEvent> = observable({});
-}
-interface IRenderedPortalProps {
-    children?: any,
-    style?: any;
 }
 
 /**
@@ -22,7 +17,7 @@ interface IRenderedPortalProps {
  * A `IPortalItem` consists of a unique key and the React element to be rendered.
  * These items are used internally in the `PortalProvider` to manage portal entries.
  */
-interface IPortalItem<AsProps extends IRenderedPortalProps = IViewProps> {
+interface IPortalItem {
     /**
      * Unique key to identify each portal, ensuring that individual portals can be added or removed dynamically.
      */
@@ -37,7 +32,7 @@ interface IPortalItem<AsProps extends IRenderedPortalProps = IViewProps> {
     /***
      * The props to be passed to the View component that wraps the portal content.
      */
-    props?: Omit<IPortalProps<AsProps>, "children">;
+    props?: Omit<IPortalProps, "children">;
 }
 
 
@@ -50,7 +45,7 @@ interface IPortalItem<AsProps extends IRenderedPortalProps = IViewProps> {
  * @remarks
  * These methods (`addPortal`, `removePortal`) are provided to components via React's context API to manage portal operations like adding or removing portals.
  */
-export interface IPortalContext<AsProps extends IRenderedPortalProps = IViewProps> {
+export interface IPortalContext {
     /**
      * Adds a new portal to the application with a unique key and a component to render.
      * 
@@ -63,7 +58,7 @@ export interface IPortalContext<AsProps extends IRenderedPortalProps = IViewProp
      * addPortal('example-portal', <View><Text>My Portal Content</Text></View>,{testID:"a-test-id"});
      * ```
      */
-    addPortal: (key: string, component: ReactNode, props?: IPortalProps<AsProps>) => void;
+    addPortal: (key: string, component: ReactNode, props?: IPortalProps) => void;
 
     /**
      * Removes an existing portal from the application, identified by its unique key.
@@ -174,14 +169,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     );
 };
 
-function RenderedPortal<AsProps extends ViewProps = IViewProps>({ children, as, visible, absoluteFill, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
-    const Component = useMemo(() => {
-        return as || View;
-    }, [as]) as unknown as typeof View;
+function RenderedPortal<AsProps extends ViewProps = IViewProps>({ children, visible, absoluteFill, zIndex, ...props }: IPortalProps & { zIndex: number }) {
     if (visible === false) return null;
-    return <Component  {...Object.assign({}, props)} style={[{ zIndex }, absoluteFill && styles.absoluteFill, props?.style]}>
+    return <View {...Object.assign({}, props)} style={[{ zIndex }, absoluteFill && styles.absoluteFill, props?.style]}>
         {children || null}
-    </Component>
+    </View>
 };
 RenderedPortal.displayName = "Portal.Rendered";
 /**
@@ -208,20 +200,14 @@ export const usePortal = (): IPortalContext => {
     return context;
 };
 
-export type IPortalProps<AsProps extends IRenderedPortalProps = IViewProps> = AsProps & {
-    /**
-         * Optionally specify the element type to render the Tooltip with.
-         * By default, it uses `Pressable`, but can be changed to any custom component.
-         * This provides flexibility in rendering, allowing developers to 
-         * choose the underlying element based on their needs.
-         *
-         * @type {IReactComponent}
-         * @example
-         * // Rendering the Tooltip with a custom component
-         * as: CustomTooltipComponent
-         */
-    as?: IReactComponent<AsProps>;
-
+/***
+    @interface IPortalProps
+    @description
+    This interface defines the props that can be passed to the `Portal` component.
+    It extends the `IViewProps` interface, allowing for additional props specific to the `Portal` component.
+    @extends IViewProps
+*/
+export interface IPortalProps extends IViewProps{
     /***
      * The `absoluteFill` prop determines whether the portal should fill the entire screen.
      * If set to `true`, the portal will take up the entire screen, which can be useful for mobile
@@ -236,8 +222,6 @@ export type IPortalProps<AsProps extends IRenderedPortalProps = IViewProps> = As
      * Default is false
      */
     visible?: boolean;
-
-    style?: AsProps["style"] | IStyle;
 }
 
 /**
@@ -260,7 +244,7 @@ export type IPortalProps<AsProps extends IRenderedPortalProps = IViewProps> = As
  * </Portal>
  * ```
  */
-export function Portal<AsProps extends ViewProps = IViewProps>({ children, ...props }: IPortalProps<AsProps>) {
+export function Portal({ children, ...props }: IPortalProps) {
     const { addPortal, removePortal } = usePortal();
     const key = useRef<string>(uniqid("portal-key")).current;
     useEffect(() => {

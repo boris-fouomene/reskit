@@ -63,7 +63,7 @@ export const useMenuPosition = ({
     const fullScreen = isFullScreen(customFullScreen, responsive, isMobileOrTablet);
     // Animation values
     const opacity = useRef<Animated.Value>(new Animated.Value(animated ? 0 : 1)).current;
-    const scale = useRef(new Animated.Value(animated ? 0.3 : 1)).current;
+    const scale = useRef(new Animated.Value(animated ? 0.5 : 1)).current;
     const elevation = typeof customElevation === "number" ? customElevation : fullScreen ? 0 : 10;
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
@@ -204,7 +204,7 @@ export const useMenuPosition = ({
         if (animated) {
             Animated.parallel([
                 Animated.timing(scale, {
-                    toValue: visible ? 1 : 0.3,
+                    toValue: visible ? 1 : 0.5,
                     duration: 100,
                     useNativeDriver,
                 }),

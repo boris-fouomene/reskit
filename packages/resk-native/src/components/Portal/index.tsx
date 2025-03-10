@@ -210,6 +210,7 @@ export const usePortal = (): IPortalContext => {
 export interface IPortalProps extends IViewProps{
     /***
      * The `absoluteFill` prop determines whether the portal should fill the entire screen.
+       It means that the portal view will be styled using `position: absolute` and `top: 0`, `left: 0`, `right: 0`, and `bottom: 0` from react-native StyleSheet.absoluteFill.
      * If set to `true`, the portal will take up the entire screen, which can be useful for mobile
      * or immersive experiences.
      * Default is false.

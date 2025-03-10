@@ -711,4 +711,4 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
  * const fontVariant: IThemeFontVariant = 'headlineLarge';
  * ```
  */
-export type IThemeFontVariant = Omit<keyof IThemeFontsWithVariants,keyof IThemeFonts>;
+export type IThemeFontVariant = Omit<keyof IThemeFontsWithVariants, keyof IThemeFonts>;

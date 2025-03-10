@@ -449,14 +449,14 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
     const menuWidth = typeof menuPosition?.width === "number" && menuPosition.width > 50 ? menuPosition.width : undefined;
     const canRenderDropdownSearch = !!!(context?.props?.showSearch === false || context?.props?.showSearch !== true && preparedItems?.length <= 5);
     return <View testID={testID + "-dropdown-list-container"} style={[
-            styles.dropdownListContainer,
-            fullScreen && styles.dropdownListContainerFullScreen,
-            typeof menuHeight == "number" && { height: menuHeight },
-            typeof menuWidth == "number" && { width: menuWidth },
-            canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled
-        ]}
+        styles.dropdownListContainer,
+        fullScreen && styles.dropdownListContainerFullScreen,
+        typeof menuHeight == "number" && { height: menuHeight },
+        typeof menuWidth == "number" && { width: menuWidth },
+        canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled
+    ]}
     >
-         {canRenderDropdownSearch ? <DropdownSearch isFullScreen={fullScreen} /> : null}
+        {canRenderDropdownSearch ? <DropdownSearch isFullScreen={fullScreen} /> : null}
         <List<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
             {...listProps}
@@ -644,16 +644,15 @@ const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: b
         return null;
     }
     return (
-        <>
+        <View testID={`${testID}-dropdown-search-container`} style={[styles.searchInputContainer]}>
             <TextInput
-                testID={`${testID}_dropdown-search`}
+                testID={`${testID}-dropdown-search`}
                 autoFocus={visible && !Platform.isTouchDevice()}
                 affix={false}
                 {...props}
                 defaultValue={searchText}
                 onChangeText={onSearch}
                 style={[styles.searchInput, props.style]}
-                containerProps={Object.assign({}, props.containerProps, { style: [styles.searchInputContainer, props.containerProps?.style] })}
                 placeholder={i18n.t("components.dropdown.searchPlaceholder", { count: filteredItems.length })}
                 right={!actions?.length ? null : (
                     <Menu
@@ -674,7 +673,7 @@ const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: b
                 }
             />
             {!canReverse ? <Divider testID={`${testID}-divider`} style={[styles.searchDivider]} /> : null}
-        </>
+        </View>
     );
 };
 

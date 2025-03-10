@@ -24,14 +24,21 @@ import { View as RNView } from 'react-native';
  * </Surface>
  * ```
  */
-const Surface = React.forwardRef((props: ISurfaceProps, ref: React.ForwardedRef<RNView>) => {
+const Surface = React.forwardRef(({ style, shadowOpacity = 0.24, borderRadius, elevation, ...rest }: ISurfaceProps, ref: React.ForwardedRef<RNView>) => {
     const theme = useTheme();
-    const { style, elevation, ...rest } = props;
+    shadowOpacity = typeof shadowOpacity === 'number' ? shadowOpacity : 0.24;
+    borderRadius = typeof borderRadius === 'number' ? borderRadius : 0;
+    const shadowElevation = typeof elevation == 'number' && elevation > 0 ? elevation : 0;
+    const elvevStyle = shadowElevation && Theme.elevations[shadowElevation] || null;
     return <View testID={'resk-surface'} {...rest} ref={ref}
-        style={[{ backgroundColor: theme.colors.surface },
-        elevation && typeof elevation == 'number' && Theme.elevations[elevation] ? Theme.elevations[elevation] : null,
+        style={[
+            { backgroundColor: theme.colors.surface },
+            elvevStyle,
+            shadowElevation && { shadowOpacity },
+            borderRadius > 0 && { borderRadius },
             style
-        ]} />
+        ]}
+    />
 });
 /**
  * Represents the properties for the Surface component.
@@ -57,6 +64,18 @@ export interface ISurfaceProps extends IViewProps {
      * The level of elevation for the surface shadow.
      */
     elevation?: number;
+
+    /***
+     * The shadow opacity for the surface shadow.
+     * Default is 0.24
+     */
+    shadowOpacity?: number;
+
+    /***
+     * The border radius for the surface.
+     * Default is 0
+     */
+    borderRadius?: number;
 }
 
 Surface.displayName = "Surface";

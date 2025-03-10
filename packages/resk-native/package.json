@@ -7,14 +7,13 @@
   "scripts": {
     "build-core": "cd ../resk-core && npm run build",
     "build": "npm run build-core && cd ../resk-native && npm run build-me",
-    "build-me": "tsc && npx tsc-alias -p tsconfig.json",
+    "build-me": "tsc && tsc-alias -p tsconfig.json",
     "pretest": "npm run build-test",
-    "build-test": "npm run build-core && cd ../resk-native && tsc --project ./tsconfig.test.json && npx tsc-alias -p tsconfig.test.json",
+    "build-test": "npm run build-core && cd ../resk-native && tsc --project ./tsconfig.test.json && tsc-alias -p tsconfig.test.json",
     "test": "npx jest"
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
-    "@resk/core": "^1.5.0",
     "color": "^4.2.3",
     "tippy.js": "^6.3.7"
   },
@@ -29,7 +28,8 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@types/react-is": "^18.0.0",
-    "@types/react-native-vector-icons": "^6.0.0"
+    "@types/react-native-vector-icons": "^6.0.0",
+    "tsc-alias": "^1.8.11"
   },
   "publishConfig": {
     "access": "public"

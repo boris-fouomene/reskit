@@ -1,5 +1,5 @@
 import { Platform as ReskPlatform } from "@resk/core";
-import { Platform } from 'react-native';
+import { Dimensions, Platform, StatusBar } from 'react-native';
 /**
  * Determines if the current environment is a development environment.
  * 
@@ -177,4 +177,88 @@ const isTouchDevice: () => boolean = (): boolean => {
 }
 
 
-export default { ...ReskPlatform, ...Platform, isTouchDevice, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };
+/**
+ * Checks if the device is an iPhone X.
+ * 
+ * This function checks the device's operating system, screen dimensions, and type to determine if it's an iPhone X.
+ * 
+ * @returns {boolean} True if the device is an iPhone X, false otherwise.
+ * 
+ * @example
+ * if (Platform.isIphoneX()) {
+ *   console.log('This is an iPhone X');
+ * } else {
+ *   console.log('This is not an iPhone X');
+ * }
+ */
+function isIphoneX() {
+    const dimen = Dimensions.get('window');
+    return (
+        Platform.OS === 'ios' &&
+        !Platform.isPad &&
+        !Platform.isTV &&
+        ((dimen.height === 780 || dimen.width === 780)
+            || (dimen.height === 812 || dimen.width === 812)
+            || (dimen.height === 844 || dimen.width === 844)
+            || (dimen.height === 896 || dimen.width === 896)
+            || (dimen.height === 926 || dimen.width === 926))
+    );
+}
+/**
+ * Returns the style or properties for iPhone X devices or regular devices.
+ * 
+ * This function checks if the device is an iPhone X using the `isIphoneX` function and returns the corresponding style.
+ * 
+ * @param {any} iphoneXStyle The style to return if the device is an iPhone X.
+ * @param {any} regularStyle The style to return if the device is not an iPhone X.
+ * 
+ * @returns {any} The style for the current device.
+ * 
+ * @example
+ * const style = iphoneX({ height: 100 }, { height: 50 });
+ * console.log(style); // Output: { height: 100 } if iPhone X, { height: 50 } otherwise
+ */
+function iphoneX(iphoneXStyle: any, regularStyle: any) {
+    if (isIphoneX()) {
+        return iphoneXStyle;
+    }
+    return regularStyle;
+}
+/**
+ * Returns the height of the status bar based on the device's operating system.
+ * 
+ * This function checks the device's operating system and returns the corresponding status bar height.
+ * If the device is an iPhone X, it returns the height based on the `safe` parameter.
+ * 
+ * @param {boolean} [safe=false] Whether to return the safe area height for iPhone X devices.
+ * 
+ * @returns {number} The height of the status bar.
+ * 
+ * @example
+ * const statusBarHeight = getStatusBarHeight(true);
+ * console.log(statusBarHeight); // Output: 44 if iPhone X, 20 otherwise
+ */
+function getStatusBarHeight(safe?: boolean) {
+    return Platform.select({
+        ios: iphoneX(safe ? 44 : 30, 20),
+        android: StatusBar.currentHeight,
+        default: 0
+    });
+}
+
+/**
+ * Returns the bottom space height for iPhone X devices.
+ * 
+ * This function checks if the device is an iPhone X and returns the corresponding bottom space height.
+ * 
+ * @returns {number} The bottom space height for iPhone X devices, 0 otherwise.
+ * 
+ * @example
+ * const bottomSpace = getBottomSpace();
+ * console.log(bottomSpace); // Output: 34 if iPhone X, 0 otherwise
+ */
+function getBottomSpace() {
+    return isIphoneX() ? 34 : 0;
+}
+
+export default { ...ReskPlatform, ...Platform, isIphoneX, iphoneX, getStatusBarHeight, getBottomSpace, isTouchDevice, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };

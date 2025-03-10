@@ -702,7 +702,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         for (const namespace in this.namespaceResolvers) {
             if (this.namespaceResolvers.hasOwnProperty(namespace) && typeof this.namespaceResolvers[namespace] === "function") {
                 namespaces.push(new Promise((resolve, reject) => {
-                    this.namespaceResolvers[namespace](locale).then((trs) => {
+                    this.namespaceResolvers[namespace](locale as string).then((trs) => {
                         extendObj(translations, trs);
                     }).finally(() => {
                         resolve(true);

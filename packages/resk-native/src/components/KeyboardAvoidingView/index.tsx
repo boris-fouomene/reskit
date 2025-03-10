@@ -2,7 +2,7 @@ import View from "@components/View";
 import React from "react";
 import { isNonNullString } from "@resk/core";
 import { IKeyboardAvoidingViewProps } from "./types";
-import { View as RNView } from "react-native";
+import { View as RNView, StyleSheet } from "react-native";
 import { defaultStr } from "@resk/core";
 
 export * from "./types";
@@ -70,9 +70,11 @@ const IKeyboardAvoidingView = React.forwardRef(({ children, style, testID, ...pr
   return <View  {...props} ref={ref} style={[styles.main, style]} children={children} testID={testID} />
 });
 
-const styles = {
-  main: {}
-}
+const styles = StyleSheet.create({
+  main: {
+    maxHeight: "100%",
+  }
+});
 IKeyboardAvoidingView.displayName = "IKeyboardAvoidingView";
 
 export { IKeyboardAvoidingView as KeyboardAvoidingView }

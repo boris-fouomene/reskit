@@ -70,7 +70,7 @@
       "@src/*": [
         "src/*"
       ],
-      "@resk/core": [
+      "@resk/core1": [
         "../resk-core/build"
       ],
       "react-native": [
@@ -79,7 +79,7 @@
       "react-native-svg": [
         "../../examples/resk-expo-docs/node_modules/react-native-svg",
       ],
-      "expo-sqlite/*" : [
+      "expo-sqlite/*": [
         "../../examples/resk-expo-docs/node_modules/expo-sqlite/*",
       ]
     }

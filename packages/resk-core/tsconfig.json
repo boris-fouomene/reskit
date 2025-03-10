@@ -42,6 +42,7 @@
         "build/**/*",
         "node_modules/**/*",
         "jest.config.*",
+        "../../jest.config.*",
         //"src/**/*.test.*",
     ]
 }

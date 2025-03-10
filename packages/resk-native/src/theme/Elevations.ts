@@ -140,8 +140,19 @@ const generateElevationStyle = (depth: number = 0) => {
     return style
 }
 
-const elevations = new Array(maxElevation + 1)
-    .fill(undefined)
-    .map((x, index) => generateElevationStyle(index))
-
-export default elevations;
+/**
+ * Generates an array of elevation styles for a given depth.
+ * 
+ * @param depth The maximum elevation depth. Defaults to `maxElevation` if not provided.
+ * @returns An array of elevation styles, where each style corresponds to an elevation depth from 0 to `depth`.
+ * 
+ * @example
+ * const elevationStyles = generateElevations(5);
+ * console.log(elevationStyles); // Output: An array of 5 elevation styles
+ */
+export function generateElevations(depth: number = maxElevation) {
+    depth = Math.max(typeof depth === 'number' ? depth : 0, maxElevation + 1);
+    return new Array(depth)
+        .fill(undefined)
+        .map((x, index) => generateElevationStyle(index));
+}

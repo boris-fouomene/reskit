@@ -80,7 +80,7 @@ import defaultVal from '../../../../../../frontend-dash/src/utils/defaultVal';
  * The `TextInput` component is designed to be versatile and reusable across various parts of an application, ensuring a consistent and engaging user experience. 
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
-const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
+const TextInput = React.forwardRef(({ render, withKeyboardAvoidingView, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
     const { variant, containerProps, onPress, focus, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, inputRef, right, label, ...rest } = useTextInput(props);
     const leftContainerProps = Object.assign({}, cLeftContainerProps);
     const isLabelEmbededVariant = variant === "labelEmbeded";
@@ -92,7 +92,10 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
     const inputProps = { ...(!canWrapWithTouchable && editable ? pressableProps : {}), focus, ...rest, editable: canWrapWithTouchable ? false : editable, readOnly: canWrapWithTouchable ? true : props.readOnly }
     const inputElement = typeof render == "function" ? render(inputProps, inputRef) : <RNTextInput {...inputProps} ref={inputRef} />;
-    return <KeyboardAvoidingView {...containerProps} >
+    const Avoiding = useMemo(() => {
+        return withKeyboardAvoidingView !== false ? KeyboardAvoidingView : View;
+    }, [withKeyboardAvoidingView]);
+    return <Avoiding {...containerProps} >
         {isLabelEmbededVariant ? null : labelContent}
         <Wrapper {...wrapperProps} {...contentContainerProps} style={[styles.wrapper, contentContainerProps?.style]}>
             <View testID={testID + "-left-content-container"} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContentContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
@@ -106,7 +109,7 @@ const TextInput = React.forwardRef(({ render, ...props }: ITextInputProps, ref?:
                 {right}
             </View>) : null}
         </Wrapper>
-    </KeyboardAvoidingView>
+    </Avoiding>
 });
 
 /**

@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef } from 'react';
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Animated,
     Pressable,
@@ -11,6 +11,7 @@ import { getColors } from './utils';
 import Theme, { useTheme } from '@theme/index';
 import Platform from "@platform";
 import useStateCallback from '@utils/stateCallback';
+import { Portal } from "@components/Portal";
 
 const useNativeDriver = Platform.canUseNativeDriver();
 const version = parseInt(String(Platform.Version));
@@ -20,6 +21,7 @@ const isAndroid = Platform.isAndroid() && (typeof version == "number" ? version 
 interface ITouchableRippleState {
     width: number;
     height: number;
+    visible: boolean,
     ripple: {
         radii: number;
         dia: number;
@@ -112,8 +114,6 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     borderWidth,
     maskDuration,
     onLayout,
-    onPressIn,
-    onPressOut,
     rippleLocation,
     ...props
 }, ref) => {
@@ -131,51 +131,12 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
 
     const animatedOpacityRef = useRef<Animated.Value>(new Animated.Value(0.1));
     const animatedRippleScaleRef = useRef<Animated.Value>(new Animated.Value(0));
-    const rippleAniRef = useRef<Animated.CompositeAnimation>();
-    const pendingRippleAni = useRef<(() => void)>();
     const [rippleState, setRippleState] = useStateCallback<ITouchableRippleState>({
         height: 1,
         width: 1,
+        visible: false,
         ripple: { radii: 0, dia: 0, offset: { top: 0, left: 0 } },
     });
-
-    const showRipple = () => {
-        animatedOpacityRef.current.setValue(1);
-        animatedRippleScaleRef.current.setValue(0.3);
-
-        // scaling up the ripple layer
-        (rippleAniRef).current = Animated.timing(animatedRippleScaleRef.current, {
-            duration: rippleDuration,
-            toValue: 1,
-            useNativeDriver,
-        });
-
-        // enlarge the shadow, if enabled
-        (rippleAniRef as any).current.start(() => {
-            (rippleAniRef).current = undefined;
-
-            // if any pending animation, do it
-            if (pendingRippleAni.current) {
-                pendingRippleAni.current();
-            }
-        });
-    }
-    const hideRipple = () => {
-        pendingRippleAni.current = () => {
-            // hide the ripple layer
-            Animated.timing(animatedOpacityRef.current, {
-                duration: maskDuration,
-                toValue: 0,
-                useNativeDriver,
-            }).start();
-            pendingRippleAni.current = undefined;
-        };
-
-        if (!rippleAniRef.current && typeof pendingRippleAni.current == "function") {
-            // previous ripple animation is done, good to go
-            pendingRippleAni.current();
-        }
-    }
 
     const shadowStyle = useMemo(() => {
         return shadowEnabled ? {
@@ -185,30 +146,32 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
             }
         } : undefined;
     }, [shadowEnabled, isRippleDisabled]);
-    const rippleContent = !isRippleDisabled ? <Animated.View
-        testID={testID + "-animated-container"}
-        style={{
-            ...StyleSheet.absoluteFillObject,
-            height: rippleState.height,
-            width: rippleState.width,
-            left: -(borderWidth),
-            top: -(borderWidth),
-            opacity: animatedOpacityRef.current,
-        }}
-    >
+    const rippleContent = !isRippleDisabled && rippleState.visible ? <Portal testID={testID + "-ripple-portal"}>
         <Animated.View
-            testID={testID + "-animated-content"}
-            style={{
-                height: rippleState.ripple.dia,
-                width: rippleState.ripple.dia,
+            testID={testID + "-animated-container"}
+            style={[{
+                ...StyleSheet.absoluteFillObject,
+                height: rippleState.height,
+                width: rippleState.width,
+                left: -(borderWidth),
+                top: -(borderWidth),
+                opacity: animatedOpacityRef.current,
+            }, !rippleState.visible && styles.animatedHidden]}
+        >
+            <Animated.View
+                testID={testID + "-animated-content"}
+                style={{
+                    height: rippleState.ripple.dia,
+                    width: rippleState.ripple.dia,
 
-                ...rippleState.ripple.offset,
-                backgroundColor: rippleColor,
-                borderRadius: rippleState.ripple.radii,
-                transform: [{ scale: animatedRippleScaleRef.current }],
-            }}
-        />
-    </Animated.View> : null;
+                    ...rippleState.ripple.offset,
+                    backgroundColor: rippleColor,
+                    borderRadius: rippleState.ripple.radii,
+                    transform: [{ scale: animatedRippleScaleRef.current }],
+                }}
+            />
+        </Animated.View>
+    </Portal> : null;
     return <Pressable
         ref={ref}
         {...props}
@@ -226,42 +189,65 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 width,
             });
         }}
-        onPressIn={(evt) => {
-            if (typeof onPressIn == "function") onPressIn(evt);
+        onPress={(event) => {
             if (isRippleDisabled) {
+                if (typeof props.onPress == 'function') {
+                    props.onPress(event);
+                }
                 return;
             }
-            const { nativeEvent: { pageX, pageY } } = evt;
-            const { width, height } = rippleState;
-            let radii;
-            let hotSpotX = pageX;
-            let hotSpotY = pageY;
+            setTimeout(() => {
+                const { nativeEvent: { pageX, pageY } } = event;
+                const { width, height } = rippleState;
+                let radii;
+                let hotSpotX = pageX;
+                let hotSpotY = pageY;
 
-            if (rippleLocation === 'center') {
-                hotSpotX = width / 2;
-                hotSpotY = height / 2;
-            }
-            const offsetX = Math.max(hotSpotX, width - hotSpotX);
-            const offsetY = Math.max(hotSpotY, height - hotSpotY);
-            radii = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-            setRippleState({
-                ...rippleState,
-                ripple: {
-                    dia: radii * 2,
-                    offset: {
-                        left: hotSpotX - radii,
-                        top: hotSpotY - radii,
+                if (rippleLocation === 'center') {
+                    hotSpotX = width / 2;
+                    hotSpotY = height / 2;
+                }
+                const offsetX = Math.max(hotSpotX, width - hotSpotX);
+                const offsetY = Math.max(hotSpotY, height - hotSpotY);
+                radii = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+                setRippleState({
+                    ...rippleState,
+                    visible: true,
+                    ripple: {
+                        dia: radii * 2,
+                        offset: {
+                            left: hotSpotX - radii,
+                            top: hotSpotY - radii,
+                        },
+                        radii,
                     },
-                    radii,
-                },
-            }, showRipple);
-        }}
-        onPressOut={(evt) => {
-            if (typeof onPressOut == "function") onPressOut(evt);
-            if (isRippleDisabled) {
-                return;
-            }
-            hideRipple();
+                }, () => {
+                    animatedOpacityRef.current.setValue(1);
+                    animatedRippleScaleRef.current.setValue(0.3);
+
+                    // scaling up the ripple layer
+                    Animated.timing(animatedRippleScaleRef.current, {
+                        duration: rippleDuration,
+                        toValue: 1,
+                        useNativeDriver,
+                    }).start(() => {
+                        // hide the ripple layer
+                        Animated.timing(animatedOpacityRef.current, {
+                            duration: maskDuration,
+                            toValue: 0,
+                            useNativeDriver,
+                        }).start(() => {
+                            setRippleState({
+                                ...rippleState,
+                                visible: false,
+                            })
+                        });
+                    });
+                    if (typeof props.onPress == 'function') {
+                        props.onPress(event);
+                    }
+                });
+            }, 50);
         }}
         style={(state) => {
             const cStyle = typeof style === 'function' ? style(state) : style;
@@ -280,6 +266,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
             disableRipple ? undefined : Object.assign({
                 color: rippleColor,
                 duration: rippleDuration,
+                foreground: Platform.OS === 'android' && Platform.Version >= 28 && !!props?.android_ripple?.borderless
             }, props.android_ripple)
         }
         testID={testID}
@@ -305,6 +292,10 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
         //userSelect: "none",
     },
+    animatedHidden: {
+        opacity: 0,
+        display: 'none',
+    }
 });
 
 export * from "./utils";

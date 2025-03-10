@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { ITheme } from '@theme/types';
 import Theme, { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
 import useStateCallback from '@utils/stateCallback';
 import { extendObj, isNumber, isObj } from '@resk/core';
 import stableHash from "stable-hash";
@@ -119,7 +119,7 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
-    <SafeAreaView testID="resk-native-safe-area-provider" style={[style, Theme.styles.flex1, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView testID="resk-native-safe-area-provider" style={[style, styles.safeAreaView, { backgroundColor: theme.colors.background }]}>
       <ReskNativeContext.Provider value={{ theme, i18n, safeAreaInsets, updateTheme, ...rest, breakpoints }}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
@@ -143,3 +143,13 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeAreaView: {
+    position: "relative",
+    flex: 1,
+    overflow: "hidden",
+    maxHeight: "100%",
+    maxWidth: "100%",
+  }
+})

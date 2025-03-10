@@ -80,6 +80,7 @@ KeyboardAvoidingView.displayName = "KeyboardAvoidingView";
 export default KeyboardAvoidingView;
 const styles = StyleSheet.create({
   wrapper: {
+    maxHeight: "100%",
   },
 });
 

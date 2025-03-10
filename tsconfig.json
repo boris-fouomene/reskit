@@ -1,24 +1,25 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "rootDir": ".", // TypeScript source directory
+    "rootDir": ".",
     "outDir": "./build",
-    "target": "ES2021", // Or the desired target
-    "module": "ESNext", // Output CommonJS modules
+    "target": "ES2021",
+    "module": "ESNext",
     "removeComments": true,
-    "moduleResolution": "node", // Resolve modules using Node.js style
+    "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true, // Enable experimental support for decorators
-    "emitDecoratorMetadata": true, // Enable emitting design:type metadata
-    "strict": true, // Enable all strict type checking options
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strict": true,
     "resolveJsonModule": true,
     "incremental": true,
     "noLib": false,
     "sourceMap": false,
     "noEmitOnError": true,
+    "noEmit": false,
     "typeRoots": [
       "./node_modules/@types"
-    ], // Ensure Jest typings are included
+    ],
     "types": [
       "jest",
       "node"
@@ -26,12 +27,10 @@
     "skipLibCheck": true,
     "composite": true,
     "allowSyntheticDefaultImports": true,
-    //"module": "NodeNext",
-    "esModuleInterop": true, // Compatibility with ES module imports
-    //"sourceMap": true,
+    "esModuleInterop": true,
     "declaration": true,
-    "declarationMap": true, // Generates .d.ts.map files (optional)
-    "jsx": "react-jsx", // Set the JSX code generation
+    "declarationMap": true,
+    "jsx": "react-jsx",
     "plugins": [
       {
         "transform": "typescript-transform-paths"
@@ -49,6 +48,7 @@
     "packages/resk-nest/src/locales/common.js"
   ],
   "exclude": [
+    "./jest.config.js",
     "**/node_modules/*",
     "**/dist/*",
     "**/*.spec.ts",
@@ -63,5 +63,6 @@
     "**/*.spec.tsx",
     "**/*.spec.js",
     "**/*.spec.jsx"
-  ]
+  ],
+  "extends": "expo/tsconfig.base"
 }

@@ -197,9 +197,8 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
     return handleDismiss();
   }, [dismissable]);
   useBackHandler(handleBack);
-  if (!visible) return null;
   return (
-    <Portal style={styles.absoluteFill} testID={testID + "-modal-portal"}>
+    <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"}>
       <Animated.View
         testID={testID + "-modal-backdrop"}
         style={[
@@ -417,8 +416,7 @@ export interface IModalProps extends Animated.AnimatedProps<ViewProps> {
 const styles = StyleSheet.create({
   absoluteFill: {
     ...StyleSheet.absoluteFillObject,
-    width: "100%",
-    height: "100%",
+    flex: 1,
   },
   hidden: {
     opacity: 0,

@@ -8,8 +8,10 @@ import Color from "color";
 import updateNative from "./updateNative";
 import styles from "./styles";
 import { useReskNative } from "@src/context/hooks";
-import Elevations from "./Elevations";
 import { defaultFontsConfig, defaultTextStylesVariants } from "./defaultFontsConfig";
+import { generateElevations } from "./Elevations";
+
+const defaultElevations = generateElevations();
 export * from "./utils";
 export * from "./types";
 
@@ -131,6 +133,13 @@ const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => an
     }
     return events.on(UPDATE_THEME, callstack);
 };
+const isThemeManager = (theme: any) => {
+    return isObj(theme) && theme && Array.isArray(theme.elevations) && isObj(theme.colors)
+        && Colors.isValid(theme.colors.primary) && theme.colors.onPrimary
+        && typeof theme.getColorScheme == 'function' && typeof theme.getColor == 'function'
+        && typeof theme.addEventListener == 'function' && typeof theme.generateElevations == 'function'
+        && isObj(theme.fonts)
+}
 
 /**
  * create a theme object by adding utility functions such as `getColor` and `getColorScheme`.
@@ -166,12 +175,17 @@ const addEventListener = (callstack: (theme: ITheme) => any): { remove: () => an
  * ```
  *
  * @param {ITheme} theme - The base theme object that contains color definitions.
+ * @param {Object} options - Optional options for the theme creation.
+ * @param {number} options.maxElevation - The maximum elevation level for the theme. Defaults to 24.
  * @returns {ITheme} - The theme object extended with utility methods.
  */
-export function createTheme(theme: ITheme): IThemeManager {
+export function createTheme(theme: ITheme, options?: { maxElevation?: number }): IThemeManager {
+    if (isObj(theme) && isThemeManager(theme)) return theme as IThemeManager;
     const Material3Theme = getMaterial3Theme(theme?.colors?.primary);
     theme = extendObj({}, theme?.dark ? Material3Theme.dark : Material3Theme.light, theme);
     const context = theme;
+    const elvs = typeof options?.maxElevation == "number" && options?.maxElevation > 10 ? generateElevations(options?.maxElevation) : defaultElevations;
+    const elevations = Array.isArray((context as any).elevations) ? (context as any).elevations : elvs;
     const { variants, ...restFonts } = Object.assign({}, context.fontsConfig);
     const fontsConfig = extendObj({}, defaultFontsConfig, restFonts);
     const fonts: IThemeFontsWithVariants = fontsConfig[String(RNPlatform.OS).toLowerCase()] || fontsConfig.default;
@@ -198,7 +212,7 @@ export function createTheme(theme: ITheme): IThemeManager {
             return styles;
         },
         get elevations() {
-            return Elevations;
+            return elevations;
         },
         /**
          * Retrieves the color associated with the given color key or value.
@@ -295,6 +309,7 @@ export function createTheme(theme: ITheme): IThemeManager {
         get fonts() {
             return fonts;
         },
+        generateElevations,
     };
 }
 
@@ -557,7 +572,7 @@ export interface IThemeManager extends ITheme {
     getColor(color?: IThemeColorsTokenName, ...defaultColors: any[]): string | undefined;
     getColorScheme(colorSheme?: IThemeColorsTokenName): IThemeColorSheme
     styles: typeof styles;
-    elevations: typeof Elevations;
+    elevations: ReturnType<typeof generateElevations>;
     /**
      * @method addEventListener
      * Adds an event listener to track theme changes or updates.
@@ -596,6 +611,18 @@ export interface IThemeManager extends ITheme {
      * This property allows you to define the font styles for different platforms and font weights.
      */
     fonts: IThemeFontsWithVariants;
+
+    /**
+     * Generates an array of elevation styles for a given depth.
+     * 
+     * @param depth The maximum elevation depth. Defaults to `maxElevation` if not provided.
+     * @returns An array of elevation styles, where each style corresponds to an elevation depth from 0 to `depth`.
+     * 
+     * @example
+     * const elevationStyles = generateElevations(5);
+     * console.log(elevationStyles); // Output: An array of 5 elevation styles
+     */
+    generateElevations: typeof generateElevations;
 };
 
 export * from "./useColorScheme";

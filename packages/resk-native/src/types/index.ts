@@ -76,7 +76,7 @@ export type IReactRef<T extends unknown = unknown> = React.MutableRefObject<T> |
  * );
  * ```
  */
-export type IReactComponent<IProps = {}, IState = {}> = React.ComponentType<IProps> | React.ComponentClass<IProps, IState>;
+export type IReactComponent<IProps = {}, IState = {}> = React.FunctionComponent<IProps> | React.ComponentType<IProps> | React.ComponentClass<IProps, IState>;
 
 
 /**

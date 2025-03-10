@@ -1,10 +1,19 @@
 import View, { IViewProps } from '@components/View';
-import { uniqid } from '@resk/core';
-import React, { createContext, useRef, useContext, ReactNode, useEffect } from 'react';
+import { IObservable, observable, uniqid } from '@resk/core';
+import React, { createContext, useRef, useContext, ReactNode, useEffect, useMemo } from 'react';
 import { StyleSheet, ViewProps } from 'react-native';
 import { getMaxZindex, Platform } from '@resk/core';
-import { IReactComponent } from '../../types';
-import { SafeAreaView } from "react-native";
+import { IReactComponent, IStyle } from '../../types';
+
+type IPortalEvent = "add" | "remove";
+class EventManager {
+    static events: IObservable<IPortalEvent> = observable({});
+}
+interface IRenderedPortalProps {
+    children?: any,
+    style?: any;
+}
+
 /**
  * @interface IPortalItem
  * Interface defining the structure of a portal item.
@@ -13,7 +22,7 @@ import { SafeAreaView } from "react-native";
  * A `IPortalItem` consists of a unique key and the React element to be rendered.
  * These items are used internally in the `PortalProvider` to manage portal entries.
  */
-interface IPortalItem<AsProps extends ViewProps = IViewProps> {
+interface IPortalItem<AsProps extends IRenderedPortalProps = IViewProps> {
     /**
      * Unique key to identify each portal, ensuring that individual portals can be added or removed dynamically.
      */
@@ -23,23 +32,25 @@ interface IPortalItem<AsProps extends ViewProps = IViewProps> {
      * The React node (element) to be rendered inside the portal.
      * This could be any valid JSX element that should be displayed on top of the regular content.
      */
-    element: ReactNode;
+    children: ReactNode;
 
     /***
      * The props to be passed to the View component that wraps the portal content.
      */
-    props?: IPortalProps<AsProps>;
+    props?: Omit<IPortalProps<AsProps>, "children">;
 }
 
 
+
+
 /**
- * @interface IPortalContextProps
+ * @interface IPortalContext
  * Interface defining the properties of the portal context.
  * 
  * @remarks
  * These methods (`addPortal`, `removePortal`) are provided to components via React's context API to manage portal operations like adding or removing portals.
  */
-export interface IPortalContextProps {
+export interface IPortalContext<AsProps extends IRenderedPortalProps = IViewProps> {
     /**
      * Adds a new portal to the application with a unique key and a component to render.
      * 
@@ -52,7 +63,7 @@ export interface IPortalContextProps {
      * addPortal('example-portal', <View><Text>My Portal Content</Text></View>,{testID:"a-test-id"});
      * ```
      */
-    addPortal: (key: string, component: ReactNode, props?: IViewProps) => void;
+    addPortal: (key: string, component: ReactNode, props?: IPortalProps<AsProps>) => void;
 
     /**
      * Removes an existing portal from the application, identified by its unique key.
@@ -66,6 +77,11 @@ export interface IPortalContextProps {
      * ```
      */
     removePortal: (key: string) => void;
+
+    /***
+     * The list of portals
+     */
+    portals: IPortalItem[];
 }
 
 /**
@@ -74,7 +90,7 @@ export interface IPortalContextProps {
  * @internal
  * The context will provide portal operations to all components wrapped within `PortalProvider`.
  */
-export const PortalContext = createContext<IPortalContextProps | undefined>(undefined);
+export const PortalContext = createContext<IPortalContext | undefined>(undefined);
 
 /**
  * The `PortalProvider` component is responsible for managing and rendering dynamic portals in a React Native app.
@@ -105,12 +121,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
      * Adds a portal with a unique key and a JSX component to be rendered.
      * 
      * @param key - The unique key for identifying the portal.
-     * @param component - The React element to render inside the portal.
-     * @param props - The props to be passed to the View component that wraps the portal content.
+     * @param children - The React element to render inside the portal.
+     * @param props - The props to be passed to the View children that wraps the portal content.
      */
-    const addPortal = (key: string, component: ReactNode, props?: IViewProps) => {
-        portalRefs.current = [...portalRefs.current, { key, element: component, props }];
+    const addPortal = (key: string, children: ReactNode, props?: IViewProps) => {
+        portalRefs.current = [...portalRefs.current, { key, children, props }];
         updatePortalLayer();
+        EventManager.events.trigger("add", key);
     };
 
     /**
@@ -121,6 +138,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const removePortal = (key: string) => {
         portalRefs.current = portalRefs.current.filter((portal) => portal.key !== key);
         updatePortalLayer();
+        EventManager.events.trigger("remove", key);
     };
 
     /**
@@ -136,30 +154,36 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
     const testID = "resk-portal";
     return (
-        <PortalContext.Provider value={{ addPortal, removePortal }}>
+        <PortalContext.Provider value={{ addPortal, removePortal, portals: portalRefs.current }}>
             {children}
             {/* Dynamically render portal elements with a stacking order based on their position in the array */}
             <View testID={`${testID}-container`} style={styles.absoluteFill} pointerEvents="box-none">
-                {portalRefs.current.map(({ key, element, props }, index) => (
-                    <RenderPortal
-                        testID={`${testID}_${index + 1}`}
-                        key={key}
-                        zIndex={startIndex + index + 1}
-                        children={element}
-                        {...Object.assign({}, props)}
-                    />
-                ))}
+                {portalRefs.current.map(({ key, children, props }, index) => {
+                    return (
+                        <RenderedPortal
+                            testID={`${testID}_${index + 1}`}
+                            key={key}
+                            zIndex={startIndex + index + 1}
+                            children={children}
+                            {...Object.assign({}, props)}
+                        />
+                    );
+                })}
             </View>
         </PortalContext.Provider>
     );
 };
 
-function RenderPortal<AsProps extends ViewProps = IViewProps>({ children, absoluteFill, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
-    return <View  {...Object.assign({}, props)} style={[{ zIndex: 0 }, absoluteFill && styles.absoluteFill, props?.style]}>
-        {children}
-    </View>
+function RenderedPortal<AsProps extends ViewProps = IViewProps>({ children, as, visible, absoluteFill, zIndex, ...props }: IPortalProps<AsProps> & { zIndex: number }) {
+    const Component = useMemo(() => {
+        return as || View;
+    }, [as]) as unknown as typeof View;
+    if (visible === false) return null;
+    return <Component  {...Object.assign({}, props)} style={[{ zIndex }, absoluteFill && styles.absoluteFill, props?.style]}>
+        {children || null}
+    </Component>
 };
-RenderPortal.displayName = "Portal.Rendered";
+RenderedPortal.displayName = "Portal.Rendered";
 /**
  * Custom hook to access the portal context and manage adding or removing portals.
  * 
@@ -176,7 +200,7 @@ RenderPortal.displayName = "Portal.Rendered";
  * }, []);
  * ```
  */
-export const usePortal = (): IPortalContextProps => {
+export const usePortal = (): IPortalContext => {
     const context = useContext(PortalContext);
     if (!context) {
         throw new Error('usePortal must be used within a PortalProvider');
@@ -184,7 +208,7 @@ export const usePortal = (): IPortalContextProps => {
     return context;
 };
 
-export type IPortalProps<AsProps extends ViewProps = IViewProps> = AsProps & {
+export type IPortalProps<AsProps extends IRenderedPortalProps = IViewProps> = AsProps & {
     /**
          * Optionally specify the element type to render the Tooltip with.
          * By default, it uses `Pressable`, but can be changed to any custom component.
@@ -205,6 +229,15 @@ export type IPortalProps<AsProps extends ViewProps = IViewProps> = AsProps & {
      * Default is false.
      */
     absoluteFill?: boolean;
+
+    /***
+     * The `visible` prop determines whether the portal is visible or not.
+     * If set to `false`, the portal will be hidden, which can be useful for hiding content temporarily.
+     * Default is false
+     */
+    visible?: boolean;
+
+    style?: AsProps["style"] | IStyle;
 }
 
 /**
@@ -232,10 +265,17 @@ export function Portal<AsProps extends ViewProps = IViewProps>({ children, ...pr
     const key = useRef<string>(uniqid("portal-key")).current;
     useEffect(() => {
         // Register the portal when the component mounts
-        addPortal(key, children, props);
+        if (props.visible !== false) {
+            addPortal(key, children, props as any);
+        }
         // Cleanup and remove the portal when the component unmounts
         return () => removePortal(key);
-    }, [key, children, props.absoluteFill]);
+    }, [key, children, props.absoluteFill, props.visible]);
+    useEffect(() => {
+        return () => {
+            removePortal(key);
+        }
+    }, [])
     return null; // Nothing is rendered here; content is managed by the PortalProvider
 };
 

@@ -6,6 +6,9 @@ const index = withAppBar(() => {
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>
+                <Button>
+                    Ripple Example
+                </Button>
                 <Button mode="contained" rippleLocation="center"
                     left={({ textColor, context }) => {
                         return <Icon color={textColor} iconName="account-circle" />

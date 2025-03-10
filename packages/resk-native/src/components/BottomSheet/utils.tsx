@@ -4,12 +4,15 @@ import { IViewProps } from "@components/View";
 import useStateCallback from "@utils/stateCallback";
 import usePrevious from "@utils/usePrevious";
 import { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { Animated, Dimensions, PanResponder, PanResponderInstance, ScrollViewProps, StyleProp, StyleSheet, View } from "react-native";
+import { Animated, Dimensions, PanResponder, ScrollViewProps, StyleSheet, View } from "react-native";
 import { useTheme } from "@theme/index";
 import { useBackHandler } from "@components/BackHandler";
-import { isNumber, Platform } from "@resk/core";
-
+import { isNumber } from "@resk/core";
+import Platform from "@platform";
 const defaultHeight = 400;
+import platform from "@platform/index";
+
+const isWeb = platform.isWeb();
 
 /**
  * Hook to prepare the bottom sheet.
@@ -33,7 +36,7 @@ export const usePrepareBottomSheet = ({
     height: customHeight,
     visible: customVisible,
     animationDuration,
-    dismissable = true,
+    dismissable,
     onDismiss,
     elevation: customElevation,
     onOpen,
@@ -41,6 +44,7 @@ export const usePrepareBottomSheet = ({
     dragFromTopOnly,
     fullScreen,
 }: IUsePrepareBottomSheetProps) => {
+    dismissable = typeof dismissable === 'boolean' ? dismissable : true;
     const theme = useTheme();
     const elevation = typeof customElevation == "number" ? customElevation : 0;
     closeOnDragDown = typeof closeOnDragDown === 'boolean' ? closeOnDragDown : true;
@@ -52,10 +56,10 @@ export const usePrepareBottomSheet = ({
     } else {
         height = Math.max(winHeight / 3, defaultHeight);
     }
-    if(isNumber(minHeight)) {
+    if (isNumber(minHeight)) {
         height = Math.max(minHeight, height);
     }
-    if(fullScreen){
+    if (fullScreen) {
         height = winHeight;
     }
     dragFromTopOnly = typeof dragFromTopOnly === 'boolean' ? dragFromTopOnly : false;
@@ -71,7 +75,10 @@ export const usePrepareBottomSheet = ({
     const heightRef = useRef(height);
     heightRef.current = height;
     const prevVisible = usePrevious(isVisible);
-    const animatedHeight = useRef(new Animated.Value(0)).current;
+    const animatedHeight = useRef(new Animated.Value(!isWeb ? winHeight : 0)).current;
+    const getTranslatedY = (value: number) => {
+        return isWeb ? value : Dimensions.get('window').height - value;
+    }
     const visibleRef = useRef(isVisible);
     visibleRef.current = isVisible;
     const animatedValueRef = useRef(0);
@@ -103,17 +110,19 @@ export const usePrepareBottomSheet = ({
             return visibleRef.current;
         }
     });
-    const handleBackPress = useCallback(() => {
+    const handleBackPress = () => {
         if (dismissable) {
             context.close();
         }
         return true;
-    }, [dismissable, context]);
+    };
     useBackHandler(handleBackPress);
     const animate = (options: Omit<Partial<Animated.TimingAnimationConfig>, "toValue"> & { toValue: number }, callback?: Function) => {
         const options2 = Object.assign({}, { duration: animationDuration }, options, { useNativeDriver: false }) as Animated.TimingAnimationConfig;
+        const value = options2.toValue;
+        options2.toValue = getTranslatedY(value as number);
         return Animated.timing(animatedHeight, options2).start(() => {
-            (animatedValueRef as any).current = options2.toValue;
+            (animatedValueRef as any).current = value;
             if (typeof callback == "function") {
                 callback();
             }
@@ -126,13 +135,10 @@ export const usePrepareBottomSheet = ({
                 return Math.abs(gestureState.dy) > 5;
             },
             onPanResponderMove: (e, gestureState) => {
-                //const initialPosition = heightRef.current;
-                //const newPosition = heightRef.current * 0.5 + gestureState.dy;
                 const diff = gestureState.dy > 0 ? animatedValueRef.current - gestureState.dy :
                     Math.min(heightRef.current, animatedValueRef.current - gestureState.dy);
                 if (diff > 0 && diff !== animatedValueRef.current) {
-                    //animate({ toValue: diff, duration: 100 });
-                    animatedHeight.setValue(diff);
+                    animatedHeight.setValue(getTranslatedY(diff));
                 }
             },
             onPanResponderRelease: (e, gestureState) => {
@@ -155,10 +161,14 @@ export const usePrepareBottomSheet = ({
     useEffect(() => {
         if (prevVisible == isVisible) return;
         pan.setValue({ x: 0, y: 0 });
-        animate({ toValue: isVisible?heightRef.current:0 }, isVisible?onOpen:undefined);
+        animate({ toValue: isVisible ? heightRef.current : 0 }, () => {
+            if (isVisible && typeof onOpen == "function") {
+                onOpen();
+            }
+        });
     }, [isVisible, prevVisible]);
     return {
-        closeOnDragDownIcon : closeOnDragDown ? (
+        closeOnDragDownIcon: closeOnDragDown ? (
             <View
                 {...(dragFromTopOnly && panResponder.panHandlers)}
                 style={[styles.draggableContainer, Platform.isWeb() ? { cursor: 'ns-resize' } as any : null]}
@@ -172,16 +182,18 @@ export const usePrepareBottomSheet = ({
         animate,
         handleBackPress,
         context,
+        portalStyle: styles.portal,
         animatedProps: {
             ...(!dragFromTopOnly ? panResponder.panHandlers : {}),
             style: [
                 styles.container,
                 theme.elevations[elevation],
                 {
-                    transform: pan.getTranslateTransform(),
+                    transform: [{ translateY: isWeb ? 0 : animatedHeight }, { translateX: 0 }],
                     backgroundColor: theme.colors.surface,
-                    height: animatedHeight
-                }
+                    maxHeight: winHeight,
+                },
+                isWeb && { height: animatedHeight }
             ],
         }
     }
@@ -253,7 +265,7 @@ export interface IUsePrepareBottomSheetProps {
      * Whether the bottom sheet can only be dragged from the top.
      * 
      * @default false
-     * @example
+     * @examplef
      * ```typescript
      * <BottomSheet dragFromTopOnly={true} />
      * ```
@@ -292,13 +304,13 @@ export interface IUsePrepareBottomSheetProps {
      * ```
      */
     onDismiss?: Function;
-    
+
     /***
         The minimum height of the bottom sheet.
     */
     minHeight?: number;
-    
-    
+
+
     /***
         Whether the Bottom sheet is full screen or not
     */
@@ -512,10 +524,34 @@ export interface IBottomSheetProps extends IViewProps, IUsePrepareBottomSheetPro
 
 
 const styles = StyleSheet.create({
+    portal: {
+        position: "relative",
+        flex: 1,
+        overflow: "hidden",
+        ...Platform.select({
+            web: {
+                flexDirection: "column-reverse",
+            },
+            default: {
+                flexDirection: "column",
+            }
+        }),
+    },
     container: {
-        position: "absolute",
-        bottom: 0,
-        left: 0,
+        position: "relative",
+        flexGrow: 0,
+        ...Platform.select({
+            web: {
+            },
+            default: {
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                flexGrow: 1,
+                height: "100%",
+            }
+        }),
         width: "100%",
         overflow: "hidden",
         alignSelf: "flex-end",
@@ -537,4 +573,8 @@ const styles = StyleSheet.create({
         margin: 10,
         backgroundColor: "#ccc"
     },
+    keyboardVisible: {
+        top: 0,
+        bottom: 0,
+    }
 });

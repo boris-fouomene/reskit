@@ -1,11 +1,11 @@
 import React, { useImperativeHandle } from "react"
 import theme from "@theme";
-import { defaultObj, Platform as ReskPlatform, isObj } from "@resk/core";
+import { defaultObj, defaultStr, isObj } from "@resk/core";
 import View from "@components/View";
 import { Portal } from "@components/Portal";
-import { ScrollView } from "react-native";
+import { Platform, ScrollView } from "react-native";
 import { ExpandableItem } from "@components/Menu/ExpandableItem";
-import { useBottomSheet, BottomSheetContext } from "./hooks";
+import { BottomSheetContext } from "./hooks";
 import {
     Pressable,
     Animated,
@@ -18,7 +18,6 @@ import { IBottomSheetItemProps, IBottomSheetMenuItemContext, IBottomSheetProps, 
 import BottomSheetItem from "./Item";
 import { useDimensions } from "@dimensions/index";
 import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
-
 
 
 /**
@@ -41,12 +40,14 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
     contentProps: customChildrenContainerProps, appBarProps, dividerAfterAppBar, withScrollView, ...props }, ref) => {
     const {
         closeOnDragDownIcon,
+        portalStyle,
         dragFromTopOnly,
         context,
         handleBackPress,
         panResponder,
         animatedProps,
     } = usePrepareBottomSheet(props);
+    testID = defaultStr(testID, "resk-bottom-sheet");
     useDimensions();
     const scrollViewProps = defaultObj(_scrollViewProps);
     const contentProps = defaultObj(customChildrenContainerProps);
@@ -64,14 +65,17 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
     const hasAppBar = isObj(appBarProps);
     appBarProps = Object.assign({}, appBarProps);
     const containerProps = defaultObj(customContainerProps);
-    return !context.isOpened ? null : (
-        <Portal absoluteFill>
+    return (
+        <Portal style={[portalStyle]} visible={context.isOpened}>
             <BottomSheetContext.Provider value={context}>
-                    <Pressable
-                        testID={testID + "-backdrop"}
-                        style={[styles.backdrop, { backgroundColor: theme.colors.backdrop }]}
-                        onPress={() => handleBackPress()}
-                    />
+                <Pressable
+                    testID={testID + "-backdrop"}
+                    style={[styles.backdrop, { backgroundColor: theme.colors.backdrop }]}
+                    onPress={handleBackPress}
+                    onAccessibilityEscape={handleBackPress}
+                />
+
+                <View testID={testID + "-content-container"} style={styles.contentContainer}>
                     <Animated.View
                         {...animatedProps}
                         testID={testID + "-container"} {...containerProps}
@@ -104,7 +108,8 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
                                     {content}
                                 </View>}
                         </View>
-                    </Animated.View>$
+                    </Animated.View>
+                </View>
             </BottomSheetContext.Provider>
         </Portal >
     );
@@ -130,6 +135,10 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         flex: 1,
         backgroundColor: "transparent",
+    },
+    contentContainer: {
+        width: '100%',
+        alignSelf: "flex-start",
     },
     titleContainer: {
         flexDirection: 'row',

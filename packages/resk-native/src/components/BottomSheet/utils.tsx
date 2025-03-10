@@ -110,12 +110,12 @@ export const usePrepareBottomSheet = ({
             return visibleRef.current;
         }
     });
-    const handleBackPress = () => {
+    const handleBackPress = useCallback(() => {
         if (dismissable) {
             context.close();
         }
         return true;
-    };
+    }, [dismissable, context]);
     useBackHandler(handleBackPress);
     const animate = (options: Omit<Partial<Animated.TimingAnimationConfig>, "toValue"> & { toValue: number }, callback?: Function) => {
         const options2 = Object.assign({}, { duration: animationDuration }, options, { useNativeDriver: false }) as Animated.TimingAnimationConfig;

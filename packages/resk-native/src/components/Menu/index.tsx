@@ -20,6 +20,9 @@ import { KeyboardAvoidingView } from '@components/KeyboardAvoidingView';
 import { Icon } from '@components/Icon';
 import { useI18n } from '@src/i18n';
 import usePrevious from '@utils/usePrevious';
+import platform from '@platform/index';
+
+const useNativeDriver = platform.canUseNativeDriver();
 
 /**
  * Custom hook to calculate the optimal position for a menu based on the anchor element's measurements.
@@ -60,7 +63,7 @@ export const useMenuPosition = ({
     const fullScreen = isFullScreen(customFullScreen, responsive, isMobileOrTablet);
     // Animation values
     const opacity = useRef<Animated.Value>(new Animated.Value(animated ? 0 : 1)).current;
-    const scale = useRef(new Animated.Value(animated ? 0.7 : 1)).current;
+    const scale = useRef(new Animated.Value(animated ? 0.3 : 1)).current;
     const elevation = typeof customElevation === "number" ? customElevation : fullScreen ? 0 : 10;
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
@@ -199,8 +202,18 @@ export const useMenuPosition = ({
     const menuPosition = calculatePosition();
     useEffect(() => {
         if (animated) {
-            opacity.setValue(visible ? 1 : 0);
-            scale.setValue(visible ? 1 : 0.5);
+            Animated.parallel([
+                Animated.timing(scale, {
+                    toValue: visible ? 1 : 0.3,
+                    duration: 100,
+                    useNativeDriver,
+                }),
+                Animated.timing(opacity, {
+                    toValue: visible ? 1 : 0,
+                    duration: 100,
+                    useNativeDriver,
+                })
+            ]).start();
         }
     }, [visible, animated]);
     const menuAnchorStyle = useMemo(() => {

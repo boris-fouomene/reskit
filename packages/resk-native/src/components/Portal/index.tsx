@@ -1,8 +1,11 @@
 import View, { IViewProps } from '@components/View';
 import { IObservable, observable, uniqid } from '@resk/core';
 import React, { createContext, useRef, useContext, ReactNode, useEffect, useMemo } from 'react';
-import { StyleSheet, ViewProps } from 'react-native';
+import { Pressable, StyleSheet, ViewProps } from 'react-native';
 import { getMaxZindex, Platform } from '@resk/core';
+import { ITouchableProps } from '@src/types';
+import { getTouchableProps } from '@utils/hasTouchHandler';
+import { useTheme } from '@theme/index';
 
 type IPortalEvent = "add" | "remove";
 class EventManager {
@@ -119,8 +122,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
      * @param children - The React element to render inside the portal.
      * @param props - The props to be passed to the View children that wraps the portal content.
      */
-    const addPortal = (key: string, children: ReactNode, props?: IViewProps) => {
-        portalRefs.current = [...portalRefs.current.filter(portal=>portal?.key !== key), { key, children, props }];
+    const addPortal = (key: string, children: ReactNode, props?: IPortalProps) => {
+        portalRefs.current = [...portalRefs.current.filter(portal => portal?.key !== key), { key, children, props }];
         updatePortalLayer();
         EventManager.events.trigger("add", key);
     };
@@ -156,7 +159,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 {portalRefs.current.map(({ key, children, props }, index) => {
                     return (
                         <RenderedPortal
-                            testID={`${testID}_${index + 1}`}
+                            testID={`${testID}-${index + 1}`}
                             key={key}
                             zIndex={startIndex + index + 1}
                             children={children}
@@ -169,11 +172,16 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     );
 };
 
-function RenderedPortal<AsProps extends ViewProps = IViewProps>({ children, visible, absoluteFill, zIndex, ...props }: IPortalProps & { zIndex: number }) {
+function RenderedPortal({ children, visible, absoluteFill, backdrop, zIndex, ...props }: IPortalProps & { zIndex: number }) {
+    const theme = useTheme();
     if (visible === false) return null;
-    return <View {...Object.assign({}, props)} style={[{ zIndex }, absoluteFill && styles.absoluteFill, props?.style]}>
+    const touchableProps = getTouchableProps(props);
+    const Component = useMemo(() => {
+        return !!touchableProps ? Pressable : View;
+    }, [!!touchableProps]);
+    return <Component {...Object.assign({}, props)} style={[{ zIndex }, absoluteFill && styles.absoluteFill, backdrop && { backgroundColor: theme.colors.backdrop }, props?.style]}>
         {children || null}
-    </View>
+    </Component>
 };
 RenderedPortal.displayName = "Portal.Rendered";
 /**
@@ -207,7 +215,7 @@ export const usePortal = (): IPortalContext => {
     It extends the `IViewProps` interface, allowing for additional props specific to the `Portal` component.
     @extends IViewProps
 */
-export interface IPortalProps extends IViewProps{
+export interface IPortalProps extends IViewProps, ITouchableProps {
     /***
      * The `absoluteFill` prop determines whether the portal should fill the entire screen.
        It means that the portal view will be styled using `position: absolute` and `top: 0`, `left: 0`, `right: 0`, and `bottom: 0` from react-native StyleSheet.absoluteFill.
@@ -223,6 +231,13 @@ export interface IPortalProps extends IViewProps{
      * Default is false
      */
     visible?: boolean;
+
+    /***
+     * Whether to add a backdrop background to the portal.
+     * Default is false.
+     * If true, the portal will have a backdrop background.
+     */
+    backdrop?: boolean;
 }
 
 /**
@@ -251,9 +266,9 @@ export function Portal({ children, ...props }: IPortalProps) {
     useEffect(() => {
         // Register the portal when the component mounts
         if (props.visible !== false) {
-            addPortal(key, children, props as any);
-        } 
-        return ()=>{
+            addPortal(key, children, props);
+        }
+        return () => {
             removePortal(key);
         }
     }, [key, children, props.absoluteFill, props.visible]);
@@ -269,7 +284,7 @@ export function Portal({ children, ...props }: IPortalProps) {
 const styles = StyleSheet.create({
     absoluteFill: {
         ...StyleSheet.absoluteFillObject,
-        flex: 1
+        flex: 1,
     },
     hidden: {
         flex: 0,

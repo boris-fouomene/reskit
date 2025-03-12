@@ -404,9 +404,8 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     return <DropdownContext.Provider value={context}>
         <Menu
             responsive
-            animated={false}
             minWidth={180}
-            bottomSheetFullScreen
+            animated={false}
             {...Object.assign({}, menuProps)}
             visible={visible}
             onDismiss={context.close.bind(context)}
@@ -523,7 +522,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
             onPress={() => {
                 context.toggleItem(preparedItem);
             }}
-            style={[styles.itemContainer, { borderBottomColor: theme.colors.outline }]}
+            style={[styles.itemContainer]}
             testID={testID + "-item-container-" + hashKey}
         >
             <View style={styles.itemContent} testID={testID + "-item-content-" + hashKey}>
@@ -564,8 +563,6 @@ const styles = StyleSheet.create({
     itemContainer: {
         paddingVertical: 10,
         paddingHorizontal: 10,
-        borderBottomWidth: 1,
-        borderTopWidth: 0,
         alignSelf: "flex-start",
         flexGrow: 1,
         overflow: "hidden",

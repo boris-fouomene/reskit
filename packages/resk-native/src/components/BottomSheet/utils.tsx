@@ -91,8 +91,8 @@ export const usePrepareBottomSheet = ({
             setVisibleState(true, cb);
         },
         close: (cb?: () => void) => {
-            pan.setValue({ x: 0, y: 0 });
             animate({ toValue: 0 }, () => {
+                pan.setValue({ x: 0, y: 0 });
                 if (isControlled) {
                     if (typeof onDismiss === 'function') {
                         onDismiss();

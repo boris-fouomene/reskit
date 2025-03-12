@@ -7,7 +7,7 @@ const ANIMATION_DURATION = 300;
 export type IAnimationsType = 'none' | 'slide' | 'fade';
 
 
-export function useGetAnimations(options: { animationType?: IAnimationsType, visible?: boolean, animationDuration?: number }) {
+export function useGetAnimationsStyle(options: { animationType?: IAnimationsType, visible?: boolean, animationDuration?: number }) {
     let { animationType, visible, animationDuration } = Object.assign({}, options);
     animationType = animationType || 'none';
     if (!["none", "slide", "fade"].includes(animationType)) {

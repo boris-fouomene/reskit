@@ -243,9 +243,9 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
     menuPosition: IMenuCalculatedPosition;
 
     /***
-     * Whether the menu is rendered as a bottom sheet
+     * Wheather the menu is rendering on fullScreen
      */
-    renderedAsBottomSheet: boolean;
+    fullScreen: boolean;
 }
 
 
@@ -345,10 +345,6 @@ export interface IUseMenuPositionProps {
 
     /** When true, the menu occupies the entire screen. */
     fullScreen?: boolean;
-
-
-    /** Enables or disables animations for opening and closing the menu. */
-    animated?: boolean;
 
 
     /**
@@ -596,22 +592,20 @@ export type IMenuProps<MenuItemContext = any> = Omit<Animated.AnimatedProps<View
      * Whether the menu should be dismissable
      */
     dismissable?: boolean;
-    
-    /***
-        The minimum height of the bottom sheet. It's used when the menu is opened as a bottom sheet.
-    */
-    bottomSheetMinHeight?: number;
-    
-    /***
-        Whether the Bottom sheet is full screen or not
-    */
-    bottomSheetFullScreen?: boolean;
-    
+
     /***
         The callback function that is called when the menu is dismissed.
         This is considered when the menu is controlled externally by providing the visible prop.
     */
-    onDismiss?: ()=>void;
+    onDismiss?: () => void;
+
+    /** Enables or disables animations for opening and closing the menu. */
+    animated?: boolean;
+
+    /***
+     * The duration of the animation in milliseconds.
+     */
+    animationDuration?: number;
 }
 
 /**

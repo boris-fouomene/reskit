@@ -404,7 +404,7 @@ class MongoToTypeOrmConverter {
             whereConditions.push(andConditions);
         }
         // Return array for multiple conditions, object for single condition
-        return whereConditions.length > 1 ? whereConditions : whereConditions[0] || andConditions;
+        return whereConditions.length > 1 ? whereConditions as any : whereConditions[0] || andConditions;
     }
 
     /**

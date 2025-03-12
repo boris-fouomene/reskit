@@ -7,9 +7,8 @@ import {
 import { defaultStr, IResourcePaginatedResult } from '@resk/core';
 import { ResourceController } from '@resource/resource.controller';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 import { IResourceControllerInferDataType } from '@resource/interfaces';
-import { Request } from 'express';
 
 
 @Injectable()
@@ -127,7 +126,7 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
     getMethod(context: ExecutionContext): string {
         return defaultStr(context.switchToHttp()?.getRequest()?.method);
     }
-    async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+    async intercept(context: ExecutionContext, next: CallHandler) {
         this.context = context;
         const handler: keyof ControllerType = (context.getHandler().name as keyof ControllerType);
         try {
@@ -135,26 +134,21 @@ export class ResourceInterceptor<ControllerType extends ResourceController<any, 
             await this.performBeforeAction(handler, context);
         } catch (error) {
             // Handle exception from beforeTrigger
-            return throwError(() => error); // Re-throw the caught exception
+            return throwError(() => error) as any;  // Re-throw the caught exception
         }
         return next.handle().pipe(
-            map(async (response) => {
-                try {
-                    // Perform async operation after the method execution, passing the response
-                    const data = await this.performAfterAction(handler, context, response);
-                    if (data !== undefined) {
-                        return data;
-                    }
-                    return response;
-                } catch (error) {
-                    // Handle exception from afterTrigger
-                    throw error; // Re-throw the caught exception
-                }
-            }),
+            map((response) => {
+                // We'll handle the async operation and return a Promise that resolves to the modified response
+                return this.performAfterAction(handler, context, response)
+                    .then(data => data !== undefined ? data : response)
+                    .catch(error => {
+                        throw error;
+                    });
+            }) as any,
             catchError((error) => {
-                // Handle any other exceptions that occur during the method execution
-                return throwError(() => error); // Re-throw the caught exception
-            }),
+                // Handle any other exceptions that occur during execution
+                return throwError(() => error);
+            }) as any
         );
     }
     /***

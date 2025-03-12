@@ -67,6 +67,7 @@
     "ts-jest": "^29.2.5",
     "ts-patch": "^3.2.1",
     "tsconfig-paths": "^4.2.0",
+    "typedoc": "^0.27.9",
     "typescript": "^5.8.2",
     "vite-tsconfig-paths": "^5.0.1"
   }

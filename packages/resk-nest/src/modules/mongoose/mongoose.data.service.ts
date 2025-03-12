@@ -162,14 +162,14 @@ export class MongooseDataService<DataType extends IDatabaseRecordType = any, Pri
         const findOptions = this.buildFindOptions(criteria as any);
         return this.executeInTransaction(async (session) => {
             const { where } = findOptions;
-            return (await this.getModel().updateMany(where, data, { session })).modifiedCount;
+            return (await this.getModel().updateMany(where as any, data, { session })).modifiedCount;
         });
     }
     deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>): Promise<number> {
         return this.executeInTransaction(async (session) => {
             const findOptions = this.buildFindOptions(criteria as any);
             const { where } = findOptions;
-            return (await this.getModel().deleteMany(where, { session })).deletedCount;
+            return (await this.getModel().deleteMany(where as any, { session })).deletedCount;
         });
     }
     count(options?: IResourceQueryOptions<DataType> | undefined): Promise<number> {

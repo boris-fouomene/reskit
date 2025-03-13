@@ -177,13 +177,13 @@ const isThemeManager = (theme: any) => {
  * @param {ITheme} theme - The base theme object that contains color definitions.
  * @param {Object} options - Optional options for the theme creation.
  * @param {number} options.maxElevation - The maximum elevation level for the theme. Defaults to 24.
- * @returns {ITheme} - The theme object extended with utility methods.
+ * @returns {Partial<ITheme>} - The theme object extended with utility methods.
  */
-export function createTheme(theme: ITheme, options?: { maxElevation?: number }): IThemeManager {
+export function createTheme(theme: Partial<ITheme>, options?: { maxElevation?: number }): IThemeManager {
     if (isObj(theme) && isThemeManager(theme)) return theme as IThemeManager;
     const Material3Theme = getMaterial3Theme(theme?.colors?.primary);
     theme = extendObj({}, theme?.dark ? Material3Theme.dark : Material3Theme.light, theme);
-    const context = theme;
+    const context: ITheme = theme as ITheme;
     const elvs = typeof options?.maxElevation == "number" && options?.maxElevation > 10 ? generateElevations(options?.maxElevation) : defaultElevations;
     const elevations = Array.isArray((context as any).elevations) ? (context as any).elevations : elvs;
     const { variants, ...restFonts } = Object.assign({}, context.fontsConfig);
@@ -207,7 +207,7 @@ export function createTheme(theme: ITheme, options?: { maxElevation?: number }):
         }
     });
     return {
-        ...Object.assign({}, theme),
+        ...theme as ITheme,
         get styles() {
             return styles;
         },
@@ -329,9 +329,9 @@ export function createTheme(theme: ITheme, options?: { maxElevation?: number }):
  * console.log(currentTheme.colors.background); // Outputs the background color of the current theme
  * ```
  * @param {boolean} isColorShemeDark - Optional parameter to specify if the color scheme is dark.
- * @returns {ITheme} The active theme (light or dark) based on session storage or the default theme.
+ * @returns {Partial<ITheme>} The active theme (light or dark) based on session storage or the default theme.
  */
-export const getDefaultTheme = (customTheme?: ITheme): ITheme => {
+export const getDefaultTheme = (customTheme?: Partial<ITheme>): ITheme => {
     // Retrieves the saved theme from the session (if available)
     const themeNameObj = extendObj({}, customTheme, Session.get("theme"));
     const { light: lightTheme, dark: darkTheme } = getMaterial3Theme(themeNameObj?.colors?.primary);
@@ -407,7 +407,7 @@ class Theme {
  * updates the theme reference, applies the theme to native elements, and optionally triggers an event to notify 
  * other parts of the app that the theme has changed.
  * 
- * @param {ITheme} theme - The new theme to be applied to the application.
+ * @param {Partial<ITheme>} theme - The new theme to be applied to the application.
  * @param {boolean} [trigger=false] - Whether to trigger the theme update event (default is `false`).
  * 
  * @returns {ITheme} - The updated theme that has been applied.
@@ -419,7 +419,7 @@ class Theme {
  * console.log(themeRef.current.name); // Logs the name of the updated theme
  * ```
  */
-export function updateTheme(theme: ITheme, trigger: boolean = false): IThemeManager {
+export function updateTheme(theme: Partial<ITheme>, trigger: boolean = false): IThemeManager {
     // Save the theme name in the session
     Session.set("theme", theme.name);
     // Update the theme reference

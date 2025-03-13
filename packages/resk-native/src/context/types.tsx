@@ -39,7 +39,7 @@ import { IAuthProviderProps } from "@auth/types";
  */
 export type IReskNativeProviderProps = {
     children?: React.ReactNode;
-    theme?: ITheme;
+    theme?: Partial<ITheme>;
     breakpoints?: IBreakpoints;
     drawerNavigationViewProps?: Omit<IDrawerNavigationViewProps, 'drawerState'>;
     /***

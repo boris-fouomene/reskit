@@ -7,24 +7,43 @@ import Label from "@components/Label";
 import Theme, { useTheme } from "@theme/index";
 import { StyleSheet } from "react-native";
 import { Portal } from "@components/Portal";
-import { IReactComponent } from "@src/types";
 
-class AuthLogin{
-  static metaData= Symbol("authLogin-metaadata");
-  static getComponent(){
-    const component = Reflect.getMetadata(AuthLogin.metaData,AuthLogin);
-      if(component){
-          return component;
-      }
-      return null;
+class AuthLogin {
+  /**
+   * A unique symbol used to store the login component metadata.
+   */
+  static metaData = Symbol("authLogin-metaadata");
+  /**
+  * Retrieves the login component metadata.
+  * @returns The login component metadata, or null if not found.
+  */
+  static getComponent() {
+    const component = Reflect.getMetadata(AuthLogin.metaData, AuthLogin);
+    if (component) {
+      return component;
+    }
+    return null;
   }
 }
-export interface ILoginProps extends React.ComponentProps<any>{
-  signIn: (user: IAuthUser) => Promise<IAuthUser> 
+/**
+ * Interface for the login component props.
+ * @extends React.ComponentProps<any>
+ */
+export interface ILoginProps extends React.ComponentProps<any> {
+  /**
+   * A function to sign in the user.
+   * @param user The user object to sign in.
+   * @returns A promise that resolves with the signed-in user object.
+   */
+  signIn: (user: IAuthUser) => Promise<IAuthUser>
 }
 
+/**
+ * A Decorator function that attaches a login component to the application.
+ * @returns A function that takes a React component class as an argument representing the login component.
+ */
 export function AttachLoginComponent() {
-  return function (target: IReactComponent<ILoginProps>) {
+  return function (target: React.ComponentClass<ILoginProps>) {
     Reflect.defineMetadata(AuthLogin.metaData, target, AuthLogin);
   };
 }

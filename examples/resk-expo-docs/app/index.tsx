@@ -1,5 +1,5 @@
-import { TextInput, withAppBar, BottomSheet, Avatar,Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
-import { View, ScrollView,StyleSheet } from 'react-native'
+import { TextInput, withAppBar, BottomSheet, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
+import { View, ScrollView, StyleSheet } from 'react-native'
 import { IField } from "@resk/core";
 
 const index = withAppBar(() => {
@@ -9,7 +9,8 @@ const index = withAppBar(() => {
                 <Button>
                     Ripple Example
                 </Button>
-                <SheetExample/>
+                <Label fontVariant={"titleLarge"}>Label Example</Label>
+                <SheetExample />
 
                 <HStack style={[Theme.styles.m2]}>
                     <Badge colorScheme="primary">Primary</Badge>
@@ -319,40 +320,40 @@ const ModalExample = () => {
 }
 
 const SheetExample = () => {
-  return null;
+    return null;
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  bottomSheetContent: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  description: {
-    marginBottom: 20,
-  },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 16,
+    },
+    bottomSheetContent: {
+        padding: 16,
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 12,
+    },
+    description: {
+        marginBottom: 20,
+    },
 });
 
 
-function ModalContentExample(){
-    return           <Button mode="contained" rippleLocation="center"
-    left={({ textColor, context }) => {
-        return <Icon color={textColor} iconName="account-circle" />
-    }}
-    onPress={(event, { dialogContext }) => {
-        Dialog.Alert.open({
-            title: "Alert",
-            cancelButtonBefore: true,
-            message: `What is Lorem Ipsum?
+function ModalContentExample() {
+    return <Button mode="contained" rippleLocation="center"
+        left={({ textColor, context }) => {
+            return <Icon color={textColor} iconName="account-circle" />
+        }}
+        onPress={(event, { dialogContext }) => {
+            Dialog.Alert.open({
+                title: "Alert",
+                cancelButtonBefore: true,
+                message: `What is Lorem Ipsum?
 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 
 Where does it come from?
@@ -361,15 +362,15 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
 
             `,
-            onOk: () => {
-                Dialog.Alert.open({ title: "Etes vous sure de confirmer", message: "Voulez vous" });
-                return false;
-            }
-        })
-    }}
->
-    Open an Alert
-</Button>
+                onOk: () => {
+                    Dialog.Alert.open({ title: "Etes vous sure de confirmer", message: "Voulez vous" });
+                    return false;
+                }
+            })
+        }}
+    >
+        Open an Alert
+    </Button>
 }
 
 export default index;// withAuth(index);

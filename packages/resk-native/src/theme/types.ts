@@ -306,10 +306,11 @@ export interface ITheme {
  * };
  * ```
  */
-export type IThemeColorSheme = { color?: string; backgroundColor?: string };
+export interface IThemeColorSheme { color?: string; backgroundColor?: string };
 
 
 /**
+ * @interface IThemeFonts
  * Interface representing a theme font configuration object.
  * 
  * This interface defines a record of theme fonts, where each key is a font style and the value is an TextStyle object.
@@ -340,7 +341,7 @@ export type IThemeColorSheme = { color?: string; backgroundColor?: string };
  * };
  * ```
  */
-export interface IThemeFonts extends Record<string, TextStyle> {
+export interface IThemeFonts {
   /**
    * The regular font style configuration.
    * 
@@ -711,4 +712,4 @@ export interface IThemeFontsWithVariants extends IThemeFonts {
  * const fontVariant: IThemeFontVariant = 'headlineLarge';
  * ```
  */
-export type IThemeFontVariant = Omit<keyof IThemeFontsWithVariants, keyof IThemeFonts>;
+export type IThemeFontVariant = keyof IThemeFontsWithVariants;

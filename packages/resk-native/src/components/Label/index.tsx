@@ -113,7 +113,7 @@ const Label = React.forwardRef(({
         r1,
         disabled && Theme.styles.disabled,
         theme.fonts.regular,
-        isNonNullString(fontVariant) && theme.fonts[fontVariant],
+        isNonNullString(fontVariant) && theme.fonts[fontVariant as keyof typeof theme.fonts],
         style,
         fontSize && typeof fontSize === "number" ? { fontSize } : null,
       ]}

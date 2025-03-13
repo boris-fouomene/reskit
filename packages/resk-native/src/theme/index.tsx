@@ -203,7 +203,7 @@ export function createTheme(theme: Partial<ITheme>, options?: { maxElevation?: n
                     variant.fontWeight = cFont.fontWeight;
                 }
             }
-            fonts[variant] = extendObj({}, variant, fonts[variant]);
+            fonts[key as keyof typeof fonts] = extendObj({}, variant, fonts[key as keyof typeof fonts]);
         }
     });
     return {

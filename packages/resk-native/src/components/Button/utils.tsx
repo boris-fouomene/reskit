@@ -64,12 +64,14 @@ export const getButtonColors = ({
   customTextColor,
   dark,
   theme,
+  hoverColor: customHoverColor
 }: {
   mode: IButtonMode;
   customBackgroundColor?: string;
   customTextColor?: string;
   dark?: boolean;
   theme: ITheme;
+  hoverColor?: string;
 }) => {
   dark = dark !== undefined ? dark : !!theme.dark;
   const isMode = (modeToCompare: IButtonMode) => {
@@ -92,9 +94,9 @@ export const getButtonColors = ({
   const borderColor = getButtonBorderColor({ isMode, theme });
 
   const borderWidth = getButtonBorderWidth({ isMode, theme });
-
   return {
     backgroundColor,
+    hoverColor: Colors.isValid(customHoverColor) ? customHoverColor : backgroundColor == "transparent" ? "transparent" : ((!theme.dark ? Colors.darken(backgroundColor as string, 0.5) : Colors.lighten(backgroundColor as string, 0.5))),
     borderColor,
     textColor,
     borderWidth,

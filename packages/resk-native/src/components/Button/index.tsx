@@ -158,6 +158,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     spaceBetweenContent,
     isExpandable,
     formName,
+    hoverColor: customHoverColor,
     resourceName,
     perm,
     ...rest
@@ -231,16 +232,17 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
         (style) => style.startsWith('border') && style.endsWith('Radius')
     );
     borderRadius = typeof borderRadiusStyles?.borderRadius === "number" ? borderRadiusStyles.borderRadius : typeof (borderRadius) === 'number' ? borderRadius : 1 * (roundness || 8);
-    const { backgroundColor, borderColor, textColor, borderWidth } =
+    const { backgroundColor, hoverColor, borderColor, textColor, borderWidth } =
         getButtonColors({
             customBackgroundColor: Colors.isValid(customBackgroundColor) ? customBackgroundColor : colorSchemeBackgroundColor,
             customTextColor: Colors.isValid(customTextColor) ? customTextColor : colorSchemeColor,
             theme,
             mode,
+            hoverColor: customHoverColor,
             dark,
         });
 
-    const rippleColor = Colors.isValid(customRippleColor) ? customRippleColor : Colors.setAlpha(backgroundColor || textColor, 0.12);
+    const rippleColor = Colors.isValid(customRippleColor) ? customRippleColor : Colors.setAlpha(backgroundColor !== "transparent" && backgroundColor || textColor, 0.12);
     const touchableStyle = {
         ...borderRadiusStyles,
         borderRadius,
@@ -315,6 +317,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
         >
             <Tooltip
                 as={TouchableRipple}
+                hoverColor={hoverColor}
                 borderless
                 accessibilityLabel={accessibilityLabel}
                 accessibilityHint={accessibilityHint}

@@ -99,7 +99,7 @@ export interface ITouchableRippleProps extends PressableProps {
     shadowEnabled?: boolean;
 
     /***
-     * The opacity of the ripple effect. Default is 0.8
+     * The opacity of the ripple effect. Default is 0.7
      */
     rippleOpacity?: number;
 }

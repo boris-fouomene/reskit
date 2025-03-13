@@ -129,7 +129,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     maskDuration = typeof maskDuration == "number" && maskDuration > 0 ? maskDuration : 200;
     shadowEnabled = typeof shadowEnabled == "boolean" ? shadowEnabled : false;
     rippleLocation = typeof rippleLocation == "string" ? rippleLocation : "tapLocation";
-    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.8;
+    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.7;
     const animatedOpacityRef = useRef<Animated.Value>(new Animated.Value(0.1));
     const animatedRippleScaleRef = useRef<Animated.Value>(new Animated.Value(0));
     const [rippleState, setRippleState] = useStateCallback<ITouchableRippleState>({

@@ -25,10 +25,16 @@ export const isReactClassComponent = function isReactClassComponent(component: a
 export const isReactFunctionComponent = function isReactFunctionComponent(component: any) {
     if (typeof component !== 'function' || !component) return false;
     const str = String(component);
+    if (typeof component === 'object') {
+        return component?.$$typeof === Symbol.for('react.forward_ref') || component?.$$typeof === Symbol.for('react.memo');
+    }
     return typeof component === 'function' && (
         str.includes('return React.createElement')
         || str.includes('children: (0, _jsxRuntime.jsxs)')
         || component.toString().includes('Component(props)')
+        || str.includes('return React.createElement')
+        || str.includes('return _jsx') ||
+        str.includes('return jsx')
     )
 }
 

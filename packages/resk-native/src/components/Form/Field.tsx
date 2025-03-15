@@ -1,5 +1,5 @@
 import "./types";
-import { getTextContent, isReactClassComponent, ObservableComponent } from "@utils/index";
+import { getTextContent, ObservableComponent } from "@utils/index";
 import { defaultStr, extendObj, areEquals, IFieldType, IField, isEmpty, isNonNullString, isObj, IValidatorRule, stringify, Validator, Logger, InputFormatter } from "@resk/core";
 import { IForm, IFormData, IFormEvent, IFormField, IFormFieldOnChangeOptions, IFormFieldState, IFormFieldValidatorOptions } from "./types";
 import React, { ReactNode } from "react";
@@ -1179,7 +1179,7 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      * Field.registerComponent("text", MyTextField);
      */
     static registerComponent(type: IFieldType, component: typeof Field) {
-        if (!isNonNullString(type) || !isReactClassComponent(component)) return;
+        if (!isNonNullString(type) || typeof (component) !== "function") return;
         const components = Field.getRegisteredComponents();
         components[type] = component;
         Reflect.defineMetadata(Field.FIELDS_COMPONENTS_METADATA_KEY, components, Field);

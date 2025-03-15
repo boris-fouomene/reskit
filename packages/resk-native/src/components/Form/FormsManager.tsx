@@ -1,7 +1,6 @@
 import { IDict, IField, IFieldType, isNonNullString, isObj, isObservable, observableFactory } from "@resk/core";
 import { IForm, IFormAction, IFormCallbackOptions, IFormData, IFormField, IFormFields, IFormGetDataOptions, IFormManagerEvent } from "./types";
 import "./types/augmented";
-import { isReactClassComponent } from "@utils/isComponent";
 /**
  * @group Forms
  * Manages the lifecycle and state of forms within the application.
@@ -54,9 +53,8 @@ export class FormsManager {
      * const isField = FormsManager.isField(fieldInstance); // true
      */
     static isField(field: any): field is IFormField {
-        if (!isReactClassComponent(field)) return false;
-        if (typeof this.isFieldInstance == "function" && this.isFieldInstance(field)) {
-            return true;
+        if (typeof FormsManager.isFieldInstance == "function") {
+            return !!FormsManager.isFieldInstance(field);
         }
         return isObservable(field) && typeof field?.getName === "function" && typeof field?.getForm === "function" && typeof field?.isValid === "function";
     }
@@ -71,10 +69,10 @@ export class FormsManager {
      * const isForm = FormsManager.isForm(formInstance); // true
      */
     static isForm(form: any): boolean {
-        if (typeof this.isFormInstance == "function" && this.isFormInstance(form)) {
-            return true;
+        if (typeof FormsManager.isFormInstance == "function") {
+            return !!FormsManager.isFormInstance(form);
         }
-        return isReactClassComponent(form) && isObservable(form) && typeof form?.getName === "function" && typeof form?.isValid === "function" && typeof form?.getData === "function" && typeof form?.getFields === "function";
+        return isObservable(form) && typeof form?.getName === "function" && typeof form?.isValid === "function" && typeof form?.getData === "function" && typeof form?.getFields === "function";
     }
     /**
      * Checks if the specified form is valid.

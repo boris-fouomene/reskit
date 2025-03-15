@@ -13,7 +13,7 @@ export * from "./Notify";
  * 
  * @example
  * Notify.success("Operation completed successfully", "Success");
- * Notify.error("An error occurred", "Error", { interval: 10000 });
+ * Notify.error("An error occurred", "Error", { duration: 10000 });
  */
 export class Notify {
     private static _notifyRef: { current: _Notifiy | null } = { current: null };
@@ -93,14 +93,14 @@ export class Notify {
                 title = i18n.t("notify.infoTitle");
             } else title = String(type).toUpperCase()
         }
-        let interval = settings.interval || defInterval;
-        if (Math.abs(interval) <= 200) {
+        let duration = settings.duration || defInterval;
+        if (Math.abs(duration) <= 200) {
             const ccc = getTextContent(message);
             if (ccc) {
-                interval = Math.max(defInterval, (ccc.length * 100));
+                duration = Math.max(defInterval, (ccc.length * 100));
             }
         }
-        const options = { ...settings, type, title, message, interval } as INotifyOptions;
+        const options = { ...settings, type, title, message, duration } as INotifyOptions;
         const { onClose } = options;
         options.onClose = (...args) => {
             if (typeof onClose == "function") return onClose(...args);
@@ -112,7 +112,7 @@ export class Notify {
      *  Displays an error notification with the provided message and title.
         @param message - The message to display in the notification. Can be a string or an INotifyOptions object.
         @param title - The title to display in the notification. Can be a string or an INotifyMessage object.
-        @param settings - Additional options to configure the notification, such as the type, interval, and onClose callback.
+        @param settings - Additional options to configure the notification, such as the type, duration, and onClose callback.
         @returns The result of calling the `notify` method with the provided parameters.
      */
     static error(message: INotifyMessage | INotifyOptions, title?: INotifyMessage, settings?: INotifyOptions) {
@@ -123,7 +123,7 @@ export class Notify {
      * Displays a success notification with the provided message and title.
      * @param message - The message to display in the notification. Can be a string or an INotifyOptions object.
      * @param title - The title to display in the notification. Can be a string or an INotifyMessage object.
-     * @param settings - Additional options to configure the notification, such as the type, interval, and onClose callback.
+     * @param settings - Additional options to configure the notification, such as the type, duration, and onClose callback.
      * @returns The result of calling the `notify` method with the provided parameters.
      */
     static success(message: INotifyMessage | INotifyOptions, title?: INotifyMessage, settings?: INotifyOptions) {
@@ -133,7 +133,7 @@ export class Notify {
      * Displays an informational notification with the provided message and title.
      * @param message - The message to display in the notification. Can be a string or an INotifyOptions object.
      * @param title - The title to display in the notification. Can be a string or an INotifyMessage object.
-     * @param settings - Additional options to configure the notification, such as the type, interval, and onClose callback.
+     * @param settings - Additional options to configure the notification, such as the type, duration, and onClose callback.
      * @returns The result of calling the `notify` method with the provided parameters.
      */
     static info(message: INotifyMessage | INotifyOptions, title?: INotifyMessage, settings?: INotifyOptions) {
@@ -143,7 +143,7 @@ export class Notify {
      * Displays a warning notification with the provided message and title.
      * @param message - The message to display in the notification. Can be a string or an INotifyOptions object.
      * @param title - The title to display in the notification. Can be a string or an INotifyMessage object.
-     * @param settings - Additional options to configure the notification, such as the type, interval, and onClose callback.
+     * @param settings - Additional options to configure the notification, such as the type, duration, and onClose callback.
      * @returns The result of calling the `notify` method with the provided parameters. 
      */
     static warning(message: INotifyMessage | INotifyOptions, title?: INotifyMessage, settings?: INotifyOptions) {

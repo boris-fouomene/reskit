@@ -82,7 +82,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
       type: undefined,
       message: "",
       title: "",
-      interval: props.closeInterval,
+      duration: props.closeInterval,
       action: undefined,
     };
     this.panResponder = this.getPanResponder();
@@ -144,22 +144,22 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
       return error?.toString();
     }
   };
-  async alert({ type = undefined, title = "", message = "", interval, ...rest }: INotifyOptions) {
+  async alert({ type = undefined, title = "", message = "", duration, ...rest }: INotifyOptions) {
     const { closeInterval } = this.props;
     const data = {
       ...rest,
       type,
       title: this.getStringValue(title),
       message: this.getStringValue(message),
-      interval: closeInterval,
+      duration: closeInterval,
     };
     //previous queue data are same to new so do nothing
     if (compareQueues(data, this.queue.firstItem)) {
       return;
     }
-    // closeInterval prop is overridden if interval is provided
-    if (interval && typeof interval === "number") {
-      data.interval = interval;
+    // closeInterval prop is overridden if duration is provided
+    if (duration && typeof duration === "number") {
+      data.duration = duration;
     }
     this.queue.enqueue(data);
     // start processing queue when it has at least one
@@ -192,9 +192,9 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
     const position = this.isKeyboardOpen() ? "top" : data.position;
     this.setState({ isOpen: true, position }, () => {
       this.animate(1, 450, () => {
-        const interval = data.interval || 5000;
-        if (interval > 0) {
-          this.closeAutomatic(interval);
+        const duration = data.duration || 5000;
+        if (duration > 0) {
+          this.closeAutomatic(duration);
         }
       });
     });
@@ -205,11 +205,11 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
       this.close(action, onDone);
     }
   };
-  closeAutomatic = (interval: number) => {
+  closeAutomatic = (duration: number) => {
     this.clearCloseTimeoutID();
     this.closeTimeoutID = setTimeout(() => {
       this.close("automatic");
-    }, interval);
+    }, duration);
   };
   getRenderedCallbackArgs(): INotifyRenderCallback {
     return {
@@ -334,16 +334,14 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
   }
   getStyleForType = (type: INotifyType | undefined) => {
     switch (type) {
-      case "info":
-        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getInfoColor(), borderColor: this.getInfoColor() }];
       case "warn":
-        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getWarnColor(), borderColor: this.getWarnColor() }];
+        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getWarnColor(), borderColor: this.getWarnColor() }, StyleSheet.flatten(this.props.style)];
       case "error":
-        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getErrorColor(), borderColor: this.getErrorColor() }];
+        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getErrorColor(), borderColor: this.getErrorColor() }, StyleSheet.flatten(this.props.style)];
       case "success":
-        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getSuccessColor(), borderColor: this.getSuccessColor() }];
+        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getSuccessColor(), borderColor: this.getSuccessColor() }, StyleSheet.flatten(this.props.style)];
       default:
-        return [StyleSheet.flatten(styles.mainContainer), StyleSheet.flatten(this.props.style), { borderColor: Theme.colors.outline }];
+        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getInfoColor(), borderColor: this.getInfoColor() }, StyleSheet.flatten(this.props.style)];
     }
   };
   getBackgroundColorForType = (type: INotifyType | undefined) => {
@@ -387,33 +385,33 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
   };
   _renderTitle = () => {
     const options = this.getRenderedCallbackArgs();
-    if (this.alertData.renderTitle) {
+    if (typeof this.alertData.renderTitle == "function") {
       return this.alertData.renderTitle(options);
     }
-    if (this.props.renderTitle) {
+    if (typeof this.props.renderTitle == "function") {
       return this.props.renderTitle(options);
     }
     const titleProps = this.alertData.titleProps || this.props.titleProps || {};
     return (
-      <Label testID={this.getTestID("Title")} numberOfLines={2} {...titleProps} style={[styles.title, { color: this.getTextColorForType(this.alertData?.type) }, titleProps.style]}>
+      <Label testID={this.getTestID("title")} numberOfLines={2} {...titleProps} style={[styles.title, { color: this.getTextColorForType(this.alertData?.type) }, titleProps.style]}>
         {this.alertData.title}
       </Label>
     );
   };
   getTestID(testID?: string) {
-    return defaultStr(this.props.testID, "resk-notify") + (testID ? "_" + testID : "");
+    return defaultStr(this.props.testID, "resk-notify") + (testID ? "-" + testID : "");
   }
   _renderMessage = () => {
     const options = this.getRenderedCallbackArgs();
-    if (this.alertData.renderMessage) {
+    if (typeof this.alertData.renderMessage == "function") {
       return this.alertData.renderMessage(options);
     }
-    if (this.props.renderMessage) {
+    if (typeof this.props.renderMessage == "function") {
       return this.props.renderMessage(options);
     }
     const messageProps = this.alertData.messageProps || this.props.messageProps || {};
     return (
-      <Label testID={this.getTestID("RNNotifyMessage")} numberOfLines={10} {...messageProps} style={[styles.message, { color: this.getTextColorForType(this.alertData?.type) }, messageProps.style]}>
+      <Label testID={this.getTestID("notify-message")} numberOfLines={10} {...messageProps} style={[styles.message, { color: this.getTextColorForType(this.alertData?.type) }, messageProps.style]}>
         {this.alertData.message}
       </Label>
     );
@@ -426,10 +424,10 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
       return null;
     }
     const options = this.getRenderedCallbackArgs();
-    if (this.alertData?.renderCancel) {
+    if (typeof this.alertData?.renderCancel == "function") {
       return this.alertData.renderCancel(options);
     }
-    if (this.props.renderCancel) {
+    if (typeof this.props.renderCancel == "function") {
       return this.props.renderCancel(options);
     }
     return (
@@ -442,7 +440,11 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
    * retourne l'icon principal du composant de notification
    */
   _renderIcon(): ReactNode {
-    if (this.props.renderIcon) {
+    const options = this.getRenderedCallbackArgs();
+    if (typeof this.alertData.renderIcon == "function") {
+      return this.alertData.renderIcon(options);
+    }
+    if (typeof this.props.renderIcon == "function") {
       return this.props.renderIcon(this.getRenderedCallbackArgs());
     }
     const iconProps = this.alertData.iconProps || this.props.iconProps || {};
@@ -472,7 +474,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
     if (!isOpen) {
       return null;
     }
-    const { elevation, wrapperProps, tapToCloseEnabled, testID: customTestId, accessible, startDelta, endDelta, translucent, showCancel } = this.props;
+    const { elevation, containerProps, tapToCloseEnabled, testID: customTestId, accessible, startDelta, endDelta, translucent, showCancel } = this.props;
     const testID = defaultStr(customTestId, "resk-notify");
     const { animationValue, bottomValue, height } = this.state;
     const { type } = this.alertData;
@@ -496,7 +498,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
       elevation: elevation,
     };
     const onPress = !tapToCloseEnabled ? null : () => this.closeAction("tap");
-    const wrapProps = wrapperProps || {};
+    const wrapProps = Object.assign({}, containerProps);
     const breakpointStyle = ({ isMobile, isTablet, width }: IDimensions) => {
       return {
         width: isMobile ? (90 * width) / 100 : isTablet ? Math.max((70 * width) / 100, 350) : 500,
@@ -504,12 +506,12 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
     };
     return (
       <Portal>
-        <Animated.View ref={(ref) => (this.mainView = ref)} {...this.panResponder.panHandlers} testID={testID + "_AnimatedView"} {...wrapProps} style={[wrapperAnimStyle, (wrapProps as any).style]}>
-          <Surface elevation={5} style={style} testID={testID + "_ContentContainer"} breakpointStyle={breakpointStyle}>
+        <Animated.View ref={(ref) => (this.mainView = ref)} {...this.panResponder.panHandlers} testID={testID + "-animated-view"} {...wrapProps} style={[wrapperAnimStyle, (wrapProps as any).style]}>
+          <Surface elevation={5} style={style} testID={testID + "content-container"} breakpointStyle={breakpointStyle}>
             <Pressable onPress={onPress} testID={testID} style={[styles.main]} disabled={!tapToCloseEnabled} onLayout={(event) => this._onLayoutEvent(event)} accessible={accessible}>
-              <View testID={testID + "_ContentWrapper"} style={[styles.contentContainer]}>
+              <View testID={testID + "-content-container"} style={[styles.contentContainer]}>
                 {this._renderIcon()}
-                <View testID={testID + "_Content"} breakpointStyle={breakpointStyle} style={styles.content}>
+                <View testID={testID + "-content"} breakpointStyle={breakpointStyle} style={styles.content}>
                   {this._renderTitle()}
                   {this._renderMessage()}
                 </View>
@@ -573,12 +575,12 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
  *     position: "top"
  *     ```
  * 
- * - **interval**: The duration (in milliseconds) for which the notification should be displayed 
+ * - **duration**: The duration (in milliseconds) for which the notification should be displayed 
  *   before automatically dismissing. If not specified, the default behavior will apply.
  *   - **Type**: `number`
  *   - **Example**: 
  *     ```typescript
- *     interval: 5000 // Notification will be displayed for 5 seconds
+ *     duration: 5000 // Notification will be displayed for 5 seconds
  *     ```
  * 
  * ### Example Usage:
@@ -591,7 +593,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
  *     type: "info",
  *     action: "automatic",
  *     position: "top",
- *     interval: 3000 // Notification will disappear after 3 seconds
+ *     duration: 3000 // Notification will disappear after 3 seconds
  * };
  * 
  * // Function to display the notification
@@ -601,7 +603,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
  * ### Notes:
  * - Ensure that the `type` property is set appropriately to provide users with visual cues about 
  *   the nature of the notification.
- * - The `interval` property can be omitted if you want the notification to remain until the user 
+ * - The `duration` property can be omitted if you want the notification to remain until the user 
  *   interacts with it.
  */
 export interface INotifyOptions extends INotifyRenderOptions {
@@ -610,7 +612,7 @@ export interface INotifyOptions extends INotifyRenderOptions {
   type?: INotifyType;
   action?: INotifyAction;
   position?: INotifyPostion;
-  interval?: number;
+  duration?: number;
 };
 
 /**
@@ -753,12 +755,12 @@ export interface INotifyRenderCallback {
  *     renderIcon: (options) => <Icon name={options.data.type === 'error' ? 'error' : 'info'} />
  *     ```
  * 
- * - **wrapperProps**: Properties for the animated wrapper component that displays the notification. 
+ * - **containerProps**: Properties for the animated container component that displays the notification. 
  *   This allows for customization of the animation behavior and style.
  *   - **Type**: `Animated.AnimatedProps<IStyle>`
  *   - **Example**: 
  *     ```typescript
- *     wrapperProps: { style: { opacity: 1 } }
+ *     containerProps: { style: { opacity: 1 } }
  *     ```
  * 
  * - **titleProps**: Properties for customizing the title of the notification. This can include 
@@ -803,16 +805,16 @@ export interface INotifyRenderCallback {
 
 */
 export interface INotifyRenderOptions {
-  renderCancel?: (options: INotifyRenderCallback) => ReactNode; //permet de render l'icone cancel
-  renderTitle?: (options: INotifyRenderCallback) => ReactNode; //permet de render le titre de la notification
-  renderMessage?: (options: INotifyRenderCallback) => ReactNode; //permet de render le contenu de la notification de la notification
-  renderIcon?: (options: INotifyRenderCallback) => ReactNode; //render l'icone principal rendu par le compat
-  wrapperProps?: Animated.AnimatedProps<IStyle>; //les props du composant animation, composant wrapper à l'affichage de l'animation
-  titleProps?: ILabelProps; //les props du titre de la notification
-  messageProps?: ILabelProps; //les props du contenu
-  iconProps?: IFontIconProps; //les props du composant icon
-  onClose?: (options: INotifyRenderCallback) => any;
-  onCancel?: (options: INotifyRenderCallback) => any;
+  renderCancel?: (options: INotifyRenderCallback) => ReactNode; // Renders the cancel icon
+  renderTitle?: (options: INotifyRenderCallback) => ReactNode; // Renders the notification title
+  renderMessage?: (options: INotifyRenderCallback) => ReactNode; // Renders the notification content
+  renderIcon?: (options: INotifyRenderCallback) => ReactNode; // Renders the main icon displayed by the component
+  containerProps?: Omit<Animated.AnimatedProps<IStyle>, "children">; // Props for the animation component, which wraps the displayed animation
+  titleProps?: ILabelProps; // Props for the notification title
+  messageProps?: ILabelProps; // Props for the notification content
+  iconProps?: IFontIconProps; // Props for the icon component
+  onClose?: (options: INotifyRenderCallback) => any; // Callback when closing the notification
+  onCancel?: (options: INotifyRenderCallback) => any; // Callback when canceling the notification
 }
 /**
  * * @type INotifyProps

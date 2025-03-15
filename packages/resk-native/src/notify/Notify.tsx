@@ -333,16 +333,8 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
     return this.getValidColor(this.props.errorTextColor, Theme.colors.onError);
   }
   getStyleForType = (type: INotifyType | undefined) => {
-    switch (type) {
-      case "warn":
-        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getWarnColor(), borderColor: this.getWarnColor() }, StyleSheet.flatten(this.props.style)];
-      case "error":
-        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getErrorColor(), borderColor: this.getErrorColor() }, StyleSheet.flatten(this.props.style)];
-      case "success":
-        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getSuccessColor(), borderColor: this.getSuccessColor() }, StyleSheet.flatten(this.props.style)];
-      default:
-        return [StyleSheet.flatten(styles.mainContainer), { backgroundColor: this.getInfoColor(), borderColor: this.getInfoColor() }, StyleSheet.flatten(this.props.style)];
-    }
+    const backgroundColor = this.getBackgroundColorForType(type);
+    return [StyleSheet.flatten(styles.mainContainer), { backgroundColor, borderColor: backgroundColor }, StyleSheet.flatten(this.props.style)];
   };
   getBackgroundColorForType = (type: INotifyType | undefined) => {
     switch (type) {
@@ -478,7 +470,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
     const testID = defaultStr(customTestId, "resk-notify");
     const { animationValue, bottomValue, height } = this.state;
     const { type } = this.alertData;
-    const style: IStyle = (IS_ANDROID && translucent) ? [this.getStyleForType(type), { paddingTop: StatusBar.currentHeight }, styles.border] : this.getStyleForType(type);
+    const style = [this.getStyleForType(type), (IS_ANDROID && translucent) ? { paddingTop: StatusBar.currentHeight } : undefined, translucent && styles.border];
     const outputRange = this.getOutputRange(height, startDelta || -100, endDelta || 0);
     const position = (this.state.position || "top").toLowerCase();
     const isTopPosition = position === "top";

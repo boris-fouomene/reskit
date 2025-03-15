@@ -365,37 +365,37 @@ const sanitizeTheme = (theme: IThemeManager) => {
 class Theme {
     private static defaultTheme: IThemeManager = createTheme(getDefaultTheme());
     static setTheme(theme: IThemeManager) {
-        this.defaultTheme = theme;
+        Theme.defaultTheme = theme;
     }
     static get dark() {
-        return this.defaultTheme?.dark; // Check if the theme is dark
+        return Theme.defaultTheme?.dark; // Check if the theme is dark
     }
     static getName() {
-        return this.defaultTheme?.name; // Get the theme name
+        return Theme.defaultTheme?.name; // Get the theme name
     }
     static get colors() {
-        return this.defaultTheme?.colors; // Access the color palette
+        return Theme.defaultTheme?.colors; // Access the color palette
     }
     static getColor(color?: IThemeColorsTokenName, ...defaultColors: any[]): string | undefined {
-        return this.defaultTheme?.getColor(color, ...defaultColors);
+        return Theme.defaultTheme?.getColor(color, ...defaultColors);
     }
     static getColorScheme(colorSheme?: IThemeColorsTokenName): IThemeColorSheme {
-        return this.defaultTheme?.getColorScheme(colorSheme);
+        return Theme.defaultTheme?.getColorScheme(colorSheme);
     }
     static get styles() {
-        return this.defaultTheme?.styles;
+        return Theme.defaultTheme?.styles;
     }
     static get elevations() {
-        return this.defaultTheme?.elevations;
+        return Theme.defaultTheme?.elevations;
     }
     static get customCSS() {
-        return this.defaultTheme?.customCSS;
+        return Theme.defaultTheme?.customCSS;
     }
     static get roundness() {
-        return this.defaultTheme?.roundness;
+        return Theme.defaultTheme?.roundness;
     }
     static get get() {
-        return this.defaultTheme;
+        return Theme.defaultTheme;
     }
     static get addEventListener() {
         return addEventListener;

@@ -194,7 +194,10 @@ export function createTheme(theme: Partial<ITheme>, options?: { maxElevation?: n
         const variant = textStylesVariants[key as any];
         if (variant) {
             const str = key.toLowerCase();
-            const cFont = (str.startsWith("label") || str.startsWith("title") || str.endsWith("medium")) ? fonts.medium : fonts.regular;
+            let cFont = fonts.regular;
+            if (str.startsWith("display") || str.startsWith("headline") || str.startsWith("title")) {
+                cFont = fonts.medium;
+            }
             if (cFont) {
                 if (cFont.fontFamily && !variant.fontFamily) {
                     variant.fontFamily = cFont.fontFamily;

@@ -350,15 +350,22 @@ const sanitizeTheme = (theme: IThemeManager) => {
     theme.roundness = typeof theme.roundness == "number" ? theme.roundness : 8;
     theme.colors = Object.assign({}, theme.colors);
     const isDark = !!theme.dark;
+    theme.colors.background = Colors.isValid(theme.colors.background) ? theme.colors.background : (isDark ? "#0D1A27" : "#F6F7F9");
+    theme.colors.onBackground = Colors.isValid(theme.colors.onBackground) ? theme.colors.onBackground : (isDark ? "#E6E1E5" : "#303741");
+    theme.colors.surface = Colors.isValid(theme.colors.surface) ? theme.colors.surface : (isDark ? "#0F1214" : "#FFFFFF");
+    theme.colors.onSurface = Colors.isValid(theme.colors.onSurface) ? theme.colors.onSurface : (isDark ? "#1C1B1F" : "#E6E1E5");
     theme.colors.placeholder = theme.colors.placeholder || Colors.setAlpha(isDark ? "white" : "black", 0.5);
-    theme.colors.text = theme.colors.text || theme.colors.onSurface;
+    theme.colors.text = Colors.isValid(theme.colors.text) ? theme.colors.text : theme.colors.onSurface;
     theme.colors.backdrop = Colors.isValid(theme.colors.backdrop) ? theme.colors.backdrop : Colors.setAlpha("rgba(50, 47, 55, 1)", 0.4) as string;
-    theme.colors.info = Colors.isValid(theme.colors.info) ? theme.colors.info : "#2B73B6";
-    theme.colors.onInfo = Colors.isValid(theme.colors.onInfo) ? theme.colors.onInfo : "white";
-    theme.colors.success = Colors.isValid(theme.colors.success) ? theme.colors.success : "#5EBA6A";
-    theme.colors.onSuccess = Colors.isValid(theme.colors.onSuccess) ? theme.colors.onSuccess : "white";
-    theme.colors.warning = Colors.isValid(theme.colors.warning) ? theme.colors.warning : (isDark ? "#FFB547" : "#BAAB5E");
-    theme.colors.onWarning = Colors.isValid(theme.colors.onWarning) ? theme.colors.onWarning : "black";
+    theme.colors.info = Colors.isValid(theme.colors.info) ? theme.colors.info : theme.dark ? "#90CAF9" : "#2196F3";
+    theme.colors.onInfo = Colors.isValid(theme.colors.onInfo) ? theme.colors.onInfo : theme.dark ? "#0D47A1" : "#FFFFFF";
+    theme.colors.success = Colors.isValid(theme.colors.success) ? theme.colors.success : (isDark ? "#A5D6A7" : "#4CAF50");
+    theme.colors.onSuccess = Colors.isValid(theme.colors.onSuccess) ? theme.colors.onSuccess : (isDark ? "#1B5E20" : "#FFFFFF");
+    theme.colors.warning = Colors.isValid(theme.colors.warning) ? theme.colors.warning : (isDark ? "#FFB74D" : "#FF9800");
+    theme.colors.onWarning = Colors.isValid(theme.colors.onWarning) ? theme.colors.onWarning : (isDark ? "#E65100" : "#FFFFFF");
+    theme.colors.error = Colors.isValid(theme.colors.error) ? theme.colors.error : theme.dark ? "#F2B8B5" : "#B3261E";
+    theme.colors.onError = Colors.isValid(theme.colors.onError) ? theme.colors.onError : theme.dark ? "#601410" : "#FFFFFF";
+    theme.colors.errorContainer = Colors.isValid(theme.colors.errorContainer) ? theme.colors.errorContainer : theme.dark ? "#8C1D18" : "#F9DEDC";
     return theme;
 }
 

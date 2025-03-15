@@ -157,7 +157,7 @@ const isThemeManager = (theme: any) => {
  *     primary: "#6200ea",
  *     onPrimary: "#ffffff",
  *     surface: "#f5f5f5",
- *     onSurface: "#000000",
+ *     onSurface: "#272727",
  *     secondary: "#03dac6",
  *   },
  * };
@@ -262,7 +262,7 @@ export function createTheme(theme: Partial<ITheme>, options?: { maxElevation?: n
          * // Returns: { color: "#ffffff", backgroundColor: "#6200ea" }
          * 
          * const onSurfaceScheme = newTheme.getColorScheme("onSurface");
-         * // Returns: { color: "#000000", backgroundColor: "#f5f5f5" }
+         * // Returns: { color: "#272727", backgroundColor: "#f5f5f5" }
          * ```
          * 
          * @param {IThemeColorsTokenName} [colorSheme] - The color key to generate a scheme for.
@@ -354,9 +354,9 @@ const sanitizeTheme = (theme: IThemeManager) => {
     theme.colors = Object.assign({}, theme.colors);
     const isDark = !!theme.dark;
     theme.colors.background = Colors.isValid(theme.colors.background) ? theme.colors.background : (isDark ? "#0D1A27" : "#F6F7F9");
-    theme.colors.onBackground = Colors.isValid(theme.colors.onBackground) ? theme.colors.onBackground : (isDark ? "#E6E1E5" : "#303741");
+    theme.colors.onBackground = Colors.isValid(theme.colors.onBackground) ? theme.colors.onBackground : (isDark ? "#E6E1E5" : "#272727");
     theme.colors.surface = Colors.isValid(theme.colors.surface) ? theme.colors.surface : (isDark ? "#0F1214" : "#FFFFFF");
-    theme.colors.onSurface = Colors.isValid(theme.colors.onSurface) ? theme.colors.onSurface : (isDark ? "#1C1B1F" : "#E6E1E5");
+    theme.colors.onSurface = Colors.isValid(theme.colors.onSurface) ? theme.colors.onSurface : (isDark ? "#1C1B1F" : "#272727");
     theme.colors.placeholder = theme.colors.placeholder || Colors.setAlpha(isDark ? "white" : "black", 0.5);
     theme.colors.text = Colors.isValid(theme.colors.text) ? theme.colors.text : theme.colors.onSurface;
     theme.colors.backdrop = Colors.isValid(theme.colors.backdrop) ? theme.colors.backdrop : Colors.setAlpha("rgba(50, 47, 55, 1)", 0.4) as string;
@@ -545,7 +545,7 @@ export default Theme;
  *    )
  * });
  * const primaryColorScheme = theme.getColorScheme("primary"); // { color: "#FFFFFF", backgroundColor: "#6200EE" }
- * const primaryColor = theme.getColor("primary", "#000000"); // "#6200EE"
+ * const primaryColor = theme.getColor("primary", "#272727"); // "#6200EE"
  * const errorScheme = theme.getColorScheme("error"); // { color: "#B00020", backgroundColor: "#FFFFFF" }
  * 
 * @method addEventListener

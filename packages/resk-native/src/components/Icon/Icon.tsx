@@ -1,5 +1,5 @@
 import React, { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
-import { IFontIconProps, IGetIconOptions, IIconProps } from "./types";
+import { IFontIconName, IFontIconProps, IGetIconOptions, IIconProps } from "./types";
 import { Image, ImageStyle } from "react-native";
 import { isValidElement, pickTouchEventHandlers } from "@utils";
 import { isImageSource, isImageUrl } from "./utils";
@@ -114,7 +114,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, resizeM
             style={iconStyle as ImageStyle}
         /> : <FontIcon
             testID={testID}
-            name={iconName as IFontIconProps["name"]}
+            name={iconName as IFontIconName}
             size={size}
             {...props}
             color={color}
@@ -155,7 +155,7 @@ export function getIcon<T = any>({ icon, color: col2, IconComponent, theme, ...r
     if (isValidElement(iconSource)) return iconSource as ReactNode;
     if (!iconSource) return null;
     const isSource = isImageSource(iconSource) || isNonNullString(iconSource) && isImageUrl(iconSource as string);
-    const iconName = typeof iconSource == "string" && !isSource ? (iconSource as unknown as IFontIconProps["name"]) : undefined;
+    const iconName = typeof iconSource == "string" && !isSource ? (iconSource as unknown as IFontIconName) : undefined;
     const iconProps: IIconProps = {
         color
         , ...rest,

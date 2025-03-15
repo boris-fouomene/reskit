@@ -1,9 +1,9 @@
-import { IAppBarAction, IAppBarProps } from "@components/AppBar/types";
+import { IAppBarAction } from "@components/AppBar/types";
 import { ITextInputProps } from "@components/TextInput/types";
 import { ReactNode } from "react";
 import { IViewProps } from "@components/View";
 import { PressableProps, FlatListProps } from "react-native";
-import { IFontIconProps } from "@components/Icon";
+import { IFontIconName } from "@components/Icon";
 import { ObservableComponent } from "@utils/index";
 import { IMenuProps } from "@components/Menu";
 
@@ -763,7 +763,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
      * If not provided, the default icon will be used.
      * by default : it's value is 'check' form multiple selection and 'radiobox-marked' for single selection
      */
-    selectedIconName?: IFontIconProps["name"];
+    selectedIconName?: IFontIconName;
 
     /***
      * Props for the menu component that wraps the dropdown.

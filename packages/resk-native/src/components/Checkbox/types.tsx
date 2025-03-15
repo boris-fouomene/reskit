@@ -1,8 +1,8 @@
-import { IFontIconProps } from '@components/Icon/types';
+import { IFontIconName, IFontIconProps } from '@components/Icon/types';
 import { IToggleableProps } from '@components/Switch/types';
 import { ITooltipBaseProps } from '@components/Tooltip';
 import { SyntheticEvent } from 'react';
-import { ColorValue, GestureResponderEvent, NativeSyntheticEvent, PressableProps, TouchableOpacityProps, ViewProps } from "react-native";
+import { ColorValue, GestureResponderEvent, NativeSyntheticEvent, TouchableOpacityProps } from "react-native";
 
 /**
  * @interface ICheckboxProps
@@ -102,11 +102,11 @@ export type ICheckboxProps = IToggleableProps<GestureResponderEvent> & ITooltipB
     /**
      * The icon name to display when the checkbox is checked.
      */
-    checkedIcon?: IFontIconProps["name"];
+    checkedIcon?: IFontIconName;
     /***
      * The icon name to display when the checkbox is unchecked.
      */
-    uncheckedIcon?: IFontIconProps["name"];
+    uncheckedIcon?: IFontIconName;
 
     /***
      * The props of the icon to display as the checkbox.

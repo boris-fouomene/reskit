@@ -193,8 +193,7 @@ export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size'> & {
      * const nameAnt: IFontIconProps['name'] = "antd-home"; // From AntDesign
      * <FontIcon name={name} />;
      */
-    name: IFontIconMaterialCommunityName | IFontAntDesignName | IFontIconFeatherName
-    | IFontIconIoniconsName | IFontIconOcticonsName | IFontIconMaterialName | IFontIconMaterialCommunityName | IFontFoundationIconsName;
+    name: IFontIconName;
 
     /**
      * The icon size.
@@ -209,6 +208,32 @@ export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size'> & {
     size?: number;
 };
 
+/**
+ * @typedef IFontIconName - The name of the font icon.
+ * @see {@link IFontIconProps} for the `IFontIconProps` type.
+ * @see {@link IFontIconMaterialCommunityName} for the `IFontIconMaterialCommunityName` type.
+ * @see {@link IFontAntDesignName} for the `IFontAntDesignName` type.
+ * @see {@link IFontIconFeatherName} for the `IFontIconFeatherName` type.
+ * @see {@link IFontIconIoniconsName} for the `IFontIconIoniconsName` type.
+ * @see {@link IFontIconOcticonsName} for the `IFontIconOcticonsName` type.
+ * @see {@link IFontIconMaterialName} for the `IFontIconMaterialName` type.
+ * @see {@link IFontIconMaterialCommunityName} for the `IFontIconMaterialCommunityName` type.
+ * @see {@link IFontFoundationIconsName} for the `IFontFoundationIconsName` type.
+ * The name of the icon to display (including the prefix for icon set if necessary).
+ * 
+ * This property specifies which icon to render. It accepts a variety of icon
+ * names from different icon sets, ensuring that only valid names are passed.
+ * The name must correspond to one of the defined types for the various icon sets
+ * (e.g., MaterialCommunityIcons, AntDesign, etc.).
+ * 
+ * @example
+ * // Valid icon names
+ * const name: IFontIconProps['name'] = "home"; // From MaterialCommunityIcons
+ * const nameAnt: IFontIconProps['name'] = "antd-home"; // From AntDesign
+ * <FontIcon name={name} />;
+ */
+export type IFontIconName = IFontIconMaterialCommunityName | IFontAntDesignName | IFontIconFeatherName
+    | IFontIconIoniconsName | IFontIconOcticonsName | IFontIconMaterialName | IFontIconMaterialCommunityName | IFontFoundationIconsName;
 
 /**
  * Maps icon set prefixes to their respective icon set names.
@@ -408,7 +433,7 @@ export interface IFontIconsSetNamesToPrefix {
  * <Icon source={{uri:"...an icon uri"}} /> // Renders the predefined icon
  * <Icon source={customIcon} /> // Renders the custom image as an icon
  */
-export type IIconSourceBase = IFontIconProps["name"] | ImageSourcePropType;
+export type IIconSourceBase = IFontIconName | ImageSourcePropType;
 
 /***
  * /**
@@ -514,7 +539,7 @@ export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Image
      * MaterialCommunityIcons, AntDesign, Feather, Ionicons, Octicons, SimpleLineIcons, 
      * Zocial, MaterialIcons, and FoundationIcons.
      */
-    iconName?: IFontIconProps["name"];
+    iconName?: IFontIconName;
 };
 
 

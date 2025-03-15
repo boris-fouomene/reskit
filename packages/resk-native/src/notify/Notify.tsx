@@ -4,7 +4,7 @@ import { Portal } from "@components/Portal";
 import Theme, { Colors } from "@theme";
 import Platform from "@platform/index";
 import { getTextContent } from "@utils";
-import { IFontIconProps } from "@components/Icon/types";
+import { IFontIconName, IFontIconProps } from "@components/Icon/types";
 import Font from "@components/Icon/Font";
 import { INotifyState, INotifyMessage, INotifyPostion, INotifyAction, INotifyType } from "./types";
 import { ILabelProps } from "@components/Label";
@@ -440,7 +440,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
       return this.props.renderIcon(this.getRenderedCallbackArgs());
     }
     const iconProps = this.alertData.iconProps || this.props.iconProps || {};
-    let icon: IFontIconProps["name"] | undefined;
+    let icon: IFontIconName | undefined;
     switch (this.alertData.type) {
       case "info":
         icon = "material-info";

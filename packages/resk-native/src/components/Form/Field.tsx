@@ -220,7 +220,7 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      * @example
      * const field = this.getField("username"); // Retrieves the username field
      */
-    getField<T extends IFieldType = any>(fieldName: string): IFormField<T> | null {
+    getField<T extends IFieldType = IFieldType>(fieldName: string): IFormField<T> | null {
         return FormsManager.getField<T>(this.getFormName(), fieldName);
     }
     isEmail() {

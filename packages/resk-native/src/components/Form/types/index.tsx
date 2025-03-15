@@ -408,7 +408,7 @@ export interface IFormField<Type extends IFieldType = IFieldType> extends Observ
      * @example
      * const field = this.getField("username"); // Retrieves the username field
      */
-    getField<T extends IFieldType = any>(fieldName: string): IFormField<T> | null;
+    getField<T extends IFieldType = IFieldType>(fieldName: string): IFormField<T> | null;
     /**
      * Validates the field with the provided options.
      * 

@@ -111,7 +111,7 @@ const index = withAppBar(() => {
                         type: "checkbox",
                         label: "My Checkbox",
                         defaultValue: true,
-                    } as IField<"checkbox">,
+                    },
                     switch: {
                         label: "Example Switch",
                         type: "switch",
@@ -135,12 +135,12 @@ const index = withAppBar(() => {
                                 value: "3"
                             },
                         ]
-                    } as IField<"select">,
+                    },
                     selectCountry: {
                         type: "selectCountry",
                         label: "Example Select Country",
                         defaultValue: "CM",
-                    } as IField<"selectCountry">,
+                    },
                     tel: {
                         type: "tel",
                         label: "Example Tel",

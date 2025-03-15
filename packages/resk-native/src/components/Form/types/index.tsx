@@ -1880,8 +1880,6 @@ declare module "@resk/core" {
             }
         ) => ReactNode;
 
-        ref?: any;
-
         onMount?: (context: IFormField<FieldType>) => any;
 
         onUnmount?: (context: IFormField<FieldType>) => any;

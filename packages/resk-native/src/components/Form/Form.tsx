@@ -745,3 +745,16 @@ const styles = StyleSheet.create({
 FormsManager.isFormInstance = (form: any) => {
     return form instanceof Form;
 }
+
+function App() {
+    return <Form
+        fields={{
+            text: {
+                type: "text",
+                label: "Text",
+                visible: false,
+                name: "boris",
+            }
+        }}
+    />
+}

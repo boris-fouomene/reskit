@@ -1,6 +1,5 @@
 import { IAuthPerm } from "@/auth/types";
 import { IResourceActionName, IResourceActionTupleObject } from "./resources";
-import { IMergeWithoutDuplicates } from "./merge";
 
 /**
  * Represents a base field with optional type, label, and name properties.

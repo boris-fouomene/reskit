@@ -4,6 +4,7 @@ import { IDropdownOnChangeOptions, IDropdownProps } from "@components/Dropdown";
 import { ITextInputProps } from "@components/TextInput/types";
 import { IFieldBase } from "@resk/core";
 import { IMergeWithoutDuplicates } from "@resk/core";
+import { ICheckboxProps } from "@components/Checkbox";
 
 /**
  * Augments the `@resk/core` module with additional form field types and properties.
@@ -14,7 +15,7 @@ declare module "@resk/core" {
     /**
      * @interface IFormFieldTextProps
      * Represents the properties for a text-based form field.
-     * @template type - The type of the form field.
+     * @template Type - The type of the form field.
      * @example
      * ```tsx
      * const textFieldProps: IFormFieldTextProps<"text"> = {
@@ -24,7 +25,7 @@ declare module "@resk/core" {
      * };
      * ```
      */
-    export type IFormFieldTextProps<type> = Omit<IMergeWithoutDuplicates<ITextInputProps, IFieldBase>, "type"> & { type: type };
+    export type IFormFieldTextProps<Type> = IFormFieldProps<Type, ITextInputProps>;
 
     /**
      * Maps form field types to their respective properties.
@@ -33,7 +34,6 @@ declare module "@resk/core" {
     export interface IFieldMap {
         /**
         * Properties for a switch form field.
-        * @type {Omit<IMergeWithoutDuplicates<ISwitchProps, IFieldBase>, "onChange" | "type"> & { type: "switch", onChange?: (options: IFormFieldOnChangeOptions<"switch"> & Partial<IToggleableOnChangeOptions>) => void }}
         * @example
         * ```tsx
         * const switchField: IFieldMap["switch"] = {
@@ -43,11 +43,10 @@ declare module "@resk/core" {
         * };
         * ```
         */
-        switch: Omit<IMergeWithoutDuplicates<ISwitchProps, IFieldBase>, "onChange" | "type"> & { type: "switch", onChange?: (options: IFormFieldOnChangeOptions<"switch"> & Partial<IToggleableOnChangeOptions>) => void };
+        switch: Omit<IFormFieldProps<"switch", ISwitchProps>, "onChange"> & { onChange?: (options: IFormFieldOnChangeOptions<"switch"> & Partial<IToggleableOnChangeOptions>) => void };
 
         /**
          * Properties for a checkbox form field.
-         * @type {Omit<IMergeWithoutDuplicates<ISwitchProps, IFieldBase>, "onChange" | "type"> & { type: "checkbox", onChange?: (options: IFormFieldOnChangeOptions<"checkbox"> & Partial<IToggleableOnChangeOptions>) => void }}
          * @example
          * ```tsx
          * const checkboxField: IFieldMap["checkbox"] = {
@@ -57,11 +56,10 @@ declare module "@resk/core" {
          * };
          * ```
          */
-        checkbox: Omit<IMergeWithoutDuplicates<ISwitchProps, IFieldBase>, "onChange" | "type"> & { type: "checkbox", onChange?: (options: IFormFieldOnChangeOptions<"checkbox"> & Partial<IToggleableOnChangeOptions>) => void };
+        checkbox: Omit<IFormFieldProps<"checkbox", ICheckboxProps>, "onChange"> & { onChange?: (options: IFormFieldOnChangeOptions<"checkbox"> & Partial<IToggleableOnChangeOptions>) => void };
 
         /**
          * Properties for a select dropdown form field.
-         * @type {Omit<IMergeWithoutDuplicates<IDropdownProps, IFieldBase>, "onChange" | "type"> & { type: "select"; onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; }}
          * @example
          * ```tsx
          * const selectField: IFieldMap["select"] = {
@@ -71,11 +69,10 @@ declare module "@resk/core" {
          * };
          * ```
          */
-        select: Omit<IMergeWithoutDuplicates<IDropdownProps, IFieldBase>, "onChange" | "type"> & { type: "select"; onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; };
+        select: Omit<IFormFieldProps<"select", IDropdownProps>, "onChange"> & { onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; };
 
         /**
          * Properties for a country select dropdown form field.
-         * @type {Omit<IMergeWithoutDuplicates<IDropdownProps, IFieldBase>, "onChange" | "type"> & { type: "selectCountry"; onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; }}
          * @example
          * ```tsx
          * const selectCountryField: IFieldMap["selectCountry"] = {
@@ -85,7 +82,7 @@ declare module "@resk/core" {
          * };
          * ```
          */
-        selectCountry: Omit<IMergeWithoutDuplicates<IDropdownProps, IFieldBase>, "onChange" | "type"> & { type: "selectCountry"; onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; };
+        selectCountry: Omit<IFormFieldProps<"selectCountry", IDropdownProps>, "onChange"> & { onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; };
 
         /**
          * Properties for a text input form field.
@@ -219,7 +216,9 @@ declare module "@resk/core" {
 * @interface IFormFieldProps
 * Represents the properties for a form field component.
 * @template FieldType - The type of the form field.
-* @template ComponentProps - The properties of the component.
+* @template ComponentProps - The properties of the component that is wrapped by the form field.
+* @see {@link IFieldBase} for common form field properties.
+* @see {@link IMergeWithoutDuplicates} for merging properties without duplicates.
 * @example
 * ```tsx
 * const switchFieldProps: IFormFieldProps<"switch", ISwitchProps> = {
@@ -229,4 +228,4 @@ declare module "@resk/core" {
 * };
 * ```
 */
-export type IFormFieldProps<FieldType, ComponentProps> = Omit<IMergeWithoutDuplicates<ComponentProps, IFieldBase>, "type"> & { type: FieldType; };
+export type IFormFieldProps<FieldType, ComponentProps> = Omit<IMergeWithoutDuplicates<IFieldBase, ComponentProps>, "type"> & { type: FieldType; };

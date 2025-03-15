@@ -180,10 +180,12 @@ export interface IFieldBase<FieldType extends IFieldType = IFieldType> extends P
     }
   ```
  */
-export interface IFieldMap { }
+export interface IFieldMap {
+    unknown: IFieldBase<"unknown">;
+}
 
 /**
- * @type IField<T extends IFieldType = any>
+ * @type IField<T extends IFieldType = IFieldType>
  * @extends IFieldBase<T>
  * 
  * Represents a field with customizable properties in a form or data structure.

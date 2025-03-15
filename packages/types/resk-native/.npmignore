@@ -1,0 +1,16 @@
+# Ignore node_modules (just in case)
+node_modules/
+
+# Ignore specific folders
+test/
+src/
+docs/
+dist/
+jest.config.js
+tsconfig.*
+vite.config.*
+# Ignore specific files
+.env
+*.log
+
+# Ignore any other file patterns you don't want to include

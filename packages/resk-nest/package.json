@@ -1,11 +1,10 @@
 {
   "name": "@resk/nest",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "",
   "author": "",
   "license": "UNLICENSED",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "prepublish": "npm run build",
     "build": "tsc --project ./tsconfig.json && npx tsc-alias -p tsconfig.json",
@@ -21,7 +20,7 @@
     "@nestjs/common": "^11.0.11",
     "@nestjs/core": "^11.0.11",
     "@nestjs/swagger": "^11.0.6",
-    "@resk/core": "^1.6.1",
+    "@resk/core": "^1.7.2",
     "bcryptjs": "^3.0.2",
     "jose": "^6.0.10",
     "mongoose": "^8.12.1",

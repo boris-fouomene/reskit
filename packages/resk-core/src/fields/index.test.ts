@@ -3,9 +3,7 @@ import { Field, getFieldsFromTarget, fieldsMetaData } from './index';
 
 declare module "../types" {
     export interface IFieldMap {
-        text: IFieldBase & {
-            type: "text";
-        }
+        text: IFieldBase<"text">
     }
     export interface IFieldBase {
         label?: string;

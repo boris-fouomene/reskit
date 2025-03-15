@@ -18,17 +18,17 @@
     "noEmitOnError": true,
     "noEmit": false,
     "typeRoots": [
-      "./node_modules/@types"
+      "./node_modules/@types",
     ],
     "types": [
       "jest",
       "node"
     ],
     "skipLibCheck": true,
-    "composite": true,
+    "composite": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "declaration": true,
+    "declaration": false,
     "declarationMap": false,
     "jsx": "react-jsx",
     "plugins": [

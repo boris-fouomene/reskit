@@ -1,0 +1,11 @@
+{
+    "extends": "../../resk-core/tsconfig.esm.json",
+    "compilerOptions": {
+        "removeComments": false,
+        "outDir": "./build",
+        "declarationDir": "./build",
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "incremental": false
+    },
+}

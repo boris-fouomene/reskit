@@ -5,6 +5,9 @@
         "module": "ESNext",
         "moduleResolution": "node",
         "outDir": "./build/esm/",
-        "declarationDir": "./build/esm",
+        //"declarationDir": "./build/esm",
     },
+    "exclude": [
+        "src/**/*.test.*",
+    ]
 }

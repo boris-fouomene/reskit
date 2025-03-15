@@ -8,5 +8,8 @@ docs/
 # Ignore specific files
 .env
 *.log
-
+.gitignore
+jest.config.*
+.prettierrc
+tsconfig.*
 # Ignore any other file patterns you don't want to include

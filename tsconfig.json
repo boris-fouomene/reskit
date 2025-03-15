@@ -29,7 +29,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "jsx": "react-jsx",
     "plugins": [
       {

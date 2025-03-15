@@ -2,6 +2,11 @@ import 'reflect-metadata';
 import { Field, getFieldsFromTarget, fieldsMetaData } from './index';
 
 declare module "../types" {
+    export interface IFieldMap {
+        text: IFieldBase & {
+            type: "text";
+        }
+    }
     export interface IFieldBase {
         label?: string;
     }

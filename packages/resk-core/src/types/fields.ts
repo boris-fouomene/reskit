@@ -1,11 +1,12 @@
 import { IAuthPerm } from "@/auth/types";
 import { IResourceActionName, IResourceActionTupleObject } from "./resources";
+import { IMergeWithoutDuplicates } from "./merge";
 
 /**
  * Represents a base field with optional type, label, and name properties.
  * The type property defaults to "text" if not specified.
  * 
- * @template FieldType - The type of the field, defaults to "text"
+ * @template IFieldType - The type of the field, defaults to "text"
  * @extends IResourceActionTupleObject
  * 
  * @description
@@ -23,7 +24,7 @@ import { IResourceActionName, IResourceActionTupleObject } from "./resources";
  * @see {@link IResourceActionName} for the `IResourceActionName` type.
  * @see {@link IResourceActionTupleObject} for the `IResourceActionTupleObject` type.
  */
-export interface IFieldBase<FieldType extends IFieldType = any> extends Partial<IResourceActionTupleObject> {
+export interface IFieldBase<FieldType extends IFieldType = IFieldType> extends Partial<IResourceActionTupleObject> {
     /**
      * The type of the field.
      * 
@@ -143,8 +144,6 @@ export interface IFieldBase<FieldType extends IFieldType = any> extends Partial<
 }
 
 
-
-
 /**
  * Represents a map of field types to their corresponding IFieldBase instances.
  * 
@@ -182,8 +181,7 @@ export interface IFieldBase<FieldType extends IFieldType = any> extends Partial<
     }
   ```
  */
-export interface IFieldMap extends Record<string, IFieldBase> { }
-
+export interface IFieldMap { }
 
 /**
  * @type IField<T extends IFieldType = any>
@@ -267,89 +265,60 @@ export interface IFieldMap extends Record<string, IFieldBase> { }
  *   based on the context in which they are used.
  * - The `form` and `filter` properties allow for nesting of fields, enabling complex data 
  *   structures that can represent forms with multiple layers of fields or filters.
- * @see {@link IFieldBase} for the `IFieldBase` type.
  * @see {@link IFieldMap} for the `IFieldMap` type.
  */
-export type IField<T extends IFieldType = any> = IFieldMap[T] & {
-    [key in ("create" | "update" | "delete" | "list" | "form" | "filter")]?: Partial<IField>;
-}
+export type IField<T extends IFieldType = IFieldType> = IFieldMap[T] & {
+    [key in ("create" | "update" | "delete" | "list" | "form" | "filter")]?: Partial<IFieldMap[IFieldType]>;
+};
 
 /**
- * @type IFields<T extends IFieldMap = any>
+ * Record type representing a collection of fields, where each value
+ * is a field of any type from the FullFieldMap.
  * 
- * Represents a mapping of field definitions to their corresponding field details.
- * This type allows for the extraction of field types from a given field map, ensuring 
- * that each field is correctly typed according to its definition.
- * 
- * ### Type Parameters
- * - **T**: The type of the field map. Defaults to `IFieldMap`. This parameter determines 
- *   the specific mapping of field types to their definitions.
- * 
- * ### Structure
- * The `IFields` type constructs a new type by iterating over the keys of the provided 
- * field map `T`. For each key, it extracts the corresponding field type from `IFieldMap` 
- * and ensures that it matches the expected field instance type.
- * 
- * ### Properties
- * - **`[K in keyof T]`**: Iterates over each key `K` in the field map `T`.
- * - **`Extract<IFieldMap[T[K]["type"]], IField<T[K]["type"]>>`**: This expression extracts 
- *   the field type from `IFieldMap` based on the type defined in `T[K]`, ensuring that 
- *   the resulting type is compatible with the `IField` type for that specific field.
- * 
- * ### Example Usage
- * Here’s an example of how to define a fields mapping using the `IFields` type:
- * 
+ * @example
  * ```typescript
- * // Example field map definition
- * const fieldMap: IFieldMap = {
- *     text: {
- *         type: 'text',
- *         label: 'Username',
- *         name: 'username',
- *         required: true,
- *     },
- *     number: {
- *         type: 'number',
- *         label: 'Age',
- *         name: 'age',
- *         required: true,
- *     }
+ * // Create a collection of fields with different types
+ * const formFields: IFields = {
+ *   username: {
+ *     type: 'text',
+ *     label: 'Username'
+ *   },
+ *   age: {
+ *     type: 'number',
+ *     label: 'Age',
+ *     min: 18
+ *   }
  * };
  * 
- * // Using the IFields type to create a strongly typed fields mapping
- * type MyFields = IFields<typeof fieldMap>;
- * 
- * // Example of using the MyFields type
- * const fields: MyFields = {
- *     text: {
- *         type: 'text',
- *         label: 'Username',
- *         name: 'username',
- *         required: true,
- *     },
- *     number: {
- *         type: 'number',
- *         label: 'Age',
- *         name: 'age',
- *         required: true,
- *     }
- * };
+ * // TypeScript knows these are valid operations
+ * console.log(formFields.username.type); // 'text'
+ * console.log(formFields.age.min);       // 18
  * ```
- * 
- * ### Notes
- * - The `IFields` type is particularly useful for ensuring type safety when working with 
- *   collections of fields, allowing developers to define and manipulate fields in a 
- *   structured manner.
- * - By leveraging TypeScript's utility types, `IFields` provides a way to enforce 
- *   consistency across field definitions and their corresponding instances.
- * 
- * ### Related Types
- * - **`IFieldMap`**: The mapping of field types to their corresponding field definitions.
- * - **`IField`**: Represents a field with customizable properties in a form or data structure.
  */
-export interface IFields extends Record<string, IField<keyof IFieldMap>> { }
+export type IFields = Record<string, IField>;
 
-
+/**
+ * Type guard to check if a field matches a specific type.
+ * Helps with type narrowing when working with fields dynamically.
+ * 
+ * @example
+ * ```typescript
+ * // Using the type guard to narrow types
+ * function renderField(field: IFieldBase) {
+ *   if (isFieldType(field, 'select')) {
+ *     // TypeScript knows field is a select field here
+ *     return <SelectInput items={field.items} multiple={field.multiple} />;
+ *   }
+ *   if (isFieldType(field, 'number')) {
+ *     // TypeScript knows field is a number field here
+ *     return <NumberInput min={field.min} max={field.max} />;
+ *   }
+ * }
+ * ```
+ */
+export function isFieldType<T extends IFieldType>(field: IFieldBase, type: T): field is IField<T> {
+    return field.type === type;
+}
 
 /**
  * Represents the type of field keys that can be used within the `IFieldMap`.
@@ -379,3 +348,40 @@ export interface IFields extends Record<string, IField<keyof IFieldMap>> { }
  * throughout the application, enhancing type safety and reducing runtime errors.
  */
 export type IFieldType = keyof IFieldMap;
+
+
+/**
+ * Helper function to create a type-safe field instance.
+ * Provides autocomplete for properties based on the specified field type.
+ * 
+ * @example
+ * ```typescript
+ * // Create a text field with autocompletion for text-specific properties
+ * const textField = createField('text', {
+ *   label: 'Full Name',
+ *   placeholder: 'Enter your name', // TypeScript suggests text field properties
+ *   maxLength: 100
+ * });
+ * 
+ * // Create a select field with autocompletion for select-specific properties
+ * const countryField = createField('select', {
+ *   label: 'Country',
+ *   items: [  // TypeScript knows this is required for select fields
+ *     { value: 'us', label: 'United States' },
+ *     { value: 'ca', label: 'Canada' }
+ *   ],
+ *   multiple: true  // TypeScript suggests select field properties
+ * });
+ * 
+ * // TypeScript would error on invalid properties
+ * const invalidField = createField('text', {
+ *   items: [] // Error: Property 'items' does not exist on text field
+ * });
+ * ```
+ */
+export function createField<T extends IFieldType>(type: T, props: Omit<IField<T>, 'type'>): IField<T> {
+    return {
+        type,
+        ...props
+    } as IField<T>;
+}

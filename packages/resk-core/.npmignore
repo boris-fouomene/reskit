@@ -6,6 +6,9 @@ test/
 src/
 docs/
 dist/
+jest.config.js
+tsconfig.*
+vite.config.*
 # Ignore specific files
 .env
 *.log

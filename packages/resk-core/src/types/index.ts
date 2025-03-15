@@ -41,29 +41,7 @@ export * from "./fields";
  */
 export type IPrimitive = string | number | boolean;
 
-
-
-/**
-* @interface
-  Merges two object types, excluding properties from the first type 
-* that are also present in the second type.
-* 
-* This type will include all properties of the first type `T` 
-* except those keys that are present in the second type `U`, 
-* and it will include all properties from `U`.
-* 
-* If there are overlapping properties, the properties from `U` 
-* will override those in `T`.
-* 
-* @typeParam T - The first object type, from which properties are 
-* omitted.
-* @typeParam U - The second object type, whose properties are included 
-* and may override properties in `T`.
-* 
-* @returns A new type that is a combination of `T` and `U`, with 
-* properties from `U` taking precedence over those from `T`.
-*/
-export type IMerge<T extends object, U = any> = Omit<T, keyof U> & U;
+export * from "./merge";
 
 
 /**
@@ -531,7 +509,7 @@ export interface IInputFormatterResult extends IInputFormatterOptions, Partial<I
    * The dial code of the phone number in case of formatting a phone number
    */
   dialCode?: string;
-  
+
   /***
     The international value of the phone number of the input value in case of formatting a phone number
   */

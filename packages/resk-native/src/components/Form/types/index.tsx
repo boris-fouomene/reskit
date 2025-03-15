@@ -5,13 +5,22 @@ import { IKeyboardEventHandlerKey } from "@components/KeyboardEventHandler/keyEv
 import { ITabItemProps, ITabProps } from "@components/Tab";
 import { IViewProps } from "@components/View";
 import { IDimensions } from "@dimensions/types";
-import { IAuthPerm, IDict, IField, IFields, IFieldType, IResourceName, IValidatorRule, IValidatorValidateOptions } from "@resk/core";
+import { IAuthPerm, IDict, IField, IFieldBase, IFields, IFieldType, IResourceName, IValidatorRule, IValidatorValidateOptions } from "@resk/core";
 import { IOnChangeOptions, IStyle } from "@src/types";
 import { ObservableComponent } from "@utils/index";
 import { ReactElement, ReactNode } from "react";
 
-
-
+/***
+ * A type representing the props for a form field component.
+ * This type extends the IField interface and includes additional properties
+ * specific to form field components.
+ * 
+ * @type IFormFieldProps
+ * @template FieldType - The type of the field. Defaults to IFieldType.
+ * @example
+ * interface MyFormFieldProps extends IFormFieldProps<MyFieldType> { ... }
+ */
+export type IFormFieldProps<FieldType extends IFieldType = IFieldType> = IField<FieldType>;
 
 /**
  * Represents a collection of form fields in a form.
@@ -244,9 +253,9 @@ export interface IForm extends ObservableComponent<IFormProps, IFormState, IForm
     /** Prepares the fields of the form based on props. */
     prepareFields(props?: IFormProps): IFields;
     /** Determines if a field can be rendered. */
-    canRenderField(options: IFormProps & { field: IField; fieldName: string; isUpdate: boolean; }): boolean;
+    canRenderField(options: IFormProps & { field: IFormFieldProps; fieldName: string; isUpdate: boolean; }): boolean;
     /** Prepares a specific field for rendering. */
-    prepareField(options: IFormProps & { field: IField; fieldName: string; isUpdate: boolean; }): IField | null;
+    prepareField(options: IFormProps & { field: IFormFieldProps; fieldName: string; isUpdate: boolean; }): IFormFieldProps | null;
     /** Checks if the form has fields. */
     hasFields(): boolean;
     /** Mounts the form instance. */
@@ -291,7 +300,7 @@ export interface IForm extends ObservableComponent<IFormProps, IFormState, IForm
  * including methods for validation, state management, and rendering.
  *
  * @interface IFormField
- * @extends ObservableComponent<IField, IFormFieldState, IFormEvent>
+ * @extends ObservableComponent<IFormFieldProps, IFormFieldState, IFormEvent>
  * @template  Type - The type of the field.
  * 
  * @remarks
@@ -299,7 +308,7 @@ export interface IForm extends ObservableComponent<IFormProps, IFormState, IForm
  * providing a consistent API for managing field behavior and interactions. It includes methods
  * for validation, value management, and rendering, making it easier to create dynamic forms.
  */
-export interface IFormField<Type extends IFieldType = any> extends ObservableComponent<IField<Type>, IFormFieldState, IFormEvent> {
+export interface IFormField<Type extends IFieldType = IFieldType> extends ObservableComponent<IFormFieldProps<Type>, IFormFieldState, IFormEvent> {
     /**
      * Retrieves the name of the field.
      * 
@@ -361,9 +370,9 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
      * The component properties for the field.
      * 
      * @readonly
-     * @type {IField<Type>}
+     * @type {IFormFieldProps<Type>}
      */
-    componentProps: IField<Type>;
+    componentProps: IFormFieldProps<Type>;
     /**
      * Checks if validation has been performed on the field.
      * 
@@ -530,13 +539,13 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
     /**
      * Retrieves the component properties for the field, optionally merging with provided props.
      * 
-     * @param {IField} [props] - Optional additional properties to merge.
-     * @returns {IField<Type>} - The merged component properties.
+     * @param {IFormFieldProps} [props] - Optional additional properties to merge.
+     * @returns {IFormFieldProps<Type>} - The merged component properties.
      * 
      * @example
      * const props = this.getComponentProps({ additionalProp: true }); // Retrieves component props
      */
-    getComponentProps(props?: IField<Type>): IField<Type>;
+    getComponentProps(props?: IFormFieldProps<Type>): IFormFieldProps<Type>;
     /**
      * Checks if the form is currently loading.
      * 
@@ -558,13 +567,13 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
     /**
      * Renders a loading state for the field.
      * 
-     * @param {IField<Type>} props - The properties to use for rendering.
+     * @param {IFormFieldProps<Type>} props - The properties to use for rendering.
      * @returns {ReactNode} - The rendered loading component.
      * 
      * @example
      * const loadingComponent = this.renderLoading(props); // Renders loading state
      */
-    renderLoading(props: IField<Type>): ReactNode;
+    renderLoading(props: IFormFieldProps<Type>): ReactNode;
     /**
      * Registers the field with the form.
      * 
@@ -641,14 +650,14 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
     /**
      * Renders the field component.
      * 
-     * @param {IField<Type>} props - The properties to use for rendering.
+     * @param {IFormFieldProps<Type>} props - The properties to use for rendering.
      * @param {any} [innerRef] - Optional reference to the inner component.
      * @returns {ReactNode} - The rendered field component.
      * 
      * @example
      * const renderedField = this._render(props); // Renders the field
      */
-    _render(props: IField<Type>, innerRef?: any): ReactNode;
+    _render(props: IFormFieldProps<Type>, innerRef?: any): ReactNode;
     /**
      * Determines if the field can accept decimal values.
      * 
@@ -729,23 +738,23 @@ export interface IFormField<Type extends IFieldType = any> extends ObservableCom
     /**
      * Determines if the field can handle breakpoint styles.
      * 
-     * @param {IField<Type>} [props] - Optional properties to check against.
+     * @param {IFormFieldProps<Type>} [props] - Optional properties to check against.
      * @returns {boolean} - Returns true if the field can handle breakpoint styles, otherwise false.
      * 
      * @example
      * const canHandle = this.canHandleBreakpointStyle(props); // true or false
      */
-    canHandleBreakpointStyle(props?: IField<Type>): boolean;
+    canHandleBreakpointStyle(props?: IFormFieldProps<Type>): boolean;
     /**
      * Retrieves the breakpoint style for the field.
      * 
-     * @param {IField<Type>} [props] - Optional properties to use for retrieving styles.
+     * @param {IFormFieldProps<Type>} [props] - Optional properties to use for retrieving styles.
      * @returns {IStyle} - The breakpoint style for the field.
      * 
      * @example
      * const style = this.getBreakpointStyle(props); // Retrieves the breakpoint style
      */
-    getBreakpointStyle(props?: IField<Type>): IStyle;
+    getBreakpointStyle(props?: IFormFieldProps<Type>): IStyle;
     /**
      * Triggers the mount lifecycle for the field.
      * 
@@ -869,7 +878,7 @@ export interface IFormOnSubmitOptions extends IFormContext {
  *     return 'Validation passed.';
  * }
  */
-export interface IFormFieldValidatorOptions<Type extends IFieldType = any> extends IValidatorValidateOptions {
+export interface IFormFieldValidatorOptions<Type extends IFieldType = IFieldType> extends IValidatorValidateOptions {
     /**
      * The previously assigned value to the field.
      * 
@@ -1342,7 +1351,7 @@ export interface IFormProps extends Omit<IViewProps, "children"> {
      */
     canRenderField?(
         options: IFormProps & {
-            field: IField;
+            field: IFormFieldProps;
             fieldName: string;
             isUpdate: boolean;
         }
@@ -1708,7 +1717,7 @@ export interface IFormData extends IDict {
  *     console.log(`Custom data: ${customData}`);
  * };
  */
-export interface IFormFieldOnChangeOptions<FieldType extends IFieldType = any> extends IOnChangeOptions {
+export interface IFormFieldOnChangeOptions<FieldType extends IFieldType = IFieldType> extends IOnChangeOptions {
     /**
      * The context of the form field that triggered the change event.
      * 
@@ -1767,7 +1776,7 @@ export interface IFormKeyboardEventHandlerOptions extends IFormContext {
 
 /**
  * Represents the state of a form field component.
- * The `IFormFieldState` type extends the base `IField` interface and includes additional properties
+ * The `IFormFieldState` type extends the base `IFormFieldProps` interface and includes additional properties
  * that manage the validation status, editability, and rendering of the field.
  * 
  * @type IFormFieldState
@@ -1803,7 +1812,7 @@ export interface IFormKeyboardEventHandlerOptions extends IFormContext {
  *     formTriedTobeSubmitted: false,
  * };
  */
-export type IFormFieldState = Partial<IField<any>> & {
+export type IFormFieldState = Partial<IFormFieldProps> & {
     error: boolean;
     isFieldEditable: boolean;
     isFieldDisabled: boolean;
@@ -1846,7 +1855,7 @@ export interface IFormAction extends IButtonProps<IFormContext> { }
 
 
 declare module "@resk/core" {
-    export interface IFieldBase<FieldType extends IFieldType = any> {
+    export interface IFieldBase<FieldType extends IFieldType = IFieldType> {
         getValidValue?: (options: { value: any; context: IFormField<FieldType>; data: IFormData }) => any;
         isFilter?: boolean;
 
@@ -1878,7 +1887,7 @@ declare module "@resk/core" {
 
         isFormSubmitting?: boolean;
         renderLoading?: (
-            options: IField<FieldType> & {
+            options: IFormFieldProps<FieldType> & {
                 width: string | number; //la largeur occupée par le champ en cas de responsive design
             }
         ) => ReactNode;
@@ -1894,8 +1903,8 @@ declare module "@resk/core" {
         defaultValue?: any;
 
         validateEmail?: boolean;
-        
-        validatePhoneNumber?:boolean;
+
+        validatePhoneNumber?: boolean;
 
         windowWidth?: number;
 

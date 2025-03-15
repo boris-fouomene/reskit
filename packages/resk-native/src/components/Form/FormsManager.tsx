@@ -192,11 +192,11 @@ export class FormsManager {
      * @example
      * const field = FormsManager.getField("myForm", "myField"); // Retrieves the specified field
      */
-    static getField<T extends IFieldType = any>(formName?: string, fieldName?: string): IFormField<T> | null {
+    static getField<T extends IFieldType = IFieldType>(formName?: string, fieldName?: string): IFormField<T> | null {
         if (!isNonNullString(formName) || !isNonNullString(fieldName)) return null;
         const fields = this.getFields(formName);
         if (isObj(fields) && fieldName) {
-            return fields[fieldName as string] || null;
+            return fields[fieldName as string] as IFormField<T> || null;
         }
         return null;
     }

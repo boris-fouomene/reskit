@@ -1,8 +1,8 @@
 import View from "@components/View";
-import { defaultStr, extendObj, IFieldType, IFields, IField, IResourceName, isEmpty, isNonNullString, isObj, areEquals, uniqid, Auth } from "@resk/core";
+import { defaultStr, extendObj, IFieldType, IFields, IResourceName, isEmpty, isNonNullString, isObj, areEquals, uniqid, Auth } from "@resk/core";
 import { isValidElement, ObservableComponent } from "@utils";
 import { FormsManager } from "./FormsManager";
-import { IFormField, IForm, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormOnSubmitOptions, IFormContext, IFormTabItemProp, IFormAction } from "./types";
+import { IFormField, IForm, IFormFieldProps, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormOnSubmitOptions, IFormContext, IFormTabItemProp, IFormAction } from "./types";
 import React, { ReactElement, ReactNode, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { ActivityIndicator } from "@components/ActivityIndicator";
@@ -72,7 +72,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         const { tabItems, mobile } = this.renderTabItems(props);
         return {
             isSubmitting: this.state.isSubmitting,
-            formFields: <Form.Fields form={this}
+            formFields: <Form.Fields form={this as IForm}
                 {...this.componentProps}
                 fields={fields}
                 children={undefined}
@@ -286,7 +286,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         }
         if (p.fields) {
             for (let i in p.fields) {
-                const field: IField | undefined =
+                const field: IFormFieldProps | undefined =
                     (p.fields[i as keyof IFields] && Object.clone(p.fields[i as keyof IFields])) || undefined;
                 if (!field || (field?.perm !== undefined && !Auth.isAllowed(field?.perm))) continue;
                 if (field.rendable === false) continue;
@@ -352,14 +352,14 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                         }
                     };
 
-                    preparedFields[name as keyof IFields] = preparedField as IField<any>;
+                    preparedFields[name as keyof IFields] = preparedField as IFormFieldProps<any>;
                 }
             }
         }
         return preparedFields;
 
     }
-    canRenderField(options: IFormProps & { field: IField; fieldName: string; isUpdate: boolean; }): boolean {
+    canRenderField(options: IFormProps & { field: IFormFieldProps; fieldName: string; isUpdate: boolean; }): boolean {
         if (options?.field?.rendable === false) return false;
         if (options?.canRenderField && !options?.canRenderField(options)) return false;
         else if (options?.canRenderField != this.props.canRenderField) {
@@ -382,7 +382,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         }
         return true;
     }
-    prepareField(options: IFormProps & { field: IField; fieldName: string; isUpdate: boolean; }): IField | null {
+    prepareField(options: IFormProps & { field: IFormFieldProps; fieldName: string; isUpdate: boolean; }): IFormFieldProps | null {
         return options?.field;
     }
     setHasTriedTobeSubmitted(hasTriedTobeSubmitted: boolean) {
@@ -604,8 +604,8 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                 }
                 const drawerWidth = drawer?.isProvider() && drawer?.getDrawerWidth() || undefined;
                 fieldProps.windowWidth = fieldProps.windowWidth || windowWidth || typeof drawerWidth === "number" && drawerWidth || undefined
-                const Component = Field.getRegisteredComponent(type as IFieldType) || Field.getRegisteredComponent("text") || Field;
-                content.push(<Component isFormLoading={isLoading} isFormSubmitting={isSubmitting} {...fieldProps} key={name} />);
+                const Component = Field.getRegisteredComponent(type as IFieldType) || Field.getRegisteredComponent("text") || Field as any;
+                content.push(<Component {...fieldProps} isFormLoading={isLoading} isFormSubmitting={isSubmitting} key={name} />);
             }
             return content;
         }, [theme, formName, props.isUpdate, data, fields, isLoading, isSubmitting]) as ReactNode[];

@@ -197,7 +197,7 @@ export type IToggleableOnChangeOptions<EventType = GestureResponderEvent> = IOnC
  * @returns {void} - This type does not return any value, as it is typically used 
  *                   as a set of properties for a toggleable component.
  */
-export type IToggleableProps<EventType = GestureResponderEvent> = {
+export interface IToggleableProps<EventType = GestureResponderEvent> extends ITooltipBaseProps {
     /**
      * @type
      * The value assigned to the toggleable 
@@ -306,7 +306,7 @@ export type IToggleableProps<EventType = GestureResponderEvent> = {
     * Callback function called when the value of the toggle changes.
      */
     onValueChange?: (value: boolean) => void;
-} & ITooltipBaseProps;
+};
 
 
 /**

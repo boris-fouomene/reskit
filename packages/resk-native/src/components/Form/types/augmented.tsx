@@ -4,113 +4,24 @@ import { IFormFieldOnChangeOptions } from "./index";
 import { IDropdownOnChangeOptions, IDropdownProps } from "@components/Dropdown";
 import { ITextInputProps } from "@components/TextInput/types";
 import "@resk/core";
+import { IMergeWithoutDuplicates } from "@resk/core";
+
 
 declare module "@resk/core" {
     export interface IFieldMap {
-        switch: Omit<ISwitchProps, "onChange" | "type"> & { onChange?: (options: IFormFieldOnChangeOptions<"switch"> & Partial<IToggleableOnChangeOptions>) => void; type: "switch" };
-        checkbox: Omit<ICheckboxProps, "onChange" | "type"> & { onChange?: (options: IFormFieldOnChangeOptions<"checkbox"> & Partial<IToggleableOnChangeOptions>) => void; type: "checkbox" };
-        select: Omit<IDropdownProps, "onChange"> & { onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; type: "select" };
-        selectCountry: Omit<IDropdownProps, "onChange"> & { onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; type: "selectCountry" };
-        /**
-         * A text field.
-         * 
-         * @description
-         * This property represents a text field, with a type of "text".
-         * 
-         * @example
-         * ```typescript
-         * const textField: IFieldBase<"text"> = {
-         *   type: 'text',
-         *   label: 'Text Field',
-         *   name: 'textField'
-         * };
-         * ```
-         */
-        text: Omit<ITextInputProps, "type"> & { type: "text" };
-        /**
-         * A number field.
-         * 
-         * @description
-         * This property represents a number field, with a type of "number".
-         * 
-         * @example
-         * ```typescript
-         * const numberField: IFieldBase<"number"> = {
-         *   type: 'number',
-         *   label: 'Number Field',
-         *   name: 'numberField'
-         * };
-         * ```
-         */
-        number: Omit<ITextInputProps, "type"> & { type: "number" };
+        switch: Omit<IMergeWithoutDuplicates<ISwitchProps, IFieldBase>, "onChange" | "type"> & { type: "switch", onChange?: (options: IFormFieldOnChangeOptions<"switch"> & Partial<IToggleableOnChangeOptions>) => void };
+        checkbox: Omit<IMergeWithoutDuplicates<ISwitchProps, IFieldBase>, "onChange" | "type"> & { type: "checkbox", onChange?: (options: IFormFieldOnChangeOptions<"checkbox"> & Partial<IToggleableOnChangeOptions>) => void };
+        select: Omit<IMergeWithoutDuplicates<IDropdownProps, IFieldBase>, "onChange" | "type"> & { type: "select"; onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; };
+        selectCountry: Omit<IMergeWithoutDuplicates<IDropdownProps, IFieldBase>, "onChange" | "type"> & { type: "selectCountry"; onChange?: (options: IFormFieldOnChangeOptions<"select"> & Partial<IDropdownOnChangeOptions>) => void; };
+        text: Omit<IMergeWithoutDuplicates<ITextInputProps, IFieldBase>, "type"> & { type: "text" };
+        number: Omit<IMergeWithoutDuplicates<ITextInputProps, IFieldBase>, "type"> & { type: "number" };
 
-        /**
-         * A date field.
-         * 
-         * @description
-         * This property represents a date field, with a type of "date".
-         * 
-         * @example
-         * ```typescript
-         * const dateField: IFieldBase<"date"> = {
-         *   type: 'date',
-         *   label: 'Date Field',
-         *   name: 'dateField'
-         * };
-         * ```
-         */
-        date: IFieldBase<"date">;
+        date: Omit<IMergeWithoutDuplicates<ITextInputProps, IFieldBase>, "type"> & { type: "date" };
 
-        /**
-         * A datetime field.
-         * 
-         * @description
-         * This property represents a datetime field, with a type of "datetime".
-         * 
-         * @example
-         * ```typescript
-         * const datetimeField: IFieldBase<"datetime"> = {
-         *   type: 'datetime',
-         *   label: 'Datetime Field',
-         *   name: 'datetimeField'
-         * };
-         * ```
-         */
-        datetime: IFieldBase<"datetime">;
+        datetime: Omit<IMergeWithoutDuplicates<ITextInputProps, IFieldBase>, "type"> & { type: "datetime" };
 
-        /**
-         * A time field.
-         * 
-         * @description
-         * This property represents a time field, with a type of "time".
-         * 
-         * @example
-         * ```typescript
-         * const timeField: IFieldBase<"time"> = {
-         *   type: 'time',
-         *   label: 'Time Field',
-         *   name: 'timeField'
-         * };
-         * ```
-         */
-        time: IFieldBase<"time">;
+        time: Omit<IMergeWithoutDuplicates<ITextInputProps, IFieldBase>, "type"> & { type: "time" };
 
-        /**
-         * An email field.
-         * 
-         * @description
-         * This property represents an email field, with a type of "email".
-         * 
-         * @example
-         * ```typescript
-         * const emailField: IFieldBase<"email"> = {
-         *   type: 'email',
-         *   label: 'Email Field',
-         *   name: 'emailField'
-         * };
-         * ```
-         */
-        email: Omit<ITextInputProps, "type"> & { type: "email" };
+        tel: Omit<IMergeWithoutDuplicates<ITextInputProps, IFieldBase>, "type"> & { type: "tel" };
     }
-
 }

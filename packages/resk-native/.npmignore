@@ -9,5 +9,7 @@ dist/
 # Ignore specific files
 .env
 *.log
-
+.jest.config.*
+tsconfig.*
+.gitignore
 # Ignore any other file patterns you don't want to include

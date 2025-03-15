@@ -333,7 +333,9 @@ export function createTheme(theme: Partial<ITheme>, options?: { maxElevation?: n
  */
 export const getDefaultTheme = (customTheme?: Partial<ITheme>): ITheme => {
     // Retrieves the saved theme from the session (if available)
-    const themeNameObj = extendObj({}, customTheme, Session.get("theme"));
+    const colorScheme = Session.set("theme-color-sheme");
+    const isDarkFromSession = colorScheme === "dark";
+    const themeNameObj = extendObj({}, { dark: isDarkFromSession }, customTheme, Session.get("theme"));
     const { light: lightTheme, dark: darkTheme } = getMaterial3Theme(themeNameObj?.colors?.primary);
     const isDark = !!themeNameObj.dark;
     const theme = extendObj({}, (isDark ? darkTheme : lightTheme), themeNameObj);
@@ -421,7 +423,7 @@ class Theme {
  */
 export function updateTheme(theme: Partial<ITheme>, trigger: boolean = false): IThemeManager {
     // Save the theme name in the session
-    Session.set("theme", theme.name);
+    Session.set("theme-color-sheme", theme.dark ? "dark" : "light");
     // Update the theme reference
     const newTheme = sanitizeTheme(createTheme(theme));
     Theme.setTheme(newTheme);

@@ -348,7 +348,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 {...rest}
                 androidRipple={Object.assign({}, { radius: borderRadius }, rest.android_ripple)}
             >
-                <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, fullWidthStyle, contentStyle, hasLeftContentWrapper && styles.contentHasLeftContentWrapper]}>
+                <View id={`${idRef.current}-content`} testID={testID + "-button-content"} {...contentProps} style={[styles.content, centered && styles.centeredContent, fullWidthStyle, contentStyle, hasLeftContentWrapper && styles.contentHasLeftContentWrapper]}>
                     <LeftContentWrapper {...letContentWrapperProps}>
                         {iconPosition != "right" ? iconContent : null}
                         {isLoading ? (
@@ -428,6 +428,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
+        alignSelf: "center",
+    },
+    centeredContent: {
+        justifyContent: "center",
         alignSelf: "center",
     },
     contentHasLeftContentWrapper: {

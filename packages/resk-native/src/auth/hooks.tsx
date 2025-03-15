@@ -30,12 +30,7 @@ class AuthLogin {
  * @extends React.ComponentProps<any>
  */
 export interface ILoginProps extends React.ComponentProps<any> {
-  /**
-   * A function to sign in the user.
-   * @param user The user object to sign in.
-   * @returns A promise that resolves with the signed-in user object.
-   */
-  signIn: (user: IAuthUser) => Promise<IAuthUser>
+
 }
 
 /**
@@ -270,7 +265,7 @@ const Login: React.FC<{}> = function ({ }) {
         <View>
           <Label colorScheme="error" fontSize={20} textBold>You must attach a login component using the `AttachLoginComponent` decorator.</Label>
         </View>
-      </View> : <Component signIn={Auth.signIn} />}
+      </View> : <Component />}
     </View>
   </Portal>;
 }

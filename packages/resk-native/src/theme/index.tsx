@@ -335,7 +335,7 @@ export const getDefaultTheme = (customTheme?: Partial<ITheme>): ITheme => {
     // Retrieves the saved theme from the session (if available)
     const colorScheme = Session.set("theme-color-sheme");
     const isDarkFromSession = colorScheme === "dark";
-    const themeNameObj = extendObj({}, { dark: isDarkFromSession }, customTheme, Session.get("theme"));
+    const themeNameObj = extendObj({}, { dark: isDarkFromSession }, customTheme);
     const { light: lightTheme, dark: darkTheme } = getMaterial3Theme(themeNameObj?.colors?.primary);
     const isDark = !!themeNameObj.dark;
     const theme = extendObj({}, (isDark ? darkTheme : lightTheme), themeNameObj);

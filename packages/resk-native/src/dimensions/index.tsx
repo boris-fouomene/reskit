@@ -1,13 +1,13 @@
 import { Dimensions } from 'react-native';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { IDimensions } from './types';
 import Breakpoints from '../breakpoints';
 import _ from "lodash";
 import { IObservable, isNonNullString, isObj, isObservable, observable } from '@resk/core';
-import useStableMemo from "@utils/useStableMemo";
-import { IFlatStyle, IReactComponent, IStyle } from "../types";
+import { IReactComponent, IStyle } from "../types";
 import { StyleSheet } from "react-native";
 import { IBreakpointName, IBreakpoints } from '@src/breakpoints/types';
+import stableHash from "stable-hash";
 
 
 
@@ -249,34 +249,35 @@ export function useBreakpointStyle<T extends IBreakpointStyleProps = any>({ styl
 	const dimensions = useDimensions(!!breakpointStyle); // Hook to get current dimensions
 	const currentMedia = Breakpoints.getCurrentMedia(); // Get the current breakpoint
 	// Use stable memoization to optimize performance
-	return useStableMemo(() => {
-		if (!breakpointStyle) return StyleSheet.flatten([style]); // Return base style if no breakpoints are defined
+	const bStyle = useMemo(() => {
+		if (!breakpointStyle) return undefined; // Return base style if no breakpoints are defined
 		const dimensions = getDimensions(); // Get current dimensions
 		// If breakpointStyle is a function, call it with dimensions
 		if (typeof breakpointStyle === "function") {
-			return StyleSheet.flatten([style, breakpointStyle(dimensions)]);
+			return breakpointStyle(dimensions);
 		}
 		// If breakpointStyle is an object, check for applicable styles
 		if (isObj(breakpointStyle)) {
 			if (breakpointStyle[currentMedia]) {
-				return StyleSheet.flatten([style, breakpointStyle[currentMedia]]);
+				return breakpointStyle[currentMedia];
 			}
 			const mQueries: Partial<Record<IBreakpointName, IStyle>> = breakpointStyle;
 			// Determine which style key to apply based on device type
 			const { isMobile, isDesktop, isPhone, isTablet, isSmallPhone, isMediumPhone } = dimensions;
 			const styleKey =
-				isSmallPhone && "sammPhone" in mQueries ? "smallPhone" :
+				isSmallPhone && "smallPhone" in mQueries ? "smallPhone" :
 					isMediumPhone && "mediumPhone" in mQueries ? "mediumPhone" :
 						isPhone && "phone" in mQueries ? "phone" :
 							isMobile && "mobile" in mQueries ? "mobile" :
 								isTablet && "tablet" in mQueries ? "tablet" :
 									isDesktop && "desktop" in mQueries ? "desktop" :
 										undefined;
-			if (styleKey) return StyleSheet.flatten([style, mQueries[styleKey]]);
-			return StyleSheet.flatten([style]);
+			if (styleKey) return mQueries[styleKey];
+			return undefined;
 		}
-		return StyleSheet.flatten([style]); // Default to base style
-	}, [breakpointStyle, currentMedia, dimensions.window, dimensions.screen, style]);
+		return undefined; // Default to base style
+	}, [stableHash(breakpointStyle), currentMedia, dimensions.window.width, dimensions.window.height, dimensions.screen.width, dimensions.screen.height]);
+	return StyleSheet.flatten([style, bStyle]); // Return the flattened style
 }
 
 

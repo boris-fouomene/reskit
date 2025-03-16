@@ -99,7 +99,7 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    */
   useEffect(() => {
     updateTheme(uTheme(Object.assign({}, theme, customTheme)));
-  }, [stableHash(customTheme)]);
+  }, [customTheme]);
   useMemo(() => {
     if (isObj(breakpoints)) {
       return Breakpoints.init(breakpoints);
@@ -120,7 +120,7 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
-    <View testID="resk-native-safe-area-provider" style={[style, styles.safeAreaView, { backgroundColor: theme.colors.background }]}>
+    <View testID="resk-native-root" style={[style, styles.root, { backgroundColor: theme.colors.background }]}>
       <ReskNativeContext.Provider value={{ theme, i18n, safeAreaInsets, updateTheme, ...rest, breakpoints }}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
@@ -146,7 +146,7 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: {
+  root: {
     position: "relative",
     flex: 1,
     overflow: "hidden",

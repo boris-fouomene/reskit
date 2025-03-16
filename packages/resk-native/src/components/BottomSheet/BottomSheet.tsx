@@ -40,7 +40,6 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
     contentProps: customChildrenContainerProps, appBarProps, dividerAfterAppBar, withScrollView, ...props }, ref) => {
     const {
         closeOnDragDownIcon,
-        portalStyle,
         dragFromTopOnly,
         context,
         handleBackPress,
@@ -48,7 +47,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
         animatedProps,
     } = usePrepareBottomSheet(props);
     testID = defaultStr(testID, "resk-bottom-sheet");
-    useDimensions();
+    const dimensions = useDimensions();
     const scrollViewProps = defaultObj(_scrollViewProps);
     const contentProps = defaultObj(customChildrenContainerProps);
     useImperativeHandle(ref, () => (context));
@@ -66,50 +65,50 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
     appBarProps = Object.assign({}, appBarProps);
     const containerProps = defaultObj(customContainerProps);
     return (
-        <Portal style={[portalStyle]} visible={context.isOpened}>
+        <Portal style={styles.portal} absoluteFill testID={testID + "-portal"} visible={context.isOpened}>
             <BottomSheetContext.Provider value={context}>
                 <Pressable
                     testID={testID + "-backdrop"}
                     style={[styles.backdrop, { backgroundColor: theme.colors.backdrop }]}
                     onPress={handleBackPress}
                     onAccessibilityEscape={handleBackPress}
-                />
-
-                <View testID={testID + "-content-container"} style={styles.contentContainer}>
-                    <Animated.View
-                        {...animatedProps}
-                        testID={testID + "-container"} {...containerProps}
-                        style={[styles.container, animatedProps.style, containerProps.style, { backgroundColor: theme.colors.surface }]}
-                    >
-                        {closeOnDragDownIcon}
-                        <View testID={testID} {...props} style={[styles.main, props.style]}>
-                            {hasAppBar ? <>
-                                <AppBar
-                                    colorScheme="surface"
-                                    statusBarHeight={0}
-                                    elevation={0}
-                                    backAction={false}
-                                    {...appBarProps}
-                                    titleProps={Object.assign({}, appBarProps.titleProps, { style: [styles.title, appBarProps.titleProps?.style] })}
-                                    context={Object.assign({}, appBarProps.context, { bottomSheet: context })}
-                                />
-                                {dividerAfterAppBar !== false ? <Divider
-                                    testID={testID + "-divider"}
-                                    style={styles.divider}
-                                /> : null}
-                            </> : null}
-                            {withScrollView !== false ?
-                                <ScrollView testID={testID + "-scroll-view"} contentProps={{ style: styles.scrollViewContent }} {...scrollViewProps} style={[styles.scrollView, scrollViewProps.style]} alwaysBounceVertical={false}
-                                    contentContainerStyle={[{ flexGrow: 1, margin: 0, paddingBottom: 30 }, scrollViewProps.contentContainerStyle]}
-                                >
-                                    {content}
-                                </ScrollView>
-                                : <View testID={testID + "-content"} {...contentProps} style={[styles.childrenNotScroll, contentProps.style]}>
-                                    {content}
-                                </View>}
-                        </View>
-                    </Animated.View>
-                </View>
+                >
+                    <View testID={testID + "-content-container"} style={styles.contentContainer}>
+                        <Animated.View
+                            {...animatedProps}
+                            testID={testID + "-container"} {...containerProps}
+                            style={[styles.container, animatedProps.style, containerProps.style, { backgroundColor: theme.colors.surface }]}
+                        >
+                            {closeOnDragDownIcon}
+                            <View testID={testID} {...props} style={[styles.main, props.style]}>
+                                {hasAppBar ? <>
+                                    <AppBar
+                                        colorScheme="surface"
+                                        statusBarHeight={0}
+                                        elevation={0}
+                                        backAction={false}
+                                        {...appBarProps}
+                                        titleProps={Object.assign({}, appBarProps.titleProps, { style: [styles.title, appBarProps.titleProps?.style] })}
+                                        context={Object.assign({}, appBarProps.context, { bottomSheet: context })}
+                                    />
+                                    {dividerAfterAppBar !== false ? <Divider
+                                        testID={testID + "-divider"}
+                                        style={styles.divider}
+                                    /> : null}
+                                </> : null}
+                                {withScrollView !== false ?
+                                    <ScrollView testID={testID + "-scroll-view"} contentProps={{ style: styles.scrollViewContent }} {...scrollViewProps} style={[styles.scrollView, scrollViewProps.style]} alwaysBounceVertical={false}
+                                        contentContainerStyle={[{ flexGrow: 1, margin: 0, paddingBottom: 30 }, scrollViewProps.contentContainerStyle]}
+                                    >
+                                        {content}
+                                    </ScrollView>
+                                    : <View testID={testID + "-content"} {...contentProps} style={[styles.childrenNotScroll, contentProps.style]}>
+                                        {content}
+                                    </View>}
+                            </View>
+                        </Animated.View>
+                    </View>
+                </Pressable>
             </BottomSheetContext.Provider>
         </Portal >
     );
@@ -126,15 +125,26 @@ function renderItem(props: IBottomSheetItemProps, index: number) {
 BottomSheet.displayName = "BottomSheet";
 
 const styles = StyleSheet.create({
+    portal: {
+        overflow: "hidden",
+    },
     keyboardAvoidingView: {
         width: '100%',
         alignSelf: "flex-start",
         flexGrow: 1,
     },
     backdrop: {
-        ...StyleSheet.absoluteFillObject,
+        //...StyleSheet.absoluteFillObject,
+        position: "relative",
         flex: 1,
-        backgroundColor: "transparent",
+        ...Platform.select({
+            web: {
+                flexDirection: "column-reverse",
+            },
+            default: {
+                flexDirection: "column",
+            }
+        }),
     },
     contentContainer: {
         width: '100%',

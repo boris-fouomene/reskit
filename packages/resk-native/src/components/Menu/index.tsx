@@ -581,7 +581,7 @@ const Menu: React.FC<IMenuProps> = ({
                     ]}
                 >
                     <Wrapper {...wrapperProps}>
-                        <KeyboardAvoidingView testID={testID + "-keyboard-avoiding-view"} style={[styles.keyboardAvoidingView]}>
+                        <View testID={testID + "-content-container"} style={[styles.contentContainer]}>
                             {renderedAsFullScreen ? <View style={styles.bottomSheetCloseIconContainer}>
                                 <View testID={testID + "-close-menu"} style={[styles.bottomSheetCloseIcon]}>
                                     <Icon
@@ -595,7 +595,7 @@ const Menu: React.FC<IMenuProps> = ({
                             </View> : null}
                             {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
                             {child}
-                        </KeyboardAvoidingView>
+                        </View>
                     </Wrapper>
                 </Animated.View>
             </MenuContext.Provider>
@@ -626,13 +626,7 @@ export const measureAnchor = (anchorRef: React.RefObject<any>, minContentHeight?
  * Default styles for the menu container
  */
 const styles = StyleSheet.create({
-    portal: {
-        flex: 1,
-        overflow: "hidden",
-        flexDirection: "column-reverse",
-        maxHeight: "100%",
-    },
-    keyboardAvoidingView: {
+    contentContainer: {
         width: '100%',
         alignSelf: "flex-start",
         flexGrow: 1,

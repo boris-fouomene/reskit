@@ -182,7 +182,6 @@ export const usePrepareBottomSheet = ({
         animate,
         handleBackPress,
         context,
-        portalStyle: styles.portal,
         animatedProps: {
             ...(!dragFromTopOnly ? panResponder.panHandlers : {}),
             style: [
@@ -524,19 +523,6 @@ export interface IBottomSheetProps extends IViewProps, IUsePrepareBottomSheetPro
 
 
 const styles = StyleSheet.create({
-    portal: {
-        position: "relative",
-        flex: 1,
-        overflow: "hidden",
-        ...Platform.select({
-            web: {
-                flexDirection: "column-reverse",
-            },
-            default: {
-                flexDirection: "column",
-            }
-        }),
-    },
     container: {
         position: "relative",
         flexGrow: 0,

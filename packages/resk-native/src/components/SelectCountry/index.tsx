@@ -37,7 +37,7 @@ export const SelectCountry = React.forwardRef<any, ISelectCountryProps & { displ
             return <View style={styles.countryFlagContainer}>
                 <Icon.CountryFlag {...countryFlagProps} countryCode={item.code} size={iconSize} style={[styles.countryFlagIcon, countryFlagProps.style]} />
                 <Label>{item.name}</Label>
-                {canDisplayDialCode && isNonNullString(item.dialCode) ? <Label style={[styles.itemLabel,{fontSize:textFontSize*0.75}]}>{"(+" + item.dialCode.ltrim("+") + ") "}</Label> : null}
+                {canDisplayDialCode && isNonNullString(item.dialCode) ? <Label style={[styles.itemLabel, { fontSize: textFontSize * 0.75 }]}>{"(+" + item.dialCode.ltrim("+")}</Label> : null}
             </View>;
         }}
         anchor={({ dropdownContext, selectedItems, selectedValues, onPress, disabled }) => {
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-start",
+        flexWrap: "wrap",
     },
     countryFlag: { pointerEvents: "box-none" },
     countryFlagIcon: {

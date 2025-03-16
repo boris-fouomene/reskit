@@ -255,7 +255,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
             const isHover = (state as any)?.hovered && !disabled;
             return StyleSheet.flatten([
                 styles.container,
-                //state.pressed && !disabled && rippleColor && { backgroundColor: rippleColor },
+                state.pressed && !disabled && rippleColor && { backgroundColor: rippleColor },
                 shadowStyle,
                 disabled && Theme.styles.disabled,
                 typeof borderRadius == "number" && { borderRadius },

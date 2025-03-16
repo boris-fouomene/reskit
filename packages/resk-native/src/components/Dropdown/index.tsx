@@ -447,10 +447,11 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
     const menuHeight = typeof menuPosition?.height === "number" && menuPosition.height > 50 ? menuPosition.height : undefined;
     const menuWidth = typeof menuPosition?.width === "number" && menuPosition.width > 50 ? menuPosition.width : undefined;
     const canRenderDropdownSearch = !!!(context?.props?.showSearch === false || context?.props?.showSearch !== true && preparedItems?.length <= 5);
+    const hasMenuHeight = typeof menuHeight == "number" && menuHeight > 0;
     return <View testID={testID + "-dropdown-list-container"} style={[
         styles.dropdownListContainer,
         fullScreen && styles.dropdownListContainerFullScreen,
-        typeof menuHeight == "number" && { height: menuHeight },
+        hasMenuHeight ? { height: menuHeight } : null,
         typeof menuWidth == "number" && { width: menuWidth },
         canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled
     ]}
@@ -458,16 +459,19 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
         {canRenderDropdownSearch ? <DropdownSearch isFullScreen={fullScreen} /> : null}
         <List<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
+            scrollEnabled
             {...listProps}
+            style={[listProps.style, hasMenuHeight && { maxHeight: menuHeight - 60 }, styles.list]}
             inverted={canReverse}
             data={filteredItems}
             keyExtractor={({ hashKey }) => hashKey}
-            renderItem={({ item, index }) => {
-                return <DropdownItem {...item} index={index} />;
-            }}
+            renderItem={renderItem}
         />
     </View>;
 }
+function renderItem<ItemType, ValueType>({ item, index }: { item: IDropdownPreparedItem<ItemType, ValueType>, index: number }) {
+    return <DropdownItem {...item} index={index} />;
+};
 
 const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) => {
     const { label, hashKey, labelText } = preparedItem;
@@ -542,10 +546,14 @@ const styles = StyleSheet.create({
     selectedIcon: {
         marginRight: 5,
     },
+    list: {
+
+    },
     itemContent: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-start",
+        textAlign: "left",
         width: "100%",
         flexWrap: "nowrap",
         paddingHorizontal: 10,
@@ -576,13 +584,6 @@ const styles = StyleSheet.create({
         width: "100%",
         paddingHorizontal: 7,
     },
-    listContainer: {
-        paddingHorizontal: 10,
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
-        height: "100%",
-        width: "100%",
-    },
     dropdownListContainerFullScreen: {
         flex: 1,
         flexGrow: 1,
@@ -611,18 +612,6 @@ const styles = StyleSheet.create({
         flexGrow: 0,
         //paddingVertical: 10,
         //paddingHorizontal: 10,
-    },
-    list: {
-
-    },
-    listContentContainerReverse: {
-        flexDirection: "column-reverse",
-    },
-    portalBackdrop: {
-        ...StyleSheet.absoluteFillObject,
-        flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: "flex-start",
     },
 });
 const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: boolean }) => {

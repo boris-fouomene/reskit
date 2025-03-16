@@ -8,7 +8,7 @@ import { IWithBreakpointStyle, withBreakpointStyle } from "@src/dimensions";
  *
  * ### Usage:
  * This component can be used just like a standard React Native `View`,
- * but it allows for the definition of `mediaQueryStyle`, which can adjust
+ * but it allows for the definition of `breakpointStyle`, which can adjust
  * the component's styles based on the current dimensions of the device.
  *
  * Example:
@@ -19,7 +19,7 @@ import { IWithBreakpointStyle, withBreakpointStyle } from "@src/dimensions";
  *   return (
  *     <View 
  *       {...rest} 
- *       mediaQueryStyle={(dimensions: IDimensionsProps) => ({
+ *       breakpointStyle={(dimensions: IDimensionsProps) => ({
  *         padding: dimensions.isMobile ? 10 : 20,
  *         backgroundColor: dimensions.isTablet ? 'lightblue' : 'white',
  *       })}

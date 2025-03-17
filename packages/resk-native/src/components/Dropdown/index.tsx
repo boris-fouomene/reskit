@@ -212,7 +212,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             });
         };
         if (menuContext && !newState.visible) {
-            menuContext.animateMenu(false, cb);
+            menuContext.animateMenu(newState.visible, cb);
         } else {
             cb();
         }
@@ -414,6 +414,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             minWidth={180}
             animated={false}
             bottomSheetTitle={context?.props?.label}
+            bottomSheetTitleDivider={!canRenderSearch(context)}
             {...Object.assign({}, menuProps)}
             bottomSheetFullScreen={(typeof menuProps?.bottomSheetFullScreen == "boolean" ? menuProps.bottomSheetFullScreen : preparedItems?.length > 10)}
             visible={visible}
@@ -440,13 +441,17 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         </Menu>
     </DropdownContext.Provider>;
 }
+const canRenderSearch = (context: IDropdownContext) => {
+    const preparedItems = context?.getPreparedItems() || [];
+    return !!!(context?.props?.showSearch === false || context?.props?.showSearch !== true && preparedItems?.length <= 5);
+}
 
 function DropdownMenu<ItemType = any, ValueType = any>() {
     const context = useDropdown();
     const filteredItems = Array.isArray(context?.filteredItems) ? context.filteredItems : [];
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
     const listProps = Object.assign({}, context?.props?.listProps);
-    const preparedItems = context?.getPreparedItems() || [];
+
     const testID = context?.getTestID();
     const menu = useMenu();
     const menuPosition = menu?.menuPosition;
@@ -455,7 +460,7 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
     const canReverse = isTopPosition && !fullScreen;
     const menuHeight = typeof menuPosition?.height === "number" && menuPosition.height > 50 ? menuPosition.height : undefined;
     const menuWidth = typeof menuPosition?.width === "number" && menuPosition.width > 50 ? menuPosition.width : undefined;
-    const canRenderDropdownSearch = !!!(context?.props?.showSearch === false || context?.props?.showSearch !== true && preparedItems?.length <= 5);
+    const canRenderDropdownSearch = canRenderSearch(context);
     const hasMenuHeight = typeof menuHeight == "number" && menuHeight > 0;
     return <View testID={testID + "-dropdown-list-container"} style={[
         styles.dropdownListContainer,

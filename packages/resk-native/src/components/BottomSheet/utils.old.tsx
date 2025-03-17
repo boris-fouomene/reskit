@@ -3,14 +3,16 @@ import { IMenuItemBase, IMenuItems } from "@components/Menu/types";
 import { IViewProps } from "@components/View";
 import useStateCallback from "@utils/stateCallback";
 import usePrevious from "@utils/usePrevious";
-import { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
-import { Animated, Dimensions, PanResponder, ScrollViewProps, StyleSheet, View } from "react-native";
+import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Animated, Dimensions, LayoutChangeEvent, PanResponder, ScrollViewProps, StyleSheet, View } from "react-native";
 import Theme, { useTheme } from "@theme/index";
 import { useBackHandler } from "@components/BackHandler";
 import { isNumber } from "@resk/core";
 import Platform from "@platform";
 const defaultHeight = 400;
 import platform from "@platform/index";
+
+const useNativeDriver = platform.canUseNativeDriver();
 
 const isWeb = platform.isWeb();
 
@@ -43,26 +45,26 @@ export const usePrepareBottomSheet = ({
     minHeight,
     dragFromTopOnly,
     fullScreen,
-    cornerRadius
+    cornerRadius,
+    backdropOpacity = 0.5,
+    animationConfig,
 }: IUsePrepareBottomSheetProps) => {
     dismissable = typeof dismissable === 'boolean' ? dismissable : true;
     const theme = useTheme();
     const elevation = typeof customElevation == "number" ? customElevation : 0;
     closeOnDragDown = typeof closeOnDragDown === 'boolean' ? closeOnDragDown : true;
-    animationDuration = typeof animationDuration === 'number' && animationDuration ? animationDuration : 300;
-    const { height: winHeight } = Dimensions.get('window');
-    let height = typeof customHeight == 'number' && customHeight ? customHeight : 0;
-    if (height > 0) {
-        height = Math.max(height, defaultHeight);
-    } else {
-        height = Math.max(winHeight / 3, defaultHeight);
-    }
-    if (isNumber(minHeight)) {
-        height = Math.max(minHeight, height);
-    }
-    if (fullScreen) {
-        height = winHeight;
-    }
+    animationDuration = isNumber(animationDuration) ? animationDuration : 300;
+    const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+    const maxHeight = 0.8 * SCREEN_HEIGHT;
+    const animatedValue = useRef(new Animated.Value(0)).current;
+    const [sheetHeight, setSheetHeight] = useState(0);
+
+    const translateY = animatedValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: [sheetHeight, 0],
+    });
+    const opacity = useRef<Animated.Value>(new Animated.Value(0)).current;
+    const lastGestureDy = useRef(0);
     dragFromTopOnly = typeof dragFromTopOnly === 'boolean' ? dragFromTopOnly : false;
     const pan = useRef(new Animated.ValueXY()).current;
     const [visibleState, setVisibleState] = useStateCallback(typeof customVisible === 'boolean' ? customVisible : false);
@@ -73,7 +75,9 @@ export const usePrepareBottomSheet = ({
         if (isControlled) return !!customVisible;
         return visibleState;
     }, [visibleState, isControlled, customVisible]);
-    const heightRef = useRef(height);
+
+
+
     const callbackRef = useRef<() => void>();
     const prevCustomVisible = usePrevious(customVisible);
     useEffect(() => {
@@ -86,9 +90,8 @@ export const usePrepareBottomSheet = ({
         }
         callbackRef.current = undefined;
     }, [isControlled, customVisible, prevCustomVisible]);
-    heightRef.current = height;
+
     const prevVisible = usePrevious(isVisible);
-    const opacity = useRef(new Animated.Value(0)).current;
     const getTranslatedY = (value: number) => {
         return isWeb ? value : Dimensions.get('window').height - value;
     }
@@ -100,14 +103,14 @@ export const usePrepareBottomSheet = ({
         if (typeof cornerRadius === 'number' && cornerRadius >= 0) {
             return cornerRadius;
         }
-        if (Math.abs(winHeight - height) <= 10) {
+        if (Math.abs(SCREEN_HEIGHT - sheetHeight) <= 50) {
             return 0;
         }
         return 20;
-    }, [cornerRadius, winHeight, height])
+    }, [cornerRadius, SCREEN_HEIGHT, sheetHeight])
     const context: IBottomSheetContext = ({
-        get height(): number {
-            return heightRef.current;
+        get height() {
+            return sheetHeight;
         },
         open: (cb?: () => void) => {
             if (isControlled) {
@@ -117,7 +120,7 @@ export const usePrepareBottomSheet = ({
             setVisibleState(true, cb);
         },
         close: (cb?: () => void) => {
-            animate(0, () => {
+            animate(false, () => {
                 if (isControlled) {
                     callbackRef.current = cb;
                     if (typeof onDismiss === 'function') {
@@ -144,13 +147,23 @@ export const usePrepareBottomSheet = ({
     }, [dismissable, context]);
     useBackHandler(handleBackPress);
     const animationsRef = useRef<Animated.CompositeAnimation>(null);
-    const animate = (toValue: number, callback?: Function, start: boolean = true) => {
-        const options2 = Object.assign({}, { duration: animationDuration }, { useNativeDriver: false }) as Animated.TimingAnimationConfig;
-        options2.toValue = getTranslatedY(toValue);
-        const visible = toValue > 0;
+    const animate = (visible: boolean, callback?: Function, start: boolean = true) => {
         const a = Animated.parallel([
-            Animated.timing(animatedHeight, options2),
-            Animated.timing(opacity, { ...options2, toValue: visible ? 1 : 0 }),
+            visible ? Animated.spring(animatedValue, {
+                bounciness: visible ? 0 : undefined,
+                ...Object.assign({}, animationConfig),
+                toValue: 1,
+                useNativeDriver,
+            }) : Animated.timing(animatedValue, {
+                toValue: 0,
+                duration: animationDuration,
+                useNativeDriver,
+            }),
+            Animated.timing(opacity, {
+                toValue: visible ? 1 : 0,
+                duration: animationDuration,
+                useNativeDriver,
+            }),
         ]);
         if (start) {
             if (animationsRef.current && typeof animationsRef.current.stop == "function") {
@@ -161,7 +174,6 @@ export const usePrepareBottomSheet = ({
                 if (!visible) {
                     pan.setValue({ x: 0, y: 0 });
                 }
-                (animatedValueRef as any).current = toValue;
                 if (typeof callback == "function") {
                     callback();
                 }
@@ -170,44 +182,50 @@ export const usePrepareBottomSheet = ({
         }
         return a;
     }
-    const panResponder = useMemo(() => {
-        return PanResponder.create({
+    const panResponder = useRef(
+        PanResponder.create({
             onStartShouldSetPanResponder: () => !!closeOnDragDown,
             onMoveShouldSetPanResponder: (_, gestureState) => {
                 return Math.abs(gestureState.dy) > 5;
             },
-            onPanResponderMove: (e, gestureState) => {
-                const diff = gestureState.dy > 0 ? animatedValueRef.current - gestureState.dy :
-                    Math.min(heightRef.current, animatedValueRef.current - gestureState.dy);
-                if (diff > 0 && diff !== animatedValueRef.current) {
-                    animatedHeight.setValue(getTranslatedY(diff));
-                }
+            onPanResponderMove: (_, gestureState) => {
+                const newTranslateY = Math.max(0, gestureState.dy);
+                // Adjust the animated value based on the gesture
+                const newAnimatedValue = 1 - (newTranslateY / sheetHeight);
+                animatedValue.setValue(Math.max(0, newAnimatedValue));
+
+                // const diff = gestureState.dy > 0 ? animatedValueRef.current - gestureState.dy :
+                //     Math.min(heightRef.current, animatedValueRef.current - gestureState.dy);
+                // if (diff > 0 && diff !== animatedValueRef.current) {
+                //     animatedHeight.setValue(getTranslatedY(diff));
+                // }
             },
-            onPanResponderRelease: (e, gestureState) => {
+            onPanResponderRelease: (_, gestureState) => {
                 // Threshold to determine if sheet should close
                 const velocity = gestureState.vy;
                 const movedDistance = gestureState.dy;
-
                 // Close if swiped down with velocity or moved down significantly
-                if (velocity > 0.5 || movedDistance > heightRef.current * 0.2) {
+                if (velocity > 0.5 || movedDistance > sheetHeight * 0.2) {
                     context.close();
                     return;
                 }
-                const height = animatedValueRef.current;
-                if (height / 3 - gestureState.dy < 0) {
+                if (sheetHeight / 3 - gestureState.dy < 0) {
                     context.close();
                 }
-            }
-        });
-    }, []);
+            },
+        })
+    ).current;
     useEffect(() => {
         if (prevVisible == isVisible) return;
-        animate(isVisible ? heightRef.current : 0, () => {
+        animate(isVisible, () => {
             if (isVisible && typeof onOpen == "function") {
                 onOpen();
             }
         });
     }, [isVisible, prevVisible]);
+
+
+
     return {
         closeOnDragDownIcon: closeOnDragDown ? (
             <View
@@ -222,9 +240,16 @@ export const usePrepareBottomSheet = ({
         panResponder,
         animate,
         handleBackPress,
-        height,
         context,
-        backdropStyle: [styles.backdrop, { backgroundColor: theme.colors.backdrop }],
+        backdropStyle: [styles.backdrop, !isVisible ? Theme.styles.hidden : undefined, { backgroundColor: theme.colors.backdrop }],
+        onContentLayout: (event: LayoutChangeEvent) => {
+            const { height } = event.nativeEvent.layout;
+            // Set sheet height based on content with a maximum limit
+            const calculatedHeight = Math.min(sheetHeight, maxHeight);
+            if (Math.abs(sheetHeight - calculatedHeight) > 50) {
+                setSheetHeight(calculatedHeight);
+            }
+        },
         animatedProps: {
             ...(!dragFromTopOnly ? panResponder.panHandlers : {}),
             style: [
@@ -234,12 +259,11 @@ export const usePrepareBottomSheet = ({
 
                     borderTopRightRadius: borderRadius,
                     borderTopLeftRadius: borderRadius,
-                    transform: [{ translateY: isWeb ? 0 : animatedHeight }, { translateX: 0 }],
                     opacity,
                     backgroundColor: theme.colors.surface,
-                    maxHeight: winHeight,
+                    transform: [{ translateY }],
+                    maxHeight: sheetHeight || maxHeight,
                 },
-                isWeb && { height: animatedHeight }
             ],
         }
     }
@@ -368,6 +392,18 @@ export interface IUsePrepareBottomSheetProps {
      * It is used to define the borderTopLeftRadius and borderTopRightRadius properties of the bottom sheet.
      */
     cornerRadius?: number;
+
+    /**
+     * Maximum opacity of the backdrop when fully opened
+     * @default 0.5
+     */
+    backdropOpacity?: number;
+
+
+    /**
+     * Animation config for the bottom sheet
+     */
+    animationConfig?: Partial<Animated.SpringAnimationConfig>;
 }
 
 /**
@@ -580,31 +616,12 @@ const styles = StyleSheet.create({
     backdrop: {
         position: "relative",
         flex: 1,
+        justifyContent: 'flex-end',
         overflow: "hidden",
-        ...Platform.select({
-            web: {
-                flexDirection: "column-reverse",
-            },
-            default: {
-                flexDirection: "column",
-            }
-        }),
     },
     container: {
         position: "relative",
         flexGrow: 0,
-        ...Platform.select({
-            web: {
-            },
-            default: {
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0,
-                flexGrow: 1,
-                height: "100%",
-            }
-        }),
         width: "100%",
         overflow: "hidden",
         alignSelf: "flex-end",

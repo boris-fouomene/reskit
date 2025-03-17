@@ -358,6 +358,7 @@ const Menu: React.FC<IMenuProps> = ({
     bottomSheetFullScreen,
     bottomSheetMinHeight,
     bottomSheetTitle,
+    bottomSheetTitleDivider,
     ...props
 }) => {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -402,7 +403,11 @@ const Menu: React.FC<IMenuProps> = ({
     const opacity = useRef<Animated.Value>(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(animated ? 0.5 : 1)).current;
     const prevIsVisible = usePrevious(isVisible);
+    const animationsRef = useRef<Animated.CompositeAnimation>(null);
     const animateMenu = (visible: boolean, callback?: (() => void)) => {
+        if (animationsRef.current && typeof animationsRef.current.stop == "function") {
+            animationsRef.current.stop();
+        }
         const animations = [
             Animated.timing(opacity, {
                 toValue: visible ? 1 : 0,
@@ -419,9 +424,11 @@ const Menu: React.FC<IMenuProps> = ({
             }));
         }
         if (!visible) {
-            animations.push(preparedBottomSheet.animate({ toValue: 0, duration: animationDuration }, undefined, false));
+            animations.push(preparedBottomSheet.animate(0, undefined, false));
         }
+        (animationsRef as any).current = animations;
         return Animated.parallel(animations).start(() => {
+            (animationsRef as any).current = null;
             if (typeof callback == "function") {
                 callback();
             }
@@ -562,7 +569,7 @@ const Menu: React.FC<IMenuProps> = ({
                 {anchor}
             </Pressable>
         </MenuContext.Provider>
-        {<Portal absoluteFill visible={isVisible} testID={testID + "-portal"}>
+        {<Portal visible={isVisible} absoluteFill style={!isVisible && Theme.styles.hidden} testID={testID + "-portal"}>
             <MenuContext.Provider value={context}>
                 <Pressable
                     onPress={() => {
@@ -605,7 +612,7 @@ const Menu: React.FC<IMenuProps> = ({
                                             }}
                                         />
                                     </View>
-                                    {bottomSheetTitle ? <Divider testID={testID + "-divider"} /> : null}
+                                    {bottomSheetTitle && bottomSheetTitleDivider !== false ? <Divider testID={testID + "-divider"} /> : null}
                                 </View> : null}
                                 {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
                                 {child}

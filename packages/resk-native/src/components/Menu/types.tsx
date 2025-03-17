@@ -621,6 +621,11 @@ export type IMenuProps<MenuItemContext = any> = Omit<Animated.AnimatedProps<View
      * The title of the bottom sheet when the menu is rendered as a bottom sheet.
      */
     bottomSheetTitle?: ReactNode;
+
+    /***
+     * Whether to show a divider between the title and the content when the menu is rendered as a bottom sheet.
+     */
+    bottomSheetTitleDivider?: boolean;
 }
 
 /**

@@ -1,9 +1,9 @@
-import React, { useImperativeHandle } from "react"
+import React, { useImperativeHandle, useRef } from "react"
 import theme from "@theme";
 import { defaultObj, defaultStr, isObj } from "@resk/core";
 import View from "@components/View";
 import { Portal } from "@components/Portal";
-import { Platform, ScrollView } from "react-native";
+import { PanResponder, Platform, ScrollView } from "react-native";
 import { ExpandableItem } from "@components/Menu/ExpandableItem";
 import { BottomSheetContext } from "./hooks";
 import {
@@ -18,7 +18,6 @@ import { IBottomSheetItemProps, IBottomSheetMenuItemContext, IBottomSheetProps, 
 import BottomSheetItem from "./Item";
 import { useDimensions } from "@dimensions/index";
 import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
-
 
 /**
  * A React component that represents a bottom sheet.
@@ -44,6 +43,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
         context,
         handleBackPress,
         panResponder,
+        height,
         backdropStyle,
         animatedProps,
     } = usePrepareBottomSheet(props);
@@ -98,7 +98,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
                                     /> : null}
                                 </> : null}
                                 {withScrollView !== false ?
-                                    <ScrollView testID={testID + "-scroll-view"} contentProps={{ style: styles.scrollViewContent }} {...scrollViewProps} style={[styles.scrollView, scrollViewProps.style]} alwaysBounceVertical={false}
+                                    <ScrollView testID={testID + "-scroll-view"} alwaysBounceVertical={false} {...scrollViewProps} style={[styles.scrollView, { maxHeight: height - 80 }, scrollViewProps.style]}
                                         contentContainerStyle={[{ flexGrow: 1, margin: 0, paddingBottom: 30 }, scrollViewProps.contentContainerStyle]}
                                     >
                                         {content}
@@ -149,17 +149,18 @@ const styles = StyleSheet.create({
 
     },
     scrollView: {
-        paddingBottom: 30,
+        paddingBottom: 40,
         margin: 0,
         flex: 1,
     },
     scrollViewContent: {
         margin: 0,
+        flexGrow: 1,
     },
     main: {
         // height: '100%'
         width: "100%",
-        flex: 1,
+        //flex: 1,
         flexGrow: 1,
     },
     wrapper: {

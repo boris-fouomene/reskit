@@ -15,13 +15,15 @@ import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
 import { MenuItem } from './Item';
 import { measureContentHeight } from '@components/BottomSheet/measureContentHeight';
-import { KeyboardAvoidingView } from '@components/KeyboardAvoidingView';
 import { Icon } from '@components/Icon';
 import { useI18n } from '@src/i18n';
 import usePrevious from '@utils/usePrevious';
-import platform from '@platform/index';
+import { usePrepareBottomSheet } from '@components/BottomSheet/utils';
+import { KeyboardAvoidingView } from '@components/KeyboardAvoidingView';
+import Label from '@components/Label';
+import { Divider } from '@components/Divider';
 
-const useNativeDriver = platform.canUseNativeDriver();
+const useNativeDriver = false;
 
 /**
  * Custom hook to calculate the optimal position for a menu based on the anchor element's measurements.
@@ -230,10 +232,8 @@ export const useMenuPosition = ({
         animatedStyle: [
             styles.menuAnimated,
             touchableBackdropStyle,
-            menuAnchorStyle,
-            {
-                ...menuContainerStyle,
-            },
+            !fullScreen && menuAnchorStyle,
+            //menuContainerStyle,
             !fullScreen && typeof borderRadius === 'number' ? { borderRadius } : null,
             typeof elevation === 'number' ? Theme.elevations[elevation] : null,
             {
@@ -341,7 +341,6 @@ const Menu: React.FC<IMenuProps> = ({
     onOpen,
     testID,
     onLayout,
-    beforeToggle,
     responsive,
     items,
     itemsProps,
@@ -356,6 +355,9 @@ const Menu: React.FC<IMenuProps> = ({
     dismissable,
     onDismiss,
     animationDuration,
+    bottomSheetFullScreen,
+    bottomSheetMinHeight,
+    bottomSheetTitle,
     ...props
 }) => {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -401,44 +403,67 @@ const Menu: React.FC<IMenuProps> = ({
     const scale = useRef(new Animated.Value(animated ? 0.5 : 1)).current;
     const prevIsVisible = usePrevious(isVisible);
     const animateMenu = (visible: boolean, callback?: (() => void)) => {
-        const animateOpacity = Animated.timing(opacity, {
-            toValue: visible ? 1 : 0,
-            duration: animationDuration,
-            useNativeDriver,
-            easing: visible ? Easing.in(Easing.exp) : Easing.out(Easing.exp),
-        });
+        const animations = [
+            Animated.timing(opacity, {
+                toValue: visible ? 1 : 0,
+                duration: animationDuration,
+                useNativeDriver,
+                easing: visible ? Easing.in(Easing.exp) : Easing.out(Easing.exp),
+            }),
+        ]
         if (animated) {
-            Animated.parallel([
-                Animated.timing(scale, {
-                    toValue: visible ? 1 : 0.5,
-                    duration: animationDuration,
-                    useNativeDriver,
-                }),
-                animateOpacity
-            ]).start(() => {
-                if (typeof callback == "function") {
-                    callback();
-                }
-            });
-        } else {
-            animateOpacity.start(() => {
-                if (typeof callback == "function") {
-                    callback();
-                }
-            });
+            animations.push(Animated.timing(scale, {
+                toValue: visible ? 1 : 0.5,
+                duration: animationDuration,
+                useNativeDriver,
+            }));
         }
+        if (!visible) {
+            animations.push(preparedBottomSheet.animate({ toValue: 0, duration: animationDuration }, undefined, false));
+        }
+        return Animated.parallel(animations).start(() => {
+            if (typeof callback == "function") {
+                callback();
+            }
+        })
     }
+    const closeMenuInternal = (callback?: Function) => {
+        if (isControlled) {
+            if (typeof onDismiss === "function") {
+                onDismiss();
+            }
+            return;
+        }
+        setState((prevState) => ({ ...prevState, visible: false }), () => {
+            if (typeof callback === "function") {
+                callback();
+            }
+            if (typeof onClose === "function") {
+                onClose();
+            }
+        });
+    };
+    const renderedAsBottomSheet = fullScreen;
+    const preparedBottomSheet = usePrepareBottomSheet({
+        visible: isVisible,
+        height: state.anchorMeasurements?.contentHeight,
+        animationDuration,
+        dismissable,
+        fullScreen: bottomSheetFullScreen,
+        onDismiss: closeMenuInternal
+    })
+
     useEffect(() => {
         if (prevIsVisible == isVisible) return;
         animateMenu(isVisible);
     }, [isVisible, prevIsVisible, animationDuration, animated]);
     useEffect(() => {
-        measureAnchor(anchorRef).then((anchorMeasurements) => {
+        measureAnchor(anchorRef, bottomSheetMinHeight).then((anchorMeasurements) => {
             setState(prevState => {
                 return { ...prevState, anchorMeasurements }
             })
         });
-    }, [screenWidth, screenHeight, anchorRef]);
+    }, [screenWidth, screenHeight, anchorRef, bottomSheetMinHeight]);
     // Handle menu layout changes
     const onMenuLayout = (event: LayoutChangeEvent) => {
         const { width: mWidth, height } = event.nativeEvent.layout;
@@ -452,8 +477,7 @@ const Menu: React.FC<IMenuProps> = ({
 
     const context1 = { animated, anchorMeasurements: state.anchorMeasurements, menuPosition, responsive, testID, borderRadius, fullScreen: fullScreen, ...props, isMenu: true, isMenuOpen, isMenuVisible: isVisible }
     const openMenu = (callback?: Function) => {
-        measureAnchor(anchorRef).then((measures) => {
-            if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu } as IMenuContext)) === false) return;
+        measureAnchor(anchorRef, bottomSheetMinHeight).then((measures) => {
             if (isControlled) {
                 setState((prevState) => {
                     return { ...prevState, anchorMeasurements: measures }
@@ -473,29 +497,9 @@ const Menu: React.FC<IMenuProps> = ({
         });
     };
     const closeMenu = (callback?: Function) => {
-        if (typeof beforeToggle === 'function' && beforeToggle(Object.assign(context1, { openMenu, closeMenu } as IMenuContext)) === false) return;
-        animateMenu(false, () => {
-            if (isControlled) {
-                if (typeof onDismiss === "function") {
-                    onDismiss();
-                }
-                return;
-            }
-            setState((prevState) => ({ ...prevState, visible: false }), () => {
-                if (typeof callback === "function") {
-                    callback();
-                }
-                if (typeof onClose === "function") {
-                    onClose();
-                }
-            });
-        });
+        animateMenu(false, closeMenuInternal);
     };
-    const renderedAsFullScreen = fullScreen;
-    const closeMenuOrBottomSheet = () => {
-        closeMenu()
-    }
-    const context = { ...context1, isMenuVisible: isVisible, isMenuOpen, openMenu, closeMenu };
+    const context = { ...context1, isMenuVisible: isVisible, animateMenu, isMenuOpen, openMenu, closeMenu };
     const anchor = useMemo(() => {
         if (typeof customAnchor === 'function') {
             return (state: PressableStateCallbackType) => {
@@ -533,7 +537,7 @@ const Menu: React.FC<IMenuProps> = ({
                         anchorContainerProps.onAccessibilityEscape()
                     }
                     if (dismissable !== false) {
-                        closeMenuOrBottomSheet();
+                        closeMenu();
                     }
                 }}
                 style={(state) => {
@@ -543,7 +547,7 @@ const Menu: React.FC<IMenuProps> = ({
                     if (typeof anchorContainerProps?.onLayout === 'function') {
                         anchorContainerProps?.onLayout(event);
                     }
-                    measureAnchor(anchorRef).then((anchorMeasurements) => {
+                    measureAnchor(anchorRef, bottomSheetMinHeight).then((anchorMeasurements) => {
                         setState(prevState => {
                             return { ...prevState, anchorMeasurements }
                         });
@@ -559,45 +563,56 @@ const Menu: React.FC<IMenuProps> = ({
             </Pressable>
         </MenuContext.Provider>
         {<Portal absoluteFill visible={isVisible} testID={testID + "-portal"}>
-            <Pressable
-                onPress={closeMenuOrBottomSheet}
-                style={[styles.portalBackdrop]}
-                testID={testID + "-menu-backdrop"}
-            />
             <MenuContext.Provider value={context}>
-                <Animated.View
-                    testID={testID}
-                    {...props}
-                    onLayout={(event) => {
-                        if (typeof onLayout === 'function') {
-                            onLayout(event);
-                        }
-                        onMenuLayout(event);
+                <Pressable
+                    onPress={() => {
+                        closeMenu();
                     }}
-                    style={[
-                        animatedStyle,
-                        { opacity, transform: [{ scale }] },
-                        props.style,
-                    ]}
+                    style={[styles.portalBackdrop, renderedAsBottomSheet && preparedBottomSheet.backdropStyle]}
+                    testID={testID + "-menu-backdrop"}
                 >
-                    <Wrapper {...wrapperProps}>
-                        <View testID={testID + "-content-container"} style={[styles.contentContainer]}>
-                            {renderedAsFullScreen ? <View style={styles.bottomSheetCloseIconContainer}>
-                                <View testID={testID + "-close-menu"} style={[styles.bottomSheetCloseIcon]}>
-                                    <Icon
-                                        iconName='close'
-                                        title={i18n.t('components.menu.close')}
-                                        size={30}
-                                        color={theme.colors.onSurface}
-                                        onPress={closeMenuOrBottomSheet}
-                                    />
-                                </View>
-                            </View> : null}
-                            {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
-                            {child}
-                        </View>
-                    </Wrapper>
-                </Animated.View>
+                    <Animated.View
+                        testID={testID}
+                        {...props}
+                        {...(renderedAsBottomSheet ? preparedBottomSheet.animatedProps : {})}
+                        onLayout={(event) => {
+                            if (typeof onLayout === 'function') {
+                                onLayout(event);
+                            }
+                            onMenuLayout(event);
+                        }}
+                        style={[
+                            animatedStyle,
+                            { opacity, transform: [{ scale }] },
+                            props.style,
+                            renderedAsBottomSheet ? preparedBottomSheet.animatedProps.style : null,
+                        ]}
+                    >
+                        <Wrapper {...wrapperProps}>
+                            <KeyboardAvoidingView testID={testID + "-content-container"} style={[styles.contentContainer]}>
+                                {renderedAsBottomSheet ? <View style={styles.bottomSheetCloseIconContainer}>
+                                    <View testID={testID + "-close-menu"} style={[styles.bottomSheetCloseIcon]}>
+                                        <View testID={testID + "-bottom-sheet-title-container"} style={[{ maxWidth: screenWidth - 70 }, styles.bottomSheetTitleContainer]} >
+                                            <Label textBold testID={testID + "-bottom-sheet-title"} color={theme.colors.onSurface}>{bottomSheetTitle}</Label>
+                                        </View>
+                                        <Icon
+                                            iconName='close'
+                                            title={i18n.t('components.menu.close')}
+                                            size={30}
+                                            color={theme.colors.onSurface}
+                                            onPress={() => {
+                                                closeMenu();
+                                            }}
+                                        />
+                                    </View>
+                                    {bottomSheetTitle ? <Divider testID={testID + "-divider"} /> : null}
+                                </View> : null}
+                                {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
+                                {child}
+                            </KeyboardAvoidingView>
+                        </Wrapper>
+                    </Animated.View>
+                </Pressable>
             </MenuContext.Provider>
         </Portal>}
     </>
@@ -629,7 +644,8 @@ const styles = StyleSheet.create({
     contentContainer: {
         width: '100%',
         alignSelf: "flex-start",
-        flexGrow: 1,
+        //flexGrow: 1,
+        flex: 1,
     },
     bottomSheetCloseIconContainer: {
         alignSelf: "flex-start",
@@ -638,17 +654,23 @@ const styles = StyleSheet.create({
     bottomSheetCloseIcon: {
         alignSelf: "flex-start",
         width: "100%",
-        //flexDirection : isRTL ? "row-reverse" : "row",
-        flexDirection: "row-reverse",
+        flexDirection: "row",
+        justifyContent: "space-between",
         alignItems: "center",
         paddingHorizontal: 10,
         paddingBottom: 10,
     },
+    bottomSheetTitleContainer: {
+        flexWrap: "wrap",
+        paddingHorizontal: 10
+    },
     portalBackdrop: {
-        ...StyleSheet.absoluteFillObject,
         flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: "flex-start",
+        overflow: "hidden",
+        position: "relative",
+    },
+    portalBottomSheet: {
+
     },
     menuAnimated: {
         overflow: "hidden",

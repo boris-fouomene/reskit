@@ -44,6 +44,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
         context,
         handleBackPress,
         panResponder,
+        backdropStyle,
         animatedProps,
     } = usePrepareBottomSheet(props);
     testID = defaultStr(testID, "resk-bottom-sheet");
@@ -69,7 +70,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
             <BottomSheetContext.Provider value={context}>
                 <Pressable
                     testID={testID + "-backdrop"}
-                    style={[styles.backdrop, { backgroundColor: theme.colors.backdrop }]}
+                    style={[backdropStyle, { backgroundColor: theme.colors.backdrop }]}
                     onPress={handleBackPress}
                     onAccessibilityEscape={handleBackPress}
                 >
@@ -131,20 +132,8 @@ const styles = StyleSheet.create({
     keyboardAvoidingView: {
         width: '100%',
         alignSelf: "flex-start",
-        flexGrow: 1,
-    },
-    backdrop: {
-        //...StyleSheet.absoluteFillObject,
-        position: "relative",
+        //flexGrow: 1,
         flex: 1,
-        ...Platform.select({
-            web: {
-                flexDirection: "column-reverse",
-            },
-            default: {
-                flexDirection: "column",
-            }
-        }),
     },
     contentContainer: {
         width: '100%',

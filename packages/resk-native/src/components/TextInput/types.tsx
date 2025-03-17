@@ -467,7 +467,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      * A boolean that determines whether to wrap the TextInput with a KeyboardAvoidingView.
      * This is useful for handling the keyboard behavior when the input is focused.
      * When set to true, the component will wrap the TextInput with a KeyboardAvoidingView.
-     * Default is true.
+     * Default is false.
      */
     withKeyboardAvoidingView?: boolean;
 

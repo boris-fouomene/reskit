@@ -246,6 +246,11 @@ export interface IMenuContext extends Omit<IMenuProps, "children" | "anchor" | "
      * Wheather the menu is rendering on fullScreen
      */
     fullScreen: boolean;
+
+    /***
+     * A function that animates the menu
+     */
+    animateMenu: (visible: boolean, callback?: () => void) => void;
 }
 
 
@@ -477,8 +482,6 @@ export interface IUseMenuPositionProps {
  * @property {Omit<PressableProps, 'children'>} [anchorContainerProps] - 
  * @property {Omit<PressableProps, 'children' | 'onPress'>} [anchorContainerProps] - Props for the pressable component parent of the anchor element.
  * @property {Element | ((options: IMenuContext) => Element)} [children] - Menu content, either as static JSX or a function returning JSX based on the menu context.
- * @property {(menuContext:IMenuContext) => any} beforeToggle - 
- *         Method called before the menu is toggled. If this method returns false, the menu will not be toggled.
  * @property {boolean} [responsive] - 
  *         Optional flag to enable responsive behavior for the menu. 
  *         When set to true, the menu will adjust its position and size 
@@ -574,9 +577,6 @@ export type IMenuProps<MenuItemContext = any> = Omit<Animated.AnimatedProps<View
     /** Menu content, either as static JSX or a function returning JSX based on the menu context. */
     children?: IReactNullableElement | ((options: IMenuContext) => IReactNullableElement);
 
-    /** Method called before the menu is toggled. if this method returns false, the menu will not be toggled */
-    beforeToggle?: (menuContext: IMenuContext) => any;
-
     /**
      * An optional property that defines an array of menu items. Each item can either be a valid menu item object or undefined/null.
      */
@@ -606,6 +606,21 @@ export type IMenuProps<MenuItemContext = any> = Omit<Animated.AnimatedProps<View
      * The duration of the animation in milliseconds.
      */
     animationDuration?: number;
+
+    /***
+     * Whether the bottom sheet should be full screen or not when the menu is rendered as a bottom sheet.
+     */
+    bottomSheetFullScreen?: boolean;
+
+    /***
+     * The minimum height of the bottom sheet when the menu is rendered as a bottom sheet.
+     */
+    bottomSheetMinHeight?: number;
+
+    /***
+     * The title of the bottom sheet when the menu is rendered as a bottom sheet.
+     */
+    bottomSheetTitle?: ReactNode;
 }
 
 /**

@@ -7,7 +7,7 @@ import { DropdownContext, useDropdown } from "./hooks";
 import Theme, { useTheme } from "@theme/index";
 import { TouchableOpacity } from 'react-native';
 import TextInput from "@components/TextInput";
-import { Menu, useMenu } from "@components/Menu";
+import { IMenuContext, Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { TouchableRipple } from "@components/TouchableRipple";
 import { StyleSheet } from "react-native";
@@ -181,7 +181,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             }, 10);
         }
     }
-    toggleItem(preparedItem: IDropdownPreparedItem<ItemType, ValueType> & { index: number }) {
+    toggleItem(preparedItem: IDropdownPreparedItem<ItemType, ValueType> & { index: number }, menuContext?: IMenuContext) {
         if (!isObj(preparedItem) || !isNonNullString(preparedItem.hashKey)) return;
         const newItemStatus = !this.isSelectedByHashKey(preparedItem.hashKey);
         const newState: IDropdownState<ItemType, ValueType> = {} as IDropdownState<ItemType, ValueType>;
@@ -199,16 +199,23 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             newState.selectedItemsByHashKey = newItemStatus ? { [preparedItem.hashKey]: preparedItem } : {};
             newState.visible = false;
         }
-        this.setState(newState, () => {
-            this.callOnChange(preparedItem);
-            const triggerCallOptions = { ...preparedItem, dropdownContext: this };
-            this.trigger("toggleItem", triggerCallOptions);
-            if (newItemStatus) {
-                this.trigger("selectItem", triggerCallOptions);
-            } else {
-                this.trigger("unselectItem", triggerCallOptions);
-            }
-        });
+        const cb = () => {
+            this.setState(newState, () => {
+                this.callOnChange(preparedItem);
+                const triggerCallOptions = { ...preparedItem, dropdownContext: this };
+                this.trigger("toggleItem", triggerCallOptions);
+                if (newItemStatus) {
+                    this.trigger("selectItem", triggerCallOptions);
+                } else {
+                    this.trigger("unselectItem", triggerCallOptions);
+                }
+            });
+        };
+        if (menuContext && !newState.visible) {
+            menuContext.animateMenu(false, cb);
+        } else {
+            cb();
+        }
     }
     open() {
         const { isLoading, readOnly, disabled } = this.props;
@@ -406,7 +413,9 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             responsive
             minWidth={180}
             animated={false}
+            bottomSheetTitle={context?.props?.label}
             {...Object.assign({}, menuProps)}
+            bottomSheetFullScreen={(typeof menuProps?.bottomSheetFullScreen == "boolean" ? menuProps.bottomSheetFullScreen : preparedItems?.length > 10)}
             visible={visible}
             onDismiss={context.close.bind(context)}
             withScrollView={false}
@@ -461,7 +470,7 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
             testID={testID + "-dropdown-list"}
             scrollEnabled
             {...listProps}
-            style={[listProps.style, hasMenuHeight && { maxHeight: menuHeight - 60 }, styles.list]}
+            style={[listProps.style, hasMenuHeight && { maxHeight: menuHeight - (canRenderDropdownSearch ? 10 : 60) }, styles.list]}
             inverted={canReverse}
             data={filteredItems}
             keyExtractor={({ hashKey }) => hashKey}
@@ -475,6 +484,7 @@ function renderItem<ItemType, ValueType>({ item, index }: { item: IDropdownPrepa
 
 const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) => {
     const { label, hashKey, labelText } = preparedItem;
+    const menuContext = useMenu()
     const forceRender = useForceRender();
     const context = useDropdown();
     const theme = useTheme();
@@ -524,7 +534,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
             title={label}
             as={TouchableRipple}
             onPress={() => {
-                context.toggleItem(preparedItem);
+                context.toggleItem(preparedItem, menuContext);
             }}
             style={[styles.itemContainer]}
             testID={testID + "-item-container-" + hashKey}

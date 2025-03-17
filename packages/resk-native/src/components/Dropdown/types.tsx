@@ -5,7 +5,7 @@ import { IViewProps } from "@components/View";
 import { PressableProps, FlatListProps } from "react-native";
 import { IFontIconName } from "@components/Icon";
 import { ObservableComponent } from "@utils/index";
-import { IMenuProps } from "@components/Menu";
+import { IMenuContext, IMenuProps } from "@components/Menu/types";
 
 /**
  * Represents the context for a dropdown component, providing methods and state 
@@ -249,7 +249,7 @@ export interface IDropdownContext<ItemType = any, ValueType = any> extends Obser
      * @param {IDropdownPreparedItem<ItemType, ValueType> & { index: number }} preparedItem - The prepared item to toggle.
      * @returns {void} This method does not return a value.
      */
-    toggleItem: (preparedItem: IDropdownPreparedItem<ItemType, ValueType> & { index: number }) => any;
+    toggleItem: (preparedItem: IDropdownPreparedItem<ItemType, ValueType> & { index: number }, menuContext?: IMenuContext) => any;
     /***
      * Check if a given hash key is selected.
      * 

@@ -93,9 +93,9 @@ const TextInput = React.forwardRef(({ render, withKeyboardAvoidingView, ...props
     const inputProps = { ...(!canWrapWithTouchable && editable ? pressableProps : {}), focus, ...rest, editable: canWrapWithTouchable ? false : editable, readOnly: canWrapWithTouchable ? true : props.readOnly }
     const inputElement = typeof render == "function" ? render(inputProps, inputRef) : <RNTextInput {...inputProps} ref={inputRef} />;
     const Avoiding = useMemo(() => {
-        return withKeyboardAvoidingView !== false ? KeyboardAvoidingView : View;
+        return withKeyboardAvoidingView ? KeyboardAvoidingView : View;
     }, [withKeyboardAvoidingView]);
-    return <Avoiding {...containerProps} >
+    return <Avoiding {...containerProps}>
         {isLabelEmbededVariant ? null : labelContent}
         <Wrapper {...wrapperProps} {...contentContainerProps} style={[styles.wrapper, contentContainerProps?.style]}>
             <View testID={testID + "-left-content-container"} {...leftContainerProps} style={[styles.leftOrRightContainer, styles.leftContentContainer, canWrapWithTouchable && styles.leftContainerWrappedWithTouchable, leftContainerProps.style]}>
@@ -516,6 +516,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, style
             multiple={false}
             textFontSize={fontSize}
             disabled={!editable}
+            menuProps={{ bottomSheetTitle: label }}
             defaultValue={inputState.phoneCountryCode}
             onChange={!editable ? undefined : ({ value }) => {
                 if (isNonNullString(value) && value !== inputState.phoneCountryCode && String(value).toLowerCase() !== "undefined") {

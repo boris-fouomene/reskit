@@ -11,6 +11,7 @@ import { isNumber } from "@resk/core";
 import Platform from "@platform";
 const defaultHeight = 400;
 import platform from "@platform/index";
+import { background } from "@theme/typography";
 
 const isWeb = platform.isWeb();
 
@@ -73,9 +74,22 @@ export const usePrepareBottomSheet = ({
         return visibleState;
     }, [visibleState, isControlled, customVisible]);
     const heightRef = useRef(height);
+    const callbackRef = useRef<() => void>();
+    const prevCustomVisible = usePrevious(customVisible);
+    useEffect(() => {
+        if (!isControlled || prevCustomVisible === customVisible) {
+            callbackRef.current = undefined;
+            return;
+        }
+        if (typeof callbackRef.current == 'function') {
+            callbackRef.current();
+        }
+        callbackRef.current = undefined;
+    }, [isControlled, customVisible, prevCustomVisible]);
     heightRef.current = height;
     const prevVisible = usePrevious(isVisible);
     const animatedHeight = useRef(new Animated.Value(!isWeb ? winHeight : 0)).current;
+    const opacity = useRef(new Animated.Value(0)).current;
     const getTranslatedY = (value: number) => {
         return isWeb ? value : Dimensions.get('window').height - value;
     }
@@ -87,13 +101,16 @@ export const usePrepareBottomSheet = ({
             return heightRef.current;
         },
         open: (cb?: () => void) => {
-            if (isControlled) return;
+            if (isControlled) {
+                callbackRef.current = cb;
+                return;
+            }
             setVisibleState(true, cb);
         },
         close: (cb?: () => void) => {
             animate({ toValue: 0 }, () => {
-                pan.setValue({ x: 0, y: 0 });
                 if (isControlled) {
+                    callbackRef.current = cb;
                     if (typeof onDismiss === 'function') {
                         onDismiss();
                     }
@@ -117,16 +134,27 @@ export const usePrepareBottomSheet = ({
         return true;
     }, [dismissable, context]);
     useBackHandler(handleBackPress);
-    const animate = (options: Omit<Partial<Animated.TimingAnimationConfig>, "toValue"> & { toValue: number }, callback?: Function) => {
+    const animate = (options: Omit<Partial<Animated.TimingAnimationConfig>, "toValue"> & { toValue: number }, callback?: Function, start: boolean = true) => {
         const options2 = Object.assign({}, { duration: animationDuration }, options, { useNativeDriver: false }) as Animated.TimingAnimationConfig;
         const value = options2.toValue;
         options2.toValue = getTranslatedY(value as number);
-        return Animated.timing(animatedHeight, options2).start(() => {
-            (animatedValueRef as any).current = value;
-            if (typeof callback == "function") {
-                callback();
-            }
-        });
+        const visible = value as number > 0;
+        const a = Animated.parallel([
+            Animated.timing(animatedHeight, options2),
+            Animated.timing(opacity, { ...options2, toValue: visible ? 1 : 0 }),
+        ]);
+        if (start) {
+            a.start(() => {
+                if (!visible) {
+                    pan.setValue({ x: 0, y: 0 });
+                }
+                (animatedValueRef as any).current = value;
+                if (typeof callback == "function") {
+                    callback();
+                }
+            })
+        }
+        return a;
     }
     const panResponder = useMemo(() => {
         return PanResponder.create({
@@ -160,7 +188,6 @@ export const usePrepareBottomSheet = ({
     }, []);
     useEffect(() => {
         if (prevVisible == isVisible) return;
-        pan.setValue({ x: 0, y: 0 });
         animate({ toValue: isVisible ? heightRef.current : 0 }, () => {
             if (isVisible && typeof onOpen == "function") {
                 onOpen();
@@ -182,6 +209,7 @@ export const usePrepareBottomSheet = ({
         animate,
         handleBackPress,
         context,
+        backdropStyle: [styles.backdrop, { backgroundColor: theme.colors.backdrop }],
         animatedProps: {
             ...(!dragFromTopOnly ? panResponder.panHandlers : {}),
             style: [
@@ -189,6 +217,7 @@ export const usePrepareBottomSheet = ({
                 theme.elevations[elevation],
                 {
                     transform: [{ translateY: isWeb ? 0 : animatedHeight }, { translateX: 0 }],
+                    opacity,
                     backgroundColor: theme.colors.surface,
                     maxHeight: winHeight,
                 },
@@ -523,6 +552,19 @@ export interface IBottomSheetProps extends IViewProps, IUsePrepareBottomSheetPro
 
 
 const styles = StyleSheet.create({
+    backdrop: {
+        position: "relative",
+        flex: 1,
+        overflow: "hidden",
+        ...Platform.select({
+            web: {
+                flexDirection: "column-reverse",
+            },
+            default: {
+                flexDirection: "column",
+            }
+        }),
+    },
     container: {
         position: "relative",
         flexGrow: 0,

@@ -15,8 +15,7 @@ export function measureContentHeight(anchorRef: React.RefObject<View>, minConten
         const { height, y } = result;
         const winHeight = Dimensions.get("window").height;
         minContentHeight = typeof minContentHeight == "number" && minContentHeight > 0 ? minContentHeight : 400;
-        const rHeight = winHeight - y - height;
-        const contentHeight = Math.max(Math.min(rHeight, winHeight - 100), y - height - 10, minContentHeight);
+        const contentHeight = Math.max(Math.min(winHeight - y - height, winHeight - 100), minContentHeight);
         return {
             ...result,
             contentHeight: Math.min(contentHeight, winHeight)

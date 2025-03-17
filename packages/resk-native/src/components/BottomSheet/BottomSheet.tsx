@@ -81,7 +81,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
                             style={[styles.container, animatedProps.style, containerProps.style, { backgroundColor: theme.colors.surface }]}
                         >
                             {closeOnDragDownIcon}
-                            <View testID={testID} {...props} style={[styles.main, props.style]}>
+                            <Pressable testID={testID} {...props} onPress={(event) => { event.stopPropagation(); return false; }} style={[styles.main, props.style]}>
                                 {hasAppBar ? <>
                                     <AppBar
                                         colorScheme="surface"
@@ -106,7 +106,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
                                     : <View testID={testID + "-content"} {...contentProps} style={[styles.childrenNotScroll, contentProps.style]}>
                                         {content}
                                     </View>}
-                            </View>
+                            </Pressable>
                         </Animated.View>
                     </View>
                 </Pressable>

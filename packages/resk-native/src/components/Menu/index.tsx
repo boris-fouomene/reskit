@@ -597,25 +597,27 @@ const Menu: React.FC<IMenuProps> = ({
                     >
                         <Wrapper {...wrapperProps}>
                             <KeyboardAvoidingView testID={testID + "-content-container"} style={[styles.contentContainer]}>
-                                {renderedAsBottomSheet ? <View style={styles.bottomSheetCloseIconContainer}>
-                                    <View testID={testID + "-close-menu"} style={[styles.bottomSheetCloseIcon]}>
-                                        <View testID={testID + "-bottom-sheet-title-container"} style={[{ maxWidth: screenWidth - 70 }, styles.bottomSheetTitleContainer]} >
-                                            <Label textBold testID={testID + "-bottom-sheet-title"} color={theme.colors.onSurface}>{bottomSheetTitle}</Label>
+                                <Pressable testID={testID + "-content-wrapper"} style={styles.contentWrapper} onPress={(event) => { event.stopPropagation(); return false; }}>
+                                    {renderedAsBottomSheet ? <View style={styles.bottomSheetCloseIconContainer}>
+                                        <View testID={testID + "-close-menu"} style={[styles.bottomSheetCloseIcon]}>
+                                            <View testID={testID + "-bottom-sheet-title-container"} style={[{ maxWidth: screenWidth - 70 }, styles.bottomSheetTitleContainer]} >
+                                                <Label textBold testID={testID + "-bottom-sheet-title"} color={theme.colors.onSurface}>{bottomSheetTitle}</Label>
+                                            </View>
+                                            <Icon
+                                                iconName='close'
+                                                title={i18n.t('components.menu.close')}
+                                                size={30}
+                                                color={theme.colors.onSurface}
+                                                onPress={() => {
+                                                    closeMenu();
+                                                }}
+                                            />
                                         </View>
-                                        <Icon
-                                            iconName='close'
-                                            title={i18n.t('components.menu.close')}
-                                            size={30}
-                                            color={theme.colors.onSurface}
-                                            onPress={() => {
-                                                closeMenu();
-                                            }}
-                                        />
-                                    </View>
-                                    {bottomSheetTitle && bottomSheetTitleDivider !== false ? <Divider testID={testID + "-divider"} /> : null}
-                                </View> : null}
-                                {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
-                                {child}
+                                        {bottomSheetTitle && bottomSheetTitleDivider !== false ? <Divider testID={testID + "-divider"} /> : null}
+                                    </View> : null}
+                                    {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
+                                    {child}
+                                </Pressable>
                             </KeyboardAvoidingView>
                         </Wrapper>
                     </Animated.View>
@@ -653,6 +655,10 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
         //flexGrow: 1,
         flex: 1,
+    },
+    contentWrapper: {
+        flexGrow: 1,
+        alignSelf: "flex-start",
     },
     bottomSheetCloseIconContainer: {
         alignSelf: "flex-start",

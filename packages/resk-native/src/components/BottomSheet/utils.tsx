@@ -211,7 +211,7 @@ export const usePrepareBottomSheet = ({
     return {
         closeOnDragDownIcon: closeOnDragDown ? (
             <View
-                {...(dragFromTopOnly && panResponder.panHandlers)}
+                {...(dragFromTopOnly && panResponder.panHandlers || {})}
                 style={[styles.draggableContainer, Platform.isWeb() ? { cursor: 'ns-resize' } as any : null]}
                 testID={"-draggable-icon-container"}
             >

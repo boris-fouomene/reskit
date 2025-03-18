@@ -46,6 +46,7 @@ export const usePrepareBottomSheet = ({
     cornerRadius
 }: IUsePrepareBottomSheetProps) => {
     dismissable = typeof dismissable === 'boolean' ? dismissable : true;
+    minHeight = isNumber(minHeight) && minHeight > 0 ? minHeight : 300;
     const theme = useTheme();
     const elevation = typeof customElevation == "number" ? customElevation : 0;
     closeOnDragDown = typeof closeOnDragDown === 'boolean' ? closeOnDragDown : true;
@@ -57,9 +58,7 @@ export const usePrepareBottomSheet = ({
     } else {
         height = Math.max(winHeight / 3, defaultHeight);
     }
-    if (isNumber(minHeight)) {
-        height = Math.max(minHeight, height);
-    }
+    height = Math.min(Math.max(minHeight, height), winHeight);
     if (fullScreen) {
         height = winHeight;
     }
@@ -353,6 +352,7 @@ export interface IUsePrepareBottomSheetProps {
 
     /***
         The minimum height of the bottom sheet.
+        Default is 300
     */
     minHeight?: number;
 

@@ -78,10 +78,14 @@ const isHex = (color: string | null): boolean => {
 * console.log(invalidColor); // false
 * ```
 */
-const isValid = (color: any): boolean => {
+const isValid = (color: any): color is string => {
     if (!color || typeof color !== 'string') return false;
     if (["transparent"].includes(color)) return true;
-    return isHex(color) || isHex(Color(color)?.hex()?.toString());
+    try {
+        return isHex(color) || isHex(Color(color)?.hex()?.toString());
+    } catch (err) {
+        return false;
+    }
 };
 
 
@@ -344,7 +348,7 @@ const getContrastingColor = (inputColor: string, { darkColor, lightColor }: { da
  * fade("#3498db", 0.5); // "rgba(52, 152, 219, 0.5)"
  * ```
  */
-function fade(color: string, fade: number): string | undefined {
+function fade(color: string, fade?: number): string | undefined {
     if (typeof fade !== 'number') {
         fade = 0.5;
     }

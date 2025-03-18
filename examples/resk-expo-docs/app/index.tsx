@@ -6,7 +6,7 @@ const index = withAppBar(() => {
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>
-                <Button>
+                <Button mode="contained" onPress={() => console.log("Pressed")}>
                     Ripple Example
                 </Button>
                 <Label fontVariant={"titleLarge"}>Label Example</Label>

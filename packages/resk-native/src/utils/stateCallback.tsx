@@ -6,11 +6,6 @@ import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
  */
 export type ICallback<T> = (value: T) => any;
 
-/***
- * Type for a dispatch function that updates the state with a callback.
- * @template T - The type of the value being set.
- */
-export type DispatchWithCallback<T> = (value: T, callback?: ICallback<T>) => any;
 
 
 /***
@@ -20,15 +15,13 @@ export type DispatchWithCallback<T> = (value: T, callback?: ICallback<T>) => any
 * This hook is useful for scenarios where you need to perform
 * an action after a state change, similar to setState in class components
 * but in functional components using hooks.
- 
-  * @see https://stackoverflow.com/questions/56247433/how-to-use-setstate-callback-on-react-hooks
 * 
 * The problem with this hook is to perform a setState and then be able to call a 
 * callback function once the state has been updated.
 * 
 * @template T - The generic type associated with the state, defaulting to unknown.
 *  @param {T | (() => T)} initialState - The initial value of the state, of type T.
-* @returns {[T, DispatchWithCallback<SetStateAction<T>>]} - An array containing the state 
+* @returns {[T, (value:SetStateAction<T>, callback?: ICallback<T>) => any]} - An array containing the state 
 *          and a function to update the state that accepts an optional callback. It represents the state and a setState function that accepts a callback.
 * 
 * ### Usage Example:
@@ -46,7 +39,7 @@ export type DispatchWithCallback<T> = (value: T, callback?: ICallback<T>) => any
 * };
 * ```
 */
-export default function useStateCallback<T = unknown>(initialState: T | (() => T)): [T, DispatchWithCallback<SetStateAction<T>>] {
+export default function useStateCallback<T = unknown>(initialState: T | (() => T)): [T, (value: SetStateAction<T>, callback?: ICallback<T>) => any] {
   const [state, _setState] = useState(initialState);
   const callbackRef = useRef<ICallback<T>>();
   const isFirstCallbackCall = useRef<boolean>(true);

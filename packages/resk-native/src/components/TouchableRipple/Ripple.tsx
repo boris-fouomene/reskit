@@ -130,8 +130,8 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     shadowEnabled = typeof shadowEnabled == "boolean" ? shadowEnabled : false;
     rippleLocation = typeof rippleLocation == "string" ? rippleLocation : "tapLocation";
     rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.7;
-    const animatedOpacityRef = useRef<Animated.Value>(new Animated.Value(0.1));
-    const animatedRippleScaleRef = useRef<Animated.Value>(new Animated.Value(0));
+    const opacityAnimation = useRef<Animated.Value>(new Animated.Value(0.1)).current;
+    const scaleAnimation = useRef<Animated.Value>(new Animated.Value(0)).current;
     const [rippleState, setRippleState] = useStateCallback<ITouchableRippleState>({
         height: 1,
         width: 1,
@@ -156,7 +156,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 width: rippleState.width,
                 left: -(borderWidth),
                 top: -(borderWidth),
-                opacity: animatedOpacityRef.current,
+                opacity: opacityAnimation,
             }, !rippleState.visible && styles.animatedHidden]}
         >
             <Animated.View
@@ -168,7 +168,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                     ...rippleState.ripple.offset,
                     backgroundColor: rippleColor,
                     borderRadius: rippleState.ripple.radii,
-                    transform: [{ scale: animatedRippleScaleRef.current }],
+                    transform: [{ scale: scaleAnimation }],
                 }}
             />
         </Animated.View>
@@ -177,29 +177,15 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
         ref={ref}
         {...props}
         disabled={disabled}
-        onLayout={(evt) => {
-            if (typeof onLayout == "function") onLayout(evt);
+        onLayout={onLayout}
+        onPressIn={(event) => {
+            if (!disabled && typeof props.onPressIn == 'function') {
+                props.onPressIn(event);
+            }
             if (isRippleDisabled) return;
-            const { width, height } = evt.nativeEvent.layout;
-            if (width === rippleState.width && height === rippleState.height) {
-                return;
-            }
-            setRippleState({
-                ...rippleState,
-                height,
-                width,
-            });
-        }}
-        onPress={(event) => {
-            if (isRippleDisabled) {
-                if (typeof props.onPress == 'function') {
-                    props.onPress(event);
-                }
-                return;
-            }
-            setTimeout(() => {
+            const { target, currentTarget } = event;
+            (currentTarget || target).measureInWindow((x, y, width, height) => {
                 const { nativeEvent: { pageX, pageY } } = event;
-                const { width, height } = rippleState;
                 let radii;
                 let hotSpotX = pageX;
                 let hotSpotY = pageY;
@@ -223,17 +209,22 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                         radii,
                     },
                 }, () => {
-                    animatedOpacityRef.current.setValue(1);
-                    animatedRippleScaleRef.current.setValue(0.3);
 
                     // scaling up the ripple layer
-                    Animated.timing(animatedRippleScaleRef.current, {
-                        duration: rippleDuration,
-                        toValue: 1,
-                        useNativeDriver,
-                    }).start(() => {
+                    Animated.parallel([
+                        Animated.timing(scaleAnimation, {
+                            duration: rippleDuration,
+                            toValue: 1,
+                            useNativeDriver,
+                        }),
+                        Animated.timing(opacityAnimation, {
+                            duration: rippleDuration,
+                            toValue: 1,
+                            useNativeDriver,
+                        }),
+                    ]).start(() => {
                         // hide the ripple layer
-                        Animated.timing(animatedOpacityRef.current, {
+                        Animated.timing(opacityAnimation, {
                             duration: maskDuration,
                             toValue: 0,
                             useNativeDriver,
@@ -244,12 +235,10 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                             })
                         });
                     });
-                    if (typeof props.onPress == 'function') {
-                        props.onPress(event);
-                    }
                 });
-            }, 50);
+            });
         }}
+        onPress={props.onPress}
         style={(state) => {
             const cStyle = typeof style === 'function' ? style(state) : style;
             const isHover = (state as any)?.hovered && !disabled;

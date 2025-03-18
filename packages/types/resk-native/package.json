@@ -1,6 +1,6 @@
 {
     "name": "@resk/types-native",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Declarations for @resk/native package",
     "types": "build/index.d.ts",
     "main": "build/index.d.ts",

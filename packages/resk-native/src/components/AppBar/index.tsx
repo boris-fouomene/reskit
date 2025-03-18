@@ -88,10 +88,10 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   const colorScheme = theme.getColorScheme(customColorScheme as IThemeColorsTokenName);
   const flattenStyle = (StyleSheet.flatten(style) || {});
   backgroundColor = (
-    Colors.isValid(backgroundColor) ? backgroundColor : theme.getColor(backgroundColor as IThemeColorsTokenName)
+    Colors.isValid(backgroundColor) ? backgroundColor : theme.getColor(backgroundColor)
       || colorScheme.backgroundColor || flattenStyle?.backgroundColor || tBackgroundColor
   ) as string;
-  color = (Colors.isValid(color) ? color : theme.getColor(color as IThemeColorsTokenName) || colorScheme.color || (flattenStyle as any)?.color || tColor) as string;
+  color = (Colors.isValid(color) ? color : theme.getColor(color) || colorScheme.color || (flattenStyle as any)?.color || tColor) as string;
   const titleTextColor = Colors.isValid(color) ? color : undefined;
   titleProps = Object.assign({}, titleProps);
   subtitleProps = Object.assign({}, subtitleProps);

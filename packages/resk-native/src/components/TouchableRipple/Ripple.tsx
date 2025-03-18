@@ -178,11 +178,14 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
         {...props}
         disabled={disabled}
         onLayout={onLayout}
-        onPressIn={(event) => {
-            if (!disabled && typeof props.onPressIn == 'function') {
-                props.onPressIn(event);
+        onPress={(event) => {
+            if (disabled) return;
+            if (isRippleDisabled) {
+                if (typeof props.onPress == 'function') {
+                    props.onPress(event);
+                }
+                return;
             }
-            if (isRippleDisabled) return;
             const { target, currentTarget } = event;
             (currentTarget || target).measureInWindow((x, y, width, height) => {
                 const { nativeEvent: { pageX, pageY } } = event;
@@ -199,6 +202,8 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 radii = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
                 setRippleState({
                     ...rippleState,
+                    width,
+                    height,
                     visible: true,
                     ripple: {
                         dia: radii * 2,
@@ -236,9 +241,11 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                         });
                     });
                 });
+                if (typeof props.onPress == 'function') {
+                    props.onPress(event);
+                }
             });
         }}
-        onPress={props.onPress}
         style={(state) => {
             const cStyle = typeof style === 'function' ? style(state) : style;
             const isHover = (state as any)?.hovered && !disabled;

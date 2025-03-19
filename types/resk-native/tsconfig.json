@@ -1,5 +1,5 @@
 {
-    "extends": "../../resk-native/tsconfig.json",
+    "extends": "../../packages/resk-native/tsconfig.json",
     "compilerOptions": {
         "removeComments": false,
         "outDir": "./build",

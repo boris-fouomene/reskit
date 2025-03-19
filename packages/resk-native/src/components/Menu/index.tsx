@@ -481,7 +481,6 @@ const Menu: React.FC<IMenuProps> = ({
         }
         setMenuLayout({ width, height, x: 0, y: 0 });
     }
-
     const context1 = { animated, anchorMeasurements: state.anchorMeasurements, menuPosition, responsive, testID, borderRadius, fullScreen: fullScreen, ...props, isMenu: true, isMenuOpen, isMenuVisible: isVisible }
     const openMenu = (callback?: Function) => {
         measureAnchor(anchorRef, bottomSheetMinHeight).then((measures) => {
@@ -653,12 +652,16 @@ const styles = StyleSheet.create({
     contentContainer: {
         width: '100%',
         alignSelf: "flex-start",
-        //flexGrow: 1,
-        flex: 1,
+        flexGrow: 1,
+        overflow: "hidden",
+        maxHeight: "100%",
     },
     contentWrapper: {
         flexGrow: 1,
         alignSelf: "flex-start",
+        maxHeight: "100%",
+        width: "100%",
+        //overflow: "hidden",
     },
     bottomSheetCloseIconContainer: {
         alignSelf: "flex-start",

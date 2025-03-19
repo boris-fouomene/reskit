@@ -74,24 +74,11 @@ export interface ITouchableRippleProps extends PressableProps {
 
     /** Background color of the component. Default is 'transparent' */
     hoverColor?: string;
-    centered?: boolean;
-    underlayColor?: string;
     borderRadius?: number;
     /***
      * Disables the ripple effect.
      */
     disableRipple?: boolean;
-    /***
-    *   
-    * The location of the ripple effect,Hot-spot position of the ripple effect. Default is 'tapLocation'.
-    */
-    rippleLocation?: 'tapLocation' | 'center',
-
-    /** Border width TODO move to `style`? */
-    borderWidth?: number;
-
-    /** Duration of the mask effect (alpha), in milliseconds */
-    maskDuration?: number;
 
     /** Animating the shadow (on pressed/released) or not 
      * Default is false

@@ -7,9 +7,6 @@
     "composite": false,
     "incremental": false,
     "paths": {
-      "@resk/core": [
-        "../types/resk-core"
-      ],
       "@breakpoints/*": [
         "src/breakpoints/*"
       ],

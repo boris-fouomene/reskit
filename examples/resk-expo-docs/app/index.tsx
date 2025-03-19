@@ -1,12 +1,17 @@
 import { TextInput, withAppBar, BottomSheet, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
 import { View, ScrollView, StyleSheet } from 'react-native'
-import { IField } from "@resk/core";
 
 const index = withAppBar(() => {
     return (
         <ScrollView>
             <View style={{ margin: 10 }}>
-                <Button mode="contained" onPress={() => console.log("Pressed")}>
+                <Button mode="contained" onPress={() => console.log("Pressed")}
+                    onLongPress={(e) => {
+                        console.log(e, " is long pressed")
+                    }}
+                //rippleColor="red"
+
+                >
                     Ripple Example
                 </Button>
                 <Label fontVariant={"titleLarge"}>Label Example</Label>
@@ -357,7 +362,8 @@ const styles = StyleSheet.create({
 
 
 function ModalContentExample() {
-    return <Button mode="contained" rippleLocation="center"
+    return <Button mode="contained"
+        rippleColor="red"
         left={({ textColor, context }) => {
             return <Icon color={textColor} iconName="account-circle" />
         }}

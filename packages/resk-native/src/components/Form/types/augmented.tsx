@@ -6,26 +6,27 @@ import { IFieldBase } from "@resk/core";
 import { IMergeWithoutDuplicates } from "@resk/core";
 import { ICheckboxProps } from "@components/Checkbox";
 
+
+/**
+ * @interface IFormFieldTextProps
+ * Represents the properties for a text-based form field.
+ * @template Type - The type of the form field.
+ * @example
+ * ```tsx
+ * const textFieldProps: IFormFieldTextProps<"text"> = {
+ *   type: "text",
+ *   placeholder: "Enter your name",
+ *   value: "John Doe"
+ * };
+ * ```
+ */
+export type IFormFieldTextProps<Type> = IFormFieldProps<Type, ITextInputProps>;
+
 /**
  * Augments the `@resk/core` module with additional form field types and properties.
  * @module @resk/core
  */
 declare module "@resk/core" {
-
-    /**
-     * @interface IFormFieldTextProps
-     * Represents the properties for a text-based form field.
-     * @template Type - The type of the form field.
-     * @example
-     * ```tsx
-     * const textFieldProps: IFormFieldTextProps<"text"> = {
-     *   type: "text",
-     *   placeholder: "Enter your name",
-     *   value: "John Doe"
-     * };
-     * ```
-     */
-    export type IFormFieldTextProps<Type> = IFormFieldProps<Type, ITextInputProps>;
 
     /**
      * Maps form field types to their respective properties.
@@ -229,3 +230,5 @@ declare module "@resk/core" {
 * ```
 */
 export type IFormFieldProps<FieldType, ComponentProps> = Omit<IMergeWithoutDuplicates<IFieldBase, ComponentProps>, "type"> & { type: FieldType; };
+
+

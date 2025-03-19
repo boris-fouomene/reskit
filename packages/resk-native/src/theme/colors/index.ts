@@ -370,7 +370,7 @@ function fade(color: string, fade?: number): string | undefined {
  * console.log(isDarkColor); // false
  * ```
  */
-export function isLight(color: string): boolean {
+function isLight(color: string): boolean {
     return Color(color).isLight();
 }
 
@@ -389,8 +389,32 @@ export function isLight(color: string): boolean {
  * console.log(isLightColor); // true
  * ```
  */
-export function isDark(color: string): boolean {
-    return Color(color).isDark();
+function isDark(color: string): boolean {
+    try {
+        return Color(color).isDark();
+    } catch (e) {
+        return false;
+    }
+}
+/***
+ * Mixes two colors together using a specified weight.
+ * 
+ * @param {string} color1 - The first color to mix.
+ * @param {string} color2 - The second color to mix.
+ * @param {number} weight - The weight of the second color in the mix. Should be a value between 0 and 1.
+ * @returns {string | undefined} The mixed color in rgba format, or `undefined` if the input is invalid.
+ * 
+ * @example
+ * ```ts
+ * const mixedColor = mix("#3498db", "#f00", 0.5); // "rgba(52, 152, 219, 0.5)"
+ * ```  
+ */
+function mix(color1: string, color2: string, weight: number): string | undefined {
+    try {
+        return Color(color1).mix(Color(color2), weight).rgb().string();
+    } catch (e) {
+        return undefined;
+    }
 }
 
-export default { setAlpha, isLight, isDark, fade, isHex, isValid, getContrastingColor, darken, lighten, hexToRgb, rgbStringToRgb, getBrightness, getContrast };
+export default { setAlpha, isLight, mix, isDark, fade, isHex, isValid, getContrastingColor, darken, lighten, hexToRgb, rgbStringToRgb, getBrightness, getContrast };

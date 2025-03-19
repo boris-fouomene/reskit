@@ -339,16 +339,16 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                                 ? preparedField.displayErrors
                                 : undefined;
                     const { onMount, onUnmount } = preparedField;
-                    preparedField.onMount = (formField: IFormField<any>) => {
+                    (preparedField as any).onMount = (formField: IFormField<IFieldType>) => {
                         this.mountField(formField);
                         if (onMount) {
-                            onMount(formField);
+                            onMount(formField as any);
                         }
                     };
-                    preparedField.onUnmount = (formField: IFormField<any>) => {
+                    (preparedField as any).onUnmount = (formField: IFormField<any>) => {
                         this.unmountField(formField);
                         if (onUnmount) {
-                            onUnmount(formField);
+                            onUnmount(formField as any);
                         }
                     };
 

@@ -10,6 +10,11 @@
     "jsx": "react-jsx", // Use the new JSX transform
     "module": "ESNext", // Ensure module syntax is ESNext
     "target": "ES6", // Target modern ECMAScript version
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@resk/core": [
+        "../../types/resk-core"
+      ],
+    }
   }
 }

@@ -1,5 +1,5 @@
 {
-    "extends": "../../resk-core/tsconfig.esm.json",
+    "extends": "../../packages/resk-core/tsconfig.esm.json",
     "compilerOptions": {
         "removeComments": false,
         "outDir": "./build",

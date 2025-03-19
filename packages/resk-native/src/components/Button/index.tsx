@@ -242,7 +242,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
             dark,
         });
 
-    const rippleColor = Colors.isValid(customRippleColor) ? customRippleColor : Colors.setAlpha(backgroundColor !== "transparent" && backgroundColor || textColor, 0.12);
+    const rippleColor = Colors.isValid(customRippleColor) ? customRippleColor : backgroundColor !== "transparent" && Colors.isValid(backgroundColor) ? (Colors.isDark(backgroundColor) ? TouchableRipple.darkRippleColor : TouchableRipple.lightRippleColor) : theme.dark ? TouchableRipple.darkRippleColor : TouchableRipple.lightRippleColor;
     const touchableStyle = {
         ...borderRadiusStyles,
         borderRadius,
@@ -345,6 +345,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                     }
                     return r
                 }}
+                borderRadius={borderRadius}
                 {...rest}
                 androidRipple={Object.assign({}, { radius: borderRadius }, rest.android_ripple)}
             >

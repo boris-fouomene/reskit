@@ -415,6 +415,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             animated={false}
             bottomSheetTitle={context?.props?.label}
             bottomSheetTitleDivider={!canRenderSearch(context)}
+            testID={testID + "-menu"}
             {...Object.assign({}, menuProps)}
             bottomSheetFullScreen={(typeof menuProps?.bottomSheetFullScreen == "boolean" ? menuProps.bottomSheetFullScreen : preparedItems?.length > 10)}
             visible={visible}
@@ -475,7 +476,7 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
             testID={testID + "-dropdown-list"}
             scrollEnabled
             {...listProps}
-            style={[listProps.style, hasMenuHeight && { maxHeight: menuHeight - (canRenderDropdownSearch ? 10 : 60) }, styles.list]}
+            style={[listProps.style, hasMenuHeight && { maxHeight: menuHeight - (canRenderDropdownSearch ? 30 : 60) }, styles.list]}
             inverted={canReverse}
             data={filteredItems}
             keyExtractor={({ hashKey }) => hashKey}
@@ -609,24 +610,17 @@ const styles = StyleSheet.create({
     },
     dropdownListContainer: {
         width: "100%",
-        height: "100%",
+        flexGrow: 1,
         paddingHorizontal: 0,
         paddingVertical: 0,
         paddingBottom: 10,
         flexDirection: "column",
+        maxHeight: "100%"
     },
     dropdownListTopPosition: {
         flexDirection: "column-reverse",
         paddingTop: 10,
         paddingBottom: 10,
-    },
-    dropdownListContentContainer: {
-        width: "100%",
-        height: "100%",
-        alignSelf: "flex-start",
-        flexGrow: 0,
-        //paddingVertical: 10,
-        //paddingHorizontal: 10,
     },
 });
 const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: boolean }) => {

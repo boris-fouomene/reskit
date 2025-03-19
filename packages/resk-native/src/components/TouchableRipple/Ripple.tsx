@@ -1,6 +1,5 @@
-import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useMemo } from 'react';
 import {
-    Animated,
     Pressable,
     StyleSheet,
     View,
@@ -10,28 +9,11 @@ import { defaultStr } from '@resk/core';
 import { getColors } from './utils';
 import Theme, { useTheme } from '@theme/index';
 import Platform from "@platform";
-import useStateCallback from '@utils/stateCallback';
-import { Portal } from "@components/Portal";
+import useGetRippleContent from "./RippleContent";
 
-const useNativeDriver = Platform.canUseNativeDriver();
+
 const version = parseInt(String(Platform.Version));
 const isAndroid = Platform.isAndroid() && (typeof version == "number" ? version >= 21 : true); //ANDROID_VERSION_LOLLIPOP;
-
-/** State of the {@link TouchableRipple} */
-interface ITouchableRippleState {
-    width: number;
-    height: number;
-    visible: boolean,
-    ripple: {
-        radii: number;
-        dia: number;
-        offset: {
-            top: number;
-            left: number;
-        };
-    };
-}
-
 
 /**
  * A custom `TouchableRipple` component that implements Material Design's ripple effect 
@@ -111,10 +93,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     testID, borderRadius,
     rippleDuration,
     shadowEnabled,
-    borderWidth,
-    maskDuration,
     onLayout,
-    rippleLocation,
     rippleOpacity,
     ...props
 }, ref) => {
@@ -124,20 +103,18 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     const isRippleDisabled = useMemo(() => {
         return disableRipple || disabled || isAndroid;
     }, [disableRipple, disabled, isAndroid]);
-    borderWidth = typeof borderWidth == "number" && borderWidth || 0;
-    rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 300;
-    maskDuration = typeof maskDuration == "number" && maskDuration > 0 ? maskDuration : 200;
+    rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 500;
     shadowEnabled = typeof shadowEnabled == "boolean" ? shadowEnabled : false;
-    rippleLocation = typeof rippleLocation == "string" ? rippleLocation : "tapLocation";
-    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.7;
-    const opacityAnimation = useRef<Animated.Value>(new Animated.Value(0.1)).current;
-    const scaleAnimation = useRef<Animated.Value>(new Animated.Value(0)).current;
-    const [rippleState, setRippleState] = useStateCallback<ITouchableRippleState>({
-        height: 1,
-        width: 1,
-        visible: false,
-        ripple: { radii: 0, dia: 0, offset: { top: 0, left: 0 } },
-    });
+    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.9;
+    const { startRipple, rippleContent, onLayout: onRippleLayout } = useGetRippleContent({
+        testID,
+        rippleColor,
+        rippleOpacity,
+        rippleDuration,
+        disabled,
+        disableRipple: isRippleDisabled,
+        borderRadius,
+    })
 
     const shadowStyle = useMemo(() => {
         return shadowEnabled ? {
@@ -146,38 +123,19 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 width: 0,
             }
         } : undefined;
-    }, [shadowEnabled, isRippleDisabled]);
-    const rippleContent = !isRippleDisabled && rippleState.visible ? <Portal testID={testID + "-ripple-portal"}>
-        <Animated.View
-            testID={testID + "-animated-container"}
-            style={[{
-                ...StyleSheet.absoluteFillObject,
-                height: rippleState.height,
-                width: rippleState.width,
-                left: -(borderWidth),
-                top: -(borderWidth),
-                opacity: opacityAnimation,
-            }, !rippleState.visible && styles.animatedHidden]}
-        >
-            <Animated.View
-                testID={testID + "-animated-content"}
-                style={{
-                    height: rippleState.ripple.dia,
-                    width: rippleState.ripple.dia,
-                    opacity: rippleOpacity,
-                    ...rippleState.ripple.offset,
-                    backgroundColor: rippleColor,
-                    borderRadius: rippleState.ripple.radii,
-                    transform: [{ scale: scaleAnimation }],
-                }}
-            />
-        </Animated.View>
-    </Portal> : null;
+    }, [shadowEnabled]);
     return <Pressable
         ref={ref}
         {...props}
         disabled={disabled}
-        onLayout={onLayout}
+        onLayout={(event) => {
+            if (typeof onLayout === "function") {
+                onLayout(event)
+            }
+            if (typeof onRippleLayout === "function") {
+                onRippleLayout(event);
+            }
+        }}
         onPress={(event) => {
             if (disabled) return;
             if (isRippleDisabled) {
@@ -186,65 +144,12 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 }
                 return;
             }
-            const { target, currentTarget } = event;
-            (currentTarget || target).measureInWindow((x, y, width, height) => {
-                const { nativeEvent: { pageX, pageY } } = event;
-                let radii;
-                let hotSpotX = pageX;
-                let hotSpotY = pageY;
-
-                if (rippleLocation === 'center') {
-                    hotSpotX = width / 2;
-                    hotSpotY = height / 2;
-                }
-                const offsetX = Math.max(hotSpotX, width - hotSpotX);
-                const offsetY = Math.max(hotSpotY, height - hotSpotY);
-                radii = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-                setRippleState({
-                    ...rippleState,
-                    width,
-                    height,
-                    visible: true,
-                    ripple: {
-                        dia: radii * 2,
-                        offset: {
-                            left: hotSpotX - radii,
-                            top: hotSpotY - radii,
-                        },
-                        radii,
-                    },
-                }, () => {
-
-                    // scaling up the ripple layer
-                    Animated.parallel([
-                        Animated.timing(scaleAnimation, {
-                            duration: rippleDuration,
-                            toValue: 1,
-                            useNativeDriver,
-                        }),
-                        Animated.timing(opacityAnimation, {
-                            duration: rippleDuration,
-                            toValue: 1,
-                            useNativeDriver,
-                        }),
-                    ]).start(() => {
-                        // hide the ripple layer
-                        Animated.timing(opacityAnimation, {
-                            duration: maskDuration,
-                            toValue: 0,
-                            useNativeDriver,
-                        }).start(() => {
-                            setRippleState({
-                                ...rippleState,
-                                visible: false,
-                            })
-                        });
-                    });
-                });
-                if (typeof props.onPress == 'function') {
-                    props.onPress(event);
-                }
-            });
+            if (typeof startRipple === "function") {
+                startRipple(event);
+            }
+            if (typeof props.onPress == 'function') {
+                props.onPress(event);
+            }
         }}
         style={(state) => {
             const cStyle = typeof style === 'function' ? style(state) : style;
@@ -285,14 +190,15 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
 
 const styles = StyleSheet.create({
     container: {
-        //overflow: 'hidden',
         alignSelf: "flex-start",
+        position: "relative",
+        ...Platform.select({
+            web: {
+                overflow: "hidden",
+            }
+        })
         //userSelect: "none",
     },
-    animatedHidden: {
-        opacity: 0,
-        display: 'none',
-    }
 });
 
 export * from "./utils";

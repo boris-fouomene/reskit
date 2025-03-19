@@ -96,7 +96,8 @@ export const getButtonColors = ({
   const borderWidth = getButtonBorderWidth({ isMode, theme });
   return {
     backgroundColor,
-    hoverColor: Colors.isValid(customHoverColor) ? customHoverColor : backgroundColor === "transparent" ? "transparent" : Colors.isValid(backgroundColor) ? ((Colors.isLight(backgroundColor) ? Colors.darken(backgroundColor as string, 0.2) : Colors.lighten(backgroundColor as string, 0.2))) : undefined,
+    hoverColor: Colors.isValid(customHoverColor) ? customHoverColor : backgroundColor !== "transparent" && Colors.isValid(backgroundColor) ?
+      Colors.isDark(backgroundColor) ? Colors.lighten(backgroundColor, 0.5) : Colors.darken(backgroundColor, 0.2) : undefined,
     borderColor,
     textColor,
     borderWidth,

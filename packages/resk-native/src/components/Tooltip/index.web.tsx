@@ -2,11 +2,13 @@ import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import React, { useMemo } from "react";
 import { getTextContent, isValidElement, setRef, useMergeRefs } from '@utils';
-import { getMaxZindex, isDOMElement, Logger } from "@resk/core";
+import { getMaxZindex, isDOMElement, Logger, Platform } from "@resk/core";
 import { TIPPY_THEME } from '@theme/updateNative/utils';
 import { uniqid, defaultStr } from "@resk/core";
 import { Pressable } from "react-native";
 import { ITooltipProps } from './types';
+
+"use client";
 
 export * from "./types";
 
@@ -35,6 +37,11 @@ export * from "./types";
 const Tooltip = React.forwardRef(({
     children, title, tooltip, disabled, as, testID, id, ...rest
 }: ITooltipProps, ref) => {
+
+    // Determine the component to render (Pressable by default or a custom one)
+    const Component = useMemo(() => {
+        return as || Pressable;
+    }, [as]);
     // Set a default testID if none is provided
     testID = defaultStr(testID, "resk-tooltip");
 
@@ -52,7 +59,7 @@ const Tooltip = React.forwardRef(({
 
     React.useEffect(() => {
         // Do nothing if disabled
-        if (disabled) return;
+        if (disabled || !Platform.isClientSide()) return;
 
         // Prepare tooltip content, allowing for HTML formatting
         const content = String(getTextContent(tooltip) || getTextContent(title)).replaceAll("\n", "<br/>");
@@ -87,11 +94,6 @@ const Tooltip = React.forwardRef(({
         Logger.warn("is not valid tooltip children element ", children);
         return null;
     }
-
-    // Determine the component to render (Pressable by default or a custom one)
-    const Component = useMemo(() => {
-        return as || Pressable;
-    }, [as]);
     // Render the Tooltip component, passing down props and attaching the inner reference
     return (
         <Component {...rest} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>

@@ -1,6 +1,6 @@
-import { Dimensions, PixelRatio } from "react-native";
-import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointNamePhone, IBreakpointNameSmallPhone, IBreakpointNameMobile, IBreakpointNameTablet, IBreakpointNameDesktop, IBreakpointNameMediumPhone, IBreakpointName } from "./types";
-import { addClassName, IDict, isDOMElement, isObj, removeClassName } from "@resk/core";
+import { Dimensions, PixelRatio, ViewStyle } from "react-native";
+import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointNamePhone, IBreakpointNameSmallPhone, IBreakpointNameMobile, IBreakpointNameTablet, IBreakpointNameDesktop, IBreakpointNameMediumPhone, IBreakpointName, IBreakpointColumn, IBreakpointColumns } from "./types";
+import { addClassName, IDict, isDOMElement, isNonNullString, isObj, isStringNumber, removeClassName } from "@resk/core";
 import { IStyle } from "@src/types";
 import Platform from "@platform/index";
 
@@ -64,36 +64,43 @@ export default class Breakpoints {
             max: 320,  // Small phone breakpoint (320px and below)
             name: 'sp',
             label: "Small phone",
+            gutter: 3, // Small phone gutter
         },
         mp: {
             max: 399,  // Medium phone breakpoint (399px and below)
             name: 'mp',
             label: "Medium phone",
+            gutter: 4, // Medium phone gutter
         },
         xs: {
             max: 600,  // Small devices (landscape phones, 600px and below)
             name: 'xs',
             label: "Phone : Small devices (landscape phones, 600 and bellow)",
+            gutter: 5, // Phone : Small devices (landscape phones, 600 and bellow) gutter
         },
         sm: {
             max: 767,  // Medium devices (tablets, 767px and below)
             name: 'sm',
             label: "Medium devices (tablets, 767px bellow)",
+            gutter: 6, // Medium devices (tablets, 767px and below) gutter
         },
         md: {
             max: 1024,  // Medium devices (laptops, 1024px and up)
             name: 'md',
             label: "medium devices (laptops, 1024px and up)",
+            gutter: 7, // medium devices (laptops, 1024px and up) gutter
         },
         lg: {
             max: 1199,  // Large devices (large desktops, 1200px and up)
             name: 'lg',
             label: "large devices (large desktops, 1200px and up)",
+            gutter: 8, //Large devices gutter
         },
         xl: {
             max: Infinity,  // Extra large devices (large desktops and beyond)
             name: 'xl',
             label: "Extra large devices (large desktops)",
+            gutter: 10,
         },
     }
     /**
@@ -109,10 +116,10 @@ export default class Breakpoints {
     * console.log(breakpointsRef.current.all.sp); // { max: 320, name: 'sp', label: 'Small phone' }
     * ```
     */
-    private static readonly breakpointsRef: { current: INormalizedBreakpoints & { medias: Record<string, IMediaQueryTemplate> } } = {
+    private static readonly breakpointsRef: { current: INormalizedBreakpoints & { mediaQueries: Record<keyof IBreakpoints, IMediaQueryTemplate> } } = {
         current: {
             all: this.defaultBreakpoints,
-            medias: this.createMediaQueries(this.defaultBreakpoints)
+            mediaQueries: this.createMediaQueries(this.defaultBreakpoints)
         }
     }
     /**
@@ -126,7 +133,7 @@ export default class Breakpoints {
     * @returns An object with media query templates for each breakpoint key.
     * 
     * @example
-    * // Creating media queries from defined breakpoints
+    * // Creating breakpoint columns from defined breakpoints
     * const breakpoints: IBreakpoints = {
     *   sp: { max: 320 },
     *   md: { min: 1024 },
@@ -136,27 +143,27 @@ export default class Breakpoints {
     * console.log(mediaQueries.sp); // Output: '@media (max-width: 320px)'
     * console.log(mediaQueries.md); // Output: '@media (min-width: 1024px)'
     */
-    public static createMediaQueries(breakpoints: IBreakpoints): Record<string, IMediaQueryTemplate> {
-        const mediaQueries: Record<string, IMediaQueryTemplate> = {};
+    public static createMediaQueries(breakpoints: IBreakpoints): Record<keyof IBreakpoints, IMediaQueryTemplate> {
+        const mediaQueries: Record<keyof IBreakpoints, IMediaQueryTemplate> = {} as Record<keyof IBreakpoints, IMediaQueryTemplate>;
         // Loop through each breakpoint and generate corresponding media query strings
         for (const key in breakpoints) {
             const breakpoint = breakpoints[key as keyof IBreakpoints];
             if (isObj(breakpoint) && breakpoint) {
                 // Generate media query for min-width if defined
-                if (breakpoint.min !== undefined) {
-                    mediaQueries[key] = `@media (min-width: ${breakpoint.min}px)`;
+                if (isNumber(breakpoint.min)) {
+                    mediaQueries[key as keyof IBreakpoints] = `@media (min-width: ${breakpoint.min}px)`;
                 }
                 // Generate media query for max-width if defined
-                if (breakpoint.max !== undefined) {
-                    mediaQueries[key] = `@media (max-width: ${breakpoint.max}px)`;
+                if (isNumber(breakpoint.max)) {
+                    mediaQueries[key as keyof IBreakpoints] = `@media (max-width: ${breakpoint.max}px)`;
                 }
                 // Generate combined media query for both min and max widths
-                if (breakpoint.min !== undefined && breakpoint.max !== undefined) {
-                    mediaQueries[key] = `@media (min-width: ${breakpoint.min}px) and (max-width: ${breakpoint.max}px)`;
+                if (isNumber(breakpoint.min) && isNumber(breakpoint.max)) {
+                    mediaQueries[key as keyof IBreakpoints] = `@media (min-width: ${breakpoint.min}px) and (max-width: ${breakpoint.max}px)`;
                 }
             }
         }
-        return mediaQueries; // Return the generated media queries
+        return mediaQueries; // Return the generated breakpoint columns
     }
     /**
   * @function normalize
@@ -194,7 +201,7 @@ export default class Breakpoints {
         this.breakpointsRef.current = {
             ...this.breakpointsRef.current,
             all,
-            medias: this.createMediaQueries(all)
+            mediaQueries: this.createMediaQueries(all)
         };
         // Normalize the breakpoints object
         const maxWidths = setMaxWidths(this.breakpointsRef.current.all); // Calculate max widths for each breakpoint
@@ -345,15 +352,15 @@ export default class Breakpoints {
      * If a match is found, the corresponding breakpoint key is returned. If no match is found, 
      * the function returns the name of the currently active breakpoint or an empty string.
      */
-    public static getCurrentMedia(width?: number): keyof IBreakpoints {
-        // If width is valid and greater than 300, use it; otherwise, get the current window width
-        width = width && width > 300 ? width : Dimensions.get("window").width;
+    public static getCurrentMedia(windowWidth?: number): keyof IBreakpoints {
+        // If width is valid and greater than 300, use it; otherwise, get the current window windowWidth
+        windowWidth = isNumber(windowWidth) && windowWidth >= MIN_WIDTH ? windowWidth : Dimensions.get("window").width;
         // Iterate through defined breakpoints to find the current media type
         for (let i in this.breakpointsRef.current.all) {
             const breakpoint = this.breakpointsRef.current.all[i as keyof IBreakpoints];
-            if (!breakpoint || !breakpoint?.max || !breakpoint?.min) continue;
+            if (!breakpoint || !isNumber(breakpoint?.max) || !isNumber(breakpoint?.min)) continue;
             // Return the key of the first matching media type based on the width
-            if (width <= breakpoint.max) return i as keyof IBreakpoints;
+            if (windowWidth <= breakpoint.max) return i as keyof IBreakpoints;
         }
         // Return the name of the current breakpoint or an empty string if none found
         return this.breakpointsRef.current.current?.name || "lg";
@@ -666,7 +673,7 @@ export default class Breakpoints {
                 removeClassName(b, c);
             }
 
-            // Determine the new device class based on media queries
+            // Determine the new device class based on breakpoint columns
             let className = this.isMobileMedia() ? "mobile" : this.isTabletMedia() ? "tablet" : "desktop";
             if (this.isSmallPhoneMedia()) {
                 className += "small-phone";
@@ -799,107 +806,113 @@ export default class Breakpoints {
     /**
      *It represents an object where each key corresponds to a media query template. This allows for
     * easy access to the appropriate media query for applying responsive styles.
-     * 
+     * @see {@link Breakpoints.createMediaQueries} from more
      */
-    public static get medias(): Record<string, IMediaQueryTemplate> {
-        return this.breakpointsRef.current.medias;
+    public static get mediaQueries(): Record<keyof IBreakpoints, IMediaQueryTemplate> {
+        return this.breakpointsRef.current.mediaQueries;
     }
+    /***
+     * Returns the current breakpoint
+     * @returns {IBreakpoint}
+     */
     public static get currentBreakpoint(): IBreakpoint {
         return this.breakpointsRef.current.current as IBreakpoint;
     }
+    /***
+     * Returns all breakpoints
+     * @returns {IBreakpoints}
+     */
+    public static get allBreakpoints(): IBreakpoints {
+        return this.breakpointsRef.current.all;
+    }
 
     /**
-     * @group Breakpoints
-     * Determines the appropriate styles for a column based on the current screen dimensions.
-     * This function interprets the provided media queries and calculates the column width accordingly.
+     * Generates a column style object for a responsive grid system.
      * 
-     * Example usage:
+     * The `col` method calculates and returns the styles for a column in a responsive grid layout.
+     * It determines the appropriate width, padding, and visibility based on the provided breakpoint columns,
+     * the current screen width, and optional configuration parameters.
+     * 
+     * @param {IBreakpointColumns} [breakpointCols=["col-4", "phone-12", "tablet-6", "desktop-4"]] - 
+     * An array of breakpoint column definitions. Each definition specifies the number of columns (1-12) 
+     * for a specific breakpoint (e.g., `col-md-4`).
+     * 
+     * @param {number} [windowWidth] - An optional width to calculate the column styles. If not provided, the current window width is used.
+     * 
+     * @param {boolean} [withMultiplicater=false] - A flag indicating whether to include the `multiplicater` value in the returned object.
+     * 
+     * @returns {ViewStyle & {multiplicater:number}} - An object containing the computed styles for the column, including `width`, `paddingRight`, and optional visibility styles.
+     * If `withMultiplicater` is true, the `multiplicater` value is also included.
+     * 
+     * @example
      * ```typescript
-     * const columnStyle = col("md-5 xs-3 lg-8 sm-10");
-     * console.log(columnStyle.width); // Outputs the width of the column based on the screen size.
+     * // Example usage with default breakpoint columns:
+     * const columnStyles = Breakpoints.col();
+     * console.log(columnStyles);
+     * // Output: { width: '33.33333333%', paddingRight: 14.4, currentMedia: 'md' }
+     * 
+     * // Example usage with custom breakpoint columns:
+     * const customColumnStyles = Breakpoints.col(["col-md-6"], 500);
+     * console.log(customColumnStyles);
+     * // Output: { width: '50.00000000%', paddingRight: 14.4, currentMedia: 'sm' }
+     * 
+     * // Example usage with multiplicater:
+     * const columnStylesWithMultiplicater = Breakpoints.col(["col-lg-3"], undefined, true);
+     * console.log(columnStylesWithMultiplicater);
+     * // Output: { width: '25.00000000%', paddingRight: 14.4, currentMedia: 'lg', multiplicater: 3 }
      * ```
-     * 
-     * @param {string} mediaQuery - The media queries to use for column subdivision. 
-     * Default: "col-4 phone-12 tablet-6 desktop-4".
-     * 
-     * @param {number} width - The size of the window (optional). If not provided, the current window size is used.
-     * 
-     * @param {boolean} withMultiplicater - Whether to return the multiplicater used for the column calculation.
-     * 
-     * @returns {IDict} An object containing the computed styles for the column, including width and any additional styles.
      */
-    public static col(mediaQuery: string = "col-4 phone-12 tablet-6 desktop-4", width?: number, withMultiplicater?: boolean) {
-        width = getWidth(width ? width : undefined);
-        let { gutter, currentMedia, ...rest } = rowCol(width).col;
+    public static col(breakpointCols: IBreakpointColumns = ["col-4", "phone-12", "tablet-6", "desktop-4"], windowWidth?: number, withMultiplicater?: boolean) {
+        const currentMedia = Breakpoints.getCurrentMedia(windowWidth);
         const otherStyle: IStyle = {} as IStyle;
         let commonMultiplicater: number = 0;
 
         // Split the media query string into an array
-        const split = String(mediaQuery || "col-4 phone-12 tablet-6 desktop-4").trim().split(" ");
-        const opts: IDict = {};
+        const split = Array.isArray(breakpointCols) && breakpointCols.length ? breakpointCols : ["col-4", "phone-12", "tablet-6", "desktop-4"];
+        const opts: Partial<Record<IBreakpointName, number>> = {};
 
         split.map((s) => {
-            if (!s) return;
-            const sp = s.replace("_", "-").trim().toLowerCase();
-            if (sp) {
-                const spSplit = sp.split("-");
-                let media = spSplit[0], mediaValue = spSplit[1];
-
-                // Normalize media query values
-                if (media == "small-phone" || media == "s-phone") {
-                    media = "sp";
-                } else if (media == "medium-phone" || media == "m-phone") {
-                    media = "mp";
-                } else if (media === 'phone') {
-                    media = currentMedia == 'xs' ? 'xs' : currentMedia == 'sp' ? 'sp' : 'mp';
-                } else if (media == "tablet") {
-                    media = currentMedia == "sm" ? "sm" : "md";
-                } else if (media == 'xl' || media == "desktop") {
-                    media = "lg";
+            if (!s || !isNonNullString(s) || !s.includes("-")) return;
+            const sSplit = s.trim().split("-");
+            let breakpoinName: IBreakpointName = split[0] as IBreakpointName;
+            const colNumberStr = sSplit[1];
+            if (!canBeNumber(colNumberStr)) {
+                return;
+            }
+            const colNumber = parseInt(colNumberStr);
+            if (isNaN(colNumber) || colNumber < 0 || colNumber > 12) {
+                return;
+            }
+            if ((breakpoinName as any) === "col") {
+                commonMultiplicater = colNumber;
+            } else {
+                if (breakpoinName in this.smallPhoneBreakpoints) {
+                    breakpoinName = this.smallPhoneBreakpoint;
+                } else if (breakpoinName in this.mediumPhoneBreakpoints) {
+                    breakpoinName = this.mediumPhoneBreakpoint;
+                } else if (breakpoinName in this.phoneBreakpoints) {
+                    breakpoinName = this.phoneBreakpoint;
+                } else if (breakpoinName in this.tabletBreakpoints) {
+                    breakpoinName = currentMedia in this.tabletBreakpoints ? currentMedia : "md";
+                } else if (breakpoinName in this.desktopBreakpoints) {
+                    breakpoinName = currentMedia in this.desktopBreakpoints ? currentMedia : "lg";
                 }
-
-                // Determine the appropriate styles based on media queries
-                if (currentMedia === media && spSplit.length === 2) {
-                    if (mediaValue === "hidden") {
+                // Determine the appropriate styles based on breakpoint columns
+                if (currentMedia === breakpoinName) {
+                    opts[currentMedia] = colNumber;
+                    if (colNumber === 0) {
                         (otherStyle as any).display = "none";
-                    } else if (canBeNumber(mediaValue)) {
-                        opts[currentMedia] = parseFloat(mediaValue);
-                    }
-                } else if ((media == "col" || media == "column") && canBeNumber(mediaValue)) {
-                    const v: number = parseFloat(mediaValue);
-                    if (!isNaN(v) && v <= 12) {
-                        commonMultiplicater = v;
+                        (otherStyle as any).opacity = 0;
                     }
                 }
             }
         });
-        let hasFound = false, multiplicater = 12;
-        // Calculate the multiplicater based on options found
-        if (isObj(opts)) {
-            for (let i in opts) {
-                if (i == "col" || i == "column") {
-                    if (isNumber(opts[i]) && opts[i] <= 12) {
-                        commonMultiplicater = opts[i];
-                    }
-                } else if (i == currentMedia) {
-                    if (isNumber(opts[i]) && opts[i] <= 12) {
-                        multiplicater = opts[i];
-                        hasFound = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (!hasFound && isNumber(commonMultiplicater)) {
-            multiplicater = commonMultiplicater;
-        }
+        const multiplicater = typeof opts[currentMedia] == "number" ? opts[currentMedia] : commonMultiplicater;
         // Return the computed styles for the column
         const ret = {
-            ...rest,
             ...(otherStyle as object),
             width: (colWidth * multiplicater).toFixed(8) + '%'
-        } as IDict;
+        } as ViewStyle & { multiplicater: number };
         if (withMultiplicater) {
             ret.multiplicater = multiplicater;
         }
@@ -912,28 +925,23 @@ export default class Breakpoints {
     * 
     * Example usage:
     * ```typescript
-    * const numberOfCols = numColumns("md-5 xs-3 lg-8 sm-10");
+    * const numberOfCols = numColumns(["md-5", "xs-3", "lg-8","sm-10"]);
     * console.log(numberOfCols); // Outputs the number of columns based on the screen size.
     * ```
     * 
-    * @param {string} mediaQuery - The media queries to use for the column calculation (optional).
+    * @param {IBreakpointColumns} breakpointCols - The breakpoint columns to use for the column calculation (optional).
     * 
     * @param {number} width - The size of the window (optional). If not provided, the current window size is used.
     * 
     * @returns {number} The number of columns currently available in the view, ensuring a minimum of 1 column.
     */
-    public static numColumns(mediaQuery?: string, width?: number) {
-        const { multiplicater } = this.col(mediaQuery, width, true);
+    public static numColumns(breakpointCols?: IBreakpointColumns, width?: number) {
+        const { multiplicater } = this.col(breakpointCols, width, true);
         let numColumns = 1;
-
         if (multiplicater && multiplicater > 0) {
             numColumns = Math.trunc(12 / multiplicater);
         }
-
         return Math.max(numColumns, 1);
-    }
-    private static pixelRatioRoundToNearestPixel(value: number) {
-
     }
     /**
      * Converts provided width percentage to independent pixel (dp).
@@ -1004,6 +1012,77 @@ export default class Breakpoints {
         }
         return PixelRatio.roundToNearestPixel(size);
     }
+
+    /**
+     * Retrieves a comprehensive list of all breakpoint names, including custom aliases.
+     * 
+     * The `allBreakpointsNames` method returns an array of all defined breakpoint names
+     * from the `Breakpoints.allBreakpoints` object, along with additional aliases such as
+     * `"tablet"`, `"desktop"`, `"mobile"`, `"phone"`, `"mediumPhone"`, and `"smallPhone"`.
+     * 
+     * This method is useful for obtaining a complete list of breakpoints and their aliases
+     * for responsive design purposes.
+     * 
+     * @returns {IBreakpointName[]} - An array of all breakpoint names and aliases.
+     * 
+     * @example
+     * ```typescript
+     * // Example usage:
+     * const breakpointNames = Breakpoints.allBreakpointsNames();
+     * console.log(breakpointNames);
+     * // Output: ["sp", "mp", "xs", "sm", "md", "lg", "xl", "tablet", "desktop", "mobile", "phone", "mediumPhone", "smallPhone"]
+     * ```
+     * 
+     * @remarks
+     * - The method combines the keys of the `Breakpoints.allBreakpoints` object with additional
+     *   aliases to provide a comprehensive list of breakpoint names.
+     * - This list can be used for validation, configuration, or debugging purposes in responsive
+     *   design systems.
+     * 
+     * @see {@link Breakpoints.allBreakpoints} for the source of the breakpoint keys.
+     */
+    static get allBreakpointsNames(): IBreakpointName[] {
+        return [...Object.keys(Breakpoints.allBreakpoints) as any as IBreakpointName[], "tablet", "desktop", "mobile", "phone", "mediumPhone", "smallPhone"];
+    }
+    /**
+     * Retrieves the gutter size for the current or specified breakpoint.
+     * 
+     * The `getGutter` method calculates the gutter (spacing) value for the current breakpoint
+     * based on the window width or an optionally provided width. The gutter value is defined
+     * in the `Breakpoints.allBreakpoints` object for each breakpoint.
+     * 
+     * @param {number} [windowWidth] - An optional width to determine the active breakpoint. 
+     * If not provided, the current window width is used.
+     * 
+     * @returns {number} - The gutter size in pixels for the active breakpoint. Returns `0` if no gutter is defined.
+     * 
+     * @example
+     * ```typescript
+     * // Example usage with the current window width:
+     * const gutter = Breakpoints.getGutter();
+     * console.log(gutter); // Output: 6 (for example, if the current breakpoint is "sm")
+     * 
+     * // Example usage with a custom width:
+     * const customGutter = Breakpoints.getGutter(500);
+     * console.log(customGutter); // Output: 5 (for example, if the width corresponds to the "xs" breakpoint)
+     * ```
+     * 
+     * @remarks
+     * - The method uses the `Breakpoints.getCurrentMedia` function to determine the active breakpoint.
+     * - If the active breakpoint has a defined `gutter` value, it is returned. Otherwise, the method returns `0`.
+     * - This method is useful for dynamically adjusting spacing in responsive layouts.
+     * 
+     * @see {@link Breakpoints.getCurrentMedia} for determining the active breakpoint.
+     * @see {@link Breakpoints.allBreakpoints} for the definition of breakpoints and their gutter values.
+     */
+    static getGutter(windowWidth?: number) {
+        const media = Breakpoints.getCurrentMedia(windowWidth);
+        const all = Breakpoints.allBreakpoints;
+        if (isObj(all) && all[media]) {
+            return isNumber(all[media]?.gutter) ? all[media].gutter : 0;
+        }
+        return 0;
+    }
 }
 
 // Given a breakpointsRef.current object, will create a "max" breakpoint
@@ -1029,45 +1108,17 @@ const canBeNumber = function isNumeric(value: any): boolean {
 
 
 let colWidth = 100 / 12;
-export const medias = {
-    sp: 3,//maxWidth = 320
-    mp: 4, //maxWidth = 399
-    xs: 5,//575, // Small devices (landscape phones, 576px and up)
-    sm: 6,//767,// Medium devices (tablets, 768px and up)
-    md: 7,//1024,,
-    lg: 8,//1199, // Extra large devices (large desktops, 1200px and up)
-}
 
 const isNumber = (value: any) => typeof value === 'number';
 
-function rowCol(width?: number) {
-    const winWidth = Dimensions.get("window").width;
-    const hasWidth = isNumber(width) && Math.abs((width as number) - winWidth) > 10 && (width as number) > MIN_WIDTH ? true : false;
-    width = hasWidth ? width : winWidth;
-    let cMedia = Breakpoints.getCurrentMedia();
-    let currentMedia: string = "lg";
-    if (cMedia == "xl") cMedia = "lg";
-    if (!hasWidth && cMedia && medias[cMedia]) {
-        currentMedia = cMedia;
-    } else {
-        currentMedia = (hasWidth || !cMedia ? Breakpoints.getCurrentMedia(width) : cMedia) || "lg";
-    }
-    let gutter = medias[currentMedia as keyof typeof medias];
-    if (!isNumber(gutter)) {
-        gutter = 0;
-    }
-    return {
-        row: { flexDirection: 'row', flexWrap: 'wrap', marginRight: -1 * gutter, gutter, currentMedia },
-        col: { paddingRight: gutter * 1.8, gutter, currentMedia },
-    }
-}
 
-const MIN_WIDTH = 300;
 
-const getWidth = (width?: number) => {
+const MIN_WIDTH = 200;
+
+const getWidth = (windowWidth?: number) => {
     const _width = Dimensions.get("window").width;
-    if (typeof width == 'number' && width > MIN_WIDTH && width < (_width - 100)) {
-        return width;
+    if (typeof windowWidth == 'number' && windowWidth > MIN_WIDTH && windowWidth < (_width - 10)) {
+        return windowWidth;
     }
     return _width;
 }

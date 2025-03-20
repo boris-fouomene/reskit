@@ -110,6 +110,7 @@ export interface IBreakpoint {
     min?: number; // Minimum width for the breakpoint (e.g., 768px for tablets)
     name?: keyof IBreakpoints; // The name of the breakpoint (e.g., 'sm', 'md')
     label?: string; // A label to describe the breakpoint (e.g., "Tablet", "Desktop")
+    gutter?: number; // The gutter size for the breakpoint (e.g., 10px for small phones)
 }
 
 /**
@@ -321,3 +322,108 @@ export type IBreakpointsMediaQueries = {
     breakpoints: IBreakpoints;
     mediaQueries: Record<string, IMediaQueryTemplate>;
 };
+
+
+/**
+ * @typedef IBreakpointColumn
+ * Represents a responsive column class name based on a breakpoint and column number.
+ * 
+ * The `IBreakpointColumn` type is a template literal type that dynamically generates
+ * class names for responsive grid systems. It combines a breakpoint name (e.g., `sm`, `md`, `lg`)
+ * with a column number to create a class name string (e.g., `sm-6`, `md-12`).
+ * 
+ * This type is useful for defining responsive layouts in CSS frameworks or utility-based
+ * design systems where grid classes are used to control the width of elements at different
+ * breakpoints.
+ * 
+ * @template IBreakpointName - Represents the name of the breakpoint (e.g., `sm`, `md`, `lg`).
+ * @template number - Represents the column number (e.g., `1`, `2`, ..., `12`).
+ * 
+ * @example
+ * ```typescript
+ * // Example usage in a responsive grid system:
+ * const smallColumn: IBreakpointColumn = "sm-6"; // 6 columns at the "sm" breakpoint
+ * const mediumColumn: IBreakpointColumn = "md-12"; // Full width (12 columns) at the "md" breakpoint
+ * 
+ * // Example in a CSS-in-JS framework:
+ * const columnClass: IBreakpointColumn = `lg-4`; // 4 columns at the "lg" breakpoint
+ * 
+ * // Example in a utility-based design system:
+ * const columnClasses: IBreakpointColumn[] = [
+ *   "sm-6", // 6 columns at "sm"
+ *   "md-4", // 4 columns at "md"
+ *   "lg-3"  // 3 columns at "lg"
+ *   "col-4" // 4 columns at "col"
+ * ];
+ * ```
+ * 
+ * @remarks
+ * - This type is particularly useful in responsive design systems where grid layouts
+ *   are defined using class names.
+ * - The column number typically ranges from `1` to `12` in a 12-column grid system.
+ * - The breakpoint names should correspond to the defined breakpoints in the system (e.g., `sm`, `md`, `lg`).
+ * 
+ * @see {@link IBreakpoints} for the list of available breakpoints.
+ */
+export type IBreakpointColumn = `${IBreakpointName}-${IBreakpointColumnSize}` | `col-${IBreakpointColumnSize}`;
+
+/**
+ * Represents the size of a column in a responsive grid system.
+ * 
+ * The `IBreakpointColumnSize` type defines the possible column sizes in a 12-column grid system.
+ * Each value corresponds to the number of columns an element should span at a specific breakpoint.
+ * 
+ * @example
+ * ```typescript
+ * const smallColumnSize: IBreakpointColumnSize = 6; // Element spans 6 columns
+ * const fullWidthColumnSize: IBreakpointColumnSize = 12; // Element spans the full width (12 columns)
+ * const noColumnSize: IBreakpointColumnSize = 0; // Element is hidden or does not occupy any columns
+ * ```
+ * 
+ * @remarks
+ * - The column size typically ranges from `0` to `12` in a 12-column grid system.
+ * - A value of `0` indicates that the element does not occupy any space in the grid (ie it is hidden).
+ * - A value of `12` indicates that the element spans the full width of the grid.
+ */
+export type IBreakpointColumnSize = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+/**
+ * Represents one or more responsive column class names in a grid system.
+ * 
+ * The `IBreakpointColumns` type allows for defining multiple responsive column class names
+ * in an array. Each class name corresponds to a specific breakpoint and column configuration
+ * (e.g., `md-4`, `sm-6`, `lg-3`).
+ * 
+ * @example
+ * ```typescript
+ * // Example usage in a responsive grid system:
+ * const responsiveColumns: IBreakpointColumns = [
+ *   "md-4", // Element spans 4 columns at the "md" breakpoint
+ *   "sm-6", // Element spans 6 columns at the "sm" breakpoint
+ *   "lg-3"  // Element spans 3 columns at the "lg" breakpoint
+ * ];
+ * 
+ * // Example in a CSS-in-JS framework:
+ * const columnClasses: IBreakpointColumns = [
+ *   "xs-12", // Full width at "xs" breakpoint
+ *   "md-8",  // 8 columns at "md" breakpoint
+ *   "lg-6"   // 6 columns at "lg" breakpoint
+ * ];
+ * 
+ * // Example in a utility-based design system:
+ * const gridClasses: IBreakpointColumns = [
+ *   "sp-6",  // 6 columns at "sp" (small phone) breakpoint
+ *   "md-4",  // 4 columns at "md" breakpoint
+ *   "xl-3"   // 3 columns at "xl" (extra-large) breakpoint
+ * ];
+ * ```
+ * 
+ * @remarks
+ * - This type is particularly useful in responsive design systems where multiple grid layouts
+ *   need to be applied for different breakpoints.
+ * - Each `IBreakpointColumn` value should follow the format `{breakpoint}-{number}`.
+ * - The values are stored in an array to allow for easy manipulation and iteration.
+ * 
+ * @see {@link IBreakpointColumn} for individual column class names.
+ */
+export type IBreakpointColumns = IBreakpointColumn[];

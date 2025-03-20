@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useMemo } from 'react';
-import { View } from "react-native";
+import View from "./View";
 import { ITheme } from '@theme/types';
 import { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
 import { StyleSheet } from "react-native";
 import useStateCallback from '@utils/stateCallback';
-import { extendObj, isNumber, isObj } from '@resk/core';
+import { extendObj, isNumber, isObj, Platform } from '@resk/core';
 import { IReskNativeProviderProps } from './types';
 import { ReskNativeContext } from './hooks';
 import { PortalProvider } from "@components/Portal";
@@ -120,7 +120,7 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
-    <View testID="resk-native-root" style={[style, styles.root, { backgroundColor: theme.colors.background }]}>
+    <View testID="resk-native-root" style={[styles.root, { backgroundColor: theme.colors.background }, style]}>
       <ReskNativeContext.Provider value={{ theme, i18n, safeAreaInsets, updateTheme, ...rest, breakpoints }}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
@@ -134,8 +134,10 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
             <Dialog.Provider.Provider />
             <Drawer.Provider.Provider />
             <BottomSheet.Provider.Provider />
-            <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>
-              <StatusBar />
+            <Drawer renderNavigationView={(drawerState) => {
+              return Platform.isClientSide() ? <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} /> : null;
+            }}>
+              {Platform.isClientSide() ? <StatusBar /> : null}
               {children}
             </Drawer>
           </Default.AuthContext.Provider>

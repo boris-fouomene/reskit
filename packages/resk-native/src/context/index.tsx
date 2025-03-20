@@ -1,10 +1,11 @@
+"use client";
 import { useEffect, useMemo } from 'react';
 import { View } from "react-native";
 import { ITheme } from '@theme/types';
 import { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
 import { StyleSheet } from "react-native";
 import useStateCallback from '@utils/stateCallback';
-import { extendObj, isNumber, isObj, Platform } from '@resk/core';
+import { extendObj, isNumber, isObj } from '@resk/core';
 import { IReskNativeProviderProps } from './types';
 import { ReskNativeContext } from './hooks';
 import { PortalProvider } from "@components/Portal";
@@ -113,7 +114,6 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
     const { top, bottom, right, left } = Object.assign({}, safeAreaInsets);
     return [isNumber(top) && { paddingTop: top }, isNumber(bottom) && { paddingBottom: bottom }, isNumber(right) && { paddingRight: right }, isNumber(left) && { paddingLeft: left }];
   }, [safeAreaInsets]);
-  const isClientSide = Platform.isClientSide();
   /**
    * Provides the current theme and the `updateTheme` function to all child components
    * through the `ReskNativeContext`.
@@ -134,10 +134,10 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
             <Dialog.Provider.Provider />
             <Drawer.Provider.Provider />
             <BottomSheet.Provider.Provider />
-            {!isClientSide ? children : <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>
+            <Drawer renderNavigationView={(drawerState) => <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} />}>
               <StatusBar />
               {children}
-            </Drawer>}
+            </Drawer>
           </Default.AuthContext.Provider>
         </PortalProvider>
       </ReskNativeContext.Provider>

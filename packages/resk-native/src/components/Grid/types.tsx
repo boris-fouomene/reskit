@@ -31,7 +31,6 @@ import { ViewProps } from "react-native";
  * - The `responsive` property is useful for creating layouts that adapt to different screen sizes.
  */
 export interface IGridProps extends ViewProps {
-    responsive?: boolean;
     /***
      * controls whether child elements wrap within the grid container.
      * Default is true
@@ -77,9 +76,15 @@ export interface IGridProps extends ViewProps {
  * - The `defaultSize` property is useful for defining a fallback size when no specific breakpoint size is provided.
  * - The `gutter` property controls the spacing between columns, allowing for flexible layout adjustments.
  * - The `elevation` property can be used to add depth and visual hierarchy to the column.
+ * - The `responsive` property enables dynamic layout adjustments based on screen dimensions.
  */
 export interface IGridColProps extends ViewProps, Partial<Record<`${IBreakpointName}Size`, IBreakpointColumnSize>> {
     defaultSize?: IBreakpointColumnSize;
     gutter?: number;
     windowWidth?: number;
+    /**
+     * The `responsive` property enables dynamic layout adjustments based on screen dimensions.
+     * Default is true
+     */
+    responsive?: boolean;
 }

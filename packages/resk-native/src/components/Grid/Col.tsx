@@ -1,11 +1,12 @@
 'use strict';
 
 import React, { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { IGridColProps } from './types';
 import { defaultStr, isNonNullString, isNumber } from '@resk/core';
 import Breakpoints from '@breakpoints/index';
 import { IBreakpointColumns, IBreakpointColumnSize, IBreakpointName } from '@breakpoints/types';
+import { useDimensions } from '@dimensions/index';
 
 const isValidSize = (size: any): size is number => isNumber(size) && 0 <= size && size <= 12;
 
@@ -33,6 +34,9 @@ const isValidSize = (size: any): size is number => isNumber(size) && 0 <= size &
  * 
  * @property {ViewStyle} [style] - Additional styles to apply to the column.
  * 
+ * @property {boolean} [responsive] - Indicates whether the component should be responsive.
+ * If `true`, the component dynamically adjusts its layout based on the screen dimensions.
+ * 
  * @returns {JSX.Element} - A `View` component styled as a responsive grid column.
  * 
  * @example
@@ -57,8 +61,9 @@ const isValidSize = (size: any): size is number => isNumber(size) && 0 <= size &
  * @see {@link Breakpoints.col} for the method used to calculate column styles.
  * @see {@link Breakpoints.getGutter} for the method used to calculate gutter spacing.
  */
-const GridCol = React.forwardRef<View, IGridColProps>(({ style, windowWidth, gutter, defaultSize, testID, ...props }, ref) => {
+const GridCol = React.forwardRef<View, IGridColProps>(({ style, responsive, windowWidth, gutter, defaultSize, testID, ...props }, ref) => {
     const currentMedia = Breakpoints.getCurrentMedia();
+    const dimen = useDimensions(responsive);
     const colSizes = useMemo(() => {
         const breakpointsAll = Breakpoints.allBreakpointsNames;
         const colSizes: IBreakpointColumns = [];
@@ -81,7 +86,7 @@ const GridCol = React.forwardRef<View, IGridColProps>(({ style, windowWidth, gut
     }, [props, defaultSize]);
     const colStyle = useMemo(() => {
         return Breakpoints.col(colSizes, windowWidth, false);
-    }, [colSizes.join(","), currentMedia, windowWidth]);
+    }, [colSizes.join(","), currentMedia, windowWidth, dimen.width]);
     const paddingStyle = useMemo(() => {
         const padding = isNumber(gutter) ? gutter : Breakpoints.getGutter(windowWidth);
         return { padding };

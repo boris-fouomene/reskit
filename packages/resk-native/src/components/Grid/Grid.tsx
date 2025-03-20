@@ -15,8 +15,6 @@ import { useDimensions } from '@dimensions/index';
  * @param {IGridProps} props - The properties for the grid container.
  * @param {React.Ref<View>} ref - A reference to the underlying `View` component.
  * 
- * @property {boolean} [responsive] - Indicates whether the grid container should be responsive. 
- * If `true`, the grid dynamically adjusts its layout based on the screen dimensions.
  * 
  * @property {boolean} [flexWrap=true] - Specifies whether the child elements should wrap within the grid container.
  * Defaults to `true`, enabling wrapping behavior.
@@ -33,7 +31,7 @@ import { useDimensions } from '@dimensions/index';
  * 
  * const App = () => {
  *   return (
- *     <Grid responsive flexWrap={true} style={{ backgroundColor: "lightgray" }}>
+ *     <Grid lexWrap={true} style={{ backgroundColor: "lightgray" }}>
  *       <Grid.Col mdSize={6} smSize={12}>Content 1</Grid.Col>
  *       <Grid.Col mdSize={6} smSize={12}>Content 2</Grid.Col>
  *     </Grid>
@@ -42,16 +40,14 @@ import { useDimensions } from '@dimensions/index';
  * ```
  * 
  * @remarks
- * - The `responsive` property enables dynamic layout adjustments based on screen dimensions.
  * - The `flexWrap` property controls whether child elements wrap within the grid container.
  * - This component is typically used as a parent container for `Col` components in a responsive grid system.
  * 
  * @see {@link IGridProps} for the interface defining the grid properties.
  * @see {@link useDimensions} for the hook used to handle responsive behavior.
  */
-const Grid = React.forwardRef<View, IGridProps>(({ responsive, flexWrap = true, testID, style, ...props }, ref) => {
+const Grid = React.forwardRef<View, IGridProps>(({ flexWrap = false, testID, style, ...props }, ref) => {
     testID = defaultStr(testID, "resk-grid");
-    useDimensions(responsive);
     return <View
         {...props}
         testID={testID}

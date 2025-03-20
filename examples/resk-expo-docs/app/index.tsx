@@ -1,9 +1,11 @@
-import { TextInput, withAppBar, BottomSheet, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
+import { i18n } from "@resk/core";
+import { TextInput, withAppBar, Surface, Grid, BottomSheet, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
 import { View, ScrollView, StyleSheet } from 'react-native'
 
 const index = withAppBar(() => {
     return (
         <ScrollView>
+            <LoginExample />
             <View style={{ margin: 10 }}>
                 <Button mode="contained" onPress={() => console.log("Pressed")}
                     onLongPress={(e) => {
@@ -389,6 +391,65 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     >
         Open an Alert
     </Button>
+}
+
+function LoginExample() {
+    const formName = "login-form";
+    return <Surface testID={"login"} style={[Theme.styles.flex1, Theme.styles.w100]}>
+        <Grid testID="login-content-container" style={[Theme.styles.w100]}>
+            <Grid.Col testID="login-content" defaultSize={12} desktopSize={4} tabletSize={6}>
+                <View testID="login-header" style={[Theme.styles.centered, Theme.styles.w100]}>
+                    <Label fontVariant={"headlineLarge"} textBold >{i18n.t("screens.login.signIn")}</Label>
+                    <Label style={Theme.styles.m1} color={Theme.colors.text} fontVariant="bodyMedium">{i18n.t("screens.login.signInDescription")}</Label>
+                </View>
+                <Form
+                    name={formName}
+                    responsive={false}
+                    fields={{
+                        email: {
+                            type: "email",
+                            label: i18n.t("screens.login.email"),
+                            placeholder: i18n.t("screens.login.emailPlaceholder"),
+                            required: true,
+                        },
+                        password: {
+                            type: "password",
+                            label: i18n.t("screens.login.password"),
+                            placeholder: i18n.t("screens.login.passwordPlaceholder"),
+                            required: true,
+                        }
+                    }}
+                    onSubmit={({ data, form }) => {
+                        console.log(data, " is data heeein ", form?.getFields());
+                    }}
+                />
+                <View testID="forgot-password-container" style={[Theme.styles.flexRow, Theme.styles.pb05, Theme.styles.justifyContentEnd, Theme.styles.w100]}>
+                    <>
+                        <Label colorScheme="primary" underlined textBold>{i18n.t("screens.login.forgotPassword")}</Label>
+                    </>
+                </View>
+                <Button
+                    fullWidth
+                    centered
+                    left={({ textColor }) => <Icon iconName={"login"} size={24} color={textColor} />}
+                    formName={formName}
+                    mode="contained"
+                >{i18n.t("screens.login.signIn")}</Button>
+                <View style={Theme.styles.w100}>
+                    <View style={[Theme.styles.alignItemsCenter, Theme.styles.p1, Theme.styles.alignSelfCenter]}>
+                        <Label textBold>{i18n.t("screens.login.orContinueWith")}</Label>
+                        <View style={[Theme.styles.flexRow, Theme.styles.p1, Theme.styles.alignItemsCenter]}>
+                            <Icon.Button color={Theme.colors.primary} title="Google" iconName="google" size={30} />
+                        </View>
+                    </View>
+                </View>
+            </Grid.Col>
+            <Grid.Col defaultSize={0} tabletSize={6} desktopSize={8} testID={"login-content-right"} >
+                <Label>Right Content</Label>
+            </Grid.Col>
+        </Grid>
+    </Surface>
+
 }
 
 export default index;// withAuth(index);

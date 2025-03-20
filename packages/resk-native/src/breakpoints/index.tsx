@@ -1,6 +1,6 @@
 import { Dimensions, PixelRatio, ViewStyle } from "react-native";
 import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointNamePhone, IBreakpointNameSmallPhone, IBreakpointNameMobile, IBreakpointNameTablet, IBreakpointNameDesktop, IBreakpointNameMediumPhone, IBreakpointName, IBreakpointColumns } from "./types";
-import { addClassName, isDOMElement, isNonNullString, isObj, isNumber, removeClassName } from "@resk/core";
+import { addClassName, isDOMElement, isNonNullString, isObj, isNumber, removeClassName, isStringNumber } from "@resk/core";
 import { IStyle } from "@src/types";
 import Platform from "@platform/index";
 
@@ -385,7 +385,7 @@ export default class Breakpoints {
     public static isMediaDevice(alias: string | string[]): boolean {
         const currentBreakpoint = this.currentBreakpoint;
         if (!(currentBreakpoint) || !alias) return false;
-        const aliasSplit = typeof alias === "string" ? alias.trim().toLowerCase().split(",") : alias;
+        const aliasSplit = typeof alias === "string" ? alias.trim().toLowerCase().split(",") : Array.isArray(alias) ? alias : [];
         if (currentBreakpoint?.name) {
             return aliasSplit.includes(currentBreakpoint.name.toLowerCase());
         }
@@ -864,19 +864,19 @@ export default class Breakpoints {
      */
     public static col(breakpointCols: IBreakpointColumns = ["col-4", "phone-12", "tablet-6", "desktop-4"], windowWidth?: number, withMultiplicater?: boolean) {
         const currentMedia = Breakpoints.getCurrentMedia(windowWidth);
-        const otherStyle: IStyle = {} as IStyle;
-        let commonMultiplicater: number = 0;
+        const otherStyle: ViewStyle = {};
+        let commonMultiplicater: number = 12;
 
         // Split the media query string into an array
         const split = Array.isArray(breakpointCols) && breakpointCols.length ? breakpointCols : ["col-4", "phone-12", "tablet-6", "desktop-4"];
         const opts: Partial<Record<IBreakpointName, number>> = {};
-
+        let hideByDefault = false;
         split.map((s) => {
-            if (!s || !isNonNullString(s) || !s.includes("-")) return;
+            if (!isNonNullString(s) || !s.includes("-")) return;
             const sSplit = s.trim().split("-");
-            let breakpoinName: IBreakpointName = split[0] as IBreakpointName;
+            let breakpoinName: IBreakpointName = sSplit[0] as IBreakpointName;
             const colNumberStr = sSplit[1];
-            if (!canBeNumber(colNumberStr)) {
+            if (!isStringNumber(colNumberStr, false)) {
                 return;
             }
             const colNumber = parseInt(colNumberStr);
@@ -886,32 +886,34 @@ export default class Breakpoints {
             if ((breakpoinName as any) === "col") {
                 commonMultiplicater = colNumber;
             } else {
-                if (breakpoinName in this.smallPhoneBreakpoints) {
-                    breakpoinName = this.smallPhoneBreakpoint;
-                } else if (breakpoinName in this.mediumPhoneBreakpoints) {
-                    breakpoinName = this.mediumPhoneBreakpoint;
-                } else if (breakpoinName in this.phoneBreakpoints) {
-                    breakpoinName = this.phoneBreakpoint;
-                } else if (breakpoinName in this.tabletBreakpoints) {
-                    breakpoinName = currentMedia in this.tabletBreakpoints ? currentMedia : "md";
-                } else if (breakpoinName in this.desktopBreakpoints) {
-                    breakpoinName = currentMedia in this.desktopBreakpoints ? currentMedia : "lg";
+                if (breakpoinName !== currentMedia) {
+                    if (this.smallPhoneBreakpoints.includes(breakpoinName as IBreakpointNameSmallPhone)) {
+                        breakpoinName = this.smallPhoneBreakpoint;
+                    } else if (this.mediumPhoneBreakpoints.includes(breakpoinName as IBreakpointNameMediumPhone)) {
+                        breakpoinName = this.mediumPhoneBreakpoint;
+                    } else if (this.phoneBreakpoints.includes(breakpoinName as IBreakpointNamePhone)) {
+                        breakpoinName = this.phoneBreakpoint;
+                    } else if (this.tabletBreakpoints.includes(breakpoinName as IBreakpointNameTablet)) {
+                        breakpoinName = this.tabletBreakpoints.includes(currentMedia as IBreakpointNameTablet) ? currentMedia : "md";
+                    } else if (this.desktopBreakpoints.includes(breakpoinName as IBreakpointNameDesktop)) {
+                        breakpoinName = this.desktopBreakpoints.includes(currentMedia as IBreakpointNameDesktop) ? currentMedia : "lg";
+                    }
                 }
                 // Determine the appropriate styles based on breakpoint columns
                 if (currentMedia === breakpoinName) {
                     opts[currentMedia] = colNumber;
-                    if (colNumber === 0) {
-                        (otherStyle as any).display = "none";
-                        (otherStyle as any).opacity = 0;
-                    }
                 }
             }
         });
-        const multiplicater = typeof opts[currentMedia] == "number" ? opts[currentMedia] : commonMultiplicater;
+        const multiplicater = isNumber(opts[currentMedia]) ? opts[currentMedia] : commonMultiplicater;
+        if (multiplicater === 0) {
+            otherStyle.display = "none";
+            otherStyle.opacity = 0;
+        }
         // Return the computed styles for the column
         const ret = {
-            ...(otherStyle as object),
-            width: (colWidth * multiplicater).toFixed(8) + '%'
+            ...(otherStyle as ViewStyle),
+            width: multiplicater ? ((colWidth * multiplicater).toFixed(8) + '%') : 0
         } as ViewStyle & { multiplicater: number };
         if (withMultiplicater) {
             ret.multiplicater = multiplicater;
@@ -1098,13 +1100,6 @@ const addMaxBreakpoint = function (breakpoints: INormalizedBreakpoints, maxWidth
         max: Infinity
     };
 };
-
-
-
-const canBeNumber = function isNumeric(value: any): boolean {
-    if (typeof value !== "string") return false;
-    return /^-?\d+$/.test(value);
-}
 
 
 let colWidth = 100 / 12;

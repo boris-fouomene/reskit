@@ -1,3 +1,5 @@
+import React from "react";
+
 /**
  * Checks if the provided font icon name is valid.
  *
@@ -13,4 +15,6 @@ export default function FontIcon(props: any) {
 }
 
 
+FontIcon.isValidName = isValidFontIconName;
+FontIcon.getIconSet = () => ({ iconSetName: "", iconSetPrefix: "", iconName: "", iconSet: React.Fragment });
 export const DEFAULT_FONT_ICON_SIZE = 20;

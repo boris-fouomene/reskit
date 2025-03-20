@@ -1,6 +1,6 @@
 import { Dimensions, PixelRatio, ViewStyle } from "react-native";
-import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointNamePhone, IBreakpointNameSmallPhone, IBreakpointNameMobile, IBreakpointNameTablet, IBreakpointNameDesktop, IBreakpointNameMediumPhone, IBreakpointName, IBreakpointColumn, IBreakpointColumns } from "./types";
-import { addClassName, IDict, isDOMElement, isNonNullString, isObj, isStringNumber, removeClassName } from "@resk/core";
+import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointNamePhone, IBreakpointNameSmallPhone, IBreakpointNameMobile, IBreakpointNameTablet, IBreakpointNameDesktop, IBreakpointNameMediumPhone, IBreakpointName, IBreakpointColumns } from "./types";
+import { addClassName, isDOMElement, isNonNullString, isObj, isNumber, removeClassName } from "@resk/core";
 import { IStyle } from "@src/types";
 import Platform from "@platform/index";
 
@@ -1108,8 +1108,6 @@ const canBeNumber = function isNumeric(value: any): boolean {
 
 
 let colWidth = 100 / 12;
-
-const isNumber = (value: any) => typeof value === 'number';
 
 
 

@@ -1,3 +1,4 @@
+"use client";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import React, { useMemo } from "react";
@@ -8,7 +9,6 @@ import { uniqid, defaultStr } from "@resk/core";
 import { Pressable } from "react-native";
 import { ITooltipProps } from './types';
 
-"use client";
 
 export * from "./types";
 

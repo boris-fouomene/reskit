@@ -1,3 +1,4 @@
+"use client";
 import React, { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
 import { IFontIconName, IFontIconProps, IGetIconOptions, IIconProps } from "./types";
 import { Image, ImageStyle } from "react-native";

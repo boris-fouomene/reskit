@@ -1,3 +1,4 @@
+import { Platform } from '@resk/core';
 import React from 'react';
 
 /**
@@ -44,5 +45,16 @@ export default class Component<IProps = unknown, IState = unknown> extends React
    */
   isMounted(): boolean {
     return this._isMounted;
+  }
+  /***
+   * Overrides the `setState` method to only update the state if the component is mounted.
+   * Prevents unnecessary re-renders and improves performance on the server side.
+   */
+  setState<K extends keyof IState>(
+    state: ((prevState: Readonly<IState>, props: Readonly<IProps>) => Pick<IState, K> | IState | null) | (Pick<IState, K> | IState | null),
+    callback?: () => void,
+  ): void {
+    if (!Platform.isClientSide()) return;
+    super.setState(state, callback);
   }
 }

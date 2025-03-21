@@ -20,28 +20,8 @@ import { defaultStr, I18n } from "@resk/core";
  * ```
  */
 export const applyLanguage = async (i18n: I18n, request: any) => {
-    /**
-     * Extracts the 'Accept-Language' header from the request and sets the locale accordingly.
-     * 
-     * If the 'Accept-Language' header is not present, it defaults to 'en'.
-     * 
-     * @note The 'Accept-Language' header is case-insensitive, so both 'accept-language' and 'Accept-Language' are supported.
-     */
-    let lang = defaultStr(Object.assign({}, request.headers)['accept-language'], Object.assign({}, request.headers)['Accept-Language'], 'en');
-
-    /**
-     * Checks if the extracted language is supported by the I18n instance.
-     * 
-     * If the language is not supported, it defaults to 'en'.
-     */
-    if (!i18n.hasLocale(lang)) {
-        lang = "en";
-    }
-
-    /**
-     * Sets the locale using the I18n instance.
-     * 
-     * @note This method is asynchronous and returns a promise that resolves when the locale has been set.
-     */
+    const acceptLanguage = defaultStr(Object.assign({}, request.headers)['accept-language'], Object.assign({}, request.headers)['Accept-Language'], 'en');
+    const preferredLanguage = acceptLanguage.split(",")[0].split("-")[0]; // e.g., "fr-FR" -> "fr"
+    const lang = i18n.hasLocale(acceptLanguage) ? acceptLanguage : i18n.hasLocale(preferredLanguage) ? preferredLanguage : "en";
     await i18n.setLocale(lang);
 }

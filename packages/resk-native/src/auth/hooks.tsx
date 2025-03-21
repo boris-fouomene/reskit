@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode, isValidElement, Suspense } from "react";
+import React, { createContext, useContext, useEffect, useState, ReactNode, isValidElement } from "react";
 import { IAuthContext, IAuthProviderProps } from "./types";
-import { Auth, isObj, Platform } from "@resk/core";
+import { Auth, isObj } from "@resk/core";
 import { IWithHOCOptions } from "@hooks/withHOC";
 import View from "@components/View";
 import Label from "@components/Label";
@@ -219,9 +219,6 @@ export function withAuth<T extends any = any>(Component: React.FC<IWithAuthProps
   const { fallback, displayName } = options;
   const fn: React.FC<IWithAuthProps<T>> = function (props: IWithAuthProps<T>): ReactNode {
     const user = useGetSignedUser();
-    if (!Platform.isClientSide()) {
-      return null;
-    }
     if (!user) {
       if (typeof fallback === "function") {
         return fallback();

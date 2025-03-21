@@ -16,4 +16,5 @@ export * from "./notify";
 export * from "./hooks";
 export * from "./components/Badge";
 export * from "./components/Grid";
-export * from "./components/StatusBar"
+export * from "./components/StatusBar";
+export * from "./types";

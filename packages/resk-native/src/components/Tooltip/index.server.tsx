@@ -1,3 +1,3 @@
-export default function Tooltip() {
+export function Tooltip() {
     return null;
 }

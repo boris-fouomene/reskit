@@ -1,4 +1,3 @@
-import { Platform } from '@resk/core';
 import React from 'react';
 
 /**
@@ -54,7 +53,7 @@ export default class Component<IProps = unknown, IState = unknown> extends React
     state: ((prevState: Readonly<IState>, props: Readonly<IProps>) => Pick<IState, K> | IState | null) | (Pick<IState, K> | IState | null),
     callback?: () => void,
   ): void {
-    if (!Platform.isClientSide()) return;
+    if (!this.isMounted()) return;
     super.setState(state, callback);
   }
 }

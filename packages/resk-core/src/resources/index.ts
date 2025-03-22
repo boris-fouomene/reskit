@@ -1131,19 +1131,19 @@ export class ResourcesManager {
  * 
  * ```
  */
-export function ResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData: IResource<DataType, PrimaryKeyType> & {
+export function ResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData?: IResource<DataType, PrimaryKeyType> & {
   /***
    * whether the resource should be instanciated or not
    */
   instanciate?: boolean;
 }) {
-  return function (target: IClassConstructor) {
+  return function (target: typeof Resource<DataType, PrimaryKeyType>) {
     metaData = Object.assign({}, metaData);
     metaData.className = defaultStr(metaData.className, target?.name);
     if (typeof target == "function") {
       if (metaData?.instanciate) {
         try {
-          const resource = new (target as IClassConstructor)() as Resource<DataType>;
+          const resource = new (target as any)() as Resource<DataType>;
           resource.updateMetadata(metaData);
           ResourcesManager.addResource<DataType>((metaData.name as IResourceName), resource);
         } catch { }

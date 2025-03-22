@@ -1,6 +1,6 @@
 {
     "name": "@resk/types-core",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "Declarations for @resk/core package",
     "types": "build/index.d.ts",
     "main": "build/index.d.ts",

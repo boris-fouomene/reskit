@@ -11,5 +11,7 @@ vite.config.*
 # Ignore specific files
 .env
 *.log
+.rollup.cache
+
 
 # Ignore any other file patterns you don't want to include

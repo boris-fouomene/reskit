@@ -41,8 +41,8 @@
     "exclude": [
         "build/**/*",
         "node_modules/**/*",
+        "../node_modules/**/*",
         "jest.config.*",
         "../../jest.config.*",
-        //"src/**/*.test.*",
     ]
 }

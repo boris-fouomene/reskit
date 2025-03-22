@@ -1,9 +1,9 @@
 {
     "name": "@resk/core",
-    "version": "1.9.1",
+    "version": "1.10.0",
     "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
     "main": "build/cjs/index",
-    "module": "./build/esm/index.js",
+    "module": "./build/mjs/index.mjs",
     "types": "../types-core/build/index.d.ts",
     "typesVersions": {
         "*": {
@@ -59,83 +59,84 @@
     },
     "exports": {
         "./auth": {
-            "import": "./build/esm/auth/index.js",
+            "import": "./build/mjs/auth/index.mjs",
             "require": "./build/cjs/auth/index.js"
         },
         "./countries": {
-            "import": "./build/esm/countries/index.js",
+            "import": "./build/mjs/countries/index.mjs",
             "require": "./build/cjs/countries/index.js"
         },
         "./currency": {
-            "import": "./build/esm/currency/index.js",
+            "import": "./build/mjs/currency/index.mjs",
             "require": "./build/cjs/currency/index.js"
         },
         "./decorators": {
-            "import": "./build/esm/decorators/index.js",
+            "import": "./build/mjs/decorators/index.mjs",
             "require": "./build/cjs/decorators/index.js"
         },
         "./fields": {
-            "import": "./build/esm/fields/index.js",
+            "import": "./build/mjs/fields/index.mjs",
             "require": "./build/cjs/fields/index.js"
         },
         "./i18n": {
-            "import": "./build/esm/i18n/index.js",
+            "import": "./build/mjs/i18n/index.mjs",
             "require": "./build/cjs/i18n/index.js"
         },
         "./inputFormatter": {
-            "import": "./build/esm/inputFormatter/index.js",
+            "import": "./build/mjs/inputFormatter/index.mjs",
             "require": "./build/cjs/inputFormatter/index.js"
         },
         "./logger": {
-            "import": "./build/esm/logger/index.js",
+            "import": "./build/mjs/logger/index.mjs",
             "require": "./build/cjs/logger/index.js"
         },
         "./observable": {
-            "import": "./build/esm/observable/index.js",
+            "import": "./build/mjs/observable/index.mjs",
             "require": "./build/cjs/observable/index.js"
         },
         "./platform": {
-            "import": "./build/esm/platform/index.js",
+            "import": "./build/mjs/platform/index.mjs",
             "require": "./build/cjs/platform/index.js"
         },
         "./resources": {
-            "import": "./build/esm/resources/index.js",
+            "import": "./build/mjs/resources/index.mjs",
             "require": "./build/cjs/resources/index.js"
         },
         "./session": {
-            "import": "./build/esm/session/index.js",
+            "import": "./build/mjs/session/index.mjs",
             "require": "./build/cjs/session/index.js"
         },
         "./utils": {
-            "import": "./build/esm/utils/index.js",
+            "import": "./build/mjs/utils/index.mjs",
             "require": "./build/cjs/utils/index.js"
         },
         "./types": {
-            "import": "./build/esm/types/index.js",
+            "import": "./build/mjs/types/index.mjs",
             "require": "./build/cjs/types/index.js"
         },
         "./validator": {
-            "import": "./build/esm/validator/index.js",
+            "import": "./build/mjs/validator/index.mjs",
             "require": "./build/cjs/validator/index.js"
         },
         "./*": {
-            "import": "./build/esm/*",
+            "import": "./build/mjs/*",
             "require": "./build/cjs/*"
         },
         ".": {
-            "import": "./build/esm/index.js",
+            "import": "./build/mjs/index.mjs",
             "require": "./build/cjs/index.js"
         }
     },
     "scripts": {
         "clear-npx-cache": "npx clear-npx-cache",
         "pretest": "npm run build-test",
-        "build-test": "tsc --project ./tsconfig.test.json && npx tsc-alias -p tsconfig.test.json",
+        "build-test1": "tsc --project ./tsconfig.test.json && npx tsc-alias -p tsconfig.test.json",
+        "build-test": "rollup -c rollup.test.mjs",
         "test": "npx jest",
-        "build": "npm run build:esm && npm run build:cjs",
+        "build": "rollup -c rollup.build.mjs",
+        "build1": "npm run build:mjs && npm run build:cjs",
         "build:cjs": "tsc -p tsconfig.cjs.json && npx tsc-alias -p tsconfig.cjs.json",
-        "build:esm": "tsc -p tsconfig.esm.json && npx tsc-alias -p tsconfig.esm.json",
-        "test-node": "npm run build && node ./build/test/index.js",
+        "build:mjs": "tsc -p tsconfig.mjs.json && npx tsc-alias -p tsconfig.mjs.json",
         "start": "node build/test/index",
         "prepublish": "npm run build",
         "build-doc": "npx typedoc",
@@ -143,28 +144,32 @@
         "dev": "npx concurrently \"tsc --watch\" \"npx tsc-alias -p tsconfig.json\""
     },
     "devDependencies": {
+        "@rollup/plugin-commonjs": "^28.0.3",
+        "@rollup/plugin-node-resolve": "^16.0.1",
+        "@rollup/plugin-typescript": "^12.1.2",
         "@types/crypto-js": "^4.2.2",
         "@types/dotenv": "^6.1.1",
         "@types/google-libphonenumber": "^7.4.30",
         "@types/node": "^22.10.7",
         "@types/qs": "^6.9.18",
         "copyfiles": "^2.4.1",
-        "dotenv": "^16.4.7",
+        "fast-glob": "^3.3.3",
         "lerna": "^8.1.9",
-        "openai": "^4.79.4",
-        "reflect-metadata": "^0.2.2",
+        "rollup": "^4.36.0",
         "ts-alias": "^0.0.7",
         "ts-jest": "^29.2.5",
-        "vite-tsconfig-paths": "^5.1.4"
+        "tsc-alias": "^1.8.11",
+        "typescript": "^5.8.2"
     },
     "dependencies": {
-        "@resk/types-core": "^1.3.0",
+        "@resk/types-core": "^1.3.1",
         "@types/color": "^4.2.0",
         "crypto-js": "^4.2.0",
         "google-libphonenumber": "^3.2.40",
         "i18n-js": "^4.5.1",
         "moment": "^2.30.1",
         "qs": "^6.14.0",
+        "reflect-metadata": "^0.2.2",
         "stable-hash": "^0.0.4"
     },
     "publishConfig": {

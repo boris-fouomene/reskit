@@ -50,6 +50,7 @@
   "exclude": [
     "./jest.config.js",
     "**/node_modules/**/*",
+    "node_modules/**/*",
     "./node_modules/@resk/**/*",
     "./node_modules/@resk/types-native/**/*",
     "**/dist/*",

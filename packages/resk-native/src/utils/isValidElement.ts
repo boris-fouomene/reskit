@@ -1,5 +1,4 @@
 import * as ReactIs from "react-is";
-import React, { ReactNode } from "react";
 /**
  * Checks if the provided element is a valid React element.
  *

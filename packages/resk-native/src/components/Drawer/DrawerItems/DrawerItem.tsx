@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { StyleSheet, TextStyle, } from 'react-native';
 import { Colors } from "@theme";
-import { defaultStr } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 import { MINIMIZED_ICON_SIZE, ICON_SIZE, getBackgroundColor } from '../utils';
 import { useTheme } from '@theme';
 import { IDrawerItemProps } from '../types';

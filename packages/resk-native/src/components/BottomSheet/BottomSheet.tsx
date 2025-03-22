@@ -1,6 +1,6 @@
 import React, { useImperativeHandle, useRef } from "react"
 import theme from "@theme";
-import { defaultObj, defaultStr, isObj } from "@resk/core";
+import { defaultObj, defaultStr, isObj } from "@resk/core/utils";
 import View from "@components/View";
 import { Portal } from "@components/Portal";
 import { PanResponder, Platform, ScrollView } from "react-native";

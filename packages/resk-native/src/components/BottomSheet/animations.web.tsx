@@ -1,4 +1,4 @@
-import { isNumber } from '@resk/core';
+import { isNumber } from '@resk/core/utils';
 import * as React from 'react';
 import { StyleSheet, ViewStyle } from "react-native";
 

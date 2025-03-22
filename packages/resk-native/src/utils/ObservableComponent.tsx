@@ -1,5 +1,5 @@
 import ReactComponent from "./Component";
-import { IObservable, observableFactory, IObservableAllEventType, IObservableCallback, IObservableCallbacks } from "@resk/core";
+import { IObservable, observableFactory, IObservableAllEventType, IObservableCallback, IObservableCallbacks } from "@resk/core/observable";
 /**
  * Extends the React component by defining an observable component.
  * 

@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { IThemeColorsTokenName, useTheme } from "@theme";
 import Label, { ILabelProps } from '@components/Label';
-import { defaultStr } from '@resk/core';
+import { defaultStr } from '@resk/core/utils';
 
 const defaultSize = 20;
 

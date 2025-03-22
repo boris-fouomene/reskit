@@ -2,7 +2,7 @@
   "name": "@resk/native",
   "main": "build/index",
   "types": "../types-native/build/index.d.ts",
-  "version": "1.7.22",
+  "version": "1.8.0",
   "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
   "scripts": {
     "build-core": "cd ../resk-core && npm run build",
@@ -15,9 +15,8 @@
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
-    "@resk/core": "^1.7.5",
-    "@resk/types-core": "^1.0.2",
-    "@resk/types-native": "^1.1.2",
+    "@resk/core": "^1.8.1",
+    "@resk/types-native": "^1.2.0",
     "@types/react-native-vector-icons": "^6.4.18",
     "color": "^4.2.3",
     "tippy.js": "^6.3.7"

@@ -1,5 +1,4 @@
-import { IAuthUser } from "@resk/core"
-import { IReactComponent } from "@src/types";
+import { IAuthUser } from "@resk/core/auth/types";
 
 /**
  * Represents the authentication context in the application.

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, isValidElement } from "react";
 import { IAuthContext, IAuthProviderProps } from "./types";
-import { Auth, isObj } from "@resk/core";
+import Auth from "@resk/core/auth";
+import { isObj } from "@resk/core/utils";
 import { IWithHOCOptions } from "@hooks/withHOC";
 import View from "@components/View";
 import Label from "@components/Label";

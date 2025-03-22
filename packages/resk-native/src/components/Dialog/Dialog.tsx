@@ -13,7 +13,7 @@ import View from "@components/View";
 import DialogActions from "./DialogActions";
 import { ScrollView, StyleSheet } from "react-native";
 import { IDialogProps } from "./types";
-import { defaultStr } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 
 /**
  * A Dialog component that renders a modal dialog with customizable content,

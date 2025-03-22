@@ -1,4 +1,4 @@
-import { isObj } from '@resk/core';
+import { isObj } from '@resk/core/utils';
 import { ITouchableEventNames, ITouchableProps } from '../types';
 
 /**

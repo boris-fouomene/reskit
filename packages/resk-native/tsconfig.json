@@ -70,9 +70,6 @@
       "@src/*": [
         "src/*"
       ],
-      "@resk/core1": [
-        "../resk-core/build"
-      ],
       "react-native": [
         "../../examples/resk-expo-docs/node_modules/react-native",
       ],

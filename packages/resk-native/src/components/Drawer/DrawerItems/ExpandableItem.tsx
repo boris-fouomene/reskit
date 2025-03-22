@@ -1,5 +1,5 @@
 
-import { defaultStr } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 import DrawerItem from "./DrawerItem";
 import { useDrawer } from "../hooks";
 import { IDrawerItemProps } from "../types";

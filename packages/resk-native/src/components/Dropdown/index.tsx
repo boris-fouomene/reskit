@@ -1,7 +1,9 @@
 import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownEvent, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
-import { defaultStr, i18n, IDict, isEmpty, isNonNullString, isObj, Logger, areEquals } from "@resk/core";
+import { defaultStr, isEmpty, isNonNullString, isObj, areEquals } from "@resk/core/utils";
+import Logger from "@resk/core/logger";
+import { i18n } from "@resk/core/i18n";
 import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import Theme, { useTheme } from "@theme/index";
@@ -66,7 +68,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         }
         const { item } = options;
         if (item && isObj(item)) {
-            const { label } = (item as IDict);
+            const { label } = (item as any);
             if (isReactNode(label)) {
                 return label;
             }
@@ -90,7 +92,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         }
         const { item, index } = options;
         if (item && isObj(item)) {
-            const { value } = (item as IDict);
+            const { value } = (item as any);
             if (!isEmpty(value)) {
                 return value;
             }

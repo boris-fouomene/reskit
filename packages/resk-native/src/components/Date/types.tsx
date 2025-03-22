@@ -1,6 +1,7 @@
 import { IModalProps } from "@components/Modal";
 import { ISurfaceProps } from "@components/Surface";
-import { I18n, IMomentFormat } from "@resk/core"
+import { IMomentFormat } from "@resk/core/types";
+import { I18n } from "@resk/core/i18n";
 import useStateCallback from "@utils/stateCallback";
 import { Moment } from "moment";
 import { ReactNode } from "react";

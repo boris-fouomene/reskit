@@ -3,7 +3,7 @@ import { useDrawer, useDrawerCurrentState } from "./hooks";
 import _Drawer from "./Drawer";
 import { IDrawerProps } from "./types";
 import { IReactComponent } from "@src/types";
-import { defaultObj, defaultStr } from "@resk/core";
+import { defaultObj, defaultStr } from "@resk/core/utils";
 import DrawerItems from "./DrawerItems";
 import Provider from "./Provider";
 import DrawerItem from "./DrawerItems/DrawerItem";

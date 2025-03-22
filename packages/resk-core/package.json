@@ -1,6 +1,6 @@
 {
     "name": "@resk/core",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
     "main": "build/cjs/index",
     "module": "./build/esm/index.js",
@@ -30,6 +30,9 @@
             ],
             "logger": [
                 "../types-core/build/logger/index.d.ts"
+            ],
+            "observable": [
+                "../types-core/build/observable/index.d.ts"
             ],
             "platform": [
                 "../types-core/build/platform/index.d.ts"
@@ -86,6 +89,10 @@
         "./logger": {
             "import": "./build/esm/logger/index.js",
             "require": "./build/cjs/logger/index.js"
+        },
+        "./observable": {
+            "import": "./build/esm/observable/index.js",
+            "require": "./build/cjs/observable/index.js"
         },
         "./platform": {
             "import": "./build/esm/platform/index.js",
@@ -148,7 +155,7 @@
         "vite-tsconfig-paths": "^5.1.4"
     },
     "dependencies": {
-        "@resk/types-core": "^1.1.0",
+        "@resk/types-core": "^1.2.0",
         "@types/color": "^4.2.0",
         "crypto-js": "^4.2.0",
         "google-libphonenumber": "^3.2.40",

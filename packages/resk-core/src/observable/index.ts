@@ -183,7 +183,7 @@ export const observableFactory = function <EventType extends string = string>():
               arr.splice(i--, 1);
             }
           }
-        } else {}
+        } else { }
       }
       return this;
     },

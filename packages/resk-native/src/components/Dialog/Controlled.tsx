@@ -2,7 +2,7 @@
 import React, { ReactNode } from "react";
 import Dialog from "./Dialog";
 import { isValidElement } from "@utils";
-import { defaultStr, isObj } from "@resk/core";
+import { defaultStr, isObj } from "@resk/core/utils";
 import { StyleSheet } from "react-native";
 import theme from "@theme";
 import { ActivityIndicator, IActivityIndicatorProps } from "@components/ActivityIndicator";

@@ -1,6 +1,7 @@
 import DialogControlled, { IDialogControlledProps } from "./Controlled";
 import { createProvider, isValidElement } from "@utils";
-import { i18n, isNonNullString } from "@resk/core";
+import { isNonNullString } from "@resk/core/utils";
+import { i18n } from "@resk/core/i18n";
 import { IAppBarAction } from "@components/AppBar";
 import { ReactNode } from "react";
 import Label from "@components/Label";

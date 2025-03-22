@@ -12,7 +12,8 @@ import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IDividerProps } from "@components/Divider";
 import { IFormData } from "@components/Form/types";
-import { IAuthPerm, IResourceName } from "@resk/core";
+import { IAuthPerm } from "@resk/core/auth/types";
+import { IResourceName } from "@resk/core/types";
 
 /**
  * @interface IButtonMode

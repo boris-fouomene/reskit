@@ -1,5 +1,5 @@
 import { Button, IButtonProps } from "@components/Button";
-import { defaultStr } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 import isValidElement from "@utils/isValidElement";
 import { GestureResponderEvent, StyleSheet } from "react-native";
 import { ICalendarBaseProps } from "./types";
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         alignSelf: "flex-end",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingHorizontal:5,
+        paddingHorizontal: 5,
     },
     calendar: {
         flexDirection: "column",

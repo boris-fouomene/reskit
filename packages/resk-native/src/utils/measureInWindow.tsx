@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { isNumber } from "@resk/core";
+import { isNumber } from "@resk/core/utils";
 
 /**
  * Determines the location of the given view in the window and resolve the values. 

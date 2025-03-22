@@ -1,4 +1,4 @@
-import { defaultStr, isObj, isEmpty } from "@resk/core";
+import { defaultStr, isObj, isEmpty } from "@resk/core/utils";
 
 /**
  * Retrieves the unique key(s) that can identify a React element based on the provided data.

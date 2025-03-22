@@ -8,7 +8,7 @@ import { useTheme } from '@theme';
 import { useRenderMenuItems } from '@components/Menu';
 import { IDrawerContext, IDrawerItemProps, IDrawerItemsProps } from '../types';
 import { StyleSheet } from 'react-native';
-import { defaultStr } from '@resk/core';
+import { defaultStr } from '@resk/core/utils';
 
 /**
  * DrawerItems component renders a list of drawer items, including expandable items.

@@ -1,11 +1,7 @@
 import { renderMenuItems } from "@components/Menu/utils";
 import { getDimensions } from "@dimensions";
-import { ITheme, IThemeColorSheme, IThemeColorsTokenName } from "@theme/types";
-import { IMenuItemRenderFunc, IMenuRenderItemsOptions } from "@components/Menu/types";
 import { IAppBarAction, IAppBarContext, IAppBarProps } from "./types";
-import Theme, { Colors } from "@theme/index";
 import { Dimensions } from "react-native";
-import { IDict } from "@resk/core";
 import { IReactNullableElement } from "@src/types";
 
 

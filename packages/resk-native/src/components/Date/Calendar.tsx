@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useEffect, useImperativeHandle, useMemo } from "react";
 import { View, StyleSheet, GestureResponderEvent } from "react-native";
 import moment, { Moment } from "moment";
-import { DateHelper, defaultStr, I18n, IMomentFormat, isEmpty, isNonNullString } from "@resk/core";
+import { DateHelper, defaultStr, isEmpty, isNonNullString } from "@resk/core/utils";
+import { I18n } from "@resk/core/i18n";
+import { IMomentFormat } from "@resk/core/types"
 import { ICalendarBaseProps, ICalendarDate, CalendarModalContext, ICalendarDayItem, ICalendarDayViewProps, ICalendarDisplayView, ICalendarHourItem, ICalendarModalDayViewProps, ICalendarMonthItem, ICalendarMonthViewProps, ICalendarYearItem, ICalendarYearViewProps, ICalendarContext, ICalendarState, ICalendarItem, ICalendarItemsContainerProps } from "./types";
 import { Icon } from "@components/Icon";
 import Label from "@components/Label";
@@ -206,7 +208,7 @@ export default class Calendar {
         const itemsCount = Array.isArray(children) ? children.length : 1;
         const { width: screenWidth, height: screenHeight } = useDimensions();
         const itemsSize = Math.min(screenWidth, typeof itemsContainerWidth == "number" && itemsContainerWidth > 10 ? itemsContainerWidth : 392);
-        return <CalendarItemContainerContext.Provider value={{ itemsCount,itemsSize,itemSize:itemsCount > 0 ? itemsSize / itemsCount : 0, screenWidth, screenHeight }}>
+        return <CalendarItemContainerContext.Provider value={{ itemsCount, itemsSize, itemSize: itemsCount > 0 ? itemsSize / itemsCount : 0, screenWidth, screenHeight }}>
             <View testID={testID + "-items-container"} style={[Styles.calendarItemsContainer]}>
                 <View testID={testID + "-items-container-content"} style={[Styles.calendarItemContainer, { width: itemsSize }]}>
                     {children}
@@ -604,20 +606,20 @@ const CalendarItemContainerContext = createContext<{
     screenWidth: number;
     screenHeight: number;
     itemSize: number;
-    itemsSize:number,
+    itemsSize: number,
 }>({
     itemsCount: 1,
     screenWidth: 0,
     screenHeight: 0,
     itemSize: 0,
-    itemsSize:0
+    itemsSize: 0
 });
 
 Calendar.ItemsContainer.displayName = "Calendar.ItemsContainer";
 interface ICalendarItemProps { item: ICalendarItem, style?: IStyle, isCurrent: boolean, onPress: (e: GestureResponderEvent) => void, isDefaultValue?: boolean, disabled: boolean, testID: string, label: string }
 const CalendarItem = ({ isCurrent, item, isDefaultValue, disabled, onPress, label, testID, style }: ICalendarItemProps) => {
     const { isItemMarked } = useCalendar();
-    const {itemSize} = useCalendarItemsContainer();
+    const { itemSize } = useCalendarItemsContainer();
     const theme = useTheme();
     const isMarked = typeof isItemMarked == "function" ? isItemMarked(item) : false;
     const selectedBackgroundColor = theme.colors.primary;
@@ -631,7 +633,7 @@ const CalendarItem = ({ isCurrent, item, isDefaultValue, disabled, onPress, labe
             disabled={disabled}
             onPress={onPress}
             hoverColor={Colors.setAlpha(selectedBackgroundColor, 0.4)}
-            android_ripple={{ foreground: !!backgroundColor,radius:itemSize*0.5}}
+            android_ripple={{ foreground: !!backgroundColor, radius: itemSize * 0.5 }}
             style={StyleSheet.flatten([
                 Styles.calendarItem,
                 backgroundColor && { backgroundColor },
@@ -890,7 +892,7 @@ const CalendarYearView: React.FC<ICalendarYearViewProps> = () => {
     });
 }
 
-const useCalendarItemsContainer = ()=>{
+const useCalendarItemsContainer = () => {
     return useContext(CalendarItemContainerContext);
 }
 

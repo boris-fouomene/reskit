@@ -1,7 +1,7 @@
 import { I18n, Translate } from '../index';
 import "../../utils";
 import { I18nEvent, II18nTranslation } from '../../types/i18n';
-import { IObservableCallback } from '../../utils/observable';
+import { IObservableCallback } from '../../observable';
 
 describe('I18n', () => {
     let i18n: I18n;

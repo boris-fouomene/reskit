@@ -2,8 +2,7 @@ import { ISwitchProps, IToggleableOnChangeOptions } from "@components/Switch/typ
 import { IFormFieldOnChangeOptions } from "./index";
 import { IDropdownOnChangeOptions, IDropdownProps } from "@components/Dropdown";
 import { ITextInputProps } from "@components/TextInput/types";
-import { IFieldBase } from "@resk/core";
-import { IMergeWithoutDuplicates } from "@resk/core";
+import { IMergeWithoutDuplicates, IFieldBase } from "@resk/core/types";
 import { ICheckboxProps } from "@components/Checkbox";
 
 

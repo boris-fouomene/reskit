@@ -1,8 +1,9 @@
 import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionName, IResourceAction, IResourceDataService, IResourceQueryOptions, IResourcePaginatedResult, IResourcePrimaryKey, IResourceManyCriteria, IResourceActionTupleArray } from '../types';
 import { getFields } from '../fields';
-import { isEmpty, defaultStr, isObj, isNonNullString, stringify, ObservableClass, observableFactory, extendObj } from '../utils/index';
+import { isEmpty, defaultStr, isObj, isNonNullString, stringify, extendObj } from '../utils/index';
+import { ObservableClass, observableFactory } from "@/observable";
 import { IClassConstructor } from '../types/index';
-import { IAuthPerm, IAuthUser } from '@/auth/types';
+import { IAuthUser } from '@/auth/types';
 import Auth from "../auth";
 import { i18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';

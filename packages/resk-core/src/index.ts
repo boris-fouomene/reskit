@@ -32,8 +32,8 @@ export * from "./resources";
 export * from "./types";
 export * from "./utils";
 export * from "./currency/types"
-export * from "./auth/types";
 export { default as Auth } from "./auth";
+export * from "./auth";
 export * from "./i18n";
 export * from "./validator";
 export * from "./decorators";
@@ -42,3 +42,4 @@ export * from "./inputFormatter";
 export { default as InputFormatter } from "./inputFormatter";
 export * from "./logger";
 export { default as Logger } from "./logger";
+export * from "./observable";

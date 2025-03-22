@@ -1,4 +1,4 @@
-import { Platform as ReskPlatform } from "@resk/core";
+import ReskPlatform from "@resk/core/platform";
 import { Dimensions, Platform, StatusBar } from 'react-native';
 /**
  * Determines if the current environment is a development environment.

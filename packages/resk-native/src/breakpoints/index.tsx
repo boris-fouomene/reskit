@@ -1,7 +1,6 @@
 import { Dimensions, PixelRatio, ViewStyle } from "react-native";
 import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointNamePhone, IBreakpointNameSmallPhone, IBreakpointNameMobile, IBreakpointNameTablet, IBreakpointNameDesktop, IBreakpointNameMediumPhone, IBreakpointName, IBreakpointColumns } from "./types";
-import { addClassName, isDOMElement, isNonNullString, isObj, isNumber, removeClassName, isStringNumber } from "@resk/core";
-import { IStyle } from "@src/types";
+import { addClassName, isDOMElement, isNonNullString, isObj, isNumber, removeClassName, isStringNumber } from "@resk/core/utils";
 import Platform from "@platform/index";
 
 

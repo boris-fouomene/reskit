@@ -1,9 +1,9 @@
 import React, { useMemo, useRef } from "react";
-import View, { IViewProps } from "@components/View";
-import { StyleSheet, View as RNView, Pressable, Animated, GestureResponderEvent, ViewProps, } from "react-native";
-import Label, { ILabelProps } from "@components/Label";
-import { Icon, IIconProps, IIconSource, useGetIcon } from "@components/Icon";
-import { defaultStr } from "@resk/core";
+import View from "@components/View";
+import { StyleSheet, View as RNView, Pressable, Animated, GestureResponderEvent, } from "react-native";
+import Label from "@components/Label";
+import { Icon, useGetIcon } from "@components/Icon";
+import { defaultStr } from "@resk/core/utils";
 import { useTheme, Colors } from "@theme";
 import useStateCallback from "@utils/stateCallback";
 import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";

@@ -1,4 +1,4 @@
-import { defaultStr, isNonNullString } from '@resk/core';
+import { defaultStr, isNonNullString } from '@resk/core/utils';
 import { IReactComponent, ITouchableProps } from '@src/types';
 import { useMemo } from 'react';
 import {

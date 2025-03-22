@@ -1,4 +1,4 @@
-import { defaultStr, isDOMElement } from "@resk/core";
+import { defaultStr, isDOMElement } from "@resk/core/utils";
 import { ReactElement } from "react";
 import * as reactIs from "react-is";
 /**

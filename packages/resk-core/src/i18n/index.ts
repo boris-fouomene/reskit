@@ -2,7 +2,7 @@ import "reflect-metadata";
 import isNonNullString from "@utils/isNonNullString";
 import { I18nEvent, II18nTranslation } from "../types/i18n";
 import { extendObj, isObj } from "@utils/object";
-import { IObservable, IObservableCallback, observableFactory } from "@utils/observable";
+import { IObservable, IObservableCallback, observableFactory } from "@/observable";
 import { Dict, I18n as I18nJs, I18nOptions, Scope, TranslateOptions } from "i18n-js";
 import defaultStr from "@utils/defaultStr";
 import stringify from "@utils/stringify";

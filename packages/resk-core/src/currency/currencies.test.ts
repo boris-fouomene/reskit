@@ -3,7 +3,7 @@ import Currency from "./index";
 import session from "./session";
 import { ICurrency } from "./types";
 import "../translations";
-import { i18n } from "@/i18n";
+import i18n from "@/i18n";
 
 describe("Currency Utils", () => {
   beforeEach(() => {
@@ -48,34 +48,34 @@ describe("Currency Utils", () => {
       expect(Currency.formatNumber(1234567.89, { decimalDigits: 2, thousandSeparator: ",", decimalSeparator: "." })).toBe("1,234,567.89");
     });
   });
-  
+
   describe("format", () => {
     it("should format number correctly", () => {
       expect(Currency.formatNumber(1234567.89)).toBe("1,234,567.89");
     });
   });
-  
+
   describe("Fromat with internalized currency", () => {
-    beforeAll(async ()=>{
-        i18n.registerTranslations({
-            "fr" : {
-                "currencies" : {
-                    thousandSeparator: " ",
-                    decimalSeparator: ".",
-                    decimalDigits: 2,
-                }
-            }
-        })
-        await i18n.setLocale("fr");
-    })
-    it("Should format number in frensh",()=>{
-        expect(Currency.session.getCurrency()).toMatchObject({
-            decimalDigits: 2,
+    beforeAll(async () => {
+      i18n.registerTranslations({
+        "fr": {
+          "currencies": {
+            thousandSeparator: " ",
             decimalSeparator: ".",
-            thousandSeparator: " "
-        });
-        expect(Currency.formatNumber(1234567.89)).toBe("1 234 567.89");
-        expect(Currency.formatMoney(1234567.89)).toBe("1 234 567.89 FCFA");
+            decimalDigits: 2,
+          }
+        }
+      })
+      await i18n.setLocale("fr");
+    })
+    it("Should format number in frensh", () => {
+      expect(Currency.session.getCurrency()).toMatchObject({
+        decimalDigits: 2,
+        decimalSeparator: ".",
+        thousandSeparator: " "
+      });
+      expect(Currency.formatNumber(1234567.89)).toBe("1 234 567.89");
+      expect(Currency.formatMoney(1234567.89)).toBe("1 234 567.89 FCFA");
     })
   });
 });

@@ -5,7 +5,7 @@ import { ObservableClass, observableFactory } from "@/observable";
 import { IClassConstructor } from '../types/index';
 import { IAuthUser } from '@/auth/types';
 import Auth from "../auth";
-import { i18n } from '@/i18n';
+import i18n from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
 import { ResourcePaginationHelper } from './ResourcePaginationHelper';
 import { IResourceActions } from '../types/resources';

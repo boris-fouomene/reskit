@@ -12,9 +12,12 @@
     "target": "ES6", // Target modern ECMAScript version
     "skipLibCheck": true,
     "paths": {
-      "@resk/core": [
-        "../../types/resk-core"
+      /*       "@resk/core/*": [
+        "../../types/resk-core/*"
       ],
+      "@resk/core": [
+        "../../types/resk-core/index.d.ts"
+      ], */
     }
   }
 }

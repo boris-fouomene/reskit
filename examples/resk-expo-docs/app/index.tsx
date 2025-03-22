@@ -1,4 +1,4 @@
-import { i18n } from "@resk/core";
+import i18n from "@resk/core/i18n";
 import { TextInput, withAppBar, Surface, Grid, BottomSheet, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
 import { View, ScrollView, StyleSheet } from 'react-native'
 

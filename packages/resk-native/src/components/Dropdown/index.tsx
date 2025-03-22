@@ -3,7 +3,7 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
 import { defaultStr, isEmpty, isNonNullString, isObj, areEquals } from "@resk/core/utils";
 import Logger from "@resk/core/logger";
-import { i18n } from "@resk/core/i18n";
+import i18n from "@resk/core/i18n";
 import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import Theme, { useTheme } from "@theme/index";

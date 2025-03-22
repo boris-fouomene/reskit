@@ -1,13 +1,13 @@
-import { I18n, Translate } from '../index';
+import { I18nClass, Translate } from '../index';
 import "../../utils";
 import { I18nEvent, II18nTranslation } from '../../types/i18n';
 import { IObservableCallback } from '../../observable';
 
-describe('I18n', () => {
-    let i18n: I18n;
+describe('I18nClass', () => {
+    let i18n: I18nClass;
 
     beforeEach(() => {
-        i18n = I18n.getInstance();
+        i18n = I18nClass.getInstance();
         i18n.registerTranslations({
             en: {
                 "resources": {

@@ -35,6 +35,7 @@ export * from "./currency/types"
 export { default as Auth } from "./auth";
 export * from "./auth";
 export * from "./i18n";
+export { default as i18n } from "./i18n";
 export * from "./validator";
 export * from "./decorators";
 export * from "./countries";

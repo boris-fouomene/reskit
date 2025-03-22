@@ -1,4 +1,4 @@
-import { I18n, ResourceMetadata } from "@resk/core";
+import { I18nClass, ResourceMetadata } from "@resk/core";
 import { Resource } from "./base";
 @ResourceMetadata({
     name: "users",

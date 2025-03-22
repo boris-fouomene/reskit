@@ -1,7 +1,7 @@
 import { IBreakpoints } from "@src/breakpoints/types";
 import { ITheme } from "@theme/types";
 import { IDrawerNavigationViewProps } from "@layouts/DrawerNavigationView";
-import { I18n } from "@resk/core";
+import { I18nClass } from "@resk/core";
 import { IUseI18nOptions } from "@src/types";
 import { IAuthProviderProps } from "@auth/types";
 
@@ -107,7 +107,7 @@ export interface IReskNativeContext extends Omit<IReskNativeProviderProps, "type
     /***
      * i18n instance library
      */
-    i18n: I18n;
+    i18n: I18nClass;
 }
 
 

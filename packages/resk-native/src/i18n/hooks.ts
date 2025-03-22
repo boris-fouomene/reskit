@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { I18n, isNonNullString, Platform } from "@resk/core";
+import { I18nClass, isNonNullString, Platform } from "@resk/core";
 import { getLocales } from "./locales";
 
 import { IUseI18nOptions } from "@src/types";
@@ -9,15 +9,15 @@ import { IUseI18nOptions } from "@src/types";
  * @group Internationalization
  * @function useI18n
  * 
- * A custom hook that provides an instance of the `I18n` class for managing internationalization (i18n) in the application.
+ * A custom hook that provides an instance of the `I18nClass` class for managing internationalization (i18n) in the application.
  * This hook allows for the configuration of locale settings based on user preferences or device settings.
  * 
- * @param {I18n} [i18n] - An optional instance of the `I18n` class. If provided, this instance will be used; otherwise, a new instance will be created.
+ * @param {I18nClass} [i18n] - An optional instance of the `I18nClass` class. If provided, this instance will be used; otherwise, a new instance will be created.
  * 
  * @param {IUseI18nOptions} [options] - An optional configuration object that defines how the i18n instance should handle locale settings.
  * This object can specify whether to use the device's locale and the specific locale to set.
  * 
- * @returns {I18n} The configured instance of the `I18n` class, which can be used to manage translations and locale settings throughout the application.
+ * @returns {I18nClass} The configured instance of the `I18nClass` class, which can be used to manage translations and locale settings throughout the application.
  * 
  * @example
  * // Example of using the useI18n hook in a functional component
@@ -43,11 +43,11 @@ import { IUseI18nOptions } from "@src/types";
  * allowing for flexible configuration of locale settings based on user preferences or device settings.
  * It also handles locale changes dynamically, ensuring that the application reflects the correct language and regional settings.
  */
-export const useI18n = (i18n?: I18n, options?: IUseI18nOptions): I18n => {
+export const useI18n = (i18n?: I18nClass, options?: IUseI18nOptions): I18nClass => {
     const { locale: i18nLocale, useLocaleFromDevice, languages: customLanguages } = Object.assign({}, options);
     const instance = useMemo(() => {
-        return i18n instanceof I18n ? i18n : I18n.getInstance();
-    }, [i18n, I18n.getInstance()]);
+        return i18n instanceof I18nClass ? i18n : I18nClass.getInstance();
+    }, [i18n, I18nClass.getInstance()]);
     const instanceLocale = instance.getLocale();
     useEffect(() => {
         if (!useLocaleFromDevice && instanceLocale != i18nLocale && i18nLocale && isNonNullString(i18nLocale)) {
@@ -90,7 +90,7 @@ export const useI18n = (i18n?: I18n, options?: IUseI18nOptions): I18n => {
     useEffect(() => {
         if (useLocaleFromDevice && detectedLocale?.languageTag) {
             const detectedLangCode = instance.isLocaleSupported(detectedLocale.languageTag) ? detectedLocale.languageTag : instance.isLocaleSupported(detectedLocale.languageCode as string) ? detectedLocale.languageCode as string : undefined;
-            if (instance.isDefaultInstance() && detectedLangCode != instance.getLocale() && !I18n.getLocaleFromSession()) {
+            if (instance.isDefaultInstance() && detectedLangCode != instance.getLocale() && !I18nClass.getLocaleFromSession()) {
                 instance.setLocale(detectedLangCode as string);
             }
         }

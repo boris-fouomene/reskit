@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useImperativeHandle, useMe
 import { View, StyleSheet, GestureResponderEvent } from "react-native";
 import moment, { Moment } from "moment";
 import { DateHelper, defaultStr, isEmpty, isNonNullString } from "@resk/core/utils";
-import { I18n } from "@resk/core/i18n";
+import { I18nClass } from "@resk/core/i18n";
 import { IMomentFormat } from "@resk/core/types"
 import { ICalendarBaseProps, ICalendarDate, CalendarModalContext, ICalendarDayItem, ICalendarDayViewProps, ICalendarDisplayView, ICalendarHourItem, ICalendarModalDayViewProps, ICalendarMonthItem, ICalendarMonthViewProps, ICalendarYearItem, ICalendarYearViewProps, ICalendarContext, ICalendarState, ICalendarItem, ICalendarItemsContainerProps } from "./types";
 import { Icon } from "@components/Icon";
@@ -506,7 +506,7 @@ function CalendarWithContext<T extends ICalendarBaseProps = ICalendarBaseProps>(
         dateCursor: getMomentDate(customDateCursor),
     });
     useMemo(() => {
-        I18n.setMomentLocale(locale);
+        I18nClass.setMomentLocale(locale);
     }, [locale, i18nLocale]);
     const momentMaxDate = useMemo(() => {
         return state?.maxDate ? getMomentDate(state?.maxDate) : undefined;

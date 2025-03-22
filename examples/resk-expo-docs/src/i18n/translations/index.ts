@@ -1,7 +1,7 @@
-import { I18n } from "@resk/core";
+import { I18nClass } from "@resk/core";
 import "./resources";
 
-I18n.RegisterTranslations(({
+I18nClass.RegisterTranslations(({
     en: {
         "appBar": {
             title: "Resk Expo is the title",

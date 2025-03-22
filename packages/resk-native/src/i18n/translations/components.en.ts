@@ -1,5 +1,5 @@
-import { I18n } from "@resk/core";
-I18n.RegisterTranslations({
+import { I18nClass } from "@resk/core";
+I18nClass.RegisterTranslations({
     "en": {
         "components": {
             "calendar": {

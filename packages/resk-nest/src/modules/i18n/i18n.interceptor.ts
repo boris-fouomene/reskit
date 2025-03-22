@@ -5,11 +5,11 @@ import {
   CallHandler,
   Inject,
 } from '@nestjs/common';
-import { defaultStr, I18n } from '@resk/core';
+import { defaultStr, I18nClass } from '@resk/core';
 import { applyLanguage } from './utils';
 
 /**
- * I18n Interceptor class that handles internationalization for incoming requests.
+ * I18nClass Interceptor class that handles internationalization for incoming requests.
  * 
  * This class implements the NestInterceptor interface and is responsible for setting the locale
  * based on the 'Accept-Language' header in the incoming request.
@@ -31,10 +31,10 @@ import { applyLanguage } from './utils';
  * ```typescript
  *  //i18n.controller.ts
  *  import { Controller, Get, Inject } from '@nestjs/common';
-    import { I18n } from '@resk/core';
+    import { I18nClass } from '@resk/core';
     @Controller('i18n')
     export class I18nController {
-      constructor(@Inject('I18N') private readonly i18n: I18n) {}
+      constructor(@Inject('I18N') private readonly i18n: I18nClass) {}
       @Get()
       async getHello(): Promise<string> {
         const message = await this.i18n.t('greeting', { name: 'John' });
@@ -68,9 +68,9 @@ export class I18nInterceptor implements NestInterceptor {
   /**
    * Creates an instance of I18nInterceptor.
    * 
-   * @param i18n The I18n instance injected through the 'I18N' token.
+   * @param i18n The I18nClass instance injected through the 'I18N' token.
    */
-  constructor(@Inject("I18N") private readonly i18n: I18n) { }
+  constructor(@Inject("I18N") private readonly i18n: I18nClass) { }
 
   /**
    * Intercepts incoming requests and sets the locale based on the 'Accept-Language' header.

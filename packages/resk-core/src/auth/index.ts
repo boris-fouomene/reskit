@@ -1,5 +1,5 @@
 
-import { i18n } from "../i18n";
+import i18n from "../i18n";
 import $session from "../session";
 import { IDict, IResourceActionName, IResourceActionTupleArray, IResourceActionTupleObject, IResourceName } from "../types";
 import { isObj, JsonHelper, isNonNullString } from "../utils";

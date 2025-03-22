@@ -1,6 +1,6 @@
 import { IValidatorRule, IValidatorValidateOptions, IValidatorRuleMap, IValidatorRuleName, IValidatorRuleFunction, IValidatorResult, IValidatorSanitizedRules } from "./types";
 import { defaultStr, defaultVal, extendObj, isNonNullString, isObj, stringify } from "@utils/index";
-import { i18n } from "../i18n";
+import i18n from "../i18n";
 import { IClassConstructor, IDict } from "@/types";
 import { createPropertyDecorator, getDecoratedProperties } from "@/decorators";
 

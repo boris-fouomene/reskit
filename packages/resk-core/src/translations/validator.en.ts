@@ -1,5 +1,5 @@
-import { I18n } from "../i18n";
-I18n.RegisterTranslations({
+import { I18nClass } from "../i18n";
+I18nClass.RegisterTranslations({
     "en": {
         /**
          * @group Validator

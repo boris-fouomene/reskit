@@ -1,6 +1,6 @@
-import { I18n } from "@resk/core";
+import { I18nClass } from "@resk/core";
 
-I18n.RegisterTranslations({
+I18nClass.RegisterTranslations({
     "en": {
         "dates": {
             /***

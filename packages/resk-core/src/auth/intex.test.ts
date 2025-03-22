@@ -1,4 +1,4 @@
-import { i18n } from "../i18n";
+import i18n from "../i18n";
 import "../translations";
 import Auth from "./index";
 import $session from "../session";

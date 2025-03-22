@@ -3,7 +3,7 @@ import { IMomentFormat } from '@/types';
 import isEmpty from '@utils/isEmpty';
 import isNonNullString from '@utils/isNonNullString';
 import defaultStr from '@utils/defaultStr';
-import { i18n } from '@/i18n';
+import i18n from '@/i18n';
 import isDateObj from "./isDateObj";
 import { isNumber } from '@utils/isNumber';
 /**

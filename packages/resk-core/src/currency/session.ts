@@ -3,7 +3,7 @@ import currencies from "./currencies";
 import { ICurrency } from "./types";
 import isNonNullString from "../utils/isNonNullString";
 import { isValidCurrency } from "./utils";
-import {i18n} from "../i18n";
+import i18n from "../i18n";
 
 /**
  * The default format for displaying currency values.

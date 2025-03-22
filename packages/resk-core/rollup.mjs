@@ -1,5 +1,5 @@
 import typescript from '@rollup/plugin-typescript';
-import resolve from '@rollup/plugin-node-resolve';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import { execSync } from 'child_process';
 
@@ -37,15 +37,16 @@ export const createRollupOptions = (format, ouputOptions, tsconfigPath, input, e
             },
         },
         external: external !== undefined ? external : (id) => {
-            return id.includes('node_modules');
+            return id.includes('node_modules') || id.includes("tslib");
         }, // Automatically exclude all node_modules
         plugins: [
             // Compile TypeScript files
             typescript({
                 tsconfig: tsconfigPath ?? `./tsconfig.${format}.json`,
-                outputToFilesystem: true, // Explicitly set to true
+                outputToFilesystem: false, // Explicitly set to true
+                tslib: false,
             }),
-            resolve(),
+            nodeResolve(),
             commonjs(),
             // Run tsc-alias after the build to resolve path aliases
             {

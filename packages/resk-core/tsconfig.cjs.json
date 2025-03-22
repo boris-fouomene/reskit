@@ -1,9 +1,6 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "target": "ES2015",
-        "module": "ESNext",
-        "moduleResolution": "node",
         "outDir": "./build/cjs/",
     },
     "exclude": [

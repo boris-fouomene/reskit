@@ -1,4 +1,4 @@
-import { isClientSide } from "../platform";
+import Platform from "../platform";
 import { JsonHelper } from "../utils/json";
 import { IClassConstructor, IDict } from '../types/index';
 import isNonNullString from '../utils/isNonNullString';
@@ -40,7 +40,7 @@ class SessionManager {
       this._storage = storage;
     }
     if (this._storage) return this._storage;
-    if (isClientSide() && typeof window !== 'undefined' && window.localStorage && window.localStorage?.getItem) {
+    if (Platform.isClientSide() && typeof window !== 'undefined' && window.localStorage && window.localStorage?.getItem) {
       this._storage = {
         get: (key: string) => window.localStorage.getItem(key),
         set: (key: string, value: any) => window.localStorage.setItem(key, value),

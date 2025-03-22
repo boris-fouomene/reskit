@@ -3,7 +3,10 @@ import { Field, getFieldsFromTarget, fieldsMetaData } from './index';
 
 declare module "../types" {
     export interface IFieldMap {
-        text: IFieldBase<"text">
+        text: IFieldBase<"text">;
+        number: IFieldBase<"number">;
+        boolean: IFieldBase<"boolean">;
+        date: IFieldBase<"date">;
     }
     export interface IFieldBase {
         label?: string;

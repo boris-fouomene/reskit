@@ -6,7 +6,7 @@ import { isObj, JsonHelper, isNonNullString, IObservable, observable } from "../
 import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPerms, IAuthEvent, IAuthRole } from "./types";
 import "./types";
 import CryptoJS from "crypto-js";
-import { Logger } from "../logger";
+import Logger from "../logger";
 
 const encrypt = CryptoJS.AES.encrypt;
 const decrypt = CryptoJS.AES.decrypt;

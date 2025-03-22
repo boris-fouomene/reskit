@@ -18,7 +18,7 @@ export { Session };
  * This namespace provides a collection of functions for detecting the current platform or environment,
  * including `isDarwin`, `isWin32`, and `isLinux`.
  */
-export * as Platform from "./platform";
+export { default as Platform } from "./platform";
 
 /**
   @namespace Currency 
@@ -38,3 +38,7 @@ export * from "./i18n";
 export * from "./validator";
 export * from "./decorators";
 export * from "./countries";
+export * from "./inputFormatter";
+export { default as InputFormatter } from "./inputFormatter";
+export * from "./logger";
+export { default as Logger } from "./logger";

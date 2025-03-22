@@ -4,7 +4,7 @@ import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { defaultStr, isEmpty, isNonNullString, isValidUrl, isValidEmail, isStringNumber } from "@utils/index";
 import { Validator } from "../validator";
 import { i18n } from "../../i18n";
-import { InputFormatter } from "@utils/inputFormatter";
+import InputFormatter from "../../inputFormatter";
 
 /**
  * @function compareNumer

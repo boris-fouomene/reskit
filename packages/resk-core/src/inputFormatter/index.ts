@@ -1,10 +1,10 @@
-import { IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterMaskWithValidation } from "../../types";
-import { DateHelper } from "../date/dateHelper";
-import defaultStr from "../defaultStr";
-import isNonNullString from "../isNonNullString";
-import isRegExp from "../isRegex";
+import { IInputFormatterMask, IInputFormatterMaskArray, IInputFormatterMaskOptions, IInputFormatterOptions, IInputFormatterResult, IInputFormatterMaskResult, IInputFormatterMaskWithValidation } from "../types";
+import { DateHelper } from "@utils/date/dateHelper";
+import defaultStr from "@utils/defaultStr";
+import isNonNullString from "@utils/isNonNullString";
+import isRegExp from "@utils/isRegex";
 import moment from "moment";
-import "../numbers";
+import "../utils/numbers";
 import _ from "lodash";
 
 import libPhoneNumber, { PhoneNumber, PhoneNumberFormat } from 'google-libphonenumber';
@@ -14,7 +14,7 @@ const phoneUtil = libPhoneNumber.PhoneNumberUtil.getInstance();
 const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
 import { CountriesManager, ICountryCode } from "@countries/index";
 import isEmpty from "@utils/isEmpty";
-import { Logger } from "@logger";
+import Logger from "@logger";
 
 const DIGIT_REGEX = /\d/;
 const LETTER_REGEX = /[a-zA-Z]/;
@@ -24,7 +24,7 @@ const LETTER_REGEX = /[a-zA-Z]/;
 /***
     InputFormatter class is used to format the value to the desired format
 */
-export class InputFormatter {
+export default class InputFormatter {
   /**
    * @description
    * Formats a value according to the provided options defined in the IInputFormatterOptions interface.
@@ -107,7 +107,7 @@ export class InputFormatter {
           result.dialCode = parsed.getCountryCode() + "";
           result.phoneCountryCode = defaultStr(phoneUtil.getRegionCodeForNumber(parsed), phoneCountryCode) as ICountryCode;
         } else if (phoneCountryCode) {
-          result.dialCode = CountriesManager.getDialCode(phoneCountryCode);
+          result.dialCode = InputFormatter.getCountryDialCode(phoneCountryCode);
         }
         result.phoneNumber = InputFormatter.prefixPhoneNumberWithDialCode(formattedValue, result.dialCode as string).replace(/\s/g, '');
       }
@@ -131,6 +131,31 @@ export class InputFormatter {
       decimalValue: typeof parsedValue == 'number' ? parsedValue : 0,
       ...result,
     };
+  }
+  /**
+    * Gets the dial code for a given country code.
+    * 
+    * @param {ICountryCode} code The country code.
+    * @returns {string} The dial code for the given country code, or an empty string if the country code is not found.
+    * 
+    * @example
+    * ```typescript
+    * console.log(CountriesManager.getCountryDialCode('US')); // '+1'
+    * ```
+    */
+  static getCountryDialCode(countryCode: ICountryCode): string {
+    const r = defaultStr(CountriesManager.getCountry(countryCode)?.dialCode);
+    if (r) return r;
+    try {
+      // Get the country calling code (dial code)
+      const countryCallingCode = phoneUtil.getCountryCodeForRegion(countryCode);
+
+      // If the calling code is 0, it means the region code is invalid or not found
+      if (countryCallingCode !== 0) {
+        return countryCallingCode.toString();
+      }
+    } catch (error) { }
+    return "";
   }
   /**
    * @description
@@ -300,8 +325,8 @@ export class InputFormatter {
       }
       const maskChar = maskArray[maskCharIndex];
       const valueChar = value[valueCharIndex];
-      const customNonRegexReplacedChars : IInputFormatterMaskResult["nonRegexReplacedChars"] = [];
-      let { isValid: customIsValid, masked: customMasked, obfuscated: cusotmObfuscated, isMaskRegex } = handleMaskAtIndex({ maskChar, nonRegexReplacedChars:customNonRegexReplacedChars, valueChar, obfuscationCharacter, valueCharIndex, maskCharIndex })
+      const customNonRegexReplacedChars: IInputFormatterMaskResult["nonRegexReplacedChars"] = [];
+      let { isValid: customIsValid, masked: customMasked, obfuscated: cusotmObfuscated, isMaskRegex } = handleMaskAtIndex({ maskChar, nonRegexReplacedChars: customNonRegexReplacedChars, valueChar, obfuscationCharacter, valueCharIndex, maskCharIndex })
       masked += customMasked;
       obfuscated += cusotmObfuscated;
       unmasked += valueChar;
@@ -311,7 +336,7 @@ export class InputFormatter {
       maskCharIndex += 1;
       valueCharIndex += 1;
       let canBreak = false;
-      if (maskAutoComplete && !isMaskRegex && maskCharIndex< maskArray.length && valueCharIndex < maskArray.length && valueCharIndex == value.length && valueChar !== customMasked) {
+      if (maskAutoComplete && !isMaskRegex && maskCharIndex < maskArray.length && valueCharIndex < maskArray.length && valueCharIndex == value.length && valueChar !== customMasked) {
         const nextOpts = handleMaskAtIndex({ maskChar: maskArray[maskCharIndex], nonRegexReplacedChars: [], valueChar, obfuscationCharacter, valueCharIndex, maskCharIndex });
         if (nextOpts.isMaskRegex && nextOpts.isValid && nextOpts.masked == valueChar) {
           masked += valueChar;
@@ -323,13 +348,13 @@ export class InputFormatter {
           canBreak = true;
         }
       }
-      if(customNonRegexReplacedChars[0]){
+      if (customNonRegexReplacedChars[0]) {
         nonRegexReplacedChars.push(...customNonRegexReplacedChars);
       }
       if (!customIsValid) {
         isValid = false;
       }
-      if(canBreak){
+      if (canBreak) {
         break;
       }
     }

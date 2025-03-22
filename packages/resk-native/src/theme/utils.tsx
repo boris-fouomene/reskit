@@ -1,4 +1,4 @@
-import { Logger } from "@resk/core";
+import Logger from "@resk/core/logger";
 import { ViewStyle } from "react-native";
 
 /**

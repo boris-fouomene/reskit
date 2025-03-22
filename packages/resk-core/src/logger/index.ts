@@ -12,7 +12,7 @@ import { DateHelper } from '@utils/date';
  * class MyCustomLogger implements ILogger {
  *   // Implementation of ILogger methods
  * }
- * import { Logger } from '@resk/core';
+ * import Logger from '@resk/core/Logger';
  * Logger.log("This is a log message");
  * Logger.info("This is an info message");
  * Logger.debug("This is a debug message");
@@ -20,7 +20,7 @@ import { DateHelper } from '@utils/date';
  * Logger.error("This is an error message");
  * ```
  */
-export class Logger {
+export default class Logger {
   /**
    * Metadata key used to store logger information.
    * This is useful for dynamically registering a logger instance.
@@ -210,7 +210,7 @@ export interface ILogger {
    * logger.log({ foo: 'bar' });
    * ```
    */
-  log(dateTimeString:string,...data: any[]): void;
+  log(dateTimeString: string, ...data: any[]): void;
 
   /**
    * Logs a message at the info level.
@@ -225,7 +225,7 @@ export interface ILogger {
    * logger.info('User  logged in.');
    * ```
    */
-  info(dateTimeString:string,...data: any[]): void;
+  info(dateTimeString: string, ...data: any[]): void;
 
   /**
    * Logs a message at the debug level.
@@ -240,7 +240,7 @@ export interface ILogger {
    * logger.debug('Function foo was called.');
    * ```
    */
-  debug(dateTimeString:string,...data: any[]): void;
+  debug(dateTimeString: string, ...data: any[]): void;
 
   /**
    * Logs a message at the warn level.
@@ -255,7 +255,7 @@ export interface ILogger {
    * logger.warn('Invalid user input detected.');
    * ```
    */
-  warn(dateTimeString:string,...data: any[]): void;
+  warn(dateTimeString: string, ...data: any[]): void;
 
   /**
    * Logs a message at the error level.
@@ -270,7 +270,7 @@ export interface ILogger {
    * logger.error('Invalid data detected.');
    * ```
    */
-  error(dateTimeString:string,...data: any[]): void;
+  error(dateTimeString: string, ...data: any[]): void;
 };
 
 /**

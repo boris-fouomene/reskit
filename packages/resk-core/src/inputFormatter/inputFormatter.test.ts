@@ -1,4 +1,5 @@
-import { InputFormatter } from './index';
+import InputFormatter from './index';
+import "../utils/index";
 describe('InputFormatter', () => {
     describe('formatValue', () => {
         it('should format a decimal value', () => {

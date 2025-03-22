@@ -5,7 +5,6 @@ import isNonNullString from "@utils/isNonNullString";
 import { extendObj, isObj } from "@utils/object";
 import countries from "./countries";
 import _ from "lodash";
-import { PhoneNumberUtil } from "google-libphonenumber";
 const countriesByDialCodes = {};
 Object.keys(countries).map(countryCode => {
     const country = countries[countryCode as keyof typeof countries];
@@ -141,33 +140,6 @@ export class CountriesManager {
      */
     static getPhoneNumberExample(code: ICountryCode): string {
         return defaultStr(this.getCountry(code)?.phoneNumberExample);
-    }
-
-    /**
-     * Gets the dial code for a given country code.
-     * 
-     * @param {ICountryCode} code The country code.
-     * @returns {string} The dial code for the given country code, or an empty string if the country code is not found.
-     * 
-     * @example
-     * ```typescript
-     * console.log(CountriesManager.getDialCode('US')); // '+1'
-     * ```
-     */
-    static getDialCode(code: ICountryCode): string {
-        const r = defaultStr(this.getCountry(code)?.dialCode);
-        if (r) return r;
-        try {
-            const phoneUtil = PhoneNumberUtil.getInstance();
-            // Get the country calling code (dial code)
-            const countryCallingCode = phoneUtil.getCountryCodeForRegion(code);
-
-            // If the calling code is 0, it means the region code is invalid or not found
-            if (countryCallingCode !== 0) {
-                return countryCallingCode.toString();
-            }
-        } catch (error) { }
-        return "";
     }
 
     /**

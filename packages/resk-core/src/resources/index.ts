@@ -8,7 +8,7 @@ import { i18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
 import { ResourcePaginationHelper } from './ResourcePaginationHelper';
 import { IResourceActions } from '../types/resources';
-import { Logger } from "../logger";
+import Logger from "../logger";
 export * from './ResourcePaginationHelper';
 const resourcesMetaDataKey = Symbol('resources');
 const resourcesClassNameMetaData = Symbol('resourceFromClassName');

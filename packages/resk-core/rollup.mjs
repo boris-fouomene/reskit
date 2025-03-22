@@ -18,7 +18,7 @@ function getPackageName(id) {
     const match = id.match(/^(@[^/]+\/[^/]+|[^/]+)/);
     return match ? match[0] : null;
 }
-export const createRollupOptions = (format, ouputOptions, tsconfigPath, input) => {
+export const createRollupOptions = (format, ouputOptions, tsconfigPath, input, external) => {
     const formatName = format === 'cjs' ? 'cjs' : 'es';
     const formatExt = format === 'cjs' ? 'js' : 'mjs';
     return {
@@ -36,8 +36,8 @@ export const createRollupOptions = (format, ouputOptions, tsconfigPath, input) =
                 return packageName ? packageName : null; // Map to package name if possible
             },
         },
-        external: (id) => {
-            return id.includes('node_modules') || id.includes('jest') || id.includes("tslib") || id.includes('@jest/');
+        external: external !== undefined ? external : (id) => {
+            return id.includes('node_modules');
         }, // Automatically exclude all node_modules
         plugins: [
             // Compile TypeScript files

@@ -1,5 +1,3 @@
-import { isRegExp as _isRegexP } from "lodash";
-
 /**
  * Checks if the provided value is a regular expression.
  *
@@ -28,24 +26,10 @@ export default function isRegExp(regExp: any): regExp is RegExp {
   if (!regExp || typeof regExp !== "object" || (!Object.prototype.toString.call(regExp).includes("RegExp"))) {
     return false;
   }
-
-  /**
-   * If the value is a regular expression pattern, it's a regular expression.
-   */
-  if (_isRegexP(regExp)) {
-    return true;
-  }
-
-  /**
-   * Try to convert the value to a RegExp. If it succeeds, it's a regular expression.
-   */
   try {
     new RegExp(regExp);
     return true;
   } catch (e) {
-    /**
-     * If the conversion fails, it's not a regular expression.
-     */
     return false;
   }
 }

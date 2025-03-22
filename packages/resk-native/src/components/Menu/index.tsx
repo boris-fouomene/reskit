@@ -3,7 +3,6 @@
 import ExpandableMenuItem from './ExpandableItem';
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
-import { isNumber } from "lodash";
 import { useDimensions } from '@dimensions/index';
 import Theme, { useTheme } from '@theme/index';
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
@@ -22,6 +21,7 @@ import { usePrepareBottomSheet } from '@components/BottomSheet/utils';
 import { KeyboardAvoidingView } from '@components/KeyboardAvoidingView';
 import Label from '@components/Label';
 import { Divider } from '@components/Divider';
+import { isNumber } from "@resk/core/utils";
 
 const useNativeDriver = false;
 

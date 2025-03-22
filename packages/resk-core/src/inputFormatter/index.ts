@@ -5,8 +5,6 @@ import isNonNullString from "@utils/isNonNullString";
 import isRegExp from "@utils/isRegex";
 import moment from "moment";
 import "../utils/numbers";
-import _ from "lodash";
-
 import libPhoneNumber, { PhoneNumber, PhoneNumberFormat } from 'google-libphonenumber';
 
 
@@ -827,24 +825,6 @@ export default class InputFormatter {
   static extractNumbersFromString(str: string) {
     if (!isNonNullString(str)) return "";
     return str.replace(/\D/g, '');
-  }
-
-  /***
-   * Gets the phone number type from a phone number string.
-   * @param {string} phoneNumber The phone number string.
-   * @param {ICountryCode} countryCode The country code to use for the phone number.
-   * @returns {string | undefined} The phone number type, or undefined if the phone number is not valid.
-   * @example
-   * ```typescript
-   * console.log(getPhoneNumberType('+1 202 555 0144')); // Output: undefined
-   * console.log(getPhoneNumberType('+1 202 555 0144', 'US')); // Output: undefined
-   * console.log(getPhoneNumberType('+1 202 555 0144', 'FR')); // Output: 'FIXED_LINE_OR_MOBILE'
-   * ```
-   */
-  static getPhoneNumberType(phoneNumber: string, countryCode?: ICountryCode): string | undefined {
-    const phoneInfo = this.parsePhoneNumber(phoneNumber, countryCode);
-    const typeIndex = phoneInfo ? phoneUtil.getNumberType(phoneInfo) : -1;
-    return _.findKey(phoneNumber, (noType) => noType === typeIndex);
   }
 };
 

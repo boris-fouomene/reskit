@@ -2,11 +2,10 @@ import { Dimensions } from 'react-native';
 import React, { useEffect, useMemo, useState } from "react";
 import { IDimensions } from './types';
 import Breakpoints from '../breakpoints';
-import _ from "lodash";
-import { IObservable, isNonNullString, isObj, isObservable, observable } from '@resk/core';
+import { IObservable, isNonNullString, isObj, isObservable, observable, debounce } from '@resk/core';
 import { IReactComponent, IStyle } from "../types";
 import { StyleSheet } from "react-native";
-import { IBreakpointName, IBreakpoints } from '@src/breakpoints/types';
+import { IBreakpointName } from '@src/breakpoints/types';
 import stableHash from "stable-hash";
 
 
@@ -155,10 +154,11 @@ export const useDimensions = (responsive: boolean = true): IDimensions => {
 export const dimentionAddListener = (callback: (dimensions: IDimensions) => any, timeout: number = 200) => {
 	if (typeof callback !== 'function') return null;
 	timeout = typeof timeout === 'number' ? timeout : 200;
-	return Dimensions.addEventListener("change", _.debounce(() => {
+	return Dimensions.addEventListener("change", debounce(() => {
 		return callback(getDimensions());
 	}, timeout));
 };
+
 
 
 /**

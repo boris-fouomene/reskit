@@ -1,11 +1,10 @@
 
-import { isNumber } from "lodash";
 import { IValidatorResult, IValidatorValidateOptions } from "../types";
 import { defaultStr, isEmpty, isNonNullString, isValidUrl, isValidEmail, isStringNumber } from "@utils/index";
 import { Validator } from "../validator";
 import { i18n } from "../../i18n";
 import InputFormatter from "../../inputFormatter";
-
+import { isNumber } from "@utils/isNumber";
 /**
  * @function compareNumer
  * 

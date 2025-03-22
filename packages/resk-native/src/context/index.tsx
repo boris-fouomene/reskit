@@ -39,7 +39,7 @@ export { useReskNative } from "./hooks";
  * @example
  * ```tsx
  * import { ReskNativeProvider } from './ReskNativeProvider';
-import { isNumber } from 'lodash';
+import { isNumber } from '@resk/core';
  * 
  * const customTheme = {
  *   colors: { primary: '#123456', secondary: '#654321' },
@@ -60,7 +60,7 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
   const i18n = useI18n(undefined, i18nOptions);
   auth = Object.assign({}, auth);
   drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
-  safeAreaInsets = extendObj({}, { top: 0, left: 0, right: 0, bottom: 0 }, safeAreaInsets);
+  safeAreaInsets = extendObj({}, { top: 0, left: 0, right: 0, bottom: 0 }, safeAreaInsets) as any;
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
    * to be executed once the theme state is updated.

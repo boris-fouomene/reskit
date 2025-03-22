@@ -17,6 +17,8 @@ export * from "./sort";
 export * from "./defaultArray";
 export * from "./object";
 export * from "./isNumber";
+export * from "./debounce";
+export { default as debounce } from "./debounce";
 
 export * from "./string";
 export * from "./uri";

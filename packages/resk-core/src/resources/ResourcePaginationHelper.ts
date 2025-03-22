@@ -1,11 +1,10 @@
 import isNonNullString from "@utils/isNonNullString";
-import { IMongoQuery, IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderDirection } from "../types";
-import { isNumber } from "lodash";
-import { defaultObj, extendObj, isObj } from "@utils/object";
+import { IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderDirection } from "../types";
+import { extendObj, isObj } from "@utils/object";
 import { getQueryParams } from "@utils/uri";
-import defaultVal from "@utils/defaultVal";
 import { isStringNumber } from "@utils/string";
 import { defaultArray } from "@utils/defaultArray";
+import { isNumber } from "@utils/isNumber";
 
 export class ResourcePaginationHelper {
     /**

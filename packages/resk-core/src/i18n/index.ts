@@ -8,7 +8,6 @@ import defaultStr from "@utils/defaultStr";
 import stringify from "@utils/stringify";
 import session from "@session/index";
 import { IDict } from "../types/index";
-import { isString } from "lodash";
 import moment, { LocaleSpecification } from "moment";
 import { createPropertyDecorator, getDecoratedProperties } from "@/decorators";
 import momentLocaleFr from "./locales/moment.locale.fr";
@@ -265,7 +264,7 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
         locale = defaultStr(locale, this.getLocale());
         const r = this.getNestedTranslation(scope, locale) as IDict;
         if (!isObj(r) || !r) return false;
-        return isString(r?.one) && isString(r?.other) //&& isNonNullString(r?.zero);
+        return isNonNullString(r?.one) && isNonNullString(r?.other) //&& isNonNullString(r?.zero);
     }
     /**
      * Resolves translation for nested keys.

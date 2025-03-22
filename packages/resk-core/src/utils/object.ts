@@ -1,7 +1,8 @@
 import { IDict, IPrimitive } from "../types";
-import { isPlainObject, isRegExp, merge } from "lodash";
 import isPrimitive from "./isPrimitive";
 import isDateObj from "./date/isDateObj";
+import isRegExp from "./isRegex";
+import { isDOMElement } from "./dom";
 
 /**
  * Checks if the given variable is a plain object.
@@ -37,13 +38,46 @@ import isDateObj from "./date/isDateObj";
  * ```
  */
 export const isPlainObj = function (obj: any): boolean {
-  return isPlainObject(obj);
+  if (obj === null || typeof obj !== 'object' || isDOMElement(obj) || isDateObj(obj) || isRegExp(obj) || isPrimitive(obj)) {
+    return false;
+  }
+
+  // Get the prototype of the value
+  const proto = Object.getPrototypeOf(obj);
+
+  // Objects with null prototype are plain objects
+  if (proto === null) {
+    return true;
+  }
+
+  // Check if the constructor is Object and has the default prototype chain
+  // This handles browser environments where Object.prototype might have been modified
+  const Ctor = proto.constructor;
+  if (typeof Ctor !== 'function') {
+    return false;
+  }
+  // Check if it's the object constructor
+  if (Ctor === Object) {
+    return true;
+  }
+  const protoCtor = Ctor.prototype;
+  if (typeof protoCtor !== 'object') {
+    return false;
+  }
+  if (protoCtor === Object.prototype) {
+    return true;
+  }
+  // Test if proto has its own isPrototypeOf method
+  // This is important to detect objects from iframes or different execution contexts
+  return typeof proto.hasOwnProperty === 'function' &&
+    proto.hasOwnProperty('isPrototypeOf') &&
+    typeof proto.isPrototypeOf === 'function';
 };
 
 /**
  * Clones a source object by returning a non-reference copy of the object.
  *
- * This function uses `cloneDeep` from lodash to create a deep copy of the provided object.
+ * This function creates a deep copy of the provided object.
  * Any nested objects or arrays within the source will also be cloned, ensuring that the 
  * returned object does not reference the original object.
  *
@@ -132,7 +166,7 @@ export function cloneObject(source: any): any {
  * ```
  */
 export function isObj(obj: any): boolean {
-  return obj && isPlainObject(obj);
+  return isPlainObj(obj);
 };
 
 
@@ -426,16 +460,18 @@ declare global {
   }
 }
 
+
 /**
  * Extends an object by merging properties from one or more source objects.
  *
  * This function takes a target object and one or more source objects, merging the properties
  * from the source objects into the target object. If a property exists in both the target
  * and a source object, the value from the source object will overwrite the target's value.
- *
- * @param {any} target - The object to extend. This object will be modified and returned.
+ * For arrays, the function merges the contents of the arrays, preserving the original order of the elements.
+ *@template T - The type of the target object.
+ * @param {T} target - The object to extend. It will receive the new properties.
  * @param {...any[]} sources - The source objects to merge into the target. These objects will not be modified.
- * @returns {any} The extended target object, which contains properties from the source objects.
+ * @returns {T} The extended target object, which contains properties from the source objects.
  *
  * @example
  * ```ts
@@ -447,11 +483,119 @@ declare global {
  * console.log(extended); // Outputs: { a: 1, b: 3, c: 4, d: 5 }
  * console.log(target);   // Outputs: { a: 1, b: 3 } (target is modified)
  * ```
+ * Merges the contents of two or more objects together into the first object.
+ * Similar to jQuery's $.extend function. 
+ * @remarks
+ * This function is used to merge the contents of multiple objects into a single object. It takes an optional target object as the first argument and one or more source objects as additional arguments. The function returns the merged object, which is a new object that contains all the properties from the source objects.
+ * 
+ * If the target object is not provided or is not a plain object, an empty object is returned.
+ * 
+ * If the target object is a plain object, the function iterates over the sources and copies the properties from each source object to the target object. If a property with the same name already exists in the target object, it is overwritten with the corresponding value from the source object.
+ * 
+ * If the target object is a plain object, the function iterates over the sources and copies the properties from each source object to the target object. If a property with the same name already exists in the target object, it is overwritten with the corresponding value from the source object.
+ * For arrays, The function replaces the contents of the arrays, preserving the original order of the elements.
+ * Empty values like null, undefined, and empty strings are ignored.
  */
-export function extendObj(target: any, ...sources: any[]): any {
-  return merge(target, ...sources);
-};
+export function extendObj<T extends Record<string, any> = any>(target: any, ...sources: any[]): T {
+  const isTargetArray = Array.isArray(target);
+  const isTargetObj = isPlainObj(target);
+  // Return if no target provided
+  if (target == null || (!isTargetArray && !isTargetObj)) {
+    target = {};
+  }
+  // For each source object
+  for (let i = 0; i < sources.length; i++) {
+    const source = sources[i];
+    // Skip null/undefined sources
+    if (source == null) {
+      continue;
+    }
+    const isSourceObj = isPlainObj(source);
+    const isSourceArr = Array.isArray(source);
+    //We only merge plain objects and arrays
+    if (!isSourceObj && !isSourceArr) {
+      continue;
+    }
+    if (isTargetArray) {
+      if (isSourceArr) {
+        mergeTwoArray(target, source);
+      } else {//preserving the type
+        //target.push(source);
+      }
+      continue;
+    } else if (isSourceArr) {
+      //we only merge same type
+      continue;
+    }
+    //We are sure that target is a plain object and source is a plain object
+    // Extend the target with source properties
+    for (let j in source) {
+      const srcValue = (source as any)[j];
 
+      // Skip undefined values
+      if (srcValue === undefined || srcValue === null) {
+        continue;
+      }
+      if (srcValue === source) {
+        (target as any)[j] = target; // Point to the target itself
+        continue;
+      }
+      const targetValue = (target as any)[j];
+      const isTargetValueArr = Array.isArray(targetValue);
+      const isSrcArr = Array.isArray(srcValue);
+      if (isTargetValueArr) {
+        if (isSrcArr) {
+          mergeTwoArray(target[j], srcValue);
+        } else {
+          (target as any)[j] = srcValue;
+        }
+        continue;
+      } else if (!isPlainObj(targetValue)) {
+        (target as any)[j] = srcValue;
+        continue;
+      }
+      //here targetValue is a plain object
+      if (isSrcArr || !isPlainObj(srcValue)) {
+        (target as any)[j] = srcValue;
+        continue;
+      }
+      //here targetValue is a plain object and srcValue is an object, recursively extend them
+      (target as any)[j] = extendObj({}, targetValue, srcValue);
+    }
+  }
+  return target as T;
+}
+
+const mergeTwoArray = (target: any[], source: any[]) => {
+  const sourceLength = source.length;
+  let indexCounter = 0;
+  for (let k = 0; k < target.length; k++) {
+    const targetK = target[k];
+    const sourceK = source[k];
+    if (k < sourceLength) {
+      const isTkArray = Array.isArray(targetK), isSkArray = Array.isArray(sourceK);
+      const isTObj = isPlainObj(targetK), isSObj = isPlainObj(sourceK);
+      if ((isTkArray && isSkArray) || (isTObj && isSObj)) {
+        target[indexCounter] = extendObj(isTkArray ? [] : {}, targetK, sourceK);
+        indexCounter++;
+      } else {
+        if (sourceK !== undefined && sourceK !== null) {
+          target[indexCounter] = sourceK;
+          indexCounter++;
+        } else if (targetK !== undefined && targetK !== null) {
+          target[indexCounter] = targetK;
+          indexCounter++;
+        }
+      }
+    }
+  }
+  for (let k = target.length; k < sourceLength; k++) {
+    if (source[k] !== undefined && source[k] !== null) {
+      target.push(source[k]);
+    }
+  }
+  return target;
+}
 
 /**
      * Flattens a nested object structure into a single-level object with dot/bracket notation keys.

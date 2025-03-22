@@ -4,7 +4,6 @@ import defaultStr from "@utils/defaultStr";
 import isNonNullString from "@utils/isNonNullString";
 import { extendObj, isObj } from "@utils/object";
 import countries from "./countries";
-import _ from "lodash";
 const countriesByDialCodes = {};
 Object.keys(countries).map(countryCode => {
     const country = countries[countryCode as keyof typeof countries];
@@ -211,7 +210,7 @@ export class CountriesManager {
      */
     static getCountry(code: ICountryCode): ICountry | undefined {
         if (!isNonNullString(code)) return undefined;
-        return extendObj({}, i18n.t(`countries.${code}`), this.countries[code]);
+        return extendObj<ICountry>({} as ICountry, i18n.t(`countries.${code}`), this.countries[code]);
     }
 
     /**

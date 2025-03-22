@@ -1,5 +1,5 @@
-import { isDate } from "lodash";
 import defaultStr from "./defaultStr";
+import { isNumber } from "./isNumber";
 
 function escapeString(str: string): string {
   return defaultStr(str)
@@ -40,31 +40,18 @@ export default function stringify(obj: any, options?: { parenthesis: boolean }):
   if (["string", "boolean", "undefined"].includes(typeof obj) || obj === null) {
     return String(obj);
   }
-  /**
-   * If the input is a number, return its string representation using the formatNumber method.
-   */
-  if (typeof obj === 'number') {
+  if (isNumber(obj)) {
     return (obj as number).formatNumber();
   }
-  if (isDate(obj)) {
-    return (obj as Date).toFormat();
+  if (obj instanceof Date) {
+    return (obj).toFormat();
   }
-  /**
-   * If the input is an Error object, return its string representation.
-   */
   if (obj instanceof Error) {
     return obj?.toString();
   }
-
-  /**
-   * Extract the parenthesis option from the options object.
-   */
   const { parenthesis } = Object.assign({}, options);
   const openParen = parenthesis ? '(' : '';
   const closeParen = parenthesis ? ')' : '';
-  /**
-   * If the input is a RegExp, Number, or Boolean object, return its string representation.
-   */
   if (isType(obj, 'RegExp') || isType(obj, 'Number') || isType(obj, 'Boolean')) {
     return obj.toString();
   }

@@ -2,10 +2,10 @@ import moment from 'moment';
 import { IMomentFormat } from '@/types';
 import isEmpty from '@utils/isEmpty';
 import isNonNullString from '@utils/isNonNullString';
-import { isBoolean, isNumber } from 'lodash';
 import defaultStr from '@utils/defaultStr';
 import { i18n } from '@/i18n';
 import isDateObj from "./isDateObj";
+import { isNumber } from '@utils/isNumber';
 /**
  * Result object returned by the date parser
  */
@@ -430,7 +430,7 @@ export class DateHelper {
     /**
      * If the input is a boolean, it's not a valid date.
      */
-    if (isBoolean(sDate)) return false;
+    if (typeof (sDate) === "boolean") return false;
 
     /**
      * If the input is already a Date object, it's a valid date.

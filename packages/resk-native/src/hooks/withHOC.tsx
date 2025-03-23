@@ -1,3 +1,4 @@
+import { Platform } from "@resk/core";
 import { IReactComponent } from "@src/types";
 import * as React from "react";
 import { ReactNode } from "react";
@@ -18,6 +19,13 @@ export interface IWithHOCOptions {
      * If this function returns null or a React element, then the component is not rendered.
      */
     fallback?: ReactNode | null | ((...args: any[]) => boolean | null);
+
+    /***
+     * The fallback element or a function to test the rendering of the fallback.
+     * If this function returns null or a React element, then the component is not rendered.
+     * It's called on server side
+     */
+    serverFallback?: ReactNode | null | ((...args: any[]) => boolean | null);
 }
 
 
@@ -33,9 +41,21 @@ export interface IWithHOCOptions {
  */
 export function withHOC<T>(Component: IReactComponent<T>, options: IWithHOCOptions = {}) {
     options = Object.assign({}, options);
-    const { displayName, fallback } = options;
+    const { displayName, fallback, serverFallback } = options;
     const fn = React.forwardRef(function (props: T, ref?): ReactNode {
         props = (props || {}) as T;
+        const [isClient, setIsClient] = React.useState(Platform.isClientSide());
+        React.useEffect(() => {
+            if (!isClient) {
+                setIsClient(true);
+            }
+        }, []);
+        if (!isClient) {
+            if (typeof serverFallback === "function") {
+                return serverFallback();
+            }
+            return React.isValidElement(serverFallback) ? serverFallback : null;
+        }
         if (fallback !== undefined) {
             if (typeof fallback === "function") {
                 return fallback();

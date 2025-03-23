@@ -33,16 +33,15 @@ import { defaultStr } from '@resk/core/utils';
 const DrawerItems = React.forwardRef(({ testID, style, items: customItems, ...rest }: IDrawerItemsProps, ref: React.ForwardedRef<RNView>) => {
   const { drawer } = useDrawer();
   testID = defaultStr(testID, "resk-draweritems")
-  const theme = useTheme();
   const items = useRenderMenuItems<IDrawerContext>({
     items: (Array.isArray(customItems) ? customItems : []),
     context: { drawer },
     render: renderItem,
     renderExpandable,
   });
-  return <View testID={testID} ref={ref} {...rest} style={[styles.container, style]} key={theme.name + '-' + theme.dark}>
+  return <View testID={testID} ref={ref} {...rest} style={[styles.container, style]}>
     {items}
-    <View testID={testID + "_DrawerItemsPaddingSeparator"} style={{ height: 30 }}></View>
+    <View testID={testID + "drawer-item-padding-separator"} style={{ height: 30 }}></View>
   </View>
 });
 

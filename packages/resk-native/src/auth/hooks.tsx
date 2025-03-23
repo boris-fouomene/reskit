@@ -9,6 +9,7 @@ import Label from "@components/Label";
 import Theme, { useTheme } from "@theme/index";
 import { StyleSheet } from "react-native";
 import { Portal } from "@components/Portal";
+import { Platform } from "@resk/core";
 
 class AuthLogin {
   /**
@@ -218,9 +219,21 @@ export type IWithAuthProps<T extends any = any> = T & {
  */
 export function withAuth<T extends any = any>(Component: React.FC<IWithAuthProps<T>>, options: IWithAuthOptions = {}): React.FC<IWithAuthProps<T>> {
   options = Object.assign({}, options);
-  const { fallback, displayName } = options;
+  const { fallback, displayName, serverFallback } = options;
   const fn: React.FC<IWithAuthProps<T>> = function (props: IWithAuthProps<T>): ReactNode {
     const user = useGetSignedUser();
+    const [isClient, setIsClient] = React.useState(Platform.isClientSide());
+    React.useEffect(() => {
+      if (!isClient) {
+        setIsClient(true);
+      }
+    }, []);
+    if (!isClient) {
+      if (typeof serverFallback === "function") {
+        return serverFallback();
+      }
+      return React.isValidElement(serverFallback) ? serverFallback : null;
+    }
     if (!user) {
       if (typeof fallback === "function") {
         return fallback();

@@ -14,8 +14,8 @@
     "noEmitHelpers": true,
     "noEmit": false,
     "target": "ES2015", // Or the desired target
-    "module": "NodeNext", // Enables ESM & CJS interop
-    "moduleResolution": "NodeNext", // Ensures Node-style resolution
+    "module": "ES6", // Enables ESM & CJS interop
+    "moduleResolution": "node", // Ensures Node-style resolution
     "removeComments": true,
     "declaration": false,
     "sourceMap": false,

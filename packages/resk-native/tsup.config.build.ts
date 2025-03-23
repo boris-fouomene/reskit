@@ -1,9 +1,11 @@
 import createConfig from "../../tsup";
 
-const config = createConfig("build", {
-    external: ["@resk/core", "node_modules"],
-});
 export default [
-    config
+    createConfig("build", {
+        external: ["@resk/core", "node_modules"],
+        format: ["esm"],
+        /* esbuildOptions(options) {
+            options.outExtension = { '.js': '.js' }; // Ensure .js extension is used instead of .mjs
+        }, */
+    })
 ];
-console.log(config, " is dddddddddddddddddddddddddddddd")

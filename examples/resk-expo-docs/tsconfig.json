@@ -8,8 +8,9 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx", // Use the new JSX transform
-    "module": "ESNext", // Ensure module syntax is ESNext
-    "target": "ES6", // Target modern ECMAScript version
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "Node",
     "skipLibCheck": true
   }
 }

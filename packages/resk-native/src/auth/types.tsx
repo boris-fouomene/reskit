@@ -1,4 +1,4 @@
-import { IAuthUser } from "@resk/core/auth/types";
+import { IAuthUser } from "@resk/core/auth";
 
 /**
  * Represents the authentication context in the application.

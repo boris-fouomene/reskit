@@ -1,147 +1,148 @@
 {
     "name": "@resk/core",
-    "version": "1.10.5",
+    "version": "1.12.1",
     "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
-    "main": "build/cjs/index",
-    "module": "./build/mjs/index.mjs",
-    "types": "../types-core/build/index.d.ts",
+    "main": "./build/index",
+    "module": "./build/index.mjs",
+    "types": "./build/index.d.ts",
+    "files": [
+        "build"
+    ],
     "typesVersions": {
         "*": {
             ".": [
-                "../types-core/build/index.d.ts"
+                "./build/index.d.ts"
             ],
             "auth": [
-                "../types-core/build/auth/index.d.ts"
+                "./build/auth/index.d.ts"
             ],
             "countries": [
-                "../types-core/build/countries/index.d.ts"
+                "./build/countries/index.d.ts"
             ],
             "currency": [
-                "../types-core/build/currency/index.d.ts"
+                "./build/currency/index.d.ts"
             ],
             "decorators": [
-                "../types-core/build/decorators/index.d.ts"
+                "./build/decorators/index.d.ts"
             ],
             "i18n": [
-                "../types-core/build/i18n/index.d.ts"
+                "./build/i18n/index.d.ts"
             ],
             "inputFormatter": [
-                "../types-core/build/inputFormatter/index.d.ts"
+                "./build/inputFormatter/index.d.ts"
             ],
             "logger": [
-                "../types-core/build/logger/index.d.ts"
+                "./build/logger/index.d.ts"
             ],
             "observable": [
-                "../types-core/build/observable/index.d.ts"
+                "./build/observable/index.d.ts"
             ],
             "platform": [
-                "../types-core/build/platform/index.d.ts"
+                "./build/platform/index.d.ts"
             ],
             "resources": [
-                "../types-core/build/resources/index.d.ts"
+                "./build/resources/index.d.ts"
             ],
             "session": [
-                "../types-core/build/session/index.d.ts"
+                "./build/session/index.d.ts"
             ],
             "utils": [
-                "../types-core/build/utils/index.d.ts"
+                "./build/utils/index.d.ts"
             ],
             "types": [
-                "../types-core/build/types/index.d.ts"
+                "./build/types/index.d.ts"
             ],
             "validator": [
-                "../types-core/build/validator/index.d.ts"
+                "./build/validator/index.d.ts"
             ],
             "*": [
-                "../types-core/build/*"
+                "./build/*"
             ]
         }
     },
     "exports": {
         "./auth": {
-            "import": "./build/mjs/auth/index.mjs",
-            "require": "./build/cjs/auth/index.js"
+            "import": "./build/auth/index.mjs",
+            "require": "./build/auth/index.js"
         },
         "./countries": {
-            "import": "./build/mjs/countries/index.mjs",
-            "require": "./build/cjs/countries/index.js"
+            "import": "./build/countries/index.mjs",
+            "require": "./build/countries/index.js"
         },
         "./currency": {
-            "import": "./build/mjs/currency/index.mjs",
-            "require": "./build/cjs/currency/index.js"
+            "import": "./build/currency/index.mjs",
+            "require": "./build/currency/index.js"
         },
         "./decorators": {
-            "import": "./build/mjs/decorators/index.mjs",
-            "require": "./build/cjs/decorators/index.js"
+            "import": "./build/decorators/index.mjs",
+            "require": "./build/decorators/index.js"
         },
         "./fields": {
-            "import": "./build/mjs/fields/index.mjs",
-            "require": "./build/cjs/fields/index.js"
+            "import": "./build/fields/index.mjs",
+            "require": "./build/fields/index.js"
         },
         "./i18n": {
-            "import": "./build/mjs/i18n/index.mjs",
-            "require": "./build/cjs/i18n/index.js"
+            "import": "./build/i18n/index.mjs",
+            "require": "./build/i18n/index.js"
         },
         "./inputFormatter": {
-            "import": "./build/mjs/inputFormatter/index.mjs",
-            "require": "./build/cjs/inputFormatter/index.js"
+            "import": "./build/inputFormatter/index.mjs",
+            "require": "./build/inputFormatter/index.js"
         },
         "./logger": {
-            "import": "./build/mjs/logger/index.mjs",
-            "require": "./build/cjs/logger/index.js"
+            "import": "./build/logger/index.mjs",
+            "require": "./build/logger/index.js"
         },
         "./observable": {
-            "import": "./build/mjs/observable/index.mjs",
-            "require": "./build/cjs/observable/index.js"
+            "import": "./build/observable/index.mjs",
+            "require": "./build/observable/index.js"
         },
         "./platform": {
-            "import": "./build/mjs/platform/index.mjs",
-            "require": "./build/cjs/platform/index.js"
+            "import": "./build/platform/index.mjs",
+            "require": "./build/platform/index.js"
         },
         "./resources": {
-            "import": "./build/mjs/resources/index.mjs",
-            "require": "./build/cjs/resources/index.js"
+            "import": "./build/resources/index.mjs",
+            "require": "./build/resources/index.js"
         },
         "./session": {
-            "import": "./build/mjs/session/index.mjs",
-            "require": "./build/cjs/session/index.js"
+            "import": "./build/session/index.mjs",
+            "require": "./build/session/index.js"
         },
         "./utils": {
-            "import": "./build/mjs/utils/index.mjs",
-            "require": "./build/cjs/utils/index.js"
+            "import": "./build/utils/index.mjs",
+            "require": "./build/utils/index.js"
         },
         "./types": {
-            "import": "./build/mjs/types/index.mjs",
-            "require": "./build/cjs/types/index.js"
+            "import": "./build/types/index.mjs",
+            "require": "./build/types/index.js"
         },
         "./validator": {
-            "import": "./build/mjs/validator/index.mjs",
-            "require": "./build/cjs/validator/index.js"
+            "import": "./build/validator/index.mjs",
+            "require": "./build/validator/index.js"
         },
         "./*": {
-            "import": "./build/mjs/*",
-            "require": "./build/cjs/*"
+            "import": "./build/*",
+            "require": "./build/*"
         },
         ".": {
-            "import": "./build/mjs/index.mjs",
-            "require": "./build/cjs/index.js"
+            "import": "./build/index.mjs",
+            "require": "./build/index.js"
         }
     },
     "scripts": {
         "clear-npx-cache": "npx clear-npx-cache",
         "pretest": "npm run build-test",
-        "build-test1": "tsc --project ./tsconfig.test.json && npx tsc-alias -p tsconfig.test.json",
-        "build-test": "rollup -c rollup.test.mjs",
+        "build": "tsup --config tsup.config.build.ts",
+        "build-dts": "tsc -p tsconfig.dts.json && npx tsc-alias -p tsconfig.dts.json",
+        "build-test": "tsup --config tsup.config.test.ts",
+        "dev": "tsup --config tsup.config.build.ts --watch",
         "test": "npx jest",
-        "build": "rollup -c rollup.build.mjs",
-        "build2": "npm run build:mjs && npm run build:cjs",
-        "build:cjs": "tsc -p tsconfig.cjs.json && npx tsc-alias -p tsconfig.cjs.json",
-        "build:mjs": "tsc -p tsconfig.mjs.json && npx tsc-alias -p tsconfig.mjs.json && node ./rename-mjs.js ./build/mjs",
         "start": "node build/test/index",
         "prepublish": "npm run build",
         "build-doc": "npx typedoc",
-        "build:watch": "tsc && (concurrently \"tsc -w\" \"tsc-alias -w\")",
-        "dev": "npx concurrently \"tsc --watch\" \"npx tsc-alias -p tsconfig.json\""
+        "check": "npm pack --dry-run",
+        "types:publish": "npm publish ./types --access public"
     },
     "devDependencies": {
         "@types/crypto-js": "^4.2.2",
@@ -149,19 +150,10 @@
         "@types/google-libphonenumber": "^7.4.30",
         "@types/node": "^22.10.7",
         "@types/qs": "^6.9.18",
-        "copyfiles": "^2.4.1",
-        "fast-glob": "^3.3.3",
         "lerna": "^8.1.9",
-        "ts-alias": "^0.0.7",
-        "ts-jest": "^29.2.5",
-        "tsc-alias": "^1.8.11",
         "typescript": "^5.8.2"
     },
     "dependencies": {
-        "@resk/types-core": "^1.3.1",
-        "@rollup/plugin-commonjs": "^28.0.3",
-        "@rollup/plugin-node-resolve": "^16.0.1",
-        "@rollup/plugin-typescript": "^12.1.2",
         "@types/color": "^4.2.0",
         "crypto-js": "^4.2.0",
         "google-libphonenumber": "^3.2.40",
@@ -169,8 +161,7 @@
         "moment": "^2.30.1",
         "qs": "^6.14.0",
         "reflect-metadata": "^0.2.2",
-        "rollup": "^4.36.0",
-        "stable-hash": "^0.0.4"
+        "stable-hash": "^0.0.5"
     },
     "peerDependenciesMeta": {},
     "publishConfig": {

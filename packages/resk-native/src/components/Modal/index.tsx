@@ -53,10 +53,10 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
     }
   };
   const setAnimation = (value: Animated.Value, visible: boolean) => {
-    const duration = Math.max(animationDuration, animationDuration, 0);
+    const duration = Math.max(animationDuration as number, animationDuration as number, 0);
     stopCurrentAnimation();
     const opacityAnim = currentAnimation.current = Animated.timing(backgroundOpacity, {
-      toValue: visible ? customBackgroundOpacity : 0,
+      toValue: (visible ? customBackgroundOpacity : 0) as any,
       duration,
       useNativeDriver,
       easing: visible ? Easing.in(Easing.exp) : Easing.out(Easing.exp),
@@ -212,8 +212,8 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
         testID={testID + "-modal-content-container"}
         {...contentContainerProps}
         onAccessibilityEscape={() => {
-          if (typeof contentContainerProps.onAccessibilityEscape === "function") {
-            contentContainerProps.onAccessibilityEscape();
+          if (typeof contentContainerProps?.onAccessibilityEscape === "function") {
+            contentContainerProps?.onAccessibilityEscape();
           }
           if (dismissable === false) return;
           handleDismiss(undefined as any);

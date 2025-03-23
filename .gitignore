@@ -1,4 +1,5 @@
 package-lock.json
+packages/resk-core/types/
 **/package-lock.json
 ### AL ###
 #Template for AL projects for Dynamics 365 Business Central

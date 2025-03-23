@@ -904,7 +904,7 @@ export default class Breakpoints {
                 }
             }
         });
-        const multiplicater = isNumber(opts[currentMedia]) ? opts[currentMedia] : commonMultiplicater;
+        const multiplicater: number = (isNumber(opts[currentMedia]) ? opts[currentMedia] : commonMultiplicater) as number;
         if (multiplicater === 0) {
             otherStyle.display = "none";
             otherStyle.opacity = 0;
@@ -1079,8 +1079,8 @@ export default class Breakpoints {
     static getGutter(windowWidth?: number) {
         const media = Breakpoints.getCurrentMedia(windowWidth);
         const all = Breakpoints.allBreakpoints;
-        if (isObj(all) && all[media]) {
-            return isNumber(all[media]?.gutter) ? all[media].gutter : 0;
+        if (all && isObj(all) && all[media]) {
+            return isNumber(all[media]?.gutter) ? all[media]?.gutter : 0;
         }
         return 0;
     }

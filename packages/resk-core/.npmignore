@@ -15,5 +15,13 @@ vite.config.*
 .rename-mjs.js
 rollup*
 tsconfig*
+# Ignore test files
+**/*.test.ts
+**/*.test.js
+**/__tests__/
+jest.config.ts
 
+# Ignore Jest cache & coverage reports
+coverage/
+.jest-cache/
 # Ignore any other file patterns you don't want to include

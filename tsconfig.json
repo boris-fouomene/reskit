@@ -1,43 +1,44 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "rootDir": ".",
+    //"baseUrl": ".",
+    //"rootDir": ".",
     "outDir": "./build",
-    "target": "ES2021",
-    "module": "ESNext",
-    "removeComments": true,
-    "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strict": true,
     "resolveJsonModule": true,
-    "incremental": true,
     "noLib": false,
-    "sourceMap": false,
     "noEmitOnError": true,
     "importHelpers": false,
     "noEmitHelpers": true,
     "noEmit": false,
+    "target": "ES2015", // Or the desired target
+    "module": "NodeNext", // Enables ESM & CJS interop
+    "moduleResolution": "NodeNext", // Ensures Node-style resolution
+    "removeComments": true,
+    "declaration": false,
+    "sourceMap": false,
+    "declarationMap": false,
+    "incremental": false,
+    "composite": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "jsx": "react-native",
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    "skipLibCheck": true,
     "typeRoots": [
       "./node_modules/@types",
+      "../node_modules/tsup"
     ],
     "types": [
       "jest",
       "node"
     ],
-    "skipLibCheck": true,
-    "composite": false,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "declaration": false,
-    "declarationMap": false,
-    "jsx": "react-jsx",
-    "plugins": [
-      {
-        "transform": "typescript-transform-paths"
-      }
-    ]
   },
   "include": [
     "**/*.ts",
@@ -47,14 +48,17 @@
     "packages/resk-tamagui/vite.config.mjs",
     "jest.config.js",
     "packages/resk-core/jest.config.js",
-    "packages/resk-nest/src/locales/common.js"
+    "packages/resk-nest/src/locales/common.js",
+    "packages/resk-core/jest.config.n.js"
   ],
   "exclude": [
     "./jest.config.js",
     "**/node_modules/**/*",
     "node_modules/**/*",
+    "**/dist/**/*",
+    "**/build/**/*",
     "./node_modules/@resk/**/*",
-    "./node_modules/@resk/types-native/**/*",
+    "@resk/**/*",
     "**/dist/*",
     "**/*.spec.ts",
     "**/build/**/*",
@@ -69,5 +73,5 @@
     "**/*.spec.js",
     "**/*.spec.jsx"
   ],
-  "extends": "expo/tsconfig.base"
+  //"extends": "expo/tsconfig.base"
 }

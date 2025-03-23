@@ -12,7 +12,7 @@ import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IDividerProps } from "@components/Divider";
 import { IFormData } from "@components/Form/types";
-import { IAuthPerm } from "@resk/core/auth/types";
+import { IAuthPerm } from "@resk/core/auth";
 import { IResourceName } from "@resk/core/types";
 
 /**

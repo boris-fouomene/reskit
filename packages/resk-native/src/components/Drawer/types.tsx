@@ -1,7 +1,7 @@
 import { IAppBarProps } from "@components/AppBar";
 import { IMenuItemBase, IMenuItems } from "@components/Menu/types";
 import { IViewProps } from "@components/View";
-import { IAuthSessionStorage } from "@resk/core/auth/types";
+import { IAuthSessionStorage } from "@resk/core/auth";
 import { IDict } from "@resk/core/types";
 import { IObservable } from "@resk/core/observable";
 import { ReactNode } from "react";

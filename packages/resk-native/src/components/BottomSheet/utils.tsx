@@ -5,7 +5,7 @@ import useStateCallback from "@utils/stateCallback";
 import usePrevious from "@utils/usePrevious";
 import { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { Animated, Dimensions, PanResponder, ScrollViewProps, StyleSheet, View } from "react-native";
-import Theme, { useTheme } from "@theme/index";
+import { useTheme } from "@theme/index";
 import { useBackHandler } from "@components/BackHandler";
 import { isNumber } from "@resk/core";
 import Platform from "@platform";

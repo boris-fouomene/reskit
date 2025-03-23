@@ -4,13 +4,6 @@
         "baseUrl": ".",
         "rootDir": "./src",
         "outDir": "./build",
-        "target": "ESNext", // Or the desired target
-        "module": "ESNext", // Output CommonJS modules
-        "moduleResolution": "node",
-        "removeComments": true,
-        "sourceMap": false,
-        "declarationMap": false,
-        "incremental": false,
         "paths": {
             "@logger": [
                 "src/logger"
@@ -45,11 +38,4 @@
         "src/**/*.ts",
         "src/**/*.tsx",
     ],
-    "exclude": [
-        "build/**/*",
-        "node_modules/**/*",
-        "../node_modules/**/*",
-        "jest.config.*",
-        "../../jest.config.*",
-    ]
 }

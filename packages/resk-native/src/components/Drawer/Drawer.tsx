@@ -6,7 +6,7 @@ import { AppBar, IAppBarProps } from "@components/AppBar";
 import { uniqid } from "@resk/core/utils";
 import i18n from "@resk/core/i18n";
 import Auth from "@resk/core/auth";
-import { IAuthSessionStorage } from "@resk/core/auth/types";
+import { IAuthSessionStorage } from "@resk/core/auth";
 import { IDict } from "@resk/core/types";
 import { canDrawerBeMinimizedOrPermanent } from "./utils";
 import { isValidElement } from "@utils";

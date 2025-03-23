@@ -1,11 +1,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "rootDir": "./src",
     "outDir": "./build",
-    "composite": false,
-    "incremental": false,
     "paths": {
       "@breakpoints/*": [
         "src/breakpoints/*"
@@ -82,7 +80,16 @@
     }
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "./src/**/*.ts",
+    "./src/**/*.tsx",
   ],
+  "exclude": [
+    "@resk/core",
+    "../resk-core/**/*",
+    "**/resk-core/**/*",
+    "node_modules",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "test",
+  ]
 }

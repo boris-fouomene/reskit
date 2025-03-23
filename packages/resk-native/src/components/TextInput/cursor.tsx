@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import * as React from "react";
+import { useRef, useState } from 'react';
 import { TextInput, StyleSheet, View } from 'react-native';
 
 interface CursorAwareInputProps {

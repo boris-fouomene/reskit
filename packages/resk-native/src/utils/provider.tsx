@@ -1,4 +1,5 @@
-import React, { LegacyRef, useEffect, useRef } from "react";
+import * as React from "react";
+import { LegacyRef, useEffect, useRef } from "react";
 
 /**
  * A custom React hook that creates a reference for a provider component.

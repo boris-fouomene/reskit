@@ -1,5 +1,6 @@
 import View, { IViewProps } from "@components/View";
-import React, { forwardRef } from "react";
+import * as React from "react";
+import { forwardRef } from "react";
 import { StyleSheet, View as RNView } from "react-native";
 
 

@@ -1,5 +1,5 @@
 import { measureInWindow } from "@utils/measureInWindow";
-import React from "react";
+import * as React from "react";
 import { Dimensions, View } from "react-native";
 
 /**

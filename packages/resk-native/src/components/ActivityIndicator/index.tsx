@@ -18,7 +18,7 @@ import { useTheme } from "@theme";
  * Here’s an example of how to use the custom `ActivityIndicator`:
  * 
  * ```tsx
- * import React from 'react';
+ * import * as React from 'react';
  * import { View } from 'react-native';
  * import ActivityIndicator from './ActivityIndicator'; // Adjust the import path as necessary
  * 
@@ -59,7 +59,7 @@ export function ActivityIndicator(props: IActivityIndicatorProps) {
  * Here’s an example of how to use the `IActivityIndicatorProps`:
  * 
  * ```tsx
- * import React from 'react';
+ * import * as React from 'react';
  * import { View } from 'react-native';
  * import ActivityIndicator, { IActivityIndicatorProps } from './ActivityIndicator'; // Adjust the import path as necessary
  * 

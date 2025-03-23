@@ -1,4 +1,5 @@
-import React, { forwardRef } from 'react';
+import * as React from "react";
+import { forwardRef } from 'react';
 import { BackAction } from './BackAction';
 import getThemeColors from './getThemeColor';
 import { AppBarContext, useAppBar } from './hooks';

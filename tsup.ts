@@ -8,7 +8,7 @@ export default function createConfig(type?: "build" | "test" | "dts", options?: 
     const isTest = type === "test";
     return {
         entry: glob.sync(`./src/**/${!isTest ? '!(*.d|*.spec|*.test)' : "*"}.(ts|tsx|js|jsx)`),
-        format: isTest ? ["cjs"] : ["cjs", "esm"],
+        format: ["cjs"],// isTest ? ["cjs"] : ["cjs", "esm"],
         outDir: "./build",
         splitting: false, // Avoid splitting to keep module references simple
         sourcemap: false,

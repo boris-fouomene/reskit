@@ -1,6 +1,7 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import * as React from "react";
+import { useMemo } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { IGridColProps } from './types';
 import { defaultStr, isNonNullString, isNumber } from '@resk/core';

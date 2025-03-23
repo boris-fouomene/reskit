@@ -19,7 +19,7 @@ import { KeyboardAvoidingViewProps } from "react-native";
  * functional component:
  * 
  * ```tsx
- * import React from 'react';
+ * import * as React from 'react';
  * import { KeyboardAvoidingView, TextInput, Button, ActivityIndicator } from 'react-native';
  * import { IKeyboardAvoidingViewProps } from './types';
  * 

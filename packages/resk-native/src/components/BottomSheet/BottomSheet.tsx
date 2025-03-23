@@ -1,4 +1,5 @@
-import React, { useImperativeHandle, useRef } from "react"
+import * as React from "react";
+import { useImperativeHandle, useRef } from "react"
 import theme from "@theme";
 import { defaultObj, defaultStr, isObj } from "@resk/core/utils";
 import View from "@components/View";

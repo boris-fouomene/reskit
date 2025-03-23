@@ -4,6 +4,9 @@
     "baseUrl": "./",
     "rootDir": "./src",
     "outDir": "./build",
+    "declaration": false,
+    "target": "ES6",
+    "module": "ESNext",
     "paths": {
       "@breakpoints/*": [
         "src/breakpoints/*"

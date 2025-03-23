@@ -1,5 +1,6 @@
 import { Pressable } from "react-native";
-import React, { useMemo } from "react";
+import * as React from "react";
+import { useMemo } from "react";
 import { ITooltipProps } from "./types";
 import { defaultStr, uniqid } from "@resk/core";
 import { useMergeRefs } from "@utils/mergeRefs";

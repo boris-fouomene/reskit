@@ -1,6 +1,7 @@
 import View, { IViewProps } from '@components/View';
 import { IObservable, observable, uniqid } from '@resk/core';
-import React, { createContext, useRef, useContext, ReactNode, useEffect, useMemo } from 'react';
+import * as React from "react";
+import { createContext, useRef, useContext, ReactNode, useEffect, useMemo } from 'react';
 import { Pressable, StyleSheet, ViewProps } from 'react-native';
 import { getMaxZindex, Platform } from '@resk/core';
 import { ITouchableProps } from '@src/types';

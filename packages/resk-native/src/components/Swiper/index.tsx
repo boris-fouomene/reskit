@@ -1,5 +1,5 @@
 
-import React, { ReactNode } from 'react';
+import * as React from "react";
 import { Animated, I18nManager, Dimensions, PanResponder, StyleSheet, View, PanResponderInstance, GestureResponderEvent, LayoutChangeEvent } from 'react-native';
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { IViewProps } from '@components/View';

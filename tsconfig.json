@@ -10,8 +10,9 @@
     "resolveJsonModule": true,
     "noLib": false,
     "noEmitOnError": true,
-    "importHelpers": false,
-    "noEmitHelpers": true,
+    "jsxImportSource": "react",
+    //"importHelpers": false,
+    //"noEmitHelpers": true,
     "noEmit": false,
     "target": "ES2015", // Or the desired target
     "module": "ES6", // Enables ESM & CJS interop

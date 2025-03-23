@@ -25,7 +25,7 @@ import platform from '@platform/index';
  * Here’s an example of how to use the `HelperText` component:
  * 
  * ```tsx
- * import React from 'react';
+ * import * as React from 'react';
  * import { View } from 'react-native';
  * import HelperText from './HelperText'; // Adjust the import path as necessary
  * 

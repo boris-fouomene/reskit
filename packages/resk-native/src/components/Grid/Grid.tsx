@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { IGridProps } from './types';
 import { defaultStr } from '@resk/core';

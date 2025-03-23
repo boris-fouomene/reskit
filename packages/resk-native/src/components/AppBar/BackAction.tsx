@@ -1,7 +1,7 @@
 import FontIcon from "@components/Icon/Font";
 import IconButton from "@components/Icon/Button";
 import { forwardRef } from 'react';
-import React from "react";
+import * as React from "react";
 import { View } from "react-native";
 import { IBackActionProps } from "./types";
 import { useAppBar } from "./hooks";

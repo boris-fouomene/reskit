@@ -1,4 +1,5 @@
-import React, { FC } from "react";
+import * as React from "react";
+import { FC } from "react";
 import { StyleSheet } from "react-native";
 import View from "@components/View";
 import TabItems from "./TabItems";

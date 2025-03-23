@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useImperativeHandle, useMemo } from "react";
+import * as React from "react";
+import { createContext, useContext, useEffect, useImperativeHandle, useMemo } from "react";
 import { View, StyleSheet, GestureResponderEvent } from "react-native";
 import moment, { Moment } from "moment";
 import { DateHelper, defaultStr, isEmpty, isNonNullString } from "@resk/core/utils";

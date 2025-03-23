@@ -21,7 +21,7 @@ import View, { IViewProps } from '@components/View';
  * Here’s an example of how to use the `Divider` component:
  *
  * ```tsx
- * import React from 'react';
+ * import * as React from 'react';
  * import { View } from 'react-native';
  * import Divider from './Divider'; // Adjust the import path as necessary
  * 
@@ -75,7 +75,7 @@ const Divider = React.forwardRef(({ disabled, style, ...rest }: IDividerProps, r
  * Here’s an example of how to use the `IDividerProps` interface:
  * 
  * ```tsx
- * import React from 'react';
+ * import * as React from 'react';
  * import { View } from 'react-native';
  * import Divider, { IDividerProps } from './Divider'; // Adjust the import path as necessary
  * 

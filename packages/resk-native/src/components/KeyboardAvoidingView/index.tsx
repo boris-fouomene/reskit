@@ -1,5 +1,5 @@
 import View from "@components/View";
-import React from "react";
+import * as React from "react";
 import { isNonNullString } from "@resk/core";
 import { IKeyboardAvoidingViewProps } from "./types";
 import { View as RNView, StyleSheet } from "react-native";
@@ -71,7 +71,7 @@ const IKeyboardAvoidingView = React.forwardRef(({ children, style, testID, ...pr
 });
 
 const styles = StyleSheet.create({
-  main: { }
+  main: {}
 });
 IKeyboardAvoidingView.displayName = "IKeyboardAvoidingView";
 

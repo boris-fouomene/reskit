@@ -1,5 +1,6 @@
 
-import React, { ReactNode } from "react";
+import * as React from "react";
+import { ReactNode } from "react";
 import Dialog from "./Dialog";
 import { isValidElement } from "@utils";
 import { defaultStr, isObj } from "@resk/core/utils";

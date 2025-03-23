@@ -1,13 +1,9 @@
 {
     "name": "@resk/core",
-    "version": "1.12.2",
+    "version": "1.12.6",
     "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
-    "main": "./build/index.js",
-    "module": "./build/index.mjs",
+    "main": "./build/index",
     "types": "./build/index.d.ts",
-    "files": [
-        "build"
-    ],
     "typesVersions": {
         "*": {
             ".": [
@@ -57,76 +53,28 @@
             ]
         }
     },
-    "exports": {
-        "./auth": {
-            "import": "./build/auth/index.mjs",
-            "require": "./build/auth/index.js"
-        },
-        "./countries": {
-            "import": "./build/countries/index.mjs",
-            "require": "./build/countries/index.js"
-        },
-        "./currency": {
-            "import": "./build/currency/index.mjs",
-            "require": "./build/currency/index.js"
-        },
-        "./decorators": {
-            "import": "./build/decorators/index.mjs",
-            "require": "./build/decorators/index.js"
-        },
-        "./fields": {
-            "import": "./build/fields/index.mjs",
-            "require": "./build/fields/index.js"
-        },
-        "./i18n": {
-            "import": "./build/i18n/index.mjs",
-            "require": "./build/i18n/index.js"
-        },
-        "./inputFormatter": {
-            "import": "./build/inputFormatter/index.mjs",
-            "require": "./build/inputFormatter/index.js"
-        },
-        "./logger": {
-            "import": "./build/logger/index.mjs",
-            "require": "./build/logger/index.js"
-        },
-        "./observable": {
-            "import": "./build/observable/index.mjs",
-            "require": "./build/observable/index.js"
-        },
-        "./platform": {
-            "import": "./build/platform/index.mjs",
-            "require": "./build/platform/index.js"
-        },
-        "./resources": {
-            "import": "./build/resources/index.mjs",
-            "require": "./build/resources/index.js"
-        },
-        "./session": {
-            "import": "./build/session/index.mjs",
-            "require": "./build/session/index.js"
-        },
-        "./utils": {
-            "import": "./build/utils/index.mjs",
-            "require": "./build/utils/index.js"
-        },
-        "./types": {
-            "import": "./build/types/index.mjs",
-            "require": "./build/types/index.js"
-        },
-        "./validator": {
-            "import": "./build/validator/index.mjs",
-            "require": "./build/validator/index.js"
-        },
-        "./*": {
-            "import": "./build/*",
-            "require": "./build/*"
-        },
-        ".": {
-            "import": "./build/index.mjs",
-            "require": "./build/index.js"
-        }
-    },
+    "files": [
+        "build",
+        "readme.md",
+        "package.json",
+        "auth.js",
+        "countries.js",
+        "currency.js",
+        "decorators.js",
+        "fields.js",
+        "i18n.js",
+        "index.js",
+        "inputFormatter.js",
+        "logger.js",
+        "observable.js",
+        "platform.js",
+        "resources.js",
+        "session.js",
+        "translations.js",
+        "types.js",
+        "utils.js",
+        "validator.js"
+    ],
     "scripts": {
         "clear-npx-cache": "npx clear-npx-cache",
         "pretest": "npm run build-test",

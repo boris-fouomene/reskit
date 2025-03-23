@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import * as React from "react";;
+import { useMemo } from 'react';
 import { MenuItem } from './Item';
 import View, { IViewProps } from "@components/View";
 import { renderMenuItems, useRenderMenuItems } from './utils';

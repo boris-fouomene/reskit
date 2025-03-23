@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import Theme, { useTheme } from "@theme";
 import View, { IViewProps } from "@components/View";
 import { View as RNView } from 'react-native';

@@ -39,7 +39,7 @@ import { DrawerMenuIcon } from "./DrawerMenuIcon";
  * within a screen component:
  * 
  * ```typescript
- * import React from 'react';
+ * import * as React from 'react';
  * import { AppBarLayout } from './AppBarLayout';
  * 
  * const MyScreen = () => {

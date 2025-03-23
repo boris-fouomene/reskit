@@ -23,7 +23,8 @@
  * ```
  */
 
-import React, { useMemo } from 'react';
+import * as React from "react";
+import { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 import Platform from "@platform";
 import { CountriesManager, defaultStr, ICountryCode, isNonNullString, Logger } from '@resk/core';

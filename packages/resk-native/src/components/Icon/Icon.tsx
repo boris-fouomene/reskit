@@ -1,5 +1,6 @@
 "use client";
-import React, { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
+import * as React from "react"
+import { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
 import { IFontIconName, IFontIconProps, IGetIconOptions, IIconProps } from "./types";
 import { Image, ImageStyle } from "react-native";
 import { isValidElement, pickTouchEventHandlers } from "@utils";
@@ -46,7 +47,7 @@ import { isReactComponent } from "@utils/isComponent";
  * Here’s an example of how to use the `Icon` component:
  * 
  * ```tsx
- * import React from 'react';
+ * import * as React from 'react';
  * import { View } from 'react-native';
  * import Icon from './Icon'; // Adjust the import path as necessary
  * 

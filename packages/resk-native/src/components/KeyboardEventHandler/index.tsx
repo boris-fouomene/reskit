@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react';
+import * as React from "react";
+import { ReactNode } from 'react';
 import { IKeyboardEventHandlerKey, findMatchedKey } from './keyEvents';
 import View, { IViewProps } from "@components/View";
 import { StyleSheet, View as RNView, NativeSyntheticEvent, TextInputKeyPressEventData } from "react-native";

@@ -1,5 +1,5 @@
-import { IClassConstructor } from '@resk/core';
-import React, { useMemo, useRef } from 'react';
+import * as React from "react";
+import { useMemo } from 'react';
 import { FlatListProps, FlatList } from 'react-native';
 
 /**

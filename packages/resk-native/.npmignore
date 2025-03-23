@@ -1,6 +1,12 @@
 # Ignore node_modules (just in case)
 node_modules/
 
+# Ignore everything
+*
+# Except the build directory
+!build/
+!package.json
+
 # Ignore specific folders
 test/
 src/

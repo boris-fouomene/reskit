@@ -1,5 +1,6 @@
 import { IReactComponent } from "@src/types";
-import React, { ReactNode } from "react";
+import * as React from "react";
+import { ReactNode } from "react";
 
 
 /**
@@ -33,7 +34,7 @@ export interface IWithHOCOptions {
 export function withHOC<T>(Component: IReactComponent<T>, options: IWithHOCOptions = {}) {
     options = Object.assign({}, options);
     const { displayName, fallback } = options;
-    const fn = React.forwardRef(function (props : T, ref?): ReactNode {
+    const fn = React.forwardRef(function (props: T, ref?): ReactNode {
         props = (props || {}) as T;
         if (fallback !== undefined) {
             if (typeof fallback === "function") {

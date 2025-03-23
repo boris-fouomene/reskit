@@ -200,7 +200,7 @@ export interface IExpandableCallbackOptions {
  * @example
  * // Example of using IExpandableContext in a functional component
  * 
- * import React, { useContext } from 'react';
+ * import React { useContext } from 'react';
  * import { IExpandableContext, useExpandable } from './ExpandableContext';
 import View from '../../../build/components/View/index';
  * 

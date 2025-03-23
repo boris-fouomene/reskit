@@ -1,5 +1,6 @@
 
-import React, { Fragment, ReactNode, useMemo } from "react";
+import * as React from "react";
+import { Fragment, ReactNode, useMemo } from "react";
 import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";

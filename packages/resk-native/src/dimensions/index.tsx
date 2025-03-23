@@ -1,5 +1,6 @@
 import { Dimensions } from 'react-native';
-import React, { useEffect, useMemo, useState } from "react";
+import * as React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IDimensions } from './types';
 import Breakpoints from '../breakpoints';
 import { IObservable, isNonNullString, isObj, isObservable, observable, debounce } from '@resk/core';

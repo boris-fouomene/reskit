@@ -45,7 +45,7 @@ export type IReactRef<T extends unknown = unknown> = React.MutableRefObject<T> |
  * ### Usage Example:
  * 
  * ```tsx
- * import React from 'react';
+ * import * as React from 'react';
  * 
  * interface MyProps {
  *   message: string;

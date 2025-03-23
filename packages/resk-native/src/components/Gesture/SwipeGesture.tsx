@@ -21,7 +21,8 @@
  */
 
 import View, { IViewProps } from '@components/View';
-import React, { useCallback, useRef } from 'react';
+import * as React from "react";
+import { useCallback, useRef } from 'react';
 import { PanResponder, GestureResponderEvent, PanResponderGestureState, Animated, ViewProps } from 'react-native';
 
 /**

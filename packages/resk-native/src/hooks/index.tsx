@@ -45,7 +45,7 @@ import { defaultStr } from "@resk/core";
  * create a new component with an AppBar:
  * 
  * ```typescript
- * import React from 'react';
+ * import * as React from 'react';
  * import { withAppBar } from '@resk/native';
  * 
  * const MyComponent: React.FC<{ message: string }> = ({ message }) => {

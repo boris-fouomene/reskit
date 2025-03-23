@@ -58,14 +58,14 @@ import { BackPressEventName } from "react-native";
 function emptyFunction() { }
 
 class BackHandler {
-  static exitApp= emptyFunction;
-  static addEventListener(eventName: BackPressEventName,handler: () => boolean | null | undefined): NativeEventSubscription{
+  static exitApp = emptyFunction;
+  static addEventListener(eventName: BackPressEventName, handler: () => boolean | null | undefined): NativeEventSubscription {
     return {
       remove: emptyFunction,
     };
   }
-  static removeEventListener(eventName: BackPressEventName,handler: () => boolean | null | undefined) {
-  
+  static removeEventListener(eventName: BackPressEventName, handler: () => boolean | null | undefined) {
+
   };
 };
 

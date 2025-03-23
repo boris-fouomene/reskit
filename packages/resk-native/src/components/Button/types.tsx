@@ -5,7 +5,7 @@ import { ITooltipBaseProps } from "@components/Tooltip";
 import { ITouchableRippleProps } from "@components/TouchableRipple";
 import { IThemeColorsTokenName } from "@theme/types";
 import { IStyle } from "../../types";
-import React from "react";
+import * as React from "react";
 import { AccessibilityRole, GestureResponderEvent, View } from "react-native";
 import { ILabelProps } from "@components/Label";
 import { IViewProps } from "@components/View";

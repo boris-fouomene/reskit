@@ -1,7 +1,8 @@
 import { Dropdown, IDropdownProps } from "@components/Dropdown";
 import { CountriesManager, defaultStr, ICountry, ICountryCode, isNonNullString } from "@resk/core";
 import { TouchableOpacity, StyleSheet, TouchableOpacityProps } from "react-native";
-import React, { useMemo } from "react";
+import { forwardRef } from "react";
+import { useMemo } from "react";
 import { Icon } from "@components/Icon";
 import Label from "@components/Label";
 import View from "@components/View";
@@ -16,7 +17,7 @@ import { SelectCountryRef } from "@components/TextInput/SelectCountryRef";
  * @param {ISelectCountryProps} props - The props for the country selector component.
  * @returns {JSX.Element} The rendered country selector component.
  */
-export const SelectCountry = React.forwardRef<any, ISelectCountryProps & { displayDialCode?: boolean }>(({ withLabel, countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }, ref) => {
+export const SelectCountry = forwardRef<any, ISelectCountryProps & { displayDialCode?: boolean }>(({ withLabel, countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }, ref) => {
     const countries = useMemo(() => {
         return Object.values(CountriesManager.getCountries());
     }, []);

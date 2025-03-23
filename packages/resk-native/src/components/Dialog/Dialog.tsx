@@ -7,7 +7,8 @@ import {
 } from "@components/AppBar";
 import DialogTitle from "./DialogTitle";
 import DialogFooter from "./DialogFooter";
-import React, { ReactNode, useMemo } from "react";
+import * as React from "react";
+import { ReactNode, useMemo } from "react";
 import { isValidElement } from "@utils";
 import View from "@components/View";
 import DialogActions from "./DialogActions";

@@ -1,7 +1,8 @@
 import { Text } from "react-native";
 import { StyleSheet, TextProps, Role } from "react-native";
 import Theme, { useTheme, Colors } from "@theme";
-import React, { ReactNode } from "react";
+import * as React from "react";
+import { ReactNode } from "react";
 import { isValidElement } from "@utils";
 import { IStyle } from "../../types";
 import { IDict, isNonNullString } from "@resk/core";

@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, createContext, useContext, useRef, useCallback } from "react";
+import * as React from "react";
+import { useEffect, useMemo, createContext, useContext, useRef, useCallback } from "react";
 import Platform from "@platform";
 import { StyleSheet, ViewProps, Animated, Pressable, GestureResponderEvent, PressableProps, Easing } from "react-native";
 import { IViewProps } from "@components/View";
@@ -593,7 +594,7 @@ const ModalContext = createContext<IModalContext | null>(null);
  *
  * @example
  * // Example of using the useModal hook in a component
- * import React from 'react';
+ * import * as React from 'react';
  * import { useModal } from './path/to/useModal';
  *
  * const ModalComponent = () => {

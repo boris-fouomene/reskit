@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import * as React from "react";
 import { StyleSheet, View } from 'react-native';
 import { Colors } from '@theme';
 import { defaultStr, IDict } from "@resk/core";

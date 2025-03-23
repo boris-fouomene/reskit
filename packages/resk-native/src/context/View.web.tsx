@@ -1,5 +1,6 @@
-import { isObj, Platform } from "@resk/core";
+import { Platform } from "@resk/core";
 import { StyleSheet } from "react-native";
+import * as React from "react";
 
 export default function View({ children, testID, style }: { children: any; testID: string, style: any }) {
     const newStyle = Platform.isClientSide() ? StyleSheet.flatten(style) : {};

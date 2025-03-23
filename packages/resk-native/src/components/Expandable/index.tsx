@@ -1,4 +1,5 @@
-import React, { useMemo, useRef } from "react";
+import * as React from "react";
+import { useMemo, useRef } from "react";
 import View from "@components/View";
 import { StyleSheet, View as RNView, Pressable, Animated, GestureResponderEvent, } from "react-native";
 import Label from "@components/Label";
@@ -219,7 +220,7 @@ const ExpandableContext = React.createContext<IExpandableContext>({} as IExpanda
  * @example
  * // Example of using the useExpandable hook in a component
  * 
- * import React from 'react';
+ * import * as React from 'react';
  * import { useExpandable } from './ExpandableContext';
  * 
  * const MyExpandableComponent: React.FC = () => {

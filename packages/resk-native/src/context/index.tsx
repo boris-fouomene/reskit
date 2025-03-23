@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo } from 'react';
+import * as React from "react";
 import View from "./View";
 import { ITheme } from '@theme/types';
 import { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
@@ -97,20 +97,20 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    * 
    * @param {string} stableHash(customTheme) - Memoized hash value of the custom theme.
    */
-  useEffect(() => {
+  React.useEffect(() => {
     updateTheme(uTheme(Object.assign({}, theme, customTheme)));
   }, [customTheme]);
-  useMemo(() => {
+  React.useMemo(() => {
     if (isObj(breakpoints)) {
       return Breakpoints.init(breakpoints);
     }
   }, [breakpoints]);
-  useEffect(() => {
+  React.useEffect(() => {
     if (isObj(breakpoints)) {
       Breakpoints.update();
     }
   }, [breakpoints]);
-  const style = useMemo(() => {
+  const style = React.useMemo(() => {
     const { top, bottom, right, left } = Object.assign({}, safeAreaInsets);
     return [isNumber(top) && { paddingTop: top }, isNumber(bottom) && { paddingBottom: bottom }, isNumber(right) && { paddingRight: right }, isNumber(left) && { paddingLeft: left }];
   }, [safeAreaInsets]);

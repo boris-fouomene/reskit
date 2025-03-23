@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, Fragment } from "react";
 import { Divider } from "@components/Divider";
 import { IMenuItemBase, IMenuRenderItemOptions, IMenuRenderItemsOptions } from "./types";
 import { useTheme } from "@theme/index";
@@ -6,7 +6,6 @@ import { IReactNullableElement } from "../../types";
 import stableHash from "stable-hash";
 import { Auth, cloneObject, isObj } from "@resk/core";
 import { useReskNative } from "@src/context/hooks";
-import { ResourcesManager } from "@resk/core";
 
 /**
  * Renders either an expandable menu item or a section based on the provided properties.
@@ -163,7 +162,7 @@ export function renderMenuItems<MenuItemContext = any>({ items, render, renderEx
       clonedItem.level = level;
       const r = renderMenuItem({ item: clonedItem, index, render, renderExpandable, level, context });
       if (r) {
-        _items.push(r);
+        _items.push(<Fragment key={index}>{r}</Fragment>);
       }
     });
   }

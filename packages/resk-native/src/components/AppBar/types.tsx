@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { IThemeColorsTokenName } from "@theme/types";
 import { GestureResponderEvent, ViewProps } from "react-native";
 import { IIconButtonProps } from "@components/Icon";
-import { IMenuItemBase, IMenuItemRenderFunc, IMenuItemsProps, IMenuRenderItemsOptions } from "@components/Menu";
+import { IMenuItemBase, IMenuRenderItemsOptions } from "@components/Menu";
 import { ILabelOrLeftOrRightProps } from "@hooks/index";
 import { IReactNullableElement } from "@src/types";
 

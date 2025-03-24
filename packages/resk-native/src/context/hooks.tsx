@@ -6,29 +6,8 @@ import Platform from "@resk/core/platform";
 import { IReactComponent } from "@src/types";
 import { IWithHOCOptions } from "@hooks/withHOC";
 import { defaultStr, isNonNullString } from "@resk/core";
-/**
- * @group ReskNativeProvider
- * Creates a context for the ReskNativeProvider.
- * This context will hold the current theme and the method to update it.
- * 
- * @type {React.Context<IReskNativeContext>} 
- * 
- * **Example**:
- * ```tsx
- * const contextValue: IReskNativeContext = {
- *   theme: {
- *     primaryColor: '#6200ee',
- *     secondaryColor: '#03dac6',
- *   },
- *   updateTheme: (newTheme) => { },
- * };
- * 
- * <ReskNativeContext.Provider value={contextValue}>
- *   <YourComponent />
- * </ReskNativeContext.Provider>
- * ```
- */
-export const ReskNativeContext = React.createContext<IReskNativeContext>({} as IReskNativeContext);
+import { ReskNativeContext } from "./context";
+
 
 /**
  * @group ReskNativeProvider

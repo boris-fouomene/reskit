@@ -8,7 +8,7 @@ import useStateCallback from '@utils/stateCallback';
 import { extendObj, isNumber, isObj } from '@resk/core/utils';
 import Platform from "@resk/core/platform";
 import { IReskNativeProviderProps } from './types';
-import { ReskNativeContext } from './hooks';
+import { ReskNativeContext } from './context';
 import { PortalProvider } from "@components/Portal";
 import Breakpoints from "@src/breakpoints";
 import { Preloader, Dialog } from "@components/Dialog";
@@ -22,7 +22,7 @@ import { BottomSheet } from '@components/BottomSheet';
 import { ReskNativeEvents } from "./events";
 
 export * from "./types";
-export { useReskNative } from "./hooks";
+export * from "./hooks";
 
 /**
  * @group ReskNativeProvider

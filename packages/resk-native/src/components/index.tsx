@@ -33,3 +33,6 @@ export * from "./Avatar";
 export * from "./List";
 export * from "./ProgressBar";
 export * from "./BottomSheet";
+export * from "./Badge";
+export * from "./Grid";
+export * from "./StatusBar";

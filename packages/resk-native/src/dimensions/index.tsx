@@ -10,7 +10,7 @@ import { StyleSheet } from "react-native";
 import { IBreakpointName } from '@src/breakpoints/types';
 import stableHash from "stable-hash";
 
-
+export * from "./types";
 
 /***
  * Returns the device dimensions properties for calculating new dimensions 

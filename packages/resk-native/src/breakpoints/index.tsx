@@ -4,6 +4,7 @@ import { addClassName, isDOMElement, isNonNullString, isObj, isNumber, removeCla
 import Platform from "@platform/index";
 import { ReskNativeEvents } from "@src/context/events";
 
+export * from "./types";
 // int comparer for sorts
 const compareInts = function compare(a: any, b: any): number {
     if (a < b) {

@@ -7,6 +7,7 @@ import { getMaxZindex, Platform } from '@resk/core';
 import { ITouchableProps } from '@src/types';
 import { getTouchableProps } from '@utils/hasTouchHandler';
 import { useTheme } from '@theme/index';
+import { typeOf } from 'react-is';
 
 type IPortalEvent = "add" | "remove";
 class EventManager {
@@ -201,12 +202,9 @@ RenderedPortal.displayName = "Portal.Rendered";
  * }, []);
  * ```
  */
-export const usePortal = (): IPortalContext => {
+const usePortal = (): IPortalContext => {
     const context = useContext(PortalContext);
-    if (!context) {
-        throw new Error('usePortal must be used within a PortalProvider');
-    }
-    return context;
+    return Object.assign({}, context);
 };
 
 /***
@@ -266,16 +264,16 @@ export function Portal({ children, ...props }: IPortalProps) {
     const key = useRef<string>(uniqid("portal-key")).current;
     useEffect(() => {
         // Register the portal when the component mounts
-        if (props.visible !== false) {
+        if (props.visible !== false && typeof addPortal === "function") {
             addPortal(key, children, props);
         }
         return () => {
-            removePortal(key);
+            typeof removePortal === "function" && removePortal(key);
         }
     }, [key, children, props.absoluteFill, props.visible]);
     useEffect(() => {
         return () => {
-            removePortal(key);
+            typeof removePortal === "function" && removePortal(key);
         }
     }, [])
     return null; // Nothing is rendered here; content is managed by the PortalProvider

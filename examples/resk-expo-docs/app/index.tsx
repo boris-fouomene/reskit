@@ -1,5 +1,5 @@
 import i18n from "@resk/core/i18n";
-import { TextInput, withAppBar, Surface, Grid, BottomSheet, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
+import { TextInput, withAppBar, Surface, Grid, BottomSheet, withAppMounted, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
 import { View, ScrollView, StyleSheet } from 'react-native'
 
 const index = withAppBar(() => {
@@ -393,7 +393,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     </Button>
 }
 
-function LoginExample() {
+const LoginExample = withAppMounted(function LoginExample() {
     const formName = "login-form";
     return <Surface testID={"login"} style={[Theme.styles.flex1, Theme.styles.w100]}>
         <Grid testID="login-content-container" style={[Theme.styles.w100]}>
@@ -450,6 +450,6 @@ function LoginExample() {
         </Grid>
     </Surface>
 
-}
+});
 
 export default index;// withAuth(index);

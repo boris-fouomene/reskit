@@ -119,6 +119,10 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
   const context = { theme, i18n, safeAreaInsets, updateTheme, ...rest, breakpoints };
   React.useEffect(() => {
     ReskNativeEvents.events.trigger("appReady", context);
+    ReskNativeEvents.events.trigger("appMounted", context);
+    return () => {
+      ReskNativeEvents.events.trigger("appUnmounted", context);
+    }
   }, []);
   /**
    * Provides the current theme and the `updateTheme` function to all child components

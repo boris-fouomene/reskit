@@ -86,7 +86,7 @@ import { defaultStr } from "@resk/core/utils";
  */
 export function withAppBar<T extends object, TState extends object = any>(Component: IReactComponent<T, TState>, appBarProps?: IAppBarProps | IReskNativeContextCallback<IAppBarProps>, options?: IWithHOCOptions) {
     options = options || {};
-    options.displayName = defaultStr(options.displayName, Component?.displayName, "WithAppBarComponent");
+    options.displayName = defaultStr(options.displayName, (Component as any)?.displayName, "WithAppBarComponent");
     return withHOC<T>(function (props: T) {
         const reskExpoContext = useReskNative();
         const _appBarProps = Object.assign({}, (typeof appBarProps === "function" ? appBarProps(reskExpoContext) : appBarProps)) as IAppBarProps;

@@ -66,7 +66,7 @@ interface IWithDrawerOptions {
 export function withDrawer<T extends object>(Component: IReactComponent<T>, props?: IWithDrawerOptions, options?: IWithHOCOptions) {
   options = defaultObj(options);
   const { drawerProps: _drawerProps } = Object.assign({}, props) as IWithDrawerOptions;
-  options.displayName = defaultStr(options.displayName, Component?.displayName, "WithDrawerComponent");
+  options.displayName = defaultStr(options.displayName, (Component as any)?.displayName, "WithDrawerComponent");
   return withHOC<T>(function (props: T) {
     const reskExpoContext = useReskNative();
     const drawerProps = Object.assign({}, (typeof _drawerProps === "function" ? _drawerProps(reskExpoContext) : _drawerProps)) as IDrawerProps;

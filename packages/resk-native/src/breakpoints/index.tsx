@@ -2,7 +2,7 @@ import { Dimensions, PixelRatio, ViewStyle } from "react-native";
 import { IBreakpoints, IBreakpoint, INormalizedBreakpoints, IMediaQueryTemplate, IBreakpointNamePhone, IBreakpointNameSmallPhone, IBreakpointNameMobile, IBreakpointNameTablet, IBreakpointNameDesktop, IBreakpointNameMediumPhone, IBreakpointName, IBreakpointColumns } from "./types";
 import { addClassName, isDOMElement, isNonNullString, isObj, isNumber, removeClassName, isStringNumber } from "@resk/core/utils";
 import Platform from "@platform/index";
-
+import { ReskNativeEvents } from "@src/context/events";
 
 // int comparer for sorts
 const compareInts = function compare(a: any, b: any): number {
@@ -316,7 +316,10 @@ export default class Breakpoints {
                 break; // Exit the loop once the active breakpoint is found
             }
         }
-        this.updateDeviceClassName();
+        const bindEvent = ReskNativeEvents.events.once("appMounted", () => {
+            this.updateDeviceClassName();
+            bindEvent?.remove();
+        });
     }
 
 
@@ -666,12 +669,10 @@ export default class Breakpoints {
             let b = document.body;
             let deviceKey = "data-device-name";
             let c = b.getAttribute(deviceKey);
-
             // Remove the current device class if it exists
             if (c) {
                 removeClassName(b, c);
             }
-
             // Determine the new device class based on breakpoint columns
             let className = this.isMobileMedia() ? "mobile" : this.isTabletMedia() ? "tablet" : "desktop";
             if (this.isSmallPhoneMedia()) {

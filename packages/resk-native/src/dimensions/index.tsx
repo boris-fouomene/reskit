@@ -344,8 +344,8 @@ export function withBreakpointStyle<IProps extends IBreakpointStyleProps = any, 
 		const { breakpointStyle, ...rest } = props as IWithBreakpointStyle<IProps> & { breakpointStyle?: any };
 		return <Component ref={ref} {...rest as IProps} style={style} />; // Render the wrapped component with props and responsive styles
 	});	// Set a display name for the wrapped component for better debugging
-	if (isNonNullString(Component?.displayName)) {
-		fn.displayName = Component.displayName + "_WithBreakpointStyle"; // Append suffix to original display name
+	if (isNonNullString((Component as any)?.displayName)) {
+		fn.displayName = (Component as any).displayName + "_WithBreakpointStyle"; // Append suffix to original display name
 	} else if (isNonNullString(displayName)) {
 		fn.displayName = displayName; // Use custom display name if provided
 	}

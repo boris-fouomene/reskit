@@ -1,5 +1,6 @@
 import { IInputFormatterResult } from "@resk/core/types";
 import { II18nLocale } from "@src/i18n";
+import * as React from "react";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent, PressableProps, TouchableWithoutFeedback, TouchableWithoutFeedbackProps } from "react-native";
 /**
    @interface
@@ -42,6 +43,8 @@ export type IReactRef<T extends unknown = unknown> = React.MutableRefObject<T> |
  * React components as props or within other components. The type is generic, 
  * allowing you to specify the props and state types for class components.
  * 
+ * @template Props - The type of the component's props.
+ * @template State - The type of the component's state.
  * ### Usage Example:
  * 
  * ```tsx
@@ -76,7 +79,15 @@ export type IReactRef<T extends unknown = unknown> = React.MutableRefObject<T> |
  * );
  * ```
  */
-export type IReactComponent<IProps = {}, IState = {}> = React.FunctionComponent<IProps> | React.ComponentType<IProps> | React.ComponentClass<IProps, IState>;
+export type IReactComponent<Props = any, State = any> =
+  | React.FunctionComponent<Props>                                    // Functional Component
+  | (new (props: Props) => React.Component<Props, State>) // Class Component Constructor
+  | React.ComponentClass<Props, State>                 // Class Component Class
+  | React.ForwardRefExoticComponent<Props>             // Forwarded Ref Component
+  | React.ExoticComponent<Props>                       // Exotic Components (like Memo, Lazy)
+  | React.ForwardRefRenderFunction<State, Props>             // Forward Ref Render Function
+  | ((props: Props) => React.ReactElement | null)            // Basic Function Component
+  | React.JSXElementConstructor<Props>                       // Any component that can be used in JSX
 
 
 /**

@@ -15,8 +15,11 @@ import { IObservable, observable } from "@resk/core/observable";
  * const event: IReskNativeEvent = "appReady";
  * console.log(event); // Output: "appReady"
  * ```
+ * appReady is called 
+ * appMounted is called when ReskNativeProvider is mounted
+ * appUnmounted is called when ReskNativeProvider is unmounted
  */
-export type IReskNativeEvent = "appReady";
+export type IReskNativeEvent = "appReady" | "appMounted" | "appUnmounted";
 
 /**
  * A utility class for managing and observing events in the Resk Native context.

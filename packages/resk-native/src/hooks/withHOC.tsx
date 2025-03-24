@@ -49,8 +49,8 @@ export function withHOC<T>(Component: IReactComponent<T>, options: IWithHOCOptio
         }
         return <Component {...props} ref={ref} />;
     } as React.ForwardRefRenderFunction<unknown, React.PropsWithoutRef<T>>);
-    if (Component?.displayName) {
-        fn.displayName = Component.displayName + "_WithAuth";
+    if ((Component as any)?.displayName) {
+        fn.displayName = (Component as any).displayName + "_WithAuth";
     } else if (displayName) {
         fn.displayName = displayName;
     }

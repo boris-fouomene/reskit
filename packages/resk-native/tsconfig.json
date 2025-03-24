@@ -5,8 +5,9 @@
     "rootDir": "./src",
     "outDir": "./build",
     "declaration": false,
-    "target": "ES6",
-    "module": "ESNext",
+    "target": "ES2015",
+    "module": "ES2015",
+    "moduleResolution": "node",
     "paths": {
       "@breakpoints/*": [
         "src/breakpoints/*"

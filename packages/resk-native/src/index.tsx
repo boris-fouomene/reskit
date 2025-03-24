@@ -1,5 +1,6 @@
 export * from "./i18n";
 export * from "./context";
+export * from "./context/hooks";
 export * from "./theme";
 export { default as Theme } from "./theme";
 export * from "./breakpoints";

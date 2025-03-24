@@ -662,7 +662,7 @@ export default class Breakpoints {
      * @see Platform.isTouchDevice
      */
     public static updateDeviceClassName(): string | boolean {
-        if (typeof document !== 'undefined' && document && isDOMElement(document.body)) {
+        if (typeof document !== 'undefined' && document && isDOMElement(document.body) && typeof window !== "undefined" && window) {
             let b = document.body;
             let deviceKey = "data-device-name";
             let c = b.getAttribute(deviceKey);

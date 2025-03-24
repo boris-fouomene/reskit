@@ -1,3 +1,4 @@
+"use client";
 import { uniqid, isObj } from "@resk/core/utils";
 import Platform from "@resk/core/platform";
 import { TIPPY_THEME } from "./utils";
@@ -44,6 +45,7 @@ const themeDomId = uniqid("web-theme-id");
  * - Merges any custom CSS passed in the `theme.customCSS` property.
  */
 export default function updateWebTheme(theme: ITheme) {
+    if (typeof window === "undefined" || !window) return null;
     if (!Platform.isWeb() || !isObj(theme)) return null; // Return early if not in a web environment or if theme is invalid
     let style = document.querySelector(`#${themeDomId}`);
     if (!style) {

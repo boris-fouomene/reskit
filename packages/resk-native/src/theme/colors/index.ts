@@ -1,4 +1,4 @@
-import { defaultStr, isNonNullString } from "@resk/core";
+import { defaultStr, isNonNullString } from "@resk/core/utils";
 import Color from "color";
 
 /**

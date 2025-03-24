@@ -1,7 +1,7 @@
 import { IBreakpoints } from "@src/breakpoints/types";
 import { ITheme } from "@theme/types";
 import { IDrawerNavigationViewProps } from "@layouts/DrawerNavigationView";
-import { I18nClass } from "@resk/core";
+import { I18nClass } from "@resk/core/i18n";
 import { IUseI18nOptions } from "@src/types";
 import { IAuthProviderProps } from "@auth/types";
 

@@ -1,4 +1,4 @@
-import { SessionStorage } from "@resk/core";
+import { SessionStorage } from "@resk/core/session";
 import Storage from 'expo-sqlite/kv-store';
 
 @SessionStorage()

@@ -4,7 +4,7 @@ import { IWithHOCOptions, withHOC } from "./withHOC";
 import AppBarLayout from "@layouts/AppBarLayout";
 import { IReskNativeContextCallback } from "@src/context/types";
 import { useReskNative } from "@src/context/hooks";
-import { defaultStr } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 
 
 

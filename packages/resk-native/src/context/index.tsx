@@ -5,7 +5,8 @@ import { ITheme } from '@theme/types';
 import { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
 import { StyleSheet } from "react-native";
 import useStateCallback from '@utils/stateCallback';
-import { extendObj, isNumber, isObj, Platform } from '@resk/core';
+import { extendObj, isNumber, isObj } from '@resk/core/utils';
+import Platform from "@resk/core/platform";
 import { IReskNativeProviderProps } from './types';
 import { ReskNativeContext } from './hooks';
 import { PortalProvider } from "@components/Portal";
@@ -18,6 +19,7 @@ import Default from "@auth/hooks";
 import { Notify } from "@notify/index";
 import { StatusBar } from '@components/StatusBar';
 import { BottomSheet } from '@components/BottomSheet';
+import { ReskNativeEvents } from "./events";
 
 export * from "./types";
 export { useReskNative } from "./hooks";
@@ -114,6 +116,10 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
     const { top, bottom, right, left } = Object.assign({}, safeAreaInsets);
     return [isNumber(top) && { paddingTop: top }, isNumber(bottom) && { paddingBottom: bottom }, isNumber(right) && { paddingRight: right }, isNumber(left) && { paddingLeft: left }];
   }, [safeAreaInsets]);
+  const context = { theme, i18n, safeAreaInsets, updateTheme, ...rest, breakpoints };
+  React.useEffect(() => {
+    ReskNativeEvents.events.trigger("appReady", context);
+  }, []);
   /**
    * Provides the current theme and the `updateTheme` function to all child components
    * through the `ReskNativeContext`.
@@ -121,7 +127,7 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    */
   return (
     <View testID="resk-native-root" style={[styles.root, { backgroundColor: theme.colors.background }, style]}>
-      <ReskNativeContext.Provider value={{ theme, i18n, safeAreaInsets, updateTheme, ...rest, breakpoints }}>
+      <ReskNativeContext.Provider value={context}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
             <Notify.Component

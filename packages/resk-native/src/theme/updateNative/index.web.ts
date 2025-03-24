@@ -1,4 +1,5 @@
-import { uniqid, Platform, isObj } from "@resk/core";
+import { uniqid, isObj } from "@resk/core/utils";
+import Platform from "@resk/core/platform";
 import { TIPPY_THEME } from "./utils";
 import { ITheme } from "@theme/types";
 const themeDomId = uniqid("web-theme-id");

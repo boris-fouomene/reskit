@@ -7,7 +7,7 @@ import { ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { Animated, Dimensions, PanResponder, ScrollViewProps, StyleSheet, View } from "react-native";
 import { useTheme } from "@theme/index";
 import { useBackHandler } from "@components/BackHandler";
-import { isNumber } from "@resk/core";
+import { isNumber } from "@resk/core/utils";
 import Platform from "@platform";
 const defaultHeight = 400;
 import platform from "@platform/index";

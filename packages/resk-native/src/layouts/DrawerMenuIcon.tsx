@@ -4,7 +4,7 @@ import { IDrawerCurrentState, useDrawerCurrentState } from "@components/Drawer";
 import { useMemo } from "react";
 import { Icon, IIconSource, FontIcon, IIconProps, IIconSourceBase } from "@components/Icon";
 import { GestureResponderEvent } from "react-native";
-import { isNonNullString } from "@resk/core";
+import { isNonNullString } from "@resk/core/utils";
 import { useAppBar } from "@components/AppBar";
 
 /**

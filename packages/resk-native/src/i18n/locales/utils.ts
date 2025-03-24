@@ -1,4 +1,4 @@
-import { defaultStr, isNonNullString } from "@resk/core";
+import { defaultStr, isNonNullString } from "@resk/core/utils";
 import { I18nManager } from "react-native";
 import { II18nLocale } from "../types";
 // RTL language codes based on common knowledge

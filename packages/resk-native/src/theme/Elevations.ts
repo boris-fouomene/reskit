@@ -1,5 +1,5 @@
 /***@see : https://github.com/Naeemur/react-native-elevation */
-import { IDict } from "@resk/core"
+import { IDict } from "@resk/core/types"
 import { Platform } from "react-native"
 
 const webDepth: IDict = {

@@ -8,7 +8,7 @@ import { useTheme } from "@theme";
 import { ScrollView } from "react-native";
 import { Divider } from "@components/Divider";
 import { isRTL } from "@utils/index";
-import { defaultStr } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 import { isValidElement } from "@utils";
 import { ReactNode } from "react";
 import DrawerItems from "@components/Drawer/DrawerItems";

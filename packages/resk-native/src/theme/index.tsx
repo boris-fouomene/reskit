@@ -1,9 +1,11 @@
 import { IThemeColorSheme, ITheme, IThemeColorsTokenName, IThemeColorsTokens, IThemeFontsWithVariants } from "./types";
 import Colors from "./colors";
-import { defaultStr, extendObj, IDict, IObservable, isObj, isObservable, observable } from "@resk/core";
+import { defaultStr, extendObj, isObj } from "@resk/core/utils";
+import { IObservable, isObservable, observable } from "@resk/core/observable";
+import { IDict } from "@resk/core/types";
 import { Platform as RNPlatform } from "react-native";
 import { createMaterial3Theme as _createMaterial3Theme } from "./material-colors";
-import { Session } from "@resk/core";
+import Session from "@resk/core/session";
 import Color from "color";
 import updateNative from "./updateNative";
 import styles from "./styles";

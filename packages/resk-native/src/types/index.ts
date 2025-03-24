@@ -1,4 +1,4 @@
-import { IInputFormatterResult } from "@resk/core";
+import { IInputFormatterResult } from "@resk/core/types";
 import { II18nLocale } from "@src/i18n";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent, PressableProps, TouchableWithoutFeedback, TouchableWithoutFeedbackProps } from "react-native";
 /**

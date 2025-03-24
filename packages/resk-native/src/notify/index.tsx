@@ -1,7 +1,9 @@
-import { isNonNullString, defaultStr, IDict, stringify, isObj, i18n } from "@resk/core";
+import { isNonNullString, defaultStr, stringify, isObj } from "@resk/core/utils";
+import i18n from "@resk/core/i18n"
 import getTextContent from "@utils/getTextContent";
 import { INotifyMessage, INotifyType } from "./types";
 import _Notifiy, { INotifyOptions } from "./Notify";
+import { IDict } from "@resk/core/types";
 
 export * from "./types";
 export * from "./Notify";

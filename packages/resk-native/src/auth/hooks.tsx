@@ -9,7 +9,7 @@ import Label from "@components/Label";
 import Theme, { useTheme } from "@theme/index";
 import { StyleSheet } from "react-native";
 import { Portal } from "@components/Portal";
-import { Platform } from "@resk/core";
+import { useIsAppReady } from "@src/context/hooks";
 
 class AuthLogin {
   /**
@@ -219,26 +219,16 @@ export type IWithAuthProps<T extends any = any> = T & {
  */
 export function withAuth<T extends any = any>(Component: React.FC<IWithAuthProps<T>>, options: IWithAuthOptions = {}): React.FC<IWithAuthProps<T>> {
   options = Object.assign({}, options);
-  const { fallback, displayName, serverFallback } = options;
+  const { fallback, displayName } = options;
   const fn: React.FC<IWithAuthProps<T>> = function (props: IWithAuthProps<T>): ReactNode {
+    const isAppReady = useIsAppReady();
     const user = useGetSignedUser();
-    const [isClient, setIsClient] = React.useState(Platform.isClientSide());
-    React.useEffect(() => {
-      if (!isClient) {
-        setIsClient(true);
-      }
-    }, []);
-    if (!isClient) {
-      if (typeof serverFallback === "function") {
-        return serverFallback();
-      }
-      return React.isValidElement(serverFallback) ? serverFallback : null;
-    }
-    if (!user) {
+    if (!user || !isAppReady) {
       if (typeof fallback === "function") {
         return fallback();
       }
-      if (fallback !== undefined && isValidElement(fallback)) return fallback;
+      if (fallback !== undefined && React.isValidElement(fallback)) return fallback;
+      if (!isAppReady) return null;
       return <Login />;
     }
     return <Component {...props} user={user} />;

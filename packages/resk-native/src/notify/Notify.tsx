@@ -15,7 +15,8 @@ import Label from "@components/Label";
 import Queue from "./Queue";
 import { DEFAULT_IMAGE_DIMENSIONS } from "./utils";
 import { IStyle } from "../types";
-import { defaultStr, IDict, stringify } from "@resk/core";
+import { defaultStr, stringify } from "@resk/core/utils";
+import { IDict } from "@resk/core/types";
 import { IDimensions } from "@dimensions/types";
 
 const IS_ANDROID = Platform.isAndroid();

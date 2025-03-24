@@ -120,17 +120,13 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
             prevValue: value,
             isFieldDisabled: false,
         } as IFormFieldState;
-        this.validate({ value: this.state.value, context: this as IFormField<Type> });
+        this.validate({ value: this.state.value, context: this as IFormField<Type> }).catch((e) => { });
     }
     componentDidUpdate(prevProps: IField<Type>): void {
         const wrapperStyle = this.getBreakpointStyle(this.props);
         if (stableHash(wrapperStyle) == stableHash(this.state.wrapperStyle)) return;
         this.setState({ wrapperStyle: this.getBreakpointStyle(this.props) }, () => {
-            if ("defaultValue" in this.props) {
-                this.validate({ value: this.props.defaultValue } as IFormFieldValidatorOptions<Type>, true);
-            } else {
-                this.validate({ value: this.state.value, context: this as IFormField<Type> }, true);
-            }
+            this.validate({ value: "defaultValue" in this.props ? this.props.defaultValue : this.state.value, context: this as IFormField<Type> }, true).catch((e) => { });
         });
     }
     /**
@@ -718,7 +714,11 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      * this.validateOnChange({ value: "new value" }); // Validates the field on change
      */
     validateOnChange(options: IFormFieldValidatorOptions<Type>) {
-        return this.validate(options);
+        return this.validate(options).then((r) => {
+            return r;
+        }).catch((e) => {
+            return e;
+        });
     }
     /**
      * Renders the field component.

@@ -45,10 +45,15 @@ import { IUseI18nOptions } from "@src/types";
  * It also handles locale changes dynamically, ensuring that the application reflects the correct language and regional settings.
  */
 export const useI18n = (i18n?: I18nClass, options?: IUseI18nOptions): I18nClass => {
-    const { locale: i18nLocale, useLocaleFromDevice, languages: customLanguages } = Object.assign({}, options);
+    const { locale: i18nLocale, useLocaleFromDevice, languages: customLanguages, locales } = Object.assign({}, options);
     const instance = useMemo(() => {
         return i18n instanceof I18nClass ? i18n : I18nClass.getInstance();
     }, [i18n, I18nClass.getInstance()]);
+    useMemo(() => {
+        if (Array.isArray(locales) && locales.length) {
+            instance.setLocales(locales);
+        }
+    }, [locales]);
     const instanceLocale = instance.getLocale();
     useEffect(() => {
         if (!useLocaleFromDevice && instanceLocale != i18nLocale && i18nLocale && isNonNullString(i18nLocale)) {

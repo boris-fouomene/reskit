@@ -492,4 +492,9 @@ export interface IUseI18nOptions {
    * An array of supported languages for the i18n instance.
    */
   languages?: II18nLocale[];
+
+  /***
+   * An array of supported locales for the i18n instance.
+   */
+  locales?: string[];
 }

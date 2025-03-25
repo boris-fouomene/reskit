@@ -17,21 +17,10 @@ import isNonNullString from "./isNonNullString";
  * ```
  */
 export const ltrim = function (current: string, str: string = "") {
-  /**
-   * If the current string is empty, return an empty string.
-   */
-  if (!current) return "";
-
-  /**
-   * If the string to remove is not provided, simply trim the current string.
-   */
-  if (!str) {
+  if (!current || typeof current !== "string") return "";
+  if (!(str) || typeof str !== "string") {
     return current.trim();
   }
-
-  /**
-   * Initialize the index to the length of the current string.
-   */
   let index = current.length;
 
   /**
@@ -69,21 +58,10 @@ export const ltrim = function (current: string, str: string = "") {
  * ```
  */
 export const rtrim = function (current: string, str: string = ""): string {
-  /**
-   * If the current string is empty, return an empty string.
-   */
-  if (!current) return "";
-
-  /**
-   * If the string to remove is not provided, simply trim the current string.
-   */
-  if (!(str)) {
+  if (!current || typeof current !== "string") return "";
+  if (!(str) || typeof str !== "string") {
     return current.trim();
   }
-
-  /**
-   * Initialize the index to the length of the current string.
-   */
   let index = current.length;
 
   /**

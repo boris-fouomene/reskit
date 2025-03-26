@@ -341,6 +341,7 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      * Allows for displaying fixed text or values alongside the input, 
      * such as character counts. This can be a function returning a node 
      * or a simple value. If set to `false`, no affix will be displayed.
+     * @default false
      */
     affix?: ((options: ITextInputCallbackOptions) => ReactNode) | false;
 
@@ -372,6 +373,13 @@ export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defa
      * @min 0
      */
     debounceTimeout?: number;
+
+    /***
+     * @description
+     * Specifies whether the error color should be applied to the label when the text input has erroneous values.
+     * @default false
+     */
+    applyErrorColorOnLabel?: boolean;
 
     /***
      * The disabled status of the text input.

@@ -483,7 +483,9 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             this.setHasTriedTobeSubmitted(true);
             this.toggleValidationStatus(false);
             const message = this.getErrorText();
-            Notify.error(message);
+            if (this.componentProps?.displayErrorsWhenSubmitting) {
+                Notify.error(message);
+            }
             const fields = this.getFields();
             for (let i in fields) {
                 const field = fields[i];

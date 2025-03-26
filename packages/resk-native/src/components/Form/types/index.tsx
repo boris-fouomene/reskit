@@ -1469,6 +1469,14 @@ export interface IFormProps extends Omit<IViewProps, "children"> {
      * renderTabType: 'desktop', // Render tabs for desktop view
      */
     renderTabType?: IFormRenderTabProp;
+
+    /***
+     * Specifies whether errors should be displayed when the form is submitting.
+     * When form is submitting, the form check if it's valid, if not, it display the errors in the form 
+     * if this property is set to true
+     * @default false
+     */
+    displayErrorsWhenSubmitting?: boolean;
 };
 
 /**

@@ -1,7 +1,7 @@
-import { Field, FormField } from "../Field";
+import { Field, AttachFormField } from "../Field";
 import { SelectCountry } from "@components/SelectCountry";
 
-@FormField("selectCountry")
+@AttachFormField("selectCountry")
 export class SelectCountryField extends Field<"selectCountry"> {
     isTextField(): boolean {
         return false;

@@ -2,7 +2,7 @@
 import i18n from "../i18n";
 import $session from "../session";
 import { IDict, IResourceActionName, IResourceActionTupleArray, IResourceActionTupleObject, IResourceName } from "../types";
-import { isObj, JsonHelper, isNonNullString } from "../utils";
+import { isObj, JsonHelper, isNonNullString, stringify } from "../utils";
 import { IObservable, observable } from "@/observable";
 import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPerms, IAuthEvent, IAuthRole } from "./types";
 import "./types";
@@ -100,7 +100,7 @@ class Session {
      * const sessionKey = getKey(); // Returns: 'auth--'
      */
     static getKey(sessionName?: string) {
-        return `auth-${Auth.getSignedUser()?.id || ""}-${sessionName || ""}`;
+        return `auth-${stringify(Auth.getSignedUser()?.id)}-${sessionName || ""}`;
     }
     /**
      * Retrieves session data associated with a specific session name.

@@ -1232,10 +1232,10 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
  * @returns {PropertyDecorator & MethodDecorator} - A decorator that registers the field component.
  * 
  * @example
- * // Using the FormField decorator to register a custom text field component
+ * // Using the AttachFormField decorator to register a custom text field component
  * import {Form} from "@resk/native"
 import stableHash from 'stable-hash';
- * @FormField("text")
+ * @AttachFormField("text")
  * class MyForm extends Form.Field {
  *     
  * }
@@ -1245,7 +1245,7 @@ import stableHash from 'stable-hash';
  * @see {@link IField<Type>} for the `IField` type.
  * @see {@link IFormFieldState} for the `IFormFieldState` type.
  */
-export function FormField<Type extends IFieldType = IFieldType>(type: Type) {
+export function AttachFormField<Type extends IFieldType = IFieldType>(type: Type) {
     return (target: typeof Field<Type>) => {
         Field.registerComponent(type, target as typeof Field);
     };

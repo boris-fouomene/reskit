@@ -1,10 +1,11 @@
 import isNonNullString from "@utils/isNonNullString";
-import { IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderDirection } from "../types";
+import { IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from "../types";
 import { extendObj, isObj } from "@utils/object";
 import { getQueryParams } from "@utils/uri";
 import { isStringNumber } from "@utils/string";
 import { defaultArray } from "@utils/defaultArray";
 import { isNumber } from "@utils/isNumber";
+import defaultStr from "@utils/defaultStr";
 
 export class ResourcePaginationHelper {
     /**
@@ -47,52 +48,34 @@ export class ResourcePaginationHelper {
     /**
      * Normalizes the `orderBy` object from the query options.
      * Ensures the order direction is either 'ASC' or 'DESC' and handles multiple fields.
-     *
-     * @param {IResourceQueryOptions} queryOptions - The query options object containing the orderBy property.
-     * @returns {Record<string, IResourceQueryOptionsOrderDirection>} A normalized object suitable for TypeORM's `order` option.
+     * 
+     * @template DataType - The type of the data being queried.
+     * 
+     * @param {IResourceQueryOptionsOrderBy<DataType>} orderBy - The orderBy property from the query options.
+     * @returns  A normalized object suitable for TypeORM's `order` option.
      *
      * @example
      * ```typescript
-     * normalizeOrderBy({ lastName: 'ASC', firstName: 'DESC' });
+     * normalizeOrderBy<User>([{ name: 'asc' }, { age: 'desc' }]);
      * // Output: { lastName: 'ASC', firstName: 'DESC' }
      * 
-     * normalizeOrderBy({ age: 'asc', createdAt: 'DESC' });
+     * normalizeOrderBy<User>([{ age: 'asc'}, { createdAt: 'DESC' }]);
      * // Output: { age: 'ASC', createdAt: 'DESC' }
-     * 
-     * normalizeOrderBy({ name: ['ASC', 'DESC'] });
-     * // Output: { name: 'ASC' } (if you provide multiple directions for the same field)
      * ```
      */
-    static normalizeOrderBy(orderBy?: IResourceQueryOptions<any>["orderBy"]): Record<string, IResourceQueryOptionsOrderDirection> {
-        if (!orderBy) return {}
-        if (isNonNullString(orderBy)) {
-            return { [orderBy]: 'ASC' };
-        }
-        if (Array.isArray(orderBy)) {
-            const r: Record<string, IResourceQueryOptionsOrderDirection> = {};
-            orderBy.map((o) => {
-                if (isObj(o)) {
-                    const [field, dir] = Object.entries(o)[0];
-                    if (!isNonNullString(field)) return;
-                    r[field] = String(dir).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-                }
-            });
-            return r;
-        }
-        if (!isObj(orderBy)) return {};
-        const normalizedOrder: Record<string, IResourceQueryOptionsOrderDirection> = {};
-        for (const [field, direction] of Object.entries(orderBy)) {
-            if (!isNonNullString(field)) continue;
-            let normalizedDirection: IResourceQueryOptionsOrderDirection;
-            // Handle array of directions (if provided)
-            if (Array.isArray(direction)) {
-                normalizedDirection = String(direction[0]).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-            } else {
-                normalizedDirection = String(direction).toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-            }
-            normalizedOrder[field] = normalizedDirection;
-        }
-        return normalizedOrder;
+    static normalizeOrderBy<DataType = any>(orderBy?: IResourceQueryOptionsOrderBy<DataType>): Partial<{
+        [K in keyof DataType]?: IResourceQueryOptionsOrderDirection | IResourceQueryOptionsOrderBy<DataType[K]>;
+    }> {
+        if (!Array.isArray(orderBy)) return {}
+        const r: Record<string, IResourceQueryOptionsOrderDirection> = {};
+        orderBy.map((o) => {
+            if (!isObj(o)) return;
+            const [field, dir] = Object.entries(o)[0];
+            const newDir = defaultStr(dir).toLowerCase().trim();
+            if (!isNonNullString(field) || ["asc", "desc"].includes(newDir)) return;
+            (r as any)[field] = newDir;
+        });
+        return r;
     }
 
     /***
@@ -169,7 +152,7 @@ export class ResourcePaginationHelper {
         }
         const defaultOrderBy = xFilters.orderBy;
         const orderBy = ResourcePaginationHelper.normalizeOrderBy(defaultOrderBy);
-        if (orderBy) {
+        if (orderBy && Object.getSize(orderBy, true) > 0) {
             (result as any).orderBy = orderBy;
         }
         const include = defaultArray<any>(xFilters.include);

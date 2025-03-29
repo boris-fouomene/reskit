@@ -43,7 +43,7 @@ import { defaultStr, isObj, isEmpty } from "@resk/core/utils";
  * // Key field not found
  * const key4 = getReactKey(data, "unknownField"); // Returns ""
  */
-export const getReactKey = <T extends object = {}>(data: T, keyField?: keyof T | keyof T[], concatSeparator: string = "/"): string | number | symbol => {
+export const getReactKey = <T extends object = {}>(data: T, keyField?: keyof T | (keyof T)[], concatSeparator: string = "/"): string => {
     concatSeparator = defaultStr(concatSeparator, "/");
     const rKeys: (keyof T)[] = Array.isArray(keyField) ? keyField : [keyField as keyof T];
     if (isObj(data) && rKeys.length) {

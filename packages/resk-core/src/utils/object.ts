@@ -210,18 +210,13 @@ export function isObj(obj: any): boolean {
  * console.log(nonObjectSize); // Outputs: 0
  */
 export const objectSize = Object.getSize = function (obj: any, breakOnFirstElementFound: boolean = false): number {
-  /**
-   * If the object is null or not an object, return 0.
-   */
   if (!obj || typeof obj !== "object") return 0;
-
   /**
    * If the object is an array, return its length.
    */
   if (Array.isArray(obj)) {
     return obj.length;
   }
-
   /**
    * Ensure breakOnFirstElementFound is a boolean.
    */

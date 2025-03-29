@@ -1,10 +1,10 @@
 
 import { getToggleableDefaultValues, ISwitchProps, IToggleableProps, Switch } from "@components/Switch";
-import { Field, FormField } from "../Field";
+import { Field, AttachFormField } from "../Field";
 import { StyleSheet } from "react-native";
 import { IFieldType, IField } from "@resk/core/types";
 
-@FormField<"switch">("switch")
+@AttachFormField<"switch">("switch")
 export class FormFieldSwitch<Type extends IFieldType = "switch"> extends Field<Type> {
     isTextField(): boolean {
         return false;

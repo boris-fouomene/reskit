@@ -219,8 +219,6 @@ export class RequestParser {
         Object.assign(req, { queryOptions: r });
         return r as IResourceQueryOptions<T>;
     }
-
-
 }
 
 /**

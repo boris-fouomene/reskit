@@ -287,24 +287,118 @@ export type IMongoComparisonOperatorName = keyof IMongoComparisonOperators;
  * const ascending: IResourceQueryOptionsOrderDirection = 'asc';  // Ascending order
  * const descending: IResourceQueryOptionsOrderDirection = 'desc'; // Descending order
  */
-export type IResourceQueryOptionsOrderDirection = 'asc' | 'desc' | 'ASC' | 'DESC';;
+export type IResourceQueryOptionsOrderDirection = 'asc' | 'desc';;
+
+// Base type for a single order by field
+type IResourceQueryOptionsOrderByField<DataType = any> = {
+  [key in keyof DataType]: IResourceQueryOptionsOrderDirection | IResourceQueryOptionsOrderByNestedField<DataType[key]>;
+};
+
+// Type for nested fields
+type IResourceQueryOptionsOrderByNestedField<DataType = any> = Partial<{
+  [key in keyof DataType]: IResourceQueryOptionsOrderDirection | IResourceQueryOptionsOrderByNestedField<DataType[key]>;
+}>;
+
+/**
+ * Represents an object with exactly one field derived from the keys of a given type `T`.
+ *
+ * This utility type ensures that:
+ * - The resulting object has exactly one key-value pair.
+ * - The key is one of the keys of `T`.
+ * - The value corresponds to the type of the selected key in `T`.
+ * - All other keys of `T` are explicitly disallowed by setting their types to `never`.
+ *
+ * @template T - The base type from which the single-field object is derived.
+ *              Must be an object type with defined keys.
+ *
+ * @example
+ * ```typescript
+ * type ExampleType = { a: number; b: string; c: boolean };
+ *
+ * // Valid usage
+ * const obj1: ISingleFieldOf<ExampleType> = { a: 42 }; // Single field 'a' with a number value
+ * const obj2: ISingleFieldOf<ExampleType> = { b: "hello" }; // Single field 'b' with a string value
+ * const obj3: ISingleFieldOf<ExampleType> = { c: true }; // Single field 'c' with a boolean value
+ *
+ * // Invalid usage
+ * const invalidObj1: ISingleFieldOf<ExampleType> = { a: 42, b: "hello" }; // Error: More than one field
+ * const invalidObj2: ISingleFieldOf<ExampleType> = {}; // Error: No fields
+ * ```
+ *
+ * @remarks
+ * This type is particularly useful when you need to enforce strict constraints on object structures,
+ * such as in APIs or configuration objects where only one property can be specified at a time.
+ *
+ * It uses a mapped type combined with conditional logic to ensure that only one key is allowed.
+ * Other keys are explicitly set to `never`, making them invalid if included in the object.
+ */
+export type ISingleFieldOf<T> = {
+  /**
+   * Iterates over each key `K` of `T` and constructs a union of objects with exactly one key-value pair.
+   *
+   * @template K - A key of `T`.
+   * @template P - The current key being processed (same as `K`).
+   *
+   * @description
+   * For each key `K` of `T`:
+   * - `{ [P in K]: T[K] }` ensures that the object has a single key `K` with the corresponding value type from `T`.
+   * - `{ [P in Exclude<keyof T, K>]?: never }` ensures that all other keys of `T` are disallowed by setting their types to `never`.
+   *
+   * @example
+   * ```typescript
+   * type ExampleType = { a: number; b: string; c: boolean };
+   *
+   * // For key 'a':
+   * type FieldA = { a: number } & { b?: never; c?: never };
+   * const validA: FieldA = { a: 42 }; // Valid
+   * const invalidA: FieldA = { a: 42, b: "extra" }; // Error: 'b' is not allowed
+   *
+   * // For key 'b':
+   * type FieldB = { b: string } & { a?: never; c?: never };
+   * const validB: FieldB = { b: "hello" }; // Valid
+   * const invalidB: FieldB = { b: "hello", c: true }; // Error: 'c' is not allowed
+   * ```
+   */
+  [K in keyof T]: { [P in K]: T[K] } & { [P in Exclude<keyof T, K>]?: never };
+}[keyof T];
+
 
 /**
  * @interface IResourceQueryOptionsOrderBy
- * Type representing the sorting criteria for filtering operations.
+ * Represents the sorting options for a resource query.
  * 
- * This type can be a string representing a single field to sort by, an object
- * where each key is a field name and the value is the sort direction, or an array
- * of such objects for multiple sorting criteria.
+ * The `IResourceQueryOptionsOrderBy` type allows specifying sorting criteria for a resource query.
+ * It supports sorting by individual fields or nested fields within an object.
+ * 
+ * @template DataType - The type of the data being queried.
  * 
  * @example
- * // Valid examples of IResourceQueryOptionsOrderBy
- * const singleFieldSort: IResourceQueryOptionsOrderBy = 'name'; // Sort by the 'name' field
- * const objectSort: IResourceQueryOptionsOrderBy = { age: 'asc', name: 'desc' }; // Sort by 'age' ascending and 'name' descending
- * const arraySort: IResourceQueryOptionsOrderBy = [{ age: 'asc' }, { name: 'desc' }]; // Sort by 'age' ascending and 'name' descending using an array
+ * ```typescript
+ * interface User {
+ *   name: string;
+ *   age: number;
+ *   address: {
+ *     city: string;
+ *     country: string;
+ *   };
+ * }
+ * 
+ * const orderBy: IResourceQueryOptionsOrderBy<User> = [
+ *   { name: "asc" }, // Sort by name in ascending order
+ *   { age: "desc" }, // Sort by age in descending order
+ *   { address: { city: "asc", country: "desc" } } // Nested sorting
+ * ];
+ * ```
+ * 
+ * @remarks
+ * - Sorting direction can be `"asc"` (ascending) or `"desc"` (descending).
+ * - Nested sorting is supported by specifying sorting directions for nested fields.
+ * 
+ * @see {@link IResourceQueryOptionsOrderDirection} for sorting direction options.
  */
-export type IResourceQueryOptionsOrderBy<DataType = any> = string | { [field in keyof DataType]: IResourceQueryOptionsOrderDirection } | Array<{ [field in keyof DataType]: IResourceQueryOptionsOrderDirection }>;
-
+export type IResourceQueryOptionsOrderBy<DataType = any> = Array<
+  ISingleFieldOf<IResourceQueryOptionsOrderByField<DataType>>
+>;
 
 /**
  * A collection of MongoDB operators categorized into logical, comparison, and array operators.

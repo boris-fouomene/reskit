@@ -36,3 +36,4 @@ export * from "./BottomSheet";
 export * from "./Badge";
 export * from "./Grid";
 export * from "./StatusBar";
+export * from "./Datagrid";

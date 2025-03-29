@@ -1272,27 +1272,7 @@ export interface IResourcePaginatedResult<DataType extends IResourceData = any> 
     errors?: string | Error[]; // Optional errors for the operation
 
     /** Pagination metadata. */
-    meta?: {
-        /** The total number of items available. */
-        total: number;
-        /** The current page number. */
-        currentPage?: number;
-        /** The number of items per page. */
-        pageSize?: number;
-        /** The total number of pages. */
-        totalPages?: number;
-        nextPage?: number;
-        previousPage?: number;
-        lastPage?: number;
-        /***
-         * Whether there is a next page.
-         */
-        hasNextPage?: boolean;
-        /***
-         * Whether there is a previous page.
-         */
-        hasPreviousPage?: boolean;
-    };
+    meta?: IResourcePaginationMetaData;
 
     /** Links for navigation in paginated results. */
     links?: {
@@ -1305,4 +1285,44 @@ export interface IResourcePaginatedResult<DataType extends IResourceData = any> 
         /** URL or index to the last page. */
         last?: string | number;
     };
+}
+
+/**
+ * @typedef IResourcePaginationMetaData
+ * Represents the pagination metadata for a resource.
+ * 
+ * This type defines the structure of the pagination metadata returned by a resource query operation.
+ * It includes information about the total number of items, the current page, the page size, and other
+ * pagination-related properties.
+ * 
+ * @property {number} total - The total number of items available.
+ * @property {number} [currentPage] - The current page number.
+ * @property {number} [pageSize] - The number of items per page.
+ * @property {number} [totalPages] - The total number of pages.
+ * @property {number} [nextPage] - The next page number.
+ * @property {number} [previousPage] - The previous page number.
+ * @property {number} [lastPage] - The last page number.
+ * @property {boolean} [hasNextPage] - Whether there is a next page.
+ * @property {boolean} [hasPreviousPage] - Whether there is a previous page.
+ */
+export interface IResourcePaginationMetaData {
+    /** The total number of items available. */
+    total: number;
+    /** The current page number. */
+    currentPage?: number;
+    /** The number of items per page. */
+    pageSize?: number;
+    /** The total number of pages. */
+    totalPages?: number;
+    nextPage?: number;
+    previousPage?: number;
+    lastPage?: number;
+    /***
+     * Whether there is a next page.
+     */
+    hasNextPage?: boolean;
+    /***
+     * Whether there is a previous page.
+     */
+    hasPreviousPage?: boolean;
 }

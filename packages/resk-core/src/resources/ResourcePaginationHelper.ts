@@ -1,5 +1,5 @@
 import isNonNullString from "@utils/isNonNullString";
-import { IResourceData, IResourcePaginatedResult, IResourceQueryOptions, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from "../types";
+import { IResourceData, IResourcePaginatedResult, IResourcePaginationMetaData, IResourceQueryOptions, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from "../types";
 import { extendObj, isObj } from "@utils/object";
 import { getQueryParams } from "@utils/uri";
 import { isStringNumber } from "@utils/string";
@@ -96,17 +96,10 @@ export class ResourcePaginationHelper {
         }
         return isNumber(queryOptions.limit);
     }
-
-    /***
-     * Paginates the result based on the provided options.
-     * @param {DataType[]} data - The data to paginate.
-     * @param {number} count - The total count of the data.
-     * @param {IResourceQueryOptions} options - The pagination options.
-     * @returns {IResourcePaginatedResult<DataType>} The paginated result.
-     */
-    static paginate<DataType extends IResourceData = any>(data: DataType[], count: number, options?: IResourceQueryOptions) {
-        const { limit, page, skip } = ResourcePaginationHelper.normalizePagination(options);
-        const meta: IResourcePaginatedResult<DataType>["meta"] = {
+    static getPaginationMetaData(count: number, queryOptions?: IResourceQueryOptions): IResourcePaginationMetaData {
+        const { limit, page, skip } = ResourcePaginationHelper.normalizePagination(queryOptions);
+        count = isNumber(count) ? count : 0;
+        const meta: IResourcePaginationMetaData = {
             total: count,
         }
         if (typeof limit === "number" && limit > 0 && typeof page === "number" && page >= 0) {
@@ -119,10 +112,27 @@ export class ResourcePaginationHelper {
             meta.previousPage = meta.hasPreviousPage ? meta.currentPage - 1 : undefined;
             meta.lastPage = meta.totalPages;
         }
+        return meta;
+    }
+    /***
+     * Paginates the result based on the provided options.
+     * @param {DataType[]} data - The data to paginate.
+     * @param {number} count - The total count of the data.
+     * @param {IResourceQueryOptions} options - The pagination options.
+     * @returns {IResourcePaginatedResult<DataType>} The paginated result.
+     */
+    static paginate<DataType extends IResourceData = any>(data: DataType[], count: number, options?: IResourceQueryOptions) {
+        const meta = ResourcePaginationHelper.getPaginationMetaData(count, options);
+        const { currentPage, pageSize, totalPages } = meta;
+        if (Array.isArray(data) && isNumber(currentPage) && isNumber(pageSize) && isNumber(totalPages)) {
+            const startIndex = Math.max(0, currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            data = data.slice(startIndex, endIndex);
+        }
         return {
             data,
             total: count,
-            meta,
+            meta
         }
     }
     /**

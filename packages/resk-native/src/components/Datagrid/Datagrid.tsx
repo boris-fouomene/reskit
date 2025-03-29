@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 import {
     View,
     Text,
@@ -8,30 +8,19 @@ import {
     ScrollView,
     ViewProps
 } from 'react-native';
-import {
-    IDatagridPivotConfig,
-    IDatagridDataType,
-    IDatagridColumnProps,
-    IDatagridEvent,
-    IDatagridDisplayViewName,
-    IDatagridOrderBy,
-    IDatagridStateColumn,
-    IDatagridAggregationFunctions,
-    IDatagridAggregationFunction,
-    IDatagridStateData,
-    IDatagridGroupedRow
-} from './types';
 import { Component, ObservableComponent, getReactKey, getTextContent } from '@utils/index';
-import { defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify } from '@resk/core/utils';
+import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
-import { IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from '@resk/core/types';
+import { IField, IFieldType, IMergeWithoutDuplicates, IResourcePaginationMetaData, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
 import Label from '@components/Label';
+import InputFormatter from '@resk/core/inputFormatter';
+import { ResourcePaginationHelper } from '@resk/core/resources';
 
 const defaultNumber = (a: any) => isNumber(a) ? a : 0;
 
 
-export class Datagrid<DataType extends IDatagridDataType = any> extends ObservableComponent<IDatagridProps<DataType>, IDatagridState<DataType>, IDatagridEvent> {
+class Datagrid<DataType extends IDatagridDataType = any> extends ObservableComponent<IDatagridProps<DataType>, IDatagridState<DataType>, IDatagridEvent> {
     private static reflectMetadataKey = Symbol('datagrid-reflect-metadata-key');
     private static aggregationFunctionMetadataKey = Symbol("datagrid-aggregation-functions-meta");
     static maxAggregationFunction: IDatagridAggregationFunction = function (acc, currentValue, currentIndex, data) {
@@ -199,22 +188,23 @@ export class Datagrid<DataType extends IDatagridDataType = any> extends Observab
         return this.props.aggregatable !== false;
     }
     isGroupable(): boolean {
-        return this.props.groupable !== false && Array.isArray(this.state.groupableColumns) && this.state.groupableColumns.length > 0;
+        return this.props.groupable !== false;
     }
 
-    protected computeColumnValue(column: IDatagridStateColumn | string, rowData: DataType): any {
+    computeColumnValue(column: IDatagridStateColumn | string, rowData: DataType, format?: boolean): any {
         const col: IDatagridStateColumn = typeof column === "string" && column ? this.getColumn(column) : column as any;
         if (!isObj(rowData) || !isObj(col) || !isNonNullString(col.name)) return undefined;
-        if (typeof col.computeValue === "function") {
-            return col.computeValue({ rowData });
+        const value = typeof col.computeValue === "function" ? col.computeValue({ rowData }) : (rowData as any)[col.name];
+        if (format && !isEmpty(value)) {
+            return InputFormatter.formatValue({ ...col, value }).formattedValue;
         }
-        return (rowData as any)[col.name];
+        return value;
     }
     getCallOptions<T = any>(otherOptions: T): IDatagridCallOptions<DataType> & T {
         return Object.assign({}, { datagridContext: this }, otherOptions);
     }
-    getRowKey(rowData: DataType, rowIndex: number): string {
-        let k: any = rowIndex;
+    getRowKey(rowData: DataType): string {
+        let k: any = undefined;
         if (typeof (this.props.getRowKey) === "function") {
             k = this.props.getRowKey(this.getCallOptions({ rowData }));
             if (typeof k == 'string' && k || typeof k == 'number') {
@@ -222,13 +212,10 @@ export class Datagrid<DataType extends IDatagridDataType = any> extends Observab
             }
         }
         const rKey = getReactKey<DataType>(rowData, this.props.rowKey);
-        return defaultStr(!isEmpty(rKey) ? String(rKey) : undefined, "datagrid-row-key-" + rowIndex);
+        return defaultStr(!isEmpty(rKey) ? String(rKey) : undefined, undefined);
     }
     isGroupedRow(rowData: IDatagridGroupedRow<DataType> | DataType): rowData is IDatagridGroupedRow {
-        return isObj(rowData) && !!rowData.isDatagridGroup && Array.isArray(rowData.data);
-    }
-    isSimpleRow(rowData: IDatagridGroupedRow<DataType> | DataType): rowData is DataType {
-        return isObj(rowData) && !this.isGroupedRow(rowData);
+        return isObj(rowData) && !!rowData.isDatagridGroup && isNonNullString(rowData.label);
     }
     internalSort(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>): DataType[] {
         if (!Array.isArray(data)) return [];
@@ -258,41 +245,49 @@ export class Datagrid<DataType extends IDatagridDataType = any> extends Observab
         if (!isNonNullString(rowKey)) return null;
         return this.state.rowsByKeys[rowKey] || null;
     }
-    getRowGroupHeaderSeparator(): string {
-        return defaultStr(this.props.rowGroupHeaderSeparator, ",");
+    getGroupedRowHeaderSeparator(): string {
+        return defaultStr(this.props.groupedRowHeaderSeparator, ",");
     }
-    getGroupedColumns() {
-
-    }
-    getRowGroupHeader(rowData: DataType, groupedColumns?: string[]): string {
+    getGroupedRowHeader(rowData: DataType, groupedColumns?: string[]): string {
         const d: string[] = [];
-        const groupHeaderSeparator = this.getRowGroupHeaderSeparator();
+        const groupHeaderSeparator = this.getGroupedRowHeaderSeparator();
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
-        const includeColumnLabelInRowGroupHeader = this.props.includeColumnLabelInRowGroupHeader !== false;
+        const includeColumnLabelInGroupedRowHeader = this.props.includeColumnLabelInGroupedRowHeader !== false;
         groupedColumns.map((columnName) => {
             if (!isNonNullString(columnName)) return;
             const column = this.getColumn(columnName);
             if (!column) return;
-            const txt = this.computeColumnValue(column, rowData);
+            const txt = this.computeColumnValue(column, rowData, true);
             if (isEmpty(txt)) return;
             const labelText = getTextContent(column.label);
             const stringifiedTxt = stringify(txt);
             if (!stringifiedTxt) return;
-            if (labelText && includeColumnLabelInRowGroupHeader) {
+            if (labelText && includeColumnLabelInGroupedRowHeader) {
                 d.push(`${labelText} : ${stringifiedTxt}`)
             } else {
                 d.push(stringifiedTxt)
             }
         });
-        return d.join(groupHeaderSeparator) || "";
+        return d.join(groupHeaderSeparator).toUpperCase() || "";
+    }
+    getGroupedRows(groupedRowKey: string): DataType[] {
+        if (!isNonNullString(groupedRowKey)) return [];
+        const r = this.state.groupedRowsByKeys[groupedRowKey];
+        return Array.isArray(r) ? r : [];
+    }
+    canPaginate(): boolean {
+        return !!this.props.paginationEnabled;
     }
     // Process data with sorting and other transformations
-    protected processData(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>, groupedColumns?: string[]): Partial<IDatagridState<DataType>> {
+    protected processData(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination): Partial<IDatagridState<DataType>> {
         let processingData: DataType[] = [];
-        const { columns, groupableColumns, aggregatableColumns } = this.state;
+        const paginationConfig: IDatagridPagination = isObj(pagination) ? pagination as IDatagridPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridPagination;
+        const { columns, aggregatableColumns } = this.state;
+        const canPaginate = this.canPaginate();
+        groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const groupedRowsByKeys: IDatagridState<DataType>["groupedRowsByKeys"] = {} as IDatagridState<DataType>["groupedRowsByKeys"];
         const rowsByKeys: IDatagridState<DataType>["rowsByKeys"] = {} as IDatagridState<DataType>["rowsByKeys"];
-        const isGroupable = this.isGroupable();
+        const isGroupable = this.isGroupable() && groupedColumns?.length;
         const aggregationFunctions = Datagrid.getRegisteredAggregationFunctions();
         const aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>> = {};
         aggregatableColumns.map((column) => {
@@ -305,7 +300,7 @@ export class Datagrid<DataType extends IDatagridDataType = any> extends Observab
             if (!isObj(rowData) || (typeof this.props.internalFilter == "function" && !this.props.internalFilter(rowData, index))) return;
             rowData = typeof this.props.rowDataMutator == "function" ? this.props.rowDataMutator(this.getCallOptions({ rowData })) : rowData;
             if (!isObj(rowData)) return;
-            const rowKey = this.getRowKey(rowData, index);
+            const rowKey = this.getRowKey(rowData);
             if (!isNonNullString(rowKey)) {
                 Logger.log("Invalid datagrid rowKey : rowKey is not a string", rowKey, " at index ", index, " datagrid session name : ", this.getSesionName());
                 return;
@@ -329,25 +324,39 @@ export class Datagrid<DataType extends IDatagridDataType = any> extends Observab
                 }
             });
         });
+        paginationConfig.total = processingData.length;
+        paginationConfig.currentPage = isNumber(paginationConfig.currentPage) && paginationConfig.currentPage > 0 ? paginationConfig.currentPage : 1;
+        paginationConfig.pageSize = isNumber(paginationConfig.pageSize) && paginationConfig.pageSize > 0 ? paginationConfig.pageSize : 10;
         processingData = this.internalSort(processingData, orderBy);
+        let paginatedData = processingData;
+        if (canPaginate) {
+            const { data: rData, meta } = ResourcePaginationHelper.paginate(processingData, paginationConfig.total, {
+                ...paginationConfig,
+                limit: paginationConfig.pageSize,
+                page: paginationConfig.currentPage
+            });
+            Object.assign(paginationConfig, meta);
+            paginatedData = rData;
+        }
         const stateData: IDatagridStateData<DataType> = isGroupable ? [] : processingData;
         const unknowGroupLabel = "N/A";
         if (isGroupable) {
-            processingData.map((rowData, rowIndex) => {
-                const groupableKey = defaultStr(this.getRowGroupHeader(rowData, groupedColumns), unknowGroupLabel);
-                if (!groupedRowsByKeys[groupableKey]) {
-                    (groupedRowsByKeys as any)[groupableKey] = {
-                        label: groupableKey,
-                        data: [rowData],
-                        isDatagridGroup: true,
-                    } as IDatagridGroupedRow;
-                    stateData.push(groupedRowsByKeys[groupableKey])
-                } else {
-                    groupedRowsByKeys[groupableKey].data.push(rowData);
+            paginatedData.map((rowData, rowIndex) => {
+                const groupableKey = defaultStr(this.getGroupedRowHeader(rowData, groupedColumns), unknowGroupLabel);
+                const groupedRowHeader = {
+                    label: groupableKey,
+                    isDatagridGroup: true,
+                    groupedKey: groupableKey,
+                } as IDatagridGroupedRow;
+                if (!Array.isArray(groupedRowsByKeys[groupableKey])) {
+                    groupedRowsByKeys[groupableKey] = [];
                 }
+                groupedRowsByKeys[groupableKey].push(rowData);
+                stateData.push(groupedRowHeader);
+                stateData.push(rowData);
             });
         }
-        return { aggregatedColumnsValues, data: stateData, groupedRowsByKeys, rowsByKeys };
+        return { aggregatedColumnsValues, paginatedData, allData: processingData, data: stateData, pagination: paginationConfig, groupedRowsByKeys, rowsByKeys };
     }
     static areArraysEqual(a?: any[], b?: any[]) {
         if (!Array.isArray(a)) {
@@ -376,9 +385,11 @@ export class Datagrid<DataType extends IDatagridDataType = any> extends Observab
         const orderBy = hasOrderByChanged ? this.props.orderBy : this.state.orderBy;
         const groupedColumns = Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const hasGroupedColumnsChanged = !Datagrid.areArraysEqual(prevProps.groupedColumns, this.props.groupedColumns) && Array.isArray(this.props.groupedColumns);
+        const hasPaginationChanged = defaultBool(prevProps.paginationEnabled) !== defaultBool(this.props.paginationEnabled) || !areEquals(prevProps.pagination, this.props.pagination);
+        const pagination: IDatagridPagination = isObj(this.props.pagination) ? this.props.pagination as any : this.state.pagination;
         // Check if data has changed
-        if (hasUpdated || hasGroupedColumnsChanged || hasOrderByChanged || !Datagrid.areArraysEqual(prevProps.data, this.props.data)) {
-            Object.assign(newState, this.processData(this.props.data, orderBy, groupedColumns));
+        if (hasUpdated || hasPaginationChanged || hasGroupedColumnsChanged || hasOrderByChanged || !Datagrid.areArraysEqual(prevProps.data, this.props.data)) {
+            Object.assign(newState, this.processData(this.props.data, orderBy, groupedColumns, pagination));
             hasUpdated = true;
         }
         if (hasUpdated) {
@@ -470,7 +481,8 @@ export class Datagrid<DataType extends IDatagridDataType = any> extends Observab
         return multiplicater * (a < b ? -1 : +(a > b));
     };
     static getRegisteredDisplayView(displayView: IDatagridDisplayViewName): typeof DatagridDisplayView {
-        return Datagrid.getRegisteredDisplayViews()[displayView];
+        if (!isNonNullString(displayView)) return DatagridDisplayView;
+        return Datagrid.getRegisteredDisplayViews()[displayView] || DatagridDisplayView;
     }
     static isValidAggregationFunction(aggregationFunction: IDatagridAggregationFunction<any>) {
         return typeof aggregationFunction === "function";
@@ -482,9 +494,25 @@ export class Datagrid<DataType extends IDatagridDataType = any> extends Observab
         (aggregationsFunctions as any)[aggregationFunctionName] = aggregationFunction;
         Reflect.defineMetadata(Datagrid.aggregationFunctionMetadataKey, aggregationsFunctions, Datagrid);
     }
-    private static getRegisteredAggregationFunctions(): IDatagridAggregationFunctions {
+    static getRegisteredAggregationFunctions(): IDatagridAggregationFunctions {
         const aggregationsFunctions = Reflect.getMetadata(Datagrid.aggregationFunctionMetadataKey, Datagrid);
         return isObj(aggregationsFunctions) ? aggregationsFunctions : {} as any;
+    }
+
+    static registredColumnsReflectMetadataKey = Symbol("datagrid-registred-columns-reflect-metadata-key");
+    static registerColumn(type: IFieldType, component: typeof DatagridColumn) {
+        if (!isNonNullString(type) || typeof (component) !== "function") return;
+        const components = Datagrid.getRegisteredColumns();
+        components[type] = component;
+        Reflect.defineMetadata(Datagrid.registredColumnsReflectMetadataKey, components, Datagrid);
+    }
+    static getRegisteredColumns(): Record<IFieldType, typeof DatagridColumn> {
+        const components = Reflect.getMetadata(Datagrid.registredColumnsReflectMetadataKey, Datagrid);
+        return isObj(components) ? components : {} as any;
+    }
+    static getRegisteredColumn(type: IFieldType): typeof DatagridColumn {
+        const components = Datagrid.getRegisteredColumns();
+        return isNonNullString(type) ? components[type] : DatagridColumn || DatagridColumn;
     }
 }
 
@@ -496,8 +524,6 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
     const Component = useMemo<typeof DatagridDisplayView<DataType>>(() => {
         return Datagrid.getRegisteredDisplayView(displayView);
     }, [displayView]);
-    const displayViews = context.getDisplayViews();
-    const { data } = context.state;
     return (
         <DatagridContext.Provider value={context}>
             <View testID={testID} style={[styles.main, props.style]}>
@@ -513,6 +539,39 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
     );
 }
 
+
+class DatagridColumn<DataType extends IDatagridDataType = any, PropsType = unknown, StateType = unknown> extends Component<IMergeWithoutDuplicates<IDatagridStateColumn<DataType> & { datagridContext: Datagrid<DataType> }, PropsType>, StateType> {
+    render(): React.ReactNode {
+        return <></>;
+    }
+}
+function Column<DataType extends IDatagridDataType = any>({ rowData, columnName }: { columnName: string; rowData: IDatagridGroupedRow | DataType }) {
+    const datagridContext = useContext(DatagridContext);
+    const column = datagridContext?.getColumn(columnName);
+    const columnType = useMemo<IFieldType>(() => {
+        return column?.type || "text";
+    }, [column?.type]);
+    const Component = useMemo<any>(() => {
+        return Datagrid.getRegisteredColumn(columnType);
+    }, [columnType]);
+    if (!datagridContext || !column) return null;
+    const testId = datagridContext?.getTestID();
+    const rowKey = datagridContext?.getRowKey(rowData);
+    return <Component
+        datagridContext={datagridContext}
+        testID={`${testId}-column-${name}`}
+        key={`${testId}-cell-${name}-${rowKey}`}
+    />;
+}
+Column.displayName = "Datagrid.RenderedColumn";
+
+
+export function AttachDatagridColumn(type: IFieldType) {
+    return (target: typeof DatagridColumn) => {
+        Datagrid.registerColumn(type, target as typeof DatagridColumn);
+    };
+}
+
 export function AttachDatagridDisplayView(displayView: IDatagridDisplayViewName) {
     return (target: typeof DatagridDisplayView) => {
         Datagrid.registerDisplayView(displayView, target as typeof DatagridDisplayView);
@@ -520,9 +579,42 @@ export function AttachDatagridDisplayView(displayView: IDatagridDisplayViewName)
 }
 
 
-class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType extends object = any, StateType extends object = any, EventType extends string = any> extends ObservableComponent<PropType, StateType, EventType> {
-    render() {
+class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {}, StateType extends object = any, EventType extends string = any> extends ObservableComponent<PropType & { datagridContext: Datagrid<DataType> }, StateType, EventType> {
+    getDatagridContext() {
+        return this.props.datagridContext;
+    }
+    getData(): IDatagridStateData<DataType> {
+        const d = this.getDatagridContext().state.data;
+        return Array.isArray(d) ? d : [];
+    }
+    getAllData(): DataType[] {
+        const d = this.getDatagridContext().state.allData;
+        return Array.isArray(d) ? d : [];
+    }
+    getPaginatedData(): DataType[] {
+        const d = this.getDatagridContext().state.paginatedData;
+        return Array.isArray(d) ? d : [];
+    }
+    getColumn(columnName: string) {
+        return this.getDatagridContext().getColumn(columnName);
+    }
+    isGroupedRow(rowData: IDatagridGroupedRow<DataType> | DataType): rowData is IDatagridGroupedRow {
+        return !!this.getDatagridContext().isGroupedRow(rowData);
+    }
+    renderGroupedRow(rowData: IDatagridGroupedRow<DataType>) {
         return null;
+    }
+    renderColumn(columnName: string, rowData: IDatagridGroupedRow | DataType) {
+        if (!isObj(rowData) || !this.getColumn(columnName)) return null;
+        if (this.isGroupedRow(rowData)) {
+            return this.renderGroupedRow(rowData);
+        }
+        return <Column columnName={columnName} rowData={rowData} />;
+    }
+    render() {
+        return <Label>
+            No display view found for datagrid
+        </Label>;
     }
 }
 
@@ -555,18 +647,20 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
     /**
      * A string to be used as a separator between group header and group rows.
      */
-    rowGroupHeaderSeparator?: string;
+    groupedRowHeaderSeparator?: string;
     /***
      * Wheter to prefix each row group header by the label of the current grouped column
      * Default is true.
      */
-    includeColumnLabelInRowGroupHeader?: boolean;
+    includeColumnLabelInGroupedRowHeader?: boolean;
     rowDataMutator?: (options: IDatagridCallOptions<DataType> & { rowData: DataType }) => DataType;
     /***
      * A list of display views to be displayed in the datagrid. if provided, it will override the default display views.
      */
     displayViews?: IDatagridDisplayViewName[],
     sessionName?: string;
+    pagination?: Partial<IDatagridPagination>;
+    paginationEnabled?: boolean;
 }
 
 const DatagridContext = createContext<Datagrid | null>(null);
@@ -575,8 +669,35 @@ export function useDatagrid<DataType extends IDatagridDataType = any>(): (Datagr
     return useContext(DatagridContext) as (Datagrid<DataType>) | null;
 }
 
+
+export type IDatagridStateColumn<DataType extends IDatagridDataType = any> = Omit<IDatagridColumnProps<DataType>, "getAggregationValue" | "aggregationFunction" | "sortable" | "filterable" | "groupable" | "aggregatable" | "visible"> & {
+    sortable: boolean;
+    filterable: boolean;
+    groupable: boolean;
+    aggregatable: boolean;
+    visible: boolean;
+    aggregationFunction: IDatagridAggregationFunction<DataType>;
+    testID?: string;
+}
+
+export type IDatagridColumnProps<DataType extends IDatagridDataType = any> = Omit<IField, "name"> & {
+    sortable?: boolean;
+    name: string;
+    filterable?: boolean;
+    groupable?: boolean;
+    pivotable?: boolean;
+    aggregatable?: boolean;
+    width?: number | `${number}%`;
+    minWidth?: number;
+    visible?: boolean;
+    computeValue?: (options: { rowData: DataType }) => any;
+    ignoreCaseWhenSorting?: boolean;
+    aggregationFunction?: keyof IDatagridAggregationFunctions<DataType> | IDatagridAggregationFunction<DataType>;
+}
+
 export interface IDatagridState<DataType extends IDatagridDataType = any> {
     data: IDatagridStateData<DataType>;
+    allData: DataType[];
     rowsByKeys: Record<string, DataType>;
     pivotedData?: any[];
     displayView: IDatagridDisplayViewName;
@@ -586,14 +707,82 @@ export interface IDatagridState<DataType extends IDatagridDataType = any> {
     visibleColumns: IDatagridStateColumn<DataType>[];
     groupableColumns: IDatagridStateColumn<DataType>[];
     groupedColumns: string[];
-    groupedRowsByKeys: Record<string, IDatagridGroupedRow<DataType>>;
+    groupedRowsByKeys: Record<string, DataType[]>;
     orderBy: IDatagridOrderBy<DataType>;
+    pagination: IDatagridPagination;
+    paginatedData: DataType[];
     /***
      * A record where each key is a column name and the value is an object containing the aggregation functions and their values
      */
     aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>;
     displayGroupedColumns: boolean;
 };
+
+export interface IDatagridEventMap {
+    fetchData: string;
+}
+
+export type IDatagridEvent = keyof IDatagridEventMap;
+
+export interface IDatagridDataType extends Record<string, any> { }
+
+export interface IDatagridAggregationAccumulator<DataType extends IDatagridDataType = any> extends Record<keyof IDatagridAggregationFunctions | string, number> {
+
+}
+export type IDatagridAggregationFunction<DataType extends IDatagridDataType = any> = (acc: IDatagridAggregationAccumulator, currentValue: number, currentIndex: number, data: DataType[]) => number;
+//reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number, array: T[]) => U, initialValue: U): U
+
+export interface IDatagridAggregationFunctions<DataType extends IDatagridDataType = any> {
+    "sum": IDatagridAggregationFunction<DataType>;
+    "average": IDatagridAggregationFunction<DataType>;
+    "count": IDatagridAggregationFunction<DataType>;
+    "min": IDatagridAggregationFunction<DataType>;
+    "max": IDatagridAggregationFunction<DataType>;
+}
+
+export type IDatagridAggregator = keyof IDatagridAggregationFunctions;
+
+export interface IDatagridGroupedRow<DataType extends IDatagridDataType = any> {
+    isDatagridGroup: true;
+    label: string;
+    groupedKey: string;
+}
+
+export type IDatagridStateData<DataType extends IDatagridDataType = any> = Array<IDatagridGroupedRow<DataType> | DataType>;
+
+
+// Pivot Configuration
+export interface IDatagridPivotConfig<DataType extends IDatagridDataType = any> {
+    rows: (keyof DataType)[];
+    columns: (keyof DataType)[];
+    values: {
+        field: keyof DataType;
+        aggregationFunction?: IDatagridAggregator;
+    }[];
+}
+export interface IDatagridDisplayViewConfig {
+    name: string;
+    label: string;
+    icon?: string;
+}
+export interface IDatagridDisplayViewMap {
+
+}
+export type IDatagridDisplayViewName = keyof IDatagridDisplayViewMap;
+
+
+export type IDatagridOrderBy<DataType extends IDatagridDataType = any> = IResourceQueryOptionsOrderBy<DataType>;
+
+export interface IDatagridPagination extends IResourcePaginationMetaData {
+    limit: number;
+}
+
+const DatagridExported: typeof Datagrid & {
+    Column: DatagridColumn;
+    DisplayView: DatagridDisplayView;
+} = Datagrid as any;
+
+export { DatagridExported as Datagrid };
 
 const styles = StyleSheet.create({
     main: {

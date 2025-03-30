@@ -411,18 +411,18 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @param {DataType} rowData - The data for the row.
      * @param {boolean} [format=false] - Whether to format the value using the column's formatter.
      * 
-     * @returns {any} - The computed value of the column.
+     * @returns {any} - The computed value of the row cell.
      * 
      * @example
      * ```typescript
-     * const value = datagridInstance.computeColumnValue("name", { name: "John" });
+     * const value = datagridInstance.computeCellValue("name", { name: "John" });
      * console.log(value); // Output: "John"
      * ```
      */
-    computeColumnValue(column: IDatagridStateColumn | string, rowData: DataType, format?: boolean): any {
+    computeCellValue(column: IDatagridStateColumn | string, rowData: DataType, format?: boolean): any {
         const col: IDatagridStateColumn = typeof column === "string" && column ? this.getColumn(column) : column as any;
         if (!isObj(rowData) || !isObj(col) || !isNonNullString(col.name)) return undefined;
-        const v = typeof col.computeValue === "function" ? col.computeValue(this.getCallOptions({ rowData })) : (rowData as any)[col.name];
+        const v = typeof col.computeCellValue === "function" ? col.computeCellValue(this.getCallOptions({ rowData })) : (rowData as any)[col.name];
         const value = typeof v === "object" ? stringify(v) : v;
         if (format && !isEmpty(value)) {
             return InputFormatter.formatValue({ ...col, value }).formattedValue;
@@ -502,7 +502,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                     for (const sortColumn of sortableCols) {
                         const [field, direction] = Object.entries(sortColumn)[0];
                         const column = this.getColumn(field);
-                        return this.compareValues(a, b, column, direction as any, column.ignoreCaseWhenSorting);
+                        return this.compareCellValues(a, b, column, direction as any, column.ignoreCaseWhenSorting);
                     }
                     return 0;
                 });
@@ -550,7 +550,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             if (!isNonNullString(columnName)) return;
             const column = this.getColumn(columnName);
             if (!column) return;
-            const txt = this.computeColumnValue(column, rowData, true);
+            const txt = this.computeCellValue(column, rowData, true);
             if (isEmpty(txt)) return;
             const labelText = getTextContent(column.label);
             const stringifiedTxt = stringify(txt);
@@ -634,7 +634,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                     const colAggregated = (aggregatedColumnsValues as any)[column.name];
                     for (let i in aggregationFunctions) {
                         const fn: IDatagridAggregationFunction = (aggregationFunctions as any)[i];
-                        const value = this.computeColumnValue(column, rowData);
+                        const value = this.computeCellValue(column, rowData);
                         const val2 = isStringNumber(value) ? parseFloat(value) : value;
                         if (isNumber(val2) && typeof fn === "function") {
                             (colAggregated as any)[i] = defaultNumber(fn(colAggregated, val2, index, data));
@@ -916,11 +916,11 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * 
      * @returns {number} A negative, zero, or positive number indicating the result of the comparison.
      */
-    compareValues(rowDataA: DataType, rowDataB: DataType, column: IDatagridStateColumn, sortDirection: IResourceQueryOptionsOrderDirection = "asc", ignoreCase: boolean = true) {
+    compareCellValues(rowDataA: DataType, rowDataB: DataType, column: IDatagridStateColumn, sortDirection: IResourceQueryOptionsOrderDirection = "asc", ignoreCase: boolean = true) {
         const multiplicater = !!(String(sortDirection).toLowerCase().trim() === "desc") ? -1 : 1;
-        let a: any = this.computeColumnValue(column, rowDataA);
+        let a: any = this.computeCellValue(column, rowDataA);
         if (isEmpty(a)) a = "";
-        let b: any = this.computeColumnValue(column, rowDataB);
+        let b: any = this.computeCellValue(column, rowDataB);
         if (isEmpty(b)) b = "";
 
         const isStringCompare = [typeof a, typeof b].includes("string");
@@ -1163,17 +1163,17 @@ class DatagridColumn<DataType extends IDatagridDataType = any, PropExtensions = 
         return this.getDatagridContext().isAggregatable();
     }
     /**
-     * Computes the value of the column.
+     * Computes the value of a row cell based on the provided row data and format.
      * 
      * This method computes the value of the column based on the provided row data and format.
      * 
      * @param rowData The row data to compute the value for.
      * @param format Whether to format the value.
-     * @returns The computed value of the column.
+     * @returns The computed value of the row cell.
      */
-    computeValue(rowData: DataType, format: boolean = false) {
+    computeCellValue(rowData: DataType, format: boolean = false) {
         if (!this.isRowCell()) return null;
-        return this.getDatagridContext().computeColumnValue(this.props.name, rowData, format);
+        return this.getDatagridContext().computeCellValue(this.props.name, rowData, format);
     }
     /**
      * Returns a state column definition by name.
@@ -1289,8 +1289,18 @@ class DatagridColumn<DataType extends IDatagridDataType = any, PropExtensions = 
             const datagridContext = this.getDatagridContext();
             return this.props.renderRowCell(datagridContext.getCallOptions({ column, rowData: rowData }));
         }
-        return <Label {...labelProps} >{this.computeValue(rowData as DataType)}</Label>;
+        return <Label {...labelProps} >{this.computeCellValue(rowData as DataType)}</Label>;
     }
+
+    /**
+     * Checks if the column is a valid column.
+     * 
+     * This method checks if the column is a valid column by checking its name and whether it is an object.
+     * 
+     * @param {IDatagridStateColumn<DataType>} column - The column to check.
+     * 
+     * @returns {column is IDatagridStateColumn<DataType>} True if the column is a valid column, false otherwise.
+     */
     isValidColumn(column: IDatagridStateColumn<DataType>): column is IDatagridStateColumn<DataType> {
         return this.getDatagridContext().isValidColumn(column);
     }
@@ -1999,9 +2009,9 @@ export type IDatagridColumnProps<DataType extends IDatagridDataType = any> = Omi
      * This property is used to calculate the value of the column based on the data in the grid.
      * 
      * @param options An object containing the row data.
-     * @returns The computed value of the column.
+     * @returns The computed value of the row cell.
      */
-    computeValue?: (options: IDatagridCallOptions<DataType> & { rowData: DataType }) => any;
+    computeCellValue?: (options: IDatagridCallOptions<DataType> & { rowData: DataType }) => any;
 
     /**
      * Whether to ignore case when sorting the column.

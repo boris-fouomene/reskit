@@ -40,7 +40,7 @@ export interface ILoginProps extends React.ComponentProps<any> {
  * A Decorator function that attaches a login component to the application.
  * @returns A function that takes a React component class as an argument representing the login component.
  */
-export function AttachLoginComponent() {
+export function AttachLogin() {
   return function (target: React.ComponentClass<ILoginProps>) {
     Reflect.defineMetadata(AuthLogin.metaData, target, AuthLogin);
   };
@@ -267,7 +267,7 @@ const Login: React.FC<{}> = function ({ }) {
     <View testID="resk-auth-login-container" style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {!Component || typeof Component !== "function" ? <View style={[styles.container, Theme.styles.centered, , Theme.styles.h100, Theme.styles.w100]} testID="resk-auth-login-container">
         <View>
-          <Label colorScheme="error" fontSize={20} textBold>You must attach a login component using the `AttachLoginComponent` decorator.</Label>
+          <Label colorScheme="error" fontSize={20} textBold>You must attach a login component using the `AttachLogin` decorator.</Label>
         </View>
       </View> : <Component />}
     </View>

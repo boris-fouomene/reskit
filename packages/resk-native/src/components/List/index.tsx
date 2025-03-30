@@ -79,10 +79,10 @@ export const List = React.forwardRef(function GenericList<ItemType = any>(props:
  *     return super(this.props);
  *   }
  * }
- * AttachListComponent()(MyList);
+ * AttachList()(MyList);
  * ```
  */
-export function AttachListComponent() {
+export function AttachList() {
     return function (target: React.ComponentClass<FlatListProps<any>>) {
         Reflect.defineMetadata(ListManager.metaData, target, ListManager);
     };

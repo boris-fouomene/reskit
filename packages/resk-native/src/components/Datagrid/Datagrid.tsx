@@ -1672,9 +1672,27 @@ class DatagridColumn<DataType extends IDatagridDataType = any, PropExtensions = 
             </View>;
         </View>
     }
+    /**
+     * Retrieves the type of the field for the column.
+     * 
+     * This method returns the type of the field associated with the column, defaulting to "text"
+     * if no specific type is provided. The type is derived from the column's properties and ensures
+     * type safety by casting to `IFieldType`.
+     * 
+     * @returns {IFieldType} The type of the field for the column, defaulting to "text".
+     */
     getType(): IFieldType {
         return defaultStr(this.props.type, "text") as IFieldType;
     }
+
+    /**
+     * Retrieves the sort icon for the column, based on the column's type and sort direction.
+     * 
+     * This method returns the sort icon for the column, based on the column's type and sort direction.
+     * If the column is not sortable, it returns null.
+     * 
+     * @returns {IFontIconName | null} The sort icon for the column.
+     */
     getSortIcon(): IFontIconName | null {
         if (!this.isSortable()) return null;
         const orderBy = this.getDatagridContext()?.state?.orderBy;

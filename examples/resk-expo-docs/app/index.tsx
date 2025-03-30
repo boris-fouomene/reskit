@@ -1,11 +1,24 @@
 import i18n from "@resk/core/i18n";
-import { TextInput, withAppBar, Surface, Grid, BottomSheet, withAppMounted, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
+import { TextInput, withAppBar, Datagrid, Surface, Grid, BottomSheet, withAppMounted, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
 import { View, ScrollView, StyleSheet } from 'react-native'
 
 const index = withAppBar(() => {
     return (
         <ScrollView>
-            <LoginExample />
+            <Datagrid
+                data={[
+                    {
+                        label: "One",
+                    }
+                ]}
+                columns={[
+                    {
+                        name: "label",
+                        type: "text",
+                        label: "Abc"
+                    }
+                ]}
+            />
             <View style={{ margin: 10 }}>
                 <Button mode="contained" onPress={() => console.log("Pressed")}
                     onLongPress={(e) => {

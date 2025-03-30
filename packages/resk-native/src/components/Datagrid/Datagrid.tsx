@@ -4,7 +4,10 @@ import {
     StyleSheet,
     ScrollView,
     ViewProps,
-    Pressable
+    Pressable,
+    Dimensions,
+    LayoutChangeEvent,
+    LayoutRectangle
 } from 'react-native';
 import { Component, ObservableComponent, getReactKey, getTextContent, useForceRender, useIsMounted } from '@utils/index';
 import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber } from '@resk/core/utils';
@@ -18,8 +21,10 @@ import { IReactComponent } from '@src/types';
 import { Preloader } from '@components/Dialog';
 import { AppBar, IAppBarAction, IAppBarProps } from '@components/AppBar';
 import { Divider } from '@components/Divider';
-import { FontIcon, IFontIconName } from '@components/Icon';
+import { FontIcon, IFontIconName, IIconSource } from '@components/Icon';
 import Theme from "@theme";
+import { useDimensions } from '@dimensions/index';
+import i18n from '@resk/core/i18n';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -129,6 +134,51 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         if (this.isGroupedRow(rowData)) return false;
         if (typeof this.props.isRowSelectable === "function") return this.props.isRowSelectable(this.getCallOptions({ rowData }));
         return true;
+    }
+    /**
+     * Handles the layout change event for the container view.
+     * 
+     * This method is called when the container view's layout changes.
+     * It updates the component's state with the new layout dimensions if the change is significant enough.
+     * @param {LayoutChangeEvent} event - The layout change event.
+     * @private
+     */
+    onContainerLayout(event: LayoutChangeEvent) {
+        const { layout } = event.nativeEvent;
+        const { width, height } = this.getContainerLayout();
+        if (Math.abs(layout.width - width) <= 50 && Math.abs(layout.height - height) <= 50) return;
+        this.setState({ containerLayout: layout });
+    }
+
+    /**
+     * Returns the list of visible columns in the Datagrid.
+     * 
+     * This method returns the list of visible columns from the Datagrid's state.
+     * 
+     * @returns {IDatagridStateColumn[]} The list of visible columns.
+     */
+    getVisibleColumns() {
+        return this.state.visibleColumns;
+    }
+    /**
+     * Returns the list of all columns in the Datagrid.
+     * 
+     * This method retrieves the complete list of columns from the Datagrid's state.
+     * 
+     * @returns {IDatagridStateColumn[]} The list of all columns.
+    */
+    getColumns() {
+        return this.state.columns;
+    }
+    /**
+     * Returns the list of columns that can be grouped.
+     * 
+     * This method retrieves the list of groupable columns from the Datagrid's state.
+     * 
+     * @returns {IDatagridStateColumn[]} The list of groupable columns.
+     */
+    getGroupableColumns() {
+        return this.state.groupableColumns;
     }
     /**
      * Toggles the selection state of a row in the Datagrid.
@@ -351,9 +401,31 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         super(props);
         (this as any).state = {
             ...this.initStateFromSessionData(),
-            ...this.processColumns()
+            columnsWidths: {},
+            containerLayout: {
+                x: 0, y: 0, width: 0, height: 0
+            }
         };
+        Object.assign(this.state, this.processColumns());
         Object.assign(this.state, this.processData(this.props.data));
+    }
+    getColumnWidth(colName: string) {
+        const column = this.getColumn(colName);
+        if (!column) return 0;
+        const colWidth = this.state.columnsWidths[colName];
+        if (isNumber(colWidth) && colWidth > 20) return colWidth;
+        if (isNumber(column.width) && column.width > 20) return column.width;
+        if (["date", "time", "datetime", "tel"].includes(column.type)) {
+            return column.type == "datetime" ? 280 : 200;
+        }
+        if (["number", "decimal"].includes(column.type)) {
+            return 170;
+        }
+        return 170;
+    }
+
+    getContainerLayout(): LayoutRectangle {
+        return this.state.containerLayout;
     }
     /**
      * Sorts or unsorts a column based on the specified action.
@@ -426,6 +498,21 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         r.displayView = displayView ? displayView : this.isValidDisplayView(this.props.displayView) ? this.props.displayView : displayViews[0];
         const groupedColumns = Array.isArray(sessionData.groupedColumns) ? sessionData.groupedColumns : Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : [];
         r.groupedColumns = groupedColumns;
+        r.displayFilters = defaultBool(sessionData.displayFilters, this.isFiltrable());
+        r.displayHeaders = defaultBool(sessionData.displayHeaders, true);
+        r.displayAggregatedHeaders = defaultBool(sessionData.displayAggregatedHeaders, this.props.aggregatable !== false);
+        if (this.props.displayHeaders === false) {
+            r.displayHeaders = false;
+        }
+        if (this.props.displayFilters === false) {
+            r.displayFilters = false;
+        }
+        if (this.props.displayAggregatedHeaders === false) {
+            r.displayAggregatedHeaders = false;
+        }
+        this.setSessionData("displayFilters", r.displayFilters);
+        this.setSessionData("displayHeaders", r.displayHeaders);
+        this.setSessionData("displayAggregatedHeaders", r.displayAggregatedHeaders);
         return r;
     }
     /**
@@ -460,7 +547,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * returns the list of display views to be displayed in the datagrid. if provided from props, it will override the default display views.
      */
     getDisplayViews(): IDatagridDisplayViewName[] {
-        return Array.isArray(this.props.displayViews) && this.props.displayViews.length > 0 ? this.props.displayViews : Object.keys(Datagrid.getRegisteredDisplayViews()) as IDatagridDisplayViewName[];
+        return Array.isArray(this.props.displayViews) && this.props.displayViews.length > 0 ? this.props.displayViews : Object.keys(Datagrid.getRegisteredDispayViews2Metadata()) as IDatagridDisplayViewName[];
     }
     /**
      * Processes the columns for the component.
@@ -545,6 +632,63 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      */
     isColumnAggregatable(colName: string) {
         return this.isAggregatable() && this.getColumn(colName).aggregatable;
+    }
+    /**
+     * Toggles the display of filters.
+     * 
+     * This method simply toggles the `displayFilters` state and persists it to the session data.
+     * 
+     * @returns {void}
+     */
+    toggleDisplayFilters() {
+        this.updateState({ displayFilters: !this.state.displayFilters }, () => {
+            this.setSessionData("displayFilters", this.state.displayFilters);
+        });
+    }
+    /**
+     * Toggles the display of aggregated headers.
+     * 
+     * This method simply toggles the `displayAggregatedHeaders` state and persists it to the session data.
+     * 
+     * @returns {void}
+     */
+    toggleDisplayAggregatedHeaders() {
+        this.updateState({ displayFilters: !this.state.displayAggregatedHeaders }, () => {
+            this.setSessionData("displayAggregatedHeaders", this.state.displayAggregatedHeaders);
+        });
+    }
+    /**
+     * Toggles the display of headers.
+     * 
+     * This method simply toggles the `displayHeaders` state and persists it to the session data.
+     * 
+     * @returns {void}
+     */
+    toggleDisplayHeaders() {
+        this.updateState({ displayHeaders: !this.state.displayHeaders }, () => {
+            this.setSessionData("displayHeaders", this.state.displayHeaders);
+        });
+    }
+
+    /**
+     * Determines if headers can be displayed in the datagrid.
+     *
+     * This method checks the current state and props to decide if headers should be shown.
+     *
+     * @returns {boolean} - `true` if headers can be displayed, otherwise `false`.
+     */
+    canDisplayHeaders() {
+        return !!this.state.displayHeaders && this.props.displayHeaders !== false;
+    }
+    /**
+     * Determines if filters can be displayed in the datagrid.
+     *
+     * This method checks the current state and props to decide if filters should be shown.
+     *
+     * @returns {boolean} - `true` if filters can be displayed, otherwise `false`.
+     */
+    canDisplayFilters() {
+        return !!this.state.displayFilters && this.props.displayFilters !== false;
     }
     /**
      * Checks if a column is groupable.
@@ -946,11 +1090,24 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             Object.assign(newState, this.processData(this.props.data, orderBy, groupedColumns, pagination));
             hasUpdated = true;
         }
+        if (prevProps.displayFilters !== this.props.displayFilters && typeof this.props.displayFilters == "boolean") {
+            newState.displayFilters = this.props.displayFilters;
+            hasUpdated = true;
+        }
+        if (prevProps.displayHeaders !== this.props.displayHeaders && typeof this.props.displayHeaders == "boolean") {
+            newState.displayHeaders = this.props.displayHeaders;
+            hasUpdated = true;
+        }
+        if (prevProps.displayAggregatedHeaders !== this.props.displayAggregatedHeaders && typeof this.props.displayAggregatedHeaders === "boolean") {
+            newState.displayAggregatedHeaders = this.props.displayAggregatedHeaders;
+            hasUpdated = true;
+        }
         if (hasUpdated) {
             this.updateState(newState, () => {
                 this.setSessionData("displayView", this.state.displayView);
                 this.setSessionData("orderBy", this.state.orderBy);
                 this.setSessionData("groupedColumns", this.state.groupedColumns);
+                this.setSessionData("displayAggregatedHeaders", this.state.displayAggregatedHeaders);
             });
         } else {
             setTimeout(() => {
@@ -1088,15 +1245,16 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * The method adds the display view to the list of registered display views.
      * If the display view name is not a non-null string or the component is not a valid function, the method does nothing.
      * 
-     * @param {IDatagridDisplayViewName} displayView - The name of the display view to register.
+     * @param {IDatagridDisplayViewMetadata} metadata, the display view meta data
      * @param {typeof DatagridDisplayView} component - The component class to register for the display view.
      * 
      * @returns {void} This function does not return a value.
      */
-    static registerDisplayView(displayView: IDatagridDisplayViewName, component: typeof DatagridDisplayView) {
-        if (!isNonNullString(displayView) || typeof (component) !== "function") return;
-        const components = Datagrid.getRegisteredDisplayViews();
-        (components as any)[displayView] = component;
+    static registerDisplayView(metadata: IDatagridDisplayViewMetadata, component: typeof DatagridDisplayView) {
+        metadata = Object.assign({}, metadata);
+        if (!isNonNullString(metadata.name) || typeof (component) !== "function") return;
+        const components = Datagrid.getRegisteredDispayViews2Metadata();
+        (components as any)[metadata.name] = { ...metadata, Component: component };
         Reflect.defineMetadata(Datagrid.reflectMetadataKey, components, Datagrid);
     }
     /**
@@ -1106,10 +1264,10 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * the list of registered display views. If no display views are 
      * registered, it returns an empty object.
      * 
-     * @returns {Record<IDatagridDisplayViewName, typeof DatagridDisplayView>} 
-     * An object mapping display view names to their corresponding component classes.
+     * @returns {Record<IDatagridDisplayViewName, IDatagridDisplayViewMetadata & {Component:typeof DatagridDisplayView}>} 
+     * An object mapping display view names to their corresponding component classes and metadata.
      */
-    static getRegisteredDisplayViews(): Record<IDatagridDisplayViewName, typeof DatagridDisplayView> {
+    static getRegisteredDispayViews2Metadata(): Record<IDatagridDisplayViewName, IDatagridDisplayViewMetadata & { Component: typeof DatagridDisplayView }> {
         const components = Reflect.getMetadata(Datagrid.reflectMetadataKey, Datagrid);
         return isObj(components) ? components : {} as any;
     }
@@ -1159,8 +1317,21 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {typeof DatagridDisplayView} - The registered display view class, or the default display view class if the display view is not registered or the display view name is invalid.
      */
     static getRegisteredDisplayView(displayView: IDatagridDisplayViewName): typeof DatagridDisplayView {
-        if (!isNonNullString(displayView)) return DatagridDisplayView;
-        return Datagrid.getRegisteredDisplayViews()[displayView] || DatagridDisplayView;
+        const d = Datagrid.getRegisteredDisplayView2Metadata(displayView);
+        return typeof d.Component == "function" ? d.Component : DatagridDisplayView;
+    }
+    /**
+     * Retrieves the registered display view metadata for the given display view name.
+     * 
+     * If the display view name is not a non-null string, the method returns an empty object.
+     * If the display view name is not registered, the method returns an empty object.
+     * 
+     * @param {IDatagridDisplayViewName} displayView - The name of the display view to retrieve.
+     * @returns {IDatagridDisplayViewMetadata & { Component: typeof DatagridDisplayView }} - An object containing the metadata and the component class of the registered display view, or an empty object if the display view is not registered or the display view name is invalid.
+     */
+    static getRegisteredDisplayView2Metadata(displayView: IDatagridDisplayViewName): IDatagridDisplayViewMetadata & { Component: typeof DatagridDisplayView } {
+        if (!isNonNullString(displayView)) return {} as IDatagridDisplayViewMetadata & { Component: typeof DatagridDisplayView };
+        return Object.assign({}, Datagrid.getRegisteredDispayViews2Metadata()[displayView]) as any;
     }
 
     /**
@@ -1378,7 +1549,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             <AppBar testID={`${testID}-actions`}
                 backAction={false}
                 backgroundColor='transparent' {...Object.assign({}, actionsToolbarProps)}
-                title={title || null} actions={actionsToDisplay as any}
+                title={title || i18n.t("components.datagrid.actions")} actions={actionsToDisplay as any}
             />
             <Divider testID={testID + "-actions-divider"} />
         </View>
@@ -1410,23 +1581,53 @@ export type IDatagridColumnRenderType = "header" | "rowCell";
 
 function DatagridRendered<DataType extends IDatagridDataType = any>(options: { context: Datagrid<DataType> }) {
     const { context } = options;
+    const { width: screenWidth, height: screenHeight } = useDimensions();
     const displayView = context.getDisplayView();
     const testID = context.getTestID();
     const props = context.props;
     const Component = useMemo<typeof DatagridDisplayView<DataType>>(() => {
         return Datagrid.getRegisteredDisplayView(displayView);
     }, [displayView]);
+    const { width: containerWidth } = context.getContainerLayout();
+    const visibleColumns = context.getVisibleColumns();
+    // Calculate column widths
+    const visibleColumnsWidths = useMemo(() => {
+        const availableWidth = Math.min(containerWidth, screenWidth);
+        if (availableWidth <= 0) return {} as Record<string, number>;
+        const visibleColumnsWidths: Record<string, number> = {};
+        const remainingColumns: string[] = [];
+        let remainingWidth = availableWidth;
+
+        // First pass: calculate fixed widths
+        visibleColumns.forEach((column) => {
+            if (isNumber(column.width) && column.width) {
+                visibleColumnsWidths[column.name] = column.width;
+                remainingWidth -= column.width;
+            } else {
+                remainingColumns.push(column.name);
+            }
+        });
+
+        // Second pass: calculate flex-based widths
+        if (remainingColumns.length && remainingWidth > 0) {
+            const equalSize = remainingWidth / remainingColumns.length;
+            remainingColumns.forEach((columnName) => {
+                visibleColumnsWidths[columnName] = equalSize;
+            });
+        }
+        return visibleColumnsWidths;
+    }, [visibleColumns, containerWidth, screenWidth]);
     const isLoading = context.isLoading();
     return (
         <DatagridContext.Provider value={context}>
-            <View testID={testID} style={[styles.main, isLoading && styles.disabled, props.style]}>
+            <View testID={testID} style={[styles.main, isLoading && styles.disabled, props.style]} onLayout={context.onContainerLayout.bind(context)}>
                 {context.renderLoadingIndicator()}
                 {<Datagrid.Actions />}
                 {/* View switcher */}
                 <ScrollView testID={testID + "-horizontal-header-scrollview"} horizontal style={styles.viewSwitcher}>
 
                 </ScrollView>
-                {Component ? <Component datagridContext={context} /> : <Label colorScheme="error" fontSize={20} textBold>
+                {Component ? <Component visibleColumnsWidths={visibleColumnsWidths} datagridContext={context} /> : <Label colorScheme="error" fontSize={20} textBold>
                     {"No display view found for datagrid"}
                 </Label>}
             </View>
@@ -1780,17 +1981,50 @@ export function AttachDatagridColumn(type: IFieldType) {
         Datagrid.registerColumn(type, target as typeof DatagridColumn);
     };
 }
+export interface IDatagridDisplayViewMetadata {
+    /***
+     * The name of the display view.
+     */
+    name: IDatagridDisplayViewName;
+    /***
+     * The label of the display view.
+     */
+    label: string;
+    /**
+     * The icon of the display view.
+     */
+    icon?: IIconSource;
+
+    /**
+     * @property {string} optimizedFor - Specifies the screen size or device type for which this display view is optimized.
+     *
+     * This property determines the target screen size or condition under which the current view should be rendered.
+     * It ensures that the layout, styling, and behavior of the component are tailored to provide the best user experience
+     * for the specified screen size or device type.
+     *
+     * ### Supported Values:
+     * - `"mobile"`: Optimized for small screens, @see {@link {IBreakpoint}} for more information about mobile breakpoints.
+     * - `"tablet"`: Optimized for medium-sized screens, Suitable for tablet.
+     * - `"desktop"`: Optimized for large screens, typically wider than 1024px. Designed for desktop and laptop devices.
+     * ### Notes:
+     * - Ensure that the value provided matches one of the predefined options to avoid unexpected behavior.
+     * - This property works in conjunction with responsive design principles to dynamically adjust the UI based on the user's device.
+     *
+     * @default ["mobile","tablet","desktop"]
+     */
+    optimizedFor?: ("mobile" | "tablet" | "desktop")[];
+}
 /**
  * A decorator to attach a display view to the Datagrid component.
  * 
  * This decorator registers the display view with the Datagrid component, making it available for use.
  * 
- * @param displayView The name of the display view to attach.
+ * @param {IDatagridDisplayViewMetadata}, the display view meta data
  * @returns A decorator function that registers the display view.
  */
-export function AttachDatagridDisplayView(displayView: IDatagridDisplayViewName) {
+export function AttachDatagridDisplayView(metadata: IDatagridDisplayViewMetadata) {
     return (target: typeof DatagridDisplayView) => {
-        Datagrid.registerDisplayView(displayView, target as typeof DatagridDisplayView);
+        Datagrid.registerDisplayView(metadata, target as typeof DatagridDisplayView);
     };
 }
 
@@ -1808,16 +2042,51 @@ export function AttachDatagridDisplayView(displayView: IDatagridDisplayViewName)
  * @see {@link IDatagridDisplayViewMap} for more information about display view maps.
  * @see {@link IDatagridCallOptions} for more information about call options.
  */
-class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {}, StateType extends object = any, EventType extends string = any> extends ObservableComponent<PropType & { datagridContext: Datagrid<DataType> }, StateType, EventType> {
+class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = unknown, StateType extends object = any, EventType extends string = any> extends ObservableComponent<PropType & { datagridContext: Datagrid<DataType>, visibleColumnsWidths: Record<string, number> }, StateType, EventType> {
     /**
-     * Returns the Datagrid context.
+     * Retrieves the datagrid context associated with this display view.
      * 
-     * This method provides access to the Datagrid component's state and methods.
+     * This method provides access to the datagrid context, allowing the display view 
+     * to interact with the datagrid's state, methods, and properties.
      * 
-     * @returns The Datagrid context.
+     * @returns {Datagrid<DataType>} The datagrid context for the current display view.
      */
     getDatagridContext() {
         return this.props.datagridContext;
+    }
+    /**
+     * Retrieves the list of visible columns for the current display view.
+     * 
+     * This method accesses the datagrid context to obtain the list of columns that are currently visible. 
+     * It is useful for determining which columns should be displayed based on the current state of the datagrid.
+     * 
+     * @returns {IDatagridStateColumn<DataType>[]} An array of visible column definitions.
+     */
+    getVisibleColumns() {
+        return this.getDatagridContext().getVisibleColumns();
+    }
+
+    /**
+     * Retrieves the list of all columns in the datagrid.
+     * 
+     * This method provides access to the complete list of columns in the datagrid, including hidden columns.
+     * It is useful for determining the structure of the data displayed in the datagrid.
+     * 
+     * @returns {IDatagridStateColumn<DataType>[]} An array of all column definitions.
+     */
+    getColumns() {
+        return this.getDatagridContext().getColumns();
+    }
+    /**
+     * Retrieves the list of all columns in the datagrid.
+     * 
+     * This method provides access to the complete list of columns in the datagrid, including hidden columns.
+     * It is useful for determining the structure of the data displayed in the datagrid.
+     * 
+     * @returns {IDatagridStateColumn<DataType>[]} An array of all column definitions.
+     */
+    getGroupableColumns() {
+        return this.getDatagridContext().getGroupableColumns();
     }
 
     /**
@@ -2258,7 +2527,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * 
      * This property is used to customize the appearance of the grid.
      */
-    style: ViewProps["style"];
+    style?: ViewProps["style"];
 
     /**
      * A unique identifier for the grid.
@@ -2315,15 +2584,6 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * This property is used to specify the key or keys that should be used for the row.
      */
     rowKey?: (keyof DataType) | (keyof DataType)[];
-
-    /**
-     * A function to handle row press events.
-     * 
-     * This property is used to specify a custom function for handling row press events.
-     * 
-     * @param options An object containing the row data and the datagrid context.
-     */
-    onRowPress?: (options: IDatagridCallOptions<DataType> & { rowData: DataType }) => void;
 
     /**
      * A function to determine whether a row is selectable.
@@ -2547,7 +2807,22 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * 
      * @see {@link IDatagridAction} for the structure of an action.
      */
-    selectedRowsActions: IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[]);
+    selectedRowsActions?: IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[]);
+
+    /**
+     * Whether to display headers in the Datagrid.
+     */
+    displayHeaders?: boolean;
+
+    /***
+     * Whether to display filters in the Datagrid.
+     */
+    displayFilters?: boolean;
+
+    /***
+     * Whether to display aggregated headers in the Datagrid.
+     */
+    displayAggregatedHeaders?: boolean;
 }
 
 /**
@@ -2777,7 +3052,7 @@ export type IDatagridColumnProps<DataType extends IDatagridDataType = any> = Omi
      * "20%" // 20% of the grid width
      * ```
      */
-    width?: number | `${number}%`;
+    width?: number;
 
     /**
      * The minimum width of the column.
@@ -2985,6 +3260,32 @@ export interface IDatagridState<DataType extends IDatagridDataType = any> {
      * This property determines whether to display the grouped columns in the grid.
      */
     displayGroupedColumns: boolean;
+
+    /***
+     * A flag indicating whether to display filters.
+     */
+    displayFilters: boolean;
+
+    /***
+     * A flag indicating whether to display headers.
+     */
+    displayHeaders: boolean;
+
+    /**
+     * The layout of the view container.
+     */
+    containerLayout: LayoutRectangle;
+
+    /***
+     * The widths of the columns.
+     * Each key is the name of the column and the value is the width of the column.
+     */
+    columnsWidths: Record<string, number>;
+
+    /**
+     * Whether to display aggregated headers in the Datagrid.
+     */
+    displayAggregatedHeaders: boolean;
 }
 
 /**
@@ -3153,16 +3454,19 @@ export interface IDatagridLoadingIndicatorProps extends Record<string, any> {
 }
 
 const DatagridExported: typeof Datagrid & {
-    Column: DatagridColumn;
-    DisplayView: DatagridDisplayView;
+    Column: typeof DatagridColumn;
+    DisplayView: typeof DatagridDisplayView;
 } = Datagrid as any;
+
+DatagridExported.Column = DatagridColumn;
+DatagridExported.DisplayView = DatagridDisplayView;
 
 export { DatagridExported as Datagrid };
 
 const styles = StyleSheet.create({
     main: {
         width: "100%",
-        minHeight: 300,
+        minHeight: 100,
     },
     disabled: {
         pointerEvents: "none",

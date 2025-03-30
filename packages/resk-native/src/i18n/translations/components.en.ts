@@ -38,6 +38,9 @@ I18nClass.RegisterTranslations({
                 "open": "Open",
                 "toggle": "Toggle",
                 "toggleFullScreen": "Toggle Drawer Full Screen",
+            },
+            "datagrid": {
+                "actions": "Actions"
             }
         }
     }

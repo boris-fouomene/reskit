@@ -3,7 +3,8 @@ import {
     View,
     StyleSheet,
     ScrollView,
-    ViewProps
+    ViewProps,
+    Pressable
 } from 'react-native';
 import { Component, ObservableComponent, getReactKey, getTextContent, useForceRender, useIsMounted } from '@utils/index';
 import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber } from '@resk/core/utils';
@@ -17,6 +18,8 @@ import { IReactComponent } from '@src/types';
 import { Preloader } from '@components/Dialog';
 import { AppBar, IAppBarAction, IAppBarProps } from '@components/AppBar';
 import { Divider } from '@components/Divider';
+import { FontIcon, IFontIconName } from '@components/Icon';
+import Theme from "@theme";
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -1660,7 +1663,72 @@ class DatagridColumn<DataType extends IDatagridDataType = any, PropExtensions = 
             const datagridContext = this.getDatagridContext();
             return this.props.renderHeader(datagridContext.getCallOptions({ column }));
         }
-        return <Label {...labelProps} >{this.props.label}</Label>;
+        const testId = this.getDatagridContext().getTestID() + "-column-" + column.name;
+        const sortIcon = this.getSortIcon();
+        return <View style={styles.headerWrapper} testID={testId + "-wrapper"}>
+            <View testID={testId + "-container"} style={[styles.headerContainer]}>
+                <Label testID={testId} {...labelProps} >{this.props.label}</Label>
+                {sortIcon ? <FontIcon testID={testId + "-sort-icon"} color={Theme.colors.primary} size={25} name={sortIcon} onPress={(event) => { this.sort(); }} /> : null}
+            </View>;
+        </View>
+    }
+    getType(): IFieldType {
+        return defaultStr(this.props.type, "text") as IFieldType;
+    }
+    getSortIcon(): IFontIconName | null {
+        if (!this.isSortable()) return null;
+        const orderBy = this.getDatagridContext()?.state?.orderBy;
+        let sortDirection: IResourceQueryOptionsOrderDirection | undefined;
+        if (Array.isArray(orderBy) && orderBy.length > 0) {
+            for (const ob of orderBy) {
+                if (!isObj(ob)) continue;
+                const [field, direction] = Object.entries(ob)[0];
+                if (field == this.getName()) {
+                    sortDirection = direction as any;
+                    break;
+                }
+            }
+        }
+        if (sortDirection) {
+            const isDesc = String(sortDirection).toLowerCase().trim() === "desc";
+            const sortType = defaultStr(this.getType()).toLowerCase();
+            let sortIcon: IFontIconName | null = null;
+            switch (sortType) {
+                case "number":
+                    sortIcon = isDesc ? "sort-numeric-descending" : "sort-numeric-ascending";
+                    break;
+                case "decimal":
+                    sortIcon = isDesc ? "sort-numeric-descending" : "sort-numeric-ascending";
+                    break;
+                case "boolean":
+                    sortIcon = isDesc ? "sort-bool-descending" : "sort-bool-ascending";
+                    break;
+                case "date":
+                    sortIcon = isDesc ? "sort-calendar-descending" : "sort-calendar-ascending";
+                    break;
+                case "datetime":
+                    sortIcon = isDesc ? "sort-calendar-descending" : "sort-calendar-ascending";
+                    break;
+                case "time":
+                    sortIcon = isDesc ? "sort-clock-descending" : "sort-clock-ascending";
+                    break;
+                default:
+                    sortIcon = isDesc ? "sort-alphabetical-descending" : "sort-alphabetical-ascending";
+                    break;
+            }
+            return sortIcon;
+        }
+        return null;
+    }
+    /**
+     * Initiates sorting on the column if it is a header.
+     * 
+     * This method checks if the column is a header and, if so, triggers the sorting functionality
+     * for the column using the Datagrid context. The sorting is performed based on the column's name.
+     */
+    sort() {
+        if (!this.isHeader()) return;
+        return this.getDatagridContext().sortColumn(this.getName());
     }
     /**
      * Renders the column.
@@ -3087,4 +3155,12 @@ const styles = StyleSheet.create({
     viewSwitcher: {
 
     },
+    headerWrapper: {
+        alignSelf: "flex-start",
+    },
+    headerContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        alignSelf: "flex-start",
+    }
 });

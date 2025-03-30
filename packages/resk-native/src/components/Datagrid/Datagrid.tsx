@@ -331,21 +331,59 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
     isColumnVisible(colName: string) {
         return this.getColumn(colName).visible;
     }
+    /**
+     * Checks if a column is aggregatable.
+     * 
+     * @param {string} colName - The name of the column to check.
+     * 
+     * @returns {boolean} - `true` if the column is aggregatable, otherwise `false`.
+     */
     isColumnAggregatable(colName: string) {
         return this.isAggregatable() && this.getColumn(colName).aggregatable;
     }
+    /**
+     * Checks if a column is groupable.
+     * 
+     * @param {string} colName - The name of the column to check.
+     * 
+     * @returns {boolean} - `true` if the column is groupable, otherwise `false`.
+     */
     isColumnGroupable(colName: string) {
         return this.isGroupable() && this.getColumn(colName).groupable;
     }
+    /**
+     * Checks if a column is sortable.
+     * 
+     * @param {string} colName - The name of the column to check.
+     * 
+     * @returns {boolean} - `true` if the column is sortable, otherwise `false`.
+     */
     isColumnSortable(colName: string) {
         return this.isSortable() && this.getColumn(colName).sortable;
     }
+    /**
+     * Checks if a column is filterable.
+     * 
+     * @param {string} colName - The name of the column to check.
+     * 
+     * @returns {boolean} - `true` if the column is filterable, otherwise `false`.
+     */
     isColumnFilterable(colName: string) {
         return this.isFiltrable() && this.getColumn(colName).filterable;
     }
+    /**
+     * Determines whether the grid supports sorting.
+     * 
+     * @returns {boolean} - `true` if sorting is enabled, otherwise `false`.
+     */
     isSortable() {
         return this.props.sortable !== false;
     }
+    /**
+     * Determines whether the grid supports filtering.
+     * 
+     * @returns {boolean} - `true` if filtering is enabled, otherwise `false`.
+     */
     isFiltrable() {
         return this.props.filterable !== false;
     }
@@ -391,6 +429,15 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         }
         return value;
     }
+    /**
+     * Returns an object containing the Datagrid context and the provided options.
+     * 
+     * @template T - The type of the options.
+     * @param {T} otherOptions - The options to include in the returned object.
+     * 
+     * @returns {IDatagridCallOptions<DataType> & T} - The object containing the Datagrid context and the provided options.
+     * 
+     */
     getCallOptions<T = any>(otherOptions: T): IDatagridCallOptions<DataType> & T {
         return Object.assign({}, { datagridContext: this }, otherOptions);
     }
@@ -418,9 +465,27 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         const rKey = getReactKey<DataType>(rowData, this.props.rowKey);
         return defaultStr(!isEmpty(rKey) ? String(rKey) : undefined, undefined);
     }
+    /**
+     * Determines if the provided row data represents a grouped row.
+     *
+     * This method checks if the row data is an object and contains the properties 
+     * indicating it is a grouped row, such as `isDatagridGroup` and a valid `label`.
+     * 
+     * @param {IDatagridGroupedRow<DataType> | DataType} rowData - The row data to evaluate.
+     * 
+     * @returns {boolean} - Returns true if the row data is a grouped row; otherwise, false.
+     */
     isGroupedRow(rowData: IDatagridGroupedRow<DataType> | DataType): rowData is IDatagridGroupedRow {
         return isObj(rowData) && !!rowData.isDatagridGroup && isNonNullString(rowData.label);
     }
+    /**
+     * Sorts the data in ascending or descending order according to the specified columns and directions.
+     * 
+     * @param {DataType[]} data - The data to be sorted.
+     * @param {IResourceQueryOptionsOrderBy<DataType>} orderBy - The sorting columns and directions. If not specified, the Datagrid's `orderBy` state is used.
+     * 
+     * @returns {DataType[]} - The sorted data.
+     */
     internalSort(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>): DataType[] {
         if (!Array.isArray(data)) return [];
         orderBy = Array.isArray(orderBy) ? orderBy : this.state.orderBy;
@@ -437,7 +502,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                     for (const sortColumn of sortableCols) {
                         const [field, direction] = Object.entries(sortColumn)[0];
                         const column = this.getColumn(field);
-                        return this.sortCompare(a, b, column, direction as any, column.ignoreCaseWhenSorting);
+                        return this.compareValues(a, b, column, direction as any, column.ignoreCaseWhenSorting);
                     }
                     return 0;
                 });
@@ -445,13 +510,37 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         }
         return data;
     }
+    /**
+     * Retrieves a row by its key.
+     * 
+     * @param {string} rowKey - The key of the row to retrieve.
+     * 
+     * @returns {DataType | null} - The row data if found, otherwise `null`.
+     */
     getRowByKey(rowKey: string): DataType | null {
         if (!isNonNullString(rowKey)) return null;
         return this.state.rowsByKeys[rowKey] || null;
     }
+    /**
+     * Returns the separator used for grouping row headers.
+     * 
+     * The separator is used to separate the column values in the grouped row header.
+     * 
+     * If not specified, the default value is a comma (`,`).
+     * 
+     * @returns {string} - The separator used for grouping row headers.
+     */
     getGroupedRowHeaderSeparator(): string {
         return defaultStr(this.props.groupedRowHeaderSeparator, ",");
     }
+    /**
+     * Computes the grouped row header text from the given row data.
+     * 
+     * @param {DataType} rowData - The row data to use for computing the grouped row header.
+     * @param {string[]} groupedColumns - The columns to include in the grouped row header. If not specified, the Datagrid's `groupedColumns` state is used.
+     * 
+     * @returns {string} - The grouped row header text. If no columns are specified, an empty string is returned.
+     */
     getGroupedRowHeader(rowData: DataType, groupedColumns?: string[]): string {
         const d: string[] = [];
         const groupHeaderSeparator = this.getGroupedRowHeaderSeparator();
@@ -474,19 +563,43 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         });
         return d.join(groupHeaderSeparator).toUpperCase() || "";
     }
+    /**
+     * Retrieves the grouped rows associated with the given key.
+     * 
+     * @param {string} groupedRowKey - The key of the grouped row to retrieve.
+     * 
+     * @returns {DataType[]} - The grouped row data if found, otherwise an empty array.
+     */
     getGroupedRows(groupedRowKey: string): DataType[] {
         if (!isNonNullString(groupedRowKey)) return [];
         const r = this.state.groupedRowsByKeys[groupedRowKey];
         return Array.isArray(r) ? r : [];
     }
+    /**
+     * Checks if the Datagrid can paginate its data.
+     * 
+     * It checks if the component's `paginationEnabled` prop is set to `true`.
+     * 
+     * @returns {boolean} Whether the Datagrid can paginate its data.
+     */
     canPaginate(): boolean {
         return !!this.props.paginationEnabled;
     }
+
     /**
      * Processes the data for the component.
      * 
+     * This method is an internal, protected method that is used by the Datagrid to process the data
+     * when the component mounts or when the data changes.
+     * 
+     * It processes the data by sorting it, filtering it, grouping it, and paginating it.
+     * 
      * @param {DataType[]} data - The data to process.
-     * @returns {IDatagridState<DataType>} The processed data.
+     * @param {IResourceQueryOptionsOrderBy<DataType>} orderBy - The sorting columns and directions. If not specified, the Datagrid's `orderBy` state is used.
+     * @param {string[]} groupedColumns - The columns to group the data by. If not specified, the Datagrid's `groupedColumns` state is used.
+     * @param {IDatagridPagination} pagination - The pagination configuration. If not specified, the Datagrid's `pagination` state is used.
+     * 
+     * @returns {Partial<IDatagridState<DataType>>} - A partial state object containing the aggregated columns values, the paginated data, the all data, the data to display, the pagination configuration, and the grouped rows by keys.
      */
     protected processData(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination): Partial<IDatagridState<DataType>> {
         let processingData: DataType[] = [];
@@ -567,6 +680,19 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         }
         return { aggregatedColumnsValues, paginatedData, allData: processingData, data: stateData, pagination: paginationConfig, groupedRowsByKeys, rowsByKeys };
     }
+    /**
+     * Checks if two arrays are equal.
+     * 
+     * This function assumes that the arrays contain only primitive values and not objects.
+     * It first checks if the arrays have the same length. If they do, it checks if the arrays are the same reference.
+     * If they are not the same reference, it checks every element in the arrays to see if they are equal.
+     * If all elements are equal, it returns true, otherwise it returns false.
+     * If the arrays are not the same length, it returns false.
+     * If either of the arrays is null or undefined, it returns true.
+     * @param a The first array to compare.
+     * @param b The second array to compare.
+     * @returns {boolean} True if the arrays are equal, otherwise false.
+     */
     static areArraysEqual(a?: any[], b?: any[]) {
         if (!Array.isArray(a)) {
             a = [];
@@ -578,7 +704,16 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         if (a.length !== b.length) return false;
         return a === b;
     }
-    // Handle component updates
+    /**
+     * Lifecycle method that is called after the component updates.
+     *
+     * This method updates the component's state based on changes in props such as columns, sorting, filtering, aggregation,
+     * grouping, display view, order by, grouped columns, and pagination. If any of these properties change, the method
+     * processes the new columns, data, and state, and updates the session data accordingly.
+     * 
+     * @param {IDatagridProps<DataType>} prevProps - The previous properties of the datagrid component.
+     * @param {IDatagridState<DataType>} prevState - The previous state of the datagrid component.
+     */
     componentDidUpdate(prevProps: IDatagridProps<DataType>, prevState: IDatagridState<DataType>) {
         const newState: Partial<IDatagridState<DataType>> = {};
         let hasUpdated = false;
@@ -615,18 +750,44 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         }
     }
 
+    /**
+     * Checks if the given display view is valid.
+     * 
+     * The method checks if the given display view is a non-null string and if it is included in the list of registered display views.
+     * 
+     * @param {any} displayView - The display view to check.
+     * @returns {displayView is IDatagridDisplayViewName} - If the display view is valid, the method returns true.
+     */
     isValidDisplayView(displayView: any): displayView is IDatagridDisplayViewName {
         if (!isNonNullString(displayView)) return false;
         const displayViews = this.getDisplayViews();
         return displayViews.includes(displayView as IDatagridDisplayViewName);
     }
-    // Switch view method
+    /***
+     * Switches the display view of the Datagrid.
+     * 
+     * This method updates the state of the Datagrid to switch the display view.
+     * 
+     * @param {IDatagridDisplayViewName} displayView - The name of the display view to switch to.
+     */
     switchDisplayView = (displayView: IDatagridDisplayViewName) => {
         this.setState({ displayView });
     }
+    /**
+     * Returns the current display view of the Datagrid.
+     * 
+     * @returns {IDatagridDisplayViewName} - The current display view of the Datagrid.
+     */
     getDisplayView() {
         return this.state.displayView;
     }
+    /**
+     * Retrieves the test ID for the Datagrid component.
+     * 
+     * The method returns the value of the `testID` property if it is a non-null string, otherwise it returns "resk-datagrid".
+     * 
+     * @returns {string} The test ID for the Datagrid component.
+     */
     getTestID() {
         return defaultStr(this.props.testID, "resk-datagrid");
     }
@@ -635,15 +796,52 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             context={this}
         />
     }
+    /**
+     * Generates a unique session key based on the provided session name.
+     * 
+     * The session key is constructed in the format: `datagrid-session-data-{sessionName}`.
+     * If the session name is not specified, the default session name is `default`.
+     * 
+     * @returns {string} The unique session key associated with the Datagrid component.
+     */
     getSesionName() {
         return `datagrid-session-data-${defaultStr(this.props.sessionName, "default")}`;
     }
+    /**
+     * Removes the session data for the Datagrid component associated with the specified session name.
+     * 
+     * If the session name is not a non-null string, the method does nothing.
+     * 
+     * @param {string} sessionName - The session name associated with the session data to remove.
+     * @returns {any} The previous session data associated with the specified session name, or undefined if no session data was associated with the session name.
+     */
     removeSessionData(sessionName: string) {
         return this.setSessionData(sessionName, undefined);
     }
+    /**
+     * Removes all session data associated with the Datagrid component.
+     * 
+     * This function clears all stored data for the session identified by the component's session name.
+     * It sets the session data to an empty object, effectively removing any existing data.
+     * 
+     * @returns {void} This function does not return a value.
+     */
+
     removeAllSessionData() {
         return Auth.Session.set(this.getSesionName(), {});
     }
+    /**
+     * Sets a value in the session data associated with the specified session name.
+     * 
+     * This function sets a value in the session data associated with the specified session name.
+     * If the value is undefined or null, the corresponding key is removed from the session data.
+     * If the session name is not a non-null string, the method does nothing.
+     * 
+     * @param {keyof IDatagridState<DataType> | string} sessionName - The session name associated with the session data to set.
+     * @param {any} data - The value to set in the session data.
+     * 
+     * @returns {any} The updated session data associated with the specified session name.
+     */
     setSessionData(sessionName: keyof IDatagridState<DataType> | string, data: any) {
         const sessionData = this.getSessionData();
         if (!isNonNullString(sessionName)) return sessionData;
@@ -655,6 +853,16 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         Auth.Session.set(this.getSesionName(), sessionData);
         return sessionData;
     }
+    /**
+    * Retrieves the session data associated with the Datagrid component, or a value from that session data if a session name is provided.
+    * 
+    * This function retrieves the session data associated with the Datagrid component's session name.
+    * If the session name is not a non-null string, the method does nothing and the original session data is returned.
+    * If the session name is provided, the corresponding value is returned from the session data.
+    * 
+    * @param {keyof IDatagridState<DataType> | string} [sessionName] - The session name associated with the value to retrieve from the session data.
+    * @returns {any} The session data associated with the Datagrid component, or the value associated with the specified session name.
+    */
     getSessionData(sessionName?: keyof IDatagridState<DataType> | string) {
         const data = Object.assign({}, Auth.Session.get(this.getSesionName()));
         if (isNonNullString(sessionName)) {
@@ -662,18 +870,53 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         }
         return data;
     }
+    /**
+     * Registers a display view for the Datagrid component.
+     * 
+     * The method adds the display view to the list of registered display views.
+     * If the display view name is not a non-null string or the component is not a valid function, the method does nothing.
+     * 
+     * @param {IDatagridDisplayViewName} displayView - The name of the display view to register.
+     * @param {typeof DatagridDisplayView} component - The component class to register for the display view.
+     * 
+     * @returns {void} This function does not return a value.
+     */
     static registerDisplayView(displayView: IDatagridDisplayViewName, component: typeof DatagridDisplayView) {
         if (!isNonNullString(displayView) || typeof (component) !== "function") return;
         const components = Datagrid.getRegisteredDisplayViews();
         (components as any)[displayView] = component;
         Reflect.defineMetadata(Datagrid.reflectMetadataKey, components, Datagrid);
     }
+    /**
+     * Retrieves the registered display views for the Datagrid component.
+     * 
+     * This method accesses the metadata of the Datagrid class to obtain 
+     * the list of registered display views. If no display views are 
+     * registered, it returns an empty object.
+     * 
+     * @returns {Record<IDatagridDisplayViewName, typeof DatagridDisplayView>} 
+     * An object mapping display view names to their corresponding component classes.
+     */
     static getRegisteredDisplayViews(): Record<IDatagridDisplayViewName, typeof DatagridDisplayView> {
         const components = Reflect.getMetadata(Datagrid.reflectMetadataKey, Datagrid);
         return isObj(components) ? components : {} as any;
     }
 
-    sortCompare(rowDataA: DataType, rowDataB: DataType, column: IDatagridStateColumn, sortDirection: IResourceQueryOptionsOrderDirection = "asc", ignoreCase: boolean = true) {
+    /**
+     * Compares two values and returns a negative, zero, or positive number to indicate that the first value is less than, equal to, or greater than the second value.
+     * 
+     * The comparison is done based on the specified column and sort direction. Strings are compared lexicographically, while booleans are compared by converting them to integers.
+     * If `ignoreCase` is true, strings are compared in a case-insensitive manner.
+     * 
+     * @param {DataType} rowDataA - The first row to compare.
+     * @param {DataType} rowDataB - The second row to compare.
+     * @param {IDatagridStateColumn} column - The column to use for sorting.
+     * @param {IResourceQueryOptionsOrderDirection} [sortDirection="asc"] - The direction of the sort. Can be either "asc" or "desc".
+     * @param {boolean} [ignoreCase=true] - Whether to ignore case when comparing strings.
+     * 
+     * @returns {number} A negative, zero, or positive number indicating the result of the comparison.
+     */
+    compareValues(rowDataA: DataType, rowDataB: DataType, column: IDatagridStateColumn, sortDirection: IResourceQueryOptionsOrderDirection = "asc", ignoreCase: boolean = true) {
         const multiplicater = !!(String(sortDirection).toLowerCase().trim() === "desc") ? -1 : 1;
         let a: any = this.computeColumnValue(column, rowDataA);
         if (isEmpty(a)) a = "";
@@ -694,36 +937,107 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         }
         return multiplicater * (a < b ? -1 : +(a > b));
     };
+    /**
+     * Returns the registered display view for the given display view name.
+     * 
+     * If the display view name is not a non-null string, the method returns the default display view class.
+     * If the display view name is not registered, the method returns the default display view class.
+     * 
+     * @param {IDatagridDisplayViewName} displayView - The name of the display view to retrieve.
+     * @returns {typeof DatagridDisplayView} - The registered display view class, or the default display view class if the display view is not registered or the display view name is invalid.
+     */
     static getRegisteredDisplayView(displayView: IDatagridDisplayViewName): typeof DatagridDisplayView {
         if (!isNonNullString(displayView)) return DatagridDisplayView;
         return Datagrid.getRegisteredDisplayViews()[displayView] || DatagridDisplayView;
     }
+
+    /**
+     * Determines whether the given function is a valid aggregation function for the Datagrid component.
+     * 
+     * An aggregation function is considered valid if it is a function.
+     * 
+     * @param {IDatagridAggregationFunction<any>} aggregationFunction - The aggregation function to validate.
+     * @returns {aggregationFunction is IDatagridAggregationFunction} Whether the given aggregation function is valid.
+     */
     static isValidAggregationFunction(aggregationFunction: IDatagridAggregationFunction<any>): aggregationFunction is IDatagridAggregationFunction {
         return typeof aggregationFunction === "function";
     }
 
+    /**
+     * Registers a custom aggregation function for the Datagrid component.
+     * 
+     * This method adds the specified aggregation function to the list of registered aggregation functions.
+     * If the aggregation function name is not a non-null string or the aggregation function is not a valid function, the method does nothing.
+     * 
+     * @param {keyof IDatagridAggregationFunctions} aggregationFunctionName - The name of the aggregation function to register.
+     * @param {IDatagridAggregationFunction} aggregationFunction - The aggregation function to register.
+     * 
+     * @returns {void} This function does not return a value.
+     */
     static registerAggregationFunction(aggregationFunctionName: keyof IDatagridAggregationFunctions, aggregationFunction: IDatagridAggregationFunction) {
         if (!isNonNullString(aggregationFunctionName) || !Datagrid.isValidAggregationFunction(aggregationFunction)) return;
         const aggregationsFunctions = Datagrid.getRegisteredAggregationFunctions();
         (aggregationsFunctions as any)[aggregationFunctionName] = aggregationFunction;
         Reflect.defineMetadata(Datagrid.aggregationFunctionMetadataKey, aggregationsFunctions, Datagrid);
     }
+    /**
+     * Retrieves the registered aggregation functions for the Datagrid component.
+     * 
+     * This method accesses the metadata of the Datagrid class to obtain 
+     * the list of registered aggregation functions. If no aggregation functions are 
+     * registered, it returns an empty object.
+     * 
+     * @returns {IDatagridAggregationFunctions} 
+     * An object mapping aggregation function names to their corresponding functions.
+     */
+
     static getRegisteredAggregationFunctions(): IDatagridAggregationFunctions {
         const aggregationsFunctions = Reflect.getMetadata(Datagrid.aggregationFunctionMetadataKey, Datagrid);
         return isObj(aggregationsFunctions) ? aggregationsFunctions : {} as any;
     }
 
     static registredColumnsReflectMetadataKey = Symbol("datagrid-registred-columns-reflect-metadata-key");
+
+    /**
+     * Registers a column type with its corresponding component in the Datagrid.
+     * 
+     * This method allows users to add custom column types to the Datagrid by associating a column type name with a component class.
+     * If the type is not a non-null string or the component is not a valid function, the method does nothing.
+     * 
+     * @param {IFieldType} type - The name of the column type to register.
+     * @param {typeof DatagridColumn} component - The component class to associate with the column type.
+     * 
+     * @returns {void} This function does not return a value.
+     */
     static registerColumn(type: IFieldType, component: typeof DatagridColumn) {
         if (!isNonNullString(type) || typeof (component) !== "function") return;
         const components = Datagrid.getRegisteredColumns();
         components[type] = component;
         Reflect.defineMetadata(Datagrid.registredColumnsReflectMetadataKey, components, Datagrid);
     }
+
+    /**
+     * Retrieves the registered column types and their associated components.
+     * 
+     * This method provides access to the list of column types and their associated components that have been registered
+     * using the `registerColumn` method. If no column types have been registered, it returns an empty object.
+     * 
+     * @returns {Record<IFieldType, typeof DatagridColumn>} An object mapping column types to their associated components.
+     */
     static getRegisteredColumns(): Record<IFieldType, typeof DatagridColumn> {
         const components = Reflect.getMetadata(Datagrid.registredColumnsReflectMetadataKey, Datagrid);
         return isObj(components) ? components : {} as any;
     }
+    /**
+     * Retrieves the registered column component for a given column type.
+     * 
+     * This method returns the component class associated with the given column type. If the type is not a non-null string or
+     * the type has not been registered with the `registerColumn` method, it returns the default column component class.
+     * 
+     * @param {IFieldType} type - The name of the column type to retrieve the component for.
+     * 
+     * @returns {typeof DatagridColumn} The component class associated with the column type, or the default column component class.
+     */
     static getRegisteredColumn(type: IFieldType): typeof DatagridColumn {
         const components = Datagrid.getRegisteredColumns();
         return isNonNullString(type) ? components[type] : DatagridColumn || DatagridColumn;
@@ -775,6 +1089,7 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
         </DatagridContext.Provider>
     );
 }
+DatagridRendered.displayName = "Datagrid.Rendered";
 
 
 /**
@@ -1068,10 +1383,28 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {
         return this.props.datagridContext;
     }
 
+    /**
+     * Returns an object containing the aggregated values for all columns in the grid.
+     * 
+     * The object returned by this method is a record of aggregated values, where each key is the column name and each value is an object containing the aggregated values for that column.
+     * 
+     * @returns {Record<string, Record<keyof IDatagridAggregationFunctions, number>>} An object containing the aggregated values for all columns in the grid.
+     */
     getAggregatedColumnsValues(): Record<string, Record<keyof IDatagridAggregationFunctions, number>> {
         const o = this.getDatagridContext().state.aggregatedColumnsValues;
         return isObj(o) ? o : {};
     }
+
+    /**
+     * Retrieves the aggregated values for a specific column.
+     * 
+     * This method returns an object containing the aggregated values for the specified column name.
+     * The object includes various aggregation metrics as defined by the `IDatagridAggregationFunctions`.
+     * 
+     * @param {string} columnName - The name of the column for which to retrieve aggregated values.
+     * 
+     * @returns {Record<keyof IDatagridAggregationFunctions, number>} An object containing the aggregated values for the specified column. If the column does not exist or the name is invalid, an empty object is returned.
+     */
     getAggregatedColumnValues(columnName: string): Record<keyof IDatagridAggregationFunctions, number> {
         if (!isNonNullString(columnName)) return {} as Record<keyof IDatagridAggregationFunctions, number>;
         const o = this.getAggregatedColumnsValues();
@@ -1149,19 +1482,73 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {
     renderGroupedRow(rowData: IDatagridGroupedRow<DataType>) {
         return null;
     }
+    /**
+     * Retrieves the test identifier for the current Datagrid display view.
+     * 
+     * This method returns the test ID from the Datagrid context if available.
+     * If the test ID is not specified, it defaults to "resk-datagrid".
+     * 
+     * @returns {string} The test ID for the Datagrid display view.
+     */
     getTestID() {
         return defaultStr(this.getDatagridContext().getTestID(), "resk-datagrid");
     }
+    /**
+     * Retrieves the key for the given row data.
+     * 
+     * This method delegates to the Datagrid context's `getRowKey` method.
+     * 
+     * @param {DataType} rowData - The row data for which to retrieve the key.
+     * 
+     * @returns {string} - The key for the row data.
+     */
+
     getRowKey(rowData: DataType) {
         return this.getDatagridContext().getRowKey(rowData);
     }
+    /**
+     * Retrieves the grouped row header text from the given row data.
+     * 
+     * This method delegates to the Datagrid context's `getGroupedRowHeader` method.
+     * 
+     * @param {DataType} rowData - The row data to use for computing the grouped row header.
+     * 
+     * @returns {string} - The grouped row header text.
+     */
+
     getGroupedRowHeader(rowData: DataType) {
         return this.getDatagridContext().getGroupedRowHeader(rowData);
     }
+    /**
+     * Returns the separator used for grouping row headers.
+     * 
+     * The separator is used to separate the column values in the grouped row header.
+     * 
+     * If not specified, the default value is a comma (`,`).
+     * 
+     * @returns {string} - The separator used for grouping row headers.
+     */
     getGroupedRowHeaderSeparator() {
         return this.getDatagridContext().getGroupedRowHeaderSeparator();
     }
 
+    /**
+     * Renders a column as either a row cell or header.
+     * 
+     * This method renders a column as a row cell or header, depending on the value of `renderType`.
+     * 
+     * If `renderType` is `"rowCell"`, the column is rendered as a row cell and the `rowData` prop is required.
+     * 
+     * If `renderType` is `"header"`, the column is rendered as a header and the `rowData` prop is ignored.
+     * 
+     * This method will return null if the column is not found or if the `rowData` prop is not an object.
+     * 
+     * @param {string} columnName - The name of the column.
+     * @param {IDatagridColumnRenderType} [renderType="rowCell"] - The type of rendering for the column.
+     * @param {IDatagridGroupedRow | DataType} [rowData] - The row data to use for rendering the column as a row cell.
+     * 
+     * @returns {React.ReactNode} - The rendered column.
+     */
     protected renderRowCellOrHeader(columnName: string, renderType: IDatagridColumnRenderType = "rowCell", rowData?: IDatagridGroupedRow | DataType) {
         const datagridContext = this.getDatagridContext();
         if (!datagridContext) return null;
@@ -1202,6 +1589,18 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {
         }
         return this.renderRowCellOrHeader(columnName, "rowCell", rowData);
     }
+    /**
+     * Renders a header cell in the grid for a given column.
+     * 
+     * This method is called when the component needs to render a header cell for a given column.
+     * 
+     * It delegates rendering to `renderRowCellOrHeader`, passing `"header"` as the render type.
+     * 
+     * @param columnName - The name of the column to render the header cell for.
+     * 
+     * @returns The rendered header cell component, or null if the column does not exist.
+     */
+
     renderHeader(columnName: string) {
         return this.renderRowCellOrHeader(columnName, "header");
     }
@@ -1941,13 +2340,11 @@ const styles = StyleSheet.create({
     },
     viewSwitcher: {
         flexDirection: 'row',
-        backgroundColor: '#f0f0f0',
         padding: 10
     },
     viewSwitcherButton: {
         marginRight: 10,
         padding: 5,
-        backgroundColor: '#e0e0e0',
         borderRadius: 5
     }
 });

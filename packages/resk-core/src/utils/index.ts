@@ -1,3 +1,4 @@
+import { isNumber } from "./isNumber";
 
 export * from "./numbers";
 export * from "./json";
@@ -26,22 +27,21 @@ export * from "./isValidEmail";
 export { default as isPrimitive } from "./isPrimitive";
 export { default as Global } from "./global";
 
-/***
- * Cée un objet enum à partir d'un type union
+
+/**
+ * Checks if a value is an integer.
+ * 
+ * This function returns true if the value is a finite number and its floor value is equal to the value itself.
+ * 
+ * @param x The value to check.
+ * @returns True if the value is an integer, false otherwise.
  */
-export function createEnum<T extends string>(...args: T[]): { [K in T]: K } {
-  return args.reduce((acc, value) => {
-    acc[value] = value;
-    return acc;
-  }, Object.create(null)) as { [K in T]: K };
+export function isInteger(x: any): x is number {
+  return isNumber(x) && isFinite(x) && Math.floor(x) === x;
 }
 
-/***
- * vérifie si la valeur passée en paramètre est un nombre entier
- */
-export function isInteger(x: any) {
-  return typeof x === "number" && isFinite(x) && Math.floor(x) === x;
-}
+export * from "./isNullable";
+
 export { default as isClass } from "./isClass";
 
 export { default as isEmpty } from "./isEmpty";

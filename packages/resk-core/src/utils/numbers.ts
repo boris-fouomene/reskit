@@ -1,5 +1,6 @@
 import Currency from "../currency";
 import { ICurrency, ICurrencyFormatterKey, ICurrencyFormatters } from "../currency/types";
+import { isNumber } from "./isNumber";
 
 const { currencies } = Currency;
 
@@ -344,6 +345,21 @@ Number.prototype.abreviate2FormatMoney = function (
   return abreviate2FormatMoney(this.valueOf(), symbol, decimalDigits, thousandSeparator, decimalSeparator, format);
 }
 
+/**
+ * Returns the first non-zero number from a list of arguments, or 0 if no such number exists.
+ * 
+ * This function iterates over the arguments and returns the first one that is a non-zero number.
+ * If no such number is found, it returns 0.
+ * 
+ * @param args A list of arguments to check.
+ * @returns The first non-zero number, or 0 if no such number exists.
+ */
+export function defaultNumber(...args: any[]): number {
+  for (const arg of args) {
+    if (isNumber(arg) && arg !== 0) return arg;
+  }
+  return 0;
+}
 
 // Step 3: Dynamically add formatter methods to Number.prototype
 Object.keys(currencies).forEach((currencyKey) => {

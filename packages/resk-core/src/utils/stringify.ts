@@ -1,5 +1,6 @@
 import defaultStr from "./defaultStr";
 import { isNumber } from "./isNumber";
+import { isNullable } from "./isNullable";
 
 function escapeString(str: string): string {
   return defaultStr(str)
@@ -37,7 +38,7 @@ function isType(obj: any, type: string): boolean {
  * ```
  */
 export default function stringify(obj: any, options?: { parenthesis: boolean }): string {
-  if (["string", "boolean", "undefined"].includes(typeof obj) || obj === null) {
+  if (["boolean", "undefined"].includes(typeof obj) || obj === null) {
     return String(obj);
   }
   if (isNumber(obj)) {
@@ -52,22 +53,14 @@ export default function stringify(obj: any, options?: { parenthesis: boolean }):
   const { parenthesis } = Object.assign({}, options);
   const openParen = parenthesis ? '(' : '';
   const closeParen = parenthesis ? ')' : '';
-  if (isType(obj, 'RegExp') || isType(obj, 'Number') || isType(obj, 'Boolean')) {
-    return obj.toString();
-  }
-
-  /**
-   * If the input is a function, return its string representation wrapped in parentheses if specified.
-   */
-  if (typeof obj === 'function') {
-    return openParen + obj.toString() + closeParen;
-  }
-
   /**
    * If the input is a string, return its string representation wrapped in single quotes.
    */
   if (typeof obj === 'string') {
     return "'" + escapeString(obj) + "'";
+  }
+  if (isType(obj, 'RegExp') || isType(obj, 'Number') || isType(obj, 'Boolean')) {
+    return obj.toString();
   }
 
   /**
@@ -93,10 +86,6 @@ export default function stringify(obj: any, options?: { parenthesis: boolean }):
       return stringify(k) + ':' + stringify(v);
     }).join(',') + '}' + closeParen;
   }
-
-  /**
-   * If the input is not an object, return its string representation using the toString method.
-   */
   if (!obj) return String(obj);
   return typeof obj?.toString == "function" ? obj?.toString() : String(obj);
 }

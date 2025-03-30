@@ -13,6 +13,9 @@ const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
 import { CountriesManager, ICountryCode } from "@countries/index";
 import isEmpty from "@utils/isEmpty";
 import Logger from "@logger";
+import isPrimitive from "@utils/isPrimitive";
+import stringify from "@utils/stringify";
+import { isNullable } from "@utils/isNullable";
 
 const DIGIT_REGEX = /\d/;
 const LETTER_REGEX = /[a-zA-Z]/;
@@ -66,10 +69,10 @@ export default class InputFormatter {
     let parsedValue = value;
     const result: Partial<IInputFormatterResult> = {};
     // Normalize the value: if it's undefined, null, or empty, set it to an empty string.
-    value = value === undefined || value === null || !value ? "" : value;
+    value = isNullable(value) ? "" : value;
     if (!value) {
       // If the value is empty and can be decimal, set parsedValue to 0; otherwise, set it to an empty string.
-      parsedValue = canValueBeDecimal ? 0 : '';
+      parsedValue = canValueBeDecimal ? 0 : String(value);
     }
 
     // If the value can be a decimal, parse it accordingly.
@@ -78,7 +81,7 @@ export default class InputFormatter {
     }
 
     // Convert non-string values to strings.
-    let formattedValue = typeof value == 'string' ? value : value?.toString() || '';
+    let formattedValue: any = isPrimitive(value) ? String(value) : DateHelper.isDateObj(value) ? value : stringify(value);
 
     // If a format function is provided, use it to format the value.
     if (typeof format === 'function') {

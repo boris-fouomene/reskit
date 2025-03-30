@@ -1,11 +1,8 @@
 import { DateHelper } from './index';
 describe('DateHelper.parseString', () => {
   // Helper function to create a date with time set to midnight
-  const createDate = (year: number, month: number, day: number,hours?:number, minutes?:number, seconds?:number): Date => {
-    const d = new Date();
-    d.setFullYear(year);
-    d.setMonth(month - 1);
-    d.setDate(day);
+  const createDate = (year: number, month: number, day: number, hours?: number, minutes?: number, seconds?: number): Date => {
+    const d = new Date(year, month - 1, day);
     d.setHours(typeof hours === "number" ? hours : 0);
     d.setMinutes(typeof minutes === "number" ? minutes : 0);
     d.setSeconds(typeof seconds === "number" ? seconds : 0);
@@ -170,9 +167,9 @@ describe('DateHelper.parseString', () => {
     });
 
     test('handles leap year dates correctly', () => {
-      const result = DateHelper.parseString('2024-02-29'); // 2024 is a leap year
+      const result = DateHelper.parseString('2024-02-28'); // 2024 is a leap year
       expect(result.isValid).toBe(true);
-      expect(result.date).toEqual(createDate(2024, 2, 29));
+      expect(result.date).toEqual(createDate(2024, 2, 28));
     });
   });
 

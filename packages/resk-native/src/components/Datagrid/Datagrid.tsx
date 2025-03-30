@@ -1,9 +1,6 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import {
     View,
-    Text,
-    FlatList,
-    TouchableOpacity,
     StyleSheet,
     ScrollView,
     ViewProps
@@ -11,9 +8,9 @@ import {
 import { Component, ObservableComponent, getReactKey, getTextContent } from '@utils/index';
 import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
-import { IField, IFieldType, IMergeWithoutDuplicates, IResourcePaginationMetaData, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from '@resk/core/types';
+import { IField, IFieldType, IResourcePaginationMetaData, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
-import Label from '@components/Label';
+import Label, { ILabelProps } from '@components/Label';
 import InputFormatter from '@resk/core/inputFormatter';
 import { ResourcePaginationHelper } from '@resk/core/resources';
 
@@ -274,27 +271,36 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         const groupableColumns: IDatagridStateColumn<DataType>[] = [];
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const stateGroupedColumns: string[] = [];
+        let colIndex = -1;
         this.props.columns.map((column) => {
             if (isObj(column) && isNonNullString(column.name)) {
-                column.groupable = this.isGroupable() && column.groupable !== false;
-                column.filterable = this.isFiltrable() && column.filterable !== false;
-                column.sortable = this.isSortable() && column.sortable !== false;
-                column.visible = column.visible !== false;
-                column.aggregatable = this.isAggregatable() && column.aggregatable !== false;
-                columns.push(column as IDatagridStateColumn<DataType>);
-                if (column.visible !== false) {
-                    visibleColumns.push(column as IDatagridStateColumn<DataType>);
+                colIndex++;
+                const aggretagionFunction = isNonNullString(column.aggregationFunction) ? Datagrid.getAggregationFunction(column.aggregationFunction) :
+                    Datagrid.isValidAggregationFunction(column.aggregationFunction as any) ? column.aggregationFunction : undefined;
+                const col: IDatagridStateColumn<DataType> = {
+                    ...Object.clone(column),
+                    colIndex,
+                    groupable: this.isGroupable() && column.groupable !== false,
+                    filterable: this.isFiltrable() && column.filterable !== false,
+                    sortable: this.isSortable() && column.sortable !== false,
+                    visible: column.visible !== false,
+                    aggregatable: this.isAggregatable() && column.aggregatable !== false,
+                    aggregationFunction: aggretagionFunction ? aggretagionFunction : Datagrid.countAggregationFunction,
+                };
+                columns.push(col);
+                if (col.visible !== false) {
+                    visibleColumns.push(col);
                 }
-                if (column.aggregatable !== false) {
-                    aggregatableColumns.push(column as IDatagridStateColumn<DataType>);
+                if (col.aggregatable !== false) {
+                    aggregatableColumns.push(col);
                 }
-                if (column.groupable !== false) {
-                    groupableColumns.push(column as IDatagridStateColumn<DataType>);
-                    if (groupedColumns.includes(column.name)) {
-                        stateGroupedColumns.push(column.name);
+                if (col.groupable !== false) {
+                    groupableColumns.push(col);
+                    if (groupedColumns.includes(col.name)) {
+                        stateGroupedColumns.push(col.name);
                     }
                 }
-                columnsByName[column.name] = column as IDatagridStateColumn<DataType>;
+                columnsByName[col.name] = col;
             }
         });
         return { columns, visibleColumns, columnsByName, aggregatableColumns, groupableColumns, groupedColumnsNames: stateGroupedColumns };
@@ -311,6 +317,9 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             return this.state.columnsByName[colName]
         }
         return {} as IDatagridStateColumn<DataType>;
+    }
+    isValidColumn(column: IDatagridStateColumn): column is IDatagridStateColumn<DataType> {
+        return isObj(column) && isNonNullString(column.name);
     }
     /**
      * Checks if a column is visible.
@@ -375,7 +384,8 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
     computeColumnValue(column: IDatagridStateColumn | string, rowData: DataType, format?: boolean): any {
         const col: IDatagridStateColumn = typeof column === "string" && column ? this.getColumn(column) : column as any;
         if (!isObj(rowData) || !isObj(col) || !isNonNullString(col.name)) return undefined;
-        const value = typeof col.computeValue === "function" ? col.computeValue({ rowData }) : (rowData as any)[col.name];
+        const v = typeof col.computeValue === "function" ? col.computeValue(this.getCallOptions({ rowData })) : (rowData as any)[col.name];
+        const value = typeof v === "object" ? stringify(v) : v;
         if (format && !isEmpty(value)) {
             return InputFormatter.formatValue({ ...col, value }).formattedValue;
         }
@@ -688,7 +698,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         if (!isNonNullString(displayView)) return DatagridDisplayView;
         return Datagrid.getRegisteredDisplayViews()[displayView] || DatagridDisplayView;
     }
-    static isValidAggregationFunction(aggregationFunction: IDatagridAggregationFunction<any>) {
+    static isValidAggregationFunction(aggregationFunction: IDatagridAggregationFunction<any>): aggregationFunction is IDatagridAggregationFunction {
         return typeof aggregationFunction === "function";
     }
 
@@ -719,6 +729,29 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         return isNonNullString(type) ? components[type] : DatagridColumn || DatagridColumn;
     }
 }
+/**
+ * Specifies the type of rendering for the column.
+ *
+ * This prop determines whether the column should render as a **cell** or a **header** in the datagrid.
+ * It allows developers to control the visual representation of the column based on its role in the table.
+ *
+ * @type {"rowCell" | "header"}
+ * @example
+ * // Render a column as a header
+ * <DatagridColumn renderType="header" value="ID" />
+ *
+ * @example
+ * // Render a column as a cell
+ * <DatagridColumn renderType="rowCell" value={row.id} />
+ *
+ * @remarks
+ * - Use `"header"` when the column represents a table header (e.g., column titles).
+ * - Use `"rowCell"` when the column represents a table cell (e.g., row data).
+ *
+ * @default "rowCell"
+ */
+export type IDatagridColumnRenderType = "header" | "rowCell";
+
 
 function DatagridRendered<DataType extends IDatagridDataType = any>(options: { context: Datagrid<DataType> }) {
     const { context } = options;
@@ -750,40 +783,231 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
  * This class provides a basic implementation for a Datagrid column, and can be extended to create custom columns.
  * 
  * @template DataType - The type of the data displayed in the grid.
- * @template PropsType - The type of the component's props.
+ * @template PropExtensions - The type of the component's props. This type is used to extend the component's props with additional properties.
  * @template StateType - The type of the component's state.
  */
-class DatagridColumn<DataType extends IDatagridDataType = any, PropsType = unknown, StateType = unknown> extends Component<IMergeWithoutDuplicates<IDatagridStateColumn<DataType> & { datagridContext: Datagrid<DataType> }, PropsType>, StateType> {
+class DatagridColumn<DataType extends IDatagridDataType = any, PropExtensions = unknown, StateType = unknown> extends Component<IDatagridStateColumn<DataType> & { rowData?: DataType, renderType?: IDatagridColumnRenderType, datagridContext: Datagrid<DataType> } & PropExtensions, StateType> {
     /**
-     * Renders the column.
+     * Returns the Datagrid context.
      * 
-     * This method is called when the column is rendered.
+     * This method provides access to the Datagrid component's state and methods.
+     * 
+     * @returns The Datagrid context.
+     */
+    getDatagridContext() {
+        return this.props.datagridContext;
+    }
+    /**
+     * Returns the name of the column.
+     * 
+     * This method returns the name of the column, or an empty string if no name is provided.
+     * 
+     * @returns The name of the column.
+     */
+    getName() {
+        return defaultStr(this.props.name);
+    }
+    /**
+     * Checks if the column is groupable.
+     * 
+     * This method checks if the column is groupable by calling the Datagrid context's isGroupable method.
+     * 
+     * @returns True if the column is groupable, false otherwise.
+     */
+    isGroupable() {
+        return this.getDatagridContext().isGroupable();
+    }
+    /**
+     * Checks if the column is filtrable.
+     * 
+     * This method checks if the column is filtrable by calling the Datagrid context's isFiltrable method.
+     * 
+     * @returns True if the column is filtrable, false otherwise.
+     */
+    isFiltrable() {
+        return this.getDatagridContext().isFiltrable();
+    }
+    /**
+     * Checks if the column is sortable.
+     * 
+     * This method checks if the column is sortable by calling the Datagrid context's isSortable method.
+     * 
+     * @returns True if the column is sortable, false otherwise.
+     */
+    isSortable() {
+        return this.getDatagridContext().isSortable();
+    }
+    /**
+     * Checks if the column is aggregatable.
+     * 
+     * This method checks if the column is aggregatable by calling the Datagrid context's isAggregatable method.
+     * 
+     * @returns True if the column is aggregatable, false otherwise.
+     */
+    isAggregatable() {
+        return this.getDatagridContext().isAggregatable();
+    }
+    /**
+     * Computes the value of the column.
+     * 
+     * This method computes the value of the column based on the provided row data and format.
+     * 
+     * @param rowData The row data to compute the value for.
+     * @param format Whether to format the value.
+     * @returns The computed value of the column.
+     */
+    computeValue(rowData: DataType, format: boolean = false) {
+        if (!this.isRowCell()) return null;
+        return this.getDatagridContext().computeColumnValue(this.props.name, rowData, format);
+    }
+    /**
+     * Returns a state column definition by name.
+     * 
+     * This method returns the column definition from the Datagrid context.
+     * 
+     * @param colName The name of the column to retrieve. If not provided, it defaults to the current column's name.
+     * @returns The column definition.
+     */
+    getColumn(colName?: string): IDatagridStateColumn<DataType> {
+        return this.getDatagridContext().getColumn(defaultStr(colName, this.getName()));
+    }
+    /**
+     * Returns the list of statecolumns.
+     * 
+     * This method returns the list of columns from the Datagrid context.
+     * 
+     * @returns The list of columns.
+     */
+    getColumns(): IDatagridStateColumn<DataType>[] {
+        const columns = this.getDatagridContext().state.columns;
+        return Array.isArray(columns) ? columns : [];
+    }
+    /**
+     * Returns the list of visible state columns.
+     * 
+     * This method returns the list of visible columns from the Datagrid context.
+     * 
+     * @returns The list of visible columns.
+     */
+    getVisibleColumns(): IDatagridStateColumn<DataType>[] {
+        const columns = this.getDatagridContext().state.visibleColumns;
+        return Array.isArray(columns) ? columns : [];
+    }
+    /**
+     * Checks if the column is the first column.
+     * 
+     * This method checks if the column is the first column by comparing its name to the name of the first column.
+     * 
+     * @returns True if the column is the first column, false otherwise.
+     */
+    isFirstColumn() {
+        return this.getColumns()[0]?.name === this.getName();
+    }
+    /**
+     * Checks if the column is the last column.
+     * 
+     * This method checks if the column is the last column by comparing its name to the name of the last column.
+     * 
+     * @returns True if the column is the last column, false otherwise.
+     */
+    isLastColumn() {
+        const columns = this.getColumns();
+        return columns?.length && columns[columns.length - 1]?.name === this.getName();
+    }
+    /**
+     * Checks if the column is the first visible column.
+     * 
+     * This method checks if the column is the first visible column by comparing its name to the name of the first visible column.
+     * 
+     * @returns True if the column is the first visible column, false otherwise.
+     */
+    isFirstVisibleColumn() {
+        const columns = this.getVisibleColumns();
+        return columns?.length && columns[0]?.name === this.getName();
+    }
+    /**
+     * Checks if the column is the last visible column.
+     * 
+     * This method checks if the column is the last visible column by comparing its name to the name of the last visible column.
+     * 
+     * @returns True if the column is the last visible column, false otherwise.
+     */
+    isLastVisibleColumn() {
+        const columns = this.getVisibleColumns();
+        return columns?.length && columns[columns.length - 1]?.name === this.getName();
+    }
+    /**
+     * Checks if the column is a header.
+     * 
+     * This method checks if the column is a header by checking its render type.
+     * 
+     * @returns True if the column is a header, false otherwise.
+     */
+    isHeader() {
+        return this.props.renderType === "header";
+    }
+    /**
+     * Checks if the column is a row cell.
+     * 
+     * This method checks if the column is a row cell by checking its render type and row data.
+     * 
+     * @returns True if the column is a row cell, false otherwise.
+     */
+    isRowCell() {
+        return this.props.renderType === "rowCell" && isObj(this.props.rowData);
+    }
+    /**
+     * Renders the column as a row cell.
+     * 
+     * This method renders the column as a row cell, using the provided row data and label props.
      * 
      * @returns The rendered column.
      */
-    render(): React.ReactNode {
-        return <></>;
+    protected renderRowCell(): React.ReactNode {
+        const { labelProps, rowData } = this.props;
+        if (!rowData || !this.isRowCell()) {
+            return null;
+        }
+        const column = this.getColumn();
+        if (!this.isValidColumn(column)) return null;
+        if (typeof this.props.renderRowCell == "function") {
+            const datagridContext = this.getDatagridContext();
+            return this.props.renderRowCell(datagridContext.getCallOptions({ column, rowData: rowData }));
+        }
+        return <Label {...labelProps} >{this.computeValue(rowData as DataType)}</Label>;
+    }
+    isValidColumn(column: IDatagridStateColumn<DataType>): column is IDatagridStateColumn<DataType> {
+        return this.getDatagridContext().isValidColumn(column);
+    }
+    /**
+     * Renders the column as a header.
+     * 
+     * This method renders the column as a header, using the provided label props.
+     * 
+     * @returns The rendered column.
+     */
+    protected renderHeader(): React.ReactNode {
+        const { labelProps, rowData } = this.props;
+        const column = this.getColumn();
+        if (!this.isValidColumn(column)) return null;
+        if (typeof this.props.renderHeader == "function") {
+            const datagridContext = this.getDatagridContext();
+            return this.props.renderHeader(datagridContext.getCallOptions({ column }));
+        }
+        return <Label {...labelProps} >{this.props.label}</Label>;
+    }
+    /**
+     * Renders the column.
+     * 
+     * This method renders the column, either as a row cell or a header, depending on its render type.
+     * 
+     * @returns The rendered column.
+     */
+    render() {
+        return this.isRowCell() ? this.renderRowCell() : this.renderHeader();
     }
 }
-function Column<DataType extends IDatagridDataType = any>({ rowData, columnName }: { columnName: string; rowData: IDatagridGroupedRow | DataType }) {
-    const datagridContext = useContext(DatagridContext);
-    const column = datagridContext?.getColumn(columnName);
-    const columnType = useMemo<IFieldType>(() => {
-        return column?.type || "text";
-    }, [column?.type]);
-    const Component = useMemo<any>(() => {
-        return Datagrid.getRegisteredColumn(columnType);
-    }, [columnType]);
-    if (!datagridContext || !column) return null;
-    const testId = datagridContext?.getTestID();
-    const rowKey = datagridContext?.getRowKey(rowData);
-    return <Component
-        datagridContext={datagridContext}
-        testID={`${testId}-column-${name}`}
-        key={`${testId}-cell-${name}-${rowKey}`}
-    />;
-}
-Column.displayName = "Datagrid.RenderedColumn";
+
 
 
 /**
@@ -842,6 +1066,16 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {
      */
     getDatagridContext() {
         return this.props.datagridContext;
+    }
+
+    getAggregatedColumnsValues(): Record<string, Record<keyof IDatagridAggregationFunctions, number>> {
+        const o = this.getDatagridContext().state.aggregatedColumnsValues;
+        return isObj(o) ? o : {};
+    }
+    getAggregatedColumnValues(columnName: string): Record<keyof IDatagridAggregationFunctions, number> {
+        if (!isNonNullString(columnName)) return {} as Record<keyof IDatagridAggregationFunctions, number>;
+        const o = this.getAggregatedColumnsValues();
+        return isObj(o) && isObj(o[columnName]) ? o[columnName] : {} as Record<keyof IDatagridAggregationFunctions, number>;
     }
 
     /**
@@ -915,22 +1149,61 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {
     renderGroupedRow(rowData: IDatagridGroupedRow<DataType>) {
         return null;
     }
+    getTestID() {
+        return defaultStr(this.getDatagridContext().getTestID(), "resk-datagrid");
+    }
+    getRowKey(rowData: DataType) {
+        return this.getDatagridContext().getRowKey(rowData);
+    }
+    getGroupedRowHeader(rowData: DataType) {
+        return this.getDatagridContext().getGroupedRowHeader(rowData);
+    }
+    getGroupedRowHeaderSeparator() {
+        return this.getDatagridContext().getGroupedRowHeaderSeparator();
+    }
 
+    protected renderRowCellOrHeader(columnName: string, renderType: IDatagridColumnRenderType = "rowCell", rowData?: IDatagridGroupedRow | DataType) {
+        const datagridContext = this.getDatagridContext();
+        if (!datagridContext) return null;
+        const column = this.getColumn(columnName);
+        if (!column || renderType === "rowCell" && !isObj(rowData)) return null;
+        const columnType = defaultStr(column?.type, "text");
+        const Component = Datagrid.getRegisteredColumn(columnType as IFieldType);
+        const testId = datagridContext.getTestID();
+        const isRowCell = renderType === "rowCell" && isObj(rowData);
+        if (renderType === "rowCell" && !isRowCell) return null;
+        if (rowData && this.isGroupedRow(rowData)) {
+            return this.renderGroupedRow(rowData);
+        }
+        const rowKey = isRowCell ? datagridContext.getRowKey(rowData as DataType) : "";
+        return <Component<DataType>
+            {...column}
+            renderType={renderType}
+            datagridContext={datagridContext}
+            testID={`${testId}-column-${columnName}`}
+            key={`${testId}-cell-${columnName}-${rowKey}`}
+        />;
+    }
     /**
-     * Renders a column.
+     * Renders a cell in the grid for a given column and row data.
      * 
-     * This method is called when a column is encountered.
+     * @param columnName - The name of the column to render the cell for.
+     * @param rowData - The data for the row, which can be either a grouped row or a regular data row.
      * 
-     * @param columnName The name of the column to render.
-     * @param rowData The row data to render.
-     * @returns The rendered column.
+     * @returns The rendered cell component, or null if the row data is invalid or the column does not exist.
+     * 
+     * If the row data is a grouped row, it delegates rendering to `renderGroupedRow`. Otherwise, it renders a regular `DatagridCell`.
      */
-    renderColumn(columnName: string, rowData: IDatagridGroupedRow | DataType) {
+
+    renderRowCell(columnName: string, rowData: IDatagridGroupedRow | DataType) {
         if (!isObj(rowData) || !this.getColumn(columnName)) return null;
         if (this.isGroupedRow(rowData)) {
             return this.renderGroupedRow(rowData);
         }
-        return <Column columnName={columnName} rowData={rowData} />;
+        return this.renderRowCellOrHeader(columnName, "rowCell", rowData);
+    }
+    renderHeader(columnName: string) {
+        return this.renderRowCellOrHeader(columnName, "header");
     }
 
     /**
@@ -1183,7 +1456,7 @@ export function useDatagrid<DataType extends IDatagridDataType = any>(): (Datagr
  * @template DataType - The type of the data displayed in the grid.
  * @see {@link IDatagridColumnProps} for more information about column properties.  
  */
-export type IDatagridStateColumn<DataType extends IDatagridDataType = any> = Omit<IDatagridColumnProps<DataType>, "getAggregationValue" | "aggregationFunction" | "sortable" | "filterable" | "groupable" | "aggregatable" | "visible"> & {
+export type IDatagridStateColumn<DataType extends IDatagridDataType = any> = Omit<IDatagridColumnProps<DataType>, "name" | "getAggregationValue" | "aggregationFunction" | "sortable" | "filterable" | "groupable" | "aggregatable" | "visible"> & {
     /**
      * Whether the column is sortable.
      * 
@@ -1234,6 +1507,16 @@ export type IDatagridStateColumn<DataType extends IDatagridDataType = any> = Omi
      * This property is used for testing purposes and can be used to identify the column in the grid.
      */
     testID?: string;
+
+    /***
+     * The unique name of the column.
+     */
+    name: string;
+
+    /***
+     * The index of the column in the list of columns of the grid.
+     */
+    colIndex: number;
 }
 
 
@@ -1253,6 +1536,8 @@ export type IDatagridColumnProps<DataType extends IDatagridDataType = any> = Omi
      * If true, the column can be sorted in ascending or descending order.
      */
     sortable?: boolean;
+
+    labelProps?: Partial<Omit<ILabelProps, "children">>;
 
     /**
      * The name of the column.
@@ -1317,7 +1602,7 @@ export type IDatagridColumnProps<DataType extends IDatagridDataType = any> = Omi
      * @param options An object containing the row data.
      * @returns The computed value of the column.
      */
-    computeValue?: (options: { rowData: DataType }) => any;
+    computeValue?: (options: IDatagridCallOptions<DataType> & { rowData: DataType }) => any;
 
     /**
      * Whether to ignore case when sorting the column.
@@ -1334,6 +1619,25 @@ export type IDatagridColumnProps<DataType extends IDatagridDataType = any> = Omi
      * @see {@link IDatagridAggregationFunctions} for more information about aggregation functions.
      */
     aggregationFunction?: keyof IDatagridAggregationFunctions<DataType> | IDatagridAggregationFunction<DataType>;
+
+    /***
+     * A custom render function for the column.
+     * 
+     * This property is used to render the column in a custom way.
+     * 
+     * @param options An object containing the row data and the datagrid context.
+     * @returns The rendered column.
+     */
+    renderRowCell?: (options: IDatagridCallOptions<DataType> & { rowData: DataType; column: IDatagridStateColumn<DataType> }) => React.ReactNode;
+
+    /**
+     * A custom render function for the header of the column.
+     * 
+     * This property is used to render the header of the column in a custom way.
+     * @param options An object containing the row data and the datagrid context.
+     * @returns The rendered header.
+     */
+    renderHeader?: (options: IDatagridCallOptions<DataType> & { column: IDatagridStateColumn<DataType> }) => React.ReactNode;
 }
 
 /**

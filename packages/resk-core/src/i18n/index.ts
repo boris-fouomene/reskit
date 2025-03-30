@@ -11,6 +11,8 @@ import { IDict } from "../types/index";
 import moment, { LocaleSpecification } from "moment";
 import { createPropertyDecorator, getDecoratedProperties } from "@/decorators";
 import momentLocaleFr from "./locales/moment.locale.fr";
+import isPrimitive from "@utils/isPrimitive";
+import { isNullable } from "@utils/isNullable";
 /**
  * A key to store metadata for translations.
  */
@@ -751,15 +753,17 @@ export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
      * @returns The interpolated string.
      */
     private static defaultInterpolator(i18n: I18nJs, value: string, params?: Record<string, any>) {
-        if (value === undefined || value === null) return "";
-        if (!["number", "boolean", "string"].includes(typeof value)) {
+        if (isNullable(value)) return "";
+        if (!isPrimitive(value)) {
             return stringify(value);
         }
         value = String(value);
         if (!isObj(params)) return value;
         if (!params) return value;
         if (!isObj(params) || !params) return value;
-        return value.replace(/%{(.*?)}/g, (_, key) => stringify(params[key]));
+        return value.replace(/%{(.*?)}/g, (_, key) => {
+            return isNullable(params[key]) ? "" : isPrimitive(params[key]) ? String(params[key]) : stringify(params[key]);
+        });
     }
 
 }

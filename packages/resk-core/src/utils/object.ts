@@ -81,9 +81,10 @@ export const isPlainObj = function (obj: any): boolean {
  * Any nested objects or arrays within the source will also be cloned, ensuring that the 
  * returned object does not reference the original object.
  *
- * @param {any} source - The object to clone. This can be any type, including arrays and nested objects.
+ * @template T - The type of the object to clone. This can be any type, including arrays and nested objects.
+ * @param {T} source - The object to clone. This can be any type, including arrays and nested objects.
  * 
- * @returns {IDict | Array<any>} A deep cloned copy of the source object. The return type can be
+ * @returns {T} A deep cloned copy of the source object. The return type can be
  * either an object or an array, depending on the input.
  *
  * @example
@@ -112,23 +113,23 @@ export const isPlainObj = function (obj: any): boolean {
  * console.log(clonedComplex); // Outputs: { a: 1, b: [2, { c: 3 }] }
  * ```
  */
-export function cloneObject(source: any): any {
+export function cloneObject<T = any>(source: T): T {
   if (Array.isArray(source)) {
     const clone = [];
     for (var i = 0; i < source.length; i++) {
       clone[i] = cloneObject(source[i]);
     }
-    return clone;
-  } else if (isPlainObj(source)) {
+    return clone as T;
+  } else if (isPlainObj(source) && source) {
     const clone: IDict = {};
     for (var prop in source) {
       if (source.hasOwnProperty(prop)) {
         clone[prop] = cloneObject(source[prop]);
       }
     }
-    return clone;
+    return clone as T;
   } else {
-    return source;
+    return source as T;
   }
 };
 
@@ -354,8 +355,11 @@ declare global {
      * cloned.b.c = 3;
      * console.log(original.b.c); // Outputs: 2 (original remains unchanged)
      * ```
+     * @template T - The type of the object to clone.
+     * @param {T} obj - The object to clone.
+     * @returns {T} A clone of the object.
      */
-    clone: (obj: any) => any;
+    clone: <T = any>(obj: T) => T;
 
     /**
      * Determines the size of an object or array.

@@ -1,20 +1,22 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, isValidElement, useContext, useEffect, useMemo, useRef } from 'react';
 import {
     View,
     StyleSheet,
     ScrollView,
     ViewProps
 } from 'react-native';
-import { Component, ObservableComponent, getReactKey, getTextContent } from '@utils/index';
-import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify } from '@resk/core/utils';
+import { Component, ObservableComponent, getReactKey, getTextContent, useForceRender, useIsMounted } from '@utils/index';
+import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
 import { IField, IFieldType, IResourcePaginationMetaData, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
 import Label, { ILabelProps } from '@components/Label';
 import InputFormatter from '@resk/core/inputFormatter';
 import { ResourcePaginationHelper } from '@resk/core/resources';
-
-const defaultNumber = (a: any) => isNumber(a) ? a : 0;
+import { IReactComponent } from '@src/types';
+import { Preloader } from '@components/Dialog';
+import { AppBar, IAppBarAction, IAppBarProps } from '@components/AppBar';
+import { Divider } from '@components/Divider';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -58,6 +60,196 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * A unique symbol used to store aggregation function metadata for the [Datagrid](cci:2://file:///d:/Projets/VSCODE/reskit/packages/resk-native/src/components/Datagrid/Datagrid.tsx:726:0-787:1) component.
      */
     private static aggregationFunctionMetadataKey = Symbol("datagrid-aggregation-functions-meta");
+    private _isLoading: boolean = false;
+    private _toggleLoading: boolean = false;
+    /***
+     * A set of selected rows keys.
+     */
+    private readonly selectedRowsKeys: Set<string> = new Set();
+
+    /**
+     * Retrieves the keys of the currently selected rows.
+     *
+     * @returns {string[]} An array of strings representing the keys of the selected rows.
+     */
+    public getSelectedRowsKeys(): string[] {
+        return Array.from(this.selectedRowsKeys);
+    }
+    /***
+     * Retrieves the number of selected rows.
+     *
+     * @returns {number} The number of selected rows.
+     */
+    public getSelectedRowsCount(): number {
+        return this.selectedRowsKeys.size;
+    }
+    /**
+     * Determines if the given row is selected.
+     *
+     * This method checks if the specified row data corresponds to a selected row
+     * within the Datagrid. It retrieves the row key using the provided row data and
+     * verifies its validity. If the row key is valid, it checks the selection state
+     * of the row by determining if the key exists in the set of selected row keys.
+     *
+     * @param {DataType} rowData - The data of the row to check selection status for.
+     * @returns {boolean} `true` if the row is selected, `false` otherwise.
+     */
+    isRowSelected(rowData: DataType) {
+        const rowKey = this.getRowKey(rowData);
+        if (!Datagrid.isValidRowKey(rowKey)) return false;
+        return this.selectedRowsKeys.has(rowKey);
+    }
+    /**
+     * Validates the provided row key.
+     *
+     * This static method checks if the given row key is a non-null string,
+     * indicating that it is a valid key for identifying a row in the Datagrid.
+     *
+     * @param {string} rowKey - The row key to validate.
+     * @returns {boolean} - Returns `true` if the row key is a non-null string, `false` otherwise.
+     */
+    static isValidRowKey(rowKey: string) {
+        return isNonNullString(rowKey);
+    }
+
+    /**
+     * Checks if a row is selectable.
+     *
+     * This method determines if the given row data can be selected by checking if the row is a grouped row or if the `isRowSelectable` property is a function.
+     * If the `isRowSelectable` property is a function, it calls the function with the provided row data and the current component's state and props.
+     * Otherwise, it returns true, indicating that the row is selectable.
+     *
+     * @param {DataType | IDatagridGroupedRow} rowData - The data of the row to check selection status for.
+     * @returns {boolean} - Returns `true` if the row is selectable, `false` otherwise.
+     */
+    isRowSelectable(rowData: DataType | IDatagridGroupedRow) {
+        if (this.isGroupedRow(rowData)) return false;
+        if (typeof this.props.isRowSelectable === "function") return this.props.isRowSelectable(this.getCallOptions({ rowData }));
+        return true;
+    }
+    /**
+     * Toggles the selection state of a row in the Datagrid.
+     * 
+     * This method takes a row data object as a parameter and checks if the row is selectable by calling the `isRowSelectable` method.
+     * If the row is not selectable, the method does nothing.
+     * Otherwise, it checks if the row is already selected by calling the `isRowSelected` method.
+     * If the row is selected, it removes the row key from the set of selected row keys and triggers the "rowUnselected" event.
+     * Otherwise, it adds the row key to the set of selected row keys and triggers the "rowSelected" event.
+     * Finally, it triggers the "toggleRowSelection" event with the updated selection state.
+     * 
+     * @param {DataType} rowData - The data of the row to toggle selection for.
+     * @param {boolean} trigger - Optional flag to trigger the row selection changed event. Defaults to true.
+     */
+    toggleRowSelection(rowData: DataType, trigger: boolean = true) {
+        const rowKey = this.getRowKey(rowData);
+        if (!Datagrid.isValidRowKey(rowKey) || !this.isRowSelectable(rowData)) return;
+        const isSelected = this.isRowSelected(rowData);
+        if (isSelected) {
+            this.selectedRowsKeys.delete(rowKey);
+            if (trigger !== false) {
+                this.trigger("rowUnselected", { rowData });
+            }
+        } else {
+            this.selectedRowsKeys.add(rowKey);
+            if (trigger !== false) {
+                this.trigger("rowSelected", { rowData });
+            }
+        }
+        if (trigger !== false) {
+            this.trigger("toggleRowSelection", { rowData, isRowSelected: !isSelected });
+        }
+    }
+    isAllRowsSelected() {
+        return this.state.paginatedData.length > 0 && this.state.paginatedData.length <= this.selectedRowsKeys.size;
+    }
+
+    /**
+     * Determines if the Datagrid is currently in a loading state.
+     * The loading state is determined by the presence of the `isLoading` property
+     * in the component's props.
+     * @returns {boolean} `true` if the Datagrid is currently in a loading state, `false` otherwise.
+     */
+    isLoading() {
+        return !!this.props.isLoading;
+    }
+    /**
+     * Determines if the loading indicator can be rendered.
+     * 
+     * The loading indicator can be rendered if the Datagrid is in a loading state,
+     * either due to the `isLoading` prop or the internal `_isLoading` state.
+     * 
+     * @returns {boolean} `true` if the loading indicator can be rendered, `false` otherwise.
+     */
+    canRenderLoadingIndicator() {
+        return this.isLoading() || this._isLoading;
+    }
+    /**
+     * Sets the loading state of the Datagrid and triggers the "toggleIsLoading" event.
+     * If the loading state is set to `true`, the `_toggleLoading` flag is set to `true`.
+     * The `cb` argument is a callback function that is called after the loading state has been toggled.
+     * The callback function is called with the `isLoading` state as an argument.
+     * The `timeout` argument is the time in milliseconds to wait before calling the callback function.
+     * If `timeout` is not provided, the default timeout of 500 milliseconds is used.
+     * @param {boolean} loading - The loading state of the Datagrid to be set.
+     * @param {Function} [cb] - The callback function to be called after the loading state has been toggled.
+     * @param {number} [timeout] - The time in milliseconds to wait before calling the callback function.
+     * @returns {boolean} The loading state of the Datagrid.
+     */
+    setIsLoading(loading: boolean, cb?: Function, timeout?: number) {
+        if (loading === true) {
+            this._toggleLoading = true;
+        }
+        loading = this.props.isLoading === true ? true : typeof loading == "boolean" ? loading : false;
+        timeout = typeof timeout == "number" ? timeout : 500;
+        cb = typeof cb == "function" ? cb : () => true;
+        this._isLoading = loading;
+        this.trigger("toggleIsLoading", { isLoading: loading });
+        setTimeout(cb, timeout);
+        return this._isLoading;
+    };
+    /**
+     * Toggles the selection state of all rows in the Datagrid.
+     * 
+     * This method takes an optional boolean parameter `selectOrUnselectAll` to determine if all rows should be selected.
+     * If `selectOrUnselectAll` is `undefined`, the method will toggle the selection state of all rows.
+     * If `selectOrUnselectAll` is `true`, all rows will be selected.
+     * If `selectOrUnselectAll` is `false`, all rows will be unselected.
+     * The method will also trigger the "toggleAllRowsSelection" event with the updated selection state if the `trigger` parameter is not set to `false`.
+     * 
+     * @param {boolean} [selectOrUnselectAll] - Optional flag to select all rows. Defaults to `undefined`.
+     * @param {boolean} [trigger] - Optional flag to trigger the "toggleAllRowsSelection" event. Defaults to `true`.
+     */
+    toggleAllRowsSelection(selectOrUnselectAll?: boolean, trigger: boolean = true) {
+        selectOrUnselectAll = typeof selectOrUnselectAll == "boolean" ? selectOrUnselectAll : !this.isAllRowsSelected();
+        this.selectedRowsKeys.clear();
+        if (selectOrUnselectAll) {
+            for (const rowData of this.state.paginatedData) {
+                const rowKey = this.getRowKey(rowData);
+                if (!Datagrid.isValidRowKey(rowKey)) continue;
+                this.selectedRowsKeys.add(rowKey);
+            }
+        }
+        if (trigger !== false) {
+            this.trigger("toggleAllRowsSelection", { isAllRowsSelected: selectOrUnselectAll });
+        }
+    }
+    /**
+     * Retrieves the selected rows.
+     *
+     * This method returns an array of rows that are currently selected in the Datagrid.
+     * The array contains the actual data of the selected rows.
+     *
+     * @returns {DataType[]} An array of rows that are currently selected in the Datagrid.
+     */
+    getSelectedRows(): DataType[] {
+        const selectedRows: DataType[] = [];
+        for (const rowKey of this.selectedRowsKeys) {
+            const row = this.getRowByKey(rowKey);
+            if (!isObj(row) || !row) continue;
+            selectedRows.push(row);
+        }
+        return selectedRows;
+    }
     /**
      * A built-in aggregation function that returns the maximum value of a column.
      * 
@@ -248,8 +440,18 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             });
         }
     }
+
+    /**
+     * Updates the component's state with the provided data, and optionally executes a callback function
+     * after the state has been updated.
+     * 
+     * @param {Partial<IDatagridState<DataType>>} stateData - The data to update the component's state with.
+     * @param {() => void} [callback] - An optional function to execute after the state has been updated.
+     */
     updateState(stateData: Partial<IDatagridState<DataType>>, callback?: () => void) {
-        this.setState((prevState) => ({ ...prevState, ...stateData }), callback);
+        this.setIsLoading(true, () => {
+            this.setState((prevState) => ({ ...prevState, ...stateData }), callback);
+        });
     }
     /***
      * returns the list of display views to be displayed in the datagrid. if provided from props, it will override the default display views.
@@ -471,11 +673,11 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * This method checks if the row data is an object and contains the properties 
      * indicating it is a grouped row, such as `isDatagridGroup` and a valid `label`.
      * 
-     * @param {IDatagridGroupedRow<DataType> | DataType} rowData - The row data to evaluate.
+     * @param {IDatagridGroupedRow | DataType} rowData - The row data to evaluate.
      * 
      * @returns {boolean} - Returns true if the row data is a grouped row; otherwise, false.
      */
-    isGroupedRow(rowData: IDatagridGroupedRow<DataType> | DataType): rowData is IDatagridGroupedRow {
+    isGroupedRow(rowData: IDatagridGroupedRow | DataType): rowData is IDatagridGroupedRow {
         return isObj(rowData) && !!rowData.isDatagridGroup && isNonNullString(rowData.label);
     }
     /**
@@ -619,7 +821,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             }
         });
         data.map((rowData, index) => {
-            if (!isObj(rowData) || (typeof this.props.internalFilter == "function" && !this.props.internalFilter(rowData, index))) return;
+            if (!isObj(rowData) || (typeof this.props.localFilter == "function" && !this.props.localFilter(rowData, index))) return;
             rowData = typeof this.props.rowDataMutator == "function" ? this.props.rowDataMutator(this.getCallOptions({ rowData })) : rowData;
             if (!isObj(rowData)) return;
             const rowKey = this.getRowKey(rowData);
@@ -747,6 +949,13 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                 this.setSessionData("orderBy", this.state.orderBy);
                 this.setSessionData("groupedColumns", this.state.groupedColumns);
             });
+        } else {
+            setTimeout(() => {
+                if (this._toggleLoading === true) {
+                    this.setIsLoading(false);
+                }
+                this._toggleLoading = false;
+            }, 500);
         }
     }
 
@@ -1042,6 +1251,135 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         const components = Datagrid.getRegisteredColumns();
         return isNonNullString(type) ? components[type] : DatagridColumn || DatagridColumn;
     }
+    /**
+     * A loading indicator component for the Datagrid.
+     * 
+     * This static method renders a custom loading indicator component based on the 
+     * current loading state of the Datagrid. It listens for "toggleIsLoading" events 
+     * from the Datagrid context to update the loading state. The loading state is 
+     * managed internally using React's state and effect hooks.
+     * 
+     * @param {Object} param - The function parameter.
+     * @param {IReactComponent<IDatagridLoadingIndicatorProps>} param.Component - The component to render as the 
+     * loading indicator. It receives the `isLoading` prop to determine its display.
+     * 
+     * @returns {JSX.Element | null} The rendered loading indicator component, or null 
+     * if the provided Component is not a function.
+     */
+    static LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridLoadingIndicatorProps> }) {
+        const datagridContext = useDatagrid();
+        const canRenderLoadingIndicator = !!datagridContext?.canRenderLoadingIndicator();
+        const [isLoading, _setIsLoading] = React.useState(canRenderLoadingIndicator);
+        const isMounted = useIsMounted();
+        const setIsLoading = (nLoading: boolean) => {
+            if (!isMounted() || nLoading == isLoading) return;
+            _setIsLoading(nLoading);
+        };
+        useDatagridOnEvent("toggleIsLoading", (newIsLoading) => {
+            setIsLoading(newIsLoading?.isLoading);
+        }, false);
+        useEffect(() => {
+            const loading: boolean = !!datagridContext?.canRenderLoadingIndicator();
+            if (loading !== isLoading) {
+                setIsLoading(loading);
+            }
+        }, [datagridContext?.canRenderLoadingIndicator()]);
+        return typeof Component !== "function" ? null : <Component isLoading={isLoading} />;
+    };
+    /**
+     * The default loading indicator component for the Datagrid.
+     * 
+     * This loading indicator uses the {@link Preloader} component to show a loading indicator
+     * that covers the entire screen. It listens for "toggleIsLoading" events from the Datagrid
+     * context to update the loading state. The loading state is managed internally using
+     * React's state and effect hooks.
+     * 
+     * @param {IDatagridLoadingIndicatorProps} props - The properties for the loading indicator.
+     * @param {boolean} props.isLoading - The boolean indicating whether the Datagrid is in a loading state.
+     * 
+     * @returns {JSX.Element | null} The rendered loading indicator component, or null if the loading
+     * indicator is not to be rendered.
+     */
+    static DefaultLoadingIndicator({ isLoading }: IDatagridLoadingIndicatorProps) {
+        const hasShownPreloaderRef = useRef(false);
+        useEffect(() => {
+            if (isLoading) {
+                Preloader.open();
+            } else {
+                if (hasShownPreloaderRef.current) {
+                    Preloader.close();
+                }
+            }
+            (hasShownPreloaderRef as any).current = isLoading;
+        }, [!!isLoading]);
+        return null;
+    }
+
+    /**
+     * Renders the loading indicator for the Datagrid component.
+     *
+     * This function checks if the loading indicator can be rendered, and if so,
+     * it returns a `Datagrid.LoadingIndicator` component. The loading indicator
+     * to be rendered can be customized via the `loadingIndicator` prop. If the
+     * `loadingIndicator` prop is a valid React element, it will be rendered
+     * directly. Otherwise, the default loading indicator is rendered.
+     *
+     * @returns {JSX.Element | null} The loading indicator component if it can be
+     * rendered, otherwise null.
+     */
+    renderLoadingIndicator() {
+        if (!this.canRenderLoadingIndicator()) {
+            return null;
+        }
+        const loadingIndicator = this.props.loadingIndicator;
+        return <Datagrid.LoadingIndicator
+            Component={function ({ isLoading }: IDatagridLoadingIndicatorProps) {
+                if (isValidElement(loadingIndicator) && loadingIndicator) {
+                    return loadingIndicator;
+                }
+                return <Datagrid.DefaultLoadingIndicator isLoading={isLoading} />;
+            }}
+        />;
+    }
+    /**
+     * Renders the actions toolbar component for the Datagrid component.
+     *
+     * This component renders the actions toolbar with the actions specified
+     * in the `actions` or `selectedRowsActions` props. If `selectedRowsActions`
+     * is present and there are selected rows, it will be used instead of the
+     * `actions` prop. The title of the toolbar is automatically set to
+     * the number of selected rows, or an empty string if there are no selected
+     * rows.
+     *
+     * @returns {JSX.Element | null} The actions toolbar component if the
+     * `renderActionsToolbar` prop is true, otherwise null.
+     */
+    static Actions() {
+        const datagridContext = useDatagrid();
+        const { selectedRowsActions, actions, renderActionsToolbar, actionsToolbarProps, ...props } = Object.assign({}, datagridContext?.props);
+        useDatagridOnEvent(["toggleAllRowsSelection"], undefined, true);
+        const { actions: actionsToDisplay, title } = useMemo(() => {
+            if (!datagridContext) return {
+                actions: [],
+                title: ""
+            };
+            const count = defaultNumber(datagridContext?.getSelectedRowsCount());
+            const actionsOrCallback = count > 0 ? selectedRowsActions : actions;
+            const _actions = typeof actionsOrCallback === "function" ? actionsOrCallback(datagridContext) : actionsOrCallback;
+            const suffix = count > 1 ? "s" : "";
+            return { actions: Array.isArray(_actions) ? _actions : [], title: count ? count.formatNumber() + suffix : "" };
+        }, [datagridContext?.getSelectedRowsCount()]);
+        if (!renderActionsToolbar) return null;
+        const testID = datagridContext?.getTestID();
+        return <View testID={testID + "-actions-container"} style={[styles.actionsToolbar]}>
+            <AppBar testID={`${testID}-actions`}
+                backAction={false}
+                backgroundColor='transparent' {...Object.assign({}, actionsToolbarProps)}
+                title={title || null} actions={actionsToDisplay as any}
+            />
+            <Divider testID={testID + "-actions-divider"} />
+        </View>
+    }
 }
 /**
  * Specifies the type of rendering for the column.
@@ -1075,9 +1413,12 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
     const Component = useMemo<typeof DatagridDisplayView<DataType>>(() => {
         return Datagrid.getRegisteredDisplayView(displayView);
     }, [displayView]);
+    const isLoading = context.isLoading();
     return (
         <DatagridContext.Provider value={context}>
-            <View testID={testID} style={[styles.main, props.style]}>
+            <View testID={testID} style={[styles.main, isLoading && styles.disabled, props.style]}>
+                {context.renderLoadingIndicator()}
+                {<Datagrid.Actions />}
                 {/* View switcher */}
                 <ScrollView testID={testID + "-horizontal-header-scrollview"} horizontal style={styles.viewSwitcher}>
 
@@ -1477,7 +1818,7 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {
      * @param rowData The row data to check.
      * @returns Whether the row is a grouped row.
      */
-    isGroupedRow(rowData: IDatagridGroupedRow<DataType> | DataType): rowData is IDatagridGroupedRow {
+    isGroupedRow(rowData: IDatagridGroupedRow | DataType): rowData is IDatagridGroupedRow {
         return !!this.getDatagridContext().isGroupedRow(rowData);
     }
 
@@ -1489,7 +1830,7 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {
      * @param rowData The row data to render.
      * @returns The rendered grouped row.
      */
-    renderGroupedRow(rowData: IDatagridGroupedRow<DataType>) {
+    renderGroupedRow(rowData: IDatagridGroupedRow) {
         return null;
     }
     /**
@@ -1614,7 +1955,138 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = {
     renderHeader(columnName: string) {
         return this.renderRowCellOrHeader(columnName, "header");
     }
+    /**
+     * Retrieves the keys of the currently selected rows.
+     *
+     * @returns {string[]} An array of strings representing the keys of the selected rows.
+     */
+    getSelectedRowsKeys() {
+        return this.getDatagridContext().getSelectedRowsKeys();
+    }
 
+    /**
+     * Retrieves the number of selected rows.
+     *
+     * @returns {number} The number of selected rows.
+     */
+    getSelectedRowsCount() {
+        return this.getDatagridContext().getSelectedRowsCount();
+    }
+    /**
+     * Retrieves the currently selected rows.
+     *
+     * @returns {DataType[]} An array of objects representing the currently selected rows.
+     */
+    getSelectedRows() {
+        return this.getDatagridContext().getSelectedRows();
+    }
+    /**
+     * Checks if a row is selected.
+     * 
+     * This method checks if a given row is selected in the grid.
+     * 
+     * @param rowData - The row data to check.
+     * 
+     * @returns Whether the row is selected.
+     * 
+     * @remarks
+     * It delegates the check to the Datagrid context's isRowSelected method.
+     */
+    isRowSelected(rowData: DataType) {
+        return this.getDatagridContext().isRowSelected(rowData);
+    }
+
+    /**
+     * Toggles the selection state of a row in the Datagrid.
+     * 
+     * This method is a pass-through to the Datagrid context's toggleRowSelection method.
+     * It takes a row data object as a parameter and checks if the row is selectable by calling the `isRowSelectable` method.
+     * If the row is not selectable, the method does nothing.
+     * Otherwise, it checks if the row is already selected by calling the `isRowSelected` method.
+     * If the row is selected, it removes the row key from the set of selected row keys and triggers the "rowUnselected" event.
+     * Otherwise, it adds the row key to the set of selected row keys and triggers the "rowSelected" event.
+     * Finally, it triggers the "toggleRowSelection" event with the updated selection state.
+     * 
+     * @param {DataType} rowData - The data of the row to toggle selection for.
+     * @param {boolean} trigger - Optional flag to trigger the row selection changed event. Defaults to true.
+     */
+    toggleRowSelection(rowData: DataType, trigger: boolean = true) {
+        return this.getDatagridContext().toggleRowSelection(rowData, true);
+    }
+    /**
+     * Toggles the selection state of all rows in the Datagrid.
+     * 
+     * This method is a pass-through to the Datagrid context's toggleAllRowsSelection method.
+     * It takes an optional boolean parameter `selectOrUnselectAll` to determine if all rows should be selected.
+     * If `selectOrUnselectAll` is `undefined`, the method will toggle the selection state of all rows.
+     * If `selectOrUnselectAll` is `true`, all rows will be selected.
+     * If `selectOrUnselectAll` is `false`, all rows will be unselected.
+     * The method will also trigger the "toggleAllRowsSelection" event with the updated selection state if the `trigger` parameter is not set to `false`.
+     * 
+     * @param {boolean} [selectOrUnselectAll] - Optional flag to select all rows. Defaults to `undefined`.
+     * @param {boolean} [trigger] - Optional flag to trigger the "toggleAllRowsSelection" event. Defaults to `true`.
+     */
+    toggleAllRowsSelection(selectOrUnselectAll?: boolean, trigger: boolean = true) {
+        return this.getDatagridContext().toggleAllRowsSelection(selectOrUnselectAll, trigger);
+    }
+
+    /**
+     * Checks if a row is selectable.
+     * 
+     * This method checks if the given row is selectable by delegating the check to the Datagrid context's isRowSelectable method.
+     * 
+     * @param {DataType | IDatagridGroupedRow} rowData - The data of the row to check selection status for.
+     * 
+     * @returns {boolean} - Whether the row is selectable.
+     */
+    isRowSelectable(rowData: DataType | IDatagridGroupedRow) {
+        return this.getDatagridContext().isRowSelectable(rowData);
+    }
+    /**
+     * Checks if the Datagrid is currently loading data.
+     * 
+     * This method is a pass-through to the Datagrid context's isLoading method.
+     * It returns a boolean indicating whether the Datagrid is currently loading data.
+     * 
+     * @returns {boolean} - Whether the Datagrid is currently loading data.
+     */
+    isLoading() {
+        return this.getDatagridContext().isLoading();
+    }
+
+    /**
+     * Checks if the loading indicator can be rendered.
+     * 
+     * This method is a pass-through to the Datagrid context's canRenderLoadingIndicator method.
+     * It returns a boolean indicating whether the loading indicator can be rendered.
+     * The loading indicator can be rendered if the Datagrid is in a loading state,
+     * either due to the `isLoading` prop or the internal `_isLoading` state.
+     * 
+     * @returns {boolean} - Whether the loading indicator can be rendered.
+     */
+    canRenderLoadingIndicator() {
+        return this.getDatagridContext().canRenderLoadingIndicator();
+    }
+    /**
+     * Sets the loading state of the Datagrid and triggers the "toggleIsLoading" event.
+     * 
+     * This method is a pass-through to the Datagrid context's setIsLoading method.
+     * It takes three parameters: `loading`, `cb`, and `timeout`.
+     * The `loading` parameter is a boolean indicating whether the Datagrid should be in a loading state.
+     * The `cb` parameter is an optional callback function to be called after the loading state has been toggled.
+     * The `timeout` parameter is an optional number indicating the time in milliseconds to wait before calling the callback function.
+     * If `timeout` is not provided, the default timeout of 500 milliseconds is used.
+     * The callback function is called with the `isLoading` state as an argument.
+     * The method returns the `isLoading` state of the Datagrid.
+     * 
+     * @param {boolean} loading - The loading state to set the Datagrid to.
+     * @param {Function} [cb] - An optional callback function to be called after the loading state has been toggled.
+     * @param {number} [timeout] - An optional number indicating the time in milliseconds to wait before calling the callback function.
+     * @returns {boolean} The loading state of the Datagrid.
+     */
+    setIsLoading(loading: boolean, cb?: Function, timeout?: number) {
+        this.getDatagridContext().setIsLoading(loading, cb, timeout);
+    }
     /**
      * Renders the component.
      * 
@@ -1679,7 +2151,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * @param rowIndex The index of the row.
      * @returns Whether the row should be included in the grid.
      */
-    internalFilter?: (rowData: DataType, rowIndex: number) => boolean;
+    localFilter?: (rowData: DataType, rowIndex: number) => boolean;
 
     /**
      * Whether aggregation is enabled for the grid.
@@ -1749,14 +2221,14 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * @param options An object containing the row data and the datagrid context.
      * @returns The key for the row.
      */
-    getRowKey: (options: IDatagridCallOptions<DataType> & { rowData: DataType }) => string | number;
+    getRowKey?: (options: IDatagridCallOptions<DataType> & { rowData: DataType }) => string | number;
 
     /**
      * The key or keys to use for the row.
      * 
      * This property is used to specify the key or keys that should be used for the row.
      */
-    rowKey: (keyof DataType) | (keyof DataType)[];
+    rowKey?: (keyof DataType) | (keyof DataType)[];
 
     /**
      * A function to handle row press events.
@@ -1834,7 +2306,197 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * If true, the grid allows pagination.
      */
     paginationEnabled?: boolean;
+
+    /***
+     * Whether the grid is loading data.
+     */
+    isLoading?: boolean;
+
+    /**
+     * A JSX element or `null` to render as the loading indicator.
+     *
+     * This prop allows you to customize the visual representation of the loading state in the datagrid.
+     * When the `isLoading` prop is set to `true`, the `loadingIndicator` will be displayed in place of the actual data.
+     * If no `loadingIndicator` is provided, the datagrid will not display any loading UI.
+     *
+     * @type {React.ReactNode}
+     * @example
+     * // Using a custom progress bar component
+     * <Datagrid
+     *   isLoading={true}
+     *   loadingIndicator={<LoadingIndicator />}
+     * />
+     *
+     * @example
+     * // Using a simple text-based loading indicator
+     * <Datagrid
+     *   isLoading={true}
+     *   loadingIndicator={<Text>Loading...</Text>}
+     * />
+     *
+     * @example
+     * // No loading indicator (default behavior)
+     * <Datagrid
+     *   isLoading={true}
+     * />
+     *
+     * @remarks
+     * - The `loadingIndicator` is only rendered when the `isLoading` prop is `true`.
+     * - You can pass any valid React element, including functional components, class components, or HTML elements.
+     * - If you pass `null` or omit this prop, no loading indicator will be displayed.
+     */
+    loadingIndicator?: JSX.Element | null;
+
+
+    /**
+     * Defines the actions that can be performed within the Datagrid component.
+     * 
+     * The `actions` property allows you to specify a list of actions or a function that dynamically generates actions
+     * based on the current state of the Datagrid. These actions can be displayed in the Datagrid's toolbar or other interactive elements.
+     * 
+     * @type {IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[])}
+     * 
+     * @template DataType - The type of the data displayed in the grid.
+     * 
+     * @example
+     * ```typescript
+     * const deleteAction: IDatagridAction = {
+     *   icon: "delete",
+     *   label: "Delete",
+     *   onPress : (event,{ datagridContext }) => {
+     *     const selectedRows = datagridContext.getSelectedRows();
+     *     console.log("Deleting rows:", selectedRows);
+     *   },
+     * };
+     * 
+     * const actions: IDatagridAction[] = [deleteAction];
+     * 
+     * <Datagrid
+     *   data={data}
+     *   columns={columns}
+     *   actions={actions}
+     * />
+     * ```
+     * 
+     * @remarks
+     * - The `actions` property can be a static array of actions or a function that dynamically generates actions based on the Datagrid's state.
+     * - Each action must conform to the `IDatagridAction` interface.
+     * - If no actions are provided, the toolbar will not display any actions.
+     * 
+     * @see {@link IDatagridAction} for the structure of an action.
+     */
+    actions?: IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[]);
+
+    /***
+     * Whether to render the actions toolbar.
+     */
+    renderActionsToolbar?: boolean;
+
+    /***
+     * The props to pass to the actions toolbar.
+     */
+    actionsToolbarProps?: Partial<Omit<IAppBarProps, "children" | "actions">>;
+
+    /**
+     * Defines the actions that can be performed on the selected rows within the Datagrid component.
+     * 
+     * The `selectedRowsActions` property allows you to specify a list of actions or a function that dynamically generates actions
+     * based on the current state of the Datagrid and the selected rows. These actions can be displayed in the Datagrid's toolbar
+     * or other interactive elements.
+     * 
+     * @type {IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[])}
+     * 
+     * @template DataType - The type of the data displayed in the grid.
+     * 
+     * @example
+     * ```typescript
+     * const deleteAction: IDatagridAction = {
+     *   icon: "delete",
+     *   label: "Delete",
+     *   onPress :  (event,{ datagridContext }) => {
+     *     const selectedRows = datagridContext.getSelectedRows();
+     *     console.log("Deleting rows:", selectedRows);
+     *   },
+     * };
+     * 
+     * const selectedRowsActions: IDatagridAction[] = [deleteAction];
+     * 
+     * <Datagrid
+     *   data={data}
+     *   columns={columns}
+     *   selectedRowsActions={selectedRowsActions}
+     * />
+     * ```
+     * 
+     * @example
+     * ```typescript
+     * const dynamicActions = (datagridContext: Datagrid<any>) => {
+     *   const selectedRowsCount = datagridContext.getSelectedRowsCount();
+     *   if (selectedRowsCount > 0) {
+     *     return [
+     *       {
+     *         icon: "delete",
+     *         label: `Delete (${selectedRowsCount})`,
+     *         onPress :  (event,{ datagridContext }) => {
+     *           const selectedRows = datagridContext.getSelectedRows();
+     *           console.log("Deleting rows:", selectedRows);
+     *         },
+     *       },
+     *     ];
+     *   }
+     *   return [];
+     * };
+     * 
+     * <Datagrid
+     *   data={data}
+     *   columns={columns}
+     *   selectedRowsActions={dynamicActions}
+     * />
+     * ```
+     * 
+     * @remarks
+     * - The `selectedRowsActions` property can be a static array of actions or a function that dynamically generates actions based on the Datagrid's state and selected rows.
+     * - Each action must conform to the `IDatagridAction` interface.
+     * - If no actions are provided, the toolbar will not display any actions for selected rows.
+     * 
+     * @see {@link IDatagridAction} for the structure of an action.
+     */
+    selectedRowsActions: IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[]);
 }
+
+/**
+ * Represents an action that can be performed within the Datagrid component.
+ * 
+ * The `IDatagridAction` interface extends the `IAppBarAction` interface, adding a context specific to the Datagrid.
+ * Actions defined by this interface can be used in the Datagrid's toolbar or other interactive elements.
+ * 
+ * @template DataType - The type of the data displayed in the grid.
+ * 
+ * @extends {IAppBarAction}
+ * 
+ * @property {Datagrid<any>} datagridContext - The context of the Datagrid component, providing access to its state and methods.
+ * 
+ * @example
+ * ```typescript
+ * const deleteAction: IDatagridAction = {
+ *   icon: "delete",
+ *   label: "Delete",
+ *   onPress : (event,{ datagridContext }) => {
+ *     const selectedRows = datagridContext.getSelectedRows();
+ *     console.log("Deleting rows:", selectedRows);
+ *   },
+ * };
+ * 
+ * const actions: IDatagridAction[] = [deleteAction];
+ * ```
+ * 
+ * @remarks
+ * - Actions can be dynamically generated based on the Datagrid's state or user interactions.
+ * - The `datagridContext` provides access to the Datagrid's methods, such as `getSelectedRows` or `toggleRowSelection`.
+ * 
+ * @see {@link IAppBarAction} for the base action interface.
+ */
+export interface IDatagridAction extends IAppBarAction<{ datagridContext: Datagrid<any> }> { }
 
 const DatagridContext = createContext<Datagrid | null>(null);
 
@@ -1856,6 +2518,48 @@ export function useDatagrid<DataType extends IDatagridDataType = any>(): (Datagr
      * @see {@link DatagridContext} for more information about the Datagrid component's context.
      */
     return useContext(DatagridContext) as (Datagrid<DataType>) | null;
+}
+
+/**** Hooks sections */
+
+/**
+ * A hook to subscribe to events emitted by the Datagrid component.
+ * 
+ * This hook uses the useEffect hook to subscribe to the specified event(s) on the Datagrid component.
+ * When the event is emitted, the callback function is called with the provided arguments.
+ * If the forceRender argument is true, the component will be forced to re-render.
+ * If the forceRender argument is a function, it will be called to determine whether to force a re-render.
+ * 
+ * @param event The event to subscribe to, or an array of events to subscribe to.
+ * @param callback The callback function to call when the event is emitted.
+ * @param forceRender Whether to force a re-render of the component when the event is emitted.
+ * 
+ * @example
+ */
+export function useDatagridOnEvent(event: IDatagridEvent | IDatagridEvent[], callback?: (...args: any[]) => any, forceRender?: boolean | (() => boolean)) {
+    const datagridContext = useDatagrid();
+    const fRender = useForceRender();
+    useEffect(() => {
+        const subscribers: Record<string, { remove: Function }> = {};
+        (Array.isArray(event) ? event : [event]).map((event) => {
+            if (isNonNullString(event)) {
+                (subscribers as any)[String(event.toLowerCase().trim())] = datagridContext?.on(event, (...args: any[]) => {
+                    const canForceRender = typeof forceRender === "function" ? forceRender() : !!forceRender;
+                    if (typeof callback === "function") {
+                        callback(...args, event);
+                    }
+                    if (canForceRender) {
+                        fRender();
+                    }
+                });
+            }
+        });
+        return () => {
+            for (let i in subscribers) {
+                subscribers[i].remove();
+            }
+        };
+    }, [event, datagridContext?.on, callback]);
 }
 
 /**
@@ -2201,7 +2905,30 @@ export interface IDatagridState<DataType extends IDatagridDataType = any> {
  * A map of events that can be triggered by the Datagrid component. Each key is an event name.
  * @typedef IDatagridEventMap
  */
-export interface IDatagridEventMap { }
+export interface IDatagridEventMap {
+    /***
+     * Triggered when a row is selected.
+     */
+    rowSelected: string;
+    /***
+     * Triggered when a row is unselected.
+     */
+    rowUnselected: string;
+    /***
+     * Triggered when the selection state of a row changes.
+     */
+    toggleRowSelection: string;
+
+    /***
+     * Triggered when the selection state of all rows changes.
+     */
+    toggleAllRowsSelection: string;
+
+    /***
+     * Triggered to toggle loading state of the Datagrid component.
+     */
+    toggleIsLoading: string;
+}
 
 /**
  * A type representing the possible events that can be triggered by the Datagrid component.
@@ -2278,7 +3005,7 @@ export type IDatagridAggregator = keyof IDatagridAggregationFunctions;
  * @typedef IDatagridGroupedRow
  * @template DataType - The type of the data displayed in the grid.
  */
-export interface IDatagridGroupedRow<DataType extends IDatagridDataType = any> {
+export interface IDatagridGroupedRow {
     /**
      * A flag indicating that this is a grouped row.
      */
@@ -2300,7 +3027,7 @@ export interface IDatagridGroupedRow<DataType extends IDatagridDataType = any> {
  * @template DataType - The type of the data displayed in the grid.
  * @see {@link IDatagridGroupedRow} for more information about grouped rows.
  */
-export type IDatagridStateData<DataType extends IDatagridDataType = any> = Array<IDatagridGroupedRow<DataType> | DataType>;
+export type IDatagridStateData<DataType extends IDatagridDataType = any> = Array<IDatagridGroupedRow | DataType>;
 
 
 /**
@@ -2335,6 +3062,9 @@ export interface IDatagridPagination extends IResourcePaginationMetaData {
      */
     limit: number;
 }
+export interface IDatagridLoadingIndicatorProps extends Record<string, any> {
+    isLoading?: boolean;
+}
 
 const DatagridExported: typeof Datagrid & {
     Column: DatagridColumn;
@@ -2348,13 +3078,13 @@ const styles = StyleSheet.create({
         width: "100%",
         minHeight: 300,
     },
-    viewSwitcher: {
-        flexDirection: 'row',
-        padding: 10
+    disabled: {
+        pointerEvents: "none",
     },
-    viewSwitcherButton: {
-        marginRight: 10,
-        padding: 5,
-        borderRadius: 5
-    }
+    actionsToolbar: {
+        width: "100%",
+    },
+    viewSwitcher: {
+
+    },
 });

@@ -55,6 +55,19 @@ I18nClass.RegisterTranslations({
                 "showAggregatedTotals": "Show aggregated totals",
                 "columns": "Columns",
                 "hideAggregatedTotals": "Hide aggregated totals",
+                "groupTableData": "Group table data",
+                "groupBy": "Group by",
+                "displayOnlyAggregatedTotal": "Display only aggregated total",
+                "ungroup": "Ungroup",
+                "aggregationFunctionMenuDescription": "Select the aggregation function to use for the totals of the numeric columns",
+                "aggregationFunctionsLabel": "Aggregation functions",
+                "aggregationFunctions": {
+                    "sum": "Sum",
+                    "min": "Min",
+                    "max": "Max",
+                    "count": "Count",
+                    "average": "Average",
+                }
             }
         }
     }

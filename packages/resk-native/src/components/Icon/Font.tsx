@@ -615,6 +615,11 @@ type IFontWithCustomIcons = typeof FontIcon & {
      *   screen reader labels, to enhance usability for all users.
      */
     UNCHECKED: "checkbox-blank-outline";
+
+    /***
+     * Represent the check icon
+     */
+    CHECK: "check";
 };
 const FontWithCustomIcons = FontIcon as unknown as IFontWithCustomIcons;
 
@@ -842,6 +847,8 @@ FontWithCustomIcons.CHECKED = isIos ? 'check' : "checkbox-marked";
  *   screen reader labels, to enhance usability for all users.
  */
 FontWithCustomIcons.UNCHECKED = "checkbox-blank-outline";
+
+FontWithCustomIcons.CHECK = "check";
 
 export default FontWithCustomIcons;
 

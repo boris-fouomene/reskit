@@ -30,7 +30,6 @@ import { IPreloaderProps } from '@components/Dialog/Preloader';
 import { IProgressBarProps, ProgressBar } from '@components/ProgressBar';
 import { Button, IButtonContext, IButtonProps } from '@components/Button';
 import { IMenuItemProps, IMenuProps, Menu } from '@components/Menu';
-
 /**
  * A flexible and feature-rich data grid component for React Native.
  * 
@@ -524,6 +523,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         r.displayView = displayView ? displayView : this.isValidDisplayView(this.props.displayView) ? this.props.displayView : displayViews[0];
         const groupedColumns = Array.isArray(sessionData.groupedColumns) ? sessionData.groupedColumns : Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : [];
         r.groupedColumns = groupedColumns;
+        r.showOnlyAggregatedTotals = !!sessionData.showOnlyAggregatedTotals;
 
         this.getToogleableStateKeys().map((key) => {
             const propValue = (this.props as any)[key];
@@ -658,6 +658,18 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         return this.getColumn(colName).visible;
     }
     /**
+     * Checks if a column is currently grouped.
+     * 
+     * @param {string} colName - The name of the column to check.
+     * 
+     * @returns {boolean} - `true` if the column is grouped, otherwise `false`.
+     */
+    isColumnGrouped(colName: string) {
+        const column = this.getColumn(colName);
+        if (!column || !column.groupable || !Array.isArray(this.state.groupedColumns)) return false;
+        return this.state.groupedColumns.includes(column.name);
+    }
+    /**
      * Checks if a column is aggregatable.
      * 
      * @param {string} colName - The name of the column to check.
@@ -714,6 +726,13 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
     toggleShowAggregatedTotals() {
         this.toggleShow("showAggregatedTotals");
     }
+    toggleShowOnlyAggregatedTotals() {
+        this.updateState({
+            showOnlyAggregatedTotals: !this.state.showOnlyAggregatedTotals
+        }, () => {
+            this.setSessionData("showOnlyAggregatedTotals", this.state.showOnlyAggregatedTotals);
+        });
+    }
     /**
      * Toggles the display of headers.
      * 
@@ -744,6 +763,13 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
     canShowToolbar() {
         return this.canShow("showToolbar");
     }
+    /**
+     * Toggles the visibility of a column by its name.
+     * 
+     * @param {string} columnName - The name of the column to toggle its visibility.
+     * 
+     * @returns {void}
+     */
     toggleColumnVisibility(columnName: string) {
         const column = this.getColumn(columnName);
         if (!column) return;
@@ -755,6 +781,42 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         }
         this.updateState({ columns: [...columns], visibleColumns: newVisibleColumns });
     }
+    /**
+     * Toggles the grouping state of a column in the datagrid.
+     * 
+     * This method checks if the specified column is groupable and updates the state to group or ungroup the column.
+     * If the column is not currently grouped, it will be added to the list of grouped columns; otherwise, it will be removed.
+     * The datagrid's data is reprocessed to reflect the updated grouping, and the updated grouping state is saved to the session.
+     * 
+     * @param {string} columnName - The name of the column to toggle its grouping state.
+     * 
+     * @returns {void}
+     */
+    toggleGroupedColumn(columnName: string) {
+        const column = this.getColumn(columnName);
+        if (!column || !column.groupable) return;
+        const { groupedColumns } = this.state;
+        const isGrouped = groupedColumns.includes(columnName);
+        const newGroupedColumns = isGrouped ? groupedColumns.filter(c => c !== columnName) : groupedColumns;
+        if (!isGrouped) {
+            newGroupedColumns.push(column.name);
+        }
+        this.setIsLoading(true);
+        this.updateState({
+            ...this.processData(this.props.data, undefined, groupedColumns),
+            groupedColumns: [...newGroupedColumns]
+        }, () => {
+            this.setSessionData("groupedColumns", this.state.groupedColumns);
+        });
+    }
+    ungroupAll() {
+        this.updateState({
+            groupedColumns: [],
+            ...this.processData(this.props.data, undefined, []),
+        }, () => {
+            this.setSessionData("groupedColumns", []);
+        });
+    }
     static getI18nTranslationKey(key: string): string {
         return `components.datagrid.${key}`;
     }
@@ -762,6 +824,183 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         if (!isNonNullString(key)) return "";
         return i18n.t(this.getI18nTranslationKey(key), options);
     }
+
+    /**
+     * Renders a menu for selecting groupable columns.
+     *
+     * This method checks if the datagrid is groupable and renders a menu that 
+     * allows the user to toggle the grouping state of each groupable column. 
+     * The menu includes items for each groupable column, with an icon indicating 
+     * whether the column is currently grouped. Additionally, it includes options 
+     * to display only aggregated totals and to ungroup all columns if there are 
+     * any grouped columns.
+     *
+     * The menu is anchored to a pressable component that displays an icon and label.
+     * When a menu item is pressed, the corresponding column's grouping state is 
+     * toggled with a slight delay.
+     *
+     * @returns {JSX.Element | null} The rendered menu or null if the datagrid 
+     * is not groupable or there are no groupable columns.
+     */
+    renderGroupableColumnsMenu(): JSX.Element | null {
+        if (!this.isGroupable()) {
+            return null;
+        }
+        const { groupedColumns, groupableColumns } = this.state;
+        if (!Array.isArray(groupableColumns) || !Array.isArray(groupedColumns)) {
+            return null;
+        }
+        const menuItems: (IDatagridToolbarAction | null)[] = [];
+        const isGlobalGrouped = groupedColumns.length;
+        groupableColumns.map((column) => {
+            if (!column?.groupable) return;
+            const isGrouped = this.isColumnGrouped(column.name);
+            menuItems.push({
+                onPress: () => {
+                    setTimeout(() => {
+                        this.toggleGroupedColumn(column.name);
+                    }, 500);
+                },
+                label: column.label || column.name,
+                icon: isGrouped ? FontIcon.CHECK : undefined,
+            });
+        });
+        if (menuItems.length > 0) {
+            return <Menu
+                anchor={({ openMenu }) => {
+                    return <Pressable onPress={() => { openMenu() }} style={[Theme.styles.row]}>
+                        <Icon iconName='format-list-group' title={Datagrid.translate("groupTableData")} />
+                        <Label textBold>{Datagrid.translate("groupBy")}</Label>
+                    </Pressable>
+                }}
+                items={[
+                    {
+                        label: Datagrid.translate("groupBy"),
+                        icon: "group",
+                        closeOnPress: false,
+                        right: (p) => <Icon {...p} iconName="material-settings" />,
+                        divider: true,
+                        labelProps: { textBold: true },
+                        ///onPress : this.configureSectionLists.bind(this),
+                    },
+                    this.canShowAggregatedTotals() ? {
+                        label: Datagrid.translate("displayOnlyAggregatedTotal"),
+                        icon: this.canShowAggregatedTotals() ? "check" : null,
+                        onPress: this.toggleShowOnlyAggregatedTotals.bind(this)
+                    } : null,
+                    isGlobalGrouped ? {
+                        label: Datagrid.translate("ungroup"),
+                        icon: "ungroup",
+                        divider: true,
+                        onPress: () => {
+                            setTimeout(() => {
+                                this.ungroupAll();
+                            }, 100)
+                        }
+                    } : null,
+                    ...menuItems,
+                ]}
+            />
+        }
+        return null;
+    }
+    renderDisplayViewsMenu() {
+        return null;
+    }
+
+    /**
+     * Retrieves the localized labels for the aggregation functions.
+     *
+     * This method returns an object containing the translated labels for each aggregation function.
+     * The labels are fetched from the localization files using the `i18n` utility.
+     * 
+     * @returns {Partial<Record<keyof IDatagridAggregationFunctions | string, string>>} 
+     * An object mapping each aggregation function name or identifier to its localized label.
+     */
+    getAggregationFunctionsTranslations(): Partial<Record<keyof IDatagridAggregationFunctions | string, string>> {
+        return Object.assign({}, i18n.getNestedTranslation("components.datagrid.aggregationFunctions") as any);
+    }
+
+
+    /**
+     * Renders a menu for selecting aggregation functions.
+     *
+     * This method checks if the datagrid is aggregatable and renders a menu that 
+     * allows the user to toggle the aggregation function for each aggregatable column. 
+     * The menu includes items for each aggregation function, with an icon indicating 
+     * whether the function is currently active for the column. Additionally, it includes 
+     * an option to toggle the display of abbreviated values for numerical columns.
+     * 
+     * The menu is anchored to a pressable component that displays an icon and label.
+     * When a menu item is pressed, the corresponding aggregation function is toggled 
+     * with a slight delay.
+     *
+     * @returns {JSX.Element | null} The rendered menu or null if the datagrid 
+     * is not aggregatable or there are no aggregatable columns.
+     */
+    renderAggregationFunctionsMenu() {
+        if (!this.isAggregatable()) return null;
+        const aggregatableColumns = this.getAggregatableColumns();
+        if (!aggregatableColumns.length) return null;
+        const menuItems: (IDatagridToolbarAction<DataType> | null)[] = [];
+        //const aggregatorFunction = this.getCurrentAggregationFunctionName();
+        const aggregationsFunctions = this.getAggregationFunctions();
+        const aggregationTranslations = this.getAggregationFunctionsTranslations();
+        for (let funcName in aggregationsFunctions) {
+            const label = defaultStr(aggregationTranslations[funcName], funcName);
+            if (label) {
+                menuItems.push({
+                    label,
+                    //icon : active?"check":null,
+                    /* onPress : active ? undefined : ()=>{
+                        this.toggleActiveAggregatorFunction(ag);
+                    } */
+                })
+            }
+        }
+        if (menuItems.length) {
+            menuItems.push({ divider: true });
+        }
+        /* m.push({text:"Abréger les valeurs numériques",textBold:!!this.state.abreviateValues,icon:this.state.abreviateValues?'check':null,onPress:this.toggleAbreviateValues.bind(this)})
+        if(m.length){
+            m.unshift({
+                text : "Fonctions d'aggrégation",
+                icon : "material-functions",
+                style : [{fontWeight:'bold'}],
+                //divider : true,
+            });
+            if(withDivider !== false){
+                m.unshift({divider:true});
+            }
+            if(withDivider !== false){
+                m[m.length-1].divider = true;
+            }
+        } */
+        if (!menuItems.length) return null;
+        return <Menu
+            items={menuItems}
+            anchor={({ openMenu }) => {
+                return <Pressable onPress={() => { openMenu() }} style={[Theme.styles.row]}>
+                    <Icon iconName="material-functions" title={Datagrid.translate("aggregationFunctionMenuDescription")}></Icon>
+                    <Label splitText numberOfLines={1} textBold>{Datagrid.translate("aggregationFunctionsLabel")}</Label>
+                </Pressable>
+            }}
+        />
+    }
+    /**
+     * Renders the toolbar for the datagrid.
+     * 
+     * This method will render all the toolbar actions, including the following:
+     * - A button to show/hide all filters, if the datagrid is filterable.
+     * - A button to show/hide all aggregated totals, if the datagrid is aggregatable.
+     * - A button to select/unselect all rows, if the datagrid is selectable and there is at least one row.
+     * - A button to select/unselect all rows, if there are selected rows.
+     * - A menu to show/hide columns, with the column name as the label and a check icon if the column is visible.
+     * 
+     * The toolbar actions are wrapped in a scroll view, so they can be scrolled horizontally.
+     * 
+     * @returns {JSX.Element} - The rendered toolbar.
+     */
     renderToolbar() {
         if (!this.canShowToolbar()) return null;
         const dimensions = getDimensions();
@@ -769,7 +1008,8 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         const { columns } = this.state;
         const cActions = typeof this.props.toolbarActions === "function" ? this.props.toolbarActions(this.getCallOptions({ dimensions }))
             : Array.isArray(this.props.toolbarActions) ? this.props.toolbarActions : undefined;
-        const actions: IDatagridToolbarAction<DataType>[] = (Array.isArray(cActions) ? cActions : []) as IDatagridToolbarAction<DataType>[];
+        const inputActions = (Array.isArray(cActions) ? cActions : []) as IDatagridToolbarAction<DataType>[];
+        const actions: IDatagridToolbarAction<DataType>[] = [];
         const selectable = this.isSelectable();
         const data = this.state.data;
         const paginatedData = this.state.paginatedData;
@@ -789,7 +1029,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         if (isAggregatable) {
             actions.push({
                 label: !this.canShowAggregatedTotals() ? Datagrid.translate("showAggregatedTotals") : Datagrid.translate("hideAggregatedTotals"),
-                icon: this.canShowAggregatedTotals() ? 'view-column' : 'view-module',
+                icon: this.canShowAggregatedTotals() ? 'view-column' : 'view-module-outline',
                 onPress: this.toggleShowAggregatedTotals.bind(this),
             })
         }
@@ -821,17 +1061,15 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                     }, 500);
                 },
                 label: column.label || column.name,
-                icon: visible ? FontIcon.CHECKED : undefined,
+                icon: visible ? FontIcon.CHECK : undefined,
             });
         })
         const testID = this.getTestID();
         return <ScrollView horizontal testID={testID + "-toolbar-scrollview"} contentContainerStyle={styles.headerScrollViewContentContainer} style={[styles.headerScrollView]}>
             <View testID={testID + "-toolbar-container"} style={[styles.toolbarContainer]}>
                 {actions.map((action, index) => {
-                    if (!action) return null;
+                    if (!action || !isObj(action)) return null;
                     const key = "toolbar-action-" + index;
-                    const isValid = isValidElement(action.label);
-                    if (isValid) return <React.Fragment key={key}>{action.label}</React.Fragment>;
                     return <Button
                         testID={testID + "-toolbar-button-" + index} key={key}
                         {...action}
@@ -843,7 +1081,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                         const onPress = () => {
                             openMenu();
                         }
-                        return isMobile ? <Icon iconName='view-column' onPress={onPress} size={25} /> : <Button
+                        return isMobile ? <Icon iconName='view-column' tooltip={Datagrid.translate("columns")} onPress={onPress} size={25} /> : <Button
                             icon="view-column"
                             children={Datagrid.translate("columns")}
                             onPress={onPress}
@@ -851,6 +1089,9 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                     }}
                     items={visibleColumnsMenus}
                 />
+                {this.renderGroupableColumnsMenu()}
+                {this.renderDisplayViewsMenu()}
+                {this.renderAggregationFunctionsMenu()}
             </View>
         </ScrollView>
     }
@@ -903,6 +1144,16 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      */
     canShowAggregatedTotals() {
         return this.canShow("showAggregatedTotals");
+    }
+    /**
+     * Determines if only aggregated headers can be shown in the datagrid.
+     *
+     * This method checks the current state to decide if only aggregated headers should be shown.
+     *
+     * @returns {boolean} - `true` if only aggregated headers can be shown, otherwise `false`.
+     */
+    canShowOnlyAggregatedTotals() {
+        return !!this.state.showOnlyAggregatedTotals;
     }
     /**
      * Checks if a column is groupable.
@@ -1191,6 +1442,18 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
     }
 
     /**
+     * Returns the aggregation functions available for use in the Datagrid.
+     * 
+     * This method returns the set of aggregation functions registered with the Datagrid.
+     * The set of aggregation functions includes all built-in aggregation functions and
+     * any functions registered by the user.
+     * 
+     * @returns {IDatagridAggregationFunctions} The set of aggregation functions available for use.
+     */
+    getAggregationFunctions() {
+        return Datagrid.getRegisteredAggregationFunctions();
+    }
+    /**
      * Initializes the computation of aggregated values for the datagrid columns.
      * 
      * This method prepares the data structure for storing aggregated values for each
@@ -1268,7 +1531,6 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
     protected processData(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination): Partial<IDatagridState<DataType>> {
         let processingData: DataType[] = [];
         const paginationConfig: IDatagridPagination = isObj(pagination) ? pagination as IDatagridPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridPagination;
-        const { columns, aggregatableColumns } = this.state;
         const canPaginate = this.canPaginate();
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const groupedRowsByKeys: IDatagridState<DataType>["groupedRowsByKeys"] = {} as IDatagridState<DataType>["groupedRowsByKeys"];
@@ -3709,8 +3971,11 @@ export interface IDatagridState<DataType extends IDatagridDataType = any> {
 
     showAggregatedTotals: boolean;
 
+    showOnlyAggregatedTotals: boolean;
+
     showToolbar: boolean;
     showActions: boolean;
+    currentAggregationFunctionName: keyof IDatagridAggregationFunctions<DataType>;
 }
 
 /**

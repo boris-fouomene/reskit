@@ -462,7 +462,7 @@ export type IIconSourceBase = IFontIconName | ImageSourcePropType;
  * <Icon source={customIcon} />
  * <Icon source={dynamicIcon} color="red" />
  */
-export type IIconSource = IIconSourceBase | JSX.Element | ((props: IIconProps & { color: string }) => IIconSourceBase | JSX.Element);
+export type IIconSource = IIconSourceBase | null | JSX.Element | ((props: IIconProps & { color: string }) => IIconSourceBase | JSX.Element);
 
 /**
  * @interface IIconProps

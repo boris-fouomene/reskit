@@ -1904,8 +1904,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                 title={actionsTitle}
                 actions={appBarActions as any}
             />
-            {divider !== false && title ?
-                <Divider testID={testID + "-actions-divider"} /> : null}
+            {divider !== false ? <Divider testID={testID + "-actions-divider"} /> : null}
         </View>
     }
 }

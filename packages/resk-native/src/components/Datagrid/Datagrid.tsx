@@ -1768,7 +1768,6 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
     return (
         <DatagridContext.Provider value={context}>
             <View testID={testID} style={[styles.main, isLoading && styles.disabled, props.style]} onLayout={context.onContainerLayout.bind(context)}>
-                {context.renderLoadingIndicator()}
                 {<Datagrid.Actions />}
                 {showHeaders ? <ScrollView testID={testID + "-header-scrollview"} contentContainerStyle={styles.headerScrollViewContentContainer} style={[styles.headerScrollView]}>
                     <View testID={testID + "-header-container"} style={[styles.headerContainer]}>
@@ -1776,6 +1775,7 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
                         <Label>Example of header 2</Label>
                     </View>
                 </ScrollView> : null}
+                {context.renderLoadingIndicator()}
                 {Component ? <Component visibleColumnsWidths={visibleColumnsWidths} datagridContext={context} /> : <Label colorScheme="error" fontSize={20} textBold>
                     {"No display view found for datagrid"}
                 </Label>}

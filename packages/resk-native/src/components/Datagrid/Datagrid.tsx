@@ -3897,6 +3897,7 @@ const styles = StyleSheet.create({
     },
     actionsToolbar: {
         width: "100%",
+        paddingHorizontal: 7,
     },
     headerScrollViewContentContainer: {
         minWidth: '100%',

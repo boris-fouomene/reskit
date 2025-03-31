@@ -46,6 +46,14 @@ I18nClass.RegisterTranslations({
                     "one": "one selected row",
                     "other": "%{countStr} selected rows",
                 },
+                "selectAll": {
+                    "zero": "Select all",
+                    "one": "Select one row",
+                    "other": "Select %{countStr} rows",
+                },
+                "showFilters": "Show filters",
+                "showAggregatedTotals": "Show aggregated totals",
+                "columns": "Columns",
             }
         }
     }

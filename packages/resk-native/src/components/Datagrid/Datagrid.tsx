@@ -7,7 +7,8 @@ import {
     Pressable,
     Dimensions,
     LayoutChangeEvent,
-    LayoutRectangle
+    LayoutRectangle,
+    GestureResponderEvent
 } from 'react-native';
 import { Component, ObservableComponent, getReactKey, getTextContent, useForceRender, useIsMounted } from '@utils/index';
 import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber } from '@resk/core/utils';
@@ -21,12 +22,14 @@ import { IReactComponent } from '@src/types';
 import { Preloader } from '@components/Dialog';
 import { AppBar, IAppBarAction, IAppBarProps } from '@components/AppBar';
 import { Divider } from '@components/Divider';
-import { FontIcon, IFontIconName, IIconSource } from '@components/Icon';
+import { FontIcon, IFontIconName, IIconSource, Icon } from '@components/Icon';
 import Theme from "@theme";
-import { useDimensions } from '@dimensions/index';
+import { useDimensions, getDimensions, IDimensions } from '@dimensions/index';
 import i18n from '@resk/core/i18n';
 import { IPreloaderProps } from '@components/Dialog/Preloader';
 import { IProgressBarProps, ProgressBar } from '@components/ProgressBar';
+import { Button, IButtonContext, IButtonProps } from '@components/Button';
+import { IMenuItemProps, IMenuProps, Menu } from '@components/Menu';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -133,7 +136,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {boolean} - Returns `true` if the row is selectable, `false` otherwise.
      */
     isRowSelectable(rowData: DataType | IDatagridGroupedRow) {
-        if (this.isGroupedRow(rowData)) return false;
+        if (!this.isSelectable() || this.isGroupedRow(rowData)) return false;
         if (typeof this.props.isRowSelectable === "function") return this.props.isRowSelectable(this.getCallOptions({ rowData }));
         return true;
     }
@@ -181,6 +184,27 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      */
     getGroupableColumns() {
         return this.state.groupableColumns;
+    }
+    /**
+     * Returns the list of columns that support aggregation.
+     * 
+     * This method retrieves the list of aggregatable columns from the Datagrid's state.
+     * 
+     * @returns {IDatagridStateColumn[]} The list of aggregatable columns.
+     */
+    getAggregatableColumns() {
+        return this.state.aggregatableColumns;
+    }
+    /**
+     * Retrieves the list of grouped columns in the Datagrid.
+     * 
+     * This method returns the names of the columns that are currently grouped in the Datagrid,
+     * as specified in the component's state.
+     * 
+     * @returns {string[]} An array of column names that are grouped.
+     */
+    getGroupedColumns(): string[] {
+        return this.state.groupedColumns;
     }
     /**
      * Toggles the selection state of a row in the Datagrid.
@@ -235,7 +259,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * 
      * @returns {boolean} `true` if the loading indicator can be rendered, `false` otherwise.
      */
-    canRenderLoadingIndicator() {
+    canShowLoadingIndicator() {
         return this.isLoading() || this._isLoading;
     }
     /**
@@ -500,22 +524,30 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         r.displayView = displayView ? displayView : this.isValidDisplayView(this.props.displayView) ? this.props.displayView : displayViews[0];
         const groupedColumns = Array.isArray(sessionData.groupedColumns) ? sessionData.groupedColumns : Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : [];
         r.groupedColumns = groupedColumns;
-        r.showFilters = defaultBool(sessionData.showFilters, this.isFiltrable());
-        r.showHeaders = defaultBool(sessionData.showHeaders, true);
-        r.showAggregatedTotals = defaultBool(sessionData.showAggregatedTotals, this.props.aggregatable !== false);
-        if (this.props.showHeaders === false) {
-            r.showHeaders = false;
-        }
-        if (this.props.showFilters === false) {
-            r.showFilters = false;
-        }
-        if (this.props.showAggregatedTotals === false) {
-            r.showAggregatedTotals = false;
-        }
-        this.setSessionData("showFilters", r.showFilters);
-        this.setSessionData("showHeaders", r.showHeaders);
-        this.setSessionData("showAggregatedTotals", r.showAggregatedTotals);
+
+        this.getToogleableStateKeys().map((key) => {
+            const propValue = (this.props as any)[key];
+            (r as any)[key] = defaultBool(sessionData[key], propValue, propValue !== false);
+            if (propValue === false) {
+                (r as any)[key] = false;
+            }
+            this.setSessionData(key, (r as any)[key]);
+        })
         return r;
+    }
+
+    /**
+     * Retrieves the list of state keys that can be toggled.
+     *
+     * This method returns an array of state keys that represent the togglable
+     * features of the Datagrid component, such as visibility of filters, headers,
+     * aggregated totals, actions, and the toolbar.
+     *
+     * @returns {(keyof IDatagridState<DataType>)[]} An array of keys indicating
+     * the togglable state properties of the Datagrid.
+     */
+    getToogleableStateKeys(): (keyof IDatagridState<DataType>)[] {
+        return ["showFilters", "showHeaders", "showAggregatedTotals", "showActions", "showToolbar"];
     }
     /**
      * Updates the current display view of the datagrid if the provided display view is valid and 
@@ -575,10 +607,10 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                     ...Object.clone(column),
                     colIndex,
                     groupable: this.isGroupable() && column.groupable !== false,
-                    filterable: this.isFiltrable() && column.filterable !== false,
+                    filterable: this.isFilterable() && column.filterable !== false,
                     sortable: this.isSortable() && column.sortable !== false,
                     visible: column.visible !== false,
-                    aggregatable: this.isAggregatable() && column.aggregatable !== false,
+                    aggregatable: this.props.aggregatable !== false && column.aggregatable !== false,
                     aggregationFunction: aggretagionFunction ? aggretagionFunction : Datagrid.countAggregationFunction,
                 };
                 columns.push(col);
@@ -636,6 +668,33 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         return this.isAggregatable() && this.getColumn(colName).aggregatable;
     }
     /**
+     * Toggles the state value of the provided key in the Datagrid component's state.
+     * If the state value is a boolean, it is simply toggled. If the state value is a number, it is negated.
+     * The new state value is then persisted to the session data under the same key.
+     * 
+     * @param {keyof IDatagridState<DataType>} stateKey - The key of the state value to toggle.
+     */
+    toggleShow(stateKey: keyof IDatagridState<DataType>) {
+        const stateValue = this.state[stateKey];
+        if (["number", "boolean"].includes(typeof stateValue)) {
+            this.updateState({ [stateKey]: !stateValue }, () => {
+                this.setSessionData(stateKey, this.state[stateKey]);
+            });
+        }
+    }
+    /**
+     * Checks if a specific state key can be shown in the datagrid.
+     * 
+     * This method determines if the specified state key is currently set to `true` 
+     * in the component's state and is not restricted by the component's props.
+     *
+     * @param {keyof IDatagridState<DataType>} stateKey - The key of the state value to check.
+     * @returns {boolean} - `true` if the state key can be shown, otherwise `false`.
+     */
+    canShow(stateKey: keyof IDatagridState<DataType>) {
+        return this.state[stateKey] === true// && (this.props as any)[stateKey] !== false;
+    }
+    /**
      * Toggles the display of filters.
      * 
      * This method simply toggles the `showFilters` state and persists it to the session data.
@@ -643,9 +702,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {void}
      */
     toggleShowFilters() {
-        this.updateState({ showFilters: !this.state.showFilters }, () => {
-            this.setSessionData("showFilters", this.state.showFilters);
-        });
+        this.toggleShow("showFilters");
     }
     /**
      * Toggles the display of aggregated headers.
@@ -655,9 +712,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {void}
      */
     toggleShowAggregatedTotals() {
-        this.updateState({ showFilters: !this.state.showAggregatedTotals }, () => {
-            this.setSessionData("showAggregatedTotals", this.state.showAggregatedTotals);
-        });
+        this.toggleShow("showAggregatedTotals");
     }
     /**
      * Toggles the display of headers.
@@ -667,11 +722,134 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {void}
      */
     toggleShowHeaderss() {
-        this.updateState({ showHeaders: !this.state.showHeaders }, () => {
-            this.setSessionData("showHeaders", this.state.showHeaders);
-        });
+        this.toggleShow("showHeaders");
     }
-
+    /**
+     * Toggles the display of the toolbar.
+     * 
+     * This method simply toggles the `showToolbar` state and persists it to the session data.
+     * 
+     * @returns {void}
+     */
+    toggleShowToolbar() {
+        this.toggleShow("showToolbar");
+    }
+    /**
+     * Determines if the toolbar can be shown in the datagrid.
+     *
+     * This method checks the current state and props to decide if the toolbar should be shown.
+     *
+     * @returns {boolean} - `true` if the toolbar can be shown, otherwise `false`.
+     */
+    canShowToolbar() {
+        return this.canShow("showToolbar");
+    }
+    toggleColumnVisibility(columnName: string) {
+        const column = this.getColumn(columnName);
+        if (!column) return;
+        const { columns, visibleColumns } = this.state;
+        column.visible = !column.visible;
+        const newVisibleColumns = visibleColumns.filter(c => c.name !== columnName);
+        if (column.visible) {
+            newVisibleColumns.push(column);
+        }
+        this.updateState({ columns: [...columns], visibleColumns: newVisibleColumns });
+    }
+    static getI18nTranslationKey(key: string): string {
+        return `components.datagrid.${key}`;
+    }
+    static translate(key: string, options?: any) {
+        if (!isNonNullString(key)) return "";
+        return i18n.t(this.getI18nTranslationKey(key), options);
+    }
+    renderToolbar() {
+        if (!this.canShowToolbar()) return null;
+        const dimensions = getDimensions();
+        const { isMobile } = dimensions;
+        const { columns } = this.state;
+        const cActions = typeof this.props.toolbarActions === "function" ? this.props.toolbarActions(this.getCallOptions({ dimensions }))
+            : Array.isArray(this.props.toolbarActions) ? this.props.toolbarActions : undefined;
+        const actions: IDatagridToolbarAction<DataType>[] = (Array.isArray(cActions) ? cActions : []) as IDatagridToolbarAction<DataType>[];
+        const selectable = this.isSelectable();
+        const data = this.state.data;
+        const paginatedData = this.state.paginatedData;
+        const dataLength = paginatedData.length;
+        const isFilterable = this.isFilterable();
+        const selectedRowsCount = this.getSelectedRowsCount();
+        const isAggregatable = this.isAggregatable();
+        if (isFilterable) {
+            actions.push({
+                label: Datagrid.translate("showFilters", { count: dataLength }),
+                icon: this.canShowFilters() ? 'eye-off' : 'eye',
+                onPress: () => {
+                    this.toggleShowFilters();
+                }
+            })
+        }
+        if (isAggregatable) {
+            actions.push({
+                label: Datagrid.translate("showAggregatedTotals"),
+                icon: this.canShowAggregatedTotals() ? 'view-column' : 'view-module',
+                onPress: this.toggleShowAggregatedTotals.bind(this),
+            })
+        }
+        if (selectable && dataLength) {
+            actions.push({
+                label: Datagrid.translate("selectAll", { count: dataLength }),
+                icon: "check",
+                onPress: () => {
+                    this.toggleAllRowsSelection(true);
+                }
+            });
+        }
+        if (selectedRowsCount > 0) {
+            actions.push({
+                label: Datagrid.translate("unselectAll", { count: selectedRowsCount }),
+                icon: "check",
+                onPress: () => {
+                    this.toggleAllRowsSelection(false);
+                }
+            });
+        }
+        const visibleColumnsMenus: IMenuItemProps<{ datagridContext: Datagrid<DataType> }>[] = [];
+        columns.map((column) => {
+            const visible = column.visible;
+            visibleColumnsMenus.push({
+                onPress: () => {
+                    setTimeout(() => {
+                        this.toggleColumnVisibility(column.name);
+                    }, 500);
+                    return false;
+                },
+                label: column.label || column.name,
+                icon: visible ? FontIcon.CHECKED : undefined,
+            });
+        })
+        const testID = this.getTestID();
+        return <ScrollView horizontal testID={testID + "-toolbar-scrollview"} contentContainerStyle={styles.headerScrollViewContentContainer} style={[styles.headerScrollView]}>
+            <View testID={testID + "-toolbar-container"} style={[styles.toolbarContainer]}>
+                {actions.map((action, index) => {
+                    if (!action) return null;
+                    const key = "toolbar-action-" + index;
+                    const isValid = isValidElement(action.label);
+                    if (isValid) return <React.Fragment key={key}>{action.label}</React.Fragment>;
+                    return <Button
+                        testID={testID + "-toolbar-button-" + index} key={key}
+                        {...action}
+                        context={Object.assign({}, action.context, { datagridContext: this })}
+                    />
+                })}
+                <Menu
+                    anchor={isMobile ? <Icon iconName='view-column' size={25} /> : <Button
+                        icon="view-column"
+                        mode="outlined"
+                        children={Datagrid.translate("columns")}
+                    />}
+                    items={visibleColumnsMenus}
+                />
+            </View>
+        </ScrollView>
+    }
     /**
      * Determines if headers can be shown in the datagrid.
      *
@@ -680,7 +858,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {boolean} - `true` if headers can be shown, otherwise `false`.
      */
     canShowHeaders() {
-        return !!this.state.showHeaders && this.props.showHeaders !== false;
+        return this.canShow("showHeaders");
     }
     /**
      * Determines if filters can be shown in the datagrid.
@@ -690,7 +868,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {boolean} - `true` if filters can be shown, otherwise `false`.
      */
     canShowFilters() {
-        return !!this.state.showFilters && this.props.showFilters !== false;
+        return this.canShow("showFilters");
     }
     /**
      * Determines if actions can be shown in the datagrid.
@@ -700,7 +878,17 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {boolean} - `true` if actions can be shown, otherwise `false`.
      */
     canShowActions() {
-        return this.props.showActions !== false;
+        return this.canShow("showActions");
+    }
+    /**
+     * Toggles the display of the actions toolbar.
+     * 
+     * This method simply toggles the `showActions` state and persists it to the session data.
+     * 
+     * @returns {void}
+     */
+    toggleShowActions() {
+        this.toggleShow("showActions");
     }
     /**
      * Determines if aggregated headers can be shown in the datagrid.
@@ -710,7 +898,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {boolean} - `true` if aggregated headers can be shown, otherwise `false`.
      */
     canShowAggregatedTotals() {
-        return !!this.state.showAggregatedTotals && this.props.showAggregatedTotals !== false;
+        return this.canShow("showAggregatedTotals");
     }
     /**
      * Checks if a column is groupable.
@@ -740,7 +928,19 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {boolean} - `true` if the column is filterable, otherwise `false`.
      */
     isColumnFilterable(colName: string) {
-        return this.isFiltrable() && this.getColumn(colName).filterable;
+        return this.isFilterable() && this.getColumn(colName).filterable;
+    }
+
+    /**
+     * Determines if the datagrid is selectable.
+     *
+     * This method checks the `selectable` property in the component's props
+     * to decide if the datagrid allows row selection.
+     *
+     * @returns {boolean} - `true` if the datagrid is selectable, `false` otherwise.
+     */
+    isSelectable() {
+        return this.props.selectable !== false;
     }
     /**
      * Determines whether the grid supports sorting.
@@ -755,7 +955,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * 
      * @returns {boolean} - `true` if filtering is enabled, otherwise `false`.
      */
-    isFiltrable() {
+    isFilterable() {
         return this.props.filterable !== false;
     }
     /**
@@ -764,7 +964,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * @returns {boolean} - `true` if aggregation is enabled, otherwise `false`.
      */
     isAggregatable() {
-        return this.props.aggregatable !== false;
+        return this.props.aggregatable !== false && !!this.getAggregatableColumns()?.length;
     }
     /**
      * Determines whether the grid supports grouping.
@@ -1193,24 +1393,21 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             Object.assign(newState, this.processData(this.props.data, orderBy, groupedColumns, pagination));
             hasUpdated = true;
         }
-        if (prevProps.showFilters !== this.props.showFilters && typeof this.props.showFilters == "boolean") {
-            newState.showFilters = this.props.showFilters;
-            hasUpdated = true;
-        }
-        if (prevProps.showHeaders !== this.props.showHeaders && typeof this.props.showHeaders == "boolean") {
-            newState.showHeaders = this.props.showHeaders;
-            hasUpdated = true;
-        }
-        if (prevProps.showAggregatedTotals !== this.props.showAggregatedTotals && typeof this.props.showAggregatedTotals === "boolean") {
-            newState.showAggregatedTotals = this.props.showAggregatedTotals;
-            hasUpdated = true;
-        }
+        this.getToogleableStateKeys().map((key) => {
+            const propValue = (this.props as any)[key];
+            const prevPropValue = (prevProps as any)[key];
+            if (prevPropValue !== propValue && typeof propValue == "boolean") {
+                (newState as any)[key] = propValue;
+                hasUpdated = true;
+            }
+        });
         if (hasUpdated) {
             this.updateState(newState, () => {
-                this.setSessionData("displayView", this.state.displayView);
-                this.setSessionData("orderBy", this.state.orderBy);
-                this.setSessionData("groupedColumns", this.state.groupedColumns);
-                this.setSessionData("showAggregatedTotals", this.state.showAggregatedTotals);
+                this.getToogleableStateKeys().map((key) => {
+                    if (key in newState) {
+                        this.setSessionData(key, newState[key]);
+                    }
+                })
             });
         } else {
             setTimeout(() => {
@@ -1545,8 +1742,8 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      */
     static LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridLoadingIndicatorProps> }) {
         const datagridContext = useDatagrid();
-        const canRenderLoadingIndicator = !!datagridContext?.canRenderLoadingIndicator();
-        const [isLoading, _setIsLoading] = React.useState(canRenderLoadingIndicator);
+        const canShowLoadingIndicator = !!datagridContext?.canShowLoadingIndicator();
+        const [isLoading, _setIsLoading] = React.useState(canShowLoadingIndicator);
         const isMounted = useIsMounted();
         const setIsLoading = (nLoading: boolean) => {
             if (!isMounted() || nLoading == isLoading) return;
@@ -1556,11 +1753,11 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             setIsLoading(newIsLoading?.isLoading);
         }, false);
         useEffect(() => {
-            const loading: boolean = !!datagridContext?.canRenderLoadingIndicator();
+            const loading: boolean = !!datagridContext?.canShowLoadingIndicator();
             if (loading !== isLoading) {
                 setIsLoading(loading);
             }
-        }, [datagridContext?.canRenderLoadingIndicator()]);
+        }, [datagridContext?.canShowLoadingIndicator()]);
         return typeof Component !== "function" ? null : <Component isLoading={isLoading} />;
     };
 
@@ -1645,7 +1842,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * rendered, otherwise null.
      */
     renderLoadingIndicator() {
-        if (!this.canRenderLoadingIndicator()) {
+        if (!this.canShowLoadingIndicator()) {
             return null;
         }
         const loadingIndicator = this.props.loadingIndicator;
@@ -1673,7 +1870,8 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      */
     static Actions() {
         const datagridContext = useDatagrid();
-        const { selectedRowsActions, actions, showActions, actionsProps } = Object.assign({}, datagridContext?.props);
+        const { selectedRowsActions, actions, showActions, actionsProps: aProps } = Object.assign({}, datagridContext?.props);
+        const { divider, ...actionsProps } = Object.assign({}, aProps);
         useDatagridOnEvent(["toggleAllRowsSelection"], undefined, true);
         const { actions: actionsToDisplay, title } = useMemo(() => {
             if (!datagridContext) return {
@@ -1682,20 +1880,27 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             };
             const count = defaultNumber(datagridContext?.getSelectedRowsCount());
             const actionsOrCallback = count > 0 ? selectedRowsActions : actions;
-            const _actions = typeof actionsOrCallback === "function" ? actionsOrCallback(datagridContext) : actionsOrCallback;
-            return { actions: Array.isArray(_actions) ? _actions : [], title: count > 0 ? i18n.t("components.datagrid.selectedActionsCount", { count }) : "" };
+            const _actions = typeof actionsOrCallback === "function" ? actionsOrCallback(datagridContext.getCallOptions({} as any)) : actionsOrCallback;
+            return { actions: Array.isArray(_actions) ? _actions : [], title: count > 0 ? Datagrid.translate("selectedActionsCount", { count }) : "" };
         }, [datagridContext?.getSelectedRowsCount()]);
         if (!datagridContext?.canShowActions()) return null;
         const testID = datagridContext?.getTestID();
+        const actionsTitle = title || actionsProps.title;
+        const appBarActions = Array.isArray(actionsToDisplay) && actionsToDisplay.length ? actionsToDisplay : [];
+        const hasActions = appBarActions.length > 0;
         return <View testID={testID + "-actions-container"} style={[styles.actionsToolbar]}>
             <AppBar testID={`${testID}-actions`}
                 backAction={false}
                 backgroundColor='transparent'
+                statusBarHeight={0}
                 {...Object.assign({}, actionsProps)}
-                title={title || actionsProps?.title || i18n.t("components.datagrid.actions") || ""}
-                actions={actionsToDisplay as any}
+                context={Object.assign({}, actionsProps.context, { datagridContext })}
+                right={actionsProps.right || !hasActions && !actionsTitle ? <Button mode='text'>{Datagrid.translate("components.datagrid.actions")}</Button> : null}
+                title={actionsTitle}
+                actions={appBarActions as any}
             />
-            <Divider testID={testID + "-actions-divider"} />
+            {divider !== false && title ?
+                <Divider testID={testID + "-actions-divider"} /> : null}
         </View>
     }
 }
@@ -1734,9 +1939,6 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
     }, [displayView]);
     const { width: containerWidth } = context.getContainerLayout();
     const visibleColumns = context.getVisibleColumns();
-    const showHeaders = context.canShowHeaders();
-    const showFilters = context.canShowFilters();
-    const showAggregatedTotals = context.canShowAggregatedTotals();
     // Calculate column widths
     const visibleColumnsWidths = useMemo(() => {
         const availableWidth = Math.min(containerWidth, screenWidth);
@@ -1769,12 +1971,7 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
         <DatagridContext.Provider value={context}>
             <View testID={testID} style={[styles.main, isLoading && styles.disabled, props.style]} onLayout={context.onContainerLayout.bind(context)}>
                 {<Datagrid.Actions />}
-                {showHeaders ? <ScrollView testID={testID + "-header-scrollview"} contentContainerStyle={styles.headerScrollViewContentContainer} style={[styles.headerScrollView]}>
-                    <View testID={testID + "-header-container"} style={[styles.headerContainer]}>
-                        <Label>Example of header 1</Label>
-                        <Label>Example of header 2</Label>
-                    </View>
-                </ScrollView> : null}
+                {context.renderToolbar()}
                 {context.renderLoadingIndicator()}
                 {Component ? <Component visibleColumnsWidths={visibleColumnsWidths} datagridContext={context} /> : <Label colorScheme="error" fontSize={20} textBold>
                     {"No display view found for datagrid"}
@@ -1829,12 +2026,12 @@ class DatagridColumn<DataType extends IDatagridDataType = any, PropExtensions = 
     /**
      * Checks if the column is filtrable.
      * 
-     * This method checks if the column is filtrable by calling the Datagrid context's isFiltrable method.
+     * This method checks if the column is filtrable by calling the Datagrid context's isFilterable method.
      * 
      * @returns True if the column is filtrable, false otherwise.
      */
-    isFiltrable() {
-        return this.getDatagridContext().isFiltrable();
+    isFilterable() {
+        return this.getDatagridContext().isFilterable();
     }
     /**
      * Checks if the column is sortable.
@@ -1855,6 +2052,16 @@ class DatagridColumn<DataType extends IDatagridDataType = any, PropExtensions = 
      */
     isAggregatable() {
         return this.getDatagridContext().isAggregatable();
+    }
+    /**
+     * Returns the list of aggregatable columns.
+     * 
+     * This method returns the list of columns that are aggregatable in the Datagrid context.
+     * 
+     * @returns The list of aggregatable columns.
+     */
+    getAggregatableColumns() {
+        return this.getDatagridContext().getAggregatableColumns();
     }
     /**
      * Computes the value of a row cell based on the provided row data and format.
@@ -2015,8 +2222,8 @@ class DatagridColumn<DataType extends IDatagridDataType = any, PropExtensions = 
         }
         const testId = this.getDatagridContext().getTestID() + "-column-" + column.name;
         const sortIcon = this.getSortIcon();
-        return <View style={styles.headerWrapper} testID={testId + "-wrapper"}>
-            <View testID={testId + "-container"} style={[styles.headerContainer]}>
+        return <View style={styles.columnHeaderWrapper} testID={testId + "-wrapper"}>
+            <View testID={testId + "-container"} style={[styles.columnHeaderContainer]}>
                 <Label testID={testId} {...labelProps} >{this.props.label}</Label>
                 {sortIcon ? <FontIcon testID={testId + "-sort-icon"} color={Theme.colors.primary} size={25} name={sortIcon} onPress={(event) => { this.sort(); }} /> : null}
             </View>;
@@ -2236,6 +2443,17 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = u
      */
     getGroupableColumns() {
         return this.getDatagridContext().getGroupableColumns();
+    }
+    /**
+     * Retrieves the list of grouped columns in the datagrid.
+     * 
+     * This method accesses the datagrid context to obtain the list of columns that are currently grouped. 
+     * It is useful for determining which columns have been grouped by the user or the grid's configuration.
+     * 
+     * @returns {string[]} An array of column names that are currently grouped.
+     */
+    getGroupedColumns(): string[] {
+        return this.getDatagridContext().getGroupedColumns();
     }
 
     /**
@@ -2562,15 +2780,15 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = u
     /**
      * Checks if the loading indicator can be rendered.
      * 
-     * This method is a pass-through to the Datagrid context's canRenderLoadingIndicator method.
+     * This method is a pass-through to the Datagrid context's canShowLoadingIndicator method.
      * It returns a boolean indicating whether the loading indicator can be rendered.
      * The loading indicator can be rendered if the Datagrid is in a loading state,
      * either due to the `isLoading` prop or the internal `_isLoading` state.
      * 
      * @returns {boolean} - Whether the loading indicator can be rendered.
      */
-    canRenderLoadingIndicator() {
-        return this.getDatagridContext().canRenderLoadingIndicator();
+    canShowLoadingIndicator() {
+        return this.getDatagridContext().canShowLoadingIndicator();
     }
     /**
      * Sets the loading state of the Datagrid and triggers the "toggleIsLoading" event.
@@ -2646,6 +2864,12 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * If true, the grid allows filtering of rows.
      */
     filterable?: boolean;
+
+    /***
+     * Whether selection is enabled for the grid.
+     * If false, the grid does not allow selection of rows.
+     */
+    selectable?: boolean;
 
     /**
      * A function to filter rows internally.
@@ -2881,7 +3105,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * 
      * @see {@link IDatagridAction} for the structure of an action.
      */
-    actions?: IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[]);
+    actions?: IDatagridAction | null[] | ((options: IDatagridCallOptions<DataType>) => (IDatagridAction | null)[]);
 
     /**
      * Controls whether the set of action buttons is displayed on top of the datagrid.
@@ -2898,7 +3122,12 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
     /***
      * The props to pass to the actions toolbar.
      */
-    actionsProps?: Partial<Omit<IAppBarProps, "children" | "actions">>;
+    actionsProps?: Partial<Omit<IAppBarProps, "children" | "actions">> & {
+        /***
+         * Whether to render a divider (after actions) between the actions and the content.
+         */
+        divider?: boolean;
+    };
 
     /**
      * Defines the actions that can be performed on the selected rows within the Datagrid component.
@@ -2987,6 +3216,33 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * <DataGrid showAggregatedTotals={false} />
      */
     showAggregatedTotals?: boolean;
+
+    /**
+     * Controls whether the toolbar is displayed.
+     * When set to `true`, the toolbar will be visible.
+     * When set to `false`, the toolbar will be hidden.
+     *
+     * @default true
+     * @type {boolean}
+     * @example
+     * <DataGrid showToolbar={false} />
+     */
+    showToolbar?: boolean;
+
+    /**
+     * Allows adding extra actions to the toolbar.
+     * This prop accepts either:
+     * - A function that returns an array of React nodes (e.g., buttons), or
+     * - An array of React nodes directly.
+     *
+     * @type {((datagridContext: Datagrid<DataType>) => ((IDatagridToolbarAction<DataType>|null)[])) | (IDatagridToolbarAction<DataType>|null)[]}
+     * @remarks Toolbar actions are rendered in the order they are defined. Toolbar represents the top-right area of the Datagrid, rendered directly under the actions bar.
+     */
+    toolbarActions?: ((options: IDatagridCallOptions<DataType> & { dimensions: IDimensions }) => ((IDatagridToolbarAction<DataType> | null)[])) | (IDatagridToolbarAction<DataType> | null)[];
+}
+
+export interface IDatagridToolbarAction<DataType extends IDatagridDataType = any> extends IButtonProps<{ datagridContext: Datagrid<DataType> }> {
+
 }
 
 /**
@@ -3447,6 +3703,9 @@ export interface IDatagridState<DataType extends IDatagridDataType = any> {
 
 
     showAggregatedTotals: boolean;
+
+    showToolbar: boolean;
+    showActions: boolean;
 }
 
 /**
@@ -3646,10 +3905,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         flexDirection: 'row'
     },
-    headerWrapper: {
+    columnHeaderWrapper: {
         alignSelf: "flex-start",
     },
-    headerContainer: {
+    columnHeaderContainer: {
+        width: '100%',
+        justifyContent: "center",
+        alignItems: "flex-start",
+    },
+    toolbarContainer: {
         flex: 1,
         flexDirection: 'row',
         width: '100%',

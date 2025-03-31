@@ -839,10 +839,16 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                     />
                 })}
                 <Menu
-                    anchor={isMobile ? <Icon iconName='view-column' size={25} /> : <Button
-                        icon="view-column"
-                        children={Datagrid.translate("columns")}
-                    />}
+                    anchor={({ openMenu }) => {
+                        const onPress = () => {
+                            openMenu();
+                        }
+                        return isMobile ? <Icon iconName='view-column' onPress={onPress} size={25} /> : <Button
+                            icon="view-column"
+                            children={Datagrid.translate("columns")}
+                            onPress={onPress}
+                        />
+                    }}
                     items={visibleColumnsMenus}
                 />
             </View>

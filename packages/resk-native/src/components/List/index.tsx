@@ -58,7 +58,7 @@ export const List = React.forwardRef(function GenericList<ItemType = any>(props:
     const Component = useMemo(() => {
         return ListManager.getComponent();
     }, []);
-    return <Component {...props} ref={ref} />
+    return <Component nestedScrollEnabled {...props} ref={ref} />
 }) as <ItemType>(
     props: IListProps<ItemType> & { ref?: React.Ref<FlatList<ItemType>> }
 ) => JSX.Element;

@@ -40,7 +40,12 @@ I18nClass.RegisterTranslations({
                 "toggleFullScreen": "Toggle Drawer Full Screen",
             },
             "datagrid": {
-                "actions": "Actions"
+                "actions": "Actions",
+                "selectedActionsCount": {
+                    "zero": "No selected rows",
+                    "one": "one selected row",
+                    "other": "%{countStr} selected rows",
+                },
             }
         }
     }

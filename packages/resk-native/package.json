@@ -23,20 +23,22 @@
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
     "@resk/core": "^1.14.1",
-    "@types/react-native-vector-icons": "^6.4.18",
     "color": "^4.2.3",
     "tippy.js": "^6.3.7"
   },
-  "peerDependencies1": {
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
     "react-is": ">=18.0.0",
     "react-native": ">=0.76.0",
-    "react-native-vector-icons": ">=6.0.0",
+    "react-native-vector-icons": ">=10.0.0",
     "react-native-web": ">=0.19.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@types/react-is": "^18.0.0",
+    "@types/react-native-vector-icons": "^6.4.18",
     "tsc-alias": "^1.8.11"
   },
   "publishConfig": {

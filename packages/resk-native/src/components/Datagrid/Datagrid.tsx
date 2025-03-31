@@ -25,6 +25,8 @@ import { FontIcon, IFontIconName, IIconSource } from '@components/Icon';
 import Theme from "@theme";
 import { useDimensions } from '@dimensions/index';
 import i18n from '@resk/core/i18n';
+import { IPreloaderProps } from '@components/Dialog/Preloader';
+import { IProgressBarProps, ProgressBar } from '@components/ProgressBar';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -32,7 +34,7 @@ import i18n from '@resk/core/i18n';
  * The `Datagrid` class provides a powerful grid system for displaying, sorting, filtering, grouping, and paginating data.
  * It supports advanced features such as column aggregation, custom display views, and session-based state persistence.
  * 
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * 
  * @example
  * ```tsx
@@ -498,21 +500,21 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         r.displayView = displayView ? displayView : this.isValidDisplayView(this.props.displayView) ? this.props.displayView : displayViews[0];
         const groupedColumns = Array.isArray(sessionData.groupedColumns) ? sessionData.groupedColumns : Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : [];
         r.groupedColumns = groupedColumns;
-        r.displayFilters = defaultBool(sessionData.displayFilters, this.isFiltrable());
-        r.displayHeaders = defaultBool(sessionData.displayHeaders, true);
-        r.displayAggregatedHeaders = defaultBool(sessionData.displayAggregatedHeaders, this.props.aggregatable !== false);
-        if (this.props.displayHeaders === false) {
-            r.displayHeaders = false;
+        r.showFilters = defaultBool(sessionData.showFilters, this.isFiltrable());
+        r.showHeaders = defaultBool(sessionData.showHeaders, true);
+        r.showAggregatedTotals = defaultBool(sessionData.showAggregatedTotals, this.props.aggregatable !== false);
+        if (this.props.showHeaders === false) {
+            r.showHeaders = false;
         }
-        if (this.props.displayFilters === false) {
-            r.displayFilters = false;
+        if (this.props.showFilters === false) {
+            r.showFilters = false;
         }
-        if (this.props.displayAggregatedHeaders === false) {
-            r.displayAggregatedHeaders = false;
+        if (this.props.showAggregatedTotals === false) {
+            r.showAggregatedTotals = false;
         }
-        this.setSessionData("displayFilters", r.displayFilters);
-        this.setSessionData("displayHeaders", r.displayHeaders);
-        this.setSessionData("displayAggregatedHeaders", r.displayAggregatedHeaders);
+        this.setSessionData("showFilters", r.showFilters);
+        this.setSessionData("showHeaders", r.showHeaders);
+        this.setSessionData("showAggregatedTotals", r.showAggregatedTotals);
         return r;
     }
     /**
@@ -544,7 +546,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         });
     }
     /***
-     * returns the list of display views to be displayed in the datagrid. if provided from props, it will override the default display views.
+     * returns the list of display views to be shown in the datagrid. if provided from props, it will override the default display views.
      */
     getDisplayViews(): IDatagridDisplayViewName[] {
         return Array.isArray(this.props.displayViews) && this.props.displayViews.length > 0 ? this.props.displayViews : Object.keys(Datagrid.getRegisteredDispayViews2Metadata()) as IDatagridDisplayViewName[];
@@ -636,59 +638,79 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
     /**
      * Toggles the display of filters.
      * 
-     * This method simply toggles the `displayFilters` state and persists it to the session data.
+     * This method simply toggles the `showFilters` state and persists it to the session data.
      * 
      * @returns {void}
      */
-    toggleDisplayFilters() {
-        this.updateState({ displayFilters: !this.state.displayFilters }, () => {
-            this.setSessionData("displayFilters", this.state.displayFilters);
+    toggleShowFilters() {
+        this.updateState({ showFilters: !this.state.showFilters }, () => {
+            this.setSessionData("showFilters", this.state.showFilters);
         });
     }
     /**
      * Toggles the display of aggregated headers.
      * 
-     * This method simply toggles the `displayAggregatedHeaders` state and persists it to the session data.
+     * This method simply toggles the `showAggregatedTotals` state and persists it to the session data.
      * 
      * @returns {void}
      */
-    toggleDisplayAggregatedHeaders() {
-        this.updateState({ displayFilters: !this.state.displayAggregatedHeaders }, () => {
-            this.setSessionData("displayAggregatedHeaders", this.state.displayAggregatedHeaders);
+    toggleShowAggregatedTotals() {
+        this.updateState({ showFilters: !this.state.showAggregatedTotals }, () => {
+            this.setSessionData("showAggregatedTotals", this.state.showAggregatedTotals);
         });
     }
     /**
      * Toggles the display of headers.
      * 
-     * This method simply toggles the `displayHeaders` state and persists it to the session data.
+     * This method simply toggles the `showHeaders` state and persists it to the session data.
      * 
      * @returns {void}
      */
-    toggleDisplayHeaders() {
-        this.updateState({ displayHeaders: !this.state.displayHeaders }, () => {
-            this.setSessionData("displayHeaders", this.state.displayHeaders);
+    toggleShowHeaderss() {
+        this.updateState({ showHeaders: !this.state.showHeaders }, () => {
+            this.setSessionData("showHeaders", this.state.showHeaders);
         });
     }
 
     /**
-     * Determines if headers can be displayed in the datagrid.
+     * Determines if headers can be shown in the datagrid.
      *
      * This method checks the current state and props to decide if headers should be shown.
      *
-     * @returns {boolean} - `true` if headers can be displayed, otherwise `false`.
+     * @returns {boolean} - `true` if headers can be shown, otherwise `false`.
      */
-    canDisplayHeaders() {
-        return !!this.state.displayHeaders && this.props.displayHeaders !== false;
+    canShowHeaders() {
+        return !!this.state.showHeaders && this.props.showHeaders !== false;
     }
     /**
-     * Determines if filters can be displayed in the datagrid.
+     * Determines if filters can be shown in the datagrid.
      *
      * This method checks the current state and props to decide if filters should be shown.
      *
-     * @returns {boolean} - `true` if filters can be displayed, otherwise `false`.
+     * @returns {boolean} - `true` if filters can be shown, otherwise `false`.
      */
-    canDisplayFilters() {
-        return !!this.state.displayFilters && this.props.displayFilters !== false;
+    canShowFilters() {
+        return !!this.state.showFilters && this.props.showFilters !== false;
+    }
+    /**
+     * Determines if actions can be shown in the datagrid.
+     *
+     * This method checks the current props to decide if actions should be shown.
+     *
+     * @returns {boolean} - `true` if actions can be shown, otherwise `false`.
+     */
+    canShowActions() {
+        return this.props.showActions !== false;
+    }
+    /**
+     * Determines if aggregated headers can be shown in the datagrid.
+     *
+     * This method checks the current state and props to decide if aggregated headers should be shown.
+     *
+     * @returns {boolean} - `true` if aggregated headers can be shown, otherwise `false`.
+     */
+    canShowAggregatedTotals() {
+        return !!this.state.showAggregatedTotals && this.props.showAggregatedTotals !== false;
     }
     /**
      * Checks if a column is groupable.
@@ -922,7 +944,36 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
     getGroupedRows(groupedRowKey: string): DataType[] {
         if (!isNonNullString(groupedRowKey)) return [];
         const r = this.state.groupedRowsByKeys[groupedRowKey];
-        return Array.isArray(r) ? r : [];
+        return Array.isArray(r?.data) ? r.data : [];
+    }
+    /**
+     * Retrieves the aggregated values for the given grouped row key.
+     * Representing a record of aggregated values, where each key is a column name and each value is an object containing the aggregated values for that column.
+     * 
+     * @param {string} groupedRowKey - The key of the grouped row to retrieve.
+     * 
+     * @returns {Record<string, Record<keyof IDatagridAggregationFunctions, number>>} - The aggregated values for the given grouped row key.
+    */
+    getGroupedRowAggregatedColumnsValues(groupedRowKey: string): Record<string, Record<keyof IDatagridAggregationFunctions, number>> {
+        if (!isNonNullString(groupedRowKey)) return {} as Record<string, Record<keyof IDatagridAggregationFunctions, number>>;
+        const r = this.state.groupedRowsByKeys[groupedRowKey];
+        return isObj(r?.aggregatedColumnsValues) ? r?.aggregatedColumnsValues : {};
+    }
+
+    /**
+     * Retrieves the aggregated values for a specific column in the given grouped row key.
+     * 
+     * @param {string} groupedRowKey - The key of the grouped row to retrieve.
+     * @param {string} columnName - The name of the column for which to retrieve aggregated values.
+     * 
+     * @returns {Record<keyof IDatagridAggregationFunctions, number>} An object containing the aggregated values for the specified column in the given grouped row key. If the column does not exist or the name is invalid, an empty object is returned.
+     * The returned object represent a record of aggregated values, where each key is the name of an aggregation function and the value is the result of the aggregation function for the specified column in the given grouped row key.
+     */
+    getGroupedRowAggregatedColumnValues(groupedRowKey: string, columnName: string): Record<keyof IDatagridAggregationFunctions, number> {
+        const r = this.getGroupedRowAggregatedColumnsValues(groupedRowKey);
+        if (!isObj(r)) return {} as Record<keyof IDatagridAggregationFunctions, number>;
+        const r2 = r[columnName];
+        return isObj(r2) ? r2 : {} as Record<keyof IDatagridAggregationFunctions, number>;
     }
     /**
      * Checks if the Datagrid can paginate its data.
@@ -935,6 +986,66 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         return !!this.props.paginationEnabled;
     }
 
+    /**
+     * Initializes the computation of aggregated values for the datagrid columns.
+     * 
+     * This method prepares the data structure for storing aggregated values for each
+     * column that supports aggregation. It retrieves available aggregation functions
+     * and initializes the aggregated values to zero for each function and column.
+     * 
+     * @returns {Object} An object containing the aggregation functions and the initialized
+     * aggregated columns values.
+     * - `aggregationFunctions`: The set of aggregation functions available for use.
+     * - `aggregatedColumnsValues`: A record with column names as keys and their respective
+     * aggregated values initialized to zero for each aggregation function.
+     */
+    protected initAggregationComputation() {
+        const aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>> = {};
+        const aggregationFunctions = Datagrid.getRegisteredAggregationFunctions();
+        const { aggregatableColumns } = this.state;
+        if (Array.isArray(aggregatableColumns)) {
+            aggregatableColumns.map((column) => {
+                const colAggregated = (aggregatedColumnsValues as any)[column.name] = {};
+                for (let i in aggregationFunctions) {
+                    (colAggregated as any)[i] = 0;
+                }
+            });
+        }
+        return { aggregationFunctions, aggregatedColumnsValues };
+    }
+    /**
+     * Computes the aggregated values for each column that supports aggregation.
+     * 
+     * This method iterates over the aggregatable columns and applies the provided aggregation
+     * functions to compute the aggregated values for each column based on the row data.
+     * The computed values are stored in the `aggregatedColumnsValues` object.
+     * 
+     * @param {DataType} rowData - The data for the current row being processed.
+     * @param {number} rowIndex - The index of the current row in the dataset.
+     * @param {IDatagridAggregationFunctions<DataType>} aggregationFunctions - The set of aggregation functions to apply.
+     * @param {Record<string, Record<keyof IDatagridAggregationFunctions, number>>} aggregatedColumnsValues - An object to store the aggregated values for each column.
+     * @param {DataType[]} allData - The complete dataset being processed.
+     * @returns {Record<string, Record<keyof IDatagridAggregationFunctions, number>>} - The updated object containing aggregated values for each column.
+     */
+    protected computeAggregationsForRow(rowData: DataType, rowIndex: number, aggregationFunctions: IDatagridAggregationFunctions<DataType>, aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>, allData: DataType[]) {
+        const { aggregatableColumns } = this.state;
+        aggregatedColumnsValues = isObj(aggregatedColumnsValues) ? aggregatedColumnsValues : {};
+        if (!Array.isArray(aggregatableColumns)) return aggregatedColumnsValues;
+        aggregatableColumns.map((column) => {
+            if (column.aggregatable) {
+                const colAggregated = (aggregatedColumnsValues as any)[column.name];
+                for (let i in aggregationFunctions) {
+                    const fn: IDatagridAggregationFunction = (aggregationFunctions as any)[i];
+                    const value = this.computeCellValue(column, rowData);
+                    const val2 = isStringNumber(value) ? parseFloat(value) : value;
+                    if (isNumber(val2) && typeof fn === "function") {
+                        (colAggregated as any)[i] = defaultNumber(fn(colAggregated, val2, rowIndex, allData));
+                    }
+                }
+            }
+        });
+        return aggregatedColumnsValues;
+    }
     /**
      * Processes the data for the component.
      * 
@@ -959,14 +1070,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         const groupedRowsByKeys: IDatagridState<DataType>["groupedRowsByKeys"] = {} as IDatagridState<DataType>["groupedRowsByKeys"];
         const rowsByKeys: IDatagridState<DataType>["rowsByKeys"] = {} as IDatagridState<DataType>["rowsByKeys"];
         const isGroupable = this.isGroupable() && groupedColumns?.length;
-        const aggregationFunctions = Datagrid.getRegisteredAggregationFunctions();
-        const aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>> = {};
-        aggregatableColumns.map((column) => {
-            const colAggregated = (aggregatedColumnsValues as any)[column.name] = {};
-            for (let i in aggregationFunctions) {
-                (colAggregated as any)[i] = 0;
-            }
-        });
+        const { aggregationFunctions, aggregatedColumnsValues } = this.initAggregationComputation();
         data.map((rowData, index) => {
             if (!isObj(rowData) || (typeof this.props.localFilter == "function" && !this.props.localFilter(rowData, index))) return;
             rowData = typeof this.props.rowDataMutator == "function" ? this.props.rowDataMutator(this.getCallOptions({ rowData })) : rowData;
@@ -978,22 +1082,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             }
             rowsByKeys[rowKey] = rowData;
             processingData.push(rowData);
-            columns.map((column) => {
-                if (column.aggregatable) {
-                    const colAggregated = (aggregatedColumnsValues as any)[column.name];
-                    for (let i in aggregationFunctions) {
-                        const fn: IDatagridAggregationFunction = (aggregationFunctions as any)[i];
-                        const value = this.computeCellValue(column, rowData);
-                        const val2 = isStringNumber(value) ? parseFloat(value) : value;
-                        if (isNumber(val2) && typeof fn === "function") {
-                            (colAggregated as any)[i] = defaultNumber(fn(colAggregated, val2, index, data));
-                        }
-                    }
-                }
-                if (column.groupable) {
-
-                }
-            });
+            this.computeAggregationsForRow(rowData, index, aggregationFunctions, aggregatedColumnsValues, data);
         });
         paginationConfig.total = processingData.length;
         paginationConfig.currentPage = isNumber(paginationConfig.currentPage) && paginationConfig.currentPage > 0 ? paginationConfig.currentPage : 1;
@@ -1019,13 +1108,27 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                     isDatagridGroup: true,
                     groupedKey: groupableKey,
                 } as IDatagridGroupedRow;
-                if (!Array.isArray(groupedRowsByKeys[groupableKey])) {
-                    groupedRowsByKeys[groupableKey] = [];
+                if (!isObj(groupedRowsByKeys[groupableKey]) || !groupedRowsByKeys[groupableKey]) {
+                    groupedRowsByKeys[groupableKey] = {
+                        data: [],
+                        aggregatedColumnsValues: this.initAggregationComputation().aggregatedColumnsValues,
+                    };
                 }
-                groupedRowsByKeys[groupableKey].push(rowData);
+                groupedRowsByKeys[groupableKey].data.push(rowData);
                 stateData.push(groupedRowHeader);
                 stateData.push(rowData);
             });
+            /***
+             * We compute aggregation values for each grouped row key
+             */
+            for (let i in groupedRowsByKeys) {
+                const d = groupedRowsByKeys[i];
+                if (Array.isArray(d.data) && d.data.length > 0) {
+                    d.data.map((rowData, rowIndex) => {
+                        d.aggregatedColumnsValues = this.computeAggregationsForRow(rowData, rowIndex, aggregationFunctions, d.aggregatedColumnsValues, data);
+                    })
+                }
+            }
         }
         return { aggregatedColumnsValues, paginatedData, allData: processingData, data: stateData, pagination: paginationConfig, groupedRowsByKeys, rowsByKeys };
     }
@@ -1090,16 +1193,16 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             Object.assign(newState, this.processData(this.props.data, orderBy, groupedColumns, pagination));
             hasUpdated = true;
         }
-        if (prevProps.displayFilters !== this.props.displayFilters && typeof this.props.displayFilters == "boolean") {
-            newState.displayFilters = this.props.displayFilters;
+        if (prevProps.showFilters !== this.props.showFilters && typeof this.props.showFilters == "boolean") {
+            newState.showFilters = this.props.showFilters;
             hasUpdated = true;
         }
-        if (prevProps.displayHeaders !== this.props.displayHeaders && typeof this.props.displayHeaders == "boolean") {
-            newState.displayHeaders = this.props.displayHeaders;
+        if (prevProps.showHeaders !== this.props.showHeaders && typeof this.props.showHeaders == "boolean") {
+            newState.showHeaders = this.props.showHeaders;
             hasUpdated = true;
         }
-        if (prevProps.displayAggregatedHeaders !== this.props.displayAggregatedHeaders && typeof this.props.displayAggregatedHeaders === "boolean") {
-            newState.displayAggregatedHeaders = this.props.displayAggregatedHeaders;
+        if (prevProps.showAggregatedTotals !== this.props.showAggregatedTotals && typeof this.props.showAggregatedTotals === "boolean") {
+            newState.showAggregatedTotals = this.props.showAggregatedTotals;
             hasUpdated = true;
         }
         if (hasUpdated) {
@@ -1107,7 +1210,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                 this.setSessionData("displayView", this.state.displayView);
                 this.setSessionData("orderBy", this.state.orderBy);
                 this.setSessionData("groupedColumns", this.state.groupedColumns);
-                this.setSessionData("displayAggregatedHeaders", this.state.displayAggregatedHeaders);
+                this.setSessionData("showAggregatedTotals", this.state.showAggregatedTotals);
             });
         } else {
             setTimeout(() => {
@@ -1460,25 +1563,65 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         }, [datagridContext?.canRenderLoadingIndicator()]);
         return typeof Component !== "function" ? null : <Component isLoading={isLoading} />;
     };
+
+
     /**
-     * The default loading indicator component for the Datagrid.
-     * 
-     * This loading indicator uses the {@link Preloader} component to show a loading indicator
-     * that covers the entire screen. It listens for "toggleIsLoading" events from the Datagrid
-     * context to update the loading state. The loading state is managed internally using
+     * A loading indicator component for the Datagrid that uses the ProgressBar
+     * component to show an indeterminate progress bar at the bottom of the
+     * Datagrid. It listens for "toggleIsLoading" events from the Datagrid context
+     * to update the loading state. The loading state is managed internally using
      * React's state and effect hooks.
      * 
-     * @param {IDatagridLoadingIndicatorProps} props - The properties for the loading indicator.
-     * @param {boolean} props.isLoading - The boolean indicating whether the Datagrid is in a loading state.
+     * @param {IDatagridLoadingIndicatorProps & IProgressBarProps} props - The properties for the
+     * loading indicator.
+     * @param {boolean} props.isLoading - The boolean indicating whether the
+     * Datagrid is in a loading state.
      * 
-     * @returns {JSX.Element | null} The rendered loading indicator component, or null if the loading
-     * indicator is not to be rendered.
+     * @returns {JSX.Element | null} The rendered loading indicator component, or
+     * null if the loading indicator is not to be rendered.
      */
+    static ProgressBarLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIndicatorProps & IProgressBarProps) {
+        return <ProgressBar indeterminate visible={isLoading} {...props} />
+    }
+    /**
+     * A default loading indicator component for the Datagrid that uses the
+     * ProgressBarLoadingIndicator loading indicator component to show an
+     * indeterminate progress bar at the bottom of the Datagrid. It listens
+     * for "toggleIsLoading" events from the Datagrid context to update the
+     * loading state. The loading state is managed internally using
+     * React's state and effect hooks.
+     * @param {IDatagridLoadingIndicatorProps} props - The properties for the
+     * loading indicator.
+     * @param {boolean} props.isLoading - The boolean indicating whether the
+     * Datagrid is in a loading state.
+     * @returns {JSX.Element | null} The rendered loading indicator component, or
+     * null if the loading indicator is not to be rendered.
+     */
+
     static DefaultLoadingIndicator({ isLoading }: IDatagridLoadingIndicatorProps) {
+        return <Datagrid.ProgressBarLoadingIndicator isLoading={isLoading} />;
+    }
+
+    /**
+     * A loading indicator component for the Datagrid that uses the Preloader
+     * component to show a loading indicator that covers the entire screen.
+     * It listens for "toggleIsLoading" events from the Datagrid context to
+     * update the loading state. The loading state is managed internally using
+     * React's state and effect hooks.
+     * 
+     * @param {IDatagridLoadingIndicatorProps & IPreloaderProps} props - The properties for the
+     * loading indicator.
+     * @param {boolean} props.isLoading - The boolean indicating whether the
+     * Datagrid is in a loading state.
+     * 
+     * @returns {JSX.Element | null} The rendered loading indicator component, or
+     * null if the loading indicator is not to be rendered.
+     */
+    static PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIndicatorProps & IPreloaderProps) {
         const hasShownPreloaderRef = useRef(false);
         useEffect(() => {
             if (isLoading) {
-                Preloader.open();
+                Preloader.open(props);
             } else {
                 if (hasShownPreloaderRef.current) {
                     Preloader.close();
@@ -1526,11 +1669,11 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      * rows.
      *
      * @returns {JSX.Element | null} The actions toolbar component if the
-     * `renderActionsToolbar` prop is true, otherwise null.
+     * `showActions` prop is true, otherwise null.
      */
     static Actions() {
         const datagridContext = useDatagrid();
-        const { selectedRowsActions, actions, renderActionsToolbar, actionsToolbarProps, ...props } = Object.assign({}, datagridContext?.props);
+        const { selectedRowsActions, actions, showActions, actionsProps } = Object.assign({}, datagridContext?.props);
         useDatagridOnEvent(["toggleAllRowsSelection"], undefined, true);
         const { actions: actionsToDisplay, title } = useMemo(() => {
             if (!datagridContext) return {
@@ -1540,16 +1683,17 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
             const count = defaultNumber(datagridContext?.getSelectedRowsCount());
             const actionsOrCallback = count > 0 ? selectedRowsActions : actions;
             const _actions = typeof actionsOrCallback === "function" ? actionsOrCallback(datagridContext) : actionsOrCallback;
-            const suffix = count > 1 ? "s" : "";
-            return { actions: Array.isArray(_actions) ? _actions : [], title: count ? count.formatNumber() + suffix : "" };
+            return { actions: Array.isArray(_actions) ? _actions : [], title: count > 0 ? i18n.t("components.datagrid.selectedActionsCount", { count }) : "" };
         }, [datagridContext?.getSelectedRowsCount()]);
-        if (!renderActionsToolbar) return null;
+        if (!datagridContext?.canShowActions()) return null;
         const testID = datagridContext?.getTestID();
         return <View testID={testID + "-actions-container"} style={[styles.actionsToolbar]}>
             <AppBar testID={`${testID}-actions`}
                 backAction={false}
-                backgroundColor='transparent' {...Object.assign({}, actionsToolbarProps)}
-                title={title || i18n.t("components.datagrid.actions")} actions={actionsToDisplay as any}
+                backgroundColor='transparent'
+                {...Object.assign({}, actionsProps)}
+                title={title || actionsProps?.title || i18n.t("components.datagrid.actions") || ""}
+                actions={actionsToDisplay as any}
             />
             <Divider testID={testID + "-actions-divider"} />
         </View>
@@ -1590,6 +1734,9 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
     }, [displayView]);
     const { width: containerWidth } = context.getContainerLayout();
     const visibleColumns = context.getVisibleColumns();
+    const showHeaders = context.canShowHeaders();
+    const showFilters = context.canShowFilters();
+    const showAggregatedTotals = context.canShowAggregatedTotals();
     // Calculate column widths
     const visibleColumnsWidths = useMemo(() => {
         const availableWidth = Math.min(containerWidth, screenWidth);
@@ -1623,10 +1770,12 @@ function DatagridRendered<DataType extends IDatagridDataType = any>(options: { c
             <View testID={testID} style={[styles.main, isLoading && styles.disabled, props.style]} onLayout={context.onContainerLayout.bind(context)}>
                 {context.renderLoadingIndicator()}
                 {<Datagrid.Actions />}
-                {/* View switcher */}
-                <ScrollView testID={testID + "-horizontal-header-scrollview"} horizontal style={styles.viewSwitcher}>
-
-                </ScrollView>
+                {showHeaders ? <ScrollView testID={testID + "-header-scrollview"} contentContainerStyle={styles.headerScrollViewContentContainer} style={[styles.headerScrollView]}>
+                    <View testID={testID + "-header-container"} style={[styles.headerContainer]}>
+                        <Label>Example of header 1</Label>
+                        <Label>Example of header 2</Label>
+                    </View>
+                </ScrollView> : null}
                 {Component ? <Component visibleColumnsWidths={visibleColumnsWidths} datagridContext={context} /> : <Label colorScheme="error" fontSize={20} textBold>
                     {"No display view found for datagrid"}
                 </Label>}
@@ -1642,7 +1791,7 @@ DatagridRendered.displayName = "Datagrid.Rendered";
  * 
  * This class provides a basic implementation for a Datagrid column, and can be extended to create custom columns.
  * 
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * @template PropExtensions - The type of the component's props. This type is used to extend the component's props with additional properties.
  * @template StateType - The type of the component's state.
  */
@@ -2034,7 +2183,7 @@ export function AttachDatagridDisplayView(metadata: IDatagridDisplayViewMetadata
  * 
  * This class provides a set of methods for accessing the Datagrid context and rendering data.
  * 
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * @template PropType - The type of the component's props.
  * @template StateType - The type of the component's state.
  * @template EventType - The type of the component's events.
@@ -2058,7 +2207,7 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = u
      * Retrieves the list of visible columns for the current display view.
      * 
      * This method accesses the datagrid context to obtain the list of columns that are currently visible. 
-     * It is useful for determining which columns should be displayed based on the current state of the datagrid.
+     * It is useful for determining which columns should be shown based on the current state of the datagrid.
      * 
      * @returns {IDatagridStateColumn<DataType>[]} An array of visible column definitions.
      */
@@ -2070,7 +2219,7 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = u
      * Retrieves the list of all columns in the datagrid.
      * 
      * This method provides access to the complete list of columns in the datagrid, including hidden columns.
-     * It is useful for determining the structure of the data displayed in the datagrid.
+     * It is useful for determining the structure of the data shown in the datagrid.
      * 
      * @returns {IDatagridStateColumn<DataType>[]} An array of all column definitions.
      */
@@ -2081,7 +2230,7 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = u
      * Retrieves the list of all columns in the datagrid.
      * 
      * This method provides access to the complete list of columns in the datagrid, including hidden columns.
-     * It is useful for determining the structure of the data displayed in the datagrid.
+     * It is useful for determining the structure of the data shown in the datagrid.
      * 
      * @returns {IDatagridStateColumn<DataType>[]} An array of all column definitions.
      */
@@ -2110,6 +2259,7 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = u
      * @param {string} columnName - The name of the column for which to retrieve aggregated values.
      * 
      * @returns {Record<keyof IDatagridAggregationFunctions, number>} An object containing the aggregated values for the specified column. If the column does not exist or the name is invalid, an empty object is returned.
+     * The returned object represent a record of aggregated values, where each key is the name of an aggregation function and the value is the result of the aggregation function for the specified column in the given grouped row key.
      */
     getAggregatedColumnValues(columnName: string): Record<keyof IDatagridAggregationFunctions, number> {
         if (!isNonNullString(columnName)) return {} as Record<keyof IDatagridAggregationFunctions, number>;
@@ -2118,11 +2268,11 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = u
     }
 
     /**
-     * Returns the data to be displayed in the grid.
+     * Returns the data to be shown in the grid.
      * 
      * This method returns the data from the Datagrid context's state.
      * 
-     * @returns The data to be displayed in the grid.
+     * @returns The data to be shown in the grid.
      */
     getData(): IDatagridStateData<DataType> {
         const d = this.getDatagridContext().state.data;
@@ -2459,7 +2609,7 @@ class DatagridDisplayView<DataType extends IDatagridDataType = any, PropType = u
 /**
  * Represents the options for a Datagrid call.
  * 
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  */
 export interface IDatagridCallOptions<DataType extends IDatagridDataType = any> {
     /**
@@ -2473,7 +2623,7 @@ export interface IDatagridCallOptions<DataType extends IDatagridDataType = any> 
  * @typedef IDatagridProps
  * Represents the properties for the `Datagrid` component.
  * 
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  */
 export interface IDatagridProps<DataType extends IDatagridDataType = any> {
     /**
@@ -2622,9 +2772,9 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
     rowDataMutator?: (options: IDatagridCallOptions<DataType> & { rowData: DataType }) => DataType;
 
     /**
-     * A list of display views to be displayed in the datagrid.
+     * A list of display views to be shown in the datagrid.
      * 
-     * This property is used to specify a list of display views that should be displayed in the datagrid.
+     * This property is used to specify a list of display views that should be shown in the datagrid.
      * 
      * If provided, it will override the default display views.
      */
@@ -2662,7 +2812,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * A JSX element or `null` to render as the loading indicator.
      *
      * This prop allows you to customize the visual representation of the loading state in the datagrid.
-     * When the `isLoading` prop is set to `true`, the `loadingIndicator` will be displayed in place of the actual data.
+     * When the `isLoading` prop is set to `true`, the `loadingIndicator` will be shown in place of the actual data.
      * If no `loadingIndicator` is provided, the datagrid will not display any loading UI.
      *
      * @type {React.ReactNode}
@@ -2689,7 +2839,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * @remarks
      * - The `loadingIndicator` is only rendered when the `isLoading` prop is `true`.
      * - You can pass any valid React element, including functional components, class components, or HTML elements.
-     * - If you pass `null` or omit this prop, no loading indicator will be displayed.
+     * - If you pass `null` or omit this prop, no loading indicator will be shown.
      */
     loadingIndicator?: JSX.Element | null;
 
@@ -2698,11 +2848,11 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * Defines the actions that can be performed within the Datagrid component.
      * 
      * The `actions` property allows you to specify a list of actions or a function that dynamically generates actions
-     * based on the current state of the Datagrid. These actions can be displayed in the Datagrid's toolbar or other interactive elements.
+     * based on the current state of the Datagrid. These actions can be shown in the Datagrid's toolbar or other interactive elements.
      * 
      * @type {IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[])}
      * 
-     * @template DataType - The type of the data displayed in the grid.
+     * @template DataType - The type of the data shown in the grid.
      * 
      * @example
      * ```typescript
@@ -2733,26 +2883,33 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      */
     actions?: IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[]);
 
-    /***
-     * Whether to render the actions toolbar.
+    /**
+     * Controls whether the set of action buttons is displayed on top of the datagrid.
+     * When set to `true`, the action buttons will be visible.
+     * When set to `false`, the action buttons will be hidden.
+     *
+     * @default true
+     * @type {boolean}
+     * @example
+     * <DataGrid showActions={false} />
      */
-    renderActionsToolbar?: boolean;
+    showActions?: boolean;
 
     /***
      * The props to pass to the actions toolbar.
      */
-    actionsToolbarProps?: Partial<Omit<IAppBarProps, "children" | "actions">>;
+    actionsProps?: Partial<Omit<IAppBarProps, "children" | "actions">>;
 
     /**
      * Defines the actions that can be performed on the selected rows within the Datagrid component.
      * 
      * The `selectedRowsActions` property allows you to specify a list of actions or a function that dynamically generates actions
-     * based on the current state of the Datagrid and the selected rows. These actions can be displayed in the Datagrid's toolbar
+     * based on the current state of the Datagrid and the selected rows. These actions can be shown in the Datagrid's toolbar
      * or other interactive elements.
      * 
      * @type {IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[])}
      * 
-     * @template DataType - The type of the data displayed in the grid.
+     * @template DataType - The type of the data shown in the grid.
      * 
      * @example
      * ```typescript
@@ -2812,17 +2969,24 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
     /**
      * Whether to display headers in the Datagrid.
      */
-    displayHeaders?: boolean;
+    showHeaders?: boolean;
 
     /***
      * Whether to display filters in the Datagrid.
      */
-    displayFilters?: boolean;
+    showFilters?: boolean;
 
-    /***
-     * Whether to display aggregated headers in the Datagrid.
+    /**
+     * Controls whether the aggregated totals are displayed in the grid.
+     * When set to `true`, the aggregated totals (e.g., sums, averages) will be visible.
+     * When set to `false`, the aggregated totals will be hidden.
+     *
+     * @default true
+     * @type {boolean}
+     * @example
+     * <DataGrid showAggregatedTotals={false} />
      */
-    displayAggregatedHeaders?: boolean;
+    showAggregatedTotals?: boolean;
 }
 
 /**
@@ -2831,7 +2995,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
  * The `IDatagridAction` interface extends the `IAppBarAction` interface, adding a context specific to the Datagrid.
  * Actions defined by this interface can be used in the Datagrid's toolbar or other interactive elements.
  * 
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * 
  * @extends {IAppBarAction}
  * 
@@ -2866,7 +3030,7 @@ const DatagridContext = createContext<Datagrid | null>(null);
  * 
  * This hook returns the Datagrid component's context, which provides access to the grid's state and methods.
  * 
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * 
  * @returns The Datagrid component's context, or null if not found.
  */
@@ -2927,7 +3091,7 @@ export function useDatagridOnEvent(event: IDatagridEvent | IDatagridEvent[], cal
  * @typedef IDatagridStateColumn
  * Represents a column in the Datagrid component's state.
  * @extends {IDatagridColumnProps}
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * @see {@link IDatagridColumnProps} for more information about column properties.  
  */
 export type IDatagridStateColumn<DataType extends IDatagridDataType = any> = Omit<IDatagridColumnProps<DataType>, "name" | "getAggregationValue" | "aggregationFunction" | "sortable" | "filterable" | "groupable" | "aggregatable" | "visible"> & {
@@ -3001,7 +3165,7 @@ export type IDatagridStateColumn<DataType extends IDatagridDataType = any> = Omi
  * @extends {IField}
  * @see {@link IField} for more information about the properties of a column.
  * 
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  */
 export type IDatagridColumnProps<DataType extends IDatagridDataType = any> = Omit<IField, "name"> & {
     /**
@@ -3118,11 +3282,11 @@ export type IDatagridColumnProps<DataType extends IDatagridDataType = any> = Omi
  * Represents the state of the Datagrid component.
  * @typedef IDatagridState
  * 
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  */
 export interface IDatagridState<DataType extends IDatagridDataType = any> {
     /**
-     * The data to be displayed in the grid.
+     * The data to be shown in the grid.
      * 
      * This property contains an array of either grouped rows or data rows.
      * 
@@ -3147,7 +3311,7 @@ export interface IDatagridState<DataType extends IDatagridDataType = any> {
     /**
      * The current display view of the grid.
      * 
-     * This property determines how the data is displayed in the grid.
+     * This property determines how the data is shown in the grid.
      * 
      * @see {@link IDatagridDisplayViewName} for more information about display view names.
      */
@@ -3200,7 +3364,10 @@ export interface IDatagridState<DataType extends IDatagridDataType = any> {
      * 
      * This property allows for efficient lookup of grouped rows by their keys.
      */
-    groupedRowsByKeys: Record<string, DataType[]>;
+    groupedRowsByKeys: Record<string, {
+        data: DataType[];
+        aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>;
+    }>;
 
     /**
      * The current order by configuration of the grid.
@@ -3264,28 +3431,22 @@ export interface IDatagridState<DataType extends IDatagridDataType = any> {
     /***
      * A flag indicating whether to display filters.
      */
-    displayFilters: boolean;
+    showFilters: boolean;
 
     /***
      * A flag indicating whether to display headers.
      */
-    displayHeaders: boolean;
+    showHeaders: boolean;
 
     /**
      * The layout of the view container.
      */
     containerLayout: LayoutRectangle;
 
-    /***
-     * The widths of the columns.
-     * Each key is the name of the column and the value is the width of the column.
-     */
     columnsWidths: Record<string, number>;
 
-    /**
-     * Whether to display aggregated headers in the Datagrid.
-     */
-    displayAggregatedHeaders: boolean;
+
+    showAggregatedTotals: boolean;
 }
 
 /**
@@ -3333,7 +3494,7 @@ export interface IDatagridDataType extends Record<string, any> { }
  * An interface representing the accumulator object used in aggregation functions.
  * It is an object with properties that are the keys of the IDatagridAggregationFunctions interface.
  * @typedef IDatagridAggregationAccumulator
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * @see {@link IDatagridAggregationFunctions} for more information about aggregation functions.
  */
 export interface IDatagridAggregationAccumulator<DataType extends IDatagridDataType = any> extends Record<keyof IDatagridAggregationFunctions | string, number> {
@@ -3355,7 +3516,7 @@ export type IDatagridAggregationFunction<DataType extends IDatagridDataType = an
 /**
  * An interface representing the possible aggregation functions that can be used in the Datagrid component.
  * @typedef IDatagridAggregationFunctions
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * @see {@link IDatagridAggregationFunction} for more information about aggregation functions.
  */
 export interface IDatagridAggregationFunctions<DataType extends IDatagridDataType = any> {
@@ -3390,7 +3551,7 @@ export type IDatagridAggregator = keyof IDatagridAggregationFunctions;
 /**
  * An interface representing a grouped row in the Datagrid component.
  * @typedef IDatagridGroupedRow
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  */
 export interface IDatagridGroupedRow {
     /**
@@ -3411,7 +3572,7 @@ export interface IDatagridGroupedRow {
  * A type representing the data state of the Datagrid component.
  * It is an array of either grouped rows or data rows.
  * @typedef IDatagridStateData
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * @see {@link IDatagridGroupedRow} for more information about grouped rows.
  */
 export type IDatagridStateData<DataType extends IDatagridDataType = any> = Array<IDatagridGroupedRow | DataType>;
@@ -3434,7 +3595,7 @@ export type IDatagridDisplayViewName = keyof IDatagridDisplayViewMap;
 /**
  * A type representing the order by configuration of the Datagrid component.
  * @typedef IDatagridOrderBy
- * @template DataType - The type of the data displayed in the grid.
+ * @template DataType - The type of the data shown in the grid.
  * @extends {IResourceQueryOptionsOrderBy<DataType>}
  * @see {@link IResourceQueryOptionsOrderBy}
  */
@@ -3474,15 +3635,26 @@ const styles = StyleSheet.create({
     actionsToolbar: {
         width: "100%",
     },
-    viewSwitcher: {
-
+    headerScrollViewContentContainer: {
+        minWidth: '100%',
+        paddingRight: 10,
+    },
+    headerScrollView: {
+        flex: 1,
+        flexGrow: 1,
+        width: '100%',
+        paddingHorizontal: 10,
+        flexDirection: 'row'
     },
     headerWrapper: {
         alignSelf: "flex-start",
     },
     headerContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        alignSelf: "flex-start",
+        flex: 1,
+        flexDirection: 'row',
+        width: '100%',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        paddingHorizontal: 10,
     }
 });

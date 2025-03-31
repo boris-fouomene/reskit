@@ -49,110 +49,345 @@ import { TextStyle } from "react-native";
  *     // Other corner tokens here
  *   },
  * };
- * 
- * @typedef {Object} IThemeColorsTokens
- * @property {string} [text] - The color applied on text elements
- * @property {string} [primary] - The primary color of the application. It's used to highlight important elements like buttons or icons. Primary color tokens representing the most prominent color in the app. Used for key UI elements like FABs, prominent buttons, active states.
- * @property {string} [onPrimary] - The color applied on top of the primary background (e.g., text or icons).Secondary color tokens for less prominent UI elements.Provides complementary accents to your primary color.
- * @property {string} [primaryContainer] - A container color associated with the primary color, typically used for background areas. 
- * @property {string} [onPrimaryContainer] - Color used for text or icons placed on a primary container. 
- * @property {string} [secondary] - The secondary color, used for less prominent elements in the UI. 
- * @property {string} [onSecondary] - The color used for text or icons placed on secondary-colored backgrounds.
- * @property {string} [secondaryContainer] - A container color associated with the secondary color, used for background areas.
- * @property {string} [onSecondaryContainer] - Text or icons placed on a secondary container background. 
- * @property {string} [tertiary] - Tertiary color, often used for accents or additional visual differentiation.
- * @property {string} [onTertiary] - Text or icons placed on tertiary-colored backgrounds.
- * @property {string} [tertiaryContainer] - Background or container color associated with the tertiary color. 
- * @property {string} [onTertiaryContainer] - Text or icons placed on a tertiary container background. 
- * @property {string} [surface] - Main surface color, used for cards, sheets, or other elevated elements. 
- * @property {string} [onSurface] - Text or icons placed on surfaces. 
- * @property {string} [surfaceVariant] - Variant of the surface color for distinguishing different UI sections. it can be used for elements like chips or buttons.$
- * @property {string} [onSurfaceVariant] - Text or icons placed on a surface variant. The onSurfaceVariant color is a good choice for placeholders, as it contrasts against the surface but appears softer than primary text colors.
- * @property {string} [outline] - Outline color used for borders or outlines.
- * @property {string} [surfaceTint] - Surface tint color for elements like hover or focus states.  For a backdrop or overlay, you can use the surfaceTint for a lighter, more subtle effect or inverseSurface for a contrasting, darker effect. This provides a visually distinct background for modals or other overlays
- * @property {string} [inverseSurface] - Inverse of the surface color, for use in dark/light modes.
- * @property {string} [inverseOnSurface] - Text or icons placed on the inverse surface. 
- * @property {string} [inversePrimary] - Inverse of the primary color, for contrast in dark or light themes. 
- * @property {string} [background] - Main background color for the application. 
- * @property {string} [onBackground] - Text or icons placed on the background. 
- * @property {string} [warning] - The color used for warnings.
- * @property {string} [onWarning] - The color applied on top of the warning background (e.g., text or icons).
- * @property {string} [statusBar] - The color of the status bar.
- * @property {string} [info] - The color used for informational messages.
- * @property {string} [onInfo] - The color applied on top of the info background.
- * @property {string} [success] - The color used for success states.
- * @property {string} [onSuccess] - The color applied on top of the success background.
- * @property {string} [error] - Error color used to indicate failure or important issues. 
- * @property {string} [onError] - Text or icons placed on error-colored backgrounds. 
- * @property {string} [errorContainer] - Background or container color associated with error states. 
- * @property {string} [onErrorContainer] - Text or icons placed on an error container background.
- * 
- * @property {string} [placeholder] - The color used for placeholders.
- * @property {string} [outline] - The color used for outlines.  
- * @property {string} [backdrop] - The color used for modal's backdrop.
- * @example
- * ```ts
- * const themeColors: IThemeColorsTokens = {
- *    primary: "#6200EE",
- *    onPrimary: "#FFFFFF",
- *    warning: "#FFA726",
- *    onWarning: "#FFFFFF",
- *    statusBar: "#000000"
- * };
- * ```
  */
 export interface IThemeColorsTokens {
+  /**
+   * The primary color of the theme, used for key components like buttons and app bars.
+   * Typically represents the main brand color.
+   *
+   * @type {string}
+   * @example '#6200EE' // A deep purple color
+   */
   primary: string;
+
+  /**
+   * The color used for content (e.g., text, icons) displayed on top of the primary color.
+   * Ensures proper contrast for readability.
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White text/icons on a dark primary background
+   */
   onPrimary: string;
+
+  /**
+   * A container variant of the primary color, often used for backgrounds or larger areas.
+   *
+   * @type {string}
+   * @example '#EADDFF' // A light purple color
+   */
   primaryContainer: string;
+
+  /**
+   * The color used for content displayed on top of the primary container.
+   *
+   * @type {string}
+   * @example '#21005D' // Dark text/icons on a light primary container
+   */
   onPrimaryContainer: string;
 
+  /**
+   * The secondary color of the theme, used for less prominent components.
+   * Often complements the primary color.
+   *
+   * @type {string}
+   * @example '#625B71' // A muted purple-gray color
+   */
   secondary: string;
+
+  /**
+   * The color used for content displayed on top of the secondary color.
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White text/icons on a dark secondary background
+   */
   onSecondary: string;
+
+  /**
+   * A container variant of the secondary color, used for backgrounds or larger areas.
+   *
+   * @type {string}
+   * @example '#E8DEF8' // A light purple-gray color
+   */
   secondaryContainer: string;
+
+  /**
+   * The color used for content displayed on top of the secondary container.
+   *
+   * @type {string}
+   * @example '#1D192B' // Dark text/icons on a light secondary container
+   */
   onSecondaryContainer: string;
 
+  /**
+   * The tertiary color of the theme, used for accentuating specific elements.
+   *
+   * @type {string}
+   * @example '#7D5260' // A muted pink-brown color
+   */
   tertiary: string;
+
+  /**
+   * The color used for content displayed on top of the tertiary color.
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White text/icons on a dark tertiary background
+   */
   onTertiary: string;
+
+  /**
+   * A container variant of the tertiary color, used for backgrounds or larger areas.
+   *
+   * @type {string}
+   * @example '#FFD8E4' // A light pink-brown color
+   */
   tertiaryContainer: string;
+
+  /**
+   * The color used for content displayed on top of the tertiary container.
+   *
+   * @type {string}
+   * @example '#31111D' // Dark text/icons on a light tertiary container
+   */
   onTertiaryContainer: string;
 
+  /**
+   * The background color of the application, used for large areas like the main screen.
+   *
+   * @type {string}
+   * @example '#FFFBFF' // A very light gray or white color
+   */
   background: string;
+
+  /**
+   * The color used for content displayed on top of the background.
+   *
+   * @type {string}
+   * @example '#000000' // Black text/icons on a light background
+   */
   onBackground: string;
 
+  /**
+   * The surface color, used for components like cards, sheets, and menus.
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White surface color
+   */
   surface: string;
+
+  /**
+   * The color used for content displayed on top of the surface.
+   *
+   * @type {string}
+   * @example '#000000' // Black text/icons on a light surface
+   */
   onSurface: string;
+
+  /**
+   * A variant of the surface color, used for components that need subtle differentiation.
+   *
+   * @type {string}
+   * @example '#F4F4F4' // A slightly darker/lighter surface color
+   */
   surfaceVariant: string;
+
+  /**
+   * The color used for content displayed on top of the surface variant.
+   *
+   * @type {string}
+   * @example '#000000' // Black text/icons on a surface variant
+   */
   onSurfaceVariant: string;
 
+  /**
+   * The outline color, used for borders or dividers to separate components.
+   *
+   * @type {string}
+   * @example '#DADADA' // A light gray outline
+   */
   outline: string;
+
+  /**
+   * A variant of the outline color, used for subtle borders or dividers.
+   *
+   * @type {string}
+   * @example '#EAEAEA' // A lighter gray outline
+   */
   outlineVariant: string;
 
+  /**
+   * The inverse surface color, used for components in inverted contexts (e.g., dark mode).
+   *
+   * @type {string}
+   * @example '#1C1B1F' // A dark surface color
+   */
   inverseSurface: string;
+
+  /**
+   * The color used for content displayed on top of the inverse surface.
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White text/icons on a dark inverse surface
+   */
   inverseOnSurface: string;
+
+  /**
+   * The inverse primary color, used for key components in inverted contexts.
+   *
+   * @type {string}
+   * @example '#D0BCFF' // A light purple color
+   */
   inversePrimary: string;
 
-
+  /**
+   * The error color, used for indicating errors or critical states.
+   *
+   * @type {string}
+   * @example '#B00020' // A bright red color
+   */
   error: string;
+
+  /**
+   * The color used for content displayed on top of the error color.
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White text/icons on an error background
+   */
   onError: string;
+
+  /**
+   * A container variant of the error color, used for backgrounds or larger areas.
+   *
+   * @type {string}
+   * @example '#F9DEDC' // A light red color
+   */
   errorContainer: string;
+
+  /**
+   * The color used for content displayed on top of the error container.
+   *
+   * @type {string}
+   * @example '#410002' // Dark text/icons on a light error container
+   */
   onErrorContainer: string;
 
+  /**
+   * The shadow color, used for drop shadows to indicate elevation.
+   *
+   * @type {string}
+   * @example '#000000' // Black shadow
+   */
   shadow: string;
+
+  /**
+   * The scrim color, used for overlays or dimming effects.
+   *
+   * @type {string}
+   * @example 'rgba(0, 0, 0, 0.5)' // Semi-transparent black scrim
+   */
   scrim: string;
+
+  /**
+   * The color used for disabled surfaces, such as inactive buttons or cards.
+   *
+   * @type {string}
+   * @example '#E0E0E0' // A light gray color
+   */
   surfaceDisabled: string;
+
+  /**
+   * The color used for content displayed on top of disabled surfaces.
+   *
+   * @type {string}
+   * @example '#A3A3A3' // Gray text/icons on a disabled surface
+   */
   onSurfaceDisabled: string;
+
+  /**
+   * The backdrop color, used for modal overlays or blurred backgrounds.
+   *
+   * @type {string}
+   * @example 'rgba(0, 0, 0, 0.4)' // Semi-transparent black backdrop
+   */
   backdrop: string;
 
+  /**
+   * The default surface container color, used for grouping content.
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White container
+   */
   surfaceContainer: string;
+
+  /**
+   * A low-contrast variant of the surface container color.
+   *
+   * @type {string}
+   * @example '#FAFAFA' // Very light gray
+   */
   surfaceContainerLow: string;
+
+  /**
+   * The lowest-contrast variant of the surface container color.
+   *
+   * @type {string}
+   * @example '#FCFCFC' // Almost white
+   */
   surfaceContainerLowest: string;
+
+  /**
+   * A high-contrast variant of the surface container color.
+   *
+   * @type {string}
+   * @example '#F5F5F5' // Light gray
+   */
   surfaceContainerHigh: string;
+
+  /**
+   * The highest-contrast variant of the surface container color.
+   *
+   * @type {string}
+   * @example '#E0E0E0' // Medium gray
+   */
   surfaceContainerHighest: string;
+
+  /**
+   * A brighter variant of the surface color, used for highlighting.
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White highlight
+   */
   surfaceBright: string;
+
+  /**
+   * A dimmer variant of the surface color, used for de-emphasizing.
+   *
+   * @type {string}
+   * @example '#F0F0F0' // Light gray dim
+   */
   surfaceDim: string;
+
+  /**
+   * The tint color applied to surfaces for subtle branding effects.
+   *
+   * @type {string}
+   * @example '#6200EE' // Primary color as a tint
+   */
   surfaceTint: string;
 
+  /**
+   * Elevation levels for components, used to indicate depth via shadows.
+   *
+   * @type {{ level0: string; level1: string; level2: string; level3: string; level4: string; level5: string }}
+   * @example
+   * elevation: {
+   *   level0: 'none',          // No shadow
+   *   level1: '0px 1px 2px rgba(0, 0, 0, 0.3)', // Subtle shadow
+   *   level2: '0px 1px 3px rgba(0, 0, 0, 0.3)',
+   *   level3: '0px 4px 5px rgba(0, 0, 0, 0.3)',
+   *   level4: '0px 6px 10px rgba(0, 0, 0, 0.3)',
+   *   level5: '0px 8px 12px rgba(0, 0, 0, 0.3)'
+   * }
+   */
   elevation?: {
     level0: string;
     level1: string;
@@ -162,44 +397,78 @@ export interface IThemeColorsTokens {
     level5: string;
   };
 
+  /**
+   * The color of the status bar, used for system-level UI.
+   *
+   * @type {string}
+   * @example '#000000' // Black status bar
+   */
   statusBar?: string;
-  /*** colors of text and icons elements */
+
+  /**
+   * The color of text and icon elements in the application.
+   *
+   * @type {string}
+   * @example '#000000' // Black text/icons
+   */
   text?: string;
 
   /**
-   * The color applied on placeholder text.
+   * The color applied to placeholder text, used for input fields or labels.
+   *
+   * @type {string}
+   * @example '#A3A3A3' // Gray placeholder text
    */
   placeholder?: string;
 
   /**
-   * The color used for informational messages.
+   * The color used for informational messages or notifications.
+   *
+   * @type {string}
+   * @example '#2196F3' // Blue info color
    */
   info?: string;
 
-  /***
-   * The color applied on top of the info background.
+  /**
+   * The color applied on top of the info background (e.g., text or icons).
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White text/icons on an info background
    */
   onInfo?: string;
 
   /**
-   * The color used for success states.
+   * The color used for success states, such as confirmation messages.
+   *
+   * @type {string}
+   * @example '#4CAF50' // Green success color
    */
   success?: string;
 
   /**
-   * The color applied on top of the success background.
+   * The color applied on top of the success background (e.g., text or icons).
+   *
+   * @type {string}
+   * @example '#FFFFFF' // White text/icons on a success background
    */
   onSuccess?: string;
-  /***
-   * The color used for warnings.
+
+  /**
+   * The color used for warning states, such as alerts or cautions.
+   *
+   * @type {string}
+   * @example '#FF9800' // Orange warning color
    */
   warning?: string;
 
   /**
    * The color applied on top of the warning background (e.g., text or icons).
+   *
+   * @type {string}
+   * @example '#000000' // Black text/icons on a warning background
    */
   onWarning?: string;
-};
+}
 
 /**
  * @interface IThemeColorsTokenName

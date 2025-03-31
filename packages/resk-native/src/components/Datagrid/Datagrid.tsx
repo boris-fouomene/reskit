@@ -819,7 +819,6 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                     setTimeout(() => {
                         this.toggleColumnVisibility(column.name);
                     }, 500);
-                    return false;
                 },
                 label: column.label || column.name,
                 icon: visible ? FontIcon.CHECKED : undefined,
@@ -842,7 +841,6 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                 <Menu
                     anchor={isMobile ? <Icon iconName='view-column' size={25} /> : <Button
                         icon="view-column"
-                        mode="outlined"
                         children={Datagrid.translate("columns")}
                     />}
                     items={visibleColumnsMenus}
@@ -1893,6 +1891,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                 backAction={false}
                 backgroundColor='transparent'
                 statusBarHeight={0}
+                elevation={0}
                 {...Object.assign({}, actionsProps)}
                 context={Object.assign({}, actionsProps.context, { datagridContext })}
                 right={actionsProps.right || !hasActions && !actionsTitle ? <Button mode='text'>{Datagrid.translate("components.datagrid.actions")}</Button> : null}

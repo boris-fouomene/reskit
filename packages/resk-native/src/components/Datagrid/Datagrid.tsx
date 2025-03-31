@@ -1900,7 +1900,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                 elevation={0}
                 {...Object.assign({}, actionsProps)}
                 context={Object.assign({}, actionsProps.context, { datagridContext })}
-                right={actionsProps.right || !hasActions && !actionsTitle ? <Button mode='text'>{Datagrid.translate("components.datagrid.actions")}</Button> : null}
+                right={actionsProps.right || !hasActions && !actionsTitle ? <Button mode='text'>{Datagrid.translate("actions")}</Button> : null}
                 title={actionsTitle}
                 actions={appBarActions as any}
             />

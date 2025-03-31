@@ -200,7 +200,7 @@ const ProgressBar = ({
             accessibilityValue={
                 indeterminate ? {} : { min: 0, max: 100, now: progress * 100 }
             }
-            style={[isWeb && styles.webContainer, !isVisible && styles.hidden]}
+            style={[isWeb && styles.webContainer]}
             testID={testID}
         >
             <Animated.View

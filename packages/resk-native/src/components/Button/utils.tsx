@@ -29,13 +29,10 @@ const getButtonTextColor = ({ isMode, customTextColor, backgroundColor, dark, th
   if (Colors.isValid(customTextColor)) {
     return customTextColor;
   }
-  if (isMode('outlined') || isMode('text')) {
-    return theme.colors.primary;
-  }
   if (isMode('contained')) {
     return theme.colors.onPrimary;
   }
-  return theme.colors.primary;
+  return theme.colors.text;
 };
 
 const getButtonBorderColor = ({ isMode, theme }: IButtonGetBackgroundColorProps) => {

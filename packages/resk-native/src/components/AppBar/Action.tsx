@@ -49,7 +49,6 @@ const AppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionConte
     textColor={colorSchemeColor.color || appBarContext.textColor || props.context?.textColor}
     borderRadius={props.level ? 0 : undefined}
     backgroundColor={colorSchemeColor.backgroundColor || appBarContext.backgroundColor || props.context?.backgroundColor}
-    mode={"contained"}
     containerProps={{
       ...containerProps,
       style: [containerProps?.style, styles.buttonContainer]
@@ -64,6 +63,7 @@ export default AppBarAction
 const styles = StyleSheet.create({
   buttonContainer: {
     marginHorizontal: 7,
+    paddingVertical: 0,
     width: undefined,
   },
 });

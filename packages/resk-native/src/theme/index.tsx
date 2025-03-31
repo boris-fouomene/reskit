@@ -1,6 +1,6 @@
 import { IThemeColorSheme, ITheme, IThemeColorsTokenName, IThemeColorsTokens, IThemeFontsWithVariants } from "./types";
 import Colors from "./colors";
-import { defaultStr, extendObj, isObj } from "@resk/core/utils";
+import { defaultStr, extendObj, isNonNullString, isObj } from "@resk/core/utils";
 import { IObservable, isObservable, observable } from "@resk/core/observable";
 import { IDict } from "@resk/core/types";
 import { Platform as RNPlatform } from "react-native";
@@ -238,7 +238,7 @@ export function createTheme(theme: Partial<ITheme>, options?: { maxElevation?: n
          * @returns {string | undefined} - The resolved color value or undefined if none is found.
          */
         getColor(color?: IThemeColorsTokenName, ...defaultColors: any[]): string | undefined {
-            if (color && color in context.colors) {
+            if (isNonNullString(color) && color in context.colors) {
                 return context.colors[color as keyof typeof context.colors] as string;
             }
             if (Colors.isValid(color)) return color as string;

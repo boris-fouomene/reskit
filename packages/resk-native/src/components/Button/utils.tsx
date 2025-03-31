@@ -32,6 +32,9 @@ const getButtonTextColor = ({ isMode, customTextColor, backgroundColor, dark, th
   if (isMode('contained')) {
     return theme.colors.onPrimary;
   }
+  if (backgroundColor !== "transparent" && Colors.isValid(backgroundColor)) {
+    return Colors.getContrast(backgroundColor);
+  }
   return theme.colors.text;
 };
 

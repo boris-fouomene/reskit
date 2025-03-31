@@ -23,7 +23,7 @@ import { Preloader } from '@components/Dialog';
 import { AppBar, IAppBarAction, IAppBarProps } from '@components/AppBar';
 import { Divider } from '@components/Divider';
 import { FontIcon, IFontIconName, IIconSource, Icon } from '@components/Icon';
-import Theme from "@theme";
+import Theme, { useTheme } from "@theme";
 import { useDimensions, getDimensions, IDimensions } from '@dimensions/index';
 import i18n from '@resk/core/i18n';
 import { IPreloaderProps } from '@components/Dialog/Preloader';
@@ -788,7 +788,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         }
         if (isAggregatable) {
             actions.push({
-                label: Datagrid.translate("showAggregatedTotals"),
+                label: !this.canShowAggregatedTotals() ? Datagrid.translate("showAggregatedTotals") : Datagrid.translate("hideAggregatedTotals"),
                 icon: this.canShowAggregatedTotals() ? 'view-column' : 'view-module',
                 onPress: this.toggleShowAggregatedTotals.bind(this),
             })
@@ -1876,6 +1876,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
         const datagridContext = useDatagrid();
         const { selectedRowsActions, actions, showActions, actionsProps: aProps } = Object.assign({}, datagridContext?.props);
         const { divider, ...actionsProps } = Object.assign({}, aProps);
+        const theme = useTheme();
         useDatagridOnEvent(["toggleAllRowsSelection"], undefined, true);
         const { actions: actionsToDisplay, title } = useMemo(() => {
             if (!datagridContext) return {

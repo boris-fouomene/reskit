@@ -54,6 +54,7 @@ I18nClass.RegisterTranslations({
                 "showFilters": "Show filters",
                 "showAggregatedTotals": "Show aggregated totals",
                 "columns": "Columns",
+                "hideAggregatedTotals": "Hide aggregated totals",
             }
         }
     }

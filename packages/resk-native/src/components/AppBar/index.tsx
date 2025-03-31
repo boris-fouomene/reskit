@@ -1,7 +1,6 @@
 import * as React from "react";
 import { forwardRef } from 'react';
 import { BackAction } from './BackAction';
-import getThemeColors from './getThemeColor';
 import { AppBarContext, useAppBar } from './hooks';
 import {
   View,
@@ -84,15 +83,11 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   useDimensions(bindResizeEvent !== false); //pour le rendu responsive de l'AppBar
   const theme = useTheme();
   contentProps = Object.assign({}, contentProps);
-  const { color: tColor, backgroundColor: tBackgroundColor } = getThemeColors(theme);
   testID = testID || 'resk-appbar';
   const colorScheme = theme.getColorScheme(customColorScheme as IThemeColorsTokenName);
   const flattenStyle = (StyleSheet.flatten(style) || {});
-  backgroundColor = (
-    Colors.isValid(backgroundColor) ? backgroundColor : theme.getColor(backgroundColor)
-      || colorScheme.backgroundColor || flattenStyle?.backgroundColor || tBackgroundColor
-  ) as string;
-  color = (Colors.isValid(color) ? color : theme.getColor(color) || colorScheme.color || (flattenStyle as any)?.color || tColor) as string;
+  backgroundColor = (Colors.isValid(backgroundColor) ? backgroundColor : theme.getColor(backgroundColor) || colorScheme.backgroundColor || flattenStyle?.backgroundColor) as string;
+  color = (Colors.isValid(color) ? color : theme.getColor(color) || colorScheme.color || (flattenStyle as any)?.color) as string;
   const titleTextColor = Colors.isValid(color) ? color : undefined;
   titleProps = Object.assign({}, titleProps);
   subtitleProps = Object.assign({}, subtitleProps);

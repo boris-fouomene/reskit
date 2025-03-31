@@ -11,6 +11,15 @@ const index = withAppBar(() => {
                         label: "One",
                     }
                 ]}
+                actions={[
+                    {
+                        label: "An action",
+                        icon: "check",
+                        onPress: (event, { datagridContext }) => {
+                            console.log(datagridContext, " is dddddddddd")
+                        }
+                    }
+                ]}
                 columns={[
                     {
                         name: "label",

@@ -3078,7 +3078,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * The `actions` property allows you to specify a list of actions or a function that dynamically generates actions
      * based on the current state of the Datagrid. These actions can be shown in the Datagrid's toolbar or other interactive elements.
      * 
-     * @type {IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[])}
+     * @type {(IDatagridAction | null)[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[])}
      * 
      * @template DataType - The type of the data shown in the grid.
      * 
@@ -3109,7 +3109,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * 
      * @see {@link IDatagridAction} for the structure of an action.
      */
-    actions?: IDatagridAction | null[] | ((options: IDatagridCallOptions<DataType>) => (IDatagridAction | null)[]);
+    actions?: (IDatagridAction | null)[] | ((options: IDatagridCallOptions<DataType>) => (IDatagridAction | null)[]);
 
     /**
      * Controls whether the set of action buttons is displayed on top of the datagrid.
@@ -3140,7 +3140,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * based on the current state of the Datagrid and the selected rows. These actions can be shown in the Datagrid's toolbar
      * or other interactive elements.
      * 
-     * @type {IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[])}
+     * @type {(IDatagridAction | null)[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[])}
      * 
      * @template DataType - The type of the data shown in the grid.
      * 
@@ -3197,7 +3197,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * 
      * @see {@link IDatagridAction} for the structure of an action.
      */
-    selectedRowsActions?: IDatagridAction | null[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[]);
+    selectedRowsActions?: (IDatagridAction | null)[] | ((dataTableContext: Datagrid<DataType>) => (IDatagridAction | null)[]);
 
     /**
      * Whether to display headers in the Datagrid.
@@ -3897,7 +3897,6 @@ const styles = StyleSheet.create({
     },
     actionsToolbar: {
         width: "100%",
-        paddingHorizontal: 7,
     },
     headerScrollViewContentContainer: {
         minWidth: '100%',

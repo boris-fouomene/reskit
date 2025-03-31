@@ -188,6 +188,7 @@ const ProgressBar = ({
 
     const tintColor = color || theme.colors?.primary;
     const trackTintColor = theme.colors.surfaceVariant;
+    const isVisible = visible !== false;
 
     return (
         <View
@@ -199,7 +200,7 @@ const ProgressBar = ({
             accessibilityValue={
                 indeterminate ? {} : { min: 0, max: 100, now: progress * 100 }
             }
-            style={isWeb && styles.webContainer}
+            style={[isWeb && styles.webContainer, !isVisible && styles.hidden]}
             testID={testID}
         >
             <Animated.View
@@ -273,7 +274,9 @@ const styles = StyleSheet.create({
     },
     webContainer: {
         width: '100%',
-        height: '100%',
+    },
+    hidden: {
+        display: "none",
     },
     progressBar: {
         flex: 1,

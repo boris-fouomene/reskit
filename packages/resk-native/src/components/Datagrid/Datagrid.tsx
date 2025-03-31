@@ -3653,6 +3653,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         width: '100%',
+        flexGrow: 1,
         justifyContent: 'flex-end',
         alignItems: 'center',
         paddingHorizontal: 10,

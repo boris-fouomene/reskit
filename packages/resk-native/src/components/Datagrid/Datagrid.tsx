@@ -3901,13 +3901,11 @@ const styles = StyleSheet.create({
     },
     headerScrollViewContentContainer: {
         minWidth: '100%',
-        paddingRight: 10,
     },
     headerScrollView: {
         flex: 1,
         flexGrow: 1,
         width: '100%',
-        paddingHorizontal: 10,
         flexDirection: 'row'
     },
     columnHeaderWrapper: {

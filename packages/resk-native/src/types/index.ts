@@ -90,8 +90,32 @@ export type IReactComponent<Props = any, State = any> =
   | ((props: Props) => React.ReactElement | null)            // Basic Function Component
   | React.JSXElementConstructor<Props>                       // Any component that can be used in JSX
 
+/**
+ * @typedef ITextStyle
+ * Type alias for TextStyle props.
+ * This type is used to define styles for Text components.
+ * @example
+ * const textStyle: ITextStyle = { fontSize: 24, color: 'black' };
+ * @see {@link https://reactnative.dev/docs/text} for more information about Text component styles.
+ */
 export type ITextStyle = StyleProp<TextStyle>;
+
+/**
+ * Type alias for ViewStyle props.
+ * This type is used to define styles for View components.
+ * @example
+ * const viewStyle: IViewStyle = { flex: 1, justifyContent: 'center', alignItems: 'center' };
+ * @see {@link https://reactnative.dev/docs/view} for more information about View component styles.
+ */
 export type IViewStyle = StyleProp<ViewStyle>;
+
+/**
+ * Type alias for ImageStyle props.
+ * This type is used to define styles for Image components.
+ * @example
+ * const imageStyle: IImageStyle = { width: 100, height: 100, borderRadius: 50 };
+ * @see {@link https://reactnative.dev/docs/image} for more information about Image component styles.
+ */
 export type IImageStyle = StyleProp<ImageStyle>;
 
 /**
@@ -108,6 +132,7 @@ export type IImageStyle = StyleProp<ImageStyle>;
  *   opacity: animatedValue,
  *   transform: [{ scale: animatedValue }],
  * };
+ * @see {@link https://reactnative.dev/docs/animated} for more information about Animated component styles.
  */
 export type IAnimatedViewStyle = Animated.WithAnimatedValue<StyleProp<ViewStyle>>;
 
@@ -127,6 +152,7 @@ export type IAnimatedViewStyle = Animated.WithAnimatedValue<StyleProp<ViewStyle>
  *     outputRange: [12, 24],
  *   }),
  * };
+ *  @see {@link https://reactnative.dev/docs/animated} for more information about Animated component styles.
  */
 export type IAnimatedTextStyle = Animated.WithAnimatedValue<StyleProp<TextStyle>>;
 
@@ -148,6 +174,7 @@ export type IAnimatedTextStyle = Animated.WithAnimatedValue<StyleProp<TextStyle>
  *     outputRange: [0, 50],
  *   }),
  * };
+ *  @see {@link https://reactnative.dev/docs/animated} for more information about Animated component styles.
  */
 export type IAnimatedImageStyle = Animated.WithAnimatedValue<StyleProp<ImageStyle>>;
 

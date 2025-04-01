@@ -3,7 +3,7 @@ import Label from "@components/Label";
 
 declare module "./Datagrid" {
     export interface IDatagridViews {
-        table: typeof Datagrid.View;
+        table: typeof DatagridTableView;
     }
 }
 

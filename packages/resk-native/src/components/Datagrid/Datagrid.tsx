@@ -1,4 +1,4 @@
-import React, { createContext, isValidElement, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { createContext, isValidElement, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
     View,
     StyleSheet,
@@ -28,6 +28,7 @@ import { IPreloaderProps } from '@components/Dialog/Preloader';
 import { IProgressBarProps, ProgressBar } from '@components/ProgressBar';
 import { Button, IButtonProps } from '@components/Button';
 import { IMenuItemProps, Menu } from '@components/Menu';
+import { stat } from 'fs';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -1823,7 +1824,7 @@ class DatagridView<DataType extends IDatagridDataType = any> extends ObservableC
     _render(): JSX.Element | null {
         return null;
     }
-    render() {
+    render(): JSX.Element | null {
         const testID = this.getTestID();
         const isLoading = this.isLoading();
         const { containerStyle } = this.props;
@@ -1924,7 +1925,7 @@ class DatagridView<DataType extends IDatagridDataType = any> extends ObservableC
     static registerView(viewName: IDatagridViewName, component: typeof DatagridView) {
         if (!isNonNullString(viewName) || typeof (component) !== "function") return;
         const components = DatagridView.getRegisteredViews();
-        (components as any)[viewName] = Component;
+        (components as any)[viewName] = component;
         Reflect.defineMetadata(DatagridView.reflectMetadataKey, components, DatagridView);
     }
 
@@ -1989,6 +1990,7 @@ class DatagridView<DataType extends IDatagridDataType = any> extends ObservableC
      * @returns {typeof DatagridView} The component class associated with the view name, or the DatagridUnimplemented component.
      */
     static getRegisteredView(viewName: IDatagridViewName): typeof DatagridView {
+        if (!isNonNullString(viewName)) return DatagridUnimplemented;
         const components = DatagridView.getRegisteredViews();
         const component = components[viewName as keyof typeof components];
         return typeof component === "function" ? component : DatagridUnimplemented;
@@ -2298,7 +2300,7 @@ class DatagridUnimplemented<DataTye extends IDatagridDataType = any> extends Dat
 }
 
 
-export type IDatagridProps<DataType extends IDatagridDataType = any, ViewName extends IDatagridViewName = IDatagridViewName> = IDatagridViews<DataType>[ViewName] extends DatagridView<DataType> ? (IDatagridViews<DataType>[ViewName] & {
+export type IDatagridProps<DataType extends IDatagridDataType = any, ViewName extends IDatagridViewName = IDatagridViewName> = (IDatagridViews<DataType>[ViewName] & {
     /**
      * The view name to use for the grid.
      * 
@@ -2316,14 +2318,25 @@ export type IDatagridProps<DataType extends IDatagridDataType = any, ViewName ex
      * If provided, it will override the default view names.
      */
     viewNames?: IDatagridViewName[];
-}) : never;
+});
 
-function Datagrid<DataType extends IDatagridDataType = any>(props: IDatagridProps<DataType>) {
-    const { viewName, viewNames } = props;
+function Datagrid<DataType extends IDatagridDataType = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType>) {
     useDimensions();
+    const { viewNames, viewName } = useMemo(() => {
+        const registeredViewNames = Object.keys(DatagridView.getRegisteredViews()) as IDatagridViewName[];
+        const viewNames = (Array.isArray(cViewNames) && cViewNames.length) ? cViewNames.filter((vName) => registeredViewNames.includes(vName)) : registeredViewNames;
+        return {
+            viewNames,
+            viewName: isNonNullString(cViewName) && viewNames.includes(cViewName) ? cViewName : viewNames[0]
+        }
+    }, [cViewName, cViewNames]);
+    const [state, setState] = useState({ viewName, viewNames });
+    useEffect(() => {
+
+    }, [viewName, viewNames, state]);
     const Component = useMemo<typeof DatagridView<DataType>>(() => {
-        return DatagridView.getRegisteredView(viewName);
-    }, [viewName]);
+        return DatagridView.getRegisteredView(state.viewName);
+    }, [state.viewName]);
     return <Component
         {...props as any}
     />;

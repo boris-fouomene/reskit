@@ -29,7 +29,6 @@ import { userTabs } from './context';
  * @param {IIconProps} [props.iconProps] - Additional properties for the icon.
  * @param {number} [props.index] - The index of the tab item in the tab list.
  * @param {number} [props.activeIndex] - The currently active tab index.
- * @param {IStyle} [props.style] - Additional styles for the tab item.
  * @param {ITouchableRippleProps} [rest] - Additional props for the TouchableRipple component.
  * 
  * @returns {JSX.Element} Returns a JSX element representing the TabItem component.

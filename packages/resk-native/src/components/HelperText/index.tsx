@@ -1,8 +1,7 @@
 import { Animated, StyleSheet } from 'react-native';
-import { defaultStr, isNonNullString } from "@resk/core";
-import Theme, { useTheme } from "@theme";
+import { defaultStr } from "@resk/core";
+import { useTheme } from "@theme";
 import Label, { ILabelProps } from '@components/Label';
-import isValidElement from '@utils/isValidElement';
 import { useEffect } from 'react';
 import platform from '@platform/index';
 
@@ -17,7 +16,7 @@ import platform from '@platform/index';
  * @param {boolean} [props.error=false] - Specifies if the helper text represents an error.
  * @param {string} [props.color] - Custom color for the helper text.
  * @param {React.ReactNode} [props.children] - The text or element to be displayed.
- * @param {IStyle} [props.style] - Additional styles for the helper text.
+ * @param {ITextStyle} [props.style] - Additional styles for the helper text.
  * 
  * @returns {JSX.Element | null} The rendered component or null if not visible.
  *

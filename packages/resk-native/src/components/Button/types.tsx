@@ -4,7 +4,6 @@ import { ISurfaceProps } from "@components/Surface";
 import { ITooltipBaseProps } from "@components/Tooltip";
 import { ITouchableRippleProps } from "@components/TouchableRipple";
 import { IThemeColorsTokenName } from "@theme/types";
-import { IStyle } from "../../types";
 import * as React from "react";
 import { AccessibilityRole, GestureResponderEvent, View } from "react-native";
 import { ILabelProps } from "@components/Label";
@@ -14,6 +13,7 @@ import { IDividerProps } from "@components/Divider";
 import { IFormData } from "@components/Form/types";
 import { IAuthPerm } from "@resk/core/auth";
 import { IResourceName } from "@resk/core/types";
+import { ITextStyle } from "@src/types";
 
 /**
  * @interface IButtonMode
@@ -93,9 +93,9 @@ export type IButtonProps<IButtonExtendContext = any, ResourceName extends IResou
      * Can be used to customize the appearance of the button.
      * 
      * @example
-     * const buttonStyle: IStyle = { backgroundColor: 'blue', borderRadius: 5 };
+     * const buttonStyle: IViewStyle = { backgroundColor: 'blue', borderRadius: 5 };
      */
-    style?: IStyle;
+    style?: ITextStyle;
 
     /**
      * Label text of the button, displayed as the button's content.

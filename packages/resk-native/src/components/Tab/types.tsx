@@ -3,7 +3,7 @@ import { ILabelProps } from "@components/Label";
 import { ISwiperProps } from "@components/Swiper/types";
 import { ITouchableRippleProps } from "@components/TouchableRipple";
 import { IViewProps } from "@components/View";
-import { IStyle } from "../../types";
+import { IViewStyle } from "../../types";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, ScrollViewProps, ViewProps } from "react-native";
 import { IThemeColorsTokenName } from "@theme/types";
@@ -148,9 +148,9 @@ export type ITabItemProps = Omit<ITouchableRippleProps, "children" | "style"> & 
     /** 
      * Additional styles for the TabItem.
      * 
-     * @type {IStyle}
+     * @type {IViewStyle}
      */
-    style?: IStyle;
+    style?: IViewStyle;
 
     /***
      * The key of the tab item
@@ -244,7 +244,4 @@ export interface ITabItemsProps extends IViewProps {
  * @interface ITabContentProps
  * @extends ISwiperProps
  */
-export interface ITabContentProps extends ISwiperProps {
-    /** Styling for TabContent.Item Component container. */
-    tabItemContainerStyle: IStyle
-}
+export interface ITabContentProps extends ISwiperProps { }

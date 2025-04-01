@@ -1,7 +1,8 @@
 import { IInputFormatterResult } from "@resk/core/types";
 import { II18nLocale } from "@src/i18n";
+import { background } from "@theme/typography";
 import * as React from "react";
-import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, GestureResponderEvent, PressableProps, TouchableWithoutFeedback, TouchableWithoutFeedbackProps } from "react-native";
+import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, Animated, PressableProps, TouchableWithoutFeedbackProps } from "react-native";
 /**
    @interface
  * Represents a reference to a React component or DOM element.
@@ -89,106 +90,66 @@ export type IReactComponent<Props = any, State = any> =
   | ((props: Props) => React.ReactElement | null)            // Basic Function Component
   | React.JSXElementConstructor<Props>                       // Any component that can be used in JSX
 
+export type ITextStyle = StyleProp<TextStyle>;
+export type IViewStyle = StyleProp<ViewStyle>;
+export type IImageStyle = StyleProp<ImageStyle>;
 
 /**
- * @interface IFlatStyle
- * @description
- * Represents a flat style definition in React Native.
- *
- * This type allows for the definition of styles directly as plain objects,
- * which is commonly used in React Native applications. The styles can be 
- * defined using the `StyleSheet.create` method or directly as an object.
- *
- * The `IFlatStyle` type can encompass various style types, including:
+ * @typedef IAnimatedViewStyle
+ * Represents the style type for an `Animated.View`.
  * 
- * - `ViewStyle`: Styles applicable to View components.
- * - `TextStyle`: Styles applicable to Text components.
- * - `ImageStyle`: Styles applicable to Image components.
- *
- * Example usage:
+ * This type extends the base `ViewStyle` to include support for animated values.
+ * It is compatible with both static styles (e.g., `{ opacity: 0.5 }`) and dynamic
+ * styles using `Animated.Value` or interpolated values.
  * 
- * ```typescript
- * const myStyle: IFlatStyle = {
- *   paddingHorizontal: 10,
- *   fontSize: 14,
- *   color: 'blue',
+ * @example
+ * const animatedValue = new Animated.Value(0);
+ * const viewStyle: IAnimatedViewStyle = {
+ *   opacity: animatedValue,
+ *   transform: [{ scale: animatedValue }],
  * };
- * ```
- *
- * In the example above, `myStyle` is an object that defines padding, 
- * font size, and color, which can be applied to a Text or View component.
- *
- * This type is particularly useful for creating reusable styles 
- * that can be easily applied across multiple components in a React 
- * Native application, promoting consistency and maintainability.
  */
-export type IFlatStyle = ViewStyle | TextStyle | ImageStyle;
-
+export type IAnimatedViewStyle = Animated.WithAnimatedValue<StyleProp<ViewStyle>>;
 
 /**
- * @interface IStyle
- * @description
- * Represents a flexible style type that can be used for various React Native components.
- * This type union includes styles for View, Text, and Image components, as well as
- * undefined and null for optional styling.
+ * @typedef IAnimatedTextStyle
+ * Represents the style type for an `Animated.Text`.
  * 
- * @typedef {StyleProp<ViewStyle> | StyleProp<TextStyle> | StyleProp<ImageStyle> | undefined | null} IStyle
- * 
- * @example
- * // Using IStyle for a custom component
- * interface MyComponentProps {
- *   style?: IStyle;
- * }
- * 
- * const MyComponent: React.FC<MyComponentProps> = ({ style }) => {
- *   return <View style={style}>
- *     <Text>Styled component</Text>
- *   </View>
- * };
+ * This type extends the base `TextStyle` to include support for animated values.
+ * It is compatible with both static styles (e.g., `{ fontSize: 16 }`) and dynamic
+ * styles using `Animated.Value` or interpolated values.
  * 
  * @example
- * // Using IStyle with different React Native components
- * const styles = {
- *   container: {
- *     flex: 1,
- *     backgroundColor: 'white',
- *   } as IStyle,
- *   text: {
- *     fontSize: 16,
- *     color: 'black',
- *   } as IStyle,
- *   image: {
- *     width: 100,
- *     height: 100,
- *     resizeMode: 'cover',
- *   } as IStyle,
- * };
- * 
- * const App = () => (
- *   <View style={styles.container}>
- *     <Text style={styles.text}>Hello, World!</Text>
- *     <Image source={{uri: 'https://example.com/image.jpg'}} style={styles.image} />
- *   </View>
- * );
- * 
- * @example
- * // Using IStyle with conditional styling
- * const ConditionalStyle: React.FC<{ isActive: boolean }> = ({ isActive }) => {
- *   const dynamicStyle: IStyle = isActive
- *     ? { backgroundColor: 'blue', color: 'white' }
- *     : { backgroundColor: 'gray', color: 'black' };
- * 
- *   return <View style={dynamicStyle}>
- *     <Text>Conditional Styling</Text>
- *   </View>
+ * const animatedValue = new Animated.Value(0);
+ * const textStyle: IAnimatedTextStyle = {
+ *   fontSize: animatedValue.interpolate({
+ *     inputRange: [0, 1],
+ *     outputRange: [12, 24],
+ *   }),
  * };
  */
-export type IStyle =
-  | StyleProp<ViewStyle>
-  | StyleProp<TextStyle>
-  | StyleProp<ImageStyle>
-  | undefined
-  | null;
+export type IAnimatedTextStyle = Animated.WithAnimatedValue<StyleProp<TextStyle>>;
+
+/**
+ * @typedef IAnimatedImageStyle
+ * Represents the style type for an `Animated.Image`.
+ * 
+ * This type extends the base `ImageStyle` to include support for animated values.
+ * It is compatible with both static styles (e.g., `{ width: 100, height: 100 }`)
+ * and dynamic styles using `Animated.Value` or interpolated values.
+ * 
+ * @example
+ * const animatedValue = new Animated.Value(0);
+ * const imageStyle: IAnimatedImageStyle = {
+ *   width: 100,
+ *   height: 100,
+ *   borderRadius: animatedValue.interpolate({
+ *     inputRange: [0, 1],
+ *     outputRange: [0, 50],
+ *   }),
+ * };
+ */
+export type IAnimatedImageStyle = Animated.WithAnimatedValue<StyleProp<ImageStyle>>;
 
 
 /**

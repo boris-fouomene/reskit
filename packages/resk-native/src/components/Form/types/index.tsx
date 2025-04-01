@@ -6,7 +6,7 @@ import { ITabItemProps, ITabProps } from "@components/Tab";
 import { IViewProps } from "@components/View";
 import { IDimensions } from "@dimensions/types";
 import { IAuthPerm, IDict, IField, IFieldBase, IFields, IFieldType, IResourceName, IValidatorRule, IValidatorValidateOptions } from "@resk/core";
-import { IOnChangeOptions, IStyle } from "@src/types";
+import { IOnChangeOptions, IViewStyle } from "@src/types";
 import { ObservableComponent } from "@utils/index";
 import { ReactElement, ReactNode } from "react";
 
@@ -737,12 +737,12 @@ export interface IFormField<Type extends IFieldType = IFieldType> extends Observ
      * Retrieves the breakpoint style for the field.
      * 
      * @param {IField<Type>} [props] - Optional properties to use for retrieving styles.
-     * @returns {IStyle} - The breakpoint style for the field.
+     * @returns {IViewStyle} - The breakpoint style for the field.
      * 
      * @example
      * const style = this.getBreakpointStyle(props); // Retrieves the breakpoint style
      */
-    getBreakpointStyle(props?: IField<Type>): IStyle;
+    getBreakpointStyle(props?: IField<Type>): IViewStyle;
     /**
      * Triggers the mount lifecycle for the field.
      * 
@@ -1787,7 +1787,7 @@ export interface IFormKeyboardEventHandlerOptions extends IFormContext {
  * @property {any} [prevValue] - The value previously assigned to the field.
  * @property {string} errorText - The error message associated with the field.
  * @property {boolean} [formTriedTobeSubmitted] - Indicates if the form has been submitted.
- * @property {IStyle} wrapperStyle - The style applied to the field's wrapper.
+ * @property {IViewStyle} wrapperStyle - The style applied to the field's wrapper.
  * 
  * @remarks
  * This type is useful for managing the internal state of a form field component,
@@ -1818,7 +1818,7 @@ export type IFormFieldState = Partial<IField> & {
     prevValue?: any;
     errorText: string;
     formTriedTobeSubmitted?: boolean;
-    wrapperStyle: IStyle;
+    wrapperStyle: IViewStyle;
 }
 /**
  * Represents a protected resource that can be associated with a button in the user interface.

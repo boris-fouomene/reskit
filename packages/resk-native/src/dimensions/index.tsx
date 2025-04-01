@@ -5,7 +5,7 @@ import { IDimensions } from './types';
 import Breakpoints from '../breakpoints';
 import { isNonNullString, isObj, debounce } from '@resk/core/utils';
 import { IObservable, isObservable, observable } from "@resk/core/observable";
-import { IReactComponent, IStyle } from "../types";
+import { IReactComponent, ITextStyle, IImageStyle, IViewStyle } from "../types";
 import { StyleSheet } from "react-native";
 import { IBreakpointName } from '@src/breakpoints/types';
 import stableHash from "stable-hash";
@@ -167,12 +167,12 @@ export const dimentionAddListener = (callback: (dimensions: IDimensions) => any,
  * @interface IBreakpointStyleProps
  * Type definition for a component's props that includes responsive styling capabilities.
  * @typedef {Object} IBreakpointStyleProps
- * @property {IStyle} [style] - The base style to apply.
- * @property {(Partial<Record<IBreakpointName, IStyle>>) | ((dimensions: IDimensions) => IStyle)} [breakpointStyle] - The style to apply based on the current breakpoint.
+ * @property {ITextStyle | IViewStyle  | IImageStyle} [style] - The base style to apply.
+ * @property {(Partial<Record<IBreakpointName, ITextStyle | IViewStyle  | IImageStyle>>) | ((dimensions: IDimensions) => ITextStyle | IViewStyle  | IImageStyle)} [breakpointStyle] - The style to apply based on the current breakpoint.
  */
 type IBreakpointStyleProps = {
-	style?: IStyle; // The base style to apply
-	breakpointStyle?: (Partial<Record<IBreakpointName, IStyle>>) | ((dimensions: IDimensions) => IStyle);
+	style?: ITextStyle | IViewStyle | IImageStyle; // The base style to apply
+	breakpointStyle?: (Partial<Record<IBreakpointName, ITextStyle | IViewStyle | IImageStyle>>) | ((dimensions: IDimensions) => ITextStyle | IViewStyle | IImageStyle);
 };
 
 /**
@@ -220,7 +220,7 @@ export type IWithBreakpointStyle<T = any> =
  * A custom hook that applies responsive styles based on breakpoints.
  * 
  * @param {IWithBreakpointStyle<T>} props - The properties including base style and breakpoints.
- * @returns {IStyle} - The computed style that combines the base style with the applicable breakpoint breakpoint styles.
+ * @returns {ITextStyle | IViewStyle  | IImageStyle} - The computed style that combines the base style with the applicable breakpoint breakpoint styles.
  * 
  * ### Example Usage:
  * 1. **Basic Usage**:
@@ -263,7 +263,7 @@ export function useBreakpointStyle<T extends IBreakpointStyleProps = any>({ styl
 			if (breakpointStyle[currentMedia]) {
 				return breakpointStyle[currentMedia];
 			}
-			const mQueries: Partial<Record<IBreakpointName, IStyle>> = breakpointStyle;
+			const mQueries: Partial<Record<IBreakpointName, ITextStyle | IViewStyle | IImageStyle>> = breakpointStyle;
 			// Determine which style key to apply based on device type
 			const { isMobile, isDesktop, isPhone, isTablet, isSmallPhone, isMediumPhone } = dimensions;
 			const styleKey =

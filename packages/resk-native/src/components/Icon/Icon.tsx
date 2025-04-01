@@ -34,7 +34,6 @@ import { isReactComponent } from "@utils/isComponent";
   @param {string} [props.testID] - An optional test ID for testing purposes.
  *@param {number} [props.size] - The size of the icon. If not provided or invalid, 
  *                                 it defaults to `DEFAULT_FONT_ICON_SIZE` : 20.
- * @param {IStyle} [props.style] - Optional. Additional styles for the icon.
  * @param {string} [props.color] - Optional. Color for the font icon or tint color for the image icon.
  * 
  * @param {React.Ref} ref - A ref to access the underlying component.
@@ -120,7 +119,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, resizeM
             size={size}
             {...props}
             color={color}
-            style={iconStyle}
+            style={iconStyle as ImageStyle}
             ref={ref}
         />}
     </Component>;

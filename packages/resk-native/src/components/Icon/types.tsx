@@ -7,7 +7,7 @@ import MaterialIcons from "react-native-vector-icons/glyphmaps/MaterialIcons.jso
 import Octicons from "react-native-vector-icons/glyphmaps/Octicons.json";
 import Feather from "react-native-vector-icons/glyphmaps/Feather.json";
 
-import { IReactComponent, IStyle, ITouchableProps } from "../../types";
+import { IReactComponent, ITextStyle, ITouchableProps } from "../../types";
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip";
 import { ITheme } from "@theme/types";
@@ -127,14 +127,14 @@ export type IFontIconMaterialCommunityName = keyof typeof MaterialCommunity;
  * the `name`, `style`, and `size` properties to redefine them with more specific types.
  *
  * @typedef {object} IFontIconProps
- * @property {IStyle} [style] - The style object for the icon.
+ * @property {ITextStyle} [style] - The style object for the icon.
  * 
  * This property allows you to customize the icon's appearance using
  * standard React Native style properties. You can specify styles such as
  * color, margin, padding, etc.
  * 
  * @example
- * const customStyle: IStyle = { color: 'red', margin: 10 };
+ * const customStyle: ITextStyle = { color: 'red', margin: 10 };
  * <FontIcon name="home" style={customStyle} />;
  *
  * @property {IFontIconMaterialCommunityName | IFontAntDesignName | IFontIconFeatherName | 
@@ -174,10 +174,10 @@ export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size'> & {
      * color, margin, padding, etc.
      * 
      * @example
-     * const customStyle: IStyle = { color: 'red', margin: 10 };
+     * const customStyle: ITextStyle = { color: 'red', margin: 10 };
      * <FontIcon name="home" style={customStyle} />;
      */
-    style?: IStyle;
+    style?: ITextStyle;
 
     /**
      * The name of the icon to display (including the prefix for icon set if necessary).

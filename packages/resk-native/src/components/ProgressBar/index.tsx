@@ -9,9 +9,10 @@ import {
     ViewStyle,
 } from 'react-native';
 
-import { IStyle } from '@src/types';
+import { IAnimatedViewStyle } from '@src/types';
 import { useTheme } from '@theme/index';
 import View from "@components/View";
+import { defaultStr } from '@resk/core/utils';
 
 export type IProgressBarProps = React.ComponentPropsWithRef<typeof View> & {
     /**
@@ -44,7 +45,8 @@ export type IProgressBarProps = React.ComponentPropsWithRef<typeof View> & {
      * Style of filled part of the ProgresBar.
      */
     fillStyle?: Animated.WithAnimatedValue<StyleProp<ViewStyle>>;
-    style?: IStyle;
+
+    contentContainerStyle?: IAnimatedViewStyle;
     /**
      * testID to be used on tests.
      */
@@ -76,14 +78,15 @@ const ProgressBar = ({
     progress = 0,
     visible = true,
     animatedValue,
-    style,
+    contentContainerStyle,
     fillStyle,
-    testID = 'progress-bar',
+    testID,
     animationScale = 1.0,
     ...rest
 }: IProgressBarProps) => {
     const isWeb = Platform.OS === 'web';
     const theme = useTheme();
+    testID = defaultStr(testID, "resk-progress-bar");
     const { current: timer } = React.useRef<Animated.Value>(
         new Animated.Value(0)
     );
@@ -188,7 +191,6 @@ const ProgressBar = ({
 
     const tintColor = color || theme.colors?.primary;
     const trackTintColor = theme.colors.surfaceVariant;
-    const isVisible = visible !== false;
 
     return (
         <View
@@ -200,14 +202,15 @@ const ProgressBar = ({
             accessibilityValue={
                 indeterminate ? {} : { min: 0, max: 100, now: progress * 100 }
             }
-            style={[isWeb && styles.webContainer]}
+            style={[isWeb && styles.webContainer, rest.style]}
             testID={testID}
         >
             <Animated.View
+                testID={`${testID}-content-container`}
                 style={[
                     styles.container,
                     { backgroundColor: trackTintColor, opacity: fade },
-                    style,
+                    contentContainerStyle,
                 ]}
             >
                 {width ? (

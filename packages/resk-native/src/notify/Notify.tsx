@@ -14,7 +14,7 @@ import { Surface } from "@components/Surface";
 import Label from "@components/Label";
 import Queue from "./Queue";
 import { DEFAULT_IMAGE_DIMENSIONS } from "./utils";
-import { IStyle } from "../types";
+import { ITextStyle } from "../types";
 import { defaultStr, stringify } from "@resk/core/utils";
 import { IDict } from "@resk/core/types";
 import { IDimensions } from "@dimensions/types";
@@ -655,10 +655,10 @@ export interface INotifyOptions extends INotifyRenderOptions {
  * 
  * - **style**: The style object that defines how the notification should be visually presented. 
  *   This can include styles for layout, colors, fonts, and other visual properties.
- *   - **Type**: `IStyle`
+ *   - **Type**: `ITextStyle`
  *   - **Example**: 
  *     ```typescript
- *     const style: IStyle = {
+ *     const style: ITextStyle = {
  *         backgroundColor: "#fff",
  *         padding: 10,
  *         borderRadius: 5,
@@ -703,7 +703,7 @@ export interface INotifyRenderCallback {
   props: INotifyProps;
   context: Notify;
   data: IDict;
-  style: IStyle;
+  style: ITextStyle;
 };
 
 /**
@@ -751,7 +751,7 @@ export interface INotifyRenderCallback {
  * 
  * - **containerProps**: Properties for the animated container component that displays the notification. 
  *   This allows for customization of the animation behavior and style.
- *   - **Type**: `Animated.AnimatedProps<IStyle>`
+ *   - **Type**: `Animated.AnimatedProps<ITextStyle>`
  *   - **Example**: 
  *     ```typescript
  *     containerProps: { style: { opacity: 1 } }
@@ -803,7 +803,7 @@ export interface INotifyRenderOptions {
   renderTitle?: (options: INotifyRenderCallback) => ReactNode; // Renders the notification title
   renderMessage?: (options: INotifyRenderCallback) => ReactNode; // Renders the notification content
   renderIcon?: (options: INotifyRenderCallback) => ReactNode; // Renders the main icon displayed by the component
-  containerProps?: Omit<Animated.AnimatedProps<IStyle>, "children">; // Props for the animation component, which wraps the displayed animation
+  containerProps?: Omit<Animated.AnimatedProps<ITextStyle>, "children">; // Props for the animation component, which wraps the displayed animation
   titleProps?: ILabelProps; // Props for the notification title
   messageProps?: ILabelProps; // Props for the notification content
   iconProps?: IFontIconProps; // Props for the icon component

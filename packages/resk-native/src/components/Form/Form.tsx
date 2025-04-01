@@ -12,7 +12,7 @@ import { Tab } from "@components/Tab";
 import { useDrawer } from "@components/Drawer/hooks";
 import Theme, { useTheme } from "@theme/index";
 import { Field } from "./Field";
-import { IStyle } from "@src/types";
+import { IViewStyle } from "@src/types";
 import { FormContext } from "./context";
 import "./types/augmented";
 import { INotifyMessage, Notify } from "@notify/index";
@@ -633,7 +633,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         const submitStyle = isSubmitting ? [isSubmitting ? styles.submitting : undefined] : [];
         const disabledStyle = isSubmitting ? Theme.styles.disabled : undefined;
         const formContainerStyle = [styles.formContainer, ...submitStyle, disabledStyle];
-        const mainFormTabStyle: IStyle = [
+        const mainFormTabStyle: IViewStyle = [
             ...formContainerStyle,
             styles.mainFormTab,
             { flexDirection: responsive === false ? "column" : "row" },

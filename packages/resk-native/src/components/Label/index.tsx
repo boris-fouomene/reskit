@@ -4,7 +4,7 @@ import Theme, { useTheme, Colors } from "@theme";
 import * as React from "react";
 import { ReactNode } from "react";
 import { isValidElement } from "@utils";
-import { IStyle } from "../../types";
+import { ITextStyle } from "../../types";
 import { IDict, isNonNullString } from "@resk/core";
 import { IThemeColorsTokenName, IThemeFontVariant } from "@theme/types";
 
@@ -188,10 +188,10 @@ export type ILabelProps = Omit<TextProps, "role" | "children" | "style"> & {
    */
   textBold?: boolean;
   /***
-   * @type IStyle
+   * @type ITextStyle
    * Additional styles for the label
    */
-  style?: IStyle;
+  style?: ITextStyle;
   /***
    * @type ReactNode, Children elements or text content
    */

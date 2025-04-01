@@ -1,7 +1,6 @@
 import { defaultStr } from "@resk/core";
-import { Swiper, ISwiperProps } from "@components/Swiper";
+import { Swiper } from "@components/Swiper";
 import platform from '@platform/index';
-import { IStyle } from '../../types';
 import { ITabContentProps } from "./types";
 import { userTabs } from "./context";
 

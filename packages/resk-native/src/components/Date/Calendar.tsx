@@ -11,7 +11,7 @@ import Label from "@components/Label";
 import { useI18n } from "@src/i18n/hooks";
 import { TouchableRipple } from "@components/TouchableRipple";
 import Theme, { Colors, IThemeManager, useTheme } from "@theme/index";
-import { IStyle } from "@src/types";
+import { IViewStyle } from "@src/types";
 import useStateCallback from "@utils/stateCallback";
 import { Notify } from "@notify";
 import { IModalProps, Modal, useModal } from '@components/Modal';
@@ -617,7 +617,7 @@ const CalendarItemContainerContext = createContext<{
 });
 
 Calendar.ItemsContainer.displayName = "Calendar.ItemsContainer";
-interface ICalendarItemProps { item: ICalendarItem, style?: IStyle, isCurrent: boolean, onPress: (e: GestureResponderEvent) => void, isDefaultValue?: boolean, disabled: boolean, testID: string, label: string }
+interface ICalendarItemProps { item: ICalendarItem, style?: IViewStyle, isCurrent: boolean, onPress: (e: GestureResponderEvent) => void, isDefaultValue?: boolean, disabled: boolean, testID: string, label: string }
 const CalendarItem = ({ isCurrent, item, isDefaultValue, disabled, onPress, label, testID, style }: ICalendarItemProps) => {
     const { isItemMarked } = useCalendar();
     const { itemSize } = useCalendarItemsContainer();

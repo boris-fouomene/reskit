@@ -16,7 +16,7 @@ import { HelperText } from "@components/HelperText";
 import { dimentionAddListener } from "@dimensions/index";
 import TextInput from "@components/TextInput";
 import { IKeyboardEventHandlerKey } from "@components/KeyboardEventHandler/keyEvents";
-import { IStyle } from "@src/types";
+import { IViewStyle } from "@src/types";
 import stableHash from 'stable-hash';
 /**
  * Represents a form field component that can be used within a form.
@@ -914,12 +914,12 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      * Retrieves the breakpoint style for the field.
      * 
      * @param {IField<Type>} [props] - Optional properties to use for style calculation.
-     * @returns {IStyle} - The calculated style for the field.
+     * @returns {IViewStyle} - The calculated style for the field.
      * 
      * @example
      * const style = this.getBreakpointStyle(); // Retrieves the breakpoint style
      */
-    getBreakpointStyle(props?: Readonly<IField<Type>>): IStyle {
+    getBreakpointStyle(props?: Readonly<IField<Type>>): IViewStyle {
         if (!this.canHandleBreakpointStyle(props)) return null;
         const windowWidth = (props || this.props).windowWidth;
         const b = Breakpoints.col(undefined, windowWidth);

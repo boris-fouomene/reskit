@@ -1003,13 +1003,11 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
      */
     renderToolbar() {
         if (!this.canShowToolbar()) return null;
-        const dimensions = getDimensions();
-        const { isMobile } = dimensions;
         const { columns } = this.state;
-        const cActions = typeof this.props.toolbarActions === "function" ? this.props.toolbarActions(this.getCallOptions({ dimensions }))
+        const cActions = typeof this.props.toolbarActions === "function" ? this.props.toolbarActions(this.getCallOptions({}))
             : Array.isArray(this.props.toolbarActions) ? this.props.toolbarActions : undefined;
-        const inputActions = (Array.isArray(cActions) ? cActions : []) as IDatagridToolbarAction<DataType>[];
-        const actions: IDatagridToolbarAction<DataType>[] = [];
+        const actions = (Array.isArray(cActions) ? cActions : []) as IDatagridToolbarAction<DataType>[];
+        //const actions: IDatagridToolbarAction<DataType>[] = [];
         const selectable = this.isSelectable();
         const data = this.state.data;
         const paginatedData = this.state.paginatedData;
@@ -1081,7 +1079,7 @@ class Datagrid<DataType extends IDatagridDataType = any> extends ObservableCompo
                         const onPress = () => {
                             openMenu();
                         }
-                        return isMobile ? <Icon iconName='view-column' tooltip={Datagrid.translate("columns")} onPress={onPress} size={25} /> : <Button
+                        return <Button
                             icon="view-column"
                             children={Datagrid.translate("columns")}
                             onPress={onPress}
@@ -3505,7 +3503,7 @@ export interface IDatagridProps<DataType extends IDatagridDataType = any> {
      * @type {((datagridContext: Datagrid<DataType>) => ((IDatagridToolbarAction<DataType>|null)[])) | (IDatagridToolbarAction<DataType>|null)[]}
      * @remarks Toolbar actions are rendered in the order they are defined. Toolbar represents the top-right area of the Datagrid, rendered directly under the actions bar.
      */
-    toolbarActions?: ((options: IDatagridCallOptions<DataType> & { dimensions: IDimensions }) => ((IDatagridToolbarAction<DataType> | null)[])) | (IDatagridToolbarAction<DataType> | null)[];
+    toolbarActions?: ((options: IDatagridCallOptions<DataType>) => ((IDatagridToolbarAction<DataType> | null)[])) | (IDatagridToolbarAction<DataType> | null)[];
 }
 
 export interface IDatagridToolbarAction<DataType extends IDatagridDataType = any> extends IButtonProps<{ datagridContext: Datagrid<DataType> }> {

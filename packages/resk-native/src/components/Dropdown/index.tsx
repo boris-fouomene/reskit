@@ -16,7 +16,7 @@ import { StyleSheet } from "react-native";
 import View from "@components/View";
 import { FontIcon } from "@components/Icon";
 import Label from "@components/Label";
-import { IStyle } from "@src/types";
+import { IViewStyle } from "@src/types";
 import { useI18n } from "@src/i18n/hooks";
 import { Divider } from "@components/Divider";
 import { ProgressBar } from "@components/ProgressBar";
@@ -428,7 +428,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             onClose={context.close.bind(context)}
             anchor={<View disabled={disabled}
                 testID={`${testID}-dropdown-anchor-container`}
-                {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IStyle}
+                {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IViewStyle}
             >
                 {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdownContext: context })
                     :

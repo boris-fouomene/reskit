@@ -10,7 +10,7 @@ import View from "@components/View";
 import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import { ITextInputCallbackOptions, ITextInputProps, ITextInputType, IUseTextInputProps } from "./types";
 import { ITheme } from "@theme/types";
-import { IStyle } from "@src/types";
+import { ITextStyle, IViewStyle } from "@src/types";
 import { IFontIconProps } from "@components/Icon";
 import Breakpoints from "@breakpoints/index";
 import { Calendar, CalendarModalContext } from "@components/Date";
@@ -145,13 +145,13 @@ const TextInput = React.forwardRef(({ render, withKeyboardAvoidingView, ...props
 const getContainerAndContentStyle = ({ isFocused, variant, withBackground, compact, isLabelEmbededVariant, textColor, borderColor, theme, isDefaultVariant }: { isLabelEmbededVariant: boolean, canRenderLabel: boolean, theme: ITheme, variant: ITextInputProps["variant"], isFocused: boolean, textColor?: string, borderColor?: string, isDefaultVariant: boolean, compact?: boolean, withBackground?: boolean }) => {
     const isFlatVariant = false;//variant === "flat";
     const backgroundColor = withBackground !== false ? theme.colors.surfaceVariant : undefined;
-    const contentContainerStyle: IStyle = [], containerStyle: IStyle = [], inputStyle: IStyle = [styles.input, { color: textColor }], labelStyle: IStyle = [{ color: textColor }];
+    const contentContainerStyle: IViewStyle = [], containerStyle: IViewStyle = [], inputStyle: ITextStyle = [styles.input, { color: textColor }], labelStyle: ITextStyle = [{ color: textColor }];
     const borderedStyle = [
         isFocused ? styles.focusedOutlineBorder : styles.borderWidth1,
         { borderColor, borderRadius: theme.roundness },
     ];
     const notEmbeededLabelStyle = [styles.notEmbededLabelStyle],
-        notEmbeededInputStyle: IStyle[] = []
+        notEmbeededInputStyle: ITextStyle[] = []
     if (isLabelEmbededVariant) {
         contentContainerStyle.push(borderedStyle);
     } else if (isFlatVariant) {
@@ -564,7 +564,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, style
         editable,
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: [
-            Object.assign({}, Platform.isWeb() ? { outline: "none" } : {}) as IStyle,
+            Object.assign({}, Platform.isWeb() ? { outline: "none" } : {}) as ITextStyle,
             styles.input,
             minHeight > 0 && { minHeight },
             inputStyle,

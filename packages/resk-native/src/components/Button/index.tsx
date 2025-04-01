@@ -17,7 +17,6 @@ import { Surface } from '@components/Surface';
 import { TouchableRipple } from '@components/TouchableRipple';
 import Label from '@components/Label';
 import { IButtonProps, IButtonContext, IButtonRef } from './types';
-import { IFlatStyle } from '../../types/index';
 import { useGetIcon } from '@components/Icon';
 import { defaultStr, isNonNullString, uniqid } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
@@ -268,7 +267,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     const iconColor: string = (Colors.isValid(customLabelColor) ? customLabelColor : Colors.isValid(iconProps?.color) ? iconProps.color : textColor) as string;
     const icon = useGetIcon({ icon: iconProp, size: iconSize, ...iconProps, color: iconColor as unknown as string, theme });
     const iconContent = icon && isLoading !== true ? icon : null;
-    const contentStyle = StyleSheet.flatten([contentProps.style]) as IFlatStyle;
+    const contentStyle = StyleSheet.flatten([contentProps.style]) as ViewStyle;
     const hasLeftContentWrapper = !!isExpandable || !!spaceBetweenContent;
     const LeftContentWrapper = hasLeftContentWrapper ? View : React.Fragment;
     const letContentWrapperProps = hasLeftContentWrapper ? {

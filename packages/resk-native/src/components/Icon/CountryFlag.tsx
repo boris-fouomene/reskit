@@ -28,7 +28,7 @@ import { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 import Platform from "@platform";
 import { CountriesManager, defaultStr, ICountryCode, isNonNullString, Logger } from '@resk/core';
-import { IStyle } from '@src/types';
+import { ITextStyle } from '@src/types';
 import { isImageSource } from './utils';
 import Icon from './Icon';
 import Label from "@components/Label";
@@ -104,7 +104,7 @@ export interface ICountryFlagProps extends TouchableOpacityProps {
      * The style object for the flag emoji.
      * This is an object that defines the styling properties for the flag emoji.
      */
-    style?: IStyle;
+    style?: ITextStyle;
     /***
      * The fallback content to display when the flag emoji fails to load.
      * This is a React node that represents the fallback content to display when the flag emoji fails to load.

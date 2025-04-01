@@ -1,9 +1,7 @@
 
 import * as React from "react";
-import { Animated, I18nManager, Dimensions, PanResponder, StyleSheet, View, PanResponderInstance, GestureResponderEvent, LayoutChangeEvent } from 'react-native';
+import { Animated, I18nManager, Dimensions, PanResponder, StyleSheet, View, PanResponderInstance, GestureResponderEvent, LayoutChangeEvent, ViewStyle } from 'react-native';
 import { ActivityIndicator } from '@components/ActivityIndicator';
-import { IViewProps } from '@components/View';
-import { IFlatStyle, IStyle } from '../../types';
 import Theme from "@theme";
 import { ISwiperProps, ISwiperState } from './types';
 import { isRTL } from '@utils/i18nManager';
@@ -521,7 +519,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
       >
         {!isReady ? (
           React.isValidElement(placeholder) ? placeholder :
-            <View testID={testID + '-preloader-container'} style={styles.preloaderContainer as IStyle}>
+            <View testID={testID + '-preloader-container'} style={styles.preloaderContainer as any}>
               {<ActivityIndicator testID={testID + "-preloader"} size={'large'} />}
             </View>
         ) : null}
@@ -605,11 +603,11 @@ const styles = {
     flex: 1,
     marginVertical: 50,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   }
 };
 
-const addAutoHeight = (style: IFlatStyle, height?: number | string, autoHeight?: boolean): IFlatStyle => {
+const addAutoHeight = (style: ViewStyle, height?: number | string, autoHeight?: boolean): ViewStyle => {
   if (height !== undefined && (typeof height == "number") && autoHeight) {
     style.height = height;
   }

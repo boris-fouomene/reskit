@@ -80,6 +80,9 @@ export const useMenuPosition = ({
             const { pageX: pX, pageY: pY, width: anchorWidth, height: anchorHeight } = anchorMeasurements;
             const pageX = Math.max(0, pX), pageY = Math.max(0, pY);
             minWidth = typeof minWidth == 'number' && minWidth > 0 ? minWidth : anchorWidth;
+            if (anchorWidth <= screenWidth - pageX) {
+                minWidth = Math.max(minWidth, anchorWidth);
+            }
             menuHeight = !dynamicHeight ? (typeof menuHeight == 'number' && menuHeight > 0 ? menuHeight : 0) : 0;
             const minMenuWidth = Math.max(minWidth, anchorWidth);
             if (sameWidth) {
@@ -201,16 +204,12 @@ export const useMenuPosition = ({
     const menuPosition = calculatePosition();
     const menuAnchorStyle = useMemo(() => {
         if (typeof anchorMeasurements?.width != "number") return {};
-        const { width } = anchorMeasurements;
-        return sameWidth ? { width } : null;//{ minWidth: width };
-    }, [anchorMeasurements?.width, sameWidth]);
-    // Full screen styles
-    const menuContainerStyle = useMemo(() => {
-        return fullScreen ? {
-            width: screenWidth,
-            height: screenHeight,
-        } : {};
-    }, [fullScreen]);
+        const { width, pageX } = anchorMeasurements;
+        if (!isNumber(width)) return null;
+        if (sameWidth) return { width };
+        if (isNumber(pageX) && screenWidth >= pageX + width) return { minWidth: width };
+        return null;
+    }, [anchorMeasurements?.width, sameWidth, visible, screenWidth]);
     const sizeToRemove = useMemo(() => {
         return {
             height: position === "top" ? anchorMeasurements?.height || 0 : 0,
@@ -234,7 +233,6 @@ export const useMenuPosition = ({
             styles.menuAnimated,
             touchableBackdropStyle,
             !fullScreen && menuAnchorStyle,
-            //menuContainerStyle,
             !fullScreen && typeof borderRadius === 'number' ? { borderRadius } : null,
             typeof elevation === 'number' ? Theme.elevations[elevation] : null,
             {
@@ -531,7 +529,7 @@ const Menu: React.FC<IMenuProps> = ({
         }
         return {
             Wrapper: ScrollView,
-            wrapperProps: Object.assign({}, { testID: testID + "-scroll-view" }, scrollViewProps)
+            wrapperProps: Object.assign({}, { testID: testID + "-scroll-view" }, scrollViewProps, { style: StyleSheet.flatten([styles.scrollview, scrollViewProps?.style]) })
         }
     }, [withScrollView, testID, scrollViewProps]);
     return <>
@@ -650,6 +648,9 @@ export const measureAnchor = (anchorRef: React.RefObject<any>, minContentHeight?
  * Default styles for the menu container
  */
 const styles = StyleSheet.create({
+    scrollview: {
+        width: "100%",
+    },
     contentContainer: {
         width: '100%',
         alignSelf: "flex-start",

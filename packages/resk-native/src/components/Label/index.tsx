@@ -31,7 +31,7 @@ const Label = React.forwardRef(({
   role,
   color,
   textBold,
-  upperCase,
+  uppercase,
   fontSize,
   testID,
   wrapText,
@@ -94,7 +94,7 @@ const Label = React.forwardRef(({
   // Convert children to string if necessary and apply upper case transformation
   if ((children && typeof children === "string") || typeof children === "number" || typeof children === "boolean") {
     children = String(children);
-    if (upperCase) {
+    if (uppercase) {
       children = (children as string).toUpperCase();
     }
   }
@@ -142,7 +142,7 @@ export type ILabelProps = Omit<TextProps, "role" | "children" | "style"> & {
   /***
   * @type boolean, If true, transforms the text to upper case
   */
-  upperCase?: boolean;
+  uppercase?: boolean;
   /**
    * @type number, Font size of the text
    */

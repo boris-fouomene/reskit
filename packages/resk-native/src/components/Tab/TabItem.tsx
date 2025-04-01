@@ -91,7 +91,7 @@ const TabItem = ({
   >
     <View testID={testID + '-content-container'} style={[style.contentContainer]}>
       {isIconTop && icon ? icon : null}
-      <Label upperCase  {...labelProps} color={color} testID={testID + "-label"} style={[[styles.label, { color, paddingVertical: !icon ? 8 : 2, }, activeStyle(labelProps.style)]]}>
+      <Label uppercase  {...labelProps} color={color} testID={testID + "-label"} style={[[styles.label, { color, paddingVertical: !icon ? 8 : 2, }, activeStyle(labelProps.style)]]}>
         {label}
       </Label>
       {!isIconTop && icon ? icon : null}

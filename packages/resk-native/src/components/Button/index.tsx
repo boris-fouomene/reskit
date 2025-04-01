@@ -130,7 +130,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     accessibilityHint,
     accessibilityRole = 'button',
     style,
-    uppercase = true,
+    uppercase,
     testID,
     accessible,
     containerRef,

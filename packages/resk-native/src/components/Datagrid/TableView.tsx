@@ -8,7 +8,9 @@ declare module "./Datagrid" {
 }
 
 @AttachDatagridView("table")
-export class DatagridTableView<DataType extends IDatagridDataType = any> extends Datagrid.View<DataType> {
+export class DatagridTableView<DataType extends IDatagridDataType = any> extends Datagrid.View<DataType, {
+    myExample?: string;
+}> {
     _render() {
         return <Label>
             I'm display from table

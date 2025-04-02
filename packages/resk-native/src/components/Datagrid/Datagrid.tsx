@@ -19,7 +19,7 @@ import { IReactComponent, IViewStyle } from '@src/types';
 import { Preloader } from '@components/Dialog';
 import { AppBar, IAppBarAction, IAppBarProps } from '@components/AppBar';
 import { Divider } from '@components/Divider';
-import { FontIcon, IFontIconName, Icon } from '@components/Icon';
+import { FontIcon, IFontIconName, IIconSource, Icon } from '@components/Icon';
 import Theme, { useTheme } from "@theme";
 import { useDimensions } from '@dimensions/index';
 import i18n from '@resk/core/i18n';
@@ -1917,27 +1917,30 @@ class DatagridView<DataType extends IDatagridDataType = any, PropsExtensions = u
      * The method adds the view name to the list of registered view names.
      * If the view name name is not a non-null string or the component is not a valid function, the method does nothing.
      * 
-     * @param {IDatagridViewName} viewName, the view name name
+     * @param {IDatagridRegisterViewOptions} options - The options for registering the view.
      * @param {typeof DatagridView} component - The component class to register for the view name.
      * 
      * @returns {void} This function does not return a value.
      */
-    static registerView(viewName: IDatagridViewName, component: typeof DatagridView<any, any, any>) {
+    static registerView(options: IDatagridRegisterViewOptions, component: typeof DatagridView) {
+        options = Object.assign({}, options);
+        const { name: viewName } = options;
         if (!isNonNullString(viewName) || typeof (component) !== "function") return;
-        const components = DatagridView.getRegisteredViews();
-        (components as any)[viewName] = component;
+        const components = DatagridView.getRegisteredViewsWithOptions();
+        (components as any)[viewName] = { ...options, component };
         Reflect.defineMetadata(DatagridView.reflectMetadataKey, components, DatagridView);
     }
 
+
     /**
-     * Retrieves the registered view names and their associated components.
+     * Retrieves the registered view options and component classes for all registered views.
      * 
-     * This method provides access to the list of view names and their associated components that have been registered
-     * using the `registerView` method. If no view names have been registered, it returns an empty object.
+     * This method returns an object containing all registered view names as keys and their associated options and component classes as values.
+     * If no views have been registered, the method returns an empty object.
      * 
-     * @returns {Record<IDatagridViewName, typeof DatagridView>} An object mapping view names to their associated components.
+     * @returns {Record<IDatagridViewName, IDatagridRegisterViewOptions & { component: typeof DatagridView }>} An object containing the registered view options and component classes as well as their associated options.
      */
-    static getRegisteredViews(): Record<IDatagridViewName, typeof DatagridView<any, any, any>> {
+    static getRegisteredViewsWithOptions(): Record<IDatagridViewName, IDatagridRegisterViewOptions & { component: typeof DatagridView }> {
         const components = Reflect.getMetadata(DatagridView.reflectMetadataKey, DatagridView);
         return isObj(components) ? components : {} as any;
     }
@@ -1991,9 +1994,25 @@ class DatagridView<DataType extends IDatagridDataType = any, PropsExtensions = u
      */
     static getRegisteredView(viewName: IDatagridViewName): typeof DatagridView<any, any, any> {
         if (!isNonNullString(viewName)) return DatagridUnimplemented;
-        const components = DatagridView.getRegisteredViews();
-        const component = components[viewName as keyof typeof components];
+        const { component } = DatagridView.getRegisteredViewWithOptions(viewName);
         return typeof component === "function" ? component : DatagridUnimplemented;
+    }
+    /**
+     * Retrieves the registered view options and component for a specified view name.
+     * 
+     * This method looks up the view name in the list of registered views and returns an object
+     * containing the view's registration options and the associated component class. If the view name
+     * is not a non-null string or is not registered, it returns an empty object with the expected type.
+     * 
+     * @param {IDatagridViewName} viewName - The name of the view to retrieve the options and component for.
+     * 
+     * @returns {IDatagridRegisterViewOptions & { component: typeof DatagridView }} An object containing
+     * the view's registration options and the associated component class.
+     */
+    static getRegisteredViewWithOptions(viewName: IDatagridViewName): IDatagridRegisterViewOptions & { component: typeof DatagridView } {
+        if (!isNonNullString(viewName)) return {} as IDatagridRegisterViewOptions & { component: typeof DatagridView };
+        const components = DatagridView.getRegisteredViewsWithOptions();
+        return Object.assign({}, { component: DatagridUnimplemented }, components[viewName as keyof typeof components]);
     }
 
     /**
@@ -2196,31 +2215,8 @@ class DatagridUnimplemented<DataTye extends IDatagridDataType = any> extends Dat
         </Label>
     }
 }
-/**
- * A type that maps view names to their corresponding props.
- *
- * This type is used to create a union of props for different views.
- * It takes a `DataType` type parameter, which represents the type of data being displayed in the grid.
- *
- * @template DataType - The type of data being displayed in the grid.
- * @see IDatagridViewName for a list of available view names.
- * @see IDatagridViews for a map of view names to their corresponding views.
- * @example 
- * <Datagrid
- *    tableViewProps = {{}}
- * />
- */
-export type IDatagridViewPropsMap<DataType extends IDatagridDataType = any> = {
-    /**
-     * A mapped type that creates a union of props for different views.
-     *
-     * For each view name `K` in `IDatagridViewName`, it creates a property `${K}ViewProps` that is optional (`?`) and has a type of `IDatagridViews<DataType>[K]`.
-     * If `IDatagridViews<DataType>[K]` is a subclass of `DatagridView<DataType>`, then the property type is `IDatagridViews<DataType>[K]`, otherwise it is an empty object (`{}`).
-     */
-    [K in IDatagridViewName as `${K}ViewProps`]?: IDatagridViews<DataType>[K] extends DatagridView<DataType> ? IDatagridViews<DataType>[K] : {};
-};
 
-export type IDatagridProps<DataType extends IDatagridDataType = any> = IDatagridViewProps<DataType> & Partial<IDatagridViewPropsMap<DataType>> & {
+export type IDatagridProps<DataType extends IDatagridDataType = any, PropsExtensions = unknown> = IDatagridViewProps<DataType, PropsExtensions> & {
     /**
      * The view name to use for the grid.
      * 
@@ -2238,6 +2234,14 @@ export type IDatagridProps<DataType extends IDatagridDataType = any> = IDatagrid
      * If provided, it will override the default view names.
      */
     viewNames?: IDatagridViewName[];
+} & {
+    /**
+     * A mapped type that creates a union of props for different views.
+     *
+     * For each view name `K` in `IDatagridViewName`, it creates a property `${K}ViewProps` that is optional (`?`) and has a type of `IDatagridViews<DataType>[K]`.
+     * If `IDatagridViews<DataType>[K]` is a subclass of `DatagridView<DataType>`, then the property type is `IDatagridViews<DataType>[K]`, otherwise it is an empty object (`{}`).
+     */
+    [K in IDatagridViewName as `${K}ViewProps`]?: Partial<IDatagridViews<DataType>[K]>;
 };
 
 
@@ -2586,36 +2590,44 @@ class DatagridViewColumn<DataType extends IDatagridDataType = any, PropExtension
  * @param type The type of the column to attach.
  * @returns A decorator function that registers the column.
  */
-export function AttachDatagridViewColumn(type: IFieldType) {
-    return (target: typeof DatagridViewColumn) => {
+export function AttachDatagridViewColumn<DataTye extends IDatagridDataType = any, PropsExtensions = unknown, StateExtensions = unknown>(type: IFieldType) {
+    return (target: typeof DatagridViewColumn<DataTye, PropsExtensions, StateExtensions>) => {
         /**
          * Registers the column with the DatagridView component.
          * 
          * This method adds the column to the DatagridView component's registry, making it available for use.
          */
-        DatagridView.registerColumn(type, target as typeof DatagridViewColumn);
+        DatagridView.registerColumn(type, target as typeof DatagridViewColumn<DataTye, PropsExtensions, StateExtensions>);
     };
 }
+
 /**
- * A decorator to attach a view name to the DatagridView component.
+ * A decorator to attach a view to the DatagridView component.
  * 
- * This decorator registers the view name with the DatagridView component, making it available for use.
+ * This decorator registers the view with the DatagridView component using the provided options,
+ * making it available for use. The view is associated with a specific view name, which must be a non-null string.
  * 
- * @param {IDatagridViewName}, the view name name
- * @returns A decorator function that registers the view name.
+ * @template DataType - The type of the data shown in the grid.
+ * @template PropsExtensions - The type of the component's props, used to extend the component's props with additional properties.
+ * @template StateExtensions - The type of the component's state, used to extend the component's state with additional properties.
+ * 
+ * @param {IDatagridRegisterViewOptions} options - The options for registering the datagrid view.
+ * 
+ * @returns A decorator function that registers the view.
  */
-export function AttachDatagridView(viewName: IDatagridViewName) {
-    return (target: typeof DatagridView<any, any, any>) => {
-        DatagridView.registerView(viewName, target as typeof DatagridView);
+
+export function AttachDatagridView<DataType extends IDatagridDataType = any, PropsExtensions = unknown, StateExtensions = unknown>(options: IDatagridRegisterViewOptions) {
+    return (target: typeof DatagridView<DataType, PropsExtensions, StateExtensions>) => {
+        DatagridView.registerView(options, target as typeof DatagridView);
     };
 }
 
 
 
-function Datagrid<DataType extends IDatagridDataType = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType>) {
+function Datagrid<DataType extends IDatagridDataType = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType, {}>) {
     useDimensions();
     const { viewNames, viewName } = useMemo(() => {
-        const registeredViewNames = Object.keys(DatagridView.getRegisteredViews()) as IDatagridViewName[];
+        const registeredViewNames = Object.keys(DatagridView.getRegisteredViewsWithOptions()) as IDatagridViewName[];
         const viewNames = (Array.isArray(cViewNames) && cViewNames.length) ? cViewNames.filter((vName) => registeredViewNames.includes(vName)) : registeredViewNames;
         return {
             viewNames,
@@ -2626,13 +2638,14 @@ function Datagrid<DataType extends IDatagridDataType = any>({ viewName: cViewNam
     useEffect(() => {
 
     }, [viewName, viewNames, state]);
-    const { Component, restProps } = useMemo<{ Component: typeof DatagridView<DataType>, restProps: IDatagridViewPropsMap<DataType>[`${typeof state.viewName}ViewProps`] }>(() => {
+    const { Component, restProps, options: viewOptions } = useMemo<{ Component: typeof DatagridView<DataType>, restProps: any, options: IDatagridRegisterViewOptions }>(() => {
+        const { component, ...options } = DatagridView.getRegisteredViewWithOptions(state.viewName);
         return {
-            Component: DatagridView.getRegisteredView(state.viewName),
+            Component: component,
+            options,
             restProps: isNonNullString(state.viewName) ? Object.assign({}, (props as any)[`${state.viewName}ViewProps`]) : {}
         }
     }, [state.viewName]);
-    console.log(props, " is props, rest props is ", restProps);
     return <Component
         {...props as any}
         {...restProps}
@@ -3782,9 +3795,18 @@ export type IDatagridViewStateData<DataType extends IDatagridDataType = any> = A
 
 /**
  * An interface representing the view name map of the DatagridView component.
- * Eeach key is a view name name and each value is the view name configuration.
- * Eeach value must be a class extending the DatagridView class.
+ * Eeach key is a view name name and each value is the custom datagrid view props interface.
  * @typedef IDatagridViews
+ * @example 
+ * ```
+ * import "@resk/native";
+ * declare module "@resk/native"{
+ *    interface IDatagridViews {
+ *      table: IDatagridTableViewProps;
+ *      card: IDatagridCardViewProps;
+ *    }
+ * }
+ * ```
  */
 export interface IDatagridViews<DataType extends IDatagridDataType = any> { }
 
@@ -3812,6 +3834,41 @@ export interface IDatagridPagination extends IResourcePaginationMetaData {
      */
     limit: number;
 }
+
+export interface IDatagridRegisterViewOptions {
+    /***
+     * The name of the display view.
+     */
+    name: IDatagridViewName;
+    /***
+     * The label of the display view.
+     */
+    label?: string;
+    /**
+     * The icon of the display view.
+     */
+    icon?: IIconSource;
+
+    /**
+     * @property {string} optimizedFor - Specifies the screen size or device type for which this display view is optimized.
+     *
+     * This property determines the target screen size or condition under which the current view should be rendered.
+     * It ensures that the layout, styling, and behavior of the component are tailored to provide the best user experience
+     * for the specified screen size or device type.
+     *
+     * ### Supported Values:
+     * - `"mobile"`: Optimized for small screens, @see {@link {IBreakpoint}} for more information about mobile breakpoints.
+     * - `"tablet"`: Optimized for medium-sized screens, Suitable for tablet.
+     * - `"desktop"`: Optimized for large screens, typically wider than 1024px. Designed for desktop and laptop devices.
+     * ### Notes:
+     * - Ensure that the value provided matches one of the predefined options to avoid unexpected behavior.
+     * - This property works in conjunction with responsive design principles to dynamically adjust the UI based on the user's device.
+     *
+     * @default ["mobile","tablet","desktop"]
+     */
+    optimizedFor?: ("mobile" | "tablet" | "desktop")[];
+}
+
 export interface IDatagridLoadingIndicatorProps extends Record<string, any> {
     isLoading?: boolean;
 }

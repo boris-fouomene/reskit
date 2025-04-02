@@ -11,6 +11,9 @@ const index = withAppBar(() => {
                         label: "One",
                     }
                 ]}
+                tableViewProps={{
+                    myExample: "test"
+                }}
                 actions={[
                     {
                         label: "An action",

@@ -1,7 +1,5 @@
 import { useMemo } from "react";
-import { Datagrid, AttachDatagridView, useDatagrid, IDatagridViewRowData } from "./Datagrid";
-import Label from "@components/Label";
-
+import { Datagrid, AttachDatagridView, useDatagrid, IDatagridViewRowData, IDatagridViewName } from "./Datagrid";
 
 export interface IDatagridTableViewProps<DataType extends object = any> {
 
@@ -20,11 +18,11 @@ export class DatagridTableView<DataType extends object = any> extends Datagrid.V
     renderTableHeader() {
         return <Columns datagridContext={this} />
     }
+    getViewName(): IDatagridViewName {
+        return "table";
+    }
     renderTableRow(rowData: IDatagridViewRowData<DataType>, rowIndex: number) {
         return <Rows datagridContext={this} rowData={rowData} rowIndex={rowIndex} />
-    }
-    renderRows() {
-        const { data } = this.state;
     }
 }
 

@@ -47,6 +47,24 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     public getSelectedRowsKeys(): string[] {
         return Array.from(this.selectedRowsKeys);
     }
+    /**
+     * Retrieves the name of the datagrid view. This is used by the datagrid to determine which type of view to render.
+     * The default implementation returns an empty string.
+     * Subclasses should override this method to provide a meaningful name.
+     * @returns {IDatagridViewName} The name of the view.
+     */
+    getViewName(): IDatagridViewName {
+        return "" as IDatagridViewName
+    }
+    /**
+     * Determines whether the given view name matches the name of the current datagrid view.
+     * The comparison is case-insensitive and trims the given view name.
+     * @param {IDatagridViewName} viewName - The name of the view to check.
+     * @returns {boolean} True if the given view name matches the name of the current view, otherwise false.
+     */
+    public isDatagridView(viewName: IDatagridViewName) {
+        return isNonNullString(viewName) && (viewName).toLowerCase().trim() === String(this.getViewName()).toLowerCase();
+    }
     /***
      * Retrieves the number of selected rows.
      *
@@ -214,7 +232,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {React.ReactNode} - The rendered column.
      */
-    protected renderTableCellOrColumnHeader(columnName: string, renderType: IDatagridViewColumnRenderType = "rowCell", rowData?: DataType, rowIndex?: number) {
+    renderTableCellOrColumnHeader(columnName: string, renderType: IDatagridViewColumnRenderType = "rowCell", rowData?: DataType, rowIndex?: number) {
         const column = this.getColumn(columnName);
         if (!column || renderType === "rowCell" && !isObj(rowData)) return null;
         const columnType = defaultStr(column?.type, "text");
@@ -271,6 +289,39 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return null;
     }
 
+    /**
+     * Returns the container style for the datagrid view.
+     * 
+     * This method can be overridden to provide a custom style for the container that wraps the entire grid.
+     * 
+     * @returns {IViewStyle} The container style.
+     */
+    getContainerStyle(): IViewStyle {
+        return null;
+    }
+    /**
+     * Returns the content container style for the datagrid view.
+     * 
+     * This method can be overridden to provide a custom style for the content container
+     * that wraps the grid content.
+     * 
+     * @returns {IViewStyle} The content container style.
+     */
+    getContentContainerStyle(): IViewStyle {
+        return null;
+    }
+    /**
+     * Renders a single row of the table.
+     * 
+     * This method is responsible for rendering a single row of the table, which may contain
+     * grouped rows. If the row is a grouped row, it will be rendered using the
+     * `renderTableGroupedRow` method. Otherwise, it will be rendered as a regular row.
+     * 
+     * @param {IDatagridViewRowData<DataType>} rowData - The row data to render.
+     * @param {number} rowIndex - The index of the row in the state data array.
+     * 
+     * @returns The rendered row, or null if the row should not be displayed.
+     */
     renderTableRow(rowData: IDatagridViewRowData<DataType>, rowIndex: number) {
         const rowKey = this.getRowKey(rowData);
         if (!rowKey) return null;
@@ -630,7 +681,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     * 
     * @returns {IDatagridViewState<DataType, StateExtensions>} The initialized state.
     */
-    protected initStateFromSessionData(): Partial<IDatagridViewState<DataType, StateExtensions>> {
+    initStateFromSessionData(): Partial<IDatagridViewState<DataType, StateExtensions>> {
         const sessionData = this.getSessionData();
         const r: Partial<IDatagridViewState<DataType, StateExtensions>> = {};
         if (Array.isArray(sessionData.orderBy) && sessionData.orderBy.length > 0) {
@@ -1617,7 +1668,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * - `aggregatedColumnsValues`: A record with column names as keys and their respective
      * aggregated values initialized to zero for each aggregation function.
      */
-    protected initAggregationComputation() {
+    initAggregationComputation() {
         const aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>> = {};
         const aggregationFunctions = DatagridView.getRegisteredAggregationFunctions();
         const { aggregatableColumns } = this.state;
@@ -1645,7 +1696,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @param {DataType[]} allData - The complete dataset being processed.
      * @returns {Record<string, Record<keyof IDatagridAggregationFunctions, number>>} - The updated object containing aggregated values for each column.
      */
-    protected computeAggregationsForRow(rowData: DataType, rowIndex: number, aggregationFunctions: IDatagridAggregationFunctions<DataType>, aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>, allData: DataType[]) {
+    computeAggregationsForRow(rowData: DataType, rowIndex: number, aggregationFunctions: IDatagridAggregationFunctions<DataType>, aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>, allData: DataType[]) {
         const { aggregatableColumns } = this.state;
         aggregatedColumnsValues = isObj(aggregatedColumnsValues) ? aggregatedColumnsValues : {};
         if (!Array.isArray(aggregatableColumns)) return aggregatedColumnsValues;
@@ -1667,7 +1718,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     /**
      * Processes the data for the component.
      * 
-     * This method is an internal, protected method that is used by the DatagridView to process the data
+     * This method is an internal, method that is used by the DatagridView to process the data
      * when the component mounts or when the data changes.
      * 
      * It processes the data by sorting it, filtering it, grouping it, and paginating it.
@@ -1679,7 +1730,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {Partial<IDatagridViewState<DataType, StateExtensions>>} - A partial state object containing the aggregated columns values, the paginated data, the all data, the data to display, the pagination configuration, and the grouped rows by keys.
      */
-    protected processData(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination): Partial<IDatagridViewState<DataType, any>> {
+    processData(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination): Partial<IDatagridViewState<DataType, any>> {
         let processingData: DataType[] = [];
         const paginationConfig: IDatagridPagination = isObj(pagination) ? pagination as IDatagridPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridPagination;
         const canPaginate = this.canPaginate();
@@ -1847,11 +1898,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const isLoading = this.isLoading();
         const { containerStyle, contentContainerStyle } = this.props;
         return <DatagridContext.Provider value={this}>
-            <View testID={testID + "-container"} style={[styles.main, isLoading && styles.disabled, containerStyle]} onLayout={this.onContainerLayout.bind(this)}>
+            <View testID={testID + "-container"} style={[styles.main, isLoading && styles.disabled, containerStyle, this.getContainerStyle()]} onLayout={this.onContainerLayout.bind(this)}>
                 {<DatagridView.Actions />}
                 {this.renderToolbar()}
                 {this.renderLoadingIndicator()}
-                <View testID={testID + "-content-container"} style={[styles.contentContainer, contentContainerStyle]}>
+                <View testID={testID + "-content-container"} style={[styles.contentContainer, contentContainerStyle, this.getContentContainerStyle()]}>
                     {this.renderTableHeader()}
                     {this.renderTableBody()}
                     {this.renderTableFooter()}
@@ -2126,7 +2177,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
     static getRegisteredColumn(type: IFieldType): typeof DatagridViewColumn {
         const components = DatagridView.getRegisteredColumns();
-        return isNonNullString(type) ? components[type] : DatagridViewColumn || DatagridViewColumn;
+        return isNonNullString(type) && typeof components[type] === "function" ? components[type] : DatagridViewColumn;
     }
 
 
@@ -2464,7 +2515,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      * 
      * @returns The rendered column.
      */
-    protected renderRowCell(): React.ReactNode {
+    renderRowCell(): React.ReactNode {
         const { labelProps, rowData } = this.props;
         if (!rowData || !this.isRowCell()) {
             return null;
@@ -2497,7 +2548,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      * 
      * @returns The rendered column.
      */
-    protected renderHeader(): React.ReactNode {
+    renderHeader(): React.ReactNode {
         const { labelProps, rowData } = this.props;
         const column = this.getColumn();
         if (!this.isValidColumn(column)) return null;
@@ -2511,7 +2562,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
             <View testID={testId + "-container"} style={[styles.columnHeaderContainer]}>
                 <Label testID={testId} {...labelProps} >{this.props.label}</Label>
                 {sortIcon ? <FontIcon testID={testId + "-sort-icon"} color={Theme.colors.primary} size={25} name={sortIcon} onPress={(event) => { this.sort(); }} /> : null}
-            </View>;
+            </View>
         </View>
     }
     /**

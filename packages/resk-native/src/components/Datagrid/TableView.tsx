@@ -1,19 +1,27 @@
-import { Datagrid, AttachDatagridView, IDatagridDataType } from "./Datagrid";
+import { Datagrid, AttachDatagridView, IDatagridDataType, useDatagrid, IDatagridGroupedRow } from "./Datagrid";
 import Label from "@components/Label";
 
-type ITest = {
-    myExample: string;
-};
+
+export interface IDatagridTableViewProps<DataType extends IDatagridDataType = any> {
+
+}
+
 declare module "./Datagrid" {
     export interface IDatagridViews {
-        table: ITest;
+        table: IDatagridTableViewProps;
     }
 }
 
 @AttachDatagridView({
     name: "table",
 })
-export class DatagridTableView<DataType extends IDatagridDataType = any> extends Datagrid.View<DataType, ITest> {
+export class DatagridTableView<DataType extends IDatagridDataType = any> extends Datagrid.View<DataType, IDatagridTableViewProps> {
+    static Rows<DataType extends IDatagridDataType = any>(): JSX.Element | null {
+        return null;
+    }
+    static Columns(): JSX.Element | null {
+        return null;
+    }
     _render() {
         return <Label>
             I'm display from table
@@ -21,12 +29,11 @@ export class DatagridTableView<DataType extends IDatagridDataType = any> extends
     }
 }
 
+
+
 function t() {
     return <Datagrid
         data={[]}
         columns={[]}
-        tableViewProps={{
-            myExample: "test"
-        }}
     />
 }

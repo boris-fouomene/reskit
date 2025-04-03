@@ -28,42 +28,7 @@ import { IProgressBarProps, ProgressBar } from '@components/ProgressBar';
 import { Button, IButtonProps } from '@components/Button';
 import { IMenuItemProps, Menu } from '@components/Menu';
 
-/**
- * A flexible and feature-rich data grid component for React Native.
- * 
- * The `DatagridView` class provides a powerful grid system for displaying, sorting, filtering, grouping, and paginating data.
- * It supports advanced features such as column aggregation, custom view names, and session-based state persistence.
- * 
- * @template DataType - The type of the data shown in the grid.
- * @template PropsExtensions - The type of the component's props. This type is used to extend the component's props with additional properties.
- * @template StateExtensions - The type of the component's state. This type is used to extend the component's state with additional properties.
- * 
- * @example
- * ```tsx
- * import { DatagridView } from "./DatagridView";
- * 
- * const data = [
- *   { id: 1, name: "John", age: 30 },
- *   { id: 2, name: "Jane", age: 25 },
- * ];
- * 
- * const columns = [
- *   { name: "name", label: "Name", sortable: true },
- *   { name: "age", label: "Age", sortable: true, aggregatable: true },
- * ];
- * 
- * const App = () => (
- *   <DatagridView
- *     data={data}
- *     columns={columns}
- *     sortable
- *     aggregatable
- *     viewName = "table"
- *     paginationEnabled
- *   />
- * );
- * ```
- */
+
 class DatagridView<DataType extends IDatagridDataType = any, PropsExtensions = unknown, StateExtensions = unknown> extends ObservableComponent<IDatagridViewProps<DataType, PropsExtensions>, IDatagridViewState<DataType, StateExtensions>, IDatagridEvent> {
     private static reflectMetadataKey = Symbol('datagrid-reflect-viewName-key');
     private static aggregationFunctionMetadataKey = Symbol("datagrid-aggregation-functions-meta");
@@ -282,19 +247,17 @@ class DatagridView<DataType extends IDatagridDataType = any, PropsExtensions = u
     renderGroupedRow(rowData: IDatagridGroupedRow) {
         return null;
     }
-    /**
-     * Renders a header cell in the grid for a given column.
-     * 
-     * This method is called when the component needs to render a header cell for a given column.
-     * 
-     * It delegates rendering to `renderRowCellOrHeader`, passing `"header"` as the render type.
-     * 
-     * @param columnName - The name of the column to render the header cell for.
-     * 
-     * @returns The rendered header cell component, or null if the column does not exist.
-     */
 
-    renderHeader(columnName: string) {
+    /**
+     * Renders a column header in the grid.
+     * 
+     * This method delegates rendering to `renderRowCellOrHeader` with the `renderType` set to `"header"`.
+     * It returns the rendered column header component, or null if the column does not exist.
+     * 
+     * @param columnName - The name of the column to render the header for.
+     * @returns The rendered column header component, or null if the column does not exist.
+     */
+    renderColumnHeader(columnName: string) {
         return this.renderRowCellOrHeader(columnName, "header");
     }
     /**
@@ -1489,7 +1452,7 @@ class DatagridView<DataType extends IDatagridDataType = any, PropsExtensions = u
      * 
      * @returns {string} - The grouped row header text. If no columns are specified, an empty string is returned.
      */
-    getGroupedRowHeader(rowData: DataType, groupedColumns?: string[]): string {
+    computeGroupedRowHeader(rowData: DataType, groupedColumns?: string[]): string {
         const d: string[] = [];
         const groupHeaderSeparator = this.getGroupedRowHeaderSeparator();
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
@@ -1690,7 +1653,7 @@ class DatagridView<DataType extends IDatagridDataType = any, PropsExtensions = u
         const unknowGroupLabel = "N/A";
         if (isGroupable) {
             paginatedData.map((rowData, rowIndex) => {
-                const groupableKey = defaultStr(this.getGroupedRowHeader(rowData, groupedColumns), unknowGroupLabel);
+                const groupableKey = defaultStr(this.computeGroupedRowHeader(rowData, groupedColumns), unknowGroupLabel);
                 const groupedRowHeader = {
                     label: groupableKey,
                     isDatagridGroup: true,
@@ -2241,7 +2204,7 @@ export type IDatagridProps<DataType extends IDatagridDataType = any, PropsExtens
      * For each view name `K` in `IDatagridViewName`, it creates a property `${K}ViewProps` that is optional (`?`) and has a type of `IDatagridViews<DataType>[K]`.
      * If `IDatagridViews<DataType>[K]` is a subclass of `DatagridView<DataType>`, then the property type is `IDatagridViews<DataType>[K]`, otherwise it is an empty object (`{}`).
      */
-    [K in IDatagridViewName as `${K}ViewProps`]?: Partial<IDatagridViews<DataType>[K]>;
+    [K in IDatagridViewName as `${K}ViewProps`]?: Partial<(keyof IDatagridViews<DataType>[K] extends never ? never : IDatagridViews<DataType>[K])>;
 };
 
 
@@ -2624,7 +2587,7 @@ export function AttachDatagridView<DataType extends IDatagridDataType = any, Pro
 
 
 
-function Datagrid<DataType extends IDatagridDataType = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType, {}>) {
+const Datagrid: IDatagridExported = function Datagrid<DataType extends IDatagridDataType = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType, {}>) {
     useDimensions();
     const { viewNames, viewName } = useMemo(() => {
         const registeredViewNames = Object.keys(DatagridView.getRegisteredViewsWithOptions()) as IDatagridViewName[];
@@ -2650,7 +2613,9 @@ function Datagrid<DataType extends IDatagridDataType = any>({ viewName: cViewNam
         {...props as any}
         {...restProps}
     />;
-}
+} as IDatagridExported;
+
+(Datagrid as any).View = DatagridView;
 
 
 function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridLoadingIndicatorProps> }) {
@@ -2716,9 +2681,40 @@ function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIndi
 }
 
 
-const DatagridExported: typeof Datagrid & {
-    Column: typeof DatagridViewColumn;
+interface IDatagridExported<DataType extends IDatagridDataType = any> extends React.FC<IDatagridProps<DataType>> {
+
+    /**
+     * A flexible and feature-rich data grid component for React Native.
+     * 
+     * The `DatagridView` class provides a powerful grid system for displaying, sorting, filtering, grouping, and paginating data.
+     * It supports advanced features such as column aggregation, custom view names, and session-based state persistence.
+     * 
+     * @template DataType - The type of the data shown in the grid.
+     * @template PropsExtensions - The type of the component's props. This type is used to extend the component's props with additional properties.
+     * @template StateExtensions - The type of the component's state. This type is used to extend the component's state with additional properties.
+     * 
+     * @example
+     * ```tsx
+     *  // Extending DatagridView externally to add a custom view
+     *  import {AttachDatagridView} from "@resk/native";
+     *  interface IDatagridTableViewProps<DataType extends IDatagridDataType = any> {}
+     *
+     *   declare module "@resk/native" {
+     *       export interface IDatagridViews {
+     *           table: IDatagridTableViewProps;
+     *       }
+     *   }
+     *  @AttachDatagridView({name: "table", label: "Table"})
+     *  class DatagridTableView<DataType extends IDatagridDataType = any> extends DatagridView<DataType, IDatagridTableViewProps> {
+     *      _render(){
+     *          //render table view
+     *      }
+     *  }
+     * ```
+     */
     View: typeof DatagridView;
+
+
     /**
      * A loading indicator component for the DatagridView.
      * 
@@ -2767,16 +2763,14 @@ const DatagridExported: typeof Datagrid & {
      * null if the loading indicator is not to be rendered.
      */
     PreloaderLoadingIndicator: typeof PreloaderLoadingIndicator;
-} = Datagrid as any;
+}
 
-DatagridExported.Column = DatagridViewColumn;
-DatagridExported.View = DatagridView;
-DatagridExported.LoadingIndicator = LoadingIndicator;
-DatagridExported.DefaultLoadingIndicator = DefaultLoadingIndicator;
-DatagridExported.PreloaderLoadingIndicator = PreloaderLoadingIndicator;
+Datagrid.displayName = "Datagrid";
+Datagrid.LoadingIndicator = LoadingIndicator;
+Datagrid.DefaultLoadingIndicator = DefaultLoadingIndicator;
+Datagrid.PreloaderLoadingIndicator = PreloaderLoadingIndicator;
 
-export { DatagridExported as Datagrid };
-
+export { Datagrid };
 
 /****************** export interfaces section */
 
@@ -3902,6 +3896,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "flex-start",
     },
+    toolbarButton: {},
     toolbarContainer: {
         flex: 1,
         flexDirection: 'row',

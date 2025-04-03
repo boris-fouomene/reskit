@@ -4012,7 +4012,6 @@ export interface IDatagridLoadingIndicatorProps extends Record<string, any> {
 const styles = StyleSheet.create({
     contentContainer: {
         width: "100%",
-        flexGrow: 1,
     },
     main: {
         width: "100%",

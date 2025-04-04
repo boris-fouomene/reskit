@@ -256,13 +256,13 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const testId = this.getTestID();
         const isRowCell = renderType === "rowCell" && isObj(rowData);
         if (renderType === "rowCell" && !isRowCell) return null;
-        const rowKey = isRowCell ? this.getRowKey(rowData as DataType) : String(column.name);
         return <Component<DataType>
             {...column}
             renderType={renderType}
             datagridContext={this as any}
-            testID={`${testId}-column-${columnName}`}
-            key={`${testId}-cell-${columnName}-${rowKey}`}
+            testID={`${testId}-column-${columnName}-cell`}
+            rowData={rowData}
+            key={`cell-${columnName}`}
         />;
     }
     /**
@@ -345,11 +345,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             return <React.Fragment key={rowKey}>{this.renderTableGroupedRow(rowData, rowIndex)}</React.Fragment>
         }
         const visibleColumns = this.getVisibleColumns();
-        return <>
-            {visibleColumns.map((column, columnIndex) => <React.Fragment key={rowKey}>
+        return <React.Fragment key={rowKey}>
+            {visibleColumns.map((column, columnIndex) => <React.Fragment key={column.name}>
                 {this.renderTableCell(column.name, rowData, rowIndex)}
             </React.Fragment>)}
-        </>
+        </React.Fragment>
     }
     /**
      * Renders a cell in the grid for a given column and row data.
@@ -2461,7 +2461,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      */
     computeCellValue(rowData: DataType, format: boolean = false) {
         if (!this.isRowCell()) return null;
-        return this.getDatagridContext().computeCellValue(this.props.name, rowData, format);
+        return this.getDatagridContext().computeCellValue(this.getName(), rowData, format);
     }
     /**
      * Returns a state column definition by name.

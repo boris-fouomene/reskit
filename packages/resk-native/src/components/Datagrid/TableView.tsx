@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Datagrid, AttachDatagridView, useDatagrid, IDatagridViewRowOrGroup, IDatagridViewName } from "./Datagrid";
-import { FlatList, SectionList } from "react-native";
+import { FlatList, SectionList, StyleSheet, View } from "react-native";
+import test from "node:test";
 
 export interface IDatagridTableViewProps<DataType extends object = any> {
 
@@ -17,12 +18,14 @@ declare module "./Datagrid" {
 })
 export class DatagridTableView<DataType extends object = any> extends Datagrid.View<DataType, IDatagridTableViewProps> {
     renderTableHeader() {
-        return <Columns datagridContext={this} />
+        return <View style={styles.headers}>
+            <Columns datagridContext={this} />
+        </View>
     }
     getViewName(): IDatagridViewName {
         return "table";
     }
-    _render() {
+    renderTableBody() {
         return <DatagridTableViewRendered<DataType>
             context={this}
         />
@@ -82,9 +85,10 @@ function Rows<DataType extends object = any>({ datagridContext, rowData, rowInde
     const rowsCells = useMemo(() => {
         return datagridContext.renderTableRow(rowData, rowIndex);
     }, [rowData, visibleColumns]);
-    return <>
+    const testID = datagridContext.getTestID();
+    return <View testID={testID + "-row"} style={[styles.row]}>
         {rowsCells}
-    </>;
+    </View>;
 }
 Rows.displayName = "DatagridTableView.Rows";
 
@@ -104,3 +108,16 @@ function t() {
         ]}
     />
 }
+
+const styles = StyleSheet.create({
+    headers: {
+        flexDirection: 'row',
+        borderBottomWidth: 2,
+        alignItems: 'center',
+    },
+    row: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        alignItems: 'center',
+    },
+})

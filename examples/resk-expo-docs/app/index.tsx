@@ -1,35 +1,13 @@
 import i18n from "@resk/core/i18n";
 import { TextInput, withAppBar, Datagrid, Surface, Grid, BottomSheet, withAppMounted, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
-import { View, ScrollView, StyleSheet } from 'react-native'
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { DatagridExample } from "./_datagrid";
 
 const index = withAppBar(() => {
     return (
         <ScrollView>
-            <Datagrid
-                data={[
-                    {
-                        label: "One",
-                    }
-                ]}
-                tableViewProps={{
-                    myExample: "test"
-                }}
-                actions={[
-                    {
-                        label: "An action",
-                        icon: "check",
-                        onPress: (event, { datagridContext }) => {
-                            console.log(datagridContext, " is dddddddddd")
-                        }
-                    }
-                ]}
-                columns={[
-                    {
-                        name: "label",
-                        type: "text",
-                        label: "Abc"
-                    }
-                ]}
+            <DatagridExample
+                count={5}
             />
             <View style={{ margin: 10 }}>
                 <Button mode="contained" onPress={() => console.log("Pressed")}

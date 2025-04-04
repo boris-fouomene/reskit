@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { Datagrid, AttachDatagridView, useDatagrid, IDatagridViewRowData, IDatagridViewName } from "./Datagrid";
+import { Datagrid, AttachDatagridView, useDatagrid, IDatagridViewRowOrGroup, IDatagridViewName } from "./Datagrid";
+import { FlatList, SectionList } from "react-native";
 
 export interface IDatagridTableViewProps<DataType extends object = any> {
 
@@ -21,8 +22,10 @@ export class DatagridTableView<DataType extends object = any> extends Datagrid.V
     getViewName(): IDatagridViewName {
         return "table";
     }
-    renderTableRow(rowData: IDatagridViewRowData<DataType>, rowIndex: number) {
-        return <Rows datagridContext={this} rowData={rowData} rowIndex={rowIndex} />
+    _render() {
+        return <DatagridTableViewRendered<DataType>
+            context={this}
+        />
     }
 }
 
@@ -43,7 +46,38 @@ function Columns<DataType extends object = any>({ datagridContext }: IDatagridTa
 }
 Columns.displayName = "DatagridTableView.Columns";
 
-function Rows<DataType extends object = any>({ datagridContext, rowData, rowIndex }: IDatagridTableViewCommonProps<DataType> & { rowData: IDatagridViewRowData<DataType>, rowIndex: number }): JSX.Element | null {
+
+function DatagridTableViewRendered<DataType extends object = any>({ context }: { context: DatagridTableView<DataType> }) {
+    const stateData = context.getData();
+    const hasGroupedRows = context.hasGroupedRows();
+    const { Component, props } = useMemo(() => {
+        return {
+            Component: hasGroupedRows ? SectionList : FlatList,
+            props: hasGroupedRows ? {
+                sections: stateData,
+            } : {
+                data: stateData,
+            },
+        };
+    }, [hasGroupedRows, stateData]);
+    const C = Component as any;
+    return <C
+        {...props}
+        renderSectionHeader={(options: any) => {
+            console.log("rendering section ", options);
+            return null;
+        }}
+        renderItem={function ({ item: rowData, index: rowIndex }: { item: DataType, index: number }) {
+            return <Rows
+                rowData={rowData}
+                rowIndex={rowIndex}
+                datagridContext={context}
+            />
+        }}
+    />
+}
+
+function Rows<DataType extends object = any>({ datagridContext, rowData, rowIndex }: IDatagridTableViewCommonProps<DataType> & { rowData: DataType, rowIndex: number }): JSX.Element | null {
     const visibleColumns = datagridContext.getVisibleColumns();
     const rowsCells = useMemo(() => {
         return datagridContext.renderTableRow(rowData, rowIndex);

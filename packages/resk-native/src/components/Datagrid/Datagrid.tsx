@@ -109,10 +109,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * If the `isRowSelectable` property is a function, it calls the function with the provided row data and the current component's state and props.
      * Otherwise, it returns true, indicating that the row is selectable.
      *
-     * @param {IDatagridViewRowData<DataType>} rowData - The data of the row to check selection status for.
+     * @param {IDatagridViewRowOrGroup<DataType>} rowData - The data of the row to check selection status for.
      * @returns {boolean} - Returns `true` if the row is selectable, `false` otherwise.
      */
-    isRowSelectable(rowData: IDatagridViewRowData<DataType>) {
+    isRowSelectable(rowData: IDatagridViewRowOrGroup<DataType>) {
         if (!this.isSelectable() || this.isGroupedRow(rowData)) return false;
         if (typeof this.props.isRowSelectable === "function") return this.props.isRowSelectable(this.getCallOptions({ rowData }));
         return true;
@@ -187,6 +187,22 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (!isNonNullString(columnName)) return {} as Record<keyof IDatagridAggregationFunctions, number>;
         const o = this.getAggregatedColumnsValues();
         return isObj(o) && isObj(o[columnName]) ? o[columnName] : {} as Record<keyof IDatagridAggregationFunctions, number>;
+    }
+
+    /**
+     * Renders the table structure including the header, body, and footer.
+     * 
+     * This method returns a JSX fragment containing the rendered components
+     * for the table header, body, and footer, which together constitute the
+     * complete table layout.
+     * Each Datagrid table view must implement or override this method.
+     */
+    _render() {
+        return <>
+            {this.renderTableHeader()}
+            {this.renderTableBody()}
+            {this.renderTableFooter()}
+        </>
     }
     /**
      * Returns an object containing the aggregated values for all columns in the grid.
@@ -317,12 +333,12 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * grouped rows. If the row is a grouped row, it will be rendered using the
      * `renderTableGroupedRow` method. Otherwise, it will be rendered as a regular row.
      * 
-     * @param {IDatagridViewRowData<DataType>} rowData - The row data to render.
+     * @param {IDatagridViewRowOrGroup<DataType>} rowData - The row data to render.
      * @param {number} rowIndex - The index of the row in the state data array.
      * 
      * @returns The rendered row, or null if the row should not be displayed.
      */
-    renderTableRow(rowData: IDatagridViewRowData<DataType>, rowIndex: number) {
+    renderTableRow(rowData: IDatagridViewRowOrGroup<DataType>, rowIndex: number) {
         const rowKey = this.getRowKey(rowData);
         if (!rowKey) return null;
         if (this.isGroupedRow(rowData)) {
@@ -360,7 +376,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @param {rowIndex} the index of the row from state data
      * @returns The rendered grouped row.
      */
-    renderTableGroupedRow(rowData: IDatagridViewGroupedRowData, rowIndex: number) {
+    renderTableGroupedRow(rowData: IDatagridViewGroupedRow<DataType>, rowIndex: number) {
         return null;
     }
 
@@ -1429,6 +1445,41 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     }
 
     /**
+     * Determines if the datagrid has grouped data.
+     * 
+     * This method checks if the datagrid is groupable and if there are any grouped columns.
+     * 
+     * @returns {boolean} - Returns true if the datagrid is groupable and has grouped columns, otherwise false.
+     */
+    hasGroupedRows(): boolean {
+        return this.isGroupable() && this.state.groupedColumns.length > 0;
+    }
+
+    /**
+     * Retrieves all data stored in the component's state.
+     * 
+     * This method returns the complete set of data present in the `allData` state.
+     * If `allData` is not an array, it returns an empty array.
+     * 
+     * @returns {DataType[]} - An array of all data objects.
+     */
+    getAllData(): DataType[] {
+        return Array.isArray(this.state.allData) ? this.state.allData : [];
+    }
+
+    /**
+     * Retrieves the data from state displayed in the datagrid.
+     * 
+     * This method returns the array of data objects that are currently displayed in the datagrid.
+     * If the `data` state is not an array, it returns an empty array.
+     * 
+     * @returns {DataType[]} - An array of data objects.
+     */
+    getData() {
+        return Array.isArray(this.state.data) ? this.state.data : [];
+    }
+
+    /**
      * Computes the value of a column for a given row.
      * 
      * @param {IDatagridViewStateColumn | string} column - The column object or column name.
@@ -1468,7 +1519,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     /**
      * Retrieves the key for a given row.
      * 
-     * @param {IDatagridViewRowData<DataType>} rowData - The data for the row.
+     * @param {IDatagridViewRowOrGroup<DataType>} rowData - The data for the row.
      * 
      * @returns {string} - The key for the row.
      * 
@@ -1478,9 +1529,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * console.log(rowKey); // Output: "1"
      * ```
      */
-    getRowKey(rowData: IDatagridViewRowData<DataType>): string {
+    getRowKey(rowData: IDatagridViewRowOrGroup<DataType>): string {
         if (this.isGroupedRow(rowData)) {
-            return String(rowData.label).replace(/\s/g, '');
+            return String(rowData.datagridGroupedRowKey).trim().replace(/\s/g, '_');
         }
         let k: any = undefined;
         if (typeof (this.props.getRowKey) === "function") {
@@ -1498,12 +1549,14 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * This method checks if the row data is an object and contains the properties 
      * indicating it is a grouped row, such as `isDatagridGroupedRowData` and a valid `label`.
      * 
-     * @param {IDatagridViewRowData<DataType>} rowData - The row data to evaluate.
+     * @param {IDatagridViewRowOrGroup<DataType>} rowData - The row data to evaluate.
      * 
      * @returns {boolean} - Returns true if the row data is a grouped row; otherwise, false.
      */
-    isGroupedRow(rowData: IDatagridViewRowData<DataType>): rowData is IDatagridViewGroupedRowData {
-        return isObj(rowData) && !!(rowData as IDatagridViewGroupedRowData).isDatagridGroupedRowData && !!isNonNullString((rowData as IDatagridViewGroupedRowData).label);
+    isGroupedRow(rowData: IDatagridViewRowOrGroup<DataType>): rowData is IDatagridViewGroupedRow<DataType> {
+        return isObj(rowData) &&
+            !!Array.isArray((rowData as IDatagridViewGroupedRow).data) &&
+            !!(rowData as IDatagridViewGroupedRow).isDatagridGroupedRowData && !!isNonNullString((rowData as IDatagridViewGroupedRow).label);
     }
     /**
      * Sorts the data in ascending or descending order according to the specified columns and directions.
@@ -1731,7 +1784,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {Partial<IDatagridViewState<DataType, StateExtensions>>} - A partial state object containing the aggregated columns values, the paginated data, the all data, the data to display, the pagination configuration, and the grouped rows by keys.
      */
     processData(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination): Partial<IDatagridViewState<DataType, any>> {
-        let processingData: DataType[] = [];
+        let allData: DataType[] = [];
         const paginationConfig: IDatagridPagination = isObj(pagination) ? pagination as IDatagridPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridPagination;
         const canPaginate = this.canPaginate();
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
@@ -1749,16 +1802,16 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 return;
             }
             (rowsByKeys as any)[rowKey] = rowData;
-            processingData.push(rowData);
+            allData.push(rowData);
             this.computeAggregationsForRow(rowData, index, aggregationFunctions, aggregatedColumnsValues, data);
         });
-        paginationConfig.total = processingData.length;
+        paginationConfig.total = allData.length;
         paginationConfig.currentPage = isNumber(paginationConfig.currentPage) && paginationConfig.currentPage > 0 ? paginationConfig.currentPage : 1;
         paginationConfig.pageSize = isNumber(paginationConfig.pageSize) && paginationConfig.pageSize > 0 ? paginationConfig.pageSize : 10;
-        processingData = this.internalSort(processingData, orderBy);
-        let paginatedData = processingData;
+        allData = this.internalSort(allData, orderBy);
+        let paginatedData: DataType[] = allData;
         if (canPaginate) {
-            const { data: rData, meta } = ResourcePaginationHelper.paginate(processingData, paginationConfig.total, {
+            const { data: rData, meta } = ResourcePaginationHelper.paginate(allData, paginationConfig.total, {
                 ...paginationConfig,
                 limit: paginationConfig.pageSize,
                 page: paginationConfig.currentPage
@@ -1766,25 +1819,25 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             Object.assign(paginationConfig, meta);
             paginatedData = rData;
         }
-        const stateData: IDatagridViewState<DataType>["data"] = isGroupable ? [] : processingData;
+        const stateData: IDatagridViewState<DataType>["data"] = isGroupable ? [] : paginatedData;
         const unknowGroupLabel = "N/A";
         if (isGroupable) {
             paginatedData.map((rowData, rowIndex) => {
-                const groupableKey = defaultStr(this.computeGroupedRowHeader(rowData, groupedColumns), unknowGroupLabel);
-                const groupedRowHeader = {
-                    label: groupableKey,
+                const groupedRowLabel = defaultStr(this.computeGroupedRowHeader(rowData, groupedColumns), unknowGroupLabel);
+                const groupedRowKey = groupedRowLabel.trim().replace(/\s/g, '_');
+                const groupedRow: IDatagridViewGroupedRow<DataType> = {
+                    label: groupedRowLabel,
                     isDatagridGroupedRowData: true,
-                    groupedKey: groupableKey,
-                } as IDatagridViewGroupedRowData;
-                if (!isObj(groupedRowsByKeys[groupableKey]) || !groupedRowsByKeys[groupableKey]) {
-                    (groupedRowsByKeys as any)[groupableKey] = {
-                        data: [],
-                        aggregatedColumnsValues: this.initAggregationComputation().aggregatedColumnsValues,
-                    };
+                    datagridGroupedRowKey: groupedRowKey,
+                    data: [],
+                    aggregatedColumnsValues: this.initAggregationComputation().aggregatedColumnsValues,
+                };
+                if (!groupedRowsByKeys[groupedRowKey]) {
+                    (groupedRowsByKeys as any)[groupedRowKey] = groupedRow;
                 }
-                groupedRowsByKeys[groupableKey].data.push(rowData);
-                stateData.push(groupedRowHeader);
-                stateData.push(rowData);
+                groupedRowsByKeys[groupedRowKey].data.push(rowData);
+                (stateData as Array<IDatagridViewGroupedRow<DataType>>).push(groupedRow);
+                //stateData.push(rowData);
             });
             /***
              * We compute aggregation values for each grouped row key
@@ -1798,7 +1851,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 }
             }
         }
-        return { aggregatedColumnsValues, paginatedData, allData: processingData, data: stateData, pagination: paginationConfig, groupedRowsByKeys, rowsByKeys };
+        return { aggregatedColumnsValues, paginatedData, allData, data: stateData, pagination: paginationConfig, groupedRowsByKeys, rowsByKeys };
     }
     /**
      * Checks if two arrays are equal.
@@ -1903,9 +1956,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 {this.renderToolbar()}
                 {this.renderLoadingIndicator()}
                 <View testID={testID + "-content-container"} style={[styles.contentContainer, contentContainerStyle, this.getContentContainerStyle()]}>
-                    {this.renderTableHeader()}
-                    {this.renderTableBody()}
-                    {this.renderTableFooter()}
+                    {this._render()}
                 </View>
             </View>
         </DatagridContext.Provider>
@@ -3597,6 +3648,7 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
     renderHeader?: (options: IDatagridViewCallOptions<DataType> & { column: IDatagridViewStateColumn<DataType> }) => React.ReactNode;
 }
 
+
 /**
  * Represents the state of the DatagridView component.
  * @typedef IDatagridViewState
@@ -3608,11 +3660,9 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
     /**
      * The data to be shown in the grid.
      * 
-     * This property contains an array of either grouped rows or data rows.
-     * 
-     * @see {@link IDatagridViewRowData} for more information about the data state.
+     * This property contains either an array of grouped rows or an array of data rows.
      */
-    data: Array<IDatagridViewRowData<DataType>>;
+    data: Array<IDatagridViewGroupedRow<DataType>> | Array<DataType>;
 
     /**
      * The entire dataset, including all rows and columns.
@@ -3675,10 +3725,7 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
      * 
      * This property allows for efficient lookup of grouped rows by their keys.
      */
-    groupedRowsByKeys: Record<string, {
-        data: DataType[];
-        aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>;
-    }>;
+    groupedRowsByKeys: Record<string, IDatagridViewGroupedRow<DataType>>;
 
     /**
      * The current order by configuration of the grid.
@@ -3866,10 +3913,10 @@ export type IDatagridAggregator = keyof IDatagridAggregationFunctions;
 
 /**
  * An interface representing a grouped row in the DatagridView component.
- * @typedef IDatagridViewGroupedRowData
+ * @typedef IDatagridViewGroupedRow
  * @template DataType - The type of the data shown in the grid.
  */
-export interface IDatagridViewGroupedRowData {
+export interface IDatagridViewGroupedRow<DataType extends object = any> {
     /**
      * A flag indicating that this is a grouped row.
      */
@@ -3881,14 +3928,24 @@ export interface IDatagridViewGroupedRowData {
     /**
      * The key of the grouped row.
      */
-    groupedKey: string;
+    datagridGroupedRowKey: string;
+
+    /***
+     * The data of the grouped row.
+     */
+    data: DataType[];
+
+    /***
+     * The aggregated values of the grouped row.
+     */
+    aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>;
 }
 
 
 /**
  * Represents the data structure for a row in the DatagridView component.
  * 
- * The `IDatagridViewRowData` type is a union type that can represent either a standard data row
+ * The `IDatagridViewRowOrGroup` type is a union type that can represent either a standard data row
  * or a grouped row in the DatagridView. This allows the grid to handle both individual data rows
  * and grouped rows seamlessly.
  * 
@@ -3903,30 +3960,30 @@ export interface IDatagridViewGroupedRowData {
  *   age: number;
  * }
  * 
- * const rowData: IDatagridViewRowData<User> = {
+ * const rowData: IDatagridViewRowOrGroup<User> = {
  *   id: 1,
  *   name: "John Doe",
  *   age: 30,
  * };
  * 
  * // Example of a grouped row
- * const groupedRowData: IDatagridViewRowData<User> = {
+ * const groupedRowData: IDatagridViewRowOrGroup<User> = {
  *   isDatagridGroupedRowData: true,
  *   label: "Age Group: 30-40",
- *   groupedKey: "ageGroup_30_40",
+ *   datagridGroupedRowKey: "ageGroup_30_40",
  * };
  * ```
  * 
  * @remarks
  * - Standard data rows are represented by the `DataType` type.
- * - Grouped rows are represented by the `IDatagridViewGroupedRowData` interface, which includes additional metadata for grouping.
+ * - Grouped rows are represented by the `IDatagridViewGroupedRow` interface, which includes additional metadata for grouping.
  * - This type is used internally by the DatagridView component to handle both individual and grouped rows.
  * 
- * @see {@link IDatagridViewGroupedRowData} for the structure of grouped rows.
+ * @see {@link IDatagridViewGroupedRow} for the structure of grouped rows.
  */
-export type IDatagridViewRowData<DataType extends object = any> =
+export type IDatagridViewRowOrGroup<DataType extends object = any> =
     | DataType
-    | IDatagridViewGroupedRowData;
+    | IDatagridViewGroupedRow<DataType>;
 
 /**
  * An interface representing the view name map of the DatagridView component.

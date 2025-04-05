@@ -5,9 +5,11 @@ import {
     ScrollView,
     Pressable,
     LayoutChangeEvent,
-    LayoutRectangle
+    LayoutRectangle,
+    Dimensions,
+    ViewStyle
 } from 'react-native';
-import { Component, ObservableComponent, getReactKey, getTextContent, useForceRender, useIsMounted } from '@utils/index';
+import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted } from '@utils/index';
 import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
 import { IField, IFieldType, IMergeWithoutDuplicates, IResourcePaginationMetaData, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from '@resk/core/types';
@@ -34,6 +36,20 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     private static aggregationFunctionMetadataKey = Symbol("datagrid-aggregation-functions-meta");
     private _isLoading: boolean = false;
     private _toggleLoading: boolean = false;
+    private _containerRef: React.RefObject<View> = { current: null };
+    private _contentContainerRef: React.RefObject<View> = { current: null };
+    private _toolbarActionsContainerRef: React.RefObject<View> = { current: null };
+    private dimensionsBindListener: { remove: Function } | null = null;
+    static MIN_HEIGHT: number = 100;
+    public get containerRef() {
+        return this._containerRef;
+    }
+    public get contentContainerRef() {
+        return this._contentContainerRef;
+    }
+    public get toolbarActionsContainerRef() {
+        return this._toolbarActionsContainerRef;
+    }
     /***
      * A set of selected rows keys.
      */
@@ -129,9 +145,58 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const { layout } = event.nativeEvent;
         const { width, height } = this.getContainerLayout();
         if (Math.abs(layout.width - width) <= 50 && Math.abs(layout.height - height) <= 50) return;
-        this.setState({ containerLayout: layout } as IDatagridViewState<DataType, StateExtensions>);
+        this.measureLayout().then((r) => {
+            this.setState({ ...r, isLayoutMeasured: true } as IDatagridViewState<DataType, StateExtensions>);
+        });
     }
 
+    /**
+     * Measures the layout of the given view ref.
+     *
+     * This method returns a promise that resolves with the layout coordinates of the given view ref.
+     * If the `measure` method of the view is available, it is called instead of `measureInWindow` to measure the layout.
+     * @param {React.RefObject<View>} ref - The reference to the view to measure.
+     * @returns {Promise<{ x: number, y: number, width: number, height: number, pageX: number, pageY: number }>} A promise that resolves with the layout coordinates of the view.
+     * @private
+     */
+    protected measureViewLayout(ref: React.RefObject<View>): Promise<IDatagridViewMeasuredLayout> {
+        return new Promise((resolve, reject) => {
+            if (typeof ref.current?.measure === "function") {
+                return ref.current.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
+                    resolve({
+                        x,
+                        y,
+                        width,
+                        height,
+                        pageX,
+                        pageY,
+                    })
+                });
+            } else {
+                measureInWindow(ref).then((r) => {
+                    resolve(Object.assign(r, { pageX: 0, pageY: 0 }));
+                }).catch(reject);
+            }
+        })
+    }
+    /**
+     * Measures the layout of the DatagridView's container and content container views.
+     *
+     * This method returns a promise that resolves with an object containing the layout coordinates of both the container view and the content container view.
+     * The properties of the resolved object are `containerLayout` and `contentContainerLayout`.
+     * These properties are objects with the following properties: `x`, `y`, `width`, `height`, `pageX`, and `pageY`.
+     * The `pageX` and `pageY` properties are only available if the view is positioned relative to the window, otherwise they are `0`.
+     * @returns {Promise<{ containerLayout: IDatagridViewMeasuredLayout, contentContainerLayout: IDatagridViewMeasuredLayout,toolbarActionsContainerLayout:IDatagridViewMeasuredLayout}>} A promise that resolves with an object containing the layout coordinates of both the container view and the content container view.
+     */
+    measureLayout() {
+        return Promise.all([
+            measureInWindow(this.containerRef),
+            this.measureViewLayout(this.contentContainerRef),
+            this.measureViewLayout(this.toolbarActionsContainerRef),
+        ]).then(([containerLayout, contentContainerLayout, toolbarActionsContainerLayout]) => {
+            return { containerLayout, contentContainerLayout, toolbarActionsContainerLayout }
+        });
+    }
     /**
      * Returns the list of visible columns in the DatagridView.
      * 
@@ -171,6 +236,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
     getAggregatableColumns() {
         return this.state.aggregatableColumns;
+    }
+    componentWillUnmount(): void {
+        super.componentWillUnmount();
+        typeof this.dimensionsBindListener?.remove == "function" && this.dimensionsBindListener?.remove();
     }
     /**
      * Retrieves the aggregated values for a specific column.
@@ -446,7 +515,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {boolean} `true` if the loading indicator can be rendered, `false` otherwise.
      */
     canShowLoadingIndicator() {
-        return this.isLoading() || this._isLoading;
+        return this.isLoading() || this._isLoading || !this.state.isLayoutMeasured;
     }
     /**
      * Sets the loading state of the DatagridView and triggers the "toggleIsLoading" event.
@@ -611,15 +680,31 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
     constructor(props: IDatagridViewProps<DataType, PropsExtensions>) {
         super(props);
+        this.dimensionsBindListener = Dimensions.addEventListener("change", this.onDimensionsChange.bind(this));
         (this as any).state = {
             ...this.initStateFromSessionData(),
             columnsWidths: {},
             containerLayout: {
                 x: 0, y: 0, width: 0, height: 0
-            }
-        };
+            },
+            contentContainerLayout: {
+                x: 0, y: 0, width: 0, height: 0,
+            },
+            toolbarActionsContainerLayout: {
+                x: 0, y: 0, width: 0, height: 0,
+            },
+            isLayoutMeasured: true,
+        } as IDatagridViewState<DataType>;
         Object.assign(this.state, this.processColumns());
         Object.assign(this.state, this.processData(this.props.data));
+    }
+    onDimensionsChange() {
+        if (this.props.bindDimensionsChangeEvent === false) {
+            return;
+        }
+        this.measureLayout().then((r) => {
+            this.setState({ ...r, isLayoutMeasured: true } as IDatagridViewState<DataType, StateExtensions>);
+        });
     }
     getColumnWidth(colName: string) {
         const column = this.getColumn(colName);
@@ -636,7 +721,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return 170;
     }
 
-    getContainerLayout(): LayoutRectangle {
+    getContainerLayout(): IDatagridViewMeasuredLayout {
         return this.state.containerLayout;
     }
     /**
@@ -1946,16 +2031,72 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     getTestID() {
         return defaultStr(this.props.testID, "resk-datagrid");
     }
+
+
+    /**
+     * Retrieves the minimum height of the DatagridView component.
+     * 
+     * The method returns the value of the `minHeight` property if it is a number, otherwise it returns the constant `DatagridView.MIN_HEIGHT`.
+     * 
+     * @returns {number} The minimum height of the DatagridView component.
+     */
+    getMinHeight(): number {
+        return defaultNumber(this.props.minHeight, DatagridView.MIN_HEIGHT);
+    }
+
+    /**
+     * Retrieves the maximum height of the DatagridView component.
+     * 
+     * The method returns the maximum of the value of the `maxHeight` property and the minimum height of the component.
+     * 
+     * @returns {number} The maximum height of the DatagridView component.
+     */
+    getMaxHeight(): number {
+        const m = defaultNumber(this.props.maxHeight);
+        const screenHeight = Dimensions.get("window").height - 100;
+        if (m > 0) return Math.min(m,);
+        return Math.min(screenHeight, Math.max(screenHeight, this.getMinHeight(), 0));
+    }
+    /**
+     * Calculates the heights of the DatagridView component.
+     * 
+     * The method takes into account the height of the parent container, the position of the DatagridView component
+     * within the parent container, the minimum and maximum heights of the DatagridView component, and the height of the
+     * content container. The method returns an object with the following properties:
+     * 
+     * - `minHeight`: The minimum height of the DatagridView component.
+     * - `maxHeight`: The maximum height of the DatagridView component.
+     * - `availableHeight`: The available height of the DatagridView component.
+     * - `parentBottom`: The bottom position of the parent container.
+     * 
+     * @returns {Object} An object with the calculated heights of the DatagridView component.
+     */
+    calculateHeights() {
+        const { containerLayout: { y: parentPageY, height: parentHeight }, contentContainerLayout: { pageY }, toolbarActionsContainerLayout: { height: toolbarHeight } } = this.state;
+        const minHeight = this.getMinHeight();
+        const maxHeight = this.getMaxHeight();
+        //const containerRelativeY = Math.max(defaultNumber(pageY) - parentPageY, 0);
+        //const availableHeight = defaultNumber(Math.max(parentHeight - containerRelativeY - 20, minHeight, 0));
+        const availableHeight = maxHeight - defaultNumber(toolbarHeight);
+        return {
+            minHeight,
+            maxHeight,
+            availableHeight: Math.max(availableHeight, 100),
+        };
+    }
     render(): JSX.Element | null {
         const testID = this.getTestID();
         const isLoading = this.isLoading();
         const { containerStyle, contentContainerStyle } = this.props;
+        const { minHeight, maxHeight, availableHeight } = this.calculateHeights();
         return <DatagridContext.Provider value={this}>
-            <View testID={testID + "-container"} style={[styles.main, isLoading && styles.disabled, containerStyle, this.getContainerStyle()]} onLayout={this.onContainerLayout.bind(this)}>
-                {<DatagridView.Actions />}
-                {this.renderToolbar()}
-                {this.renderLoadingIndicator()}
-                <View testID={testID + "-content-container"} style={[styles.contentContainer, contentContainerStyle, this.getContentContainerStyle()]}>
+            <View ref={this.containerRef} testID={testID + "-container"} style={[styles.container, isNumber(minHeight) && minHeight > 0 && { minHeight }, { maxHeight }, isLoading && styles.disabled, containerStyle, this.getContainerStyle()]} onLayout={this.onContainerLayout.bind(this)}>
+                <View ref={this.toolbarActionsContainerRef} testID={testID + "-toolbar-actions-container"} style={styles.toolbarActionsContainer}>
+                    {<DatagridView.Actions />}
+                    {this.renderToolbar()}
+                    {this.renderLoadingIndicator()}
+                </View>
+                <View ref={this.contentContainerRef} testID={testID + "-content-container"} style={[styles.contentContainer, { maxHeight: availableHeight }, contentContainerStyle, this.getContentContainerStyle()]}>
                     {this._render()}
                 </View>
             </View>
@@ -3341,6 +3482,22 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * @remarks Toolbar actions are rendered in the order they are defined. Toolbar represents the top-right area of the DatagridView, rendered directly under the actions bar.
      */
     toolbarActions?: ((options: IDatagridViewCallOptions<DataType, PropsExtensions>) => ((IDatagridToolbarAction<DataType> | null)[])) | (IDatagridToolbarAction<DataType> | null)[];
+
+    /**
+     * Minimum height the DataGrid should maintain
+     */
+    minHeight?: number;
+
+    /**
+     * Maximum height the DataGrid can expand to
+     */
+    maxHeight?: number;
+
+    /***
+     * Whether to bind the dimensions change event and update the component's state
+     * Default is true
+     */
+    bindDimensionsChangeEvent?: boolean;
 } & PropsExtensions;
 
 
@@ -3648,7 +3805,10 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
     renderHeader?: (options: IDatagridViewCallOptions<DataType> & { column: IDatagridViewStateColumn<DataType> }) => React.ReactNode;
 }
 
-
+interface IDatagridViewMeasuredLayout extends LayoutRectangle {
+    pageX: number;
+    pageY: number;
+}
 /**
  * Represents the state of the DatagridView component.
  * @typedef IDatagridViewState
@@ -3799,7 +3959,22 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
     /**
      * The layout of the view container.
      */
-    containerLayout: LayoutRectangle;
+    containerLayout: IDatagridViewMeasuredLayout;
+
+    /***
+     * The layout of the table.
+     */
+    contentContainerLayout: IDatagridViewMeasuredLayout;
+
+    /***
+     * toolbarActionsContainerLayout
+     */
+    toolbarActionsContainerLayout: IDatagridViewMeasuredLayout;
+
+    /**
+     * Wheither the layout has been measured.
+     */
+    isLayoutMeasured: boolean;
 
     columnsWidths: Record<string, number>;
 
@@ -4067,12 +4242,17 @@ export interface IDatagridLoadingIndicatorProps extends Record<string, any> {
 
 
 const styles = StyleSheet.create({
+    container: {
+        width: "100%",
+        position: "relative",
+    },
     contentContainer: {
         width: "100%",
+        overflow: "hidden",
     },
-    main: {
+    toolbarActionsContainer: {
         width: "100%",
-        minHeight: 100,
+        alignSelf: "flex-start",
     },
     disabled: {
         pointerEvents: "none",
@@ -4084,8 +4264,6 @@ const styles = StyleSheet.create({
         minWidth: '100%',
     },
     headerScrollView: {
-        flex: 1,
-        flexGrow: 1,
         width: '100%',
         flexDirection: 'row'
     },

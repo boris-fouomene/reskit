@@ -17,7 +17,6 @@ export function DatagridExample({ count, ...props }) {
         }}
         sessionName="datagrid-test-data"
         rowKey={"userId"}
-        containerStyle={{ maxHeight: 500 }}
         columns={[
             {
                 type: "number",

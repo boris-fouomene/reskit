@@ -4388,7 +4388,6 @@ const styles = StyleSheet.create({
     },
     columnHeaderLabelContainer: {
         flexWrap: "wrap",
-        flexGrow: 1,
         alignSelf: "flex-start",
     },
     toolbarButton: {},

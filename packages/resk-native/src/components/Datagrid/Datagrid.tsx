@@ -523,7 +523,56 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return null;
     }
 
-
+    /**
+     * Retrieves the appropriate sort icon based on the column type and sort direction.
+     * 
+     * This method determines the sort icon to be displayed for a given column name in the DatagridView.
+     * It checks if the column is sortable and if it is part of the current sorting order. Based on the
+     * column type and direction ("asc" or "desc"), it returns a corresponding icon name.
+     * 
+     * @param {keyof DataType | string} columnName - The name of the column for which to retrieve the sort icon.
+     * @param {IFieldType} columnType - The type of the column for which to retrieve the sort icon.
+     * 
+     * @returns {IFontIconName | null} The name of the sort icon to be used, or null if the column is not sortable
+     * or not part of the current sorting order.
+     */
+    getSortIcon(columnName: keyof DataType | string, columnType?: IFieldType): IFontIconName | null {
+        if (!this.isSortable()) return null;
+        const columnObj = this.getColumn(columnName);
+        if (!columnObj) return null;
+        const { column, direction: sortDirection } = Object.assign({}, this.getOrderBy());
+        if (!column || column !== columnObj.name) return null;
+        if (sortDirection) {
+            const isDesc = String(sortDirection).toLowerCase().trim() === "desc";
+            const sortType = defaultStr(columnType, columnObj.type).toLowerCase();
+            let sortIcon: IFontIconName | null = null;
+            switch (sortType) {
+                case "number":
+                    sortIcon = isDesc ? "sort-numeric-descending" : "sort-numeric-ascending";
+                    break;
+                case "decimal":
+                    sortIcon = isDesc ? "sort-numeric-descending" : "sort-numeric-ascending";
+                    break;
+                case "boolean":
+                    sortIcon = isDesc ? "sort-bool-descending" : "sort-bool-ascending";
+                    break;
+                case "date":
+                    sortIcon = isDesc ? "sort-calendar-descending" : "sort-calendar-ascending";
+                    break;
+                case "datetime":
+                    sortIcon = isDesc ? "sort-calendar-descending" : "sort-calendar-ascending";
+                    break;
+                case "time":
+                    sortIcon = isDesc ? "sort-clock-descending" : "sort-clock-ascending";
+                    break;
+                default:
+                    sortIcon = isDesc ? "sort-alphabetical-descending" : "sort-alphabetical-ascending";
+                    break;
+            }
+            return sortIcon;
+        }
+        return null;
+    }
     /**
      * Retrieves the list of grouped columns in the DatagridView.
      * 
@@ -757,7 +806,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         this.dimensionsBindListener = Dimensions.addEventListener("change", this.onDimensionsChange.bind(this));
         (this as any).state = {
             ...this.initStateFromSessionData(),
-            columnsWidths: {},
             containerLayout: {
                 x: 0, y: 0, width: 0, height: 0
             },
@@ -780,72 +828,60 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             this.setState({ ...r, isLayoutMeasured: true } as IDatagridViewState<DataType, StateExtensions>);
         });
     }
-    getColumnWidth(colName: string) {
-        const column = this.getColumn(colName);
-        if (!column) return 0;
-        const colWidth = this.state.columnsWidths[colName];
-        if (isNumber(colWidth) && colWidth > 20) return colWidth;
-        if (isNumber(column.width) && column.width > 20) return column.width;
-        if (["date", "time", "datetime", "tel"].includes(column.type)) {
-            return column.type == "datetime" ? 280 : 200;
-        }
-        if (["number", "decimal"].includes(column.type)) {
-            return 170;
-        }
-        return 170;
-    }
 
+    /**
+     * Gets the layout of the container view.
+     * 
+     * @returns {IDatagridViewMeasuredLayout} The layout of the container view.
+     * 
+     * @remarks
+     * The layout is only available after the component has been rendered and the onLayout event has been triggered.
+     * If the component is not rendered or the layout is not measured, returns an object with all properties set to 0.
+     */
     getContainerLayout(): IDatagridViewMeasuredLayout {
         return this.state.containerLayout;
     }
+
     /**
-     * Sorts or unsorts a column based on the specified action.
+     * Sorts the data in ascending or descending order according to the specified column and direction.
      * 
-     * @param {string} colName - The name of the column to sort or unsort.
-     * @param {"sort" | "unsort"} action - The action to perform (`"sort"` or `"unsort"`).
+     * @param {string} colName - The name of the column to sort by.
+     * 
+     * If the column is already sorted, reverses the direction.
+     * If the column is not sorted, sets the direction to ascending.
+     * If the column is not sortable, does nothing.
+     * 
+     * Updates the component state with the new sorted data.
+     * Sets the sorted column and direction in the component session data.
      */
-    private sortOrUnSortColumn(colName: string, action: "sort" | "unsort") {
+    sortColumn(colName: string) {
         if (!isNonNullString(colName) || !this.isSortable()) return;
         const column = this.getColumn(colName);
         if (!column || column.sortable === false) return;
         let direction: IResourceQueryOptionsOrderDirection = "asc";
         const { column: field, direction: cDirection } = Object.assign({}, this.state.orderBy);
-
-        const hasF = String(field).toLowerCase() !== String(colName).toLowerCase();
+        const hasF = String(field).toLowerCase() === String(colName).toLowerCase();
         if (hasF) {
-            direction = String(cDirection).toLowerCase() === "desc" ? "asc" : "desc";
+            direction = String(cDirection).toLowerCase() === "asc" ? "desc" : "asc";
         }
         const orderBy: IDatagridViewOrderBy<DataType> = { column: colName, direction };
         this.updateState({ orderBy, ...this.processData(this.props.data, orderBy) }, () => {
             this.setSessionData("orderBy", orderBy);
         });
     }
+
     /**
-     * Sorts a column in ascending or descending order.
+     * Returns the current sorting configuration for the DatagridView.
      * 
-     * @param {string} colName - The name of the column to sort.
+     * This method returns the current sorting configuration as an `IDatagridViewOrderBy` object.
+     * This object contains the field name and direction of the sorting criteria.
      * 
-     * @example
-     * ```typescript
-     * datagridInstance.sortColumn("name");
-     * ```
+     * @returns {IDatagridViewOrderBy} - The current sorting configuration.
      */
-    sortColumn(colName: string) {
-        this.sortOrUnSortColumn(colName, "sort");
+    getOrderBy(): IDatagridViewOrderBy {
+        return isObj(this.state.orderBy) ? this.state.orderBy : {} as IDatagridViewOrderBy;
     }
-    /**
-     * Unsorts a column, removing it from the sorting criteria.
-     * 
-     * @param {string} colName - The name of the column to unsort.
-     * 
-     * @example
-     * ```typescript
-     * datagridInstance.unsortColumn("name");
-     * ```
-     */
-    unsortColumn(colName: string) {
-        this.sortOrUnSortColumn(colName, "unsort");
-    }
+
     /**
     * Initializes the component's state from session data.
     * 
@@ -952,7 +988,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {IDatagridViewStateColumn<DataType> | null} The column definition if found, otherwise an empty object.
      */
-    getColumn(colName: string): IDatagridViewStateColumn<DataType> | null {
+    getColumn(colName: keyof DataType | string): IDatagridViewStateColumn<DataType> | null {
         if (isNonNullString(colName) && this.state.columnsByName[colName]) {
             return this.state.columnsByName[colName]
         }
@@ -2841,8 +2877,10 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         return <Pressable onPress={(event) => { this.sort() }} disabled={!this.isSortable()} style={[styles.columnHeader, this.getStyle()]} testID={testId}>
             <View testID={testId + "-content-container"} style={[styles.columnHeaderContentContainer]}>
                 {header && isValidElement(header) ? header : <Label testID={testId + "-label"} textBold {...labelProps} >{this.props.label}</Label>}
-                {sortIcon ? <FontIcon testID={testId + "-sort-icon"} color={Theme.colors.primary} size={25} name={sortIcon} /> : null}
-                {sortIcon ? <FontIcon size={25} name="sort-variant-remove" testID={testId + "-unsort-icon"} /> : null}
+                <SortIcon
+                    columnName={column.name}
+                    columnType={this.getType()}
+                />
             </View>
         </Pressable>
     }
@@ -2861,7 +2899,6 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
     getType(): IFieldType {
         return defaultStr(this.props.type, "text") as IFieldType;
     }
-
     /**
      * Retrieves the sort icon for the column, based on the column's type and sort direction.
      * 
@@ -2871,40 +2908,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      * @returns {IFontIconName | null} The sort icon for the column.
      */
     getSortIcon(): IFontIconName | null {
-        if (!this.isSortable()) return null;
-        const orderBy = Object.assign({}, this.getDatagridContext()?.state?.orderBy);
-        const { column, direction: sortDirection } = orderBy;
-        if (!column || column !== this.getName()) return null;
-        if (sortDirection) {
-            const isDesc = String(sortDirection).toLowerCase().trim() === "desc";
-            const sortType = defaultStr(this.getType()).toLowerCase();
-            let sortIcon: IFontIconName | null = null;
-            switch (sortType) {
-                case "number":
-                    sortIcon = isDesc ? "sort-numeric-descending" : "sort-numeric-ascending";
-                    break;
-                case "decimal":
-                    sortIcon = isDesc ? "sort-numeric-descending" : "sort-numeric-ascending";
-                    break;
-                case "boolean":
-                    sortIcon = isDesc ? "sort-bool-descending" : "sort-bool-ascending";
-                    break;
-                case "date":
-                    sortIcon = isDesc ? "sort-calendar-descending" : "sort-calendar-ascending";
-                    break;
-                case "datetime":
-                    sortIcon = isDesc ? "sort-calendar-descending" : "sort-calendar-ascending";
-                    break;
-                case "time":
-                    sortIcon = isDesc ? "sort-clock-descending" : "sort-clock-ascending";
-                    break;
-                default:
-                    sortIcon = isDesc ? "sort-alphabetical-descending" : "sort-alphabetical-ascending";
-                    break;
-            }
-            return sortIcon;
-        }
-        return null;
+        return this.getDatagridContext().getSortIcon(this.getName(), this.getType());
     }
     /**
      * Initiates sorting on the column if it is a header.
@@ -3039,7 +3043,28 @@ function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridL
     return typeof Component !== "function" ? null : <Component isLoading={isLoading} />;
 };
 
-
+/**
+ * A component to display the sort icon for a given column.
+ * 
+ * This component will render the appropriate sort icon for the given column name and type.
+ * If the column is not sortable or not part of the current sorting order, it will return null.
+ * It uses the `getSortIcon` method of the DatagridView context to determine the sort icon.
+ * 
+ * @param {{ columnName: keyof DataTye | string, columnType?: IFieldType }} props - The component props.
+ * @param {keyof DataTye | string} props.columnName - The name of the column to display the sort icon for.
+ * @param {IFieldType} [props.columnType] - The type of the column. If not provided, it is determined from the column definition.
+ * 
+ * @returns {React.ReactNode | null} The rendered sort icon component, or null if the column is not sortable.
+ */
+function SortIcon<DataTye extends object = any>({ columnName, columnType }: { columnName: keyof DataTye | string, columnType?: IFieldType }) {
+    const datagrid = useDatagrid();
+    if (!datagrid) return null;
+    const sortIcon = datagrid.getSortIcon(columnName, columnType);
+    if (!sortIcon) return null;
+    const testID = datagrid.getTestID();
+    return <FontIcon testID={testID + "-sort-icon"} color={Theme.colors.primary} size={25} name={sortIcon} />;
+}
+SortIcon.displayName = "Datagrid.SortIcon";
 /**
  * A loading indicator component for the DatagridView that uses the ProgressBar
  * component to show an indeterminate progress bar at the bottom of the
@@ -3112,6 +3137,7 @@ Datagrid.LoadingIndicator = LoadingIndicator;
 Datagrid.DefaultLoadingIndicator = DefaultLoadingIndicator;
 Datagrid.PreloaderLoadingIndicator = PreloaderLoadingIndicator;
 Datagrid.View = DatagridView;
+Datagrid.SortIcon = SortIcon;
 
 
 LoadingIndicator.displayName = "Datagrid.LoadingIndicator";
@@ -4030,9 +4056,6 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
      * Wheither the layout has been measured.
      */
     isLayoutMeasured: boolean;
-
-    columnsWidths: Record<string, number>;
-
 
     /***
      * A flag indicating whether to show the aggregated totals.

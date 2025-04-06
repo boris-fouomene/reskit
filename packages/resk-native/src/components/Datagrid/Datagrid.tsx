@@ -10,9 +10,9 @@ import {
     ViewStyle
 } from 'react-native';
 import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted } from '@utils/index';
-import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber } from '@resk/core/utils';
+import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber, sortBy } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
-import { IField, IFieldType, IMergeWithoutDuplicates, IResourcePaginationMetaData, IResourceQueryOptionsOrderDirection } from '@resk/core/types';
+import { IField, IFieldType, IMergeWithoutDuplicates, IResourcePaginationMetaData, IResourceQueryOptionsOrderByDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
 import Label, { ILabelProps } from '@components/Label';
 import InputFormatter from '@resk/core/inputFormatter';
@@ -858,7 +858,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (!isNonNullString(colName) || !this.isSortable()) return;
         const column = this.getColumn(colName);
         if (!column || column.sortable === false) return;
-        let direction: IResourceQueryOptionsOrderDirection = "asc";
+        let direction: IResourceQueryOptionsOrderByDirection = "asc";
         const { column: field, direction: cDirection } = Object.assign({}, this.state.orderBy);
         const hasF = String(field).toLowerCase() === String(colName).toLowerCase();
         if (hasF) {
@@ -1759,9 +1759,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const sortColObj = isNonNullString(sortColumn) && this.getColumn(sortColumn) || null;
         // Multi-field sorting
         if (data.length && this.isSortable() && sortColObj) {
-            return data.sort((a, b) => {
-                return this.compareCellValues(a, b, sortColObj, sortDirection, sortColObj.ignoreCaseWhenSorting);
-            });
+            return sortBy<DataType>(data, (item) => this.computeCellValue(sortColObj, item), {
+                direction: orderBy.direction,
+                ignoreCase: sortColObj.ignoreCaseWhenSorting
+            })
         }
         return data;
     }
@@ -2301,42 +2302,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const components = Reflect.getMetadata(DatagridView.reflectMetadataKey, DatagridView);
         return isObj(components) ? components : {} as any;
     }
-
-    /**
-     * Compares two values and returns a negative, zero, or positive number to indicate that the first value is less than, equal to, or greater than the second value.
-     * 
-     * The comparison is done based on the specified column and sort direction. Strings are compared lexicographically, while booleans are compared by converting them to integers.
-     * If `ignoreCase` is true, strings are compared in a case-insensitive manner.
-     * 
-     * @param {DataType} rowDataA - The first row to compare.
-     * @param {DataType} rowDataB - The second row to compare.
-     * @param {IDatagridViewStateColumn} column - The column to use for sorting.
-     * @param {IResourceQueryOptionsOrderDirection} [sortDirection="asc"] - The direction of the sort. Can be either "asc" or "desc".
-     * @param {boolean} [ignoreCase=true] - Whether to ignore case when comparing strings.
-     * 
-     * @returns {number} A negative, zero, or positive number indicating the result of the comparison.
-     */
-    compareCellValues(rowDataA: DataType, rowDataB: DataType, column: IDatagridViewStateColumn, sortDirection: IResourceQueryOptionsOrderDirection = "asc", ignoreCase: boolean = true) {
-        const multiplicater = !!(String(sortDirection).toLowerCase().trim() === "desc") ? -1 : 1;
-        let a: any = this.computeCellValue(column, rowDataA);
-        if (isEmpty(a)) a = "";
-        let b: any = this.computeCellValue(column, rowDataB);
-        if (isEmpty(b)) b = "";
-
-        const isStringCompare = [typeof a, typeof b].includes("string");
-        if (isStringCompare || [typeof a, typeof b].includes("boolean")) {
-            // Convert values to strings if necessary
-            a = a?.toString() ?? "";
-            b = b?.toString() ?? "";
-
-            // Ignore case if specified
-            if (ignoreCase !== false) {
-                a = a.toLowerCase();
-                b = b.toLowerCase();
-            }
-        }
-        return multiplicater * (a < b ? -1 : +(a > b));
-    };
 
 
     /**
@@ -4287,7 +4252,7 @@ export type IDatagridViewName = keyof IDatagridViews;
  */
 export interface IDatagridViewOrderBy<DataType extends object = any> {
     column: keyof DataType | string;
-    direction?: IResourceQueryOptionsOrderDirection
+    direction?: IResourceQueryOptionsOrderByDirection
 };
 
 /**

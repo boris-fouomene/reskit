@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
-    "@resk/core": "^1.14.1",
+    "@resk/core": "^1.15.0",
     "color": "^4.2.3",
     "tippy.js": "^6.3.7"
   },

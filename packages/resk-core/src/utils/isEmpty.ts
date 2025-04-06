@@ -19,7 +19,7 @@ export default function isEmpty(value: any): boolean {
   /**
    * Check if the value is null or undefined.
    */
-  if (value === null || value === undefined) {
+  if (value === null || value === undefined || typeof value == "undefined") {
     return true;
   }
 

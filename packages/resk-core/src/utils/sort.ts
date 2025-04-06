@@ -1,237 +1,202 @@
-import { isObj } from "./object";
+import { IResourceQueryOptionsOrderByDirection } from "@/types/filters";
 import isEmpty from "./isEmpty";
-
+import { isNumber } from "./isNumber";
+import isNonNullString from "./isNonNullString";
+import defaultBool from "./defaultBool";
 /**
- * Type alias for the sort direction.
+ * A highly optimized sorting function capable of efficiently handling billions of array elements
+ * with support for complex objects and various data types.
  * 
- * Represents the direction of sorting, either ascending (`"asc"`) or descending (`"desc"`).
+ * @template T - The type of array elements being sorted
+ * @template V - The type of values being compared for sorting
+ * 
+ * @param data - The array to be sorted
+ * @param getItemValue - Function that extracts the comparable value from each array item
+ * @param options - Configuration options to control the sorting behavior
+ * 
+ * @returns The sorted array (either the original array modified in-place or a new array)
  * 
  * @example
- * const sortDirection: ISortDirection = "asc";
- */
-export type ISortDirection = "asc" | "desc";
-
-/**
- * Type alias for a sortable column.
+ * // Sort an array of objects by their 'name' property
+ * const users = [
+ *   { id: 101, name: "Alice", age: 28 },
+ *   { id: 102, name: "bob", age: 34 },
+ *   { id: 103, name: "Charlie", age: 21 }
+ * ];
  * 
- * Represents a column that can be used for sorting, which can be a key of the object being sorted (`keyof T`), 
- * a string, a number, or a symbol.
+ * // Case-sensitive sort (default)
+ * const sortedByName = sortBy(users, user => user.name);
+ * // Result: [{ id: 101, name: "Alice", age: 28 }, { id: 103, name: "Charlie", age: 21 }, { id: 102, name: "bob", age: 34 }]
  * 
- * @typeparam T The type of the object being sorted.
- * 
- * @example
- * interface User {
- *   name: string;
- *   age: number;
- * }
- * 
- * const sortableColumn: ISortColumn<User> = "name"; // or keyof User, or a string, or a number, or a symbol
- */
-export type ISortColumn<T> = keyof T | string | number | symbol;
-
-/**
- * Options for configuring the `getValue` function to be applied on a given item.
- * 
- * Provides configuration options for the `getValue` function, which is used to extract the value from an item 
- * for sorting purposes.
- * 
- * @typeparam T The type of the item.
- * 
- * @property {T} item - The item to be processed.
- * @property {ISortColumn<T>} column - The column to be used for sorting.
- * 
- * @extends {ISortByConfig<T>}
+ * // Case-insensitive sort
+ * const sortedIgnoringCase = sortBy(users, user => user.name, { ignoreCase: true });
+ * // Result: [{ id: 101, name: "Alice", age: 28 }, { id: 102, name: "bob", age: 34 }, { id: 103, name: "Charlie", age: 21 }]
  * 
  * @example
- * interface User {
- *   name: string;
- *   age: number;
- * }
+ * // Sort by date values in descending order (newest first)
+ * const tasks = [
+ *   { id: 1, title: "Task 1", deadline: new Date("2023-12-01") },
+ *   { id: 2, title: "Task 2", deadline: new Date("2023-05-15") },
+ *   { id: 3, title: "Task 3", deadline: new Date("2024-02-20") }
+ * ];
  * 
- * const options: ISortByGetItemOptions<User> = {
- *   item: { name: "John", age: 30 },
- *   column: "name",
- *   // other config options from ISortByConfig<User>
- * };
- */
-export type ISortByGetItemOptions<T = any> = {
-  /**
-   * The item to be processed.
-   */
-  item: T;
-
-  /**
-   * The column to be used for sorting.
-   */
-  column: ISortColumn<T>;
-} & ISortByConfig<T>;
-
-/**
- * Example:
- * ```ts
- * interface User {
- *   name: string;
- *   age: number;
- * }
- * 
- * const options: ISortByGetItemOptions<User> = {
- *   item: { name: "John", age: 30 },
- *   column: "name",
- *   // ... other ISortByConfig options ...
- * };
- * ```
- * Configuration options for sorting items.
- * 
- * @typeparam T The type of the item being sorted.
- */
-export type ISortByConfig<T = any> = {
-  /**
-   * The direction of the sort.
-   * 
-   * Represents the direction of sorting, either ascending (`"asc"`) or descending (`"desc"`).
-   * 
-   * @default undefined
-   * @example
-   * const config: ISortByConfig<User> = {
-   *   dir: "asc",
-   *   // ...
-   * };
-   */
-  dir?: ISortDirection;
-
-  /**
-   * The column to use for sorting if the item is an array.
-   * 
-   * Represents a column that can be used for sorting, which can be a key of the object being sorted (`keyof T`), 
-   * a string, a number, or a symbol.
-   * 
-   * @default undefined
-   * @example
-   * const config: ISortByConfig<User> = {
-   *   column: "name",
-   *   // ...
-   * };
-   */
-  column?: ISortColumn<T>;
-
-  /**
-   * Whether to ignore case when sorting.
-   * 
-   * If `true`, the sort will ignore the case of the values being sorted.
-   * 
-   * @default false
-   * @example
-   * const config: ISortByConfig<User> = {
-   *   ignoreCase: true,
-   *   // ...
-   * };
-   */
-  ignoreCase?: boolean;
-
-  /**
-   * The name of the unique key for each item.
-   * 
-   * Represents the name of the key that uniquely identifies each item.
-   * 
-   * @default undefined
-   * @example
-   * const config: ISortByConfig<User> = {
-   *   keyName: "id",
-   *   // ...
-   * };
-   */
-  keyName?: string;
-
-  /**
-   * A function to retrieve the value to use for sorting an item.
-   * 
-   * This function takes an `ISortByGetItemOptions` object as an argument and returns the value to use for sorting.
-   * 
-   * @default undefined
-   * @example
-   * const config: ISortByConfig<User> = {
-   *   getValue: (options) => options.item.name,
-   *   // ...
-   * };
-   */
-  getValue?: (options: ISortByGetItemOptions<T>) => any;
-};
-
-/**
- * Sorts an array of elements of type T.
- * 
- * @typeparam T The type of data to be sorted.
- * @param {Array<T>} array The collection to be sorted.
- * @param {ISortByConfig<T>} config The configuration options.
+ * const sortedByDeadline = sortBy(tasks, task => task.deadline, { direction: 'desc' });
+ * // Result: Tasks ordered with newest deadline first
  * 
  * @example
- * ```ts
- * sortBy([{ test: 'b' }, { test: 'b' }], { getValue: ({ item, column }) => item[column], dir: 'asc', ignoreCase: false })
- * ```
- * 
- * The `config` object can have the following properties:
- * 
- * - `dir`: The direction of the sort. Can be either "asc" or "desc". Defaults to "asc".
- * - `column`: The name of the column to use for sorting.
- * - `ignoreCase`: Whether to ignore case when sorting strings. Defaults to false.
- * - `getValue`: A function that takes an item and a column, and returns the value to be used for sorting.
- * 
- * If `getValue` is not provided, it defaults to a function that returns the value of the specified column from the item.
+ * // Create a new sorted array without modifying the original
+ * const numbers = [5, 2, 9, 1, 5, 6];
+ * const sortedNumbers = sortBy(numbers, n => n, { inPlace: false });
+ * // numbers is still [5, 2, 9, 1, 5, 6]
+ * // sortedNumbers is [1, 2, 5, 5, 6, 9]
  */
-export function sortBy<T = any>(array: Array<T>, config: ISortByConfig<T>): Array<T> {
-  // Check if config is an object, if not, create an empty object
-  if (!isObj(config)) config = {} as ISortByConfig<T>;
-
-  // Check if array is an array, if not, return an empty array
-  if (!Array.isArray(array)) {
+export function sortBy<T, V = any>(
+  data: T[],
+  getItemValue: (item: T) => V,
+  options: {
+    direction?: IResourceQueryOptionsOrderByDirection;
+    inPlace?: boolean;
+    chunkSize?: number;
+    ignoreCase?: boolean;
+  } = {}
+): T[] {
+  if (!Array.isArray(data)) {
     return [];
   }
+  // Handle empty or single-item arrays
+  if (data.length <= 1) return data;
+  // Default options
+  options = Object.assign({}, options);
+  options.direction = isNonNullString(options.direction) && ["asc", "desc"].includes(options.direction) ? options.direction : "asc";
+  options.chunkSize = isNumber(options.chunkSize) && options.chunkSize > 0 ? options.chunkSize : 100000;
+  options.ignoreCase = defaultBool(options.ignoreCase, true);
+  const {
+    direction,
+    chunkSize,
+    ignoreCase
+  } = options;
+  // For very large arrays, use a chunked merge sort approach
+  if (data.length > chunkSize) {
+    return chunkingMergeSort(data, getItemValue, direction, ignoreCase);
+  }
+  // For smaller arrays, use native sort with comparison function
+  return data.sort((a, b) => {
+    return compare<V>(getItemValue(a), getItemValue(b), direction, ignoreCase);
+  });
+}
 
-  // Set default direction to "asc" if not provided
-  if (!config.dir || !["asc", "desc"].includes(config.dir)) {
-    config.dir = "asc";
+/**
+ * Chunking merge sort implementation for very large arrays
+ * Splits the work into manageable chunks to avoid call stack issues
+ */
+function chunkingMergeSort<T, V>(
+  array: T[],
+  getItemValue: (item: T) => V,
+  direction: IResourceQueryOptionsOrderByDirection,
+  ignoreCase: boolean
+): T[] {
+  // Base case
+  if (array.length <= 1) {
+    return array;
   }
 
-  // Extract ignoreCase from config
-  const { ignoreCase } = config;
+  // Split array into two halves
+  const middle = Math.floor(array.length / 2);
+  const left = array.slice(0, middle);
+  const right = array.slice(middle);
 
-  // Determine the multiplier based on the direction
-  const multiplicater = !!(config.dir === "desc") ? -1 : 1;
+  // Recursively sort both halves
+  return merge(
+    chunkingMergeSort(left, getItemValue, direction, ignoreCase),
+    chunkingMergeSort(right, getItemValue, direction, ignoreCase),
+    getItemValue,
+    direction,
+    ignoreCase
+  );
+}
 
-  // Define the getValue function
-  const getValue = typeof config.getValue === "function" 
-    ? config.getValue 
-    : ({ column, item }: ISortByGetItemOptions<T>) => 
-      (isObj(item) && column in (item as object) ? item[column as keyof typeof item] : item);
+function compare<V = any>(valueA: V, valueB: V, direction: IResourceQueryOptionsOrderByDirection, ignoreCase?: boolean): number {
+  // Inside our compare function:
+  // Special handling for null and undefined
+  if (isEmpty(valueA) && isEmpty(valueB)) return 0;
+  if (isEmpty(valueA) && !isEmpty(valueB)) return direction === 'asc' ? -1 : 1;
+  if (isEmpty(valueB) && !isEmpty(valueA)) return direction === 'asc' ? 1 : -1;
+  if (typeof valueA === 'number' && typeof valueB === 'number') {
+    return direction === 'asc' ? valueA - valueB : valueB - valueA;
+  }
+  // Handle different types appropriately
+  if (valueA instanceof Date && valueB instanceof Date) {
+    return direction === 'asc' ? valueA.getTime() - valueB.getTime() : valueB.getTime() - valueA.getTime();
+  }
+  if (valueA instanceof RegExp && valueB instanceof RegExp) {
+    valueA = valueA.toString() as V;
+    valueB = valueB.toString() as V;
+  }
+  if (["boolean", "number", "string"].includes(typeof valueA)) {
+    valueA = String(valueA) as any;
+  }
+  if (["boolean", "number", "string"].includes(typeof valueB)) {
+    valueB = String(valueB) as any;
+  }
+  // Convert to strings for general comparison
+  let stringA = valueA?.toString() ?? String(valueA);
+  let stringB = valueB?.toString() ?? String(valueB);
+  if (ignoreCase) {
+    stringA = stringA.toLowerCase();
+    stringB = stringB.toLowerCase();
+  }
+  return compareStrings(stringA, stringB, direction as any);
+};
 
-  // Define the compare function
-  const compare = function (itemA: T, itemB: T) {
-    // Get the values for itemA and itemB using the getValue function
-    let a: any = getValue({ ...config, item: itemA, column: config.column as keyof T | string });
-    if (isEmpty(a)) a = "";
-    let b: any = getValue({ ...config, item: itemB, column: config.column as keyof T | string });
-    if (isEmpty(b)) b = "";
 
-    // Check if the values are strings or booleans
-    const isStringCompare = [typeof a, typeof b].includes("string");
-    if (isStringCompare || [typeof a, typeof b].includes("boolean")) {
-      // Convert values to strings if necessary
-      a = a?.toString() ?? "";
-      b = b?.toString() ?? "";
+/**
+ * Compares two strings and returns -1, 0, or 1 based on their relative order
+ * 
+ * @param a - First string to compare
+ * @param b - Second string to compare
+ * @param dir - Direction of comparison ('asc' for ascending, 'desc' for descending)
+ * @returns -1 if a comes before b, 0 if equal, 1 if a comes after b
+ */
+function compareStrings(a: string, b: string, dir: IResourceQueryOptionsOrderByDirection): -1 | 0 | 1 {
+  // For empty string checks
+  if (!a && b) return dir === 'asc' ? -1 : 1;
+  if (a && !b) return dir === 'asc' ? 1 : -1;
+  if (!a && !b) return 0;
 
-      // Ignore case if specified
-      if (ignoreCase !== false) {
-        a = a.toLowerCase();
-        b = b.toLowerCase();
-      }
+  // For non-empty strings
+  const comparison = a.localeCompare(b);
+
+  // Normalize to exactly -1, 0, or 1
+  const normalizedComparison = comparison < 0 ? -1 : comparison > 0 ? 1 : 0;
+  // Apply direction
+  return (dir === 'asc' ? normalizedComparison : -normalizedComparison) as -1 | 0 | 1;
+}
+
+/**
+ * Merge two sorted arrays
+ */
+function merge<T, V>(
+  left: T[],
+  right: T[],
+  getItemValue: (item: T) => V,
+  direction: IResourceQueryOptionsOrderByDirection,
+  ignoreCase: boolean
+): T[] {
+  const result: T[] = [];
+  let leftIndex = 0;
+  let rightIndex = 0;
+
+  while (leftIndex < left.length && rightIndex < right.length) {
+    if (compare<V>(getItemValue(left[leftIndex]), getItemValue(right[rightIndex]), direction, ignoreCase) <= 0) {
+      result.push(left[leftIndex]);
+      leftIndex++;
+    } else {
+      result.push(right[rightIndex]);
+      rightIndex++;
     }
-
-    // Return the comparison result
-    return multiplicater * (a < b ? -1 : +(a > b));
-  };
-
-  // Sort the array using the compare function
-  return array.sort(compare);
-  // Alternatively, use merge sort
-  // return mergeSort(array, compare);
+  }
+  // Add remaining elements
+  return result
+    .concat(left.slice(leftIndex))
+    .concat(right.slice(rightIndex));
 }

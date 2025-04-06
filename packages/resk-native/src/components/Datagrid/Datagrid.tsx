@@ -867,6 +867,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const orderBy: IDatagridViewOrderBy<DataType> = { column: colName, direction };
         this.updateState({ orderBy, ...this.processData(this.props.data, orderBy) }, () => {
             this.setSessionData("orderBy", orderBy);
+            this.trigger("columnSorted", orderBy);
         });
     }
 
@@ -2508,7 +2509,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const { selectedRowsActions, actions, showActions, actionsProps: aProps } = Object.assign({}, datagridContext?.props);
         const { divider, ...actionsProps } = Object.assign({}, aProps);
         const theme = useTheme();
-        useDatagridOnEvent(["toggleAllRowsSelection"], undefined, true);
+        useDatagridOnEvent(["toggleAllRowsSelection"], true);
         const { actions: actionsToDisplay, title } = useMemo(() => {
             if (!datagridContext) return {
                 actions: [],
@@ -2873,10 +2874,11 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         const datagridContext = this.getDatagridContext();
         const header = typeof this.props.renderHeader == "function" ? this.props.renderHeader(datagridContext.getCallOptions({ column })) : null;
         const testId = this.getTestID();
-        const sortIcon = this.getSortIcon();
         return <Pressable onPress={(event) => { this.sort() }} disabled={!this.isSortable()} style={[styles.columnHeader, this.getStyle()]} testID={testId}>
             <View testID={testId + "-content-container"} style={[styles.columnHeaderContentContainer]}>
-                {header && isValidElement(header) ? header : <Label testID={testId + "-label"} textBold {...labelProps} >{this.props.label}</Label>}
+                <View testID={testId + "-label-container"} style={[styles.columnHeaderLabelContainer]}>
+                    {header && isValidElement(header) ? header : <Label testID={testId + "-label"} textBold {...labelProps} >{this.props.label}</Label>}
+                </View>
                 <SortIcon
                     columnName={column.name}
                     columnType={this.getType()}
@@ -3033,7 +3035,8 @@ function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridL
     };
     useDatagridOnEvent("toggleIsLoading", (newIsLoading) => {
         setIsLoading(newIsLoading?.isLoading);
-    }, false);
+        return false;
+    });
     useEffect(() => {
         const loading: boolean = !!datagridContext?.canShowLoadingIndicator();
         if (loading !== isLoading) {
@@ -3058,6 +3061,7 @@ function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridL
  */
 function SortIcon<DataTye extends object = any>({ columnName, columnType }: { columnName: keyof DataTye | string, columnType?: IFieldType }) {
     const datagrid = useDatagrid();
+    useDatagridOnEvent("columnSorted", true);
     if (!datagrid) return null;
     const sortIcon = datagrid.getSortIcon(columnName, columnType);
     if (!sortIcon) return null;
@@ -3655,21 +3659,27 @@ export function useDatagrid<DataType extends object = any>(): (DatagridView<Data
 
 /**** Hooks sections */
 
+
 /**
- * A hook to subscribe to events emitted by the DatagridView component.
+ * A hook to subscribe to events on the DatagridView component and call a function when the event is triggered.
  * 
- * This hook uses the useEffect hook to subscribe to the specified event(s) on the DatagridView component.
- * When the event is emitted, the callback function is called with the provided arguments.
- * If the forceRender argument is true, the component will be forced to re-render.
- * If the forceRender argument is a function, it will be called to determine whether to force a re-render.
+ * This hook takes an event or an array of events to subscribe to, and an optional callback function or force render flag.
+ * If the callback function is provided, it will be called with the event arguments when the event is triggered.
+ * If the force render flag is set to true, the component will be forced to re-render when the event is triggered.
+ * If the force render flag is set to false, the component will not be forced to re-render.
+ * If the force render flag is not provided, the component will be forced to re-render.
  * 
- * @param event The event to subscribe to, or an array of events to subscribe to.
- * @param callback The callback function to call when the event is emitted.
- * @param forceRender Whether to force a re-render of the component when the event is emitted.
+ * @param {IDatagridEvent | IDatagridEvent[]} event - The event or events to subscribe to.
+ * @param {((...args: any[]) => any) | boolean} [callbackOrForceRender] - The callback function or force render flag.
+ * @returns {void}
  * 
  * @example
+ * const MyComponent = () => {
+ *   useDatagridOnEvent("row-click", (event) => console.log("Row clicked:", event));
+ *   return <DatagridView />;
+ * };
  */
-export function useDatagridOnEvent(event: IDatagridEvent | IDatagridEvent[], callback?: (...args: any[]) => any, forceRender?: boolean | (() => boolean)) {
+export function useDatagridOnEvent(event: IDatagridEvent | IDatagridEvent[], callbackOrForceRender?: (boolean | ((...args: any[]) => any))) {
     const datagridContext = useDatagrid();
     const fRender = useForceRender();
     useEffect(() => {
@@ -3677,11 +3687,8 @@ export function useDatagridOnEvent(event: IDatagridEvent | IDatagridEvent[], cal
         (Array.isArray(event) ? event : [event]).map((event) => {
             if (isNonNullString(event)) {
                 (subscribers as any)[String(event.toLowerCase().trim())] = datagridContext?.on(event, (...args: any[]) => {
-                    const canForceRender = typeof forceRender === "function" ? forceRender() : !!forceRender;
-                    if (typeof callback === "function") {
-                        callback(...args, event);
-                    }
-                    if (canForceRender) {
+                    const canForceRender = typeof callbackOrForceRender === "function" ? callbackOrForceRender(...args, event) : !!callbackOrForceRender;
+                    if (canForceRender !== false) {
                         fRender();
                     }
                 });
@@ -3692,7 +3699,7 @@ export function useDatagridOnEvent(event: IDatagridEvent | IDatagridEvent[], cal
                 subscribers[i].remove();
             }
         };
-    }, [event, datagridContext?.on, callback]);
+    }, [event, datagridContext?.on, callbackOrForceRender]);
 }
 
 /**
@@ -4104,6 +4111,11 @@ export interface IDatagridEventMap {
      * Triggered to toggle loading state of the DatagridView component.
      */
     toggleIsLoading: string;
+
+    /***
+     * Triggered when a column is sorted.
+     */
+    columnSorted: string;
 }
 
 /**
@@ -4357,7 +4369,6 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
         position: "relative",
         flexDirection: "column",
-        flexWrap: "wrap",
         paddingVertical: 7,
         marginHorizontal: 7,
     },
@@ -4371,8 +4382,14 @@ const styles = StyleSheet.create({
     },
     columnHeaderContentContainer: {
         width: '100%',
-        justifyContent: "center",
-        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        flexDirection: "row",
+    },
+    columnHeaderLabelContainer: {
+        flexWrap: "wrap",
+        flexGrow: 1,
+        alignSelf: "flex-start",
     },
     toolbarButton: {},
     toolbarContainer: {

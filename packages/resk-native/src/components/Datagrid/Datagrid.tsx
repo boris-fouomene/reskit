@@ -12,7 +12,7 @@ import {
 import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted } from '@utils/index';
 import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
-import { IField, IFieldType, IMergeWithoutDuplicates, IResourcePaginationMetaData, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from '@resk/core/types';
+import { IField, IFieldType, IMergeWithoutDuplicates, IResourcePaginationMetaData, IResourceQueryOptionsOrderDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
 import Label, { ILabelProps } from '@components/Label';
 import InputFormatter from '@resk/core/inputFormatter';
@@ -809,19 +809,13 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const column = this.getColumn(colName);
         if (!column || column.sortable === false) return;
         let direction: IResourceQueryOptionsOrderDirection = "asc";
-        const orderBy2 = Array.isArray(this.state.orderBy) ? this.state.orderBy : [];
-        const orderBy = [...orderBy2].filter((o) => {
-            if (!isObj(o)) return false;
-            const [field, cDirection] = Object.entries(o)[0];
-            const hasF = String(field).toLowerCase() !== String(colName).toLowerCase();
-            if (hasF) {
-                direction = String(cDirection).toLowerCase() === "asc" ? "desc" : "asc";
-            }
-            return !hasF;
-        });
-        if (action == "sort") {
-            orderBy.push({ [colName]: direction } as any);
+        const { column: field, direction: cDirection } = Object.assign({}, this.state.orderBy);
+
+        const hasF = String(field).toLowerCase() !== String(colName).toLowerCase();
+        if (hasF) {
+            direction = String(cDirection).toLowerCase() === "desc" ? "asc" : "desc";
         }
+        const orderBy: IDatagridViewOrderBy<DataType> = { column: colName, direction };
         this.updateState({ orderBy, ...this.processData(this.props.data, orderBy) }, () => {
             this.setSessionData("orderBy", orderBy);
         });
@@ -860,13 +854,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     initStateFromSessionData(): Partial<IDatagridViewState<DataType, StateExtensions>> {
         const sessionData = this.getSessionData();
         const r: Partial<IDatagridViewState<DataType, StateExtensions>> = {};
-        if (Array.isArray(sessionData.orderBy) && sessionData.orderBy.length > 0) {
+        if (isObj(sessionData.orderBy) && sessionData?.orderBy?.column) {
             r.orderBy = sessionData.orderBy;
-        } else if (Array.isArray(this.props.orderBy) && this.props.orderBy.length > 0) {
-            (r as any).orderBy = this.props.orderBy;
-        }
-        if (!Array.isArray(r.orderBy)) {
-            (r as any).orderBy = [];
+        } else {
+            (r as any).orderBy = Object.assign({}, this.props.orderBy);
         }
         const groupedColumns = Array.isArray(sessionData.groupedColumns) ? sessionData.groupedColumns : Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : [];
         r.groupedColumns = groupedColumns;
@@ -1720,32 +1711,20 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * Sorts the data in ascending or descending order according to the specified columns and directions.
      * 
      * @param {DataType[]} data - The data to be sorted.
-     * @param {IResourceQueryOptionsOrderBy<DataType>} orderBy - The sorting columns and directions. If not specified, the DatagridView's `orderBy` state is used.
+     * @param {IDatagridViewOrderBy<DataType>} orderBy - The sorting columns and directions. If not specified, the DatagridView's `orderBy` state is used.
      * 
      * @returns {DataType[]} - The sorted data.
      */
-    internalSort(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>): DataType[] {
+    internalSort(data: DataType[], orderBy?: IDatagridViewOrderBy<DataType>): DataType[] {
         if (!Array.isArray(data)) return [];
-        orderBy = Array.isArray(orderBy) ? orderBy : Array.isArray(this.state.orderBy) ? this.state.orderBy : [];
+        orderBy = Object.assign({}, isObj(orderBy) && orderBy ? orderBy : this.state.orderBy);
+        const sortColumn = orderBy.column, sortDirection = isNonNullString(orderBy.direction) && ["asc", "desc"].includes(orderBy.direction.toLowerCase()) ? orderBy.direction : "asc";
+        const sortColObj = isNonNullString(sortColumn) && this.getColumn(sortColumn) || null;
         // Multi-field sorting
-        if (data.length && this.isSortable() && Array.isArray(orderBy) && orderBy.length > 0) {
-            const sortableCols = orderBy.filter((sortColumn) => {
-                if (!isObj(sortColumn)) return false;
-                const [field, direction] = Object.entries(sortColumn)[0];
-                const column = this.getColumn(field);
-                return column && ["asc", "desc"].includes(String(direction).toLowerCase());
+        if (data.length && this.isSortable() && sortColObj) {
+            return data.sort((a, b) => {
+                return this.compareCellValues(a, b, sortColObj, sortDirection, sortColObj.ignoreCaseWhenSorting);
             });
-            if (sortableCols.length) {
-                return data.sort((a, b) => {
-                    for (const sortColumn of sortableCols) {
-                        const [field, direction] = Object.entries(sortColumn)[0];
-                        const column = this.getColumn(field);
-                        if (!column) return 0;
-                        return this.compareCellValues(a, b, column, direction as any, column.ignoreCaseWhenSorting);
-                    }
-                    return 0;
-                });
-            }
         }
         return data;
     }
@@ -1935,13 +1914,13 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * It processes the data by sorting it, filtering it, grouping it, and paginating it.
      * 
      * @param {DataType[]} data - The data to process.
-     * @param {IResourceQueryOptionsOrderBy<DataType>} orderBy - The sorting columns and directions. If not specified, the DatagridView's `orderBy` state is used.
+     * @param {IDatagridViewOrderBy<DataType>} orderBy - The sorting columns and directions. If not specified, the DatagridView's `orderBy` state is used.
      * @param {string[]} groupedColumns - The columns to group the data by. If not specified, the DatagridView's `groupedColumns` state is used.
      * @param {IDatagridPagination} pagination - The pagination configuration. If not specified, the DatagridView's `pagination` state is used.
      * 
      * @returns {Partial<IDatagridViewState<DataType, StateExtensions>>} - A partial state object containing the aggregated columns values, the paginated data, the all data, the data to display, the pagination configuration, and the grouped rows by keys.
      */
-    processData(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination): Partial<IDatagridViewState<DataType, any>> {
+    processData(data: DataType[], orderBy?: IDatagridViewOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination): Partial<IDatagridViewState<DataType, any>> {
         let allData: DataType[] = [];
         const paginationConfig: IDatagridPagination = isObj(pagination) ? pagination as IDatagridPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridPagination;
         const canPaginate = this.canPaginate();
@@ -2057,7 +2036,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             Object.assign(newState, this.processColumns());
             hasUpdated = true;
         }
-        const hasOrderByChanged = !DatagridView.areArraysEqual(prevProps.orderBy, this.props.orderBy) && Array.isArray(this.props.orderBy);
+        const hasOrderByChanged = prevProps?.orderBy?.column !== this.props.orderBy?.column || prevProps?.orderBy?.direction !== this.props.orderBy?.direction && isObj(this.props.orderBy);
         const orderBy = hasOrderByChanged ? (this.props as any).orderBy : this.state.orderBy;
         const groupedColumns = Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const hasGroupedColumnsChanged = !DatagridView.areArraysEqual(prevProps.groupedColumns, this.props.groupedColumns) && Array.isArray(this.props.groupedColumns);
@@ -2893,18 +2872,9 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      */
     getSortIcon(): IFontIconName | null {
         if (!this.isSortable()) return null;
-        const orderBy = this.getDatagridContext()?.state?.orderBy;
-        let sortDirection: IResourceQueryOptionsOrderDirection | undefined;
-        if (Array.isArray(orderBy) && orderBy.length > 0) {
-            for (const ob of orderBy) {
-                if (!isObj(ob)) continue;
-                const [field, direction] = Object.entries(ob)[0];
-                if (field == this.getName()) {
-                    sortDirection = direction as any;
-                    break;
-                }
-            }
-        }
+        const orderBy = Object.assign({}, this.getDatagridContext()?.state?.orderBy);
+        const { column, direction: sortDirection } = orderBy;
+        if (!column || column !== this.getName()) return null;
         if (sortDirection) {
             const isDesc = String(sortDirection).toLowerCase().trim() === "desc";
             const sortType = defaultStr(this.getType()).toLowerCase();
@@ -3264,9 +3234,9 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * 
      * This property is used to specify the order by configuration for the grid.
      * 
-     * @see {@link IDatagridOrderBy} for more information about order by configurations.
+     * @see {@link IDatagridViewOrderBy} for more information about order by configurations.
      */
-    orderBy?: IDatagridOrderBy<DataType>;
+    orderBy?: IDatagridViewOrderBy<DataType>;
 
     /**
      * A function to get the key for a row.
@@ -3977,9 +3947,9 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
      * 
      * This property determines how the data is sorted in the grid.
      * 
-     * @see {@link IDatagridOrderBy} for more information about order by configurations.
+     * @see {@link IDatagridViewOrderBy} for more information about order by configurations.
      */
-    orderBy: IDatagridOrderBy<DataType>;
+    orderBy: IDatagridViewOrderBy<DataType>;
 
     /**
      * The current pagination configuration of the grid.
@@ -4276,12 +4246,14 @@ export type IDatagridViewName = keyof IDatagridViews;
 
 /**
  * A type representing the order by configuration of the DatagridView component.
- * @typedef IDatagridOrderBy
+ * @typedef IDatagridViewOrderBy
  * @template DataType - The type of the data shown in the grid.
- * @extends {IResourceQueryOptionsOrderBy<DataType>}
- * @see {@link IResourceQueryOptionsOrderBy}
+ * @see {@link IDatagridViewOrderBy}
  */
-export type IDatagridOrderBy<DataType extends object = any> = IResourceQueryOptionsOrderBy<DataType>;
+export interface IDatagridViewOrderBy<DataType extends object = any> {
+    column: keyof DataType | string;
+    direction?: IResourceQueryOptionsOrderDirection
+};
 
 /**
  * An interface representing the pagination configuration of the DatagridView component.

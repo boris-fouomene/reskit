@@ -1,5 +1,5 @@
 import isNonNullString from "@utils/isNonNullString";
-import { IResourceData, IResourcePaginatedResult, IResourcePaginationMetaData, IResourceQueryOptions, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderDirection } from "../types";
+import { IResourceData, IResourcePaginatedResult, IResourcePaginationMetaData, IResourceQueryOptions, IResourceQueryOptionsOrderBy, IResourceQueryOptionsOrderByDirection } from "../types";
 import { extendObj, isObj } from "@utils/object";
 import { getQueryParams } from "@utils/uri";
 import { isStringNumber } from "@utils/string";
@@ -64,10 +64,10 @@ export class ResourcePaginationHelper {
      * ```
      */
     static normalizeOrderBy<DataType = any>(orderBy?: IResourceQueryOptionsOrderBy<DataType>): Partial<{
-        [K in keyof DataType]?: IResourceQueryOptionsOrderDirection | IResourceQueryOptionsOrderBy<DataType[K]>;
+        [K in keyof DataType]?: IResourceQueryOptionsOrderByDirection | IResourceQueryOptionsOrderBy<DataType[K]>;
     }> {
         if (!Array.isArray(orderBy)) return {}
-        const r: Record<string, IResourceQueryOptionsOrderDirection> = {};
+        const r: Record<string, IResourceQueryOptionsOrderByDirection> = {};
         orderBy.map((o) => {
             if (!isObj(o)) return;
             const [field, dir] = Object.entries(o)[0];

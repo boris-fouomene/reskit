@@ -277,26 +277,26 @@ export interface IMongoArrayOperators<T = any> {
 export type IMongoComparisonOperatorName = keyof IMongoComparisonOperators;
 
 /**
- * @interface {IResourceQueryOptionsOrderDirection}
+ * @interface {IResourceQueryOptionsOrderByDirection}
  * Type representing the direction of sorting operations.
  * 
  * This type can be either 'asc' |'ASC' for ascending order or 'desc' | 'DESC' for descending order.
  * 
  * @example
- * // Valid examples of IResourceQueryOptionsOrderDirection
- * const ascending: IResourceQueryOptionsOrderDirection = 'asc';  // Ascending order
- * const descending: IResourceQueryOptionsOrderDirection = 'desc'; // Descending order
+ * // Valid examples of IResourceQueryOptionsOrderByDirection
+ * const ascending: IResourceQueryOptionsOrderByDirection = 'asc';  // Ascending order
+ * const descending: IResourceQueryOptionsOrderByDirection = 'desc'; // Descending order
  */
-export type IResourceQueryOptionsOrderDirection = 'asc' | 'desc';;
+export type IResourceQueryOptionsOrderByDirection = 'asc' | 'desc';;
 
 // Base type for a single order by field
 type IResourceQueryOptionsOrderByField<DataType = any> = {
-  [key in keyof DataType]: IResourceQueryOptionsOrderDirection | IResourceQueryOptionsOrderByNestedField<DataType[key]>;
+  [key in keyof DataType]: IResourceQueryOptionsOrderByDirection | IResourceQueryOptionsOrderByNestedField<DataType[key]>;
 };
 
 // Type for nested fields
 type IResourceQueryOptionsOrderByNestedField<DataType = any> = Partial<{
-  [key in keyof DataType]: IResourceQueryOptionsOrderDirection | IResourceQueryOptionsOrderByNestedField<DataType[key]>;
+  [key in keyof DataType]: IResourceQueryOptionsOrderByDirection | IResourceQueryOptionsOrderByNestedField<DataType[key]>;
 }>;
 
 /**
@@ -394,7 +394,7 @@ export type ISingleFieldOf<T> = {
  * - Sorting direction can be `"asc"` (ascending) or `"desc"` (descending).
  * - Nested sorting is supported by specifying sorting directions for nested fields.
  * 
- * @see {@link IResourceQueryOptionsOrderDirection} for sorting direction options.
+ * @see {@link IResourceQueryOptionsOrderByDirection} for sorting direction options.
  */
 export type IResourceQueryOptionsOrderBy<DataType = any> = Array<
   ISingleFieldOf<IResourceQueryOptionsOrderByField<DataType>>

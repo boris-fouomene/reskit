@@ -657,7 +657,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             this._toggleLoading = true;
         }
         loading = this.props.isLoading === true ? true : typeof loading == "boolean" ? loading : false;
-        timeout = typeof timeout == "number" ? timeout : 500;
+        timeout = typeof timeout == "number" ? timeout : 1000;
         cb = typeof cb == "function" ? cb : () => true;
         this._isLoading = loading;
         this.trigger("toggleIsLoading", { isLoading: loading });
@@ -933,9 +933,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
     updateState(stateData: Partial<IDatagridViewState<DataType, any>>, callback?: () => void) {
         this.setIsLoading(true, () => {
-            setTimeout(() => {
-                this.setState((prevState) => ({ ...prevState, ...stateData }), callback);
-            }, 200);
+            this.setState((prevState) => ({ ...prevState, ...stateData }), callback);
         });
     }
 

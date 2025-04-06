@@ -1,4 +1,3 @@
-import { Dimensions, View } from "react-native";
 import BottomSheet from "./BottomSheet";
 import BottomSheetProvider from "./Provider";
 import BottomSheetItem from "./Item";

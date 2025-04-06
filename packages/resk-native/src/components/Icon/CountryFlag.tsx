@@ -125,7 +125,7 @@ export interface ICountryFlagProps extends TouchableOpacityProps {
  * @param {ICountryFlagProps} props - Component props
  * @returns {React.ReactNode} The rendered flag or fallback component
  */
-const CountryFlag: React.FC<ICountryFlagProps> = ({
+const CountryFlag = function CountryFlag({
     countryCode,
     size,
     textFontSize,
@@ -134,7 +134,7 @@ const CountryFlag: React.FC<ICountryFlagProps> = ({
     textColor,
     fallback,
     ...props
-}) => {
+}: ICountryFlagProps) {
     const hasTouchable = hasTouchHandler(props);
     const Component = useMemo(() => {
         return hasTouchable ? TouchableOpacity : View;
@@ -198,11 +198,10 @@ const canRenderEmoji = (emoji?: string): boolean => {
     }
 };
 
-const FlagExported: typeof CountryFlag & { isEmojiSupported: typeof isEmojiSupported; canRenderEmoji: typeof canRenderEmoji; createEmoji: typeof createEmoji } = CountryFlag as any;
-FlagExported.isEmojiSupported = isEmojiSupported;
-FlagExported.createEmoji = createEmoji;
-FlagExported.canRenderEmoji = canRenderEmoji;
+CountryFlag.isEmojiSupported = isEmojiSupported;
+CountryFlag.createEmoji = createEmoji;
+CountryFlag.canRenderEmoji = canRenderEmoji;
 
-export default FlagExported;
+export default CountryFlag;
 
 CountryFlag.displayName = "Country.CountryFlag";

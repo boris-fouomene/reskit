@@ -328,7 +328,7 @@ interface IMenuState {
  * };
  * ```
  */
-const Menu: React.FC<IMenuProps> = ({
+const Menu = function Menu({
     onClose,
     children,
     animated = true,
@@ -359,7 +359,7 @@ const Menu: React.FC<IMenuProps> = ({
     bottomSheetTitle,
     bottomSheetTitleDivider,
     ...props
-}) => {
+}: IMenuProps) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
     animationDuration = typeof animationDuration === 'number' && animationDuration > 0 ? animationDuration : 300;
     const i18n = useI18n();
@@ -732,27 +732,16 @@ type IMenu = typeof Menu & {
     ExpandableItem: typeof ExpandableMenuItem;
 };
 
-/**
- * Enhances the Menu component by adding references to Item, Items, and
- * ExpandableItem components. This allows developers to use the Menu in a
- * structured way, improving the organization of the code and the clarity
- * of the API.
- *
- * The MenuExported constant is created by casting the Menu to the IMenu type,
- * and then the Item, Items, and ExpandableItem properties are assigned to
- * their respective components. The displayName properties are set for better
- * debugging and identification in React DevTools.
- */
-const MenuExported = Menu as unknown as IMenu;
-MenuExported.Item = MenuItem;
-MenuExported.displayName = 'Menu.Item';
-MenuExported.displayName = 'Menu';
 
-MenuExported.Items = MenuItems;
-MenuExported.Items.displayName = 'Menu.Items';
+Menu.Item = MenuItem;
+Menu.displayName = 'Menu.Item';
+Menu.displayName = 'Menu';
 
-MenuExported.ExpandableItem = ExpandableMenuItem;
-MenuExported.ExpandableItem.displayName = 'Menu.ExpandableItem';
+Menu.Items = MenuItems;
+Menu.Items.displayName = 'Menu.Items';
+
+Menu.ExpandableItem = ExpandableMenuItem;
+Menu.ExpandableItem.displayName = 'Menu.ExpandableItem';
 
 
-export { MenuExported as Menu };
+export { Menu };

@@ -1,7 +1,9 @@
 import { useMemo } from "react";
-import { Datagrid, AttachDatagridView, useDatagrid, IDatagridViewRowOrGroup, IDatagridViewName } from "./Datagrid";
+import { Datagrid, AttachDatagridView, useDatagrid, IDatagridViewRowOrGroup, IDatagridViewName, IDatagridViewGroupedRow, IDatagridViewStateColumn } from "./Datagrid";
 import { FlatList, SectionList, StyleSheet, View } from "react-native";
 import test from "node:test";
+import { IViewStyle } from "@src/types";
+import { isNumber } from "@resk/core";
 
 export interface IDatagridTableViewProps<DataType extends object = any> {
 
@@ -24,6 +26,24 @@ export class DatagridTableView<DataType extends object = any> extends Datagrid.V
     }
     getViewName(): IDatagridViewName {
         return "table";
+    }
+    getColumnWidthStyle(column: IDatagridViewStateColumn<DataType>): IViewStyle {
+        if (!column) return null;
+        if (isNumber(column.width) && column.width > 0) {
+            return { width: column.width };
+        }
+        if (isNumber(column.flex) && column.flex >= 0) {
+            return { flex: column.flex };
+        }
+        return { flex: 1 };
+    }
+    getTableCellStyle(column: IDatagridViewStateColumn<DataType>, rowData: DataType): IViewStyle {
+        const s = super.getTableCellStyle(column, rowData);
+        return [s, this.getColumnWidthStyle(column)];
+    }
+    getTableColumnHeaderStyle(column: IDatagridViewStateColumn<DataType>): IViewStyle {
+        const s = super.getTableColumnHeaderStyle(column);
+        return [s, this.getColumnWidthStyle(column)];
     }
     renderTableBody() {
         return <DatagridTableViewRendered<DataType>
@@ -53,21 +73,28 @@ Columns.displayName = "DatagridTableView.Columns";
 function DatagridTableViewRendered<DataType extends object = any>({ context }: { context: DatagridTableView<DataType> }) {
     const stateData = context.getData();
     const hasGroupedRows = context.hasGroupedRows();
-    const { Component, props } = useMemo(() => {
-        return {
-            Component: hasGroupedRows ? SectionList : FlatList,
-            props: hasGroupedRows ? {
-                sections: stateData,
-            } : {
-                data: stateData,
-            },
-        };
+    const isLoading = context.isLoading();
+    const sections = useMemo(() => {
+        if (hasGroupedRows) {
+            return stateData as IDatagridViewGroupedRow<DataType>[];
+        }
+        return [
+            {
+                label: "Non groupedData",
+                isDatagridGroupedRowData: true,
+                datagridGroupedRowKey: "not-grouped-data",
+                data: stateData as DataType[],
+            }
+        ]
     }, [hasGroupedRows, stateData]);
-    const C = Component as any;
-    return <C
-        {...props}
-        renderSectionHeader={(options: any) => {
-            console.log("rendering section ", options);
+    return <SectionList<DataType>
+        sections={sections}
+        extraData={hasGroupedRows || isLoading}
+        renderSectionHeader={function (options: any) {
+            if (!hasGroupedRows) {
+                return null;
+            }
+            console.log("will render aggregated header ", options);
             return null;
         }}
         renderItem={function ({ item: rowData, index: rowIndex }: { item: DataType, index: number }) {

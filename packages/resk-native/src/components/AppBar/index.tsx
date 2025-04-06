@@ -68,7 +68,7 @@ import { useReskNative } from '@src/context/hooks';
  * theme, allowing for consistent styling across the app. The AppBar can 
  * include custom actions and can be extended with additional props as needed.
  */
-const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionContext = any>({
+const AppBar = function AppBar<AppBarActionContext = any>({
   bindResizeEvent, textColor: color, backgroundColor, context, colorScheme: customColorScheme,
   renderAction, renderExpandableAction, maxActions,
   actions: customActions, title, subtitle, titleProps, subtitleProps, windowWidth, onBackActionPress, testID,
@@ -79,7 +79,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
   right: customRight,
   contentProps,
   ...appBarProps
-}: IAppBarProps<AppBarActionContext>, ref: React.ForwardedRef<View>) {
+}: IAppBarProps<AppBarActionContext>) {
   useDimensions(bindResizeEvent !== false); //pour le rendu responsive de l'AppBar
   const theme = useTheme();
   contentProps = Object.assign({}, contentProps);
@@ -196,9 +196,7 @@ const AppBar = forwardRef<any, IAppBarProps<any>>(function AppBar<AppBarActionCo
       </Surface>
     </AppBarContext.Provider>
   );
-});
-
-
+};
 
 const DEFAULT_APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 
@@ -238,22 +236,16 @@ const styles = StyleSheet.create({
 
 AppBar.displayName = 'AppBar';
 
-type IAppBar = typeof AppBar & {
-  Action: typeof AppBarAction;
-  BackAction: typeof BackAction;
-  ExpandableAction: typeof ExpandableAppBarAction;
-};
 
-const AppBarExported = AppBar as unknown as IAppBar;
-AppBarExported.displayName = 'AppBar';
-AppBarExported.Action = AppBarAction;
-AppBarExported.Action.displayName = 'AppBar.Action';
 
-AppBarExported.BackAction = BackAction;
-AppBarExported.BackAction.displayName = 'AppBar.BackAction';
-AppBarExported.ExpandableAction = ExpandableAppBarAction;
+AppBar.displayName = 'AppBar';
+AppBar.Action = AppBarAction;
+AppBar.Action.displayName = 'AppBar.Action';
+AppBar.BackAction = BackAction;
+AppBar.BackAction.displayName = 'AppBar.BackAction';
+AppBar.ExpandableAction = ExpandableAppBarAction;
 
-export { AppBarExported as AppBar };
+export { AppBar };
 
 export * from "./types";
 export * from "./utils";

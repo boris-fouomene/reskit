@@ -49,7 +49,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
         animatedProps,
     } = usePrepareBottomSheet(props);
     testID = defaultStr(testID, "resk-bottom-sheet");
-    const dimensions = useDimensions();
+    useDimensions();
     const scrollViewProps = defaultObj(_scrollViewProps);
     const contentProps = defaultObj(customChildrenContainerProps);
     useImperativeHandle(ref, () => (context));

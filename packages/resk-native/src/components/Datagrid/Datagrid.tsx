@@ -30,7 +30,35 @@ import { IProgressBarProps, ProgressBar } from '@components/ProgressBar';
 import { Button, IButtonProps } from '@components/Button';
 import { IMenuItemProps, Menu } from '@components/Menu';
 
-
+/**
+ * A flexible and feature-rich data grid component for React Native.
+ * 
+ * The `DatagridView` class provides a powerful grid system for displaying, sorting, filtering, grouping, and paginating data.
+ * It supports advanced features such as column aggregation, custom view names, and session-based state persistence.
+ * 
+ * @template DataType - The type of the data shown in the grid.
+ * @template PropsExtensions - The type of the component's props. This type is used to extend the component's props with additional properties.
+ * @template StateExtensions - The type of the component's state. This type is used to extend the component's state with additional properties.
+ * 
+ * @example
+ * ```tsx
+ *  // Extending DatagridView externally to add a custom view
+ *  import {AttachDatagridView} from "@resk/native";
+ *  interface IDatagridTableViewProps<DataType extends object = any> {}
+ *
+ *   declare module "@resk/native" {
+ *       export interface IDatagridViews {
+ *           table: IDatagridTableViewProps;
+ *       }
+ *   }
+ *  @AttachDatagridView({name: "table", label: "Table"})
+ *  class DatagridTableView<DataType extends object = any> extends DatagridView<DataType, IDatagridTableViewProps> {
+ *      _render(){
+ *          //render table view
+ *      }
+ *  }
+ * ```
+ */
 class DatagridView<DataType extends object = any, PropsExtensions = unknown, StateExtensions = unknown> extends ObservableComponent<IDatagridViewProps<DataType, PropsExtensions>, IDatagridViewState<DataType, StateExtensions>, IDatagridEvent> {
     private static reflectMetadataKey = Symbol('datagrid-reflect-viewName-key');
     private static aggregationFunctionMetadataKey = Symbol("datagrid-aggregation-functions-meta");
@@ -345,8 +373,39 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns The rendered column header component, or null if the column does not exist.
      */
     renderTableColumnHeader(columnName: string, columnIndex: number): JSX.Element | null {
-        return this.renderTableCellOrColumnHeader(columnName, "header");
+        return <>
+            {this.renderTableCellOrColumnHeader(columnName, "header")}
+            {this.renderTableColumnHeaderChildren(columnName, columnIndex)}
+        </>
     }
+    /*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Renders additional children for a table column header.
+     * 
+     * By default, this method returns null, so the rendered column header does not have any additional children.
+     * 
+     * @param {string} columnName - The name of the column to render children for.
+     * @param {number} columnIndex - The index of the column in the grid.
+     * @returns {JSX.Element | null} - The rendered additional children for the column header, or null if no additional children are needed.
+     */
+    /*******  2e8e8306-8b4d-42fe-812e-3ef78c15112f  *******/
+
+    renderTableColumnHeaderChildren(columnName: string, columnIndex: number): JSX.Element | null {
+        return null;
+    }
+    /**
+     * Returns the style object for a table column header.
+     * 
+     * By default, this method returns null and the column header style is determined by the theme.
+     * 
+     * @param {IDatagridViewStateColumn<DataType>} column - The column to get the style for.
+     * 
+     * @returns {IViewStyle} The style object for the column header.
+     */
+    getTableColumnHeaderStyle(column: IDatagridViewStateColumn<DataType>): IViewStyle {
+        return null;
+    }
+
     /**
      * Renders the table body.
      * 
@@ -435,6 +494,19 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     renderTableCell(columnName: string, rowData: DataType, rowIndex: number): JSX.Element | null {
         if (!isObj(rowData) || !this.getColumn(columnName)) return null;
         return this.renderTableCellOrColumnHeader(columnName, "rowCell", rowData);
+    }
+    /**
+     * Returns the style for a table cell in the grid.
+     * 
+     * This method can be overridden to provide a custom style for a table cell in the grid.
+     * 
+     * @param {IDatagridViewStateColumn<DataType>} column - The column configuration for the column that the cell belongs to.
+     * @param {DataType} rowData - The row data for the cell.
+     * 
+     * @returns {IViewStyle} The style for the table cell.
+     */
+    getTableCellStyle(column: IDatagridViewStateColumn<DataType>, rowData: DataType): IViewStyle {
+        return null;
     }
     /**
      * Renders a grouped row.
@@ -792,11 +864,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         const groupedColumns = Array.isArray(sessionData.groupedColumns) ? sessionData.groupedColumns : Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : [];
         r.groupedColumns = groupedColumns;
-        (r as any).showOnlyAggregatedTotals = !!sessionData.showOnlyAggregatedTotals;
 
         this.getToogleableStateKeys().map((key) => {
             const propValue = (this.props as any)[key];
-            (r as any)[key] = defaultBool(sessionData[key], propValue, propValue !== false);
+            (r as any)[key] = defaultBool(sessionData[key], propValue, !["showOnlyAggregatedTotals"].includes(key as string));
             if (propValue === false) {
                 (r as any)[key] = false;
             }
@@ -816,7 +887,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * the togglable state properties of the DatagridView.
      */
     getToogleableStateKeys(): (keyof IDatagridViewState<DataType, StateExtensions>)[] {
-        return ["showFilters", "showHeaders", "showAggregatedTotals", "showActions", "showToolbar"];
+        return ["showFilters", "showHeaders", "showAggregatedTotals", "showActions", "showToolbar", "showOnlyAggregatedTotals"];
     }
 
     /**
@@ -984,11 +1055,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         this.toggleShow("showAggregatedTotals");
     }
     toggleShowOnlyAggregatedTotals() {
-        this.updateState({
-            showOnlyAggregatedTotals: !this.state.showOnlyAggregatedTotals
-        }, () => {
-            this.setSessionData("showOnlyAggregatedTotals", this.state.showOnlyAggregatedTotals);
-        });
+        this.toggleShow("showOnlyAggregatedTotals");
     }
     /**
      * Toggles the display of headers.
@@ -1560,7 +1627,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {DataType[]} - An array of data objects.
      */
-    getData() {
+    getData(): DataType[] | IDatagridViewGroupedRow<DataType>[] {
         return Array.isArray(this.state.data) ? this.state.data : [];
     }
 
@@ -2075,6 +2142,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const { containerLayout: { y: parentPageY, height: parentHeight }, contentContainerLayout: { pageY }, toolbarActionsContainerLayout: { height: toolbarHeight } } = this.state;
         const minHeight = this.getMinHeight();
         const maxHeight = this.getMaxHeight();
+        //const screenHeight = Dimensions.get("window").height;
+        //const bottomPadding = screenHeight - defaultNumber(parentPageY);
         //const containerRelativeY = Math.max(defaultNumber(pageY) - parentPageY, 0);
         //const availableHeight = defaultNumber(Math.max(parentHeight - containerRelativeY - 20, minHeight, 0));
         const availableHeight = maxHeight - defaultNumber(toolbarHeight);
@@ -2700,6 +2769,9 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
     isRowCell() {
         return this.props.renderType === "rowCell" && isObj(this.props.rowData);
     }
+    getTestID() {
+        return defaultStr(this.props.testID, this.getDatagridContext().getTestID() + "-column" + this.getName() + (this.isRowCell() ? "-cell" : "-header"));
+    }
     /**
      * Renders the column as a row cell.
      * 
@@ -2718,7 +2790,10 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
             const datagridContext = this.getDatagridContext();
             return this.props.renderRowCell(datagridContext.getCallOptions({ column, rowData: rowData }));
         }
-        return <Label {...labelProps} >{this.computeCellValue(rowData as DataType)}</Label>;
+        const testID = this.getTestID();
+        return <View testID={testID} style={[styles.rowCell, this.getStyle()]}>
+            <Label {...labelProps} testID={testID + "-label"} style={[this.getStyle(), labelProps?.style]} >{this.computeCellValue(rowData as DataType)}</Label>
+        </View>;
     }
 
     /**
@@ -2732,6 +2807,35 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      */
     isValidColumn(column: any): column is IDatagridViewStateColumn<DataType> {
         return this.getDatagridContext().isValidColumn(column);
+    }
+    /**
+     * Gets the row data.
+     * 
+     * This method returns the row data, if the column is a row cell.
+     * 
+     * @returns The row data, or null if the column is not a row cell.
+     */
+    getRowData(): DataType | null {
+        if (!this.isRowCell()) return null;
+        return this.props.rowData as DataType;
+    }
+
+    /**
+     * Gets the style for the column, depending on whether it is a row cell or a header.
+     * 
+     * If the column is a row cell, this method calls `getTableCellStyle` on the datagrid context, passing the column configuration and the row data.
+     * If the column is a header, this method calls `getTableColumnHeaderStyle` on the datagrid context, passing the column configuration.
+     * 
+     * @returns The style for the column, or null if the column is not a valid column.
+     */
+    getStyle(): IViewStyle {
+        const datagridContext = this.getDatagridContext();
+        const column = this.getColumn();
+        if (!column) return null;
+        if (this.isRowCell()) {
+            return datagridContext.getTableCellStyle(column, this.getRowData() as DataType);
+        }
+        return datagridContext.getTableColumnHeaderStyle(column);
     }
     /**
      * Renders the column as a header.
@@ -2748,14 +2852,17 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
             const datagridContext = this.getDatagridContext();
             return this.props.renderHeader(datagridContext.getCallOptions({ column }));
         }
-        const testId = this.getDatagridContext().getTestID() + "-column-" + column.name;
+        const testId = this.getTestID();
         const sortIcon = this.getSortIcon();
-        return <View style={styles.columnHeaderWrapper} testID={testId + "-wrapper"}>
-            <View testID={testId + "-container"} style={[styles.columnHeaderContainer]}>
-                <Label testID={testId} {...labelProps} >{this.props.label}</Label>
+        return <View style={[styles.columnHeader, this.getStyle()]} testID={testId}>
+            <View testID={testId + "-content-container"} style={[styles.columnHeaderContentContainer]}>
+                <Label testID={testId + "-label"} {...labelProps} >{this.props.label}</Label>
                 {sortIcon ? <FontIcon testID={testId + "-sort-icon"} color={Theme.colors.primary} size={25} name={sortIcon} onPress={(event) => { this.sort(); }} /> : null}
             </View>
         </View>
+    }
+    renderHeaderChildren(): JSX.Element | null {
+        return null;
     }
     /**
      * Retrieves the type of the field for the column.
@@ -2889,7 +2996,7 @@ export function AttachDatagridView<DataType extends object = any, PropsExtension
 
 
 
-const Datagrid: IDatagridExported = function Datagrid<DataType extends object = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType, {}>) {
+const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType, {}>) {
     useDimensions();
     const { viewNames, viewName } = useMemo(() => {
         const registeredViewNames = Object.keys(DatagridView.getRegisteredViewsWithOptions()) as IDatagridViewName[];
@@ -2915,11 +3022,26 @@ const Datagrid: IDatagridExported = function Datagrid<DataType extends object = 
         {...props as any}
         {...restProps}
     />;
-} as IDatagridExported;
+};
 
 (Datagrid as any).View = DatagridView;
 
 
+/**
+ * A loading indicator component for the DatagridView.
+ * 
+ * This static method renders a custom loading indicator component based on the 
+ * current loading state of the DatagridView. It listens for "toggleIsLoading" events 
+ * from the DatagridView context to update the loading state. The loading state is 
+ * managed internally using React's state and effect hooks.
+ * 
+ * @param {Object} param - The function parameter.
+ * @param {IReactComponent<IDatagridLoadingIndicatorProps>} param.Component - The component to render as the 
+ * loading indicator. It receives the `isLoading` prop to determine its display.
+ * 
+ * @returns {JSX.Element | null} The rendered loading indicator component, or null 
+ * if the provided Component is not a function.
+ */
 function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridLoadingIndicatorProps> }) {
     const datagridContext = useDatagrid();
     const canShowLoadingIndicator = !!datagridContext?.canShowLoadingIndicator();
@@ -2961,12 +3083,40 @@ function ProgressBarLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIn
     return <ProgressBar indeterminate visible={isLoading} {...props} />
 }
 
-
+/**
+ * A default loading indicator component for the DatagridView that uses the
+ * ProgressBarLoadingIndicator loading indicator component to show an
+ * indeterminate progress bar at the bottom of the DatagridView. It listens
+ * for "toggleIsLoading" events from the DatagridView context to update the
+ * loading state. The loading state is managed internally using
+ * React's state and effect hooks.
+ * @param {IDatagridLoadingIndicatorProps} props - The properties for the
+ * loading indicator.
+ * @param {boolean} props.isLoading - The boolean indicating whether the
+ * DatagridView is in a loading state.
+ * @returns {JSX.Element | null} The rendered loading indicator component, or
+ * null if the loading indicator is not to be rendered.
+ */
 function DefaultLoadingIndicator({ isLoading }: IDatagridLoadingIndicatorProps) {
     return <ProgressBarLoadingIndicator isLoading={isLoading} />;
 }
 
 
+/**
+ * A loading indicator component for the DatagridView that uses the Preloader
+ * component to show a loading indicator that covers the entire screen.
+ * It listens for "toggleIsLoading" events from the DatagridView context to
+ * update the loading state. The loading state is managed internally using
+ * React's state and effect hooks.
+ * 
+ * @param {IDatagridLoadingIndicatorProps & IPreloaderProps} props - The properties for the
+ * loading indicator.
+ * @param {boolean} props.isLoading - The boolean indicating whether the
+ * DatagridView is in a loading state.
+ * 
+ * @returns {JSX.Element | null} The rendered loading indicator component, or
+ * null if the loading indicator is not to be rendered.
+ */
 function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIndicatorProps & IPreloaderProps) {
     const hasShownPreloaderRef = useRef(false);
     useEffect(() => {
@@ -2981,98 +3131,16 @@ function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIndi
     }, [!!isLoading]);
     return null;
 }
-
-
-interface IDatagridExported<DataType extends object = any> extends React.FC<IDatagridProps<DataType>> {
-
-    /**
-     * A flexible and feature-rich data grid component for React Native.
-     * 
-     * The `DatagridView` class provides a powerful grid system for displaying, sorting, filtering, grouping, and paginating data.
-     * It supports advanced features such as column aggregation, custom view names, and session-based state persistence.
-     * 
-     * @template DataType - The type of the data shown in the grid.
-     * @template PropsExtensions - The type of the component's props. This type is used to extend the component's props with additional properties.
-     * @template StateExtensions - The type of the component's state. This type is used to extend the component's state with additional properties.
-     * 
-     * @example
-     * ```tsx
-     *  // Extending DatagridView externally to add a custom view
-     *  import {AttachDatagridView} from "@resk/native";
-     *  interface IDatagridTableViewProps<DataType extends object = any> {}
-     *
-     *   declare module "@resk/native" {
-     *       export interface IDatagridViews {
-     *           table: IDatagridTableViewProps;
-     *       }
-     *   }
-     *  @AttachDatagridView({name: "table", label: "Table"})
-     *  class DatagridTableView<DataType extends object = any> extends DatagridView<DataType, IDatagridTableViewProps> {
-     *      _render(){
-     *          //render table view
-     *      }
-     *  }
-     * ```
-     */
-    View: typeof DatagridView;
-
-
-    /**
-     * A loading indicator component for the DatagridView.
-     * 
-     * This static method renders a custom loading indicator component based on the 
-     * current loading state of the DatagridView. It listens for "toggleIsLoading" events 
-     * from the DatagridView context to update the loading state. The loading state is 
-     * managed internally using React's state and effect hooks.
-     * 
-     * @param {Object} param - The function parameter.
-     * @param {IReactComponent<IDatagridLoadingIndicatorProps>} param.Component - The component to render as the 
-     * loading indicator. It receives the `isLoading` prop to determine its display.
-     * 
-     * @returns {JSX.Element | null} The rendered loading indicator component, or null 
-     * if the provided Component is not a function.
-     */
-    LoadingIndicator: typeof LoadingIndicator;
-    /**
-     * A default loading indicator component for the DatagridView that uses the
-     * ProgressBarLoadingIndicator loading indicator component to show an
-     * indeterminate progress bar at the bottom of the DatagridView. It listens
-     * for "toggleIsLoading" events from the DatagridView context to update the
-     * loading state. The loading state is managed internally using
-     * React's state and effect hooks.
-     * @param {IDatagridLoadingIndicatorProps} props - The properties for the
-     * loading indicator.
-     * @param {boolean} props.isLoading - The boolean indicating whether the
-     * DatagridView is in a loading state.
-     * @returns {JSX.Element | null} The rendered loading indicator component, or
-     * null if the loading indicator is not to be rendered.
-     */
-    DefaultLoadingIndicator: typeof DefaultLoadingIndicator;
-
-    /**
-     * A loading indicator component for the DatagridView that uses the Preloader
-     * component to show a loading indicator that covers the entire screen.
-     * It listens for "toggleIsLoading" events from the DatagridView context to
-     * update the loading state. The loading state is managed internally using
-     * React's state and effect hooks.
-     * 
-     * @param {IDatagridLoadingIndicatorProps & IPreloaderProps} props - The properties for the
-     * loading indicator.
-     * @param {boolean} props.isLoading - The boolean indicating whether the
-     * DatagridView is in a loading state.
-     * 
-     * @returns {JSX.Element | null} The rendered loading indicator component, or
-     * null if the loading indicator is not to be rendered.
-     */
-    PreloaderLoadingIndicator: typeof PreloaderLoadingIndicator;
-
-    <T extends object = any>(props: IDatagridProps<T>): React.ReactElement;
-}
-
 Datagrid.displayName = "Datagrid";
 Datagrid.LoadingIndicator = LoadingIndicator;
 Datagrid.DefaultLoadingIndicator = DefaultLoadingIndicator;
 Datagrid.PreloaderLoadingIndicator = PreloaderLoadingIndicator;
+Datagrid.View = DatagridView;
+
+
+LoadingIndicator.displayName = "Datagrid.LoadingIndicator";
+DefaultLoadingIndicator.displayName = "Datagrid.DefaultLoadingIndicator";
+PreloaderLoadingIndicator.displayName = "Datagrid.PreloaderLoadingIndicator";
 
 export { Datagrid };
 
@@ -3460,6 +3528,12 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      */
     showAggregatedTotals?: boolean;
 
+    /***
+     * A flag indicating whether to show only the aggregated totals.
+     * Default is to false
+     */
+    showOnlyAggregatedTotals?: boolean;
+
     /**
      * Controls whether the toolbar is displayed.
      * When set to `true`, the toolbar will be visible.
@@ -3745,6 +3819,11 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
      */
     width?: number;
 
+    /***
+     * The flex value of the column or cell column in a header or cell.
+     */
+    flex?: number;
+
     /**
      * The minimum width of the column.
      * 
@@ -3979,8 +4058,14 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
     columnsWidths: Record<string, number>;
 
 
+    /***
+     * A flag indicating whether to show the aggregated totals.
+     */
     showAggregatedTotals: boolean;
 
+    /***
+     * A flag indicating whether to show only the aggregated totals.
+     */
     showOnlyAggregatedTotals: boolean;
 
     /***
@@ -4267,10 +4352,19 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row'
     },
-    columnHeaderWrapper: {
+    columnHeader: {
         alignSelf: "flex-start",
+        position: "relative",
+        flexDirection: "column",
+        flexWrap: "wrap",
     },
-    columnHeaderContainer: {
+    rowCell: {
+        alignSelf: "flex-start",
+        position: "relative",
+        flexDirection: "column",
+        flexWrap: "wrap",
+    },
+    columnHeaderContentContainer: {
         width: '100%',
         justifyContent: "center",
         alignItems: "flex-start",

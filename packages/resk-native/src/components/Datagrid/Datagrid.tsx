@@ -2799,7 +2799,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         }
         const testID = this.getTestID();
         return <View testID={testID} style={[styles.rowCell, this.getStyle()]}>
-            <Label {...labelProps} testID={testID + "-label"} style={[this.getStyle(), labelProps?.style]} >{this.computeCellValue(rowData as DataType)}</Label>
+            <Label {...labelProps} testID={testID + "-label"} >{this.computeCellValue(rowData as DataType)}</Label>
         </View>;
     }
 

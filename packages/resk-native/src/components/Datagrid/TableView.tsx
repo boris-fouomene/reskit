@@ -4,6 +4,7 @@ import { FlatList, SectionList, StyleSheet, View } from "react-native";
 import test from "node:test";
 import { IViewStyle } from "@src/types";
 import { isNumber } from "@resk/core";
+import { useTheme } from "@theme/index";
 
 export interface IDatagridTableViewProps<DataType extends object = any> {
 
@@ -20,9 +21,7 @@ declare module "./Datagrid" {
 })
 export class DatagridTableView<DataType extends object = any> extends Datagrid.View<DataType, IDatagridTableViewProps> {
     renderTableHeader() {
-        return <View style={styles.headers}>
-            <Columns datagridContext={this} />
-        </View>
+        return <Columns datagridContext={this} />
     }
     getViewName(): IDatagridViewName {
         return "table";
@@ -58,14 +57,15 @@ interface IDatagridTableViewCommonProps<DataType extends object = any> {
 
 function Columns<DataType extends object = any>({ datagridContext }: IDatagridTableViewCommonProps<DataType>): JSX.Element | null {
     const visibleColumns = datagridContext.getVisibleColumns();
+    const theme = useTheme();
     const columns = useMemo(() => {
         return visibleColumns.map((column, index) => {
             return datagridContext.renderTableColumnHeader(column.name, index);
         });
     }, [visibleColumns]);
-    return <>
+    return <View testID={datagridContext.getTestID() + "-columns-headers"} style={[styles.headers, { borderBottomWidth: 1, borderBottomColor: theme.colors.outline }]}>
         {columns}
-    </>;
+    </View>;
 }
 Columns.displayName = "DatagridTableView.Columns";
 
@@ -139,12 +139,10 @@ function t() {
 const styles = StyleSheet.create({
     headers: {
         flexDirection: 'row',
-        borderBottomWidth: 2,
         alignItems: 'center',
     },
     row: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
         alignItems: 'center',
     },
 })

@@ -373,10 +373,12 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns The rendered column header component, or null if the column does not exist.
      */
     renderTableColumnHeader(columnName: string, columnIndex: number): JSX.Element | null {
-        return <>
+        const column = this.getColumn(columnName);
+        if (!column) return null;
+        return <React.Fragment key={`column-header-${columnName}`}>
             {this.renderTableCellOrColumnHeader(columnName, "header")}
             {this.renderTableColumnHeaderChildren(columnName, columnIndex)}
-        </>
+        </React.Fragment>
     }
     /*************  ✨ Windsurf Command ⭐  *************/
     /**
@@ -807,7 +809,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const column = this.getColumn(colName);
         if (!column || column.sortable === false) return;
         let direction: IResourceQueryOptionsOrderDirection = "asc";
-        const orderBy = [...this.state.orderBy].filter((o) => {
+        const orderBy2 = Array.isArray(this.state.orderBy) ? this.state.orderBy : [];
+        const orderBy = [...orderBy2].filter((o) => {
             if (!isObj(o)) return false;
             const [field, cDirection] = Object.entries(o)[0];
             const hasF = String(field).toLowerCase() !== String(colName).toLowerCase();
@@ -819,7 +822,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (action == "sort") {
             orderBy.push({ [colName]: direction } as any);
         }
-        this.updateState({ orderBy }, () => {
+        this.updateState({ orderBy, ...this.processData(this.props.data, orderBy) }, () => {
             this.setSessionData("orderBy", orderBy);
         });
     }
@@ -861,6 +864,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             r.orderBy = sessionData.orderBy;
         } else if (Array.isArray(this.props.orderBy) && this.props.orderBy.length > 0) {
             (r as any).orderBy = this.props.orderBy;
+        }
+        if (!Array.isArray(r.orderBy)) {
+            (r as any).orderBy = [];
         }
         const groupedColumns = Array.isArray(sessionData.groupedColumns) ? sessionData.groupedColumns : Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : [];
         r.groupedColumns = groupedColumns;
@@ -1720,7 +1726,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
     internalSort(data: DataType[], orderBy?: IResourceQueryOptionsOrderBy<DataType>): DataType[] {
         if (!Array.isArray(data)) return [];
-        orderBy = Array.isArray(orderBy) ? orderBy : this.state.orderBy;
+        orderBy = Array.isArray(orderBy) ? orderBy : Array.isArray(this.state.orderBy) ? this.state.orderBy : [];
         // Multi-field sorting
         if (data.length && this.isSortable() && Array.isArray(orderBy) && orderBy.length > 0) {
             const sortableCols = orderBy.filter((sortColumn) => {
@@ -1924,7 +1930,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * Processes the data for the component.
      * 
      * This method is an internal, method that is used by the DatagridView to process the data
-     * when the component mounts or when the data changes.
+     * when the component mounts or when the data changes.z
      * 
      * It processes the data by sorting it, filtering it, grouping it, and paginating it.
      * 
@@ -2096,7 +2102,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {string} The test ID for the DatagridView component.
      */
     getTestID() {
-        return defaultStr(this.props.testID, "resk-datagrid");
+        const viewName = this.getViewName();
+        return defaultStr(this.props.testID, "resk-datagrid" + viewName ? `-${viewName}` : "");
     }
 
 
@@ -2786,8 +2793,8 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         }
         const column = this.getColumn();
         if (!this.isValidColumn(column)) return null;
+        const datagridContext = this.getDatagridContext();
         if (typeof this.props.renderRowCell == "function") {
-            const datagridContext = this.getDatagridContext();
             return this.props.renderRowCell(datagridContext.getCallOptions({ column, rowData: rowData }));
         }
         const testID = this.getTestID();
@@ -2848,18 +2855,17 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         const { labelProps, rowData } = this.props;
         const column = this.getColumn();
         if (!this.isValidColumn(column)) return null;
-        if (typeof this.props.renderHeader == "function") {
-            const datagridContext = this.getDatagridContext();
-            return this.props.renderHeader(datagridContext.getCallOptions({ column }));
-        }
+        const datagridContext = this.getDatagridContext();
+        const header = typeof this.props.renderHeader == "function" ? this.props.renderHeader(datagridContext.getCallOptions({ column })) : null;
         const testId = this.getTestID();
         const sortIcon = this.getSortIcon();
-        return <View style={[styles.columnHeader, this.getStyle()]} testID={testId}>
+        return <Pressable onPress={(event) => { this.sort() }} disabled={!this.isSortable()} style={[styles.columnHeader, this.getStyle()]} testID={testId}>
             <View testID={testId + "-content-container"} style={[styles.columnHeaderContentContainer]}>
-                <Label testID={testId + "-label"} {...labelProps} >{this.props.label}</Label>
-                {sortIcon ? <FontIcon testID={testId + "-sort-icon"} color={Theme.colors.primary} size={25} name={sortIcon} onPress={(event) => { this.sort(); }} /> : null}
+                {header && isValidElement(header) ? header : <Label testID={testId + "-label"} textBold {...labelProps} >{this.props.label}</Label>}
+                {sortIcon ? <FontIcon testID={testId + "-sort-icon"} color={Theme.colors.primary} size={25} name={sortIcon} /> : null}
+                {sortIcon ? <FontIcon size={25} name="sort-variant-remove" testID={testId + "-unsort-icon"} /> : null}
             </View>
-        </View>
+        </Pressable>
     }
     renderHeaderChildren(): JSX.Element | null {
         return null;
@@ -4357,12 +4363,16 @@ const styles = StyleSheet.create({
         position: "relative",
         flexDirection: "column",
         flexWrap: "wrap",
+        paddingVertical: 7,
+        marginHorizontal: 7,
     },
     rowCell: {
         alignSelf: "flex-start",
         position: "relative",
         flexDirection: "column",
         flexWrap: "wrap",
+        paddingVertical: 7,
+        marginHorizontal: 7,
     },
     columnHeaderContentContainer: {
         width: '100%',

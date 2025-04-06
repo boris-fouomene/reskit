@@ -933,7 +933,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
     updateState(stateData: Partial<IDatagridViewState<DataType, any>>, callback?: () => void) {
         this.setIsLoading(true, () => {
-            this.setState((prevState) => ({ ...prevState, ...stateData }), callback);
+            setTimeout(() => {
+                this.setState((prevState) => ({ ...prevState, ...stateData }), callback);
+            }, 200);
         });
     }
 

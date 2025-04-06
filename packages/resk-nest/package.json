@@ -1,6 +1,6 @@
 {
   "name": "@resk/nest",
-  "version": "1.7.8",
+  "version": "1.7.9",
   "description": "",
   "author": "",
   "license": "UNLICENSED",
@@ -20,7 +20,7 @@
     "@nestjs/common": "^11.0.11",
     "@nestjs/core": "^11.0.11",
     "@nestjs/swagger": "^11.0.6",
-    "@resk/core": "^1.15.0",
+    "@resk/core": "^1.15.3",
     "bcryptjs": "^3.0.2",
     "jose": "^6.0.10",
     "mongoose": "^8.12.1",

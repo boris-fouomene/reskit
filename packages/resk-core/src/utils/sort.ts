@@ -68,7 +68,7 @@ export function sortBy<T, V = any>(
   // Default options
   options = Object.assign({}, options);
   options.direction = isNonNullString(options.direction) && ["asc", "desc"].includes(options.direction) ? options.direction : "asc";
-  options.chunkSize = isNumber(options.chunkSize) && options.chunkSize > 0 ? options.chunkSize : 100000;
+  options.chunkSize = isNumber(options.chunkSize) && options.chunkSize > 0 ? options.chunkSize : 10000;
   options.ignoreCase = defaultBool(options.ignoreCase, true);
   const {
     direction,

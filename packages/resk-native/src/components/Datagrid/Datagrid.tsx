@@ -818,7 +818,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             isLayoutMeasured: true,
         } as IDatagridViewState<DataType>;
         Object.assign(this.state, this.processColumns());
-        Object.assign(this.state, this.processData(this.props.data));
+        Object.assign(this.state, this.processData({
+            data: this.props.data,
+        }));
     }
     onDimensionsChange() {
         if (this.props.bindDimensionsChangeEvent === false) {
@@ -866,7 +868,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         const orderBy: IDatagridViewOrderBy<DataType> = { column: colName, direction };
         this.setIsLoading(true, () => {
-            this.updateState({ orderBy, ...this.processData(this.props.data, orderBy) }, () => {
+            this.updateState({ orderBy, ...this.processData({ orderBy }) }, () => {
                 this.setSessionData("orderBy", orderBy);
                 this.trigger("columnSorted", orderBy);
             });
@@ -903,7 +905,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
 
         this.getToogleableStateKeys().map((key) => {
             const propValue = (this.props as any)[key];
-            (r as any)[key] = defaultBool(sessionData[key], propValue, !["showOnlyAggregatedTotals"].includes(key as string));
+            (r as any)[key] = defaultBool(sessionData[key], propValue, !["showOnlyAggregatedTotals", "includeColumnLabelInGroupedRowHeader"].includes(key as string));
             if (propValue === false) {
                 (r as any)[key] = false;
             }
@@ -923,7 +925,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * the togglable state properties of the DatagridView.
      */
     getToogleableStateKeys(): (keyof IDatagridViewState<DataType, StateExtensions>)[] {
-        return ["showFilters", "showHeaders", "showAggregatedTotals", "showActions", "showToolbar", "showOnlyAggregatedTotals"];
+        return ["showFilters", "showHeaders", "showAggregatedTotals", "showActions", "showToolbar", "showOnlyAggregatedTotals", "includeColumnLabelInGroupedRowHeader"];
     }
 
     /**
@@ -1114,6 +1116,24 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         this.toggleShow("showToolbar");
     }
     /**
+     * Toggles the inclusion of column labels in the grouped row header.
+     *
+     * This method toggles the `includeColumnLabelInGroupedRowHeader` state and persists it to the session data.
+     *
+     * @returns {void}
+     */
+    toggleIncludeColumnLabelInGroupedRowHeader() {
+        this.setIsLoading(true, () => {
+            const includeColumnLabelInGroupedRowHeader = !!!this.state.includeColumnLabelInGroupedRowHeader;
+            this.updateState({
+                includeColumnLabelInGroupedRowHeader,
+                ...this.processData({ includeColumnLabelInGroupedRowHeader })
+            }, () => {
+                this.setSessionData("includeColumnLabelInGroupedRowHeader", includeColumnLabelInGroupedRowHeader);
+            })
+        });
+    }
+    /**
      * Determines if the toolbar can be shown in the datagrid.
      *
      * This method checks the current state and props to decide if the toolbar should be shown.
@@ -1165,7 +1185,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 newGroupedColumns.push(column.name as any);
             }
             this.updateState({
-                ...this.processData(this.state.allData, this.state.orderBy, newGroupedColumns),
+                ...this.processData({
+                    orderBy: this.state.orderBy,
+                    groupedColumns: newGroupedColumns
+                }),
                 groupedColumns: newGroupedColumns
             }, () => {
                 this.setSessionData("groupedColumns", this.state.groupedColumns);
@@ -1184,7 +1207,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         this.setIsLoading(true, () => {
             this.updateState({
                 groupedColumns: [],
-                ...this.processData(this.props.data, undefined, []),
+                ...this.processData({
+                    groupedColumns: [],
+                }),
             }, () => {
                 this.setSessionData("groupedColumns", []);
             });
@@ -1235,6 +1260,26 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return DatagridView.staticTranslate<T>(key, options);
     }
     /**
+     * Returns an array of menu items for selecting groupable columns.
+     *
+     * Each item must conform to the IDatagridViewToolbarAction interface and
+     * must have the following properties:
+     * - label: The label to display for the menu item.
+     * - icon: The icon to display for the menu item. If the column is currently
+     *   grouped, the icon should be a check icon. If the column is not grouped,
+     *   the icon should be a null or undefined.
+     * - onPress: The function to call when the menu item is pressed. This
+     *   function should toggle the grouping state of the column.
+     *
+     * The method should return an empty array if the datagrid is not groupable.
+     *
+     * @returns {(IDatagridViewToolbarAction<DataType> | null)[]} - An array of
+     *   menu items for selecting groupable columns.
+     */
+    getGroupableColumnsMenuItems(): (IDatagridViewToolbarAction<DataType> | null)[] {
+        return [];
+    }
+    /**
      * Renders a menu for selecting groupable columns.
      *
      * This method checks if the datagrid is groupable and renders a menu that 
@@ -1259,7 +1304,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (!Array.isArray(groupableColumns) || !Array.isArray(groupedColumns)) {
             return null;
         }
-        const menuItems: (IDatagridToolbarAction | null)[] = [];
+        const menuItems2 = this.getGroupableColumnsMenuItems();
+        const menuItems: (IDatagridViewToolbarAction | null)[] = [];
         const isGlobalGrouped = groupedColumns.length;
         groupableColumns.map((column) => {
             if (!column?.groupable) return;
@@ -1290,21 +1336,29 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                         labelProps: { textBold: true },
                         ///onPress : this.configureSectionLists.bind(this),
                     },
+                    {
+                        label: this.translate("includeColumnLabelInGroupedRowHeader"),
+                        icon: this.state.includeColumnLabelInGroupedRowHeader ? "check" : null,
+                        onPress: () => {
+                            this.toggleIncludeColumnLabelInGroupedRowHeader();
+                        }
+                    },
                     this.canShowAggregatedTotals() ? {
                         label: DatagridView.staticTranslate("displayOnlyAggregatedTotal"),
                         icon: this.canShowAggregatedTotals() ? "check" : null,
                         onPress: this.toggleShowOnlyAggregatedTotals.bind(this)
                     } : null,
+                    ...(Array.isArray(menuItems2) ? menuItems2 : []),
                     isGlobalGrouped ? {
                         label: DatagridView.staticTranslate("ungroup"),
                         icon: "ungroup",
-                        divider: true,
                         onPress: () => {
                             setTimeout(() => {
                                 this.ungroupAll();
                             }, 100)
                         }
                     } : null,
+                    { divider: true },
                     ...menuItems,
                 ]}
             />
@@ -1349,7 +1403,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (!this.isAggregatable()) return null;
         const aggregatableColumns = this.getAggregatableColumns();
         if (!aggregatableColumns.length) return null;
-        const menuItems: (IDatagridToolbarAction<DataType> | null)[] = [];
+        const menuItems: (IDatagridViewToolbarAction<DataType> | null)[] = [];
         //const aggregatorFunction = this.getCurrentAggregationFunctionName();
         const aggregationsFunctions = this.getAggregationFunctions();
         const aggregationTranslations = this.getAggregationFunctionsTranslations();
@@ -1395,6 +1449,23 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         />
     }
     /**
+     * Returns an array of actions to be displayed in the toolbar of the DatagridView component.
+     * 
+     * By default, this method returns an empty array. You can override this method to return your own
+     * actions. Each action should be an object with the following properties:
+     * - `label`: The text to be displayed in the action button.
+     * - `icon`: The icon to be displayed in the action button.
+     * - `onPress`: The function to be called when the action button is pressed.
+     * - `divider`: A boolean indicating whether to display a divider after the action button.
+     * - `style`: An array of styles to be applied to the action button.
+     * - `disabled`: A boolean indicating whether the action button is disabled.
+     * 
+     * @returns {(IDatagridViewToolbarAction<DataType> | null)[]} An array of actions to be displayed in the toolbar.
+     */
+    getToolbarActions(): (IDatagridViewToolbarAction<DataType> | null)[] {
+        return [];
+    }
+    /**
      * Renders the toolbar for the datagrid.
      * 
      * This method will render all the toolbar actions, including the following:
@@ -1413,8 +1484,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const { columns } = this.state;
         const cActions = typeof this.props.toolbarActions === "function" ? this.props.toolbarActions(this.getCallOptions({}))
             : Array.isArray(this.props.toolbarActions) ? this.props.toolbarActions : undefined;
-        const actions = (Array.isArray(cActions) ? cActions : []) as IDatagridToolbarAction<DataType>[];
-        //const actions: IDatagridToolbarAction<DataType>[] = [];
+        const actions = (Array.isArray(cActions) ? cActions : []) as IDatagridViewToolbarAction<DataType>[];
+        //const actions: IDatagridViewToolbarAction<DataType>[] = [];
         const selectable = this.isSelectable();
         const data = this.state.data;
         const paginatedData = this.state.paginatedData;
@@ -1422,6 +1493,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const isFilterable = this.isFilterable();
         const selectedRowsCount = this.getSelectedRowsCount();
         const isAggregatable = this.isAggregatable();
+        const customToolbarActions = this.getToolbarActions();
         if (isFilterable) {
             actions.push({
                 label: DatagridView.staticTranslate("showFilters", { count: dataLength }),
@@ -1472,13 +1544,13 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const testID = this.getTestID();
         return <ScrollView horizontal testID={testID + "-toolbar-scrollview"} contentContainerStyle={styles.headerScrollViewContentContainer} style={[styles.headerScrollView]}>
             <View testID={testID + "-toolbar-container"} style={[styles.toolbarContainer]}>
-                {actions.map((action, index) => {
+                {(Array.isArray(customToolbarActions) ? [...actions, customToolbarActions] : actions).map((action, index) => {
                     if (!action || !isObj(action)) return null;
                     const key = "toolbar-action-" + index;
                     return <Button
                         testID={testID + "-toolbar-button-" + index} key={key}
                         {...action}
-                        context={Object.assign({}, action.context, { datagridContext: this })}
+                        context={Object.assign({}, (action as any).context, { datagridContext: this })}
                     />
                 })}
                 <Menu
@@ -1792,30 +1864,32 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {string} - The separator used for grouping row headers.
      */
     getGroupedRowHeaderSeparator(): string {
-        return defaultStr(this.props.groupedRowHeaderSeparator, ",");
+        return defaultStr(this.props.groupedRowHeaderSeparator, ", ");
     }
     /**
      * Computes the grouped row header text from the given row data.
      * 
      * @param {DataType} rowData - The row data to use for computing the grouped row header.
      * @param {string[]} groupedColumns - The columns to include in the grouped row header. If not specified, the DatagridView's `groupedColumns` state is used.
-     * 
+     * @param {boolean} includeColumnLabelInGroupedRowHeader  - 
      * @returns {string} - The grouped row header text. If no columns are specified, an empty string is returned.
      */
-    computeGroupedRowHeader(rowData: DataType, groupedColumns?: string[]): string {
+    computeGroupedRowHeader(rowData: DataType, groupedColumns?: string[], includeColumnLabelInGroupedRowHeader?: boolean): string {
         const d: string[] = [];
         const groupHeaderSeparator = this.getGroupedRowHeaderSeparator();
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
-        const includeColumnLabelInGroupedRowHeader = this.props.includeColumnLabelInGroupedRowHeader !== false;
+        includeColumnLabelInGroupedRowHeader = defaultBool(includeColumnLabelInGroupedRowHeader, this.state.includeColumnLabelInGroupedRowHeader, this.props.includeColumnLabelInGroupedRowHeader !== false);
         groupedColumns.map((columnName) => {
             if (!isNonNullString(columnName)) return;
             const column = this.getColumn(columnName);
             if (!column) return;
-            const txt = this.computeCellValue(column, rowData, true);
-            if (isEmpty(txt)) return;
-            const labelText = getTextContent(column.label);
+            let txt = this.computeCellValue(column, rowData, true);
+            if (isEmpty(txt)) {
+                txt = "N/A";
+            }
             const stringifiedTxt = stringify(txt, { escapeString: false });
             if (!stringifiedTxt) return;
+            const labelText = getTextContent(column.label);
             if (labelText && includeColumnLabelInGroupedRowHeader) {
                 d.push(`${labelText} : ${stringifiedTxt}`)
             } else {
@@ -1956,17 +2030,20 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * It processes the data by sorting it, filtering it, grouping it, and paginating it.
      * 
-     * @param {DataType[]} data - The data to process.
-     * @param {IDatagridViewOrderBy<DataType>} orderBy - The sorting columns and directions. If not specified, the DatagridView's `orderBy` state is used.
-     * @param {string[]} groupedColumns - The columns to group the data by. If not specified, the DatagridView's `groupedColumns` state is used.
+     * @param {object} options
+     * @param {DataType[]} options.data - The data to process.
+     * @param {IDatagridViewOrderBy<DataType>} options.orderBy - The sorting columns and directions. If not specified, the DatagridView's `orderBy` state is used.
+     * @param {string[]} options.groupedColumns - The columns to group the data by. If not specified, the DatagridView's `groupedColumns` state is used.
      * @param {IDatagridPagination} pagination - The pagination configuration. If not specified, the DatagridView's `pagination` state is used.
-     * 
+     * @param {boolean} {options.includeColumnLabelInGroupedRowHeader} - Whether to include the column label in the grouped row header. If not specified, the DatagridView's `includeColumnLabelInGroupedRowHeader` state is used.
      * @returns {Partial<IDatagridViewState<DataType, StateExtensions>>} - A partial state object containing the aggregated columns values, the paginated data, the all data, the data to display, the pagination configuration, and the grouped rows by keys.
      */
-    processData(data: DataType[], orderBy?: IDatagridViewOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination): Partial<IDatagridViewState<DataType, any>> {
+    processData(options?: { data?: DataType[], orderBy?: IDatagridViewOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination, includeColumnLabelInGroupedRowHeader?: boolean }): Partial<IDatagridViewState<DataType, any>> {
+        let { data, orderBy, groupedColumns, pagination, includeColumnLabelInGroupedRowHeader } = Object.assign({}, options);
         let allData: DataType[] = [];
         const paginationConfig: IDatagridPagination = isObj(pagination) ? pagination as IDatagridPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridPagination;
         const canPaginate = this.canPaginate();
+        data = Array.isArray(data) ? data : Array.isArray(this.state.allData) ? this.state.allData : Array.isArray(this.props.data) ? this.props.data : [];
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const groupedRowsByKeys: IDatagridViewState<DataType, StateExtensions>["groupedRowsByKeys"] = {} as IDatagridViewState<DataType, StateExtensions>["groupedRowsByKeys"];
         const rowsByKeys: IDatagridViewState<DataType, StateExtensions>["rowsByKeys"] = {} as IDatagridViewState<DataType, StateExtensions>["rowsByKeys"];
@@ -2003,7 +2080,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const unknowGroupLabel = "N/A";
         if (isGroupable) {
             paginatedData.map((rowData, rowIndex) => {
-                const groupedRowLabel = defaultStr(this.computeGroupedRowHeader(rowData, groupedColumns), unknowGroupLabel);
+                const groupedRowLabel = defaultStr(this.computeGroupedRowHeader(rowData, groupedColumns, includeColumnLabelInGroupedRowHeader), unknowGroupLabel);
                 const groupedRowKey = groupedRowLabel.trim().replace(/\s/g, '_');
                 const groupedRow: IDatagridViewGroupedRow<DataType> = {
                     label: groupedRowLabel,
@@ -2080,14 +2157,16 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             hasUpdated = true;
         }
         const hasOrderByChanged = prevProps?.orderBy?.column !== this.props.orderBy?.column || prevProps?.orderBy?.direction !== this.props.orderBy?.direction && isObj(this.props.orderBy);
-        const orderBy = hasOrderByChanged ? (this.props as any).orderBy : this.state.orderBy;
+        const orderBy: IDatagridViewOrderBy<DataType> = hasOrderByChanged ? (this.props as any).orderBy : this.state.orderBy;
         const groupedColumns = Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const hasGroupedColumnsChanged = !DatagridView.areArraysEqual(prevProps.groupedColumns, this.props.groupedColumns) && Array.isArray(this.props.groupedColumns);
         const hasPaginationChanged = defaultBool(prevProps.paginationEnabled) !== defaultBool(this.props.paginationEnabled) || !areEquals(prevProps.pagination, this.props.pagination);
         const pagination: IDatagridPagination = isObj(this.props.pagination) ? this.props.pagination as any : this.state.pagination;
+
+        const dataChanged = !DatagridView.areArraysEqual(prevProps.data, this.props.data);
         // Check if data has changed
-        if (hasUpdated || hasPaginationChanged || hasGroupedColumnsChanged || hasOrderByChanged || !DatagridView.areArraysEqual(prevProps.data, this.props.data)) {
-            Object.assign(newState, this.processData(this.props.data, orderBy, groupedColumns, pagination));
+        if (hasUpdated || hasPaginationChanged || hasGroupedColumnsChanged || hasOrderByChanged || dataChanged) {
+            Object.assign(newState, this.processData({ orderBy, groupedColumns, pagination, data: dataChanged ? this.props.data : this.state.allData }));
             hasUpdated = true;
         }
         this.getToogleableStateKeys().map((key) => {
@@ -3528,10 +3607,10 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * - A function that returns an array of React nodes (e.g., buttons), or
      * - An array of React nodes directly.
      *
-     * @type {((datagridContext: DatagridView<DataType>) => ((IDatagridToolbarAction<DataType>|null)[])) | (IDatagridToolbarAction<DataType>|null)[]}
+     * @type {((datagridContext: DatagridView<DataType>) => ((IDatagridViewToolbarAction<DataType>|null)[])) | (IDatagridViewToolbarAction<DataType>|null)[]}
      * @remarks Toolbar actions are rendered in the order they are defined. Toolbar represents the top-right area of the DatagridView, rendered directly under the actions bar.
      */
-    toolbarActions?: ((options: IDatagridViewCallOptions<DataType, PropsExtensions>) => ((IDatagridToolbarAction<DataType> | null)[])) | (IDatagridToolbarAction<DataType> | null)[];
+    toolbarActions?: ((options: IDatagridViewCallOptions<DataType, PropsExtensions>) => ((IDatagridViewToolbarAction<DataType> | null)[])) | (IDatagridViewToolbarAction<DataType> | null)[];
 
     /**
      * Minimum height the DataGrid should maintain
@@ -3562,7 +3641,7 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
  * @template DatagridStateExtensions - The type of the DatagridView component's state.
  * @extends {IButtonProps}
  */
-export interface IDatagridToolbarAction<DataType extends object = any, DatagridPropExtensions = unknown, DatagridStateExtensions = unknown> extends IButtonProps<{
+export interface IDatagridViewToolbarAction<DataType extends object = any, DatagridPropExtensions = unknown, DatagridStateExtensions = unknown> extends IButtonProps<{
     /**
      * The DatagridView context.
      *
@@ -4053,6 +4132,8 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
      * A flag indicating whether to display the actions toolbar.
      */
     showActions: boolean;
+
+    includeColumnLabelInGroupedRowHeader?: boolean;
 };
 
 /**

@@ -91,13 +91,6 @@ const Label = React.forwardRef(({
 
   r2.userSelect = typeof userSelect === "boolean" ? (!userSelect ? "none" : "all") : userSelect;
 
-  // Convert children to string if necessary and apply upper case transformation
-  if ((children && typeof children === "string") || typeof children === "number" || typeof children === "boolean") {
-    children = String(children);
-    if (uppercase) {
-      children = (children as string).toUpperCase();
-    }
-  }
   return (
     <Text
       allowFontScaling={true}
@@ -112,6 +105,7 @@ const Label = React.forwardRef(({
         splitText ? Theme.styles.flexWrap : null,
         splitText ? Theme.styles.w100 : null,
         textBold ? Theme.styles.fontBold : null,
+        uppercase ? Theme.styles.uppercase : null,
         r2,
         r1,
         disabled && Theme.styles.disabled,

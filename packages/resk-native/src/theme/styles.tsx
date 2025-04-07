@@ -314,8 +314,25 @@ const styles = StyleSheet.create({
      * ```
      */
     underline: { textDecorationLine: 'underline' },
+    /***
+     *  Text Decoration: line-through
+     * 
+     * This style adds a line through the text.
+     */
     lineThrough: { textDecorationLine: 'line-through' },
+    /***
+     *  Text Transform: uppercase
+     * 
+     * This style transforms the text to uppercase.
+     * 
+     */
+    uppercase: { textTransform: 'uppercase' },
 
+    /**
+     *  Flex: flex0
+     * 
+     * This style sets the flex property to 0.
+     */
     flex0: {
         flex: 0,
     },
@@ -382,21 +399,53 @@ const styles = StyleSheet.create({
      * </View>
      */
     flex6: { flex: 6 },
+    /***
+     *  Flex: flexRow
+     * flexDirection: row
+     */
     flexRow: { flexDirection: 'row' },
+    /**
+     *  Flex: flexCol
+     * flexDirection: column
+     */
     flexCol: { flexDirection: 'column' },
+    /**
+     *  Flex: flexWrap
+     * flexWrap: wrap
+     */
     flexWrap: { flexWrap: 'wrap' },
+    /**
+     *  Flex: flexColReverse
+     * flexDirection: column-reverse
+     */
     flexColReverse: {
         flexDirection: 'column-reverse',
     },
+    /***
+     *  Flex: flexRowReverse
+     * flexDirection: row-reverse
+     */
     flexRowReverse: {
         flexDirection: 'row-reverse',
     },
+    /***
+     *  Flex: flexGrow
+     * flexGrow: 1
+     */
     flexGrow: {
         flexGrow: 1,
     },
+    /***
+     *  Flex: flexShrink
+     * flexShrink: 1
+     */
     flexShrink: {
         flexShrink: 1,
     },
+    /***
+     *  Flex: flexShrink0
+     * flexShrink: 0
+     */
     flexShrink0: {
         flexShrink: 0,
     },

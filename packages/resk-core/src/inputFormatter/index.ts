@@ -16,6 +16,7 @@ import Logger from "@logger";
 import isPrimitive from "@utils/isPrimitive";
 import stringify from "@utils/stringify";
 import { isNullable } from "@utils/isNullable";
+import { isNumber } from "@utils/isNumber";
 
 const DIGIT_REGEX = /\d/;
 const LETTER_REGEX = /[a-zA-Z]/;
@@ -114,7 +115,7 @@ export default class InputFormatter {
       }
       if (hasFoundDate) { }
       // Format numbers based on the specified format.
-      else if (typeof parsedValue == 'number') {
+      else if (isNumber(parsedValue)) {
         if (typeof (Number.prototype)[format as keyof Number] === 'function') {
           formattedValue = (parsedValue as number)[format as keyof Number]();
         } else {

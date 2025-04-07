@@ -1,4 +1,4 @@
-import React, { createContext, isValidElement, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, isValidElement, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
     View,
     StyleSheet,
@@ -1760,8 +1760,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     computeCellValue(column: IDatagridViewStateColumn<DataType> | IDatagridViewColumnName<DataType>, rowData: DataType, format?: boolean): any {
         const col: IDatagridViewStateColumn = typeof column === "string" && column ? this.getColumn(column) : column as any;
         if (!isObj(rowData) || !isObj(col) || !isNonNullString(col.name)) return undefined;
-        const v = typeof col.computeCellValue === "function" ? col.computeCellValue(this.getCallOptions({ rowData })) : (rowData as any)[col.name];
-        const value = v;
+        const value = typeof col.computeCellValue === "function" ? col.computeCellValue(this.getCallOptions({ rowData })) : (rowData as any)[col.name];
         if (format && !isEmpty(value)) {
             return InputFormatter.formatValue({ ...col, value }).formattedValue;
         }
@@ -2864,8 +2863,18 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         return <View testID={testID} style={[styles.rowCell, this.getStyle()]}>
             <Label wrapText numberOfLines={10} {...labelProps} testID={testID + "-label"} >{
                 children !== null && children != undefined && (["number", "boolean"].includes(typeof children) || children) ? children
-                    : this.computeCellValue(rowData as DataType, true)}</Label>
+                    : this.renderRowCellContent()}</Label>
         </View>;
+    }
+    /**
+     * Renders the content of the row cell.
+     * 
+     * This method renders the content of the row cell by computing the value of the column based on the provided row data and formatting it.
+     * 
+     * @returns The rendered row cell content.
+     */
+    renderRowCellContent(): ReactNode {
+        return this.computeCellValue(this.props.rowData as DataType, true);
     }
 
     /**

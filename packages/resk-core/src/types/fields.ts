@@ -1,5 +1,8 @@
 import { IAuthPerm } from "@/auth/types";
 import { IResourceActionName, IResourceActionTupleObject } from "./resources";
+import { IMomentFormat } from "./date";
+import { ICountryCode } from "@countries/index";
+import { ICurrencyFormatterKey } from "@/currency/types";
 
 /**
  * Represents a base field with optional type, label, and name properties.
@@ -7,6 +10,7 @@ import { IResourceActionName, IResourceActionTupleObject } from "./resources";
  * 
  * @template IFieldType - The type of the field, defaults to "text"
  * @extends IResourceActionTupleObject
+ * @extends Omit<IInputFormatterOptions, "value" | "type">
  * 
  * @description
  * This interface serves as a base for all field types, providing common properties such as type, label, and name.
@@ -22,8 +26,9 @@ import { IResourceActionName, IResourceActionTupleObject } from "./resources";
  * @see {@link IResourceActionTupleObject} for the `IResourceActionTupleObject` type.
  * @see {@link IResourceActionName} for the `IResourceActionName` type.
  * @see {@link IResourceActionTupleObject} for the `IResourceActionTupleObject` type.
+ * @see {@link IInputFormatterOptions} for the `IInputFormatterOptions` type.
  */
-export interface IFieldBase<FieldType extends IFieldType = IFieldType> extends Partial<IResourceActionTupleObject> {
+export interface IFieldBase<FieldType extends IFieldType = IFieldType> extends Partial<IResourceActionTupleObject>, Omit<IInputFormatterOptions, "value" | "type"> {
     /**
      * The type of the field.
      * 
@@ -385,4 +390,136 @@ export function createField<T extends IFieldType>(type: T, props: Omit<IField<T>
         type,
         ...props
     } as IField<T>;
+}
+
+
+
+/**
+ * @interface
+ * Represents a function that formats a field value according to specified options.
+ *
+ * The formatting can be customized based on the options provided when 
+ * the `format` function of the `IField` interface is called. This type 
+ * allows for greater flexibility in defining how field values should 
+ * be displayed or manipulated.
+ *
+ * ### Parameters:
+ * - `options`: 
+ *   - **Type**: `IInputFormatterOptions`
+ *   - An object containing options for formatting the value. The options may 
+ *     include the value to be formatted, the expected type of the value, 
+ *     and a custom format specification.
+ *
+ * ### Returns:
+ * - **Type**: `string`
+ *   - The formatted value as a string, based on the provided options.
+ *
+ * ### Example Usage:
+ * ```typescript
+ * const customFormatter: IInputFormatterValueFunc = (options) => {
+ *     const { value, format } = options;
+ *     if (format === 'money') {
+ *         return `$${parseFloat(value).toFixed(2)}`; // Formats value as money
+ *     }
+ *     return String(value); // Default to string conversion
+ * };
+ *
+ * const formattedValue = customFormatter({
+ *     value: 1234.567,
+ *     format: 'money'
+ * });
+ * console.log(formattedValue); // Outputs: "$1234.57"
+ * ```
+ */
+export type IInputFormatterValueFunc = ((options: IInputFormatterOptions) => string);
+
+
+
+/**
+ * Represents the format types for value formatting.
+ *
+ * This type can be used to specify how values should be formatted in an application, such as:
+ * - As a standard number
+ * - As a monetary value
+ * - Using a custom format defined by the user
+ *
+ * ### Format Options:
+ * - `"number"`: For standard numerical formatting.
+ * - `"money"`: For formatting values as monetary amounts, following currency rules.
+ * - `"custom"`: For user-defined formatting rules.
+ * - `ICurrencyFormatterKey`: Represents a specific currency format that adheres to the structure defined in the `ICurrencyFormatterKey` interface.
+ *
+ * ### Example Usage:
+ * ```typescript
+ * // Define a value with a money format
+ * const moneyValue: IInputFormatterValueFormat = "money";
+ *
+ * // Define a custom format
+ * const customValue: IInputFormatterValueFormat = "custom";
+ *
+ * // Define a value using ICurrencyFormatterKey
+ * const currencyValue: IInputFormatterValueFormat = "formatUSD" | "formatCAD" | "formatEUR" | "formatAED" | "formatAFN" | "formatALL" | "formatAMD" | "formatARS" |;
+ * ```
+ */
+export type IInputFormatterValueFormat = "number" | "money" | "custom" | ICurrencyFormatterKey | IInputFormatterValueFunc;
+
+/**
+ * Options for formatting a value into a string representation.
+ *
+ * This interface is used in the `formatValue` function to specify the options 
+ * for formatting a given value, allowing for flexible and customizable 
+ * output based on the provided settings.
+ *
+ * ### Properties:
+ * - `value?`: The value to be formatted. This can be of any type and is the 
+ *   main input for the formatting process.
+ * - `type?`: The expected type of the input value, which can help in determining 
+ *   the appropriate formatting logic to apply.
+ * - `format?`: A predefined or custom format to be used for formatting the parsed 
+ *   value. This allows for dynamic formatting based on the specified type.
+ *
+ * ### Example Usage:
+ * ```typescript
+ * const options: IInputFormatterOptions = {
+ *   value: 1234.56,
+ *   type: "number",
+ *   format: "money" // Example format for monetary values
+ * };
+ *
+ * const formattedValue = formatValue(options);
+ * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
+ * ```
+ * 
+ *  * ```typescript
+ * const options: IInputFormatterOptions = {
+ *   value: 1234.56,
+ *   type: "number",
+ *   format: "formatUSD" // Example format for monetary values in $USD
+ * };
+ *
+ * const formattedValue = formatValue(options);
+ * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
+ * ```
+ */
+export interface IInputFormatterOptions {
+    value?: any; // The value to be formatted
+    type?: any; // The expected type of the value
+    /**
+    * This function is used by default to format the parsed or custom value.
+    * In an input field, that function or a string used to format the value displayed in the input field.
+    * ```ts
+    *   format : "moneay", //will format the value to money format
+    *   format : ({value:any,type:ITextInputType,format?:"custom"}) => any; //will format the value to any format
+    * ```
+    */
+    format?: IInputFormatterValueFormat; // The format to be applied
+
+    /***
+     * Format for date types
+     */
+    dateFormat?: IMomentFormat;
+    /***
+     * The phone country code, in case of formatting a phone number, type="tel"
+     */
+    phoneCountryCode?: ICountryCode;
 }

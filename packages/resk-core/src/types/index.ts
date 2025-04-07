@@ -1,6 +1,8 @@
-import { ICurrency } from "@/currency/types";
 import { ICountryCode } from "@countries/index";
+import { IInputFormatterOptions } from "./fields";
+import { IMomentFormat } from "./date";
 
+export * from "./date";
 export * from "./dictionary";
 export * from "./filters";
 export * from "./i18n";
@@ -92,135 +94,7 @@ export interface IClassConstructor<T = any, D extends any[] = any[]> extends Fun
  */
 export type ITypeRegistryRenderer<InputType = any, OutputType = any> = (value: InputType) => OutputType;
 
-/**
- * @interface
- * Represents a function that formats a field value according to specified options.
- *
- * The formatting can be customized based on the options provided when 
- * the `format` function of the `IField` interface is called. This type 
- * allows for greater flexibility in defining how field values should 
- * be displayed or manipulated.
- *
- * ### Parameters:
- * - `options`: 
- *   - **Type**: `IInputFormatterOptions`
- *   - An object containing options for formatting the value. The options may 
- *     include the value to be formatted, the expected type of the value, 
- *     and a custom format specification.
- *
- * ### Returns:
- * - **Type**: `string`
- *   - The formatted value as a string, based on the provided options.
- *
- * ### Example Usage:
- * ```typescript
- * const customFormatter: IInputFormatterValueFunc = (options) => {
- *     const { value, format } = options;
- *     if (format === 'money') {
- *         return `$${parseFloat(value).toFixed(2)}`; // Formats value as money
- *     }
- *     return String(value); // Default to string conversion
- * };
- *
- * const formattedValue = customFormatter({
- *     value: 1234.567,
- *     format: 'money'
- * });
- * console.log(formattedValue); // Outputs: "$1234.57"
- * ```
- */
-export type IInputFormatterValueFunc = ((options: IInputFormatterOptions) => string);
 
-
-
-/**
- * Represents the format types for value formatting.
- *
- * This type can be used to specify how values should be formatted in an application, such as:
- * - As a standard number
- * - As a monetary value
- * - Using a custom format defined by the user
- *
- * ### Format Options:
- * - `"number"`: For standard numerical formatting.
- * - `"money"`: For formatting values as monetary amounts, following currency rules.
- * - `"custom"`: For user-defined formatting rules.
- * - `ICurrencyFormatterKey`: Represents a specific currency format that adheres to the structure defined in the `ICurrencyFormatterKey` interface.
- *
- * ### Example Usage:
- * ```typescript
- * // Define a value with a money format
- * const moneyValue: IInputFormatterValueFormat = "money";
- *
- * // Define a custom format
- * const customValue: IInputFormatterValueFormat = "custom";
- *
- * // Define a value using ICurrencyFormatterKey
- * const currencyValue: IInputFormatterValueFormat = "formatUSD" | "formatCAD" | "formatEUR" | "formatAED" | "formatAFN" | "formatALL" | "formatAMD" | "formatARS" |;
- * ```
- */
-export type IInputFormatterValueFormat = "number" | "money" | "custom" | IInputFormatterValueFunc;
-
-/**
- * Options for formatting a value into a string representation.
- *
- * This interface is used in the `formatValue` function to specify the options 
- * for formatting a given value, allowing for flexible and customizable 
- * output based on the provided settings.
- *
- * ### Properties:
- * - `value?`: The value to be formatted. This can be of any type and is the 
- *   main input for the formatting process.
- * - `type?`: The expected type of the input value, which can help in determining 
- *   the appropriate formatting logic to apply.
- * - `format?`: A predefined or custom format to be used for formatting the parsed 
- *   value. This allows for dynamic formatting based on the specified type.
- *
- * ### Example Usage:
- * ```typescript
- * const options: IInputFormatterOptions = {
- *   value: 1234.56,
- *   type: "number",
- *   format: "money" // Example format for monetary values
- * };
- *
- * const formattedValue = formatValue(options);
- * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
- * ```
- * 
- *  * ```typescript
- * const options: IInputFormatterOptions = {
- *   value: 1234.56,
- *   type: "number",
- *   format: "formatUSD" // Example format for monetary values in $USD
- * };
- *
- * const formattedValue = formatValue(options);
- * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
- * ```
- */
-export interface IInputFormatterOptions {
-  value?: any; // The value to be formatted
-  type?: any; // The expected type of the value
-  /**
-  * This function is used by default to format the parsed or custom value.
-  * In an input field, that function or a string used to format the value displayed in the input field.
-  * ```ts
-  *   format : "moneay", //will format the value to money format
-  *   format : ({value:any,type:ITextInputType,format?:"custom"}) => any; //will format the value to any format
-  * ```
-  */
-  format?: IInputFormatterValueFormat; // The format to be applied
-
-  /***
-   * Format for date types
-   */
-  dateFormat?: IMomentFormat;
-  /***
-   * The phone country code, in case of formatting a phone number, type="tel"
-   */
-  phoneCountryCode?: ICountryCode;
-}
 
 /**
  * Options for formatting a masked input value.
@@ -656,47 +530,3 @@ export interface IInputFormatterMaskResult {
     maskChar: string;
   }[]
 }
-/**
- * @type IMomentFormat
- * @description
- * A comprehensive type representing all valid Moment.js format strings.
- * This type serves as a unified reference for various date/time formatting options,
- * accommodating various combinations of date, time, and day of the week components.
- * ### Supported Tokens:
- *  monts : 
- *   M : Month number, without leading zeros (1-12).
- * - **`'MM'`**: 2-digit month (e.g., `10` for October).
- * - **`'MMM'`**: Abbreviated month name (e.g., `Oct` for October).
- * - **`'MMMM'`**: Full month name (e.g., `October`).
- * - **`'D'`**: Day of the month (e.g., `1` for the first day of the month... 2 ... 30 31).
- * - **``Do'`**: Ordinal day of the month (e.g., `1st` for the first day of the month,1st 2nd ... 30th 31st).
- * - **`'DD'`**: 2-digit day of the month (e.g., `01` for the first day of the month).
- * - **`'DDD'`**: 3-digit day of the year (e.g., `001` for the first day of the year).
- * - **`'DDDD'`**: 4-digit day of the year (e.g., `0001` for the first day of the year).
- * - **``d'`**: Day of the week (e.g., `1` for Monday : 0 1 ... 5 6).
- * - **``do'`**: Ordinal day of the week (e.g., `1st` for Monday).
- * - **``dd'`**: Abbreviated day of the week (e.g., `Mon` for Monday).
- * - **``ddd'`**: Full day of the week (e.g., `Monday`).
- * - **``dddd'`**: Full day of the week (e.g., `Monday`).
- * - **`'YY'`**: 2-digit year (e.g., `19` for the year 2019).
- * - **`'YYYY'`**: 4-digit year (e.g., `2019`).
- * - **`'YYYYY'`**: 5-digit year (e.g., `1999`).
- * - **`'a'`**: Lowercase am/pm marker (e.g., `am` or `pm`).
- * - **`'A'`**: Uppercase AM/PM marker (e.g., `AM` or `PM`).
- * - **`'H'`**: 24-hour hour (e.g., `0` to `23`).
- * - **`'HH'`**: 2-digit 24-hour hour (e.g., `00` to `23`).
- * - **`'h'`**: 12-hour hour (e.g., `1` to `12`).
- * - **`'hh'`**: 2-digit 12-hour hour (e.g., `01` to `12`).
- * - **`'m'`**: Minutes (e.g., `0` to `59`).
- * - **`'mm'`**: 2-digit minutes (e.g., `00` to `59`).
- * - **`'s'`**: Seconds (e.g., `0` to `59`).
- * - **`'ss'`**: 2-digit seconds (e.g., `00` to `59`).
- * - **`'S'`**: Milliseconds (e.g., `0` to `999`).
- * - **`'SS'`**: 3-digit milliseconds (e.g., `00` to `999`).
- * - **`'SSS'`**: 4-digit milliseconds (e.g., `000` to `9999`). 
- * - Q : Quarter of the year (1-4) : 1 2 3 4.
- * - Qo : Quarter of the year (1-4) : 1st 2nd 3rd 4th.
- * 
-   * @see https://momentjs.com/docs/#/displaying/format for more information about the supported tokens.
- */
-export type IMomentFormat = string;

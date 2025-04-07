@@ -5,7 +5,7 @@ import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextI
 import { ReactNode } from "react";
 import { ILabelProps } from "@components/Label";
 import { IFontIconProps } from "@components/Icon/types";
-import { IInputFormatterMask, IInputFormatterMaskOptions, ICountryCode, IInputFormatterOptions, IInputFormatterResult } from "@resk/core";
+import { IInputFormatterMask, IInputFormatterMaskOptions, ICountryCode, IInputFormatterResult, IFieldBase } from "@resk/core";
 import { ICalendarModalDayViewProps } from '../Date/types';
 import { IKeyboardAvoidingViewProps } from "@components/KeyboardAvoidingView";
 /**
@@ -262,7 +262,7 @@ export interface ITextInputOnChangeOptions extends Omit<IOnChangeOptions<ITextIn
  * input components that enhance user interaction and maintainability 
  * in React Native applications.
  */
-export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defaultValue'>, ILabelOrLeftOrRightProps<ITextInputCallbackOptions>, Omit<IInputFormatterOptions, "value"> {
+export interface ITextInputProps extends Omit<TextInputProps, 'onChange' | 'defaultValue'>, ILabelOrLeftOrRightProps<ITextInputCallbackOptions>, Omit<IFieldBase, "type" | "value"> {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 

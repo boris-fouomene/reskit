@@ -1,6 +1,8 @@
 import React from 'react';
 import { faker } from '@faker-js/faker';
 import { Datagrid } from '@resk/native';
+import "@resk/core";
+import { InputFormatter } from '@resk/core';
 export function DatagridExample({ count, ...props }) {
     const data = React.useMemo(() => {
         count = typeof count == 'number' && count > 5 ? count : 100000;
@@ -23,6 +25,7 @@ export function DatagridExample({ count, ...props }) {
                 name: "userId",
                 label: "Id",
                 width: 100,
+                format: "formatCAD",
             },
             {
                 label: "Name",

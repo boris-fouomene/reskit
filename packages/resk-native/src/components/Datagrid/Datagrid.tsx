@@ -1322,13 +1322,13 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             return <Menu
                 anchor={({ openMenu }) => {
                     return <Pressable onPress={() => { openMenu() }} style={[Theme.styles.row]}>
-                        <Icon iconName='format-list-group' title={DatagridView.staticTranslate("groupTableData")} />
-                        <Label textBold>{DatagridView.staticTranslate("groupBy")}</Label>
+                        <Icon iconName='format-list-group' title={this.translate("groupTableData")} />
+                        <Label textBold>{this.translate("groupBy")}</Label>
                     </Pressable>
                 }}
                 items={[
                     {
-                        label: DatagridView.staticTranslate("groupBy"),
+                        label: this.translate("groupBy"),
                         icon: "group",
                         closeOnPress: false,
                         right: (p) => <Icon {...p} iconName="material-settings" />,
@@ -1344,13 +1344,13 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                         }
                     },
                     this.canShowAggregatedTotals() ? {
-                        label: DatagridView.staticTranslate("displayOnlyAggregatedTotal"),
+                        label: this.translate("displayOnlyAggregatedTotal"),
                         icon: this.canShowAggregatedTotals() ? "check" : null,
                         onPress: this.toggleShowOnlyAggregatedTotals.bind(this)
                     } : null,
                     ...(Array.isArray(menuItems2) ? menuItems2 : []),
                     isGlobalGrouped ? {
-                        label: DatagridView.staticTranslate("ungroup"),
+                        label: this.translate("ungroup"),
                         icon: "ungroup",
                         onPress: () => {
                             setTimeout(() => {
@@ -1442,8 +1442,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             items={menuItems}
             anchor={({ openMenu }) => {
                 return <Pressable onPress={() => { openMenu() }} style={[Theme.styles.row]}>
-                    <Icon iconName="material-functions" title={DatagridView.staticTranslate("aggregationFunctionMenuDescription")}></Icon>
-                    <Label splitText numberOfLines={1} textBold>{DatagridView.staticTranslate("aggregationFunctionsLabel")}</Label>
+                    <Icon iconName="material-functions" title={this.translate("aggregationFunctionMenuDescription")}></Icon>
+                    <Label splitText numberOfLines={1} textBold>{this.translate("aggregationFunctionsLabel")}</Label>
                 </Pressable>
             }}
         />
@@ -1496,7 +1496,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const customToolbarActions = this.getToolbarActions();
         if (isFilterable) {
             actions.push({
-                label: DatagridView.staticTranslate("showFilters", { count: dataLength }),
+                label: this.translate("showFilters", { count: dataLength }),
                 icon: this.canShowFilters() ? 'eye-off' : 'eye',
                 onPress: () => {
                     this.toggleShowFilters();
@@ -1505,14 +1505,14 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         if (isAggregatable) {
             actions.push({
-                label: !this.canShowAggregatedTotals() ? DatagridView.staticTranslate("showAggregatedTotals") : DatagridView.staticTranslate("hideAggregatedTotals"),
+                label: !this.canShowAggregatedTotals() ? this.translate("showAggregatedTotals") : this.translate("hideAggregatedTotals"),
                 icon: this.canShowAggregatedTotals() ? 'view-column' : 'view-module-outline',
                 onPress: this.toggleShowAggregatedTotals.bind(this),
             })
         }
         if (selectable && dataLength) {
             actions.push({
-                label: DatagridView.staticTranslate("selectAll", { count: dataLength }),
+                label: this.translate("selectAll", { count: dataLength }),
                 icon: "check",
                 onPress: () => {
                     this.toggleAllRowsSelection(true);
@@ -1521,7 +1521,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         if (selectedRowsCount > 0) {
             actions.push({
-                label: DatagridView.staticTranslate("unselectAll", { count: selectedRowsCount }),
+                label: this.translate("unselectAll", { count: selectedRowsCount }),
                 icon: "check",
                 onPress: () => {
                     this.toggleAllRowsSelection(false);
@@ -1560,7 +1560,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                         }
                         return <Button
                             icon="view-column"
-                            children={DatagridView.staticTranslate("columns")}
+                            children={this.translate("columns")}
                             onPress={onPress}
                         />
                     }}

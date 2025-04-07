@@ -61,6 +61,7 @@ I18nClass.RegisterTranslations({
                 "ungroup": "Ungroup",
                 "aggregationFunctionMenuDescription": "Select the aggregation function to use for the totals of the numeric columns",
                 "aggregationFunctionsLabel": "Aggregation functions",
+                "includeColumnLabelInGroupedRowHeader": "Include column label in grouped row header",
                 "aggregationFunctions": {
                     "sum": "Sum",
                     "min": "Min",

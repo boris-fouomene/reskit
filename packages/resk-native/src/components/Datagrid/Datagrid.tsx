@@ -280,7 +280,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {Record<keyof IDatagridAggregationFunctions, number>} An object containing the aggregated values for the specified column. If the column does not exist or the name is invalid, an empty object is returned.
      * The returned object represent a record of aggregated values, where each key is the name of an aggregation function and the value is the result of the aggregation function for the specified column in the given grouped row key.
      */
-    getAggregatedColumnValues(columnName: string): Record<keyof IDatagridAggregationFunctions, number> {
+    getAggregatedColumnValues(columnName: IDatagridViewColumnName<DataType>): Record<keyof IDatagridAggregationFunctions, number> {
         if (!isNonNullString(columnName)) return {} as Record<keyof IDatagridAggregationFunctions, number>;
         const o = this.getAggregatedColumnsValues();
         return isObj(o) && isObj(o[columnName]) ? o[columnName] : {} as Record<keyof IDatagridAggregationFunctions, number>;
@@ -345,7 +345,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {React.ReactNode} - The rendered column.
      */
-    renderTableCellOrColumnHeader(columnName: string, renderType: IDatagridViewColumnRenderType = "rowCell", rowData?: DataType, rowIndex?: number) {
+    renderTableCellOrColumnHeader(columnName: IDatagridViewColumnName<DataType>, renderType: IDatagridViewColumnRenderType = "rowCell", rowData?: DataType, rowIndex?: number) {
         const column = this.getColumn(columnName);
         if (!column || renderType === "rowCell" && !isObj(rowData)) return null;
         const columnType = defaultStr(column?.type, "text");
@@ -372,7 +372,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @param columnIndex - The index of the column in the grid.
      * @returns The rendered column header component, or null if the column does not exist.
      */
-    renderTableColumnHeader(columnName: string, columnIndex: number): JSX.Element | null {
+    renderTableColumnHeader(columnName: IDatagridViewColumnName<DataType>, columnIndex: number): JSX.Element | null {
         const column = this.getColumn(columnName);
         if (!column) return null;
         return <React.Fragment key={`column-header-${columnName}`}>
@@ -392,7 +392,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
     /*******  2e8e8306-8b4d-42fe-812e-3ef78c15112f  *******/
 
-    renderTableColumnHeaderChildren(columnName: string, columnIndex: number): JSX.Element | null {
+    renderTableColumnHeaderChildren(columnName: IDatagridViewColumnName<DataType>, columnIndex: number): JSX.Element | null {
         return null;
     }
     /**
@@ -493,7 +493,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * If the row data is a grouped row, it delegates rendering to `renderTableGroupedRow`. Otherwise, it renders a regular `DatagridCell`.
      */
 
-    renderTableCell(columnName: string, rowData: DataType, rowIndex: number): JSX.Element | null {
+    renderTableCell(columnName: IDatagridViewColumnName<DataType>, rowData: DataType, rowIndex: number): JSX.Element | null {
         if (!isObj(rowData) || !this.getColumn(columnName)) return null;
         return this.renderTableCellOrColumnHeader(columnName, "rowCell", rowData);
     }
@@ -530,13 +530,13 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * It checks if the column is sortable and if it is part of the current sorting order. Based on the
      * column type and direction ("asc" or "desc"), it returns a corresponding icon name.
      * 
-     * @param {keyof DataType | string} columnName - The name of the column for which to retrieve the sort icon.
+     * @param {IDatagridViewColumnName<DataType>} columnName - The name of the column for which to retrieve the sort icon.
      * @param {IFieldType} columnType - The type of the column for which to retrieve the sort icon.
      * 
      * @returns {IFontIconName | null} The name of the sort icon to be used, or null if the column is not sortable
      * or not part of the current sorting order.
      */
-    getSortIcon(columnName: keyof DataType | string, columnType?: IFieldType): IFontIconName | null {
+    getSortIcon(columnName: IDatagridViewColumnName<DataType>, columnType?: IFieldType): IFontIconName | null {
         if (!this.isSortable()) return null;
         const columnObj = this.getColumn(columnName);
         if (!columnObj) return null;
@@ -854,7 +854,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * Updates the component state with the new sorted data.
      * Sets the sorted column and direction in the component session data.
      */
-    sortColumn(colName: string) {
+    sortColumn(colName: IDatagridViewColumnName<DataType>) {
         if (!isNonNullString(colName) || !this.isSortable()) return;
         const column = this.getColumn(colName);
         if (!column || column.sortable === false) return;
@@ -991,7 +991,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {IDatagridViewStateColumn<DataType> | null} The column definition if found, otherwise an empty object.
      */
-    getColumn(colName: keyof DataType | string): IDatagridViewStateColumn<DataType> | null {
+    getColumn(colName: IDatagridViewColumnName<DataType>): IDatagridViewStateColumn<DataType> | null {
         if (isNonNullString(colName) && this.state.columnsByName[colName]) {
             return this.state.columnsByName[colName]
         }
@@ -1018,7 +1018,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {boolean} - `true` if the column is visible, otherwise `false`.
      */
-    isColumnVisible(colName: string) {
+    isColumnVisible(colName: IDatagridViewColumnName<DataType>) {
         return this.getColumn(colName)?.visible;
     }
     /**
@@ -1028,7 +1028,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {boolean} - `true` if the column is grouped, otherwise `false`.
      */
-    isColumnGrouped(colName: string) {
+    isColumnGrouped(colName: IDatagridViewColumnName<DataType>) {
         const column = this.getColumn(colName);
         if (!column || !column.groupable || !Array.isArray(this.state.groupedColumns)) return false;
         return this.state.groupedColumns.includes(column.name);
@@ -1040,7 +1040,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {boolean} - `true` if the column is aggregatable, otherwise `false`.
      */
-    isColumnAggregatable(colName: string) {
+    isColumnAggregatable(colName: IDatagridViewColumnName<DataType>) {
         return this.isAggregatable() && !!this.getColumn(colName)?.aggregatable;
     }
     /**
@@ -1130,7 +1130,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {void}
      */
-    toggleColumnVisibility(columnName: string) {
+    toggleColumnVisibility(columnName: IDatagridViewColumnName<DataType>) {
         const column = this.getColumn(columnName);
         if (!column) return;
         const { columns, visibleColumns } = this.state;
@@ -1154,19 +1154,19 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {void}
      */
-    toggleGroupedColumn(columnName: string) {
+    toggleGroupedColumn(columnName: IDatagridViewColumnName<DataType>) {
         const column = this.getColumn(columnName);
         if (!column || !column.groupable) return;
-        const { groupedColumns } = this.state;
-        const isGrouped = groupedColumns.includes(columnName);
-        const newGroupedColumns = isGrouped ? groupedColumns.filter(c => c !== columnName) : groupedColumns;
-        if (!isGrouped) {
-            newGroupedColumns.push(column.name);
-        }
         this.setIsLoading(true, () => {
+            const { groupedColumns } = this.state;
+            const isGrouped = groupedColumns.includes(columnName);
+            const newGroupedColumns = isGrouped ? [...groupedColumns].filter(c => c !== columnName) : [...groupedColumns];
+            if (!isGrouped) {
+                newGroupedColumns.push(column.name as any);
+            }
             this.updateState({
-                ...this.processData(this.props.data, undefined, groupedColumns),
-                groupedColumns: [...newGroupedColumns]
+                ...this.processData(this.state.allData, this.state.orderBy, newGroupedColumns),
+                groupedColumns: newGroupedColumns
             }, () => {
                 this.setSessionData("groupedColumns", this.state.groupedColumns);
             });
@@ -1266,9 +1266,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             const isGrouped = this.isColumnGrouped(column.name);
             menuItems.push({
                 onPress: () => {
-                    setTimeout(() => {
-                        this.toggleGroupedColumn(column.name);
-                    }, 500);
+                    this.toggleGroupedColumn(column.name);
                 },
                 label: column.label || column.name,
                 icon: isGrouped ? FontIcon.CHECK : undefined,
@@ -1569,7 +1567,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {boolean} - `true` if the column is groupable, otherwise `false`.
      */
-    isColumnGroupable(colName: string) {
+    isColumnGroupable(colName: IDatagridViewColumnName<DataType>) {
         return this.isGroupable() && !!this.getColumn(colName)?.groupable;
     }
     /**
@@ -1579,7 +1577,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {boolean} - `true` if the column is sortable, otherwise `false`.
      */
-    isColumnSortable(colName: string) {
+    isColumnSortable(colName: IDatagridViewColumnName<DataType>) {
         return this.isSortable() && !!this.getColumn(colName)?.sortable;
     }
     /**
@@ -1589,7 +1587,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {boolean} - `true` if the column is filterable, otherwise `false`.
      */
-    isColumnFilterable(colName: string) {
+    isColumnFilterable(colName: IDatagridViewColumnName<DataType>) {
         return this.isFilterable() && !!this.getColumn(colName)?.filterable;
     }
 
@@ -1675,7 +1673,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     /**
      * Computes the value of a column for a given row.
      * 
-     * @param {IDatagridViewStateColumn | string} column - The column object or column name.
+     * @param {IDatagridViewStateColumn<DataType>} column - The column object or column name.
      * @param {DataType} rowData - The data for the row.
      * @param {boolean} [format=false] - Whether to format the value using the column's formatter.
      * 
@@ -1687,7 +1685,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * console.log(value); // Output: "John"
      * ```
      */
-    computeCellValue(column: IDatagridViewStateColumn | string, rowData: DataType, format?: boolean): any {
+    computeCellValue(column: IDatagridViewStateColumn<DataType> | IDatagridViewColumnName<DataType>, rowData: DataType, format?: boolean): any {
         const col: IDatagridViewStateColumn = typeof column === "string" && column ? this.getColumn(column) : column as any;
         if (!isObj(rowData) || !isObj(col) || !isNonNullString(col.name)) return undefined;
         const v = typeof col.computeCellValue === "function" ? col.computeCellValue(this.getCallOptions({ rowData })) : (rowData as any)[col.name];
@@ -1861,10 +1859,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {Record<keyof IDatagridAggregationFunctions, number>} An object containing the aggregated values for the specified column in the given grouped row key. If the column does not exist or the name is invalid, an empty object is returned.
      * The returned object represent a record of aggregated values, where each key is the name of an aggregation function and the value is the result of the aggregation function for the specified column in the given grouped row key.
      */
-    getGroupedRowAggregatedColumnValues(groupedRowKey: string, columnName: string): Record<keyof IDatagridAggregationFunctions, number> {
+    getGroupedRowAggregatedColumnValues(groupedRowKey: string, columnName: IDatagridViewColumnName<DataType>): Record<keyof IDatagridAggregationFunctions, number> {
         const r = this.getGroupedRowAggregatedColumnsValues(groupedRowKey);
         if (!isObj(r)) return {} as Record<keyof IDatagridAggregationFunctions, number>;
-        const r2 = r[columnName];
+        const r2 = r[columnName as any];
         return isObj(r2) ? r2 : {} as Record<keyof IDatagridAggregationFunctions, number>;
     }
     /**
@@ -2537,7 +2535,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
 export type IDatagridViewColumnRenderType = "header" | "rowCell";
 
 
-class DatagridUnimplemented<DataTye extends object = any> extends DatagridView<DataTye> {
+class DatagridUnimplemented<DataType extends object = any> extends DatagridView<DataType> {
     _render() {
         return <Label colorScheme="error" fontSize={20} textBold>
             {"No Datagrid View found for datagrid"}
@@ -2601,8 +2599,8 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      * 
      * @returns The name of the column.
      */
-    getName() {
-        return defaultStr(this.props.name);
+    getName(): IDatagridViewColumnName<DataType> {
+        return defaultStr(this.props.name) as IDatagridViewColumnName<DataType>;
     }
     /**
      * Checks if the column is groupable.
@@ -2916,14 +2914,14 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
  * @param type The type of the column to attach.
  * @returns A decorator function that registers the column.
  */
-export function AttachDatagridViewColumn<DataTye extends object = any, PropsExtensions = unknown, StateExtensions = unknown>(type: IFieldType) {
-    return (target: typeof DatagridViewColumn<DataTye, PropsExtensions, StateExtensions>) => {
+export function AttachDatagridViewColumn<DataType extends object = any, PropsExtensions = unknown, StateExtensions = unknown>(type: IFieldType) {
+    return (target: typeof DatagridViewColumn<DataType, PropsExtensions, StateExtensions>) => {
         /**
          * Registers the column with the DatagridView component.
          * 
          * This method adds the column to the DatagridView component's registry, making it available for use.
          */
-        DatagridView.registerColumn(type, target as typeof DatagridViewColumn<DataTye, PropsExtensions, StateExtensions>);
+        DatagridView.registerColumn(type, target as typeof DatagridViewColumn<DataType, PropsExtensions, StateExtensions>);
     };
 }
 
@@ -3025,13 +3023,13 @@ function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridL
  * If the column is not sortable or not part of the current sorting order, it will return null.
  * It uses the `getSortIcon` method of the DatagridView context to determine the sort icon.
  * 
- * @param {{ columnName: keyof DataTye | string, columnType?: IFieldType }} props - The component props.
- * @param {keyof DataTye | string} props.columnName - The name of the column to display the sort icon for.
+ * @param {{ columnName: IDatagridViewColumnName<DataType>, columnType?: IFieldType }} props - The component props.
+ * @param {columnName: IDatagridViewColumnName<DataType>} props.columnName - The name of the column to display the sort icon for.
  * @param {IFieldType} [props.columnType] - The type of the column. If not provided, it is determined from the column definition.
  * 
  * @returns {React.ReactNode | null} The rendered sort icon component, or null if the column is not sortable.
  */
-function SortIcon<DataTye extends object = any>({ columnName, columnType }: { columnName: keyof DataTye | string, columnType?: IFieldType }) {
+function SortIcon<DataType extends object = any>({ columnName, columnType }: { columnName: IDatagridViewColumnName<DataType>, columnType?: IFieldType }) {
     const datagrid = useDatagrid();
     useDatagridOnEvent("columnSorted", true);
     if (!datagrid) return null;
@@ -3604,7 +3602,7 @@ export interface IDatagridToolbarAction<DataType extends object = any, DatagridP
  * 
  * @see {@link IAppBarAction} for the base action interface.
  */
-export interface IDatagridAction<DataTye extends object = any, DatagridPropExtensions = unknown, DatatagridStateExtensions = any> extends IAppBarAction<{ datagridContext: DatagridView<DataTye, DatagridPropExtensions, DatatagridStateExtensions> }> { }
+export interface IDatagridAction<DataType extends object = any, DatagridPropExtensions = unknown, DatatagridStateExtensions = any> extends IAppBarAction<{ datagridContext: DatagridView<DataType, DatagridPropExtensions, DatatagridStateExtensions> }> { }
 
 
 const DatagridContext = createContext<DatagridView<any, any, any> | null>(null);
@@ -3674,6 +3672,7 @@ export function useDatagridOnEvent(event: IDatagridEvent | IDatagridEvent[], cal
     }, [event, datagridContext?.on, callbackOrForceRender]);
 }
 
+export type IDatagridViewColumnName<DataType extends object = any> = (keyof DataType & string) | string;
 /**
  * @typedef IDatagridViewStateColumn
  * Represents a column in the DatagridView component's state.
@@ -3736,7 +3735,7 @@ export type IDatagridViewStateColumn<DataType extends object = any> = Omit<IData
     /***
      * The unique name of the column.
      */
-    name: IDatagridViewColumnProps<DataType>["name"];
+    name: IDatagridViewColumnName<DataType>;
 }
 
 
@@ -3764,7 +3763,7 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
      * 
      * This property is required and must be a unique string.
      */
-    name: (keyof DataType & string) | string;
+    name: IDatagridViewColumnName<DataType>;
 
     /**
      * Whether the column is filterable.
@@ -3938,7 +3937,7 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
      * 
      * This property contains an array of column names that are currently grouped in the grid.
      */
-    groupedColumns: string[];
+    groupedColumns: (IDatagridViewColumnName<DataType>)[];
 
     /**
      * A map of grouped rows by their keys.
@@ -4258,7 +4257,7 @@ export type IDatagridViewName = keyof IDatagridViews;
  * @see {@link IDatagridViewOrderBy}
  */
 export interface IDatagridViewOrderBy<DataType extends object = any> {
-    column: keyof DataType | string;
+    column: IDatagridViewColumnName<DataType>;
     direction?: IResourceQueryOptionsOrderByDirection
 };
 

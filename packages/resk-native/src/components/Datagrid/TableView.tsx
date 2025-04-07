@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     },
     sectionHeader: {
         width: "100%",
-        paddingVertical: 7,
+        paddingVertical: 10,
         paddingHorizontal: 7,
     },
 })

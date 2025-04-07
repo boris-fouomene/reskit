@@ -2859,12 +2859,12 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         const column = this.getColumn();
         if (!this.isValidColumn(column)) return null;
         const datagridContext = this.getDatagridContext();
-        if (typeof this.props.renderRowCell == "function") {
-            return this.props.renderRowCell(datagridContext.getCallOptions({ column, rowData: rowData }));
-        }
+        const children = typeof this.props.renderRowCell == "function" ? this.props.renderRowCell(datagridContext.getCallOptions({ column, rowData: rowData })) : null;
         const testID = this.getTestID();
         return <View testID={testID} style={[styles.rowCell, this.getStyle()]}>
-            <Label wrapText numberOfLines={10} {...labelProps} testID={testID + "-label"} >{this.computeCellValue(rowData as DataType)}</Label>
+            <Label wrapText numberOfLines={10} {...labelProps} testID={testID + "-label"} >{
+                children !== null && children != undefined && (["number", "boolean"].includes(typeof children) || children) ? children
+                    : this.computeCellValue(rowData as DataType, true)}</Label>
         </View>;
     }
 

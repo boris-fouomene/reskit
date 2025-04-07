@@ -21,11 +21,10 @@ export function DatagridExample({ count, ...props }) {
         rowKey={"userId"}
         columns={[
             {
-                type: "number",
+                type: "text",
                 name: "userId",
                 label: "Id",
                 width: 100,
-                format: "formatCAD",
             },
             {
                 label: "Name",
@@ -37,6 +36,7 @@ export function DatagridExample({ count, ...props }) {
                 type: "number",
                 label: "Amount",
                 name: "amount",
+                format: "formatCAD",
             },
             {
                 type: "email",

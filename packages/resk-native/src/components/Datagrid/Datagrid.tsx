@@ -657,7 +657,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             this._toggleLoading = true;
         }
         loading = this.props.isLoading === true ? true : typeof loading == "boolean" ? loading : false;
-        timeout = typeof timeout == "number" ? timeout : 1000;
+        timeout = typeof timeout == "number" ? timeout : 500;
         cb = typeof cb == "function" ? cb : () => true;
         this._isLoading = loading;
         this.trigger("toggleIsLoading", { isLoading: loading });
@@ -865,9 +865,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             direction = String(cDirection).toLowerCase() === "asc" ? "desc" : "asc";
         }
         const orderBy: IDatagridViewOrderBy<DataType> = { column: colName, direction };
-        this.updateState({ orderBy, ...this.processData(this.props.data, orderBy) }, () => {
-            this.setSessionData("orderBy", orderBy);
-            this.trigger("columnSorted", orderBy);
+        this.setIsLoading(true, () => {
+            this.updateState({ orderBy, ...this.processData(this.props.data, orderBy) }, () => {
+                this.setSessionData("orderBy", orderBy);
+                this.trigger("columnSorted", orderBy);
+            });
         });
     }
 
@@ -1137,7 +1139,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (column.visible) {
             newVisibleColumns.push(column);
         }
-        this.updateState({ columns: [...columns], visibleColumns: newVisibleColumns });
+        this.setIsLoading(true, () => {
+            this.updateState({ columns: [...columns], visibleColumns: newVisibleColumns })
+        });
     }
     /**
      * Toggles the grouping state of a column in the datagrid.
@@ -1159,12 +1163,13 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (!isGrouped) {
             newGroupedColumns.push(column.name);
         }
-        this.setIsLoading(true);
-        this.updateState({
-            ...this.processData(this.props.data, undefined, groupedColumns),
-            groupedColumns: [...newGroupedColumns]
-        }, () => {
-            this.setSessionData("groupedColumns", this.state.groupedColumns);
+        this.setIsLoading(true, () => {
+            this.updateState({
+                ...this.processData(this.props.data, undefined, groupedColumns),
+                groupedColumns: [...newGroupedColumns]
+            }, () => {
+                this.setSessionData("groupedColumns", this.state.groupedColumns);
+            });
         });
     }
     /**
@@ -1176,12 +1181,14 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {void}
      */
     ungroupAll() {
-        this.updateState({
-            groupedColumns: [],
-            ...this.processData(this.props.data, undefined, []),
-        }, () => {
-            this.setSessionData("groupedColumns", []);
-        });
+        this.setIsLoading(true, () => {
+            this.updateState({
+                groupedColumns: [],
+                ...this.processData(this.props.data, undefined, []),
+            }, () => {
+                this.setSessionData("groupedColumns", []);
+            });
+        })
     }
     /**
      * Gets the translation key for a given key in the datagrid.
@@ -1684,11 +1691,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const col: IDatagridViewStateColumn = typeof column === "string" && column ? this.getColumn(column) : column as any;
         if (!isObj(rowData) || !isObj(col) || !isNonNullString(col.name)) return undefined;
         const v = typeof col.computeCellValue === "function" ? col.computeCellValue(this.getCallOptions({ rowData })) : (rowData as any)[col.name];
-        const value = typeof v === "object" ? stringify(v) : v;
+        const value = v;
         if (format && !isEmpty(value)) {
             return InputFormatter.formatValue({ ...col, value }).formattedValue;
         }
-        return value;
+        return typeof value === "object" ? stringify(value, { escapeString: false }) : value;
     }
     /**
      * Returns an object containing the DatagridView context and the provided options.
@@ -1809,7 +1816,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             const txt = this.computeCellValue(column, rowData, true);
             if (isEmpty(txt)) return;
             const labelText = getTextContent(column.label);
-            const stringifiedTxt = stringify(txt);
+            const stringifiedTxt = stringify(txt, { escapeString: false });
             if (!stringifiedTxt) return;
             if (labelText && includeColumnLabelInGroupedRowHeader) {
                 d.push(`${labelText} : ${stringifiedTxt}`)

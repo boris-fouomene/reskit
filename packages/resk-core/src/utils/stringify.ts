@@ -28,6 +28,7 @@ function isType(obj: any, type: string): boolean {
  * @param {any} obj The variable to convert to a string.
  * @param {{parenthesis: boolean}} [options] Additional options.
  * @param {boolean} [options.parenthesis=false] Whether to wrap the result in parentheses.
+ * @param {boolean} [options.escapeString=true] Whether to escape quotes and other special characters in the string representation.
  * @returns {string} The string representation of the variable.
  * @example
  * ```typescript
@@ -37,7 +38,7 @@ function isType(obj: any, type: string): boolean {
  * console.log(stringify(undefined)); // Output: "undefined"
  * ```
  */
-export default function stringify(obj: any, options?: { parenthesis: boolean }): string {
+export default function stringify(obj: any, options?: { parenthesis?: boolean, escapeString?: boolean }): string {
   if (["boolean", "undefined"].includes(typeof obj) || obj === null) {
     return String(obj);
   }
@@ -50,14 +51,15 @@ export default function stringify(obj: any, options?: { parenthesis: boolean }):
   if (obj instanceof Error) {
     return obj?.toString();
   }
-  const { parenthesis } = Object.assign({}, options);
+  options = Object.assign({}, options);
+  const { parenthesis } = options;
   const openParen = parenthesis ? '(' : '';
   const closeParen = parenthesis ? ')' : '';
   /**
    * If the input is a string, return its string representation wrapped in single quotes.
    */
   if (typeof obj === 'string') {
-    return "'" + escapeString(obj) + "'";
+    return options?.escapeString !== false ? ("'" + escapeString(obj as string) + "'") : obj;
   }
   if (isType(obj, 'RegExp') || isType(obj, 'Number') || isType(obj, 'Boolean')) {
     return obj.toString();
@@ -74,7 +76,7 @@ export default function stringify(obj: any, options?: { parenthesis: boolean }):
    * If the input is an array, return its string representation as a comma-separated list of string representations.
    */
   if (Array.isArray(obj)) {
-    return '[' + obj.map(v => stringify(v)).join(',') + ']';
+    return '[' + obj.map(v => stringify(v, options)).join(',') + ']';
   }
 
   /**
@@ -83,7 +85,7 @@ export default function stringify(obj: any, options?: { parenthesis: boolean }):
   if (typeof obj === 'object') {
     return openParen + '{' + Object.keys(obj).map(k => {
       var v = obj[k];
-      return stringify(k) + ':' + stringify(v);
+      return stringify(k, options) + ':' + stringify(v, options);
     }).join(',') + '}' + closeParen;
   }
   if (!obj) return String(obj);

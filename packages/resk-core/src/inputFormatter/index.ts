@@ -81,7 +81,7 @@ export default class InputFormatter {
     }
 
     // Convert non-string values to strings.
-    let formattedValue: any = isPrimitive(value) ? String(value) : DateHelper.isDateObj(value) ? value : stringify(value);
+    let formattedValue: any = isPrimitive(value) ? String(value) : DateHelper.isDateObj(value) ? value : stringify(value, { escapeString: false });
 
     // If a format function is provided, use it to format the value.
     if (typeof format === 'function') {

@@ -66,6 +66,6 @@ export function createRandomUser() {
         avatar: faker.image.avatar(),
         password: faker.internet.password(),
         birthdate: faker.date.birthdate(),
-        registeredAt: faker.date.past(),
+        registeredAt: faker.date.past().toString(),
     };
 }

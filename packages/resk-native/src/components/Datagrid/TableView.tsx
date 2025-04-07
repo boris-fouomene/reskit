@@ -5,6 +5,7 @@ import test from "node:test";
 import { IViewStyle } from "@src/types";
 import { isNumber } from "@resk/core";
 import { useTheme } from "@theme/index";
+import Label from "@components/Label";
 
 export interface IDatagridTableViewProps<DataType extends object = any> {
 
@@ -90,12 +91,13 @@ function DatagridTableViewRendered<DataType extends object = any>({ context }: {
     return <SectionList<DataType>
         sections={sections}
         extraData={hasGroupedRows || isLoading}
-        renderSectionHeader={function (options: any) {
+        renderSectionHeader={function ({ section }) {
             if (!hasGroupedRows) {
                 return null;
             }
-            console.log("will render aggregated header ", options);
-            return null;
+            return <SectionHeader<DataType>
+                {...section as any}
+            />
         }}
         renderItem={function ({ item: rowData, index: rowIndex }: { item: DataType, index: number }) {
             return <Rows
@@ -118,6 +120,14 @@ function Rows<DataType extends object = any>({ datagridContext, rowData, rowInde
     </View>;
 }
 Rows.displayName = "DatagridTableView.Rows";
+
+function SectionHeader<DataType extends object = any>({ datagridGroupedRowKey, label }: IDatagridViewGroupedRow<DataType>) {
+    return <>
+        <View style={[styles.sectionHeader]}>
+            <Label textBold colorScheme="primary">{label}</Label>
+        </View>
+    </>
+}
 
 interface IT extends Record<string, any> {
     abc11: string;
@@ -144,5 +154,10 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         alignItems: 'center',
+    },
+    sectionHeader: {
+        width: "100%",
+        paddingVertical: 7,
+        paddingHorizontal: 7,
     },
 })

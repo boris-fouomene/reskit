@@ -755,14 +755,14 @@ export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
     private static defaultInterpolator(i18n: I18nJs, value: string, params?: Record<string, any>) {
         if (isNullable(value)) return "";
         if (!isPrimitive(value)) {
-            return stringify(value);
+            return stringify(value, { escapeString: false });
         }
         value = String(value);
         if (!isObj(params)) return value;
         if (!params) return value;
         if (!isObj(params) || !params) return value;
         return value.replace(/%{(.*?)}/g, (_, key) => {
-            return isNullable(params[key]) ? "" : isPrimitive(params[key]) ? String(params[key]) : stringify(params[key]);
+            return isNullable(params[key]) ? "" : isPrimitive(params[key]) ? String(params[key]) : stringify(params[key], { escapeString: false });
         });
     }
 

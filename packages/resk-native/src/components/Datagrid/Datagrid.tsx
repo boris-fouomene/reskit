@@ -843,6 +843,18 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     getContainerLayout(): IDatagridViewMeasuredLayout {
         return this.state.containerLayout;
     }
+    /**
+     * Gets the layout of the content container view.
+     * 
+     * @returns {IDatagridViewMeasuredLayout} The layout of the content container view.
+     * 
+     * @remarks
+     * The layout is only available after the component has been rendered and the onLayout event has been triggered.
+     * If the component is not rendered or the layout is not measured, returns an object with all properties set to 0.
+     */
+    getContentContainerLayout(): IDatagridViewMeasuredLayout {
+        return this.state.contentContainerLayout;
+    }
 
     /**
      * Sorts the data in ascending or descending order according to the specified column and direction.
@@ -2203,7 +2215,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
     getTestID() {
         const viewName = this.getViewName();
-        return defaultStr(this.props.testID, "resk-datagrid" + viewName ? `-${viewName}` : "");
+        return defaultStr(this.props.testID, ("resk-datagrid" + (viewName ? `-${viewName}` : "")));
     }
 
 
@@ -2260,6 +2272,17 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             availableHeight: Math.max(availableHeight, 100),
         };
     }
+    /**
+     * Renders the filters component.
+     * 
+     * The method returns null if the filters should not be shown, otherwise it returns null.
+     * 
+     * @returns {JSX.Element | null} The filters component or null.
+     */
+    renderFilters(): JSX.Element | null {
+        if (!this.canShowFilters()) return null;
+        return null;
+    }
     render(): JSX.Element | null {
         const testID = this.getTestID();
         const isLoading = this.isLoading();
@@ -2270,6 +2293,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 <View ref={this.toolbarActionsContainerRef} testID={testID + "-toolbar-actions-container"} style={styles.toolbarActionsContainer}>
                     {<DatagridView.Actions />}
                     {this.renderToolbar()}
+                    {this.renderFilters()}
                     {this.renderLoadingIndicator()}
                 </View>
                 <View ref={this.contentContainerRef} testID={testID + "-content-container"} style={[styles.contentContainer, { maxHeight: availableHeight }, contentContainerStyle, this.getContentContainerStyle()]}>
@@ -2531,11 +2555,16 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         const loadingIndicator = this.props.loadingIndicator;
         return <LoadingIndicator
-            Component={function ({ isLoading }: IDatagridLoadingIndicatorProps) {
-                if (isValidElement(loadingIndicator) && loadingIndicator) {
-                    return loadingIndicator;
-                }
-                return <DefaultLoadingIndicator isLoading={isLoading} />;
+            Component={function ({ isLoading }: IDatagridViewLoadingIndicatorProps) {
+                const datagridContext = useDatagrid();
+                const testID = defaultStr(datagridContext?.getTestID(), "resk-datagrid");
+                return isValidElement(loadingIndicator) && loadingIndicator ? loadingIndicator : <DefaultLoadingIndicator
+                    testID={testID + "-loading-indicator"}
+                    isLoading={isLoading}
+                />;
+                /* return <View testID={testID + "-loading-indicator-container"} style={[isLoading && styles.loadingIndicatorContainer]}>
+                    {}
+                </View>; */
             }}
         />;
     }
@@ -3076,13 +3105,13 @@ const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cV
  * managed internally using React's state and effect hooks.
  * 
  * @param {Object} param - The function parameter.
- * @param {IReactComponent<IDatagridLoadingIndicatorProps>} param.Component - The component to render as the 
+ * @param {IReactComponent<IDatagridViewLoadingIndicatorProps>} param.Component - The component to render as the 
  * loading indicator. It receives the `isLoading` prop to determine its display.
  * 
  * @returns {JSX.Element | null} The rendered loading indicator component, or null 
  * if the provided Component is not a function.
  */
-function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridLoadingIndicatorProps> }) {
+function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridViewLoadingIndicatorProps> }) {
     const datagridContext = useDatagrid();
     const canShowLoadingIndicator = !!datagridContext?.canShowLoadingIndicator();
     const [isLoading, _setIsLoading] = React.useState(canShowLoadingIndicator);
@@ -3103,7 +3132,7 @@ function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridL
     }, [datagridContext?.canShowLoadingIndicator()]);
     return typeof Component !== "function" ? null : <Component isLoading={isLoading} />;
 };
-
+LoadingIndicator.displayName = "Datagrid.LoadingIndicator";
 /**
  * A component to display the sort icon for a given column.
  * 
@@ -3134,7 +3163,7 @@ SortIcon.displayName = "Datagrid.SortIcon";
  * to update the loading state. The loading state is managed internally using
  * React's state and effect hooks.
  * 
- * @param {IDatagridLoadingIndicatorProps & IProgressBarProps} props - The properties for the
+ * @param {IDatagridViewLoadingIndicatorProps & IProgressBarProps} props - The properties for the
  * loading indicator.
  * @param {boolean} props.isLoading - The boolean indicating whether the
  * DatagridView is in a loading state.
@@ -3142,8 +3171,8 @@ SortIcon.displayName = "Datagrid.SortIcon";
  * @returns {JSX.Element | null} The rendered loading indicator component, or
  * null if the loading indicator is not to be rendered.
  */
-function ProgressBarLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIndicatorProps & IProgressBarProps) {
-    return <ProgressBar indeterminate visible={isLoading} {...props} />
+function ProgressBarLoadingIndicator({ isLoading, ...props }: IDatagridViewLoadingIndicatorProps & IProgressBarProps) {
+    return <ProgressBar indeterminate visible={isLoading} {...props} />;
 }
 
 /**
@@ -3153,15 +3182,15 @@ function ProgressBarLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIn
  * for "toggleIsLoading" events from the DatagridView context to update the
  * loading state. The loading state is managed internally using
  * React's state and effect hooks.
- * @param {IDatagridLoadingIndicatorProps} props - The properties for the
+ * @param {IDatagridViewLoadingIndicatorProps} props - The properties for the
  * loading indicator.
  * @param {boolean} props.isLoading - The boolean indicating whether the
  * DatagridView is in a loading state.
  * @returns {JSX.Element | null} The rendered loading indicator component, or
  * null if the loading indicator is not to be rendered.
  */
-function DefaultLoadingIndicator({ isLoading }: IDatagridLoadingIndicatorProps) {
-    return <ProgressBarLoadingIndicator isLoading={isLoading} />;
+function DefaultLoadingIndicator({ isLoading }: IDatagridViewLoadingIndicatorProps) {
+    return <ProgressBarLoadingIndicator isLoading={isLoading} />
 }
 
 
@@ -3172,7 +3201,7 @@ function DefaultLoadingIndicator({ isLoading }: IDatagridLoadingIndicatorProps) 
  * update the loading state. The loading state is managed internally using
  * React's state and effect hooks.
  * 
- * @param {IDatagridLoadingIndicatorProps & IPreloaderProps} props - The properties for the
+ * @param {IDatagridViewLoadingIndicatorProps & IPreloaderProps} props - The properties for the
  * loading indicator.
  * @param {boolean} props.isLoading - The boolean indicating whether the
  * DatagridView is in a loading state.
@@ -3180,7 +3209,7 @@ function DefaultLoadingIndicator({ isLoading }: IDatagridLoadingIndicatorProps) 
  * @returns {JSX.Element | null} The rendered loading indicator component, or
  * null if the loading indicator is not to be rendered.
  */
-function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIndicatorProps & IPreloaderProps) {
+function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridViewLoadingIndicatorProps & IPreloaderProps) {
     const hasShownPreloaderRef = useRef(false);
     useEffect(() => {
         if (isLoading) {
@@ -3194,15 +3223,13 @@ function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridLoadingIndi
     }, [!!isLoading]);
     return null;
 }
-Datagrid.displayName = "Datagrid";
 Datagrid.LoadingIndicator = LoadingIndicator;
+Datagrid.displayName = "Datagrid";
 Datagrid.DefaultLoadingIndicator = DefaultLoadingIndicator;
 Datagrid.PreloaderLoadingIndicator = PreloaderLoadingIndicator;
 Datagrid.View = DatagridView;
 Datagrid.SortIcon = SortIcon;
 
-
-LoadingIndicator.displayName = "Datagrid.LoadingIndicator";
 DefaultLoadingIndicator.displayName = "Datagrid.DefaultLoadingIndicator";
 PreloaderLoadingIndicator.displayName = "Datagrid.PreloaderLoadingIndicator";
 
@@ -4395,8 +4422,16 @@ export interface IDatagridRegisterViewOptions {
     optimizedFor?: ("mobile" | "tablet" | "desktop")[];
 }
 
-export interface IDatagridLoadingIndicatorProps extends Record<string, any> {
+
+/**
+ * Props for the loading indicator component used in the Datagrid.
+ *
+ * @interface IDatagridViewLoadingIndicatorProps
+ * @property {boolean} [isLoading] - Optional flag indicating whether the Datagrid is in a loading state.
+ */
+export interface IDatagridViewLoadingIndicatorProps {
     isLoading?: boolean;
+    testID?: string;
 }
 
 
@@ -4404,6 +4439,13 @@ const styles = StyleSheet.create({
     container: {
         width: "100%",
         position: "relative",
+    },
+    loadingIndicatorContainer: {
+        width: "100%",
+        position: "absolute",
+        top: 0, left: 0,
+        pointerEvents: "none",
+        height: "100%",
     },
     contentContainer: {
         width: "100%",

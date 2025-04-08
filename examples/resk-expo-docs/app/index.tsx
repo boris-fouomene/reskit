@@ -1,5 +1,5 @@
 import i18n from "@resk/core/i18n";
-import { TextInput, withAppBar, Datagrid, Surface, Grid, BottomSheet, withAppMounted, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, getDefaultTheme, HStack } from "@resk/native";
+import { TextInput, withAppBar, Datagrid, Surface, Grid, BottomSheet, withAppMounted, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, HStack } from "@resk/native";
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { DatagridExample } from "./_datagrid";
 
@@ -221,7 +221,7 @@ const index = withAppBar(() => {
                 icon: theme.dark ? "lightbulb-outline" : "lightbulb",
                 onPress: () => {
                     const dark = theme.dark ? false : true;
-                    const nTheme = getDefaultTheme({ dark: dark, colors: (dark ? {} : { background: "#fff", onBackground: "#000" }) } as ITheme);
+                    const nTheme = Theme.getDefaultTheme({ dark: dark, colors: (dark ? {} : { background: "#fff", onBackground: "#000" }) } as ITheme);
                     updateTheme(nTheme);
                 }
             },

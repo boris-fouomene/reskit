@@ -182,8 +182,8 @@ class Theme {
         const themeNameObj = extendObj({}, { dark: isDarkFromSession }, customTheme);
         const { light: lightTheme, dark: darkTheme } = getMaterial3Theme(themeNameObj?.colors?.primary);
         const isDark = !!themeNameObj.dark;
-        const iosTheme = Platform.isIos() ? (isDark ? iosMaterial3Theme.dark : iosMaterial3Theme.light) : undefined;
-        const theme = extendObj({}, (isDark ? darkTheme : lightTheme), iosTheme, themeNameObj);
+        //const iosTheme = Platform.isIos() ? (isDark ? iosMaterial3Theme.dark : iosMaterial3Theme.light) : undefined;
+        const theme = extendObj({}, (isDark ? darkTheme : lightTheme), themeNameObj);
         sanitizeTheme(theme);
         updateNative(theme);
         // Returns the fully prepared theme

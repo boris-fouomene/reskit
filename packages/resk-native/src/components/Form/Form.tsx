@@ -287,19 +287,18 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         }
         if (p.fields) {
             for (let i in p.fields) {
-                const field: IField | undefined =
-                    (p.fields[i as keyof IFields] && Object.clone(p.fields[i as keyof IFields])) || undefined;
+                const field: IField | undefined = (isObj(p.fields[i as keyof IFields]) && Object.clone(p.fields[i as keyof IFields])) || undefined;
                 if (!field || (field?.perm !== undefined && !Auth.isAllowed(field?.perm))) continue;
                 if (field.rendable === false) continue;
                 delete field.rendable;
-                if (field.form) {
-                    //on override l'objet field par les propriété personnalisées définis dans le form
-                    extendObj(field, field.form);
-                    if (isUpdate && (field.form as any).update) {
-                        extendObj(field, (field.form as any).update);
-                    } else if (!isUpdate && (field.form as any).create) {
-                        extendObj(field, (field.form as any).create);
-                    }
+                ///override create and update props
+                if (isObj(field.createOrUpdate)) {
+                    extendObj(field, field.createOrUpdate);
+                }
+                if (isUpdate && isObj(field.update)) {
+                    extendObj(field, field.update);
+                } else if (!isUpdate && isObj(field.create)) {
+                    extendObj(field, field.create);
                 }
                 if (field.rendable === false) continue;
                 if (!("responsive" in field && typeof responsive == "boolean")) {

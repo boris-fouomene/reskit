@@ -4,6 +4,7 @@ import { IDropdownOnChangeOptions, IDropdownProps } from "@components/Dropdown";
 import { ITextInputProps } from "@components/TextInput/types";
 import { IMergeWithoutDuplicates, IFieldBase } from "@resk/core/types";
 import { ICheckboxProps } from "@components/Checkbox";
+import { IBreakpointColumns } from "@breakpoints/types";
 
 
 /**
@@ -228,6 +229,15 @@ declare module "@resk/core" {
 * };
 * ```
 */
-export type IFormFieldProps<FieldType, ComponentProps> = Omit<IMergeWithoutDuplicates<IFieldBase, ComponentProps>, "type"> & { type: FieldType; };
+export type IFormFieldProps<FieldType, ComponentProps> = Omit<IMergeWithoutDuplicates<IFieldBase, ComponentProps>, "type"> & {
+    type: FieldType;
+    /***
+     * The breakpoint columns for the field.
+     * 
+     * @type {IBreakpointColumns}
+     * 
+     */
+    breakpointColumns?: IBreakpointColumns;
+};
 
 

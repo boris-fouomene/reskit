@@ -274,7 +274,7 @@ export interface IFieldMap {
  * @see {@link IFieldMap} for the `IFieldMap` type.
  */
 export type IField<T extends IFieldType = IFieldType> = IFieldMap[T] & {
-    [key in ("create" | "update" | "delete" | "list" | "form" | "filter")]?: Partial<IFieldMap[IFieldType]>;
+    [key in ("create" | "update" | "createOrUpdate" | "list" | "filter")]?: Partial<IFieldMap[IFieldType]>;
 };
 
 /**

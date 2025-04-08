@@ -114,7 +114,7 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
         this.state = {
             error: false,
             hasPerformedValidation: false,
-            wrapperStyle: this.getBreakpointStyle(),
+            containerStyle: this.getBreakpointStyle(),
             isFieldEditable: false,
             value,
             prevValue: value,
@@ -123,9 +123,9 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
         this.validate({ value: this.state.value, context: this as IFormField<Type> }).catch((e) => { });
     }
     componentDidUpdate(prevProps: IField<Type>): void {
-        const wrapperStyle = this.getBreakpointStyle(this.props);
-        if (stableHash(wrapperStyle) == stableHash(this.state.wrapperStyle)) return;
-        this.setState({ wrapperStyle: this.getBreakpointStyle(this.props) }, () => {
+        const containerStyle = this.getBreakpointStyle(this.props);
+        if (stableHash(containerStyle) == stableHash(this.state.containerStyle)) return;
+        this.setState({ containerStyle: this.getBreakpointStyle(this.props) }, () => {
             this.validate({ value: "defaultValue" in this.props ? this.props.defaultValue : this.state.value, context: this as IFormField<Type> }, true).catch((e) => { });
         });
     }
@@ -907,8 +907,8 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      */
     doUpdateBreakpointStyle(args: IDimensions) {
         if (!this.canHandleBreakpointStyle()) return;
-        const wrapperStyle = this.getBreakpointStyle();
-        this.setState({ wrapperStyle });
+        const containerStyle = this.getBreakpointStyle();
+        this.setState({ containerStyle });
     }
     /**
      * Retrieves the breakpoint style for the field.
@@ -921,8 +921,8 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      */
     getBreakpointStyle(props?: Readonly<IField<Type>>): IViewStyle {
         if (!this.canHandleBreakpointStyle(props)) return null;
-        const windowWidth = (props || this.props).windowWidth;
-        const b = Breakpoints.col(undefined, windowWidth);
+        const windowWidth = (props || this.props)?.windowWidth;
+        const b = Breakpoints.col(((props || this.props) as any)?.breakpointColumns, windowWidth);
         return StyleSheet.flatten([b]);
     }
     /**
@@ -1000,8 +1000,8 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      */
     renderLoading(props: IField<Type>): ReactNode {
         let width: number | string = "100%";
-        const wrapStyle = isObj(this.state.wrapperStyle) && this.state.wrapperStyle && "width" in this.state.wrapperStyle
-            ? this.state.wrapperStyle
+        const wrapStyle = isObj(this.state.containerStyle) && this.state.containerStyle && "width" in this.state.containerStyle
+            ? this.state.containerStyle
             : { width: "100%" };
         if (wrapStyle) {
             const w = parseFloat(String(wrapStyle.width)?.replace("%", ""));
@@ -1040,7 +1040,6 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
             data,
             keyboardEventHandlerProps,
             formName,
-            form,
             responsive,
             isFilter: cIsFilter,
             visible,
@@ -1050,7 +1049,7 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
         if (isFilter) {
             if ((rest as any).rendable === false) return null;
         }
-        const wrapperProps = Object.assign({}, keyboardEventHandlerProps);
+        const containerProps = Object.assign({}, keyboardEventHandlerProps);
         const visibleStyle = !this.isFilter() && visible === false && styles.hidden;
         const disabled = rest.disabled || this.isDisabled();
         const readOnly = rest.readOnly || this.isFormSubmitting();
@@ -1065,13 +1064,13 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
             <KeyboardEventHandler
                 testID={"resk-form-field-container-" + this.getName()}
                 innerRef={this.wrapperRef}
-                {...wrapperProps}
-                handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(wrapperProps)}
+                {...containerProps}
+                handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(containerProps)}
                 onKeyEvent={this.onKeyEvent.bind(this)}
                 disabled={disabled || readOnly}
                 style={[
-                    responsive !== false && this.state.wrapperStyle,
-                    wrapperProps.style,
+                    responsive !== false && this.state.containerStyle,
+                    containerProps.style,
                     visibleStyle,
                     disabledStyle,
                     readOnlyStyle,

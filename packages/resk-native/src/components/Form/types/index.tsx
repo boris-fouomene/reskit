@@ -1787,7 +1787,7 @@ export interface IFormKeyboardEventHandlerOptions extends IFormContext {
  * @property {any} [prevValue] - The value previously assigned to the field.
  * @property {string} errorText - The error message associated with the field.
  * @property {boolean} [formTriedTobeSubmitted] - Indicates if the form has been submitted.
- * @property {IViewStyle} wrapperStyle - The style applied to the field's wrapper.
+ * @property {IViewStyle} containerStyle - The style applied to the field's wrapper.
  * 
  * @remarks
  * This type is useful for managing the internal state of a form field component,
@@ -1818,7 +1818,7 @@ export type IFormFieldState = Partial<IField> & {
     prevValue?: any;
     errorText: string;
     formTriedTobeSubmitted?: boolean;
-    wrapperStyle: IViewStyle;
+    containerStyle: IViewStyle;
 }
 /**
  * Represents a protected resource that can be associated with a button in the user interface.

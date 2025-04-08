@@ -2,7 +2,7 @@
 import * as React from "react";
 import View from "./View";
 import { ITheme } from '@theme/types';
-import { getDefaultTheme, updateTheme as uTheme, triggerThemeUpdate, createTheme } from '@theme/index';
+import Theme from '@theme/index';
 import { StyleSheet } from "react-native";
 import useStateCallback from '@utils/stateCallback';
 import { extendObj, isNumber, isObj } from '@resk/core/utils';
@@ -68,7 +68,7 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    *
    * @type {[ITheme, Function]} The current theme and a function to update the theme.
    */
-  const [theme, setTheme] = useStateCallback<ITheme>(createTheme(getDefaultTheme(Object.assign({}, customTheme))));
+  const [theme, setTheme] = useStateCallback<ITheme>(Theme.create(Theme.getDefaultTheme(Object.assign({}, customTheme))));
 
   /**
    * Updates the current theme.
@@ -85,8 +85,8 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    * ```
    */
   const updateTheme = (theme: ITheme) => {
-    setTheme(uTheme(theme, false), (t) => {
-      triggerThemeUpdate(t as ITheme);
+    setTheme(Theme.update(theme, false), (t) => {
+      Theme.triggerUpdate(t as ITheme);
     });
   }
   /**
@@ -99,7 +99,7 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    * @param {string} stableHash(customTheme) - Memoized hash value of the custom theme.
    */
   React.useEffect(() => {
-    updateTheme(uTheme(Object.assign({}, theme, customTheme)));
+    updateTheme(Theme.update(Object.assign({}, theme, customTheme)));
   }, [customTheme]);
   React.useMemo(() => {
     if (isObj(breakpoints)) {

@@ -1,176 +1,74 @@
-export default {
-    /**
-     * Primary color used for prominent elements in the UI, such as buttons or active states.
-     * @example
-     * Use `primary` for a call-to-action button background, e.g., "Sign Up" or "Get Started."
-     */
-    primary: '#6750A4',
+import { IThemeColorsTokens } from "@theme/types";
 
-    /**
-     * Color for text or icons displayed on `primary` color backgrounds.
-     * @example
-     * Use `onPrimary` for button text on a `primary` button, ensuring sufficient contrast.
-     */
-    onPrimary: '#FFFFFF',
+const lightTheme: IThemeColorsTokens = {
+    primary: '#007AFF', // iOS blue (matches system blue)
+    onPrimary: '#FFFFFF', // White text/icons on primary
+    primaryContainer: '#E8F5FE', // Light blue container
+    onPrimaryContainer: '#002C66', // Dark blue text/icons on primary container
 
-    /**
-     * Background color used for primary surfaces, like elevated cards or headers.
-     * @example
-     * Apply `primaryContainer` for the background of a top navigation bar or highlighted sections.
-     */
-    primaryContainer: '#EADDFF',
+    secondary: '#595959', // Neutral gray
+    onSecondary: '#FFFFFF', // White text/icons on secondary
+    secondaryContainer: '#F2F2F7', // Light gray container (matches iOS gray)
+    onSecondaryContainer: '#1C1C1E', // Dark gray text/icons on secondary container
 
-    /**
-     * Color for text or icons on `primaryContainer` backgrounds.
-     * @example
-     * Use `onPrimaryContainer` for text in a navigation bar where the background is `primaryContainer`.
-     */
-    onPrimaryContainer: '#21005D',
+    tertiary: '#BF5AF2', // Purple accent (matches iOS purple)
+    onTertiary: '#FFFFFF', // White text/icons on tertiary
+    tertiaryContainer: '#F3E8FF', // Light purple container
+    onTertiaryContainer: '#380061', // Dark purple text/icons on tertiary container
 
-    /**
-     * Secondary color, typically used for accents, such as secondary buttons or less prominent icons.
-     * @example
-     * Use `secondary` for borders around cards or less prominent elements.
-     */
-    secondary: '#625B71',
+    background: '#FFFFFF', // White background
+    onBackground: '#000000', // Black text/icons on background
 
-    /**
-     * Color for text or icons on `secondary` color backgrounds.
-     * @example
-     * Apply `onSecondary` to icons on a `secondary` button for proper contrast.
-     */
-    onSecondary: '#FFFFFF',
+    surface: '#FFFFFF', // White surface
+    onSurface: '#000000', // Black text/icons on surface
+    surfaceVariant: '#F2F2F7', // Light gray surface variant
+    onSurfaceVariant: '#3A3A3C', // Dark gray text/icons on surface variant
 
-    /**
-     * Background color for secondary surfaces, such as cards or sections that need to be distinct but less prominent.
-     * @example
-     * Use `secondaryContainer` as a background color for secondary cards or banners.
-     */
-    secondaryContainer: '#E8DEF8',
+    outline: '#D1D1D6', // Light gray outline
+    outlineVariant: '#E5E5EA', // Slightly lighter gray outline
 
-    /**
-     * Color for text or icons on `secondaryContainer` backgrounds.
-     * @example
-     * Use `onSecondaryContainer` for text on secondary cards where the background is `secondaryContainer`.
-     */
-    onSecondaryContainer: '#1D192B',
+    inverseSurface: '#1C1C1E', // Dark surface for inverted contexts
+    inverseOnSurface: '#FFFFFF', // White text/icons on inverse surface
+    inversePrimary: '#A0C7FF', // Light blue for inverted primary
 
-    /**
-     * Tertiary color, used for subtle accents or special cases.
-     * @example
-     * Use `tertiary` sparingly for buttons in alternative flows, like a "Help" or "Support" button.
-     */
-    tertiary: '#7D5260',
+    error: '#FF3B30', // Red error color (matches iOS red)
+    onError: '#FFFFFF', // White text/icons on error
+    errorContainer: '#FFE5E3', // Light red container
+    onErrorContainer: '#410002', // Dark red text/icons on error container
 
-    /**
-     * Color for text or icons on `tertiary` backgrounds.
-     * @example
-     * Use `onTertiary` on text for alternative action buttons colored with `tertiary`.
-     */
-    onTertiary: '#FFFFFF',
+    shadow: '#000000', // Black shadow
+    scrim: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black scrim
+    surfaceDisabled: '#E5E5EA', // Disabled surface (light gray)
+    onSurfaceDisabled: '#A3A3A3', // Disabled text/icons (medium gray)
+    backdrop: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black backdrop
 
-    /**
-     * Background color for tertiary surfaces, often used for less primary elements.
-     * @example
-     * Use `tertiaryContainer` as a background for cards that hold contextual or additional information.
-     */
-    tertiaryContainer: '#FFD8E4',
+    surfaceContainer: '#FFFFFF', // White container
+    surfaceContainerLow: '#FAFAFA', // Very light gray container
+    surfaceContainerLowest: '#FCFCFC', // Almost white container
+    surfaceContainerHigh: '#F5F5F5', // Light gray container
+    surfaceContainerHighest: '#E0E0E0', // Medium gray container
+    surfaceBright: '#FFFFFF', // Bright white surface
+    surfaceDim: '#F0F0F0', // Dimmed light gray surface
+    surfaceTint: '#007AFF', // Primary blue tint
 
-    /**
-     * Color for text or icons on `tertiaryContainer` backgrounds.
-     * @example
-     * Use `onTertiaryContainer` for headings within cards that have `tertiaryContainer` as background.
-     */
-    onTertiaryContainer: '#31111D',
+    elevation: {
+        level0: 'none',
+        level1: '0px 1px 2px rgba(0, 0, 0, 0.1)',
+        level2: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+        level3: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+        level4: '0px 6px 12px rgba(0, 0, 0, 0.1)',
+        level5: '0px 8px 16px rgba(0, 0, 0, 0.1)',
+    },
 
-    /**
-     * Error color used for critical error messages or destructive actions.
-     * @example
-     * Apply `error` to icons or text indicating errors, like form validation errors.
-     */
-    error: '#B3261E',
+    statusBar: '#000000', // Black status bar text
+    text: '#000000', // Black text/icons
+    placeholder: '#A3A3A3', // Gray placeholder text
+    info: '#007AFF', // Blue info color
+    onInfo: '#FFFFFF', // White text/icons on info
+    success: '#34C759', // Green success color
+    onSuccess: '#FFFFFF', // White text/icons on success
+    warning: '#FF9500', // Orange warning color
+    onWarning: '#000000', // Black text/icons on warning
+};
 
-    /**
-     * Color for text or icons on `error` color backgrounds.
-     * @example
-     * Use `onError` for "Retry" text on a button with an `error` background.
-     */
-    onError: '#FFFFFF',
-
-    /**
-     * Background color for error surfaces, like error messages or notifications.
-     * @example
-     * Use `errorContainer` as the background for an error message section.
-     */
-    errorContainer: '#F9DEDC',
-
-    /**
-     * Color for text or icons on `errorContainer` backgrounds.
-     * @example
-     * Use `onErrorContainer` for error message text against an `errorContainer` background.
-     */
-    onErrorContainer: '#410E0B',
-
-    /**
-     * Background color for the app, generally applied to large surface areas.
-     * @example
-     * Use `background` as the base background color for the app’s main content.
-     */
-    background: '#FFFFFF',
-
-    /**
-     * Color for text on top of the background.
-     * @example
-     * Apply `onBackground` to the main text color for content on the `background`.
-     */
-    onBackground: '#1C1B1F',
-
-    /**
-     * Surface color, used for components like cards or modal backgrounds.
-     * @example
-     * Use `surface` for cards or surfaces in lists to distinguish them from the `background`.
-     */
-    surface: '#FFFFFF',
-
-    /**
-     * Color for text or icons on `surface` color backgrounds.
-     * @example
-     * Use `onSurface` for card content text where the background is `surface`.
-     */
-    onSurface: '#1C1B1F',
-
-    /**
-     * Variant of the surface color for elements like secondary cards or subtly raised surfaces.
-     * @example
-     * Use `surfaceVariant` for cards that need slight contrast with the main `surface`.
-     */
-    surfaceVariant: '#E7E0EC',
-
-    /**
-     * Color for text or icons on `surfaceVariant` backgrounds.
-     * @example
-     * Apply `onSurfaceVariant` to secondary text on surfaces with `surfaceVariant` as background.
-     */
-    onSurfaceVariant: '#49454F',
-
-    /**
-     * Outline color for borders, separators, or low-emphasis dividers.
-     * @example
-     * Use `outline` for dividers between list items or in form fields.
-     */
-    outline: '#79747E',
-
-    /**
-     * Inverse surface color, typically used for modal backgrounds or dark-mode contexts.
-     * @example
-     * Use `inverseSurface` for backgrounds on darker themes or overlays.
-     */
-    inverseSurface: '#313033',
-
-    /**
-     * Color for text or icons on `inverseSurface` backgrounds.
-     * @example
-     * Use `inverseOnSurface` for text over `inverseSurface` in overlays or dark mode.
-     */
-    inverseOnSurface: '#F4EFF4',
-}
+export default lightTheme;

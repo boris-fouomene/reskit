@@ -9,7 +9,7 @@ import {
     GestureResponderEvent,
 } from 'react-native';
 
-import Theme, { useTheme, splitStyles, Colors } from '@theme/index';
+import Theme, { useTheme, Colors } from '@theme/index';
 import { forwardRef } from 'react';
 import { getButtonColors } from './utils';
 import { ActivityIndicator } from '@components/ActivityIndicator';
@@ -227,10 +227,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     }, [isElevationEntitled, elevation, initialElevation]);
 
     const flattenedStyles = (StyleSheet.flatten(style) || {}) as ViewStyle;
-    const [restButtonStyle, borderRadiusStyles] = splitStyles(
-        flattenedStyles,
-        (style) => style.startsWith('border') && style.endsWith('Radius')
-    );
+    const [restButtonStyle, borderRadiusStyles] = Theme.splitStyles(flattenedStyles, (style) => style.startsWith('border') && style.endsWith('Radius'));
     borderRadius = typeof borderRadiusStyles?.borderRadius === "number" ? borderRadiusStyles.borderRadius : typeof (borderRadius) === 'number' ? borderRadius : 1 * (roundness || 8);
     const { backgroundColor, hoverColor, borderColor, textColor, borderWidth } =
         getButtonColors({

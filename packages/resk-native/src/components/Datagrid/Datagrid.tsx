@@ -4608,5 +4608,6 @@ const styles = StyleSheet.create({
     button: {
         paddingHorizontal: 7,
         paddingVertical: 2,
+        marginHorizontal: 5,
     }
 });

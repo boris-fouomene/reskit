@@ -397,6 +397,12 @@ export type IButtonProps<IButtonExtendContext = any, ResourceName extends IResou
      * When this name is provided, button can be used as an actions for a form with that resource.
      */
     resourceName?: ResourceName;
+
+    /***
+     * Specifies whether the button should have no padding.
+     * If true, the button will not have any padding.
+     */
+    noPadding?: boolean;
 }
 
 /**

@@ -161,6 +161,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     hoverColor: customHoverColor,
     resourceName,
     perm,
+    noPadding,
     ...rest
 }: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
@@ -324,7 +325,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 disabled={disabled}
                 disabledRipple={disableRipple}
                 rippleColor={rippleColor}
-                style={[styles.touchable, compactStyle, fullWidthStyle, restButtonStyle, touchableStyle]}
+                style={[styles.button, compactStyle, fullWidthStyle, noPadding && styles.noPadding, restButtonStyle, touchableStyle]}
                 testID={testID}
                 ref={innerRef}
                 id={idRef.current}
@@ -398,10 +399,14 @@ const styles = StyleSheet.create({
     fullWidth: {
         width: "100%",
     },
-    touchable: {
+    button: {
         width: "100%",
         paddingHorizontal: 7,
         paddingVertical: 7,
+    },
+    noPadding: {
+        paddingHorizontal: 0,
+        paddingVertical: 0,
     },
     compact: {
         paddingVertical: 0,

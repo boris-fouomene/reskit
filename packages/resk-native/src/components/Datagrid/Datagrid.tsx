@@ -1562,11 +1562,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             <View testID={testID + "-toolbar-container"} style={[styles.toolbarContainer]}>
                 {(Array.isArray(customToolbarActions) ? [...actions, customToolbarActions] : actions).map((action, index) => {
                     if (!action || !isObj(action)) return null;
-                    const key = "toolbar-action-" + index;
-                    return <Button
-                        testID={testID + "-toolbar-button-" + index} key={key}
+                    return <DatagridButton
+                        testID={testID + "-toolbar-button-" + index}
+                        key={"toolbar-action-" + index}
                         {...action}
-                        context={Object.assign({}, (action as any).context, { datagridContext: this })}
                     />
                 })}
                 <Menu
@@ -1574,7 +1573,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                         const onPress = () => {
                             openMenu();
                         }
-                        return <Button
+                        return <DatagridButton
                             icon="view-column"
                             children={this.translate("columns")}
                             onPress={onPress}
@@ -3318,6 +3317,16 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
     />
 }
 
+function DatagridButton<DataType extends object = any>({ testID, ...props }: IButtonProps<{ datagridContext: DatagridView<DataType> }>) {
+    const datagridContext = useDatagrid();
+    return <Button
+        noPadding
+        {...props}
+        context={Object.assign({}, (props as any).context, { datagridContext })}
+    />
+}
+DatagridButton.displayName = "Datagrid.Button";
+
 AggregatedValue.displayName = "Datagrid.AggregatedValue";
 Datagrid.AggregatedValue = AggregatedValue;
 Datagrid.View = DatagridView;
@@ -3327,6 +3336,7 @@ Datagrid.DefaultLoadingIndicator = DefaultLoadingIndicator;
 Datagrid.PreloaderLoadingIndicator = PreloaderLoadingIndicator;
 Datagrid.View = DatagridView;
 Datagrid.SortIcon = SortIcon;
+Datagrid.Button = DatagridButton;
 
 DefaultLoadingIndicator.displayName = "Datagrid.DefaultLoadingIndicator";
 PreloaderLoadingIndicator.displayName = "Datagrid.PreloaderLoadingIndicator";
@@ -4592,5 +4602,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         alignItems: 'center',
         paddingHorizontal: 10,
+        paddingVertical: 5,
     }
 });

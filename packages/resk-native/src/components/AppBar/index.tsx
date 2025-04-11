@@ -87,7 +87,7 @@ const AppBar = function AppBar<AppBarActionContext = any>({
   const colorScheme = theme.getColorScheme(customColorScheme as IThemeColorsTokenName);
   const flattenStyle = (StyleSheet.flatten(style) || {});
   backgroundColor = (Colors.isValid(backgroundColor) ? backgroundColor : theme.getColor(backgroundColor) || colorScheme.backgroundColor || flattenStyle?.backgroundColor) as string;
-  color = (Colors.isValid(color) ? color : theme.getColor(color) || colorScheme.color || (flattenStyle as any)?.color) as string;
+  color = (Colors.isValid(color) ? color : theme.getColor(color) || colorScheme.color || theme.colors.text) as string;
   const titleTextColor = Colors.isValid(color) ? color : undefined;
   titleProps = Object.assign({}, titleProps);
   subtitleProps = Object.assign({}, subtitleProps);

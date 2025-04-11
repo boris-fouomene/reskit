@@ -422,7 +422,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             {data.map((rowData, rowIndex) => this.renderTableRow(rowData, rowIndex))}
         </>
     }
-
     /**
      * Renders the table footer.
      * 
@@ -914,10 +913,12 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         const groupedColumns = Array.isArray(sessionData.groupedColumns) ? sessionData.groupedColumns : Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : [];
         r.groupedColumns = groupedColumns;
-
+        r.aggregationFunction = isNonNullString(this.props.defaultAggregationFunction) && DatagridView.isValidAggregationFunction(this.props.defaultAggregationFunction) ? this.props.defaultAggregationFunction :
+            isNonNullString(sessionData.aggregationFunction) && DatagridView.isValidAggregationFunction(sessionData.aggregationFunction) ? sessionData.aggregationFunction : "sum";
+        this.setSessionData("aggregationFunction", r.aggregationFunction);
         this.getToogleableStateKeys().map((key) => {
             const propValue = (this.props as any)[key];
-            (r as any)[key] = defaultBool(sessionData[key], propValue, !["showOnlyAggregatedTotals", "includeColumnLabelInGroupedRowHeader"].includes(key as string));
+            (r as any)[key] = defaultBool(sessionData[key], propValue, !["showOnlyAggregatedValues", "includeColumnLabelInGroupedRowHeader"].includes(key as string));
             if (propValue === false) {
                 (r as any)[key] = false;
             }
@@ -937,7 +938,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * the togglable state properties of the DatagridView.
      */
     getToogleableStateKeys(): (keyof IDatagridViewState<DataType, StateExtensions>)[] {
-        return ["showFilters", "showHeaders", "showAggregatedTotals", "showActions", "showToolbar", "showOnlyAggregatedTotals", "includeColumnLabelInGroupedRowHeader"];
+        return ["showFilters", "showHeaders", "showAggregatedValues", "showActions", "showToolbar", "showOnlyAggregatedValues", "includeColumnLabelInGroupedRowHeader"];
     }
 
     /**
@@ -969,8 +970,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const stateGroupedColumns: string[] = [];
         this.props.columns.map((column) => {
             if (isObj(column) && isNonNullString(column.name)) {
-                const aggretagionFunction = isNonNullString(column.aggregationFunction) ? DatagridView.getAggregationFunction(column.aggregationFunction) :
-                    DatagridView.isValidAggregationFunction(column.aggregationFunction as any) ? column.aggregationFunction : undefined;
                 const col: IDatagridViewStateColumn<DataType> = {
                     ...Object.clone(column),
                     groupable: this.isGroupable() && column.groupable !== false,
@@ -978,7 +977,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     sortable: this.isSortable() && column.sortable !== false,
                     visible: column.visible !== false,
                     aggregatable: this.props.aggregatable !== false && column.aggregatable !== false,
-                    aggregationFunction: aggretagionFunction ? aggretagionFunction : DatagridView.countAggregationFunction,
                 };
                 columns.push(col);
                 if (col.visible !== false) {
@@ -1097,15 +1095,15 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     /**
      * Toggles the display of aggregated headers.
      * 
-     * This method simply toggles the `showAggregatedTotals` state and persists it to the session data.
+     * This method simply toggles the `showAggregatedValues` state and persists it to the session data.
      * 
      * @returns {void}
      */
-    toggleShowAggregatedTotals() {
-        this.toggleShow("showAggregatedTotals");
+    toggleShowAggregatedValues() {
+        this.toggleShow("showAggregatedValues");
     }
-    toggleShowOnlyAggregatedTotals() {
-        this.toggleShow("showOnlyAggregatedTotals");
+    toggleShowOnlyAggregatedValues() {
+        this.toggleShow("showOnlyAggregatedValues");
     }
     /**
      * Toggles the display of headers.
@@ -1355,10 +1353,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                             this.toggleIncludeColumnLabelInGroupedRowHeader();
                         }
                     },
-                    this.canShowAggregatedTotals() ? {
+                    this.canShowAggregatedValues() ? {
                         label: this.translate("displayOnlyAggregatedTotal"),
-                        icon: this.canShowAggregatedTotals() ? "check" : null,
-                        onPress: this.toggleShowOnlyAggregatedTotals.bind(this)
+                        icon: this.canShowAggregatedValues() ? "check" : null,
+                        onPress: this.toggleShowOnlyAggregatedValues.bind(this)
                     } : null,
                     ...(Array.isArray(menuItems2) ? menuItems2 : []),
                     isGlobalGrouped ? {
@@ -1391,7 +1389,12 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * An object mapping each aggregation function name or identifier to its localized label.
      */
     getAggregationFunctionsTranslations(): Partial<Record<keyof IDatagridAggregationFunctions | string, string>> {
-        return Object.assign({}, i18n.getNestedTranslation("components.datagrid.aggregationFunctions") as any);
+        const registeredAggregations = Object.keys(DatagridView.aggregationFunctions);
+        const obj = {};
+        registeredAggregations.map((aggregation) => {
+            (obj as any)[aggregation] = aggregation;
+        })
+        return Object.assign({}, obj, i18n.getNestedTranslation("components.datagrid.aggregationFunctions") as any);
     }
 
 
@@ -1421,13 +1424,14 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const aggregationTranslations = this.getAggregationFunctionsTranslations();
         for (let funcName in aggregationsFunctions) {
             const label = defaultStr(aggregationTranslations[funcName], funcName);
+            const active = this.getAggregationFunction() === funcName;
             if (label) {
                 menuItems.push({
                     label,
-                    //icon : active?"check":null,
-                    /* onPress : active ? undefined : ()=>{
-                        this.toggleActiveAggregatorFunction(ag);
-                    } */
+                    icon: active ? "check" : null,
+                    onPress: active ? undefined : () => {
+                        this.toggleAggregationFunction(funcName as any);
+                    }
                 })
             }
         }
@@ -1517,9 +1521,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         if (isAggregatable) {
             actions.push({
-                label: !this.canShowAggregatedTotals() ? this.translate("showAggregatedTotals") : this.translate("hideAggregatedTotals"),
-                icon: this.canShowAggregatedTotals() ? 'view-column' : 'view-module-outline',
-                onPress: this.toggleShowAggregatedTotals.bind(this),
+                label: !this.canShowAggregatedValues() ? this.translate("showAggregatedValues") : this.translate("hideAggregatedValues"),
+                icon: this.canShowAggregatedValues() ? 'view-column' : 'view-module-outline',
+                onPress: this.toggleShowAggregatedValues.bind(this),
             })
         }
         if (selectable && dataLength) {
@@ -1631,8 +1635,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      *
      * @returns {boolean} - `true` if aggregated headers can be shown, otherwise `false`.
      */
-    canShowAggregatedTotals() {
-        return this.canShow("showAggregatedTotals");
+    canShowAggregatedValues() {
+        return this.canShow("showAggregatedValues") && this.isAggregatable();
     }
     /**
      * Determines if only aggregated headers can be shown in the datagrid.
@@ -1641,8 +1645,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      *
      * @returns {boolean} - `true` if only aggregated headers can be shown, otherwise `false`.
      */
-    canShowOnlyAggregatedTotals() {
-        return !!this.state.showOnlyAggregatedTotals;
+    canShowOnlyAggregatedValues() {
+        return !!this.state.showOnlyAggregatedValues;
     }
     /**
      * Checks if a column is groupable.
@@ -1971,7 +1975,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {IDatagridAggregationFunctions} The set of aggregation functions available for use.
      */
     getAggregationFunctions() {
-        return DatagridView.getRegisteredAggregationFunctions();
+        return DatagridView.aggregationFunctions;
     }
     /**
      * Initializes the computation of aggregated values for the datagrid columns.
@@ -1987,8 +1991,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * aggregated values initialized to zero for each aggregation function.
      */
     initAggregationComputation() {
-        const aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>> = {};
-        const aggregationFunctions = DatagridView.getRegisteredAggregationFunctions();
+        const aggregatedColumnsValues: Record<IDatagridViewColumnName<DataType>, Record<keyof IDatagridAggregationFunctions, number>> = {} as any;
+        const aggregationFunctions = this.getAggregationFunctions();
         const { aggregatableColumns } = this.state;
         if (Array.isArray(aggregatableColumns)) {
             aggregatableColumns.map((column) => {
@@ -2014,9 +2018,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @param {DataType[]} allData - The complete dataset being processed.
      * @returns {Record<string, Record<keyof IDatagridAggregationFunctions, number>>} - The updated object containing aggregated values for each column.
      */
-    computeAggregationsForRow(rowData: DataType, rowIndex: number, aggregationFunctions: IDatagridAggregationFunctions<DataType>, aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>, allData: DataType[]) {
+    computeAggregationsForRow(rowData: DataType, rowIndex: number, aggregationFunctions: IDatagridAggregationFunctions<DataType>, aggregatedColumnsValues: Record<IDatagridViewColumnName<DataType>, Record<keyof IDatagridAggregationFunctions, number>>, allData: DataType[]) {
         const { aggregatableColumns } = this.state;
-        aggregatedColumnsValues = isObj(aggregatedColumnsValues) ? aggregatedColumnsValues : {};
+        aggregatedColumnsValues = isObj(aggregatedColumnsValues) ? aggregatedColumnsValues : {} as any;
         if (!Array.isArray(aggregatableColumns)) return aggregatedColumnsValues;
         aggregatableColumns.map((column) => {
             if (column.aggregatable) {
@@ -2173,6 +2177,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const hasGroupedColumnsChanged = !DatagridView.areArraysEqual(prevProps.groupedColumns, this.props.groupedColumns) && Array.isArray(this.props.groupedColumns);
         const hasPaginationChanged = defaultBool(prevProps.paginationEnabled) !== defaultBool(this.props.paginationEnabled) || !areEquals(prevProps.pagination, this.props.pagination);
         const pagination: IDatagridPagination = isObj(this.props.pagination) ? this.props.pagination as any : this.state.pagination;
+        if (prevProps.defaultAggregationFunction !== this.props.defaultAggregationFunction && isNonNullString(this.props.defaultAggregationFunction) && DatagridView.isValidAggregationFunction(this.props.defaultAggregationFunction)) {
+            newState.aggregationFunction = this.props.defaultAggregationFunction as any;
+            hasUpdated = true;
+        }
 
         const dataChanged = !DatagridView.areArraysEqual(prevProps.data, this.props.data);
         // Check if data has changed
@@ -2190,6 +2198,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         });
         if (hasUpdated) {
             this.updateState(newState, () => {
+                if (newState.aggregationFunction) {
+                    this.setSessionData("aggregationFunction", newState.aggregationFunction);
+                }
                 this.getToogleableStateKeys().map((key) => {
                     if (key in newState) {
                         this.setSessionData(key, newState[key]);
@@ -2218,7 +2229,29 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return defaultStr(this.props.testID, ("resk-datagrid" + (viewName ? `-${viewName}` : "")));
     }
 
-
+    /**
+     * Retrieves the current aggregation function of the DatagridView component.
+     * 
+     * @returns {keyof IDatagridAggregationFunctions} The current aggregation function of the DatagridView component.
+     */
+    getAggregationFunction(): keyof IDatagridAggregationFunctions {
+        return this.state.aggregationFunction;
+    }
+    /**
+     * Toggles the aggregation function of the DatagridView component.
+     * 
+     * The method takes an aggregation function name as parameter and checks if the aggregation function is valid and not already set.
+     * If the aggregation function is valid and not already set, it updates the state of the component with the new aggregation function.
+     * If the aggregation function is not valid or already set, the method does nothing.
+     * @param {keyof IDatagridAggregationFunctions} aggregationFunction - The aggregation function to toggle.
+     * @returns {void} This function does not return a value.
+     */
+    toggleAggregationFunction(aggregationFunction: keyof IDatagridAggregationFunctions) {
+        const aggregations = this.getAggregationFunctions();
+        if (aggregationFunction !== this.getAggregationFunction() && isNonNullString(aggregationFunction) && aggregationFunction in aggregations) {
+            this.updateState({ aggregationFunction });
+        }
+    }
     /**
      * Retrieves the minimum height of the DatagridView component.
      * 
@@ -2449,10 +2482,14 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * An aggregation function is considered valid if it is a function.
      * 
-     * @param {IDatagridAggregationFunction<any>} aggregationFunction - The aggregation function to validate.
+     * @param {IDatagridAggregationFunction<any> | keyof IDatagridAggregationFunctions} aggregationFunction - The aggregation function to validate.
      * @returns {aggregationFunction is IDatagridAggregationFunction} Whether the given aggregation function is valid.
      */
-    static isValidAggregationFunction(aggregationFunction: IDatagridAggregationFunction<any>): aggregationFunction is IDatagridAggregationFunction {
+    static isValidAggregationFunction(aggregationFunction: IDatagridAggregationFunction<any> | keyof IDatagridAggregationFunctions): aggregationFunction is IDatagridAggregationFunction {
+        if (isNonNullString(aggregationFunction)) {
+            const aggregatedFunctions = DatagridView.aggregationFunctions;
+            return typeof aggregatedFunctions[aggregationFunction as keyof typeof aggregatedFunctions] === "function";
+        }
         return typeof aggregationFunction === "function";
     }
 
@@ -3065,6 +3102,24 @@ export function AttachDatagridView<DataType extends object = any, PropsExtension
 
 
 
+/**
+ * Datagrid component for rendering data views.
+ * 
+ * This component determines the appropriate view to render based on the provided view name(s).
+ * It utilizes registered views from `DatagridView` and ensures that only valid views are selected.
+ * 
+ * @template DataType - The type of the data displayed in the grid.
+ * 
+ * @param {IDatagridProps<DataType, {}>} props - The properties for the Datagrid component, including view names and additional props.
+ * @returns {JSX.Element} - The rendered component corresponding to the selected view.
+ * 
+ * @remarks
+ * - Uses `useDimensions` to handle responsive design.
+ * - Computes the current view and view names using `useMemo`.
+ * - Manages state with `useState` and effects with `useEffect`.
+ * - Renders the appropriate `DatagridView` component based on the selected view name.
+ */
+
 const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType, {}>) {
     useDimensions();
     const { viewNames, viewName } = useMemo(() => {
@@ -3092,8 +3147,6 @@ const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cV
         {...restProps}
     />;
 };
-
-(Datagrid as any).View = DatagridView;
 
 
 /**
@@ -3223,6 +3276,51 @@ function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridViewLoading
     }, [!!isLoading]);
     return null;
 }
+
+function AggregatedValue<DataType extends object = any>({ values, column }: { values: Record<keyof IDatagridAggregationFunctions, number>, column: IDatagridViewColumnName<DataType> }) {
+    const datagridContext = useDatagrid();
+    const columnObj = datagridContext?.getColumn(column);
+    const [aggregationFunction, setAggregationFunction] = useState<keyof IDatagridAggregationFunctions>(datagridContext?.getAggregationFunction() || "sum");
+    const aggregatedValue = useMemo(() => {
+        if (!isObj(columnObj)) return 0;
+        return InputFormatter.formatValue({ ...columnObj, value: defaultNumber(values[aggregationFunction]) }).formattedValue;
+    }, [values, aggregationFunction, columnObj]);
+    const aggregations = datagridContext?.getAggregationFunctions();
+    const aggretionsTranslations = datagridContext?.getAggregationFunctionsTranslations();
+    const menuItems = useMemo(() => {
+        if (!isObj(aggretionsTranslations) || !isObj(aggregations)) return [];
+        const items = [];
+        for (let i in aggregations) {
+            const label = defaultStr((aggretionsTranslations as any)[i], i);
+            const active = aggregationFunction === i;
+            items.push({
+                label,
+                icon: active ? "check" : null,
+                onPress: () => {
+                    setAggregationFunction(i as any);
+                }
+            });
+        }
+        return items;
+    }, [aggregationFunction, aggretionsTranslations]);
+    if (!columnObj || !isObj(values) || !datagridContext || !datagridContext?.canShowAggregatedValues()) return null;
+    const testID = datagridContext.getTestID();
+    return <Menu
+        items={menuItems as any}
+        testID={testID + "-aggregated-value-menu"}
+        anchor={({ openMenu }) => {
+            return <Pressable testID={testID + "-aggregated-value-container"} onPress={(e) => { openMenu() }}>
+                <Label textBold fontSize={16} colorScheme="primary">
+                    {aggregatedValue}
+                </Label>
+            </Pressable>
+        }}
+    />
+}
+
+AggregatedValue.displayName = "Datagrid.AggregatedValue";
+Datagrid.AggregatedValue = AggregatedValue;
+Datagrid.View = DatagridView;
 Datagrid.LoadingIndicator = LoadingIndicator;
 Datagrid.displayName = "Datagrid";
 Datagrid.DefaultLoadingIndicator = DefaultLoadingIndicator;
@@ -3615,15 +3713,15 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * @default true
      * @type {boolean}
      * @example
-     * <DataGrid showAggregatedTotals={false} />
+     * <DataGrid showAggregatedValues={false} />
      */
-    showAggregatedTotals?: boolean;
+    showAggregatedValues?: boolean;
 
     /***
      * A flag indicating whether to show only the aggregated totals.
      * Default is to false
      */
-    showOnlyAggregatedTotals?: boolean;
+    showOnlyAggregatedValues?: boolean;
 
     /**
      * Controls whether the toolbar is displayed.
@@ -3663,6 +3761,11 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * Default is true
      */
     bindDimensionsChangeEvent?: boolean;
+
+    /**
+     * The default aggregation function to use for columns that support aggregation.
+     */
+    defaultAggregationFunction?: keyof IDatagridAggregationFunctions;
 } & PropsExtensions;
 
 
@@ -3832,15 +3935,6 @@ export type IDatagridViewStateColumn<DataType extends object = any> = Omit<IData
     visible: boolean;
 
     /**
-     * The aggregation function to use for the column.
-     * 
-     * This property is a computed value based on the column's configuration and the grid's settings.
-     * 
-     * @see {@link IDatagridAggregationFunction} for more information about aggregation functions.
-     */
-    aggregationFunction: IDatagridAggregationFunction<DataType>;
-
-    /**
      * The test ID for the column.
      * 
      * This property is used for testing purposes and can be used to identify the column in the grid.
@@ -3949,15 +4043,6 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
      * If true, the column is sorted in a case-insensitive manner.
      */
     ignoreCaseWhenSorting?: boolean;
-
-    /**
-     * The aggregation function to use for the column.
-     * 
-     * This property can be a key of the IDatagridAggregationFunctions interface or a custom aggregation function.
-     * 
-     * @see {@link IDatagridAggregationFunctions} for more information about aggregation functions.
-     */
-    aggregationFunction?: keyof IDatagridAggregationFunctions<DataType> | IDatagridAggregationFunction<DataType>;
 
     /***
      * A custom render function for the column.
@@ -4111,7 +4196,7 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
      * }
      * ```
      */
-    aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>;
+    aggregatedColumnsValues: Record<IDatagridViewColumnName<DataType>, Record<keyof IDatagridAggregationFunctions, number>>;
 
     /**
      * A flag indicating whether to display grouped columns.
@@ -4153,12 +4238,12 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
     /***
      * A flag indicating whether to show the aggregated totals.
      */
-    showAggregatedTotals: boolean;
+    showAggregatedValues: boolean;
 
     /***
      * A flag indicating whether to show only the aggregated totals.
      */
-    showOnlyAggregatedTotals: boolean;
+    showOnlyAggregatedValues: boolean;
 
     /***
      * A flag indicating whether to display the toolbar.
@@ -4170,6 +4255,11 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
     showActions: boolean;
 
     includeColumnLabelInGroupedRowHeader?: boolean;
+
+    /***
+     * The default aggregation function to use for columns that support aggregation.
+     */
+    aggregationFunction: keyof IDatagridAggregationFunctions;
 };
 
 /**
@@ -4297,7 +4387,7 @@ export interface IDatagridViewGroupedRow<DataType extends object = any> {
     /***
      * The aggregated values of the grouped row.
      */
-    aggregatedColumnsValues: Record<string, Record<keyof IDatagridAggregationFunctions, number>>;
+    aggregatedColumnsValues: Record<IDatagridViewColumnName<DataType>, Record<keyof IDatagridAggregationFunctions, number>>;
 }
 
 

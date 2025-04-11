@@ -58,12 +58,20 @@ interface IDatagridTableViewCommonProps<DataType extends object = any> {
 
 function Columns<DataType extends object = any>({ datagridContext }: IDatagridTableViewCommonProps<DataType>): JSX.Element | null {
     const visibleColumns = datagridContext.getVisibleColumns();
+    const canShowAggregatedValues = datagridContext.canShowAggregatedValues();
+    const aggregatedValues = datagridContext.getAggregatedColumnsValues();
     const theme = useTheme();
     const columns = useMemo(() => {
         return visibleColumns.map((column, index) => {
             return datagridContext.renderTableColumnHeader(column.name, index);
         });
     }, [visibleColumns]);
+    const aggregatedContent = useMemo(() => {
+        if (!canShowAggregatedValues) return null;
+        return <View testID={datagridContext.getTestID() + "-aggregated-values"} style={[styles.headers, { borderBottomWidth: 1, borderBottomColor: theme.colors.outline }]}>
+
+        </View>
+    }, [visibleColumns, aggregatedValues, canShowAggregatedValues])
     return <View testID={datagridContext.getTestID() + "-columns-headers"} style={[styles.headers, { borderBottomWidth: 1, borderBottomColor: theme.colors.outline }]}>
         {columns}
     </View>;

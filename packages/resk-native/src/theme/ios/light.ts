@@ -38,18 +38,9 @@ const lightTheme: IThemeColorsTokens = {
 
     shadow: '#000000', // Black shadow
     scrim: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black scrim
-    surfaceDisabled: '#E5E5EA', // Disabled surface (light gray)
-    onSurfaceDisabled: '#A3A3A3', // Disabled text/icons (medium gray)
     backdrop: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black backdrop
 
     surfaceContainer: '#FFFFFF', // White container
-    surfaceContainerLow: '#FAFAFA', // Very light gray container
-    surfaceContainerLowest: '#FCFCFC', // Almost white container
-    surfaceContainerHigh: '#F5F5F5', // Light gray container
-    surfaceContainerHighest: '#E0E0E0', // Medium gray container
-    surfaceBright: '#FFFFFF', // Bright white surface
-    surfaceDim: '#F0F0F0', // Dimmed light gray surface
-    surfaceTint: '#007AFF', // Primary blue tint
 
     elevation: {
         level0: 'none',

@@ -15,7 +15,6 @@ import { generateElevations } from "./Elevations";
 import iosMaterial3Theme from "./ios";
 import Logger from "@resk/core/logger";
 import { IViewStyle } from "@src/types";
-import Platform from "@platform";
 
 const defaultElevations = generateElevations();
 
@@ -137,6 +136,35 @@ class Theme {
     private static defaultTheme: IThemeManager = Theme.create(Theme.getDefaultTheme());
 
     /**
+     * Retrieves the currently stored theme color scheme from session storage.
+     * 
+     * This method returns the color scheme stored in session storage, which is
+     * used to determine the theme color scheme to apply to the application.
+     * The color scheme is a string that can be either "light" or "dark".
+     * 
+     * @returns {string} The currently stored theme color scheme, either "light" or "dark".
+     */
+    static getColorSchemeFromSession() {
+        return Session.get("theme-color-sheme");
+    }
+
+    /**
+     * Sets the theme color scheme in session storage.
+     *
+     * This method updates the session storage with the given color scheme, which can
+     * be either "light" or "dark". The input is validated to ensure it is a non-null
+     * string matching one of the expected values. If the input is invalid, the method 
+     * returns without making any changes.
+     *
+     * @param {"light" | "dark"} colorScheme - The color scheme to be set in session storage.
+     */
+    static setColorSchemeInSession(colorScheme: "light" | "dark") {
+        colorScheme = defaultStr(colorScheme, "light").toLowerCase().trim() as any;
+        if (!isNonNullString(colorScheme) || !["light", "dark"].includes(colorScheme)) return;
+        Session.set("theme-color-sheme", colorScheme);
+    }
+
+    /**
      * Retrieves a set of light and dark themes based on the Material Design 3 specification.
      * 
      * This function utilizes the Material 3 theme system to generate light and dark theme color palettes
@@ -177,7 +205,7 @@ class Theme {
      */
     static getDefaultTheme(customTheme?: Partial<ITheme>): ITheme {
         // Retrieves the saved theme from the session (if available)
-        const colorScheme = Session.set("theme-color-sheme");
+        const colorScheme = Theme.getColorSchemeFromSession();
         const isDarkFromSession = colorScheme === "dark";
         const themeNameObj = extendObj({}, { dark: isDarkFromSession }, customTheme);
         const { light: lightTheme, dark: darkTheme } = getMaterial3Theme(themeNameObj?.colors?.primary);
@@ -347,13 +375,15 @@ class Theme {
      * @returns {ITheme} - The updated theme that has been applied.
      */
     static update(theme: Partial<ITheme>, trigger: boolean = false): IThemeManager {
-        // Save the theme name in the session
-        Session.set("theme-color-sheme", theme.dark ? "dark" : "light");
         // Update the theme reference
         const newTheme = sanitizeTheme(Theme.create(theme));
         Theme.setTheme(newTheme);
         // Apply the theme to native elements (like the status bar)
         updateNative(newTheme);
+
+        // Save the theme name in the session
+        Theme.setColorSchemeInSession(newTheme.dark ? "dark" : "light");
+
         // Optionally trigger a global theme update event
         if (trigger) {
             Theme.triggerUpdate(newTheme);
@@ -489,6 +519,9 @@ class Theme {
              * @returns {IThemeColorSheme} - An object containing `color` and `backgroundColor` properties.
              */
             getColorScheme(colorSheme?: IThemeColorsTokenName): IThemeColorSheme {
+                if (colorSheme === "transparent") {
+                    return {}
+                }
                 if (!colorSheme || typeof colorSheme != "string" || !(colorSheme in context.colors)) {
                     return {};
                 }

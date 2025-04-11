@@ -20,6 +20,7 @@ import { Notify } from "@notify/index";
 import { StatusBar } from '@components/StatusBar';
 import { BottomSheet } from '@components/BottomSheet';
 import { ReskNativeEvents } from "./events";
+import { useColorScheme } from "@theme/useColorScheme";
 
 export * from "./types";
 
@@ -56,19 +57,21 @@ import { isNumber } from '@resk/core';
  * }
  * ```
  */
-export function ReskNativeProvider({ children, theme: customTheme, safeAreaInsets, auth, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskNativeProviderProps) {
+export function ReskNativeProvider({ children, themes, safeAreaInsets, auth, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskNativeProviderProps) {
   i18nOptions = Object.assign({}, i18nOptions);
   const i18n = useI18n(undefined, i18nOptions);
   auth = Object.assign({}, auth);
   drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
   safeAreaInsets = extendObj({}, { top: 0, left: 0, right: 0, bottom: 0 }, safeAreaInsets) as any;
+  const { light, dark } = Object.assign({}, themes);
+  const colorScheme = useColorScheme() || Theme.getColorSchemeFromSession() || "light";
   /**
    * Manages the current theme state using `useStateCallback`, which allows for callback functions
    * to be executed once the theme state is updated.
    *
    * @type {[ITheme, Function]} The current theme and a function to update the theme.
    */
-  const [theme, setTheme] = useStateCallback<ITheme>(Theme.create(Theme.getDefaultTheme(Object.assign({}, customTheme))));
+  const [theme, setTheme] = useStateCallback<ITheme>(Theme.create(Theme.getDefaultTheme(Object.assign({}, colorScheme === "dark" ? dark : light))));
 
   /**
    * Updates the current theme.
@@ -99,8 +102,8 @@ export function ReskNativeProvider({ children, theme: customTheme, safeAreaInset
    * @param {string} stableHash(customTheme) - Memoized hash value of the custom theme.
    */
   React.useEffect(() => {
-    updateTheme(Theme.update(Object.assign({}, theme, customTheme)));
-  }, [customTheme]);
+    updateTheme(Theme.update(Object.assign({}, theme, colorScheme === "dark" ? dark : light)));
+  }, [themes, colorScheme]);
   React.useMemo(() => {
     if (isObj(breakpoints)) {
       return Breakpoints.init(breakpoints);

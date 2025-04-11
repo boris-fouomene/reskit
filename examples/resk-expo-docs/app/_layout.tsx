@@ -1,26 +1,20 @@
 import "../src/session";
 import * as SplashScreen from 'expo-splash-screen';
-import { ITheme, Label, ReskNativeProvider, Theme, useDrawer, useI18n, View } from "@resk/native";
+import { ReskNativeProvider, useI18n } from "@resk/native";
 import { Slot } from 'expo-router';
 import "../src/i18n/translations";
 import "../src/resources";
-import { ResourcesManager } from '@resk/core';
-import { Users } from '../src/resources';
 import { useEffect } from 'react';
 
 export default function RootLayout() {
-    // Prevent the splash screen from auto-hiding before asset loading is complete.
     SplashScreen.preventAutoHideAsync();
-    const users = ResourcesManager.getResource<Users>("users");
     useI18n();
     useEffect(() => {
         SplashScreen.hideAsync();
-        console.log("splaqsh hidden");
     }, [])
     return (<ReskNativeProvider
         drawerNavigationViewProps={{}}
-        theme={{ dark: true, colors: { onPrimary: "black" } } as ITheme}
-        auth={{ }}
+        auth={{}}
     >
         <Slot />
     </ReskNativeProvider>);

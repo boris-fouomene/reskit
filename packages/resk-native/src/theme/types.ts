@@ -287,22 +287,6 @@ export interface IThemeColorsTokens {
   scrim: string;
 
   /**
-   * The color used for disabled surfaces, such as inactive buttons or cards.
-   *
-   * @type {string}
-   * @example '#E0E0E0' // A light gray color
-   */
-  surfaceDisabled: string;
-
-  /**
-   * The color used for content displayed on top of disabled surfaces.
-   *
-   * @type {string}
-   * @example '#A3A3A3' // Gray text/icons on a disabled surface
-   */
-  onSurfaceDisabled: string;
-
-  /**
    * The backdrop color, used for modal overlays or blurred backgrounds.
    *
    * @type {string}
@@ -317,62 +301,6 @@ export interface IThemeColorsTokens {
    * @example '#FFFFFF' // White container
    */
   surfaceContainer: string;
-
-  /**
-   * A low-contrast variant of the surface container color.
-   *
-   * @type {string}
-   * @example '#FAFAFA' // Very light gray
-   */
-  surfaceContainerLow: string;
-
-  /**
-   * The lowest-contrast variant of the surface container color.
-   *
-   * @type {string}
-   * @example '#FCFCFC' // Almost white
-   */
-  surfaceContainerLowest: string;
-
-  /**
-   * A high-contrast variant of the surface container color.
-   *
-   * @type {string}
-   * @example '#F5F5F5' // Light gray
-   */
-  surfaceContainerHigh: string;
-
-  /**
-   * The highest-contrast variant of the surface container color.
-   *
-   * @type {string}
-   * @example '#E0E0E0' // Medium gray
-   */
-  surfaceContainerHighest: string;
-
-  /**
-   * A brighter variant of the surface color, used for highlighting.
-   *
-   * @type {string}
-   * @example '#FFFFFF' // White highlight
-   */
-  surfaceBright: string;
-
-  /**
-   * A dimmer variant of the surface color, used for de-emphasizing.
-   *
-   * @type {string}
-   * @example '#F0F0F0' // Light gray dim
-   */
-  surfaceDim: string;
-
-  /**
-   * The tint color applied to surfaces for subtle branding effects.
-   *
-   * @type {string}
-   * @example '#6200EE' // Primary color as a tint
-   */
-  surfaceTint: string;
 
   /**
    * Elevation levels for components, used to indicate depth via shadows.
@@ -503,7 +431,7 @@ export interface IThemeColorsTokens {
  * - It helps in maintaining type safety and reducing runtime errors by leveraging 
  *   TypeScript's type system.
  */
-export type IThemeColorsTokenName = keyof IThemeColorsTokens;
+export type IThemeColorsTokenName = keyof IThemeColorsTokens | "transparent";
 
 
 /**

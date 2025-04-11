@@ -24,13 +24,16 @@ type IColorScheme = 'light' | 'dark';
 function getColorScheme(): IColorScheme {
   // Check if we're in a browser environment with window.matchMedia available
   if (!isSupported) {
-    return "light";
+    return undefined as any;
   }
   // Check if the user prefers dark mode
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
     return 'dark';
   }
-  return 'light';
+  if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+    return "light";
+  }
+  return undefined as any;
 }
 
 

@@ -4,7 +4,6 @@ import { defaultStr, extendObj, isNonNullString, isObj } from "@resk/core/utils"
 import { IObservable, isObservable, observable } from "@resk/core/observable";
 import { IDict } from "@resk/core/types";
 import { Platform as RNPlatform, ViewStyle, StyleSheet } from "react-native";
-import { createMaterial3Theme as _createMaterial3Theme } from "./material-colors";
 import Session from "@resk/core/session";
 import Color from "color";
 import updateNative from "./updateNative";
@@ -12,34 +11,17 @@ import styles from "./styles";
 import { useReskNative } from "@src/context/hooks";
 import { defaultFontsConfig, defaultTextStylesVariants } from "./defaultFontsConfig";
 import { generateElevations } from "./Elevations";
-import iosMaterial3Theme from "./ios";
+import lightColors from "./palettes/light";
+import darkColors from "./palettes/dark";
 import Logger from "@resk/core/logger";
 import { IViewStyle } from "@src/types";
+
+lightColors.backdrop = darkColors.backdrop = Colors.setAlpha("rgba(50, 47, 55, 1)", 0.4) as string;
 
 const defaultElevations = generateElevations();
 
 export * from "./types";
 
-
-
-
-const getMaterial3Theme = (fallbackSourceColor?: string) => {
-    const { light, dark } = _createMaterial3Theme(defaultStr(fallbackSourceColor, "#007AFF"));
-    return {
-        light: { colors: prepareMaterial3Theme(light, false), dark: false },
-        dark: { colors: prepareMaterial3Theme(dark, true), dark: true },
-    }
-}
-
-
-
-
-const prepareMaterial3Theme = (colors: IThemeColorsTokens, dark: boolean): IThemeColorsTokens => {
-    if (Colors.isValid(colors?.background) && colors?.background === colors?.surface) {
-        colors.background = (dark ? Colors.lighten : Colors.darken)(colors.background, 0.4) as string;
-    }
-    return colors;
-}
 
 /**
  * @constant UPDATE_THEME
@@ -104,37 +86,9 @@ const isThemeManager = (theme: any) => {
 }
 
 
-
-
-
-const sanitizeTheme = (theme: IThemeManager) => {
-    theme.name = defaultStr(theme.name, `theme-${theme.dark ? "dark" : "light"}`);
-    theme.roundness = typeof theme.roundness == "number" ? theme.roundness : 8;
-    theme.colors = Object.assign({}, theme.colors);
-    const isDark = !!theme.dark;
-    theme.colors.background = Colors.isValid(theme.colors.background) ? theme.colors.background : (isDark ? "#0D1A27" : "#F6F7F9");
-    theme.colors.onBackground = Colors.isValid(theme.colors.onBackground) ? theme.colors.onBackground : (isDark ? "#E6E1E5" : "#272727");
-    theme.colors.surface = Colors.isValid(theme.colors.surface) ? theme.colors.surface : (isDark ? "#0F1214" : "#FFFFFF");
-    theme.colors.onSurface = Colors.isValid(theme.colors.onSurface) ? theme.colors.onSurface : (isDark ? "#1C1B1F" : "#272727");
-    theme.colors.placeholder = theme.colors.placeholder || Colors.setAlpha(isDark ? "white" : "black", 0.5);
-    theme.colors.text = Colors.isValid(theme.colors.text) ? theme.colors.text : theme.colors.onSurface;
-    theme.colors.backdrop = Colors.isValid(theme.colors.backdrop) ? theme.colors.backdrop : Colors.setAlpha("rgba(50, 47, 55, 1)", 0.4) as string;
-    theme.colors.info = Colors.isValid(theme.colors.info) ? theme.colors.info : theme.dark ? "#90CAF9" : "#2196F3";
-    theme.colors.onInfo = Colors.isValid(theme.colors.onInfo) ? theme.colors.onInfo : theme.dark ? "#0D47A1" : "#FFFFFF";
-    theme.colors.success = Colors.isValid(theme.colors.success) ? theme.colors.success : (isDark ? "#A5D6A7" : "#4CAF50");
-    theme.colors.onSuccess = Colors.isValid(theme.colors.onSuccess) ? theme.colors.onSuccess : (isDark ? "#1B5E20" : "#FFFFFF");
-    theme.colors.warning = Colors.isValid(theme.colors.warning) ? theme.colors.warning : (isDark ? "#FFB74D" : "#FF9800");
-    theme.colors.onWarning = Colors.isValid(theme.colors.onWarning) ? theme.colors.onWarning : (isDark ? "#E65100" : "#FFFFFF");
-    theme.colors.error = Colors.isValid(theme.colors.error) ? theme.colors.error : theme.dark ? "#F2B8B5" : "#B3261E";
-    theme.colors.onError = Colors.isValid(theme.colors.onError) ? theme.colors.onError : theme.dark ? "#601410" : "#FFFFFF";
-    theme.colors.errorContainer = Colors.isValid(theme.colors.errorContainer) ? theme.colors.errorContainer : theme.dark ? "#8C1D18" : "#F9DEDC";
-    return theme;
-}
-
 class Theme {
 
     private static defaultTheme: IThemeManager = Theme.create(Theme.getDefaultTheme());
-
     /**
      * Retrieves the currently stored theme color scheme from session storage.
      * 
@@ -164,28 +118,6 @@ class Theme {
         Session.set("theme-color-sheme", colorScheme);
     }
 
-    /**
-     * Retrieves a set of light and dark themes based on the Material Design 3 specification.
-     * 
-     * This function utilizes the Material 3 theme system to generate light and dark theme color palettes
-     * based on an optional fallback source color. It also determines if dynamic theme support is available.
-     * 
-     * @param {string} [fallbackSourceColor] - An optional fallback color to use as the source for theme generation.
-     * 
-     * @returns {Object} An object containing:
-     * - `light`: An object representing the light theme with color properties.
-     * - `dark`: An object representing the dark theme with color properties.
-     * 
-     * 
-     * @example
-     * ```ts
-     * const themes = getMaterial3Theme("#6200EE");
-     * console.log(themes.light.colors.primary); // Outputs the primary color for the light theme
-     * console.log(themes.dark.colors.primary); // Outputs the primary color for the dark theme
-     * ```
-     */
-    static getMaterial3Theme = getMaterial3Theme;
-
     /***
      * Returns the default theme for the application based on the stored theme in session.
      * By default, the text color is set to the onSurface color because it offers high contrast on most backgrounds, and it aligns with MD3’s focus on adaptability across light and dark modes.
@@ -208,22 +140,12 @@ class Theme {
         const colorScheme = Theme.getColorSchemeFromSession();
         const isDarkFromSession = colorScheme === "dark";
         const themeNameObj = extendObj({}, { dark: isDarkFromSession }, customTheme);
-        const { light: lightTheme, dark: darkTheme } = getMaterial3Theme(themeNameObj?.colors?.primary);
+        const lightTheme = { colors: lightColors }, darkTheme = { dark: true, colors: darkColors };
         const isDark = !!themeNameObj.dark;
-        //const iosTheme = Platform.isIos() ? (isDark ? iosMaterial3Theme.dark : iosMaterial3Theme.light) : undefined;
         const theme = extendObj({}, (isDark ? darkTheme : lightTheme), themeNameObj);
-        sanitizeTheme(theme);
         updateNative(theme);
-        // Returns the fully prepared theme
         return theme;
     };
-
-    /**
-     * A static property that holds the Material 3 theme configuration for iOS.
-     * This theme is used to style components according to the Material Design 3 guidelines
-     * specifically tailored for iOS platforms.
-     */
-    static iosMaterial3Theme = iosMaterial3Theme;
 
 
     private static setTheme(theme: IThemeManager) {
@@ -376,7 +298,7 @@ class Theme {
      */
     static update(theme: Partial<ITheme>, trigger: boolean = false): IThemeManager {
         // Update the theme reference
-        const newTheme = sanitizeTheme(Theme.create(theme));
+        const newTheme = Theme.create(theme);
         Theme.setTheme(newTheme);
         // Apply the theme to native elements (like the status bar)
         updateNative(newTheme);
@@ -431,8 +353,7 @@ class Theme {
      */
     static create(theme: Partial<ITheme>, options?: { maxElevation?: number }): IThemeManager {
         if (isObj(theme) && isThemeManager(theme)) return theme as IThemeManager;
-        const Material3Theme = getMaterial3Theme(theme?.colors?.primary);
-        theme = extendObj({}, theme?.dark ? Material3Theme.dark : Material3Theme.light, theme);
+        theme = extendObj({}, theme?.dark ? { colors: lightColors } : { colors: darkColors }, theme);
         const context: ITheme = theme as ITheme;
         const elvs = typeof options?.maxElevation == "number" && options?.maxElevation > 10 ? generateElevations(options?.maxElevation) : defaultElevations;
         const elevations = Array.isArray((context as any).elevations) ? (context as any).elevations : elvs;
@@ -590,33 +511,6 @@ class Theme {
     static triggerUpdate(theme: ITheme): void {
         if (isObj(theme)) {
             events?.trigger(UPDATE_THEME, theme);
-        }
-    }
-
-    /**
-     * Creates a theme object with light and dark variants based on the given source color.
-     * 
-     * The method creates a Material 3 theme based on the given source color and then creates
-     * a theme object with light and dark variants. The theme object also includes a boolean
-     * changes.
-     * 
-     * @param {string} sourceColor - The source color for theme generation.
-     * 
-     * @returns {Object} - An object containing light and dark themes with color properties and
-     * @returns {ITheme} returns.light - The light theme with color properties.
-     * @returns {ITheme} returns.dark - The dark theme with color properties.
-     * 
-     * @example
-     * import {Theme} from "@resk/native";
-     * const themes = Theme.createMaterial3Theme("#6200EE");
-     * console.log(themes.light.colors.primary); // Outputs the primary color for the light theme
-     * console.log(themes.dark.colors.primary); // Outputs the primary color for the dark theme
-     */
-    static createMaterial3Theme(sourceColor: string): { light: ITheme, dark: ITheme } {
-        const { light, dark } = _createMaterial3Theme(sourceColor);
-        return {
-            light: { colors: prepareMaterial3Theme(light, false), dark: false },
-            dark: { colors: prepareMaterial3Theme(dark, true), dark: true },
         }
     }
 

@@ -3322,6 +3322,7 @@ function DatagridButton<DataType extends object = any>({ testID, ...props }: IBu
     return <Button
         noPadding
         {...props}
+        style={[styles.button, props.style]}
         context={Object.assign({}, (props as any).context, { datagridContext })}
     />
 }
@@ -4603,5 +4604,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
         paddingVertical: 5,
+    },
+    button: {
+        paddingHorizontal: 7,
+        paddingVertical: 2,
     }
 });

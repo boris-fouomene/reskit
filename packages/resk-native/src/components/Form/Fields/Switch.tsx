@@ -3,6 +3,7 @@ import { getToggleableDefaultValues, ISwitchProps, IToggleableProps, Switch } fr
 import { Field, AttachFormField } from "../Field";
 import { StyleSheet } from "react-native";
 import { IFieldType, IField } from "@resk/core/types";
+import { IViewStyle } from "@src/types";
 
 @AttachFormField<"switch">("switch")
 export class FormFieldSwitch<Type extends IFieldType = "switch"> extends Field<Type> {
@@ -18,11 +19,11 @@ export class FormFieldSwitch<Type extends IFieldType = "switch"> extends Field<T
     }
     getComponentProps(props?: IField<Type> | undefined): IField<Type> {
         const p = super.getComponentProps(props);
-        p.keyboardEventHandlerProps = Object.assign({}, p.keyboardEventHandlerProps);
-        p.keyboardEventHandlerProps.style = [styles.keyboardEventHandler, p.keyboardEventHandlerProps.style];
+        p.containerProps = Object.assign({}, p.containerProps);
+        p.containerProps.style = [styles.keyboardEventHandler, p.containerProps?.style as IViewStyle];
         return p;
     }
-    _render({ keyboardEventHandlerProps, ...props }: IField<Type>, innerRef: any) {
+    _render({ containerProps, ...props }: IField<Type>, innerRef: any) {
         return <Switch  {...(props as ISwitchProps)} />;
     }
 }

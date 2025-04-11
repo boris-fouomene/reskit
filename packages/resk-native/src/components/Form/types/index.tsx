@@ -667,13 +667,13 @@ export interface IFormField<Type extends IFieldType = IFieldType> extends Observ
     /**
      * Retrieves keyboard event handlers for the field.
      * 
-     * @param {IKeyboardEventHandlerProps} keyboardEventHandlerProps - The properties for keyboard event handling.
+     * @param {IKeyboardEventHandlerProps} keyboardEventHandlerOptions - The properties for keyboard event handling.
      * @returns {IKeyboardEventHandlerKey[]} - An array of keyboard event handler keys.
      * 
      * @example
      * const keyboardEvents = this.getKeyboardEvents(props); // Retrieves keyboard event handlers
      */
-    getKeyboardEvents(keyboardEventHandlerProps: IKeyboardEventHandlerProps): IKeyboardEventHandlerKey[];
+    getKeyboardEvents(keyboardEventHandlerOptions: IKeyboardEventHandlerProps): IKeyboardEventHandlerKey[];
     /**
      * Retrieves the form associated with the field.
      * 
@@ -1868,7 +1868,7 @@ declare module "@resk/core" {
 
         onNoValidate?: (options: IFormFieldValidatorOptions<FieldType>) => any;
 
-        keyboardEventHandlerProps?: IKeyboardEventHandlerProps;
+        containerProps?: IKeyboardEventHandlerProps;
 
         formName?: string;
 

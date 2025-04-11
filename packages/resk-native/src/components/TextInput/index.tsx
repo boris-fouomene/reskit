@@ -266,7 +266,7 @@ const iconSize = 25;
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, style: customStyle, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix = false, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, applyErrorColorOnLabel, style: customStyle, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix = false, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const style = StyleSheet.flatten([customStyle])
     const fontSize = style.fontSize ?? 16;
@@ -406,7 +406,11 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, style
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
-    const textColor = error ? theme.colors.error : isFocused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
+    let labelColor = isFocused && editable ? theme.colors.primary : theme.colors.onSurfaceVariant;
+    if (error && applyErrorColorOnLabel) {
+        labelColor = theme.colors.error;
+    }
+    const textColor = error ? theme.colors.error : labelColor;
     const callOptions: ITextInputCallbackOptions = { ...inputState, error: !!error, variant, isFocused, textColor: textColor as string, editable, disabled: disabled as boolean };
     const multiline = !!props.multiline;
     const isMobile = Breakpoints.isMobileMedia();
@@ -556,7 +560,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, style
             style: [styles.contentContainer, contentContainerStyle,
             contentContainerProps.style]
         }),
-        label: (label ? <Label color={textColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
+        label: (label ? <Label color={labelColor} testID={`${testID}-label`} {...Object.assign({}, labelProps)} style={[labelStyle, labelProps?.style]}>{label}{labelSuffix}{isLabelEmbededVariant ? ` : ` : ""}</Label> : null),
         withLabel,
         placeholder: hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
         testID: testID,

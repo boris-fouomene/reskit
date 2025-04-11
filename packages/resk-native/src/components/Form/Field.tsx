@@ -761,17 +761,17 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
     /**
      * Retrieves the keyboard events for the field.
      * 
-     * @param {IKeyboardEventHandlerProps} keyboardEventHandlerProps - The keyboard event handler properties.
+     * @param {IKeyboardEventHandlerProps} keyboardEventHandlerOptions - The keyboard event handler properties.
      * @returns {IKeyboardEventHandlerKey[]} - An array of keyboard event keys.
      * 
      * @example
      * const keyboardEvents = this.getKeyboardEvents(props); // Retrieves the keyboard events
      */
-    getKeyboardEvents(keyboardEventHandlerProps: IKeyboardEventHandlerProps): IKeyboardEventHandlerKey[] {
+    getKeyboardEvents(keyboardEventHandlerOptions: IKeyboardEventHandlerProps): IKeyboardEventHandlerKey[] {
         const sanitizeKeyEvent = "ctrl+m";
         const events = [sanitizeKeyEvent, "enter", "up", "down", "left", "right"];
-        if (Array.isArray(keyboardEventHandlerProps?.handleKeys)) {
-            keyboardEventHandlerProps?.handleKeys.map((key) => {
+        if (Array.isArray(keyboardEventHandlerOptions?.handleKeys)) {
+            keyboardEventHandlerOptions?.handleKeys.map((key) => {
                 if (!events.includes(key)) {
                     events.push(key);
                 }
@@ -1038,7 +1038,7 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
         this._componentProps = {} as IField<Type>;
         let {
             data,
-            keyboardEventHandlerProps,
+            containerProps,
             formName,
             responsive,
             isFilter: cIsFilter,
@@ -1049,7 +1049,7 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
         if (isFilter) {
             if ((rest as any).rendable === false) return null;
         }
-        const containerProps = Object.assign({}, keyboardEventHandlerProps);
+        const _containerProps = Object.assign({}, containerProps);
         const visibleStyle = !this.isFilter() && visible === false && styles.hidden;
         const disabled = rest.disabled || this.isDisabled();
         const readOnly = rest.readOnly || this.isFormSubmitting();
@@ -1064,13 +1064,14 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
             <KeyboardEventHandler
                 testID={"resk-form-field-container-" + this.getName()}
                 innerRef={this.wrapperRef}
-                {...containerProps}
-                handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(containerProps)}
+                {..._containerProps}
+                handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(_containerProps as any)}
                 onKeyEvent={this.onKeyEvent.bind(this)}
                 disabled={disabled || readOnly}
                 style={[
-                    responsive !== false && this.state.containerStyle,
-                    containerProps.style,
+                    responsive !== false ? this.state.containerStyle as any : null,
+                    !this.isFilter() && styles.container,
+                    _containerProps.style,
                     visibleStyle,
                     disabledStyle,
                     readOnlyStyle,
@@ -1258,6 +1259,9 @@ function compareValues(a: any, b: any) {
 const styles = StyleSheet.create({
     hidden: { display: "none", opacity: 0 },
     helperTextHidden: { opacity: 0 },
+    container: {
+        paddingHorizontal: 7,
+    },
     labelLoading: {
         marginHorizontal: 15,
         marginBottom: -5,

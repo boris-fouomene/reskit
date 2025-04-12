@@ -93,7 +93,7 @@ describe('_abreviateNumber formatting options', () => {
   test('should format using decimalDigits option', () => {
     // Using exactly 3 decimal places
     expect(abreviateNumber(1500, 3)).toBe("1.500K");
-    expect(abreviateNumber(1500, 0)).toBe("2K");
+    expect(abreviateNumber(1500, 0)).toBe("1.5K");
     expect(abreviateNumber(1234, 2)).toBe("1.23K");
   });
 

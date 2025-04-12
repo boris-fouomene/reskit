@@ -14,7 +14,26 @@ describe('InputFormatter', () => {
             expect(result.parsedValue).toBe(123.45);
             expect(result.decimalValue).toBe(123.45);
         });
+        test("test abreviateNumber", () => {
+            expect(InputFormatter.formatValue({
+                value: 123456789,
+                type: "number",
+                abreviateNumber: true,
+            }).formattedValue).toBe("123.45679M");
+            expect(InputFormatter.formatValue({
+                value: 12345,
+                type: "number",
+                abreviateNumber: true,
+                format: "formatCAD"
+            }).formattedValue).toBe("CA$ 12.35K");
 
+            expect(InputFormatter.formatValue({
+                value: 12345,
+                abreviateNumber: true,
+                type: "number",
+                format: "formatXAF",
+            }).formattedValue).toBe("12.345K FCFA");
+        });
         it('should format a numeric value', () => {
             const options = {
                 value: '123',

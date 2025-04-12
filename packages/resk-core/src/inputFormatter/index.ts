@@ -65,7 +65,7 @@ export default class InputFormatter {
    * // }
    * ```
    */
-  static formatValue({ value, type, format, dateFormat, phoneCountryCode, ...rest }: IInputFormatterOptions): IInputFormatterResult {
+  static formatValue({ value, type, format, dateFormat, phoneCountryCode, abreviateNumber, ...rest }: IInputFormatterOptions): IInputFormatterResult {
     const canValueBeDecimal = type && ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());
     let parsedValue = value;
     const result: Partial<IInputFormatterResult> = {};
@@ -116,7 +116,10 @@ export default class InputFormatter {
       if (hasFoundDate) { }
       // Format numbers based on the specified format.
       else if (isNumber(parsedValue)) {
-        if (typeof (Number.prototype)[format as keyof Number] === 'function') {
+        const abreviateFnStr = `abreviate2${defaultStr(format, "FormatNumber").trim().upperFirst()}`;
+        if (abreviateNumber && typeof (Number.prototype as any)[abreviateFnStr] === 'function') {
+          formattedValue = (parsedValue as any)[abreviateFnStr]();
+        } else if (isNonNullString(format) && typeof (Number.prototype)[format as keyof Number] === 'function') {
           formattedValue = (parsedValue as number)[format as keyof Number]();
         } else {
           formattedValue = (parsedValue as number).formatNumber();

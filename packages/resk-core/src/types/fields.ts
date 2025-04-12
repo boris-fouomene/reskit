@@ -522,4 +522,9 @@ export interface IInputFormatterOptions {
      * The phone country code, in case of formatting a phone number, type="tel"
      */
     phoneCountryCode?: ICountryCode;
+
+    /***
+     * Whether to abreviate the number
+     */
+    abreviateNumber?: boolean;
 }

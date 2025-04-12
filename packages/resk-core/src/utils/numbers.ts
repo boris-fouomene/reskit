@@ -212,10 +212,11 @@ export const _abreviateNumber = (num: number, decimalDigits?: number, thousandsS
   const isUnder1000 = Math.abs(num) < 1000;
   // Abbreviation thresholds and corresponding suffixes
   const thresholds = [
-    { value: 1e12, suffix: 'T' },
-    { value: 1e9, suffix: 'B' },
-    { value: 1e6, suffix: 'M' },
-    { value: 1e3, suffix: 'K' },
+    //{ value: 1e15, suffix: 'Q' },// Quadrillion (10^15)
+    { value: 1e12, suffix: 'T' },// Trillion (10^12)
+    { value: 1e9, suffix: 'B' }, // Billion (10^9)
+    { value: 1e6, suffix: 'M' },// Million (10^6)
+    { value: 1e3, suffix: 'K' }, // Thousand (10^3)
     { value: 1, suffix: '' }
   ];
 

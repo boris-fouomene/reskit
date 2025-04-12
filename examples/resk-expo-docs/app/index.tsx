@@ -2,6 +2,7 @@ import i18n from "@resk/core/i18n";
 import { TextInput, withAppBar, Datagrid, Surface, Grid, BottomSheet, withAppMounted, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, HStack } from "@resk/native";
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { DatagridExample } from "./_datagrid";
+import { InputFormatter } from "@resk/core";
 
 const index = withAppBar(() => {
     return (
@@ -460,4 +461,8 @@ const LoginExample = withAppMounted(function LoginExample() {
 
 });
 
+console.log(InputFormatter.formatValue({
+    value: 448745130379325400000,
+    //format: "money",
+}), " is ffffffffffffffffffffffffffff ")
 export default index;// withAuth(index);

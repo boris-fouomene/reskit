@@ -20,7 +20,7 @@ declare module "./Datagrid" {
 @AttachDatagridView({
     name: "table",
 })
-export class DatagridTableView<DataType extends object = any> extends Datagrid.View<DataType, IDatagridTableViewProps> {
+export class DatagridTableView<DataType extends object = any> extends Datagrid.View<DataType, IDatagridTableViewProps<DataType>, IDatagridTableViewState<DataType>> {
     renderTableHeader() {
         return <Columns datagridContext={this} />
     }
@@ -55,6 +55,9 @@ export class DatagridTableView<DataType extends object = any> extends Datagrid.V
 interface IDatagridTableViewCommonProps<DataType extends object = any> {
     datagridContext: DatagridTableView<DataType>;
 }
+interface IDatagridTableViewState<DataType extends object = any> {
+
+}
 
 function Columns<DataType extends object = any>({ datagridContext }: IDatagridTableViewCommonProps<DataType>): JSX.Element | null {
     const visibleColumns = datagridContext.getVisibleColumns();
@@ -68,12 +71,20 @@ function Columns<DataType extends object = any>({ datagridContext }: IDatagridTa
     }, [visibleColumns]);
     const aggregatedContent = useMemo(() => {
         if (!canShowAggregatedValues) return null;
-        return <View testID={datagridContext.getTestID() + "-aggregated-values"} style={[styles.headers, { borderBottomWidth: 1, borderBottomColor: theme.colors.outline }]}>
-
+        return <View testID={datagridContext.getTestID() + "-aggregated-values"} style={[styles.headers]}>
+            {visibleColumns.map((column, index) => {
+                return <View key={column.name + "-" + index} testID={datagridContext.getTestID() + "-aggregated-values-column+" + column.name} style={[datagridContext?.getTableColumnHeaderStyle(column)]}>
+                    {!column.aggregatable ? <Label>{" "}</Label> : <Datagrid.AggregatedValue values={aggregatedValues[column.name]} column={column.name} />}
+                </View>
+            })}
         </View>
-    }, [visibleColumns, aggregatedValues, canShowAggregatedValues])
-    return <View testID={datagridContext.getTestID() + "-columns-headers"} style={[styles.headers, { borderBottomWidth: 1, borderBottomColor: theme.colors.outline }]}>
-        {columns}
+    }, [visibleColumns, aggregatedValues, canShowAggregatedValues]);
+    const testID = datagridContext.getTestID();
+    return <View testID={testID + "-columns-headers-container"} style={[styles.headersContainer, { borderBottomWidth: 1, borderBottomColor: theme.colors.outline }]}>
+        <View testID={datagridContext.getTestID() + "-columns-headers"} style={[styles.headers]}>
+            {columns}
+        </View>
+        {aggregatedContent}
     </View>;
 }
 Columns.displayName = "DatagridTableView.Columns";
@@ -155,9 +166,14 @@ function t() {
 }
 
 const styles = StyleSheet.create({
+    headersContainer: {
+        alignSelf: "flex-start",
+        width: "100%",
+    },
     headers: {
         flexDirection: 'row',
         alignItems: 'center',
+        width: "100%",
     },
     row: {
         flexDirection: 'row',

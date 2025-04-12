@@ -35,6 +35,7 @@ export function DatagridExample({ count, ...props }) {
             {
                 type: "number",
                 label: "Amount",
+                aggregatable: true,
                 name: "amount",
                 format: "formatCAD",
             },

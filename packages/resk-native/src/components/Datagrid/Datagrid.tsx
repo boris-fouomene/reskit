@@ -405,7 +405,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {IViewStyle} The style object for the column header.
      */
     getTableColumnHeaderStyle(column: IDatagridViewStateColumn<DataType>): IViewStyle {
-        return null;
+        return [styles.rowCell];
     }
 
     /**
@@ -507,7 +507,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {IViewStyle} The style for the table cell.
      */
     getTableCellStyle(column: IDatagridViewStateColumn<DataType>, rowData: DataType): IViewStyle {
-        return null;
+        return [styles.rowCell];
     }
     /**
      * Renders a grouped row.
@@ -976,13 +976,13 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     filterable: this.isFilterable() && column.filterable !== false,
                     sortable: this.isSortable() && column.sortable !== false,
                     visible: column.visible !== false,
-                    aggregatable: this.props.aggregatable !== false && column.aggregatable !== false,
+                    aggregatable: this.props.aggregatable !== false && column.aggregatable === true || false,
                 };
                 columns.push(col);
                 if (col.visible !== false) {
                     visibleColumns.push(col);
                 }
-                if (col.aggregatable !== false) {
+                if (col.aggregatable) {
                     aggregatableColumns.push(col);
                 }
                 if (col.groupable !== false) {
@@ -2738,7 +2738,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      * @returns True if the column is groupable, false otherwise.
      */
     isGroupable() {
-        return this.getDatagridContext().isGroupable();
+        return this.getDatagridContext().isGroupable() && this.props.groupable !== false;
     }
     /**
      * Checks if the column is filtrable.
@@ -2748,7 +2748,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      * @returns True if the column is filtrable, false otherwise.
      */
     isFilterable() {
-        return this.getDatagridContext().isFilterable();
+        return this.getDatagridContext().isFilterable() && this.props.filterable !== false;
     }
     /**
      * Checks if the column is sortable.
@@ -2758,7 +2758,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      * @returns True if the column is sortable, false otherwise.
      */
     isSortable() {
-        return this.getDatagridContext().isSortable();
+        return this.getDatagridContext().isSortable() && this.props.sortable !== false;
     }
     /**
      * Checks if the column is aggregatable.
@@ -2768,7 +2768,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
      * @returns True if the column is aggregatable, false otherwise.
      */
     isAggregatable() {
-        return this.getDatagridContext().isAggregatable();
+        return this.getDatagridContext().isAggregatable() && this.props.aggregatable === true;
     }
     /**
      * Returns the list of aggregatable columns.
@@ -3265,20 +3265,28 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
     const datagridContext = useDatagrid();
     const columnObj = datagridContext?.getColumn(column);
     const [aggregationFunction, setAggregationFunction] = useState<keyof IDatagridAggregationFunctions>(datagridContext?.getAggregationFunction() || "sum");
+    const formatValue = (aggregationFunction: keyof IDatagridAggregationFunctions) => {
+        if (!isObj(columnObj)) return 0;
+        const value = values[aggregationFunction];
+        if (!isNumber(value)) return 0;
+        return InputFormatter.formatValue({ ...columnObj, value }).formattedValue;
+    }
     const aggregatedValue = useMemo(() => {
         if (!isObj(columnObj)) return 0;
-        return InputFormatter.formatValue({ ...columnObj, value: defaultNumber(values[aggregationFunction]) }).formattedValue;
+        console.log("formatting value ", aggregationFunction, " is aaaaa ", values[aggregationFunction], " is value ", formatValue(aggregationFunction));
+        return formatValue(aggregationFunction);
     }, [values, aggregationFunction, columnObj]);
     const aggregations = datagridContext?.getAggregationFunctions();
     const aggretionsTranslations = datagridContext?.getAggregationFunctionsTranslations();
     const menuItems = useMemo(() => {
         if (!isObj(aggretionsTranslations) || !isObj(aggregations)) return [];
         const items = [];
+        if (!isObj(values)) return [];
         for (let i in aggregations) {
             const label = defaultStr((aggretionsTranslations as any)[i], i);
             const active = aggregationFunction === i;
             items.push({
-                label,
+                label: `${label} : ${formatValue(i as any)}`,
                 icon: active ? "check" : null,
                 onPress: () => {
                     setAggregationFunction(i as any);
@@ -3286,7 +3294,7 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
             });
         }
         return items;
-    }, [aggregationFunction, aggretionsTranslations]);
+    }, [aggregationFunction, aggretionsTranslations, values, columnObj]);
     if (!columnObj || !isObj(values) || !datagridContext || !datagridContext?.canShowAggregatedValues()) return null;
     const testID = datagridContext.getTestID();
     return <Menu

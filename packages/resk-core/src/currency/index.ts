@@ -196,7 +196,6 @@ const unformat = (value: any, decimalSeparator?: string): number => {
 	return !isNaN(unformatted) ? unformatted : 0;
 };
 
-
 /**
  * @group Currency
  * Implementation of toFixed() that treats floats more like decimals.
@@ -220,25 +219,34 @@ const toFixed: (value: number, decimalDigits?: number) => string = (value: numbe
 	 */
 	decimalDigits = checkPrecision(decimalDigits, settings.decimalDigits);
 
-	/**
-	 * Convert the value to an exponential form with the specified decimal digits.
-	 */
-	const exponentialForm = Number(unformat(value) + 'e' + decimalDigits);
+	// Convert to string first to handle very large numbers
+	const valueStr = String(value);
 
-	/**
-	 * Round the exponential form to the nearest integer.
-	 */
-	const rounded = Math.round(exponentialForm);
+	// Remove any non-numeric characters (except decimal point) - unformat substitute
+	const cleanValue = valueStr.replace(/[^\d.-]/g, '');
 
-	/**
-	 * Convert the rounded exponential form back to a decimal form with the specified decimal digits.
-	 */
-	const finalResult = Number(rounded + 'e-' + decimalDigits).toFixed(decimalDigits);
+	// Handle BigInt or very large numbers
+	if (cleanValue.length > 15 && !cleanValue.includes('.')) {
+		// For integers, just add decimal places
+		return cleanValue + '.' + '0'.repeat(decimalDigits);
+	} else {
+		try {
+			// For numbers that can be handled by standard JS number operations
+			const num = Number(cleanValue);
+			if (isNaN(num)) {
+				return 'NaN';
+			}
 
-	/**
-	 * Return the formatted number as a string.
-	 */
-	return finalResult;
+			// Use standard exponential trick for standard-sized numbers
+			const exponentialForm = Number(num + 'e' + decimalDigits);
+			const rounded = Math.round(exponentialForm);
+			const finalResult = Number(rounded + 'e-' + decimalDigits).toFixed(decimalDigits);
+			return finalResult;
+		} catch (e) {
+			// Fallback for cases where conversion fails
+			return 'NaN';
+		}
+	}
 };
 
 

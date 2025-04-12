@@ -130,3 +130,9 @@ describe('_abreviateNumber formatting options', () => {
     expect(result.minAbreviationDecimalDigits).toBe(3);
   });
 });
+describe("Will format large numbers", () => {
+  test("should format large number correctly", () => {
+    expect(Currency.formatNumber(448745130379325400000)).toBe("448 745 130 379 325 400 000");
+    expect(Currency.formatMoney(448745130379325400000)).toBe("448 745 130 379 325 400 000 FCFA");
+  });
+})

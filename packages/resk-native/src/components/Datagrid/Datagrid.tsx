@@ -9,7 +9,7 @@ import {
     Dimensions,
     ViewStyle
 } from 'react-native';
-import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted } from '@utils/index';
+import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted, usePrevious } from '@utils/index';
 import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber, sortBy } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
 import { IField, IFieldType, IMergeWithoutDuplicates, IResourcePaginationMetaData, IResourceQueryOptionsOrderByDirection } from '@resk/core/types';
@@ -3268,7 +3268,14 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
     const datagridContext = useDatagrid();
     useDatagridOnEvent("aggregationFunctionChanged", true);
     const columnObj = datagridContext?.getColumn(column);
-    const [aggregationFunction, setAggregationFunction] = useState<keyof IDatagridAggregationFunctions>(datagridContext?.getAggregationFunction() || "sum");
+    const datagridAggregationFunction = datagridContext?.getAggregationFunction() || "sum";
+    const prevDatagridAggregationFunc = usePrevious(datagridAggregationFunction);
+    const [aggregationFunction, setAggregationFunction] = useState<keyof IDatagridAggregationFunctions>(datagridAggregationFunction);
+    useEffect(() => {
+        if (datagridAggregationFunction !== aggregationFunction && prevDatagridAggregationFunc !== datagridAggregationFunction) {
+            setAggregationFunction(datagridAggregationFunction);
+        }
+    }, [datagridAggregationFunction, prevDatagridAggregationFunc]);
     const formatValue = (aggregationFunction: keyof IDatagridAggregationFunctions) => {
         if (!isObj(columnObj)) return 0;
         const value = values[aggregationFunction];

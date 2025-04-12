@@ -5,7 +5,7 @@ import "@resk/core";
 import { InputFormatter } from '@resk/core';
 export function DatagridExample({ count, ...props }) {
     const data = React.useMemo(() => {
-        count = typeof count == 'number' && count > 5 ? count : 100000;
+        count = typeof count == 'number' && count > 5 ? count : 10000;
         return faker.helpers.multiple(createRandomUser, {
             count,
         }).map((u, index) => {

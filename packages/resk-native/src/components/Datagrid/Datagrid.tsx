@@ -1331,9 +1331,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (menuItems.length > 0) {
             return <Menu
                 anchor={({ openMenu }) => {
-                    return <DatagridButton icon='format-list-group' title={this.translate("groupTableData")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
+                    return <DatagridToolbarAction icon='format-list-group' title={this.translate("groupTableData")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
                         {this.translate("groupBy")}
-                    </DatagridButton>
+                    </DatagridToolbarAction>
                 }}
                 items={[
                     {
@@ -1456,9 +1456,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return <Menu
             items={menuItems}
             anchor={({ openMenu }) => {
-                return <DatagridButton icon="material-functions" title={this.translate("aggregationFunctionMenuDescription")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
+                return <DatagridToolbarAction icon="material-functions" title={this.translate("aggregationFunctionMenuDescription")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
                     {this.translate("aggregationFunctionsLabel")}
-                </DatagridButton>
+                </DatagridToolbarAction>
             }}
         />
     }
@@ -1566,7 +1566,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             <View testID={testID + "-toolbar-container"} style={[styles.toolbarContainer]}>
                 {(Array.isArray(customToolbarActions) ? [...actions, customToolbarActions] : actions).map((action, index) => {
                     if (!action || !isObj(action)) return null;
-                    return <DatagridButton
+                    return <DatagridToolbarAction
                         testID={testID + "-toolbar-button-" + index}
                         key={"toolbar-action-" + index}
                         {...action}
@@ -1577,7 +1577,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                         const onPress = () => {
                             openMenu();
                         }
-                        return <DatagridButton
+                        return <DatagridToolbarAction
                             icon="view-column"
                             children={this.translate("columns")}
                             onPress={onPress}
@@ -3284,6 +3284,20 @@ function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridViewLoading
     return null;
 }
 
+/**
+ * A component that displays the aggregated value for a given column.
+ * It renders a button that when pressed shows a menu with all the available
+ * aggregation functions for the given column. The selected aggregation function
+ * is highlighted in the menu.
+ * The component uses the `getAggregationFunctions` method of the DatagridView
+ * context to get the list of available aggregation functions for the given column.
+ * The component uses the `getAggregationFunctionsTranslations` method of the
+ * DatagridView context to get the translations for the aggregation functions.
+ * The component uses the `canShowAggregatedValues` method of the DatagridView
+ * context to determine if the aggregated values are to be shown.
+ * @example
+ * <AggregatedValue values={{sum:10, count: 20}} column="myColumn" />
+ */
 function AggregatedValue<DataType extends object = any>({ values, column }: { values: Record<keyof IDatagridAggregationFunctions, number>, column: IDatagridViewColumnName<DataType> }) {
     const datagridContext = useDatagrid();
     useDatagridOnEvent("aggregationFunctionChanged", true);
@@ -3343,7 +3357,17 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
     />
 }
 
-function DatagridButton<DataType extends object = any>({ testID, ...props }: IButtonProps<{ datagridContext: DatagridView<DataType> }>) {
+/**
+ * A button component that is designed to be used within the DatagridView component's toolbar.
+ * 
+ * This component is a wrapper around the Button component, with some additional features that are specific to the DatagridView component.
+ * It provides a convenient way to add buttons to the toolbar, with automatic integration with the DatagridView component's context.
+ * 
+ * @template DataType - The type of the data shown in the grid.
+ * @param {IButtonProps<{ datagridContext: DatagridView<DataType> }>} props - The props of the button component.
+ * @returns {JSX.Element} - The rendered button component.
+ */
+function DatagridToolbarAction<DataType extends object = any>({ testID, ...props }: IButtonProps<{ datagridContext: DatagridView<DataType> }>) {
     const datagridContext = useDatagrid();
     return <Button
         noPadding
@@ -3352,7 +3376,7 @@ function DatagridButton<DataType extends object = any>({ testID, ...props }: IBu
         context={Object.assign({}, (props as any).context, { datagridContext })}
     />
 }
-DatagridButton.displayName = "Datagrid.Button";
+DatagridToolbarAction.displayName = "Datagrid.ToolbarAction";
 
 AggregatedValue.displayName = "Datagrid.AggregatedValue";
 Datagrid.AggregatedValue = AggregatedValue;
@@ -3363,7 +3387,7 @@ Datagrid.DefaultLoadingIndicator = DefaultLoadingIndicator;
 Datagrid.PreloaderLoadingIndicator = PreloaderLoadingIndicator;
 Datagrid.View = DatagridView;
 Datagrid.SortIcon = SortIcon;
-Datagrid.Button = DatagridButton;
+Datagrid.ToolbarAction = DatagridToolbarAction;
 
 
 /**
@@ -3381,7 +3405,7 @@ Datagrid.ToggleAllRowsSelection = function ToggleAllRowsSelection() {
     if (!datagridContext || !datagridContext?.isSelectable() || !datagridContext?.getData()?.length) return null;
     const isAllRowsSelected = datagridContext?.isAllRowsSelected();
     const title = DatagridView.staticTranslate(isAllRowsSelected ? "unselectAll" : "selectAll", { count: defaultNumber(datagridContext?.getData()?.length) });
-    return <DatagridButton
+    return <DatagridToolbarAction
         role="none"
         icon={isAllRowsSelected ? "select-off" : "check"}
         title={title}

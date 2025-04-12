@@ -3341,6 +3341,7 @@ Datagrid.ToggleAllRowsSelection = function ToggleAllRowsSelection() {
     const isAllRowsSelected = datagridContext?.isAllRowsSelected();
     const title = DatagridView.staticTranslate(isAllRowsSelected ? "unselectAll" : "selectAll", { count: defaultNumber(datagridContext?.getData()?.length) });
     return <DatagridButton
+        role="none"
         icon={isAllRowsSelected ? "select-off" : "check"}
         title={title}
         children={title}

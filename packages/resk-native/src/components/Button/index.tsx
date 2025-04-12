@@ -298,6 +298,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     const hasRightContent = (iconPosition == "right" && iconContent) || (isValidElement(right) && right);
     return (<ButtonContext.Provider value={context}>
         <Surface
+            role="none"
             id={`${idRef.current}-container`}
             {...containerProps}
             ref={containerRef}

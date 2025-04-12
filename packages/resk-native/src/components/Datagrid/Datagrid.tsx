@@ -2233,7 +2233,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     toggleAggregationFunction(aggregationFunction: keyof IDatagridAggregationFunctions) {
         const aggregations = this.getAggregationFunctions();
         if (aggregationFunction !== this.getAggregationFunction() && isNonNullString(aggregationFunction) && aggregationFunction in aggregations) {
-            this.updateState({ aggregationFunction });
+            this.updateState({ aggregationFunction }, () => {
+                this.setSessionData("aggregationFunction", aggregationFunction);
+                this.trigger("aggregationFunctionChanged", this.getAggregationFunction());
+            });
         }
     }
     /**
@@ -3263,6 +3266,7 @@ function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridViewLoading
 
 function AggregatedValue<DataType extends object = any>({ values, column }: { values: Record<keyof IDatagridAggregationFunctions, number>, column: IDatagridViewColumnName<DataType> }) {
     const datagridContext = useDatagrid();
+    useDatagridOnEvent("aggregationFunctionChanged", true);
     const columnObj = datagridContext?.getColumn(column);
     const [aggregationFunction, setAggregationFunction] = useState<keyof IDatagridAggregationFunctions>(datagridContext?.getAggregationFunction() || "sum");
     const formatValue = (aggregationFunction: keyof IDatagridAggregationFunctions) => {
@@ -3276,7 +3280,6 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
     }
     const aggregatedValue = useMemo(() => {
         if (!isObj(columnObj)) return 0;
-        console.log("formatting value ", aggregationFunction, " is aaaaa ", values[aggregationFunction], " is value ", formatValue(aggregationFunction));
         return formatValue(aggregationFunction);
     }, [values, aggregationFunction, columnObj]);
     const aggregations = datagridContext?.getAggregationFunctions();
@@ -4330,6 +4333,11 @@ export interface IDatagridEventMap {
      * Triggered when a column is sorted.
      */
     columnSorted: string;
+
+    /***
+     * Triggered when the aggregation function is changed.
+     */
+    aggregationFunctionChanged: string;
 }
 
 /**

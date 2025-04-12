@@ -1,5 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
+  noStackTrace: true,
   // Point Jest to look in the dist directory
   roots: ['<rootDir>/dist'],
   // Tell Jest to process .js files

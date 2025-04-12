@@ -1331,10 +1331,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (menuItems.length > 0) {
             return <Menu
                 anchor={({ openMenu }) => {
-                    return <Pressable onPress={() => { openMenu() }} style={[Theme.styles.row]}>
-                        <Icon iconName='format-list-group' title={this.translate("groupTableData")} />
-                        <Label textBold>{this.translate("groupBy")}</Label>
-                    </Pressable>
+                    return <DatagridButton icon='format-list-group' title={this.translate("groupTableData")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
+                        {this.translate("groupBy")}
+                    </DatagridButton>
                 }}
                 items={[
                     {
@@ -1457,10 +1456,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return <Menu
             items={menuItems}
             anchor={({ openMenu }) => {
-                return <Pressable onPress={() => { openMenu() }} style={[Theme.styles.row]}>
-                    <Icon iconName="material-functions" title={this.translate("aggregationFunctionMenuDescription")}></Icon>
-                    <Label splitText numberOfLines={1} textBold>{this.translate("aggregationFunctionsLabel")}</Label>
-                </Pressable>
+                return <DatagridButton icon="material-functions" title={this.translate("aggregationFunctionMenuDescription")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
+                    {this.translate("aggregationFunctionsLabel")}
+                </DatagridButton>
             }}
         />
     }

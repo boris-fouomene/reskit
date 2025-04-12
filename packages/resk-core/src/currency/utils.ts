@@ -1,3 +1,4 @@
+import { ICurrency } from "./types";
 
 /**
  * @group Currency
@@ -22,7 +23,7 @@
  * const arrayInput = ["$"];
  * console.log(isValidCurrency(arrayInput)); // Output: false
  */
-export const isValidCurrency = (obj: any): boolean =>
+export const isValidCurrency = (obj: any): obj is ICurrency =>
     obj &&
     typeof obj === 'object' &&
     !Array.isArray(obj) &&

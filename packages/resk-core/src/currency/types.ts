@@ -200,6 +200,40 @@ export type ICurrencyFormatter = (decimalDigits?: number, thousandSeparator?: st
  */
 export type ICurrencyFormatterKey = `format${keyof ICurrencies}`;
 
+
+/**
+ * @group Currency
+ * Represents a string template type for dynamically generating keys for abbreviated currency formatters.
+ * 
+ * The `ICurrencyAbreviate2FormatKey` type constructs keys by combining the `abreviate2Format` prefix
+ * with the keys of the `ICurrencies` interface. This allows for the creation of dynamic formatter keys
+ * specific to each currency.
+ * 
+ * @template keyof ICurrencies - The keys of the `ICurrencies` interface, representing ISO currency codes.
+ * 
+ * @example
+ * ```typescript
+ * // Assuming the `ICurrencies` interface contains the following keys:
+ * // { USD, CAD, EUR }
+ * 
+ * type AbbreviatedFormatKeys = ICurrencyAbreviate2FormatKey;
+ * 
+ * // The resulting type will include:
+ * // 'abreviate2FormatUSD', 'abreviate2FormatCAD', 'abreviate2FormatEUR'
+ * 
+ * const formatKey: ICurrencyAbreviate2FormatKey = "abreviate2FormatUSD";
+ * console.log(formatKey); // Output: "abreviate2FormatUSD"
+ * ```
+ * 
+ * @remarks
+ * - This type is useful for defining dynamic keys for currency-specific formatting functions.
+ * - It ensures that the keys are consistent with the currencies defined in the `ICurrencies` interface.
+ * 
+ * @see {@link ICurrencies} for the structure of the currencies interface.
+ * @see {@link ICurrencyFormatterKey} for a similar type used for general currency formatters.
+ */
+export type ICurrencyAbreviate2FormatKey = `abreviate2Format${keyof ICurrencies}`;
+
 /**
  * @group Currency
  * Represents a collection of dynamically generated currency formatter functions.
@@ -216,6 +250,7 @@ export type ICurrencyFormatterKey = `format${keyof ICurrencies}`;
  * const formatters: ICurrencyFormatters = {
  *   formatUSD: (value) => `$${value.toFixed(2)}`,
  *   formatCAD: (value) => `CA$${value.toFixed(2)}`,
+ *  
  * };
  * 
  * // Usage of the dynamically generated formatters:
@@ -225,7 +260,7 @@ export type ICurrencyFormatterKey = `format${keyof ICurrencies}`;
  * const formattedCAD = formatters.formatCAD(123456.789);
  * console.log(formattedCAD); // Output: "CA$123,456.79"
  */
-export type ICurrencyFormatters = Record<ICurrencyFormatterKey, ICurrencyFormatter>
+export type ICurrencyFormatters = Record<ICurrencyFormatterKey | ICurrencyAbreviate2FormatKey, ICurrencyFormatter>
 
 
 /**

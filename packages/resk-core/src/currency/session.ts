@@ -4,6 +4,7 @@ import { ICurrency } from "./types";
 import isNonNullString from "../utils/isNonNullString";
 import { isValidCurrency } from "./utils";
 import i18n from "../i18n";
+import defaultStr from "@utils/defaultStr";
 
 /**
  * The default format for displaying currency values.
@@ -80,7 +81,7 @@ const setCurrency = (currency: ICurrency | string): ICurrency => {
     /**
      * If the currency is not valid, try to extract the currency code from the provided value.
      */
-    let cCode = typeof currency === "object" && currency && !Array.isArray(currency) ? currency.code : typeof currency === "string" ? currency : undefined;
+    let cCode = typeof currency === "object" && currency && !Array.isArray(currency) ? defaultStr((currency as any).code, (currency as any).name) : typeof currency === "string" ? currency : undefined;
     if (cCode) {
       /**
        * Trim and uppercase the currency code.

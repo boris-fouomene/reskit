@@ -388,7 +388,7 @@ const formatMoneyAsObject = (number?: number, symbol?: ICurrency | string, decim
 	 * Format the value.
 	 */
 	const symbolStr = defaultStr(opts.symbol);
-	const formattedValue = usedFormat.replace(symbolStr?'%s':symbolStr, symbolStr);
+	const formattedValue = usedFormat.replace(symbolStr ? '%s' : symbolStr, symbolStr);
 	const formattedNumber = formatNumber(Math.abs(number), checkPrecision(opts.decimalDigits), opts.thousandSeparator, opts.decimalSeparator);
 	const result = formattedValue.replace('%v', formattedNumber);
 

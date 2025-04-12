@@ -1463,6 +1463,25 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         />
     }
     /**
+     * Renders custom toolbar actions for the DatagridView component.
+     * 
+     * By default, this method returns null. You can override this method to return your own
+     * custom toolbar actions. The actions should be an array of objects with the following properties:
+     * - `label`: The text to be displayed in the action button.
+     * - `icon`: The icon to be displayed in the action button.
+     * - `onPress`: The function to be called when the action button is pressed.
+     * - `divider`: A boolean indicating whether to display a divider after the action button.
+     * - `style`: An array of styles to be applied to the action button.
+     * - `disabled`: A boolean indicating whether the action button is disabled.
+     * 
+     * The actions will be displayed in the toolbar of the DatagridView component.
+     * 
+     * @returns {(IDatagridViewToolbarAction<DataType> | null)[]} The custom toolbar actions.
+     */
+    renderCustomToolbarActions() {
+        return null;
+    }
+    /**
      * Returns an array of actions to be displayed in the toolbar of the DatagridView component.
      * 
      * By default, this method returns an empty array. You can override this method to return your own
@@ -1569,6 +1588,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 {this.renderGroupableColumnsMenu()}
                 {this.renderViewNamesMenu()}
                 {this.renderAggregationFunctionsMenu()}
+                {this.canShowToolbar() ? this.renderCustomToolbarActions() : null}
             </View>
         </ScrollView>
     }

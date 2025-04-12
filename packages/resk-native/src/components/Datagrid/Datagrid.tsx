@@ -3269,6 +3269,9 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
         if (!isObj(columnObj)) return 0;
         const value = values[aggregationFunction];
         if (!isNumber(value)) return 0;
+        if (aggregationFunction == "count") {
+            return value.formatNumber();
+        }
         return InputFormatter.formatValue({ ...columnObj, value }).formattedValue;
     }
     const aggregatedValue = useMemo(() => {
@@ -3302,7 +3305,7 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
         testID={testID + "-aggregated-value-menu"}
         anchor={({ openMenu }) => {
             return <Pressable testID={testID + "-aggregated-value-container"} onPress={(e) => { openMenu() }}>
-                <Label textBold fontSize={16} colorScheme="primary">
+                <Label textBold numberOfLines={10} wrapText fontSize={16} colorScheme="primary">
                     {aggregatedValue}
                 </Label>
             </Pressable>

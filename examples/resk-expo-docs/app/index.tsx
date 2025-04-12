@@ -460,9 +460,4 @@ const LoginExample = withAppMounted(function LoginExample() {
     </Surface>
 
 });
-
-console.log(InputFormatter.formatValue({
-    value: 448745130379325400000,
-    //format: "money",
-}), " is ffffffffffffffffffffffffffff ")
 export default index;// withAuth(index);

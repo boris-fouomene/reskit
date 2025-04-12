@@ -6,9 +6,7 @@ import { DatagridExample } from "./_datagrid";
 const index = withAppBar(() => {
     return (
         <ScrollView>
-            <DatagridExample
-                count={5}
-            />
+
             <View style={{ margin: 10 }}>
                 <Button mode="contained" onPress={() => console.log("Pressed")}
                     onLongPress={(e) => {
@@ -23,13 +21,20 @@ const index = withAppBar(() => {
                 <SheetExample />
 
                 <HStack style={[Theme.styles.m2]}>
-                    <Badge colorScheme="primary">Primary</Badge>
-                    <Badge colorScheme="secondary">Secondary</Badge>
-                    <Badge colorScheme="tertiary">Tertiary</Badge>
-                    <Badge colorScheme="error">Error</Badge>
-                    <Badge colorScheme="success">Success</Badge>
-                    <Badge colorScheme="warning">Warning</Badge>
-                    <Badge colorScheme="info">Info</Badge>
+                    <View>
+                        <Badge colorScheme="primary">Primary</Badge>
+                        <Badge colorScheme="secondary">Secondary</Badge>
+                        <Badge colorScheme="tertiary">Tertiary</Badge>
+                        <Badge colorScheme="error">Error</Badge>
+                    </View>
+                    <DatagridExample
+                        count={5}
+                    />
+                    <View>
+                        <Badge colorScheme="success">Success</Badge>
+                        <Badge colorScheme="warning">Warning</Badge>
+                        <Badge colorScheme="info">Info</Badge>
+                    </View>
                 </HStack>
                 <HStack style={[Theme.styles.m2]}>
                     <Avatar

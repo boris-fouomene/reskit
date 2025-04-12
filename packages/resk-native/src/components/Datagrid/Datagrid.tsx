@@ -1510,7 +1510,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const customToolbarActions = this.getToolbarActions();
         if (isFilterable) {
             actions.push({
-                label: this.translate("showFilters", { count: dataLength }),
+                label: this.translate(this.canShowFilters() ? "hideFilters" : "showFilters", { count: dataLength }),
                 icon: this.canShowFilters() ? 'eye-off' : 'eye',
                 onPress: () => {
                     this.toggleShowFilters();
@@ -1526,20 +1526,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         if (selectable && dataLength) {
             actions.push({
-                label: this.translate("selectAll", { count: dataLength }),
-                icon: "check",
-                onPress: () => {
-                    this.toggleAllRowsSelection(true);
-                }
-            });
-        }
-        if (selectedRowsCount > 0) {
-            actions.push({
-                label: this.translate("unselectAll", { count: selectedRowsCount }),
-                icon: "check",
-                onPress: () => {
-                    this.toggleAllRowsSelection(false);
-                }
+                label: <Datagrid.ToggleAllRowsSelection />,
             });
         }
         const visibleColumnsMenus: IMenuItemProps<{ datagridContext: DatagridView<DataType> }>[] = [];
@@ -3337,6 +3324,32 @@ Datagrid.View = DatagridView;
 Datagrid.SortIcon = SortIcon;
 Datagrid.Button = DatagridButton;
 
+
+/**
+ * Renders a button that toggles the selection state of all rows in the DatagridView component.
+ * 
+ * This component is a convenience wrapper around the `toggleAllRowsSelection` method of the DatagridView component.
+ * It uses the `useDatagrid` and `useDatagridOnEvent` hooks to access the DatagridView context and to trigger the "toggleAllRowsSelection" event.
+ * The component returns null if the DatagridView is not selectable or if there is no data to select.
+ * Otherwise, it renders a button with the "selectAll" or "unselectAll" label, depending on the current selection state.
+ * When the button is pressed, it calls the `toggleAllRowsSelection` method of the DatagridView component.
+ */
+Datagrid.ToggleAllRowsSelection = function ToggleAllRowsSelection() {
+    const datagridContext = useDatagrid();
+    useDatagridOnEvent(["toggleAllRowsSelection", "toggleRowSelection"], true);
+    if (!datagridContext || !datagridContext?.isSelectable() || !datagridContext?.getData()?.length) return null;
+    const isAllRowsSelected = datagridContext?.isAllRowsSelected();
+    const title = DatagridView.staticTranslate(isAllRowsSelected ? "unselectAll" : "selectAll", { count: defaultNumber(datagridContext?.getData()?.length) });
+    return <DatagridButton
+        icon={isAllRowsSelected ? "select-off" : "check"}
+        title={title}
+        children={title}
+        onPress={() => {
+            datagridContext.toggleAllRowsSelection();
+        }}
+    />;
+};
+
 DefaultLoadingIndicator.displayName = "Datagrid.DefaultLoadingIndicator";
 PreloaderLoadingIndicator.displayName = "Datagrid.PreloaderLoadingIndicator";
 
@@ -3881,16 +3894,18 @@ export function useDatagridOnEvent(event: IDatagridEvent | IDatagridEvent[], cal
     const fRender = useForceRender();
     useEffect(() => {
         const subscribers: Record<string, { remove: Function }> = {};
-        (Array.isArray(event) ? event : [event]).map((event) => {
-            if (isNonNullString(event)) {
-                (subscribers as any)[String(event.toLowerCase().trim())] = datagridContext?.on(event, (...args: any[]) => {
-                    const canForceRender = typeof callbackOrForceRender === "function" ? callbackOrForceRender(...args, event) : !!callbackOrForceRender;
-                    if (canForceRender !== false) {
-                        fRender();
-                    }
-                });
-            }
-        });
+        if (typeof datagridContext?.on == "function") {
+            (Array.isArray(event) ? event : [event]).map((event) => {
+                if (isNonNullString(event)) {
+                    (subscribers as any)[String(event.toLowerCase().trim())] = datagridContext?.on(event, (...args: any[]) => {
+                        const canForceRender = typeof callbackOrForceRender === "function" ? callbackOrForceRender(...args, event) : !!callbackOrForceRender;
+                        if (canForceRender !== false) {
+                            fRender();
+                        }
+                    });
+                }
+            });
+        }
         return () => {
             for (let i in subscribers) {
                 subscribers[i].remove();
@@ -4536,7 +4551,7 @@ export interface IDatagridViewLoadingIndicatorProps {
 
 const styles = StyleSheet.create({
     container: {
-        width: "100%",
+        flexGrow: 1,
         position: "relative",
     },
     loadingIndicatorContainer: {

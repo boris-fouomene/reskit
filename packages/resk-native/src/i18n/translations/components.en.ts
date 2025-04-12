@@ -51,7 +51,13 @@ I18nClass.RegisterTranslations({
                     "one": "Select one row",
                     "other": "Select %{countStr} rows",
                 },
+                "unselectAll": {
+                    "zero": "Unselect all",
+                    "one": "Unselect one row",
+                    "other": "Unselect %{countStr} rows",
+                },
                 "showFilters": "Show filters",
+                "hideFilters": "Hide filters",
                 "showAggregatedTotals": "Show aggregated totals",
                 "columns": "Columns",
                 "hideAggregatedTotals": "Hide aggregated totals",

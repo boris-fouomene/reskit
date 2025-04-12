@@ -4551,7 +4551,7 @@ export interface IDatagridViewLoadingIndicatorProps {
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
+        width: "100%",
         position: "relative",
     },
     loadingIndicatorContainer: {

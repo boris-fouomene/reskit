@@ -972,7 +972,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         r.aggregationFunction = isNonNullString(this.props.defaultAggregationFunction) && DatagridView.isValidAggregationFunction(this.props.defaultAggregationFunction) ? this.props.defaultAggregationFunction :
             isNonNullString(sessionData.aggregationFunction) && DatagridView.isValidAggregationFunction(sessionData.aggregationFunction) ? sessionData.aggregationFunction : "sum";
         this.setSessionData("aggregationFunction", r.aggregationFunction);
-        this.getToogleableStateKeys().map((key) => {
+        this.getToggleableStateItems().map((key) => {
             const propValue = (this.props as any)[key];
             (r as any)[key] = defaultBool(sessionData[key], propValue, !["showOnlyAggregatedValues", "abreviateAggregatableValues", "includeColumnLabelInGroupedRowHeader"].includes(key as string));
             if (propValue === false) {
@@ -999,7 +999,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {(keyof IDatagridViewState<DataType, StateExtensions>)[]} An array of keys indicating
      * the togglable state properties of the DatagridView.
      */
-    getToogleableStateKeys(): (keyof IDatagridViewState<DataType, StateExtensions>)[] {
+    getToggleableStateItems(): (keyof IDatagridViewState<DataType, StateExtensions>)[] {
         return ["showFilters", "showHeaders", "showAggregatedValues", "abreviateAggregatableValues", "showActions", "showToolbar", "showOnlyAggregatedValues", "includeColumnLabelInGroupedRowHeader"];
     }
 
@@ -1287,11 +1287,12 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @param {keyof IDatagridViewState<DataType, StateExtensions>} stateKey - The key of the state value to toggle.
      */
-    toggleShow(stateKey: keyof IDatagridViewState<DataType, StateExtensions>) {
+    toggleToggleableStateItem(stateKey: keyof IDatagridViewState<DataType, StateExtensions>, cb?: () => void) {
         const stateValue = this.state[stateKey];
         if (["number", "boolean"].includes(typeof stateValue)) {
-            this.updateState({ [stateKey]: !stateValue }, () => {
+            this.updateState({ [stateKey]: !!!stateValue }, () => {
                 this.setSessionData(stateKey, this.state[stateKey]);
+                if (typeof cb === "function") cb();
             });
         }
     }
@@ -1315,7 +1316,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {void}
      */
     toggleShowFilters() {
-        this.toggleShow("showFilters");
+        this.toggleToggleableStateItem("showFilters");
     }
     /**
      * Toggles the display of aggregated headers.
@@ -1325,10 +1326,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {void}
      */
     toggleShowAggregatedValues() {
-        this.toggleShow("showAggregatedValues");
+        this.toggleToggleableStateItem("showAggregatedValues");
     }
     toggleShowOnlyAggregatedValues() {
-        this.toggleShow("showOnlyAggregatedValues");
+        this.toggleToggleableStateItem("showOnlyAggregatedValues");
     }
     /**
      * Toggles the abbreviation of aggregatable values.
@@ -1338,8 +1339,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {void}
      */
     toggleAbreviateAggregatableValues() {
-        this.toggleShow("abreviateAggregatableValues");
-        this.trigger("abreviateAggregatableValuesChanged");
+        this.toggleToggleableStateItem("abreviateAggregatableValues", () => {
+            this.trigger("abreviateAggregatableValuesChanged");
+        });
     }
 
     /**
@@ -1361,7 +1363,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {void}
      */
     toggleShowHeaderss() {
-        this.toggleShow("showHeaders");
+        this.toggleToggleableStateItem("showHeaders");
     }
     /**
      * Toggles the display of the toolbar.
@@ -1371,7 +1373,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {void}
      */
     toggleShowToolbar() {
-        this.toggleShow("showToolbar");
+        this.toggleToggleableStateItem("showToolbar");
     }
     /**
      * Toggles the inclusion of column labels in the grouped row header.
@@ -2066,7 +2068,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {void}
      */
     toggleShowActions() {
-        this.toggleShow("showActions");
+        this.toggleToggleableStateItem("showActions");
     }
     /**
      * Determines if aggregated headers can be shown in the datagrid.
@@ -2538,7 +2540,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             if (!isObj(rowData)) return;
             const rowKey = this.getRowKey(rowData);
             if (!isNonNullString(rowKey)) {
-                Logger.log("Invalid datagrid rowKey : rowKey is not a string", rowKey, " at index ", index, " datagrid session name : ", this.getSesionName());
+                Logger.log("Invalid datagrid rowKey : rowKey is not a string", rowKey, " at index ", index, " datagrid session name : ", this.getSessionName());
                 return;
             }
             (rowsByKeys as any)[rowKey] = rowData;
@@ -2659,7 +2661,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             Object.assign(newState, this.processData({ orderBy, groupedColumns, pagination, data: dataChanged ? this.props.data : this.state.allData }));
             hasUpdated = true;
         }
-        this.getToogleableStateKeys().map((key) => {
+        this.getToggleableStateItems().map((key) => {
             const propValue = (this.props as any)[key];
             const prevPropValue = (prevProps as any)[key];
             if (prevPropValue !== propValue && typeof propValue == "boolean") {
@@ -2672,7 +2674,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 if (newState.aggregationFunction) {
                     this.setSessionData("aggregationFunction", newState.aggregationFunction);
                 }
-                this.getToogleableStateKeys().map((key) => {
+                this.getToggleableStateItems().map((key) => {
                     if (key in newState) {
                         this.setSessionData(key, newState[key]);
                     }
@@ -2817,7 +2819,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns {string} The unique session key associated with the DatagridView component.
      */
-    getSesionName() {
+    getSessionName() {
         return `datagrid-session-data-${defaultStr(this.props.sessionName, "default")}`;
     }
     /**
@@ -2841,7 +2843,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
 
     removeAllSessionData() {
-        return Auth.Session.set(this.getSesionName(), {});
+        return this.session.set({});
     }
     /**
      * Sets a value in the session data associated with the specified session name.
@@ -2856,15 +2858,17 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {any} The updated session data associated with the specified session name.
      */
     setSessionData(sessionName: keyof IDatagridViewState<DataType, StateExtensions> | string, data: any) {
-        const sessionData = this.getSessionData();
-        if (!isNonNullString(sessionName)) return sessionData;
-        if (data === undefined || data === null) {
-            delete sessionData[sessionName as keyof typeof sessionData];
-        } else {
-            (sessionData as any)[sessionName] = data;
-        }
-        Auth.Session.set(this.getSesionName(), sessionData);
-        return sessionData;
+        return this.session.set(sessionName as any, data);
+    }
+    /**
+     * Retrieves the session storage associated with the DatagridView component.
+     * 
+     * This property returns an object that provides methods for managing session data associated with the DatagridView component.
+     * 
+     * @returns {IAuthSessionStorage} The authentication session storage associated with the DatagridView component's session name.
+     */
+    get session() {
+        return Auth.Session.getStorage(this.getSessionName());
     }
     /**
     * Retrieves the session data associated with the DatagridView component, or a value from that session data if a session name is provided.
@@ -2877,7 +2881,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     * @returns {any} The session data associated with the DatagridView component, or the value associated with the specified session name.
     */
     getSessionData(sessionName?: keyof IDatagridViewState<DataType, StateExtensions> | string) {
-        const data = Object.assign({}, Auth.Session.get(this.getSesionName()));
+        const data = Object.assign({}, this.session.getData());
         if (isNonNullString(sessionName)) {
             return data[sessionName as keyof typeof data];
         }

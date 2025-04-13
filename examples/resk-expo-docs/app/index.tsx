@@ -2,7 +2,7 @@ import i18n from "@resk/core/i18n";
 import { TextInput, withAppBar, Datagrid, Surface, Grid, BottomSheet, withAppMounted, Avatar, Badge, Drawer, Button, Form, Dialog, Icon, Theme, Label, ITheme, HStack } from "@resk/native";
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { DatagridExample } from "./_datagrid";
-import { InputFormatter } from "@resk/core";
+import { Auth, InputFormatter, Session } from "@resk/core";
 
 const index = withAppBar(() => {
     return (

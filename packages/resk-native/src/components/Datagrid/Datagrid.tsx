@@ -953,7 +953,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     getOrderBy(): IDatagridViewOrderBy {
         return isObj(this.state.orderBy) ? this.state.orderBy : {} as IDatagridViewOrderBy;
     }
-
+    private persistablePaginationOptions: (keyof IDatagridViewPagination)[] = ["pageSize"];
     /**
     * Initializes the component's state from session data.
     * 
@@ -979,6 +979,12 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 (r as any)[key] = false;
             }
             this.setSessionData(key, (r as any)[key]);
+        });
+        const pagination = Object.assign({}, sessionData.pagination);
+        this.persistablePaginationOptions.map((o) => {
+            if (isNumber(sessionData[o]) && sessionData[0] > 0 && !isNumber(pagination[0])) {
+                pagination[o] = sessionData[o];
+            }
         })
         return r;
     }
@@ -1740,11 +1746,19 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             ...this.state.pagination,
             ...pagination
         }
+        const cb = () => {
+            const persistable = {} as any;
+            this.persistablePaginationOptions.map((o) => {
+                persistable[o] = this.state.pagination[o];
+            });
+            this.setSessionData('pagination', persistable);
+        }
         if (!this.canPaginateInternally()) {
             this.updateState({ pagination }, () => {
                 if (typeof this.props.onPaginate === "function") {
                     this.props.onPaginate(this.getCallOptions({ ...pagination }));
                 }
+                cb();
             });
             return;
         }
@@ -1753,7 +1767,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 data: this.state.allData,
                 pagination,
             })
-        });
+        }, cb);
     }
 
     /**
@@ -2401,7 +2415,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {boolean} Whether the DatagridView can paginate its data.
      */
     canPaginate(): boolean {
-        return !!this.props.paginationEnabled;
+        return this.props.paginationEnabled !== false;
     }
 
     /**

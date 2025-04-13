@@ -13,7 +13,7 @@ import {
     PanResponderGestureState
 } from 'react-native';
 import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted, usePrevious } from '@utils/index';
-import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber, sortBy } from '@resk/core/utils';
+import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber, sortBy, extendObj } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
 import { IField, IFieldType, IResourcePaginationMetaData, IResourceQueryOptionsOrderByDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
@@ -980,14 +980,29 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             }
             this.setSessionData(key, (r as any)[key]);
         });
-        const pagination = Object.assign({}, sessionData.pagination);
-        console.log(pagination, " is pagination ", sessionData, " is ssssss");
-        this.persistablePaginationOptions.map((o) => {
-            if (isNumber(sessionData[o]) && sessionData[0] > 0 && !isNumber(pagination[0])) {
-                pagination[o] = sessionData[o];
-            }
-        })
+
         return r;
+    }
+
+    /**
+     * Retrieves pagination configuration from session data.
+     *
+     * This function accesses the session data to extract pagination options 
+     * and returns a partial pagination configuration.
+     * 
+     * @returns {Partial<IDatagridViewPagination>} The pagination configuration 
+     * retrieved from session data.
+     */
+    getPaginationFromSession(): Partial<IDatagridViewPagination> {
+        const sessionData = this.getSessionData();
+        const pagination = Object.assign({}, sessionData.pagination);
+        const result = {};
+        this.persistablePaginationOptions.map((o) => {
+            if (isNumber(sessionData[o]) && pagination[0] > 0) {
+                (result as any)[o] = pagination[o];
+            }
+        });
+        return result as any;
     }
 
     /**
@@ -2529,7 +2544,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     processData(options?: { data?: DataType[], orderBy?: IDatagridViewOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridViewPagination, includeColumnLabelInGroupedRowHeader?: boolean }): Partial<IDatagridViewState<DataType, any>> {
         let { data, orderBy, groupedColumns, pagination, includeColumnLabelInGroupedRowHeader } = Object.assign({}, options);
         let allData: DataType[] = [];
-        const paginationConfig: IDatagridViewPagination = isObj(pagination) ? pagination as IDatagridViewPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridViewPagination;
+        const paginationConfig: IDatagridViewPagination = extendObj({}, this.getPaginationFromSession(), isObj(pagination) ? pagination as IDatagridViewPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridViewPagination);
         data = Array.isArray(data) ? data : Array.isArray(this.state.allData) ? this.state.allData : Array.isArray(this.props.data) ? this.props.data : [];
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const groupedRowsByKeys: IDatagridViewState<DataType, StateExtensions>["groupedRowsByKeys"] = {} as IDatagridViewState<DataType, StateExtensions>["groupedRowsByKeys"];

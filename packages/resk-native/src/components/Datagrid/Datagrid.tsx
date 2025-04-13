@@ -1797,11 +1797,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 }}
             />
         }
-        const limit = defaultNumber(pagination.pageSize, 10);
+        const pageSize = defaultNumber(pagination.pageSize, 10);
         const currentPage = defaultNumber(pagination.currentPage);
         const testID = this.getTestID();
         const total = defaultNumber(pagination.total, this.getAllData().length);
-        const totalPages = isNumber(pagination.totalPages) ? pagination.totalPages : limit > 0 ? Math.ceil(total / limit) : 1;
+        const totalPages = isNumber(pagination.totalPages) ? pagination.totalPages : pageSize > 0 ? Math.ceil(total / pageSize) : 1;
         const hasNextPage = typeof pagination.hasNextPage === 'boolean' ? pagination.hasNextPage : currentPage < totalPages;;
         const hasPreviousPage = typeof pagination.hasPreviousPage === 'boolean' ? pagination.hasPreviousPage : currentPage > 1;
         const nextPage = hasNextPage ? currentPage + 1 : undefined;
@@ -1816,10 +1816,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             if (!isNumber(item)) return null;
             itLimits.push({
                 label: item.formatNumber(),
-                icon: limit == item ? 'check' : null,
-                colorScheme: limit === item ? "primary" : undefined,
+                icon: pageSize == item ? 'check' : null,
+                colorScheme: pageSize === item ? "primary" : undefined,
                 onPress: () => {
-                    if (item == limit) return;
+                    if (item == pageSize) return;
                     this.paginate({
                         ...pagination,
                         pageSize: item
@@ -1832,15 +1832,16 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 <Menu
                     testID={testID + "_SimpleSelect"}
                     anchor={({ openMenu }) => {
-                        return <Pressable testID={testID + "-pagination-limit"}>
+                        return <Pressable style={styles.paginationItem} onPress={() => openMenu()} testID={testID + "-pagination-page-size"}>
                             <Label colorScheme='primary' fontSize={16}>
-                                {limit.formatNumber()}
+                                {pageSize.formatNumber()}
                             </Label>
                         </Pressable>
                     }}
                     items={itLimits}
                 />
                 <Icon
+                    size={25}
                     title={this.translate("pagination.goToFirstPage")}
                     iconName="material-first-page"
                     disabled={!!!hasPreviousPage}
@@ -1853,6 +1854,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     }}
                 />
                 <Icon
+                    size={25}
                     title={this.translate("pagination.goToPreviousPage")}
                     iconName="material-keyboard-arrow-left"
                     disabled={!!!hasPreviousPage || !!!previousPage}
@@ -1869,10 +1871,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 />
                 <View testID={testID + "-pagination-label"}>
                     <Label style={{ fontSize: 15 }}>
-                        {total.formatNumber()}-{totalPages.formatNumber()}{" / "}{total.formatNumber()}
+                        {currentPage.formatNumber()}-{totalPages.formatNumber()}{" / "}{total.formatNumber()}
                     </Label>
                 </View>
                 <Icon
+                    size={25}
                     title={this.translate("pagination.goToNextPage")}
                     iconName="material-keyboard-arrow-right"
                     disabled={!!!hasNextPage || !!!nextPage}
@@ -1885,6 +1888,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     }}
                 />
                 <Icon
+                    size={25}
                     iconName="material-last-page"
                     title={this.translate("pagination.goToLastPage")}
                     disabled={currentPage >= totalPages || !!!lastPage}
@@ -5163,11 +5167,6 @@ export interface IDatagridViewOrderBy<DataType extends object = any> {
  */
 export interface IDatagridViewPagination extends IResourcePaginationMetaData {
     /**
-     * The limit of the pagination.
-     */
-    limit: number;
-
-    /**
      * The page sizes of the pagination.
      */
     pageSizes?: number[];
@@ -5245,6 +5244,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-start",
+    },
+    paginationItem: {
+        paddingHorizontal: 7,
     },
     disabled: {
         pointerEvents: "none",

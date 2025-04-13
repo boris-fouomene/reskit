@@ -32,6 +32,7 @@ import { IPreloaderProps } from '@components/Dialog/Preloader';
 import { IProgressBarProps, ProgressBar } from '@components/ProgressBar';
 import { Button, IButtonProps } from '@components/Button';
 import { IMenuItemProps, Menu } from '@components/Menu';
+import Breakpoints from '@breakpoints/index';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -1704,6 +1705,187 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return null;
     }
     /**
+     * Retrieves the list of page sizes for the pagination controls.
+     *
+     * If the `pagination.pageSizes` property is an array with at least one element, it is returned.
+     * Otherwise, a default list of page sizes is generated.
+     *
+     * The default list includes the following values: 0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, and 5000.
+     * If the current viewport is a desktop, the list is extended with the following values: 6000, 7000, 8000, 9000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, and 50000.
+     *
+     * @returns {number[]} The list of page sizes for the pagination controls.
+     */
+    getPaginationPageSizes() {
+        if (Array.isArray(this.props.pagination?.pageSizes) && this.props.pagination.pageSizes.length) {
+            return this.props.pagination.pageSizes;
+        }
+        return [5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, ...(Breakpoints.isDesktopMedia() ? [6000, 7000, 8000, 9000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000] : [])];
+    }
+
+
+    /**
+     * Paginates the data using the given pagination options.
+     *
+     * This method is called when the pagination controls are used to navigate through the data.
+     * If the `canPaginateInternally` method returns `true`, this method will filter the data
+     * according to the given pagination options and update the component's state accordingly.
+     * If the `canPaginateInternally` method returns `false`, this method will call the
+     * `onPaginate` callback function with the given pagination options.
+     *
+     * @param pagination - The pagination options to use for paginating the data.
+     */
+    protected paginate(pagination: IDatagridViewPagination) {
+        if (!isObj(pagination) || !this.canPaginate()) return;
+        pagination = {
+            ...this.state.pagination,
+            ...pagination
+        }
+        if (!this.canPaginateInternally()) {
+            this.updateState({ pagination }, () => {
+                if (typeof this.props.onPaginate === "function") {
+                    this.props.onPaginate(this.getCallOptions({ ...pagination }));
+                }
+            });
+            return;
+        }
+        this.updateState({
+            pagination, ...this.processData({
+                data: this.state.allData,
+                pagination,
+            })
+        });
+    }
+
+    /**
+     * Renders the pagination controls in the DatagridView component.
+     *
+     * This method returns `null` if the `pagination` property is not an object or if the `total` property is not a number.
+     * If the `canPaginate` method returns `false`, this method will render a simple label with the total number of records.
+     * If the `canPaginate` method returns `true`, this method will render a more complex pagination control with the following elements:
+     *  - A dropdown menu with the page size options.
+     *  - A "first page" button.
+     *  - A "previous page" button.
+     *  - A label with the current page number.
+     *  - A "next page" button.
+     *  - A "last page" button.
+     *
+     * @returns {JSX.Element | null} The rendered pagination controls or null if the `pagination` property is not an object or if the `total` property is not a number.
+     */
+    renderPagination() {
+        const { pagination } = this.state;
+        if (!pagination || !isNumber(pagination.total)) return null;
+        if (!this.canPaginate()) {
+            return <DatagridToolbarAction
+                children={pagination.total.formatNumber()}
+                colorScheme={"primary"}
+                labelProps={{
+                    textBold: true,
+                }}
+            />
+        }
+        const limit = defaultNumber(pagination.pageSize, 10);
+        const currentPage = defaultNumber(pagination.currentPage);
+        const testID = this.getTestID();
+        const total = defaultNumber(pagination.total, this.getAllData().length);
+        const totalPages = isNumber(pagination.totalPages) ? pagination.totalPages : limit > 0 ? Math.ceil(total / limit) : 1;
+        const hasNextPage = typeof pagination.hasNextPage === 'boolean' ? pagination.hasNextPage : currentPage < totalPages;;
+        const hasPreviousPage = typeof pagination.hasPreviousPage === 'boolean' ? pagination.hasPreviousPage : currentPage > 1;
+        const nextPage = hasNextPage ? currentPage + 1 : undefined;
+        const previousPage = hasPreviousPage ? currentPage - 1 : undefined;
+        const lastPage = totalPages;
+
+        const itLimits: IDatagridViewToolbarAction<DataType>[] = [{
+            label: this.translate("pagination.pageSize"),
+            divider: true,
+        }];
+        this.getPaginationPageSizes().map((item) => {
+            if (!isNumber(item)) return null;
+            itLimits.push({
+                label: item.formatNumber(),
+                icon: limit == item ? 'check' : null,
+                colorScheme: limit === item ? "primary" : undefined,
+                onPress: () => {
+                    if (item == limit) return;
+                    this.paginate({
+                        ...pagination,
+                        pageSize: item
+                    })
+                }
+            });
+        });
+        return <View testID={testID + "-pagination-container"}>
+            <View style={[styles.paginationContentContainer]} testID={testID + "-pagination-content-container"}>
+                <Menu
+                    testID={testID + "_SimpleSelect"}
+                    anchor={({ openMenu }) => {
+                        return <Pressable testID={testID + "-pagination-limit"}>
+                            <Label colorScheme='primary' fontSize={16}>
+                                {limit.formatNumber()}
+                            </Label>
+                        </Pressable>
+                    }}
+                    items={itLimits}
+                />
+                <Icon
+                    title={this.translate("pagination.goToFirstPage")}
+                    iconName="material-first-page"
+                    disabled={!!!hasPreviousPage}
+                    onPress={() => {
+                        if (!hasPreviousPage) return;
+                        this.paginate({
+                            ...pagination,
+                            currentPage: 1
+                        })
+                    }}
+                />
+                <Icon
+                    title={this.translate("pagination.goToPreviousPage")}
+                    iconName="material-keyboard-arrow-left"
+                    disabled={!!!hasPreviousPage || !!!previousPage}
+                    onPress={() => {
+                        if (!previousPage) return;
+                        const page = previousPage;
+                        if (page < 1) return;
+                        this.paginate({
+                            ...pagination,
+                            currentPage: previousPage
+                        })
+                    }}
+
+                />
+                <View testID={testID + "-pagination-label"}>
+                    <Label style={{ fontSize: 15 }}>
+                        {total.formatNumber()}-{totalPages.formatNumber()}{" / "}{total.formatNumber()}
+                    </Label>
+                </View>
+                <Icon
+                    title={this.translate("pagination.goToNextPage")}
+                    iconName="material-keyboard-arrow-right"
+                    disabled={!!!hasNextPage || !!!nextPage}
+                    onPress={() => {
+                        if (!nextPage) return;
+                        this.paginate({
+                            ...pagination,
+                            currentPage: nextPage
+                        })
+                    }}
+                />
+                <Icon
+                    iconName="material-last-page"
+                    title={this.translate("pagination.goToLastPage")}
+                    disabled={currentPage >= totalPages || !!!lastPage}
+                    onPress={() => {
+                        if (currentPage >= totalPages || !lastPage) return;
+                        this.paginate({
+                            ...pagination,
+                            currentPage: lastPage
+                        });
+                    }}
+                />
+            </View>
+        </View>
+    }
+    /**
      * Returns an array of actions to be displayed in the toolbar of the DatagridView component.
      * 
      * By default, this method returns an empty array. You can override this method to return your own
@@ -1786,7 +1968,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const testID = this.getTestID();
         return <ScrollView horizontal testID={testID + "-toolbar-scrollview"} contentContainerStyle={styles.headerScrollViewContentContainer} style={[styles.headerScrollView]}>
             <View testID={testID + "-toolbar-container"} style={[styles.toolbarContainer]}>
-                {this.canShowToolbar() ? this.renderFirstToolbarActions() : null}
+                {this.renderPagination()}
+                {this.renderFirstToolbarActions()}
                 {(Array.isArray(customToolbarActions) ? [...actions, customToolbarActions] : actions).map((action, index) => {
                     if (!action || !isObj(action)) return null;
                     return <DatagridToolbarAction
@@ -1811,7 +1994,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 {this.renderGroupableColumnsMenu()}
                 {this.renderViewNamesMenu()}
                 {this.renderAggregationFunctionsMenu()}
-                {this.canShowToolbar() ? this.renderLastToolbarActions() : null}
+                {this.renderLastToolbarActions()}
             </View>
         </ScrollView>
     }
@@ -2305,14 +2488,14 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @param {DataType[]} options.data - The data to process.
      * @param {IDatagridViewOrderBy<DataType>} options.orderBy - The sorting columns and directions. If not specified, the DatagridView's `orderBy` state is used.
      * @param {string[]} options.groupedColumns - The columns to group the data by. If not specified, the DatagridView's `groupedColumns` state is used.
-     * @param {IDatagridPagination} pagination - The pagination configuration. If not specified, the DatagridView's `pagination` state is used.
+     * @param {IDatagridViewPagination} pagination - The pagination configuration. If not specified, the DatagridView's `pagination` state is used.
      * @param {boolean} {options.includeColumnLabelInGroupedRowHeader} - Whether to include the column label in the grouped row header. If not specified, the DatagridView's `includeColumnLabelInGroupedRowHeader` state is used.
      * @returns {Partial<IDatagridViewState<DataType, StateExtensions>>} - A partial state object containing the aggregated columns values, the paginated data, the all data, the data to display, the pagination configuration, and the grouped rows by keys.
      */
-    processData(options?: { data?: DataType[], orderBy?: IDatagridViewOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridPagination, includeColumnLabelInGroupedRowHeader?: boolean }): Partial<IDatagridViewState<DataType, any>> {
+    processData(options?: { data?: DataType[], orderBy?: IDatagridViewOrderBy<DataType>, groupedColumns?: string[], pagination?: IDatagridViewPagination, includeColumnLabelInGroupedRowHeader?: boolean }): Partial<IDatagridViewState<DataType, any>> {
         let { data, orderBy, groupedColumns, pagination, includeColumnLabelInGroupedRowHeader } = Object.assign({}, options);
         let allData: DataType[] = [];
-        const paginationConfig: IDatagridPagination = isObj(pagination) ? pagination as IDatagridPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridPagination;
+        const paginationConfig: IDatagridViewPagination = isObj(pagination) ? pagination as IDatagridViewPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridViewPagination;
         data = Array.isArray(data) ? data : Array.isArray(this.state.allData) ? this.state.allData : Array.isArray(this.props.data) ? this.props.data : [];
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const groupedRowsByKeys: IDatagridViewState<DataType, StateExtensions>["groupedRowsByKeys"] = {} as IDatagridViewState<DataType, StateExtensions>["groupedRowsByKeys"];
@@ -2332,7 +2515,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             allData.push(rowData);
             this.computeAggregationsForRow(rowData, index, aggregationFunctions, aggregatedColumnsValues, data);
         });
-        paginationConfig.total = allData.length;
+        paginationConfig.total = isNumber(paginationConfig?.total) ? paginationConfig.total : allData.length;
         paginationConfig.currentPage = isNumber(paginationConfig.currentPage) && paginationConfig.currentPage > 0 ? paginationConfig.currentPage : 1;
         paginationConfig.pageSize = isNumber(paginationConfig.pageSize) && paginationConfig.pageSize > 0 ? paginationConfig.pageSize : 10;
         allData = this.internalSort(allData, orderBy);
@@ -2434,7 +2617,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const groupedColumns = Array.isArray(this.props.groupedColumns) ? this.props.groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const hasGroupedColumnsChanged = !DatagridView.areArraysEqual(prevProps.groupedColumns, this.props.groupedColumns) && Array.isArray(this.props.groupedColumns);
         const hasPaginationChanged = defaultBool(prevProps.paginationEnabled) !== defaultBool(this.props.paginationEnabled) || !areEquals(prevProps.pagination, this.props.pagination);
-        const pagination: IDatagridPagination = isObj(this.props.pagination) ? this.props.pagination as any : this.state.pagination;
+        const pagination: IDatagridViewPagination = isObj(this.props.pagination) ? this.props.pagination as any : this.state.pagination;
         if (prevProps.defaultAggregationFunction !== this.props.defaultAggregationFunction && isNonNullString(this.props.defaultAggregationFunction) && DatagridView.isValidAggregationFunction(this.props.defaultAggregationFunction)) {
             newState.aggregationFunction = this.props.defaultAggregationFunction as any;
             hasUpdated = true;
@@ -3965,9 +4148,9 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * 
      * This property is used to specify the pagination configuration for the grid.
      * 
-     * @see {@link IDatagridPagination} for more information about pagination configurations.
+     * @see {@link IDatagridViewPagination} for more information about pagination configurations.
      */
-    pagination?: Partial<IDatagridPagination>;
+    pagination?: Partial<IDatagridViewPagination>;
 
     /**
      * Whether pagination is enabled for the grid.
@@ -4233,7 +4416,7 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * if specified, it will be called when the datagrid is paginated and the datagrid won't be paginated internally.
      * @param options An object containing the datagrid context and the pagination configuration.
      */
-    onPaginate?: (options: IDatagridViewCallOptions<DataType, IDatagridPagination>) => any;
+    onPaginate?: (options: IDatagridViewCallOptions<DataType, IDatagridViewPagination>) => any;
 } & PropsExtensions;
 
 
@@ -4635,9 +4818,9 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
      * 
      * This property determines how the data is paginated in the grid.
      * 
-     * @see {@link IDatagridPagination} for more information about pagination configurations.
+     * @see {@link IDatagridViewPagination} for more information about pagination configurations.
      */
-    pagination: IDatagridPagination;
+    pagination: IDatagridViewPagination;
 
     /**
      * The paginated data in the grid.
@@ -4964,11 +5147,16 @@ export interface IDatagridViewOrderBy<DataType extends object = any> {
 /**
  * An interface representing the pagination configuration of the DatagridView component.
  */
-export interface IDatagridPagination extends IResourcePaginationMetaData {
+export interface IDatagridViewPagination extends IResourcePaginationMetaData {
     /**
      * The limit of the pagination.
      */
     limit: number;
+
+    /**
+     * The page sizes of the pagination.
+     */
+    pageSizes?: number[];
 }
 
 export interface IDatagridRegisterViewOptions {
@@ -5037,6 +5225,12 @@ const styles = StyleSheet.create({
     toolbarActionsContainer: {
         width: "100%",
         alignSelf: "flex-start",
+    },
+    paginationContentContainer: {
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
     },
     disabled: {
         pointerEvents: "none",

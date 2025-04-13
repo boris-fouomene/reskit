@@ -7,12 +7,15 @@ import {
     LayoutChangeEvent,
     LayoutRectangle,
     Dimensions,
-    ViewStyle
+    PanResponderInstance,
+    PanResponder,
+    GestureResponderEvent,
+    PanResponderGestureState
 } from 'react-native';
 import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted, usePrevious } from '@utils/index';
 import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber, sortBy } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
-import { IField, IFieldType, IMergeWithoutDuplicates, IResourcePaginationMetaData, IResourceQueryOptionsOrderByDirection } from '@resk/core/types';
+import { IField, IFieldType, IResourcePaginationMetaData, IResourceQueryOptionsOrderByDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
 import Label, { ILabelProps } from '@components/Label';
 import InputFormatter from '@resk/core/inputFormatter';
@@ -22,7 +25,7 @@ import { Preloader } from '@components/Dialog';
 import { AppBar, IAppBarAction, IAppBarProps } from '@components/AppBar';
 import { Divider } from '@components/Divider';
 import { FontIcon, IFontIconName, IIconSource, Icon } from '@components/Icon';
-import Theme, { useTheme } from "@theme";
+import Theme, { Colors, useTheme } from "@theme";
 import { useDimensions } from '@dimensions/index';
 import i18n from '@resk/core/i18n';
 import { IPreloaderProps } from '@components/Dialog/Preloader';
@@ -77,6 +80,50 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     }
     public get toolbarActionsContainerRef() {
         return this._toolbarActionsContainerRef;
+    }
+
+    /**
+     * Determines whether the datagrid view is resizable.
+     *
+     * This method checks the `resizable` property from the component's props to 
+     * determine if the datagrid view can be resized. By default, the datagrid is 
+     * resizable unless explicitly set otherwise.
+     *
+     * @returns {boolean} `true` if the datagrid view is resizable, `false` otherwise.
+     */
+    public isResizable(): boolean {
+        return this.props.resizable !== false;
+    }
+    /**
+     * Handles the column resize event.
+     *
+     * This method is invoked when a column in the datagrid is resized, allowing 
+     * for custom behavior or state updates based on the new column width. It 
+     * receives details about the column being resized, the previous and new 
+     * widths, and optional gesture event details.
+     *
+     * @param {Object} options - The options object containing event details.
+     * @param {IDatagridViewStateColumn<DataType>} options.column - The column that is being resized.
+     * @param {number} options.oldWidth - The previous width of the column before resizing.
+     * @param {number} options.newWidth - The new width of the column after resizing.
+     * @param {GestureResponderEvent} [options.gestureEvent] - Optional gesture event associated with the resizing action.
+     * @param {PanResponderGestureState} options.gestureState - The state of the gesture during the resize.
+     * @returns {any} - This method currently does not return a value.
+     */
+    public onColumnResize({ column, newWidth }: { column: IDatagridViewStateColumn<DataType>, oldWidth: number, newWidth: number, gestureEvent?: GestureResponderEvent, gestureState: PanResponderGestureState }): any {
+        if (!this.isResizable() || !this.isValidColumn(column) || column.resizable === false) {
+            return null;
+        }
+        const oldResizedWidth = this.getResizedColumnWidth(column.name);
+        if (newWidth === oldResizedWidth) {
+            return null;
+        }
+        this.updateState({
+            resizedColumnsWidths: {
+                ...this.state.resizedColumnsWidths,
+                [column.name]: newWidth
+            }
+        });
     }
     /***
      * A set of selected rows keys.
@@ -174,7 +221,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const { width, height } = this.getContainerLayout();
         if (Math.abs(layout.width - width) <= 50 && Math.abs(layout.height - height) <= 50) return;
         this.measureLayout().then((r) => {
-            this.setState({ ...r, isLayoutMeasured: true } as IDatagridViewState<DataType, StateExtensions>);
+            this.setState({ ...r, isLayoutMeasured: true, columnsWidths: this.processColumnsWidths() } as IDatagridViewState<DataType, StateExtensions>);
         });
     }
 
@@ -405,7 +452,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {IViewStyle} The style object for the column header.
      */
     getTableColumnHeaderStyle(column: IDatagridViewStateColumn<DataType>): IViewStyle {
-        return [styles.rowCell];
+        return [styles.columnHeaderOrCell];
     }
 
     /**
@@ -507,7 +554,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {IViewStyle} The style for the table cell.
      */
     getTableCellStyle(column: IDatagridViewStateColumn<DataType>, rowData: DataType): IViewStyle {
-        return [styles.rowCell];
+        return [styles.columnHeaderOrCell];
     }
     /**
      * Renders a grouped row.
@@ -953,11 +1000,174 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             this.setState((prevState) => ({ ...prevState, ...stateData }), callback);
         });
     }
+    /**
+     * Returns the widths of the columns as an object where the keys are the column names
+     * and the values are the column widths.
+     * 
+     * @returns {IDatagridViewState<DataType, StateExtensions>["columnsWidths"]} - The widths of the columns.
+     * 
+     * @remarks
+     * The column widths are initially set based on the type of the column. The widths are
+     * then updated based on the user's interactions with the datagrid.
+     * 
+     * @example
+     * // Get the widths of the columns
+     * const widths = datagrid.getColumnsWidths();
+     */
+    getColumnsWidths(): IDatagridViewState<DataType, StateExtensions>["columnsWidths"] {
+        return isObj(this.state.columnsWidths) ? this.state.columnsWidths : {} as any;
+    }
+    /**
+     * Retrieves the current widths of all resized columns.
+     * 
+     * This method returns an object with the resized widths of columns,
+     * where the keys are column names and the values are the widths
+     * in pixels. If there are no resized columns or the state is invalid,
+     * an empty object is returned.
+     * 
+     * @returns {Partial<Record<IDatagridViewColumnName<DataType>, number>>} - An object
+     * mapping column names to their resized widths.
+     */
+    getResizedColumnsWidths(): Partial<Record<IDatagridViewColumnName<DataType>, number>> {
+        return isObj(this.state.resizedColumnsWidths) ? this.state.resizedColumnsWidths : {} as any;
+    }
+    /**
+     * Retrieves the width of a resized column.
+     * 
+     * This method returns the current width of a column that has been resized
+     * by the user. If the column name is invalid or not found, it returns a default
+     * width of 0. The width is determined from the `resizedColumnsWidths` state.
+     *
+     * @param {IDatagridViewColumnName<DataType>} columnName - The name of the column
+     * for which to retrieve the resized width.
+     * 
+     * @returns {number} - The current width of the resized column, or 0 if the column
+     * name is invalid or not found.
+     */
+    getResizedColumnWidth(columnName: IDatagridViewColumnName<DataType>): number {
+        if (!isNonNullString(columnName)) return 0;
+        return defaultNumber(this.getResizedColumnsWidths()[columnName]);
+    }
+    /**
+     * Returns the width of a column based on its type.
+     *
+     * This method determines the default width for a column by evaluating its type.
+     * Different column types have pre-defined widths to ensure optimal display within
+     * the datagrid. If the column type is not recognized, a default width is returned.
+     *
+     * @param {IFieldType} columnType - The type of the column, which influences the width.
+     * 
+     * @returns {number} - The width of the column in pixels.
+     * 
+     * @example
+     * // Get the width for a date column
+     * const width = getColumnWidthFromType("date");
+     */
+    getColumnWidthFromType(columnType: IFieldType) {
+        switch (columnType) {
+            case "date":
+                return 180;
+            case "time":
+                return 120;
+            case "datetime":
+                return 200;
+            default:
+                return 150;
+        }
+    }
+
 
     /**
-     * Processes the columns for the component.
+     * Returns the width of a column in pixels.
      * 
-     * @returns {IDatagridViewState<DataType, StateExtensions>} The processed columns.
+     * This method determines the width of a column by evaluating the column type and
+     * the pre-defined widths for different column types. If the column type is not
+     * recognized, a default width is returned.
+     * 
+     * @param {string} columnName - The name of the column.
+     * 
+     * @returns {number} The width of the column in pixels.
+     * 
+     * @example
+     * // Get the width for a column named "date"
+     * const width = getColumnWidth("date");
+     */
+    getColumnWidth(columnName: IDatagridViewColumnName<DataType>): number {
+        const resizedWidth = this.getResizedColumnWidth(columnName);
+        if (resizedWidth > 0) return resizedWidth;
+        if (!isNonNullString(columnName)) return 0;
+        const widths = this.getColumnsWidths();
+        if (isNumber(widths[columnName]) && widths[columnName] > 0) {
+            return widths[columnName];
+        }
+        const column = this.getColumn(columnName);
+        if (!this.isValidColumn(column)) return 0;
+        return this.getColumnWidthFromType(column.type);
+    }
+
+    /**
+     * Calculates the width of each column in the datagrid based on its type and constraints.
+     * 
+     * This method processes the columns and determines their widths by evaluating their types, widths, min widths, and flex units.
+     * The method has two passes: the first pass counts the fixed widths and flex units of all columns, and the second pass calculates the width of each flex column based on the available space and the flex units.
+     * If the total fixed width of all columns exceeds the screen width, the table is considered scrollable and the flex columns are not resized.
+     * Otherwise, the flex columns are resized to fit the available space by multiplying their flex units by the flex unit value.
+     * The method returns the calculated widths of each column in a record with column names as keys and the widths as values.
+     * @param {IDatagridViewStateColumn<DataType>[]} [columns] - An array of column objects to process. If not provided, the method will use the columns from the datagrid state.
+     * @returns {IDatagridViewState<DataType>["columnsWidths"]} - The calculated widths of each column.
+     */
+    processColumnsWidths(columns?: IDatagridViewStateColumn<DataType>[]): IDatagridViewState<DataType>["columnsWidths"] {
+        const cols = Array.isArray(columns) ? columns : this.getColumns();
+        const columnsWidths: IDatagridViewState<DataType>['columnsWidths'] = {} as any;
+        const containerWidths = defaultNumber(this.getContainerLayout()?.width);
+        const screenWidth = Dimensions.get('window').width;
+        let totalFixedWidth = 0;
+        let totalFlexUnits = 0;
+
+        // First pass: count fixed widths and flex units
+        cols.forEach(column => {
+            const colWidth = isNumber(column.width) && column.width > 0 ? column.width : 0;//this.getColumnWidthFromType(column.type);
+            const width = Math.max(colWidth, defaultNumber(column.minWidth));
+            if (width > 0) {
+                totalFixedWidth += width;
+                columnsWidths[column.name] = width;
+            } else if (isNumber(column.flex)) {
+                totalFlexUnits += column.flex;
+            } else {
+                totalFixedWidth += Math.max(this.getColumnWidthFromType(column.type), defaultNumber(column.minWidth));
+            }
+        });
+
+        // Determine if table needs to be scrollable
+        const isScrollable = totalFixedWidth > (containerWidths > 0 ? containerWidths : screenWidth);
+
+        // Calculate available space for flex columns
+        const availableFlexSpace = isScrollable ? 0 : (screenWidth - totalFixedWidth);
+        const flexUnit = totalFlexUnits > 0 ? availableFlexSpace / totalFlexUnits : 0;
+
+        cols.map(column => {
+            if (!columnsWidths[column.name]) {
+                const minWidth = defaultNumber(column.minWidth);
+                if (!isScrollable && isNumber(column.flex) && column.flex > 0) {
+                    columnsWidths[column.name] = Math.max(minWidth, column.flex * flexUnit);
+                } else {
+                    columnsWidths[column.name] = Math.max(minWidth, this.getColumnWidthFromType(column.type));
+                }
+            }
+        });
+        return columnsWidths;
+    }
+
+    /**
+     * Processes the columns and returns the columns, visible columns, columns by name, groupable columns, and grouped columns names.
+     * 
+     * This method processes the columns and returns the columns, visible columns, columns by name, groupable columns, and grouped columns names.
+     * The method also sets the `visible`, `filterable`, `sortable`, and `aggregatable` properties of each column based on the component's props.
+     * If the column is groupable, the method adds it to the `groupableColumns` array and to the `groupedColumnsNames` array if it is already grouped.
+     * 
+     * @param {string[]} [groupedColumns] - The names of the columns that are grouped.
+     * 
+     * @returns {IDatagridViewState<DataType, StateExtensions> & { groupedColumnsNames: string[]; }} - The columns, visible columns, columns by name, groupable columns, and grouped columns names.
      */
     processColumns(groupedColumns?: string[]) {
         if (!Array.isArray(this.props.columns)) return { columns: [], groupedColumns: [], groupableColumns: [], visibleColumns: [], columnsByName: {}, aggregatableColumns: [] };
@@ -994,7 +1204,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 (columnsByName as any)[col.name] = col;
             }
         });
-        return { columns, visibleColumns, columnsByName, aggregatableColumns, groupableColumns, groupedColumnsNames: stateGroupedColumns };
+        return { columns, columnsWidths: this.processColumnsWidths(columns), visibleColumns, columnsByName, aggregatableColumns, groupableColumns, groupedColumnsNames: stateGroupedColumns };
     }
     /**
      * Retrieves a column definition by name.
@@ -1462,23 +1672,27 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             }}
         />
     }
+
     /**
-     * Renders custom toolbar actions for the DatagridView component.
-     * 
-     * By default, this method returns null. You can override this method to return your own
-     * custom toolbar actions. The actions should be an array of objects with the following properties:
-     * - `label`: The text to be displayed in the action button.
-     * - `icon`: The icon to be displayed in the action button.
-     * - `onPress`: The function to be called when the action button is pressed.
-     * - `divider`: A boolean indicating whether to display a divider after the action button.
-     * - `style`: An array of styles to be applied to the action button.
-     * - `disabled`: A boolean indicating whether the action button is disabled.
-     * 
-     * The actions will be displayed in the toolbar of the DatagridView component.
-     * 
-     * @returns {(IDatagridViewToolbarAction<DataType> | null)[]} The custom toolbar actions.
+     * Renders the first set of actions in the toolbar of the DatagridView component.
+     *
+     * This method is intended to be overridden to provide custom actions that will appear
+     * at the start of the toolbar. By default, it returns null, indicating no actions.
+     *
+     * @returns {JSX.Element | (JSX.Element|null)[] | null } The rendered toolbar actions or null if no actions are provided.
      */
-    renderCustomToolbarActions() {
+    renderFirstToolbarActions(): JSX.Element | (JSX.Element | null)[] | null {
+        return null;
+    }
+    /**
+     * Renders the last set of actions in the toolbar of the DatagridView component.
+     *
+     * This method is intended to be overridden to provide custom actions that will appear
+     * at the end of the toolbar. By default, it returns null, indicating no actions.
+     *
+     * @returns {JSX.Element | (JSX.Element|null)[] | null } The rendered toolbar actions or null if no actions are provided.
+     */
+    renderLastToolbarActions(): JSX.Element | (JSX.Element | null)[] | null {
         return null;
     }
     /**
@@ -1527,6 +1741,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const selectedRowsCount = this.getSelectedRowsCount();
         const isAggregatable = this.isAggregatable();
         const customToolbarActions = this.getToolbarActions();
+        if (selectable && dataLength) {
+            actions.push({
+                label: <Datagrid.ToggleAllRowsSelection />,
+            });
+        }
         if (isFilterable) {
             actions.push({
                 label: this.translate(this.canShowFilters() ? "hideFilters" : "showFilters", { count: dataLength }),
@@ -1542,11 +1761,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 icon: this.canShowAggregatedValues() ? 'view-column' : 'view-module-outline',
                 onPress: this.toggleShowAggregatedValues.bind(this),
             })
-        }
-        if (selectable && dataLength) {
-            actions.push({
-                label: <Datagrid.ToggleAllRowsSelection />,
-            });
         }
         const visibleColumnsMenus: IMenuItemProps<{ datagridContext: DatagridView<DataType> }>[] = [];
         columns.map((column) => {
@@ -1564,6 +1778,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const testID = this.getTestID();
         return <ScrollView horizontal testID={testID + "-toolbar-scrollview"} contentContainerStyle={styles.headerScrollViewContentContainer} style={[styles.headerScrollView]}>
             <View testID={testID + "-toolbar-container"} style={[styles.toolbarContainer]}>
+                {this.canShowToolbar() ? this.renderFirstToolbarActions() : null}
                 {(Array.isArray(customToolbarActions) ? [...actions, customToolbarActions] : actions).map((action, index) => {
                     if (!action || !isObj(action)) return null;
                     return <DatagridToolbarAction
@@ -1588,7 +1803,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 {this.renderGroupableColumnsMenu()}
                 {this.renderViewNamesMenu()}
                 {this.renderAggregationFunctionsMenu()}
-                {this.canShowToolbar() ? this.renderCustomToolbarActions() : null}
+                {this.canShowToolbar() ? this.renderLastToolbarActions() : null}
             </View>
         </ScrollView>
     }
@@ -2722,6 +2937,9 @@ export type IDatagridProps<DataType extends object = any, PropsExtensions = unkn
     [K in IDatagridViewName as `${K}ViewProps`]?: Partial<(keyof IDatagridViews<DataType>[K] extends never ? never : IDatagridViews<DataType>[K])>;
 };
 
+export interface IDatagridViewColumnState<DataType extends object = any> {
+    panResponder: PanResponderInstance;
+}
 
 /**
  * A base class for DatagridView columns.
@@ -2730,9 +2948,59 @@ export type IDatagridProps<DataType extends object = any, PropsExtensions = unkn
  * 
  * @template DataType - The type of the data shown in the grid.
  * @template PropExtensions - The type of the component's props. This type is used to extend the component's props with additional properties.
- * @template StateType - The type of the component's state.
+ * @template StateExtensions - The type of the component's state.
  */
-class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown, StateType = unknown> extends Component<IDatagridViewStateColumn<DataType> & { rowData?: DataType, renderType?: IDatagridViewColumnRenderType, datagridContext: DatagridView<DataType, any, any> } & PropExtensions, StateType> {
+class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown, StateExtensions = unknown> extends Component<IDatagridViewStateColumn<DataType> & { rowData?: DataType, renderType?: IDatagridViewColumnRenderType, datagridContext: DatagridView<DataType, any, any> } & PropExtensions, StateExtensions & IDatagridViewColumnState<DataType>> {
+    private panResizingOptions = {
+        startX: 0,
+        startWidth: 0,
+        width: 0,
+    }
+
+    /**
+     * Returns whether the column is resizable.
+     * 
+     * This method checks both the `resizable` property of the column and the `isResizable` method of the datagrid context.
+     * If both are true, it returns true, otherwise it returns false.
+     * 
+     * @returns {boolean} Whether the column is resizable.
+     */
+    isResizable(): boolean {
+        return false;
+        return this.props.resizable !== false && !!this.getDatagridContext()?.isResizable();
+    }
+    readonly state: StateExtensions & IDatagridViewColumnState<DataType> = {
+        panResponder: PanResponder.create({
+            onStartShouldSetPanResponder: () => this.isResizable(),
+            onMoveShouldSetPanResponder: () => this.isResizable(),
+            onPanResponderGrant: (evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+                this.panResizingOptions.startX = gestureState.x0;
+                this.panResizingOptions.width = this.panResizingOptions.width || 0;
+            },
+            onPanResponderMove: (evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+                // Calculate the delta movement
+                const { startX, startWidth } = this.panResizingOptions;
+                const dx = gestureState.moveX - startX;
+
+                // Calculate new width ensuring it doesn't go below min width
+                const minWidth = Math.max(this.getMinWidth(), 50); // Default min width
+                const oldWidth = this.panResizingOptions.width;
+                const newWidth = Math.max(minWidth, startWidth + dx);
+                const column = this.getColumn();
+                if (!column) return;
+                this.panResizingOptions.width = newWidth;// Ensure width doesn't go below min width
+                this.getDatagridContext()?.onColumnResize({ column, oldWidth, newWidth, gestureEvent: evt, gestureState });
+            },
+            onPanResponderRelease: () => {
+                this.panResizingOptions.startX = 0;
+                this.panResizingOptions.startWidth = 0;
+            },
+            onPanResponderTerminate: () => {
+                this.panResizingOptions.startX = 0;
+                this.panResizingOptions.startWidth = 0;
+            }
+        })
+    } as any;
     /**
      * Returns the DatagridView context.
      * 
@@ -2933,7 +3201,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         const datagridContext = this.getDatagridContext();
         const children = typeof this.props.renderRowCell == "function" ? this.props.renderRowCell(datagridContext.getCallOptions({ column, rowData: rowData })) : null;
         const testID = this.getTestID();
-        return <View testID={testID} style={[styles.rowCell, this.getStyle()]}>
+        return <View testID={testID} style={[styles.columnHeaderOrCell, this.getStyle()]}>
             <Label wrapText numberOfLines={10} {...labelProps} testID={testID + "-label"} >{
                 children !== null && children != undefined && (["number", "boolean"].includes(typeof children) || children) ? children
                     : this.renderRowCellContent()}</Label>
@@ -2991,6 +3259,58 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         }
         return datagridContext.getTableColumnHeaderStyle(column);
     }
+
+    /**
+     * Returns the width of the column in pixels.
+     * 
+     * This method returns the width of the column by retrieving the column width from the datagrid context.
+     * If the column does not exist or the column width is not specified, this method returns 0.
+     * 
+     * @returns The width of the column in pixels.
+     */
+    getWidth(): number {
+        const column = this.getColumn();
+        if (!column) return 0;
+        return this.getDatagridContext()?.getColumnWidth(column.name) || 0;
+    }
+
+    /**
+     * Returns the minimum width of the column in pixels.
+     * 
+     * This method returns the value of the `minWidth` prop if it is a number, otherwise it returns 0.
+     * 
+     * @returns The minimum width of the column in pixels.
+     */
+    getMinWidth(): number {
+        return defaultNumber(this.props.minWidth);
+    }
+    /**
+     * Returns the style for the column width.
+     * 
+     * This method returns a style object with a single property, `width`, which is the width of the column in pixels.
+     * The width is determined by calling `getWidth`, which returns 0 if the column does not exist or the column width is not specified.
+     * 
+     * @returns The style object with the width of the column in pixels.
+     */
+    getWidthStyle(): IViewStyle {
+        return { width: this.getWidth() };
+    }
+
+
+    renderResizeHandle() {
+        if (!this.isResizable()) return null;
+        return (
+            <View
+                testID={this.getTestID() + "-resize-handle"}
+                style={[styles.resizeHandle, {
+                    borderRightColor: Theme.colors.outline,
+                    backgroundColor: Colors.setAlpha(Theme.colors.surface, 0.2),
+                }]}
+                {...this.state.panResponder.panHandlers}
+            />
+        )
+    }
+
     /**
      * Renders the column as a header.
      * 
@@ -3003,9 +3323,10 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
         const column = this.getColumn();
         if (!this.isValidColumn(column)) return null;
         const datagridContext = this.getDatagridContext();
+        if (!datagridContext) return null;
         const header = typeof this.props.renderHeader == "function" ? this.props.renderHeader(datagridContext.getCallOptions({ column })) : null;
         const testId = this.getTestID();
-        return <Pressable onPress={(event) => { this.sort() }} disabled={!this.isSortable()} style={[styles.columnHeader, this.getStyle()]} testID={testId}>
+        return <Pressable onPress={(event) => { this.sort() }} disabled={!this.isSortable()} style={[styles.columnHeaderOrCell, this.getStyle()]} testID={testId}>
             <View testID={testId + "-content-container"} style={[styles.columnHeaderContentContainer]}>
                 <View testID={testId + "-label-container"} style={[styles.columnHeaderLabelContainer]}>
                     {header && isValidElement(header) ? header : <Label testID={testId + "-label"} textBold {...labelProps} >{this.props.label}</Label>}
@@ -3014,6 +3335,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
                     columnName={column.name}
                     columnType={this.getType()}
                 />
+                {this.renderResizeHandle()}
             </View>
         </Pressable>
     }
@@ -3854,6 +4176,11 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * The default aggregation function to use for columns that support aggregation.
      */
     defaultAggregationFunction?: keyof IDatagridAggregationFunctions;
+
+    /***
+     * Whether the datagrid is resizable.
+     */
+    resizable?: boolean;
 } & PropsExtensions;
 
 
@@ -4152,6 +4479,11 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
      * @returns The rendered header.
      */
     renderHeader?: (options: IDatagridViewCallOptions<DataType> & { column: IDatagridViewStateColumn<DataType> }) => React.ReactNode;
+
+    /**
+     * Whether the column is resizable.
+     */
+    resizable?: boolean;
 }
 
 interface IDatagridViewMeasuredLayout extends LayoutRectangle {
@@ -4350,6 +4682,18 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
      * The default aggregation function to use for columns that support aggregation.
      */
     aggregationFunction: keyof IDatagridAggregationFunctions;
+
+    /***
+     * The width of each column in the DatagridView.
+     * It represents the width of each column in the DatagridView.
+     */
+    columnsWidths: Record<IDatagridViewColumnName<DataType>, number>;
+
+    /***
+     * The width of resized columns in the DatagridView.
+     * It represents the width of resized columns in the DatagridView.
+     */
+    resizedColumnsWidths: Partial<Record<IDatagridViewColumnName<DataType>, number>>;
 };
 
 /**
@@ -4653,18 +4997,10 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row'
     },
-    columnHeader: {
+    columnHeaderOrCell: {
         alignSelf: "flex-start",
         position: "relative",
         flexDirection: "column",
-        paddingVertical: 7,
-        marginHorizontal: 7,
-    },
-    rowCell: {
-        alignSelf: "flex-start",
-        position: "relative",
-        flexDirection: "column",
-        flexWrap: "wrap",
         paddingVertical: 7,
         marginHorizontal: 7,
     },
@@ -4673,6 +5009,7 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         alignItems: "center",
         flexDirection: "row",
+        position: "relative",
     },
     columnHeaderLabelContainer: {
         flexWrap: "wrap",
@@ -4688,6 +5025,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
         paddingVertical: 5,
+    },
+    resizeHandle: {
+        position: 'absolute',
+        top: 0,
+        right: -5,
+        width: 10,
+        height: '100%',
+        zIndex: 10,
+        // Visual indicator for the handle (optional)
+        borderRightWidth: 10,
+    },
+    resizeHandleActive: {
+        width: 14,
+        right: -7,
     },
     button: {
         paddingHorizontal: 7,

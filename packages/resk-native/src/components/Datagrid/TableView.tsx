@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Datagrid, AttachDatagridView, useDatagrid, IDatagridViewRowOrGroup, IDatagridViewName, IDatagridViewGroupedRow, IDatagridViewStateColumn } from "./Datagrid";
-import { FlatList, SectionList, StyleSheet, View } from "react-native";
+import { FlatList, ScrollView, SectionList, StyleSheet, View } from "react-native";
 import test from "node:test";
 import { IViewStyle } from "@src/types";
 import { isNumber } from "@resk/core";
@@ -28,22 +28,14 @@ export class DatagridTableView<DataType extends object = any> extends Datagrid.V
         return "table";
     }
     getColumnWidthStyle(column: IDatagridViewStateColumn<DataType>): IViewStyle {
-        if (!column) return null;
-        if (isNumber(column.width) && column.width > 0) {
-            return { width: column.width };
-        }
-        if (isNumber(column.flex) && column.flex >= 0) {
-            return { flex: column.flex };
-        }
-        return { flex: 1 };
+        if (!this.isValidColumn(column)) return null;
+        return { width: this.getColumnWidth(column.name) };
     }
     getTableCellStyle(column: IDatagridViewStateColumn<DataType>, rowData: DataType): IViewStyle {
-        const s = super.getTableCellStyle(column, rowData);
-        return [s, this.getColumnWidthStyle(column)];
+        return [super.getTableCellStyle(column, rowData), this.getColumnWidthStyle(column)];
     }
     getTableColumnHeaderStyle(column: IDatagridViewStateColumn<DataType>): IViewStyle {
-        const s = super.getTableColumnHeaderStyle(column);
-        return [s, this.getColumnWidthStyle(column)];
+        return [super.getTableColumnHeaderStyle(column), this.getColumnWidthStyle(column)];
     }
     renderTableBody() {
         return <DatagridTableViewRendered<DataType>
@@ -107,25 +99,32 @@ function DatagridTableViewRendered<DataType extends object = any>({ context }: {
             }
         ]
     }, [hasGroupedRows, stateData]);
-    return <SectionList<DataType>
-        sections={sections}
-        extraData={hasGroupedRows || isLoading}
-        renderSectionHeader={function ({ section }) {
-            if (!hasGroupedRows) {
-                return null;
-            }
-            return <SectionHeader<DataType>
-                {...section as any}
-            />
-        }}
-        renderItem={function ({ item: rowData, index: rowIndex }: { item: DataType, index: number }) {
-            return <Rows
-                rowData={rowData}
-                rowIndex={rowIndex}
-                datagridContext={context}
-            />
-        }}
-    />
+    const testID = context.getTestID();
+    return <ScrollView
+        horizontal testID={testID + "-horizontal-scrollview"}
+        showsHorizontalScrollIndicator={true}
+        scrollEventThrottle={16}
+        contentContainerStyle={styles.horizontalScrollViewContentContainer} style={[styles.horizontalScrollView]}>
+        <SectionList<DataType>
+            sections={sections}
+            extraData={hasGroupedRows || isLoading}
+            renderSectionHeader={function ({ section }) {
+                if (!hasGroupedRows) {
+                    return null;
+                }
+                return <SectionHeader<DataType>
+                    {...section as any}
+                />
+            }}
+            renderItem={function ({ item: rowData, index: rowIndex }: { item: DataType, index: number }) {
+                return <Rows
+                    rowData={rowData}
+                    rowIndex={rowIndex}
+                    datagridContext={context}
+                />
+            }}
+        />
+    </ScrollView>
 }
 
 function Rows<DataType extends object = any>({ datagridContext, rowData, rowIndex }: IDatagridTableViewCommonProps<DataType> & { rowData: DataType, rowIndex: number }): JSX.Element | null {
@@ -166,6 +165,12 @@ function t() {
 }
 
 const styles = StyleSheet.create({
+    horizontalScrollView: {
+        flex: 1,
+    },
+    horizontalScrollViewContentContainer: {
+        flexGrow: 1,
+    },
     headersContainer: {
         alignSelf: "flex-start",
         width: "100%",

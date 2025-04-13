@@ -70,6 +70,7 @@ I18nClass.RegisterTranslations({
                 "includeColumnLabelInGroupedRowHeader": "Include column label in grouped row header",
                 "showAggregatedValues": "Show Aggregated Values",
                 "hideAggregatedValues": "Hide Aggregated Values",
+                "abreviateAggregatableValues": "Abreviate Aggregatable Values",
                 "pagination": {
                     "pageSize": "Pagination Page size",
                     "goToFirstPage": "Go to first page",

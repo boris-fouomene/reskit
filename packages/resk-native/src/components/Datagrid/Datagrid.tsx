@@ -354,11 +354,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * The object returned by this method is a record of aggregated values, where each key is the column name and each value is an object containing the aggregated values for that column.
      * 
-     * @returns {Record<string, Record<keyof IDatagridAggregationFunctions, number>>} An object containing the aggregated values for all columns in the grid.
+     * @returns {Record<IDatagridViewColumnName<DataType>, Record<keyof IDatagridAggregationFunctions, number>>} An object containing the aggregated values for all columns in the grid.
      */
-    getAggregatedColumnsValues(): Record<string, Record<keyof IDatagridAggregationFunctions, number>> {
+    getAggregatedColumnsValues(): Record<IDatagridViewColumnName<DataType>, Record<keyof IDatagridAggregationFunctions, number>> {
         const o = this.state.aggregatedColumnsValues;
-        return isObj(o) ? o : {};
+        return isObj(o) ? o : {} as any;
     }
 
     /**
@@ -974,7 +974,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         this.setSessionData("aggregationFunction", r.aggregationFunction);
         this.getToogleableStateKeys().map((key) => {
             const propValue = (this.props as any)[key];
-            (r as any)[key] = defaultBool(sessionData[key], propValue, !["showOnlyAggregatedValues", "includeColumnLabelInGroupedRowHeader"].includes(key as string));
+            (r as any)[key] = defaultBool(sessionData[key], propValue, !["showOnlyAggregatedValues", "abreviateAggregatableValues", "includeColumnLabelInGroupedRowHeader"].includes(key as string));
             if (propValue === false) {
                 (r as any)[key] = false;
             }
@@ -1000,7 +1000,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * the togglable state properties of the DatagridView.
      */
     getToogleableStateKeys(): (keyof IDatagridViewState<DataType, StateExtensions>)[] {
-        return ["showFilters", "showHeaders", "showAggregatedValues", "showActions", "showToolbar", "showOnlyAggregatedValues", "includeColumnLabelInGroupedRowHeader"];
+        return ["showFilters", "showHeaders", "showAggregatedValues", "abreviateAggregatableValues", "showActions", "showToolbar", "showOnlyAggregatedValues", "includeColumnLabelInGroupedRowHeader"];
     }
 
     /**
@@ -1331,6 +1331,29 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         this.toggleShow("showOnlyAggregatedValues");
     }
     /**
+     * Toggles the abbreviation of aggregatable values.
+     * 
+     * This method toggles the `abreviateAggregatableValues` state and persists it to the session data.
+     * 
+     * @returns {void}
+     */
+    toggleAbreviateAggregatableValues() {
+        this.toggleShow("abreviateAggregatableValues");
+        this.trigger("abreviateAggregatableValuesChanged");
+    }
+
+    /**
+     * Checks if the abreviation of aggregatable values can be shown in the datagrid.
+     * 
+     * This method determines if the `abreviateAggregatableValues` state key is currently set to `true` 
+     * in the component's state and is not restricted by the component's props.
+     *
+     * @returns {boolean} - `true` if the abreviation of aggregatable values can be shown, otherwise `false`.
+     */
+    canAbreviateAggregatableValues() {
+        return this.canShow("abreviateAggregatableValues");
+    }
+    /**
      * Toggles the display of headers.
      * 
      * This method simply toggles the `showHeaders` state and persists it to the session data.
@@ -1643,6 +1666,15 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const aggregatableColumns = this.getAggregatableColumns();
         if (!aggregatableColumns.length) return null;
         const menuItems: (IDatagridViewToolbarAction<DataType> | null)[] = [];
+        if (this.isAggregatable()) {
+            const canAbreviateAggregatableValues = this.canAbreviateAggregatableValues();
+            menuItems.push({
+                label: this.translate("abreviateAggregatableValues"),
+                icon: canAbreviateAggregatableValues ? 'check' : null,
+                onPress: this.toggleAbreviateAggregatableValues.bind(this),
+                divider: true,
+            })
+        }
         //const aggregatorFunction = this.getCurrentAggregationFunctionName();
         const aggregationsFunctions = this.getAggregationFunctions();
         const aggregationTranslations = this.getAggregationFunctionsTranslations();
@@ -1659,25 +1691,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 })
             }
         }
-        if (menuItems.length) {
-            menuItems.push({ divider: true });
-        }
-        /* m.push({text:"Abréger les valeurs numériques",textBold:!!this.state.abreviateValues,icon:this.state.abreviateValues?'check':null,onPress:this.toggleAbreviateValues.bind(this)})
-        if(m.length){
-            m.unshift({
-                text : "Fonctions d'aggrégation",
-                icon : "material-functions",
-                style : [{fontWeight:'bold'}],
-                //divider : true,
-            });
-            if(withDivider !== false){
-                m.unshift({divider:true});
-            }
-            if(withDivider !== false){
-                m[m.length-1].divider = true;
-            }
-        } */
-        if (!menuItems.length) return null;
         return <Menu
             items={menuItems}
             anchor={({ openMenu }) => {
@@ -1816,8 +1829,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             if (!isNumber(item)) return null;
             itLimits.push({
                 label: item.formatNumber(),
-                icon: pageSize == item ? 'check' : null,
-                colorScheme: pageSize === item ? "primary" : undefined,
+                icon: pageSize == item ? FontIcon.CHECK : null,
                 onPress: () => {
                     if (item == pageSize) return;
                     this.paginate({
@@ -1869,7 +1881,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     }}
 
                 />
-                <View testID={testID + "-pagination-label"}>
+                <View testID={testID + "-pagination-label"} style={[styles.paginationItem]}>
                     <Label style={{ fontSize: 15 }}>
                         {currentPage.formatNumber()}-{totalPages.formatNumber()}{" / "}{total.formatNumber()}
                     </Label>
@@ -3863,9 +3875,11 @@ function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridViewLoading
 function AggregatedValue<DataType extends object = any>({ values, column }: { values: Record<keyof IDatagridAggregationFunctions, number>, column: IDatagridViewColumnName<DataType> }) {
     const datagridContext = useDatagrid();
     useDatagridOnEvent("aggregationFunctionChanged", true);
+    useDatagridOnEvent("abreviateAggregatableValuesChanged", true);
     const columnObj = datagridContext?.getColumn(column);
     const datagridAggregationFunction = datagridContext?.getAggregationFunction() || "sum";
     const prevDatagridAggregationFunc = usePrevious(datagridAggregationFunction);
+    const abreviate = !!datagridContext?.canAbreviateAggregatableValues();
     const [aggregationFunction, setAggregationFunction] = useState<keyof IDatagridAggregationFunctions>(datagridAggregationFunction);
     useEffect(() => {
         if (datagridAggregationFunction !== aggregationFunction && prevDatagridAggregationFunc !== datagridAggregationFunction) {
@@ -3879,12 +3893,12 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
         if (aggregationFunction == "count") {
             return value.formatNumber();
         }
-        return InputFormatter.formatValue({ ...columnObj, value }).formattedValue;
+        return InputFormatter.formatValue({ ...columnObj, abreviateNumber: abreviate || !!columnObj?.abreviateNumber, value }).formattedValue;
     }
     const aggregatedValue = useMemo(() => {
         if (!isObj(columnObj)) return 0;
         return formatValue(aggregationFunction);
-    }, [values, aggregationFunction, columnObj]);
+    }, [values, aggregationFunction, columnObj, abreviate]);
     const aggregations = datagridContext?.getAggregationFunctions();
     const aggretionsTranslations = datagridContext?.getAggregationFunctionsTranslations();
     const menuItems = useMemo(() => {
@@ -3903,7 +3917,7 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
             });
         }
         return items;
-    }, [aggregationFunction, aggretionsTranslations, values, columnObj]);
+    }, [aggregationFunction, aggretionsTranslations, values, columnObj, abreviate]);
     if (!columnObj || !isObj(values) || !datagridContext || !datagridContext?.canShowAggregatedValues()) return null;
     const testID = datagridContext.getTestID();
     return <Menu
@@ -4435,6 +4449,12 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * @param options An object containing the datagrid context and the pagination configuration.
      */
     onPaginate?: (options: IDatagridViewCallOptions<DataType, IDatagridViewPagination>) => any;
+
+    /***
+     * If true, the values of the aggregatable columns will be abreviated to the first letter of the value.
+     * For example, if the value is "100", it will be abreviated to "1K"
+     */
+    abreviateAggregatableValues?: boolean;
 } & PropsExtensions;
 
 
@@ -4948,6 +4968,11 @@ export type IDatagridViewState<DataType extends object = any, StateExtensions = 
      * It represents the width of resized columns in the DatagridView.
      */
     resizedColumnsWidths: Partial<Record<IDatagridViewColumnName<DataType>, number>>;
+
+    /***
+     * If true, the aggregatable column values will be abreviate
+     */
+    abreviateAggregatableValues: boolean;
 };
 
 /**
@@ -4987,6 +5012,12 @@ export interface IDatagridEventMap {
      * Triggered when the aggregation function is changed.
      */
     aggregationFunctionChanged: string;
+
+
+    /***
+     * Triggered when the abreviateAggregatableValues is changed.
+     */
+    abreviateAggregatableValuesChanged: string;
 }
 
 /**
@@ -5247,6 +5278,7 @@ const styles = StyleSheet.create({
     },
     paginationItem: {
         paddingHorizontal: 7,
+        marginTop: -4,
     },
     disabled: {
         pointerEvents: "none",

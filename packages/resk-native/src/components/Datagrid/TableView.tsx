@@ -1,9 +1,8 @@
 import { useMemo } from "react";
-import { Datagrid, AttachDatagridView, useDatagrid, IDatagridViewRowOrGroup, IDatagridViewName, IDatagridViewGroupedRow, IDatagridViewStateColumn } from "./Datagrid";
-import { FlatList, ScrollView, SectionList, StyleSheet, View } from "react-native";
-import test from "node:test";
+import { Datagrid, AttachDatagridView, IDatagridViewName, IDatagridViewGroupedRow, IDatagridViewStateColumn, IDatagridViewColumnName, IDatagridAggregationFunctions, useDatagrid } from "./Datagrid";
+import { ScrollView, SectionList, StyleSheet, View } from "react-native";
 import { IViewStyle } from "@src/types";
-import { isNumber } from "@resk/core";
+import { isObj } from "@resk/core/utils";
 import { useTheme } from "@theme/index";
 import Label from "@components/Label";
 
@@ -50,33 +49,39 @@ interface IDatagridTableViewCommonProps<DataType extends object = any> {
 interface IDatagridTableViewState<DataType extends object = any> {
 
 }
-
+function AggregatedValues<DataType extends object = any>({ values }: { values: Record<IDatagridViewColumnName<DataType>, Record<keyof IDatagridAggregationFunctions, number>> }) {
+    const datagridContext = useDatagrid();
+    const canShowAggregatedValues = datagridContext?.canShowAggregatedValues();
+    const visibleColumns = datagridContext?.getVisibleColumns();
+    const aggregatedValues = isObj(values) ? values : {} as any;
+    const aggregatedContent = useMemo(() => {
+        if (!canShowAggregatedValues || !datagridContext || !Array.isArray(visibleColumns)) return null;
+        return <View testID={datagridContext?.getTestID() + "-aggregated-values"} style={[styles.headers]}>
+            {visibleColumns.map((column, index) => {
+                return <View key={column.name + "-" + index} testID={datagridContext?.getTestID() + "-aggregated-values-column+" + column.name} style={[datagridContext?.getTableColumnHeaderStyle(column)]}>
+                    {!column.aggregatable ? <Label>{" "}</Label> : <Datagrid.AggregatedValue values={aggregatedValues[column.name]} column={column.name} />}
+                </View>
+            })}
+        </View>
+    }, [visibleColumns, aggregatedValues, canShowAggregatedValues]);
+    if (!canShowAggregatedValues) return null;
+    return aggregatedContent;
+}
 function Columns<DataType extends object = any>({ datagridContext }: IDatagridTableViewCommonProps<DataType>): JSX.Element | null {
     const visibleColumns = datagridContext.getVisibleColumns();
-    const canShowAggregatedValues = datagridContext.canShowAggregatedValues();
-    const aggregatedValues = datagridContext.getAggregatedColumnsValues();
     const theme = useTheme();
     const columns = useMemo(() => {
         return visibleColumns.map((column, index) => {
             return datagridContext.renderTableColumnHeader(column.name, index);
         });
     }, [visibleColumns]);
-    const aggregatedContent = useMemo(() => {
-        if (!canShowAggregatedValues) return null;
-        return <View testID={datagridContext.getTestID() + "-aggregated-values"} style={[styles.headers]}>
-            {visibleColumns.map((column, index) => {
-                return <View key={column.name + "-" + index} testID={datagridContext.getTestID() + "-aggregated-values-column+" + column.name} style={[datagridContext?.getTableColumnHeaderStyle(column)]}>
-                    {!column.aggregatable ? <Label>{" "}</Label> : <Datagrid.AggregatedValue values={aggregatedValues[column.name]} column={column.name} />}
-                </View>
-            })}
-        </View>
-    }, [visibleColumns, aggregatedValues, canShowAggregatedValues]);
+
     const testID = datagridContext.getTestID();
     return <View testID={testID + "-columns-headers-container"} style={[styles.headersContainer, { borderBottomWidth: 1, borderBottomColor: theme.colors.outline }]}>
         <View testID={datagridContext.getTestID() + "-columns-headers"} style={[styles.headers]}>
             {columns}
         </View>
-        {aggregatedContent}
+        {<AggregatedValues values={datagridContext.getAggregatedColumnsValues()} />}
     </View>;
 }
 Columns.displayName = "DatagridTableView.Columns";
@@ -139,11 +144,12 @@ function Rows<DataType extends object = any>({ datagridContext, rowData, rowInde
 }
 Rows.displayName = "DatagridTableView.Rows";
 
-function SectionHeader<DataType extends object = any>({ datagridGroupedRowKey, label }: IDatagridViewGroupedRow<DataType>) {
+function SectionHeader<DataType extends object = any>({ datagridGroupedRowKey, label, aggregatedColumnsValues }: IDatagridViewGroupedRow<DataType>) {
     return <>
         <View style={[styles.sectionHeader]}>
             <Label textBold colorScheme="primary">{label}</Label>
         </View>
+        <AggregatedValues values={aggregatedColumnsValues} />
     </>
 }
 

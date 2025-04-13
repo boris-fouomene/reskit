@@ -998,7 +998,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         const pagination = Object.assign({}, sessionData.pagination);
         const result = {};
         this.persistablePaginationOptions.map((o) => {
-            if (isNumber(sessionData[o]) && pagination[0] > 0) {
+            if (isNumber(pagination[o]) && pagination[o] > 0) {
                 (result as any)[o] = pagination[o];
             }
         });

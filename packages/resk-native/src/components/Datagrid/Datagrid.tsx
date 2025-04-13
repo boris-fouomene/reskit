@@ -925,6 +925,14 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             direction = String(cDirection).toLowerCase() === "asc" ? "desc" : "asc";
         }
         const orderBy: IDatagridViewOrderBy<DataType> = { column: colName, direction };
+        if (!this.canSortInternally()) {
+            if (typeof this.props.onSort === "function") {
+                this.updateState({ orderBy }, () => {
+                    (this.props.onSort as any)(this.getCallOptions({ ...orderBy, ignoreCase: column.ignoreCaseWhenSorting }));
+                });
+            }
+            return;
+        }
         this.setIsLoading(true, () => {
             this.updateState({ orderBy, ...this.processData({ orderBy }) }, () => {
                 this.setSessionData("orderBy", orderBy);
@@ -2055,6 +2063,29 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             !!Array.isArray((rowData as IDatagridViewGroupedRow).data) &&
             !!(rowData as IDatagridViewGroupedRow).isDatagridGroupedRowData && !!isNonNullString((rowData as IDatagridViewGroupedRow).label);
     }
+
+    /**
+     * Checks if the DatagridView can sort the data internally.
+     * 
+     * This method checks if the `onSort` property is not a function, which means that the DatagridView should sort the data internally.
+     * When `onSort` is a function, the DatagridView will not sort the data internally and will instead rely on the parent component to sort the data.
+     * 
+     * @returns {boolean} - Returns true if the DatagridView can sort the data internally, otherwise false.
+     */
+    canSortInternally() {
+        return typeof this.props.onSort !== "function";
+    }
+    /**
+     * Checks if the DatagridView can paginate the data internally.
+     * 
+     * This method checks if the `onPaginate` property is not a function, which means that the DatagridView should paginate the data internally.
+     * When `onPaginate` is a function, the DatagridView will not paginate the data internally and will instead rely on the parent component to paginate the data.
+     * 
+     * @returns {boolean} - Returns true if the DatagridView can paginate the data internally, otherwise false.
+     */
+    canPaginateInternally() {
+        return typeof this.props.onPaginate !== "function";
+    }
     /**
      * Sorts the data in ascending or descending order according to the specified columns and directions.
      * 
@@ -2065,13 +2096,19 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      */
     internalSort(data: DataType[], orderBy?: IDatagridViewOrderBy<DataType>): DataType[] {
         if (!Array.isArray(data)) return [];
+        if (!this.isSortable()) return data;
         orderBy = Object.assign({}, isObj(orderBy) && orderBy ? orderBy : this.state.orderBy);
-        const sortColumn = orderBy.column, sortDirection = isNonNullString(orderBy.direction) && ["asc", "desc"].includes(orderBy.direction.toLowerCase()) ? orderBy.direction : "asc";
+        const sortColumn = orderBy.column,
+            sortDirection = isNonNullString(orderBy.direction) && ["asc", "desc"].includes(orderBy.direction.toLowerCase()) ? orderBy.direction : "asc";
         const sortColObj = isNonNullString(sortColumn) && this.getColumn(sortColumn) || null;
+        if (!sortColObj) return data;
+        if (!this.canSortInternally()) {
+            return data;
+        }
         // Multi-field sorting
-        if (data.length && this.isSortable() && sortColObj) {
+        if (data.length) {
             return sortBy<DataType>(data, (item) => this.computeCellValue(sortColObj, item), {
-                direction: orderBy.direction,
+                direction: sortDirection,
                 ignoreCase: sortColObj.ignoreCaseWhenSorting
             })
         }
@@ -2276,7 +2313,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         let { data, orderBy, groupedColumns, pagination, includeColumnLabelInGroupedRowHeader } = Object.assign({}, options);
         let allData: DataType[] = [];
         const paginationConfig: IDatagridPagination = isObj(pagination) ? pagination as IDatagridPagination : isObj(this.state.pagination) ? this.state.pagination : {} as IDatagridPagination;
-        const canPaginate = this.canPaginate();
         data = Array.isArray(data) ? data : Array.isArray(this.state.allData) ? this.state.allData : Array.isArray(this.props.data) ? this.props.data : [];
         groupedColumns = Array.isArray(groupedColumns) ? groupedColumns : Array.isArray(this.state.groupedColumns) ? this.state.groupedColumns : [];
         const groupedRowsByKeys: IDatagridViewState<DataType, StateExtensions>["groupedRowsByKeys"] = {} as IDatagridViewState<DataType, StateExtensions>["groupedRowsByKeys"];
@@ -2301,7 +2337,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         paginationConfig.pageSize = isNumber(paginationConfig.pageSize) && paginationConfig.pageSize > 0 ? paginationConfig.pageSize : 10;
         allData = this.internalSort(allData, orderBy);
         let paginatedData: DataType[] = allData;
-        if (canPaginate) {
+        const canPaginate = this.canPaginate();
+        const canPaginateInternally = this.canPaginateInternally();
+
+        if (canPaginate && canPaginateInternally) {
             const { data: rData, meta } = ResourcePaginationHelper.paginate(allData, paginationConfig.total, {
                 ...paginationConfig,
                 limit: paginationConfig.pageSize,
@@ -4181,6 +4220,20 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * Whether the datagrid is resizable.
      */
     resizable?: boolean;
+
+    /***
+     * A callback function that is called when the datagrid is sorted.
+     * if specified, it will be called when the datagrid is sorted and the datagrid won't be sorted internally.
+     * @param options An object containing the datagrid context and the order by configuration.
+     */
+    onSort?: (options: IDatagridViewCallOptions<DataType, IDatagridViewOrderBy<DataType>>) => any;
+
+    /***
+     * A callback function that is called when the datagrid is paginated.
+     * if specified, it will be called when the datagrid is paginated and the datagrid won't be paginated internally.
+     * @param options An object containing the datagrid context and the pagination configuration.
+     */
+    onPaginate?: (options: IDatagridViewCallOptions<DataType, IDatagridPagination>) => any;
 } & PropsExtensions;
 
 
@@ -4904,7 +4957,8 @@ export type IDatagridViewName = keyof IDatagridViews;
  */
 export interface IDatagridViewOrderBy<DataType extends object = any> {
     column: IDatagridViewColumnName<DataType>;
-    direction?: IResourceQueryOptionsOrderByDirection
+    direction?: IResourceQueryOptionsOrderByDirection;
+    ignoreCase?: boolean;
 };
 
 /**

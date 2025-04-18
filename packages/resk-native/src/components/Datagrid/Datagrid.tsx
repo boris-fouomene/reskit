@@ -1915,14 +1915,12 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return <View testID={testID + "-pagination-container"}>
             <View style={[styles.paginationContentContainer]} testID={testID + "-pagination-content-container"}>
                 <Menu
-                    testID={testID + "_SimpleSelect"}
-                    anchor={({ openMenu }) => {
-                        return <Pressable style={styles.paginationItem} onPress={() => openMenu()} testID={testID + "-pagination-page-size"}>
-                            <Label colorScheme='primary' fontSize={16}>
-                                {pageSize.formatNumber()}
-                            </Label>
-                        </Pressable>
-                    }}
+                    testID={testID + "pagination-page-size-menu"}
+                    anchor={<View style={styles.paginationItem} testID={testID + "-pagination-page-size"}>
+                        <Label colorScheme='primary' fontSize={16}>
+                            {pageSize.formatNumber()}
+                        </Label>
+                    </View>}
                     items={itLimits}
                 />
                 <Icon
@@ -3998,13 +3996,11 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
     return <Menu
         items={menuItems as any}
         testID={testID + "-aggregated-value-menu"}
-        anchor={({ openMenu }) => {
-            return <Pressable testID={testID + "-aggregated-value-container"} onPress={(e) => { openMenu() }}>
-                <Label textBold numberOfLines={10} wrapText fontSize={16} colorScheme="primary">
-                    {aggregatedValue}
-                </Label>
-            </Pressable>
-        }}
+        anchor={<View testID={testID + "-aggregated-value-container"}>
+            <Label textBold numberOfLines={10} wrapText fontSize={16} colorScheme="primary">
+                {aggregatedValue}
+            </Label>
+        </View>}
     />
 }
 

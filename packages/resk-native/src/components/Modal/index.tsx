@@ -200,19 +200,15 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
   useBackHandler(handleBack);
   return (
     <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"}>
-      <AnimatedPressable
+      <Animated.View
         testID={testID + "-modal-backdrop"}
         style={[
           { backgroundColor: theme.colors.backdrop },
           styles.backdrop,
           styles.absoluteFill,
         ]}
-        onPress={(e: GestureResponderEvent) => {
-          if (fullScreen || dismissable === false) return;
-          handleDismiss(e);
-        }}
       />
-      <Animated.View
+      <AnimatedPressable
         testID={testID + "-modal-content-container"}
         {...contentContainerProps}
         onAccessibilityEscape={() => {
@@ -230,8 +226,12 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
           { opacity: backgroundOpacity },
           contentContainerProps.style,
         ]}
+        onPress={(e: GestureResponderEvent) => {
+          if (fullScreen || dismissable === false) return;
+          handleDismiss(e);
+        }}
       >
-        <Animated.View
+        <AnimatedPressable
           testID={testID}
           {...props}
           style={[
@@ -242,12 +242,17 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
             getAnimatedStyle(),
             props.style,
           ]}
+          onPress={(e: GestureResponderEvent) => {
+            typeof e?.stopPropagation == "function" && e.stopPropagation();
+            typeof e?.preventDefault == "function" && e.preventDefault();
+            return false;
+          }}
         >
           <ModalContext.Provider value={{ ...props, isModal: true, isPureModal: !!pureModal, modalVisible: visible as boolean, isModalClosed: () => !!!visible, isModalOpen: () => !!visible, modalMaxWidth: !fullScreen ? maxWidth : undefined, modalMaxHeight: !fullScreen ? maxHeight : undefined, handleDismiss, onDismiss, dismissable, backgroundOpacity: customBackgroundOpacity, visible, responsive, fullScreen }}>
             {children}
           </ModalContext.Provider>
-        </Animated.View>
-      </Animated.View>
+        </AnimatedPressable>
+      </AnimatedPressable>
     </Portal>
   );
 };
@@ -433,7 +438,8 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     flex: 1,
-    opacity: 1,
+    pointerEvents: "none",
+    opacity: 0.8,
   },
   backdropContent: {
     flex: 1,

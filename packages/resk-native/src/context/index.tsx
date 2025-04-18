@@ -21,6 +21,7 @@ import { StatusBar } from '@components/StatusBar';
 import { BottomSheet } from '@components/BottomSheet';
 import { ReskNativeEvents } from "./events";
 import { useColorScheme } from "@theme/useColorScheme";
+import { Form } from "@components/Form";
 
 export * from "./types";
 
@@ -145,6 +146,8 @@ export function ReskNativeProvider({ children, themes, safeAreaInsets, auth, bre
             <Dialog.Alert.Provider />
             <Dialog.Provider.Provider />
             <Drawer.Provider.Provider />
+            <Form.Drawer.Provider />
+            <Form.Dialog.Provider />
             <BottomSheet.Provider.Provider />
             <Drawer renderNavigationView={(drawerState) => {
               return Platform.isClientSide() ? <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} /> : null;

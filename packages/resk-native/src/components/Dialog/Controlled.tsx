@@ -19,10 +19,10 @@ import { IDialogProps } from "./types";
  * 
  * @extends React.Component
  */
-export default class DialogControlled extends React.Component<IDialogControlledProps, IDialogControlledState> {
+export default class DialogControlled<DialogContextExtended = any> extends React.Component<IDialogControlledProps<DialogContextExtended>, IDialogControlledState> {
     isDialog: boolean = true;
     isDialogControlled: boolean = true;
-    constructor(props: IDialogControlledProps) {
+    constructor(props: IDialogControlledProps<DialogContextExtended>) {
         super(props);
         this.state = {
             visible: typeof props.visible === "boolean" ? props.visible : false,
@@ -38,7 +38,7 @@ export default class DialogControlled extends React.Component<IDialogControlledP
      * @param props - Optional properties to update the dialog.
      * @param callback - Optional callback function to execute after the state is updated.
      */
-    toggle(visible: boolean, props?: IDialogControlledProps, callback?: Function) {
+    toggle(visible: boolean, props?: IDialogControlledProps<DialogContextExtended>, callback?: Function) {
         const nState: IDialogControlledState = { visible } as IDialogControlledState;
         if (this.isProvider() && isObj(props)) {
             nState.providerProps = { ...Object.assign({}, props) };
@@ -56,7 +56,7 @@ export default class DialogControlled extends React.Component<IDialogControlledP
      * @param callback - Optional callback function to execute after opening the dialog.
      * @returns {DialogControlled}
      */
-    open(props?: IDialogControlledProps, callback?: Function) {
+    open(props?: IDialogControlledProps<DialogContextExtended>, callback?: Function) {
         this.toggle(true, props, callback);
         return this;
     }
@@ -67,7 +67,7 @@ export default class DialogControlled extends React.Component<IDialogControlledP
      * @param callback - Optional callback function to execute after closing the dialog.
      * @returns {DialogControlled}
      */
-    close(props?: IDialogControlledProps, callback?: Function) {
+    close(props?: IDialogControlledProps<DialogContextExtended>, callback?: Function) {
         this.toggle(false, props, callback);
         return this;
     }
@@ -136,7 +136,7 @@ export default class DialogControlled extends React.Component<IDialogControlledP
         return this.isPreloader() ? "resk-dialog-preloader" : this.isProvider() ? "resk-dialog-provider" : "resk-dialog";
     }
     render() {
-        const { children, indicatorOnRight, indicatorProps, testID: cTestID, onDismiss, ...props } = this.getProps();
+        const { children, indicatorOnRight, context, indicatorProps, testID: cTestID, onDismiss, ...props } = this.getProps();
         const testID = defaultStr(cTestID, this.getTestID());
         const rProps: IDialogControlledProps = { children };
         if (this.isPreloader()) {
@@ -158,7 +158,7 @@ export default class DialogControlled extends React.Component<IDialogControlledP
             {...(props)}
             isPreloader={this.isPreloader()}
             testID={testID}
-            context={this}
+            context={Object.assign({}, context, { dialogContext: this })}
             visible={this.state.visible}
             onDismiss={(event) => {
                 if (typeof onDismiss === 'function' && onDismiss(event) === false) return true;
@@ -169,27 +169,48 @@ export default class DialogControlled extends React.Component<IDialogControlledP
 }
 
 
-export interface IDialogControlledProps extends IDialogProps<DialogControlled> {
+/**
+ * Props for the `DialogControlled` component, extending the base `IDialogProps` interface.
+ *
+ * @template DialogContextExtended
+ *
+ * @property {boolean} [isProvider] - Indicates if the dialog is acting as a provider.
+ * @property {IActivityIndicatorProps} [indicatorProps] - Props for customizing the activity indicator.
+ * @property {boolean} [indicatorOnRight] - Determines if the activity indicator should be displayed on the right side.
+ */
+export interface IDialogControlledProps<DialogContextExtended = any> extends Omit<IDialogProps<DialogContextExtended>, "context"> {
     isProvider?: boolean;//s'il s'agit d'un provider
-    /***
-    * les props à passer au composant ActivityIndicator de react-native lorsqu'il s'agit d'un preloader
-    */
     indicatorProps?: IActivityIndicatorProps;
 
-    /***
-     * spécifie si l'activity indicator sera affiché en position droite du contenu du preloader
-     */
     indicatorOnRight?: boolean;
+    context?: DialogContextExtended & { dialogContext: DialogControlled };
 }
 
-/***
- * interface représentant l'état du dialog controllé
+
+/**
+ * Represents the state of a controlled dialog component.
+ * @typedef IDialogControlledState
  */
 export interface IDialogControlledState {
-    visible: boolean;//si la boite de dialogue est visible
-    isProvider: boolean; //s'il s'agit d'un provider
-    isPreloader?: boolean; //s'il s'agit d'un preloader
-    providerProps: IDialogControlledProps;//les props lorsqu'il s'agit du provider
+    /**
+     * Indicates whether the dialog is currently visible.
+     */
+    visible: boolean;
+
+    /**
+     * Specifies if the dialog is acting as a provider.
+     */
+    isProvider: boolean;
+
+    /**
+     * (Optional) Indicates if the dialog is in a preloader state.
+     */
+    isPreloader?: boolean;
+
+    /**
+     * The properties passed to the dialog provider.
+     */
+    providerProps: IDialogControlledProps;
 }
 
 const styles = StyleSheet.create({

@@ -77,6 +77,9 @@ I18nClass.RegisterTranslations({
                     "goToLastPage": "Go to last page",
                     "goToPreviousPage": "Go to previous page",
                     "goToNextPage": "Go to next page",
+                    "customPageSize": "Custom page size",
+                    "customizePageSizeTitle": "Customize page size",
+                    "saveCustomPageSize": "Save",
                 },
                 "aggregationFunctions": {
                     "sum": "Sum",

@@ -16,6 +16,81 @@ import { IViewStyle } from "@src/types";
 import { FormContext } from "./context";
 import "./types/augmented";
 import { INotifyMessage, Notify } from "@notify/index";
+import { createProvider } from "@utils/provider";
+import { IDialogControlledProps } from "@components/Dialog";
+import DialogControlled from "@components/Dialog/Controlled";
+import { ViewProps } from "react-native";
+import { IDrawerCurrentState, IDrawerProps, IDrawerProviderProps } from "@components/Drawer";
+import Drawer from "@components/Drawer/Drawer";
+
+
+
+
+
+class FormDialogProvider extends createProvider<IFormDialogProps, DialogControlled>(DialogControlled, { isProvider: true }) {
+    /**
+     * Opens a form dialog with the specified properties.
+     *
+     * @param props - The properties for the form dialog, including form data, fields, and callbacks.
+     * @param innerProviderRef - An optional reference to a specific provider instance.
+     * @param callback - An optional callback function to be executed after the dialog is opened.
+     * @returns The result of the `open` method on the provider instance, or `undefined` if the instance is not available.
+     */
+    static open(props: IFormDialogProps, innerProviderRef?: any, callback?: Function) {
+        const instance = this.getProviderInstance(innerProviderRef);
+        if (!instance || typeof instance?.open !== "function") return;
+        const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
+        props.children = <Form name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+        return instance.open(rest, callback);
+    };
+    /**
+     * Closes the form dialog with the specified properties.
+     *
+     * @param props - Optional properties for closing the dialog.
+     * @param innerProviderRef - An optional reference to a specific provider instance.
+     * @param callback - An optional callback function to be executed after the dialog is closed.
+     * @returns The result of the `close` method on the provider instance, or `undefined` if the instance is not available.
+     */
+    static close(props?: IFormDialogProps, innerProviderRef?: any, callback?: Function) {
+        const instance = this.getProviderInstance(innerProviderRef);
+        if (!instance || typeof instance?.close !== "function") return;
+        return instance.close(props, callback);
+    }
+}
+
+
+
+class FormDrawerProvider extends createProvider<IFormDrawerProps & IDrawerProps, Drawer>(Drawer, { permanent: false, isProvider: true }) {
+    /**
+     * Opens the form drawer with the specified properties and optional callback.
+     *
+     * @param props - The properties to configure the form drawer, including form data,
+     *                fields, submission handlers, validation handlers, and additional options.
+     * @param innerProviderRef - An optional reference to a specific provider instance.
+     * @param callback - An optional callback function to execute after the drawer is opened.
+     * @returns The result of the `open` method on the drawer instance, if available.
+     */
+    static open(props: IFormDrawerProps, innerProviderRef?: any, callback?: (options: IDrawerCurrentState) => void) {
+        const instance = this.getProviderInstance(innerProviderRef);
+        if (!instance || typeof instance?.open !== "function") return;
+        const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
+        props.children = <Form name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+        return instance.open(rest, callback);
+    };
+    /**
+     * Closes the form drawer with the specified properties and optional callback.
+     *
+     * @param props - Optional properties to configure the drawer closure behavior.
+     * @param innerProviderRef - An optional reference to a specific provider instance.
+     * @param callback - An optional callback function to execute after the drawer is closed.
+     * @returns The result of the `close` method on the drawer instance, if available.
+     */
+    static close(props?: IDrawerProviderProps, innerProviderRef?: any, callback?: Function) {
+        const instance = this.getProviderInstance(innerProviderRef);
+        if (!instance || typeof instance?.close !== "function") return;
+        return instance.close(props, callback);
+    }
+}
 
 /**
  * Represents a form component that manages its state, fields, and validation.
@@ -554,6 +629,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         this.validationStatus = !!this.validationStatus;
         return validationStatus;
     }
+
     static Loading: React.FC<IFormProps> = (props) => {
         return (
             <View
@@ -612,7 +688,25 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             return content;
         }, [theme, formName, props.isUpdate, data, fields, isLoading, isSubmitting]) as ReactNode[];
     }
+    /**
+     * A provider class for managing dialog interactions with forms. This class extends a base provider
+     * and provides static methods to open and close form dialogs. It integrates with the `DialogControlled`
+     * component and dynamically renders a `Form` component within the dialog.
+     *
+     * @template IFormDialogProps - The interface defining the properties for the form dialog.
+     * @template DialogControlled - The base dialog component to be controlled by this provider.
+     */
+    static Dialog = FormDialogProvider;
 
+    /**
+     * A specialized provider class for managing the lifecycle of a form drawer component.
+     * This class extends a generic provider and integrates with a `Drawer` component to
+     * handle opening and closing of a form drawer with specific properties and behaviors.
+     *
+     * @template IFormDrawerProps - The interface defining the properties for the form drawer.
+     * @template Drawer - The drawer component to be used as the base for this provider.
+     */
+    static Drawer = FormDrawerProvider;
     render() {
         const props = this.componentProps;
         const { formFields, tabs, children: cChildren, header } = this.state;
@@ -704,6 +798,42 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
 }
 
 Form.Loading.displayName = "Form.Loading";
+
+
+interface IFormProviderProps {
+    data?: IFormProps["data"];
+    fields?: IFormProps["fields"];
+    onSubmit?: IFormProps["onSubmit"];
+    beforeSubmit?: IFormProps["beforeSubmit"];
+    onValidate?: IFormProps["onValidate"];
+    onNoValidate?: IFormProps["onNoValidate"];
+    formName?: IFormProps["name"];
+    formProps?: Omit<IFormProps, 'data' | 'fields' | 'onSubmit' | 'beforeSubmit' | 'onValidate' | 'onNoValidate' | 'name'>;
+}
+/**
+ * Props for the `FormDialog` component.
+ *
+ * This interface extends `IDialogControlledProps` and includes all properties
+ * from `IFormProps` except those that overlap with `ViewProps`.
+ *
+ * @extends IDialogControlledProps
+ * @extends IFormProviderProps
+ * @template IFormProps - The base form properties.
+ * @template ViewProps - The view properties to omit from `IFormProps`.
+ * @see {@link IDialogControlledProps} for more information about dialog controlled props.
+ * @see {@link IFormProps} for more information about the base form properties.
+ * @see {@link ViewProps} for more information about the view properties.
+ */
+export interface IFormDialogProps extends IDialogControlledProps, IFormProviderProps { }
+
+
+/**
+ * Props for the `FormDrawer` component, combining properties from `IDrawerProps` and `IFormProviderProps`.
+ *
+ * @extends IDrawerProviderProps - Properties related to the drawer functionality.
+ * @extends IFormProviderProps - Properties related to the form provider functionality.
+ */
+export interface IFormDrawerProps extends IDrawerProviderProps, IFormProviderProps { }
 
 
 const styles = StyleSheet.create({

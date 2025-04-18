@@ -13,7 +13,7 @@ import {
     PanResponderGestureState
 } from 'react-native';
 import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted, usePrevious } from '@utils/index';
-import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber, sortBy, extendObj } from '@resk/core/utils';
+import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber, sortBy, extendObj, uniqid } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
 import { IField, IFieldType, IResourcePaginationMetaData, IResourceQueryOptionsOrderByDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
@@ -33,6 +33,7 @@ import { IProgressBarProps, ProgressBar } from '@components/ProgressBar';
 import { Button, IButtonProps } from '@components/Button';
 import { IMenuItemProps, Menu } from '@components/Menu';
 import Breakpoints from '@breakpoints/index';
+import { Form } from '@components/Form';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -1756,9 +1757,16 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (Array.isArray(this.props.pagination?.pageSizes) && this.props.pagination.pageSizes.length) {
             return this.props.pagination.pageSizes;
         }
-        return [5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, ...(Breakpoints.isDesktopMedia() ? [6000, 7000, 8000, 9000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000] : [])];
+        return [0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 10000];
     }
 
+    getCustomPaginationSize(): number | undefined {
+        const customPageSize = this.getSessionData("customPageSize");
+        if (isNumber(customPageSize) && customPageSize > 0) {
+            return customPageSize;
+        }
+        return undefined;
+    }
 
     /**
      * Paginates the data using the given pagination options.
@@ -1776,6 +1784,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         pagination = {
             ...this.state.pagination,
             ...pagination
+        }
+        if (pagination.pageSize !== this.state.pagination?.pageSize) {
+            pagination.currentPage = 1;
         }
         const cb = () => {
             const persistable = {} as any;
@@ -1799,6 +1810,32 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 pagination,
             })
         }, cb);
+    }
+    askForCustomPaginationSize(callback?: (pageSize: number) => any) {
+        const formName = uniqid("custom-pagination-size");
+        Form.Dialog.open({
+            title: this.translate("pagination.customizePageSizeTitle"),
+            formName,
+            actions: [
+                {
+                    label: this.translate("pagination.saveCustomPageSize"),
+                    formName,
+                    icon: "check",
+                }
+            ],
+            onSubmit: ({ data }) => {
+                if (typeof callback === "function" && isNumber(data.pageSize) && data.pageSize > 0) {
+                    callback(data.pageSize);
+                }
+            },
+            fields: {
+                pageSize: {
+                    type: "number",
+                    label: this.translate("pagination.customPageSize"),
+                    defaultValue: this.getCustomPaginationSize(),
+                }
+            },
+        });
     }
 
     /**
@@ -1843,18 +1880,32 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             label: this.translate("pagination.pageSize"),
             divider: true,
         }];
-        this.getPaginationPageSizes().map((item) => {
-            if (!isNumber(item)) return null;
+        const pageSizes = this.getPaginationPageSizes();
+        const customPageSize = this.getCustomPaginationSize();
+        if (isNumber(customPageSize) && customPageSize > 0) {
+            pageSizes.push(customPageSize);
+        }
+        pageSizes.map((item) => {
+            //if (!isNumber(item)) return null;
             itLimits.push({
                 label: item.formatNumber(),
                 icon: pageSize == item ? FontIcon.CHECK : null,
                 onPress: () => {
                     if (item == pageSize) return;
-                    this.paginate({
+                    if (!isNumber(item) || item === 0) {
+                        return this.askForCustomPaginationSize((pageSize) => {
+                            this.paginate({
+                                ...pagination,
+                                pageSize,
+                                currentPage: 1,
+                            });
+                        })
+                    }
+                    return this.paginate({
                         ...pagination,
                         pageSize: item,
                         currentPage: 1,
-                    })
+                    });
                 }
             });
         });

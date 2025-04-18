@@ -156,7 +156,10 @@ export default class DialogControlled<DialogContextExtended = any> extends React
         return <Dialog<DialogControlled>
             {...rProps}
             {...(props)}
-            isPreloader={this.isPreloader()}
+            isPreloader={false}
+            appBarProps={Object.assign({}, props.appBarProps, {
+                context: Object.assign({}, context, props?.appBarProps?.context, { dialogContext: this }),
+            })}
             testID={testID}
             context={Object.assign({}, context, { dialogContext: this })}
             visible={this.state.visible}

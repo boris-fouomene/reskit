@@ -192,6 +192,7 @@ function ModalWrapper<DialogContextExtend = any>({
           ...titleProps,
           ...Object.assign({}, appBarProps?.titleProps),
         }}
+        context={Object.assign({}, context, appBarProps?.context)}
       />
       <DialogTitle
         testID={testID + "-dialog-title"}

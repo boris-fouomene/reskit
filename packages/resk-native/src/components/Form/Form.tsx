@@ -40,7 +40,7 @@ class FormDialogProvider extends createProvider<IFormDialogProps, DialogControll
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.open !== "function") return;
         const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
-        props.children = <Form name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+        rest.children = <Form name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
         return instance.open(rest, callback);
     };
     /**
@@ -74,7 +74,7 @@ class FormDrawerProvider extends createProvider<IFormDrawerProps & IDrawerProps,
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.open !== "function") return;
         const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
-        props.children = <Form name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+        rest.children = <Form name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
         return instance.open(rest, callback);
     };
     /**

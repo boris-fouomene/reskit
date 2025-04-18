@@ -1105,8 +1105,8 @@ export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
 
   /* Overlay styles */
   const overlayOpacity = openValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0.7],
+    inputRange: [0, 0.7],
+    outputRange: [0, 1],
     extrapolate: "clamp",
   });
   const animatedOverlayStyles = { opacity: overlayOpacity };

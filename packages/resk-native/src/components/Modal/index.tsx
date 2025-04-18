@@ -15,7 +15,7 @@ import { useDimensions } from "@dimensions";
 export const AnimatedPressable: React.FC<any> = Animated.createAnimatedComponent(Pressable);
 
 export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: customMaxWidth, maxHeight: customMaxHeight, contentContainerProps, animationDuration, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: customBackgroundOpacity, contentProps, ...props }: IModalProps) => {
-  customBackgroundOpacity = typeof customBackgroundOpacity === "number" ? customBackgroundOpacity : 0.5;
+  customBackgroundOpacity = typeof customBackgroundOpacity === "number" ? customBackgroundOpacity : 1;
   contentProps = Object.assign({}, contentProps);
   animationDuration = typeof animationDuration === "number" ? animationDuration : 300;
   const { height: screenHeight, width: screenWidth, isMobileOrTablet } = useDimensions();
@@ -206,7 +206,6 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
           { backgroundColor: theme.colors.backdrop },
           styles.backdrop,
           styles.absoluteFill,
-          { opacity: backgroundOpacity }
         ]}
       />
       <AnimatedPressable
@@ -224,6 +223,7 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
           modalStyle as any,
           props.style,
           styles.notHidden,
+          { opacity: backgroundOpacity },
           contentContainerProps.style,
         ]}
         onPress={(e: GestureResponderEvent) => {
@@ -382,7 +382,7 @@ export interface IModalProps extends Animated.AnimatedProps<ViewProps> {
   dismissable?: boolean;
 
   /***
-   * The opacity level of the background when the modal is displayed. Defaults to 0.5 if not specified.
+   * The opacity level of the background when the modal is displayed. Defaults to 1 if not specified.
    */
   backgroundOpacity?: number;
   /**
@@ -434,6 +434,7 @@ const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
     pointerEvents: "none",
+    opacity: 1,
   },
   backdropContent: {
     flex: 1,

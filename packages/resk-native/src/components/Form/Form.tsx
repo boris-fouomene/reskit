@@ -40,6 +40,7 @@ class FormDialogProvider extends createProvider<IFormDialogProps, DialogControll
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.open !== "function") return;
         const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
+        //rest.dismissable = typeof rest.dismissable == "boolean" ? rest.dismissable : false;
         rest.children = <Form withScrollView={false} responsive={rest.responsive} name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
         return instance.open(rest, callback);
     };
@@ -860,7 +861,7 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         padding: 10,
-        paddingTop: 15,
+        //paddingTop: 15,
         marginVertical: 2,
         rowGap: 5,
     },

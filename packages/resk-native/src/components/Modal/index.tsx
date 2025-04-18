@@ -200,15 +200,19 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
   useBackHandler(handleBack);
   return (
     <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"}>
-      <Animated.View
+      <AnimatedPressable
         testID={testID + "-modal-backdrop"}
         style={[
           { backgroundColor: theme.colors.backdrop },
           styles.backdrop,
           styles.absoluteFill,
         ]}
+        onPress={(e: GestureResponderEvent) => {
+          if (fullScreen || dismissable === false) return;
+          handleDismiss(e);
+        }}
       />
-      <AnimatedPressable
+      <Animated.View
         testID={testID + "-modal-content-container"}
         {...contentContainerProps}
         onAccessibilityEscape={() => {
@@ -226,10 +230,6 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
           { opacity: backgroundOpacity },
           contentContainerProps.style,
         ]}
-        onPress={(e: GestureResponderEvent) => {
-          if (fullScreen || dismissable === false) return;
-          handleDismiss(e);
-        }}
       >
         <Animated.View
           testID={testID}
@@ -247,7 +247,7 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
             {children}
           </ModalContext.Provider>
         </Animated.View>
-      </AnimatedPressable>
+      </Animated.View>
     </Portal>
   );
 };
@@ -433,7 +433,6 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     flex: 1,
-    pointerEvents: "none",
     opacity: 1,
   },
   backdropContent: {

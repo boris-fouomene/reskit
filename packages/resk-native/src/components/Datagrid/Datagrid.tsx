@@ -1884,7 +1884,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }];
         const pageSizes = this.getPaginationPageSizes();
         const customPageSize = this.getCustomPaginationSize();
-        if (isNumber(customPageSize) && customPageSize > 0) {
+        if (isNumber(customPageSize) && customPageSize > 0 && !pageSizes.includes(customPageSize)) {
             pageSizes.push(customPageSize);
         }
         pageSizes.map((item) => {

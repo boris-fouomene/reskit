@@ -1816,6 +1816,8 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         Form.Dialog.open({
             title: this.translate("pagination.customizePageSizeTitle"),
             formName,
+            responsive: false,
+            fullScreen: false,
             actions: [
                 {
                     label: this.translate("pagination.saveCustomPageSize"),
@@ -1894,6 +1896,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     if (item == pageSize) return;
                     if (!isNumber(item) || item === 0) {
                         return this.askForCustomPaginationSize((pageSize) => {
+                            this.setSessionData("customPageSize", pageSize);
                             this.paginate({
                                 ...pagination,
                                 pageSize,

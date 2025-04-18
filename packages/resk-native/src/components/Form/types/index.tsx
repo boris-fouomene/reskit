@@ -9,6 +9,7 @@ import { IAuthPerm, IDict, IField, IFieldBase, IFields, IFieldType, IResourceNam
 import { IOnChangeOptions, IViewStyle } from "@src/types";
 import { ObservableComponent } from "@utils/index";
 import { ReactElement, ReactNode } from "react";
+import { ScrollViewProps } from "react-native";
 
 /**
  * Represents a collection of form fields in a form.
@@ -1477,6 +1478,18 @@ export interface IFormProps extends Omit<IViewProps, "children"> {
      * @default false
      */
     displayErrorsWhenSubmitting?: boolean;
+
+    /**
+     * If true, the form will be wrapped in a ScrollView
+     * Default is false
+     */
+    withScrollView?: boolean;
+
+    /***
+     * Props to pass to the ScrollView component that wraps the form content.
+     * This allows for further customization of the ScrollView's appearance and behavior.
+     */
+    scrollViewProps?: ScrollViewProps;
 };
 
 /**

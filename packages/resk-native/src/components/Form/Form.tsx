@@ -5,7 +5,7 @@ import { FormsManager } from "./FormsManager";
 import { IFormField, IForm, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormOnSubmitOptions, IFormContext, IFormTabItemProp, IFormAction } from "./types";
 import * as React from "react";
 import { ReactElement, ReactNode, useMemo } from "react";
-import { StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 import Breakpoints from "@breakpoints/index";
 import { Tab } from "@components/Tab";
@@ -27,7 +27,7 @@ import Drawer from "@components/Drawer/Drawer";
 
 
 
-class FormDialogProvider extends createProvider<IFormDialogProps, DialogControlled>(DialogControlled, { isProvider: true }) {
+class FormDialogProvider extends createProvider<IFormDialogProps, DialogControlled>(DialogControlled, { isProvider: true, dismissable: false }) {
     /**
      * Opens a form dialog with the specified properties.
      *
@@ -40,7 +40,7 @@ class FormDialogProvider extends createProvider<IFormDialogProps, DialogControll
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.open !== "function") return;
         const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
-        rest.children = <Form name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+        rest.children = <Form withScrollView={false} responsive={rest.responsive} name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
         return instance.open(rest, callback);
     };
     /**
@@ -73,8 +73,8 @@ class FormDrawerProvider extends createProvider<IFormDrawerProps & IDrawerProps,
     static open(props: IFormDrawerProps, innerProviderRef?: any, callback?: (options: IDrawerCurrentState) => void) {
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.open !== "function") return;
-        const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
-        rest.children = <Form name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+        const { data, withScrollView, scrollViewProps, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
+        rest.children = <Form withScrollView={withScrollView} scrollViewProps={scrollViewProps} name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
         return instance.open(rest, callback);
     };
     /**
@@ -717,6 +717,8 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             tabsProps: tProps,
             mainTabItemProps,
             sessionName,
+            withScrollView,
+            scrollViewProps,
             ...viewProps
         } = this.componentProps;
         const testID = viewProps.testID || "resk-form";;
@@ -770,27 +772,31 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                 </Tab>
             );
         }
+        const Wrapper = withScrollView ? ScrollView : React.Fragment;
+        const wrapperProps = withScrollView ? Object.assign({}, { testID: testID + "-scrollview" }, scrollViewProps) : {};
         return (
             <FormContext.Provider value={{ form: this }}>
-                <View
-                    {...viewProps}
-                    testID={testID}
-                    style={[
-                        tabItems.length ? styles.tabsContainer : styles.formContainer,
-                        responsive !== false && styles.responsiveFormContainer,
-                        style,
-                        submitStyle,
-                    ]}
-                >
-                    {mobile && tabItems.length ? (
-                        tabChildren
-                    ) : (
-                        <>
-                            {children}
-                            {tabChildren}
-                        </>
-                    )}
-                </View>
+                <Wrapper {...wrapperProps}>
+                    <View
+                        {...viewProps}
+                        testID={testID}
+                        style={[
+                            tabItems.length ? styles.tabsContainer : styles.formContainer,
+                            responsive !== false && styles.responsiveFormContainer,
+                            style,
+                            submitStyle,
+                        ]}
+                    >
+                        {mobile && tabItems.length ? (
+                            tabChildren
+                        ) : (
+                            <>
+                                {children}
+                                {tabChildren}
+                            </>
+                        )}
+                    </View>
+                </Wrapper>
             </FormContext.Provider>
         );
     }
@@ -802,6 +808,8 @@ Form.Loading.displayName = "Form.Loading";
 
 interface IFormProviderProps {
     data?: IFormProps["data"];
+    withScrollView?: IFormProps["withScrollView"];
+    scrollViewProps?: IFormProps["scrollViewProps"];
     fields?: IFormProps["fields"];
     onSubmit?: IFormProps["onSubmit"];
     beforeSubmit?: IFormProps["beforeSubmit"];

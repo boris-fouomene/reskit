@@ -578,7 +578,10 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    */
 
   getComponentProps(): Partial<IDrawerProps> {
-    return this.isProvider() ? isObj(this.state.providerProps) ? this.state.providerProps : {} : this.props;
+    if (this.isProvider() && isObj(this.state)) {
+      return isObj(this.state?.providerProps) ? this.state?.providerProps : {};
+    }
+    return this.props;
   }
 
   /**

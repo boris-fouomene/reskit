@@ -22,12 +22,12 @@ const index = withAppBar(() => {
                 <SheetExample />
 
                 <HStack style={[Theme.styles.m2]}>
-                    <View>
+                    <HStack>
                         <Badge colorScheme="primary">Primary</Badge>
                         <Badge colorScheme="secondary">Secondary</Badge>
                         <Badge colorScheme="tertiary">Tertiary</Badge>
                         <Badge colorScheme="error">Error</Badge>
-                    </View>
+                    </HStack>
                     <DatagridExample
                         count={5}
                     />

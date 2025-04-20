@@ -27,8 +27,15 @@ import { StyleSheet, View as RNView } from "react-native";
  * </HStack>
  * ```
  */
-const HStack = forwardRef(({ style, ...props }: IViewProps, ref: React.ForwardedRef<RNView>) => {
-    return <View ref={ref} style={[styles.container, style]} {...props} />
+const HStack = forwardRef(({ style, noWrap, ...props }: IViewProps & {
+    /***
+     * Whether the HStack should wrap its children.
+     * If set to true, the HStack will wrap its children in a View with flexWrap set to wrap.
+     * Default is false
+     */
+    noWrap?: boolean;
+}, ref: React.ForwardedRef<RNView>) => {
+    return <View ref={ref} style={[styles.container, noWrap === true && styles.noWrap, style]} {...props} />
 });
 
 /**
@@ -68,5 +75,8 @@ const styles = StyleSheet.create({
         columnGap: 5,
         alignItems: "center",
         justifyContent: "flex-start",
+    },
+    noWrap: {
+        flexWrap: "nowrap",
     }
 })

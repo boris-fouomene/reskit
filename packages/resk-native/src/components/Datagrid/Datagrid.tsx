@@ -34,6 +34,7 @@ import { Button, IButtonProps } from '@components/Button';
 import { IMenuItemProps, Menu } from '@components/Menu';
 import Breakpoints from '@breakpoints/index';
 import { Form } from '@components/Form';
+import { HStack } from '@components/Stack';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -1642,10 +1643,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         return null;
     }
-    renderViewNamesMenu() {
-        return null;
-    }
-
     /**
      * Retrieves the localized labels for the aggregation functions.
      *
@@ -2054,22 +2051,26 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             items={views.map((view) => {
                 if (!view) return null;
                 delete ((view as any).component);
-                const { name, icon, label, rendable } = view;
+                const { name, label, rendable } = view;
                 if (typeof rendable === "function" && !rendable({ datagrid: this as any })) {
                     return null;
                 }
                 const checked = this.getViewName() === name;
                 return {
                     ...view,
+                    label: label || name,
                     right: checked ? ({ textColor }) => <FontIcon name="check" color={textColor} size={20} /> : undefined,
                     onPress: checked ? undefined : () => {
                         this.onToggleView(name)
                     }
                 };
             })}
-            anchor={<View>
+            anchor={<HStack noWrap>
+                <FontIcon
+                    name="material-display-settings"
+                />
                 <Label>{this.translate("viewsMenuItems")}</Label>
-            </View>}
+            </HStack>}
         />;
     }
     /**
@@ -2174,7 +2175,6 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     items={visibleColumnsMenus}
                 />
                 {this.renderGroupableColumnsMenu()}
-                {this.renderViewNamesMenu()}
                 {this.renderAggregationFunctionsMenu()}
                 {this.renderLastToolbarActions()}
                 {this.renderViewsMenu()}

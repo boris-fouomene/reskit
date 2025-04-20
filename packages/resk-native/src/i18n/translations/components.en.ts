@@ -71,6 +71,7 @@ I18nClass.RegisterTranslations({
                 "showAggregatedValues": "Show Aggregated Values",
                 "hideAggregatedValues": "Hide Aggregated Values",
                 "abreviateAggregatableValues": "Abreviate Aggregatable Values",
+                "viewsMenuItems": "Display View",
                 "pagination": {
                     "pageSize": "Pagination Page size",
                     "goToFirstPage": "Go to first page",

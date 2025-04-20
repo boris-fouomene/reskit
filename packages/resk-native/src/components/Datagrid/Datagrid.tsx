@@ -12,7 +12,7 @@ import {
     GestureResponderEvent,
     PanResponderGestureState
 } from 'react-native';
-import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted, usePrevious } from '@utils/index';
+import { Component, ObservableComponent, getReactKey, getTextContent, measureInWindow, useForceRender, useIsMounted, usePrevious, useStateCallback } from '@utils/index';
 import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber, isObj, isStringNumber, stringify, defaultNumber, sortBy, extendObj, uniqid } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
 import { IField, IFieldType, IResourcePaginationMetaData, IResourceQueryOptionsOrderByDirection } from '@resk/core/types';
@@ -1597,6 +1597,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         });
         if (menuItems.length > 0) {
             return <Menu
+                bottomSheetFullScreen
                 anchor={({ openMenu }) => {
                     return <DatagridToolbarAction icon='format-list-group' title={this.translate("groupTableData")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
                         {this.translate("groupBy")}
@@ -1712,6 +1713,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         return <Menu
             items={menuItems}
+            bottomSheetFullScreen
             anchor={({ openMenu }) => {
                 return <DatagridToolbarAction icon="material-functions" title={this.translate("aggregationFunctionMenuDescription")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
                     {this.translate("aggregationFunctionsLabel")}
@@ -1915,6 +1917,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return <View testID={testID + "-pagination-container"}>
             <View style={[styles.paginationContentContainer]} testID={testID + "-pagination-content-container"}>
                 <Menu
+                    bottomSheetFullScreen
                     testID={testID + "pagination-page-size-menu"}
                     anchor={<View style={styles.paginationItem} testID={testID + "-pagination-page-size"}>
                         <Label colorScheme='primary' fontSize={16}>
@@ -2004,6 +2007,83 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return [];
     }
     /**
+     * Retrieves the list of views that are registered to be displayed in the DatagridView component.
+     * 
+     * The `getViews` method returns an array of objects with the following properties:
+     * - `name`: The name of the view.
+     * - `component`: The component to be rendered for the view.
+     * - Other properties from the `IDatagridRegisterViewOptions` interface.
+     * 
+     * The method takes into account the `viewNames` property of the component and filters out
+     * any views that are not specified in the array. If `viewNames` is not an array, the method
+     * returns all registered views.
+     * 
+     * @returns {Array< IDatagridRegisterViewOptions & {component: typeof DatagridView<DataType>;} >} An array of view options.
+     */
+    getViews(): Array<IDatagridRegisterViewOptions & { component: typeof DatagridView<DataType>; }> {
+        const views = [];
+        const viewsOptions = DatagridView.getRegisteredViewsWithOptions();
+        const possibleDisplayViews: IDatagridViewName[] = Array.isArray(this.props.viewNames) ? this.props.viewNames : [];
+        for (const name in viewsOptions) {
+            if (possibleDisplayViews.length && !possibleDisplayViews.includes(name as any)) {
+                continue;
+            }
+            views.push({
+                name,
+                ...(viewsOptions as any)[name]
+            });
+        }
+        return views;
+    }
+    /**
+     * Renders a menu of available views for the DatagridView component.
+     * 
+     * This method retrieves the views using `getViews`. If there are no views available, it returns `null`.
+     * Otherwise, it returns a `Menu` component containing the views without their component property. 
+     * The menu is anchored by a label displaying a translated string for "viewsMenuItems".
+     * 
+     * @returns {JSX.Element | null} A menu with the available views or null if no views are available.
+     */
+    renderViewsMenu() {
+        const views = this.getViews();
+        if (!views.length) {
+            return null;
+        }
+        return <Menu
+            bottomSheetFullScreen
+            items={views.map((view) => {
+                if (!view) return null;
+                delete ((view as any).component);
+                const { name, icon, label, rendable } = view;
+                if (typeof rendable === "function" && !rendable({ datagrid: this as any })) {
+                    return null;
+                }
+                const checked = this.getViewName() === name;
+                return {
+                    ...view,
+                    right: checked ? ({ textColor }) => <FontIcon name="check" color={textColor} size={20} /> : undefined,
+                    onPress: checked ? undefined : () => {
+                        this.onToggleView(name)
+                    }
+                };
+            })}
+            anchor={<View>
+                <Label>{this.translate("viewsMenuItems")}</Label>
+            </View>}
+        />;
+    }
+    /**
+     * Toggles the datagrid view based on the view name provided.
+     * @param {IDatagridViewName} name The name of the view to toggle.
+     * @fires Datagrid#toggleView
+     */
+    onToggleView(name: IDatagridViewName) {
+        this.trigger("toggleView", name);
+        if (typeof this.props.onToggleView === "function") {
+            this.props.onToggleView(this.getCallOptions({ viewName: name } as any));
+        }
+    }
+    /**
      * Renders the toolbar for the datagrid.
      * 
      * This method will render all the toolbar actions, including the following:
@@ -2080,6 +2160,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     />
                 })}
                 <Menu
+                    bottomSheetFullScreen
                     anchor={({ openMenu }) => {
                         const onPress = () => {
                             openMenu();
@@ -2096,6 +2177,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                 {this.renderViewNamesMenu()}
                 {this.renderAggregationFunctionsMenu()}
                 {this.renderLastToolbarActions()}
+                {this.renderViewsMenu()}
             </View>
         </ScrollView>
     }
@@ -3243,15 +3325,6 @@ export type IDatagridProps<DataType extends object = any, PropsExtensions = unkn
      * @see {@link IDatagridViewName} for more information about view name names.
      */
     viewName?: IDatagridViewName;
-
-    /**
-     * A list of view names to be shown in the datagrid.
-     * 
-     * This property is used to specify a list of view names that should be shown in the datagrid.
-     * 
-     * If provided, it will override the default view names.
-     */
-    viewNames?: IDatagridViewName[];
 } & {
     /**
      * A mapped type that creates a union of props for different views.
@@ -3784,10 +3857,7 @@ const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cV
             viewName: isNonNullString(cViewName) && viewNames.includes(cViewName) ? cViewName : viewNames[0]
         }
     }, [cViewName, cViewNames]);
-    const [state, setState] = useState({ viewName, viewNames });
-    useEffect(() => {
-
-    }, [viewName, viewNames, state]);
+    const [state, setState] = useStateCallback({ viewName, viewNames });
     const { Component, restProps, options: viewOptions } = useMemo<{ Component: typeof DatagridView<DataType>, restProps: any, options: IDatagridRegisterViewOptions }>(() => {
         const { component, ...options } = DatagridView.getRegisteredViewWithOptions(state.viewName);
         return {
@@ -3799,6 +3869,15 @@ const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cV
     return <Component
         {...props as any}
         {...restProps}
+        onToggleView={(options) => {
+            if (!options.viewName || viewName === options.viewName) return;
+            setState({ ...state, viewName: options.viewName }, () => {
+                if (typeof props.onToggleView === "function") {
+                    props.onToggleView(options);
+                }
+            });
+        }}
+        viewNames={viewNames}
     />;
 };
 
@@ -3994,6 +4073,7 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
     if (!columnObj || !isObj(values) || !datagridContext || !datagridContext?.canShowAggregatedValues()) return null;
     const testID = datagridContext.getTestID();
     return <Menu
+        bottomSheetFullScreen
         items={menuItems as any}
         testID={testID + "-aggregated-value-menu"}
         anchor={<View testID={testID + "-aggregated-value-container"}>
@@ -4526,6 +4606,23 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * For example, if the value is "100", it will be abreviated to "1K"
      */
     abreviateAggregatableValues?: boolean;
+
+    /**
+     * A list of view names to be shown in the datagrid.
+     * 
+     * This property is used to specify a list of view names that should be shown in the datagrid.
+     * 
+     * If provided, it will override the default view names.
+    */
+    viewNames?: IDatagridViewName[];
+
+    /***
+     * A callback function that is called when the user toggles between views.
+     * 
+     * This callback function is called when the user toggles between views using the datagrid's toolbar.
+     * @param options An object containing the datagrid context and the current view name.
+     */
+    onToggleView?: (options: IDatagridViewCallOptions<DataType> & { viewName: IDatagridViewName }) => void;
 } & PropsExtensions;
 
 
@@ -5089,6 +5186,11 @@ export interface IDatagridEventMap {
      * Triggered when the abreviateAggregatableValues is changed.
      */
     abreviateAggregatableValuesChanged: string;
+
+    /***
+     * Triggered when the view is toggled.
+     */
+    toggleView: string;
 }
 
 /**
@@ -5306,6 +5408,14 @@ export interface IDatagridRegisterViewOptions {
      * @default ["mobile","tablet","desktop"]
      */
     optimizedFor?: ("mobile" | "tablet" | "desktop")[];
+
+    /***
+     * A function that determines whether the datagrid view is rendable or not.
+     * 
+     * @param {DatagridView} options - The DatagridView instance.
+     * @returns {boolean} - Returns true if the datagrid view is rendable, otherwise false.
+     */
+    rendable?: (options: { datagrid: DatagridView }) => boolean
 }
 
 

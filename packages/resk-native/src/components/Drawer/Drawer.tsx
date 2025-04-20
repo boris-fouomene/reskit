@@ -4,7 +4,7 @@ import { Fragment, ReactNode, useMemo } from "react";
 import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";
-import { uniqid } from "@resk/core/utils";
+import { defaultStr, isNumber, isObj, uniqid } from "@resk/core/utils";
 import i18n from "@resk/core/i18n";
 import Auth from "@resk/core/auth";
 import { IAuthSessionStorage } from "@resk/core/auth";
@@ -19,7 +19,7 @@ import { Colors, useTheme } from "@theme";
 import { getDrawerWidth } from "./utils";
 import FontIcon from "@components/Icon/Font";
 import { Tooltip } from "@components/Tooltip";
-import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerProviderProps, IDrawerState, IDrawerCurrentState, IDrawerEvent } from "./types";
+import { IDrawer, IDrawerContext, IDrawerPosition, IDrawerProps, IDrawerState, IDrawerCurrentState, IDrawerEvent } from "./types";
 import { DrawerContext } from "./hooks";
 import { dimentionAddListener } from "@dimensions";
 import { IDimensions } from "@dimensions/types";
@@ -119,8 +119,8 @@ const SETTLING = "Settling";
  * @method canBePinned - Checks if the drawer can be pinned.
  * @returns {boolean} - True if the drawer can be pinned, false otherwise.
  *
- * @method getProps - Gets the properties of the drawer.
- * @returns {Partial<IDrawerProps & IDrawerState>} - The properties of the drawer.
+ * @method getComponentProps - Gets the properties of the drawer.
+ * @returns {Partial<IDrawerProps>} - The properties of the drawer.
  *
  * @method getTestID - Gets the test ID of the drawer.
  * @returns {string} - The test ID of the drawer.
@@ -137,10 +137,10 @@ const SETTLING = "Settling";
  * @param {boolean} [handleDrawerWidth] - Optional flag to handle drawer width.
  * @returns {IAppBarProps} - The app bar properties.
  *
- * @method renderProviderTitle - Renders the provider title.
+ * @method renderTitle - Renders the provider title.
  * @returns {ReactNode} - The provider title.
  *
- * @method renderProviderChildren - Renders the provider children.
+ * @method renderChildren - Renders the provider children.
  * @returns {ReactNode} - The provider children.
  *
  * @method renderContent - Renders the content of the drawer.
@@ -172,11 +172,11 @@ const SETTLING = "Settling";
  * @param {string} newState - The new state of the drawer.
  *
  * @method open - Opens the drawer.
- * @param {IDrawerProviderProps} [options] - Optional options for opening the drawer.
+ * @param {IDrawerProps} [options] - Optional options for opening the drawer.
  * @param {boolean | Function} [callback] - Optional flag or function to reset provider properties.
  *
  * @method close - Closes the drawer.
- * @param {IDrawerProviderProps} [options] - Optional options for closing the drawer.
+ * @param {IDrawerProps} [options] - Optional options for closing the drawer.
  * @param {Function} [callback] - Optional callback function to execute after closing.
  *
  * @method _handleDrawerOpen - Handles the drawer open event.
@@ -287,21 +287,21 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
   readonly _dimensionChangedListener = dimentionAddListener(this._onDimensionsChanged.bind(this));
   constructor(props: IDrawerProps) {
     super(props);
-    const isProvider = !!props.isProvider;
     const permSession = this.getSession("permanent");
     let permanent = typeof props.permanent == "boolean" ? props.permanent : typeof permSession === "boolean" ? permSession : !this.isProvider() && canDrawerBeMinimizedOrPermanent();
     if (!canDrawerBeMinimizedOrPermanent()) {
       permanent = false;
     }
-    const drawerShown = !isProvider && permanent ? true : false;
-    const providerProps = Object.assign({}, this.props.providerProps);
+    const drawerShown = !this.isProvider() && permanent ? true : false;
 
     const minimized = typeof this.props.minimized === "boolean" ? this.props.minimized : this.getSession("minimized");
     this.state = {
+      providerProps: {
+        permanent: false,
+        ...(this.isProvider() ? this.props : {}),
+      },
       accessibilityViewIsModal: false,
       drawerShown,
-      isProvider,
-      providerProps: { ...providerProps },
       openValue: new Animated.Value(drawerShown ? 1 : 0) as Animated.Value,
       minimized,
       permanent,
@@ -313,7 +313,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * @returns {boolean} True if the drawer can be minimized, false otherwise.
    */
   isMinimizable(): boolean {
-    return !!this.getProps().minimizable;
+    return !!this.getComponentProps().minimizable;
   }
 
   /**
@@ -374,7 +374,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       });
     };
     if (permanent) {
-      this.open({ callback: cb2 });
+      this.open(undefined, cb2);
     } else {
       cb2();
     }
@@ -407,7 +407,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    */
   isMinimized(): boolean {
     if (!this.isProvider() && !canDrawerBeMinimizedOrPermanent()) return false;
-    return this.isMinimizable() && !!(this.isProvider() ? this.state.providerProps.minimized : this.state.minimized);
+    return this.isMinimizable() && !!(this.state.minimized);
   }
   /**
    * Determines if the drawer should be permanent.
@@ -415,7 +415,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * @returns {boolean} - Returns `true` if the drawer is permanent, otherwise `false`.
    */
   isPermanent(): boolean {
-    return this.isProvider() ? false : this.getProps().permanent || false;
+    return this.isProvider() ? false : this.getComponentProps().permanent || false;
   }
   /**
    * Generates and returns the state options for the drawer component.
@@ -458,9 +458,9 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       return;
     }
     if (this.isOpen()) {
-      this.close({ callback: cb });
+      this.close(cb);
     } else {
-      this.open({ callback: cb });
+      this.open(undefined, cb);
     }
   }
   /**
@@ -468,7 +468,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
   * @returns True if the drawer is a provider, false otherwise.
   */
   isProvider() {
-    return !!this.state?.isProvider;
+    return false;
   }
   /**
    * Returns the width of the device's window, ensuring a minimum width of 280.
@@ -487,7 +487,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    */
   getDrawerPosition(): IDrawerPosition {
     const rtl = I18nManager.isRTL;
-    let position: IDrawerPosition = this.getProps()?.position;
+    let position: IDrawerPosition = this.getComponentProps()?.position;
     if (position !== "left" && position !== "right") {
       position = this.isProvider() ? "right" : "left";
     }
@@ -565,14 +565,20 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     return canDrawerBeMinimizedOrPermanent();
   }
 
+
   /**
    * Retrieves the properties for the Drawer component.
    * 
-   * @returns {Partial<IDrawerProps & IDrawerState>} A partial object containing either the provider properties 
-   * if the component is a provider, or a combination of the component's props and state.
+   * This function determines whether the component is a provider and returns the appropriate
+   * properties based on that condition. If the component is a provider, it returns the provider
+   * properties from the state. Otherwise, it returns the component's own properties.
+   * 
+   * @returns {Partial<IDrawerProps>} A partial object containing either the 
+   * provider properties if the component is a provider, or the component's props.
    */
-  getProps(): Partial<IDrawerProps & IDrawerState> {
-    return this.isProvider() ? this.state.providerProps || {} : { ...this.props, ...this.state };
+
+  getComponentProps(): Partial<IDrawerProps> {
+    return this.isProvider() ? isObj(this.state.providerProps) ? this.state.providerProps : {} : this.props;
   }
 
   /**
@@ -582,7 +588,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * it returns "resk-drawer-provider", otherwise it returns "resk-drawer".
    */
   getTestID(): string {
-    return this.getProps()?.testID || this.isProvider() ? "resk-drawer-provider" : "resk-drawer";
+    return defaultStr(this.getComponentProps()?.testID, this.isProvider() ? "resk-drawer-provider" : "resk-drawer");
   }
 
   /**
@@ -643,7 +649,8 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    */
   getProviderAppBarProps(handleDrawerWidth?: boolean): IAppBarProps {
     const testID = this.getTestID();
-    const appBarProps = Object.assign({}, this.state.providerProps.appBarProps);
+    const props = this.getComponentProps();
+    const appBarProps = Object.assign({}, props.appBarProps);
     return Object.assign(
       {},
       {
@@ -666,24 +673,46 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       appBarProps
     );
   }
-  renderProviderTitle(): ReactNode {
-    const { appBar } = this.state.providerProps;
+  /**
+   * Renders the title of the drawer component. If the component has a `appBar` property and it is a valid
+   * React element, it renders the element. Otherwise, it renders an AppBar component with the properties
+   * retrieved from the {@link getProviderAppBarProps} method.
+   *
+   * @returns {ReactNode} The rendered title, or null if no valid title is provided.
+   */
+  renderTitle(): ReactNode {
+    const { appBar } = this.getComponentProps();
+    if (appBar === false) return null;
     const appBarProps = this.getProviderAppBarProps();
     if (appBar) {
       const aBar: ReactNode = typeof appBar == "function" ? appBar({ drawer: this, appBarProps }) : appBar;
       return isValidElement(aBar) ? aBar : null;
     }
-    if (this.state.providerProps?.appBarProps === null) return null;
-    return <AppBar {...appBarProps} />;
+    return <AppBar {...appBarProps} context={Object.assign({}, appBarProps?.context, { drawer: this })} />;
   }
-  renderProviderChildren(): ReactNode {
+  /**
+   * Renders the children of the drawer component. If the component has a `children` property and it is a valid
+   * React element, it renders the element. Otherwise, it does not render anything.
+   *
+   * @returns {ReactNode} The rendered children, or null if no valid children are provided.
+   */
+  renderChildren(): ReactNode {
+    const { children } = this.getComponentProps();
     return (
       <>
-        {this.renderProviderTitle()}
-        <Fragment key={this.state?.providerProps?.resetProvider !== false && !this._isTogglingFullScreen ? uniqid("drawerId-") : "resetProvider"}>{React.isValidElement(this.state.providerProps?.children) ? this.state.providerProps?.children : null}</Fragment>
+        {this.renderTitle()}
+        <>{React.isValidElement(children) ? children : null}</>
       </>
     );
   }
+
+  /**
+   * Renders the content of the drawer component.
+   *
+   * @returns {ReactNode} A React element that wraps the component's children with a View component.
+   * The View component has a style that includes the main style in the component's styles object.
+   * The test ID of the View component is generated by appending "drawer-content" to the component's test ID.
+   */
   renderContent() {
     return (
       <View style={[styles.main]} testID={this.getTestID() + "drawer-content"}>
@@ -700,7 +729,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * it returns "drawer".
    */
   getSessionName(): string {
-    return this.getProps()?.sessionName || this.isProvider() ? "drawer-provider" : "drawer";
+    return this.getComponentProps()?.sessionName || this.isProvider() ? "drawer-provider" : "drawer";
   }
 
   /**
@@ -717,8 +746,8 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     if (fullScreen || (this.isProvider() && Breakpoints.isMobileMedia())) {
       return Dimensions.get("window").width;
     }
-    const props = this.getProps();
-    return Math.min(typeof props?.drawerWidth == "number" ? props?.drawerWidth : getDrawerWidth(this.isProvider()));
+    const props = this.getComponentProps();
+    return Math.min(isNumber(props.drawerWidth) && props.drawerWidth > 0 ? props?.drawerWidth : getDrawerWidth(this.isProvider()));
   }
   /**
    * Retrieves the current authentication session storage.
@@ -753,8 +782,9 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
 
   _onOverlayClick(e: GestureResponderEvent): void {
     e.stopPropagation();
-    if (this.getProps()?.closeOnOverlayClick === false) return;
-    if (this.getProps()?.onOverlayClick && (this.getProps() as IDict)?.onOverlayClick({ event: e, ...this.getStateOptions() }) === false) return;
+    const { onOverlayClick, closeOnOverlayClick } = this.getComponentProps();
+    if (closeOnOverlayClick === false) return;
+    if (typeof onOverlayClick === "function" && onOverlayClick({ event: e, ...this.getStateOptions() }) === false) return;
     if (!this._isLockedClosed() && !this._isLockedOpen()) {
       this.close();
     }
@@ -775,12 +805,12 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
   /**
    * Opens the drawer with the specified options.
    *
-   * @param {IDrawerProviderProps} [options={}] - The options for opening the drawer.
+   * @param {IDrawerProps} [options={}] - The options for opening the drawer.
    * @param {boolean | Function} [callback=false] - Determines whether to reset provider props or a function that is call after the drawer is opened.
    *
    * @returns {Drawer}
    */
-  open(options: IDrawerProviderProps = {}, callback: boolean | Function = false): Drawer {
+  open(options: IDrawerProps = {}, callback: boolean | Function = false): Drawer {
     options = Object.assign({}, options);
     const cb = () => {
       this._emitStateChanged(SETTLING);
@@ -796,31 +826,14 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
         if (typeof callback == "function") {
           callback = callback(this.getStateOptions());
         }
-        if (typeof options.callback == "function" && options.callback !== callback) {
-          options.callback(this.getStateOptions());
-        }
-        if (this.isProvider()) {
-          if (this.state.providerProps.onDrawerOpen) {
-            this.state.providerProps.onDrawerOpen(this.getStateOptions());
-          }
-        } else if (this.props.onDrawerOpen) {
-          this.props.onDrawerOpen(this.getStateOptions());
+        const { onDrawerOpen } = this.getComponentProps();
+        if (typeof onDrawerOpen === "function") {
+          onDrawerOpen(this.getStateOptions());
         }
       });
     };
-
     if (this.isProvider()) {
-      callback = options?.resetProvider !== false || callback;
-      this.setState(
-        {
-          providerProps: callback
-            ? Object.assign({}, options, { resetProvider: callback })
-            : {
-              ...Object.assign({}, this.state.providerProps),
-              ...options,
-              resetProvider: callback,
-            },
-        },
+      this.setState({ providerProps: Object.assign({}, this.state.providerProps, options) },
         cb
       );
     } else {
@@ -833,7 +846,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
   /**
    * Closes the drawer with optional settings and a callback function.
    * 
-   * @param {IDrawerProviderProps} [options] - Optional settings for closing the drawer.
+   * @param {IDrawerProps} [options] - Optional settings for closing the drawer.
    * @param {Function} [callback] - Optional callback function to be called after the drawer is closed.
    * @returns {Drawer}, The drawer instance
    * 
@@ -850,29 +863,17 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * - If the drawer is not permanent and is currently open, animates the drawer to a closed state and then calls the `end` function.
    * - If the drawer is already closed or permanent, directly calls the `end` function.
    */
-  close(options?: IDrawerProviderProps, callback?: Function): Drawer {
-    options = Object.assign({}, options);
+  close(callback?: Function): Drawer {
     this._emitStateChanged(SETTLING);
     callback = typeof callback == "function" ? callback : undefined;
-    /*************  ✨ Codeium Command ⭐  *************/
-    /**
-     * A callback function that is called when the drawer is closed. It is used to cleanup and emit the CLOSED event.
-     * @param {IDrawerCurrentState} options - The options passed to the drawer.
-     */
     /******  f1cf9943-958c-4b60-8b76-104ac1d2c950  *******/
     const end = () => {
       if (typeof callback == "function") {
         callback(this.getStateOptions());
       }
-      if (typeof options?.callback == "function" && options.callback !== callback) {
-        options.callback(this.getStateOptions());
-      }
-      if (this.isProvider()) {
-        if (this.state.providerProps.onDrawerClose) {
-          this.state.providerProps.onDrawerClose(this.getStateOptions());
-        }
-      } else if (this.props.onDrawerClose) {
-        this.props.onDrawerClose(this.getStateOptions());
+      const { onDrawerClose } = this.getComponentProps();
+      if (typeof onDrawerClose === "function") {
+        onDrawerClose(this.getStateOptions());
       }
       this._emitStateChanged(IDLE);
       this.trigger("closed", this.getStateOptions());
@@ -883,7 +884,6 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
         bounciness: 0,
         restSpeedThreshold: 1,
         useNativeDriver,
-        ...options,
       }).start(end);
     } else end();
     return this;
@@ -977,9 +977,9 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     const THRESHOLD = this.getThreshold();
     if (this.getDrawerPosition() === "left") {
       if ((vx > 0 && moveX > THRESHOLD) || vx >= VX_MAX || (isWithinVelocityThreshold && previouslyOpen && moveX > THRESHOLD)) {
-        this.open({ velocity: vx });
+        this.open();
       } else if ((vx < 0 && moveX < THRESHOLD) || vx < -VX_MAX || (isWithinVelocityThreshold && !previouslyOpen)) {
-        this.close({ velocity: vx });
+        this.close();
       } else if (previouslyOpen) {
         this.open();
       } else {
@@ -987,9 +987,9 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
       }
     } else {
       if ((vx < 0 && moveX < THRESHOLD) || vx <= -VX_MAX || (isWithinVelocityThreshold && previouslyOpen && moveX < THRESHOLD)) {
-        this.open({ velocity: -1 * vx });
+        this.open();
       } else if ((vx > 0 && moveX > THRESHOLD) || vx > VX_MAX || (isWithinVelocityThreshold && !previouslyOpen)) {
-        this.close({ velocity: -1 * vx });
+        this.close();
       } else if (previouslyOpen) {
         this.open();
       } else {
@@ -1067,9 +1067,10 @@ export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
   const theme = useTheme();
   const { i18n } = useReskNative();
   const locale = i18n.getLocale();
+  const drawerProps = drawer.getComponentProps();
   const children = useMemo(() => {
-    return drawer.isProvider() ? drawer.renderProviderChildren() : drawer.renderNavigationView();
-  }, [drawer.isProvider(), locale, drawer.state?.providerProps, drawer?.state?.providerProps?.appBarProps, theme, drawer.props.renderNavigationView]);
+    return drawer.isProvider() ? drawer.renderChildren() : drawer.renderNavigationView();
+  }, [drawer.isProvider(), locale, drawerProps.appBarProps, drawerProps.children, drawerProps.appBar, theme, drawerProps.renderNavigationView]);
   const content = useMemo(() => {
     return drawer.renderContent();
   }, [theme, drawer.props.children, locale]);
@@ -1080,14 +1081,13 @@ export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
   const permanent = drawer.isPermanent();
   const { navigationViewRef } = drawer.props;
   const drawerWidth = drawer.getDrawerWidth();
-  const props = drawer.getProps();
   /**
    * We need to use the "original" drawer position here
    * as RTL turns position left and right on its own
    **/
   const posRight = drawer.isPositionRight();
   const dynamicDrawerStyles = {
-    backgroundColor: Colors.isValid(props.backgroundColor) ? props.backgroundColor : theme.colors.surface,
+    backgroundColor: Colors.isValid(drawerProps.backgroundColor) ? drawerProps.backgroundColor : theme.colors.surface,
     width: drawerWidth,
     left: !posRight ? 0 : null,
     right: posRight ? 0 : null,

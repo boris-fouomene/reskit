@@ -76,7 +76,7 @@ const DrawerItem = ({
           return customOnPress(event, context);
         }
       };
-      closeOnPress !== false ? drawer?.close({ callback }) : callback();
+      closeOnPress !== false ? drawer?.close(callback) : callback();
     }}
     testID={testID}
     uppercase={false}

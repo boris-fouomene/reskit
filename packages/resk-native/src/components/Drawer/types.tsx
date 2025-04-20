@@ -108,7 +108,7 @@ export interface IDrawer extends IObservable<IDrawerEvent>, React.PureComponent<
      * Retrieves the properties of the drawer.
      * @returns Partial properties of the drawer.
      */
-    getProps(): Partial<IDrawerProps & IDrawerState>;
+    getComponentProps(): Partial<IDrawerProps>;
 
     /**
      * Retrieves the test ID for the drawer.
@@ -144,13 +144,13 @@ export interface IDrawer extends IObservable<IDrawerEvent>, React.PureComponent<
      * Renders the title for the provider.
      * @returns The title to be rendered for the provider.
      */
-    renderProviderTitle(): React.ReactNode;
+    renderTitle(): React.ReactNode;
 
     /**
      * Renders the children for the provider.
      * @returns The children to be rendered for the provider.
      */
-    renderProviderChildren(): React.ReactNode;
+    renderChildren(): React.ReactNode;
 
     /**
      * Checks if the drawer is a provider.
@@ -272,10 +272,10 @@ export interface IDrawer extends IObservable<IDrawerEvent>, React.PureComponent<
     /**
     * Retrieves the properties for the Drawer component.
     * 
-    * @returns {Partial<IDrawerProps & IDrawerState>} A partial object containing either the provider properties 
+    * @returns {Partial<IDrawerProps>} A partial object containing either the provider properties 
     * if the component is a provider, or a combination of the component's props and state.
     */
-    getProps(): Partial<IDrawerProps & IDrawerState>;
+    getComponentProps(): Partial<IDrawerProps>;
 
 
     /**
@@ -379,17 +379,16 @@ export interface IDrawer extends IObservable<IDrawerEvent>, React.PureComponent<
     /**
      * Opens the drawer with the specified options.
      *
-     * @param {IDrawerProviderProps} [options={}] - The options for opening the drawer.
+     * @param {IDrawerProps} [options={}] - The options for opening the drawer.
      * @param {boolean | Function} [callback=false] - Determines whether to reset provider props or a function that is call after the drawer is opened.
      *
      * @returns {void}
      */
-    open: (options?: IDrawerProviderProps, callback?: boolean | Function) => void;
+    open: (options?: IDrawerProps, callback?: boolean | Function) => void;
 
     /**
      * Closes the drawer with optional settings and a callback function.
      * 
-     * @param {IDrawerProviderProps} [options] - Optional settings for closing the drawer.
      * @param {Function} [callback] - Optional callback function to be called after the drawer is closed.
      * 
      * The function performs the following actions:
@@ -405,7 +404,7 @@ export interface IDrawer extends IObservable<IDrawerEvent>, React.PureComponent<
      * - If the drawer is not permanent and is currently open, animates the drawer to a closed state and then calls the `end` function.
      * - If the drawer is already closed or permanent, directly calls the `end` function.
      */
-    close(options?: IDrawerProviderProps, callback?: Function): void;
+    close(callback?: Function): void;
 
     /**
      * Function to render the navigation view of the drawer.
@@ -485,16 +484,6 @@ export interface IDrawerState {
     minimized?: boolean;
 
     /**
-     * Indicates if the drawer is provided by a provider.
-     */
-    isProvider: boolean;
-
-    /**
-     * Properties of the drawer provider.
-     */
-    providerProps: IDrawerProviderProps;
-
-    /**
      * Animated value representing the open state of the drawer.
      */
     openValue: Animated.Value;
@@ -535,6 +524,11 @@ export interface IDrawerState {
      * Optional.
      */
     fullScreen?: boolean;
+
+    /**
+     * Properties for the drawer provider.
+     */
+    providerProps?: IDrawerProps;
 }
 
 
@@ -549,69 +543,12 @@ export interface IDrawerState {
  */
 export type IDrawerPosition = "left" | "right" | undefined;
 
-
-/**
- * Props for the DrawerProvider component.
- * 
- * @extends IDrawerToggleOptions
- * 
- * @property {IDrawerPosition} [position] - The position of the drawer.
- * @property {boolean} [minimizable] - Indicates if the drawer is minimizable.
- * @property {boolean} [minimized] - Indicates if the drawer is minimized.
- * @property {string} [sessionName] - The name of the session to use for persisting the drawer state.
- * @property {string} [testID] - The test ID of the provider.
- * @property {any} [children] - The child elements.
- * @property {boolean} [closeOnOverlayClick] - Indicates if the drawer will close when clicking on the overlay. This is only applicable when the drawer is in temporary mode.
- * @property {IAppBarProps | null} [appBarProps] - The props for the AppBar component, useful for rendering the AppBar.
- * @property {boolean} [permanent] - Indicates if the provider is permanent.
- * @property {(options: IDrawerCurrentState) => any} [onDrawerOpen] - Callback when the drawer is opened.
- * @property {(options: IDrawerCurrentState) => any} [onDrawerClose] - Callback when the drawer is closed.
- * @property {(options: IDrawerCurrentState) => any} [onOverlayClick] - Callback when clicking on the overlay.
- * @property {number} [drawerWidth] - The width of the drawer.
- * @property {boolean} [resetProvider] - Indicates if the drawer should be reset.
- * @property {ReactNode | ((options: IDrawerContext & { appBarProps: IAppBarProps }) => ReactNode)} [appBar] - The AppBar component to render within the DrawerProvider. This can be a ReactNode or a function that returns a ReactNode when used.
- */
-export interface IDrawerProviderProps extends IDrawerToggleOptions {
-    position?: IDrawerPosition;
-    minimizable?: boolean; //si le drawer est minimizable
-    minimized?: boolean; // si le drawer est minimisé
-    sessionName?: string; //le nom de la session à utiliser pour persister l'état du drawer
-    testID?: string; //le test id du provider
-    children?: any; //la prop enfant
-    closeOnOverlayClick?: boolean; // si le drawer sera fermé lorsqu'on clique sur l'espace vide. c'est valable seulement lorsque le drawer est en mode temporaire
-    appBarProps?: IAppBarProps | null; //les pross du composant AppBar, utiles pour le rendu du appBar
-    permanent?: boolean; //su le provider est permanent
-    onDrawerOpen?: (options: IDrawerCurrentState) => any; //lorsque le drawer est open
-    onDrawerClose?: (options: IDrawerCurrentState) => any; //lorsque le drawer est closed
-    onOverlayClick?: (options: IDrawerCurrentState) => any; //lorsque l'on clique sur l'espace autre que le drawer (overlay)
-    drawerWidth?: number; //la largeur du drawer
-    resetProvider?: boolean; //si le drawer  doit être réinitialisé
-    /****l'on peut directement décider de render l'appBar au composant Drawer provider
-      dans ce cas, il suffit de spécifier la props AppBar de type reactNode ou de type fonction qui lorsqu'elle est utilisée, retourne un reactNode
-    */
-    appBar?: ReactNode | ((options: IDrawerContext & { appBarProps: IAppBarProps }) => ReactNode);
-}
-
-
 /***
  * Interface representing the context of the drawer.
  */
 export interface IDrawerContext {
     drawer: IDrawer;
 }
-
-
-/**
- * Options for toggling the drawer.
- * 
- * This type extends `Animated.SpringAnimationConfig` excluding the `toValue` and `useNativeDriver` properties.
- * 
- * @property {function} [callback] - Optional callback function that receives `IDrawerCurrentState` as an argument.
- */
-export type IDrawerToggleOptions = Omit<Animated.SpringAnimationConfig, "toValue" | "useNativeDriver"> & {
-    callback?: (options: IDrawerCurrentState) => void;
-};
-
 
 /**
  * @interface IDrawerProps
@@ -621,12 +558,6 @@ export type IDrawerToggleOptions = Omit<Animated.SpringAnimationConfig, "toValue
  * @see {@link IViewProps} for more details.
  */
 export interface IDrawerProps extends IViewProps {
-    /**
-     * Indicates if the drawer is a provider.
-     * @default false
-     */
-    isProvider?: boolean;
-
     /**
      * Determines if the drawer can be minimized.
      * @default false
@@ -732,11 +663,6 @@ export interface IDrawerProps extends IViewProps {
     gesturesEnabled?: boolean;
 
     /**
-     * Properties for the drawer provider.
-     */
-    providerProps?: IDrawerProviderProps;
-
-    /**
      * The background color of the drawer.
      */
     backgroundColor?: string;
@@ -762,6 +688,10 @@ export interface IDrawerProps extends IViewProps {
      * @default true
      */
     bindResizeEvent?: boolean;
+
+    appBarProps?: IAppBarProps<IDrawerContext>;
+
+    appBar?: false | JSX.Element | null | ((options: IDrawerContext & { appBarProps: IAppBarProps }) => JSX.Element | null);
 }
 
 

@@ -49,7 +49,6 @@ export default class Preloader extends createProvider<IPreloaderProps, DialogCon
      * This static method retrieves the instance of the Preloader and calls its close method.
      * It passes the provided properties to the close method for any necessary cleanup.
      * 
-     * @param props - Optional properties for closing the preloader dialog.
      * @param ref - An optional ref to access the instance of the DialogControlled.
      * @param callback - An optional callback function that is called after closing the dialog.
      * 
@@ -60,10 +59,10 @@ export default class Preloader extends createProvider<IPreloaderProps, DialogCon
      *     console.log("Preloader closed");
      * });
      */
-    static close(props?: IPreloaderProps, ref?: React.RefObject<DialogControlled>, callback?: Function) {
+    static close(ref?: React.RefObject<DialogControlled>, callback?: Function) {
         const instance = this.getProviderInstance(ref);
         if (!instance || typeof instance?.close !== "function") return;
-        return instance.close(props as IDialogProps, callback);
+        return instance.close(callback);
     }
 }
 

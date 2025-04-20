@@ -77,7 +77,6 @@ export default class DialogAlert extends createProvider<IDialogControlledProps, 
      * This static method retrieves the instance of the DialogAlert and calls its close method.
      * It can also pass properties to the close method for any necessary cleanup.
      * 
-     * @param props - Optional properties for closing the dialog.
      * @param innerProviderRef - An optional reference to access the instance of the DialogControlled.
      * @param callback - An optional callback function that is called after closing the dialog.
      * 
@@ -88,9 +87,9 @@ export default class DialogAlert extends createProvider<IDialogControlledProps, 
      *   console.log("Dialog closed");
      * });
      */
-    static close(props?: IDialogControlledProps, innerProviderRef?: any, callback?: Function) {
+    static close(innerProviderRef?: any, callback?: Function) {
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.close !== "function") return;
-        return instance.close(props, callback);
+        return instance.close(callback);
     }
 }

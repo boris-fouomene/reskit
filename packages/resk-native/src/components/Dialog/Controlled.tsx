@@ -40,7 +40,7 @@ export default class DialogControlled<DialogContextExtended = any> extends React
      */
     toggle(visible: boolean, props?: IDialogControlledProps<DialogContextExtended>, callback?: Function) {
         const nState: IDialogControlledState = { visible } as IDialogControlledState;
-        if (this.isProvider() && isObj(props)) {
+        if (this.isProvider() && isObj(props) && Object.getSize(props, true)) {
             nState.providerProps = { ...Object.assign({}, props) };
         }
         this.setState(nState, () => {
@@ -63,12 +63,11 @@ export default class DialogControlled<DialogContextExtended = any> extends React
     /**
      * Closes the dialog.
      * 
-     * @param props - Optional properties to pass to the dialog.
      * @param callback - Optional callback function to execute after closing the dialog.
      * @returns {DialogControlled}
      */
-    close(props?: IDialogControlledProps<DialogContextExtended>, callback?: Function) {
-        this.toggle(false, props, callback);
+    close(callback?: Function) {
+        this.toggle(false, undefined, callback);
         return this;
     }
     /**

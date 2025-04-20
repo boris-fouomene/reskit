@@ -20,7 +20,7 @@ import { createProvider } from "@utils/provider";
 import { IDialogControlledProps } from "@components/Dialog";
 import DialogControlled from "@components/Dialog/Controlled";
 import { ViewProps } from "react-native";
-import { IDrawerCurrentState, IDrawerProps, IDrawerProviderProps } from "@components/Drawer";
+import { IDrawerCurrentState, IDrawerProps } from "@components/Drawer";
 import Drawer from "@components/Drawer/Drawer";
 
 
@@ -52,16 +52,16 @@ class FormDialogProvider extends createProvider<IFormDialogProps, DialogControll
      * @param callback - An optional callback function to be executed after the dialog is closed.
      * @returns The result of the `close` method on the provider instance, or `undefined` if the instance is not available.
      */
-    static close(props?: IFormDialogProps, innerProviderRef?: any, callback?: Function) {
+    static close(innerProviderRef?: any, callback?: Function) {
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.close !== "function") return;
-        return instance.close(props, callback);
+        return instance.close(callback);
     }
 }
 
 
 
-class FormDrawerProvider extends createProvider<IFormDrawerProps & IDrawerProps, Drawer>(Drawer, { permanent: false, isProvider: true }) {
+class FormDrawerProvider extends createProvider<IFormDrawerProps & IDrawerProps, Drawer>(Drawer, { permanent: false }) {
     /**
      * Opens the form drawer with the specified properties and optional callback.
      *
@@ -81,15 +81,14 @@ class FormDrawerProvider extends createProvider<IFormDrawerProps & IDrawerProps,
     /**
      * Closes the form drawer with the specified properties and optional callback.
      *
-     * @param props - Optional properties to configure the drawer closure behavior.
      * @param innerProviderRef - An optional reference to a specific provider instance.
      * @param callback - An optional callback function to execute after the drawer is closed.
      * @returns The result of the `close` method on the drawer instance, if available.
      */
-    static close(props?: IDrawerProviderProps, innerProviderRef?: any, callback?: Function) {
+    static close(innerProviderRef?: any, callback?: Function) {
         const instance = this.getProviderInstance(innerProviderRef);
         if (!instance || typeof instance?.close !== "function") return;
-        return instance.close(props, callback);
+        return instance.close(callback);
     }
 }
 
@@ -829,10 +828,10 @@ export interface IFormDialogProps extends IDialogControlledProps, IFormProviderP
 /**
  * Props for the `FormDrawer` component, combining properties from `IDrawerProps` and `IFormProviderProps`.
  *
- * @extends IDrawerProviderProps - Properties related to the drawer functionality.
+ * @extends IDrawerProps - Properties related to the drawer functionality.
  * @extends IFormProviderProps - Properties related to the form provider functionality.
  */
-export interface IFormDrawerProps extends IDrawerProviderProps, IFormProviderProps { }
+export interface IFormDrawerProps extends IDrawerProps, IFormProviderProps { }
 
 
 const styles = StyleSheet.create({

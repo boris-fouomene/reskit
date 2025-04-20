@@ -3907,6 +3907,7 @@ const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cV
     }, [cViewName, cViewNames, dimensions.width, dimensions.height]);
     const [state, setState] = useStateCallback({ viewName, viewNames });
     const { Component, restProps, options: viewOptions } = useMemo<{ Component: typeof DatagridView<DataType>, restProps: any, options: IDatagridRegisterViewOptions }>(() => {
+        const optimizedViews = DatagridView.getOptimizedRendableViewOptions();
         const { component, ...options } = DatagridView.getRegisteredViewWithOptions(state.viewName);
         return {
             Component: component,

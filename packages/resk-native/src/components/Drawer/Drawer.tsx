@@ -415,7 +415,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * @returns {boolean} - Returns `true` if the drawer is permanent, otherwise `false`.
    */
   isPermanent(): boolean {
-    return this.isProvider() ? false : this.getComponentProps().permanent || false;
+    return this.isProvider() ? false : this.state.permanent || false;
   }
   /**
    * Generates and returns the state options for the drawer component.

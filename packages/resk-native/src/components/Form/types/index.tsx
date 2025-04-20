@@ -198,7 +198,6 @@ export type IFormManagerEvent = `${IFormEvent}Form` | `${IFormEvent}Action` | `$
 export interface IForm extends ObservableComponent<IFormProps, IFormState, IFormEvent> {
     defaultName: string;
     readonly state: IFormState;
-    componentProps: IFormProps;
     primaryKeyFields: IFields;
     /** Initializes the form component. */
     init(): void;
@@ -1490,6 +1489,12 @@ export interface IFormProps extends Omit<IViewProps, "children"> {
      * This allows for further customization of the ScrollView's appearance and behavior.
      */
     scrollViewProps?: ScrollViewProps;
+
+    /***
+     * If true, the form will be rendered as a table
+     * Default is false
+     */
+    renderAsTable?: boolean;
 };
 
 /**

@@ -166,11 +166,11 @@ export function cloneObject<T = any>(source: T): T {
  * console.log(isObj(obj)); // Outputs: true
  * ```
  */
-export function isObj(obj: any): boolean {
+export function isObj<T = any>(obj: T): obj is IObject<T> {
   return isPlainObj(obj);
 };
 
-
+type IObject<T = any> = T extends IDict ? T : T extends undefined ? never : any;
 /**
  * Calculates the size of an object or array.
  *

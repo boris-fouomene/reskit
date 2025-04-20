@@ -111,6 +111,7 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
     constructor(props: IField) {
         super(props as IField<Type>);
         const value = this.sanitizeValue(props.defaultValue);
+        Object.assign(this.componentProps, props);
         this.state = {
             error: false,
             hasPerformedValidation: false,
@@ -625,6 +626,19 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      */
     getErrorText(): string {
         return defaultStr(this.state.errorText);
+    }
+
+    /**
+     * Updates the component properties when the props change.
+     * 
+     * @param {IField<Type>} nextProps - The new props for the component.
+     * @param {any} nextContext - The new context for the component.
+     * 
+     * @example
+     * // This function is called when the component's props change
+     */
+    componentWillReceiveProps(nextProps: Readonly<IField<Type>>, nextContext: any): void {
+        this.getComponentProps(nextProps);
     }
     /**
      * Retrieves the specific properties for the field.

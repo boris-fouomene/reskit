@@ -17,6 +17,15 @@ export class FormFieldSwitch<Type extends IFieldType = "switch"> extends Field<T
         const { checkedValue, uncheckedValue } = this.getDefaultValues(this.props as any);
         return value === checkedValue ? checkedValue : uncheckedValue;
     }
+    /**
+     * Retrieves and modifies the component properties for the form field switch.
+     * 
+     * @param {IField<Type> | undefined} [props] - Optional properties for the field.
+     * If not provided, default properties from the superclass are used.
+     * 
+     * @returns {IField<Type>} The updated field properties with an additional
+     * style for keyboard event handling added to the container's style.
+     */
     getComponentProps(props?: IField<Type> | undefined): IField<Type> {
         const p = super.getComponentProps(props);
         p.containerProps = Object.assign({}, p.containerProps);

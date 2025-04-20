@@ -130,7 +130,6 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
     private readonly fields: IFormFields = {};
     private errors: string[] = [];
     readonly primaryKeyFields: IFields = {} as IFields;
-    componentProps: IFormProps = {} as IFormProps;
     constructor(props: IFormProps) {
         super(props);
         this.init();
@@ -144,19 +143,19 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
      * @returns {IFormState} - The prepared state for the form.
      */
     prepareState(props?: IFormProps): IFormState {
-        props = this.getComponentProps(props);
-        const fields = (props.fields = this.prepareFields(props));
-        const { tabItems, mobile } = this.renderTabItems(props);
+        const _props = isObj(props) && props ? props : this.props;
+        const fields = this.prepareFields(this.props);
+        const { tabItems, mobile } = this.renderTabItems(_props);
         return {
             isSubmitting: this.state.isSubmitting,
-            formFields: <Form.Fields form={this as IForm}
-                {...this.componentProps}
+            formFields: <Form.Fields form={this as any}
+                {..._props}
                 fields={fields}
                 children={undefined}
             />,
             tabs: { mobile, items: tabItems },
-            children: this.renderChildren(props),
-            header: this.renderHeader(props),
+            children: this.renderChildren(_props),
+            header: this.renderHeader(_props),
         };
     }
     componentDidUpdate(prevProps: Readonly<IFormProps>) {
@@ -221,8 +220,8 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         if (isNonNullString(options.renderTabType)) {
             return options.renderTabType as IFormRenderTabProp;
         }
-        if (isObj(this.componentProps) && isNonNullString(this.componentProps.renderTabType)) {
-            return this.componentProps.renderTabType as IFormRenderTabProp;
+        if (isNonNullString(this.props.renderTabType)) {
+            return this.props.renderTabType as IFormRenderTabProp;
         }
         return "auto";
     }
@@ -234,14 +233,14 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         return defaultStr(this.props.name, this.defaultName);
     }
     getForm(name: string): Form | undefined {
-        return FormsManager.getForm(name) as Form;
+        return FormsManager.getForm(name) as any;
     }
     isDataEditing(props?: IFormProps): boolean {
+        const _props = isObj(props) && props ? props : this.props;
         const p: IFormCallbackOptions = {
             ...this.props,
             ...Object.assign({}, props),
-            fields: props?.fields || this.componentProps?.fields || undefined,
-            form: this
+            form: this as any,
         };
         p.fields = Object.assign({}, p.fields);
         if (this.props.isDataEditing) {
@@ -253,7 +252,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         return !!this.state?.isSubmitting || !!this.props.isSubmitting || false;
     }
     isLoading(options?: IFormProps): boolean {
-        return !!options?.isLoading || !!this.componentProps?.isLoading;
+        return !!options?.isLoading || !!this.props?.isLoading;
     }
     getFields(): { [fieldName: string]: IFormField } {
         return this.fields;
@@ -282,7 +281,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
      * @param {IFormGetDataOptions} [options]
      **/
     getData(options?: IFormGetDataOptions): IFormData {
-        const data = { ...Object.assign({}, this.componentProps.data) };
+        const data = { ...Object.assign({}, this.props.data) };
         if (options?.handleChange === false) {
             return data;
         }
@@ -300,15 +299,6 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         }
         return data;
     }
-    getComponentProps(props?: IFormProps): IFormProps {
-        this.componentProps = {} as IFormProps;
-        props = props || this.props;
-        Object.assign(this.componentProps, {
-            ...Object.assign({}, props),
-            isUpdate: this.isDataEditing(props),
-        });
-        return this.componentProps;
-    }
     getErrors(): string[] {
         return Array.isArray(this.errors) ? this.errors : [];
     }
@@ -316,13 +306,13 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         options = Object.assign({}, options);
         options.formData = this.getData();
         options.form = this;
-        if (this.componentProps?.onKeyboardEvent) {
-            this.componentProps?.onKeyboardEvent(options);
+        if (this.props?.onKeyboardEvent) {
+            this.props?.onKeyboardEvent(options);
         }
         if (options?.key === "enter" && this.isValid()) {
             if (
-                this.componentProps?.onEnterKeyPress &&
-                this.componentProps.onEnterKeyPress(options) === false
+                this.props?.onEnterKeyPress &&
+                this.props.onEnterKeyPress(options) === false
             ) {
                 return;
             }
@@ -357,7 +347,6 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         const { responsive } = p;
         const preparedFields: IFields = {} as IFields;
         const isUpdate = this.isDataEditing(p);
-        this.componentProps.isUpdate = isUpdate;
         for (let i in this.primaryKeyFields) {
             delete this.primaryKeyFields[i as keyof IFields];
         }
@@ -518,10 +507,10 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         if (options) {
             options.isUpdate =
                 !!options.isUpdate ||
-                this.isDataEditing({ ...this.componentProps, ...Object.assign({}, options) });
+                this.isDataEditing({ ...this.props, ...Object.assign({}, options) });
         }
         return new Promise<any>((resolve, reject) => {
-            const callback = this.componentProps?.onSubmit;
+            const callback = this.props?.onSubmit;
             try {
                 resolve(callback ? callback(options) : options);
             } catch (err) {
@@ -537,7 +526,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
      */
     beforeSubmit(options: IFormOnSubmitOptions): Promise<any> {
         return new Promise<any>((resolve, reject) => {
-            const callback = this.componentProps?.beforeSubmit;
+            const callback = this.props?.beforeSubmit;
             try {
                 resolve(callback ? callback(options) : options);
             } catch (err) {
@@ -558,7 +547,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             this.setHasTriedTobeSubmitted(true);
             this.toggleValidationStatus(false);
             const message = this.getErrorText();
-            if (this.componentProps?.displayErrorsWhenSubmitting) {
+            if (this.props?.displayErrorsWhenSubmitting) {
                 Notify.error(message);
             }
             const fields = this.getFields();
@@ -573,7 +562,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         return new Promise((resolve, reject) => {
             const data = this.getData();
             const isUpdate =
-                !!this.componentProps?.isUpdate || this.isDataEditing({ ...this.componentProps, data });
+                !!this.props?.isUpdate || this.isDataEditing({ ...this.props, data });
             const options = { data, isUpdate, form: this };
             return this.beforeSubmit(options).then(() => {
                 this.toggleIsSubmitting(true, () => {
@@ -708,8 +697,9 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
      * @template Drawer - The drawer component to be used as the base for this provider.
      */
     static Drawer = FormDrawerProvider;
+
     render() {
-        const props = this.componentProps;
+        const props = this.props;
         const { formFields, tabs, children: cChildren, header } = this.state;
         const {
             data,
@@ -721,7 +711,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
             withScrollView,
             scrollViewProps,
             ...viewProps
-        } = this.componentProps;
+        } = this.props;
         const testID = viewProps.testID || "resk-form";;
         const isSubmitting = this.isSubmitting() || props?.isSubmitting;
         const tabsProps = Object.assign({}, tProps);

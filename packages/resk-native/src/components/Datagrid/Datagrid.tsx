@@ -3107,6 +3107,54 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     }
 
     /**
+     * Retrieves the component class for a specified view name if it is optimized 
+     * for the current media type.
+     *
+     * This method fetches the registered view options for the given view name 
+     * and checks if the view is optimized for the current media type 
+     * (mobile, tablet, or desktop). If the view is optimized for the current 
+     * media, it returns the associated component class; otherwise, it returns null.
+     *
+     * @param {IDatagridViewName} viewName - The name of the view to retrieve the component for.
+     *
+     * @returns {typeof DatagridView | null} The component class if the view is optimized 
+     * for the current media type, or null if not optimized or not registered.
+     */
+    static getRendableViewComponent(viewName: IDatagridViewName): typeof DatagridView | null {
+        const options = DatagridView.getRegisteredViewWithOptions(viewName);
+        if (!options) return null;
+        if (Array.isArray(options.optimizedFor) && options.optimizedFor.length) {
+            const currentMedia = Breakpoints.isMobileMedia() ? "mobile" : Breakpoints.isTabletMedia() ? "tablet" : "desktop";
+            if (!options.optimizedFor.includes(currentMedia)) {
+                return null;
+            }
+            return options.component;
+        }
+        return null;
+    }
+    /**
+     * Retrieves the names of the views that are optimized for the current media type.
+     *
+     * This method fetches the registered view options and filters out the views that are
+     * not optimized for the current media type (mobile, tablet, or desktop).
+     *
+     * @returns {IDatagridViewName[]} An array of view names that are optimized for the current media type.
+     */
+    static getOptimizedRendableViewOptions() {
+        const views = DatagridView.getRegisteredViewsWithOptions();
+        const optimizedViews = Object.keys(views).filter((viewName) => {
+            const options = views[viewName as keyof typeof views];
+            if (!options) return false;
+            if (Array.isArray(options.optimizedFor) && options.optimizedFor.length) {
+                const currentMedia = Breakpoints.isMobileMedia() ? "mobile" : Breakpoints.isTabletMedia() ? "tablet" : "desktop";
+                return options.optimizedFor.includes(currentMedia);
+            }
+            return true;
+        });
+        return optimizedViews;
+    }
+
+    /**
      * Determines whether the given function is a valid aggregation function for the DatagridView component.
      * 
      * An aggregation function is considered valid if it is a function.
@@ -3848,7 +3896,7 @@ export function AttachDatagridView<DataType extends object = any, PropsExtension
  */
 
 const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType, {}>) {
-    useDimensions();
+    const dimensions = useDimensions();
     const { viewNames, viewName } = useMemo(() => {
         const registeredViewNames = Object.keys(DatagridView.getRegisteredViewsWithOptions()) as IDatagridViewName[];
         const viewNames = (Array.isArray(cViewNames) && cViewNames.length) ? cViewNames.filter((vName) => registeredViewNames.includes(vName)) : registeredViewNames;
@@ -3856,7 +3904,7 @@ const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cV
             viewNames,
             viewName: isNonNullString(cViewName) && viewNames.includes(cViewName) ? cViewName : viewNames[0]
         }
-    }, [cViewName, cViewNames]);
+    }, [cViewName, cViewNames, dimensions.width, dimensions.height]);
     const [state, setState] = useStateCallback({ viewName, viewNames });
     const { Component, restProps, options: viewOptions } = useMemo<{ Component: typeof DatagridView<DataType>, restProps: any, options: IDatagridRegisterViewOptions }>(() => {
         const { component, ...options } = DatagridView.getRegisteredViewWithOptions(state.viewName);

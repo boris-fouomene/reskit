@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { Fragment, ReactNode, useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";
@@ -1027,6 +1027,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     zIndex: 1001,
+    pointerEvents: "auto",
   },
   main: {
     flex: 1,
@@ -1078,7 +1079,7 @@ export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
     return drawer.renderContent();
   }, [theme, drawer.props.children, locale]);
   const { accessibilityViewIsModal, drawerShown, openValue } = drawer.state;
-  const elevation = typeof drawer.props.elevation == "number" ? drawer.props.elevation : 3;
+  const elevation = isNumber(drawer.props.elevation) && drawer.props.elevation >= 0 ? drawer.props.elevation : 3;
   const elev = drawer.isPermanent() ? (theme.elevations[elevation] ?? null) : null;
   const testID = drawer.getTestID();
   const permanent = drawer.isPermanent();

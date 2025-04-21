@@ -16,7 +16,7 @@ import { Drawer } from "@components/Drawer";
 import { DrawerNavigationView } from "@layouts/DrawerNavigationView";
 import { useI18n } from "@src/i18n/hooks";
 import Default from "@auth/hooks";
-import { Notify } from "@notify/index";
+import Notify from "@notify/index";
 import { StatusBar } from '@components/StatusBar';
 import { BottomSheet } from '@components/BottomSheet';
 import { ReskNativeEvents } from "./events";
@@ -137,7 +137,7 @@ export function ReskNativeProvider({ children, themes, safeAreaInsets, auth, bre
       <ReskNativeContext.Provider value={context}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
-            <Notify.Component
+            <Notify
               ref={(el) => {
                 Notify.notifyRef = el;
               }}

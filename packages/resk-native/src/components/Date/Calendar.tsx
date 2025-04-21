@@ -13,7 +13,7 @@ import { TouchableRipple } from "@components/TouchableRipple";
 import Theme, { Colors, IThemeManager, useTheme } from "@theme/index";
 import { IViewStyle } from "@src/types";
 import useStateCallback from "@utils/stateCallback";
-import { Notify } from "@notify";
+import Notify from "@notify";
 import { IModalProps, Modal, useModal } from '@components/Modal';
 import { useDimensions } from "@dimensions/index";
 import { ICON_SIZE, renderCalendar } from "./utils";

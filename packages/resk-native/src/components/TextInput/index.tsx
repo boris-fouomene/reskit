@@ -269,7 +269,7 @@ const iconSize = 25;
 export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, applyErrorColorOnLabel, style: customStyle, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix = false, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>): IUseTextInputProps => {
     const [isFocused, setIsFocused] = React.useState(false);
     const style = StyleSheet.flatten([customStyle])
-    const fontSize = style.fontSize ?? 16;
+    const fontSize = isNumber(style.fontSize) && style.fontSize > 0 ? style.fontSize : 16;
     const { isPhone, isDateOrTime, typeString } = useMemo(() => {
         const t = String(type).toLowerCase();
         return {
@@ -513,8 +513,8 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
         if (String(inputValue).startsWith(dialCode)) {
             return null;
         }
-        return <Label color={textColor}>{dialCode.trim() + " "}</Label>
-    }, [phoneDialCode, isPhone, textColor, inputValue]);
+        return <Label fontSize={fontSize} color={textColor}>{dialCode.trim() + " "}</Label>
+    }, [phoneDialCode, isPhone, textColor, inputValue, fontSize]);
     const phoneCountryFlag = isPhone && SelectCountryComponent ? <>
         <SelectCountryComponent
             multiple={false}

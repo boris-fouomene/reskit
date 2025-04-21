@@ -9,6 +9,7 @@ import View from "@components/View";
 import Theme, { Colors } from "@theme/index";
 import { ISelectCountryProps } from "./types";
 import { SelectCountryRef } from "@components/TextInput/SelectCountryRef";
+import { isNumber } from "@resk/core/utils";
 
 /***
  * The country selector component.
@@ -25,7 +26,7 @@ export const SelectCountry = forwardRef<any, ISelectCountryProps & { displayDial
     anchorProps = Object.assign({}, anchorProps);
     const iconSize = typeof countryFlagProps.size == "number" ? countryFlagProps.size : 24;
     const textColor = customTextColor;
-    const textFontSize = typeof countryFlagProps.textFontSize == "number" ? countryFlagProps.textFontSize : 16;
+    const textFontSize = isNumber(countryFlagProps.textFontSize) && countryFlagProps.textFontSize > 0 ? countryFlagProps.textFontSize : 16;
     const canDisplayDialCode = displayDialCode !== false;
     return <Dropdown<ICountry, ICountryCode>
         ref={ref}
@@ -38,7 +39,7 @@ export const SelectCountry = forwardRef<any, ISelectCountryProps & { displayDial
             return <View style={styles.countryFlagContainer}>
                 <Icon.CountryFlag {...countryFlagProps} countryCode={item.code} size={iconSize} style={[styles.countryFlagIcon, countryFlagProps.style]} />
                 <Label>{item.name}</Label>
-                {canDisplayDialCode && isNonNullString(item.dialCode) ? <Label style={[styles.itemLabel, { fontSize: textFontSize * 0.75 }]}>{"(+" + item.dialCode.ltrim("+")}</Label> : null}
+                {canDisplayDialCode && isNonNullString(item.dialCode) ? <Label style={[styles.itemLabel, { fontSize: textFontSize }]}>{"(+" + item.dialCode.ltrim("+")}</Label> : null}
             </View>;
         }}
         anchor={({ dropdownContext, selectedItems, selectedValues, onPress, disabled }) => {
@@ -50,7 +51,7 @@ export const SelectCountry = forwardRef<any, ISelectCountryProps & { displayDial
                         countryCode={item.code}
                         size={iconSize}
                         style={styles.countryFlag}
-                        fallback={<Label color={textColor} >[{item.code}]</Label>}
+                        fallback={<Label fontSize={textFontSize} color={textColor} >[{item.code}]</Label>}
                     />
                 });
             }, [selectedItems, textColor, iconSize]);

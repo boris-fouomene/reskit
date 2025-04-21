@@ -656,11 +656,11 @@ export class DateHelper {
    * 
    * Example:
    * ```ts
-   * console.log(getCurrentMonthDaysLimits()); // Output: { first: Date, last: Date }
-   * console.log(getCurrentMonthDaysLimits(new Date("2022-01-15"))); // Output: { first: Date, last: Date }
+   * console.log(getCurrentMonthDaysRange()); // Output: { first: Date, last: Date }
+   * console.log(getCurrentMonthDaysRange(new Date("2022-01-15"))); // Output: { first: Date, last: Date }
    * ```
    */
-  static getCurrentMonthDaysLimits = (date?: any): { first: Date, last: Date } => {
+  static getCurrentMonthDaysRange = (date?: any): { first: Date, last: Date } => {
     /**
      * If no date is provided, use the current date.
      * 
@@ -693,11 +693,11 @@ export class DateHelper {
    * 
    * Example:
    * ```ts
-   * console.log(getPreviousWeekDaysLimits()); // Output: { first: Date, last: Date }
-   * console.log(getPreviousWeekDaysLimits(new Date("2022-01-15"))); // Output: { first: Date, last: Date }
+   * console.log(getPreviousWeekDaysRange()); // Output: { first: Date, last: Date }
+   * console.log(getPreviousWeekDaysRange(new Date("2022-01-15"))); // Output: { first: Date, last: Date }
    * ```
    */
-  static getPreviousWeekDaysLimits = (date?: any): { first: Date, last: Date } => {
+  static getPreviousWeekDaysRange = (date?: any): { first: Date, last: Date } => {
     /**
      * If no date is provided, use the current date.
      * 
@@ -758,11 +758,11 @@ export class DateHelper {
    * 
    * Example:
    * ```ts
-   * console.log(getCurrentWeekDaysLimits()); // Output: { first: Date, last: Date }
-   * console.log(getCurrentWeekDaysLimits(new Date("2022-01-15"))); // Output: { first: Date, last: Date }
+   * console.log(getCurrentWeekDaysRange()); // Output: { first: Date, last: Date }
+   * console.log(getCurrentWeekDaysRange(new Date("2022-01-15"))); // Output: { first: Date, last: Date }
    * ```
    */
-  static getCurrentWeekDaysLimits = (date?: any) => {
+  static getCurrentWeekDaysRange = (date?: any) => {
     /**
      * If no date is provided, use the current date.
      * 

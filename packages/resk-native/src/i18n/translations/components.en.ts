@@ -1,3 +1,4 @@
+import { IMongoComparisonOperators, IMongoLogicalOperators, IMongoOperatorName } from "@resk/core/types";
 import { I18nClass } from "@resk/core/i18n";
 I18nClass.RegisterTranslations({
     "en": {
@@ -89,7 +90,59 @@ I18nClass.RegisterTranslations({
                     "count": "Count",
                     "average": "Average",
                 }
-            }
+            },
+            "filters": {
+                "selectValue": "Select a value",
+                "set": "Set",
+                "moduloDivisor": "Divisor",
+                "searchInLabel": "Search in %{label}",
+                "moduloRemainder": "Remainder",
+                "periodFromDate": "From",
+                "periodToDate": "To",
+                "fromValue": "From",
+                "toValue": "To",
+                "moduloDividerMayNotBeNull": "Divisor may not be nulll",
+                "endValueMustBeGreaterThanStartValue": "End value must be greater than Start Value",
+                "setStartAndEndValue": "Set Start and End Value",
+                "operators": {
+                    "$and": "And",
+                    "$or": "Or",
+                    "$nor": "Nor",
+                    "$not": "Not",
+                    "$eq": "Equals",
+                    "$ne": "Not Equals",
+                    "$gt": "Greater Than",
+                    "$gte": "Greater Than or Equals",
+                    "$lt": "Less Than",
+                    "$lte": "Less Than or Equals",
+                    "$in": "In",
+                    "$nin": "Not In",
+                    "$exists": "Exists",
+                    "$type": "Type",
+                    "$regex": "Regex",
+                    "$options": "Options",
+                    "$size": "Size",
+                    "$mod": "Modulo",
+                    "$all": "All",
+                    "$elemMatch": "Element Match",
+                    "$regexEquals": "Equals",
+                    "$regexContains": "Contains",
+                    "$regexNotContains": "Not Contains",
+                    "$regexNotequals": "Not Equals",
+                    "$regexStartswith": "Starts With",
+                    "$regexEndswith": "Ends With",
+                    "$week": "Week",
+                    "$month": "Month",
+                    "$period": "Period",
+                    "$thisday": "This Day",
+                    "$yesterday": "Yesterday",
+                    "$prevWeek": "Previous Week",
+                    "$nextWeek": "Next Week",
+                    "$between": "Between",
+                    "$prevMonth": "Previous Month",
+                    "$nextMonth": "Next Month",
+                } as Record<IMongoOperatorName, string>,
+            },
         }
     }
 });

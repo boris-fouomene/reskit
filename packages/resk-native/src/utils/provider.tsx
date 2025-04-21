@@ -82,8 +82,8 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
          * This static method retrieves the instance of the provider component and calls its close method.
          * It allows for any necessary cleanup to be performed on the provider component.
          * 
-         * @param innerProviderRef - An optional reference to access the instance of the provider component.
          * @param callback - An optional callback function that is called after closing the provider component.
+         * @param innerProviderRef - An optional reference to access the instance of the provider component.
          * 
          * @returns The result of the close method on the provider component, or undefined if the instance is not valid.
          * 
@@ -92,7 +92,7 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
          *     console.log('Provider closed');
          * });
          */
-        static close(innerProviderRef?: any, callback?: Function) {
+        static close(callback?: Function, innerProviderRef?: any) {
             const instance = this.getProviderInstance(innerProviderRef);
             if (!instance || typeof (instance as any)?.close !== "function") return;
             return (instance as any).close(callback);

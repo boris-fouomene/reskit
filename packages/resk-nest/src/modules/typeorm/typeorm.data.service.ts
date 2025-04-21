@@ -1,7 +1,7 @@
 
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { i18n, IClassConstructor, IMongoQuery, IResourceData, IResourceDataService, IResourceManyCriteria, IResourcePrimaryKey, IResourceQueryOptions, isNonNullString, isObj, ResourcePaginationHelper } from "@resk/core";
-import { DataSource, DeepPartial, EntityManager, In, QueryRunner, Repository, FindOptionsWhere, FindManyOptions, MoreThan, MoreThanOrEqual, LessThan, LessThanOrEqual, Not, ILike, IsNull, Like } from "typeorm";
+import { defaultStr, i18n, IClassConstructor, IMongoComparisonOperatorName, IMongoComparisonOperators, IMongoLogicalOperators, IMongoQuery, IResourceData, IResourceDataService, IResourceManyCriteria, IResourcePrimaryKey, IResourceQueryOptions, isEmpty, isNonNullString, isNumber, isObj, ResourcePaginationHelper } from "@resk/core";
+import { DataSource, DeepPartial, EntityManager, In, QueryRunner, Repository, FindOptionsWhere, FindManyOptions, MoreThan, MoreThanOrEqual, LessThan, LessThanOrEqual, Not, ILike, IsNull, Like, ArrayContains, Raw, Equal, FindOperator } from "typeorm";
 
 
 /***
@@ -336,31 +336,62 @@ export class TypeOrmDataService<DataType extends IResourceData = any, PrimaryKey
     }
 }
 
-
+const toArray = (value: any) => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+    if (["number", "string"].includes(typeof value)) {
+        return [value];
+    }
+    return [];
+}
+const stringify = (value: any) => {
+    if (typeof value === "boolean") {
+        return value ? "true" : "false";
+    }
+    return isNonNullString(value) ? value.trim() : isNumber(value) ? String(value) : defaultStr(value?.toString());
+}
+const mongoRegex = (value: string, options?: string) => {
+    const pattern = `%${stringify(value)}%`;
+    return defaultStr(options)?.includes('i') ? ILike(pattern) : Like(pattern);
+}
 
 class MongoToTypeOrmConverter {
-    /**
-     * Converts MongoDB query operators to TypeORM FindOperators
-     */
-    private static operatorMap = {
-        $eq: (value: any) => value,
+    private static operatorMap: Record<IMongoComparisonOperatorName, Function> = {
+        $eq: (value: any) => Equal(value),
         $gt: (value: any) => MoreThan(value),
         $gte: (value: any) => MoreThanOrEqual(value),
         $lt: (value: any) => LessThan(value),
         $lte: (value: any) => LessThanOrEqual(value),
-        $ne: (value: any) => Not(value),
-        $in: (value: any[]) => In(value),
-        $nin: (value: any[]) => Not(In(value)),
-        $regex: (value: string, options?: string) => {
-            const pattern = `%${value}%`;
-            return options?.includes('i') ? ILike(pattern) : Like(pattern);
-        },
-        $exists: (value: boolean) => value ? Not(IsNull()) : IsNull(),
+        $ne: (value: any) => Not(toArray(value)),
+        $in: (value: any[]) => In(toArray(value)),
+        $nin: (value: any[]) => Not(In(toArray(value))),
+        $all: (value: any[]) => ArrayContains(toArray(value)),
+        $regex: mongoRegex,
+        $options: () => undefined,
+        $exists: (value: boolean) => !isEmpty(value) ? Not(IsNull()) : IsNull(),
         $elemMatch: (value: any) => Array.isArray(value) ? In(value) : undefined,
+        $size: (value: any) => Raw(alias => `array_length(${alias}, 1) = :size`, { size: value }),
+        $type: (value: any) => undefined,//Raw(alias => `pg_typeof(${alias}) = '${stringify(value).replace(/'/g, "''")}'::regtype`, {}),
+        $mod: (value: [number, number]) => {
+            if (!Array.isArray(value) || value.length != 2) return undefined;
+            return Raw(alias => `${alias} % :divisor = :remainder`, { divisor: value[0], remainder: [value[1]] });
+        },
     };
 
+
     /**
-     * Main conversion method
+     * Converts a MongoDB query into a TypeORM `FindOptionsWhere` object.
+     * 
+     * This static method takes a MongoDB query object and processes its
+     * conditions, converting them into a format that is compatible with
+     * TypeORM's `FindOptionsWhere`. It supports handling `$or` and `$and`
+     * logical operators, as well as regular field conditions.
+     * 
+     * @template DataType - The type of the data being queried. Defaults to `any`.
+     * @param {any} mongoQuery - The MongoDB query object to be converted.
+     * @returns {FindOptionsWhere<DataType>} - A TypeORM `FindOptionsWhere` object
+     * that represents the equivalent query conditions.
      */
     static convert<DataType = any>(mongoQuery: any): FindOptionsWhere<DataType> {
         // Handle empty query
@@ -391,6 +422,16 @@ class MongoToTypeOrmConverter {
                         }
                     });
                 }
+            } else if (key === '$nor') {
+                // Handle AND conditions
+                if (Array.isArray(value)) {
+                    (value as any).forEach((condition: any) => {
+                        const processed = this.processCondition(condition);
+                        if (typeof processed === "function" || processed instanceof FindOperator || typeof processed === "object" && processed) {
+                            Object.assign(andConditions, Not(processed));
+                        }
+                    });
+                }
             } else {
                 // Handle regular field conditions
                 const processed = this.processCondition({ [key]: value });
@@ -407,8 +448,17 @@ class MongoToTypeOrmConverter {
         return whereConditions.length > 1 ? whereConditions as any : whereConditions[0] || andConditions;
     }
 
+
     /**
-     * Process individual conditions
+     * Processes a condition object to convert MongoDB-style operators into TypeORM-compatible format.
+     * 
+     * This static method takes a condition object and iterates over its fields, converting any
+     * MongoDB-style operators (e.g., `$eq`, `$gt`, etc.) into a format that is compatible with
+     * TypeORM. It handles nested objects and direct field values, ensuring that each condition
+     * is processed appropriately.
+     * 
+     * @param {any} condition - The condition object to process, potentially containing MongoDB-style operators.
+     * @returns {any} - A processed condition object with TypeORM-compatible operators and structure.
      */
     private static processCondition(condition: any): any {
         const result: any = {};
@@ -417,7 +467,7 @@ class MongoToTypeOrmConverter {
                 // Handle operator objects
                 const operators = Object.keys(value);
                 if (operators.some(op => op.startsWith('$'))) {
-                    const v = this.convertOperators(value);
+                    const v = this.convertOperator(value);
                     if (v !== undefined) {
                         result[field] = v;
                     }
@@ -435,15 +485,28 @@ class MongoToTypeOrmConverter {
     }
 
     /**
-     * Convert MongoDB operators to TypeORM operators
+     * Converts a MongoDB-style operator object into a TypeORM-compatible format.
+     * 
+     * This static method takes an operator object (e.g., `{ $eq: 5 }`) and returns
+     * a value that is compatible with TypeORM's filtering capabilities. It supports
+     * a variety of MongoDB-style operators, converting them into the
+     * appropriate TypeORM-compatible format.
+     * 
+     * @param {any} operatorObj - The MongoDB-style operator object to convert.
+     * @returns {any} - A converted value that is compatible with TypeORM's filtering capabilities.
      */
-    private static convertOperators(operatorObj: any): any {
-        for (const [operator, value] of Object.entries(operatorObj)) {
-            if (operator in this.operatorMap) {
-                if (operator === '$regex') {
-                    return this.operatorMap[operator](value as any, operatorObj.$options);
+    private static convertOperator(operatorObj: any): any {
+        if (isObj(operatorObj)) {
+            for (const [operator, value] of Object.entries(operatorObj)) {
+                if (operator === "$options") {
+                    return undefined;
                 }
-                return this.operatorMap[operator as keyof typeof this.operatorMap](value);
+                if (operator in this.operatorMap) {
+                    if (['$regex'].includes(operator)) {
+                        return this.operatorMap[operator as keyof typeof this.operatorMap](value as any, defaultStr(operatorObj.$options, operatorObj.options));
+                    }
+                    return this.operatorMap[operator as keyof typeof this.operatorMap](value);
+                }
             }
         }
         return operatorObj;

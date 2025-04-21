@@ -15,7 +15,7 @@ import { Field } from "./Field";
 import { IViewStyle } from "@src/types";
 import { FormContext } from "./context";
 import "./types/augmented";
-import { INotifyMessage, Notify } from "@notify/index";
+import Notify, { INotifyMessage } from "@notify";
 import { createProvider } from "@utils/provider";
 import { IDialogControlledProps } from "@components/Dialog";
 import DialogControlled from "@components/Dialog/Controlled";
@@ -568,7 +568,6 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         this.validationStatus = !!this.validationStatus;
         return validationStatus;
     }
-
     static Loading: React.FC<IFormProps> = (props) => {
         return (
             <View

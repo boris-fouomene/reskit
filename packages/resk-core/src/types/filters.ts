@@ -40,6 +40,12 @@ export interface IMongoComparisonOperators<T = any> extends IMongoArrayOperators
   $regex?: string | RegExp;  // regular expression
   $options?: string;             // regex options
   $size?: number;                  // array size
+  /***
+   * modulo operator.
+   * example : 
+   * { age: { $mod: [5, 0] } } - finds documents where age mod 5 equals 0
+   */
+  $mod?: [divisor: number, remainder: number];                  // modulo
 };
 
 
@@ -76,6 +82,86 @@ export interface IMongoLogicalOperators<T = any> {
   $not?: IMongoQuery<T>; // A filter selector or comparison operator that must not match
 }
 
+/**
+ * Represents the names of logical operators defined in the `IMongoLogicalOperators` interface.
+ * 
+ * The `IMongoLogicalOperatorName` type is a union of the keys from the `IMongoLogicalOperators` interface.
+ * It provides a concise and type-safe way to refer to logical operator names used in MongoDB queries.
+ * 
+ * @example
+ * ```typescript
+ * const logicalOperator: IMongoLogicalOperatorName = "$and"; // Valid, as $and is a logical operator
+ * const invalidOperator: IMongoLogicalOperatorName = "$invalid"; // Error: "$invalid" is not a valid logical operator
+ * ```
+ * 
+ * @remarks
+ * - This type is particularly useful when you need to validate or restrict the usage of logical operator names in MongoDB queries.
+ * - It ensures type safety and reduces the risk of typos in operator names.
+ * 
+ * @see {@link IMongoLogicalOperators} for the structure of logical operators.
+ */
+export type IMongoLogicalOperatorName = keyof IMongoLogicalOperators;
+
+/**
+ * @interface IMongoOperators
+ * Combines logical and comparison operators for MongoDB queries.
+ * 
+ * This interface represents a union of logical and comparison operators, allowing you to construct
+ * complex MongoDB queries with both logical conditions and value-based comparisons.
+ * 
+ * @template T - The type of the data being queried (default is `any`).
+ * 
+ * @example
+ * // Example usage of IMongoOperators
+ * interface User {
+ *   name: string;
+ *   age: number;
+ *   tags: string[];
+ * }
+ * 
+ * const query: IMongoOperators<User> = {
+ *   $and: [
+ *     { age: { $gte: 18 } }, // Logical AND: age must be greater than or equal to 18
+ *     { tags: { $in: ["active", "premium"] } } // Logical AND: tags must include "active" or "premium"
+ *   ],
+ *   $or: [
+ *     { name: { $regex: "^John", $options: "i" } }, // Logical OR: name starts with "John" (case-insensitive)
+ *     { age: { $lt: 30 } } // Logical OR: age is less than 30
+ *   ]
+ * };
+ * 
+ * // This query will match documents where:
+ * // - The age is greater than or equal to 18 AND the tags include "active" or "premium".
+ * // - OR the name starts with "John" (case-insensitive) OR the age is less than 30.
+ * 
+ * @see {@link IMongoLogicalOperators} for logical operators.
+ * @see {@link IMongoComparisonOperators} for comparison operators.
+ */
+export interface IMongoOperators extends IMongoLogicalOperators, IMongoComparisonOperators { }
+
+
+/**
+ * @typedef IMongoOperatorName
+ * Represents the names of all available operators (logical and comparison) defined in the `IMongoOperators` interface.
+ * 
+ * This type is a union of the keys from the `IMongoOperators` interface, allowing for a concise way to refer to any operator name
+ * that can be used in MongoDB queries. It ensures type safety and reduces the risk of typos in operator names.
+ * 
+ * @example
+ * // Example usage of IMongoOperatorName
+ * const operator1: IMongoOperatorName = "$and"; // Valid, as $and is a logical operator
+ * const operator2: IMongoOperatorName = "$eq";  // Valid, as $eq is a comparison operator
+ * 
+ * // The following would cause a TypeScript error, as "$invalid" is not a defined operator
+ * // const invalidOperator: IMongoOperatorName = "$invalid"; // Error: Type '"$invalid"' is not assignable to type 'IMongoOperatorName'
+ * 
+ * @remarks
+ * This type is particularly useful when you need to validate or restrict the usage of operator names in MongoDB queries.
+ * It provides a type-safe way to reference operator names, ensuring that only valid operators are used.
+ * 
+ * @see {@link IMongoOperators} for the full list of logical and comparison operators.
+ */
+export type IMongoOperatorName = keyof IMongoOperators;
 /**
  * A type that represents the depth limit for recursion in MongoDB queries.
  * 
@@ -399,68 +485,3 @@ export type ISingleFieldOf<T> = {
 export type IResourceQueryOptionsOrderBy<DataType = any> = Array<
   ISingleFieldOf<IResourceQueryOptionsOrderByField<DataType>>
 >;
-
-/**
- * A collection of MongoDB operators categorized into logical, comparison, and array operators.
- * 
- * This constant provides a structured way to access various MongoDB operators that can be used
- * in queries. Each category contains a list of operator keys that correspond to their respective
- * types in MongoDB.
- * 
- * @constant
- * @type {Object}
- * @property {Array<keyof IMongoLogicalOperators>} LOGICAL - An array of logical operators.
- *   - **Example**: 
- *     - `$and`: Joins query clauses with a logical AND.
- *     - `$or`: Joins query clauses with a logical OR.
- *     - `$nor`: Joins query clauses with a logical NOR.
- *     - `$not`: Inverts the effect of a query expression.
- * 
- * @property {Array<keyof IMongoComparisonOperators>} COMPARATOR - An array of comparison operators.
- *   - **Example**: 
- *     - `$eq`: Matches values that are equal to a specified value.
- *     - `$ne`: Matches all values that are not equal to a specified value.
- *     - `$gt`: Matches values that are greater than a specified value.
- *     - `$gte`: Matches values that are greater than or equal to a specified value.
- *     - `$lt`: Matches values that are less than a specified value.
- *     - `$lte`: Matches values that are less than or equal to a specified value.
- *     - `$in`: Matches any of the values specified in an array.
- *     - `$nin`: Matches none of the values specified in an array.
- *     - `$exists`: Matches documents that have the specified field.
- *     - `$type`: Matches documents based on the type of the field.
- *     - `$regex`: Matches documents where the field value matches a specified regular expression.
- *     - `$size`: Matches any array with the number of elements specified.
- *     - `$mod`: Matches documents where the value of a field is equal to the specified value when divided by a specified divisor.
- *     - `$all`: Matches arrays that contain all elements specified in the query.
- *     - `$elemMatch`: Matches documents that contain an array field with at least one element that matches all the specified query criteria.
- * 
- * @property {Array<keyof IMongoArrayOperators>} ARRAY - An array of array operators.
- *   - **Example**: 
- *     - `$all`: Matches arrays that contain all elements specified in the query.
- *     - `$elemMatch`: Matches documents that contain an array field with at least one element that matches all the specified query criteria.
- *     - `$in`: Matches any of the values specified in an array.
- *     - `$nin`: Matches none of the values specified in an array.
- * 
- * @example
- * // Example usage of MANGO_OPERATORS in a MongoDB query
- * const query = {
- *   $or: [
- *     { age: { $gt: 18 } },
- *     { name: { $regex: /John/i } }
- *   ]
- * };
- * 
- * // This query will find documents where the age is greater than 18
- * // or the name matches the regex for "John".
- * 
- * @see {@link https://docs.mongodb.com/manual/reference/operator/|MongoDB Operators Documentation} for more details on each operator.
- */
-export const MANGO_OPERATORS: {
-  LOGICAL: (keyof IMongoLogicalOperators)[],
-  COMPARATOR: (keyof IMongoComparisonOperators)[],
-  ARRAY: (keyof IMongoArrayOperators)[],
-} = {
-  LOGICAL: ["$and", "$or", "$nor", "$not"] as (keyof IMongoLogicalOperators)[],
-  COMPARATOR: ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$exists", "$type", "$regex", "$size", "$mod", "$all", "$elemMatch"] as (keyof IMongoComparisonOperators)[],
-  ARRAY: ["$all", "$elemMatch", "$in", "$nin"] as (keyof IMongoArrayOperators)[],
-}

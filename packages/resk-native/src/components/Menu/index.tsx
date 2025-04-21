@@ -354,7 +354,7 @@ const Menu = function Menu({
     dismissable,
     onDismiss,
     animationDuration,
-    bottomSheetFullScreen,
+    renderAsBottomSheetInFullScreen,
     bottomSheetMinHeight,
     bottomSheetTitle,
     bottomSheetTitleDivider,
@@ -455,7 +455,7 @@ const Menu = function Menu({
         height: state.anchorMeasurements?.contentHeight,
         animationDuration,
         dismissable,
-        fullScreen: bottomSheetFullScreen,
+        fullScreen: renderAsBottomSheetInFullScreen,
         onDismiss: closeMenuInternal
     })
 

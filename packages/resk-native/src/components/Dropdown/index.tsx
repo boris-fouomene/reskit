@@ -419,7 +419,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             bottomSheetTitleDivider={!canRenderSearch(context)}
             testID={testID + "-menu"}
             {...Object.assign({}, menuProps)}
-            bottomSheetFullScreen={(typeof menuProps?.bottomSheetFullScreen == "boolean" ? menuProps.bottomSheetFullScreen : preparedItems?.length > 10)}
+            renderAsBottomSheetInFullScreen={(typeof menuProps?.renderAsBottomSheetInFullScreen == "boolean" ? menuProps.renderAsBottomSheetInFullScreen : preparedItems?.length > 10)}
             visible={visible}
             onDismiss={context.close.bind(context)}
             withScrollView={false}

@@ -931,7 +931,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (!this.canSortInternally()) {
             if (typeof this.props.onSort === "function") {
                 this.updateState({ orderBy }, () => {
-                    (this.props.onSort as any)(this.getCallOptions({ ...orderBy, ignoreCase: column.ignoreCaseWhenSorting }));
+                    (this.props.onSort as any)(this.getCallOptions({ ...orderBy, ignoreCase: column.ignoreCase }));
                 });
             }
             return;
@@ -1503,7 +1503,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {string} - The translation key for the given key.
      */
     static getI18nTranslationKey(key: string): string {
-        return `components.datagrid.${key}`;
+        return `components.datagrid.${defaultStr(key).trim()}`;
     }
 
     /**
@@ -1598,7 +1598,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         });
         if (menuItems.length > 0) {
             return <Menu
-                bottomSheetFullScreen
+                renderAsBottomSheetInFullScreen
                 anchor={({ openMenu }) => {
                     return <DatagridToolbarAction icon='format-list-group' title={this.translate("groupTableData")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
                         {this.translate("groupBy")}
@@ -1710,7 +1710,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         return <Menu
             items={menuItems}
-            bottomSheetFullScreen
+            renderAsBottomSheetInFullScreen
             anchor={({ openMenu }) => {
                 return <DatagridToolbarAction icon="material-functions" title={this.translate("aggregationFunctionMenuDescription")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
                     {this.translate("aggregationFunctionsLabel")}
@@ -1914,7 +1914,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return <View testID={testID + "-pagination-container"}>
             <View style={[styles.paginationContentContainer]} testID={testID + "-pagination-content-container"}>
                 <Menu
-                    bottomSheetFullScreen
+                    renderAsBottomSheetInFullScreen
                     testID={testID + "pagination-page-size-menu"}
                     anchor={<View style={styles.paginationItem} testID={testID + "-pagination-page-size"}>
                         <Label colorScheme='primary' fontSize={16}>
@@ -2047,7 +2047,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             return null;
         }
         return <Menu
-            bottomSheetFullScreen
+            renderAsBottomSheetInFullScreen
             items={views.map((view) => {
                 if (!view) return null;
                 delete ((view as any).component);
@@ -2161,7 +2161,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     />
                 })}
                 <Menu
-                    bottomSheetFullScreen
+                    renderAsBottomSheetInFullScreen
                     anchor={({ openMenu }) => {
                         const onPress = () => {
                             openMenu();
@@ -2475,7 +2475,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         if (data.length) {
             return sortBy<DataType>(data, (item) => this.computeCellValue(sortColObj, item), {
                 direction: sortDirection,
-                ignoreCase: sortColObj.ignoreCaseWhenSorting
+                ignoreCase: sortColObj.ignoreCase
             })
         }
         return data;
@@ -4138,7 +4138,7 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
     if (!columnObj || !isObj(values) || !datagridContext || !datagridContext?.canShowAggregatedValues()) return null;
     const testID = datagridContext.getTestID();
     return <Menu
-        bottomSheetFullScreen
+        renderAsBottomSheetInFullScreen
         items={menuItems as any}
         testID={testID + "-aggregated-value-menu"}
         anchor={<View testID={testID + "-aggregated-value-container"}>
@@ -4966,7 +4966,7 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
      * 
      * If true, the column is sorted in a case-insensitive manner.
      */
-    ignoreCaseWhenSorting?: boolean;
+    ignoreCase?: boolean;
 
     /***
      * A custom render function for the column.
@@ -5537,7 +5537,6 @@ const styles = StyleSheet.create({
     },
     headerScrollView: {
         width: '100%',
-        flexDirection: 'row'
     },
     columnHeaderOrCell: {
         alignSelf: "flex-start",

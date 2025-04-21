@@ -45,6 +45,7 @@ export default class DialogAlert extends createProvider<IDialogControlledProps, 
         if (!instance || typeof instance?.open !== "function") return;
         const { okButton: oButton, message, cancelButton: cButton, onOk, onCancel, cancelButtonBefore, children, ...rest } = Object.assign({}, props);
         const okButton = oButton === false ? undefined : Object.assign({}, oButton);
+        console.log(okButton, " is opening dialog");
         if (okButton) {
             const { onPress: onOkPress } = okButton;
             okButton.onPress = async (event, context) => {
@@ -70,26 +71,4 @@ export default class DialogAlert extends createProvider<IDialogControlledProps, 
         const actions = Array.isArray(props?.actions) && props.actions.length ? props?.actions : [cancelButtonBefore ? cancelButton : okButton, cancelButtonBefore ? okButton : cancelButton];
         return instance.open(Object.assign({}, { dismissable: false, children: <Label testID="resk-dialog-alert-label" style={Theme.styles.ph1} children={(isValidElement(children, true) && children || message) as ReactNode} /> }, instance?.props, rest, { fullScreen: false, actions }), callback);
     };
-
-    /**
-     * Closes the currently open dialog.
-     * 
-     * This static method retrieves the instance of the DialogAlert and calls its close method.
-     * It can also pass properties to the close method for any necessary cleanup.
-     * 
-     * @param innerProviderRef - An optional reference to access the instance of the DialogControlled.
-     * @param callback - An optional callback function that is called after closing the dialog.
-     * 
-     * @returns The result of the close method or undefined if the instance is not valid.
-     * 
-     * @example
-     * DialogAlert.close({ result: "Confirmed" }, myRef, () => {
-     *   console.log("Dialog closed");
-     * });
-     */
-    static close(innerProviderRef?: any, callback?: Function) {
-        const instance = this.getProviderInstance(innerProviderRef);
-        if (!instance || typeof instance?.close !== "function") return;
-        return instance.close(callback);
-    }
 }

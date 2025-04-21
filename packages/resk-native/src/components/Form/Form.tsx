@@ -27,70 +27,20 @@ import Drawer from "@components/Drawer/Drawer";
 
 
 
-class FormDialogProvider extends createProvider<IFormDialogProps, DialogControlled>(DialogControlled, { isProvider: true, dismissable: false }) {
-    /**
-     * Opens a form dialog with the specified properties.
-     *
-     * @param props - The properties for the form dialog, including form data, fields, and callbacks.
-     * @param innerProviderRef - An optional reference to a specific provider instance.
-     * @param callback - An optional callback function to be executed after the dialog is opened.
-     * @returns The result of the `open` method on the provider instance, or `undefined` if the instance is not available.
-     */
-    static open(props: IFormDialogProps, innerProviderRef?: any, callback?: Function) {
-        const instance = this.getProviderInstance(innerProviderRef);
-        if (!instance || typeof instance?.open !== "function") return;
-        const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
-        //rest.dismissable = typeof rest.dismissable == "boolean" ? rest.dismissable : false;
-        rest.children = <Form withScrollView={false} responsive={false} name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
-        return instance.open(rest, callback);
-    };
-    /**
-     * Closes the form dialog with the specified properties.
-     *
-     * @param props - Optional properties for closing the dialog.
-     * @param innerProviderRef - An optional reference to a specific provider instance.
-     * @param callback - An optional callback function to be executed after the dialog is closed.
-     * @returns The result of the `close` method on the provider instance, or `undefined` if the instance is not available.
-     */
-    static close(innerProviderRef?: any, callback?: Function) {
-        const instance = this.getProviderInstance(innerProviderRef);
-        if (!instance || typeof instance?.close !== "function") return;
-        return instance.close(callback);
-    }
-}
+class FormDialogProvider extends createProvider<IFormDialogProps, DialogControlled>(DialogControlled, { isProvider: true, dismissable: false }, (options) => {
+    const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = options;
+    //rest.dismissable = typeof rest.dismissable == "boolean" ? rest.dismissable : false;
+    rest.children = <Form withScrollView={false} responsive={false} name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+    return rest;
+}) { }
 
 
 
-class FormDrawerProvider extends createProvider<IFormDrawerProps & IDrawerProps, Drawer>(Drawer, { permanent: false }) {
-    /**
-     * Opens the form drawer with the specified properties and optional callback.
-     *
-     * @param props - The properties to configure the form drawer, including form data,
-     *                fields, submission handlers, validation handlers, and additional options.
-     * @param innerProviderRef - An optional reference to a specific provider instance.
-     * @param callback - An optional callback function to execute after the drawer is opened.
-     * @returns The result of the `open` method on the drawer instance, if available.
-     */
-    static open(props: IFormDrawerProps, innerProviderRef?: any, callback?: (options: IDrawerCurrentState) => void) {
-        const instance = this.getProviderInstance(innerProviderRef);
-        if (!instance || typeof instance?.open !== "function") return;
-        const { data, withScrollView, scrollViewProps, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = props;
-        rest.children = <Form withScrollView={withScrollView} scrollViewProps={scrollViewProps} name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
-        return instance.open(rest, callback);
-    };
-    /**
-     * Closes the form drawer with the specified properties and optional callback.
-     *
-     * @param innerProviderRef - An optional reference to a specific provider instance.
-     * @param callback - An optional callback function to execute after the drawer is closed.
-     * @returns The result of the `close` method on the drawer instance, if available.
-     */
-    static close(innerProviderRef?: any, callback?: Function) {
-        const instance = this.getProviderInstance(innerProviderRef);
-        if (!instance || typeof instance?.close !== "function") return;
-        return instance.close(callback);
-    }
-}
+class FormDrawerProvider extends createProvider<IFormDrawerProps & IDrawerProps, Drawer>(Drawer, { permanent: false }, (options) => {
+    const { data, withScrollView, scrollViewProps, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = options;
+    rest.children = <Form withScrollView={withScrollView} scrollViewProps={scrollViewProps} name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+    return rest;
+}) { }
 
 /**
  * Represents a form component that manages its state, fields, and validation.

@@ -3140,7 +3140,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      *
      * @returns {IDatagridViewName[]} An array of view names that are optimized for the current media type.
      */
-    static getOptimizedRendableViewOptions() {
+    static getOptimizedRendableViewOptions(): IDatagridViewName[] {
         const views = DatagridView.getRegisteredViewsWithOptions();
         const optimizedViews = Object.keys(views).filter((viewName) => {
             const options = views[viewName as keyof typeof views];
@@ -3151,7 +3151,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             }
             return true;
         });
-        return optimizedViews;
+        return optimizedViews as IDatagridViewName[];
     }
 
     /**
@@ -3897,17 +3897,22 @@ export function AttachDatagridView<DataType extends object = any, PropsExtension
 
 const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cViewName, viewNames: cViewNames, ...props }: IDatagridProps<DataType, {}>) {
     const dimensions = useDimensions();
+    const sessionName = "datagrid";
+    const session = useMemo(() => {
+        return Auth.Session.getStorage(sessionName);
+    }, [sessionName]);
     const { viewNames, viewName } = useMemo(() => {
+        const optimizedViews = DatagridView.getOptimizedRendableViewOptions();
         const registeredViewNames = Object.keys(DatagridView.getRegisteredViewsWithOptions()) as IDatagridViewName[];
+        const viewNameFromSession = session.get("viewName");
         const viewNames = (Array.isArray(cViewNames) && cViewNames.length) ? cViewNames.filter((vName) => registeredViewNames.includes(vName)) : registeredViewNames;
         return {
             viewNames,
-            viewName: isNonNullString(cViewName) && viewNames.includes(cViewName) ? cViewName : viewNames[0]
+            viewName: isNonNullString(cViewName) && viewNames.includes(cViewName) ? cViewName : viewNameFromSession && registeredViewNames.includes(viewNameFromSession) ? viewNameFromSession : optimizedViews[0] || viewNames[0]
         }
     }, [cViewName, cViewNames, dimensions.width, dimensions.height]);
     const [state, setState] = useStateCallback({ viewName, viewNames });
     const { Component, restProps, options: viewOptions } = useMemo<{ Component: typeof DatagridView<DataType>, restProps: any, options: IDatagridRegisterViewOptions }>(() => {
-        const optimizedViews = DatagridView.getOptimizedRendableViewOptions();
         const { component, ...options } = DatagridView.getRegisteredViewWithOptions(state.viewName);
         return {
             Component: component,
@@ -3915,12 +3920,23 @@ const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cV
             restProps: isNonNullString(state.viewName) ? Object.assign({}, (props as any)[`${state.viewName}ViewProps`]) : {}
         }
     }, [state.viewName]);
+    if (!Component) {
+        return <View
+            testID={'datagrid-view-invalid'}
+            style={[Theme.styles.centered, Theme.styles.w100]}
+        >
+            <Label textBold colorScheme='error'>
+                {`Invalid Datagrid view name: ${defaultStr(state.viewName, 'N/A')}`}
+            </Label>
+        </View>;
+    }
     return <Component
         {...props as any}
         {...restProps}
         onToggleView={(options) => {
             if (!options.viewName || viewName === options.viewName) return;
             setState({ ...state, viewName: options.viewName }, () => {
+                session.set("viewName", options.viewName);
                 if (typeof props.onToggleView === "function") {
                     props.onToggleView(options);
                 }

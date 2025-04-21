@@ -21,6 +21,16 @@ class BottomSheetClass extends PureComponent<IBottomSheetProps, IBottomSheetClas
     static state: IBottomSheetClasState = {
         visible: false
     }
+
+    /**
+     * Opens the bottom sheet.
+     * 
+     * This method can be used to open the bottom sheet programmatically.
+     * It takes an optional `props` argument which can be used to set the props of the bottom sheet.
+     * It also takes an optional `callback` argument which is called after the bottom sheet has been opened.
+     * @param props - Optional props to set on the bottom sheet.
+     * @param callback - Optional callback to be called after the bottom sheet has been opened.
+     */
     open(props?: IBottomSheetProviderProps, callback?: () => {}) {
         this.setState({
             appBarProps: undefined,
@@ -29,6 +39,17 @@ class BottomSheetClass extends PureComponent<IBottomSheetProps, IBottomSheetClas
             typeof callback == "function" && callback();
         });
     }
+
+
+    /**
+     * Closes the bottom sheet.
+     * 
+     * This method can be used to close the bottom sheet programmatically.
+     * It takes an optional `props` argument which can be used to set the props of the bottom sheet.
+     * It also takes an optional `callback` argument which is called after the bottom sheet has been closed.
+     * @param props - Optional props to set on the bottom sheet.
+     * @param callback - Optional callback to be called after the bottom sheet has been closed.
+     */
     close(props?: IBottomSheetProviderProps, callback?: () => {}) {
         this.setState({
             ...Object.assign({}, props), visible: false
@@ -53,29 +74,4 @@ export interface IBottomSheetProviderProps extends Omit<IBottomSheetProps, "visi
  * 
  * @extends createProvider<IBottomSheetProps, BottomSheetClass>
  */
-export default class BottomSheetProvider extends createProvider<IBottomSheetProps, BottomSheetClass>(BottomSheetClass, { visible: false }) {
-    /**
-     * Opens the bottom sheet.
-     * 
-     * @param props The properties to pass to the bottom sheet.
-     * @param innerProviderRef A reference to the inner provider.
-     * @param callback A callback function to call after the bottom sheet is opened.
-     */
-    static open(props: IBottomSheetProviderProps, innerProviderRef?: any, callback?: () => {}) {
-        const instance = this.getProviderInstance(innerProviderRef);
-        if (!instance || typeof instance?.open !== "function") return;
-        return instance.open(props, callback);
-    };
-    /**
-     * Closes the bottom sheet.
-     * 
-     * @param props The properties to pass to the bottom sheet.
-     * @param innerProviderRef A reference to the inner provider.
-     * @param callback A callback function to call after the bottom sheet is closed.
-     */
-    static close(props?: IBottomSheetProviderProps, innerProviderRef?: any, callback?: () => {}) {
-        const instance = this.getProviderInstance(innerProviderRef);
-        if (!instance || typeof instance?.close !== "function") return;
-        return instance.close(props, callback);
-    }
-}
+export default class BottomSheetProvider extends createProvider<IBottomSheetProps, BottomSheetClass, IBottomSheetProviderProps>(BottomSheetClass, { visible: false }) { }

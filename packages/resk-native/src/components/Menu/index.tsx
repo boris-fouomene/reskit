@@ -22,7 +22,7 @@ import { usePrepareBottomSheet } from '@components/BottomSheet/utils';
 import { KeyboardAvoidingView } from '@components/KeyboardAvoidingView';
 import Label from '@components/Label';
 import { Divider } from '@components/Divider';
-import { isNumber } from "@resk/core/utils";
+import { defaultNumber, isNumber } from "@resk/core/utils";
 
 const useNativeDriver = false;
 
@@ -56,6 +56,7 @@ export const useMenuPosition = ({
     elevation: customElevation,
     preferedPositionAxis,
     anchorMeasurements,
+    maxHeight: customMaxHeight,
     dynamicHeight,
 }: IUseMenuPositionProps) => {
     dynamicHeight = dynamicHeight !== false;
@@ -122,7 +123,14 @@ export const useMenuPosition = ({
                 left: isMaxHorizontalSpaceLeft,//(pos.left >= padding),// && isMaxHorizontalSpaceLeft,
                 right: isNumber(pos.left) && (pos.left + menuWidth <= screenWidth - padding) || isMaxHorizontalSpaceRight,// ,// && isMaxHorizontalSpaceRight,
             });
-            const maxHeight = Math.max(spaces.top - 50, spaces.bottom - 50);
+            let maxHeight = Math.max(spaces.top - 50, spaces.bottom - 50);
+            if ((isNumber(customMaxHeight))) {
+                if (customMaxHeight >= screenHeight * 0.45) {
+                    maxHeight = Math.min(customMaxHeight, maxHeight);
+                } else if (customMaxHeight < 200) {
+                    maxHeight = customMaxHeight;
+                }
+            }
             const rProps: Partial<IMenuCalculatedPosition> = !dynamicHeight && maxHeight > 50 ? {
                 height: maxHeight,
             } : {};
@@ -200,7 +208,7 @@ export const useMenuPosition = ({
             calculatedPosition = bestPosition;
         }
         return calculatedPosition;
-    }, [anchorMeasurements?.width, anchorMeasurements?.height, anchorMeasurements?.pageX, anchorMeasurements?.pageY, sameWidth, minWidth, visible, menuWidth, menuHeight, padding, position, fullScreen, screenWidth, screenHeight]);
+    }, [anchorMeasurements?.width, customMaxHeight, anchorMeasurements?.height, anchorMeasurements?.pageX, anchorMeasurements?.pageY, sameWidth, minWidth, visible, menuWidth, menuHeight, padding, position, fullScreen, screenWidth, screenHeight]);
     const menuPosition = calculatePosition();
     const menuAnchorStyle = useMemo(() => {
         if (typeof anchorMeasurements?.width != "number") return {};
@@ -358,6 +366,7 @@ const Menu = function Menu({
     bottomSheetMinHeight,
     bottomSheetTitle,
     bottomSheetTitleDivider,
+    maxHeight,
     ...props
 }: IMenuProps) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -386,6 +395,7 @@ const Menu = function Menu({
     const { fullScreen, menuPosition, animatedStyle, screenWidth, screenHeight } = useMenuPosition({
         menuWidth: menuLayout?.width || 0,
         menuHeight: menuLayout?.height || 0,
+        maxHeight,
         dynamicHeight,
         position: customPosition,
         fullScreen: customFullScreen,

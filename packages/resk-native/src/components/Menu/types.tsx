@@ -407,6 +407,8 @@ export interface IUseMenuPositionProps {
     */
     dynamicHeight?: boolean;
 
+    maxHeight?: number;
+
 }
 
 
@@ -626,6 +628,11 @@ export type IMenuProps<MenuItemContext = any> = Omit<Animated.AnimatedProps<View
      * Whether to show a divider between the title and the content when the menu is rendered as a bottom sheet.
      */
     bottomSheetTitleDivider?: boolean;
+
+    /***
+     * The max height of the menu, when the menu is not rendered in full screen mode or as a bottom sheet.
+     */
+    maxHeight?: number;
 }
 
 /**

@@ -786,6 +786,19 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
         selectedItems: ItemType[];
         selectedValues: ValueType[];
     }) => JSX.Element;
+
+    /***
+     * Use When getItemLabel is not specified
+     * It represent a key of ItemType to be used as label when ItemType is an object
+     * If a string is provided, we will retrieve the value of the field using the string as key
+     */
+    itemLabelField?: keyof ItemType | string;
+
+    /***
+     * Use When getItemValue is not specified
+     * It represent the field of the item to be used as value when ItemType is an object
+     */
+    valueField?: keyof ItemType | string;
 };
 
 /**

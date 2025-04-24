@@ -1,13 +1,13 @@
 import { IDropdownAction, IDropdownCallbackOptions, IDropdownContext, IDropdownEvent, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
-import { defaultStr, isEmpty, isNonNullString, isObj, areEquals } from "@resk/core/utils";
+import { defaultStr, isEmpty, isNonNullString, isObj, areEquals, stringify, isNumber } from "@resk/core/utils";
 import Logger from "@resk/core/logger";
 import i18n from "@resk/core/i18n";
 import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
 import Theme, { useTheme } from "@theme/index";
-import { TouchableOpacity } from 'react-native';
+import { Dimensions, TouchableOpacity } from 'react-native';
 import TextInput from "@components/TextInput";
 import { IMenuContext, Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
@@ -67,7 +67,13 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             return getItemLabel(options);
         }
         const { item } = options;
-        if (item && isObj(item)) {
+        if (item && isObj<ItemType>(item)) {
+            if (isNonNullString(this.props.itemLabelField)) {
+                const l = (item as any)[this.props.itemLabelField];
+                if (!isEmpty(l)) {
+                    return stringify(l, { escapeString: false });
+                }
+            }
             const { label } = (item as any);
             if (isReactNode(label)) {
                 return label;
@@ -91,7 +97,13 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             return getItemValue(options);
         }
         const { item, index } = options;
-        if (item && isObj(item)) {
+        if (item && isObj<ItemType>(item)) {
+            if (isNonNullString(this.props.valueField)) {
+                const v = (item as any)[this.props.valueField];
+                if (!isEmpty(v)) {
+                    return v as ValueType;
+                }
+            }
             const { value } = (item as any);
             if (!isEmpty(value)) {
                 return value;
@@ -297,13 +309,17 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
     const theme = useTheme();
     const i18n = useI18n();
-    let { anchorContainerProps, menuProps, anchor, error, defaultValue, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
+    let { anchorContainerProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
     const { visible, preparedItems } = context.state;
     const isLoading = !!props.isLoading;
     const disabledStyle = isLoading && styles.disabled || null;
     anchorContainerProps = Object.assign({}, anchorContainerProps);
     testID = context.getTestID();
     const [searchText, setSearchText] = useState("");
+    const { height: screenHeight } = Dimensions.get("window");
+    const maxDropdownHeight = useMemo(() => {
+        return isNumber(maxHeight) && maxHeight > 0 ? maxHeight : Math.max(screenHeight * 0.5, 300);
+    }, [maxHeight, screenHeight]);
     const onSearch = (text: string) => {
         text = defaultStr(text);
         if (text.toLowerCase() == searchText.toLowerCase()) {
@@ -414,6 +430,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         <Menu
             responsive
             minWidth={180}
+            maxHeight={maxDropdownHeight}
             animated={false}
             bottomSheetTitle={context?.props?.label}
             bottomSheetTitleDivider={!canRenderSearch(context)}

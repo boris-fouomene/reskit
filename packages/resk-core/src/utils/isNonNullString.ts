@@ -14,7 +14,7 @@
  * console.log(isNonNullString(123)); // Output: false
  * ```
  */
-export default function isNonNullString(val: any): val is string {
+export default function isNonNullString<T=any>(val:T): val is T & string {
   /**
    * Check if the value is not null and is a string.
    */

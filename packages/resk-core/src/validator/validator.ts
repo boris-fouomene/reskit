@@ -195,7 +195,7 @@ export class Validator {
               return reject({ ...valResult, message: i18n.t("validator.invalidMessage", i18nRuleOptions) });
             } else if (isNonNullString(result)) {
               return reject({ ...valResult, message: result });
-            } else if (result instanceof Error) {
+            } else if ((result as any) instanceof Error) {
               return reject({ ...valResult, message: stringify(result) });
             }
             return next();

@@ -362,6 +362,7 @@ const Menu = function Menu({
     dismissable,
     onDismiss,
     animationDuration,
+    bottomSheetFullScreen,
     renderAsBottomSheetInFullScreen,
     bottomSheetMinHeight,
     bottomSheetTitle,
@@ -459,13 +460,13 @@ const Menu = function Menu({
             }
         });
     };
-    const renderedAsBottomSheet = fullScreen;
+    const renderedAsBottomSheet = fullScreen && renderAsBottomSheetInFullScreen !== false;
     const preparedBottomSheet = usePrepareBottomSheet({
         visible: isVisible,
         height: state.anchorMeasurements?.contentHeight,
         animationDuration,
         dismissable,
-        fullScreen: renderAsBottomSheetInFullScreen,
+        fullScreen: bottomSheetFullScreen,
         onDismiss: closeMenuInternal
     })
 

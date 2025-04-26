@@ -612,6 +612,11 @@ export type IMenuProps<MenuItemContext = any> = Omit<Animated.AnimatedProps<View
     /***
      * Whether the bottom sheet should be full screen or not when the menu is rendered as a bottom sheet.
      */
+    bottomSheetFullScreen?: boolean;
+
+    /***
+     * Whether the menu should be rendered as a bottom sheet in full screen mode.
+     */
     renderAsBottomSheetInFullScreen?: boolean;
 
     /***

@@ -483,7 +483,126 @@ export interface ITheme {
   fontsConfig?: IThemeFontsConfig & {
     variants?: Partial<IThemeFontsWithVariants>;
   };
+
+  /**
+  * Represents the styling properties for customizing scrollbars in web platforms.
+  * This property is platform-aware and ensures that scrollbar styles are only applied on web environments.
+  *
+  * @remarks
+  * Scrollbar styles are ignored in React Native as it does not support custom scrollbars natively.
+  *
+  * @property scrollbar - Styles for the entire scrollbar (e.g., width, height).
+  * @property track - Styles for the scrollbar track (background area).
+  * @property thumb - Styles for the draggable part of the scrollbar (thumb).
+  * @property thumbHover - Styles for the thumb when hovered.
+  * @property thumbActive - Styles for the thumb when actively dragged.
+  * @property corner - Styles for the corner where two scrollbars meet.
+  * @property resizer - Styles for the resizer handle (if applicable).
+  *
+  * @example
+  * ```typescript
+  * const scrollbarStyles: IWebScrollbarStyle = {
+  *   scrollbar: {
+  *     width: "12px",
+  *     height: "12px",
+  *   },
+  *   track: {
+  *     background: "#f0f0f0",
+  *     borderRadius: "10px",
+  *   },
+  *   thumb: {
+  *     background: "#888",
+  *     borderRadius: "10px",
+  *   },
+  *   thumbHover: {
+  *     background: "#555",
+  *   },
+  *   thumbActive: {
+  *     background: "#333",
+  *   },
+  *   corner: {
+  *     background: "#ccc",
+  *   },
+  *   resizer: {
+  *     background: "#aaa",
+  *   },
+  * };
+  * ```
+   */
+  webScrollbar?: IWebScrollbarStyle;
 }
+
+/**
+ * A utility type that determines whether a given type should be applied based on the platform.
+ * This type resolves to `T` if running in a browser (web) environment, otherwise it resolves to `{}` for non-browser environments like React Native.
+ *
+ * @template T - The type to conditionally apply. Typically used for CSS-related types like `CSSStyleDeclaration`.
+ * @example
+ * ```typescript
+ * // On web, this resolves to Partial<CSSStyleDeclaration>
+ * type WebStyles = IPlatformSpecificStyles<Partial<CSSStyleDeclaration>>;
+ *
+ * // On React Native, this resolves to {}
+ * type NativeStyles = IPlatformSpecificStyles<Partial<CSSStyleDeclaration>>;
+ * ```
+ */
+type IPlatformSpecificStyles<T> = typeof window extends { CSSStyleDeclaration: infer _ } ? T : never;
+
+/**
+ * Represents the styling properties for customizing scrollbars.
+ * This interface is platform-aware and ensures that scrollbar styles are only applied on web environments.
+ *
+ * @remarks
+ * Scrollbar styles are ignored in React Native as it does not support custom scrollbars natively.
+ *
+ * @property scrollbar - Styles for the entire scrollbar (e.g., width, height).
+ * @property track - Styles for the scrollbar track (background area).
+ * @property thumb - Styles for the draggable part of the scrollbar (thumb).
+ * @property thumbHover - Styles for the thumb when hovered.
+ * @property thumbActive - Styles for the thumb when actively dragged.
+ * @property corner - Styles for the corner where two scrollbars meet.
+ * @property resizer - Styles for the resizer handle (if applicable).
+ *
+ * @example
+ * ```typescript
+ * const scrollbarStyles: IWebScrollbarStyle = {
+ *   scrollbar: {
+ *     width: "12px",
+ *     height: "12px",
+ *   },
+ *   track: {
+ *     background: "#f0f0f0",
+ *     borderRadius: "10px",
+ *   },
+ *   thumb: {
+ *     background: "#888",
+ *     borderRadius: "10px",
+ *   },
+ *   thumbHover: {
+ *     background: "#555",
+ *   },
+ *   thumbActive: {
+ *     background: "#333",
+ *   },
+ *   corner: {
+ *     background: "#ccc",
+ *   },
+ *   resizer: {
+ *     background: "#aaa",
+ *   },
+ * };
+ * ```
+ */
+export interface IWebScrollbarStyle extends IPlatformSpecificStyles<{
+  scrollbar?: Partial<CSSStyleDeclaration>;
+  track?: Partial<CSSStyleDeclaration>;
+  thumb?: Partial<CSSStyleDeclaration>;
+  thumbHover?: Partial<CSSStyleDeclaration>;
+  thumbActive?: Partial<CSSStyleDeclaration>;
+  corner?: Partial<CSSStyleDeclaration>;
+  resizer?: Partial<CSSStyleDeclaration>;
+}> { };
+
 
 /**
  * @interface IThemeColorSheme

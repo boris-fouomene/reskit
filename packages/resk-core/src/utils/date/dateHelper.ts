@@ -450,7 +450,7 @@ export class DateHelper {
     /**
      * If the input is a number that can be converted to a string, it's not a valid date.
      */
-    if (sDate?.toString && sDate?.toString() == parseInt(sDate).toString()) return false;
+    if ((sDate as any)?.toString && (sDate as any)?.toString() == parseInt(sDate).toString()) return false;
 
     /**
      * Try to create a new Date object from the input.

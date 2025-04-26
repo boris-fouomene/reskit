@@ -1598,7 +1598,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         });
         if (menuItems.length > 0) {
             return <Menu
-                renderAsBottomSheetInFullScreen
+                responsive
                 anchor={({ openMenu }) => {
                     return <DatagridToolbarAction icon='format-list-group' title={this.translate("groupTableData")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
                         {this.translate("groupBy")}
@@ -1710,7 +1710,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         }
         return <Menu
             items={menuItems}
-            renderAsBottomSheetInFullScreen
+            responsive
             anchor={({ openMenu }) => {
                 return <DatagridToolbarAction icon="material-functions" title={this.translate("aggregationFunctionMenuDescription")} onPress={() => { openMenu() }} style={[Theme.styles.row]}>
                     {this.translate("aggregationFunctionsLabel")}
@@ -1914,7 +1914,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
         return <View testID={testID + "-pagination-container"}>
             <View style={[styles.paginationContentContainer]} testID={testID + "-pagination-content-container"}>
                 <Menu
-                    renderAsBottomSheetInFullScreen
+                    responsive
                     testID={testID + "pagination-page-size-menu"}
                     anchor={<View style={styles.paginationItem} testID={testID + "-pagination-page-size"}>
                         <Label colorScheme='primary' fontSize={16}>
@@ -2047,7 +2047,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             return null;
         }
         return <Menu
-            renderAsBottomSheetInFullScreen
+            responsive
             items={views.map((view) => {
                 if (!view) return null;
                 delete ((view as any).component);
@@ -2161,7 +2161,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
                     />
                 })}
                 <Menu
-                    renderAsBottomSheetInFullScreen
+                    responsive
                     anchor={({ openMenu }) => {
                         const onPress = () => {
                             openMenu();
@@ -4138,7 +4138,7 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
     if (!columnObj || !isObj(values) || !datagridContext || !datagridContext?.canShowAggregatedValues()) return null;
     const testID = datagridContext.getTestID();
     return <Menu
-        renderAsBottomSheetInFullScreen
+        responsive
         items={menuItems as any}
         testID={testID + "-aggregated-value-menu"}
         anchor={<View testID={testID + "-aggregated-value-container"}>

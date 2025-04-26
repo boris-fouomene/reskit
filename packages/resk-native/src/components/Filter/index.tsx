@@ -521,7 +521,7 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
                     {isLoading ? (<ActivityIndicator size="small" animating />) : (
                         <Menu
                             testID={testID + "-menu"}
-                            renderAsBottomSheetInFullScreen
+                            responsive={true}
                             anchor={<View>
                                 <FontIcon
                                     {...props}

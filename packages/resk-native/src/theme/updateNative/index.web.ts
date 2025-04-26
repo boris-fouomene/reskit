@@ -1,8 +1,9 @@
 "use client";
-import { uniqid, isObj } from "@resk/core/utils";
+import { uniqid, isObj, defaultNumber, isNumber, isEmpty } from "@resk/core/utils";
 import Platform from "@resk/core/platform";
 import { TIPPY_THEME } from "./utils";
 import { ITheme } from "@theme/types";
+import { Colors } from "..";
 const themeDomId = uniqid("web-theme-id");
 
 /**
@@ -54,14 +55,44 @@ export default function updateWebTheme(theme: ITheme) {
     }
     style.id = themeDomId;
 
-    const primary = theme.colors.primary;
-    const trackBG = theme.colors.surface;
-    const scrollbarColor = theme.colors.primary;
+    const webScrollbar = Object.assign({}, theme.webScrollbar);
 
+    const primary = theme.colors.primary;
+    const width = 8;
+    const height = 8;
+    const trackBG = theme.colors.surface;
+    const backgroundColor = theme.colors.primary;
+
+    const scrollbarStyle = `::-webkit-scrollbar
+        {
+            width: ${width}px;
+            height:${height}px;
+            border:opx!important;
+            ${toCSSString(webScrollbar.scrollbar)}
+        }
+    `;
+    const trackstyle = `::-webkit-scrollbar-track
+        {
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            background-color: ${trackBG};
+            border:0px!important;
+            ${toCSSString(webScrollbar.track)}	
+        }
+    `;
+    const thumbStyle = `::-webkit-scrollbar-thumb
+        {
+            background-color: ${backgroundColor};
+            ${toCSSString(webScrollbar.thumb)}
+        }
+    `;
+    const thumHoverStyle = `::-webkit-scrollbar-thumb:hover { ${toCSSString(webScrollbar.thumbHover)} }`
+    const thumActiveStyle = `::-webkit-scrollbar-thumb:active { ${toCSSString(webScrollbar.thumbActive)} }`;;
+    const cornerStyle = `::-webkit-scrollbar-corner { ${toCSSString(webScrollbar.corner)} }`;
+    const resizerStyle = `::-webkit-resizer { ${toCSSString(webScrollbar.resizer)} }`;
     style.textContent = `
         body,html { 
             -ms-overflow-style: none !important; 
-            color:#4b4646;
             -webkit-text-size-adjust: none!important;
             position: relative;
             z-index: 1;
@@ -76,40 +107,26 @@ export default function updateWebTheme(theme: ITheme) {
         body > div {
             background-color : transparent;
         }
-        body.desktop ::-webkit-scrollbar-track
-        {
-            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-            border-radius: 10px;
-            background-color: ${trackBG};
-        }
-        body.desktop ::-webkit-scrollbar
-        {
-            width: 10px;
-            height:10px;
-            background-color: ${trackBG};
-        }
-        body.desktop ::-webkit-scrollbar-thumb
-        {
-            background-color: ${theme.colors.primary};
-        }
-        body.not-touch-device ::-webkit-scrollbar-track
-        {
-            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-            border-radius: 10px;
-            background-color: ${trackBG};
-            border:0px!important;
-        }
-        body.not-touch-device ::-webkit-scrollbar
-        {
-            width: 10px;
-            height:10px;
-            background-color: ${trackBG};
-            border:0px!important;
-        }
-        body.not-touch-device ::-webkit-scrollbar-thumb
-        {
-            background-color: ${scrollbarColor};
-        }
+        body.desktop ${trackstyle}
+        body.desktop ${scrollbarStyle}
+        body.desktop ${thumbStyle}
+
+
+        body.not-touch-device ${trackstyle}
+        body.not-touch-device ${scrollbarStyle}
+        body.not-touch-device ${thumbStyle}
+        
+        body.desktop ${thumHoverStyle}
+        body.desktop ${thumActiveStyle}
+        body.desktop ${cornerStyle}
+        body.desktop ${resizerStyle}
+
+        body.not-touch-device ${thumHoverStyle}
+        body.not-touch-device ${thumActiveStyle}
+        body.not-touch-device ${cornerStyle}
+        body.not-touch-device ${resizerStyle}
+
+
         .tippy-box[data-theme~='${TIPPY_THEME}'] {
             background-color: ${theme.colors.primary};
             color: ${theme.colors.onPrimary};
@@ -133,4 +150,16 @@ export default function updateWebTheme(theme: ITheme) {
         }
         ${theme.customCSS || ''}
     `;
+}
+
+// Helper function to convert CSSProperties to a CSS string
+function toCSSString(properties?: Partial<CSSStyleDeclaration>): string {
+    if (!isObj(properties)) return "";
+    return Object.entries(properties)
+        .map((arr) => {
+            const [key, value] = arr;
+            if (!isEmpty(value)) return "";
+            return `${key as any}: ${value};` as string;
+        })
+        .join(" ");
 }

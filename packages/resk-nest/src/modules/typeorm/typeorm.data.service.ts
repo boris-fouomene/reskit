@@ -349,7 +349,7 @@ const stringify = (value: any) => {
     if (typeof value === "boolean") {
         return value ? "true" : "false";
     }
-    return isNonNullString(value) ? value.trim() : isNumber(value) ? String(value) : defaultStr(value?.toString());
+    return isNonNullString(value) ? value.trim() : isNumber(value) ? String(value) : defaultStr((value as any)?.toString());
 }
 const mongoRegex = (value: string, options?: string) => {
     const pattern = `%${stringify(value)}%`;

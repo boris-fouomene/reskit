@@ -36,7 +36,7 @@ import Breakpoints from '@breakpoints/index';
 import { Form } from '@components/Form';
 import { HStack } from '@components/Stack';
 import { IFilterColumnName, IFilterGroupProps, IFilterProps } from '@components/Filter/types';
-import Filter from '@components/Filter';
+import { Filter } from '@components/Filter';
 
 /**
  * A flexible and feature-rich data grid component for React Native.

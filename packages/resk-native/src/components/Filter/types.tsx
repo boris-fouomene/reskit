@@ -111,8 +111,16 @@ export interface IFilterGroupProps<DataType extends object = any> extends Omit<V
     columns: IFilterProps<DataType>[];
     withScrollView?: boolean;
     scrollViewProps?: ScrollViewProps;
+    sessionName?: string;
 }
 
 export interface IFilterGroupState<DataType extends object = any> {
-    columns: IFilterProps<DataType>[];
+    columns: Array<{
+        name: IFilterProps<DataType>["name"];
+        value: IFilterProps<DataType>["defaultValue"];
+        key: string;
+        action: IFilterAction;
+        ignoreCase: boolean;
+        operator: IFilterOperator;
+    }>;
 }

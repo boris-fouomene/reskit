@@ -4,7 +4,7 @@ import { ScrollView, ScrollViewProps, StyleSheet, View } from "react-native";
 import { IDict, IFields, IFieldType, IMongoOperatorName, IMongoQuery } from "@resk/core/types";
 import { MONGO_OPERATORS } from "@resk/core/filters";
 import Component from "@utils/Component";
-import { IFilterAction, IFilterActions, IFilterGroupProps, IFilterGroupState, IFilterOnChangeOptions, IFilterOperator, IFilterOperators, IFilterProcessedProps, IFilterProps, IFilterRegexAction, IFilterState } from "./types";
+import { IFilterAction, IFilterActions, IFilterColumnName, IFilterGroupProps, IFilterGroupState, IFilterOnChangeOptions, IFilterOperator, IFilterOperators, IFilterProcessedProps, IFilterProps, IFilterRegexAction, IFilterState } from "./types";
 import { Drawer } from "@components/Drawer";
 import { Form } from "@components/Form";
 import Notify from "@notify";
@@ -17,8 +17,9 @@ import FontIcon from "@components/Icon/Font.server";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 import TextInput from "@components/TextInput";
 import { getToggleableDefaultValues, IToggleableProps } from "@components/Switch";
-import { Fragment, useMemo } from "react";
+import { Fragment, useCallback, useContext, useMemo, useRef, createContext } from "react";
 import useStateCallback from "@utils/stateCallback";
+import { Auth, IAuthSessionStorage } from "@resk/core";
 
 
 export default class Filter<DataType extends object = any, FieldType extends IFieldType = IFieldType> extends Component<IFilterProps<DataType, FieldType>, IFilterState> {
@@ -1055,17 +1056,44 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
             return Filter.translateOperator("regexEndswith");
         },
     }
-    static Group<DataType extends object = any>({ withScrollView, style, scrollViewProps, columns, testID, ...props }: IFilterGroupProps<DataType>) {
+    static Group<DataType extends object = any>({ withScrollView, style, scrollViewProps, sessionName, columns, testID, ...props }: IFilterGroupProps<DataType>) {
         testID = defaultStr(testID, "resk-filter");
-        const filterableColumns = useMemo(() => {
-            const f = [];
-            if (Array.isArray(columns)) {
-
+        const sessionStorage = useMemo<IAuthSessionStorage | null>(() => {
+            if (isNonNullString(sessionName)) {
+                return Auth.Session.getStorage(sessionName);
             }
+            return null;
+        }, [sessionName]);
+        const sessionData = Object.assign({}, sessionStorage?.getData());
+        const { filterableColumns, columnsByNames } = useMemo(() => {
+            const cols: Array<IFilterProps<DataType>> = [];
+            const columnsByNames: Record<string, IFilterProps<DataType>> = {};
+            if (Array.isArray(columns)) {
+                columns.map((col) => {
+                    if (!isObj(col) || col.filterable === false || !isNonNullString(col.name)) return;
+                    const newColumn = Object.clone(col);
+                    cols.push(newColumn);
+                    columnsByNames[col.name] = newColumn;
+                })
+            }
+            return { filterableColumns: cols, columnsByNames };
         }, [columns]);
+        const filteredColumns = useMemo(() => {
+            const columns = Array.isArray(sessionData.columns) ? sessionData.columns : [];
+            return columns.filter((column) => {
+                if (!isObj(column) || !isNonNullString(column.name)) return false;
+                return filterableColumns.some((col) => {
+                    return col.name === column.name;
+                })
+            })
+        }, [filterableColumns, sessionData]);
         const [state, setState] = useStateCallback<IFilterGroupState<DataType>>({
-            columns: []
+            columns: filteredColumns
         });
+        const getColumn = useCallback((columnName: IFilterColumnName<DataType>) => {
+            if (!isNonNullString(columnName)) return null;
+            return columnsByNames[columnName] || null;
+        }, [columnsByNames]);
         const { Wrapper, wrapperProps } = useMemo(() => {
             return {
                 Wrapper: withScrollView !== false ? ScrollView : Fragment,
@@ -1077,10 +1105,29 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
         }, [withScrollView, scrollViewProps]);
         return <View testID={testID} {...props} style={[styles.filterGroup, style]}>
             <Wrapper {...wrapperProps}>
-
+                <FilterGroupContext.Provider value={{ getColumn, testID }}>
+                    {state.columns.map((col, index) => <FilterGroupItem {...col} />)}
+                </FilterGroupContext.Provider>
             </Wrapper>
         </View>
     }
+}
+const FilterGroupContext = createContext<{
+    testID: string,
+    getColumn: (columnName: IFilterColumnName<any>) => IFilterProps<any> | null;
+}>({} as any);
+
+const useFilterGroup = () => {
+    return useContext(FilterGroupContext);
+}
+function FilterGroupItem<DataType extends object = any>({ name, value, key: customKey, ...rest }: IFilterGroupState<DataType>["columns"][number]) {
+    const { getColumn, testID } = useFilterGroup();
+    const key = useRef(defaultStr(customKey, uniqid("filter-group-item"))).current;
+    const col = getColumn(name);
+    if (!col) return null;
+    return <View testID={testID + "-filter-container-" + { name } + "-index"} style={styles.filterGroupItemContainer}>
+        <Filter {...col} {...rest} defaultValue={value} key={key} />
+    </View>
 }
 /**
  * le composant Filter hérite du composant Field de formField en ajoutant des fonctions spécifiques liées au filtrage des données
@@ -1113,4 +1160,10 @@ const styles = StyleSheet.create({
     filterGroup: {
         width: "100%",
     },
+    filterGroupItemContainer: {
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        marginHorizontal: 5,
+    }
 });

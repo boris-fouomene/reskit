@@ -250,36 +250,38 @@ export interface IFilterGroupProps<DataType extends object = any> extends Omit<V
     scrollViewProps?: ScrollViewProps;
     sessionName?: string;
     removable?: boolean;
-    defaultValue?: Array<IFilterGroupState<DataType>["columns"][number] & {
-        getFilterValue?: (groupContext: IFilterGroupContext<DataType>) => IFilterProps<DataType>["defaultValue"]
+    defaultValue?: Array<IFilterGroupStateColumn<DataType> & {
+        getFilterValue?: (groupContext: IFilterGroupContext<DataType>) => any;
     }>;
 }
 export interface IFilterGroupContext<DataType extends object = any> {
     testID: string,
-    getColumn: (columnName: IFilterColumnName<any>) => IFilterProps<any> | null;
+    getColumn: (columnName: IFilterColumnName<any>) => IFilterProps<DataType> | null;
     sessionStorage: IAuthSessionStorage | null;
     removeFilter: (filterKey: string) => void;
 }
 
+export interface IFilterGroupStateColumn<DataType extends object = any> {
+    name: IFilterColumnName<DataType>;
+    value?: any;
+    /***
+     * unique key used to identify the filter from the group
+     */
+    filterKey: string;
+    /***
+     * action to apply to the filter
+     */
+    action?: IFilterAction;
+    /**
+     * ignore case for the filter
+     */
+    ignoreCase?: boolean;
+    /***
+     * operator to apply to the filter
+     */
+    operator?: IFilterOperator;
+};
+
 export interface IFilterGroupState<DataType extends object = any> {
-    columns: Array<{
-        name: IFilterProps<DataType>["name"];
-        value?: IFilterProps<DataType>["defaultValue"];
-        /***
-         * unique key used to identify the filter from the group
-         */
-        filterKey: string;
-        /***
-         * action to apply to the filter
-         */
-        action?: IFilterAction;
-        /**
-         * ignore case for the filter
-         */
-        ignoreCase?: boolean;
-        /***
-         * operator to apply to the filter
-         */
-        operator?: IFilterOperator;
-    }>;
+    columns: Array<IFilterGroupStateColumn<DataType>>;
 }

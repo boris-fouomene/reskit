@@ -4,7 +4,7 @@ import { ScrollView, ScrollViewProps, StyleSheet, View } from "react-native";
 import { IDict, IFields, IFieldType, IMongoOperatorName, IMongoQuery } from "@resk/core/types";
 import { MONGO_OPERATORS } from "@resk/core/filters";
 import Component from "@utils/Component";
-import { IFilterAction, IFilterActions, IFilterColumnName, IFilterGroupContext, IFilterGroupProps, IFilterGroupState, IFilterOnChangeOptions, IFilterOperator, IFilterOperators, IFilterProcessedProps, IFilterProps, IFilterRegexAction, IFilterState } from "./types";
+import { IFilterAction, IFilterActions, IFilterColumnName, IFilterGroupContext, IFilterGroupProps, IFilterGroupState, IFilterGroupStateColumn, IFilterOnChangeOptions, IFilterOperator, IFilterOperators, IFilterProcessedProps, IFilterProps, IFilterRegexAction, IFilterState } from "./types";
 import { Drawer } from "@components/Drawer";
 import { Form } from "@components/Form";
 import Notify from "@notify";
@@ -1394,13 +1394,13 @@ const FilterGroupContext = createContext<IFilterGroupContext>({} as any);
 const useFilterGroup = () => {
     return useContext(FilterGroupContext);
 }
-function FilterGroupItem<DataType extends object = any>({ name, filterKey, value, ...rest }: IFilterGroupState<DataType>["columns"][number]) {
+function FilterGroupItem<DataType extends object = any>({ name, filterKey, value, ...rest }: IFilterGroupStateColumn<DataType>) {
     const { getColumn, sessionStorage, testID, removeFilter } = useFilterGroup();
     const key = useRef(defaultStr(filterKey, uniqid("filter-group-item"))).current;
     const col = getColumn?.(name);
     const { data: sessionData, setData: setSessionData } = useMemo<{
-        data: IFilterGroupState<DataType>["columns"][number] | null;
-        setData: (item: Partial<IFilterGroupState<DataType>["columns"][number]>) => void;
+        data: IFilterGroupStateColumn<DataType> | null;
+        setData: (item: Partial<IFilterGroupStateColumn<DataType>>) => void;
     }>(() => {
         const sessionData = sessionStorage?.get(key);
         if (!isObj(sessionData?.columns) || !sessionStorage) {

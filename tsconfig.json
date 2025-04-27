@@ -56,6 +56,8 @@
     "./jest.config.js",
     "**/node_modules/**/*",
     "node_modules/**/*",
+    "node_modules",
+    "**/node_modules/*",
     "**/dist/**/*",
     "**/build/**/*",
     "./node_modules/@resk/**/*",

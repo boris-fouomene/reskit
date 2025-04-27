@@ -2942,6 +2942,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {JSX.Element | null} The filters component or null.
      */
     renderFilters(): JSX.Element | null {
+        if (!this.isFilterable()) return null;
         const canShowFilters = this.canShowFilters();
         return <Filter.Group
             {...Object.assign({}, { sessionName: this.getSessionName() }, this.props.filterGroupProps)}

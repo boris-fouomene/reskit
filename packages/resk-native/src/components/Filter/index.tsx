@@ -1068,6 +1068,28 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
             return Filter.translateOperator("regexEndswith");
         },
     }
+    /**
+     * Renders a filter group with a list of filters that can be used to filter data.
+     *
+     * The component accepts the following props:
+     * - `withScrollView`: A boolean indicating whether to render the filters in a scroll view or not.
+     * - `disabled`: A boolean indicating whether the filter group is disabled or not.
+     * - `style`: An optional style object to style the filter group.
+     * - `scrollViewProps`: An optional object with props to pass to the scroll view component.
+     * - `defaultValue`: An optional array of filters to use as the default value.
+     * - `sessionName`: An optional string to use as the session storage key.
+     * - `columns`: An array of filters to render in the filter group.
+     * - `testID`: An optional string to use as the test ID for the component.
+     *
+     * The component renders a list of filters that can be used to filter data. The filters are rendered as a list of `Filter` components.
+     * The component also renders a button to add a new filter to the list.
+     *
+     * If `withScrollView` is true, the filters are rendered in a scroll view.
+     * If `disabled` is true, the filter group is disabled and the filters are not rendered.
+     *
+     * The component uses the `FilterGroupContext` to share the filters and the session storage with its children.
+     *
+     */
     static Group<DataType extends object = any>({ withScrollView, disabled, style, scrollViewProps, defaultValue, sessionName, columns, testID, ...props }: IFilterGroupProps<DataType>) {
         testID = defaultStr(testID, "resk-filter");
         const isDisabled = disabled === true;

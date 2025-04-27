@@ -23,7 +23,192 @@ import FontIcon from "@components/Icon/Font";
 import Label from "@components/Label";
 
 
-
+/**
+ * The `Filter` class is a React component that provides a flexible and extensible filtering mechanism.
+ * It supports various filter types, operators, and actions, allowing users to filter data based on
+ * different criteria. The component is designed to handle complex filtering scenarios, including
+ * date ranges, regex-based filtering, and logical operators.
+ *
+ * @template DataType - The type of data being filtered. Defaults to `any`.
+ * @template FieldType - The type of field being filtered. Defaults to `IFieldType`.
+ *
+ * @extends Component<IFilterProps<DataType, FieldType>, IFilterState>
+ *
+ * @property {string} formName - A unique identifier for the filter form.
+ * @property {string} defaultName - A unique default name for the filter.
+ * @property {IFilterState} state - The current state of the filter.
+ * @property {{ current: typeof Drawer | null }} drawerRef - A reference to the Drawer component.
+ *
+ * @method getStateProps - Extracts specific properties from the component's props.
+ * @param {IFilterProps<DataType, FieldType>} props - The component's props.
+ * @returns {Partial<IFilterState>} - The extracted state properties.
+ *
+ * @method processProps - Processes the component's props to derive the initial state and other properties.
+ * @param {IFilterProps<DataType, FieldType>} [props] - The component's props.
+ * @returns {IFilterProcessedProps} - The processed properties.
+ *
+ * @method componentDidUpdate - React lifecycle method that updates the state when props change.
+ * @param {Readonly<IFilterProps<DataType, FieldType>>} prevProps - The previous props.
+ * @param {any} nextContext - The next context.
+ *
+ * @method setSelectorField - Sets the active selector field.
+ * @param {string} selectorActiveFieldName - The name of the active selector field.
+ *
+ * @method setOperator - Sets the filter operator.
+ * @param {IFilterOperator} operator - The operator to set.
+ *
+ * @method isToDaysAction - Checks if the given action is a "today" action.
+ * @param {IFilterAction} [action] - The action to check.
+ * @returns {boolean} - `true` if the action is a "today" action, `false` otherwise.
+ *
+ * @method isBetweenAction - Checks if the given action is a "between" action.
+ * @param {IFilterAction} [action] - The action to check.
+ * @returns {boolean} - `true` if the action is a "between" action, `false` otherwise.
+ *
+ * @method handleModuloAction - Handles the modulo action by invoking the between action selector.
+ * @returns {Promise<[number, number]>} - A promise that resolves to an array with the divisor and remainder values.
+ *
+ * @method setAction - Sets the filter action and handles specific actions like "between" and "modulo".
+ * @param {IFilterAction} action - The action to set.
+ *
+ * @method getType - Gets the type of the filter field.
+ * @returns {IFieldType} - The type of the filter field.
+ *
+ * @method isDateTime - Checks if the filter type is "datetime".
+ * @returns {boolean} - `true` if the filter type is "datetime", `false` otherwise.
+ *
+ * @method isDate - Checks if the filter type is "date".
+ * @returns {boolean} - `true` if the filter type is "date", `false` otherwise.
+ *
+ * @method isTime - Checks if the filter type is "time".
+ * @returns {boolean} - `true` if the filter type is "time", `false` otherwise.
+ *
+ * @method isStartBetweenValueGreterThanEnd - Checks if the start value is greater than the end value.
+ * @param {any} start - The start value.
+ * @param {any} end - The end value.
+ * @returns {boolean} - `true` if the start value is greater than the end value, `false` otherwise.
+ *
+ * @method handleBetweenActionSelector - Handles the "between" action by opening a drawer for user input.
+ * @param {IFilterAction} [action] - The action to handle.
+ * @returns {Promise<{ betweenStartValue: any; betweenEndValue: any }>} - A promise that resolves to the start and end values.
+ *
+ * @method getMenuOperators - Gets the menu items for the filter operators.
+ * @returns {IMenuItemBase[]} - An array of menu items for the operators.
+ *
+ * @method isModuloAction - Checks if the given action is a "modulo" action.
+ * @param {IFilterAction} [action] - The action to check.
+ * @returns {boolean} - `true` if the action is a "modulo" action, `false` otherwise.
+ *
+ * @method getModuloText - Gets the text representation of the "modulo" action.
+ * @returns {string} - The text representation of the "modulo" action.
+ *
+ * @method getBetweenText - Gets the text representation of the "between" action.
+ * @returns {string} - The text representation of the "between" action.
+ *
+ * @method hasFilterValue - Checks if the filter has a value.
+ * @returns {boolean} - `true` if the filter has a value, `false` otherwise.
+ *
+ * @method getSelectorFieldsActions - Gets the menu items for the selector fields.
+ * @returns {IMenuItemProps[]} - An array of menu items for the selector fields.
+ *
+ * @method getMenuActions - Gets the menu items for the filter actions.
+ * @returns {IMenuItemBase[]} - An array of menu items for the actions.
+ *
+ * @method clearFilter - Clears the filter value and resets the state.
+ *
+ * @method getTitleLabelProps - Gets the props for the title label.
+ * @returns {object} - The props for the title label.
+ *
+ * @method render - Renders the filter component.
+ * @returns {JSX.Element | null} - The rendered component.
+ *
+ * @method getComponentProps - Gets the component props, including default values and overrides.
+ * @param {IFilterProps<DataType, FieldType>} [props] - The component props.
+ * @returns {IFilterProps<DataType, FieldType>} - The processed component props.
+ *
+ * @method getName - Gets the name of the filter.
+ * @returns {string} - The name of the filter.
+ *
+ * @method isNumber - Checks if the filter type is "number".
+ * @returns {boolean} - `true` if the filter type is "number", `false` otherwise.
+ *
+ * @method compareValues - Compares two values for equality.
+ * @param {any} value1 - The first value.
+ * @param {any} value2 - The second value.
+ * @returns {boolean} - `true` if the values are equal, `false` otherwise.
+ *
+ * @method handleChange - Handles changes to the filter state and triggers the `onChange` callback.
+ * @param {IFilterOnChangeOptions<DataType, FieldType> | IFilterState} options - The change options.
+ * @param {IFilterState} [newState] - The new state to set.
+ *
+ * @method translate - Translates a given key using the i18n instance.
+ * @param {string} key - The key to translate.
+ * @param {object} [options] - Optional translation options.
+ * @returns {T} - The translated value.
+ *
+ * @static
+ * @method staticTranslate - Translates a given key using the i18n instance (static version).
+ * @param {string} key - The key to translate.
+ * @param {object} [options] - Optional translation options.
+ * @returns {T} - The translated value.
+ *
+ * @static
+ * @method translateOperator - Translates a MongoDB operator name.
+ * @param {IMongoOperatorName | string} operator - The operator name to translate.
+ * @returns {string} - The translated operator name.
+ *
+ * @static
+ * @method getOperators - Gets all MongoDB operators and their translated names.
+ * @param {(operatorName: IMongoOperatorName, translatedOperatorName: string) => boolean} [filter] - An optional filter function.
+ * @returns {Record<IMongoOperatorName, string>} - An object mapping operator names to their translations.
+ *
+ * @static
+ * @method isLogicalOperator - Checks if the given operator is a logical operator.
+ * @param {IMongoOperatorName} operator - The operator to check.
+ * @returns {boolean} - `true` if the operator is a logical operator, `false` otherwise.
+ *
+ * @static
+ * @method isComparisonOperator - Checks if the given operator is a comparison operator.
+ * @param {IMongoOperatorName} operator - The operator to check.
+ * @returns {boolean} - `true` if the operator is a comparison operator, `false` otherwise.
+ *
+ * @static
+ * @method isRegexOperator - Checks if the given operator is a regex operator.
+ * @param {IMongoOperatorName} operator - The operator to check.
+ * @returns {boolean} - `true` if the operator is a regex operator, `false` otherwise.
+ *
+ * @static
+ * @method getI18nTranslationKey - Gets the translation key for a given key in the filter.
+ * @param {string} key - The key to get the translation key for.
+ * @returns {string} - The translation key.
+ *
+ * @static
+ * @method getDefaultAction - Gets the default action for a given field type.
+ * @param {IFieldType} [type] - The field type.
+ * @returns {IFilterAction} - The default action.
+ *
+ * @static
+ * @method toMongoRegex - Converts a value to a MongoDB regex string.
+ * @param {string} val - The value to convert.
+ * @param {IFilterRegexAction} comparator - The regex comparator.
+ * @returns {string} - The MongoDB regex string.
+ *
+ * @static
+ * @method escapeRegexChars - Escapes regex characters in a string.
+ * @param {string} value - The string to escape.
+ * @returns {string} - The escaped string.
+ *
+ * @static
+ * @method isArrayOperator - Checks if the given action is an array operator.
+ * @param {IFilterAction} [action] - The action to check.
+ * @returns {boolean} - `true` if the action is an array operator, `false` otherwise.
+ *
+ * @static
+ * @method Group - Renders a filter group with a list of filters.
+ * @template DataType - The type of data being filtered.
+ * @param {IFilterGroupProps<DataType>} props - The filter group props.
+ * @returns {JSX.Element} - The rendered filter group.
+ */
 export class Filter<DataType extends object = any, FieldType extends IFieldType = IFieldType> extends Component<IFilterProps<DataType, FieldType>, IFilterState> {
     readonly formName: string = uniqid("filter-form-named");
     readonly defaultName: string = uniqid("filter-default-name");

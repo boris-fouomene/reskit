@@ -4,7 +4,7 @@ import { ScrollView, ScrollViewProps, StyleSheet, View } from "react-native";
 import { IDict, IFields, IFieldType, IMongoOperatorName, IMongoQuery } from "@resk/core/types";
 import { MONGO_OPERATORS } from "@resk/core/filters";
 import Component from "@utils/Component";
-import { IFilterAction, IFilterActions, IFilterColumnName, IFilterGroupProps, IFilterGroupState, IFilterOnChangeOptions, IFilterOperator, IFilterOperators, IFilterProcessedProps, IFilterProps, IFilterRegexAction, IFilterState } from "./types";
+import { IFilterAction, IFilterActions, IFilterColumnName, IFilterGroupContext, IFilterGroupProps, IFilterGroupState, IFilterOnChangeOptions, IFilterOperator, IFilterOperators, IFilterProcessedProps, IFilterProps, IFilterRegexAction, IFilterState } from "./types";
 import { Drawer } from "@components/Drawer";
 import { Form } from "@components/Form";
 import Notify from "@notify";
@@ -20,6 +20,8 @@ import { getToggleableDefaultValues, IToggleableProps } from "@components/Switch
 import { Fragment, useCallback, useContext, useMemo, useRef, createContext } from "react";
 import useStateCallback from "@utils/stateCallback";
 import { Auth, IAuthSessionStorage } from "@resk/core";
+import { Button } from "@components/Button";
+import Label from "@components/Label";
 
 
 export default class Filter<DataType extends object = any, FieldType extends IFieldType = IFieldType> extends Component<IFilterProps<DataType, FieldType>, IFilterState> {
@@ -463,6 +465,8 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
             filter,
             visible,
             filterable,
+            removable,
+            onFilterRemove,
             ...props
         } = this.getComponentProps();
         if (filterable === false) return null;
@@ -523,6 +527,7 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
                         <Menu
                             testID={testID + "-menu"}
                             responsive={true}
+                            renderAsBottomSheetInFullScreen
                             anchor={<View>
                                 <FontIcon
                                     {...props}
@@ -542,7 +547,7 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
                                 ...(label
                                     ? [
                                         {
-                                            label: `Filtre [${label}]`,
+                                            label: `${this.translate("filter")} [${label}]`,
                                             divider: true,
                                             labelProps: {
                                                 ...titleLabelProps,
@@ -551,9 +556,16 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
                                         },
                                     ]
                                     : []),
+                                removable && typeof onFilterRemove == "function" ? {
+                                    label: this.translate("removeFilter"),
+                                    icon: "filter-remove",
+                                    onPress: () => {
+                                        onFilterRemove();
+                                    },
+                                } : undefined,
                                 hasFilterVal
                                     ? {
-                                        label: "Clear filter",
+                                        label: this.translate("clearFilter"),
                                         icon: "filter-remove",
                                         onPress: this.clearFilter.bind(this),
                                     }
@@ -561,7 +573,7 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
                                 ...this.getSelectorFieldsActions(),
                                 canIgnoreCase
                                     ? {
-                                        label: "Ignor Case",
+                                        label: this.translate("ignoreCase"),
                                         icon: ignoreCase ? "check" : null,
                                         onPress: () => {
                                             this.handleChange({ ignoreCase: !ignoreCase } as IFilterState);
@@ -570,7 +582,7 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
                                     }
                                     : null,
                                 {
-                                    label: "Opérateurs",
+                                    label: this.translate("operatorsLabel"),
                                     closeOnPress: false,
                                     labelProps: titleLabelProps,
                                     divider: true,
@@ -578,14 +590,14 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
                                 ...this.getMenuOperators(),
                                 { divider: true },
                                 {
-                                    label: "Actions",
+                                    label: this.translate("actionsLabel"),
                                     closeOnPress: false,
                                     labelProps: titleLabelProps,
                                     divider: true,
                                 },
                                 this.isNumber() && false
                                     ? {
-                                        label: "Traitez la valeur 0",
+                                        label: this.translate("handleZero"),
                                         icon: this.state.handleZero ? "check" : null,
                                         onPress: () => {
                                             this.handleChange({
@@ -632,13 +644,13 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
     compareValues(value1: any, value2: any) {
         const isNum = this.isNumber();
         const canotHandleZero = true || !this.state.handleZero;
-        if (isEmpty(value1) || (isNum && value1 === 0 && canotHandleZero)) {
+        if ((isNum && value1 === 0 && canotHandleZero)) {
             value1 = "";
         }
-        if (isEmpty(value2) || (isNum && value2 === 0 && canotHandleZero)) {
+        if ((isNum && value2 === 0 && canotHandleZero)) {
             value2 = "";
         }
-        return areEquals(value1, value2);
+        return compareValues(value1, value2);
     }
     handleChange(
         options: IFilterOnChangeOptions<DataType, FieldType> | IFilterState,
@@ -1056,15 +1068,15 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
             return Filter.translateOperator("regexEndswith");
         },
     }
-    static Group<DataType extends object = any>({ withScrollView, style, scrollViewProps, sessionName, columns, testID, ...props }: IFilterGroupProps<DataType>) {
+    static Group<DataType extends object = any>({ withScrollView, disabled, style, scrollViewProps, defaultValue, sessionName, columns, testID, ...props }: IFilterGroupProps<DataType>) {
         testID = defaultStr(testID, "resk-filter");
+        const isDisabled = disabled === true;
         const sessionStorage = useMemo<IAuthSessionStorage | null>(() => {
             if (isNonNullString(sessionName)) {
                 return Auth.Session.getStorage(sessionName);
             }
             return null;
         }, [sessionName]);
-        const sessionData = Object.assign({}, sessionStorage?.getData());
         const { filterableColumns, columnsByNames } = useMemo(() => {
             const cols: Array<IFilterProps<DataType>> = [];
             const columnsByNames: Record<string, IFilterProps<DataType>> = {};
@@ -1078,22 +1090,52 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
             }
             return { filterableColumns: cols, columnsByNames };
         }, [columns]);
-        const filteredColumns = useMemo(() => {
-            const columns = Array.isArray(sessionData.columns) ? sessionData.columns : [];
-            return columns.filter((column) => {
-                if (!isObj(column) || !isNonNullString(column.name)) return false;
-                return filterableColumns.some((col) => {
-                    return col.name === column.name;
-                })
-            })
-        }, [filterableColumns, sessionData]);
-        const [state, setState] = useStateCallback<IFilterGroupState<DataType>>({
-            columns: filteredColumns
-        });
         const getColumn = useCallback((columnName: IFilterColumnName<DataType>) => {
             if (!isNonNullString(columnName)) return null;
             return columnsByNames[columnName] || null;
         }, [columnsByNames]);
+        const context = {
+            getColumn, sessionStorage, testID, removeFilter: (filterKey: string) => {
+                if (!isNonNullString(filterKey) || !sessionStorage) return;
+                const sessionData = sessionStorage?.getData();
+                if (!isObj(sessionData?.columns)) return;
+                delete (sessionData as any).columns[filterKey];
+                sessionStorage.set("columns", sessionData.columns);
+            }
+        };
+        const filteredColumns = useMemo(() => {
+            const columns = [];
+            const sessionData = Object.assign({}, sessionStorage?.getData());
+            const filtersFromDefaultValue = {};
+            const filtersArrayFromDefaultValue: IFilterGroupState<DataType>["columns"] = [];
+            if (Array.isArray(defaultValue)) {
+                defaultValue.map((f) => {
+                    if (!isNonNullString(f) || !isNonNullString(f.name) || !isNonNullString(f.filterKey)) return;
+                    if (typeof f.getFilterValue == "function") {
+                        f.value = f.getFilterValue(context);
+                    }
+                    const f2 = Object.clone(f);
+                    delete f2.getFilterValue;
+                    (filtersFromDefaultValue as any)[f.filterKey] = f2;
+                    filtersArrayFromDefaultValue.push(f2);
+                });
+            }
+            if (isObj(sessionData.columns)) {
+                for (let i in sessionData) {
+                    const column = sessionData[i];
+                    if (!isObj(column) || !isNonNullString(column.name) || !isNonNullString(column.filterKey)) continue;
+                    if (filterableColumns.some((col) => col.name === column.name)) {
+                        columns.push(column);
+                    }
+                }
+            } else {
+                return filtersArrayFromDefaultValue;
+            }
+            return columns;
+        }, [filterableColumns, defaultValue]);
+        const [state, setState] = useStateCallback<IFilterGroupState<DataType>>({
+            columns: filteredColumns
+        });
         const { Wrapper, wrapperProps } = useMemo(() => {
             return {
                 Wrapper: withScrollView !== false ? ScrollView : Fragment,
@@ -1103,31 +1145,111 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
                 }) as ScrollViewProps : {}
             }
         }, [withScrollView, scrollViewProps]);
-        return <View testID={testID} {...props} style={[styles.filterGroup, style]}>
+        const filterMenuItems = useMemo(() => {
+            return filterableColumns.map(({ label, name, type, defaultValue }) => {
+                if (!label) return null;
+                return {
+                    label,
+                    right: <FontIcon name="filter-add" size={25} />,
+                    onPress: () => {
+                        setState((nState) => {
+                            return { ...nState, columns: [...nState.columns, { name, filterKey: uniqid("filter-group-key"), value: defaultValue }] }
+                        })
+                    }
+                }
+            })
+        }, [filterableColumns]);
+        return <View testID={testID} {...props} style={[styles.filterGroup, style, isDisabled && Theme.styles.disabled]}>
             <Wrapper {...wrapperProps}>
-                <FilterGroupContext.Provider value={{ getColumn, testID }}>
-                    {state.columns.map((col, index) => <FilterGroupItem {...col} />)}
+                <FilterGroupContext.Provider value={context}>
+                    {state.columns.map((col, index) => <FilterGroupItem key={col.filterKey || index} {...col} />)}
                 </FilterGroupContext.Provider>
+                {!isDisabled ? <Menu
+                    items={filterMenuItems}
+                    responsive
+                    renderAsBottomSheetInFullScreen
+                    anchor={<HStack noWrap>
+                        <Label>
+                            {Filter.staticTranslate("addFilter")}
+                        </Label>
+                        <FontIcon
+                            name="filter-menu"
+                            size={25}
+                        />
+                    </HStack>}
+                /> : null}
             </Wrapper>
         </View>
     }
 }
-const FilterGroupContext = createContext<{
-    testID: string,
-    getColumn: (columnName: IFilterColumnName<any>) => IFilterProps<any> | null;
-}>({} as any);
+const FilterGroupContext = createContext<IFilterGroupContext>({} as any);
 
 const useFilterGroup = () => {
     return useContext(FilterGroupContext);
 }
-function FilterGroupItem<DataType extends object = any>({ name, value, key: customKey, ...rest }: IFilterGroupState<DataType>["columns"][number]) {
-    const { getColumn, testID } = useFilterGroup();
-    const key = useRef(defaultStr(customKey, uniqid("filter-group-item"))).current;
-    const col = getColumn(name);
+function FilterGroupItem<DataType extends object = any>({ name, filterKey, value, ...rest }: IFilterGroupState<DataType>["columns"][number]) {
+    const { getColumn, sessionStorage, testID, removeFilter } = useFilterGroup();
+    const key = useRef(defaultStr(filterKey, uniqid("filter-group-item"))).current;
+    const col = getColumn?.(name);
+    const { data: sessionData, setData: setSessionData } = useMemo<{
+        data: IFilterGroupState<DataType>["columns"][number] | null;
+        setData: (item: Partial<IFilterGroupState<DataType>["columns"][number]>) => void;
+    }>(() => {
+        const sessionData = sessionStorage?.get(key);
+        if (!isObj(sessionData?.columns) || !sessionStorage) {
+            return { data: null, setData: () => { } };
+        }
+        const cols = sessionData.columns;
+        return {
+            data: cols[key] || null, setData: (item) => {
+                cols[key] = {
+                    ...item,
+                    name,
+                    filterKey: key,
+                };
+                sessionStorage.set("columns", cols);
+            }
+        };
+    }, [key, name]);
+    const defaultValue = useMemo(() => {
+        if (!sessionData || !isObj(sessionData)) return value;
+        if (!(key in sessionData)) return value;
+        return (sessionData as any)[key];
+    }, [sessionData, value]);
     if (!col) return null;
     return <View testID={testID + "-filter-container-" + { name } + "-index"} style={styles.filterGroupItemContainer}>
-        <Filter {...col} {...rest} defaultValue={value} key={key} />
+        <Filter
+            removable={true}
+            defaultValue={defaultValue}
+            onChange={(options) => {
+                const { value, action, operator, ignoreCase } = options;
+                if (compareValues(value, options.value) && compareValues(action, options.action) && compareValues(operator, options.operator) && compareValues(ignoreCase, options.ignoreCase)) {
+                    return;
+                }
+                setSessionData({
+                    value,
+                    action,
+                    operator,
+                    ignoreCase,
+                });
+                if (typeof col.onChange == "function") {
+                    col.onChange(options);
+                }
+            }}
+            onFilterRemove={() => {
+                removeFilter(key);
+            }} {...col} {...rest}
+            key={key} />
     </View>
+}
+const compareValues = (value1: any, value2: any) => {
+    if (isEmpty(value1)) {
+        value1 = "";
+    }
+    if (isEmpty(value2)) {
+        value2 = "";
+    }
+    return areEquals(value1, value2);
 }
 /**
  * le composant Filter hérite du composant Field de formField en ajoutant des fonctions spécifiques liées au filtrage des données

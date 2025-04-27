@@ -1,4 +1,6 @@
 import { IFormFieldValidatorOptions } from "@components/Form";
+import { IMenuItemProps } from "@components/Menu";
+import { IAuthSessionStorage } from "@resk/core";
 import { IField, IFieldType, IMergeWithoutDuplicates, IMongoLogicalOperatorName, IMongoOperatorName, IMongoQuery } from "@resk/core/types";
 import { ScrollViewProps, ViewProps } from "react-native";
 
@@ -103,6 +105,18 @@ export type IFilterProps<DataType extends object = any, FieldType extends IField
     testID?: string;
     onChange?: (options: IFilterOnChangeOptions<DataType, FieldType>) => any;
     selectorActiveFieldName?: string;
+    customMenuActions?: IMenuItemProps[];
+    /***
+     * Whether to display a remove button in the filter menu.
+     */
+    removable?: boolean;
+    /**
+     * Callback function to be called when the filter is removed.
+     * It only exists if the `removable` prop is set to true.
+     * @param {void} void
+     * @returns {void}
+     */
+    onFilterRemove?: () => void;
 };
 
 
@@ -110,17 +124,43 @@ export type IFilterProps<DataType extends object = any, FieldType extends IField
 export interface IFilterGroupProps<DataType extends object = any> extends Omit<ViewProps, "children"> {
     columns: IFilterProps<DataType>[];
     withScrollView?: boolean;
+    /***
+     * Whether the filter group is disabled.
+     */
+    disabled?: boolean;
     scrollViewProps?: ScrollViewProps;
     sessionName?: string;
+    removable?: boolean;
+    defaultValue?: Array<IFilterGroupState<DataType>["columns"][number] & {
+        getFilterValue?: (groupContext: IFilterGroupContext<DataType>) => IFilterProps<DataType>["defaultValue"]
+    }>;
+}
+export interface IFilterGroupContext<DataType extends object = any> {
+    testID: string,
+    getColumn: (columnName: IFilterColumnName<any>) => IFilterProps<any> | null;
+    sessionStorage: IAuthSessionStorage | null;
+    removeFilter: (filterKey: string) => void;
 }
 
 export interface IFilterGroupState<DataType extends object = any> {
     columns: Array<{
         name: IFilterProps<DataType>["name"];
-        value: IFilterProps<DataType>["defaultValue"];
-        key: string;
-        action: IFilterAction;
-        ignoreCase: boolean;
-        operator: IFilterOperator;
+        value?: IFilterProps<DataType>["defaultValue"];
+        /***
+         * unique key used to identify the filter from the group
+         */
+        filterKey: string;
+        /***
+         * action to apply to the filter
+         */
+        action?: IFilterAction;
+        /**
+         * ignore case for the filter
+         */
+        ignoreCase?: boolean;
+        /***
+         * operator to apply to the filter
+         */
+        operator?: IFilterOperator;
     }>;
 }

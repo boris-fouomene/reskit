@@ -35,6 +35,8 @@ import { IMenuItemProps, Menu } from '@components/Menu';
 import Breakpoints from '@breakpoints/index';
 import { Form } from '@components/Form';
 import { HStack } from '@components/Stack';
+import { IFilterGroupProps } from '@components/Filter/types';
+import Filter from '@components/Filter';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -2940,8 +2942,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {JSX.Element | null} The filters component or null.
      */
     renderFilters(): JSX.Element | null {
-        if (!this.canShowFilters()) return null;
-        return null;
+        const canShowFilters = this.canShowFilters();
+        return <Filter.Group
+            {...Object.assign({}, { sessionName: this.getSessionName() }, this.props.filterGroupProps)}
+            style={[this.props.filterGroupProps?.style, !canShowFilters && Theme.styles.hidden]}
+        />;
     }
     render(): JSX.Element | null {
         const testID = this.getTestID();
@@ -4688,6 +4693,11 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * @param options An object containing the datagrid context and the current view name.
      */
     onToggleView?: (options: IDatagridViewCallOptions<DataType> & { viewName: IDatagridViewName }) => void;
+
+    /**
+     * The props to be passed to the datagrid's filter group.
+     */
+    filterGroupProps?: IFilterGroupProps<DataType>;
 } & PropsExtensions;
 
 

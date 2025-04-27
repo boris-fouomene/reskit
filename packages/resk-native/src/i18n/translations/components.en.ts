@@ -104,6 +104,13 @@ I18nClass.RegisterTranslations({
                 "moduloDividerMayNotBeNull": "Divisor may not be nulll",
                 "endValueMustBeGreaterThanStartValue": "End value must be greater than Start Value",
                 "setStartAndEndValue": "Set Start and End Value",
+                "addFilter": "Add Filter",
+                "filter": "Filter",
+                "clearFilter": "Clear Filter",
+                "ignoreCase": "Ignore Case",
+                "operatorsLabel": "Operators",
+                "actionsLabel": "Actions",
+                "handleZero": "Handle Zero",
                 "operators": {
                     "$and": "And",
                     "$or": "Or",

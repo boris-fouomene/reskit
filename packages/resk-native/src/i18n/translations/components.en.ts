@@ -91,7 +91,7 @@ I18nClass.RegisterTranslations({
                     "average": "Average",
                 }
             },
-            "filters": {
+            "filter": {
                 "selectValue": "Select a value",
                 "set": "Set",
                 "moduloDivisor": "Divisor",

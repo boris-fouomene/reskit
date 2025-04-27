@@ -13,14 +13,13 @@ import InputFormatter from "@resk/core/inputFormatter";
 import Theme from "@theme/index";
 import getTextContent from "@utils/getTextContent";
 import { HStack } from "@components/Stack";
-import FontIcon from "@components/Icon/Font.server";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 import TextInput from "@components/TextInput";
 import { getToggleableDefaultValues, IToggleableProps } from "@components/Switch";
 import { Fragment, useCallback, useContext, useMemo, useRef, createContext } from "react";
 import useStateCallback from "@utils/stateCallback";
 import { Auth, IAuthSessionStorage } from "@resk/core";
-import { Button } from "@components/Button";
+import FontIcon from "@components/Icon/Font";
 import Label from "@components/Label";
 
 
@@ -1172,7 +1171,7 @@ export default class Filter<DataType extends object = any, FieldType extends IFi
                 if (!label) return null;
                 return {
                     label,
-                    right: <FontIcon name="filter-add" size={25} />,
+                    right: <FontIcon name="filter-plus" size={25} />,
                     onPress: () => {
                         setState((nState) => {
                             return { ...nState, columns: [...nState.columns, { name, filterKey: uniqid("filter-group-key"), value: defaultValue }] }
@@ -1303,6 +1302,7 @@ const styles = StyleSheet.create({
     },
     filterGroup: {
         width: "100%",
+        paddingVertical: 5,
     },
     filterGroupItemContainer: {
         flexDirection: "row",

@@ -35,7 +35,7 @@ import { IMenuItemProps, Menu } from '@components/Menu';
 import Breakpoints from '@breakpoints/index';
 import { Form } from '@components/Form';
 import { HStack } from '@components/Stack';
-import { IFilterGroupProps } from '@components/Filter/types';
+import { IFilterColumnName, IFilterGroupProps, IFilterProps } from '@components/Filter/types';
 import Filter from '@components/Filter';
 
 /**
@@ -2944,8 +2944,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     renderFilters(): JSX.Element | null {
         if (!this.isFilterable()) return null;
         const canShowFilters = this.canShowFilters();
-        return <Filter.Group
+        return <Filter.Group<DataType>
             {...Object.assign({}, { sessionName: this.getSessionName() }, this.props.filterGroupProps)}
+            columns={this.props.columns}
             style={[this.props.filterGroupProps?.style, !canShowFilters && Theme.styles.hidden]}
         />;
     }
@@ -4698,7 +4699,7 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
     /**
      * The props to be passed to the datagrid's filter group.
      */
-    filterGroupProps?: IFilterGroupProps<DataType>;
+    filterGroupProps?: Omit<IFilterGroupProps<DataType>, "columns">;
 } & PropsExtensions;
 
 
@@ -4825,7 +4826,7 @@ export function useDatagridOnEvent(event: IDatagridEvent | IDatagridEvent[], cal
     }, [event, datagridContext?.on, callbackOrForceRender]);
 }
 
-export type IDatagridViewColumnName<DataType extends object = any> = (keyof DataType & string) | string;
+export type IDatagridViewColumnName<DataType extends object = any> = IFilterColumnName<DataType>;
 /**
  * @typedef IDatagridViewStateColumn
  * Represents a column in the DatagridView component's state.
@@ -4903,13 +4904,6 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
     labelProps?: Partial<Omit<ILabelProps, "children">>;
 
     /**
-     * The name of the column.
-     * 
-     * This property is required and must be a unique string.
-     */
-    name: IDatagridViewColumnName<DataType>;
-
-    /**
      * Whether the column is filterable.
      * 
      * If true, the column can be filtered using a filter input.
@@ -4972,13 +4966,6 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
      */
     computeCellValue?: (options: IDatagridViewCallOptions<DataType> & { rowData: DataType }) => any;
 
-    /**
-     * Whether to ignore case when sorting the column.
-     * 
-     * If true, the column is sorted in a case-insensitive manner.
-     */
-    ignoreCase?: boolean;
-
     /***
      * A custom render function for the column.
      * 
@@ -5002,7 +4989,7 @@ export type IDatagridViewColumnProps<DataType extends object = any> = Omit<IFiel
      * Whether the column is resizable.
      */
     resizable?: boolean;
-}
+} & IFilterProps<DataType, any>;
 
 interface IDatagridViewMeasuredLayout extends LayoutRectangle {
     pageX: number;

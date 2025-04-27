@@ -88,12 +88,10 @@
     "./src/**/*.tsx",
   ],
   "exclude": [
-    "@resk/core",
     "../resk-core/**/*",
     "**/resk-core/**/*",
-    "node_modules",
+    "node_modules/**/*",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
-    "test",
   ]
 }

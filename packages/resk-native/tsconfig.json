@@ -90,7 +90,9 @@
   "exclude": [
     "../resk-core/**/*",
     "**/resk-core/**/*",
+    "react-native",
     "node_modules/**/*",
+    "../../node_modules/**/*",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
   ]

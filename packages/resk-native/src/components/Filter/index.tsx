@@ -23,7 +23,8 @@ import FontIcon from "@components/Icon/Font";
 import Label from "@components/Label";
 
 
-export default class Filter<DataType extends object = any, FieldType extends IFieldType = IFieldType> extends Component<IFilterProps<DataType, FieldType>, IFilterState> {
+
+export class Filter<DataType extends object = any, FieldType extends IFieldType = IFieldType> extends Component<IFilterProps<DataType, FieldType>, IFilterState> {
     readonly formName: string = uniqid("filter-form-named");
     readonly defaultName: string = uniqid("filter-default-name");
     readonly state: IFilterState = {} as IFilterState;

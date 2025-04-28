@@ -1,9 +1,10 @@
 import { IBreakpoints } from "@src/breakpoints/types";
 import { ITheme } from "@theme/types";
-import { IDrawerNavigationViewProps } from "@layouts/DrawerNavigationView";
+import { IDrawerNavigationViewProps } from "@layouts/DrawerNavigationView/types";
 import { I18nClass } from "@resk/core/i18n";
 import { IUseI18nOptions } from "@src/types";
 import { IAuthProviderProps } from "@auth/types";
+
 
 /**
  * @group ReskNativeProvider

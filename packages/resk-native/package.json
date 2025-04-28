@@ -6,7 +6,6 @@
   "module1": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
-    "build",
     "package.json",
     "readme.md"
   ],
@@ -16,11 +15,12 @@
     "build-dts": "tsc -p tsconfig.dts.json && npx tsc-alias -p tsconfig.dts.json",
     "pretest": "npm run build-test",
     "build-test": "tsup --config tsup.config.test.ts",
-    "test": "npx jest"
+    "test": "npx jest",
+    "circular-deps": "madge --circular --extensions ts ./src/index.tsx"
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
-    "@resk/core": "^1.18.8",
+    "@resk/core": "^1.19.0",
     "color": "^5.0.0",
     "tippy.js": "^6.3.7"
   },

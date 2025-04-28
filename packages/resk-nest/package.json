@@ -20,7 +20,7 @@
     "@nestjs/common": "^11.0.20",
     "@nestjs/core": "^11.0.20",
     "@nestjs/swagger": "^11.1.4",
-    "@resk/core": "^1.18.8",
+    "@resk/core": "^1.19.0",
     "bcryptjs": "^3.0.2",
     "jose": "^6.0.10",
     "mongoose": "^8.13.2",

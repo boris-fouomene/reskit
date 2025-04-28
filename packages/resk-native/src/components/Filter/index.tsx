@@ -1235,22 +1235,22 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
     };
     static readonly REGEX_ACTIONS: Record<IFilterRegexAction, string> = {
         get $regexequals() {
-            return Filter.translateOperator("regexEquals");
+            return Filter.translateOperator("$regexEquals");
         },
         get $regexcontains() {
-            return Filter.translateOperator("regexContains");
+            return Filter.translateOperator("$regexContains");
         },
         get $regexnotcontains() {
-            return Filter.translateOperator("regexNotContains");
+            return Filter.translateOperator("$regexNotContains");
         },
         get $regexnotequals() {
-            return Filter.translateOperator("regexNotequals");
+            return Filter.translateOperator("$regexNotequals");
         },
         get $regexstartswith() {
-            return Filter.translateOperator("regexStartswith");
+            return Filter.translateOperator("$regexStartswith");
         },
         get $regexendswith() {
-            return Filter.translateOperator("regexEndswith");
+            return Filter.translateOperator("$regexEndswith");
         },
     }
     /**

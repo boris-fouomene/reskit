@@ -1,7 +1,8 @@
 import * as React from "react";
 import Theme, { useTheme } from "@theme";
-import View, { IViewProps } from "@components/View";
+import View from "@components/View";
 import { View as RNView } from 'react-native';
+import { ISurfaceProps } from "./types";
 
 /**
  * The Surface component renders a box with shadow, similar to CSS box-shadow.
@@ -40,43 +41,7 @@ const Surface = React.forwardRef(({ style, shadowOpacity = 0.24, borderRadius, e
         ]}
     />
 });
-/**
- * Represents the properties for the Surface component.
- * This interface extends all properties from the View component 
- * (see $components/View).
- * 
- * @interface ISurfaceProps
- * @extends IViewProps
- * 
- * @property {number} [elevation] - The elevation level of the surface's shadow.
- *                                     This value determines the intensity of the shadow 
- *                                     effect and should be a number between 0 and 10.
- *                                     A higher value results in a more pronounced shadow.
- *                                     @example
- *                                     ```tsx
- *                                     <Surface elevation={3} style={{ padding: 20 }}>
- *                                       <Text>Sample Surface</Text>
- *                                     </Surface>
- *                                     ```
- */
-export interface ISurfaceProps extends IViewProps {
-    /***
-     * The level of elevation for the surface shadow.
-     */
-    elevation?: number;
-
-    /***
-     * The shadow opacity for the surface shadow.
-     * Default is 0.24
-     */
-    shadowOpacity?: number;
-
-    /***
-     * The border radius for the surface.
-     * Default is 0
-     */
-    borderRadius?: number;
-}
+export * from "./types";
 
 Surface.displayName = "Surface";
 

@@ -1,4 +1,5 @@
-import { IBreakpoints } from "@src/breakpoints/types";
+import { IBreakpointName, IBreakpoints } from "@src/breakpoints/types";
+import { IImageStyle, ITextStyle, IViewStyle } from "@src/types";
 import { ScaledSize } from "react-native";
 
 /**
@@ -109,3 +110,56 @@ export interface IDimensions extends ScaledSize {
     isLandscape: boolean;
 }
 
+/**
+ * @interface IWithBreakpointStyle
+ * Type definition for a component's props that includes responsive styling capabilities.
+ * 
+ * This type extends the base props `T` by omitting any properties that are already defined in 
+ * the `IBreakpointStyleProps` interface, while also ensuring that the component has all the properties 
+ * defined in `IBreakpointStyleProps`. This allows for a clean integration of responsive styles 
+ * without conflicting with existing props.
+ * 
+ * @template T - The base props type that extends `IBreakpointStyleProps`. Defaults to `any`.
+ * 
+ * ### Key Features:
+ * - **Omitted Properties**: By using `Omit<T, keyof IBreakpointStyleProps>`, any properties from `T` that 
+ *   overlap with `IBreakpointStyleProps` are removed, preventing prop collisions.
+ * - **Breakpoint Style Properties**: The resulting type includes all properties from `IBreakpointStyleProps`, 
+ *   ensuring that any component using this type will have access to responsive styling features.
+ * 
+ * ### Usage Example:
+ * This type is typically used in conjunction with higher-order components (HOCs) 
+ * or styled components to define props that require responsive styling.
+ * 
+ * ```typescript
+ * interface IBreakpointStyleProps {
+ *   style?: React.CSSProperties; // Base style prop
+ *   breakpointStyle?: (dimensions: IDimensionsProps) => React.CSSProperties; // Function for responsive styles
+ * }
+ * 
+ * // Define a component's props using IWithBreakpointStyle
+ * interface IMyComponentProps extends IWithBreakpointStyle<React.HTMLProps<HTMLDivElement>> {
+ *   title: string; // Additional prop
+ * }
+ * 
+ * const MyComponent: React.FC<IMyComponentProps> = ({ title, style, breakpointStyle }) => {
+ *   const responsiveStyle = breakpointStyle ? breakpointStyle(getDeviceDimensions()) : {};
+ *   return <div style={{ ...style, ...responsiveStyle }}>{title}</div>;
+ * };
+ * ```
+ */
+export type IWithBreakpointStyle<T = any> =
+    Omit<T, keyof IBreakpointStyleProps> & IBreakpointStyleProps;
+
+
+/**
+ * @interface IBreakpointStyleProps
+ * Type definition for a component's props that includes responsive styling capabilities.
+ * @typedef {Object} IBreakpointStyleProps
+ * @property {ITextStyle | IViewStyle  | IImageStyle} [style] - The base style to apply.
+ * @property {(Partial<Record<IBreakpointName, ITextStyle | IViewStyle  | IImageStyle>>) | ((dimensions: IDimensions) => ITextStyle | IViewStyle  | IImageStyle)} [breakpointStyle] - The style to apply based on the current breakpoint.
+ */
+export interface IBreakpointStyleProps {
+    style?: ITextStyle | IViewStyle | IImageStyle; // The base style to apply
+    breakpointStyle?: (Partial<Record<IBreakpointName, ITextStyle | IViewStyle | IImageStyle>>) | ((dimensions: IDimensions) => ITextStyle | IViewStyle | IImageStyle);
+};

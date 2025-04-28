@@ -1,19 +1,14 @@
 {
   "compilerOptions": {
-    //"baseUrl": ".",
-    //"rootDir": ".",
     "outDir": "./build",
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "strict": true,
-    "resolveJsonModule": true,
-    "noLib": false,
-    "noEmitOnError": true,
     "jsxImportSource": "react",
-    //"importHelpers": false,
-    //"noEmitHelpers": true,
-    "noEmit": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true, // Allow interoperability with CommonJS modules
+    "allowJs": true,
+    "resolveJsonModule": true,
     "target": "ES2015", // Or the desired target
     "module": "ES6", // Enables ESM & CJS interop
     "moduleResolution": "node", // Ensures Node-style resolution
@@ -23,19 +18,16 @@
     "declarationMap": false,
     "incremental": false,
     "composite": false,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "jsx": "react-native",
+    "strict": true,
+    "noEmitOnError": true,
+    "noEmit": false,
+    "noLib": false,
+    "jsx": "preserve",
     "lib": [
       "DOM",
       "ESNext"
     ],
     "skipLibCheck": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "../node_modules/tsup"
-    ],
     "types": [
       "jest",
       "node"
@@ -45,12 +37,6 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.json",
-    "ts-paths-to-vite-alias.mjs",
-    "packages/resk-tamagui/vite.config.mjs",
-    "jest.config.js",
-    "packages/resk-core/jest.config.js",
-    "packages/resk-nest/src/locales/common.js",
-    "packages/resk-core/jest.config.n.js"
   ],
   "exclude": [
     "./jest.config.js",
@@ -60,7 +46,6 @@
     "**/node_modules/*",
     "**/dist/**/*",
     "**/build/**/*",
-    "./node_modules/@resk/**/*",
     "@resk/**/*",
     "**/dist/*",
     "**/*.spec.ts",
@@ -76,5 +61,4 @@
     "**/*.spec.js",
     "**/*.spec.jsx"
   ],
-  //"extends": "expo/tsconfig.base"
 }

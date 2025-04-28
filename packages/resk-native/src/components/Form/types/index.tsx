@@ -1,11 +1,11 @@
 import "@resk/core";
-import { IButtonProps } from "@components/Button";
-import { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler";
+import { IButtonProps } from "@components/Button/types";
+import { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler/types";
 import { IKeyboardEventHandlerKey } from "@components/KeyboardEventHandler/keyEvents";
-import { ITabItemProps, ITabProps } from "@components/Tab";
-import { IViewProps } from "@components/View";
+import { ITabItemProps, ITabProps } from "@components/Tab/types";
+import { IViewProps } from "@components/View/types";
 import { IDimensions } from "@dimensions/types";
-import { IAuthPerm, IDict, IField, IFieldBase, IFields, IFieldType, IResourceName, IValidatorRule, IValidatorValidateOptions } from "@resk/core";
+import { IAuthPerm, IDict, IField, IFields, IFieldType, IResourceName, IValidatorRule, IValidatorValidateOptions } from "@resk/core";
 import { IOnChangeOptions, IViewStyle } from "@src/types";
 import { ObservableComponent } from "@utils/index";
 import { ReactElement, ReactNode } from "react";

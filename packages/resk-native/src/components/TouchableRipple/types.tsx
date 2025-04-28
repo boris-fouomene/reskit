@@ -1,4 +1,4 @@
-import { PressableAndroidRippleConfig, PressableProps } from 'react-native';
+import { PressableProps } from 'react-native';
 /**
  * Interface representing the props for the `TouchableRipple` component.
  * This interface extends the standard `PressableProps` from React Native,

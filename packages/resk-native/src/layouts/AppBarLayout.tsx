@@ -1,5 +1,5 @@
 import { AppBar, IAppBarProps } from "@components/AppBar";
-import { DrawerMenuIcon } from "./DrawerMenuIcon";
+import { DrawerMenuIcon } from "./DrawerNavigationView/DrawerMenuIcon";
 
 /**
  * A functional component that renders an AppBar with a customizable layout.

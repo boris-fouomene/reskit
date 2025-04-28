@@ -1,4 +1,4 @@
-import { IViewProps } from "@components/View";
+import { IViewProps } from "@components/View/types";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent } from "react-native";
 

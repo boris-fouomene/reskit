@@ -1,5 +1,5 @@
-import { IResourceActionName, IResourceActionTuple, IResourceActionTupleArray, IResourceName } from "@/types/resources";
-import { IDict } from "../types";
+import { IResourceActionName, IResourceActionTuple, IResourceName } from "@/types/resources";
+import { IDict } from "../types/dictionary";
 /**
  * @interface IAuthUser
  * Represents an authenticated user in the application.

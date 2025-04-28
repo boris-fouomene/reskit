@@ -1,5 +1,6 @@
 import { View as RNView, ViewProps } from "react-native";
-import { IWithBreakpointStyle, withBreakpointStyle } from "@src/dimensions";
+import { withBreakpointStyle } from "@src/dimensions";
+import { IViewProps } from "./types";
 
 /***
  * The `View` component is a wrapper around the React Native `View` component.
@@ -32,23 +33,11 @@ import { IWithBreakpointStyle, withBreakpointStyle } from "@src/dimensions";
  * In this example, the `View` component's padding and background color
  * are adjusted based on whether the device is mobile or tablet.
  */
-const View = withBreakpointStyle(RNView, "View");
+const View = withBreakpointStyle<IViewProps>(RNView, "View");
 
 export default View;
 
 // Set a display name for better debugging in React DevTools
-View.displayName = "ViewComponent";
+View.displayName = "ReskNativeView";
 
-/***
- * The props for the `View` component are a combination of the standard
- * props from React Native's `View` and the additional props from the
- * `withBreakpointStyle` HOC.
- * 
- * ### Props:
- * - `style`: The base style to apply to the view.
- * - `mediaQueries`: A function or an object that defines styles based on device dimensions.
- * - Other standard `ViewProps` from React Native's `View`.
- */
-export type IViewProps = Omit<ViewProps, "style"> & IWithBreakpointStyle<ViewProps> & {
-    // Additional props can be defined here if needed
-};
+export * from "./types";

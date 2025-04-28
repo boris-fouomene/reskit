@@ -1,11 +1,11 @@
 "use client";
 import * as React from "react"
 import { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
-import { IFontIconName, IFontIconProps, IGetIconOptions, IIconProps } from "./types";
+import { IFontIconName, IGetIconOptions, IIconProps } from "./types";
 import { Image, ImageStyle } from "react-native";
 import { isValidElement, pickTouchEventHandlers } from "@utils";
 import { isImageSource, isImageUrl } from "./utils";
-import { defaultStr, isNonNullString, isObj } from "@resk/core";
+import { defaultStr, isNonNullString, isObj } from "@resk/core/utils";
 import Theme, { Colors, useTheme } from "@theme/index";
 import FontIcon, { DEFAULT_FONT_ICON_SIZE } from "./Font";
 import { Tooltip } from "@components/Tooltip";

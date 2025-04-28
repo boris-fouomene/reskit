@@ -1,10 +1,9 @@
-import { IAppBarProps } from "@components/AppBar";
+import { IAppBarProps } from "@components/AppBar/types";
 import { IMenuItemBase, IMenuItems } from "@components/Menu/types";
-import { IViewProps } from "@components/View";
+import { IViewProps } from "@components/View/types";
 import { IAuthSessionStorage } from "@resk/core/auth";
 import { IDict } from "@resk/core/types";
 import { IObservable } from "@resk/core/observable";
-import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, PanResponderInstance } from "react-native";
 
 

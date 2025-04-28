@@ -1,7 +1,7 @@
 
 import { IButtonProps } from "@components/Button/types";
-import { IExpandableProps } from "@components/Expandable";
-import { IViewProps } from "@components/View";
+import { IExpandableProps } from "@components/Expandable/types";
+import { IViewProps } from "@components/View/types";
 import { IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
 import { PressableProps, ScrollViewProps, ViewProps, Animated } from "react-native";

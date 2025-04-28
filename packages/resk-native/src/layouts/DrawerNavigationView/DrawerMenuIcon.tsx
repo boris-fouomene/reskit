@@ -1,63 +1,13 @@
-import { useTheme } from "@theme";
-import { IBackActionProps } from "@components/AppBar/types";
+import { IBackActionProps } from "@components/AppBar";
 import { IDrawerCurrentState, useDrawerCurrentState } from "@components/Drawer";
 import { useMemo } from "react";
-import { Icon, IIconSource, FontIcon, IIconProps, IIconSourceBase } from "@components/Icon";
+import { Icon, FontIcon, IIconProps } from "@components/Icon";
 import { GestureResponderEvent } from "react-native";
 import { isNonNullString } from "@resk/core/utils";
 import { useAppBar } from "@components/AppBar";
+import { IDrawerMenuIconProps } from "./types";
 
-/**
- * Props for the `DrawerMenuIcon` component.
- * 
- * The `IDrawerMenuIconProps` interface defines the properties that can be passed to the 
- * `DrawerMenuIcon` component, which is responsible for rendering a back action button 
- * that interacts with a drawer navigation system. This interface extends the properties 
- * of {@link IBackActionProps}, omitting specific properties to customize the behavior of the 
- * back action based on the drawer's state.
- * 
- * @extends IBackActionProps - Inherits properties from the {@link IBackActionProps} interface, 
- *                             excluding 'onPress', 'iconName', and 'source'.
- * 
- * @property {("permanent" | "temporary") | undefined} drawerMode - Specifies the behavior 
- * of the back action based on the drawer's state. If set to "permanent", the back action 
- * is rendered only when the drawer is in permanent mode. If set to "temporary", it is 
- * rendered only when the drawer is in temporary mode.
- * 
- * @property {((event: GestureResponderEvent, drawerState: IDrawerCurrentState) => any) | undefined} onPress - 
- * A callback function that is triggered when the back action button is pressed. It receives 
- * the event and the current state of the drawer as parameters.
- * 
- * @property {(IIconSourceBase | JSX.Element | ((drawerState?: IDrawerCurrentState) => IIconSource)) | undefined} icon - 
- * The icon to be displayed on the back action button. This can be a static icon source, 
- * a JSX element, or a function that returns an icon source based on the current drawer state.
- * 
- * @example
- * const backActionProps: IDrawerMenuIconProps = {
- *     drawerMode: "temporary",
- *     onPress: (event, drawerState) => {
- *         console.log("Back action pressed", drawerState);
- *     },
- *     icon: "arrow-back" // or <SomeCustomIcon />
- * };
- * 
- * @example
- * // Using a function to determine the icon based on drawer state
- * const backActionPropsWithDynamicIcon: IDrawerMenuIconProps = {
- *     drawerMode: "permanent",
- *     onPress: (event, drawerState) => {
- *         // Handle back action
- *     },
- *     icon: (drawerState) => {
- *         return drawerState.isPermanent ? "arrow-back" : "menu";
- *     }
- * };
- */
-export interface IDrawerMenuIconProps extends Omit<IBackActionProps, 'onPress' | 'iconName' | 'source'> {
-    drawerMode?: "permanent" | "temporary";
-    onPress?: (event: GestureResponderEvent, drawerState: IDrawerCurrentState) => any;
-    icon?: IIconSourceBase | JSX.Element | ((drawerState?: IDrawerCurrentState) => IIconSource);
-}
+
 
 /**
  * A functional component that renders a back action button for drawer navigation.

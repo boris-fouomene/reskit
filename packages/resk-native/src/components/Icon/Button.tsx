@@ -8,12 +8,12 @@ import {
 import { Surface } from '@components/Surface';
 import { TouchableRipple } from '@components/TouchableRipple';
 import { getColors } from "@components/TouchableRipple/utils";
-import { IIconButtonProps, IIconProps, IIconSource } from './types';
-import { Colors, useTheme } from '@theme/index';
+import { IIconButtonProps } from './types';
+import { Colors, useTheme } from '@theme';
 import { useGetIcon } from "./Icon";
 import { DEFAULT_FONT_ICON_SIZE } from "./Font";
 import { ITheme } from '@theme/types';
-import { defaultStr } from '@resk/core';
+import { defaultStr } from '@resk/core/utils';
 
 const PADDING = 8;
 
@@ -118,7 +118,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
             as: TouchableRipple,
             rippleColor,
             ...rest, icon: source || iconName || undefined, testID,
-            android_ripple : Object.assign({},{radius:size*0.5}, rest.android_ripple),
+            android_ripple: Object.assign({}, { radius: size * 0.5 }, rest.android_ripple),
             color: iconColor,
             disabled, size,
             containerProps: {

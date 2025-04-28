@@ -1,8 +1,8 @@
 import { View } from "react-native";
-import { IDrawerItemsProps, IDrawerProps, IDrawerCurrentState } from "@components/Drawer";
+import { IDrawerItemsProps, IDrawerCurrentState } from "@components/Drawer";
 import { StyleSheet } from "react-native";
 import Label from "@components/Label";
-import { DrawerMenuIcon, IDrawerMenuIconProps } from "./DrawerMenuIcon";
+import { DrawerMenuIcon } from "./DrawerMenuIcon";
 import { HStack } from "@components/Stack";
 import { useTheme } from "@theme";
 import { ScrollView } from "react-native";
@@ -12,6 +12,10 @@ import { defaultStr } from "@resk/core/utils";
 import { isValidElement } from "@utils";
 import { ReactNode } from "react";
 import DrawerItems from "@components/Drawer/DrawerItems";
+import { IDrawerNavigationViewHeader, IDrawerNavigationViewProps, IDrawerMenuIconProps } from "./types";
+
+export * from "./types";
+export { DrawerMenuIcon } from "./DrawerMenuIcon";
 
 /**
  * A functional component that renders the navigation drawer view.
@@ -164,91 +168,4 @@ const styles = StyleSheet.create({
     },
 });
 
-/**
- * Type definition for the header of a drawer navigation component.
- * 
- * The `IDrawerNavigationViewHeader` type can either be a JSX element or a function that returns a 
- * JSX element. This allows for flexible rendering of the drawer navigation header based on 
- * the current state of the drawer and other relevant properties.
- * 
- * @type {JSX.Element | ((options: { drawerState: IDrawerCurrentState | null, menuIcon: JSX.Element, menuIconProps: IDrawerMenuIconProps, testID: string }) => JSX.Element)}
- * 
- * @example
- * // Using a static JSX element as the drawer navigation header
- * const drawerHeader: IDrawerNavigationViewHeader = <Text>Drawer Header</Text>;
- * 
- * @example
- * // Using a function to dynamically render the drawer navigation header based on drawer state
- * const drawerHeader: IDrawerNavigationViewHeader = ({ drawerState, menuIcon, menuIconProps, testID }) => {
- *     return (
- *         <View testID={testID}>
- *             {drawerState?.isPermanent ? menuIcon : <Text>Open Menu</Text>}
- *         </View>
- *     );
- * };
- */
-type IDrawerNavigationViewHeader = JSX.Element | ((options: {
-    drawerState: IDrawerCurrentState | null,
-    menuIcon: JSX.Element;
-    menuIconProps: IDrawerMenuIconProps;
-    testID: string;
-}) => JSX.Element);
 
-/**
- * Props for the `DrawerNavigationView` component.
- * 
- * The `IDrawerNavigationViewProps` interface defines the properties that can be passed to the 
- * `DrawerNavigationView` component, which manages the layout and rendering of the navigation 
- * drawer and its items. This interface extends the `IDrawerProps` interface, allowing for 
- * additional customization of the drawer's behavior and appearance.
- * 
- * @extends IDrawerProps - Inherits properties from the `IDrawerProps` interface, 
- *                         providing base functionality for the drawer component.
- * 
- * @property {IDrawerNavigationViewHeader | undefined} header - An optional header for the 
- *        drawer navigation view. This can be a static JSX element or a function that returns 
- *        a JSX element based on the current drawer state.
- * 
- * @property {IDrawerItemsProps["items"] | undefined} items - An optional array of items 
- *        to be displayed in the drawer. This allows for dynamic rendering of navigation 
- *        items based on the application's structure.
- * 
- * @property {Partial<Omit<IDrawerItemsProps, "items">> | undefined} drawerItemsProps - 
- *        Optional properties for customizing the drawer items. This allows for partial 
- *        overrides of the `IDrawerItemsProps` interface, excluding the `items` property.
- * 
- * @example
- * // Basic usage of DrawerNavigationView with a header and items
- * const drawerViewProps: IDrawerNavigationViewProps = {
- *     header: <Text>My Drawer Header</Text>,
- *     items: [
- *         { label: 'Home', onPress: () => console.log('Home pressed') },
- *         { label: 'Settings', onPress: () => console.log('Settings pressed') },
- *     ],
- *     drawerItemsProps: {
- *         itemStyle: { padding: 10 },
- *     },
- * };
- * 
- * @example
- * // Using a function for the header to dynamically render based on drawer state
- * const drawerViewPropsWithDynamicHeader: IDrawerNavigationViewProps = {
- *     header: ({ drawerState, menuIcon, menuIconProps, testID }) => (
- *         <View testID={testID}>
- *             <Text>{drawerState?.isPermanent ? 'Permanent Drawer' : 'Temporary Drawer'}</Text>
- *             {menuIcon}
- *         </View>
- *     ),
- *     items: [
- *         { label: 'Profile', onPress: () => console.log('Profile pressed') },
- *         { label: 'Logout', onPress: () => console.log('Logout pressed') },
- *     ],
- * };
- */
-export interface IDrawerNavigationViewProps extends IDrawerProps {
-    header?: IDrawerNavigationViewHeader;
-    navigationTitle?: ReactNode;
-    items?: IDrawerItemsProps["items"];
-    drawerItemsProps?: Partial<Omit<IDrawerItemsProps, "items">>;
-    drawerState: IDrawerCurrentState;
-};

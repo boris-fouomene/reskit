@@ -1,11 +1,11 @@
-import { ILabelProps } from "@components/Label";
-import { ISurfaceProps } from "@components/Surface";
+import { ILabelProps } from "@components/Label/types";
+import { ISurfaceProps } from "@components/Surface/types";
 import { ReactNode } from "react";
 import { IThemeColorsTokenName } from "@theme/types";
 import { GestureResponderEvent, ViewProps } from "react-native";
-import { IIconButtonProps } from "@components/Icon";
-import { IMenuItemBase, IMenuRenderItemsOptions } from "@components/Menu";
-import { ILabelOrLeftOrRightProps } from "@hooks/index";
+import { IIconButtonProps } from "@components/Icon/types";
+import { IMenuItemBase, IMenuRenderItemsOptions } from "@components/Menu/types";
+import { ILabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import { IReactNullableElement } from "@src/types";
 
 

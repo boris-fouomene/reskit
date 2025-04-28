@@ -1,9 +1,9 @@
 import * as React from "react";
-import { ReactNode } from 'react';
 import { IKeyboardEventHandlerKey, findMatchedKey } from './keyEvents';
-import View, { IViewProps } from "@components/View";
-import { StyleSheet, View as RNView, NativeSyntheticEvent, TextInputKeyPressEventData } from "react-native";
+import View from "@components/View";
+import { StyleSheet, View as RNView, TextInputKeyPressEventData } from "react-native";
 import { mergeRefs } from "@utils/mergeRefs";
+import { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps, IKeyboardEventHandlerState } from "./types";
 
 
 /**
@@ -175,95 +175,8 @@ export default class KeyboardEventHandler<T = TextInputKeyPressEventData> extend
     </View>
   }
 }
-/**
- * @interface IKeyboardEventHandlerKey
- * 
- * The event type related to the KeyboardEventHandler component.
- */
-export type IKeyboardEventHandlerEvent<T = TextInputKeyPressEventData> = NativeSyntheticEvent<T>;
 
-/**
- * Properties for the KeyboardEventHandler component.
- * 
- * @template T - The type of the keyboard event data.
- */
-export interface IKeyboardEventHandlerProps<T = TextInputKeyPressEventData> extends Omit<IViewProps, 'children'> {
-  /** 
-   * An array of keys to handle for keyboard events.
-   */
-  handleKeys?: IKeyboardEventHandlerKey[],
-
-  /** 
-   * The type of keyboard event to handle (keydown, keyup, keypress).
-   */
-  handleEventType?: 'keydown' | 'keyup' | 'keypress',
-
-  /** 
-   * Indicates if focusable elements should be handled.
-   */
-  handleFocusableElements?: boolean;
-
-  /** 
-   * Function called when a matching key event is detected.
-   */
-  onKeyEvent?: (matchKey: IKeyboardEventHandlerKey, event: IKeyboardEventHandlerEvent<T>) => any;
-
-  /** 
-   * Indicates if the handler is exclusive.
-   */
-  isExclusive?: boolean,
-
-  /** 
-   * Children elements or a function that returns children based on event options.
-   */
-  children?: ReactNode | ((options: { onKeyPress?: (event: IKeyboardEventHandlerEvent<T>) => any }) => ReactNode);
-
-  /** 
-   * Reference to the child view component.
-   */
-  innerRef?: React.RefObject<RNView | null>,
-
-  /** 
-   * Indicates if the component is read-only.
-   */
-  readOnly?: boolean;
-
-  /** 
-   * Indicates if keyboard event handling is disabled.
-   */
-  disabled?: boolean;
-
-  /** 
-   * Indicates if the component is a filter type.
-   */
-  isFilter?: boolean;
-}
-
-
-/**
- * Represents the state for the `KeyboardEventHandler` component.
- * 
- * This interface is currently empty but can be extended in the future to include
- * properties that represent the internal state of the `KeyboardEventHandler`.
- * 
- * For example, you might want to track whether a key is currently pressed,
- * or maintain a history of key events for debugging purposes.
- * 
- * @example
- * ```typescript
- * interface IKeyboardEventHandlerState {
- *     isKeyPressed: boolean; // Indicates if a specific key is currently pressed
- *     lastKeyPressed: string; // Stores the last key that was pressed
- * }
- * ```
- * 
- * By extending this interface, you can manage the component's state more effectively
- * and provide additional functionality based on user interactions with the keyboard.
- */
-export interface IKeyboardEventHandlerState {
-
-}
-
+export * from "./types";
 
 const styles = StyleSheet.create({
   content: {

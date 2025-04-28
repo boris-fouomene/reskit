@@ -1,5 +1,5 @@
 import { IReactComponent } from "@src/types";
-import { IAppBarProps } from "@components/AppBar";
+import { IAppBarProps } from "@components/AppBar/types";
 import { IWithHOCOptions, withHOC } from "./withHOC";
 import AppBarLayout from "@layouts/AppBarLayout";
 import { IReskNativeContextCallback } from "@src/context/types";

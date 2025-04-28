@@ -1,6 +1,5 @@
 import { IInputFormatterResult } from "@resk/core/types";
 import { II18nLocale } from "@src/i18n";
-import { background } from "@theme/typography";
 import * as React from "react";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, Animated, PressableProps, TouchableWithoutFeedbackProps } from "react-native";
 /**

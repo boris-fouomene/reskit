@@ -4,11 +4,6 @@
     "baseUrl": "./",
     "rootDir": "./src",
     "outDir": "./build",
-    "declaration": false,
-    "target": "ES2015",
-    "module": "ES2015",
-    "skipLibCheck": true,
-    "moduleResolution": "node",
     "paths": {
       "@breakpoints/*": [
         "src/breakpoints/*"
@@ -81,16 +76,35 @@
       ],
       "expo-sqlite/*": [
         "../../examples/resk-expo-docs/node_modules/expo-sqlite/*",
-      ]
+      ],
+      "@resk/core/*": [
+        "../resk-core/build/*"
+      ],
+      "@resk/core": [
+        "../resk-core/build/index"
+      ],
     }
   },
   "include": [
     "./src/**/*.ts",
     "./src/**/*.tsx",
+    //"src/components/Icon/Button.tsx",
+    //"src/components/Datagrid/**/*",
+    //"src/components/Filter/**/*",
+    //"src/components/Form/**/*",
+    //"src/components/Grid/**/*",
+    //"src/components/Label/**/*",
   ],
   "exclude": [
+    "../../resk-core/**/*",
+    "**/resk-core/build/**/*",
+    "react-native",
+    "@resk/core",
+    "./src/components/**/*",
     "../resk-core/**/*",
     "**/resk-core/**/*",
+    "@resk/core/**/*",
+    "react-native",
     "node_modules",
     "**/node_modules/*",
     "node_modules/**/*",

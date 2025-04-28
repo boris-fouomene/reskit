@@ -8,7 +8,7 @@ import Session from "@resk/core/session";
 import Color from "color";
 import updateNative from "./updateNative";
 import styles from "./styles";
-import { useReskNative } from "@src/context/hooks";
+import { useReskNative } from "@src/context/context"
 import { defaultFontsConfig, defaultTextStylesVariants } from "./defaultFontsConfig";
 import { generateElevations } from "./Elevations";
 import lightColors from "./palettes/light";

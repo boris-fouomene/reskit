@@ -1,7 +1,7 @@
 import { IIconProps, IIconSource } from "@components/Icon/types";
-import { ILabelProps } from "@components/Label";
+import { ILabelProps } from "@components/Label/types";
 import { IViewProps } from "@components/View";
-import { ILabelOrLeftOrRightProps } from "@hooks/index";
+import { ILabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, PressableProps, View, ViewProps } from "react-native";
 /**

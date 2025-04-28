@@ -24,7 +24,7 @@ export default function BottomSheetItem({ closeOnPress, onPress: customOnPress, 
                     return customOnPress(event, context);
                 }
             };
-            closeOnPress !== false ? bottomSheet?.close(callback) : callback();
+            closeOnPress !== false && typeof (bottomSheet as any)?.close === "function" ? (bottomSheet as any)?.close(callback) : callback();
         }}
         context={Object.assign({}, props.context, { bottomSheet })}
     />;

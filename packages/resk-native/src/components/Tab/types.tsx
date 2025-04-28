@@ -1,8 +1,8 @@
-import { IIconProps, IIconSource } from "@components/Icon";
-import { ILabelProps } from "@components/Label";
+import { IIconProps, IIconSource } from "@components/Icon/types";
+import { ILabelProps } from "@components/Label/types";
 import { ISwiperProps } from "@components/Swiper/types";
-import { ITouchableRippleProps } from "@components/TouchableRipple";
-import { IViewProps } from "@components/View";
+import { ITouchableRippleProps } from "@components/TouchableRipple/types";
+import { IViewProps } from "@components/View/types";
 import { IViewStyle } from "../../types";
 import { ReactNode } from "react";
 import { Animated, GestureResponderEvent, ScrollViewProps, ViewProps } from "react-native";

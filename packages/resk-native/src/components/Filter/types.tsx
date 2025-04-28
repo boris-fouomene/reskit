@@ -1,5 +1,5 @@
-import { IFormFieldValidatorOptions } from "@components/Form";
-import { IMenuItemProps } from "@components/Menu";
+import { IFormFieldValidatorOptions } from "@components/Form/types";
+import { IMenuItemProps } from "@components/Menu/types";
 import { IAuthSessionStorage } from "@resk/core";
 import { IField, IFieldType, IMongoLogicalOperatorName, IMongoOperatorName, IMongoQuery } from "@resk/core/types";
 import { ScrollViewProps, ViewProps } from "react-native";

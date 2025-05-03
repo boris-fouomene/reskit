@@ -280,7 +280,7 @@ const SwipeGestureHandler: React.FC<ISwipeGestureProps> = ({
         <Animated.View testID={"resk-swipe-gesture"}
             {...props}
             {...panResponder.panHandlers}
-            style={[animatedStyle, props.style]}
+            style={[animatedStyle as any, props.style]}
         >
             {children}
         </Animated.View>

@@ -21,6 +21,7 @@ import useStateCallback from "@utils/stateCallback";
 import { Auth, IAuthSessionStorage } from "@resk/core";
 import FontIcon from "@components/Icon/Font";
 import Label from "@components/Label";
+import { Button } from "@components/Button";
 
 
 /**
@@ -224,7 +225,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
     }
     processProps(props?: IFilterProps<DataType, FieldType>): IFilterProcessedProps {
         let { type, actions: _actions, selectorActiveFieldName, name, operators: _operators, action, ignoreCase, operator, orOperator, andOperator, defaultValue, isFilter = false, ...rest } = isObj(props) && Object.getSize(props, true) ? props : this.props;
-        type = type || "text";
+        type = (type || "text") as any;
         let operators: IFilterOperators = { ...Filter.OPERATORS };
         const arrayOperators: Record<IMongoOperatorName, string> = {} as any;
         const defaultActions: Record<IMongoOperatorName, string> = {} as any;
@@ -528,18 +529,18 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
         const remainder = defaultNumber(this.state.moduloRemainder);
         return (
             "%" +
-            InputFormatter.formatValue({ ...this.props, type: this.getType(), value: divisor }) +
+            InputFormatter.formatValue({ ...this.props, type: this.getType(), value: divisor }).formattedValue +
             "=" +
-            InputFormatter.formatValue({ ...this.props, type: this.getType(), value: remainder })
+            InputFormatter.formatValue({ ...this.props, type: this.getType(), value: remainder }).formattedValue
         );
     }
     getBetweenText(): string {
         if (!this.isBetweenAction()) return "";
         const { betweenStartValue, betweenEndValue } = this.state;
         return (
-            InputFormatter.formatValue({ ...this.props, type: this.getType(), value: betweenStartValue }) +
+            InputFormatter.formatValue({ ...this.props, type: this.getType(), value: betweenStartValue }).formattedValue +
             "=>" +
-            InputFormatter.formatValue({ ...this.props, type: this.getType(), value: betweenEndValue })
+            InputFormatter.formatValue({ ...this.props, type: this.getType(), value: betweenEndValue }).formattedValue
         );
     }
     hasFilterValue(): boolean {
@@ -601,7 +602,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
                 } else if (betweenText) {
                     x = x + " <" + betweenText + ">";
                 } else {
-                    x = x + " <" + InputFormatter.formatValue({ ...this.props, type: this.state.type, value: defaultValue }) + ">";
+                    x = x + " <" + InputFormatter.formatValue({ ...this.props, type: this.state.type, value: defaultValue }).formattedValue + ">";
                 }
             }
             const disabled = isBetweenAction
@@ -639,6 +640,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
             } as IFilterState
         );
     }
+    static ICON_SIZE = 20;
     getTitleLabelProps() {
         return { style: [Theme.styles.fontBold, styles.noVerticalPadding] };
     }
@@ -668,7 +670,6 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
                 debounceTimeout: 1000,
                 mode: "flat",
                 placeholder: "Search...",
-                left: <FontIcon name="magnify" size={25} />,
             }
             : { textFieldMode: "flat", mode: "flat" };
         const isBetweenAction = this.isBetweenAction(), isModuloAction = this.isModuloAction();
@@ -687,7 +688,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
                             />
                         </View>
                     ) : (
-                        <View style={styles.componentContainer}>
+                        <View testID={testID + "-filter-container"} style={styles.componentContainer}>
                             <Component
                                 variant={"labelEmbeded"}
                                 {...componentProps2}
@@ -716,7 +717,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
                             anchor={<View>
                                 <FontIcon
                                     {...props}
-                                    size={25}
+                                    size={Filter.ICON_SIZE}
                                     style={[
                                         Theme.styles.noPadding,
                                         hasFilterVal && { color: Theme.colors.primary },
@@ -866,7 +867,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
                 if (isEquals && !this.compareValues(optionValue, stateValue)) {
                     isEquals = false;
                 }
-                nState[i as keyof IFilterState] = optionValue;
+                (nState as any)[i as keyof IFilterState] = optionValue;
             }
         });
         if (newState) {
@@ -1276,7 +1277,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
      *
      */
     static Group<DataType extends object = any>({ withScrollView, disabled, style, scrollViewProps, defaultValue, sessionName, columns, testID, ...props }: IFilterGroupProps<DataType>) {
-        testID = defaultStr(testID, "resk-filter");
+        testID = defaultStr(testID, "resk-filter-group");
         const isDisabled = disabled === true;
         const sessionStorage = useMemo<IAuthSessionStorage | null>(() => {
             if (isNonNullString(sessionName)) {
@@ -1357,7 +1358,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
                 if (!label) return null;
                 return {
                     label,
-                    right: <FontIcon name="filter-plus" size={25} />,
+                    right: <FontIcon name="filter-plus" size={Filter.ICON_SIZE} />,
                     onPress: () => {
                         setState((nState) => {
                             return { ...nState, columns: [...nState.columns, { name, filterKey: uniqid("filter-group-key"), value: defaultValue }] }
@@ -1375,15 +1376,9 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
                     items={filterMenuItems}
                     responsive
                     renderAsBottomSheetInFullScreen
-                    anchor={<HStack noWrap>
-                        <Label>
-                            {Filter.staticTranslate("addFilter")}
-                        </Label>
-                        <FontIcon
-                            name="filter-menu"
-                            size={25}
-                        />
-                    </HStack>}
+                    anchor={<Button icon={"filter-plus"} noPadding>
+                        {Filter.staticTranslate("addFilter")}
+                    </Button>}
                 /> : null}
             </Wrapper>
         </View>
@@ -1488,7 +1483,7 @@ const styles = StyleSheet.create({
     },
     filterGroup: {
         width: "100%",
-        paddingVertical: 5,
+        paddingVertical: 7,
     },
     filterGroupItemContainer: {
         flexDirection: "row",

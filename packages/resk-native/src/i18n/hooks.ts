@@ -101,6 +101,6 @@ export const useI18n = (i18n?: I18nClass, options?: IUseI18nOptions): I18nClass 
             }
         }
     }, [detectedLocale, instance.getLocale(), useLocaleFromDevice]);
-    instance.detectedLocale = detectedLocale;
+    (instance as any).detectedLocale = detectedLocale;
     return instance;
 };

@@ -8,8 +8,11 @@
     "packages/*",
     "examples/*"
   ],
+  "packageManager": "npm@11.2.0",
   "scripts": {
-    "build-all": "npx lerna run build",
+    "build": "turbo run build",
+    "build:watch": "turbo run build:watch",
+    "test": "turbo run test",
     "clean": "npx rimraf build",
     "install-vercel": "npm i && cd examples/resk-expo-docs && npm i && cd ../../packages/resk-core && npm i && cd ../resk-native && npm i",
     "build-vercel": "cd examples/resk-expo-docs && npm run build",
@@ -18,11 +21,8 @@
     "publish-all": "lerna publish",
     "document": "npx ts-node ./generate-typedoc.ts",
     "clear-npx-cache": "npx clear-npx-cache",
-    "test": "npm run build && npx vitest",
     "test:watch": "jest --watch",
     "test-node": "npm run build && node ./build/test/index.js",
-    "build": "tsc && npx tsc-alias -p tsconfig.json",
-    "build:watch": "tsc && (concurrently \"tsc -w\" \"npx tsc-alias -w\")",
     "start": "node build/test/index",
     "prepublish1": "npm run build",
     "build-doc": "npx typedoc"
@@ -72,6 +72,7 @@
     "tsc-alias": "^1.8.11",
     "tsconfig-paths": "^4.2.0",
     "tsup": "^8.4.0",
+    "turbo": "^2.5.2",
     "typedoc": "^0.27.9",
     "typescript": "^5.8.2",
     "vite-tsconfig-paths": "^5.0.1"

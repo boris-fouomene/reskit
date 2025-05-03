@@ -1,7 +1,8 @@
 "use client";
 import * as React from "react";
 import { forwardRef } from "react";
-import { isNonNullString, defaultStr, Logger } from "@resk/core";
+import { isNonNullString, defaultStr } from "@resk/core/utils";
+import Logger from "@resk/core/logger";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
@@ -14,7 +15,7 @@ import Feather from "react-native-vector-icons/Feather";
 
 import { useTheme } from "@theme";
 import Colors from "@colors";
-import { IFontIconProps, IPrefixToFontIconsSetNames } from "./types";
+import { IFontIconProps } from "./types";
 import Platform from "@platform/index";
 import { isRTL } from "@utils/i18nManager";
 import { getTouchableProps } from "@utils/hasTouchHandler";
@@ -156,9 +157,9 @@ const getFontIconSet = (name: string): { iconSetName: string, iconSetPrefix: str
         for (let iconSetPrefix in PREFIX_TO_ICONS_SET_NAMES) {
             if (!iconSetPrefix || (isFontIconName(nameString, iconSetPrefix))) {
                 const iconPrefix = iconSetPrefix ? (iconSetPrefix.rtrim("-") + "-") : "";
-                const iconSetName = PREFIX_TO_ICONS_SET_NAMES[iconSetPrefix as keyof IPrefixToFontIconsSetNames];
+                const iconSetName = (PREFIX_TO_ICONS_SET_NAMES as any)[iconSetPrefix as any];
                 const iconName = nameString.trim().ltrim(iconPrefix).trim().ltrim("-").trim();
-                const iconSet = fontsObjects[iconSetName];
+                const iconSet = (fontsObjects as any)[iconSetName];
                 if (iconSet) {
                     return {
                         iconSetName,
@@ -320,7 +321,7 @@ const fontsObjects: IFontIconSets = {
 
 
 /** An object that maps icon set prefixes to their respective names. */
-const PREFIX_TO_ICONS_SET_NAMES: IPrefixToFontIconsSetNames = {
+const PREFIX_TO_ICONS_SET_NAMES = {
     material: "MaterialIcons",
     fa: "FontAwesome6",
     antd: "AntDesign",

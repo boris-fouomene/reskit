@@ -1872,6 +1872,7 @@ declare module "@resk/core" {
     export interface IFieldBase<FieldType extends IFieldType = IFieldType> {
         getValidValue?: (options: { value: any; context: IFormField<FieldType>; data: IFormData }) => any;
         isFilter?: boolean;
+        isFilterGroupItem?: boolean;
 
         validateOnMount?: boolean;
 

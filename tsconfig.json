@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
-    "outDir": "./build",
-    "forceConsistentCasingInFileNames": true,
+    "skipDefaultLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true,
     "jsxImportSource": "react",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true, // Allow interoperability with CommonJS modules
     "allowJs": true,
-    "resolveJsonModule": true,
+    "resolveJsonModule": false,
     "target": "ES2015", // Or the desired target
     "module": "ES6", // Enables ESM & CJS interop
-    "moduleResolution": "node", // Ensures Node-style resolution
+    "moduleResolution": "node",
     "removeComments": true,
     "declaration": false,
     "sourceMap": false,
@@ -23,42 +23,28 @@
     "noEmit": false,
     "noLib": false,
     "jsx": "preserve",
+    "skipLibCheck": true,
+    "isolatedModules": true,
     "lib": [
       "DOM",
       "ESNext"
     ],
-    "skipLibCheck": true,
-    "types": [
-      "jest",
-      "node"
-    ],
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.json",
+  "types": [
+    "jest",
+    "node",
+    "react-native",
+    "react",
   ],
   "exclude": [
-    "./jest.config.js",
-    "**/node_modules/**/*",
-    "node_modules/**/*",
+    "react-native",
     "node_modules",
-    "**/node_modules/*",
+    "node_modules/**/*",
+    "@resk/core/**/*",
+    "docs/**/*",
+    "examples/**/*",
+    "**/build/**/*",
     "**/dist/**/*",
-    "**/build/**/*",
-    "@resk/**/*",
-    "**/dist/*",
-    "**/*.spec.ts",
-    "**/build/**/*",
-    "jest.config.*",
-    "generate-typedoc",
-    "**.test.ts",
-    "**/*.test.tsx",
-    "**/*.test.js",
-    "**/*.test.jsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/*.spec.js",
-    "**/*.spec.jsx"
+    "**/*.js",
   ],
 }

@@ -1,9 +1,41 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./",
-    "rootDir": "./src",
+    // Remove rootDir to prevent src folder creation in output
+    // "rootDir": "./",
     "outDir": "./build",
+    // Comments handling
+    "removeComments": false,
+    "declaration": false,
+    "preserveConstEnums": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "resolveJsonModule": false,
+    "strict": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "jsx": "react-native",
+    "target": "ES2015", // Or the desired target
+    "module": "ES6", // Enables ESM & CJS interop
+    "moduleResolution": "node",
+    // Performance optimizations
+    "incremental": true,
+    "tsBuildInfoFile": "./build/.tsbuildinfo",
+    "isolatedModules": true,
+    "disableSourceOfProjectReferenceRedirect": true,
+    "preserveSymlinks": true,
+    "plugins": [
+      // Transform paths in output .js files
+      {
+        "transform": "typescript-transform-paths"
+      },
+      // Transform paths in output .d.ts files (Include this line if you output declarations files)
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      },
+    ],
+    // Paths remain the same
     "paths": {
       "@breakpoints/*": [
         "src/breakpoints/*"
@@ -69,47 +101,34 @@
         "src/*"
       ],
       "react-native": [
-        "../../examples/resk-expo-docs/node_modules/react-native",
+        "../../examples/resk-expo-docs/node_modules/react-native"
       ],
       "react-native-svg": [
-        "../../examples/resk-expo-docs/node_modules/react-native-svg",
+        "../../examples/resk-expo-docs/node_modules/react-native-svg"
       ],
       "expo-sqlite/*": [
-        "../../examples/resk-expo-docs/node_modules/expo-sqlite/*",
-      ],
-      "@resk/core/*": [
-        "../resk-core/build/*"
-      ],
-      "@resk/core": [
-        "../resk-core/build/index"
-      ],
+        "../../examples/resk-expo-docs/node_modules/expo-sqlite/*"
+      ]
     }
   },
+  // Include what you need - change as needed
   "include": [
-    "./src/**/*.ts",
-    "./src/**/*.tsx",
-    //"src/components/Icon/Button.tsx",
-    //"src/components/Datagrid/**/*",
-    //"src/components/Filter/**/*",
-    //"src/components/Form/**/*",
-    //"src/components/Grid/**/*",
-    //"src/components/Label/**/*",
+    "src/**/*"
+    // Uncomment if you still only want that specific file
+    // "./src/components/Icon/Icon.tsx",
   ],
+  // Improved exclude patterns
   "exclude": [
-    "../../resk-core/**/*",
-    "**/resk-core/build/**/*",
-    "react-native",
-    "@resk/core",
-    "./src/components/**/*",
-    "../resk-core/**/*",
-    "**/resk-core/**/*",
-    "@resk/core/**/*",
-    "react-native",
     "node_modules",
-    "**/node_modules/*",
-    "node_modules/**/*",
+    "**/@resk/core/**", // More aggressive pattern to exclude @resk/core
+    "**/resk-core/**",
     "../../node_modules/**/*",
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
-  ]
+    "../../examples/**/*",
+    "react-native",
+    "react-native-svg",
+    "react-native-vector-icons/**/*",
+    "../dist/**/*",
+    "../build/**/*",
+    "docs/**/*"
+  ],
 }

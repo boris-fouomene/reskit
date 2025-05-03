@@ -1,6 +1,5 @@
 "use client";
-import * as React from "react"
-import { forwardRef, LegacyRef, ReactNode, useMemo } from "react";
+import { forwardRef, LegacyRef, ReactNode, useMemo, Fragment, Ref } from "react";
 import { IFontIconName, IGetIconOptions, IIconProps } from "./types";
 import { Image, ImageStyle } from "react-native";
 import { isValidElement, pickTouchEventHandlers } from "@utils";
@@ -36,7 +35,7 @@ import { isReactComponent } from "@utils/isComponent";
  *                                 it defaults to `DEFAULT_FONT_ICON_SIZE` : 20.
  * @param {string} [props.color] - Optional. Color for the font icon or tint color for the image icon.
  * 
- * @param {React.Ref} ref - A ref to access the underlying component.
+ * @param {Ref} ref - A ref to access the underlying component.
  * @returns {JSX.Element} - Returns an `Image` component if `source` is an 
  *                          image, otherwise returns a `FontIcon` component.
  * 
@@ -75,7 +74,7 @@ import { isReactComponent } from "@utils/isComponent";
  * <Icon iconName="material-home" size={24} color="#000" />
  */
 
-const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, resizeMode, as, disabled, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
+const Icon = forwardRef<Ref<Image | any>, IIconProps>(({ iconName, resizeMode, as, disabled, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
     const isSource = isImageSource(source);
     //const isValidIconName = iconName && FontIcon.isValidName(iconName);
     testID = defaultStr(testID, isSource ? "resk-image" : "resk-font-icon");
@@ -90,7 +89,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, resizeM
             _props.as = as || TouchableRipple;
         }
         return {
-            Component: isTooltip ? Tooltip : React.Fragment,
+            Component: isTooltip ? Tooltip : Fragment,
             props: _props,
         };
     }, [title, tooltip, touchableEvents, disabled, testID, as, containerProps]);
@@ -111,7 +110,7 @@ const Icon = forwardRef<React.Ref<Image | any>, IIconProps>(({ iconName, resizeM
             {...props}
             testID={testID}
             source={["object", "number"].includes(typeof source) ? source : isNonNullString(source) ? { uri: source } : undefined}
-            ref={ref as LegacyRef<Image>}
+            ref={ref as any}
             style={iconStyle as ImageStyle}
         /> : <FontIcon
             testID={testID}

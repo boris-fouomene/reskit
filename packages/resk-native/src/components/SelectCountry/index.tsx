@@ -17,7 +17,7 @@ import { isNumber } from "@resk/core/utils";
  * @param {ISelectCountryProps} props - The props for the country selector component.
  * @returns {JSX.Element} The rendered country selector component.
  */
-export function SelectCountry({ withLabel, countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }:ISelectCountryProps & { displayDialCode?: boolean }) => {
+export function SelectCountry({ withLabel, countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }:ISelectCountryProps & { displayDialCode?: boolean }){
     const countries = useMemo(() => {
         return Object.values(CountriesManager.getCountries());
     }, []);
@@ -28,7 +28,6 @@ export function SelectCountry({ withLabel, countryFlagProps: customCountryFlagPr
     const textFontSize = isNumber(countryFlagProps.textFontSize) && countryFlagProps.textFontSize > 0 ? countryFlagProps.textFontSize : 16;
     const canDisplayDialCode = displayDialCode !== false;
     return <Dropdown<ICountry, ICountryCode>
-        ref={ref}
         items={countries}
         multiple={false}
         label={label}

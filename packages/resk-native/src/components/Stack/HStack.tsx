@@ -29,8 +29,8 @@ function HStack({ style, noWrap, ...props }: IViewProps & {
      * Default is false
      */
     noWrap?: boolean;
-}) => {
-    return <View ref={ref} style={[styles.container, noWrap === true && styles.noWrap, style]} {...props} />
+}){
+    return <View style={[styles.container, noWrap === true && styles.noWrap, style]} {...props} />
 };
 
 /**

@@ -27,7 +27,6 @@ const PADDING = 8;
  *
  * @component IconButton
  * @param {IIconButtonProps} props - The properties for configuring the IconButton.
- * @param {React.Ref<View>} ref - A ref for accessing the underlying View component.
  *
  * @returns {JSX.Element} The rendered IconButton component.
  *
@@ -71,8 +70,7 @@ const PADDING = 8;
  *   />
  * );
  */
-const IconButton = React.forwardRef<View, IIconButtonProps>(
-    (
+function IconButton(
         {
             backgroundColor: customBackgroundColor,
             rippleColor: customRippleColor,
@@ -87,10 +85,9 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
             source,
             containerProps,
             containerSize,
+            ref,
             ...rest
-        },
-        ref
-    ) => {
+        } : IIconButtonProps) {
         const theme = useTheme();
         containerProps = Object.assign({}, containerProps);
         testID = defaultStr(testID, "resk-icon-button");
@@ -159,8 +156,7 @@ const IconButton = React.forwardRef<View, IIconButtonProps>(
                 {isLoading ? <ActivityIndicator size={size} color={iconColor} /> : icon}
             </Surface>
         );
-    }
-);
+};
 
 const styles = StyleSheet.create({
     container: {

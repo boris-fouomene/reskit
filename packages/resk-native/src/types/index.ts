@@ -1,39 +1,8 @@
 import { IInputFormatterResult } from "@resk/core/types";
 import { II18nLocale } from "@src/i18n";
-import * as React from "react";
+import { Component, ComponentClass, ExoticComponent, FunctionComponent, JSXElementConstructor, ReactElement } from "react";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, Animated, PressableProps, TouchableWithoutFeedbackProps } from "react-native";
-/**
-   @interface
- * Represents a reference to a React component or DOM element.
- * 
- * This type can be used to hold references to either mutable objects or legacy 
- * refs in React applications. It supports generic types to define the 
- * structure of the referenced object.
- * 
- * ### Usage Example:
- * 
- * ```tsx
- * import React, { useRef } from 'react';
- * 
- * const MyComponent: React.FC = () => {
- *   const myRef: IReactRef<HTMLDivElement> = useRef(null);
- * 
- *   const handleClick = () => {
- *     if (myRef.current) {
- *       myRef.current.focus(); // Example of using the ref to access the DOM element
- *     }
- *   };
- * 
- *   return (
- *     <div>
- *       <button onClick={handleClick}>Focus the div</button>
- *       <div ref={myRef}>This div can be focused!</div>
- *     </div>
- *   );
- * };
- * ```
- */
-export type IReactRef<T extends unknown = unknown> = React.MutableRefObject<T> | React.LegacyRef<T> | undefined | null;
+
 
 /**
   @interface
@@ -79,15 +48,13 @@ export type IReactRef<T extends unknown = unknown> = React.MutableRefObject<T> |
  * );
  * ```
  */
-export type IReactComponent<Props = any, State = any> =
-  | React.FunctionComponent<Props>                                    // Functional Component
-  | (new (props: Props) => React.Component<Props, State>) // Class Component Constructor
-  | React.ComponentClass<Props, State>                 // Class Component Class
-  | React.ForwardRefExoticComponent<Props>             // Forwarded Ref Component
-  | React.ExoticComponent<Props>                       // Exotic Components (like Memo, Lazy)
-  | React.ForwardRefRenderFunction<State, Props>             // Forward Ref Render Function
-  | ((props: Props) => React.ReactElement | null)            // Basic Function Component
-  | React.JSXElementConstructor<Props>                       // Any component that can be used in JSX
+export type IReactComponent<Props = any, State = any> = 
+  FunctionComponent<Props>                                    // Functional Component
+  | (new (props: Props) => Component<Props, State>) // Class Component Constructor
+  | ComponentClass<Props, State>                 // Class Component Class
+  | ExoticComponent<Props>                       // Exotic Components (like Memo, Lazy)
+  | ((props: Props) => ReactElement | null)            // Basic Function Component
+  | JSXElementConstructor<Props>                       // Any component that can be used in JSX
 
 /**
  * @typedef ITextStyle
@@ -107,6 +74,19 @@ export type ITextStyle = StyleProp<TextStyle>;
  * @see {@link https://reactnative.dev/docs/view} for more information about View component styles.
  */
 export type IViewStyle = StyleProp<ViewStyle>;
+
+/**
+ * @typedef IStyle
+ * Type alias for styles that can be applied to various components.
+ * This type is a union of ITextStyle, IViewStyle, and IImageStyle.
+ * It allows for flexibility in defining styles for different types of components.
+ * @example
+ * const style: IStyle = { fontSize: 16, color: 'blue' };
+ * @see {@link ITextStyle} for more information about Text component styles.
+ * @see {@link IViewStyle} for more information about View component styles.
+ * @see {@link IImageStyle} for more information about Image component styles.
+ */
+export type IStyle = ITextStyle | IViewStyle | IImageStyle;
 
 /**
  * Type alias for ImageStyle props.
@@ -429,7 +409,7 @@ export type ITouchableProps = {
  *   );
  * };
  */
-export type IReactNullableElement = React.ReactElement | null;
+export type IReactNullableElement = ReactElement | null;
 
 
 /**

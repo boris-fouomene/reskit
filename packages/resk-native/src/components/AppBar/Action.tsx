@@ -1,8 +1,7 @@
 import { StyleSheet } from 'react-native'
-import { Button, ButtonContext, IButtonRef } from "@components/Button";
+import { Button} from "@components/Button";
 import { useAppBar } from './hooks';
-import { forwardRef } from 'react';
-import { IAppBarContext, IAppBarAction } from './types';
+import { IAppBarAction } from './types';
 import { useTheme } from '@theme/index';
 
 
@@ -14,8 +13,6 @@ import { useTheme } from '@theme/index';
  * to tailor the button's appearance and behavior according to their application's needs.
  * 
  * @param {IAppBarAction<IAppBarActionContext>} props - The properties for configuring the AppBarAction.
- * 
- * @param {React.ForwardedRef<IButtonContext<IAppBarContext<IAppBarActionContext>>>} ref - A ref for 
  * accessing the underlying Button component. This allows parent components to interact with the 
  * button, such as focusing or measuring its dimensions.
  * 
@@ -40,12 +37,11 @@ import { useTheme } from '@theme/index';
  * the AppBar context, ensuring consistent styling across the application. It is designed to 
  * work well with the AppBar's layout and can be easily integrated with other AppBar components.
  */
-const AppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionContext = any>({ colorScheme, containerProps, ...props }: IAppBarAction<IAppBarActionContext>, ref: IButtonRef<IAppBarContext<IAppBarActionContext>>) {
+function AppBarAction<IAppBarActionContext = any>({ colorScheme, containerProps, ...props }: IAppBarAction<IAppBarActionContext>) {
   const appBarContext = useAppBar();
   const colorSchemeColor = useTheme().getColorScheme(colorScheme);
   containerProps = Object.assign({}, containerProps);
   return <Button
-    ref={ref}
     textColor={colorSchemeColor.color || appBarContext.textColor || props.context?.textColor}
     borderRadius={props.level ? 0 : undefined}
     backgroundColor={colorSchemeColor.backgroundColor || appBarContext.backgroundColor || props.context?.backgroundColor}
@@ -55,7 +51,7 @@ const AppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionConte
     }}
     {...props}
   />
-});
+};
 AppBarAction.displayName = 'AppBarAction';
 
 export default AppBarAction

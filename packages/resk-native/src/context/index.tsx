@@ -1,5 +1,4 @@
 "use client";
-import * as React from "react";
 import View from "./View";
 import { ITheme } from '@theme/types';
 import Theme from '@theme/index';
@@ -22,6 +21,7 @@ import { BottomSheet } from '@components/BottomSheet';
 import { ReskNativeEvents } from "./events";
 import { useColorScheme } from "@theme/useColorScheme";
 import { Form } from "@components/Form";
+import { useEffect, useMemo, useRef } from "react";
 
 export * from "./types";
 
@@ -102,25 +102,25 @@ export function ReskNativeProvider({ children, themes, safeAreaInsets, auth, bre
    * 
    * @param {string} stableHash(customTheme) - Memoized hash value of the custom theme.
    */
-  React.useEffect(() => {
+  useEffect(() => {
     updateTheme(Theme.update(Object.assign({}, theme, colorScheme === "dark" ? dark : light)));
   }, [themes, colorScheme]);
-  React.useMemo(() => {
+  useMemo(() => {
     if (isObj(breakpoints)) {
       return Breakpoints.init(breakpoints);
     }
   }, [breakpoints]);
-  React.useEffect(() => {
+  useEffect(() => {
     if (isObj(breakpoints)) {
       Breakpoints.update();
     }
   }, [breakpoints]);
-  const style = React.useMemo(() => {
+  const style = useMemo(() => {
     const { top, bottom, right, left } = Object.assign({}, safeAreaInsets);
     return [isNumber(top) && { paddingTop: top }, isNumber(bottom) && { paddingBottom: bottom }, isNumber(right) && { paddingRight: right }, isNumber(left) && { paddingLeft: left }];
   }, [safeAreaInsets]);
   const context = { theme, i18n, safeAreaInsets, updateTheme, ...rest, breakpoints };
-  React.useEffect(() => {
+  useEffect(() => {
     ReskNativeEvents.events.trigger("appReady", context);
     ReskNativeEvents.events.trigger("appMounted", context);
     return () => {
@@ -138,7 +138,7 @@ export function ReskNativeProvider({ children, themes, safeAreaInsets, auth, bre
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
             <Notify
-              ref={(el) => {
+              ref={(el : Notify) => {
                 Notify.notifyRef = el;
               }}
             />

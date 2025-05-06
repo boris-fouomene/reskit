@@ -1,9 +1,9 @@
-import * as React from "react";
 import { ReskNativeEvents } from "./events";
 import Platform from "@resk/core/platform";
 import { IReactComponent } from "@src/types";
 import { IWithHOCOptions } from "@hooks/withHOC";
 import { defaultStr, isNonNullString } from "@resk/core";
+import { FC, isValidElement, useEffect, useState } from "react";
 
 export { useReskNative } from "./context";
 
@@ -44,9 +44,9 @@ export { useReskNative } from "./context";
  */
 export const useIsAppReady = (isAppReady?: boolean) => {
     // Initialize the state to determine if the app is ready
-    const [isReady, setIsReady] = React.useState(typeof isAppReady == "boolean" ? isAppReady : Platform.isClientSide());
+    const [isReady, setIsReady] = useState(typeof isAppReady == "boolean" ? isAppReady : Platform.isClientSide());
 
-    React.useEffect(() => {
+    useEffect(() => {
         // Subscribe to the "appReady" event
         const appReady = ReskNativeEvents.events.on("appReady", () => {
             if (!isReady) {
@@ -99,9 +99,9 @@ export const useIsAppReady = (isAppReady?: boolean) => {
  */
 export function useIsAppMounted() {
     // Initialize the state to determine if the app is mounted
-    const [isAppMounted, setIsAppMounted] = React.useState(false);
+    const [isAppMounted, setIsAppMounted] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         // Subscribe to the "appMounted" event
         const onAppMounted = ReskNativeEvents.events.on("appMounted", () => {
             setIsAppMounted(true); // Update the state when the event is emitted
@@ -130,11 +130,11 @@ export function useIsAppMounted() {
  * 
  * @param {IReactComponent<Props, State>} Component - The component to wrap.
  * @param {IWithHOCOptions} [options] - Optional configuration for the HOC.
- * @param {React.ReactNode | (() => React.ReactNode)} [options.fallback] - A fallback component or function to render
+ * @param {ReactNode | (() => ReactNode)} [options.fallback] - A fallback component or function to render
  * while the application is not mounted.
  * @param {string} [options.displayName] - A custom display name for the HOC.
  * 
- * @returns {React.FC<Props>} - A functional component that wraps the provided component.
+ * @returns {FC<Props>} - A functional component that wraps the provided component.
  * 
  * @example
  * ```tsx
@@ -158,19 +158,19 @@ export function useIsAppMounted() {
 export function withAppMounted<Props = any, State = any>(
     Component: IReactComponent<Props, State>,
     options?: IWithHOCOptions
-): React.FC<Props> {
+): FC<Props> {
     const { fallback } = Object.assign({}, options);
     const fn = function (props: Props) {
         const isAppMounted = useIsAppMounted();
         if (!isAppMounted) {
-            return typeof fallback === "function" ? fallback() : React.isValidElement(fallback) ? fallback : null;
+            return typeof fallback === "function" ? fallback() : isValidElement(fallback) ? fallback : null;
         }
         const Component2: any = Component as any;
         return <Component2 {...props} />;
     };
     fn.displayName = defaultStr(
         options?.displayName,
-        isNonNullString((Component as React.FC)?.displayName) && (Component as React.FC)?.displayName + "_WithAppMounted",
+        isNonNullString((Component as FC)?.displayName) && (Component as FC)?.displayName + "_WithAppMounted",
         Component?.constructor?.name || "WithAppMountedComponent"
     );
     return fn;
@@ -190,11 +190,11 @@ export function withAppMounted<Props = any, State = any>(
  * 
  * @param {IReactComponent<Props, State>} Component - The component to wrap.
  * @param {IWithHOCOptions} [options] - Optional configuration for the HOC.
- * @param {React.ReactNode | (() => React.ReactNode)} [options.fallback] - A fallback component or function to render
+ * @param {ReactNode | (() => ReactNode)} [options.fallback] - A fallback component or function to render
  * while the application is not ready.
  * @param {string} [options.displayName] - A custom display name for the HOC.
  * 
- * @returns {React.FC<Props>} - A functional component that wraps the provided component.
+ * @returns {FC<Props>} - A functional component that wraps the provided component.
  * 
  * @example
  * ```tsx
@@ -218,19 +218,19 @@ export function withAppMounted<Props = any, State = any>(
 export function withAppReady<Props = any, State = any>(
     Component: IReactComponent<Props, State>,
     options?: IWithHOCOptions
-): React.FC<Props> {
+): FC<Props> {
     const { fallback } = Object.assign({}, options);
     const fn = function (props: Props) {
         const isAppReady = useIsAppReady();
         if (!isAppReady) {
-            return typeof fallback === "function" ? fallback() : React.isValidElement(fallback) ? fallback : null;
+            return typeof fallback === "function" ? fallback() : isValidElement(fallback) ? fallback : null;
         }
         const Component2: any = Component as any;
         return <Component2 {...props} />;
     };
     fn.displayName = defaultStr(
         options?.displayName,
-        isNonNullString((Component as React.FC)?.displayName) && (Component as React.FC)?.displayName + "_WithAppReady",
+        isNonNullString((Component as FC)?.displayName) && (Component as FC)?.displayName + "_WithAppReady",
         Component?.constructor?.name || "WithAppReadyComponent"
     );
     return fn;

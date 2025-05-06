@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState } from "react";
 import useIsMounted from "./useIsMounted";
 
 /***
@@ -13,7 +13,7 @@ import useIsMounted from "./useIsMounted";
  */
 export default function useForceRender() {
     const isMounted = useIsMounted();
-    const [, dispatch] = React.useState(Object.create(null));
+    const [, dispatch] = useState(Object.create(null));
     return () => {
         if (isMounted()) {
             dispatch(Object.create(null)); // Trigger a re-render by updating state

@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import {useMemo } from 'react';
 import {
     Pressable,
     StyleSheet,
@@ -13,7 +13,7 @@ import useGetRippleContent from "./RippleContent";
 
 
 const version = parseInt(String(Platform.Version));
-const isAndroid = Platform.isAndroid() && (typeof version == "number" ? version >= 21 : true); //ANDROID_VERSION_LOLLIPOP;
+const isAndroid = Platform.isAndroid() && (typeof version == "number" ? version >= 21 : true);
 
 /**
  * A custom `TouchableRipple` component that implements Material Design's ripple effect 
@@ -41,8 +41,6 @@ const isAndroid = Platform.isAndroid() && (typeof version == "number" ? version 
  * @param {boolean} [props.disabled=false] - If true, disables the button, preventing any interaction.
  * 
  * @param {string} [props.testID] - Optional test ID used for testing purposes, defaults to "resk-touchable-ripple".
- * 
- * @param {React.Ref} ref - A ref that can be used to access the underlying Pressable component.
  * 
  * @returns {JSX.Element} A `Pressable` component with ripple effect and hover functionality.
  * 
@@ -85,7 +83,7 @@ const isAndroid = Platform.isAndroid() && (typeof version == "number" ? version 
  * </TouchableRipple>
  * ```
  */
-export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
+export function TouchableRipple({
     children, disabled, style,
     rippleColor: customRippleColor,
     hoverColor: customHoverColor,
@@ -94,9 +92,10 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
     rippleDuration,
     shadowEnabled,
     onLayout,
+    ref,
     rippleOpacity,
     ...props
-}, ref) => {
+} : ITouchableRippleProps){
     const theme = useTheme();
     const { rippleColor, hoverColor } = getColors({ rippleColor: customRippleColor, hoverColor: customHoverColor, theme });
     testID = defaultStr(testID, "resk-touchable-ripple");
@@ -184,7 +183,7 @@ export const TouchableRipple = forwardRef<View, ITouchableRippleProps>(({
                 {children}
             </>}
     </Pressable>;
-});
+};
 
 
 

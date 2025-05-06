@@ -1,13 +1,12 @@
 import { Dropdown, IDropdownProps } from "@components/Dropdown";
 import { CountriesManager, defaultStr, ICountry, ICountryCode, isNonNullString } from "@resk/core";
 import { TouchableOpacity, StyleSheet, TouchableOpacityProps } from "react-native";
-import { forwardRef } from "react";
 import { useMemo } from "react";
 import { Icon } from "@components/Icon";
 import Label from "@components/Label";
 import View from "@components/View";
 import Theme, { Colors } from "@theme/index";
-import { ISelectCountryProps } from "./types";
+import { ISelectCountryProps } from './types';
 import { SelectCountryRef } from "@components/TextInput/SelectCountryRef";
 import { isNumber } from "@resk/core/utils";
 
@@ -18,7 +17,7 @@ import { isNumber } from "@resk/core/utils";
  * @param {ISelectCountryProps} props - The props for the country selector component.
  * @returns {JSX.Element} The rendered country selector component.
  */
-export const SelectCountry = forwardRef<any, ISelectCountryProps & { displayDialCode?: boolean }>(({ withLabel, countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }, ref) => {
+export function SelectCountry({ withLabel, countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }:ISelectCountryProps & { displayDialCode?: boolean }) => {
     const countries = useMemo(() => {
         return Object.values(CountriesManager.getCountries());
     }, []);
@@ -80,7 +79,7 @@ export const SelectCountry = forwardRef<any, ISelectCountryProps & { displayDial
         {...props}
         menuProps={Object.assign({}, { minWidth: canDisplayDialCode ? 280 : 260 }, props.menuProps)}
     />
-});
+};
 
 SelectCountry.displayName = "SelectCountry";
 

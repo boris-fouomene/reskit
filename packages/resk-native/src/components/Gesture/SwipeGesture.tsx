@@ -19,10 +19,7 @@
  * </SwipeGestureHandler>
  * ```
  */
-
-import View, { IViewProps } from '@components/View';
-import * as React from "react";
-import { useCallback, useRef } from 'react';
+import { FC, useCallback, useRef } from 'react';
 import { PanResponder, GestureResponderEvent, PanResponderGestureState, Animated, ViewProps } from 'react-native';
 
 /**
@@ -118,7 +115,7 @@ export interface ISwipeGestureProps extends Animated.AnimatedProps<ViewProps> {
  * during and after swipes.
  * @component
  */
-const SwipeGestureHandler: React.FC<ISwipeGestureProps> = ({
+const SwipeGestureHandler: FC<ISwipeGestureProps> = ({
     onSwipeLeft,
     onSwipeRight,
     onSwipeTop,

@@ -1,6 +1,5 @@
 
-import * as React from "react";
-import { ReactNode } from "react";
+import { Component, ReactNode } from "react";
 import Dialog from "./Dialog";
 import { isValidElement } from "@utils";
 import { defaultStr, isObj } from "@resk/core/utils";
@@ -19,7 +18,7 @@ import { IDialogProps } from "./types";
  * 
  * @extends React.Component
  */
-export default class DialogControlled<DialogContextExtended = any> extends React.Component<IDialogControlledProps<DialogContextExtended>, IDialogControlledState> {
+export default class DialogControlled<DialogContextExtended = any> extends Component<IDialogControlledProps<DialogContextExtended>, IDialogControlledState> {
     isDialog: boolean = true;
     isDialogControlled: boolean = true;
     constructor(props: IDialogControlledProps<DialogContextExtended>) {
@@ -154,11 +153,11 @@ export default class DialogControlled<DialogContextExtended = any> extends React
         }
         return <Dialog<DialogControlled>
             {...rProps}
-            {...(props)}
+            {...(props as any)}
             isPreloader={false}
             appBarProps={Object.assign({}, props.appBarProps, {
                 context: Object.assign({}, context, props?.appBarProps?.context, { dialogContext: this }),
-            })}
+            }) as any}
             testID={testID}
             context={Object.assign({}, context, { dialogContext: this })}
             visible={this.state.visible}

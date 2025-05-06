@@ -1,4 +1,4 @@
-import * as React from "react";
+import { createContext, useContext } from "react";
 import { IAppBarContext } from "./types";
 
 /**
@@ -17,7 +17,7 @@ import { IAppBarContext } from "./types";
  *     return <div>{appBarContext.someValue}</div>;
  * };
  */
-export const AppBarContext = React.createContext<IAppBarContext<any>>({} as IAppBarContext<any>);
+export const AppBarContext = createContext<IAppBarContext<any>>({} as IAppBarContext<any>);
 
 /**
  * Custom hook to access the AppBar context.
@@ -44,5 +44,5 @@ export const AppBarContext = React.createContext<IAppBarContext<any>>({} as IApp
  * };
  */
 export function useAppBar<IAppBarActionContext = any>(): IAppBarContext<IAppBarActionContext> {
-    return React.useContext(AppBarContext) as IAppBarContext<IAppBarActionContext>;
+    return useContext(AppBarContext) as IAppBarContext<IAppBarActionContext>;
 };

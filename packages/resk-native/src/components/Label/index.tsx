@@ -1,7 +1,6 @@
 import { Text } from "react-native";
 import { StyleSheet } from "react-native";
 import Theme, { useTheme, Colors } from "@theme";
-import * as React from "react";
 import { IDict, isNonNullString } from "@resk/core";
 import { ILabelProps } from "./types";
 import isValidElement from "@utils/isValidElement";
@@ -23,7 +22,7 @@ import isValidElement from "@utils/isValidElement";
  * <Label children={'An example of children'} textBold {...otherProperties} />
  * ```
  */
-const Label = React.forwardRef(({
+function Label({
   children,
   userSelect,
   role,
@@ -40,7 +39,7 @@ const Label = React.forwardRef(({
   fontVariant,
   colorScheme: customColorScheme,
   ...rest
-}: ILabelProps, ref: React.ForwardedRef<Text>) => {
+}: ILabelProps){
   const theme = useTheme();
   const colorScheme = theme.getColorScheme(customColorScheme);
 
@@ -92,7 +91,6 @@ const Label = React.forwardRef(({
   return (
     <Text
       allowFontScaling={true}
-      ref={ref}
       {...rest}
       {...restProps}
       testID={testID}
@@ -114,7 +112,7 @@ const Label = React.forwardRef(({
       {children}
     </Text>
   );
-});
+}
 
 export * from "./types";
 

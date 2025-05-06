@@ -7,8 +7,7 @@ import {
 } from "@components/AppBar";
 import DialogTitle from "./DialogTitle";
 import DialogFooter from "./DialogFooter";
-import * as React from "react";
-import { ReactNode, useMemo } from "react";
+import { Fragment, ReactNode, useMemo } from "react";
 import { isValidElement } from "@utils";
 import View from "@components/View";
 import DialogActions from "./DialogActions";
@@ -178,7 +177,7 @@ function ModalWrapper<DialogContextExtend = any>({
   const { Component: Wrapper, props: wrapperProps } = useMemo(() => {
     const canRenderScrollView = withScrollView !== false && !isPreloader;
     return {
-      Component: canRenderScrollView ? ScrollView : React.Fragment,
+      Component: canRenderScrollView ? ScrollView : Fragment,
       props: canRenderScrollView ? Object.assign({}, { testID: testID + "-scrollview" }, scrollViewProps) : {}
     }
   }, [withScrollView, scrollViewProps, testID, isPreloader]);

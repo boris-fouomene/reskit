@@ -1,4 +1,3 @@
-import * as React from "react";
 import { StyleSheet, View } from 'react-native';
 import { Colors } from '@theme';
 import { defaultStr, IDict } from "@resk/core";
@@ -7,6 +6,7 @@ import Label from "@components/Label";
 import { useGetIcon } from '@components/Icon';
 import { ITabItemProps } from './types';
 import { userTabs } from './context';
+import { useCallback } from 'react';
 
 
 /**
@@ -66,7 +66,7 @@ const TabItem = ({
   const isActive = index === activeIndex;
   const style: IDict = Object.assign({}, StyleSheet.flatten(customStyle));
 
-  const activeStyle = React.useCallback((type: any) => {
+  const activeStyle =useCallback((type: any) => {
     return (typeof type === 'function' ? type(active) : type);
   }, [active]);
   const backgroundColor: string = Colors.isValid(style.backgroundColor) ? style.backgroundColor : 'transparent';

@@ -1,8 +1,7 @@
 "use client";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
-import * as React from "react";
-import { useMemo } from "react";
+import { useMemo,useRef,useState} from "react";
 import { getTextContent, isValidElement, setRef, useMergeRefs } from '@utils';
 import { getMaxZindex, isDOMElement, Logger, Platform } from "@resk/core";
 import { TIPPY_THEME } from '@theme/updateNative/utils';
@@ -32,12 +31,9 @@ export * from "./types";
  * @param {React.ElementType} [props.as] - Optionally defines a different component to use instead of `Pressable`.
  * @param {string} [props.testID] - A unique identifier for testing purposes.
  * @param {string} [props.id] - A unique ID for the tooltip instance. Auto-generated if not provided.
- * @param {React.Ref} ref - A forwarded ref for accessing the underlying element or tooltip instance.
  * @returns {React.ReactElement | null} - The rendered Tooltip component.
  */
-const Tooltip = React.forwardRef(({
-    children, title, tooltip, disabled, as, testID, id, ...rest
-}: ITooltipProps, ref) => {
+export function Tooltip({ children, title, tooltip, disabled, as, testID, id, ref, ...rest }: ITooltipProps) {
 
     // Determine the component to render (Pressable by default or a custom one)
     const Component = useMemo(() => {
@@ -47,10 +43,10 @@ const Tooltip = React.forwardRef(({
     testID = defaultStr(testID, "resk-tooltip");
 
     // Reference for instance ID or generate a unique one
-    const instanceIdRef = React.useRef(id || uniqid("tippy-instance-id"));
+    const instanceIdRef = useRef(id || uniqid("tippy-instance-id"));
 
     // Reference for the child element (e.g., button)
-    const buttonRef = React.useRef(null);
+    const buttonRef = useRef(null);
 
     // Combine external ref with internal button reference
     const innerRef = useMergeRefs(ref, buttonRef);
@@ -58,7 +54,7 @@ const Tooltip = React.forwardRef(({
     // Determine the DOM selector based on button reference or instance ID
     const selector = isDOMElement(buttonRef.current) ? buttonRef.current : "#" + instanceIdRef.current;
 
-    React.useEffect(() => {
+    useEffect(() => {
         // Do nothing if disabled
         if (disabled || !Platform.isClientSide()) return;
 
@@ -101,7 +97,6 @@ const Tooltip = React.forwardRef(({
             {children}
         </Component>
     );
-});
+};
 
 Tooltip.displayName = "Tooltip";
-export { Tooltip }

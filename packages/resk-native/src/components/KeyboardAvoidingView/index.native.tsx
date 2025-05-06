@@ -1,5 +1,4 @@
 import { KeyboardAvoidingView as RNKeyboardAvoidingView, StyleSheet } from 'react-native';
-import * as React from "react";
 import { IKeyboardAvoidingViewProps } from './types';
 import Platform from '@platform';
 
@@ -26,9 +25,6 @@ export * from "./types";
  * @param {KeyboardAvoidingViewProps} [props.rest] - Additional props to be 
  * passed to the underlying `KeyboardAvoidingView`, allowing for further 
  * customization of its behavior and styling.
- * 
- * @param {React.Ref<KeyboardAvoidingView>} ref - A ref that can be used to 
- * access the underlying `KeyboardAvoidingView` component.
  * 
  * @returns {JSX.Element} A `KeyboardAvoidingView` component that adjusts 
  * its position based on the keyboard's visibility.
@@ -63,10 +59,9 @@ export * from "./types";
  * on Android, it uses 'height'. The `keyboardVerticalOffset` is set 
  * to 80 for iOS to account for any navigation bars or headers.
  */
-const KeyboardAvoidingView = React.forwardRef(({ children, isPreloader, ...rest }: IKeyboardAvoidingViewProps, ref: React.Ref<RNKeyboardAvoidingView>) => {
+function KeyboardAvoidingView ({ children, isPreloader, ...rest }: IKeyboardAvoidingViewProps){
   return (
     <RNKeyboardAvoidingView
-      ref={ref ? ref : x => x}
       behavior={Platform.isIos() ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.isAndroid() ? 0 : 80}
       {...rest}
@@ -75,7 +70,7 @@ const KeyboardAvoidingView = React.forwardRef(({ children, isPreloader, ...rest 
       {children}
     </RNKeyboardAvoidingView>
   );
-});
+};
 KeyboardAvoidingView.displayName = "KeyboardAvoidingView";
 export default KeyboardAvoidingView;
 const styles = StyleSheet.create({

@@ -1,7 +1,6 @@
-import * as React from "react";
-import { useMemo, useRef } from "react";
+import {createContext, useContext, useEffect, useMemo, useRef} from "react";
 import View from "@components/View";
-import { StyleSheet, View as RNView, Pressable, Animated, GestureResponderEvent, } from "react-native";
+import { StyleSheet, Pressable, Animated, GestureResponderEvent, } from "react-native";
 import Label from "@components/Label";
 import { Icon, useGetIcon } from "@components/Icon";
 import { defaultStr } from "@resk/core/utils";
@@ -65,7 +64,7 @@ import { isRTL } from "@utils/i18nManager";
  * @see {@link IExpandableCallbackOptions} for callback options
  */
 
-export const Expandable = React.forwardRef(({ left: customLeft, expandIconSize, expandedIconProps, children: customChildren, unexpandedIconProps, right: customRight, label: customLabel, usePrimaryColorWhenExpended, onToggleExpand, testID, onPress, expanded: expandedProp, expandedIcon, defaultExpanded, unexpandedIcon, leftContainerProps, rightContainerProps, contentProps, labelProps, contentContainerProps, showExpandIcon, containerProps, autoMountChildren = false, style, expandIconPosition, ...props }: IExpandableProps, ref: React.ForwardedRef<RNView>) => {
+export function Expandable ({ left: customLeft,ref, expandIconSize, expandedIconProps, children: customChildren, unexpandedIconProps, right: customRight, label: customLabel, usePrimaryColorWhenExpended, onToggleExpand, testID, onPress, expanded: expandedProp, expandedIcon, defaultExpanded, unexpandedIcon, leftContainerProps, rightContainerProps, contentProps, labelProps, contentContainerProps, showExpandIcon, containerProps, autoMountChildren = false, style, expandIconPosition, ...props }: IExpandableProps){
   const theme = useTheme();
   const children = useMemo(() => {
     return customChildren;
@@ -109,7 +108,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandIconSize, 
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isControlled) {
       if (typeof expandedProp == "boolean" && expandedProp !== expanded) {
         setExpanded(expandedProp);
@@ -171,7 +170,7 @@ export const Expandable = React.forwardRef(({ left: customLeft, expandIconSize, 
       </View>
     </ExpandableContext.Provider>
   );
-});
+};
 
 Expandable.displayName = "Expandable";
 
@@ -206,7 +205,7 @@ Expandable.displayName = "Expandable";
  *   );
  * };
  */
-const ExpandableContext = React.createContext<IExpandableContext>({} as IExpandableContext);
+const ExpandableContext = createContext<IExpandableContext>({} as IExpandableContext);
 
 /**
  * A custom hook that provides access to the `ExpandableContext`.
@@ -235,7 +234,7 @@ const ExpandableContext = React.createContext<IExpandableContext>({} as IExpanda
  *   );
  * };
  */
-export const useExpandable = () => React.useContext(ExpandableContext);
+export const useExpandable = () => useContext(ExpandableContext);
 
 const styles = StyleSheet.create({
   center: {

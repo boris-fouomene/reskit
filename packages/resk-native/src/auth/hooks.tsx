@@ -1,5 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode, isValidElement } from "react";
-import * as React from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, isValidElement, ComponentProps, ComponentClass, FC } from "react";
 import { IAuthContext, IAuthProviderProps } from "./types";
 import Auth from "@resk/core/auth";
 import { isObj } from "@resk/core/utils";
@@ -32,7 +31,7 @@ class AuthLogin {
  * Interface for the login component props.
  * @extends React.ComponentProps<any>
  */
-export interface ILoginProps extends React.ComponentProps<any> {
+export interface ILoginProps extends ComponentProps<any> {
 
 }
 
@@ -41,7 +40,7 @@ export interface ILoginProps extends React.ComponentProps<any> {
  * @returns A function that takes a React component class as an argument representing the login component.
  */
 export function AttachLogin() {
-  return function (target: React.ComponentClass<ILoginProps>) {
+  return function (target:ComponentClass<ILoginProps>) {
     Reflect.defineMetadata(AuthLogin.metaData, target, AuthLogin);
   };
 }
@@ -217,17 +216,17 @@ export type IWithAuthProps<T extends any = any> = T & {
  * // Usage in a parent component
  * <MyComponentWithAuth />
  */
-export function withAuth<T extends any = any>(Component: React.FC<IWithAuthProps<T>>, options: IWithAuthOptions = {}): React.FC<IWithAuthProps<T>> {
+export function withAuth<T extends any = any>(Component: FC<IWithAuthProps<T>>, options: IWithAuthOptions = {}): FC<IWithAuthProps<T>> {
   options = Object.assign({}, options);
   const { fallback, displayName } = options;
-  const fn: React.FC<IWithAuthProps<T>> = function (props: IWithAuthProps<T>): ReactNode {
+  const fn: FC<IWithAuthProps<T>> = function (props: IWithAuthProps<T>): ReactNode {
     const isAppReady = useIsAppReady();
     const user = useGetSignedUser();
     if (!user || !isAppReady) {
       if (typeof fallback === "function") {
         return fallback();
       }
-      if (fallback !== undefined && React.isValidElement(fallback)) return fallback;
+      if (fallback !== undefined && isValidElement(fallback)) return fallback;
       if (!isAppReady) return null;
       return <Login />;
     }
@@ -260,7 +259,7 @@ export function withAuth<T extends any = any>(Component: React.FC<IWithAuthProps
  * // Usage of the Login component
  * <Login/>
  */
-const Login: React.FC<{}> = function ({ }) {
+const Login: FC<{}> = function ({ }) {
   const Component = AuthLogin.getComponent();
   const theme = useTheme();
   return <Portal testID="resk-auth-login-portal" absoluteFill>
@@ -304,7 +303,7 @@ Login.displayName = "ReskNativeAuthLogin";
  *     <div>Protected content that only authenticated users can see.</div>
  * </Container>
  */
-const Container: React.FC<{ children: JSX.Element }> = ({ children }: { children: JSX.Element }) => {
+const Container: FC<{ children: JSX.Element }> = ({ children }: { children: JSX.Element }) => {
   const user = useGetSignedUser();
   return user ? children : <Login />;
 }

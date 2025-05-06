@@ -1,8 +1,5 @@
 import FontIcon from "@components/Icon/Font";
 import IconButton from "@components/Icon/Button";
-import { forwardRef } from 'react';
-import * as React from "react";
-import { View } from "react-native";
 import { IBackActionProps } from "./types";
 import { useAppBar } from "./hooks";
 
@@ -14,7 +11,6 @@ import { useAppBar } from "./hooks";
  *
  * @component BackAction
  * @param {IBackActionProps} props - The properties for configuring the BackAction.
- * @param {React.Ref<View>} ref - A ref for accessing the underlying IconButton component.
  *
  * @returns {JSX.Element} The rendered BackAction component.
  *
@@ -28,7 +24,7 @@ import { useAppBar } from "./hooks";
  *   );
  * };
  */
-export const BackAction = forwardRef<View, IBackActionProps>(({ accessibilityLabel = 'Appbar.BackAction', ...rest }: IBackActionProps, ref: React.Ref<View>) => {
+export function BackAction({ accessibilityLabel = 'Appbar.BackAction', ...rest }: IBackActionProps) {
   const appBarContext = useAppBar();
   return <IconButton
     accessibilityLabel={accessibilityLabel}
@@ -37,9 +33,8 @@ export const BackAction = forwardRef<View, IBackActionProps>(({ accessibilityLab
     backgroundColor={appBarContext.backgroundColor}
     size={30}
     {...rest}
-    ref={ref}
   />;
-});
+};
 
 BackAction.displayName = 'AppBarBackAction';
 

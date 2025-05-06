@@ -1,6 +1,5 @@
 "use client";
-import * as React from "react";
-import { forwardRef } from "react";
+import {FC} from "react";
 import { isNonNullString, defaultStr } from "@resk/core/utils";
 import Logger from "@resk/core/logger";
 
@@ -59,11 +58,10 @@ const isIos = Platform.isIos();
  * ```
  * 
  * @param {IFontIconProps} props The properties of the `FontIcon` component.
- * @param {React.Ref} ref The reference to the icon component.
  * @returns {JSX.Element | null} Returns the icon element, or null if the icon is not defined.
  */
-const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, style, color, ...props }, ref) => {
-    const pressableProps = getTouchableProps(props);
+function FontIcon({ name,ref, disabled, style, color, ...props }:IFontIconProps){
+    const pressableProps = getTouchableProps(props as any);
     const theme = useTheme();
     color = Colors.isValid(color) ? color : theme.colors.text;
     let { iconSetName, iconSetPrefix, iconSet: IconSet, iconName } = getFontIconSet(name as string);
@@ -71,7 +69,8 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
         Logger.warn(`Icon not defined for FontIcon component, icon [${name as string}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
-    const Component: React.FC<IconProps & { ref: any }> = IconSet as unknown as React.FC<IconProps>;
+    const Component: FC<IconProps & {ref?:any}> = IconSet as unknown as FC<IconProps>;
+    const flattenStyle = StyleSheet.flatten([theme.styles.RTL, style]);
     if (pressableProps) {
         for (let i in pressableProps) {
             delete props[i as keyof typeof props];
@@ -84,7 +83,7 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
                 ref={ref as any}
                 color={color}
                 name={iconName}
-                style={[theme.styles.RTL, style]}
+                style={flattenStyle}
             />
         </TouchableOpacity>
     }
@@ -95,9 +94,9 @@ const FontIcon = forwardRef<React.Ref<any>, IFontIconProps>(({ name, disabled, s
         ref={ref as any}
         color={color}
         name={iconName}
-        style={[theme.styles.RTL, style]}
+        style={flattenStyle}
     />;
-});
+};
 
 
 /**
@@ -853,4 +852,4 @@ FontWithCustomIcons.CHECK = "check";
 
 export default FontWithCustomIcons;
 
-FontWithCustomIcons.displayName = "FontIcon";
+(FontWithCustomIcons as any).displayName = "FontIcon";

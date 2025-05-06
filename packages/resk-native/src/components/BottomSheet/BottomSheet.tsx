@@ -1,10 +1,9 @@
-import * as React from "react";
-import { useImperativeHandle, useRef } from "react"
+import { useImperativeHandle } from "react"
 import theme from "@theme";
 import { defaultObj, defaultStr, isObj } from "@resk/core/utils";
 import View from "@components/View";
 import { Portal } from "@components/Portal";
-import { PanResponder, Platform, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import { ExpandableItem } from "@components/Menu/ExpandableItem";
 import { BottomSheetContext } from "./hooks";
 import {
@@ -33,11 +32,11 @@ import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
  * </BottomSheet>
  * ```
  */
-const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
+function BottomSheet({ children,
     scrollViewProps: _scrollViewProps, containerProps: customContainerProps,
     testID,
     items: customItems,
-    contentProps: customChildrenContainerProps, appBarProps, dividerAfterAppBar, withScrollView, ...props }, ref) => {
+    contentProps: customChildrenContainerProps, appBarProps, dividerAfterAppBar,ref, withScrollView, ...props } : IBottomSheetProps){
     const {
         closeOnDragDownIcon,
         dragFromTopOnly,
@@ -114,7 +113,7 @@ const BottomSheet = React.forwardRef<any, IBottomSheetProps>(({ children,
             </BottomSheetContext.Provider>
         </Portal >
     );
-});
+};
 
 function renderExpandable(props: IBottomSheetItemProps, index: number) {
     return <ExpandableItem {...props} as={BottomSheetItem} key={index} />;

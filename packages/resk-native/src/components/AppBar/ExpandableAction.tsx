@@ -1,8 +1,5 @@
 import { Menu } from "@components/Menu";
-import { Button, IButtonContext, IButtonRef } from "@components/Button";
 import { IAppBarAction, IAppBarContext } from './types';
-import { GestureResponderEvent } from "react-native";
-import { forwardRef } from "react";
 import Action from "./Action";
 
 
@@ -51,12 +48,11 @@ import Action from "./Action";
  * actions. This component is useful for grouping related actions under a single button, improving the 
  * user interface's cleanliness and usability.
  */
-const ExpandableAppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarActionContext = any>({ items, children, ...rest }: IAppBarAction<IAppBarActionContext>, ref: IButtonRef<IAppBarContext<IAppBarActionContext>>) {
+function ExpandableAppBarAction<IAppBarActionContext = any>({ items, children, ...rest }: IAppBarAction<IAppBarActionContext>) {
     return <Menu
         anchor={({ openMenu }) => {
             return (
                 <Action testID='resk-expandable-appbar-action-anchor'
-                    ref={ref}
                     {...rest}
                     onPress={(event, context) => {
                         openMenu();
@@ -69,6 +65,6 @@ const ExpandableAppBarAction = forwardRef<any, IAppBarAction>(function <IAppBarA
         }}
         items={items}
     />
-});
+};
 
 export default ExpandableAppBarAction

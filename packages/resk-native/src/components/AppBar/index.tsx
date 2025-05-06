@@ -1,6 +1,3 @@
-import * as React from "react";
-import { forwardRef } from 'react';
-import { BackAction } from './BackAction';
 import { AppBarContext, useAppBar } from './hooks';
 import {
   View,
@@ -10,7 +7,7 @@ import {
 } from 'react-native';
 import Label from '@components/Label';
 import { Surface } from '@components/Surface';
-import Theme, { Colors, IThemeColorsTokenName, useTheme } from '@theme/index';
+import { Colors, IThemeColorsTokenName, useTheme } from '@theme/index';
 import { IAppBarProps } from './types';
 import { getLabelOrLeftOrRightProps } from '@hooks/label2left2right';
 import { useDimensions } from '@dimensions/index';
@@ -22,7 +19,7 @@ import FontIcon from '@components/Icon/Font';
 import IconButton from '@components/Icon/Button';
 import ExpandableAppBarAction from './ExpandableAction';
 import AppBarAction from './Action';
-import { useReskNative } from '@src/context/hooks';
+import { BackAction } from "./BackAction";
 
 
 /**
@@ -40,7 +37,6 @@ import { useReskNative } from '@src/context/hooks';
  * @param {IAppBarProps<AppBarActionContext>} props - The properties for 
  * configuring the AppBar, including title, subtitle, actions, and styles.
  * 
- * @param {React.ForwardedRef<View>} ref - A forwarded reference to the 
  * underlying View component, allowing parent components to access it.
  * 
  * @returns {JSX.Element} The rendered AppBar component, which includes 
@@ -68,7 +64,7 @@ import { useReskNative } from '@src/context/hooks';
  * theme, allowing for consistent styling across the app. The AppBar can 
  * include custom actions and can be extended with additional props as needed.
  */
-const AppBar = function AppBar<AppBarActionContext = any>({
+function AppBar<AppBarActionContext = any>({
   bindResizeEvent, textColor: color, backgroundColor, context, colorScheme: customColorScheme,
   renderAction, renderExpandableAction, maxActions,
   actions: customActions, title, subtitle, titleProps, subtitleProps, windowWidth, onBackActionPress, testID,

@@ -1,6 +1,5 @@
 
-import * as React from "react";
-import { ReactNode, useMemo } from "react";
+import { createRef, FC, Fragment, ReactNode, useMemo } from "react";
 import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";
@@ -277,13 +276,13 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
    * @type {React.RefObject<any>}
    * @private
    */
-  _navigationViewRef: any = React.createRef();
+  _navigationViewRef: any = createRef();
   /**
    * Reference to the backdrop element.
    * @type {React.RefObject<any>}
    * @private
    */
-  _backdropRef: any = React.createRef();
+  _backdropRef: any = createRef();
   readonly _dimensionChangedListener = dimentionAddListener(this._onDimensionsChanged.bind(this));
   constructor(props: IDrawerProps) {
     super(props);
@@ -704,7 +703,7 @@ export default class Drawer extends ObservableComponent<IDrawerProps, IDrawerSta
     return (
       <>
         {this.renderTitle()}
-        <>{React.isValidElement(children) ? children : null}</>
+        <>{isValidElement(children) ? children : null}</>
       </>
     );
   }
@@ -1067,7 +1066,7 @@ const styles = StyleSheet.create({
 
 
 
-export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
+export const DrawerChildren: FC<IDrawerContext> = ({ drawer }) => {
   const theme = useTheme();
   const { i18n } = useReskNative();
   const locale = i18n.getLocale();
@@ -1115,7 +1114,7 @@ export const DrawerChildren: React.FC<IDrawerContext> = ({ drawer }) => {
   });
   const animatedOverlayStyles = { opacity: overlayOpacity };
   const pointerEvents = drawerShown || permanent ? "auto" : "none";
-  const Wrapper = drawer.isProvider() ? Portal : React.Fragment;
+  const Wrapper = drawer.isProvider() ? Portal : Fragment;
   const canRender = drawer.isProvider() ? drawer.isOpen() : true;
   const wrapperProps = drawer.isProvider() ? { absoluteFill: canRender, testID: testID + "-portal" } : {};
   return (

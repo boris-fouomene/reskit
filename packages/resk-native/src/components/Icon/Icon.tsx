@@ -1,5 +1,5 @@
 "use client";
-import { forwardRef, LegacyRef, ReactNode, useMemo, Fragment, Ref } from "react";
+import { ReactNode, useMemo, Fragment, Ref } from "react";
 import { IFontIconName, IGetIconOptions, IIconProps } from "./types";
 import { Image, ImageStyle } from "react-native";
 import { isValidElement, pickTouchEventHandlers } from "@utils";
@@ -74,7 +74,7 @@ import { isReactComponent } from "@utils/isComponent";
  * <Icon iconName="material-home" size={24} color="#000" />
  */
 
-const Icon = forwardRef<Ref<Image | any>, IIconProps>(({ iconName, resizeMode, as, disabled, containerProps, title, tooltip, source, testID, size, style, color, ...props }, ref) => {
+function Icon ({ iconName, resizeMode, as, disabled, containerProps, title, tooltip, source, testID, size, style, color,ref, ...props }:IIconProps) {
     const isSource = isImageSource(source);
     //const isValidIconName = iconName && FontIcon.isValidName(iconName);
     testID = defaultStr(testID, isSource ? "resk-image" : "resk-font-icon");
@@ -122,7 +122,7 @@ const Icon = forwardRef<Ref<Image | any>, IIconProps>(({ iconName, resizeMode, a
             ref={ref}
         />}
     </Component>;
-});
+};
 
 
 

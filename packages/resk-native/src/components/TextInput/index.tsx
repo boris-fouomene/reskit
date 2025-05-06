@@ -1,8 +1,7 @@
 import Label from "@components/Label";
 import { isValidElement, useMergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
-import * as React from "react";
-import { ReactNode, useEffect, useMemo, useRef } from "react";
+import { ReactNode, useEffect, useMemo, useRef,useState,isValidElement } from "react";
 import { InputFormatter, isNumber, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, IInputFormatterResult } from "@resk/core";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
@@ -80,7 +79,7 @@ import defaultVal from '../../../../../../frontend-dash/src/utils/defaultVal';
  * The `TextInput` component is designed to be versatile and reusable across various parts of an application, ensuring a consistent and engaging user experience. 
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
-const TextInput = React.forwardRef(({ render, withKeyboardAvoidingView, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>) => {
+function TextInput({ render, withKeyboardAvoidingView,ref, ...props }: ITextInputProps) {
     const { variant, containerProps, onPress, focus, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, inputRef, right, label, ...rest } = useTextInput(props);
     const leftContainerProps = Object.assign({}, cLeftContainerProps);
     const isLabelEmbededVariant = variant === "labelEmbeded";
@@ -110,7 +109,7 @@ const TextInput = React.forwardRef(({ render, withKeyboardAvoidingView, ...props
             </View>) : null}
         </Wrapper>
     </Avoiding>
-});
+}
 
 /**
  * Function to determine the styles for the container and content based on the input state.
@@ -266,8 +265,8 @@ const iconSize = 25;
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, applyErrorColorOnLabel, style: customStyle, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix = false, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ...props }: ITextInputProps, ref?: React.Ref<RNTextInput>): IUseTextInputProps => {
-    const [isFocused, setIsFocused] = React.useState(false);
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, applyErrorColorOnLabel, style: customStyle, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix = false, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange,ref, ...props }: ITextInputProps): IUseTextInputProps => {
+    const [isFocused, setIsFocused] = useState(false);
     const style = StyleSheet.flatten([customStyle])
     const fontSize = isNumber(style.fontSize) && style.fontSize > 0 ? style.fontSize : 16;
     const { isPhone, isDateOrTime, typeString } = useMemo(() => {
@@ -294,7 +293,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
     const isLabelEmbededVariant = variant == "labelEmbeded";
     const isDefaultVariant = !isLabelEmbededVariant;
-    const [isSecure, setIsSecure] = React.useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
+    const [isSecure, setIsSecure] = useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
     useEffect(() => {
         return () => {
@@ -380,7 +379,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
     const valCase = useMemo(() => {
         return toCase(defaultValue, customPhoneCountryCode);
     }, [defaultValue, mask, maskOptions, customPhoneCountryCode])
-    const [inputState, setInputState] = React.useState<IInputFormatterResult & { phoneCountryCode?: ICountryCode }>(valCase);
+    const [inputState, setInputState] = useState<IInputFormatterResult & { phoneCountryCode?: ICountryCode }>(valCase);
     const focusedValue = isFocused ? (inputState.value === emptyValue ? '' : inputState.value) : '';
     useEffect(() => {
         if (areCasesEquals(valCase, inputState)) return;
@@ -433,7 +432,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
             }
         }
         if (!affContent) return null;
-        if (React.isValidElement(affContent)) {
+        if (isValidElement(affContent)) {
             return affContent;
         }
         return <Label children={affContent} style={[styles.affix, { color: textColor }]} />;
@@ -450,7 +449,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
     const canRenderLabel = withLabel !== false;
     const { left, right, label } = getLabelOrLeftOrRightProps<ITextInputCallbackOptions>({ left: customLeft, right: customRight, label: canRenderLabel ? customLabel : null }, callOptions);
     const disabledOrEditStyle = [!editable ? Theme.styles.readOnly : null, props.disabled ? Theme.styles.disabled : null, typeof opacity === "number" ? { opacity } : null];
-    const secureIconProps: Partial<IFontIconProps> = React.useMemo(() => {
+    const secureIconProps: Partial<IFontIconProps> = useMemo(() => {
         if (!isPasswordField) return {} as IFontIconProps;
         if (typeof secureTextEntryGetToggleIconProps == "function") {
             return Object.assign({}, secureTextEntryGetToggleIconProps({ isPasswordVisible: isSecure }));

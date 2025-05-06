@@ -4,7 +4,6 @@ import { ISurfaceProps } from "@components/Surface";
 import { ITooltipBaseProps } from "@components/Tooltip/types";
 import { ITouchableRippleProps } from "@components/TouchableRipple/types";
 import { IThemeColorsTokenName } from "@theme/types";
-import * as React from "react";
 import { AccessibilityRole, GestureResponderEvent, View } from "react-native";
 import { ILabelProps } from "@components/Label/types";
 import { IViewProps } from "@components/View/types";
@@ -14,6 +13,7 @@ import { IFormData } from "@components/Form/types";
 import { IAuthPerm } from "@resk/core/auth";
 import { IResourceName } from "@resk/core/types";
 import { ITextStyle } from "@src/types";
+import { ReactNode, Ref, RefObject } from "react";
 
 /**
  * @interface IButtonMode
@@ -87,7 +87,7 @@ export type IButtonMode = | 'text' | 'outlined' | 'contained';
  * @see {@link ISurfaceProps} for the `ISurfaceProps` type.
  * @see {@link ILabelProps} for the `ILabelProps` type.
  */
-export type IButtonProps<IButtonExtendContext = any, ResourceName extends IResourceName = IResourceName> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, textColor: string }> & Omit<ITouchableRippleProps, "style" | 'onPress' | "children"> & Omit<ITooltipBaseProps, 'disabled'> & {
+export type IButtonProps<IButtonExtendContext = any, ResourceName extends IResourceName = IResourceName> = ILabelOrLeftOrRightProps<{ context: IButtonContext<IButtonExtendContext>, textColor: string }> & Omit<ITouchableRippleProps, "style" | 'onPress' | "children" | "ref"> & Omit<ITooltipBaseProps, 'disabled' | 'ref'> & {
     /**
      * Optional style for the button component.
      * Can be used to customize the appearance of the button.
@@ -104,7 +104,7 @@ export type IButtonProps<IButtonExtendContext = any, ResourceName extends IResou
      * @example
      * <Button children="Submit" />
      */
-    children?: React.ReactNode;
+    children?: ReactNode;
 
     /**
      * Props for the button label.
@@ -319,7 +319,7 @@ export type IButtonProps<IButtonExtendContext = any, ResourceName extends IResou
      * const buttonRef = useRef<View>(null);
      * <Button containerRef={buttonRef} label="Ref Example" />
      */
-    containerRef?: React.RefObject<View>;
+    containerRef?: RefObject<View>;
 
     /**
      * Additional properties for the surface that contains the button.
@@ -403,6 +403,8 @@ export type IButtonProps<IButtonExtendContext = any, ResourceName extends IResou
      * If true, the button will not have any padding.
      */
     noPadding?: boolean;
+    
+    ref?:Ref<IButtonContext<IButtonExtendContext> & View>;
 }
 
 /**
@@ -525,49 +527,8 @@ export type IButtonContext<IButtonExtendContext = any> = Readonly<{
      */
     setIsLoading: (isLoading: boolean) => void;
 
-    /**
-     * A reference to the underlying View component that wraps the button. This can be used for direct manipulation or animations.
-     */
-    ref: View | null;
-
     /***
      * The data associated with the form if the button is representing a form action.
      */
     formData: IFormData;
 } & IButtonExtendContext>;
-
-
-/**
- * Type definition for a forwarded reference to a Button component.
- * 
- * This type encapsulates the reference that can be used to access 
- * the underlying Button component's context. It allows for the 
- * extension of button context properties through a generic type 
- * parameter, enabling developers to create more specialized 
- * button contexts as needed.
- * 
- * @template IButtonExtendContext - A generic type parameter that allows 
- * extending the context for the Button component. This enables 
- * customization of the properties passed to the button context.
- * 
- * @typedef {React.ForwardedRef<IButtonContext<IButtonExtendContext>>} IButtonRef
- * 
- * @example
- * // Example usage of IButtonRef in a functional component
- * const MyButton = React.forwardRef<IButtonContext, ButtonProps>((props, ref) => {
- *     return (
- *         <Button ref={ref} {...props}>
- *             Click Me
- *         </Button>
- *     );
- * });
- * 
- * // Using the IButtonRef type to create a reference
- * const buttonRef: IButtonRef = React.createRef();
- * 
- * @remarks
- * Utilizing the IButtonRef type allows for type-safe handling of 
- * button references, making it easier to manage button states 
- * and actions in a React application.
- */
-export type IButtonRef<IButtonExtendContext = any> = React.ForwardedRef<IButtonContext<IButtonExtendContext>>;

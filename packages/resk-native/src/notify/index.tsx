@@ -1,4 +1,4 @@
-import * as React from "react";
+import {PureComponent, Ref} from "react";
 import { ReactNode } from "react";
 import View, { IViewProps } from "@components/View";
 import { Portal } from "@components/Portal";
@@ -9,7 +9,7 @@ import { IFontIconName, IFontIconProps } from "@components/Icon/types";
 import Font from "@components/Icon/Font";
 import { INotifyState, INotifyMessage, INotifyPostion, INotifyAction, INotifyType } from "./types";
 import { ILabelProps } from "@components/Label";
-import { StyleSheet, Dimensions, Pressable, Animated, StatusBar, PanResponder, Keyboard, Image, PanResponderInstance, EmitterSubscription, GestureResponderEvent, PanResponderGestureState, LayoutChangeEvent } from "react-native";
+import { StyleSheet, Dimensions, Pressable, Animated, StatusBar, PanResponder, Keyboard, PanResponderInstance, EmitterSubscription, GestureResponderEvent, PanResponderGestureState, LayoutChangeEvent } from "react-native";
 import { Surface } from "@components/Surface";
 import Label from "@components/Label";
 import Queue from "./Queue";
@@ -41,15 +41,15 @@ const TOP = 50;
  *   onTap={(options) => console.log("Notification tapped", options)}
  * />
  */
-export default class Notify extends React.PureComponent<INotifyProps, INotifyState> {
+export default class Notify extends PureComponent<INotifyProps, INotifyState> {
   panResponder: PanResponderInstance;
   readonly queue: Queue = new Queue();
   __isKeyboardOpen: boolean = false;
   state: INotifyState;
   closeTimeoutID?: any;
   alertData: INotifyOptions = {};
-  mainView?: any = null;
   activeData?: IDict;
+  notifyRef?:Notify;
   static defaultProps: INotifyProps = {
     closeInterval: 4000,
     startDelta: -100,
@@ -634,7 +634,7 @@ export default class Notify extends React.PureComponent<INotifyProps, INotifySta
     };
     return (
       <Portal>
-        <Animated.View ref={(ref) => (this.mainView = ref)} {...this.panResponder.panHandlers} testID={testID + "-animated-view"} {...wrapProps} style={[wrapperAnimStyle, (wrapProps as any).style]}>
+        <Animated.View {...this.panResponder.panHandlers} testID={testID + "-animated-view"} {...wrapProps} style={[wrapperAnimStyle, (wrapProps as any).style]}>
           <Surface elevation={5} style={style} testID={testID + "content-container"} breakpointStyle={breakpointStyle}>
             <Pressable onPress={onPress} testID={testID} style={[styles.main]} disabled={!tapToCloseEnabled} onLayout={(event) => this._onLayoutEvent(event)} accessible={accessible}>
               <View testID={testID + "-content-container"} style={[styles.contentContainer]}>
@@ -1137,7 +1137,7 @@ export interface INotifyRenderOptions {
  *     ```
 
  */
-export interface INotifyProps extends IViewProps,
+export interface INotifyProps extends Omit<IViewProps,"ref">,
   INotifyRenderOptions {
   closeInterval?: number;
   startDelta?: number;
@@ -1163,6 +1163,7 @@ export interface INotifyProps extends IViewProps,
   warnTextColor?: string;
   errorTextColor?: string;
   positon?: INotifyPostion;
+  ref?:Ref<Notify>;
 };
 
 const styles = StyleSheet.create({

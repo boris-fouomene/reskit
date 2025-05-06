@@ -1,11 +1,10 @@
 import { Dimensions } from 'react-native';
-import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, FC } from 'react';
 import { IBreakpointStyleProps, IDimensions, IWithBreakpointStyle } from './types';
 import Breakpoints from '../breakpoints';
 import { isNonNullString, isObj, debounce } from '@resk/core/utils';
 import { IObservable, isObservable, observable } from "@resk/core/observable";
-import { IReactComponent, ITextStyle, IImageStyle, IViewStyle } from "../types";
+import { IReactComponent, ITextStyle, IImageStyle, IViewStyle, IStyle } from "../types";
 import { StyleSheet } from "react-native";
 import { IBreakpointName } from '@src/breakpoints/types';
 import stableHash from "stable-hash";
@@ -287,12 +286,12 @@ export function useBreakpointStyle<T extends IBreakpointStyleProps = any>({ styl
  *    ```
  *    This custom display name will appear in React DevTools, making it easier to identify the component.
  */
-export function withBreakpointStyle<IProps extends IBreakpointStyleProps = any, IState = any>(Component: IReactComponent<IProps, IState>, displayName?: string) {
+export function withBreakpointStyle<IProps extends IBreakpointStyleProps = any, IState = any,StyleProps extends IStyle = IStyle>(Component: IReactComponent<IProps, IState>, displayName?: string) {
 	// Define a functional component that wraps the provided component
-	const fn = React.forwardRef<any, IWithBreakpointStyle<IProps>>((props, ref): React.ReactNode => {
+	const fn :FC<IWithBreakpointStyle<IProps,StyleProps>> = ((props : IWithBreakpointStyle<IProps>): React.ReactNode => {
 		const style = useBreakpointStyle(props as any); // Get responsive styles using the custom hook
 		const { breakpointStyle, ...rest } = props as IWithBreakpointStyle<IProps> & { breakpointStyle?: any };
-		return <Component ref={ref} {...rest as IProps} style={style} />; // Render the wrapped component with props and responsive styles
+		return <Component {...(rest as IProps)} style={style} />; // Render the wrapped component with props and responsive styles
 	});	// Set a display name for the wrapped component for better debugging
 	if (isNonNullString((Component as any)?.displayName)) {
 		fn.displayName = (Component as any).displayName + "_WithBreakpointStyle"; // Append suffix to original display name

@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useEffect, useMemo, createContext, useContext, useRef, useCallback } from "react";
+import { useEffect, useMemo, createContext, useContext, useRef, useCallback, FC, ReactNode } from "react";
 import Platform from "@platform";
 import { StyleSheet, ViewProps, Animated, Pressable, GestureResponderEvent, PressableProps, Easing } from "react-native";
 import { IViewProps } from "@components/View";
@@ -12,7 +11,7 @@ const useNativeDriver = Platform.canUseNativeDriver()
 
 import { useDimensions } from "@dimensions";
 
-export const AnimatedPressable: React.FC<any> = Animated.createAnimatedComponent(Pressable);
+export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: customMaxWidth, maxHeight: customMaxHeight, contentContainerProps, animationDuration, responsive, isPreloader, dismissable, onDismiss, fullScreen: customFullScreen, backgroundOpacity: customBackgroundOpacity, contentProps, ...props }: IModalProps) => {
   customBackgroundOpacity = typeof customBackgroundOpacity === "number" ? customBackgroundOpacity : 1;
@@ -39,7 +38,7 @@ export const Modal = ({ visible, testID, animationType, pureModal, maxWidth: cus
   }, [isMobileOrTablet, screenWidth, screenHeight, responsive, visible, customFullScreen, pureModal]);
   const children = useMemo(() => {
     return props.children;
-  }, [props.children]) as React.ReactNode;
+  }, [props.children]) as ReactNode;
   contentContainerProps = Object.assign({}, contentContainerProps);
   testID = testID || "resk-modal";
 

@@ -7,6 +7,7 @@ import { ITouchableRippleProps } from "@components/TouchableRipple/types";
 import { ISurfaceProps } from "@components/Surface/types";
 import { IconProps } from "react-native-vector-icons/Icon";
 
+
 export * from "./icon-types";
 
 /**
@@ -57,7 +58,7 @@ export * from "./icon-types";
 * <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
-export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size'> & {
+export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size' | "ref"> & {
     /**
      * The style object for the icon.
      * 
@@ -98,6 +99,8 @@ export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size'> & {
      * <FontIcon name="home" size={30} /> // Renders the icon with a size of 30 pixels
      */
     size?: number;
+    
+    ref?: React.Ref<View>;
 };
 
 
@@ -459,4 +462,6 @@ export type IIconButtonProps = Omit<ITouchableRippleProps, "children"> & IIconPr
     *
      */
     containerSize?: number;
+    
+    ref?:React.Ref<View>;
 };

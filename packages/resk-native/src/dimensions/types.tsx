@@ -1,6 +1,6 @@
 import { IBreakpointName, IBreakpoints } from "@src/breakpoints/types";
-import { IImageStyle, ITextStyle, IViewStyle } from "@src/types";
-import { ScaledSize } from "react-native";
+import { IImageStyle, IStyle, ITextStyle, IViewStyle } from "@src/types";
+import { ScaledSize} from 'react-native';
 
 /**
  * @interface IDimensions
@@ -148,18 +148,17 @@ export interface IDimensions extends ScaledSize {
  * };
  * ```
  */
-export type IWithBreakpointStyle<T = any> =
-    Omit<T, keyof IBreakpointStyleProps> & IBreakpointStyleProps;
-
+export type IWithBreakpointStyle<T = any,StyleProps extends IStyle = IStyle> = Omit<T, "style" | "breakpointStyle"> & IBreakpointStyleProps<StyleProps>;
 
 /**
  * @interface IBreakpointStyleProps
+   @template T - The type of the style object, which can be a text, view, or image style.
  * Type definition for a component's props that includes responsive styling capabilities.
  * @typedef {Object} IBreakpointStyleProps
- * @property {ITextStyle | IViewStyle  | IImageStyle} [style] - The base style to apply.
- * @property {(Partial<Record<IBreakpointName, ITextStyle | IViewStyle  | IImageStyle>>) | ((dimensions: IDimensions) => ITextStyle | IViewStyle  | IImageStyle)} [breakpointStyle] - The style to apply based on the current breakpoint.
+ * @property {T} [style] - The base style to apply.
+ * @property {(Partial<Record<IBreakpointName, T>>) | ((dimensions: IDimensions) => T)} [breakpointStyle] - The style to apply based on the current breakpoint.
  */
-export interface IBreakpointStyleProps {
-    style?: ITextStyle | IViewStyle | IImageStyle; // The base style to apply
-    breakpointStyle?: (Partial<Record<IBreakpointName, ITextStyle | IViewStyle | IImageStyle>>) | ((dimensions: IDimensions) => ITextStyle | IViewStyle | IImageStyle);
+export interface IBreakpointStyleProps<T extends IStyle = IStyle> {
+    style?: T; // The base style to apply
+    breakpointStyle?: (Partial<Record<IBreakpointName, T>>) | ((dimensions: IDimensions) => T);
 };

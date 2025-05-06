@@ -73,17 +73,17 @@ export const usePrepareBottomSheet = ({
         return visibleState;
     }, [visibleState, isControlled, customVisible]);
     const heightRef = useRef(height);
-    const callbackRef = useRef<() => void>();
+    const callbackRef = useRef<() => void>(null);
     const prevCustomVisible = usePrevious(customVisible);
     useEffect(() => {
         if (!isControlled || prevCustomVisible === customVisible) {
-            callbackRef.current = undefined;
+            (callbackRef as any).current = undefined;
             return;
         }
         if (typeof callbackRef.current == 'function') {
             callbackRef.current();
         }
-        callbackRef.current = undefined;
+        (callbackRef as any).current = undefined;
     }, [isControlled, customVisible, prevCustomVisible]);
     heightRef.current = height;
     const prevVisible = usePrevious(isVisible);
@@ -110,7 +110,7 @@ export const usePrepareBottomSheet = ({
         },
         open: (cb?: () => void) => {
             if (isControlled) {
-                callbackRef.current = cb;
+                (callbackRef as any).current = cb;
                 return;
             }
             setVisibleState(true, cb);
@@ -118,7 +118,7 @@ export const usePrepareBottomSheet = ({
         close: (cb?: () => void) => {
             animate(0, () => {
                 if (isControlled) {
-                    callbackRef.current = cb;
+                    (callbackRef as any).current = cb;
                     if (typeof onDismiss === 'function') {
                         onDismiss();
                     }
@@ -573,6 +573,8 @@ export interface IBottomSheetProps extends IViewProps, IUsePrepareBottomSheetPro
      * Default is true
      */
     dividerAfterAppBar?: boolean;
+    
+    ref?:any;
 };
 
 

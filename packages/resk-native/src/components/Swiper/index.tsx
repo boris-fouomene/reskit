@@ -1,11 +1,10 @@
-
-import * as React from "react";
 import { Animated, I18nManager, Dimensions, PanResponder, StyleSheet, View, PanResponderInstance, GestureResponderEvent, LayoutChangeEvent, ViewStyle } from 'react-native';
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import Theme from "@theme";
 import { ISwiperProps, ISwiperState } from './types';
 import { isRTL } from '@utils/i18nManager';
 import platform from '@platform/index';
+import { Component, isValidElement } from 'react';
 const WIDTH_HEIGHT = 250;
 
 const useNativeDriver = platform.isNative(); // because of RN #13377
@@ -161,7 +160,7 @@ export * from "./types";
  *                 <Swiper disabled={true} />
  *                 ```
  */
-export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
+export class Swiper extends Component<ISwiperProps, ISwiperState> {
   /**
    * Default properties for the Swiper component.
    * 
@@ -180,7 +179,9 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
     positionFixed: false,
   }
   autoplay: any;// Autoplay timer reference
-  children = (() => React.Children.toArray(this.props.children as any))()// Array of children passed to the swiper;
+  get children(){
+    return Array.isArray(this.props.children) ? this.props.children : [this.props.children];
+  }
   count = (() => this.children.length)();
   _panResponder?: PanResponderInstance; // PanResponder instance for handling gestures
   _animatedValueX: number = 0; // Current animated value for X axis
@@ -508,7 +509,6 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
     const height = autoHeight ? this.state.height : !isReady ? WIDTH_HEIGHT : customHeight;
     contentContainerProps = Object.assign({}, contentContainerProps);
     const disabledStyle = disabled && Theme.styles.disabled;
-    this.children = (() => React.Children.toArray(this.props.children as any))();
     this.count = (() => this.children.length)();
     return (
       <View
@@ -518,7 +518,7 @@ export class Swiper extends React.Component<ISwiperProps, ISwiperState> {
         onLayout={this._onLayout}
       >
         {!isReady ? (
-          React.isValidElement(placeholder) ? placeholder :
+          isValidElement(placeholder) ? placeholder :
             <View testID={testID + '-preloader-container'} style={styles.preloaderContainer as any}>
               {<ActivityIndicator testID={testID + "-preloader"} size={'large'} />}
             </View>

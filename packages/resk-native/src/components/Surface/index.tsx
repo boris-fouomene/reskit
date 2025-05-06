@@ -1,4 +1,3 @@
-import * as React from "react";
 import Theme, { useTheme } from "@theme";
 import View from "@components/View";
 import { View as RNView } from 'react-native';
@@ -25,13 +24,14 @@ import { ISurfaceProps } from "./types";
  * </Surface>
  * ```
  */
-const Surface = React.forwardRef(({ style, shadowOpacity = 0.24, borderRadius, elevation, ...rest }: ISurfaceProps, ref: React.ForwardedRef<RNView>) => {
+function Surface({ style, shadowOpacity = 0.24, borderRadius, elevation, ...rest }: ISurfaceProps) {
     const theme = useTheme();
     shadowOpacity = typeof shadowOpacity === 'number' ? shadowOpacity : 0.24;
     borderRadius = typeof borderRadius === 'number' ? borderRadius : 0;
     const shadowElevation = typeof elevation == 'number' && elevation > 0 ? elevation : 0;
     const elvevStyle = shadowElevation && Theme.elevations[shadowElevation] || null;
-    return <View testID={'resk-surface'} {...rest} ref={ref}
+    return <View 
+        testID={'resk-surface'} {...rest} 
         style={[
             { backgroundColor: theme.colors.surface },
             elvevStyle,
@@ -40,7 +40,7 @@ const Surface = React.forwardRef(({ style, shadowOpacity = 0.24, borderRadius, e
             style
         ]}
     />
-});
+}
 export * from "./types";
 
 Surface.displayName = "Surface";

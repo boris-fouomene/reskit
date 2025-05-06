@@ -1,11 +1,7 @@
-import * as React from "react";;
-import { useMemo } from 'react';
 import { MenuItem } from './Item';
-import View, { IViewProps } from "@components/View";
-import { renderMenuItems, useRenderMenuItems } from './utils';
-import { View as RNView } from "react-native";
-import { IMenuItemBase, IMenuItemContext, IMenuItemProps, IMenuItemsProps } from './types';
-import { useTheme } from '@theme/index';
+import View from "@components/View";
+import { useRenderMenuItems } from './utils';
+import { IMenuItemBase, IMenuItemContext, IMenuItemsProps } from './types';
 import ExpandableMenuItem from './ExpandableItem';
 import { useMenu } from './context';
 
@@ -27,9 +23,6 @@ import { useMenu } from './context';
  * @param {IMenuItemProps<IMenuItemExtendContext>[]} [props.items] - An optional array of
  * menu item properties. Each item can either be a valid menu item object or undefined/null.
  * This array is used to render the individual menu items.
- * 
- * @param {React.Ref<RNView>} ref - A forwarded reference to the underlying RNView component,
- * allowing parent components to directly interact with the rendered view.
  *
  * @returns {JSX.Element} Returns a JSX element representing the menu items wrapped in a View.
  *
@@ -53,7 +46,7 @@ import { useMenu } from './context';
  * across the menu items. The `renderMenuItems` utility function is used to generate
  * the appropriate JSX for each item based on its properties.
  */
-export const MenuItems = React.forwardRef<any, IMenuItemsProps<any>>(function <IMenuItemExtendContext = any>({ items: customItems, context, testID, ...rest }: IMenuItemsProps<IMenuItemExtendContext>, ref: React.ForwardedRef<RNView>) {
+export function MenuItems<IMenuItemExtendContext = any>({ items: customItems, context, testID, ...rest }: IMenuItemsProps<IMenuItemExtendContext>) {
   testID = testID || "resk-menu-item";
   const menuContext = useMenu();
   const items = useRenderMenuItems<IMenuItemContext<IMenuItemExtendContext>>({
@@ -62,10 +55,10 @@ export const MenuItems = React.forwardRef<any, IMenuItemsProps<any>>(function <I
     render: renderItem,
     renderExpandable,
   });
-  return <View testID={testID} ref={ref} {...rest}>
+  return <View testID={testID} {...rest}>
     {items}
   </View>
-});
+};
 
 function renderExpandable<IMenuItemExtendContext = any>(props: IMenuItemBase<IMenuItemContext<IMenuItemExtendContext>>, index: number) {
   return <ExpandableMenuItem {...props} key={index} />;

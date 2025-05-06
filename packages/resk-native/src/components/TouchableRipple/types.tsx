@@ -1,4 +1,5 @@
-import { PressableProps } from 'react-native';
+import { Ref } from 'react';
+import { PressableProps, View } from 'react-native';
 /**
  * Interface representing the props for the `TouchableRipple` component.
  * This interface extends the standard `PressableProps` from React Native,
@@ -89,4 +90,6 @@ export interface ITouchableRippleProps extends PressableProps {
      * The opacity of the ripple effect. Default is 0.7
      */
     rippleOpacity?: number;
+    
+    ref?:Ref<View>
 }

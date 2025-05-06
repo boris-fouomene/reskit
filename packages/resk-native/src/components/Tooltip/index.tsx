@@ -1,21 +1,18 @@
 import { Pressable } from "react-native";
-import * as React from "react";
-import { useMemo } from "react";
-import { ITooltipProps } from "./types";
+import { useMemo, useRef } from "react";
+import { ITooltipProps } from './types';
 import { defaultStr, uniqid } from "@resk/core";
 import { useMergeRefs } from "@utils/mergeRefs";
 import { isValidElement } from "@utils";
 
 export * from "./types";
 
-const Tooltip = React.forwardRef(({
-  children, title, tooltip, disabled, as, testID, id, ...rest
-}: ITooltipProps, ref) => {
+export function Tooltip ({children, title, tooltip, disabled, as, testID, id,ref, ...rest}:ITooltipProps){
   testID = defaultStr(testID, "resk-tooltip");
   // Reference for instance ID or generate a unique one
-  const instanceIdRef = React.useRef(id || uniqid("tippy-instance-id"));
+  const instanceIdRef = useRef(id || uniqid("tippy-instance-id"));
   // Reference for the child element (e.g., button)
-  const buttonRef = React.useRef(null);
+  const buttonRef = useRef(null);
   // Combine external ref with internal button reference
   const innerRef = useMergeRefs(ref, buttonRef);
   const content = useMemo(() => {
@@ -29,8 +26,6 @@ const Tooltip = React.forwardRef(({
       {children}
     </Component>
   );
-});
-
-export { Tooltip }
+};
 
 Tooltip.displayName = "TooltipNative";

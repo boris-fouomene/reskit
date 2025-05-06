@@ -1,6 +1,5 @@
 import { isObj } from "@resk/core";
-import * as React from "react";
-import { LegacyRef, useEffect, useRef } from "react";
+import {ComponentClass, Ref, RefObject, useEffect, useRef } from "react";
 
 /**
  * A custom React hook that creates a reference for a provider component.
@@ -17,11 +16,11 @@ import { LegacyRef, useEffect, useRef } from "react";
  *     return ref;
  * });
  */
-function useCreateProviderRef<T>(cb?: (context: React.RefObject<T>) => React.RefObject<T>) {
+function useCreateProviderRef<T>(cb?: (context: RefObject<T>) => RefObject<T>) {
     const ref = useRef<T>(null);
     useEffect(() => {
         if (typeof cb === 'function') {
-            cb(ref);
+            cb(ref as any);
         }
     }, [ref.current]);
     return ref;
@@ -46,9 +45,9 @@ function useCreateProviderRef<T>(cb?: (context: React.RefObject<T>) => React.Ref
  * <MyProvider someProp={value} />
  * MyProvider.getProviderInstance(myRef)?.someMethod();
  */
-export function createProvider<ComponentProps = unknown, ComponentInstance = unknown, ProviderOpenProps = ComponentProps>(Component: React.ComponentClass<ComponentProps>, defaultRenderProps?: ComponentProps, openProviderOptionMutator?: (options: ProviderOpenProps) => ProviderOpenProps) {
+export function createProvider<ComponentProps = unknown, ComponentInstance = unknown, ProviderOpenProps = ComponentProps>(Component: ComponentClass<ComponentProps>, defaultRenderProps?: ComponentProps, openProviderOptionMutator?: (options: ProviderOpenProps) => ProviderOpenProps) {
     return class ProviderClass extends Component {
-        static _innerClassProviderRef?: React.RefObject<ComponentInstance>;
+        static _innerClassProviderRef?: RefObject<ComponentInstance>;
 
         /**
          * Opens the provider component with the specified properties and optional callback.
@@ -108,18 +107,16 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
          * @example
          * <this.Provider ref={myRef} someProp={value} />
          */
-        static Provider = React.forwardRef<ComponentInstance, ComponentProps>(
-            (props, ref) => {
-                const hasRef = !!ref;
-                const innerRef = useCreateProviderRef<ComponentInstance>((ref) => {
-                    if (!hasRef || !this._innerClassProviderRef) {
-                        this._innerClassProviderRef = ref;
-                    }
-                    return ref;
-                });
-                return <Component {...Object.assign({}, defaultRenderProps)} {...props} ref={(ref || innerRef) as unknown as LegacyRef<React.Component<ComponentProps, any, any>>} />;
-            }
-        );
+        static Provider (props?:ComponentProps, ref?:Ref<ComponentInstance>):JSX.Element {
+            const hasRef = !!ref;
+            const innerRef = useCreateProviderRef<ComponentInstance>((ref) => {
+                if (!hasRef || !this._innerClassProviderRef) {
+                    this._innerClassProviderRef = ref;
+                }
+                return ref;
+            });
+            return <Component {...Object.assign({}, defaultRenderProps)} {...props} ref={(ref || innerRef) as any} />;
+        };
 
         /**
          * Retrieves the instance of the provider component.
@@ -134,13 +131,13 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
          *     instance.someMethod();
          * }
          */
-        static getProviderInstance(innerProviderRef?: ComponentInstance | React.RefObject<ComponentInstance>): ComponentInstance | null {
+        static getProviderInstance(innerProviderRef?: ComponentInstance | RefObject<ComponentInstance>): ComponentInstance | null {
             if (innerProviderRef instanceof Component && innerProviderRef) {
                 return innerProviderRef as ComponentInstance;
             }
             try {
-                if (innerProviderRef && (innerProviderRef as React.RefObject<ComponentInstance>).current instanceof Component) {
-                    return (innerProviderRef as React.RefObject<ComponentInstance>).current as ComponentInstance;
+                if (innerProviderRef && (innerProviderRef as RefObject<ComponentInstance>).current instanceof Component) {
+                    return (innerProviderRef as RefObject<ComponentInstance>).current as ComponentInstance;
                 }
             } catch (e) { }
             if (this._innerClassProviderRef && this._innerClassProviderRef?.current instanceof Component) {

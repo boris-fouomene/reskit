@@ -1,12 +1,11 @@
 
 
-import ExpandableMenuItem from './ExpandableItem';
+import ExpandableMenuItem, { ExpandableItem } from './ExpandableItem';
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { useDimensions } from '@dimensions/index';
 import Theme, { useTheme } from '@theme/index';
-import * as React from "react";
-import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo, Fragment, RefObject } from 'react';
 import { View, Animated, StyleSheet, LayoutChangeEvent, LayoutRectangle, Pressable, PressableStateCallbackType, ScrollView, Easing } from 'react-native';
 import { IMenuAnchorMeasurements, IMenuCalculatedPosition, IMenuContext, IMenuPosition, IMenuProps, IUseMenuPositionProps } from './types';
 import isValidElement from '@utils/isValidElement';
@@ -335,6 +334,15 @@ interface IMenuState {
  *   );
  * };
  * ```
+ * @property {typeof MenuItem} Item - A reference to the MenuItem component,
+ * allowing it to be used as a nested component within the Menu.
+ *
+ * @property {typeof MenuItems} Items - A reference to the MenuItems component,
+ * which can be used to render a collection of menu items.
+ *
+ * @property {typeof ExpandableMenuItem} ExpandableItem - A reference to the
+ * ExpandableMenuItem component, allowing for items that can expand to show
+ * additional content.
  */
 const Menu = function Menu({
     onClose,
@@ -526,8 +534,6 @@ const Menu = function Menu({
         }
         return isValidElement(customAnchor) ? customAnchor : null;
     }, [customAnchor, isVisible, fullScreen, context]);
-
-    //React.setRef(ref,context);
     const child = useMemo(() => {
         if (typeof children == 'function') {
             return children(context);
@@ -536,7 +542,7 @@ const Menu = function Menu({
     }, [children, context, isVisible]);
     const { Wrapper, wrapperProps } = useMemo(() => {
         if (!withScrollView) {
-            return { Wrapper: React.Fragment, wrapperProps: {} }
+            return { Wrapper: Fragment, wrapperProps: {} }
         }
         return {
             Wrapper: ScrollView,
@@ -624,7 +630,7 @@ const Menu = function Menu({
                                         </View>
                                         {bottomSheetTitle && bottomSheetTitleDivider !== false ? <Divider testID={testID + "-divider"} /> : null}
                                     </View> : null}
-                                    {items ? <MenuItems testID={testID + "-menu-items"} items={items} {...itemsProps} /> : null}
+                                    {items ? <MenuItems testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                                     {child}
                                 </Pressable>
                             </KeyboardAvoidingView>
@@ -643,7 +649,7 @@ const Menu = function Menu({
  * @param {(anchorMeasurements: IMenuAnchorMeasurements) => void} callback - The callback function to be called with the measurements.
  * @returns void
  */
-export const measureAnchor = (anchorRef: React.RefObject<any>, minContentHeight?: number) => {
+export const measureAnchor = (anchorRef: RefObject<any>, minContentHeight?: number) => {
     return measureContentHeight(anchorRef, minContentHeight).then(({ x, y, width, height, contentHeight }) => {
         return {
             pageX: x,
@@ -717,33 +723,6 @@ export * from "./context";
 export * from "./types";
 export * from "./utils";
 
-
-/**
- * Type definition for a Menu component that includes nested Item components,
- * a collection of items, and expandable items. This type extends the base
- * Menu component type to provide a structured API for rendering menus and
- * their various item types.
- *
- * @type IMenu
- * @extends {typeof Menu} - Inherits the properties and methods of the base Menu component.
- * 
- * @property {typeof MenuItem} Item - A reference to the MenuItem component,
- * allowing it to be used as a nested component within the Menu.
- *
- * @property {typeof MenuItems} Items - A reference to the MenuItems component,
- * which can be used to render a collection of menu items.
- *
- * @property {typeof ExpandableMenuItem} ExpandableItem - A reference to the
- * ExpandableMenuItem component, allowing for items that can expand to show
- * additional content.
- */
-type IMenu = typeof Menu & {
-    Item: typeof MenuItem;
-    Items: typeof MenuItems;
-    ExpandableItem: typeof ExpandableMenuItem;
-};
-
-
 Menu.Item = MenuItem;
 Menu.displayName = 'Menu.Item';
 Menu.displayName = 'Menu';
@@ -752,7 +731,9 @@ Menu.Items = MenuItems;
 Menu.Items.displayName = 'Menu.Items';
 
 Menu.ExpandableItem = ExpandableMenuItem;
+Menu.ExpandableItemBase = ExpandableItem;
 Menu.ExpandableItem.displayName = 'Menu.ExpandableItem';
+Menu.ExpandableItemBase.displayName = 'Menu.ExpandableItemBase';
 
 
 export { Menu };

@@ -1,5 +1,4 @@
-import * as React from "react";
-import { createContext, useContext, useEffect, useImperativeHandle, useMemo } from "react";
+import { createContext, useContext, useEffect, useImperativeHandle,Context, useMemo, FC, Ref } from "react";
 import { View, StyleSheet, GestureResponderEvent } from "react-native";
 import moment, { Moment } from "moment";
 import { DateHelper, defaultStr, isEmpty, isNonNullString } from "@resk/core/utils";
@@ -10,7 +9,7 @@ import { Icon } from "@components/Icon";
 import Label from "@components/Label";
 import { useI18n } from "@src/i18n/hooks";
 import { TouchableRipple } from "@components/TouchableRipple";
-import Theme, { Colors, IThemeManager, useTheme } from "@theme/index";
+import { Colors, useTheme } from "@theme/index";
 import { IViewStyle } from "@src/types";
 import useStateCallback from "@utils/stateCallback";
 import Notify from "@notify";
@@ -24,7 +23,7 @@ export default class Calendar {
      * 
      * This context provides access to the calendar's state and props.
      */
-    static Context: React.Context<ICalendarContext> = createContext<ICalendarContext>({} as ICalendarContext);
+    static Context: Context<ICalendarContext> = createContext<ICalendarContext>({} as ICalendarContext);
     /**
      * Generates the headers for a week based on the start day.
      * 
@@ -201,7 +200,7 @@ export default class Calendar {
      * @param {ICalendarItemsContainerProps} props - The props for the ItemsContainer component.
      * @returns {JSX.Element} - The rendered ItemsContainer component.
      */
-    static ItemsContainer: React.FC<ICalendarItemsContainerProps> = ({ children, testID, width: itemsContainerWidth }) => {
+    static ItemsContainer: FC<ICalendarItemsContainerProps> = ({ children, testID, width: itemsContainerWidth }) => {
         const { itemsContainerProps: cCalendarItemsContainerProps } = useCalendar();
         const itemsContainerProps = Object.assign({}, cCalendarItemsContainerProps);
         testID = defaultStr(testID, "resk-calendar");
@@ -268,7 +267,7 @@ export default class Calendar {
      * @param {ICalendarBaseProps} props - The props for the ModalContent component.
      * @returns {JSX.Element} - The rendered ModalContent component.
      */
-    static ModalContent: React.FC<ICalendarBaseProps & { displayView: ICalendarDisplayView }> = ({ children, header, testID, displayView, ...props }) => {
+    static ModalContent: FC<ICalendarBaseProps & { displayView: ICalendarDisplayView }> = ({ children, header, testID, displayView, ...props }) => {
         testID = defaultStr(testID, "resk-calendar-modal");
         const modalContext = useModal();
         const i18n = useI18n();
@@ -312,10 +311,9 @@ export default class Calendar {
      * This component provides a modal window for displaying the day view of the calendar.
      * 
      * @param {ICalendarModalDayViewProps} props - The props for the ModalDayView component.
-     * @param {React.ForwardedRef<CalendarModalContext>} ref - The reference to the modal context.
      * @returns {JSX.Element} - The rendered ModalDayView component.
      */
-    static ModalDayView = React.forwardRef(({ modalProps, testID, ...props }: ICalendarModalDayViewProps, ref: React.ForwardedRef<CalendarModalContext>) => {
+    static ModalDayView ({ modalProps, testID, ...props }: ICalendarModalDayViewProps){
         testID = defaultStr(testID, "resk-calendar-modal-dayview");
         modalProps = Object.assign({}, modalProps);
         return <Calendar.Modal
@@ -328,9 +326,8 @@ export default class Calendar {
                 {...props}
                 displayView="day"
             />}
-            ref={ref}
         />
-    });
+    };
     /**
       * A month view component for the calendar.
       * 
@@ -368,10 +365,9 @@ export default class Calendar {
      * This component provides a modal window for displaying the calendar.
      * 
      * @param {IModalProps} props - The props for the Modal component.
-     * @param {React.Ref<CalendarModalContext>} ref - The reference to the modal context.
      * @returns {JSX.Element} - The rendered Modal component.
      */
-    static Modal = React.forwardRef(({ onDismiss, ...props }: IModalProps, ref: React.Ref<CalendarModalContext>) => {
+    static Modal({ onDismiss,ref, ...props }: IModalProps & {ref?: Ref<CalendarModalContext>}) {
         const [visible, setVisible] = useStateCallback(false);
         const context = {
             open: (cb?: () => void) => {
@@ -394,7 +390,7 @@ export default class Calendar {
             }}
             visible={visible}
         />
-    });
+    };
 }
 Calendar.ModalContent.displayName = "Calendar.ModalContent";
 const Styles = StyleSheet.create({
@@ -652,7 +648,7 @@ const CalendarItem = ({ isCurrent, item, isDefaultValue, disabled, onPress, labe
 }
 CalendarItem.displayName = "Calendar.Item";
 
-const CalendarDayView: React.FC = () => {
+const CalendarDayView: FC = () => {
     const theme = useTheme();
     const { momentMaxDate, itemsContainerProps, testID: customTestID, weekStartDay, header, momentMinDate, isValidItem, i18n, locale, setState, navigateToNext, navigateToPrevious, dateFormat, state, momentDefaultValue, ...props } = useCalendar<ICalendarDayViewProps>();
     const testID = defaultStr(customTestID, "resk-calendar-day-view");
@@ -772,7 +768,7 @@ const CalendarDayView: React.FC = () => {
 CalendarDayView.displayName = "Calendar.DayView";
 
 
-const CalendarMonthView: React.FC<ICalendarMonthViewProps> = () => {
+const CalendarMonthView: FC<ICalendarMonthViewProps> = () => {
     const theme = useTheme();
     const { state, setState, defaultValue, momentDefaultValue, momentMinDate, momentMaxDate, locale, navigateToNext, navigateToPrevious, ...props } = useCalendar<ICalendarMonthViewProps>();
     const { dateCursor } = state;
@@ -845,7 +841,7 @@ const CalendarMonthView: React.FC<ICalendarMonthViewProps> = () => {
 }
 CalendarMonthView.displayName = "Calendar.MonthView";
 
-const CalendarYearView: React.FC<ICalendarYearViewProps> = () => {
+const CalendarYearView: FC<ICalendarYearViewProps> = () => {
     const { locale, state, momentDefaultValue, navigateToNext, navigateToPrevious, ...props } = useCalendar<ICalendarYearViewProps>();
     const { dateCursor } = state;
     const yearView = useMemo(() => {
@@ -899,5 +895,5 @@ const useCalendarItemsContainer = () => {
 
 CalendarYearView.displayName = "Calendar.YearView";
 
-Calendar.Modal.displayName = "Calendar.Modal";
-Calendar.ModalDayView.displayName = "Calendar.ModalDayView";
+(Calendar.Modal as any).displayName = "Calendar.Modal";
+(Calendar.ModalDayView as any).displayName = "Calendar.ModalDayView";

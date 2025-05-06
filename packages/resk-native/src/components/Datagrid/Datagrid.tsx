@@ -1,4 +1,4 @@
-import React, { createContext, isValidElement, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, createRef, isValidElement, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
     View,
     StyleSheet,
@@ -72,9 +72,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
     private static aggregationFunctionMetadataKey = Symbol("datagrid-aggregation-functions-meta");
     private _isLoading: boolean = false;
     private _toggleLoading: boolean = false;
-    private _containerRef: React.RefObject<View> = { current: null };
-    private _contentContainerRef: React.RefObject<View> = { current: null };
-    private _toolbarActionsContainerRef: React.RefObject<View> = { current: null };
+    private _containerRef = createRef<View>();
+    private _contentContainerRef = createRef<View>();
+    private _toolbarActionsContainerRef = createRef<View>();
     private dimensionsBindListener: { remove: Function } | null = null;
     static MIN_HEIGHT: number = 100;
     public get containerRef() {
@@ -239,7 +239,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {Promise<{ x: number, y: number, width: number, height: number, pageX: number, pageY: number }>} A promise that resolves with the layout coordinates of the view.
      * @private
      */
-    protected measureViewLayout(ref: React.RefObject<View>): Promise<IDatagridViewMeasuredLayout> {
+    protected measureViewLayout(ref: React.RefObject<View|null|undefined>): Promise<IDatagridViewMeasuredLayout> {
         return new Promise((resolve, reject) => {
             if (typeof ref.current?.measure === "function") {
                 return ref.current.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
@@ -3857,7 +3857,7 @@ export function AttachDatagridViewColumn<DataType extends object = any, PropsExt
          * 
          * This method adds the column to the DatagridView component's registry, making it available for use.
          */
-        DatagridView.registerColumn(type, target as typeof DatagridViewColumn<DataType, PropsExtensions, StateExtensions>);
+        DatagridView.registerColumn(type, target as any);
     };
 }
 

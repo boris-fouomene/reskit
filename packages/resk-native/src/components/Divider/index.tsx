@@ -15,8 +15,6 @@ import View, { IViewProps } from '@components/View';
  * 
  * @param {ViewStyle} [props.style] - Additional styles to customize the divider's appearance.
  * 
- * @param {React.Ref} ref - A ref that can be forwarded to the underlying view.
- * 
  * @example
  * Here’s an example of how to use the `Divider` component:
  *
@@ -42,12 +40,11 @@ import View, { IViewProps } from '@components/View';
  * `theme.colors.outline`. Ensure that the theme provider is correctly set up 
  * in your application for the color to be applied.
  */
-const Divider = React.forwardRef(({ disabled, style, ...rest }: IDividerProps, ref: React.ForwardedRef<RNView>) => {
+function Divider({ disabled, style, ...rest }: IDividerProps) {
   const theme = useTheme();
   return (
     <View
       {...rest}
-      ref={ref}
       style={[
         styles.main,
         { backgroundColor: theme.colors.outline },
@@ -56,7 +53,7 @@ const Divider = React.forwardRef(({ disabled, style, ...rest }: IDividerProps, r
       ]}
     />
   );
-});
+};
 
 /**
  * The `IDividerProps` interface defines the properties for the `Divider` component.

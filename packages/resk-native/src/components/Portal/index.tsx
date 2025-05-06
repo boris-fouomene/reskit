@@ -1,13 +1,11 @@
 import View, { IViewProps } from '@components/View';
 import { IObservable, observable, uniqid } from '@resk/core';
-import * as React from "react";
-import { createContext, useRef, useContext, ReactNode, useEffect, useMemo } from 'react';
+import { createContext, useRef, useContext, ReactNode, useEffect, useMemo, FC, useReducer } from 'react';
 import { Pressable, StyleSheet, ViewProps } from 'react-native';
 import { getMaxZindex, Platform } from '@resk/core';
 import { ITouchableProps } from '@src/types';
 import { getTouchableProps } from '@utils/hasTouchHandler';
 import { useTheme } from '@theme/index';
-import { typeOf } from 'react-is';
 
 type IPortalEvent = "add" | "remove";
 class EventManager {
@@ -113,7 +111,7 @@ export const PortalContext = createContext<IPortalContext | undefined>(undefined
  * };
  * ```
  */
-export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const PortalProvider: FC<{ children: ReactNode }> = ({ children }) => {
     // Stores the list of active portals using a ref to avoid unnecessary re-renders.
     const portalRefs = useRef<IPortalItem[]>([]);
     const startIndex = useRef<number>(Math.max(Platform.isWeb() ? getMaxZindex() : 1000, 1000)).current;
@@ -151,7 +149,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     /**
      * Reducer function used to force a re-render of the portal container, without affecting the previously rendered portals.
      */
-    const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
+    const [, forceUpdate] = useReducer((x) => x + 1, 0);
     const testID = "resk-portal";
     return (
         <PortalContext.Provider value={{ addPortal, removePortal, portals: portalRefs.current }}>

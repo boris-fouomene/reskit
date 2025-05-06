@@ -5,12 +5,6 @@ import { Dimensions } from "react-native";
 import { IReactNullableElement } from "@src/types";
 
 
-
-const ACTION_ICON_SIZE = 30;
-
-const TITLE_FONT_SIZE = 16;
-
-
 /**
  * Calculates the maximum number of actions that can be displayed in the AppBar
  * based on the provided window width. This function helps to ensure that the AppBar

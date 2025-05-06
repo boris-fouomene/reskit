@@ -2,8 +2,7 @@ import "./types";
 import { getTextContent, ObservableComponent } from "@utils/index";
 import { defaultStr, extendObj, areEquals, IFieldType, IField, isEmpty, isNonNullString, isObj, IValidatorRule, stringify, Validator, Logger, InputFormatter } from "@resk/core";
 import { IForm, IFormData, IFormEvent, IFormField, IFormFieldOnChangeOptions, IFormFieldState, IFormFieldValidatorOptions } from "./types";
-import * as React from "react";
-import { ReactNode } from "react";
+import { createRef, ReactNode,isValidElement } from "react";
 import { Dimensions, View as RNView, TextInput as RNTextInput, NativeSyntheticEvent, TextInputFocusEventData, StyleSheet } from "react-native";
 import { FormsManager } from "./FormsManager";
 import { IDimensions } from "@dimensions/types";
@@ -84,7 +83,7 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      * @readonly
      * @type {React.Ref<RNView>}
      */
-    readonly wrapperRef = React.createRef<RNView>();
+    readonly wrapperRef = createRef<RNView>();
     /** 
      * Reference to the field component.
      * 
@@ -745,10 +744,9 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      * const renderedField = this._render(props, innerRef); // Renders the field component
      * @see {@link IField<Type>} for the `IField<Type>` type.
      * @see {@link ITextInputProps} for the `ITextInputProps` type.
-     * @see {@link React.LegacyRef} for the `React.LegacyRef` type.
      */
     _render(props: IField<Type>, innerRef?: any): ReactNode {
-        return (<TextInput ref={innerRef as React.LegacyRef<RNTextInput>} {...(props as ITextInputProps)} />);
+        return (<TextInput ref={innerRef as any} {...(props as any)} />);
     }
     /**
     * Checks if the field can accept decimal values.
@@ -1029,9 +1027,7 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
                 width,
             } as any)
             : null;
-        return React.isValidElement(ret) ? (
-            ret
-        ) : (
+        return isValidElement(ret) ? (ret) : (
             <>
                 <Label children={this.componentProps.label} style={[styles.labelLoading]} />
                 {/* <ContentLoader height={59} speed={3}>

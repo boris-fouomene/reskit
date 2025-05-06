@@ -30,7 +30,7 @@ import { defaultStr } from '@resk/core/utils';
  * @see {@link useTheme} for theme context.
  * @see {@link useRenderMenuItems} for rendering menu items.
  */
-const DrawerItems = React.forwardRef(({ testID, style, items: customItems, ...rest }: IDrawerItemsProps, ref: React.ForwardedRef<RNView>) => {
+function DrawerItems({ testID, style, items: customItems, ...rest }: IDrawerItemsProps) {
   const { drawer } = useDrawer();
   testID = defaultStr(testID, "resk-draweritems")
   const items = useRenderMenuItems<IDrawerContext>({
@@ -39,11 +39,11 @@ const DrawerItems = React.forwardRef(({ testID, style, items: customItems, ...re
     render: renderItem,
     renderExpandable,
   });
-  return <View testID={testID} ref={ref} {...rest} style={[styles.container, style]}>
+  return <View testID={testID} {...rest} style={[styles.container, style]}>
     {items}
     <View testID={testID + "drawer-item-padding-separator"} style={{ height: 30 }}></View>
   </View>
-});
+};
 
 
 function renderExpandable(props: IDrawerItemProps, index: number) {

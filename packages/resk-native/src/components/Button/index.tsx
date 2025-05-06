@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useState,useImperativeHandle,useEffect, useContext,useRef, createContext, FC, Fragment} from 'react';
 import { FormsManager } from '@components/Form/FormsManager';
 import {
     Animated,
@@ -10,13 +10,12 @@ import {
 } from 'react-native';
 
 import Theme, { useTheme, Colors } from '@theme/index';
-import { forwardRef } from 'react';
 import { getButtonColors } from './utils';
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import { TouchableRipple } from '@components/TouchableRipple';
 import Label from '@components/Label';
-import { IButtonProps, IButtonContext, IButtonRef } from './types';
+import { IButtonProps, IButtonContext} from './types';
 import { useGetIcon } from '@components/Icon';
 import { defaultStr, isNonNullString, uniqid } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
@@ -103,6 +102,7 @@ import { Divider } from '@components/Divider';
  * @example
  * // Example usage of the Button component
  * import { Button } from '@resk/native';
+import useImperativeHandle from 'react';
  * <Button
  *     mode="contained"
  *     isLoading={false}
@@ -115,7 +115,7 @@ import { Divider } from '@components/Divider';
  *     Submit
  * </Button>
  */
-export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExtendContext = any>({
+export function Button<IButtonExtendContext = any>({
     disabled: customDisabled,
     compact,
     mode = 'text',
@@ -161,16 +161,17 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     hoverColor: customHoverColor,
     resourceName,
     perm,
+    ref,
     noPadding,
     ...rest
-}: IButtonProps<IButtonExtendContext>, ref: IButtonRef<IButtonExtendContext>) {
+}: IButtonProps<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
     leftContentWrapperProps = Object.assign({}, leftContentWrapperProps);
     rightContentWrapperProps = Object.assign({}, rightContentWrapperProps);
     const theme = useTheme();
-    const [isLoading, _setIsLoading] = React.useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
-    const [isDisabled, setIsDisabled] = React.useState(typeof customDisabled == "boolean" ? customDisabled : false);
-    const idRef = React.useRef<string>(id || uniqid("menu-item-id-"));
+    const [isLoading, _setIsLoading] = useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
+    const [isDisabled, setIsDisabled] = useState(typeof customDisabled == "boolean" ? customDisabled : false);
+    const idRef = useRef<string>(id || uniqid("menu-item-id-"));
     const disabled: boolean = isDisabled || isLoading;
     const divider = customDivider === true;
     const disable = () => {
@@ -187,43 +188,40 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 _setIsLoading(customIsLoading);
             }
         };
-    React.useEffect(() => {
+    useEffect(() => {
         if (typeof customDisabled == "boolean") {
             setIsDisabled(customDisabled);
         }
     }, [customDisabled]);
-    React.useEffect(() => {
+    useEffect(() => {
         if (typeof customIsLoading == "boolean") {
             setIsLoading(customIsLoading);
         }
     }, [customIsLoading]);
     const { color: colorSchemeColor, backgroundColor: colorSchemeBackgroundColor } = Theme.getColorScheme(colorScheme);
     dark = dark ?? theme.dark;
-    const innerRef = React.useRef<RNView>(null);
+    const innerRef = useRef<RNView>(null);
     const context = {
         enable,
         disable,
         isEnabled,
         get id() { return idRef.current },
         setIsLoading,
-        get ref() {
-            return innerRef.current;
-        },
         ...Object.assign({}, extendContext)
     }
     // Expose methods using useImperativeHandle
-    React.useImperativeHandle(ref, () => (context as IButtonContext<IButtonExtendContext>));
+    useImperativeHandle(ref, () => (context as IButtonContext<IButtonExtendContext>));
     const { roundness } = theme;
     containerProps = Object.assign({}, containerProps);
 
     const isElevationEntitled = !disabled;
     const initialElevation = 1;
 
-    const { current: elevation } = React.useRef<Animated.Value>(
+    const { current: elevation } = useRef<Animated.Value>(
         new Animated.Value(isElevationEntitled ? initialElevation : 0)
     );
 
-    React.useEffect(() => {
+    useEffect(() => {
         elevation.setValue(isElevationEntitled ? initialElevation : 0);
     }, [isElevationEntitled, elevation, initialElevation]);
 
@@ -267,7 +265,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
     const iconContent = icon && isLoading !== true ? icon : null;
     const contentStyle = StyleSheet.flatten([contentProps.style]) as ViewStyle;
     const hasLeftContentWrapper = !!isExpandable || !!spaceBetweenContent;
-    const LeftContentWrapper = hasLeftContentWrapper ? View : React.Fragment;
+    const LeftContentWrapper = hasLeftContentWrapper ? View : Fragment;
     const letContentWrapperProps = hasLeftContentWrapper ? {
         id: `${idRef.current}-left-content-wrapper`,
         testID: testID + "-left-content-wrapper",
@@ -284,7 +282,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
                 styles.icon,
                 styles[`icon${compact ? 'Compact' : ''}`],
             ];
-    React.useEffect(() => {
+    useEffect(() => {
         if (isNonNullString(formName)) {
             FormsManager.mountAction(context, formName);
         }
@@ -389,7 +387,7 @@ export const Button = forwardRef<any, IButtonProps>(function Button<IButtonExten
         </Surface>
         {divider ? <Divider id={idRef.current + "-divider"} testID={testID + "-button-divider"} {...dividerProps} style={[dividerProps.style, Theme.styles.w100]} /> : null}
     </ButtonContext.Provider>);
-});
+};
 
 
 const styles = StyleSheet.create({
@@ -491,7 +489,7 @@ Button.displayName = "Button";
  * The default value is initialized as an empty object cast to `IButtonContext`, 
  * which should be replaced with a proper context value when the context provider is used.
  */
-export const ButtonContext = React.createContext<IButtonContext>({} as IButtonContext);
+export const ButtonContext = createContext<IButtonContext>({} as IButtonContext);
 
 /**
  * @function useButton
@@ -505,7 +503,7 @@ export const ButtonContext = React.createContext<IButtonContext>({} as IButtonCo
  * 
  * @example
  * // Example of using the useButton hook in a functional component
- * const MyButtonComponent: React.FC = () => {
+ * const MyButtonComponent: FC = () => {
  *     const buttonContext = useButton(); // Access the button context
  *     
  *     return (
@@ -515,7 +513,7 @@ export const ButtonContext = React.createContext<IButtonContext>({} as IButtonCo
  *     );
  * };
  */
-export const useButton = () => React.useContext(ButtonContext) || {};
+export const useButton = () => useContext(ButtonContext) || {};
 
 
 export * from "./types";

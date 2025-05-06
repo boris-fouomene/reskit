@@ -10,7 +10,7 @@ import { isNumber } from "@resk/core/utils";
  * @param {React.RefObject<View>} ref - The reference to the component to measure.
  * @returns {Promise<{ x: number, y: number, width: number, height: number }>} A promise that resolves with the layout coordinates.
  */
-export const measureInWindow = (ref: React.RefObject<View>): Promise<{ x: number, y: number, width: number, height: number }> => {
+export const measureInWindow = (ref: React.RefObject<View|null|undefined>): Promise<{ x: number, y: number, width: number, height: number }> => {
     return new Promise((resolve, reject) => {
         try {
             const _ref = ref && ref?.current && typeof ref?.current?.measureInWindow === 'function' ? ref.current : undefined;

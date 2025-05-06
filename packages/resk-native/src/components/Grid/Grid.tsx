@@ -13,7 +13,6 @@ import { useDimensions } from '@dimensions/index';
  * @component
  * 
  * @param {IGridProps} props - The properties for the grid container.
- * @param {React.Ref<View>} ref - A reference to the underlying `View` component.
  * 
  * 
  * @property {boolean} [flexWrap=true] - Specifies whether the child elements should wrap within the grid container.
@@ -46,15 +45,14 @@ import { useDimensions } from '@dimensions/index';
  * @see {@link IGridProps} for the interface defining the grid properties.
  * @see {@link useDimensions} for the hook used to handle responsive behavior.
  */
-const Grid = React.forwardRef<View, IGridProps>(({ flexWrap = false, testID, style, ...props }, ref) => {
+function Grid ({ flexWrap = false, testID, style, ...props } : IGridProps){
     testID = defaultStr(testID, "resk-grid");
     return <View
         {...props}
         testID={testID}
         style={[styles.container, flexWrap && styles.flexWrap, style]}
-        ref={ref}
     />
-});
+};
 
 const styles = StyleSheet.create({
     container: {

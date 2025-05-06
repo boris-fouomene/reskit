@@ -1,6 +1,4 @@
 import View, { IViewProps } from "@components/View";
-import * as React from "react";
-import { forwardRef } from "react";
 import { StyleSheet, View as RNView } from "react-native";
 
 
@@ -13,9 +11,6 @@ import { StyleSheet, View as RNView } from "react-native";
  * @param {IViewProps} props - The properties for the HStack, including any valid View properties.
  *   - **style**: Optional additional styles to apply to the component.
  *   - **...props**: Any additional props that should be passed to the underlying View.
- * 
- * @param {React.ForwardedRef<RNView>} ref - A forwarded reference to the underlying RNView component.
- * 
  * @returns {JSX.Element} A JSX element representing the HStack, styled as a horizontal stack.
  * 
  * @example
@@ -27,16 +22,16 @@ import { StyleSheet, View as RNView } from "react-native";
  * </HStack>
  * ```
  */
-const HStack = forwardRef(({ style, noWrap, ...props }: IViewProps & {
+function HStack({ style, noWrap, ...props }: IViewProps & {
     /***
      * Whether the HStack should wrap its children.
      * If set to true, the HStack will wrap its children in a View with flexWrap set to wrap.
      * Default is false
      */
     noWrap?: boolean;
-}, ref: React.ForwardedRef<RNView>) => {
+}) => {
     return <View ref={ref} style={[styles.container, noWrap === true && styles.noWrap, style]} {...props} />
-});
+};
 
 /**
  * IHStackProps interface defines the properties for the HStack.

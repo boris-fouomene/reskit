@@ -1,5 +1,4 @@
 import View, { IViewProps } from "@components/View";
-import { forwardRef } from "react";
 import { StyleSheet, View as RNView } from "react-native";
 
 /**
@@ -12,8 +11,6 @@ import { StyleSheet, View as RNView } from "react-native";
  *   - **style**: Optional additional styles to apply to the component.
  *   - **...props**: Any additional props that should be passed to the underlying View.
  * 
- * @param {React.ForwardedRef<RNView>} ref - A forwarded reference to the underlying RNView component.
- * 
  * @returns {JSX.Element} A JSX element representing the VStack, styled as a vertical stack.
  * 
  * @example
@@ -25,9 +22,9 @@ import { StyleSheet, View as RNView } from "react-native";
  * </VStack>
  * ```
  */
-const VStack = forwardRef(({ style, ...props }: IVStackProps, ref: React.ForwardedRef<RNView>) => {
+function VStack({ style, ...props }: IVStackProps){
     return <View ref={ref} style={[styles.container, style]} {...props} />
-});
+};
 
 /**
  * IVStackProps interface defines the properties for the VStack.

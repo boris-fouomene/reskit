@@ -157,6 +157,8 @@ export type IExpandableProps = Omit<PressableProps, "children"> & ILabelOrLeftOr
      * @default 20
      */
     expandIconSize?: number;
+    
+    ref?:React.Ref<View>;
 }
 
 /**

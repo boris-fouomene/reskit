@@ -1,8 +1,6 @@
 'use strict';
-
-import * as React from "react";
 import { useMemo } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { IGridColProps } from './types';
 import { defaultStr, isNonNullString, isNumber } from '@resk/core';
 import Breakpoints from '@breakpoints/index';
@@ -21,7 +19,6 @@ const isValidSize = (size: any): size is number => isNumber(size) && 0 <= size &
  * @component
  * 
  * @param {IGridColProps} props - The properties for the grid column.
- * @param {React.Ref<View>} ref - A reference to the underlying `View` component.
  * 
  * @property {IBreakpointColumnSize} [defaultSize] - The default size of the column when no specific breakpoint size is provided.
  * The size is specified as a number between `0` and `12` in a 12-column grid system. If the size is `0`, the column will be hidden.
@@ -62,7 +59,7 @@ const isValidSize = (size: any): size is number => isNumber(size) && 0 <= size &
  * @see {@link Breakpoints.col} for the method used to calculate column styles.
  * @see {@link Breakpoints.getGutter} for the method used to calculate gutter spacing.
  */
-const GridCol = React.forwardRef<View, IGridColProps>(({ style, responsive, windowWidth, gutter, defaultSize, testID, ...props }, ref) => {
+function GridCol({ style, responsive, windowWidth, gutter, defaultSize, testID, ...props }:IGridColProps){
     const currentMedia = Breakpoints.getCurrentMedia();
     const dimen = useDimensions(responsive);
     const colSizes = useMemo(() => {
@@ -95,9 +92,8 @@ const GridCol = React.forwardRef<View, IGridColProps>(({ style, responsive, wind
     return <View {...props}
         testID={defaultStr(testID, "resk-grid-column")}
         style={[styles.container, colStyle, colStyle, paddingStyle, style]}
-        ref={ref}
     />
-});
+};
 
 GridCol.displayName = "Grid.Col";
 const styles = StyleSheet.create({

@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useMemo } from 'react';
+import { ComponentClass, useMemo } from 'react';
 import { FlatListProps, FlatList } from 'react-native';
 
 /**
@@ -54,14 +53,12 @@ export interface IListProps<ItemType = any> extends Partial<FlatListProps<ItemTy
  * @param ref A reference to the list component.
  * @returns The rendered list component.
  */
-export const List = React.forwardRef(function GenericList<ItemType = any>(props: IListProps<ItemType>, ref: React.Ref<FlatList<ItemType>>) {
+export function List <ItemType = any>(props: IListProps<ItemType>) {
     const Component = useMemo(() => {
         return ListManager.getComponent();
     }, []);
-    return <Component nestedScrollEnabled {...props} ref={ref} />
-}) as <ItemType>(
-    props: IListProps<ItemType> & { ref?: React.Ref<FlatList<ItemType>> }
-) => JSX.Element;
+    return <Component nestedScrollEnabled {...props}/>
+};
 (List as any).displayName = "List";
 
 
@@ -83,7 +80,7 @@ export const List = React.forwardRef(function GenericList<ItemType = any>(props:
  * ```
  */
 export function AttachList() {
-    return function (target: React.ComponentClass<FlatListProps<any>>) {
+    return function (target:ComponentClass<FlatListProps<any>>) {
         Reflect.defineMetadata(ListManager.metaData, target, ListManager);
     };
 }

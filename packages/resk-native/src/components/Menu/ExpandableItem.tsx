@@ -3,8 +3,7 @@ import { MenuItem } from "./Item";
 import { Expandable, useExpandable } from "@components/Expandable";
 import { IMenuItemBase, IMenuItemContext, IMenuItemProps } from "./types";
 import { Divider } from "@components/Divider";
-import { forwardRef, useMemo } from "react";
-import { IButtonRef } from "@components/Button";
+import {useMemo } from "react";
 import { StyleSheet } from "react-native";
 import Theme from "@theme/index";
 import isValidElement from "@utils/isValidElement";
@@ -78,7 +77,7 @@ import { useMenu } from "./context";
  * @see {@link IMenuRenderItemsOptions} for the options of the menu render function.
  * @see {@link useGetExpandableItemProps} for the hook that retrieves the properties of the expandable item.
  */
-export const ExpandableItem = forwardRef<any, IMenuItemBase<any> & { as?: IReactComponent<IMenuItemBase<any & { ref?: IButtonRef<any> }> > }>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, as, dividerProps, items, divider, expandableProps, children, contentProps, ...props }: IMenuItemBase<IMenuItemExtendContext> & { as?: IReactComponent<IMenuItemBase<IMenuItemExtendContext> & { ref?: IButtonRef<IMenuItemExtendContext> }> }, ref: IButtonRef<IMenuItemExtendContext>) {
+export function ExpandableItem<IMenuItemExtendContext = any>({ testID, as,dividerProps, items, divider, expandableProps, children, contentProps,ref, ...props }: IMenuItemBase<IMenuItemExtendContext> & { as?: IReactComponent<IMenuItemBase<IMenuItemExtendContext>>}) {
     testID = defaultStr(testID, "resk-expandable-item");
     expandableProps = Object.assign({}, expandableProps);
     const containerProps = Object.assign({}, expandableProps.containerProps);
@@ -96,18 +95,17 @@ export const ExpandableItem = forwardRef<any, IMenuItemBase<any> & { as?: IReact
             {divider && <Divider testID={testID + "-divider"} {...Object.assign({}, dividerProps)} />}
         </>}
     />
-});
-const ExpandableItemLabel = forwardRef<any, IMenuItemBase<any> & { as?: IReactComponent<IMenuItemBase<any> & { ref?: IButtonRef<any> }> }>(function ExpandableMenuItem({ as, ...rest }, ref) {
+};
+function ExpandableItemLabel({ as, ...rest }:IMenuItemBase<any> & { as?: IReactComponent<IMenuItemBase<any>>}) {
     const Component = useMemo(() => {
         return as || MenuItem;
     }, [as]);
     const props = useGetExpandableItemProps(rest);
     return <Component
-        ref={ref}
         isExpandable
-        {...props}
+        {...props as any}
     />
-});
+};
 ExpandableItemLabel.displayName = "ExpandableMenuItemLabel";
 ExpandableItem.displayName = "ExpandableMenuItem";
 
@@ -164,16 +162,15 @@ ExpandableItem.displayName = "ExpandableMenuItem";
  * The use of generics allows for flexibility in extending the component's functionality
  * based on specific requirements.
  */
-const ExpandableMenuItem = forwardRef<any, IMenuItemProps>(function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, context, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
+function ExpandableMenuItem<IMenuItemExtendContext = any>({ testID, context, ...props }: IMenuItemProps<IMenuItemExtendContext>) {
     const menuContext = useMenu();
     return <ExpandableItem
-        context={Object.assign({}, context, menuContext)}
         testID={testID}
-        {...props}
+        {...props as any}
+        context={Object.assign({}, context, menuContext)}
         as={MenuItem}
-        ref={ref}
     />
-});
+};
 
 
 ExpandableMenuItem.displayName = "ExpandableMenuItem";

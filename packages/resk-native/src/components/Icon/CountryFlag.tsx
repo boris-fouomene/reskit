@@ -1,30 +1,4 @@
-/**
- * @module CountryFlag
- * @description A cross-platform React Native component that displays country flags using Unicode emoji or image source retrieve from country object of @resk/core CountriesManager.
- * Compatible with both web and native platforms, with built-in platform compatibility checking.
- * 
- * @example
- * ```tsx
- * // Basic usage
- * <CountryFlag countryCode="US" />
- * 
- * // Custom size
- * <CountryFlag countryCode="FR" size={32} />
- * 
- * // With custom styles
- * <CountryFlag countryCode="JP" style={{ marginLeft: 10 }} />
- * 
- * // With fallback
- * <CountryFlag 
- *   countryCode="GB" 
- *   fallback={<Text>🏳️</Text>}
- *   onError={(error) => console.warn(error)} 
- * />
- * ```
- */
-
-import * as React from "react";
-import { useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, TouchableOpacityProps, View } from 'react-native';
 import Platform from "@platform";
 import { CountriesManager, defaultStr, ICountryCode, isNonNullString, Logger } from '@resk/core';
@@ -109,7 +83,7 @@ export interface ICountryFlagProps extends TouchableOpacityProps {
      * The fallback content to display when the flag emoji fails to load.
      * This is a React node that represents the fallback content to display when the flag emoji fails to load.
      */
-    fallback?: React.ReactNode;
+    fallback?: ReactNode;
 
     /***
      * The color of the emoji icon
@@ -119,13 +93,30 @@ export interface ICountryFlagProps extends TouchableOpacityProps {
 }
 
 /**
- * CountryFlag component that displays a country flag emoji.
+ * @module CountryFlag
+ * @description A cross-platform React Native component that displays country flags using Unicode emoji or image source retrieve from country object of @resk/core CountriesManager.
+ * Compatible with both web and native platforms, with built-in platform compatibility checking.
  * 
- * @component
- * @param {ICountryFlagProps} props - Component props
- * @returns {React.ReactNode} The rendered flag or fallback component
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <CountryFlag countryCode="US" />
+ * 
+ * // Custom size
+ * <CountryFlag countryCode="FR" size={32} />
+ * 
+ * // With custom styles
+ * <CountryFlag countryCode="JP" style={{ marginLeft: 10 }} />
+ * 
+ * // With fallback
+ * <CountryFlag 
+ *   countryCode="GB" 
+ *   fallback={<Text>🏳️</Text>}
+ *   onError={(error) => console.warn(error)} 
+ * />
+ * ```
  */
-const CountryFlag = function CountryFlag({
+function CountryFlag({
     countryCode,
     size,
     textFontSize,

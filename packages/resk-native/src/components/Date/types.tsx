@@ -5,7 +5,7 @@ import { I18nClass } from "@resk/core/i18n";
 import useStateCallback from "@utils/stateCallback";
 import { Moment } from "moment";
 import { ReactNode } from "react";
-import { GestureResponderEvent } from "react-native";
+import { GestureResponderEvent, View } from "react-native";
 
 /**
  * @interface ICalendarDate
@@ -26,7 +26,7 @@ export interface CalendarModalContext {
  * Interface representing the base properties of a calendar component.
  * @extends ISurfaceProps
  */
-export interface ICalendarBaseProps extends ISurfaceProps {
+export interface ICalendarBaseProps extends Omit<ISurfaceProps,"ref"> {
     /**
      * The minimum date that can be selected in the calendar.
      * @default undefined
@@ -135,6 +135,8 @@ export interface ICalendarBaseProps extends ISurfaceProps {
      * @default 0
      */
     borderRadius?: number;
+    
+    ref?: React.Ref<CalendarModalContext & View>;
 }
 /***
  * Interface representing the properties of the calendar items container.

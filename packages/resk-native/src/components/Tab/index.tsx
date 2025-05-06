@@ -1,5 +1,4 @@
-import * as React from "react";
-import { FC } from "react";
+import { FC, Fragment, ReactElement, ReactNode, useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import View from "@components/View";
 import TabItems from "./TabItems";
@@ -133,7 +132,7 @@ const Tab = (props: ITabProps) => {
     indicatorStyle.backgroundColor = Colors.isValid(indicatorStyle.backgroundColor) ? indicatorStyle.backgroundColor : defaultActiveTabItemTextColor;
 
     tabContentProps = Object.assign({}, tabContentProps);
-    const [index, setIndex] = React.useState(getSessionActiveIndex(props));
+    const [index, setIndex] = useState(getSessionActiveIndex(props));
     const setActiveIndex = ({ index: nIndex }: { index: number }) => {
         setIndex(nIndex);
         setSessionActiveIndex(nIndex, sessionName);
@@ -142,18 +141,18 @@ const Tab = (props: ITabProps) => {
             onChange({ index: nIndex, sessionName, setActiveIndex: (index) => { setActiveIndex({ index }) } });
         }
     }
-    React.useEffect(() => {
+    useEffect(() => {
         activeIndex = getSessionActiveIndex(props);
         if (activeIndex !== index) {
             setActiveIndex(activeIndex);
         }
     }, [children, activeIndex]);
     testID = defaultStr(testID, "resk-tab");
-    const { tabs, contents } = React.useMemo(() => {
-        const tabs: React.ReactNode[] = [], contents: React.ReactNode[] = [];
-        React.Children.map(children, (child, index) => {
+    const { tabs, contents } = useMemo(() => {
+        const tabs: ReactNode[] = [], contents:ReactNode[] = [];
+        (Array.isArray(children) ? children : [children]).map((child, index) => {
             if (!isObj(child)) return null;
-            const _child: React.ReactElement = child as React.ReactElement;
+            const _child: ReactElement = child as ReactElement;
             const { label, tabItemKey, perm, children: childChildren, ...rest } = (isObj(_child.props) ? _child.props : child) as ITabItemProps;
             if (!isValidElement(label, true) || (perm !== undefined && !Auth.isAllowed(perm))) {
                 return null;
@@ -167,9 +166,9 @@ const Tab = (props: ITabProps) => {
                 style={[tabItemProps?.style, rest.style]}
                 testID={defaultStr(testID, tabItemProps?.testID) + "-tab-item-" + index}
             />);
-            contents.push(<React.Fragment key={key}>
+            contents.push(<Fragment key={key}>
                 {childChildren}
-            </React.Fragment>)
+            </Fragment>)
         })
         return { tabs, contents }
     }, [children, theme]);

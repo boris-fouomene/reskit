@@ -6,7 +6,6 @@ import { GestureResponderEvent, ViewProps } from "react-native";
 import { IIconButtonProps } from "@components/Icon/types";
 import { IMenuItemBase, IMenuRenderItemsOptions } from "@components/Menu/types";
 import { ILabelOrLeftOrRightProps } from "@hooks/label2left2right";
-import { IReactNullableElement } from "@src/types";
 
 
 /**
@@ -146,7 +145,7 @@ export type IAppBarProps<IAppBarActionContext = any> = ISurfaceProps & {
     elevation?: number;
 
     /** If backAction is a string, it is the name of the FontIcon to render for the back action. */
-    backAction?: IReactNullableElement | false | ((props: IBackActionProps) => ReactNode);
+    backAction?: JSX.Element| null | false | ((props: IBackActionProps) => ReactNode);
     /** Properties for the BackAction component when rendered. */
     backActionProps?: IBackActionProps;
     /** The context to pass to each action, used to extend the context for the actions. */

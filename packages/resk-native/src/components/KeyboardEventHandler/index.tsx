@@ -1,9 +1,9 @@
-import * as React from "react";
 import { IKeyboardEventHandlerKey, findMatchedKey } from './keyEvents';
 import View from "@components/View";
 import { StyleSheet, View as RNView, TextInputKeyPressEventData } from "react-native";
 import { mergeRefs } from "@utils/mergeRefs";
 import { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps, IKeyboardEventHandlerState } from "./types";
+import { Component, createRef, isValidElement, RefObject } from 'react';
 
 
 /**
@@ -14,8 +14,8 @@ import { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps, IKeyboardEventH
  * 
  * @see https://github.com/linsight/react-keyboard-event-handler for documentation.
  */
-export default class KeyboardEventHandler<T = TextInputKeyPressEventData> extends React.Component<IKeyboardEventHandlerProps<T>, IKeyboardEventHandlerState> {
-  readonly childRef: React.RefObject<RNView | null> = React.createRef();
+export default class KeyboardEventHandler<T = TextInputKeyPressEventData> extends Component<IKeyboardEventHandlerProps<T>, IKeyboardEventHandlerState> {
+  readonly childRef: RefObject<RNView | null> = createRef();
   /**
   * Finds the matched key from a keyboard event based on the provided keys.
   * 
@@ -169,7 +169,7 @@ export default class KeyboardEventHandler<T = TextInputKeyPressEventData> extend
     if (typeof children == 'function') {
       children = children(events);
     }
-    if (!React.isValidElement(children)) return null;
+    if (!isValidElement(children)) return null;
     return <View {...rest} style={[styles.content, rest.style]} ref={mergeRefs(this.childRef, innerRef)}>
       {children}
     </View>

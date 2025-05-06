@@ -3,8 +3,7 @@ import { defaultStr, extendObj, IFieldType, IField, IFields, IResourceName, isEm
 import { isValidElement, ObservableComponent } from "@utils";
 import { FormsManager } from "./FormsManager";
 import { IFormField, IForm, IFormProps, IFormState, IFormEvent, IFormGetDataOptions, IFormData, IFormFields, IFormKeyboardEventHandlerOptions, IFormRenderTabProp, IFormCallbackOptions, IFormOnSubmitOptions, IFormContext, IFormTabItemProp, IFormAction } from "./types";
-import * as React from "react";
-import { ReactElement, ReactNode, useMemo } from "react";
+import { ReactElement, ReactNode, useMemo, Fragment, FC } from 'react';
 import { ScrollView, StyleSheet } from "react-native";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 import Breakpoints from "@breakpoints/index";
@@ -20,9 +19,8 @@ import { createProvider } from "@utils/provider";
 import { IDialogControlledProps } from "@components/Dialog";
 import DialogControlled from "@components/Dialog/Controlled";
 import { ViewProps } from "react-native";
-import { IDrawerCurrentState, IDrawerProps } from "@components/Drawer";
+import { IDrawerProps } from "@components/Drawer";
 import Drawer from "@components/Drawer/Drawer";
-
 
 
 
@@ -159,7 +157,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         const children =
             typeof options?.children == "function" ? options.children(options) : options?.children;
         if (children && this.isLoading(options)) return this.renderLoading(options);
-        return isValidElement(children) ? (children as ReactElement) : <React.Fragment />;
+        return isValidElement(children) ? (children as ReactElement) : <Fragment />;
     }
     /***
      * retourne le type de rendu pour le composant Tab
@@ -568,7 +566,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         this.validationStatus = !!this.validationStatus;
         return validationStatus;
     }
-    static Loading: React.FC<IFormProps> = (props) => {
+    static Loading: FC<IFormProps> = (props) => {
         return (
             <View
                 testID={`${props?.testID || ""}-form-loading-container`}
@@ -579,7 +577,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
         );
     }
 
-    static Fields: React.FC<IFormProps & IFormContext> = (props) => {
+    static Fields: FC<IFormProps & IFormContext> = (props) => {
         const theme = useTheme();
         const { fields, data, name: formName, testID: cTestID, form, windowWidth, isLoading, isSubmitting } = props;
         const testID = defaultStr(cTestID, "resk-form");
@@ -711,7 +709,7 @@ export class Form extends ObservableComponent<IFormProps, IFormState, IFormEvent
                 </Tab>
             );
         }
-        const Wrapper = withScrollView ? ScrollView : React.Fragment;
+        const Wrapper = withScrollView ? ScrollView : Fragment;
         const wrapperProps = withScrollView ? Object.assign({}, { testID: testID + "-scrollview" }, scrollViewProps) : {};
         return (
             <FormContext.Provider value={{ form: this }}>

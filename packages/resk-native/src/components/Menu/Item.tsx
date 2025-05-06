@@ -1,9 +1,7 @@
 import { Button } from "@components/Button";
 import { useMenu } from "./context";
-import { IMenuItemContext, IMenuItemProps } from "./types";
-import { GestureResponderEvent, StyleSheet } from "react-native";
-import { forwardRef } from "react";
-import { IButtonRef } from "@components/Button/types";
+import { IMenuItemProps } from "./types";
+import { StyleSheet } from "react-native";
 import { useTheme } from "@theme/index";
 
 /**
@@ -54,11 +52,10 @@ import { useTheme } from "@theme/index";
  * - The component allows for custom styling through the `labelProps` 
  *   and `iconProps`, enabling developers to tailor the appearance 
  *   of the menu item as needed.
- * - The `forwardRef` is used to allow parent components to reference 
  *   the underlying button context, providing additional flexibility 
  *   in managing button states and behaviors.
  */
-export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<IMenuItemExtendContext extends object = any>({ expandableProps, containerProps, contentProps, closeOnPress, items, ...props }: IMenuItemProps<IMenuItemExtendContext>, ref?: IButtonRef<IMenuItemContext<IMenuItemExtendContext>>) {
+export function MenuItem<IMenuItemExtendContext extends object = any>({ expandableProps, containerProps, contentProps, closeOnPress, items, ...props }: IMenuItemProps<IMenuItemExtendContext>) {
     const menuContext = useMenu();
     const theme = useTheme();
     containerProps = Object.assign({}, containerProps);
@@ -83,9 +80,8 @@ export const MenuItem = forwardRef<any, IMenuItemProps<any>>(function MenuItem<I
                 menuContext.closeMenu();
             }
         }}
-        ref={ref}
     />
-});
+};
 
 MenuItem.displayName = "MenuItem";
 

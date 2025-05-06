@@ -1,5 +1,4 @@
-import { IReactRef } from "../types";
-import type * as React from "react";
+import {Ref,RefCallback} from "react";
 import { useMemo } from "react";
 
 /**
@@ -23,15 +22,24 @@ import { useMemo } from "react";
  * return <div ref={mergedRef}>Hello World</div>;
  * ```
  */
-export function mergeRefs<T = any>(...refs: Array<IReactRef<T>>): React.RefCallback<T> {
+export function mergeRefs<T = any>(...refs: Array<Ref<T> | undefined | null>): RefCallback<T> {
   return (value) => {
+    const refCallbacks : Array<Function> = [];
     refs.forEach((ref) => {
       if (typeof ref === "function") {
-        ref(value);
+        const r = ref(value);
+        if(typeof r === 'function') {
+          refCallbacks.push(r);
+        }
       } else if (ref != null) {
-        (ref as React.MutableRefObject<T | null>).current = value;
+        (ref as any).current = value;
       }
     });
+    return (...args: any[]) => {
+      refCallbacks.forEach((refCallback) => {
+        refCallback(...args);
+      });
+    }
   };
 }
 
@@ -56,6 +64,6 @@ export function mergeRefs<T = any>(...refs: Array<IReactRef<T>>): React.RefCallb
  * return <div ref={mergedRef}>Hello World</div>;
  * ```
  */
-export function useMergeRefs<T>(...refs: Array<React.MutableRefObject<T> | React.LegacyRef<T> | undefined | null>): React.RefCallback<T> {
+export function useMergeRefs<T>(...refs: Array<Ref<T> | undefined | null>): RefCallback<T> {
   return useMemo(() => mergeRefs<T>(...refs), [...refs]);
 }

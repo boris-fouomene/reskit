@@ -1,5 +1,5 @@
 import Theme, { useTheme } from "@theme";
-import View from "@components/View";
+import {View} from "@components/View";
 import { View as RNView } from 'react-native';
 import { ISurfaceProps } from "./types";
 

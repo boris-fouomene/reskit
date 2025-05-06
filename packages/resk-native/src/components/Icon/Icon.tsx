@@ -4,7 +4,6 @@ import { IFontIconName, IGetIconOptions, IIconProps } from "./types";
 import { Image, ImageStyle } from "react-native";
 import { isValidElement, pickTouchEventHandlers } from "@utils";
 import { isImageSource, isImageUrl } from "./utils";
-import { defaultStr, isNonNullString, isObj } from "@resk/core/utils";
 import Theme, { Colors, useTheme } from "@theme/index";
 import FontIcon, { DEFAULT_FONT_ICON_SIZE } from "./Font";
 import { Tooltip } from "@components/Tooltip";
@@ -12,6 +11,7 @@ import { StyleSheet } from "react-native";
 import { TouchableRipple } from "@components/TouchableRipple";
 import { isReactComponent } from "@utils/isComponent";
 
+const isNonNullString = (value: any): value is string => typeof value === "string" && !!value;
 /**
  * The `Icon` component is a versatile icon renderer that can display both 
  * image-based icons and font-based icons. It supports press events, tooltips, 
@@ -48,6 +48,7 @@ import { isReactComponent } from "@utils/isComponent";
  * import * as React from 'react';
  * import { View } from 'react-native';
  * import Icon from './Icon'; // Adjust the import path as necessary
+import isNonNullString from '../../../../resk-core/build/utils/isNonNullString';
  * 
  * const MyComponent = () => {
  *   return (
@@ -77,7 +78,7 @@ import { isReactComponent } from "@utils/isComponent";
 function Icon ({ iconName, resizeMode, as, disabled, containerProps, title, tooltip, source, testID, size, style, color,ref, ...props }:IIconProps) {
     const isSource = isImageSource(source);
     //const isValidIconName = iconName && FontIcon.isValidName(iconName);
-    testID = defaultStr(testID, isSource ? "resk-image" : "resk-font-icon");
+    testID = testID && typeof testID =="string" ? testID : (isSource ? "resk-image" : "resk-font-icon");
     size = typeof size == "number" && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const touchableEvents = pickTouchEventHandlers(props);
     const { Component, props: containerP } = useMemo(() => {
@@ -109,7 +110,7 @@ function Icon ({ iconName, resizeMode, as, disabled, containerProps, title, tool
             resizeMode={resizeMode || "contain"}
             {...props}
             testID={testID}
-            source={["object", "number"].includes(typeof source) ? source : isNonNullString(source) ? { uri: source } : undefined}
+            source={["object", "number"].includes(typeof source) ? source : source && typeof (source) =="string" ? { uri: source } : undefined}
             ref={ref as any}
             style={iconStyle as ImageStyle}
         /> : <FontIcon
@@ -149,7 +150,7 @@ function Icon ({ iconName, resizeMode, as, disabled, containerProps, title, tool
  */
 export function getIcon<T = any>({ icon, color: col2, IconComponent, theme, ...rest }: IGetIconOptions<T>): ReactNode {
     if (isValidElement(icon)) return icon as ReactNode;
-    theme = isObj(theme) && theme || Theme;
+    theme = theme || Theme;
     const color: string = (Colors.isValid(col2) ? col2 : theme.colors.text) as string;
     const iconSource = typeof icon == "function" ? icon({ ...rest, color } as IIconProps & { color: string }) : icon;
     if (isValidElement(iconSource)) return iconSource as ReactNode;
@@ -166,7 +167,7 @@ export function getIcon<T = any>({ icon, color: col2, IconComponent, theme, ...r
     return <Component {...iconProps} />;
 }
 const getIconSource = (icon: any) => {
-    return { source: typeof icon == "number" ? icon : isObj(icon) ? icon : isNonNullString(icon) ? { uri: icon } : undefined };
+    return { source: typeof icon == "number" ? icon : icon && typeof icon =="object" && !Array.isArray(icon) ? icon : isNonNullString(icon) ? { uri: icon } : undefined };
 }
 
 /**

@@ -22,7 +22,7 @@ import isValidElement from "@utils/isValidElement";
  * <Label children={'An example of children'} textBold {...otherProperties} />
  * ```
  */
-function Label({
+export function Label({
   children,
   userSelect,
   role,
@@ -117,7 +117,3 @@ function Label({
 export * from "./types";
 
 Label.displayName = "Label";
-
-
-
-export default Label;

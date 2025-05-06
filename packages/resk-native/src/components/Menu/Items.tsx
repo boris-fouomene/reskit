@@ -1,5 +1,5 @@
 import { MenuItem } from './Item';
-import View from "@components/View";
+import {View} from "@components/View";
 import { useRenderMenuItems } from './utils';
 import { IMenuItemBase, IMenuItemContext, IMenuItemsProps } from './types';
 import ExpandableMenuItem from './ExpandableItem';

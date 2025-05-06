@@ -1,5 +1,4 @@
-import { IReactRef } from "../types";
-
+import {Ref} from "react";
 /**
  * Associates the provided value with the given reference.
  * 
@@ -26,7 +25,7 @@ import { IReactRef } from "../types";
  * console.log(myRef.current); // Outputs: 42
  * ```
  */
-export default function setRef<T extends unknown = unknown>(ref: IReactRef<T>, value: T, cb?: React.RefCallback<T>) {
+export default function setRef<T extends unknown = unknown>(ref: Ref<T>, value: T, cb?: React.RefCallback<T>) {
     if (typeof ref == "function") {
         ref(value); // If ref is a function, call it with the value.
     } else if (ref && typeof ref == "object" && "current" in ref) {

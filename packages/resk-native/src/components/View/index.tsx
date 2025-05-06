@@ -35,9 +35,9 @@ import { IViewProps } from "./types";
  */
 const View = withBreakpointStyle<IViewProps>(RNView, "View");
 
-export default View;
+export {View};
 
 // Set a display name for better debugging in React DevTools
-View.displayName = "ReskNativeView";
+View.displayName = "ReskNativeView";1
 
 export * from "./types";

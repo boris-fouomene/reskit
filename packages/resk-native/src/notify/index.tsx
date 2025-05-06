@@ -11,7 +11,7 @@ import { INotifyState, INotifyMessage, INotifyPostion, INotifyAction, INotifyTyp
 import { ILabelProps } from "@components/Label";
 import { StyleSheet, Dimensions, Pressable, Animated, StatusBar, PanResponder, Keyboard, PanResponderInstance, EmitterSubscription, GestureResponderEvent, PanResponderGestureState, LayoutChangeEvent } from "react-native";
 import { Surface } from "@components/Surface";
-import Label from "@components/Label";
+import {Label} from "@components/Label";
 import Queue from "./Queue";
 import { DEFAULT_IMAGE_DIMENSIONS } from "./utils";
 import { ITextStyle } from "../types";

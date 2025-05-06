@@ -41,7 +41,7 @@ export type ICallback<T> = (value: T) => any;
 */
 export default function useStateCallback<T = unknown>(initialState: T | (() => T)): [T, (value: SetStateAction<T>, callback?: ICallback<T>) => any] {
   const [state, _setState] = useState(initialState);
-  const callbackRef = useRef<ICallback<T>>();
+  const callbackRef = useRef<ICallback<T> | undefined | null>(null);
   const isFirstCallbackCall = useRef<boolean>(true);
   const setState = useCallback((setStateAction: SetStateAction<T>, callback?: ICallback<T>): any => {
     callbackRef.current = callback;

@@ -5,7 +5,7 @@ import { CountriesManager, defaultStr, ICountryCode, isNonNullString, Logger } f
 import { ITextStyle } from '@src/types';
 import { isImageSource } from './utils';
 import Icon from './Icon';
-import Label from "@components/Label";
+import {Label} from "@components/Label";
 import { hasTouchHandler } from '@utils/hasTouchHandler';
 import isValidElement from '@utils/isValidElement';
 /**

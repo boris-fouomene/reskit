@@ -1,5 +1,5 @@
 
-import { isObj, isValidImageSrc, isValidUrl } from "@resk/core";
+import { isObj, isValidImageSrc, isValidUrl } from "@resk/core/utils";
 
 /**
  * Determines if the provided source is a valid image source.

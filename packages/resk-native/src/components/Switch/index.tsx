@@ -2,7 +2,7 @@ import {TouchableOpacity, Platform, StyleSheet, Switch as RNSwitch, SwitchChange
 import { ISwitchProps } from "./types";
 import { useToggleable } from "./utils";
 import { Tooltip } from "@components/Tooltip";
-import Label from "@components/Label";
+import {Label} from "@components/Label";
 
 export * from "./types";
 export * from "./utils";

@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import { IDrawerItemsProps, IDrawerCurrentState } from "@components/Drawer";
 import { StyleSheet } from "react-native";
-import Label from "@components/Label";
+import {Label} from "@components/Label";
 import { DrawerMenuIcon } from "./DrawerMenuIcon";
 import { HStack } from "@components/Stack";
 import { useTheme } from "@theme";

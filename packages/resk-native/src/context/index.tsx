@@ -11,8 +11,6 @@ import { ReskNativeContext } from './context';
 import { PortalProvider } from "@components/Portal";
 import Breakpoints from "@src/breakpoints";
 import { Preloader, Dialog } from "@components/Dialog";
-import { Drawer } from "@components/Drawer";
-import { DrawerNavigationView } from "@layouts/DrawerNavigationView";
 import { useI18n } from "@src/i18n/hooks";
 import Default from "@auth/hooks";
 import Notify from "@notify/index";
@@ -20,8 +18,7 @@ import { StatusBar } from '@components/StatusBar';
 import { BottomSheet } from '@components/BottomSheet';
 import { ReskNativeEvents } from "./events";
 import { useColorScheme } from "@theme/useColorScheme";
-import { Form } from "@components/Form";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 
 export * from "./types";
 
@@ -58,11 +55,11 @@ import { isNumber } from '@resk/core';
  * }
  * ```
  */
-export function ReskNativeProvider({ children, themes, safeAreaInsets, auth, breakpoints, i18nOptions, drawerNavigationViewProps, ...rest }: IReskNativeProviderProps) {
+export function ReskNativeProvider({ children, themes, safeAreaInsets, auth, breakpoints, i18nOptions, ...rest }: IReskNativeProviderProps) {
   i18nOptions = Object.assign({}, i18nOptions);
   const i18n = useI18n(undefined, i18nOptions);
   auth = Object.assign({}, auth);
-  drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
+  //drawerNavigationViewProps = Object.assign({}, drawerNavigationViewProps);
   safeAreaInsets = extendObj({}, { top: 0, left: 0, right: 0, bottom: 0 }, safeAreaInsets) as any;
   const { light, dark } = Object.assign({}, themes);
   const colorScheme = useColorScheme() || Theme.getColorSchemeFromSession() || "light";
@@ -145,16 +142,11 @@ export function ReskNativeProvider({ children, themes, safeAreaInsets, auth, bre
             <Preloader.Provider />
             <Dialog.Alert.Provider />
             <Dialog.Provider.Provider />
-            <Drawer.Provider.Provider />
-            <Form.Drawer.Provider />
-            <Form.Dialog.Provider />
             <BottomSheet.Provider.Provider />
-            <Drawer renderNavigationView={(drawerState) => {
-              return Platform.isClientSide() ? <DrawerNavigationView  {...drawerNavigationViewProps} drawerState={drawerState} /> : null;
-            }}>
+            <>
               {Platform.isClientSide() ? <StatusBar /> : null}
               {children}
-            </Drawer>
+            </>
           </Default.AuthContext.Provider>
         </PortalProvider>
       </ReskNativeContext.Provider>

@@ -113,15 +113,18 @@
   },
   // Include what you need - change as needed
   "include": [
-    "src/**/*"
-    // Uncomment if you still only want that specific file
-    // "./src/components/Icon/Icon.tsx",
+    "src/**/*",
   ],
   // Improved exclude patterns
   "exclude": [
     "node_modules",
-    "**/@resk/core/**", // More aggressive pattern to exclude @resk/core
-    "**/resk-core/**",
+    "src/components/**/*",
+    "@resk/core",
+    "@resk/core/utils",
+    "@resk/core/*",
+    "@resk/*",
+    "../../packages/resk-core/**/*",
+    "../resk-core/**/*",
     "../../node_modules/**/*",
     "../../examples/**/*",
     "react-native",

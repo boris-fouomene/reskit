@@ -284,4 +284,4 @@ const SwipeGestureHandler: FC<ISwipeGestureProps> = ({
     );
 };
 
-export default SwipeGestureHandler;
+export {SwipeGestureHandler};

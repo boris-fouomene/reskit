@@ -1,7 +1,7 @@
 import { TouchableOpacity, StyleSheet, GestureResponderEvent } from "react-native";
 import { ICheckboxProps } from "./types";
 import { Tooltip } from "@components/Tooltip";
-import Label from "@components/Label";
+import {Label} from "@components/Label";
 import { useToggleable } from "@components/Switch/utils";
 import FontIcon from "@components/Icon/Font";
 import { isNonNullString } from "@resk/core/utils";

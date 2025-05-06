@@ -52,7 +52,7 @@ function AppBarAction<IAppBarActionContext = any>({ colorScheme, containerProps,
     {...props}
   />
 };
-AppBarAction.displayName = 'AppBarAction';
+AppBarAction.displayName = 'AppBar.Action';
 
 export default AppBarAction
 

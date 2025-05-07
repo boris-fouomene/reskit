@@ -1,0 +1,50 @@
+import MaterialCommunityIcons from "react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json";
+import FontAwesome6 from "react-native-vector-icons/glyphmaps/FontAwesome6Free.json";
+import AntDesign from "react-native-vector-icons/glyphmaps/AntDesign.json";
+import Foundation from "react-native-vector-icons/glyphmaps/Foundation.json";
+import Ionicons from "react-native-vector-icons/glyphmaps/Ionicons.json";
+import MaterialIcons from "react-native-vector-icons/glyphmaps/MaterialIcons.json";
+import Octicons from "react-native-vector-icons/glyphmaps/Octicons.json";
+import FontAwesome5 from "react-native-vector-icons/glyphmaps/FontAwesome5Free.json";
+
+
+export type IFontIconAntDesign = `antd-${keyof typeof AntDesign}`;
+
+export type IFontIconFoundation = `foundation-${keyof typeof Foundation}`;
+
+export type IFontIconIonicons = `ionicons-${keyof typeof Ionicons}`;
+
+export type IFontIconMaterialCommunityIcons = keyof typeof MaterialCommunityIcons;
+
+export type IFontIconMaterialIcons = `material-${keyof typeof MaterialIcons}`;
+
+export type IFontIconOcticons = `octicons-${keyof typeof Octicons}`;
+
+export type IFontFontAwesome5 = `fa5-${keyof typeof FontAwesome5}`;
+
+export type IFontFontAwesome6 = `fa6-${keyof typeof FontAwesome6}`;
+
+
+    /**
+     * @typedef IFontIconName - The name of the font icon.
+     * The name of the icon to display (including the prefix for icon set if necessary).
+     * 
+     * This property specifies which icon to render. It accepts a variety of icon
+     * names from different icon sets, ensuring that only valid names are passed.
+     * The name must correspond to one of the defined types for the various icon sets
+     * (e.g., MaterialCommunityIcons, AntDesign, etc.).
+     * 
+     * @example
+     * // Valid icon names
+     * const name: IFontIconName = "home"; // From MaterialCommunityIcons
+     * const nameAnt: IFontIconName = "antd-home"; // From AntDesign
+     * const nameFa5: IFontIconName = "fa5-home"; // From FontAwesome5
+     * const nameFa6: IFontIconName = "fa6-home"; // From FontAwesome6
+     * const nameFeather: IFontIconName = "feather-home"; // From Feather
+     * const nameFoundation: IFontIconName = "foundation-home"; // From Foundation
+     * const nameIonicons: IFontIconName = "ionicons-home"; // From Ionicons
+     * const nameOcticons: IFontIconName = "octicons-home"; // From Octicons
+     * const nameMaterialIcons: IFontIconName = "material-home"; // From MaterialIcons
+     */
+    export type IFontIconName = IFontFontAwesome5 | IFontFontAwesome6 | IFontIconAntDesign | IFontIconFoundation | IFontIconIonicons | IFontIconMaterialCommunityIcons | IFontIconMaterialIcons | IFontIconOcticons
+

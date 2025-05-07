@@ -10,7 +10,7 @@
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "resolveJsonModule": false,
+    "resolveJsonModule": true,
     "strict": true,
     "esModuleInterop": true,
     "allowJs": true,
@@ -115,7 +115,6 @@
   // Include what you need - change as needed
   "include": [
     "src/**/*",
-    "types",
   ],
   // Improved exclude patterns
   "exclude": [

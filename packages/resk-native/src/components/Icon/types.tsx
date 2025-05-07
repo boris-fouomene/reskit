@@ -1,3 +1,4 @@
+import { IFontIconName } from "./icon-types";
 import { IReactComponent, ITextStyle, ITouchableProps } from "../../types";
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { ITooltipBaseProps, ITooltipProps } from "@components/Tooltip/types";
@@ -5,6 +6,8 @@ import { ITheme } from "@theme/types";
 import { ITouchableRippleProps } from "@components/TouchableRipple/types";
 import { ISurfaceProps } from "@components/Surface/types";
 import { IconProps } from "react-native-vector-icons/Icon";
+
+export {IFontIconName} from "./icon-types";
 
 /**
  * Props for the FontIcon component, extending the properties of MaterialCommunityIcons

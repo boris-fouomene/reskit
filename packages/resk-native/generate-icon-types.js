@@ -93,12 +93,13 @@ export function generateTypeDefinitions() {
         const prefix = iconSetNames[setName];
         if (prefix !== undefined) {
             const prefixName = prefix ? `${prefix.replace(/-/g, '')}-` : '';
-            output += `declare type IFontIcon${setName} = ${iconNames.map(name => `'${prefixName}${name}'`).join(' | ')};\n\n`;
+            output += `const ${setName}Icons = {${iconNames.map(name => `'${prefixName}${name}':''`).join(",")}} as const;\n\n`;
+            output += `export type IFontIcon${setName} = keyof typeof ${setName}Icons;\n\n`;
         }
     });
 
     // Generate the IconSets interface
-    output += 'declare interface IFontIconSetsNames {\n';
+    output += 'export interface IFontIconSetsNames {\n';
     const allIconNames = Object.keys(iconSets);
     allIconNames.forEach(setName => {
         //output += `  ${iconSetName}: IconNames<typeof ${setName}[number]>;\n`;
@@ -107,7 +108,7 @@ export function generateTypeDefinitions() {
     output += '}\n\n';
 
     // Generate the IconSets interface
-    output += 'declare interface IFontIconSetsPrefixes {\n';
+    output += 'export interface IFontIconSetsPrefixes {\n';
     Object.keys(iconSetNames).forEach(setName => {
         output += `  ${setName}: '${iconSetNames[setName]}';\n`;
     });
@@ -135,12 +136,12 @@ export function generateTypeDefinitions() {
      * const nameOcticons: IFontIconName = "octicons-home"; // From Octicons
      * const nameMaterialIcons: IFontIconName = "material-home"; // From MaterialIcons
      */
-    declare type IFontIconName = ${allIconNames.map(name => `IFontIcon${name}`).join(' | ')}\n\n`;
+    export type IFontIconName = ${allIconNames.map(name => `IFontIcon${name}`).join(' | ')}\n\n`;
     return output;
 }
 // Generate the types
 const typeDefinitions = generateTypeDefinitions();
 
 // Write to a file
-const outputPath = join(__dirname,"types","icon.font.d.ts")//join(__dirname, 'src', 'components', 'ICon', 'icon-types.d.ts');
+const outputPath = join(__dirname, 'src', 'components', 'ICon', 'icon-types.d.ts');//join(__dirname,"types","icon.font.d.ts")//
 writeFileSync(outputPath, typeDefinitions, 'utf8');

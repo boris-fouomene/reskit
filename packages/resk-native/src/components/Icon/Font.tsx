@@ -4,18 +4,18 @@ import { isNonNullString, defaultStr } from "@resk/core/utils";
 import Logger from "@resk/core/logger";
 
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Foundation from "react-native-vector-icons/Foundation";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Octicons from "react-native-vector-icons/Octicons";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
-
+const tt :IFontIconName = "material-home-max";
 import { useTheme } from "@theme";
 import Colors from "@colors";
-import { IFontIconProps } from "./types";
+import { IFontIconName, IFontIconProps } from "./types";
 import Platform from "@platform/index";
 import { isRTL } from "@utils/i18nManager";
 import { getTouchableProps } from "@utils/hasTouchHandler";

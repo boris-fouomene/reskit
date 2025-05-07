@@ -1,0 +1,16 @@
+{
+  "name": "@resk/native-icon-types",
+  "version": "1.0.2",
+  "description": "Icon types for resk-native framework",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node ./generate-icon-types"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

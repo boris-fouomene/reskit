@@ -1,10 +1,10 @@
 // icon-autocomplete.ts
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
-import { join, resolve as pathResolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+const { readdirSync, readFileSync, writeFileSync } = require('fs');
+const { join, resolve: pathResolve, dirname } = require('path');
+/* const { fileURLToPath } = require('url');
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(__filename); */
 
 /***
  * all supported icons
@@ -83,7 +83,7 @@ function generateIconNameArrays(filter) {
 }
 
 // This function generates a type definition file with the actual icon names
-export function generateTypeDefinitions() {
+function generateTypeDefinitions() {
     const iconSets = generateIconNameArrays();
 
     let output = '// Auto-generated type definitions for react-native-vector-icons\n\n';
@@ -93,8 +93,9 @@ export function generateTypeDefinitions() {
         const prefix = iconSetNames[setName];
         if (prefix !== undefined) {
             const prefixName = prefix ? `${prefix.replace(/-/g, '')}-` : '';
-            output += `const ${setName}Icons = {${iconNames.map(name => `'${prefixName}${name}':''`).join(",")}} as const;\n\n`;
-            output += `export type IFontIcon${setName} = keyof typeof ${setName}Icons;\n\n`;
+            //output += `const ${setName}Icons = {${iconNames.map(name => `'${prefixName}${name}':''`).join(",")}} as const;\n\n`;
+            //output += `export type IFontIcon${setName} = keyof typeof ${setName}Icons;\n\n`;
+            output += `export type IFontIcon${setName} = ${iconNames.map(name => `'${prefixName}${name}'`).join("|")};\n\n`;
         }
     });
 
@@ -143,5 +144,5 @@ export function generateTypeDefinitions() {
 const typeDefinitions = generateTypeDefinitions();
 
 // Write to a file
-const outputPath = join(__dirname, 'src', 'components', 'ICon', 'icon-types.d.ts');//join(__dirname,"types","icon.font.d.ts")//
+const outputPath = join(__dirname,"index.d.ts");//join(__dirname, 'src', 'components', 'ICon', 'icon-types.d.ts');//
 writeFileSync(outputPath, typeDefinitions, 'utf8');

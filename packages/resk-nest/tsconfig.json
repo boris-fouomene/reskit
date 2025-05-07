@@ -57,6 +57,10 @@
     "src/**/*.json"
   ],
   "exclude": [
+    "@resk/core",
+    "@resk/core/**/*",
+    "@resk/native-icon-types/**/*",
+    "@resk/native-icon-types",
     "../packages/resk-native/**/*",
     "../packages/resk-expo-docs/**/*",
     "**/*.tsx"

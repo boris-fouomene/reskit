@@ -3,7 +3,7 @@ import { ITextInputProps } from "@components/TextInput/types";
 import { ReactNode } from "react";
 import { IViewProps } from "@components/View";
 import { PressableProps, FlatListProps } from "react-native";
-import { IFontIconName } from "@components/Icon";
+import {IFontIconName} from "@resk/native-icon-types";
 import { ObservableComponent } from "@utils/index";
 import { IMenuContext, IMenuProps } from "@components/Menu/types";
 

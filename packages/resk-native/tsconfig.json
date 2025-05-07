@@ -122,7 +122,6 @@
     "@resk/core",
     "@resk/core/utils",
     "@resk/core/*",
-    "src/components/Icon/icon-types.ts",
     "@resk/*",
     "../../packages/resk-core/**/*",
     "../resk-core/**/*",

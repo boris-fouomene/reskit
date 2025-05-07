@@ -12,10 +12,9 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Octicons from "react-native-vector-icons/Octicons";
 
-const tt :IFontIconName = "material-home-max";
 import { useTheme } from "@theme";
 import Colors from "@colors";
-import { IFontIconName, IFontIconProps } from "./types";
+import {IFontIconProps } from "./types";
 import Platform from "@platform/index";
 import { isRTL } from "@utils/i18nManager";
 import { getTouchableProps } from "@utils/hasTouchHandler";

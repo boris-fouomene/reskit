@@ -1,6 +1,6 @@
 "use client";
 import { ReactNode, useMemo, Fragment, Ref } from "react";
-import { IFontIconName, IGetIconOptions, IIconProps } from "./types";
+import {IGetIconOptions, IIconProps } from "./types";
 import { Image, ImageStyle } from "react-native";
 import { isValidElement, pickTouchEventHandlers } from "@utils";
 import { isImageSource, isImageUrl } from "./utils";
@@ -10,6 +10,7 @@ import { Tooltip } from "@components/Tooltip";
 import { StyleSheet } from "react-native";
 import { TouchableRipple } from "@components/TouchableRipple";
 import { isReactComponent } from "@utils/isComponent";
+import {IFontIconName} from "@resk/native-icon-types";
 
 const isNonNullString = (value: any): value is string => typeof value === "string" && !!value;
 /**

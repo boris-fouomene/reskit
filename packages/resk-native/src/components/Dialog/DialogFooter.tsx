@@ -1,4 +1,4 @@
-import View, { IViewProps } from "@components/View";
+import {View, IViewProps } from "@components/View";
 import { StyleSheet } from "react-native";
 import { useCanRender } from "./utils";
 import isValidElement from "@utils/isValidElement";

@@ -1,7 +1,7 @@
 import { Animated, StyleSheet } from 'react-native';
 import { defaultStr } from "@resk/core";
 import { useTheme } from "@theme";
-import Label, { ILabelProps } from '@components/Label';
+import {Label,ILabelProps } from '@components/Label';
 import { useEffect } from 'react';
 import platform from '@platform/index';
 

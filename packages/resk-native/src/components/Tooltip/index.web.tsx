@@ -1,7 +1,7 @@
 "use client";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
-import { useMemo,useRef,useState} from "react";
+import { useEffect, useMemo,useRef,useState} from "react";
 import { getTextContent, isValidElement, setRef, useMergeRefs } from '@utils';
 import { getMaxZindex, isDOMElement, Logger, Platform } from "@resk/core";
 import { TIPPY_THEME } from '@theme/updateNative/utils';

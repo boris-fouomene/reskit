@@ -9,11 +9,11 @@ import { ILabelProps } from "@components/Label/types";
 import { IViewProps } from "@components/View/types";
 import { ILabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import { IDividerProps } from "@components/Divider";
-import { IFormData } from "@components/Form/types";
 import { IAuthPerm } from "@resk/core/auth";
 import { IResourceName } from "@resk/core/types";
 import { ITextStyle } from "@src/types";
 import { ReactNode, Ref, RefObject } from "react";
+import { IDict } from '@resk/core/types';
 
 /**
  * @interface IButtonMode
@@ -530,5 +530,5 @@ export type IButtonContext<IButtonExtendContext = any> = Readonly<{
     /***
      * The data associated with the form if the button is representing a form action.
      */
-    formData: IFormData;
+    formData?: IDict;
 } & IButtonExtendContext>;

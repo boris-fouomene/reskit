@@ -5,7 +5,7 @@ import {
   Platform,
   GestureResponderEvent,
 } from 'react-native';
-import Label from '@components/Label';
+import {Label} from '@components/Label';
 import { Surface } from '@components/Surface';
 import { Colors, IThemeColorsTokenName, useTheme } from '@theme/index';
 import { IAppBarProps } from './types';

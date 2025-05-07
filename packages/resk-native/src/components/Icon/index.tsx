@@ -19,7 +19,6 @@ const IconWithButton = Icon as unknown as IIcon;
 IconWithButton.Button = Button;
 IconWithButton.displayName = 'Icon.Buttton';
 IconWithButton.Font = FontIcon;
-IconWithButton.Font.displayName = 'Icon.Font';
 IconWithButton.CountryFlag = CountryFlag;
 
 export { IconWithButton as Icon };

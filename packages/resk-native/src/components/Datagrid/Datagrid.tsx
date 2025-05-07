@@ -17,7 +17,7 @@ import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber,
 import Auth from "@resk/core/auth";
 import { IField, IFieldType, IResourcePaginationMetaData, IResourceQueryOptionsOrderByDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
-import Label, { ILabelProps } from '@components/Label';
+import {Label,ILabelProps } from '@components/Label';
 import InputFormatter from '@resk/core/inputFormatter';
 import { ResourcePaginationHelper } from '@resk/core/resources';
 import { IReactComponent, IViewStyle } from '@src/types';

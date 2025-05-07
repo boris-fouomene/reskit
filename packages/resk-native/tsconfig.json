@@ -19,9 +19,10 @@
     "module": "ES6", // Enables ESM & CJS interop
     "moduleResolution": "node",
     // Performance optimizations
-    "incremental": true,
+    "incremental":false,
+    "noEmitOnError": false,
     "tsBuildInfoFile": "./build/.tsbuildinfo",
-    "isolatedModules": true,
+    "isolatedModules": false,
     "disableSourceOfProjectReferenceRedirect": true,
     "preserveSymlinks": true,
     "plugins": [
@@ -114,14 +115,15 @@
   // Include what you need - change as needed
   "include": [
     "src/**/*",
+    "types",
   ],
   // Improved exclude patterns
   "exclude": [
     "node_modules",
-    "src/components/**/*",
     "@resk/core",
     "@resk/core/utils",
     "@resk/core/*",
+    "src/components/Icon/icon-types.ts",
     "@resk/*",
     "../../packages/resk-core/**/*",
     "../resk-core/**/*",

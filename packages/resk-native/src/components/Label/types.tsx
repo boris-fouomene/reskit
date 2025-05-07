@@ -1,7 +1,7 @@
 import { ITextStyle } from "@src/types";
 import { IThemeColorsTokenName, IThemeFontVariant } from "@theme/types";
 import { ReactNode } from "react";
-import { Role, TextProps } from "react-native";
+import { Role, Text, TextProps } from "react-native";
 
 /**
  * @interface
@@ -78,4 +78,6 @@ export interface ILabelProps extends Omit<TextProps, "role" | "children" | "styl
      * The font variant to use for the label
      */
     fontVariant?: IThemeFontVariant;
+    
+    ref?: React.Ref<Text>;
 };

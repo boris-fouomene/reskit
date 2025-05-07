@@ -141,7 +141,7 @@ import { Animated, GestureResponderEvent } from "react-native";
  *                 <Swiper disabled={true} />
  *                 ```
  */
-export interface ISwiperProps extends IViewProps {
+export interface ISwiperProps extends Omit<IViewProps,'ref'> {
 
     /**
      * Indicates if the swiper should scroll vertically. 

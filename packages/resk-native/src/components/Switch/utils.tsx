@@ -90,7 +90,7 @@ export * from "./types";
 export function useToggleable<EventType = GestureResponderEvent>({ disabled, checkedTooltip, onValueChange, uncheckedTooltip, tooltip, title, color, readOnly, labelPosition, beforeToggle, onChange, label, checkedLabel, uncheckedLabel, labelProps, containerProps, ...rest }: IToggleableProps<EventType>) {
   const { checkedValue, uncheckedValue, defaultValue } = getToggleableDefaultValues(rest);
   const theme = useTheme();
-  const eventRef = useRef<EventType>();
+  const eventRef = useRef<EventType>(null);
   const [checked, setChecked] = useStateCallback(defaultValue === checkedValue ? true : false);
   const getValue = () => {
     return checked ? checkedValue : uncheckedValue;
@@ -109,7 +109,7 @@ export function useToggleable<EventType = GestureResponderEvent>({ disabled, che
       if (typeof onValueChange === "function") {
         onValueChange(isChecked);
       }
-      if (typeof onChange === "function") {
+      if (typeof onChange === "function" && eventRef.current) {
         onChange({ checked: isChecked, checkedValue, uncheckedValue, event: eventRef.current, value });
       }
     });

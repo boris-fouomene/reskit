@@ -1,4 +1,4 @@
-import View, { IViewProps } from "@components/View";
+import {View, IViewProps } from "@components/View";
 import { StyleSheet, View as RNView } from "react-native";
 
 

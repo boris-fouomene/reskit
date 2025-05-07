@@ -515,7 +515,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
     const theme = useTheme();
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
     const itemsByHashKey = context.itemsByHashKey;
-    const labelRef = useRef(null);
+    const labelRef = useRef<Text>(null);
     const { multiple, selectedIconName } = context.props;
     const testID = context.getTestID();
     const isSelected = useMemo(() => {
@@ -566,7 +566,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
         >
             <View style={styles.itemContent} testID={testID + "-item-content-" + hashKey}>
                 {isSelected ? <FontIcon style={[styles.selectedIcon]} name={isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked"} size={20} color={theme.colors.primary} /> : null}
-                {<Label ref={labelRef} fontSize={15} color={isSelected ? theme.colors.primary : undefined}>{label}</Label>}
+                {<Label ref={labelRef as any} fontSize={15} color={isSelected ? theme.colors.primary : undefined}>{label}</Label>}
             </View>
         </Tooltip>
     );

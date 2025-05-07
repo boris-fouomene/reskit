@@ -1,5 +1,5 @@
 import * as React from 'react';
-import View, { IViewProps } from "@components/View";
+import {View, IViewProps } from "@components/View";
 import {
   Animated,
   StyleSheet,

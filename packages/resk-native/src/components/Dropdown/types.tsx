@@ -727,7 +727,7 @@ export interface IDropdownCallbackOptions<ItemType = any, ValueType = any> {
  * - Ensure that the appropriate props are passed to customize the dropdown according to 
  *   the application's requirements.
  */
-export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps, "onChange"> {
+export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps, "onChange" | "ref"> {
     items?: ItemType[]; // An optional array of items to be displayed in the dropdown
     testID?: string; // An optional test ID for the dropdown
     getItemValue?: (options: IDropdownCallbackOptions<ItemType, ValueType>) => ValueType | undefined; // Function to get item value

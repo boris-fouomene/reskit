@@ -19,7 +19,7 @@ import { useI18n } from '@src/i18n';
 import usePrevious from '@utils/usePrevious';
 import { usePrepareBottomSheet } from '@components/BottomSheet/utils';
 import { KeyboardAvoidingView } from '@components/KeyboardAvoidingView';
-import Label from '@components/Label';
+import {Label} from '@components/Label';
 import { Divider } from '@components/Divider';
 import { defaultNumber, isNumber } from "@resk/core/utils";
 

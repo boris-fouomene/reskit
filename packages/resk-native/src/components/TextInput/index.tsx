@@ -1,11 +1,10 @@
 import {Label} from "@components/Label";
 import { isValidElement, useMergeRefs } from "@utils";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
-import { ReactNode, useEffect, useMemo, useRef,useState,isValidElement } from "react";
+import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, View } from 'react-native';
+import { ReactNode, useEffect, useMemo, useRef,useState} from "react";
 import { InputFormatter, isNumber, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, IInputFormatterResult } from "@resk/core";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
-import {View} from "@components/View";
 import { getLabelOrLeftOrRightProps } from "@hooks/label2left2right";
 import { ITextInputCallbackOptions, ITextInputProps, ITextInputType, IUseTextInputProps } from "./types";
 import { ITheme } from "@theme/types";
@@ -294,10 +293,10 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
     const isLabelEmbededVariant = variant == "labelEmbeded";
     const isDefaultVariant = !isLabelEmbededVariant;
     const [isSecure, setIsSecure] = useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
-    const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
+    const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(null);
     useEffect(() => {
         return () => {
-            clearTimeout(debounceTimeoutRef.current);
+            clearTimeout(debounceTimeoutRef.current as any);
         }
     }, []);
     useEffect(() => {
@@ -461,7 +460,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
     const { containerStyle, contentContainerStyle, inputStyle, labelStyle } = getContainerAndContentStyle({ variant, withBackground, compact, canRenderLabel, isFocused, isLabelEmbededVariant, theme, textColor, borderColor, isDefaultVariant })
     const labelSuffix = suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? <Label color={textColor}>{" "}[{inputMaskPlaceholder}]</Label> : null;
     const calendarIProps = Object.assign({}, iconProps);
-    const calendarRef = useRef<CalendarModalContext>(null);
+    const calendarRef = useRef<CalendarModalContext & View>(null);
     const calendarFlag = canRenderCalendar && editable ? <>
         <FontIcon
             color={textColor}
@@ -521,7 +520,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
             disabled={!editable}
             menuProps={{ bottomSheetTitle: label }}
             defaultValue={inputState.phoneCountryCode}
-            onChange={!editable ? undefined : ({ value }) => {
+            onChange={!editable ? undefined : ({ value } : any) => {
                 if (isNonNullString(value) && value !== inputState.phoneCountryCode && String(value).toLowerCase() !== "undefined") {
                     setInputState({
                         ...inputState,
@@ -598,7 +597,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
                 const isValid = (valCase2.isValid !== false) && (isPhone ? isPhoneValid(valCase2.value, phoneCountryCode) : true);
                 setInputState(options);
                 if (typeof onChange == "function" && isValid) {
-                    clearTimeout(debounceTimeoutRef.current);
+                    clearTimeout(debounceTimeoutRef.current as any);
                     debounceTimeoutRef.current = setTimeout(() => {
                         onChange(options);
                     }, isNumber(debounceTimeout) && debounceTimeout > 0 ? debounceTimeout : 0);

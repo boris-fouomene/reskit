@@ -10,7 +10,8 @@ import Foundation from "react-native-vector-icons/Foundation";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Octicons from "react-native-vector-icons/Octicons";
-import Feather from "react-native-vector-icons/Feather";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+
 
 import { useTheme } from "@theme";
 import Colors from "@colors";
@@ -33,9 +34,9 @@ const isIos = Platform.isIos();
  * @see https://www.npmjs.com/package/react-native-vector-icons for application icons
  * 
  * The following prefixes should be used to specify the icon set:
- *  - `fa` for FontAwesome6
+ *  - `fa6` for FontAwesome6
  *  - `antd` for AntDesign
- *  - `feather` for Feather
+ *  - `fa5` for FontAwesome5
  *  - `foundation` for Foundation
  *  - `ionic` for Ionicons
  *  - `octicons` for Octicons
@@ -51,7 +52,7 @@ const isIos = Platform.isIos();
  *   return (
  *     <>
  *       <FontIcon name="camera" />  // Defaults to MaterialCommunityIcons
- *       <FontIcon name="fa-camera" />  // Uses FontAwesome6 icon set
+ *       <FontIcon name="fa6-camera" />  // Uses FontAwesome6 icon set
  *     </>
  *   );
  * }
@@ -113,14 +114,14 @@ function FontIcon({ name,ref, disabled, style, color, ...props }:IFontIconProps)
  *
  * @example
  * ```typescript
- * const iconDetails = getFontIconSet("fa-solid-home");
+ * const iconDetails = getFontIconSet("fa6-solid-home");
  * console.log(iconDetails);
  * // Output:
  * // {
  * //   iconSetName: "FontAwesome",
- * //   iconSetPrefix: "fa-solid",
+ * //   iconSetPrefix: "fa6-solid",
  * //   iconName: "home",
- * //   iconSet: FontAwesomeIcons
+ * //   iconSet: FontAwesomeIconsf
  * // }
  * ```
  *
@@ -254,30 +255,29 @@ const isFontIconName = (name: string, iconSetName: string): boolean => {
  * - MaterialCommunityIcons
  * - FontAwesome6
  * - AntDesign
- * - Feather
+ * - FontAwesome5
  * - Foundation
  * - Ionicons
  * - Octicons
  * - MaterialIcons
  */
-export type IFontIconSet = typeof MaterialCommunityIcons | typeof FontAwesome6 | typeof AntDesign | typeof Feather | typeof Foundation | typeof Ionicons | typeof Octicons | typeof MaterialIcons;
+export type IFontIconSet = typeof MaterialCommunityIcons | typeof FontAwesome6 | typeof AntDesign | typeof FontAwesome5 | typeof Foundation | typeof Ionicons | typeof Octicons | typeof MaterialIcons;
 
 
 /**
  * Represents the set of possible icon font names that can be used in the application.
  * 
- * @typedef {("MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "Feather" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons")} IFontIconSetName
+ * @typedef {("MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "FontAwesome5" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons")} IFontIconSetName
  * 
  * @property {"MaterialCommunityIcons"} MaterialCommunityIcons - Icon set from Material Community Icons.
  * @property {"FontAwesome6"} FontAwesome6 - Icon set from Font Awesome 5.
  * @property {"AntDesign"} AntDesign - Icon set from Ant Design.
- * @property {"Feather"} Feather - Icon set from Feather.
  * @property {"Foundation"} Foundation - Icon set from Foundation.
  * @property {"Ionicons"} Ionicons - Icon set from Ionicons.
  * @property {"Octicons"} Octicons - Icon set from Octicons.
  * @property {"MaterialIcons"} MaterialIcons - Icon set from Material Icons.
  */
-export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "Feather" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons";
+export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "FontAwesome5" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons";
 
 /**
  * Represents an object containing various icon font types.
@@ -286,7 +286,7 @@ export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntD
  * @property {typeof MaterialCommunityIcons} MaterialCommunityIcons - The MaterialCommunityIcons font type.
  * @property {typeof FontAwesome6} FontAwesome6 - The FontAwesome6 font type.
  * @property {typeof AntDesign} AntDesign - The AntDesign font type.
- * @property {typeof Feather} Feather - The Feather font type.
+ * @property {typeof FontAwesome5} FontAwesome5 - The FontAwesome5 font type.
  * @property {typeof Foundation} Foundation - The Foundation font type.
  * @property {typeof Ionicons} Ionicons - The Ionicons font type.
  * @property {typeof MaterialIcons} MaterialIcons - The MaterialIcons font type.
@@ -301,7 +301,7 @@ export type IFontIconSets = Record<IFontIconSetName, IFontIconSet>;
  * @property {typeof MaterialCommunityIcons} MaterialCommunityIcons - The Material Community Icons library.
  * @property {typeof FontAwesome6} FontAwesome6 - The FontAwesome 5 Icons library.
  * @property {typeof AntDesign} AntDesign - The AntDesign Icons library.
- * @property {typeof Feather} Feather - The Feather Icons library.
+ * @property {typeof FontAwesome5} FontAwesome5 - The FontAwesome5 Icons library.
  * @property {typeof Foundation} Foundation - The Foundation Icons library.
  * @property {typeof Ionicons} Ionicons - The Ionicons library.
  * @property {typeof MaterialIcons} MaterialIcons - The Material Icons library.
@@ -311,7 +311,7 @@ const fontsObjects: IFontIconSets = {
     MaterialCommunityIcons,
     FontAwesome6,
     AntDesign,
-    Feather,
+    FontAwesome5,
     Foundation,
     Ionicons,
     MaterialIcons,
@@ -322,10 +322,10 @@ const fontsObjects: IFontIconSets = {
 /** An object that maps icon set prefixes to their respective names. */
 const PREFIX_TO_ICONS_SET_NAMES = {
     material: "MaterialIcons",
-    fa: "FontAwesome6",
+    "fa6": "FontAwesome6",
     antd: "AntDesign",
     foundation: "Foundation",
-    feather: "Feather",
+    fa5: "FontAwesome5",
     ionic: "Ionicons",
     octicons: "Octicons",
     "": "MaterialCommunityIcons"
@@ -520,12 +520,12 @@ type IFontWithCustomIcons = typeof FontIcon & {
      *
      * @example
      * ```typescript
-     * const iconDetails = getFontIconSet("fa-solid-home");
+     * const iconDetails = getFontIconSet("fa6-solid-home");
      * console.log(iconDetails);
      * // Output:
      * // {
      * //   iconSetName: "FontAwesome",
-     * //   iconSetPrefix: "fa-solid",
+     * //   iconSetPrefix: "fa6-solid",
      * //   iconName: "home",
      * //   iconSet: FontAwesomeIcons
      * // }
@@ -621,7 +621,8 @@ type IFontWithCustomIcons = typeof FontIcon & {
      */
     CHECK: "check";
 };
-const FontWithCustomIcons = FontIcon as unknown as IFontWithCustomIcons;
+FontIcon.displayName = "Icon.Font";
+const FontWithCustomIcons = FontIcon as IFontWithCustomIcons;
 
 FontWithCustomIcons.isValidName = isValidFontIconName;
 FontWithCustomIcons.getIconSet = getFontIconSet;

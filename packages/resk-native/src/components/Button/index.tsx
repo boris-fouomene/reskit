@@ -1,4 +1,4 @@
-import {useState,useImperativeHandle,useEffect, useContext,useRef, createContext, FC, Fragment} from 'react';
+import {useState,useImperativeHandle,useEffect, useContext,useRef, createContext, Fragment} from 'react';
 import { FormsManager } from '@components/Form/FormsManager';
 import {
     Animated,
@@ -14,16 +14,16 @@ import { getButtonColors } from './utils';
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import { TouchableRipple } from '@components/TouchableRipple';
-import Label from '@components/Label';
+import {Label} from '@components/Label';
 import { IButtonProps, IButtonContext} from './types';
-import { useGetIcon } from '@components/Icon';
 import { defaultStr, isNonNullString, uniqid } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
 import { Tooltip } from '@components/Tooltip';
 import isValidElement from '@utils/isValidElement';
-import View from '@components/View';
+import {View} from '@components/View';
 import { getLabelOrLeftOrRightProps } from '@hooks/label2left2right';
 import { Divider } from '@components/Divider';
+import { useGetIcon } from '@components/Icon/Icon';
 
 /**
  * A customizable button component that supports various styles, states, and accessibility features.
@@ -171,7 +171,7 @@ export function Button<IButtonExtendContext = any>({
     const theme = useTheme();
     const [isLoading, _setIsLoading] = useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
     const [isDisabled, setIsDisabled] = useState(typeof customDisabled == "boolean" ? customDisabled : false);
-    const idRef = useRef<string>(id || uniqid("menu-item-id-"));
+    const idRef = useRef<string>(defaultStr(id,uniqid("menu-item-id-")));
     const disabled: boolean = isDisabled || isLoading;
     const divider = customDivider === true;
     const disable = () => {
@@ -210,7 +210,7 @@ export function Button<IButtonExtendContext = any>({
         ...Object.assign({}, extendContext)
     }
     // Expose methods using useImperativeHandle
-    useImperativeHandle(ref, () => (context as IButtonContext<IButtonExtendContext>));
+    useImperativeHandle(ref, () => (context as any));
     const { roundness } = theme;
     containerProps = Object.assign({}, containerProps);
 
@@ -332,13 +332,13 @@ export function Button<IButtonExtendContext = any>({
                     const form = formName ? FormsManager.getForm(formName) : null;
                     const hasForm = form && form.isValid();
                     const context2: IButtonContext<IButtonExtendContext> = context as IButtonContext<IButtonExtendContext>;
-                    if (hasForm) {
-                        (context2 as any).formData = form?.getData();
+                    if (hasForm && typeof (form as any).getData =="function") {
+                        (context2 as any).formData = (form as any).getData();
                     }
                     const r = typeof onPress === 'function' ? onPress(event, context2) : true;
                     if (r === false || submitFormOnPress === false) return;
-                    if (form) {
-                        form.submit();
+                    if (form && typeof (form as any)?.submit === 'function') {
+                        (form as any).submit();
                     }
                     return r
                 }}

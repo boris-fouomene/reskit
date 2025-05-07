@@ -61,10 +61,11 @@ function generateIconNameArrays(filter) {
         files.forEach(file => {
             if (file.endsWith('.json')) {
                 let setName = file.replace('.json', '');
-                if (setName.endsWith("Pro") || !(setName in iconSetNames)) return;
+                if (setName.endsWith("Pro")) return;
                 if (setName.endsWith("Free")) {
                     setName = setName.split("Free")[0].trim();
                 }
+                if(!(setName in iconSetNames)) return;
                 console.log('Processing set:', setName);
                 if (filter(setName) && !setName.toLowerCase().endsWith("_meta")) {
                     const icons = extractIconNames(join(glyphMapsPath, file));
@@ -92,12 +93,12 @@ export function generateTypeDefinitions() {
         const prefix = iconSetNames[setName];
         if (prefix !== undefined) {
             const prefixName = prefix ? `${prefix.replace(/-/g, '')}-` : '';
-            output += `export type IFontIcon${setName} = ${iconNames.map(name => `'${prefixName}${name}'`).join(' | ')};\n\n`;
+            output += `declare type IFontIcon${setName} = ${iconNames.map(name => `'${prefixName}${name}'`).join(' | ')};\n\n`;
         }
     });
 
     // Generate the IconSets interface
-    output += 'export interface IFontIconSetsNames {\n';
+    output += 'declare interface IFontIconSetsNames {\n';
     const allIconNames = Object.keys(iconSets);
     allIconNames.forEach(setName => {
         //output += `  ${iconSetName}: IconNames<typeof ${setName}[number]>;\n`;
@@ -106,7 +107,7 @@ export function generateTypeDefinitions() {
     output += '}\n\n';
 
     // Generate the IconSets interface
-    output += 'export interface IFontIconSetsPrefixes {\n';
+    output += 'declare interface IFontIconSetsPrefixes {\n';
     Object.keys(iconSetNames).forEach(setName => {
         output += `  ${setName}: '${iconSetNames[setName]}';\n`;
     });
@@ -134,12 +135,12 @@ export function generateTypeDefinitions() {
      * const nameOcticons: IFontIconName = "octicons-home"; // From Octicons
      * const nameMaterialIcons: IFontIconName = "material-home"; // From MaterialIcons
      */
-    export type IFontIconName = ${allIconNames.map(name => `IFontIcon${name}`).join(' | ')}\n\n`;
+    declare type IFontIconName = ${allIconNames.map(name => `IFontIcon${name}`).join(' | ')}\n\n`;
     return output;
 }
 // Generate the types
 const typeDefinitions = generateTypeDefinitions();
 
 // Write to a file
-const outputPath = join(__dirname, 'src', 'components', 'ICon', 'icon-types.ts');
+const outputPath = join(__dirname,"types","icon.font.d.ts")//join(__dirname, 'src', 'components', 'ICon', 'icon-types.d.ts');
 writeFileSync(outputPath, typeDefinitions, 'utf8');

@@ -1049,7 +1049,7 @@ export interface IFormGetDataOptions {
  *     disabled: false,
  * };
  */
-export interface IFormProps extends Omit<IViewProps, "children"> {
+export interface IFormProps extends Omit<IViewProps, "children" | "ref"> {
     /**
      * The initial data for the form.
      * 

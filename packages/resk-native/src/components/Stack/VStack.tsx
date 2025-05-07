@@ -1,4 +1,4 @@
-import View, { IViewProps } from "@components/View";
+import {View,IViewProps } from "@components/View";
 import { StyleSheet, View as RNView } from "react-native";
 
 /**
@@ -23,7 +23,7 @@ import { StyleSheet, View as RNView } from "react-native";
  * ```
  */
 function VStack({ style, ...props }: IVStackProps){
-    return <View ref={ref} style={[styles.container, style]} {...props} />
+    return <View style={[styles.container, style]} {...props} />
 };
 
 /**

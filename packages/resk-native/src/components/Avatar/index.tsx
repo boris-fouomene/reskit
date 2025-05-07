@@ -13,8 +13,7 @@ import {
 import { isReactComponent } from '@utils/isComponent';
 import { getTouchableProps } from '@utils/hasTouchHandler';
 import { getIcon, IIconProps, IIconSource } from '@components/Icon';
-import Label, { ILabelProps } from '@components/Label';
-import { IViewProps } from '@components/View';
+import {Label, ILabelProps } from '@components/Label';
 import { IThemeColorsTokenName } from '@theme/types';
 import { JSX } from 'react/jsx-runtime';
 import { Colors, useTheme } from '@theme/index';

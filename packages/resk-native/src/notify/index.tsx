@@ -1,6 +1,6 @@
 import {PureComponent, Ref} from "react";
 import { ReactNode } from "react";
-import View, { IViewProps } from "@components/View";
+import {View, IViewProps } from "@components/View";
 import { Portal } from "@components/Portal";
 import Theme, { Colors } from "@theme";
 import Platform from "@platform/index";

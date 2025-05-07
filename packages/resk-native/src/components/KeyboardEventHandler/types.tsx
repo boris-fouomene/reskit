@@ -9,7 +9,7 @@ import { ReactNode } from "react";
  * 
  * @template T - The type of the keyboard event data.
  */
-export interface IKeyboardEventHandlerProps<T = TextInputKeyPressEventData> extends Omit<IViewProps, 'children'> {
+export interface IKeyboardEventHandlerProps<T = TextInputKeyPressEventData> extends Omit<IViewProps, 'children' | "ref"> {
     /** 
      * An array of keys to handle for keyboard events.
      */

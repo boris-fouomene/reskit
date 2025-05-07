@@ -556,7 +556,7 @@ export interface IDrawerContext {
  * Extends the properties of IViewProps.
  * @see {@link IViewProps} for more details.
  */
-export interface IDrawerProps extends IViewProps {
+export interface IDrawerProps extends Omit<IViewProps,"ref">{
     /**
      * Determines if the drawer can be minimized.
      * @default false

@@ -10,7 +10,7 @@ import Breakpoints from "@breakpoints/index";
 import {Label} from "@components/Label";
 import { ITextInputProps } from "@components/TextInput/types";
 import Theme from "@theme/index";
-import KeyboardEventHandler, { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler";
+import  KeyboardEventHandler, {IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler";
 import { HelperText } from "@components/HelperText";
 import { dimentionAddListener } from "@dimensions/index";
 import TextInput from "@components/TextInput";

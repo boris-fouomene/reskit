@@ -1,7 +1,7 @@
-import View, { IViewProps } from '@components/View';
+import {View, IViewProps } from '@components/View';
 import { IObservable, observable, uniqid } from '@resk/core';
 import { createContext, useRef, useContext, ReactNode, useEffect, useMemo, FC, useReducer } from 'react';
-import { Pressable, StyleSheet, ViewProps } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { getMaxZindex, Platform } from '@resk/core';
 import { ITouchableProps } from '@src/types';
 import { getTouchableProps } from '@utils/hasTouchHandler';

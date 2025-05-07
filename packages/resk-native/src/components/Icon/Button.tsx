@@ -2,7 +2,6 @@ import * as React from 'react';
 import {
     StyleSheet,
     ViewStyle,
-    View,
     ActivityIndicator,
 } from 'react-native';
 import { Surface } from '@components/Surface';

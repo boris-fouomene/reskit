@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { StyleSheet, View as RNView } from 'react-native';
 import { useTheme } from '@theme';
-import View, { IViewProps } from '@components/View';
+import {View,IViewProps } from '@components/View';
 
 /**
  * The `Divider` component renders a horizontal separation line on the page.

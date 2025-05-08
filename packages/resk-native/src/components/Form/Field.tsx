@@ -2,15 +2,15 @@ import "./types";
 import { getTextContent, ObservableComponent } from "@utils/index";
 import { defaultStr, extendObj, areEquals, IFieldType, IField, isEmpty, isNonNullString, isObj, IValidatorRule, stringify, Validator, Logger, InputFormatter } from "@resk/core";
 import { IForm, IFormData, IFormEvent, IFormField, IFormFieldOnChangeOptions, IFormFieldState, IFormFieldValidatorOptions } from "./types";
-import { createRef, ReactNode,isValidElement } from "react";
+import { createRef, ReactNode, isValidElement } from "react";
 import { Dimensions, View as RNView, TextInput as RNTextInput, NativeSyntheticEvent, TextInputFocusEventData, StyleSheet } from "react-native";
 import { FormsManager } from "./FormsManager";
 import { IDimensions } from "@dimensions/types";
 import Breakpoints from "@breakpoints/index";
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 import { ITextInputProps } from "@components/TextInput/types";
 import Theme from "@theme/index";
-import  KeyboardEventHandler, {IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler";
+import KeyboardEventHandler, { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler";
 import { HelperText } from "@components/HelperText";
 import { dimentionAddListener } from "@dimensions/index";
 import TextInput from "@components/TextInput";
@@ -665,6 +665,17 @@ export class Field<Type extends IFieldType = IFieldType> extends ObservableCompo
      */
     isFilter(): boolean {
         return !!this.componentProps?.isFilter || !!this.props?.isFilter;
+    }
+    /**
+     * Checks if the field is a filter group item.
+     * 
+     * @returns {boolean} - Returns true if the field is a filter group item, otherwise false.
+     * 
+     * @example
+     * const isFilterGroupItem = this.isFilterGroupItem(); // Checks if the field is a filter group item
+     */
+    isFilterGroupItem(): boolean {
+        return this.componentProps?.isFilterGroupItem || !!this.props?.isFilterGroupItem;
     }
     /**
      * Checks if the field is editable.

@@ -20,7 +20,7 @@ import { Fragment, useCallback, useContext, useMemo, useRef, createContext } fro
 import useStateCallback from "@utils/stateCallback";
 import { Auth, IAuthSessionStorage } from "@resk/core";
 import FontIcon from "@components/Icon/Font";
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 import { Button } from "@components/Button";
 
 
@@ -297,7 +297,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
         }
         (operator as any) = operator || "$and";
         if (areEquals(actions, Filter.ARRAY_ACTIONS) || type.includes("select")) {
-            defaultValue = isNonNullString(defaultValue) ? defaultValue.split(",") : Array.isArray(defaultValue) ? defaultValue : !isEmpty(defaultValue) ? [defaultValue] : undefined;
+            (defaultValue as any) = isNonNullString(defaultValue) ? defaultValue.split(",") : Array.isArray(defaultValue) ? defaultValue : !isEmpty(defaultValue) ? [defaultValue] : undefined;
         }
         let selectorFields: IFields = {};
         let hasSelectorFields = false;
@@ -312,7 +312,7 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
         if (!isNumberType) {
             delete actions.$mod;
         }
-        return { actions, isNumber: isNumberType, selectorFields, hasSelectorFields, selectorActiveFieldName, action: action as IFilterAction, type, ignoreCase: ignoreCase as boolean, canIgnoreCase: isTextFilter && String(type).toLowerCase().includes("text"), operator: operator as IFilterOperator, operators, defaultValue, isFilter, isTextFilter };
+        return { actions, isNumber: isNumberType, selectorFields, hasSelectorFields, selectorActiveFieldName, action: action as IFilterAction, type, ignoreCase: ignoreCase as boolean, canIgnoreCase: isTextFilter && String(type).toLowerCase().includes("text"), operator: operator as IFilterOperator, operators, defaultValue, isFilter: true, isTextFilter };
     }
     componentDidUpdate(prevProps: Readonly<IFilterProps<DataType, FieldType>>, nextContext: any): void {
         if (areEquals(this.getStateProps(this.props as any), this.getStateProps(prevProps as any)) && this.compareValues(this.props.defaultValue, prevProps.defaultValue)) {
@@ -665,13 +665,10 @@ export class Filter<DataType extends object = any, FieldType extends IFieldType 
         const anchorProps = Object.assign({}, (this.props as any).anchorProps);
         const titleLabelProps = this.getTitleLabelProps();
         const label = getTextContent(customLabel);
-        const restProps = isTextFilter
-            ? {
-                debounceTimeout: 1000,
-                mode: "flat",
-                placeholder: "Search...",
-            }
-            : { textFieldMode: "flat", mode: "flat" };
+        const restProps = {
+            debounceTimeout: 1000,
+            placeholder: this.translate("search"),
+        };
         const isBetweenAction = this.isBetweenAction(), isModuloAction = this.isModuloAction();
         return (
             <View style={[styles.container]} testID={testID + "-filter-container"}>
@@ -1419,7 +1416,7 @@ function FilterGroupItem<DataType extends object = any>({ name, filterKey, value
         return (sessionData as any)[key];
     }, [sessionData, value]);
     if (!col) return null;
-    return <View testID={testID + "-filter-container-" + { name } + "-index"} style={styles.filterGroupItemContainer}>
+    return <View testID={testID + "-group-item-container-" + { name } + "-index"} style={styles.filterGroupItemContainer}>
         <Filter
             removable={true}
             defaultValue={defaultValue}
@@ -1440,7 +1437,10 @@ function FilterGroupItem<DataType extends object = any>({ name, filterKey, value
             }}
             onFilterRemove={() => {
                 removeFilter(key);
-            }} {...col} {...rest}
+            }}
+            {...col}
+            {...rest}
+            isFilterGroupItem
             key={key} />
     </View>
 }

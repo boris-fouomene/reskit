@@ -1,7 +1,7 @@
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 import { isValidElement, useMergeRefs } from "@utils";
 import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, View } from 'react-native';
-import { ReactNode, useEffect, useMemo, useRef,useState} from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { InputFormatter, isNumber, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, IInputFormatterResult } from "@resk/core";
 import Theme, { useTheme } from "@theme";
 import FontIcon from "@components/Icon/Font";
@@ -78,7 +78,7 @@ import defaultVal from '../../../../../../frontend-dash/src/utils/defaultVal';
  * The `TextInput` component is designed to be versatile and reusable across various parts of an application, ensuring a consistent and engaging user experience. 
  * It can be easily integrated with other components and libraries, making it a valuable addition to any React Native project.
  */
-function TextInput({ render, withKeyboardAvoidingView,ref, ...props }: ITextInputProps) {
+function TextInput({ render, withKeyboardAvoidingView, ref, ...props }: ITextInputProps) {
     const { variant, containerProps, onPress, focus, onPressIn, onPressOut, editable, canRenderLabel, isFocused, leftContainerProps: cLeftContainerProps, contentContainerProps, left, inputRef, right, label, ...rest } = useTextInput(props);
     const leftContainerProps = Object.assign({}, cLeftContainerProps);
     const isLabelEmbededVariant = variant === "labelEmbeded";
@@ -264,7 +264,7 @@ const iconSize = 25;
  * );
  * 
  */
-export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, applyErrorColorOnLabel, style: customStyle, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix = false, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange,ref, ...props }: ITextInputProps): IUseTextInputProps => {
+export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, applyErrorColorOnLabel, style: customStyle, mask: customMask, handleMaskValidationErrors, phoneCountryCode: customPhoneCountryCode, suffixLabelWithMaskPlaceholder, maskOptions: customMaskOptions, maxHeight: customMaxHeight, withBackground, onContentSizeChange, minHeight: customMinHeight, compact, opacity, isDropdownAnchor, secureTextEntryGetToggleIconProps, testID, value: omittedValue, withLabel, left: customLeft, variant = "default", error: customError, label: customLabel, labelProps, containerProps, right: customRight, contentContainerProps, debounceTimeout, rightContainerProps, emptyValue: cIsEmptyValue, maxLength, length, calendarProps: customDateProps, affix = false, type, readOnly, secureTextEntry, toCase: cToCase, inputMode: cInputMode, onChange, ref, ...props }: ITextInputProps): IUseTextInputProps => {
     const [isFocused, setIsFocused] = useState(false);
     const style = StyleSheet.flatten([customStyle])
     const fontSize = isNumber(style.fontSize) && style.fontSize > 0 ? style.fontSize : 16;
@@ -520,7 +520,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
             disabled={!editable}
             menuProps={{ bottomSheetTitle: label }}
             defaultValue={inputState.phoneCountryCode}
-            onChange={!editable ? undefined : ({ value } : any) => {
+            onChange={!editable ? undefined : ({ value }: any) => {
                 if (isNonNullString(value) && value !== inputState.phoneCountryCode && String(value).toLowerCase() !== "undefined") {
                     setInputState({
                         ...inputState,
@@ -598,7 +598,7 @@ export const useTextInput = ({ defaultValue, dateFormat: customDateFormat, apply
                 setInputState(options);
                 if (typeof onChange == "function" && isValid) {
                     clearTimeout(debounceTimeoutRef.current as any);
-                    debounceTimeoutRef.current = setTimeout(() => {
+                    (debounceTimeoutRef as any).current = setTimeout(() => {
                         onChange(options);
                     }, isNumber(debounceTimeout) && debounceTimeout > 0 ? debounceTimeout : 0);
                 }

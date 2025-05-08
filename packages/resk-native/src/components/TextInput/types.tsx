@@ -5,9 +5,9 @@ import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextI
 import React, { ReactNode } from "react";
 import { ILabelProps } from "@components/Label";
 import { IFontIconProps } from "@components/Icon/types";
-import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult} from "@resk/core/types";
-import {IFieldBase} from "@resk/core/types";
-import {ICountryCode} from "@resk/core/countries";
+import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult } from "@resk/core/types";
+import { IFieldBase } from "@resk/core/types";
+import { ICountryCode } from "@resk/core/countries";
 import { ICalendarModalDayViewProps } from '../Date/types';
 import { IKeyboardAvoidingViewProps } from "@components/KeyboardAvoidingView";
 /**
@@ -117,12 +117,12 @@ export interface ITextInputCallbackOptions extends IInputFormatterResult {
     /**
      * Indicates if the component is isFocused.
      */
-    isFocused?: boolean;
-    editable?: boolean;
-    disabled?: boolean;
+    isFocused: boolean;
+    editable: boolean;
+    disabled: boolean;
     /** if label is embedded in the text input */
-    variant?: ITextInputProps["variant"];
-    error?: boolean;
+    variant: ITextInputProps["variant"];
+    error: boolean;
 };
 
 
@@ -264,7 +264,7 @@ export interface ITextInputOnChangeOptions extends Omit<IOnChangeOptions<ITextIn
  * input components that enhance user interaction and maintainability 
  * in React Native applications.
  */
-export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange' | 'defaultValue' | "ref">, ILabelOrLeftOrRightProps<ITextInputCallbackOptions>, Omit<IFieldBase, "type" | "value"> {
+export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange' | 'defaultValue' | "label" | "ref">, ILabelOrLeftOrRightProps<ITextInputCallbackOptions>, Omit<IFieldBase, "type" | "value" | "label"> {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 
@@ -493,9 +493,9 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
         */
         iconProps?: IFontIconProps;
     };
-    
-    
-    ref?:React.Ref<TextInput>;
+
+
+    ref?: React.Ref<TextInput>;
 };
 
 /**

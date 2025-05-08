@@ -19,7 +19,7 @@ import { useI18n } from '@src/i18n';
 import usePrevious from '@utils/usePrevious';
 import { usePrepareBottomSheet } from '@components/BottomSheet/utils';
 import { KeyboardAvoidingView } from '@components/KeyboardAvoidingView';
-import {Label} from '@components/Label';
+import { Label } from '@components/Label';
 import { Divider } from '@components/Divider';
 import { defaultNumber, isNumber } from "@resk/core/utils";
 
@@ -532,7 +532,7 @@ const Menu = function Menu({
                 return a;
             }
         }
-        return isValidElement(customAnchor) ? customAnchor : null;
+        return isValidElement(customAnchor) ? <View testID={testID + "-anchor-content-container"}>{customAnchor}</View> : null;
     }, [customAnchor, isVisible, fullScreen, context]);
     const child = useMemo(() => {
         if (typeof children == 'function') {

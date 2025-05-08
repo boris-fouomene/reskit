@@ -2,6 +2,7 @@ import { IFormFieldValidatorOptions } from "@components/Form/types";
 import { IMenuItemProps } from "@components/Menu/types";
 import { IAuthSessionStorage } from "@resk/core";
 import { IField, IFieldType, IMongoLogicalOperatorName, IMongoOperatorName, IMongoQuery } from "@resk/core/types";
+import { ReactNode } from "react";
 import { ScrollViewProps, ViewProps } from "react-native";
 
 export interface IFilterState extends IFilterProcessedProps {
@@ -180,7 +181,7 @@ export type IFilterColumnName<DataType extends object = any> = (keyof DataType &
  * @property {string} [selectorActiveFieldName] - The name of the active field in merged selectors.
  * @property {IMenuItemProps[]} [customMenuActions] - Custom menu actions for the filter.
  */
-export type IFilterProps<DataType extends object = any, FieldType extends IFieldType = IFieldType> = Omit<IField<FieldType>, "type" | "name" | "onChange"> & {
+export type IFilterProps<DataType extends object = any, FieldType extends IFieldType = IFieldType> = Omit<IField<FieldType>, "type" | "name" | "onChange" | "label"> & {
 
     /**
      * The name of the column.
@@ -236,6 +237,8 @@ export type IFilterProps<DataType extends object = any, FieldType extends IField
      * @returns {void}
      */
     onFilterRemove?: () => void;
+
+    label?: ReactNode;
 };
 
 

@@ -4,5 +4,13 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ESNext",
-  }
+    "paths": {
+      "@resk/native/*": [
+        "../../packages/resk-native/*"
+      ],
+      "@resk/native": [
+        "../../packages/resk-native"
+      ],
+    }
+  },
 }

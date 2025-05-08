@@ -78,7 +78,7 @@ types/**/node_modules/
 types/**/dist/
 types/**/build/
 /dist/
-
+**/tsconfig.tsbuildinfo
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 

@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@resk/core": "^1.19.0",
-    "@resk/native-icon-types": "^1.0.2",
+    "@resk/native-icon-types": "^1.0.4",
     "color": "^5.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

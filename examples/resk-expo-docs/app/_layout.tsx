@@ -13,7 +13,6 @@ export default function RootLayout() {
         SplashScreen.hideAsync();
     }, [])
     return (<ReskNativeProvider
-        drawerNavigationViewProps={{}}
         auth={{}}
     >
         <Slot />

@@ -101,15 +101,6 @@
       "@src/*": [
         "src/*"
       ],
-      "react-native": [
-        "../../examples/resk-expo-docs/node_modules/react-native"
-      ],
-      "react-native-svg": [
-        "../../examples/resk-expo-docs/node_modules/react-native-svg"
-      ],
-      "expo-sqlite/*": [
-        "../../examples/resk-expo-docs/node_modules/expo-sqlite/*"
-      ]
     },
   },
   "references": [

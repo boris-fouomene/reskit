@@ -26,7 +26,7 @@ export * from "./types";
  * passed to the underlying `KeyboardAvoidingView`, allowing for further 
  * customization of its behavior and styling.
  * 
- * @returns {JSX.Element} A `KeyboardAvoidingView` component that adjusts 
+ * @returns {ReactElement} A `KeyboardAvoidingView` component that adjusts 
  * its position based on the keyboard's visibility.
  * 
  * @example
@@ -59,7 +59,7 @@ export * from "./types";
  * on Android, it uses 'height'. The `keyboardVerticalOffset` is set 
  * to 80 for iOS to account for any navigation bars or headers.
  */
-function KeyboardAvoidingView ({ children, isPreloader, ...rest }: IKeyboardAvoidingViewProps){
+function KeyboardAvoidingView({ children, isPreloader, ...rest }: IKeyboardAvoidingViewProps) {
   return (
     <RNKeyboardAvoidingView
       behavior={Platform.isIos() ? 'padding' : 'height'}

@@ -1,6 +1,6 @@
 import { ILabelProps } from "@components/Label/types";
 import { ISurfaceProps } from "@components/Surface/types";
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import { IThemeColorsTokenName } from "@theme/types";
 import { GestureResponderEvent, ViewProps } from "react-native";
 import { IIconButtonProps } from "@components/Icon/types";
@@ -145,7 +145,7 @@ export type IAppBarProps<IAppBarActionContext = any> = ISurfaceProps & {
     elevation?: number;
 
     /** If backAction is a string, it is the name of the FontIcon to render for the back action. */
-    backAction?: JSX.Element| null | false | ((props: IBackActionProps) => ReactNode);
+    backAction?: ReactElement | null | false | ((props: IBackActionProps) => ReactNode);
     /** Properties for the BackAction component when rendered. */
     backActionProps?: IBackActionProps;
     /** The context to pass to each action, used to extend the context for the actions. */

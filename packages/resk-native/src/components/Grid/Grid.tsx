@@ -22,7 +22,7 @@ import { useDimensions } from '@dimensions/index';
  * 
  * @property {ViewStyle} [style] - Additional styles to apply to the grid container.
  * 
- * @returns {JSX.Element} - A `View` component styled as a responsive grid container.
+ * @returns {ReactElement} - A `View` component styled as a responsive grid container.
  * 
  * @example
  * ```tsx
@@ -45,7 +45,7 @@ import { useDimensions } from '@dimensions/index';
  * @see {@link IGridProps} for the interface defining the grid properties.
  * @see {@link useDimensions} for the hook used to handle responsive behavior.
  */
-function Grid ({ flexWrap = false, testID, style, ...props } : IGridProps){
+function Grid({ flexWrap = false, testID, style, ...props }: IGridProps) {
     testID = defaultStr(testID, "resk-grid");
     return <View
         {...props}

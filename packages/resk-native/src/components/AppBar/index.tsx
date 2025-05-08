@@ -5,21 +5,21 @@ import {
   Platform,
   GestureResponderEvent,
 } from 'react-native';
-import {Label} from '@components/Label';
+import { Label } from '@components/Label';
 import { Surface } from '@components/Surface';
 import { Colors, IThemeColorsTokenName, useTheme } from '@theme/index';
 import { IAppBarProps } from './types';
 import { getLabelOrLeftOrRightProps } from '@hooks/label2left2right';
 import { useDimensions } from '@dimensions/index';
 import { splitAppBarActions } from './utils';
-import Action from './Action';
 import isValidElement from '@utils/isValidElement';
 import { Menu } from '@components/Menu';
 import FontIcon from '@components/Icon/Font';
 import IconButton from '@components/Icon/Button';
 import ExpandableAppBarAction from './ExpandableAction';
-import AppBarAction from './Action';
+import { AppBarAction } from './Action';
 import { BackAction } from "./BackAction";
+import { ReactNode } from 'react';
 
 
 /**
@@ -39,7 +39,7 @@ import { BackAction } from "./BackAction";
  * 
  * underlying View component, allowing parent components to access it.
  * 
- * @returns {JSX.Element} The rendered AppBar component, which includes 
+ * @returns {ReactElement} The rendered AppBar component, which includes 
  * title, subtitle, actions, and other customizable elements.
  * 
  * @example
@@ -95,7 +95,7 @@ function AppBar<AppBarActionContext = any>({
     if (onPress) onPress(e);
     if (onBackActionPress) onBackActionPress(e);
   }
-  const backAction = typeof customBackAction == "function" ? customBackAction(backActionProps) : customBackAction;
+  const backAction: ReactNode | false = typeof customBackAction == "function" ? customBackAction(backActionProps) : customBackAction;
   const appBarContext = Object.assign({}, context, { backgroundColor, isAppBar: true, textColor: color });
   const { actions, menuItems } = splitAppBarActions<AppBarActionContext>({
     ...appBarProps,
@@ -108,7 +108,7 @@ function AppBar<AppBarActionContext = any>({
     context: appBarContext,
     renderAction: function (props, index) {
       if (typeof renderAction === 'function') return renderAction(props, index);
-      return <Action {...props} key={index} />;
+      return <AppBarAction {...props} key={index} />;
     },
     renderExpandableAction: function (props, index) {
       if (typeof renderExpandableAction === 'function') return renderExpandableAction(props, index);
@@ -138,8 +138,9 @@ function AppBar<AppBarActionContext = any>({
           style,
         ]}
       >
-        {backAction != false ? isValidElement(backAction) ? backAction : <BackAction testID={`${testID}-back-action`} color={color} {...backActionProps} /> : null}
-        {isValidElement(leftContent) ? leftContent : null}
+        {(backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
+          <BackAction testID={`${testID}-back-action`} color={color} {...backActionProps} /> : null}
+        {isValidElement(leftContent) ? leftContent as any : null}
         <View testID={`${testID}-content`} {...contentProps} style={[styles.content, contentProps?.style]}>
           <Label
             numberOfLines={1}
@@ -168,7 +169,7 @@ function AppBar<AppBarActionContext = any>({
           ) : null}
         </View>
         {isValidElement(children) ? children : null}
-        {actions}
+        {actions as any}
         {menuItems.length ? <Menu
           preferedPositionAxis='vertical'
           testID={`${testID}-menu`}

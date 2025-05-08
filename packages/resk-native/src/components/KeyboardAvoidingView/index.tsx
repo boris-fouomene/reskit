@@ -1,4 +1,4 @@
-import {View} from "@components/View";
+import { View } from "@components/View";
 import { isNonNullString } from "@resk/core";
 import { IKeyboardAvoidingViewProps } from "./types";
 import { View as RNView, StyleSheet } from "react-native";
@@ -29,7 +29,7 @@ export * from "./types";
  * customization of its behavior and styling.
  * 
  * 
- * @returns {JSX.Element} A `KeyboardAvoidingView` component that adjusts 
+ * @returns {ReactElement} A `KeyboardAvoidingView` component that adjusts 
  * its position based on the keyboard's visibility.
  * 
  * @example
@@ -62,8 +62,8 @@ export * from "./types";
  * on Android, it uses 'height'. The `keyboardVerticalOffset` is set 
  * to 80 for iOS to account for any navigation bars or headers.
  */
-export function KeyboardAvoidingView({ children, testID, ...props } : IKeyboardAvoidingViewProps){
+export function KeyboardAvoidingView({ children, testID, ...props }: IKeyboardAvoidingViewProps) {
   testID = defaultStr(testID, 'resk-keyboard-avoiding-view');
-  return <View  {...props}  children={children} testID={testID} />;
+  return <View  {...props} children={children} testID={testID} />;
 }
 KeyboardAvoidingView.displayName = "KeyboardAvoidingView";

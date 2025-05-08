@@ -20,7 +20,7 @@ import { useCanRender } from './utils';
  * @param {object} [props.context] - Optional context object to extend the dialog's context.
  * @param {object} [props.style] - Additional styles for the AppBar component.
  * 
- * @returns {JSX.Element | null} Returns the AppBar component with the specified actions, or null if
+ * @returns {ReactElement | null} Returns the AppBar component with the specified actions, or null if
  * the actions cannot be rendered or if the dialog is in full-screen mode.
  * 
  * @example

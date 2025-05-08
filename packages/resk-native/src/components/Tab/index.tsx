@@ -1,6 +1,6 @@
 import { FC, Fragment, ReactElement, ReactNode, useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
-import {View} from "@components/View";
+import { View } from "@components/View";
 import TabItems from "./TabItems";
 import TabItem from "./TabItem";
 import TabContent from "./TabContent";
@@ -91,7 +91,7 @@ const getSessionActiveIndex = (props: ITabProps) => {
  * @param {object} [props.tabItemsProps] - Additional properties to pass to the TabItems component.
  * @param {boolean} [props.disabled] - Indicates whether the tab component is disabled.
  * 
- * @returns {JSX.Element} Returns a JSX element representing the Tab component with tab items and content.
+ * @returns {ReactElement} Returns a JSX element representing the Tab component with tab items and content.
  * 
  * @example
  * // Example usage of the Tab component
@@ -149,7 +149,7 @@ const Tab = (props: ITabProps) => {
     }, [children, activeIndex]);
     testID = defaultStr(testID, "resk-tab");
     const { tabs, contents } = useMemo(() => {
-        const tabs: ReactNode[] = [], contents:ReactNode[] = [];
+        const tabs: ReactNode[] = [], contents: ReactNode[] = [];
         (Array.isArray(children) ? children : [children]).map((child, index) => {
             if (!isObj(child)) return null;
             const _child: ReactElement = child as ReactElement;
@@ -206,7 +206,7 @@ export { Tab }
  *   <TItem title="Home" icon="home-icon" />
  * );
  * 
- * @returns {JSX.Element | null} Returns a JSX element representing the tab item, or null if not rendered.
+ * @returns {ReactElement | null} Returns a JSX element representing the tab item, or null if not rendered.
  * 
  * @remarks
  * This component currently returns null. To make it functional, implement the rendering logic

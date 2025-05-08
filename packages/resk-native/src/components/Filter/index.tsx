@@ -121,7 +121,7 @@ import { Button } from "@components/Button";
  * @returns {object} - The props for the title label.
  *
  * @method render - Renders the filter component.
- * @returns {JSX.Element | null} - The rendered component.
+ * @returns {ReactElement | null} - The rendered component.
  *
  * @method getComponentProps - Gets the component props, including default values and overrides.
  * @param {IFilterProps<DataType, FieldType>} [props] - The component props.
@@ -208,7 +208,7 @@ import { Button } from "@components/Button";
  * @method Group - Renders a filter group with a list of filters.
  * @template DataType - The type of data being filtered.
  * @param {IFilterGroupProps<DataType>} props - The filter group props.
- * @returns {JSX.Element} - The rendered filter group.
+ * @returns {ReactElement} - The rendered filter group.
  */
 export class Filter<DataType extends object = any, FieldType extends IFieldType = IFieldType> extends Component<IFilterProps<DataType, FieldType>, IFilterState> {
     readonly formName: string = uniqid("filter-form-named");

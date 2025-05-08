@@ -1,7 +1,7 @@
 import { TouchableOpacity, StyleSheet, GestureResponderEvent } from "react-native";
 import { ICheckboxProps } from "./types";
 import { Tooltip } from "@components/Tooltip";
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 import { useToggleable } from "@components/Switch/utils";
 import FontIcon from "@components/Icon/Font";
 import { isNonNullString } from "@resk/core/utils";
@@ -28,7 +28,7 @@ export * from "./types";
  * @param {boolean} [props.readOnly] - Flag to indicate if the checkbox is read-only.
  * @param {object} [rest] - Additional props passed to the RNCheckbox component.
  *
- * @returns {JSX.Element} - Returns a JSX element representing the Checkbox component.
+ * @returns {ReactElement} - Returns a JSX element representing the Checkbox component.
  *
  * @example
  * // Usage example of the Checkbox component

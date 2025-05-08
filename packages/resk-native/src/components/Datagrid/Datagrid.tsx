@@ -1,4 +1,4 @@
-import React, { createContext, createRef, isValidElement, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, createRef, isValidElement, ReactElement, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
     View,
     StyleSheet,
@@ -17,15 +17,14 @@ import { areEquals, defaultBool, defaultStr, isEmpty, isNonNullString, isNumber,
 import Auth from "@resk/core/auth";
 import { IField, IFieldType, IResourcePaginationMetaData, IResourceQueryOptionsOrderByDirection } from '@resk/core/types';
 import Logger from "@resk/core/logger";
-import {Label,ILabelProps } from '@components/Label';
+import { Label, ILabelProps } from '@components/Label';
 import InputFormatter from '@resk/core/inputFormatter';
 import { ResourcePaginationHelper } from '@resk/core/resources';
 import { IReactComponent, IViewStyle } from '@src/types';
 import { Preloader } from '@components/Dialog';
 import { AppBar, IAppBarAction, IAppBarProps } from '@components/AppBar';
 import { Divider } from '@components/Divider';
-import { FontIcon,IIconSource, Icon } from '@components/Icon';
-import {IFontIconName} from "@resk/native-icon-types";
+import { FontIcon, IIconSource, Icon } from '@components/Icon';
 import Theme, { Colors, useTheme } from "@theme";
 import { useDimensions } from '@dimensions/index';
 import i18n from '@resk/core/i18n';
@@ -38,6 +37,7 @@ import { Form } from '@components/Form';
 import { HStack } from '@components/Stack';
 import { IFilterColumnName, IFilterGroupProps, IFilterProps } from '@components/Filter/types';
 import { Filter } from '@components/Filter';
+import { IFontIconName } from '@resk/native-icon-types';
 
 /**
  * A flexible and feature-rich data grid component for React Native.
@@ -240,7 +240,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @returns {Promise<{ x: number, y: number, width: number, height: number, pageX: number, pageY: number }>} A promise that resolves with the layout coordinates of the view.
      * @private
      */
-    protected measureViewLayout(ref: React.RefObject<View|null|undefined>): Promise<IDatagridViewMeasuredLayout> {
+    protected measureViewLayout(ref: React.RefObject<View | null | undefined>): Promise<IDatagridViewMeasuredLayout> {
         return new Promise((resolve, reject) => {
             if (typeof ref.current?.measure === "function") {
                 return ref.current.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
@@ -372,7 +372,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * This method renders the table header, which consists of all visible columns.
      * Each column is rendered as a header cell by calling `renderTableColumnHeader` with the column name.
      * 
-     * @returns {JSX.Element} The rendered table header.
+     * @returns {ReactElement} The rendered table header.
      */
     renderTableHeader() {
         const visibleColumns = this.getVisibleColumns();
@@ -425,7 +425,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * @param columnIndex - The index of the column in the grid.
      * @returns The rendered column header component, or null if the column does not exist.
      */
-    renderTableColumnHeader(columnName: IDatagridViewColumnName<DataType>, columnIndex: number): JSX.Element | null {
+    renderTableColumnHeader(columnName: IDatagridViewColumnName<DataType>, columnIndex: number): ReactElement | null {
         const column = this.getColumn(columnName);
         if (!column) return null;
         return <React.Fragment key={`column-header-${columnName}`}>
@@ -441,11 +441,11 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @param {string} columnName - The name of the column to render children for.
      * @param {number} columnIndex - The index of the column in the grid.
-     * @returns {JSX.Element | null} - The rendered additional children for the column header, or null if no additional children are needed.
+     * @returns {ReactElement | null} - The rendered additional children for the column header, or null if no additional children are needed.
      */
     /*******  2e8e8306-8b4d-42fe-812e-3ef78c15112f  *******/
 
-    renderTableColumnHeaderChildren(columnName: IDatagridViewColumnName<DataType>, columnIndex: number): JSX.Element | null {
+    renderTableColumnHeaderChildren(columnName: IDatagridViewColumnName<DataType>, columnIndex: number): ReactElement | null {
         return null;
     }
     /**
@@ -467,7 +467,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * This method maps over the data in the current state and renders each row using `renderTableRow`.
      * It returns a collection of rendered rows, which are displayed as the table body.
      * 
-     * @returns {JSX.Element[]} The rendered table body containing all the rows.
+     * @returns {ReactElement[]} The rendered table body containing all the rows.
      */
     renderTableBody() {
         const { data } = this.state;
@@ -483,7 +483,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * @returns The rendered table footer, or null if no footer should be displayed.
      */
-    renderTableFooter(): JSX.Element | null {
+    renderTableFooter(): ReactElement | null {
         return null;
     }
 
@@ -545,7 +545,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * If the row data is a grouped row, it delegates rendering to `renderTableGroupedRow`. Otherwise, it renders a regular `DatagridCell`.
      */
 
-    renderTableCell(columnName: IDatagridViewColumnName<DataType>, rowData: DataType, rowIndex: number): JSX.Element | null {
+    renderTableCell(columnName: IDatagridViewColumnName<DataType>, rowData: DataType, rowIndex: number): ReactElement | null {
         if (!isObj(rowData) || !this.getColumn(columnName)) return null;
         return this.renderTableCellOrColumnHeader(columnName, "rowCell", rowData);
     }
@@ -1574,10 +1574,10 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * When a menu item is pressed, the corresponding column's grouping state is 
      * toggled with a slight delay.
      *
-     * @returns {JSX.Element | null} The rendered menu or null if the datagrid 
+     * @returns {ReactElement | null} The rendered menu or null if the datagrid 
      * is not groupable or there are no groupable columns.
      */
-    renderGroupableColumnsMenu(): JSX.Element | null {
+    renderGroupableColumnsMenu(): ReactElement | null {
         if (!this.isGroupable()) {
             return null;
         }
@@ -1678,7 +1678,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * When a menu item is pressed, the corresponding aggregation function is toggled 
      * with a slight delay.
      *
-     * @returns {JSX.Element | null} The rendered menu or null if the datagrid 
+     * @returns {ReactElement | null} The rendered menu or null if the datagrid 
      * is not aggregatable or there are no aggregatable columns.
      */
     renderAggregationFunctionsMenu() {
@@ -1728,9 +1728,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * This method is intended to be overridden to provide custom actions that will appear
      * at the start of the toolbar. By default, it returns null, indicating no actions.
      *
-     * @returns {JSX.Element | (JSX.Element|null)[] | null } The rendered toolbar actions or null if no actions are provided.
+     * @returns {ReactElement | (ReactElement|null)[] | null } The rendered toolbar actions or null if no actions are provided.
      */
-    renderFirstToolbarActions(): JSX.Element | (JSX.Element | null)[] | null {
+    renderFirstToolbarActions(): ReactElement | (ReactElement | null)[] | null {
         return null;
     }
     /**
@@ -1739,9 +1739,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * This method is intended to be overridden to provide custom actions that will appear
      * at the end of the toolbar. By default, it returns null, indicating no actions.
      *
-     * @returns {JSX.Element | (JSX.Element|null)[] | null } The rendered toolbar actions or null if no actions are provided.
+     * @returns {ReactElement | (ReactElement|null)[] | null } The rendered toolbar actions or null if no actions are provided.
      */
-    renderLastToolbarActions(): JSX.Element | (JSX.Element | null)[] | null {
+    renderLastToolbarActions(): ReactElement | (ReactElement | null)[] | null {
         return null;
     }
     /**
@@ -1855,7 +1855,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      *  - A "next page" button.
      *  - A "last page" button.
      *
-     * @returns {JSX.Element | null} The rendered pagination controls or null if the `pagination` property is not an object or if the `total` property is not a number.
+     * @returns {ReactElement | null} The rendered pagination controls or null if the `pagination` property is not an object or if the `total` property is not a number.
      */
     renderPagination() {
         const { pagination } = this.state;
@@ -2042,7 +2042,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * Otherwise, it returns a `Menu` component containing the views without their component property. 
      * The menu is anchored by a label displaying a translated string for "viewsMenuItems".
      * 
-     * @returns {JSX.Element | null} A menu with the available views or null if no views are available.
+     * @returns {ReactElement | null} A menu with the available views or null if no views are available.
      */
     renderViewsMenu() {
         const views = this.getViews();
@@ -2099,7 +2099,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * The toolbar actions are wrapped in a scroll view, so they can be scrolled horizontally.
      * 
-     * @returns {JSX.Element} - The rendered toolbar.
+     * @returns {ReactElement} - The rendered toolbar.
      */
     renderToolbar() {
         if (!this.canShowToolbar()) return null;
@@ -2940,9 +2940,9 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * 
      * The method returns null if the filters should not be shown, otherwise it returns null.
      * 
-     * @returns {JSX.Element | null} The filters component or null.
+     * @returns {ReactElement | null} The filters component or null.
      */
-    renderFilters(): JSX.Element | null {
+    renderFilters(): ReactElement | null {
         if (!this.isFilterable()) return null;
         const canShowFilters = this.canShowFilters();
         return <Filter.Group<DataType>
@@ -2951,7 +2951,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
             style={[this.props.filterGroupProps?.style, !canShowFilters && Theme.styles.hidden]}
         />;
     }
-    render(): JSX.Element | null {
+    render(): ReactElement | null {
         const testID = this.getTestID();
         const isLoading = this.isLoading();
         const { containerStyle, contentContainerStyle } = this.props;
@@ -3268,7 +3268,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * `loadingIndicator` prop is a valid React element, it will be rendered
      * directly. Otherwise, the default loading indicator is rendered.
      *
-     * @returns {JSX.Element | null} The loading indicator component if it can be
+     * @returns {ReactElement | null} The loading indicator component if it can be
      * rendered, otherwise null.
      */
     renderLoadingIndicator() {
@@ -3300,7 +3300,7 @@ class DatagridView<DataType extends object = any, PropsExtensions = unknown, Sta
      * the number of selected rows, or an empty string if there are no selected
      * rows.
      *
-     * @returns {JSX.Element | null} The actions toolbar component if the
+     * @returns {ReactElement | null} The actions toolbar component if the
      * `showActions` prop is true, otherwise null.
      */
     static Actions() {
@@ -3793,7 +3793,7 @@ class DatagridViewColumn<DataType extends object = any, PropExtensions = unknown
             </View>
         </Pressable>
     }
-    renderHeaderChildren(): JSX.Element | null {
+    renderHeaderChildren(): ReactElement | null {
         return null;
     }
     /**
@@ -3894,7 +3894,7 @@ export function AttachDatagridView<DataType extends object = any, PropsExtension
  * @template DataType - The type of the data displayed in the grid.
  * 
  * @param {IDatagridProps<DataType, {}>} props - The properties for the Datagrid component, including view names and additional props.
- * @returns {JSX.Element} - The rendered component corresponding to the selected view.
+ * @returns {ReactElement} - The rendered component corresponding to the selected view.
  * 
  * @remarks
  * - Uses `useDimensions` to handle responsive design.
@@ -3967,7 +3967,7 @@ const Datagrid = function Datagrid<DataType extends object = any>({ viewName: cV
  * @param {IReactComponent<IDatagridViewLoadingIndicatorProps>} param.Component - The component to render as the 
  * loading indicator. It receives the `isLoading` prop to determine its display.
  * 
- * @returns {JSX.Element | null} The rendered loading indicator component, or null 
+ * @returns {ReactElement | null} The rendered loading indicator component, or null 
  * if the provided Component is not a function.
  */
 function LoadingIndicator({ Component }: { Component: IReactComponent<IDatagridViewLoadingIndicatorProps> }) {
@@ -4027,7 +4027,7 @@ SortIcon.displayName = "Datagrid.SortIcon";
  * @param {boolean} props.isLoading - The boolean indicating whether the
  * DatagridView is in a loading state.
  * 
- * @returns {JSX.Element | null} The rendered loading indicator component, or
+ * @returns {ReactElement | null} The rendered loading indicator component, or
  * null if the loading indicator is not to be rendered.
  */
 function ProgressBarLoadingIndicator({ isLoading, ...props }: IDatagridViewLoadingIndicatorProps & IProgressBarProps) {
@@ -4045,7 +4045,7 @@ function ProgressBarLoadingIndicator({ isLoading, ...props }: IDatagridViewLoadi
  * loading indicator.
  * @param {boolean} props.isLoading - The boolean indicating whether the
  * DatagridView is in a loading state.
- * @returns {JSX.Element | null} The rendered loading indicator component, or
+ * @returns {ReactElement | null} The rendered loading indicator component, or
  * null if the loading indicator is not to be rendered.
  */
 function DefaultLoadingIndicator({ isLoading }: IDatagridViewLoadingIndicatorProps) {
@@ -4065,7 +4065,7 @@ function DefaultLoadingIndicator({ isLoading }: IDatagridViewLoadingIndicatorPro
  * @param {boolean} props.isLoading - The boolean indicating whether the
  * DatagridView is in a loading state.
  * 
- * @returns {JSX.Element | null} The rendered loading indicator component, or
+ * @returns {ReactElement | null} The rendered loading indicator component, or
  * null if the loading indicator is not to be rendered.
  */
 function PreloaderLoadingIndicator({ isLoading, ...props }: IDatagridViewLoadingIndicatorProps & IPreloaderProps) {
@@ -4165,7 +4165,7 @@ function AggregatedValue<DataType extends object = any>({ values, column }: { va
  * 
  * @template DataType - The type of the data shown in the grid.
  * @param {IButtonProps<{ datagridContext: DatagridView<DataType> }>} props - The props of the button component.
- * @returns {JSX.Element} - The rendered button component.
+ * @returns {ReactElement} - The rendered button component.
  */
 function DatagridToolbarAction<DataType extends object = any>({ testID, ...props }: IButtonProps<{ datagridContext: DatagridView<DataType> }>) {
     const datagridContext = useDatagrid();
@@ -4453,7 +4453,7 @@ export type IDatagridViewProps<DataType extends object = any, PropsExtensions = 
      * - You can pass any valid React element, including functional components, class components, or HTML elements.
      * - If you pass `null` or omit this prop, no loading indicator will be shown.
      */
-    loadingIndicator?: JSX.Element | null;
+    loadingIndicator?: ReactElement | null;
 
 
     /**

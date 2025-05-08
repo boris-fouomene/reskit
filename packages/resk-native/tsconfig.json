@@ -19,7 +19,7 @@
     "module": "ES6", // Enables ESM & CJS interop
     "moduleResolution": "node",
     // Performance optimizations
-    "incremental":false,
+    "incremental": false,
     "noEmitOnError": false,
     "tsBuildInfoFile": "./build/.tsbuildinfo",
     "isolatedModules": false,
@@ -110,8 +110,13 @@
       "expo-sqlite/*": [
         "../../examples/resk-expo-docs/node_modules/expo-sqlite/*"
       ]
-    }
+    },
   },
+  "references": [
+    {
+      "path": "../../types/resk-native-icons"
+    }
+  ],
   // Include what you need - change as needed
   "include": [
     "src/**/*",

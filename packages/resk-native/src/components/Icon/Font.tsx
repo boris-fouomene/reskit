@@ -1,5 +1,5 @@
 "use client";
-import {FC} from "react";
+import { FC } from "react";
 import { isNonNullString, defaultStr } from "@resk/core/utils";
 import Logger from "@resk/core/logger";
 
@@ -14,7 +14,7 @@ import Octicons from "react-native-vector-icons/Octicons";
 
 import { useTheme } from "@theme";
 import Colors from "@colors";
-import {IFontIconProps } from "./types";
+import { IFontIconProps } from "./types";
 import Platform from "@platform/index";
 import { isRTL } from "@utils/i18nManager";
 import { getTouchableProps } from "@utils/hasTouchHandler";
@@ -58,9 +58,9 @@ const isIos = Platform.isIos();
  * ```
  * 
  * @param {IFontIconProps} props The properties of the `FontIcon` component.
- * @returns {JSX.Element | null} Returns the icon element, or null if the icon is not defined.
+ * @returns {ReactElement | null} Returns the icon element, or null if the icon is not defined.
  */
-function FontIcon({ name,ref, disabled, style, color, ...props }:IFontIconProps){
+function FontIcon({ name, ref, disabled, style, color, ...props }: IFontIconProps) {
     const pressableProps = getTouchableProps(props as any);
     const theme = useTheme();
     color = Colors.isValid(color) ? color : theme.colors.text;
@@ -69,7 +69,7 @@ function FontIcon({ name,ref, disabled, style, color, ...props }:IFontIconProps)
         Logger.warn(`Icon not defined for FontIcon component, icon [${name as string}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
-    const Component: FC<IconProps & {ref?:any}> = IconSet as unknown as FC<IconProps>;
+    const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>;
     const flattenStyle = StyleSheet.flatten([theme.styles.RTL, style]);
     if (pressableProps) {
         for (let i in pressableProps) {

@@ -1,4 +1,4 @@
-import {View, IViewProps } from "@components/View";
+import { View, IViewProps } from "@components/View";
 import { StyleSheet } from "react-native";
 import { useCanRender } from "./utils";
 import isValidElement from "@utils/isValidElement";
@@ -11,7 +11,7 @@ import isValidElement from "@utils/isValidElement";
  * @param {IViewProps} props - The properties for configuring the View component.
  * This includes standard view properties such as style, accessibility, and layout options.
  * 
- * @returns {JSX.Element | null} Returns the View component as the dialog footer if the modal context
+ * @returns {ReactElement | null} Returns the View component as the dialog footer if the modal context
  * is available and the footer can be rendered; otherwise, it returns null.
  * 
  * @example

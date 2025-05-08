@@ -4,7 +4,7 @@ import { IMomentFormat } from "@resk/core/types";
 import { I18nClass } from "@resk/core/i18n";
 import useStateCallback from "@utils/stateCallback";
 import { Moment } from "moment";
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import { GestureResponderEvent, View } from "react-native";
 
 /**
@@ -26,7 +26,7 @@ export interface CalendarModalContext {
  * Interface representing the base properties of a calendar component.
  * @extends ISurfaceProps
  */
-export interface ICalendarBaseProps extends Omit<ISurfaceProps,"ref"> {
+export interface ICalendarBaseProps extends Omit<ISurfaceProps, "ref"> {
     /**
      * The minimum date that can be selected in the calendar.
      * @default undefined
@@ -95,9 +95,9 @@ export interface ICalendarBaseProps extends Omit<ISurfaceProps,"ref"> {
      * The header element to be displayed in the calendar.
      * @default undefined
      * @example
-     * const header: JSX.Element = <div>Calendar Header</div>;
+     * const header: ReactElement = <div>Calendar Header</div>;
      */
-    header?: JSX.Element;
+    header?: ReactElement;
 
 
     /***
@@ -135,7 +135,7 @@ export interface ICalendarBaseProps extends Omit<ISurfaceProps,"ref"> {
      * @default 0
      */
     borderRadius?: number;
-    
+
     ref?: React.Ref<CalendarModalContext & View>;
 }
 /***

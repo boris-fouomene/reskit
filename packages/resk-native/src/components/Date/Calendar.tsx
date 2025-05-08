@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useImperativeHandle,Context, useMemo, FC, Ref } from "react";
+import { createContext, useContext, useEffect, useImperativeHandle, Context, useMemo, FC, Ref } from "react";
 import { View, StyleSheet, GestureResponderEvent } from "react-native";
 import moment, { Moment } from "moment";
 import { DateHelper, defaultStr, isEmpty, isNonNullString } from "@resk/core/utils";
@@ -6,7 +6,7 @@ import { I18nClass } from "@resk/core/i18n";
 import { IMomentFormat } from "@resk/core/types"
 import { ICalendarBaseProps, ICalendarDate, CalendarModalContext, ICalendarDayItem, ICalendarDayViewProps, ICalendarDisplayView, ICalendarHourItem, ICalendarModalDayViewProps, ICalendarMonthItem, ICalendarMonthViewProps, ICalendarYearItem, ICalendarYearViewProps, ICalendarContext, ICalendarState, ICalendarItem, ICalendarItemsContainerProps } from "./types";
 import { Icon } from "@components/Icon";
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 import { useI18n } from "@src/i18n/hooks";
 import { TouchableRipple } from "@components/TouchableRipple";
 import { Colors, useTheme } from "@theme/index";
@@ -198,7 +198,7 @@ export default class Calendar {
      * This component provides a context for its children, which includes the number of items, screen width, and screen height.
      * 
      * @param {ICalendarItemsContainerProps} props - The props for the ItemsContainer component.
-     * @returns {JSX.Element} - The rendered ItemsContainer component.
+     * @returns {ReactElement} - The rendered ItemsContainer component.
      */
     static ItemsContainer: FC<ICalendarItemsContainerProps> = ({ children, testID, width: itemsContainerWidth }) => {
         const { itemsContainerProps: cCalendarItemsContainerProps } = useCalendar();
@@ -249,7 +249,7 @@ export default class Calendar {
      * This component renders a day view of the calendar, with a grid of days and navigation buttons.
      * 
      * @param {ICalendarDayViewProps} props - The props for the DayView component.
-     * @returns {JSX.Element} - The rendered DayView component.
+     * @returns {ReactElement} - The rendered DayView component.
      */
     static DayView(props: ICalendarDayViewProps) {
         return <CalendarWithContext
@@ -265,7 +265,7 @@ export default class Calendar {
      * This component provides a container for the modal content, with access to the modal context.
      * 
      * @param {ICalendarBaseProps} props - The props for the ModalContent component.
-     * @returns {JSX.Element} - The rendered ModalContent component.
+     * @returns {ReactElement} - The rendered ModalContent component.
      */
     static ModalContent: FC<ICalendarBaseProps & { displayView: ICalendarDisplayView }> = ({ children, header, testID, displayView, ...props }) => {
         testID = defaultStr(testID, "resk-calendar-modal");
@@ -311,9 +311,9 @@ export default class Calendar {
      * This component provides a modal window for displaying the day view of the calendar.
      * 
      * @param {ICalendarModalDayViewProps} props - The props for the ModalDayView component.
-     * @returns {JSX.Element} - The rendered ModalDayView component.
+     * @returns {ReactElement} - The rendered ModalDayView component.
      */
-    static ModalDayView ({ modalProps, testID, ...props }: ICalendarModalDayViewProps){
+    static ModalDayView({ modalProps, testID, ...props }: ICalendarModalDayViewProps) {
         testID = defaultStr(testID, "resk-calendar-modal-dayview");
         modalProps = Object.assign({}, modalProps);
         return <Calendar.Modal
@@ -334,7 +334,7 @@ export default class Calendar {
       * This component renders a month view of the calendar, with a grid of months and navigation buttons.
       * 
       * @param {ICalendarMonthViewProps} props - The props for the MonthView component.
-      * @returns {JSX.Element} - The rendered MonthView component.
+      * @returns {ReactElement} - The rendered MonthView component.
       */
     static MonthView(props: ICalendarMonthViewProps) {
         return <CalendarWithContext
@@ -350,7 +350,7 @@ export default class Calendar {
      * This component renders a year view of the calendar, with a grid of years and navigation buttons.
      * 
      * @param {ICalendarYearViewProps} props - The props for the YearView component.
-     * @returns {JSX.Element} - The rendered YearView component.
+     * @returns {ReactElement} - The rendered YearView component.
      */
     static YearView(props: ICalendarYearViewProps) {
         return <CalendarWithContext
@@ -365,9 +365,9 @@ export default class Calendar {
      * This component provides a modal window for displaying the calendar.
      * 
      * @param {IModalProps} props - The props for the Modal component.
-     * @returns {JSX.Element} - The rendered Modal component.
+     * @returns {ReactElement} - The rendered Modal component.
      */
-    static Modal({ onDismiss,ref, ...props }: IModalProps & {ref?: Ref<CalendarModalContext>}) {
+    static Modal({ onDismiss, ref, ...props }: IModalProps & { ref?: Ref<CalendarModalContext> }) {
         const [visible, setVisible] = useStateCallback(false);
         const context = {
             open: (cb?: () => void) => {

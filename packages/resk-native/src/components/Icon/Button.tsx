@@ -27,7 +27,7 @@ const PADDING = 8;
  * @component IconButton
  * @param {IIconButtonProps} props - The properties for configuring the IconButton.
  *
- * @returns {JSX.Element} The rendered IconButton component.
+ * @returns {ReactElement} The rendered IconButton component.
  *
  * @example
  * // Example usage of the IconButton component
@@ -70,91 +70,91 @@ const PADDING = 8;
  * );
  */
 function IconButton(
-        {
-            backgroundColor: customBackgroundColor,
-            rippleColor: customRippleColor,
-            size = DEFAULT_FONT_ICON_SIZE,
+    {
+        backgroundColor: customBackgroundColor,
+        rippleColor: customRippleColor,
+        size = DEFAULT_FONT_ICON_SIZE,
+        accessibilityLabel,
+        disabled,
+        style,
+        testID,
+        isLoading = false,
+        color,
+        iconName,
+        source,
+        containerProps,
+        containerSize,
+        ref,
+        ...rest
+    }: IIconButtonProps) {
+    const theme = useTheme();
+    containerProps = Object.assign({}, containerProps);
+    testID = defaultStr(testID, "resk-icon-button");
+    const containerStyle = StyleSheet.flatten([containerProps?.style]);
+    const backgroundColor = getBackgroundColor({ theme, customBackgroundColor: Colors.isValid(customBackgroundColor) ? customBackgroundColor : Colors.isValid(containerStyle?.backgroundColor) ? containerStyle.backgroundColor : undefined });
+    customRippleColor = Colors.isValid(customRippleColor) ? customRippleColor : undefined;
+    const { rippleColor } = getColors({
+        theme,
+        disabled,
+        rippleColor: customRippleColor,
+    });
+    size = typeof size == "number" ? size : DEFAULT_FONT_ICON_SIZE;
+    const iconColor = Colors.isValid(color) ? color : theme.colors.text;
+    containerSize = typeof containerSize == "number" ? containerSize : (size + 2 * PADDING);
+    const {
+        borderWidth = isLoading ? 0 : 0,
+        borderRadius = containerSize / 2,
+        borderColor = isLoading ? undefined : theme.colors.outline,
+    } = (StyleSheet.flatten(style) || {}) as ViewStyle;
+    const butonSizeStyle = {
+        width: containerSize,
+        height: containerSize
+    }
+    const icon = useGetIcon<IIconButtonProps>({
+        as: TouchableRipple,
+        rippleColor,
+        ...rest, icon: source || iconName || undefined, testID,
+        android_ripple: Object.assign({}, { radius: size * 0.5 }, rest.android_ripple),
+        color: iconColor,
+        disabled, size,
+        containerProps: {
+            hitSplot: { top: 10, left: 10, bottom: 10, right: 10 },
+            testID: `${testID}-tooltip`,
             accessibilityLabel,
+            centered: true,
             disabled,
-            style,
-            testID,
-            isLoading = false,
-            color,
-            iconName,
-            source,
-            containerProps,
-            containerSize,
-            ref,
-            ...rest
-        } : IIconButtonProps) {
-        const theme = useTheme();
-        containerProps = Object.assign({}, containerProps);
-        testID = defaultStr(testID, "resk-icon-button");
-        const containerStyle = StyleSheet.flatten([containerProps?.style]);
-        const backgroundColor = getBackgroundColor({ theme, customBackgroundColor: Colors.isValid(customBackgroundColor) ? customBackgroundColor : Colors.isValid(containerStyle?.backgroundColor) ? containerStyle.backgroundColor : undefined });
-        customRippleColor = Colors.isValid(customRippleColor) ? customRippleColor : undefined;
-        const { rippleColor } = getColors({
-            theme,
-            disabled,
-            rippleColor: customRippleColor,
-        });
-        size = typeof size == "number" ? size : DEFAULT_FONT_ICON_SIZE;
-        const iconColor = Colors.isValid(color) ? color : theme.colors.text;
-        containerSize = typeof containerSize == "number" ? containerSize : (size + 2 * PADDING);
-        const {
-            borderWidth = isLoading ? 0 : 0,
-            borderRadius = containerSize / 2,
-            borderColor = isLoading ? undefined : theme.colors.outline,
-        } = (StyleSheet.flatten(style) || {}) as ViewStyle;
-        const butonSizeStyle = {
-            width: containerSize,
-            height: containerSize
-        }
-        const icon = useGetIcon<IIconButtonProps>({
-            as: TouchableRipple,
-            rippleColor,
-            ...rest, icon: source || iconName || undefined, testID,
-            android_ripple: Object.assign({}, { radius: size * 0.5 }, rest.android_ripple),
-            color: iconColor,
-            disabled, size,
-            containerProps: {
-                hitSplot: { top: 10, left: 10, bottom: 10, right: 10 },
-                testID: `${testID}-tooltip`,
-                accessibilityLabel,
-                centered: true,
-                disabled,
-                borderRadius,
-                accessibilityRole: "button",
-                backgroundColor,
-                style: [styles.touchable, butonSizeStyle],
-            }
-        });
-
-        const borderStyles = {
-            borderWidth,
             borderRadius,
-            borderColor,
-        };
-        return (
-            <Surface
-                elevation={0}
-                ref={ref}
-                {...containerProps}
-                testID={`${testID}-container`}
-                style={[
-                    styles.container,
-                    borderStyles,
-                    disabled && styles.disabled,
-                    containerProps?.style,
-                    {
-                        backgroundColor,
-                    },
-                    butonSizeStyle
-                ]}
-            >
-                {isLoading ? <ActivityIndicator size={size} color={iconColor} /> : icon}
-            </Surface>
-        );
+            accessibilityRole: "button",
+            backgroundColor,
+            style: [styles.touchable, butonSizeStyle],
+        }
+    });
+
+    const borderStyles = {
+        borderWidth,
+        borderRadius,
+        borderColor,
+    };
+    return (
+        <Surface
+            elevation={0}
+            ref={ref}
+            {...containerProps}
+            testID={`${testID}-container`}
+            style={[
+                styles.container,
+                borderStyles,
+                disabled && styles.disabled,
+                containerProps?.style,
+                {
+                    backgroundColor,
+                },
+                butonSizeStyle
+            ]}
+        >
+            {isLoading ? <ActivityIndicator size={size} color={iconColor} /> : icon}
+        </Surface>
+    );
 };
 
 const styles = StyleSheet.create({

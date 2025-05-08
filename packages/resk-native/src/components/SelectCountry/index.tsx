@@ -3,8 +3,8 @@ import { CountriesManager, defaultStr, ICountry, ICountryCode, isNonNullString }
 import { TouchableOpacity, StyleSheet, TouchableOpacityProps } from "react-native";
 import { useMemo } from "react";
 import { Icon } from "@components/Icon";
-import {Label} from "@components/Label";
-import {View} from "@components/View";
+import { Label } from "@components/Label";
+import { View } from "@components/View";
 import Theme, { Colors } from "@theme/index";
 import { ISelectCountryProps } from './types';
 import { SelectCountryRef } from "@components/TextInput/SelectCountryRef";
@@ -15,9 +15,9 @@ import { isNumber } from "@resk/core/utils";
  * 
  * @component
  * @param {ISelectCountryProps} props - The props for the country selector component.
- * @returns {JSX.Element} The rendered country selector component.
+ * @returns {ReactElement} The rendered country selector component.
  */
-export function SelectCountry({ withLabel, countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }:ISelectCountryProps & { displayDialCode?: boolean }){
+export function SelectCountry({ withLabel, countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }: ISelectCountryProps & { displayDialCode?: boolean }) {
     const countries = useMemo(() => {
         return Object.values(CountriesManager.getCountries());
     }, []);

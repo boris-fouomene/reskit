@@ -1,6 +1,6 @@
 import { defaultStr, isDOMElement } from "@resk/core/utils";
 import { ReactElement } from "react";
-import * as reactIs from "react-is";
+import isValidElement from "./isValidElement";
 /**
  * Traverses all `props.children` to obtain their combined textual content.
  *
@@ -34,8 +34,8 @@ export default function getTextContent(elem: any, childContentSeparator: string 
     if (isDOMElement(elem)) {
         return getTextContent(defaultStr((elem as HTMLElement).innerText, (elem as HTMLElement).textContent));
     }
-    if (!(reactIs.isElement(elem))) {
-        return (elem?.toString() || '');
+    if (!(isValidElement(elem, true))) {
+        return (typeof elem?.toString == "function" ? elem?.toString() : '');
     }
     elem = elem as ReactElement;
     const children = elem.props && elem.props.children;

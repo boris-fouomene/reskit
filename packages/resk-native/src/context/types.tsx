@@ -3,6 +3,7 @@ import { ITheme } from "@theme/types";
 import { I18nClass } from "@resk/core/i18n";
 import { IUseI18nOptions } from "@src/types";
 import { IAuthProviderProps } from "@auth/types";
+import { ReactElement } from "react";
 
 
 /**
@@ -37,7 +38,7 @@ import { IAuthProviderProps } from "@auth/types";
  * 
  */
 export type IReskNativeProviderProps = {
-    children?: JSX.Element | null;
+    children?: ReactElement | null;
     themes?: {
         light: Partial<ITheme>,
         dark: Partial<ITheme>,

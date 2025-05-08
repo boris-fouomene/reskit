@@ -4,7 +4,7 @@ import { ISwiperProps } from "@components/Swiper/types";
 import { ITouchableRippleProps } from "@components/TouchableRipple/types";
 import { IViewProps } from "@components/View/types";
 import { IViewStyle } from "../../types";
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import { Animated, GestureResponderEvent, ScrollViewProps, ViewProps } from "react-native";
 import { IThemeColorsTokenName } from "@theme/types";
 import { IAuthPerm } from "@resk/core";
@@ -134,9 +134,9 @@ export type ITabItemProps = Omit<ITouchableRippleProps, "children" | "style"> & 
     /** 
      * Optional children to render inside the TabItem.
      * 
-     * @type {JSX.Element}
+     * @type {ReactElement}
      */
-    children?: JSX.Element;
+    children?: ReactElement;
 
     /** 
      * The index of the TabItem in the tab list.

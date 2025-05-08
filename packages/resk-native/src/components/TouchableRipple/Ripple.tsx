@@ -1,4 +1,4 @@
-import {useMemo } from 'react';
+import { useMemo } from 'react';
 import {
     Pressable,
     StyleSheet,
@@ -42,7 +42,7 @@ const isAndroid = Platform.isAndroid() && (typeof version == "number" ? version 
  * 
  * @param {string} [props.testID] - Optional test ID used for testing purposes, defaults to "resk-touchable-ripple".
  * 
- * @returns {JSX.Element} A `Pressable` component with ripple effect and hover functionality.
+ * @returns {ReactElement} A `Pressable` component with ripple effect and hover functionality.
  * 
  * @example
  * Basic usage of the `TouchableRipple` component:
@@ -95,7 +95,7 @@ export function TouchableRipple({
     ref,
     rippleOpacity,
     ...props
-} : ITouchableRippleProps){
+}: ITouchableRippleProps) {
     const theme = useTheme();
     const { rippleColor, hoverColor } = getColors({ rippleColor: customRippleColor, hoverColor: customHoverColor, theme });
     testID = defaultStr(testID, "resk-touchable-ripple");

@@ -1,10 +1,10 @@
-import { useMemo } from "react";
+import { ReactElement, useMemo } from "react";
 import { Datagrid, AttachDatagridView, IDatagridViewName, IDatagridViewGroupedRow, IDatagridViewStateColumn, IDatagridViewColumnName, IDatagridAggregationFunctions, useDatagrid } from "./Datagrid";
 import { ScrollView, SectionList, StyleSheet, View } from "react-native";
 import { IViewStyle } from "@src/types";
 import { isObj } from "@resk/core/utils";
 import { useTheme } from "@theme/index";
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 
 export interface IDatagridTableViewProps<DataType extends object = any> {
 
@@ -67,7 +67,7 @@ function AggregatedValues<DataType extends object = any>({ values }: { values: R
     if (!canShowAggregatedValues) return null;
     return aggregatedContent;
 }
-function Columns<DataType extends object = any>({ datagridContext }: IDatagridTableViewCommonProps<DataType>): JSX.Element | null {
+function Columns<DataType extends object = any>({ datagridContext }: IDatagridTableViewCommonProps<DataType>): ReactElement | null {
     const visibleColumns = datagridContext.getVisibleColumns();
     const theme = useTheme();
     const columns = useMemo(() => {
@@ -132,7 +132,7 @@ function DatagridTableViewRendered<DataType extends object = any>({ context }: {
     </ScrollView>
 }
 
-function Rows<DataType extends object = any>({ datagridContext, rowData, rowIndex }: IDatagridTableViewCommonProps<DataType> & { rowData: DataType, rowIndex: number }): JSX.Element | null {
+function Rows<DataType extends object = any>({ datagridContext, rowData, rowIndex }: IDatagridTableViewCommonProps<DataType> & { rowData: DataType, rowIndex: number }): ReactElement | null {
     const visibleColumns = datagridContext.getVisibleColumns();
     const rowsCells = useMemo(() => {
         return datagridContext.renderTableRow(rowData, rowIndex);

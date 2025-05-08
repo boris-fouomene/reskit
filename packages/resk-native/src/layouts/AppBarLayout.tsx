@@ -68,7 +68,7 @@ import { DrawerMenuIcon } from "./DrawerNavigationView/DrawerMenuIcon";
  * AppBar, which includes the specified title, subtitle, actions, and 
  * back action.
  * 
- * @returns {JSX.Element} The rendered AppBar component with the 
+ * @returns {ReactElement} The rendered AppBar component with the 
  * customized layout.
  */
 export default function AppBarLayout({ ...appBarProps }: IAppBarProps) {

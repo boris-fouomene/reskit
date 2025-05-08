@@ -12,7 +12,7 @@ import { useCanRender } from "./utils";
  * @param {IDialogActionsProps<DialogContextExtend>} props - The properties for configuring the AppBar.
  * This includes any additional context or actions specific to the dialog's functionality.
  * 
- * @returns {JSX.Element | null} Returns the AppBar component if the modal can be rendered and is in full-screen mode; otherwise, it returns null.
+ * @returns {ReactElement | null} Returns the AppBar component if the modal can be rendered and is in full-screen mode; otherwise, it returns null.
  * 
  * @example
  * // Example usage of DialogAppBar within a dialog component

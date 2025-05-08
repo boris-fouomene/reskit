@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import { IDrawerItemsProps, IDrawerCurrentState } from "@components/Drawer";
 import { StyleSheet } from "react-native";
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 import { DrawerMenuIcon } from "./DrawerMenuIcon";
 import { HStack } from "@components/Stack";
 import { useTheme } from "@theme";
@@ -10,7 +10,7 @@ import { Divider } from "@components/Divider";
 import { isRTL } from "@utils/index";
 import { defaultStr } from "@resk/core/utils";
 import { isValidElement } from "@utils";
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import DrawerItems from "@components/Drawer/DrawerItems";
 import { IDrawerNavigationViewHeader, IDrawerNavigationViewProps, IDrawerMenuIconProps } from "./types";
 
@@ -36,7 +36,7 @@ export { DrawerMenuIcon } from "./DrawerMenuIcon";
  * @param {React.ReactNode} props.children - Optional additional children to be rendered 
  *        within the drawer view.
  * 
- * @returns {JSX.Element} Returns a JSX element representing the drawer navigation view.
+ * @returns {ReactElement} Returns a JSX element representing the drawer navigation view.
  * 
  * @example
  * // Basic usage of DrawerNavigationView with a header and items
@@ -60,7 +60,7 @@ export const DrawerNavigationView = ({ children, testID, navigationTitle, header
         size: 25,
         testID: `${testID}-back-action-layout`,
         color: theme.colors.onSurface,
-        icon: (drawerState) => {
+        icon: (drawerState: any) => {
             if (drawerState?.canBePinned) {
                 return drawerState?.isPinned ? "pin-off" : "pin";
             }
@@ -94,7 +94,7 @@ export const DrawerNavigationView = ({ children, testID, navigationTitle, header
  * @param {IDrawerNavigationViewHeader | undefined} props.children - Optional children 
  *        for the header, which can be a static JSX element or a function that returns 
  *        a JSX element based on the current drawer state.
- * @param {JSX.Element} props.menuIcon - The drawer navigation view menu icon to be displayed.
+ * @param {ReactElement} props.menuIcon - The drawer navigation view menu icon to be displayed.
  *        to be displayed in the header.
  * @param {IDrawerMenuIconProps} props.menuIconProps - Properties to customize 
  *        the drawer navigation menu icon.
@@ -124,7 +124,7 @@ export const DrawerNavigationView = ({ children, testID, navigationTitle, header
  *     )}
  * </DrawerNavigationHeader>
  */
-const DrawerNavigationHeader: React.FC<{ testID: string, title?: ReactNode, children?: IDrawerNavigationViewHeader, drawerState: IDrawerCurrentState, menuIcon: JSX.Element; menuIconProps: IDrawerMenuIconProps }> = ({ children, menuIcon, menuIconProps, testID, drawerState, title }): React.ReactNode => {
+const DrawerNavigationHeader: React.FC<{ testID: string, title?: ReactNode, children?: IDrawerNavigationViewHeader, drawerState: IDrawerCurrentState, menuIcon: ReactElement; menuIconProps: IDrawerMenuIconProps }> = ({ children, menuIcon, menuIconProps, testID, drawerState, title }): React.ReactNode => {
     if (isValidElement(children)) {
         return children as ReactNode;
     }

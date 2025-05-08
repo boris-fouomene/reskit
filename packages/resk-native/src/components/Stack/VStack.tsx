@@ -1,4 +1,4 @@
-import {View,IViewProps } from "@components/View";
+import { View, IViewProps } from "@components/View";
 import { StyleSheet, View as RNView } from "react-native";
 
 /**
@@ -11,7 +11,7 @@ import { StyleSheet, View as RNView } from "react-native";
  *   - **style**: Optional additional styles to apply to the component.
  *   - **...props**: Any additional props that should be passed to the underlying View.
  * 
- * @returns {JSX.Element} A JSX element representing the VStack, styled as a vertical stack.
+ * @returns {ReactElement} A JSX element representing the VStack, styled as a vertical stack.
  * 
  * @example
  * ```tsx
@@ -22,7 +22,7 @@ import { StyleSheet, View as RNView } from "react-native";
  * </VStack>
  * ```
  */
-function VStack({ style, ...props }: IVStackProps){
+function VStack({ style, ...props }: IVStackProps) {
     return <View style={[styles.container, style]} {...props} />
 };
 

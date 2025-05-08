@@ -2,7 +2,7 @@ import { IIconProps, IIconSource } from "@components/Icon/types";
 import { ILabelProps } from "@components/Label/types";
 import { IViewProps } from "@components/View";
 import { ILabelOrLeftOrRightProps } from "@hooks/label2left2right";
-import { ReactNode } from "react";
+import { ReactNode, ReactElement } from "react";
 import { Animated, GestureResponderEvent, PressableProps, View, ViewProps } from "react-native";
 /**
  * Interface for Expandable component props that provides collapsible/expandable functionality with customizable icons and content.
@@ -12,7 +12,7 @@ import { Animated, GestureResponderEvent, PressableProps, View, ViewProps } from
  * @param {React.ForwardedRef<RNView>} ref - A ref forwarded to the root view of the component.
  *
  * 
- * @returns {JSX.Element} The rendered expandable component.
+ * @returns {ReactElement} The rendered expandable component.
  * @extends {Omit<PressableProps, "children">}
  * @extends {ILabelOrLeftOrRightProps<IExpandableCallbackOptions>}
  * 
@@ -36,9 +36,9 @@ import { Animated, GestureResponderEvent, PressableProps, View, ViewProps } from
 export type IExpandableProps = Omit<PressableProps, "children"> & ILabelOrLeftOrRightProps<IExpandableCallbackOptions> & {
     /** 
      * The content to be shown/hidden when expanding/collapsing
-     * @type {JSX.Element}
+     * @type {ReactElement}
      */
-    children?: JSX.Element;
+    children?: ReactElement;
 
     /**
      * Props to customize the label appearance and behavior
@@ -157,8 +157,8 @@ export type IExpandableProps = Omit<PressableProps, "children"> & ILabelOrLeftOr
      * @default 20
      */
     expandIconSize?: number;
-    
-    ref?:React.Ref<View>;
+
+    ref?: React.Ref<View>;
 }
 
 /**

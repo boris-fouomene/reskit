@@ -23,12 +23,12 @@ import { IDrawerMenuIconProps } from "./types";
  *        If set to "permanent", the button is rendered only when the drawer is in 
  *        permanent mode; if "temporary", it is rendered only when the drawer is in 
  *        temporary mode.
- * @param {(IIconSourceBase | JSX.Element | ((drawerState?: IDrawerCurrentState) => IIconSource)) | undefined} props.icon - 
+ * @param {(IIconSourceBase | ReactElement | ((drawerState?: IDrawerCurrentState) => IIconSource)) | undefined} props.icon - 
  *        The icon to be displayed on the button. This can be a static icon source, 
  *        a JSX element, or a function that returns an icon based on the current drawer state.
  * @param {IIconProps} props - Additional properties for the icon button.
  * 
- * @returns {JSX.Element | null} Returns a JSX element representing the back action button 
+ * @returns {ReactElement | null} Returns a JSX element representing the back action button 
  *          if it can be rendered; otherwise, returns null.
  * 
  * @example

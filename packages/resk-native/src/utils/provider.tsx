@@ -1,5 +1,5 @@
 import { isObj } from "@resk/core";
-import {ComponentClass, Ref, RefObject, useEffect, useRef } from "react";
+import { ComponentClass, ReactElement, Ref, RefObject, useEffect, useRef } from "react";
 
 /**
  * A custom React hook that creates a reference for a provider component.
@@ -107,7 +107,7 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
          * @example
          * <this.Provider ref={myRef} someProp={value} />
          */
-        static Provider (props?:ComponentProps, ref?:Ref<ComponentInstance>):JSX.Element {
+        static Provider(props?: ComponentProps, ref?: Ref<ComponentInstance>): ReactElement {
             const hasRef = !!ref;
             const innerRef = useCreateProviderRef<ComponentInstance>((ref) => {
                 if (!hasRef || !this._innerClassProviderRef) {

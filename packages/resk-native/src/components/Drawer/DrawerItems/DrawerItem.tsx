@@ -29,7 +29,7 @@ import { Button } from '@components/Button';
  * @param {boolean} closeOnPress - Indicates if the drawer should close on press.
  * @param {object} rest - Additional properties.
  *
- * @returns {JSX.Element} The rendered DrawerItem component.
+ * @returns {ReactElement} The rendered DrawerItem component.
  */
 const DrawerItem = ({
   active: customActive,

@@ -10,7 +10,7 @@ import { IBottomSheetItemProps } from "./utils";
  * to handle the closing of the bottom sheet when pressed.
  * 
  * @param {IBottomSheetItemProps} props - The props for the component.
- * @returns {JSX.Element} The rendered bottom sheet item.
+ * @returns {ReactElement} The rendered bottom sheet item.
  */
 export default function BottomSheetItem({ closeOnPress, onPress: customOnPress, ...props }: IBottomSheetItemProps) {
     const bottomSheet = useBottomSheet();

@@ -1,8 +1,8 @@
-import {TouchableOpacity, Platform, StyleSheet, Switch as RNSwitch, SwitchChangeEvent, GestureResponderEvent } from "react-native";
+import { TouchableOpacity, Platform, StyleSheet, Switch as RNSwitch, SwitchChangeEvent, GestureResponderEvent } from "react-native";
 import { ISwitchProps } from "./types";
 import { useToggleable } from "./utils";
 import { Tooltip } from "@components/Tooltip";
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 
 export * from "./types";
 export * from "./utils";
@@ -30,7 +30,7 @@ export * from "./utils";
  * @param {object} [props.containerProps] - Additional properties for the container component.
  * @param {object} [rest] - Additional props passed to the React Native Switch component.
  *
- * @returns {JSX.Element} - Returns a JSX element representing the Switch component.
+ * @returns {ReactElement} - Returns a JSX element representing the Switch component.
  *
  * @example
  * // Usage example of the Switch component

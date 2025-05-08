@@ -5,6 +5,7 @@ import { IAuthSessionStorage } from "@resk/core/auth";
 import { IDict } from "@resk/core/types";
 import { IObservable } from "@resk/core/observable";
 import { Animated, GestureResponderEvent, PanResponderInstance } from "react-native";
+import { ReactElement } from "react";
 
 
 /**
@@ -556,7 +557,7 @@ export interface IDrawerContext {
  * Extends the properties of IViewProps.
  * @see {@link IViewProps} for more details.
  */
-export interface IDrawerProps extends Omit<IViewProps,"ref">{
+export interface IDrawerProps extends Omit<IViewProps, "ref"> {
     /**
      * Determines if the drawer can be minimized.
      * @default false
@@ -690,7 +691,7 @@ export interface IDrawerProps extends Omit<IViewProps,"ref">{
 
     appBarProps?: IAppBarProps<IDrawerContext>;
 
-    appBar?: false | JSX.Element | null | ((options: IDrawerContext & { appBarProps: IAppBarProps }) => JSX.Element | null);
+    appBar?: false | ReactElement | null | ((options: IDrawerContext & { appBarProps: IAppBarProps }) => ReactElement | null);
 }
 
 

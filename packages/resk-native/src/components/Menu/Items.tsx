@@ -1,5 +1,5 @@
 import { MenuItem } from './Item';
-import {View} from "@components/View";
+import { View } from "@components/View";
 import { useRenderMenuItems } from './utils';
 import { IMenuItemBase, IMenuItemContext, IMenuItemsProps } from './types';
 import ExpandableMenuItem from './ExpandableItem';
@@ -24,7 +24,7 @@ import { useMenu } from './context';
  * menu item properties. Each item can either be a valid menu item object or undefined/null.
  * This array is used to render the individual menu items.
  *
- * @returns {JSX.Element} Returns a JSX element representing the menu items wrapped in a View.
+ * @returns {ReactElement} Returns a JSX element representing the menu items wrapped in a View.
  *
  * @example
  * ```tsx

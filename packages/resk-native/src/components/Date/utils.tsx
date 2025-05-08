@@ -4,12 +4,13 @@ import isValidElement from "@utils/isValidElement";
 import { GestureResponderEvent, StyleSheet } from "react-native";
 import { ICalendarBaseProps } from "./types";
 import { Surface } from "@components/Surface";
-import {View} from "@components/View";
+import { View } from "@components/View";
 import { Divider } from "@components/Divider";
 import { SwipeGestureHandler } from "@components/Gesture";
 import { Icon } from "@components/Icon";
+import { ReactElement } from "react";
 
-export function renderCalendar({ testID, children, navigateToNext, borderRadius, navigateToPrevious, renderNavigationButtons, footer, header, displayViewToggleButton, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | JSX.Element | false, children: JSX.Element, footer?: JSX.Element, navigateToNext?: (event?: GestureResponderEvent) => void, navigateToPrevious?: (event?: GestureResponderEvent) => void, header?: JSX.Element, }) {
+export function renderCalendar({ testID, children, navigateToNext, borderRadius, navigateToPrevious, renderNavigationButtons, footer, header, displayViewToggleButton, ...props }: ICalendarBaseProps & { testID?: string, renderNavigationButtons?: boolean, displayViewToggleButton?: IButtonProps | ReactElement | false, children: ReactElement, footer?: ReactElement, navigateToNext?: (event?: GestureResponderEvent) => void, navigateToPrevious?: (event?: GestureResponderEvent) => void, header?: ReactElement, }) {
     testID = defaultStr(testID, "resk-calendar");
     const isValidHeader = isValidElement(header);
     const canDisplayHeader = isValidHeader || renderNavigationButtons !== false || displayViewToggleButton !== false;

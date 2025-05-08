@@ -1,11 +1,11 @@
 import { ITouchableRippleProps } from "./types";
 import useStateCallback from "@utils/stateCallback";
-import { useEffect, useRef } from "react";
+import { ReactElement, useEffect, useRef } from "react";
 import { Animated, GestureResponderEvent, LayoutChangeEvent, LayoutRectangle, StyleSheet } from "react-native";
 import Platform from "@platform";
 
 export default function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleOpacity, rippleDuration }: ITouchableRippleProps): {
-    rippleContent?: JSX.Element | null;
+    rippleContent?: ReactElement | null;
     startRipple?: (event: GestureResponderEvent) => void;
     onLayout?: (event: LayoutChangeEvent) => void;
 } {

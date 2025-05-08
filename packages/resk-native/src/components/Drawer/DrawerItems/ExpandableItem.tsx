@@ -14,7 +14,7 @@ import { ExpandableItem } from "@components/Menu/ExpandableItem";
  * @param {object} props.expandableProps - The properties for the expandable component.
  * @param {object} rest - The remaining properties for the drawer item.
  *
- * @returns {JSX.Element} The rendered expandable drawer item.
+ * @returns {ReactElement} The rendered expandable drawer item.
  */
 export default function ExpandableDrawerItem({ testID, context, items, dividerProps, divider, expandableProps, ...rest }: IDrawerItemProps) {
     testID = defaultStr(testID, "resk-drawer-expandable-item")

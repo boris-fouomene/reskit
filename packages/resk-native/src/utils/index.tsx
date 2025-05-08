@@ -38,4 +38,3 @@ export function isReactNode(node: any): node is ReactNode {
 
 
 export * from "./hasTouchHandler";
-export * from "./isComponent";

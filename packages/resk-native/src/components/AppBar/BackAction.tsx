@@ -12,7 +12,7 @@ import { useAppBar } from "./hooks";
  * @component BackAction
  * @param {IBackActionProps} props - The properties for configuring the BackAction.
  *
- * @returns {JSX.Element} The rendered BackAction component.
+ * @returns {ReactElement} The rendered BackAction component.
  *
  * @example
  * // Example usage of the BackAction component

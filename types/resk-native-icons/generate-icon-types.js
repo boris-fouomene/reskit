@@ -65,7 +65,7 @@ function generateIconNameArrays(filter) {
                 if (setName.endsWith("Free")) {
                     setName = setName.split("Free")[0].trim();
                 }
-                if(!(setName in iconSetNames)) return;
+                if (!(setName in iconSetNames)) return;
                 console.log('Processing set:', setName);
                 if (filter(setName) && !setName.toLowerCase().endsWith("_meta")) {
                     const icons = extractIconNames(join(glyphMapsPath, file));
@@ -144,5 +144,5 @@ function generateTypeDefinitions() {
 const typeDefinitions = generateTypeDefinitions();
 
 // Write to a file
-const outputPath = join(__dirname,"index.d.ts");//join(__dirname, 'src', 'components', 'ICon', 'icon-types.d.ts');//
+const outputPath = join(__dirname, "src", "index.ts");//join(__dirname, 'src', 'components', 'ICon', 'icon-types.d.ts');//
 writeFileSync(outputPath, typeDefinitions, 'utf8');

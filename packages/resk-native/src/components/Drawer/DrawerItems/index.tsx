@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ExpandableItem from './ExpandableItem';
 import DrawerItem from './DrawerItem';
-import {View} from "@components/View";
+import { View } from "@components/View";
 import { useDrawer } from '../hooks';
 import { View as RNView } from "react-native";
 import { useTheme } from '@theme';
@@ -18,7 +18,7 @@ import { defaultStr } from '@resk/core/utils';
  * @param {string} [props.testID] - Optional test ID for the component.
  * @param {IDrawerItemProps[]} [props.items] - Custom items to be rendered in the drawer.
  * @param {React.ForwardedRef<RNView>} ref - Forwarded ref to the underlying RNView component.
- * @returns {JSX.Element} The rendered DrawerItems component.
+ * @returns {ReactElement} The rendered DrawerItems component.
  * 
  * @example
  * <DrawerItems

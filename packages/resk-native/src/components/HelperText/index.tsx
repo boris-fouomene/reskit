@@ -1,7 +1,7 @@
 import { Animated, StyleSheet } from 'react-native';
 import { defaultStr } from "@resk/core";
 import { useTheme } from "@theme";
-import {Label,ILabelProps } from '@components/Label';
+import { Label, ILabelProps } from '@components/Label';
 import { useEffect } from 'react';
 import platform from '@platform/index';
 
@@ -18,7 +18,7 @@ import platform from '@platform/index';
  * @param {React.ReactNode} [props.children] - The text or element to be displayed.
  * @param {ITextStyle} [props.style] - Additional styles for the helper text.
  * 
- * @returns {JSX.Element | null} The rendered component or null if not visible.
+ * @returns {ReactElement | null} The rendered component or null if not visible.
  *
  * @example
  * Here’s an example of how to use the `HelperText` component:

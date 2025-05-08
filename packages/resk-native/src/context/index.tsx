@@ -19,6 +19,8 @@ import { BottomSheet } from '@components/BottomSheet';
 import { ReskNativeEvents } from "./events";
 import { useColorScheme } from "@theme/useColorScheme";
 import { useEffect, useMemo } from "react";
+import { Drawer } from "@components/Drawer";
+import { Form } from "@components/Form";
 
 export * from "./types";
 
@@ -130,18 +132,21 @@ export function ReskNativeProvider({ children, themes, safeAreaInsets, auth, bre
    * wraps the child components to ensure consistent theming across the application.
    */
   return (
-    <View testID="resk-native-root" style={[styles.root, { backgroundColor: theme.colors.background }, style]}>
+    <View testID="resk-root" style={[styles.root, { backgroundColor: theme.colors.background }, style]}>
       <ReskNativeContext.Provider value={context}>
         <PortalProvider>
           <Default.AuthContext.Provider value={auth}>
             <Notify
-              ref={(el : Notify) => {
+              ref={(el: Notify) => {
                 Notify.notifyRef = el;
               }}
             />
             <Preloader.Provider />
             <Dialog.Alert.Provider />
             <Dialog.Provider.Provider />
+            <Drawer.Provider.Provider />
+            <Form.Drawer.Provider />
+            <Form.Dialog.Provider />
             <BottomSheet.Provider.Provider />
             <>
               {Platform.isClientSide() ? <StatusBar /> : null}

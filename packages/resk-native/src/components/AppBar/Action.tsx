@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native'
-import { Button} from "@components/Button";
+import { Button } from "@components/Button";
 import { useAppBar } from './hooks';
 import { IAppBarAction } from './types';
 import { useTheme } from '@theme/index';
@@ -16,7 +16,7 @@ import { useTheme } from '@theme/index';
  * accessing the underlying Button component. This allows parent components to interact with the 
  * button, such as focusing or measuring its dimensions.
  * 
- * @returns {JSX.Element} The rendered AppBarAction component, which is a button styled for the AppBar.
+ * @returns {ReactElement} The rendered AppBarAction component, which is a button styled for the AppBar.
  * 
  * @example
  * // Example usage of the AppBarAction component within an AppBar
@@ -37,7 +37,7 @@ import { useTheme } from '@theme/index';
  * the AppBar context, ensuring consistent styling across the application. It is designed to 
  * work well with the AppBar's layout and can be easily integrated with other AppBar components.
  */
-function AppBarAction<IAppBarActionContext = any>({ colorScheme, containerProps, ...props }: IAppBarAction<IAppBarActionContext>) {
+export function AppBarAction<IAppBarActionContext = any>({ colorScheme, containerProps, ...props }: IAppBarAction<IAppBarActionContext>) {
   const appBarContext = useAppBar();
   const colorSchemeColor = useTheme().getColorScheme(colorScheme);
   containerProps = Object.assign({}, containerProps);
@@ -53,8 +53,6 @@ function AppBarAction<IAppBarActionContext = any>({ colorScheme, containerProps,
   />
 };
 AppBarAction.displayName = 'AppBar.Action';
-
-export default AppBarAction
 
 const styles = StyleSheet.create({
   buttonContainer: {

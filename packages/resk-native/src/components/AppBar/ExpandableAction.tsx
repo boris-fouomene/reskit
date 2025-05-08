@@ -1,6 +1,6 @@
 import { Menu } from "@components/Menu";
-import { IAppBarAction, IAppBarContext } from './types';
-import Action from "./Action";
+import { IAppBarAction } from './types';
+import { AppBarAction } from "./Action";
 
 
 /**
@@ -22,7 +22,7 @@ import Action from "./Action";
  * accessing the underlying Button component. This allows parent components to interact with the 
  * button, such as focusing or measuring its dimensions.
  * 
- * @returns {JSX.Element} The rendered ExpandableAppBarAction component, which includes a button that opens a menu.
+ * @returns {ReactElement} The rendered ExpandableAppBarAction component, which includes a button that opens a menu.
  * 
  * @example
  * // Example usage of the ExpandableAppBarAction component
@@ -52,7 +52,7 @@ function ExpandableAppBarAction<IAppBarActionContext = any>({ items, children, .
     return <Menu
         anchor={({ openMenu }) => {
             return (
-                <Action testID='resk-expandable-appbar-action-anchor'
+                <AppBarAction testID='resk-expandable-appbar-action-anchor'
                     {...rest}
                     onPress={(event, context) => {
                         openMenu();

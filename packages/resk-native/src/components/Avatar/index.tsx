@@ -1,6 +1,6 @@
 import { defaultStr, isNonNullString } from '@resk/core/utils';
 import { IReactComponent, ITouchableProps } from '@src/types';
-import { useMemo } from 'react';
+import { ReactElement, useMemo } from 'react';
 import {
   View,
   ImageProps, ViewProps,
@@ -10,10 +10,9 @@ import {
   ViewStyle,
   ImageSourcePropType,
 } from 'react-native';
-import { isReactComponent } from '@utils/isComponent';
 import { getTouchableProps } from '@utils/hasTouchHandler';
 import { getIcon, IIconProps, IIconSource } from '@components/Icon';
-import {Label, ILabelProps } from '@components/Label';
+import { Label, ILabelProps } from '@components/Label';
 import { IThemeColorsTokenName } from '@theme/types';
 import { JSX } from 'react/jsx-runtime';
 import { Colors, useTheme } from '@theme/index';
@@ -30,7 +29,7 @@ export interface IAvatarProps<AsProps extends Partial<ITouchableProps> = ViewPro
    *
    *  @default `Press handlers present then Pressable else View`
    */
-  as?: IReactComponent<Omit<AsProps, 'children'> & { children?: JSX.Element }>;
+  as?: IReactComponent<Omit<AsProps, 'children'> & { children?: ReactElement }>;
 
   /***
     * Color scheme token key to apply a theme color to the avatar.
@@ -100,7 +99,7 @@ export interface IAvatarProps<AsProps extends Partial<ITouchableProps> = ViewPro
   */
   color?: string;
 
-  children?: JSX.Element;
+  children?: ReactElement;
 
   testID?: string;
 
@@ -117,7 +116,7 @@ export interface IAvatarProps<AsProps extends Partial<ITouchableProps> = ViewPro
  * They are commonly used to represent a user and can contain photos, icons, or even text.
  * */
 export function Avatar<AsProps extends Partial<ITouchableProps> = ViewProps>({
-  as,
+  as: customAs,
   icon,
   source,
   size = 'small',
@@ -160,14 +159,14 @@ export function Avatar<AsProps extends Partial<ITouchableProps> = ViewProps>({
     return getIcon({ icon, size: avatarSize / 2, color, testID: testID + "-icon", ...Object.assign({}, iconProps) });
   }, [avatarSize, colorScheme, rounded, color, backgroundColor, icon, iconProps, textProps, testID, text]);
   const Component = useMemo(() => {
-    if (isReactComponent(as) && as) {
-      return as;
+    if (customAs && typeof customAs == 'function') {
+      return customAs;
     }
     if (touchableProps) {
       return Pressable;
     }
     return View;
-  }, [as, touchableProps]);
+  }, [customAs, touchableProps]);
   return (
     <Component
       testID={testID}

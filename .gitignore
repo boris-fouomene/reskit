@@ -74,6 +74,9 @@ packages/**/build/
 examples/**/node_modules/
 examples/**/dist/
 examples/**/build/
+types/**/node_modules/
+types/**/dist/
+types/**/build/
 /dist/
 
 # Snowpack dependency directory (https://snowpack.dev/)

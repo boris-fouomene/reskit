@@ -3,7 +3,7 @@ import { MenuItem } from "./Item";
 import { Expandable, useExpandable } from "@components/Expandable";
 import { IMenuItemBase, IMenuItemContext, IMenuItemProps } from "./types";
 import { Divider } from "@components/Divider";
-import {useMemo } from "react";
+import { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import Theme from "@theme/index";
 import isValidElement from "@utils/isValidElement";
@@ -45,7 +45,7 @@ import { useMenu } from "./context";
  * @param {object} [props.contentProps] - Additional properties for customizing the content
  * wrapper of the expandable item.
  * 
- * @returns {JSX.Element} Returns a JSX element representing the expandable menu item,
+ * @returns {ReactElement} Returns a JSX element representing the expandable menu item,
  * including the label and the expandable content.
  * 
  * @example
@@ -77,7 +77,7 @@ import { useMenu } from "./context";
  * @see {@link IMenuRenderItemsOptions} for the options of the menu render function.
  * @see {@link useGetExpandableItemProps} for the hook that retrieves the properties of the expandable item.
  */
-export function ExpandableItem<IMenuItemExtendContext = any>({ testID, as,dividerProps, items, divider, expandableProps, children, contentProps,ref, ...props }: IMenuItemBase<IMenuItemExtendContext> & { as?: IReactComponent<IMenuItemBase<IMenuItemExtendContext>>}) {
+export function ExpandableItem<IMenuItemExtendContext = any>({ testID, as, dividerProps, items, divider, expandableProps, children, contentProps, ref, ...props }: IMenuItemBase<IMenuItemExtendContext> & { as?: IReactComponent<IMenuItemBase<IMenuItemExtendContext>> }) {
     testID = defaultStr(testID, "resk-expandable-item");
     expandableProps = Object.assign({}, expandableProps);
     const containerProps = Object.assign({}, expandableProps.containerProps);
@@ -96,7 +96,7 @@ export function ExpandableItem<IMenuItemExtendContext = any>({ testID, as,divide
         </>}
     />
 };
-function ExpandableItemLabel({ as, ...rest }:IMenuItemBase<any> & { as?: IReactComponent<IMenuItemBase<any>>}) {
+function ExpandableItemLabel({ as, ...rest }: IMenuItemBase<any> & { as?: IReactComponent<IMenuItemBase<any>> }) {
     const Component = useMemo(() => {
         return as || MenuItem;
     }, [as]);
@@ -138,7 +138,7 @@ ExpandableItem.displayName = "ExpandableMenuItem";
  * section. This can include any valid React nodes, allowing for rich content to be displayed
  * when the menu item is expanded.
  * 
- * @returns {JSX.Element} Returns a JSX element representing the expandable menu item,
+ * @returns {ReactElement} Returns a JSX element representing the expandable menu item,
  * including the label and the expandable content.
  *
  * @example

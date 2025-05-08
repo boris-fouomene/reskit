@@ -5,7 +5,7 @@ import {
     useWindowDimensions,
 } from 'react-native';
 import { IThemeColorsTokenName, useTheme } from "@theme";
-import {Label, ILabelProps } from '@components/Label';
+import { Label, ILabelProps } from '@components/Label';
 import { defaultStr } from '@resk/core/utils';
 
 const defaultSize = 20;
@@ -56,7 +56,7 @@ export type IBadgeProps = React.ComponentProps<typeof AnimatedLabel> & Omit<ILab
  * Displays a small badge with a given size and content.
  * 
  * @param props Props for the Badge component.
- * @returns JSX.Element
+ * @returns ReactElement
  */
 export const Badge = ({
     children,

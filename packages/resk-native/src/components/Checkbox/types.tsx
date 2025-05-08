@@ -1,9 +1,9 @@
 import { IFontIconProps } from '@components/Icon/types';
 import { IToggleableProps } from '@components/Switch/types';
 import { ITooltipBaseProps } from '@components/Tooltip';
+import { IFontIconName } from '@resk/native-icon-types';
 import { SyntheticEvent } from 'react';
 import { ColorValue, GestureResponderEvent, NativeSyntheticEvent, TouchableOpacityProps } from "react-native";
-import {IFontIconName} from "@resk/native-icon-types";
 
 /**
  * @interface ICheckboxProps

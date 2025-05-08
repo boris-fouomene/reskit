@@ -1,4 +1,4 @@
-import {View, IViewProps } from "@components/View";
+import { View, IViewProps } from "@components/View";
 import { StyleSheet, View as RNView } from "react-native";
 
 
@@ -11,7 +11,7 @@ import { StyleSheet, View as RNView } from "react-native";
  * @param {IViewProps} props - The properties for the HStack, including any valid View properties.
  *   - **style**: Optional additional styles to apply to the component.
  *   - **...props**: Any additional props that should be passed to the underlying View.
- * @returns {JSX.Element} A JSX element representing the HStack, styled as a horizontal stack.
+ * @returns {ReactElement} A JSX element representing the HStack, styled as a horizontal stack.
  * 
  * @example
  * ```tsx
@@ -29,7 +29,7 @@ function HStack({ style, noWrap, ...props }: IViewProps & {
      * Default is false
      */
     noWrap?: boolean;
-}){
+}) {
     return <View style={[styles.container, noWrap === true && styles.noWrap, style]} {...props} />
 };
 

@@ -19,7 +19,7 @@ import { userTabs } from "./context";
  * @param {string} [props.testID] - An optional test ID for testing purposes.
  * @param {object} [props.rest] - Additional properties to pass to the Swiper component.
  * 
- * @returns {JSX.Element} Returns a JSX element representing the TabContent component,
+ * @returns {ReactElement} Returns a JSX element representing the TabContent component,
  * which wraps the Swiper component.
  * 
  * @example

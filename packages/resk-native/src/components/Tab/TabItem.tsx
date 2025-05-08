@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { Colors } from '@theme';
 import { defaultStr, IDict } from "@resk/core";
 import { TouchableRipple } from '@components/TouchableRipple';
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 import { useGetIcon } from '@components/Icon';
 import { ITabItemProps } from './types';
 import { userTabs } from './context';
@@ -24,14 +24,14 @@ import { useCallback } from 'react';
  * @param {string} [props.iconPosition='top'] - Position of the icon relative to the label ('top' or 'bottom').
  * @param {ReactNode} props.label - The label to display for the tab item.
  * @param {string} [props.testID] - An optional test ID for testing purposes.
- * @param {JSX.Element} [props.children] - Optional children to render inside the tab item.
+ * @param {ReactElement} [props.children] - Optional children to render inside the tab item.
  * @param {IIconSource} [props.icon] - The icon to display in the tab item.
  * @param {IIconProps} [props.iconProps] - Additional properties for the icon.
  * @param {number} [props.index] - The index of the tab item in the tab list.
  * @param {number} [props.activeIndex] - The currently active tab index.
  * @param {ITouchableRippleProps} [rest] - Additional props for the TouchableRipple component.
  * 
- * @returns {JSX.Element} Returns a JSX element representing the TabItem component.
+ * @returns {ReactElement} Returns a JSX element representing the TabItem component.
  * 
  * @example
  * // Example usage of the TabItem component
@@ -66,7 +66,7 @@ const TabItem = ({
   const isActive = index === activeIndex;
   const style: IDict = Object.assign({}, StyleSheet.flatten(customStyle));
 
-  const activeStyle =useCallback((type: any) => {
+  const activeStyle = useCallback((type: any) => {
     return (typeof type === 'function' ? type(active) : type);
   }, [active]);
   const backgroundColor: string = Colors.isValid(style.backgroundColor) ? style.backgroundColor : 'transparent';

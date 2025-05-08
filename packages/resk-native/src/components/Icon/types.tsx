@@ -6,6 +6,7 @@ import { ITheme } from "@theme/types";
 import { ITouchableRippleProps } from "@components/TouchableRipple/types";
 import { ISurfaceProps } from "@components/Surface/types";
 import { IconProps } from "react-native-vector-icons/Icon";
+import { ReactElement } from "react";
 /**
  * Props for the FontIcon component, extending the properties of MaterialCommunityIcons
  * while allowing for customization of icon appearance and behavior.
@@ -95,7 +96,7 @@ export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size' | "ref"> 
      * <FontIcon name="home" size={30} /> // Renders the icon with a size of 30 pixels
      */
     size?: number;
-    
+
     ref?: React.Ref<View>;
 };
 
@@ -145,7 +146,7 @@ export type IIconSourceBase = IFontIconName | ImageSourcePropType;
  * <Icon source={customIcon} />
  * <Icon source={dynamicIcon} color="red" />
  */
-export type IIconSource = IIconSourceBase | null | JSX.Element | ((props: IIconProps & { color: string }) => IIconSourceBase | JSX.Element);
+export type IIconSource = IIconSourceBase | null | ReactElement | ((props: IIconProps & { color: string }) => IIconSourceBase | ReactElement);
 
 /**
  * @interface IIconProps
@@ -458,6 +459,6 @@ export type IIconButtonProps = Omit<ITouchableRippleProps, "children"> & IIconPr
     *
      */
     containerSize?: number;
-    
-    ref?:React.Ref<View>;
+
+    ref?: React.Ref<View>;
 };

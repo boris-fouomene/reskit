@@ -1,10 +1,10 @@
-import { createContext, useContext, useEffect, useState, ReactNode, isValidElement, ComponentProps, ComponentClass, FC } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, isValidElement, ComponentProps, ComponentClass, FC, ReactElement } from "react";
 import { IAuthContext, IAuthProviderProps } from "./types";
 import Auth from "@resk/core/auth";
 import { isObj } from "@resk/core/utils";
 import { IWithHOCOptions } from "@hooks/withHOC";
-import {View} from "@components/View";
-import {Label} from "@components/Label";
+import { View } from "@components/View";
+import { Label } from "@components/Label";
 import Theme, { useTheme } from "@theme/index";
 import { StyleSheet } from "react-native";
 import { Portal } from "@components/Portal";
@@ -40,7 +40,7 @@ export interface ILoginProps extends ComponentProps<any> {
  * @returns A function that takes a React component class as an argument representing the login component.
  */
 export function AttachLogin() {
-  return function (target:ComponentClass<ILoginProps>) {
+  return function (target: ComponentClass<ILoginProps>) {
     Reflect.defineMetadata(AuthLogin.metaData, target, AuthLogin);
   };
 }
@@ -81,7 +81,7 @@ export const useAuth = () => {
  * 
  * @param {IAuthProviderProps} props - The properties for the AuthProvider, including 
  * children and any additional context values.
- * @returns {JSX.Element} The AuthContext provider wrapping the children.
+ * @returns {ReactElement} The AuthContext provider wrapping the children.
  * 
  * @example
  * <AuthProvider>
@@ -253,7 +253,7 @@ export function withAuth<T extends any = any>(Component: FC<IWithAuthProps<T>>, 
  * @param {ReactNode} [props.children] - Optional children to render alongside 
  * the error message if the Login component is not available.
  * 
- * @returns {JSX.Element} The rendered Login component or an error message.
+ * @returns {ReactElement} The rendered Login component or an error message.
  * 
  * @example
  * // Usage of the Login component
@@ -293,9 +293,9 @@ Login.displayName = "ReskNativeAuthLogin";
  * not authenticated, it renders the `Login` component to prompt the user to sign in.
  * 
  * @param {Object} props - The props for the Container component.
- * @param {JSX.Element} props.children - The child elements to render if the user is authenticated.
+ * @param {ReactElement} props.children - The child elements to render if the user is authenticated.
  * 
- * @returns {JSX.Element} The rendered children if the user is signed in, or the Login component if not.
+ * @returns {ReactElement} The rendered children if the user is signed in, or the Login component if not.
  * 
  * @example
  * // Usage of the Container component
@@ -303,7 +303,7 @@ Login.displayName = "ReskNativeAuthLogin";
  *     <div>Protected content that only authenticated users can see.</div>
  * </Container>
  */
-const Container: FC<{ children: JSX.Element }> = ({ children }: { children: JSX.Element }) => {
+const Container: FC<{ children: ReactElement }> = ({ children }: { children: ReactElement }) => {
   const user = useGetSignedUser();
   return user ? children : <Login />;
 }

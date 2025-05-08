@@ -35,7 +35,7 @@ const isValidSize = (size: any): size is number => isNumber(size) && 0 <= size &
  * @property {boolean} [responsive] - Indicates whether the component should be responsive.
  * If `true`, the component dynamically adjusts its layout based on the screen dimensions.
  * 
- * @returns {JSX.Element} - A `View` component styled as a responsive grid column.
+ * @returns {ReactElement} - A `View` component styled as a responsive grid column.
  * 
  * @example
  * ```tsx
@@ -59,7 +59,7 @@ const isValidSize = (size: any): size is number => isNumber(size) && 0 <= size &
  * @see {@link Breakpoints.col} for the method used to calculate column styles.
  * @see {@link Breakpoints.getGutter} for the method used to calculate gutter spacing.
  */
-function GridCol({ style, responsive, windowWidth, gutter, defaultSize, testID, ...props }:IGridColProps){
+function GridCol({ style, responsive, windowWidth, gutter, defaultSize, testID, ...props }: IGridColProps) {
     const currentMedia = Breakpoints.getCurrentMedia();
     const dimen = useDimensions(responsive);
     const colSizes = useMemo(() => {

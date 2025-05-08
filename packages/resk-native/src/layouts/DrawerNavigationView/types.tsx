@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import { IDrawerCurrentState, IDrawerProps, IDrawerItemsProps } from "../../components/Drawer/types";
 import { IBackActionProps } from "@components/AppBar/types";
 import { IIconSource, IIconSourceBase } from "@components/Icon/types";
@@ -70,7 +70,7 @@ export interface IDrawerNavigationViewProps extends IDrawerProps {
  * JSX element. This allows for flexible rendering of the drawer navigation header based on 
  * the current state of the drawer and other relevant properties.
  * 
- * @type {JSX.Element | ((options: { drawerState: IDrawerCurrentState | null, menuIcon: JSX.Element, menuIconProps: IDrawerMenuIconProps, testID: string }) => JSX.Element)}
+ * @type {ReactElement | ((options: { drawerState: IDrawerCurrentState | null, menuIcon: ReactElement, menuIconProps: IDrawerMenuIconProps, testID: string }) => ReactElement)}
  * 
  * @example
  * // Using a static JSX element as the drawer navigation header
@@ -86,12 +86,12 @@ export interface IDrawerNavigationViewProps extends IDrawerProps {
  *     );
  * };
  */
-export type IDrawerNavigationViewHeader = JSX.Element | ((options: {
+export type IDrawerNavigationViewHeader = ReactElement | ((options: {
     drawerState: IDrawerCurrentState | null,
-    menuIcon: JSX.Element;
+    menuIcon: ReactElement;
     menuIconProps: IDrawerMenuIconProps;
     testID: string;
-}) => JSX.Element);
+}) => ReactElement);
 
 
 /**
@@ -115,7 +115,7 @@ export type IDrawerNavigationViewHeader = JSX.Element | ((options: {
  * A callback function that is triggered when the back action button is pressed. It receives 
  * the event and the current state of the drawer as parameters.
  * 
- * @property {(IIconSourceBase | JSX.Element | ((drawerState?: IDrawerCurrentState) => IIconSource)) | undefined} icon - 
+ * @property {(IIconSourceBase | ReactElement | ((drawerState?: IDrawerCurrentState) => IIconSource)) | undefined} icon - 
  * The icon to be displayed on the back action button. This can be a static icon source, 
  * a JSX element, or a function that returns an icon source based on the current drawer state.
  * 
@@ -143,5 +143,5 @@ export type IDrawerNavigationViewHeader = JSX.Element | ((options: {
 export interface IDrawerMenuIconProps extends Omit<IBackActionProps, 'onPress' | 'iconName' | 'source'> {
     drawerMode?: "permanent" | "temporary";
     onPress?: (event: GestureResponderEvent, drawerState: IDrawerCurrentState) => any;
-    icon?: IIconSourceBase | JSX.Element | ((drawerState?: IDrawerCurrentState) => IIconSource);
+    icon?: IIconSourceBase | ReactElement | ((drawerState?: IDrawerCurrentState) => IIconSource);
 }

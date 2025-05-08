@@ -1,9 +1,9 @@
 import { IAppBarAction } from "@components/AppBar/types";
 import { ITextInputProps } from "@components/TextInput/types";
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import { IViewProps } from "@components/View";
 import { PressableProps, FlatListProps } from "react-native";
-import {IFontIconName} from "@resk/native-icon-types";
+import { IFontIconName } from "@resk/native-icon-types";
 import { ObservableComponent } from "@utils/index";
 import { IMenuContext, IMenuProps } from "@components/Menu/types";
 
@@ -785,7 +785,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
          */
         selectedItems: ItemType[];
         selectedValues: ValueType[];
-    }) => JSX.Element;
+    }) => ReactElement;
 
     /***
      * Use When getItemLabel is not specified

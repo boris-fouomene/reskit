@@ -1,4 +1,4 @@
-import * as ReactIs from "react-is";
+import { ReactNode, isValidElement as isValidReactElement } from "react";
 /**
  * Checks if the provided element is a valid React element.
  *
@@ -8,8 +8,8 @@ import * as ReactIs from "react-is";
  * @returns {boolean} `true` if the element is a valid React element or if
  *   it is a string, number, or boolean when `includeStrOrText` is true; otherwise, `false`.
  */
-export default function isValidElement(element: any, includeStrOrText: boolean = false): boolean {
-    if (element === null || ReactIs.isElement(element)) return true;
+export default function isValidElement(element: any, includeStrOrText: boolean = false): element is ReactNode {
+    if (element === null || isValidReactElement(element)) return true;
     if (includeStrOrText && (typeof element === "string" || typeof element === "number" || typeof element === 'boolean')) {
         return true;
     }

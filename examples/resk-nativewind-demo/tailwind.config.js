@@ -1,14 +1,18 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-
   content: ["./App.{js,ts,tsx}",
     "./components/**/*.{js,ts,tsx}",
-    "@resk/nativewind/dist/**/*.{js}"
+    "../../packages/resk-nativewind/build/**/*.js",
   ],
-
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: "red",
+        }
+      }
+    },
   },
   plugins: [],
 }

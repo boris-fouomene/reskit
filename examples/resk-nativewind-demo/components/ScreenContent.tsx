@@ -1,5 +1,5 @@
 import { Text, Div } from '@resk/nativewind/html';
-import { Icon } from "@resk/nativewind";
+import { Icon, ActivityIndicator } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -11,6 +11,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
   return (
     <Div className={styles.container}>
       <Text className={styles.title}>{title}</Text>
+      <ActivityIndicator className='border-t-red-500' size={80} style={{ borderWidth: 10 }} />
       <Div className={[styles.separator]} />
       <Icon
         onPress={(event) => {

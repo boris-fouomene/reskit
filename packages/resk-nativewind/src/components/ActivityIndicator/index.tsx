@@ -3,7 +3,22 @@ import { cn } from "@utils/cn";
 import { ActivityIndicatorProps } from "react-native";
 import { StyleSheet } from "react-native";
 
-export function ActivityIndicator({ size, style, testID, id, color, className, children, ...props }: ActivityIndicatorProps) {
+/**
+ * A customizable `ActivityIndicator` component that wraps the standard 
+ * `ActivityIndicator` from React Native. This component integrates 
+ * with the application's theme to provide a consistent loading indicator 
+ * appearance based on the current theme colors.
+ * 
+ * @param {ActivityIndicatorProps} props - The properties passed to the 
+ * `ActivityIndicator` component. This includes all standard 
+ * `ActivityIndicatorProps` from React Native, allowing for customization 
+ * of the loading indicator's behavior and appearance.
+ * 
+ * @example
+ * Here’s an example of how to use the custom `ActivityIndicator`:
+ * 
+ */
+export function ActivityIndicator({ size, style, testID, id, color, className, children, role, ...props }: ActivityIndicatorProps) {
     let clx = undefined;
     if (isNumber(size) && size > 0) {
         let borderWidth = Math.max(size / (size > 10 ? 5 : 4), 5);
@@ -18,5 +33,5 @@ export function ActivityIndicator({ size, style, testID, id, color, className, c
         style = [{ borderTopColor: color }, style];
     }
     testID = defaultStr(testID, "resk-nativewind-activity-indicator");
-    return <div data-testid={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
+    return <div role={defaultStr(role, "status")} data-testid={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
 }

@@ -3,6 +3,7 @@ import { ImageProps, ImageStyle, PressableProps, TextProps, TextStyle, ViewProps
 
 export interface IHtmlDivProps extends INativewindBaseProps {
     id?: ViewProps["id"];
+    disabled?: boolean;
     style?: ViewStyle;
     children?: ViewProps["children"];
     role?: ViewProps["role"];

@@ -18,7 +18,7 @@ export default function FontIcon(props: any) {
 
 FontIcon.isValidName = isValidFontIconName;
 FontIcon.getIconSet = () => ({ iconSetName: "", iconSetPrefix: "", iconName: "", iconSet: Fragment });
-FontIcon.SIZE = 20;
+FontIcon.DEFAULT_SIZE = 20;
 FontIcon.COPY = "content-copy";
 FontIcon.MENU = "menu";
 FontIcon.MORE = isIos ? "dots-horizontal" : "dots-vertical";

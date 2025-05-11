@@ -386,7 +386,7 @@ export type ITouchableEventNames = keyof ITouchableProps;
  *
  * simulatePress(touchableHandlers.onPress); // Output: Pressed!
  */
-export type ITouchableProps = {
+export interface ITouchableProps {
   onPress?: TouchableWithoutFeedbackProps['onPress'];
   onLongPress?: TouchableWithoutFeedbackProps['onLongPress'];
   onPressIn?: TouchableWithoutFeedbackProps['onPressIn'];

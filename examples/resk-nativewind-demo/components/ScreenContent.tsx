@@ -11,8 +11,13 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
   return (
     <Div className={styles.container}>
       <Text className={styles.title}>{title}</Text>
-      <Div className={styles.separator} />
-      <Icon.Font name="material-home" size={20} />
+      <Div className={[styles.separator]} />
+      <Icon
+        onPress={(event) => {
+          console.log("pressed icon");
+        }}
+        className={["text-orange-500"]} iconName="material-home" size={20}
+      />
       {children}
     </Div>
   );

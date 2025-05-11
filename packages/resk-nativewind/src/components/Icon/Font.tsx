@@ -1,6 +1,6 @@
 "use client";
 import { FC } from "react";
-import { isNonNullString, defaultStr } from "@resk/core/utils";
+import { isNonNullString, defaultStr, isNumber } from "@resk/core/utils";
 import Logger from "@resk/core/logger";
 import { IFontIconProps, IFontIconSet, IFontIconSetName } from "./types";
 import Platform from "@platform/index";
@@ -16,6 +16,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Octicons from "react-native-vector-icons/Octicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { normalizeProps } from "@utils/cn";
 
 
 const isIos = Platform.isIos();
@@ -39,8 +40,6 @@ const isIos = Platform.isIos();
  *  - `octicons` for Octicons
  *  - `material` for MaterialIcons (default)
  * 
- * By default, the icon color is based on the app's theme text color.
- * 
  * @example
  * ```ts
  * import FontIcon from "$components/Icon/Font";
@@ -58,22 +57,22 @@ const isIos = Platform.isIos();
  * @param {IFontIconProps} props The properties of the `FontIcon` component.
  * @returns {ReactElement | null} Returns the icon element, or null if the icon is not defined.
  */
-export default function FontIcon({ name, ref, disabled, color, ...props }: IFontIconProps) {
-    const { touchableProps, ...restProps } = pickTouchableProps(props as any);
+export default function FontIcon({ name, ref, disabled, ...props }: IFontIconProps) {
+    const { touchableProps, size, ...restProps } = pickTouchableProps(normalizeProps(props));
     let { iconSetName, iconSetPrefix, iconSet: IconSet, iconName } = getFontIconSet(name as string);
     if (!iconSetName || !IconSet || !iconName) {
         Logger.warn(`Icon not defined for FontIcon component, icon [${name as string}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
+    const iconSize = isNumber(size) && size >= 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>;
     if (touchableProps) {
         return <TouchableOpacity disabled={disabled} {...touchableProps}>
             <Component
                 disabled={disabled}
-                {...props}
-                size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
+                {...restProps}
                 ref={ref as any}
-                color={color}
+                size={iconSize}
                 name={iconName}
             />
         </TouchableOpacity>
@@ -81,10 +80,9 @@ export default function FontIcon({ name, ref, disabled, color, ...props }: IFont
     return <Component
         {...restProps}
         disabled={disabled}
-        size={typeof props.size == "number" ? props.size : DEFAULT_FONT_ICON_SIZE}
         ref={ref as any}
-        color={color}
         name={iconName}
+        size={iconSize}
     />;
 };
 
@@ -178,7 +176,7 @@ const DEFAULT_FONT_ICON_SIZE = 20;
  * The default size of the font icon.
  * value: 20
  */
-FontIcon.SIZE = DEFAULT_FONT_ICON_SIZE;
+FontIcon.DEFAULT_SIZE = DEFAULT_FONT_ICON_SIZE;
 
 
 /**
@@ -298,7 +296,7 @@ FontIcon.getIconSet = getFontIconSet;
  * import { BACK_ICON } from '@resk/native';
  * 
  * const BackButton = () => (
- *   <Icon name={BACK_ICON} size={24} color="#000" />
+ *   <Icon name={BACK_ICON} size={24}/>
  * );
  * 
  * @remarks
@@ -330,7 +328,7 @@ FontIcon.BACK = isIos ? (isRTL ? "chevron-right" : "chevron-left") : (isRTL ? "a
  * import { FontIcon } from '@resk/native';
  * 
  * const MenuButton = () => (
- *   <Icon name={FontIcon.MENU} size={24} color="#000" />
+ *   <Icon name={FontIcon.MENU} size={24} />
  * );
  * 
  * @remarks
@@ -364,7 +362,7 @@ FontIcon.MENU = "menu";
  * 
  * const CopyButton = () => (
  *   <Button onPress={handleCopy}>
- *     <Icon name={FontIcon.COPY} size={24} color="#000" />
+ *     <Icon name={FontIcon.COPY} size={24}/>
  *     <Text>Copy</Text>
  *   </Button>
  * );
@@ -398,7 +396,7 @@ FontIcon.COPY = "content-copy";
  * import {FontIcon} from '@resk/native';
  * 
  * const MoreOptionsButton = () => (
- *   <Icon name={FontIcon.MORE} size={24} color="#000" />
+ *   <Icon name={FontIcon.MORE} size={24}/>
  * );
  * 
  * @remarks
@@ -432,7 +430,7 @@ FontIcon.MORE = isIos ? "dots-horizontal" : "dots-vertical";
  * 
  * const PrintButton = () => (
  *   <Button onPress={handlePrint}>
- *     <Icon name={FontIcon.PRINT} size={24} color="#000" />
+ *     <Icon name={FontIcon.PRINT} size={24}/>
  *     <Text>Print</Text>
  *   </Button>
  * );

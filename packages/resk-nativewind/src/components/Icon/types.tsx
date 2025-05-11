@@ -1,4 +1,4 @@
-import { ITextStyle, ITouchableProps } from "../../types";
+import { INativewindBaseProps, ITextStyle, ITouchableProps } from "../../types";
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
 import { ReactElement } from "react";
@@ -103,7 +103,7 @@ export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntD
 * <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
-export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size' | "ref"> & {
+export interface IFontIconProps extends Omit<IconProps, 'name' | "color" | 'style' | 'size' | "ref" | "className">, INativewindBaseProps {
     /**
      * The style object for the icon.
      * 
@@ -148,25 +148,6 @@ export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size' | "ref"> 
     ref?: React.Ref<View>;
 };
 
-
-/**
- * 
- *
- * @typedef {IIconSourceBase}
- * @type {string | ImageSourcePropType}
- * @see the name property of the {@link IIconProps} interface
- * @example
- * // Using a predefined icon name
- * const name: IIconSourceBase = "home"; // From MaterialCommunityIcons
- *
- * // Using a custom image source
- * const customIcon: IIconSourceBase = require('./path/to/icon.png');
- *
- * <Icon source={{uri:"...an icon uri"}} /> // Renders the predefined icon
- * <Icon source={customIcon} /> // Renders the custom image as an icon
- */
-export type IIconSourceBase = IFontIconName | ImageSourcePropType;
-
 /***
  * /**
  * Represents the source for an icon, which can be either a predefined icon name 
@@ -174,8 +155,8 @@ export type IIconSourceBase = IFontIconName | ImageSourcePropType;
  * icon source based on the provided props.
  * 
  * @type {IIconSource}
- * @see {@link IIconSourceBase}  IIconSourceBase
- * @see {@link IIconProps}
+ * @see {@link IFontIconName} For the name of the font icon (used if `source` is not provided).
+ * @see {@link ImageSourcePropType} 
 
  * 
  * @example
@@ -185,16 +166,11 @@ export type IIconSourceBase = IFontIconName | ImageSourcePropType;
  * // Using a custom image source
  * const customIcon: IIconSource = require('./path/to/icon.png');
  *
- * // Using a function to dynamically determine the icon source
- * const dynamicIcon: IIconSource = (props) => {
- *   return props.color === 'red' ? "alert" : require('./path/to/default/icon.png');
- * };
- *
  * <Icon source={icon} />
  * <Icon source={customIcon} />
  * <Icon source={dynamicIcon} color="red" />
  */
-export type IIconSource = IIconSourceBase | null | ReactElement | ((props: IIconProps & { color: string }) => IIconSourceBase | ReactElement);
+export type IIconSource = IFontIconName | ImageSourcePropType | null | ReactElement;
 
 /**
  * @interface IIconProps
@@ -252,11 +228,7 @@ export type IIconSource = IIconSourceBase | null | ReactElement | ((props: IIcon
  *   onError: () => console.error('Error loading image'),
  * };
  */
-export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & ImageProps & ITouchableProps & {
-    /**
-     * Optional. The color of the icon.
-     */
-    color?: string;
+export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Omit<ImageProps, "className"> & Omit<ITouchableProps, "className"> & {
     /****
      * the name of the icon to display (including the prefix for icon set if necessary).
      * It accepts a variety of icon names from different icon libraries such as 

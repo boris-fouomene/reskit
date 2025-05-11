@@ -1,0 +1,267 @@
+import { ITextStyle, ITouchableProps } from "../../types";
+import { ImageProps, ImageSourcePropType, View } from "react-native";
+import { IconProps } from "react-native-vector-icons/Icon";
+import { ReactElement } from "react";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import Foundation from "react-native-vector-icons/Foundation";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Octicons from "react-native-vector-icons/Octicons";
+
+type IFontIconNamePrefix = IFontIconSetsPrefixes[keyof IFontIconSetsPrefixes];
+interface IFontIconSetsPrefixes {
+    AntDesign: 'antd';
+    FontAwesome5: 'fa5';
+    FontAwesome6: 'fa6';
+    Foundation: 'foundation';
+    Ionicons: 'ionic';
+    MaterialCommunityIcons: '';
+    MaterialIcons: 'material';
+    Octicons: 'octicons';
+}
+export type IFontIconName = `${Omit<IFontIconNamePrefix, ""> & string}-${string}` | string;
+
+/**
+ * Represents a type that can be any of the specified icon sets.
+ * 
+ * This type is a union of the following icon sets:
+ * - MaterialCommunityIcons
+ * - FontAwesome6
+ * - AntDesign
+ * - FontAwesome5
+ * - Foundation
+ * - Ionicons
+ * - Octicons
+ * - MaterialIcons
+ */
+export type IFontIconSet = typeof MaterialCommunityIcons | typeof FontAwesome6 | typeof AntDesign | typeof FontAwesome5 | typeof Foundation | typeof Ionicons | typeof Octicons | typeof MaterialIcons;
+
+
+/**
+ * Represents the set of possible icon font names that can be used in the application.
+ * 
+ * @typedef {("MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "FontAwesome5" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons")} IFontIconSetName
+ * 
+ * @property {"MaterialCommunityIcons"} MaterialCommunityIcons - Icon set from Material Community Icons.
+ * @property {"FontAwesome6"} FontAwesome6 - Icon set from Font Awesome 5.
+ * @property {"AntDesign"} AntDesign - Icon set from Ant Design.
+ * @property {"Foundation"} Foundation - Icon set from Foundation.
+ * @property {"Ionicons"} Ionicons - Icon set from Ionicons.
+ * @property {"Octicons"} Octicons - Icon set from Octicons.
+ * @property {"MaterialIcons"} MaterialIcons - Icon set from Material Icons.
+ */
+export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "FontAwesome5" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons";
+
+/**
+ * Props for the FontIcon component, extending the properties of MaterialCommunityIcons
+ * while allowing for customization of icon appearance and behavior.
+ * 
+ * it defines the properties that can be passed to the `FontIcon`
+ * component, allowing for customization of the icon's appearance and behavior.
+ * It extends the props of the `MaterialCommunityIcons` component while omitting
+ * the `name`, `style`, and `size` properties to redefine them with more specific types.
+ *
+ * @typedef {object} IFontIconProps
+ * @property {ITextStyle} [style] - The style object for the icon.
+ * 
+ * This property allows you to customize the icon's appearance using
+ * standard React Native style properties. You can specify styles such as
+ * color, margin, padding, etc.
+ * 
+ * @example
+ * const customStyle: ITextStyle = { color: 'red', margin: 10 };
+ * <FontIcon name="home" style={customStyle} />;
+ *
+ * @property {IFontIconMaterialCommunityName | IFontAntDesignName | IFontIconFeatherName | 
+*           IFontIconIoniconsName | IFontIconOcticonsName | IFontSimpleLineIconsName | 
+*           IFontZocialName | IFontIconMaterialName | IFontIconMaterialCommunityName | 
+*           IFontFoundationIconsName} name - The name of the icon to display.
+* 
+*
+* This property specifies which icon to render (including the prefix for icon set if necessary).
+* It accepts a variety of icon names from different icon sets, ensuring that only valid names are passed.
+* The name must correspond to one of the defined types for the various icon sets
+* (e.g., MaterialCommunityIcons, AntDesign, etc.).
+* 
+* @extends React.ComponentProps<typeof MaterialCommunityIcons>
+* @example
+* // Valid icon names
+* const iconName: IFontIconProps['name'] = "home"; // From MaterialCommunityIcons
+* const iconNameAnt: IFontIconProps['name'] = "antd-home"; // From AntDesign
+* <FontIcon name={iconName} />;
+*
+* @property {number} [size] - The icon size.
+* 
+* This property defines the size of the icon in pixels. If not specified,
+* a default size will be used. You can set this to any number to customize
+* the icon's size according to your layout needs.
+* 
+* @example
+* <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
+    
+*/
+export type IFontIconProps = Omit<IconProps, 'name' | 'style' | 'size' | "ref"> & {
+    /**
+     * The style object for the icon.
+     * 
+     * This property allows you to customize the icon's appearance using
+     * standard React Native style properties. You can specify styles such as
+     * color, margin, padding, etc.
+     * 
+     * @example
+     * const customStyle: ITextStyle = { color: 'red', margin: 10 };
+     * <FontIcon name="home" style={customStyle} />;
+     */
+    style?: ITextStyle;
+
+    /**
+     * The name of the icon to display (including the prefix for icon set if necessary).
+     * 
+     * This property specifies which icon to render. It accepts a variety of icon
+     * names from different icon sets, ensuring that only valid names are passed.
+     * The name must correspond to one of the defined types for the various icon sets
+     * (e.g., MaterialCommunityIcons, AntDesign, etc.).
+     * 
+     * @example
+     * // Valid icon names
+     * const name: IFontIconProps['name'] = "home"; // From MaterialCommunityIcons
+     * const nameAnt: IFontIconProps['name'] = "antd-home"; // From AntDesign
+     * <FontIcon name={name} />;
+     */
+    name: IFontIconName;
+
+    /**
+     * The icon size.
+     * 
+     * This property defines the size of the icon in pixels. If not specified,
+     * a default size will be used. You can set this to any number to customize
+     * the icon's size according to your layout needs.
+     * 
+     * @example
+     * <FontIcon name="home" size={30} /> // Renders the icon with a size of 30 pixels
+     */
+    size?: number;
+
+    ref?: React.Ref<View>;
+};
+
+
+/**
+ * 
+ *
+ * @typedef {IIconSourceBase}
+ * @type {string | ImageSourcePropType}
+ * @see the name property of the {@link IIconProps} interface
+ * @example
+ * // Using a predefined icon name
+ * const name: IIconSourceBase = "home"; // From MaterialCommunityIcons
+ *
+ * // Using a custom image source
+ * const customIcon: IIconSourceBase = require('./path/to/icon.png');
+ *
+ * <Icon source={{uri:"...an icon uri"}} /> // Renders the predefined icon
+ * <Icon source={customIcon} /> // Renders the custom image as an icon
+ */
+export type IIconSourceBase = IFontIconName | ImageSourcePropType;
+
+/***
+ * /**
+ * Represents the source for an icon, which can be either a predefined icon name 
+ * or a custom image source. Additionally, it can be a function that returns an 
+ * icon source based on the provided props.
+ * 
+ * @type {IIconSource}
+ * @see {@link IIconSourceBase}  IIconSourceBase
+ * @see {@link IIconProps}
+
+ * 
+ * @example
+ * // Using a predefined icon source
+ * const icon: IIconSource = "settings";
+ *
+ * // Using a custom image source
+ * const customIcon: IIconSource = require('./path/to/icon.png');
+ *
+ * // Using a function to dynamically determine the icon source
+ * const dynamicIcon: IIconSource = (props) => {
+ *   return props.color === 'red' ? "alert" : require('./path/to/default/icon.png');
+ * };
+ *
+ * <Icon source={icon} />
+ * <Icon source={customIcon} />
+ * <Icon source={dynamicIcon} color="red" />
+ */
+export type IIconSource = IIconSourceBase | null | ReactElement | ((props: IIconProps & { color: string }) => IIconSourceBase | ReactElement);
+
+/**
+ * @interface IIconProps
+ * Represents the properties for an icon component that combines the icon-specific
+ * properties from `IFontIconProps` with the standard image properties from React Native.
+ *
+ * This type allows for a versatile icon component that can render both font-based icons,
+ * custom images, and tooltip functionality, allowing for a versatile icon component that can display both font-based and image-based icons,
+ * as well as providing optional tooltip support, providing a unified interface for developers. It inherits all the
+ * properties from both `IFontIconProps` and `ImageProps`, enabling the use of various
+ * icon sources and additional image attributes.
+ * 
+ * This type allows flexibility in using icons within your application by supporting:
+ * 
+ * 1. **Predefined Icon Names**: You can use names from different icon libraries such as 
+ *    MaterialCommunityIcons, AntDesign, Feather, Ionicons, Octicons, SimpleLineIcons, 
+ *    Zocial, MaterialIcons, and FoundationIcons.
+ *
+ * 2. **Custom Image Sources**: You can also provide an image source using the standard
+ *    `ImageSourcePropType` from React Native, allowing you to use any image as an icon.
+ *
+ * @typedef {IIconProps}
+ * 
+ * @extends {IFontIconProps} - All properties related to font icons, including:
+ *   - `iconName`: The name of the icon to display.
+ *   - `style`: The style object for the icon.
+ *   - `size`: The size of the icon.
+ * 
+ * @extends {ImageProps} - All standard image properties, including:
+ *   - `source`: The source of the image (can be a URI or local asset).
+ *   - `resizeMode`: How to resize the image when the frame doesn't match the raw image dimensions.
+ *   - `onLoad`: Callback function when the image loads successfully.
+ *   - `onError`: Callback function when the image fails to load.
+ * 
+ * @extends ITooltipBaseProps
+ * 
+ * @property {ITooltipProps} [containerProps] - Optional. Properties for the tooltip container,
+ * allowing customization of the tooltip behavior and appearance when the icon is hovered or focused.
+ *
+ * @example
+ * // Using IIconProps to render a font icon
+ * const iconProps: IIconProps = {
+ *   iconName : "home" | "material-home",
+ *   style: { color: 'blue', fontSize: 24 },
+ *   size: 30,
+ *   resizeMode: 'contain',
+ *   onLoad: () => console.log('Icon loaded'),
+ * };
+ *
+ * // Using IIconProps to render a custom image
+ * const customIconProps: IIconProps = {
+ *   source: require('./path/to/icon.png'),
+ *   style: { width: 50, height: 50 },
+ *   resizeMode: 'cover',
+ *   onError: () => console.error('Error loading image'),
+ * };
+ */
+export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & ImageProps & ITouchableProps & {
+    /**
+     * Optional. The color of the icon.
+     */
+    color?: string;
+    /****
+     * the name of the icon to display (including the prefix for icon set if necessary).
+     * It accepts a variety of icon names from different icon libraries such as 
+     * MaterialCommunityIcons, AntDesign, Feather, Ionicons, Octicons, SimpleLineIcons, 
+     * Zocial, MaterialIcons, and FoundationIcons.
+     */
+    iconName?: IFontIconName;
+};

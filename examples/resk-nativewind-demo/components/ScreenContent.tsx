@@ -1,4 +1,5 @@
 import { Text, Div } from '@resk/nativewind/html';
+import { Icon } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -11,6 +12,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
     <Div className={styles.container}>
       <Text className={styles.title}>{title}</Text>
       <Div className={styles.separator} />
+      <Icon.Font name="material-home" size={20} />
       {children}
     </Div>
   );

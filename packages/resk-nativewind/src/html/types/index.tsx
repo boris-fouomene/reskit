@@ -7,7 +7,6 @@ export interface IHtmlDivProps extends INativewindBaseProps {
     style?: ViewStyle;
     children?: ViewProps["children"];
     role?: ViewProps["role"];
-    "data-testid"?: ViewProps["testID"];
     tabIndex?: ViewProps["tabIndex"];
     "aria-label"?: ViewProps["aria-label"];
     accessible?: ViewProps["accessible"];
@@ -26,8 +25,7 @@ export interface IHtmlDivProps extends INativewindBaseProps {
     "collapsable"?: ViewProps["collapsable"];
     "title"?: string;
     /**@platform native */
-    testID?: string;
-    onPress?: PressableProps['onPress'];
+    testID?: ViewProps["testID"];
 }
 
 export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "children" | "onPress"> {

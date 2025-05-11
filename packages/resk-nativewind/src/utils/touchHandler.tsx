@@ -62,18 +62,20 @@ const touchableEvents: ITouchableEventNames[] = [
  * const isInvalid = hasTouchHandler(invalidInput); // Returns false
  */
 export function hasTouchHandler(props: ITouchableProps) {
-  return !!pickTouchableProps(props);
+  return !!pickTouchableProps(props).touchableProps;
 }
 
-/***
- * Extracts touchable props from the provided props object.
+
+/**
+ * Extracts touch event handlers from the provided props object.
  *
- * This function takes an object containing touch event handlers and returns
- * a new object with only the handlers that are defined for the touchable events.
- * If no valid handlers are found, the function returns an empty object.
+ * The `pickTouchableProps` function takes an object containing potential 
+ * touch event handlers and returns a new object with only the handlers 
+ * that are defined for the touchable events. If no valid handlers are found, 
+ * the function returns an empty object.
  *
  * @param {@link ITouchableProps} props - An object that may contain touch event handlers.
- * @returns {@link ITouchableProps | null} An object with the valid touch event handlers, or `null` if none are found.
+ * @returns {Omit<T, keyof ITouchableProps> & { touchableProps?: ITouchableProps }} An object with the valid touch event handlers, or an empty object if none are found.
  *
  * @example
  * // Example usage of pickTouchableProps
@@ -84,21 +86,23 @@ export function hasTouchHandler(props: ITouchableProps) {
  * };
  *
  * const handlers = pickTouchableProps(props);
- * console.log(handlers);
+ * console.log(handlers); 
  * // Output: { onPress: [Function], onLongPress: [Function] }
  *
  * const emptyHandlers = pickTouchableProps({});
- * console.log(emptyHandlers);
+ * console.log(emptyHandlers); 
+ * // Output: {}
  */
-export const pickTouchableProps = (props: ITouchableProps): ITouchableProps | null => {
-  if (!isObj(props)) return null;
+export function pickTouchableProps<T extends ITouchableProps = any>(props: T): Omit<T, keyof ITouchableProps> & { touchableProps?: ITouchableProps } {
+  if (!isObj(props)) return {} as any;
   const r: ITouchableProps = {};
   let hasTouchableEvents = false;
   touchableEvents.forEach((event) => {
     if (typeof (props[event]) === 'function') {
       r[event] = props[event];
       hasTouchableEvents = true;
+      delete props[event];
     }
   });
-  return hasTouchableEvents ? r : null;
+  return { ...props, touchableProps: hasTouchableEvents ? r : undefined };
 }

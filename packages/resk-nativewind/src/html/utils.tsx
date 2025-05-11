@@ -1,21 +1,22 @@
+import { defaultStr, isObj } from "@resk/core/utils";
 import { IHtmlDivProps } from "./types";
 import { cn, normalizeProps } from "@utils";
 import { StyleSheet } from "react-native";
 
 
-const isNonNullString = (value: unknown): value is string => typeof value === "string" && !!value.length;
-export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, ...props }: T) {
+export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, ...props }: T, defaultProps?: T) {
     return {
-        testID: isNonNullString(testID) ? testID : isNonNullString(props["data-testid"]) ? props["data-testid"] : undefined,
-        ...normalizeProps(props),
+        ...normalizeProps(props, defaultProps),
+        testID: defaultStr(testID, defaultProps?.testID),
     }
 }
 
-export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, style, onPress, ...props }: T) {
+export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, style, ...props }: T, defaultProps?: T) {
     return {
-        "data-test-id": isNonNullString(testID) ? testID : isNonNullString(props["data-testid"]) ? props["data-testid"] : undefined,
         style: style ? StyleSheet.flatten(style) : undefined as any,
-        ...normalizeProps(props),
-        onClick: typeof onPress == "function" ? onPress as any : undefined
+        ...normalizeProps(props, defaultProps),
+        "data-test-id": defaultStr(testID, defaultProps?.testID),
     }
 }
+
+

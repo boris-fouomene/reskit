@@ -1,5 +1,6 @@
 import { Fragment } from "react";
-
+import { Platform } from "react-native";
+const isIos = Platform.OS === "ios";
 /**
  * Checks if the provided font icon name is valid.
  *
@@ -17,6 +18,13 @@ export default function FontIcon(props: any) {
 
 FontIcon.isValidName = isValidFontIconName;
 FontIcon.getIconSet = () => ({ iconSetName: "", iconSetPrefix: "", iconName: "", iconSet: Fragment });
-export const DEFAULT_FONT_ICON_SIZE = 20;
+FontIcon.SIZE = 20;
+FontIcon.COPY = "content-copy";
+FontIcon.MENU = "menu";
+FontIcon.MORE = isIos ? "dots-horizontal" : "dots-vertical";
+FontIcon.BACK = isIos ? "chevron-left" : "arrow-left";
+FontIcon.PRINT = "printer";
+FontIcon.CHECKED = isIos ? 'check' : "checkbox-marked";
+FontIcon.UNCHECKED = "checkbox-blank-outline";
 
-FontIcon.SIZE = DEFAULT_FONT_ICON_SIZE;
+FontIcon.CHECK = "check";

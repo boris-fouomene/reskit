@@ -1,3 +1,4 @@
+import { isObj } from '@resk/core/utils';
 import { INativewindBaseProps } from '@src/types';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -37,6 +38,7 @@ export function cn(...inputs: ClassValue[]) {
  * @template T - The type extending INativewindBaseProps, defaulting to any.
  * 
  * @param {T} props - The component props including an optional className.
+ * @param {T} [defaultProps] - An optional object of default props to use if the input props are undefined.
  * @returns {Omit<T, "className"> & { className: string }} - A new props object with 
  *          a normalized className string.
  *
@@ -46,6 +48,8 @@ export function cn(...inputs: ClassValue[]) {
  * // normalizedProps.className will be a string formatted by `cn` function
  */
 
-export function normalizeProps<T extends INativewindBaseProps = any>({ className, ...props }: T): Omit<T, "className"> & { className: string } {
-    return { ...props, className: cn(className) }
+export function normalizeProps<T extends INativewindBaseProps = any>({ className, ...props }: T, defaultProps?: T): Omit<T, "className"> & { className: string } {
+    defaultProps = isObj(defaultProps) ? defaultProps : {} as T;
+    const disabledClass = (props as any).disabled && "pointer-events-none" || (defaultProps as any)?.disabled && "pointer-events-none"
+    return { ...defaultProps, ...props, className: cn(defaultProps.className, disabledClass, className) }
 }

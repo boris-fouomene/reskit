@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "removeComments": false,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        // Keep comments in .d.ts files only
+        "declarationDir": "./build",
+    },
+}

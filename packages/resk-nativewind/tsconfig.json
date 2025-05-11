@@ -1,0 +1,117 @@
+{
+  "compilerOptions": {
+    "target": "ES2015", // Or the desired target
+    "module": "ES6", // Enables ESM & CJS interop
+    "lib": [
+      "dom"
+    ],
+    "declaration": true,
+    "declarationDir": "build",
+    "removeComments": true,
+    "sourceMap": false,
+    "outDir": "build",
+    "strict": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": false,
+    "jsx": "react-jsx",
+    "jsxImportSource": "nativewind",
+    "baseUrl": "./",
+    "preserveConstEnums": true,
+    "allowJs": true,
+    "paths": {
+      "@breakpoints/*": [
+        "src/breakpoints/*"
+      ],
+      "@breakpoints": [
+        "src/breakpoints"
+      ],
+      "@dimensions/*": [
+        "src/dimensions/*"
+      ],
+      "@dimensions": [
+        "src/dimensions"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@utils": [
+        "src/utils"
+      ],
+      "@html/*": [
+        "src/html/*"
+      ],
+      "@html": [
+        "src/html"
+      ],
+      "@theme/*": [
+        "src/theme/*"
+      ],
+      "@theme": [
+        "src/theme"
+      ],
+      "@auth/*": [
+        "src/auth/*"
+      ],
+      "@auth": [
+        "src/auth"
+      ],
+      "@platform/*": [
+        "src/platform/*"
+      ],
+      "@platform": [
+        "src/platform"
+      ],
+      "@notify/*": [
+        "src/notify/*"
+      ],
+      "@notify": [
+        "src/notify"
+      ],
+      "@hooks/*": [
+        "src/hooks/*"
+      ],
+      "@layouts/*": [
+        "src/layouts/*"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@constants/*": [
+        "src/constants/*"
+      ],
+      "@src/*": [
+        "src/*"
+      ]
+    }
+  },
+  "types": [
+    "jest",
+    "node",
+    "react-native",
+    "react",
+  ],
+  "include": [
+    "src/**/*",
+  ],
+  "exclude": [
+    "node_modules",
+    "@resk/core",
+    "@resk/core/utils",
+    "@resk/core/*",
+    "@resk/*",
+    "../../packages/resk-core/**/*",
+    "../resk-core/**/*",
+    "../../node_modules/**/*",
+    "../../examples/**/*",
+    "react-native",
+    "react-native-svg",
+    "react-native-vector-icons/**/*",
+    "../build/**/*",
+    "../build/**/*",
+    "docs/**/*"
+  ],
+}

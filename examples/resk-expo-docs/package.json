@@ -14,23 +14,23 @@
   },
   "dependencies": {
     "@faker-js/faker": "^9.6.0",
-    "expo": "~52.0.46",
-    "expo-linking": "~7.0.5",
-    "expo-router": "~4.0.20",
-    "expo-splash-screen": "~0.29.24",
-    "expo-sqlite": "~15.1.4",
-    "expo-status-bar": "~2.0.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-native": "0.76.9",
-    "react-native-safe-area-context": "4.12.0",
-    "react-native-screens": "~4.4.0",
-    "react-native-svg": "15.8.0",
+    "expo": "^53.0.9",
+    "expo-linking": "~7.1.4",
+    "expo-router": "~5.0.6",
+    "expo-splash-screen": "~0.30.8",
+    "expo-sqlite": "~15.2.9",
+    "expo-status-bar": "~2.2.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native": "0.79.2",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-screens": "~4.10.0",
+    "react-native-svg": "15.11.2",
     "react-native-vector-icons": "^10.2.0",
-    "react-native-web": "~0.19.13"
+    "react-native-web": "^0.20.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.9",
-    "@types/react": "~18.3.12"
+    "@types/react": "~19.0.10"
   }
 }

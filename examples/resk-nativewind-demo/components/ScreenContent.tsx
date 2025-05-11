@@ -11,7 +11,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
   return (
     <Div className={styles.container}>
       <Text className={styles.title}>{title}</Text>
-      <ActivityIndicator className='border-t-red-500' size={80} style={{ borderWidth: 10 }} />
+      <ActivityIndicator size={80} color={"yellow"} />
       <Div className={[styles.separator]} />
       <Icon
         onPress={(event) => {

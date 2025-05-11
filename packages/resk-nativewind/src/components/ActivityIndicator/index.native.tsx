@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@utils/cn";
-import { ActivityIndicator as RNPActivityIndicator, ActivityIndicatorProps } from "react-native";
+import { ActivityIndicator as RNPActivityIndicator, ActivityIndicatorProps, StyleSheet } from "react-native";
 
 /**
  * A custom `ActivityIndicator` component that wraps the standard 
@@ -40,6 +40,6 @@ import { ActivityIndicator as RNPActivityIndicator, ActivityIndicatorProps } fro
  * Ensure that the theme provider is correctly set up in your application 
  * for the color to be applied.
  */
-export function ActivityIndicator(props: ActivityIndicatorProps) {
-  return <RNPActivityIndicator testID="resk-activity-indicator" {...props} className={cn("text-primary", props.className)} />;
+export function ActivityIndicator({ className, style, ...props }: ActivityIndicatorProps) {
+  return <RNPActivityIndicator testID="resk-activity-indicator" {...props} />;
 }

@@ -24,7 +24,7 @@ export function ActivityIndicator({ size, style, testID, id, color, className, c
     if (isNumber(size) && size > 0) {
         let borderWidth = Math.max(size / (size > 10 ? 5 : 4), 5);
         if (size >= 40) {
-            borderWidth = Math.max(size / 5, 10);
+            borderWidth = Math.max(size / 10, size < 60 ? 6 : size < 80 ? 8 : 10);
         }
         style = [{ width: size, height: size, borderWidth }, style]
     } else {
@@ -34,5 +34,5 @@ export function ActivityIndicator({ size, style, testID, id, color, className, c
         style = [{ borderTopColor: color }, style];
     }
     testID = defaultStr(testID, "resk-nativewind-activity-indicator");
-    return <div role={defaultStr(role, "status")} {...pickHtmlProps(props)} data-testid={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
+    return <div role={defaultStr(role, "progressbar")} {...pickHtmlProps(props)} data-testid={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
 }

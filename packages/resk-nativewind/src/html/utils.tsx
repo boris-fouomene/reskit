@@ -15,6 +15,7 @@ export function pickHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDi
     if (!isObj(props)) return {} as Partial<IHtmlDivProps>;
     const result: Partial<IHtmlDivProps> = {};
     [
+        "id",
         "tabIndex",
         "aria-label",
         "accessible",
@@ -36,6 +37,9 @@ export function pickHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDi
             (result as any)[p] = props[p as keyof typeof props];
         }
     });
+    if (props?.disabled) {
+        result.className = cn("pointer-events-none", props.className)
+    }
     return result;
 }
 

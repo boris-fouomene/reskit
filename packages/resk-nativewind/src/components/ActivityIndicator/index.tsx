@@ -1,3 +1,4 @@
+import { pickHtmlProps } from "@html/utils";
 import { defaultStr, isNonNullString, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { ActivityIndicatorProps } from "react-native";
@@ -33,5 +34,5 @@ export function ActivityIndicator({ size, style, testID, id, color, className, c
         style = [{ borderTopColor: color }, style];
     }
     testID = defaultStr(testID, "resk-nativewind-activity-indicator");
-    return <div role={defaultStr(role, "status")} data-testid={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
+    return <div role={defaultStr(role, "status")} {...pickHtmlProps(props)} data-testid={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
 }

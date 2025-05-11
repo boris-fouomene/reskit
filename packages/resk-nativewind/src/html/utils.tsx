@@ -11,6 +11,34 @@ export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<
     }
 }
 
+export function pickHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>(props: T): Partial<IHtmlDivProps> {
+    if (!isObj(props)) return {} as Partial<IHtmlDivProps>;
+    const result: Partial<IHtmlDivProps> = {};
+    [
+        "tabIndex",
+        "aria-label",
+        "accessible",
+        "accessibilityLabel",
+        "accessibilityRole",
+        "aria-busy",
+        "aria-checked",
+        "aria-disabled",
+        "aria-expanded",
+        "aria-hidden",
+        "aria-selected",
+        "aria-valuemax",
+        "aria-valuemin",
+        "aria-valuenow",
+        "aria-valuetext",
+        "collapsable",
+    ].map((p) => {
+        if (p in props && typeof props[p as keyof typeof props] !== "undefined") {
+            (result as any)[p] = props[p as keyof typeof props];
+        }
+    });
+    return result;
+}
+
 export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, style, ...props }: T, defaultProps?: T) {
     return {
         style: style ? StyleSheet.flatten(style) : undefined as any,

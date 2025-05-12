@@ -1,5 +1,5 @@
 import { Text, Div } from '@resk/nativewind/html';
-import { Icon, ActivityIndicator, variants } from "@resk/nativewind";
+import { Icon, ActivityIndicator, variants, Surface } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -9,7 +9,7 @@ type ScreenContentProps = {
 
 export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
   return (
-    <Div className={styles.container}>
+    <Surface className={styles.container}>
       <Text className={styles.title}>{title}</Text>
       <ActivityIndicator size={80} color={"yellow"} />
       <Div className={[styles.separator]} />
@@ -22,7 +22,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
         size={40}
       />
       {children}
-    </Div>
+    </Surface>
   );
 };
 const styles = {

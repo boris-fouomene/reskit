@@ -1,5 +1,6 @@
 import { tv, type VariantProps } from "tailwind-variants";
 import surface from "./surface";
+import text from "./text";
 export const variants = {
     all: tv({
         base: "",
@@ -11,8 +12,10 @@ export const variants = {
                 true: "pointer-events-none opacity-80 web:cursor-not-allowed",
             },
             hover: "hover:bg-gray-100 dark:hover:bg-gray-800",
+            hidden: {
+                true: "hidden opacity-0",
+            }
         },
-        compoundVariants: []
     }),
     icon: tv({
         base: "",
@@ -29,7 +32,8 @@ export const variants = {
             },
         },
     }),
-    surface
+    surface,
+    text,
 }
 export type IVariantPropsAll = VariantProps<typeof variants.all>;
 export type IVariantPropsIcon = Omit<VariantProps<typeof variants.icon>, "size"> & {

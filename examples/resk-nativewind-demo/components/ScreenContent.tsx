@@ -1,5 +1,5 @@
 import { Text, Div } from '@resk/nativewind/html';
-import { Icon, ActivityIndicator, variants, Surface } from "@resk/nativewind";
+import { Icon, ActivityIndicator, variants, Surface, HelperText } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -13,6 +13,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
       <Text className={styles.title}>{title}</Text>
       <ActivityIndicator size={80} color={"yellow"} />
       <Div className={[styles.separator]} />
+      <HelperText error>An example of helper text</HelperText>
       <Icon.Font
         disabled
         onPress={(event) => {
@@ -26,7 +27,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
   );
 };
 const styles = {
-  container: `items-center flex-1 justify-center hover:bg-red-500 `,
+  container: `items-center flex-1 justify-center `,
   separator: `h-[1px] my-7 w-4/5 bg-gray-200`,
   title: `text-xl font-bold text-green-500`,
 };

@@ -1,5 +1,5 @@
 import { tv, type VariantProps } from "tailwind-variants";
-
+import surface from "./surface";
 export const variants = {
     all: tv({
         base: "",
@@ -27,19 +27,9 @@ export const variants = {
                 warning: "text-warning dark:text-dark-warning",
                 error: "text-error dark:text-dark-error",
             },
-            /* size: {
-                "sm": "web:!text-sm",
-                "md": "web:!text-md",
-                "lg": "web:!text-lg",
-                "xl": "web:!text-xl",
-                "2xl": "web:!text-2xl",
-                "3xl": "web:!text-3xl",
-                "4xl": "web:!text-4xl",
-                "5xl": "web:!text-5xl",
-                "6xl": "web:!text-6xl",
-            } */
         },
-    })
+    }),
+    surface
 }
 export type IVariantPropsAll = VariantProps<typeof variants.all>;
 export type IVariantPropsIcon = Omit<VariantProps<typeof variants.icon>, "size"> & {

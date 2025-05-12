@@ -4,3 +4,4 @@ export * from "./utils";
 export * from "./theme";
 export * from "./types";
 export * from "./components";
+export * from "./variants";

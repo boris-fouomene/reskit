@@ -3,9 +3,13 @@ import { II18nLocale } from "@src/i18n/types";
 import { Component, ComponentClass, ExoticComponent, FunctionComponent, JSXElementConstructor, ReactElement } from "react";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, Animated, PressableProps, TouchableWithoutFeedbackProps } from "react-native";
 import { type ClassValue } from 'clsx';
+import { IVariantPropsAll } from "@variants/index";
 
-export interface INativewindBaseProps {
-  className?: ClassValue;
+
+export type IClassName = ClassValue;
+
+export interface INativewindBaseProps extends IVariantPropsAll {
+  className?: IClassName;
 }
 /**
   @interface

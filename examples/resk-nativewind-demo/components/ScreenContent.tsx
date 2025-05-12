@@ -1,5 +1,5 @@
 import { Text, Div } from '@resk/nativewind/html';
-import { Icon, ActivityIndicator } from "@resk/nativewind";
+import { Icon, ActivityIndicator, variants } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -13,11 +13,13 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
       <Text className={styles.title}>{title}</Text>
       <ActivityIndicator size={80} color={"yellow"} />
       <Div className={[styles.separator]} />
-      <Icon
+      <Icon.Font
+        disabled
         onPress={(event) => {
           console.log("pressed icon");
         }}
-        className={["text-orange-500"]} iconName="material-home" size={20}
+        className={[variants.icon({ color: "primary" })]} name="material-home"
+        size={40}
       />
       {children}
     </Div>

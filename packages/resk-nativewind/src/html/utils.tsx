@@ -2,6 +2,7 @@ import { defaultStr, isObj } from "@resk/core/utils";
 import { IHtmlDivProps } from "./types";
 import { cn, normalizeProps } from "@utils";
 import { StyleSheet } from "react-native";
+import { variants } from "@variants/index";
 
 
 export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, ...props }: T, defaultProps?: T) {
@@ -37,9 +38,7 @@ export function pickHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDi
             (result as any)[p] = props[p as keyof typeof props];
         }
     });
-    if (props?.disabled) {
-        result.className = cn("pointer-events-none", props.className)
-    }
+    result.className = cn(variants.all({ disabled: !!((props as any).disabled) }), props.className);
     return result;
 }
 

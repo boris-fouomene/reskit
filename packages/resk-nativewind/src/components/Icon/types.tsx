@@ -1,4 +1,4 @@
-import { INativewindBaseProps, ITextStyle, ITouchableProps } from "../../types";
+import { IClassName, INativewindBaseProps, ITextStyle, ITouchableProps } from "../../types";
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
 import { ReactElement } from "react";
@@ -10,6 +10,7 @@ import Foundation from "react-native-vector-icons/Foundation";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Octicons from "react-native-vector-icons/Octicons";
+import { IVariantPropsAll, IVariantPropsIcon } from "@variants/index";
 
 type IFontIconNamePrefix = IFontIconSetsPrefixes[keyof IFontIconSetsPrefixes];
 interface IFontIconSetsPrefixes {
@@ -103,7 +104,7 @@ export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntD
 * <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
-export interface IFontIconProps extends Omit<IconProps, 'name' | "color" | 'style' | 'size' | "ref" | "className">, INativewindBaseProps {
+export type IFontIconProps = Omit<IconProps, 'name' | "color" | 'style' | 'size' | "ref" | "className"> & INativewindBaseProps & IVariantPropsIcon & IVariantPropsAll & {
     /**
      * The style object for the icon.
      * 
@@ -146,6 +147,11 @@ export interface IFontIconProps extends Omit<IconProps, 'name' | "color" | 'styl
     size?: number;
 
     ref?: React.Ref<View>;
+
+    /***
+     * The className of the container of the icon. It's used when the icon is wrapped in a Pressable component
+     */
+    containerClassName?: IClassName;
 };
 
 /***

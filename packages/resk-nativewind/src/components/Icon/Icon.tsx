@@ -2,11 +2,12 @@
 import { Fragment, ReactNode } from "react";
 import { IIconProps, IFontIconName, IIconSource } from "./types";
 import { Image, ImageSourcePropType, ImageStyle, Pressable } from "react-native";
-import { isValidElement, normalizeProps, pickTouchableProps } from "@utils";
+import { cn, isValidElement, normalizeProps, pickTouchableProps } from "@utils";
 import { isImageSource, isImageUrl } from "./utils";
 import FontIcon from "./Font";
 import { StyleSheet } from "react-native";
 import { isNonNullString, isObj } from "@resk/core/utils";
+import { remapProps } from "nativewind";
 /**
  * The `Icon` component is a versatile icon renderer that can display both 
  * image-based icons and font-based icons. It supports press events, tooltips, 
@@ -67,24 +68,25 @@ import isNonNullString from '../../../../resk-core/build/utils/isNonNullString';
  * <Icon iconName="material-home" size={24} />
  */
 
-function Icon({ iconName, resizeMode, disabled, source, testID, size, style, ref, ...props }: IIconProps) {
+function Icon({ iconName, resizeMode, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
     const isSource = isImageSource(source);
     //const isValidIconName = iconName && FontIcon.isValidName(iconName);
     testID = testID && typeof testID == "string" ? testID : (isSource ? "resk-image" : "resk-font-icon");
-    size = typeof size == "number" && size > 0 ? size : FontIcon.DEFAULT_SIZE;
-    const iconStyle = StyleSheet.flatten([
-        {
-            width: size,
-            height: size,
-        },
-        style,
-    ]);
+    const iconSize = typeof size == "number" && size > 0 ? size : FontIcon.DEFAULT_SIZE;
     if (isSource) {
         const { touchableProps, ...restProps } = pickTouchableProps(normalizeProps(props));
+        const disabled = props.disabled;
         const isPressable = !disabled && !!touchableProps;
         const Component = isPressable ? Pressable : Fragment;
         const containerP = isPressable ? Object.assign({}, touchableProps, { testID: testID + "-icon-container" }) : {};
-        return <Component {...containerP}>
+        const iconStyle = StyleSheet.flatten([
+            iconSize ? {
+                width: iconSize,
+                height: iconSize,
+            } : undefined,
+            style,
+        ]);
+        return <Component {...containerP} className={cn("self-start", containerClassName)}>
             <Image
                 accessibilityIgnoresInvertColors
                 resizeMode={resizeMode || "contain"}
@@ -97,17 +99,15 @@ function Icon({ iconName, resizeMode, disabled, source, testID, size, style, ref
         </Component>
     }
     return <FontIcon
+        containerClassName={containerClassName}
         testID={testID}
         name={iconName as IFontIconName}
-        size={size}
+        size={iconSize}
+        style={style}
         {...props}
         ref={ref}
-        style={iconStyle as ImageStyle}
     />
 };
-
-
-
 
 
 

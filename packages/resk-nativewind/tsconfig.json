@@ -29,6 +29,12 @@
       "@breakpoints": [
         "src/breakpoints"
       ],
+      "@variants/*": [
+        "src/variants/*"
+      ],
+      "@variants": [
+        "src/variants"
+      ],
       "@dimensions/*": [
         "src/dimensions/*"
       ],

@@ -2,7 +2,7 @@
 import { FC } from "react";
 import { isNonNullString, defaultStr, isNumber } from "@resk/core/utils";
 import Logger from "@resk/core/logger";
-import { IFontIconProps, IFontIconSet, IFontIconSetName } from "./types";
+import { IFontIconProps, IFontIconSet } from "./types";
 import Platform from "@platform/index";
 import { isRTL } from "@utils/i18nManager";
 import { pickTouchableProps } from "@utils/touchHandler";
@@ -16,7 +16,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Octicons from "react-native-vector-icons/Octicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { normalizeProps } from "@utils/cn";
+import { cn, normalizeProps } from "@utils/cn";
 
 
 const isIos = Platform.isIos();
@@ -57,22 +57,23 @@ const isIos = Platform.isIos();
  * @param {IFontIconProps} props The properties of the `FontIcon` component.
  * @returns {ReactElement | null} Returns the icon element, or null if the icon is not defined.
  */
-export default function FontIcon({ name, ref, disabled, ...props }: IFontIconProps) {
-    const { touchableProps, size, ...restProps } = pickTouchableProps(normalizeProps(props));
+export default function FontIcon({ name, containerClassName, ref, ...props }: IFontIconProps) {
+    const { touchableProps, size, disabled, ...restProps } = pickTouchableProps(normalizeProps(props));
     let { iconSetName, iconSetPrefix, iconSet: IconSet, iconName } = getFontIconSet(name as string);
     if (!iconSetName || !IconSet || !iconName) {
         Logger.warn(`Icon not defined for FontIcon component, icon [${name as string}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
-    const iconSize = isNumber(size) && size >= 0 ? size : DEFAULT_FONT_ICON_SIZE;
+    const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
+    const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>;
     if (touchableProps) {
-        return <TouchableOpacity disabled={disabled} {...touchableProps}>
+        return <TouchableOpacity disabled={disabled} {...touchableProps} className={cn("self-start", containerClassName)}>
             <Component
                 disabled={disabled}
                 {...restProps}
                 ref={ref as any}
-                size={iconSize}
+                {...rP}
                 name={iconName}
             />
         </TouchableOpacity>
@@ -82,7 +83,7 @@ export default function FontIcon({ name, ref, disabled, ...props }: IFontIconPro
         disabled={disabled}
         ref={ref as any}
         name={iconName}
-        size={iconSize}
+        {...rP}
     />;
 };
 

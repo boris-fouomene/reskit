@@ -12,9 +12,11 @@ import { IVariantPropsSurface } from "@variants/surface";
  * @see {@link Div} for more information about the Div component.
  * @see {@link IHtmlDivProps} for more information about the Div props.
  */
-export function Surface(props: IHtmlDivProps & IVariantPropsSurface) {
+export function Surface(props: ISurfaceProps) {
     return <Div
         testID={"resk-nativewind-surface"}
         {...props} className={cn(variants.surface(), props.className)}
     />
 }
+
+export interface ISurfaceProps extends IHtmlDivProps, IVariantPropsSurface { }

@@ -26,18 +26,29 @@ export interface IHtmlDivProps extends INativewindBaseProps {
     "title"?: string;
     /**@platform native */
     testID?: ViewProps["testID"];
+    onPress?: PressableProps["onPress"];
+    onPressIn?: PressableProps["onPressIn"];
+    onPressOut?: PressableProps["onPressOut"];
 }
 
-export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "children" | "onPress"> {
+export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "children" | "onPress" | "onPressIn" | "onPressOut"> {
     style?: TextStyle;
     children?: TextProps["children"];
     onPress?: TextProps["onPress"];
+    onPressIn?: TextProps["onPressIn"];
+    onPressOut?: TextProps["onPressOut"];
 }
 
 export interface IHtmlImageProps extends Omit<IHtmlDivProps, "style" | "children"> {
     style?: ImageStyle;
+    srcSet?: ImageProps["srcSet"];
+    /***
+     * @platform native
+     */
+    defaultSource?: ImageProps["defaultSource"];
+    referrerPolicy?: ImageProps["referrerPolicy"];
+    alt?: ImageProps["alt"];
     src?: ImageProps["src"];
-    alt?: string;
     height?: ImageProps["height"];
     width?: ImageProps["width"];
     resizeMethod?: ImageProps["resizeMethod"];

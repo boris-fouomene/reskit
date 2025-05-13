@@ -1,6 +1,6 @@
 import { IHtmlImageProps } from "../types";
 import { normalizeHtmlProps } from "../utils";
 
-export function Image(props: IHtmlImageProps) {
-    return <img {...normalizeHtmlProps(props)} />;
+export function Image({ defaultSource, ...props }: IHtmlImageProps) {
+    return <img {...normalizeHtmlProps(props)} onClick={(event) => { }} />;
 }

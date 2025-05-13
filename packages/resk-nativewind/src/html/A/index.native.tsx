@@ -7,12 +7,11 @@ import { sanitizeHref } from './utils';
 export function A({ href, target, onPress, download, rel, ...props }: IHtmlAprops) {
     const url = sanitizeHref(href);
     return <Text role="link" {...props}
-        onPress={
-            (event: GestureResponderEvent) => {
-                typeof onPress === 'function' && onPress(event);
-                if (url) {
-                    Linking.openURL(url);
-                }
-            }}
+        onPress={(event: GestureResponderEvent) => {
+            typeof onPress === 'function' && onPress(event);
+            if (url) {
+                Linking.openURL(url);
+            }
+        }}
     />;
 }

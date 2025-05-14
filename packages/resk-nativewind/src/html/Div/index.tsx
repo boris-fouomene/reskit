@@ -1,5 +1,6 @@
 import { normalizeHtmlProps } from "@html/utils";
 import { IHtmlDivProps } from "../types";
+import { withAsChild } from "@components/Slot";
 
 /**
  * A wrapper component for the HTML `<div>` element.
@@ -13,6 +14,6 @@ import { IHtmlDivProps } from "../types";
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div}
  * @see {@link https://reactnative.dev/docs/view#props}
  */
-export function Div(props: IHtmlDivProps) {
+export const Div = withAsChild(function Div(props: IHtmlDivProps) {
     return <div {...normalizeHtmlProps(props)} />;
-}
+}, "Html.Div");

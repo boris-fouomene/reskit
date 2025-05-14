@@ -1,7 +1,7 @@
 import { defaultStr, isObj } from "@resk/core/utils";
 import { IHtmlDivProps } from "./types";
 import { cn, normalizeProps } from "@utils";
-import { GestureResponderEvent, StyleSheet, Platform } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { variants } from "@variants/index";
 import { normalizeGestureEvent } from "./events";
 import { MouseEvent, TouchEvent } from "react";

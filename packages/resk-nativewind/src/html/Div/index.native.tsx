@@ -1,8 +1,8 @@
 "use client";
-import { View as RNView, Pressable, View } from "react-native";
+import { View as RNView } from "react-native";
 import { IHtmlDivProps } from "../types";
 import { normalizeNativeProps } from "../utils";
-import { useMemo } from "react";
+import { withAsChild } from "@components/Slot";
 
 
 /**
@@ -17,6 +17,6 @@ import { useMemo } from "react";
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div}
  * @see {@link https://reactnative.dev/docs/view#props}
  */
-export function Div(props: IHtmlDivProps) {
+export const Div = withAsChild(function Div(props: IHtmlDivProps) {
     return <RNView {...props} {...normalizeNativeProps(props)} />
-}   
+}, "Html.Div");

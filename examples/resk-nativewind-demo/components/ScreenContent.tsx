@@ -12,7 +12,9 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
     <Surface className={styles.container}>
       <Text className={styles.title}>{title}</Text>
       <ActivityIndicator size={80} color={"yellow"} />
-      <Div className={[styles.separator]} />
+      <Div asChild testID="example-of-slot" className={"text-red-500"}>
+        <Text className={[styles.separator]} testID='example-of-children-slot' children="Example of slot" />
+      </Div>
       <HelperText error>An example of helper text</HelperText>
       <Icon.Font
         disabled

@@ -2,6 +2,8 @@ import { tv, type VariantProps } from "tailwind-variants";
 import surface from "./surface";
 import text from "./text";
 import ripple from "./ripple";
+import iconButton from "./iconButton";
+import heading from "./heading";
 export const variants = {
     all: tv({
         base: "",
@@ -33,14 +35,10 @@ export const variants = {
             },
         },
     }),
+    heading,
+    iconButton,
     surface,
     text,
     ripple,
 }
 export type IVariantPropsAll = VariantProps<typeof variants.all>;
-export type IVariantPropsIcon = Omit<VariantProps<typeof variants.icon>, "size"> & {
-    size?: number;//| VariantProps<typeof variants.icon>["size"];
-};
-
-export * from "./text";
-export * from "./ripple";

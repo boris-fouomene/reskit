@@ -7,7 +7,7 @@ import { isImageSource, isImageUrl } from "./utils";
 import FontIcon from "./Font";
 import { StyleSheet } from "react-native";
 import { isNonNullString, isObj } from "@resk/core/utils";
-import { remapProps } from "nativewind";
+import { variants } from "@variants/index";
 /**
  * The `Icon` component is a versatile icon renderer that can display both 
  * image-based icons and font-based icons. It supports press events, tooltips, 
@@ -68,13 +68,14 @@ import isNonNullString from '../../../../resk-core/build/utils/isNonNullString';
  * <Icon iconName="material-home" size={24} />
  */
 
-function Icon({ iconName, resizeMode, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
+function Icon({ iconName, className, variant, resizeMode, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
     const isSource = isImageSource(source);
+    className = cn(isObj(variant) ? variants.icon(variant) : undefined, className);
     //const isValidIconName = iconName && FontIcon.isValidName(iconName);
     testID = testID && typeof testID == "string" ? testID : (isSource ? "resk-image" : "resk-font-icon");
     const iconSize = typeof size == "number" && size > 0 ? size : FontIcon.DEFAULT_SIZE;
     if (isSource) {
-        const { touchableProps, ...restProps } = pickTouchableProps(normalizeProps(props));
+        const { touchableProps, ...restProps } = pickTouchableProps(normalizeProps({ ...props, className }));
         const disabled = props.disabled;
         const isPressable = !disabled && !!touchableProps;
         const Component = isPressable ? Pressable : Fragment;
@@ -105,6 +106,7 @@ function Icon({ iconName, resizeMode, source, containerClassName, testID, size, 
         size={iconSize}
         style={style}
         {...props}
+        className={className}
         ref={ref}
     />
 };

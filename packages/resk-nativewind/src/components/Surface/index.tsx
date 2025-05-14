@@ -1,4 +1,5 @@
 import { Div, IHtmlDivProps } from "@html";
+import { isObj } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { variants } from "@variants/index";
 import { IVariantPropsSurface } from "@variants/surface";
@@ -12,11 +13,14 @@ import { IVariantPropsSurface } from "@variants/surface";
  * @see {@link Div} for more information about the Div component.
  * @see {@link IHtmlDivProps} for more information about the Div props.
  */
-export function Surface(props: ISurfaceProps) {
+export function Surface({ variant, className, ...props }: ISurfaceProps) {
     return <Div
         testID={"resk-surface"}
-        {...props} className={cn(variants.surface(), props.className)}
+        {...props}
+        className={cn(isObj(variant) && variants.surface(variant), className)}
     />
 }
 
-export interface ISurfaceProps extends IHtmlDivProps, IVariantPropsSurface { }
+export interface ISurfaceProps extends IHtmlDivProps {
+    variant?: IVariantPropsSurface;
+}

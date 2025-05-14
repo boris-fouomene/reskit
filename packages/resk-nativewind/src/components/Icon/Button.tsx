@@ -6,6 +6,8 @@ import { defaultStr, isNumber } from '@resk/core/utils';
 import { IIconButtonProps } from './types';
 import Icon from "./Icon";
 import { cn } from '@utils/cn';
+import { pickTouchableProps } from '@utils/touchHandler';
+import iconButton from '@variants/iconButton';
 
 const PADDING = 8;
 
@@ -38,6 +40,7 @@ export default function IconButton(
         isLoading = false,
         iconName,
         source,
+        variant: buttonVariant,
         containerClassName,
         containerSize,
         className,
@@ -46,26 +49,28 @@ export default function IconButton(
     }: IIconButtonProps) {
     testID = defaultStr(testID, "resk-icon-button");
     size = isNumber(size) ? size : FontIcon.DEFAULT_SIZE;
+    const variant = iconButton(buttonVariant);
+    const { touchableProps, ...restProps } = pickTouchableProps(rest);
     containerSize = isNumber(containerSize) && containerSize > size ? containerSize : (size + 2 * PADDING);
     return (
         <Surface
             testID={`${testID}-container`}
-            className={cn("overflow-hidden align-center justify-center flex flex-col", containerClassName)}
+            disabled={disabled}
+            className={cn("overflow-hidden align-center justify-center flex flex-col", variant?.iconContainer?.(), containerClassName)}
             style={{
                 width: containerSize,
                 height: containerSize,
                 borderRadius: containerSize / 2,
             }}
             ref={ref}
+            {...Object.assign({}, touchableProps)}
         >
             {isLoading ? <ActivityIndicator size={size} /> : Icon.getIcon({
-                ...rest,
-                className: cn("self-center", className),
-                containerClassName: cn("self-center"),
+                ...restProps,
+                className: cn("self-center", disabled && "pointer-events-none", variant?.icon?.(), className),
                 style,
                 icon: source || iconName || undefined,
                 testID,
-                disabled,
                 size,
             })}
         </Surface>

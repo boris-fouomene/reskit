@@ -1,4 +1,4 @@
-import { Text, Div } from '@resk/nativewind/html';
+import { Text, Div, Heading } from '@resk/nativewind/html';
 import { Icon, ActivityIndicator, variants, Surface, HelperText } from "@resk/nativewind";
 
 type ScreenContentProps = {
@@ -16,15 +16,29 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
         <Text className={[styles.separator]} testID='example-of-children-slot' children="Example of slot" />
       </Div>
       <HelperText error>An example of helper text</HelperText>
-      <Icon.Button
-        disabled
+      <Div className="p-5">
+        <Heading level={1}>Heading 1</Heading>
+        <Heading level={2}>Heading 2</Heading>
+        <Heading level={3}>Heading 3</Heading>
+        <Heading level={4}>Heading 4</Heading>
+        <Heading level={5}>Heading 5</Heading>
+        <Heading level={6}>Heading 6</Heading>
+      </Div>
+      <Icon.Button variant={{ color: "secondary" }}
+        iconName='camera'
+        size={30}
         onPress={(event) => {
           console.log("pressed icon");
         }}
-        className={[variants.icon({ color: "primary" })]}
+      />
+      <Icon.Button
+        disabled
+        variant={{ color: "primary" }}
+        //className={[variants.icon({ color: "primary" })]}
         iconName="material-home"
         size={40}
       />
+      <Icon.Font variant={{ color: "primary" }} name={"phone"} size={45} />
       {children}
     </Div>
   );

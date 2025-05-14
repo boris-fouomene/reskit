@@ -10,8 +10,9 @@ import Foundation from "react-native-vector-icons/Foundation";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Octicons from "react-native-vector-icons/Octicons";
-import { IVariantPropsAll, IVariantPropsIcon } from "@variants/index";
-import { ISurfaceProps } from "@components/Surface";
+import { IVariantPropsAll } from "@variants/index";
+import { IVariantPropsIconButton } from '@variants/iconButton';
+import { IVariantPropsIcon } from "@variants/icon";
 
 type IFontIconNamePrefix = IFontIconSetsPrefixes[keyof IFontIconSetsPrefixes];
 interface IFontIconSetsPrefixes {
@@ -105,7 +106,7 @@ export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntD
 * <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
-export type IFontIconProps = Omit<IconProps, 'name' | "color" | 'style' | 'size' | "ref" | "className"> & INativewindBaseProps & IVariantPropsIcon & IVariantPropsAll & {
+export type IFontIconProps = Omit<IconProps, 'name' | "color" | 'style' | 'size' | "ref" | "className"> & INativewindBaseProps & IVariantPropsAll & {
     /**
      * The style object for the icon.
      * 
@@ -153,6 +154,11 @@ export type IFontIconProps = Omit<IconProps, 'name' | "color" | 'style' | 'size'
      * The className of the container of the icon. It's used when the icon is wrapped in a Pressable component
      */
     containerClassName?: IClassName;
+
+    /***
+     * Variant for the icon
+     */
+    variant?: IVariantPropsIcon;
 };
 
 /***
@@ -320,8 +326,9 @@ export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Omit<
  * // Customizing the container view
  * const buttonProps: IIconButtonProps = {};
  */
-export interface IIconButtonProps extends IIconProps {
+export interface IIconButtonProps extends Omit<IIconProps, "variant"> {
     isLoading?: boolean;
     containerClassName?: IClassName;
     containerSize?: number;
+    variant?: IVariantPropsIconButton;
 };

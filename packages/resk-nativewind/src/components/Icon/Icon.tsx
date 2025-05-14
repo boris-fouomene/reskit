@@ -86,7 +86,7 @@ function Icon({ iconName, resizeMode, source, containerClassName, testID, size, 
             } : undefined,
             style,
         ]);
-        return <Component {...containerP} className={cn("self-start", containerClassName)}>
+        return <Component {...containerP} className={cn(containerClassName)}>
             <Image
                 accessibilityIgnoresInvertColors
                 resizeMode={resizeMode || "contain"}

@@ -318,14 +318,10 @@ export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Omit<
  *
  * @example
  * // Customizing the container view
- * const buttonProps: IIconButtonProps = {
- *   containerProps: {
- *     elevation: 4,
- *     style: { padding: 10 },
- *   },
- * };
+ * const buttonProps: IIconButtonProps = {};
  */
 export interface IIconButtonProps extends IIconProps {
     isLoading?: boolean;
     containerClassName?: IClassName;
+    containerSize?: number;
 };

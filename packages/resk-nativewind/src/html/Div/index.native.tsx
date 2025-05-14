@@ -1,8 +1,9 @@
 "use client";
-import { View as RNView } from "react-native";
+import { View as RNView, Pressable } from "react-native";
 import { IHtmlDivProps } from "../types";
 import { normalizeNativeProps } from "../utils";
 import { withAsChild } from "@components/Slot";
+import { pickTouchableProps } from "@utils/touchHandler";
 
 
 /**
@@ -18,5 +19,7 @@ import { withAsChild } from "@components/Slot";
  * @see {@link https://reactnative.dev/docs/view#props}
  */
 export const Div = withAsChild(function Div(props: IHtmlDivProps) {
-    return <RNView {...props} {...normalizeNativeProps(props)} />
+    const { touchableProps } = pickTouchableProps(props as any);
+    const Component = touchableProps ? Pressable : RNView;
+    return <Component {...props} {...normalizeNativeProps(props)} />
 }, "Html.Div");

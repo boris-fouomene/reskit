@@ -9,23 +9,24 @@ type ScreenContentProps = {
 
 export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
   return (
-    <Surface className={styles.container}>
+    <Div className={styles.container}>
       <Text className={styles.title}>{title}</Text>
       <ActivityIndicator size={80} color={"yellow"} />
       <Div asChild testID="example-of-slot" className={"text-red-500"}>
         <Text className={[styles.separator]} testID='example-of-children-slot' children="Example of slot" />
       </Div>
       <HelperText error>An example of helper text</HelperText>
-      <Icon.Font
+      <Icon.Button
         disabled
         onPress={(event) => {
           console.log("pressed icon");
         }}
-        className={[variants.icon({ color: "primary" })]} name="material-home"
+        className={[variants.icon({ color: "primary" })]}
+        iconName="material-home"
         size={40}
       />
       {children}
-    </Surface>
+    </Div>
   );
 };
 const styles = {

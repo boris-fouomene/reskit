@@ -14,7 +14,7 @@ import { IVariantPropsSurface } from "@variants/surface";
  */
 export function Surface(props: ISurfaceProps) {
     return <Div
-        testID={"resk-nativewind-surface"}
+        testID={"resk-surface"}
         {...props} className={cn(variants.surface(), props.className)}
     />
 }

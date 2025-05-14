@@ -8,8 +8,9 @@ import { IVariantPropsAll } from "@variants/index";
 
 export type IClassName = ClassValue;
 
-export interface INativewindBaseProps extends IVariantPropsAll {
+export interface INativewindBaseProps extends Omit<IVariantPropsAll, "disabled"> {
   className?: IClassName;
+  disabled?: PressableProps["disabled"];
 }
 /**
   @interface

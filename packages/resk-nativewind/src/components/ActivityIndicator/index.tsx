@@ -33,6 +33,6 @@ export function ActivityIndicator({ size, style, testID, id, color, className, c
     if (isNonNullString(color) && color.trim()) {
         style = [{ borderTopColor: color }, style];
     }
-    testID = defaultStr(testID, "resk-nativewind-activity-indicator");
+    testID = defaultStr(testID, "resk-activity-indicator");
     return <div role={defaultStr(role, "progressbar")} {...pickHtmlProps(props)} data-testid={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
 }

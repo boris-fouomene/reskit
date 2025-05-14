@@ -1,4 +1,5 @@
 import { INativewindBaseProps } from "@src/types";
+import { Ref } from "react";
 import { ImageProps, ImageStyle, PressableProps, TextProps, TextStyle, ViewProps, ViewStyle } from "react-native";
 
 export interface IHtmlDivProps extends INativewindBaseProps {
@@ -29,6 +30,7 @@ export interface IHtmlDivProps extends INativewindBaseProps {
     onPress?: PressableProps["onPress"];
     onPressIn?: PressableProps["onPressIn"];
     onPressOut?: PressableProps["onPressOut"];
+    ref?: Ref<any>;
 }
 
 export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "children" | "onPress" | "onPressIn" | "onPressOut"> {

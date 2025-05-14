@@ -4,6 +4,7 @@ import text from "./text";
 import ripple from "./ripple";
 import iconButton from "./iconButton";
 import heading from "./heading";
+import divider from "./divider";
 export const variants = {
     all: tv({
         base: "",
@@ -40,5 +41,6 @@ export const variants = {
     surface,
     text,
     ripple,
+    divider,
 }
 export type IVariantPropsAll = VariantProps<typeof variants.all>;

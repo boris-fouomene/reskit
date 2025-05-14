@@ -8,6 +8,7 @@ import Icon from "./Icon";
 import { cn } from '@utils/cn';
 import { pickTouchableProps } from '@utils/touchHandler';
 import iconButton from '@variants/iconButton';
+import { isValidElement } from 'react';
 
 const PADDING = 8;
 
@@ -45,6 +46,7 @@ export default function IconButton(
         containerSize,
         className,
         ref,
+        children,
         ...rest
     }: IIconButtonProps) {
     testID = defaultStr(testID, "resk-icon-button");
@@ -60,7 +62,6 @@ export default function IconButton(
             style={{
                 width: containerSize,
                 height: containerSize,
-                borderRadius: containerSize / 2,
             }}
             ref={ref}
             {...Object.assign({}, touchableProps)}
@@ -72,7 +73,7 @@ export default function IconButton(
                 icon: source || iconName || undefined,
                 testID,
                 size,
-            })}
+            }) || (isValidElement(children) ? children : null)}
         </Surface>
     );
 };

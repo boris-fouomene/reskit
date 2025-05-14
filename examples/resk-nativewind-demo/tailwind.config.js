@@ -58,6 +58,12 @@ module.exports = {
         "surface-foreground": {
           DEFAULT: "#1C1B1F",
         },
+        outline: {
+          DEFAULT: "#79747E",
+        },
+        "dark-outline": {
+          DEFAULT: '#938F99'
+        }
       }
     },
   },

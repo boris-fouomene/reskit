@@ -1,6 +1,5 @@
 import { Text, Div, Heading } from '@resk/nativewind/html';
-import { Icon, ActivityIndicator, variants, Surface, HelperText } from "@resk/nativewind";
-
+import { Icon, ActivityIndicator, HelperText, Avatar, Divider } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   path: string;
@@ -34,12 +33,13 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
       <Icon.Button
         disabled
         variant={{ color: "primary" }}
-        //className={[variants.icon({ color: "primary" })]}
         iconName="material-home"
         size={40}
       />
       <Icon.Font variant={{ color: "primary" }} name={"phone"} size={45} />
       {children}
+      <Divider />
+      <Avatar text='A' variant={{ color: "warning" }} size={"small"} className={"text-lg font-bold"} />
     </Div>
   );
 };

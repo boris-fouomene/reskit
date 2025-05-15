@@ -2,10 +2,11 @@
 import { defaultStr, isNonNullString, isNumber } from '@resk/core/utils';
 import { IIconButtonProps } from '@components/Icon/types';
 import { Text } from "@html/Text";
-import iconButtonVariant from '@variants/iconButton';
 import IconButton from "@components/Icon/Button";
 import { cn } from '@utils/cn';
 import { StyleSheet } from 'react-native';
+import { IVariantPropsAvatar } from '@variants/avatar';
+import avatarVariants from "@variants/avatar";
 
 const avatarSizes: Record<string, number> = {
   small: 34,
@@ -19,7 +20,7 @@ const fontSizeClassName: Record<keyof typeof avatarSizes, string> = {
   large: "text-base",
   xlarge: "text-lg",
 };
-export interface IAvatarProps extends Omit<IIconButtonProps, "size"> {
+export interface IAvatarProps extends Omit<IIconButtonProps, "size" | "variant"> {
   /** Renders text in the placeholder.
    *
    * @default undefined
@@ -30,6 +31,8 @@ export interface IAvatarProps extends Omit<IIconButtonProps, "size"> {
    * @default small
    */
   size?: ('small' | 'medium' | 'large' | 'xlarge') | number;
+
+  variant?: IVariantPropsAvatar
 }
 
 
@@ -52,6 +55,6 @@ export function Avatar({
     testID={testID}
     {...rest}
   >
-    {avatarText ? <Text testID={`${testID}-avatar-text`} style={StyleSheet.flatten(style) as any} className={cn("text-center", isNonNullString(size) && fontSizeClassName[size] || `text-[${avatarSize}px]`, iconButtonVariant(rest?.variant)?.icon, className)}>{avatarText}</Text> : null}
+    {avatarText ? <Text testID={`${testID}-avatar-text`} style={StyleSheet.flatten(style) as any} className={cn("text-center", avatarVariants(rest?.variant)?.text?.(), className)}>{avatarText}</Text> : null}
   </IconButton>
 };

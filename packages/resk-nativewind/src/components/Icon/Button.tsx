@@ -58,7 +58,7 @@ export default function IconButton(
         <Surface
             testID={`${testID}-container`}
             disabled={disabled}
-            className={cn("overflow-hidden align-center justify-center flex flex-col", variant?.iconContainer?.(), containerClassName)}
+            className={cn("overflow-hidden align-center justify-center flex flex-col", variant?.container?.(), containerClassName)}
             style={{
                 width: containerSize,
                 height: containerSize,

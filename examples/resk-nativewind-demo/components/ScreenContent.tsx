@@ -36,10 +36,10 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
         iconName="material-home"
         size={40}
       />
-      <Icon.Font variant={{ color: "primary" }} name={"phone"} size={45} />
+      <Icon.Font variant={{ color: "primary" }} name={"phone"} className={"text-lg"} />
       {children}
       <Divider />
-      <Avatar text='A' variant={{ color: "warning" }} size={"small"} className={"text-lg font-bold"} />
+      <Avatar text='A' variant={{ color: "error", textSize: "4xl" }} size={50} />
     </Div>
   );
 };

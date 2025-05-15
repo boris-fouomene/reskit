@@ -5,7 +5,6 @@ import ripple from "./ripple";
 import iconButton from "./iconButton";
 import heading from "./heading";
 import divider from "./divider";
-import avatar from "./avatar";
 export const variants = {
     all: tv({
         base: "",
@@ -39,7 +38,6 @@ export const variants = {
     }),
     heading,
     iconButton,
-    avatar,
     surface,
     text,
     ripple,

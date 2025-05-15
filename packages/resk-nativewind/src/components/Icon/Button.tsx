@@ -2,7 +2,7 @@
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import FontIcon from "./Font";
-import { defaultStr, isNumber } from '@resk/core/utils';
+import { defaultStr, isNonNullString, isNumber } from '@resk/core/utils';
 import { IIconButtonProps } from './types';
 import Icon from "./Icon";
 import { cn } from '@utils/cn';
@@ -59,7 +59,7 @@ export default function IconButton(
             testID={`${testID}-container`}
             disabled={disabled}
             className={cn("overflow-hidden align-center justify-center flex flex-col", variant?.container?.(), containerClassName)}
-            style={{
+            style={isNonNullString(buttonVariant?.size) ? undefined : {
                 width: containerSize,
                 height: containerSize,
             }}

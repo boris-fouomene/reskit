@@ -1,4 +1,5 @@
 import { Text, Div, Heading } from '@resk/nativewind/html';
+import { ScrollView } from 'react-native';
 import { Icon, ActivityIndicator, HelperText, Avatar, Divider } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
@@ -8,39 +9,41 @@ type ScreenContentProps = {
 
 export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
   return (
-    <Div className={styles.container}>
-      <Text className={styles.title}>{title}</Text>
-      <ActivityIndicator size={80} color={"yellow"} />
-      <Div asChild testID="example-of-slot" className={"text-red-500"}>
-        <Text className={[styles.separator]} testID='example-of-children-slot' children="Example of slot" />
+    <ScrollView>
+      <Div className={styles.container}>
+        <Text className={styles.title}>{title}</Text>
+        <ActivityIndicator size={80} color={"yellow"} />
+        <Div asChild testID="example-of-slot" className={"text-red-500"}>
+          <Text className={[styles.separator]} testID='example-of-children-slot' children="Example of slot" />
+        </Div>
+        <HelperText error>An example of helper text</HelperText>
+        <Div className="p-5">
+          <Heading level={1}>Heading 1</Heading>
+          <Heading level={2}>Heading 2</Heading>
+          <Heading level={3}>Heading 3</Heading>
+          <Heading level={4}>Heading 4</Heading>
+          <Heading level={5}>Heading 5</Heading>
+          <Heading level={6}>Heading 6</Heading>
+        </Div>
+        <Icon.Button variant={{ color: "secondary" }}
+          iconName='camera'
+          size={30}
+          onPress={(event) => {
+            console.log("pressed icon");
+          }}
+        />
+        <Icon.Button
+          disabled
+          variant={{ color: "primary", size: "5xl" }}
+          iconName="material-home"
+          size={40}
+        />
+        <Icon.Font variant={{ color: "primary" }} name={"phone"} className={"text-lg"} />
+        {children}
+        <Divider />
+        <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
       </Div>
-      <HelperText error>An example of helper text</HelperText>
-      <Div className="p-5">
-        <Heading level={1}>Heading 1</Heading>
-        <Heading level={2}>Heading 2</Heading>
-        <Heading level={3}>Heading 3</Heading>
-        <Heading level={4}>Heading 4</Heading>
-        <Heading level={5}>Heading 5</Heading>
-        <Heading level={6}>Heading 6</Heading>
-      </Div>
-      <Icon.Button variant={{ color: "secondary" }}
-        iconName='camera'
-        size={30}
-        onPress={(event) => {
-          console.log("pressed icon");
-        }}
-      />
-      <Icon.Button
-        disabled
-        variant={{ color: "primary" }}
-        iconName="material-home"
-        size={40}
-      />
-      <Icon.Font variant={{ color: "primary" }} name={"phone"} className={"text-lg"} />
-      {children}
-      <Divider />
-      <Avatar text='A' variant={{ color: "error", textSize: "4xl" }} size={50} />
-    </Div>
+    </ScrollView>
   );
 };
 const styles = {

@@ -1,5 +1,3 @@
-import { warn } from 'console';
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./App.{js,ts,tsx}",
@@ -64,7 +62,17 @@ module.exports = {
         "dark-outline": {
           DEFAULT: '#938F99'
         }
-      }
+      },
+      spacing: {
+        // w-100 = 400dp, w-96 = 384dp, etc.
+        72: 288,
+        80: 320,
+        96: 384,
+        100: 400,
+        104: 416,
+        112: 448,
+        128: 512,
+      },
     },
   },
   plugins: [],

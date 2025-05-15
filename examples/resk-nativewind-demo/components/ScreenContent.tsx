@@ -1,6 +1,6 @@
 import { Text, Div, Heading } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
-import { Icon, ActivityIndicator, HelperText, Avatar, Divider } from "@resk/nativewind";
+import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   path: string;
@@ -42,6 +42,8 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
         {children}
         <Divider />
         <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
+        <Heading level={1}>Badges</Heading>
+        <Badge className="text-red-500 w-20 h-20 text-lg">1</Badge>
       </Div>
     </ScrollView>
   );

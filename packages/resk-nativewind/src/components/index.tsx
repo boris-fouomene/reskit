@@ -5,3 +5,5 @@ export * from "./HelperText";
 export * from "./Slot";
 export * from "./Divider";
 export * from "./Avatar";
+export * from "./Badge";
+export * from "./BackHandler";

@@ -88,7 +88,7 @@ const isAndroid = (): boolean => Platform.OS === 'android';
  *   console.log("This app is running on a mobile native platform.");
  * }
  */
-const isNative = (): boolean => isAndroid() || isIos();
+const isNative = (): boolean => ReskPlatform.isClientSide() && Platform.OS !== "web";
 
 
 /**
@@ -149,7 +149,9 @@ function native(value: any) {
  * If it is, it returns true, otherwise it returns false.
  * @returns {boolean} - Returns `true` if the native driver can be used for animations, otherwise `false`.
  */
-const canUseNativeDriver: () => boolean = isNative;
+const canUseNativeDriver: () => boolean = () => {
+    return ReskPlatform.isClientSide() && !isWeb();
+};
 
 /**
   @group Platform

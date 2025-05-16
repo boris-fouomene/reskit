@@ -1,6 +1,6 @@
 import { Text, Div, Heading } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
-import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge } from "@resk/nativewind";
+import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge, HStack } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   path: string;
@@ -25,25 +25,28 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
           <Heading level={5}>Heading 5</Heading>
           <Heading level={6}>Heading 6</Heading>
         </Div>
-        <Icon.Button variant={{ color: "secondary" }}
-          iconName='camera'
-          size={30}
-          onPress={(event) => {
-            console.log("pressed icon");
-          }}
-        />
-        <Icon.Button
-          disabled
-          variant={{ color: "primary", size: "5xl" }}
-          iconName="material-home"
-          size={40}
-        />
-        <Icon.Font variant={{ color: "primary" }} name={"phone"} className={"text-lg"} />
-        {children}
+        <Heading level={2}>Icons examples : </Heading>
+        <HStack className="p-5 !gap-x-10">
+          <Icon.Button variant={{ color: "secondary" }}
+            iconName='camera'
+            size={30}
+            onPress={(event) => {
+              console.log("pressed icon");
+            }}
+          />
+          <Icon.Button
+            disabled
+            variant={{ color: "primary", size: "5xl" }}
+            iconName="material-home"
+            size={40}
+          />
+          <Icon.Font variant={{ color: "success", size: "5xl" }} name={"phone"} />
+          {children}
+          <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
+        </HStack>
         <Divider />
-        <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
         <Heading level={1}>Badges</Heading>
-        <Badge className="text-red-500 w-20 h-20 text-lg">1</Badge>
+        <Badge className="text-red-500 w-20 h-20 text-3xl">1</Badge>
       </Div>
     </ScrollView>
   );

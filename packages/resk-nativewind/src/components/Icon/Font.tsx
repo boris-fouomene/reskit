@@ -65,12 +65,12 @@ export default function FontIcon({ name, variant, containerClassName, ref, ...pr
         Logger.warn(`Icon not defined for FontIcon component, icon [${name as string}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
-    const iconClassName = cn(isObj(variant) ? variants.icon(variant) : undefined, className);
+    const iconClassName = cn(variants.icon(variant), className);
     const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>;
     if (touchableProps) {
-        return <TouchableOpacity disabled={disabled} {...touchableProps} className={cn("self-start", containerClassName)}>
+        return <TouchableOpacity disabled={disabled} {...touchableProps} className={cn("shrink-0 grow-0", containerClassName)}>
             <Component
                 disabled={disabled}
                 {...restProps}
@@ -83,11 +83,11 @@ export default function FontIcon({ name, variant, containerClassName, ref, ...pr
     }
     return <Component
         {...restProps}
+        {...rP}
         disabled={disabled}
         ref={ref as any}
         name={iconName}
         className={iconClassName}
-        {...rP}
     />;
 };
 

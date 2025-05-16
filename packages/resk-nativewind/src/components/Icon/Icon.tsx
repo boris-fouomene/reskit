@@ -70,7 +70,7 @@ import isNonNullString from '../../../../resk-core/build/utils/isNonNullString';
 
 function Icon({ iconName, className, variant, resizeMode, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
     const isSource = isImageSource(source);
-    className = cn(isObj(variant) ? variants.icon(variant) : undefined, className);
+    className = cn(variants.icon(variant), className);
     //const isValidIconName = iconName && FontIcon.isValidName(iconName);
     testID = testID && typeof testID == "string" ? testID : (isSource ? "resk-image" : "resk-font-icon");
     const iconSize = typeof size == "number" && size > 0 ? size : FontIcon.DEFAULT_SIZE;
@@ -87,7 +87,7 @@ function Icon({ iconName, className, variant, resizeMode, source, containerClass
             } : undefined,
             style,
         ]);
-        return <Component {...containerP} className={cn(containerClassName)}>
+        return <Component {...containerP} className={cn("shrink-0 grow-0", containerClassName)}>
             <Image
                 accessibilityIgnoresInvertColors
                 resizeMode={resizeMode || "contain"}

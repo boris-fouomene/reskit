@@ -106,7 +106,7 @@ export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntD
 * <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
-export type IFontIconProps = Omit<IconProps, 'name' | "color" | 'style' | 'size' | "ref" | "className"> & INativewindBaseProps & IVariantPropsAll & {
+export type IFontIconProps = Omit<IconProps, 'name' | 'size' | "ref" | "className"> & INativewindBaseProps & IVariantPropsAll & {
     /**
      * The style object for the icon.
      * 

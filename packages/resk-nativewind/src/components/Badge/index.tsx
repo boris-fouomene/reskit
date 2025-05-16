@@ -12,6 +12,9 @@ export interface IBadgeProps extends IHtmlTextProps {
      */
     visible?: boolean;
 
+    /***
+     * Badge variants
+     */
     variant?: ISurfaceProps["variant"];
 };
 
@@ -26,7 +29,7 @@ export function Badge({
     return (
         <Text
             testID={testID}
-            className={cn("text-center overflow-hidden w-5 h-5 rounded-full hover:opacity-50 active:opacity-50", surfaceVariants(variant), visible === false && "hidden", className)}
+            className={cn("flex self-start flex-row justify-center items-center rounded-full", surfaceVariants(variant), visible === false && "hidden", className)}
             {...rest}
         />
     );

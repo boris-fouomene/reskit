@@ -63,7 +63,7 @@ module.exports = {
           DEFAULT: '#938F99'
         }
       },
-      spacing: {
+      spacing11: {
         // w-100 = 400dp, w-96 = 384dp, etc.
         72: 288,
         80: 320,

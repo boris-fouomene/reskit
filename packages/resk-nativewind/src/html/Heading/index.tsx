@@ -1,4 +1,4 @@
-import { Div } from "@html/Div";
+import { Text } from "@html/Text";
 import { IHtmlHeadingProps } from "@html/types";
 import heading from "@variants/heading";
 import { cn } from "@utils/cn";
@@ -30,7 +30,7 @@ import { isNumber } from "@resk/core/utils";
  */
 export function Heading({ level, variant, className, ...props }: IHtmlHeadingProps & { level: IHHeadingLevel; }) {
     level = isNumber(level) && [1, 2, 3, 4, 5, 6].includes(level) ? level : 1;
-    return <Div role={"heading"} className={cn(heading({ level: `h${level}` }), heading(variant), className)} accessibilityRole="header" {...props} asHtmlTag={`h${level}`} />
+    return <Text role={"heading"} className={cn(heading({ level: `h${level}` }), heading(variant), className)} accessibilityRole="header" {...props} asHtmlTag={`h${level}`} />
 }
 
 /**

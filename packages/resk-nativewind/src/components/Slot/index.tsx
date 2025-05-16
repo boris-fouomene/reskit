@@ -37,9 +37,8 @@ export interface AsChildProps {
 export function withAsChild<T extends ComponentType<any>>(Component: T, displayName?: string): FC<PropsOf<T> & AsChildProps> {
     function WithAsChildComponent(props: PropsOf<T> & AsChildProps) {
         const { asChild, ...componentProps } = props;
-        if (asChild && isValidElement(props.children)) {
-            Logger.log("Slot :[")
-            return <Slot {...componentProps as any}>{props.children}</Slot>;
+        if (asChild && isValidElement(componentProps.children)) {
+            return <Slot {...componentProps as any}>{componentProps.children}</Slot>;
         }
         return <Component {...componentProps as any} />;
     }

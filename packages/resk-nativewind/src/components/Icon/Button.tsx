@@ -59,9 +59,14 @@ export default function IconButton(
             testID={`${testID}-container`}
             disabled={disabled}
             className={cn("overflow-hidden align-center justify-center flex flex-col", variant?.container?.(), containerClassName)}
-            style={isNonNullString(buttonVariant?.size) ? undefined : {
+            style={isNonNullString(buttonVariant?.size) ? {
+                flexShrink: 0,
+                flexGrow: 0,
+            } : {
                 width: containerSize,
                 height: containerSize,
+                flexShrink: 0,
+                flexGrow: 0,
             }}
             ref={ref}
             {...Object.assign({}, touchableProps)}

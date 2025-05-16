@@ -65,7 +65,7 @@ export default function FontIcon({ name, variant, containerClassName, ref, ...pr
         Logger.warn(`Icon not defined for FontIcon component, icon [${name as string}], iconSet [${iconSetName}], please specify a supported icon from https://www.npmjs.com/package/react-native-vector-icons`, iconSetName, " icon set prefix : ", iconSetPrefix, props);
         return null;
     }
-    const iconClassName = cn(variants.icon(variant), className);
+    const iconClassName = cn(isObj(variant) && variants.icon(variant), className);
     const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>;

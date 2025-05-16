@@ -40,7 +40,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
             iconName="material-home"
             size={40}
           />
-          <Icon.Font variant={{ color: "success", size: "5xl" }} name={"phone"} />
+          <Icon.Font variant={{ color: "primary", size: "5xl" }} name={"phone"} />
           {children}
           <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
         </HStack>

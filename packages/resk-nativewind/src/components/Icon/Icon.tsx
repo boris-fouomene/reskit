@@ -102,7 +102,7 @@ function Icon({ iconName, className, variant, resizeMode, source, containerClass
     return <FontIcon
         containerClassName={containerClassName}
         testID={testID}
-        name={iconName as any}
+        name={iconName as never}
         size={iconSize}
         style={style}
         {...props}

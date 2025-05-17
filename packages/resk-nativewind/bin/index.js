@@ -14,7 +14,7 @@ program
 
 program.command('generate-icon-types')
     .description(`generate font icon types`)
-    .argument('<sets>', 'The icon sets name prefix to generate. Separate multiple sets with a comma. Example: material,fa6')
+    .argument('[sets]', 'The icon sets name or prefix to generate. Separate multiple sets with a comma. Example: material,fa6,antd,foundation,ionic,octicons')
     .option('-o, --out [path]', 'the output file path')
     .action((iconSetsPrefixes, options) => {
         require("./generate-icon-types")(iconSetsPrefixes, Object.assign({}, options))

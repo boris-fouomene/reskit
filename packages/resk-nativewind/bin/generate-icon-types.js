@@ -1,12 +1,15 @@
 const { readdirSync, readFileSync, writeFileSync, existsSync } = require('fs');
 const path = require('path');
 const iconSetNames = {
-    "MaterialCommunityIcons": "",
-    "MaterialIcons": "material",
-    "AntDesign": "antd",
-    "FontAwesome5": "fa5",
-    "FontAwesome6": "fa6",
-    "Ionicons": "ionic",
+    MaterialCommunityIcons: "",
+    MaterialIcons: "material",
+    AntDesign: "antd",
+    FontAwesome6: "fa6",
+    Ionicons: "ionic",
+
+    Feather: "feather",
+    Foundation: "foundation",
+    Octicons: "octicons",
 }
 // Helper function to extract icon names from the glyphmaps
 function extractIconNames(glyphMapPath) {
@@ -71,22 +74,22 @@ function generateIconSets(filter) {
     }
 }
 
-module.exports = function generateIconTypes(iconSetsPrefixes, options) {
-    const iconSetsToGenerate = iconSetsPrefixes && typeof iconSetsPrefixes == "string" ? iconSetsPrefixes.split(",") : [];
+module.exports = function generateIconTypes(iconSetsPrefixesOrNames, options) {
+    const iconSetsGenerated = iconSetsPrefixesOrNames && typeof iconSetsPrefixesOrNames == "string" ? iconSetsPrefixesOrNames.split(",") : [];
     const outputPathOption = options && typeof options.out == "string" ? path.resolve(options.out) : undefined;
     const outputPath = outputPathOption ? outputPathOption : path.resolve(process.cwd(), "fonts.types.ts");
     const iconSets = generateIconSets();
     let generatedIcons = "";
     // Generate the const arrays with the actual icon names
     Object.entries(iconSets).forEach(([setName, iconNames]) => {
-        if (setName != "MaterialCommunityIcons" && !iconSetsToGenerate.includes(setName)) return;
         const prefix = iconSetNames[setName];
+        if (setName != "MaterialCommunityIcons" && !iconSetsGenerated.includes(setName) && !iconSetsGenerated.includes(setName.toLowerCase()) && (!prefix || !iconSetsGenerated.includes(prefix))) return;
         if (prefix !== undefined) {
             const prefixName = prefix ? `${prefix.replace(/-/g, '')}-` : '';
             generatedIcons += `${iconNames.map(name => `'${prefixName}${name}':''`).join(";")};`;
         }
     });
-    const output = `\n\n
+    const output = `
     declare module "@resk/nativewind" {
         interface IFontIconNameRegistry {
             ${generatedIcons}

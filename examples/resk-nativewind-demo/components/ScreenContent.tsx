@@ -37,7 +37,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
           <Icon.Button
             disabled
             variant={{ color: "primary", size: "5xl" }}
-            iconName="material-home"
+            iconName="fa6-home"
             size={40}
           />
           <Icon.Font variant={{ color: "primary", size: "5xl" }} name={"phone"} />

@@ -7,12 +7,14 @@ import { isRTL } from "@utils/i18nManager";
 import { pickTouchableProps } from "@utils/touchHandler";
 import { TouchableOpacity } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Feather from "react-native-vector-icons/Feather";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Foundation from "react-native-vector-icons/Foundation";
+import Octicons from "react-native-vector-icons/Octicons";
 import { cn, normalizeProps } from "@utils/cn";
 import { variants } from "@variants/index";
 
@@ -32,7 +34,9 @@ const isIos = Platform.isIos();
  * The following prefixes should be used to specify the icon set:
  *  - `fa6` for FontAwesome6
  *  - `antd` for AntDesign
- *  - `fa5` for FontAwesome5
+ *  - `feather` for Feather
+ *  - `foundation` for Foundation
+ *  - `octicons` for Octicons
  *  - `ionic` for Ionicons
  *  - `material` for MaterialIcons (default)
  * 
@@ -163,10 +167,12 @@ const isFontIconName = (name: string, iconSetName: string): boolean => {
 const fontsObjects = {
     "": MaterialCommunityIcons,
     antd: AntDesign,
-    fa5: FontAwesome5,
     fa6: FontAwesome6,
     ionic: Ionicons,
     material: MaterialIcons,
+    feather: Feather,
+    foundation: Foundation,
+    octicons: Octicons,
 }
 
 FontIcon.displayName = "Icon.Font";

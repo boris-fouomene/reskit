@@ -1,3 +1,4 @@
+const flattenColorPalette = require('tailwindcss/lib/util/flattenColorPalette').default
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./App.{js,ts,tsx}",
@@ -136,67 +137,52 @@ module.exports = {
     },
   },
   plugins: [
+    /**
+    * Creates a Tailwind CSS plugin that converts theme colors to CSS variables
+    * 
+    * This plugin automatically extracts all colors defined in your Tailwind theme
+    * and converts them to CSS variables available at the `:root` level. It supports
+    * nested color objects and automatically transforms color paths to kebab-case.
+    * 
+    * @param {CssVariablePluginOptions} [options] - Configuration options for the plugin
+    * @returns {Plugin} - A Tailwind CSS plugin
+    * 
+    * @example
+    * ```js
+    * // tailwind.config.js
+    * module.exports = {
+    *   // Your Tailwind configuration...
+    *   plugins: [
+    *     require('./tailwind-css-variable-plugin')({
+    *       prefix: 'color',
+    *       includeDefaultColors: true,
+    *       excludeColors: ['transparent', 'current']
+    *     })
+    *   ]
+    * }
+    * ```
+    */
     function ({ addBase, theme }) {
+      const colors = flattenColorPalette(theme('colors'))
+      const darkColors = {};
+      const cssVariables = Object.fromEntries(
+        Object.entries(colors).map(([key, value]) => {
+          const keyValue = `--color-${key.replace(/[.]/g, '-').toLowerCase()}`;
+          if (key.startsWith("dark-")) {
+            darkColors[keyValue] = value;
+          }
+          return [
+            keyValue,
+            value
+          ]
+        })
+      )
       addBase({
-        ':root': {
-          '--color-primary': theme('colors.primary'),
-          '--color-primary-foreground': theme('colors.primary-foreground'),
-          '--color-secondary': theme('colors.secondary'),
-          '--color-secondary-foreground': theme('colors.secondary-foreground'),
-          '--color-accent': theme('colors.accent'),
-          '--color-accent-foreground': theme('colors.accent-foreground'),
-          '--color-info': theme('colors.info'),
-          '--color-info-foreground': theme('colors.info-foreground'),
-          '--color-success': theme('colors.success'),
-          '--color-success-foreground': theme('colors.success-foreground'),
-          '--color-warning': theme('colors.warning'),
-          '--color-warning-foreground': theme('colors.warning-foreground'),
-          '--color-error': theme('colors.error'),
-          '--color-error-foreground': theme('colors.error-foreground'),
-          '--color-surface': theme('colors.surface'),
-          '--color-surface-foreground': theme('colors.surface-foreground'),
-          '--color-outline': theme('colors.outline'),
-          '--color-dark-outline': theme('colors.dark-outline'),
-          '--color-dark-primary': theme('colors.dark-primary'),
-          '--color-dark-primary-foreground': theme('colors.dark-primary-foreground'),
-          '--color-dark-secondary': theme('colors.dark-secondary'),
-          '--color-dark-secondary-foreground': theme('colors.dark-secondary-foreground'),
-          '--color-dark-accent': theme('colors.dark-accent'),
-          '--color-dark-accent-foreground': theme('colors.dark-accent-foreground'),
-          '--color-dark-info': theme('colors.dark-info'),
-          '--color-dark-info-foreground': theme('colors.dark-info-foreground'),
-          '--color-dark-success': theme('colors.dark-success'),
-          '--color-dark-success-foreground': theme('colors.dark-success-foreground'),
-          '--color-dark-warning': theme('colors.dark-warning'),
-          '--color-dark-warning-foreground': theme('colors.dark-warning-foreground'),
-          '--color-dark-error': theme('colors.dark-error'),
-          '--color-dark-error-foreground': theme('colors.dark-error-foreground'),
-          '--color-dark-surface': theme('colors.dark-surface'),
-          '--color-dark-surface-foreground': theme('colors.dark-surface-foreground'),
-        },
+        ':root': cssVariables,
         '@media (prefers-color-scheme: dark)': {
-          ':root': {
-            '--color-primary': theme('colors.dark-primary'),
-            '--color-primary-foreground': theme('colors.dark-primary-foreground'),
-            '--color-secondary': theme('colors.dark-secondary'),
-            '--color-secondary-foreground': theme('colors.dark-secondary-foreground'),
-            '--color-accent': theme('colors.dark-accent'),
-            '--color-accent-foreground': theme('colors.dark-accent-foreground'),
-            '--color-info': theme('colors.dark-info'),
-            '--color-info-foreground': theme('colors.dark-info-foreground'),
-            '--color-success': theme('colors.dark-success'),
-            '--color-success-foreground': theme('colors.dark-success-foreground'),
-            '--color-warning': theme('colors.dark-warning'),
-            '--color-warning-foreground': theme('colors.dark-warning-foreground'),
-            '--color-error': theme('colors.dark-error'),
-            '--color-error-foreground': theme('colors.dark-error-foreground'),
-            '--color-surface': theme('colors.dark-surface'),
-            '--color-surface-foreground': theme('colors.dark-surface-foreground'),
-            '--color-outline': theme('colors.dark-outline'),
-            '--color-dark-outline': theme('colors.outline'),
-          },
+          ':root': darkColors
         },
       })
-    },
+    }
   ],
 }

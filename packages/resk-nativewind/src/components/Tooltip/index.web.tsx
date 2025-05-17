@@ -9,6 +9,9 @@ import { Pressable } from "react-native";
 import { ITooltipProps } from './types';
 import { withAsChild } from '@components/Slot';
 
+const TIPPY_THEME = "customtippy-themename";
+
+const typyStyleId = "typy-csss-style-id";
 
 export * from "./types";
 
@@ -41,13 +44,14 @@ export const Tooltip = withAsChild(function Tooltip({ children, title, tooltip, 
     const innerRef = useMergeRefs(ref, buttonRef);
     const selector = isDOMElement(buttonRef.current) ? buttonRef.current : "#" + instanceIdRef.current;
     useEffect(() => {
+        initCss();
         if (disabled || !Platform.isClientSide()) return;
         const content = String(getTextContent(tooltip) || getTextContent(title)).replaceAll("\n", "<br/>");
         if (!content) return;
         const tpI = tippy(selector as any, {
             content,
             allowHTML: true,
-            theme: "customtippy-themename",
+            theme: TIPPY_THEME,
             onShow: (instance) => {
                 if (instance && typeof instance.setProps === "function") {
                     instance.setProps({ zIndex: getMaxZindex() });
@@ -69,3 +73,63 @@ export const Tooltip = withAsChild(function Tooltip({ children, title, tooltip, 
         {children}
     </Pressable>;
 }, "Tooltip");
+
+const initCss = function () {
+    if (!Platform.isWeb() || typeof document == "undefined") return;
+    let elem = document.querySelector(`#${typyStyleId}`);
+    if (elem) return;
+    elem = document.createElement("style");
+    elem.id = typyStyleId;
+    document.body.appendChild(elem);
+    elem.textContent = `
+        .tippy-box[data-theme~='${TIPPY_THEME}'] {
+            background-color: var(--color-primary);
+            color: var(--color-primary-foreground);
+            font-weight: 400;
+            text-shadow: none;
+            box-shadow: none;
+        }
+
+        .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='top']>.tippy-arrow::before {
+            border-top-color: var(--color-primary);
+        }
+
+        .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='bottom']>.tippy-arrow::before {
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='left']>.tippy-arrow::before {
+            border-left-color: var(--color-primary);
+        }
+
+        .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right']>.tippy-arrow::before {
+            border-right-color: var(--color-primary);
+        }
+
+        /* dark colors for theme*/
+        .dark .tippy-box[data-theme~='${TIPPY_THEME}'] {
+            background-color: var(--color-dark-primary);
+            color: var(--color-dark-primary-foreground);
+            font-weight: 400;
+            text-shadow: none;
+            box-shadow: none;
+        }
+
+        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='top']>.tippy-arrow::before {
+            border-top-color: var(--color-dark-primary);
+        }
+
+        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='bottom']>.tippy-arrow::before {
+            border-bottom-color: var(--color-dark-primary);
+        }
+
+        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='left']>.tippy-arrow::before {
+            border-left-color: var(--color-dark-primary);
+        }
+
+        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right']>.tippy-arrow::before {
+            border-right-color: var(--color-dark-primary);
+        }
+    `;
+    return elem;
+}

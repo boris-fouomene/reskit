@@ -8,3 +8,4 @@ export * from "./Avatar";
 export * from "./Badge";
 export * from "./BackHandler";
 export * from "./Stack";
+export * from "./Tooltip";

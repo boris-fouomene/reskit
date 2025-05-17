@@ -16,8 +16,6 @@ export default function FontIcon(props: any) {
 }
 
 
-FontIcon.isValidName = isValidFontIconName;
-FontIcon.getIconSet = () => ({ iconSetName: "", iconSetPrefix: "", iconName: "", iconSet: Fragment });
 FontIcon.DEFAULT_SIZE = 20;
 FontIcon.COPY = "content-copy";
 FontIcon.MENU = "menu";

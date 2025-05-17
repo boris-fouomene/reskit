@@ -6,6 +6,9 @@
   "author": "",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "bin": {
+    "@resk/nativewind": "bin/index.js"
+  },
   "typesVersions": {
     "*": {
       ".": [
@@ -28,7 +31,8 @@
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "css:dev": "npx tailwindcss -i ./global-src.css -o ./global.css --watch",
-    "css:build": "npx tailwindcss -i ./global-src.css -o ./global.css"
+    "css:build": "npx tailwindcss -i ./global-src.css -o ./global.css",
+    "generate-icon-types": "node tests/cli.generate-icon-types"
   },
   "keywords": [
     "react-native",

@@ -2,61 +2,20 @@ import { IClassName, INativewindBaseProps, ITextStyle, ITouchableProps } from ".
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
 import { ReactElement } from "react";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Foundation from "react-native-vector-icons/Foundation";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import Octicons from "react-native-vector-icons/Octicons";
 import { IVariantPropsAll } from "@variants/index";
 import { IVariantPropsIconButton } from '@variants/iconButton';
 import { IVariantPropsIcon } from "@variants/icon";
 
-type IFontIconNamePrefix = IFontIconSetsPrefixes[keyof IFontIconSetsPrefixes];
-interface IFontIconSetsPrefixes {
-    AntDesign: 'antd';
-    FontAwesome5: 'fa5';
-    FontAwesome6: 'fa6';
-    Foundation: 'foundation';
-    Ionicons: 'ionic';
-    MaterialCommunityIcons: '';
-    MaterialIcons: 'material';
-    Octicons: 'octicons';
-}
-export type IFontIconName = `${Omit<IFontIconNamePrefix, ""> & string}-${string}` | string;
-
-/**
- * Represents a type that can be any of the specified icon sets.
+/***
+ * The `IFontIconNameRegistry` interface is used to define the registry of font icon names.
+ * It is used to augment the `IFontIconName` type with the registry of font icon names.
  * 
- * This type is a union of the following icon sets:
- * - MaterialCommunityIcons
- * - FontAwesome6
- * - AntDesign
- * - FontAwesome5
- * - Foundation
- * - Ionicons
- * - Octicons
- * - MaterialIcons
+ * @interface IFontIconNameRegistry
+ * 
  */
-export type IFontIconSet = typeof MaterialCommunityIcons | typeof FontAwesome6 | typeof AntDesign | typeof FontAwesome5 | typeof Foundation | typeof Ionicons | typeof Octicons | typeof MaterialIcons;
+export interface IFontIconNameRegistry { };
 
-
-/**
- * Represents the set of possible icon font names that can be used in the application.
- * 
- * @typedef {("MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "FontAwesome5" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons")} IFontIconSetName
- * 
- * @property {"MaterialCommunityIcons"} MaterialCommunityIcons - Icon set from Material Community Icons.
- * @property {"FontAwesome6"} FontAwesome6 - Icon set from Font Awesome 5.
- * @property {"AntDesign"} AntDesign - Icon set from Ant Design.
- * @property {"Foundation"} Foundation - Icon set from Foundation.
- * @property {"Ionicons"} Ionicons - Icon set from Ionicons.
- * @property {"Octicons"} Octicons - Icon set from Octicons.
- * @property {"MaterialIcons"} MaterialIcons - Icon set from Material Icons.
- */
-export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntDesign" | "FontAwesome5" | "Foundation" | "Ionicons" | "Octicons" | "MaterialIcons";
+export type IFontIconName = keyof IFontIconNameRegistry;
 
 /**
  * Props for the FontIcon component, extending the properties of MaterialCommunityIcons
@@ -77,11 +36,6 @@ export type IFontIconSetName = "MaterialCommunityIcons" | "FontAwesome6" | "AntD
  * @example
  * const customStyle: ITextStyle = { color: 'red', margin: 10 };
  * <FontIcon name="home" style={customStyle} />;
- *
- * @property {IFontIconMaterialCommunityName | IFontAntDesignName | IFontIconFeatherName | 
-*           IFontIconIoniconsName | IFontIconOcticonsName | IFontSimpleLineIconsName | 
-*           IFontZocialName | IFontIconMaterialName | IFontIconMaterialCommunityName | 
-*           IFontFoundationIconsName} name - The name of the icon to display.
 * 
 *
 * This property specifies which icon to render (including the prefix for icon set if necessary).

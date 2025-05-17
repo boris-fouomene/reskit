@@ -1,6 +1,6 @@
 "use client";
 import { Fragment, ReactNode } from "react";
-import { IIconProps, IFontIconName, IIconSource } from "./types";
+import { IIconProps, IIconSource } from "./types";
 import { Image, ImageSourcePropType, ImageStyle, Pressable } from "react-native";
 import { cn, isValidElement, normalizeProps, pickTouchableProps } from "@utils";
 import { isImageSource, isImageUrl } from "./utils";
@@ -102,7 +102,7 @@ function Icon({ iconName, className, variant, resizeMode, source, containerClass
     return <FontIcon
         containerClassName={containerClassName}
         testID={testID}
-        name={iconName as IFontIconName}
+        name={iconName as any}
         size={iconSize}
         style={style}
         {...props}
@@ -169,7 +169,7 @@ Icon.getIcon = function getIcon<T = any>({ icon, ...rest }: IGetIconOptions<T>):
     if (isValidElement(icon)) return icon as ReactNode;
     if (!icon) return null;
     const isSource = isImageSource(icon) || isNonNullString(icon) && isImageUrl(icon as string);
-    const iconName = typeof icon == "string" && !isSource ? (icon as unknown as IFontIconName) : undefined;
+    const iconName = typeof icon == "string" && !isSource ? (icon as any) : undefined;
     const iconProps: IIconProps = {
         ...rest,
         iconName,

@@ -1,9 +1,9 @@
 import { defaultStr } from '@resk/core/utils';
 import { Text } from "@html/Text";
 import { cn } from "@utils/cn";
-import { ISurfaceProps } from '@components/Surface';
-import surfaceVariants from "@variants/surface";
+import badgeVariants from "@variants/badge";
 import { IHtmlTextProps } from '@html/types';
+import { IVariantPropsBadge } from '@variants/badge';
 
 
 export interface IBadgeProps extends IHtmlTextProps {
@@ -15,7 +15,7 @@ export interface IBadgeProps extends IHtmlTextProps {
     /***
      * Badge variants
      */
-    variant?: ISurfaceProps["variant"];
+    variant?: IVariantPropsBadge;
 };
 
 export function Badge({
@@ -29,7 +29,7 @@ export function Badge({
     return (
         <Text
             testID={testID}
-            className={cn("flex self-start flex-row justify-center items-center rounded-full", surfaceVariants(variant), visible === false && "hidden", className)}
+            className={cn("inline-flex items-center", badgeVariants(variant), visible === false && "hidden", className)}
             {...rest}
         />
     );

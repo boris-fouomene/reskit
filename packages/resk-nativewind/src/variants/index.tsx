@@ -6,6 +6,7 @@ import iconButton from "./iconButton";
 import heading from "./heading";
 import divider from "./divider";
 import icon from "./icon";
+import badge from "./badge";
 export const variants = {
     all: tv({
         base: "",
@@ -26,6 +27,7 @@ export const variants = {
     heading,
     iconButton,
     surface,
+    badge,
     text,
     ripple,
     divider,

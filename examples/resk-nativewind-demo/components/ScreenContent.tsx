@@ -37,7 +37,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
           <Icon.Button
             disabled
             variant={{ color: "primary", size: "5xl" }}
-            iconName="fa6-home"
+            iconName="fa6-car"
             size={40}
           />
           <Icon.Font variant={{ color: "primary", size: "5xl" }} name={"phone"} />
@@ -46,7 +46,11 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
         </HStack>
         <Divider />
         <Heading level={1}>Badges</Heading>
-        <Badge className="text-red-500 w-20 h-20 text-3xl">1</Badge>
+        <HStack className="p-5 !gap-x-10">
+          <Badge variant={{ color: "primary" }}>Badge 1</Badge>
+          <Badge variant={{ color: "secondary", size: "xl" }}>Badge 2 - size xl</Badge>
+          <Badge variant={{ color: "success", size: "md", rounded: "full" }}>Badge Succes - size - md</Badge>
+        </HStack>
       </Div>
     </ScrollView>
   );

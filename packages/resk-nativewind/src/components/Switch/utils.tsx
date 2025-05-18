@@ -8,6 +8,43 @@ import { variants } from "@variants/index";
 export * from "./types";
 
 
+/**
+ * A custom hook for managing the state and behavior of a toggleable component.
+ * This hook provides functionality for toggling between checked and unchecked states,
+ * handling events, and managing tooltip display.
+ *
+ * @param {IToggleableProps} props - The properties for the toggleable component.
+ * @param {boolean} [props.disabled] - whether the toggleable component is disabled. If true, the component will be non-interactive.
+ * @param {ReactNode} [props.checkedTooltip] - Tooltip content to display when the toggleable component is in a checked state.
+ * @param {ReactNode} [props.uncheckedTooltip] -  Tooltip content to display when the toggleable component is in an unchecked state.
+ * @param {ReactNode} [props.tooltip] - Default tooltip to display.
+ * @param {string} [props.title] - The title for the toggleable component, used in tooltips.
+ * @param {string} [props.color] - Custom color for the toggleable component.
+ * @param {boolean} [props.readOnly] - Indicates whether the toggle is read-only.
+ * @param {"left" | "right"} [props.labelPosition] - The position of the label relative to the toggleable component.
+ * @param {(options: IToggleableOnChangeOptions) => boolean | void} [props.beforeToggle] - Callback function called when the toggle is pressed.
+ * @param {(options: IToggleableOnChangeOptions<EventType>) => void} [props.onChange] - 
+ * Callback function called when the toggle value changes.
+ * @param {ReactNode} [props.label] - The label displayed next to the toggle.
+ * @param {ReactNode} [props.checkedLabel] - The label displayed when the toggle is checked.
+ * @param {ReactNode} [props.uncheckedLabel] - The label displayed when the toggle is unchecked.
+ * @param {ILabelProps} [props.labelProps] - Optional props for the label associated with the toggleable component.
+ * @param {(value:boolean)=>void} [onValueChange] - Callback function called when the value of the toggle changes.
+ * 
+ * @returns {object} An object containing the state and methods for managing the toggleable component.
+ * 
+ * @returns {boolean} checked - Indicates whether the toggle is currently checked
+ * @returns {() => void} toggleStatus - A function for toggling the toggleable component
+ * @returns {() => boolean} getValue - A function for getting the current value of the toggleable component
+ * @returns {() => boolean} setValue - A function for setting the value of the toggleable component
+ * @returns {() => void} onChange - A function for setting the callback function for changes in the toggleable component
+ * @returns {ReactNode} label - The label displayed next to the toggle
+ * @returns {boolean} isLabelOnLeftSide - A boolean indicating whether the label is on the left side of the toggleable component
+ * @returns {any} checkedValue - The value of the toggleable component when it is checked
+ * @returns {any} uncheckedValue - The value of the toggleable component when it is unchecked
+ * @returns {any} defaultValue - The default value of the toggleable component
+ * @returns {boolean} disabled - A boolean indicating whether the toggleable component is disabled.
+ */
 export function useToggleable({ disabled, className, checkedTooltip, onValueChange, uncheckedTooltip, tooltip, title, color, readOnly, labelPosition, beforeToggle, onChange, label, checkedLabel, uncheckedLabel, labelClassName, containerClassName, ...rest }: IToggleableProps) {
   const { checkedValue, uncheckedValue, defaultValue } = getToggleableDefaultValues(rest);
   const eventRef = useRef(null);
@@ -46,8 +83,8 @@ export function useToggleable({ disabled, className, checkedTooltip, onValueChan
   return {
     ...rest,
     className: cn(variants.all({ disabled }), className),
-    containerClassName: cn(variants.all({ disabled }), containerClassName),
-    labelClassName: cn(className),
+    containerClassName: cn(variants.all({ disabled }), "flex flex-row self-start items-center justify-start", containerClassName),
+    labelClassName: cn(!disabled && "select-text mx-[7px]", className),
     checked,
     labelPosition,
     tooltip: (checked ? checkedTooltip : uncheckedTooltip) || tooltip || title,

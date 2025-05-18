@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { SwitchProps } from "react-native";
 import { ITooltipBaseProps } from "@components/Tooltip/types";
 import { IClassName, IOnChangeOptions } from "@src/types";
-import { IVariantPropsSwitch } from "@variants/switch";
 
 
 /**
@@ -180,17 +179,6 @@ export interface IToggleableProps extends ITooltipBaseProps {
     onValueChange?: (value: boolean) => void;
 
     className?: IClassName;
-
-    /***
-     * Custom class for the track
-     */
-    trackClassName?: IClassName;
-    /***
-     * Custom class for the thumb
-     */
-    thumbClassName?: IClassName;
-
-    variant?: IVariantPropsSwitch;
 };
 
 

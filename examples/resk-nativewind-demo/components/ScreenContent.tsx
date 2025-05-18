@@ -1,6 +1,6 @@
 import { Text, Div, Heading } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
-import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge, HStack, Tooltip } from "@resk/nativewind";
+import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge, HStack, Tooltip, Switch } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   path: string;
@@ -56,6 +56,14 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
         <Tooltip title="A tooltip">
           <Text> Example of tooltip</Text>
         </Tooltip>
+      </Div>
+      <Div className="p-5">
+        <Heading level={1}>Switch examples</Heading>
+        <HStack className="p-5 !gap-x-10">
+          <Switch label={"Example 1"} title="Switch example" />
+          <Switch label={"Example 2"} title="Switch example" />
+          <Switch label={"Example 3"} title="Switch example" />
+        </HStack>
       </Div>
     </ScrollView>
   );

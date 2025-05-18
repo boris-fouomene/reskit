@@ -4,14 +4,73 @@ import { ISwitchProps } from "./types";
 import { useToggleable } from "./utils";
 import { Tooltip } from "@components/Tooltip";
 import { Text } from "@html/Text";
-import switchVariants from "@variants/switch";
 import { cn } from "@utils/cn";
-import { remapProps } from "nativewind";
 
 export * from "./types";
 export * from "./utils";
 
-export const Switch = ({ testID, ...props }: ISwitchProps) => {
+
+/**
+ * A customizable Switch component that supports tooltip, labels, and toggle functionality.
+ *
+ * This component wraps the `Switch` from React Native and enhances its usability by providing
+ * optional tooltips and labels. It allows users to toggle between checked and unchecked states
+ * easily, making it suitable for various applications such as settings, forms, and toggle controls.
+ *
+ * @param {object} props - The properties for the Switch component.
+ * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "resk-switch".
+ * @param {boolean} props.checked - Indicates whether the switch is in the checked state.
+ * @param {string} [props.tooltip] - Optional tooltip text displayed when the user hovers over the switch.
+ * @param {ReactElement} [props.label] - The text label associated with the switch.
+ * @param {boolean} [props.isLabelOnLeftSide] - Indicates whether the label should be on the left side of the switch.
+ * @param {any} [props.checkedValue] - The value representing the checked state.
+ * @param {any} [props.uncheckedValue] - The value representing the unchecked state.
+ * @param {any} [props.defaultValue] - The default value of the switch.
+ * @param {boolean} [props.disabled] - Flag to indicate if the switch is disabled.
+ * @param {boolean} [props.readOnly] - Flag to indicate if the switch is read-only.
+ * @param {string} [props.className] - The tailwind CSS class names for the switch component.
+ * @param {string} [props.containerClassName] - The tailwind CSS class names for the container component.
+ * @param {string} [props.labelClassName] - The tailwind CSS class names for the label component.
+ * @param {any} [rest] - Additional props passed to the React Native Switch component.
+ *
+ * @returns {ReactElement} - Returns a JSX element representing the Switch component.
+ *
+ * @example
+ * // Usage example of the Switch component
+ * import { Switch } from './path/to/Switch';
+ *
+ * const MyComponent = () => {
+ *   return (
+ *     <Switch
+ *       defaultValue={true}
+ *       tooltip="Toggle to receive notifications"
+ *       label="Enable Notifications"
+ *       color="#4CAF50"
+ *       disabled={false}
+ *       readOnly={false}
+ *       onChange={({value,event,checked})=>{
+ *            console.log(value," is value");//display "checked" or "unchecked"
+ *       }}
+ *     />
+ *   );
+ * };
+ *
+ * @example
+ * import { Switch } from '@resk/nativewind';
+ * <Switch 
+ *     {...{
+ *   tooltip: "Toggle to receive notifications",
+ *   label: "Enable Notifications",
+ *   color: "#4CAF50",
+ *   disabled: false,
+ *   readOnly: false,
+ *   defaultValue: true,
+ *   onChange: (options) => {
+ *     console.log(options);
+ *   }}
+ * />
+ */
+export function Switch({ testID, ...props }: ISwitchProps) {
     const {
         checked,
         tooltip,
@@ -24,31 +83,25 @@ export const Switch = ({ testID, ...props }: ISwitchProps) => {
         checkedValue,
         uncheckedValue,
         defaultValue,
-        variant,
         disabled,
         className,
-        thumbClassName,
-        trackClassName,
         readOnly,
         containerClassName,
         labelClassName,
         ...rest
     } = useToggleable(props);
     const MTestID = typeof testID === 'string' && testID || "resk-switch";
-    const variantSwitch = switchVariants(variant);
-    const labelContent = <Text testID={`${MTestID}-label`} children={label} className={cn(variantSwitch?.label(), labelClassName)} />;
+    const labelContent = <Text testID={`${MTestID}-label`} children={label} className={labelClassName} />;
     return <Tooltip<TouchableOpacityProps> as={TouchableOpacity as any} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`}
         onPress={(event: GestureResponderEvent) => {
             toggleStatus();
         }}
-        className={cn(variantSwitch?.container(), containerClassName)}
+        className={cn(containerClassName)}
     >
         {isLabelOnLeftSide ? labelContent : null}
-        <CustomSwitch
+        <RNSwitch
             {...rest}
-            className={cn(variantSwitch?.base(), className)}
-            thumbClassName={cn(variantSwitch?.thumb(), thumbClassName)}
-            trackClassName={cn(variantSwitch?.track(), trackClassName)}
+            className={cn(className)}
             value={checked}
             onValueChange={toggleStatus}
             testID={MTestID}
@@ -57,22 +110,5 @@ export const Switch = ({ testID, ...props }: ISwitchProps) => {
         {!isLabelOnLeftSide ? labelContent : null}
     </Tooltip>
 }
-const CustomSwitch = remapProps(RNSwitch, {
-    thumbClassName: "thumbColor",
-    trackClassName: "trackColor",
-});
-CustomSwitch.displayName = "Switch.RemapProps";
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        alignSelf: "flex-start"
-    },
-    label: {
-        userSelect: "text",
-        marginHorizontal: 7,
-    }
-});
 
 Switch.displayName = "Switch"

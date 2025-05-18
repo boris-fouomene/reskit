@@ -16,7 +16,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Foundation from "react-native-vector-icons/Foundation";
 import Octicons from "react-native-vector-icons/Octicons";
 import { cn, normalizeProps } from "@utils/cn";
-import { variants } from "@variants/index";
+import iconVariants from "@variants/icon";
 import { Tooltip } from "@components/Tooltip";
 
 
@@ -70,12 +70,14 @@ export default function FontIcon({ name, variant, containerClassName, title, too
         nameArray.shift();
         iconName = nameArray.join("-");
     }
-    const iconClassName = cn(isObj(variant) && variants.icon(variant), className);
+    const iconClassName = cn(isObj(variant) && iconVariants(variant), className);
     const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>;
     if (touchableProps || title || tooltip) {
-        return <Tooltip as={TouchableOpacity} title={title} tooltip={tooltip} disabled={disabled} {...touchableProps as any} className={cn("shrink-0 grow-0", containerClassName)}>
+        return <Tooltip as={TouchableOpacity} title={title} tooltip={tooltip}
+            disabled={disabled} {...touchableProps as any}
+            className={cn("shrink-0 grow-0", containerClassName)}>
             <Component
                 disabled={disabled}
                 {...restProps}

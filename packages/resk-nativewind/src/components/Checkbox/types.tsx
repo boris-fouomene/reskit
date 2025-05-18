@@ -4,7 +4,7 @@ import { IClassName } from "@src/types";
 import { IFontIconName, IFontIconProps } from '@components/Icon/types';
 
 
-export interface ICheckboxProps extends IToggleableProps, ITooltipBaseProps, Omit<IFontIconProps, "variant"> {
+export interface ICheckboxProps extends IToggleableProps, ITooltipBaseProps, Omit<IFontIconProps, "variant" | "name"> {
     /**
      * Callback that is invoked when the user presses the checkbox.
      * @param value A boolean indicating the new checked state of the checkbox.

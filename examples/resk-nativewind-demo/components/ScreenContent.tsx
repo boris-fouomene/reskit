@@ -1,6 +1,6 @@
 import { Text, Div, Heading } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
-import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge, HStack, Tooltip, Switch } from "@resk/nativewind";
+import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   path: string;
@@ -63,6 +63,14 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
           <Switch label={"Example 1"} title="Switch example" />
           <Switch label={"Example 2"} title="Switch example" />
           <Switch label={"Example 3"} title="Switch example" />
+        </HStack>
+      </Div>
+      <Div className="p-5">
+        <Heading level={1}>Checkbox examples</Heading>
+        <HStack className="p-5 !gap-x-10">
+          <Checkbox label={"Example 1"} title="Checkbox example1" checkedVariant={{ color: "primary", size: "4xl" }} />
+          <Checkbox label={"Example 2"} title="Checkbox example2" checkedVariant={{ color: "secondary", size: "40px" }} />
+          <Checkbox label={"Example 3"} title="Checkbox example3 - disabled" disabled />
         </HStack>
       </Div>
     </ScrollView>

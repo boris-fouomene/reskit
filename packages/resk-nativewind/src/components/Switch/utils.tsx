@@ -81,7 +81,7 @@ export function useToggleable({ disabled, className, checkedTooltip, onValueChan
   uncheckedTooltip = getTextContent(uncheckedTooltip) && uncheckedTooltip || title;
   return {
     ...rest,
-    className: cn(variants.all({ disabled }), className),
+    className: cn(variants.all({ disabled, readOnly }), className),
     containerClassName: cn(variants.all({ disabled, readOnly }), "flex flex-row self-start items-center justify-start", containerClassName),
     labelClassName: cn(!disabled && "select-text mx-[7px]", className),
     checked,

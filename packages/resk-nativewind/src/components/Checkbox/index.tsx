@@ -5,12 +5,68 @@ import { Tooltip } from "@components/Tooltip";
 import { Text } from "@html/Text";
 import { useToggleable } from "@components/Switch/utils";
 import FontIcon from "@components/Icon/Font";
-import { isNonNullString } from "@resk/core/utils";
+import { isNonNullString, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
+import getTextContent from "@utils/getTextContent";
+import { pickTouchableProps } from "@utils/touchHandler";
 
 export * from "./types";
 
-export function Checkbox({ testID, checkedIconName, uncheckedIconName, checkedClassName, uncheckedClassName, checkedVariant, uncheckedVariant, style, ...props }: ICheckboxProps) {
+
+/**
+ * A customizable Checkbox component that supports tooltip, labels, and toggle functionality.
+ *
+ * This component wraps the `TouchableOpacity` from React Native and enhances its usability by providing
+ * optional tooltips and labels. It allows users to toggle between checked and unchecked states
+ * easily, making it suitable for various applications such as settings, forms, and toggle controls.
+ *
+ * @param {object} props - The properties for the Checkbox component.
+ * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "resk-checkbox".
+ * @param {string} [props.checkedIconName] - The icon name of the checked icon.
+ * @param {number} [props.size] - The size of the checkbox.
+ * @param {string} [props.uncheckedIconName] - The icon name of the unchecked icon.
+ * @param {string} [props.checkedClassName] - The class name for the checked icon.
+ * @param {string} [props.uncheckedClassName] - The class name for the unchecked icon.
+ * @param {string} [props.checkedVariant] - The variant name for the checked icon.
+ * @param {string} [props.uncheckedVariant] - The variant name for the unchecked icon.
+ * @param {object} [props.style] - Additional styles for the checkbox container.
+ * @param {object} [props.containerClassName] - The tailwind CSS class names for the container component.
+ * @param {boolean} [props.disabled] - Flag to indicate if the checkbox is disabled.
+ * @param {boolean} [props.readOnly] - Flag to indicate if the checkbox is read-only.
+ * @param {string} [props.label] - The text label associated with the checkbox.
+ * @param {boolean} [props.isLabelOnLeftSide] - Indicates whether the label should be on the left side of the checkbox.
+ * @param {any} [props.checkedValue] - The value representing the checked state.
+ * @param {any} [props.uncheckedValue] - The value representing the unchecked state.
+ * @param {any} [props.defaultValue] - The default value of the checkbox.
+ *
+ * @returns {ReactElement} - Returns a JSX element representing the Checkbox component.
+ *
+ * @example
+ * // Usage example of the Checkbox component
+ * import { Checkbox } from './path/to/Checkbox';
+ *
+ * const MyComponent = () => {
+ *   return (
+ *     <Checkbox
+ *       defaultValue={"checked"}
+ *       uncheckedValue="unchecked"
+ *       checkedValue={"checked"}
+ *       uncheckedValue={"unchecked"}
+ *       label="Enable Notifications"
+ *       tooltip="Toggle to receive notifications"
+ *       color="#4CAF50"
+ *       disabled={false}
+ *       readOnly={false}
+ *       onChange={({value,event,checked})=>{
+ *            console.log(value," is value");//display "checked" or "unchecked"
+ *       }}
+ *     />
+ *   );
+ * };
+ *
+ * for more information on the underlying RNCheckbox component.
+ */
+export function Checkbox({ testID, checkedIconName, size, uncheckedIconName, checkedClassName, uncheckedClassName, checkedVariant, uncheckedVariant, style, ...props }: ICheckboxProps) {
     const {
         checked,
         tooltip,
@@ -30,31 +86,38 @@ export function Checkbox({ testID, checkedIconName, uncheckedIconName, checkedCl
         containerClassName,
         ...rest
     } = useToggleable(props);
+    const { touchableProps, ...nonTouchableProps } = pickTouchableProps(rest as any);
     const handleOnPress = (event: GestureResponderEvent) => {
         toggleStatus();
     };
     const iconChecked = isNonNullString(checkedIconName) ? checkedIconName : FontIcon.CHECKED;
     const iconUnchecked = isNonNullString(uncheckedIconName) ? uncheckedIconName : FontIcon.UNCHECKED;
-    const MTestID = typeof testID === 'string' && testID || "resk-checkbox";
-    const labelContent = <Text testID={`${MTestID}-label`} className={cn(labelClassName)} children={label} />;
+    const checkboxTestID = typeof testID === 'string' && testID || "resk-checkbox";
+    const labelContent = <Text testID={`${checkboxTestID}-label`} className={cn(labelClassName)} children={label} />;
     return <Tooltip
         as={TouchableOpacity}
         disabled={disabled || readOnly}
         tooltip={tooltip}
-        testID={`${MTestID}`}
+        testID={`${checkboxTestID}-container`}
         accessibilityRole="checkbox"
         accessibilityState={{ disabled, checked }}
+        accessibilityLabel={getTextContent(label)}
+        {...Object.assign({}, touchableProps) as any}
         onPress={handleOnPress}
         className={cn(containerClassName)}
     >
         {isLabelOnLeftSide ? labelContent : null}
         <FontIcon
-            {...rest}
+            {...nonTouchableProps}
             disabled={disabled}
             accessibilityRole="checkbox"
             className={cn(checked ? checkedClassName : uncheckedClassName)}
             variant={checked ? checkedVariant : uncheckedVariant}
             name={(checked ? iconChecked as never : iconUnchecked as never)}
+            size={isNumber(size) && size > 0 ? size : 25}
+            testID={checkboxTestID}
+            title={undefined}
+            tooltip={undefined}
         />
         {!isLabelOnLeftSide ? labelContent : null}
     </Tooltip>

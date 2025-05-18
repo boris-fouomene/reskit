@@ -5,6 +5,7 @@ import { useToggleable, getToggleableDefaultValues } from "./utils";
 import { Tooltip } from "@components/Tooltip";
 import { Text } from "@html/Text";
 import { cn } from "@utils/cn";
+import { pickTouchableProps } from "@utils/touchHandler";
 
 export { useToggleable };
 export * from "./types";
@@ -90,9 +91,11 @@ export function Switch({ testID, ...props }: ISwitchProps) {
         labelClassName,
         ...rest
     } = useToggleable(props);
+    const { touchableProps, ...nonTouchableProps } = pickTouchableProps(rest as any);
     const MTestID = typeof testID === 'string' && testID || "resk-switch";
     const labelContent = <Text testID={`${MTestID}-label`} children={label} className={labelClassName} />;
     return <Tooltip<TouchableOpacityProps> as={TouchableOpacity as any} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`}
+        {...Object.assign({}, touchableProps) as any}
         onPress={(event: GestureResponderEvent) => {
             toggleStatus();
         }}
@@ -100,7 +103,7 @@ export function Switch({ testID, ...props }: ISwitchProps) {
     >
         {isLabelOnLeftSide ? labelContent : null}
         <RNSwitch
-            {...rest}
+            {...nonTouchableProps}
             className={cn(className)}
             value={checked}
             onValueChange={toggleStatus}

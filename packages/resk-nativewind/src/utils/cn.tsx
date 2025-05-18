@@ -54,7 +54,7 @@ export function normalizeProps<T extends INativewindBaseProps = any>({ className
     return {
         ...defaultProps, ...props, className: cn(defaultProps.className,
             variants.all({ disabled: !!((props as any).disabled || (defaultProps as any)?.disabled) }),
-            variants.all({ readonly: !!((props as any).readonly || (defaultProps as any)?.readonly) }),
+            variants.all({ readOnly: !!((props as any).readonly || (defaultProps as any)?.readonly) }),
             className
         )
     }

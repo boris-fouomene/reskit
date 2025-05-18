@@ -19,7 +19,6 @@ export * from "./types";
  * @param {ReactNode} [props.uncheckedTooltip] -  Tooltip content to display when the toggleable component is in an unchecked state.
  * @param {ReactNode} [props.tooltip] - Default tooltip to display.
  * @param {string} [props.title] - The title for the toggleable component, used in tooltips.
- * @param {string} [props.color] - Custom color for the toggleable component.
  * @param {boolean} [props.readOnly] - Indicates whether the toggle is read-only.
  * @param {"left" | "right"} [props.labelPosition] - The position of the label relative to the toggleable component.
  * @param {(options: IToggleableOnChangeOptions) => boolean | void} [props.beforeToggle] - Callback function called when the toggle is pressed.
@@ -45,7 +44,7 @@ export * from "./types";
  * @returns {any} defaultValue - The default value of the toggleable component
  * @returns {boolean} disabled - A boolean indicating whether the toggleable component is disabled.
  */
-export function useToggleable({ disabled, className, checkedTooltip, onValueChange, uncheckedTooltip, tooltip, title, color, readOnly, labelPosition, beforeToggle, onChange, label, checkedLabel, uncheckedLabel, labelClassName, containerClassName, ...rest }: IToggleableProps) {
+export function useToggleable({ disabled, className, checkedTooltip, onValueChange, uncheckedTooltip, tooltip, title, readOnly, labelPosition, beforeToggle, onChange, label, checkedLabel, uncheckedLabel, labelClassName, containerClassName, ...rest }: IToggleableProps) {
   const { checkedValue, uncheckedValue, defaultValue } = getToggleableDefaultValues(rest);
   const eventRef = useRef(null);
   const [checked, setChecked] = useStateCallback(defaultValue === checkedValue ? true : false);
@@ -83,11 +82,11 @@ export function useToggleable({ disabled, className, checkedTooltip, onValueChan
   return {
     ...rest,
     className: cn(variants.all({ disabled }), className),
-    containerClassName: cn(variants.all({ disabled }), "flex flex-row self-start items-center justify-start", containerClassName),
+    containerClassName: cn(variants.all({ disabled, readOnly }), "flex flex-row self-start items-center justify-start", containerClassName),
     labelClassName: cn(!disabled && "select-text mx-[7px]", className),
     checked,
     labelPosition,
-    tooltip: (checked ? checkedTooltip : uncheckedTooltip) || tooltip || title,
+    tooltip: (checked ? checkedTooltip : uncheckedTooltip) || tooltip || title || undefined,
     setChecked,
     toggleStatus,
     getValue,
@@ -105,7 +104,7 @@ export function useToggleable({ disabled, className, checkedTooltip, onValueChan
   };
 };
 
-/***
+/**
  * Retrieves the default values for a toggleable component based on the provided props.
  * This function ensures that the checked and unchecked values are set to sensible defaults 
  * if they are not explicitly provided in the props.
@@ -131,26 +130,6 @@ export function useToggleable({ disabled, className, checkedTooltip, onValueChan
  * @returns {any} defaultValue - The default value for the toggleable component, 
  * which is either the provided default value or the unchecked value if the 
  * provided default is not valid.
- * @returns {string} onTintColor the color that the toggle will display when it is in the "on" state (i.e., when the toggle is activated or checked). It is typically used to visually indicate that the toggle is active.
- * Usage: it's often applied to the track of the toggle switch, providing a clear visual cue to the user that the toggle is in the "on" position.
-   The color can vary based on the application's theme (light or dark) and the toggle's state (enabled or disabled).
-  
- * @returns {string} thumbTintColor - It's defines the color of the thumb (the draggable part) of the toggle switch. It is the visual element that the user interacts with to change the toggle's state.
-    Usage: The thumb color can change based on whether the toggle is enabled or disabled and whether it is in the "on" or "off" state. A clear distinction in color helps users identify the current state of the toggle easily.
- * @returns {string} checkedColor - It specifies the color to use when the toggle is in the "checked" state. It serves as a reference for what color should be displayed when the toggle is activated.
-    Usage : It can be customized by the developer or designer, allowing for flexibility in the appearance of the toggle.
-    It is particularly useful in themes where the default colors may not fit the desired aesthetic.
-  @example
- * const props: IToggleableProps = {
- *     checkedValue: true,
- *     uncheckedValue: false,
- *     defaultValue: true,
- * };
- * 
- * const { checkedValue, uncheckedValue, defaultValue } = getToggleableDefaultValues(props);
- * console.log(checkedValue); // true
- * console.log(uncheckedValue); // false
- * console.log(defaultValue); // true
  */
 export const getToggleableDefaultValues = (props: IToggleableProps) => {
   let checkedValue = props?.checkedValue, uncheckedValue = props?.uncheckedValue, defaultValue = props?.defaultValue;

@@ -141,10 +141,6 @@ export interface IToggleableProps extends ITooltipBaseProps {
      * relative to the toggleable component. Can be either "left" or "right".
      */
     labelPosition?: "left" | "right";
-    /**
-     * Custom color for the toggleable component. This can be used to match the component with the application's theme.
-     */
-    color?: string;
 
     /**
      * A boolean indicating whether the 

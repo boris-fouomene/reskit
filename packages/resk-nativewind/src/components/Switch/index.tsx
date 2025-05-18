@@ -1,13 +1,13 @@
 "use client";
 import { TouchableOpacity, StyleSheet, TouchableOpacityProps, Switch as RNSwitch, GestureResponderEvent } from "react-native";
 import { ISwitchProps } from "./types";
-import { useToggleable } from "./utils";
+import { useToggleable, getToggleableDefaultValues } from "./utils";
 import { Tooltip } from "@components/Tooltip";
 import { Text } from "@html/Text";
 import { cn } from "@utils/cn";
 
+export { useToggleable };
 export * from "./types";
-export * from "./utils";
 
 
 /**
@@ -111,4 +111,5 @@ export function Switch({ testID, ...props }: ISwitchProps) {
     </Tooltip>
 }
 
+Switch.getToogleableDefaultValues = getToggleableDefaultValues;
 Switch.displayName = "Switch"

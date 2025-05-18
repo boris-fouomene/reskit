@@ -14,7 +14,7 @@ export const variants = {
             disabled: {
                 true: "pointers-events-none opacity-70 web:cursor-not-allowed",
             },
-            readonly: {
+            readOnly: {
                 true: "pointer-events-none opacity-80 web:cursor-not-allowed",
             },
             hover: "hover:bg-gray-100 dark:hover:bg-gray-800",

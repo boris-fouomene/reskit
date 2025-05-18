@@ -9,3 +9,4 @@ export * from "./Badge";
 export * from "./BackHandler";
 export * from "./Stack";
 export * from "./Tooltip";
+export * from "./Switch";

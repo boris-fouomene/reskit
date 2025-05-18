@@ -29,18 +29,20 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
         <HStack className="p-5 !gap-x-10">
           <Icon.Button variant={{ color: "secondary" }}
             iconName='camera'
+            title="secondary color icon camera"
             size={30}
             onPress={(event) => {
               console.log("pressed icon");
             }}
           />
           <Icon.Button
+            title="primary color icon car"
             disabled
             variant={{ color: "primary", size: "5xl" }}
             iconName="fa6-car"
             size={40}
           />
-          <Icon.Font variant={{ color: "primary", size: "5xl" }} name={"phone"} />
+          <Icon.Font title={"A phone icon"} variant={{ color: "primary", size: "5xl" }} name={"phone"} />
           {children}
           <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
         </HStack>

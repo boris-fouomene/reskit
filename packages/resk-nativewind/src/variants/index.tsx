@@ -7,6 +7,7 @@ import heading from "./heading";
 import divider from "./divider";
 import icon from "./icon";
 import badge from "./badge";
+import switchVariants from "./switch";
 export const variants = {
     all: tv({
         base: "",
@@ -26,6 +27,7 @@ export const variants = {
     icon,
     heading,
     iconButton,
+    switch: switchVariants,
     surface,
     badge,
     text,

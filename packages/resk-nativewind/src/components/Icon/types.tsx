@@ -5,6 +5,7 @@ import { ReactElement } from "react";
 import { IVariantPropsAll } from "@variants/index";
 import { IVariantPropsIconButton } from '@variants/iconButton';
 import { IVariantPropsIcon } from "@variants/icon";
+import { ITooltipBaseProps } from "@components/Tooltip/types";
 
 /***
  * The `IFontIconNameRegistry` interface is used to define the registry of font icon names.
@@ -60,7 +61,7 @@ export type IFontIconName = keyof IFontIconNameRegistry;
 * <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
-export type IFontIconProps = Omit<IconProps, 'name' | 'size' | "ref" | "className"> & INativewindBaseProps & IVariantPropsAll & {
+export type IFontIconProps = Omit<IconProps, 'name' | 'size' | "ref" | "className"> & INativewindBaseProps & ITooltipBaseProps & IVariantPropsAll & {
     /**
      * The style object for the icon.
      * 
@@ -195,7 +196,7 @@ export type IIconSource = IFontIconName | ImageSourcePropType | null | ReactElem
  *   onError: () => console.error('Error loading image'),
  * };
  */
-export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Omit<ImageProps, "className"> & Omit<ITouchableProps, "className"> & {
+export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Omit<ImageProps, "className"> & ITooltipBaseProps & Omit<ITouchableProps, "className"> & {
     /****
      * the name of the icon to display (including the prefix for icon set if necessary).
      * It accepts a variety of icon names from different icon libraries such as 

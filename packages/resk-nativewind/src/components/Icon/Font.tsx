@@ -17,6 +17,7 @@ import Foundation from "react-native-vector-icons/Foundation";
 import Octicons from "react-native-vector-icons/Octicons";
 import { cn, normalizeProps } from "@utils/cn";
 import { variants } from "@variants/index";
+import { Tooltip } from "@components/Tooltip";
 
 
 const isIos = Platform.isIos();
@@ -57,7 +58,7 @@ const isIos = Platform.isIos();
  * @param {IFontIconProps} props The properties of the `FontIcon` component.
  * @returns {ReactElement | null} Returns the icon element, or null if the icon is not defined.
  */
-export default function FontIcon({ name, variant, containerClassName, ref, ...props }: IFontIconProps) {
+export default function FontIcon({ name, variant, containerClassName, title, tooltip, ref, ...props }: IFontIconProps) {
     const { touchableProps, size, disabled, className, ...restProps } = pickTouchableProps(normalizeProps(props));
     const nameString = defaultStr(name).trim();
     let iconName = nameString;
@@ -73,8 +74,8 @@ export default function FontIcon({ name, variant, containerClassName, ref, ...pr
     const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>;
-    if (touchableProps) {
-        return <TouchableOpacity disabled={disabled} {...touchableProps} className={cn("shrink-0 grow-0", containerClassName)}>
+    if (touchableProps || title || tooltip) {
+        return <Tooltip as={TouchableOpacity} title={title} tooltip={tooltip} disabled={disabled} {...touchableProps as any} className={cn("shrink-0 grow-0", containerClassName)}>
             <Component
                 disabled={disabled}
                 {...restProps}
@@ -83,7 +84,7 @@ export default function FontIcon({ name, variant, containerClassName, ref, ...pr
                 className={iconClassName}
                 name={iconName}
             />
-        </TouchableOpacity>
+        </Tooltip>
     }
     return <Component
         {...restProps}

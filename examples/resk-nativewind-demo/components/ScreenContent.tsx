@@ -9,7 +9,7 @@ type ScreenContentProps = {
 
 export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
   return (
-    <ScrollView>
+    <ScrollView style={{ flex: 1 }}>
       <Div className={styles.container}>
         <Text className={styles.title}>{title}</Text>
         <ActivityIndicator size={80} color={"yellow"} />

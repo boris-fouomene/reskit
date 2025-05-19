@@ -57,24 +57,26 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
     }
     return {
         rippleContent: <>
-            {ripples.map((ripple, index) => (
-                <Animated.View
-                    key={ripple.key}
-                    testID={testID + "-ripple-" + index}
-                    style={{
-                        left: ripple.x - ripple.size / 2,
-                        top: ripple.y - ripple.size / 2,
-                        width: ripple.size,
-                        height: ripple.size,
-                        position: "absolute",
-                        borderRadius: ripple.size / 2,
-                        backgroundColor: "red",//rippleColor as any,
-                        opacity: ripple.opacity,
-                        transform: [{ scale: ripple.scale }],
-                    }}
-                    className={className}
-                />
-            ))}
+            {ripples.map((ripple, index) => {
+                return (
+                    <Animated.View
+                        key={ripple.key}
+                        testID={testID + "-ripple-" + index}
+                        style={{
+                            left: ripple.x - ripple.size / 2,
+                            top: ripple.y - ripple.size / 2,
+                            width: ripple.size,
+                            height: ripple.size,
+                            position: "absolute",
+                            borderRadius: ripple.size / 2,
+                            backgroundColor: "red",//rippleColor as any,
+                            opacity: ripple.opacity,
+                            transform: [{ scale: ripple.scale }],
+                        }}
+                        className={className}
+                    />
+                );
+            })}
         </>,
         startRipple: (event: GestureResponderEvent) => {
             const { currentTarget, target } = event;

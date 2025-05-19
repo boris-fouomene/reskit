@@ -4,6 +4,7 @@ import { IHtmlTextProps } from "@html/types";
 import { cn } from "@utils/cn";
 import { IClassName } from "@src/types";
 import { isNumber } from "@resk/core/utils";
+import { StyleSheet } from "react-native";
 
 export const Text = withAsChild(function Text({ numberOfLines, allowFontScaling, style: cStyle, ellipsizeMode, lineBreakMode, maxFontSizeMultiplier, minimumFontScale, ...props }: IHtmlTextProps) {
     const classes: IClassName = [];

@@ -15,7 +15,7 @@ import { cn } from '@utils/cn';
 import { Icon } from '@components/Icon';
 import { Div } from '@html/Div';
 import buttonVariant from "@variants/button";
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { useGetRippleContent } from './ripple';
 
 

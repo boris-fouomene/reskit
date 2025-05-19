@@ -1,6 +1,6 @@
 import { Text, Div, Heading } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
-import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
+import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   path: string;
@@ -71,6 +71,15 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
           <Checkbox label={"Example 1"} title="Checkbox example1" checkedVariant={{ color: "primary", size: "4xl" }} />
           <Checkbox label={"Example 2"} title="Checkbox example2" checkedVariant={{ color: "secondary", size: "40px" }} />
           <Checkbox label={"Example 3"} title="Checkbox example3 - disabled" disabled />
+        </HStack>
+      </Div>
+      <Div className="p-5">
+        <Heading level={1}>Button examples</Heading>
+        <HStack className="p-5 !gap-x-10">
+          <Button title="Button example1" variant={{ color: "primary" }} />
+          <Button title="Button example2" variant={{ color: "secondary" }} />
+          <Button title="Button example3 - disabled" disabled />
+          <Button title="Button example4 - loading" isLoading />
         </HStack>
       </Div>
     </ScrollView>

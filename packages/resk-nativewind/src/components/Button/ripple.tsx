@@ -36,7 +36,7 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
         scale: Animated.Value;
     }>>([]);
     const nextKey = useRef(0);
-    const className = cn(rippleClassName);
+    const className = cn("absolute", rippleClassName);
     useEffect(() => {
         const timeoutIds: NodeJS.Timeout[] = [];
         ripples.forEach((ripple) => {
@@ -61,19 +61,16 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
                 <Animated.View
                     key={ripple.key}
                     testID={testID + "-ripple-" + index}
-                    style={[
-                        styles.ripple,
-                        {
-                            left: ripple.x - ripple.size / 2,
-                            top: ripple.y - ripple.size / 2,
-                            width: ripple.size,
-                            height: ripple.size,
-                            borderRadius: ripple.size / 2,
-                            backgroundColor: rippleColor as any,
-                            opacity: ripple.opacity,
-                            transform: [{ scale: ripple.scale }],
-                        },
-                    ]}
+                    style={{
+                        left: ripple.x - ripple.size / 2,
+                        top: ripple.y - ripple.size / 2,
+                        width: ripple.size,
+                        height: ripple.size,
+                        borderRadius: ripple.size / 2,
+                        backgroundColor: rippleColor as any,
+                        opacity: ripple.opacity,
+                        transform: [{ scale: ripple.scale }],
+                    }}
                     className={className}
                 />
             ))}
@@ -118,9 +115,3 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
 
 const useNativeDriver = Platform.canUseNativeDriver();
 
-
-const styles = StyleSheet.create({
-    ripple: {
-        position: 'absolute',
-    },
-});

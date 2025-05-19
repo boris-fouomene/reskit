@@ -4,9 +4,25 @@ import { cn, normalizeProps } from "@utils";
 import { StyleSheet, Platform, PressableProps } from "react-native";
 import { normalizeGestureEvent } from "./events";
 import { MouseEvent, TouchEvent } from "react";
+import { UIManager } from "./UIManager";
 
 export * from "./events";
 
+/**
+ * Normalizes props for React Native elements.
+ *
+ * This function takes all the props that can be passed to a React Native component,
+ * and normalizes them into a format that can be passed to the component.
+ *
+ * The following props are normalized:
+ * - `testID` is converted to `testID` (no change)
+ * - `nativeID` is converted to `id` (for accessibility)
+ * - `asHtmlTag` is not passed to the component
+ *
+ * @param props - The props to normalize
+ * @param defaultProps - The default props to use if `props` is undefined
+ * @returns The normalized props
+ */
 export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, nativeID, asHtmlTag, ...props }: T, defaultProps?: T) {
     return {
         ...normalizeProps(props, defaultProps),
@@ -16,11 +32,40 @@ export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<
     }
 }
 
-export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, android_ripple, nativeID, onPress, onPressIn, onPressOut, style, ...props }: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
+/**
+ * Normalizes props for HTML elements.
+ *
+ * This function takes all the props that can be passed to a React Native component,
+ * and converts them into props that can be passed to an equivalent HTML element.
+ *
+ * - `testID` is converted to `data-test-id`
+ * - `ref` is converted to a function that normalizes the ref and calls the original ref function
+ * - `android_ripple` is ignored
+ * - `nativeID` is converted to `id`
+ * - `onPress` is converted to `onClick` if it's a function
+ * - `onPressIn` is converted to `onMouseDown` if it's a function
+ * - `onPressOut` is converted to `onMouseUp` if it's a function
+ * - `style` is flattened using `StyleSheet.flatten`
+ * - `disabled`, `readOnly`, and `readonly` are converted to `disabled` and `readOnly`
+ * - `className` is set to `"cursor-pointer"` if the element is not disabled and has an `onClick`, `onMouseDown`, or `onMouseUp` prop
+ *
+ * @param props The props to normalize
+ * @param defaultProps The default props to normalize
+ * @returns The normalized props
+ */
+export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, ref, android_ripple, nativeID, onPress, onPressIn, onPressOut, style, ...props }: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
     const disabled = !!(props as any).disabled || !!(props as any).readOnly || !!(props as any).readonly;
     const r = {
         style: style ? StyleSheet.flatten(style) : undefined as any,
         ...convertAccessibilityPropsToDOM(normalizeProps(props, defaultProps)),
+        ref: ref !== undefined && ref ? function (personalizedRef: any) {
+            UIManager.normalizeRef(personalizedRef);
+            console.log(personalizedRef?.measure, " is ppp ref", personalizedRef);
+
+            if (typeof ref == "function") {
+                return ref(personalizedRef);
+            }
+        } as any : undefined,
         "data-test-id": defaultStr(testID, defaultProps?.testID),
         id: defaultStr(props.id, nativeID),
         onClick: !disabled && typeof onPress == "function" ? function normalizedOnClick(event: MouseEvent<any> | TouchEvent<any>) {
@@ -65,7 +110,7 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ access
             }
         }
         if (value.busy !== undefined) domProps['aria-busy'] = value.busy;
-        if (value.expanded !== undefined) domProps['aria-expanded'] = value.expanded;
+        if (value.expanded !== undefined) domProps['aria-expanded'] = String(value.expanded) as any;
     }
     if (isObj(accessibilityValue)) {
         const val = accessibilityValue;
@@ -82,6 +127,9 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ access
     }
     if (accessibilityViewIsModal !== undefined) {
         (domProps as any)['aria-modal'] = String(accessibilityViewIsModal);
+    }
+    if ((domProps as any)["selectable"] !== undefined) {
+        (domProps as any)["selectable"] = String((domProps as any)["selectable"]);
     }
     return domProps as any;
 }

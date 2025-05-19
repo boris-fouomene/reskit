@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import isValidElement from "./isValidElement";
-export { default as useStableMemo } from "./useStableMemo";
 export { default as isValidElement } from "./isValidElement";
 export { default as usePrevious } from "./usePrevious";
 export * from "./mergeRefs";
@@ -16,6 +15,7 @@ export * from "./measureInWindow";
 export * from "./keyboard";
 export * from "./cn";
 export * from "./Component";
+export * from "./getBoundingClientRect";
 
 /***
     vérifie si la variable node est un élément reactNode

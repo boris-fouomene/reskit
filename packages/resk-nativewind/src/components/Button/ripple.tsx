@@ -66,8 +66,9 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
                         top: ripple.y - ripple.size / 2,
                         width: ripple.size,
                         height: ripple.size,
+                        position: "absolute",
                         borderRadius: ripple.size / 2,
-                        backgroundColor: rippleColor as any,
+                        backgroundColor: "red",//rippleColor as any,
                         opacity: ripple.opacity,
                         transform: [{ scale: ripple.scale }],
                     }}
@@ -80,6 +81,7 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
             (currentTarget || target)?.measure((x, y, width, height, pageX, pageY) => {
                 const touchX = event.nativeEvent.pageX - pageX;
                 const touchY = event.nativeEvent.pageY - pageY;
+                console.log(touchX, touchY, " are touch ", event);
                 const size = Math.max(width, height) * 2;
                 const opacity = new Animated.Value(rippleOpacity as number);
                 const scale = new Animated.Value(0);

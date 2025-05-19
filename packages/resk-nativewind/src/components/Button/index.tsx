@@ -2,7 +2,7 @@
 import { useState, useImperativeHandle, useEffect, useRef } from 'react';
 //import { FormsManager } from '@components/Form/FormsManager';
 import { Animated, GestureResponderEvent } from 'react-native';
-
+import iconVariants from "@variants/icon";
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import { Text } from '@html/Text';
@@ -59,7 +59,6 @@ export function Button<IButtonExtendContext = any>({
     context: extendContext,
     onPress,
     submitFormOnPress,
-    isExpandable,
     formName,
     resourceName,
     perm,
@@ -76,7 +75,7 @@ export function Button<IButtonExtendContext = any>({
     testID = defaultStr(testID, "resk-button");
     const [isLoading, _setIsLoading] = useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
     const [isDisabled, setIsDisabled] = useState(typeof customDisabled == "boolean" ? customDisabled : false);
-    const idRef = useRef<string>(defaultStr(id, uniqid("menu-item-id-")));
+    const idRef = useRef<string>(defaultStr(id, uniqid("button-id-")));
     if (isNonNullString(id) && id !== idRef.current) {
         idRef.current = id;
     }
@@ -132,7 +131,9 @@ export function Button<IButtonExtendContext = any>({
 
     const iconSize = 18;
     iconProps = Object.assign({}, iconProps);
-    const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps });
+    const labelVariant = variant?.color && buttonVariant({ color: variant?.color });
+    iconProps.className = cn(labelVariant?.label?.(), iconProps?.variant && iconVariants(iconProps.variant), iconProps.className);
+    const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps, variant: undefined });
     const iconContent = icon && isLoading !== true ? icon : null;
 
     useEffect(() => {
@@ -162,10 +163,10 @@ export function Button<IButtonExtendContext = any>({
             role="none"
             {...rest}
             {...rProps}
-            id={`${buttonId}`}
+            id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn(bVariant?.base?.(), className)}
+            className={cn("relative", bVariant?.base?.(), className)}
             onPress={(event: GestureResponderEvent) => {
                 if (typeof startRipple === "function") {
                     startRipple(event);

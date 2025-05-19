@@ -1,7 +1,7 @@
 import { defaultNumber } from '@resk/core/utils';
 import { MouseEvent, TouchEvent } from 'react';
 import { GestureResponderEvent } from 'react-native';
-
+import { UIManager } from "../UIManager";
 
 /**
  * Converts a browser MouseEvent or TouchEvent to a structure compatible with 
@@ -11,6 +11,10 @@ import { GestureResponderEvent } from 'react-native';
  * @returns An event object compatible with GestureResponderEvent
  */
 export function normalizeGestureEvent(event: MouseEvent<any> | TouchEvent<any>): GestureResponderEvent {
+    if (event) {
+        UIManager.normalizeRef(event?.target);
+        UIManager.normalizeRef(event?.currentTarget);
+    }
     // If it's already a GestureResponderEvent, just return it directly
     if ('nativeEvent' in event &&
         event.nativeEvent &&

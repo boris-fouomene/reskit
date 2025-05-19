@@ -134,12 +134,6 @@ export interface IButtonProps<IButtonExtendContext = any> extends Omit<ISurfaceP
     onPress?: (event: GestureResponderEvent, context: IButtonContext<IButtonExtendContext>) => any;
 
     /***
-     * If true, the button will be expandable.
-     * This can be used to create buttons that can be expanded or collapsed.
-     */
-    isExpandable?: boolean;
-
-    /***
      * The name of the form associated with the button in case of button representing a form action.
      * when this property is set, the button listens dynamically to the state of the form and is activated or deactivated according to the validated state or name of the form. 
      */

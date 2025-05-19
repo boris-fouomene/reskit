@@ -4,6 +4,7 @@ import { IHtmlDivProps } from "../types";
 import { normalizeNativeProps } from "../utils";
 import { withAsChild } from "@components/Slot";
 import { pickTouchableProps } from "@utils/touchHandler";
+import { isObj } from "@resk/core/utils";
 
 
 /**
@@ -20,6 +21,6 @@ import { pickTouchableProps } from "@utils/touchHandler";
  */
 export const Div = withAsChild(function Div(props: IHtmlDivProps) {
     const { touchableProps } = pickTouchableProps(props as any);
-    const Component = touchableProps ? Pressable : RNView;
-    return <Component {...props} {...normalizeNativeProps(props)} />
+    const Component = touchableProps || isObj((props as any).android_ripple) ? Pressable : RNView;
+    return <Component {...normalizeNativeProps(props)} />
 }, "Html.Div");

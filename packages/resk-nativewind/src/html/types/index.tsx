@@ -9,6 +9,7 @@ export interface IHtmlDivProps extends INativewindBaseProps, INativeAccessibilit
     style?: ViewStyle;
     children?: ViewProps["children"];
     role?: ViewProps["role"];
+    nativeID?: ViewProps["nativeID"];
     tabIndex?: ViewProps["tabIndex"];
     "aria-label"?: ViewProps["aria-label"];
     "aria-busy"?: ViewProps["aria-busy"];
@@ -38,6 +39,17 @@ export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "children"
     onPress?: TextProps["onPress"];
     onPressIn?: TextProps["onPressIn"];
     onPressOut?: TextProps["onPressOut"];
+    selectable?: TextProps["selectable"];
+    numberOfLines?: TextProps["numberOfLines"];
+    adjustsFontSizeToFit?: TextProps["adjustsFontSizeToFit"];
+    minimumFontScale?: TextProps["minimumFontScale"];
+    suppressHighlighting?: TextProps["suppressHighlighting"];
+    allowFontScaling?: TextProps["allowFontScaling"];
+    ellipsizeMode?: TextProps["ellipsizeMode"];
+    lineBreakMode?: TextProps["lineBreakMode"];
+    maxFontSizeMultiplier?: TextProps["maxFontSizeMultiplier"];
+    /**@platform native */
+    testID?: TextProps["testID"];
 }
 /**
  * Converts React Native accessibility props to corresponding DOM accessibility props.

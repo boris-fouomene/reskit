@@ -1,25 +1,28 @@
 import { defaultStr, isNonNullString, isObj } from "@resk/core/utils";
 import { IHtmlAccessibilityProps, IHtmlDivProps, INativeAccessibilityProps } from "./types";
 import { cn, normalizeProps } from "@utils";
-import { StyleSheet, Platform } from "react-native";
+import { StyleSheet, Platform, PressableProps } from "react-native";
 import { normalizeGestureEvent } from "./events";
 import { MouseEvent, TouchEvent } from "react";
 
 export * from "./events";
 
-export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, asHtmlTag, ...props }: T, defaultProps?: T) {
+export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, nativeID, asHtmlTag, ...props }: T, defaultProps?: T) {
     return {
         ...normalizeProps(props, defaultProps),
+        id: defaultStr(props.id, nativeID),
+        nativeID,
         testID: defaultStr(testID, defaultProps?.testID),
     }
 }
 
-export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, onPress, onPressIn, onPressOut, style, ...props }: T, defaultProps?: T) {
+export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, android_ripple, nativeID, onPress, onPressIn, onPressOut, style, ...props }: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
     const disabled = !!(props as any).disabled || !!(props as any).readOnly || !!(props as any).readonly;
     const r = {
         style: style ? StyleSheet.flatten(style) : undefined as any,
         ...convertAccessibilityPropsToDOM(normalizeProps(props, defaultProps)),
         "data-test-id": defaultStr(testID, defaultProps?.testID),
+        id: defaultStr(props.id, nativeID),
         onClick: !disabled && typeof onPress == "function" ? function normalizedOnClick(event: MouseEvent<any> | TouchEvent<any>) {
             return onPress(normalizeGestureEvent(event));
         } : undefined,

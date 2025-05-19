@@ -11,3 +11,4 @@ export * from "./Stack";
 export * from "./Tooltip";
 export * from "./Switch";
 export * from "./Checkbox";
+export * from "./Button";

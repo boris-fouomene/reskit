@@ -1,14 +1,25 @@
-import { ITouchableRippleProps } from "./types";
+"use client";
 import useStateCallback from "@utils/stateCallback";
 import { ReactElement, useEffect, useRef } from "react";
-import { Animated, GestureResponderEvent, LayoutChangeEvent, LayoutRectangle, StyleSheet } from "react-native";
+import { Animated, GestureResponderEvent, StyleSheet } from "react-native";
 import Platform from "@platform";
+import { IButtonProps } from "./types";
+import { cn } from "@utils/cn";
 
-export default function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleOpacity, rippleDuration }: ITouchableRippleProps): {
+
+/**
+ * Hook to generate the content of the ripple effect and the function to start the animation
+ * 
+ * @param {{ testID: string, disableRipple: boolean, disabled: boolean, rippleColor: string, rippleClassName: string, rippleOpacity: number, rippleDuration: number }} props - The props for the ripple effect
+ * 
+ * @returns {{ rippleContent?: ReactElement | null; startRipple?: (event: GestureResponderEvent) => void }} - The content of the ripple effect and the function to start the animation
+ */
+export function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleClassName, rippleOpacity, rippleDuration }: Partial<IButtonProps>): {
     rippleContent?: ReactElement | null;
     startRipple?: (event: GestureResponderEvent) => void;
-    onLayout?: (event: LayoutChangeEvent) => void;
 } {
+    rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 500;
+    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.9;
     const isRippleDisabled = !!(disabled || disableRipple);
     const timerRef = useRef<any>(null);
     useEffect(() => {
@@ -25,10 +36,9 @@ export default function useGetRippleContent({ testID, disableRipple, disabled, r
         scale: Animated.Value;
     }>>([]);
     const nextKey = useRef(0);
-    // Clean up completed ripples
+    const className = cn(rippleClassName);
     useEffect(() => {
         const timeoutIds: NodeJS.Timeout[] = [];
-
         ripples.forEach((ripple) => {
             const id = setTimeout(() => {
                 setRipples(prevRipples =>
@@ -38,7 +48,6 @@ export default function useGetRippleContent({ testID, disableRipple, disabled, r
 
             timeoutIds.push(id);
         });
-
         return () => {
             timeoutIds.forEach(id => clearTimeout(id));
         };
@@ -60,11 +69,12 @@ export default function useGetRippleContent({ testID, disableRipple, disabled, r
                             width: ripple.size,
                             height: ripple.size,
                             borderRadius: ripple.size / 2,
-                            backgroundColor: rippleColor,
+                            backgroundColor: rippleColor as any,
                             opacity: ripple.opacity,
                             transform: [{ scale: ripple.scale }],
                         },
                     ]}
+                    className={className}
                 />
             ))}
         </>,
@@ -73,15 +83,9 @@ export default function useGetRippleContent({ testID, disableRipple, disabled, r
             (currentTarget || target)?.measure((x, y, width, height, pageX, pageY) => {
                 const touchX = event.nativeEvent.pageX - pageX;
                 const touchY = event.nativeEvent.pageY - pageY;
-
-                // Calculate ripple size (diagonal of the button for full coverage)
                 const size = Math.max(width, height) * 2;
-
-                // Create animated values for scale and opacity
                 const opacity = new Animated.Value(rippleOpacity as number);
                 const scale = new Animated.Value(0);
-
-                // Add the new ripple
                 const newRipple = {
                     key: nextKey.current,
                     x: touchX,
@@ -90,11 +94,8 @@ export default function useGetRippleContent({ testID, disableRipple, disabled, r
                     opacity,
                     scale,
                 };
-
                 nextKey.current += 1;
                 setRipples(prevRipples => [...prevRipples, newRipple]);
-
-                // Animate the ripple
                 Animated.parallel([
                     Animated.timing(scale, {
                         toValue: 1,

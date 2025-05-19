@@ -7,6 +7,7 @@ import heading from "./heading";
 import divider from "./divider";
 import icon from "./icon";
 import badge from "./badge";
+import button from "./button";
 export const variants = {
     all: tv({
         base: "",
@@ -31,5 +32,6 @@ export const variants = {
     text,
     ripple,
     divider,
+    button,
 }
 export type IVariantPropsAll = VariantProps<typeof variants.all>;

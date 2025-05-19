@@ -1,5 +1,5 @@
 "use client";
-import { TouchableOpacity, StyleSheet, TouchableOpacityProps, Switch as RNSwitch, GestureResponderEvent } from "react-native";
+import { TouchableOpacity, TouchableOpacityProps, Switch as RNSwitch, GestureResponderEvent } from "react-native";
 import { ISwitchProps } from "./types";
 import { useToggleable, getToggleableDefaultValues } from "./utils";
 import { Tooltip } from "@components/Tooltip";

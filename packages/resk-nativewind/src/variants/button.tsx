@@ -2,7 +2,7 @@ import { tv, VariantProps } from 'tailwind-variants';
 
 const buton = tv({
     slots: {
-        base: "ring",
+        base: "",
         content: "",
         leftContainer: "",
         rightContainer: "",

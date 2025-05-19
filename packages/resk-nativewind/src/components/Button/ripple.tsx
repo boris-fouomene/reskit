@@ -5,6 +5,7 @@ import { Animated, GestureResponderEvent, StyleSheet } from "react-native";
 import Platform from "@platform";
 import { IButtonProps } from "./types";
 import { cn } from "@utils/cn";
+import { isNonNullString } from "@resk/core/utils";
 
 
 /**
@@ -68,8 +69,9 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
                             width: ripple.size,
                             height: ripple.size,
                             position: "absolute",
+                            overflow: "hidden",
                             borderRadius: ripple.size / 2,
-                            backgroundColor: "red",//rippleColor as any,
+                            ...(isNonNullString(rippleColor) ? { backgroundColor: rippleColor as any } : {}),
                             opacity: ripple.opacity,
                             transform: [{ scale: ripple.scale }],
                         }}
@@ -83,7 +85,6 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
             (currentTarget || target)?.measure((x, y, width, height, pageX, pageY) => {
                 const touchX = event.nativeEvent.pageX - pageX;
                 const touchY = event.nativeEvent.pageY - pageY;
-                console.log(touchX, touchY, " are touch ", event);
                 const size = Math.max(width, height) * 2;
                 const opacity = new Animated.Value(rippleOpacity as number);
                 const scale = new Animated.Value(0);

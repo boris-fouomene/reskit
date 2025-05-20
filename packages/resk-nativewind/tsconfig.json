@@ -5,6 +5,8 @@
     "lib": [
       "dom"
     ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "declaration": true,
     "declarationDir": "build",
     "removeComments": true,

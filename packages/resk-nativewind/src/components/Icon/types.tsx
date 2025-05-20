@@ -2,7 +2,7 @@ import { IClassName, INativewindBaseProps, ITextStyle, ITouchableProps } from ".
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
 import { ReactElement } from "react";
-import { IVariantPropsAll } from "@variants/index";
+import { IVariantPropsAll } from "@variants/all";
 import { IVariantPropsIconButton } from '@variants/iconButton';
 import { IVariantPropsIcon } from "@variants/icon";
 import { ITooltipBaseProps } from "@components/Tooltip/types";

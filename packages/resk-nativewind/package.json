@@ -32,7 +32,8 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "css:dev": "npx tailwindcss -i ./global-src.css -o ./global.css --watch",
     "css:build": "npx tailwindcss -i ./global-src.css -o ./global.css",
-    "generate-icon-types": "node tests/cli.generate-icon-types"
+    "generate-icon-types": "node tests/cli.generate-icon-types",
+    "generate-color-variants": "node tests/cli.generate-color-variants"
   },
   "keywords": [
     "react-native",
@@ -54,6 +55,7 @@
     "tailwind-variants": "^1.0.0"
   },
   "dependencies": {
+    "@resk/core": "^1.19.0",
     "clsx": "^2.1.1",
     "commander": "^13.1.0",
     "tailwind-merge": "^3.2.0",

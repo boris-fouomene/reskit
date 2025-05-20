@@ -1,4 +1,5 @@
 import { tv, VariantProps } from "tailwind-variants";
+import { VariantsGeneratedColors } from "./generated-variants-colors";
 
 const iconButton = tv({
     slots: {
@@ -7,53 +8,7 @@ const iconButton = tv({
         text: "text-surface-foreground dark:text-dark-surface-foreground",
     },
     variants: {
-        color: {
-            primary: {
-                container: "bg-primary dark:bg-dark-primary",
-                icon: "!text-primary-foreground dark:!text-dark-primary-foreground",
-                text: "text-primary-foreground dark:text-dark-primary-foreground",
-            },
-            secondary: {
-                container: "bg-secondary dark:bg-dark-secondary",
-                icon: "!text-secondary-foreground dark:!text-dark-secondary-foreground",
-                text: "text-secondary-foreground dark:text-dark-secondary-foreground",
-            },
-            surface: {
-                container: "bg-surface dark:bg-dark-surface",
-                icon: "!text-surface-foreground dark:!text-dark-surface-foreground",
-                text: "text-surface-foreground dark:text-dark-surface-foreground",
-            },
-            accent: {
-                container: "bg-accent dark:bg-dark-accent",
-                icon: "!text-accent-foreground dark:!text-dark-accent-foreground",
-                text: "text-accent-foreground dark:text-dark-accent-foreground",
-            },
-            neutral: {
-                container: "bg-neutral dark:bg-dark-neutral",
-                icon: "!text-neutral-foreground dark:!text-dark-neutral-foreground",
-                text: "text-neutral-foreground dark:text-dark-neutral-foreground",
-            },
-            info: {
-                container: "bg-info dark:bg-dark-info",
-                icon: "!text-info-foreground dark:!text-dark-info-foreground",
-                text: "text-info-foreground dark:text-dark-info-foreground",
-            },
-            success: {
-                container: "bg-success dark:bg-dark-success",
-                icon: "!text-success-foreground dark:!text-dark-success-foreground",
-                text: "text-success-foreground dark:text-dark-success-foreground",
-            },
-            warning: {
-                container: "bg-warning dark:bg-dark-warning",
-                icon: "!text-warning-foreground dark:!text-dark-warning-foreground",
-                text: "text-warning-foreground dark:text-dark-warning-foreground",
-            },
-            error: {
-                container: "bg-error dark:bg-dark-error",
-                icon: "!text-error-foreground dark:!text-dark-error-foreground",
-                text: "text-error-foreground dark:text-dark-error-foreground",
-            }
-        },
+        color: VariantsGeneratedColors.iconButton,
         size: {
             sm: {
                 container: "w-8 h-8",

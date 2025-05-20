@@ -3,7 +3,7 @@ import { II18nLocale } from "@src/i18n/types";
 import { Component, ComponentClass, ExoticComponent, FunctionComponent, JSXElementConstructor, ReactElement } from "react";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, Animated, PressableProps, TouchableWithoutFeedbackProps } from "react-native";
 import { type ClassValue } from 'clsx';
-import { IVariantPropsAll } from "@variants/index";
+import { IVariantPropsAll } from "@variants/all";
 
 
 export type IClassName = ClassValue;

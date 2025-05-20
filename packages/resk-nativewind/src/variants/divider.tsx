@@ -1,17 +1,11 @@
 import { tv, VariantProps } from "tailwind-variants";
+import { VariantsColors } from "./colors";
+import { VariantsGeneratedColors } from "./generated-variants-colors";
 
 const divider = tv({
     base: "bg-outline dark:bg-dark-outline w-full",
     variants: {
-        color: {
-            primary: "bg-primary dark:bg-primary-foreground",
-            secondary: "bg-secondary dark:bg-secondary-foreground",
-            tertiary: "bg-tertiary dark:bg-tertiary-foreground",
-            info: "bg-info dark:bg-info-foreground",
-            success: "bg-success dark:bg-success-foreground",
-            warning: "bg-warning dark:bg-warning-foreground",
-            error: "bg-error dark:bg-error-foreground",
-        },
+        color: VariantsGeneratedColors.divider
     }
 });
 export default divider;

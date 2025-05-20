@@ -1,6 +1,6 @@
 import { Text, Div, Heading } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
-import { Icon, ActivityIndicator, HelperText, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
+import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   path: string;
@@ -10,6 +10,9 @@ type ScreenContentProps = {
 export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
   return (
     <ScrollView style={{ flex: 1 }}>
+      {VariantsColors.colors.map((color) => {
+        return <Text key={color} className={`text-${color} dark:text-dark-${color} bg-${color} dark:bg-dark-${color}`} children={color} />
+      })}
       <Div className={styles.container}>
         <Text className={styles.title}>{title}</Text>
         <ActivityIndicator size={80} color={"yellow"} />
@@ -42,7 +45,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
             iconName="fa6-car"
             size={40}
           />
-          <Icon.Font title={"A phone icon"} variant={{ color: "primary", size: "5xl" }} name={"phone"} />
+          <Icon.Font title={"A phone icon"} variant={{ color: "secondary", size: "5xl" }} name={"phone"} />
           {children}
           <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
         </HStack>

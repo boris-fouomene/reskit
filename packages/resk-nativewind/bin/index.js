@@ -20,4 +20,11 @@ program.command('generate-icon-types')
         require("./generate-icon-types")(iconSetsPrefixes, Object.assign({}, options))
     });
 
+program.command('generate-color-variants')
+    .description(`Generate color variants`)
+    .argument('[colors]', 'The colors name to generate separated with a comma. Example: accent,neutral')
+    .action((colors, options) => {
+        require("./generate-color-variants")(colors, Object.assign({}, options))
+    });
+
 program.parse();

@@ -131,8 +131,7 @@ export function Button<IButtonExtendContext = any>({
 
     const iconSize = 18;
     iconProps = Object.assign({}, iconProps);
-    const labelVariant = variant?.color && buttonVariant({ color: variant?.color });
-    iconProps.className = cn(labelVariant?.label?.(), iconProps?.variant && iconVariants(iconProps.variant), iconProps.className);
+    iconProps.className = cn(bVariant?.icon?.(), iconProps?.variant && iconVariants(iconProps.variant), iconProps.className);
     const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps, variant: undefined });
     const iconContent = icon && isLoading !== true ? icon : null;
 

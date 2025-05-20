@@ -2,7 +2,7 @@ import { isObj } from '@resk/core/utils';
 import { INativewindBaseProps } from '@src/types';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { variants } from '@variants/index';
+import variantsAll from '@variants/all';
 /**
  * A function that takes in any number of class names and returns a single class name string
  * that can be used in a React component's className prop. This function is useful for
@@ -53,8 +53,8 @@ export function normalizeProps<T extends INativewindBaseProps = any>({ className
     defaultProps = isObj(defaultProps) ? defaultProps : {} as T;
     return {
         ...defaultProps, ...props, className: cn(defaultProps.className,
-            variants.all({ disabled: !!((props as any).disabled || (defaultProps as any)?.disabled) }),
-            variants.all({ readOnly: !!((props as any).readonly || (defaultProps as any)?.readonly) }),
+            variantsAll({ disabled: !!((props as any).disabled || (defaultProps as any)?.disabled) }),
+            variantsAll({ readOnly: !!((props as any).readonly || (defaultProps as any)?.readonly) }),
             className
         )
     }

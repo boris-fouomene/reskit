@@ -6,6 +6,7 @@ import { IClassName } from "@src/types";
 import { ReactNode, Ref } from "react";
 import { IDict, IResourceName } from '@resk/core/types';
 import { IVariantPropsButton } from "@variants/button";
+import { IVariantPropsRipple } from "@variants/ripple";
 
 export interface IButtonProps<IButtonExtendContext = any> extends Omit<ISurfaceProps, "onPress" | "variant"> {
     /***
@@ -179,7 +180,15 @@ export interface IButtonProps<IButtonExtendContext = any> extends Omit<ISurfaceP
 
     android_ripple?: PressableProps["android_ripple"];
 
+    /***
+     * The variant of the button
+     */
     variant?: IVariantPropsButton;
+
+    /***
+     * The variant of the ripple
+     */
+    rippleVariant?: IVariantPropsRipple;
 }
 
 /**

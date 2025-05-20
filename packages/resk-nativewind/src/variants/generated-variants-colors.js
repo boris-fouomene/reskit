@@ -118,6 +118,89 @@ export const VariantsGeneratedColors = {
     "warning": "text-warning dark:text-dark-warning",
     "error": "text-error dark:text-dark-error",
     "surface": "text-surface dark:text-dark-surface"
+  },
+  "ripple": {
+    "color": {
+      "primary": "before:bg-primary dark:before:bg-dark-primary",
+      "secondary": "before:bg-secondary dark:before:bg-dark-secondary",
+      "info": "before:bg-info dark:before:bg-dark-info",
+      "success": "before:bg-success dark:before:bg-dark-success",
+      "warning": "before:bg-warning dark:before:bg-dark-warning",
+      "error": "before:bg-error dark:before:bg-dark-error",
+      "surface": "before:bg-surface dark:before:bg-dark-surface"
+    },
+    "compoundVariants": [
+      {
+        "color": "primary",
+        "effect": "material",
+        "class": "before:bg-primary before:opacity-30"
+      },
+      {
+        "color": "primary",
+        "effect": "strong",
+        "class": "before:bg-primary before:opacity-40"
+      },
+      {
+        "color": "secondary",
+        "effect": "material",
+        "class": "before:bg-secondary before:opacity-30"
+      },
+      {
+        "color": "secondary",
+        "effect": "strong",
+        "class": "before:bg-secondary before:opacity-40"
+      },
+      {
+        "color": "info",
+        "effect": "material",
+        "class": "before:bg-info before:opacity-30"
+      },
+      {
+        "color": "info",
+        "effect": "strong",
+        "class": "before:bg-info before:opacity-40"
+      },
+      {
+        "color": "success",
+        "effect": "material",
+        "class": "before:bg-success before:opacity-30"
+      },
+      {
+        "color": "success",
+        "effect": "strong",
+        "class": "before:bg-success before:opacity-40"
+      },
+      {
+        "color": "warning",
+        "effect": "material",
+        "class": "before:bg-warning before:opacity-30"
+      },
+      {
+        "color": "warning",
+        "effect": "strong",
+        "class": "before:bg-warning before:opacity-40"
+      },
+      {
+        "color": "error",
+        "effect": "material",
+        "class": "before:bg-error before:opacity-30"
+      },
+      {
+        "color": "error",
+        "effect": "strong",
+        "class": "before:bg-error before:opacity-40"
+      },
+      {
+        "color": "surface",
+        "effect": "material",
+        "class": "before:bg-surface before:opacity-30"
+      },
+      {
+        "color": "surface",
+        "effect": "strong",
+        "class": "before:bg-surface before:opacity-40"
+      }
+    ]
   }
 }
     

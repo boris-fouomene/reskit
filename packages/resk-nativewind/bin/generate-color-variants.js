@@ -49,7 +49,24 @@ module.exports = (colors, options) => {
         surface: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
             return cn(colorWithPrefix, darkColorWithPrefix, `text-${colorWithoutPrefix}-foreground dark:text-dark-${colorWithoutPrefix}-foreground`)
         }),
-        text: VariantsColors.buildTextColors()
+        text: VariantsColors.buildTextColors(),
+        ripple: {
+            color: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
+                return cn(`before:bg-${colorWithoutPrefix} dark:before:bg-dark-${colorWithoutPrefix}`)
+            }),
+            compoundVariants: VariantsColors.colors.map((color) => {
+                return [{
+                    color,
+                    effect: 'material',
+                    class: `before:bg-${color} before:opacity-30`
+                },
+                {
+                    color: color,
+                    effect: 'strong',
+                    class: `before:bg-${color} before:opacity-40`
+                }]
+            }).flat()
+        }
     }, null, 2);
 
     fs.writeFileSync(outputPath, `
@@ -67,6 +84,14 @@ export const VariantsGeneratedColors = ${content}
         divider : Record<IName,string>;
         heading : Record<IName,string>;
         text : Record<IName,string>;
+        ripple : {
+            color : Record<IName,string>;
+            compoundVariants : Array<{
+                color : IName;
+                effect : 'material' | 'strong';
+                class : string;
+            }>;
+        }
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any as IVariantsGeneratedColors;
     `, 'utf8');

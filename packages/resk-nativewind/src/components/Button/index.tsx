@@ -7,7 +7,7 @@ import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import { Text } from '@html/Text';
 import { IButtonProps, IButtonContext } from './types';
-import { defaultStr, isNonNullString, uniqid } from '@resk/core/utils';
+import { defaultStr, isNonNullString, isObj, uniqid } from '@resk/core/utils';
 import Auth from "@resk/core/auth";
 import isValidElement from '@utils/isValidElement';
 import { Divider } from '@components/Divider';
@@ -15,8 +15,9 @@ import { cn } from '@utils/cn';
 import { Icon } from '@components/Icon';
 import { Div } from '@html/Div';
 import buttonVariant from "@variants/button";
+import rippleVariants from "@variants/ripple";
 import { Platform, StyleSheet } from 'react-native';
-import { useGetRippleContent } from './ripple';
+//import { useGetRippleContent } from './ripple';
 
 
 /**
@@ -70,6 +71,7 @@ export function Button<IButtonExtendContext = any>({
     rippleOpacity,
     rippleDuration,
     rippleClassName,
+    rippleVariant,
     ...rest
 }: IButtonProps<IButtonExtendContext>) {
     testID = defaultStr(testID, "resk-button");
@@ -148,14 +150,14 @@ export function Button<IButtonExtendContext = any>({
     const aRipple = Object.assign({}, android_ripple);
     const isRippleDisabled = disableRipple || disabled || Platform.OS === 'android';
     const rProps = isRippleDisabled ? {} : { android_ripple: { color: rippleColor || undefined, ...aRipple } };
-    const { rippleContent, startRipple } = useGetRippleContent({
+    /* const { rippleContent, startRipple } = useGetRippleContent({
         rippleColor: defaultStr(rProps?.android_ripple?.color) || undefined,
         rippleOpacity, rippleDuration,
         disabled,
         testID,
         disableRipple: !!isRippleDisabled,
-        rippleClassName: cn(rippleClassName, bVariant?.ripple?.()),
-    });
+        //rippleClassName: cn(rippleClassName, bVariant?.ripple?.()),
+    }); */
     if (perm !== undefined && !Auth.isAllowed(perm)) return null;
     return (<>
         <Surface
@@ -165,11 +167,11 @@ export function Button<IButtonExtendContext = any>({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("relative", bVariant?.base?.(), className)}
+            className={cn("relative overflow-hidden", bVariant?.base?.(), variant?.color && rippleVariants({ color: variant?.color }), isObj(rippleVariant) && rippleVariants(rippleVariant), className)}
             onPress={(event: GestureResponderEvent) => {
-                if (typeof startRipple === "function") {
-                    startRipple(event);
-                }
+                /*  if (typeof startRipple === "function") {
+                     startRipple(event);
+                 } */
                 const form = null;//formName ? FormsManager.getForm(formName) : null;
                 const hasForm = false;//form && (form as any).isValid();
                 const context2: IButtonContext<IButtonExtendContext> = context as IButtonContext<IButtonExtendContext>;
@@ -216,7 +218,7 @@ export function Button<IButtonExtendContext = any>({
                     {right}
                 </Div> : null}
             </Div>
-            {rippleContent}
+            {/* rippleContent */}
         </Surface>
         {divider ? <Divider id={buttonId + "-divider"} testID={testID + "-button-divider"} className={cn("button-divider", dividerClassName)} /> : null}
     </>);

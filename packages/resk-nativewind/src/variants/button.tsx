@@ -9,7 +9,6 @@ const buton = tv({
         rightContainer: "",
         icon: "",
         label: "",
-        ripple: "",
     },
     variants: {
         color: VariantsGeneratedColors.button,

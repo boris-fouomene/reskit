@@ -9,6 +9,14 @@
         divider : Record<IName,string>;
         heading : Record<IName,string>;
         text : Record<IName,string>;
+        ripple : {
+            color : Record<IName,string>;
+            compoundVariants : Array<{
+                color : IName;
+                effect : 'material' | 'strong';
+                class : string;
+            }>;
+        }
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any as IVariantsGeneratedColors;
     

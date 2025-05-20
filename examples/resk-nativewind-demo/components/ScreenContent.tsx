@@ -8,11 +8,17 @@ type ScreenContentProps = {
 };
 
 export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
+  VariantsColors.registerColor("accent", "neutral");
   return (
     <ScrollView style={{ flex: 1 }}>
-      {VariantsColors.colors.map((color) => {
-        return <Text key={color} className={`text-${color} dark:text-dark-${color} bg-${color} dark:bg-dark-${color}`} children={color} />
-      })}
+      <Div className="p-5">
+        <Heading level={2}>Colors Variants</Heading>
+        <HStack >
+          {VariantsColors.colors.map((color) => {
+            return <Text key={color} className={`text-${color}-foreground dark:text-dark-${color}-foreground bg-${color} mx-4 px-4 py-2 dark:bg-dark-${color}`} children={color} />
+          })}
+        </HStack>
+      </Div>
       <Div className={styles.container}>
         <Text className={styles.title}>{title}</Text>
         <ActivityIndicator size={80} color={"yellow"} />
@@ -21,8 +27,8 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
         </Div>
         <HelperText error>An example of helper text</HelperText>
         <Div className="p-5">
-          <Heading level={1}>Heading 1</Heading>
-          <Heading level={2}>Heading 2</Heading>
+          <Heading level={1} variant={{ color: "accent" }}>Heading 1 - accent</Heading>
+          <Heading level={2} variant={{ color: "neutral" }}>Heading 2 - neutral</Heading>
           <Heading level={3}>Heading 3</Heading>
           <Heading level={4}>Heading 4</Heading>
           <Heading level={5}>Heading 5</Heading>

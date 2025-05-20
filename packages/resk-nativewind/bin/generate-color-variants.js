@@ -25,9 +25,7 @@ module.exports = (colors, options) => {
     const isDev = options.isDev === true && variantsRootDir && fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));
     const variantsDir = variantsRootDir ? path.resolve(variantsRootDir, isDev ? 'src' : 'build', 'variants') : dir;
     const cols = typeof colors == "string" && colors ? colors.split(",") : [];
-    cols.map((col) => {
-        VariantsColors.registerColor(col);
-    });
+    VariantsColors.registerColor(...cols);
     const outputPath = path.resolve(variantsDir ?? dir, "generated-variants-colors.js");
     const outputDeclarations = path.resolve(variantsDir ?? dir, "generated-variants-colors.d.ts")
     const content = JSON.stringify({

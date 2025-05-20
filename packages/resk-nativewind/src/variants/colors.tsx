@@ -22,9 +22,11 @@ export namespace IVariantsColors {
 
 export class VariantsColors {
     private static _colors: IVariantsColors.ColorName[] = ["primary", "secondary", "info", "success", "warning", "error", "surface"];
-    static registerColor(color: IVariantsColors.ColorName) {
-        if (!color || typeof (color as any) !== "string" || this._colors.includes(color)) return;
-        this._colors.push(color);
+    static registerColor(...colors: IVariantsColors.ColorName[]) {
+        colors.map((color) => {
+            if (!color || typeof (color as any) !== "string" || !color.trim() || this._colors.includes((color as any).trim())) return;
+            this._colors.push((color as any).trim());
+        });
     }
     static get colors(): IVariantsColors.ColorName[] {
         return this._colors;

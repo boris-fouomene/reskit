@@ -8,6 +8,7 @@ const buton = tv({
         leftContainer: "",
         rightContainer: "",
         icon: "",
+        ripple: "",
         label: "",
     },
     variants: {

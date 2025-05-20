@@ -1,7 +1,7 @@
 "use client";
 import useStateCallback from "@utils/stateCallback";
 import { ReactElement, useEffect, useRef } from "react";
-import { Animated, GestureResponderEvent, StyleSheet } from "react-native";
+import { Animated, GestureResponderEvent } from "react-native";
 import Platform from "@platform";
 import { IButtonProps } from "./types";
 import { cn } from "@utils/cn";
@@ -20,7 +20,7 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
     startRipple?: (event: GestureResponderEvent) => void;
 } {
     rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 500;
-    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.9;
+    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.7;
     const isRippleDisabled = !!(disabled || disableRipple);
     const timerRef = useRef<any>(null);
     useEffect(() => {

@@ -9,11 +9,12 @@ const cn = (...args) => {
 
 
 module.exports = (colors, options) => {
-    if (!fs.existsSync(path.resolve(dir, "../build/variants/colors"))) {
+    const variantJsFile = path.resolve(__dirname, "../build/variants/colors.js");
+    if (!fs.existsSync(variantJsFile)) {
         return;
     }
 
-    const { VariantsColors } = require("../build/variants/colors");
+    const { VariantsColors } = require(variantJsFile);
     const variantsRootDir = require("./find-package-dir")('build', 'variants');
     options = Object.assign({}, options);
     const isDev = options.isDev === true && variantsRootDir && fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));
@@ -28,6 +29,7 @@ module.exports = (colors, options) => {
                 base: `${colorNameWithPrefix} ${darkColorWithPrefix}`,
                 label: `text-${color}-foreground dark:text-dark${color}-foreground`,
                 icon: `!text-${color}-foreground dark:!text-dark${color}-foreground`,
+                ripple: `bg-${color} dark:bg-dark${color} opacity-75`,
             }
         }),
         icon: VariantsColors.buildTextColors(true),
@@ -43,26 +45,8 @@ module.exports = (colors, options) => {
         surface: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
             return cn(colorWithPrefix, darkColorWithPrefix, `text-${colorWithoutPrefix}-foreground dark:text-dark-${colorWithoutPrefix}-foreground`)
         }),
-        text: VariantsColors.buildTextColors(),
-        ripple: {
-            color: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
-                return cn(`before:bg-${colorWithoutPrefix} dark:before:bg-dark-${colorWithoutPrefix}`)
-            }),
-            compoundVariants: VariantsColors.colors.map((color) => {
-                return [{
-                    color,
-                    effect: 'material',
-                    class: `before:bg-${color} before:opacity-30`
-                },
-                {
-                    color: color,
-                    effect: 'strong',
-                    class: `before:bg-${color} before:opacity-40`
-                }]
-            }).flat()
-        }
+        text: VariantsColors.buildTextColors()
     }, null, 2);
-
     fs.writeFileSync(outputPath, `
 export const VariantsGeneratedColors = ${content}
     `, 'utf8');
@@ -71,21 +55,13 @@ export const VariantsGeneratedColors = ${content}
     import { IVariantsColors } from "./colors";
     type IName = IVariantsColors.ColorName;
     export declare interface IVariantsGeneratedColors {
-        button : Record<IName,Record<"base"|"label"|"icon",string>>;
+        button : Record<IName,Record<"base"|"label"|"icon" | "ripple",string>>;
         icon : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
         divider : Record<IName,string>;
         heading : Record<IName,string>;
         text : Record<IName,string>;
-        ripple : {
-            color : Record<IName,string>;
-            compoundVariants : Array<{
-                color : IName;
-                effect : 'material' | 'strong';
-                class : string;
-            }>;
-        }
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any as IVariantsGeneratedColors;
     `, 'utf8');

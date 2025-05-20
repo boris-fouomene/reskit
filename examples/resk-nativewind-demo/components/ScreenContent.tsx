@@ -56,7 +56,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
           <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
         </HStack>
         <Divider />
-        <Heading level={1}>Badges</Heading>
+        <Heading level={1} className="text-red-500">Badges</Heading>
         <HStack className="p-5 !gap-x-10">
           <Badge variant={{ color: "primary" }}>Badge 1</Badge>
           <Badge variant={{ color: "secondary", size: "xl" }}>Badge 2 - size xl</Badge>
@@ -85,7 +85,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10">
-          <Button label="Button example1" rippleVariant={{ color: "primary" }} variant={{ color: "primary" }} />
+          <Button label="Button example1" variant={{ color: "primary" }} rippleColor={"yellow"} />
           <Button label="Button example2" variant={{ color: "secondary" }} />
           <Button label="Button example3 - disabled" disabled variant={{ color: "error", padding: "sm" }} />
           <Button label="Button example4 - loading" isLoading variant={{ color: "success" }} />

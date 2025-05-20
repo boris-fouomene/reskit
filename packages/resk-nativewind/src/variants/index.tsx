@@ -1,4 +1,4 @@
-import { tv, type VariantProps } from "tailwind-variants";
+export * from "./generated-variants-colors";
 import surface from "./surface";
 import text from "./text";
 import ripple from "./ripple";

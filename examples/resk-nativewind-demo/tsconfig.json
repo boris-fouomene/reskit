@@ -12,7 +12,6 @@
   },
   "include": [
     "components/**/*",
-    "fonts.types.ts",
     "app.tsx",
     "index.ts",
     "nativewind-env.d.ts",

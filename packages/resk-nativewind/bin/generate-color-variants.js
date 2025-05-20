@@ -7,20 +7,10 @@ const cn = (...args) => {
     return args.filter((text) => text && typeof text == "string").join(" ");
 }
 
-function findRootDir() {
-    let root = path.resolve(process.cwd());
-    for (let i = 0; i < 4; i++) {
-        const variantsDir = path.resolve(root, "node_modules", '@resk/nativewind');
-        if (fs.existsSync(path.resolve(variantsDir, 'build', 'variants'))) {
-            return variantsDir;
-        }
-        root = path.resolve(root, "..");
-    }
-    return null;
-}
+
 
 module.exports = (colors, options) => {
-    const variantsRootDir = findRootDir();
+    const variantsRootDir = require("./find-package-dir")('build', 'variants');
     options = Object.assign({}, options);
     const isDev = options.isDev === true && variantsRootDir && fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));
     const variantsDir = variantsRootDir ? path.resolve(variantsRootDir, isDev ? 'src' : 'build', 'variants') : dir;

@@ -1,4 +1,5 @@
 "use client";
+import "./font.types";
 import { FC } from "react";
 import { isNonNullString, defaultStr, isNumber, isObj } from "@resk/core/utils";
 import { IFontIconProps } from "./types";

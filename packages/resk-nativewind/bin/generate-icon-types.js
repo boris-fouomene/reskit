@@ -77,7 +77,8 @@ function generateIconSets(filter) {
 module.exports = function generateIconTypes(iconSetsPrefixesOrNames, options) {
     const iconSetsGenerated = iconSetsPrefixesOrNames && typeof iconSetsPrefixesOrNames == "string" ? iconSetsPrefixesOrNames.split(",") : [];
     const outputPathOption = options && typeof options.out == "string" ? path.resolve(options.out) : undefined;
-    const outputPath = outputPathOption ? outputPathOption : path.resolve(process.cwd(), "fonts.types.ts");
+    const packageDir = require("./find-package-dir")('build', 'components', 'Icon');
+    const outputPath = outputPathOption ? outputPathOption : packageDir ? path.resolve(packageDir, 'build', 'components', 'Icon', 'font.types.d.ts') : path.resolve(process.cwd(), "fonts.types.ts");
     const iconSets = generateIconSets();
     let generatedIcons = "";
     // Generate the const arrays with the actual icon names
@@ -90,10 +91,12 @@ module.exports = function generateIconTypes(iconSetsPrefixesOrNames, options) {
         }
     });
     const output = `
+    import "@resk/nativewind";
     declare module "@resk/nativewind" {
         interface IFontIconNameRegistry {
             ${generatedIcons}
         }   
     }`;
     writeFileSync(outputPath, output, 'utf8');
+    console.log("icon types generated at : ", outputPath);
 }

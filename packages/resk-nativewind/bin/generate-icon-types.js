@@ -78,7 +78,8 @@ module.exports = function generateIconTypes(iconSetsPrefixesOrNames, options) {
     const iconSetsGenerated = iconSetsPrefixesOrNames && typeof iconSetsPrefixesOrNames == "string" ? iconSetsPrefixesOrNames.split(",") : [];
     const outputPathOption = options && typeof options.out == "string" ? path.resolve(options.out) : undefined;
     const packageDir = require("./find-package-dir")('build', 'components', 'Icon');
-    const outputPath = outputPathOption ? outputPathOption : packageDir ? path.resolve(packageDir, 'build', 'components', 'Icon', 'font.types.d.ts') : path.resolve(process.cwd(), "fonts.types.ts");
+    const packageOutPath = packageDir ? path.resolve(packageDir, 'build', 'components', 'Icon', 'font.types.d.ts') : undefined;
+    const outputPath = outputPathOption ? outputPathOption : packageDir ? packageOutPath : path.resolve(process.cwd(), "fonts.types.ts");
     const iconSets = generateIconSets();
     let generatedIcons = "";
     // Generate the const arrays with the actual icon names
@@ -98,5 +99,9 @@ module.exports = function generateIconTypes(iconSetsPrefixesOrNames, options) {
         }   
     }`;
     writeFileSync(outputPath, output, 'utf8');
+    if (outputPath === packageOutPath) {
+        const jsonPath = path.resolve(path.dirname(outputPath), "font.types.js");
+        writeFileSync(jsonPath, `export {};`, 'utf8');
+    }
     console.log("icon types generated at : ", outputPath);
 }

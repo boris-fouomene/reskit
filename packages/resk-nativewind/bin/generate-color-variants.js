@@ -2,7 +2,6 @@ const fs = require("fs"),
     path = require("path");
 
 const dir = path.resolve(process.cwd());
-const { VariantsColors } = require("../build/variants/colors");
 const cn = (...args) => {
     return args.filter((text) => text && typeof text == "string").join(" ");
 }
@@ -10,6 +9,11 @@ const cn = (...args) => {
 
 
 module.exports = (colors, options) => {
+    if (!fs.existsSync(path.resolve(dir, "../build/variants/colors"))) {
+        return;
+    }
+
+    const { VariantsColors } = require("../build/variants/colors");
     const variantsRootDir = require("./find-package-dir")('build', 'variants');
     options = Object.assign({}, options);
     const isDev = options.isDev === true && variantsRootDir && fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));

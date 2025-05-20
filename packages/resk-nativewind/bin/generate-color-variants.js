@@ -29,7 +29,7 @@ module.exports = (colors, options) => {
                 base: `${colorNameWithPrefix} ${darkColorWithPrefix} hover:opacity-75`,
                 label: `text-${color}-foreground dark:text-dark${color}-foreground`,
                 icon: `!text-${color}-foreground dark:!text-dark${color}-foreground`,
-                ripple: `bg-${color} dark:bg-dark${color} opacity-80`,
+                ripple: `bg-${color} dark:bg-dark${color} opacity-90`,
             }
         }),
         icon: VariantsColors.buildTextColors(true),

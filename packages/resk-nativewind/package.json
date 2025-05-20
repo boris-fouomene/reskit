@@ -21,18 +21,20 @@
   },
   "files": [
     "build",
+    "bin",
     "readme.md",
     "package.json",
     "html.js"
   ],
   "scripts": {
-    "build": "tsc && npx tsc-alias -p tsconfig.json && npm run build:dts",
+    "build": "npm run generate-color-variants-dev && tsc && npx tsc-alias -p tsconfig.json && npm run build:dts",
     "build:dts": "tsc -p tsconfig.dts.json --emitDeclarationOnly && npx tsc-alias -p tsconfig.dts.json",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "css:dev": "npx tailwindcss -i ./global-src.css -o ./global.css --watch",
     "css:build": "npx tailwindcss -i ./global-src.css -o ./global.css",
     "generate-icon-types": "node tests/cli.generate-icon-types",
+    "generate-color-variants-dev": "node bin/generate-color-variants-dev",
     "generate-color-variants": "node tests/cli.generate-color-variants"
   },
   "keywords": [

@@ -21,7 +21,8 @@ function findRootDir() {
 
 module.exports = (colors, options) => {
     const variantsRootDir = findRootDir();
-    const isDev = variantsRootDir && fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));
+    options = Object.assign({}, options);
+    const isDev = options.isDev === true && variantsRootDir && fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));
     const variantsDir = variantsRootDir ? path.resolve(variantsRootDir, isDev ? 'src' : 'build', 'variants') : dir;
     const cols = typeof colors == "string" && colors ? colors.split(",") : [];
     cols.map((col) => {

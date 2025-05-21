@@ -174,6 +174,9 @@ export interface IToggleableProps extends ITooltipBaseProps {
      */
     onValueChange?: (value: boolean) => void;
 
+    /**
+     * The class name of the Toggleable component.
+     */
     className?: IClassName;
 };
 
@@ -236,4 +239,16 @@ export interface IToggleableProps extends ITooltipBaseProps {
  * @returns {void} - This type does not return any value, as it is typically used 
  *                   as a set of properties for a switch component.
  */
-export type ISwitchProps = IToggleableProps & SwitchProps;
+export interface ISwitchProps extends IToggleableProps, Omit<SwitchProps, "className" | "onChange" | "onValueChange"> {
+    /***
+     * The class name of the thumb color.
+     * The thum color is the color of the foreground switch grip. If this is set on iOS, the switch grip will lose its drop shadow.
+     */
+    thumbColorClassName?: IClassName;
+
+    /***
+     * The class name of the track color.
+     * The trackColor is the color of the switch track.
+     */
+    trackColorClassName?: IClassName;
+}

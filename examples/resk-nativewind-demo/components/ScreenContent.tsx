@@ -69,7 +69,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
       <Div className="p-5">
         <Heading level={1}>Switch examples</Heading>
         <HStack className="p-5 !gap-x-10">
-          <Switch label={"Example 1"} title="Switch example" />
+          <Switch label={"Example 1"} trackColorClassName="primary" thumbColorClassName="red-500" title="Switch example" />
           <Switch label={"Example 2"} title="Switch example" />
           <Switch label={"Example 3"} title="Switch example" />
         </HStack>

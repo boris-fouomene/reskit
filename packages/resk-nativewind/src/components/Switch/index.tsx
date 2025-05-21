@@ -6,6 +6,7 @@ import { Tooltip } from "@components/Tooltip";
 import { Text } from "@html/Text";
 import { cn } from "@utils/cn";
 import { pickTouchableProps } from "@utils/touchHandler";
+import { cssInterop } from "nativewind";
 
 export { useToggleable };
 export * from "./types";
@@ -71,7 +72,7 @@ export * from "./types";
  *   }}
  * />
  */
-export function Switch({ testID, ...props }: ISwitchProps) {
+export function Switch({ testID, thumbColorClassName, trackColorClassName, ...props }: ISwitchProps) {
     const {
         checked,
         tooltip,
@@ -93,6 +94,7 @@ export function Switch({ testID, ...props }: ISwitchProps) {
     } = useToggleable(props);
     const { touchableProps, ...nonTouchableProps } = pickTouchableProps(rest as any);
     const MTestID = typeof testID === 'string' && testID || "resk-switch";
+    console.log(trackColorClassName, " is trtttt", thumbColorClassName)
     const labelContent = <Text testID={`${MTestID}-label`} children={label} className={labelClassName} />;
     return <Tooltip<TouchableOpacityProps> as={TouchableOpacity as any} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`}
         {...Object.assign({}, touchableProps) as any}
@@ -102,9 +104,11 @@ export function Switch({ testID, ...props }: ISwitchProps) {
         className={cn(containerClassName)}
     >
         {isLabelOnLeftSide ? labelContent : null}
-        <RNSwitch
+        <RSwitch
             {...nonTouchableProps}
             className={cn(className)}
+            thumbColorClassName={cn(thumbColorClassName)}
+            trackColorClassName={cn(trackColorClassName)}
             value={checked}
             onValueChange={toggleStatus}
             testID={MTestID}
@@ -114,5 +118,19 @@ export function Switch({ testID, ...props }: ISwitchProps) {
     </Tooltip>
 }
 
+const RSwitch = cssInterop(RNSwitch, {
+    thumbColorClassName: {
+        target: false,
+        nativeStyleToProp: {
+            color: "thumbColor",
+        }
+    },
+    trackColorClassName: {
+        target: false,
+        nativeStyleToProp: {
+            color: "trackColor",
+        }
+    },
+});
 Switch.getToogleableDefaultValues = getToggleableDefaultValues;
 Switch.displayName = "Switch"

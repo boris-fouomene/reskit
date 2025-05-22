@@ -1,4 +1,4 @@
-import { defaultStr, isNonNullString, isObj } from "@resk/core/utils";
+import { defaultStr, isEmpty, isNonNullString, isObj } from "@resk/core/utils";
 import { IHtmlAccessibilityProps, IHtmlDivProps, INativeAccessibilityProps } from "./types";
 import { cn, normalizeProps } from "@utils";
 import { StyleSheet, Platform, PressableProps } from "react-native";
@@ -86,6 +86,32 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
 
 
 
+/**
+ * Converts React Native-style accessibility props to their corresponding DOM accessibility attributes.
+ *
+ * This utility function takes a set of accessibility-related props (commonly used in React Native)
+ * and maps them to appropriate ARIA and DOM attributes for web compatibility.
+ *
+ * @template T - The type extending `IHtmlDivProps` that includes both native and DOM props.
+ * @param props - An object containing accessibility props and other native props.
+ * @param props.accessible - If `false`, sets `aria-hidden="true"` on the DOM element.
+ * @param props.onAccessibilityEscape - Not mapped; included for compatibility.
+ * @param props.accessibilityLanguage - Sets the `lang` attribute if provided.
+ * @param props.accessibilityActions - Not mapped; included for compatibility.
+ * @param props.accessibilityIgnoresInvertColors - Not mapped; included for compatibility.
+ * @param props.accessibilityViewIsModal - Sets `aria-modal` if provided.
+ * @param props.importantForAccessibility - If `"no-hide-descendants"`, sets `aria-hidden="true"`.
+ * @param props.accessibilityElementsHidden - Sets `aria-hidden` based on value.
+ * @param props.role - Sets the `role` attribute, or maps `accessibilityRole` to a DOM role.
+ * @param props.accessibilityLiveRegion - Maps to `aria-live` attribute.
+ * @param props.accessibilityRole - Maps to the corresponding DOM `role` attribute.
+ * @param props.accessibilityLabel - Sets the `aria-label` attribute.
+ * @param props.accessibilityState - Maps state values to ARIA attributes such as `aria-disabled`, `aria-selected`, `aria-checked`, `aria-busy`, and `aria-expanded`.
+ * @param props.accessibilityValue - Maps value props to ARIA attributes such as `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-valuetext`.
+ * @param props.accessibilityHint - Sets the `aria-describedby` and `aria-description` attributes.
+ * @param rnProps - Remaining props passed through to the DOM element.
+ * @returns The props object with React Native accessibility props converted to DOM/ARIA attributes, omitting the original native accessibility props.
+ */
 export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ accessible, onAccessibilityEscape, accessibilityLanguage, accessibilityActions, accessibilityIgnoresInvertColors, accessibilityViewIsModal, importantForAccessibility, accessibilityElementsHidden, role, accessibilityLiveRegion, accessibilityRole, accessibilityLabel, accessibilityState, accessibilityValue, accessibilityHint, ...rnProps }: T): Omit<T, keyof INativeAccessibilityProps> {
     const domProps: Partial<T> & IHtmlAccessibilityProps = { ...(isObj(rnProps) ? rnProps : {}) } as any;
     domProps['aria-label'] = defaultStr(rnProps["aria-label"], accessibilityLabel);
@@ -95,7 +121,7 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ access
     if (accessible === false) {
         (domProps as any)["aria-hidden"] = "true";
     } else if (accessibilityElementsHidden !== undefined) {
-        domProps["aria-hidden"] = accessibilityElementsHidden;;
+        domProps["aria-hidden"] = String(accessibilityElementsHidden) as any;
     }
     (domProps as any)['aria-live'] = defaultStr(domProps["aria-live"], accessibilityLiveRegion && mapLiveRegionToDOM(accessibilityLiveRegion));
     if (isObj(accessibilityState)) {
@@ -106,10 +132,10 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ access
             if (value.checked === 'mixed') {
                 domProps['aria-checked'] = 'mixed';
             } else {
-                domProps['aria-checked'] = value.checked;
+                domProps['aria-checked'] = String(value.checked) as any;
             }
         }
-        if (value.busy !== undefined) domProps['aria-busy'] = value.busy;
+        if (value.busy !== undefined) domProps['aria-busy'] = String(value.busy) as any;
         if (value.expanded !== undefined) domProps['aria-expanded'] = String(value.expanded) as any;
     }
     if (isObj(accessibilityValue)) {
@@ -120,7 +146,7 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ access
         if ('text' in val) domProps['aria-valuetext'] = val.text;
     }
     if (importantForAccessibility === "no-hide-descendants") {
-        domProps['aria-hidden'] = true;
+        domProps['aria-hidden'] = "true" as any;
     }
     if (isNonNullString(accessibilityLanguage)) {
         (domProps as any)["lang"] = accessibilityLanguage;
@@ -134,6 +160,34 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ access
     return domProps as any;
 }
 
+
+/**
+ * Picks and returns only the valid HTML-related properties from the given props object.
+ *
+ * This function creates a shallow copy of the input props, then filters out only the properties
+ * that are relevant for HTML elements (such as accessibility, ARIA, and DOM props).
+ * The returned object is normalized before being returned.
+ *
+ * @typeParam T - The type extending `IHtmlDivProps` from which to pick HTML props.
+ * @param props - The props object to filter.
+ * @param normalize - If `true`, normalizes the returned props object.
+ * @returns A partial object containing only the valid HTML-related properties from the input.
+ */
+export function pickHtmlProps<T extends IHtmlDivProps>(props: T, normalize?: boolean): Partial<T> {
+    props = Object.assign({}, props);
+    const r = {} as any;
+    const domProps: (keyof IHtmlDivProps)[] = [
+        "id", "role", "nativeID", "tabIndex", "aria-label", "aria-busy", "aria-checked", "aria-disabled", "aria-expanded", "aria-hidden", "aria-selected", "aria-valuemax", "aria-valuemin", "aria-valuenow", "aria-valuetext", "collapsable", "title", "onPress", "onPressIn", "onPressOut", "ref", "asHtmlTag",
+        //accessibility props : 
+        "accessible", "accessibilityLabel", "accessibilityHint", "accessibilityRole", "accessibilityState", "accessibilityLiveRegion", "accessibilityValue", "accessibilityElementsHidden", "importantForAccessibility", "onAccessibilityEscape", "accessibilityLanguage", "accessibilityViewIsModal", "accessibilityActions", "accessibilityIgnoresInvertColors",
+    ];
+    domProps.map((p) => {
+        if (!isEmpty(props[p])) {
+            r[p] = props[p];
+        }
+    });
+    return normalize ? normalizeHtmlProps(r) : r;
+}
 /**
  * Maps React Native live region values to ARIA live region values
  */

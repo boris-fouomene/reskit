@@ -1,3 +1,4 @@
+"use client";
 import { PureComponent } from "react";
 import { IObservable, observableFactory, IObservableAllEventType, IObservableCallback, IObservableCallbacks } from "@resk/core/observable";
 

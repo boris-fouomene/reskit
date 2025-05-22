@@ -1,4 +1,5 @@
 import { Div } from "@html/Div";
+import { pickHtmlProps } from "@html/utils";
 import { defaultStr, isNonNullString, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { ActivityIndicatorProps } from "react-native";
@@ -20,7 +21,7 @@ import { StyleSheet } from "react-native";
  * 
  */
 export function ActivityIndicator({ size, style, testID, id, color, className, children, role, ...props }: ActivityIndicatorProps) {
-    let clx = undefined;
+    const clx = [];
     if (isNumber(size) && size > 0) {
         let borderWidth = Math.max(size / (size > 10 ? 5 : 4), 5);
         if (size >= 40) {
@@ -28,11 +29,11 @@ export function ActivityIndicator({ size, style, testID, id, color, className, c
         }
         style = [{ width: size, height: size, borderWidth }, style]
     } else {
-        clx = size === "large" ? "h-16 w-16 border-8" : "h-8 w-8 border-4"
+        clx.push(size === "large" ? "h-16 w-16 border-8" : "h-[20px] w-[20px] border-4")
     }
     if (isNonNullString(color) && color.trim()) {
         style = [{ borderTopColor: color }, style];
     }
     testID = defaultStr(testID, "resk-activity-indicator");
-    return <Div role={defaultStr(role, "progressbar") as any} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
+    return <Div {...pickHtmlProps(props)} role={defaultStr(role, "progressbar") as any} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
 }

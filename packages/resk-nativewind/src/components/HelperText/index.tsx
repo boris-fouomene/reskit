@@ -5,6 +5,17 @@ import { IVariantPropsText } from "@variants/text";
 import { variants } from "@variants/index";
 
 
+/**
+ * Renders a helper text component, typically used for displaying validation messages or additional information.
+ *
+ * @param visible - Controls the visibility of the helper text. Defaults to `true`.
+ * @param error - If provided, styles the text to indicate an error state.
+ * @param className - Additional class names to apply to the component.
+ * @param testID - Optional test identifier for testing purposes. Defaults to `"resk-helper-text"`.
+ * @param rest - Additional props passed to the underlying `Text` component.
+ * 
+ * @returns A styled `Text` component displaying helper information or error messages.
+ */
 export function HelperText({ visible = true, error, className, testID, ...rest }: IHelperTextProps & IVariantPropsText) {
     testID = defaultStr(testID, "resk-helper-text");
     return <Text

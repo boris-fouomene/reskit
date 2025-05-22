@@ -3,11 +3,10 @@ import { ScrollView } from 'react-native';
 import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
-  path: string;
   children?: React.ReactNode;
 };
 
-export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
+export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   VariantsColors.registerColor("accent", "neutral");
   return (
     <ScrollView style={{ flex: 1 }}>
@@ -99,3 +98,11 @@ const styles = {
   separator: `h-[1px] my-7 w-4/5 bg-gray-200`,
   title: `text-xl font-bold text-green-500`,
 };
+
+
+declare module "@resk/nativewind" {
+  interface IVariantsColorsMap {
+    accent: string;
+    neutral: string;
+  }
+}

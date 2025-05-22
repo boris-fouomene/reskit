@@ -1,4 +1,3 @@
-"use client";
 import { defaultStr } from '@resk/core/utils';
 import { IIconButtonProps } from '@components/Icon/types';
 import { Text } from "@html/Text";

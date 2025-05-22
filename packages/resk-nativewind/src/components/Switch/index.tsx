@@ -72,7 +72,7 @@ export * from "./types";
  *   }}
  * />
  */
-export function Switch({ testID, thumbColorClassName, trackColorClassName, ...props }: ISwitchProps) {
+function Switch({ testID, ...props }: ISwitchProps) {
     const {
         checked,
         tooltip,
@@ -94,7 +94,7 @@ export function Switch({ testID, thumbColorClassName, trackColorClassName, ...pr
     } = useToggleable(props);
     const { touchableProps, ...nonTouchableProps } = pickTouchableProps(rest as any);
     const MTestID = typeof testID === 'string' && testID || "resk-switch";
-    console.log(trackColorClassName, " is trtttt", thumbColorClassName)
+    console.log(nonTouchableProps, " is trtttt", props)
     const labelContent = <Text testID={`${MTestID}-label`} children={label} className={labelClassName} />;
     return <Tooltip<TouchableOpacityProps> as={TouchableOpacity as any} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`}
         {...Object.assign({}, touchableProps) as any}
@@ -104,11 +104,9 @@ export function Switch({ testID, thumbColorClassName, trackColorClassName, ...pr
         className={cn(containerClassName)}
     >
         {isLabelOnLeftSide ? labelContent : null}
-        <RSwitch
+        <RNSwitch
             {...nonTouchableProps}
             className={cn(className)}
-            thumbColorClassName={cn(thumbColorClassName)}
-            trackColorClassName={cn(trackColorClassName)}
             value={checked}
             onValueChange={toggleStatus}
             testID={MTestID}
@@ -118,7 +116,7 @@ export function Switch({ testID, thumbColorClassName, trackColorClassName, ...pr
     </Tooltip>
 }
 
-const RSwitch = cssInterop(RNSwitch, {
+const RSwitch = cssInterop(Switch, {
     thumbColorClassName: {
         target: false,
         nativeStyleToProp: {
@@ -132,5 +130,6 @@ const RSwitch = cssInterop(RNSwitch, {
         }
     },
 });
+export { RSwitch as Switch }
 Switch.getToogleableDefaultValues = getToggleableDefaultValues;
 Switch.displayName = "Switch"

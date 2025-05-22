@@ -1,5 +1,5 @@
 "use client";
-import { useState, useImperativeHandle, useEffect, useRef } from 'react';
+import { useState, useImperativeHandle, useEffect, useRef, Fragment } from 'react';
 //import { FormsManager } from '@components/Form/FormsManager';
 import { Animated, GestureResponderEvent } from 'react-native';
 import iconVariants from "@variants/icon";
@@ -158,7 +158,7 @@ export function Button<IButtonExtendContext = any>({
         rippleClassName,
     });
     if (perm !== undefined && !Auth.isAllowed(perm)) return null;
-    return (<>
+    return (<Fragment>
         <Surface
             role="none"
             {...rest}
@@ -220,7 +220,7 @@ export function Button<IButtonExtendContext = any>({
             {rippleContent}
         </Surface>
         {divider ? <Divider id={buttonId + "-divider"} testID={testID + "-button-divider"} className={cn("button-divider", dividerClassName)} /> : null}
-    </>);
+    </Fragment>);
 };
 
 Button.displayName = "Button";

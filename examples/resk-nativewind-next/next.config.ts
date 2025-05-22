@@ -36,15 +36,13 @@ export default function (phase: string, { defaultConfig }: { defaultConfig: Next
       "react-native-css-interop",
       "react-native-reanimated",
       "react-native-vector-icons",
-      "@expo/vector-icons"
+      "@expo/vector-icons",
+      "react-native-safe-area-context"
     ],
     turbopack: {
       root: path.join(__dirname, "..", '..'),
       resolveAlias: {
         'react-native': "react-native-web",
-        //'react-native/Libraries/EventEmitter/RCTDeviceEventEmitter$': 'react-native-web/dist/vendor/react-native/NativeEventEmitter/RCTDeviceEventEmitter',
-        //'react-native/Libraries/vendor/emitter/EventEmitter$': 'react-native-web/dist/vendor/react-native/emitter/EventEmitter',
-        //'react-native/Libraries/EventEmitter/NativeEventEmitter$': 'react-native-web/dist/vendor/react-native/NativeEventEmitter',
       },
       resolveExtensions: [
         ...serverExtensions,

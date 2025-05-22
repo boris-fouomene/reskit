@@ -39,9 +39,6 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
             iconName='camera'
             title="secondary color icon camera"
             size={30}
-            onPress={(event) => {
-              console.log("pressed icon");
-            }}
           />
           <Icon.Button
             title="primary color icon car"

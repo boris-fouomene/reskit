@@ -20,6 +20,7 @@ export * from "./object";
 export * from "./isNumber";
 export * from "./debounce";
 export { default as debounce } from "./debounce";
+export * from "./uri";
 
 export * from "./string";
 export * from "./uri";

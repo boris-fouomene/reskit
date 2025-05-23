@@ -21,7 +21,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <Heading level={2}>ActivityIndicator</Heading>
         <HStack className="p-5 !gap-x-10">
-          <ActivityIndicator variant={{ color: "primary" }} color={"red"} />
+          <ActivityIndicator variant={{ color: "primary" }} color={"red"} size={50} />
           <ActivityIndicator size={"small"} variant={{ color: "secondary" }} />
           <ActivityIndicator size={"large"} variant={{ color: "success" }} />
           <ActivityIndicator size={80} variant={{ color: "error" }} />

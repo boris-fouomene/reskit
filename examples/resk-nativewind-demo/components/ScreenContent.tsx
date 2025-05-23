@@ -3,11 +3,10 @@ import { ScrollView } from 'react-native';
 import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
-  path: string;
   children?: React.ReactNode;
 };
 
-export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
+export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   VariantsColors.registerColor("accent", "neutral");
   return (
     <ScrollView style={{ flex: 1 }}>
@@ -19,9 +18,20 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
           })}
         </HStack>
       </Div>
+      <Div className="p-5">
+        <Heading level={2}>ActivityIndicator</Heading>
+        <HStack className="p-5 !gap-x-10">
+          <ActivityIndicator variant={{ color: "primary" }} color={"red"} />
+          <ActivityIndicator size={"small"} variant={{ color: "secondary" }} />
+          <ActivityIndicator size={"large"} variant={{ color: "success" }} />
+          <ActivityIndicator size={80} variant={{ color: "error" }} />
+          <ActivityIndicator size={90} variant={{ color: "warning" }} />
+          <ActivityIndicator variant={{ color: "info" }} />
+          <ActivityIndicator variant={{ color: "neutral" }} />
+        </HStack>
+      </Div>
       <Div className={styles.container}>
         <Text className={styles.title}>{title}</Text>
-        <ActivityIndicator size={80} color={"yellow"} />
         <Div asChild testID="example-of-slot" className={"text-red-500"}>
           <Text className={[styles.separator]} testID='example-of-children-slot' children="Example of slot" />
         </Div>
@@ -40,9 +50,6 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
             iconName='camera'
             title="secondary color icon camera"
             size={30}
-            onPress={(event) => {
-              console.log("pressed icon");
-            }}
           />
           <Icon.Button
             title="primary color icon car"
@@ -69,7 +76,7 @@ export const ScreenContent = ({ title, path, children }: ScreenContentProps) => 
       <Div className="p-5">
         <Heading level={1}>Switch examples</Heading>
         <HStack className="p-5 !gap-x-10">
-          <Switch label={"Example 1"} trackColorClassName="text-primary" thumbColorClassName="red-500" title="Switch example" />
+          <Switch label={"Example 1"} thumbColorClassName="text-error" title="Switch example" />
           <Switch label={"Example 2"} title="Switch example" />
           <Switch label={"Example 3"} title="Switch example" />
         </HStack>
@@ -99,3 +106,11 @@ const styles = {
   separator: `h-[1px] my-7 w-4/5 bg-gray-200`,
   title: `text-xl font-bold text-green-500`,
 };
+
+
+declare module "@resk/nativewind" {
+  interface IVariantsColorsMap {
+    accent: string;
+    neutral: string;
+  }
+}

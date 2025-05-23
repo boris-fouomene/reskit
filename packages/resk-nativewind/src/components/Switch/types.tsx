@@ -245,10 +245,4 @@ export interface ISwitchProps extends IToggleableProps, Omit<SwitchProps, "class
      * The thum color is the color of the foreground switch grip. If this is set on iOS, the switch grip will lose its drop shadow.
      */
     thumbColorClassName?: IClassName;
-
-    /***
-     * The class name of the track color.
-     * The trackColor is the color of the switch track.
-     */
-    trackColorClassName?: IClassName;
 }

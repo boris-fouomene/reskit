@@ -2,8 +2,9 @@ import { Div } from "@html/Div";
 import { pickHtmlProps } from "@html/utils";
 import { defaultStr, isNonNullString, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
-import { ActivityIndicatorProps } from "react-native";
 import { StyleSheet } from "react-native";
+import activityIndicatorVariant from "@variants/activityIndicator";
+import { IActivityIndicatorProps } from "./types";
 
 /**
  * A customizable `ActivityIndicator` component that wraps the standard 
@@ -20,7 +21,7 @@ import { StyleSheet } from "react-native";
  * Here’s an example of how to use the custom `ActivityIndicator`:
  * 
  */
-export function ActivityIndicator({ size, style, testID, id, color, className, children, role, ...props }: ActivityIndicatorProps) {
+export function ActivityIndicator({ size, style, variant, testID, id, color, className, children, role, ...props }: IActivityIndicatorProps) {
     const clx = [];
     if (isNumber(size) && size > 0) {
         let borderWidth = Math.max(size / (size > 10 ? 5 : 4), 5);
@@ -35,5 +36,7 @@ export function ActivityIndicator({ size, style, testID, id, color, className, c
         style = [{ borderTopColor: color }, style];
     }
     testID = defaultStr(testID, "resk-activity-indicator");
-    return <Div {...pickHtmlProps(props)} role={defaultStr(role, "progressbar") as any} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 border-t-primary animate-spin rounded-full", clx, className)} />
+    return <Div {...pickHtmlProps(props)} role={defaultStr(role, "progressbar") as any} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("border-gray-300 animate-spin rounded-full", clx, activityIndicatorVariant(variant), className)} />
 }
+
+export * from "./types";

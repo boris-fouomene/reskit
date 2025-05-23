@@ -45,7 +45,10 @@ module.exports = (colors, options) => {
         surface: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
             return cn(colorWithPrefix, darkColorWithPrefix, `text-${colorWithoutPrefix}-foreground dark:text-dark-${colorWithoutPrefix}-foreground`)
         }),
-        text: VariantsColors.buildTextColors()
+        text: VariantsColors.buildTextColors(),
+        activityIndicator: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+            return cn(`border-t-${color} dark:border-t-dark-${color}`);
+        })
     }, null, 2);
     fs.writeFileSync(outputPath, `
 export const VariantsGeneratedColors = ${content}
@@ -62,8 +65,9 @@ export const VariantsGeneratedColors = ${content}
         divider : Record<IName,string>;
         heading : Record<IName,string>;
         text : Record<IName,string>;
+        activityIndicator: Record<IName,string>;
     }
-export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any as IVariantsGeneratedColors;
+export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     `, 'utf8');
 
     console.log("Variants colors file generated at ", outputPath, "\n");

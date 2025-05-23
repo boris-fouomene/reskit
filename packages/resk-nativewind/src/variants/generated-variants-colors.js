@@ -125,6 +125,15 @@ export const VariantsGeneratedColors = {
     "warning": "text-warning dark:text-dark-warning",
     "error": "text-error dark:text-dark-error",
     "surface": "text-surface dark:text-dark-surface"
+  },
+  "activityIndicator": {
+    "primary": "border-t-primary dark:border-t-dark-primary",
+    "secondary": "border-t-secondary dark:border-t-dark-secondary",
+    "info": "border-t-info dark:border-t-dark-info",
+    "success": "border-t-success dark:border-t-dark-success",
+    "warning": "border-t-warning dark:border-t-dark-warning",
+    "error": "border-t-error dark:border-t-dark-error",
+    "surface": "border-t-surface dark:border-t-dark-surface"
   }
 }
     

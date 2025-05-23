@@ -8,7 +8,7 @@ import icon from "./icon";
 import badge from "./badge";
 import all from "./all";
 import button from "./button";
-export * from "./colors";
+import activityIndicator from "./activityIndicator";
 export const variants = {
     all,
     icon,
@@ -19,4 +19,6 @@ export const variants = {
     text,
     divider,
     button,
+    activityIndicator,
 }
+export * from "./colors";

@@ -59,6 +59,8 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
             size={40}
           />
           <Icon.Font title={"A phone icon"} variant={{ color: "secondary", size: "5xl" }} name={"phone"} />
+          <Icon.Font id="phone" title="An idd" name="phone" size={50} variant={{ color: "primary" }} />
+          <Icon.Font name="abacus" variant={{ color: "success" }} />
           {children}
           <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
         </HStack>

@@ -1,6 +1,6 @@
 "use client";
 import { Pressable, PressableProps } from "react-native";
-import { useMemo, useRef } from "react";
+import { useId, useMemo, useRef } from "react";
 import { ITooltipProps } from './types';
 import { defaultStr, uniqid } from "@resk/core";
 import { useMergeRefs } from "@utils/mergeRefs";
@@ -10,7 +10,8 @@ import { ITouchableProps } from "@src/types";
 export * from "./types";
 export function Tooltip<asProps extends Partial<ITouchableProps> = PressableProps>({ children, className, as, title, tooltip, disabled, testID, id, ref, ...rest }: ITooltipProps<asProps>) {
   testID = defaultStr(testID, "resk-tooltip");
-  const instanceIdRef = useRef(id || uniqid("tippy-instance-id"));
+  const uId = useId();
+  const instanceIdRef = useRef(defaultStr(id, uId));
   const buttonRef = useRef(null);
   const innerRef = useMergeRefs(ref, buttonRef);
   const content = useMemo(() => {

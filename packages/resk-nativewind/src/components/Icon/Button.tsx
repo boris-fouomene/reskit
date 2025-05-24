@@ -58,7 +58,7 @@ export default function IconButton(
         <Surface
             testID={`${testID}-container`}
             disabled={disabled}
-            className={cn("overflow-hidden align-center justify-center flex flex-col", variant?.container?.(), containerClassName)}
+            className={cn("overflow-hidden align-center items-center justify-center flex flex-col", variant?.container?.(), containerClassName)}
             style={isNonNullString(buttonVariant?.size) ? {
                 flexShrink: 0,
                 flexGrow: 0,
@@ -71,7 +71,7 @@ export default function IconButton(
             ref={ref}
             {...Object.assign({}, touchableProps)}
         >
-            {isLoading ? <ActivityIndicator size={size} /> : Icon.getIcon({
+            {isLoading ? <ActivityIndicator className={cn("self-center")} size={size} /> : Icon.getIcon({
                 ...restProps,
                 className: cn("self-center", disabled && "pointer-events-none", variant?.icon?.(), className),
                 style,

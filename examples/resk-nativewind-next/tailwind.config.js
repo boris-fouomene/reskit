@@ -4,6 +4,7 @@ module.exports = {
     "../../packages/resk-nativewind/build/**/*.js",
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  presets: [require('nativewind/preset')],
   theme: {
     extend: {
       colors: {

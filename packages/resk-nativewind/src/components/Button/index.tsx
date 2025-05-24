@@ -1,5 +1,5 @@
 "use client";
-import { useImperativeHandle, useEffect, useRef } from 'react';
+import { useImperativeHandle, useEffect, useRef, useId } from 'react';
 //import { FormsManager } from '@components/Form/FormsManager';
 import { GestureResponderEvent } from 'react-native';
 import { ButtonBase } from './base';
@@ -32,7 +32,8 @@ export function Button<IButtonExtendContext = any>({
 }: IButtonProps<IButtonExtendContext>) {
     const [isLoading, _setIsLoading] = useStateCallback(typeof customIsLoading == "boolean" ? customIsLoading : false);
     const [isDisabled, setIsDisabled] = useStateCallback(typeof customDisabled == "boolean" ? customDisabled : false);
-    const buttonId = defaultStr(id, testID, "resk-button-id");
+    const uId = useId();
+    const buttonId = defaultStr(id, uId);
     testID = defaultStr(testID, "resk-button");
     const disabled: boolean = isDisabled || isLoading;
     const disable = (cb?: () => void) => { setIsDisabled(true, cb); },

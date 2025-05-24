@@ -19,6 +19,7 @@ import Octicons from "react-native-vector-icons/Octicons";
 import { cn, normalizeProps } from "@utils/cn";
 import iconVariants from "@variants/icon";
 import { Tooltip } from "@components/Tooltip";
+import { cssInterop } from "nativewind";
 
 
 const isIos = Platform.isIos();
@@ -76,7 +77,9 @@ export default function FontIcon({ name, variant, containerClassName, title, too
     const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>
     if (touchableProps || title || tooltip) {
-        return <Tooltip as={TouchableOpacity} title={title} tooltip={tooltip}
+        return <Tooltip
+            as={TouchableOpacity} title={title}
+            tooltip={tooltip}
             disabled={disabled} {...touchableProps as any}
             className={cn("shrink-0 grow-0", containerClassName)}>
             <Component
@@ -106,67 +109,6 @@ const DEFAULT_FONT_ICON_SIZE = 20;
  * value: 20
  */
 FontIcon.DEFAULT_SIZE = DEFAULT_FONT_ICON_SIZE;
-
-
-/**
- * Checks whether the provided icon belongs to a specific icon set.
- * 
- * This function is used to determine if an icon name is associated with a particular
- * icon set, such as MaterialCommunityIcons, AntDesign, etc. It checks if the icon
- * name starts with the specified icon set name, followed by a hyphen.
- * 
- * @param {string} name The name of the icon to check.
- * 
- * @description The icon name to verify. It should be a string and is case-insensitive.
- * 
- * @example
- * const name = "material-home";
- * const isValid = isFontIconName(name, "material"); // Returns true
- * 
- * @param {string} iconSetName The name of the icon set to check within.
- * 
- * @description The name of the icon set to check against. It should be a string and
- * is case-insensitive. The icon set name should not include the hyphen or any
- * additional characters.
- * 
- * @example
- * const iconSetName = "material";
- * const isValid = isFontIconName("material-home", iconSetName); // Returns true
- * 
- * @returns {boolean} Returns `true` if the icon belongs to the specified icon set, otherwise `false`.
- * 
- * @description The return value indicates whether the icon name is associated with the
- * specified icon set. If the icon name starts with the icon set name followed by a
- * hyphen, the function returns `true`. Otherwise, it returns `false`.
- * 
- * @example
- * const isValid = isFontIconName("material-home", "material"); // Returns true
- * const isValid = isFontIconName("material-home", "antdesign"); // Returns false
- */
-const isFontIconName = (name: string, iconSetName: string): boolean => {
-    /**
-     * Checks if both the icon name and icon set name are non-null and non-empty strings.
-     * 
-     * If either of the inputs is not a valid string, the function immediately returns `false`.
-     */
-    if (!isNonNullString(name) || !isNonNullString(iconSetName)) return false;
-
-    /**
-     * Converts both the icon name and icon set name to lowercase for case-insensitive comparison.
-     */
-    name = name.toLowerCase();
-    iconSetName = iconSetName.toLowerCase().trim();
-    if (iconSetName) {
-        iconSetName = iconSetName.rtrim("-") + "-";
-    }
-    /**
-     * Checks if the icon name starts with the icon set name followed by a hyphen.
-     * 
-     * If the icon name matches the specified pattern, the function returns `true`. Otherwise, it returns `false`.
-     */
-    return name.startsWith(iconSetName);
-};
-
 
 const fontsObjects = {
     "": MaterialCommunityIcons,

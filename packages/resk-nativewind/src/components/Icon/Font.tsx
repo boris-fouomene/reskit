@@ -74,7 +74,7 @@ export default function FontIcon({ name, variant, containerClassName, title, too
     const iconClassName = cn(isObj(variant) && iconVariants(variant), className);
     const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const rP = iconSize ? { size } : {};
-    const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>;
+    const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>
     if (touchableProps || title || tooltip) {
         return <Tooltip as={TouchableOpacity} title={title} tooltip={tooltip}
             disabled={disabled} {...touchableProps as any}

@@ -1,0 +1,90 @@
+import type { NextConfig } from "next";
+const path = require("path");
+const fs = require('fs');
+const sharedAliases = require("../../shared/path-aliases");
+const baseExtensions = [
+  ".js",".jsx",".ts",".tsx"
+];
+
+export default function NextConfig(phase, { defaultConfig }){
+  const nextConfig: NextConfig = {
+    ...defaultConfig,
+    reactStrictMode: true,
+    images: {
+      ...Object.assign({},defaultConfig?.images),
+      remotePatterns: [
+        new URL('https://transfergratis.com/images/**'),
+        new URL("https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"),
+        new URL("https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"),
+        new URL("https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"),
+        new URL("https://reactnative.dev/**"),
+      ],
+    },
+    transpilePackages: [
+      ...(Array.isArray(defaultConfig?.transpilePackages) ? defaultConfig?.transpilePackages : []),
+      "expo",
+      "expo-modules-core",
+      'react-native',
+      'react-native-web',
+      '@transfergratis/ui',
+      "nativewind", 
+      "react-native-css-interop",
+      "react-native-reanimated",
+      "react-native-vector-icons",
+      "react-native-safe-area-context",
+      "@expo/vector-icons"
+    ],
+    turbopack : {
+      root: path.join(__dirname,"..",".."),
+      rules: {
+        '*.ttf': {
+          loaders: ['raw-loader'],
+          as: '*.ttf',
+        }
+      },
+      resolveAlias : {
+        underscore: 'lodash',
+        ...sharedAliases,
+        'react-native': 'react-native-web',
+      },
+      resolveExtensions : [
+        '.next.js',
+        '.next.jsx',
+        '.next.ts',
+        '.next.tsx',
+        '.web.js',
+        '.web.jsx',
+        '.web.ts',
+        '.web.tsx',
+        ...baseExtensions,
+        ".json",
+        ".ttf"
+      ],
+    },
+    // Disable other compilers that might interfere
+    compiler: {
+      ...Object.assign({},defaultConfig?.compiler),
+      reactRemoveProperties: true,
+    },
+  };
+  return nextConfig;
+}
+
+/**
+ * Creates a file at the specified path with the given content.
+ * - Overwrites the file if it already exists
+ * - Recursively creates directories if they don't exist
+ * 
+ * @param {string} content - The content to write to the file
+ * @param {string} filePath - The destination path for the file
+ * @returns {Promise<void>}
+ */
+function createFileWithDirectories(content, filePath) {
+  try {
+    const dirPath = path.dirname(filePath);
+    fs.mkdirSync(dirPath, { recursive: true });
+    fs.writeFileSync(filePath, content, 'utf8');
+   } catch (error) {
+    console.error(`Error creating file: ${error.message}`);
+  }
+}

@@ -21,9 +21,7 @@ export default function (phase: string, { defaultConfig }: { defaultConfig: Next
   ] : ['.client.js', '.client.jsx', '.client.ts', '.client.tsx',]);
   const nextConfig: NextConfig = {
     ...defaultConfig,
-    experimental: {
-
-    },
+    reactStrictMode: true,
     /* config options here */
     transpilePackages: [
       "expo",
@@ -49,13 +47,7 @@ export default function (phase: string, { defaultConfig }: { defaultConfig: Next
         ...resolveExtensions,
         '.js', '.jsx', '.ts', '.tsx', '.json'
       ],
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    }
+    },
   };
   return nextConfig;
 }

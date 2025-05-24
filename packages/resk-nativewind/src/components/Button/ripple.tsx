@@ -15,12 +15,11 @@ import { isNonNullString } from "@resk/core/utils";
  * 
  * @returns {{ rippleContent?: ReactElement | null; startRipple?: (event: GestureResponderEvent) => void }} - The content of the ripple effect and the function to start the animation
  */
-export function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleClassName, rippleOpacity, rippleDuration }: Partial<IButtonProps>): {
+export function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleClassName }: Partial<IButtonProps>): {
     rippleContent?: ReactElement | null;
     startRipple?: (event: GestureResponderEvent) => void;
 } {
-    rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 500;
-    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.7;
+    const rippleDuration = 500, rippleOpacity = 0.7;
     const isRippleDisabled = !!(disabled || disableRipple);
     const timerRef = useRef<any>(null);
     useEffect(() => {
@@ -59,6 +58,18 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
     return {
         rippleContent: <>
             {ripples.map((ripple, index) => {
+                console.log({
+                    left: ripple.x - ripple.size / 2,
+                    top: ripple.y - ripple.size / 2,
+                    width: ripple.size,
+                    height: ripple.size,
+                    position: "absolute",
+                    overflow: "hidden",
+                    borderRadius: ripple.size / 2,
+                    ...(isNonNullString(rippleColor) ? { backgroundColor: rippleColor as any } : {}),
+                    opacity: ripple.opacity,
+                    transform: [{ scale: ripple.scale }],
+                }, " is dddddddddddddddddddddddddd")
                 return (
                     <Animated.View
                         key={ripple.key}

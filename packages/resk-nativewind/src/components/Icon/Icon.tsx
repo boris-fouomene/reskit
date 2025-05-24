@@ -169,7 +169,6 @@ Icon.getIconSource = getIconSource;
  */
 Icon.getIcon = function getIcon<T = any>({ icon, ...rest }: IGetIconOptions<T>): ReactNode {
     if (isValidElement(icon)) return icon as ReactNode;
-    if (isValidElement(icon)) return icon as ReactNode;
     if (!icon) return null;
     const isSource = isImageSource(icon) || isNonNullString(icon) && isImageUrl(icon as string);
     const iconName = typeof icon == "string" && !isSource ? (icon as any) : undefined;

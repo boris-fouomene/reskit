@@ -1,0 +1,24 @@
+@font-face {
+    src: url(/fonts/MaterialIcons111.ttf);
+    font-family: "MaterialIcons";
+}
+
+@font-face {
+    src: url(/fonts/MaterialCommunityIcons.ttf);
+    font-family: "MaterialCommunityIcons";
+}
+
+@font-face {
+    src: url(/fonts/FontAwesome6_Solid.ttf);
+    font-family: "FontAwesome6_Solid";
+}
+
+/* @font-face {
+    src: url(/fonts/FontAwesome6_Brands.ttf);
+    font-family: "FontAwesome6_Brands";
+}
+
+@font-face {
+    src: url(/fonts/FontAwesome6_Regular.ttf);
+    font-family: "FontAwesome6_Regular";
+} */

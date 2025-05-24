@@ -1,6 +1,6 @@
 import { Text, Div, Heading } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
-import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
+import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, ButtonBase, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
@@ -76,7 +76,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <Heading level={1}>Switch examples</Heading>
         <HStack className="p-5 !gap-x-10">
-          <Switch label={"Example 1"} trackColorClassName="text-primary" thumbColorClassName="red-500" title="Switch example" />
+          <Switch label={"Example 1"} thumbColorClassName="red-500" title="Switch example" />
           <Switch label={"Example 2"} title="Switch example" />
           <Switch label={"Example 3"} title="Switch example" />
         </HStack>
@@ -95,7 +95,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Button label="Button example1" variant={{ color: "primary" }} rippleColor={"yellow"} />
           <Button label="Button example2" variant={{ color: "secondary" }} />
           <Button label="Button example3 - disabled" disabled variant={{ color: "error", padding: "sm" }} />
-          <Button label="Button example4 - loading" isLoading variant={{ color: "success" }} />
+          <Button label="Button example4 - loading" loading variant={{ color: "success" }} />
         </HStack>
       </Div>
     </ScrollView>

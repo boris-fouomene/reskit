@@ -3,34 +3,16 @@ import { ISurfaceProps } from "@components/Surface";
 import { GestureResponderEvent, PressableProps, View } from "react-native";
 import { IAuthPerm } from "@resk/core/auth";
 import { IClassName } from "@src/types";
-import { ReactNode, Ref } from "react";
+import { ReactElement, ReactNode, Ref } from "react";
 import { IDict, IResourceName } from '@resk/core/types';
 import { IVariantPropsButton } from "@variants/button";
 
-export interface IButtonProps<IButtonExtendContext = any> extends Omit<ISurfaceProps, "onPress" | "variant"> {
+
+export interface IButtonBaseProps extends Omit<ISurfaceProps, "variant"> {
     /***
      * The class name for the label
      */
     labelClassName?: IClassName;
-
-    /**
-     * Disables the ripple effect on button press.
-     * If set to true, the ripple effect will not be shown when the button is pressed.
-     * 
-     * @example
-     * <Button disableRipple={true} />
-     */
-    disableRipple?: boolean;
-
-    /** Duration of the ripple effect, in milliseconds
-     * Default value is 500 (ms)
-     */
-    rippleDuration?: number;
-
-    /***
-     * The opacity of the ripple effect. Default is 0.9
-     */
-    rippleOpacity?: number;
 
     /**
      * Position of the icon relative to the button label.
@@ -41,14 +23,6 @@ export interface IButtonProps<IButtonExtendContext = any> extends Omit<ISurfaceP
      */
     iconPosition?: "left" | "right";
 
-    /**
-     * Indicates whether the button is in a loading state.
-     * When true, the button will be disabled and show a loading indicator.
-     * 
-     * @example
-     * <Button isLoading={true} />
-     */
-    isLoading?: boolean;
 
     /***
      * The class name for the activity indicator of the button. It's used when the button is in a loading state.
@@ -69,19 +43,6 @@ export interface IButtonProps<IButtonExtendContext = any> extends Omit<ISurfaceP
      * right container class name for the button.
      */
     rightContainerClassName?: IClassName;
-    /**
-     * Color of the ripple effect when the button is pressed.
-     * This can enhance the visual feedback of the button interaction.
-     * 
-     * @example
-     * <Button rippleColor="#0000ff" label="Ripple Effect" />
-     */
-    rippleColor?: string | null;
-
-    /***
-     * The class name for the ripple effect.
-     */
-    rippleClassName?: IClassName;
 
     /**
      * Indicates whether to show a loading indicator on the button.
@@ -127,6 +88,56 @@ export interface IButtonProps<IButtonExtendContext = any> extends Omit<ISurfaceP
     dividerClassName?: IClassName;
 
     /***
+     * The label of the button
+     */
+    label?: ReactNode;
+
+    /***
+     * The left content of the button
+     */
+    left?: ReactNode;
+
+    /***
+     * The right content of the button
+     */
+    right?: ReactNode;
+
+    /**
+     * Disables the ripple effect on button press.
+     * If set to true, the ripple effect will not be shown when the button is pressed.
+     * 
+     * @example
+     * <Button disableRipple={true} />
+     */
+    disableRipple?: boolean;
+
+    /***
+     * @platform android
+     */
+    android_ripple?: PressableProps["android_ripple"];
+
+
+    /***
+     * The variant of the button
+     */
+    variant?: IVariantPropsButton;
+
+    rippleContent?: ReactElement | null;
+}
+
+export interface IButtonProps<IButtonExtendContext = any> extends Omit<IButtonBaseProps, "ref" | "onPress"> {
+
+    /** Duration of the ripple effect, in milliseconds
+     * Default value is 500 (ms)
+     */
+    //rippleDuration?: number;
+
+    /***
+     * The opacity of the ripple effect. Default is 0.9
+     */
+    //rippleOpacity?: number;
+
+    /***
      * Optional context for the button component.
      */
     context?: IButtonExtendContext;
@@ -162,27 +173,20 @@ export interface IButtonProps<IButtonExtendContext = any> extends Omit<ISurfaceP
      */
     ref?: Ref<IButtonContext<IButtonExtendContext> & View>;
 
-    /***
-     * The label of the button
+
+    /**
+     * Color of the ripple effect when the button is pressed.
+     * This can enhance the visual feedback of the button interaction.
+     * 
+     * @example
+     * <Button rippleColor="#0000ff" label="Ripple Effect" />
      */
-    label?: ReactNode;
+    rippleColor?: string | null;
 
     /***
-     * The left content of the button
+     * The class name for the ripple effect.
      */
-    left?: ReactNode;
-
-    /***
-     * The right content of the button
-     */
-    right?: ReactNode;
-
-    android_ripple?: PressableProps["android_ripple"];
-
-    /***
-     * The variant of the button
-     */
-    variant?: IVariantPropsButton;
+    rippleClassName?: IClassName;
 }
 
 /**
@@ -224,7 +228,7 @@ export interface IButtonProps<IButtonExtendContext = any> extends Omit<ISurfaceP
  * @property {function(boolean): void} setIsLoading - Sets the loading state of the button. 
  * When loading is true, the button will show a loading indicator.
  * 
- * @param {boolean} isLoading - Sets the loading state of the button. 
+ * @param {boolean} loading - Sets the loading state of the button. 
  * When true, the button will show a loading indicator; when false, it will return to its normal state.
  * 
  * @example
@@ -284,11 +288,11 @@ export type IButtonContext<IButtonExtendContext = any> = Readonly<{
     /*
         Enables the button, allowing it to respond to user interactions.
     */
-    enable: () => void;
+    enable: (callback?: () => void) => void;
     /**
      * disable the button, preventing it from responding to user interactions.
      */
-    disable: () => void;
+    disable: (callback?: () => void) => void;
     /***
      * Returns a boolean indicating whether the button is currently enabled.
      */
@@ -303,7 +307,7 @@ export type IButtonContext<IButtonExtendContext = any> = Readonly<{
      * @param isLoading {boolean} - Sets the loading state of the button. When loading is true, the button will show a loading indicator.
      * @returns 
      */
-    setIsLoading: (isLoading: boolean) => void;
+    setIsLoading: (isLoading: boolean, callback?: (isLoading?: boolean) => void) => void;
 
     /***
      * The data associated with the form if the button is representing a form action.

@@ -3,7 +3,35 @@ import { Div } from "../Div";
 import { cn } from "@utils/cn";
 import { Text } from "../Text";
 
-interface ITable {
+/**
+ * The main table component.
+ *
+ * This component wraps the HtmlDiv component to provide a table element.
+ *
+ * @param {IHtmlDivProps} props - The properties for the main table component.
+ *   - **style**: Optional additional styles to apply to the component.
+ *   - **...props**: Any additional props that should be passed to the underlying HtmlDiv.
+ * 
+ * @returns {ReactElement} A JSX element representing the main table, styled as a table.
+ * 
+ *
+ * @example
+ * <Table>
+ *     <Table.THead>
+ *         <Table.TR>
+ *             <Table.TH>Column 1</Table.TH>
+ *             <Table.TH>Column 2</Table.TH>
+ *         </Table.TR>
+ *     </Table.THead>
+ *     <Table.TBody>
+ *         <Table.TR>
+ *             <Table.TD>Row 1, Cell 1</Table.TD>
+ *             <Table.TD>Row 1, Cell 2</Table.TD>
+ *         </Table.TR>
+ *     </Table.TBody>
+ * </Table>
+ */
+interface ITable extends React.FC<IHtmlDivProps> {
     /**
      * The table head component.
      *
@@ -174,36 +202,36 @@ interface ITable {
  * </Table>
  */
 function MainTable(props: IHtmlDivProps) {
-    return <Div {...props} asHtmlTag="table" />
+    return <Div role="table" {...props} asHtmlTag="table" />
 }
 
 const Table: ITable = MainTable as any as ITable;
 Object.assign(MainTable, {
     THead: function TableHead(props: IHtmlDivProps) {
-        return <Div  {...props} asHtmlTag="thead" />
+        return <Div role="rowgroup" {...props} asHtmlTag="thead" />
     },
 
     TBody: function TableBody(props: IHtmlDivProps) {
-        return <Div {...props} asHtmlTag="tbody" />
+        return <Div role="rowgroup" {...props} asHtmlTag="tbody" />
     },
 
     TFoot: function TableBody(props: IHtmlDivProps) {
-        return <Div {...props} asHtmlTag="tfoot" />
+        return <Div role='rowgroup' {...props} asHtmlTag="tfoot" />
     },
 
     TR: function TR(props: IHtmlDivProps) {
-        return <Div {...props} asHtmlTag="tr" className={cn("native:flex-row native:flex", props.className)} />;
+        return <Div role="row" {...props} asHtmlTag="tr" className={cn("native:flex-row native:flex", props.className)} />;
     },
     TH: function TH(props: IHtmlTableTextProps) {
-        return <Text {...props} asHtmlTag="th" className={cn("native:flex-1 native:flex-col", props.className)} />;
+        return <Text role="columnheader"  {...props} asHtmlTag="th" className={cn("native:flex-1 text-left font-bold native:flex-col", props.className)} />;
     },
 
     TD: function TD(props: IHtmlTableTextProps) {
-        return <Text {...props} asHtmlTag="td" className={cn("native:flex-1 native:flex-col", props.className)} />;
+        return <Text role="cell" {...props} asHtmlTag="td" className={cn("native:flex-1 text-left native:flex-col", props.className)} />;
     },
 
     Caption: function Caption(props: IHtmlTextProps) {
-        return <Text {...props} asHtmlTag="caption" className={cn("native:text-center", props.className)} />;
+        return <Text {...props} asHtmlTag="caption" className={cn("text-center", props.className)} />;
     }
 });
 

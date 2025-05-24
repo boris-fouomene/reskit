@@ -1,4 +1,4 @@
-import { Text, Div, Heading } from '@resk/nativewind/html';
+import { Text, Div, Heading, Table, H2 } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, ButtonBase, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
 type ScreenContentProps = {
@@ -99,6 +99,30 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ color: "error" }} />
           <Button label="Button example4 - loading" loading variant={{ color: "success" }} className="px-[10px] py-[5px] rounded-full" />
         </HStack>
+      </Div>
+      <Div className="p-5">
+        <H2>Table Example</H2>
+        <Table>
+          <Table.Caption>An example of Caption</Table.Caption>
+          <Table.THead>
+            <Table.TR>
+              <Table.TH>Header1, Cell 1</Table.TH>
+              <Table.TH>Header1, Cell 2</Table.TH>
+            </Table.TR>
+          </Table.THead>
+          <Table.TBody>
+            <Table.TR>
+              <Table.TD>Row 1, Cell 1</Table.TD>
+              <Table.TD>Row 1, Cell 2</Table.TD>
+            </Table.TR>
+          </Table.TBody>
+          <Table.TFoot>
+            <Table.TR>
+              <Table.TD>Footer 1, Cell 1</Table.TD>
+              <Table.TD>Footer 1, Cell 2</Table.TD>
+            </Table.TR>
+          </Table.TFoot>
+        </Table>
       </Div>
     </ScrollView>
   );

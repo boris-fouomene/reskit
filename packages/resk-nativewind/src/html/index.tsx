@@ -4,3 +4,5 @@ export * from "./Text";
 export * from "./types";
 export * from "./utils";
 export * from "./Heading";
+export * from "./text-elements";
+export * from "./Table";

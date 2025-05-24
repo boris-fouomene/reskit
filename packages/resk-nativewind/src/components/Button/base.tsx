@@ -82,7 +82,7 @@ export function ButtonBase({
                     {isLoading ? (
                         <ActivityIndicator
                             size={iconProps?.size || "small"}
-                            className={cn("button-indicator", activityIndicatorClassName)}
+                            className={cn("button-indicator mx-[5px]", activityIndicatorClassName)}
                             testID={testID + "-button-activity-indicator"}
                         />
                     ) : null}

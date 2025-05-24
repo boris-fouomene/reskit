@@ -7,7 +7,7 @@ const buton = tv({
         content: "",
         leftContainer: "",
         rightContainer: "",
-        icon: "",
+        icon: "mx-[5px]",
         ripple: "",
         label: "",
     },
@@ -43,30 +43,128 @@ const buton = tv({
             },
         },
         padding: {
-            xs: {
-                base: "p-sx",
+            "5px": {
+                base: "p-[5px]",
             },
-            sm: {
-                base: "p-sm"
+            "10px": {
+                base: "p-[10px]",
             },
-            md: {
-                base: "p-md",
+            "15px": {
+                base: "p-[15px]",
             },
-            lg: {
-                base: "p-lg",
+            "20px": {
+                base: "p-[20px]",
             },
-            xl: {
-                base: "p-xl"
+            "25px": {
+                base: "p-[25px]",
             },
-            "2xl": {
-                base: "p-2xl",
+            "30px": {
+                base: "p-[30px]",
             },
-            "3xl": {
-                base: "p-3xl"
+            "35px": {
+                base: "p-[35px]",
             },
-            "4xl": {
-                base: "p-4xl"
-            }
+            "40px": {
+                base: "p-[40px]",
+            },
+            "45px": {
+                base: "p-[45px]",
+            },
+            "50px": {
+                base: "p-[50px]",
+            },
+            "55px": {
+                base: "p-[55px]",
+            },
+            "60px": {
+                base: "p-[60px]",
+            },
+            "65px": {
+                base: "p-[65px]",
+            },
+            "70px": {
+                base: "p-[70px]",
+            },
+            "75px": {
+                base: "p-[75px]",
+            },
+            "80px": {
+                base: "p-[80px]",
+            },
+            "85px": {
+                base: "p-[85px]",
+            },
+            "90px": {
+                base: "p-[90px]",
+            },
+            "95px": {
+                base: "p-[95px]",
+            },
+            "100px": {
+                base: "p-[100px]",
+            },
+        },
+        margin: {
+            "5px": {
+                base: "m-[5px]",
+            },
+            "10px": {
+                base: "m-[10px]",
+            },
+            "15px": {
+                base: "m-[15px]",
+            },
+            "20px": {
+                base: "m-[20px]",
+            },
+            "25px": {
+                base: "m-[25px]",
+            },
+            "30px": {
+                base: "m-[30px]",
+            },
+            "35px": {
+                base: "m-[35px]",
+            },
+            "40px": {
+                base: "m-[40px]",
+            },
+            "45px": {
+                base: "m-[45px]",
+            },
+            "50px": {
+                base: "m-[50px]",
+            },
+            "55px": {
+                base: "m-[55px]",
+            },
+            "60px": {
+                base: "m-[60px]",
+            },
+            "65px": {
+                base: "m-[65px]",
+            },
+            "70px": {
+                base: "m-[70px]",
+            },
+            "75px": {
+                base: "m-[75px]",
+            },
+            "80px": {
+                base: "m-[80px]",
+            },
+            "85px": {
+                base: "m-[85px]",
+            },
+            "90px": {
+                base: "m-[90px]",
+            },
+            "95px": {
+                base: "m-[95px]",
+            },
+            "100px": {
+                base: "m-[100px]",
+            },
         }
     }
 });

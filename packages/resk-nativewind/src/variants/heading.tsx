@@ -17,6 +17,7 @@ const heading = tv({
             left: 'text-left',
             center: 'text-center',
             right: 'text-right',
+            justify: 'text-justify',
         },
         weight: {
             light: 'font-light',
@@ -24,6 +25,10 @@ const heading = tv({
             medium: 'font-medium',
             semibold: 'font-semibold',
             bold: 'font-bold',
+            "400": 'font-400',
+            "500": 'font-500',
+            "600": 'font-600',
+            "700": 'font-700',
         },
         color: VariantsGeneratedColors.heading
     },

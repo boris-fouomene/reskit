@@ -24,6 +24,8 @@ export * from "./events";
  * @returns The normalized props
  */
 export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, nativeID, asHtmlTag, ...props }: T, defaultProps?: T) {
+    delete (props as any).colSpan;
+    delete (props as any).rowSpan;
     return {
         ...normalizeProps(props, defaultProps),
         id: defaultStr(props.id, nativeID),

@@ -94,10 +94,10 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10">
-          <Button label="Button example1" variant={{ color: "primary" }} rippleClassName="!bg-red-500" />
-          <Button label="Button example2" variant={{ color: "secondary" }} />
-          <Button label="Button example3 - disabled" disabled variant={{ color: "error", padding: "sm" }} />
-          <Button label="Button example4 - loading" loading variant={{ color: "success" }} />
+          <Button label="Button example1" icon={"camera"} variant={{ color: "primary", padding: "5px" }} />
+          <Button label="Button example2" icon="radio" variant={{ color: "secondary", padding: "10px" }} />
+          <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ color: "error" }} />
+          <Button label="Button example4 - loading" loading variant={{ color: "success" }} className="px-[10px] py-[5px] rounded-full" />
         </HStack>
       </Div>
     </ScrollView>

@@ -2,43 +2,43 @@
 export const VariantsGeneratedColors = {
   "button": {
     "primary": {
-      "base": "bg-primary dark:bg-dark-primary hover:opacity-75",
+      "base": "bg-primary dark:bg-dark-primary",
       "label": "text-primary-foreground dark:text-darkprimary-foreground",
       "icon": "!text-primary-foreground dark:!text-darkprimary-foreground",
       "ripple": "bg-primary dark:bg-darkprimary opacity-90"
     },
     "secondary": {
-      "base": "bg-secondary dark:bg-dark-secondary hover:opacity-75",
+      "base": "bg-secondary dark:bg-dark-secondary",
       "label": "text-secondary-foreground dark:text-darksecondary-foreground",
       "icon": "!text-secondary-foreground dark:!text-darksecondary-foreground",
       "ripple": "bg-secondary dark:bg-darksecondary opacity-90"
     },
     "info": {
-      "base": "bg-info dark:bg-dark-info hover:opacity-75",
+      "base": "bg-info dark:bg-dark-info",
       "label": "text-info-foreground dark:text-darkinfo-foreground",
       "icon": "!text-info-foreground dark:!text-darkinfo-foreground",
       "ripple": "bg-info dark:bg-darkinfo opacity-90"
     },
     "success": {
-      "base": "bg-success dark:bg-dark-success hover:opacity-75",
+      "base": "bg-success dark:bg-dark-success",
       "label": "text-success-foreground dark:text-darksuccess-foreground",
       "icon": "!text-success-foreground dark:!text-darksuccess-foreground",
       "ripple": "bg-success dark:bg-darksuccess opacity-90"
     },
     "warning": {
-      "base": "bg-warning dark:bg-dark-warning hover:opacity-75",
+      "base": "bg-warning dark:bg-dark-warning",
       "label": "text-warning-foreground dark:text-darkwarning-foreground",
       "icon": "!text-warning-foreground dark:!text-darkwarning-foreground",
       "ripple": "bg-warning dark:bg-darkwarning opacity-90"
     },
     "error": {
-      "base": "bg-error dark:bg-dark-error hover:opacity-75",
+      "base": "bg-error dark:bg-dark-error",
       "label": "text-error-foreground dark:text-darkerror-foreground",
       "icon": "!text-error-foreground dark:!text-darkerror-foreground",
       "ripple": "bg-error dark:bg-darkerror opacity-90"
     },
     "surface": {
-      "base": "bg-surface dark:bg-dark-surface hover:opacity-75",
+      "base": "bg-surface dark:bg-dark-surface",
       "label": "text-surface-foreground dark:text-darksurface-foreground",
       "icon": "!text-surface-foreground dark:!text-darksurface-foreground",
       "ripple": "bg-surface dark:bg-darksurface opacity-90"

@@ -26,7 +26,7 @@ module.exports = (colors, options) => {
     const content = JSON.stringify({
         button: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
             return {
-                base: `${colorNameWithPrefix} ${darkColorWithPrefix} hover:opacity-75`,
+                base: `${colorNameWithPrefix} ${darkColorWithPrefix}`,
                 label: `text-${color}-foreground dark:text-dark${color}-foreground`,
                 icon: `!text-${color}-foreground dark:!text-dark${color}-foreground`,
                 ripple: `bg-${color} dark:bg-dark${color} opacity-90`,

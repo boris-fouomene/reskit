@@ -19,7 +19,6 @@ import Octicons from "react-native-vector-icons/Octicons";
 import { cn, normalizeProps } from "@utils/cn";
 import iconVariants from "@variants/icon";
 import { Tooltip } from "@components/Tooltip";
-import { cssInterop } from "nativewind";
 
 
 const isIos = Platform.isIos();

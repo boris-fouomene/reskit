@@ -1,10 +1,10 @@
 "use client";
-import { useImperativeHandle, useEffect, useRef, useId } from 'react';
+import { useImperativeHandle, useEffect, useId } from 'react';
 //import { FormsManager } from '@components/Form/FormsManager';
 import { GestureResponderEvent } from 'react-native';
 import { ButtonBase } from './base';
 import { IButtonContext, IButtonProps } from './types';
-import { defaultStr, isNonNullString, uniqid } from '@resk/core/utils';
+import { defaultStr } from '@resk/core/utils';
 import { cn } from '@utils/cn';
 import { useGetRippleContent } from './ripple';
 import Auth from '@resk/core/auth';

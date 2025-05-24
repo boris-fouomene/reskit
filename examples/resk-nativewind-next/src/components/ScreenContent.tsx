@@ -94,7 +94,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10">
-          <Button label="Button example1" variant={{ color: "primary" }} rippleColor={"yellow"} />
+          <Button label="Button example1" variant={{ color: "primary" }} rippleClassName="!bg-red-500" />
           <Button label="Button example2" variant={{ color: "secondary" }} />
           <Button label="Button example3 - disabled" disabled variant={{ color: "error", padding: "sm" }} />
           <Button label="Button example4 - loading" loading variant={{ color: "success" }} />

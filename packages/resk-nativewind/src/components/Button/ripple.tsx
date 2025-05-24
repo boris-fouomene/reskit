@@ -58,18 +58,6 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
     return {
         rippleContent: <>
             {ripples.map((ripple, index) => {
-                console.log({
-                    left: ripple.x - ripple.size / 2,
-                    top: ripple.y - ripple.size / 2,
-                    width: ripple.size,
-                    height: ripple.size,
-                    position: "absolute",
-                    overflow: "hidden",
-                    borderRadius: ripple.size / 2,
-                    ...(isNonNullString(rippleColor) ? { backgroundColor: rippleColor as any } : {}),
-                    opacity: ripple.opacity,
-                    transform: [{ scale: ripple.scale }],
-                }, " is dddddddddddddddddddddddddd")
                 return (
                     <Animated.View
                         key={ripple.key}
@@ -94,8 +82,8 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
         startRipple: (event: GestureResponderEvent) => {
             const { currentTarget, target } = event;
             (currentTarget || target)?.measure((x, y, width, height, pageX, pageY) => {
-                const touchX = event.nativeEvent.pageX - pageX;
-                const touchY = event.nativeEvent.pageY - pageY;
+                const touchX = Math.min(x, Math.max(0, event.nativeEvent.pageX - pageX));
+                const touchY = Math.min(y, Math.max(0, event.nativeEvent.pageY - pageY));
                 const size = Math.max(width, height) * 2;
                 const opacity = new Animated.Value(rippleOpacity as number);
                 const scale = new Animated.Value(0);

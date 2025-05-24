@@ -57,37 +57,37 @@ export const VariantsGeneratedColors = {
     "primary": {
       "container": "bg-primary dark:bg-dark!text-primary-foreground",
       "icon": "!text-primary-foreground dark:!text-dark-primary-foreground",
-      "text": "text-!text-primary-foreground-foreground dark:text-dark-primary-foreground"
+      "text": "text-primary-foreground dark:text-dark-primary-foreground"
     },
     "secondary": {
       "container": "bg-secondary dark:bg-dark!text-secondary-foreground",
       "icon": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
-      "text": "text-!text-secondary-foreground-foreground dark:text-dark-secondary-foreground"
+      "text": "text-secondary-foreground dark:text-dark-secondary-foreground"
     },
     "info": {
       "container": "bg-info dark:bg-dark!text-info-foreground",
       "icon": "!text-info-foreground dark:!text-dark-info-foreground",
-      "text": "text-!text-info-foreground-foreground dark:text-dark-info-foreground"
+      "text": "text-info-foreground dark:text-dark-info-foreground"
     },
     "success": {
       "container": "bg-success dark:bg-dark!text-success-foreground",
       "icon": "!text-success-foreground dark:!text-dark-success-foreground",
-      "text": "text-!text-success-foreground-foreground dark:text-dark-success-foreground"
+      "text": "text-success-foreground dark:text-dark-success-foreground"
     },
     "warning": {
       "container": "bg-warning dark:bg-dark!text-warning-foreground",
       "icon": "!text-warning-foreground dark:!text-dark-warning-foreground",
-      "text": "text-!text-warning-foreground-foreground dark:text-dark-warning-foreground"
+      "text": "text-warning-foreground dark:text-dark-warning-foreground"
     },
     "error": {
       "container": "bg-error dark:bg-dark!text-error-foreground",
       "icon": "!text-error-foreground dark:!text-dark-error-foreground",
-      "text": "text-!text-error-foreground-foreground dark:text-dark-error-foreground"
+      "text": "text-error-foreground dark:text-dark-error-foreground"
     },
     "surface": {
       "container": "bg-surface dark:bg-dark!text-surface-foreground",
       "icon": "!text-surface-foreground dark:!text-dark-surface-foreground",
-      "text": "text-!text-surface-foreground-foreground dark:text-dark-surface-foreground"
+      "text": "text-surface-foreground dark:text-dark-surface-foreground"
     }
   },
   "divider": {

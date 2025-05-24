@@ -37,7 +37,7 @@ module.exports = (colors, options) => {
             return {
                 container: `bg-${colorWithoutPrefix} dark:bg-dark${colorWithPrefix}`,
                 icon: cn(colorWithPrefix, darkColorWithPrefix),
-                text: `text-${colorWithPrefix}-foreground dark:text-dark-${colorWithoutPrefix}-foreground`
+                text: `text-${colorWithoutPrefix}-foreground dark:text-dark-${colorWithoutPrefix}-foreground`
             }
         }),
         divider: VariantsColors.buildBackgroundColors(),

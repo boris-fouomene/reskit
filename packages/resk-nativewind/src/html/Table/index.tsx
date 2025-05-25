@@ -235,11 +235,13 @@ Object.assign(MainTable, {
     }
 });
 
-Table.THead.displayName = "Table.Head";
-Table.TBody.displayName = "Table.Body";
-Table.TFoot.displayName = "Table.Foot";
-Table.TR.displayName = "Table.TR";
-Table.TH.displayName = "Table.TH";
-Table.TD.displayName = "Table.TD";
+MainTable.displayName = "Html.Table";
+Table.THead.displayName = "Html.Table.THead";
+Table.TBody.displayName = "Html.Table.TBody";
+Table.TFoot.displayName = "Html.Table.TFoot";
+Table.TR.displayName = "Html.Table.TR";
+Table.TH.displayName = "Html.Table.TH";
+Table.TD.displayName = "Html.Table.TD";
+Table.Caption.displayName = "Html.Table.Caption";
 
 export { Table };

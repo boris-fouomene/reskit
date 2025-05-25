@@ -39,3 +39,10 @@ export function BlockQuote({ className, cite, ...props }: IHtmlBlockQuoteProps) 
 export function BR({ className, ...props }: Omit<IHtmlDivProps, "children" | "asHtmlTag">) {
     return <Div asHtmlTag="br" {...props} className={cn("native:w-0 native:h-[7px]", className)} />;
 }
+P.displayName = "Html.P";
+B.displayName = "Html.B";
+S.displayName = "Html.S";
+I.displayName = "Html.I";
+Q.displayName = "Html.Q";
+BlockQuote.displayName = "Html.BlockQuote";
+BR.displayName = "Html.BR";

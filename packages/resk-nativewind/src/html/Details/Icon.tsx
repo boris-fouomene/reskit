@@ -8,6 +8,18 @@ import allVariants from "@variants/all";
 import { addClassName, removeClassName, defaultStr } from "@resk/core/utils";
 import { IFontIconName } from "@components/Icon/types";
 
+/**
+ * A component that renders an icon that can be used to toggle a `<details>` element.
+ * It can either be used as a native icon that is rendered directly inside the `<details>` element
+ * or as a custom icon that is rendered separately.
+ * If the `toggleOpen` property is provided, the component will render a native icon that can be used
+ * to toggle the `<details>` element. If the `toggleOpen` property is not provided, the component will
+ * render a custom icon that can be used to toggle the `<details>` element.
+ * The `open` property is used to determine whether the icon should be rendered as an opened or closed icon.
+ * The `openedIcon` and `closedIcon` properties are used to customize the appearance of the icon.
+ * @param {IHtmlDetailsIconProps & { toggleOpen?: () => void; open: boolean; }} props
+ * @returns {JSX.Element}
+ */
 export function DetailsIcon({ openedIcon, closedIcon, toggleOpen, open, testID, className, ...rest }: IHtmlDetailsIconProps & { toggleOpen?: () => void; open: boolean; }) {
     const isNative = typeof toggleOpen == "function";
     const iconId = useId();
@@ -38,8 +50,8 @@ export function DetailsIcon({ openedIcon, closedIcon, toggleOpen, open, testID, 
         }
     }, []);
     const iconProps = Object.assign({}, { size: 20 }, rest);
-    openedIcon = defaultStr(openedIcon, "chevron-up") as IFontIconName;
-    closedIcon = defaultStr(closedIcon, "chevron-down") as IFontIconName;
+    openedIcon = defaultStr(openedIcon, "chevron-down") as IFontIconName;
+    closedIcon = defaultStr(closedIcon, "chevron-right") as IFontIconName;
     if (isNative) {
         return <FontIcon
             id={iconId}

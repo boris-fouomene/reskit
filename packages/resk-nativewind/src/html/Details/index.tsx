@@ -1,12 +1,28 @@
 import { cn } from "@utils/cn";
 import { Div } from "../Div";
-import { Text } from "../Text";
 import { defaultStr } from "@resk/core/utils";
 import allVariants from "@variants/all"
 import { useDetailsState } from "./state";
 import { IHtmlDetailsProps } from "./types";
 import { DetailsIcon } from "./Icon";
 
+/**
+ * A component that provides a clickable summary element and a content element
+ * that can be toggled open and closed.
+ *
+ * @param {object} props - The properties for the Details component.
+ * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "resk-details".
+ * @param {object} [props.iconProps] - Additional properties for the icon component.
+ * @param {string} [props.iconPosition] - The position of the icon. Defaults to "left".
+ * @param {boolean} [props.disabled] - Flag to indicate if the component is disabled.
+ * @param {string} [props.className] - Additional CSS class names to apply to the container element.
+ * @param {any} [props.open] - The value of the `open` attribute for the `details` element.
+ * @param {string} [props.summaryClassName] - Additional CSS class names to apply to the summary element.
+ * @param {ReactElement} [props.summary] - The content of the summary element.
+ * @param {ReactElement} [props.children] - The content of the content element.
+ * @param {object} [props.contentClassName] - Additional properties for the content element.
+ * @param {object} [rest] - Additional props passed to the `Div` component.
+ */
 export function Details({ className, iconProps, iconPosition, disabled, testID, contentClassName, open, summaryClassName, summary, children, ...rest }: IHtmlDetailsProps) {
     testID = defaultStr(testID, "resk-details");
     const { isOpen, toggleOpen } = useDetailsState(open);
@@ -32,3 +48,6 @@ export function Details({ className, iconProps, iconPosition, disabled, testID, 
 }
 
 
+export * from "./types";
+
+Details.displayName = "Html.Details";

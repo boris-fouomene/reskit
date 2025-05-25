@@ -46,45 +46,45 @@ export const VariantsGeneratedColors = {
   },
   "buttonOutline": {
     "primary": {
-      "base": "p-[5px] border-2 border-primary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-primary hover:bg-primary focus-visible:outline-primary",
-      "label": "text-primary dark:text-darkprimary hover:text-primary-foreground dark:hover:text-dark-primary-foreground active:text-primary-foreground dark:active:text-dark-primary-foreground",
-      "icon": "!text-primary dark:!text-darkprimary hover:!text-primary-foreground dark:hover:!text-dark-primary-foreground active:!text-primary-foreground dark:active:!text-dark-primary-foreground",
+      "base": "p-[5px] border-2 border-primary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-primary",
+      "label": "text-primary dark:text-darkprimary",
+      "icon": "!text-primary dark:!text-darkprimary",
       "ripple": ""
     },
     "secondary": {
-      "base": "p-[5px] border-2 border-secondary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-secondary hover:bg-secondary focus-visible:outline-secondary",
-      "label": "text-secondary dark:text-darksecondary hover:text-secondary-foreground dark:hover:text-dark-secondary-foreground active:text-secondary-foreground dark:active:text-dark-secondary-foreground",
-      "icon": "!text-secondary dark:!text-darksecondary hover:!text-secondary-foreground dark:hover:!text-dark-secondary-foreground active:!text-secondary-foreground dark:active:!text-dark-secondary-foreground",
+      "base": "p-[5px] border-2 border-secondary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-secondary",
+      "label": "text-secondary dark:text-darksecondary",
+      "icon": "!text-secondary dark:!text-darksecondary",
       "ripple": ""
     },
     "info": {
-      "base": "p-[5px] border-2 border-info bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-info hover:bg-info focus-visible:outline-info",
-      "label": "text-info dark:text-darkinfo hover:text-info-foreground dark:hover:text-dark-info-foreground active:text-info-foreground dark:active:text-dark-info-foreground",
-      "icon": "!text-info dark:!text-darkinfo hover:!text-info-foreground dark:hover:!text-dark-info-foreground active:!text-info-foreground dark:active:!text-dark-info-foreground",
+      "base": "p-[5px] border-2 border-info bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-info",
+      "label": "text-info dark:text-darkinfo",
+      "icon": "!text-info dark:!text-darkinfo",
       "ripple": ""
     },
     "success": {
-      "base": "p-[5px] border-2 border-success bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-success hover:bg-success focus-visible:outline-success",
-      "label": "text-success dark:text-darksuccess hover:text-success-foreground dark:hover:text-dark-success-foreground active:text-success-foreground dark:active:text-dark-success-foreground",
-      "icon": "!text-success dark:!text-darksuccess hover:!text-success-foreground dark:hover:!text-dark-success-foreground active:!text-success-foreground dark:active:!text-dark-success-foreground",
+      "base": "p-[5px] border-2 border-success bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-success",
+      "label": "text-success dark:text-darksuccess",
+      "icon": "!text-success dark:!text-darksuccess",
       "ripple": ""
     },
     "warning": {
-      "base": "p-[5px] border-2 border-warning bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-warning hover:bg-warning focus-visible:outline-warning",
-      "label": "text-warning dark:text-darkwarning hover:text-warning-foreground dark:hover:text-dark-warning-foreground active:text-warning-foreground dark:active:text-dark-warning-foreground",
-      "icon": "!text-warning dark:!text-darkwarning hover:!text-warning-foreground dark:hover:!text-dark-warning-foreground active:!text-warning-foreground dark:active:!text-dark-warning-foreground",
+      "base": "p-[5px] border-2 border-warning bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-warning",
+      "label": "text-warning dark:text-darkwarning",
+      "icon": "!text-warning dark:!text-darkwarning",
       "ripple": ""
     },
     "error": {
-      "base": "p-[5px] border-2 border-error bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-error hover:bg-error focus-visible:outline-error",
-      "label": "text-error dark:text-darkerror hover:text-error-foreground dark:hover:text-dark-error-foreground active:text-error-foreground dark:active:text-dark-error-foreground",
-      "icon": "!text-error dark:!text-darkerror hover:!text-error-foreground dark:hover:!text-dark-error-foreground active:!text-error-foreground dark:active:!text-dark-error-foreground",
+      "base": "p-[5px] border-2 border-error bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-error",
+      "label": "text-error dark:text-darkerror",
+      "icon": "!text-error dark:!text-darkerror",
       "ripple": ""
     },
     "surface": {
-      "base": "p-[5px] border-2 border-surface bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-surface hover:bg-surface focus-visible:outline-surface",
-      "label": "text-surface dark:text-darksurface hover:text-surface-foreground dark:hover:text-dark-surface-foreground active:text-surface-foreground dark:active:text-dark-surface-foreground",
-      "icon": "!text-surface dark:!text-darksurface hover:!text-surface-foreground dark:hover:!text-dark-surface-foreground active:!text-surface-foreground dark:active:!text-dark-surface-foreground",
+      "base": "p-[5px] border-2 border-surface bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-surface",
+      "label": "text-surface dark:text-darksurface",
+      "icon": "!text-surface dark:!text-darksurface",
       "ripple": ""
     }
   },

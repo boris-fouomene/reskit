@@ -33,10 +33,16 @@ module.exports = (colors, options) => {
             }
         }),
         buttonOutline: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
+            /***
+             *  base: `p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-${color} hover:bg-${color} focus-visible:outline-${color}`,
+                label: `text-${color} dark:text-dark${color} hover:text-${color}-foreground btn-hover:text-${color}-foreground dark:hover:text-dark-${color}-foreground dark:btn-hover:text-dark-${color}-foreground active:text-${color}-foreground dark:active:text-dark-${color}-foreground`,
+                icon: `!text-${color} dark:!text-dark${color} hover:!text-${color}-foreground btn-hover:!text-${color}-foreground dark:hover:!text-dark-${color}-foreground dark:btn-hover:!text-dark-${color}-foreground active:!text-${color}-foreground dark:active:!text-dark-${color}-foreground`,
+                ripple: ""
+             */
             return {
-                base: `p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-${color} hover:bg-${color} focus-visible:outline-${color}`,
-                label: `text-${color} dark:text-dark${color} hover:text-${color}-foreground dark:hover:text-dark-${color}-foreground active:text-${color}-foreground dark:active:text-dark-${color}-foreground`,
-                icon: `!text-${color} dark:!text-dark${color} hover:!text-${color}-foreground dark:hover:!text-dark-${color}-foreground active:!text-${color}-foreground dark:active:!text-dark-${color}-foreground`,
+                base: `p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-${color}`,
+                label: `text-${color} dark:text-dark${color}`,
+                icon: `!text-${color} dark:!text-dark${color}`,
                 ripple: ""
             }
         }),

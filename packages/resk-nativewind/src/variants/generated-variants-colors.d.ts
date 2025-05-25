@@ -3,6 +3,7 @@
     type IName = IVariantsColors.ColorName;
     export declare interface IVariantsGeneratedColors {
         button : Record<IName,Record<"base"|"label"|"icon" | "ripple",string>>;
+        buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "ripple",string>>;
         icon : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;

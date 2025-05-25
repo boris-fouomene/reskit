@@ -93,9 +93,15 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       </Div>
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
-        <HStack className="p-5 !gap-x-10">
+        <HStack className="p-5 !gap-x-10 gap-y-5">
           <Button label="Button example1" icon={"camera"} variant={{ color: "primary", padding: "5px" }} />
           <Button label="Button example2" icon="radio" variant={{ color: "secondary", padding: "10px" }} />
+          <Button label="Outline Button 1" variant={{ outline: "primary" }} className="p-[2px]" />
+          <Button label="Outline Button 2" variant={{ outline: "secondary" }} />
+          <Button label="Outline Button 3" variant={{ outline: "info" }} />
+          <Button label="Outline Button 4" variant={{ outline: "success", rounded: "sm" }} />
+          <Button label="Outline Button 5" variant={{ outline: "warning" }} />
+          <Button label="Outline Button 6" variant={{ outline: "error" }} />
           <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ color: "error" }} />
           <Button label="Button example4 - loading" loading variant={{ color: "success" }} className="px-[10px] py-[5px] rounded-full" />
         </HStack>

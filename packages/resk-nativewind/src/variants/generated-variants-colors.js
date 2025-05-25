@@ -2,46 +2,90 @@
 export const VariantsGeneratedColors = {
   "button": {
     "primary": {
-      "base": "bg-primary dark:bg-dark-primary",
+      "base": "bg-primary dark:bg-dark-primary focus-visible:outline-primary dark:focus-visible:outline-dark-primary",
       "label": "text-primary-foreground dark:text-darkprimary-foreground",
       "icon": "!text-primary-foreground dark:!text-darkprimary-foreground",
-      "ripple": "bg-primary dark:bg-darkprimary opacity-90"
+      "ripple": ""
     },
     "secondary": {
-      "base": "bg-secondary dark:bg-dark-secondary",
+      "base": "bg-secondary dark:bg-dark-secondary focus-visible:outline-secondary dark:focus-visible:outline-dark-secondary",
       "label": "text-secondary-foreground dark:text-darksecondary-foreground",
       "icon": "!text-secondary-foreground dark:!text-darksecondary-foreground",
-      "ripple": "bg-secondary dark:bg-darksecondary opacity-90"
+      "ripple": ""
     },
     "info": {
-      "base": "bg-info dark:bg-dark-info",
+      "base": "bg-info dark:bg-dark-info focus-visible:outline-info dark:focus-visible:outline-dark-info",
       "label": "text-info-foreground dark:text-darkinfo-foreground",
       "icon": "!text-info-foreground dark:!text-darkinfo-foreground",
-      "ripple": "bg-info dark:bg-darkinfo opacity-90"
+      "ripple": ""
     },
     "success": {
-      "base": "bg-success dark:bg-dark-success",
+      "base": "bg-success dark:bg-dark-success focus-visible:outline-success dark:focus-visible:outline-dark-success",
       "label": "text-success-foreground dark:text-darksuccess-foreground",
       "icon": "!text-success-foreground dark:!text-darksuccess-foreground",
-      "ripple": "bg-success dark:bg-darksuccess opacity-90"
+      "ripple": ""
     },
     "warning": {
-      "base": "bg-warning dark:bg-dark-warning",
+      "base": "bg-warning dark:bg-dark-warning focus-visible:outline-warning dark:focus-visible:outline-dark-warning",
       "label": "text-warning-foreground dark:text-darkwarning-foreground",
       "icon": "!text-warning-foreground dark:!text-darkwarning-foreground",
-      "ripple": "bg-warning dark:bg-darkwarning opacity-90"
+      "ripple": ""
     },
     "error": {
-      "base": "bg-error dark:bg-dark-error",
+      "base": "bg-error dark:bg-dark-error focus-visible:outline-error dark:focus-visible:outline-dark-error",
       "label": "text-error-foreground dark:text-darkerror-foreground",
       "icon": "!text-error-foreground dark:!text-darkerror-foreground",
-      "ripple": "bg-error dark:bg-darkerror opacity-90"
+      "ripple": ""
     },
     "surface": {
-      "base": "bg-surface dark:bg-dark-surface",
+      "base": "bg-surface dark:bg-dark-surface focus-visible:outline-surface dark:focus-visible:outline-dark-surface",
       "label": "text-surface-foreground dark:text-darksurface-foreground",
       "icon": "!text-surface-foreground dark:!text-darksurface-foreground",
-      "ripple": "bg-surface dark:bg-darksurface opacity-90"
+      "ripple": ""
+    }
+  },
+  "buttonOutline": {
+    "primary": {
+      "base": "border-2 border-primary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-primary hover:bg-primary hover:text-primary-foreground dark:hover:text-dark-primary-foreground  focus-visible:outline-primary",
+      "label": "text-primary dark:text-darkprimary hover:text-primary-foreground dark:hover:text-dark-primary-foreground",
+      "icon": "!text-primary dark:!text-darkprimary hover:!text-primary-foreground dark:hover:!text-dark-primary-foreground",
+      "ripple": ""
+    },
+    "secondary": {
+      "base": "border-2 border-secondary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-secondary hover:bg-secondary hover:text-secondary-foreground dark:hover:text-dark-secondary-foreground  focus-visible:outline-secondary",
+      "label": "text-secondary dark:text-darksecondary hover:text-secondary-foreground dark:hover:text-dark-secondary-foreground",
+      "icon": "!text-secondary dark:!text-darksecondary hover:!text-secondary-foreground dark:hover:!text-dark-secondary-foreground",
+      "ripple": ""
+    },
+    "info": {
+      "base": "border-2 border-info bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-info hover:bg-info hover:text-info-foreground dark:hover:text-dark-info-foreground  focus-visible:outline-info",
+      "label": "text-info dark:text-darkinfo hover:text-info-foreground dark:hover:text-dark-info-foreground",
+      "icon": "!text-info dark:!text-darkinfo hover:!text-info-foreground dark:hover:!text-dark-info-foreground",
+      "ripple": ""
+    },
+    "success": {
+      "base": "border-2 border-success bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-success hover:bg-success hover:text-success-foreground dark:hover:text-dark-success-foreground  focus-visible:outline-success",
+      "label": "text-success dark:text-darksuccess hover:text-success-foreground dark:hover:text-dark-success-foreground",
+      "icon": "!text-success dark:!text-darksuccess hover:!text-success-foreground dark:hover:!text-dark-success-foreground",
+      "ripple": ""
+    },
+    "warning": {
+      "base": "border-2 border-warning bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-warning hover:bg-warning hover:text-warning-foreground dark:hover:text-dark-warning-foreground  focus-visible:outline-warning",
+      "label": "text-warning dark:text-darkwarning hover:text-warning-foreground dark:hover:text-dark-warning-foreground",
+      "icon": "!text-warning dark:!text-darkwarning hover:!text-warning-foreground dark:hover:!text-dark-warning-foreground",
+      "ripple": ""
+    },
+    "error": {
+      "base": "border-2 border-error bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-error hover:bg-error hover:text-error-foreground dark:hover:text-dark-error-foreground  focus-visible:outline-error",
+      "label": "text-error dark:text-darkerror hover:text-error-foreground dark:hover:text-dark-error-foreground",
+      "icon": "!text-error dark:!text-darkerror hover:!text-error-foreground dark:hover:!text-dark-error-foreground",
+      "ripple": ""
+    },
+    "surface": {
+      "base": "border-2 border-surface bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-surface hover:bg-surface hover:text-surface-foreground dark:hover:text-dark-surface-foreground  focus-visible:outline-surface",
+      "label": "text-surface dark:text-darksurface hover:text-surface-foreground dark:hover:text-dark-surface-foreground",
+      "icon": "!text-surface dark:!text-darksurface hover:!text-surface-foreground dark:hover:!text-dark-surface-foreground",
+      "ripple": ""
     }
   },
   "icon": {

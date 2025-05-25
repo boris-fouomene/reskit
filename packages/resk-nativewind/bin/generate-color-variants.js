@@ -26,10 +26,18 @@ module.exports = (colors, options) => {
     const content = JSON.stringify({
         button: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
             return {
-                base: `${colorNameWithPrefix} ${darkColorWithPrefix}`,
+                base: `${colorNameWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${color} dark:focus-visible:outline-dark-${color}`,
                 label: `text-${color}-foreground dark:text-dark${color}-foreground`,
                 icon: `!text-${color}-foreground dark:!text-dark${color}-foreground`,
-                ripple: `bg-${color} dark:bg-dark${color} opacity-90`,
+                ripple: ""
+            }
+        }),
+        buttonOutline: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
+            return {
+                base: `p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-${color} hover:bg-${color} focus-visible:outline-${color}`,
+                label: `text-${color} dark:text-dark${color} hover:text-${color}-foreground dark:hover:text-dark-${color}-foreground active:text-${color}-foreground dark:active:text-dark-${color}-foreground`,
+                icon: `!text-${color} dark:!text-dark${color} hover:!text-${color}-foreground dark:hover:!text-dark-${color}-foreground active:!text-${color}-foreground dark:active:!text-dark-${color}-foreground`,
+                ripple: ""
             }
         }),
         icon: VariantsColors.buildTextColors(true),
@@ -48,7 +56,7 @@ module.exports = (colors, options) => {
         text: VariantsColors.buildTextColors(),
         activityIndicator: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`border-t-${color} dark:border-t-dark-${color}`);
-        })
+        }),
     }, null, 2);
     fs.writeFileSync(outputPath, `
 export const VariantsGeneratedColors = ${content}
@@ -59,6 +67,7 @@ export const VariantsGeneratedColors = ${content}
     type IName = IVariantsColors.ColorName;
     export declare interface IVariantsGeneratedColors {
         button : Record<IName,Record<"base"|"label"|"icon" | "ripple",string>>;
+        buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "ripple",string>>;
         icon : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;

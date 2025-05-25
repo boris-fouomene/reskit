@@ -13,6 +13,24 @@ const buton = tv({
     },
     variants: {
         color: VariantsGeneratedColors.button,
+        outline: VariantsGeneratedColors.buttonOutline,
+        border: {
+            none: {
+                base: "border-none"
+            },
+            solid: {
+                base: "border-solid"
+            },
+            dashed: {
+                base: "border-dashed"
+            },
+            dotted: {
+                base: "border-dotted"
+            },
+            double: {
+                base: "border-double"
+            },
+        },
         rounded: {
             none: {
                 base: "rounded-none",

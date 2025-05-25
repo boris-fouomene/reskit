@@ -1,5 +1,6 @@
 import { tv, VariantProps } from 'tailwind-variants';
 import { VariantsGeneratedColors } from "./generated-variants-colors";
+import activityIndicator from './activityIndicator';
 
 const buton = tv({
     slots: {
@@ -8,6 +9,7 @@ const buton = tv({
         leftContainer: "",
         rightContainer: "",
         icon: "mx-[5px]",
+        activityIndicator: "",
         ripple: "",
         label: "",
     },

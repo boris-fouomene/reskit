@@ -5,43 +5,50 @@ export const VariantsGeneratedColors = {
       "base": "bg-primary dark:bg-dark-primary focus-visible:outline-primary dark:focus-visible:outline-dark-primary",
       "label": "text-primary-foreground dark:text-darkprimary-foreground",
       "icon": "!text-primary-foreground dark:!text-darkprimary-foreground",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-primary-foreground dark:border-t-dark-primary-foreground"
     },
     "secondary": {
       "base": "bg-secondary dark:bg-dark-secondary focus-visible:outline-secondary dark:focus-visible:outline-dark-secondary",
       "label": "text-secondary-foreground dark:text-darksecondary-foreground",
       "icon": "!text-secondary-foreground dark:!text-darksecondary-foreground",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground"
     },
     "info": {
       "base": "bg-info dark:bg-dark-info focus-visible:outline-info dark:focus-visible:outline-dark-info",
       "label": "text-info-foreground dark:text-darkinfo-foreground",
       "icon": "!text-info-foreground dark:!text-darkinfo-foreground",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-info-foreground dark:border-t-dark-info-foreground"
     },
     "success": {
       "base": "bg-success dark:bg-dark-success focus-visible:outline-success dark:focus-visible:outline-dark-success",
       "label": "text-success-foreground dark:text-darksuccess-foreground",
       "icon": "!text-success-foreground dark:!text-darksuccess-foreground",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-success-foreground dark:border-t-dark-success-foreground"
     },
     "warning": {
       "base": "bg-warning dark:bg-dark-warning focus-visible:outline-warning dark:focus-visible:outline-dark-warning",
       "label": "text-warning-foreground dark:text-darkwarning-foreground",
       "icon": "!text-warning-foreground dark:!text-darkwarning-foreground",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-warning-foreground dark:border-t-dark-warning-foreground"
     },
     "error": {
       "base": "bg-error dark:bg-dark-error focus-visible:outline-error dark:focus-visible:outline-dark-error",
       "label": "text-error-foreground dark:text-darkerror-foreground",
       "icon": "!text-error-foreground dark:!text-darkerror-foreground",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-error-foreground dark:border-t-dark-error-foreground"
     },
     "surface": {
       "base": "bg-surface dark:bg-dark-surface focus-visible:outline-surface dark:focus-visible:outline-dark-surface",
       "label": "text-surface-foreground dark:text-darksurface-foreground",
       "icon": "!text-surface-foreground dark:!text-darksurface-foreground",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-surface-foreground dark:border-t-dark-surface-foreground"
     }
   },
   "buttonOutline": {
@@ -49,43 +56,50 @@ export const VariantsGeneratedColors = {
       "base": "p-[5px] border-2 border-primary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-primary",
       "label": "text-primary dark:text-darkprimary",
       "icon": "!text-primary dark:!text-darkprimary",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-primary dark:border-t-dark-primary"
     },
     "secondary": {
       "base": "p-[5px] border-2 border-secondary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-secondary",
       "label": "text-secondary dark:text-darksecondary",
       "icon": "!text-secondary dark:!text-darksecondary",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-secondary dark:border-t-dark-secondary"
     },
     "info": {
       "base": "p-[5px] border-2 border-info bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-info",
       "label": "text-info dark:text-darkinfo",
       "icon": "!text-info dark:!text-darkinfo",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-info dark:border-t-dark-info"
     },
     "success": {
       "base": "p-[5px] border-2 border-success bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-success",
       "label": "text-success dark:text-darksuccess",
       "icon": "!text-success dark:!text-darksuccess",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-success dark:border-t-dark-success"
     },
     "warning": {
       "base": "p-[5px] border-2 border-warning bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-warning",
       "label": "text-warning dark:text-darkwarning",
       "icon": "!text-warning dark:!text-darkwarning",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-warning dark:border-t-dark-warning"
     },
     "error": {
       "base": "p-[5px] border-2 border-error bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-error",
       "label": "text-error dark:text-darkerror",
       "icon": "!text-error dark:!text-darkerror",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-error dark:border-t-dark-error"
     },
     "surface": {
       "base": "p-[5px] border-2 border-surface bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-surface",
       "label": "text-surface dark:text-darksurface",
       "icon": "!text-surface dark:!text-darksurface",
-      "ripple": ""
+      "ripple": "",
+      "activityIndicator": "border-t-surface dark:border-t-dark-surface"
     }
   },
   "icon": {

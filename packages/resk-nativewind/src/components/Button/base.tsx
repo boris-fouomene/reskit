@@ -68,7 +68,7 @@ export function ButtonBase({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("btn relative overflow-hidden button", !disabled && "hover:opacity-90 active:scale-[0.97]", allVariants({ disabled }), bVariant?.base?.(), className)}
+            className={cn("btn relative overflow-hidden button select-text", !disabled && "hover:opacity-90 active:scale-[0.97]", allVariants({ disabled }), bVariant?.base?.(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}
@@ -82,7 +82,7 @@ export function ButtonBase({
                     {isLoading ? (
                         <ActivityIndicator
                             size={iconProps?.size || "small"}
-                            className={cn("button-indicator mx-[5px]", activityIndicatorClassName)}
+                            className={cn("button-indicator mx-[5px]", bVariant?.activityIndicator?.(), activityIndicatorClassName)}
                             testID={testID + "-button-activity-indicator"}
                         />
                     ) : null}

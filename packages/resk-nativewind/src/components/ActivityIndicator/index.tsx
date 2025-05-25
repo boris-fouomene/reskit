@@ -30,7 +30,7 @@ export function ActivityIndicator({ size, style, variant, testID, id, color, cla
         }
         style = [{ width: size, height: size, borderWidth }, style]
     } else {
-        clx.push(size === "large" ? "h-16 w-16 border-8" : "h-[20px] w-[20px] border-4")
+        clx.push(size === "large" ? "h-16 w-16 border-8" : "h-[20px] w-[20px] border-[3px]")
     }
     if (isNonNullString(color) && color.trim()) {
         style = [{ borderTopColor: color }, style];

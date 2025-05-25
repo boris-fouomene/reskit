@@ -1,4 +1,4 @@
-import { Text, Div, Heading, Table, H2 } from '@resk/nativewind/html';
+import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, ButtonBase, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
 type ScreenContentProps = {
@@ -105,6 +105,12 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ color: "error" }} />
           <Button label="Button example4 - loading" loading variant={{ color: "success" }} className="px-[10px] py-[5px] rounded-full" />
         </HStack>
+      </Div>
+      <Div className="p-5">
+        <Heading level={2}>Details</Heading>
+        <Details summary={<Text>An example of details</Text>}>
+          <Text>Details content</Text>
+        </Details>
       </Div>
       <Div className="p-5">
         <H2>Table Example</H2>

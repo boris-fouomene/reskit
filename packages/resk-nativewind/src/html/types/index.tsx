@@ -1,7 +1,7 @@
-import { INativewindBaseProps } from "@src/types";
+import { IClassName, INativewindBaseProps } from "@src/types";
 import { IVariantPropsHeading } from "@variants/heading";
 import { IVariantPropsText } from "@variants/text";
-import { JSX, Ref } from "react";
+import { JSX, ReactElement, Ref } from "react";
 import { ImageProps, ImageStyle, PressableProps, TextProps, TextStyle, View, ViewProps, ViewStyle } from "react-native";
 
 export interface IHtmlDivProps extends INativewindBaseProps, INativeAccessibilityProps {

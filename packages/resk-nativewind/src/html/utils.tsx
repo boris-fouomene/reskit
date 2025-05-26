@@ -208,33 +208,12 @@ function mapLiveRegionToDOM(liveRegion: string): string {
 function mapRoleToDOM(role: string): string {
     switch (role) {
         case 'adjustable': return 'slider';
-        case 'alert': return 'alert';
-        case 'button': return 'button';
-        case 'checkbox': return 'checkbox';
-        case 'combobox': return 'combobox';
         case 'header': return 'heading';
         case 'image': return 'img';
         case 'imagebutton': return 'button';
         case 'keyboardkey': return 'key';
-        case 'link': return 'link';
-        case 'menu': return 'menu';
-        case 'menubar': return 'menubar';
-        case 'menuitem': return 'menuitem';
-        case 'none': return 'none';
-        case 'progressbar': return 'progressbar';
-        case 'radio': return 'radio';
-        case 'radiogroup': return 'radiogroup';
-        case 'scrollbar': return 'scrollbar';
-        case 'search': return 'search';
-        case 'spinbutton': return 'spinbutton';
-        case 'summary': return 'summary';
-        case 'switch': return 'switch';
-        case 'tab': return 'tab';
-        case 'tablist': return 'tablist';
         case 'text': return 'textbox';
-        case 'timer': return 'timer';
         case 'togglebutton': return 'button';
-        case 'toolbar': return 'toolbar';
         default: return role; // Return as-is for custom or unknown roles
     }
 }

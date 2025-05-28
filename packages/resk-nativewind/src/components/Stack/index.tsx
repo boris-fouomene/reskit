@@ -19,7 +19,7 @@ import { cn } from "@utils/cn";
  * @returns {ReactElement} A JSX element representing the HStack component.
  */
 export function HStack(props: IHtmlDivProps) {
-    return <Div testID="resk-hstack" {...props} className={cn("flex flex-wrap flex-row items-center justify-start", props.className)} />
+    return <Div testID="hstack" {...props} className={cn("flex flex-wrap flex-row items-center justify-start", props.className)} />
 };
 
 /*************  ✨ Windsurf Command ⭐  *************/

@@ -1,4 +1,3 @@
-const flattenColorPalette = require('tailwindcss/lib/util/flattenColorPalette').default
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./App.{js,ts,tsx}",
@@ -136,53 +135,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    /**
-    * Creates a Tailwind CSS plugin that converts theme colors to CSS variables
-    * 
-    * This plugin automatically extracts all colors defined in your Tailwind theme
-    * and converts them to CSS variables available at the `:root` level. It supports
-    * nested color objects and automatically transforms color paths to kebab-case.
-    * 
-    * @param {CssVariablePluginOptions} [options] - Configuration options for the plugin
-    * @returns {Plugin} - A Tailwind CSS plugin
-    * 
-    * @example
-    * ```js
-    * // tailwind.config.js
-    * module.exports = {
-    *   // Your Tailwind configuration...
-    *   plugins: [
-    *     require('./tailwind-css-variable-plugin')({
-    *       prefix: 'color',
-    *       includeDefaultColors: true,
-    *       excludeColors: ['transparent', 'current']
-    *     })
-    *   ]
-    * }
-    * ```
-    */
-    function ({ addBase, theme }) {
-      const colors = flattenColorPalette(theme('colors'))
-      const darkColors = {};
-      const cssVariables = Object.fromEntries(
-        Object.entries(colors).map(([key, value]) => {
-          const keyValue = `--color-${key.replace(/[.]/g, '-').toLowerCase()}`;
-          if (key.startsWith("dark-")) {
-            darkColors[keyValue] = value;
-          }
-          return [
-            keyValue,
-            value
-          ]
-        })
-      )
-      addBase({
-        ':root': cssVariables,
-        '@media (prefers-color-scheme: dark)': {
-          ':root': darkColors
-        },
-      })
-    }
-  ],
+  plugins: [],
 }

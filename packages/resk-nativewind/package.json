@@ -24,7 +24,8 @@
     "bin",
     "readme.md",
     "package.json",
-    "html.js"
+    "html.js",
+    "theme-to-css-vars"
   ],
   "scripts": {
     "build": "npm run generate-color-variants && tsc && npx tsc-alias -p tsconfig.json && npm run build:dts",

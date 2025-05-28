@@ -5,8 +5,9 @@ import { cn } from "@utils/cn";
 import { IClassName } from "@src/types";
 import { isNumber } from "@resk/core/utils";
 import { StyleSheet } from "react-native";
+import variantText from "@variants/text";
 
-export const Text = withAsChild(function Text({ numberOfLines, allowFontScaling, style: cStyle, ellipsizeMode, lineBreakMode, maxFontSizeMultiplier, minimumFontScale, ...props }: IHtmlTextProps) {
+export const Text = withAsChild(function Text({ numberOfLines, variant, allowFontScaling, style: cStyle, ellipsizeMode, lineBreakMode, maxFontSizeMultiplier, minimumFontScale, ...props }: IHtmlTextProps) {
     const classes: IClassName = [];
     const style = {} as any;
     if (ellipsizeMode || lineBreakMode) {
@@ -32,5 +33,5 @@ export const Text = withAsChild(function Text({ numberOfLines, allowFontScaling,
         style.MozTextSizeAdjust = 'none';
         style.msTextSizeAdjust = 'none';
     }
-    return <Div {...props} style={StyleSheet.flatten([style, cStyle])} className={cn(classes, props.className)} />;
+    return <Div {...props} style={StyleSheet.flatten([style, cStyle])} className={cn(classes, variantText(variant), props.className)} />;
 }, "Html.Text");

@@ -1,61 +1,23 @@
 "use client";
-import { useState, useImperativeHandle, useEffect, useRef, Fragment } from 'react';
+import { useImperativeHandle, useEffect, useId } from 'react';
 //import { FormsManager } from '@components/Form/FormsManager';
-import { Animated, GestureResponderEvent } from 'react-native';
-import iconVariants from "@variants/icon";
-import { ActivityIndicator } from '@components/ActivityIndicator';
-import { Surface } from '@components/Surface';
-import { Text } from '@html/Text';
-import { IButtonProps, IButtonContext } from './types';
-import { defaultStr, isNonNullString, isObj, uniqid } from '@resk/core/utils';
-import Auth from "@resk/core/auth";
-import isValidElement from '@utils/isValidElement';
-import { Divider } from '@components/Divider';
+import { GestureResponderEvent } from 'react-native';
+import { ButtonBase } from './base';
+import { IButtonContext, IButtonProps } from './types';
+import { defaultStr } from '@resk/core/utils';
 import { cn } from '@utils/cn';
-import { Icon } from '@components/Icon';
-import { Div } from '@html/Div';
-import buttonVariant from "@variants/button";
-import { Platform, StyleSheet } from 'react-native';
 import { useGetRippleContent } from './ripple';
+import Auth from '@resk/core/auth';
+import useStateCallback from '@utils/stateCallback';
+import buttonVariants from "@variants/button";
 
 
-/**
- * A button component that can be used to handle user interactions. It can be used to wrap any type of content
- * and provides a way to customize the appearance and behavior of the button. The component also supports
- * accessibility features and can be used with React Native's built-in accessibility features.
- *
- * @typedef {{}} IButtonProps
- * @typedef {{}} IButtonContext
- * @typedef {import('@theme/types').ITheme} ITheme
- *
- * @param {IButtonProps} props - The properties for the button component.
- * @returns {JSX.Element} The button component.
- */
 export function Button<IButtonExtendContext = any>({
     disabled: customDisabled,
-    isLoading: customIsLoading,
-    icon: iconProp,
+    loading: customIsLoading,
     rippleColor,
-    children,
-    accessibilityLabel,
-    accessibilityHint,
-    accessibilityRole = 'button',
-    testID,
-    accessible,
-    labelClassName,
-    contentClassName,
-    leftContainerClassName,
-    rightContainerClassName,
-    iconPosition,
-    iconProps,
-    containerClassName,
-    label,
     disableRipple,
     id,
-    left,
-    right,
-    dividerClassName,
-    divider: customDivider,
     context: extendContext,
     onPress,
     submitFormOnPress,
@@ -63,38 +25,27 @@ export function Button<IButtonExtendContext = any>({
     resourceName,
     perm,
     ref,
-    className,
     android_ripple,
-    activityIndicatorClassName,
-    variant,
-    rippleOpacity,
-    rippleDuration,
     rippleClassName,
+    testID,
     ...rest
 }: IButtonProps<IButtonExtendContext>) {
+    const [isLoading, _setIsLoading] = useStateCallback(typeof customIsLoading == "boolean" ? customIsLoading : false);
+    const [isDisabled, setIsDisabled] = useStateCallback(typeof customDisabled == "boolean" ? customDisabled : false);
+    const uId = useId();
+    const buttonId = defaultStr(id, uId);
     testID = defaultStr(testID, "resk-button");
-    const [isLoading, _setIsLoading] = useState(typeof customIsLoading == "boolean" ? customIsLoading : false);
-    const [isDisabled, setIsDisabled] = useState(typeof customDisabled == "boolean" ? customDisabled : false);
-    const idRef = useRef<string>(defaultStr(id, uniqid("button-id-")));
-    if (isNonNullString(id) && id !== idRef.current) {
-        idRef.current = id;
-    }
-    const buttonId = idRef.current;
     const disabled: boolean = isDisabled || isLoading;
-    const divider = customDivider === true;
-    const bVariant = buttonVariant(variant);
-    const disable = () => {
-        setIsDisabled(true);
-    },
-        enable = () => {
-            setIsDisabled(false);
+    const disable = (cb?: () => void) => { setIsDisabled(true, cb); },
+        enable = (cb?: () => void) => {
+            setIsDisabled(false, cb);
         },
         isEnabled = () => {
             return !!!isDisabled;
         },
-        setIsLoading = (customIsLoading: boolean) => {
+        setIsLoading = (customIsLoading: boolean, cb?: (isLoading?: boolean) => void) => {
             if (typeof customIsLoading === "boolean") {
-                _setIsLoading(customIsLoading);
+                _setIsLoading(customIsLoading, cb);
             }
         };
     useEffect(() => {
@@ -111,30 +62,12 @@ export function Button<IButtonExtendContext = any>({
         enable,
         disable,
         isEnabled,
-        get id() { return idRef.current },
+        get id() { return buttonId },
         setIsLoading,
         ...Object.assign({}, extendContext)
     }
     // Expose methods using useImperativeHandle
     useImperativeHandle(ref, () => (context as any));
-
-    const isElevationEntitled = !disabled;
-    const initialElevation = 1;
-
-    const { current: elevation } = useRef<Animated.Value>(
-        new Animated.Value(isElevationEntitled ? initialElevation : 0)
-    );
-
-    useEffect(() => {
-        elevation.setValue(isElevationEntitled ? initialElevation : 0);
-    }, [isElevationEntitled, elevation, initialElevation]);
-
-    const iconSize = 18;
-    iconProps = Object.assign({}, iconProps);
-    iconProps.className = cn(bVariant?.icon?.(), iconProps?.variant && iconVariants(iconProps.variant), iconProps.className);
-    const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps, variant: undefined });
-    const iconContent = icon && isLoading !== true ? icon : null;
-
     useEffect(() => {
         /*  if (isNonNullString(formName)) {
              FormsManager.mountAction(context, formName);
@@ -142,87 +75,51 @@ export function Button<IButtonExtendContext = any>({
          return () => {
              FormsManager.unmountAction(context.id, formName);
          }; */
-    }, [formName, idRef.current, context.id]);
-    const hasRightContent = isValidElement(right) && !!right;
-    const rowClassName = "flex flex-row items-center self-center justify-center";
+    }, [formName, buttonId, context.id]);
     const aRipple = Object.assign({}, android_ripple);
-    const isRippleDisabled = disableRipple || disabled || Platform.OS === 'android';
+    const isRippleDisabled = disableRipple || disabled;
     const rProps = isRippleDisabled ? {} : { android_ripple: { color: rippleColor || undefined, ...aRipple } };
-    rippleClassName = cn(rippleClassName, bVariant?.ripple?.());
+    rippleClassName = cn(rest?.variant && buttonVariants(rest.variant)?.ripple?.(), rippleClassName);
     const { rippleContent, startRipple } = useGetRippleContent({
-        rippleColor: defaultStr(rProps?.android_ripple?.color) || undefined,
-        rippleOpacity, rippleDuration,
+        rippleColor,
         disabled,
         testID,
         disableRipple: !!isRippleDisabled,
         rippleClassName,
     });
     if (perm !== undefined && !Auth.isAllowed(perm)) return null;
-    return (<Fragment>
-        <Surface
-            role="none"
-            {...rest}
-            {...rProps}
-            id={buttonId}
-            testID={`${testID}`}
-            ref={ref}
-            className={cn("relative overflow-hidden", bVariant?.base?.(), variant?.color, className)}
-            onPress={(event: GestureResponderEvent) => {
-                if (typeof startRipple === "function") {
-                    startRipple(event);
-                }
-                const form = null;//formName ? FormsManager.getForm(formName) : null;
-                const hasForm = false;//form && (form as any).isValid();
-                const context2: IButtonContext<IButtonExtendContext> = context as IButtonContext<IButtonExtendContext>;
-                if (hasForm && typeof (form as any).getData == "function") {
-                    (context2 as any).formData = (form as any).getData();
-                }
-                const r = typeof onPress === 'function' ? onPress(event, context2) : true;
-                if (r === false || submitFormOnPress === false) return;
-                if (form && typeof (form as any)?.submit === 'function') {
-                    (form as any).submit();
-                }
-                return r
-            }}
-            accessibilityLabel={accessibilityLabel}
-            accessibilityHint={accessibilityHint}
-            accessibilityRole={accessibilityRole}
-            accessibilityState={{ disabled }}
-            accessible={accessible}
-            disabled={disabled}
-        >
-            <Div id={`${buttonId}-content`} testID={testID + "-button-content"} className={cn("button-contain flex flex-row items-center self-center", bVariant?.content?.(), contentClassName)}>
-                <Div className={cn("button-left-container", rowClassName, bVariant?.leftContainer?.(), leftContainerClassName)} testID={testID + "-button-left-container"}>
-                    {iconPosition != "right" ? iconContent : null}
-                    {isLoading ? (
-                        <ActivityIndicator
-                            size={iconProps?.size || "small"}
-                            className={cn(activityIndicatorClassName)}
-                            testID={testID + "-button-activity-indicator"}
-                        />
-                    ) : null}
-                    {left}
-                    <Text
-                        id={`${buttonId}-label`}
-                        selectable={false}
-                        numberOfLines={1}
-                        testID={`${testID}-button-label`}
-                        className={cn(bVariant?.label?.(), labelClassName)}
-                    >
-                        {isValidElement(children, true) && children || label}
-                    </Text>
-                </Div>
-                {(hasRightContent) ? <Div testID={testID + "-right-content-wrapper"} id={`${buttonId}-right-content-wrapper`} className={cn("button-right-container", rowClassName, bVariant?.rightContainer?.(), rightContainerClassName)}>
-                    {iconPosition == "right" ? iconContent : null}
-                    {right}
-                </Div> : null}
-            </Div>
-            {rippleContent}
-        </Surface>
-        {divider ? <Divider id={buttonId + "-divider"} testID={testID + "-button-divider"} className={cn("button-divider", dividerClassName)} /> : null}
-    </Fragment>);
+    return (<ButtonBase
+        {...rest}
+        {...rProps}
+        disableRipple={isRippleDisabled}
+        disabled={disabled}
+        loading={isLoading}
+        id={buttonId}
+        testID={`${testID}`}
+        ref={ref}
+        onPress={(event: GestureResponderEvent) => {
+            if (typeof startRipple === "function") {
+                startRipple(event);
+            }
+            const form = null;//formName ? FormsManager.getForm(formName) : null;
+            const hasForm = false;//form && (form as any).isValid();
+            const context2: IButtonContext<IButtonExtendContext> = context as IButtonContext<IButtonExtendContext>;
+            if (hasForm && typeof (form as any).getData == "function") {
+                (context2 as any).formData = (form as any).getData();
+            }
+            const r = typeof onPress === 'function' ? onPress(event, context2) : true;
+            if (r === false || submitFormOnPress === false) return;
+            if (form && typeof (form as any)?.submit === 'function') {
+                (form as any).submit();
+            }
+            return r
+        }}
+        rippleContent={rippleContent}
+    />);
 };
 
 Button.displayName = "Button";
+Button.Base = ButtonBase;
 
+export * from "./base";
 export * from "./types";

@@ -1,7 +1,7 @@
 "use client";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useId, useMemo, useRef } from "react";
 import { cn, getTextContent, isValidElement, useMergeRefs } from '@utils';
 import { getMaxZindex, isDOMElement, uniqid, defaultStr } from "@resk/core/utils";
 import Platform from "@resk/core/platform";
@@ -19,8 +19,8 @@ export * from "./types";
 export function Tooltip<AsProps extends ITouchableProps = PressableProps>({ children, className, title, tooltip, as, disabled, testID, ref, id, ...rest }: ITooltipProps<AsProps>) {
     testID = defaultStr(testID, "resk-tooltip");
     testID = defaultStr(testID, "resk-tooltip");
-    const instanceId = defaultStr(id, uniqid("tippy-instance-id"));
-    const instanceIdRef = useRef(instanceId);
+    const uId = useId();
+    const instanceIdRef = useRef(defaultStr(id, uId));
     const buttonRef = useRef(null);
     const innerRef = useMergeRefs(ref, buttonRef);
     const selector = isDOMElement(buttonRef.current) ? buttonRef.current : "#" + instanceIdRef.current;

@@ -15,12 +15,11 @@ import { isNonNullString } from "@resk/core/utils";
  * 
  * @returns {{ rippleContent?: ReactElement | null; startRipple?: (event: GestureResponderEvent) => void }} - The content of the ripple effect and the function to start the animation
  */
-export function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleClassName, rippleOpacity, rippleDuration }: Partial<IButtonProps>): {
+export function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleClassName }: Partial<IButtonProps>): {
     rippleContent?: ReactElement | null;
     startRipple?: (event: GestureResponderEvent) => void;
 } {
-    rippleDuration = typeof rippleDuration == "number" && rippleDuration > 0 ? rippleDuration : 500;
-    rippleOpacity = typeof rippleOpacity == "number" && rippleOpacity > 0 && rippleOpacity <= 1 ? rippleOpacity : 0.7;
+    const rippleDuration = 500, rippleOpacity = 0.7;
     const isRippleDisabled = !!(disabled || disableRipple);
     const timerRef = useRef<any>(null);
     useEffect(() => {
@@ -83,8 +82,8 @@ export function useGetRippleContent({ testID, disableRipple, disabled, rippleCol
         startRipple: (event: GestureResponderEvent) => {
             const { currentTarget, target } = event;
             (currentTarget || target)?.measure((x, y, width, height, pageX, pageY) => {
-                const touchX = event.nativeEvent.pageX - pageX;
-                const touchY = event.nativeEvent.pageY - pageY;
+                const touchX = Math.min(x, Math.max(0, event.nativeEvent.pageX - pageX));
+                const touchY = Math.min(y, Math.max(0, event.nativeEvent.pageY - pageY));
                 const size = Math.max(width, height) * 2;
                 const opacity = new Animated.Value(rippleOpacity as number);
                 const scale = new Animated.Value(0);

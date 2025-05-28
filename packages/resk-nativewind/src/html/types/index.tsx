@@ -1,6 +1,7 @@
-import { INativewindBaseProps } from "@src/types";
+import { IClassName, INativewindBaseProps } from "@src/types";
 import { IVariantPropsHeading } from "@variants/heading";
-import { JSX, Ref } from "react";
+import { IVariantPropsText } from "@variants/text";
+import { JSX, ReactElement, Ref } from "react";
 import { ImageProps, ImageStyle, PressableProps, TextProps, TextStyle, View, ViewProps, ViewStyle } from "react-native";
 
 export interface IHtmlDivProps extends INativewindBaseProps, INativeAccessibilityProps {
@@ -50,6 +51,7 @@ export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "children"
     maxFontSizeMultiplier?: TextProps["maxFontSizeMultiplier"];
     /**@platform native */
     testID?: TextProps["testID"];
+    variant?: IVariantPropsText;
 }
 /**
  * Converts React Native accessibility props to corresponding DOM accessibility props.
@@ -108,11 +110,8 @@ export interface IHtmlQuoteProps extends IHtmlTextProps {
     cite?: string
 }
 
-export interface IHtmlBlockQuoteProps extends IHtmlDivProps {
+export interface IHtmlBlockQuoteProps extends IHtmlTextProps {
     cite?: string
-}
-export interface IHtmlTimeProps extends IHtmlTextProps {
-    dateTime?: string
 }
 
 export interface IHtmlAprops extends Omit<IHtmlTextProps, "asHtmlTag"> {
@@ -126,6 +125,14 @@ export interface IHtmlAprops extends Omit<IHtmlTextProps, "asHtmlTag"> {
     download?: boolean | string;
 }
 
-export interface IHtmlHeadingProps extends Omit<IHtmlTextProps, "asHtmlTag"> {
+export interface IHtmlHeadingProps extends Omit<IHtmlTextProps, "asHtmlTag" | "variant"> {
     variant?: IVariantPropsHeading;
+}
+
+
+export interface IHtmlTableTextProps extends IHtmlTextProps {
+    /** @platform web */
+    colSpan?: number | string;
+    /** @platform web */
+    rowSpan?: number | string;
 }

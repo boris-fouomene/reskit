@@ -32,7 +32,7 @@ export function Heading({ level, variant, className, ...props }: IHtmlHeadingPro
     level = isNumber(level) && [1, 2, 3, 4, 5, 6].includes(level) ? level : 1;
     return <Text role={"heading"} className={cn(heading({ level: `h${level}` }), heading(variant), className)} accessibilityRole="header" {...props} asHtmlTag={`h${level}`} />
 }
-
+Heading.displayName = "Html.Heading";
 /**
  * A shortcut for `<Heading level={1}>`.
  * @example
@@ -41,6 +41,7 @@ export function Heading({ level, variant, className, ...props }: IHtmlHeadingPro
 export function H1(props: IHtmlHeadingProps) {
     return <Heading level={1} {...props} />
 }
+H1.displayName = "Html.H1";
 /**
  * A shortcut for `<Heading level={2}>`.
  * @example
@@ -49,6 +50,7 @@ export function H1(props: IHtmlHeadingProps) {
 export function H2(props: IHtmlHeadingProps) {
     return <Heading  {...props} level={2} />
 }
+H2.displayName = "Html.H2";
 /**
  * A shortcut for `<Heading level={3}>`.
  * @example
@@ -57,6 +59,7 @@ export function H2(props: IHtmlHeadingProps) {
 export function H3(props: IHtmlHeadingProps) {
     return <Heading {...props} level={3} />
 }
+H3.displayName = "Html.H3";
 /**
  * A shortcut for `<Heading level={4}>`.
  * @example
@@ -65,6 +68,7 @@ export function H3(props: IHtmlHeadingProps) {
 export function H4(props: IHtmlHeadingProps) {
     return <Heading  {...props} level={4} />
 }
+H4.displayName = "Html.H4";
 /**
  * A shortcut for `<Heading level={5}>`.
  * @example
@@ -73,6 +77,7 @@ export function H4(props: IHtmlHeadingProps) {
 export function H5(props: IHtmlHeadingProps) {
     return <Heading {...props} level={5} />
 }
+H5.displayName = "Html.H5";
 /**
  * A shortcut for `<Heading level={6}>`.
  * @example
@@ -81,4 +86,5 @@ export function H5(props: IHtmlHeadingProps) {
 export function H6(props: IHtmlHeadingProps) {
     return <Heading {...props} level={6} />
 }
+H6.displayName = "Html.H6";
 type IHHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;

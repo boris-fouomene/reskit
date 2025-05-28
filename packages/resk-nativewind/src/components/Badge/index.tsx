@@ -6,7 +6,7 @@ import { IHtmlTextProps } from '@html/types';
 import { IVariantPropsBadge } from '@variants/badge';
 
 
-export interface IBadgeProps extends IHtmlTextProps {
+export interface IBadgeProps extends Omit<IHtmlTextProps, "variant"> {
     /**
      * Whether the badge is visible
      */

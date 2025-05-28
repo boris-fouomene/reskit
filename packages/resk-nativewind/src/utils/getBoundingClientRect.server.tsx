@@ -1,1 +1,0 @@
-export function getBoundingClientRect(node?: any) { };

@@ -10,12 +10,12 @@ import { cn } from '@utils/cn';
 import { Icon } from '@components/Icon';
 import { Div } from '@html/Div';
 import buttonVariant from "@variants/button";
-import { IButtonBaseProps } from "./types";
+import { IButtonLeftOrRightFuncOptions, IButtonBaseProps } from "./types";
 import { Fragment } from "react";
 import allVariants from "@variants/all";
 
 
-export function ButtonBase<IButtonExtendContext extends Record<string, any> = any>({
+export function ButtonBase<IButtonExtendContext = unknown>({
     disabled: customDisabled,
     loading: customIsLoading,
     icon: iconProp,
@@ -59,8 +59,14 @@ export function ButtonBase<IButtonExtendContext extends Record<string, any> = an
     const disabledClass = disabled && "pointer-events-none";
     iconProps.className = cn("button-icon", computedVariant.icon?.(), iconProps?.variant && iconVariants(iconProps.variant), disabledClass, iconProps.className);
     const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps, variant: undefined });
-    const iconContent = icon && isLoading !== true ? icon : null;
-    const buttonContext = Object.assign({}, context, { loading: isLoading, variant, computedVariant });
+    const iconContent = isLoading ? (
+        <ActivityIndicator
+            size={iconProps?.size || "small"}
+            className={cn("button-indicator mx-[5px]", computedVariant.activityIndicator?.(), activityIndicatorClassName)}
+            testID={testID + "-button-activity-indicator"}
+        />
+    ) : icon || null;
+    const buttonContext = Object.assign({}, context, { loading: isLoading, computedVariant }) as IButtonLeftOrRightFuncOptions<IButtonExtendContext>;
     const leftContent = typeof left === "function" ? left(buttonContext) : left;
     const rightContent = typeof right === "function" ? right(buttonContext) : right;
     const hasRightContent = isValidElement(right) && !!right;
@@ -82,15 +88,8 @@ export function ButtonBase<IButtonExtendContext extends Record<string, any> = an
         >
             <Div id={`${buttonId}-content`} testID={testID + "-button-content"} className={cn("button-content flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
                 <Div className={cn("button-left-container", rowClassName, computedVariant.leftContainer?.(), leftContainerClassName)} testID={testID + "-button-left-container"}>
-                    {iconPosition != "right" ? iconContent : null}
-                    {isLoading ? (
-                        <ActivityIndicator
-                            size={iconProps?.size || "small"}
-                            className={cn("button-indicator mx-[5px]", computedVariant.activityIndicator?.(), activityIndicatorClassName)}
-                            testID={testID + "-button-activity-indicator"}
-                        />
-                    ) : null}
                     {leftContent}
+                    {iconPosition != "right" ? iconContent : null}
                     <Text
                         id={`${buttonId}-label`}
                         selectable={false}

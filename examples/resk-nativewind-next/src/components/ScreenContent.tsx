@@ -1,6 +1,6 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
-import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, ButtonBase, HStack, Tooltip, Switch, Checkbox } from "@resk/nativewind";
+import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, ButtonBase, HStack, Tooltip, Switch, Checkbox, variants } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
@@ -94,7 +94,9 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10 gap-y-5">
-          <Button label="Button example1" icon={"camera"} variant={{ color: "primary", padding: "5px" }} />
+          <Button label="Button example1 with left icon" icon={"camera"} variant={{ color: "primary", padding: "5px" }}
+            left={<Icon.Font name="ph" size={30} className={variants.button({ color: "primary" }).icon()} />}
+          />
           <Button label="Button example2" icon="radio" variant={{ color: "secondary", padding: "10px" }} />
           <Button loading label="Outline Button 1" variant={{ outline: "primary" }} className="p-[2px] rounded-lg" />
           <Button icon={"camera"} label="Outline Button 2" variant={{ outline: "secondary" }} />

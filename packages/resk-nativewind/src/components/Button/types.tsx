@@ -7,13 +7,13 @@ import { ReactElement, ReactNode, Ref } from "react";
 import { IDict, IResourceName } from '@resk/core/types';
 import buttonVariant, { IVariantPropsButton } from "@variants/button";
 
-export interface IButtonBaseLeftOrRightOptions<IButtonExtendContext extends Record<string, any> = any> {
-    variant?: IVariantPropsButton;
+export interface IButtonLeftOrRightFuncOptions<IButtonExtendContext = unknown> {
     context: IButtonExtendContext;
     loading: boolean;
+    disabled: boolean;
     computedVariant: ReturnType<typeof buttonVariant>;
 }
-export interface IButtonBaseProps<IButtonExtendContext extends Record<string, any> = any> extends Omit<ISurfaceProps, "variant"> {
+export interface IButtonBaseProps<IButtonExtendContext = unknown> extends Omit<ISurfaceProps, "variant"> {
     /***
      * The class name for the label
      */
@@ -100,12 +100,12 @@ export interface IButtonBaseProps<IButtonExtendContext extends Record<string, an
     /***
      * The left content of the button
      */
-    left?: ReactNode | ((options: IButtonBaseLeftOrRightOptions<IButtonExtendContext>) => ReactNode);
+    left?: ReactNode | ((options: IButtonLeftOrRightFuncOptions<IButtonExtendContext>) => ReactNode);
 
     /***
      * The right content of the button
      */
-    right?: ReactNode | ((options: IButtonBaseLeftOrRightOptions<IButtonExtendContext>) => ReactNode);
+    right?: ReactNode | ((options: IButtonLeftOrRightFuncOptions<IButtonExtendContext>) => ReactNode);
 
     /**
      * Disables the ripple effect on button press.
@@ -145,7 +145,7 @@ export interface IButtonBaseProps<IButtonExtendContext extends Record<string, an
     context?: IButtonExtendContext;
 }
 
-export interface IButtonProps<IButtonExtendContext extends Record<string, any> = any> extends Omit<IButtonBaseProps<IButtonExtendContext>, "ref" | "onPress"> {
+export interface IButtonProps<IButtonExtendContext = unknown> extends Omit<IButtonBaseProps<IButtonExtendContext>, "ref" | "onPress"> {
 
 
 
@@ -196,102 +196,7 @@ export interface IButtonProps<IButtonExtendContext extends Record<string, any> =
     rippleClassName?: IClassName;
 }
 
-/**
- * @typedef IButtonContext
- * 
- * Represents the context for a button component, providing methods and properties
- * that enable interaction and state management. This context is useful for managing
- * the button's behavior in a consistent manner across different implementations.
- * 
- * @template IButtonExtendContext - A generic type that allows the inclusion of additional properties
- *               specific to the button context implementation. This can be any type, 
- *               and the context will inherit properties from it.
- * 
- * @property {function(): void} enable - Enables the button, allowing it to respond to user interactions.
- * 
- * @example
- * // Example of enabling a button
- * buttonContext.enable(); // The button is now enabled and can be interacted with.
- * 
- * @property {function(): void} disable - Disables the button, preventing it from responding to user interactions.
- * 
- * @example
- * // Example of disabling a button
- * buttonContext.disable(); // The button is now disabled and cannot be interacted with.
- * 
- * @property {function(): boolean} isEnabled - Returns a boolean indicating whether the button is currently enabled.
- * 
- * @example
- * // Example of checking if the button is enabled
- * const enabled = buttonContext.isEnabled(); // Returns true if the button is enabled, false otherwise.
- * 
- * @property {function(): string} getId - Returns the unique identifier of the button. 
- * This can be useful for tracking or logging purposes.
- * 
- * @example
- * // Example of getting the button's unique identifier
- * const buttonId = buttonContext.getId(); // Retrieves the unique ID of the button.
- * 
- * @property {function(boolean): void} setIsLoading - Sets the loading state of the button. 
- * When loading is true, the button will show a loading indicator.
- * 
- * @param {boolean} loading - Sets the loading state of the button. 
- * When true, the button will show a loading indicator; when false, it will return to its normal state.
- * 
- * @example
- * // Example of setting the button to loading state
- * buttonContext.setIsLoading(true); // The button shows a loading indicator.
- * buttonContext.setIsLoading(false); // The button returns to its normal state.
- * 
- * @property {View | null} ref - A reference to the underlying View component that wraps the button. 
- * This can be used for direct manipulation or animations.
- * 
- * @example
- * // Example of using the ref property
- * if (buttonContext.ref) {
- *     // Perform some manipulation or animation on the underlying View component
- *     buttonContext.ref.animate({ opacity: 0.5 }, 300); // Example of animating the button's opacity.
- * }
- * 
- * & IButtonExtendContext - Additional properties specific to the button context implementation.
- * 
- * @example
- * // Example of extending the button context with additional properties
- * interface MyButtonContext extends IButtonContext<{ customData: string }> {
- *     customMethod: () => void; // A custom method specific to MyButtonContext
- * }
- *  * @example
- * // Example usage of IButtonContext in a functional component
- * const MyComponent: React.FC = () => {
- *     const buttonRef = useRef<IButtonContext>(null);
- *     
- *     const handleEnable = () => {
- *         buttonRef.current?.enable();
- *     };
- *     
- *     const handleDisable = () => {
- *         buttonRef.current?.disable();
- *     };
- *     
- *     const handleLoading = () => {
- *         buttonRef.current?.setIsLoading(true);
- *         // Simulate loading process
- *         setTimeout(() => {
- *             buttonRef.current?.setIsLoading(false);
- *         }, 2000);
- *     };
- *     
- *     return (
- *         <View>
- *             <Button ref={buttonRef} label="Submit" />
- *             <Button onPress={handleEnable} label="Enable Button" />
- *             <Button onPress={handleDisable} label="Disable Button" />
- *             <Button onPress={handleLoading} label="Load" />
- *         </View>
- *     );
- * };
- */
-export type IButtonContext<IButtonExtendContext = any> = Readonly<{
+export type IButtonContext<IButtonExtendContext = unknown> = Readonly<{
     /*
         Enables the button, allowing it to respond to user interactions.
     */
@@ -312,12 +217,13 @@ export type IButtonContext<IButtonExtendContext = any> = Readonly<{
     /**
      * Sets the loading state of the button. When loading is true, the button will show a loading indicator.
      * @param isLoading {boolean} - Sets the loading state of the button. When loading is true, the button will show a loading indicator.
+     * @param callback {(newIsLoading: boolean) => void} - Optional callback function to be called when the loading state changes.
      * @returns 
      */
-    setIsLoading: (isLoading: boolean, callback?: (isLoading?: boolean) => void) => void;
+    setIsLoading: (isLoading: boolean, callback?: (newIsLoading: boolean) => void) => void;
 
     /***
      * The data associated with the form if the button is representing a form action.
      */
     formData?: IDict;
-} & IButtonExtendContext>;
+}> & Omit<IButtonLeftOrRightFuncOptions<IButtonExtendContext>, "context">;

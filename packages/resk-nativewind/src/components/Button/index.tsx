@@ -12,7 +12,7 @@ import useStateCallback from '@utils/stateCallback';
 import buttonVariants from "@variants/button";
 
 
-export function Button<IButtonExtendContext = any>({
+export function Button<IButtonExtendContext = unknown>({
     disabled: customDisabled,
     loading: customIsLoading,
     rippleColor,
@@ -43,7 +43,7 @@ export function Button<IButtonExtendContext = any>({
         isEnabled = () => {
             return !!!isDisabled;
         },
-        setIsLoading = (customIsLoading: boolean, cb?: (isLoading?: boolean) => void) => {
+        setIsLoading = (customIsLoading: boolean, cb?: (isLoading: boolean) => void) => {
             if (typeof customIsLoading === "boolean") {
                 _setIsLoading(customIsLoading, cb);
             }
@@ -58,13 +58,16 @@ export function Button<IButtonExtendContext = any>({
             setIsLoading(customIsLoading);
         }
     }, [customIsLoading]);
-    const context = {
+    const context: IButtonContext<IButtonExtendContext> = {
+        ...Object.assign({}, extendContext),
         enable,
         disable,
         isEnabled,
+        loading: isLoading,
+        computedVariant: buttonVariants(rest.variant),
+        disabled,
         get id() { return buttonId },
         setIsLoading,
-        ...Object.assign({}, extendContext)
     }
     // Expose methods using useImperativeHandle
     useImperativeHandle(ref, () => (context as any));
@@ -89,8 +92,9 @@ export function Button<IButtonExtendContext = any>({
     });
     if (perm !== undefined && !Auth.isAllowed(perm)) return null;
     return (<ButtonBase
-        {...rest}
+        {...rest as any}
         {...rProps}
+        context={context}
         disableRipple={isRippleDisabled}
         disabled={disabled}
         loading={isLoading}

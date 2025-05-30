@@ -1,6 +1,4 @@
-"use client";
-import { useEffect, useRef } from "react";
-import BackHandler from "./BackHandler";
+
 
 /**
  * Hook to handle the back button press event on Android.
@@ -12,26 +10,8 @@ import BackHandler from "./BackHandler";
  * @returns {{ addEventListener: () => void, removeEventListener: () => void }} An object with methods to add and remove the event listener.
  */
 export function useBackHandler(handler: () => boolean | null | undefined) {
-    const subscription = useRef<{ remove: () => void }>(null);
-    const addEventListener = () => {
-        (subscription as any).current = BackHandler.addEventListener('hardwareBackPress', handler);
-    }
-    const removeEventListener = () => {
-        if (typeof subscription.current?.remove == "function") {
-            subscription.current.remove();
-        } else {
-            BackHandler.removeEventListener('hardwareBackPress', handler);
-        }
-    };
-    useEffect(() => {
-        addEventListener();
-        return removeEventListener;
-    }, [handler]);
-    useEffect(() => {
-        return removeEventListener;
-    }, []);
     return {
-        addEventListener,
-        removeEventListener
+        addEventListener: () => { },
+        removeEventListener: () => { }
     }
 }

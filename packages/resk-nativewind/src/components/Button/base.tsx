@@ -3,7 +3,7 @@ import iconVariants from "@variants/icon";
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import { Text } from '@html/Text';
-import { defaultStr, uniqid } from '@resk/core/utils';
+import { defaultStr } from '@resk/core/utils';
 import isValidElement from '@utils/isValidElement';
 import { Divider } from '@components/Divider';
 import { cn } from '@utils/cn';
@@ -15,6 +15,35 @@ import { Fragment } from "react";
 import allVariants from "@variants/all";
 
 
+/**
+ * A functional component that renders a basic button with customizable properties.
+ * It supports loading states and can display either an icon or an image icon.
+ *
+ * @param {IButtonBaseProps} props - The properties to configure the ButtonBase.
+ * @param {boolean} [props.disabled=false] - Whether the button is disabled.
+ * @param {boolean} [props.loading=false] - Indicates if a loading spinner should be shown instead of the icon.
+ * @param {string} [props.icon] - The name of the font icon to display.
+ * @param {ReactNode} [props.children] - The content of the button.
+ * @param {string} [props.accessibilityLabel] - The accessibility label for the button.
+ * @param {string} [props.accessibilityHint] - The accessibility hint for the button.
+ * @param {string} [props.testID] - Optional test identifier for the button.
+ * @param {string} [props.id] - Optional id for the button.
+ * @param {boolean} [props.accessible=true] - Whether the button is accessible.
+ * @param {string} [props.labelClassName] - Additional class names for the label.
+ * @param {string} [props.contentClassName] - Additional class names for the content.
+ * @param {string} [props.leftContainerClassName] - Additional class names for the left container.
+ * @param {string} [props.rightContainerClassName] - Additional class names for the right container.
+ * @param {string} [props.iconPosition="left"] - The position of the icon.
+ * @param {object} [props.iconProps] - The properties to configure the icon.
+ * @param {string} [props.containerClassName] - Additional class names for the button container.
+ * @param {string} [props.className] - Additional class names for the button.
+ * @param {React.Ref} [props.ref] - A reference to the button container.
+ * @param {object} [props.context] - Additional context properties to pass to the label and icon.
+ * @param {boolean} [props.disableRipple=false] - Whether to disable the ripple effect.
+ * @param {ReactNode} [props.rippleContent] - The content for the ripple effect.
+ *
+ * @returns {JSX.Element} The rendered ButtonBase component.
+ */
 export function ButtonBase<IButtonExtendContext = unknown>({
     disabled: customDisabled,
     loading: customIsLoading,

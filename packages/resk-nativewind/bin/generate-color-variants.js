@@ -40,12 +40,18 @@ module.exports = (colors, options) => {
                 icon: `!text-${color} dark:!text-dark${color} hover:!text-${color}-foreground btn-hover:!text-${color}-foreground dark:hover:!text-dark-${color}-foreground dark:btn-hover:!text-dark-${color}-foreground active:!text-${color}-foreground dark:active:!text-dark-${color}-foreground`,
                 ripple: ""
              */
+            const groupClassName = {
+                base: `group hover:bg-${color} dark:hover:bg-dark-${color}`,
+                label: `hover:text-${color}-foreground dark:hover:text-dark-${color}-foreground group-hover:text-${color}-foreground dark:group-hover:text-dark-${color}-foreground`,
+                icon: `hover:!text-${color}-foreground dark:hover:!text-dark-${color}-foreground group-hover:!text-${color}-foreground dark:group-hover:!text-dark-${color}-foreground`,
+                activityIndicator: `hover:border-t-${color}-foreground dark:hover:border-t-dark-${color}-foreground group-hover:border-t-${color}-foreground dark:group-hover:border-t-dark-${color}-foreground`,
+            }
             return {
-                base: `p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-${color}`,
-                label: `text-${color} dark:text-dark${color}`,
-                icon: `!text-${color} dark:!text-dark${color}`,
+                base: `${groupClassName.base} p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-${color}`,
+                label: `${groupClassName.label} text-${color} dark:text-dark${color}`,
+                icon: `${groupClassName.icon} !text-${color} dark:!text-dark${color}`,
                 ripple: "",
-                activityIndicator: cn(`border-t-${color} dark:border-t-dark-${color}`),
+                activityIndicator: cn(groupClassName.activityIndicator, `border-t-${color} dark:border-t-dark-${color}`),
             }
         }),
         icon: VariantsColors.buildTextColors(true),

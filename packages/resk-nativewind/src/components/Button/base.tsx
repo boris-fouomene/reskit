@@ -68,7 +68,7 @@ export function ButtonBase({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("btn relative overflow-hidden button select-text", !disabled && "hover:opacity-90 active:scale-[0.97]", allVariants({ disabled }), bVariant?.base?.(), className)}
+            className={cn("group/btn btn relative overflow-hidden button select-text", !disabled && "hover:opacity-90 active:scale-[0.97]", allVariants({ disabled }), bVariant?.base?.(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}

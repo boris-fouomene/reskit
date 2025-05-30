@@ -5,10 +5,15 @@ import { IAuthPerm } from "@resk/core/auth";
 import { IClassName } from "@src/types";
 import { ReactElement, ReactNode, Ref } from "react";
 import { IDict, IResourceName } from '@resk/core/types';
-import { IVariantPropsButton } from "@variants/button";
+import buttonVariant, { IVariantPropsButton } from "@variants/button";
 
-
-export interface IButtonBaseProps extends Omit<ISurfaceProps, "variant"> {
+export interface IButtonBaseLeftOrRightOptions<IButtonExtendContext extends Record<string, any> = any> {
+    variant?: IVariantPropsButton;
+    context: IButtonExtendContext;
+    loading: boolean;
+    computedVariant: ReturnType<typeof buttonVariant>;
+}
+export interface IButtonBaseProps<IButtonExtendContext extends Record<string, any> = any> extends Omit<ISurfaceProps, "variant"> {
     /***
      * The class name for the label
      */
@@ -95,12 +100,12 @@ export interface IButtonBaseProps extends Omit<ISurfaceProps, "variant"> {
     /***
      * The left content of the button
      */
-    left?: ReactNode;
+    left?: ReactNode | ((options: IButtonBaseLeftOrRightOptions<IButtonExtendContext>) => ReactNode);
 
     /***
      * The right content of the button
      */
-    right?: ReactNode;
+    right?: ReactNode | ((options: IButtonBaseLeftOrRightOptions<IButtonExtendContext>) => ReactNode);
 
     /**
      * Disables the ripple effect on button press.
@@ -123,9 +128,6 @@ export interface IButtonBaseProps extends Omit<ISurfaceProps, "variant"> {
     variant?: IVariantPropsButton;
 
     rippleContent?: ReactElement | null;
-}
-
-export interface IButtonProps<IButtonExtendContext = any> extends Omit<IButtonBaseProps, "ref" | "onPress"> {
 
     /** Duration of the ripple effect, in milliseconds
      * Default value is 500 (ms)
@@ -141,6 +143,11 @@ export interface IButtonProps<IButtonExtendContext = any> extends Omit<IButtonBa
      * Optional context for the button component.
      */
     context?: IButtonExtendContext;
+}
+
+export interface IButtonProps<IButtonExtendContext extends Record<string, any> = any> extends Omit<IButtonBaseProps<IButtonExtendContext>, "ref" | "onPress"> {
+
+
 
     onPress?: (event: GestureResponderEvent, context: IButtonContext<IButtonExtendContext>) => any;
 

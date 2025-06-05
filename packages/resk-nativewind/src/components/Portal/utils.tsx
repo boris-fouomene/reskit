@@ -1,3 +1,5 @@
+import { ViewStyle } from "react-native";
+
 export const absoluteClassName = "w-full h-full";
 export const styles = {
     absoluteFill: {
@@ -7,5 +9,5 @@ export const styles = {
         top: 0,
         bottom: 0,
         flex: 1,
-    }
+    } as ViewStyle,
 }

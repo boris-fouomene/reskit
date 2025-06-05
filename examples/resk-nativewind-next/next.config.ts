@@ -16,6 +16,9 @@ export default function (phase: string, { defaultConfig }: { defaultConfig: Next
   const nextConfig: NextConfig = {
     ...defaultConfig,
     reactStrictMode: true,
+    publicRuntimeConfig: {
+      __DEV__: process.env.NODE_ENV === 'development',
+    },
     /* config options here */
     transpilePackages: [
       "expo",

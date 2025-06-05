@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, createContext, useContext, ReactNode } from "react";
+import { useMemo, createContext, useContext, ReactNode, useEffect } from "react";
 import { Animated, Pressable, GestureResponderEvent } from "react-native";
 import { Portal } from "@components/Portal";
 import { useBackHandler } from "@components/BackHandler/hooks";

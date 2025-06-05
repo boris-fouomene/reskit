@@ -1,5 +1,6 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
+import { ModalExample } from './ModalExample';
 import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
@@ -10,6 +11,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   VariantsColors.registerColor("accent", "neutral");
   return (
     <ScrollView style={{ flex: 1 }}>
+      <ModalExample />
       <Div className="p-5">
         <Heading level={2}>Colors Variants</Heading>
         <HStack >

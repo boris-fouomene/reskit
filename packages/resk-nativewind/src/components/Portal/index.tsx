@@ -47,11 +47,11 @@ export function Portal({ children, className, visible, absoluteFill, id, testID 
             createdElementRef.current = element;
         }
         element.id = targetId;
-        element.style.zIndex = String(getMaxZindex());
+        element.style.zIndex = String(Math.max(getMaxZindex(), 1000));
         element.className = cn(absoluteFill && absoluteClassName, className);
         element.setAttribute("data-testid", defaultStr(testID, "portal-" + targetId));
         if (absoluteFill) {
-            element.style.position = "absolute";
+            element.style.position = "fixed";
             element.style.top = "0";
             element.style.left = "0";
             element.style.right = "0";
@@ -71,7 +71,7 @@ export function Portal({ children, className, visible, absoluteFill, id, testID 
             // Remove created element on unmount
             try {
                 if (createdElementRef.current && createdElementRef.current.parentNode) {
-                    createdElementRef.current.parentNode.removeChild(createdElementRef.current);
+                    createdElementRef.current.remove();
                     createdElementRef.current = null;
                 }
             } catch (e) {

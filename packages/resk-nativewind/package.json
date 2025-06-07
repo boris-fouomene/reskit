@@ -58,7 +58,7 @@
     "tailwind-variants": "^1.0.0"
   },
   "dependencies": {
-    "@resk/core": "^1.19.0",
+    "@resk/core": "^1.19.1",
     "clsx": "^2.1.1",
     "commander": "^13.1.0",
     "tailwind-merge": "^3.2.0",

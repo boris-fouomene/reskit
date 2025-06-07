@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, createContext, useContext, ReactNode, useEffect } from "react";
+import { useMemo, createContext, useContext } from "react";
 import { Animated, Pressable, GestureResponderEvent } from "react-native";
 import { Portal } from "@components/Portal";
 import { useBackHandler } from "@components/BackHandler/hooks";
@@ -9,14 +9,15 @@ import { IHtmlDivProps } from "@html/types";
 import { styles as portalStyles, absoluteClassName } from "@components/Portal/utils";
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
-import { EnteringExitingAnimation, IEnteringExitingAnimationProps } from "@components/Animation";
+import allVariants from "@variants/all";
+import { AnimatedEnterExit, IAnimatedEnterExitProps } from "@components/Animation";
 
 export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export const Modal = ({ visible, testID, backdropClassName, className, onAccessibilityEscape, containerClassName, dismissable, onDismiss, ...props }: IModalProps) => {
   const children = useMemo(() => {
     return props.children;
-  }, [props.children]) as ReactNode;
+  }, [props.children]);
   testID = defaultStr(testID, "resk-modal");
 
   const handleDismiss = (e?: GestureResponderEvent | KeyboardEvent): any => {
@@ -33,7 +34,7 @@ export const Modal = ({ visible, testID, backdropClassName, className, onAccessi
     <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"}>
       <Div
         testID={testID + "-modal-backdrop"}
-        className={cn(absoluteClassName, backdropClassName)}
+        className={cn(absoluteClassName, "pointer-events-none", allVariants({ backdrop: true }), backdropClassName)}
         style={portalStyles.absoluteFill}
       />
       <Div
@@ -45,32 +46,27 @@ export const Modal = ({ visible, testID, backdropClassName, className, onAccessi
           if (dismissable === false) return;
           handleDismiss(undefined as any);
         }}
-        className={cn(absoluteClassName, "w-full h-full", containerClassName)}
-        style={portalStyles.absoluteFill}
+        className={cn("w-full h-full", containerClassName)}
         onPress={dismissable === false ? undefined : (e: GestureResponderEvent) => {
           handleDismiss(e);
         }}
       >
-        <EnteringExitingAnimation
+        <AnimatedEnterExit
           {...props}
           testID={testID}
-          className={cn(className, containerClassName)}
-          onPress={(e: GestureResponderEvent) => {
-            typeof e?.stopPropagation == "function" && e.stopPropagation();
-            typeof e?.preventDefault == "function" && e.preventDefault();
-            return false;
-          }}
+          className={cn(className)}
+          visible={visible}
         >
-          <ModalContext.Provider value={{ ...props, isVisible: visible as boolean, isClosed: () => !!!visible, isOpen: () => !!visible, handleDismiss, dismissable: dismissable !== false }}>
+          <ModalContext.Provider value={{ isVisible: visible as boolean, isClosed: () => !!!visible, isOpen: () => !!visible, handleDismiss, dismissable: dismissable !== false }}>
             {children}
           </ModalContext.Provider>
-        </EnteringExitingAnimation>
+        </AnimatedEnterExit>
       </Div>
     </Portal>
   );
 };
 
-export interface IModalProps extends IEnteringExitingAnimationProps {
+export interface IModalProps extends IAnimatedEnterExitProps {
   /**
    * Indicates whether the modal is currently visible.
  * If set to true, the modal will be displayed; otherwise, it will be hidden. */

@@ -1,0 +1,35 @@
+"use client";
+import { ComponentProps, ReactNode } from "react";
+import Animated from "react-native-reanimated";
+import { getEnteringExitingAnimations, IEnteringExitingAnimationsName } from "./utils";
+import { Pressable } from "react-native";
+export function EnteringExitingAnimation({ animationType = "fade", children, enteringCallback, exitingCallback, animationDuration, animationMutator, inAnimationDuration, outAnimationDuration, ...props }: IEnteringExitingAnimationProps) {
+    const opts = getEnteringExitingAnimations({ animationType, animationDuration, inAnimationDuration, outAnimationDuration });
+    if (typeof animationMutator == "function") {
+        animationMutator(opts);
+    }
+    return <AnimatedPressable
+        {...opts}
+        entering={typeof enteringCallback == "function" ? opts.entering.withCallback(enteringCallback) : opts.entering}
+        exiting={typeof exitingCallback == "function" ? opts.exiting.withCallback(exitingCallback) : opts.exiting}
+        {...props}
+        children={children}
+    />
+}
+
+EnteringExitingAnimation.displayName = "EnteringExitingAnimation";
+EnteringExitingAnimation.getAnimations = getEnteringExitingAnimations;
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+AnimatedPressable.displayName = "AnimatedPressable";
+export interface IEnteringExitingAnimationProps extends Omit<ComponentProps<typeof AnimatedPressable>, "children" | "key"> {
+    children?: ReactNode;
+    key?: string | number;
+    animationType?: IEnteringExitingAnimationsName,
+    animationDuration?: number,
+    inAnimationDuration?: number,
+    outAnimationDuration?: number,
+    enteringCallback?: (finished: boolean) => void,
+    exitingCallback?: (finished: boolean) => void,
+    animationMutator?: (options: ReturnType<typeof getEnteringExitingAnimations>) => void,
+}

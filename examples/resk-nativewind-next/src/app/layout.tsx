@@ -1,5 +1,6 @@
 import "./globals.css";
 import "./fonts.css"
+import { SetupExpo__DEV__ } from "@resk/nativewind";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -26,6 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <SetupExpo__DEV__ />
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
       </body>

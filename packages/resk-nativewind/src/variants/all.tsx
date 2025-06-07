@@ -12,6 +12,9 @@ const all = tv({
         hover: "hover:bg-gray-100 dark:hover:bg-gray-800",
         hidden: {
             true: classes.hidden,
+        },
+        backdrop: {
+            true: "bg-backdrop flex flex-1 flex-col h-full w-full dark:bg-dark-backdrop opacity-75",
         }
     },
 });

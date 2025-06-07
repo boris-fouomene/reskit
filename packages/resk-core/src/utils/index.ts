@@ -26,7 +26,7 @@ export * from "./string";
 export * from "./uri";
 export * from "./isValidEmail";
 export { default as isPrimitive } from "./isPrimitive";
-export { default as Global } from "./global";
+export * from "./global";
 
 
 /**

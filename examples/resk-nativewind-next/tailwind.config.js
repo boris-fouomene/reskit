@@ -122,6 +122,12 @@ module.exports = {
         "dark-surface-foreground": {
           DEFAULT: "#1C1B1F",
         },
+        "backdrop": {
+          DEFAULT: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black backdrop
+        },
+        "dark-backdrop": {
+          DEFAULT: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black backdrop
+        }
       },
       spacing11: {
         // w-100 = 400dp, w-96 = 384dp, etc.

@@ -17,3 +17,4 @@ export * from "./KeyboardAvoidingView";
 export * from "./KeyboardEventHandler";
 export * from "./Modal";
 export * from "./Animation";
+export * from "./SetupExpo__DEV__";

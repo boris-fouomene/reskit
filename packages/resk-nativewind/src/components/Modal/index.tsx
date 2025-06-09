@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, createContext, useContext } from "react";
+import { useMemo, createContext, useContext, useEffect } from "react";
 import { Animated, Pressable, GestureResponderEvent } from "react-native";
 import { Portal } from "@components/Portal";
 import { useBackHandler } from "@components/BackHandler/hooks";
@@ -11,15 +11,16 @@ import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
 import allVariants from "@variants/all";
 import { AnimatedEnterExit, IAnimatedEnterExitProps } from "@components/Animation";
+import modalVariants, { IVariantPropsModal } from "@variants/modal";
 
 export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export const Modal = ({ visible, testID, backdropClassName, className, onAccessibilityEscape, containerClassName, dismissable, onDismiss, ...props }: IModalProps) => {
+export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable, onDismiss, ...props }: IModalProps) => {
   const children = useMemo(() => {
     return props.children;
   }, [props.children]);
   testID = defaultStr(testID, "resk-modal");
-
+  const modalVariant = modalVariants(variant);
   const handleDismiss = (e?: GestureResponderEvent | KeyboardEvent): any => {
     if (typeof onDismiss == "function") {
       onDismiss(e);
@@ -30,11 +31,19 @@ export const Modal = ({ visible, testID, backdropClassName, className, onAccessi
     if (dismissable === false) return true;
     return handleDismiss();
   });
+  useEffect(() => {
+    if (visible) {
+      setTimeout(() => {
+
+      }, 500);
+    }
+  }, [visible]);
+  const hidden = !!!visible;
   return (
     <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"}>
       <Div
         testID={testID + "-modal-backdrop"}
-        className={cn(absoluteClassName, "pointer-events-none", allVariants({ backdrop: true }), backdropClassName)}
+        className={cn(absoluteClassName, "pointer-events-none", allVariants({ backdrop: true }), modalVariant.backkdrop(), backdropClassName)}
         style={portalStyles.absoluteFill}
       />
       <Div
@@ -46,27 +55,34 @@ export const Modal = ({ visible, testID, backdropClassName, className, onAccessi
           if (dismissable === false) return;
           handleDismiss(undefined as any);
         }}
-        className={cn("w-full h-full", containerClassName)}
+        className={cn("w-full h-full transition-opacity duration-500", modalVariant.container(), containerClassName, allVariants({ hidden }))}
         onPress={dismissable === false ? undefined : (e: GestureResponderEvent) => {
           handleDismiss(e);
         }}
       >
-        <AnimatedEnterExit
+        <Div
           {...props}
           testID={testID}
-          className={cn(className)}
-          visible={visible}
+          className={cn("resk-modal", modalVariant.content(), className)}
+          onPress={(e: GestureResponderEvent) => {
+            typeof e?.stopPropagation == "function" && e.stopPropagation();
+            typeof e?.preventDefault == "function" && e.preventDefault();
+            if (typeof onPress == "function") {
+              onPress(e);
+            }
+            return false;
+          }}
         >
           <ModalContext.Provider value={{ isVisible: visible as boolean, isClosed: () => !!!visible, isOpen: () => !!visible, handleDismiss, dismissable: dismissable !== false }}>
             {children}
           </ModalContext.Provider>
-        </AnimatedEnterExit>
+        </Div>
       </Div>
     </Portal>
   );
 };
 
-export interface IModalProps extends IAnimatedEnterExitProps {
+export interface IModalProps extends IHtmlDivProps {
   /**
    * Indicates whether the modal is currently visible.
  * If set to true, the modal will be displayed; otherwise, it will be hidden. */
@@ -91,6 +107,7 @@ export interface IModalProps extends IAnimatedEnterExitProps {
 
   onAccessibilityEscape?: IHtmlDivProps["onAccessibilityEscape"];
 
+  variant?: IVariantPropsModal;
 }
 
 export interface IModalContext {

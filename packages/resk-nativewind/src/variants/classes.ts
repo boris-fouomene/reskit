@@ -4,7 +4,7 @@ export const classes: IVariantsClasses = {
     disabled: "pointer-events-none opacity-70 web:cursor-not-allowed",
     readOnly: "pointer-events-none opacity-80 web:cursor-not-allowed",
     hidden: "hidden opacity-0",
-    hover: "hover:opacity-80"
+    hover: "hover:opacity-80",
 }
 export interface IVariantsClasses {
     disabled: ClassValue;
@@ -12,3 +12,4 @@ export interface IVariantsClasses {
     hidden: ClassValue;
     hover: ClassValue;
 }
+

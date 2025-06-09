@@ -1,7 +1,7 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
-import { Icon, ActivityIndicator, HelperText, VariantsColors, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants } from "@resk/nativewind";
+import { Icon, ActivityIndicator, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
@@ -21,16 +21,18 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         </HStack>
       </Div>
       <Div className="p-5">
-        <Heading level={2}>ActivityIndicator</Heading>
-        <HStack className="p-5 !gap-x-10">
-          <ActivityIndicator variant={{ color: "primary" }} />
-          <ActivityIndicator size={"small"} variant={{ color: "secondary" }} />
-          <ActivityIndicator size={"large"} variant={{ color: "success" }} />
-          <ActivityIndicator size={80} variant={{ color: "error" }} />
-          <ActivityIndicator size={90} variant={{ color: "warning" }} />
-          <ActivityIndicator variant={{ color: "info" }} />
-          <ActivityIndicator variant={{ color: "neutral" }} />
-        </HStack>
+        <Heading level={2}>ActivityIndicator, on surface with padding</Heading>
+        <Surface variant={{ padding: "100px", border: "none", rounded: true }}>
+          <HStack className="p-5 !gap-x-10">
+            <ActivityIndicator variant={{ color: "primary" }} />
+            <ActivityIndicator size={"small"} variant={{ color: "secondary" }} />
+            <ActivityIndicator size={"large"} variant={{ color: "success" }} />
+            <ActivityIndicator size={80} variant={{ color: "error" }} />
+            <ActivityIndicator size={90} variant={{ color: "warning" }} />
+            <ActivityIndicator variant={{ color: "info" }} />
+            <ActivityIndicator variant={{ color: "neutral" }} />
+          </HStack>
+        </Surface>
       </Div>
       <Div className={styles.container}>
         <Text className={styles.title}>{title}</Text>

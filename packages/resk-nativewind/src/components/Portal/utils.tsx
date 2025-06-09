@@ -1,6 +1,6 @@
 import { Platform, ViewStyle } from "react-native";
 
-export const absoluteClassName = "w-full h-full web:position-fixed position-absolute";
+export const absoluteClassName = "w-screen h-screen web:position-fixed position-absolute";
 export const styles = {
     absoluteFill: {
         position: Platform.select({

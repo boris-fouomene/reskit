@@ -78,16 +78,24 @@ export const VariantsFactory = {
     createBorderVariants: function createBorderVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses, ResultType>) {
         return VariantsFactory.create<typeof borderClasses, ResultType>(borderClasses, variantMutator);
     },
-    get all() {
-        return {
-            border: VariantsFactory.createBorderVariants(),
-            rounded: VariantsFactory.createRoundedVariants(),
-            padding: VariantsFactory.createPaddingVariants(),
-            paddingX: VariantsFactory.createPaddingXVariants(),
-            paddingY: VariantsFactory.createPaddingYVariants(),
-            margin: VariantsFactory.createMarginVariants(),
-            marginX: VariantsFactory.createMarginXVariants(),
-            marginY: VariantsFactory.createMarginYVariants()
-        }
-    }
+    createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof allVariantClasses[keyof typeof allVariantClasses], ResultType>): IVariantFactoryAll<ResultType> {
+        const result: IVariantFactoryAll<ResultType> = {} as any;
+        Object.keys(allVariantClasses).forEach((variantClassName) => {
+            (result as any)[variantClassName] = VariantsFactory.create((allVariantClasses as any)[variantClassName], variantMutator);
+        });
+        return result;
+    },
+}
+const allVariantClasses = {
+    border: borderClasses,
+    rounded: roundeClasses,
+    padding: paddingClasses,
+    paddingX: paddingXClasses,
+    paddingY: paddingYClasses,
+    margin: marginClasses,
+    marginX: marginXClasses,
+    marginY: marginYClasses
+};
+type IVariantFactoryAll<ResultType = string> = {
+    [key in keyof typeof allVariantClasses]: Record<keyof typeof allVariantClasses[key], ResultType>;
 }

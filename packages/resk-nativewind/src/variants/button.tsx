@@ -16,31 +16,10 @@ const buton = tv({
     variants: {
         color: VariantsGeneratedColors.button,
         outline: VariantsGeneratedColors.buttonOutline,
-        border: VariantsFactory.createBorderVariants((value) => {
-            return { base: value }
-        }),
-        rounded: VariantsFactory.createRoundedVariants<{ base: string }>((variantValue) => {
+        ...VariantsFactory.createAll<{ base: string }>((value) => {
             return {
-                base: variantValue
+                base: value,
             }
-        }),
-        padding: VariantsFactory.createPaddingVariants<{ base: string }>((value) => {
-            return { base: value }
-        }),
-        paddingX: VariantsFactory.createPaddingXVariants<{ base: string }>((value) => {
-            return { base: value }
-        }),
-        paddingY: VariantsFactory.createPaddingYVariants<{ base: string }>((value) => {
-            return { base: value }
-        }),
-        margin: VariantsFactory.createMarginVariants<{ base: string }>((value) => {
-            return { base: value }
-        }),
-        marginX: VariantsFactory.createMarginXVariants<{ base: string }>((value) => {
-            return { base: value }
-        }),
-        marginY: VariantsFactory.createMarginYVariants<{ base: string }>((value) => {
-            return { base: value }
         })
     }
 });

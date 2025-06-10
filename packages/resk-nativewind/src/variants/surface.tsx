@@ -6,7 +6,7 @@ const surface = tv({
     base: "bg-surface dark:bg-dark-surface text-surface-foreground dark:text-dark-surface-foreground",
     variants: {
         color: VariantsGeneratedColors.surface,
-        ...VariantsFactory.all,
+        ...VariantsFactory.createAll(),
     },
     defaultVariants: {
         color: "surface",

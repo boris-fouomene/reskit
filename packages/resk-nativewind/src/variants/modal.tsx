@@ -6,7 +6,7 @@ const modal = tv({
     slots: {
         backkdrop: "",
         container: "justify-center align-center flex flex-1 flex-col",
-        content: "w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl mx-auto",
+        content: "md:max-w-md sm:max-w-sm",
     },
     variants: {
         background: VariantsFactory.create<typeof VariantsGeneratedColors.surface, { content: string, container: string }>(VariantsGeneratedColors.surface, (value) => {
@@ -15,38 +15,18 @@ const modal = tv({
                 container: "",
             }
         }),
-        border: VariantsFactory.createBorderVariants((value) => {
-            return { content: value }
-        }),
-        rounded: VariantsFactory.createRoundedVariants<{ content: string }>((variantValue) => {
-            return {
-                content: variantValue
-            }
-        }),
-        padding: VariantsFactory.createPaddingVariants<{ content: string }>((value) => {
-            return { content: value }
-        }),
-        paddingX: VariantsFactory.createPaddingXVariants<{ content: string }>((value) => {
-            return { content: value }
-        }),
-        paddingY: VariantsFactory.createPaddingYVariants<{ content: string }>((value) => {
-            return { content: value }
-        }),
-        margin: VariantsFactory.createMarginVariants<{ content: string }>((value) => {
-            return { content: value }
-        }),
-        marginX: VariantsFactory.createMarginXVariants<{ content: string }>((value) => {
-            return { content: value }
-        }),
-        marginY: VariantsFactory.createMarginYVariants<{ content: string }>((value) => {
-            return { content: value }
-        }),
         responsive: {
             true: {
-                container: "block",
-                content: "md:w-full md:max-w-md sm:w-full sm:max-w-sm",
+                container: "md:block sm:block",
+                content: "md:w-screen md:h-screen md:max-w-full md:max-h-full sm:w-screen sm:h-screen sm:max-w-full sm:max-h-full",
             }
-        }
+        },
+        ...VariantsFactory.createAll<{ content: string, container: string }>((value) => {
+            return {
+                content: value,
+                container: ""
+            }
+        }),
     },
     defaultVariants: {
         background: "surface",

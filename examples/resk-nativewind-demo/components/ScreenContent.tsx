@@ -95,7 +95,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Button label="Button example1" variant={{ color: "primary" }} rippleColor={"yellow"} />
           <Button label="Button example2" variant={{ color: "secondary" }} />
           <Button label="Button example3 - disabled" disabled variant={{ color: "error", padding: "sm" }} />
-          <Button label="Button example4 - loading" isLoading variant={{ color: "success" }} />
+          <Button label="Button example4 - loading" loading variant={{ color: "success" }} />
         </HStack>
       </Div>
     </ScrollView>

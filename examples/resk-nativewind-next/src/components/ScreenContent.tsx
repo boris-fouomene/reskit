@@ -1,12 +1,11 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
-import { Icon, Menu, ActivityIndicator, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants } from "@resk/nativewind";
+import { Icon, Menu, MenuItems, ActivityIndicator, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
 };
-
 export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   VariantsColors.registerColor("accent", "neutral");
   return (
@@ -16,9 +15,13 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <H2>Menu Examples</H2>
         <Menu
           anchor={<Text>Open Menu</Text>}
-          children={<HStack>
-            Menu Opened with this children
-          </HStack>}
+          items={[
+            { label: "Home", icon: "material-home" },
+            { label: "Settings", icon: "star-settings" },
+          ]}
+          children={<VStack>
+            <Text>Menu Opened with this children</Text>
+          </VStack>}
         />
       </HStack>
       <Div className="p-5">

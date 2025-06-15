@@ -11,6 +11,7 @@
     "declarationDir": "build",
     "removeComments": true,
     "sourceMap": false,
+    "isolatedModules": true,
     "outDir": "build",
     "strict": true,
     "moduleResolution": "node",

@@ -1,16 +1,14 @@
 "use client";
 
-import ExpandableMenuItem, { ExpandableItem } from './ExpandableItem';
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
-import { useEffect, useState, useRef, useMemo, RefObject } from 'react';
-import { View, LayoutChangeEvent, LayoutRectangle, Pressable } from 'react-native';
+import { useEffect, useState, useRef, useMemo, RefObject, Fragment } from 'react';
+import { View, LayoutChangeEvent, LayoutRectangle, Pressable, ScrollView } from 'react-native';
 import { IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
 import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
-import { MenuItem } from './Item';
 import { isNumber } from "@resk/core/utils";
 import { measureContentHeight } from '@utils/measureContentHeight';
 import { useMenuPosition } from './position';
@@ -40,6 +38,10 @@ export function Menu({
     backdropClassName,
     maxHeight,
     className,
+    scrollViewProps,
+    withScrollView,
+    items,
+    itemsProps,
     ...props
 }: IMenuProps) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -141,6 +143,15 @@ export function Menu({
         }
         return children;
     }, [children, context]);
+    const { Wrapper, wrapperProps } = useMemo(() => {
+        if (!withScrollView) {
+            return { Wrapper: Fragment, wrapperProps: {} }
+        }
+        return {
+            Wrapper: ScrollView,
+            wrapperProps: Object.assign({}, { testID: testID + "-scroll-view" }, scrollViewProps, { style: StyleSheet.flatten([scrollViewProps?.style]) })
+        }
+    }, [withScrollView, testID, scrollViewProps]);
     return <>
         <MenuContext.Provider value={context}>
             <Pressable testID={testID + "-anchor-container"}
@@ -183,7 +194,10 @@ export function Menu({
                     }}
                     style={[menuStyle, props.style]}
                 >
-                    {child}
+                    <Wrapper {...wrapperProps}>
+                        {items ? <MenuItems testID={testID + "-menu-items"} items={items as any} {...Object.assign({}, itemsProps)} /> : null}
+                        {child}
+                    </Wrapper>
                 </Pressable>
             </MenuContext.Provider>
         </Portal>}
@@ -203,7 +217,7 @@ const measureAnchor = (anchorRef: RefObject<any>, minContentHeight?: number) => 
     });
 }
 
-Menu.Item = MenuItem;
+/* Menu.Item = MenuItem;
 Menu.displayName = 'Menu.Item';
 Menu.displayName = 'Menu';
 
@@ -215,8 +229,9 @@ Menu.ExpandableItemBase = ExpandableItem;
 Menu.ExpandableItem.displayName = 'Menu.ExpandableItem';
 Menu.ExpandableItemBase.displayName = 'Menu.ExpandableItemBase';
 
-
-
-
+ */
+export { MenuItems };
+export * from "./utils";
+export * from "./hooks";
 export * from "./context";
 export * from "./types";

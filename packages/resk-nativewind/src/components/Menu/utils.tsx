@@ -6,7 +6,7 @@ import Auth from "@resk/core/auth";
 import { cloneObject, isObj } from "@resk/core/utils";
 
 
-const renderExpandableMenuItemOrSection = function <ItemContext = unknown>({ item, itemsNodes, index, context, render, renderExpandable, level }: IMenuRenderItemOptions<ItemContext>) {
+function renderExpandableMenuItemOrSection<ItemContext = unknown>({ item, itemsNodes, index, context, render, renderExpandable, level }: IMenuRenderItemOptions<ItemContext>) {
   level = typeof level == "number" && level || 0;
   if (item?.perm !== undefined && !Auth.isAllowed(item?.perm)) return null;
   const { section, items, ...rest } = item;
@@ -40,7 +40,7 @@ function renderMenuItem<ItemContext = unknown>({ item, index, render, renderExpa
 
 
 
-export function renderItems<ItemContext = unknown>({ items, render, renderExpandable, context }: IMenuRenderItemsOptions<ItemContext>): IReactNullableElement[] {
+export function renderMenuItems<ItemContext = unknown>({ items, render, renderExpandable, context }: IMenuRenderItemsOptions<ItemContext>): IReactNullableElement[] {
   const _items: IReactNullableElement[] = [];
   const level = 0;
   if (Array.isArray(items)) {

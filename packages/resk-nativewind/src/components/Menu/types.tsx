@@ -8,6 +8,7 @@ import { PressableStateCallbackType } from "react-native";
 import { IHtmlDivProps } from "@html/types";
 import { useBreakpoints } from "@utils/breakpoints";
 import { IHtmlDetailsProps } from "@html/Details";
+import { IKeyboardAvoidingViewProps } from "@components/KeyboardAvoidingView";
 
 /**
  * Represents the possible positions where the menu can be displayed
@@ -321,7 +322,7 @@ export interface IUseMenuPositionProps {
 
 
 
-export interface IMenuProps extends Omit<PressableProps, "children" | "style" | "className">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
+export interface IMenuProps<ItemContext = unknown> extends Omit<PressableProps, "children" | "style" | "className">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
 
     /** Optional callback that is invoked when the menu opens. */
     onOpen?: () => void;
@@ -339,6 +340,19 @@ export interface IMenuProps extends Omit<PressableProps, "children" | "style" | 
 
     /** Menu content, either as static JSX or a function returning JSX based on the menu context. */
     children?: IReactNullableElement | ((options: IMenuContext) => IReactNullableElement);
+
+    /***
+     * Default true
+     * if true, the menu content will be wrapped in a ScrollView
+     * if false, the menu content will be rendered directly
+     */
+    withScrollView?: boolean;
+
+    /***
+     * Props for the scrollView component that wraps the menu content.
+     * This allows for customization of the scrollView's appearance and behavior.
+     */
+    scrollViewProps?: Omit<ScrollViewProps, "children">;
 
     /***
      * Whether the menu should be dismissable
@@ -373,6 +387,10 @@ export interface IMenuProps extends Omit<PressableProps, "children" | "style" | 
     bottomSheetTitleDivider?: boolean;
 
     style?: ViewProps["style"];
+
+    items?: IMenuItemsProps<ItemContext>["items"];
+
+    itemsProps?: Omit<IMenuItemsProps<ItemContext>, "items">;
 }
 
 

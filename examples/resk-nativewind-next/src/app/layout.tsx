@@ -29,7 +29,9 @@ export default function RootLayout({
     <html lang="en">
       <SetupExpo__DEV__ />
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        <div className="flex flex-col h-screen w-screen flex-1" id="root">
+          {children}
+        </div>
       </body>
     </html>
   );

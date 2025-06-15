@@ -6,7 +6,7 @@ const modal = tv({
     slots: {
         backkdrop: "",
         container: "justify-center items-center flex flex-1 flex-col",
-        content: "max-w-[40%] lg:max-w-[30%] 2xs:max-w-[20%] m-auto",
+        content: "max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
     },
     variants: {
         background: VariantsFactory.create<typeof VariantsGeneratedColors.surface, { content: string, container: string }>(VariantsGeneratedColors.surface, (value) => {
@@ -18,7 +18,7 @@ const modal = tv({
         responsive: {
             true: {
                 container: "block md:flex",
-                content: "w-screen h-screen max-w-full lg:max-w-[30%]",
+                content: "max-w-full sm:max-w-full w-screen h-screen max-w-full max-h-full lg:max-h[50%] lg:max-w-[600%]",
             }
         },
         ...VariantsFactory.createAll<{ content: string, container: string }>((value) => {

@@ -1,6 +1,6 @@
 "use client";
-import { useMemo, createContext, useContext, useEffect } from "react";
-import { Animated, Pressable, GestureResponderEvent } from "react-native";
+import { useMemo, createContext, useContext } from "react";
+import { GestureResponderEvent } from "react-native";
 import { Portal } from "@components/Portal";
 import { useBackHandler } from "@components/BackHandler/hooks";
 import { defaultStr } from "@resk/core/utils";
@@ -10,10 +10,7 @@ import { styles as portalStyles, absoluteClassName } from "@components/Portal/ut
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
 import allVariants from "@variants/all";
-import { AnimatedEnterExit, IAnimatedEnterExitProps } from "@components/Animation";
 import modalVariants, { IVariantPropsModal } from "@variants/modal";
-
-export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable, onDismiss, ...props }: IModalProps) => {
   const children = useMemo(() => {
@@ -31,13 +28,6 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
     if (dismissable === false) return true;
     return handleDismiss();
   });
-  useEffect(() => {
-    if (visible) {
-      setTimeout(() => {
-
-      }, 500);
-    }
-  }, [visible]);
   const hidden = !!!visible;
   return (
     <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"}>
@@ -89,7 +79,6 @@ export interface IModalProps extends IHtmlDivProps {
   visible?: boolean;
 
   backdropClassName?: IClassName;
-
   /**
    * A callback function that is called when an attempt is made to close the modal. 
    * The event parameter can be either a GestureResponderEvent or a KeyboardEvent.

@@ -147,8 +147,6 @@ export interface IButtonBaseProps<IButtonExtendContext = unknown> extends Omit<I
 
 export interface IButtonProps<IButtonExtendContext = unknown> extends Omit<IButtonBaseProps<IButtonExtendContext>, "ref" | "onPress"> {
 
-
-
     onPress?: (event: GestureResponderEvent, context: IButtonContext<IButtonExtendContext>) => any;
 
     /***

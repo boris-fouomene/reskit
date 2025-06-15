@@ -22,3 +22,9 @@
     src: url(/fonts/FontAwesome6_Regular.ttf);
     font-family: "FontAwesome6_Regular";
 } */
+
+
+html,
+body {
+    height: 100vh;
+}

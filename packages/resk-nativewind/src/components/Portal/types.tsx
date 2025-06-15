@@ -1,4 +1,6 @@
 import { IHtmlDivProps } from "@html/types";
+import { ViewStyle } from "react-native";
+import { GestureResponderEvent } from "react-native";
 
 /**
  * Props for the Portal component.
@@ -9,6 +11,7 @@ import { IHtmlDivProps } from "@html/types";
  * @property id - Optional unique identifier for the portal container.
  * @property absoluteFill - If true, the portal will fill its parent absolutely.
  * @property visible - Controls the visibility of the portal content.
+ * @property withBackdrop - If true, the portal will have a backdrop.
  */
 export interface IPortalProps {
     children: IHtmlDivProps["children"];
@@ -16,5 +19,15 @@ export interface IPortalProps {
     testID?: IHtmlDivProps["testID"];
     id?: IHtmlDivProps["id"];
     absoluteFill?: boolean;
+    /***
+     * If true, the portal will have a backdrop.
+     */
+    withBackdrop?: boolean;
     visible?: boolean;
+    /***
+     * The callback function to be called when the portal is pressed.
+     */
+    onPress?: (event: GestureResponderEvent) => void;
+
+    style?: IHtmlDivProps["style"];
 }

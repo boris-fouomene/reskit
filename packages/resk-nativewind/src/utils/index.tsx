@@ -16,7 +16,8 @@ export * from "./keyboard";
 export * from "./cn";
 export * from "./Component";
 export * from "./getBoundingClientRect";
-
+export * from "./measureContentHeight";
+export * from "./breakpoints";
 /***
     vérifie si la variable node est un élément reactNode
 */

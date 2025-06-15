@@ -1,10 +1,13 @@
 "use client";
-import { defaultStr, getMaxZindex } from '@resk/core/utils';
+import { addClassName, defaultStr, getMaxZindex } from '@resk/core/utils';
 import { useEffect, useState, useRef, ReactNode, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@utils/cn';
-import { absoluteClassName } from './utils';
+import { absoluteClassName, styles } from './utils';
 import { IPortalProps } from './types';
+import { normalizeGestureEvent } from '@html/events';
+import allVariants from '@variants/all';
+import { StyleSheet } from 'react-native';
 
 
 /**
@@ -23,7 +26,7 @@ import { IPortalProps } from './types';
  *   )
  * }
  */
-export function Portal({ children, className, visible, absoluteFill, id, testID }: IPortalProps) {
+export function Portal({ children, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
     const [mounted, setMounted] = useState(false);
     const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
     const createdElementRef = useRef<HTMLElement | null>(null);
@@ -48,21 +51,21 @@ export function Portal({ children, className, visible, absoluteFill, id, testID 
         }
         element.id = targetId;
         element.style.zIndex = String(Math.max(getMaxZindex(), 1000));
-        element.className = cn(absoluteFill && absoluteClassName, className);
+        element.className = cn(absoluteFill && absoluteClassName, "portal", allVariants({ backdrop: withBackdrop }), className);
         element.setAttribute("data-testid", defaultStr(testID, "portal-" + targetId));
-        if (absoluteFill) {
-            element.style.position = "fixed";
-            element.style.top = "0";
-            element.style.left = "0";
-            element.style.right = "0";
-            element.style.bottom = "0";
-            element.style.flex = "1";
+        const stylesProp = StyleSheet.flatten([absoluteFill && styles.absoluteFill, style]) as any;
+        for (const key in stylesProp) {
+            if (key in element.style) {
+                (element.style as any)[key] = stylesProp[key];
+            }
+        }
+        if (typeof onPress == "function") {
+            element.onclick = function (event) {
+                onPress(normalizeGestureEvent(event as any));
+            };
+            element.style.cursor = "pointer";
         } else {
-            element.style.position = "";
-            element.style.top = "auto";
-            element.style.left = "auto";
-            element.style.right = "auto";
-            element.style.bottom = "auto";
+            element.style.cursor = "default";
         }
         setTargetElement(element);
 
@@ -78,7 +81,7 @@ export function Portal({ children, className, visible, absoluteFill, id, testID 
                 console.log(e, " removing portal element")
             }
         };
-    }, [target, targetId, className, absoluteFill, visible, testID]);
+    }, [target, targetId, className, absoluteFill, visible, testID, onPress]);
     // Don't render anything on server side or before mounting
     if (!mounted || !targetElement) {
         return null;

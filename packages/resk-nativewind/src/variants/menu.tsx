@@ -25,7 +25,7 @@ const menu = tv({
     },
     defaultVariants: {
         background: "surface",
-        padding: 4
+        paddingX: 4
     }
 });
 

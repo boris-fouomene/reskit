@@ -1,18 +1,18 @@
 import { MenuItem } from './Item';
 import { useRenderMenuItems } from './hooks';
-import { IMenuContext, IMenuItemContext, IMenuItemProps, IMenuItemsProps } from './types';
+import { IMenuContext, IMenuItemProps, IMenuItemsProps } from './types';
 import ExpandableMenuItem from './ExpandableItem';
 import { useMenu } from './context';
 import { Div } from '@html/Div';
 import { defaultStr } from '@resk/core/utils';
 
 
-export function MenuItems<ItemContext = unknown>({ items: customItems, context, testID, ...rest }: IMenuItemsProps<ItemContext>) {
+export function MenuItems<Context = unknown>({ items: customItems, context, testID, ...rest }: IMenuItemsProps<Context>) {
   testID = defaultStr(testID, "resk-menu-item");
-  const menu = useMenu() as IMenuContext;
-  const items = useRenderMenuItems<IMenuItemContext<ItemContext>>({
+  const menuContext = useMenu() as IMenuContext<Context>;
+  const items = useRenderMenuItems<IMenuContext<Context>>({
     items: (Array.isArray(customItems) ? customItems : []),
-    context: Object.assign({}, context, { menu }),
+    context: Object.assign({}, context, menuContext),
     render: renderItem,
     renderExpandable,
   });
@@ -21,10 +21,10 @@ export function MenuItems<ItemContext = unknown>({ items: customItems, context, 
   </Div>
 };
 
-function renderExpandable<ItemContext = unknown>(props: IMenuItemProps<ItemContext>, index: number) {
+function renderExpandable<Context = unknown>(props: IMenuItemProps<Context>, index: number) {
   return <ExpandableMenuItem {...props} key={index} />;
 }
-function renderItem<ItemContext = unknown>(props: IMenuItemProps<ItemContext>, index: number) {
+function renderItem<Context = unknown>(props: IMenuItemProps<Context>, index: number) {
   return <MenuItem {...props as any} key={index} />;
 }
 

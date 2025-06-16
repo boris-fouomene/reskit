@@ -2,6 +2,7 @@ import { roundeClasses } from "./rounded";
 import { paddingClasses, paddingXClasses, paddingYClasses } from "./padding";
 import { marginClasses, marginXClasses, marginYClasses } from "./margin";
 import { borderClasses } from "./border";
+import { ShadowColorsClasses, ShadowClasses } from "./shadow";
 
 type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], variantName: keyof InputType) => ResultType;
 
@@ -78,6 +79,12 @@ export const VariantsFactory = {
     createBorderVariants: function createBorderVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses, ResultType>) {
         return VariantsFactory.create<typeof borderClasses, ResultType>(borderClasses, variantMutator);
     },
+    createShadowVariants: function createShadowVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof ShadowClasses, ResultType>) {
+        return VariantsFactory.create<typeof ShadowClasses, ResultType>(ShadowClasses, variantMutator);
+    },
+    createShadowColorsVariants: function createShadowColorsVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof ShadowColorsClasses, ResultType>) {
+        return VariantsFactory.create<typeof ShadowColorsClasses, ResultType>(ShadowColorsClasses, variantMutator);
+    },
     createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof allVariantClasses[keyof typeof allVariantClasses], ResultType>): IVariantFactoryAll<ResultType> {
         const result: IVariantFactoryAll<ResultType> = {} as any;
         Object.keys(allVariantClasses).forEach((variantClassName) => {
@@ -94,7 +101,9 @@ const allVariantClasses = {
     paddingY: paddingYClasses,
     margin: marginClasses,
     marginX: marginXClasses,
-    marginY: marginYClasses
+    marginY: marginYClasses,
+    shadow: ShadowClasses,
+    shadowColor: ShadowColorsClasses,
 };
 type IVariantFactoryAll<ResultType = string> = {
     [key in keyof typeof allVariantClasses]: Record<keyof typeof allVariantClasses[key], ResultType>;

@@ -1,14 +1,18 @@
 export const marginClasses = {
     none: 'm-0',
-    xs: 'm-1',
-    sm: 'm-2',
-    md: 'm-4',
-    lg: 'm-6',
-    xl: 'm-8',
-    '2xl': 'm-12',
-    '3xl': 'm-16',
-    '4xl': 'm-20',
-    '5xl': 'm-24',
+    px: 'm-px',
+    1: 'm-1',       // 4mx
+    2: 'm-2',       // 8mx
+    3: 'm-3',		// 12mx
+    4: 'm-4',       // 16mx
+    5: 'm-5',       // 24mx
+    6: 'm-6',
+    8: 'm-8',
+    10: 'm-10',
+    12: 'm-12',
+    16: 'm-16',
+    20: 'm-20',
+    24: 'm-24',
     auto: 'm-auto',
     "5px": "m-[5px]",
     "10px": "m-[10px]",
@@ -34,15 +38,19 @@ export const marginClasses = {
 
 export const marginXClasses = {
     none: 'mx-0',
-    xs: 'mx-1',
-    sm: 'mx-2',
-    md: 'mx-4',
-    lg: 'mx-6',
-    xl: 'mx-8',
-    '2xl': 'mx-12',
-    '3xl': 'mx-16',
-    '4xl': 'mx-20',
-    '5xl': 'mx-24',
+    px: 'mx-px',
+    1: 'mx-1',       // 4mx
+    2: 'mx-2',       // 8mx
+    3: 'mx-3',		// 12mx
+    4: 'mx-4',       // 16mx
+    5: 'mx-5',       // 24mx
+    6: 'mx-6',
+    8: 'mx-8',
+    10: 'mx-10',
+    12: 'mx-12',
+    16: 'mx-16',
+    20: 'mx-20',
+    24: 'mx-24',
     auto: 'mx-auto',
     "5px": "mx-[5px]",
     "10px": "mx-[10px]",
@@ -68,15 +76,19 @@ export const marginXClasses = {
 };
 export const marginYClasses = {
     none: 'my-0',
-    xs: 'my-1',
-    sm: 'my-2',
-    md: 'my-4',
-    lg: 'my-6',
-    xl: 'my-8',
-    '2xl': 'my-12',
-    '3xl': 'my-16',
-    '4xl': 'my-20',
-    '5xl': 'my-24',
+    px: 'my-px',
+    1: 'my-1',       // 4my
+    2: 'my-2',       // 8my
+    3: 'my-3',		// 12my
+    4: 'my-4',       // 16my
+    5: 'my-5',       // 24my
+    6: 'my-6',
+    8: 'my-8',
+    10: 'my-10',
+    12: 'my-12',
+    16: 'my-16',
+    20: 'my-20',
+    24: 'my-24',
     auto: 'my-auto',
     "5px": "my-[5px]",
     "10px": "my-[10px]",

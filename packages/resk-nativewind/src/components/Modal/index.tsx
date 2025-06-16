@@ -24,13 +24,10 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
     }
     return true;
   }
-  useBackHandler(function handleDismissBack() {
-    if (dismissable === false) return true;
-    return handleDismiss();
-  });
+  useBackHandler(dismissable ? handleDismiss : () => true);
   const hidden = !!!visible;
   return (
-    <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"}>
+    <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"} className={"modal-portal"}>
       <Div
         testID={testID + "-modal-backdrop"}
         className={cn(absoluteClassName, "pointer-events-none", allVariants({ backdrop: true }), modalVariant.backkdrop(), backdropClassName)}

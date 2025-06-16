@@ -1,14 +1,19 @@
 export const paddingClasses = {
     none: 'p-0',
-    xs: 'p-1',       // 4px
-    sm: 'p-2',       // 8px
-    md: 'p-4',       // 16px
-    lg: 'p-6',       // 24px
-    xl: 'p-8',       // 32px
-    '2xl': 'p-12',   // 48px
-    '3xl': 'p-16',   // 64px
-    '4xl': 'p-20',   // 80px
-    '5xl': 'p-24',   // 96px
+    px: 'p-px',
+    1: 'p-1',       // 4px
+    2: 'p-2',       // 8px
+    3: 'p-3',		// 12px
+    4: 'p-4',       // 16px
+    5: 'p-5',       // 24px
+    6: 'p-6',
+    8: 'p-8',
+    10: 'p-10',
+    12: 'p-12',
+    16: 'p-16',
+    20: 'p-20',
+    24: 'p-24',
+    "auto": "p-auto",
     "5px": "p-[5px]",
     "10px": "p-[10px]",
     "15px": "p-[15px]",
@@ -53,15 +58,20 @@ export const paddingClasses = {
 
 export const paddingXClasses = {
     none: 'px-0',
-    xs: 'px-1',
-    sm: 'px-2',
-    md: 'px-4',
-    lg: 'px-6',
-    xl: 'px-8',
-    '2xl': 'px-12',
-    '3xl': 'px-16',
-    '4xl': 'px-20',
-    '5xl': 'px-24',
+    px: 'px-px',
+    1: 'px-1',       // 4px
+    2: 'px-2',       // 8px
+    3: 'px-3',		// 12px
+    4: 'px-4',       // 16px
+    5: 'px-5',       // 24px
+    6: 'px-6',
+    8: 'px-8',
+    10: 'px-10',
+    12: 'px-12',
+    16: 'px-16',
+    20: 'px-20',
+    24: 'px-24',
+    "auto": "px-auto",
     "5px": "px-[5px]",
     "10px": "px-[10px]",
     "15px": "px-[15px]",
@@ -86,15 +96,20 @@ export const paddingXClasses = {
 
 export const paddingYClasses = {
     none: 'py-0',
-    xs: 'py-1',
-    sm: 'py-2',
-    md: 'py-4',
-    lg: 'py-6',
-    xl: 'py-8',
-    '2xl': 'py-12',
-    '3xl': 'py-16',
-    '4xl': 'py-20',
-    '5xl': 'py-24',
+    px: 'py-px',
+    1: 'py-1',       // 4py-
+    2: 'py-2',       // 8py-
+    3: 'py-3',		// 12py-
+    4: 'py-4',       // 16py-
+    5: 'py-5',       // 24py-
+    6: 'py-6',
+    8: 'py-8',
+    10: 'py-10',
+    12: 'py-12',
+    16: 'py-16',
+    20: 'py-20',
+    24: 'py-24',
+    "auto": "py-auto",
     "5px": "py-[5px]",
     "10px": "py-[10px]",
     "15px": "py-[15px]",

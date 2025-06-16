@@ -9,7 +9,7 @@ import { useMenu } from "./context";
 import { Details } from "@html/Details";
 
 
-export function ExpandableItem<ItemContext = unknown>({ testID, as, dividerClassName, items, divider, expandableProps, children, ref, ...props }: IMenuItem<ItemContext> & { as?: IReactComponent<IMenuItem<ItemContext>> }) {
+export function ExpandableItem<Context = unknown>({ testID, as, dividerClassName, items, divider, expandableProps, children, ref, ...props }: IMenuItem<Context> & { as?: IReactComponent<IMenuItem<Context>> }) {
     testID = defaultStr(testID, "resk-menu-expandable-item");
     expandableProps = Object.assign({}, expandableProps);
     return <Details
@@ -35,7 +35,7 @@ ExpandableItemLabel.displayName = "Menu.ExpandableItemLabel";
 ExpandableItem.displayName = "Menu.ExpandableItem";
 
 
-function ExpandableMenuItem<ItemContext = unknown>({ testID, context, ...props }: IMenuItemProps<ItemContext>) {
+function ExpandableMenuItem<Context = unknown>({ testID, context, ...props }: IMenuItemProps<Context>) {
     const menuContext = useMenu();
     return <ExpandableItem
         testID={testID}

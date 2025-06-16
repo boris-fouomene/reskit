@@ -67,6 +67,9 @@ module.exports = (colors, options) => {
         surface: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
             return cn(colorWithPrefix, darkColorWithPrefix, `text-${colorWithoutPrefix}-foreground dark:text-dark-${colorWithoutPrefix}-foreground`)
         }),
+        shadow: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
+            return cn(`shadow-${colorWithoutPrefix}/20 dark:shadow-${colorWithoutPrefix}/30`)
+        }),
         text: VariantsColors.buildTextColors(),
         activityIndicator: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`border-t-${color} dark:border-t-dark-${color}`);
@@ -88,6 +91,7 @@ export const VariantsGeneratedColors = ${content}
         divider : Record<IName,string>;
         heading : Record<IName,string>;
         text : Record<IName,string>;
+        shadow : Record<IName,string>;
         activityIndicator: Record<IName,string>;
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;

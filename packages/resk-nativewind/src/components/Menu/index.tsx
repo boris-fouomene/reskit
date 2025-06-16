@@ -3,7 +3,7 @@
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { useEffect, useState, useRef, useMemo, RefObject, Fragment } from 'react';
-import { View, LayoutChangeEvent, LayoutRectangle, Pressable, ScrollView } from 'react-native';
+import { View, LayoutChangeEvent, LayoutRectangle, Pressable, ScrollView, ScrollViewProps } from 'react-native';
 import { IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
@@ -13,11 +13,12 @@ import { isNumber } from "@resk/core/utils";
 import { measureContentHeight } from '@utils/measureContentHeight';
 import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
-import surface from '@variants/surface';
+import { useBackHandler } from '@components/BackHandler';
+import menuVariants from '@variants/menu';
 
 
 
-export function Menu({
+export function Menu<Context = unknown>({
     onClose,
     children,
     anchor: customAnchor,
@@ -38,12 +39,14 @@ export function Menu({
     backdropClassName,
     maxHeight,
     className,
-    scrollViewProps,
+    scrollViewClassName,
+    scrollViewContentContainerClassName,
     withScrollView,
     items,
     itemsProps,
+    variant,
     ...props
-}: IMenuProps) {
+}: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
     const [state, setState] = useStateCallback({
         visible: isControlled ? !!visible : false,
@@ -127,7 +130,7 @@ export function Menu({
     const close = (callback?: Function) => {
         closeMenuInternal(callback);
     };
-    const context: IMenuContext = { windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible };
+    const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
     let anchor = null;
     if (typeof customAnchor === 'function') {
         const a = customAnchor(context);
@@ -143,20 +146,20 @@ export function Menu({
         }
         return children;
     }, [children, context]);
-    const { Wrapper, wrapperProps } = useMemo(() => {
-        if (!withScrollView) {
-            return { Wrapper: Fragment, wrapperProps: {} }
-        }
-        return {
-            Wrapper: ScrollView,
-            wrapperProps: Object.assign({}, { testID: testID + "-scroll-view" }, scrollViewProps, { style: StyleSheet.flatten([scrollViewProps?.style]) })
-        }
-    }, [withScrollView, testID, scrollViewProps]);
+    useBackHandler(function () {
+        close();
+        return true;
+    });
+    const menuVariant = menuVariants(variant);
+    const Wrapper = !withScrollView ? Fragment : ScrollView;
+    const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", className: cn(menuVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(menuVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
+    itemsProps = Object.assign({}, itemsProps);
+    itemsProps.className = cn(menuVariant.items(), itemsProps.className);
     return <>
         <MenuContext.Provider value={context}>
             <Pressable testID={testID + "-anchor-container"}
                 ref={anchorRef}
-                className={cn(anchorContainerClassName)}
+                className={cn(menuVariant.anchorContainer(), anchorContainerClassName, "menu-anchor-container")}
                 onAccessibilityEscape={dismissable !== false ? () => {
                     close();
                 } : undefined}
@@ -173,7 +176,7 @@ export function Menu({
                 {anchor}
             </Pressable>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => { close(); }} className={cn(backdropClassName)}>
+        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => { close(); }} className={cn(menuVariant.portal(), backdropClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
                 <Pressable
                     testID={testID}
@@ -185,7 +188,7 @@ export function Menu({
                         }
                         return false;
                     }}
-                    className={cn(surface({ color: "surface" }), className)}
+                    className={cn(menuVariant.base(), className)}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
                             onLayout(event);
@@ -195,7 +198,7 @@ export function Menu({
                     style={[menuStyle, props.style]}
                 >
                     <Wrapper {...wrapperProps}>
-                        {items ? <MenuItems testID={testID + "-menu-items"} items={items as any} {...Object.assign({}, itemsProps)} /> : null}
+                        {items ? <MenuItems testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                         {child}
                     </Wrapper>
                 </Pressable>

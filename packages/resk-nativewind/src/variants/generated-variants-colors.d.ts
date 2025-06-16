@@ -10,6 +10,7 @@
         divider : Record<IName,string>;
         heading : Record<IName,string>;
         text : Record<IName,string>;
+        shadow : Record<IName,string>;
         activityIndicator: Record<IName,string>;
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;

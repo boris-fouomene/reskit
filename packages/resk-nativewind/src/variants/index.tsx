@@ -10,8 +10,10 @@ import all from "./all";
 import button from "./button";
 import activityIndicator from "./activityIndicator";
 import modal from "./modal";
+import menu from "./menu";
 export const variants = {
     all,
+    menu,
     icon,
     heading,
     iconButton,

@@ -122,7 +122,6 @@ export function ButtonBase<IButtonExtendContext = unknown>({
                     <Text
                         id={`${buttonId}-label`}
                         selectable={false}
-                        numberOfLines={1}
                         testID={`${testID}-button-label`}
                         className={cn("button-label", computedVariant.label?.(), disabledClass, labelClassName)}
                     >

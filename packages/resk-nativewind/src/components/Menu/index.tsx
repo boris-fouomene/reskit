@@ -1,5 +1,4 @@
 "use client";
-
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { useEffect, useState, useRef, useMemo, RefObject, Fragment } from 'react';
@@ -198,7 +197,7 @@ export function Menu<Context = unknown>({
                     style={[menuStyle, props.style]}
                 >
                     <Wrapper {...wrapperProps}>
-                        {items ? <MenuItems testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
+                        {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                         {child}
                     </Wrapper>
                 </Pressable>
@@ -220,21 +219,5 @@ const measureAnchor = (anchorRef: RefObject<any>, minContentHeight?: number) => 
     });
 }
 
-/* Menu.Item = MenuItem;
-Menu.displayName = 'Menu.Item';
-Menu.displayName = 'Menu';
-
-Menu.Items = MenuItems;
-Menu.Items.displayName = 'Menu.Items';
-
-Menu.ExpandableItem = ExpandableMenuItem;
-Menu.ExpandableItemBase = ExpandableItem;
-Menu.ExpandableItem.displayName = 'Menu.ExpandableItem';
-Menu.ExpandableItemBase.displayName = 'Menu.ExpandableItemBase';
-
- */
-export { MenuItems };
-export * from "./utils";
-export * from "./hooks";
 export * from "./context";
 export * from "./types";

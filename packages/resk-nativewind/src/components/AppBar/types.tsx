@@ -1,6 +1,6 @@
 import { ReactElement, ReactNode } from "react";
 import { IIconButtonProps } from "@components/Icon/types";
-import { IMenuItem, IMenuRenderItemsOptions } from "@components/Menu/types";
+import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IClassName } from "@src/types";
 import { IVariantPropsText } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
@@ -53,12 +53,12 @@ export interface IAppBarActionsProps<Context = unknown> {
     /**
      * The function used to render an appBar action. This function receives the item properties and is responsible for generating the corresponding JSX.
      */
-    renderAction?: IMenuRenderItemsOptions<Context>["render"];
+    renderAction?: INavItemsProps<Context>["renderItem"];
 
     /**
      * The function used to render expandable actions. Similar to the render function, this handles the rendering of
      */
-    renderExpandableAction?: IMenuRenderItemsOptions<Context>["renderExpandable"];
+    renderExpandableAction?: INavItemsProps<Context>["renderExpandableItem"];
 
 
     /** The context to pass to each action, used to extend the context for the actions. */
@@ -71,7 +71,7 @@ export interface IAppBarActionsProps<Context = unknown> {
 /**
  * Type definition for actions that can be included in an application bar (AppBar).
  * 
- * The `IAppBarAction` type extends the properties of {@link IMenuItem}, allowing
+ * The `IAppBarAction` type extends the properties of {@link INavItemProps}, allowing
  * developers to define actions that can be performed from the AppBar. This type
  * can be used to create buttons or interactive elements within the AppBar that 
  * respond to user interactions.
@@ -82,8 +82,8 @@ export interface IAppBarActionsProps<Context = unknown> {
  *
  * @interface IAppBarAction
  * 
- * @extends {IMenuItem<Context>} - Inherits the properties 
- * and methods from the `IMenuItem` interface, which defines the structure 
+ * @extends {INavItemProps<Context>} - Inherits the properties 
+ * and methods from the `INavItemProps` interface, which defines the structure 
  * for menu items, ensuring consistency and reusability across different components.
  *
  * @example
@@ -96,7 +96,7 @@ export interface IAppBarActionsProps<Context = unknown> {
  *     );
  * };
  */
-export interface IAppBarAction<Context = unknown> extends IMenuItem<Context> { };
+export interface IAppBarAction<Context = unknown> extends INavItemProps<Context> { };
 
 /**
  * 

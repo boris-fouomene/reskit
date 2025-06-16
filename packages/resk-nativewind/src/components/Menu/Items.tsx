@@ -1,34 +1,47 @@
-import { MenuItem } from './Item';
-import { useRenderMenuItems } from './hooks';
 import { IMenuContext, IMenuItemProps, IMenuItemsProps } from './types';
-import ExpandableMenuItem from './ExpandableItem';
 import { useMenu } from './context';
-import { Div } from '@html/Div';
 import { defaultStr } from '@resk/core/utils';
+import { Nav } from "@components/Nav";
+import { JSX } from 'react';
+import { cn } from '@utils/cn';
 
 
-export function MenuItems<Context = unknown>({ items: customItems, context, testID, ...rest }: IMenuItemsProps<Context>) {
+export default function MenuItems<Context = unknown>({ context, testID, ...rest }: IMenuItemsProps<Context>) {
   testID = defaultStr(testID, "resk-menu-item");
   const menuContext = useMenu() as IMenuContext<Context>;
-  const items = useRenderMenuItems<IMenuContext<Context>>({
-    items: (Array.isArray(customItems) ? customItems : []),
-    context: Object.assign({}, context, menuContext),
-    render: renderItem,
-    renderExpandable,
-  });
-  return <Div testID={testID} {...rest}>
-    {items}
-  </Div>
+  return <Nav.Items<IMenuContext<Context>>
+    testID={testID}
+    {...rest}
+    renderItem={renderMenuItem}
+    renderExpandableItem={renderExpandableMenuItem}
+    context={Object.assign({}, context, menuContext)}
+  />
 };
 
-function renderExpandable<Context = unknown>(props: IMenuItemProps<Context>, index: number) {
-  return <ExpandableMenuItem {...props} key={index} />;
+function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Element {
+  const { closeOnPress } = props;
+  const { menu } = Object.assign({}, props.context);
+  return <Nav.Item
+    {...props}
+    onPress={(event, context) => {
+      if (typeof props.onPress == "function" && props.onPress(event, context) === false) {
+        return;
+      }
+      if (closeOnPress !== false && typeof menu?.close == "function") {
+        menu.close();
+      }
+    }}
+  />;
 }
-function renderItem<Context = unknown>(props: IMenuItemProps<Context>, index: number) {
-  return <MenuItem {...props as any} key={index} />;
+(MenuItem as any).displayName = "Menu.Item";
+function renderMenuItem<Context = unknown>(props: IMenuItemProps<Context>, index: number) {
+  return <MenuItem {...props} className={cn("w-full", props.className)} key={index} />;
 }
 
-export default MenuItems;
+
+function renderExpandableMenuItem<Context = unknown>(props: IMenuItemProps<Context>, index: number) {
+  return <Nav.ExpandableItem<IMenuContext<Context>> as={MenuItem} {...props} key={index} />;
+}
 
 MenuItems.displayName = "MenuItems";
 

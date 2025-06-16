@@ -1,12 +1,10 @@
 
-import { IButtonProps } from "@components/Button/types";
 import { IClassName, IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
 import { PressableProps, ViewProps } from "react-native";
-import { IHtmlDivProps } from "@html/types";
 import { useBreakpoints } from "@utils/breakpoints";
-import { IHtmlDetailsProps } from "@html/Details";
 import { IVariantPropsMenu } from "@variants/menu";
+import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 
 /**
  * Represents the possible positions where the menu can be displayed
@@ -336,9 +334,9 @@ export interface IMenuProps<Context = unknown> extends Omit<PressableProps, "chi
 
     style?: ViewProps["style"];
 
-    items?: IMenuItems<Context>["items"];
+    items?: INavItemsProps<Context>["items"];
 
-    itemsProps?: Omit<IMenuItems<Context>, "items">;
+    itemsProps?: Omit<INavItemsProps<Context>, "items">;
 
     /***
      * The variant to use for the menu.
@@ -352,182 +350,11 @@ export interface IMenuProps<Context = unknown> extends Omit<PressableProps, "chi
 }
 
 
-export interface IMenuItem<Context = unknown> extends IButtonProps<Context> {
-    /***
-     * if true, the menu item will be rendered as a section, if false, it will be rendered as an item
-     */
-    section?: boolean;
-    /***
-     * Props for the sub items. In case of existance of sub items.  If provided, the menu item will be expandable.
-     */
-    items?: IMenuItem<Context>[];
-    /**
-     * Props for the expandable component that will be used to expand the menu item. In case of existance of sub items.
-     */
-    expandableProps?: Omit<IHtmlDetailsProps, "summary">;
-
-    /***
-     * level of the menu item in the hierarchy. 
-     * this is used to determine the indentation of the menu item.
-     * this value is auto calculated by the menu items component.
-     */
-    level?: number;
-
-    /***
-     * if true, the menu will be closed when the button is pressed.
-     */
-    closeOnPress?: boolean;
-
-    dividerClassName?: IClassName;
-};
-
-export interface IMenuItemProps<Context = unknown> extends IMenuItem<IMenuContext<Context>> {
-
-};
 
 
+export interface IMenuItemProps<Context = unknown> extends INavItemProps<IMenuContext<Context>> { };
 
 
-/**
- * Represents the base properties for a collection of menu items, extending the view properties.
- * This type is designed to facilitate the rendering of multiple menu items within a menu component,
- * allowing for customization of the layout and behavior of the items.
- *
- * @template Context - A generic type parameter that allows the inclusion of additional
- * context properties specific to the menu items. This can be any object type, enabling extensibility
- * of the menu item's contextual behavior.
- *
- * @extends IHtmlDivProps - This type extends the properties of a Div, allowing for additional layout and
- * styling options that are applicable to the container of the menu items.
- *
- * @property {Array<IMenuItem<Context> | undefined | null>} [items] - Optional property
- * that defines an array of menu items. Each item can either be a valid menu item object, null, or undefined.
- * This array is utilized to render the individual menu items within the menu component.
- *
- * @example
- * const menuItems: IMenuItems = {
- *   items: [
- *     { label: "Home", onPress: () => console.log("Home pressed") },
- *     { label: "Settings", onPress: () => console.log("Settings pressed") },
- *     { label: "Help", items: [{ label: "FAQ", onPress: () => console.log("FAQ pressed") }] },
- *   ],
- * };
- *
- * // Rendering the menu items in a component
- * const MyMenu = () => {
- *   return (
- *     <View>
- *       <MenuItems items={menuItems.items} />
- *     </View>
- *   );
- * };
- */
-export interface IMenuItems<Context = unknown> extends IHtmlDivProps {
-    items?: (IMenuItem<Context> | undefined | null)[]
-}
-
-
-export interface IMenuItemsProps<Context = unknown> extends IMenuItems<IMenuContext<Context>> {
-    /**
-     * Additional context options to pass to the rendering functions.
-    * for menu items. This enables customization of the properties passed to the menu item
-    * render function, allowing for additional context-specific data to be included.
-     */
+export interface IMenuItemsProps<Context = unknown> extends Omit<INavItemsProps<IMenuContext<Context>>, "renderItem" | "context" | "renderExpandableItem"> {
     context?: Context;
 };
-
-/**
- * Type definition for a function that renders a menu item.
- * This function receives the properties of the menu item and an optional index,
- * and returns a IReactNullableElement representing the rendered item.
- *
- * @template Context - A generic type parameter that allows extending the context
- * for menu items. This enables customization of the properties passed to the menu item
- * render function, allowing for additional context-specific data to be included.
- *
- * @param {IMenuItem<Context>} props - The properties of the menu item to render.
- * This includes all relevant data required to display the item, such as its label, icon,
- * and any action handlers.
- *
- * @param {number} [index] - An optional index indicating the position of the item in the
- * list of menu items. This can be useful for applying specific styles or behaviors based
- * on the item's position within the menu.
- *
- * @returns {IReactNullableElement} Returns a IReactNullableElement representing the rendered menu item. This can
- * be any valid React element, including custom components, JSX, or null if the item should
- * not be rendered.
- *
- * @example
- * ```tsx
- * const renderMenuItem: IMenuItemRenderFunc = (props, index) => {
- *   return (
- *     <div key={index} onClick={props.onPress}>
- *       {props.label}
- *     </div>
- *   );
- * };
- * ```
- *
- * In the example above, the `renderMenuItem` function takes menu item properties and an
- * index, returning a JSX element that displays the item's label and attaches an onClick
- * handler to it.
- */
-export type IMenuItemRenderFunc<Context = unknown> = (props: IMenuItem<Context>, index: number) => IReactNullableElement;
-
-
-type IMenuRenderItemsOptionsBase<Context = unknown> = {
-    /**
-     * The function used to render a
-    * standard menu item. This function receives the item properties and is responsible for generating
-    * the corresponding JSX.
-     */
-    render: IMenuItemRenderFunc<Context>,
-
-    /**
-     * The function used to
-    * render expandable menu items. Similar to the render function, this handles the rendering of
-    * items that can expand to show additional content.
-     */
-    renderExpandable: IMenuItemRenderFunc<Context>,
-
-    /**
-     * additioonal parameters that allows extending the context
-    * for menu items. This enables customization of the properties passed to the menu item
-    * render function, allowing for additional context-specific data to be included.
-    *
-    */
-    context?: Context;
-}
-
-export interface IMenuRenderItemOptions<Context = unknown> extends IMenuRenderItemsOptionsBase<Context> {
-    /**
-     * The menu item to render. This includes
-    * all relevant data required to display the item, such as its label, icon, and any action handlers.
-     */
-    item: IMenuItem<Context>,
-    /**
-     * The index of the item in the list. This can be useful for applying
-    * specific styles or behaviors based on the item's position within the menu.
-     */
-    index: number,
-
-
-
-    /**
-     * An optional property indicating the current level of the menu item
-        * in the hierarchy. This value can be used to determine the indentation of the menu item.
-     */
-    level?: number,
-
-
-    /**
-     * The child nodes of the current item, rendered
-    * using the renderMenuItem method applied to each child item.
-     */
-    itemsNodes?: IReactNullableElement[];
-};
-
-
-export interface IMenuRenderItemsOptions<Context = unknown> extends IMenuRenderItemsOptionsBase<Context> {
-    items?: IMenuItems<Context>["items"];
-}

@@ -1,7 +1,7 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
-import { Icon, Menu, MenuItems, ActivityIndicator, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
+import { Icon, Menu, AppBar, ActivityIndicator, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
@@ -71,7 +71,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
             title="primary color icon car"
             disabled
             variant={{ color: "primary", size: "5xl" }}
-            iconName="fa6-car"
+            iconName="car"
             size={40}
           />
           <Icon.Font title={"A phone icon"} variant={{ color: "secondary", size: "5xl" }} name={"phone"} />

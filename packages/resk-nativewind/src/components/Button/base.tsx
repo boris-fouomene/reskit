@@ -100,7 +100,7 @@ export function ButtonBase<IButtonExtendContext = unknown>({
     const rightContent = typeof right === "function" ? right(buttonContext) : right;
     const hasRightContent = isValidElement(right) && !!right;
     const rowClassName = cn("flex flex-row items-center self-center justify-center", disabledClass);
-    return (<Fragment>
+    return (<>
         <Surface
             role="none"
             {...rest}
@@ -137,7 +137,7 @@ export function ButtonBase<IButtonExtendContext = unknown>({
             {disableRipple || !isValidElement(rippleContent) ? null : rippleContent}
         </Surface>
         {divider ? <Divider id={buttonId + "-divider"} testID={testID + "-button-divider"} className={cn("button-divider", disabledClass, dividerClassName)} /> : null}
-    </Fragment>);
+    </>);
 };
 
 ButtonBase.displayName = "Button.Base";

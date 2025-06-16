@@ -28,7 +28,7 @@
     "theme-to-css-vars"
   ],
   "scripts": {
-    "build": "npm run generate-color-variants && tsc && npx tsc-alias -p tsconfig.json && npm run build:dts",
+    "build": "npm run generate-color-variants && tsc && npx tsc-alias -p tsconfig.json && npm run build:dts && npm run generate-icon-types",
     "build:dts": "tsc -p tsconfig.dts.json --emitDeclarationOnly && npx tsc-alias -p tsconfig.dts.json",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
@@ -44,16 +44,11 @@
     "tailwindcss",
     "ui-framework"
   ],
-  "peerDependencies": {
-    "nativewind": "*",
-    "react-native": "*",
-    "react-native-vector-icons": "*",
-    "react-native-web": "*",
-    "tailwind-variants": "*"
-  },
   "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@types/react-native-vector-icons": "^6.4.18",
     "nativewind": "^4.1.23",
-    "react-native": "^0.79.2",
     "react-native-vector-icons": "^10.2.0",
     "tailwind-variants": "^1.0.0"
   },

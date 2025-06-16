@@ -1,6 +1,6 @@
 import Logger from "@resk/core/logger";
 import { defaultStr, isObj } from "@resk/core/utils";
-import { isValidElement, ComponentType, ReactNode, FC, cloneElement } from "react";
+import { isValidElement, ComponentType, ReactNode, FC, cloneElement, ReactElement } from "react";
 import { StyleSheet } from "nativewind";
 import { cn } from "@utils/cn";
 // Type to extract the props of a component
@@ -34,13 +34,14 @@ export interface AsChildProps {
  *   <p>This is the children of the component</p>
  * </MyComponentWithAsChild>;
  */
-export function withAsChild<T extends ComponentType<any>>(Component: T, displayName?: string): FC<PropsOf<T> & AsChildProps> {
+export function withAsChild<T extends ComponentType<any>>(Component: T, displayName?: string): (props: PropsOf<T> & AsChildProps) => ReactElement {
     function WithAsChildComponent(props: PropsOf<T> & AsChildProps) {
         const { asChild, ...componentProps } = props;
         if (asChild && isValidElement(componentProps.children)) {
             return <Slot {...componentProps as any}>{componentProps.children}</Slot>;
         }
-        return <Component {...componentProps as any} />;
+        const F = Component as any;
+        return <F {...componentProps as any} />;
     }
 
     WithAsChildComponent.displayName = defaultStr(displayName, `WithAsChild(${Component.displayName || Component.name || 'Component'})`);
@@ -98,7 +99,7 @@ export function Slot<T extends SlotProps>(props: T) {
             (compProps as any)[propName] = childPropValue;
         }
     }
-    return cloneElement(children, compProps);
+    return cloneElement(children, compProps) as ReactElement;
 }
 
 Slot.displayName = 'Slot';

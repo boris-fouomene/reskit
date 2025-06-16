@@ -1,9 +1,11 @@
 "use client";
 import { cn } from "@utils/cn";
 import { cssInterop } from "nativewind";
-import { ActivityIndicator as RNPActivityIndicator } from "react-native";
+import { ActivityIndicatorProps, ActivityIndicator as RNPActivityIndicator } from "react-native";
 import { IActivityIndicatorProps } from "./types";
 import activityIndicatorVariant from "@variants/activityIndicator";
+import {ComponentType} from "react";
+import { IReactComponent } from "@src/types";
 
 /**
  * A custom `ActivityIndicator` component that wraps the standard 
@@ -25,6 +27,7 @@ import activityIndicatorVariant from "@variants/activityIndicator";
  * import * as React from 'react';
  * import { View } from 'react-native';
  * import ActivityIndicator from './ActivityIndicator'; // Adjust the import path as necessary
+import { ComponentType } from 'react';
  * 
  * const MyComponent = () => {
  *   return (
@@ -47,7 +50,7 @@ export function ActivityIndicator({ className, variant, style, ...props }: IActi
   return <RNActivityIndicator className={cn(activityIndicatorVariant(variant), className)} testID="resk-activity-indicator" {...props} />;
 }
 
-const RNActivityIndicator = cssInterop(RNPActivityIndicator, {
+const RNActivityIndicator = cssInterop(RNPActivityIndicator as any, {
   className: {
     target: false,
     nativeStyleToProp: {

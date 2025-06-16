@@ -24,6 +24,7 @@
     "jsxImportSource": "nativewind",
     "baseUrl": "./",
     "preserveConstEnums": true,
+    "incremental": false,
     "allowJs": true,
     "paths": {
       "@breakpoints/*": [

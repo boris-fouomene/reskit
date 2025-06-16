@@ -15,31 +15,33 @@ export class Nav {
     static renderItems({ items, renderItem, renderExpandableItem, context, ...rest }: INavItemsProps) {
         return renderNavItems({ items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem, context });
     };
-    static Item<Context = unknown>({ expandableProps, closeOnPress, items, ...props }: INavItemProps<Context>) {
+    static Item<Context = unknown>({ expandableProps, className, closeOnPress, items, ...props }: INavItemProps<Context>) {
         return <Button
-            testID="menu-item"
+            testID="nav-item"
             {...props}
+            className={cn("w-full", "px-[7px] py-[7px]", className)}
             context={Object.assign({}, props.context)}
         />
     }
     static Items<Context = unknown>({ items: customItems, renderItem, renderExpandableItem, context, testID, ...rest }: INavItemsProps<Context>) {
-        testID = defaultStr(testID, "resk-menu-item");
+        testID = defaultStr(testID, "resk-nav-item");
         const items = useRenderNavItems<Context>({
             items: (Array.isArray(customItems) ? customItems : []),
             context: Object.assign({}, context),
             renderItem: typeof renderItem === "function" ? renderItem : renderNavItem,
             renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem,
         });
-        return <Div testID={testID} {...rest} className={cn("w-full", rest.className)}>
+        return <Div testID={testID} {...rest} className={cn("w-full nav-items", rest.className)}>
             {items}
         </Div>
     }
     static ExpandableItem<Context = unknown>({ testID, as, dividerClassName, items, divider, expandableProps, children, ref, ...props }: INavItemProps<Context> & { as?: IReactComponent<INavItemProps<Context>> }) {
-        testID = defaultStr(testID, "resk-menu-expandable-item");
+        testID = defaultStr(testID, "resk-nav-expandable-item");
         expandableProps = Object.assign({}, expandableProps);
         return <Details
             testID={testID + "-expandable-item"}
             {...expandableProps}
+            className={cn("w-full", expandableProps.className)}
             summary={<ExpandableItemLabel as={as} {...props} ref={ref} />}
             children={<>
                 {children}

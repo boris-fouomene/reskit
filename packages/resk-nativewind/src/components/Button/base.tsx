@@ -11,7 +11,6 @@ import { Icon } from '@components/Icon';
 import { Div } from '@html/Div';
 import buttonVariant from "@variants/button";
 import { IButtonLeftOrRightFuncOptions, IButtonBaseProps } from "./types";
-import { Fragment } from "react";
 import allVariants from "@variants/all";
 
 

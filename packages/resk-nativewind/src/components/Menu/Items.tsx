@@ -35,7 +35,7 @@ function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Elemen
 }
 (MenuItem as any).displayName = "Menu.Item";
 function renderMenuItem<Context = unknown>(props: IMenuItemProps<Context>, index: number) {
-  return <MenuItem {...props} className={cn("w-full", props.className)} key={index} />;
+  return <MenuItem {...props} key={index} />;
 }
 
 

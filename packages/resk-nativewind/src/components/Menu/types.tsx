@@ -262,7 +262,7 @@ export interface IUseMenuPositionProps {
 
 
 
-export interface IMenuProps<Context = unknown> extends Omit<PressableProps, "children" | "style" | "className">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
+export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children" | "style" | "className">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
 
     /** Optional callback that is invoked when the menu opens. */
     onOpen?: () => void;

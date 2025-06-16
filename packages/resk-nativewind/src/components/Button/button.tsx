@@ -83,13 +83,13 @@ export function Button<IButtonExtendContext = unknown>({
     const isRippleDisabled = disableRipple || disabled;
     const rProps = isRippleDisabled ? {} : { android_ripple: { color: rippleColor || undefined, ...aRipple } };
     rippleClassName = cn(rest?.variant && buttonVariants(rest.variant)?.ripple?.(), rippleClassName);
-    const { rippleContent, startRipple } = useGetRippleContent({
+    /* const { rippleContent, startRipple } = useGetRippleContent({
         rippleColor,
         disabled,
         testID,
         disableRipple: !!isRippleDisabled,
         rippleClassName,
-    });
+    }); */
     if (perm !== undefined && !Auth.isAllowed(perm)) return null;
     return (<ButtonBase
         {...rest as any}
@@ -102,9 +102,9 @@ export function Button<IButtonExtendContext = unknown>({
         testID={`${testID}`}
         ref={ref}
         onPress={(event: GestureResponderEvent) => {
-            if (typeof startRipple === "function") {
+            /* if (typeof startRipple === "function") {
                 startRipple(event);
-            }
+            } */
             const form = null;//formName ? FormsManager.getForm(formName) : null;
             const hasForm = false;//form && (form as any).isValid();
             const context2: IButtonContext<IButtonExtendContext> = context as IButtonContext<IButtonExtendContext>;
@@ -118,7 +118,7 @@ export function Button<IButtonExtendContext = unknown>({
             }
             return r
         }}
-        rippleContent={rippleContent}
+        rippleContent={null}
     />);
 };
 

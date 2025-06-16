@@ -1,7 +1,6 @@
-"use client";
 import { Fragment, ReactNode } from "react";
 import { IIconProps, IIconSource } from "./types";
-import { Image, ImageSourcePropType, ImageStyle, Pressable, TouchableOpacity } from "react-native";
+import { Image, ImageSourcePropType, ImageStyle, TouchableOpacity } from "react-native";
 import { cn, isValidElement, normalizeProps, pickTouchableProps } from "@utils";
 import { isImageSource, isImageUrl } from "./utils";
 import FontIcon from "./Font";

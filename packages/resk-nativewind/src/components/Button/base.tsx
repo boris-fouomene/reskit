@@ -1,4 +1,3 @@
-"use client";
 import iconVariants from "@variants/icon";
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
@@ -106,7 +105,7 @@ export function ButtonBase<IButtonExtendContext = unknown>({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("group/btn btn relative overflow-hidden button select-text", !disabled && "hover:opacity-90 active1:animate-ping active:scale-[0.97]", allVariants({ disabled }), computedVariant.base?.(), className)}
+            className={cn("group/btn btn relative overflow-hidden11 button select-text", !disabled && "hover:opacity-90 active1:animate-ping active:scale-[0.97]", allVariants({ disabled }), computedVariant.base?.(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}
@@ -114,7 +113,7 @@ export function ButtonBase<IButtonExtendContext = unknown>({
             accessible={accessible}
             disabled={disabled}
         >
-            <Div id={`${buttonId}-content`} testID={testID + "-button-content"} className={cn("button-content flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
+            <Div id={`${buttonId}-content`} testID={testID + "-button-content"} className={cn("button-content w-full flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
                 <Div className={cn("button-left-container", rowClassName, computedVariant.leftContainer?.(), leftContainerClassName)} testID={testID + "-button-left-container"}>
                     {leftContent}
                     {iconPosition != "right" ? iconContent : null}

@@ -24,12 +24,19 @@ function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Elemen
   return <Nav.Item
     {...props}
     onPress={(event, context) => {
+      if (typeof event?.stopPropagation == "function") {
+        event.stopPropagation();
+      }
+      if (typeof event?.preventDefault == "function") {
+        event.preventDefault();
+      }
       if (typeof props.onPress == "function" && props.onPress(event, context) === false) {
         return;
       }
       if (closeOnPress !== false && typeof menu?.close == "function") {
         menu.close();
       }
+      return false;
     }}
   />;
 }

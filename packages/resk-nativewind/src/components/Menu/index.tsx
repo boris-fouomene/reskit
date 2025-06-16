@@ -175,18 +175,16 @@ export function Menu<Context = unknown>({
                 {anchor}
             </Pressable>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => { close(); }} className={cn(menuVariant.portal(), backdropClassName, "menu-portal")}>
+        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} handleOnPressOnlyOnTarget onPress={(event) => {
+            if (event.target == event.currentTarget) {
+                close();
+                return;
+            }
+        }} className={cn(menuVariant.portal(), backdropClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
-                <Pressable
+                <View
                     testID={testID}
                     {...props}
-                    onPress={(event) => {
-                        event.stopPropagation();
-                        if (typeof props.onPress === "function") {
-                            return props.onPress(event);
-                        }
-                        return false;
-                    }}
                     className={cn(menuVariant.base(), className)}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
@@ -200,7 +198,7 @@ export function Menu<Context = unknown>({
                         {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                         {child}
                     </Wrapper>
-                </Pressable>
+                </View>
             </MenuContext.Provider>
         </Portal>}
     </>

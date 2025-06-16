@@ -29,5 +29,10 @@ export interface IPortalProps {
      */
     onPress?: (event: GestureResponderEvent) => void;
 
+    /***
+     * If true, the portal will only handle the onPress event when the target is the portal itself, not any internal elements.
+     */
+    handleOnPressOnlyOnTarget?: boolean;
+
     style?: IHtmlDivProps["style"];
 }

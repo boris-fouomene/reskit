@@ -2,7 +2,7 @@ import FontIcon from "./Font";
 import Icon from "./Icon";
 import Button from "./Button";
 export * from "./Font";
-export * from "./Icon";
+//export * from "./Icon";
 export * from "./types";
 
 type IIcon = typeof Icon & {

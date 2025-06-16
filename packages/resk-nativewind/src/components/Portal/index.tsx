@@ -26,7 +26,7 @@ import { StyleSheet } from 'react-native';
  *   )
  * }
  */
-export function Portal({ children, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
+export function Portal({ children, style, className, handleOnPressOnlyOnTarget, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
     const [mounted, setMounted] = useState(false);
     const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
     const createdElementRef = useRef<HTMLElement | null>(null);
@@ -53,6 +53,7 @@ export function Portal({ children, style, className, onPress, withBackdrop, visi
         element.style.zIndex = String(Math.max(getMaxZindex(), 1000));
         element.className = cn(absoluteFill && absoluteClassName, "portal", allVariants({ backdrop: withBackdrop }), className);
         element.setAttribute("data-testid", defaultStr(testID, "portal-" + targetId));
+        element.style.pointerEvents = "box-only";
         const stylesProp = StyleSheet.flatten([absoluteFill && styles.absoluteFill, style]) as any;
         for (const key in stylesProp) {
             if (key in element.style) {
@@ -61,6 +62,7 @@ export function Portal({ children, style, className, onPress, withBackdrop, visi
         }
         if (typeof onPress == "function") {
             element.onclick = function (event) {
+                if (handleOnPressOnlyOnTarget && event.target !== element) return
                 onPress(normalizeGestureEvent(event as any));
             };
             element.style.cursor = "pointer";
@@ -81,7 +83,7 @@ export function Portal({ children, style, className, onPress, withBackdrop, visi
                 console.log(e, " removing portal element")
             }
         };
-    }, [target, targetId, className, absoluteFill, visible, testID, onPress]);
+    }, [target, targetId, className, absoluteFill, visible, testID, onPress, handleOnPressOnlyOnTarget]);
     // Don't render anything on server side or before mounting
     if (!mounted || !targetElement) {
         return null;

@@ -132,13 +132,19 @@ export function PortalProvider({ children }: { children?: ReactNode }) {
             {children}
             <>
                 {portalRefs.current.map(({ key, children, props }, index) => {
+                    const { handleOnPressOnlyOnTarget, style, onPress, ...rest } = Object.assign({}, props);
                     return (
                         <RenderedPortal
                             testID={`${testID}-${index + 1}`}
                             key={key}
                             zIndex={startIndex + index + 1}
                             children={children}
-                            {...Object.assign({}, props)}
+                            {...rest}
+                            style={StyleSheet.flatten([{ pointerEvents: "box-only" }, style])}
+                            onPress={typeof onPress == "function" ? (event) => {
+                                if (handleOnPressOnlyOnTarget && event.target !== event.currentTarget) return;
+                                onPress(event);
+                            } : undefined}
                         />
                     );
                 })}

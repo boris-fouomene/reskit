@@ -38,7 +38,7 @@ export const useMenuPosition = ({
         } else {
             const { pageX: pX, pageY: pY, width: anchorWidth, height: anchorHeight } = anchorMeasurements;
             const pageX = Math.max(0, pX), pageY = Math.max(0, pY);
-            minWidth = typeof minWidth == 'number' && minWidth > 0 ? minWidth : anchorWidth;
+            minWidth = Math.max(typeof minWidth == 'number' && minWidth > 0 ? minWidth : anchorWidth, 100);
             if (anchorWidth <= windowWidth - pageX) {
                 minWidth = Math.max(minWidth, anchorWidth);
             }

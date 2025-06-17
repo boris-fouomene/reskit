@@ -153,7 +153,7 @@ export function Menu<Context = unknown>({
     const Wrapper = !withScrollView ? Fragment : ScrollView;
     const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", className: cn(menuVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(menuVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
-    itemsProps.className = cn(menuVariant.items(), itemsProps.className);
+    itemsProps.className = cn(menuVariant.items(), itemsProps.className); 
     return <>
         <MenuContext.Provider value={context}>
             <Pressable testID={testID + "-anchor-container"}

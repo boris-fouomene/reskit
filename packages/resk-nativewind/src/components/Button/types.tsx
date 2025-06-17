@@ -7,13 +7,13 @@ import { ReactElement, ReactNode, Ref } from "react";
 import { IDict, IResourceName } from '@resk/core/types';
 import buttonVariant, { IVariantPropsButton } from "@variants/button";
 
-export interface IButtonLeftOrRightFuncOptions<IButtonExtendContext = unknown> {
-    context: IButtonExtendContext;
+
+export type IButtonBaseContext<Context = unknown> = Context & {
     loading: boolean;
     disabled: boolean;
     computedVariant: ReturnType<typeof buttonVariant>;
 }
-export interface IButtonBaseProps<IButtonExtendContext = unknown> extends Omit<ISurfaceProps, "variant"> {
+export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "variant" | "onPress"> {
     /***
      * The class name for the label
      */
@@ -100,12 +100,12 @@ export interface IButtonBaseProps<IButtonExtendContext = unknown> extends Omit<I
     /***
      * The left content of the button
      */
-    left?: ReactNode | ((options: IButtonLeftOrRightFuncOptions<IButtonExtendContext>) => ReactNode);
+    left?: ReactNode | ((options: IButtonBaseContext<Context>) => ReactNode);
 
     /***
      * The right content of the button
      */
-    right?: ReactNode | ((options: IButtonLeftOrRightFuncOptions<IButtonExtendContext>) => ReactNode);
+    right?: ReactNode | ((options: IButtonBaseContext<Context>) => ReactNode);
 
     /**
      * Disables the ripple effect on button press.
@@ -142,13 +142,28 @@ export interface IButtonBaseProps<IButtonExtendContext = unknown> extends Omit<I
     /***
      * Optional context for the button component.
      */
-    context?: IButtonExtendContext;
+    context?: Context;
+    
+    /***
+        The callback function to be called when the button is pressed.
+    */
+    onPress?: (event: GestureResponderEvent, context: IButtonBaseContext<Context>) => any;
+    
+        /***
+     * The permission associated with the button. This permission is used to determine if the button will be rendered or not.
+     * If not provided, the button will be rendered regardless of the user's permissions.
+     */
+    perm?: IAuthPerm;
+
+    /***
+     * The name of the resource associated with the button.
+     * When this name is provided, button can be used as an actions for a form with that resource.
+     */
+    resourceName?: IResourceName;
+
 }
 
-export interface IButtonProps<IButtonExtendContext = unknown> extends Omit<IButtonBaseProps<IButtonExtendContext>, "ref" | "onPress"> {
-
-    onPress?: (event: GestureResponderEvent, context: IButtonContext<IButtonExtendContext>) => any;
-
+export interface IButtonInteractiveProps<Context = unknown> extends Omit<IButtonProps<IButtonContext<Context>>, "ref"> {
     /***
      * The name of the form associated with the button in case of button representing a form action.
      * when this property is set, the button listens dynamically to the state of the form and is activated or deactivated according to the validated state or name of the form. 
@@ -161,22 +176,11 @@ export interface IButtonProps<IButtonExtendContext = unknown> extends Omit<IButt
      */
     submitFormOnPress?: boolean;
 
-    /***
-     * The permission associated with the button. This permission is used to determine if the button will be rendered or not.
-     * If not provided, the button will be rendered regardless of the user's permissions.
-     */
-    perm?: IAuthPerm;
-
-    /***
-     * The name of the resource associated with the button.
-     * When this name is provided, button can be used as an actions for a form with that resource.
-     */
-    resourceName?: IResourceName;
 
     /***
      * The réf of the button component.
      */
-    ref?: Ref<IButtonContext<IButtonExtendContext> & View>;
+    ref?: Ref<IButtonContext<Context> & View>;
 
 
     /**
@@ -194,7 +198,7 @@ export interface IButtonProps<IButtonExtendContext = unknown> extends Omit<IButt
     rippleClassName?: IClassName;
 }
 
-export type IButtonContext<IButtonExtendContext = unknown> = Readonly<{
+export type IButtonContext<Context = unknown> = Readonly<{
     /*
         Enables the button, allowing it to respond to user interactions.
     */
@@ -224,4 +228,4 @@ export type IButtonContext<IButtonExtendContext = unknown> = Readonly<{
      * The data associated with the form if the button is representing a form action.
      */
     formData?: IDict;
-}> & Omit<IButtonLeftOrRightFuncOptions<IButtonExtendContext>, "context">;
+}> & Omit<IButtonBaseContext<Context>, "context">;

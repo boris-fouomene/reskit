@@ -31,8 +31,8 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           title="My Application"
           subtitle="Welcome to the app"
           actions={[
-            { label: "Settings", onPress: () => console.log('Settings pressed') },
-            { label: "Profile", onPress: () => console.log('Profile pressed') },
+            { label: "Settings"},
+            { label: "Profile"},
           ]}
         />
       </Div>
@@ -122,7 +122,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10 gap-y-5">
-          <Button.Base label="Button base example1 with left icon" icon={"camera"} variant={{ color: "primary", padding: "5px" }}
+          <Button label="Button base example1 with left icon" icon={"camera"} variant={{ color: "primary", padding: "5px" }}
             left={<Icon.Font name="ph" size={30} className={variants.button({ color: "primary" }).icon()} />}
           />
           <Button label="Button example2" icon="radio" variant={{ color: "secondary", padding: "10px" }} />

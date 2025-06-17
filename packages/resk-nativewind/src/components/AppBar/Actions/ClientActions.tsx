@@ -10,8 +10,7 @@ import { Icon } from "@components/Icon";
 import { FONT_ICONS } from "@components/Icon/Font/icons";
 
 export function AppBarClientActions<Context = unknown>({ context, testID, renderAction, renderExpandableAction, actionClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
-    const {windowWidth } = useBreakpoints();
-    console.log("AppBarClientActions", { windowWidth, viewportWidth, maxVisibleActions, items });
+    const {window:{width:windowWidth},isClientSide } = useBreakpoints();
     testID = defaultStr(testID, "resk-appbar-actions");
     const menuItems: IAppBarActionProps<Context>[] = [];
     const actionCounter = { current: 0 };
@@ -51,12 +50,13 @@ export function AppBarClientActions<Context = unknown>({ context, testID, render
             return _render(renderExpandableAction, props, index);
         },
     });
+    
     return <>
         {actions}
-        {menuItems.length ? <Menu
+        {menuItems.length > 0 ? <Menu
             preferedPositionAxis='vertical'
             testID={`${testID}-menu`}
-            anchor={({ menu }) => {
+            anchor={menuItems.length ? ({ menu }) => {
                 return <Icon.Button
                     size={28}
                     iconName={FONT_ICONS.MORE as any}
@@ -65,9 +65,9 @@ export function AppBarClientActions<Context = unknown>({ context, testID, render
                         menu?.open();
                     }}
                 />
-            }}
+            }: null}
             items={menuItems}
-        /> : null}
+        />: null}
     </>;
 }
 

@@ -9,40 +9,13 @@ import { cn } from '@utils/cn';
 import { Icon } from '@components/Icon';
 import { Div } from '@html/Div';
 import buttonVariant from "@variants/button";
-import { IButtonLeftOrRightFuncOptions, IButtonBaseProps } from "./types";
+import { IButtonBaseContext,IButtonProps } from "./types";
 import allVariants from "@variants/all";
+import { GestureResponderEvent } from "react-native";
+import Auth from '@resk/core/auth';
 
 
-/**
- * A functional component that renders a basic button with customizable properties.
- * It supports loading states and can display either an icon or an image icon.
- *
- * @param {IButtonBaseProps} props - The properties to configure the ButtonBase.
- * @param {boolean} [props.disabled=false] - Whether the button is disabled.
- * @param {boolean} [props.loading=false] - Indicates if a loading spinner should be shown instead of the icon.
- * @param {string} [props.icon] - The name of the font icon to display.
- * @param {ReactNode} [props.children] - The content of the button.
- * @param {string} [props.accessibilityLabel] - The accessibility label for the button.
- * @param {string} [props.accessibilityHint] - The accessibility hint for the button.
- * @param {string} [props.testID] - Optional test identifier for the button.
- * @param {string} [props.id] - Optional id for the button.
- * @param {boolean} [props.accessible=true] - Whether the button is accessible.
- * @param {string} [props.labelClassName] - Additional class names for the label.
- * @param {string} [props.contentClassName] - Additional class names for the content.
- * @param {string} [props.leftContainerClassName] - Additional class names for the left container.
- * @param {string} [props.rightContainerClassName] - Additional class names for the right container.
- * @param {string} [props.iconPosition="left"] - The position of the icon.
- * @param {object} [props.iconProps] - The properties to configure the icon.
- * @param {string} [props.containerClassName] - Additional class names for the button container.
- * @param {string} [props.className] - Additional class names for the button.
- * @param {React.Ref} [props.ref] - A reference to the button container.
- * @param {object} [props.context] - Additional context properties to pass to the label and icon.
- * @param {boolean} [props.disableRipple=false] - Whether to disable the ripple effect.
- * @param {ReactNode} [props.rippleContent] - The content for the ripple effect.
- *
- * @returns {JSX.Element} The rendered ButtonBase component.
- */
-export function ButtonBase<IButtonExtendContext = unknown>({
+export function ButtonBase<Context = unknown>({
     disabled: customDisabled,
     loading: customIsLoading,
     icon: iconProp,
@@ -73,8 +46,12 @@ export function ButtonBase<IButtonExtendContext = unknown>({
     disableRipple,
     rippleContent,
     context,
+    perm,
+    resourceName,
+    onPress,
     ...rest
-}: IButtonBaseProps) {
+}: IButtonProps<Context>) {
+    if (perm !== undefined && !Auth.isAllowed(perm)) return null;
     const buttonId = defaultStr(id, testID, "resk-button-base-id");
     testID = defaultStr(testID, "resk-button-base");
     const isLoading = !!customIsLoading;
@@ -93,7 +70,7 @@ export function ButtonBase<IButtonExtendContext = unknown>({
             testID={testID + "-button-activity-indicator"}
         />
     ) : icon || null;
-    const buttonContext = Object.assign({}, context, { loading: isLoading, computedVariant }) as IButtonLeftOrRightFuncOptions<IButtonExtendContext>;
+    const buttonContext = Object.assign({}, context, { loading: isLoading, computedVariant }) as IButtonBaseContext<Context>;
     const leftContent = typeof left === "function" ? left(buttonContext) : left;
     const rightContent = typeof right === "function" ? right(buttonContext) : right;
     const hasRightContent = isValidElement(right) && !!right;
@@ -105,13 +82,17 @@ export function ButtonBase<IButtonExtendContext = unknown>({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("group/btn btn relative overflow-hidden11 button select-text", !disabled && "hover:opacity-90 active1:animate-ping active:scale-[0.97]", allVariants({ disabled }), computedVariant.base?.(), className)}
+            className={cn("group/btn btn relative  button select-text",rippleContent?"overflow-hidden":"", !disabled && "hover:opacity-90 active1:animate-ping active:scale-[0.97]", allVariants({ disabled }), computedVariant.base?.(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}
             accessibilityState={{ disabled }}
             accessible={accessible}
             disabled={disabled}
+            onPress = {typeof onPress ==="function" ? (event: GestureResponderEvent) => {
+                const r = onPress(event, buttonContext);
+                return r
+            }: undefined}
         >
             <Div id={`${buttonId}-content`} testID={testID + "-button-content"} className={cn("button-content w-full flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
                 <Div className={cn("button-left-container", rowClassName, computedVariant.leftContainer?.(), leftContainerClassName)} testID={testID + "-button-left-container"}>

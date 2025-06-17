@@ -3,11 +3,10 @@ import { useImperativeHandle, useEffect, useId } from 'react';
 //import { FormsManager } from '@components/Form/FormsManager';
 import { GestureResponderEvent } from 'react-native';
 import { ButtonBase } from './base';
-import { IButtonContext, IButtonProps } from './types';
+import { IButtonContext, IButtonInteractiveProps, IButtonProps } from './types';
 import { defaultStr } from '@resk/core/utils';
 import { cn } from '@utils/cn';
 import { useGetRippleContent } from './ripple';
-import Auth from '@resk/core/auth';
 import useStateCallback from '@utils/stateCallback';
 import buttonVariants from "@variants/button";
 
@@ -29,7 +28,7 @@ export function Button<IButtonExtendContext = unknown>({
     rippleClassName,
     testID,
     ...rest
-}: IButtonProps<IButtonExtendContext>) {
+}: IButtonInteractiveProps<IButtonExtendContext>) {
     const [isLoading, _setIsLoading] = useStateCallback(typeof customIsLoading == "boolean" ? customIsLoading : false);
     const [isDisabled, setIsDisabled] = useStateCallback(typeof customDisabled == "boolean" ? customDisabled : false);
     const uId = useId();
@@ -82,15 +81,15 @@ export function Button<IButtonExtendContext = unknown>({
     const aRipple = Object.assign({}, android_ripple);
     const isRippleDisabled = disableRipple || disabled;
     const rProps = isRippleDisabled ? {} : { android_ripple: { color: rippleColor || undefined, ...aRipple } };
-    rippleClassName = cn(rest?.variant && buttonVariants(rest.variant)?.ripple?.(), rippleClassName);
-    /* const { rippleContent, startRipple } = useGetRippleContent({
+    /* rippleClassName = cn(rest?.variant && buttonVariants(rest.variant)?.ripple?.(), rippleClassName);
+    const { rippleContent, startRipple } = useGetRippleContent({
         rippleColor,
         disabled,
         testID,
         disableRipple: !!isRippleDisabled,
         rippleClassName,
     }); */
-    if (perm !== undefined && !Auth.isAllowed(perm)) return null;
+    
     return (<ButtonBase
         {...rest as any}
         {...rProps}

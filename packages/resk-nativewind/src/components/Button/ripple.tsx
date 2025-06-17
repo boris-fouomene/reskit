@@ -15,7 +15,7 @@ import { isNonNullString } from "@resk/core/utils";
  * 
  * @returns {{ rippleContent?: ReactElement | null; startRipple?: (event: GestureResponderEvent) => void }} - The content of the ripple effect and the function to start the animation
  */
-export function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleClassName }: Partial<IButtonProps>): {
+export function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleClassName }: Partial<IButtonProps> & any): {
     rippleContent?: ReactElement | null;
     startRipple?: (event: GestureResponderEvent) => void;
 } {

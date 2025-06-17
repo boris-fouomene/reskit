@@ -1,9 +1,9 @@
 import { Menu } from "@components/Menu";
-import { IAppBarAction } from './types';
+import { IAppBarActionProps } from './types';
 import { AppBarAction } from "./Action";
 
 
-function ExpandableAppBarAction<AppBarActionContext = unknown>({ items, children, ...rest }: IAppBarAction<AppBarActionContext>) {
+function ExpandableAppBarAction<AppBarActionContext = unknown>({ items, children, ...rest }: IAppBarActionProps<AppBarActionContext>) {
     return <Menu<AppBarActionContext>
         anchor={({ menu }) => {
             return (

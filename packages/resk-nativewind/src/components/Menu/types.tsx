@@ -1,8 +1,7 @@
 
 import { IClassName, IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
-import { PressableProps, ViewProps } from "react-native";
-import { useBreakpoints } from "@utils/breakpoints";
+import { ViewProps } from "react-native";
 import { IVariantPropsMenu } from "@variants/menu";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 
@@ -209,11 +208,6 @@ export interface IUseMenuPositionProps {
      * Whether the menu should be responsive on tablet devices or not. If set to true, the menu will fill the entire screeen on tablet devices, and will be fixed on desktop.
      */
     fullScreenOnTablet?: boolean;
-
-    /***
-     * Breakpoint options for the useBreakpoints hook.
-     */
-    breakpointOptions?: Parameters<typeof useBreakpoints>[0];
 
     /***
      * If true, the menu will have the same width as the anchor element.

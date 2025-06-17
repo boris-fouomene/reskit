@@ -4,18 +4,19 @@ import { INavItemProps, INavRenderItemOptions, INavItemsProps } from "./types";
 import { IReactNullableElement } from "../../types";
 import Auth from "@resk/core/auth";
 import { cloneObject, isObj } from "@resk/core/utils";
+import { cn } from "@utils/cn";
 
 
-function renderExpandableMenuItemOrSection<ItemContext = unknown>({ item, itemsNodes, index, context, renderItem, renderExpandableItem, level }: INavRenderItemOptions<ItemContext>) {
+function renderExpandableMenuItemOrSection<ItemContext = unknown>({ item, itemsNodes, index, context, renderItem, renderExpandableItem, level, itemClassName }: INavRenderItemOptions<ItemContext>) {
   level = typeof level == "number" && level || 0;
   if (item?.perm !== undefined && !Auth.isAllowed(item?.perm)) return null;
   const { section, items, ...rest } = item;
   context = { ...Object.assign({}, rest.context), ...Object.assign({}, context) };
-  return (section ? renderItem : renderExpandableItem)({ level, items, ...rest, children: itemsNodes, context }, index);
+  return (section ? renderItem : renderExpandableItem)({ level, items, ...rest, className: cn(itemClassName, rest.className), children: itemsNodes, context }, index);
 }
 
 
-function renderNavItem<ItemContext = unknown>({ item, index, renderItem, renderExpandableItem, level, context }: INavRenderItemOptions<ItemContext>): IReactNullableElement {
+function renderNavItem<ItemContext = unknown>({ item, index, renderItem, renderExpandableItem, itemClassName, level, context }: INavRenderItemOptions<ItemContext>): IReactNullableElement {
   level = typeof level == "number" && level || 0;
   if (!item) return null;
   item.level = level;
@@ -29,18 +30,18 @@ function renderNavItem<ItemContext = unknown>({ item, index, renderItem, renderE
     item.items.map((it, i) => {
       if (!it) return null;
       it.level = (level as number) + 1;
-      itemsNodes.push(renderNavItem({ level: (level as number) + 1, item: it as INavItemProps<ItemContext>, context, index: i, renderItem, renderExpandableItem }));
+      itemsNodes.push(renderNavItem({ level: (level as number) + 1, itemClassName, item: it as INavItemProps<ItemContext>, context, index: i, renderItem, renderExpandableItem }));
     });
     if (itemsNodes.length) {
-      return renderExpandableMenuItemOrSection({ level, itemsNodes: itemsNodes, index, item, renderItem, renderExpandableItem, context })
+      return renderExpandableMenuItemOrSection({ level, itemClassName, itemsNodes: itemsNodes, index, item, renderItem, renderExpandableItem, context })
     }
   }
-  return renderItem({ ...item, level, context: { ...Object.assign({}, item.context), ...Object.assign({}, context) } }, index);
+  return renderItem({ ...item, className: cn(itemClassName, item.className), level, context: { ...Object.assign({}, item.context), ...Object.assign({}, context) } }, index);
 }
 
 
 
-export function renderNavItems<ItemContext = unknown>({ items, renderItem, renderExpandableItem, context }: INavItemsProps<ItemContext>): IReactNullableElement[] {
+export function renderNavItems<ItemContext = unknown>({ items, renderItem, itemClassName, renderExpandableItem, context }: INavItemsProps<ItemContext>): IReactNullableElement[] {
   const _items: IReactNullableElement[] = [];
   const level = 0;
   if (Array.isArray(items)) {
@@ -48,7 +49,7 @@ export function renderNavItems<ItemContext = unknown>({ items, renderItem, rende
       if (!item || !isObj(item)) return null;
       const clonedItem = cloneObject(item);
       clonedItem.level = level;
-      const r = renderNavItem({ item: clonedItem, index, renderItem, renderExpandableItem, level, context });
+      const r = renderNavItem({ item: clonedItem, itemClassName, index, renderItem, renderExpandableItem, level, context });
       if (r) {
         _items.push(<Fragment key={index}>{r}</Fragment>);
       }

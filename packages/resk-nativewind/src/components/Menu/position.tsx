@@ -3,7 +3,7 @@ import { isNumber, isObj } from "@resk/core/utils";
 import { IMenuCalculatedPosition, IMenuPosition, IUseMenuPositionProps } from "./types";
 import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
-import { useBreakpoints } from "@utils/breakpoints";
+import { useBreakpoints } from "@utils/breakpoints/hooks";
 
 export const useMenuPosition = ({
     position,
@@ -17,10 +17,9 @@ export const useMenuPosition = ({
     menuWidth,
     menuHeight,
     maxHeight: customMaxHeight,
-    breakpointOptions,
 }: IUseMenuPositionProps) => {
     const padding = 0;
-    const { windowWidth, windowHeight, isTablet, isMobile, ...rest } = useBreakpoints(breakpointOptions);
+    const { windowWidth, windowHeight, isTablet, isMobile, ...rest } = useBreakpoints();
     const fullScreen = !!(isMobile && fullScreenOnMobile || isTablet && fullScreenOnTablet);
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));

@@ -43,7 +43,13 @@ export interface INavContext<Context = unknown> {
     context?: Context;
 }
 export interface INavItemsProps<Context = unknown> extends IHtmlDivProps, INavContext<Context> {
+
     items?: (INavItemProps<Context> | undefined | null)[];
+
+    /****
+     * The class name to apply to each nav item.
+     */
+    itemClassName?: IClassName;
 
     /**
      * The function used to render a

@@ -1,7 +1,4 @@
-import {
-  StyleSheet,
-  Platform,
-} from 'react-native';
+import { Platform } from 'react-native';
 import { Surface } from '@components/Surface';
 import { IAppBarProps } from './types';
 import isValidElement from '@utils/isValidElement';
@@ -20,7 +17,7 @@ import { AppBarActions } from './Actions';
 function AppBar<Context = any>({
   renderAction,
   renderExpandableAction,
-  maxActions,
+  maxVisibleActions,
   viewportWidth,
   actions,
   title,
@@ -38,6 +35,7 @@ function AppBar<Context = any>({
   right,
   contentClassName,
   context,
+  className,
   ...appBarProps
 }: IAppBarProps<Context>) {
   testID = defaultStr(testID, 'resk-appbar');
@@ -51,6 +49,7 @@ function AppBar<Context = any>({
     }
   }) : customBackAction;
   return (<Surface
+    className={cn(`appbar h-[${DEFAULT_APPBAR_HEIGHT}px] px-[7px] z-1 flex flex-row items-center`, className)}
     {...appBarProps}
     testID={testID}
   >
@@ -76,49 +75,27 @@ function AppBar<Context = any>({
       ) : null}
     </Div>
     {isValidElement(children) ? children : null}
-    {<AppBarActions actions={actions} maxActions={maxActions} viewportWidth={viewportWidth} renderAction={renderAction} renderExpandableAction={renderExpandableAction} />}
+    {<AppBarActions testID={testID + "-actions"} actions={actions} maxVisibleActions={maxVisibleActions} viewportWidth={viewportWidth} renderAction={renderAction} renderExpandableAction={renderExpandableAction} />}
     {isValidElement(right) ? right : null}
   </Surface>);
 };
 
 const DEFAULT_APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 
-const styles = StyleSheet.create({
-  appbar: {
-    height: DEFAULT_APPBAR_HEIGHT,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 7,
-    zIndex: 1,
-  },
-  subtitle: {
-    fontSize: 14,
-  },
-  action: {
-    padding: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backAction: {
-    marginLeft: 4,
-  },
-  menuContainer: {
-  },
-  menuAnchorContainer: {
-    marginHorizontal: 7
-  }
-});
 
 AppBar.displayName = 'AppBar';
 
 
 
-AppBar.displayName = 'AppBar';
 AppBar.Action = AppBarAction;
-AppBar.Action.displayName = 'AppBar.Action';
+AppBar.Actions = AppBarActions;
 AppBar.BackAction = BackAction;
-AppBar.BackAction.displayName = 'AppBar.BackAction';
 AppBar.ExpandableAction = ExpandableAppBarAction;
+
+AppBar.displayName = 'AppBar';
+AppBar.Action.displayName = 'AppBar.Action';
+AppBar.BackAction.displayName = 'AppBar.BackAction';
+(AppBar.ExpandableAction as any).displayName = 'AppBar.ExpandableAction';
 
 export { AppBar };
 

@@ -1,7 +1,7 @@
 import { Button } from "@components/Button";
-import { IAppBarAction } from './types';
+import { IAppBarActionProps } from './types';
 
-export function AppBarAction<Context = unknown>(props: IAppBarAction<Context>) {
+export function AppBarAction<Context = unknown>(props: IAppBarActionProps<Context>) {
   return <Button
     variant={{ paddingX: 2 }}
     {...props}

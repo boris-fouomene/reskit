@@ -26,6 +26,7 @@ export class Nav {
     static Items<Context = unknown>({ items: customItems, renderItem, renderExpandableItem, context, testID, ...rest }: INavItemsProps<Context>) {
         testID = defaultStr(testID, "resk-nav-item");
         const items = useRenderNavItems<Context>({
+            ...rest,
             items: (Array.isArray(customItems) ? customItems : []),
             context: Object.assign({}, context),
             renderItem: typeof renderItem === "function" ? renderItem : renderNavItem,

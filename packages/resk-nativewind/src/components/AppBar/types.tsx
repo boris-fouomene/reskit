@@ -41,14 +41,25 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
 }
 
 export interface IAppBarActionsProps<Context = unknown> {
+
+    testID?: string;
+
     /** The width of the viewport, used to calculate the maximum number of actions to display. */
     viewportWidth?: number;
 
     /** an array of actions to display in the AppBar. These actions can be buttons or other interactive elements that respond to user interactions. */
-    actions?: IAppBarAction<Context>[];
+    actions?: IAppBarActionProps<Context>[];
 
-    /** The maximum number of actions to display directly on the AppBar. */
-    maxActions?: number;
+    /** The maximum visible number of actions to display directly on the AppBar. 
+     * This value is used to determine the number of actions that can be displayed on the AppBar.
+     * The rest of the actions will be displayed in a menu.
+    */
+    maxVisibleActions?: number;
+
+    /***
+     * class name for each action item
+     */
+    actionClassName?: IClassName;
 
     /**
      * The function used to render an appBar action. This function receives the item properties and is responsible for generating the corresponding JSX.
@@ -60,18 +71,14 @@ export interface IAppBarActionsProps<Context = unknown> {
      */
     renderExpandableAction?: INavItemsProps<Context>["renderExpandableItem"];
 
-
     /** The context to pass to each action, used to extend the context for the actions. */
     context?: Context; // The context for actions requiring specific context information.
-
-
-    actionClassName?: IClassName;
 }
 
 /**
  * Type definition for actions that can be included in an application bar (AppBar).
  * 
- * The `IAppBarAction` type extends the properties of {@link INavItemProps}, allowing
+ * The `IAppBarActionProps` type extends the properties of {@link INavItemProps}, allowing
  * developers to define actions that can be performed from the AppBar. This type
  * can be used to create buttons or interactive elements within the AppBar that 
  * respond to user interactions.
@@ -80,15 +87,15 @@ export interface IAppBarActionsProps<Context = unknown> {
  * extending the context for AppBar actions. This enables customization of the 
  * properties passed to action items within the AppBar.
  *
- * @interface IAppBarAction
+ * @interface IAppBarActionProps
  * 
  * @extends {INavItemProps<Context>} - Inherits the properties 
  * and methods from the `INavItemProps` interface, which defines the structure 
  * for menu items, ensuring consistency and reusability across different components.
  *
  * @example
- * // Example of using IAppBarAction in an AppBar component
- * const MyAppBarAction: React.FC<IAppBarAction> = (props) => {
+ * // Example of using IAppBarActionProps in an AppBar component
+ * const MyAppBarAction: React.FC<IAppBarActionProps> = (props) => {
  *     return (
  *         <Button onPress={props.onPress}>
  *             {props.label}
@@ -96,7 +103,7 @@ export interface IAppBarActionsProps<Context = unknown> {
  *     );
  * };
  */
-export interface IAppBarAction<Context = unknown> extends INavItemProps<Context> { };
+export interface IAppBarActionProps<Context = unknown> extends INavItemProps<Context> { };
 
 /**
  * 

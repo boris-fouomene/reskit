@@ -11,7 +11,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   return (
     <ScrollView testID='main-entry-appp'>
       <ModalExample />
-      <HStack>
+      <HStack className="p-5">
         <H2>Menu Examples</H2>
         <Menu
           anchor={<Text>Open Menu</Text>}
@@ -24,6 +24,17 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           </VStack>}
         />
       </HStack>
+      <Div className="p-5">
+        <H2> AppBar Example</H2>
+        <AppBar
+          title="My Application"
+          subtitle="Welcome to the app"
+          actions={[
+            { label: "Settings", onPress: () => console.log('Settings pressed') },
+            { label: "Profile", onPress: () => console.log('Profile pressed') },
+          ]}
+        />
+      </Div>
       <Div className="p-5">
         <Heading level={2}>Colors Variants</Heading>
         <HStack >

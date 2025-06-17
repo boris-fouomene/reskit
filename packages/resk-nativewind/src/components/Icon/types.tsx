@@ -205,6 +205,8 @@ export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Omit<
      * Zocial, MaterialIcons, and FoundationIcons.
      */
     iconName?: IFontIconName;
+
+    ref?: any;
 };
 
 

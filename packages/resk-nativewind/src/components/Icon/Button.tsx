@@ -1,4 +1,3 @@
-"use client";
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import FontIcon from "./Font";

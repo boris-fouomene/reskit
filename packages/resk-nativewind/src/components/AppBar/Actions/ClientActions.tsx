@@ -7,7 +7,7 @@ import { cn } from "@utils/cn";
 import { defaultStr, isNumber } from "@resk/core/utils";
 import { Menu } from "@components/Menu";
 import { Icon } from "@components/Icon";
-import FontIcon from "@components/Icon/Font";
+import { FONT_ICONS } from "@components/Icon/Font/icons";
 
 export function AppBarClientActions<Context = unknown>({ context, testID, renderAction, renderExpandableAction, actionClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
     const { isMobileOrTablet, windowWidth } = useBreakpoints();
@@ -58,7 +58,7 @@ export function AppBarClientActions<Context = unknown>({ context, testID, render
             anchor={({ menu }) => {
                 return <Icon.Button
                     size={28}
-                    iconName={FontIcon.MORE as any}
+                    iconName={FONT_ICONS.MORE as any}
                     className="mx-[7px]"
                     onPress={() => {
                         menu?.open();

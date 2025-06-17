@@ -5,6 +5,7 @@ import { Tooltip } from "@components/Tooltip";
 import { Text } from "@html/Text";
 import { useToggleable } from "@components/Switch/utils";
 import FontIcon from "@components/Icon/Font";
+import { FONT_ICONS } from "@components/Icon/Font/icons";
 import { isNonNullString, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import getTextContent from "@utils/getTextContent";
@@ -90,8 +91,8 @@ export function Checkbox({ testID, checkedIconName, size, uncheckedIconName, che
     const handleOnPress = (event: GestureResponderEvent) => {
         toggleStatus();
     };
-    const iconChecked = isNonNullString(checkedIconName) ? checkedIconName : FontIcon.CHECKED;
-    const iconUnchecked = isNonNullString(uncheckedIconName) ? uncheckedIconName : FontIcon.UNCHECKED;
+    const iconChecked = isNonNullString(checkedIconName) ? checkedIconName : FONT_ICONS.CHECKED;
+    const iconUnchecked = isNonNullString(uncheckedIconName) ? uncheckedIconName : FONT_ICONS.UNCHECKED;
     const checkboxTestID = typeof testID === 'string' && testID || "resk-checkbox";
     const labelContent = <Text testID={`${checkboxTestID}-label`} className={cn(labelClassName)} children={label} />;
     return <Tooltip

@@ -49,14 +49,14 @@ function AppBar<Context = any>({
     }
   }) : customBackAction;
   return (<Surface
-    className={cn(`appbar h-[${DEFAULT_APPBAR_HEIGHT}px] px-[7px] z-1 flex flex-row items-center`, className)}
+    className={cn(`appbar px-[7px] h-[${DEFAULT_APPBAR_HEIGHT}px] px-[7px] z-1 flex flex-row items-center`, className)}
     {...appBarProps}
     testID={testID}
   >
     {(backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
       <BackAction testID={`${testID}-back-action`} className={cn(backActionClassName)} onPress={onBackActionPress} /> : null}
     {isValidElement(left) ? left as any : null}
-    <Div testID={`${testID}-content`} className={cn("flex flex-1 flex-row px-[12px]", contentClassName)}>
+    <Div testID={`${testID}-content`} className={cn("flex-1 px-[12px]", contentClassName)}>
       <Text
         numberOfLines={1}
         testID={`${testID}-title`}

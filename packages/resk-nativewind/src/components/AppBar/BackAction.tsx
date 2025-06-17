@@ -1,11 +1,11 @@
-import FontIcon from "@components/Icon/Font";
 import IconButton from "@components/Icon/Button";
 import { IBackActionProps } from "./types";
+import { FONT_ICONS } from "@components/Icon/Font/icons";
 
 export function BackAction({ accessibilityLabel = 'Appbar.BackAction', ...rest }: IBackActionProps) {
   return <IconButton
     accessibilityLabel={accessibilityLabel}
-    iconName={FontIcon.BACK as any}
+    iconName={FONT_ICONS.BACK as any}
     size={30}
     {...rest}
   />;

@@ -6,10 +6,8 @@ import { useBackHandler } from "@components/BackHandler/hooks";
 import { defaultStr } from "@resk/core/utils";
 import { Div } from "@html/Div";
 import { IHtmlDivProps } from "@html/types";
-import { styles as portalStyles, absoluteClassName } from "@components/Portal/utils";
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
-import allVariants from "@variants/all";
 import modalVariants, { IVariantPropsModal } from "@variants/modal";
 
 export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable, onDismiss, ...props }: IModalProps) => {
@@ -27,12 +25,7 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
   useBackHandler(dismissable ? handleDismiss : () => true);
   const hidden = !!!visible;
   return (
-    <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"} className={"modal-portal"}>
-      <Div
-        testID={testID + "-modal-backdrop"}
-        className={cn(absoluteClassName, "pointer-events-none", allVariants({ backdrop: true }), modalVariant.backkdrop(), backdropClassName)}
-        style={portalStyles.absoluteFill}
-      />
+    <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"} withBackdrop className={cn("modal-portal", modalVariant.backkdrop(), backdropClassName)}>
       <Div
         testID={testID + "-modal-container"}
         onAccessibilityEscape={() => {
@@ -42,7 +35,7 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
           if (dismissable === false) return;
           handleDismiss(undefined as any);
         }}
-        className={cn("w-full h-full transition-opacity duration-500", modalVariant.container(), containerClassName, allVariants({ hidden }))}
+        className={cn("w-full h-full transition-opacity duration-500", modalVariant.container(), containerClassName)}
         onPress={dismissable === false ? undefined : (e: GestureResponderEvent) => {
           handleDismiss(e);
         }}

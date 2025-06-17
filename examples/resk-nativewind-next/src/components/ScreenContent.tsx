@@ -2,6 +2,7 @@ import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
 import { Icon, Menu, AppBar, ActivityIndicator, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
+
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;

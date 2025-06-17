@@ -62,7 +62,7 @@ export function Portal({ children, style, className, handleOnPressOnlyOnTarget, 
         }
         if (typeof onPress == "function") {
             element.onclick = function (event) {
-                if (handleOnPressOnlyOnTarget && event.target !== element) return
+                if (handleOnPressOnlyOnTarget && event.target !== element && event.currentTarget !== event.target) return
                 onPress(normalizeGestureEvent(event as any));
             };
             element.style.cursor = "pointer";

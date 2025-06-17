@@ -14,7 +14,7 @@ const all = tv({
             true: classes.hidden,
         },
         backdrop: {
-            true: "bg-backdrop flex flex-1 flex-col h-full w-full dark:bg-dark-backdrop opacity-75",
+            true: "bg-backdrop flex flex-1 flex-col h-full w-full dark:bg-dark-backdrop",
         }
     },
 });

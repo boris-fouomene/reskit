@@ -10,7 +10,8 @@ import { Icon } from "@components/Icon";
 import { FONT_ICONS } from "@components/Icon/Font/icons";
 
 export function AppBarClientActions<Context = unknown>({ context, testID, renderAction, renderExpandableAction, actionClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
-    const { isMobileOrTablet, windowWidth } = useBreakpoints();
+    const {windowWidth } = useBreakpoints();
+    console.log("AppBarClientActions", { windowWidth, viewportWidth, maxVisibleActions, items });
     testID = defaultStr(testID, "resk-appbar-actions");
     const menuItems: IAppBarActionProps<Context>[] = [];
     const actionCounter = { current: 0 };

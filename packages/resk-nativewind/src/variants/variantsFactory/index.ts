@@ -1,6 +1,5 @@
 import { roundeClasses } from "./rounded";
-import { paddingClasses, paddingXClasses, paddingYClasses } from "./padding";
-import { marginClasses, marginXClasses, marginYClasses } from "./margin";
+import { padding2marginClasses } from "./padding2margin";
 import { borderClasses } from "./border";
 import { ShadowColorsClasses, ShadowClasses } from "./shadow";
 
@@ -58,23 +57,8 @@ export const VariantsFactory = {
     createRoundedVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
         return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);
     },
-    createPaddingVariants: function createPaddingVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses, ResultType>) {
-        return VariantsFactory.create<typeof paddingClasses, ResultType>(paddingClasses, variantMutator);
-    },
-    createMarginVariants: function createMarginVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof marginClasses, ResultType>) {
-        return VariantsFactory.create<typeof marginClasses, ResultType>(marginClasses, variantMutator);
-    },
-    createPaddingXVariants: function createPaddingXVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingXClasses, ResultType>) {
-        return VariantsFactory.create<typeof paddingXClasses, ResultType>(paddingXClasses, variantMutator);
-    },
-    createPaddingYVariants: function createPaddingYVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingYClasses, ResultType>) {
-        return VariantsFactory.create<typeof paddingYClasses, ResultType>(paddingYClasses, variantMutator);
-    },
-    createMarginXVariants: function createMarginXVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof marginXClasses, ResultType>) {
-        return VariantsFactory.create<typeof marginXClasses, ResultType>(marginXClasses, variantMutator);
-    },
-    createMarginYVariants: function createMarginYVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof marginYClasses, ResultType>) {
-        return VariantsFactory.create<typeof marginYClasses, ResultType>(marginYClasses, variantMutator);
+    createPadding2MarginVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof padding2marginClasses, ResultType>) {
+        return VariantsFactory.create<typeof padding2marginClasses, ResultType>(padding2marginClasses, variantMutator);
     },
     createBorderVariants: function createBorderVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses, ResultType>) {
         return VariantsFactory.create<typeof borderClasses, ResultType>(borderClasses, variantMutator);
@@ -96,14 +80,9 @@ export const VariantsFactory = {
 const allVariantClasses = {
     border: borderClasses,
     rounded: roundeClasses,
-    padding: paddingClasses,
-    paddingX: paddingXClasses,
-    paddingY: paddingYClasses,
-    margin: marginClasses,
-    marginX: marginXClasses,
-    marginY: marginYClasses,
     shadow: ShadowClasses,
     shadowColor: ShadowColorsClasses,
+    ...padding2marginClasses,
 };
 type IVariantFactoryAll<ResultType = string> = {
     [key in keyof typeof allVariantClasses]: Record<keyof typeof allVariantClasses[key], ResultType>;

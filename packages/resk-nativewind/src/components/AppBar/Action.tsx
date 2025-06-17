@@ -3,7 +3,7 @@ import { IAppBarActionProps } from './types';
 
 export function AppBarAction<Context = unknown>(props: IAppBarActionProps<Context>) {
   return <Button
-    variant={{ paddingX: 2 }}
+    variant={{ paddingX: "2"}}
     {...props}
   />
 };

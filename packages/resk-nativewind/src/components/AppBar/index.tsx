@@ -75,7 +75,7 @@ function AppBar<Context = any>({
       ) : null}
     </Div>
     {isValidElement(children) ? children : null}
-    {<AppBarActions testID={testID + "-actions"} actions={actions} maxVisibleActions={maxVisibleActions} viewportWidth={viewportWidth} renderAction={renderAction} renderExpandableAction={renderExpandableAction} />}
+    <AppBarActions testID={testID + "-actions"} actions={actions} maxVisibleActions={maxVisibleActions} viewportWidth={viewportWidth} renderAction={renderAction} renderExpandableAction={renderExpandableAction} />
     {isValidElement(right) ? right : null}
   </Surface>);
 };

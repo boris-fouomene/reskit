@@ -36,7 +36,8 @@
     "css:build": "npx tailwindcss -i ./global-src.css -o ./global.css",
     "generate-icon-types": "node tests/cli.generate-icon-types",
     "generate-color-variants": "node bin/generate-color-variants-dev",
-    "generate-color-variants:test": "node tests/cli.generate-color-variants"
+    "generate-color-variants:test": "node tests/cli.generate-color-variants",
+    "generate-padding-margin-variants": "node bin/generate-padding2marginVariants"
   },
   "keywords": [
     "react-native",

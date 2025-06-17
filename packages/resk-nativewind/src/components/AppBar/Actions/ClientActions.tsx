@@ -50,7 +50,7 @@ export function AppBarClientActions<Context = unknown>({ context, testID, render
             return _render(renderExpandableAction, props, index);
         },
     });
-    
+    console.log("will render menu",actions, menuItems.length);
     return <>
         {actions}
         {menuItems.length > 0 ? <Menu

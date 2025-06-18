@@ -18,6 +18,7 @@ export * from "./Component";
 export * from "./getBoundingClientRect";
 export * from "./measureContentHeight";
 export * from "./breakpoints";
+export * from "./useHydrated";
 /***
     vérifie si la variable node est un élément reactNode
 */

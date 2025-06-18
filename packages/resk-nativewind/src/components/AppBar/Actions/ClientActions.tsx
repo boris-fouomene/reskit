@@ -10,6 +10,8 @@ import { renderActions } from "./utils";
 import { isNextJs } from "@platform/isNext";
 import { cn } from "@utils/cn";
 import { Div } from "@html/Div";
+import { ActivityIndicator } from "@components/ActivityIndicator";
+import { classes } from "@variants/classes";
 
 export function AppBarClientActions<Context = unknown>({ context, testID, actionClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
     const {window:{width:windowWidth},isClientSide} = useBreakpoints();
@@ -23,10 +25,12 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
     const actions : IReactNullableElement[] = []; 
     const computedClassName = "appbar-action-"+id;
     const isNext = isNextJs();
-    const menuAnchorId = `${id}-menu`;
-    const rProps = {
-        "data-max-actions": String(mAction),
-    }
+    const menuAnchorId = `${id}-menu-anchor`;
+    const menuId = `${id}-menu`;
+    const activityIndicatorId = `${id}-activity-indicator`;
+    const nextClassName = isNext ? "appbar-nextjs-hidden" : "";
+    const hiddenClassName = classes.hidden;
+    let renderedMenuItems = 0;
     renderActions<Context>({
         context: Object.assign({}, { isAppBar: true }, context),
         actions: items,
@@ -39,10 +43,14 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
             //props.id = defaultStr(props.id,(id+index).toString());
             const canRenderAction = !level && (actionCounter.current <= mAction && mAction > 1) || items?.length === 1;
             const canAddAction = canRenderAction|| isNext;
-            const canAddMenu = !canRenderAction && !level|| isNext;
-            props.className= cn(actionClassName,computedClassName,props.className,canAddAction && "appbar-action",canAddMenu && "appbar-menu");
+            const canAddMenuWithoutNext = !canRenderAction && !level;
+            const canAddMenu =  canAddMenuWithoutNext || isNext;
+            props.className= cn(actionClassName,isNext && nextClassName,computedClassName,props.className,canAddAction && "appbar-action",canAddMenu && "appbar-menu");
             const renderedAction = (renderer as any)(props, index);
             if(!renderedAction) return null;
+            if(canAddMenuWithoutNext){
+                renderedMenuItems++;
+            }
             if (canAddAction) {
                 actions.push(renderedAction);
                 itemsCountRef.current++;
@@ -55,20 +63,23 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
         },
     });
     return <>
+         {isNext ? <ActivityIndicator id={activityIndicatorId} size={"small"}/>:null}
          {actions}
          <Menu
             preferedPositionAxis='vertical'
             testID={`${testID}-menu`}
+            className={cn("appbar-menu")}
+            id={menuId}
             anchor={({ menu }) => {
                 return <Div id={menuAnchorId} testID={testID+"-menu-anchor-container"} className={cn("appbar-menu-anchor-container",computedClassName)}>
-                    <Icon.Button
+                    {<Icon.Button
                         size={28}
                         iconName={FONT_ICONS.MORE as any}
-                        className="mx-[7px]"
+                        className={cn("mx-[7px]",!menuItems.length && hiddenClassName)}
                         onPress={() => {
                             menu?.open();
                         }}
-                    />
+                    />}    
                 </Div>
             }}
             items={menuItems}

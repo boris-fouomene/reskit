@@ -6,7 +6,7 @@ import { IVariantPropsText } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
 
 
-export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "title" | "variant">, IAppBarActionsProps<Context> {
+export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "title" | "variant"> {
     /** The main title displayed in the AppBar. */
     title?: ReactNode;
     /** An optional subtitle displayed below the title. */
@@ -38,12 +38,19 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
     left?: ReactNode;
 
     right?: ReactNode;
+    
+    actions?:IAppBarActionsProps<Context>["actions"];
+    
+    
+    actionsProps?:IAppBarActionsProps<Context>;
+    
+    
+    context?:IAppBarActionsProps<Context>["context"];
 }
 
 export interface IAppBarActionsProps<Context = unknown> {
-
     testID?: string;
-
+    
     /** The width of the viewport, used to calculate the maximum number of actions to display. */
     viewportWidth?: number;
 
@@ -56,11 +63,36 @@ export interface IAppBarActionsProps<Context = unknown> {
     */
     maxVisibleActions?: number;
 
-    /***
-     * class name for each action item
+    /**
+     * A class name to apply to each AppBar action button rendered directly inside the AppBar (outside of any dropdown or menu).
+     *
+     * This is useful for customizing the look and feel of AppBar actions that are always visible, such as icons or buttons for notifications, settings, etc.
+     *
+     * @example
+     * ```tsx
+     * <AppBar
+     *   actionClassName="text-white hover:bg-primary-600 transition-colors"
+     * />
+     * ```
      */
-    actionClassName?: IClassName;
-
+    actionClassName?: string;
+    
+    /**
+     * A class name to apply specifically to AppBar actions rendered inside an action menu (e.g., a dropdown or overflow menu).
+     *
+     * Use this to distinguish styles between actions shown directly in the AppBar and those shown inside a contextual or overflow menu.
+     *
+     * @example
+     * ```tsx
+     * <AppBar
+     *   actionMenuItemClassName="px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+     * />
+     * ```
+     *
+     * @remarks
+     * This is particularly useful when the AppBar overflows or groups certain actions into a dropdown menu on smaller screens.
+     */
+    actionMenuItemClassName?: string;
     /**
      * The function used to render an appBar action. This function receives the item properties and is responsible for generating the corresponding JSX.
      */
@@ -73,6 +105,13 @@ export interface IAppBarActionsProps<Context = unknown> {
 
     /** The context to pass to each action, used to extend the context for the actions. */
     context?: Context; // The context for actions requiring specific context information.
+    
+    /***
+        The fallback element to render as actions during the hydration process, 
+        when the component is not yet mounted.
+        only on nextjs platform
+    */
+    hydrationFallback?:ReactNode;
 }
 
 /**

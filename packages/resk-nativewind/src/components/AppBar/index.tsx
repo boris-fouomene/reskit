@@ -15,11 +15,8 @@ import { AppBarActions } from './Actions';
 
 
 function AppBar<Context = any>({
-  renderAction,
-  renderExpandableAction,
-  maxVisibleActions,
-  viewportWidth,
   actions,
+  actionsProps,
   title,
   subtitle,
   titleClassName,
@@ -34,8 +31,8 @@ function AppBar<Context = any>({
   left,
   right,
   contentClassName,
-  context,
   className,
+  context,
   ...appBarProps
 }: IAppBarProps<Context>) {
   testID = defaultStr(testID, 'resk-appbar');
@@ -75,7 +72,7 @@ function AppBar<Context = any>({
       ) : null}
     </Div>
     {isValidElement(children) ? children : null}
-    <AppBarActions testID={testID + "-actions"} actions={actions} maxVisibleActions={maxVisibleActions} viewportWidth={viewportWidth} renderAction={renderAction} renderExpandableAction={renderExpandableAction} />
+    <AppBarActions testID={testID + "-actions"}  {...Object.assign({}, actionsProps,{context})} actions={actions} />
     {isValidElement(right) ? right : null}
   </Surface>);
 };

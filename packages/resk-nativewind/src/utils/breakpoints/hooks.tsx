@@ -6,17 +6,18 @@ import { IBreakpoints } from './types';
 import useStateCallback from '@utils/stateCallback';
 import { useEffect } from 'react';
 import { isObj } from '@resk/core/utils';
+import { getInitialHydrationStatus } from '@utils/useHydrated';
 
 const scaleSized = { width: 0, height: 0,fontScale:1, scale: 1 };
 export const useBreakpoints = (options?: Partial<IBreakpoints>): IUseBreakpointResult => {
-    const isClientSide = typeof window !== "undefined" && window ? true : false;
-    const [state, setState] = useStateCallback<{window:ScaledSize,screen:ScaledSize,isClientSide:boolean}>(isClientSide ? 
-    {window: Dimensions.get('window'),screen: Dimensions.get('screen'),isClientSide} : {window : scaleSized,screen: scaleSized,isClientSide:false});
+    const isHydrated = getInitialHydrationStatus();
+    const [state, setState] = useStateCallback<{window:ScaledSize,screen:ScaledSize,isHydrated:boolean}>(isHydrated ? 
+    {window: Dimensions.get('window'),screen: Dimensions.get('screen'),isHydrated} : {window : scaleSized,screen: scaleSized,isHydrated:false});
     const {window:{width}} = state;
     useEffect(()=>{
         const r =  Dimensions.addEventListener('change', function onDimensionChanged(state:{window: ScaledSize, screen: ScaledSize}) {
             if(isObj(state)) {
-                setState({...state,isClientSide:true})
+                setState({...state,isHydrated:true})
             }
         });
         return () => {
@@ -49,7 +50,7 @@ interface IUseBreakpointResult {
     isMobileOrTablet: boolean;
     window: ScaledSize;
     screen: ScaledSize;
-    isClientSide: boolean;
+    isHydrated: boolean;
 }
 
 

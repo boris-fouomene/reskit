@@ -1,4 +1,5 @@
 "use client";
+import { isNextJs } from '@platform/isNext';
 import { useState, useEffect } from 'react';
 
 /**
@@ -11,8 +12,8 @@ import { useState, useEffect } from 'react';
  * - Ensures hydration state is set to `true` after the first render on the client.
  * - Useful for avoiding mismatches between server-side and client-side rendering.
  */
-export function useHydrated() {
-    const [hydrated, setHydrated] = useState(typeof window !== 'undefined' && window ? true : false);
+export function useHydrationStatus() {
+    const [hydrated, setHydrated] = useState(getInitialHydrationStatus() ? true : false);
     useEffect(() => {
         if(!hydrated){
             setHydrated(true);
@@ -20,3 +21,14 @@ export function useHydrated() {
     }, []);
     return hydrated;
 }
+
+/**
+ * Determines the initial hydration status of the application.
+ *
+ * This function checks if the code is running in a browser environment (i.e., `window` is defined and truthy)
+ * and not within a Next.js environment (as determined by `isNextJs()`).
+ * Returns `true` if hydration should be considered complete, otherwise `false`.
+ *
+ * @returns {boolean} `true` if running in a browser and not in Next.js, otherwise `false`.
+ */
+export const getInitialHydrationStatus = ()=>typeof window !== 'undefined' && window && !isNextJs() ? true : false;

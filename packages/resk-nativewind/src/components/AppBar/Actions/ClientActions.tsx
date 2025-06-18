@@ -2,35 +2,20 @@
 import { useBreakpoints } from "@utils/breakpoints/hooks";
 import { IAppBarActionProps, IAppBarActionsProps } from "../types";
 import { IReactNullableElement } from "@src/types";
-import { defaultStr, isNumber } from "@resk/core/utils";
-import { useId, useRef } from "react";
+import { isNumber } from "@resk/core/utils";
 import { Menu } from "@components/Menu";
 import { FONT_ICONS, Icon } from "@components/Icon";
 import { renderActions } from "./utils";
-import { isNextJs } from "@platform/isNext";
 import { cn } from "@utils/cn";
-import { Div } from "@html/Div";
+import { isValidElement } from "react";
 import { ActivityIndicator } from "@components/ActivityIndicator";
-import { classes } from "@variants/classes";
 
-export function AppBarClientActions<Context = unknown>({ context, testID, actionClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
-    const {window:{width:windowWidth},isClientSide} = useBreakpoints();
-    testID = defaultStr(testID, "resk-appbar-actions");
-    const id = useId();
-    const itemsCountRef = useRef<number>(0);
-    itemsCountRef.current = 0;
+export function AppBarClientActions<Context = unknown>({ context,hydrationFallback, testID, actionClassName,actionMenuItemClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
+    const {window:{width:windowWidth},isHydrated} = useBreakpoints();
     const mAction: number = typeof maxVisibleActions === "number" && maxVisibleActions ? Math.trunc(maxVisibleActions) : getAppBarMaxActions(windowWidth, viewportWidth);
     const actionCounter = { current: 0 };
     const menuItems: IAppBarActionProps<Context>[] = [];
     const actions : IReactNullableElement[] = []; 
-    const computedClassName = "appbar-action-"+id;
-    const isNext = isNextJs();
-    const menuAnchorId = `${id}-menu-anchor`;
-    const menuId = `${id}-menu`;
-    const activityIndicatorId = `${id}-activity-indicator`;
-    const nextClassName = isNext ? classes.hidden : "";
-    const hiddenClassName = classes.hidden;
-    let renderedMenuItemsCount = 0;
     renderActions<Context>({
         context: Object.assign({}, { isAppBar: true }, context),
         actions: items,
@@ -40,50 +25,44 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
             if (!level && actionCounter.current <= mAction + 1) {
                 actionCounter.current++;
             }
-            //props.id = defaultStr(props.id,(id+index).toString());
             const canRenderAction = !level && (actionCounter.current <= mAction && mAction > 1) || items?.length === 1;
-            const canAddAction = canRenderAction|| isNext;
-            const canAddMenuWithoutNext = !canRenderAction && !level;
-            const canAddMenu =  canAddMenuWithoutNext || isNext;
-            props.className= cn(actionClassName,isNext && nextClassName,computedClassName,props.className,canAddAction && "appbar-action",canAddMenu && "appbar-menu");
+            const canAddAction = canRenderAction;
+            const canAddMenu =  !canRenderAction && !level;
+            props.className= cn(canAddAction && cn("appbar-action",actionClassName),canAddMenu && cn("appbar-menu",actionMenuItemClassName));
             const renderedAction = (renderer as any)(props, index);
             if(!renderedAction) return null;
-            if(canAddMenuWithoutNext){
-                renderedMenuItemsCount++;
-            }
             if (canAddAction) {
                 actions.push(renderedAction);
-                itemsCountRef.current++;
-            }
-            if (canAddMenu) {
+            } else if (canAddMenu) {
                 menuItems.push(props);
-                itemsCountRef.current++;
             }
             return null;
         },
     });
+    if(!isHydrated){
+        if(isValidElement(hydrationFallback)){
+            return hydrationFallback;
+        }
+        return <ActivityIndicator size={"small"}/>;
+    }
     return <>
-         {isNext ? <ActivityIndicator id={activityIndicatorId} size={"small"}/>:null}
          {actions}
-         <Menu
+         {menuItems.length ? <Menu
             preferedPositionAxis='vertical'
             testID={`${testID}-menu`}
-            className={cn("appbar-menu",nextClassName)}
-            id={menuId}
+            className={cn("appbar-menu")}
             anchor={({ menu }) => {
-                return <Div id={menuAnchorId} testID={testID+"-menu-anchor-container"} className={cn("appbar-menu-anchor-container",nextClassName,computedClassName)}>
-                    {<Icon.Button
-                        size={28}
-                        iconName={FONT_ICONS.MORE as any}
-                        className={"mx-[7px]"}
-                        onPress={() => {
-                            menu?.open();
-                        }}
-                    />}    
-                </Div>
+                return <Icon.Button
+                    size={28}
+                    iconName={FONT_ICONS.MORE as any}
+                    className={"mx-[7px]"}
+                    onPress={() => {
+                        menu?.open();
+                    }}
+                />
             }}
             items={menuItems}
-        /> 
+        /> : null}
     </>;
 }
 

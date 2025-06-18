@@ -30,7 +30,7 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
     const activityIndicatorId = `${id}-activity-indicator`;
     const nextClassName = isNext ? "appbar-nextjs-hidden" : "";
     const hiddenClassName = classes.hidden;
-    let renderedMenuItems = 0;
+    let renderedMenuItemsCount = 0;
     renderActions<Context>({
         context: Object.assign({}, { isAppBar: true }, context),
         actions: items,
@@ -49,7 +49,7 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
             const renderedAction = (renderer as any)(props, index);
             if(!renderedAction) return null;
             if(canAddMenuWithoutNext){
-                renderedMenuItems++;
+                renderedMenuItemsCount++;
             }
             if (canAddAction) {
                 actions.push(renderedAction);
@@ -75,7 +75,7 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
                     {<Icon.Button
                         size={28}
                         iconName={FONT_ICONS.MORE as any}
-                        className={cn("mx-[7px]",!menuItems.length && hiddenClassName)}
+                        className={cn("mx-[7px]",!renderedMenuItemsCount && hiddenClassName)}
                         onPress={() => {
                             menu?.open();
                         }}

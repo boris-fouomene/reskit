@@ -186,7 +186,7 @@ export function Menu<Context = unknown>({
                 <View
                     testID={testID}
                     {...props}
-                    className={cn(classes.positionFixed,menuVariant.base(), className)}
+                    className={cn(menuVariant.base(), className)}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
                             onLayout(event);

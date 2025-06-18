@@ -15,11 +15,14 @@ export const useBreakpoints = (options?: Partial<IBreakpoints>): IUseBreakpointR
     {window: Dimensions.get('window'),screen: Dimensions.get('screen'),isHydrated} : {window : scaleSized,screen: scaleSized,isHydrated:false});
     const {window:{width}} = state;
     useEffect(()=>{
-        const r =  Dimensions.addEventListener('change', function onDimensionChanged(state:{window: ScaledSize, screen: ScaledSize}) {
-            if(isObj(state)) {
+        const r =  Dimensions.addEventListener('change', function onDimensionChanged(newState:{window: ScaledSize, screen: ScaledSize}) {
+            if(isObj(newState) && (newState.window.width !== state.window.width || newState.window.height !== state.window.height)) {
                 setState({...state,isHydrated:true})
             }
         });
+        if(!isHydrated){
+            setState({...state,window: Dimensions.get('window'),screen: Dimensions.get('screen'),isHydrated:true})
+        }
         return () => {
           r?.remove();
         };

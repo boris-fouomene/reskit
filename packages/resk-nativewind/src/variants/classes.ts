@@ -6,6 +6,7 @@ export const classes: IVariantsClasses = {
     hidden: "hidden opacity-0",
     hover: "hover:opacity-80",
     cursorPointed: "cursor-pointer",
+    positionFixed : "absolute web:fixed",
 }
 export interface IVariantsClasses {
     disabled: ClassValue;
@@ -13,5 +14,6 @@ export interface IVariantsClasses {
     hidden: ClassValue;
     hover: ClassValue;
     cursorPointed: ClassValue;
+    positionFixed: ClassValue;
 }
 

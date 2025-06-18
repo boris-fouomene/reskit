@@ -10,13 +10,13 @@ import { isObj } from '@resk/core/utils';
 const scaleSized = { width: 0, height: 0,fontScale:1, scale: 1 };
 export const useBreakpoints = (options?: Partial<IBreakpoints>): IUseBreakpointResult => {
     const isClientSide = typeof window !== "undefined" && window ? true : false;
-    const [dims, setDims] = useStateCallback<{window:ScaledSize,screen:ScaledSize}>(isClientSide ? 
-    {window: Dimensions.get('window'),screen: Dimensions.get('screen'),} : {window : scaleSized,screen: scaleSized});
-    const {window:{width,height}} = dims;
+    const [state, setState] = useStateCallback<{window:ScaledSize,screen:ScaledSize,isClientSide:boolean}>(isClientSide ? 
+    {window: Dimensions.get('window'),screen: Dimensions.get('screen'),isClientSide} : {window : scaleSized,screen: scaleSized,isClientSide:false});
+    const {window:{width}} = state;
     useEffect(()=>{
-        const r =  Dimensions.addEventListener('change', function onDimensionChanged(dims:{window: ScaledSize, screen: ScaledSize}) {
-            if(isObj(dims)) {
-                setDims({...dims})
+        const r =  Dimensions.addEventListener('change', function onDimensionChanged(state:{window: ScaledSize, screen: ScaledSize}) {
+            if(isObj(state)) {
+                setState({...state,isClientSide:true})
             }
         });
         return () => {
@@ -34,8 +34,7 @@ export const useBreakpoints = (options?: Partial<IBreakpoints>): IUseBreakpointR
     const isTablet = width > breakpoints.mobileMaxWidth && width <= breakpoints.tabletMaxWidth;
     const isDesktop = width > breakpoints.tabletMaxWidth;
     return {
-        ...dims,
-        isClientSide,
+        ...state,
         isMobile,
         isTablet,
         isDesktop,

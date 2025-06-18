@@ -91,7 +91,7 @@ export function ButtonBase<Context = unknown>({
             disabled={disabled}
             onPress = {typeof onPress ==="function" ? (event: GestureResponderEvent) => {
                 const r = onPress(event, buttonContext);
-                return r
+                return r;
             }: undefined}
         >
             <Div id={`${buttonId}-content`} testID={testID + "-button-content"} className={cn("button-content w-full flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>

@@ -14,6 +14,7 @@ import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
 import { useBackHandler } from '@components/BackHandler';
 import menuVariants from '@variants/menu';
+import { classes } from '@variants/classes';
 
 
 
@@ -185,7 +186,7 @@ export function Menu<Context = unknown>({
                 <View
                     testID={testID}
                     {...props}
-                    className={cn(menuVariant.base(), className)}
+                    className={cn(classes.positionFixed,menuVariant.base(), className)}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
                             onLayout(event);

@@ -1,5 +1,6 @@
 import ReskPlatform from "@resk/core/platform";
 import { Dimensions, Platform, StatusBar } from 'react-native';
+import { isNextJs } from "./isNext";
 /**
  * Determines if the current environment is a development environment.
  * 
@@ -263,4 +264,4 @@ function getBottomSpace() {
     return isIphoneX() ? 34 : 0;
 }
 
-export default { ...ReskPlatform, ...Platform, isIphoneX, iphoneX, getStatusBarHeight, getBottomSpace, isTouchDevice, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };
+export default { ...ReskPlatform, ...Platform,isNextJs, isIphoneX, iphoneX, getStatusBarHeight, getBottomSpace, isTouchDevice, canUseNativeDriver, select: Platform.select, isDev, isIos, isAndroid, isWeb, isNative, web, ios, android, native };

@@ -1,73 +1,78 @@
 "use client";
 import { useBreakpoints } from "@utils/breakpoints/hooks";
-import { IAppBarActionProps, IAppBarActionsProps, IAppBarProps } from "../types";
+import { IAppBarActionProps, IAppBarActionsProps } from "../types";
 import { IReactNullableElement } from "@src/types";
-import { renderNavItems } from "@components/Nav/utils";
-import { cn } from "@utils/cn";
 import { defaultStr, isNumber } from "@resk/core/utils";
+import { useId, useRef } from "react";
 import { Menu } from "@components/Menu";
-import { Icon } from "@components/Icon";
-import { FONT_ICONS } from "@components/Icon/Font/icons";
+import { FONT_ICONS, Icon } from "@components/Icon";
+import { renderActions } from "./utils";
+import { isNextJs } from "@platform/isNext";
+import { cn } from "@utils/cn";
+import { Div } from "@html/Div";
 
-export function AppBarClientActions<Context = unknown>({ context, testID, renderAction, renderExpandableAction, actionClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
-    const {window:{width:windowWidth},isClientSide } = useBreakpoints();
+export function AppBarClientActions<Context = unknown>({ context, testID, actionClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
+    const {window:{width:windowWidth},isClientSide} = useBreakpoints();
     testID = defaultStr(testID, "resk-appbar-actions");
-    const menuItems: IAppBarActionProps<Context>[] = [];
-    const actionCounter = { current: 0 };
-    context = Object.assign({}, context);
+    const id = useId();
+    const itemsCountRef = useRef<number>(0);
+    itemsCountRef.current = 0;
     const mAction: number = typeof maxVisibleActions === "number" && maxVisibleActions ? Math.trunc(maxVisibleActions) : getAppBarMaxActions(windowWidth, viewportWidth);
-    const renderedActions = [];
-    const canRenderAction = (level?: number) => {
-        if (level) return false;
-        return (actionCounter.current <= mAction && mAction > 1) || items?.length === 1;
-    };
-    const pushAction = (action: IReactNullableElement, item: IAppBarActionProps<Context>, level?: number) => {
-        if (canRenderAction(level)) {
-            renderedActions.push(level);
-            return action;
-        }
-        if (!level) {
-            menuItems.push(item);
-        }
-        return null;
-    };
-    const _render = function (renderCb: IAppBarProps<Context>["renderAction"], props: IAppBarActionProps<Context>, index: number): IReactNullableElement {
-        if (!props?.level && actionCounter.current <= mAction + 1) {
-            actionCounter.current++;
-        }
-        const itx: IAppBarActionProps<Context> = props;
-        return pushAction(typeof renderCb != "function" ? null : renderCb(itx, index), itx, props.level);
-    };
-    const actions = renderNavItems<Context>({
+    const actionCounter = { current: 0 };
+    const menuItems: IAppBarActionProps<Context>[] = [];
+    const actions : IReactNullableElement[] = []; 
+    const computedClassName = "appbar-action-"+id;
+    const isNext = isNextJs();
+    const menuAnchorId = `${id}-menu`;
+    const rProps = {
+        "data-max-actions": String(mAction),
+    }
+    renderActions<Context>({
         context: Object.assign({}, { isAppBar: true }, context),
-        items: items,
+        actions: items,
         ...props,
-        itemClassName: cn("appbar-action", actionClassName),
-        renderItem: function (props, index) {
-            return _render(renderAction, props, index);
-        },
-        renderExpandableItem: function (props, index) {
-            return _render(renderExpandableAction, props, index);
+        actionMutator : function (renderer, props, index): IReactNullableElement {
+            const {level} = props;
+            if (!level && actionCounter.current <= mAction + 1) {
+                actionCounter.current++;
+            }
+            //props.id = defaultStr(props.id,(id+index).toString());
+            const canRenderAction = !level && (actionCounter.current <= mAction && mAction > 1) || items?.length === 1;
+            const canAddAction = canRenderAction|| isNext;
+            const canAddMenu = !canRenderAction && !level|| isNext;
+            props.className= cn(actionClassName,computedClassName,props.className,canAddAction && "appbar-action",canAddMenu && "appbar-menu");
+            const renderedAction = (renderer as any)(props, index);
+            if(!renderedAction) return null;
+            if (canAddAction) {
+                actions.push(renderedAction);
+                itemsCountRef.current++;
+            }
+            if (canAddMenu) {
+                menuItems.push(props);
+                itemsCountRef.current++;
+            }
+            return null;
         },
     });
-    console.log("will render menu",actions, menuItems.length);
     return <>
-        {actions}
-        {menuItems.length > 0 ? <Menu
+         {actions}
+         <Menu
             preferedPositionAxis='vertical'
             testID={`${testID}-menu`}
-            anchor={menuItems.length ? ({ menu }) => {
-                return <Icon.Button
-                    size={28}
-                    iconName={FONT_ICONS.MORE as any}
-                    className="mx-[7px]"
-                    onPress={() => {
-                        menu?.open();
-                    }}
-                />
-            }: null}
+            anchor={({ menu }) => {
+                return <Div id={menuAnchorId} testID={testID+"-menu-anchor-container"} className={cn("appbar-menu-anchor-container",computedClassName)}>
+                    <Icon.Button
+                        size={28}
+                        iconName={FONT_ICONS.MORE as any}
+                        className="mx-[7px]"
+                        onPress={() => {
+                            menu?.open();
+                        }}
+                    />
+                </Div>
+            }}
             items={menuItems}
-        />: null}
+        /> 
     </>;
 }
 

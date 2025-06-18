@@ -28,7 +28,7 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
     const menuAnchorId = `${id}-menu-anchor`;
     const menuId = `${id}-menu`;
     const activityIndicatorId = `${id}-activity-indicator`;
-    const nextClassName = isNext ? "appbar-nextjs-hidden" : "";
+    const nextClassName = isNext ? classes.hidden : "";
     const hiddenClassName = classes.hidden;
     let renderedMenuItemsCount = 0;
     renderActions<Context>({
@@ -68,14 +68,14 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
          <Menu
             preferedPositionAxis='vertical'
             testID={`${testID}-menu`}
-            className={cn("appbar-menu")}
+            className={cn("appbar-menu",nextClassName)}
             id={menuId}
             anchor={({ menu }) => {
                 return <Div id={menuAnchorId} testID={testID+"-menu-anchor-container"} className={cn("appbar-menu-anchor-container",computedClassName)}>
                     {<Icon.Button
                         size={28}
                         iconName={FONT_ICONS.MORE as any}
-                        className={cn("mx-[7px]",!renderedMenuItemsCount && hiddenClassName)}
+                        className={"mx-[7px]"}
                         onPress={() => {
                             menu?.open();
                         }}

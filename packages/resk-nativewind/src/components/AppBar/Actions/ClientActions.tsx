@@ -71,7 +71,7 @@ export function AppBarClientActions<Context = unknown>({ context, testID, action
             className={cn("appbar-menu",nextClassName)}
             id={menuId}
             anchor={({ menu }) => {
-                return <Div id={menuAnchorId} testID={testID+"-menu-anchor-container"} className={cn("appbar-menu-anchor-container",computedClassName)}>
+                return <Div id={menuAnchorId} testID={testID+"-menu-anchor-container"} className={cn("appbar-menu-anchor-container",nextClassName,computedClassName)}>
                     {<Icon.Button
                         size={28}
                         iconName={FONT_ICONS.MORE as any}

@@ -25,9 +25,9 @@ export function ActivityIndicator({ size, borderWidth, style, variant, testID, i
     const clx = [];
     if (isNumber(size) && size > 0) {
         const hasBorderWidth = isNumber(borderWidth) && borderWidth > 0;
-        borderWidth = hasBorderWidth ? borderWidth : Math.max(size / (size > 10 ? 5 : 3), 3);
+        borderWidth = hasBorderWidth ? borderWidth : size >= 30 ? 3 : 4;
         if (!hasBorderWidth && size >= 40) {
-            borderWidth = Math.max(size / 10, size < 60 ? 6 : size < 80 ? 8 : 10);
+            borderWidth = Math.max(size / 10, size < 60 ? 5 : size < 80 ? 6 : size < 90 ? 9 : 10);
         }
         style = [{ width: size, height: size, borderWidth }, style]
     } else {

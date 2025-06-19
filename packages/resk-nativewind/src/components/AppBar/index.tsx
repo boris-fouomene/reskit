@@ -56,7 +56,7 @@ function AppBar<Context = any>({
     {(backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
       <BackAction testID={`${testID}-back-action`} className={cn(appVarVariant.icon(),backActionClassName)} onPress={onBackActionPress} /> : null}
     {isValidElement(left) ? left as any : null}
-    <Div testID={`${testID}-content`} className={cn("flex-1 px-[12px]",appVarVariant.content(), contentClassName)}>
+    <Div testID={`${testID}-content`} className={cn("px-[12px] max-w-full block native:flex-1",appVarVariant.content(), contentClassName)}>
       <Text
         numberOfLines={1}
         testID={`${testID}-title`}

@@ -174,3 +174,10 @@ const styles = {
   title: `text-xl font-bold text-green-500`,
 };
 
+
+declare module "@resk/nativewind" {
+  interface IVariantsColorsMap {
+    accent: string;
+    neutral: string;
+  }
+}

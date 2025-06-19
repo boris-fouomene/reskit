@@ -35,3 +35,5 @@ export * from "./types";
 export * from "./colors";
 
 export * from "./variantsFactory";
+
+export * from "./generated-variants-colors";

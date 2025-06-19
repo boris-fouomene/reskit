@@ -8,7 +8,6 @@ type ScreenContentProps = {
   children?: React.ReactNode;
 };
 export const ScreenContent = ({ title, children }: ScreenContentProps) => {
-  VariantsColors.registerColor("accent", "neutral");
   return (
     <ScrollView testID='main-entry-appp'>
       <ModalExample />

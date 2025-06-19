@@ -4,7 +4,7 @@ import { VariantsGeneratedColors } from "./generated-variants-colors";
 const text = tv({
     base: "",
     variants: {
-        color: VariantsGeneratedColors.text,
+        color: VariantsGeneratedColors.color,
         error: {
             true: "text-error dark:text-dark-error",
         },

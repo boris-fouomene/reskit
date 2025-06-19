@@ -11,6 +11,8 @@ import button from "./button";
 import activityIndicator from "./activityIndicator";
 import modal from "./modal";
 import menu from "./menu";
+import color from "./color";
+import background from "./background";
 export const variants = {
     all,
     menu,
@@ -24,6 +26,8 @@ export const variants = {
     button,
     activityIndicator,
     modal,
+    color,
+    background,
 }
 export * from "./colors";
 

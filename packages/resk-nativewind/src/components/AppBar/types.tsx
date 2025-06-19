@@ -4,6 +4,7 @@ import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IClassName } from "@src/types";
 import { IVariantPropsText } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
+import { IVariantPropsAppBar } from "@variants/appBar";
 
 
 export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "title" | "variant"> {
@@ -29,7 +30,7 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
 
     /** class name for the BackAction component when rendered. */
     backActionClassName?: IClassName;
-
+    
     /***
      * Class name for the content of the AppBar.
      */
@@ -46,6 +47,8 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
 
 
     context?: IAppBarActionsProps<Context>["context"];
+    
+    variant?: IVariantPropsAppBar;
 }
 
 export interface IAppBarActionsProps<Context = unknown> {

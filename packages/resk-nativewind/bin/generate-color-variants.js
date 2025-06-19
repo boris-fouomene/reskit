@@ -55,22 +55,36 @@ module.exports = (colors, options) => {
             }
         }),
         icon: VariantsColors.buildTextColors(true),
-        iconButton: VariantsColors.buildForegroundColors(true, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
+        iconButton: VariantsColors.buildForegroundColors(true, (colorWithPrefix, darkColorWithPrefix, color) => {
             return {
-                container: `bg-${colorWithoutPrefix} dark:bg-dark${colorWithPrefix}`,
+                container: `bg-${color} dark:bg-dark${color}`,
                 icon: cn(colorWithPrefix, darkColorWithPrefix),
-                text: `text-${colorWithoutPrefix}-foreground dark:text-dark-${colorWithoutPrefix}-foreground`
+                text: `text-${color}-foreground dark:text-dark-${color}-foreground`
             }
         }),
-        divider: VariantsColors.buildBackgroundColors(),
-        heading: VariantsColors.buildTextColors(),
-        surface: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
-            return cn(colorWithPrefix, darkColorWithPrefix, `text-${colorWithoutPrefix}-foreground dark:text-dark-${colorWithoutPrefix}-foreground`)
+        surface: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+            return cn(colorWithPrefix, darkColorWithPrefix, `text-${color}-foreground dark:text-dark-${color}-foreground`)
         }),
-        shadow: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, colorWithoutPrefix) => {
-            return cn(`shadow-${colorWithoutPrefix}/20 dark:shadow-${colorWithoutPrefix}/30`)
+        shadow: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+            return cn(`shadow-${color}/20 dark:shadow-${color}/30`)
         }),
-        text: VariantsColors.buildTextColors(),
+        color:VariantsColors.buildTextColors(),
+        background:VariantsColors.buildBackgroundColors(),
+        borderColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+            return cn(`border-${color} dark:border-dark-${color}`);
+        }),
+        borderTopColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+            return cn(`border-t-${color} dark:border-t-dark-${color}`);
+        }),
+        borderBottomColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+            return cn(`border-b-${color} dark:border-b-dark-${color}`);
+        }),
+        borderLeftColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+            return cn(`border-l-${color} dark:border-l-dark-${color}`);
+        }),
+        borderRightColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+            return cn(`border-r-${color} dark:border-r-dark-${color}`);
+        }),
         activityIndicator: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`border-t-${color} dark:border-t-dark-${color}`);
         }),
@@ -88,11 +102,15 @@ export const VariantsGeneratedColors = ${content}
         icon : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
-        divider : Record<IName,string>;
-        heading : Record<IName,string>;
-        text : Record<IName,string>;
+        color : Record<IName,string>;
+        background : Record<IName,string>;
         shadow : Record<IName,string>;
         activityIndicator: Record<IName,string>;
+        borderColor : Record<IName,string>;
+        borderTopColor : Record<IName,string>;
+        borderBottomColor : Record<IName,string>;
+        borderLeftColor : Record<IName,string>;
+        borderRightColor : Record<IName,string>;
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     `, 'utf8');

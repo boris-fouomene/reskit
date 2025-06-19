@@ -113,58 +113,40 @@ export const VariantsGeneratedColors = {
   },
   "iconButton": {
     "primary": {
-      "container": "bg-primary dark:bg-dark!text-primary-foreground",
+      "container": "bg-primary dark:bg-darkprimary",
       "icon": "!text-primary-foreground dark:!text-dark-primary-foreground",
       "text": "text-primary-foreground dark:text-dark-primary-foreground"
     },
     "secondary": {
-      "container": "bg-secondary dark:bg-dark!text-secondary-foreground",
+      "container": "bg-secondary dark:bg-darksecondary",
       "icon": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
       "text": "text-secondary-foreground dark:text-dark-secondary-foreground"
     },
     "info": {
-      "container": "bg-info dark:bg-dark!text-info-foreground",
+      "container": "bg-info dark:bg-darkinfo",
       "icon": "!text-info-foreground dark:!text-dark-info-foreground",
       "text": "text-info-foreground dark:text-dark-info-foreground"
     },
     "success": {
-      "container": "bg-success dark:bg-dark!text-success-foreground",
+      "container": "bg-success dark:bg-darksuccess",
       "icon": "!text-success-foreground dark:!text-dark-success-foreground",
       "text": "text-success-foreground dark:text-dark-success-foreground"
     },
     "warning": {
-      "container": "bg-warning dark:bg-dark!text-warning-foreground",
+      "container": "bg-warning dark:bg-darkwarning",
       "icon": "!text-warning-foreground dark:!text-dark-warning-foreground",
       "text": "text-warning-foreground dark:text-dark-warning-foreground"
     },
     "error": {
-      "container": "bg-error dark:bg-dark!text-error-foreground",
+      "container": "bg-error dark:bg-darkerror",
       "icon": "!text-error-foreground dark:!text-dark-error-foreground",
       "text": "text-error-foreground dark:text-dark-error-foreground"
     },
     "surface": {
-      "container": "bg-surface dark:bg-dark!text-surface-foreground",
+      "container": "bg-surface dark:bg-darksurface",
       "icon": "!text-surface-foreground dark:!text-dark-surface-foreground",
       "text": "text-surface-foreground dark:text-dark-surface-foreground"
     }
-  },
-  "divider": {
-    "primary": "bg-primary dark:bg-dark-primary",
-    "secondary": "bg-secondary dark:bg-dark-secondary",
-    "info": "bg-info dark:bg-dark-info",
-    "success": "bg-success dark:bg-dark-success",
-    "warning": "bg-warning dark:bg-dark-warning",
-    "error": "bg-error dark:bg-dark-error",
-    "surface": "bg-surface dark:bg-dark-surface"
-  },
-  "heading": {
-    "primary": "text-primary dark:text-dark-primary",
-    "secondary": "text-secondary dark:text-dark-secondary",
-    "info": "text-info dark:text-dark-info",
-    "success": "text-success dark:text-dark-success",
-    "warning": "text-warning dark:text-dark-warning",
-    "error": "text-error dark:text-dark-error",
-    "surface": "text-surface dark:text-dark-surface"
   },
   "surface": {
     "primary": "bg-primary dark:bg-dark-primary text-primary-foreground dark:text-dark-primary-foreground",
@@ -184,7 +166,7 @@ export const VariantsGeneratedColors = {
     "error": "shadow-error/20 dark:shadow-error/30",
     "surface": "shadow-surface/20 dark:shadow-surface/30"
   },
-  "text": {
+  "color": {
     "primary": "text-primary dark:text-dark-primary",
     "secondary": "text-secondary dark:text-dark-secondary",
     "info": "text-info dark:text-dark-info",
@@ -192,6 +174,60 @@ export const VariantsGeneratedColors = {
     "warning": "text-warning dark:text-dark-warning",
     "error": "text-error dark:text-dark-error",
     "surface": "text-surface dark:text-dark-surface"
+  },
+  "background": {
+    "primary": "bg-primary dark:bg-dark-primary",
+    "secondary": "bg-secondary dark:bg-dark-secondary",
+    "info": "bg-info dark:bg-dark-info",
+    "success": "bg-success dark:bg-dark-success",
+    "warning": "bg-warning dark:bg-dark-warning",
+    "error": "bg-error dark:bg-dark-error",
+    "surface": "bg-surface dark:bg-dark-surface"
+  },
+  "borderColor": {
+    "primary": "border-primary dark:border-dark-primary",
+    "secondary": "border-secondary dark:border-dark-secondary",
+    "info": "border-info dark:border-dark-info",
+    "success": "border-success dark:border-dark-success",
+    "warning": "border-warning dark:border-dark-warning",
+    "error": "border-error dark:border-dark-error",
+    "surface": "border-surface dark:border-dark-surface"
+  },
+  "borderTopColor": {
+    "primary": "border-t-primary dark:border-t-dark-primary",
+    "secondary": "border-t-secondary dark:border-t-dark-secondary",
+    "info": "border-t-info dark:border-t-dark-info",
+    "success": "border-t-success dark:border-t-dark-success",
+    "warning": "border-t-warning dark:border-t-dark-warning",
+    "error": "border-t-error dark:border-t-dark-error",
+    "surface": "border-t-surface dark:border-t-dark-surface"
+  },
+  "borderBottomColor": {
+    "primary": "border-b-primary dark:border-b-dark-primary",
+    "secondary": "border-b-secondary dark:border-b-dark-secondary",
+    "info": "border-b-info dark:border-b-dark-info",
+    "success": "border-b-success dark:border-b-dark-success",
+    "warning": "border-b-warning dark:border-b-dark-warning",
+    "error": "border-b-error dark:border-b-dark-error",
+    "surface": "border-b-surface dark:border-b-dark-surface"
+  },
+  "borderLeftColor": {
+    "primary": "border-l-primary dark:border-l-dark-primary",
+    "secondary": "border-l-secondary dark:border-l-dark-secondary",
+    "info": "border-l-info dark:border-l-dark-info",
+    "success": "border-l-success dark:border-l-dark-success",
+    "warning": "border-l-warning dark:border-l-dark-warning",
+    "error": "border-l-error dark:border-l-dark-error",
+    "surface": "border-l-surface dark:border-l-dark-surface"
+  },
+  "borderRightColor": {
+    "primary": "border-r-primary dark:border-r-dark-primary",
+    "secondary": "border-r-secondary dark:border-r-dark-secondary",
+    "info": "border-r-info dark:border-r-dark-info",
+    "success": "border-r-success dark:border-r-dark-success",
+    "warning": "border-r-warning dark:border-r-dark-warning",
+    "error": "border-r-error dark:border-r-dark-error",
+    "surface": "border-r-surface dark:border-r-dark-surface"
   },
   "activityIndicator": {
     "primary": "border-t-primary dark:border-t-dark-primary",

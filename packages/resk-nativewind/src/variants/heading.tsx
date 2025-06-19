@@ -30,7 +30,7 @@ const heading = tv({
             "600": 'font-600',
             "700": 'font-700',
         },
-        color: VariantsGeneratedColors.heading
+        color: VariantsGeneratedColors.color,
     },
     defaultVariants: {},
 })

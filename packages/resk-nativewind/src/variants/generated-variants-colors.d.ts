@@ -7,11 +7,15 @@
         icon : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
-        divider : Record<IName,string>;
-        heading : Record<IName,string>;
-        text : Record<IName,string>;
+        color : Record<IName,string>;
+        background : Record<IName,string>;
         shadow : Record<IName,string>;
         activityIndicator: Record<IName,string>;
+        borderColor : Record<IName,string>;
+        borderTopColor : Record<IName,string>;
+        borderBottomColor : Record<IName,string>;
+        borderLeftColor : Record<IName,string>;
+        borderRightColor : Record<IName,string>;
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     

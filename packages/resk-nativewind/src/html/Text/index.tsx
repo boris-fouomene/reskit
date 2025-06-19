@@ -7,9 +7,24 @@ import { isNumber } from "@resk/core/utils";
 import { StyleSheet } from "react-native";
 import variantText from "@variants/text";
 
-export const Text = withAsChild(function Text({ numberOfLines, variant, allowFontScaling, style: cStyle, ellipsizeMode, lineBreakMode, maxFontSizeMultiplier, minimumFontScale, ...props }: IHtmlTextProps) {
+export const Text = withAsChild(function Text({ numberOfLines,selectable, variant, allowFontScaling, style: cStyle, ellipsizeMode, lineBreakMode, maxFontSizeMultiplier, minimumFontScale, ...props }: IHtmlTextProps) {
     const classes: IClassName = [];
     const style = {} as any;
+    classes.push(selectable === false ? "select-none" : "select-text")
+    if (isNumber(numberOfLines) && numberOfLines >= 1) {
+        classes.push("max-w-full","text-ellipsis");
+        if(numberOfLines> 1){
+            Object.assign(style,{
+                display: '-webkit-box',
+                overflow: 'clip',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: numberOfLines,
+            })
+        } else {
+            classes.push("overflow-hidden whitespace-nowrap");
+            style.wordWrap = "normal";
+        }
+    }
     if (ellipsizeMode || lineBreakMode) {
         const truncationMode = ellipsizeMode || lineBreakMode;
         classes.push("overflow-hidden");
@@ -20,12 +35,6 @@ export const Text = withAsChild(function Text({ numberOfLines, variant, allowFon
         } else if (truncationMode === 'head' || truncationMode === 'middle') {
             classes.push('truncate');
         }
-    }
-    if (isNumber(numberOfLines) && numberOfLines > 0) {
-        style.display = '-webkit-box';
-        style.WebkitBoxOrient = 'vertical';
-        style.WebkitLineClamp = numberOfLines;
-        classes.push("overflow-hidden", "text-ellipsis",);
     }
     if (allowFontScaling === false) {
         style.textSizeAdjust = 'none';

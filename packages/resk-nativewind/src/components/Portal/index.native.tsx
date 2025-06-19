@@ -156,7 +156,7 @@ export function PortalProvider({ children }: { children?: ReactNode }) {
 
 function RenderedPortal({ children, className, withBackdrop, style, visible, absoluteFill, zIndex, ...props }: IPortalProps & { zIndex: number }) {
     if (visible === false) return null;
-    return <Div {...Object.assign({}, props)} className={cn(absoluteFill && classes.absoluteFill, allVariants({ backdrop: withBackdrop }), className)} style={StyleSheet.flatten([{ zIndex }, absoluteFill && styles.absoluteFill, style]) as any}>
+    return <Div {...props} className={cn(absoluteFill && classes.absoluteFill, allVariants({ backdrop: withBackdrop }), className)} style={StyleSheet.flatten([{ zIndex }, absoluteFill && styles.absoluteFill, style]) as any}>
         {children || null}
     </Div>
 };

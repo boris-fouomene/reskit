@@ -27,8 +27,8 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <H2> AppBar Example</H2>
         <AppBar
-          title="My Application"
-          subtitle="Welcome to the app"
+          title="My Applicationdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          subtitle="Welcome to the appsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
           actions={[
             { label: "Settings"},
             { label: "Profile"},

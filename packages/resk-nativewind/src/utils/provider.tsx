@@ -116,7 +116,7 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
                 }
                 return ref;
             });
-            return <Component {...Object.assign({}, defaultRenderProps)} {...props} ref={(ref || innerRef) as any} />;
+            return <Component {...defaultRenderProps as any} {...props} ref={(ref || innerRef) as any} />;
         };
 
         /**

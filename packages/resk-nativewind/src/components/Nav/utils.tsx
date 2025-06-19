@@ -11,7 +11,6 @@ function renderExpandableMenuItemOrSection<ItemContext = unknown>({ item, itemsN
   level = typeof level == "number" && level || 0;
   if (item?.perm !== undefined && !Auth.isAllowed(item?.perm)) return null;
   const { section, items, ...rest } = item;
-  context = { ...Object.assign({}, rest.context), ...Object.assign({}, context) };
   return (section ? renderItem : renderExpandableItem)({ level, items, ...rest, className: cn(itemClassName, rest.className), children: itemsNodes, context }, index);
 }
 
@@ -36,7 +35,7 @@ function renderNavItem<ItemContext = unknown>({ item, index, renderItem, renderE
       return renderExpandableMenuItemOrSection({ level, itemClassName, itemsNodes: itemsNodes, index, item, renderItem, renderExpandableItem, context })
     }
   }
-  return renderItem({ ...item, className: cn(itemClassName, item.className), level, context: { ...Object.assign({}, item.context), ...Object.assign({}, context) } }, index);
+  return renderItem({ ...item, className: cn(itemClassName, item.className), level, context }, index);
 }
 
 

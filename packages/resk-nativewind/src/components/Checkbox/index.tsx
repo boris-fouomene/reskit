@@ -103,7 +103,7 @@ export function Checkbox({ testID, checkedIconName, size, uncheckedIconName, che
         accessibilityRole="checkbox"
         accessibilityState={{ disabled, checked }}
         accessibilityLabel={getTextContent(label)}
-        {...Object.assign({}, touchableProps) as any}
+        {...touchableProps as any}
         onPress={handleOnPress}
         className={cn(containerClassName)}
     >

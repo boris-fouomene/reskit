@@ -5,10 +5,12 @@
         button : Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
         buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
         icon : Record<IName,string>;
+        iconForeground : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
         color : Record<IName,string>;
         background : Record<IName,string>;
+        foreground : Record<IName,string>;
         shadow : Record<IName,string>;
         activityIndicator: Record<IName,string>;
         borderColor : Record<IName,string>;

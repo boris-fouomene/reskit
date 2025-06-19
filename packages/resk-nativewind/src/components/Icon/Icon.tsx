@@ -173,7 +173,7 @@ Icon.getIcon = function getIcon<T = any>({ icon, ...rest }: IGetIconOptions<T>):
     const iconProps: IIconProps = {
         ...rest,
         iconName,
-        ...Object.assign({}, !iconName ? { source: getIconSource(icon) } : undefined),
+        ...(!iconName ? { source: getIconSource(icon) }:{}),
     }
     return <Icon {...iconProps} />;
 }

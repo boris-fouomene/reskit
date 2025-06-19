@@ -1,5 +1,5 @@
 import { ReactElement, ReactNode } from "react";
-import { IIconButtonProps } from "@components/Icon/types";
+import { IIconButtonProps, IIconSource } from "@components/Icon/types";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IClassName } from "@src/types";
 import { IVariantPropsText } from "@variants/text";
@@ -115,6 +115,18 @@ export interface IAppBarActionsProps<Context = unknown> {
         only on nextjs platform
     */
     hydrationFallback?: ReactNode;
+    
+    /***
+        The class name to apply to the menu anchor.
+        When the actions items are rendered as a menu, this class name is applied to the menu anchor.
+    */
+    menuAnchorClassName?: IClassName;
+    
+    /***
+        The icon to use for the menu anchor.
+        When the actions items are rendered as a menu, this icon is used to render the menu anchor.
+    */
+    menuAnchorIconProps?: IIconButtonProps;
 }
 
 /**

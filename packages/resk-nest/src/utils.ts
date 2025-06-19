@@ -62,7 +62,7 @@ export async function createApp<T extends INestApplication = INestApplication>(
     const vOptions: VersioningOptions = {
         type: VersioningType.URI,
         defaultVersion: '1',
-        ...Object.assign({}, versioningOptions),
+        ...versioningOptions,
     } as VersioningOptions;
     const appVersion = typeof vOptions.defaultVersion === 'string' ? vOptions.defaultVersion : '1';
     // Capture the global prefix if set later

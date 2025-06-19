@@ -69,7 +69,7 @@ export default function IconButton(
                 flexGrow: 0,
             }}
             ref={ref}
-            {...Object.assign({}, touchableProps)}
+            {...touchableProps}
         >
             {isLoading ? <ActivityIndicator className={cn("self-center")} size={size} /> : Icon.getIcon({
                 ...restProps,

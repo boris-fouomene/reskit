@@ -10,7 +10,7 @@ import { cn } from "@utils/cn";
 import { isValidElement, useMemo } from "react";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 
-export function AppBarClientActions<Context = unknown>({ context, renderAction, renderExpandableAction, hydrationFallback, testID, actionClassName, actionMenuItemClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
+export function AppBarClientActions<Context = unknown>({ context,menuAnchorClassName,menuAnchorIconProps, renderAction, renderExpandableAction, hydrationFallback, testID, actionClassName, actionMenuItemClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
     const { window: { width: windowWidth }, isHydrated } = useBreakpoints();
     const mAction: number = typeof maxVisibleActions === "number" && maxVisibleActions ? Math.trunc(maxVisibleActions) : getAppBarMaxActions(windowWidth, viewportWidth);
     const { actions, menuItems } = useMemo(() => {
@@ -61,7 +61,8 @@ export function AppBarClientActions<Context = unknown>({ context, renderAction, 
                 return <Icon.Button
                     size={28}
                     iconName={FONT_ICONS.MORE as any}
-                    className={"mx-[7px]"}
+                    {...menuAnchorIconProps}
+                    className={cn("mx-[7px]",menuAnchorClassName,menuAnchorIconProps?.className)}
                     onPress={() => {
                         menu?.open();
                     }}

@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { Surface } from '@components/Surface';
-import { IAppBarProps } from './types';
+import { IAppBarActionsProps, IAppBarProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import ExpandableAppBarAction from './ExpandableAction';
 import { AppBarAction } from './Action';
@@ -12,6 +12,7 @@ import { Div } from '@html/Div';
 import { Text } from '@html/Text';
 import textVariant from "@variants/text";
 import { AppBarActions } from './Actions';
+import appBarVariants from "@variants/appBar";
 
 
 function AppBar<Context = any>({
@@ -33,12 +34,14 @@ function AppBar<Context = any>({
   contentClassName,
   className,
   context,
+  variant,
   ...appBarProps
 }: IAppBarProps<Context>) {
   testID = defaultStr(testID, 'resk-appbar');
+  const appVarVariant = appBarVariants(variant);
   subtitle = subtitle === false ? null : subtitle;
   const backAction: ReactNode | false = typeof customBackAction == "function" ? customBackAction({
-    ...Object.assign({}, context),
+    ...context as any,
     handleBackPress: (event: any) => {
       if (typeof onBackActionPress == "function") {
         onBackActionPress(event);
@@ -46,18 +49,18 @@ function AppBar<Context = any>({
     }
   }) : customBackAction;
   return (<Surface
-    className={cn(`appbar px-[7px] h-[${DEFAULT_APPBAR_HEIGHT}px] px-[7px] z-1 flex flex-row items-center overflow-hidden`, className)}
+    className={cn(`appbar px-[7px] px-[7px] z-1 flex flex-row items-center max-w-full`,Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]",appVarVariant.base(), className)}
     {...appBarProps}
     testID={testID}
   >
     {(backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
-      <BackAction testID={`${testID}-back-action`} className={cn(backActionClassName)} onPress={onBackActionPress} /> : null}
+      <BackAction testID={`${testID}-back-action`} className={cn(appVarVariant.icon(),backActionClassName)} onPress={onBackActionPress} /> : null}
     {isValidElement(left) ? left as any : null}
-    <Div testID={`${testID}-content`} className={cn("flex-1 px-[12px]", contentClassName)}>
+    <Div testID={`${testID}-content`} className={cn("flex-1 px-[12px]",appVarVariant.content(), contentClassName)}>
       <Text
         numberOfLines={1}
         testID={`${testID}-title`}
-        className={cn("font-medium text-lg", textVariant(titleVariant), titleClassName)}
+        className={cn("font-medium text-lg",appVarVariant.title(), textVariant(titleVariant), titleClassName)}
       >
         {title}
       </Text>
@@ -65,19 +68,24 @@ function AppBar<Context = any>({
         <Text
           numberOfLines={1}
           testID={`${testID}-subtitle`}
-          className={cn("text-sm opacity-90", textVariant(subtitleVariant), subtitleClassName)}
+          className={cn("text-sm opacity-90",appVarVariant.subtitle(), textVariant(subtitleVariant), subtitleClassName)}
         >
           {subtitle}
         </Text>
       ) : null}
     </Div>
     {isValidElement(children) ? children : null}
-    <AppBarActions testID={testID + "-actions"}  {...Object.assign({}, { context }, actionsProps)} actions={actions} />
+    <AppBarActions testID={testID + "-actions"} 
+      context={context}
+      {...actionsProps}
+      actions={actions} 
+      actionClassName={cn(appVarVariant.action(),actionsProps?.actionClassName)}
+      actionMenuItemClassName={cn(appVarVariant.actionMenuItem(),actionsProps?.actionMenuItemClassName)}
+      menuAnchorClassName={cn(appVarVariant.icon(),actionsProps?.menuAnchorClassName)}
+    />
     {isValidElement(right) ? right : null}
   </Surface>);
 };
-
-const DEFAULT_APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
 
 
 AppBar.displayName = 'AppBar';

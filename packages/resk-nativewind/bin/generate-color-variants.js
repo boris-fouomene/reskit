@@ -55,6 +55,7 @@ module.exports = (colors, options) => {
             }
         }),
         icon: VariantsColors.buildTextColors(true),
+        iconForeground: VariantsColors.buildForegroundColors(true),
         iconButton: VariantsColors.buildForegroundColors(true, (colorWithPrefix, darkColorWithPrefix, color) => {
             return {
                 container: `bg-${color} dark:bg-dark${color}`,
@@ -70,6 +71,7 @@ module.exports = (colors, options) => {
         }),
         color:VariantsColors.buildTextColors(),
         background:VariantsColors.buildBackgroundColors(),
+        foreground:VariantsColors.buildForegroundColors(),
         borderColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`border-${color} dark:border-dark-${color}`);
         }),
@@ -100,10 +102,12 @@ export const VariantsGeneratedColors = ${content}
         button : Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
         buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
         icon : Record<IName,string>;
+        iconForeground : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
         color : Record<IName,string>;
         background : Record<IName,string>;
+        foreground : Record<IName,string>;
         shadow : Record<IName,string>;
         activityIndicator: Record<IName,string>;
         borderColor : Record<IName,string>;

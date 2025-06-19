@@ -30,7 +30,7 @@ export function Details({ className, iconProps, iconPosition, disabled, testID, 
     const isIconOnLeft = iconPosition !== "right" ? true : false;
     const icon = <DetailsIcon
         testID={testID + "-icon"}
-        {...Object.assign({}, iconProps)}
+        {...iconProps}
         toggleOpen={toggleOpen}
         open={isOpen}
         className={cn("details-icon")}

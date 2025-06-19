@@ -96,7 +96,7 @@ export function Switch({ testID, ...props }: ISwitchProps) {
     const MTestID = typeof testID === 'string' && testID || "resk-switch";
     const labelContent = <Text testID={`${MTestID}-label`} children={label} className={labelClassName} />;
     return <Tooltip<TouchableOpacityProps> as={TouchableOpacity as any} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`}
-        {...Object.assign({}, touchableProps) as any}
+        {...touchableProps as any}
         onPress={(event: GestureResponderEvent) => {
             toggleStatus();
         }}

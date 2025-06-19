@@ -30,7 +30,7 @@ export const useBreakpoints = (options?: Partial<IBreakpoints>): IUseBreakpointR
     const breakpoints = {
         mobileMaxWidth: Breakpoints.mobileMaxWidth,
         tabletMaxWidth: Breakpoints.tabletMaxWidth,
-        ...Object.assign({}, options),
+        ...options,
     };
     breakpoints.mobileMaxWidth = isNumber(breakpoints.mobileMaxWidth) && breakpoints.mobileMaxWidth > 0 ? breakpoints.mobileMaxWidth : Breakpoints.mobileMaxWidth;
     breakpoints.tabletMaxWidth = isNumber(breakpoints.tabletMaxWidth) && breakpoints.tabletMaxWidth > 0 ? breakpoints.tabletMaxWidth : Breakpoints.tabletMaxWidth;

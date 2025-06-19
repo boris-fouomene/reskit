@@ -13,6 +13,7 @@ import modal from "./modal";
 import menu from "./menu";
 import color from "./color";
 import background from "./background";
+import foreground from "./foreground";
 export const variants = {
     all,
     menu,
@@ -28,6 +29,7 @@ export const variants = {
     modal,
     color,
     background,
+    foreground,
 }
 
 export * from "./types";

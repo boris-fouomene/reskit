@@ -49,7 +49,7 @@ export function AppBarClientActions<Context = unknown>({ context, renderAction, 
         if (isValidElement(hydrationFallback)) {
             return hydrationFallback;
         }
-        return <ActivityIndicator size={25} borderWidth={3} />;
+        return <ActivityIndicator size="small" />;
     }
     return <>
         {actions}

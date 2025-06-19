@@ -20,7 +20,7 @@ export const useMenuPosition = ({
     maxHeight: customMaxHeight,
 }: IUseMenuPositionProps) => {
     const padding = 0;
-    const { window:{width:windowWidth,height:windowHeight}, isTablet, isMobile, ...rest } = useBreakpoints();
+    const { window: { width: windowWidth, height: windowHeight }, isTablet, isMobile, ...rest } = useBreakpoints();
     const fullScreen = !!(isMobile && fullScreenOnMobile || isTablet && fullScreenOnTablet);
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
@@ -38,7 +38,7 @@ export const useMenuPosition = ({
         } else {
             const { pageX: pX, pageY: pY, width: anchorWidth, height: anchorHeight } = anchorMeasurements;
             const pageX = Math.max(0, pX), pageY = Math.max(0, pY);
-            minWidth = Math.max(typeof minWidth == 'number' && minWidth > 0 ? minWidth : anchorWidth,MENU_MIN_WIDTH);
+            minWidth = Math.max(typeof minWidth == 'number' && minWidth > 0 ? minWidth : anchorWidth, MENU_MIN_WIDTH);
             if (anchorWidth <= windowWidth - pageX) {
                 minWidth = Math.max(minWidth, anchorWidth);
             }

@@ -37,16 +37,16 @@ function AppBar<Context = any>({
 }: IAppBarProps<Context>) {
   testID = defaultStr(testID, 'resk-appbar');
   subtitle = subtitle === false ? null : subtitle;
-  context = Object.assign({}, context);
   const backAction: ReactNode | false = typeof customBackAction == "function" ? customBackAction({
-    ...context, handleBackPress: (event: any) => {
+    ...Object.assign({}, context),
+    handleBackPress: (event: any) => {
       if (typeof onBackActionPress == "function") {
         onBackActionPress(event);
       }
     }
   }) : customBackAction;
   return (<Surface
-    className={cn(`appbar px-[7px] h-[${DEFAULT_APPBAR_HEIGHT}px] px-[7px] z-1 flex flex-row items-center`, className)}
+    className={cn(`appbar px-[7px] h-[${DEFAULT_APPBAR_HEIGHT}px] px-[7px] z-1 flex flex-row items-center overflow-hidden`, className)}
     {...appBarProps}
     testID={testID}
   >
@@ -72,7 +72,7 @@ function AppBar<Context = any>({
       ) : null}
     </Div>
     {isValidElement(children) ? children : null}
-    <AppBarActions testID={testID + "-actions"}  {...Object.assign({}, actionsProps,{context})} actions={actions} />
+    <AppBarActions testID={testID + "-actions"}  {...Object.assign({}, { context }, actionsProps)} actions={actions} />
     {isValidElement(right) ? right : null}
   </Surface>);
 };

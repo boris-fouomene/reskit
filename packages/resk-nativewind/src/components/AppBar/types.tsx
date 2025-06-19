@@ -38,19 +38,19 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
     left?: ReactNode;
 
     right?: ReactNode;
-    
-    actions?:IAppBarActionsProps<Context>["actions"];
-    
-    
-    actionsProps?:IAppBarActionsProps<Context>;
-    
-    
-    context?:IAppBarActionsProps<Context>["context"];
+
+    actions?: IAppBarActionsProps<Context>["actions"];
+
+
+    actionsProps?: IAppBarActionsProps<Context>;
+
+
+    context?: IAppBarActionsProps<Context>["context"];
 }
 
 export interface IAppBarActionsProps<Context = unknown> {
     testID?: string;
-    
+
     /** The width of the viewport, used to calculate the maximum number of actions to display. */
     viewportWidth?: number;
 
@@ -76,7 +76,7 @@ export interface IAppBarActionsProps<Context = unknown> {
      * ```
      */
     actionClassName?: string;
-    
+
     /**
      * A class name to apply specifically to AppBar actions rendered inside an action menu (e.g., a dropdown or overflow menu).
      *
@@ -105,13 +105,13 @@ export interface IAppBarActionsProps<Context = unknown> {
 
     /** The context to pass to each action, used to extend the context for the actions. */
     context?: Context; // The context for actions requiring specific context information.
-    
+
     /***
         The fallback element to render as actions during the hydration process, 
         when the component is not yet mounted.
         only on nextjs platform
     */
-    hydrationFallback?:ReactNode;
+    hydrationFallback?: ReactNode;
 }
 
 /**

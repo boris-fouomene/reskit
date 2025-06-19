@@ -2,7 +2,7 @@
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { useEffect, useState, useRef, useMemo, RefObject, Fragment } from 'react';
-import { View, LayoutChangeEvent, LayoutRectangle, Pressable, ScrollView, ScrollViewProps } from 'react-native';
+import { View, LayoutChangeEvent, LayoutRectangle, Pressable, ScrollView, ScrollViewProps, StyleSheet } from 'react-native';
 import { IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
@@ -14,7 +14,7 @@ import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
 import { useBackHandler } from '@components/BackHandler';
 import menuVariants from '@variants/menu';
-import { classes } from '@variants/classes';
+import { Div } from '@html/Div';
 
 
 
@@ -154,7 +154,7 @@ export function Menu<Context = unknown>({
     const Wrapper = !withScrollView ? Fragment : ScrollView;
     const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", className: cn(menuVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(menuVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
-    itemsProps.className = cn(menuVariant.items(), itemsProps.className); 
+    itemsProps.className = cn(menuVariant.items(), itemsProps.className);
     return <>
         <MenuContext.Provider value={context}>
             <Pressable testID={testID + "-anchor-container"}
@@ -186,14 +186,14 @@ export function Menu<Context = unknown>({
                 <View
                     testID={testID}
                     {...props}
-                    className={cn(menuVariant.base(), className)}
+                    className={cn("resk-menu absolute", menuVariant.base(), className)}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
                             onLayout(event);
                         }
                         onMenuLayout(event);
                     }}
-                    style={[menuStyle, props.style]}
+                    style={StyleSheet.flatten([menuStyle, props.style])}
                 >
                     <Wrapper {...wrapperProps}>
                         {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}

@@ -1,6 +1,5 @@
 import { Platform, ViewStyle } from "react-native";
 
-export const absoluteClassName = "w-screen h-screen web:position-fixed position-absolute pointer-events-auto";
 export const styles = {
     absoluteFill: {
         position: Platform.select({

@@ -2,9 +2,10 @@ import { Div } from '@html/Div';
 import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, useId } from 'react';
 import { StyleSheet } from 'react-native';
 import { cn } from '@utils/cn';
-import { absoluteClassName, styles } from './utils';
+import { styles } from './utils';
 import { IPortalProps } from './types';
 import allVariants from "@variants/all";
+import { classes } from '@variants/classes';
 
 /**
  * @interface IPortalItem
@@ -155,7 +156,7 @@ export function PortalProvider({ children }: { children?: ReactNode }) {
 
 function RenderedPortal({ children, className, withBackdrop, style, visible, absoluteFill, zIndex, ...props }: IPortalProps & { zIndex: number }) {
     if (visible === false) return null;
-    return <Div {...Object.assign({}, props)} className={cn(absoluteFill && absoluteClassName, allVariants({ backdrop: withBackdrop }), className)} style={StyleSheet.flatten([{ zIndex }, absoluteFill && styles.absoluteFill, style]) as any}>
+    return <Div {...Object.assign({}, props)} className={cn(absoluteFill && classes.absoluteFill, allVariants({ backdrop: withBackdrop }), className)} style={StyleSheet.flatten([{ zIndex }, absoluteFill && styles.absoluteFill, style]) as any}>
         {children || null}
     </Div>
 };

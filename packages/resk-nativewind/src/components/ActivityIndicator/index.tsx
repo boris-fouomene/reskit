@@ -21,11 +21,12 @@ import { IActivityIndicatorProps } from "./types";
  * Here’s an example of how to use the custom `ActivityIndicator`:
  * 
  */
-export function ActivityIndicator({ size, style, variant, testID, id, color, className, children, role, ...props }: IActivityIndicatorProps) {
+export function ActivityIndicator({ size, borderWidth, style, variant, testID, id, color, className, children, role, ...props }: IActivityIndicatorProps) {
     const clx = [];
     if (isNumber(size) && size > 0) {
-        let borderWidth = Math.max(size / (size > 10 ? 5 : 4), 5);
-        if (size >= 40) {
+        const hasBorderWidth = isNumber(borderWidth) && borderWidth > 0;
+        borderWidth = hasBorderWidth ? borderWidth : Math.max(size / (size > 10 ? 5 : 3), 3);
+        if (!hasBorderWidth && size >= 40) {
             borderWidth = Math.max(size / 10, size < 60 ? 6 : size < 80 ? 8 : 10);
         }
         style = [{ width: size, height: size, borderWidth }, style]

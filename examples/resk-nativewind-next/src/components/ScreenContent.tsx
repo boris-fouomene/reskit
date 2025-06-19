@@ -1,7 +1,7 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
-import { Icon, Menu, AppBar, ActivityIndicator, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
+import { Icon, Menu, AppBar, ActivityIndicator,IVariantsColorsMap, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -174,10 +174,3 @@ const styles = {
   title: `text-xl font-bold text-green-500`,
 };
 
-
-declare module "@resk/nativewind" {
-  interface IVariantsColorsMap {
-    accent: string;
-    neutral: string;
-  }
-}

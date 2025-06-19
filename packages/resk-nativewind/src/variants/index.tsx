@@ -29,6 +29,9 @@ export const variants = {
     color,
     background,
 }
+
+export * from "./types";
+
 export * from "./colors";
 
 export * from "./variantsFactory";

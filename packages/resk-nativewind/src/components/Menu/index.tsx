@@ -75,6 +75,9 @@ export function Menu<Context = unknown>({
         anchorMeasurements: state.anchorMeasurements,
         preferedPositionAxis,
     });
+    if(isVisible){
+        //console.log("is visible ",menuPosition,JSON.stringify(menuStyle,null,2)," is menu style",JSON.stringify(state.anchorMeasurements,null,2)," is anchor measre");
+    }
     const closeMenuInternal = (callback?: Function) => {
         if (isControlled) {
             if (typeof onDismiss === "function") {
@@ -115,6 +118,7 @@ export function Menu<Context = unknown>({
                 return;
             }
             setState((prevState) => {
+                console.log(JSON.stringify(measures,null,2)," are new anchor measures");
                 return { ...prevState, anchorMeasurements: measures, visible: true }
             }, () => {
                 if (typeof callback === "function") {

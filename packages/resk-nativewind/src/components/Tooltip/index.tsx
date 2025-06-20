@@ -18,7 +18,7 @@ export function Tooltip<asProps extends Partial<ITouchableProps> = PressableProp
     return isValidElement(tooltip, true) ? tooltip : isValidElement(title, true) ? title : null;
   }, [title, tooltip]);
   const Component = useMemo(() => {
-    return as && typeof as == "function" ? as : Pressable;
+    return as || Pressable;
   }, [as])
   return (
     <Component {...rest as any} className={cn(className)} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>

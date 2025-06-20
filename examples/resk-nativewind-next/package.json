@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "next": "^15.3.2",
-    "react-native": "^0.79.3",
     "react-native-web": "^0.20.0"
   },
   "devDependencies": {

@@ -7,9 +7,9 @@ import './global.css';
 export default function App() {
   return (
     <PortalProvider>
-      <SafeAreaView>
+      <SafeAreaView style={{flex:1,position:"relative"}}>
         <StatusBar style="auto" />
-        <ScreenContent title="Home" />
+        <ScreenContent title="Home"/>
       </SafeAreaView>
     </PortalProvider>
   );

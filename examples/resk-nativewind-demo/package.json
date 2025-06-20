@@ -13,10 +13,10 @@
     "generate-icon-types": "npx @resk/nativewind generate-icon-types material,fa6"
   },
   "dependencies": {
-    "expo": "~53.0.6",
+    "expo": "53.0.12",
     "expo-status-bar": "~2.2.3",
     "nativewind": "latest",
-    "react-native": "0.79.2",
+    "react-native": "0.79.4",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0"
   },

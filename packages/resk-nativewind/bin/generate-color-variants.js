@@ -34,12 +34,7 @@ module.exports = (colors, options) => {
             }
         }),
         buttonOutline: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
-            /***
-             *  base: `p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke] dark:hover:bg-dark-${color} hover:bg-${color} focus-visible:outline-${color}`,
-                label: `text-${color} dark:text-dark${color} hover:text-${color}-foreground btn-hover:text-${color}-foreground dark:hover:text-dark-${color}-foreground dark:btn-hover:text-dark-${color}-foreground active:text-${color}-foreground dark:active:text-dark-${color}-foreground`,
-                icon: `!text-${color} dark:!text-dark${color} hover:!text-${color}-foreground btn-hover:!text-${color}-foreground dark:hover:!text-dark-${color}-foreground dark:btn-hover:!text-dark-${color}-foreground active:!text-${color}-foreground dark:active:!text-dark-${color}-foreground`,
-                ripple: ""
-             */
+            
             const groupClassName = {
                 base: `group hover:bg-${color} dark:hover:bg-dark-${color}`,
                 label: `hover:text-${color}-foreground dark:hover:text-dark-${color}-foreground group-hover:text-${color}-foreground dark:group-hover:text-dark-${color}-foreground`,

@@ -4,7 +4,6 @@ import { VariantsFactory } from "./variantsFactory";
 
 const modal = tv({
     slots: {
-        backkdrop: "",
         container: "justify-center items-center flex flex-1 flex-col",
         content: "max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
     },
@@ -31,7 +30,7 @@ const modal = tv({
     defaultVariants: {
         background: "surface",
         rounded: true,
-        shadow:"md",
+        //shadow:"md",
         shadowColor:"surface"
     }
 });

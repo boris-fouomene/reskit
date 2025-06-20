@@ -1,6 +1,6 @@
 import { Div } from '@html/Div';
 import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, useId } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ViewStyle } from 'react-native';
 import { cn } from '@utils/cn';
 import { styles } from './utils';
 import { IPortalProps } from './types';
@@ -133,7 +133,7 @@ export function PortalProvider({ children }: { children?: ReactNode }) {
             {children}
             <>
                 {portalRefs.current.map(({ key, children, props }, index) => {
-                    const { handleOnPressOnlyOnTarget, style, onPress, ...rest } = Object.assign({}, props);
+                    const { handleOnPressOnlyOnTarget,onPress, ...rest } = Object.assign({}, props);
                     return (
                         <RenderedPortal
                             testID={`${testID}-${index + 1}`}
@@ -141,7 +141,7 @@ export function PortalProvider({ children }: { children?: ReactNode }) {
                             zIndex={startIndex + index + 1}
                             children={children}
                             {...rest}
-                            style={StyleSheet.flatten([{ pointerEvents: "box-only" }, style])}
+                            {...{ pointerEvents: "box-only" } as any}
                             onPress={typeof onPress == "function" ? (event) => {
                                 if (handleOnPressOnlyOnTarget && event.target !== event.currentTarget) return;
                                 onPress(event);
@@ -156,7 +156,8 @@ export function PortalProvider({ children }: { children?: ReactNode }) {
 
 function RenderedPortal({ children, className, withBackdrop, style, visible, absoluteFill, zIndex, ...props }: IPortalProps & { zIndex: number }) {
     if (visible === false) return null;
-    return <Div {...props} className={cn(absoluteFill && classes.absoluteFill, allVariants({ backdrop: withBackdrop }), className)} style={StyleSheet.flatten([{ zIndex }, absoluteFill && styles.absoluteFill, style]) as any}>
+    const flattenStyle = StyleSheet.flatten([{ zIndex,pointerEvents:"box-only"} as ViewStyle, absoluteFill && styles.absoluteFill, style] as any);
+    return <Div {...props} className={cn(absoluteFill && classes.absoluteFill, allVariants({ backdrop: withBackdrop }), className)} style={flattenStyle}>
         {children || null}
     </Div>
 };

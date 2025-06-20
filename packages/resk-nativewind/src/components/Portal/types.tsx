@@ -1,5 +1,5 @@
 import { IHtmlDivProps } from "@html/types";
-import { ViewStyle } from "react-native";
+import { ViewProps, ViewStyle } from "react-native";
 import { GestureResponderEvent } from "react-native";
 
 /**
@@ -35,4 +35,6 @@ export interface IPortalProps {
     handleOnPressOnlyOnTarget?: boolean;
 
     style?: IHtmlDivProps["style"];
+    
+    onAccessibilityEscape?: ViewProps["onAccessibilityEscape"];
 }

@@ -32,6 +32,10 @@ export interface IHtmlDivProps extends INativewindBaseProps, INativeAccessibilit
     onPressOut?: PressableProps["onPressOut"];
     ref?: Ref<any>;
     asHtmlTag?: keyof JSX.IntrinsicElements;
+    /***
+        The shadow elevation of the element.
+    */
+    elevation?:number;
 }
 
 export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "children" | "onPress" | "onPressIn" | "onPressOut"> {

@@ -9,7 +9,7 @@ import { normalizeGestureEvent } from '@html/events';
 import allVariants from '@variants/all';
 import { StyleSheet } from 'react-native';
 import { classes } from '@variants/classes';
-
+import { AccessibilityEscapeManager } from '@html/accessibility';
 
 /**
  * A component that renders children into a DOM node that is not a descendant of the parent component.
@@ -27,13 +27,21 @@ import { classes } from '@variants/classes';
  *   )
  * }
  */
-export function Portal({ children, style, className, handleOnPressOnlyOnTarget, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
+export function Portal({ children,onAccessibilityEscape, style, className, handleOnPressOnlyOnTarget, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
     const [mounted, setMounted] = useState(false);
     const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
     const createdElementRef = useRef<HTMLElement | null>(null);
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const target = `#${targetId}`;
+    useEffect(()=>{
+        if(typeof onAccessibilityEscape === "function" && targetElement){
+            const bindEvent= AccessibilityEscapeManager.getInstance().register(targetElement, onAccessibilityEscape);
+            return ()=>{
+                bindEvent?.remove();
+            }
+        }
+    },[targetElement,onAccessibilityEscape]);
     useEffect(() => {
         // Only run on client side
         setMounted(true);
@@ -68,6 +76,7 @@ export function Portal({ children, style, className, handleOnPressOnlyOnTarget, 
             element.style.cursor = "default";
         }
         setTargetElement(element);
+        
 
         // Cleanup function
         return () => {

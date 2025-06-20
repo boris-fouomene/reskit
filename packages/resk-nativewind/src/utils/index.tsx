@@ -19,6 +19,7 @@ export * from "./getBoundingClientRect";
 export * from "./measureContentHeight";
 export * from "./breakpoints";
 export * from "./useHydrated";
+export * from "./elevations-styles"
 /***
     vérifie si la variable node est un élément reactNode
 */

@@ -10,10 +10,11 @@ import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
 import modalVariants, { IVariantPropsModal } from "@variants/modal";
 
-export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable, onDismiss, ...props }: IModalProps) => {
+export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable:customDismissable, onDismiss, ...props }: IModalProps) => {
   const children = useMemo(() => {
     return props.children;
   }, [props.children]);
+  const dismissable = customDismissable !== false;
   testID = defaultStr(testID, "resk-modal");
   const modalVariant = modalVariants(variant);
   const handleDismiss = (e?: GestureResponderEvent | KeyboardEvent): any => {
@@ -23,28 +24,25 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
     return true;
   }
   useBackHandler(dismissable ? handleDismiss : () => true);
-  const hidden = !!!visible;
   return (
-    <Portal absoluteFill visible={visible} testID={testID + "-modal-portal"} withBackdrop className={cn("modal-portal", modalVariant.backkdrop(), backdropClassName)}>
-      <Div
-        testID={testID + "-modal-container"}
-        onAccessibilityEscape={() => {
+    <Portal absoluteFill visible={visible} 
+      testID={testID + "-modal-portal"} 
+      handleOnPressOnlyOnTarget={true}
+      onPress={dismissable ? handleDismiss : undefined} withBackdrop className={cn("modal-portal-container", modalVariant.container(), backdropClassName)}
+      onAccessibilityEscape={() => {
           if (typeof onAccessibilityEscape === "function") {
             onAccessibilityEscape();
           }
           if (dismissable === false) return;
           handleDismiss(undefined as any);
-        }}
-        className={cn("w-full h-full transition-opacity duration-500", modalVariant.container(), containerClassName)}
-        onPress={dismissable === false ? undefined : (e: GestureResponderEvent) => {
-          handleDismiss(e);
-        }}
-      >
-        <Div
+      }}
+    >
+      <Div
           {...props}
           testID={testID}
-          className={cn("resk-modal", modalVariant.content(), className)}
+          className={cn("resk-modal transition-opacity duration-500", modalVariant.content(), className)}
           onPress={(e: GestureResponderEvent) => {
+            console.log(e," is pressedddd");
             typeof e?.stopPropagation == "function" && e.stopPropagation();
             typeof e?.preventDefault == "function" && e.preventDefault();
             if (typeof onPress == "function") {
@@ -57,7 +55,6 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
             {children}
           </ModalContext.Provider>
         </Div>
-      </Div>
     </Portal>
   );
 };
@@ -154,6 +151,7 @@ const ModalContext = createContext<IModalContext | null>(null);
  * // Example of using the useModal hook in a component
  * import * as React from 'react';
  * import { useModal } from './path/to/useModal';
+import { disabled } from '../../../../../../frontend-dash/src/decorators/all/index';
  *
  * const ModalComponent = () => {
  *   const modalContext = useModal();

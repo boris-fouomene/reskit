@@ -1,8 +1,10 @@
-import { isObj } from '@resk/core/utils';
+import { isNumber, isObj } from '@resk/core/utils';
 import { INativewindBaseProps } from '@src/types';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import variantsAll from '@variants/all';
+import {StyleSheet} from "react-native";
+import { generateElevationStyle } from './elevations-styles';
 /**
  * A function that takes in any number of class names and returns a single class name string
  * that can be used in a React component's className prop. This function is useful for
@@ -15,6 +17,7 @@ import variantsAll from '@variants/all';
  *
  * @example
  * import { cn } from '@resk/nativewind'
+import { StyleSheet } from 'react-native';
  *
  * const MyComponent = ({ isDisabled }) => {
  *   return (
@@ -49,8 +52,12 @@ export function cn(...inputs: ClassValue[]) {
  * // normalizedProps.className will be a string formatted by `cn` function
  */
 
-export function normalizeProps<T extends INativewindBaseProps = any>({ className, ...props }: T, defaultProps?: T): Omit<T, "className"> & { className: string } {
+export function normalizeProps<T extends INativewindBaseProps = any>({ className, ...props }: T, defaultProps?: T): Omit<T, "className"> & { className: string} {
     defaultProps = isObj(defaultProps) ? defaultProps : {} as T;
+    const {elevation} = props as any;
+    if(isNumber(elevation)){
+        (props as any).style = StyleSheet.flatten([generateElevationStyle(elevation),(props as any).style]);
+    }
     return {
         ...defaultProps, ...props, className: cn(defaultProps.className,
             variantsAll({ disabled: !!((props as any).disabled || (defaultProps as any)?.disabled) }),

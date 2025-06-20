@@ -1,7 +1,7 @@
 import { roundeClasses } from "./rounded";
 import { padding2marginClasses } from "./padding2margin";
 import { borderClasses } from "./border";
-import { ShadowColorsClasses, ShadowClasses } from "./shadow";
+import { ShadowColorsClasses} from "./shadow";
 
 type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], variantName: keyof InputType) => ResultType;
 
@@ -63,9 +63,6 @@ export const VariantsFactory = {
     createBorderVariants: function createBorderVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses, ResultType>) {
         return VariantsFactory.create<typeof borderClasses, ResultType>(borderClasses, variantMutator);
     },
-    createShadowVariants: function createShadowVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof ShadowClasses, ResultType>) {
-        return VariantsFactory.create<typeof ShadowClasses, ResultType>(ShadowClasses, variantMutator);
-    },
     createShadowColorsVariants: function createShadowColorsVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof ShadowColorsClasses, ResultType>) {
         return VariantsFactory.create<typeof ShadowColorsClasses, ResultType>(ShadowColorsClasses, variantMutator);
     },
@@ -80,7 +77,6 @@ export const VariantsFactory = {
 const allVariantClasses = {
     border: borderClasses,
     rounded: roundeClasses,
-    shadow: ShadowClasses,
     shadowColor: ShadowColorsClasses,
     ...padding2marginClasses,
 };

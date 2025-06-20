@@ -49,7 +49,7 @@ export function AppBarClientActions<Context = unknown>({ context, menuAnchorClas
         if (isValidElement(hydrationFallback)) {
             return hydrationFallback;
         }
-        return <ActivityIndicator size="small" />;
+        return <ActivityIndicator size="small" className="flex-none" />;
     }
     return <>
         {actions}

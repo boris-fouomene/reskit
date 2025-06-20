@@ -30,7 +30,7 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
 
     /** class name for the BackAction component when rendered. */
     backActionClassName?: IClassName;
-    
+
     /***
      * Class name for the content of the AppBar.
      */
@@ -47,7 +47,7 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
 
 
     context?: IAppBarActionsProps<Context>["context"];
-    
+
     variant?: IVariantPropsAppBar;
 }
 
@@ -115,13 +115,13 @@ export interface IAppBarActionsProps<Context = unknown> {
         only on nextjs platform
     */
     hydrationFallback?: ReactNode;
-    
+
     /***
         The class name to apply to the menu anchor.
         When the actions items are rendered as a menu, this class name is applied to the menu anchor.
     */
     menuAnchorClassName?: IClassName;
-    
+
     /***
         The icon to use for the menu anchor.
         When the actions items are rendered as a menu, this icon is used to render the menu anchor.

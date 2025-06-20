@@ -49,18 +49,18 @@ function AppBar<Context = any>({
     }
   }) : customBackAction;
   return (<Surface
-    className={cn(`appbar px-[7px] px-[7px] z-1 flex flex-row items-center max-w-full`,Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]",appVarVariant.base(), className)}
+    className={cn(`appbar px-[7px] px-[7px] z-1 overflow-hidden flex flex-row items-center max-w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", appVarVariant.base(), className)}
     {...appBarProps}
     testID={testID}
   >
     {(backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
-      <BackAction testID={`${testID}-back-action`} className={cn(appVarVariant.icon(),backActionClassName)} onPress={onBackActionPress} /> : null}
+      <BackAction testID={`${testID}-back-action`} className={cn(appVarVariant.icon(), backActionClassName)} onPress={onBackActionPress} /> : null}
     {isValidElement(left) ? left as any : null}
-    <Div testID={`${testID}-content`} className={cn("px-[12px] max-w-full block native:flex-1",appVarVariant.content(), contentClassName)}>
+    <Div testID={`${testID}-content`} className={cn("px-[12px] flex-1 basis-0 min-w-0 native:flex-1", appVarVariant.content(), contentClassName)}>
       <Text
         numberOfLines={1}
         testID={`${testID}-title`}
-        className={cn("font-medium text-lg",appVarVariant.title(), textVariant(titleVariant), titleClassName)}
+        className={cn("font-medium text-lg", appVarVariant.title(), textVariant(titleVariant), titleClassName)}
       >
         {title}
       </Text>
@@ -68,20 +68,20 @@ function AppBar<Context = any>({
         <Text
           numberOfLines={1}
           testID={`${testID}-subtitle`}
-          className={cn("text-sm opacity-90",appVarVariant.subtitle(), textVariant(subtitleVariant), subtitleClassName)}
+          className={cn("text-sm opacity-90", appVarVariant.subtitle(), textVariant(subtitleVariant), subtitleClassName)}
         >
           {subtitle}
         </Text>
       ) : null}
     </Div>
     {isValidElement(children) ? children : null}
-    <AppBarActions testID={testID + "-actions"} 
+    <AppBarActions testID={testID + "-actions"}
       context={context}
       {...actionsProps}
-      actions={actions} 
-      actionClassName={cn(appVarVariant.action(),actionsProps?.actionClassName)}
-      actionMenuItemClassName={cn(appVarVariant.actionMenuItem(),actionsProps?.actionMenuItemClassName)}
-      menuAnchorClassName={cn(appVarVariant.icon(),actionsProps?.menuAnchorClassName)}
+      actions={actions}
+      actionClassName={cn(appVarVariant.action(), actionsProps?.actionClassName)}
+      actionMenuItemClassName={cn(appVarVariant.actionMenuItem(), actionsProps?.actionMenuItemClassName)}
+      menuAnchorClassName={cn(appVarVariant.icon(), actionsProps?.menuAnchorClassName)}
     />
     {isValidElement(right) ? right : null}
   </Surface>);

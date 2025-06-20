@@ -10,7 +10,7 @@ import { cn } from "@utils/cn";
 import { isValidElement, useMemo } from "react";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 
-export function AppBarClientActions<Context = unknown>({ context,menuAnchorClassName,menuAnchorIconProps, renderAction, renderExpandableAction, hydrationFallback, testID, actionClassName, actionMenuItemClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
+export function AppBarClientActions<Context = unknown>({ context, menuAnchorClassName, menuAnchorIconProps, renderAction, renderExpandableAction, hydrationFallback, testID, actionClassName, actionMenuItemClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
     const { window: { width: windowWidth }, isHydrated } = useBreakpoints();
     const mAction: number = typeof maxVisibleActions === "number" && maxVisibleActions ? Math.trunc(maxVisibleActions) : getAppBarMaxActions(windowWidth, viewportWidth);
     const { actions, menuItems } = useMemo(() => {
@@ -32,7 +32,7 @@ export function AppBarClientActions<Context = unknown>({ context,menuAnchorClass
                 const canRenderAction = !level && (actionCounter.current <= mAction && mAction > 1) || items?.length === 1;
                 const canAddAction = canRenderAction;
                 const canAddMenu = !canRenderAction && !level;
-                props.className = cn(canAddAction && cn("appbar-action", actionClassName), canAddMenu && cn("appbar-action-menu-item", actionMenuItemClassName));
+                props.className = cn(canAddAction && cn("appbar-action flex-none", actionClassName), canAddMenu && cn("appbar-action-menu-item", actionMenuItemClassName));
                 const renderedAction = (renderer as any)(props, index);
                 if (!renderedAction) return null;
                 if (canAddAction) {
@@ -62,7 +62,7 @@ export function AppBarClientActions<Context = unknown>({ context,menuAnchorClass
                     size={28}
                     iconName={FONT_ICONS.MORE as any}
                     {...menuAnchorIconProps}
-                    className={cn("mx-[7px]",menuAnchorClassName,menuAnchorIconProps?.className)}
+                    className={cn("flex-none mx-[7px]", menuAnchorClassName, menuAnchorIconProps?.className)}
                     onPress={() => {
                         menu?.open();
                     }}

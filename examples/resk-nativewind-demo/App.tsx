@@ -1,6 +1,6 @@
 
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, Text } from 'react-native';
+import { SafeAreaView} from 'react-native-safe-area-context';
 import { ScreenContent } from 'components/ScreenContent';
 import { PortalProvider } from '@resk/nativewind';
 import './global.css';

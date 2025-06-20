@@ -16,6 +16,7 @@ import iconVariants from "@variants/icon";
 import { FC } from "react";
 import { IconProps } from "react-native-vector-icons/Icon";
 import { Tooltip } from "@components/Tooltip";
+import { classes } from "@variants/classes";
 
 
 export const DEFAULT_FONT_ICON_SIZE = 20;
@@ -58,7 +59,7 @@ export default function ClientFontIcon({ name, variant, containerClassName, titl
         disabled={disabled}
         ref={ref as any}
         name={iconName}
-        className={iconClassName}
+        className={cn(classes.active2hoverState,iconClassName)}
     />;
 }
 

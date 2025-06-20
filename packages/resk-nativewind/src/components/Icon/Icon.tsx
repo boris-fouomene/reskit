@@ -8,6 +8,7 @@ import { StyleSheet } from "react-native";
 import { isNonNullString, isObj } from "@resk/core/utils";
 import { variants } from "@variants/index";
 import { Tooltip } from "@components/Tooltip";
+import { classes } from "@variants/classes";
 /**
  * The `Icon` component is a versatile icon renderer that can display both 
  * image-based icons and font-based icons. It supports press events, tooltips, 
@@ -86,7 +87,7 @@ function Icon({ iconName, className, variant, resizeMode, tooltip, title, source
             } : undefined,
             style,
         ]);
-        return <Component as={TouchableOpacity} title={title} tooltip={tooltip} disabled={disabled} {...containerP as any} className={cn("shrink-0 grow-0", containerClassName)}>
+        return <Component as={TouchableOpacity} title={title} tooltip={tooltip} disabled={disabled} {...containerP as any} className={cn("shrink-0 grow-0",classes.active2hoverState, containerClassName)}>
             <Image
                 accessibilityIgnoresInvertColors
                 resizeMode={resizeMode || "contain"}

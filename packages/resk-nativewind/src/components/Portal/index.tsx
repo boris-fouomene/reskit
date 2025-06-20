@@ -27,7 +27,7 @@ import { AccessibilityEscapeManager } from '@html/accessibility';
  *   )
  * }
  */
-export function Portal({ children,onAccessibilityEscape, style, className, handleOnPressOnlyOnTarget, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
+export function Portal({ children,onAccessibilityEscape, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
     const [mounted, setMounted] = useState(false);
     const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
     const createdElementRef = useRef<HTMLElement | null>(null);
@@ -68,7 +68,7 @@ export function Portal({ children,onAccessibilityEscape, style, className, handl
         applyReactStylesToDOM(element, stylesProp);
         if (hasOnPress) {
             element.onclick = function (event) {
-                if (handleOnPressOnlyOnTarget && event.target !== element && event.currentTarget !== event.target) return
+                if (event.target !== element && event.currentTarget !== event.target) return
                 onPress(normalizeGestureEvent(event as any));
             };
             element.style.cursor = "pointer";
@@ -90,7 +90,7 @@ export function Portal({ children,onAccessibilityEscape, style, className, handl
                 console.log(e, " removing portal element")
             }
         };
-    }, [target, targetId, className, absoluteFill, visible, testID, onPress, handleOnPressOnlyOnTarget]);
+    }, [target, targetId, className, absoluteFill, visible, testID, onPress]);
     // Don't render anything on server side or before mounting
     if (!mounted || !targetElement) {
         return null;

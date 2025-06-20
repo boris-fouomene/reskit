@@ -5,7 +5,6 @@ import { cn } from '@utils/cn';
 import { styles } from './utils';
 import { IPortalProps } from './types';
 import allVariants from "@variants/all";
-import { classes } from '@variants/classes';
 
 /**
  * @interface IPortalItem
@@ -133,19 +132,13 @@ export function PortalProvider({ children }: { children?: ReactNode }) {
             {children}
             <>
                 {portalRefs.current.map(({ key, children, props }, index) => {
-                    const { handleOnPressOnlyOnTarget,onPress, ...rest } = Object.assign({}, props);
                     return (
                         <RenderedPortal
                             testID={`${testID}-${index + 1}`}
                             key={key}
                             zIndex={startIndex + index + 1}
                             children={children}
-                            {...rest}
-                            {...{ pointerEvents: "box-only" } as any}
-                            onPress={typeof onPress == "function" ? (event) => {
-                                if (handleOnPressOnlyOnTarget && event.target !== event.currentTarget) return;
-                                onPress(event);
-                            } : undefined}
+                            {...props}
                         />
                     );
                 })}
@@ -154,10 +147,15 @@ export function PortalProvider({ children }: { children?: ReactNode }) {
     );
 };
 
-function RenderedPortal({ children, className, withBackdrop, style, visible, absoluteFill, zIndex, ...props }: IPortalProps & { zIndex: number }) {
+function RenderedPortal({ children, className, withBackdrop,onPress, style, visible, absoluteFill,testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
     if (visible === false) return null;
-    const flattenStyle = StyleSheet.flatten([{ zIndex,pointerEvents:"box-only"} as ViewStyle, absoluteFill && styles.absoluteFill, style] as any);
-    return <Div {...props} className={cn(absoluteFill && classes.absoluteFill, allVariants({ backdrop: withBackdrop }), className)} style={flattenStyle}>
+    absoluteFill = withBackdrop || absoluteFill;
+    const absoluteFillStyle = absoluteFill ? styles.absoluteFill : undefined;
+    const handleBackdrop = withBackdrop || absoluteFill;
+    const flattenStyle = StyleSheet.flatten([{ zIndex} as ViewStyle, style] as any);
+    const backdropClassName = cn(allVariants({ backdrop: withBackdrop }));
+    return <Div {...props} onPress={!handleBackdrop?onPress:undefined} className={cn(!handleBackdrop && backdropClassName, className)} style={Object.assign({},absoluteFillStyle,flattenStyle)}>
+        {handleBackdrop ? <Div testID={testID+"-backdrop"} className={cn("portal-backdrop",backdropClassName)} style={absoluteFillStyle} onPress={onPress}/>:null}
         {children || null}
     </Div>
 };

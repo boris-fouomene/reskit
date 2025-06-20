@@ -175,7 +175,7 @@ export function Menu<Context = unknown>({
                 {anchor}
             </Pressable>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} handleOnPressOnlyOnTarget onPress={(event) => {
+        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={(event) => {
             if (event.target == event.currentTarget) {
                 close();
                 return;

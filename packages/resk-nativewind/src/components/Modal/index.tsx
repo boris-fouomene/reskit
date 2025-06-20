@@ -27,7 +27,6 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
   return (
     <Portal absoluteFill visible={visible} 
       testID={testID + "-modal-portal"} 
-      handleOnPressOnlyOnTarget={true}
       onPress={dismissable ? handleDismiss : undefined} withBackdrop className={cn("modal-portal-container", modalVariant.container(), backdropClassName)}
       onAccessibilityEscape={() => {
           if (typeof onAccessibilityEscape === "function") {
@@ -41,15 +40,6 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
           {...props}
           testID={testID}
           className={cn("resk-modal transition-opacity duration-500", modalVariant.content(), className)}
-          onPress={(e: GestureResponderEvent) => {
-            console.log(e," is pressedddd");
-            typeof e?.stopPropagation == "function" && e.stopPropagation();
-            typeof e?.preventDefault == "function" && e.preventDefault();
-            if (typeof onPress == "function") {
-              onPress(e);
-            }
-            return false;
-          }}
         >
           <ModalContext.Provider value={{ isVisible: visible as boolean, isClosed: () => !!!visible, isOpen: () => !!visible, handleDismiss, dismissable: dismissable !== false }}>
             {children}

@@ -6,7 +6,7 @@ import { Text } from "@html/Text";
 import { useToggleable } from "@components/Switch/utils";
 import FontIcon from "@components/Icon/Font";
 import { FONT_ICONS } from "@components/Icon/Font/icons";
-import { isNonNullString, isNumber } from "@resk/core/utils";
+import { isNonNullString } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import getTextContent from "@utils/getTextContent";
 import { pickTouchableProps } from "@utils/touchHandler";
@@ -90,6 +90,8 @@ export function Checkbox({ testID, variant, checkedIconName, uncheckedIconName, 
         ...rest
     } = useToggleable(props);
     const computedVariant = checkboxVariant(variant);
+    const iconClx = checked ? computedVariant.checkedIconColor() : computedVariant.uncheckedIconColor();
+    const labelClx = checked ? computedVariant.checkedLabelColor() : computedVariant.uncheckedLabelColor();
     const { touchableProps, ...nonTouchableProps } = pickTouchableProps(rest as any);
     const handleOnPress = disabled ? undefined : (event: GestureResponderEvent) => {
         toggleStatus();
@@ -97,7 +99,7 @@ export function Checkbox({ testID, variant, checkedIconName, uncheckedIconName, 
     const iconChecked = isNonNullString(checkedIconName) ? checkedIconName : FONT_ICONS.CHECKED;
     const iconUnchecked = isNonNullString(uncheckedIconName) ? uncheckedIconName : FONT_ICONS.UNCHECKED;
     const checkboxTestID = typeof testID === 'string' && testID || "resk-checkbox";
-    const labelContent = <Text testID={`${checkboxTestID}-label`} className={cn(computedVariant.label(), labelClassName)} children={label} />;
+    const labelContent = <Text testID={`${checkboxTestID}-label`} className={cn(labelClx, computedVariant.label(), labelClassName)} children={label} />;
     const activeClassName = cn(!disabled && !readOnly && classes.active2hoverState);
     return <Tooltip
         as={TouchableOpacity}
@@ -117,7 +119,7 @@ export function Checkbox({ testID, variant, checkedIconName, uncheckedIconName, 
                 {...nonTouchableProps}
                 disabled={disabled}
                 accessibilityRole="checkbox"
-                className={cn(activeClassName, "mx-[7px]", computedVariant.icon(), checked && computedVariant.checkedColor(), checked ? checkedClassName : uncheckedClassName, !checked && computedVariant.uncheckedColor())}
+                className={cn(activeClassName, "mx-[7px]", iconClx, computedVariant.icon(), checked ? checkedClassName : uncheckedClassName)}
                 variant={checked ? checkedVariant : uncheckedVariant}
                 name={(checked ? iconChecked as never : iconUnchecked as never)}
                 testID={checkboxTestID}

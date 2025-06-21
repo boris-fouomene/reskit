@@ -1,5 +1,4 @@
 import { tv, VariantProps } from 'tailwind-variants';
-import { iconSizes } from './variantsFactory/iconSizes';
 import { VariantsFactory } from './variantsFactory';
 import { VariantsGeneratedColors } from './generated-variants-colors';
 
@@ -7,31 +6,39 @@ const checkbox = tv({
     slots: {
         icon: "",
         label: "",
-        checkedColor: "",
-        uncheckedColor: "",
+        checkedIconColor: "",
+        uncheckedIconColor: "",
+        checkedLabelColor: "",
+        uncheckedLabelColor: ""
     },
     variants: {
-        size: VariantsFactory.create<typeof iconSizes, { icon: string, label: string }>(iconSizes, (value) => {
+        iconSize: VariantsFactory.createIconSizes<{ icon: string, label: string }>((value) => {
             return {
                 icon: value,
-                label: value.split("!")[1],
+                label: "",
             }
         }),
-        checkedColor: VariantsFactory.create<typeof VariantsGeneratedColors.icon, { icon: string, label: string }>(VariantsGeneratedColors.icon, (value, colorName) => {
+        labelSize: VariantsFactory.createIconSizes<{ icon: string, label: string }>((value) => {
             return {
-                icon: value,
-                label: VariantsGeneratedColors.color[colorName],
+                icon: "",
+                label: value,
             }
         }),
-        uncheckedColor: VariantsFactory.create<typeof VariantsGeneratedColors.icon, { icon: string, label: string }>(VariantsGeneratedColors.icon, (value, colorName) => {
+        checkedColor: VariantsFactory.create<typeof VariantsGeneratedColors.color2foregroundWithImportant, { checkedIconColor: string, checkedLabelColor: string }>(VariantsGeneratedColors.color2foregroundWithImportant, (value, colorName) => {
             return {
-                icon: value,
-                label: VariantsGeneratedColors.color[colorName],
+                checkedIconColor: value,
+                checkedLabelColor: value.split("!").join(""),
+            }
+        }),
+        uncheckedColor: VariantsFactory.create<typeof VariantsGeneratedColors.color2foregroundWithImportant, { uncheckedIconColor: string, uncheckedLabelColor: string }>(VariantsGeneratedColors.color2foregroundWithImportant, (value, colorName) => {
+            return {
+                uncheckedIconColor: value,
+                uncheckedLabelColor: value.split("!").join(""),
             }
         }),
     },
     defaultVariants: {
-        size: "25px",
+        iconSize: "25px",
         checkedColor: "primary",
     }
 })

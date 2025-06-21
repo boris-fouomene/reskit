@@ -184,14 +184,55 @@ export const VariantsGeneratedColors = {
     "error": "text-error dark:text-dark-error",
     "surface": "text-surface dark:text-dark-surface"
   },
+  "colorWithImportant": {
+    "primary": "!text-primary dark:!text-dark-primary",
+    "secondary": "!text-secondary dark:!text-dark-secondary",
+    "info": "!text-info dark:!text-dark-info",
+    "success": "!text-success dark:!text-dark-success",
+    "warning": "!text-warning dark:!text-dark-warning",
+    "error": "!text-error dark:!text-dark-error",
+    "surface": "!text-surface dark:!text-dark-surface"
+  },
+  "foregroundWithImportant": {
+    "primary": "!text-primary-foreground dark:!text-dark-primary-foreground",
+    "secondary": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
+    "info": "!text-info-foreground dark:!text-dark-info-foreground",
+    "success": "!text-success-foreground dark:!text-dark-success-foreground",
+    "warning": "!text-warning-foreground dark:!text-dark-warning-foreground",
+    "error": "!text-error-foreground dark:!text-dark-error-foreground",
+    "surface": "!text-surface-foreground dark:!text-dark-surface-foreground"
+  },
   "color2foreground": {
-    "primary": "text-primary-foreground dark:text-dark-primary-foreground",
-    "secondary": "text-secondary-foreground dark:text-dark-secondary-foreground",
-    "info": "text-info-foreground dark:text-dark-info-foreground",
-    "success": "text-success-foreground dark:text-dark-success-foreground",
-    "warning": "text-warning-foreground dark:text-dark-warning-foreground",
-    "error": "text-error-foreground dark:text-dark-error-foreground",
-    "surface": "text-surface-foreground dark:text-dark-surface-foreground"
+    "primary": "text-primary dark:text-dark-primary",
+    "secondary": "text-secondary dark:text-dark-secondary",
+    "info": "text-info dark:text-dark-info",
+    "success": "text-success dark:text-dark-success",
+    "warning": "text-warning dark:text-dark-warning",
+    "error": "text-error dark:text-dark-error",
+    "surface": "text-surface dark:text-dark-surface",
+    "primary-foreground": "text-primary-foreground dark:text-dark-primary-foreground",
+    "secondary-foreground": "text-secondary-foreground dark:text-dark-secondary-foreground",
+    "info-foreground": "text-info-foreground dark:text-dark-info-foreground",
+    "success-foreground": "text-success-foreground dark:text-dark-success-foreground",
+    "warning-foreground": "text-warning-foreground dark:text-dark-warning-foreground",
+    "error-foreground": "text-error-foreground dark:text-dark-error-foreground",
+    "surface-foreground": "text-surface-foreground dark:text-dark-surface-foreground"
+  },
+  "color2foregroundWithImportant": {
+    "primary": "!text-primary dark:!text-dark-primary",
+    "secondary": "!text-secondary dark:!text-dark-secondary",
+    "info": "!text-info dark:!text-dark-info",
+    "success": "!text-success dark:!text-dark-success",
+    "warning": "!text-warning dark:!text-dark-warning",
+    "error": "!text-error dark:!text-dark-error",
+    "surface": "!text-surface dark:!text-dark-surface",
+    "primary-foreground": "!text-primary-foreground dark:!text-dark-primary-foreground",
+    "secondary-foreground": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
+    "info-foreground": "!text-info-foreground dark:!text-dark-info-foreground",
+    "success-foreground": "!text-success-foreground dark:!text-dark-success-foreground",
+    "warning-foreground": "!text-warning-foreground dark:!text-dark-warning-foreground",
+    "error-foreground": "!text-error-foreground dark:!text-dark-error-foreground",
+    "surface-foreground": "!text-surface-foreground dark:!text-dark-surface-foreground"
   },
   "background": {
     "primary": "bg-primary dark:bg-dark-primary",

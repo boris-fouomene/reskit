@@ -2,6 +2,7 @@ import { roundeClasses } from "./rounded";
 import { padding2marginClasses } from "./padding2margin";
 import { borderClasses } from "./border";
 import { ShadowColorsClasses } from "./shadow";
+import { textSizes } from "./textSizes";
 
 type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], colorName: keyof InputType) => ResultType;
 
@@ -53,6 +54,15 @@ export const VariantsFactory = {
         return Object.fromEntries(Object.entries(input).map(([key, value]) => {
             return [key, variantMutator(value as any, key as keyof InputType)]
         })) as Record<keyof InputType, ResultType>;
+    },
+    createTextSizes: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textSizes, ResultType>) {
+        return VariantsFactory.create<typeof textSizes, ResultType>(textSizes, variantMutator);
+    },
+    createIconSizes: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textSizes, ResultType>) {
+        return VariantsFactory.create<typeof textSizes, ResultType>(textSizes, (value, colorName) => {
+            value = value.startsWith("!") ? value : "!" + value;
+            return typeof variantMutator == "function" ? variantMutator(value, colorName) : value as ResultType;
+        });
     },
     createRoundedVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
         return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);

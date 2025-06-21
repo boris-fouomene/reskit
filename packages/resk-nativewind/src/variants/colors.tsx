@@ -34,6 +34,8 @@ export namespace IVariantsColors {
      * ```
      */
     export type ColorName = keyof IVariantsColorsMap & string;
+
+    export type ColorName2Foreground = ColorName | `${ColorName}-foreground`;
     /**
      * Represents all possible foreground color variant names, including dark mode.
      *

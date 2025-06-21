@@ -22,7 +22,14 @@ module.exports = (colors, options) => {
     VariantsColors.registerColor(...cols);
     const finalDir = variantsDir ?? dir;
     const outputPath = path.resolve(finalDir, "generated-variants-colors.js");
-    const outputDeclarations = path.resolve(finalDir, "generated-variants-colors.d.ts")
+    const outputDeclarations = path.resolve(finalDir, "generated-variants-colors.d.ts");
+    const color2foreground = {
+        ...VariantsColors.buildTextColors(),
+        ...Object.fromEntries(Object.entries(VariantsColors.buildForegroundColors()).map(([key, value]) => [`${key}-foreground`, value])),
+    }, color2foregroundWithImportant = {
+        ...VariantsColors.buildTextColors(true),
+        ...Object.fromEntries(Object.entries(VariantsColors.buildForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value])),
+    }
     const content = JSON.stringify({
         button: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
             return {
@@ -65,10 +72,10 @@ module.exports = (colors, options) => {
             return cn(`shadow-${color}/20 dark:shadow-${color}/30`)
         }),
         color: VariantsColors.buildTextColors(),
-        color2foreground: {
-            ...VariantsColors.buildTextColors(),
-            ...VariantsColors.buildForegroundColors(),
-        },
+        colorWithImportant: VariantsColors.buildTextColors(true),
+        foregroundWithImportant: VariantsColors.buildForegroundColors(true),
+        color2foreground,
+        color2foregroundWithImportant,
         background: VariantsColors.buildBackgroundColors(),
         foreground: VariantsColors.buildForegroundColors(),
         borderColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
@@ -97,6 +104,7 @@ export const VariantsGeneratedColors = ${content}
     fs.writeFileSync(outputDeclarations, `
     import { IVariantsColors } from "./colors";
     type IName = IVariantsColors.ColorName;
+    type IName2Foreground = IVariantsColors.ColorName2Foreground;
     export declare interface IVariantsGeneratedColors {
         button : Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
         buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
@@ -105,7 +113,10 @@ export const VariantsGeneratedColors = ${content}
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
         color : Record<IName,string>;
-        color2foreground : Record<IName | \`\${IName}-foreground\`,string>;
+        colorWithImportant : Record<IName,string>;
+        color2foregroundWithImportant : Record<IName2Foreground,string>;
+        foregroundWithImportant: Record<IName,string>;
+        color2foreground : Record<IName2Foreground ,string>;
         background : Record<IName,string>;
         foreground : Record<IName,string>;
         shadow : Record<IName,string>;

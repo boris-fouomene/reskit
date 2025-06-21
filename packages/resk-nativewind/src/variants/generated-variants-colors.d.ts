@@ -1,6 +1,7 @@
 
     import { IVariantsColors } from "./colors";
     type IName = IVariantsColors.ColorName;
+    type IName2Foreground = IVariantsColors.ColorName2Foreground;
     export declare interface IVariantsGeneratedColors {
         button : Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
         buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
@@ -9,7 +10,10 @@
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
         color : Record<IName,string>;
-        color2foreground : Record<IName | `${IName}-foreground`,string>;
+        colorWithImportant : Record<IName,string>;
+        color2foregroundWithImportant : Record<IName2Foreground,string>;
+        foregroundWithImportant: Record<IName,string>;
+        color2foreground : Record<IName2Foreground ,string>;
         background : Record<IName,string>;
         foreground : Record<IName,string>;
         shadow : Record<IName,string>;

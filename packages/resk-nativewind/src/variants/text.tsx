@@ -1,5 +1,6 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsGeneratedColors } from "./generated-variants-colors";
+import { VariantsFactory } from "./variantsFactory";
 
 const text = tv({
     base: "",
@@ -25,21 +26,7 @@ const text = tv({
             "600": 'font-600',
             "700": 'font-700',
         },
-        size: {
-            "xs": "text-xs",
-            "sm": "text-sm",
-            "base": "text-base",
-            "lg": "text-lg",
-            "xl": "text-xl",
-            "2xl": "text-2xl",
-            "3xl": "text-3xl",
-            "4xl": "text-4xl",
-            "5xl": "text-5xl",
-            "6xl": "text-6xl",
-            "7xl": "text-7xl",
-            "8xl": "text-8xl",
-            "9xl": "text-9xl",
-        }
+        size: VariantsFactory.createTextSizes(),
     },
     compoundVariants: [
         {

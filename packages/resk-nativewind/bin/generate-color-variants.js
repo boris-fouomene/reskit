@@ -26,7 +26,7 @@ module.exports = (colors, options) => {
     const content = JSON.stringify({
         button: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
             return {
-                base: `${colorNameWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${color} dark:focus-visible:outline-dark-${color}`,
+                base: `${colorNameWithPrefix} ${darkColorWithPrefix} web:focus-visible:outline-${color} web:dark:focus-visible:outline-dark-${color}`,
                 label: `text-${color}-foreground dark:text-dark${color}-foreground`,
                 icon: `!text-${color}-foreground dark:!text-dark${color}-foreground`,
                 ripple: "",
@@ -34,7 +34,7 @@ module.exports = (colors, options) => {
             }
         }),
         buttonOutline: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
-            
+
             const groupClassName = {
                 base: `group hover:bg-${color} dark:hover:bg-dark-${color}`,
                 label: `hover:text-${color}-foreground dark:hover:text-dark-${color}-foreground group-hover:text-${color}-foreground dark:group-hover:text-dark-${color}-foreground`,
@@ -42,7 +42,7 @@ module.exports = (colors, options) => {
                 activityIndicator: `hover:border-t-${color}-foreground dark:hover:border-t-dark-${color}-foreground group-hover:border-t-${color}-foreground dark:group-hover:border-t-dark-${color}-foreground`,
             }
             return {
-                base: `${groupClassName.base} p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-${color}`,
+                base: `${groupClassName.base} p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-${color}`,
                 label: `${groupClassName.label} text-${color} dark:text-dark${color}`,
                 icon: `${groupClassName.icon} !text-${color} dark:!text-dark${color}`,
                 ripple: "",
@@ -64,22 +64,22 @@ module.exports = (colors, options) => {
         shadow: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`shadow-${color}/20 dark:shadow-${color}/30`)
         }),
-        color:VariantsColors.buildTextColors(),
-        background:VariantsColors.buildBackgroundColors(),
-        foreground:VariantsColors.buildForegroundColors(),
-        borderColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+        color: VariantsColors.buildTextColors(),
+        background: VariantsColors.buildBackgroundColors(),
+        foreground: VariantsColors.buildForegroundColors(),
+        borderColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`border-${color} dark:border-dark-${color}`);
         }),
-        borderTopColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+        borderTopColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`border-t-${color} dark:border-t-dark-${color}`);
         }),
-        borderBottomColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+        borderBottomColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`border-b-${color} dark:border-b-dark-${color}`);
         }),
-        borderLeftColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+        borderLeftColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`border-l-${color} dark:border-l-dark-${color}`);
         }),
-        borderRightColor : VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
+        borderRightColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
             return cn(`border-r-${color} dark:border-r-dark-${color}`);
         }),
         activityIndicator: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
@@ -113,18 +113,18 @@ export const VariantsGeneratedColors = ${content}
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     `, 'utf8');
-    if(!isDev){
-        generateColorMapTypes(finalDir,cols);
+    if (!isDev) {
+        generateColorMapTypes(finalDir, cols);
     }
     console.log("Variants colors file generated at ", outputPath, "\n");
     console.log("Variants colors file types generated at ", outputDeclarations);
 }
 
-function generateColorMapTypes(variantRootDir,colors) {
-    if(typeof variantRootDir == "string" && fs.existsSync(variantRootDir)){
+function generateColorMapTypes(variantRootDir, colors) {
+    if (typeof variantRootDir == "string" && fs.existsSync(variantRootDir)) {
         colors = Array.isArray(colors) && colors.length > 0 ? colors : [];
         const colorMapTypesPath = path.resolve(variantRootDir, "types/colorsMap.d.ts");
-        console.log(colorMapTypesPath," is color map types path");
+        console.log(colorMapTypesPath, " is color map types path");
         try {
             fs.writeFileSync(colorMapTypesPath, `
 /**
@@ -193,12 +193,12 @@ export interface IVariantsColorsMap {
      */
     background: string;
     
-${colors.map((color)=>`\t${color}: string;`).join("\n\n")}
+${colors.map((color) => `\t${color}: string;`).join("\n\n")}
 }        
 `, 'utf8');
         }
         catch (error) {
-            console.log("Error generating color map types file at ", colorMapTypesPath,error);
+            console.log("Error generating color map types file at ", colorMapTypesPath, error);
         }
     }
 }

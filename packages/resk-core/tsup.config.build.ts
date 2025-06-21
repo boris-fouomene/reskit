@@ -1,4 +1,4 @@
-import createConfig from "../../tsup";
+import createConfig from "./tsup";
 
 export default [
     createConfig("build"),

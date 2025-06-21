@@ -1,6 +1,6 @@
 {
   "name": "@resk/nativewind",
-  "version": "1.0.0",
+  "version": "1.0.1-canary.0",
   "description": "Precompiled TypeScript UI framework built on NativeWind",
   "license": "ISC",
   "author": "",
@@ -37,6 +37,9 @@
     "generate-icon-types": "node tests/cli.generate-icon-types",
     "generate-color-variants": "node bin/generate-color-variants-dev",
     "generate-color-variants:test": "node tests/cli.generate-color-variants",
+    "publish-preview": "npm publish --dry-run",
+    "copy-build-to-expo-demo": "node bin/copy-build-to-expo-demo",
+    "build:expo-demo": "npm run build && npm run copy-build-to-expo-demo",
     "generate-padding-margin-variants": "node bin/generate-padding2marginVariants"
   },
   "keywords": [
@@ -49,14 +52,15 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@types/react-native-vector-icons": "^6.4.18",
+    "commander": "^14.0.0",
+    "execa": "^9.6.0",
     "nativewind": "^4.1.23",
     "react-native-vector-icons": "^10.2.0",
     "tailwind-variants": "^1.0.0"
   },
   "dependencies": {
-    "@resk/core": "^1.19.1",
+    "@resk/core": "^1.20.0",
     "clsx": "^2.1.1",
-    "commander": "^13.1.0",
     "tailwind-merge": "^3.2.0",
     "tippy.js": "^6.3.7"
   }

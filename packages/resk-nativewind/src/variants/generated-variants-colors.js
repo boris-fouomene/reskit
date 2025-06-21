@@ -2,49 +2,49 @@
 export const VariantsGeneratedColors = {
   "button": {
     "primary": {
-      "base": "bg-primary dark:bg-dark-primary web:focus-visible:outline-primary web:dark:focus-visible:outline-dark-primary",
+      "base": "bg-primary dark:bg-dark-primary focus-visible:outline-primary dark:focus-visible:outline-dark-primary",
       "label": "text-primary-foreground dark:text-darkprimary-foreground",
       "icon": "!text-primary-foreground dark:!text-darkprimary-foreground",
       "ripple": "",
       "activityIndicator": "border-t-primary-foreground dark:border-t-dark-primary-foreground"
     },
     "secondary": {
-      "base": "bg-secondary dark:bg-dark-secondary web:focus-visible:outline-secondary web:dark:focus-visible:outline-dark-secondary",
+      "base": "bg-secondary dark:bg-dark-secondary focus-visible:outline-secondary dark:focus-visible:outline-dark-secondary",
       "label": "text-secondary-foreground dark:text-darksecondary-foreground",
       "icon": "!text-secondary-foreground dark:!text-darksecondary-foreground",
       "ripple": "",
       "activityIndicator": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground"
     },
     "info": {
-      "base": "bg-info dark:bg-dark-info web:focus-visible:outline-info web:dark:focus-visible:outline-dark-info",
+      "base": "bg-info dark:bg-dark-info focus-visible:outline-info dark:focus-visible:outline-dark-info",
       "label": "text-info-foreground dark:text-darkinfo-foreground",
       "icon": "!text-info-foreground dark:!text-darkinfo-foreground",
       "ripple": "",
       "activityIndicator": "border-t-info-foreground dark:border-t-dark-info-foreground"
     },
     "success": {
-      "base": "bg-success dark:bg-dark-success web:focus-visible:outline-success web:dark:focus-visible:outline-dark-success",
+      "base": "bg-success dark:bg-dark-success focus-visible:outline-success dark:focus-visible:outline-dark-success",
       "label": "text-success-foreground dark:text-darksuccess-foreground",
       "icon": "!text-success-foreground dark:!text-darksuccess-foreground",
       "ripple": "",
       "activityIndicator": "border-t-success-foreground dark:border-t-dark-success-foreground"
     },
     "warning": {
-      "base": "bg-warning dark:bg-dark-warning web:focus-visible:outline-warning web:dark:focus-visible:outline-dark-warning",
+      "base": "bg-warning dark:bg-dark-warning focus-visible:outline-warning dark:focus-visible:outline-dark-warning",
       "label": "text-warning-foreground dark:text-darkwarning-foreground",
       "icon": "!text-warning-foreground dark:!text-darkwarning-foreground",
       "ripple": "",
       "activityIndicator": "border-t-warning-foreground dark:border-t-dark-warning-foreground"
     },
     "error": {
-      "base": "bg-error dark:bg-dark-error web:focus-visible:outline-error web:dark:focus-visible:outline-dark-error",
+      "base": "bg-error dark:bg-dark-error focus-visible:outline-error dark:focus-visible:outline-dark-error",
       "label": "text-error-foreground dark:text-darkerror-foreground",
       "icon": "!text-error-foreground dark:!text-darkerror-foreground",
       "ripple": "",
       "activityIndicator": "border-t-error-foreground dark:border-t-dark-error-foreground"
     },
     "surface": {
-      "base": "bg-surface dark:bg-dark-surface web:focus-visible:outline-surface web:dark:focus-visible:outline-dark-surface",
+      "base": "bg-surface dark:bg-dark-surface focus-visible:outline-surface dark:focus-visible:outline-dark-surface",
       "label": "text-surface-foreground dark:text-darksurface-foreground",
       "icon": "!text-surface-foreground dark:!text-darksurface-foreground",
       "ripple": "",
@@ -53,49 +53,49 @@ export const VariantsGeneratedColors = {
   },
   "buttonOutline": {
     "primary": {
-      "base": "group hover:bg-primary dark:hover:bg-dark-primary p-[5px] border-2 border-primary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-primary",
+      "base": "group hover:bg-primary dark:hover:bg-dark-primary p-[5px] border-2 border-primary web:bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-primary",
       "label": "hover:text-primary-foreground dark:hover:text-dark-primary-foreground group-hover:text-primary-foreground dark:group-hover:text-dark-primary-foreground text-primary dark:text-darkprimary",
       "icon": "hover:!text-primary-foreground dark:hover:!text-dark-primary-foreground group-hover:!text-primary-foreground dark:group-hover:!text-dark-primary-foreground !text-primary dark:!text-darkprimary",
       "ripple": "",
       "activityIndicator": "hover:border-t-primary-foreground dark:hover:border-t-dark-primary-foreground group-hover:border-t-primary-foreground dark:group-hover:border-t-dark-primary-foreground border-t-primary dark:border-t-dark-primary"
     },
     "secondary": {
-      "base": "group hover:bg-secondary dark:hover:bg-dark-secondary p-[5px] border-2 border-secondary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-secondary",
+      "base": "group hover:bg-secondary dark:hover:bg-dark-secondary p-[5px] border-2 border-secondary web:bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-secondary",
       "label": "hover:text-secondary-foreground dark:hover:text-dark-secondary-foreground group-hover:text-secondary-foreground dark:group-hover:text-dark-secondary-foreground text-secondary dark:text-darksecondary",
       "icon": "hover:!text-secondary-foreground dark:hover:!text-dark-secondary-foreground group-hover:!text-secondary-foreground dark:group-hover:!text-dark-secondary-foreground !text-secondary dark:!text-darksecondary",
       "ripple": "",
       "activityIndicator": "hover:border-t-secondary-foreground dark:hover:border-t-dark-secondary-foreground group-hover:border-t-secondary-foreground dark:group-hover:border-t-dark-secondary-foreground border-t-secondary dark:border-t-dark-secondary"
     },
     "info": {
-      "base": "group hover:bg-info dark:hover:bg-dark-info p-[5px] border-2 border-info bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-info",
+      "base": "group hover:bg-info dark:hover:bg-dark-info p-[5px] border-2 border-info web:bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-info",
       "label": "hover:text-info-foreground dark:hover:text-dark-info-foreground group-hover:text-info-foreground dark:group-hover:text-dark-info-foreground text-info dark:text-darkinfo",
       "icon": "hover:!text-info-foreground dark:hover:!text-dark-info-foreground group-hover:!text-info-foreground dark:group-hover:!text-dark-info-foreground !text-info dark:!text-darkinfo",
       "ripple": "",
       "activityIndicator": "hover:border-t-info-foreground dark:hover:border-t-dark-info-foreground group-hover:border-t-info-foreground dark:group-hover:border-t-dark-info-foreground border-t-info dark:border-t-dark-info"
     },
     "success": {
-      "base": "group hover:bg-success dark:hover:bg-dark-success p-[5px] border-2 border-success bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-success",
+      "base": "group hover:bg-success dark:hover:bg-dark-success p-[5px] border-2 border-success web:bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-success",
       "label": "hover:text-success-foreground dark:hover:text-dark-success-foreground group-hover:text-success-foreground dark:group-hover:text-dark-success-foreground text-success dark:text-darksuccess",
       "icon": "hover:!text-success-foreground dark:hover:!text-dark-success-foreground group-hover:!text-success-foreground dark:group-hover:!text-dark-success-foreground !text-success dark:!text-darksuccess",
       "ripple": "",
       "activityIndicator": "hover:border-t-success-foreground dark:hover:border-t-dark-success-foreground group-hover:border-t-success-foreground dark:group-hover:border-t-dark-success-foreground border-t-success dark:border-t-dark-success"
     },
     "warning": {
-      "base": "group hover:bg-warning dark:hover:bg-dark-warning p-[5px] border-2 border-warning bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-warning",
+      "base": "group hover:bg-warning dark:hover:bg-dark-warning p-[5px] border-2 border-warning web:bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-warning",
       "label": "hover:text-warning-foreground dark:hover:text-dark-warning-foreground group-hover:text-warning-foreground dark:group-hover:text-dark-warning-foreground text-warning dark:text-darkwarning",
       "icon": "hover:!text-warning-foreground dark:hover:!text-dark-warning-foreground group-hover:!text-warning-foreground dark:group-hover:!text-dark-warning-foreground !text-warning dark:!text-darkwarning",
       "ripple": "",
       "activityIndicator": "hover:border-t-warning-foreground dark:hover:border-t-dark-warning-foreground group-hover:border-t-warning-foreground dark:group-hover:border-t-dark-warning-foreground border-t-warning dark:border-t-dark-warning"
     },
     "error": {
-      "base": "group hover:bg-error dark:hover:bg-dark-error p-[5px] border-2 border-error bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-error",
+      "base": "group hover:bg-error dark:hover:bg-dark-error p-[5px] border-2 border-error web:bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-error",
       "label": "hover:text-error-foreground dark:hover:text-dark-error-foreground group-hover:text-error-foreground dark:group-hover:text-dark-error-foreground text-error dark:text-darkerror",
       "icon": "hover:!text-error-foreground dark:hover:!text-dark-error-foreground group-hover:!text-error-foreground dark:group-hover:!text-dark-error-foreground !text-error dark:!text-darkerror",
       "ripple": "",
       "activityIndicator": "hover:border-t-error-foreground dark:hover:border-t-dark-error-foreground group-hover:border-t-error-foreground dark:group-hover:border-t-dark-error-foreground border-t-error dark:border-t-dark-error"
     },
     "surface": {
-      "base": "group hover:bg-surface dark:hover:bg-dark-surface p-[5px] border-2 border-surface bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-surface",
+      "base": "group hover:bg-surface dark:hover:bg-dark-surface p-[5px] border-2 border-surface web:bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-surface",
       "label": "hover:text-surface-foreground dark:hover:text-dark-surface-foreground group-hover:text-surface-foreground dark:group-hover:text-dark-surface-foreground text-surface dark:text-darksurface",
       "icon": "hover:!text-surface-foreground dark:hover:!text-dark-surface-foreground group-hover:!text-surface-foreground dark:group-hover:!text-dark-surface-foreground !text-surface dark:!text-darksurface",
       "ripple": "",

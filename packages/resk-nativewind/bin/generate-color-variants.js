@@ -26,7 +26,7 @@ module.exports = (colors, options) => {
     const content = JSON.stringify({
         button: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
             return {
-                base: `${colorNameWithPrefix} ${darkColorWithPrefix} web:focus-visible:outline-${color} web:dark:focus-visible:outline-dark-${color}`,
+                base: `${colorNameWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${color} dark:focus-visible:outline-dark-${color}`,
                 label: `text-${color}-foreground dark:text-dark${color}-foreground`,
                 icon: `!text-${color}-foreground dark:!text-dark${color}-foreground`,
                 ripple: "",
@@ -42,7 +42,7 @@ module.exports = (colors, options) => {
                 activityIndicator: `hover:border-t-${color}-foreground dark:hover:border-t-dark-${color}-foreground group-hover:border-t-${color}-foreground dark:group-hover:border-t-dark-${color}-foreground`,
             }
             return {
-                base: `${groupClassName.base} p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-${color}`,
+                base: `${groupClassName.base} p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-${color}`,
                 label: `${groupClassName.label} text-${color} dark:text-dark${color}`,
                 icon: `${groupClassName.icon} !text-${color} dark:!text-dark${color}`,
                 ripple: "",

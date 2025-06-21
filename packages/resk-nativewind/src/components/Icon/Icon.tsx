@@ -31,10 +31,10 @@ import { classes } from "@variants/classes";
  *@param {number} [props.size] - The size of the icon. If not provided or invalid, 
  *                                 it defaults to `DEFAULT_FONT_ICON_SIZE` : 20.
  * @param {Ref} ref - A ref to access the underlying component.
- * @returns {ReactElement} - Returns an `Image` component if `source` is an 
+ * @returns {JSX.Element} - Returns an `Image` component if `source` is an 
  *                          image, otherwise returns a `FontIcon` component.
  * 
- * @returns {ReactElement} The rendered icon component.
+ * @returns {JSX.Element} The rendered icon component.
  *
  * @example
  * Here’s an example of how to use the `Icon` component:
@@ -87,7 +87,7 @@ function Icon({ iconName, className, variant, resizeMode, tooltip, title, source
             } : undefined,
             style,
         ]);
-        return <Component as={TouchableOpacity} title={title} tooltip={tooltip} disabled={disabled} {...containerP as any} className={cn("shrink-0 grow-0",classes.active2hoverState, containerClassName)}>
+        return <Component as={TouchableOpacity} title={title} tooltip={tooltip} disabled={disabled} {...containerP as any} className={cn("shrink-0 grow-0", classes.active2hoverState, containerClassName)}>
             <Image
                 accessibilityIgnoresInvertColors
                 resizeMode={resizeMode || "contain"}
@@ -174,7 +174,7 @@ Icon.getIcon = function getIcon<T = any>({ icon, ...rest }: IGetIconOptions<T>):
     const iconProps: IIconProps = {
         ...rest,
         iconName,
-        ...(!iconName ? { source: getIconSource(icon) }:{}),
+        ...(!iconName ? { source: getIconSource(icon) } : {}),
     }
     return <Icon {...iconProps} />;
 }

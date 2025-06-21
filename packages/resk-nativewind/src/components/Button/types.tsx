@@ -3,7 +3,7 @@ import { ISurfaceProps } from "@components/Surface";
 import { GestureResponderEvent, PressableProps, View } from "react-native";
 import { IAuthPerm } from "@resk/core/auth";
 import { IClassName } from "@src/types";
-import { ReactElement, ReactNode, Ref } from "react";
+import { JSX, ReactNode, Ref } from "react";
 import { IDict, IResourceName } from '@resk/core/types';
 import buttonVariant, { IVariantPropsButton } from "@variants/button";
 
@@ -127,7 +127,7 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
      */
     variant?: IVariantPropsButton;
 
-    rippleContent?: ReactElement | null;
+    rippleContent?: JSX.Element | null;
 
     /** Duration of the ripple effect, in milliseconds
      * Default value is 500 (ms)
@@ -143,16 +143,16 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
      * Optional context for the button component.
      */
     context?: Context;
-    
+
     /***
         The callback function to be called when the button is pressed.
     */
     onPress?: (event: GestureResponderEvent, context: IButtonBaseContext<Context>) => any;
-    
-        /***
-     * The permission associated with the button. This permission is used to determine if the button will be rendered or not.
-     * If not provided, the button will be rendered regardless of the user's permissions.
-     */
+
+    /***
+ * The permission associated with the button. This permission is used to determine if the button will be rendered or not.
+ * If not provided, the button will be rendered regardless of the user's permissions.
+ */
     perm?: IAuthPerm;
 
     /***

@@ -23,7 +23,7 @@ export * from "./types";
  * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "resk-switch".
  * @param {boolean} props.checked - Indicates whether the switch is in the checked state.
  * @param {string} [props.tooltip] - Optional tooltip text displayed when the user hovers over the switch.
- * @param {ReactElement} [props.label] - The text label associated with the switch.
+ * @param {JSX.Element} [props.label] - The text label associated with the switch.
  * @param {boolean} [props.isLabelOnLeftSide] - Indicates whether the label should be on the left side of the switch.
  * @param {any} [props.checkedValue] - The value representing the checked state.
  * @param {any} [props.uncheckedValue] - The value representing the unchecked state.
@@ -35,7 +35,7 @@ export * from "./types";
  * @param {string} [props.labelClassName] - The tailwind CSS class names for the label component.
  * @param {any} [rest] - Additional props passed to the React Native Switch component.
  *
- * @returns {ReactElement} - Returns a JSX element representing the Switch component.
+ * @returns {JSX.Element} - Returns a JSX element representing the Switch component.
  *
  * @example
  * // Usage example of the Switch component

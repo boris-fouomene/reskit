@@ -40,7 +40,7 @@ export * from "./types";
  * @param {any} [props.uncheckedValue] - The value representing the unchecked state.
  * @param {any} [props.defaultValue] - The default value of the checkbox.
  *
- * @returns {ReactElement} - Returns a JSX element representing the Checkbox component.
+ * @returns {JSX.Element} - Returns a JSX element representing the Checkbox component.
  *
  * @example
  * // Usage example of the Checkbox component

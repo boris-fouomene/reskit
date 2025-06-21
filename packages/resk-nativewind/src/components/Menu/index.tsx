@@ -14,6 +14,7 @@ import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
 import { useBackHandler } from '@components/BackHandler';
 import menuVariants from '@variants/menu';
+import { InteractionManager } from 'react-native';
 
 
 
@@ -75,9 +76,6 @@ export function Menu<Context = unknown>({
         anchorMeasurements: state.anchorMeasurements,
         preferedPositionAxis,
     });
-    if(isVisible){
-        //console.log("is visible ",menuPosition,JSON.stringify(menuStyle,null,2)," is menu style",JSON.stringify(state.anchorMeasurements,null,2)," is anchor measre");
-    }
     const closeMenuInternal = (callback?: Function) => {
         if (isControlled) {
             if (typeof onDismiss === "function") {
@@ -99,6 +97,9 @@ export function Menu<Context = unknown>({
             setState(prevState => ({ ...prevState, anchorMeasurements }));
         });
     }, [windowWidth, windowHeight, anchorRef]);
+    if (isVisible) {
+        console.log("is visible ", JSON.stringify(menuPosition, null, 2));
+    }
     // Handle menu layout changes
     const onMenuLayout = (event: LayoutChangeEvent) => {
         const { width: mWidth, height } = event.nativeEvent.layout;
@@ -110,23 +111,24 @@ export function Menu<Context = unknown>({
         setMenuLayout({ width, height, x: 0, y: 0 });
     }
     const open = (callback?: Function) => {
-        measureAnchor(anchorRef).then((measures) => {
-            if (isControlled) {
+        InteractionManager.runAfterInteractions(() => {
+            measureAnchor(anchorRef).then((measures) => {
+                if (isControlled) {
+                    setState((prevState) => {
+                        return { ...prevState, anchorMeasurements: measures }
+                    });
+                    return;
+                }
                 setState((prevState) => {
-                    return { ...prevState, anchorMeasurements: measures }
+                    return { ...prevState, anchorMeasurements: measures, visible: true }
+                }, () => {
+                    if (typeof callback === "function") {
+                        callback();
+                    }
+                    if (typeof onOpen === "function") {
+                        onOpen();
+                    }
                 });
-                return;
-            }
-            setState((prevState) => {
-                console.log(JSON.stringify(measures,null,2)," are new anchor measures");
-                return { ...prevState, anchorMeasurements: measures, visible: true }
-            }, () => {
-                if (typeof callback === "function") {
-                    callback();
-                }
-                if (typeof onOpen === "function") {
-                    onOpen();
-                }
             });
         });
     };
@@ -162,7 +164,7 @@ export function Menu<Context = unknown>({
         <MenuContext.Provider value={context}>
             <Pressable testID={testID + "-anchor-container"}
                 ref={anchorRef}
-                className={cn(menuVariant.anchorContainer(), anchorContainerClassName, "menu-anchor-container")}
+                className={cn(menuVariant.anchorContainer(), anchorContainerClassName, "relative menu-anchor-container")}
                 onAccessibilityEscape={dismissable !== false ? () => {
                     close();
                 } : undefined}

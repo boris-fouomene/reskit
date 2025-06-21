@@ -1,6 +1,6 @@
 import Logger from "@resk/core/logger";
 import { defaultStr, isObj } from "@resk/core/utils";
-import { isValidElement, ComponentType, ReactNode, FC, cloneElement, ReactElement } from "react";
+import { isValidElement, ComponentType, ReactNode, FC, cloneElement, JSX } from "react";
 import { StyleSheet } from "nativewind";
 import { cn } from "@utils/cn";
 // Type to extract the props of a component
@@ -34,7 +34,7 @@ export interface AsChildProps {
  *   <p>This is the children of the component</p>
  * </MyComponentWithAsChild>;
  */
-export function withAsChild<T extends ComponentType<any>>(Component: T, displayName?: string): (props: PropsOf<T> & AsChildProps) => ReactElement {
+export function withAsChild<T extends ComponentType<any>>(Component: T, displayName?: string): (props: PropsOf<T> & AsChildProps) => JSX.Element {
     function WithAsChildComponent(props: PropsOf<T> & AsChildProps) {
         const { asChild, ...componentProps } = props;
         if (asChild && isValidElement(componentProps.children)) {
@@ -66,7 +66,7 @@ export interface SlotProps {
  * @template T - Extends SlotProps, representing the type of props the component can accept.
  * @param {T} props - The properties and children for the Slot component. 
  * Includes the child element and any additional props to merge.
- * @returns {ReactElement|null} - Returns the cloned child element with merged props, 
+ * @returns {JSX.Element|null} - Returns the cloned child element with merged props, 
  */
 export function Slot<T extends SlotProps>(props: T) {
     const { children, ...slotProps } = props;
@@ -99,7 +99,7 @@ export function Slot<T extends SlotProps>(props: T) {
             (compProps as any)[propName] = childPropValue;
         }
     }
-    return cloneElement(children, compProps) as ReactElement;
+    return cloneElement(children, compProps) as JSX.Element;
 }
 
 Slot.displayName = 'Slot';

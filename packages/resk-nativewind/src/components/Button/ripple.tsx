@@ -1,6 +1,6 @@
 "use client";
 import useStateCallback from "@utils/stateCallback";
-import { ReactElement, useEffect, useRef } from "react";
+import { JSX, useEffect, useRef } from "react";
 import { Animated, GestureResponderEvent } from "react-native";
 import Platform from "@platform";
 import { IButtonProps } from "./types";
@@ -13,10 +13,10 @@ import { isNonNullString } from "@resk/core/utils";
  * 
  * @param {{ testID: string, disableRipple: boolean, disabled: boolean, rippleColor: string, rippleClassName: string, rippleOpacity: number, rippleDuration: number }} props - The props for the ripple effect
  * 
- * @returns {{ rippleContent?: ReactElement | null; startRipple?: (event: GestureResponderEvent) => void }} - The content of the ripple effect and the function to start the animation
+ * @returns {{ rippleContent?: JSX.Element | null; startRipple?: (event: GestureResponderEvent) => void }} - The content of the ripple effect and the function to start the animation
  */
 export function useGetRippleContent({ testID, disableRipple, disabled, rippleColor, rippleClassName }: Partial<IButtonProps> & any): {
-    rippleContent?: ReactElement | null;
+    rippleContent?: JSX.Element | null;
     startRipple?: (event: GestureResponderEvent) => void;
 } {
     const rippleDuration = 500, rippleOpacity = 0.7;

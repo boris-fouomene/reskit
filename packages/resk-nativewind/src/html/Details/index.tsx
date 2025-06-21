@@ -18,8 +18,8 @@ import { DetailsIcon } from "./Icon";
  * @param {string} [props.className] - Additional CSS class names to apply to the container element.
  * @param {any} [props.open] - The value of the `open` attribute for the `details` element.
  * @param {string} [props.summaryClassName] - Additional CSS class names to apply to the summary element.
- * @param {ReactElement} [props.summary] - The content of the summary element.
- * @param {ReactElement} [props.children] - The content of the content element.
+ * @param {JSX.Element} [props.summary] - The content of the summary element.
+ * @param {JSX.Element} [props.children] - The content of the content element.
  * @param {object} [props.contentClassName] - Additional properties for the content element.
  * @param {object} [rest] - Additional props passed to the `Div` component.
  */

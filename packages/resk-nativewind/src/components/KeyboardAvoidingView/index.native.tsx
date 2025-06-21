@@ -27,7 +27,7 @@ export * from "./types";
  * passed to the underlying `KeyboardAvoidingView`, allowing for further 
  * customization of its behavior and styling.
  * 
- * @returns {ReactElement} A `KeyboardAvoidingView` component that adjusts 
+ * @returns {JSX.Element} A `KeyboardAvoidingView` component that adjusts 
  * its position based on the keyboard's visibility.
  * 
  * @example

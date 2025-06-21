@@ -1,5 +1,5 @@
-import { ReactElement, ReactNode } from "react";
-import { IIconButtonProps, IIconSource } from "@components/Icon/types";
+import { JSX, ReactNode } from "react";
+import { IIconButtonProps } from "@components/Icon/types";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IClassName } from "@src/types";
 import { IVariantPropsText } from "@variants/text";
@@ -26,7 +26,7 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
     onBackActionPress?: (event: any) => any;
 
     /** If backAction is a string, it is the name of the FontIcon to render for the back action. */
-    backAction?: ReactElement | null | false | ((context: Context & { handleBackPress: (event: any) => void }) => ReactNode);
+    backAction?: JSX.Element | null | false | ((context: Context & { handleBackPress: (event: any) => void }) => ReactNode);
 
     /** class name for the BackAction component when rendered. */
     backActionClassName?: IClassName;

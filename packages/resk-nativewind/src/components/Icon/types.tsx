@@ -1,7 +1,7 @@
 import { IClassName, INativewindBaseProps, ITextStyle, ITouchableProps } from "../../types";
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
-import { ReactElement } from "react";
+import { JSX } from "react";
 import { IVariantPropsAll } from "@variants/all";
 import { IVariantPropsIconButton } from '@variants/iconButton';
 import { IVariantPropsIcon } from "@variants/icon";
@@ -139,7 +139,7 @@ export type IFontIconProps = Omit<IconProps, 'name' | 'size' | "ref" | "classNam
  * <Icon source={customIcon} />
  * <Icon source={dynamicIcon} color="red" />
  */
-export type IIconSource = IFontIconName | ImageSourcePropType | null | ReactElement;
+export type IIconSource = IFontIconName | ImageSourcePropType | null | JSX.Element;
 
 /**
  * @interface IIconProps

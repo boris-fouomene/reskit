@@ -16,7 +16,7 @@ import { cn } from "@utils/cn";
  * </HStack>
  *
  * @param {IHtmlDivProps} props - The properties for the HStack component.
- * @returns {ReactElement} A JSX element representing the HStack component.
+ * @returns {JSX.Element} A JSX element representing the HStack component.
  */
 export function HStack(props: IHtmlDivProps) {
     return <Div testID="hstack" {...props} className={cn("flex flex-wrap flex-row items-center justify-start", props.className)} />
@@ -33,7 +33,7 @@ export function HStack(props: IHtmlDivProps) {
  *   - **style**: Optional additional styles to apply to the component.
  *   - **...props**: Any additional props that should be passed to the underlying HtmlDiv.
  * 
- * @returns {ReactElement} A JSX element representing the VStack, styled as a vertical stack.
+ * @returns {JSX.Element} A JSX element representing the VStack, styled as a vertical stack.
  * 
  *
  * @example

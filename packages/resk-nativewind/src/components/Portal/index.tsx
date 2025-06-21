@@ -1,6 +1,6 @@
 "use client";
 import { defaultStr, getMaxZindex } from '@resk/core/utils';
-import { useEffect, useState, useRef, ReactNode, useId, CSSProperties } from 'react';
+import { useEffect, useState, useRef, ReactNode, useId, CSSProperties, JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@utils/cn';
 import { styles } from './utils';
@@ -27,21 +27,21 @@ import { AccessibilityEscapeManager } from '@html/accessibility';
  *   )
  * }
  */
-export function Portal({ children,onAccessibilityEscape, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
+export function Portal({ children, onAccessibilityEscape, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
     const [mounted, setMounted] = useState(false);
     const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
     const createdElementRef = useRef<HTMLElement | null>(null);
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const target = `#${targetId}`;
-    useEffect(()=>{
-        if(typeof onAccessibilityEscape === "function" && targetElement){
-            const bindEvent= AccessibilityEscapeManager.getInstance().register(targetElement, onAccessibilityEscape);
-            return ()=>{
+    useEffect(() => {
+        if (typeof onAccessibilityEscape === "function" && targetElement) {
+            const bindEvent = AccessibilityEscapeManager.getInstance().register(targetElement, onAccessibilityEscape);
+            return () => {
                 bindEvent?.remove();
             }
         }
-    },[targetElement,onAccessibilityEscape]);
+    }, [targetElement, onAccessibilityEscape]);
     useEffect(() => {
         // Only run on client side
         setMounted(true);
@@ -76,7 +76,7 @@ export function Portal({ children,onAccessibilityEscape, style, className, onPre
             element.style.cursor = "default";
         }
         setTargetElement(element);
-        
+
 
         // Cleanup function
         return () => {
@@ -111,8 +111,8 @@ export function Portal({ children,onAccessibilityEscape, style, className, onPre
  *   );
  * };
  */
-export function PortalProvider({ children }: { children?: ReactNode }) {
-    return children;
+export function PortalProvider({ children }: { children?: ReactNode }): JSX.Element {
+    return <>{children}</>;
 }
 
 

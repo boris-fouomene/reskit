@@ -1,8 +1,8 @@
-import { IClassName, INativewindBaseProps } from "@src/types";
+import { INativewindBaseProps } from "@src/types";
 import { IVariantPropsHeading } from "@variants/heading";
 import { IVariantPropsText } from "@variants/text";
-import { JSX, ReactElement, Ref } from "react";
-import { ImageProps, ImageStyle, PressableProps, TextProps, TextStyle, View, ViewProps, ViewStyle } from "react-native";
+import { JSX, Ref } from "react";
+import { ImageProps, ImageStyle, PressableProps, TextProps, TextStyle, ViewProps, ViewStyle } from "react-native";
 
 export interface IHtmlDivProps extends INativewindBaseProps, INativeAccessibilityProps {
     id?: ViewProps["id"];
@@ -35,12 +35,11 @@ export interface IHtmlDivProps extends INativewindBaseProps, INativeAccessibilit
     /***
         The shadow elevation of the element.
     */
-    elevation?:number;
+    elevation?: number;
 }
 
-export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "children" | "onPress" | "onPressIn" | "onPressOut"> {
+export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "onPress" | "onPressIn" | "onPressOut"> {
     style?: TextStyle;
-    children?: TextProps["children"];
     onPress?: TextProps["onPress"];
     onPressIn?: TextProps["onPressIn"];
     onPressOut?: TextProps["onPressOut"];

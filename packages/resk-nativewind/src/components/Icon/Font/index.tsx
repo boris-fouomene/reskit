@@ -35,7 +35,7 @@ import ClientFontIcon, { DEFAULT_FONT_ICON_SIZE } from "./Client";
  * ```
  * 
  * @param {IFontIconProps} props The properties of the `FontIcon` component.
- * @returns {ReactElement | null} Returns the icon element, or null if the icon is not defined.
+ * @returns {JSX.Element | null} Returns the icon element, or null if the icon is not defined.
  */
 export default function FontIcon(props: IFontIconProps) {
     return <>

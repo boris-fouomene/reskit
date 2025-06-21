@@ -1,5 +1,5 @@
 "use client";
-import { TouchableOpacity, GestureResponderEvent } from "react-native";
+import { TouchableOpacity, GestureResponderEvent, TouchableWithoutFeedback } from "react-native";
 import { ICheckboxProps } from "./types";
 import { Tooltip } from "@components/Tooltip";
 import { Text } from "@html/Text";
@@ -10,6 +10,8 @@ import { isNonNullString, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import getTextContent from "@utils/getTextContent";
 import { pickTouchableProps } from "@utils/touchHandler";
+import { classes } from "@variants/classes";
+import checkboxVariant from "@variants/checkbox";
 
 export * from "./types";
 
@@ -67,7 +69,7 @@ export * from "./types";
  *
  * for more information on the underlying RNCheckbox component.
  */
-export function Checkbox({ testID, checkedIconName, size, uncheckedIconName, checkedClassName, uncheckedClassName, checkedVariant, uncheckedVariant, style, ...props }: ICheckboxProps) {
+export function Checkbox({ testID, variant, checkedIconName, uncheckedIconName, checkedClassName, uncheckedClassName, checkedVariant, uncheckedVariant, style, ...props }: ICheckboxProps) {
     const {
         checked,
         tooltip,
@@ -87,14 +89,16 @@ export function Checkbox({ testID, checkedIconName, size, uncheckedIconName, che
         containerClassName,
         ...rest
     } = useToggleable(props);
+    const computedVariant = checkboxVariant(variant);
     const { touchableProps, ...nonTouchableProps } = pickTouchableProps(rest as any);
-    const handleOnPress = (event: GestureResponderEvent) => {
+    const handleOnPress = disabled ? undefined : (event: GestureResponderEvent) => {
         toggleStatus();
     };
     const iconChecked = isNonNullString(checkedIconName) ? checkedIconName : FONT_ICONS.CHECKED;
     const iconUnchecked = isNonNullString(uncheckedIconName) ? uncheckedIconName : FONT_ICONS.UNCHECKED;
     const checkboxTestID = typeof testID === 'string' && testID || "resk-checkbox";
-    const labelContent = <Text testID={`${checkboxTestID}-label`} className={cn(labelClassName)} children={label} />;
+    const labelContent = <Text testID={`${checkboxTestID}-label`} className={cn(computedVariant.label(), labelClassName)} children={label} />;
+    const activeClassName = cn(!disabled && !readOnly && classes.active2hoverState);
     return <Tooltip
         as={TouchableOpacity}
         disabled={disabled || readOnly}
@@ -108,18 +112,19 @@ export function Checkbox({ testID, checkedIconName, size, uncheckedIconName, che
         className={cn(containerClassName)}
     >
         {isLabelOnLeftSide ? labelContent : null}
-        <FontIcon
-            {...nonTouchableProps}
-            disabled={disabled}
-            accessibilityRole="checkbox"
-            className={cn(checked ? checkedClassName : uncheckedClassName)}
-            variant={checked ? checkedVariant : uncheckedVariant}
-            name={(checked ? iconChecked as never : iconUnchecked as never)}
-            size={isNumber(size) && size > 0 ? size : 25}
-            testID={checkboxTestID}
-            title={undefined}
-            tooltip={undefined}
-        />
+        <TouchableWithoutFeedback disabled={disabled} onPress={handleOnPress} className={activeClassName} testID={testID + "-checkbox-container"}>
+            <FontIcon
+                {...nonTouchableProps}
+                disabled={disabled}
+                accessibilityRole="checkbox"
+                className={cn(activeClassName, "mx-[7px]", computedVariant.icon(), checked && computedVariant.checkedColor(), checked ? checkedClassName : uncheckedClassName, !checked && computedVariant.uncheckedColor())}
+                variant={checked ? checkedVariant : uncheckedVariant}
+                name={(checked ? iconChecked as never : iconUnchecked as never)}
+                testID={checkboxTestID}
+                title={undefined}
+                tooltip={undefined}
+            />
+        </TouchableWithoutFeedback>
         {!isLabelOnLeftSide ? labelContent : null}
     </Tooltip>
 }

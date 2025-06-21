@@ -65,6 +65,10 @@ module.exports = (colors, options) => {
             return cn(`shadow-${color}/20 dark:shadow-${color}/30`)
         }),
         color: VariantsColors.buildTextColors(),
+        color2foreground: {
+            ...VariantsColors.buildTextColors(),
+            ...VariantsColors.buildForegroundColors(),
+        },
         background: VariantsColors.buildBackgroundColors(),
         foreground: VariantsColors.buildForegroundColors(),
         borderColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
@@ -101,6 +105,7 @@ export const VariantsGeneratedColors = ${content}
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
         color : Record<IName,string>;
+        color2foreground : Record<IName | \`\${IName}-foreground\`,string>;
         background : Record<IName,string>;
         foreground : Record<IName,string>;
         shadow : Record<IName,string>;

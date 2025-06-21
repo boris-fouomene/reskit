@@ -8,6 +8,7 @@ import Platform from "@resk/core/platform";
 import { Pressable, PressableProps } from "react-native";
 import { ITooltipProps } from './types';
 import { ITouchableProps } from '@src/types';
+import { classes } from '@variants/classes';
 
 const TIPPY_THEME = "customtippy-themename";
 
@@ -53,7 +54,7 @@ export function Tooltip<AsProps extends ITouchableProps = PressableProps>({ chil
     if (!isValidElement(children)) {
         return null;
     }
-    return <Component {...rest as any} className={cn(className)} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>
+    return <Component {...rest as any} className={cn(!disabled && classes.active2hoverState, className)} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>
         {children}
     </Component>;
 };

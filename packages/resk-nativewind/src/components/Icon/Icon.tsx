@@ -79,7 +79,7 @@ function Icon({ iconName, className, variant, resizeMode, tooltip, title, source
         const disabled = props.disabled;
         const isPressable = !disabled && !!touchableProps;
         const Component = isPressable ? Tooltip : Fragment;
-        const containerP = isPressable ? Object.assign({}, touchableProps, { testID: testID + "-icon-container" }) : {};
+        const containerP = isPressable ? Object.assign({}, touchableProps, { testID: testID + "-icon-container", as: TouchableOpacity, className: cn("shrink-0 grow-0", !disabled && classes.active2hoverState, containerClassName) }) : {};
         const iconStyle = StyleSheet.flatten([
             iconSize ? {
                 width: iconSize,
@@ -87,7 +87,7 @@ function Icon({ iconName, className, variant, resizeMode, tooltip, title, source
             } : undefined,
             style,
         ]);
-        return <Component as={TouchableOpacity} title={title} tooltip={tooltip} disabled={disabled} {...containerP as any} className={cn("shrink-0 grow-0", classes.active2hoverState, containerClassName)}>
+        return <Component title={title} tooltip={tooltip} disabled={disabled} {...containerP as any}>
             <Image
                 accessibilityIgnoresInvertColors
                 resizeMode={resizeMode || "contain"}

@@ -2,6 +2,7 @@ import { IToggleableProps } from '@components/Switch/types';
 import { ITooltipBaseProps } from '@components/Tooltip';
 import { IClassName } from "@src/types";
 import { IFontIconName, IFontIconProps } from '@components/Icon/types';
+import { IVariantPropsCheckbox } from '@variants/checkbox';
 
 
 export interface ICheckboxProps extends IToggleableProps, ITooltipBaseProps, Omit<IFontIconProps, "variant" | "name"> {
@@ -31,6 +32,8 @@ export interface ICheckboxProps extends IToggleableProps, ITooltipBaseProps, Omi
      * The className of the icon when the checkbox is unchecked
      */
     uncheckedClassName?: IClassName;
+
+    variant?: IVariantPropsCheckbox;
 
     /***
      * The variant of the icon when the checkbox is checked

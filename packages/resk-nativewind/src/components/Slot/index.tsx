@@ -43,7 +43,6 @@ export function withAsChild<T extends ComponentType<any>>(Component: T, displayN
         const F = Component as any;
         return <F {...componentProps as any} />;
     }
-
     WithAsChildComponent.displayName = defaultStr(displayName, `WithAsChild(${Component.displayName || Component.name || 'Component'})`);
     return WithAsChildComponent;
 }

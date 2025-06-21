@@ -11,12 +11,12 @@ import { IFontIconProps } from "../types";
 import { pickTouchableProps } from "@utils/touchHandler";
 import { cn, normalizeProps } from "@utils/cn";
 import { defaultStr, isNonNullString, isNumber } from "@resk/core/utils";
-import { TouchableOpacity } from "react-native";
 import iconVariants from "@variants/icon";
 import { FC } from "react";
 import { IconProps } from "react-native-vector-icons/Icon";
 import { Tooltip } from "@components/Tooltip";
 import { classes } from "@variants/classes";
+import { TouchableOpacity } from "react-native";
 
 
 export const DEFAULT_FONT_ICON_SIZE = 20;
@@ -39,9 +39,11 @@ export default function ClientFontIcon({ name, variant, containerClassName, titl
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>
     if (touchableProps || title || tooltip) {
         return <Tooltip
-            as={TouchableOpacity} title={title}
+            title={title}
             tooltip={tooltip}
-            disabled={disabled} {...touchableProps as any}
+            disabled={disabled}
+            as={TouchableOpacity}
+            {...touchableProps as any}
             className={cn("shrink-0 grow-0", containerClassName)}>
             <Component
                 disabled={disabled}
@@ -59,7 +61,7 @@ export default function ClientFontIcon({ name, variant, containerClassName, titl
         disabled={disabled}
         ref={ref as any}
         name={iconName}
-        className={cn(classes.active2hoverState,iconClassName)}
+        className={cn(!disabled && classes.active2hoverState, iconClassName)}
     />;
 }
 

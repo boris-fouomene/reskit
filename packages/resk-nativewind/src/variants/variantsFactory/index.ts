@@ -1,9 +1,9 @@
 import { roundeClasses } from "./rounded";
 import { padding2marginClasses } from "./padding2margin";
 import { borderClasses } from "./border";
-import { ShadowColorsClasses} from "./shadow";
+import { ShadowColorsClasses } from "./shadow";
 
-type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], variantName: keyof InputType) => ResultType;
+type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], colorName: keyof InputType) => ResultType;
 
 export const VariantsFactory = {
     /**

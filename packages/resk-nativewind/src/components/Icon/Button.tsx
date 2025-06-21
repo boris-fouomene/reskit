@@ -59,7 +59,7 @@ export default function IconButton(
         <Surface
             testID={`${testID}-container`}
             disabled={disabled}
-            className={cn("overflow-hidden align-center items-center justify-center flex flex-col",classes.active2hoverState, variant?.container?.(), containerClassName)}
+            className={cn("overflow-hidden align-center items-center justify-center flex flex-col", classes.active2hoverState, variant.container(), containerClassName)}
             style={isNonNullString(buttonVariant?.size) ? {
                 flexShrink: 0,
                 flexGrow: 0,

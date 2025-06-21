@@ -184,6 +184,15 @@ export const VariantsGeneratedColors = {
     "error": "text-error dark:text-dark-error",
     "surface": "text-surface dark:text-dark-surface"
   },
+  "color2foreground": {
+    "primary": "text-primary-foreground dark:text-dark-primary-foreground",
+    "secondary": "text-secondary-foreground dark:text-dark-secondary-foreground",
+    "info": "text-info-foreground dark:text-dark-info-foreground",
+    "success": "text-success-foreground dark:text-dark-success-foreground",
+    "warning": "text-warning-foreground dark:text-dark-warning-foreground",
+    "error": "text-error-foreground dark:text-dark-error-foreground",
+    "surface": "text-surface-foreground dark:text-dark-surface-foreground"
+  },
   "background": {
     "primary": "bg-primary dark:bg-dark-primary",
     "secondary": "bg-secondary dark:bg-dark-secondary",

@@ -14,6 +14,7 @@ import menu from "./menu";
 import color from "./color";
 import background from "./background";
 import foreground from "./foreground";
+import checkbox from "./checkbox";
 export const variants = {
     all,
     menu,
@@ -30,6 +31,7 @@ export const variants = {
     color,
     background,
     foreground,
+    checkbox,
 }
 
 export * from "./types";

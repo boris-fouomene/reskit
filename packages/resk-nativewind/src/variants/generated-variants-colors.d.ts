@@ -9,6 +9,7 @@
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
         color : Record<IName,string>;
+        color2foreground : Record<IName | `${IName}-foreground`,string>;
         background : Record<IName,string>;
         foreground : Record<IName,string>;
         shadow : Record<IName,string>;

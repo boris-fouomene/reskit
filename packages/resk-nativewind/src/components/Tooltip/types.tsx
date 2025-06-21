@@ -2,7 +2,7 @@
 
 "use client";
 import { IClassName, ITouchableProps } from "@src/types";
-import { ComponentProps, ComponentType, ReactNode } from "react"
+import { ComponentProps, ComponentType, JSX, ReactNode } from "react"
 import { PressableProps, View } from "react-native";
 
 /**
@@ -76,7 +76,7 @@ export interface ITooltipBaseProps {
 export type ITooltipProps<AsProps extends ITouchableProps = PressableProps> = ITooltipBaseProps & Partial<AsProps> & {
     ref?: React.Ref<View>;
     as?: ComponentType<ITooltipBaseProps & AsProps>;
-    children?: ReactNode;
+    children?: JSX.Element | null;
     testID?: PressableProps["testID"];
     disabled?: PressableProps["disabled"];
     id?: PressableProps["id"];

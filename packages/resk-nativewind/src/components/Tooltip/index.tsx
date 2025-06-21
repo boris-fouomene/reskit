@@ -6,6 +6,7 @@ import { defaultStr, uniqid } from "@resk/core";
 import { useMergeRefs } from "@utils/mergeRefs";
 import { cn, isValidElement } from "@utils";
 import { ITouchableProps } from "@src/types";
+import { classes } from "@variants/classes";
 
 export * from "./types";
 export function Tooltip<asProps extends Partial<ITouchableProps> = PressableProps>({ children, className, as, title, tooltip, disabled, testID, id, ref, ...rest }: ITooltipProps<asProps>) {
@@ -21,7 +22,7 @@ export function Tooltip<asProps extends Partial<ITouchableProps> = PressableProp
     return as || Pressable;
   }, [as])
   return (
-    <Component {...rest as any} className={cn(className)} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>
+    <Component {...rest as any} className={cn(!disabled && classes.active2hoverState, className)} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>
       {children}
     </Component>
   );

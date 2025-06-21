@@ -9,7 +9,7 @@ import { cn } from '@utils/cn';
 import { Icon } from '@components/Icon';
 import { Div } from '@html/Div';
 import buttonVariant from "@variants/button";
-import { IButtonBaseContext,IButtonProps } from "./types";
+import { IButtonBaseContext, IButtonProps } from "./types";
 import allVariants from "@variants/all";
 import { GestureResponderEvent } from "react-native";
 import Auth from '@resk/core/auth';
@@ -41,7 +41,6 @@ export function ButtonBase<Context = unknown>({
     divider: customDivider,
     ref,
     className,
-    android_ripple,
     activityIndicatorClassName,
     variant,
     disableRipple,
@@ -83,17 +82,17 @@ export function ButtonBase<Context = unknown>({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("group/btn btn relative  button select-text",rippleContent?"overflow-hidden":"", !disabled && cn(classes.active2hoverState,"active:scale-[0.97]"), allVariants({ disabled }), computedVariant.base?.(), className)}
+            className={cn("group/btn btn relative  button select-text", rippleContent ? "overflow-hidden" : "", !disabled && cn(classes.active2hoverState, "active:scale-[0.97]"), allVariants({ disabled }), computedVariant.base?.(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}
             accessibilityState={{ disabled }}
             accessible={accessible}
             disabled={disabled}
-            onPress = {typeof onPress ==="function" ? (event: GestureResponderEvent) => {
+            onPress={typeof onPress === "function" ? (event: GestureResponderEvent) => {
                 const r = onPress(event, buttonContext);
                 return r;
-            }: undefined}
+            } : undefined}
         >
             <Div id={`${buttonId}-content`} testID={testID + "-button-content"} className={cn("button-content w-full flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
                 <Div className={cn("button-left-container", rowClassName, computedVariant.leftContainer?.(), leftContainerClassName)} testID={testID + "-button-left-container"}>

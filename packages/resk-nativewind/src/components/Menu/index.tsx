@@ -97,9 +97,6 @@ export function Menu<Context = unknown>({
             setState(prevState => ({ ...prevState, anchorMeasurements }));
         });
     }, [windowWidth, windowHeight, anchorRef]);
-    if (isVisible) {
-        console.log("is visible ", JSON.stringify(menuPosition, null, 2));
-    }
     // Handle menu layout changes
     const onMenuLayout = (event: LayoutChangeEvent) => {
         const { width: mWidth, height } = event.nativeEvent.layout;

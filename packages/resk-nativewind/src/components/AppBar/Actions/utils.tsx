@@ -1,7 +1,6 @@
-import { IAppBarActionProps, IAppBarActionsProps, IAppBarProps } from "../types";
+import { IAppBarActionProps, IAppBarActionsProps, IAppBarContext, IAppBarProps } from "../types";
 import { IReactNullableElement } from "@src/types";
 import { renderNavItems } from "@components/Nav/utils";
-import { cn } from "@utils/cn";
 import { AppBarAction } from "../Action";
 import ExpandableAppBarAction from "../ExpandableAction";
 
@@ -12,7 +11,7 @@ export function renderActions<Context = unknown>({ context, actionMutator, testI
   renderAction = typeof renderAction === 'function' ? renderAction : renderAppBarAction;
   renderExpandableAction = typeof renderExpandableAction === 'function' ? renderExpandableAction : renderExpandableAppBarAction;
   const mutatedActionMutator = typeof actionMutator === 'function' ? actionMutator : (renderer: IAppBarActionsProps<Context>["renderAction"], props: IAppBarActionProps<Context>, index: number, isExpandable: boolean) => (renderer as any)(props, index);
-  return renderNavItems<Context>({
+  return renderNavItems<IAppBarContext<Context>>({
     ...props,
     context,
     items,

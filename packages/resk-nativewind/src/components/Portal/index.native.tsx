@@ -1,6 +1,6 @@
 import { Div } from '@html/Div';
 import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, useId, JSX } from 'react';
-import { StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import { cn } from '@utils/cn';
 import { styles } from './utils';
 import { IPortalProps } from './types';
@@ -129,8 +129,8 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     const testID = "portal";
     return (
         <PortalContext.Provider value={{ addPortal, removePortal, portals: portalRefs.current }}>
-            {children}
-            <>
+            <View testID={testID + "-container"} style={{ flex: 1 }} pointerEvents="box-none">
+                {children}
                 {portalRefs.current.map(({ key, children, props }, index) => {
                     return (
                         <RenderedPortal
@@ -142,7 +142,7 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
                         />
                     );
                 })}
-            </>
+            </View>
         </PortalContext.Provider>
     );
 };

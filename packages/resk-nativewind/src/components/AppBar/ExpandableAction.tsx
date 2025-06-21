@@ -1,10 +1,10 @@
 import { Menu } from "@components/Menu";
-import { IAppBarActionProps } from './types';
+import { IAppBarActionProps, IAppBarContext } from './types';
 import { AppBarAction } from "./Action";
 
 
-function ExpandableAppBarAction<AppBarActionContext = unknown>({ items, children, ...rest }: IAppBarActionProps<AppBarActionContext>) {
-    return <Menu<AppBarActionContext>
+function ExpandableAppBarAction<Context = unknown>({ items, children, ...rest }: IAppBarActionProps<Context>) {
+    return <Menu<IAppBarContext<Context>>
         anchor={({ menu }) => {
             return (
                 <AppBarAction testID='resk-expandable-appbar-action-anchor'

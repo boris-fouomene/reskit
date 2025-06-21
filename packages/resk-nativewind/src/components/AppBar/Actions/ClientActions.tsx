@@ -44,7 +44,7 @@ export function AppBarClientActions<Context = unknown>({ context, menuAnchorClas
             },
         });
         return { actions, menuItems }
-    }, [mAction, context, items, renderAction, renderExpandableAction, actionClassName, actionMenuItemClassName]);
+    }, [mAction, items, renderAction, renderExpandableAction, actionClassName, actionMenuItemClassName]);
     if (!isHydrated) {
         if (isValidElement(hydrationFallback)) {
             return hydrationFallback;

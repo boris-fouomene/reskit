@@ -4,7 +4,7 @@ import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IClassName } from "@src/types";
 import { IVariantPropsText } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
-import { IVariantPropsAppBar } from "@variants/appBar";
+import appBarVariant, { IVariantPropsAppBar } from "@variants/appBar";
 
 
 export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "title" | "variant"> {
@@ -99,15 +99,15 @@ export interface IAppBarActionsProps<Context = unknown> {
     /**
      * The function used to render an appBar action. This function receives the item properties and is responsible for generating the corresponding JSX.
      */
-    renderAction?: INavItemsProps<Context>["renderItem"];
+    renderAction?: INavItemsProps<IAppBarContext<Context>>["renderItem"];
 
     /**
      * The function used to render expandable actions. Similar to the render function, this handles the rendering of
      */
-    renderExpandableAction?: INavItemsProps<Context>["renderExpandableItem"];
+    renderExpandableAction?: INavItemsProps<IAppBarContext<Context>>["renderExpandableItem"];
 
     /** The context to pass to each action, used to extend the context for the actions. */
-    context?: Context; // The context for actions requiring specific context information.
+    context?: IAppBarContext<Context>; // The context for actions requiring specific context information.
 
     /***
         The fallback element to render as actions during the hydration process, 
@@ -127,6 +127,9 @@ export interface IAppBarActionsProps<Context = unknown> {
         When the actions items are rendered as a menu, this icon is used to render the menu anchor.
     */
     menuAnchorIconProps?: IIconButtonProps;
+}
+export type IAppBarContext<Context = unknown> = Context & {
+    appBarComputedVariant: ReturnType<typeof appBarVariant>;
 }
 
 /**
@@ -157,7 +160,7 @@ export interface IAppBarActionsProps<Context = unknown> {
  *     );
  * };
  */
-export interface IAppBarActionProps<Context = unknown> extends INavItemProps<Context> { };
+export interface IAppBarActionProps<Context = unknown> extends INavItemProps<IAppBarContext<Context>> { };
 
 /**
  * 

@@ -127,6 +127,9 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
      */
     variant?: IVariantPropsButton;
 
+    /***
+     * The content of the ripple effect
+     */
     rippleContent?: JSX.Element | null;
 
     /** Duration of the ripple effect, in milliseconds

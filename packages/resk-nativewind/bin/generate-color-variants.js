@@ -40,12 +40,11 @@ module.exports = (colors, options) => {
             }
         }),
         buttonOutline: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
-
             const groupClassName = {
-                base: `btn_group web:hover:bg-${color} web:dark:hover:bg-dark-${color}`,
-                label: `web:hover:text-${color}-foreground web:dark:hover:text-dark-${color}-foreground web:btn_group-hover:text-${color}-foreground web:dark:btn_group-hover:text-dark-${color}-foreground`,
-                icon: `web:hover:!text-${color}-foreground web:dark:hover:!text-dark-${color}-foreground web:btn_group-hover:!text-${color}-foreground web:dark:btn_group-hover:!text-dark-${color}-foreground`,
-                activityIndicator: `web:hover:border-t-${color}-foreground web:dark:hover:border-t-dark-${color}-foreground web:btn_group-hover:border-t-${color}-foreground web:dark:btn_group-hover:border-t-dark-${color}-foreground`,
+                base: `group web:hover:bg-${color} web:dark:hover:bg-dark-${color}`,
+                label: `web:hover:text-${color}-foreground web:dark:hover:text-dark-${color}-foreground web:group-hover:text-${color}-foreground web:dark:group-hover:text-dark-${color}-foreground`,
+                icon: `web:hover:!text-${color}-foreground web:dark:hover:!text-dark-${color}-foreground web:group-hover:!text-${color}-foreground web:dark:group-hover:!text-dark-${color}-foreground`,
+                activityIndicator: `web:hover:border-t-${color}-foreground web:dark:hover:border-t-dark-${color}-foreground web:group-hover:border-t-${color}-foreground web:dark:group-hover:border-t-dark-${color}-foreground`,
             }
             return {
                 base: `${groupClassName.base} p-[5px] border-2 border-${color} bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-${color}`,

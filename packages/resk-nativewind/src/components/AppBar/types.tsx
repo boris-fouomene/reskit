@@ -129,7 +129,7 @@ export interface IAppBarActionsProps<Context = unknown> {
     menuAnchorIconProps?: IIconButtonProps;
 }
 export type IAppBarContext<Context = unknown> = Context & {
-    appBarComputedVariant: ReturnType<typeof appBarVariant>;
+    appBarVariant: IVariantPropsAppBar;
 }
 
 /**

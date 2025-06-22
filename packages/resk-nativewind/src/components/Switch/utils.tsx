@@ -83,7 +83,7 @@ export function useToggleable({ disabled, className, checkedTitle, onValueChange
     ...rest,
     className: cn(variants.all({ disabled, readOnly }), className),
     containerClassName: cn(variants.all({ disabled, readOnly }), "flex flex-row self-start items-center justify-start", containerClassName),
-    labelClassName: cn(!disabled && "select-text mx-[7px]", className),
+    labelClassName: cn(!disabled && "select-text", "mx-[7px]", className),
     checked,
     labelPosition,
     title: (checked ? checkedTitle : uncheckedTitle) || title || undefined,

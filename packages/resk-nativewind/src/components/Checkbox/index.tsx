@@ -116,7 +116,7 @@ export function Checkbox({ testID, variant, checkedIconName, uncheckedIconName, 
                 {...nonTouchableProps}
                 disabled={disabled}
                 accessibilityRole="checkbox"
-                className={cn("mx-[7px]", iconClx, computedVariant.icon(), checked ? checkedClassName : uncheckedClassName)}
+                className={cn(iconClx, computedVariant.icon(), checked ? checkedClassName : uncheckedClassName)}
                 variant={checked ? checkedVariant : uncheckedVariant}
                 name={(checked ? iconChecked as never : iconUnchecked as never)}
                 testID={checkboxTestID}

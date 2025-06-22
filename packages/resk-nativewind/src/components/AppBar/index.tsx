@@ -76,7 +76,7 @@ function AppBar<Context = any>({
     </Div>
     {isValidElement(children) ? children : null}
     <AppBarActions<Context> testID={testID + "-actions"}
-      context={Object.assign({}, context, { appBarComputedVariant: appVarVariant })}
+      context={Object.assign({}, context, { appVarVariant: Object.assign({}, variant) })}
       {...actionsProps}
       actions={actions}
       actionClassName={cn(appVarVariant.action(), actionsProps?.actionClassName)}

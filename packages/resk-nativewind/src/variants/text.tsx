@@ -5,7 +5,7 @@ import { VariantsFactory } from "./variantsFactory";
 const text = tv({
     base: "",
     variants: {
-        color: VariantsGeneratedColors.color2foreground,
+        color: VariantsGeneratedColors.textWithForeground,
         error: {
             true: "text-error dark:text-dark-error",
         },

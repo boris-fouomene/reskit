@@ -11,17 +11,17 @@ const appBar = tv({
         subtitle: "",
         action: "",
         actionMenuItem: "",
-        icon : "",
-        content:"",//the content of the appBar
+        icon: "",
+        content: "",//the content of the appBar
     },
     variants: {
-        colorScheme : Object.fromEntries(Object.entries(VariantsGeneratedColors.surface).map(([key, value]) => {
+        colorScheme: Object.fromEntries(Object.entries(VariantsGeneratedColors.surface).map(([key, value]) => {
             return [key, {
                 base: value,
-                title: (VariantsGeneratedColors.foreground as any)[key],
-                subtitle : cn((VariantsGeneratedColors.foreground as any)[key],"opacity-95"),
-                action : cn((VariantsGeneratedColors.foreground as any)[key]),
-                icon : cn((VariantsGeneratedColors.iconForeground as any)[key]),
+                title: (VariantsGeneratedColors.textForeground as any)[key],
+                subtitle: cn((VariantsGeneratedColors.textForeground as any)[key], "opacity-95"),
+                action: cn((VariantsGeneratedColors.textForeground as any)[key]),
+                icon: cn((VariantsGeneratedColors.iconForeground as any)[key]),
             }]
         })) as Record<IVariantsColors.ColorName, { base: string, title: string, subtitle: string, action: string, icon: string }>,
         ...VariantsFactory.createAll<{ base: string }>((value) => {

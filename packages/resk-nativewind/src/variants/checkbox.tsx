@@ -24,13 +24,13 @@ const checkbox = tv({
                 label: value,
             }
         }),
-        checkedColor: VariantsFactory.create<typeof VariantsGeneratedColors.color2foregroundWithImportant, { checkedIconColor: string, checkedLabelColor: string }>(VariantsGeneratedColors.color2foregroundWithImportant, (value, colorName) => {
+        checkedColor: VariantsFactory.create<typeof VariantsGeneratedColors.textWithForegroundWithImportant, { checkedIconColor: string, checkedLabelColor: string }>(VariantsGeneratedColors.textWithForegroundWithImportant, (value, colorName) => {
             return {
                 checkedIconColor: value,
                 checkedLabelColor: value.split("!").join(""),
             }
         }),
-        uncheckedColor: VariantsFactory.create<typeof VariantsGeneratedColors.color2foregroundWithImportant, { uncheckedIconColor: string, uncheckedLabelColor: string }>(VariantsGeneratedColors.color2foregroundWithImportant, (value, colorName) => {
+        uncheckedColor: VariantsFactory.create<typeof VariantsGeneratedColors.textWithForegroundWithImportant, { uncheckedIconColor: string, uncheckedLabelColor: string }>(VariantsGeneratedColors.textWithForegroundWithImportant, (value, colorName) => {
             return {
                 uncheckedIconColor: value,
                 uncheckedLabelColor: value.split("!").join(""),

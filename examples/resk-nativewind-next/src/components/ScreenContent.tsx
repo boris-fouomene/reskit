@@ -1,7 +1,7 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
-import { Icon, Menu, AppBar, ActivityIndicator, IVariantsColorsMap, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
+import { Icon, Menu, AppBar, ActivityIndicator, ProgressBar, IVariantsColorsMap, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -11,6 +11,18 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   return (
     <ScrollView testID='main-entry-appp'>
       <ModalExample />
+      <VStack className="p-5">
+        <H2>ProgressBar</H2>
+        <Div className="m-5 w-full">
+          <ProgressBar value={75} max={100} />
+        </Div>
+        <Div className="m-5 w-full">
+          <ProgressBar value={45} max={100} />
+        </Div>
+        <Div className="m-5 w-full">
+          <ProgressBar indeterminate />
+        </Div>
+      </VStack>
       <HStack className="p-5">
         <H2>Menu Examples</H2>
         <Menu

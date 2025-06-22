@@ -12,6 +12,7 @@ import activityIndicator from "./activityIndicator";
 import modal from "./modal";
 import menu from "./menu";
 import checkbox from "./checkbox";
+import progressBar from "./progressBar";
 export const variants = {
     all,
     menu,
@@ -26,6 +27,7 @@ export const variants = {
     activityIndicator,
     modal,
     checkbox,
+    progressBar,
 }
 
 export * from "./types";

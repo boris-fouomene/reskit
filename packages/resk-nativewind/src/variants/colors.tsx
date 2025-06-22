@@ -313,11 +313,11 @@ export class VariantsColors {
      *
      * @example
      * ```typescript
-     * const fg = VariantsColors.buildForegroundColors();
+     * const fg = VariantsColors.buildTextForegroundColors();
      * // fg.primary === "text-primary-foreground dark:text-dark-primary-foreground"
      * ```
      */
-    static buildForegroundColors<ColorClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ColorClassNameBuilder<"text", ColorClassNameBuilderResult, "-foreground">): Record<IVariantsColors.ColorName, ColorClassNameBuilderResult> {
+    static buildTextForegroundColors<ColorClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ColorClassNameBuilder<"text", ColorClassNameBuilderResult, "-foreground">): Record<IVariantsColors.ColorName, ColorClassNameBuilderResult> {
         return VariantsColors.buildVariantsColors<"text", ColorClassNameBuilderResult, "-foreground">("text", withImportantAttribute, colorClassNameBuilder, "-foreground");
     }
 

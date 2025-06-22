@@ -116,7 +116,7 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
  * @returns The props object with React Native accessibility props converted to DOM/ARIA attributes, omitting the original native accessibility props.
  */
 export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ accessible, onAccessibilityEscape, accessibilityLanguage, accessibilityActions, accessibilityIgnoresInvertColors, accessibilityViewIsModal, importantForAccessibility, accessibilityElementsHidden, role, accessibilityLiveRegion, accessibilityRole, accessibilityLabel, accessibilityState, accessibilityValue, accessibilityHint, ...rnProps }: T): Omit<T, keyof INativeAccessibilityProps> {
-    const domProps: Partial<T> & IHtmlAccessibilityProps = { ...(isObj(rnProps) ? rnProps : {}) } as any;
+    const domProps: Partial<T> & IHtmlAccessibilityProps = rnProps as any;
     domProps['aria-label'] = defaultStr(rnProps["aria-label"], accessibilityLabel);
     domProps['aria-describedby'] = defaultStr(domProps["aria-describedby"], accessibilityHint);
     (domProps as any)["aria-description"] = defaultStr((domProps as any)["aria-description"], domProps["aria-describedby"]);
@@ -215,6 +215,6 @@ function mapRoleToDOM(role: string): string {
         case 'keyboardkey': return 'key';
         case 'text': return 'textbox';
         case 'togglebutton': return 'button';
-        default: return role; // Return as-is for custom or unknown roles
     }
+    return defaultStr(role);
 }

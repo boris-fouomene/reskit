@@ -11,7 +11,7 @@ import {
 
 import { IAnimatedViewStyle } from '@src/types';
 import { useTheme } from '@theme/index';
-import {View} from "@components/View";
+import { View } from "@components/View";
 import { defaultStr } from '@resk/core/utils';
 
 export type IProgressBarProps = React.ComponentPropsWithRef<typeof View> & {

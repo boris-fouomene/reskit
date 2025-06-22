@@ -161,7 +161,7 @@ export const VariantsGeneratedColors = {
     "error": "shadow-error/20 dark:shadow-error/30",
     "surface": "shadow-surface/20 dark:shadow-surface/30"
   },
-  "color": {
+  "text": {
     "primary": "text-primary dark:text-dark-primary",
     "secondary": "text-secondary dark:text-dark-secondary",
     "info": "text-info dark:text-dark-info",
@@ -170,7 +170,7 @@ export const VariantsGeneratedColors = {
     "error": "text-error dark:text-dark-error",
     "surface": "text-surface dark:text-dark-surface"
   },
-  "colorWithImportant": {
+  "textWithImportant": {
     "primary": "!text-primary dark:!text-dark-primary",
     "secondary": "!text-secondary dark:!text-dark-secondary",
     "info": "!text-info dark:!text-dark-info",
@@ -179,7 +179,7 @@ export const VariantsGeneratedColors = {
     "error": "!text-error dark:!text-dark-error",
     "surface": "!text-surface dark:!text-dark-surface"
   },
-  "foregroundWithImportant": {
+  "textForegroundWithImportant": {
     "primary": "!text-primary-foreground dark:!text-dark-primary-foreground",
     "secondary": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
     "info": "!text-info-foreground dark:!text-dark-info-foreground",
@@ -188,7 +188,7 @@ export const VariantsGeneratedColors = {
     "error": "!text-error-foreground dark:!text-dark-error-foreground",
     "surface": "!text-surface-foreground dark:!text-dark-surface-foreground"
   },
-  "color2foreground": {
+  "textWithForeground": {
     "primary": "text-primary dark:text-dark-primary",
     "secondary": "text-secondary dark:text-dark-secondary",
     "info": "text-info dark:text-dark-info",
@@ -204,7 +204,7 @@ export const VariantsGeneratedColors = {
     "error-foreground": "text-error-foreground dark:text-dark-error-foreground",
     "surface-foreground": "text-surface-foreground dark:text-dark-surface-foreground"
   },
-  "color2foregroundWithImportant": {
+  "textWithForegroundWithImportant": {
     "primary": "!text-primary dark:!text-dark-primary",
     "secondary": "!text-secondary dark:!text-dark-secondary",
     "info": "!text-info dark:!text-dark-info",
@@ -229,7 +229,7 @@ export const VariantsGeneratedColors = {
     "error": "bg-error dark:bg-dark-error",
     "surface": "bg-surface dark:bg-dark-surface"
   },
-  "foreground": {
+  "textForeground": {
     "primary": "text-primary-foreground dark:text-dark-primary-foreground",
     "secondary": "text-secondary-foreground dark:text-dark-secondary-foreground",
     "info": "text-info-foreground dark:text-dark-info-foreground",

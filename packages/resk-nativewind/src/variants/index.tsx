@@ -13,8 +13,10 @@ import modal from "./modal";
 import menu from "./menu";
 import checkbox from "./checkbox";
 import progressBar from "./progressBar";
+import textInput from "./textInput";
 export const variants = {
     all,
+    textInput,
     menu,
     icon,
     heading,

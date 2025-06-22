@@ -166,76 +166,6 @@ export type IAnimatedTextStyle = Animated.WithAnimatedValue<StyleProp<TextStyle>
 export type IAnimatedImageStyle = Animated.WithAnimatedValue<StyleProp<ImageStyle>>;
 
 
-/**
- * @interface IOnChangeOptionsBase
- * Represents the base options for an onChange event handler.
- * This type is generic, allowing for flexibility in the types of values
- * and events that can be passed to the handler.
- *
- * @extends {Partial<IInputFormatterResult>} This extends the `IInputFormatterResult` interface, providing additional properties for formatting and parsing values. This includes properties such as `formatValue`
- * @template ValueType - The type of the value being changed. Defaults to `any`.
- * @template OnChangeEventType - The type of the event that triggered the change. 
- *                        Defaults to React Native's text input event (`NativeSyntheticEvent<TextInputChangeEventData>) | null`.
- *
- * @property {OnChangeEventType} [event] - An optional event object that contains details
- *                                   about the change event. This can be useful for 
- *                                   accessing properties such as target value or 
- *                                   other event-specific data.
- *
- * @property {ValueType} [value] - The current value after the change. This 
- *                                   represents the new state of the input or field 
- *                                   that has changed.
- *
- * @property {any} [previousValue] - The value before the change occurred. This 
- *                                    can be useful for comparison or for undo 
- *                                    functionalities.
- *
- * @property {boolean} [focused] - Indicates whether the input field was focused 
- *                                 when the change occurred. This can help in 
- *                                 determining if the change was user-initiated.
- *
- * @property {string} [fieldName] - The name of the field that triggered the 
- *                                   change event. This is particularly useful in 
- *                                   forms with multiple fields to identify 
- *                                   which field's value has changed.
- *
- * @example
- * // Example usage of IOnChangeOptionsBase
- * const handleChange = (options: IOnChangeOptionsBase<string>) => {
- *   console.log(`Field: ${options.fieldName}`);
- *   console.log(`Previous Value: ${options.previousValue}`);
- *   console.log(`Current Value: ${options.value}`);
- *   console.log(`Event Type: ${options.event?.type}`);
- *   console.log(`Is Focused: ${options.focused}`);
- * };
- *
- * // Simulating a change event
- * handleChange({
- *   event: { type: 'change', target: { value: 'Hello World' } },
- *   value: 'Hello World',
- *   previousValue: 'Hello',
- *   focused: true,
- *   fieldName: 'greeting'
- * });
- * 
- *  * @example
- * // Using IOnChangeOptionsBase with custom types
- * type CustomEvent = { target: { value: string } };
- * const handleCustomChange = (options: IOnChangeOptionsBase<string, CustomEvent>) => {
- *   console.log('New value:', options.value);
- *   console.log('Event type:', options.event?.target.value);
- * };
- * @see {@link IInputFormatterResult} for more information on the `IInputFormatterResult` interface.
- * @returns {void} - This type does not return any value, as it is typically used 
- *                   as an argument for an event handler function.
- */
-export interface IOnChangeOptionsBase<OnChangeEventType = NativeSyntheticEvent<TextInputChangeEventData> | null, ValueType = any> extends Partial<IInputFormatterResult> {
-  event?: OnChangeEventType;
-  value?: ValueType;
-  previousValue?: any;
-  focused?: boolean;
-  fieldName?: string;
-};
 
 /**
  * @interface IOnChangeOptions
@@ -246,8 +176,6 @@ export interface IOnChangeOptionsBase<OnChangeEventType = NativeSyntheticEvent<T
  * @template OnChangeEventType - The type of the event that triggered the change. 
  *                        Defaults to The type of the event object, defaults to React Native's text input event `NativeSyntheticEvent<TextInputChangeEventData> | null`.
  * @template ValueType - The type of the value being changed. Defaults to `any`. 
- *
- * @extends {IOnChangeOptionsBase<ValueType, OnChangeEventType>} 
  * This extends the base options
  *
  * @example
@@ -307,8 +235,12 @@ export interface IOnChangeOptionsBase<OnChangeEventType = NativeSyntheticEvent<T
  * @returns {void} - This type does not return any value, as it is typically used 
  *                   as an argument for an event handler function.
  */
-export interface IOnChangeOptions<OnChangeEventType = any | null, ValueType = any> extends IOnChangeOptionsBase<OnChangeEventType, ValueType> {
-
+export interface IOnChangeOptions<OnChangeEventType = unknown | null, ValueType = unknown> {
+  event?: OnChangeEventType;
+  value?: ValueType;
+  previousValue?: any;
+  focused?: boolean;
+  fieldName?: string;
 }
 
 

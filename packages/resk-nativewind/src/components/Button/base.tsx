@@ -47,6 +47,7 @@ export function ButtonBase<Context = unknown>({
     rippleContent,
     context,
     perm,
+    iconClassName,
     resourceName,
     onPress,
     ...rest
@@ -61,7 +62,7 @@ export function ButtonBase<Context = unknown>({
     const iconSize = 18;
     iconProps = Object.assign({}, iconProps);
     const disabledClass = disabled && "pointer-events-none";
-    iconProps.className = cn("button-icon", computedVariant.icon?.(), iconProps?.variant && iconVariants(iconProps.variant), disabledClass, iconProps.className);
+    iconProps.className = cn("button-icon", computedVariant.icon?.(), iconProps?.variant && iconVariants(iconProps.variant), disabledClass, iconClassName, iconProps.className);
     const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps, variant: undefined });
     const iconContent = isLoading ? (
         <ActivityIndicator

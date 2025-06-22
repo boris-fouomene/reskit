@@ -67,6 +67,11 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
      */
     icon?: IIconSource;
 
+    /***
+     * The class name for the icon displayed on the button
+     */
+    iconClassName?: IClassName;
+
     /**
      * Props for the icon displayed on the button.
      * If the icon is a string, these props will be used to render a FontIcon.

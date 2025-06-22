@@ -12,11 +12,12 @@ import { TouchableOpacity } from "react-native";
 import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
 import textInputVariant from "@variants/textInput";
 import allVariants from "@variants/all";
+import { ActivityIndicator } from "@components/ActivityIndicator";
 
 const isNative = p.isNative();
 
 
-function TextInput({
+export function TextInput({
     readOnly,
     render, testID, error: customError, phoneCountryCode: customPhoneCountryCode, handleMaskValidationErrors,
     defaultValue, toCase: cToCase, inputMode: cInputMode, dateFormat: customDateFormat, emptyValue: cIsEmptyValue,
@@ -187,7 +188,7 @@ function TextInput({
     const containerClx = cn(computedVariant.container(), containerClassName);
     const callOptions: ITextInputCallbackOptions = { ...inputState, error: !!error, isFocused, textInputComputedVariant: computedVariant as any, editable, disabled: !!disabled };
     const multiline = !!props.multiline;
-    const { isMobile } = useBreakpoints();
+    const { isMobile, isHydrated } = useBreakpoints();
     const minHeight = useMemo(() => {
         return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbededVariant ? 30 : isMobile ? 50 : 46;
     }, [customMinHeight, isLabelEmbededVariant, isMobile]);
@@ -337,6 +338,9 @@ function TextInput({
     }, [withKeyboardAvoidingView]);
     const leftContainerWrappedWithTouchableClassName = cn(canWrapWithTouchable && "px-0");
     const leftOrRightClassName = cn("flex flex flex-row items-center self-center justify-start", disabledClx);
+    if (!isHydrated) {
+        return <ActivityIndicator size={"small"} />
+    }
     return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, "text-input-container")} testID={testID + "-container"}>
         {isLabelEmbededVariant ? null : labelContent}
         <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn("text-input-content-container w-full flex flex-row relative justify-center self-start items-center", contentContainerClx)}>
@@ -362,8 +366,6 @@ const areCasesEquals = (case1: Partial<IInputFormatterMaskResult>, case2: Partia
 
 
 TextInput.displayName = "TextInput";
-
-export default TextInput;
 
 
 const styles = StyleSheet.create({

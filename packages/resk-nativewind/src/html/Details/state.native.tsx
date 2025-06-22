@@ -10,5 +10,5 @@ export const useDetailsState = (open?: boolean): {
             setIsOpen(open);
         }
     }, [!!open])
-    return { isOpen: !!open, toggleOpen: () => { setIsOpen(!isOpen) } };
+    return { isOpen, toggleOpen: () => { setIsOpen(!isOpen) } };
 }

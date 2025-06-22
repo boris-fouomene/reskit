@@ -23,6 +23,7 @@ function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Elemen
   const { menu } = Object.assign({}, props.context);
   return <Nav.Item
     {...props}
+    className={cn("w-full", props.className)}
     onPress={(event, context) => {
       if (typeof event?.stopPropagation == "function") {
         event.stopPropagation();

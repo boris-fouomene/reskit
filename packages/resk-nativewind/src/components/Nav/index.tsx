@@ -12,23 +12,21 @@ import { cn } from "@utils/cn";
 
 
 export class Nav {
-    static renderItems({ items, renderItem, renderExpandableItem, context, ...rest }: INavItemsProps) {
-        return renderNavItems({ items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem, context });
+    static renderItems({ items, renderItem, renderExpandableItem, ...rest }: INavItemsProps) {
+        return renderNavItems({ ...rest, items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem });
     };
-    static Item<Context = unknown>({ expandableProps, className, closeOnPress, items, ...props }: INavItemProps<Context>) {
+    static Item<Context = unknown>({ className, ...props }: INavItemProps<Context>) {
         return <Button
             testID="nav-item"
             {...props}
-            className={cn("w-full", "px-[7px] py-[7px]", className)}
-            context={Object.assign({}, props.context)}
+            className={cn("p-[7px]", className)}
         />
     }
-    static Items<Context = unknown>({ items: customItems, renderItem, renderExpandableItem, context, testID, ...rest }: INavItemsProps<Context>) {
+    static Items<Context = unknown>({ items: customItems, renderItem, renderExpandableItem, testID, ...rest }: INavItemsProps<Context>) {
         testID = defaultStr(testID, "resk-nav-item");
         const items = useRenderNavItems<Context>({
             ...rest,
             items: (Array.isArray(customItems) ? customItems : []),
-            context: Object.assign({}, context),
             renderItem: typeof renderItem === "function" ? renderItem : renderNavItem,
             renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem,
         });

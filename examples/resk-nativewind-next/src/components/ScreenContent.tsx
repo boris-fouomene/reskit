@@ -1,7 +1,7 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
-import { Icon, Menu, AppBar, ActivityIndicator,IVariantsColorsMap, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
+import { Icon, Menu, AppBar, ActivityIndicator, IVariantsColorsMap, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -30,8 +30,8 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           title="My Applicationdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
           subtitle="Welcome to the appsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
           actions={[
-            { label: "Settings"},
-            { label: "Profile"},
+            { label: "Settings" },
+            { label: "Profile" },
           ]}
         />
       </Div>
@@ -73,7 +73,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         </Div>
         <Heading level={2}>Icons examples : </Heading>
         <HStack className="p-5 !gap-x-10">
-          <Icon.Button variant={{ color: "secondary" }}
+          <Icon.Button variant={{ colorScheme: "secondary" }}
             iconName='camera'
             title="secondary color icon camera"
             size={30}
@@ -81,7 +81,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Icon.Button
             title="primary color icon car"
             disabled
-            variant={{ color: "primary", size: "5xl" }}
+            variant={{ colorScheme: "primary", size: "5xl" }}
             iconName="car"
             size={40}
           />
@@ -89,7 +89,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Icon.Font id="phone" title="An idd" name="phone" size={50} variant={{ color: "primary" }} />
           <Icon.Font name="abacus" variant={{ color: "success" }} />
           {children}
-          <Avatar text='A' variant={{ color: "error", size: "5xl" }} />
+          <Avatar text='A' variant={{ colorScheme: "error", size: "5xl" }} />
         </HStack>
         <Divider />
         <Heading level={1} className="text-red-500">Badges</Heading>
@@ -121,18 +121,18 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10 gap-y-5">
-          <Button label="Button base example1 with left icon" icon={"camera"} variant={{ color: "primary", padding: "5px" }}
-            left={<Icon.Font name="ph" size={30} className={variants.button({ color: "primary" }).icon()} />}
+          <Button label="Button base example1 with left icon" icon={"camera"} variant={{ colorScheme: "primary", padding: "5px" }}
+            left={<Icon.Font name="ph" size={30} className={variants.button({ colorScheme: "primary" }).icon()} />}
           />
-          <Button label="Button example2" icon="radio" variant={{ color: "secondary", padding: "10px" }} />
+          <Button label="Button example2" icon="radio" variant={{ colorScheme: "secondary", padding: "10px" }} />
           <Button loading label="Outline Button 1" variant={{ outline: "primary" }} className="p-[2px] rounded-lg" />
           <Button icon={"camera"} label="Outline Button 2" variant={{ outline: "secondary" }} />
           <Button icon="abacus" label="Outline Button 3" variant={{ outline: "info" }} />
           <Button icon="phone" label="Outline Button 4" variant={{ outline: "success", rounded: "sm" }} />
           <Button icon="telescope" label="Outline Button 5" variant={{ outline: "warning" }} />
           <Button label="Outline Button 6" variant={{ outline: "error" }} />
-          <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ color: "error" }} />
-          <Button label="Button example4 - loading" loading variant={{ color: "success" }} className="px-[10px] py-[5px] rounded-full" />
+          <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ colorScheme: "error" }} />
+          <Button label="Button example4 - loading" loading variant={{ colorScheme: "success" }} className="px-[10px] py-[5px] rounded-full" />
         </HStack>
       </Div>
       <Div className="p-5">

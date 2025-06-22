@@ -14,7 +14,7 @@ const buton = tv({
         label: "",
     },
     variants: {
-        color: VariantsGeneratedColors.button,
+        colorScheme: VariantsGeneratedColors.button,
         outline: VariantsGeneratedColors.buttonOutline,
         ...VariantsFactory.createAll<{ base: string }>((value) => {
             return {

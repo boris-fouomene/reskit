@@ -8,7 +8,7 @@ const iconButton = tv({
         text: "text-surface-foreground dark:text-dark-surface-foreground",
     },
     variants: {
-        color: VariantsGeneratedColors.iconButton,
+        colorScheme: VariantsGeneratedColors.iconButton,
         size: {
             sm: {
                 container: "w-8 h-8",

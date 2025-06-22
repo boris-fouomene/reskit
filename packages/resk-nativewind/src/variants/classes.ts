@@ -1,7 +1,7 @@
 import { ClassValue } from "tailwind-variants";
 
 export const classes: IVariantsClasses = {
-    disabled: "pointer-events-none opacity-70 web:cursor-not-allowed",
+    disabled: "pointer-events-none opacity-60 web:cursor-not-allowed",
     readOnly: "pointer-events-none opacity-80 web:cursor-not-allowed",
     hidden: "hidden opacity-0",
     active2hoverState: "hover:opacity-80 active:opacity-60",

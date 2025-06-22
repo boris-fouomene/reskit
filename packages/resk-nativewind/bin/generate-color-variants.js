@@ -36,22 +36,21 @@ module.exports = (colors, options) => {
                 base: `${colorNameWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${color} dark:focus-visible:outline-dark-${color}`,
                 label: `text-${color}-foreground dark:text-dark${color}-foreground`,
                 icon: `!text-${color}-foreground dark:!text-dark${color}-foreground`,
-                ripple: "",
                 activityIndicator: cn(`border-t-${color}-foreground dark:border-t-dark-${color}-foreground`),
             }
         }),
         buttonOutline: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
+
             const groupClassName = {
-                base: `group hover:bg-${color} dark:hover:bg-dark-${color}`,
-                label: `hover:text-${color}-foreground dark:hover:text-dark-${color}-foreground group-hover:text-${color}-foreground dark:group-hover:text-dark-${color}-foreground`,
-                icon: `hover:!text-${color}-foreground dark:hover:!text-dark-${color}-foreground group-hover:!text-${color}-foreground dark:group-hover:!text-dark-${color}-foreground`,
-                activityIndicator: `hover:border-t-${color}-foreground dark:hover:border-t-dark-${color}-foreground group-hover:border-t-${color}-foreground dark:group-hover:border-t-dark-${color}-foreground`,
+                base: `btn_group web:hover:bg-${color} web:dark:hover:bg-dark-${color}`,
+                label: `web:hover:text-${color}-foreground web:dark:hover:text-dark-${color}-foreground web:btn_group-hover:text-${color}-foreground web:dark:btn_group-hover:text-dark-${color}-foreground`,
+                icon: `web:hover:!text-${color}-foreground web:dark:hover:!text-dark-${color}-foreground web:btn_group-hover:!text-${color}-foreground web:dark:btn_group-hover:!text-dark-${color}-foreground`,
+                activityIndicator: `web:hover:border-t-${color}-foreground web:dark:hover:border-t-dark-${color}-foreground web:btn_group-hover:border-t-${color}-foreground web:dark:btn_group-hover:border-t-dark-${color}-foreground`,
             }
             return {
-                base: `${groupClassName.base} p-[5px] border-2 border-${color} bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-${color}`,
+                base: `${groupClassName.base} p-[5px] border-2 border-${color} bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-${color}`,
                 label: `${groupClassName.label} text-${color} dark:text-dark${color}`,
                 icon: `${groupClassName.icon} !text-${color} dark:!text-dark${color}`,
-                ripple: "",
                 activityIndicator: cn(groupClassName.activityIndicator, `border-t-${color} dark:border-t-dark-${color}`),
             }
         }),
@@ -105,8 +104,8 @@ export const VariantsGeneratedColors = ${content}
     type IName = IVariantsColors.ColorName;
     type IName2Foreground = IVariantsColors.ColorName2Foreground;
     export declare interface IVariantsGeneratedColors {
-        button : Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
-        buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
+        button : Record<IName,Record<"base"|"label"|"icon" | "activityIndicator",string>>;
+        buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "activityIndicator",string>>;
         icon : Record<IName,string>;
         iconForeground : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;

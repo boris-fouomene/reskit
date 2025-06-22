@@ -3,8 +3,9 @@ import { padding2marginClasses } from "./padding2margin";
 import { borderClasses } from "./border";
 import { ShadowColorsClasses } from "./shadow";
 import { textSizes } from "./textSizes";
+import { allScaleVariants } from "./scales";
 
-type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], colorName: keyof InputType) => ResultType;
+type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], variantName: keyof InputType) => ResultType;
 
 export const VariantsFactory = {
     /**
@@ -75,6 +76,10 @@ export const VariantsFactory = {
     },
     createShadowColorsVariants: function createShadowColorsVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof ShadowColorsClasses, ResultType>) {
         return VariantsFactory.create<typeof ShadowColorsClasses, ResultType>(ShadowColorsClasses, variantMutator);
+    },
+    scalesVariants: allScaleVariants,
+    createScalesVariants: function createScaleHoverVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof allScaleVariants, ResultType>) {
+        return VariantsFactory.create<typeof allScaleVariants, ResultType>(allScaleVariants, variantMutator);
     },
     createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof allVariantClasses[keyof typeof allVariantClasses], ResultType>): IVariantFactoryAll<ResultType> {
         const result: IVariantFactoryAll<ResultType> = {} as any;

@@ -3,8 +3,8 @@
     type IName = IVariantsColors.ColorName;
     type IName2Foreground = IVariantsColors.ColorName2Foreground;
     export declare interface IVariantsGeneratedColors {
-        button : Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
-        buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "ripple" | "activityIndicator",string>>;
+        button : Record<IName,Record<"base"|"label"|"icon" | "activityIndicator",string>>;
+        buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "activityIndicator",string>>;
         icon : Record<IName,string>;
         iconForeground : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;

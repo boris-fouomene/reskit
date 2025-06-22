@@ -8,7 +8,7 @@ import { cn } from '@utils/cn';
 import { pickTouchableProps } from '@utils/touchHandler';
 import iconButton from '@variants/iconButton';
 import { isValidElement } from 'react';
-
+import { Tooltip } from '@components/Tooltip';
 
 const PADDING = 8;
 
@@ -39,7 +39,6 @@ export default function IconButton(
         style,
         testID,
         isLoading = false,
-        title,
         iconName,
         source,
         variant: buttonVariant,
@@ -56,7 +55,7 @@ export default function IconButton(
     const { touchableProps, ...restProps } = pickTouchableProps(rest);
     containerSize = isNumber(containerSize) && containerSize > size ? containerSize : (size + 2 * PADDING);
     return (
-        <Surface
+        <Tooltip
             testID={`${testID}-container`}
             disabled={disabled}
             className={cn("overflow-hidden align-center items-center justify-center flex flex-col", variant.container(), containerClassName)}
@@ -72,15 +71,17 @@ export default function IconButton(
             ref={ref}
             {...touchableProps}
         >
-            {isLoading ? <ActivityIndicator className={cn("self-center")} size={size} /> : Icon.getIcon({
-                ...restProps,
-                className: cn("self-center", disabled && "pointer-events-none", variant?.icon?.(), className),
-                style,
-                icon: source || iconName || undefined,
-                testID,
-                size,
-            }) || (isValidElement(children) ? children : null)}
-        </Surface>
+            <>
+                {isLoading ? <ActivityIndicator className={cn("self-center")} size={size} /> : Icon.getIcon({
+                    ...restProps,
+                    className: cn("self-center", disabled && "pointer-events-none", variant?.icon?.(), className),
+                    style,
+                    icon: source || iconName || undefined,
+                    testID,
+                    size,
+                }) || (isValidElement(children) ? children : null)}
+            </>
+        </Tooltip>
     );
 };
 IconButton.displayName = 'Icon.Button';

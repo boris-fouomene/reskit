@@ -39,7 +39,7 @@ export default function ClientFontIcon({ name, variant, containerClassName, titl
         return <Tooltip
             title={title}
             disabled={disabled}
-            {...touchableProps as any}
+            {...touchableProps}
             className={cn("shrink-0 grow-0", containerClassName)}>
             <Component
                 disabled={disabled}

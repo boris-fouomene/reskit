@@ -53,49 +53,49 @@ export const VariantsGeneratedColors = {
   },
   "buttonOutline": {
     "primary": {
-      "base": "group hover:bg-primary dark:hover:bg-dark-primary p-[5px] border-2 border-primary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-primary",
+      "base": "group1 hover:bg-primary dark:hover:bg-dark-primary p-[5px] border-2 border-primary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-primary",
       "label": "hover:text-primary-foreground dark:hover:text-dark-primary-foreground group-hover:text-primary-foreground dark:group-hover:text-dark-primary-foreground text-primary dark:text-darkprimary",
       "icon": "hover:!text-primary-foreground dark:hover:!text-dark-primary-foreground group-hover:!text-primary-foreground dark:group-hover:!text-dark-primary-foreground !text-primary dark:!text-darkprimary",
       "ripple": "",
       "activityIndicator": "hover:border-t-primary-foreground dark:hover:border-t-dark-primary-foreground group-hover:border-t-primary-foreground dark:group-hover:border-t-dark-primary-foreground border-t-primary dark:border-t-dark-primary"
     },
     "secondary": {
-      "base": "group hover:bg-secondary dark:hover:bg-dark-secondary p-[5px] border-2 border-secondary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-secondary",
+      "base": "group1 hover:bg-secondary dark:hover:bg-dark-secondary p-[5px] border-2 border-secondary bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-secondary",
       "label": "hover:text-secondary-foreground dark:hover:text-dark-secondary-foreground group-hover:text-secondary-foreground dark:group-hover:text-dark-secondary-foreground text-secondary dark:text-darksecondary",
       "icon": "hover:!text-secondary-foreground dark:hover:!text-dark-secondary-foreground group-hover:!text-secondary-foreground dark:group-hover:!text-dark-secondary-foreground !text-secondary dark:!text-darksecondary",
       "ripple": "",
       "activityIndicator": "hover:border-t-secondary-foreground dark:hover:border-t-dark-secondary-foreground group-hover:border-t-secondary-foreground dark:group-hover:border-t-dark-secondary-foreground border-t-secondary dark:border-t-dark-secondary"
     },
     "info": {
-      "base": "group hover:bg-info dark:hover:bg-dark-info p-[5px] border-2 border-info bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-info",
+      "base": "group1 hover:bg-info dark:hover:bg-dark-info p-[5px] border-2 border-info bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-info",
       "label": "hover:text-info-foreground dark:hover:text-dark-info-foreground group-hover:text-info-foreground dark:group-hover:text-dark-info-foreground text-info dark:text-darkinfo",
       "icon": "hover:!text-info-foreground dark:hover:!text-dark-info-foreground group-hover:!text-info-foreground dark:group-hover:!text-dark-info-foreground !text-info dark:!text-darkinfo",
       "ripple": "",
       "activityIndicator": "hover:border-t-info-foreground dark:hover:border-t-dark-info-foreground group-hover:border-t-info-foreground dark:group-hover:border-t-dark-info-foreground border-t-info dark:border-t-dark-info"
     },
     "success": {
-      "base": "group hover:bg-success dark:hover:bg-dark-success p-[5px] border-2 border-success bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-success",
+      "base": "group1 hover:bg-success dark:hover:bg-dark-success p-[5px] border-2 border-success bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-success",
       "label": "hover:text-success-foreground dark:hover:text-dark-success-foreground group-hover:text-success-foreground dark:group-hover:text-dark-success-foreground text-success dark:text-darksuccess",
       "icon": "hover:!text-success-foreground dark:hover:!text-dark-success-foreground group-hover:!text-success-foreground dark:group-hover:!text-dark-success-foreground !text-success dark:!text-darksuccess",
       "ripple": "",
       "activityIndicator": "hover:border-t-success-foreground dark:hover:border-t-dark-success-foreground group-hover:border-t-success-foreground dark:group-hover:border-t-dark-success-foreground border-t-success dark:border-t-dark-success"
     },
     "warning": {
-      "base": "group hover:bg-warning dark:hover:bg-dark-warning p-[5px] border-2 border-warning bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-warning",
+      "base": "group1 hover:bg-warning dark:hover:bg-dark-warning p-[5px] border-2 border-warning bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-warning",
       "label": "hover:text-warning-foreground dark:hover:text-dark-warning-foreground group-hover:text-warning-foreground dark:group-hover:text-dark-warning-foreground text-warning dark:text-darkwarning",
       "icon": "hover:!text-warning-foreground dark:hover:!text-dark-warning-foreground group-hover:!text-warning-foreground dark:group-hover:!text-dark-warning-foreground !text-warning dark:!text-darkwarning",
       "ripple": "",
       "activityIndicator": "hover:border-t-warning-foreground dark:hover:border-t-dark-warning-foreground group-hover:border-t-warning-foreground dark:group-hover:border-t-dark-warning-foreground border-t-warning dark:border-t-dark-warning"
     },
     "error": {
-      "base": "group hover:bg-error dark:hover:bg-dark-error p-[5px] border-2 border-error bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-error",
+      "base": "group1 hover:bg-error dark:hover:bg-dark-error p-[5px] border-2 border-error bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-error",
       "label": "hover:text-error-foreground dark:hover:text-dark-error-foreground group-hover:text-error-foreground dark:group-hover:text-dark-error-foreground text-error dark:text-darkerror",
       "icon": "hover:!text-error-foreground dark:hover:!text-dark-error-foreground group-hover:!text-error-foreground dark:group-hover:!text-dark-error-foreground !text-error dark:!text-darkerror",
       "ripple": "",
       "activityIndicator": "hover:border-t-error-foreground dark:hover:border-t-dark-error-foreground group-hover:border-t-error-foreground dark:group-hover:border-t-dark-error-foreground border-t-error dark:border-t-dark-error"
     },
     "surface": {
-      "base": "group hover:bg-surface dark:hover:bg-dark-surface p-[5px] border-2 border-surface bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-surface",
+      "base": "group1 hover:bg-surface dark:hover:bg-dark-surface p-[5px] border-2 border-surface bg-transparent transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  focus-visible:outline-surface",
       "label": "hover:text-surface-foreground dark:hover:text-dark-surface-foreground group-hover:text-surface-foreground dark:group-hover:text-dark-surface-foreground text-surface dark:text-darksurface",
       "icon": "hover:!text-surface-foreground dark:hover:!text-dark-surface-foreground group-hover:!text-surface-foreground dark:group-hover:!text-dark-surface-foreground !text-surface dark:!text-darksurface",
       "ripple": "",

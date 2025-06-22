@@ -8,7 +8,6 @@ import { StyleSheet } from "react-native";
 import { isNonNullString, isObj } from "@resk/core/utils";
 import { variants } from "@variants/index";
 import { Tooltip } from "@components/Tooltip";
-import { classes } from "@variants/classes";
 
 
 function Icon({ iconName, className, variant, resizeMode, title, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
@@ -18,10 +17,10 @@ function Icon({ iconName, className, variant, resizeMode, title, source, contain
     const iconSize = typeof size == "number" && size > 0 ? size : FontIcon.DEFAULT_SIZE;
     if (isSource) {
         const { touchableProps, ...restProps } = pickTouchableProps(normalizeProps({ ...props, className }));
-        const disabled = props.disabled;
-        const isPressable = !disabled && !!touchableProps;
+        const disabled = !!props.disabled;
+        const isPressable = !disabled && (!!touchableProps || !!title);
         const Component = isPressable ? Tooltip : Fragment;
-        const containerP = isPressable ? Object.assign({}, touchableProps, { testID: testID + "-icon-container", className: cn("shrink-0 grow-0", containerClassName) }) : {};
+        const containerP = isPressable ? Object.assign({}, touchableProps, { title, disabled, testID: testID + "-icon-container", className: cn("shrink-0 grow-0", containerClassName) }) : {};
         const iconStyle = StyleSheet.flatten([
             iconSize ? {
                 width: iconSize,
@@ -29,7 +28,7 @@ function Icon({ iconName, className, variant, resizeMode, title, source, contain
             } : undefined,
             style,
         ]);
-        return <Component title={title} disabled={disabled} {...containerP as any}>
+        return <Component {...containerP}>
             <Image
                 accessibilityIgnoresInvertColors
                 resizeMode={resizeMode || "contain"}

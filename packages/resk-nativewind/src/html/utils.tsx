@@ -1,6 +1,6 @@
 import { defaultStr, isEmpty, isNonNullString, isObj } from "@resk/core/utils";
 import { IHtmlAccessibilityProps, IHtmlDivProps, INativeAccessibilityProps } from "./types";
-import { cn, normalizeProps } from "@utils";
+import { cn, getTextContent, normalizeProps } from "@utils";
 import { StyleSheet, Platform, PressableProps } from "react-native";
 import { normalizeGestureEvent } from "./events";
 import { MouseEvent, TouchEvent } from "react";
@@ -55,10 +55,11 @@ export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<
  * @param defaultProps The default props to normalize
  * @returns The normalized props
  */
-export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, ref, android_ripple, nativeID, onPress, onPressIn, onPressOut, style, ...props }: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
+export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, title, ref, android_ripple, nativeID, onPress, onPressIn, onPressOut, style, ...props }: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
     const disabled = !!(props as any).disabled || !!(props as any).readOnly || !!(props as any).readonly;
     const r = {
         style: style ? StyleSheet.flatten(style) : undefined as any,
+        title: title ? getTextContent(title) : undefined,
         ...convertAccessibilityPropsToDOM(normalizeProps(props, defaultProps)),
         ref: ref !== undefined && ref ? function (personalizedRef: any) {
             UIManager.normalizeRef(personalizedRef);

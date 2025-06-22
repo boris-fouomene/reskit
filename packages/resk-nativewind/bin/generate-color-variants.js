@@ -41,9 +41,8 @@ module.exports = (colors, options) => {
             }
         }),
         buttonOutline: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
-
             const groupClassName = {
-                base: `group1 hover:bg-${color} dark:hover:bg-dark-${color}`,
+                base: `group hover:bg-${color} dark:hover:bg-dark-${color}`,
                 label: `hover:text-${color}-foreground dark:hover:text-dark-${color}-foreground group-hover:text-${color}-foreground dark:group-hover:text-dark-${color}-foreground`,
                 icon: `hover:!text-${color}-foreground dark:hover:!text-dark-${color}-foreground group-hover:!text-${color}-foreground dark:group-hover:!text-dark-${color}-foreground`,
                 activityIndicator: `hover:border-t-${color}-foreground dark:hover:border-t-dark-${color}-foreground group-hover:border-t-${color}-foreground dark:group-hover:border-t-dark-${color}-foreground`,

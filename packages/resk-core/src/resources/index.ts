@@ -18,7 +18,7 @@ const resourcesClassNameMetaData = Symbol('resourceFromClassName');
  * Represents the base class for any resource.
  * 
  * The `Resource` class provides a flexible structure for defining resource instances with optional metadata such as 
- * `name`, `label`, `title`, and `tooltip`. Additionally, it manages dynamic fields associated with the resource.
+ * `name`, `label`, `title`. Additionally, it manages dynamic fields associated with the resource.
  * 
  * This class can be extended to implement specific resources, and it automatically handles merging metaData passed into
  * the constructor with the instance properties. It also retrieves and manages resource fields using the `getFields` method.
@@ -33,8 +33,7 @@ const resourcesClassNameMetaData = Symbol('resourceFromClassName');
  * const resource = new Resource({
  *    name: 'user',
  *    label: 'User',
- *    title: 'User Information',
- *    tooltip: 'Contains user-related data'
+ *    title: 'User Information'
  * });
  * 
  * console.log(resource.getLabel()); // Output: 'User'
@@ -95,30 +94,17 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   label?: string;
 
   /**
-   * A descriptive title for the resource.
-   *
-   * The title provides a more detailed or contextual label for the resource, which is often displayed
-   * in prominent places like headings or page titles. It helps users understand the purpose of the resource.
-   *
-   * @example
-   * ```typescript
-   * const orderResource: IResource = { title: "Order Management" };
-   * ```
-   */
+  * A short text that appears when the user hovers over the resource.
+  * The tooltip provides additional context or information about the resource.
+  * 
+  * Typically used in user interfaces to clarify what a particular resource represents or to give instructions.
+  *
+  * @example
+  * ```typescript
+  * const userResource: IResource = { title : "This resource manages user information." };
+  * ```
+  */
   title?: string;
-
-  /**
-   * A short text that appears when the user hovers over the resource.
-   * The tooltip provides additional context or information about the resource.
-   * 
-   * Typically used in user interfaces to clarify what a particular resource represents or to give instructions.
-   *
-   * @example
-   * ```typescript
-   * const userResource: IResource = { tooltip: "This resource manages user information." };
-   * ```
-   */
-  tooltip?: string;
 
   /**
   * A type that represents a map of field names to their corresponding IField instances.
@@ -520,7 +506,6 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    *       user: {  // The resource name
    *         label: "User",  // The label property
    *         title: "User Information",  // The title property
-   *         tooltip: "Manage user data"  // The tooltip setI18nPropertyPrefix  property
    *       }
    *     }
    *   }
@@ -534,8 +519,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * // Output:
    * // {
    * //   label: "User",
-   * //   title: "User Information",
-   * //   tooltip: "Manage user data"   
+   * //   title: "User Information",   
    * // }
    */
   getTranslations(locale?: string): IDict {
@@ -560,16 +544,13 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    *       user: {  // The resource name
    *         label: "User",  // The label property
    *         title: "User Information",  // The title property
-   *         tooltip: "Manage user data"  // The tooltip setI18nPropertyPrefix  property,
    *         create: {
    *            label: "Create User",
    *            title: "Create a new user", 
-   *            tooltip: "Click to add a new user."
    *         },
    *         read: {
    *            label: "View User",
    *            title: "View a specific user",
-   *            tooltip: "Click to view a specific user.",  
    *         },
    *       }   
    *     }
@@ -579,8 +560,8 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * const userResource = ResourcesManager.getResource("user");
    * const label = userResource.translate("label"); // "User"
    * 
-   * // Translate the "tooltip" property of the "user" resource.
-   * const tooltip = userResource.translate("tooltip"); // "Manage user data"
+   * // Translate the "title" property of the "user" resource.
+   * const title = userResource.translate("title"); // "Manage user data"
    */
   translate<T = string>(scope: Scope, options?: TranslateOptions): string | T {
     const scopeArray = isNonNullString(scope) ? scope.trim().split(".") : Array.isArray(scope) ? scope : [];
@@ -745,16 +726,6 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
     return this.translateProperty("title", defaultStr(this.getMetaData().title, this.title, this.getLabel()));
   }
 
-  /**
-   * Retrieves the tooltip of the resource.
-   * 
-   * If the tooltip is not defined, it returns a default empty string.
-   * 
-   * @returns {string} The tooltip of the resource.
-   */
-  getTooltip(): string {
-    return this.translateProperty("tooltip", defaultStr(this.getMetaData().tooltip, this.tooltip));
-  }
 
   /**
    * Retrieves the fields associated with the resource.
@@ -812,16 +783,6 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    */
   getActionTitle(actionName: IResourceActionName, params?: Record<string, any>) {
     return this.sprintf(this.getAction(actionName)?.title, params);
-  }
-  /**
-   * Retrieves the tooltip for a specified action.
-   *
-   * @param actionName - The name of the action for which to get the tooltip.
-   * @param params - Optional parameters to format the tooltip string.
-   * @returns The formatted tooltip string for the specified action.
-   */
-  getActionTooltip(actionName: IResourceActionName, params?: Record<string, any>) {
-    return this.sprintf(this.getAction(actionName)?.tooltip, params);
   }
   /**
    * Retrieves a specific action by its name.
@@ -1114,7 +1075,7 @@ export class ResourcesManager {
 /**
  * A decorator function that adds resource metadata to a class that implements `Resource`
  * 
- * This decorator stores the resource properties (`name`, `label`, `title`, `tooltip`) using Reflect metadata.
+ * This decorator stores the resource properties (`name`, `label`, `title`) using Reflect metadata.
  *
  * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
  * @param metaData - The properties to be set as metadata on the class.
@@ -1125,7 +1086,6 @@ export class ResourcesManager {
  *   name: "user",
  *   label: "User",
  *   title: "User Management",
- *   tooltip: "Manage user data"
  * })
  * class User {}
  * 

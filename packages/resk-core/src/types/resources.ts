@@ -18,28 +18,23 @@ import { IMongoQuery, IResourceQueryOptionsOrderBy } from "./filters";
  *      actions : {
  *          read: {
  *              label: "Read User",
- *              title: "Read a specific user",
- *              tooltip: "Click to read a specific user.",
+ *              title: "Click to read a specific user.",
  *          };
  *          create: {
  *              label: "Create User",
- *              title: "Create a new user", 
- *              tooltip: "Click to create a new user.",
+ *              title: "Click to create a new user.",
  *          };
  *          update: {
  *              label: "Update User",
- *              title: "Update a specific user",    
- *              tooltip: "Click to update a specific user.",
+ *              title: "Click to update a specific user.",
  *          };
  *          delete: {
  *              label: "Delete User",
- *              title: "Delete a specific user",
- *              tooltip: "Click to delete a specific user.",
+ *              title: "Click to delete a specific user.",
  *          };
  *          all: {
  *              label: "All Actions",    
- *              title: "Perform all actions on the user.",
- *              tooltip: "Click to perform all actions on the user.",
+ *              title: "Click to perform all actions on the user.",
  *          };
  *      }
  *    }
@@ -136,28 +131,23 @@ export type IResourceName = keyof ICheckIResources;
  * const defaultActions: IResourceActions = {
  *     read: {
  *         label: "Read Resource",
- *         title: "Read a specific resource",
- *         tooltip: "Click to read a specific resource.",
+ *         title: "Click to read a specific resource.",
  *     },
  *     create: {
  *         label: "Create Resource",
- *         title: "Create a new resource",
- *         tooltip: "Click to create a new resource.",
+ *         title: "Click to create a new resource.",
  *     },
  *     update: {
  *         label: "Update Resource",
- *         title: "Update a specific resource",
- *         tooltip: "Click to update a specific resource.",
+ *         title: "Click to update a specific resource.",
  *     },
  *     delete: {
  *         label: "Delete Resource",
- *         title: "Delete a specific resource",
- *         tooltip: "Click to delete a specific resource.",
+ *         title: "Click to delete a specific resource.",
  *     },
  *     all: {
  *         label: "All Actions",
- *         title: "Perform all actions on the resource",
- *         tooltip: "Click to perform all actions on the resource.",
+ *         title: "Click to perform all actions on the resource.",
  *     },
  * };
  * ```
@@ -174,8 +164,7 @@ export interface IResourceActions {
      * ```typescript
      * const readAction: IResourceAction = {
      *     label: "Read Resource",
-     *     title: "Read a specific resource",
-     *     tooltip: "Click to read a specific resource.",
+     *     title: "Click to read a specific resource.",
      * };
      * ```
      */
@@ -190,8 +179,7 @@ export interface IResourceActions {
      * ```typescript
      * const createAction: IResourceAction = {
      *     label: "Create Resource",
-     *     title: "Create a new resource",
-     *     tooltip: "Click to create a new resource.",
+     *     title: "Click to create a new resource.",
      * };
      * ```
      */
@@ -206,8 +194,7 @@ export interface IResourceActions {
      * ```typescript
      * const updateAction: IResourceAction = {
      *     label: "Update Resource",
-     *     title: "Update a specific resource",
-     *     tooltip: "Click to update a specific resource.",
+     *     title: "Click to update a specific resource.",
      * };
      * ```
      */
@@ -222,8 +209,7 @@ export interface IResourceActions {
      * ```typescript
      * const deleteAction: IResourceAction = {
      *     label: "Delete Resource",
-     *     title: "Delete a specific resource",
-     *     tooltip: "Click to delete a specific resource.",
+     *     title: "Click to delete a specific resource.",
      * };
      * ```
      */
@@ -238,8 +224,7 @@ export interface IResourceActions {
      * ```typescript
      * const allAction: IResourceAction = {
      *     label: "All Actions",
-     *     title: "Perform all actions on the resource",
-     *     tooltip: "Click to perform all actions on the resource.",
+     *     title: "Click to perform all actions on the resource.",
      * };
      * ```
      */
@@ -386,12 +371,8 @@ export interface IResourceActionTupleObject<ResourceName extends IResourceName =
  *   displayed in the user interface (UI) to help users understand what the action does. 
  *   It should be concise and descriptive.
  * 
- * - `title` (optional): A more detailed title for the action. This title can provide 
- *   additional context or information about the action and may be displayed in UI elements 
- *   such as tooltips or headers.
- * 
- * - `tooltip` (optional): A short text that appears when the user hovers over the action 
- *   in the UI. The tooltip provides extra information about the action, helping users 
+ * - `title` (optional): A short text that appears when the user hovers over the action 
+ *   in the UI. The title provides extra information about the action, helping users 
  *   understand its purpose without cluttering the interface.
  * 
  * ### Example Usage
@@ -402,15 +383,13 @@ export interface IResourceActionTupleObject<ResourceName extends IResourceName =
  * // Define a resource action for creating a new document
  * const createDocumentAction: IResourceAction = {
  *     label: "Create Document",
- *     title: "Create a new document in the system",
- *     tooltip: "Click to add a new document."
+ *     title: "Click to add a new document."
  * };
  * 
  * // Function to display action information
  * function displayActionInfo(action: IResourceAction) {
  *     console.log(`Action: ${action.label}`);
  *     console.log(`Title: ${action.title}`);
- *     console.log(`Tooltip: ${action.tooltip}`);
  * }
  * 
  * // Example of displaying action information
@@ -431,7 +410,6 @@ export interface IResourceActionTupleObject<ResourceName extends IResourceName =
 export interface IResourceAction {
     label?: string;
     title?: string;
-    tooltip?: string;
 }
 
 
@@ -458,8 +436,7 @@ export interface IResourceAction {
  * @property {IResourceDataService<DataType>} dataProvider - The data provider for the resource.
  * @property {IResourceName} [name] - The internal name of the resource used for programmatic referencing.
  * @property {string} [label] - A user-friendly label for the resource, typically used in UI elements.
- * @property {string} [title] - A descriptive title for the resource, often displayed in prominent places.
- * @property {string} [tooltip] - A short text that appears when the user hovers over the resource, providing additional context.
+ * @property {string} [title] - A short text that appears when the user hovers over the resource, providing additional context.
  * @property {Partial<IResourceActions> & Record<string, IResourceAction>} [actions] - The actions associated with the resource.
  */
 export interface IResource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey> {
@@ -489,32 +466,19 @@ export interface IResource<DataType extends IResourceData = any, PrimaryKeyType 
      */
     label?: string;
 
-    /**
-     * A descriptive title for the resource.
-     *
-     * The title provides a more detailed or contextual label for the resource, which is often displayed
-     * in prominent places like headings or page titles. It helps users understand the purpose of the resource.
-     *
-     * @example
-     * ```typescript
-     * const orderResource: IResource = { title: "Order Management" };
-     * ```
-     */
-    title?: string;
-
 
     /**
      * A short text that appears when the user hovers over the resource.
-     * The tooltip provides additional context or information about the resource.
+     * The title provides additional context or information about the resource.
      * 
      * Typically used in user interfaces to clarify what a particular resource represents or to give instructions.
      *
      * @example
      * ```typescript
-     * const userResource: IResource = { tooltip: "This resource manages user information." };
+     * const userResource: IResource = { title: "This resource manages user information." };
      * ```
      */
-    tooltip?: string;
+    title?: string;
 
     /***
      * The actions associated with the resource.
@@ -526,28 +490,23 @@ export interface IResource<DataType extends IResourceData = any, PrimaryKeyType 
      * const resourceActions = {
      *     read: {
      *         label: "Read Resource",
-     *         title: "Read a specific resource",
-     *         tooltip: "Click to read a specific resource.",
+     *         title: "Click to read a specific resource.",
      *     },
      *     create: {
      *         label: "Create Resource",
-     *         title: "Create a new resource",
-     *         tooltip: "Click to create a new resource.",
+     *         title: "Click to create a new resource.",
      *     },
      *     update: {
      *         label: "Update Resource",
-     *         title: "Update a specific resource",
-     *         tooltip: "Click to update a specific resource.",
+     *         title: "Click to update a specific resource.",
      *     },
      *     delete: {
      *         label: "Delete Resource",
-     *         title: "Delete a specific resource",
-     *         tooltip: "Click to delete a specific resource.",
+     *         title: "Click to delete a specific resource.",
      *     },
      *     all: {
      *         label: "All Actions",
-     *         title: "Perform all actions on the resource",
-     *         tooltip: "Click to perform all actions on the resource.",
+     *         title: "Click to perform all actions on the resource.",
      *     },
      * };
      * ```

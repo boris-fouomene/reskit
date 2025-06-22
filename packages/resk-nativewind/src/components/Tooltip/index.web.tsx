@@ -5,10 +5,9 @@ import { useEffect, useId, useMemo, useRef } from "react";
 import { cn, getTextContent, isValidElement, useMergeRefs } from '@utils';
 import { getMaxZindex, isDOMElement, uniqid, defaultStr } from "@resk/core/utils";
 import Platform from "@resk/core/platform";
-import { Pressable, PressableProps } from "react-native";
+import { TouchableOpacity, PressableProps } from "react-native";
 import { ITooltipProps } from './types';
 import { ITouchableProps } from '@src/types';
-import { classes } from '@variants/classes';
 
 const TIPPY_THEME = "customtippy-themename";
 
@@ -17,7 +16,7 @@ const typyStyleId = "typy-csss-style-id";
 export * from "./types";
 
 
-export function Tooltip<AsProps extends ITouchableProps = PressableProps>({ children, className, title, tooltip, as, disabled, testID, ref, id, ...rest }: ITooltipProps<AsProps>) {
+export function Tooltip<AsProps extends ITouchableProps = PressableProps>({ children, className, title, as, disabled, testID, ref, id, ...rest }: ITooltipProps<AsProps>) {
     testID = defaultStr(testID, "resk-tooltip");
     testID = defaultStr(testID, "resk-tooltip");
     const uId = useId();
@@ -28,7 +27,7 @@ export function Tooltip<AsProps extends ITouchableProps = PressableProps>({ chil
     useEffect(() => {
         initCss();
         if (disabled || !Platform.isClientSide()) return;
-        const content = String(getTextContent(tooltip) || getTextContent(title)).replaceAll("\n", "<br/>");
+        const content = String(getTextContent(title)).replaceAll("\n", "<br/>");
         if (!content) return;
         const tpI = tippy(selector as any, {
             content,
@@ -47,14 +46,14 @@ export function Tooltip<AsProps extends ITouchableProps = PressableProps>({ chil
                 instance.destroy();
             }
         }
-    }, [tooltip, title, disabled, selector]);
+    }, [title, disabled, selector]);
     const Component = useMemo(() => {
-        return as && typeof as == "function" ? as : Pressable;
+        return as || TouchableOpacity;
     }, [as])
     if (!isValidElement(children)) {
         return null;
     }
-    return <Component {...rest as any} className={cn(!disabled && classes.active2hoverState, className)} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>
+    return <Component {...rest as any} className={cn(className)} disabled={disabled} id={instanceIdRef.current} testID={testID} ref={innerRef}>
         {children}
     </Component>;
 };

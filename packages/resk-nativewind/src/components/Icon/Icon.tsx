@@ -9,67 +9,9 @@ import { isNonNullString, isObj } from "@resk/core/utils";
 import { variants } from "@variants/index";
 import { Tooltip } from "@components/Tooltip";
 import { classes } from "@variants/classes";
-/**
- * The `Icon` component is a versatile icon renderer that can display both 
- * image-based icons and font-based icons. It supports press events, tooltips, 
- * and customizable styles. The component automatically determines the type of 
- * icon to render based on the provided `source` prop.
- * It  can be used to display icons in a React Native application.
- * It intelligently decides whether to render an `Image` component or a 
- * `FontIcon` component based on the type of `source` provided.
- *
- * @param {IIconProps} props - The properties for the `Icon` component.
- * @param {string} props.iconName - The name of the font icon (used if `source` is not provided).
- * @param {function} [props.onPress] - Optional. Function to call when the icon is pressed.
- * @param {ITooltipProps} [props.containerProps] - Optional. Properties for the tooltip container.
- * @param {ReactNode} [props.title] - Optional. Tooltip text to display on hover.
- * @param {ReactNode} [props.tooltip] - Optional. Tooltip text to display.
- * @param {ImageSourcePropType} props.source - The source of the image to render. 
- *                                              If this prop is provided, the 
- *                                              component will render an `Image`.
-  @param {string} [props.testID] - An optional test ID for testing purposes.
- *@param {number} [props.size] - The size of the icon. If not provided or invalid, 
- *                                 it defaults to `DEFAULT_FONT_ICON_SIZE` : 20.
- * @param {Ref} ref - A ref to access the underlying component.
- * @returns {JSX.Element} - Returns an `Image` component if `source` is an 
- *                          image, otherwise returns a `FontIcon` component.
- * 
- * @returns {JSX.Element} The rendered icon component.
- *
- * @example
- * Here’s an example of how to use the `Icon` component:
- * 
- * ```tsx
- * import * as React from 'react';
- * import { View } from 'react-native';
- * import Icon from './Icon'; // Adjust the import path as necessary
-import isNonNullString from '../../../../resk-core/build/utils/isNonNullString';
- * 
- * const MyComponent = () => {
- *   return (
- *     <View>
- *       <Icon
- *         iconName="home"
- *         size={24}
- *         onPress={() => console.log('Icon pressed!')}
- *         title="Go to home"
- *         containerProps={{ tooltip: "Home" }}
- *       />
- *     </View>
- *   );
- * };
- * 
- * export default MyComponent;
- * ```
- * @example
- * // Rendering an image icon
- * <Icon source={require('./path/to/icon.png')} size={24}  />
- *
- * // Rendering a font icon
- * <Icon iconName="material-home" size={24} />
- */
 
-function Icon({ iconName, className, variant, resizeMode, tooltip, title, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
+
+function Icon({ iconName, className, variant, resizeMode, title, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
     const isSource = isImageSource(source);
     className = cn(isObj(variant) && variants.icon(variant), className);
     testID = testID && typeof testID == "string" ? testID : (isSource ? "resk-image" : "resk-font-icon");
@@ -79,7 +21,7 @@ function Icon({ iconName, className, variant, resizeMode, tooltip, title, source
         const disabled = props.disabled;
         const isPressable = !disabled && !!touchableProps;
         const Component = isPressable ? Tooltip : Fragment;
-        const containerP = isPressable ? Object.assign({}, touchableProps, { testID: testID + "-icon-container", as: TouchableOpacity, className: cn("shrink-0 grow-0", !disabled && classes.active2hoverState, containerClassName) }) : {};
+        const containerP = isPressable ? Object.assign({}, touchableProps, { testID: testID + "-icon-container", className: cn("shrink-0 grow-0", containerClassName) }) : {};
         const iconStyle = StyleSheet.flatten([
             iconSize ? {
                 width: iconSize,
@@ -87,7 +29,7 @@ function Icon({ iconName, className, variant, resizeMode, tooltip, title, source
             } : undefined,
             style,
         ]);
-        return <Component title={title} tooltip={tooltip} disabled={disabled} {...containerP as any}>
+        return <Component title={title} disabled={disabled} {...containerP as any}>
             <Image
                 accessibilityIgnoresInvertColors
                 resizeMode={resizeMode || "contain"}
@@ -106,7 +48,6 @@ function Icon({ iconName, className, variant, resizeMode, tooltip, title, source
         size={iconSize}
         style={style}
         title={title}
-        tooltip={tooltip}
         {...props}
         className={className}
         ref={ref}

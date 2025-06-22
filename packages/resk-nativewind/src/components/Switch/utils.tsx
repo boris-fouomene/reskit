@@ -15,9 +15,9 @@ export * from "./types";
  *
  * @param {IToggleableProps} props - The properties for the toggleable component.
  * @param {boolean} [props.disabled] - whether the toggleable component is disabled. If true, the component will be non-interactive.
- * @param {ReactNode} [props.checkedTooltip] - Tooltip content to display when the toggleable component is in a checked state.
- * @param {ReactNode} [props.uncheckedTooltip] -  Tooltip content to display when the toggleable component is in an unchecked state.
- * @param {ReactNode} [props.tooltip] - Default tooltip to display.
+ * @param {ReactNode} [props.checkedTitle] - Tooltip content to display when the toggleable component is in a checked state.
+ * @param {ReactNode} [props.uncheckedTitle] -  Tooltip content to display when the toggleable component is in an unchecked state.
+ * @param {ReactNode} [props.title] - Default tooltip to display.
  * @param {string} [props.title] - The title for the toggleable component, used in tooltips.
  * @param {boolean} [props.readOnly] - Indicates whether the toggle is read-only.
  * @param {"left" | "right"} [props.labelPosition] - The position of the label relative to the toggleable component.
@@ -44,7 +44,7 @@ export * from "./types";
  * @returns {any} defaultValue - The default value of the toggleable component
  * @returns {boolean} disabled - A boolean indicating whether the toggleable component is disabled.
  */
-export function useToggleable({ disabled, className, checkedTooltip, onValueChange, uncheckedTooltip, tooltip, title, readOnly, labelPosition, beforeToggle, onChange, label, checkedLabel, uncheckedLabel, labelClassName, containerClassName, ...rest }: IToggleableProps) {
+export function useToggleable({ disabled, className, checkedTitle, onValueChange, uncheckedTitle, title, readOnly, labelPosition, beforeToggle, onChange, label, checkedLabel, uncheckedLabel, labelClassName, containerClassName, ...rest }: IToggleableProps) {
   const { checkedValue, uncheckedValue, defaultValue } = getToggleableDefaultValues(rest);
   const eventRef = useRef(null);
   const [checked, setChecked] = useStateCallback(defaultValue === checkedValue ? true : false);
@@ -77,8 +77,8 @@ export function useToggleable({ disabled, className, checkedTooltip, onValueChan
     setValue(defaultValue);
   }, [defaultValue]);
   const isLabelOnLeftSide = labelPosition === "left";
-  checkedTooltip = getTextContent(checkedTooltip) && checkedTooltip || title;
-  uncheckedTooltip = getTextContent(uncheckedTooltip) && uncheckedTooltip || title;
+  checkedTitle = getTextContent(checkedTitle) && checkedTitle || title;
+  uncheckedTitle = getTextContent(uncheckedTitle) && uncheckedTitle || title;
   return {
     ...rest,
     className: cn(variants.all({ disabled, readOnly }), className),
@@ -86,7 +86,7 @@ export function useToggleable({ disabled, className, checkedTooltip, onValueChan
     labelClassName: cn(!disabled && "select-text mx-[7px]", className),
     checked,
     labelPosition,
-    tooltip: (checked ? checkedTooltip : uncheckedTooltip) || tooltip || title || undefined,
+    title: (checked ? checkedTitle : uncheckedTitle) || title || undefined,
     setChecked,
     toggleStatus,
     getValue,

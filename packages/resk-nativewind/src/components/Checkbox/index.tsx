@@ -10,14 +10,13 @@ import { isNonNullString } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import getTextContent from "@utils/getTextContent";
 import { pickTouchableProps } from "@utils/touchHandler";
-import { classes } from "@variants/classes";
 import checkboxVariant from "@variants/checkbox";
 
 export * from "./types";
 
 
 /**
- * A customizable Checkbox component that supports tooltip, labels, and toggle functionality.
+ * A customizable Checkbox component that supports title, labels, and toggle functionality.
  *
  * This component wraps the `TouchableOpacity` from React Native and enhances its usability by providing
  * optional tooltips and labels. It allows users to toggle between checked and unchecked states
@@ -56,7 +55,7 @@ export * from "./types";
  *       checkedValue={"checked"}
  *       uncheckedValue={"unchecked"}
  *       label="Enable Notifications"
- *       tooltip="Toggle to receive notifications"
+ *       title="Toggle to receive notifications"
  *       color="#4CAF50"
  *       disabled={false}
  *       readOnly={false}
@@ -72,7 +71,7 @@ export * from "./types";
 export function Checkbox({ testID, variant, checkedIconName, uncheckedIconName, checkedClassName, uncheckedClassName, checkedVariant, uncheckedVariant, style, ...props }: ICheckboxProps) {
     const {
         checked,
-        tooltip,
+        title,
         labelClassName,
         setChecked,
         toggleStatus,
@@ -100,11 +99,9 @@ export function Checkbox({ testID, variant, checkedIconName, uncheckedIconName, 
     const iconUnchecked = isNonNullString(uncheckedIconName) ? uncheckedIconName : FONT_ICONS.UNCHECKED;
     const checkboxTestID = typeof testID === 'string' && testID || "resk-checkbox";
     const labelContent = <Text testID={`${checkboxTestID}-label`} className={cn(labelClx, computedVariant.label(), labelClassName)} children={label} />;
-    const activeClassName = cn(!disabled && !readOnly && classes.active2hoverState);
     return <Tooltip
-        as={TouchableOpacity}
         disabled={disabled || readOnly}
-        tooltip={tooltip}
+        title={title}
         testID={`${checkboxTestID}-container`}
         accessibilityRole="checkbox"
         accessibilityState={{ disabled, checked }}
@@ -114,17 +111,16 @@ export function Checkbox({ testID, variant, checkedIconName, uncheckedIconName, 
         className={cn(containerClassName)}
     >
         {isLabelOnLeftSide ? labelContent : null}
-        <TouchableWithoutFeedback disabled={disabled} onPress={handleOnPress} className={activeClassName} testID={testID + "-checkbox-container"}>
+        <TouchableWithoutFeedback disabled={disabled} onPress={handleOnPress} testID={testID + "-checkbox-container"}>
             <FontIcon
                 {...nonTouchableProps}
                 disabled={disabled}
                 accessibilityRole="checkbox"
-                className={cn(activeClassName, "mx-[7px]", iconClx, computedVariant.icon(), checked ? checkedClassName : uncheckedClassName)}
+                className={cn("mx-[7px]", iconClx, computedVariant.icon(), checked ? checkedClassName : uncheckedClassName)}
                 variant={checked ? checkedVariant : uncheckedVariant}
                 name={(checked ? iconChecked as never : iconUnchecked as never)}
                 testID={checkboxTestID}
                 title={undefined}
-                tooltip={undefined}
             />
         </TouchableWithoutFeedback>
         {!isLabelOnLeftSide ? labelContent : null}

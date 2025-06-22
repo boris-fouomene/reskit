@@ -1,5 +1,5 @@
 "use client";
-import { TouchableOpacity, TouchableOpacityProps, Switch as RNSwitch, GestureResponderEvent } from "react-native";
+import { TouchableOpacityProps, Switch as RNSwitch, GestureResponderEvent } from "react-native";
 import { ISwitchProps } from "./types";
 import { useToggleable, getToggleableDefaultValues } from "./utils";
 import { Tooltip } from "@components/Tooltip";
@@ -22,7 +22,7 @@ export * from "./types";
  * @param {object} props - The properties for the Switch component.
  * @param {string} [props.testID] - Optional test identifier for testing purposes. Defaults to "resk-switch".
  * @param {boolean} props.checked - Indicates whether the switch is in the checked state.
- * @param {string} [props.tooltip] - Optional tooltip text displayed when the user hovers over the switch.
+ * @param {string} [props.title] - Optional tooltip text displayed when the user hovers over the switch.
  * @param {JSX.Element} [props.label] - The text label associated with the switch.
  * @param {boolean} [props.isLabelOnLeftSide] - Indicates whether the label should be on the left side of the switch.
  * @param {any} [props.checkedValue] - The value representing the checked state.
@@ -45,7 +45,7 @@ export * from "./types";
  *   return (
  *     <Switch
  *       defaultValue={true}
- *       tooltip="Toggle to receive notifications"
+ *       title="Toggle to receive notifications"
  *       label="Enable Notifications"
  *       color="#4CAF50"
  *       disabled={false}
@@ -61,7 +61,7 @@ export * from "./types";
  * import { Switch } from '@resk/nativewind';
  * <Switch 
  *     {...{
- *   tooltip: "Toggle to receive notifications",
+ *   title: "Toggle to receive notifications",
  *   label: "Enable Notifications",
  *   color: "#4CAF50",
  *   disabled: false,
@@ -75,7 +75,7 @@ export * from "./types";
 export function Switch({ testID, ...props }: ISwitchProps) {
     const {
         checked,
-        tooltip,
+        title,
         setChecked,
         toggleStatus,
         getValue,
@@ -95,7 +95,7 @@ export function Switch({ testID, ...props }: ISwitchProps) {
     const { touchableProps, ...nonTouchableProps } = pickTouchableProps(rest as any);
     const MTestID = typeof testID === 'string' && testID || "resk-switch";
     const labelContent = <Text testID={`${MTestID}-label`} children={label} className={labelClassName} />;
-    return <Tooltip<TouchableOpacityProps> as={TouchableOpacity as any} disabled={disabled || readOnly} tooltip={tooltip} testID={`${MTestID}-container`}
+    return <Tooltip<TouchableOpacityProps> disabled={disabled || readOnly} title={title} testID={`${MTestID}-container`}
         {...touchableProps as any}
         onPress={(event: GestureResponderEvent) => {
             toggleStatus();

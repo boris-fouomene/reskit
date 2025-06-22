@@ -128,13 +128,13 @@ export interface IToggleableProps extends ITooltipBaseProps {
     * when the toggleable component is in a checked state. This can be any type 
     * of React node.
      */
-    checkedTooltip?: ReactNode;
+    checkedTitle?: ReactNode;
     /**
      * The tooltip content to display 
     * when the toggleable component is in an unchecked state. This can be any 
     * type of React node.
      */
-    uncheckedTooltip?: ReactNode;
+    uncheckedTitle?: ReactNode;
 
     /**
      *  The position of the label 
@@ -221,8 +221,8 @@ export interface IToggleableProps extends ITooltipBaseProps {
  *     readOnly: false,
  *     checkedLabel: 'On',
  *     uncheckedLabel: 'Off',
- *     checkedTooltip: 'Feature is enabled',
- *     uncheckedTooltip: 'Feature is disabled',
+ *     checkedTitle: 'Feature is enabled',
+ *     uncheckedTitle: 'Feature is disabled',
  *     labelPosition: 'left',
  *     error: false,
  *     beforeToggle: (event, options) => {

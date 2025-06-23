@@ -1,151 +1,158 @@
 {
-    "name": "@resk/core",
-    "version": "1.20.0",
-    "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
-    "main": "./build/index",
-    "types": "./build/index.d.ts",
-    "typesVersions": {
-        "*": {
-            ".": [
-                "./build/index.d.ts"
-            ],
-            "auth": [
-                "./build/auth/index.d.ts"
-            ],
-            "countries": [
-                "./build/countries/index.d.ts"
-            ],
-            "currency": [
-                "./build/currency/index.d.ts"
-            ],
-            "decorators": [
-                "./build/decorators/index.d.ts"
-            ],
-            "i18n": [
-                "./build/i18n/index.d.ts"
-            ],
-            "inputFormatter": [
-                "./build/inputFormatter/index.d.ts"
-            ],
-            "logger": [
-                "./build/logger/index.d.ts"
-            ],
-            "observable": [
-                "./build/observable/index.d.ts"
-            ],
-            "platform": [
-                "./build/platform/index.d.ts"
-            ],
-            "resources": [
-                "./build/resources/index.d.ts"
-            ],
-            "session": [
-                "./build/session/index.d.ts"
-            ],
-            "utils": [
-                "./build/utils/index.d.ts"
-            ],
-            "types": [
-                "./build/types/index.d.ts"
-            ],
-            "validator": [
-                "./build/validator/index.d.ts"
-            ],
-            "filters": [
-                "./build/filters/index.d.ts"
-            ]
-        }
-    },
-    "files": [
-        "build",
-        "readme.md",
-        "package.json",
-        "auth.js",
-        "countries.js",
-        "currency.js",
-        "decorators.js",
-        "fields.js",
-        "i18n.js",
-        "index.js",
-        "inputFormatter.js",
-        "logger.js",
-        "observable.js",
-        "platform.js",
-        "resources.js",
-        "session.js",
-        "translations.js",
-        "types.js",
-        "utils.js",
-        "validator.js"
-    ],
-    "scripts": {
-        "clear-npx-cache": "npx clear-npx-cache",
-        "pretest": "npm run build-test",
-        "build": "tsup --config tsup.config.build.ts",
-        "build-dts": "tsc -p tsconfig.dts.json && npx tsc-alias -p tsconfig.dts.json",
-        "build-test": "tsup --config tsup.config.test.ts",
-        "dev": "tsup --config tsup.config.build.ts --watch",
-        "test": "npx jest",
-        "start": "node build/test/index",
-        "prepublish": "npm run build",
-        "build-doc": "npx typedoc",
-        "check": "npm pack --dry-run",
-        "types:publish": "npm publish ./types --access public"
-    },
-    "devDependencies": {
-        "@types/crypto-js": "^4.2.2",
-        "@types/dotenv": "^6.1.1",
-        "@types/google-libphonenumber": "^7.4.30",
-        "@types/node": "^22.10.7",
-        "@types/qs": "^6.9.18",
-        "fast-glob": "^3.3.3",
-        "lerna": "^8.1.9",
-        "tsc-alias": "^1.8.16",
-        "tsup": "^8.5.0",
-        "typescript": "^5.8.2"
-    },
-    "dependencies": {
-        "@types/color": "^4.2.0",
-        "crypto-js": "^4.2.0",
-        "google-libphonenumber": "^3.2.40",
-        "i18n-js": "^4.5.1",
-        "moment": "^2.30.1",
-        "qs": "^6.14.0",
-        "reflect-metadata": "^0.2.2",
-        "stable-hash": "^0.0.5"
-    },
-    "peerDependenciesMeta": {},
-    "publishConfig": {
-        "access": "public"
-    },
-    "keywords": [
-        "TypeScript",
-        "Decorators",
-        "Modular",
-        "Architecture",
-        "Extensible",
-        "Framework",
-        "Custom",
-        "Field",
-        "Types",
-        "Type",
-        "Safety",
-        "API",
-        "Development",
-        "Code",
-        "Organization",
-        "Application",
-        "Scalability",
-        "Dynamic",
-        "Ecosystem",
-        "Clean",
-        "Code",
-        "Object-Oriented",
-        "Programming",
-        "Developer-Friendly",
-        "Open",
-        "Source"
-    ],
-    "author": "Boris Fouomene",
-    "npmClient": "npm"
+  "name": "@resk/core",
+  "version": "1.20.0",
+  "description": "An innovative TypeScript framework that empowers developers to build applications with a fully decorator-based architecture for efficient resource management. By combining the power of decorators with a resource-oriented design, DecorRes enhances code clarity, modularity, and maintainability.",
+  "main": "./build/index",
+  "types": "./build/index.d.ts",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./build/index.d.ts"
+      ],
+      "auth": [
+        "./build/auth/index.d.ts"
+      ],
+      "countries": [
+        "./build/countries/index.d.ts"
+      ],
+      "currency": [
+        "./build/currency/index.d.ts"
+      ],
+      "decorators": [
+        "./build/decorators/index.d.ts"
+      ],
+      "i18n": [
+        "./build/i18n/index.d.ts"
+      ],
+      "inputFormatter": [
+        "./build/inputFormatter/index.d.ts"
+      ],
+      "logger": [
+        "./build/logger/index.d.ts"
+      ],
+      "observable": [
+        "./build/observable/index.d.ts"
+      ],
+      "platform": [
+        "./build/platform/index.d.ts"
+      ],
+      "resources": [
+        "./build/resources/index.d.ts"
+      ],
+      "session": [
+        "./build/session/index.d.ts"
+      ],
+      "utils": [
+        "./build/utils/index.d.ts"
+      ],
+      "types": [
+        "./build/types/index.d.ts"
+      ],
+      "validator": [
+        "./build/validator/index.d.ts"
+      ],
+      "filters": [
+        "./build/filters/index.d.ts"
+      ],
+      "fields": [
+        "./build/fields/index.d.ts"
+      ],
+      "http-client": [
+        "./build/http-client/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "build",
+    "readme.md",
+    "package.json",
+    "auth.js",
+    "countries.js",
+    "currency.js",
+    "decorators.js",
+    "fields.js",
+    "http-client.js",
+    "i18n.js",
+    "index.js",
+    "inputFormatter.js",
+    "logger.js",
+    "observable.js",
+    "platform.js",
+    "resources.js",
+    "session.js",
+    "translations.js",
+    "types.js",
+    "utils.js",
+    "validator.js"
+  ],
+  "scripts": {
+    "clear-npx-cache": "npx clear-npx-cache",
+    "pretest": "npm run build-test",
+    "build": "tsup --config tsup.config.build.ts",
+    "build-dts": "tsc -p tsconfig.dts.json && npx tsc-alias -p tsconfig.dts.json",
+    "build-test": "tsup --config tsup.config.test.ts",
+    "dev": "tsup --config tsup.config.build.ts --watch",
+    "test": "npx jest",
+    "start": "node build/test/index",
+    "prepublish": "npm run build",
+    "build-doc": "npx typedoc",
+    "check": "npm pack --dry-run",
+    "types:publish": "npm publish ./types --access public"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/dotenv": "^6.1.1",
+    "@types/google-libphonenumber": "^7.4.30",
+    "@types/node": "^22.10.7",
+    "@types/qs": "^6.9.18",
+    "fast-glob": "^3.3.3",
+    "lerna": "^8.1.9",
+    "tsc-alias": "^1.8.16",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@types/color": "^4.2.0",
+    "crypto-js": "^4.2.0",
+    "google-libphonenumber": "^3.2.40",
+    "i18n-js": "^4.5.1",
+    "moment": "^2.30.1",
+    "qs": "^6.14.0",
+    "reflect-metadata": "^0.2.2",
+    "stable-hash": "^0.0.5"
+  },
+  "peerDependenciesMeta": {},
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "TypeScript",
+    "Decorators",
+    "Modular",
+    "Architecture",
+    "Extensible",
+    "Framework",
+    "Custom",
+    "Field",
+    "Types",
+    "Type",
+    "Safety",
+    "API",
+    "Development",
+    "Code",
+    "Organization",
+    "Application",
+    "Scalability",
+    "Dynamic",
+    "Ecosystem",
+    "Clean",
+    "Code",
+    "Object-Oriented",
+    "Programming",
+    "Developer-Friendly",
+    "Open",
+    "Source"
+  ],
+  "author": "Boris Fouomene",
+  "npmClient": "npm"
 }

@@ -1,7 +1,7 @@
 "use client";
 import { cn, isValidElement, useBreakpoints, useHydrationStatus, useMergeRefs } from "@utils";
 import { Text } from "@html/Text";
-import { NativeSyntheticEvent, TextInput as RNTextInput, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, TextInputProps } from 'react-native';
+import { NativeSyntheticEvent, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, TextInputProps } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { InputFormatter, isNumber, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, IInputFormatterResult } from "@resk/core";
 import FontIcon from "@components/Icon/Font";
@@ -180,7 +180,7 @@ export function TextInput({
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
     const labelClx = cn(computedVariant.label(), labelClassName);
-    const inputClx = cn(multiline && "py-[5px]", "flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", computedVariant.input(), className);
+    const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", computedVariant.input(), className);
     const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
     const rightContainerClx = cn(computedVariant.rightContainer(), rightContainerClassName);
@@ -247,6 +247,11 @@ export function TextInput({
     const Wrapper = canWrapWithTouchable ? TouchableOpacity : Div;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, className: cn("grouw cursor-pointer px-[5px]") };
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
+    const inputStyle = StyleSheet.flatten([
+        minHeight > 0 && { minHeight },
+        multiline && { height: inputHeight },
+        props.style,
+    ])
     const inputProps: ITextInputRenderOptions = {
         autoComplete: "off",
         ...(!canWrapWithTouchable && editable ? pressableProps : {}),
@@ -275,11 +280,7 @@ export function TextInput({
         readOnly: editable === false,
         editable,
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
-        style: [
-            Object.assign({}, Platform.isWeb() ? { outline: "none" } : {}) as ITextStyle,
-            minHeight > 0 && { minHeight },
-            multiline && { height: inputHeight },
-        ],
+        style: inputStyle,
         value: String(inputValue),
         inputMode: inputMode as any,
         autoCorrect: !maskArray?.length && props?.autoCorrect,
@@ -351,7 +352,7 @@ export function TextInput({
                 {leftContent}
                 {isLabelEmbededVariant ? labelContent : null}
             </Div>
-            {isHydrated ? inputElement : <ActivityIndicator size={"small"} />}
+            {isHydrated ? inputElement : <Div className={cn(inputClx)} style={inputStyle} />}
             {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
                 {rightContent}
             </Div>) : null}

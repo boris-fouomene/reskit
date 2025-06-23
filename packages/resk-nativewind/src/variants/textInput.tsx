@@ -29,6 +29,15 @@ const textInput = tv({
         ...VariantsFactory.createMarginsVariants<ITextInputSlots>((value, colorName) => {
             return { container: value }
         }),
+        iconSize: VariantsFactory.createIconSizes<ITextInputSlots>((value, colorName) => {
+            return { icon: value }
+        }),
+        labelTextSize: VariantsFactory.createTextSizes<ITextInputSlots>((value, colorName) => {
+            return { label: value }
+        }),
+        inputTextSize: VariantsFactory.createTextSizes<ITextInputSlots>((value, colorName) => {
+            return { input: value }
+        }),
         focus: {
             true: {
                 input: "text-primary",

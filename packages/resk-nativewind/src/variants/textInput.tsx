@@ -29,7 +29,13 @@ const textInput = tv({
         ...VariantsFactory.createMarginsVariants<ITextInputSlots>((value, colorName) => {
             return { container: value }
         }),
+        routed: VariantsFactory.createRoundedVariants<ITextInputSlots>((value, colorName) => {
+            return { contentContainer: value }
+        }),
         iconSize: VariantsFactory.createIconSizes<ITextInputSlots>((value, colorName) => {
+            return { icon: value }
+        }),
+        iconColor: VariantsFactory.create<typeof VariantsGeneratedColors.icon, ITextInputSlots>(VariantsGeneratedColors.icon, (value, colorName) => {
             return { icon: value }
         }),
         labelTextSize: VariantsFactory.createTextSizes<ITextInputSlots>((value, colorName) => {
@@ -63,7 +69,8 @@ const textInput = tv({
     },
     defaultVariants: {
         background: "surface",
-        paddingX: "5px"
+        paddingX: "5px",
+        iconSize: "25px"
     },
 });
 

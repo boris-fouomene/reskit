@@ -2,7 +2,7 @@ import { roundeClasses } from "./rounded";
 import { marginClasses, padding2marginClasses, paddingClasses } from "./padding2margin";
 import { borderClasses } from "./border";
 import { ShadowColorsClasses } from "./shadow";
-import { textSizes } from "./textSizes";
+import { IconSizes, textSizes } from "./textSizes";
 import { allScaleVariants } from "./scales";
 import { fontWeightClasses } from "./fontWeight";
 
@@ -94,10 +94,7 @@ export const VariantsFactory = {
     return VariantsFactory.create<typeof textSizes, ResultType>(textSizes, variantMutator);
   },
   createIconSizes: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textSizes, ResultType>) {
-    return VariantsFactory.create<typeof textSizes, ResultType>(textSizes, (value, colorName) => {
-      value = value.startsWith("!") ? value : "!" + value;
-      return typeof variantMutator == "function" ? variantMutator(value, colorName) : (value as ResultType);
-    });
+    return VariantsFactory.create<typeof IconSizes, ResultType>(IconSizes, variantMutator);
   },
   createRoundedVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
     return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);

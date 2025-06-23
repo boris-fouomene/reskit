@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "../../packages/resk-nativewind/build/**/*.js",
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  presets: [require('nativewind/preset')],
+  content: ["../../packages/resk-nativewind/build/**/*.js", "./src/**/*.{js,ts,jsx,tsx,mdx}"],
+  presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
@@ -15,40 +12,40 @@ module.exports = {
           DEFAULT: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#595959"
+          DEFAULT: "#595959",
         },
         "secondary-foreground": {
           DEFAULT: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#4CAF50"
+          DEFAULT: "#4CAF50",
         },
         "accent-foreground": {
           DEFAULT: "#FFFFFF",
         },
         neutral: {
-          DEFAULT: "#625B71"
+          DEFAULT: "#625B71",
         },
         "neutral-foreground": {
           DEFAULT: "#FFFFFF",
         },
         info: {
-          DEFAULT: "#2196F3"
+          DEFAULT: "#2196F3",
         },
         "info-foreground": {
-          DEFAULT: "#FFFFFF"
+          DEFAULT: "#FFFFFF",
         },
         success: {
-          DEFAULT: "#4CAF50"
+          DEFAULT: "#4CAF50",
         },
         "success-foreground": {
-          DEFAULT: "#FFFFFF"
+          DEFAULT: "#FFFFFF",
         },
         warning: {
           DEFAULT: "#FF9800",
         },
         "warning-foreground": {
-          DEFAULT: "#000000"
+          DEFAULT: "#000000",
         },
         error: {
           DEFAULT: "#B3261E",
@@ -57,7 +54,7 @@ module.exports = {
           DEFAULT: "#FFFFFF",
         },
         surface: {
-          DEFAULT: "#E7E0EC"
+          DEFAULT: "#E7E0EC",
         },
         "surface-foreground": {
           DEFAULT: "#1C1B1F",
@@ -66,49 +63,49 @@ module.exports = {
           DEFAULT: "#79747E",
         },
         "dark-outline": {
-          DEFAULT: '#938F99'
+          DEFAULT: "#938F99",
         },
         "dark-primary": {
-          DEFAULT: "#6750A4"
+          DEFAULT: "#6750A4",
         },
         "dark-primary-foreground": {
           DEFAULT: "#FFFFFF",
         },
         "dark-secondary": {
-          DEFAULT: "#625B71"
+          DEFAULT: "#625B71",
         },
         "dark-secondary-foreground": {
           DEFAULT: "#FFFFFF",
         },
         "dark-accent": {
-          DEFAULT: "#4CAF50"
+          DEFAULT: "#4CAF50",
         },
         "dark-accent-foreground": {
           DEFAULT: "#FFFFFF",
         },
         "dark-neutral": {
-          DEFAULT: "#625B71"
+          DEFAULT: "#625B71",
         },
         "dark-neutral-foreground": {
           DEFAULT: "#FFFFFF",
         },
         "dark-info": {
-          DEFAULT: "#2196F3"
+          DEFAULT: "#2196F3",
         },
         "dark-info-foreground": {
-          DEFAULT: "#FFFFFF"
+          DEFAULT: "#FFFFFF",
         },
         "dark-success": {
-          DEFAULT: "#4CAF50"
+          DEFAULT: "#4CAF50",
         },
         "dark-success-foreground": {
-          DEFAULT: "#FFFFFF"
+          DEFAULT: "#FFFFFF",
         },
         "dark-warning": {
           DEFAULT: "#FF9800",
         },
         "dark-warning-foreground": {
-          DEFAULT: "#000000"
+          DEFAULT: "#000000",
         },
         "dark-error": {
           DEFAULT: "#B3261E",
@@ -117,17 +114,17 @@ module.exports = {
           DEFAULT: "#FFFFFF",
         },
         "dark-surface": {
-          DEFAULT: "#E7E0EC"
+          DEFAULT: "#E7E0EC",
         },
         "dark-surface-foreground": {
           DEFAULT: "#1C1B1F",
         },
-        "backdrop": {
-          DEFAULT: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black backdrop
+        backdrop: {
+          DEFAULT: "rgba(0, 0, 0, 0.4)", // Semi-transparent black backdrop
         },
         "dark-backdrop": {
-          DEFAULT: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black backdrop
-        }
+          DEFAULT: "rgba(0, 0, 0, 0.4)", // Semi-transparent black backdrop
+        },
       },
       spacing11: {
         // w-100 = 400dp, w-96 = 384dp, etc.
@@ -142,4 +139,4 @@ module.exports = {
     },
   },
   plugins: [require("@resk/nativewind/theme-to-css-vars")],
-}
+};

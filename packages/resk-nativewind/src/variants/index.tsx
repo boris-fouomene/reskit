@@ -14,9 +14,16 @@ import menu from "./menu";
 import checkbox from "./checkbox";
 import progressBar from "./progressBar";
 import textInput from "./textInput";
+import { tv } from "tailwind-variants";
+import { VariantsGeneratedColors } from "./generated-variants-colors";
 export const variants = {
     all,
     textInput,
+    iconColor: tv({
+        variants: {
+            iconColor: VariantsGeneratedColors.textWithForegroundWithImportant
+        }
+    }),
     menu,
     icon,
     heading,

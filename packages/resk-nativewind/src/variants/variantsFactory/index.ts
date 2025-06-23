@@ -4,6 +4,7 @@ import { borderClasses } from "./border";
 import { ShadowColorsClasses } from "./shadow";
 import { textSizes } from "./textSizes";
 import { allScaleVariants } from "./scales";
+import { fontWeightClasses } from "./fontWeight";
 
 type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], variantName: keyof InputType) => ResultType;
 
@@ -121,6 +122,9 @@ export const VariantsFactory = {
       r[key] = VariantsFactory.create<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>(value, variantMutator);
     });
     return r;
+  },
+  createFontWeightVariants: function createFontWeightVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof fontWeightClasses, ResultType>) {
+    return VariantsFactory.create<typeof fontWeightClasses, ResultType>(fontWeightClasses, variantMutator);
   },
   createBorderVariants: function createBorderVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses, ResultType>) {
     return VariantsFactory.create<typeof borderClasses, ResultType>(borderClasses, variantMutator);

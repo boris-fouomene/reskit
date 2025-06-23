@@ -38,6 +38,12 @@ const textInput = tv({
         inputTextSize: VariantsFactory.createTextSizes<ITextInputSlots>((value, colorName) => {
             return { input: value }
         }),
+        labelWeight: VariantsFactory.createFontWeightVariants<ITextInputSlots>((value, colorName) => {
+            return { label: value }
+        }),
+        inputWeight: VariantsFactory.createFontWeightVariants<ITextInputSlots>((value, colorName) => {
+            return { input: value, labelEmbeded: value }
+        }),
         focus: {
             true: {
                 input: "text-primary",

@@ -1,5 +1,5 @@
 import { IClassName, IOnChangeOptions } from "../../types";
-import { InputModeOptions, NativeSyntheticEvent, TextInputProps, TextInput, TextInputChangeEvent } from "react-native";
+import { InputModeOptions, NativeSyntheticEvent, TextInputProps, TextInput, TextInputChangeEventData } from "react-native";
 import React, { ReactNode } from "react";
 import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult } from "@resk/core/types";
 import { IFieldBase } from "@resk/core/types";
@@ -82,7 +82,7 @@ export interface ITextInputCallbackOptions extends IInputFormatterResult {
  * @interface ITextInputOnChangeEvent
  * Represents the event type for text input changes in React Native.
  * 
- * This type is a NativeSyntheticEvent<TextInputChangeEvent>,
+ * This type is a NativeSyntheticEvent<TextInputChangeEventData>,
  * allowing for both the native event object and the absence of an event.
  * 
  * @example
@@ -93,9 +93,9 @@ export interface ITextInputCallbackOptions extends IInputFormatterResult {
  *   }
  * };
  * 
- * @typedef {NativeSyntheticEvent<TextInputChangeEvent>} ITextInputOnChangeEvent
+ * @typedef {NativeSyntheticEvent<TextInputChangeEventData>} ITextInputOnChangeEvent
  */
-export interface ITextInputOnChangeEvent extends NativeSyntheticEvent<TextInputChangeEvent> { };
+export interface ITextInputOnChangeEvent extends NativeSyntheticEvent<TextInputChangeEventData> { };
 
 /**
  * @interface ITextInputOnChangeOptions

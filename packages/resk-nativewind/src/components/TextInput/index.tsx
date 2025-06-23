@@ -1,5 +1,5 @@
 "use client";
-import { cn, isValidElement, useBreakpoints, useMergeRefs } from "@utils";
+import { cn, isValidElement, useBreakpoints, useHydrationStatus, useMergeRefs } from "@utils";
 import { Text } from "@html/Text";
 import { NativeSyntheticEvent, TextInput as RNTextInput, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, TextInputProps } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -50,6 +50,7 @@ export function TextInput({
     onPressOut,
     ...props
 }: ITextInputProps) {
+    const isHydrated = useHydrationStatus();
     const isLabelEmbededVariant = false;
     const [isFocused, setIsFocused] = useState(false);
     const { isPhone, isDateOrTime, typeString } = useMemo(() => {
@@ -350,7 +351,7 @@ export function TextInput({
                 {leftContent}
                 {isLabelEmbededVariant ? labelContent : null}
             </Div>
-            {inputElement}
+            {isHydrated ? inputElement : <ActivityIndicator size={"small"} />}
             {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
                 {rightContent}
             </Div>) : null}

@@ -1,18 +1,16 @@
 "use client";
-import { cn, isValidElement, useBreakpoints, useHydrationStatus, useMergeRefs } from "@utils";
+import { cn, isValidElement, useHydrationStatus, useMergeRefs } from "@utils";
 import { Text } from "@html/Text";
-import { NativeSyntheticEvent, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, TextInputProps } from 'react-native';
+import { NativeSyntheticEvent, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from "react";
-import { InputFormatter, isNumber, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, IInputFormatterResult } from "@resk/core";
+import { InputFormatter, isNumber, ICountryCode, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, IInputFormatterResult } from "@resk/core";
 import FontIcon from "@components/Icon/Font";
 import { ITextInputCallbackOptions, ITextInputProps, ITextInputRenderOptions, ITextInputType } from "./types";
-import { ITextStyle } from "@src/types";
 import p from "@platform";
 import { TouchableOpacity } from "react-native";
 import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
 import textInputVariant from "@variants/textInput";
 import allVariants from "@variants/all";
-import { ActivityIndicator } from "@components/ActivityIndicator";
 import { extractTextClasses } from "@utils/textClasses";
 import { Div } from "@html/Div";
 
@@ -48,10 +46,11 @@ export function TextInput({
     onPress,
     onPressIn,
     onPressOut,
+    labelEmbeded,
     ...props
 }: ITextInputProps) {
     const isHydrated = useHydrationStatus();
-    const isLabelEmbededVariant = false;
+    const isLabelEmbeded = !!labelEmbeded;
     const [isFocused, setIsFocused] = useState(false);
     const { isPhone, isDateOrTime, typeString } = useMemo(() => {
         const t = String(type).toLowerCase();
@@ -179,7 +178,7 @@ export function TextInput({
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
-    const labelClx = cn(computedVariant.label(), labelClassName);
+    const labelClx = cn(isLabelEmbeded ? computedVariant.labelEmbeded() : computedVariant.label(), labelClassName);
     const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", computedVariant.input(), className);
     const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
@@ -189,8 +188,8 @@ export function TextInput({
     const containerClx = cn(computedVariant.container(), containerClassName);
     const callOptions: ITextInputCallbackOptions = { ...inputState, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
     const minHeight = useMemo(() => {
-        return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbededVariant ? 30 : 46;
-    }, [customMinHeight, isLabelEmbededVariant]);
+        return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbeded ? 30 : 46;
+    }, [customMinHeight, isLabelEmbeded]);
     const maxHeight = useMemo(() => {
         return typeof customMaxHeight === "number" ? customMaxHeight : undefined;
     }, [customMaxHeight]);
@@ -239,7 +238,7 @@ export function TextInput({
             return <Text className={cn(inputTextClx)}>{dialCode.trim() + " "}</Text>
         }, [phoneDialCode, isPhone, inputValue, inputTextClx]); */
 
-    const labelSuffix = (suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? ` [${inputMaskPlaceholder}]` : "") + (isLabelEmbededVariant ? ` : ` : "");
+    const labelSuffix = (suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbeded && inputMaskPlaceholder ? ` [${inputMaskPlaceholder}]` : "") + (isLabelEmbeded ? ` : ` : "");
     label = typeof label === "string" ? `${label}${labelSuffix}` : isValidElement(label) ? <>{label}<Text className={extractTextClasses(labelClx)}>{labelSuffix}</Text></> : null;
     label = <Text testID={testID + "-label"} className={cn(labelClx)}>{label}</Text>;
     const labelContent = !canRenderLabel ? null : editable ? <Div testID={testID + "-input-pressable-container"} onPress={focus}>{label}</Div> : label;
@@ -346,11 +345,11 @@ export function TextInput({
             {editable || disabled !== false && isPasswordField ? secureIcon : null}
         </> : null
     return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, "input-container")} testID={testID + "-container"}>
-        {isLabelEmbededVariant ? null : labelContent}
+        {isLabelEmbeded ? null : labelContent}
         <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn("input-content-container w-full flex flex-row relative justify-center self-start items-center", contentContainerClx)}>
             <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
                 {leftContent}
-                {isLabelEmbededVariant ? labelContent : null}
+                {isLabelEmbeded ? labelContent : null}
             </Div>
             {isHydrated ? inputElement : <Div className={cn(inputClx)} style={inputStyle} />}
             {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>

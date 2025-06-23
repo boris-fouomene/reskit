@@ -9,6 +9,7 @@ const textInput = tv({
         leftContainer: "",
         rightContainer: "",
         contentContainer: "",
+        labelEmbeded: "",
         icon: "",
         label: ""
     },
@@ -17,7 +18,7 @@ const textInput = tv({
             const textColor = VariantsGeneratedColors.textForeground[colorName];
             return {
                 contentContainer: value,
-                //label: textColor,
+                labelEmbeded: textColor,
                 input: textColor,
                 icon: VariantsGeneratedColors.iconForeground[colorName],
             }
@@ -26,6 +27,7 @@ const textInput = tv({
             true: {
                 input: "text-primary",
                 label: "text-primary",
+                labelEmbeded: "text-primary",
                 icon: "!text-primary",
             }
         },
@@ -34,6 +36,7 @@ const textInput = tv({
                 input: "text-error",
                 label: "text-error",
                 icon: "!text-error",
+                labelEmbeded: "text-primary",
             }
         }
     },
@@ -58,6 +61,7 @@ type ITextInputSlots = {
     contentContainer?: string;
     icon?: string;
     label?: string;
+    labelEmbeded?: string;
 }
 
 export default textInput;

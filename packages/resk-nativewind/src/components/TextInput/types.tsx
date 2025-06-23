@@ -268,6 +268,11 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
     mask?: IInputFormatterMask;
 
     /***
+        If true, the label will be embeded in the input field
+    */
+    labelEmbeded?: boolean;
+
+    /***
         Suffix the label with the mask placeholder, when mask is provided and the variant is not labelEmbeded
     */
     suffixLabelWithMaskPlaceholder?: boolean;

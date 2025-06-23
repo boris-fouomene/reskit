@@ -47,6 +47,8 @@ export function TextInput({
     onPressIn,
     onPressOut,
     labelEmbeded,
+    passwordHiddenIconName,
+    passwordVisibleIconName,
     ...props
 }: ITextInputProps) {
     const isHydrated = useHydrationStatus();
@@ -62,11 +64,6 @@ export function TextInput({
     }, [type]);
     const innerRef = useRef<RNTextInput | null>(null);
     const inputRef = useMergeRefs(ref, innerRef);
-    const focus = () => {
-        if (innerRef?.current && typeof innerRef.current.focus === "function") {
-            innerRef.current.focus();
-        }
-    };
     testID = defaultStr(testID, "resk-text-input");
     const isPasswordField = useMemo<boolean>(() => String(type).toLowerCase() === "password", [type]);
     const [isSecure, setIsSecure] = useState(typeof secureTextEntry === "boolean" ? secureTextEntry : true);
@@ -176,6 +173,12 @@ export function TextInput({
     const computedVariant = textInputVariant(Object.assign({}, variant, { focus: isFocused, error }));
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
+    const focus = () => {
+        if (!editable) return;
+        if (innerRef?.current && typeof innerRef.current.focus === "function") {
+            innerRef.current.focus();
+        }
+    };
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
     const labelClx = cn(isLabelEmbeded ? computedVariant.labelEmbeded() : computedVariant.label(), labelClassName);
@@ -186,7 +189,7 @@ export function TextInput({
     const contentContainerClx = cn(computedVariant.contentContainer(), contentContainerClassName);
     const iconClx = cn(computedVariant.icon(), iconClassName);
     const containerClx = cn(computedVariant.container(), containerClassName);
-    const callOptions: ITextInputCallbackOptions = { ...inputState, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
+    const callOptions: ITextInputCallbackOptions = { ...inputState, labelClassName: labelClx, iconClassName: iconClx, inputClassName: inputClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
     const minHeight = useMemo(() => {
         return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbeded ? 30 : 46;
     }, [customMinHeight, isLabelEmbeded]);
@@ -226,7 +229,7 @@ export function TextInput({
     const disabledClx = cn(allVariants({ disabled }));
     const readOnlyClx = cn(allVariants({ readOnly }));
     const secureIcon = isPasswordField && editable ? <FontIcon
-        name={(isSecure ? "eye" : "eye-off") as never}
+        name={(isSecure ? defaultStr(passwordHiddenIconName, "eye") : defaultStr(passwordVisibleIconName, "eye-off")) as never}
         onPress={() => { setIsSecure(!isSecure); focus(); }} className={iconClx}
     /> : null;
     /*     const phoneDialCodeLabel = useMemo(() => {
@@ -260,9 +263,7 @@ export function TextInput({
         underlineColorAndroid: "transparent",
         ...props,
         defaultValue: undefined,
-        computedVariant,
         ref: inputRef,
-        focus,
         onContentSizeChange: (event: any) => {
             if (typeof onContentSizeChange == "function") {
                 onContentSizeChange(event);
@@ -272,8 +273,6 @@ export function TextInput({
             const height = calcHeight(contentSize.height, maxHeight);
             inputDimensionsRef.current = { width, height };
         },
-        error,
-        isFocused,
         placeholder: hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
         testID: testID,
         readOnly: editable === false,
@@ -332,7 +331,7 @@ export function TextInput({
             }
         },
     };
-    const inputElement = typeof render == "function" ? render(inputProps as any) : <RNTextInput {...inputProps as any} ref={inputRef} />;
+    const inputElement = typeof render == "function" ? render(inputProps, callOptions) : <RNTextInput {...inputProps as any} ref={inputRef} />;
     const Avoiding = useMemo(() => {
         return withKeyboardAvoidingView ? KeyboardAvoidingView : Div;
     }, [withKeyboardAvoidingView]);
@@ -342,7 +341,7 @@ export function TextInput({
         rightContent = (right || canToggleSecure || affixContent) ? <>
             {affixContent}
             {right}
-            {editable || disabled !== false && isPasswordField ? secureIcon : null}
+            {secureIcon}
         </> : null
     return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, "input-container")} testID={testID + "-container"}>
         {isLabelEmbeded ? null : labelContent}

@@ -23,6 +23,9 @@ const textInput = tv({
                 icon: VariantsGeneratedColors.iconForeground[colorName],
             }
         }),
+        ...VariantsFactory.createPadding2MarginVariants<ITextInputSlots>((value, colorName) => {
+            return { contentContainer: value, label: value }
+        }),
         focus: {
             true: {
                 input: "text-primary",
@@ -41,14 +44,9 @@ const textInput = tv({
         }
     },
     defaultVariants: {
-        background: "surface"
+        background: "surface",
+        paddingX: "5px"
     },
-    compoundVariants: [
-        {
-            error: true,
-
-        }
-    ]
 });
 
 export type IVariantPropsTextInput = VariantProps<typeof textInput>;

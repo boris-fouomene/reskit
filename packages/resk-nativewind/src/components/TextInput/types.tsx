@@ -1,11 +1,12 @@
 import { IClassName, IOnChangeOptions } from "../../types";
-import { InputModeOptions, NativeSyntheticEvent, TextInputChangeEventData, TextInputProps, TextInput } from "react-native";
+import { InputModeOptions, NativeSyntheticEvent, TextInputProps, TextInput, TextInputChangeEvent } from "react-native";
 import React, { ReactNode } from "react";
 import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult } from "@resk/core/types";
 import { IFieldBase } from "@resk/core/types";
 import { ICountryCode } from "@resk/core/countries";
 import { IVariantPropsTextInput } from "@variants/textInput";
 import textInputVariant from "@variants/textInput";
+import { IFontIconName } from "@components/Icon";
 /**
  * @interface ITextInputType
  * @description
@@ -58,6 +59,22 @@ export interface ITextInputCallbackOptions extends IInputFormatterResult {
     disabled: boolean;
     error: boolean;
     computedVariant: ITextInputComputedVariant;
+    labelEmbeded: boolean;
+    /*** The function to be called when the input field is focused. */
+    focus: () => void;
+    /***
+        The class name of the label.
+    */
+    labelClassName: string;
+    /***
+        The class name of the icon.
+    */
+    inputClassName: string;
+
+    /***
+        The class name of the icon.
+    */
+    iconClassName: string;
 };
 
 
@@ -65,7 +82,7 @@ export interface ITextInputCallbackOptions extends IInputFormatterResult {
  * @interface ITextInputOnChangeEvent
  * Represents the event type for text input changes in React Native.
  * 
- * This type is a NativeSyntheticEvent<TextInputChangeEventData>,
+ * This type is a NativeSyntheticEvent<TextInputChangeEvent>,
  * allowing for both the native event object and the absence of an event.
  * 
  * @example
@@ -76,9 +93,9 @@ export interface ITextInputCallbackOptions extends IInputFormatterResult {
  *   }
  * };
  * 
- * @typedef {NativeSyntheticEvent<TextInputChangeEventData>} ITextInputOnChangeEvent
+ * @typedef {NativeSyntheticEvent<TextInputChangeEvent>} ITextInputOnChangeEvent
  */
-export interface ITextInputOnChangeEvent extends NativeSyntheticEvent<TextInputChangeEventData> { };
+export interface ITextInputOnChangeEvent extends NativeSyntheticEvent<TextInputChangeEvent> { };
 
 /**
  * @interface ITextInputOnChangeOptions
@@ -111,14 +128,11 @@ export interface ITextInputOnChangeOptions extends Omit<IOnChangeOptions<ITextIn
     isFocused?: boolean;
     fieldName?: string;
     computedVariant: ITextInputComputedVariant;
+    labelEmbeded: boolean;
 }
 
 export interface ITextInputRenderOptions extends TextInputProps {
     ref: React.Ref<TextInput>;
-    focus: () => void;
-    computedVariant: ITextInputComputedVariant;
-    error: boolean;
-    isFocused: boolean;
 }
 
 export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange' | 'defaultValue' | "label" | "ref">, Omit<IFieldBase, "type" | "value" | "label"> {
@@ -254,7 +268,7 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
      * @param {TextInputProps} props - The props passed to the TextInput component.
      * @returns {React.ReactNode} The rendered component.
      */
-    render?: (props: ITextInputRenderOptions) => React.ReactNode;
+    render?: (props: ITextInputRenderOptions, options: ITextInputCallbackOptions) => React.ReactNode;
 
     /***
      * Input mask, use to format input value to a given format, based on mask
@@ -323,5 +337,28 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
 
     right?: ReactNode | ((options: ITextInputCallbackOptions) => ReactNode);
 
+
+    /**
+        The label to be displayed alongside the text input.
+    */
     label?: ReactNode;
+
+    /**
+     * Name of the icon to display when the password is currently hidden (secureTextEntry = true).
+     * This icon represents the action that will be performed when tapped (show password).
+     * Typically an "eye" icon to indicate "click to reveal password".
+     * Only rendered when `secureTextEntry` is true.
+     * 
+     * @example "eye", "visibility", "show"
+     */
+    passwordHiddenIconName?: IFontIconName;
+    /**
+     * Name of the icon to display when the password is currently visible (secureTextEntry = false).
+     * This icon represents the action that will be performed when tapped (hide password).
+     * Typically an "eye-off" or "eye-slash" icon to indicate "click to hide password".
+     * Only rendered when `secureTextEntry` is false.
+     * 
+     * @example "eye-off", "visibility-off", "hide"
+     */
+    passwordVisibleIconName?: IFontIconName;
 };

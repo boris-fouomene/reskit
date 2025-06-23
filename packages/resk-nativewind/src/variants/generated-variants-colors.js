@@ -245,7 +245,14 @@ export const VariantsGeneratedColors = {
     "success": "border-success dark:border-dark-success",
     "warning": "border-warning dark:border-dark-warning",
     "error": "border-error dark:border-dark-error",
-    "surface": "border-surface dark:border-dark-surface"
+    "surface": "border-surface dark:border-dark-surface",
+    "primary-foreground": "border-primary-foreground dark:border-dark-primary-foreground",
+    "secondary-foreground": "border-secondary-foreground dark:border-dark-secondary-foreground",
+    "info-foreground": "border-info-foreground dark:border-dark-info-foreground",
+    "success-foreground": "border-success-foreground dark:border-dark-success-foreground",
+    "warning-foreground": "border-warning-foreground dark:border-dark-warning-foreground",
+    "error-foreground": "border-error-foreground dark:border-dark-error-foreground",
+    "surface-foreground": "border-surface-foreground dark:border-dark-surface-foreground"
   },
   "borderTopColor": {
     "primary": "border-t-primary dark:border-t-dark-primary",
@@ -254,7 +261,14 @@ export const VariantsGeneratedColors = {
     "success": "border-t-success dark:border-t-dark-success",
     "warning": "border-t-warning dark:border-t-dark-warning",
     "error": "border-t-error dark:border-t-dark-error",
-    "surface": "border-t-surface dark:border-t-dark-surface"
+    "surface": "border-t-surface dark:border-t-dark-surface",
+    "primary-foreground": "border-t-primary-foreground dark:border-t-dark-primary-foreground",
+    "secondary-foreground": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground",
+    "info-foreground": "border-t-info-foreground dark:border-t-dark-info-foreground",
+    "success-foreground": "border-t-success-foreground dark:border-t-dark-success-foreground",
+    "warning-foreground": "border-t-warning-foreground dark:border-t-dark-warning-foreground",
+    "error-foreground": "border-t-error-foreground dark:border-t-dark-error-foreground",
+    "surface-foreground": "border-t-surface-foreground dark:border-t-dark-surface-foreground"
   },
   "borderBottomColor": {
     "primary": "border-b-primary dark:border-b-dark-primary",
@@ -263,7 +277,14 @@ export const VariantsGeneratedColors = {
     "success": "border-b-success dark:border-b-dark-success",
     "warning": "border-b-warning dark:border-b-dark-warning",
     "error": "border-b-error dark:border-b-dark-error",
-    "surface": "border-b-surface dark:border-b-dark-surface"
+    "surface": "border-b-surface dark:border-b-dark-surface",
+    "primary-foreground": "border-b-primary-foreground dark:border-b-dark-primary-foreground",
+    "secondary-foreground": "border-b-secondary-foreground dark:border-b-dark-secondary-foreground",
+    "info-foreground": "border-b-info-foreground dark:border-b-dark-info-foreground",
+    "success-foreground": "border-b-success-foreground dark:border-b-dark-success-foreground",
+    "warning-foreground": "border-b-warning-foreground dark:border-b-dark-warning-foreground",
+    "error-foreground": "border-b-error-foreground dark:border-b-dark-error-foreground",
+    "surface-foreground": "border-b-surface-foreground dark:border-b-dark-surface-foreground"
   },
   "borderLeftColor": {
     "primary": "border-l-primary dark:border-l-dark-primary",
@@ -272,7 +293,14 @@ export const VariantsGeneratedColors = {
     "success": "border-l-success dark:border-l-dark-success",
     "warning": "border-l-warning dark:border-l-dark-warning",
     "error": "border-l-error dark:border-l-dark-error",
-    "surface": "border-l-surface dark:border-l-dark-surface"
+    "surface": "border-l-surface dark:border-l-dark-surface",
+    "primary-foreground": "border-l-primary-foreground dark:border-l-dark-primary-foreground",
+    "secondary-foreground": "border-l-secondary-foreground dark:border-l-dark-secondary-foreground",
+    "info-foreground": "border-l-info-foreground dark:border-l-dark-info-foreground",
+    "success-foreground": "border-l-success-foreground dark:border-l-dark-success-foreground",
+    "warning-foreground": "border-l-warning-foreground dark:border-l-dark-warning-foreground",
+    "error-foreground": "border-l-error-foreground dark:border-l-dark-error-foreground",
+    "surface-foreground": "border-l-surface-foreground dark:border-l-dark-surface-foreground"
   },
   "borderRightColor": {
     "primary": "border-r-primary dark:border-r-dark-primary",
@@ -281,7 +309,14 @@ export const VariantsGeneratedColors = {
     "success": "border-r-success dark:border-r-dark-success",
     "warning": "border-r-warning dark:border-r-dark-warning",
     "error": "border-r-error dark:border-r-dark-error",
-    "surface": "border-r-surface dark:border-r-dark-surface"
+    "surface": "border-r-surface dark:border-r-dark-surface",
+    "primary-foreground": "border-r-primary-foreground dark:border-r-dark-primary-foreground",
+    "secondary-foreground": "border-r-secondary-foreground dark:border-r-dark-secondary-foreground",
+    "info-foreground": "border-r-info-foreground dark:border-r-dark-info-foreground",
+    "success-foreground": "border-r-success-foreground dark:border-r-dark-success-foreground",
+    "warning-foreground": "border-r-warning-foreground dark:border-r-dark-warning-foreground",
+    "error-foreground": "border-r-error-foreground dark:border-r-dark-error-foreground",
+    "surface-foreground": "border-r-surface-foreground dark:border-r-dark-surface-foreground"
   },
   "activityIndicator": {
     "primary": "border-t-primary dark:border-t-dark-primary",

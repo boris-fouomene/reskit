@@ -18,11 +18,11 @@
         textForeground : Record<IName,string>;
         shadow : Record<IName,string>;
         activityIndicator: Record<IName,string>;
-        borderColor : Record<IName,string>;
-        borderTopColor : Record<IName,string>;
-        borderBottomColor : Record<IName,string>;
-        borderLeftColor : Record<IName,string>;
-        borderRightColor : Record<IName,string>;
+        borderColor : Record<IName2Foreground,string>;
+        borderTopColor : Record<IName2Foreground,string>;
+        borderBottomColor : Record<IName2Foreground,string>;
+        borderLeftColor : Record<IName2Foreground,string>;
+        borderRightColor : Record<IName2Foreground,string>;
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     

@@ -25,9 +25,9 @@ module.exports = (colors, options) => {
   const outputPath = path.resolve(finalDir, "generated-variants-colors.js");
   const outputDeclarations = path.resolve(finalDir, "generated-variants-colors.d.ts");
   const textWithForeground = {
-      ...VariantsColors.buildTextColors(),
-      ...Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors()).map(([key, value]) => [`${key}-foreground`, value])),
-    },
+    ...VariantsColors.buildTextColors(),
+    ...Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors()).map(([key, value]) => [`${key}-foreground`, value])),
+  },
     textWithForegroundWithImportant = {
       ...VariantsColors.buildTextColors(true),
       ...Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value])),
@@ -78,21 +78,21 @@ module.exports = (colors, options) => {
       textWithForegroundWithImportant,
       background: VariantsColors.buildBackgroundColors(),
       textForeground: VariantsColors.buildTextForegroundColors(),
-      borderColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
-        return cn(`border-${color} dark:border-dark-${color}`);
-      }),
-      borderTopColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
-        return cn(`border-t-${color} dark:border-t-dark-${color}`);
-      }),
-      borderBottomColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
-        return cn(`border-b-${color} dark:border-b-dark-${color}`);
-      }),
-      borderLeftColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
-        return cn(`border-l-${color} dark:border-l-dark-${color}`);
-      }),
-      borderRightColor: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
-        return cn(`border-r-${color} dark:border-r-dark-${color}`);
-      }),
+      borderColor: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
+        return [key, value.split("text-").join("border-")]
+      })),
+      borderTopColor: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
+        return [key, value.split("text-").join("border-t-")]
+      })),
+      borderBottomColor: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
+        return [key, value.split("text-").join("border-b-")]
+      })),
+      borderLeftColor: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
+        return [key, value.split("text-").join("border-l-")]
+      })),
+      borderRightColor: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
+        return [key, value.split("text-").join("border-r-")]
+      })),
       activityIndicator: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
         return cn(`border-t-${color} dark:border-t-dark-${color}`);
       }),
@@ -130,11 +130,11 @@ export const VariantsGeneratedColors = ${content}
         textForeground : Record<IName,string>;
         shadow : Record<IName,string>;
         activityIndicator: Record<IName,string>;
-        borderColor : Record<IName,string>;
-        borderTopColor : Record<IName,string>;
-        borderBottomColor : Record<IName,string>;
-        borderLeftColor : Record<IName,string>;
-        borderRightColor : Record<IName,string>;
+        borderColor : Record<IName2Foreground,string>;
+        borderTopColor : Record<IName2Foreground,string>;
+        borderBottomColor : Record<IName2Foreground,string>;
+        borderLeftColor : Record<IName2Foreground,string>;
+        borderRightColor : Record<IName2Foreground,string>;
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     `,

@@ -1,9 +1,10 @@
 import { tv, VariantProps } from "tailwind-variants";
+import { VariantsFactory } from "./variantsFactory";
+import { VariantsGeneratedColors } from "./generated-variants-colors";
 
 const textInput = tv({
     slots: {
         input: "",
-        inputContainer: "",
         container: "",
         leftContainer: "",
         rightContainer: "",
@@ -12,19 +13,51 @@ const textInput = tv({
         label: ""
     },
     variants: {
+        background: VariantsFactory.create<typeof VariantsGeneratedColors.background, ITextInputSlots>(VariantsGeneratedColors.background, (value, colorName) => {
+            const textColor = VariantsGeneratedColors.textForeground[colorName];
+            return {
+                contentContainer: value,
+                //label: textColor,
+                input: textColor,
+                icon: VariantsGeneratedColors.iconForeground[colorName],
+            }
+        }),
         focus: {
             true: {
-
+                input: "text-primary",
+                label: "text-primary",
+                icon: "!text-primary",
             }
         },
         error: {
             true: {
-
+                input: "text-error",
+                label: "text-error",
+                icon: "!text-error",
             }
         }
-    }
+    },
+    defaultVariants: {
+        background: "surface"
+    },
+    compoundVariants: [
+        {
+            error: true,
+
+        }
+    ]
 });
 
 export type IVariantPropsTextInput = VariantProps<typeof textInput>;
+
+type ITextInputSlots = {
+    input?: string;
+    container?: string;
+    leftContainer?: string;
+    rightContainer?: string;
+    contentContainer?: string;
+    icon?: string;
+    label?: string;
+}
 
 export default textInput;

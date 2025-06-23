@@ -1,11 +1,11 @@
 "use client";
 import { cn, isValidElement, useBreakpoints, useMergeRefs } from "@utils";
 import { Text } from "@html/Text";
-import { NativeSyntheticEvent, Pressable, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, View } from 'react-native';
+import { NativeSyntheticEvent, TextInput as RNTextInput, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData, TextInputProps } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { InputFormatter, isNumber, ICountryCode, Platform, IDict, isNonNullString, isStringNumber, isEmpty, defaultStr, IInputFormatterMaskResult, defaultBool, DateHelper, IInputFormatterResult } from "@resk/core";
 import FontIcon from "@components/Icon/Font";
-import { ITextInputCallbackOptions, ITextInputProps, ITextInputType } from "./types";
+import { ITextInputCallbackOptions, ITextInputProps, ITextInputRenderOptions, ITextInputType } from "./types";
 import { ITextStyle } from "@src/types";
 import p from "@platform";
 import { TouchableOpacity } from "react-native";
@@ -13,6 +13,8 @@ import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
 import textInputVariant from "@variants/textInput";
 import allVariants from "@variants/all";
 import { ActivityIndicator } from "@components/ActivityIndicator";
+import { extractTextClasses } from "@utils/textClasses";
+import { Div } from "@html/Div";
 
 const isNative = p.isNative();
 
@@ -157,11 +159,9 @@ export function TextInput({
         if (areCasesEquals(valCase, inputState)) return;
         setInputState({ ...inputState, ...valCase });
     }, [defaultValue, valCase]);
-
     //handle mask
     const { maskArray, maskHasObfuscation, placeholder: inputMaskPlaceholder, dialCode: phoneDialCode } = inputState;
     const hasInputMask = Array.isArray(maskArray) && !!maskArray.length;
-
     const inputValue = hasInputMask ? defaultStr(maskHasObfuscation && !isFocused ? inputState.obfuscated : inputState.masked) : (isFocused ? focusedValue : inputState.formattedValue || emptyValue || "");
     const isPhoneValid = (value: string, phoneCountryCode?: ICountryCode) => {
         const v = String(value);
@@ -173,25 +173,23 @@ export function TextInput({
     const error = useMemo(() => {
         return !!customError || defaultBool(handleMaskValidationErrors, !!inputState.value) && !isInputValid;
     }, [customError, isInputValid, handleMaskValidationErrors, inputState.value])
-
     const computedVariant = textInputVariant(Object.assign({}, variant, { focus: isFocused, error }));
     const disabled = props.disabled || readOnly;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canToggleSecure = isPasswordField;
+    const multiline = !!props.multiline;
     const labelClx = cn(computedVariant.label(), labelClassName);
-    const inputClx = cn(computedVariant.input(), containerClassName);
+    const inputClx = cn(multiline && "py-[5px]", "flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", computedVariant.input(), className);
+    const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
     const rightContainerClx = cn(computedVariant.rightContainer(), rightContainerClassName);
     const contentContainerClx = cn(computedVariant.contentContainer(), contentContainerClassName);
-    const inputContainerClx = cn(computedVariant.inputContainer(), inputContainerClassName);
     const iconClx = cn(computedVariant.icon(), iconClassName);
     const containerClx = cn(computedVariant.container(), containerClassName);
-    const callOptions: ITextInputCallbackOptions = { ...inputState, error: !!error, isFocused, textInputComputedVariant: computedVariant as any, editable, disabled: !!disabled };
-    const multiline = !!props.multiline;
-    const { isMobile, isHydrated } = useBreakpoints();
+    const callOptions: ITextInputCallbackOptions = { ...inputState, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
     const minHeight = useMemo(() => {
-        return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbededVariant ? 30 : isMobile ? 50 : 46;
-    }, [customMinHeight, isLabelEmbededVariant, isMobile]);
+        return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbededVariant ? 30 : 46;
+    }, [customMinHeight, isLabelEmbededVariant]);
     const maxHeight = useMemo(() => {
         return typeof customMaxHeight === "number" ? customMaxHeight : undefined;
     }, [customMaxHeight]);
@@ -211,8 +209,8 @@ export function TextInput({
         if (isValidElement(affContent)) {
             return affContent;
         }
-        return <Text children={affContent} className={cn("mx-[5px]", inputClx)} />;
-    }, [focusedValue, isDateOrTime, canValueBeDecimal, error, multiline, inputClx, affix, isPasswordField]);
+        return <Text children={affContent} className={cn("mx-[5px]", inputTextClx)} />;
+    }, [focusedValue, isDateOrTime, canValueBeDecimal, error, multiline, inputTextClx, affix, isPasswordField]);
 
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;
@@ -231,29 +229,34 @@ export function TextInput({
         name={(isSecure ? "eye" : "eye-off") as never}
         onPress={() => { setIsSecure(!isSecure); focus(); }} className={iconClx}
     /> : null;
-    const labelSuffix = suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? <Text className={cn(labelClx)}>{" "}[{inputMaskPlaceholder}]</Text> : null;
-    const phoneDialCodeLabel = useMemo(() => {
-        if (!isPhone || !isNonNullString(phoneDialCode)) return null;
-        const dialCode = "+" + phoneDialCode.trim().ltrim("+");
-        if (String(inputValue).startsWith(dialCode)) {
-            return null;
-        }
-        return <Text className={cn(labelClassName)}>{dialCode.trim() + " "}</Text>
-    }, [phoneDialCode, isPhone, inputValue]);
-    const labelContent = !canRenderLabel ? null : !isEmpty(label) && editable ? <Pressable testID={testID + "-text-input-pressable-container"} onPress={focus}>{label}</Pressable> : label;
+    /*     const phoneDialCodeLabel = useMemo(() => {
+            if (!isPhone || !isNonNullString(phoneDialCode)) return null;
+            const dialCode = "+" + phoneDialCode.trim().ltrim("+");
+            if (String(inputValue).startsWith(dialCode)) {
+                return null;
+            }
+            return <Text className={cn(inputTextClx)}>{dialCode.trim() + " "}</Text>
+        }, [phoneDialCode, isPhone, inputValue, inputTextClx]); */
+
+    const labelSuffix = (suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbededVariant && inputMaskPlaceholder ? ` [${inputMaskPlaceholder}]` : "") + (isLabelEmbededVariant ? ` : ` : "");
+    label = typeof label === "string" ? `${label}${labelSuffix}` : isValidElement(label) ? <>{label}<Text className={extractTextClasses(labelClx)}>{labelSuffix}</Text></> : null;
+    label = <Text testID={testID + "-label"} className={cn(labelClx)}>{label}</Text>;
+    const labelContent = !canRenderLabel ? null : editable ? <Div testID={testID + "-input-pressable-container"} onPress={focus}>{label}</Div> : label;
     const canWrapWithTouchable = props.isDropdownAnchor && editable && !readOnly;
-    const Wrapper = canWrapWithTouchable ? TouchableOpacity : View;
-    const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, style: [styles.dropdownAnchorContainer] };
+    const Wrapper = canWrapWithTouchable ? TouchableOpacity : Div;
+    const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, className: cn("grouw cursor-pointer px-[5px]") };
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
-    const inputProps: ITextInputProps = {
+    const inputProps: ITextInputRenderOptions = {
         autoComplete: "off",
         ...(!canWrapWithTouchable && editable ? pressableProps : {}),
         ...props,
+        className: inputClx,
         //placeholderTextColor: isFocused || error ? textColor : theme.colors.placeholder,
         underlineColorAndroid: "transparent",
         ...props,
         defaultValue: undefined,
-        inputRef,
+        computedVariant,
+        ref: inputRef,
         focus,
         onContentSizeChange: (event: any) => {
             if (typeof onContentSizeChange == "function") {
@@ -264,8 +267,6 @@ export function TextInput({
             const height = calcHeight(contentSize.height, maxHeight);
             inputDimensionsRef.current = { width, height };
         },
-        variant,
-        canRenderLabel,
         error,
         isFocused,
         placeholder: hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
@@ -275,10 +276,8 @@ export function TextInput({
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: [
             Object.assign({}, Platform.isWeb() ? { outline: "none" } : {}) as ITextStyle,
-            styles.input,
             minHeight > 0 && { minHeight },
             multiline && { height: inputHeight },
-            multiline && styles.multilineInput,
         ],
         value: String(inputValue),
         inputMode: inputMode as any,
@@ -301,7 +300,7 @@ export function TextInput({
                 if (typeof onChange == "function" && isValid) {
                     clearTimeout(debounceTimeoutRef.current as any);
                     (debounceTimeoutRef as any).current = setTimeout(() => {
-                        onChange(options);
+                        onChange(options as any);
                     }, isNumber(debounceTimeout) && debounceTimeout > 0 ? debounceTimeout : 0);
                 }
             }
@@ -331,29 +330,30 @@ export function TextInput({
                 props.onFocus(event);
             }
         },
-    } as any;
-    const inputElement = typeof render == "function" ? render(inputProps as any, inputRef) : <RNTextInput {...inputProps as any} ref={inputRef} />;
+    };
+    const inputElement = typeof render == "function" ? render(inputProps as any) : <RNTextInput {...inputProps as any} ref={inputRef} />;
     const Avoiding = useMemo(() => {
-        return withKeyboardAvoidingView ? KeyboardAvoidingView : View;
+        return withKeyboardAvoidingView ? KeyboardAvoidingView : Div;
     }, [withKeyboardAvoidingView]);
     const leftContainerWrappedWithTouchableClassName = cn(canWrapWithTouchable && "px-0");
     const leftOrRightClassName = cn("flex flex flex-row items-center self-center justify-start", disabledClx);
-    if (!isHydrated) {
-        return <ActivityIndicator size={"small"} />
-    }
-    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, "text-input-container")} testID={testID + "-container"}>
+    const leftContent = left,
+        rightContent = (right || canToggleSecure || affixContent) ? <>
+            {affixContent}
+            {right}
+            {editable || disabled !== false && isPasswordField ? secureIcon : null}
+        </> : null
+    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, "input-container")} testID={testID + "-container"}>
         {isLabelEmbededVariant ? null : labelContent}
-        <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn("text-input-content-container w-full flex flex-row relative justify-center self-start items-center", contentContainerClx)}>
-            <View testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
-                {left}
+        <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn("input-content-container w-full flex flex-row relative justify-center self-start items-center", contentContainerClx)}>
+            <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
+                {leftContent}
                 {isLabelEmbededVariant ? labelContent : null}
-            </View>
-            <View testID={testID + "-input-container"} className={cn("flex-1 grow input-container", leftContainerWrappedWithTouchableClassName, inputContainerClx)}>
-                {inputElement}
-            </View>
-            {right ? (<View testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
-                {right}
-            </View>) : null}
+            </Div>
+            {inputElement}
+            {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
+                {rightContent}
+            </Div>) : null}
         </Wrapper>
     </Avoiding>
 }
@@ -367,81 +367,6 @@ const areCasesEquals = (case1: Partial<IInputFormatterMaskResult>, case2: Partia
 
 TextInput.displayName = "TextInput";
 
-
-const styles = StyleSheet.create({
-    affix: {
-        paddingHorizontal: 0,
-        marginHorizontal: 5,
-        fontSize: 15
-    },
-    dropdownAnchorInput: {
-        cursor: "pointer",
-    },
-    dropdownAnchorContainer: {
-        flexGrow: 1,
-        paddingHorizontal: 5,
-    },
-    input: {
-        borderColor: 'transparent', // No border
-        borderWidth: 0, // Remove border
-        borderBottomColor: "transparent",
-        borderBottomWidth: 0,
-        borderTopColor: "transparent",
-        borderTopWidth: 0,
-        borderLeftColor: "transparent",
-        borderLeftWidth: 0,
-        borderRightColor: "transparent",
-        borderRightWidth: 0,
-        borderRadius: 0,
-        backgroundColor: 'transparent',
-        flexGrow: 1,
-        overflow: 'hidden',
-        fontSize: 16,
-    },
-    compact: {
-        padding: 0,
-        paddingVertical: 0,
-        paddingHorizontal: 0,
-    },
-    multilineInput: {
-        paddingVertical: 5,
-    },
-    borderWidth1: {
-        borderWidth: 1,
-    },
-    focusedOutlineBorder: {
-        borderWidth: 2,
-    },
-    rightContainer: {
-        alignSelf: "center",
-    },
-    container: {
-        flexDirection: "column",
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
-        alignSelf: "flex-start",
-        position: 'relative',
-        width: "100%",
-    },
-    contentContainer: {
-        justifyContent: "space-between",
-        alignSelf: "flex-start",
-        flexWrap: "nowrap",
-        flexDirection: "row",
-        alignItems: "center",
-        position: "relative",
-        width: "100%",
-        paddingHorizontal: 5,
-    },
-    notEmbededLabelStyle: {
-        fontWeight: "500",
-        paddingBottom: 5,
-    },
-    flatVariantContentContainer: {
-        borderWidth: 0,
-        borderBottomWidth: 1,
-    },
-})
 
 const isDecimalType = (type: ITextInputType | string): boolean => {
     return ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());

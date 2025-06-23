@@ -77,7 +77,6 @@ const textInput = tv({
         background: "surface",
         paddingX: "5px",
         iconSize: "20px",
-        marginY: "10px"
     },
 });
 

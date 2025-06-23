@@ -181,7 +181,7 @@ export function TextInput({
     };
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
-    const labelClx = cn(isLabelEmbeded ? computedVariant.labelEmbeded() : computedVariant.label(), labelClassName);
+    const labelClx = cn(isLabelEmbeded ? ["mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), labelClassName);
     const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", computedVariant.input(), className);
     const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);

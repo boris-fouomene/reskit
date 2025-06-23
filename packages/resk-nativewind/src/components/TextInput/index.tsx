@@ -171,7 +171,7 @@ export function TextInput({
         return !!customError || defaultBool(handleMaskValidationErrors, !!inputState.value) && !isInputValid;
     }, [customError, isInputValid, handleMaskValidationErrors, inputState.value])
     const computedVariant = textInputVariant(Object.assign({}, variant, { focus: isFocused, error }));
-    const disabled = props.disabled || readOnly;
+    const disabled = props.disabled || readOnly || !isHydrated;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const focus = () => {
         if (!editable) return;

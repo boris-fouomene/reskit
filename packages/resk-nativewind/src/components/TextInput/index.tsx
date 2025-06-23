@@ -350,7 +350,7 @@ export function TextInput({
                 {leftContent}
                 {isLabelEmbeded ? labelContent : null}
             </Div>
-            {isHydrated ? inputElement : <Div className={cn(inputClx)} style={inputStyle} children={<Div className={iconClx} />} />}
+            {isHydrated ? inputElement : <Text className={cn(inputClx)} style={inputStyle} children={String(inputValue)} />}
             {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
                 {rightContent}
             </Div>) : null}

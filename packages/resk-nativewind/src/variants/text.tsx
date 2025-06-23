@@ -2,6 +2,7 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsGeneratedColors } from "./generated-variants-colors";
 import { VariantsFactory } from "./variantsFactory";
 import { fontWeightClasses } from "./variantsFactory/fontWeight";
+import { textAlignClasses } from "./variantsFactory/textAlignClasses";
 
 const text = tv({
     base: "",
@@ -10,12 +11,10 @@ const text = tv({
         error: {
             true: "text-error dark:text-dark-error",
         },
-        align: {
-            left: 'text-left',
-            center: 'text-center',
-            right: 'text-right',
-            justify: 'text-justify',
+        waring: {
+            true: "text-warning dark:text-dark-warning"
         },
+        align: textAlignClasses,
         weight: fontWeightClasses,
         size: VariantsFactory.createTextSizes(),
     },

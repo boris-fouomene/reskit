@@ -5,6 +5,7 @@ import { ShadowColorsClasses } from "./shadow";
 import { IconSizes, textSizes } from "./textSizes";
 import { allScaleVariants } from "./scales";
 import { fontWeightClasses } from "./fontWeight";
+import { textAlignClasses } from "./textAlignClasses";
 
 type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], variantName: keyof InputType) => ResultType;
 
@@ -139,6 +140,9 @@ export const VariantsFactory = {
       (result as any)[variantClassName] = VariantsFactory.create((allVariantClasses as any)[variantClassName], variantMutator);
     });
     return result;
+  },
+  createTextAlignVariants: function createTextAlignVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textAlignClasses, ResultType>) {
+    return VariantsFactory.create<typeof textAlignClasses, ResultType>(textAlignClasses, variantMutator);
   },
 };
 const allVariantClasses = {

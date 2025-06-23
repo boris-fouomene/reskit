@@ -29,7 +29,7 @@ const textInput = tv({
         ...VariantsFactory.createMarginsVariants<ITextInputSlots>((value, colorName) => {
             return { container: value }
         }),
-        routed: VariantsFactory.createRoundedVariants<ITextInputSlots>((value, colorName) => {
+        rounded: VariantsFactory.createRoundedVariants<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
         iconSize: VariantsFactory.createIconSizes<ITextInputSlots>((value, colorName) => {
@@ -42,12 +42,18 @@ const textInput = tv({
             return { label: value }
         }),
         inputTextSize: VariantsFactory.createTextSizes<ITextInputSlots>((value, colorName) => {
-            return { input: value }
+            return { input: value, labelEmbeded: value }
         }),
         labelWeight: VariantsFactory.createFontWeightVariants<ITextInputSlots>((value, colorName) => {
-            return { label: value }
+            return { label: value, labelEmbeded: value }
         }),
         inputWeight: VariantsFactory.createFontWeightVariants<ITextInputSlots>((value, colorName) => {
+            return { input: value, labelEmbeded: value }
+        }),
+        labelTextAlign: VariantsFactory.createTextAlignVariants<ITextInputSlots>((value, colorName) => {
+            return { label: value }
+        }),
+        inputTextAlign: VariantsFactory.createTextAlignVariants<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
         }),
         focus: {
@@ -70,7 +76,8 @@ const textInput = tv({
     defaultVariants: {
         background: "surface",
         paddingX: "5px",
-        iconSize: "25px"
+        iconSize: "20px",
+        marginY: "10px"
     },
 });
 

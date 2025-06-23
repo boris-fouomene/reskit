@@ -1,11 +1,14 @@
+/***
+    @see : https://tailwindcss.com/docs/font-weight
+*/
 export const fontWeightClasses = {
+  thin: "  font-thin",
   light: "font-light",
   normal: "font-normal",
   medium: "font-medium",
   semibold: "font-semibold",
   bold: "font-bold",
-  "400": "font-400",
-  "500": "font-500",
-  "600": "font-600",
-  "700": "font-700",
+  extralight: "font-extralight",
+  extrabold: "font-extrabold",
+  black: "font-black",
 };

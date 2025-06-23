@@ -244,7 +244,7 @@ export function TextInput({
     const labelSuffix = (suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbeded && inputMaskPlaceholder ? ` [${inputMaskPlaceholder}]` : "") + (isLabelEmbeded ? ` : ` : "");
     label = typeof label === "string" ? `${label}${labelSuffix}` : isValidElement(label) ? <>{label}<Text className={extractTextClasses(labelClx)}>{labelSuffix}</Text></> : null;
     label = <Text testID={testID + "-label"} className={cn(labelClx)}>{label}</Text>;
-    const labelContent = !canRenderLabel ? null : editable ? <Div testID={testID + "-input-pressable-container"} onPress={focus}>{label}</Div> : label;
+    const labelContent = !canRenderLabel ? null : editable ? <Div testID={testID + "-text-text-input-pressable-container"} onPress={focus}>{label}</Div> : label;
     const canWrapWithTouchable = props.isDropdownAnchor && editable && !readOnly;
     const Wrapper = canWrapWithTouchable ? TouchableOpacity : Div;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, className: cn("grouw cursor-pointer px-[5px]") };
@@ -343,15 +343,15 @@ export function TextInput({
             {right}
             {secureIcon}
         </> : null
-    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, "input-container")} testID={testID + "-container"}>
+    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, "text-input-container")} testID={testID + "-container"}>
         {isLabelEmbeded ? null : labelContent}
-        <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn("input-content-container w-full flex flex-row relative justify-center self-start items-center", contentContainerClx)}>
+        <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn("text-input-content-container w-full flex flex-row relative justify-center self-start items-center", contentContainerClx)}>
             <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
                 {leftContent}
                 {isLabelEmbeded ? labelContent : null}
             </Div>
             {isHydrated ? inputElement : <Div className={cn(inputClx)} style={inputStyle} children={<Div className={iconClx} />} />}
-            {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
+            {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
                 {rightContent}
             </Div>) : null}
         </Wrapper>

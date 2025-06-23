@@ -69,7 +69,7 @@ const textInput = tv({
                 input: "text-error",
                 label: "text-error",
                 icon: "!text-error",
-                labelEmbeded: "text-primary",
+                labelEmbeded: "text-error",
             }
         }
     },

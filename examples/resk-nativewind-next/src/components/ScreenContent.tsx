@@ -17,6 +17,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <TextInput variant={{ iconColor: "secondary", labelTextAlign: "right", labelWeight: "semibold", iconSize: "25px", labelTextSize: "15px" }} type="password" label="Password" placeholder="Enter your password" />
         <TextInput type="date" label="Date" placeholder="Enter your date" />
         <TextInput type="time" label="Time" placeholder="Enter your time" />
+        <TextInput type="datetime" label="DateTime" placeholder="Enter your datetime" />
         <TextInput type="tel" label="Tel" placeholder="Enter your tel" labelEmbeded />
       </Div>
       <VStack className="p-5">

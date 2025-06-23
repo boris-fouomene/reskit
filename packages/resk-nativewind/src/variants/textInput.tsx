@@ -23,8 +23,11 @@ const textInput = tv({
                 icon: VariantsGeneratedColors.iconForeground[colorName],
             }
         }),
-        ...VariantsFactory.createPadding2MarginVariants<ITextInputSlots>((value, colorName) => {
-            return { contentContainer: value, label: value }
+        ...VariantsFactory.createPaddingsVariants<ITextInputSlots>((value, colorName) => {
+            return { contentContainer: value }
+        }),
+        ...VariantsFactory.createMarginsVariants<ITextInputSlots>((value, colorName) => {
+            return { container: value }
         }),
         focus: {
             true: {

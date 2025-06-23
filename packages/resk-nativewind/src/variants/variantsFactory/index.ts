@@ -1,5 +1,5 @@
 import { roundeClasses } from "./rounded";
-import { padding2marginClasses } from "./padding2margin";
+import { marginClasses, padding2marginClasses, paddingClasses } from "./padding2margin";
 import { borderClasses } from "./border";
 import { ShadowColorsClasses } from "./shadow";
 import { textSizes } from "./textSizes";
@@ -100,6 +100,20 @@ export const VariantsFactory = {
   },
   createRoundedVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
     return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);
+  },
+  createPaddingsVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>): Record<keyof typeof paddingClasses, Record<keyof (typeof paddingClasses)[keyof typeof paddingClasses], string>> {
+    const r = {} as any;
+    Object.entries(paddingClasses).forEach(([key, value]) => {
+      r[key] = VariantsFactory.create<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>(value, variantMutator);
+    });
+    return r;
+  },
+  createMarginsVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof marginClasses)[keyof typeof marginClasses], ResultType>): Record<keyof typeof marginClasses, Record<keyof (typeof marginClasses)[keyof typeof marginClasses], string>> {
+    const r = {} as any;
+    Object.entries(marginClasses).forEach(([key, value]) => {
+      r[key] = VariantsFactory.create<(typeof marginClasses)[keyof typeof marginClasses], ResultType>(value, variantMutator);
+    });
+    return r;
   },
   createPadding2MarginVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>): Record<keyof typeof padding2marginClasses, Record<keyof (typeof padding2marginClasses)[keyof typeof padding2marginClasses], string>> {
     const r = {} as any;

@@ -1,7 +1,7 @@
 "use client";
 import { cn, isValidElement, useHydrationStatus, useMergeRefs } from "@utils";
 import { Text } from "@html/Text";
-import { NativeSyntheticEvent, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
+import { Animated, NativeSyntheticEvent, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from "react";
 import InputFormatter from "@resk/core/inputFormatter";
 import { IInputFormatterMaskResult, IInputFormatterResult } from "@resk/core/types";
@@ -16,8 +16,11 @@ import textInputVariant, { IVariantPropsTextInput } from "@variants/textInput";
 import allVariants from "@variants/all";
 import { extractTextClasses } from "@utils/textClasses";
 import { Div } from "@html/Div";
+import { remapProps } from "nativewind";
+
 
 const isNative = p.isNative();
+const useNativeDriver = p.canUseNativeDriver();
 
 
 export default function TextInput({
@@ -177,6 +180,20 @@ export default function TextInput({
     const computedVariant = textInputVariant(Object.assign({}, variant, { error, focused: !error && isFocused } as IVariantPropsTextInput));
     const disabled = props.disabled || readOnly || !isHydrated;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
+    const phoneDialCodeText = useMemo(() => {
+        if (!isPhone || !isNonNullString(phoneDialCode)) return "";
+        const dialCode = "+" + phoneDialCode.trim().ltrim("+");
+        if (String(inputValue).startsWith(dialCode)) {
+            return "";
+        }
+        return dialCode.trim() + '\u00A0';
+    }, [phoneDialCode, isPhone, inputValue]);
+    const handleFocus = () => {
+        setIsFocused(true);
+    };
+    const handleBlur = () => {
+        setIsFocused(false);
+    };
     const focus = () => {
         if (!editable) return;
         if (innerRef?.current && typeof innerRef.current.focus === "function") {
@@ -186,7 +203,7 @@ export default function TextInput({
 
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
-    const labelClx = cn(isLabelEmbeded ? ["mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), labelClassName);
+    const labelClx = cn("flex flex-row self-start justify-start items-center text-input-label", isLabelEmbeded ? ["text-input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), labelClassName);
     const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", computedVariant.input(), className);
     const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
@@ -195,14 +212,6 @@ export default function TextInput({
     const iconClx = cn(computedVariant.icon(), iconClassName);
     const containerClx = cn(computedVariant.container(), containerClassName);
 
-    const phoneDialCodeText = useMemo(() => {
-        if (!isPhone || !isNonNullString(phoneDialCode)) return "";
-        const dialCode = "+" + phoneDialCode.trim().ltrim("+");
-        if (String(inputValue).startsWith(dialCode)) {
-            return "";
-        }
-        return dialCode.trim() + '\u00A0';
-    }, [phoneDialCode, isPhone, inputValue]);
     const phoneDialCodeClx = cn("text-input-phone-dial-code-label", inputTextClx);
     const phoneDialCodeLabel = phoneDialCodeText ? <Text className={phoneDialCodeClx}>{phoneDialCodeText}</Text> : null;
     const callOptions: ITextInputCallOptions = { ...inputState, isPhone, phoneDialCodeLabel, labelClassName: labelClx, iconClassName: iconClx, inputClassName: inputClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
@@ -248,20 +257,19 @@ export default function TextInput({
         name={(isSecure ? defaultStr(passwordHiddenIconName, "eye") : defaultStr(passwordVisibleIconName, "eye-off")) as never}
         onPress={() => { setIsSecure(!isSecure); focus(); }} className={iconClx}
     /> : null;
-
     const labelSuffix = (suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbeded && inputMaskPlaceholder ? ` [${inputMaskPlaceholder}]` : "") + (isLabelEmbeded ? ` : ` : "");
     label = typeof label === "string" ? `${label}${labelSuffix}` : isValidElement(label) ? <>{label}<Text className={extractTextClasses(labelClx)}>{labelSuffix}</Text></> : null;
-    label = <Text testID={testID + "-label"} className={cn("flex flex-row self-start justify-start items-center", labelClx)}>{label}</Text>;
-    const labelContent = !canRenderLabel ? null : editable ? <Div testID={testID + "-text-text-input-label-container"} onPress={focus}>{label}</Div> : label;
+    const labelContent = canRenderLabel && label ? <Text testID={testID + "-label"} onPress={editable ? focus : undefined} className={labelClx} children={label} /> : null;
     const canWrapWithTouchable = props.isDropdownAnchor && editable && !readOnly;
     const Wrapper = canWrapWithTouchable ? TouchableOpacity : Div;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, className: cn("grouw cursor-pointer px-[5px]") };
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
+    const inputPlaceholder = hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder));
     const inputStyle = StyleSheet.flatten([
         minHeight > 0 && { minHeight },
         multiline && { height: inputHeight },
         props.style,
-    ])
+    ]);
     const inputProps: ITextInputRenderOptions = {
         autoComplete: "off",
         ...(!canWrapWithTouchable && editable ? pressableProps : {}),
@@ -281,7 +289,7 @@ export default function TextInput({
             const height = calcHeight(contentSize.height, maxHeight);
             inputDimensionsRef.current = { width, height };
         },
-        placeholder: hasInputMask ? inputMaskPlaceholder : (isEmpty(props.placeholder) ? "" : defaultStr(props.placeholder)),
+        placeholder: inputPlaceholder,
         testID: testID,
         readOnly: editable === false,
         editable,
@@ -320,20 +328,20 @@ export default function TextInput({
         },
         onKeyPress: (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
             if (!isFocused) {
-                setIsFocused(true);
+                handleFocus();
             }
             if (typeof props.onKeyPress == "function") {
                 props.onKeyPress(event);
             }
         },
         onBlur: (event: NativeSyntheticEvent<TextInputFocusEventData>) => {
-            setIsFocused(false);
+            handleBlur();
             if (typeof props.onBlur == "function") {
                 props.onBlur(event);
             }
         },
         onFocus: (event: NativeSyntheticEvent<TextInputFocusEventData>) => {
-            setIsFocused(true);
+            handleFocus();
             if (typeof props.onFocus == "function") {
                 props.onFocus(event);
             }
@@ -352,18 +360,20 @@ export default function TextInput({
             {secureIcon}
         </> : null
     return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, "text-input-container text-input-" + type + "-container")} testID={testID + "-container"}>
-        {isLabelEmbeded ? null : labelContent}
-        <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn("text-input-content-container w-full flex flex-row relative justify-center self-start items-center", contentContainerClx)}>
-            <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
-                {leftContent}
-                {isLabelEmbeded ? labelContent : null}
-                {phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
-            </Div>
-            {isHydrated ? inputElement : <Text className={cn(inputClx)} style={inputStyle} children={String(inputValue)} />}
-            {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
-                {rightContent}
-            </Div>) : null}
-        </Wrapper>
+        <Div className="w-full h-full relative text-input-wrapper" testID={testID + "-wrapper"}>
+            {isLabelEmbeded ? null : labelContent}
+            <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn("text-input-content-container w-full flex flex-row justify-center self-start items-center", contentContainerClx)}>
+                <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
+                    {leftContent}
+                    {isLabelEmbeded ? labelContent : null}
+                    {phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
+                </Div>
+                {isHydrated ? inputElement : <Text className={cn(inputClx)} style={inputStyle} children={String(inputValue)} />}
+                {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
+                    {rightContent}
+                </Div>) : null}
+            </Wrapper>
+        </Div>
     </Avoiding>
 }
 
@@ -376,6 +386,10 @@ const areCasesEquals = (case1: Partial<IInputFormatterMaskResult>, case2: Partia
 
 TextInput.displayName = "TextInput";
 
+
+const AnimatedText = remapProps(Animated.Text, {
+    className: "style"
+});
 
 const isDecimalType = (type: ITextInputType | string): boolean => {
     return ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());

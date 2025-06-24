@@ -59,7 +59,11 @@ export interface ITextInputCallOptions extends IInputFormatterResult {
     disabled: boolean;
     error: boolean;
     computedVariant: ITextInputComputedVariant;
+    /***
+        Whether the label is embeded in the input.
+    */
     labelEmbeded: boolean;
+
     /*** The function to be called when the input field is focused. */
     focus: () => void;
     /***

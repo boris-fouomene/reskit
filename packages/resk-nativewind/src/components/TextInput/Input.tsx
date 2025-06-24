@@ -25,7 +25,7 @@ const useNativeDriver = p.canUseNativeDriver();
 
 export default function TextInput({
     readOnly,
-    render, testID, error: customError, phoneCountryCode: customPhoneCountryCode, handleMaskValidationErrors,
+    renderTextInput, testID, error: customError, phoneCountryCode: customPhoneCountryCode, handleMaskValidationErrors,
     defaultValue, toCase: cToCase, inputMode: cInputMode, dateFormat: customDateFormat, emptyValue: cIsEmptyValue,
     mask: customMask, maskOptions: customMaskOptions, secureTextEntry, withKeyboardAvoidingView, type, ref,
     minHeight: customMinHeight,
@@ -347,7 +347,7 @@ export default function TextInput({
             }
         },
     };
-    const inputElement = typeof render == "function" ? render(inputProps, callOptions) : <RNTextInput {...inputProps as any} ref={inputRef} />;
+    const inputElement = typeof renderTextInput == "function" ? renderTextInput(inputProps, callOptions) : <RNTextInput {...inputProps as any} ref={inputRef} />;
     const Avoiding = useMemo(() => {
         return withKeyboardAvoidingView ? KeyboardAvoidingView : Div;
     }, [withKeyboardAvoidingView]);

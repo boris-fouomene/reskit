@@ -282,7 +282,7 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
      * @param {TextInputProps} props - The props passed to the TextInput component.
      * @returns {React.ReactNode} The rendered component.
      */
-    render?: (props: ITextInputRenderOptions, options: ITextInputCallOptions) => React.ReactNode;
+    renderTextInput?: (props: ITextInputRenderOptions, options: ITextInputCallOptions) => React.ReactNode;
 
     /***
      * Input mask, use to format input value to a given format, based on mask

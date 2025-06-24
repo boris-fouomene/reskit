@@ -56,6 +56,7 @@ export default function TextInput({
     passwordHiddenIconName,
     passwordVisibleIconName,
     displayPhoneDialCode = true,
+    placeholderClassName,
     ...props
 }: ITextInputProps) {
     const isHydrated = useHydrationStatus();
@@ -272,6 +273,7 @@ export default function TextInput({
     ]);
     const inputProps: ITextInputRenderOptions = {
         autoComplete: "off",
+        placeholderClassName: cn("text-placeholder dark:text-dark-placeholder", computedVariant.placeholder(), placeholderClassName),
         ...(!canWrapWithTouchable && editable ? pressableProps : {}),
         ...props,
         className: inputClx,
@@ -385,11 +387,6 @@ const areCasesEquals = (case1: Partial<IInputFormatterMaskResult>, case2: Partia
 
 
 TextInput.displayName = "TextInput";
-
-
-const AnimatedText = remapProps(Animated.Text, {
-    className: "style"
-});
 
 const isDecimalType = (type: ITextInputType | string): boolean => {
     return ['decimal', 'numeric', 'number'].includes(String(type).toLowerCase());

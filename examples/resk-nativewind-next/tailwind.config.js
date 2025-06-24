@@ -125,6 +125,12 @@ module.exports = {
         "dark-backdrop": {
           DEFAULT: "rgba(0, 0, 0, 0.4)", // Semi-transparent black backdrop
         },
+        placeholder: {
+          DEFAULT: "#A3A3A3", // Gray placeholder text
+        },
+        "dark-placeholder": {
+          DEFAULT: "#A3A3A3", // Gray placeholder text
+        },
       },
       spacing11: {
         // w-100 = 400dp, w-96 = 384dp, etc.

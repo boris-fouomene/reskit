@@ -11,7 +11,8 @@ const textInput = tv({
         contentContainer: "",
         labelEmbeded: "",
         icon: "",
-        label: ""
+        label: "",
+        placeholder: ""
     },
     variants: {
         background: VariantsFactory.create<typeof VariantsGeneratedColors.background, ITextInputSlots>(VariantsGeneratedColors.background, (value, colorName) => {
@@ -141,6 +142,7 @@ type ITextInputSlots = {
     icon?: string;
     label?: string;
     labelEmbeded?: string;
+    placeholder?: string;
 }
 
 export default textInput;

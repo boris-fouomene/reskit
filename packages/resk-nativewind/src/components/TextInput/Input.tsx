@@ -17,6 +17,7 @@ import allVariants from "@variants/all";
 import { extractTextClasses } from "@utils/textClasses";
 import { Div } from "@html/Div";
 import { remapProps } from "nativewind";
+import { classes } from "@variants/classes";
 
 
 const isNative = p.isNative();
@@ -70,6 +71,7 @@ export default function TextInput({
             isDateOrTime: t == "datetime" || t == "date" || t == "time"
         }
     }, [type]);
+    const cursorDefault = cn(classes.cursorDefault, !isHydrated && "cursor-not-allowed", " select-none");
     const innerRef = useRef<RNTextInput | null>(null);
     const inputRef = useMergeRefs(ref, innerRef);
     testID = defaultStr(testID, "resk-text-input");
@@ -361,17 +363,17 @@ export default function TextInput({
             {right}
             {secureIcon}
         </> : null
-    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, "text-input-container text-input-" + type + "-container")} testID={testID + "-container"}>
-        <Div className="w-full h-full relative text-input-wrapper" testID={testID + "-wrapper"}>
+    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, cursorDefault, "text-input-container text-input-" + type + "-container")} testID={testID + "-container"}>
+        <Div className={cn(cursorDefault, "w-full h-full relative text-input-wrapper")} testID={testID + "-wrapper"}>
             {isLabelEmbeded ? null : labelContent}
-            <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn("text-input-content-container w-full flex flex-row justify-center self-start items-center", contentContainerClx)}>
-                <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
+            <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn(cursorDefault, "text-input-content-container w-full flex flex-row justify-center self-start items-center", contentContainerClx)}>
+                <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, cursorDefault, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
                     {leftContent}
                     {isLabelEmbeded ? labelContent : null}
                     {phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
                 </Div>
-                {isHydrated ? inputElement : <Text className={cn(inputClx)} style={inputStyle} children={String(inputValue)} />}
-                {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
+                {isHydrated ? inputElement : <Text className={cn(inputClx, cursorDefault)} style={inputStyle} children={String(inputValue)} />}
+                {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, cursorDefault, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
                     {rightContent}
                 </Div>) : null}
             </Wrapper>

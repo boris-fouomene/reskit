@@ -5,6 +5,7 @@ import { StyleSheet, Platform, PressableProps } from "react-native";
 import { normalizeGestureEvent } from "./events";
 import { MouseEvent, TouchEvent } from "react";
 import { UIManager } from "./UIManager";
+import { classes } from '../variants/classes';
 
 export * from "./events";
 
@@ -81,6 +82,7 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
             return onPressOut(normalizeGestureEvent(event));
         } : undefined
     }
+    r.className = cn(classes.cursorDefault, r.className)
     if (Platform.OS === "web" && !r.disabled && !r.readOnly && !(r as any).readonly && (r.onClick || r.onMouseDown || r.onMouseUp)) {
         r.className = cn("cursor-pointer", r.className);
     }

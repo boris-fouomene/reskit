@@ -56,28 +56,78 @@ const textInput = tv({
         inputTextAlign: VariantsFactory.createTextAlignVariants<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
         }),
-        focus: {
-            true: {
-                input: "text-primary",
-                label: "text-primary",
-                labelEmbeded: "text-primary",
-                icon: "!text-primary",
-            }
+        borderStyle: VariantsFactory.createBorderStyleVariants<ITextInputSlots>((value, colorName) => {
+            return { contentContainer: value }
+        }),
+        borderColor: VariantsFactory.create<typeof VariantsGeneratedColors.borderColor, ITextInputSlots>(VariantsGeneratedColors.borderColor, (value, colorName) => {
+            return { contentContainer: value }
+        }),
+        ...VariantsFactory.createAllBorderWidthVariants<ITextInputSlots>((value, colorName) => {
+            return { contentContainer: value }
+        }),
+        focusedColor: VariantsFactory.create<typeof VariantsGeneratedColors.textWithForeground, ITextInputSlots>(VariantsGeneratedColors.textWithForeground, (value, colorName) => {
+            return {}
+        }),
+        errorColor: VariantsFactory.create<typeof VariantsGeneratedColors.background, ITextInputSlots>(VariantsGeneratedColors.background, (value, colorName) => {
+            return {}
+        }),
+        focusedBorderColor: VariantsFactory.create<typeof VariantsGeneratedColors.borderColor, ITextInputSlots>(VariantsGeneratedColors.borderColor, (value, colorName) => {
+            return { contentContainer: "" }
+        }),
+        focused: {
+            true: {}
         },
         error: {
-            true: {
-                input: "text-error",
-                label: "text-error",
-                icon: "!text-error",
-                labelEmbeded: "text-error",
-            }
+            true: {}
         }
     },
     defaultVariants: {
         background: "surface",
         paddingX: "5px",
         iconSize: "20px",
+        focusedColor: "primary",
+        focusedBorderColor: "primary",
+        errorColor: "error",
+        marginY: "10px",
     },
+    compoundVariants: [
+        //focused border color
+        ...Object.entries(VariantsGeneratedColors.borderColor).map(([borderColor, value]) => {
+            return {
+                focused: true,
+                focusedBorderColor: borderColor,
+                class: {
+                    contentContainer: value,
+                }
+            }
+        }) as Array<{}>,
+        //focused color
+        ...Object.entries(VariantsGeneratedColors.textWithForeground).map(([textColor, value]) => {
+            return {
+                focused: true,
+                focusedColor: textColor,
+                class: {
+                    labelEmbeded: value,
+                    label: value,
+                    input: value,
+                    icon: value.replaceAll("text-", "!text-")
+                }
+            }
+        }) as Array<{}>,
+        // error color
+        ...Object.entries(VariantsGeneratedColors.textWithForeground).map(([textColor, value]) => {
+            return {
+                error: true,
+                errorColor: textColor,
+                class: {
+                    labelEmbeded: value,
+                    label: value,
+                    input: value,
+                    icon: value.replaceAll("text-", "!text-")
+                }
+            }
+        }) as Array<{}>,
+    ]
 });
 
 export type IVariantPropsTextInput = VariantProps<typeof textInput>;

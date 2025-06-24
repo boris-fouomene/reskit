@@ -9,7 +9,7 @@ import { ITextInputCallbackOptions, ITextInputProps, ITextInputRenderOptions, IT
 import p from "@platform";
 import { TouchableOpacity } from "react-native";
 import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
-import textInputVariant from "@variants/textInput";
+import textInputVariant, { IVariantPropsTextInput } from "@variants/textInput";
 import allVariants from "@variants/all";
 import { extractTextClasses } from "@utils/textClasses";
 import { Div } from "@html/Div";
@@ -170,7 +170,7 @@ export function TextInput({
     const error = useMemo(() => {
         return !!customError || defaultBool(handleMaskValidationErrors, !!inputState.value) && !isInputValid;
     }, [customError, isInputValid, handleMaskValidationErrors, inputState.value])
-    const computedVariant = textInputVariant(Object.assign({}, variant, { focus: isFocused, error }));
+    const computedVariant = textInputVariant(Object.assign({}, variant, { error, focused: !error && isFocused } as IVariantPropsTextInput));
     const disabled = props.disabled || readOnly || !isHydrated;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const focus = () => {
@@ -179,6 +179,7 @@ export function TextInput({
             innerRef.current.focus();
         }
     };
+
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
     const labelClx = cn(isLabelEmbeded ? ["mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), labelClassName);
@@ -189,7 +190,16 @@ export function TextInput({
     const contentContainerClx = cn(computedVariant.contentContainer(), contentContainerClassName);
     const iconClx = cn(computedVariant.icon(), iconClassName);
     const containerClx = cn(computedVariant.container(), containerClassName);
-    const callOptions: ITextInputCallbackOptions = { ...inputState, labelClassName: labelClx, iconClassName: iconClx, inputClassName: inputClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
+
+    const phoneDialCodeLabel = useMemo(() => {
+        if (!isPhone || !isNonNullString(phoneDialCode)) return "";
+        const dialCode = "+" + phoneDialCode.trim().ltrim("+");
+        if (String(inputValue).startsWith(dialCode)) {
+            return "";
+        }
+        return dialCode.trim() + " ";
+    }, [phoneDialCode, isPhone, inputValue, inputTextClx]);
+    const callOptions: ITextInputCallbackOptions = { ...inputState, isPhone, phoneDialCodeLabel, labelClassName: labelClx, iconClassName: iconClx, inputClassName: inputClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
     const minHeight = useMemo(() => {
         return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbeded ? 30 : 46;
     }, [customMinHeight, isLabelEmbeded]);
@@ -232,14 +242,6 @@ export function TextInput({
         name={(isSecure ? defaultStr(passwordHiddenIconName, "eye") : defaultStr(passwordVisibleIconName, "eye-off")) as never}
         onPress={() => { setIsSecure(!isSecure); focus(); }} className={iconClx}
     /> : null;
-    /*     const phoneDialCodeLabel = useMemo(() => {
-            if (!isPhone || !isNonNullString(phoneDialCode)) return null;
-            const dialCode = "+" + phoneDialCode.trim().ltrim("+");
-            if (String(inputValue).startsWith(dialCode)) {
-                return null;
-            }
-            return <Text className={cn(inputTextClx)}>{dialCode.trim() + " "}</Text>
-        }, [phoneDialCode, isPhone, inputValue, inputTextClx]); */
 
     const labelSuffix = (suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbeded && inputMaskPlaceholder ? ` [${inputMaskPlaceholder}]` : "") + (isLabelEmbeded ? ` : ` : "");
     label = typeof label === "string" ? `${label}${labelSuffix}` : isValidElement(label) ? <>{label}<Text className={extractTextClasses(labelClx)}>{labelSuffix}</Text></> : null;

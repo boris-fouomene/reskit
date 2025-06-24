@@ -75,6 +75,16 @@ export interface ITextInputCallbackOptions extends IInputFormatterResult {
         The class name of the icon.
     */
     iconClassName: string;
+
+    /**
+     * Whether the input is a phone number.
+     */
+    isPhone: boolean;
+
+    /***
+     * The label to be displayed alongside the phone dial code.
+     */
+    phoneDialCodeLabel: string;
 };
 
 

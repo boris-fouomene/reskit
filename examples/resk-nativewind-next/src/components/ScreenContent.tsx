@@ -18,7 +18,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <TextInput type="date" label="Date" placeholder="Enter your date" />
         <TextInput type="time" label="Time" placeholder="Enter your time" />
         <TextInput type="datetime" label="DateTime" placeholder="Enter your datetime" />
-        <TextInput type="tel" label="Tel" placeholder="Enter your tel" labelEmbeded variant={{ marginY: "20px", rounded: true }} />
+        <TextInput type="tel" label="Tel" phoneCountryCode='CM' placeholder="Enter your tel" labelEmbeded variant={{ marginY: "20px", rounded: true }} />
       </Div>
       <VStack className="p-5">
         <H2>ProgressBar</H2>
@@ -66,7 +66,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       </Div>
       <Div className="p-5">
         <Heading level={2}>ActivityIndicator, on surface with padding</Heading>
-        <Surface variant={{ padding: "100px", border: "none", rounded: true }}>
+        <Surface variant={{ padding: "100px", borderStyle: "none", rounded: true }}>
           <HStack className="p-5 !gap-x-10">
             <ActivityIndicator variant={{ color: "primary" }} />
             <ActivityIndicator size={"small"} variant={{ color: "secondary" }} />

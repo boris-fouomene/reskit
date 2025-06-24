@@ -53,7 +53,7 @@ export type ITextInputType = InputModeOptions | "number" | "password" | "time" |
 
 type ITextInputComputedVariant = ReturnType<typeof textInputVariant>;
 
-export interface ITextInputCallbackOptions extends IInputFormatterResult {
+export interface ITextInputCallOptions extends IInputFormatterResult {
     isFocused: boolean;
     editable: boolean;
     disabled: boolean;
@@ -84,7 +84,7 @@ export interface ITextInputCallbackOptions extends IInputFormatterResult {
     /***
      * The label to be displayed alongside the phone dial code.
      */
-    phoneDialCodeLabel: string;
+    phoneDialCodeLabel: ReactNode;
 };
 
 
@@ -214,13 +214,13 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
     withLabel?: boolean;
 
     /**
-     * @type (options: ITextInputCallbackOptions) => ReactNode | false
+     * @type (options: ITextInputCallOptions) => ReactNode | false
      * Allows for displaying fixed text or values alongside the input, 
      * such as character counts. This can be a function returning a node 
      * or a simple value. If set to `false`, no affix will be displayed.
      * @default false
      */
-    affix?: ((options: ITextInputCallbackOptions) => ReactNode) | false;
+    affix?: ((options: ITextInputCallOptions) => ReactNode) | false;
 
     /**
      * @description
@@ -278,7 +278,7 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
      * @param {TextInputProps} props - The props passed to the TextInput component.
      * @returns {React.ReactNode} The rendered component.
      */
-    render?: (props: ITextInputRenderOptions, options: ITextInputCallbackOptions) => React.ReactNode;
+    render?: (props: ITextInputRenderOptions, options: ITextInputCallOptions) => React.ReactNode;
 
     /***
      * Input mask, use to format input value to a given format, based on mask
@@ -343,9 +343,9 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
      */
     ref?: React.Ref<TextInput>;
 
-    left?: ReactNode | ((options: ITextInputCallbackOptions) => ReactNode);
+    left?: ReactNode | ((options: ITextInputCallOptions) => ReactNode);
 
-    right?: ReactNode | ((options: ITextInputCallbackOptions) => ReactNode);
+    right?: ReactNode | ((options: ITextInputCallOptions) => ReactNode);
 
 
     /**
@@ -371,4 +371,11 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
      * @example "eye-off", "visibility-off", "hide"
      */
     passwordVisibleIconName?: IFontIconName;
+
+
+    /***
+        Whether to display the phone dial code label.
+        @default true
+    */
+    displayPhoneDialCode?: boolean;
 };

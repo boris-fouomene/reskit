@@ -1,3 +1,4 @@
+"use client";
 import { IDropdownAction, IDropdownCallOptions, IDropdownContext, IDropdownEvent, IDropdownPreparedItem, IDropdownPreparedItems, IDropdownProps, IDropdownState } from "./types";
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
@@ -223,8 +224,8 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
                 }
             });
         };
-        if (menuContext && !newState.visible) {
-            menuContext.animateMenu(newState.visible, cb);
+        if (menuContext && menuContext.menu && !newState.visible) {
+            menuContext.menu.open(newState.visible, cb);
         } else {
             cb();
         }
@@ -305,8 +306,6 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
 }
 
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
-    const theme = useTheme();
-    const i18n = useI18n();
     let { anchorContainerProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
     const { visible, preparedItems } = context.state;
     const isLoading = !!props.isLoading;

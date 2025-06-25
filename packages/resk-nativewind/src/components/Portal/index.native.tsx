@@ -5,6 +5,7 @@ import { cn } from '@utils/cn';
 import { styles } from './utils';
 import { IPortalProps } from './types';
 import allVariants from "@variants/all";
+import { useShouldRenderPortal } from './hook';
 
 /**
  * @interface IPortalItem
@@ -147,8 +148,9 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     );
 };
 
-function RenderedPortal({ children, className, withBackdrop, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
-    if (visible === false) return null;
+function RenderedPortal({ children, className, withBackdrop, unmountDelay, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
+    const shouldRender = useShouldRenderPortal({ visible, unmountDelay });
+    if (!shouldRender) return null;
     absoluteFill = withBackdrop || absoluteFill;
     const absoluteFillStyle = absoluteFill ? styles.absoluteFill : undefined;
     const handleBackdrop = withBackdrop || absoluteFill;

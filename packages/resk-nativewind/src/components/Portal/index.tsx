@@ -10,6 +10,7 @@ import allVariants from '@variants/all';
 import { StyleSheet } from 'react-native';
 import { classes } from '@variants/classes';
 import { AccessibilityEscapeManager } from '@html/accessibility';
+import { useShouldRenderPortal } from './hook';
 
 /**
  * A component that renders children into a DOM node that is not a descendant of the parent component.
@@ -27,13 +28,13 @@ import { AccessibilityEscapeManager } from '@html/accessibility';
  *   )
  * }
  */
-export function Portal({ children, onAccessibilityEscape, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
-    const [mounted, setMounted] = useState(false);
+export function Portal({ children, onAccessibilityEscape, style, className, unmountDelay, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
     const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
     const createdElementRef = useRef<HTMLElement | null>(null);
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const target = `#${targetId}`;
+    const shouldRender = useShouldRenderPortal({ visible, unmountDelay });
     useEffect(() => {
         if (typeof onAccessibilityEscape === "function" && targetElement) {
             const bindEvent = AccessibilityEscapeManager.getInstance().register(targetElement, onAccessibilityEscape);
@@ -43,9 +44,7 @@ export function Portal({ children, onAccessibilityEscape, style, className, onPr
         }
     }, [targetElement, onAccessibilityEscape]);
     useEffect(() => {
-        // Only run on client side
-        setMounted(true);
-        if (!visible) {
+        if (!shouldRender) {
             if (targetElement) {
                 setTargetElement(null);
             }
@@ -90,9 +89,9 @@ export function Portal({ children, onAccessibilityEscape, style, className, onPr
                 console.log(e, " removing portal element")
             }
         };
-    }, [target, targetId, className, absoluteFill, visible, testID, onPress]);
+    }, [target, targetId, className, absoluteFill, shouldRender, testID, onPress]);
     // Don't render anything on server side or before mounting
-    if (!mounted || !targetElement) {
+    if (!targetElement || !shouldRender) {
         return null;
     }
     return createPortal(children, targetElement);

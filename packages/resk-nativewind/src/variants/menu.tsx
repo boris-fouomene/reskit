@@ -4,7 +4,7 @@ import { VariantsFactory } from "./variantsFactory";
 
 const menu = tv({
     slots: {
-        base: "",
+        container: "duration-300 ease-out transition-opacity",
         anchorContainer: "",
         portal: "",
         contentContainer: "",
@@ -13,17 +13,46 @@ const menu = tv({
         scrollViewContentContainer: "",
     },
     variants: {
-        background: VariantsFactory.create<typeof VariantsGeneratedColors.surface, { base: string }>(VariantsGeneratedColors.surface, (value) => {
+        visible: {
+            true: {
+                container: "opacity-100",
+            },
+            false: {
+                container: "opacity-0",
+            }
+        },
+        animation: {
+            scale: {
+                container: "transform transition-all",
+            },
+        },
+        background: VariantsFactory.create<typeof VariantsGeneratedColors.surface, { container: string }>(VariantsGeneratedColors.surface, (value) => {
             return {
-                base: value,
+                container: value,
             }
         }),
-        ...VariantsFactory.createAll<{ base: string }>((value) => {
+        ...VariantsFactory.createAll<{ container: string }>((value) => {
             return {
-                base: value,
+                container: value,
             }
         })
     },
+    compoundVariants: [
+        {
+            animation: "scale",
+            visible: false,
+            class: {
+                container: "scale-90",
+            }
+        },
+        {
+            animation: "scale",
+            visible: true,
+            class: {
+                container: "scale-100",
+            }
+        }
+    ],
     defaultVariants: {
         background: "surface",
         paddingBottom: "4",

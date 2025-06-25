@@ -1,5 +1,3 @@
-import { ClassValue } from "tailwind-variants";
-
 export const classes: IVariantsClasses = {
   disabled: "pointer-events-none opacity-70 web:cursor-not-allowed",
   readOnly: "pointer-events-none opacity-80 web:cursor-not-allowed",
@@ -11,12 +9,12 @@ export const classes: IVariantsClasses = {
   cursorDefault: "cursor-default",
 };
 export interface IVariantsClasses {
-  disabled: ClassValue;
-  readOnly: ClassValue;
-  hidden: ClassValue;
-  active2hoverState: ClassValue;
-  cursorPointed: ClassValue;
-  positionFixed: ClassValue;
-  absoluteFill: ClassValue;
-  cursorDefault: ClassValue;
+  disabled: string;
+  readOnly: string;
+  hidden: string;
+  active2hoverState: string;
+  cursorPointed: string;
+  positionFixed: string;
+  absoluteFill: string;
+  cursorDefault: string;
 }

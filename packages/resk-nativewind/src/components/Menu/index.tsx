@@ -17,6 +17,8 @@ import menuVariants from '@variants/menu';
 import usePrevious from '@utils/usePrevious';
 import bottomSheetVariant from '@variants/bottomSheet';
 import { Div } from '@html/Div';
+import { classes } from '@variants/classes';
+import allVariants from '@variants/all';
 
 
 
@@ -51,7 +53,9 @@ export function Menu<Context = unknown>({
     fullScreenOnMobile,
     fullScreenOnTablet,
     onRequestOpen,
+    disabled,
     contentContainerClassName,
+    animationDuration,
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -176,11 +180,11 @@ export function Menu<Context = unknown>({
         close();
         return true;
     });
-    const menuVariant = menuVariants(variant);
+    const computedVariant = menuVariants(Object.assign({}, variant, { visible: isVisible }));
     const Wrapper = !withScrollView ? Fragment : ScrollView;
-    const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", className: cn(menuVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(menuVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
+    const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", className: cn(computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
-    itemsProps.className = cn(menuVariant.items(), itemsProps.className);
+    itemsProps.className = cn(computedVariant.items(), itemsProps.className);
     const AnchorComponent = typeof customAnchor == "function" ? View : TouchableOpacity;
     const anchorProps = typeof customAnchor == "function" ? {} : {
         onPress: () => {
@@ -192,7 +196,7 @@ export function Menu<Context = unknown>({
             <AnchorComponent
                 testID={testID + "-anchor-container"}
                 ref={anchorRef}
-                className={cn(menuVariant.anchorContainer(), anchorContainerClassName, "relative menu-anchor-container")}
+                className={cn(classes.cursorPointed, allVariants({ disabled }), computedVariant.anchorContainer(), anchorContainerClassName, "relative menu-anchor-container")}
                 onAccessibilityEscape={dismissable !== false ? () => {
                     close();
                 } : undefined}
@@ -208,12 +212,12 @@ export function Menu<Context = unknown>({
                 {anchor}
             </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} withBackdrop={renderedAsBottomSheet} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(menuVariant.portal(), backdropClassName, "menu-portal")}>
+        {<Portal visible={isVisible} unmountDelay={animationDuration} withBackdrop={renderedAsBottomSheet} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(computedVariant.portal(), renderedAsBottomSheet && computedBottomSheetVariant.portal(), backdropClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
                 <View
                     testID={testID}
                     {...props}
-                    className={cn("resk-menu absolute", menuVariant.base(), renderedAsBottomSheet && computedBottomSheetVariant.container(), className)}
+                    className={cn("resk-menu absolute", renderedAsBottomSheet ? computedBottomSheetVariant.container() : computedVariant.container(), className)}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
                             onLayout(event);
@@ -222,7 +226,7 @@ export function Menu<Context = unknown>({
                     }}
                     style={StyleSheet.flatten([!renderedAsBottomSheet && menuStyle, props.style])}
                 >
-                    <Div testID={testID + "-menu-content-container"} className={cn("flex-1 grow", renderedAsBottomSheet && computedBottomSheetVariant.contentContainer(), contentContainerClassName)}>
+                    <Div testID={testID + "-menu-content-container"} className={cn("flex-1 grow", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.contentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                             {child}

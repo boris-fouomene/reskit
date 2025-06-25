@@ -1,7 +1,7 @@
 "use client";
 import { cn, isValidElement, useHydrationStatus, useMergeRefs } from "@utils";
 import { Text } from "@html/Text";
-import { Animated, NativeSyntheticEvent, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
+import { NativeSyntheticEvent, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from "react";
 import InputFormatter from "@resk/core/inputFormatter";
 import { IInputFormatterMaskResult, IInputFormatterResult } from "@resk/core/types";
@@ -16,12 +16,10 @@ import textInputVariant, { IVariantPropsTextInput } from "@variants/textInput";
 import allVariants from "@variants/all";
 import { extractTextClasses } from "@utils/textClasses";
 import { Div } from "@html/Div";
-import { cssInterop, remapProps } from "nativewind";
 import { classes } from "@variants/classes";
 
 
 const isNative = p.isNative();
-const useNativeDriver = p.canUseNativeDriver();
 
 
 export default function TextInput({
@@ -279,7 +277,6 @@ export default function TextInput({
         ...(!canWrapWithTouchable && editable ? pressableProps : {}),
         ...props,
         className: inputClx,
-        //placeholderTextColor: isFocused || error ? textColor : theme.colors.placeholder,
         underlineColorAndroid: "transparent",
         ...props,
         defaultValue: undefined,

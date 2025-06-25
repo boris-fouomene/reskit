@@ -12,33 +12,16 @@ import { IMenuContext, Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { StyleSheet } from "react-native";
 import { IViewStyle } from "@src/types";
-import { useI18n } from "@src/i18n/hooks";
 import { Divider } from "@components/Divider";
 import { ProgressBar } from "@components/ProgressBar";
 import { ITextInputProps } from "@components/TextInput/types";
 import Platform from "@platform";
-import { FlatList } from "react-native";
 import FontIcon from "@components/Icon/Font";
 import { FONT_ICONS } from '../Icon/Font/icons';
 import { Div } from "@html/Div";
 import { TextInput } from "@components/TextInput";
 
-/**
- * Represents a dropdown component that allows users to select one or more items from a list.
- * 
- * This class extends the `Component` class and implements the `IDropdownContext` interface, 
- * providing methods and state management for dropdown interactions. It manages the visibility, 
- * selection, and filtering of items within the dropdown.
- * 
- * @class Dropdown
- * @template ItemType - The type of the items in the dropdown.
- * @template ValueType - The type of the value associated with the items.
- * 
- * @extends Component<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>>
- * @implements IDropdownContext<ItemType, ValueType>
- * 
- * @param {IDropdownProps<ItemType, ValueType>} props - The properties for the dropdown component.
- */
+
 export class Dropdown<ItemType = any, ValueType = any> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
     constructor(props: IDropdownProps<ItemType, ValueType>) {
         super(props);

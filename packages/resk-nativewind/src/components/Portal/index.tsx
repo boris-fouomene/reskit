@@ -1,5 +1,5 @@
 "use client";
-import { defaultStr, getMaxZindex } from '@resk/core/utils';
+import { defaultStr, getMaxZindex, isNumber } from '@resk/core/utils';
 import { useEffect, useState, useRef, ReactNode, useId, CSSProperties, JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@utils/cn';
@@ -30,11 +30,24 @@ import { useShouldRenderPortal } from './hook';
  */
 export function Portal({ children, onAccessibilityEscape, style, className, unmountDelay, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
     const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
+    const isRenderingRef = useRef<boolean>(false);
     const createdElementRef = useRef<HTMLElement | null>(null);
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const target = `#${targetId}`;
-    const shouldRender = useShouldRenderPortal({ visible, unmountDelay });
+    unmountDelay = isNumber(unmountDelay) && unmountDelay > 0 ? unmountDelay : 0;
+    const removePortal = () => {
+        // Remove created element on unmount
+        try {
+            if (createdElementRef.current && createdElementRef.current.parentNode) {
+                createdElementRef.current.remove();
+                createdElementRef.current = null;
+            }
+        } catch (e) {
+            console.log(e, " removing portal element")
+        }
+    };
+    //const shouldRender = useShouldRenderPortal({ visible, unmountDelay });
     useEffect(() => {
         if (typeof onAccessibilityEscape === "function" && targetElement) {
             const bindEvent = AccessibilityEscapeManager.getInstance().register(targetElement, onAccessibilityEscape);
@@ -44,9 +57,16 @@ export function Portal({ children, onAccessibilityEscape, style, className, unmo
         }
     }, [targetElement, onAccessibilityEscape]);
     useEffect(() => {
-        if (!shouldRender) {
+        isRenderingRef.current = false;
+    }, [targetElement])
+    useEffect(() => {
+        if (!visible) {
+            setTimeout(() => {
+                removePortal();
+            }, unmountDelay)
             return;
         }
+        isRenderingRef.current = true;
         let element: HTMLElement | null = document.querySelector(target) as HTMLElement;
         // Create target if it doesn't exist and createTarget is true
         if (!element) {
@@ -73,20 +93,10 @@ export function Portal({ children, onAccessibilityEscape, style, className, unmo
         }
         setTargetElement(element);
         // Cleanup function
-        return () => {
-            // Remove created element on unmount
-            try {
-                if (createdElementRef.current && createdElementRef.current.parentNode) {
-                    createdElementRef.current.remove();
-                    createdElementRef.current = null;
-                }
-            } catch (e) {
-                console.log(e, " removing portal element")
-            }
-        };
-    }, [target, targetId, className, absoluteFill, shouldRender, testID, onPress]);
+        return removePortal;
+    }, [target, targetId, className, absoluteFill, visible, testID, onPress, unmountDelay]);
     // Don't render anything on server side or before mounting
-    if (!targetElement || !shouldRender) {
+    if (!targetElement) {
         return null;
     }
     return createPortal(children, targetElement);

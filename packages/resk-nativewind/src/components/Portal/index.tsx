@@ -44,12 +44,6 @@ export function Portal({ children, onAccessibilityEscape, style, className, unmo
         }
     }, [targetElement, onAccessibilityEscape]);
     useEffect(() => {
-        if (!shouldRender) {
-            if (targetElement) {
-                setTargetElement(null);
-            }
-            return;
-        }
         let element: HTMLElement | null = document.querySelector(target) as HTMLElement;
         // Create target if it doesn't exist and createTarget is true
         if (!element) {
@@ -75,8 +69,6 @@ export function Portal({ children, onAccessibilityEscape, style, className, unmo
             element.style.cursor = "default";
         }
         setTargetElement(element);
-
-
         // Cleanup function
         return () => {
             // Remove created element on unmount

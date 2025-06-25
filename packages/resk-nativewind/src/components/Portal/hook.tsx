@@ -65,19 +65,15 @@ import { useEffect, useState } from "react";
  */
 export function useShouldRenderPortal({ visible, unmountDelay }: { visible?: boolean, unmountDelay?: number }) {
     const [shouldRender, setShouldRender] = useState(visible);
-    unmountDelay = isNumber(unmountDelay) && unmountDelay > 0 ? unmountDelay : 300;
+    unmountDelay = isNumber(unmountDelay) && unmountDelay >= 0 ? unmountDelay : 0;
     useEffect(() => {
         if (visible) {
-            // Mount immediately when visible becomes true
-            setShouldRender(true);
-        } else if (unmountDelay > 0) {
+            if (!shouldRender) setShouldRender(true);
+        } else if (shouldRender) {
             const timer = setTimeout(() => {
                 setShouldRender(false);
             }, unmountDelay);
             return () => clearTimeout(timer);
-        } else {
-            // No delay, unmount immediately
-            setShouldRender(false);
         }
     }, [visible, unmountDelay]);
     return shouldRender;

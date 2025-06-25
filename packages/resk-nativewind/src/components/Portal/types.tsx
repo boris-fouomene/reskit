@@ -61,7 +61,6 @@ export interface IPortalProps {
    * - The timeout is automatically cleared if `visible` becomes `true` again before the delay expires
    * - Setting this to 0 or omitting it results in immediate unmounting (no animation support)
    * - This value should typically match or slightly exceed your CSS animation/transition duration
-   * @default 300
    */
     unmountDelay?: number;
     /***

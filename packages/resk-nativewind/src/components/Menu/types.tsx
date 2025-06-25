@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { ViewProps } from "react-native";
 import { IVariantPropsMenu } from "@variants/menu";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
+import { IVariantPropsBottomSheet } from "@variants/bottomSheet";
 
 /**
  * Represents the possible positions where the menu can be displayed
@@ -184,6 +185,11 @@ export type IMenuContext<Context = unknown> = Context & {
          */
         fullScreen: boolean;
 
+        /***
+            Whether the menu is rendered as a bottom sheet
+        */
+        renderedAsBottomSheet: boolean;
+
         isMobile: boolean;
         isTablet: boolean;
         isDesktop: boolean;
@@ -254,7 +260,10 @@ export interface IUseMenuPositionProps {
     preferedPositionAxis?: "horizontal" | "vertical";
 }
 
-
+export interface IMenuState {
+    anchorMeasurements: IMenuAnchorMeasurements,
+    visible: boolean
+}
 
 export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children" | "style" | "className">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
 
@@ -283,6 +292,13 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     withScrollView?: boolean;
 
     /***
+        The class name for the content container.
+        This is used to apply style to the content container.
+        The content container is the flex-1 container that wraps the menu content and items.
+    */
+    contentContainerClassName?: IClassName;
+
+    /***
      * The class name for the scroll view.
      * This is used to apply style to the scroll view.
      */
@@ -306,6 +322,12 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     onDismiss?: () => void;
 
     /***
+        The callback function that is called when the menu is opened.
+        This is considered when the menu is controlled externally by providing the visible prop.
+    */
+    onRequestOpen?: (menuState: IMenuState) => void;
+
+    /***
      * The class name for the backdrop.
      */
     backdropClassName?: IClassName;
@@ -314,7 +336,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * Whether the menu should be rendered as a bottom sheet in full screen mode.
      * If set to true, the menu will be rendered as a bottom sheet on mobile (when the fullScreenOnMobile prop is set to true) or tablet (when the fullScreenOnTablet pros is set to true) devices, and as a regular menu on desktop.
      */
-    //renderAsBottomSheetInFullScreen?: boolean;
+    renderAsBottomSheetInFullScreen?: boolean;
 
     /***
      * The title of the bottom sheet when the menu is rendered as a bottom sheet.
@@ -336,6 +358,12 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * The variant to use for the menu.
      */
     variant?: IVariantPropsMenu;
+
+    /***
+        The variant to use for the bottom sheet.
+        It will be used only if the menu is rendered as a bottom sheet.
+    */
+    bottomSheetVariant?: IVariantPropsBottomSheet;
 
     /***
      * Additional context options to pass to each item, enabling customization of the properties passed to item.

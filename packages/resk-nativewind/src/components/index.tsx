@@ -21,4 +21,5 @@ export * from "./Menu";
 export * from "./Nav";
 export * from "./AppBar";
 export * from "./ProgressBar";
-export * from "./TextInput";
+export * from "./TextInput"
+export * from "./Dropdown";

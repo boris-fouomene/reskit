@@ -10,7 +10,7 @@ import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
 import modalVariants, { IVariantPropsModal } from "@variants/modal";
 
-export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable:customDismissable, onDismiss, ...props }: IModalProps) => {
+export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable: customDismissable, onDismiss, ...props }: IModalProps) => {
   const children = useMemo(() => {
     return props.children;
   }, [props.children]);
@@ -25,26 +25,26 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
   }
   useBackHandler(dismissable ? handleDismiss : () => true);
   return (
-    <Portal absoluteFill visible={visible} 
-      testID={testID + "-modal-portal"} 
+    <Portal absoluteFill visible={visible}
+      testID={testID + "-modal-portal"}
       onPress={dismissable ? handleDismiss : undefined} withBackdrop className={cn("modal-portal-container", modalVariant.container(), backdropClassName)}
       onAccessibilityEscape={() => {
-          if (typeof onAccessibilityEscape === "function") {
-            onAccessibilityEscape();
-          }
-          if (dismissable === false) return;
-          handleDismiss(undefined as any);
+        if (typeof onAccessibilityEscape === "function") {
+          onAccessibilityEscape();
+        }
+        if (dismissable === false) return;
+        handleDismiss(undefined as any);
       }}
     >
       <Div
-          {...props}
-          testID={testID}
-          className={cn("resk-modal transition-opacity duration-500", modalVariant.content(), className)}
-        >
-          <ModalContext.Provider value={{ isVisible: visible as boolean, isClosed: () => !!!visible, isOpen: () => !!visible, handleDismiss, dismissable: dismissable !== false }}>
-            {children}
-          </ModalContext.Provider>
-        </Div>
+        {...props}
+        testID={testID}
+        className={cn("resk-modal transition-opacity duration-500", modalVariant.content(), className)}
+      >
+        <ModalContext.Provider value={{ isVisible: visible as boolean, isClosed: () => !!!visible, isOpen: () => !!visible, handleDismiss, dismissable: dismissable !== false }}>
+          {children}
+        </ModalContext.Provider>
+      </Div>
     </Portal>
   );
 };

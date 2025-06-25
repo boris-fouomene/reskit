@@ -2,7 +2,7 @@
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { useEffect, useState, useRef, useMemo, RefObject, Fragment } from 'react';
-import { View, LayoutChangeEvent, LayoutRectangle, Pressable, ScrollView, ScrollViewProps, StyleSheet } from 'react-native';
+import { View, LayoutChangeEvent, LayoutRectangle, Pressable, ScrollView, ScrollViewProps, StyleSheet, TouchableOpacity } from 'react-native';
 import { IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
@@ -14,7 +14,9 @@ import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
 import { useBackHandler } from '@components/BackHandler';
 import menuVariants from '@variants/menu';
-import { InteractionManager } from 'react-native';
+import usePrevious from '@utils/usePrevious';
+import bottomSheetVariant from '@variants/bottomSheet';
+import { Div } from '@html/Div';
 
 
 
@@ -33,7 +35,7 @@ export function Menu<Context = unknown>({
     preferedPositionAxis,
     dismissable,
     onDismiss,
-    //renderAsBottomSheetInFullScreen,
+    renderAsBottomSheetInFullScreen,
     bottomSheetTitle,
     bottomSheetTitleDivider,
     backdropClassName,
@@ -45,9 +47,17 @@ export function Menu<Context = unknown>({
     items,
     itemsProps,
     variant,
+    bottomSheetVariant: bVariant,
+    fullScreenOnMobile,
+    fullScreenOnTablet,
+    onRequestOpen,
+    contentContainerClassName,
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
+    const openOrCloseCallbackRef = useRef<Function | null>(null);
+    fullScreenOnMobile = typeof fullScreenOnMobile === "boolean" ? fullScreenOnMobile : !!(renderAsBottomSheetInFullScreen);
+    fullScreenOnTablet = typeof fullScreenOnTablet === "boolean" ? fullScreenOnTablet : !!(renderAsBottomSheetInFullScreen);
     const [state, setState] = useStateCallback({
         visible: isControlled ? !!visible : false,
         anchorMeasurements: {
@@ -65,7 +75,17 @@ export function Menu<Context = unknown>({
     const isVisible = useMemo(() => {
         return isControlled ? !!visible : state.visible;
     }, [state.visible, isControlled, visible]);
+    const prevVisible = usePrevious(isVisible);
+    useEffect(() => {
+        if (isVisible !== prevVisible && isControlled && typeof openOrCloseCallbackRef.current == "function") {
+            openOrCloseCallbackRef.current();
+        }
+        openOrCloseCallbackRef.current = null;
+    }, [isVisible, isControlled, prevVisible]);
     const { menuPosition, menuStyle, isDesktop, isMobile, isTablet, windowWidth, windowHeight, fullScreen } = useMenuPosition({
+        ...props,
+        fullScreenOnMobile,
+        fullScreenOnTablet,
         menuWidth: menuLayout?.width || 0,
         menuHeight: menuLayout?.height || 0,
         maxHeight,
@@ -77,20 +97,22 @@ export function Menu<Context = unknown>({
         preferedPositionAxis,
     });
     const closeMenuInternal = (callback?: Function) => {
-        if (isControlled) {
-            if (typeof onDismiss === "function") {
-                onDismiss();
-            }
-            return;
-        }
-        setState((prevState) => ({ ...prevState, visible: false }), () => {
+        const cb = () => {
             if (typeof callback === "function") {
                 callback();
             }
             if (typeof onClose === "function") {
                 onClose();
             }
-        });
+        };
+        if (isControlled) {
+            (openOrCloseCallbackRef as any).current = cb;
+            if (typeof onDismiss === "function") {
+                onDismiss();
+            }
+            return;
+        }
+        setState((prevState) => ({ ...prevState, visible: false }), cb);
     };
     useEffect(() => {
         measureAnchor(anchorRef).then((anchorMeasurements) => {
@@ -108,31 +130,33 @@ export function Menu<Context = unknown>({
         setMenuLayout({ width, height, x: 0, y: 0 });
     }
     const open = (callback?: Function) => {
-        InteractionManager.runAfterInteractions(() => {
-            measureAnchor(anchorRef).then((measures) => {
-                if (isControlled) {
-                    setState((prevState) => {
-                        return { ...prevState, anchorMeasurements: measures }
-                    });
-                    return;
+        measureAnchor(anchorRef).then((measures) => {
+            const cb = () => {
+                if (typeof callback === "function") {
+                    callback();
                 }
+                if (typeof onOpen === "function") {
+                    onOpen();
+                }
+            };
+            if (isControlled) {
+                (openOrCloseCallbackRef as any).current = cb;
                 setState((prevState) => {
-                    return { ...prevState, anchorMeasurements: measures, visible: true }
-                }, () => {
-                    if (typeof callback === "function") {
-                        callback();
-                    }
-                    if (typeof onOpen === "function") {
-                        onOpen();
-                    }
-                });
-            });
+                    return { ...prevState, anchorMeasurements: measures }
+                }, onRequestOpen);
+                return;
+            }
+            setState((prevState) => {
+                return { ...prevState, anchorMeasurements: measures, visible: true }
+            }, cb);
         });
     };
     const close = (callback?: Function) => {
         closeMenuInternal(callback);
     };
-    const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
+    const renderedAsBottomSheet = fullScreen && renderAsBottomSheetInFullScreen !== false;
+    const computedBottomSheetVariant = bottomSheetVariant(Object.assign({}, bVariant, { visible: isVisible }));
+    const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { renderedAsBottomSheet, windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
     let anchor = null;
     if (typeof customAnchor === 'function') {
         const a = customAnchor(context);
@@ -157,9 +181,16 @@ export function Menu<Context = unknown>({
     const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", className: cn(menuVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(menuVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
     itemsProps.className = cn(menuVariant.items(), itemsProps.className);
+    const AnchorComponent = typeof customAnchor == "function" ? View : TouchableOpacity;
+    const anchorProps = typeof customAnchor == "function" ? {} : {
+        onPress: () => {
+            open();
+        }
+    }
     return <>
         <MenuContext.Provider value={context}>
-            <Pressable testID={testID + "-anchor-container"}
+            <AnchorComponent
+                testID={testID + "-anchor-container"}
                 ref={anchorRef}
                 className={cn(menuVariant.anchorContainer(), anchorContainerClassName, "relative menu-anchor-container")}
                 onAccessibilityEscape={dismissable !== false ? () => {
@@ -172,35 +203,31 @@ export function Menu<Context = unknown>({
                         });
                     });
                 }}
-                onPress={(event) => {
-                    open();
-                }}>
+                {...anchorProps}
+            >
                 {anchor}
-            </Pressable>
+            </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={(event) => {
-            if (event.target == event.currentTarget) {
-                close();
-                return;
-            }
-        }} className={cn(menuVariant.portal(), backdropClassName, "menu-portal")}>
+        {<Portal visible={isVisible} withBackdrop={renderedAsBottomSheet} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(menuVariant.portal(), backdropClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
                 <View
                     testID={testID}
                     {...props}
-                    className={cn("resk-menu absolute", menuVariant.base(), className)}
+                    className={cn("resk-menu absolute", menuVariant.base(), renderedAsBottomSheet && computedBottomSheetVariant.container(), className)}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
                             onLayout(event);
                         }
                         onMenuLayout(event);
                     }}
-                    style={StyleSheet.flatten([menuStyle, props.style])}
+                    style={StyleSheet.flatten([!renderedAsBottomSheet && menuStyle, props.style])}
                 >
-                    <Wrapper {...wrapperProps}>
-                        {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
-                        {child}
-                    </Wrapper>
+                    <Div testID={testID + "-menu-content-container"} className={cn("flex-1 grow", renderedAsBottomSheet && computedBottomSheetVariant.contentContainer(), contentContainerClassName)}>
+                        <Wrapper {...wrapperProps}>
+                            {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
+                            {child}
+                        </Wrapper>
+                    </Div>
                 </View>
             </MenuContext.Provider>
         </Portal>}

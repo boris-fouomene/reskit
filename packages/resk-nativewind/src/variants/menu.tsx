@@ -7,6 +7,7 @@ const menu = tv({
         base: "",
         anchorContainer: "",
         portal: "",
+        contentContainer: "",
         items: "",
         scrollView: "",
         scrollViewContentContainer: "",

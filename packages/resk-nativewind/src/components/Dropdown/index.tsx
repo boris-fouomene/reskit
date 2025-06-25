@@ -5,9 +5,9 @@ import stableHash from "stable-hash";
 import { defaultStr, isEmpty, isNonNullString, isObj, areEquals, stringify, isNumber } from "@resk/core/utils";
 import Logger from "@resk/core/logger";
 import i18n from "@resk/core/i18n";
-import { getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
+import { cn, getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
-import { Dimensions, TouchableOpacity } from 'react-native';
+import { Dimensions, FlatList, TouchableOpacity, View } from 'react-native';
 import { IMenuContext, Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { StyleSheet } from "react-native";
@@ -20,6 +20,7 @@ import FontIcon from "@components/Icon/Font";
 import { FONT_ICONS } from '../Icon/Font/icons';
 import { Div } from "@html/Div";
 import { TextInput } from "@components/TextInput";
+import { Text } from "@html/Text";
 
 
 export class Dropdown<ItemType = any, ValueType = any> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
@@ -108,7 +109,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         (Array.isArray(customItems) ? customItems : []).map((item, index) => {
             const value = this.getItemValue({ item, index, isDropdown: true });
             if (isEmpty(value) || !value) {
-                Logger.warn("invalid dropdown value ", value, " for item ", item, index, " with dropdown ", props);
+                Logger.warn("invalid dropdown value ", value, " for item ", item, index, " with dropdown className ", this.props.className, " test id ", this.props.testID);
                 return;
             }
             const hashKey = this.getHashKey(value);
@@ -208,7 +209,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             });
         };
         if (menuContext && menuContext.menu && !newState.visible) {
-            menuContext.menu.open(newState.visible, cb);
+            menuContext.menu.open(cb);
         } else {
             cb();
         }
@@ -347,20 +348,18 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         return { selectedText, title, selectedItems, selectedValues };
     }, [selectedItemsByHashKey]);
     context.anchorSelectedText = anchorSelectedText;
-    const actions = useMemo<IDropdownAction[]>(() => {
+    const actions = useMemo(() => {
         const actions: IDropdownAction[] = [];
         if (dropdownActions) {
-            const actProps: IDropdownAction[] = typeof dropdownActions === "function" ? dropdownActions(context) : dropdownActions;
+            const actProps = (typeof dropdownActions === "function" ? dropdownActions(context) : dropdownActions) as IDropdownAction[];
             if (Array.isArray(actProps)) {
                 actProps.map((act) => {
                     if (!act || !isObj(act)) {
                         return;
                     }
                     actions.push({
-                        uppercase: false,
                         ...act,
                         context: {
-                            ...Object.assign({}, act.context),
                             dropdown: context
                         }
                     });
@@ -395,8 +394,8 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         }
         return actions;
     }, [dropdownActions, multiple, context?.isOpen(), context, anchorSelectedText]);
-    context.dropdownActions = actions;
-    const loadingContent = isLoading ? <ProgressBar color={theme.colors.secondary} indeterminate testID={testID + "dropdown-progressbar"} /> : null;
+    context.dropdownActions = actions as any;
+    const loadingContent = isLoading ? <ProgressBar indeterminate testID={testID + "dropdown-progressbar"} /> : null;
     const anchorProps: ITextInputProps = {
         ...props,
         onChange: undefined,
@@ -408,20 +407,17 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     }
     return <DropdownContext.Provider value={context}>
         <Menu
-            responsive
             minWidth={180}
             maxHeight={maxDropdownHeight}
-            animated={false}
             bottomSheetTitle={context?.props?.label}
             bottomSheetTitleDivider={!canRenderSearch(context)}
             testID={testID + "-menu"}
             {...Object.assign({}, menuProps)}
-            bottomSheetFullScreen={(typeof menuProps?.bottomSheetFullScreen == "boolean" ? menuProps.bottomSheetFullScreen : preparedItems?.length > 10)}
+            //bottomSheetFullScreen={(typeof menuProps?.bottomSheetFullScreen == "boolean" ? menuProps.bottomSheetFullScreen : preparedItems?.length > 10)}
             visible={visible}
             onDismiss={context.close.bind(context)}
             withScrollView={false}
             sameWidth
-            dynamicHeight={false}
             onClose={context.close.bind(context)}
             anchor={<View disabled={disabled}
                 testID={`${testID}-dropdown-anchor-container`}
@@ -451,10 +447,10 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
     const filteredItems = Array.isArray(context?.filteredItems) ? context.filteredItems : [];
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
     const listProps = Object.assign({}, context?.props?.listProps);
-
     const testID = context?.getTestID();
-    const menu = useMenu();
-    const menuPosition = menu?.menuPosition;
+    const menuContext = useMenu();
+    const { menu } = Object.assign({}, menuContext);
+    const menuPosition = menu?.position;
     const isTopPosition = menuPosition?.yPosition === "top";
     const fullScreen = !!menu?.fullScreen;
     const canReverse = isTopPosition && !fullScreen;
@@ -462,16 +458,21 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
     const menuWidth = typeof menuPosition?.width === "number" && menuPosition.width > 50 ? menuPosition.width : undefined;
     const canRenderDropdownSearch = canRenderSearch(context);
     const hasMenuHeight = typeof menuHeight == "number" && menuHeight > 0;
-    return <View testID={testID + "-dropdown-list-container"} style={[
-        styles.dropdownListContainer,
-        fullScreen && styles.dropdownListContainerFullScreen,
-        hasMenuHeight ? { height: menuHeight } : null,
-        typeof menuWidth == "number" && { width: menuWidth },
-        canReverse && styles.dropdownListTopPosition, !isEditabled && Theme.styles.disabled
-    ]}
+    return <Div
+        disabled={context?.props?.disabled}
+        readOnly={!isEditabled}
+        testID={testID + "-dropdown-list-container"}
+        className={cn(
+            "w-full flex flex-1 grow pb-[10px] max-h-full", fullScreen && "flex-row",
+            //fullScreen && "flex-1"
+        )}
+        style={{
+            ...(hasMenuHeight ? { height: menuHeight } : {}),
+            ...(typeof menuWidth == "number" ? { width: menuWidth } : {}),
+        }}
     >
         {canRenderDropdownSearch ? <DropdownSearch isFullScreen={fullScreen} /> : null}
-        <List<IDropdownPreparedItem<ItemType, ValueType>>
+        <FlatList<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
             scrollEnabled
             {...listProps}
@@ -481,7 +482,7 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
             keyExtractor={({ hashKey }) => hashKey}
             renderItem={renderItem}
         />
-    </View>;
+    </Div>;
 }
 function renderItem<ItemType, ValueType>({ item, index }: { item: IDropdownPreparedItem<ItemType, ValueType>, index: number }) {
     return <DropdownItem {...item} index={index} />;
@@ -492,7 +493,6 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
     const menuContext = useMenu()
     const forceRender = useForceRender();
     const context = useDropdown();
-    const theme = useTheme();
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
     const itemsByHashKey = context.itemsByHashKey;
     const labelRef = useRef<Text>(null);
@@ -537,7 +537,6 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
     return (
         <Tooltip
             title={label}
-            as={TouchableRipple}
             onPress={() => {
                 context.toggleItem(preparedItem, menuContext);
             }}
@@ -545,8 +544,8 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
             testID={testID + "-item-container-" + hashKey}
         >
             <View style={styles.itemContent} testID={testID + "-item-content-" + hashKey}>
-                {isSelected ? <FontIcon style={[styles.selectedIcon]} name={isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked"} size={20} color={theme.colors.primary} /> : null}
-                {<Label ref={labelRef as any} fontSize={15} color={isSelected ? theme.colors.primary : undefined}>{label}</Label>}
+                {isSelected ? <FontIcon style={[styles.selectedIcon]} name={(isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked") as never} size={20} variant={{ color: "primary" }} /> : null}
+                {<Text ref={labelRef as any} variant={{ color: isSelected ? "primary" : undefined }}>{label}</Text>}
             </View>
         </Tooltip>
     );
@@ -573,11 +572,6 @@ const styles = StyleSheet.create({
         flexWrap: "nowrap",
         paddingHorizontal: 10,
     },
-    searchDivider: {
-        width: "100%",
-        marginTop: 5,
-        overflow: "hidden",
-    },
     disabled: {
         pointerEvents: "none",
         opacity: 0.9,
@@ -595,26 +589,9 @@ const styles = StyleSheet.create({
     searchInput: {
         width: "100%",
     },
-    searchInputContainer: {
-        width: "100%",
-        paddingHorizontal: 7,
-    },
-    dropdownListContainerFullScreen: {
-        flex: 1,
-        flexGrow: 1,
-    },
     contentContainer: {
         alignSelf: "flex-start",
         width: "100%",
-    },
-    dropdownListContainer: {
-        width: "100%",
-        flexGrow: 1,
-        paddingHorizontal: 0,
-        paddingVertical: 0,
-        paddingBottom: 10,
-        flexDirection: "column",
-        maxHeight: "100%"
     },
     dropdownListTopPosition: {
         flexDirection: "column-reverse",
@@ -638,7 +615,7 @@ const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: b
         return null;
     }
     return (
-        <Div testID={`${testID}-dropdown-search-container`} style={[styles.searchInputContainer]}>
+        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full px-[7px]")}>
             <TextInput
                 testID={`${testID}-dropdown-search`}
                 autoFocus={visible && !Platform.isTouchDevice()}
@@ -652,21 +629,15 @@ const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: b
                     <Menu
                         items={actions}
                         testID={`${testID}-dropdown-menu-actions`}
-                        anchor={({ menu }) => {
-                            return (
-                                <TouchableOpacity onPress={() => menu?.open()}>
-                                    <FontIcon
-                                        name={FONT_ICONS.MORE as never}
-                                        size={24}
-                                    />
-                                </TouchableOpacity>
-                            );
-                        }}
+                        anchor={<FontIcon
+                            name={FONT_ICONS.MORE as never}
+                            size={24}
+                        />}
                     />
                 )
                 }
             />
-            {!canReverse ? <Divider testID={`${testID}-divider`} style={[styles.searchDivider]} /> : null}
+            {!canReverse ? <Divider testID={`${testID}-divider`} className="w-100 overflow-hidden mt-[5px]" /> : null}
         </Div>
     );
 };

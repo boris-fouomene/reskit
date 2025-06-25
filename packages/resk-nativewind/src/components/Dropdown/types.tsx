@@ -5,7 +5,7 @@ import { ObservableComponent } from "@utils/index";
 import { IMenuContext, IMenuProps } from "@components/Menu/types";
 import { INavContext } from "@components/Nav";
 import { IFontIconName } from "@components/Icon/types";
-import { IClassName } from "@src/types";
+import { IClassName, IReactNullableElement } from "@src/types";
 
 export interface IDropdownContext<ItemType = any, ValueType = any> extends ObservableComponent<Omit<IDropdownProps<ItemType, ValueType>, "items" | "getHashKey">, IDropdownState<ItemType, ValueType>, IDropdownEvent> {
     /***
@@ -223,10 +223,11 @@ export interface IDropdownState<ItemType = any, ValueType = any> {
     preparedItems: IDropdownPreparedItem<ItemType, ValueType>[];
 };
 
-export interface IDropdownAction<Context = unknown> extends INavContext<Context> { }
+export interface IDropdownAction extends INavContext<{ dropdown: IDropdownContext }> { }
 
+export type IDropdownComputedAction = (IReactNullableElement | IDropdownAction);
 
-export type IDropdownActions<Context = unknown> = IDropdownAction<Context>[] | ((options: IDropdownContext<any, any>) => IDropdownAction<Context>[]);
+export type IDropdownActions = IDropdownComputedAction[] | ((options: IDropdownContext<any, any>) => IDropdownComputedAction[]);
 /**
  * Represents a collection of prepared items in a dropdown component.
  * 

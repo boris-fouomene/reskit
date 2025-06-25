@@ -45,6 +45,13 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
             <Text>Menu Opened with this children</Text>
           </VStack>}
         />
+        <Menu
+          anchor={<Text>Open Bottom Sheet</Text>}
+          renderAsBottomSheetInFullScreen
+
+        >
+          <Text>Bottom Sheet Menu Opened with this children</Text>
+        </Menu>
       </HStack>
       <Div className="p-5">
         <H2> AppBar Example</H2>

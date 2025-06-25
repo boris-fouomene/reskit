@@ -90,14 +90,14 @@ export const MenuContext = createContext<IMenuContext | null>(null);
  * @example
  * // Example of using the useMenu hook in a component
  * const MyMenuComponent: React.FC = () => {
- *     const { openMenu, closeMenu, visible } = useMenu();
+ *     const { menu } = useMenu();
  *     return (
  *         <View>
  *             <Button title="Open Menu" onPress={openMenu} />
  *             {visible && (
  *                 <View>
  *                     <Text>Menu Item 1</Text>
- *                     <Text onPress={closeMenu}>Close Menu</Text>
+ *                     <Text onPress={menu.close}>Close Menu</Text>
  *                 </View>
  *             )}
  *         </View>

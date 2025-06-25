@@ -55,7 +55,7 @@ export function Menu<Context = unknown>({
     onRequestOpen,
     disabled,
     contentContainerClassName,
-    animationDuration = 300,
+    animationDuration = 500,
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);

@@ -29,9 +29,9 @@ const modal = tv({
     },
     defaultVariants: {
         background: "surface",
-        rounded: true,
+        rounded: "rounded",
         //shadow:"md",
-        shadowColor:"surface"
+        shadowColor: "surface"
     }
 });
 

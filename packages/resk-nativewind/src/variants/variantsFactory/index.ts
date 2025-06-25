@@ -1,4 +1,4 @@
-import { roundeClasses } from "./rounded";
+import { roundeClasses, roundedBottomClasses, roundedBottomLeftRadiusClasses, roundedBottomRightRadiusClasses, roundedRightClasses, roundedTopClasses, roundedTopLeftRadiusClasses, roundedTopRightRadiusClasses, roundeLeftClasses } from "./rounded";
 import { marginClasses, padding2marginClasses, paddingClasses } from "./padding2margin";
 import { borderBottomWidthVariants, borderLeftWidthVariants, borderRightWidthVariants, borderStyleClasses, borderTopWidthVariants, borderWidthVariants, borderInlineWidthVariants, borderBlockWidthVariants, allBorderWidthVariants } from "./border";
 import { ShadowColorsClasses } from "./shadow";
@@ -176,6 +176,14 @@ export const VariantsFactory = {
 };
 const allVariantClasses = {
   rounded: roundeClasses,
+  roundedLeft: roundeLeftClasses,
+  roundedRight: roundedRightClasses,
+  roundedTop: roundedTopClasses,
+  roundedBottom: roundedBottomClasses,
+  roundedTopLeft: roundedTopLeftRadiusClasses,
+  roundedTopRight: roundedTopRightRadiusClasses,
+  roundedBottomLeft: roundedBottomLeftRadiusClasses,
+  roundedBottomRight: roundedBottomRightRadiusClasses,
   shadowColor: ShadowColorsClasses,
   borderStyle: borderStyleClasses,
   borderColor: VariantsGeneratedColors.borderColor,

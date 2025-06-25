@@ -118,7 +118,6 @@ const progressBar = tv({
         }
     },
     defaultVariants: {
-        rounded: true,
         height: 1,
         trackColor: "surface",
         fillColor: "primary",

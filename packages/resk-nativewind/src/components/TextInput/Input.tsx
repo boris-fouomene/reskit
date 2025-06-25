@@ -16,7 +16,7 @@ import textInputVariant, { IVariantPropsTextInput } from "@variants/textInput";
 import allVariants from "@variants/all";
 import { extractTextClasses } from "@utils/textClasses";
 import { Div } from "@html/Div";
-import { remapProps } from "nativewind";
+import { cssInterop, remapProps } from "nativewind";
 import { classes } from "@variants/classes";
 
 

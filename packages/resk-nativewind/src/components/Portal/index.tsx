@@ -44,6 +44,9 @@ export function Portal({ children, onAccessibilityEscape, style, className, unmo
         }
     }, [targetElement, onAccessibilityEscape]);
     useEffect(() => {
+        if (!shouldRender) {
+            return;
+        }
         let element: HTMLElement | null = document.querySelector(target) as HTMLElement;
         // Create target if it doesn't exist and createTarget is true
         if (!element) {

@@ -68,8 +68,10 @@ export function useShouldRenderPortal({ visible, unmountDelay }: { visible?: boo
     unmountDelay = isNumber(unmountDelay) && unmountDelay >= 0 ? unmountDelay : 0;
     useEffect(() => {
         if (visible) {
-            if (!shouldRender) setShouldRender(true);
-        } else if (shouldRender) {
+            if (!shouldRender) {
+                setShouldRender(true);
+            }
+        } else {
             const timer = setTimeout(() => {
                 setShouldRender(false);
             }, unmountDelay);

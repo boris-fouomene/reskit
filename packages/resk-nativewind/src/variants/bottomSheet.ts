@@ -6,7 +6,7 @@ const bottomSheet = tv({
   slots: {
     container: "absolute start-0 end-0 bottom-0 w-full shadow-xl bottom-0 px-2 transform transition-transform duration-300 ease-out",
     contentContainer: "w-full h-full",
-    portal: "",
+    portal: "", //"flex flex-col flex-1 justify-end",
   },
   variants: {
     visible: {

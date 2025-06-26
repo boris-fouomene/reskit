@@ -56,6 +56,7 @@ export default function TextInput({
     passwordVisibleIconName,
     displayPhoneDialCode = true,
     placeholderClassName,
+    isDropdownAnchor,
     ...props
 }: ITextInputProps) {
     const isHydrated = useHydrationStatus();
@@ -181,6 +182,8 @@ export default function TextInput({
     const computedVariant = textInputVariant(Object.assign({}, variant, { error, focused: !error && isFocused } as IVariantPropsTextInput));
     const disabled = props.disabled || readOnly || !isHydrated;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
+    const canWrapWithTouchable = isDropdownAnchor && editable && !readOnly;
+
     const phoneDialCodeText = useMemo(() => {
         if (!isPhone || !isNonNullString(phoneDialCode)) return "";
         const dialCode = "+" + phoneDialCode.trim().ltrim("+");
@@ -205,7 +208,7 @@ export default function TextInput({
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
     const labelClx = cn("flex flex-row self-start justify-start items-center text-input-label", isLabelEmbeded ? ["text-input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), labelClassName);
-    const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", computedVariant.input(), className);
+    const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", canWrapWithTouchable && "cursor-pointer", computedVariant.input(), className);
     const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
     const rightContainerClx = cn(computedVariant.rightContainer(), rightContainerClassName);
@@ -261,7 +264,6 @@ export default function TextInput({
     const labelSuffix = (suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbeded && inputMaskPlaceholder ? ` [${inputMaskPlaceholder}]` : "") + (isLabelEmbeded ? ` : ` : "");
     label = typeof label === "string" ? `${label}${labelSuffix}` : isValidElement(label) ? <>{label}<Text className={extractTextClasses(labelClx)}>{labelSuffix}</Text></> : null;
     const labelContent = canRenderLabel && label ? <Text testID={testID + "-label"} onPress={editable ? focus : undefined} className={labelClx} children={label} /> : null;
-    const canWrapWithTouchable = props.isDropdownAnchor && editable && !readOnly;
     const Wrapper = canWrapWithTouchable ? TouchableOpacity : Div;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, className: cn("grouw cursor-pointer px-[5px]") };
     const wrapperProps = canWrapWithTouchable ? Object.assign({}, pressableProps) : {};
@@ -292,8 +294,8 @@ export default function TextInput({
         },
         placeholder: inputPlaceholder,
         testID: testID,
-        readOnly: editable === false,
-        editable,
+        readOnly: editable === false || canWrapWithTouchable,
+        editable: editable && !canWrapWithTouchable,
         secureTextEntry: isPasswordField ? isSecure : secureTextEntry,
         style: inputStyle,
         value: String(inputValue),

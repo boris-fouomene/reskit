@@ -3,11 +3,10 @@ import { IDropdownAction, IDropdownCallOptions, IDropdownContext, IDropdownEvent
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
 import { defaultStr, isEmpty, isNonNullString, isObj, areEquals, stringify, isNumber } from "@resk/core/utils";
-import Logger from "@resk/core/logger";
 import i18n from "@resk/core/i18n";
 import { cn, getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
 import { DropdownContext, useDropdown } from "./hooks";
-import { Dimensions, FlatList, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, View } from 'react-native';
 import { IMenuContext, Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { StyleSheet } from "react-native";
@@ -92,7 +91,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
                 return value;
             }
         }
-        Logger.warn("getItemValue is not a function", item, index);
+        //Logger.warn("getItemValue is not a function", item, index);
         return undefined;
     }
     filterItem(options: IDropdownPreparedItem<ItemType, ValueType>, index: number): boolean {
@@ -109,7 +108,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         (Array.isArray(customItems) ? customItems : []).map((item, index) => {
             const value = this.getItemValue({ item, index, isDropdown: true });
             if (isEmpty(value) || !value) {
-                Logger.warn("invalid dropdown value ", value, " for item ", item, index, " with dropdown className ", this.props.className, " test id ", this.props.testID);
+                //Logger.warn("invalid dropdown value ", value, " for item ", item, index, " with dropdown className ", this.props.className, " test id ", this.props.testID);
                 return;
             }
             const hashKey = this.getHashKey(value);
@@ -297,10 +296,6 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     anchorContainerProps = Object.assign({}, anchorContainerProps);
     testID = context.getTestID();
     const [searchText, setSearchText] = useState("");
-    const { height: screenHeight } = Dimensions.get("window");
-    const maxDropdownHeight = useMemo(() => {
-        return isNumber(maxHeight) && maxHeight > 0 ? maxHeight : Math.max(screenHeight * 0.5, 300);
-    }, [maxHeight, screenHeight]);
     const onSearch = (text: string) => {
         text = defaultStr(text);
         if (text.toLowerCase() == searchText.toLowerCase()) {
@@ -405,6 +400,10 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         defaultValue: anchorSelectedText,
         onPress: isLoading ? undefined : context.toggle.bind(context),
     }
+    const { height: screenHeight } = Dimensions.get("window");
+    const maxDropdownHeight = useMemo(() => {
+        return isNumber(maxHeight) && maxHeight > 0 ? maxHeight : Math.max(screenHeight * 0.5, 300);
+    }, [maxHeight, screenHeight]);
     return <DropdownContext.Provider value={context}>
         <Menu
             minWidth={180}
@@ -412,13 +411,15 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             bottomSheetTitle={context?.props?.label}
             bottomSheetTitleDivider={!canRenderSearch(context)}
             testID={testID + "-menu"}
-            {...Object.assign({}, menuProps)}
-            //bottomSheetFullScreen={(typeof menuProps?.bottomSheetFullScreen == "boolean" ? menuProps.bottomSheetFullScreen : preparedItems?.length > 10)}
+            renderAsBottomSheetInFullScreen
             visible={visible}
             onDismiss={context.close.bind(context)}
             withScrollView={false}
             sameWidth
             onClose={context.close.bind(context)}
+            onRequestOpen={context.open.bind(context)}
+            {...Object.assign({}, menuProps)}
+
             anchor={<View disabled={disabled}
                 testID={`${testID}-dropdown-anchor-container`}
                 {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IViewStyle}
@@ -432,7 +433,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             </View>}
         >
             <DropdownContext.Provider value={context}>
-                <DropdownMenu<ItemType, ValueType> />
+                <DropdownMenu<ItemType, ValueType> maxHeight={maxDropdownHeight} />
             </DropdownContext.Provider>
         </Menu>
     </DropdownContext.Provider>;
@@ -442,7 +443,7 @@ const canRenderSearch = (context: IDropdownContext) => {
     return !!!(context?.props?.showSearch === false || context?.props?.showSearch !== true && preparedItems?.length <= 5);
 }
 
-function DropdownMenu<ItemType = any, ValueType = any>() {
+function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight }: { maxHeight: number }) {
     const context = useDropdown();
     const filteredItems = Array.isArray(context?.filteredItems) ? context.filteredItems : [];
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
@@ -454,29 +455,19 @@ function DropdownMenu<ItemType = any, ValueType = any>() {
     const isTopPosition = menuPosition?.yPosition === "top";
     const fullScreen = !!menu?.fullScreen;
     const canReverse = isTopPosition && !fullScreen;
-    const menuHeight = typeof menuPosition?.height === "number" && menuPosition.height > 50 ? menuPosition.height : undefined;
-    const menuWidth = typeof menuPosition?.width === "number" && menuPosition.width > 50 ? menuPosition.width : undefined;
     const canRenderDropdownSearch = canRenderSearch(context);
-    const hasMenuHeight = typeof menuHeight == "number" && menuHeight > 0;
     return <Div
         disabled={context?.props?.disabled}
         readOnly={!isEditabled}
         testID={testID + "-dropdown-list-container"}
-        className={cn(
-            "w-full flex flex-1 grow pb-[10px] max-h-full", fullScreen && "flex-row",
-            //fullScreen && "flex-1"
-        )}
-        style={{
-            ...(hasMenuHeight ? { height: menuHeight } : {}),
-            ...(typeof menuWidth == "number" ? { width: menuWidth } : {}),
-        }}
+        className={cn("w-full pb-[10px] max-h-full relative flex flex-col")}
     >
-        {canRenderDropdownSearch ? <DropdownSearch isFullScreen={fullScreen} /> : null}
+        {canRenderDropdownSearch ? <DropdownSearch /> : null}
         <FlatList<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
             scrollEnabled
+            style={{ maxHeight: "100%" }}
             {...listProps}
-            style={[listProps.style, hasMenuHeight && { maxHeight: menuHeight - (canRenderDropdownSearch ? 30 : 60) }, styles.list]}
             inverted={canReverse}
             data={filteredItems}
             keyExtractor={({ hashKey }) => hashKey}
@@ -560,9 +551,6 @@ const styles = StyleSheet.create({
     selectedIcon: {
         marginRight: 5,
     },
-    list: {
-
-    },
     itemContent: {
         flexDirection: "row",
         alignItems: "center",
@@ -599,7 +587,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
 });
-const DropdownSearch = ({ canReverse }: { isFullScreen?: boolean, canReverse?: boolean }) => {
+const DropdownSearch = ({ canReverse }: { canReverse?: boolean }) => {
     const context = useDropdown();
     const filteredItems = Array.isArray(context.filteredItems) ? context.filteredItems : [];
     const searchText = defaultStr(context.searchText);

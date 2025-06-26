@@ -1,7 +1,7 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
-import { Icon, Menu, AppBar, TextInput, VariantsFactory, ActivityIndicator, ProgressBar, IVariantsColorsMap, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
+import { Icon, Menu, AppBar, TextInput, VariantsFactory, Dropdown, ActivityIndicator, ProgressBar, IVariantsColorsMap, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -18,7 +18,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <TextInput type="date" label="Date" placeholder="Enter your date" />
         <TextInput type="time" label="Time" placeholder="Enter your time" />
         <TextInput type="datetime" label="DateTime" placeholder="Enter your datetime" />
-        <TextInput type="tel" label="Tel" phoneCountryCode='CM' placeholder="Enter your tel" labelEmbeded variant={{ marginY: "20px", rounded: true }} />
+        <TextInput type="tel" label="Tel" phoneCountryCode='CM' placeholder="Enter your tel" labelEmbeded variant={{ marginY: "20px", rounded: "rounded" }} />
         <TextInput variant={{ borderStyle: "solid", borderWidth: 1 }} type="number" label="Border" placeholder="Enter your border" />
       </Div>
       <VStack className="p-5">
@@ -33,6 +33,13 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <ProgressBar indeterminate />
         </Div>
       </VStack>
+      <Div className="p-5">
+        <H2>Dropdown</H2>
+        <Dropdown
+          label="Select an option"
+          items={Array.from({ length: 50 }).map((_, index) => ({ label: `Option ${index + 1}`, value: index }))}
+        />
+      </Div>
       <HStack className="p-5">
         <H2>Menu Examples</H2>
         <Menu
@@ -74,7 +81,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       </Div>
       <Div className="p-5">
         <Heading level={2}>ActivityIndicator, on surface with padding</Heading>
-        <Surface variant={{ padding: "100px", borderStyle: "none", rounded: true }}>
+        <Surface variant={{ padding: "100px", borderStyle: "none", rounded: "rounded" }}>
           <HStack className="p-5 !gap-x-10">
             <ActivityIndicator variant={{ color: "primary" }} />
             <ActivityIndicator size={"small"} variant={{ color: "secondary" }} />

@@ -64,8 +64,6 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
         ...convertAccessibilityPropsToDOM(normalizeProps(props, defaultProps)),
         ref: ref !== undefined && ref ? function (personalizedRef: any) {
             UIManager.normalizeRef(personalizedRef);
-            console.log(personalizedRef?.measure, " is ppp ref", personalizedRef);
-
             if (typeof ref == "function") {
                 return ref(personalizedRef);
             }

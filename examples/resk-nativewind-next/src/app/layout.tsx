@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <SetupExpo__DEV__ />
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <div className="flex flex-col h-screen w-screen flex-1" id="root">
+        <div className="flex flex-col h-screen relative w-screen relative " id="root">
           {children}
         </div>
       </body>

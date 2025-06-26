@@ -37,7 +37,7 @@ export function Portal({ children, onAccessibilityEscape, style, className, anim
         <PortalStateContext.Provider value={{ shouldRender, ...rest }}>
             {children}
         </PortalStateContext.Provider>
-    </Div>, document.body);
+    </Div>, document.querySelector("#root") || document.body);
 };
 
 export * from "./hooks";

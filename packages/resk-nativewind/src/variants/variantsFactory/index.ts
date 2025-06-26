@@ -7,6 +7,7 @@ import { allScaleVariants } from "./scales";
 import { fontWeightClasses } from "./fontWeight";
 import { textAlignClasses } from "./textAlignClasses";
 import { VariantsGeneratedColors } from "@variants/generated-variants-colors";
+import { heightClasses, maxHeightClasses, maxWidthClasses, minHeightClasses, minWidthClasses, widthClasses } from "./width2height";
 
 type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], variantName: keyof InputType) => ResultType;
 
@@ -187,6 +188,12 @@ const allVariantClasses = {
   shadowColor: ShadowColorsClasses,
   borderStyle: borderStyleClasses,
   borderColor: VariantsGeneratedColors.borderColor,
+  width: widthClasses,
+  height: heightClasses,
+  maxWidth: maxWidthClasses,
+  minWidth: minWidthClasses,
+  maxHeight: maxHeightClasses,
+  minHeight: minHeightClasses,
   ...allBorderWidthVariants,
   ...padding2marginClasses,
 };

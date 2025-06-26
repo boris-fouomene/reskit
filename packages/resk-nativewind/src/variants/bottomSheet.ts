@@ -4,7 +4,7 @@ import { VariantsGeneratedColors } from "./generated-variants-colors";
 
 const bottomSheet = tv({
   slots: {
-    container: "absolute start-0 end-0 bottom-0 w-full min-h-[40%] max-h-[70%] shadow-xl bottom-0 px-2 transform transition-transform duration-300 ease-out ",
+    container: "absolute start-0 end-0 bottom-0 w-full shadow-xl bottom-0 px-2 transform transition-transform duration-300 ease-out",
     contentContainer: "w-full h-full",
     portal: "",
   },
@@ -31,6 +31,8 @@ const bottomSheet = tv({
   defaultVariants: {
     background: "surface",
     roundedTop: "10px",
+    minHeight: "40%",
+    maxHeight: "70%",
   },
 });
 

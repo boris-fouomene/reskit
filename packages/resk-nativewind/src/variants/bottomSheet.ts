@@ -11,7 +11,7 @@ const bottomSheet = tv({
   variants: {
     visible: {
       true: {
-        container: "translate-y-0",
+        container: "translate-y-0 transform-none",
       },
       false: {
         container: "translate-y-full",

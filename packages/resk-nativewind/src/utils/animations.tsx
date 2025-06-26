@@ -1,55 +1,136 @@
 "use client";
 import { isNumber } from '@resk/core/utils';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import useStateCallback from './stateCallback';
 
 /**
- * Custom React hook to handle animated mounting and unmounting of components.
- *
- * This hook is useful for triggering entrance and exit animations when a component's visibility changes.
- * It manages the rendering state and animation state, allowing you to smoothly animate components in and out of the DOM.
- *
- * @param {Object} params - The parameters object.
- * @param {boolean} params.visible - Controls whether the component should be visible (mounted) or hidden (unmounted).
- * @param {number} [params.duration=0] - The duration (in milliseconds) of the exit animation before the component is unmounted.
- *
- * @returns {Object} An object containing:
- * - `shouldRender` (`boolean`): Indicates if the component should be rendered in the DOM.
- * - `isAnimating` (`boolean`): Indicates if the animation is currently active.
- *
+ * A React hook that manages component mounting and unmounting with delayed unmount support.
+ * 
+ * This hook is particularly useful for components that need exit animations. It keeps the component
+ * mounted in the DOM for a specified duration after `visible` becomes false, allowing CSS transitions
+ * or animations to complete before the component is removed.
+ * 
+ * @param params - Configuration object for the hook
+ * @returns Object containing render and animation state
+ * 
  * @example
+ * Basic usage with CSS transitions:
  * ```tsx
- * const { shouldRender, isAnimating } = useAnimatedMount({ visible: showModal, duration: 500 });
- *
- * return shouldRender ? (
- *   <div className={isAnimating ? 'fade-in' : 'fade-out'}>
- *     Animated Content
- *   </div>
- * ) : null;
+ * function AnimatedModal({ isOpen }: { isOpen: boolean }) {
+ *   const { shouldRender, isAnimating } = useDelayedUnmount({
+ *     visible: isOpen,
+ *     duration: 300 // 300ms for exit animation
+ *   });
+ * 
+ *   if (!shouldRender) return null;
+ * 
+ *   return (
+ *     <div className={`modal ${isAnimating ? 'modal-enter' : 'modal-exit'}`}>
+ *       Modal content
+ *     </div>
+ *   );
+ * }
  * ```
- *
+ * 
+ * @example
+ * With CSS classes for enter/exit states:
+ * ```tsx
+ * function FadeInOut({ show, children }: { show: boolean; children: React.ReactNode }) {
+ *   const { shouldRender, isAnimating } = useDelayedUnmount({
+ *     visible: show,
+ *     duration: 250
+ *   });
+ * 
+ *   if (!shouldRender) return null;
+ * 
+ *   return (
+ *     <div 
+ *       className={`transition-opacity duration-250 ${
+ *         isAnimating ? 'opacity-100' : 'opacity-0'
+ *       }`}
+ *     >
+ *       {children}
+ *     </div>
+ *   );
+ * }
+ * ```
+ * 
+ * @example
+ * Without delay (immediate unmount):
+ * ```tsx
+ * function SimpleToggle({ visible }: { visible: boolean }) {
+ *   const { shouldRender, isAnimating } = useDelayedUnmount({ visible });
+ *   
+ *   // shouldRender and isAnimating will have the same value when duration is 0
+ *   return shouldRender ? <div>Content</div> : null;
+ * }
+ * ```
+ * 
  * @remarks
- * - The `shouldRender` flag ensures the component remains in the DOM during exit animations.
- * - The `isAnimating` flag can be used to toggle CSS classes or animation states.
- * - Make sure to match the `duration` prop with your CSS animation duration for seamless transitions.
- *
- * @see {@link https://react.dev/reference/react/useEffect | React useEffect}
- * @see {@link https://react.dev/reference/react/useState | React useState}
+ * **Behavior:**
+ * - When `visible` changes from `false` to `true`: `shouldRender` becomes `true` immediately, 
+ *   then `isAnimating` becomes `true` on the next frame
+ * - When `visible` changes from `true` to `false`: `isAnimating` becomes `false` immediately, 
+ *   then `shouldRender` becomes `false` after the specified duration
+ * - The hook automatically cleans up timers when the component unmounts or when `visible` changes
+ * 
+ * **Animation Timing:**
+ * - Use `shouldRender` to control whether the component exists in the DOM
+ * - Use `isAnimating` to control CSS classes, styles, or animation states
+ * - The `duration` should match your CSS transition/animation duration
+ * 
+ * @since 1.0.0
  */
-export function useAnimatedMount({ visible, duration = 0 }: { visible?: boolean; duration?: number }) {
+export function useAnimatedVisibility({ visible, duration = 0 }: { visible?: boolean; duration?: number }): IUseAnimatedVisibilityResult {
     visible = !!visible;
     duration = isNumber(duration) && duration > 0 ? duration : 0;
-    const [shouldRender, setShouldRender] = useState(visible);
-    const [isAnimating, setIsAnimating] = useState(false);
-
-    useEffect(() => {
-        if (visible) {
-            setShouldRender(true);
-            requestAnimationFrame(() => setIsAnimating(true));
-        } else {
-            setIsAnimating(false);
-            const timer = setTimeout(() => setShouldRender(false), duration);
-            return () => clearTimeout(timer);
+    const [shouldRender, setShouldRender] = useStateCallback(visible);
+    const [isAnimating, setIsAnimating] = useStateCallback(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    // Clear any existing timeout
+    const cleanTimeoutRef = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
         }
-    }, [visible, duration]);
+    }
+    useEffect(() => {
+        cleanTimeoutRef();
+        if (visible) {
+            // First render the component
+            setShouldRender(true, () => {
+                // Use RAF + timeout for more reliable animation triggering
+                requestAnimationFrame(() => {
+                    timeoutRef.current = setTimeout(() => {
+                        setIsAnimating(true);
+                    }, 16); // One frame delay (≈16ms at 60fps)
+                })
+            });
+        } else {
+            // Start exit animation immediately
+            setIsAnimating(false);
+            // Remove from DOM after animation completes
+            timeoutRef.current = setTimeout(() => {
+                setShouldRender(false);
+            }, duration);
+        }
+        return cleanTimeoutRef;
+    }, [visible, duration, setShouldRender, setIsAnimating]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return cleanTimeoutRef;
+    }, []);
     return { shouldRender, isAnimating };
 };
+
+export interface IUseAnimatedVisibilityResult {
+    /***
+        Whether the component should be rendered.
+    */
+    shouldRender: boolean;
+    /**
+     * Whether the component is currently animating.
+     */
+    isAnimating: boolean;
+}

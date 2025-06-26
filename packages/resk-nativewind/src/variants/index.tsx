@@ -16,8 +16,10 @@ import progressBar from "./progressBar";
 import textInput from "./textInput";
 import { tv } from "tailwind-variants";
 import { VariantsGeneratedColors } from "./generated-variants-colors";
+import bottomSheet from "./bottomSheet";
 export const variants = {
     all,
+    bottomSheet,
     textInput,
     iconColor: tv({
         variants: {

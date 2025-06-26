@@ -20,8 +20,6 @@ import { Div } from '@html/Div';
 import { classes } from '@variants/classes';
 import allVariants from '@variants/all';
 
-
-
 export function Menu<Context = unknown>({
     onClose,
     children,
@@ -222,6 +220,7 @@ export function Menu<Context = unknown>({
                         if (typeof onLayout === 'function') {
                             onLayout(event);
                         }
+                        if (renderedAsBottomSheet) return;
                         onMenuLayout(event);
                     }}
                     style={StyleSheet.flatten([!renderedAsBottomSheet && menuStyle, props.style])}

@@ -10,7 +10,7 @@ import allVariants from '@variants/all';
 import { StyleSheet } from 'react-native';
 import { classes } from '@variants/classes';
 import { Div } from "@html/Div";
-import { useAnimatedMount } from '@utils/animations';
+import { useAnimatedVisibility } from '@utils/animations';
 import { useAccessibilityEscape } from '@html/accessibility';
 
 
@@ -18,7 +18,7 @@ export function Portal({ children, onAccessibilityEscape, style, className, anim
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const target = `#${targetId}`;
-    const { shouldRender } = useAnimatedMount({ visible, duration: animationDuration });
+    const { shouldRender } = useAnimatedVisibility({ visible, duration: animationDuration });
     useAccessibilityEscape(target, onAccessibilityEscape, shouldRender);
     if (!shouldRender || typeof document === "undefined" || !document || !document?.body) return null;
     const hasOnPress = typeof onPress == "function";

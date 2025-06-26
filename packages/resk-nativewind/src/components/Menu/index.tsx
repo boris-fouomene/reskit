@@ -233,20 +233,11 @@ export function Menu<Context = unknown>({
                         </Wrapper>
                     </Div>
                 </View>
-                <TestMenuContent />
             </MenuContext.Provider>
         </Portal>}
     </>
 };
 
-function TestMenuContent() {
-    useEffect(() => {
-        return () => {
-            console.log("unmounting test menu content")
-        }
-    }, [])
-    return null;
-}
 
 const measureAnchor = (anchorRef: RefObject<any>, minContentHeight?: number) => {
     return measureContentHeight(anchorRef, minContentHeight).then(({ x, y, width, height, contentHeight }) => {

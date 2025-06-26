@@ -124,13 +124,48 @@ export function useAnimatedVisibility({ visible, duration = 0 }: { visible?: boo
     return { shouldRender, isAnimating };
 };
 
+/**
+ * The result object returned by {@link useAnimatedVisibility}, describing the current render and animation state.
+ *
+ * @property shouldRender - Whether the component should be rendered in the DOM. Use this to conditionally mount/unmount your component.
+ * @property isAnimating - Whether the component is currently in its "enter" (visible) animation state. Use this to control CSS classes or animation logic.
+ *
+ * @example
+ * // Basic usage with a modal and CSS transitions
+ * function AnimatedModal({ isOpen }: { isOpen: boolean }) {
+ *   const { shouldRender, isAnimating } = useAnimatedVisibility({
+ *     visible: isOpen,
+ *     duration: 300 // ms
+ *   });
+ *   if (!shouldRender) return null;
+ *   return (
+ *     <div className={isAnimating ? "modal-enter" : "modal-exit"}>
+ *       Modal content
+ *     </div>
+ *   );
+ * }
+ *
+ * @example
+ * // Fade in/out a component with Tailwind classes
+ * function FadeInOut({ show, children }: { show: boolean; children: React.ReactNode }) {
+ *   const { shouldRender, isAnimating } = useAnimatedVisibility({
+ *     visible: show,
+ *     duration: 250
+ *   });
+ *   if (!shouldRender) return null;
+ *   return (
+ *     <div className={`transition-opacity duration-250 ${isAnimating ? "opacity-100" : "opacity-0"}`}>
+ *       {children}
+ *     </div>
+ *   );
+ * }
+ *
+ * @see useAnimatedVisibility
+ * @since 1.0.0
+ */
 export interface IUseAnimatedVisibilityResult {
-    /***
-        Whether the component should be rendered.
-    */
+    /** Whether the component should be rendered. */
     shouldRender: boolean;
-    /**
-     * Whether the component is currently animating.
-     */
+    /** Whether the component is currently animating. */
     isAnimating: boolean;
 }

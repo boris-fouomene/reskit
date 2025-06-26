@@ -1,6 +1,6 @@
 "use client";
 import { defaultStr, getMaxZindex } from '@resk/core/utils';
-import { useEffect, useId } from 'react';
+import { useId } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@utils/cn';
 import { styles } from './utils';

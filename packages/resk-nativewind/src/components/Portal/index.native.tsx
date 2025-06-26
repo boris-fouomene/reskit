@@ -6,6 +6,7 @@ import { styles } from './utils';
 import { IPortalProps } from './types';
 import allVariants from "@variants/all";
 import { useAnimatedVisibility } from '@utils/animations';
+import { PortalStateContext } from './context';
 
 /**
  * @interface IPortalItem
@@ -52,7 +53,7 @@ interface IPortalContext {
      * @param props - The props to be passed to the Div component that wraps the portal content.
      * @example
      * ```tsx
-     * const { addPortal } = usePortal();
+     * const { addPortal } = useInternalPortal();
      * addPortal('example-portal', <Div><Text>My Portal Content</Text></Div>,{testID:"a-test-id"});
      * ```
      */
@@ -65,7 +66,7 @@ interface IPortalContext {
      *
      * @example
      * ```tsx
-     * const { removePortal } = usePortal();
+     * const { removePortal } = useInternalPortal();
      * removePortal('example-portal');
      * ```
      */
@@ -83,7 +84,7 @@ interface IPortalContext {
  * @internal
  * The context will provide portal operations to all components wrapped within `PortalProvider`.
  */
-const PortalContext = createContext<IPortalContext | undefined>(undefined);
+const InternalPortalContext = createContext<IPortalContext | undefined>(undefined);
 
 /**
  * The `PortalProvider` component is responsible for managing and rendering dynamic portals in a React Native app.
@@ -129,7 +130,7 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     const [, forceUpdate] = useReducer((x) => x + 1, 0);
     const testID = "portal";
     return (
-        <PortalContext.Provider value={{ addPortal, removePortal, portals: portalRefs.current }}>
+        <InternalPortalContext.Provider value={{ addPortal, removePortal, portals: portalRefs.current }}>
             <View testID={testID + "-container"} style={{ flex: 1 }} pointerEvents="box-none">
                 {children}
                 {portalRefs.current.map(({ key, children, props }, index) => {
@@ -144,22 +145,24 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
                     );
                 })}
             </View>
-        </PortalContext.Provider>
+        </InternalPortalContext.Provider>
     );
 };
 
 function RenderedPortal({ children, className, withBackdrop, animationDuration, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
-    const { shouldRender } = useAnimatedVisibility({ visible, duration: animationDuration });
+    const { shouldRender, ...rest } = useAnimatedVisibility({ visible, duration: animationDuration });
     if (!shouldRender) return null;
     absoluteFill = withBackdrop || absoluteFill;
     const absoluteFillStyle = absoluteFill ? styles.absoluteFill : undefined;
     const handleBackdrop = withBackdrop || absoluteFill;
     const flattenStyle = StyleSheet.flatten([{ zIndex } as ViewStyle, style] as any);
     const backdropClassName = cn(allVariants({ backdrop: withBackdrop }));
-    return <Div {...props} onPress={!handleBackdrop ? onPress : undefined} className={cn(!handleBackdrop && backdropClassName, className)} style={Object.assign({}, absoluteFillStyle, flattenStyle)}>
-        {handleBackdrop ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", backdropClassName)} style={absoluteFillStyle} onPress={onPress} /> : null}
-        {children || null}
-    </Div>
+    return <PortalStateContext.Provider value={{ shouldRender, ...rest }}>
+        <Div {...props} onPress={!handleBackdrop ? onPress : undefined} className={cn(!handleBackdrop && backdropClassName, className)} style={Object.assign({}, absoluteFillStyle, flattenStyle)}>
+            {handleBackdrop ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", backdropClassName)} style={absoluteFillStyle} onPress={onPress} /> : null}
+            {children || null}
+        </Div>
+    </PortalStateContext.Provider>
 };
 RenderedPortal.displayName = "Portal.Rendered";
 /**
@@ -170,7 +173,7 @@ RenderedPortal.displayName = "Portal.Rendered";
  *
  * @example
  * ```tsx
- * const { addPortal, removePortal } = usePortal();
+ * const { addPortal, removePortal } = useInternalPortal();
  * 
  * useEffect(() => {
  *   addPortal('my-unique-portal', <MyCustomComponent />);
@@ -178,8 +181,8 @@ RenderedPortal.displayName = "Portal.Rendered";
  * }, []);
  * ```
  */
-const usePortal = (): IPortalContext => {
-    const context = useContext(PortalContext);
+const useInternalPortal = (): IPortalContext => {
+    const context = useContext(InternalPortalContext);
     return Object.assign({}, context);
 };
 
@@ -205,7 +208,7 @@ const usePortal = (): IPortalContext => {
  * ```
  */
 export function Portal({ children, ...props }: IPortalProps) {
-    const { addPortal, removePortal } = usePortal();
+    const { addPortal, removePortal } = useInternalPortal();
     const key = useId();
     useEffect(() => {
         if (props.visible !== false && typeof addPortal === "function") {
@@ -222,3 +225,5 @@ export function Portal({ children, ...props }: IPortalProps) {
     }, [])
     return null;
 };
+
+export * from "./hooks";

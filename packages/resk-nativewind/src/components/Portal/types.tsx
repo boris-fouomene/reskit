@@ -1,5 +1,5 @@
 import { IHtmlDivProps } from "@html/types";
-import { ViewProps } from "react-native";
+import { IUseAnimatedVisibilityResult } from "@utils/animations";
 import { GestureResponderEvent } from "react-native";
 
 /**
@@ -75,3 +75,5 @@ export interface IPortalProps {
 
     onAccessibilityEscape?: IHtmlDivProps["onAccessibilityEscape"];
 }
+
+export interface IPortalStateContext extends IUseAnimatedVisibilityResult { }

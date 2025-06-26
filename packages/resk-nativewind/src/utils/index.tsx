@@ -21,6 +21,7 @@ export * from "./breakpoints";
 export * from "./useHydrated";
 export * from "./elevations-styles";
 export * from "./textClasses";
+export * from "./animations";
 /***
     vérifie si la variable node est un élément reactNode
 */

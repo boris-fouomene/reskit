@@ -56,7 +56,7 @@ export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<
  * @param defaultProps The default props to normalize
  * @returns The normalized props
  */
-export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, title, ref, android_ripple, nativeID, onPress, onPressIn, onPressOut, style, ...props }: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
+export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, onAccessibilityEscape, title, ref, android_ripple, nativeID, onPress, onPressIn, onPressOut, style, ...props }: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
     const disabled = !!(props as any).disabled || !!(props as any).readOnly || !!(props as any).readonly;
     const r = {
         style: style ? StyleSheet.flatten(style) : undefined as any,
@@ -85,6 +85,16 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
     r.className = cn(classes.cursorDefault, r.className)
     if (Platform.OS === "web" && !r.disabled && !r.readOnly && !(r as any).readonly && (r.onClick || r.onMouseDown || r.onMouseUp)) {
         r.className = cn("cursor-pointer", r.className);
+    }
+    if (typeof onAccessibilityEscape == "function") {
+        (r as any).onKeyDown = function (event: KeyboardEvent) {
+            if (event?.key === "Escape") {
+                onAccessibilityEscape();
+            }
+            if (typeof (r as any).onKeyDown == "function") {
+                (r as any).onKeyDown(event);
+            }
+        }
     }
     return r;
 }

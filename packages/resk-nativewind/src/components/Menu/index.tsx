@@ -212,7 +212,7 @@ export function Menu<Context = unknown>({
                 {anchor}
             </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} unmountDelay={animationDuration} withBackdrop={renderedAsBottomSheet} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(computedVariant.portal(), renderedAsBottomSheet && computedBottomSheetVariant.portal(), backdropClassName, "menu-portal")}>
+        {<Portal visible={isVisible} animationDuration={animationDuration} withBackdrop={renderedAsBottomSheet} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(computedVariant.portal(), renderedAsBottomSheet && computedBottomSheetVariant.portal(), backdropClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
                 <View
                     testID={testID}
@@ -233,11 +233,20 @@ export function Menu<Context = unknown>({
                         </Wrapper>
                     </Div>
                 </View>
+                <TestMenuContent />
             </MenuContext.Provider>
         </Portal>}
     </>
 };
 
+function TestMenuContent() {
+    useEffect(() => {
+        return () => {
+            console.log("unmounting test menu content")
+        }
+    }, [])
+    return null;
+}
 
 const measureAnchor = (anchorRef: RefObject<any>, minContentHeight?: number) => {
     return measureContentHeight(anchorRef, minContentHeight).then(({ x, y, width, height, contentHeight }) => {

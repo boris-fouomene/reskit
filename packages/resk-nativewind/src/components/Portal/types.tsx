@@ -43,12 +43,12 @@ export interface IPortalProps {
    * @example
    * ```tsx
    * // No delay - content disappears immediately
-   * <Portal visible={isOpen} unmountDelay={0}>
+   * <Portal visible={isOpen} animationDuration={0}>
    *   <div>Content</div>
    * </Portal>
    * 
    * // 300ms delay - allows time for exit animations
-   * <Portal visible={isOpen} unmountDelay={300}>
+   * <Portal visible={isOpen} animationDuration={300}>
    *   <div className="transition-opacity duration-300">
    *     Animated content
    *   </div>
@@ -62,7 +62,7 @@ export interface IPortalProps {
    * - Setting this to 0 or omitting it results in immediate unmounting (no animation support)
    * - This value should typically match or slightly exceed your CSS animation/transition duration
    */
-    unmountDelay?: number;
+    animationDuration?: number;
     /***
      * The callback function to be called when the portal is pressed.
      */
@@ -73,5 +73,5 @@ export interface IPortalProps {
     */
     style?: IHtmlDivProps["style"];
 
-    onAccessibilityEscape?: ViewProps["onAccessibilityEscape"];
+    onAccessibilityEscape?: IHtmlDivProps["onAccessibilityEscape"];
 }

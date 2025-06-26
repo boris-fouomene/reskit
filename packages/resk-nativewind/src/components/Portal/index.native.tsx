@@ -5,7 +5,7 @@ import { cn } from '@utils/cn';
 import { styles } from './utils';
 import { IPortalProps } from './types';
 import allVariants from "@variants/all";
-import { useShouldRenderPortal } from './hook';
+import { useAnimatedMount } from '@utils/animations';
 
 /**
  * @interface IPortalItem
@@ -148,8 +148,8 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     );
 };
 
-function RenderedPortal({ children, className, withBackdrop, unmountDelay, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
-    const shouldRender = useShouldRenderPortal({ visible, unmountDelay });
+function RenderedPortal({ children, className, withBackdrop, animationDuration, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
+    const { shouldRender } = useAnimatedMount({ visible, duration: animationDuration });
     if (!shouldRender) return null;
     absoluteFill = withBackdrop || absoluteFill;
     const absoluteFillStyle = absoluteFill ? styles.absoluteFill : undefined;

@@ -9,9 +9,9 @@ import { useEffect, useState } from "react";
  * 
  * The hook provides intelligent timing control:
  * - **Immediate mounting**: When `visible` becomes `true`, returns `true` immediately
- * - **Delayed unmounting**: When `visible` becomes `false`, waits for `unmountDelay` before returning `false`
+ * - **Delayed unmounting**: When `visible` becomes `false`, waits for `animationDuration` before returning `false`
  * - **Timer management**: Automatically clears pending timers if `visible` changes back to `true`
- * - **Input validation**: Sanitizes the `unmountDelay` parameter to ensure valid behavior
+ * - **Input validation**: Sanitizes the `animationDuration` parameter to ensure valid behavior
  * 
  * @param params - Configuration object containing visibility state and unmount delay
  * @returns Boolean indicating whether the portal content should be rendered
@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
  * function Modal({ isOpen, onClose, children }) {
  *   const shouldRender = useShouldRenderPortal({ 
  *     visible: isOpen, 
- *     unmountDelay: 300 
+ *     animationDuration: 300 
  *   });
  * 
  *   if (!shouldRender) return null;
@@ -43,7 +43,7 @@ import { useEffect, useState } from "react";
  * function AnimatedTooltip({ show, animationDuration = 200, children }) {
  *   const shouldRender = useShouldRenderPortal({ 
  *     visible: show, 
- *     unmountDelay: animationDuration 
+ *     animationDuration: animationDuration 
  *   });
  * 
  *   return shouldRender ? createPortal(
@@ -63,9 +63,9 @@ import { useEffect, useState } from "react";
  * 
  * @since 1.0.0
  */
-export function useShouldRenderPortal({ visible, unmountDelay }: { visible?: boolean, unmountDelay?: number }) {
+export function useShouldRenderPortal({ visible, animationDuration }: { visible?: boolean, animationDuration?: number }) {
     const [shouldRender, setShouldRender] = useState(visible);
-    unmountDelay = isNumber(unmountDelay) && unmountDelay >= 0 ? unmountDelay : 0;
+    animationDuration = isNumber(animationDuration) && animationDuration > 0 ? animationDuration : 0;
     useEffect(() => {
         if (visible) {
             if (!shouldRender) {
@@ -74,9 +74,9 @@ export function useShouldRenderPortal({ visible, unmountDelay }: { visible?: boo
         } else {
             const timer = setTimeout(() => {
                 setShouldRender(false);
-            }, unmountDelay);
+            }, animationDuration);
             return () => clearTimeout(timer);
         }
-    }, [visible, unmountDelay]);
+    }, [visible, animationDuration]);
     return shouldRender;
 }

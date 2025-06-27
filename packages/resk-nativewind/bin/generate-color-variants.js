@@ -93,9 +93,9 @@ module.exports = (colors, options) => {
       borderRightColor: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
         return [key, value.split("text-").join("border-r-")]
       })),
-      activityIndicator: VariantsColors.buildTextColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
-        return cn(`border-t-${color} dark:border-t-dark-${color}`);
-      }),
+      activityIndicator: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
+        return [key, value.split("text-").join("border-t-")]
+      })),
     },
     null,
     2
@@ -129,7 +129,7 @@ export const VariantsGeneratedColors = ${content}
         background : Record<IName,string>;
         textForeground : Record<IName,string>;
         shadow : Record<IName,string>;
-        activityIndicator: Record<IName,string>;
+        activityIndicator: Record<IName2Foreground,string>;
         borderColor : Record<IName2Foreground,string>;
         borderTopColor : Record<IName2Foreground,string>;
         borderBottomColor : Record<IName2Foreground,string>;

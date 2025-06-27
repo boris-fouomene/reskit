@@ -5,7 +5,7 @@ import { cn } from "@utils/cn";
 import { IVariantPropsProgressBar } from "@variants/progressBar";
 import progressBarVariant from "@variants/progressBar";
 import { Text } from "@html/Text";
-import { ProgressBarFillIndeterminate } from "./Indeterminate";
+import { ProgressBarIndeterminateFill } from "./Indeterminate";
 
 /**
  * A highly customizable and accessible progress bar component built with React and Tailwind CSS.
@@ -61,8 +61,8 @@ export function ProgressBar({
     const rProps = indeterminate ? { indeterminateDuration } : {};
     testID = defaultStr(testID, "resk-progress-bar");
     const title = !indeterminate ? `value : ${value.formatNumber()}, max : ${max.formatNumber()},percentage : ${percentage}%` : props.title;
-    const Component = indeterminate ? ProgressBarFillIndeterminate : Div;
-    fillClassName = cn("progress-bar-fillBar h-full", computedVariant.fillBar(), fillClassName);
+    const Component = indeterminate ? ProgressBarIndeterminateFill : Div;
+    fillClassName = cn("progress-bar-fill h-full ", computedVariant.fillBar(), fillClassName);
     return <Div title={title} accessibilityRole="progressbar"
         accessibilityValue={indeterminate ? {} : { min: 0, max: 100, now: percentage * 100 }}
         aria-valuemax={max}
@@ -81,7 +81,7 @@ export function ProgressBar({
             <Component
                 role="presentation"
                 {...rProps}
-                testID={testID + "-fillBar"}
+                testID={testID + "-fill"}
                 className={fillClassName}
                 style={!indeterminate ? { width: `${percentage}%` } : undefined}
             />
@@ -135,7 +135,7 @@ export interface IProgressBarProps extends Omit<IHtmlDivProps, "children"> {
      * The current progress value.
      * 
      * Represents the current state of progress. This value should be between 0 and the `max` value.
-     * The component will automatically calculate the percentage and apply it to the fillBar element.
+     * The component will automatically calculate the percentage and apply it to the fill element.
      * 
      * @type {number}
      * @memberof IProgressBarProps
@@ -209,11 +209,11 @@ export interface IProgressBarProps extends Omit<IHtmlDivProps, "children"> {
     trackClassName?: string;
 
     /**
-     * Custom CSS classes for the progress bar fillBar (progress indicator).
+     * Custom CSS classes for the progress bar fill (progress indicator).
      * 
      * This className is applied to the inner Div that represents the actual progress.
      * The width is automatically calculated based on the value/max ratio. Use this
-     * to customize the fillBar color, gradients, animations, and visual effects.
+     * to customize the fill color, gradients, animations, and visual effects.
      * 
      * @type {string}
      * @memberof IProgressBarProps
@@ -221,7 +221,7 @@ export interface IProgressBarProps extends Omit<IHtmlDivProps, "children"> {
      * 
      * @example
      * ```typescript
-     * // Gradient fillBar with smooth animation
+     * // Gradient fill with smooth animation
      * fillClassName="h-full bg-gradient-to-r from-green-400 to-blue-500 transition-all duration-500 ease-in-out rounded"
      * 
      * // Pulsing animation effect

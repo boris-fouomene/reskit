@@ -28,7 +28,8 @@
     "theme-to-css-vars"
   ],
   "scripts": {
-    "build": "npm run generate-color-variants && tsc && npx tsc-alias -p tsconfig.json && npm run build:dts && npm run generate-icon-types",
+    "build": "npm run generate-color-variants && tsc && npx tsc-alias -p tsconfig.json && npm run build:dts && npm run generate-icon-types && npm run copy-css",
+    "copy-css": "copyfiles -u 1 src/**/*.css build/",
     "build:dts": "tsc -p tsconfig.dts.json --emitDeclarationOnly && npx tsc-alias -p tsconfig.dts.json",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
@@ -52,6 +53,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@types/react-native-vector-icons": "^6.4.18",
+    "copyfiles": "^2.4.1",
     "nativewind": "^4.1.23",
     "react-native-vector-icons": "^10.2.0",
     "tailwind-variants": "^1.0.0"

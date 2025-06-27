@@ -17,7 +17,7 @@
         background : Record<IName,string>;
         textForeground : Record<IName,string>;
         shadow : Record<IName,string>;
-        activityIndicator: Record<IName,string>;
+        activityIndicator: Record<IName2Foreground,string>;
         borderColor : Record<IName2Foreground,string>;
         borderTopColor : Record<IName2Foreground,string>;
         borderBottomColor : Record<IName2Foreground,string>;

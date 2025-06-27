@@ -325,7 +325,14 @@ export const VariantsGeneratedColors = {
     "success": "border-t-success dark:border-t-dark-success",
     "warning": "border-t-warning dark:border-t-dark-warning",
     "error": "border-t-error dark:border-t-dark-error",
-    "surface": "border-t-surface dark:border-t-dark-surface"
+    "surface": "border-t-surface dark:border-t-dark-surface",
+    "primary-foreground": "border-t-primary-foreground dark:border-t-dark-primary-foreground",
+    "secondary-foreground": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground",
+    "info-foreground": "border-t-info-foreground dark:border-t-dark-info-foreground",
+    "success-foreground": "border-t-success-foreground dark:border-t-dark-success-foreground",
+    "warning-foreground": "border-t-warning-foreground dark:border-t-dark-warning-foreground",
+    "error-foreground": "border-t-error-foreground dark:border-t-dark-error-foreground",
+    "surface-foreground": "border-t-surface-foreground dark:border-t-dark-surface-foreground"
   }
 }
     

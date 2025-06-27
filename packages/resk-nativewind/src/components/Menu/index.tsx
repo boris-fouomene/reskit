@@ -9,7 +9,7 @@ import { defaultStr } from '@resk/core';
 import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
 import { isNumber } from "@resk/core/utils";
-import { measureContentHeight } from '@utils/measureContentHeight';
+import { measureLayout } from '@utils/measureLayut';
 import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
 import { useBackHandler } from '@components/BackHandler';
@@ -63,11 +63,12 @@ export function Menu<Context = unknown>({
     const [state, setState] = useStateCallback({
         visible: isControlled ? !!visible : false,
         anchorMeasurements: {
+            x: 0,
+            y: 0,
             pageX: 0,
             pageY: 0,
             width: 0,
-            height: 0,
-            contentHeight: 0,
+            height: 0
         }
     });
     const [menuLayout, setMenuLayout] = useState<LayoutRectangle | null>(null);
@@ -183,7 +184,7 @@ export function Menu<Context = unknown>({
     const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", className: cn(computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
     itemsProps.className = cn(computedVariant.items(), itemsProps.className);
-    const AnchorComponent = typeof customAnchor == "function" ? View : TouchableOpacity;
+    const AnchorComponent = typeof customAnchor == "function" ? View : Pressable;
     const anchorProps = typeof customAnchor == "function" ? {} : {
         onPress: () => {
             open();
@@ -238,15 +239,7 @@ export function Menu<Context = unknown>({
 
 
 const measureAnchor = (anchorRef: RefObject<any>, minContentHeight?: number) => {
-    return measureContentHeight(anchorRef, minContentHeight).then(({ x, y, width, height, contentHeight }) => {
-        return {
-            pageX: x,
-            pageY: y,
-            width,
-            height,
-            contentHeight
-        };
-    });
+    return measureLayout(anchorRef);
 }
 
 export * from "./context";

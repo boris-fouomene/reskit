@@ -25,7 +25,7 @@ export const useMenuPosition = ({
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
         let calculatedPosition: IMenuCalculatedPosition = {
-            calculatedFromPosition: "bottom",
+            computedPlacement: "bottom",
             xPosition: "left",
             yPosition: "top",
             left: 0,
@@ -98,12 +98,14 @@ export const useMenuPosition = ({
             if (sameWidth) {
                 rProps.width = minMenuWidth;
             }
+            const bottom = spaces.bottom + anchorHeight,
+                top = pageY + anchorHeight;
             const positions: Record<IMenuPosition, IMenuCalculatedPosition> = {
                 top: {
                     ...rProps,
-                    calculatedFromPosition: "top",
+                    computedPlacement: "top",
                     top: undefined,// pageY - menuHeight,
-                    bottom: spaces.bottom + anchorHeight,
+                    bottom,
                     left: canUseAnchorSpace ? pageX : isMaxHorizontalSpaceLeft ? undefined : pageX,
                     right: canUseAnchorSpace ? undefined : isMaxHorizontalSpaceLeft ? spaces.right : undefined,
                     yPosition: 'top',
@@ -112,8 +114,8 @@ export const useMenuPosition = ({
                 },
                 bottom: {
                     ...rProps,
-                    calculatedFromPosition: "bottom",
-                    top: pageY + anchorHeight,
+                    computedPlacement: "bottom",
+                    top,
                     bottom: undefined,
                     left: canUseAnchorSpace ? pageX : isMaxHorizontalSpaceLeft ? undefined : pageX,
                     right: canUseAnchorSpace ? undefined : isMaxHorizontalSpaceLeft ? spaces.right : undefined,
@@ -126,22 +128,22 @@ export const useMenuPosition = ({
                  */
                 left: {
                     ...rProps,
-                    calculatedFromPosition: "left",
+                    computedPlacement: "left",
                     xPosition: 'left',
                     yPosition: maxVerticalPosition,
                     left: undefined,//Math.max(0, pageX + anchorWidth - padding),
                     right: spaces.right,
-                    top: isMaxVerticalSpaceBottom ? (pageY + (anchorHeight)) : undefined,// - (menuHeight / 2),
-                    bottom: isMaxVerticalSpaceBottom ? undefined : (spaces.bottom + anchorHeight),
+                    top: isMaxVerticalSpaceBottom ? top : undefined,// - (menuHeight / 2),
+                    bottom: isMaxVerticalSpaceBottom ? undefined : bottom,
                     maxHeight: isMaxVerticalSpaceBottom ? spaces.bottom : spaces.top,
                 },
                 right: {
                     ...rProps,
-                    calculatedFromPosition: "right",
+                    computedPlacement: "right",
                     left: pageX,// + anchorWidth,
                     right: undefined,
-                    top: isMaxVerticalSpaceBottom ? (pageY + (anchorHeight)) : undefined,// + (anchorHeight / 2),// - (menuHeight / 2),
-                    bottom: isMaxVerticalSpaceBottom ? undefined : (spaces.bottom + anchorHeight),
+                    top: isMaxVerticalSpaceBottom ? top : undefined,// + (anchorHeight / 2),// - (menuHeight / 2),
+                    bottom: isMaxVerticalSpaceBottom ? undefined : bottom,
                     xPosition: 'right',
                     yPosition: maxVerticalPosition,
                     maxHeight: isMaxVerticalSpaceBottom ? spaces.bottom : spaces.top,
@@ -190,7 +192,7 @@ export const useMenuPosition = ({
             maxHeight: windowHeight - (fullScreen ? 0 : Math.max(sizeToRemove.height, 10)),
         }
     }, [menuPosition, fullScreen, windowWidth, windowHeight, sizeToRemove.width, sizeToRemove.height]);
-    const { xPosition, calculatedFromPosition, yPosition, ...positionStyle } = menuPosition;
+    const { xPosition, computedPlacement, yPosition, ...positionStyle } = menuPosition;
     return {
         calculatePosition,
         menuPosition,

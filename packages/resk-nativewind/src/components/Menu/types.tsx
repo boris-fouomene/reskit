@@ -149,7 +149,7 @@ export interface IMenuCalculatedPosition {
     height?: number;
     width?: number;
     bottom?: number;
-    calculatedFromPosition: IMenuPosition;
+    computedPlacement: IMenuPosition;
     right?: number;
     /**
      * The max width of the menu.

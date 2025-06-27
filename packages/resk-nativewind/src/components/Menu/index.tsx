@@ -2,14 +2,14 @@
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { useEffect, useState, useRef, useMemo, RefObject, Fragment } from 'react';
-import { View, LayoutChangeEvent, LayoutRectangle, Pressable, ScrollView, ScrollViewProps, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, StyleSheet, TouchableOpacity } from 'react-native';
 import { IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
 import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
 import { isNumber } from "@resk/core/utils";
-import { measureLayout } from '@utils/measureLayut';
+import { measureInWindow } from '@utils/measureLayut';
 import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
 import { useBackHandler } from '@components/BackHandler';
@@ -63,8 +63,8 @@ export function Menu<Context = unknown>({
     const [state, setState] = useStateCallback({
         visible: isControlled ? !!visible : false,
         anchorMeasurements: {
-            x: 0,
-            y: 0,
+            //x: 0,
+            //y: 0,
             pageX: 0,
             pageY: 0,
             width: 0,
@@ -184,7 +184,7 @@ export function Menu<Context = unknown>({
     const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", className: cn(computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
     itemsProps.className = cn(computedVariant.items(), itemsProps.className);
-    const AnchorComponent = typeof customAnchor == "function" ? View : Pressable;
+    const AnchorComponent = typeof customAnchor == "function" ? View : TouchableOpacity;
     const anchorProps = typeof customAnchor == "function" ? {} : {
         onPress: () => {
             open();
@@ -239,7 +239,7 @@ export function Menu<Context = unknown>({
 
 
 const measureAnchor = (anchorRef: RefObject<any>, minContentHeight?: number) => {
-    return measureLayout(anchorRef);
+    return measureInWindow(anchorRef).then((({ x, y, ...rest }) => ({ pageX: x, pageY: y, ...rest })));
 }
 
 export * from "./context";

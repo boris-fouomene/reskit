@@ -4,6 +4,7 @@ import { IMenuCalculatedPosition, IMenuPosition, IUseMenuPositionProps } from ".
 import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { useBreakpoints } from "@utils/breakpoints/hooks";
+import Platform from "@platform";
 
 const MENU_MIN_WIDTH = 120;
 export const useMenuPosition = ({
@@ -98,7 +99,7 @@ export const useMenuPosition = ({
             if (sameWidth) {
                 rProps.width = minMenuWidth;
             }
-            const bottom = spaces.bottom + anchorHeight,
+            const bottom = spaces.bottom + anchorHeight + (Platform.isNative() ? -20 : 0),
                 top = pageY + anchorHeight;
             const positions: Record<IMenuPosition, IMenuCalculatedPosition> = {
                 top: {

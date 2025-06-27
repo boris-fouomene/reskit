@@ -224,7 +224,7 @@ export function Menu<Context = unknown>({
                     }}
                     style={StyleSheet.flatten([!renderedAsBottomSheet && menuStyle, props.style])}
                 >
-                    <Div testID={testID + "-menu-content-container"} className={cn("flex-1 grow", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.contentContainer(), contentContainerClassName)}>
+                    <Div testID={testID + "-menu-content-container"} className={cn("max-h-full", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.contentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                             {child}

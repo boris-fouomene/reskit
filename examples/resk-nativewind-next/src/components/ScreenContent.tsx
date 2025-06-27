@@ -74,7 +74,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <H2>A hight menu example</H2>
         <Menu
-          anchor={<Text style={{ height: 80 }}>Open Menu in a higgggggggggggggggggggggggggggggggggggggggggggggggggggggggg</Text>}
+          anchor={<Text>Open Menu in a higgggggggggggggggggggggggggggggggggggggggggggggggggggggggg</Text>}
           items={[
             { label: "Home", icon: "material-home" },
             { label: "Settings", icon: "star-settings" },

@@ -10,6 +10,9 @@ const progressBar = tv({
         text: "",
     },
     variants: {
+        indeterminate: {
+            true: {}
+        },
         height: {
             0.5: {
                 track: "h-0.5"

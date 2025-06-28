@@ -23,6 +23,9 @@
         borderBottomColor : Record<IName2Foreground,string>;
         borderLeftColor : Record<IName2Foreground,string>;
         borderRightColor : Record<IName2Foreground,string>;
+        ringColors : Record<IName2Foreground,string>;
+        hoverRingColors: Record<IName2Foreground,string>;
+        activeRingColors: Record<IName2Foreground,string>;
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     

@@ -8,10 +8,10 @@ import { Div } from "@html/Div";
 import { useEffect, useState } from "react";
 import { isNumber } from "@resk/core/utils";
 
-export function ProgressBarIndeterminateFill({ indeterminateDuration, className, ...props }: IHtmlDivProps & { indeterminateDuration?: number }) {
+export function ProgressBarIndeterminateFill({ className, ...props }: IHtmlDivProps) {
     const progress = useSharedValue(0);
     const [width, setWidth] = useState<number>(0);
-    const duration = isNumber(indeterminateDuration) && indeterminateDuration > 0 ? indeterminateDuration : 300;
+    const duration = 500;
     useEffect(() => {
         progress.value = withRepeat(
             withTiming(1, { duration }),
@@ -36,20 +36,19 @@ export function ProgressBarIndeterminateFill({ indeterminateDuration, className,
             transform: [{ translateX }, { scaleX }],
         };
     });
-    return <View className={cn("remapped-progress-bar-indeterminate relative overflow-hidden")} style={[{ width: "100%" }]} onLayout={(e) => { setWidth(e.nativeEvent.layout.width); }}>
-        <Div className={cn("absolute top-0 left-0", className)}>
-            <Animated.View
-                style={[
-                    {
-                        height: "100%",
-                        width: width * 0.4,
-                        left: 0,
-                        top: 0,
-                    },
-                    animatedStyle,
-                ]}
-            />
-        </Div>
+    return <View className={cn("native-progress-bar-indeterminate relative overflow-hidden")} onLayout={(e) => { setWidth(e.nativeEvent.layout.width); }}>
+        <Animated.View
+            style={[
+                {
+                    height: "100%",
+                    width: width ? width * 0.4 : "100%",
+                    position: 'absolute', left: 0, top: 0, bottom: 0, right: 0
+                },
+                animatedStyle,
+            ]}
+        >
+            <Div className={cn("native-indeterminate-progressbar-fil", className)} />
+        </Animated.View>
     </View>
 }
 

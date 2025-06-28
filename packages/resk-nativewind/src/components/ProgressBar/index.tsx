@@ -50,7 +50,6 @@ export function ProgressBar({
     testID,
     className,
     indeterminate,
-    indeterminateDuration,
     ...props
 }: IProgressBarProps) {
     value = isNumber(value) && value >= 0 ? value : 0;
@@ -58,11 +57,10 @@ export function ProgressBar({
     const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
     const canShowPercent = indeterminate !== false && showPercentage;
     const computedVariant = progressBarVariant(variant);
-    const rProps = indeterminate ? { indeterminateDuration } : {};
     testID = defaultStr(testID, "resk-progress-bar");
     const title = !indeterminate ? `value : ${value.formatNumber()}, max : ${max.formatNumber()},percentage : ${percentage}%` : props.title;
     const Component = indeterminate ? ProgressBarIndeterminateFill : Div;
-    fillClassName = cn("progress-bar-fill h-full ", computedVariant.fillBar(), fillClassName);
+    fillClassName = cn("progress-bar-fill h-full w-full", computedVariant.fillBar(), fillClassName);
     return <Div title={title} accessibilityRole="progressbar"
         accessibilityValue={indeterminate ? {} : { min: 0, max: 100, now: percentage * 100 }}
         aria-valuemax={max}
@@ -80,7 +78,6 @@ export function ProgressBar({
         >
             <Component
                 role="presentation"
-                {...rProps}
                 testID={testID + "-fill"}
                 className={fillClassName}
                 style={!indeterminate ? { width: `${percentage}%` } : undefined}
@@ -263,10 +260,4 @@ export interface IProgressBarProps extends Omit<IHtmlDivProps, "children"> {
      * If the progress bar will show indeterminate progress.
      */
     indeterminate?: boolean;
-
-    /***
-     * Duration of the indeterminate animation.
-     * @Default : 2000
-     */
-    indeterminateDuration?: number;
 }

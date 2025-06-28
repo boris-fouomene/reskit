@@ -21,6 +21,9 @@ const buton = tv({
                 base: value,
             }
         })
+    },
+    defaultVariants: {
+        activeScale: 97,
     }
 });
 export default buton;

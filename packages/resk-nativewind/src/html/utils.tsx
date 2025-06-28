@@ -80,7 +80,6 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
             return onPressOut(normalizeGestureEvent(event));
         } : undefined
     }
-    r.className = cn(classes.cursorDefault, r.className)
     if (Platform.OS === "web" && !r.disabled && !r.readOnly && !(r as any).readonly && (r.onClick || r.onMouseDown || r.onMouseUp)) {
         r.className = cn("cursor-pointer", r.className);
     }

@@ -3,11 +3,12 @@ import { marginClasses, padding2marginClasses, paddingClasses } from "./padding2
 import { borderBottomWidthVariants, borderLeftWidthVariants, borderRightWidthVariants, borderStyleClasses, borderTopWidthVariants, borderWidthVariants, borderInlineWidthVariants, borderBlockWidthVariants, allBorderWidthVariants } from "./border";
 import { ShadowColorsClasses } from "./shadow";
 import { IconSizes, textSizes } from "./textSizes";
-import { allScaleVariants } from "./scales";
 import { fontWeightClasses } from "./fontWeight";
 import { textAlignClasses } from "./textAlignClasses";
 import { VariantsGeneratedColors } from "@variants/generated-variants-colors";
 import { heightClasses, maxHeightClasses, maxWidthClasses, minHeightClasses, minWidthClasses, widthClasses } from "./width2height";
+import { activeRingSize, focusRingSize, hoverRingSize, ringClasses } from "./ring";
+import { scalesClasses } from "./scales";
 
 type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], variantName: keyof InputType) => ResultType;
 
@@ -102,10 +103,17 @@ export const VariantsFactory = {
   createRoundedVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
     return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);
   },
-  createPaddingsVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>): Record<keyof typeof paddingClasses, Record<keyof (typeof paddingClasses)[keyof typeof paddingClasses], string>> {
+  createPaddingsVariants: function createPaddingsVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>): Record<keyof typeof paddingClasses, Record<keyof (typeof paddingClasses)[keyof typeof paddingClasses], string>> {
     const r = {} as any;
     Object.entries(paddingClasses).forEach(([key, value]) => {
       r[key] = VariantsFactory.create<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>(value, variantMutator);
+    });
+    return r;
+  },
+  createScalesVariants: function createScalesVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>): Record<keyof typeof scalesClasses, Record<keyof (typeof scalesClasses)[keyof typeof scalesClasses], string>> {
+    const r = {} as any;
+    Object.entries(scalesClasses).forEach(([key, value]) => {
+      r[key] = VariantsFactory.create<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>(value, variantMutator);
     });
     return r;
   },
@@ -131,10 +139,6 @@ export const VariantsFactory = {
   },
   createShadowColorsVariants: function createShadowColorsVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof ShadowColorsClasses, ResultType>) {
     return VariantsFactory.create<typeof ShadowColorsClasses, ResultType>(ShadowColorsClasses, variantMutator);
-  },
-  scalesVariants: allScaleVariants,
-  createScalesVariants: function createScaleHoverVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof allScaleVariants, ResultType>) {
-    return VariantsFactory.create<typeof allScaleVariants, ResultType>(allScaleVariants, variantMutator);
   },
   createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allVariantClasses)[keyof typeof allVariantClasses], ResultType>): IVariantFactoryAll<ResultType> {
     const result: IVariantFactoryAll<ResultType> = {} as any;
@@ -194,6 +198,14 @@ const allVariantClasses = {
   minWidth: minWidthClasses,
   maxHeight: maxHeightClasses,
   minHeight: minHeightClasses,
+  ringColor: VariantsGeneratedColors.ringColors,
+  activeRingColor: VariantsGeneratedColors.activeRingColors,
+  hoverRingColor: VariantsGeneratedColors.hoverRingColors,
+  ringSize: ringClasses,
+  hoverRingSize: hoverRingSize,
+  activeRingSize: activeRingSize,
+  focusRingSize: focusRingSize,
+  ...scalesClasses,
   ...allBorderWidthVariants,
   ...padding2marginClasses,
 };

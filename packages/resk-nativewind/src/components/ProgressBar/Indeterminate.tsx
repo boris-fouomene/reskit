@@ -5,6 +5,6 @@ import "./styles.css";
 export function ProgressBarIndeterminateFill({ className, ...props }: IHtmlDivProps) {
     return <Div
         {...props}
-        className={cn("progress-bar-indeterminate", className)}
+        className={cn("progress-bar-indeterminate w-full h-full", className)}
     />
 }

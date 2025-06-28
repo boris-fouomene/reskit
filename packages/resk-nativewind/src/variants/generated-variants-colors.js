@@ -333,6 +333,54 @@ export const VariantsGeneratedColors = {
     "warning-foreground": "border-t-warning-foreground dark:border-t-dark-warning-foreground",
     "error-foreground": "border-t-error-foreground dark:border-t-dark-error-foreground",
     "surface-foreground": "border-t-surface-foreground dark:border-t-dark-surface-foreground"
+  },
+  "ringColors": {
+    "primary": "ring-primary dark:ring-dark-primary",
+    "secondary": "ring-secondary dark:ring-dark-secondary",
+    "info": "ring-info dark:ring-dark-info",
+    "success": "ring-success dark:ring-dark-success",
+    "warning": "ring-warning dark:ring-dark-warning",
+    "error": "ring-error dark:ring-dark-error",
+    "surface": "ring-surface dark:ring-dark-surface",
+    "primary-foreground": "ring-primary-foreground dark:ring-dark-primary-foreground",
+    "secondary-foreground": "ring-secondary-foreground dark:ring-dark-secondary-foreground",
+    "info-foreground": "ring-info-foreground dark:ring-dark-info-foreground",
+    "success-foreground": "ring-success-foreground dark:ring-dark-success-foreground",
+    "warning-foreground": "ring-warning-foreground dark:ring-dark-warning-foreground",
+    "error-foreground": "ring-error-foreground dark:ring-dark-error-foreground",
+    "surface-foreground": "ring-surface-foreground dark:ring-dark-surface-foreground"
+  },
+  "hoverRingColors": {
+    "primary": "hover:ring-primary dark:hover:ring-dark-primary",
+    "secondary": "hover:ring-secondary dark:hover:ring-dark-secondary",
+    "info": "hover:ring-info dark:hover:ring-dark-info",
+    "success": "hover:ring-success dark:hover:ring-dark-success",
+    "warning": "hover:ring-warning dark:hover:ring-dark-warning",
+    "error": "hover:ring-error dark:hover:ring-dark-error",
+    "surface": "hover:ring-surface dark:hover:ring-dark-surface",
+    "primary-foreground": "hover:ring-primary-foreground dark:hover:ring-dark-primary-foreground",
+    "secondary-foreground": "hover:ring-secondary-foreground dark:hover:ring-dark-secondary-foreground",
+    "info-foreground": "hover:ring-info-foreground dark:hover:ring-dark-info-foreground",
+    "success-foreground": "hover:ring-success-foreground dark:hover:ring-dark-success-foreground",
+    "warning-foreground": "hover:ring-warning-foreground dark:hover:ring-dark-warning-foreground",
+    "error-foreground": "hover:ring-error-foreground dark:hover:ring-dark-error-foreground",
+    "surface-foreground": "hover:ring-surface-foreground dark:hover:ring-dark-surface-foreground"
+  },
+  "activeRingColors": {
+    "primary": "active:ring-primary dark:active:ring-dark-primary",
+    "secondary": "active:ring-secondary dark:active:ring-dark-secondary",
+    "info": "active:ring-info dark:active:ring-dark-info",
+    "success": "active:ring-success dark:active:ring-dark-success",
+    "warning": "active:ring-warning dark:active:ring-dark-warning",
+    "error": "active:ring-error dark:active:ring-dark-error",
+    "surface": "active:ring-surface dark:active:ring-dark-surface",
+    "primary-foreground": "active:ring-primary-foreground dark:active:ring-dark-primary-foreground",
+    "secondary-foreground": "active:ring-secondary-foreground dark:active:ring-dark-secondary-foreground",
+    "info-foreground": "active:ring-info-foreground dark:active:ring-dark-info-foreground",
+    "success-foreground": "active:ring-success-foreground dark:active:ring-dark-success-foreground",
+    "warning-foreground": "active:ring-warning-foreground dark:active:ring-dark-warning-foreground",
+    "error-foreground": "active:ring-error-foreground dark:active:ring-dark-error-foreground",
+    "surface-foreground": "active:ring-surface-foreground dark:active:ring-dark-surface-foreground"
   }
 }
     

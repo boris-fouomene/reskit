@@ -62,7 +62,7 @@ export function ButtonBase<Context = unknown>({
     const iconSize = 18;
     iconProps = Object.assign({}, iconProps);
     const disabledClass = disabled && "pointer-events-none";
-    iconProps.className = cn("button-icon", computedVariant.icon?.(), iconProps?.variant && iconVariants(iconProps.variant), disabledClass, iconClassName, iconProps.className);
+    iconProps.className = cn("button-icon", computedVariant.icon(), iconProps?.variant && iconVariants(iconProps.variant), disabledClass, iconClassName, iconProps.className);
     const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps, variant: undefined });
     const iconContent = isLoading ? (
         <ActivityIndicator
@@ -83,7 +83,7 @@ export function ButtonBase<Context = unknown>({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("group/btn btn relative  button select-text", rippleContent ? "overflow-hidden" : "", classes.active2hoverState, "active:scale-[0.97]", allVariants({ disabled }), computedVariant.base?.(), className)}
+            className={cn("group/btn btn relative  button select-text cursor-pointer", rippleContent ? "overflow-hidden" : "", classes.active2hoverState, allVariants({ disabled }), computedVariant.base(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}
@@ -96,19 +96,19 @@ export function ButtonBase<Context = unknown>({
             } : undefined}
         >
             <Div id={`${buttonId}-content`} testID={testID + "-button-content"} className={cn("button-content w-full flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
-                <Div className={cn("button-left-container", rowClassName, computedVariant.leftContainer?.(), leftContainerClassName)} testID={testID + "-button-left-container"}>
+                <Div className={cn("button-left-container", rowClassName, computedVariant.leftContainer(), leftContainerClassName)} testID={testID + "-button-left-container"}>
                     {leftContent}
                     {iconPosition != "right" ? iconContent : null}
                     <Text
                         id={`${buttonId}-label`}
                         selectable={false}
                         testID={`${testID}-button-label`}
-                        className={cn("button-label", computedVariant.label?.(), disabledClass, labelClassName)}
+                        className={cn("button-label", computedVariant.label(), disabledClass, labelClassName)}
                     >
                         {isValidElement(children, true) && children || label}
                     </Text>
                 </Div>
-                {(hasRightContent) ? <Div testID={testID + "-right-content-wrapper"} id={`${buttonId}-right-content-wrapper`} className={cn("button-right-container", rowClassName, computedVariant.rightContainer?.(), rightContainerClassName)}>
+                {(hasRightContent) ? <Div testID={testID + "-right-content-wrapper"} id={`${buttonId}-right-content-wrapper`} className={cn("button-right-container", rowClassName, computedVariant.rightContainer(), rightContainerClassName)}>
                     {iconPosition == "right" ? iconContent : null}
                     {rightContent}
                 </Div> : null}

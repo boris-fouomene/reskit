@@ -96,6 +96,15 @@ module.exports = (colors, options) => {
       activityIndicator: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
         return [key, value.split("text-").join("border-t-")]
       })),
+      ringColors: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
+        return [key, value.split("text-").join("ring-")]
+      })),
+      hoverRingColors: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
+        return [key, value.split("text-").join("hover:ring-")]
+      })),
+      activeRingColors: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
+        return [key, value.split("text-").join("active:ring-")]
+      })),
     },
     null,
     2
@@ -135,6 +144,9 @@ export const VariantsGeneratedColors = ${content}
         borderBottomColor : Record<IName2Foreground,string>;
         borderLeftColor : Record<IName2Foreground,string>;
         borderRightColor : Record<IName2Foreground,string>;
+        ringColors : Record<IName2Foreground,string>;
+        hoverRingColors: Record<IName2Foreground,string>;
+        activeRingColors: Record<IName2Foreground,string>;
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     `,

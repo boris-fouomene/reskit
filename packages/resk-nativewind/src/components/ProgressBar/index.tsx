@@ -5,7 +5,7 @@ import { cn } from "@utils/cn";
 import { IVariantPropsProgressBar } from "@variants/progressBar";
 import progressBarVariant from "@variants/progressBar";
 import { Text } from "@html/Text";
-import { ProgressBarIndeterminateFill } from "./Indeterminate";
+import "./style";
 
 /**
  * A highly customizable and accessible progress bar component built with React and Tailwind CSS.
@@ -59,7 +59,6 @@ export function ProgressBar({
     const computedVariant = progressBarVariant(variant);
     testID = defaultStr(testID, "resk-progress-bar");
     const title = !indeterminate ? `value : ${value.formatNumber()}, max : ${max.formatNumber()},percentage : ${percentage}%` : props.title;
-    const Component = indeterminate ? ProgressBarIndeterminateFill : Div;
     fillClassName = cn("progress-bar-fill h-full w-full", computedVariant.fillBar(), fillClassName);
     return <Div title={title} accessibilityRole="progressbar"
         accessibilityValue={indeterminate ? {} : { min: 0, max: 100, now: percentage * 100 }}
@@ -76,11 +75,11 @@ export function ProgressBar({
             testID={testID + "-track"}
             className={cn("progress-bar-track w-full overflow-hidden min-h-1", computedVariant.track(), trackClassName)}
         >
-            <Component
+            <Div
                 role="presentation"
                 testID={testID + "-fill"}
-                className={fillClassName}
-                style={!indeterminate ? { width: `${percentage}%` } : undefined}
+                className={cn(indeterminate && "progress-bar-indeterminate w-full h-full", fillClassName)}
+                style={indeterminate ? { transformOrigin: "0% 50%" } : { width: `${percentage}%` }}
             />
         </Div>
         {canShowPercent ? <Text testID={testID + "-percentage-text"} className={cn("progress-bar-percentage-text progress-bar-percentage-container absolute inset-0 ", computedVariant.text())}>{percentage.toFixed(1)}%</Text>

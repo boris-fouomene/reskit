@@ -22,9 +22,7 @@ const buton = tv({
             }
         })
     },
-    defaultVariants: {
-        activeScale: 97,
-    }
+    defaultVariants: {}
 });
 export default buton;
 export type IVariantPropsButton = VariantProps<typeof buton>;

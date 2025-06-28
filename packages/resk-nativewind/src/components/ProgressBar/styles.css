@@ -15,8 +15,8 @@
         transform: translateX(50%) scaleX(0.2);
     }
 
-    80% {
-        transform: translateX(80%) scaleX(0.3);
+    70% {
+        transform: translateX(70%) scaleX(0.3);
     }
 
     100% {

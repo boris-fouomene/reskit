@@ -181,6 +181,9 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Button label="Outline Button 6" variant={{ outline: "error" }} />
           <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ colorScheme: "error" }} />
           <Button label="Button example4 - loading" loading variant={{ colorScheme: "success" }} className="px-[10px] py-[5px] rounded-full" />
+          <Button label="Zin color" variant={{ colorScheme: "zinc" }} />
+          <Button label="Pinc" variant={{ outline: "pink" }} />
+          <Button label="Violet Button" variant={{ outline: "violet" }} icon="camera" />
         </HStack>
       </Div>
       <Div className="p-5">

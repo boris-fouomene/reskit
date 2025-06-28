@@ -1,1 +1,1 @@
-export * from "./colorsMap";
+export * from "../colors/types";

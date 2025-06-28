@@ -1,4 +1,4 @@
-
+import { ITailwindColors } from "./types.tailwind";
 /**
  * Represents the color roles available for variant-based styling.
  *
@@ -31,7 +31,7 @@
  * This interface is intended to be used as a base for color variant mapping in design systems,
  * utility libraries, or component libraries that support theming and variant-based styling.
  */
-export interface IVariantsColorsMap {
+export interface IVariantsColorsMap extends ITailwindColors {
     /**
      * The primary color, typically used for main actions or highlights.
      */
@@ -64,6 +64,6 @@ export interface IVariantsColorsMap {
      * The background color, used for backgrounds or surfaces.
      */
     background: string;
-    
-    
-}        
+}
+
+export * from "./types.tailwind";

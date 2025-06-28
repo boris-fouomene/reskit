@@ -7,12 +7,12 @@ const cn = (...args) => {
 };
 
 module.exports = (colors, options) => {
-  const variantJsFile = path.resolve(__dirname, "../build/variants/colors.js");
+  const variantJsFile = path.resolve(__dirname, "../build/variants/colors/index.js");
   if (!fs.existsSync(variantJsFile)) {
     return;
   }
   const { VariantsColors } = require(variantJsFile);
-  if (!VariantsColors || typeof VariantsColors?.buildTextForegroundColors != "function") {
+  if (!VariantsColors || typeof VariantsColors?.buildTextColors != "function") {
     return;
   }
   const variantsRootDir = require("./find-package-dir")("build", "variants");
@@ -24,60 +24,64 @@ module.exports = (colors, options) => {
   const finalDir = variantsDir ?? dir;
   const outputPath = path.resolve(finalDir, "generated-variants-colors.js");
   const outputDeclarations = path.resolve(finalDir, "generated-variants-colors.d.ts");
+  const textColors = VariantsColors.buildTextColors();
+  const textForeground = Object.fromEntries(Object.entries(textColors).map(([key, value]) => [`${key}-foreground`, value]));
+  const textColorsWithImportant = VariantsColors.buildTextColors(true);
+  const textForegroundWithImportant = Object.fromEntries(Object.entries(textColorsWithImportant).map(([key, value]) => [`${key}-foreground`, value]))
   const textWithForeground = {
-    ...VariantsColors.buildTextColors(),
-    ...Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors()).map(([key, value]) => [`${key}-foreground`, value])),
+    ...textColors,
+    ...textForeground
   },
     textWithForegroundWithImportant = {
-      ...VariantsColors.buildTextColors(true),
-      ...Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value])),
+      ...textColorsWithImportant,
+      ...textForegroundWithImportant,
     };
   const content = JSON.stringify(
     {
-      button: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
+      button: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix, }) => {
         return {
-          base: `${colorNameWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${color} dark:focus-visible:outline-dark-${color}`,
-          label: `text-${color}-foreground dark:text-dark${color}-foreground`,
-          icon: `!text-${color}-foreground dark:!text-dark${color}-foreground`,
-          activityIndicator: cn(`border-t-${color}-foreground dark:border-t-dark-${color}-foreground`),
+          base: `${lightColorWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
+          label: `text-${lightForeground} dark:text-${darkForeground}`,
+          icon: `!text-${lightForeground} dark:!text-${darkForeground}`,
+          activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground}`),
         };
       }),
-      buttonOutline: VariantsColors.buildBackgroundColors(false, (colorNameWithPrefix, darkColorWithPrefix, color) => {
+      buttonOutline: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix, }) => {
         const groupClassName = {
-          base: `group web:hover:bg-${color} web:dark:hover:bg-dark-${color}`,
-          label: `web:hover:text-${color}-foreground web:dark:hover:text-dark-${color}-foreground web:group-hover:text-${color}-foreground web:dark:group-hover:text-dark-${color}-foreground`,
-          icon: `web:hover:!text-${color}-foreground web:dark:hover:!text-dark-${color}-foreground web:group-hover:!text-${color}-foreground web:dark:group-hover:!text-dark-${color}-foreground`,
-          activityIndicator: `web:hover:border-t-${color}-foreground web:dark:hover:border-t-dark-${color}-foreground web:group-hover:border-t-${color}-foreground web:dark:group-hover:border-t-dark-${color}-foreground`,
+          base: `group web:hover:bg-${lightColor} web:dark:hover:bg-${darkColor}`,
+          label: `web:hover:text-${lightForeground} web:dark:hover:text-${darkForeground} web:group-hover:text-${lightForeground} web:dark:group-hover:text-${darkForeground}`,
+          icon: `web:hover:!text-${lightForeground} web:dark:hover:!text-${darkForeground} web:group-hover:!text-${lightForeground} web:dark:group-hover:!text-${darkForeground}`,
+          activityIndicator: `web:hover:border-t-${lightColor}-foregund web:dark:hover:border-t-${darkForeground} web:group-hover:border-t-${lightForeground} web:dark:group-hover:border-t-${darkForeground}`,
         };
         return {
-          base: `${groupClassName.base} p-[5px] border-2 border-${color} bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]  web:focus-visible:outline-${color}`,
-          label: `${groupClassName.label} text-${color} dark:text-dark${color}`,
-          icon: `${groupClassName.icon} !text-${color} dark:!text-dark${color}`,
-          activityIndicator: cn(groupClassName.activityIndicator, `border-t-${color} dark:border-t-dark-${color}`),
+          base: `${groupClassName.base} p-[5px] border-2 border-${lightColor} dark:border-${darkColor} bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]`,
+          label: `${groupClassName.label} text-${lightColor} dark:text-${darkColor}`,
+          icon: `${groupClassName.icon} !text-${lightColor} dark:!text-${darkColor}`,
+          activityIndicator: cn(groupClassName.activityIndicator, `border-t-${lightColor} dark:border-t-${darkColor}`),
         };
       }),
-      icon: VariantsColors.buildTextColors(true),
-      iconForeground: VariantsColors.buildTextForegroundColors(true),
-      iconButton: VariantsColors.buildTextForegroundColors(true, (colorWithPrefix, darkColorWithPrefix, color) => {
+      icon: textWithForegroundWithImportant,
+      iconForeground: textWithForegroundWithImportant,
+      iconButton: Object.fromEntries(Object.entries(textWithForegroundWithImportant).map(([key, value]) => {
         return {
-          container: `bg-${color} dark:bg-dark${color}`,
-          icon: cn(colorWithPrefix, darkColorWithPrefix),
-          text: `text-${color}-foreground dark:text-dark-${color}-foreground`,
+          container: value.split("!text-").join("bg-"),
+          icon: value,
+          text: value.split('!text-').join("text")
         };
+      })),
+      surface: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
+        return cn(lightColorWithPrefix, darkColorWithPrefix, `text-${lightForeground} dark:text-${darkForeground}`);
       }),
-      surface: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
-        return cn(colorWithPrefix, darkColorWithPrefix, `text-${color}-foreground dark:text-dark-${color}-foreground`);
-      }),
-      shadow: VariantsColors.buildBackgroundColors(false, (colorWithPrefix, darkColorWithPrefix, color) => {
-        return cn(`shadow-${color}/20 dark:shadow-${color}/30`);
+      shadow: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
+        return cn(`shadow-${lightColor}/20 dark:shadow-${darkColor}/30`);
       }),
       text: VariantsColors.buildTextColors(),
-      textWithImportant: VariantsColors.buildTextColors(true),
-      textForegroundWithImportant: VariantsColors.buildTextForegroundColors(true),
+      textWithImportant: textColorsWithImportant,
+      textForegroundWithImportant,
       textWithForeground,
       textWithForegroundWithImportant,
       background: VariantsColors.buildBackgroundColors(),
-      textForeground: VariantsColors.buildTextForegroundColors(),
+      textForeground,
       borderColor: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
         return [key, value.split("text-").join("border-")]
       })),
@@ -162,7 +166,7 @@ export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
 function generateColorMapTypes(variantRootDir, colors) {
   if (typeof variantRootDir == "string" && fs.existsSync(variantRootDir)) {
     colors = Array.isArray(colors) && colors.length > 0 ? colors : [];
-    const colorMapTypesPath = path.resolve(variantRootDir, "types/colorsMap.d.ts");
+    const colorMapTypesPath = path.resolve(variantRootDir, "colors/colorsMap.d.ts");
     console.log(colorMapTypesPath, " is color map types path");
     try {
       fs.writeFileSync(

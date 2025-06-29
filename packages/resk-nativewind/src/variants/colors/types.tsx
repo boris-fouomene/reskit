@@ -67,4 +67,11 @@ export interface IVariantsColorsMapBase extends Record<string, IVariantColor> {
      * The default text color, used for text elements.
      */
     text: IVariantColor;
+
+
+    /**
+   * True gray color palette without color undertones
+   * @description A pure gray that's completely neutral
+   */
+    neutral: IVariantColor;
 }

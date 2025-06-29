@@ -77,12 +77,11 @@ export class VariantsColors {
     }
     static generateColorsMapTypes() {
         const generateText = [
-            "import { IVariantColor } from './types';",
             "import { IVariantsColorsMapBase } from './types';",
             "export interface IVariantsColorsMap extends IVariantsColorsMapBase {",
         ];
         Object.entries(VariantsColors.colors).forEach(([color, value]) => {
-            if (["primary", "secondary", "surface", "background", "text"].includes(color)) return;
+            if (["primary", "secondary", "surface", "background", "text", "neutral", "error", "info", "warning", "success"].includes(color)) return;
             generateText.push(`\t${color}: IVariantColor;`);
         });
         generateText.push("}");

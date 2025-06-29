@@ -1,5 +1,6 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsGeneratedColors } from "./colors/generated";
+import { VariantsFactory } from "./variantsFactory";
 
 const iconButton = tv({
     slots: {
@@ -8,6 +9,13 @@ const iconButton = tv({
         text: "",
     },
     variants: {
+        ...VariantsFactory.createPadding2MarginVariants<{ icon: string, container: string, text: string }>((value, iconName) => {
+            return {
+                container: value,
+                icon: "",
+                text: "",
+            }
+        }),
         colorScheme: VariantsGeneratedColors.iconButton,
         size: {
             sm: {
@@ -71,17 +79,13 @@ const iconButton = tv({
                 text: "text-9xl"
             }
         },
-        rounded: {
-            true: {
-                container: "rounded-full",
-            },
-            false: {
-                container: "rounded-none",
-            }
-        }
+        rounded: VariantsFactory.createRoundedVariants<{ container: string }>((value) => {
+            return { container: value };
+        })
     },
     defaultVariants: {
-        rounded: true,
+        rounded: "full",
+        colorScheme: "surface"
     }
 });
 

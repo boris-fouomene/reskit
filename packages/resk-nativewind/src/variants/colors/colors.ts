@@ -47,7 +47,7 @@ export class VariantsColors {
      * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
      * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
      *   If not provided, the default builder returns a string combining the light and dark class names.
-     * @param colorSuffix - (Optional) Suffix for the color class, such as `"-foreground"` to generate foreground color classes.
+     * @param isForeground - (Optional) Specify if we are building a foreground color or not.
      *
      * @returns A record mapping each registered color name to the generated class name or object, as defined by the builder.
      *
@@ -75,7 +75,6 @@ export class VariantsColors {
      *
      * @remarks
      * - The method iterates over all registered colors in the design system.
-     * - If `colorSuffix` is set to `"-foreground"`, the foreground color values are used instead of the base color.
      * - The builder function receives a detailed options object for each color, allowing for advanced customization.
      * - This method is the foundation for `buildTextColors`, `buildBackgroundColors`, and `buildBorderColors`.
      *
@@ -85,12 +84,10 @@ export class VariantsColors {
      * @see {@link VariantsColors.buildBackgroundColors}
      * @see {@link VariantsColors.buildBorderColors}
      */
-    public static buildColors<TailwindClassPrefix extends string = any, ClassNameBuilderResult = IClassName>(tailwindClassPrefix: TailwindClassPrefix, withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<TailwindClassPrefix, ClassNameBuilderResult>, colorSuffix?: IVariantsColors.ColorClassSuffix): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
+    public static buildColors<TailwindClassPrefix extends string = any, ClassNameBuilderResult = IClassName>(tailwindClassPrefix: TailwindClassPrefix, withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<TailwindClassPrefix, ClassNameBuilderResult>, isForeground: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
         const r = Object.create({}) as Record<IVariantsColors.ColorName, ClassNameBuilderResult>;
         const importantPrefix = withImportantAttribute ? "!" : "";
-        const suffix = colorSuffix && typeof colorSuffix == "string" ? colorSuffix : "";
         const colorBuilder: IVariantsColors.ClassNameBuilder<TailwindClassPrefix> = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightColorWithPrefix, darkColorWithPrefix }) => `${lightColorWithPrefix} ${darkColorWithPrefix}` as any;
-        const isForeground = String(colorSuffix).toLowerCase().split("-")[1] === "foreground";
         Object.entries(VariantsColors.colors).map(([color, value]) => {
             const { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, ...rest } = Object.assign({}, value);
             const lightColor = isForeground ? _lightForeground : light;
@@ -99,17 +96,22 @@ export class VariantsColors {
             const darkForeground = isForeground ? dark : _darkForeground;
             (r as any)[color] = colorBuilder({
                 ...rest,
+                isForeground: !!isForeground,
                 lightColor,
                 darkColor,
-                lightColorWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightColor}${suffix}`,
-                darkColorWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}${suffix}`,
+                lightColorWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`,
+                darkColorWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`,
                 darkForeground,
                 lightForeground,
-                lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}${suffix}`,
-                darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}${suffix}`,
+                lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`,
+                darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`,
             });
         });
         return r;
+    }
+
+    static buildTextForegroundColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"text", ClassNameBuilderResult>): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
+        return VariantsColors.buildColors<"text", ClassNameBuilderResult>("text", withImportantAttribute, colorClassNameBuilder, true);
     }
     /**
      * Generates a record of Tailwind CSS class names for all registered text color variants.
@@ -374,17 +376,6 @@ export namespace IVariantsColors {
     export interface Color extends IVariantColor { }
 
     /**
-     * Suffix used to indicate a foreground color class or no suffix.
-     *
-     * @example
-     * ```typescript
-     * const suffix: IVariantsColors.ColorClassSuffix = "-foreground";
-     * const noSuffix: IVariantsColors.ColorClassSuffix = "";
-     * ```
-     */
-    export type ColorClassSuffix = "-foreground" | "";
-
-    /**
      * Options for building Tailwind CSS class names for color variants.
      *
      * This interface provides all the necessary color and class name information for generating
@@ -424,6 +415,10 @@ export namespace IVariantsColors {
         lightForegroundWithPrefix: `${"!" | ""}${TailwindClassPrefix}-${string}`,
         darkColorWithPrefix: `dark:${"!" | ""}${TailwindClassPrefix}-${string}`,
         darkForegroundWithPrefix: `dark:${"!" | ""}${TailwindClassPrefix}-${string}`,
+        /***
+         * Whether the class name that is being generated is a foreground class name or not
+         */
+        isForeground: boolean;
     }
     /**
      * Function type for building a class name string or object from color options.

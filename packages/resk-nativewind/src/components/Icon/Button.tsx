@@ -51,14 +51,14 @@ export default function IconButton(
     }: IIconButtonProps) {
     testID = defaultStr(testID, "resk-icon-button");
     size = isNumber(size) ? size : FontIcon.DEFAULT_SIZE;
-    const variant = iconButton(buttonVariant);
+    const computedVariant = iconButton(buttonVariant);
     const { touchableProps, ...restProps } = pickTouchableProps(rest);
     containerSize = isNumber(containerSize) && containerSize > size ? containerSize : (size + 2 * PADDING);
     return (
         <Tooltip
             testID={`${testID}-container`}
             disabled={disabled}
-            className={cn("overflow-hidden align-center items-center justify-center flex flex-col", variant.container(), containerClassName)}
+            className={cn("overflow-hidden align-center items-center justify-center flex flex-col", computedVariant.container(), containerClassName)}
             style={isNonNullString(buttonVariant?.size) ? {
                 flexShrink: 0,
                 flexGrow: 0,
@@ -74,7 +74,7 @@ export default function IconButton(
             <>
                 {isLoading ? <ActivityIndicator className={cn("self-center")} size={size} /> : Icon.getIcon({
                     ...restProps,
-                    className: cn("self-center", disabled && "pointer-events-none", variant?.icon?.(), className),
+                    className: cn("self-center", disabled && "pointer-events-none", computedVariant?.icon?.(), className),
                     style,
                     icon: source || iconName || undefined,
                     testID,

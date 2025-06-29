@@ -135,16 +135,16 @@ export const VariantsGeneratedColors = {
     "warning": "!text-yellow-500 dark:!text-yellow-600",
     "success": "!text-green-500 dark:!text-green-600",
     "text": "!text-gray-900 dark:!text-gray-100",
-    "primary-foreground": "!text-primary dark:!text-dark-primary",
-    "secondary-foreground": "!text-secondary dark:!text-dark-secondary",
-    "surface-foreground": "!text-gray-100 dark:!text-gray-800",
-    "background-foreground": "!text-white dark:!text-gray-900",
-    "neutral-foreground": "!text-gray-500 dark:!text-gray-600",
-    "error-foreground": "!text-red-500 dark:!text-red-600",
-    "info-foreground": "!text-blue-500 dark:!text-blue-600",
-    "warning-foreground": "!text-yellow-500 dark:!text-yellow-600",
-    "success-foreground": "!text-green-500 dark:!text-green-600",
-    "text-foreground": "!text-gray-900 dark:!text-gray-100"
+    "primary-foreground": "!text-primary-foreground dark:!text-dark-primary-foreground",
+    "secondary-foreground": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
+    "surface-foreground": "!text-gray-900 dark:!text-gray-100",
+    "background-foreground": "!text-gray-900 dark:!text-gray-100",
+    "neutral-foreground": "!text-white dark:!text-gray-50",
+    "error-foreground": "!text-white dark:!text-red-50",
+    "info-foreground": "!text-white dark:!text-blue-50",
+    "warning-foreground": "!text-yellow-900 dark:!text-yellow-50",
+    "success-foreground": "!text-white dark:!text-green-50",
+    "text-foreground": "!text-gray-100 dark:!text-gray-900"
   },
   "iconForeground": {
     "primary": "!text-primary dark:!text-dark-primary",
@@ -157,117 +157,67 @@ export const VariantsGeneratedColors = {
     "warning": "!text-yellow-500 dark:!text-yellow-600",
     "success": "!text-green-500 dark:!text-green-600",
     "text": "!text-gray-900 dark:!text-gray-100",
-    "primary-foreground": "!text-primary dark:!text-dark-primary",
-    "secondary-foreground": "!text-secondary dark:!text-dark-secondary",
-    "surface-foreground": "!text-gray-100 dark:!text-gray-800",
-    "background-foreground": "!text-white dark:!text-gray-900",
-    "neutral-foreground": "!text-gray-500 dark:!text-gray-600",
-    "error-foreground": "!text-red-500 dark:!text-red-600",
-    "info-foreground": "!text-blue-500 dark:!text-blue-600",
-    "warning-foreground": "!text-yellow-500 dark:!text-yellow-600",
-    "success-foreground": "!text-green-500 dark:!text-green-600",
-    "text-foreground": "!text-gray-900 dark:!text-gray-100"
+    "primary-foreground": "!text-primary-foreground dark:!text-dark-primary-foreground",
+    "secondary-foreground": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
+    "surface-foreground": "!text-gray-900 dark:!text-gray-100",
+    "background-foreground": "!text-gray-900 dark:!text-gray-100",
+    "neutral-foreground": "!text-white dark:!text-gray-50",
+    "error-foreground": "!text-white dark:!text-red-50",
+    "info-foreground": "!text-white dark:!text-blue-50",
+    "warning-foreground": "!text-yellow-900 dark:!text-yellow-50",
+    "success-foreground": "!text-white dark:!text-green-50",
+    "text-foreground": "!text-gray-100 dark:!text-gray-900"
   },
   "iconButton": {
     "primary": {
       "container": "bg-primary dark:bg-dark-primary",
-      "icon": "!text-primary dark:!text-dark-primary",
-      "text": "textprimary dark:textdark-primary"
+      "icon": "!text-primary-foreground dark:!text-dark-primary-foreground",
+      "text": "text-primary-foreground dark:text-dark-primary-foreground"
     },
     "secondary": {
       "container": "bg-secondary dark:bg-dark-secondary",
-      "icon": "!text-secondary dark:!text-dark-secondary",
-      "text": "textsecondary dark:textdark-secondary"
+      "icon": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
+      "text": "text-secondary-foreground dark:text-dark-secondary-foreground"
     },
     "surface": {
       "container": "bg-gray-100 dark:bg-gray-800",
-      "icon": "!text-gray-100 dark:!text-gray-800",
-      "text": "textgray-100 dark:textgray-800"
+      "icon": "!text-gray-900 dark:!text-gray-100",
+      "text": "text-gray-900 dark:text-gray-100"
     },
     "background": {
       "container": "bg-white dark:bg-gray-900",
-      "icon": "!text-white dark:!text-gray-900",
-      "text": "textwhite dark:textgray-900"
+      "icon": "!text-gray-900 dark:!text-gray-100",
+      "text": "text-gray-900 dark:text-gray-100"
     },
     "neutral": {
       "container": "bg-gray-500 dark:bg-gray-600",
-      "icon": "!text-gray-500 dark:!text-gray-600",
-      "text": "textgray-500 dark:textgray-600"
+      "icon": "!text-white dark:!text-gray-50",
+      "text": "text-white dark:text-gray-50"
     },
     "error": {
       "container": "bg-red-500 dark:bg-red-600",
-      "icon": "!text-red-500 dark:!text-red-600",
-      "text": "textred-500 dark:textred-600"
+      "icon": "!text-white dark:!text-red-50",
+      "text": "text-white dark:text-red-50"
     },
     "info": {
       "container": "bg-blue-500 dark:bg-blue-600",
-      "icon": "!text-blue-500 dark:!text-blue-600",
-      "text": "textblue-500 dark:textblue-600"
+      "icon": "!text-white dark:!text-blue-50",
+      "text": "text-white dark:text-blue-50"
     },
     "warning": {
       "container": "bg-yellow-500 dark:bg-yellow-600",
-      "icon": "!text-yellow-500 dark:!text-yellow-600",
-      "text": "textyellow-500 dark:textyellow-600"
+      "icon": "!text-yellow-900 dark:!text-yellow-50",
+      "text": "text-yellow-900 dark:text-yellow-50"
     },
     "success": {
       "container": "bg-green-500 dark:bg-green-600",
-      "icon": "!text-green-500 dark:!text-green-600",
-      "text": "textgreen-500 dark:textgreen-600"
+      "icon": "!text-white dark:!text-green-50",
+      "text": "text-white dark:text-green-50"
     },
     "text": {
       "container": "bg-gray-900 dark:bg-gray-100",
-      "icon": "!text-gray-900 dark:!text-gray-100",
-      "text": "textgray-900 dark:textgray-100"
-    },
-    "primary-foreground": {
-      "container": "bg-primary dark:bg-dark-primary",
-      "icon": "!text-primary dark:!text-dark-primary",
-      "text": "textprimary dark:textdark-primary"
-    },
-    "secondary-foreground": {
-      "container": "bg-secondary dark:bg-dark-secondary",
-      "icon": "!text-secondary dark:!text-dark-secondary",
-      "text": "textsecondary dark:textdark-secondary"
-    },
-    "surface-foreground": {
-      "container": "bg-gray-100 dark:bg-gray-800",
-      "icon": "!text-gray-100 dark:!text-gray-800",
-      "text": "textgray-100 dark:textgray-800"
-    },
-    "background-foreground": {
-      "container": "bg-white dark:bg-gray-900",
-      "icon": "!text-white dark:!text-gray-900",
-      "text": "textwhite dark:textgray-900"
-    },
-    "neutral-foreground": {
-      "container": "bg-gray-500 dark:bg-gray-600",
-      "icon": "!text-gray-500 dark:!text-gray-600",
-      "text": "textgray-500 dark:textgray-600"
-    },
-    "error-foreground": {
-      "container": "bg-red-500 dark:bg-red-600",
-      "icon": "!text-red-500 dark:!text-red-600",
-      "text": "textred-500 dark:textred-600"
-    },
-    "info-foreground": {
-      "container": "bg-blue-500 dark:bg-blue-600",
-      "icon": "!text-blue-500 dark:!text-blue-600",
-      "text": "textblue-500 dark:textblue-600"
-    },
-    "warning-foreground": {
-      "container": "bg-yellow-500 dark:bg-yellow-600",
-      "icon": "!text-yellow-500 dark:!text-yellow-600",
-      "text": "textyellow-500 dark:textyellow-600"
-    },
-    "success-foreground": {
-      "container": "bg-green-500 dark:bg-green-600",
-      "icon": "!text-green-500 dark:!text-green-600",
-      "text": "textgreen-500 dark:textgreen-600"
-    },
-    "text-foreground": {
-      "container": "bg-gray-900 dark:bg-gray-100",
-      "icon": "!text-gray-900 dark:!text-gray-100",
-      "text": "textgray-900 dark:textgray-100"
+      "icon": "!text-gray-100 dark:!text-gray-900",
+      "text": "text-gray-100 dark:text-gray-900"
     }
   },
   "surface": {
@@ -319,16 +269,16 @@ export const VariantsGeneratedColors = {
     "text": "!text-gray-900 dark:!text-gray-100"
   },
   "textForegroundWithImportant": {
-    "primary-foreground": "!text-primary dark:!text-dark-primary",
-    "secondary-foreground": "!text-secondary dark:!text-dark-secondary",
-    "surface-foreground": "!text-gray-100 dark:!text-gray-800",
-    "background-foreground": "!text-white dark:!text-gray-900",
-    "neutral-foreground": "!text-gray-500 dark:!text-gray-600",
-    "error-foreground": "!text-red-500 dark:!text-red-600",
-    "info-foreground": "!text-blue-500 dark:!text-blue-600",
-    "warning-foreground": "!text-yellow-500 dark:!text-yellow-600",
-    "success-foreground": "!text-green-500 dark:!text-green-600",
-    "text-foreground": "!text-gray-900 dark:!text-gray-100"
+    "primary-foreground": "!text-primary-foreground dark:!text-dark-primary-foreground",
+    "secondary-foreground": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
+    "surface-foreground": "!text-gray-900 dark:!text-gray-100",
+    "background-foreground": "!text-gray-900 dark:!text-gray-100",
+    "neutral-foreground": "!text-white dark:!text-gray-50",
+    "error-foreground": "!text-white dark:!text-red-50",
+    "info-foreground": "!text-white dark:!text-blue-50",
+    "warning-foreground": "!text-yellow-900 dark:!text-yellow-50",
+    "success-foreground": "!text-white dark:!text-green-50",
+    "text-foreground": "!text-gray-100 dark:!text-gray-900"
   },
   "textWithForeground": {
     "primary": "text-primary dark:text-dark-primary",
@@ -341,16 +291,16 @@ export const VariantsGeneratedColors = {
     "warning": "text-yellow-500 dark:text-yellow-600",
     "success": "text-green-500 dark:text-green-600",
     "text": "text-gray-900 dark:text-gray-100",
-    "primary-foreground": "text-primary dark:text-dark-primary",
-    "secondary-foreground": "text-secondary dark:text-dark-secondary",
-    "surface-foreground": "text-gray-100 dark:text-gray-800",
-    "background-foreground": "text-white dark:text-gray-900",
-    "neutral-foreground": "text-gray-500 dark:text-gray-600",
-    "error-foreground": "text-red-500 dark:text-red-600",
-    "info-foreground": "text-blue-500 dark:text-blue-600",
-    "warning-foreground": "text-yellow-500 dark:text-yellow-600",
-    "success-foreground": "text-green-500 dark:text-green-600",
-    "text-foreground": "text-gray-900 dark:text-gray-100"
+    "primary-foreground": "text-primary-foreground dark:text-dark-primary-foreground",
+    "secondary-foreground": "text-secondary-foreground dark:text-dark-secondary-foreground",
+    "surface-foreground": "text-gray-900 dark:text-gray-100",
+    "background-foreground": "text-gray-900 dark:text-gray-100",
+    "neutral-foreground": "text-white dark:text-gray-50",
+    "error-foreground": "text-white dark:text-red-50",
+    "info-foreground": "text-white dark:text-blue-50",
+    "warning-foreground": "text-yellow-900 dark:text-yellow-50",
+    "success-foreground": "text-white dark:text-green-50",
+    "text-foreground": "text-gray-100 dark:text-gray-900"
   },
   "textWithForegroundWithImportant": {
     "primary": "!text-primary dark:!text-dark-primary",
@@ -363,16 +313,16 @@ export const VariantsGeneratedColors = {
     "warning": "!text-yellow-500 dark:!text-yellow-600",
     "success": "!text-green-500 dark:!text-green-600",
     "text": "!text-gray-900 dark:!text-gray-100",
-    "primary-foreground": "!text-primary dark:!text-dark-primary",
-    "secondary-foreground": "!text-secondary dark:!text-dark-secondary",
-    "surface-foreground": "!text-gray-100 dark:!text-gray-800",
-    "background-foreground": "!text-white dark:!text-gray-900",
-    "neutral-foreground": "!text-gray-500 dark:!text-gray-600",
-    "error-foreground": "!text-red-500 dark:!text-red-600",
-    "info-foreground": "!text-blue-500 dark:!text-blue-600",
-    "warning-foreground": "!text-yellow-500 dark:!text-yellow-600",
-    "success-foreground": "!text-green-500 dark:!text-green-600",
-    "text-foreground": "!text-gray-900 dark:!text-gray-100"
+    "primary-foreground": "!text-primary-foreground dark:!text-dark-primary-foreground",
+    "secondary-foreground": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
+    "surface-foreground": "!text-gray-900 dark:!text-gray-100",
+    "background-foreground": "!text-gray-900 dark:!text-gray-100",
+    "neutral-foreground": "!text-white dark:!text-gray-50",
+    "error-foreground": "!text-white dark:!text-red-50",
+    "info-foreground": "!text-white dark:!text-blue-50",
+    "warning-foreground": "!text-yellow-900 dark:!text-yellow-50",
+    "success-foreground": "!text-white dark:!text-green-50",
+    "text-foreground": "!text-gray-100 dark:!text-gray-900"
   },
   "background": {
     "primary": "bg-primary dark:bg-dark-primary",
@@ -387,16 +337,16 @@ export const VariantsGeneratedColors = {
     "text": "bg-gray-900 dark:bg-gray-100"
   },
   "textForeground": {
-    "primary-foreground": "text-primary dark:text-dark-primary",
-    "secondary-foreground": "text-secondary dark:text-dark-secondary",
-    "surface-foreground": "text-gray-100 dark:text-gray-800",
-    "background-foreground": "text-white dark:text-gray-900",
-    "neutral-foreground": "text-gray-500 dark:text-gray-600",
-    "error-foreground": "text-red-500 dark:text-red-600",
-    "info-foreground": "text-blue-500 dark:text-blue-600",
-    "warning-foreground": "text-yellow-500 dark:text-yellow-600",
-    "success-foreground": "text-green-500 dark:text-green-600",
-    "text-foreground": "text-gray-900 dark:text-gray-100"
+    "primary-foreground": "text-primary-foreground dark:text-dark-primary-foreground",
+    "secondary-foreground": "text-secondary-foreground dark:text-dark-secondary-foreground",
+    "surface-foreground": "text-gray-900 dark:text-gray-100",
+    "background-foreground": "text-gray-900 dark:text-gray-100",
+    "neutral-foreground": "text-white dark:text-gray-50",
+    "error-foreground": "text-white dark:text-red-50",
+    "info-foreground": "text-white dark:text-blue-50",
+    "warning-foreground": "text-yellow-900 dark:text-yellow-50",
+    "success-foreground": "text-white dark:text-green-50",
+    "text-foreground": "text-gray-100 dark:text-gray-900"
   },
   "borderColor": {
     "primary": "border-primary dark:border-dark-primary",
@@ -409,16 +359,16 @@ export const VariantsGeneratedColors = {
     "warning": "border-yellow-500 dark:border-yellow-600",
     "success": "border-green-500 dark:border-green-600",
     "text": "border-gray-900 dark:border-gray-100",
-    "primary-foreground": "border-primary dark:border-dark-primary",
-    "secondary-foreground": "border-secondary dark:border-dark-secondary",
-    "surface-foreground": "border-gray-100 dark:border-gray-800",
-    "background-foreground": "border-white dark:border-gray-900",
-    "neutral-foreground": "border-gray-500 dark:border-gray-600",
-    "error-foreground": "border-red-500 dark:border-red-600",
-    "info-foreground": "border-blue-500 dark:border-blue-600",
-    "warning-foreground": "border-yellow-500 dark:border-yellow-600",
-    "success-foreground": "border-green-500 dark:border-green-600",
-    "text-foreground": "border-gray-900 dark:border-gray-100"
+    "primary-foreground": "border-primary-foreground dark:border-dark-primary-foreground",
+    "secondary-foreground": "border-secondary-foreground dark:border-dark-secondary-foreground",
+    "surface-foreground": "border-gray-900 dark:border-gray-100",
+    "background-foreground": "border-gray-900 dark:border-gray-100",
+    "neutral-foreground": "border-white dark:border-gray-50",
+    "error-foreground": "border-white dark:border-red-50",
+    "info-foreground": "border-white dark:border-blue-50",
+    "warning-foreground": "border-yellow-900 dark:border-yellow-50",
+    "success-foreground": "border-white dark:border-green-50",
+    "text-foreground": "border-gray-100 dark:border-gray-900"
   },
   "borderTopColor": {
     "primary": "border-t-primary dark:border-t-dark-primary",
@@ -431,16 +381,16 @@ export const VariantsGeneratedColors = {
     "warning": "border-t-yellow-500 dark:border-t-yellow-600",
     "success": "border-t-green-500 dark:border-t-green-600",
     "text": "border-t-gray-900 dark:border-t-gray-100",
-    "primary-foreground": "border-t-primary dark:border-t-dark-primary",
-    "secondary-foreground": "border-t-secondary dark:border-t-dark-secondary",
-    "surface-foreground": "border-t-gray-100 dark:border-t-gray-800",
-    "background-foreground": "border-t-white dark:border-t-gray-900",
-    "neutral-foreground": "border-t-gray-500 dark:border-t-gray-600",
-    "error-foreground": "border-t-red-500 dark:border-t-red-600",
-    "info-foreground": "border-t-blue-500 dark:border-t-blue-600",
-    "warning-foreground": "border-t-yellow-500 dark:border-t-yellow-600",
-    "success-foreground": "border-t-green-500 dark:border-t-green-600",
-    "text-foreground": "border-t-gray-900 dark:border-t-gray-100"
+    "primary-foreground": "border-t-primary-foreground dark:border-t-dark-primary-foreground",
+    "secondary-foreground": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground",
+    "surface-foreground": "border-t-gray-900 dark:border-t-gray-100",
+    "background-foreground": "border-t-gray-900 dark:border-t-gray-100",
+    "neutral-foreground": "border-t-white dark:border-t-gray-50",
+    "error-foreground": "border-t-white dark:border-t-red-50",
+    "info-foreground": "border-t-white dark:border-t-blue-50",
+    "warning-foreground": "border-t-yellow-900 dark:border-t-yellow-50",
+    "success-foreground": "border-t-white dark:border-t-green-50",
+    "text-foreground": "border-t-gray-100 dark:border-t-gray-900"
   },
   "borderBottomColor": {
     "primary": "border-b-primary dark:border-b-dark-primary",
@@ -453,16 +403,16 @@ export const VariantsGeneratedColors = {
     "warning": "border-b-yellow-500 dark:border-b-yellow-600",
     "success": "border-b-green-500 dark:border-b-green-600",
     "text": "border-b-gray-900 dark:border-b-gray-100",
-    "primary-foreground": "border-b-primary dark:border-b-dark-primary",
-    "secondary-foreground": "border-b-secondary dark:border-b-dark-secondary",
-    "surface-foreground": "border-b-gray-100 dark:border-b-gray-800",
-    "background-foreground": "border-b-white dark:border-b-gray-900",
-    "neutral-foreground": "border-b-gray-500 dark:border-b-gray-600",
-    "error-foreground": "border-b-red-500 dark:border-b-red-600",
-    "info-foreground": "border-b-blue-500 dark:border-b-blue-600",
-    "warning-foreground": "border-b-yellow-500 dark:border-b-yellow-600",
-    "success-foreground": "border-b-green-500 dark:border-b-green-600",
-    "text-foreground": "border-b-gray-900 dark:border-b-gray-100"
+    "primary-foreground": "border-b-primary-foreground dark:border-b-dark-primary-foreground",
+    "secondary-foreground": "border-b-secondary-foreground dark:border-b-dark-secondary-foreground",
+    "surface-foreground": "border-b-gray-900 dark:border-b-gray-100",
+    "background-foreground": "border-b-gray-900 dark:border-b-gray-100",
+    "neutral-foreground": "border-b-white dark:border-b-gray-50",
+    "error-foreground": "border-b-white dark:border-b-red-50",
+    "info-foreground": "border-b-white dark:border-b-blue-50",
+    "warning-foreground": "border-b-yellow-900 dark:border-b-yellow-50",
+    "success-foreground": "border-b-white dark:border-b-green-50",
+    "text-foreground": "border-b-gray-100 dark:border-b-gray-900"
   },
   "borderLeftColor": {
     "primary": "border-l-primary dark:border-l-dark-primary",
@@ -475,16 +425,16 @@ export const VariantsGeneratedColors = {
     "warning": "border-l-yellow-500 dark:border-l-yellow-600",
     "success": "border-l-green-500 dark:border-l-green-600",
     "text": "border-l-gray-900 dark:border-l-gray-100",
-    "primary-foreground": "border-l-primary dark:border-l-dark-primary",
-    "secondary-foreground": "border-l-secondary dark:border-l-dark-secondary",
-    "surface-foreground": "border-l-gray-100 dark:border-l-gray-800",
-    "background-foreground": "border-l-white dark:border-l-gray-900",
-    "neutral-foreground": "border-l-gray-500 dark:border-l-gray-600",
-    "error-foreground": "border-l-red-500 dark:border-l-red-600",
-    "info-foreground": "border-l-blue-500 dark:border-l-blue-600",
-    "warning-foreground": "border-l-yellow-500 dark:border-l-yellow-600",
-    "success-foreground": "border-l-green-500 dark:border-l-green-600",
-    "text-foreground": "border-l-gray-900 dark:border-l-gray-100"
+    "primary-foreground": "border-l-primary-foreground dark:border-l-dark-primary-foreground",
+    "secondary-foreground": "border-l-secondary-foreground dark:border-l-dark-secondary-foreground",
+    "surface-foreground": "border-l-gray-900 dark:border-l-gray-100",
+    "background-foreground": "border-l-gray-900 dark:border-l-gray-100",
+    "neutral-foreground": "border-l-white dark:border-l-gray-50",
+    "error-foreground": "border-l-white dark:border-l-red-50",
+    "info-foreground": "border-l-white dark:border-l-blue-50",
+    "warning-foreground": "border-l-yellow-900 dark:border-l-yellow-50",
+    "success-foreground": "border-l-white dark:border-l-green-50",
+    "text-foreground": "border-l-gray-100 dark:border-l-gray-900"
   },
   "borderRightColor": {
     "primary": "border-r-primary dark:border-r-dark-primary",
@@ -497,16 +447,16 @@ export const VariantsGeneratedColors = {
     "warning": "border-r-yellow-500 dark:border-r-yellow-600",
     "success": "border-r-green-500 dark:border-r-green-600",
     "text": "border-r-gray-900 dark:border-r-gray-100",
-    "primary-foreground": "border-r-primary dark:border-r-dark-primary",
-    "secondary-foreground": "border-r-secondary dark:border-r-dark-secondary",
-    "surface-foreground": "border-r-gray-100 dark:border-r-gray-800",
-    "background-foreground": "border-r-white dark:border-r-gray-900",
-    "neutral-foreground": "border-r-gray-500 dark:border-r-gray-600",
-    "error-foreground": "border-r-red-500 dark:border-r-red-600",
-    "info-foreground": "border-r-blue-500 dark:border-r-blue-600",
-    "warning-foreground": "border-r-yellow-500 dark:border-r-yellow-600",
-    "success-foreground": "border-r-green-500 dark:border-r-green-600",
-    "text-foreground": "border-r-gray-900 dark:border-r-gray-100"
+    "primary-foreground": "border-r-primary-foreground dark:border-r-dark-primary-foreground",
+    "secondary-foreground": "border-r-secondary-foreground dark:border-r-dark-secondary-foreground",
+    "surface-foreground": "border-r-gray-900 dark:border-r-gray-100",
+    "background-foreground": "border-r-gray-900 dark:border-r-gray-100",
+    "neutral-foreground": "border-r-white dark:border-r-gray-50",
+    "error-foreground": "border-r-white dark:border-r-red-50",
+    "info-foreground": "border-r-white dark:border-r-blue-50",
+    "warning-foreground": "border-r-yellow-900 dark:border-r-yellow-50",
+    "success-foreground": "border-r-white dark:border-r-green-50",
+    "text-foreground": "border-r-gray-100 dark:border-r-gray-900"
   },
   "activityIndicator": {
     "primary": "border-t-primary dark:border-t-dark-primary",
@@ -519,16 +469,16 @@ export const VariantsGeneratedColors = {
     "warning": "border-t-yellow-500 dark:border-t-yellow-600",
     "success": "border-t-green-500 dark:border-t-green-600",
     "text": "border-t-gray-900 dark:border-t-gray-100",
-    "primary-foreground": "border-t-primary dark:border-t-dark-primary",
-    "secondary-foreground": "border-t-secondary dark:border-t-dark-secondary",
-    "surface-foreground": "border-t-gray-100 dark:border-t-gray-800",
-    "background-foreground": "border-t-white dark:border-t-gray-900",
-    "neutral-foreground": "border-t-gray-500 dark:border-t-gray-600",
-    "error-foreground": "border-t-red-500 dark:border-t-red-600",
-    "info-foreground": "border-t-blue-500 dark:border-t-blue-600",
-    "warning-foreground": "border-t-yellow-500 dark:border-t-yellow-600",
-    "success-foreground": "border-t-green-500 dark:border-t-green-600",
-    "text-foreground": "border-t-gray-900 dark:border-t-gray-100"
+    "primary-foreground": "border-t-primary-foreground dark:border-t-dark-primary-foreground",
+    "secondary-foreground": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground",
+    "surface-foreground": "border-t-gray-900 dark:border-t-gray-100",
+    "background-foreground": "border-t-gray-900 dark:border-t-gray-100",
+    "neutral-foreground": "border-t-white dark:border-t-gray-50",
+    "error-foreground": "border-t-white dark:border-t-red-50",
+    "info-foreground": "border-t-white dark:border-t-blue-50",
+    "warning-foreground": "border-t-yellow-900 dark:border-t-yellow-50",
+    "success-foreground": "border-t-white dark:border-t-green-50",
+    "text-foreground": "border-t-gray-100 dark:border-t-gray-900"
   },
   "ringColors": {
     "primary": "ring-primary dark:ring-dark-primary",
@@ -541,16 +491,16 @@ export const VariantsGeneratedColors = {
     "warning": "ring-yellow-500 dark:ring-yellow-600",
     "success": "ring-green-500 dark:ring-green-600",
     "text": "ring-gray-900 dark:ring-gray-100",
-    "primary-foreground": "ring-primary dark:ring-dark-primary",
-    "secondary-foreground": "ring-secondary dark:ring-dark-secondary",
-    "surface-foreground": "ring-gray-100 dark:ring-gray-800",
-    "background-foreground": "ring-white dark:ring-gray-900",
-    "neutral-foreground": "ring-gray-500 dark:ring-gray-600",
-    "error-foreground": "ring-red-500 dark:ring-red-600",
-    "info-foreground": "ring-blue-500 dark:ring-blue-600",
-    "warning-foreground": "ring-yellow-500 dark:ring-yellow-600",
-    "success-foreground": "ring-green-500 dark:ring-green-600",
-    "text-foreground": "ring-gray-900 dark:ring-gray-100"
+    "primary-foreground": "ring-primary-foreground dark:ring-dark-primary-foreground",
+    "secondary-foreground": "ring-secondary-foreground dark:ring-dark-secondary-foreground",
+    "surface-foreground": "ring-gray-900 dark:ring-gray-100",
+    "background-foreground": "ring-gray-900 dark:ring-gray-100",
+    "neutral-foreground": "ring-white dark:ring-gray-50",
+    "error-foreground": "ring-white dark:ring-red-50",
+    "info-foreground": "ring-white dark:ring-blue-50",
+    "warning-foreground": "ring-yellow-900 dark:ring-yellow-50",
+    "success-foreground": "ring-white dark:ring-green-50",
+    "text-foreground": "ring-gray-100 dark:ring-gray-900"
   },
   "hoverRingColors": {
     "primary": "hover:ring-primary dark:hover:ring-dark-primary",
@@ -563,16 +513,16 @@ export const VariantsGeneratedColors = {
     "warning": "hover:ring-yellow-500 dark:hover:ring-yellow-600",
     "success": "hover:ring-green-500 dark:hover:ring-green-600",
     "text": "hover:ring-gray-900 dark:hover:ring-gray-100",
-    "primary-foreground": "hover:ring-primary dark:hover:ring-dark-primary",
-    "secondary-foreground": "hover:ring-secondary dark:hover:ring-dark-secondary",
-    "surface-foreground": "hover:ring-gray-100 dark:hover:ring-gray-800",
-    "background-foreground": "hover:ring-white dark:hover:ring-gray-900",
-    "neutral-foreground": "hover:ring-gray-500 dark:hover:ring-gray-600",
-    "error-foreground": "hover:ring-red-500 dark:hover:ring-red-600",
-    "info-foreground": "hover:ring-blue-500 dark:hover:ring-blue-600",
-    "warning-foreground": "hover:ring-yellow-500 dark:hover:ring-yellow-600",
-    "success-foreground": "hover:ring-green-500 dark:hover:ring-green-600",
-    "text-foreground": "hover:ring-gray-900 dark:hover:ring-gray-100"
+    "primary-foreground": "hover:ring-primary-foreground dark:hover:ring-dark-primary-foreground",
+    "secondary-foreground": "hover:ring-secondary-foreground dark:hover:ring-dark-secondary-foreground",
+    "surface-foreground": "hover:ring-gray-900 dark:hover:ring-gray-100",
+    "background-foreground": "hover:ring-gray-900 dark:hover:ring-gray-100",
+    "neutral-foreground": "hover:ring-white dark:hover:ring-gray-50",
+    "error-foreground": "hover:ring-white dark:hover:ring-red-50",
+    "info-foreground": "hover:ring-white dark:hover:ring-blue-50",
+    "warning-foreground": "hover:ring-yellow-900 dark:hover:ring-yellow-50",
+    "success-foreground": "hover:ring-white dark:hover:ring-green-50",
+    "text-foreground": "hover:ring-gray-100 dark:hover:ring-gray-900"
   },
   "activeRingColors": {
     "primary": "active:ring-primary dark:active:ring-dark-primary",
@@ -585,16 +535,16 @@ export const VariantsGeneratedColors = {
     "warning": "active:ring-yellow-500 dark:active:ring-yellow-600",
     "success": "active:ring-green-500 dark:active:ring-green-600",
     "text": "active:ring-gray-900 dark:active:ring-gray-100",
-    "primary-foreground": "active:ring-primary dark:active:ring-dark-primary",
-    "secondary-foreground": "active:ring-secondary dark:active:ring-dark-secondary",
-    "surface-foreground": "active:ring-gray-100 dark:active:ring-gray-800",
-    "background-foreground": "active:ring-white dark:active:ring-gray-900",
-    "neutral-foreground": "active:ring-gray-500 dark:active:ring-gray-600",
-    "error-foreground": "active:ring-red-500 dark:active:ring-red-600",
-    "info-foreground": "active:ring-blue-500 dark:active:ring-blue-600",
-    "warning-foreground": "active:ring-yellow-500 dark:active:ring-yellow-600",
-    "success-foreground": "active:ring-green-500 dark:active:ring-green-600",
-    "text-foreground": "active:ring-gray-900 dark:active:ring-gray-100"
+    "primary-foreground": "active:ring-primary-foreground dark:active:ring-dark-primary-foreground",
+    "secondary-foreground": "active:ring-secondary-foreground dark:active:ring-dark-secondary-foreground",
+    "surface-foreground": "active:ring-gray-900 dark:active:ring-gray-100",
+    "background-foreground": "active:ring-gray-900 dark:active:ring-gray-100",
+    "neutral-foreground": "active:ring-white dark:active:ring-gray-50",
+    "error-foreground": "active:ring-white dark:active:ring-red-50",
+    "info-foreground": "active:ring-white dark:active:ring-blue-50",
+    "warning-foreground": "active:ring-yellow-900 dark:active:ring-yellow-50",
+    "success-foreground": "active:ring-white dark:active:ring-green-50",
+    "text-foreground": "active:ring-gray-100 dark:active:ring-gray-900"
   }
 }
     

@@ -45,9 +45,9 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   const outputPath = path.resolve(ouputFolder, "generated.js");
   const outputDeclarations = path.resolve(ouputFolder, "generated.d.ts");
   const textColors = VariantsColors.buildTextColors();
-  const textForeground = Object.fromEntries(Object.entries(textColors).map(([key, value]) => [`${key}-foreground`, value]));
+  const textForeground = Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors()).map(([key, value]) => [`${key}-foreground`, value]));
   const textColorsWithImportant = VariantsColors.buildTextColors(true);
-  const textForegroundWithImportant = Object.fromEntries(Object.entries(textColorsWithImportant).map(([key, value]) => [`${key}-foreground`, value]))
+  const textForegroundWithImportant = Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]))
   const textWithForeground = {
     ...textColors,
     ...textForeground
@@ -55,7 +55,7 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
     textWithForegroundWithImportant = {
       ...textColorsWithImportant,
       ...textForegroundWithImportant,
-    };
+    }, background = VariantsColors.buildBackgroundColors();
   const content = JSON.stringify(
     {
       button: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix, }) => {
@@ -82,11 +82,12 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
       }),
       icon: textWithForegroundWithImportant,
       iconForeground: textWithForegroundWithImportant,
-      iconButton: Object.fromEntries(Object.entries(textWithForegroundWithImportant).map(([key, value]) => {
-        return [key, {
-          container: value.split("!text-").join("bg-"),
+      iconButton: Object.fromEntries(Object.entries(textForegroundWithImportant).map(([key, value]) => {
+        const colorName = key.split("-foreground")[0];
+        return [colorName, {
+          container: background[colorName],
           icon: value,
-          text: value.split('!text-').join("text")
+          text: value.split('!text-').join("text-")
         }];
       })),
       surface: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
@@ -100,7 +101,7 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
       textForegroundWithImportant,
       textWithForeground,
       textWithForegroundWithImportant,
-      background: VariantsColors.buildBackgroundColors(),
+      background,
       textForeground,
       borderColor: Object.fromEntries(Object.entries(textWithForeground).map(([key, value]) => {
         return [key, value.split("text-").join("border-")]

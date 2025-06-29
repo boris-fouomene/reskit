@@ -56,7 +56,7 @@ class VariantsColors {
      * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
      * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
      *   If not provided, the default builder returns a string combining the light and dark class names.
-     * @param colorSuffix - (Optional) Suffix for the color class, such as `"-foreground"` to generate foreground color classes.
+     * @param isForeground - (Optional) Specify if we are building a foreground color or not.
      *
      * @returns A record mapping each registered color name to the generated class name or object, as defined by the builder.
      *
@@ -84,7 +84,6 @@ class VariantsColors {
      *
      * @remarks
      * - The method iterates over all registered colors in the design system.
-     * - If `colorSuffix` is set to `"-foreground"`, the foreground color values are used instead of the base color.
      * - The builder function receives a detailed options object for each color, allowing for advanced customization.
      * - This method is the foundation for `buildTextColors`, `buildBackgroundColors`, and `buildBorderColors`.
      *
@@ -94,23 +93,24 @@ class VariantsColors {
      * @see {@link VariantsColors.buildBackgroundColors}
      * @see {@link VariantsColors.buildBorderColors}
      */
-    static buildColors(tailwindClassPrefix, withImportantAttribute, colorClassNameBuilder, colorSuffix) {
+    static buildColors(tailwindClassPrefix, withImportantAttribute, colorClassNameBuilder, isForeground = false) {
         const r = Object.create({});
         const importantPrefix = withImportantAttribute ? "!" : "";
-        const suffix = colorSuffix && typeof colorSuffix == "string" ? colorSuffix : "";
         const colorBuilder = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightColorWithPrefix, darkColorWithPrefix }) => `${lightColorWithPrefix} ${darkColorWithPrefix}`;
-        const isForeground = String(colorSuffix).toLowerCase().split("-")[1] === "foreground";
         Object.entries(VariantsColors.colors).map(([color, value]) => {
             const _a = Object.assign({}, value), { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground } = _a, rest = __rest(_a, ["lightColor", "lightForeground", "darkColor", "darkForeground"]);
             const lightColor = isForeground ? _lightForeground : light;
             const darkColor = isForeground ? _darkForeground : dark;
             const lightForeground = isForeground ? light : _lightForeground;
             const darkForeground = isForeground ? dark : _darkForeground;
-            r[color] = colorBuilder(Object.assign(Object.assign({}, rest), { lightColor,
-                darkColor, lightColorWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightColor}${suffix}`, darkColorWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}${suffix}`, darkForeground,
-                lightForeground, lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}${suffix}`, darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}${suffix}` }));
+            r[color] = colorBuilder(Object.assign(Object.assign({}, rest), { isForeground: !!isForeground, lightColor,
+                darkColor, lightColorWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`, darkColorWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`, darkForeground,
+                lightForeground, lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}` }));
         });
         return r;
+    }
+    static buildTextForegroundColors(withImportantAttribute, colorClassNameBuilder) {
+        return VariantsColors.buildColors("text", withImportantAttribute, colorClassNameBuilder, true);
     }
     /**
      * Generates a record of Tailwind CSS class names for all registered text color variants.

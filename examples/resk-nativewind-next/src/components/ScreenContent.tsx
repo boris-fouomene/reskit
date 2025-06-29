@@ -112,7 +112,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Heading level={5}>Heading 5</Heading>
           <Heading level={6}>Heading 6</Heading>
         </Div>
-        <Heading level={2}>Icons examples : </Heading>
+        <Heading level={2}>Icons Buttons examples : </Heading>
         <HStack className="p-5 !gap-x-10">
           <Icon.Button variant={{ colorScheme: "secondary" }}
             iconName='camera'

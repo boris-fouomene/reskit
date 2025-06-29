@@ -8,6 +8,8 @@ import Platform from "@resk/core/platform";
 import { TouchableOpacity, PressableProps } from "react-native";
 import { ITooltipProps } from './types';
 import { ITouchableProps } from '@src/types';
+import { VariantsGeneratedColors } from '@variants/colors/generated';
+import { VariantsColors } from '@variants/colors';
 
 const TIPPY_THEME = "customtippy-themename";
 
@@ -65,54 +67,56 @@ const initCss = function () {
     elem = document.createElement("style");
     elem.id = typyStyleId;
     document.body.appendChild(elem);
+    const { lightColor, lightForeground, darkColor, darkForeground } = Object.assign({}, VariantsColors.colors.primary);
+    const primary = defaultStr(lightColor), darkPrimary = defaultStr(darkColor), primaryForeground = defaultStr(lightForeground), darkPrimaryForeground = defaultStr(darkForeground);
     elem.textContent = `
         .tippy-box[data-theme~='${TIPPY_THEME}'] {
-            background-color: var(--color-primary);
-            color: var(--color-primary-foreground);
+            background-color: var(--color-${primary});
+            color: var(--color-${primaryForeground});
             font-weight: 400;
             text-shadow: none;
             box-shadow: none;
         }
 
         .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='top']>.tippy-arrow::before {
-            border-top-color: var(--color-primary);
+            border-top-color: var(--color-${primary});
         }
 
         .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='bottom']>.tippy-arrow::before {
-            border-bottom-color: var(--color-primary);
+            border-bottom-color: var(--color-${primary});
         }
 
         .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='left']>.tippy-arrow::before {
-            border-left-color: var(--color-primary);
+            border-left-color: var(--color-${primary});
         }
 
         .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right']>.tippy-arrow::before {
-            border-right-color: var(--color-primary);
+            border-right-color: var(--color-${primary});
         }
 
         /* dark colors for theme*/
         .dark .tippy-box[data-theme~='${TIPPY_THEME}'] {
-            background-color: var(--color-dark-primary);
-            color: var(--color-dark-primary-foreground);
+            background-color: var(--color-${darkPrimary});
+            color: var(--color-${darkPrimaryForeground});
             font-weight: 400;
             text-shadow: none;
             box-shadow: none;
         }
 
         .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='top']>.tippy-arrow::before {
-            border-top-color: var(--color-dark-primary);
+            border-top-color: var(--color-${darkPrimary});
         }
 
         .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='bottom']>.tippy-arrow::before {
-            border-bottom-color: var(--color-dark-primary);
+            border-bottom-color: var(--color-${darkPrimary});
         }
 
         .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='left']>.tippy-arrow::before {
-            border-left-color: var(--color-dark-primary);
+            border-left-color: var(--color-${darkPrimary});
         }
 
         .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right']>.tippy-arrow::before {
-            border-right-color: var(--color-dark-primary);
+            border-right-color: var(--color-${darkPrimary});
         }
     `;
     return elem;

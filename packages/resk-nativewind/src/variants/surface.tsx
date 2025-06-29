@@ -3,7 +3,7 @@ import { VariantsGeneratedColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 
 const surface = tv({
-    base: "bg-surface dark:bg-dark-surface text-surface-foreground dark:text-dark-surface-foreground",
+    base: "",
     variants: {
         color: VariantsGeneratedColors.surface,
         ...VariantsFactory.createAll(),

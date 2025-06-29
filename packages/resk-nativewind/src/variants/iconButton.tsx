@@ -3,9 +3,9 @@ import { VariantsGeneratedColors } from "./colors/generated";
 
 const iconButton = tv({
     slots: {
-        icon: "!text-surface-foreground dark:!text-dark-surface-foreground",
-        container: "bg-surface dark:bg-dark-surface",
-        text: "text-surface-foreground dark:text-dark-surface-foreground",
+        icon: "",
+        container: "",
+        text: "",
     },
     variants: {
         colorScheme: VariantsGeneratedColors.iconButton,

@@ -44,10 +44,8 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <H2>Menu Examples</H2>
         <Menu
           anchor={<Text>Open Menu</Text>}
-          items={[
-            { label: "Home", icon: "material-design" },
-            { label: "Settings", icon: "star-settings" },
-          ]}
+          withScrollView
+          items={Array.from({ length: 50 }).map((_, index) => ({ label: `Option ${index + 1}`, value: index }))}
           children={<VStack>
             <Text>Menu Opened with this children</Text>
           </VStack>}
@@ -107,7 +105,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         </Div>
         <HelperText error>An example of helper text</HelperText>
         <Div className="p-5">
-          <Heading level={1} variant={{ color: "accent" }}>Heading 1 - accent</Heading>
+          <Heading level={1} variant={{ color: "red" }}>Heading 1 - Red</Heading>
           <Heading level={2} variant={{ color: "neutral" }}>Heading 2 - neutral</Heading>
           <Heading level={3}>Heading 3</Heading>
           <Heading level={4}>Heading 4</Heading>

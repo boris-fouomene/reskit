@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2015", // Or the desired target
+    "module": "commonjs",
+    "outDir": "bin/color-variants",
+    "lib": [
+      "dom"
+    ],
+    "declaration": false,
+    "removeComments": false,
+    "sourceMap": false,
+    "isolatedModules": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": false,
+    "jsx": "react-jsx",
+    "jsxImportSource": "nativewind",
+    "baseUrl": "./",
+    "preserveConstEnums": true,
+    "incremental": false,
+  },
+  "include": [
+    "src/variants/colors/colors.ts",
+  ],
+  "exclude": [],
+}

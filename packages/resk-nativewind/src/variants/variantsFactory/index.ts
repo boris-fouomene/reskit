@@ -5,7 +5,7 @@ import { ShadowColorsClasses } from "./shadow";
 import { IconSizes, textSizes } from "./textSizes";
 import { fontWeightClasses } from "./fontWeight";
 import { textAlignClasses } from "./textAlignClasses";
-import { VariantsGeneratedColors } from "@variants/generated-variants-colors";
+import { VariantsGeneratedColors } from "@variants/colors/generated";
 import { heightClasses, maxHeightClasses, maxWidthClasses, minHeightClasses, minWidthClasses, widthClasses } from "./width2height";
 import { activeRingSize, focusRingSize, hoverRingSize, ringClasses } from "./ring";
 import { scalesClasses } from "./scales";

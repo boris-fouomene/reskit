@@ -1,0 +1,64 @@
+{
+    "colors": {
+        "primary": {
+            "lightColor": "primary",
+            "darkColor": "dark-primary",
+            "lightForeground": "primary-foreground",
+            "darkForeground": "dark-primary-foreground"
+        },
+        "secondary": {
+            "lightColor": "secondary",
+            "darkColor": "dark-secondary",
+            "lightForeground": "secondary-foreground",
+            "darkForeground": "dark-secondary-foreground"
+        },
+        "surface": {
+            "lightColor": "gray-100",
+            "lightForeground": "gray-900",
+            "darkColor": "gray-800",
+            "darkForeground": "gray-100"
+        },
+        "background": {
+            "lightColor": "white",
+            "lightForeground": "gray-900",
+            "darkColor": "gray-900",
+            "darkForeground": "gray-100"
+        },
+        "neutral": {
+            "lightColor": "gray-500",
+            "lightForeground": "white",
+            "darkColor": "gray-600",
+            "darkForeground": "gray-50"
+        },
+        "error": {
+            "lightColor": "red-500",
+            "lightForeground": "white",
+            "darkColor": "red-600",
+            "darkForeground": "red-50"
+        },
+        "info": {
+            "lightColor": "blue-500",
+            "lightForeground": "white",
+            "darkColor": "blue-600",
+            "darkForeground": "blue-50"
+        },
+        "warning": {
+            "lightColor": "yellow-500",
+            "lightForeground": "yellow-900",
+            "darkColor": "yellow-600",
+            "darkForeground": "yellow-50"
+        },
+        "success": {
+            "lightColor": "green-500",
+            "lightForeground": "white",
+            "darkColor": "green-600",
+            "darkForeground": "green-50"
+        },
+        "text": {
+            "lightColor": "gray-900",
+            "lightForeground": "gray-100",
+            "darkColor": "gray-100",
+            "darkForeground": "gray-900"
+        }
+    }
+}

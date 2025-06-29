@@ -1,4 +1,4 @@
-export * from "./generated-variants-colors";
+export * from "./colors/generated";
 import surface from "./surface";
 import text from "./text";
 import iconButton from "./iconButton";
@@ -15,7 +15,7 @@ import checkbox from "./checkbox";
 import progressBar from "./progressBar";
 import textInput from "./textInput";
 import { tv } from "tailwind-variants";
-import { VariantsGeneratedColors } from "./generated-variants-colors";
+import { VariantsGeneratedColors } from "./colors/generated";
 import bottomSheet from "./bottomSheet";
 export const variants = {
     all,
@@ -47,4 +47,4 @@ export * from "./colors";
 
 export * from "./variantsFactory";
 
-export * from "./generated-variants-colors";
+export * from "./colors/generated";

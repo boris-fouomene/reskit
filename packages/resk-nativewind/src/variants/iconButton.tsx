@@ -1,5 +1,5 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsGeneratedColors } from "./generated-variants-colors";
+import { VariantsGeneratedColors } from "./colors/generated";
 
 const iconButton = tv({
     slots: {

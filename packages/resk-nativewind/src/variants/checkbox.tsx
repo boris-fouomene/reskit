@@ -1,6 +1,6 @@
 import { tv, VariantProps } from 'tailwind-variants';
 import { VariantsFactory } from './variantsFactory';
-import { VariantsGeneratedColors } from './generated-variants-colors';
+import { VariantsGeneratedColors } from './colors/generated';
 
 const checkbox = tv({
     slots: {

@@ -1,6 +1,6 @@
 // heading.ts
 import { tv, type VariantProps } from 'tailwind-variants'
-import { VariantsGeneratedColors } from "./generated-variants-colors";
+import { VariantsGeneratedColors } from "./colors/generated";
 
 const heading = tv({
     base: '',

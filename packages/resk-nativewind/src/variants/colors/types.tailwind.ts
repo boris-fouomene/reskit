@@ -150,14 +150,14 @@ export interface ITailwindColors {
 
   /**
 * Pure black color
-* @description Absolute black, inverts to white in dark mode
+* @description Absolute black, inverts to white in darkColor mode
 */
   black: string;
 
 
   /**
  * Pure white color
- * @description Absolute white, inverts to black in dark mode
+ * @description Absolute white, inverts to black in darkColor mode
  */
   white: string;
 
@@ -183,8 +183,8 @@ export interface ITailwindColors {
 }
 
 export interface ITailwindColorsMap extends Record<keyof ITailwindColors, {
-  light: string,
+  lightColor: string,
   lightForeground: string,
-  dark: string,
+  darkColor: string,
   darkForeground: string,
 }> { }

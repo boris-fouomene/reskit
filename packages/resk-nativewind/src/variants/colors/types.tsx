@@ -1,4 +1,15 @@
-import { ITailwindColors } from "./types.tailwind";
+
+export interface IVariantColor {
+    /***The light color variant*/
+    lightColor: string,
+    /***The light foreground variant*/
+    lightForeground: string,
+    /***The dark color variant*/
+    darkColor: string,
+    /**The dark foreground variant*/
+    darkForeground: string,
+}
+
 /**
  * Represents the color roles available for variant-based styling.
  *
@@ -14,56 +25,46 @@ import { ITailwindColors } from "./types.tailwind";
  * @property error - The error color, used for errors or destructive actions.
  * @property background - The background color, used for backgrounds or surfaces.
  *
- * @example
- * // Example usage in a component or theme definition
- * const myColors: IVariantsColorsMap = {
- *   primary: "bg-blue-600",
- *   secondary: "bg-gray-500",
- *   surface: "bg-white",
- *   info: "bg-cyan-500",
- *   success: "bg-green-500",
- *   warning: "bg-yellow-500",
- *   error: "bg-red-600",
- *   background: "bg-gray-500",
- * };
- *
  * @remarks
  * This interface is intended to be used as a base for color variant mapping in design systems,
  * utility libraries, or component libraries that support theming and variant-based styling.
  */
-export interface IVariantsColorsMap extends ITailwindColors {
+export interface IVariantsColorsMapBase extends Record<string, IVariantColor> {
     /**
      * The primary color, typically used for main actions or highlights.
      */
-    primary: string;
+    primary: IVariantColor;
     /**
      * The secondary color, used for secondary actions or accents.
      */
-    secondary: string;
-    /**
-     * The surface color, used for backgrounds or surfaces.
-     */
-    surface: string;
-    /**
-     * The informational color, used for info messages or highlights.
-     */
-    info: string;
-    /**
-     * The success color, used for positive or successful actions.
-     */
-    success: string;
-    /**
-     * The warning color, used for caution or warning messages.
-     */
-    warning: string;
-    /**
-     * The error color, used for errors or destructive actions.
-     */
-    error: string;
+    secondary: IVariantColor;
+
     /***
      * The background color, used for backgrounds or surfaces.
      */
-    background: string;
+    background: IVariantColor
+    /**
+     * The surface color, used for backgrounds or surfaces.
+     */
+    surface: IVariantColor
+    /**
+     * The informational color, used for info messages or highlights.
+     */
+    info: IVariantColor
+    /**
+     * The success color, used for positive or successful actions.
+     */
+    success: IVariantColor;
+    /**
+     * The warning color, used for caution or warning messages.
+     */
+    warning: IVariantColor;
+    /**
+     * The error color, used for errors or destructive actions.
+     */
+    error: IVariantColor;
+    /***
+     * The default text color, used for text elements.
+     */
+    text: IVariantColor;
 }
-
-export * from "./types.tailwind";

@@ -1,4 +1,4 @@
-import { VariantsGeneratedColors } from "@variants/generated-variants-colors";
+import { VariantsGeneratedColors } from "@variants/colors/generated";
 
 
 export const ShadowColorsClasses = VariantsGeneratedColors.shadow;

@@ -5,25 +5,45 @@ const dir = path.resolve(process.cwd());
 const cn = (...args) => {
   return args.filter((text) => text && typeof text == "string").join(" ");
 };
-
-module.exports = (colors, options) => {
-  const variantJsFile = path.resolve(__dirname, "../build/variants/colors/index.js");
-  if (!fs.existsSync(variantJsFile)) {
+const isNonNullString = x => x && typeof x == "string";
+module.exports = (options) => {
+  const buildDir = path.resolve(__dirname, "../build/variants/colors");
+  if (!fs.existsSync(buildDir)) {
     return;
   }
-  const { VariantsColors } = require(variantJsFile);
-  if (!VariantsColors || typeof VariantsColors?.buildTextColors != "function") {
+  const vPath = path.resolve(__dirname, "color-variants", "colors.js");
+  if (!fs.existsSync(vPath)) {
     return;
   }
   const variantsRootDir = require("./find-package-dir")("build", "variants");
   options = Object.assign({}, options);
   const isDev = options.isDev === true && variantsRootDir && fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));
+  const inputPath = isNonNullString(options.input) ? path.resolve(options.input) : path.resolve(dir, "variants.json");
+  if (!fs.existsSync(inputPath)) {
+    console.log("variants.json file not found at ", inputPath);
+    return;
+  }
+  const variants = require(inputPath);
+  if (!variants || typeof variants != "object") {
+    console.log("variants.json file is not a valid json object");
+    return;
+  }
   const variantsDir = variantsRootDir ? path.resolve(variantsRootDir, isDev ? "src" : "build", "variants") : dir;
-  const cols = typeof colors == "string" && colors ? colors.split(",") : [];
-  VariantsColors.registerColor(...cols);
-  const finalDir = variantsDir ?? dir;
-  const outputPath = path.resolve(finalDir, "generated-variants-colors.js");
-  const outputDeclarations = path.resolve(finalDir, "generated-variants-colors.d.ts");
+  const vOptions = { variantsRootDir, isDev, inputPath, variantsDir, outputRootDir: variantsDir ?? dir }
+  const { colors } = Object.assign({}, variants);
+  generateColorVariants(colors, vOptions);
+};
+
+function generateColorVariants(colors, { outputRootDir, isDev }) {
+  if (!colors || typeof colors != "object") return;
+  const { VariantsColors } = require("./color-variants/colors");
+  if (!VariantsColors || typeof VariantsColors.buildColors !== "function" || typeof VariantsColors.buildTextColors !== "function") {
+    return;
+  }
+  VariantsColors.registerColor(colors);
+  const ouputFolder = path.resolve(outputRootDir, "colors");
+  const outputPath = path.resolve(ouputFolder, "generated.js");
+  const outputDeclarations = path.resolve(ouputFolder, "generated.d.ts");
   const textColors = VariantsColors.buildTextColors();
   const textForeground = Object.fromEntries(Object.entries(textColors).map(([key, value]) => [`${key}-foreground`, value]));
   const textColorsWithImportant = VariantsColors.buildTextColors(true);
@@ -156,91 +176,13 @@ export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     `,
     "utf8"
   );
-  if (!isDev) {
-    generateColorMapTypes(finalDir, cols);
-  }
   console.log("Variants colors file generated at ", outputPath, "\n");
   console.log("Variants colors file types generated at ", outputDeclarations);
-};
-
-function generateColorMapTypes(variantRootDir, colors) {
-  if (typeof variantRootDir == "string" && fs.existsSync(variantRootDir)) {
-    colors = Array.isArray(colors) && colors.length > 0 ? colors : [];
-    const colorMapTypesPath = path.resolve(variantRootDir, "colors/colorsMap.d.ts");
-    console.log(colorMapTypesPath, " is color map types path");
+  if (!isDev) {
+    const colorMapTypesPath = path.resolve(ouputFolder, "colors/colorsMap.d.ts");
     try {
       fs.writeFileSync(
-        colorMapTypesPath,
-        `
-/**
- * Represents the color roles available for variant-based styling.
- *
- * This interface defines the standard color names used throughout the design system for consistent theming.
- * Each property corresponds to a semantic color role, and its value is a string representing a color class or value.
- *
- * @property primary - The primary color, typically used for main actions or highlights.
- * @property secondary - The secondary color, used for secondary actions or accents.
- * @property surface - The surface color, used for backgrounds or surfaces.
- * @property info - The informational color, used for info messages or highlights.
- * @property success - The success color, used for positive or successful actions.
- * @property warning - The warning color, used for caution or warning messages.
- * @property error - The error color, used for errors or destructive actions.
- * @property background - The background color, used for backgrounds or surfaces.
- *
- * @example
- * // Example usage in a component or theme definition
- * const myColors: IVariantsColorsMap = {
- *   primary: "bg-blue-600",
- *   secondary: "bg-gray-500",
- *   surface: "bg-white",
- *   info: "bg-cyan-500",
- *   success: "bg-green-500",
- *   warning: "bg-yellow-500",
- *   error: "bg-red-600",
- *   background: "bg-gray-500",
- * };
- *
- * @remarks
- * This interface is intended to be used as a base for color variant mapping in design systems,
- * utility libraries, or component libraries that support theming and variant-based styling.
- */
-export interface IVariantsColorsMap {
-    /**
-     * The primary color, typically used for main actions or highlights.
-     */
-    primary: string;
-    /**
-     * The secondary color, used for secondary actions or accents.
-     */
-    secondary: string;
-    /**
-     * The surface color, used for backgrounds or surfaces.
-     */
-    surface: string;
-    /**
-     * The informational color, used for info messages or highlights.
-     */
-    info: string;
-    /**
-     * The success color, used for positive or successful actions.
-     */
-    success: string;
-    /**
-     * The warning color, used for caution or warning messages.
-     */
-    warning: string;
-    /**
-     * The error color, used for errors or destructive actions.
-     */
-    error: string;
-    /***
-     * The background color, used for backgrounds or surfaces.
-     */
-    background: string;
-    
-${colors.map((color) => `\t${color}: string;`).join("\n\n")}
-}        
-`,
+        colorMapTypesPath, VariantsColors.generateColorsMapTypes(),
         "utf8"
       );
     } catch (error) {

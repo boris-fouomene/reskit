@@ -23,8 +23,7 @@ program
 program.command('generate-variants')
     .description(`Generate application variants`)
     .option('-i, --input [path]', 'The path of the input json file in which the application\'s variants are declared. If not specified, the application will try to find the variants.json file located in the directory where the command was executed.')
-    .action((colors, options) => {
-        console.log(options, " is optttttt")
+    .action((options) => {
         require("./generate-variants")(Object.assign({}, options))
     });
 

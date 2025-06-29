@@ -1,7 +1,7 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
-import { Icon, Menu, AppBar, TextInput, VariantsFactory, Dropdown, ActivityIndicator, ProgressBar, IVariantsColorsMap, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
+import { Icon, Menu, AppBar, TextInput, VariantsFactory, Dropdown, ActivityIndicator, ProgressBar, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -45,7 +45,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <Menu
           anchor={<Text>Open Menu</Text>}
           items={[
-            { label: "Home", icon: "material-home" },
+            { label: "Home", icon: "material-design" },
             { label: "Settings", icon: "star-settings" },
           ]}
           children={<VStack>
@@ -76,7 +76,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <Menu
           anchor={<Text>Open Menu in a higgggggggggggggggggggggggggggggggggggggggggggggggggggggggg</Text>}
           items={[
-            { label: "Home", icon: "material-home" },
+            { label: "Home", icon: "home" },
             { label: "Settings", icon: "star-settings" },
             { label: "Profile", icon: "star-settings" },
             { label: "Profile", icon: "star-settings" },
@@ -85,11 +85,6 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       </Div>
       <Div className="p-5">
         <Heading level={2}>Colors Variants</Heading>
-        <HStack >
-          {VariantsColors.colors.map((color) => {
-            return <Text key={color} className={`text-${color}-foreground dark:text-dark-${color}-foreground bg-${color} mx-4 px-4 py-2 dark:bg-dark-${color}`} children={color} />
-          })}
-        </HStack>
       </Div>
       <Div className="p-5">
         <Heading level={2}>ActivityIndicator, on surface with padding</Heading>

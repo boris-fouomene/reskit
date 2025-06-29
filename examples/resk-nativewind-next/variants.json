@@ -1,0 +1,160 @@
+{
+    "colors": {
+        "slate": {
+            "lightColor": "slate-500",
+            "lightForeground": "white",
+            "darkColor": "slate-400",
+            "darkForeground": "slate-900"
+        },
+        "gray": {
+            "lightColor": "gray-500",
+            "lightForeground": "white",
+            "darkColor": "gray-400",
+            "darkForeground": "gray-900"
+        },
+        "zinc": {
+            "lightColor": "zinc-500",
+            "lightForeground": "white",
+            "darkColor": "zinc-400",
+            "darkForeground": "zinc-900"
+        },
+        "neutral": {
+            "lightColor": "neutral-500",
+            "lightForeground": "white",
+            "darkColor": "neutral-400",
+            "darkForeground": "neutral-900"
+        },
+        "stone": {
+            "lightColor": "stone-500",
+            "lightForeground": "white",
+            "darkColor": "stone-400",
+            "darkForeground": "stone-900"
+        },
+        "red": {
+            "lightColor": "red-500",
+            "lightForeground": "white",
+            "darkColor": "red-400",
+            "darkForeground": "red-900"
+        },
+        "orange": {
+            "lightColor": "orange-500",
+            "lightForeground": "white",
+            "darkColor": "orange-400",
+            "darkForeground": "orange-900"
+        },
+        "amber": {
+            "lightColor": "amber-500",
+            "lightForeground": "amber-900",
+            "darkColor": "amber-400",
+            "darkForeground": "amber-900"
+        },
+        "yellow": {
+            "lightColor": "yellow-500",
+            "lightForeground": "yellow-900",
+            "darkColor": "yellow-400",
+            "darkForeground": "yellow-900"
+        },
+        "lime": {
+            "lightColor": "lime-500",
+            "lightForeground": "lime-900",
+            "darkColor": "lime-400",
+            "darkForeground": "lime-900"
+        },
+        "green": {
+            "lightColor": "green-500",
+            "lightForeground": "white",
+            "darkColor": "green-400",
+            "darkForeground": "green-900"
+        },
+        "emerald": {
+            "lightColor": "emerald-500",
+            "lightForeground": "white",
+            "darkColor": "emerald-400",
+            "darkForeground": "emerald-900"
+        },
+        "teal": {
+            "lightColor": "teal-500",
+            "lightForeground": "white",
+            "darkColor": "teal-400",
+            "darkForeground": "teal-900"
+        },
+        "cyan": {
+            "lightColor": "cyan-500",
+            "lightForeground": "cyan-900",
+            "darkColor": "cyan-400",
+            "darkForeground": "cyan-900"
+        },
+        "sky": {
+            "lightColor": "sky-500",
+            "lightForeground": "white",
+            "darkColor": "sky-400",
+            "darkForeground": "sky-900"
+        },
+        "blue": {
+            "lightColor": "blue-500",
+            "lightForeground": "white",
+            "darkColor": "blue-400",
+            "darkForeground": "blue-900"
+        },
+        "indigo": {
+            "lightColor": "indigo-500",
+            "lightForeground": "white",
+            "darkColor": "indigo-400",
+            "darkForeground": "indigo-900"
+        },
+        "violet": {
+            "lightColor": "violet-500",
+            "lightForeground": "white",
+            "darkColor": "violet-400",
+            "darkForeground": "violet-900"
+        },
+        "purple": {
+            "lightColor": "purple-500",
+            "lightForeground": "white",
+            "darkColor": "purple-400",
+            "darkForeground": "purple-900"
+        },
+        "fuchsia": {
+            "lightColor": "fuchsia-500",
+            "lightForeground": "white",
+            "darkColor": "fuchsia-400",
+            "darkForeground": "fuchsia-900"
+        },
+        "pink": {
+            "lightColor": "pink-500",
+            "lightForeground": "white",
+            "darkColor": "pink-400",
+            "darkForeground": "pink-900"
+        },
+        "rose": {
+            "lightColor": "rose-500",
+            "lightForeground": "white",
+            "darkColor": "rose-400",
+            "darkForeground": "rose-900"
+        },
+        "black": {
+            "lightColor": "black",
+            "lightForeground": "white",
+            "darkColor": "white",
+            "darkForeground": "black"
+        },
+        "white": {
+            "lightColor": "white",
+            "lightForeground": "black",
+            "darkColor": "black",
+            "darkForeground": "white"
+        },
+        "current": {
+            "lightColor": "current",
+            "lightForeground": "current",
+            "darkColor": "current",
+            "darkForeground": "current"
+        },
+        "inherit": {
+            "lightColor": "inherit",
+            "lightForeground": "inherit",
+            "darkColor": "inherit",
+            "darkForeground": "inherit"
+        }
+    }
+}

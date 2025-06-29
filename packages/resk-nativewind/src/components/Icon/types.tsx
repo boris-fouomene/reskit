@@ -6,16 +6,7 @@ import { IVariantPropsAll } from "@variants/all";
 import { IVariantPropsIconButton } from '@variants/iconButton';
 import { IVariantPropsIcon } from "@variants/icon";
 import { ITooltipBaseProps } from "@components/Tooltip/types";
-import "./font.types";
-
-/***
- * The `IFontIconNameRegistry` interface is used to define the registry of font icon names.
- * It is used to augment the `IFontIconName` type with the registry of font icon names.
- * 
- * @interface IFontIconNameRegistry
- * 
- */
-export interface IFontIconNameRegistry { };
+import { IFontIconNameRegistry } from "./font.types";
 
 export type IFontIconName = keyof IFontIconNameRegistry;
 

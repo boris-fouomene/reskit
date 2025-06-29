@@ -168,7 +168,108 @@ export const VariantsGeneratedColors = {
     "success-foreground": "!text-green-500 dark:!text-green-600",
     "text-foreground": "!text-gray-900 dark:!text-gray-100"
   },
-  "iconButton": {},
+  "iconButton": {
+    "primary": {
+      "container": "bg-primary dark:bg-dark-primary",
+      "icon": "!text-primary dark:!text-dark-primary",
+      "text": "textprimary dark:textdark-primary"
+    },
+    "secondary": {
+      "container": "bg-secondary dark:bg-dark-secondary",
+      "icon": "!text-secondary dark:!text-dark-secondary",
+      "text": "textsecondary dark:textdark-secondary"
+    },
+    "surface": {
+      "container": "bg-gray-100 dark:bg-gray-800",
+      "icon": "!text-gray-100 dark:!text-gray-800",
+      "text": "textgray-100 dark:textgray-800"
+    },
+    "background": {
+      "container": "bg-white dark:bg-gray-900",
+      "icon": "!text-white dark:!text-gray-900",
+      "text": "textwhite dark:textgray-900"
+    },
+    "neutral": {
+      "container": "bg-gray-500 dark:bg-gray-600",
+      "icon": "!text-gray-500 dark:!text-gray-600",
+      "text": "textgray-500 dark:textgray-600"
+    },
+    "error": {
+      "container": "bg-red-500 dark:bg-red-600",
+      "icon": "!text-red-500 dark:!text-red-600",
+      "text": "textred-500 dark:textred-600"
+    },
+    "info": {
+      "container": "bg-blue-500 dark:bg-blue-600",
+      "icon": "!text-blue-500 dark:!text-blue-600",
+      "text": "textblue-500 dark:textblue-600"
+    },
+    "warning": {
+      "container": "bg-yellow-500 dark:bg-yellow-600",
+      "icon": "!text-yellow-500 dark:!text-yellow-600",
+      "text": "textyellow-500 dark:textyellow-600"
+    },
+    "success": {
+      "container": "bg-green-500 dark:bg-green-600",
+      "icon": "!text-green-500 dark:!text-green-600",
+      "text": "textgreen-500 dark:textgreen-600"
+    },
+    "text": {
+      "container": "bg-gray-900 dark:bg-gray-100",
+      "icon": "!text-gray-900 dark:!text-gray-100",
+      "text": "textgray-900 dark:textgray-100"
+    },
+    "primary-foreground": {
+      "container": "bg-primary dark:bg-dark-primary",
+      "icon": "!text-primary dark:!text-dark-primary",
+      "text": "textprimary dark:textdark-primary"
+    },
+    "secondary-foreground": {
+      "container": "bg-secondary dark:bg-dark-secondary",
+      "icon": "!text-secondary dark:!text-dark-secondary",
+      "text": "textsecondary dark:textdark-secondary"
+    },
+    "surface-foreground": {
+      "container": "bg-gray-100 dark:bg-gray-800",
+      "icon": "!text-gray-100 dark:!text-gray-800",
+      "text": "textgray-100 dark:textgray-800"
+    },
+    "background-foreground": {
+      "container": "bg-white dark:bg-gray-900",
+      "icon": "!text-white dark:!text-gray-900",
+      "text": "textwhite dark:textgray-900"
+    },
+    "neutral-foreground": {
+      "container": "bg-gray-500 dark:bg-gray-600",
+      "icon": "!text-gray-500 dark:!text-gray-600",
+      "text": "textgray-500 dark:textgray-600"
+    },
+    "error-foreground": {
+      "container": "bg-red-500 dark:bg-red-600",
+      "icon": "!text-red-500 dark:!text-red-600",
+      "text": "textred-500 dark:textred-600"
+    },
+    "info-foreground": {
+      "container": "bg-blue-500 dark:bg-blue-600",
+      "icon": "!text-blue-500 dark:!text-blue-600",
+      "text": "textblue-500 dark:textblue-600"
+    },
+    "warning-foreground": {
+      "container": "bg-yellow-500 dark:bg-yellow-600",
+      "icon": "!text-yellow-500 dark:!text-yellow-600",
+      "text": "textyellow-500 dark:textyellow-600"
+    },
+    "success-foreground": {
+      "container": "bg-green-500 dark:bg-green-600",
+      "icon": "!text-green-500 dark:!text-green-600",
+      "text": "textgreen-500 dark:textgreen-600"
+    },
+    "text-foreground": {
+      "container": "bg-gray-900 dark:bg-gray-100",
+      "icon": "!text-gray-900 dark:!text-gray-100",
+      "text": "textgray-900 dark:textgray-100"
+    }
+  },
   "surface": {
     "primary": "bg-primary dark:bg-dark-primary text-primary-foreground dark:text-dark-primary-foreground",
     "secondary": "bg-secondary dark:bg-dark-secondary text-secondary-foreground dark:text-dark-secondary-foreground",

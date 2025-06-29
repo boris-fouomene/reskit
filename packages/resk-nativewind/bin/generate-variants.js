@@ -18,7 +18,7 @@ module.exports = (options) => {
   const variantsRootDir = require("./find-package-dir")("build", "variants");
   options = Object.assign({}, options);
   const isDev = options.isDev === true && variantsRootDir && fs.existsSync(path.resolve(variantsRootDir, "src", "variants"));
-  const inputPath = isNonNullString(options.input) ? path.resolve(options.input) : path.resolve(dir, "variants.json");
+  const inputPath = isNonNullString(options.input) && options.input.trim().endsWith(".json") ? path.resolve(options.input) : path.resolve(dir, "variants.json");
   if (!fs.existsSync(inputPath)) {
     console.log("variants.json file not found at ", inputPath);
     return;
@@ -83,11 +83,11 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
       icon: textWithForegroundWithImportant,
       iconForeground: textWithForegroundWithImportant,
       iconButton: Object.fromEntries(Object.entries(textWithForegroundWithImportant).map(([key, value]) => {
-        return {
+        return [key, {
           container: value.split("!text-").join("bg-"),
           icon: value,
           text: value.split('!text-').join("text")
-        };
+        }];
       })),
       surface: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
         return cn(lightColorWithPrefix, darkColorWithPrefix, `text-${lightForeground} dark:text-${darkForeground}`);
@@ -178,13 +178,14 @@ export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
   );
   console.log("Variants colors file generated at ", outputPath, "\n");
   console.log("Variants colors file types generated at ", outputDeclarations);
-  if (!isDev) {
-    const colorMapTypesPath = path.resolve(ouputFolder, "colors/colorsMap.d.ts");
+  if (!isDev && fs.existsSync(ouputFolder)) {
+    const colorMapTypesPath = path.resolve(ouputFolder, "colorsMap.d.ts");
     try {
       fs.writeFileSync(
         colorMapTypesPath, VariantsColors.generateColorsMapTypes(),
         "utf8"
       );
+      console.log("Variants colors map types generated at ", colorMapTypesPath);
     } catch (error) {
       console.log("Error generating color map types file at ", colorMapTypesPath, error);
     }

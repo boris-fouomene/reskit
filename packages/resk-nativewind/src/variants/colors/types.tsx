@@ -29,7 +29,7 @@ export interface IVariantColor {
  * This interface is intended to be used as a base for color variant mapping in design systems,
  * utility libraries, or component libraries that support theming and variant-based styling.
  */
-export interface IVariantsColorsMapBase extends Record<string, IVariantColor> {
+export interface IVariantsColorsMapBase {
     /**
      * The primary color, typically used for main actions or highlights.
      */

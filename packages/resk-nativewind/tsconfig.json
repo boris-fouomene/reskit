@@ -106,6 +106,7 @@
   ],
   "include": [
     "src/**/*",
+    "variants.json"
   ],
   "exclude": [
     "node_modules/**/*",

@@ -25,7 +25,7 @@
     "readme.md",
     "package.json",
     "html.js",
-    "theme-to-css-vars"
+    "theme-to-css-vars.js"
   ],
   "exports": {
     ".": "./build/index.js",

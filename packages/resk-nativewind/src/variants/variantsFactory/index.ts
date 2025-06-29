@@ -6,11 +6,12 @@ import { IconSizes, textSizes } from "./textSizes";
 import { fontWeightClasses } from "./fontWeight";
 import { textAlignClasses } from "./textAlignClasses";
 import { VariantsGeneratedColors } from "@variants/colors/generated";
-import { heightClasses, maxHeightClasses, maxWidthClasses, minHeightClasses, minWidthClasses, widthClasses } from "./width2height";
+import { width2heightClasses } from "./width2height";
 import { activeRingSize, focusRingSize, hoverRingSize, ringClasses } from "./ring";
 import { scalesClasses } from "./scales";
+import { IClassName } from "@src/types";
 
-type IVariantFactoryMutator<InputType extends Record<string, unknown>, ResultType = string> = (value: InputType[keyof InputType], variantName: keyof InputType) => ResultType;
+type IVariantFactoryMutator<InputType extends Record<string | number, unknown>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
 
 /**
  * A utility factory for generating and transforming variant objects in a type-safe manner.
@@ -86,11 +87,11 @@ export const VariantsFactory = {
    * - The mutator function receives both the value and the key for maximum flexibility.
    * - Useful for generating design system variants, utility classes, or mapping values.
    */
-  create: function <InputType extends Record<string, unknown>, ResultType = string>(input: InputType, variantMutator?: IVariantFactoryMutator<InputType, ResultType>) {
+  create: function <InputType extends Record<string, unknown>, ResultType = string, VariantGroupName = any>(input: InputType, variantMutator?: IVariantFactoryMutator<InputType, ResultType>, variantGroupName?: VariantGroupName) {
     variantMutator = typeof variantMutator == "function" ? variantMutator : (value) => value as ResultType;
     return Object.fromEntries(
       Object.entries(input).map(([key, value]) => {
-        return [key, variantMutator(value as any, key as keyof InputType)];
+        return [key, variantMutator(value as any, key as keyof InputType, variantGroupName)];
       })
     ) as Record<keyof InputType, ResultType>;
   },
@@ -103,34 +104,29 @@ export const VariantsFactory = {
   createRoundedVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
     return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);
   },
-  createPaddingsVariants: function createPaddingsVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>): Record<keyof typeof paddingClasses, Record<keyof (typeof paddingClasses)[keyof typeof paddingClasses], string>> {
+  createMultipleVariants: function <T extends Record<string, Record<string | number, IClassName>>, ResultType = string>(multiVariants: T, variantMutator?: IVariantFactoryMutator<T[keyof T], ResultType>): Record<keyof T, Record<keyof T[keyof T & (string | number)], ResultType>> {
     const r = {} as any;
-    Object.entries(paddingClasses).forEach(([key, value]) => {
-      r[key] = VariantsFactory.create<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>(value, variantMutator);
+    Object.entries(multiVariants).forEach(([key, value]) => {
+      r[key] = VariantsFactory.create<T[keyof T], ResultType, keyof T>(value as any, variantMutator, key);
     });
     return r;
   },
-  createScalesVariants: function createScalesVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>): Record<keyof typeof scalesClasses, Record<keyof (typeof scalesClasses)[keyof typeof scalesClasses], string>> {
-    const r = {} as any;
-    Object.entries(scalesClasses).forEach(([key, value]) => {
-      r[key] = VariantsFactory.create<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>(value, variantMutator);
-    });
-    return r;
+  createPaddingsVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>) {
+    return VariantsFactory.createMultipleVariants<typeof paddingClasses, ResultType>(paddingClasses, variantMutator);
   },
-  createMarginsVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof marginClasses)[keyof typeof marginClasses], ResultType>): Record<keyof typeof marginClasses, Record<keyof (typeof marginClasses)[keyof typeof marginClasses], string>> {
-    const r = {} as any;
-    Object.entries(marginClasses).forEach(([key, value]) => {
-      r[key] = VariantsFactory.create<(typeof marginClasses)[keyof typeof marginClasses], ResultType>(value, variantMutator);
-    });
-    return r;
+  createScalesVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>) {
+    return VariantsFactory.createMultipleVariants<typeof scalesClasses, ResultType>(scalesClasses, variantMutator as any);
   },
-  createPadding2MarginVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>): Record<keyof typeof padding2marginClasses, Record<keyof (typeof padding2marginClasses)[keyof typeof padding2marginClasses], string>> {
-    const r = {} as any;
-    Object.entries(padding2marginClasses).forEach(([key, value]) => {
-      r[key] = VariantsFactory.create<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>(value, variantMutator);
-    });
-    return r;
+  createMarginsVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof marginClasses)[keyof typeof marginClasses], ResultType>) {
+    return VariantsFactory.createMultipleVariants<typeof marginClasses, ResultType>(marginClasses, variantMutator as any);
   },
+  createWidth2HeightVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof width2heightClasses)[keyof typeof width2heightClasses], ResultType>) {
+    return VariantsFactory.createMultipleVariants<typeof width2heightClasses, ResultType>(width2heightClasses, variantMutator)
+  },
+  createPadding2MarginVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>) {
+    return VariantsFactory.createMultipleVariants<typeof padding2marginClasses, ResultType>(padding2marginClasses, variantMutator);
+  },
+
   createFontWeightVariants: function createFontWeightVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof fontWeightClasses, ResultType>) {
     return VariantsFactory.create<typeof fontWeightClasses, ResultType>(fontWeightClasses, variantMutator);
   },
@@ -192,12 +188,7 @@ const allVariantClasses = {
   shadowColor: ShadowColorsClasses,
   borderStyle: borderStyleClasses,
   borderColor: VariantsGeneratedColors.borderColor,
-  width: widthClasses,
-  height: heightClasses,
-  maxWidth: maxWidthClasses,
-  minWidth: minWidthClasses,
-  maxHeight: maxHeightClasses,
-  minHeight: minHeightClasses,
+  ...width2heightClasses,
   ringColor: VariantsGeneratedColors.ringColors,
   activeRingColor: VariantsGeneratedColors.activeRingColors,
   hoverRingColor: VariantsGeneratedColors.hoverRingColors,

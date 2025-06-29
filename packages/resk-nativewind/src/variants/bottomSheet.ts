@@ -4,9 +4,9 @@ import { VariantsGeneratedColors } from "./colors/generated";
 
 const bottomSheet = tv({
   slots: {
-    container: "absolute start-0 end-0 bottom-0 w-full shadow-xl bottom-0 px-2 transform transition-transform duration-300 ease-out",
+    container: "relative start-0 end-0 bottom-0 w-full shadow-xl px-2 transform transition-transform duration-300 ease-out",
     contentContainer: "w-full h-full",
-    portal: "", //"flex flex-col flex-1 justify-end",
+    portal: "flex flex-col-reverse flex-1", //"flex flex-col flex-1 justify-end",
   },
   variants: {
     visible: {
@@ -27,6 +27,12 @@ const bottomSheet = tv({
         container: value,
       };
     }),
+    ...VariantsFactory.createWidth2HeightVariants<{ container: string, contentContainer: string }>((value) => {
+      return {
+        container: value,
+        contentContainer: "",
+      }
+    })
   },
   defaultVariants: {
     background: "surface",

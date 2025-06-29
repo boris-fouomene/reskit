@@ -179,9 +179,11 @@ export function Menu<Context = unknown>({
         close();
         return true;
     });
+    const { maxHeight: maxMenuHeight } = Object.assign({}, menuStyle);
+    const maxHeightStyle = !renderedAsBottomSheet && isNumber(maxMenuHeight) && maxMenuHeight > 0 ? { maxHeight: maxMenuHeight } : undefined;
     const computedVariant = menuVariants(Object.assign({}, variant, { visible: isVisible }));
     const Wrapper = !withScrollView ? Fragment : ScrollView;
-    const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", className: cn(computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
+    const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", style: maxHeightStyle, className: cn("max-w-full", computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
     itemsProps.className = cn(computedVariant.items(), itemsProps.className);
     const AnchorComponent = typeof customAnchor == "function" ? View : TouchableOpacity;
@@ -211,7 +213,7 @@ export function Menu<Context = unknown>({
                 {anchor}
             </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} animationDuration={animationDuration} withBackdrop={renderedAsBottomSheet} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(computedVariant.portal(), renderedAsBottomSheet && computedBottomSheetVariant.portal(), backdropClassName, "menu-portal")}>
+        {<Portal visible={isVisible} animationDuration={animationDuration} withBackdrop={renderedAsBottomSheet} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), backdropClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
                 <View
                     testID={testID}
@@ -225,7 +227,7 @@ export function Menu<Context = unknown>({
                     }}
                     style={StyleSheet.flatten([!renderedAsBottomSheet && menuStyle, props.style])}
                 >
-                    <Div testID={testID + "-menu-content-container"} className={cn("max-h-full", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.contentContainer(), contentContainerClassName)}>
+                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.contentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                             {child}

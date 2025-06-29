@@ -608,6 +608,7 @@ const DropdownSearch = ({ canReverse }: { canReverse?: boolean }) => {
                 testID={`${testID}-dropdown-search`}
                 autoFocus={visible && !Platform.isTouchDevice()}
                 affix={false}
+                debounceTimeout={1000}
                 {...props}
                 defaultValue={searchText}
                 onChangeText={onSearch}

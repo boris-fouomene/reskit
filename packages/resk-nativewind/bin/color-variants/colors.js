@@ -28,7 +28,7 @@ class VariantsColors {
      */
     static registerColor(colors) {
         Object.entries(Object.assign({}, colors)).map(([color, value]) => {
-            if (!value || typeof value !== "object" || !isNonNullString(value === null || value === void 0 ? void 0 : value.lightColor) || !isNonNullString(value === null || value === void 0 ? void 0 : value.lightForeground) || !isNonNullString(value === null || value === void 0 ? void 0 : value.darkColor) || !isNonNullString(value === null || value === void 0 ? void 0 : value.darkForeground))
+            if (!value || typeof value !== "object" || !isNonNullString(value === null || value === void 0 ? void 0 : value.lightColor) || !isNonNullString(value === null || value === void 0 ? void 0 : value.darkColor))
                 return;
             this._colors[color] = value;
         });

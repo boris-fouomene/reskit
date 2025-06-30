@@ -20,7 +20,7 @@ export class VariantsColors {
      */
     static registerColor(colors: IVariantsColorsMap) {
         Object.entries(Object.assign({}, colors)).map(([color, value]) => {
-            if (!value || typeof value !== "object" || !isNonNullString(value?.lightColor) || !isNonNullString(value?.lightForeground) || !isNonNullString(value?.darkColor) || !isNonNullString(value?.darkForeground)) return;
+            if (!value || typeof value !== "object" || !isNonNullString(value?.lightColor) || !isNonNullString(value?.darkColor)) return;
             this._colors[color] = value;
         });
         return VariantsColors._colors;

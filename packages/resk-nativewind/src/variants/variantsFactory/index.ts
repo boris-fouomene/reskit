@@ -10,6 +10,7 @@ import { width2heightClasses } from "./width2height";
 import { activeRingSize, focusRingSize, hoverRingSize, ringClasses } from "./ring";
 import { scalesClasses } from "./scales";
 import { IClassName } from "@src/types";
+const animations = require("@src/animations");
 
 type IVariantFactoryMutator<InputType extends Record<string | number, unknown>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
 
@@ -121,7 +122,7 @@ export const VariantsFactory = {
     return VariantsFactory.createMultipleVariants<typeof marginClasses, ResultType>(marginClasses, variantMutator as any);
   },
   createWidth2HeightVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof width2heightClasses)[keyof typeof width2heightClasses], ResultType>) {
-    return VariantsFactory.createMultipleVariants<typeof width2heightClasses, ResultType>(width2heightClasses, variantMutator)
+    return VariantsFactory.createMultipleVariants<typeof width2heightClasses, ResultType>(width2heightClasses, variantMutator);
   },
   createPadding2MarginVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>) {
     return VariantsFactory.createMultipleVariants<typeof padding2marginClasses, ResultType>(padding2marginClasses, variantMutator);
@@ -142,6 +143,13 @@ export const VariantsFactory = {
       (result as any)[variantClassName] = VariantsFactory.create((allVariantClasses as any)[variantClassName], variantMutator);
     });
     return result;
+  },
+  createAnimationVariants: function createAnimationVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof animations)[keyof typeof animations], ResultType>) {
+    const r = {} as any;
+    Object.entries(animations).forEach(([key, value]) => {
+      r[key] = typeof variantMutator == "function" ? variantMutator(key, key) : key;
+    });
+    return r as Record<keyof typeof animations, ResultType>;
   },
   createTextAlignVariants: function createTextAlignVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textAlignClasses, ResultType>) {
     return VariantsFactory.create<typeof textAlignClasses, ResultType>(textAlignClasses, variantMutator);

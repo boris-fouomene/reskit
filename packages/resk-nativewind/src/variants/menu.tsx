@@ -13,18 +13,16 @@ const menu = tv({
         scrollViewContentContainer: "",
     },
     variants: {
+        animation: {
+            scale: {},
+        },
         visible: {
             true: {
-                container: "opacity-100",
+                container: "animate-fade-in",
             },
             false: {
-                container: "opacity-0",
+                container: "animate-fade-out",
             }
-        },
-        animation: {
-            scale: {
-                container: "transform transition-all",
-            },
         },
         background: VariantsFactory.create<typeof VariantsGeneratedColors.surface, { container: string }>(VariantsGeneratedColors.surface, (value) => {
             return {
@@ -42,14 +40,14 @@ const menu = tv({
             animation: "scale",
             visible: false,
             class: {
-                container: "scale-90",
+                container: "animate-scale-out",
             }
         },
         {
             animation: "scale",
             visible: true,
             class: {
-                container: "scale-100",
+                container: "animate-scale-in",
             }
         }
     ],

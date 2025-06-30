@@ -1,6 +1,6 @@
 import "./globals.css";
 import "./fonts.css"
-import { SetupExpo__DEV__ } from "@resk/nativewind";
+import { AppRoot } from "@resk/nativewind";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
@@ -27,11 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <SetupExpo__DEV__ />
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <div className="flex flex-col h-screen relative w-screen relative " id="root">
+        <AppRoot>
           {children}
-        </div>
+        </AppRoot>
       </body>
     </html>
   );

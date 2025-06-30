@@ -3,17 +3,13 @@ import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { useEffect, useId, useMemo, useRef } from "react";
 import { cn, getTextContent, isValidElement, useMergeRefs } from '@utils';
-import { getMaxZindex, isDOMElement, uniqid, defaultStr } from "@resk/core/utils";
+import { getMaxZindex, isDOMElement, defaultStr } from "@resk/core/utils";
 import Platform from "@resk/core/platform";
 import { TouchableOpacity, PressableProps } from "react-native";
 import { ITooltipProps } from './types';
 import { ITouchableProps } from '@src/types';
-import { VariantsGeneratedColors } from '@variants/colors/generated';
-import { VariantsColors } from '@variants/colors';
+import { TIPPY_THEME } from './constants';
 
-const TIPPY_THEME = "customtippy-themename";
-
-const typyStyleId = "typy-csss-style-id";
 
 export * from "./types";
 
@@ -27,7 +23,6 @@ export function Tooltip<AsProps extends ITouchableProps = PressableProps>({ chil
     const innerRef = useMergeRefs(ref, buttonRef);
     const selector = isDOMElement(buttonRef.current) ? buttonRef.current : "#" + instanceIdRef.current;
     useEffect(() => {
-        initCss();
         if (disabled || !Platform.isClientSide()) return;
         const content = String(getTextContent(title)).replaceAll("\n", "<br/>");
         if (!content) return;
@@ -59,65 +54,3 @@ export function Tooltip<AsProps extends ITouchableProps = PressableProps>({ chil
         {children}
     </Component>;
 };
-
-const initCss = function () {
-    if (!Platform.isWeb() || typeof document == "undefined") return;
-    let elem = document.querySelector(`#${typyStyleId}`);
-    if (elem) return;
-    elem = document.createElement("style");
-    elem.id = typyStyleId;
-    document.body.appendChild(elem);
-    const { lightColor, lightForeground, darkColor, darkForeground } = Object.assign({}, VariantsColors.colors.primary);
-    const primary = defaultStr(lightColor), darkPrimary = defaultStr(darkColor), primaryForeground = defaultStr(lightForeground), darkPrimaryForeground = defaultStr(darkForeground);
-    elem.textContent = `
-        .tippy-box[data-theme~='${TIPPY_THEME}'] {
-            background-color: var(--color-${primary});
-            color: var(--color-${primaryForeground});
-            font-weight: 400;
-            text-shadow: none;
-            box-shadow: none;
-        }
-
-        .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='top']>.tippy-arrow::before {
-            border-top-color: var(--color-${primary});
-        }
-
-        .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='bottom']>.tippy-arrow::before {
-            border-bottom-color: var(--color-${primary});
-        }
-
-        .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='left']>.tippy-arrow::before {
-            border-left-color: var(--color-${primary});
-        }
-
-        .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right']>.tippy-arrow::before {
-            border-right-color: var(--color-${primary});
-        }
-
-        /* dark colors for theme*/
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'] {
-            background-color: var(--color-${darkPrimary});
-            color: var(--color-${darkPrimaryForeground});
-            font-weight: 400;
-            text-shadow: none;
-            box-shadow: none;
-        }
-
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='top']>.tippy-arrow::before {
-            border-top-color: var(--color-${darkPrimary});
-        }
-
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='bottom']>.tippy-arrow::before {
-            border-bottom-color: var(--color-${darkPrimary});
-        }
-
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='left']>.tippy-arrow::before {
-            border-left-color: var(--color-${darkPrimary});
-        }
-
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right']>.tippy-arrow::before {
-            border-right-color: var(--color-${darkPrimary});
-        }
-    `;
-    return elem;
-}

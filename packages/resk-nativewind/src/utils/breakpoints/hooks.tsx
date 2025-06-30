@@ -14,6 +14,16 @@ export const useBreakpoints = (options?: Partial<IBreakpoints>): IUseBreakpointR
     const [state, setState] = useStateCallback<{ window: ScaledSize, screen: ScaledSize, isHydrated: boolean }>(isHydrated ?
         { window: Dimensions.get('window'), screen: Dimensions.get('screen'), isHydrated } : { window: scaleSized, screen: scaleSized, isHydrated: false });
     const { window: { width } } = state;
+    const breakpoints = {
+        mobileMaxWidth: Breakpoints.mobileMaxWidth,
+        tabletMaxWidth: Breakpoints.tabletMaxWidth,
+        ...options,
+    };
+    breakpoints.mobileMaxWidth = isNumber(breakpoints.mobileMaxWidth) && breakpoints.mobileMaxWidth > 0 ? breakpoints.mobileMaxWidth : Breakpoints.mobileMaxWidth;
+    breakpoints.tabletMaxWidth = isNumber(breakpoints.tabletMaxWidth) && breakpoints.tabletMaxWidth > 0 ? breakpoints.tabletMaxWidth : Breakpoints.tabletMaxWidth;
+    const isMobile = width <= breakpoints.mobileMaxWidth;
+    const isTablet = width > breakpoints.mobileMaxWidth && width <= breakpoints.tabletMaxWidth;
+    const isDesktop = width > breakpoints.tabletMaxWidth;
     useEffect(() => {
         const r = Dimensions.addEventListener('change', function onDimensionChanged(newState) {
             if (isObj(newState) && (newState.window.width !== state.window.width || newState.window.height !== state.window.height)) {
@@ -27,16 +37,7 @@ export const useBreakpoints = (options?: Partial<IBreakpoints>): IUseBreakpointR
             r?.remove();
         };
     }, []);
-    const breakpoints = {
-        mobileMaxWidth: Breakpoints.mobileMaxWidth,
-        tabletMaxWidth: Breakpoints.tabletMaxWidth,
-        ...options,
-    };
-    breakpoints.mobileMaxWidth = isNumber(breakpoints.mobileMaxWidth) && breakpoints.mobileMaxWidth > 0 ? breakpoints.mobileMaxWidth : Breakpoints.mobileMaxWidth;
-    breakpoints.tabletMaxWidth = isNumber(breakpoints.tabletMaxWidth) && breakpoints.tabletMaxWidth > 0 ? breakpoints.tabletMaxWidth : Breakpoints.tabletMaxWidth;
-    const isMobile = width <= breakpoints.mobileMaxWidth;
-    const isTablet = width > breakpoints.mobileMaxWidth && width <= breakpoints.tabletMaxWidth;
-    const isDesktop = width > breakpoints.tabletMaxWidth;
+
     return {
         ...state,
         isMobile,

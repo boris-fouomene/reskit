@@ -1,3 +1,4 @@
+"use client";
 import { useContext } from "react";
 import { PortalStateContext } from "./context";
 import { IPortalStateContext } from "./types";

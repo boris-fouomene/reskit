@@ -105,8 +105,7 @@
     "react",
   ],
   "include": [
-    "src/**/*",
-    "variants.json"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules/**/*",

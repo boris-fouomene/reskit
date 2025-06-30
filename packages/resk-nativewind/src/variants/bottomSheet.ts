@@ -4,7 +4,7 @@ import { VariantsGeneratedColors } from "./colors/generated";
 
 const bottomSheet = tv({
   slots: {
-    container: "start-0 end-0 bottom-0 w-full shadow-xl px-2 duration-500",
+    container: "start-0 end-0 bottom-0 w-full shadow-xl px-2",
     contentContainer: "w-full h-full",
     portal: "", //"flex flex-col-reverse flex-1", //"flex flex-col flex-1 justify-end",
   },

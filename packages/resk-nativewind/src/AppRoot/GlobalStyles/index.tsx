@@ -40,9 +40,10 @@ export function GlobalStyles() {
     ::-webkit-scrollbar-thumb{background-color: ${primary};}
     .dark ::-webkit-scrollbar-thumb{background-color: ${darkPrimary};}
     `;
-    return <style>
-        {<BodyClasses />}
-        {`
+    return <>
+        <BodyClasses />
+        <style>
+            {`
         .tippy-box[data-theme~='${TIPPY_THEME}'] {
             background-color: ${primary};
             color: ${primaryForeground};
@@ -109,11 +110,10 @@ export function GlobalStyles() {
         body.desktop ${trackstyle}
         body.desktop ${scrollbarStyle}
         body.desktop ${thumbStyle}
-
-
         body.not-touch-device ${trackstyle}
         body.not-touch-device ${scrollbarStyle}
         body.not-touch-device ${thumbStyle}
     `}
-    </style>
+        </style>
+    </>
 }

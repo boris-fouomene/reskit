@@ -2,6 +2,8 @@ import { Div } from "@html/Div";
 import { PortalProvider } from "@components/Portal";
 import { SetupExpo__DEV__ } from "@components/SetupExpo__DEV__";
 import { GlobalStyles } from "./GlobalStyles";
+import { IClassName } from "@src/types";
+import { cn } from "@utils/cn";
 
 /**
  * Props for the AppRoot component.
@@ -14,6 +16,14 @@ export interface IAppRootProps {
      * This typically includes your main application content and routing components.
      */
     children: React.ReactNode;
+
+    /***
+        The class name to apply to the root container.
+        This allows for custom styling or additional CSS classes to be applied.
+        It can be used to extend the default styles provided by the component.
+        If not specified, the default styles will be applied.
+    */
+    className?: IClassName;
 }
 
 /**
@@ -140,10 +150,10 @@ export interface AppRootProps {
  * @since 1.0.0
  * @public
  */
-export function AppRoot({ children }: IAppRootProps) {
+export function AppRoot({ children, className }: IAppRootProps) {
     return (
         <Div
-            className="flex flex-col flex-1 h-screen w-screen relative reskit-app-root"
+            className={cn("flex flex-col flex-1 h-screen w-screen relative reskit-app-root", className)}
             id="reskit-app-root"
         >
             <PortalProvider>

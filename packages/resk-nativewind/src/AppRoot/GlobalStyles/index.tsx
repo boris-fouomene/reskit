@@ -1,53 +1,31 @@
-"use client";
-import { addClassName, defaultStr, isDOMElement, removeClassName } from "@resk/core/utils";
-import { useBreakpoints } from "@utils/breakpoints";
-import { useEffect } from "react";
-import Platform from "@resk/core/platform";
 import { TIPPY_THEME } from "@components/Tooltip/constants";
 import { VariantsColors } from "@variants/colors";
+import { isNextJs } from "@platform/isNext";
+import { defaultStr } from "@resk/core/utils";
+import { BodyClasses } from "./BodyClasses";
 
-const globalStyleId = "resk-global-style-id";
 export function GlobalStyles() {
-    const { isMobile, isTablet, isDesktop } = useBreakpoints();
-    useEffect(() => {
-        if (typeof document !== 'undefined' && document && isDOMElement(document.body) && typeof window !== "undefined" && window) {
-            const body = document.body;
-            removeClassName(body, "mobile tablet desktop");
-            const className = isMobile ? "mobile" : isTablet ? "tablet" : "desktop";
-            addClassName(body, className);
-            removeClassName(body, "not-touch-device");
-            removeClassName(body, "is-touch-device");
-            addClassName(body, Platform.isTouchDevice() ? "is-touch-device" : "not-touch-device");
-        }
-    }, [isMobile, isTablet, isDesktop]);
+    if (!isNextJs() && (typeof document == "undefined" || typeof window === "undefined" || !window || !document || !document?.body)) return null;
+    const { lightColor, lightForeground, darkColor, darkForeground } = Object.assign({}, VariantsColors.colors.primary);
+    const { lightColor: surfaceLightColor, darkColor: surfaceDarkColor } = Object.assign({}, VariantsColors.colors.surface);
+    const primary = `var(--color-${defaultStr(lightColor)})`,
+        darkPrimary = `var(--color-${defaultStr(darkColor)})`,
+        primaryForeground = `var(--color-${defaultStr(lightForeground)})`,
+        darkPrimaryForeground = `var(--color-${defaultStr(darkForeground)})`;
 
-    useEffect(() => {
-        if (!Platform.isWeb() || typeof document == "undefined") return;
-        let elem = document.querySelector(`#${globalStyleId}`);
-        if (elem) return;
-        elem = document.createElement("style");
-        elem.id = globalStyleId;
-        document.body.appendChild(elem);
-        const { lightColor, lightForeground, darkColor, darkForeground } = Object.assign({}, VariantsColors.colors.primary);
-        const { lightColor: surfaceLightColor, darkColor: surfaceDarkColor } = Object.assign({}, VariantsColors.colors.surface);
-        const primary = `var(--color-${defaultStr(lightColor)})`,
-            darkPrimary = `var(--color-${defaultStr(darkColor)})`,
-            primaryForeground = `var(--color-${defaultStr(lightForeground)})`,
-            darkPrimaryForeground = `var(--color-${defaultStr(darkForeground)})`;
+    const width = 8;
+    const height = 8;
+    const trackBG = `var(--color-${defaultStr(surfaceLightColor)})`;
+    const darkTrackBG = `var(--color-${defaultStr(surfaceDarkColor)})`;
 
-        const width = 8;
-        const height = 8;
-        const trackBG = `var(--color-${defaultStr(surfaceLightColor)})`;
-        const darkTrackBG = `var(--color-${defaultStr(surfaceDarkColor)})`;
-
-        const scrollbarStyle = `::-webkit-scrollbar
+    const scrollbarStyle = `::-webkit-scrollbar
         {
             width: ${width}px;
             height:${height}px;
             border:opx;
         }
     `;
-        const trackstyle = `
+    const trackstyle = `
         ::-webkit-scrollbar-track{
             -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
             border-radius: 10px;
@@ -58,12 +36,13 @@ export function GlobalStyles() {
             background-color: ${darkTrackBG};
         }
     `;
-        const thumbStyle = `
+    const thumbStyle = `
     ::-webkit-scrollbar-thumb{background-color: ${primary};}
     .dark ::-webkit-scrollbar-thumb{background-color: ${darkPrimary};}
     `;
-
-        elem.textContent = `
+    return <style>
+        {<BodyClasses />}
+        {`
         .tippy-box[data-theme~='${TIPPY_THEME}'] {
             background-color: ${primary};
             color: ${primaryForeground};
@@ -135,7 +114,6 @@ export function GlobalStyles() {
         body.not-touch-device ${trackstyle}
         body.not-touch-device ${scrollbarStyle}
         body.not-touch-device ${thumbStyle}
-    `;
-    }, [])
-    return null; // This component does not render anything
+    `}
+    </style>
 }

@@ -5,4 +5,4 @@ export * from "./theme";
 export * from "./types";
 export * from "./components";
 export * from "./variants";
-export * from "./provider";
+export * from "./AppRoot";

@@ -4,17 +4,17 @@ import { VariantsGeneratedColors } from "./colors/generated";
 
 const bottomSheet = tv({
   slots: {
-    container: "relative start-0 end-0 bottom-0 w-full shadow-xl px-2 transform transition-transform duration-300 ease-out",
+    container: "start-0 end-0 bottom-0 w-full shadow-xl px-2 transform transition-transform duration-300",
     contentContainer: "w-full h-full",
-    portal: "flex flex-col-reverse flex-1", //"flex flex-col flex-1 justify-end",
+    portal: "",//"flex flex-col-reverse flex-1", //"flex flex-col flex-1 justify-end",
   },
   variants: {
     visible: {
       true: {
-        container: "translate-y-0 transform-none",
+        container: "animate-slide-in-from-bottom",
       },
       false: {
-        container: "translate-y-full",
+        container: "animate-slide-out-to-bottom",
       },
     },
     background: VariantsFactory.create<typeof VariantsGeneratedColors.surface, { container: string }>(VariantsGeneratedColors.surface, (value) => {

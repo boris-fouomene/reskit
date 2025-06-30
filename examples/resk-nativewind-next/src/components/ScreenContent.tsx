@@ -37,7 +37,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <H2>Dropdown</H2>
         <Dropdown
           label="Select an option"
-          items={Array.from({ length: 10000 }).map((_, index) => ({ label: `Option ${index + 1}`, value: index }))}
+          items={Array.from({ length: 50 }).map((_, index) => ({ label: `Option ${index + 1}`, value: index }))}
         />
       </Div>
       <HStack className="p-5">

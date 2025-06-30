@@ -42,8 +42,22 @@ export function GlobalStyles() {
     `;
     return <>
         <BodyClasses />
-        <style>
+        <style id="reskit-app-root-global-styles">
             {`
+        html,body,#root { 
+            -ms-overflow-style: none; 
+            -webkit-text-size-adjust: none;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            margin: 0px; 
+            width: 100vw; 
+            height: -webkit-fill-available;   
+            overflow:hidden;
+            margin:0;
+            padding:0;
+        }
+
         .tippy-box[data-theme~='${TIPPY_THEME}'] {
             background-color: ${primary};
             color: ${primaryForeground};
@@ -92,21 +106,7 @@ export function GlobalStyles() {
         .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right']>.tippy-arrow::before {
             border-right-color: ${darkPrimary};
         }
-        
-        
-         html,body,#root { 
-            -ms-overflow-style: none; 
-            -webkit-text-size-adjust: none;
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-            margin: 0px; 
-            width: 100vw; 
-            height: -webkit-fill-available;   
-            overflow:hidden;
-            margin:0;
-            padding:0;
-        }
+         
         body.desktop ${trackstyle}
         body.desktop ${scrollbarStyle}
         body.desktop ${thumbStyle}

@@ -456,23 +456,27 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight }: { maxHeigh
     const fullScreen = !!menu?.fullScreen;
     const canReverse = isTopPosition && !fullScreen;
     const canRenderDropdownSearch = canRenderSearch(context);
+    const search = canRenderDropdownSearch ? <DropdownSearch /> : null;
+    const maxMenuHeight = isNumber(menu?.maxHeight) && menu?.maxHeight > (Math.min(menu.maxHeight, maxHeight)) ? menu.maxHeight : maxHeight;
     return <Div
         disabled={context?.props?.disabled}
         readOnly={!isEditabled}
         testID={testID + "-dropdown-list-container"}
-        className={cn("w-full max-h-full relative", canReverse ? "pt-[30px]" : "pb-[30px]")}
+        className={cn("w-full max-h-full relative flex flex-col", canReverse ? "pt-[10px]" : "pb-[10px]")}
+        style={fullScreen ? undefined : { maxHeight: maxMenuHeight }}
     >
-        {canRenderDropdownSearch ? <DropdownSearch /> : null}
+        {canReverse ? null : search}
         <FlatList<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
             scrollEnabled
-            style={{ maxHeight: isNumber(menu?.maxHeight) ? menu.maxHeight : "100%" }}
+            style={{ maxHeight: fullScreen ? "100%" : (maxMenuHeight - (search ? 50 : 0)) }}
             {...listProps}
             inverted={canReverse}
             data={filteredItems}
             keyExtractor={({ hashKey }) => hashKey}
             renderItem={renderItem}
         />
+        {canReverse ? search : null}
     </Div>;
 }
 function renderItem<ItemType, ValueType>({ item, index }: { item: IDropdownPreparedItem<ItemType, ValueType>, index: number }) {

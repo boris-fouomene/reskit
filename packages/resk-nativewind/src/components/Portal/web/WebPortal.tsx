@@ -3,19 +3,21 @@ import { defaultStr, getMaxZindex } from '@resk/core/utils';
 import { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@utils/cn';
-import { styles } from '../utils';
 import { IPortalProps } from '../types';
 import { normalizeGestureEvent } from '@html/events';
 import allVariants from '@variants/all';
 import { StyleSheet } from 'react-native';
 import { classes } from '@variants/classes';
 import { Div } from "@html/Div";
-import { useAnimatedVisibility } from '@utils/animations';
 import { useAccessibilityEscape } from '@html/accessibility';
-import { PortalStateContext } from '../context';
+import useStateCallback from '@utils/stateCallback';
+import { isNextJs } from '@platform/isNext';
+import { classes as utilClasses } from '../utils';
 
 
-export function Portal({ children, onAccessibilityEscape, autoMountChildren, style, className, animationDuration, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
+export function Portal({ children, onAccessibilityEscape, autoMountChildren, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
+    const isVisible = !!visible || !!autoMountChildren;
+    const [shouldRender, setShouldRender] = useStateCallback(isVisible && !isNextJs());
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const target = `#${targetId}`;
@@ -32,8 +34,12 @@ export function Portal({ children, onAccessibilityEscape, autoMountChildren, sty
             }
         }
     }, [target]);
-    const { shouldRender, ...rest } = useAnimatedVisibility({ visible: visible || !!autoMountChildren, duration: animationDuration });
     useAccessibilityEscape(target, onAccessibilityEscape, shouldRender);
+    useEffect(() => {
+        if (isVisible && !shouldRender) {
+            setShouldRender(true);
+        }
+    }, []);
     if (!shouldRender || typeof document === "undefined" || !document || !document?.body) return null;
     const hasOnPress = typeof onPress == "function";
     return createPortal(<Div
@@ -44,11 +50,9 @@ export function Portal({ children, onAccessibilityEscape, autoMountChildren, sty
         } : undefined}
         id={targetId}
         testID={defaultStr(testID, "portal-" + targetId)}
-        style={StyleSheet.flatten([absoluteFill && styles.absoluteFill, { zIndex: Math.max(getMaxZindex(), 1000) }, style])}
-        className={cn(absoluteFill && classes.absoluteFill, hasOnPress && "pointer-events-auto", "portal", allVariants({ backdrop: withBackdrop }), className, allVariants({ hidden: !!!visible }))}
+        style={StyleSheet.flatten([{ zIndex: visible ? (Math.max(getMaxZindex(), 1000) + 1) : 0 }, style])}
+        className={cn(absoluteFill && classes.absoluteFill, hasOnPress && "pointer-events-auto", "portal", allVariants({ backdrop: withBackdrop }), className, !visible && utilClasses.hidden)}
     >
-        <PortalStateContext.Provider value={{ shouldRender, ...rest }}>
-            {children}
-        </PortalStateContext.Provider>
+        {children}
     </Div>, document.querySelector("#reskit-app-root") || document.body);
 };

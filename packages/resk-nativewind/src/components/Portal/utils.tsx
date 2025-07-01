@@ -1,5 +1,8 @@
-import { Platform, ViewStyle,StyleSheet } from "react-native";
+import { Platform, ViewStyle, StyleSheet } from "react-native";
 
+export const classes = {
+    hidden: "invisible opacity-0 z-0",
+}
 export const styles = {
     absoluteFill: {
         position: Platform.select({
@@ -7,10 +10,10 @@ export const styles = {
             default: "absolute",
         }),
         ...(Platform.select({
-            native : {
+            native: {
                 ...StyleSheet.absoluteFillObject,
             },
-            web : {
+            web: {
                 left: 0,
                 right: 0,
                 top: 0,

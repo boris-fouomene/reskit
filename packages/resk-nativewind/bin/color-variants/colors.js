@@ -103,7 +103,10 @@ class VariantsColors {
             const darkColor = isForeground ? _darkForeground : dark;
             const lightForeground = isForeground ? light : _lightForeground;
             const darkForeground = isForeground ? dark : _darkForeground;
-            r[color] = colorBuilder(Object.assign(Object.assign({}, rest), { isForeground: !!isForeground, lightColor,
+            //const areTailwindClasses = String(light) === color || _lightForeground === `${color}-foreground` || String(dark).endsWith(`-${color}`) || String(_darkForeground).endsWith(`-${color}-foreground`);
+            r[color] = colorBuilder(Object.assign(Object.assign({}, rest), { 
+                //areTailwindClasses: typeof rest.areTailwindClasses === "boolean" ? rest.areTailwindClasses : !areTailwindClasses,
+                isForeground: !!isForeground, lightColor,
                 darkColor, lightColorWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`, darkColorWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`, darkForeground,
                 lightForeground, lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}` }));
         });
@@ -242,6 +245,7 @@ class VariantsColors {
      * console.log(interfaceString);
      * // Output:
      * // import { IVariantsColorsMapBase } from './types';
+  import { col } from '../../../../../../frontend-dash/src/theme/grid';
      * // export interface IVariantsColorsMap extends IVariantsColorsMapBase {
      * //   customColor: IVariantColor;
      * //   ...
@@ -255,10 +259,7 @@ class VariantsColors {
      * @see {@link IVariantColor}
      */
     static generateColorsMapTypes() {
-        const generateText = [
-            "import { IVariantsColorsMapBase } from './types';",
-            "export interface IVariantsColorsMap extends IVariantsColorsMapBase {",
-        ];
+        const generateText = ["import { IVariantsColorsMapBase } from './types';", "export interface IVariantsColorsMap extends IVariantsColorsMapBase {"];
         Object.entries(VariantsColors.colors).forEach(([color, value]) => {
             if (VariantsColors.defaultColorsNames.includes(color))
                 return;
@@ -274,62 +275,62 @@ VariantsColors.defaultColors = {
         lightColor: "primary",
         darkColor: "dark-primary",
         lightForeground: "primary-foreground",
-        darkForeground: "dark-primary-foreground"
+        darkForeground: "dark-primary-foreground",
     },
     secondary: {
         lightColor: "secondary",
         darkColor: "dark-secondary",
         lightForeground: "secondary-foreground",
-        darkForeground: "dark-secondary-foreground"
+        darkForeground: "dark-secondary-foreground",
     },
     surface: {
         lightColor: "gray-100",
         lightForeground: "gray-900",
         darkColor: "gray-800",
-        darkForeground: "gray-100"
+        darkForeground: "gray-100",
     },
     background: {
         lightColor: "white",
         lightForeground: "gray-900",
         darkColor: "gray-900",
-        darkForeground: "gray-100"
+        darkForeground: "gray-100",
     },
     neutral: {
         lightColor: "gray-500",
         lightForeground: "white",
         darkColor: "gray-600",
-        darkForeground: "gray-50"
+        darkForeground: "gray-50",
     },
     error: {
         lightColor: "red-500",
         lightForeground: "white",
         darkColor: "red-600",
-        darkForeground: "red-50"
+        darkForeground: "red-50",
     },
     info: {
         lightColor: "blue-500",
         lightForeground: "white",
         darkColor: "blue-600",
-        darkForeground: "blue-50"
+        darkForeground: "blue-50",
     },
     warning: {
         lightColor: "yellow-500",
         lightForeground: "yellow-900",
         darkColor: "yellow-600",
-        darkForeground: "yellow-50"
+        darkForeground: "yellow-50",
     },
     success: {
         lightColor: "green-500",
         lightForeground: "white",
         darkColor: "green-600",
-        darkForeground: "green-50"
+        darkForeground: "green-50",
     },
     text: {
         lightColor: "gray-900",
         lightForeground: "gray-100",
         darkColor: "gray-100",
-        darkForeground: "gray-900"
-    }
+        darkForeground: "gray-900",
+    },
 };
 VariantsColors.defaultColorsNames = Object.keys(VariantsColors.defaultColors);
 VariantsColors._colors = Object.assign({}, VariantsColors.defaultColors);

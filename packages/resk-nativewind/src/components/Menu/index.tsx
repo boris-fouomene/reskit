@@ -53,7 +53,6 @@ export function Menu<Context = unknown>({
     onRequestOpen,
     disabled,
     contentContainerClassName,
-    animationDuration,
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -213,12 +212,8 @@ export function Menu<Context = unknown>({
                 {anchor}
             </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} autoMountChildren animationDuration={animationDuration} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), backdropClassName, "menu-portal")}>
+        {<Portal autoMountChildren visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), backdropClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
-                {renderedAsBottomSheet && false ? <Div
-                    className={cn(classes.absoluteFill, "bg-transparent")}
-                    onPress={onDismiss}
-                /> : null}
                 <View
                     testID={testID}
                     {...props}

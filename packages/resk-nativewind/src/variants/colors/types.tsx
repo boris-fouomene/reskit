@@ -8,6 +8,11 @@ export interface IVariantColor {
     darkColor: string,
     /**The dark foreground variant*/
     darkForeground: string,
+    /**
+     * Whether the color is a Tailwind CSS color class.
+        * @default false
+     */
+    areTailwindClasses?: boolean
 }
 
 /**
@@ -67,7 +72,6 @@ export interface IVariantsColorsMapBase {
      * The default text color, used for text elements.
      */
     text: IVariantColor;
-
 
     /**
    * True gray color palette without color undertones

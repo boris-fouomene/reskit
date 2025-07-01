@@ -43,26 +43,16 @@ export interface IPortalProps {
    * @example
    * ```tsx
    * // No delay - content disappears immediately
-   * <Portal visible={isOpen} animationDuration={0}>
+   * <Portal visible={isOpen}>
    *   <div>Content</div>
    * </Portal>
    * 
    * // 300ms delay - allows time for exit animations
-   * <Portal visible={isOpen} animationDuration={300}>
+   * <Portal visible={isOpen}>
    *   <div className="transition-opacity duration-300">
    *     Animated content
    *   </div>
    * </Portal>
-   * ```
-   * 
-   * @remarks
-   * - When `visible` changes from `false` to `true`, content mounts immediately regardless of this value
-   * - When `visible` changes from `true` to `false`, a timeout is set for this duration
-   * - The timeout is automatically cleared if `visible` becomes `true` again before the delay expires
-   * - Setting this to 0 or omitting it results in immediate unmounting (no animation support)
-   * - This value should typically match or slightly exceed your CSS animation/transition duration
-   */
-    animationDuration?: number;
     /***
      * The callback function to be called when the portal is pressed.
      */

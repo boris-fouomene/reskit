@@ -281,12 +281,6 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      */
     anchorContainerClassName?: IClassName;
 
-    /***
-        The duration of the menu animation in milliseconds.
-        This is used to control the duration of the animation when the menu is opened or closed.
-        Default is 300 milliseconds.
-    */
-    animationDuration?: number;
 
     /** Menu content, either as static JSX or a function returning JSX based on the menu context. */
     children?: IReactNullableElement | ((options: IMenuContext<Context>) => IReactNullableElement);

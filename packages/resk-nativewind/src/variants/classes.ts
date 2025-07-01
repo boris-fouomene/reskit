@@ -5,9 +5,9 @@ export const classes: IVariantsClasses = {
   active2hoverState: "hover:opacity-80 active:opacity-60",
   cursorPointed: "cursor-pointer",
   positionFixed: "absolute web:fixed",
-  absoluteFill: " absolute web:fixed flex-1 w-screen h-screenleft-0 right-0 top-0 bottom-0",
+  absoluteFill: " absolute web:fixed flex-1 w-full h-full left-0 right-0 top-0 bottom-0",
   cursorDefault: "cursor-default",
-  backdrop: "web:bg-opacity-50 bg-backdrop flex flex-1 flex-col h-full w-full dark:bg-dark-backdrop",
+  backdrop: "web:bg-opacity-50 bg-backdrop dark:bg-dark-backdrop",
 };
 export interface IVariantsClasses {
   disabled: string;

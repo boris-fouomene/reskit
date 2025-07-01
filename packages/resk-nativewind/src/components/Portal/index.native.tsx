@@ -4,9 +4,8 @@ import { StyleSheet, View, ViewStyle } from 'react-native';
 import { cn } from '@utils/cn';
 import { styles } from './utils';
 import { IPortalProps } from './types';
+import { classes } from './utils';
 import allVariants from "@variants/all";
-import { useAnimatedVisibility } from '@utils/animations';
-import { PortalStateContext } from './context';
 
 /**
  * @interface IPortalItem
@@ -109,7 +108,6 @@ const InternalPortalContext = createContext<IPortalContext | undefined>(undefine
  */
 export function PortalProvider({ children }: { children?: ReactNode }): JSX.Element {
     const portalRefs = useRef<IPortalItem[]>([]);
-    const startIndex = useRef<number>(1000).current;
     const addPortal = (key: string, children: ReactNode, props?: Omit<IPortalProps, "children">) => {
         portalRefs.current = [...portalRefs.current.filter(portal => portal?.key !== key), { key, children, props }];
         updatePortalLayer();
@@ -138,7 +136,7 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
                         <RenderedPortal
                             testID={`${testID}-${index + 1}`}
                             key={key}
-                            zIndex={startIndex + index + 1}
+                            zIndex={index + 1}
                             children={children}
                             {...props}
                         />
@@ -149,20 +147,19 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     );
 };
 
-function RenderedPortal({ children, autoMountChildren, className, withBackdrop, animationDuration, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
-    const { shouldRender, ...rest } = useAnimatedVisibility({ visible: visible || !!autoMountChildren, duration: animationDuration });
+function RenderedPortal({ children, autoMountChildren, className, withBackdrop, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
+    const shouldRender = !!visible || !!autoMountChildren;
     if (!shouldRender) return null;
     absoluteFill = withBackdrop || absoluteFill;
     const absoluteFillStyle = absoluteFill ? styles.absoluteFill : undefined;
     const handleBackdrop = withBackdrop || absoluteFill;
+    zIndex = visible ? (1000 + zIndex) : 0;
     const flattenStyle = StyleSheet.flatten([{ zIndex } as ViewStyle, style] as any);
     const backdropClassName = cn(allVariants({ backdrop: withBackdrop }));
-    return <PortalStateContext.Provider value={{ shouldRender, ...rest }}>
-        <Div {...props} onPress={!handleBackdrop ? onPress : undefined} className={cn(!handleBackdrop && backdropClassName, className, allVariants({ hidden: !!!visible }))} style={Object.assign({}, absoluteFillStyle, flattenStyle)}>
-            {handleBackdrop ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", backdropClassName)} style={absoluteFillStyle} onPress={onPress} /> : null}
-            {children || null}
-        </Div>
-    </PortalStateContext.Provider>
+    return <Div {...props} onPress={!handleBackdrop ? onPress : undefined} className={cn(!handleBackdrop && backdropClassName, className, !visible && classes.hidden)} style={Object.assign({}, absoluteFillStyle, flattenStyle)}>
+        {handleBackdrop && visible ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", backdropClassName)} style={absoluteFillStyle} onPress={onPress} /> : null}
+        {children || null}
+    </Div>
 };
 RenderedPortal.displayName = "Portal.Rendered";
 /**
@@ -211,13 +208,13 @@ export function Portal({ children, ...props }: IPortalProps) {
     const { addPortal, removePortal } = useInternalPortal();
     const key = useId();
     useEffect(() => {
-        if (props.visible !== false && typeof addPortal === "function") {
+        if (typeof addPortal === "function") {
             addPortal(key, children, props);
         }
         return () => {
             typeof removePortal === "function" && removePortal(key);
         }
-    }, [key, children, props.absoluteFill, props.visible]);
+    }, [key, children]);
     useEffect(() => {
         return () => {
             typeof removePortal === "function" && removePortal(key);
@@ -225,5 +222,3 @@ export function Portal({ children, ...props }: IPortalProps) {
     }, [])
     return null;
 };
-
-export * from "./hooks";

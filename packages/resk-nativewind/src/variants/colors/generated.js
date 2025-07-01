@@ -545,6 +545,7 @@ export const VariantsGeneratedColors = {
     "warning-foreground": "active:ring-yellow-900 dark:active:ring-yellow-50",
     "success-foreground": "active:ring-white dark:active:ring-green-50",
     "text-foreground": "active:ring-gray-100 dark:active:ring-gray-900"
-  }
+  },
+  "allColors": {}
 }
     

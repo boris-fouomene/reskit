@@ -299,11 +299,10 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
 }
 
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
-    let { anchorContainerProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
+    let { anchorContainerClassName, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
     const { visible, preparedItems } = context.state;
     const isLoading = !!props.isLoading;
     const disabledStyle = isLoading && styles.disabled || null;
-    anchorContainerProps = Object.assign({}, anchorContainerProps);
     testID = context.getTestID();
     const [searchText, setSearchText] = useState("");
     const onSearch = (text: string) => {
@@ -431,9 +430,10 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             onRequestClose={context.onRequestClose.bind(context)}
             onRequestOpen={context.onRequestOpen.bind(context)}
 
-            anchor={<View disabled={disabled}
+            anchor={<Div
+                disabled={disabled}
                 testID={`${testID}-dropdown-anchor-container`}
-                {...Object.assign({}, anchorContainerProps)} style={StyleSheet.flatten([anchorContainerProps?.style, disabledStyle]) as IViewStyle}
+                className={cn(anchorContainerClassName)}
             >
                 {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdown: context })
                     :
@@ -441,7 +441,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
                         {...anchorProps}
                     />}
                 {loadingContent}
-            </View>}
+            </Div>}
         >
             <DropdownContext.Provider value={context}>
                 <DropdownMenu<ItemType, ValueType> maxHeight={maxDropdownHeight} />
@@ -610,8 +610,8 @@ const DropdownSearch = ({ canReverse }: { canReverse?: boolean }) => {
     const onSearch = typeof context.onSearch == "function" ? context.onSearch : undefined;
     const pItem = context?.getPreparedItems();
     const preparedItems = Array.isArray(pItem) ? pItem : [];
-    const { showSearch, error, searchProps } = Object.assign({}, context.props);
-    const props = Object.assign({}, searchProps, { error: error || searchProps?.error });
+    const { showSearch, error, searchInputProps } = Object.assign({}, context.props);
+    const props = Object.assign({}, searchInputProps, { error: error || searchInputProps?.error });
     const visible = context?.isOpen();
     const actions: IDropdownAction[] = Array.isArray(context.dropdownActions) ? context.dropdownActions : [];
     if (showSearch === false || showSearch !== true && preparedItems?.length <= 5) {
@@ -623,7 +623,7 @@ const DropdownSearch = ({ canReverse }: { canReverse?: boolean }) => {
                 testID={`${testID}-dropdown-search`}
                 autoFocus={visible && !Platform.isTouchDevice()}
                 affix={false}
-                debounceTimeout={1000}
+                debounceTimeout={preparedItems?.length > 500 ? 1500 : preparedItems?.length > 200 ? 1000 : 0}
                 {...props}
                 defaultValue={searchText}
                 onChangeText={onSearch}
@@ -967,11 +967,11 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     /**
      * Whether the dropdown should display a search input
      */
-    showSearch?: boolean; // Flag for search input visibility
+    showSearch?: boolean;
     /***
-     * The props of the search input
+     * The props of the search input. It represents the props of the TextInput component used for the search input.
      */
-    searchProps?: Omit<ITextInputProps, "value" | "defaultValue">; // Props for the search input
+    searchInputProps?: Omit<ITextInputProps, "value" | "defaultValue">; // Props for the search input
 
     /**** Specifies if the dropdown is responsible for loading items */
     isLoading?: boolean; // Flag for loading state
@@ -981,10 +981,17 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
 
     listContentContainerClassName?: IClassName;
 
-    /*** Props for the Tooltip component wrapping the anchor */
-    anchorContainerProps?: PressableProps; // Props for the anchor container
 
-    dropdownActions?: IDropdownActions; // Optional actions for the dropdown
+    /***
+        ClassName for the anchor container, The View that wraps the anchor element
+    */
+    anchorContainerClassName?: IClassName; // Props for the anchor container
+
+
+    /***
+        optional actions for the dropdown
+    */
+    dropdownActions?: IDropdownActions;
 
     /***
      * The name of the icon to be used for the selected state of the dropdown items.

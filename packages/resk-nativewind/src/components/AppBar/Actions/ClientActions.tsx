@@ -1,5 +1,5 @@
 "use client";
-import { useBreakpoints } from "@utils/breakpoints/hooks";
+import { useDimensions } from "@utils/dimensions/hooks";
 import { IAppBarActionProps, IAppBarActionsProps } from "../types";
 import { IReactNullableElement } from "@src/types";
 import { isNumber } from "@resk/core/utils";
@@ -11,7 +11,7 @@ import { isValidElement, useMemo } from "react";
 import { ActivityIndicator } from "@components/ActivityIndicator";
 
 export function AppBarClientActions<Context = unknown>({ context, menuAnchorClassName, menuAnchorIconProps, renderAction, renderExpandableAction, hydrationFallback, testID, actionClassName, actionMenuItemClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
-    const { window: { width: windowWidth }, isHydrated } = useBreakpoints();
+    const { window: { width: windowWidth }, isHydrated } = useDimensions();
     const mAction: number = typeof maxVisibleActions === "number" && maxVisibleActions ? Math.trunc(maxVisibleActions) : getAppBarMaxActions(windowWidth, viewportWidth);
     const { actions, menuItems } = useMemo(() => {
         const actionCounter = { current: 0 };

@@ -9,12 +9,11 @@ const all = tv({
         readOnly: {
             true: classes.readOnly,
         },
-        hover: "hover:bg-gray-100 dark:hover:bg-gray-800",
         hidden: {
             true: classes.hidden,
         },
         backdrop: {
-            true: "web:bg-opacity-50 bg-backdrop flex flex-1 flex-col h-full w-full dark:bg-dark-backdrop",
+            true: classes.backdrop,
         }
     },
 });

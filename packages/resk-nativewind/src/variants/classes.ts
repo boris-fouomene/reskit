@@ -7,6 +7,7 @@ export const classes: IVariantsClasses = {
   positionFixed: "absolute web:fixed",
   absoluteFill: " absolute web:fixed flex-1 w-screen h-screenleft-0 right-0 top-0 bottom-0",
   cursorDefault: "cursor-default",
+  backdrop: "web:bg-opacity-50 bg-backdrop flex flex-1 flex-col h-full w-full dark:bg-dark-backdrop",
 };
 export interface IVariantsClasses {
   disabled: string;
@@ -17,4 +18,5 @@ export interface IVariantsClasses {
   positionFixed: string;
   absoluteFill: string;
   cursorDefault: string;
+  backdrop: string;
 }

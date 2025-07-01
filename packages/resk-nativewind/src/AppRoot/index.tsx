@@ -153,7 +153,7 @@ export interface AppRootProps {
 export function AppRoot({ children, className }: IAppRootProps) {
     return (
         <Div
-            className={cn("flex flex-col flex-1 h-screen w-screen relative reskit-app-root", className)}
+            className={cn("flex flex-col flex-1 h-full w-full relative reskit-app-root", className)}
             id="reskit-app-root"
         >
             <PortalProvider>

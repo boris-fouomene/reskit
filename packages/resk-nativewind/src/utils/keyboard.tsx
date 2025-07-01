@@ -17,8 +17,9 @@ const EVENT_TYPE = {
  * @returns An object with three properties: `isKeyboardVisible` (a boolean indicating whether the keyboard is currently visible), `keyboardHeight` (the height of the keyboard in pixels), and `dismissKeyboard` (a function that will dismiss the keyboard if it is visible).
  * @remarks
  * This is an original copy from https://github.com/mrzachnugent/react-native-reusables/blob/main/packages/reusables/src/lib/keyboard.tsx
+ * @returns {IUseKeyboardResult}
 */
-export function useKeyboard({ eventType = 'didShow' }: { eventType?: keyof typeof EVENT_TYPE } = { eventType: 'didShow' }) {
+export function useKeyboard({ eventType = 'didShow' }: { eventType?: keyof typeof EVENT_TYPE } = { eventType: 'didShow' }): IUseKeyboardResult {
     const [isKeyboardVisible, setKeyboardVisible] = useState(false);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     useEffect(() => {
@@ -46,4 +47,10 @@ export function useKeyboard({ eventType = 'didShow' }: { eventType?: keyof typeo
         keyboardHeight,
         dismissKeyboard,
     };
+}
+
+export interface IUseKeyboardResult {
+    isKeyboardVisible: boolean;
+    keyboardHeight: number;
+    dismissKeyboard: Function;
 }

@@ -3,7 +3,7 @@ import { isNumber, isObj } from "@resk/core/utils";
 import { IMenuCalculatedPosition, IMenuPosition, IUseMenuPositionProps } from "./types";
 import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
-import { useBreakpoints } from "@utils/breakpoints/hooks";
+import { useDimensions } from "@utils/dimensions/hooks";
 import Platform from "@platform";
 
 const MENU_MIN_WIDTH = 120;
@@ -21,7 +21,7 @@ export const useMenuPosition = ({
     maxHeight: customMaxHeight,
 }: IUseMenuPositionProps) => {
     const padding = 0;
-    const { window: { width: windowWidth, height: windowHeight }, isTablet, isMobile, ...rest } = useBreakpoints();
+    const { window: { width: windowWidth, height: windowHeight }, isTablet, isMobile, ...rest } = useDimensions();
     const fullScreen = !!(isMobile && fullScreenOnMobile || isTablet && fullScreenOnTablet);
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));

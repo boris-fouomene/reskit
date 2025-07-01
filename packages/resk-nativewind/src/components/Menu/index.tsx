@@ -213,8 +213,12 @@ export function Menu<Context = unknown>({
                 {anchor}
             </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} animationDuration={animationDuration} withBackdrop={renderedAsBottomSheet} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), backdropClassName, "menu-portal")}>
+        {<Portal visible={isVisible} animationDuration={animationDuration} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), backdropClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
+                {renderedAsBottomSheet ? <Div
+                    className={cn(classes.absoluteFill, "bg-transparent")}
+                    onPress={onDismiss}
+                /> : null}
                 <View
                     testID={testID}
                     {...props}

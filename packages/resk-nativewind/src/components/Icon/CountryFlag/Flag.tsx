@@ -8,7 +8,7 @@ import { isValidElement } from 'react';
 import { hasTouchHandler } from '@utils/touchHandler';
 import { cn } from '@utils/cn';
 import { Text } from '@html/Text';
-import { useHydrationStatus } from '@utils/useHydrated';
+import { useHydrationStatus } from '@utils/useHydrationStatus';
 import { canRenderEmoji, createEmoji } from './utils';
 import { ICountryFlagProps } from './types';
 

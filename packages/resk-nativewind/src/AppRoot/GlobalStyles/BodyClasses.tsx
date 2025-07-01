@@ -1,11 +1,11 @@
 "use client";
 import { addClassName, isDOMElement, removeClassName } from "@resk/core/utils";
-import { useBreakpoints } from "@utils/breakpoints";
+import { useDimensions } from "@utils/dimensions";
 import { useEffect } from "react";
 import Platform from "@resk/core/platform";
 
 export function BodyClasses() {
-    const { isMobile, isTablet, isDesktop } = useBreakpoints();
+    const { isMobile, isTablet, isDesktop } = useDimensions({ debounceTimeout: 0 });
     useEffect(() => {
         if (typeof document !== 'undefined' && document && isDOMElement(document.body) && typeof window !== "undefined" && window) {
             const body = document.body;

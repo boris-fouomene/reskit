@@ -1,11 +1,11 @@
 "use client";
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
-import { useEffect, useState, useRef, useMemo, RefObject, Fragment } from 'react';
+import { useEffect, useState, useRef, useMemo, RefObject, Fragment, useImperativeHandle } from 'react';
 import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, StyleSheet, TouchableOpacity } from 'react-native';
 import { IMenuAnchorMeasurements, IMenuContext, IMenuProps, IMenuState } from './types';
 import isValidElement from '@utils/isValidElement';
-import { defaultStr } from '@resk/core';
+import { defaultStr, i18n } from '@resk/core';
 import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
 import { isNumber } from "@resk/core/utils";
@@ -19,6 +19,9 @@ import bottomSheetVariant from '@variants/bottomSheet';
 import { Div } from '@html/Div';
 import { classes } from '@variants/classes';
 import allVariants from '@variants/all';
+import { Text } from '@html/Text';
+import { Icon } from '@components/Icon';
+import { Divider } from '@components/Divider';
 
 export function Menu<Context = unknown>({
     onClose,
@@ -53,6 +56,7 @@ export function Menu<Context = unknown>({
     onRequestOpen,
     disabled,
     contentContainerClassName,
+    ref,
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -173,6 +177,7 @@ export function Menu<Context = unknown>({
     const { maxHeight: _maxMenuHeight } = Object.assign({}, menuStyle);
     const maxMenuHeight = !renderedAsBottomSheet && isNumber(_maxMenuHeight) && _maxMenuHeight > 0 ? _maxMenuHeight : undefined;
     const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { maxHeight: maxMenuHeight, measureAnchor, renderedAsBottomSheet, windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
+    useImperativeHandle(ref, () => context as any);
     let anchor = null;
     if (typeof customAnchor === 'function') {
         const a = customAnchor(context);
@@ -227,6 +232,7 @@ export function Menu<Context = unknown>({
                 <View
                     testID={testID}
                     {...props}
+                    ref={ref}
                     className={cn("resk-menu absolute", renderedAsBottomSheet ? computedBottomSheetVariant.container() : computedVariant.container(), className)}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
@@ -238,6 +244,22 @@ export function Menu<Context = unknown>({
                 >
                     <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.contentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
+                            {renderedAsBottomSheet ? <Div className="self-start w-full">
+                                <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[10px]">
+                                    <Div testID={testID + "-bottom-sheet-title-container"} className="flex-wrap px-[10px]" >
+                                        <Text testID={testID + "-bottom-sheet-title"} variant={{ weight: "bold" }}>{bottomSheetTitle}</Text>
+                                    </Div>
+                                    <Icon
+                                        iconName={'close' as any}
+                                        title={i18n.t('components.menu.close')}
+                                        size={30}
+                                        onPress={() => {
+                                            close();
+                                        }}
+                                    />
+                                </Div>
+                                {bottomSheetTitle && bottomSheetTitleDivider !== false ? <Divider testID={testID + "-divider"} className="w-full" /> : null}
+                            </Div> : null}
                             {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                             {child}
                         </Wrapper>

@@ -36,8 +36,11 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         };
     }
     private menuContext?: IMenuContext;
-    getMenu(): IMenuContext<any>["menu"] | undefined {
-        return this.menuContext?.menu;
+    getMenuRef(value: IMenuContext<any>) {
+        this.menuContext = value;
+    }
+    getMenuContext(): IMenuContext<any> | undefined {
+        return this.menuContext;
     }
     getHashKey(value: ValueType): string {
         const { getHashKey } = this.props;
@@ -311,13 +314,13 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
     getTestID(): string {
         return defaultStr(this.props.testID, "resk-dropdown");
     }
-    get Item() {
-        return DropdownItem;
-    }
+    renderItem<ItemType, ValueType>({ item, index }: { item: IDropdownPreparedItem<ItemType, ValueType>, index: number }) {
+        return <DropdownItem {...item} index={index} context={this} />;
+    };
 }
 
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
-    let { anchorContainerClassName, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
+    let { anchorContainerClassName, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = context.props;
     const { visible } = context.state;
     const isLoading = !!props.isLoading;
     testID = context.getTestID();
@@ -396,7 +399,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             ];
         }
         return actions;
-    }, [dropdownActions, multiple, context?.isOpen(), context, anchorSelectedText]);
+    }, [dropdownActions, multiple, context.isOpen(), context, anchorSelectedText]);
     context.dropdownActions = actions as any;
     const loadingContent = isLoading ? <ProgressBar indeterminate testID={testID + "dropdown-progressbar"} /> : null;
     const anchorProps: ITextInputProps = {
@@ -414,58 +417,88 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     const maxDropdownHeight = useMemo(() => {
         return isNumber(maxHeight) && maxHeight > 0 ? maxHeight : Math.max(screenHeight * 0.5, 300);
     }, [maxHeight, screenHeight]);
-    return <DropdownContext.Provider value={context}>
-        <Menu
-            minWidth={180}
+
+    const filteredItems = context.state?.filteredItems
+    const searchText = defaultStr(context.state?.searchText);
+    const preparedItems = context.getPreparedItems()
+    const canRenderSeach = !!!(context.props?.showSearch === false || context.props?.showSearch !== true && preparedItems?.length <= 5)
+    const searchProps = Object.assign({}, searchInputProps, { error: error || searchInputProps?.error });
+
+    const search = canRenderSeach ?
+        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full px-[7px]")}>
+            <TextInput
+                testID={`${testID}-dropdown-search`}
+                autoFocus={visible && !Platform.isTouchDevice()}
+                affix={false}
+                debounceTimeout={preparedItems?.length > 500 ? 1500 : preparedItems?.length > 200 ? 1000 : 0}
+                {...searchProps}
+                containerClassName={(cn("w-full", props.containerClassName))}
+                variant={{ borderWidth: 1, borderColor: "surface", borderStyle: "solid", rounded: "10px", ...props.variant }}
+                defaultValue={searchText}
+                onChange={({ value }) => {
+                    context.onSearch?.({ value })
+                }}
+                placeholder={i18n.t("components.dropdown.searchPlaceholder", { count: filteredItems?.length })}
+                right={!actions?.length ? null : (
+                    <Menu
+                        items={actions as any}
+                        testID={`${testID}-dropdown-menu-actions`}
+                        anchor={<FontIcon
+                            name={FONT_ICONS.MORE as never}
+                            size={24}
+                        />}
+                    />
+                )
+                }
+            />
+        </Div> : null;
+    return <Menu
+        minWidth={180}
+        disabled={disabled}
+        maxHeight={maxDropdownHeight}
+        bottomSheetTitle={context.props?.label}
+        bottomSheetTitleDivider={!canRenderSeach}
+        testID={testID + "-menu"}
+        renderAsBottomSheetInFullScreen
+        visible={visible}
+        withScrollView={false}
+        onRequestClose={() => context.close()}
+        sameWidth
+        {...Object.assign({}, menuProps)}
+        ref={context.getMenuRef.bind(context)}
+        anchor={<Div
             disabled={disabled}
-            maxHeight={maxDropdownHeight}
-            bottomSheetTitle={context?.props?.label}
-            bottomSheetTitleDivider={!canRenderSearch(context)}
-            testID={testID + "-menu"}
-            renderAsBottomSheetInFullScreen
-            visible={visible}
-            withScrollView={false}
-            onRequestClose={() => context?.close()}
-            sameWidth
-            {...Object.assign({}, menuProps)}
-            anchor={<Div
-                disabled={disabled}
-                testID={`${testID}-dropdown-anchor-container`}
-                className={cn(anchorContainerClassName)}
-            >
-                {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdown: context })
-                    :
-                    <TextInput
-                        {...anchorProps}
-                    />}
-                {loadingContent}
-            </Div>}
+            testID={`${testID}-dropdown-anchor-container`}
+            className={cn(anchorContainerClassName)}
         >
-            <DropdownContext.Provider value={context}>
-                <DropdownMenu<ItemType, ValueType> maxHeight={maxDropdownHeight} />
-            </DropdownContext.Provider>
-        </Menu>
-    </DropdownContext.Provider>;
-}
-const canRenderSearch = (context: IDropdownContext) => {
-    const preparedItems = context?.getPreparedItems() || [];
-    return !!!(context?.props?.showSearch === false || context?.props?.showSearch !== true && preparedItems?.length <= 5);
+            {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdown: context })
+                :
+                <TextInput
+                    {...anchorProps}
+                />}
+            {loadingContent}
+        </Div>}
+    >
+        <DropdownMenu
+            maxHeight={maxDropdownHeight}
+            context={context}
+            searchInput={search}
+        />
+    </Menu>
 }
 
-function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight }: { maxHeight: number }) {
-    const context = useDropdown();
+function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, context, searchInput }: { maxHeight: number, searchInput: ReactNode, context: IDropdownContext<ItemType, ValueType> }) {
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
     const listProps = Object.assign({}, context?.props?.listProps);
     const testID = context?.getTestID();
     const menuContext = useMenu();
-    (context as any).menuContext = menuContext;
     const { menu } = Object.assign({}, menuContext);
     const menuPosition = menu?.position;
     const isTopPosition = menuPosition?.computedPlacement === "top";
     const fullScreen = !!menu?.fullScreen;
     const canReverse = isTopPosition && !fullScreen;
-    const canRenderDropdownSearch = canRenderSearch(context);
-    const search = canRenderDropdownSearch ? <DropdownSearch /> : null;
+
+
     const maxMenuHeight = isNumber(menu?.maxHeight) && menu?.maxHeight > (Math.min(menu.maxHeight, maxHeight)) ? menu.maxHeight : maxHeight;
     return <Div
         disabled={context?.props?.disabled}
@@ -474,7 +507,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight }: { maxHeigh
         className={cn("w-full max-h-full relative flex flex-col", canReverse ? "pt-[10px]" : "pb-[10px]")}
         style={fullScreen ? undefined : { maxHeight: maxMenuHeight }}
     >
-        {canReverse ? null : search}
+        {canReverse ? null : searchInput}
         <FlatList<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
             scrollEnabled
@@ -483,19 +516,15 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight }: { maxHeigh
             inverted={canReverse}
             data={context?.state?.filteredItems}
             keyExtractor={({ hashKey }) => hashKey}
-            renderItem={renderItem}
+            renderItem={context.renderItem.bind(context)}
         />
-        {canReverse ? search : null}
+        {canReverse ? searchInput : null}
     </Div>;
 }
-function renderItem<ItemType, ValueType>({ item, index }: { item: IDropdownPreparedItem<ItemType, ValueType>, index: number }) {
-    return <DropdownItem {...item} index={index} />;
-};
 
-const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) => {
-    const { label, hashKey, labelText } = preparedItem;
+const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number, context: IDropdownContext }) => {
+    const { label, hashKey, labelText, context } = preparedItem;
     const forceRender = useForceRender();
-    const context = useDropdown();
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
     const itemsByHashKey = context.itemsByHashKey;
     const labelRef = useRef<Text>(null);
@@ -514,7 +543,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
         }
     }, [label, labelText, itemsByHashKey]);
     useEffect(() => {
-        if (typeof context?.on !== "function") {
+        if (typeof context.on !== "function") {
             return;
         }
         const bindedOn = context.on("toggleItem", (options: any) => {
@@ -541,7 +570,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
         <Tooltip
             title={label}
             onPress={() => {
-                context?.toggleItem(preparedItem);
+                context.toggleItem(preparedItem);
             }}
             className={cn("py-[10px] self-start grow overflow-hidden w-full justify-center", itemContainerClassName)}
             testID={testID + "-item-container-" + hashKey}
@@ -555,57 +584,6 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
 }
 
 DropdownItem.displayName = "DropdownItem";
-
-const DropdownSearch = ({ canReverse }: { canReverse?: boolean }) => {
-    const context = useDropdown();
-    const filteredItems = context?.state?.filteredItems
-    const searchText = defaultStr(context?.state?.searchText);
-    const testID = context?.getTestID();
-    const preparedItems = context?.getPreparedItems()
-    const { showSearch, error, searchInputProps } = Object.assign({}, context.props);
-    const props = Object.assign({}, searchInputProps, { error: error || searchInputProps?.error });
-    const visible = context?.isOpen();
-    const actions: IDropdownAction[] = Array.isArray(context.dropdownActions) ? context.dropdownActions : [];
-    if (showSearch === false || showSearch !== true && preparedItems?.length <= 5) {
-        return null;
-    }
-    return (
-        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full px-[7px]")}>
-            <TextInput
-                testID={`${testID}-dropdown-search`}
-                autoFocus={visible && !Platform.isTouchDevice()}
-                affix={false}
-                debounceTimeout={preparedItems?.length > 500 ? 1500 : preparedItems?.length > 200 ? 1000 : 0}
-                {...props}
-                containerClassName={(cn("w-full", props.containerClassName))}
-                defaultValue={searchText}
-                onChange={({ value }) => {
-                    context.onSearch?.({ value })
-                }}
-                placeholder={i18n.t("components.dropdown.searchPlaceholder", { count: filteredItems?.length })}
-                right={!actions?.length ? null : (
-                    <Menu
-                        items={actions}
-                        testID={`${testID}-dropdown-menu-actions`}
-                        anchor={<FontIcon
-                            name={FONT_ICONS.MORE as never}
-                            size={24}
-                        />}
-                    />
-                )
-                }
-            />
-            {!canReverse ? <Divider testID={`${testID}-divider`} className="w-100 overflow-hidden mt-[5px]" /> : null}
-        </Div>
-    );
-};
-
-const DropdownContext = createContext<IDropdownContext<any, any>>({} as IDropdownContext<any, any>);
-
-export function useDropdown<ItemType = any, ValueType = any>(): IDropdownContext<ItemType, ValueType> {
-    const context = useContext(DropdownContext);
-    return context || {} as IDropdownContext<ItemType, ValueType>;
-};
 
 
 

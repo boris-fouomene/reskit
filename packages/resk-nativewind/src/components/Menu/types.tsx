@@ -1,7 +1,7 @@
 
 import { IClassName, IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
-import { ViewProps } from "react-native";
+import { View, ViewProps } from "react-native";
 import { IVariantPropsMenu } from "@variants/menu";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IVariantPropsBottomSheet } from "@variants/bottomSheet";
@@ -276,10 +276,12 @@ export interface IMenuState {
     visible: boolean
 }
 
-export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children" | "style" | "className">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
+export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children" | "style" | "className" | "ref">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
 
     /** Optional callback that is invoked when the menu opens. */
     onOpen?: () => void;
+
+    ref?: React.Ref<View & IMenuContext<Context>>;
 
     /** Required callback that is invoked when the menu closes. */
     onClose?: () => void;

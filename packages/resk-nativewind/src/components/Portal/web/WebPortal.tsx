@@ -1,6 +1,6 @@
 "use client";
 import { defaultStr, getMaxZindex } from '@resk/core/utils';
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@utils/cn';
 import { styles } from '../utils';
@@ -19,6 +19,19 @@ export function Portal({ children, onAccessibilityEscape, autoMountChildren, sty
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const target = `#${targetId}`;
+    useEffect(() => {
+        return () => {
+            if (typeof document === "undefined" || !document || !document?.body) return;
+            const element = document.querySelector(target) as HTMLElement;
+            if (element) {
+                try {
+                    element.remove();
+                } catch (e) {
+                    console.error(e, " removing portal element with id ", target);
+                }
+            }
+        }
+    }, [target]);
     const { shouldRender, ...rest } = useAnimatedVisibility({ visible: visible || !!autoMountChildren, duration: animationDuration });
     useAccessibilityEscape(target, onAccessibilityEscape, shouldRender);
     if (!shouldRender || typeof document === "undefined" || !document || !document?.body) return null;

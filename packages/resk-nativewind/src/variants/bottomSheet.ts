@@ -2,12 +2,13 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsFactory } from "./variantsFactory";
 import { VariantsGeneratedColors } from "./colors/generated";
 import { classes } from "./classes";
+import { transitionEasing } from "./variantsFactory/transitions";
 
 const bottomSheet = tv({
   slots: {
     container: "relative w-full shadow-xl px-2",
     contentContainer: "w-full h-full",
-    portal: "justify-end transform translate-y-full transition duration-300 ease-in-out",
+    portal: "flex flex-col flex-1 justify-end transform translate-y-full transition",
   },
   variants: {
     withBackdrop: {
@@ -20,7 +21,7 @@ const bottomSheet = tv({
     },
     visible: {
       true: {
-        portal: "translate-y-0 flex flex-col flex-1",
+        portal: "translate-y-0",
       },
       false: {
         portal: "tranlate-y-full",
@@ -30,6 +31,12 @@ const bottomSheet = tv({
       return {
         container: value,
       };
+    }),
+    ...VariantsFactory.createTransitionsVariants<{ portal: string }>((value) => {
+      return { portal: value };
+    }),
+    transitionEasing: VariantsFactory.createTransitionEasing<{ portal: string }>((value) => {
+      return { portal: value };
     }),
     ...VariantsFactory.createAll<{ container: string }>((value) => {
       return {
@@ -42,12 +49,16 @@ const bottomSheet = tv({
     roundedTop: "10px",
     minHeight: "40%",
     maxHeight: "70%",
-    easing: "ease-in-out",
     withBackdrop: true,
+    transitionDuration: 300,
+    transitionEasing: "ease-in-out",
   },
   compoundVariants: [],
 });
 
+const v = VariantsFactory.createTransitionsVariants<{ portal: string }>((value) => {
+  return { portal: value };
+});
 export default bottomSheet;
 
 export type IVariantPropsBottomSheet = VariantProps<typeof bottomSheet>;

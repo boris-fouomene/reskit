@@ -4,7 +4,7 @@ import { VariantsFactory } from "./variantsFactory";
 
 const menu = tv({
     slots: {
-        container: "duration-300 ease-out transition-opacity",
+        container: "transition-opacity transform",
         anchorContainer: "",
         portal: "",
         contentContainer: "",
@@ -14,14 +14,14 @@ const menu = tv({
     },
     variants: {
         animation: {
-            scale: {},
+            scale: {}
         },
         visible: {
             true: {
-                container: "animate-fade-in",
+                container: "opacity-100",
             },
             false: {
-                container: "animate-fade-out",
+                container: "opacity-0",
             }
         },
         background: VariantsFactory.create<typeof VariantsGeneratedColors.surface, { container: string }>(VariantsGeneratedColors.surface, (value) => {
@@ -33,29 +33,25 @@ const menu = tv({
             return {
                 container: value,
             }
-        })
+        }),
+        ...VariantsFactory.createTransitionsVariants<{ container: string }>((value) => {
+            return { container: value };
+        }),
+        transitionEasing: VariantsFactory.createTransitionEasing<{ container: string }>((value) => {
+            return { container: value };
+        }),
     },
     compoundVariants: [
-        {
-            animation: "scale",
-            visible: false,
-            class: {
-                container: "animate-scale-out",
-            }
-        },
-        {
-            animation: "scale",
-            visible: true,
-            class: {
-                container: "animate-scale-in",
-            }
-        }
+        { animation: "scale", visible: false, class: { container: "scale-75 opacity-0" } },
+        { animation: "scale", visible: true, class: { container: "scale-100 opacity-100" } },
     ],
     defaultVariants: {
         background: "surface",
         paddingBottom: "4",
         shadow: "md",
         shadowColor: "surface",
+        transitionDuration: 300,
+        transitionEasing: "ease-in-out",
     }
 });
 

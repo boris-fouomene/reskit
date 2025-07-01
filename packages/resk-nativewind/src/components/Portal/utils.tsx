@@ -1,7 +1,7 @@
 import { Platform, ViewStyle, StyleSheet } from "react-native";
 
 export const classes = {
-    hidden: "invisible opacity-0 z-0",
+    hidden: "opacity-0 z-0 pointer-events-none",
 }
 export const styles = {
     absoluteFill: {

@@ -62,6 +62,7 @@ export default function TextInput({
     const isHydrated = useHydrationStatus();
     const isLabelEmbeded = !!labelEmbeded;
     const [isFocused, setIsFocused] = useState(false);
+    type = defaultStr(type, "text") as ITextInputType;
     const { isPhone, isDateOrTime, typeString } = useMemo(() => {
         const t = String(type).toLowerCase();
         return {

@@ -320,12 +320,22 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     /***
         The callback function that is called when the menu is dismissed.
         This is considered when the menu is controlled externally by providing the visible prop.
+        @remarks
+        This function is called when the menu is dismissed, either by clicking outside the menu or by pressing the escape key.
+        It is used to update the visible state of the menu.
+        This is useful when the menu is controlled externally by providing the visible prop.
+        If the menu is not controlled externally, this function is not called.
     */
-    onDismiss?: () => void;
+    onRequestClose?: () => void;
 
     /***
         The callback function that is called when the menu is opened.
         This is considered when the menu is controlled externally by providing the visible prop.
+        @remarks
+        This function is called when the menu is opened, either by clicking on the anchor element or by pressing the menu button.
+        It is used to update the visible state of the menu.
+        This is useful when the menu is controlled externally by providing the visible prop.
+        If the menu is not controlled externally, this function is not called.
     */
     onRequestOpen?: (menuState: IMenuState) => void;
 

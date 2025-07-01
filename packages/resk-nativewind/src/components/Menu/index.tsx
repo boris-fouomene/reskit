@@ -34,7 +34,7 @@ export function Menu<Context = unknown>({
     minWidth,
     preferedPositionAxis,
     dismissable,
-    onDismiss,
+    onRequestClose,
     renderAsBottomSheetInFullScreen,
     bottomSheetTitle,
     bottomSheetTitleDivider,
@@ -109,8 +109,8 @@ export function Menu<Context = unknown>({
         };
         if (isControlled) {
             (openOrCloseCallbackRef as any).current = cb;
-            if (typeof onDismiss === "function") {
-                onDismiss();
+            if (typeof onRequestClose === "function") {
+                onRequestClose();
             }
             return;
         }

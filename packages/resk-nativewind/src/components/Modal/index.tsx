@@ -10,7 +10,7 @@ import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
 import modalVariants, { IVariantPropsModal } from "@variants/modal";
 
-export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable: customDismissable, onDismiss, ...props }: IModalProps) => {
+export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable: customDismissable, onRequestClose, ...props }: IModalProps) => {
   const children = useMemo(() => {
     return props.children;
   }, [props.children]);
@@ -18,8 +18,8 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
   testID = defaultStr(testID, "resk-modal");
   const modalVariant = modalVariants(variant);
   const handleDismiss = (e?: GestureResponderEvent | KeyboardEvent): any => {
-    if (typeof onDismiss == "function") {
-      onDismiss(e);
+    if (typeof onRequestClose == "function") {
+      onRequestClose(e);
     }
     return true;
   }
@@ -62,7 +62,7 @@ export interface IModalProps extends IHtmlDivProps {
    * @param event 
    * @returns 
    */
-  onDismiss?: (event?: GestureResponderEvent | KeyboardEvent) => any;
+  onRequestClose?: (event?: GestureResponderEvent | KeyboardEvent) => any;
 
   /***
    * When set to true, pressing the backdrop will close the modal. Defaults to true unless specified otherwise.

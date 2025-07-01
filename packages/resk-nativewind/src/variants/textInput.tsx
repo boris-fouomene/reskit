@@ -89,7 +89,6 @@ const textInput = tv({
         focusedColor: "primary",
         focusedBorderColor: "primary",
         errorColor: "error",
-        marginY: "10px",
     },
     compoundVariants: [
         //focused border color

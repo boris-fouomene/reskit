@@ -2,6 +2,8 @@
 import { isNumber } from '@resk/core/utils';
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import useStateCallback from './stateCallback';
+import { Platform } from '..';
+import { isNextJs } from '@platform/isNext';
 
 /**
  * A React hook that manages component mounting and unmounting with delayed unmount support.
@@ -84,7 +86,7 @@ import useStateCallback from './stateCallback';
 export function useAnimatedVisibility({ visible, duration = 0 }: { visible?: boolean; duration?: number }): IUseAnimatedVisibilityResult {
     visible = !!visible;
     duration = isNumber(duration) && duration > 0 ? duration : 0;
-    const [shouldRender, setShouldRender] = useStateCallback(visible);
+    const [shouldRender, setShouldRender] = useStateCallback(visible && !isNextJs());
     const [isAnimating, setIsAnimating] = useStateCallback(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     // Clear any existing timeout
@@ -119,6 +121,9 @@ export function useAnimatedVisibility({ visible, duration = 0 }: { visible?: boo
 
     // Cleanup on unmount
     useEffect(() => {
+        if (visible && !shouldRender) {
+            setShouldRender(true);
+        }
         return cleanTimeoutRef;
     }, []);
     return { shouldRender, isAnimating };

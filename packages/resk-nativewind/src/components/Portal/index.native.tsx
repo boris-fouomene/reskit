@@ -149,8 +149,8 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     );
 };
 
-function RenderedPortal({ children, className, withBackdrop, animationDuration, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
-    const { shouldRender, ...rest } = useAnimatedVisibility({ visible, duration: animationDuration });
+function RenderedPortal({ children, autoMountChildren, className, withBackdrop, animationDuration, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
+    const { shouldRender, ...rest } = useAnimatedVisibility({ visible: visible || !!autoMountChildren, duration: animationDuration });
     if (!shouldRender) return null;
     absoluteFill = withBackdrop || absoluteFill;
     const absoluteFillStyle = absoluteFill ? styles.absoluteFill : undefined;
@@ -158,7 +158,7 @@ function RenderedPortal({ children, className, withBackdrop, animationDuration, 
     const flattenStyle = StyleSheet.flatten([{ zIndex } as ViewStyle, style] as any);
     const backdropClassName = cn(allVariants({ backdrop: withBackdrop }));
     return <PortalStateContext.Provider value={{ shouldRender, ...rest }}>
-        <Div {...props} onPress={!handleBackdrop ? onPress : undefined} className={cn(!handleBackdrop && backdropClassName, className)} style={Object.assign({}, absoluteFillStyle, flattenStyle)}>
+        <Div {...props} onPress={!handleBackdrop ? onPress : undefined} className={cn(!handleBackdrop && backdropClassName, className, allVariants({ hidden: !!!visible }))} style={Object.assign({}, absoluteFillStyle, flattenStyle)}>
             {handleBackdrop ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", backdropClassName)} style={absoluteFillStyle} onPress={onPress} /> : null}
             {children || null}
         </Div>

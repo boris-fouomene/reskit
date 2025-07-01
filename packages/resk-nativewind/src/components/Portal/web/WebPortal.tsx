@@ -15,11 +15,11 @@ import { useAccessibilityEscape } from '@html/accessibility';
 import { PortalStateContext } from '../context';
 
 
-export function Portal({ children, onAccessibilityEscape, style, className, animationDuration, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
+export function Portal({ children, onAccessibilityEscape, autoMountChildren, style, className, animationDuration, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const target = `#${targetId}`;
-    const { shouldRender, ...rest } = useAnimatedVisibility({ visible, duration: animationDuration });
+    const { shouldRender, ...rest } = useAnimatedVisibility({ visible: visible || !!autoMountChildren, duration: animationDuration });
     useAccessibilityEscape(target, onAccessibilityEscape, shouldRender);
     if (!shouldRender || typeof document === "undefined" || !document || !document?.body) return null;
     const hasOnPress = typeof onPress == "function";
@@ -32,7 +32,7 @@ export function Portal({ children, onAccessibilityEscape, style, className, anim
         id={targetId}
         testID={defaultStr(testID, "portal-" + targetId)}
         style={StyleSheet.flatten([absoluteFill && styles.absoluteFill, { zIndex: Math.max(getMaxZindex(), 1000) }, style])}
-        className={cn(absoluteFill && classes.absoluteFill, hasOnPress && "pointer-events-auto", "portal", allVariants({ backdrop: withBackdrop }), className)}
+        className={cn(absoluteFill && classes.absoluteFill, hasOnPress && "pointer-events-auto", "portal", allVariants({ backdrop: withBackdrop }), className, allVariants({ hidden: !!!visible }))}
     >
         <PortalStateContext.Provider value={{ shouldRender, ...rest }}>
             {children}

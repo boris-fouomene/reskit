@@ -74,6 +74,14 @@ export interface IPortalProps {
     style?: IHtmlDivProps["style"];
 
     onAccessibilityEscape?: IHtmlDivProps["onAccessibilityEscape"];
+
+    /**
+     * If true, the portal will mount its children immediately.
+     * This is useful for cases where the portal is used to render a modal or a dialog.
+     * In such cases, the portal should be mounted immediately to ensure proper rendering.
+     * @default false
+     */
+    autoMountChildren?: boolean;
 }
 
 export interface IPortalStateContext extends IUseAnimatedVisibilityResult { }

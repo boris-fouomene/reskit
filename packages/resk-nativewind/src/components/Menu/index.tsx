@@ -215,7 +215,7 @@ export function Menu<Context = unknown>({
         </MenuContext.Provider>
         {<Portal visible={isVisible} autoMountChildren animationDuration={animationDuration} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), backdropClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
-                {renderedAsBottomSheet ? <Div
+                {renderedAsBottomSheet && false ? <Div
                     className={cn(classes.absoluteFill, "bg-transparent")}
                     onPress={onDismiss}
                 /> : null}

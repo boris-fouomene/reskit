@@ -5,9 +5,9 @@ import { classes } from "./classes";
 
 const bottomSheet = tv({
   slots: {
-    container: "relative end-0 bottom-0 w-full shadow-xl px-2",
+    container: "absolute end-0 bottom-0 w-full shadow-xl px-2 transition-transform duration-300 ease-in-out",
     contentContainer: "w-full h-full",
-    portal: "flex flex-col justify-end transition-transform duration-300 ease-in-out",
+    portal: "",
   },
   variants: {
     withBackdrop: {
@@ -21,10 +21,10 @@ const bottomSheet = tv({
     visible: {
       true: {
         //portal: "animate-slide-in-bottom",
-        portal: "translate-y-0",
+        container: "translate-y-0",
       },
       false: {
-        portal: "tranlate-y-full",
+        container: "tranlate-y-full",
       },
     },
     background: VariantsFactory.create<typeof VariantsGeneratedColors.surface, { container: string }>(VariantsGeneratedColors.surface, (value) => {

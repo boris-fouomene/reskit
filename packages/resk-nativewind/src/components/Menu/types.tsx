@@ -196,6 +196,7 @@ export type IMenuContext<Context = unknown> = Context & {
         windowWidth: number;
         windowHeight: number;
         testID: string;
+        maxHeight?: number;
     }
 }
 

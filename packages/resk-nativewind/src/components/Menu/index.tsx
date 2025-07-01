@@ -158,7 +158,9 @@ export function Menu<Context = unknown>({
     };
     const renderedAsBottomSheet = fullScreen && renderAsBottomSheetInFullScreen !== false;
     const computedBottomSheetVariant = bottomSheetVariant(Object.assign({}, bVariant, { visible: isVisible }));
-    const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { renderedAsBottomSheet, windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
+    const { maxHeight: _maxMenuHeight } = Object.assign({}, menuStyle);
+    const maxMenuHeight = !renderedAsBottomSheet && isNumber(_maxMenuHeight) && _maxMenuHeight > 0 ? _maxMenuHeight : undefined;
+    const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { maxHeight: maxMenuHeight, renderedAsBottomSheet, windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
     let anchor = null;
     if (typeof customAnchor === 'function') {
         const a = customAnchor(context);
@@ -178,8 +180,8 @@ export function Menu<Context = unknown>({
         close();
         return true;
     });
-    const { maxHeight: maxMenuHeight } = Object.assign({}, menuStyle);
-    const maxHeightStyle = !renderedAsBottomSheet && isNumber(maxMenuHeight) && maxMenuHeight > 0 ? { maxHeight: maxMenuHeight } : undefined;
+
+    const maxHeightStyle = maxMenuHeight ? { maxHeight: maxMenuHeight } : undefined;
     const computedVariant = menuVariants(Object.assign({}, variant, { visible: isVisible }));
     const Wrapper = !withScrollView ? Fragment : ScrollView;
     const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", style: maxHeightStyle, className: cn("max-w-full", computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;

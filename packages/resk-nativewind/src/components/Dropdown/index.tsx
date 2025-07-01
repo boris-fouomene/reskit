@@ -35,7 +35,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             ...this.prepareState(props),
         };
     }
-    private menuContext?: IMenuContext<any>;
+    private menuContext?: IMenuContext;
     getMenu(): IMenuContext<any>["menu"] | undefined {
         return this.menuContext?.menu;
     }
@@ -111,7 +111,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         const { items: customItems } = this.props;
         (Array.isArray(customItems) ? customItems : []).map((item, index) => {
             const value = this.getItemValue({ item, index, isDropdown: true });
-            if (isEmpty(value) || !value) {
+            if (isEmpty(value) || typeof value === "undefined") {
                 //Logger.warn("invalid dropdown value ", value, " for item ", item, index, " with dropdown className ", this.props.className, " test id ", this.props.testID);
                 return;
             }
@@ -134,7 +134,26 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
                 preparedItems.push(preparedItem);
             }
         });
-        return { visible: !!this.state?.visible, itemsByHashKey, preparedItems, ...this.getSelectedValuesAndHashKey(props?.defaultValue, itemsByHashKey) }
+        return { visible: !!this.state?.visible, itemsByHashKey, preparedItems, ...this.applySearchFilter(this.state?.searchText, preparedItems), ...this.getSelectedValuesAndHashKey(props?.defaultValue, itemsByHashKey) }
+    }
+    applySearchFilter(searchText: string, preparedItems?: IDropdownPreparedItem<ItemType, ValueType>[]) {
+        searchText = defaultStr(searchText);
+        const _preparedItems: IDropdownPreparedItem<ItemType, ValueType>[] = Array.isArray(preparedItems) ? preparedItems : Array.isArray(this.state?.preparedItems) ? this.state.preparedItems : [];
+        if (!isNonNullString(searchText)) {
+            return { searchText: "", filteredItems: _preparedItems };
+        }
+        if (searchText.toLowerCase() == String(this.state?.searchText).toLowerCase()) {
+            return { searchText, filteredItems: _preparedItems };
+        }
+        const filterRegex = new RegExp(searchText.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&"), "gi");
+        return { searchText, filteredItems: _preparedItems.filter(({ labelText }) => !!labelText.match(filterRegex)) };
+    }
+    onSearch({ value }: { value: any }) {
+        const searchText = defaultStr(value);
+        const state = this.applySearchFilter(searchText);
+        if (state) {
+            this.setState(state as any);
+        }
     }
     getSelectedValuesAndHashKey(defaultValue?: ValueType | ValueType[], itemsByHashKey?: IDropdownPreparedItems<ItemType, ValueType>): { selectedValues: ValueType[], selectedItemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>> } {
         const { multiple } = this.props;
@@ -217,27 +236,29 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             cb();
         }
     }
-    onRequestOpen() {
-        this.setState({ visible: true }, () => {
-            this.trigger("open", this);
-            this.trigger("toggleVisibility", this);
-        });
+    open(cb?: Function) {
+        const { isLoading, readOnly, disabled } = this.props;
+        if (isLoading || readOnly || disabled || this.state.visible) return;
+        this?.menuContext?.menu?.measureAnchor(true).then(() => {
+            this.setState({ visible: true }, () => {
+                this.trigger("open", this);
+                this.trigger("toggleVisibility", this);
+                if (typeof cb == "function") {
+                    cb();
+                }
+            })
+        })
     }
-    onRequestClose() {
+    close(cb?: Function) {
         if (this.state.visible) {
             this.setState({ visible: false }, () => {
                 this.trigger("close", this);
                 this.trigger("toggleVisibility", this);
+                if (typeof cb === "function") {
+                    cb();
+                }
             });
         }
-    }
-    open(cb?: Function) {
-        const { isLoading, readOnly, disabled } = this.props;
-        if (isLoading || readOnly || disabled || this.state.visible) return;
-        this.getMenu()?.open(cb);
-    }
-    close(cb?: Function) {
-        this.getMenu()?.close(cb);
     }
     selectAll() {
         const itByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>> = {};
@@ -293,36 +314,14 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
     get Item() {
         return DropdownItem;
     }
-    get Search() {
-        return DropdownSearch;
-    }
 }
 
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
     let { anchorContainerClassName, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = Object.assign({}, context.props);
-    const { visible, preparedItems } = context.state;
+    const { visible } = context.state;
     const isLoading = !!props.isLoading;
-    const disabledStyle = isLoading && styles.disabled || null;
     testID = context.getTestID();
-    const [searchText, setSearchText] = useState("");
-    const onSearch = (text: string) => {
-        text = defaultStr(text);
-        if (text.toLowerCase() == searchText.toLowerCase()) {
-            return;
-        }
-        setSearchText(text);
-    }
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
-    const filteredItems = useMemo(() => {
-        if (!isNonNullString(searchText)) {
-            return preparedItems;
-        }
-        const filterRegex = new RegExp(searchText.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&"), "gi");
-        return preparedItems.filter(({ labelText }) => !!labelText.match(filterRegex));
-    }, [preparedItems, searchText]);
-    context.searchText = searchText;
-    context.onSearch = onSearch;
-    context.filteredItems = filteredItems;
     disabled = disabled || isLoading;
     const { selectedText: anchorSelectedText, selectedItems, selectedValues } = useMemo(() => {
         let selectedText = "";
@@ -418,6 +417,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     return <DropdownContext.Provider value={context}>
         <Menu
             minWidth={180}
+            disabled={disabled}
             maxHeight={maxDropdownHeight}
             bottomSheetTitle={context?.props?.label}
             bottomSheetTitleDivider={!canRenderSearch(context)}
@@ -425,11 +425,9 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             renderAsBottomSheetInFullScreen
             visible={visible}
             withScrollView={false}
+            onRequestClose={() => context?.close()}
             sameWidth
             {...Object.assign({}, menuProps)}
-            onRequestClose={context.onRequestClose.bind(context)}
-            onRequestOpen={context.onRequestOpen.bind(context)}
-
             anchor={<Div
                 disabled={disabled}
                 testID={`${testID}-dropdown-anchor-container`}
@@ -456,7 +454,6 @@ const canRenderSearch = (context: IDropdownContext) => {
 
 function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight }: { maxHeight: number }) {
     const context = useDropdown();
-    const filteredItems = Array.isArray(context?.filteredItems) ? context.filteredItems : [];
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
     const listProps = Object.assign({}, context?.props?.listProps);
     const testID = context?.getTestID();
@@ -474,7 +471,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight }: { maxHeigh
         disabled={context?.props?.disabled}
         readOnly={!isEditabled}
         testID={testID + "-dropdown-list-container"}
-        className={cn("w-full max-h-full relative flex flex-col", canReverse ? "pt-[10px" : "pb-[10px]")}
+        className={cn("w-full max-h-full relative flex flex-col", canReverse ? "pt-[10px]" : "pb-[10px]")}
         style={fullScreen ? undefined : { maxHeight: maxMenuHeight }}
     >
         {canReverse ? null : search}
@@ -484,7 +481,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight }: { maxHeigh
             style={{ maxHeight: "100%", width: "100%" }}
             {...listProps}
             inverted={canReverse}
-            data={filteredItems}
+            data={context?.state?.filteredItems}
             keyExtractor={({ hashKey }) => hashKey}
             renderItem={renderItem}
         />
@@ -502,7 +499,7 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
     const itemsByHashKey = context.itemsByHashKey;
     const labelRef = useRef<Text>(null);
-    const { multiple, selectedIconName } = context.props;
+    const { multiple, selectedIconName, itemClassName, itemContainerClassName } = context.props;
     const testID = context.getTestID();
     const isSelected = useMemo(() => {
         return context.isSelectedByHashKey(hashKey);
@@ -544,72 +541,27 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number }) =
         <Tooltip
             title={label}
             onPress={() => {
-                context.toggleItem(preparedItem);
+                context?.toggleItem(preparedItem);
             }}
-            style={[styles.itemContainer]}
+            className={cn("py-[10px] self-start grow overflow-hidden w-full justify-center", itemContainerClassName)}
             testID={testID + "-item-container-" + hashKey}
         >
-            <View style={styles.itemContent} testID={testID + "-item-content-" + hashKey}>
-                {isSelected ? <FontIcon style={[styles.selectedIcon]} name={(isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked") as never} size={20} variant={{ color: "primary" }} /> : null}
+            <Div className={cn("px-[10px] flex flex-row items-center justify-start text-left flex-nowrap", itemClassName)} testID={testID + "-item-content-" + hashKey}>
+                {isSelected ? <FontIcon className={"mr-[5px]"} name={(isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked") as never} size={20} variant={{ color: "primary" }} /> : null}
                 {<Text ref={labelRef as any} variant={{ color: isSelected ? "primary" : undefined }}>{label}</Text>}
-            </View>
+            </Div>
         </Tooltip>
     );
 }
 
 DropdownItem.displayName = "DropdownItem";
 
-const styles = StyleSheet.create({
-    appBar: {
-        marginBottom: 7,
-    },
-    selectedIcon: {
-        marginRight: 5,
-    },
-    itemContent: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        textAlign: "left",
-        width: "100%",
-        flexWrap: "nowrap",
-        paddingHorizontal: 10,
-    },
-    disabled: {
-        pointerEvents: "none",
-        opacity: 0.9,
-    },
-    loading: {},
-    itemContainer: {
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-        alignSelf: "flex-start",
-        flexGrow: 1,
-        overflow: "hidden",
-        width: "100%",
-        justifyContent: "center",
-    },
-    searchInput: {
-        width: "100%",
-    },
-    contentContainer: {
-        alignSelf: "flex-start",
-        width: "100%",
-    },
-    dropdownListTopPosition: {
-        flexDirection: "column-reverse",
-        paddingTop: 10,
-        paddingBottom: 10,
-    },
-});
 const DropdownSearch = ({ canReverse }: { canReverse?: boolean }) => {
     const context = useDropdown();
-    const filteredItems = Array.isArray(context.filteredItems) ? context.filteredItems : [];
-    const searchText = defaultStr(context.searchText);
+    const filteredItems = context?.state?.filteredItems
+    const searchText = defaultStr(context?.state?.searchText);
     const testID = context?.getTestID();
-    const onSearch = typeof context.onSearch == "function" ? context.onSearch : undefined;
-    const pItem = context?.getPreparedItems();
-    const preparedItems = Array.isArray(pItem) ? pItem : [];
+    const preparedItems = context?.getPreparedItems()
     const { showSearch, error, searchInputProps } = Object.assign({}, context.props);
     const props = Object.assign({}, searchInputProps, { error: error || searchInputProps?.error });
     const visible = context?.isOpen();
@@ -625,10 +577,12 @@ const DropdownSearch = ({ canReverse }: { canReverse?: boolean }) => {
                 affix={false}
                 debounceTimeout={preparedItems?.length > 500 ? 1500 : preparedItems?.length > 200 ? 1000 : 0}
                 {...props}
+                containerClassName={(cn("w-full", props.containerClassName))}
                 defaultValue={searchText}
-                onChangeText={onSearch}
-                style={[styles.searchInput, props.style]}
-                placeholder={i18n.t("components.dropdown.searchPlaceholder", { count: filteredItems.length })}
+                onChange={({ value }) => {
+                    context.onSearch?.({ value })
+                }}
+                placeholder={i18n.t("components.dropdown.searchPlaceholder", { count: filteredItems?.length })}
                 right={!actions?.length ? null : (
                     <Menu
                         items={actions}
@@ -645,8 +599,6 @@ const DropdownSearch = ({ canReverse }: { canReverse?: boolean }) => {
         </Div>
     );
 };
-
-const MIN_HEIGHT = 200;
 
 const DropdownContext = createContext<IDropdownContext<any, any>>({} as IDropdownContext<any, any>);
 
@@ -665,35 +617,6 @@ export function useDropdown<ItemType = any, ValueType = any>(): IDropdownContext
 
 
 export interface IDropdownContext<ItemType = any, ValueType = any> extends Dropdown<ItemType, ValueType> {
-    /***
-     * The filtered items. based on the search text
-     */
-    filteredItems?: IDropdownPreparedItem<ItemType, ValueType>[];
-
-    /**
-     * The items by hash key.
-     */
-    itemsByHashKey: IDropdownPreparedItems<ItemType, ValueType>;
-
-    /***
-     * The visibility of the dropdown.
-     */
-    visible: boolean;
-
-    /***
-     * The search text.
-     */
-    searchText?: string;
-
-    /***
-     * The onSearch callback function.
-     */
-    onSearch?: (text: string) => any;
-    /***
-     * The state of the dropdown.
-     */
-    state: IDropdownState<ItemType, ValueType>;
-
     /***
      * The dropdown actions.
      */
@@ -796,6 +719,16 @@ export interface IDropdownState<ItemType = any, ValueType = any> {
     visible: boolean;
     selectedItemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>>;
     preparedItems: IDropdownPreparedItem<ItemType, ValueType>[];
+
+    /***
+     * The search text.
+     */
+    searchText: string;
+
+    /***
+ * The filtered items. based on the search text
+ */
+    filteredItems?: IDropdownPreparedItem<ItemType, ValueType>[];
 };
 
 export interface IDropdownAction extends INavContext<{ dropdown: IDropdownContext }> { }
@@ -1005,6 +938,16 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
      * This allows for customization of the menu's appearance and behavior.
      */
     menuProps?: Omit<IMenuProps, "anchor">;
+
+    /***
+     * The class name for the Div that render each list item 
+     */
+    itemClassName?: IClassName;
+
+    /***
+     * The class name for the item container, The Div that wrap each list item
+     */
+    itemContainerClassName?: IClassName;
 
     /***
      * The props for the anchor component.

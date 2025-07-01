@@ -164,6 +164,16 @@ export interface IMenuCalculatedPosition {
 
 export type IMenuContext<Context = unknown> = Context & {
     menu: {
+        /**
+         * Method to measure the anchor element and calculate the position of the anchor relative to the window.
+         * This method is called when the menu is opened.
+         * It takes a boolean value indicating whether the anchorMeasurements should be updated or not.
+         * It returns a promise that resolves with the updated anchorMeasurements.
+         * It must be called before the menu is opened (When the menu is controlled externally by providing the visible prop).
+         * @param updateState {boolean} Whether to update the anchorMeasurements or not.
+         * @returns 
+         */
+        measureAnchor: (updateState: boolean) => Promise<IMenuAnchorMeasurements>;
         /** Indicates whether the menu is currently visible */
         isVisible?: boolean;
         /** Function to check if the menu is open */
@@ -326,7 +336,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
         This is useful when the menu is controlled externally by providing the visible prop.
         If the menu is not controlled externally, this function is not called.
     */
-    onRequestClose?: () => void;
+    onRequestClose?: (menuState: IMenuState) => void;
 
     /***
         The callback function that is called when the menu is opened.

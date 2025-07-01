@@ -3,7 +3,7 @@ import MenuItems from './Items';
 import { Portal } from '@components/Portal';
 import { useEffect, useState, useRef, useMemo, RefObject, Fragment } from 'react';
 import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, StyleSheet, TouchableOpacity } from 'react-native';
-import { IMenuContext, IMenuProps } from './types';
+import { IMenuAnchorMeasurements, IMenuContext, IMenuProps, IMenuState } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core';
 import { MenuContext } from './context';
@@ -98,29 +98,7 @@ export function Menu<Context = unknown>({
         anchorMeasurements: state.anchorMeasurements,
         preferedPositionAxis,
     });
-    const closeMenuInternal = (callback?: Function) => {
-        const cb = () => {
-            if (typeof callback === "function") {
-                callback();
-            }
-            if (typeof onClose === "function") {
-                onClose();
-            }
-        };
-        if (isControlled) {
-            (openOrCloseCallbackRef as any).current = cb;
-            if (typeof onRequestClose === "function") {
-                onRequestClose();
-            }
-            return;
-        }
-        setState((prevState) => ({ ...prevState, visible: false }), cb);
-    };
-    useEffect(() => {
-        measureAnchor(anchorRef).then((anchorMeasurements) => {
-            setState(prevState => ({ ...prevState, anchorMeasurements }));
-        });
-    }, [windowWidth, windowHeight, anchorRef]);
+
     // Handle menu layout changes
     const onMenuLayout = (event: LayoutChangeEvent) => {
         const { width: mWidth, height } = event.nativeEvent.layout;
@@ -131,8 +109,27 @@ export function Menu<Context = unknown>({
         }
         setMenuLayout({ width, height, x: 0, y: 0 });
     }
+    const measureAnchor = (updateState: boolean = true) => {
+        return new Promise<IMenuAnchorMeasurements>((resolve) => {
+            return measureInWindow(anchorRef).then(({ x, y, ...rest }) => {
+                return { pageX: x, pageY: y, ...rest };
+            }).then((measures) => {
+                if (updateState) {
+                    setState((prevState) => ({ ...prevState, anchorMeasurements: measures }), () => {
+                        resolve(measures);
+                    });
+                } else {
+                    resolve(measures);
+                }
+            });
+        });
+    }
+
+    useEffect(() => {
+        measureAnchor();
+    }, [windowWidth, windowHeight, anchorRef]);
     const open = (callback?: Function) => {
-        measureAnchor(anchorRef).then((measures) => {
+        measureAnchor(false).then((measures) => {
             const cb = () => {
                 if (typeof callback === "function") {
                     callback();
@@ -154,13 +151,28 @@ export function Menu<Context = unknown>({
         });
     };
     const close = (callback?: Function) => {
-        closeMenuInternal(callback);
+        const cb = () => {
+            if (typeof callback === "function") {
+                callback();
+            }
+            if (typeof onClose === "function") {
+                onClose();
+            }
+        };
+        if (isControlled) {
+            (openOrCloseCallbackRef as any).current = cb;
+            if (typeof onRequestClose === "function") {
+                onRequestClose(state);
+            }
+            return;
+        }
+        setState((prevState) => ({ ...prevState, visible: false }), cb);
     };
     const renderedAsBottomSheet = fullScreen && renderAsBottomSheetInFullScreen !== false;
     const computedBottomSheetVariant = bottomSheetVariant(Object.assign({}, bVariant, { visible: isVisible }));
     const { maxHeight: _maxMenuHeight } = Object.assign({}, menuStyle);
     const maxMenuHeight = !renderedAsBottomSheet && isNumber(_maxMenuHeight) && _maxMenuHeight > 0 ? _maxMenuHeight : undefined;
-    const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { maxHeight: maxMenuHeight, renderedAsBottomSheet, windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
+    const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { maxHeight: maxMenuHeight, measureAnchor, renderedAsBottomSheet, windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
     let anchor = null;
     if (typeof customAnchor === 'function') {
         const a = customAnchor(context);
@@ -203,11 +215,7 @@ export function Menu<Context = unknown>({
                     close();
                 } : undefined}
                 onLayout={(event) => {
-                    measureAnchor(anchorRef).then((anchorMeasurements) => {
-                        setState(prevState => {
-                            return { ...prevState, anchorMeasurements }
-                        });
-                    });
+                    measureAnchor();
                 }}
                 {...anchorProps}
             >
@@ -241,9 +249,6 @@ export function Menu<Context = unknown>({
 };
 
 
-const measureAnchor = (anchorRef: RefObject<any>, minContentHeight?: number) => {
-    return measureInWindow(anchorRef).then((({ x, y, ...rest }) => ({ pageX: x, pageY: y, ...rest })));
-}
 
 export * from "./context";
 export * from "./types";

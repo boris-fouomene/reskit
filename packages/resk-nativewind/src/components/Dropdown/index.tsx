@@ -462,14 +462,14 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight }: { maxHeigh
         disabled={context?.props?.disabled}
         readOnly={!isEditabled}
         testID={testID + "-dropdown-list-container"}
-        className={cn("w-full max-h-full relative flex flex-col", canReverse ? "pt-[10px]" : "pb-[10px]")}
+        className={cn("w-full max-h-full relative flex flex-col")}
         style={fullScreen ? undefined : { maxHeight: maxMenuHeight }}
     >
         {canReverse ? null : search}
         <FlatList<IDropdownPreparedItem<ItemType, ValueType>>
             testID={testID + "-dropdown-list"}
             scrollEnabled
-            style={{ maxHeight: fullScreen ? "100%" : (maxMenuHeight - (search ? 50 : 0)) }}
+            style={{ maxHeight: "100%", width: "100%" }}
             {...listProps}
             inverted={canReverse}
             data={filteredItems}

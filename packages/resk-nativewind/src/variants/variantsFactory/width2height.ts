@@ -297,7 +297,7 @@ export const width2heightClasses = {
     "1000px": "h-[1000px]",
   },
   maxWidth: {
-    // Fixed widths - Pixel Values (0-10)
+    // Fixed Widths - Pixel Values (0-10)
     0: "max-w-0", // 0px
     px: "max-w-px", // 1px
     0.5: "max-w-0.5", // 2px
@@ -315,7 +315,7 @@ export const width2heightClasses = {
     9: "max-w-9", // 36px
     10: "max-w-10", // 40px
 
-    // Medium widths (44-96px)
+    // Medium Widths (44-96px)
     11: "max-w-11", // 44px
     12: "max-w-12", // 48px
     13: "max-w-13", // 52px
@@ -328,7 +328,7 @@ export const width2heightClasses = {
     20: "max-w-20", // 80px
     24: "max-w-24", // 96px
 
-    // Large widths (112-384px)
+    // Large Widths (112-384px)
     28: "max-w-28", // 112px
     32: "max-w-32", // 128px
     36: "max-w-36", // 144px
@@ -343,22 +343,22 @@ export const width2heightClasses = {
     80: "max-w-80", // 320px
     96: "max-w-96", // 384px
 
-    // Percentage-Based widths (Cross-platform compatible)
-    walf: "max-w-1/2", // 50%
-    twird: "max-w-1/3", // 33.333%
-    twoTwirds: "max-w-2/3", // 66.667%
+    // Percentage-Based Widths (Cross-platform compatible)
+    half: "max-w-1/2", // 50%
+    third: "max-w-1/3", // 33.333%
+    twoThirds: "max-w-2/3", // 66.667%
     quarter: "max-w-1/4", // 25%
-    twreeQuarters: "max-w-3/4", // 75%
-    fiftw: "max-w-1/5", // 20%
-    twoFiftws: "max-w-2/5", // 40%
-    twreeFiftws: "max-w-3/5", // 60%
-    fourFiftws: "max-w-4/5", // 80%
-    sixtw: "max-w-1/6", // 16.667%
-    fiveSixtws: "max-w-5/6", // 83.333%
+    threeQuarters: "max-w-3/4", // 75%
+    fifth: "max-w-1/5", // 20%
+    twoFifths: "max-w-2/5", // 40%
+    threeFifths: "max-w-3/5", // 60%
+    fourFifths: "max-w-4/5", // 80%
+    sixth: "max-w-1/6", // 16.667%
+    fiveSixths: "max-w-5/6", // 83.333%
 
-    // Full widths
+    // Full Widths
     full: "max-w-full", // 100%
-    screen: "max-w-screen", // 100vw (web) / screen width (native)
+    screen: "max-w-screen", // 100vh (web) / screen height (native)
 
     // Special Values (NativeWind 4 compatible)
     none: "max-w-none", // none
@@ -396,7 +396,7 @@ export const width2heightClasses = {
     "1000px": "max-w-[1000px]",
   },
   minWidth: {
-    // Fixed widths - Pixel Values (0-10)
+    // Fixed Widths - Pixel Values (0-10)
     0: "min-w-0", // 0px
     px: "min-w-px", // 1px
     0.5: "min-w-0.5", // 2px
@@ -414,7 +414,7 @@ export const width2heightClasses = {
     9: "min-w-9", // 36px
     10: "min-w-10", // 40px
 
-    // Medium widths (44-96px)
+    // Medium Widths (44-96px)
     11: "min-w-11", // 44px
     12: "min-w-12", // 48px
     13: "min-w-13", // 52px
@@ -427,7 +427,7 @@ export const width2heightClasses = {
     20: "min-w-20", // 80px
     24: "min-w-24", // 96px
 
-    // Large widths (112-384px)
+    // Large Widths (112-384px)
     28: "min-w-28", // 112px
     32: "min-w-32", // 128px
     36: "min-w-36", // 144px
@@ -442,22 +442,22 @@ export const width2heightClasses = {
     80: "min-w-80", // 320px
     96: "min-w-96", // 384px
 
-    // Percentage-Based widths (Cross-platform compatible)
-    walf: "min-w-1/2", // 50%
-    twird: "min-w-1/3", // 33.333%
-    twoTwirds: "min-w-2/3", // 66.667%
+    // Percentage-Based Widths (Cross-platform compatible)
+    half: "min-w-1/2", // 50%
+    third: "min-w-1/3", // 33.333%
+    twoThirds: "min-w-2/3", // 66.667%
     quarter: "min-w-1/4", // 25%
-    twreeQuarters: "min-w-3/4", // 75%
-    fiftw: "min-w-1/5", // 20%
-    twoFiftws: "min-w-2/5", // 40%
-    twreeFiftws: "min-w-3/5", // 60%
-    fourFiftws: "min-w-4/5", // 80%
-    sixtw: "min-w-1/6", // 16.667%
-    fiveSixtws: "min-w-5/6", // 83.333%
+    threeQuarters: "min-w-3/4", // 75%
+    fifth: "min-w-1/5", // 20%
+    twoFifths: "min-w-2/5", // 40%
+    threeFifths: "min-w-3/5", // 60%
+    fourFifths: "min-w-4/5", // 80%
+    sixth: "min-w-1/6", // 16.667%
+    fiveSixths: "min-w-5/6", // 83.333%
 
-    // Full widths
+    // Full Widths
     full: "min-w-full", // 100%
-    screen: "min-w-screen", // 100vw (web) / screen width (native)
+    screen: "min-w-screen", // 100vh (web) / screen height (native)
 
     // Special Values (NativeWind 4 compatible)
     none: "min-w-none", // none
@@ -495,7 +495,7 @@ export const width2heightClasses = {
     "1000px": "min-w-[1000px]",
   },
   width: {
-    // Fixed widths - Pixel Values (0-10)
+    // Fixed Widths - Pixel Values (0-10)
     0: "w-0", // 0px
     px: "w-px", // 1px
     0.5: "w-0.5", // 2px
@@ -513,7 +513,7 @@ export const width2heightClasses = {
     9: "w-9", // 36px
     10: "w-10", // 40px
 
-    // Medium widths (44-96px)
+    // Medium Widths (44-96px)
     11: "w-11", // 44px
     12: "w-12", // 48px
     13: "w-13", // 52px
@@ -526,7 +526,7 @@ export const width2heightClasses = {
     20: "w-20", // 80px
     24: "w-24", // 96px
 
-    // Large widths (112-384px)
+    // Large Widths (112-384px)
     28: "w-28", // 112px
     32: "w-32", // 128px
     36: "w-36", // 144px
@@ -541,22 +541,22 @@ export const width2heightClasses = {
     80: "w-80", // 320px
     96: "w-96", // 384px
 
-    // Percentage-Based widths (Cross-platform compatible)
-    walf: "w-1/2", // 50%
-    twird: "w-1/3", // 33.333%
-    twoTwirds: "w-2/3", // 66.667%
+    // Percentage-Based Widths (Cross-platform compatible)
+    half: "w-1/2", // 50%
+    third: "w-1/3", // 33.333%
+    twoThirds: "w-2/3", // 66.667%
     quarter: "w-1/4", // 25%
-    twreeQuarters: "w-3/4", // 75%
-    fiftw: "w-1/5", // 20%
-    twoFiftws: "w-2/5", // 40%
-    twreeFiftws: "w-3/5", // 60%
-    fourFiftws: "w-4/5", // 80%
-    sixtw: "w-1/6", // 16.667%
-    fiveSixtws: "w-5/6", // 83.333%
+    threeQuarters: "w-3/4", // 75%
+    fifth: "w-1/5", // 20%
+    twoFifths: "w-2/5", // 40%
+    threeFifths: "w-3/5", // 60%
+    fourFifths: "w-4/5", // 80%
+    sixth: "w-1/6", // 16.667%
+    fiveSixths: "w-5/6", // 83.333%
 
-    // Full widths
+    // Full Widths
     full: "w-full", // 100%
-    screen: "w-screen", // 100vw (web) / screen width (native)
+    screen: "w-screen", // 100vh (web) / screen height (native)
 
     // Special Values (NativeWind 4 compatible)
     none: "w-none", // none
@@ -566,7 +566,7 @@ export const width2heightClasses = {
     "10%": "w-[10%]",
     "20%": "w-[20%]",
     "30%": "w-[30%]",
-    "40%": "[40%]",
+    "40%": "w-[40%]",
     "60%": "w-[60%]",
     "70%": "w-[70%]",
     "80%": "w-[80%]",
@@ -592,5 +592,5 @@ export const width2heightClasses = {
     "900px": "w-[900px]",
     "950px": "w-[950px]",
     "1000px": "w-[1000px]",
-  }
+  },
 };

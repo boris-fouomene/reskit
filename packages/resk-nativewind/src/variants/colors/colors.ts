@@ -44,6 +44,7 @@ export class VariantsColorsFactory {
    * @param tailwindClassPrefix - The Tailwind class prefix to use (e.g., `"bg"`, `"text"`, `"border"`).
    * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
    * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
+     @param withHover2ActiveState - If `true`, appends `hover:active:bg-hover-active-color` to each class name to mark it as hover2active state.
    *   If not provided, the default builder returns a string combining the light and dark class names.
    * @param isForeground - (Optional) Specify if we are building a foreground color or not.
    *
@@ -82,10 +83,10 @@ export class VariantsColorsFactory {
    * @see {@link VariantsColorsFactory.buildBackgroundColors}
    * @see {@link VariantsColorsFactory.buildBorderColors}
    */
-  public static buildColors<TailwindClassPrefix extends string = any, ClassNameBuilderResult = IClassName>(tailwindClassPrefix: TailwindClassPrefix, withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<TailwindClassPrefix, ClassNameBuilderResult>, isForeground: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
+  public static buildColors<TailwindClassPrefix extends string = any, ClassNameBuilderResult = IClassName>(tailwindClassPrefix: TailwindClassPrefix, withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<TailwindClassPrefix, ClassNameBuilderResult>, isForeground: boolean = false, withHover2ActiveState: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
     const r = Object.create({}) as Record<IVariantsColors.ColorName, ClassNameBuilderResult>;
     const importantPrefix = withImportantAttribute ? "!" : "";
-    const colorBuilder: IVariantsColors.ClassNameBuilder<TailwindClassPrefix> = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightComputedColor, darkComputedColor }) => `${lightComputedColor} ${darkComputedColor}` as any;
+    const colorBuilder: IVariantsColors.ClassNameBuilder<TailwindClassPrefix> = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightComputedColor, darkComputedColor, activeDarkComputedColor, activeLightComputedColor, hoverDarkComputedColor, hoverLightComputedColor }) => `${lightComputedColor} ${darkComputedColor} ${withHover2ActiveState ? `${hoverLightComputedColor} ${hoverDarkComputedColor} ${activeLightComputedColor} ${activeDarkComputedColor}` : ""}` as any;
     Object.entries(VariantsColorsFactory.colors).map(([color, value]) => {
       const { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, hoverLightColor: _hoverLightColor, hoverDarkColor: _hoverDarkColor, hoverLightForeground: _hoverLightForeground, hoverDarkForeground: _hoverDarkForeground, activeLightColor: _activeLightColor, activeDarkColor: _activeDarkColor, activeLightForeground: _activeLightForeground, activeDarkForeground: _activeDarkForeground, ...rest } = Object.assign({}, value);
       const lightColor = defaultStr(isForeground ? _lightForeground : light);
@@ -110,7 +111,6 @@ export class VariantsColorsFactory {
         hoverDarkForeground,
         activeLightForeground,
         activeDarkForeground,
-
         isForeground: !!isForeground,
         lightColor,
         darkColor,
@@ -134,8 +134,8 @@ export class VariantsColorsFactory {
     return r;
   }
 
-  static buildTextForegroundColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"text", ClassNameBuilderResult>): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
-    return VariantsColorsFactory.buildColors<"text", ClassNameBuilderResult>("text", withImportantAttribute, colorClassNameBuilder, true);
+  static buildTextForegroundColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"text", ClassNameBuilderResult>, withHover2ActiveState: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
+    return VariantsColorsFactory.buildColors<"text", ClassNameBuilderResult>("text", withImportantAttribute, colorClassNameBuilder, true, withHover2ActiveState);
   }
   /**
    * Generates a record of Tailwind CSS class names for all registered text color variants.
@@ -147,7 +147,8 @@ export class VariantsColorsFactory {
    *
    * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
    * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
-   *   If not provided, the default builder returns a string combining the light and dark class names.
+       If not provided, the default builder returns a string combining the light and dark class names.
+    @param withHover2ActiveState - If `true`, appends `hover:active:bg-hover-active-color` to each class name to mark it as hover2active state.
    *
    * @returns A record mapping each registered color name to the generated text class name or object, as defined by the builder.
    *
@@ -172,8 +173,8 @@ export class VariantsColorsFactory {
    * @see {@link IVariantsColors.ClassNameBuilder}
    * @see {@link VariantsColorsFactory.buildColors}
    */
-  static buildTextColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"text", ClassNameBuilderResult>): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
-    return VariantsColorsFactory.buildColors<"text", ClassNameBuilderResult>("text", withImportantAttribute, colorClassNameBuilder);
+  static buildTextColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"text", ClassNameBuilderResult>, withHover2ActiveState: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
+    return VariantsColorsFactory.buildColors<"text", ClassNameBuilderResult>("text", withImportantAttribute, colorClassNameBuilder, withHover2ActiveState);
   }
   /**
    * Generates a record of Tailwind CSS class names for all registered background color variants.
@@ -186,6 +187,7 @@ export class VariantsColorsFactory {
    * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
    * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
    *   If not provided, the default builder returns a string combining the light and dark class names.
+     @param withHover2ActiveState - If `true`, appends `hover:active:bg-hover-active-color` to each class name to mark it as hover2active state.
    *
    * @returns A record mapping each registered color name to the generated background class name or object, as defined by the builder.
    *
@@ -210,8 +212,8 @@ export class VariantsColorsFactory {
    * @see {@link IVariantsColors.ClassNameBuilder}
    * @see {@link VariantsColorsFactory.buildColors}
    */
-  static buildBackgroundColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"bg", ClassNameBuilderResult>): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
-    return VariantsColorsFactory.buildColors<"bg", ClassNameBuilderResult>("bg", withImportantAttribute, colorClassNameBuilder);
+  static buildBackgroundColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"bg", ClassNameBuilderResult>, withHover2ActiveState: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
+    return VariantsColorsFactory.buildColors<"bg", ClassNameBuilderResult>("bg", withImportantAttribute, colorClassNameBuilder, withHover2ActiveState);
   }
 
   /**
@@ -225,7 +227,7 @@ export class VariantsColorsFactory {
    * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
    * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
    *   If not provided, the default builder returns a string combining the light and dark class names.
-   *
+   * @param withHover2ActiveState - If `true`, appends `hover:active:bg-hover-active-color` to each class name to mark it as hover2active state.
    * @returns A record mapping each registered color name to the generated border class name or object, as defined by the builder.
    *
    * @example
@@ -249,8 +251,8 @@ export class VariantsColorsFactory {
    * @see {@link IVariantsColors.ClassNameBuilder}
    * @see {@link VariantsColorsFactory.buildColors}
    */
-  static buildBorderColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"border", ClassNameBuilderResult>): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
-    return VariantsColorsFactory.buildColors<"border", ClassNameBuilderResult>("border", withImportantAttribute, colorClassNameBuilder);
+  static buildBorderColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"border", ClassNameBuilderResult>, withHover2ActiveState: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
+    return VariantsColorsFactory.buildColors<"border", ClassNameBuilderResult>("border", withImportantAttribute, colorClassNameBuilder, withHover2ActiveState);
   }
   /**
    * Generates a TypeScript interface definition string for the current color map.

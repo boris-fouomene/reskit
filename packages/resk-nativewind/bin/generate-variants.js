@@ -159,6 +159,9 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
       surface: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
         return cn(lightComputedColor, darkComputedColor, `text-${lightForeground} dark:text-${darkForeground}`);
       }),
+      badge: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground, activeDarkComputedColor, activeLightComputedColor, hoverDarkComputedColor, hoverLightComputedColor }) => {
+        return cn(lightComputedColor, darkComputedColor, `text-${lightForeground} dark:text-${darkForeground}`, activeDarkComputedColor, activeLightComputedColor, hoverDarkComputedColor, hoverLightComputedColor);
+      }),
       shadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
         return cn(`shadow-${lightColor}/20 dark:shadow-${darkColor}/30`);
       }),
@@ -245,6 +248,7 @@ export const VariantsColors = ${content}
         iconForeground : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
+        badge : Record<IName,string>;
         text : Record<IName,string>;
         textWithImportant : Record<IName,string>;
         textWithForegroundWithImportant : Record<IName2Foreground,string>;

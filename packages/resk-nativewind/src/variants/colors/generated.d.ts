@@ -9,6 +9,7 @@
         iconForeground : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
+        badge : Record<IName,string>;
         text : Record<IName,string>;
         textWithImportant : Record<IName,string>;
         textWithForegroundWithImportant : Record<IName2Foreground,string>;

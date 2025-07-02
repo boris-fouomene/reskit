@@ -206,6 +206,12 @@ export default function TextInput({
         }
     };
 
+    useEffect(() => {
+        if (editable && props.autoFocus && isHydrated && !isFocused) {
+            focus();
+        }
+    }, [props.autoFocus, editable, isHydrated, isFocused]);
+
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
     const isErrorVariant = !!error;

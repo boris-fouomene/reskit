@@ -136,6 +136,26 @@ const textInput = tv({
                 errorContentContainer: value,
             }
         }),
+        focusedShadow: VariantsFactory.createShadowVariants<ITextInputSlots>((value, colorName) => {
+            return {
+                focusedContentContainer: value,
+            }
+        }),
+        errorShadow: VariantsFactory.createShadowVariants<ITextInputSlots>((value, colorName) => {
+            return {
+                errorContentContainer: value,
+            }
+        }),
+        focusedShadowColor: VariantsFactory.createShadowColorsVariants<ITextInputSlots>((value, colorName) => {
+            return {
+                focusedContentContainer: value,
+            }
+        }),
+        errorShadowColor: VariantsFactory.createShadowColorsVariants<ITextInputSlots>((value, colorName) => {
+            return {
+                errorContentContainer: value,
+            }
+        }),
     },
     defaultVariants: {
         background: "surface",

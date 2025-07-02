@@ -1,7 +1,7 @@
 import { roundeClasses, roundedBottomClasses, roundedBottomLeftRadiusClasses, roundedBottomRightRadiusClasses, roundedRightClasses, roundedTopClasses, roundedTopLeftRadiusClasses, roundedTopRightRadiusClasses, roundeLeftClasses } from "./rounded";
 import { marginClasses, padding2marginClasses, paddingClasses } from "./padding2margin";
 import { borderBottomWidthClasses, borderLeftWidthClasses, borderRightWidthClasses, borderStyleClasses, borderTopWidthClasses, borderWidthClasses, borderInlineWidthClasses, borderBlockWidthClasses, allBorderWidthClasses } from "./border";
-import { ShadowColorsClasses } from "./shadow";
+import { shadowClasses, shadowColorsClasses } from "./shadow";
 import { IconSizes, textSizes } from "./textSizes";
 import { fontWeightClasses } from "./fontWeight";
 import { textAlignClasses } from "./textAlignClasses";
@@ -135,8 +135,11 @@ export const VariantsFactory = {
   createBorderStyleVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderStyleClasses, ResultType>) {
     return VariantsFactory.create<typeof borderStyleClasses, ResultType>(borderStyleClasses, variantMutator);
   },
-  createShadowColorsVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof ShadowColorsClasses, ResultType>) {
-    return VariantsFactory.create<typeof ShadowColorsClasses, ResultType>(ShadowColorsClasses, variantMutator);
+  createShadowColorsVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof shadowColorsClasses, ResultType>) {
+    return VariantsFactory.create<typeof shadowColorsClasses, ResultType>(shadowColorsClasses, variantMutator);
+  },
+  createShadowVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof shadowClasses, ResultType>) {
+    return VariantsFactory.create<typeof shadowClasses, ResultType>(shadowClasses, variantMutator);
   },
   createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allVariantClasses)[keyof typeof allVariantClasses], ResultType>): IVariantFactoryAll<ResultType> {
     const result: IVariantFactoryAll<ResultType> = {} as any;
@@ -201,7 +204,8 @@ const allVariantClasses = {
   roundedTopRight: roundedTopRightRadiusClasses,
   roundedBottomLeft: roundedBottomLeftRadiusClasses,
   roundedBottomRight: roundedBottomRightRadiusClasses,
-  shadowColor: ShadowColorsClasses,
+  shadowColor: shadowColorsClasses,
+  shadow: shadowClasses,
   borderStyle: borderStyleClasses,
   borderColor: VariantsColors.borderColor,
   ...width2heightClasses,

@@ -14,7 +14,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className="p-5">
         <H2>TextInput</H2>
         <TextInput label="TextInput"
-          variant={{ focusedRingColor: "primary", focusedRingWidth: 4 }}
+          variant={{ focusedShadow: "lg", focusedShadowColor: "primary", focusedBorderColor: "primary", focusedBorderWidth: 2 }}
         />
         <TextInput variant={{ iconColor: "secondary", labelTextAlign: "right", labelWeight: "semibold", iconSize: "25px", labelTextSize: "15px" }} type="password" label="Password" placeholder="Enter your password" />
         <TextInput type="date" label="Date" placeholder="Enter your date" />

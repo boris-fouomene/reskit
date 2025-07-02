@@ -98,17 +98,29 @@ class VariantsColorsFactory {
         const importantPrefix = withImportantAttribute ? "!" : "";
         const colorBuilder = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightColorWithPrefix, darkColorWithPrefix }) => `${lightColorWithPrefix} ${darkColorWithPrefix}`;
         Object.entries(VariantsColorsFactory.colors).map(([color, value]) => {
-            const _a = Object.assign({}, value), { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground } = _a, rest = __rest(_a, ["lightColor", "lightForeground", "darkColor", "darkForeground"]);
-            const lightColor = isForeground ? _lightForeground : light;
-            const darkColor = isForeground ? _darkForeground : dark;
-            const lightForeground = isForeground ? light : _lightForeground;
-            const darkForeground = isForeground ? dark : _darkForeground;
-            //const areTailwindClasses = String(light) === color || _lightForeground === `${color}-foreground` || String(dark).endsWith(`-${color}`) || String(_darkForeground).endsWith(`-${color}-foreground`);
-            r[color] = colorBuilder(Object.assign(Object.assign({}, rest), { 
-                //areTailwindClasses: typeof rest.areTailwindClasses === "boolean" ? rest.areTailwindClasses : !areTailwindClasses,
-                isForeground: !!isForeground, lightColor,
+            const _a = Object.assign({}, value), { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, hoverLightColor: _hoverLightColor, hoverDarkColor: _hoverDarkColor, hoverLightForeground: _hoverLightForeground, hoverDarkForeground: _hoverDarkForeground, activeLightColor: _activeLightColor, activeDarkColor: _activeDarkColor, activeLightForeground: _activeLightForeground, activeDarkForeground: _activeDarkForeground } = _a, rest = __rest(_a, ["lightColor", "lightForeground", "darkColor", "darkForeground", "hoverLightColor", "hoverDarkColor", "hoverLightForeground", "hoverDarkForeground", "activeLightColor", "activeDarkColor", "activeLightForeground", "activeDarkForeground"]);
+            const lightColor = defaultStr(isForeground ? _lightForeground : light);
+            const darkColor = defaultStr(isForeground ? _darkForeground : dark);
+            const lightForeground = defaultStr(isForeground ? light : _lightForeground);
+            const darkForeground = defaultStr(isForeground ? dark : _darkForeground);
+            const hoverLightColor = defaultStr(isForeground ? _hoverLightForeground : _hoverLightColor);
+            const hoverDarkColor = defaultStr(isForeground ? _hoverDarkForeground : _hoverDarkColor);
+            const activeLightColor = defaultStr(isForeground ? _activeLightForeground : _activeLightColor);
+            const activeDarkColor = defaultStr(isForeground ? _activeDarkForeground : _activeDarkColor);
+            const hoverLightForeground = defaultStr(isForeground ? _hoverLightColor : _hoverLightForeground);
+            const hoverDarkForeground = defaultStr(isForeground ? _hoverDarkColor : _hoverDarkForeground);
+            const activeLightForeground = defaultStr(isForeground ? _activeLightColor : _activeLightForeground);
+            const activeDarkForeground = defaultStr(isForeground ? _activeDarkColor : _activeDarkForeground);
+            r[color] = colorBuilder(Object.assign(Object.assign({}, rest), { hoverLightColor,
+                hoverDarkColor,
+                activeLightColor,
+                activeDarkColor,
+                hoverLightForeground,
+                hoverDarkForeground,
+                activeLightForeground,
+                activeDarkForeground, isForeground: !!isForeground, lightColor,
                 darkColor, lightColorWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`, darkColorWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`, darkForeground,
-                lightForeground, lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}` }));
+                lightForeground, lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`, hoverLightColorWithPrefix: hoverLightColor ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightColor}` : "", hoverDarkColorWithPrefix: hoverDarkColor ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkColor}` : "", hoverLightForegroundWithPrefix: hoverLightForeground ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightForeground}` : "", hoverDarkForegroundWithPrefix: hoverDarkForeground ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkForeground}` : "", activeLightColorWithPrefix: activeLightColor ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightColor}` : "", activeDarkColorWithPrefix: activeDarkColor ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkColor}` : "", activeLightForegroundWithPrefix: activeLightForeground ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightForeground}` : "", activeDarkForegroundWithPrefix: activeDarkForeground ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkForeground}` : "" }));
         });
         return r;
     }
@@ -334,3 +346,10 @@ VariantsColorsFactory.defaultColors = {
 };
 VariantsColorsFactory.defaultColorsNames = Object.keys(VariantsColorsFactory.defaultColors);
 VariantsColorsFactory._colors = Object.assign({}, VariantsColorsFactory.defaultColors);
+const defaultStr = (...args) => {
+    for (const arg of args) {
+        if (arg && typeof arg === "string")
+            return arg;
+    }
+    return "";
+};

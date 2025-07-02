@@ -8,11 +8,23 @@ export interface IVariantColor {
     darkColor: string,
     /**The dark foreground variant*/
     darkForeground: string,
-    /**
-     * Whether the color is a Tailwind CSS color class.
-        * @default false
-     */
-    areTailwindClasses?: boolean
+
+    /**The color variant when hovered*/
+    hoverLightColor?: string,
+    /**The color variant when hovered in dark mode*/
+    hoverDarkColor?: string,
+    /**The foreground color variant when hovered*/
+    hoverLightForeground?: string,
+    /**The foreground color variant when hovered in dark mode*/
+    hoverDarkForeground?: string,
+    /***The color variant when active*/
+    activeLightColor?: string,
+    /***The color variant when active in dark mode*/
+    activeDarkColor?: string,
+    /***The foreground color variant when active*/
+    activeLightForeground?: string,
+    /***The foreground color variant when active in dark mode*/
+    activeDarkForeground?: string,
 }
 
 /**

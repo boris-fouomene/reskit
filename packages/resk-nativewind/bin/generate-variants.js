@@ -86,14 +86,34 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   }
   const content = JSON.stringify(
     {
-      button: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
-        return {
-          base: `${lightColorWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
-          label: `text-${lightForeground} dark:text-${darkForeground}`,
-          icon: `!text-${lightForeground} dark:!text-${darkForeground}`,
-          activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground}`),
-        };
-      }),
+      button: VariantsColorsFactory.buildBackgroundColors(
+        false,
+        ({
+          lightColor,
+          darkColor,
+          lightForeground,
+          darkForeground,
+          lightColorWithPrefix,
+          lightForegroundWithPrefix,
+          darkColorWithPrefix,
+
+          hoverLightColor,
+          hoverDarkColor,
+          activeLightColor,
+          activeDarkColor,
+          hoverLightForeground,
+          hoverDarkForeground,
+          activeLightForeground,
+          activeDarkForeground,
+        }) => {
+          return {
+            base: `${lightColorWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
+            label: `text-${lightForeground} dark:text-${darkForeground}`,
+            icon: `!text-${lightForeground} dark:!text-${darkForeground}`,
+            activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground}`),
+          };
+        }
+      ),
       buttonOutline: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
         const groupClassName = {
           base: `group web:hover:bg-${lightColor} web:dark:hover:bg-${darkColor}`,

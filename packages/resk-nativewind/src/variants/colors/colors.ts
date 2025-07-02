@@ -87,15 +87,30 @@ export class VariantsColorsFactory {
     const importantPrefix = withImportantAttribute ? "!" : "";
     const colorBuilder: IVariantsColors.ClassNameBuilder<TailwindClassPrefix> = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightColorWithPrefix, darkColorWithPrefix }) => `${lightColorWithPrefix} ${darkColorWithPrefix}` as any;
     Object.entries(VariantsColorsFactory.colors).map(([color, value]) => {
-      const { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, ...rest } = Object.assign({}, value);
-      const lightColor = isForeground ? _lightForeground : light;
-      const darkColor = isForeground ? _darkForeground : dark;
-      const lightForeground = isForeground ? light : _lightForeground;
-      const darkForeground = isForeground ? dark : _darkForeground;
-      //const areTailwindClasses = String(light) === color || _lightForeground === `${color}-foreground` || String(dark).endsWith(`-${color}`) || String(_darkForeground).endsWith(`-${color}-foreground`);
+      const { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, hoverLightColor: _hoverLightColor, hoverDarkColor: _hoverDarkColor, hoverLightForeground: _hoverLightForeground, hoverDarkForeground: _hoverDarkForeground, activeLightColor: _activeLightColor, activeDarkColor: _activeDarkColor, activeLightForeground: _activeLightForeground, activeDarkForeground: _activeDarkForeground, ...rest } = Object.assign({}, value);
+      const lightColor = defaultStr(isForeground ? _lightForeground : light);
+      const darkColor = defaultStr(isForeground ? _darkForeground : dark);
+      const lightForeground = defaultStr(isForeground ? light : _lightForeground);
+      const darkForeground = defaultStr(isForeground ? dark : _darkForeground);
+      const hoverLightColor = defaultStr(isForeground ? _hoverLightForeground : _hoverLightColor);
+      const hoverDarkColor = defaultStr(isForeground ? _hoverDarkForeground : _hoverDarkColor);
+      const activeLightColor = defaultStr(isForeground ? _activeLightForeground : _activeLightColor);
+      const activeDarkColor = defaultStr(isForeground ? _activeDarkForeground : _activeDarkColor);
+      const hoverLightForeground = defaultStr(isForeground ? _hoverLightColor : _hoverLightForeground);
+      const hoverDarkForeground = defaultStr(isForeground ? _hoverDarkColor : _hoverDarkForeground);
+      const activeLightForeground = defaultStr(isForeground ? _activeLightColor : _activeLightForeground);
+      const activeDarkForeground = defaultStr(isForeground ? _activeDarkColor : _activeDarkForeground);
       (r as any)[color] = colorBuilder({
         ...rest,
-        //areTailwindClasses: typeof rest.areTailwindClasses === "boolean" ? rest.areTailwindClasses : !areTailwindClasses,
+        hoverLightColor,
+        hoverDarkColor,
+        activeLightColor,
+        activeDarkColor,
+        hoverLightForeground,
+        hoverDarkForeground,
+        activeLightForeground,
+        activeDarkForeground,
+
         isForeground: !!isForeground,
         lightColor,
         darkColor,
@@ -105,6 +120,15 @@ export class VariantsColorsFactory {
         lightForeground,
         lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`,
         darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`,
+
+        hoverLightColorWithPrefix: hoverLightColor ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightColor}` : "",
+        hoverDarkColorWithPrefix: hoverDarkColor ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkColor}` : "",
+        hoverLightForegroundWithPrefix: hoverLightForeground ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightForeground}` : "",
+        hoverDarkForegroundWithPrefix: hoverDarkForeground ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkForeground}` : "",
+        activeLightColorWithPrefix: activeLightColor ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightColor}` : "",
+        activeDarkColorWithPrefix: activeDarkColor ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkColor}` : "",
+        activeLightForegroundWithPrefix: activeLightForeground ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightForeground}` : "",
+        activeDarkForegroundWithPrefix: activeDarkForeground ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkForeground}` : "",
       });
     });
     return r;
@@ -331,7 +355,12 @@ import { col } from '../../../../../../frontend-dash/src/theme/grid';
   private static defaultColorsNames: string[] = Object.keys(VariantsColorsFactory.defaultColors);
   private static _colors: Record<string, IVariantsColors.Color> = Object.assign({}, VariantsColorsFactory.defaultColors);
 }
-
+const defaultStr = (...args: any[]) => {
+  for (const arg of args) {
+    if (arg && typeof arg === "string") return arg;
+  }
+  return "";
+};
 type IClassName = ClassValue;
 export namespace IVariantsColors {
   /**
@@ -410,6 +439,15 @@ export namespace IVariantsColors {
     lightForegroundWithPrefix: `${"!" | ""}${TailwindClassPrefix}-${string}`;
     darkColorWithPrefix: `dark:${"!" | ""}${TailwindClassPrefix}-${string}`;
     darkForegroundWithPrefix: `dark:${"!" | ""}${TailwindClassPrefix}-${string}`;
+
+    hoverLightColorWithPrefix: "" | `hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    hoverDarkColorWithPrefix: "" | `dark:hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    hoverLightForegroundWithPrefix: "" | `hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    hoverDarkForegroundWithPrefix: "" | `dark:hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    activeLightColorWithPrefix: "" | `active:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    activeDarkColorWithPrefix: "" | `dark:active:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    activeLightForegroundWithPrefix: "" | `active:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    activeDarkForegroundWithPrefix: "" | `dark:active:${"!" | ""}${TailwindClassPrefix}-${string}`;
     /***
      * Whether the class name that is being generated is a foreground class name or not
      */

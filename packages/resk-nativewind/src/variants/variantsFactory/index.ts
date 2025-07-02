@@ -1,7 +1,7 @@
 import { roundeClasses, roundedBottomClasses, roundedBottomLeftRadiusClasses, roundedBottomRightRadiusClasses, roundedRightClasses, roundedTopClasses, roundedTopLeftRadiusClasses, roundedTopRightRadiusClasses, roundeLeftClasses } from "./rounded";
 import { marginClasses, padding2marginClasses, paddingClasses } from "./padding2margin";
 import { borderBottomWidthClasses, borderLeftWidthClasses, borderRightWidthClasses, borderStyleClasses, borderTopWidthClasses, borderWidthClasses, borderInlineWidthClasses, borderBlockWidthClasses, allBorderWidthClasses } from "./border";
-import { shadowClasses, shadowColorsClasses } from "./shadow";
+import { shadowClasses } from "./shadow";
 import { IconSizes, textSizes } from "./textSizes";
 import { fontWeightClasses } from "./fontWeight";
 import { textAlignClasses } from "./textAlignClasses";
@@ -13,7 +13,7 @@ import { IClassName } from "@src/types";
 import { transitionEasing, transitions } from "./transitions";
 import { typedEntries } from "@resk/core/utils";
 
-type IVariantFactoryMutator<InputType extends Record<string | number, unknown>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
+type IVariantFactoryMutator<InputType extends Record<string | number, any>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
 
 /**
  * A utility factory for generating and transforming variant objects in a type-safe manner.
@@ -89,7 +89,7 @@ export const VariantsFactory = {
    * - The mutator function receives both the value and the key for maximum flexibility.
    * - Useful for generating design system variants, utility classes, or mapping values.
    */
-  create: function <InputType extends Record<string, unknown>, ResultType = string, VariantGroupName = any>(input: InputType, variantMutator?: IVariantFactoryMutator<InputType, ResultType>, variantGroupName?: VariantGroupName) {
+  create: function <InputType extends Record<string | number, any>, ResultType = string, VariantGroupName = any>(input: InputType, variantMutator?: IVariantFactoryMutator<InputType, ResultType, VariantGroupName>, variantGroupName?: VariantGroupName) {
     variantMutator = typeof variantMutator == "function" ? variantMutator : (value) => value as ResultType;
     return Object.fromEntries(
       typedEntries(input).map(([key, value]) => {
@@ -135,16 +135,26 @@ export const VariantsFactory = {
   createBorderStyleVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderStyleClasses, ResultType>) {
     return VariantsFactory.create<typeof borderStyleClasses, ResultType>(borderStyleClasses, variantMutator);
   },
-  createShadowColorsVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof shadowColorsClasses, ResultType>) {
-    return VariantsFactory.create<typeof shadowColorsClasses, ResultType>(shadowColorsClasses, variantMutator);
+  createShadowColorVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.shadow, ResultType>) {
+    return VariantsFactory.create<typeof VariantsColors.shadow, ResultType>(VariantsColors.shadow, variantMutator);
   },
-  createShadowVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof shadowClasses, ResultType>) {
-    return VariantsFactory.create<typeof shadowClasses, ResultType>(shadowClasses, variantMutator);
+  createShadowVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof shadowClasses.shadow, ResultType>) {
+    return VariantsFactory.create<typeof shadowClasses.shadow, ResultType>(shadowClasses.shadow, variantMutator);
   },
-  createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allVariantClasses)[keyof typeof allVariantClasses], ResultType>): IVariantFactoryAll<ResultType> {
+  createActiveShadowVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof shadowClasses.activeShadow, ResultType>) {
+    return VariantsFactory.create<typeof shadowClasses.activeShadow, ResultType>(shadowClasses.activeShadow, variantMutator);
+  },
+  createHoverShadowVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof shadowClasses.hoverShadow, ResultType>) {
+    return VariantsFactory.create<typeof shadowClasses.hoverShadow, ResultType>(shadowClasses.hoverShadow, variantMutator);
+  },
+  createAllShadowVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof shadowClasses)[keyof typeof shadowClasses], ResultType>) {
+    return VariantsFactory.createCompositeVariants<typeof shadowClasses, ResultType>(shadowClasses, variantMutator);
+  },
+  createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allVariantClasses)[keyof typeof allVariantClasses], ResultType, keyof typeof allVariantClasses>): IVariantFactoryAll<ResultType> {
     const result: IVariantFactoryAll<ResultType> = {} as any;
-    Object.keys(allVariantClasses).forEach((variantClassName) => {
-      (result as any)[variantClassName] = VariantsFactory.create((allVariantClasses as any)[variantClassName], variantMutator);
+    Object.keys(allVariantClasses).forEach((_variantGroupName) => {
+      const variantGroupName = _variantGroupName as keyof typeof allVariantClasses;
+      (result as any)[variantGroupName] = VariantsFactory.create<(typeof allVariantClasses)[keyof typeof allVariantClasses], ResultType, keyof typeof allVariantClasses>((allVariantClasses as any)[variantGroupName], variantMutator, variantGroupName);
     });
     return result;
   },
@@ -204,8 +214,13 @@ const allVariantClasses = {
   roundedTopRight: roundedTopRightRadiusClasses,
   roundedBottomLeft: roundedBottomLeftRadiusClasses,
   roundedBottomRight: roundedBottomRightRadiusClasses,
-  shadowColor: shadowColorsClasses,
-  shadow: shadowClasses,
+
+  ...shadowClasses,
+
+  shadowColor: VariantsColors.shadow,
+  activeShadowColor: VariantsColors.shadowActive,
+  hoverShadowColor: VariantsColors.shadowHover,
+
   borderStyle: borderStyleClasses,
   borderColor: VariantsColors.borderColor,
   ...width2heightClasses,

@@ -18,6 +18,8 @@
         background : Record<IName,string>;
         textForeground : Record<IName,string>;
         shadow : Record<IName,string>;
+        shadowHover : Record<IName,string>;
+        shadowActive : Record<IName,string>;
         activityIndicator: Record<IName2Foreground,string>;
         borderColor : Record<IName2Foreground,string>;
         borderTopColor : Record<IName2Foreground,string>;

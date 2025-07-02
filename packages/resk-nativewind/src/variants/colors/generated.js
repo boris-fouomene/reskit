@@ -245,16 +245,40 @@ export const VariantsColors = {
     "text": "bg-gray-900 dark:bg-gray-100 text-gray-100 dark:text-gray-900"
   },
   "shadow": {
-    "primary": "shadow-primary/20 dark:shadow-dark-primary/30",
-    "secondary": "shadow-secondary/20 dark:shadow-dark-secondary/30",
-    "surface": "shadow-gray-100/20 dark:shadow-gray-800/30",
-    "background": "shadow-white/20 dark:shadow-gray-900/30",
-    "neutral": "shadow-gray-500/20 dark:shadow-gray-600/30",
-    "error": "shadow-red-500/20 dark:shadow-red-600/30",
-    "info": "shadow-blue-500/20 dark:shadow-blue-600/30",
-    "warning": "shadow-yellow-500/20 dark:shadow-yellow-600/30",
-    "success": "shadow-green-500/20 dark:shadow-green-600/30",
-    "text": "shadow-gray-900/20 dark:shadow-gray-100/30"
+    "primary": "shadow-primary dark:shadow-dark-primary",
+    "secondary": "shadow-secondary dark:shadow-dark-secondary",
+    "surface": "shadow-gray-100 dark:shadow-gray-800",
+    "background": "shadow-white dark:shadow-gray-900",
+    "neutral": "shadow-gray-500 dark:shadow-gray-600",
+    "error": "shadow-red-500 dark:shadow-red-600",
+    "info": "shadow-blue-500 dark:shadow-blue-600",
+    "warning": "shadow-yellow-500 dark:shadow-yellow-600",
+    "success": "shadow-green-500 dark:shadow-green-600",
+    "text": "shadow-gray-900 dark:shadow-gray-100"
+  },
+  "shadowHover": {
+    "primary": "hover:shadow-primary dark:hover:shadow-dark-primary",
+    "secondary": "hover:shadow-secondary dark:hover:shadow-dark-secondary",
+    "surface": "hover:shadow-gray-100 dark:hover:shadow-gray-800",
+    "background": "hover:shadow-white dark:hover:shadow-gray-900",
+    "neutral": "hover:shadow-gray-500 dark:hover:shadow-gray-600",
+    "error": "hover:shadow-red-500 dark:hover:shadow-red-600",
+    "info": "hover:shadow-blue-500 dark:hover:shadow-blue-600",
+    "warning": "hover:shadow-yellow-500 dark:hover:shadow-yellow-600",
+    "success": "hover:shadow-green-500 dark:hover:shadow-green-600",
+    "text": "hover:shadow-gray-900 dark:hover:shadow-gray-100"
+  },
+  "shadowActive": {
+    "primary": "active:shadow-primary dark:active:shadow-dark-primary",
+    "secondary": "active:shadow-secondary dark:active:shadow-dark-secondary",
+    "surface": "active:shadow-gray-100 dark:active:shadow-gray-800",
+    "background": "active:shadow-white dark:active:shadow-gray-900",
+    "neutral": "active:shadow-gray-500 dark:active:shadow-gray-600",
+    "error": "active:shadow-red-500 dark:active:shadow-red-600",
+    "info": "active:shadow-blue-500 dark:active:shadow-blue-600",
+    "warning": "active:shadow-yellow-500 dark:active:shadow-yellow-600",
+    "success": "active:shadow-green-500 dark:active:shadow-green-600",
+    "text": "active:shadow-gray-900 dark:active:shadow-gray-100"
   },
   "text": {
     "primary": "text-primary dark:text-dark-primary ",

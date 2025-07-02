@@ -17,6 +17,7 @@ import textInput from "./textInput";
 import { tv } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
 import bottomSheet from "./bottomSheet";
+import dropdownItem from "./dropdownItem";
 export const variants = {
     all,
     bottomSheet,
@@ -39,6 +40,7 @@ export const variants = {
     modal,
     checkbox,
     progressBar,
+    dropdownItem,
 }
 
 export * from "./types";

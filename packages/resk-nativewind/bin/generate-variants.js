@@ -163,7 +163,13 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
         return cn(lightComputedColor, darkComputedColor, `text-${lightForeground} dark:text-${darkForeground}`, activeDarkComputedColor, activeLightComputedColor, hoverDarkComputedColor, hoverLightComputedColor);
       }),
       shadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
-        return cn(`shadow-${lightColor}/20 dark:shadow-${darkColor}/30`);
+        return cn(`shadow-${lightColor} dark:shadow-${darkColor}`);
+      }),
+      shadowHover: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
+        return cn(`hover:shadow-${lightColor} dark:hover:shadow-${darkColor}`);
+      }),
+      shadowActive: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
+        return cn(`active:shadow-${lightColor} dark:active:shadow-${darkColor}`);
       }),
       text: VariantsColorsFactory.buildTextColors(),
       textWithImportant: textColorsWithImportant,
@@ -257,6 +263,8 @@ export const VariantsColors = ${content}
         background : Record<IName,string>;
         textForeground : Record<IName,string>;
         shadow : Record<IName,string>;
+        shadowHover : Record<IName,string>;
+        shadowActive : Record<IName,string>;
         activityIndicator: Record<IName2Foreground,string>;
         borderColor : Record<IName2Foreground,string>;
         borderTopColor : Record<IName2Foreground,string>;

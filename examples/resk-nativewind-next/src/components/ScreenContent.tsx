@@ -37,10 +37,17 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       </VStack>
       <Div className="p-5">
         <H2>Dropdown</H2>
-        <Dropdown
-          label="Select an option"
-          items={Array.from({ length: 50 }).map((_, index) => ({ label: `Option ${index}`, value: index }))}
-        />
+        <HStack className="gap-2">
+          <Dropdown
+            label="Select an option"
+            items={Array.from({ length: 50 }).map((_, index) => ({ label: `Option ${index}`, value: index }))}
+          />
+          <Dropdown
+            label="Multi Select"
+            multiple
+            items={Array.from({ length: 10000 }).map((_, index) => ({ label: `Option ${index}`, value: index }))}
+          />
+        </HStack>
       </Div>
       <HStack className="p-5">
         <H2>Menu Examples</H2>

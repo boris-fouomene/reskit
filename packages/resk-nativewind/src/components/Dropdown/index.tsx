@@ -19,6 +19,7 @@ import { TextInput } from "@components/TextInput";
 import { Text } from "@html/Text";
 import { IFontIconName } from "@components/Icon";
 import { INavContext } from "@components/Nav";
+import dropdownItem, { IVariantPropsDropdownItem } from "@variants/dropdownItem";
 
 
 export class Dropdown<ItemType = any, ValueType = any> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
@@ -220,23 +221,16 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             newState.selectedItemsByHashKey = newItemStatus ? { [preparedItem.hashKey]: preparedItem } : {};
             newState.visible = false;
         }
-        const cb = () => {
-            this.setState(newState, () => {
-                this.callOnChange(preparedItem);
-                const triggerCallOptions = { ...preparedItem, dropdown: this };
-                this.trigger("toggleItem", triggerCallOptions);
-                if (newItemStatus) {
-                    this.trigger("selectItem", triggerCallOptions);
-                } else {
-                    this.trigger("unselectItem", triggerCallOptions);
-                }
-            });
-        };
-        if (!newState.visible) {
-            this.open(cb);
-        } else {
-            cb();
-        }
+        this.setState(newState, () => {
+            this.callOnChange(preparedItem);
+            const triggerCallOptions = { ...preparedItem, dropdown: this };
+            this.trigger("toggleItem", triggerCallOptions);
+            if (newItemStatus) {
+                this.trigger("selectItem", triggerCallOptions);
+            } else {
+                this.trigger("unselectItem", triggerCallOptions);
+            }
+        });
     }
     open(cb?: Function) {
         const { isLoading, readOnly, disabled } = this.props;
@@ -477,7 +471,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
     const searchProps = Object.assign({}, searchInputProps, { error: error || searchInputProps?.error });
     const divider = <Divider testID={`${testID}-divider`} className="w-full" />;
     const searchInput = canRenderSeach ?
-        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full px-[7px]")}>
+        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full max-w-full overflow-hidden px-[7px]")}>
             {canReverse ? divider : null}
             <TextInput
                 testID={`${testID}-dropdown-search`}
@@ -534,8 +528,9 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number, con
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
     const itemsByHashKey = context.itemsByHashKey;
     const labelRef = useRef<Text>(null);
-    const { multiple, selectedIconName, itemClassName, itemContainerClassName } = context.props;
+    const { multiple, selectedIconName, itemClassName, itemVariant, itemContainerClassName } = context.props;
     const testID = context.getTestID();
+    const computedVariant = dropdownItem(itemVariant);
     const isSelected = useMemo(() => {
         return context.isSelectedByHashKey(hashKey);
     }, [selectedItemsByHashKey, hashKey]);
@@ -578,12 +573,12 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number, con
             onPress={() => {
                 context.toggleItem(preparedItem);
             }}
-            className={cn("py-[10px] self-start grow overflow-hidden w-full justify-center", itemContainerClassName)}
+            className={cn("py-[10px] self-start grow overflow-hidden w-full justify-center", computedVariant.container(), itemContainerClassName)}
             testID={testID + "-item-container-" + hashKey}
         >
-            <Div className={cn("px-[10px] flex flex-row items-center justify-start text-left flex-nowrap", itemClassName)} testID={testID + "-item-content-" + hashKey}>
-                {isSelected ? <FontIcon className={"mr-[5px]"} name={(isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked") as never} size={20} variant={{ color: "primary" }} /> : null}
-                {<Text ref={labelRef as any} variant={{ color: isSelected ? "primary" : undefined }}>{label}</Text>}
+            <Div className={cn("px-[10px] flex flex-row items-center justify-start text-left flex-nowrap", computedVariant.base(), itemClassName)} testID={testID + "-item-content-" + hashKey}>
+                {isSelected ? <FontIcon className={cn("mr-[5px]", computedVariant.selectedIcon())} name={(isNonNullString(selectedIconName) ? selectedIconName : multiple ? "check" : "radiobox-marked") as never} /> : null}
+                {<Text ref={labelRef as any} className={cn(isSelected ? computedVariant.selectedLabel() : computedVariant.label())}>{label}</Text>}
             </Div>
         </Tooltip>
     );
@@ -869,7 +864,7 @@ export interface IDropdownCallOptions<ItemType = any, ValueType = any> {
     isDropdown: true; // Indicates that the context is within a dropdown
 }
 
-export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps, "onChange" | "ref"> {
+export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps, "onChange" | "ref" | "multiline"> {
     items?: ItemType[]; // An optional array of items to be displayed in the dropdown
     testID?: string; // An optional test ID for the dropdown
     getItemValue?: (options: IDropdownCallOptions<ItemType, ValueType>) => ValueType | undefined; // Function to get item value
@@ -927,6 +922,11 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
      * The class name for the Div that render each list item 
      */
     itemClassName?: IClassName;
+
+    /***
+        The variants for the item
+    */
+    itemVariant?: IVariantPropsDropdownItem;
 
     /***
      * The class name for the item container, The Div that wrap each list item

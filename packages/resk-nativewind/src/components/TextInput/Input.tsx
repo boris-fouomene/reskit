@@ -384,13 +384,13 @@ export default function TextInput({
     return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, cursorDefault, "text-input-container text-input-" + type + "-container")} testID={testID + "-container"}>
         <Div className={cn(cursorDefault, "w-full relative text-input-wrapper")} testID={testID + "-wrapper"}>
             {isLabelEmbeded ? null : labelContent}
-            <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn(cursorDefault, "text-input-content-container w-full flex flex-row justify-center self-start items-center", contentContainerClx)}>
+            <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn(cursorDefault, "text-input-content-container w-full flex flex-row justify-between self-start items-center", contentContainerClx)}>
                 <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, cursorDefault, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
                     {leftContent}
                     {isLabelEmbeded ? labelContent : null}
                     {phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
+                    {isHydrated ? inputElement : <Text className={cn(inputClx, cursorDefault)} style={inputStyle} children={String(inputValue)} />}
                 </Div>
-                {isHydrated ? inputElement : <Text className={cn(inputClx, cursorDefault)} style={inputStyle} children={String(inputValue)} />}
                 {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, cursorDefault, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
                     {rightContent}
                 </Div>) : null}

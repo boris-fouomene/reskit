@@ -227,7 +227,7 @@ export default function TextInput({
     const focusedLabelEmbededClx = isFocusedVariant && isLabelEmbeded && computedVariant.focusedLabelEmbeded();
     const errorLabelEmbededClx = isErrorVariant && isLabelEmbeded && computedVariant.errorLabelEmbeded();
 
-    const labelClx = cn("flex flex-row self-start justify-start items-center text-input-label", isLabelEmbeded ? ["text-input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), !isLabelEmbeded ? [focusedLabelClx, errorLabelClx] : [focusedLabelEmbededClx, errorLabelEmbededClx], labelClassName);
+    const labelClx = cn("flex flex-row self-center justify-start items-center text-input-label", isLabelEmbeded ? ["text-input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), !isLabelEmbeded ? [focusedLabelClx, errorLabelClx] : [focusedLabelEmbededClx, errorLabelEmbededClx], labelClassName);
     const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", canWrapWithTouchable && "cursor-pointer", computedVariant.input(), focusedInputClx, errorInputClx, className);
     const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
@@ -374,7 +374,7 @@ export default function TextInput({
         return withKeyboardAvoidingView ? KeyboardAvoidingView : Div;
     }, [withKeyboardAvoidingView]);
     const leftContainerWrappedWithTouchableClassName = cn(canWrapWithTouchable && "px-0");
-    const leftOrRightClassName = cn("flex flex flex-row items-center self-center justify-start", disabledClx);
+    const leftOrRightClassName = cn("flex flex-row items-center self-center justify-start", disabledClx);
     const leftContent = left,
         rightContent = (right || canToggleSecure || affixContent) ? <>
             {affixContent}
@@ -384,13 +384,13 @@ export default function TextInput({
     return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, cursorDefault, "text-input-container text-input-" + type + "-container")} testID={testID + "-container"}>
         <Div className={cn(cursorDefault, "w-full relative text-input-wrapper")} testID={testID + "-wrapper"}>
             {isLabelEmbeded ? null : labelContent}
-            <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn(cursorDefault, "text-input-content-container w-full flex flex-row justify-center self-start items-center", contentContainerClx)}>
-                <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, cursorDefault, "grow-0 self-center", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
+            <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn(cursorDefault, "text-input-content-container w-full flex flex-row justify-between self-start items-center", contentContainerClx)}>
+                <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, cursorDefault, "grow", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
                     {leftContent}
                     {isLabelEmbeded ? labelContent : null}
                     {phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
+                    {isHydrated ? inputElement : <Text className={cn(inputClx, cursorDefault)} style={inputStyle}  >{String(inputValue)}</Text>}
                 </Div>
-                {isHydrated ? inputElement : <Text className={cn(inputClx, cursorDefault)} style={inputStyle} children={String(inputValue)} />}
                 {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, cursorDefault, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
                     {rightContent}
                 </Div>) : null}

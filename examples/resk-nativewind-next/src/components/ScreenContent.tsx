@@ -145,9 +145,9 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <Divider />
         <Heading level={1} className="text-red-500">Badges</Heading>
         <HStack className="p-5 !gap-x-10">
-          <Badge variant={{ color: "primary" }}>Badge 1</Badge>
-          <Badge variant={{ color: "secondary", size: "xl" }}>Badge 2 - size xl</Badge>
-          <Badge variant={{ color: "success", size: "md", rounded: "full" }}>Badge Succes - size - md</Badge>
+          <Badge variant={{ colorScheme: "primary" }}>Badge 1</Badge>
+          <Badge variant={{ colorScheme: "secondary", size: "xl" }}>Badge 2 - size xl</Badge>
+          <Badge variant={{ colorScheme: "success", size: "md", rounded: "full" }}>Badge Succes - size - md</Badge>
         </HStack>
         <Tooltip title="A tooltip">
           <Text> Example of tooltip</Text>

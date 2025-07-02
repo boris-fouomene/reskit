@@ -180,7 +180,7 @@ export default function TextInput({
     const error = useMemo(() => {
         return !!customError || defaultBool(handleMaskValidationErrors, !!inputState.value) && !isInputValid;
     }, [customError, isInputValid, handleMaskValidationErrors, inputState.value])
-    const computedVariant = textInputVariant(Object.assign({}, variant, { error, focused: !error && isFocused } as IVariantPropsTextInput));
+    const computedVariant = textInputVariant(variant);
     const disabled = props.disabled || readOnly || !isHydrated;
     const editable = !disabled && props.editable !== false && readOnly !== false || false;
     const canWrapWithTouchable = isDropdownAnchor && editable && !readOnly;
@@ -208,13 +208,26 @@ export default function TextInput({
 
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
-    const labelClx = cn("flex flex-row self-start justify-start items-center text-input-label", isLabelEmbeded ? ["text-input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), labelClassName);
-    const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", canWrapWithTouchable && "cursor-pointer", computedVariant.input(), className);
+    const isErrorVariant = !!error;
+    const isFocusedVariant = !isErrorVariant && isFocused;
+    const focusedContentContainerClx = isFocusedVariant && computedVariant.focusedContentContainer();
+    const errorContentContainerClx = isErrorVariant && computedVariant.errorContentContainer();
+    const focusedInputClx = isFocusedVariant && computedVariant.focusedInput();
+    const focusedLabelClx = isFocusedVariant && computedVariant.focusedLabel();
+    const errorInputClx = isErrorVariant && computedVariant.errorInput();
+    const errorLabelClx = isErrorVariant && computedVariant.errorLabel();
+    const focusedIconClx = isFocusedVariant && computedVariant.focusedIcon();
+    const errorIconClx = isErrorVariant && computedVariant.errorIcon();
+    const focusedLabelEmbededClx = isFocusedVariant && isLabelEmbeded && computedVariant.focusedLabelEmbeded();
+    const errorLabelEmbededClx = isErrorVariant && isLabelEmbeded && computedVariant.errorLabelEmbeded();
+
+    const labelClx = cn("flex flex-row self-start justify-start items-center text-input-label", isLabelEmbeded ? ["text-input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), !isLabelEmbeded ? [focusedLabelClx, errorLabelClx] : [focusedLabelEmbededClx, errorLabelEmbededClx], labelClassName);
+    const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", canWrapWithTouchable && "cursor-pointer", computedVariant.input(), focusedInputClx, errorInputClx, className);
     const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
     const rightContainerClx = cn(computedVariant.rightContainer(), rightContainerClassName);
-    const contentContainerClx = cn(computedVariant.contentContainer(), contentContainerClassName);
-    const iconClx = cn(computedVariant.icon(), iconClassName);
+    const contentContainerClx = cn(computedVariant.contentContainer(), focusedContentContainerClx, errorContentContainerClx, contentContainerClassName);
+    const iconClx = cn(computedVariant.icon(), focusedIconClx, errorIconClx, iconClassName);
     const containerClx = cn(computedVariant.container(), containerClassName);
     const phoneDialCodeClx = cn("text-input-phone-dial-code-label", inputTextClx);
     const phoneDialCodeLabel = phoneDialCodeText ? <Text className={phoneDialCodeClx}>{phoneDialCodeText}</Text> : null;

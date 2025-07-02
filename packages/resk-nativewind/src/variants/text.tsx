@@ -9,10 +9,10 @@ const text = tv({
     variants: {
         color: VariantsColors.textWithForeground,
         error: {
-            true: "text-error dark:text-dark-error",
+            true: "",
         },
         waring: {
-            true: "text-warning dark:text-dark-warning"
+            true: ""
         },
         align: textAlignClasses,
         weight: fontWeightClasses,

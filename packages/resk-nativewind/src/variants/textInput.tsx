@@ -1,10 +1,7 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
-import { borderWidthClasses } from "./variantsFactory/border";
-import { ringWidthClasses } from "./variantsFactory/ring";
 import "@resk/core/utils";
-import { typedEntries } from "@resk/core/utils";
 
 const textInput = tv({
     slots: {
@@ -13,6 +10,16 @@ const textInput = tv({
         leftContainer: "",
         rightContainer: "",
         contentContainer: "",
+        focusedContentContainer: "",
+        focusedLabelEmbeded: "",
+        focusedInput: "",
+        focusedLabel: "",
+        focusedIcon: "",
+        errorContentContainer: "",
+        errorInput: "",
+        errorLabel: "",
+        errorIcon: "",
+        errorLabelEmbeded: "",
         labelEmbeded: "",
         icon: "",
         label: "",
@@ -36,6 +43,9 @@ const textInput = tv({
         }),
         ...VariantsFactory.createMarginsVariants<ITextInputSlots>((value, colorName) => {
             return { container: value }
+        }),
+        ...VariantsFactory.createAllBorderWidthVariants<ITextInputSlots>((value, colorName) => {
+            return { contentContainer: value }
         }),
         rounded: VariantsFactory.createRoundedVariants<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
@@ -70,92 +80,69 @@ const textInput = tv({
         borderColor: VariantsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
             return { contentContainer: value }
         }),
-        ...VariantsFactory.createAllBorderWidthVariants<ITextInputSlots>((value, colorName) => {
-            return { contentContainer: value }
+        focusedColor: VariantsFactory.create<typeof VariantsColors.textWithForeground, ITextInputSlots>(VariantsColors.textWithForeground, (value, colorName) => {
+            return {
+                focusedLabel: value,
+                focusedInput: value,
+                focusedLabelEmbeded: value,
+                focusedIcon: value.replaceAll("text-", "!text-")
+            }
         }),
-        focusedColor: {} as Record<keyof typeof VariantsColors.textWithForeground, ITextInputSlots>,
-        focusedRingColor: {} as Record<keyof typeof VariantsColors.ringColors, ITextInputSlots>,
-        focusedBorderWidth: {} as Record<keyof typeof borderWidthClasses, ITextInputSlots>,
-        focusedRingWidth: {} as Record<keyof typeof ringWidthClasses, ITextInputSlots>,
-        errorColor: {} as Record<keyof typeof VariantsColors.background, ITextInputSlots>,
-        focusedBorderColor: {} as Record<keyof typeof VariantsColors.borderColor, ITextInputSlots>,
-        focused: {
-            true: {}
-        },
-        error: {
-            true: {}
-        }
+        errorColor: VariantsFactory.create<typeof VariantsColors.textWithForeground, ITextInputSlots>(VariantsColors.textWithForeground, (value, colorName) => {
+            return {
+                errorLabel: value,
+                errorInput: value,
+                errorLabelEmbeded: value,
+                errorIcon: value.replaceAll("text-", "!text-")
+            }
+        }),
+        focusedRingColor: VariantsFactory.create<typeof VariantsColors.ringColors, ITextInputSlots>(VariantsColors.ringColors, (value, colorName) => {
+            return {
+                focusedContentContainer: value,
+            }
+        }),
+        errorRingColor: VariantsFactory.create<typeof VariantsColors.ringColors, ITextInputSlots>(VariantsColors.ringColors, (value, colorName) => {
+            return {
+                errorContentContainer: value,
+            }
+        }),
+        focusedBorderWidth: VariantsFactory.createBorderWidthVariants<ITextInputSlots>((value, colorName) => {
+            return {
+                focusedContentContainer: value,
+            }
+        }),
+        errorBorderWidth: VariantsFactory.createBorderWidthVariants<ITextInputSlots>((value, colorName) => {
+            return {
+                errorContentContainer: value,
+            }
+        }),
+        focusedRingWidth: VariantsFactory.createRingWidthVariants<ITextInputSlots>((value, colorName) => {
+            return {
+                focusedContentContainer: value,
+            }
+        }),
+        errorRingWidth: VariantsFactory.createRingWidthVariants<ITextInputSlots>((value, colorName) => {
+            return {
+                errorContentContainer: value,
+            }
+        }),
+        focusedBorderColor: VariantsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
+            return {
+                focusedContentContainer: value,
+            }
+        }),
+        errorBorderColor: VariantsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
+            return {
+                errorContentContainer: value,
+            }
+        }),
     },
-    compoundVariants: [
-        ...typedEntries(VariantsColors.borderColor).map(([borderColor, value]) => {
-            return {
-                focused: true,
-                focusedBorderColor: borderColor,
-                class: {
-                    contentContainer: value,
-                }
-            }
-        }),
-        ...typedEntries(borderWidthClasses).map(([borderWidth, value]) => {
-            return {
-                focused: true,
-                focusedBorderWidth: borderWidth,
-                class: {
-                    contentContainer: value,
-                }
-            }
-        }),
-        ...typedEntries(VariantsColors.ringColors).map(([ringColor, value]) => {
-            return {
-                focused: true,
-                focusedRingColor: ringColor,
-                class: {
-                    contentContainer: value,
-                }
-            }
-        }),
-        ...typedEntries(VariantsColors.textWithForeground).map(([textColor, value]) => {
-            return {
-                focused: true,
-                focusedColor: textColor,
-                class: {
-                    labelEmbeded: value,
-                    label: value,
-                    input: value,
-                    icon: value.replaceAll("text-", "!text-")
-                }
-            }
-        }),
-        // error color
-        ...typedEntries(VariantsColors.background).map(([textColor, value]) => {
-            return {
-                error: true,
-                errorColor: textColor,
-                class: {
-                    labelEmbeded: value,
-                    label: value,
-                    input: value,
-                    icon: value.replaceAll("text-", "!text-")
-                }
-            }
-        }),
-        ...typedEntries(ringWidthClasses).map(([ringWidth, value]) => {
-            return {
-                focused: true,
-                focusedRingWidth: ringWidth,
-                class: {
-                    contentContainer: value,
-                }
-            }
-        })
-    ],
     defaultVariants: {
         background: "surface",
         paddingX: "5px",
         iconSize: "20px",
-        focusedRingColor: "primary",
-        focusedRingWidth: 2,
         errorColor: "error",
+        focusedColor: "primary",
     },
 });
 
@@ -171,6 +158,12 @@ type ITextInputSlots = {
     label?: string;
     labelEmbeded?: string;
     placeholder?: string;
+    focusedContentContainer?: string;
+    focusedInput?: string;
+    focusedLabel?: string;
+    errorContentContainer?: string;
+    errorInput?: string;
+    errorLabel?: string;
 }
 
 export default textInput;

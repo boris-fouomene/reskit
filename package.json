@@ -11,6 +11,8 @@
   ],
   "packageManager": "npm@11.2.0",
   "scripts": {
+    "install-nextjs": "npm i && cd ./packages/resk-core && npm i && cd ../resk-nativewind && npm i && cd ../../examples/resk-nativewind-next && npm i",
+    "build-nextjs": "cd ./packages/resk-core && npm run build && cd ../resk-nativewind && npm run build && cd ../../examples/resk-nativewind-next && npm run build",
     "build": "turbo run build",
     "build:watch": "turbo run build:watch",
     "test": "turbo run test",

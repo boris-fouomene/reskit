@@ -5,11 +5,11 @@ import { VariantsFactory } from "./variantsFactory";
 const surface = tv({
     base: "",
     variants: {
-        color: VariantsColors.surface,
         ...VariantsFactory.createAll(),
+        colorScheme: VariantsColors.surface,
     },
     defaultVariants: {
-        color: "surface",
+        colorScheme: "surface",
     }
 });
 

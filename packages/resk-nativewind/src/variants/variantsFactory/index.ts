@@ -12,6 +12,8 @@ import { scalesClasses } from "./scales";
 import { IClassName } from "@src/types";
 import { transitionEasing, transitions } from "./transitions";
 import { typedEntries } from "@resk/core/utils";
+import { opacityClasses } from "./opacity";
+import { create } from "domain";
 
 type IVariantFactoryMutator<InputType extends Record<string | number, any>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
 
@@ -158,6 +160,15 @@ export const VariantsFactory = {
     });
     return result;
   },
+  createOpacityVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof opacityClasses.opacity, ResultType>) {
+    return VariantsFactory.create<typeof opacityClasses.opacity, ResultType>(opacityClasses.opacity, variantMutator);
+  },
+  createActiveOpacityVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof opacityClasses.activeOpacity, ResultType>) {
+    return VariantsFactory.create<typeof opacityClasses.activeOpacity, ResultType>(opacityClasses.activeOpacity, variantMutator);
+  },
+  createHoverOpacityVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof opacityClasses.hoverOpacity, ResultType>) {
+    return VariantsFactory.create<typeof opacityClasses.hoverOpacity, ResultType>(opacityClasses.hoverOpacity, variantMutator);
+  },
   createTextAlignVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textAlignClasses, ResultType>) {
     return VariantsFactory.create<typeof textAlignClasses, ResultType>(textAlignClasses, variantMutator);
   },
@@ -203,6 +214,9 @@ export const VariantsFactory = {
   createTransitionEasingVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof transitionEasing, ResultType>) {
     return VariantsFactory.create<typeof transitionEasing, ResultType>(transitionEasing, variantMutator);
   },
+  createAllOpacityVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof opacityClasses)[keyof typeof opacityClasses], ResultType>) {
+    return VariantsFactory.createCompositeVariants<typeof opacityClasses, ResultType>(opacityClasses, variantMutator);
+  },
 };
 const allVariantClasses = {
   rounded: roundeClasses,
@@ -214,7 +228,7 @@ const allVariantClasses = {
   roundedTopRight: roundedTopRightRadiusClasses,
   roundedBottomLeft: roundedBottomLeftRadiusClasses,
   roundedBottomRight: roundedBottomRightRadiusClasses,
-
+  ...opacityClasses,
   ...shadowClasses,
 
   shadowColor: VariantsColors.shadow,

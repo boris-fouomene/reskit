@@ -1,12 +1,14 @@
 import { tv, type VariantProps } from 'tailwind-variants';
 import surface from "./surface";
 import { VariantsColors } from './colors/generated';
+import { VariantsFactory } from './variantsFactory';
 
 const badge = tv({
     base: "inline-flex items-center rounded-md px-2 py-1 text-xs ring-inset",
     extend: surface,
     variants: {
-        color: VariantsColors.badge,
+        ...VariantsFactory.createAll(),
+        colorScheme: VariantsColors.badge,
         size: {
             xs: "text-xs",
             sm: "text-sm",
@@ -23,6 +25,11 @@ const badge = tv({
             "9xl": "text-9xl",
         },
     },
+    defaultVariants: {
+        activeOpacity: 80,
+        hoverOpacity: 90,
+        colorScheme: "surface"
+    }
 });
 
 export type IVariantPropsBadge = VariantProps<typeof badge>;

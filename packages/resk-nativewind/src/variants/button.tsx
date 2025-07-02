@@ -22,7 +22,10 @@ const buton = tv({
             }
         })
     },
-    defaultVariants: {}
+    defaultVariants: {
+        hoverOpacity: 90,
+        activeOpacity: 80,
+    }
 });
 export default buton;
 export type IVariantPropsButton = VariantProps<typeof buton>;

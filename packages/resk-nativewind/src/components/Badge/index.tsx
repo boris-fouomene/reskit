@@ -4,7 +4,6 @@ import { cn } from "@utils/cn";
 import badgeVariants from "@variants/badge";
 import { IHtmlTextProps } from '@html/types';
 import { IVariantPropsBadge } from '@variants/badge';
-import { classes } from '@variants/classes';
 
 
 export interface IBadgeProps extends Omit<IHtmlTextProps, "variant"> {
@@ -40,7 +39,7 @@ export function Badge({
     return (
         <Text
             testID={testID}
-            className={cn("inline-flex items-center", classes.active2hoverState, badgeVariants(variant), visible === false && "hidden", className)}
+            className={cn("inline-flex items-center", badgeVariants(variant), visible === false && "hidden", className)}
             {...rest}
         />
     );

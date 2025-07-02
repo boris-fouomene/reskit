@@ -16,6 +16,11 @@ const appBar = tv({
         content: "",//the content of the appBar
     },
     variants: {
+        ...VariantsFactory.createAll<{ base: string }>((value) => {
+            return {
+                base: value,
+            }
+        }),
         colorScheme: Object.fromEntries(typedEntries(VariantsColors.surface).map(([key, value]) => {
             return [key, {
                 base: value,
@@ -25,11 +30,6 @@ const appBar = tv({
                 icon: cn((VariantsColors.iconForeground as any)[key]),
             }]
         })) as Record<IVariantsColors.ColorName, { base: string, title: string, subtitle: string, action: string, icon: string }>,
-        ...VariantsFactory.createAll<{ base: string }>((value) => {
-            return {
-                base: value,
-            }
-        })
     },
     defaultVariants: {
         shadow: "md",

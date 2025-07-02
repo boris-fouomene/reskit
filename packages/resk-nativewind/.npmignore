@@ -6,7 +6,6 @@ node_modules/
 # Except the build directory
 !build/
 !theme-to-css-vars.js
-!animations.js
 !package.json
 !html.js
 

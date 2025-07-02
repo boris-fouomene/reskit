@@ -8,7 +8,13 @@ const modal = tv({
         content: "max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
     },
     variants: {
-        background: VariantsFactory.create<typeof VariantsColors.surface, { content: string, container: string }>(VariantsColors.surface, (value) => {
+        ...VariantsFactory.createAll<{ content: string, container: string }>((value) => {
+            return {
+                content: value,
+                container: ""
+            }
+        }),
+        colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { content: string, container: string }>(VariantsColors.surface, (value) => {
             return {
                 content: value,
                 container: "",
@@ -20,17 +26,11 @@ const modal = tv({
                 content: "max-w-full sm:max-w-full w-screen h-screen max-w-full max-h-full lg:max-h[50%] lg:max-w-[600%]",
             }
         },
-        ...VariantsFactory.createAll<{ content: string, container: string }>((value) => {
-            return {
-                content: value,
-                container: ""
-            }
-        }),
     },
     defaultVariants: {
-        background: "surface",
+        colorScheme: "surface",
         rounded: "rounded",
-        //shadow:"md",
+        shadow: "md",
         shadowColor: "surface"
     }
 });

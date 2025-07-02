@@ -25,8 +25,7 @@
     "readme.md",
     "package.json",
     "html.js",
-    "theme-to-css-vars.js",
-    "animations.js"
+    "theme-to-css-vars.js"
   ],
   "exports": {
     ".": "./build/index.js",
@@ -46,7 +45,6 @@
     "./types": "./build/types/index.js",
     "./schemas/*": "./schemas/*",
     "./theme-to-css-vars": "./theme-to-css-vars.js",
-    "./animations": "./animations.js",
     "./*": "./build/*"
   },
   "scripts": {

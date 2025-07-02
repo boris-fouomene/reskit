@@ -2,7 +2,6 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 import { classes } from "./classes";
-import { transitionEasing } from "./variantsFactory/transitions";
 
 const bottomSheet = tv({
   slots: {
@@ -27,7 +26,12 @@ const bottomSheet = tv({
         portal: "tranlate-y-full",
       },
     },
-    background: VariantsFactory.create<typeof VariantsColors.surface, { container: string }>(VariantsColors.surface, (value) => {
+    ...VariantsFactory.createAll<{ container: string }>((value) => {
+      return {
+        container: value,
+      };
+    }),
+    colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { container: string }>(VariantsColors.surface, (value) => {
       return {
         container: value,
       };
@@ -38,14 +42,9 @@ const bottomSheet = tv({
     transitionEasing: VariantsFactory.createTransitionEasingVariants<{ portal: string }>((value) => {
       return { portal: value };
     }),
-    ...VariantsFactory.createAll<{ container: string }>((value) => {
-      return {
-        container: value,
-      };
-    }),
   },
   defaultVariants: {
-    background: "surface",
+    colorScheme: "surface",
     roundedTop: "10px",
     minHeight: "40%",
     maxHeight: "70%",

@@ -16,6 +16,11 @@ const menu = tv({
         animation: {
             scale: {}
         },
+        ...VariantsFactory.createAll<{ container: string }>((value) => {
+            return {
+                container: value,
+            }
+        }),
         visible: {
             true: {
                 container: "opacity-100",
@@ -24,12 +29,7 @@ const menu = tv({
                 container: "opacity-0",
             }
         },
-        background: VariantsFactory.create<typeof VariantsColors.surface, { container: string }>(VariantsColors.surface, (value) => {
-            return {
-                container: value,
-            }
-        }),
-        ...VariantsFactory.createAll<{ container: string }>((value) => {
+        colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { container: string }>(VariantsColors.surface, (value) => {
             return {
                 container: value,
             }
@@ -46,7 +46,7 @@ const menu = tv({
         { animation: "scale", visible: true, class: { container: "scale-100 opacity-100" } },
     ],
     defaultVariants: {
-        background: "surface",
+        colorScheme: "surface",
         paddingBottom: "4",
         shadow: "md",
         shadowColor: "surface",

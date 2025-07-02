@@ -13,7 +13,6 @@ import { IButtonBaseContext, IButtonProps } from "./types";
 import allVariants from "@variants/all";
 import { GestureResponderEvent } from "react-native";
 import Auth from '@resk/core/auth';
-import { classes } from "@variants/classes";
 
 
 export function ButtonBase<Context = unknown>({
@@ -83,7 +82,7 @@ export function ButtonBase<Context = unknown>({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("group/btn btn relative  button select-text cursor-pointer", rippleContent ? "overflow-hidden" : "", classes.active2hoverState, allVariants({ disabled }), computedVariant.base(), className)}
+            className={cn("group/btn btn relative  button select-text cursor-pointer", rippleContent ? "overflow-hidden" : "", allVariants({ disabled }), computedVariant.base(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}

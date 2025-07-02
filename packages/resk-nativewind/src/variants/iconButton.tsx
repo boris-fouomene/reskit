@@ -9,7 +9,7 @@ const iconButton = tv({
         text: "",
     },
     variants: {
-        ...VariantsFactory.createPadding2MarginVariants<{ icon: string, container: string, text: string }>((value, iconName) => {
+        ...VariantsFactory.createAll<{ icon: string, container: string, text: string }>((value, iconName) => {
             return {
                 container: value,
                 icon: "",
@@ -79,13 +79,12 @@ const iconButton = tv({
                 text: "text-9xl"
             }
         },
-        rounded: VariantsFactory.createRoundedVariants<{ container: string }>((value) => {
-            return { container: value };
-        })
     },
     defaultVariants: {
         rounded: "full",
-        colorScheme: "surface"
+        colorScheme: "surface",
+        activeOpacity: 80,
+        hoverOpacity: 90
     }
 });
 

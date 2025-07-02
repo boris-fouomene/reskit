@@ -46,16 +46,17 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           anchor={<Text>Open Menu</Text>}
           withScrollView
           items={Array.from({ length: 50 }).map((_, index) => ({ label: `Option ${index + 1}`, value: index }))}
-          children={<VStack>
-            <Text>Menu Opened with this children</Text>
-          </VStack>}
-        />
+        >
+          <VStack>
+            <Text>Menu Opened with</Text>
+          </VStack>
+        </Menu>
         <Menu
           anchor={<Text>Open Bottom Sheet</Text>}
           renderAsBottomSheetInFullScreen
 
         >
-          <Text>Bottom Sheet Menu Opened with this children</Text>
+          <Text>Bottom Sheet Menu Opened with</Text>
         </Menu>
       </HStack>
       <Div className="p-5">
@@ -101,7 +102,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <Div className={styles.container}>
         <Text className={styles.title}>{title}</Text>
         <Div asChild testID="example-of-slot" className={"text-red-500"}>
-          <Text className={[styles.separator]} testID='example-of-children-slot' children="Example of slot" />
+          <Text className={[styles.separator]} testID='example-of-children-slot'  >Example of slot</Text>
         </Div>
         <HelperText error>An example of helper text</HelperText>
         <Div className="p-5">

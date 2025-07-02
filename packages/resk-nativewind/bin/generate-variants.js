@@ -49,9 +49,9 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   const textColorsWithImportant = VariantsColors.buildTextColors(true);
   const textForegroundWithImportant = Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]));
   const textWithForeground = {
-      ...textColors,
-      ...textForeground,
-    },
+    ...textColors,
+    ...textForeground,
+  },
     textWithForegroundWithImportant = {
       ...textColorsWithImportant,
       ...textForegroundWithImportant,
@@ -181,6 +181,11 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           return [key, value.split("text-").join("active:ring-")];
         })
       ),
+      focusRingColors: Object.fromEntries(
+        Object.entries(textWithForeground).map(([key, value]) => {
+          return [key, value.split("text-").join("focus:ring-")];
+        })
+      ),
       allColors,
     },
     null,
@@ -224,6 +229,7 @@ export const VariantsGeneratedColors = ${content}
         ringColors : Record<IName2Foreground,string>;
         hoverRingColors: Record<IName2Foreground,string>;
         activeRingColors: Record<IName2Foreground,string>;
+        focusRingColors: Record<IName2Foreground,string>;
     }
 export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
     `,

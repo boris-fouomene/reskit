@@ -35,7 +35,7 @@ const bottomSheet = tv({
     ...VariantsFactory.createTransitionsVariants<{ portal: string }>((value) => {
       return { portal: value };
     }),
-    transitionEasing: VariantsFactory.createTransitionEasing<{ portal: string }>((value) => {
+    transitionEasing: VariantsFactory.createTransitionEasingVariants<{ portal: string }>((value) => {
       return { portal: value };
     }),
     ...VariantsFactory.createAll<{ container: string }>((value) => {

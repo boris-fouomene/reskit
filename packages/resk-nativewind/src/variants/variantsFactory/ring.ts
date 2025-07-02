@@ -1,4 +1,4 @@
-export const ringClasses = {
+export const ringWidthClasses = {
     ring: "ring",
     0: "ring-0",
     1: "ring-1",
@@ -6,7 +6,7 @@ export const ringClasses = {
     4: "ring-4",
     8: "ring-8",
 };
-export const hoverRingSize = {
+export const hoverRingWidthClasses = {
     ring: "hover:ring",
     0: "hover:ring-0",
     1: "hover:ring-1",
@@ -14,7 +14,7 @@ export const hoverRingSize = {
     4: "hover:ring-4",
     8: "hover:ring-8",
 };
-export const activeRingSize = {
+export const activeRingWidthClasses = {
     ring: "active:ring",
     0: "active:ring-0",
     1: "active:ring-1",
@@ -22,7 +22,7 @@ export const activeRingSize = {
     4: "active:ring-4",
     8: "active:ring-8",
 };
-export const focusRingSize = {
+export const focusRingWidthClasses = {
     ring: "focus:ring",
     0: "focus:ring-0",
     1: "focus:ring-1",

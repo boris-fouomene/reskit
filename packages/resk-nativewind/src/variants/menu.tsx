@@ -37,7 +37,7 @@ const menu = tv({
         ...VariantsFactory.createTransitionsVariants<{ container: string }>((value) => {
             return { container: value };
         }),
-        transitionEasing: VariantsFactory.createTransitionEasing<{ container: string }>((value) => {
+        transitionEasing: VariantsFactory.createTransitionEasingVariants<{ container: string }>((value) => {
             return { container: value };
         }),
     },

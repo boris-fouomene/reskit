@@ -13,7 +13,9 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <ModalExample />
       <Div className="p-5">
         <H2>TextInput</H2>
-        <TextInput label="TextInput" />
+        <TextInput label="TextInput"
+          variant={{ focusedBorderWidth: 3, focusedBorderColor: "error" }}
+        />
         <TextInput variant={{ iconColor: "secondary", labelTextAlign: "right", labelWeight: "semibold", iconSize: "25px", labelTextSize: "15px" }} type="password" label="Password" placeholder="Enter your password" />
         <TextInput type="date" label="Date" placeholder="Enter your date" />
         <TextInput type="time" label="Time" placeholder="Enter your time" />

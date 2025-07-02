@@ -3,6 +3,7 @@ import { VariantsGeneratedColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 import { IVariantsColors } from "./colors";
 import { cn } from "@utils/cn";
+import { typedEntries } from "@resk/core/utils";
 
 const appBar = tv({
     slots: {
@@ -15,7 +16,7 @@ const appBar = tv({
         content: "",//the content of the appBar
     },
     variants: {
-        colorScheme: Object.fromEntries(Object.entries(VariantsGeneratedColors.surface).map(([key, value]) => {
+        colorScheme: Object.fromEntries(typedEntries(VariantsGeneratedColors.surface).map(([key, value]) => {
             return [key, {
                 base: value,
                 title: (VariantsGeneratedColors.textForeground as any)[key],

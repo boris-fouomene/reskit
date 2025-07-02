@@ -7,7 +7,7 @@ export const borderStyleClasses = {
   hidden: "web:border-hidden",
 };
 
-export const borderTopWidthVariants = {
+export const borderTopWidthClasses = {
   0: "border-t-0",
   1: "border-t",
   2: "border-t-2",
@@ -21,7 +21,7 @@ export const borderTopWidthVariants = {
   10: "border-t-10",
 } as const;
 
-export const borderBottomWidthVariants = {
+export const borderBottomWidthClasses = {
   0: "border-b-0",
   1: "border-b",
   2: "border-b-2",
@@ -35,7 +35,7 @@ export const borderBottomWidthVariants = {
   10: "border-b-10",
 } as const;
 
-export const borderLeftWidthVariants = {
+export const borderLeftWidthClasses = {
   0: "border-l-0",
   1: "border-l",
   2: "border-l-2",
@@ -49,7 +49,7 @@ export const borderLeftWidthVariants = {
   10: "border-l-10",
 } as const;
 
-export const borderRightWidthVariants = {
+export const borderRightWidthClasses = {
   0: "border-r-0",
   1: "border-r",
   2: "border-r-2",
@@ -63,7 +63,7 @@ export const borderRightWidthVariants = {
   10: "border-r-10",
 } as const;
 
-export const borderWidthVariants = {
+export const borderWidthClasses = {
   0: "border-0",
   1: "border",
   2: "border-2",
@@ -76,7 +76,7 @@ export const borderWidthVariants = {
   9: "border-9",
   10: "border-10",
 } as const;
-export const borderInlineWidthVariants = {
+export const borderInlineWidthClasses = {
   0: "border-x-0",
   1: "border-x",
   2: "border-x-2",
@@ -90,7 +90,7 @@ export const borderInlineWidthVariants = {
   10: "border-x-10",
 } as const;
 
-export const borderBlockWidthVariants = {
+export const borderBlockWidthClasses = {
   0: "border-y-0",
   1: "border-y",
   2: "border-y-2",
@@ -104,12 +104,12 @@ export const borderBlockWidthVariants = {
   10: "border-y-10",
 } as const;
 
-export const allBorderWidthVariants = {
-  borderWidth: borderWidthVariants,
-  borderLeftWidth: borderLeftWidthVariants,
-  borderRightWidth: borderRightWidthVariants,
-  borderTopWidth: borderTopWidthVariants,
-  borderBottomWidth: borderBottomWidthVariants,
-  borderInlineWidth: borderInlineWidthVariants,
-  borderBlockWidth: borderBlockWidthVariants,
+export const allBorderWidthClasses = {
+  borderWidth: borderWidthClasses,
+  borderLeftWidth: borderLeftWidthClasses,
+  borderRightWidth: borderRightWidthClasses,
+  borderTopWidth: borderTopWidthClasses,
+  borderBottomWidth: borderBottomWidthClasses,
+  borderInlineWidth: borderInlineWidthClasses,
+  borderBlockWidth: borderBlockWidthClasses,
 } as const;

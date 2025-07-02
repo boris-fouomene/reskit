@@ -1,16 +1,17 @@
 import { roundeClasses, roundedBottomClasses, roundedBottomLeftRadiusClasses, roundedBottomRightRadiusClasses, roundedRightClasses, roundedTopClasses, roundedTopLeftRadiusClasses, roundedTopRightRadiusClasses, roundeLeftClasses } from "./rounded";
 import { marginClasses, padding2marginClasses, paddingClasses } from "./padding2margin";
-import { borderBottomWidthVariants, borderLeftWidthVariants, borderRightWidthVariants, borderStyleClasses, borderTopWidthVariants, borderWidthVariants, borderInlineWidthVariants, borderBlockWidthVariants, allBorderWidthVariants } from "./border";
+import { borderBottomWidthClasses, borderLeftWidthClasses, borderRightWidthClasses, borderStyleClasses, borderTopWidthClasses, borderWidthClasses, borderInlineWidthClasses, borderBlockWidthClasses, allBorderWidthClasses } from "./border";
 import { ShadowColorsClasses } from "./shadow";
 import { IconSizes, textSizes } from "./textSizes";
 import { fontWeightClasses } from "./fontWeight";
 import { textAlignClasses } from "./textAlignClasses";
 import { VariantsGeneratedColors } from "@variants/colors/generated";
 import { width2heightClasses } from "./width2height";
-import { activeRingSize, focusRingSize, hoverRingSize, ringClasses } from "./ring";
+import { activeRingWidthClasses, focusRingWidthClasses, hoverRingWidthClasses, ringWidthClasses } from "./ring";
 import { scalesClasses } from "./scales";
 import { IClassName } from "@src/types";
 import { transitionEasing, transitions } from "./transitions";
+import { typedEntries } from "@resk/core/utils";
 
 type IVariantFactoryMutator<InputType extends Record<string | number, unknown>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
 
@@ -91,8 +92,8 @@ export const VariantsFactory = {
   create: function <InputType extends Record<string, unknown>, ResultType = string, VariantGroupName = any>(input: InputType, variantMutator?: IVariantFactoryMutator<InputType, ResultType>, variantGroupName?: VariantGroupName) {
     variantMutator = typeof variantMutator == "function" ? variantMutator : (value) => value as ResultType;
     return Object.fromEntries(
-      Object.entries(input).map(([key, value]) => {
-        return [key, variantMutator(value as any, key as keyof InputType, variantGroupName)];
+      typedEntries(input).map(([key, value]) => {
+        return [key, variantMutator(value as any, key, variantGroupName)];
       })
     ) as Record<keyof InputType, ResultType>;
   },
@@ -105,27 +106,27 @@ export const VariantsFactory = {
   createRoundedVariants: function createRoundedVariants<ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
     return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);
   },
-  createMultipleVariants: function <T extends Record<string, Record<number | string, IClassName>>, ResultType = string>(multiVariants: T, variantMutator?: IVariantFactoryMutator<T[keyof T], ResultType>): Record<keyof T, Record<keyof T[keyof T], ResultType>> {
+  createCompositeVariants: function <T extends Record<string, Record<number | string, IClassName>>, ResultType = string>(compositeVariants: T, variantMutator?: IVariantFactoryMutator<T[keyof T], ResultType>): Record<keyof T, Record<keyof T[keyof T], ResultType>> {
     const r = {} as any;
-    Object.entries(multiVariants).forEach(([key, value]) => {
-      r[key] = VariantsFactory.create<T[keyof T], ResultType, keyof T>(value as any, variantMutator, key);
+    typedEntries(compositeVariants).forEach(([key, value]) => {
+      r[key] = VariantsFactory.create<T[keyof T], ResultType, keyof T>(value, variantMutator, key);
     });
     return r;
   },
   createPaddingsVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>) {
-    return VariantsFactory.createMultipleVariants<typeof paddingClasses, ResultType>(paddingClasses, variantMutator);
+    return VariantsFactory.createCompositeVariants<typeof paddingClasses, ResultType>(paddingClasses, variantMutator);
   },
   createScalesVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>) {
-    return VariantsFactory.createMultipleVariants<typeof scalesClasses, ResultType>(scalesClasses, variantMutator as any);
+    return VariantsFactory.createCompositeVariants<typeof scalesClasses, ResultType>(scalesClasses, variantMutator as any);
   },
   createMarginsVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof marginClasses)[keyof typeof marginClasses], ResultType>) {
-    return VariantsFactory.createMultipleVariants<typeof marginClasses, ResultType>(marginClasses, variantMutator as any);
+    return VariantsFactory.createCompositeVariants<typeof marginClasses, ResultType>(marginClasses, variantMutator as any);
   },
   createWidth2HeightVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof width2heightClasses)[keyof typeof width2heightClasses], ResultType>) {
-    return VariantsFactory.createMultipleVariants<typeof width2heightClasses, ResultType>(width2heightClasses, variantMutator);
+    return VariantsFactory.createCompositeVariants<typeof width2heightClasses, ResultType>(width2heightClasses, variantMutator);
   },
   createPadding2MarginVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>) {
-    return VariantsFactory.createMultipleVariants<typeof padding2marginClasses, ResultType>(padding2marginClasses, variantMutator);
+    return VariantsFactory.createCompositeVariants<typeof padding2marginClasses, ResultType>(padding2marginClasses, variantMutator);
   },
 
   createFontWeightVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof fontWeightClasses, ResultType>) {
@@ -147,34 +148,46 @@ export const VariantsFactory = {
   createTextAlignVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textAlignClasses, ResultType>) {
     return VariantsFactory.create<typeof textAlignClasses, ResultType>(textAlignClasses, variantMutator);
   },
-  createBorderWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderWidthVariants, ResultType>) {
-    return VariantsFactory.create<typeof borderWidthVariants, ResultType>(borderWidthVariants, variantMutator);
+  createBorderWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof borderWidthClasses, ResultType>(borderWidthClasses, variantMutator);
   },
-  createBorderBottomWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderBottomWidthVariants, ResultType>) {
-    return VariantsFactory.create<typeof borderBottomWidthVariants, ResultType>(borderBottomWidthVariants, variantMutator);
+  createBorderBottomWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderBottomWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof borderBottomWidthClasses, ResultType>(borderBottomWidthClasses, variantMutator);
   },
-  createBorderTopWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderTopWidthVariants, ResultType>) {
-    return VariantsFactory.create<typeof borderTopWidthVariants, ResultType>(borderTopWidthVariants, variantMutator);
+  createRingWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof ringWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof ringWidthClasses, ResultType>(ringWidthClasses, variantMutator);
   },
-  createBorderLeftWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderLeftWidthVariants, ResultType>) {
-    return VariantsFactory.create<typeof borderLeftWidthVariants, ResultType>(borderLeftWidthVariants, variantMutator);
+  createActiveRingWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof activeRingWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof activeRingWidthClasses, ResultType>(activeRingWidthClasses, variantMutator);
   },
-  createBorderRightWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderRightWidthVariants, ResultType>) {
-    return VariantsFactory.create<typeof borderRightWidthVariants, ResultType>(borderRightWidthVariants, variantMutator);
+  createHoverRingWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof hoverRingWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof hoverRingWidthClasses, ResultType>(hoverRingWidthClasses, variantMutator);
   },
-  createBorderXWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderInlineWidthVariants, ResultType>) {
-    return VariantsFactory.create<typeof borderInlineWidthVariants, ResultType>(borderInlineWidthVariants, variantMutator);
+  createFocusRingWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof focusRingWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof focusRingWidthClasses, ResultType>(focusRingWidthClasses, variantMutator);
   },
-  createBorderYWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderBlockWidthVariants, ResultType>) {
-    return VariantsFactory.create<typeof borderBlockWidthVariants, ResultType>(borderBlockWidthVariants, variantMutator);
+  createBorderTopWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderTopWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof borderTopWidthClasses, ResultType>(borderTopWidthClasses, variantMutator);
   },
-  createAllBorderWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allBorderWidthVariants)[keyof typeof allBorderWidthVariants], ResultType>) {
-    return VariantsFactory.createMultipleVariants<typeof allBorderWidthVariants, ResultType>(allBorderWidthVariants, variantMutator);
+  createBorderLeftWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderLeftWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof borderLeftWidthClasses, ResultType>(borderLeftWidthClasses, variantMutator);
+  },
+  createBorderRightWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderRightWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof borderRightWidthClasses, ResultType>(borderRightWidthClasses, variantMutator);
+  },
+  createBorderXWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderInlineWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof borderInlineWidthClasses, ResultType>(borderInlineWidthClasses, variantMutator);
+  },
+  createBorderYWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderBlockWidthClasses, ResultType>) {
+    return VariantsFactory.create<typeof borderBlockWidthClasses, ResultType>(borderBlockWidthClasses, variantMutator);
+  },
+  createAllBorderWidthVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allBorderWidthClasses)[keyof typeof allBorderWidthClasses], ResultType>) {
+    return VariantsFactory.createCompositeVariants<typeof allBorderWidthClasses, ResultType>(allBorderWidthClasses, variantMutator);
   },
   createTransitionsVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof transitions)[keyof typeof transitions], ResultType>) {
-    return VariantsFactory.createMultipleVariants<typeof transitions, ResultType>(transitions, variantMutator);
+    return VariantsFactory.createCompositeVariants<typeof transitions, ResultType>(transitions, variantMutator);
   },
-  createTransitionEasing: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof transitionEasing, ResultType>) {
+  createTransitionEasingVariants: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof transitionEasing, ResultType>) {
     return VariantsFactory.create<typeof transitionEasing, ResultType>(transitionEasing, variantMutator);
   },
 };
@@ -195,12 +208,13 @@ const allVariantClasses = {
   ringColor: VariantsGeneratedColors.ringColors,
   activeRingColor: VariantsGeneratedColors.activeRingColors,
   hoverRingColor: VariantsGeneratedColors.hoverRingColors,
-  ringSize: ringClasses,
-  hoverRingSize: hoverRingSize,
-  activeRingSize: activeRingSize,
-  focusRingSize: focusRingSize,
+  focusRingColor: VariantsGeneratedColors.focusRingColors,
+  ringWidth: ringWidthClasses,
+  hoverRingWidth: hoverRingWidthClasses,
+  activeRingWidth: activeRingWidthClasses,
+  focusRingWidth: focusRingWidthClasses,
   ...scalesClasses,
-  ...allBorderWidthVariants,
+  ...allBorderWidthClasses,
   ...padding2marginClasses,
 };
 type IVariantFactoryAll<ResultType = string> = {

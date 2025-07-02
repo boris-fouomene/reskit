@@ -1,6 +1,0 @@
-./generate-icon-types.js
-src/
-./src/**/*
-src
-tsconfig.json
-generate-icon-types.js

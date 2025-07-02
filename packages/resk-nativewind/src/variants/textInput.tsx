@@ -1,6 +1,10 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsFactory } from "./variantsFactory";
 import { VariantsGeneratedColors } from "./colors/generated";
+import { borderWidthClasses } from "./variantsFactory/border";
+import { ringWidthClasses } from "./variantsFactory/ring";
+import "@resk/core/utils";
+import { typedEntries } from "@resk/core/utils";
 
 const textInput = tv({
     slots: {
@@ -15,6 +19,9 @@ const textInput = tv({
         placeholder: ""
     },
     variants: {
+        ...VariantsFactory.createAll<{ contentContainer: string }>((value, colorName) => {
+            return { contentContainer: value }
+        }),
         background: VariantsFactory.create<typeof VariantsGeneratedColors.background, ITextInputSlots>(VariantsGeneratedColors.background, (value, colorName) => {
             const textColor = VariantsGeneratedColors.textForeground[colorName];
             return {
@@ -66,15 +73,12 @@ const textInput = tv({
         ...VariantsFactory.createAllBorderWidthVariants<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
-        focusedColor: VariantsFactory.create<typeof VariantsGeneratedColors.textWithForeground, ITextInputSlots>(VariantsGeneratedColors.textWithForeground, (value, colorName) => {
-            return {}
-        }),
-        errorColor: VariantsFactory.create<typeof VariantsGeneratedColors.background, ITextInputSlots>(VariantsGeneratedColors.background, (value, colorName) => {
-            return {}
-        }),
-        focusedBorderColor: VariantsFactory.create<typeof VariantsGeneratedColors.borderColor, ITextInputSlots>(VariantsGeneratedColors.borderColor, (value, colorName) => {
-            return { contentContainer: "" }
-        }),
+        focusedColor: {} as Record<keyof typeof VariantsGeneratedColors.textWithForeground, ITextInputSlots>,
+        focusedRingColor: {} as Record<keyof typeof VariantsGeneratedColors.ringColors, ITextInputSlots>,
+        focusedBorderWidth: {} as Record<keyof typeof borderWidthClasses, ITextInputSlots>,
+        focusedRingWidth: {} as Record<keyof typeof ringWidthClasses, ITextInputSlots>,
+        errorColor: {} as Record<keyof typeof VariantsGeneratedColors.background, ITextInputSlots>,
+        focusedBorderColor: {} as Record<keyof typeof VariantsGeneratedColors.borderColor, ITextInputSlots>,
         focused: {
             true: {}
         },
@@ -82,17 +86,8 @@ const textInput = tv({
             true: {}
         }
     },
-    defaultVariants: {
-        background: "surface",
-        paddingX: "5px",
-        iconSize: "20px",
-        focusedColor: "primary",
-        focusedBorderColor: "primary",
-        errorColor: "error",
-    },
     compoundVariants: [
-        //focused border color
-        ...Object.entries(VariantsGeneratedColors.borderColor).map(([borderColor, value]) => {
+        ...typedEntries(VariantsGeneratedColors.borderColor).map(([borderColor, value]) => {
             return {
                 focused: true,
                 focusedBorderColor: borderColor,
@@ -100,9 +95,26 @@ const textInput = tv({
                     contentContainer: value,
                 }
             }
-        }) as Array<{}>,
-        //focused color
-        ...Object.entries(VariantsGeneratedColors.textWithForeground).map(([textColor, value]) => {
+        }),
+        ...typedEntries(borderWidthClasses).map(([borderWidth, value]) => {
+            return {
+                focused: true,
+                focusedBorderWidth: borderWidth,
+                class: {
+                    contentContainer: value,
+                }
+            }
+        }),
+        ...typedEntries(VariantsGeneratedColors.ringColors).map(([ringColor, value]) => {
+            return {
+                focused: true,
+                focusedRingColor: ringColor,
+                class: {
+                    contentContainer: value,
+                }
+            }
+        }),
+        ...typedEntries(VariantsGeneratedColors.textWithForeground).map(([textColor, value]) => {
             return {
                 focused: true,
                 focusedColor: textColor,
@@ -113,9 +125,9 @@ const textInput = tv({
                     icon: value.replaceAll("text-", "!text-")
                 }
             }
-        }) as Array<{}>,
+        }),
         // error color
-        ...Object.entries(VariantsGeneratedColors.textWithForeground).map(([textColor, value]) => {
+        ...typedEntries(VariantsGeneratedColors.background).map(([textColor, value]) => {
             return {
                 error: true,
                 errorColor: textColor,
@@ -126,8 +138,25 @@ const textInput = tv({
                     icon: value.replaceAll("text-", "!text-")
                 }
             }
-        }) as Array<{}>,
-    ]
+        }),
+        ...typedEntries(ringWidthClasses).map(([ringWidth, value]) => {
+            return {
+                focused: true,
+                focusedRingWidth: ringWidth,
+                class: {
+                    contentContainer: value,
+                }
+            }
+        })
+    ],
+    defaultVariants: {
+        background: "surface",
+        paddingX: "5px",
+        iconSize: "20px",
+        focusedRingColor: "primary",
+        focusedRingWidth: 2,
+        errorColor: "error",
+    },
 });
 
 export type IVariantPropsTextInput = VariantProps<typeof textInput>;

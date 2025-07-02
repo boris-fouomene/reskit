@@ -546,6 +546,28 @@ export const VariantsGeneratedColors = {
     "success-foreground": "active:ring-white dark:active:ring-green-50",
     "text-foreground": "active:ring-gray-100 dark:active:ring-gray-900"
   },
+  "focusRingColors": {
+    "primary": "focus:ring-primary dark:focus:ring-dark-primary",
+    "secondary": "focus:ring-secondary dark:focus:ring-dark-secondary",
+    "surface": "focus:ring-gray-100 dark:focus:ring-gray-800",
+    "background": "focus:ring-white dark:focus:ring-gray-900",
+    "neutral": "focus:ring-gray-500 dark:focus:ring-gray-600",
+    "error": "focus:ring-red-500 dark:focus:ring-red-600",
+    "info": "focus:ring-blue-500 dark:focus:ring-blue-600",
+    "warning": "focus:ring-yellow-500 dark:focus:ring-yellow-600",
+    "success": "focus:ring-green-500 dark:focus:ring-green-600",
+    "text": "focus:ring-gray-900 dark:focus:ring-gray-100",
+    "primary-foreground": "focus:ring-primary-foreground dark:focus:ring-dark-primary-foreground",
+    "secondary-foreground": "focus:ring-secondary-foreground dark:focus:ring-dark-secondary-foreground",
+    "surface-foreground": "focus:ring-gray-900 dark:focus:ring-gray-100",
+    "background-foreground": "focus:ring-gray-900 dark:focus:ring-gray-100",
+    "neutral-foreground": "focus:ring-white dark:focus:ring-gray-50",
+    "error-foreground": "focus:ring-white dark:focus:ring-red-50",
+    "info-foreground": "focus:ring-white dark:focus:ring-blue-50",
+    "warning-foreground": "focus:ring-yellow-900 dark:focus:ring-yellow-50",
+    "success-foreground": "focus:ring-white dark:focus:ring-green-50",
+    "text-foreground": "focus:ring-gray-100 dark:focus:ring-gray-900"
+  },
   "allColors": {}
 }
     

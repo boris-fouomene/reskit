@@ -216,7 +216,6 @@ export default function TextInput({
     const contentContainerClx = cn(computedVariant.contentContainer(), contentContainerClassName);
     const iconClx = cn(computedVariant.icon(), iconClassName);
     const containerClx = cn(computedVariant.container(), containerClassName);
-
     const phoneDialCodeClx = cn("text-input-phone-dial-code-label", inputTextClx);
     const phoneDialCodeLabel = phoneDialCodeText ? <Text className={phoneDialCodeClx}>{phoneDialCodeText}</Text> : null;
     const callOptions: ITextInputCallOptions = { ...inputState, isPhone, phoneDialCodeLabel, labelClassName: labelClx, iconClassName: iconClx, inputClassName: inputClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };

@@ -455,7 +455,41 @@ declare global {
     * @category Utilities
     * @since 1.0.0
     */
-    flatten(obj: any): Record<string, IPrimitive>
+    flatten(obj: any): Record<string, IPrimitive>;
+
+
+    /**
+     * Enhanced version of Object.entries that preserves key types in TypeScript inference.
+     * 
+     * Unlike the standard Object.entries which types all keys as string, this method
+     * maintains the original key types (string | number | symbol) in TypeScript's type system
+     * while still following JavaScript's runtime behavior where all keys are strings.
+     * 
+     * @template T - The object type extending Record<string | number, any>
+     * @param obj - The object to extract entries from
+     * @returns Array of key-value tuples with preserved key types in TypeScript
+     * 
+     * @example
+     * ```typescript
+     * const obj = { 1: "one", "foo": "bar", 42: "answer" } as const;
+     * 
+     * // Standard Object.entries - all keys typed as string
+     * const standard = Object.entries(obj); // [string, string][]
+     * 
+     * // Enhanced Object.typedEntries - preserves original key types
+     * const typed = Object.typedEntries(obj); 
+     * // Type: (["1", "one"] | ["foo", "bar"] | ["42", "answer"])[]
+     * ```
+     * 
+     * @remarks
+     * - Runtime behavior is identical to Object.entries (all keys are strings)
+     * - Only TypeScript inference is enhanced to remember original key types
+     * - Works best with objects declared with 'as const' for literal type inference
+     * - Particularly useful for objects with mixed string and numeric keys
+     * 
+     * @since 1.0.0
+     */
+    typedEntries<T extends Record<any, unknown> = any>(obj: T): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]>;
   }
 }
 
@@ -736,6 +770,45 @@ export function isIterableStructure(value: any): boolean {
     value instanceof WeakSet
   );
 }
+
+/**
+     * Enhanced version of Object.entries that preserves key types in TypeScript inference.
+     * 
+     * Unlike the standard Object.entries which types all keys as string, this method
+     * maintains the original key types (string | number | symbol) in TypeScript's type system
+     * while still following JavaScript's runtime behavior where all keys are strings.
+     * 
+     * @template T - The object type extending Record<string | number, any>
+     * @param obj - The object to extract entries from
+     * @returns Array of key-value tuples with preserved key types in TypeScript
+     * 
+     * @example
+     * ```typescript
+     * const obj = { 1: "one", "foo": "bar", 42: "answer" } as const;
+     * 
+     * // Standard Object.entries - all keys typed as string
+     * const standard = Object.entries(obj); // [string, string][]
+     * 
+     * // Enhanced Object.typedEntries - preserves original key types
+     * const typed = Object.typedEntries(obj); 
+     * // Type: (["1", "one"] | ["foo", "bar"] | ["42", "answer"])[]
+     * ```
+     * 
+     * @remarks
+     * - Runtime behavior is identical to Object.entries (all keys are strings)
+     * - Only TypeScript inference is enhanced to remember original key types
+     * - Works best with objects declared with 'as const' for literal type inference
+     * - Particularly useful for objects with mixed string and numeric keys
+     * 
+     * @since 1.0.0
+     */
+export function typedEntries<T extends Record<any, unknown> = any>(obj: T): Array<{ [K in keyof T]: [K, T[K]] }[keyof T]> {
+  // Runtime implementation is identical to Object.entries
+  // The magic happens in the TypeScript type annotations above
+  return Object.entries(obj) as Array<{ [K in keyof T]: [K, T[K]] }[keyof T]>;
+}
+
+Object.typedEntries = typedEntries;
 
 
 Object.flatten = flattenObject;

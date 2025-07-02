@@ -39,7 +39,7 @@ type IVariantFactoryMutator<InputType extends Record<string | number, unknown>, 
  * // Result: { primary: "bg-blue-500", secondary: "bg-gray-500" }
  *
  * // Using a custom mutator to append a prefix
- * const variantsWithPrefix = VariantsFactory.create(
+ * const computedVariants = VariantsFactory.create(
  *   { small: "p-2", large: "p-6" },
  *   (value, key) => `tw-${value}`
  * );
@@ -69,7 +69,7 @@ export const VariantsFactory = {
    * // Result: { primary: "bg-blue-500", secondary: "bg-gray-500" }
    *
    * // Using a custom mutator to append a prefix
-   * const variantsWithPrefix = VariantsFactory.create(
+   * const computedVariants = VariantsFactory.create(
    *   { small: "p-2", large: "p-6" },
    *   (value, key) => `tw-${value}`
    * );

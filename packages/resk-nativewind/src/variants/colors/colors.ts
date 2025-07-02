@@ -65,8 +65,8 @@ export class VariantsColorsFactory {
    *
    * // Use a custom builder to return an object with both light and dark classes
    * const customClasses = VariantsColorsFactory.buildColors("border", false, (opts) => ({
-   *   light: opts.lightColorWithPrefix,
-   *   dark: opts.darkColorWithPrefix
+   *   light: opts.lightComputedColor,
+   *   dark: opts.darkComputedColor
    * }));
    * // customClasses.success => { light: "border-green-500", dark: "dark:border-green-600" }
    * ```
@@ -85,7 +85,7 @@ export class VariantsColorsFactory {
   public static buildColors<TailwindClassPrefix extends string = any, ClassNameBuilderResult = IClassName>(tailwindClassPrefix: TailwindClassPrefix, withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<TailwindClassPrefix, ClassNameBuilderResult>, isForeground: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
     const r = Object.create({}) as Record<IVariantsColors.ColorName, ClassNameBuilderResult>;
     const importantPrefix = withImportantAttribute ? "!" : "";
-    const colorBuilder: IVariantsColors.ClassNameBuilder<TailwindClassPrefix> = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightColorWithPrefix, darkColorWithPrefix }) => `${lightColorWithPrefix} ${darkColorWithPrefix}` as any;
+    const colorBuilder: IVariantsColors.ClassNameBuilder<TailwindClassPrefix> = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightComputedColor, darkComputedColor }) => `${lightComputedColor} ${darkComputedColor}` as any;
     Object.entries(VariantsColorsFactory.colors).map(([color, value]) => {
       const { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, hoverLightColor: _hoverLightColor, hoverDarkColor: _hoverDarkColor, hoverLightForeground: _hoverLightForeground, hoverDarkForeground: _hoverDarkForeground, activeLightColor: _activeLightColor, activeDarkColor: _activeDarkColor, activeLightForeground: _activeLightForeground, activeDarkForeground: _activeDarkForeground, ...rest } = Object.assign({}, value);
       const lightColor = defaultStr(isForeground ? _lightForeground : light);
@@ -114,21 +114,21 @@ export class VariantsColorsFactory {
         isForeground: !!isForeground,
         lightColor,
         darkColor,
-        lightColorWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`,
-        darkColorWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`,
+        lightComputedColor: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`,
+        darkComputedColor: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`,
         darkForeground,
         lightForeground,
-        lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`,
-        darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`,
+        lightComputedForeground: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`,
+        darkComputedForeground: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`,
 
-        hoverLightColorWithPrefix: hoverLightColor ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightColor}` : "",
-        hoverDarkColorWithPrefix: hoverDarkColor ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkColor}` : "",
-        hoverLightForegroundWithPrefix: hoverLightForeground ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightForeground}` : "",
-        hoverDarkForegroundWithPrefix: hoverDarkForeground ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkForeground}` : "",
-        activeLightColorWithPrefix: activeLightColor ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightColor}` : "",
-        activeDarkColorWithPrefix: activeDarkColor ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkColor}` : "",
-        activeLightForegroundWithPrefix: activeLightForeground ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightForeground}` : "",
-        activeDarkForegroundWithPrefix: activeDarkForeground ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkForeground}` : "",
+        hoverLightComputedColor: hoverLightColor ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightColor}` : "",
+        hoverDarkComputedColor: hoverDarkColor ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkColor}` : "",
+        hoverLightComputedForeground: hoverLightForeground ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightForeground}` : "",
+        hoverDarkComputedForeground: hoverDarkForeground ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkForeground}` : "",
+        activeLightComputedColor: activeLightColor ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightColor}` : "",
+        activeDarkComputedColor: activeDarkColor ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkColor}` : "",
+        activeLightComputedForeground: activeLightForeground ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightForeground}` : "",
+        activeDarkComputedForeground: activeDarkForeground ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkForeground}` : "",
       });
     });
     return r;
@@ -163,8 +163,8 @@ export class VariantsColorsFactory {
    *
    * // Use a custom builder to return an object with both light and dark classes
    * const customTextClasses = VariantsColorsFactory.buildTextColors(false, (opts) => ({
-   *   light: opts.lightColorWithPrefix,
-   *   dark: opts.darkColorWithPrefix
+   *   light: opts.lightComputedColor,
+   *   dark: opts.darkComputedColor
    * }));
    * // customTextClasses.success => { light: "text-green-500", dark: "dark:text-green-600" }
    * ```
@@ -201,8 +201,8 @@ export class VariantsColorsFactory {
    *
    * // Use a custom builder to return an object with both light and dark classes
    * const customBgClasses = VariantsColorsFactory.buildBackgroundColors(false, (opts) => ({
-   *   light: opts.lightColorWithPrefix,
-   *   dark: opts.darkColorWithPrefix
+   *   light: opts.lightComputedColor,
+   *   dark: opts.darkComputedColor
    * }));
    * // customBgClasses.success => { light: "bg-green-500", dark: "dark:bg-green-600" }
    * ```
@@ -240,8 +240,8 @@ export class VariantsColorsFactory {
    *
    * // Use a custom builder to return an object with both light and dark classes
    * const customBorderClasses = VariantsColorsFactory.buildBorderColors(false, (opts) => ({
-   *   light: opts.lightColorWithPrefix,
-   *   dark: opts.darkColorWithPrefix
+   *   light: opts.lightComputedColor,
+   *   dark: opts.darkComputedColor
    * }));
    * // customBorderClasses.success => { light: "border-green-500", dark: "dark:border-green-600" }
    * ```
@@ -411,10 +411,10 @@ export namespace IVariantsColors {
    * @property darkColor - The color name or foreground for dark mode.
    * @property lightForeground - The foreground color for light mode.
    * @property darkForeground - The foreground color for dark mode.
-   * @property lightColorWithPrefix - The full Tailwind class for the light color, with optional important modifier.
-   * @property lightForegroundWithPrefix - The full Tailwind class for the light foreground color, with optional important modifier.
-   * @property darkColorWithPrefix - The full Tailwind class for the dark color, with dark mode and optional important modifier.
-   * @property darkForegroundWithPrefix - The full Tailwind class for the dark foreground color, with dark mode and optional important modifier.
+   * @property lightComputedColor - The full Tailwind class for the light color, with optional important modifier.
+   * @property lightComputedForeground - The full Tailwind class for the light foreground color, with optional important modifier.
+   * @property darkComputedColor - The full Tailwind class for the dark color, with dark mode and optional important modifier.
+   * @property darkComputedForeground - The full Tailwind class for the dark foreground color, with dark mode and optional important modifier.
    *
    * @example
    * ```typescript
@@ -423,10 +423,10 @@ export namespace IVariantsColors {
    *   darkColor: "dark-primary",
    *   lightForeground: "primary-foreground",
    *   darkForeground: "dark-primary-foreground",
-   *   lightColorWithPrefix: "!bg-primary",
-   *   lightForegroundWithPrefix: "!bg-primary-foreground",
-   *   darkColorWithPrefix: "dark:!bg-dark-primary",
-   *   darkForegroundWithPrefix: "dark:!bg-dark-primary-foreground"
+   *   lightComputedColor: "!bg-primary",
+   *   lightComputedForeground: "!bg-primary-foreground",
+   *   darkComputedColor: "dark:!bg-dark-primary",
+   *   darkComputedForeground: "dark:!bg-dark-primary-foreground"
    * };
    * ```
    */
@@ -435,19 +435,19 @@ export namespace IVariantsColors {
     darkColor: IVariantsColors.ColorName2Foreground | string;
     lightForeground: IVariantsColors.ColorName2Foreground | string;
     darkForeground: IVariantsColors.ColorName2Foreground | string;
-    lightColorWithPrefix: `${"!" | ""}${TailwindClassPrefix}-${string}`;
-    lightForegroundWithPrefix: `${"!" | ""}${TailwindClassPrefix}-${string}`;
-    darkColorWithPrefix: `dark:${"!" | ""}${TailwindClassPrefix}-${string}`;
-    darkForegroundWithPrefix: `dark:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    lightComputedColor: `${"!" | ""}${TailwindClassPrefix}-${string}`;
+    lightComputedForeground: `${"!" | ""}${TailwindClassPrefix}-${string}`;
+    darkComputedColor: `dark:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    darkComputedForeground: `dark:${"!" | ""}${TailwindClassPrefix}-${string}`;
 
-    hoverLightColorWithPrefix: "" | `hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
-    hoverDarkColorWithPrefix: "" | `dark:hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
-    hoverLightForegroundWithPrefix: "" | `hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
-    hoverDarkForegroundWithPrefix: "" | `dark:hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
-    activeLightColorWithPrefix: "" | `active:${"!" | ""}${TailwindClassPrefix}-${string}`;
-    activeDarkColorWithPrefix: "" | `dark:active:${"!" | ""}${TailwindClassPrefix}-${string}`;
-    activeLightForegroundWithPrefix: "" | `active:${"!" | ""}${TailwindClassPrefix}-${string}`;
-    activeDarkForegroundWithPrefix: "" | `dark:active:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    hoverLightComputedColor: "" | `hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    hoverDarkComputedColor: "" | `dark:hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    hoverLightComputedForeground: "" | `hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    hoverDarkComputedForeground: "" | `dark:hover:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    activeLightComputedColor: "" | `active:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    activeDarkComputedColor: "" | `dark:active:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    activeLightComputedForeground: "" | `active:${"!" | ""}${TailwindClassPrefix}-${string}`;
+    activeDarkComputedForeground: "" | `dark:active:${"!" | ""}${TailwindClassPrefix}-${string}`;
     /***
      * Whether the class name that is being generated is a foreground class name or not
      */
@@ -468,7 +468,7 @@ export namespace IVariantsColors {
    * @example
    * ```typescript
    * const builder: IVariantsColors.ClassNameBuilder<"text"> = (options) =>
-   *   `${options.lightColorWithPrefix} ${options.darkColorWithPrefix}`;
+   *   `${options.lightComputedColor} ${options.darkComputedColor}`;
    *
    * // Usage:
    * const className = builder({
@@ -476,10 +476,10 @@ export namespace IVariantsColors {
    *   darkColor: "dark-primary",
    *   lightForeground: "primary-foreground",
    *   darkForeground: "dark-primary-foreground",
-   *   lightColorWithPrefix: "text-primary",
-   *   lightForegroundWithPrefix: "text-primary-foreground",
-   *   darkColorWithPrefix: "dark:text-dark-primary",
-   *   darkForegroundWithPrefix: "dark:text-dark-primary-foreground"
+   *   lightComputedColor: "text-primary",
+   *   lightComputedForeground: "text-primary-foreground",
+   *   darkComputedColor: "dark:text-dark-primary",
+   *   darkComputedForeground: "dark:text-dark-primary-foreground"
    * });
    * // Result: "text-primary dark:text-dark-primary"
    * ```

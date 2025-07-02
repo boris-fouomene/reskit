@@ -2,64 +2,64 @@
 export const VariantsColors = {
   "button": {
     "primary": {
-      "base": "bg-primary dark:bg-dark-primary focus-visible:outline-primary dark:focus-visible:outline-dark-primary",
-      "label": "text-primary-foreground dark:text-dark-primary-foreground",
-      "icon": "!text-primary-foreground dark:!text-dark-primary-foreground",
-      "activityIndicator": "border-t-primary-foreground dark:border-t-dark-primary-foreground"
+      "base": "bg-primary dark:bg-dark-primary focus-visible:outline-primary dark:focus-visible:outline-dark-primary    ",
+      "label": "text-primary-foreground dark:text-dark-primary-foreground ",
+      "icon": "!text-primary-foreground dark:!text-dark-primary-foreground ",
+      "activityIndicator": "border-t-primary-foreground dark:border-t-dark-primary-foreground "
     },
     "secondary": {
-      "base": "bg-secondary dark:bg-dark-secondary focus-visible:outline-secondary dark:focus-visible:outline-dark-secondary",
-      "label": "text-secondary-foreground dark:text-dark-secondary-foreground",
-      "icon": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
-      "activityIndicator": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground"
+      "base": "bg-secondary dark:bg-dark-secondary focus-visible:outline-secondary dark:focus-visible:outline-dark-secondary    ",
+      "label": "text-secondary-foreground dark:text-dark-secondary-foreground ",
+      "icon": "!text-secondary-foreground dark:!text-dark-secondary-foreground ",
+      "activityIndicator": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground "
     },
     "surface": {
-      "base": "bg-gray-100 dark:bg-gray-800 focus-visible:outline-gray-100 dark:focus-visible:outline-gray-800",
-      "label": "text-gray-900 dark:text-gray-100",
-      "icon": "!text-gray-900 dark:!text-gray-100",
-      "activityIndicator": "border-t-gray-900 dark:border-t-gray-100"
+      "base": "bg-gray-100 dark:bg-gray-800 focus-visible:outline-gray-100 dark:focus-visible:outline-gray-800    ",
+      "label": "text-gray-900 dark:text-gray-100 ",
+      "icon": "!text-gray-900 dark:!text-gray-100 ",
+      "activityIndicator": "border-t-gray-900 dark:border-t-gray-100 "
     },
     "background": {
-      "base": "bg-white dark:bg-gray-900 focus-visible:outline-white dark:focus-visible:outline-gray-900",
-      "label": "text-gray-900 dark:text-gray-100",
-      "icon": "!text-gray-900 dark:!text-gray-100",
-      "activityIndicator": "border-t-gray-900 dark:border-t-gray-100"
+      "base": "bg-white dark:bg-gray-900 focus-visible:outline-white dark:focus-visible:outline-gray-900    ",
+      "label": "text-gray-900 dark:text-gray-100 ",
+      "icon": "!text-gray-900 dark:!text-gray-100 ",
+      "activityIndicator": "border-t-gray-900 dark:border-t-gray-100 "
     },
     "neutral": {
-      "base": "bg-gray-500 dark:bg-gray-600 focus-visible:outline-gray-500 dark:focus-visible:outline-gray-600",
-      "label": "text-white dark:text-gray-50",
-      "icon": "!text-white dark:!text-gray-50",
-      "activityIndicator": "border-t-white dark:border-t-gray-50"
+      "base": "bg-gray-500 dark:bg-gray-600 focus-visible:outline-gray-500 dark:focus-visible:outline-gray-600    ",
+      "label": "text-white dark:text-gray-50 ",
+      "icon": "!text-white dark:!text-gray-50 ",
+      "activityIndicator": "border-t-white dark:border-t-gray-50 "
     },
     "error": {
-      "base": "bg-red-500 dark:bg-red-600 focus-visible:outline-red-500 dark:focus-visible:outline-red-600",
-      "label": "text-white dark:text-red-50",
-      "icon": "!text-white dark:!text-red-50",
-      "activityIndicator": "border-t-white dark:border-t-red-50"
+      "base": "bg-red-500 dark:bg-red-600 focus-visible:outline-red-500 dark:focus-visible:outline-red-600    ",
+      "label": "text-white dark:text-red-50 ",
+      "icon": "!text-white dark:!text-red-50 ",
+      "activityIndicator": "border-t-white dark:border-t-red-50 "
     },
     "info": {
-      "base": "bg-blue-500 dark:bg-blue-600 focus-visible:outline-blue-500 dark:focus-visible:outline-blue-600",
-      "label": "text-white dark:text-blue-50",
-      "icon": "!text-white dark:!text-blue-50",
-      "activityIndicator": "border-t-white dark:border-t-blue-50"
+      "base": "bg-blue-500 dark:bg-blue-600 focus-visible:outline-blue-500 dark:focus-visible:outline-blue-600    ",
+      "label": "text-white dark:text-blue-50 ",
+      "icon": "!text-white dark:!text-blue-50 ",
+      "activityIndicator": "border-t-white dark:border-t-blue-50 "
     },
     "warning": {
-      "base": "bg-yellow-500 dark:bg-yellow-600 focus-visible:outline-yellow-500 dark:focus-visible:outline-yellow-600",
-      "label": "text-yellow-900 dark:text-yellow-50",
-      "icon": "!text-yellow-900 dark:!text-yellow-50",
-      "activityIndicator": "border-t-yellow-900 dark:border-t-yellow-50"
+      "base": "bg-yellow-500 dark:bg-yellow-600 focus-visible:outline-yellow-500 dark:focus-visible:outline-yellow-600    ",
+      "label": "text-yellow-900 dark:text-yellow-50 ",
+      "icon": "!text-yellow-900 dark:!text-yellow-50 ",
+      "activityIndicator": "border-t-yellow-900 dark:border-t-yellow-50 "
     },
     "success": {
-      "base": "bg-green-500 dark:bg-green-600 focus-visible:outline-green-500 dark:focus-visible:outline-green-600",
-      "label": "text-white dark:text-green-50",
-      "icon": "!text-white dark:!text-green-50",
-      "activityIndicator": "border-t-white dark:border-t-green-50"
+      "base": "bg-green-500 dark:bg-green-600 focus-visible:outline-green-500 dark:focus-visible:outline-green-600    ",
+      "label": "text-white dark:text-green-50 ",
+      "icon": "!text-white dark:!text-green-50 ",
+      "activityIndicator": "border-t-white dark:border-t-green-50 "
     },
     "text": {
-      "base": "bg-gray-900 dark:bg-gray-100 focus-visible:outline-gray-900 dark:focus-visible:outline-gray-100",
-      "label": "text-gray-100 dark:text-gray-900",
-      "icon": "!text-gray-100 dark:!text-gray-900",
-      "activityIndicator": "border-t-gray-100 dark:border-t-gray-900"
+      "base": "bg-gray-900 dark:bg-gray-100 focus-visible:outline-gray-900 dark:focus-visible:outline-gray-100    ",
+      "label": "text-gray-100 dark:text-gray-900 ",
+      "icon": "!text-gray-100 dark:!text-gray-900 ",
+      "activityIndicator": "border-t-gray-100 dark:border-t-gray-900 "
     }
   },
   "buttonOutline": {

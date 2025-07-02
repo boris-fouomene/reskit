@@ -76,8 +76,8 @@ class VariantsColorsFactory {
      *
      * // Use a custom builder to return an object with both light and dark classes
      * const customClasses = VariantsColorsFactory.buildColors("border", false, (opts) => ({
-     *   light: opts.lightColorWithPrefix,
-     *   dark: opts.darkColorWithPrefix
+     *   light: opts.lightComputedColor,
+     *   dark: opts.darkComputedColor
      * }));
      * // customClasses.success => { light: "border-green-500", dark: "dark:border-green-600" }
      * ```
@@ -96,7 +96,7 @@ class VariantsColorsFactory {
     static buildColors(tailwindClassPrefix, withImportantAttribute, colorClassNameBuilder, isForeground = false) {
         const r = Object.create({});
         const importantPrefix = withImportantAttribute ? "!" : "";
-        const colorBuilder = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightColorWithPrefix, darkColorWithPrefix }) => `${lightColorWithPrefix} ${darkColorWithPrefix}`;
+        const colorBuilder = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightComputedColor, darkComputedColor }) => `${lightComputedColor} ${darkComputedColor}`;
         Object.entries(VariantsColorsFactory.colors).map(([color, value]) => {
             const _a = Object.assign({}, value), { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, hoverLightColor: _hoverLightColor, hoverDarkColor: _hoverDarkColor, hoverLightForeground: _hoverLightForeground, hoverDarkForeground: _hoverDarkForeground, activeLightColor: _activeLightColor, activeDarkColor: _activeDarkColor, activeLightForeground: _activeLightForeground, activeDarkForeground: _activeDarkForeground } = _a, rest = __rest(_a, ["lightColor", "lightForeground", "darkColor", "darkForeground", "hoverLightColor", "hoverDarkColor", "hoverLightForeground", "hoverDarkForeground", "activeLightColor", "activeDarkColor", "activeLightForeground", "activeDarkForeground"]);
             const lightColor = defaultStr(isForeground ? _lightForeground : light);
@@ -119,8 +119,8 @@ class VariantsColorsFactory {
                 hoverDarkForeground,
                 activeLightForeground,
                 activeDarkForeground, isForeground: !!isForeground, lightColor,
-                darkColor, lightColorWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`, darkColorWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`, darkForeground,
-                lightForeground, lightForegroundWithPrefix: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkForegroundWithPrefix: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`, hoverLightColorWithPrefix: hoverLightColor ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightColor}` : "", hoverDarkColorWithPrefix: hoverDarkColor ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkColor}` : "", hoverLightForegroundWithPrefix: hoverLightForeground ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightForeground}` : "", hoverDarkForegroundWithPrefix: hoverDarkForeground ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkForeground}` : "", activeLightColorWithPrefix: activeLightColor ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightColor}` : "", activeDarkColorWithPrefix: activeDarkColor ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkColor}` : "", activeLightForegroundWithPrefix: activeLightForeground ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightForeground}` : "", activeDarkForegroundWithPrefix: activeDarkForeground ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkForeground}` : "" }));
+                darkColor, lightComputedColor: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`, darkComputedColor: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`, darkForeground,
+                lightForeground, lightComputedForeground: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkComputedForeground: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`, hoverLightComputedColor: hoverLightColor ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightColor}` : "", hoverDarkComputedColor: hoverDarkColor ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkColor}` : "", hoverLightComputedForeground: hoverLightForeground ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightForeground}` : "", hoverDarkComputedForeground: hoverDarkForeground ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkForeground}` : "", activeLightComputedColor: activeLightColor ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightColor}` : "", activeDarkComputedColor: activeDarkColor ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkColor}` : "", activeLightComputedForeground: activeLightForeground ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightForeground}` : "", activeDarkComputedForeground: activeDarkForeground ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkForeground}` : "" }));
         });
         return r;
     }
@@ -153,8 +153,8 @@ class VariantsColorsFactory {
      *
      * // Use a custom builder to return an object with both light and dark classes
      * const customTextClasses = VariantsColorsFactory.buildTextColors(false, (opts) => ({
-     *   light: opts.lightColorWithPrefix,
-     *   dark: opts.darkColorWithPrefix
+     *   light: opts.lightComputedColor,
+     *   dark: opts.darkComputedColor
      * }));
      * // customTextClasses.success => { light: "text-green-500", dark: "dark:text-green-600" }
      * ```
@@ -191,8 +191,8 @@ class VariantsColorsFactory {
      *
      * // Use a custom builder to return an object with both light and dark classes
      * const customBgClasses = VariantsColorsFactory.buildBackgroundColors(false, (opts) => ({
-     *   light: opts.lightColorWithPrefix,
-     *   dark: opts.darkColorWithPrefix
+     *   light: opts.lightComputedColor,
+     *   dark: opts.darkComputedColor
      * }));
      * // customBgClasses.success => { light: "bg-green-500", dark: "dark:bg-green-600" }
      * ```
@@ -229,8 +229,8 @@ class VariantsColorsFactory {
      *
      * // Use a custom builder to return an object with both light and dark classes
      * const customBorderClasses = VariantsColorsFactory.buildBorderColors(false, (opts) => ({
-     *   light: opts.lightColorWithPrefix,
-     *   dark: opts.darkColorWithPrefix
+     *   light: opts.lightComputedColor,
+     *   dark: opts.darkComputedColor
      * }));
      * // customBorderClasses.success => { light: "border-green-500", dark: "dark:border-green-600" }
      * ```

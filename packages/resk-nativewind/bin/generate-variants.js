@@ -93,9 +93,9 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           darkColor,
           lightForeground,
           darkForeground,
-          lightColorWithPrefix,
-          lightForegroundWithPrefix,
-          darkColorWithPrefix,
+          lightComputedColor,
+          lightComputedForeground,
+          darkComputedColor,
 
           hoverLightColor,
           hoverDarkColor,
@@ -105,16 +105,29 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           hoverDarkForeground,
           activeLightForeground,
           activeDarkForeground,
+
+          hoverLightComputedColor,
+          hoverDarkComputedColor,
+          hoverLightComputedForeground,
+          hoverDarkComputedForeground,
+          activeLightComputedColor,
+          activeDarkComputedColor,
+          activeLightComputedForeground,
+          activeDarkComputedForeground,
         }) => {
+          const textColor = [hoverLightComputedForeground.split("bg-").join("text-"), hoverDarkComputedForeground.split("bg-").join("text-"), activeLightComputedForeground.split("bg-").join("text-"), activeDarkComputedForeground.split("bg-").join("text-")].filter((c) => !!c).join(" "),
+            iconColor = [hoverLightComputedForeground.split("bg-").join("!text-"), hoverDarkComputedForeground.split("bg-").join("!text-"), activeLightComputedForeground.split("bg-").join("!text-"), activeDarkComputedForeground.split("bg-").join("!text-")].filter((c) => !!c).join(" ");
+          const borderTColor = [hoverLightComputedForeground.split("bg-").join("text-"), hoverDarkComputedForeground.split("bg-").join("text-"), activeLightComputedForeground.split("bg-").join("text-"), activeDarkComputedForeground.split("bg-").join("border-t-")].filter((c) => !!c).join(" ");
+
           return {
-            base: `${lightColorWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
-            label: `text-${lightForeground} dark:text-${darkForeground}`,
-            icon: `!text-${lightForeground} dark:!text-${darkForeground}`,
-            activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground}`),
+            base: `${lightComputedColor} ${darkComputedColor} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor} ${hoverLightComputedColor} ${hoverDarkComputedColor} ${activeLightComputedColor} ${activeDarkComputedColor}`,
+            label: `text-${lightForeground} dark:text-${darkForeground} ${textColor}`,
+            icon: `!text-${lightForeground} dark:!text-${darkForeground} ${iconColor}`,
+            activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground} ${borderTColor}`),
           };
         }
       ),
-      buttonOutline: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
+      buttonOutline: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
         const groupClassName = {
           base: `group web:hover:bg-${lightColor} web:dark:hover:bg-${darkColor}`,
           label: `web:hover:text-${lightForeground} web:dark:hover:text-${darkForeground} web:group-hover:text-${lightForeground} web:dark:group-hover:text-${darkForeground}`,
@@ -143,10 +156,10 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           ];
         })
       ),
-      surface: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
-        return cn(lightColorWithPrefix, darkColorWithPrefix, `text-${lightForeground} dark:text-${darkForeground}`);
+      surface: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
+        return cn(lightComputedColor, darkComputedColor, `text-${lightForeground} dark:text-${darkForeground}`);
       }),
-      shadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
+      shadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
         return cn(`shadow-${lightColor}/20 dark:shadow-${darkColor}/30`);
       }),
       text: VariantsColorsFactory.buildTextColors(),

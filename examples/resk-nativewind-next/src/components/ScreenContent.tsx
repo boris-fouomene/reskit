@@ -15,12 +15,30 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <H2>TextInput</H2>
         <TextInput label="TextInput"
           variant={{ focusedShadow: "lg", focusedShadowColor: "primary", focusedBorderColor: "primary", focusedBorderWidth: 2 }}
+          left={<>
+            <Icon iconName="phone" size={30} variant={{ color: "primary" }} />
+            <Icon iconName="camera" size={30} variant={{ color: "secondary" }} />
+          </>}
+          right={<>
+            <Icon iconName="calendar" size={30} variant={{ color: "success" }} />
+            <Icon iconName="clock" size={30} variant={{ color: "warning" }} />
+          </>}
         />
         <TextInput variant={{ iconColor: "secondary", labelTextAlign: "right", labelWeight: "semibold", iconSize: "25px", labelTextSize: "15px" }} type="password" label="Password" placeholder="Enter your password" />
         <TextInput type="date" label="Date" placeholder="Enter your date" />
         <TextInput type="time" label="Time" placeholder="Enter your time" />
         <TextInput type="datetime" label="DateTime" placeholder="Enter your datetime" />
-        <TextInput type="tel" label="Tel" phoneCountryCode='CM' placeholder="Enter your tel" labelEmbeded variant={{ marginY: "20px", rounded: "rounded" }} />
+        <TextInput type="tel" label="Tel" phoneCountryCode='CM' placeholder="Enter your tel"
+          labelEmbeded variant={{ marginY: "20px", rounded: "rounded" }}
+          left={<>
+            <Icon iconName="phone" size={30} variant={{ color: "primary" }} />
+            <Icon iconName="camera" size={30} variant={{ color: "secondary" }} />
+          </>}
+          right={<>
+            <Icon iconName="calendar" size={30} variant={{ color: "success" }} />
+            <Icon iconName="clock" size={30} variant={{ color: "warning" }} />
+          </>}
+        />
         <TextInput variant={{ borderStyle: "solid", borderWidth: 1 }} type="number" label="Border" placeholder="Enter your border" />
       </Div>
       <VStack className="p-5">

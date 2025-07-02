@@ -471,7 +471,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
     const searchProps = Object.assign({}, searchInputProps, { error: error || searchInputProps?.error });
     const divider = <Divider testID={`${testID}-divider`} className="w-full" />;
     const searchInput = canRenderSeach ?
-        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full max-w-full overflow-x-hidden px-[7px]")}>
+        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full max-w-full px-[7px]")}>
             {canReverse ? divider : null}
             <TextInput
                 testID={`${testID}-dropdown-search`}
@@ -490,6 +490,8 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
                     <Menu
                         items={actions as any}
                         testID={`${testID}-dropdown-menu-actions`}
+                        minWidth={120}
+                        preferedPositionAxis="vertical"
                         anchor={<FontIcon
                             name={FONT_ICONS.MORE as never}
                             size={24}

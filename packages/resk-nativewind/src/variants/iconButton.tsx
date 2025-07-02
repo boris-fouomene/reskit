@@ -1,5 +1,5 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsGeneratedColors } from "./colors/generated";
+import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 
 const iconButton = tv({
@@ -16,7 +16,7 @@ const iconButton = tv({
                 text: "",
             }
         }),
-        colorScheme: VariantsGeneratedColors.iconButton,
+        colorScheme: VariantsColors.iconButton,
         size: {
             sm: {
                 container: "w-8 h-8",

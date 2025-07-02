@@ -1,5 +1,5 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsGeneratedColors } from "./colors/generated";
+import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 import { fontWeightClasses } from "./variantsFactory/fontWeight";
 import { textAlignClasses } from "./variantsFactory/textAlignClasses";
@@ -7,7 +7,7 @@ import { textAlignClasses } from "./variantsFactory/textAlignClasses";
 const text = tv({
     base: "",
     variants: {
-        color: VariantsGeneratedColors.textWithForeground,
+        color: VariantsColors.textWithForeground,
         error: {
             true: "text-error dark:text-dark-error",
         },

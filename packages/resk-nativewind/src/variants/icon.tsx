@@ -1,9 +1,9 @@
 import { tv, type VariantProps } from "tailwind-variants";
-import { VariantsGeneratedColors } from "./colors/generated";
+import { VariantsColors } from "./colors/generated";
 import { IconSizes } from "./variantsFactory/textSizes";
 const icon = tv({
     variants: {
-        color: VariantsGeneratedColors.textWithForegroundWithImportant,
+        color: VariantsColors.textWithForegroundWithImportant,
         size: IconSizes,
     }
 });

@@ -1,5 +1,5 @@
 import { tv, VariantProps } from 'tailwind-variants';
-import { VariantsGeneratedColors } from "./colors/generated";
+import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from './variantsFactory';
 
 const buton = tv({
@@ -14,8 +14,8 @@ const buton = tv({
         label: "",
     },
     variants: {
-        colorScheme: VariantsGeneratedColors.button,
-        outline: VariantsGeneratedColors.buttonOutline,
+        colorScheme: VariantsColors.button,
+        outline: VariantsColors.buttonOutline,
         ...VariantsFactory.createAll<{ base: string }>((value) => {
             return {
                 base: value,

@@ -1,6 +1,6 @@
 import { tv, VariantProps } from 'tailwind-variants';
 import { VariantsFactory } from './variantsFactory';
-import { VariantsGeneratedColors } from './colors/generated';
+import { VariantsColors } from './colors/generated';
 
 const checkbox = tv({
     slots: {
@@ -24,13 +24,13 @@ const checkbox = tv({
                 label: value,
             }
         }),
-        checkedColor: VariantsFactory.create<typeof VariantsGeneratedColors.textWithForegroundWithImportant, { checkedIconColor: string, checkedLabelColor: string }>(VariantsGeneratedColors.textWithForegroundWithImportant, (value, colorName) => {
+        checkedColor: VariantsFactory.create<typeof VariantsColors.textWithForegroundWithImportant, { checkedIconColor: string, checkedLabelColor: string }>(VariantsColors.textWithForegroundWithImportant, (value, colorName) => {
             return {
                 checkedIconColor: value,
                 checkedLabelColor: value.split("!").join(""),
             }
         }),
-        uncheckedColor: VariantsFactory.create<typeof VariantsGeneratedColors.textWithForegroundWithImportant, { uncheckedIconColor: string, uncheckedLabelColor: string }>(VariantsGeneratedColors.textWithForegroundWithImportant, (value, colorName) => {
+        uncheckedColor: VariantsFactory.create<typeof VariantsColors.textWithForegroundWithImportant, { uncheckedIconColor: string, uncheckedLabelColor: string }>(VariantsColors.textWithForegroundWithImportant, (value, colorName) => {
             return {
                 uncheckedIconColor: value,
                 uncheckedLabelColor: value.split("!").join(""),

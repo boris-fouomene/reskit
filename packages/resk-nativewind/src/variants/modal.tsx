@@ -1,5 +1,5 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsGeneratedColors } from "./colors/generated";
+import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 
 const modal = tv({
@@ -8,7 +8,7 @@ const modal = tv({
         content: "max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
     },
     variants: {
-        background: VariantsFactory.create<typeof VariantsGeneratedColors.surface, { content: string, container: string }>(VariantsGeneratedColors.surface, (value) => {
+        background: VariantsFactory.create<typeof VariantsColors.surface, { content: string, container: string }>(VariantsColors.surface, (value) => {
             return {
                 content: value,
                 container: "",

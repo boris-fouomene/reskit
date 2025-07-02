@@ -1,10 +1,10 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsGeneratedColors } from "./colors/generated";
+import { VariantsColors } from "./colors/generated";
 
 const divider = tv({
     base: "bg-outline dark:bg-dark-outline w-full",
     variants: {
-        color: VariantsGeneratedColors.background
+        color: VariantsColors.background
     }
 });
 export default divider;

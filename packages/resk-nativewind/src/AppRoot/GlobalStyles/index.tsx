@@ -1,13 +1,13 @@
 import { TIPPY_THEME } from "@components/Tooltip/constants";
-import { VariantsColors } from "@variants/colors";
+import { VariantsColorsFactory } from "@variants/colors";
 import { isNextJs } from "@platform/isNext";
 import { defaultStr } from "@resk/core/utils";
 import { BodyClasses } from "./BodyClasses";
 
 export function GlobalStyles() {
     if (!isNextJs() && (typeof document == "undefined" || typeof window === "undefined" || !window || !document || !document?.body)) return null;
-    const { lightColor, lightForeground, darkColor, darkForeground } = Object.assign({}, VariantsColors.colors.primary);
-    const { lightColor: surfaceLightColor, darkColor: surfaceDarkColor } = Object.assign({}, VariantsColors.colors.surface);
+    const { lightColor, lightForeground, darkColor, darkForeground } = Object.assign({}, VariantsColorsFactory.colors.primary);
+    const { lightColor: surfaceLightColor, darkColor: surfaceDarkColor } = Object.assign({}, VariantsColorsFactory.colors.surface);
     const primary = `var(--color-${defaultStr(lightColor)})`,
         darkPrimary = `var(--color-${defaultStr(darkColor)})`,
         primaryForeground = `var(--color-${defaultStr(lightForeground)})`,

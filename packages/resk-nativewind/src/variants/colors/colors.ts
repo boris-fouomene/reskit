@@ -3,7 +3,7 @@ import { IVariantsColorsMap } from "./colorsMap";
 import { IVariantColor } from "./types";
 
 const isNonNullString = (x: any) => typeof x === "string" && x;
-export class VariantsColors {
+export class VariantsColorsFactory {
   /**
    * Registers a set of color variants in the design system.
    *
@@ -21,7 +21,7 @@ export class VariantsColors {
       if (!value || typeof value !== "object" || !isNonNullString(value?.lightColor) || !isNonNullString(value?.darkColor)) return;
       this._colors[color] = value;
     });
-    return VariantsColors._colors;
+    return VariantsColorsFactory._colors;
   }
   /**
    * Returns the registered color variants in the design system.
@@ -52,19 +52,19 @@ export class VariantsColors {
    * @example
    * ```typescript
    * // Generate background color classes for all variants
-   * const bgClasses = VariantsColors.buildColors("bg");
+   * const bgClasses = VariantsColorsFactory.buildColors("bg");
    * // bgClasses.primary => "bg-primary dark:bg-dark-primary"
    *
    * // Generate text color classes with important modifier
-   * const textClasses = VariantsColors.buildColors("text", true);
+   * const textClasses = VariantsColorsFactory.buildColors("text", true);
    * // textClasses.error => "!text-red-500 dark:!text-red-600"
    *
    * // Generate only foreground color classes for backgrounds
-   * const fgClasses = VariantsColors.buildColors("bg", false, undefined, "-foreground");
+   * const fgClasses = VariantsColorsFactory.buildColors("bg", false, undefined, "-foreground");
    * // fgClasses.primary => "bg-primary-foreground dark:bg-dark-primary-foreground"
    *
    * // Use a custom builder to return an object with both light and dark classes
-   * const customClasses = VariantsColors.buildColors("border", false, (opts) => ({
+   * const customClasses = VariantsColorsFactory.buildColors("border", false, (opts) => ({
    *   light: opts.lightColorWithPrefix,
    *   dark: opts.darkColorWithPrefix
    * }));
@@ -78,15 +78,15 @@ export class VariantsColors {
    *
    * @see {@link IVariantsColors.ClassNameBuilder}
    * @see {@link IVariantsColors.ClassNameBuilderOptions}
-   * @see {@link VariantsColors.buildTextColors}
-   * @see {@link VariantsColors.buildBackgroundColors}
-   * @see {@link VariantsColors.buildBorderColors}
+   * @see {@link VariantsColorsFactory.buildTextColors}
+   * @see {@link VariantsColorsFactory.buildBackgroundColors}
+   * @see {@link VariantsColorsFactory.buildBorderColors}
    */
   public static buildColors<TailwindClassPrefix extends string = any, ClassNameBuilderResult = IClassName>(tailwindClassPrefix: TailwindClassPrefix, withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<TailwindClassPrefix, ClassNameBuilderResult>, isForeground: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
     const r = Object.create({}) as Record<IVariantsColors.ColorName, ClassNameBuilderResult>;
     const importantPrefix = withImportantAttribute ? "!" : "";
     const colorBuilder: IVariantsColors.ClassNameBuilder<TailwindClassPrefix> = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightColorWithPrefix, darkColorWithPrefix }) => `${lightColorWithPrefix} ${darkColorWithPrefix}` as any;
-    Object.entries(VariantsColors.colors).map(([color, value]) => {
+    Object.entries(VariantsColorsFactory.colors).map(([color, value]) => {
       const { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, ...rest } = Object.assign({}, value);
       const lightColor = isForeground ? _lightForeground : light;
       const darkColor = isForeground ? _darkForeground : dark;
@@ -111,7 +111,7 @@ export class VariantsColors {
   }
 
   static buildTextForegroundColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"text", ClassNameBuilderResult>): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
-    return VariantsColors.buildColors<"text", ClassNameBuilderResult>("text", withImportantAttribute, colorClassNameBuilder, true);
+    return VariantsColorsFactory.buildColors<"text", ClassNameBuilderResult>("text", withImportantAttribute, colorClassNameBuilder, true);
   }
   /**
    * Generates a record of Tailwind CSS class names for all registered text color variants.
@@ -130,15 +130,15 @@ export class VariantsColors {
    * @example
    * ```typescript
    * // Generate text color classes for all variants
-   * const textClasses = VariantsColors.buildTextColors();
+   * const textClasses = VariantsColorsFactory.buildTextColors();
    * // textClasses.primary => "text-primary dark:text-dark-primary"
    *
    * // Generate text color classes with important modifier
-   * const importantTextClasses = VariantsColors.buildTextColors(true);
+   * const importantTextClasses = VariantsColorsFactory.buildTextColors(true);
    * // importantTextClasses.error => "!text-red-500 dark:!text-red-600"
    *
    * // Use a custom builder to return an object with both light and dark classes
-   * const customTextClasses = VariantsColors.buildTextColors(false, (opts) => ({
+   * const customTextClasses = VariantsColorsFactory.buildTextColors(false, (opts) => ({
    *   light: opts.lightColorWithPrefix,
    *   dark: opts.darkColorWithPrefix
    * }));
@@ -146,10 +146,10 @@ export class VariantsColors {
    * ```
    *
    * @see {@link IVariantsColors.ClassNameBuilder}
-   * @see {@link VariantsColors.buildColors}
+   * @see {@link VariantsColorsFactory.buildColors}
    */
   static buildTextColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"text", ClassNameBuilderResult>): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
-    return VariantsColors.buildColors<"text", ClassNameBuilderResult>("text", withImportantAttribute, colorClassNameBuilder);
+    return VariantsColorsFactory.buildColors<"text", ClassNameBuilderResult>("text", withImportantAttribute, colorClassNameBuilder);
   }
   /**
    * Generates a record of Tailwind CSS class names for all registered background color variants.
@@ -168,15 +168,15 @@ export class VariantsColors {
    * @example
    * ```typescript
    * // Generate background color classes for all variants
-   * const bgClasses = VariantsColors.buildBackgroundColors();
+   * const bgClasses = VariantsColorsFactory.buildBackgroundColors();
    * // bgClasses.primary => "bg-primary dark:bg-dark-primary"
    *
    * // Generate background color classes with important modifier
-   * const importantBgClasses = VariantsColors.buildBackgroundColors(true);
+   * const importantBgClasses = VariantsColorsFactory.buildBackgroundColors(true);
    * // importantBgClasses.error => "!bg-red-500 dark:!bg-red-600"
    *
    * // Use a custom builder to return an object with both light and dark classes
-   * const customBgClasses = VariantsColors.buildBackgroundColors(false, (opts) => ({
+   * const customBgClasses = VariantsColorsFactory.buildBackgroundColors(false, (opts) => ({
    *   light: opts.lightColorWithPrefix,
    *   dark: opts.darkColorWithPrefix
    * }));
@@ -184,10 +184,10 @@ export class VariantsColors {
    * ```
    *
    * @see {@link IVariantsColors.ClassNameBuilder}
-   * @see {@link VariantsColors.buildColors}
+   * @see {@link VariantsColorsFactory.buildColors}
    */
   static buildBackgroundColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"bg", ClassNameBuilderResult>): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
-    return VariantsColors.buildColors<"bg", ClassNameBuilderResult>("bg", withImportantAttribute, colorClassNameBuilder);
+    return VariantsColorsFactory.buildColors<"bg", ClassNameBuilderResult>("bg", withImportantAttribute, colorClassNameBuilder);
   }
 
   /**
@@ -207,15 +207,15 @@ export class VariantsColors {
    * @example
    * ```typescript
    * // Generate border color classes for all variants
-   * const borderClasses = VariantsColors.buildBorderColors();
+   * const borderClasses = VariantsColorsFactory.buildBorderColors();
    * // borderClasses.primary => "border-primary dark:border-dark-primary"
    *
    * // Generate border color classes with important modifier
-   * const importantBorderClasses = VariantsColors.buildBorderColors(true);
+   * const importantBorderClasses = VariantsColorsFactory.buildBorderColors(true);
    * // importantBorderClasses.error => "!border-red-500 dark:!border-red-600"
    *
    * // Use a custom builder to return an object with both light and dark classes
-   * const customBorderClasses = VariantsColors.buildBorderColors(false, (opts) => ({
+   * const customBorderClasses = VariantsColorsFactory.buildBorderColors(false, (opts) => ({
    *   light: opts.lightColorWithPrefix,
    *   dark: opts.darkColorWithPrefix
    * }));
@@ -223,10 +223,10 @@ export class VariantsColors {
    * ```
    *
    * @see {@link IVariantsColors.ClassNameBuilder}
-   * @see {@link VariantsColors.buildColors}
+   * @see {@link VariantsColorsFactory.buildColors}
    */
   static buildBorderColors<ClassNameBuilderResult = IClassName>(withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<"border", ClassNameBuilderResult>): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
-    return VariantsColors.buildColors<"border", ClassNameBuilderResult>("border", withImportantAttribute, colorClassNameBuilder);
+    return VariantsColorsFactory.buildColors<"border", ClassNameBuilderResult>("border", withImportantAttribute, colorClassNameBuilder);
   }
   /**
    * Generates a TypeScript interface definition string for the current color map.
@@ -240,7 +240,7 @@ export class VariantsColors {
    * @example
    * ```typescript
    * // Generate the interface definition for custom colors
-   * const interfaceString = VariantsColors.generateColorsMapTypes();
+   * const interfaceString = VariantsColorsFactory.generateColorsMapTypes();
    * console.log(interfaceString);
    * // Output:
    * // import { IVariantsColorsMapBase } from './types';
@@ -259,8 +259,8 @@ import { col } from '../../../../../../frontend-dash/src/theme/grid';
    */
   static generateColorsMapTypes() {
     const generateText = ["import { IVariantsColorsMapBase } from './types';", "export interface IVariantsColorsMap extends IVariantsColorsMapBase {"];
-    Object.entries(VariantsColors.colors).forEach(([color, value]) => {
-      if (VariantsColors.defaultColorsNames.includes(color)) return;
+    Object.entries(VariantsColorsFactory.colors).forEach(([color, value]) => {
+      if (VariantsColorsFactory.defaultColorsNames.includes(color)) return;
       generateText.push(`\t${color}: IVariantColor;`);
     });
     generateText.push("}");
@@ -328,8 +328,8 @@ import { col } from '../../../../../../frontend-dash/src/theme/grid';
       darkForeground: "gray-900",
     },
   };
-  private static defaultColorsNames: string[] = Object.keys(VariantsColors.defaultColors);
-  private static _colors: Record<string, IVariantsColors.Color> = Object.assign({}, VariantsColors.defaultColors);
+  private static defaultColorsNames: string[] = Object.keys(VariantsColorsFactory.defaultColors);
+  private static _colors: Record<string, IVariantsColors.Color> = Object.assign({}, VariantsColorsFactory.defaultColors);
 }
 
 type IClassName = ClassValue;

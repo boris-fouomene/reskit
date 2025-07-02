@@ -36,30 +36,30 @@ module.exports = (options) => {
 
 function generateColorVariants(colors, { outputRootDir, isDev }) {
   if (!colors || typeof colors != "object") return;
-  const { VariantsColors } = require("./color-variants/colors");
-  if (!VariantsColors || typeof VariantsColors.buildColors !== "function" || typeof VariantsColors.buildTextColors !== "function") {
+  const { VariantsColorsFactory } = require("./color-variants/colors");
+  if (!VariantsColorsFactory || typeof VariantsColorsFactory.buildColors !== "function" || typeof VariantsColorsFactory.buildTextColors !== "function") {
     return;
   }
-  VariantsColors.registerColor(colors);
+  VariantsColorsFactory.registerColor(colors);
   const ouputFolder = path.resolve(outputRootDir, "colors");
   const outputPath = path.resolve(ouputFolder, "generated.js");
   const outputDeclarations = path.resolve(ouputFolder, "generated.d.ts");
-  const textColors = VariantsColors.buildTextColors();
-  const textForeground = Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors()).map(([key, value]) => [`${key}-foreground`, value]));
-  const textColorsWithImportant = VariantsColors.buildTextColors(true);
-  const textForegroundWithImportant = Object.fromEntries(Object.entries(VariantsColors.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]));
+  const textColors = VariantsColorsFactory.buildTextColors();
+  const textForeground = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors()).map(([key, value]) => [`${key}-foreground`, value]));
+  const textColorsWithImportant = VariantsColorsFactory.buildTextColors(true);
+  const textForegroundWithImportant = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]));
   const textWithForeground = {
-    ...textColors,
-    ...textForeground,
-  },
+      ...textColors,
+      ...textForeground,
+    },
     textWithForegroundWithImportant = {
       ...textColorsWithImportant,
       ...textForegroundWithImportant,
     },
-    background = VariantsColors.buildBackgroundColors();
+    background = VariantsColorsFactory.buildBackgroundColors();
   const allColors = {};
   if (false) {
-    Object.entries(VariantsColors.colors).map(([key, value]) => {
+    Object.entries(VariantsColorsFactory.colors).map(([key, value]) => {
       const { lightColor, darkColor, lightForeground, darkForeground, areTailwindClasses } = value;
       const hasLight = isNonNullString(lightColor);
       const hasDark = isNonNullString(darkColor);
@@ -86,7 +86,7 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   }
   const content = JSON.stringify(
     {
-      button: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
+      button: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
         return {
           base: `${lightColorWithPrefix} ${darkColorWithPrefix} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
           label: `text-${lightForeground} dark:text-${darkForeground}`,
@@ -94,7 +94,7 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground}`),
         };
       }),
-      buttonOutline: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
+      buttonOutline: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
         const groupClassName = {
           base: `group web:hover:bg-${lightColor} web:dark:hover:bg-${darkColor}`,
           label: `web:hover:text-${lightForeground} web:dark:hover:text-${darkForeground} web:group-hover:text-${lightForeground} web:dark:group-hover:text-${darkForeground}`,
@@ -123,13 +123,13 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           ];
         })
       ),
-      surface: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
+      surface: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
         return cn(lightColorWithPrefix, darkColorWithPrefix, `text-${lightForeground} dark:text-${darkForeground}`);
       }),
-      shadow: VariantsColors.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
+      shadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightColorWithPrefix, lightForegroundWithPrefix, darkColorWithPrefix, darkForegroundWithPrefix }) => {
         return cn(`shadow-${lightColor}/20 dark:shadow-${darkColor}/30`);
       }),
-      text: VariantsColors.buildTextColors(),
+      text: VariantsColorsFactory.buildTextColors(),
       textWithImportant: textColorsWithImportant,
       textForegroundWithImportant,
       textWithForeground,
@@ -194,7 +194,7 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   fs.writeFileSync(
     outputPath,
     `
-export const VariantsGeneratedColors = ${content}
+export const VariantsColors = ${content}
     `,
     "utf8"
   );
@@ -231,7 +231,7 @@ export const VariantsGeneratedColors = ${content}
         activeRingColors: Record<IName2Foreground,string>;
         focusRingColors: Record<IName2Foreground,string>;
     }
-export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
+export const VariantsColors : IVariantsGeneratedColors = {} as any;
     `,
     "utf8"
   );
@@ -240,7 +240,7 @@ export const VariantsGeneratedColors : IVariantsGeneratedColors = {} as any;
   if (!isDev && fs.existsSync(ouputFolder)) {
     const colorMapTypesPath = path.resolve(ouputFolder, "colorsMap.d.ts");
     try {
-      fs.writeFileSync(colorMapTypesPath, VariantsColors.generateColorsMapTypes(), "utf8");
+      fs.writeFileSync(colorMapTypesPath, VariantsColorsFactory.generateColorsMapTypes(), "utf8");
       console.log("Variants colors map types generated at ", colorMapTypesPath);
     } catch (error) {
       console.log("Error generating color map types file at ", colorMapTypesPath, error);

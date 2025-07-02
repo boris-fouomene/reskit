@@ -1,6 +1,6 @@
 // heading.ts
 import { tv, type VariantProps } from 'tailwind-variants'
-import { VariantsGeneratedColors } from "./colors/generated";
+import { VariantsColors } from "./colors/generated";
 
 const heading = tv({
     base: '',
@@ -30,7 +30,7 @@ const heading = tv({
             "600": 'font-600',
             "700": 'font-700',
         },
-        color: VariantsGeneratedColors.textWithForeground,
+        color: VariantsColors.textWithForeground,
     },
     defaultVariants: {},
 })

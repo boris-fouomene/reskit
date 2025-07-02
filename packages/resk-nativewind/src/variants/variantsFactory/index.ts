@@ -5,7 +5,7 @@ import { ShadowColorsClasses } from "./shadow";
 import { IconSizes, textSizes } from "./textSizes";
 import { fontWeightClasses } from "./fontWeight";
 import { textAlignClasses } from "./textAlignClasses";
-import { VariantsGeneratedColors } from "@variants/colors/generated";
+import { VariantsColors } from "@variants/colors/generated";
 import { width2heightClasses } from "./width2height";
 import { activeRingWidthClasses, focusRingWidthClasses, hoverRingWidthClasses, ringWidthClasses } from "./ring";
 import { scalesClasses } from "./scales";
@@ -203,12 +203,12 @@ const allVariantClasses = {
   roundedBottomRight: roundedBottomRightRadiusClasses,
   shadowColor: ShadowColorsClasses,
   borderStyle: borderStyleClasses,
-  borderColor: VariantsGeneratedColors.borderColor,
+  borderColor: VariantsColors.borderColor,
   ...width2heightClasses,
-  ringColor: VariantsGeneratedColors.ringColors,
-  activeRingColor: VariantsGeneratedColors.activeRingColors,
-  hoverRingColor: VariantsGeneratedColors.hoverRingColors,
-  focusRingColor: VariantsGeneratedColors.focusRingColors,
+  ringColor: VariantsColors.ringColors,
+  activeRingColor: VariantsColors.activeRingColors,
+  hoverRingColor: VariantsColors.hoverRingColors,
+  focusRingColor: VariantsColors.focusRingColors,
   ringWidth: ringWidthClasses,
   hoverRingWidth: hoverRingWidthClasses,
   activeRingWidth: activeRingWidthClasses,

@@ -1,9 +1,9 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsGeneratedColors } from "./colors/generated";
+import { VariantsColors } from "./colors/generated";
 
 const activityIndicator = tv({
     variants: {
-        color: VariantsGeneratedColors.activityIndicator,
+        color: VariantsColors.activityIndicator,
     },
     defaultVariants: {
         color: "primary"

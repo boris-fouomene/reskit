@@ -1,5 +1,5 @@
 
-export const VariantsGeneratedColors = {
+export const VariantsColors = {
   "button": {
     "primary": {
       "base": "bg-primary dark:bg-dark-primary focus-visible:outline-primary dark:focus-visible:outline-dark-primary",

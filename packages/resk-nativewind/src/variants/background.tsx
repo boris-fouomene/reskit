@@ -1,9 +1,9 @@
 import { tv, type VariantProps } from 'tailwind-variants';
-import { VariantsGeneratedColors } from './colors/generated';
+import { VariantsColors } from './colors/generated';
 
 const background = tv({
     variants: {
-        background: VariantsGeneratedColors.background,
+        background: VariantsColors.background,
     }
 })
 

@@ -2,7 +2,7 @@
 
 import { Button, HStack, Modal } from "@resk/nativewind";
 import { Div, H2 } from "@resk/nativewind/html";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function ModalExample() {
     const [visible, setVisible] = useState(false);
@@ -10,7 +10,7 @@ export function ModalExample() {
         <HStack>
             <H2>Modal examples</H2>
         </HStack>
-        <Modal variant={{ padding: "100px", background: "error" }} visible={visible} onDismiss={() => setVisible(false)}>
+        <Modal variant={{ padding: "100px", background: "error" }} visible={visible} onRequestClose={() => setVisible(false)}>
             <Div className="w-full">
                 <H2>Modal example 1 for contentdddddddddddaaaaaaaa</H2>
             </Div>

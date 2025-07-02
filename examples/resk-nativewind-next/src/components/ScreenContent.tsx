@@ -1,7 +1,7 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
-import { Icon, Menu, AppBar, TextInput, VariantsFactory, Dropdown, ActivityIndicator, ProgressBar, HelperText, VariantsColors, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
+import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
 
 type ScreenContentProps = {
   title: string;
@@ -105,7 +105,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         </Div>
         <HelperText error>An example of helper text</HelperText>
         <Div className="p-5">
-          <Heading level={1} variant={{ color: "red" }}>Heading 1 - Red</Heading>
+          <Heading level={1} variant={{ color: "background" }}>Heading 1 - Background</Heading>
           <Heading level={2} variant={{ color: "neutral" }}>Heading 2 - neutral</Heading>
           <Heading level={3}>Heading 3</Heading>
           <Heading level={4}>Heading 4</Heading>
@@ -174,9 +174,9 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Button label="Outline Button 6" variant={{ outline: "error" }} />
           <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ colorScheme: "error" }} />
           <Button label="Button example4 - loading" loading variant={{ colorScheme: "success" }} className="px-[10px] py-[5px] rounded-full" />
-          <Button label="Zin color" variant={{ colorScheme: "zinc" }} />
-          <Button label="Pinc" variant={{ outline: "pink" }} />
-          <Button label="Violet Button" variant={{ outline: "violet" }} icon="camera" />
+          <Button label="Neutral" variant={{ colorScheme: "neutral" }} />
+          <Button label="Surface" variant={{ outline: "surface" }} />
+          <Button label="Info Button" variant={{ outline: "info" }} icon="camera" />
         </HStack>
       </Div>
       <Div className="p-5">

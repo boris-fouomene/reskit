@@ -44,7 +44,7 @@ const textInput = tv({
         ...VariantsFactory.createMargins<ITextInputSlots>((value, colorName) => {
             return { container: value }
         }),
-        ...VariantsFactory.createAllBorderWidth<ITextInputSlots>((value, colorName) => {
+        ...VariantsFactory.createBorders<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
         rounded: VariantsFactory.createRounded<ITextInputSlots>((value, colorName) => {

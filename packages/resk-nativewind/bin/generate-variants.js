@@ -48,9 +48,9 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   const textColorsWithImportant = VariantsColorsFactory.buildTextColors(true);
   const iconForeground = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]));
   const textColors = {
-    ...VariantsColorsFactory.buildTextColors(),
-    ...textForeground,
-  },
+      ...VariantsColorsFactory.buildTextColors(),
+      ...textForeground,
+    },
     icon = {
       ...textColorsWithImportant,
       ...iconForeground,
@@ -59,25 +59,14 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   const allColors = {};
   const content = JSON.stringify(
     {
-      button: VariantsColorsFactory.buildBackgroundColors(
-        false,
-        ({
-          lightColor,
-          darkColor,
-          lightForeground,
-          darkForeground,
-          lightComputedColor,
-          lightComputedForeground,
-          darkComputedColor,
-        }) => {
-          return {
-            base: `${lightComputedColor} ${darkComputedColor} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
-            label: `text-${lightForeground} dark:text-${darkForeground}`,
-            icon: `!text-${lightForeground} dark:!text-${darkForeground}`,
-            activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground}`),
-          };
-        }
-      ),
+      button: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor }) => {
+        return {
+          base: `${lightComputedColor} ${darkComputedColor} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
+          label: `text-${lightForeground} dark:text-${darkForeground}`,
+          icon: `!text-${lightForeground} dark:!text-${darkForeground}`,
+          activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground}`),
+        };
+      }),
       buttonOutline: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
         const groupClassName = {
           base: `group web:hover:bg-${lightColor} web:dark:hover:bg-${darkColor}`,
@@ -132,6 +121,16 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
       borderColor: Object.fromEntries(
         Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("border-")];
+        })
+      ),
+      hoverBorderColor: Object.fromEntries(
+        Object.entries(textColors).map(([key, value]) => {
+          return [key, value.split("text-").join("hover:border-")];
+        })
+      ),
+      activeBorderColor: Object.fromEntries(
+        Object.entries(textColors).map(([key, value]) => {
+          return [key, value.split("text-").join("active:border-")];
         })
       ),
       borderTopColor: Object.fromEntries(
@@ -224,6 +223,8 @@ export const VariantsColors = ${content}
         activeShadow : Record<IName,string>;
         activityIndicator: Record<IName2Foreground,string>;
         borderColor : Record<IName2Foreground,string>;
+        hoverBorderColor : Record<IName2Foreground,string>;
+        activeBorderColor : Record<IName2Foreground,string>;
         borderTopColor : Record<IName2Foreground,string>;
         borderBottomColor : Record<IName2Foreground,string>;
         borderLeftColor : Record<IName2Foreground,string>;

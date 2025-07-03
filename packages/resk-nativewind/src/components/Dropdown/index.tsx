@@ -20,6 +20,7 @@ import { Text } from "@html/Text";
 import { IFontIconName } from "@components/Icon";
 import { INavContext } from "@components/Nav";
 import dropdownItem, { IVariantPropsDropdownItem } from "@variants/dropdownItem";
+import { IVariantPropsIcon } from "@variants/icon";
 
 
 export class Dropdown<ItemType = any, ValueType = any> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
@@ -393,7 +394,6 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         }
         return actions;
     }, [dropdownActions, multiple, context.isOpen(), context, anchorSelectedText]);
-    context.dropdownActions = actions as any;
     const loadingContent = isLoading ? <ProgressBar indeterminate testID={testID + "dropdown-progressbar"} /> : null;
     const anchorProps: ITextInputProps = {
         ...props,
@@ -453,7 +453,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
 
 function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, canRenderSeach, context }: { maxHeight: number, actions: IDropdownAction[], canRenderSeach: boolean, context: IDropdownContext<ItemType, ValueType> }) {
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
-    const { searchInputProps, error } = context.props;
+    const { searchInputProps, error, dropdownActionsMenuClassName, dropdownActionsMenuIconName, dropdownActionsMenuIconVariant } = context.props;
     const listProps = Object.assign({}, context.props.listProps);
     const testID = context?.getTestID();
     const menuContext = useMenu();
@@ -471,7 +471,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
     const searchProps = Object.assign({}, searchInputProps, { error: error || searchInputProps?.error });
     const divider = <Divider testID={`${testID}-divider`} className="w-full" />;
     const searchInput = canRenderSeach ?
-        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full max-w-full px-[7px]")}>
+        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full max-w-full")}>
             {canReverse ? divider : null}
             <TextInput
                 testID={`${testID}-dropdown-search`}
@@ -479,7 +479,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
                 affix={false}
                 debounceTimeout={preparedItems?.length > 500 ? 1500 : preparedItems?.length > 200 ? 1000 : 0}
                 {...searchProps}
-                containerClassName={(cn("w-full", searchProps.containerClassName))}
+                containerClassName={(cn("w-full px-[7px]", searchProps.containerClassName))}
                 //variant={{ borderWidth: 1, borderColor: "surface", borderStyle: "solid", rounded: "10px", ...searchProps.variant }}
                 defaultValue={searchText}
                 onChange={({ value }) => {
@@ -493,8 +493,9 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
                         minWidth={150}
                         preferedPositionAxis="vertical"
                         anchor={<FontIcon
-                            name={FONT_ICONS.MORE as never}
-                            size={24}
+                            name={dropdownActionsMenuIconName || FONT_ICONS.MORE as never}
+                            className={dropdownActionsMenuClassName}
+                            variant={{ size: "25px", ...dropdownActionsMenuIconVariant }}
                         />}
                     />
                 )
@@ -598,10 +599,6 @@ DropdownItem.displayName = "DropdownItem";
 
 
 export interface IDropdownContext<ItemType = any, ValueType = any> extends Dropdown<ItemType, ValueType> {
-    /***
-     * The dropdown actions.
-     */
-    dropdownActions?: IDropdownAction[];
     /***
      * the corresponding selected text calculated from selected items
      */
@@ -906,6 +903,21 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
         optional actions for the dropdown
     */
     dropdownActions?: IDropdownActions;
+
+    /***
+        The variants for the dropdown actions menu icon
+    */
+    dropdownActionsMenuIconVariant?: IVariantPropsIcon;
+
+    /***
+        The icon name for the dropdown actions menu icon
+    */
+    dropdownActionsMenuIconName?: IFontIconName;
+
+    /***
+        The class name for the dropdown actions menu icon
+    */
+    dropdownActionsMenuClassName?: IClassName;
 
     /***
      * The name of the icon to be used for the selected state of the dropdown items.

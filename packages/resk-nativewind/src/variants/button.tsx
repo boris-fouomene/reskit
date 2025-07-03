@@ -27,7 +27,9 @@ const buton = tv({
             }
         }),
     },
-    defaultVariants: {}
+    defaultVariants: {
+        activeOpacity: 80
+    }
 });
 export default buton;
 export type IVariantPropsButton = VariantProps<typeof buton>;

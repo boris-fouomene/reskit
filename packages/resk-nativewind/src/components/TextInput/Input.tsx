@@ -12,7 +12,7 @@ import { ITextInputCallOptions, ITextInputProps, ITextInputRenderOptions, ITextI
 import p from "@platform";
 import { TouchableOpacity } from "react-native";
 import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
-import textInputVariant, { IVariantPropsTextInput } from "@variants/textInput";
+import textInputVariant from "@variants/textInput";
 import allVariants from "@variants/all";
 import { extractTextClasses } from "@utils/textClasses";
 import { Div } from "@html/Div";
@@ -228,15 +228,15 @@ export default function TextInput({
     const focusedLabelEmbededClx = isFocusedVariant && isLabelEmbeded && computedVariant.focusedLabelEmbeded();
     const errorLabelEmbededClx = isErrorVariant && isLabelEmbeded && computedVariant.errorLabelEmbeded();
 
-    const labelClx = cn("flex flex-row self-center justify-start items-center text-input-label", isLabelEmbeded ? ["text-input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), !isLabelEmbeded ? [focusedLabelClx, errorLabelClx] : [focusedLabelEmbededClx, errorLabelEmbededClx], labelClassName);
-    const inputClx = cn(multiline && "py-[5px]", "outline-none flex-1 grow overflow-hidden text-base border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", canWrapWithTouchable && "cursor-pointer", computedVariant.input(), focusedInputClx, errorInputClx, className);
+    const labelClx = cn("flex flex-row self-center justify-start items-center input-label", isLabelEmbeded ? ["input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), !isLabelEmbeded ? [focusedLabelClx, errorLabelClx] : [focusedLabelEmbededClx, errorLabelEmbededClx], labelClassName);
+    const inputClx = cn(multiline && "py-[5px]", "outline-none grow border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", canWrapWithTouchable && "cursor-pointer", computedVariant.input(), focusedInputClx, errorInputClx, className);
     const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
     const rightContainerClx = cn(computedVariant.rightContainer(), rightContainerClassName);
     const contentContainerClx = cn(computedVariant.contentContainer(), focusedContentContainerClx, errorContentContainerClx, contentContainerClassName);
     const iconClx = cn(computedVariant.icon(), focusedIconClx, errorIconClx, iconClassName);
     const containerClx = cn(computedVariant.container(), containerClassName);
-    const phoneDialCodeClx = cn("text-input-phone-dial-code-label", inputTextClx);
+    const phoneDialCodeClx = cn("input-phone-dial-code-label", inputTextClx);
     const phoneDialCodeLabel = phoneDialCodeText ? <Text className={phoneDialCodeClx}>{phoneDialCodeText}</Text> : null;
     const callOptions: ITextInputCallOptions = { ...inputState, isPhone, phoneDialCodeLabel, labelClassName: labelClx, iconClassName: iconClx, inputClassName: inputClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
     const minHeight = useMemo(() => {
@@ -382,18 +382,20 @@ export default function TextInput({
             {right}
             {secureIcon}
         </> : null
-    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, cursorDefault, "text-input-container text-input-" + type + "-container")} testID={testID + "-container"}>
-        <Div className={cn(cursorDefault, "w-full relative text-input-wrapper")} testID={testID + "-wrapper"}>
+    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, cursorDefault, "input-container input-" + type + "-container")} testID={testID + "-container"}>
+        <Div className={cn(cursorDefault, "w-full relative input-wrapper")} testID={testID + "-wrapper"}>
             {isLabelEmbeded ? null : labelContent}
-            <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn(cursorDefault, "text-input-content-container w-full flex flex-row justify-between self-start items-center", contentContainerClx)}>
+            <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn(cursorDefault, "input-content-container w-full flex flex-row justify-between self-start items-center", contentContainerClx)}>
                 <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, cursorDefault, "grow", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
                     {leftContent}
                     {isLabelEmbeded ? labelContent : null}
                     {phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
-                    {isHydrated ? inputElement : <Text className={cn(inputClx, cursorDefault)} style={inputStyle}  >{String(inputValue)}</Text>}
+                    {isHydrated ? inputElement : <Text className={cn(inputClx, "animate-pulse", cursorDefault)} style={inputStyle}  >{String(inputValue)}</Text>}
                 </Div>
-                {rightContent ? (<Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, cursorDefault, "text-input-right-content-container grow-0 self-center justify-end", rightContainerClx)}>
-                    {rightContent}
+                {rightContent ? (<Div className="right-content-wrapper self-center grow-0">
+                    <Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, cursorDefault, "input-right-content-container self-center", rightContainerClx)}>
+                        {rightContent}
+                    </Div>
                 </Div>) : null}
             </Wrapper>
         </Div>

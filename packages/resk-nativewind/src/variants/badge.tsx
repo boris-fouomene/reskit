@@ -26,7 +26,8 @@ const badge = tv({
         },
     },
     defaultVariants: {
-        colorScheme: "surface"
+        colorScheme: "surface",
+        activeOpacity: 80,
     }
 });
 

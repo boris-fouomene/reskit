@@ -490,7 +490,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
                     <Menu
                         items={actions as any}
                         testID={`${testID}-dropdown-menu-actions`}
-                        minWidth={180}
+                        minWidth={150}
                         preferedPositionAxis="vertical"
                         anchor={<FontIcon
                             name={FONT_ICONS.MORE as never}

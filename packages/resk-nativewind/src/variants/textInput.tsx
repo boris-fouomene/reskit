@@ -29,7 +29,7 @@ const textInput = tv({
         ...VariantsFactory.createAll<{ contentContainer: string }>((value, colorName) => {
             return { contentContainer: value }
         }),
-        background: VariantsFactory.create<typeof VariantsColors.background, ITextInputSlots>(VariantsColors.background, (value, colorName) => {
+        colorScheme: VariantsFactory.create<typeof VariantsColors.background, ITextInputSlots>(VariantsColors.background, (value, colorName) => {
             const textColor = VariantsColors.textForeground[`${colorName}-foreground`];
             return {
                 contentContainer: value,
@@ -158,7 +158,7 @@ const textInput = tv({
         }),
     },
     defaultVariants: {
-        background: "surface",
+        colorScheme: "surface",
         paddingX: "5px",
         iconSize: "20px",
         errorColor: "error",

@@ -24,6 +24,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
             <Icon iconName="clock" size={30} variant={{ color: "warning" }} />
           </>}
         />
+        <TextInput label="A Success Text Input" variant={{ colorScheme: "success" }} />
         <TextInput variant={{ iconColor: "secondary", labelTextAlign: "right", labelWeight: "semibold", iconSize: "25px", labelTextSize: "15px" }} type="password" label="Password" placeholder="Enter your password" />
         <TextInput type="date" label="Date" placeholder="Enter your date" />
         <TextInput type="time" label="Time" placeholder="Enter your time" />

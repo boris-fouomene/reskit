@@ -7,7 +7,7 @@ import { textAlignClasses } from "./variantsFactory/textAlignClasses";
 const text = tv({
     base: "",
     variants: {
-        color: VariantsColors.textWithForeground,
+        color: VariantsColors.text,
         error: {
             true: "",
         },

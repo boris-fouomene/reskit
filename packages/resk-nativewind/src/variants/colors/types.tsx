@@ -8,23 +8,6 @@ export interface IVariantColor {
     darkColor: string,
     /**The dark foreground variant*/
     darkForeground: string,
-
-    /**The color variant when hovered*/
-    hoverLightColor?: string,
-    /**The color variant when hovered in dark mode*/
-    hoverDarkColor?: string,
-    /**The foreground color variant when hovered*/
-    hoverLightForeground?: string,
-    /**The foreground color variant when hovered in dark mode*/
-    hoverDarkForeground?: string,
-    /***The color variant when active*/
-    activeLightColor?: string,
-    /***The color variant when active in dark mode*/
-    activeDarkColor?: string,
-    /***The foreground color variant when active*/
-    activeLightForeground?: string,
-    /***The foreground color variant when active in dark mode*/
-    activeDarkForeground?: string,
 }
 
 /**

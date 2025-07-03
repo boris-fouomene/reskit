@@ -83,8 +83,6 @@ const iconButton = tv({
     defaultVariants: {
         rounded: "full",
         colorScheme: "surface",
-        activeOpacity: 80,
-        hoverOpacity: 90
     }
 });
 

@@ -34,10 +34,10 @@ const menu = tv({
                 container: value,
             }
         }),
-        ...VariantsFactory.createTransitionsVariants<{ container: string }>((value) => {
+        ...VariantsFactory.createTransitions<{ container: string }>((value) => {
             return { container: value };
         }),
-        transitionEasing: VariantsFactory.createTransitionEasingVariants<{ container: string }>((value) => {
+        transitionEasing: VariantsFactory.createTransitionEasing<{ container: string }>((value) => {
             return { container: value };
         }),
     },

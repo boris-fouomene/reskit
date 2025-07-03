@@ -44,46 +44,19 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   const ouputFolder = path.resolve(outputRootDir, "colors");
   const outputPath = path.resolve(ouputFolder, "generated.js");
   const outputDeclarations = path.resolve(ouputFolder, "generated.d.ts");
-  const textColors = VariantsColorsFactory.buildTextColors();
   const textForeground = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors()).map(([key, value]) => [`${key}-foreground`, value]));
   const textColorsWithImportant = VariantsColorsFactory.buildTextColors(true);
-  const textForegroundWithImportant = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]));
-  const textWithForeground = {
-      ...textColors,
-      ...textForeground,
-    },
-    textWithForegroundWithImportant = {
+  const iconForeground = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]));
+  const textColors = {
+    ...VariantsColorsFactory.buildTextColors(),
+    ...textForeground,
+  },
+    icon = {
       ...textColorsWithImportant,
-      ...textForegroundWithImportant,
+      ...iconForeground,
     },
     background = VariantsColorsFactory.buildBackgroundColors();
   const allColors = {};
-  if (false) {
-    Object.entries(VariantsColorsFactory.colors).map(([key, value]) => {
-      const { lightColor, darkColor, lightForeground, darkForeground, areTailwindClasses } = value;
-      const hasLight = isNonNullString(lightColor);
-      const hasDark = isNonNullString(darkColor);
-      const hasLightForeground = isNonNullString(lightForeground);
-      const hasDarkForeground = isNonNullString(darkForeground);
-      if (areTailwindClasses) {
-        ["bg", "border", "border-t", "border-b", "border-l", "border-r", "ring", "shadow"].map((prefix) => {
-          const classPrefix = `${prefix}-${key}`;
-          if (hasLight) {
-            allColors[classPrefix] = `${prefix}-${lightColor}`;
-          }
-          if (hasDark) {
-            allColors[`dark:${classPrefix}`] = `${prefix}-${darkColor}`;
-          }
-          if (hasLightForeground) {
-            allColors[`${classPrefix}-foreground`] = `${prefix}-${lightForeground}`;
-          }
-          if (hasDarkForeground) {
-            allColors[`dark:${classPrefix}-foreground`] = `${prefix}-${darkForeground}`;
-          }
-        });
-      }
-    });
-  }
   const content = JSON.stringify(
     {
       button: VariantsColorsFactory.buildBackgroundColors(
@@ -96,34 +69,12 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           lightComputedColor,
           lightComputedForeground,
           darkComputedColor,
-
-          hoverLightColor,
-          hoverDarkColor,
-          activeLightColor,
-          activeDarkColor,
-          hoverLightForeground,
-          hoverDarkForeground,
-          activeLightForeground,
-          activeDarkForeground,
-
-          hoverLightComputedColor,
-          hoverDarkComputedColor,
-          hoverLightComputedForeground,
-          hoverDarkComputedForeground,
-          activeLightComputedColor,
-          activeDarkComputedColor,
-          activeLightComputedForeground,
-          activeDarkComputedForeground,
         }) => {
-          const textColor = [hoverLightComputedForeground.split("bg-").join("text-"), hoverDarkComputedForeground.split("bg-").join("text-"), activeLightComputedForeground.split("bg-").join("text-"), activeDarkComputedForeground.split("bg-").join("text-")].filter((c) => !!c).join(" "),
-            iconColor = [hoverLightComputedForeground.split("bg-").join("!text-"), hoverDarkComputedForeground.split("bg-").join("!text-"), activeLightComputedForeground.split("bg-").join("!text-"), activeDarkComputedForeground.split("bg-").join("!text-")].filter((c) => !!c).join(" ");
-          const borderTColor = [hoverLightComputedForeground.split("bg-").join("text-"), hoverDarkComputedForeground.split("bg-").join("text-"), activeLightComputedForeground.split("bg-").join("text-"), activeDarkComputedForeground.split("bg-").join("border-t-")].filter((c) => !!c).join(" ");
-
           return {
-            base: `${lightComputedColor} ${darkComputedColor} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor} ${hoverLightComputedColor} ${hoverDarkComputedColor} ${activeLightComputedColor} ${activeDarkComputedColor}`,
-            label: `text-${lightForeground} dark:text-${darkForeground} ${textColor}`,
-            icon: `!text-${lightForeground} dark:!text-${darkForeground} ${iconColor}`,
-            activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground} ${borderTColor}`),
+            base: `${lightComputedColor} ${darkComputedColor} focus-visible:outline-${lightColor} dark:focus-visible:outline-${darkColor}`,
+            label: `text-${lightForeground} dark:text-${darkForeground}`,
+            icon: `!text-${lightForeground} dark:!text-${darkForeground}`,
+            activityIndicator: cn(`border-t-${lightForeground} dark:border-t-${darkForeground}`),
           };
         }
       ),
@@ -141,10 +92,8 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
           activityIndicator: cn(groupClassName.activityIndicator, `border-t-${lightColor} dark:border-t-${darkColor}`),
         };
       }),
-      icon: textWithForegroundWithImportant,
-      iconForeground: textWithForegroundWithImportant,
       iconButton: Object.fromEntries(
-        Object.entries(textForegroundWithImportant).map(([key, value]) => {
+        Object.entries(iconForeground).map(([key, value]) => {
           const colorName = key.split("-foreground")[0];
           return [
             colorName,
@@ -159,72 +108,87 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
       surface: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
         return cn(lightComputedColor, darkComputedColor, `text-${lightForeground} dark:text-${darkForeground}`);
       }),
-      badge: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground, activeDarkComputedColor, activeLightComputedColor, hoverDarkComputedColor, hoverLightComputedColor }) => {
-        return cn(lightComputedColor, darkComputedColor, `text-${lightForeground} dark:text-${darkForeground}`, activeDarkComputedColor, activeLightComputedColor, hoverDarkComputedColor, hoverLightComputedColor);
+      hoverBackground: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
+        return cn(`hover:bg-${lightColor} dark:bg-${darkColor}`);
+      }),
+      activeBackground: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
+        return cn(`active:bg-${lightColor} dark:active:bg-${darkColor}`);
       }),
       shadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
         return cn(`shadow-${lightColor} dark:shadow-${darkColor}`);
       }),
-      shadowHover: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
+      hoverShadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
         return cn(`hover:shadow-${lightColor} dark:hover:shadow-${darkColor}`);
       }),
-      shadowActive: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
+      activeShadow: VariantsColorsFactory.buildBackgroundColors(false, ({ lightColor, darkColor, lightForeground, darkForeground, lightComputedColor, lightComputedForeground, darkComputedColor, darkComputedForeground }) => {
         return cn(`active:shadow-${lightColor} dark:active:shadow-${darkColor}`);
       }),
-      text: VariantsColorsFactory.buildTextColors(),
-      textWithImportant: textColorsWithImportant,
-      textForegroundWithImportant,
-      textWithForeground,
-      textWithForegroundWithImportant,
+      hoverText: VariantsColorsFactory.buildTextColors(false, ({ lightColor, darkColor }) => {
+        return cn(`hover:text-${lightColor} dark:hover:text-${darkColor}`);
+      }),
+      activeText: VariantsColorsFactory.buildTextColors(false, ({ lightColor, darkColor }) => {
+        return cn(`active:text-${lightColor} dark:active:text-${darkColor}`);
+      }),
+      text: textColors,
+      hoverText: Object.fromEntries(Object.entries(textColors).map(([key, value]) => [key, value.split("text-").join("hover:text-")])),
+      activeText: Object.fromEntries(Object.entries(textColors).map(([key, value]) => [key, value.split("text-").join("active:text-")])),
+      icon,
+      hoverIcon: Object.fromEntries(Object.entries(icon).map(([key, value]) => [key, value.split("!text-").join("hover:!text-")])),
+      activeIcon: Object.fromEntries(Object.entries(icon).map(([key, value]) => [key, value.split("!text-").join("active:!text-")])),
       background,
       textForeground,
+      hoverTextForeground: Object.fromEntries(Object.entries(textForeground).map(([key, value]) => [key, value.split("text-").join("hover:text-")])),
+      activeTextForeground: Object.fromEntries(Object.entries(textForeground).map(([key, value]) => [key, value.split("text-").join("active:text-")])),
+      iconForeground,
+      hoverIconForeground: Object.fromEntries(Object.entries(iconForeground).map(([key, value]) => [key, value.split("!text-").join("hover:!text-")])),
+      activeIconForeground: Object.fromEntries(Object.entries(iconForeground).map(([key, value]) => [key, value.split("!text-").join("active:!text-")])),
       borderColor: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("border-")];
         })
       ),
       borderTopColor: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("border-t-")];
         })
       ),
       borderBottomColor: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("border-b-")];
         })
       ),
       borderLeftColor: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("border-l-")];
         })
       ),
       borderRightColor: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("border-r-")];
         })
       ),
       activityIndicator: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("border-t-")];
         })
       ),
       ringColors: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("ring-")];
         })
       ),
       hoverRingColors: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("hover:ring-")];
         })
       ),
       activeRingColors: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("active:ring-")];
         })
       ),
       focusRingColors: Object.fromEntries(
-        Object.entries(textWithForeground).map(([key, value]) => {
+        Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("focus:ring-")];
         })
       ),
@@ -250,21 +214,27 @@ export const VariantsColors = ${content}
     export declare interface IVariantsGeneratedColors {
         button : Record<IName,Record<"base"|"label"|"icon" | "activityIndicator",string>>;
         buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "activityIndicator",string>>;
-        icon : Record<IName,string>;
-        iconForeground : Record<IName,string>;
         iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
         badge : Record<IName,string>;
-        text : Record<IName,string>;
-        textWithImportant : Record<IName,string>;
-        textWithForegroundWithImportant : Record<IName2Foreground,string>;
-        textForegroundWithImportant: Record<IName,string>;
-        textWithForeground : Record<IName2Foreground ,string>;
+        icon : Record<IName2Foreground,string>;
+        hoverIcon : Record<IName2Foreground,string>;
+        activeIcon : Record<IName2Foreground,string>;
+        text : Record<IName2Foreground ,string>;
+        hoverText : Record<IName2Foreground ,string>;
+        activeText : Record<IName2Foreground ,string>;
         background : Record<IName,string>;
+        hoverBackground : Record<IName,string>;
+        activeBackground : Record<IName,string>;
         textForeground : Record<IName,string>;
+        hoverTextForeground : Record<IName,string>;
+        activeTextForeground : Record<IName,string>;
+        iconForeground : Record<IName,string>;
+        hoverIconForeground : Record<IName,string>;
+        activeIconForeground : Record<IName,string>;
         shadow : Record<IName,string>;
-        shadowHover : Record<IName,string>;
-        shadowActive : Record<IName,string>;
+        hoverShadow : Record<IName,string>;
+        activeShadow : Record<IName,string>;
         activityIndicator: Record<IName2Foreground,string>;
         borderColor : Record<IName2Foreground,string>;
         borderTopColor : Record<IName2Foreground,string>;

@@ -36,10 +36,10 @@ const bottomSheet = tv({
         container: value,
       };
     }),
-    ...VariantsFactory.createTransitionsVariants<{ portal: string }>((value) => {
+    ...VariantsFactory.createTransitions<{ portal: string }>((value) => {
       return { portal: value };
     }),
-    transitionEasing: VariantsFactory.createTransitionEasingVariants<{ portal: string }>((value) => {
+    transitionEasing: VariantsFactory.createTransitionEasing<{ portal: string }>((value) => {
       return { portal: value };
     }),
   },
@@ -52,10 +52,6 @@ const bottomSheet = tv({
     transitionDuration: 300,
     transitionEasing: "ease-in-out",
   },
-});
-
-const v = VariantsFactory.createTransitionsVariants<{ portal: string }>((value) => {
-  return { portal: value };
 });
 export default bottomSheet;
 

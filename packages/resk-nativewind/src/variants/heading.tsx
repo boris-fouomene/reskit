@@ -15,10 +15,10 @@ const heading = tv({
             h5: 'text-lg font-medium',
             h6: 'text-base font-normal',
         },
-        align: VariantsFactory.createTextAlignVariants(),
+        align: VariantsFactory.createTextAlign,
         textSize: VariantsFactory.createTextSizes(),
-        weight: VariantsFactory.createFontWeightVariants(),
-        color: VariantsColors.textWithForeground,
+        weight: VariantsFactory.createFontWeight,
+        color: VariantsColors.text,
     },
     defaultVariants: {},
 })

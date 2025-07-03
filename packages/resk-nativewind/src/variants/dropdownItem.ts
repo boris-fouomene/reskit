@@ -22,7 +22,7 @@ const dropdownItem = tv({
         label: VariantsColors.textForeground[colorName],
       };
     }),
-    selectedColor: VariantsFactory.create<typeof VariantsColors.textWithForegroundWithImportant, IDropdownIconSlots>(VariantsColors.textWithForegroundWithImportant, (value, colorName) => {
+    selectedColor: VariantsFactory.create<typeof VariantsColors.icon, IDropdownIconSlots>(VariantsColors.icon, (value, colorName) => {
       return {
         selectedLabel: value.split("!text-").join("text-"),
         selectedIcon: value,
@@ -38,12 +38,12 @@ const dropdownItem = tv({
         label: value,
       };
     }),
-    textAlign: VariantsFactory.createTextAlignVariants<IDropdownIconSlots>((value, colorName) => {
+    textAlign: VariantsFactory.createTextAlign<IDropdownIconSlots>((value, colorName) => {
       return {
         label: value,
       };
     }),
-    textWeight: VariantsFactory.createFontWeightVariants<IDropdownIconSlots>((value, colorName) => {
+    textWeight: VariantsFactory.createFontWeight<IDropdownIconSlots>((value, colorName) => {
       return {
         label: value,
       };
@@ -53,7 +53,7 @@ const dropdownItem = tv({
         selectedLabel: value,
       };
     }),
-    selectedTextWeight: VariantsFactory.createFontWeightVariants<IDropdownIconSlots>((value, colorName) => {
+    selectedTextWeight: VariantsFactory.createFontWeight<IDropdownIconSlots>((value, colorName) => {
       return {
         selectedLabel: value,
       };

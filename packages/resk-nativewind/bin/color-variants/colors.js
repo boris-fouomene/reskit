@@ -55,7 +55,6 @@ class VariantsColorsFactory {
      * @param tailwindClassPrefix - The Tailwind class prefix to use (e.g., `"bg"`, `"text"`, `"border"`).
      * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
      * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
-       @param withHover2ActiveState - If `true`, appends `hover:active:bg-hover-active-color` to each class name to mark it as hover2active state.
      *   If not provided, the default builder returns a string combining the light and dark class names.
      * @param isForeground - (Optional) Specify if we are building a foreground color or not.
      *
@@ -94,39 +93,24 @@ class VariantsColorsFactory {
      * @see {@link VariantsColorsFactory.buildBackgroundColors}
      * @see {@link VariantsColorsFactory.buildBorderColors}
      */
-    static buildColors(tailwindClassPrefix, withImportantAttribute, colorClassNameBuilder, isForeground = false, withHover2ActiveState = false) {
+    static buildColors(tailwindClassPrefix, withImportantAttribute, colorClassNameBuilder, isForeground = false) {
         const r = Object.create({});
         const importantPrefix = withImportantAttribute ? "!" : "";
-        const colorBuilder = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightComputedColor, darkComputedColor, activeDarkComputedColor, activeLightComputedColor, hoverDarkComputedColor, hoverLightComputedColor }) => `${lightComputedColor} ${darkComputedColor} ${withHover2ActiveState ? `${hoverLightComputedColor} ${hoverDarkComputedColor} ${activeLightComputedColor} ${activeDarkComputedColor}` : ""}`;
+        const colorBuilder = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightComputedColor, darkComputedColor }) => `${lightComputedColor} ${darkComputedColor}`;
         Object.entries(VariantsColorsFactory.colors).map(([color, value]) => {
-            const _a = Object.assign({}, value), { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, hoverLightColor: _hoverLightColor, hoverDarkColor: _hoverDarkColor, hoverLightForeground: _hoverLightForeground, hoverDarkForeground: _hoverDarkForeground, activeLightColor: _activeLightColor, activeDarkColor: _activeDarkColor, activeLightForeground: _activeLightForeground, activeDarkForeground: _activeDarkForeground } = _a, rest = __rest(_a, ["lightColor", "lightForeground", "darkColor", "darkForeground", "hoverLightColor", "hoverDarkColor", "hoverLightForeground", "hoverDarkForeground", "activeLightColor", "activeDarkColor", "activeLightForeground", "activeDarkForeground"]);
+            const _a = Object.assign({}, value), { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground } = _a, rest = __rest(_a, ["lightColor", "lightForeground", "darkColor", "darkForeground"]);
             const lightColor = defaultStr(isForeground ? _lightForeground : light);
             const darkColor = defaultStr(isForeground ? _darkForeground : dark);
             const lightForeground = defaultStr(isForeground ? light : _lightForeground);
             const darkForeground = defaultStr(isForeground ? dark : _darkForeground);
-            const hoverLightColor = defaultStr(isForeground ? _hoverLightForeground : _hoverLightColor);
-            const hoverDarkColor = defaultStr(isForeground ? _hoverDarkForeground : _hoverDarkColor);
-            const activeLightColor = defaultStr(isForeground ? _activeLightForeground : _activeLightColor);
-            const activeDarkColor = defaultStr(isForeground ? _activeDarkForeground : _activeDarkColor);
-            const hoverLightForeground = defaultStr(isForeground ? _hoverLightColor : _hoverLightForeground);
-            const hoverDarkForeground = defaultStr(isForeground ? _hoverDarkColor : _hoverDarkForeground);
-            const activeLightForeground = defaultStr(isForeground ? _activeLightColor : _activeLightForeground);
-            const activeDarkForeground = defaultStr(isForeground ? _activeDarkColor : _activeDarkForeground);
-            r[color] = colorBuilder(Object.assign(Object.assign({}, rest), { hoverLightColor,
-                hoverDarkColor,
-                activeLightColor,
-                activeDarkColor,
-                hoverLightForeground,
-                hoverDarkForeground,
-                activeLightForeground,
-                activeDarkForeground, isForeground: !!isForeground, lightColor,
+            r[color] = colorBuilder(Object.assign(Object.assign({}, rest), { isForeground: !!isForeground, lightColor,
                 darkColor, lightComputedColor: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`, darkComputedColor: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`, darkForeground,
-                lightForeground, lightComputedForeground: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkComputedForeground: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`, hoverLightComputedColor: hoverLightColor ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightColor}` : "", hoverDarkComputedColor: hoverDarkColor ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkColor}` : "", hoverLightComputedForeground: hoverLightForeground ? `hover:${importantPrefix}${tailwindClassPrefix}-${hoverLightForeground}` : "", hoverDarkComputedForeground: hoverDarkForeground ? `dark:hover:${importantPrefix}${tailwindClassPrefix}-${hoverDarkForeground}` : "", activeLightComputedColor: activeLightColor ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightColor}` : "", activeDarkComputedColor: activeDarkColor ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkColor}` : "", activeLightComputedForeground: activeLightForeground ? `active:${importantPrefix}${tailwindClassPrefix}-${activeLightForeground}` : "", activeDarkComputedForeground: activeDarkForeground ? `dark:active:${importantPrefix}${tailwindClassPrefix}-${activeDarkForeground}` : "" }));
+                lightForeground, lightComputedForeground: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkComputedForeground: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}` }));
         });
         return r;
     }
-    static buildTextForegroundColors(withImportantAttribute, colorClassNameBuilder, withHover2ActiveState = false) {
-        return VariantsColorsFactory.buildColors("text", withImportantAttribute, colorClassNameBuilder, true, withHover2ActiveState);
+    static buildTextForegroundColors(withImportantAttribute, colorClassNameBuilder) {
+        return VariantsColorsFactory.buildColors("text", withImportantAttribute, colorClassNameBuilder, true);
     }
     /**
      * Generates a record of Tailwind CSS class names for all registered text color variants.
@@ -139,7 +123,7 @@ class VariantsColorsFactory {
      * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
      * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
          If not provided, the default builder returns a string combining the light and dark class names.
-      @param withHover2ActiveState - If `true`, appends `hover:active:bg-hover-active-color` to each class name to mark it as hover2active state.
+      
      *
      * @returns A record mapping each registered color name to the generated text class name or object, as defined by the builder.
      *
@@ -164,8 +148,8 @@ class VariantsColorsFactory {
      * @see {@link IVariantsColors.ClassNameBuilder}
      * @see {@link VariantsColorsFactory.buildColors}
      */
-    static buildTextColors(withImportantAttribute, colorClassNameBuilder, withHover2ActiveState = false) {
-        return VariantsColorsFactory.buildColors("text", withImportantAttribute, colorClassNameBuilder, withHover2ActiveState);
+    static buildTextColors(withImportantAttribute, colorClassNameBuilder) {
+        return VariantsColorsFactory.buildColors("text", withImportantAttribute, colorClassNameBuilder);
     }
     /**
      * Generates a record of Tailwind CSS class names for all registered background color variants.
@@ -178,7 +162,7 @@ class VariantsColorsFactory {
      * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
      * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
      *   If not provided, the default builder returns a string combining the light and dark class names.
-       @param withHover2ActiveState - If `true`, appends `hover:active:bg-hover-active-color` to each class name to mark it as hover2active state.
+       
      *
      * @returns A record mapping each registered color name to the generated background class name or object, as defined by the builder.
      *
@@ -203,8 +187,8 @@ class VariantsColorsFactory {
      * @see {@link IVariantsColors.ClassNameBuilder}
      * @see {@link VariantsColorsFactory.buildColors}
      */
-    static buildBackgroundColors(withImportantAttribute, colorClassNameBuilder, withHover2ActiveState = false) {
-        return VariantsColorsFactory.buildColors("bg", withImportantAttribute, colorClassNameBuilder, withHover2ActiveState);
+    static buildBackgroundColors(withImportantAttribute, colorClassNameBuilder) {
+        return VariantsColorsFactory.buildColors("bg", withImportantAttribute, colorClassNameBuilder);
     }
     /**
      * Generates a record of Tailwind CSS class names for all registered border color variants.
@@ -217,7 +201,7 @@ class VariantsColorsFactory {
      * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
      * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
      *   If not provided, the default builder returns a string combining the light and dark class names.
-     * @param withHover2ActiveState - If `true`, appends `hover:active:bg-hover-active-color` to each class name to mark it as hover2active state.
+     *
      * @returns A record mapping each registered color name to the generated border class name or object, as defined by the builder.
      *
      * @example
@@ -241,8 +225,8 @@ class VariantsColorsFactory {
      * @see {@link IVariantsColors.ClassNameBuilder}
      * @see {@link VariantsColorsFactory.buildColors}
      */
-    static buildBorderColors(withImportantAttribute, colorClassNameBuilder, withHover2ActiveState = false) {
-        return VariantsColorsFactory.buildColors("border", withImportantAttribute, colorClassNameBuilder, withHover2ActiveState);
+    static buildBorderColors(withImportantAttribute, colorClassNameBuilder) {
+        return VariantsColorsFactory.buildColors("border", withImportantAttribute, colorClassNameBuilder);
     }
     /**
      * Generates a TypeScript interface definition string for the current color map.

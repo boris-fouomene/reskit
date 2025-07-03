@@ -14,19 +14,12 @@ import menu from "./menu";
 import checkbox from "./checkbox";
 import progressBar from "./progressBar";
 import textInput from "./textInput";
-import { tv } from "tailwind-variants";
-import { VariantsColors } from "./colors/generated";
 import bottomSheet from "./bottomSheet";
 import dropdownItem from "./dropdownItem";
 export const variants = {
     all,
     bottomSheet,
     textInput,
-    iconColor: tv({
-        variants: {
-            iconColor: VariantsColors.textWithForegroundWithImportant
-        }
-    }),
     menu,
     icon,
     heading,

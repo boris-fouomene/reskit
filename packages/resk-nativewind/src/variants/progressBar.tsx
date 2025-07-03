@@ -97,12 +97,12 @@ const progressBar = tv({
                 fillBar: value,
             }
         }),
-        textColor: VariantsFactory.create<typeof VariantsColors.textWithForeground, { text: string }>(VariantsColors.textWithForeground, (value, colorName) => {
+        textColor: VariantsFactory.create<typeof VariantsColors.text, { text: string }>(VariantsColors.text, (value, colorName) => {
             return {
                 text: value,
             }
         }),
-        rounded: VariantsFactory.createRoundedVariants<{ track: string, fillBar: string }>((value) => {
+        rounded: VariantsFactory.createRounded<{ track: string, fillBar: string }>((value) => {
             return {
                 track: "",
                 fillBar: value,

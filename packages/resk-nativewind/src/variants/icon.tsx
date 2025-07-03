@@ -3,7 +3,7 @@ import { VariantsColors } from "./colors/generated";
 import { IconSizes } from "./variantsFactory/textSizes";
 const icon = tv({
     variants: {
-        color: VariantsColors.textWithForegroundWithImportant,
+        color: VariantsColors.icon,
         size: IconSizes,
     }
 });

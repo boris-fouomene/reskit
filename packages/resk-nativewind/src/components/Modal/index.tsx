@@ -17,23 +17,27 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
   const dismissable = customDismissable !== false;
   testID = defaultStr(testID, "resk-modal");
   const modalVariant = modalVariants(variant);
-  const handleDismiss = (e?: GestureResponderEvent | KeyboardEvent): any => {
+  const handleRequestClose = (e?: GestureResponderEvent | KeyboardEvent): any => {
     if (typeof onRequestClose == "function") {
       onRequestClose(e);
     }
     return true;
   }
-  useBackHandler(dismissable ? handleDismiss : () => true);
+  useBackHandler(dismissable ? handleRequestClose : () => true);
+  if (visible) {
+    console.log("modal visible shouldrender ", props)
+  }
   return (
-    <Portal absoluteFill visible={visible}
+    <Portal absoluteFill
+      visible={visible}
       testID={testID + "-modal-portal"}
-      onPress={dismissable ? handleDismiss : undefined} withBackdrop className={cn("modal-portal-container", modalVariant.container(), backdropClassName)}
+      onPress={dismissable ? handleRequestClose : undefined} withBackdrop className={cn("modal-portal-container", modalVariant.container(), backdropClassName)}
       onAccessibilityEscape={() => {
         if (typeof onAccessibilityEscape === "function") {
           onAccessibilityEscape();
         }
         if (dismissable === false) return;
-        handleDismiss(undefined as any);
+        handleRequestClose(undefined as any);
       }}
     >
       <Div
@@ -41,7 +45,7 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
         testID={testID}
         className={cn("resk-modal transition-opacity duration-500", modalVariant.content(), className)}
       >
-        <ModalContext.Provider value={{ isVisible: visible as boolean, isClosed: () => !!!visible, isOpen: () => !!visible, handleDismiss, dismissable: dismissable !== false }}>
+        <ModalContext.Provider value={{ isVisible: visible as boolean, isClosed: () => !!!visible, isOpen: () => !!visible, handleRequestClose, dismissable: dismissable !== false }}>
           {children}
         </ModalContext.Provider>
       </Div>
@@ -80,7 +84,7 @@ export interface IModalContext {
   isOpen?: () => boolean;
   isClosed?: () => boolean;
   isVisible?: boolean;
-  handleDismiss: (e: GestureResponderEvent | KeyboardEvent) => any;
+  handleRequestClose: (e: GestureResponderEvent | KeyboardEvent) => any;
   dismissable: boolean;
 }
 
@@ -104,11 +108,11 @@ export interface IModalContext {
  *     return <div>No Modal Context available</div>;
  *   }
  *   
- *   const { isOpen, handleDismiss } = modalContext;
+ *   const { isOpen, handleRequestClose } = modalContext;
  *   
  *   return (
  *     <div>
- *       <button onClick={handleDismiss}>Dismiss Modal</button>
+ *       <button onClick={handleRequestClose}>Dismiss Modal</button>
  *       <p>Is Modal Opened: {isOpen() ? "Yes" : "No"}</p>
  *     </div>
  *   );
@@ -150,12 +154,12 @@ import { disabled } from '../../../../../../frontend-dash/src/decorators/all/ind
  *     return <div>No modal context available</div>;
  *   }
  *   
- *   const { isVisible, handleDismiss } = modalContext;
+ *   const { isVisible, handleRequestClose } = modalContext;
  *   
  *   return (
  *     <div>
  *       <h1>{isVisible ? "Modal is Open" : "Modal is Closed"}</h1>
- *       <button onClick={handleDismiss}>Close Modal</button>
+ *       <button onClick={handleRequestClose}>Close Modal</button>
  *     </div>
  *   );
  * };

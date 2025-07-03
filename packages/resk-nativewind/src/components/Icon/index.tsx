@@ -4,6 +4,7 @@ import Button from "./Button";
 import { CountryFlag } from "./CountryFlag";
 export * from "./types";
 export * from "./Font/icons";
+export * from "./CountryFlag/types";
 
 type IIcon = typeof Icon & {
     Button: typeof Button;

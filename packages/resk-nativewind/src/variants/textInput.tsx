@@ -163,6 +163,7 @@ const textInput = tv({
         iconSize: "20px",
         errorColor: "error",
         focusedColor: "primary",
+        borderWidth: 1
     },
 });
 

@@ -2,6 +2,7 @@ import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
 import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack } from "@resk/nativewind";
+import { SelectCountry } from '@resk/nativewind/src';
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
@@ -64,6 +65,9 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
             label="Multi Select"
             multiple
             items={Array.from({ length: 10000 }).map((_, index) => ({ label: `Option ${index}`, value: index }))}
+          />
+          <SelectCountry
+            label="SelectCountry"
           />
         </HStack>
       </Div>

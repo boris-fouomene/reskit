@@ -13,9 +13,12 @@ import { IClassName } from "@src/types";
 import { transitionEasing, transitions } from "./transitions";
 import { typedEntries } from "@resk/core/utils";
 import { opacityClasses } from "./opacity";
-import { create } from "domain";
 
-type IVariantFactoryMutator<InputType extends Record<string | number, any>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
+type IVariantFactoryMutator<InputType extends Record<IVariantKey, any>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
+type IVariantKey = string | number;
+type IVariantCompositeResult<T extends Record<string, Record<IVariantKey, unknown>>> = {
+  [K in keyof T]: T[K] extends Record<IVariantKey, infer V> ? Record<keyof T[K], V> : never;
+};
 
 /**
  * A utility factory for generating and transforming variant objects in a type-safe manner.
@@ -91,7 +94,7 @@ export const VariantsFactory = {
    * - The mutator function receives both the value and the key for maximum flexibility.
    * - Useful for generating design system variants, utility classes, or mapping values.
    */
-  create: function <InputType extends Record<string | number, any>, ResultType = string, VariantGroupName = any>(input: InputType, variantMutator?: IVariantFactoryMutator<InputType, ResultType, VariantGroupName>, variantGroupName?: VariantGroupName) {
+  create: function <InputType extends Record<IVariantKey, any>, ResultType = string, VariantGroupName = any>(input: InputType, variantMutator?: IVariantFactoryMutator<InputType, ResultType, VariantGroupName>, variantGroupName?: VariantGroupName) {
     variantMutator = typeof variantMutator == "function" ? variantMutator : (value) => value as ResultType;
     return Object.fromEntries(
       typedEntries(input).map(([key, value]) => {
@@ -108,7 +111,7 @@ export const VariantsFactory = {
   createRounded: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
     return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);
   },
-  createComposite: function <T extends Record<string, Record<number | string, IClassName>>, ResultType = string>(composite: T, variantMutator?: IVariantFactoryMutator<T[keyof T], ResultType>): Record<keyof T, Record<keyof T[keyof T], ResultType>> {
+  createComposite: function <T extends Record<string, Record<IVariantKey, IClassName>>, ResultType = string>(composite: T, variantMutator?: IVariantFactoryMutator<T[keyof T], ResultType>): IVariantCompositeResult<T> {
     const r = {} as any;
     typedEntries(composite).forEach(([key, value]) => {
       r[key] = VariantsFactory.create<T[keyof T], ResultType, keyof T>(value, variantMutator, key);

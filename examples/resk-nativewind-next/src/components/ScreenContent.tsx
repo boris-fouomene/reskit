@@ -19,10 +19,11 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
             <Icon iconName="camera" size={30} variant={{ color: "secondary" }} />
           </>}
           right={<>
-            <Icon iconName="calendar" size={30} variant={{ color: "success" }} />
+            <Icon iconName="material-language" size={30} variant={{ color: "success" }} />
             <Icon iconName="clock" size={30} variant={{ color: "warning" }} />
           </>}
         />
+        <TextInput.Tel label="Tex input Tel example" labelEmbeded />
         <TextInput label="A Success Text Input" variant={{ colorScheme: "success" }} />
         <TextInput variant={{ iconColor: "secondary", labelTextAlign: "right", labelWeight: "semibold", iconSize: "25px", labelTextSize: "15px" }} type="password" label="Password" placeholder="Enter your password" />
         <TextInput type="date" label="Date" placeholder="Enter your date" />

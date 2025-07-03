@@ -55,7 +55,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         const { getItemText } = this.props;
         options = Object.assign({}, options);
         if (typeof getItemText === "function") {
-            return this.getItemText(options);
+            return getItemText(options);
         }
         return getTextContent(options.computedLabel);
     }

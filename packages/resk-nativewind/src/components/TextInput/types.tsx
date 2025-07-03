@@ -89,6 +89,12 @@ export interface ITextInputCallOptions extends IInputFormatterResult {
      * The label to be displayed alongside the phone dial code.
      */
     phoneDialCodeLabel: ReactNode;
+
+    /**
+     * A function to format the input value, allowing for transformation 
+     * of the text (e.g., converting to uppercase, converting to number).
+     */
+    toCase: (value: any, phoneCountryCode?: ICountryCode) => IInputFormatterResult & { phoneCountryCode?: ICountryCode }
 };
 
 

@@ -34,41 +34,6 @@ export function SelectCountry({ countryFlagProps: customCountryFlagProps, displa
                 {canDisplayDialCode && isNonNullString(item.dialCode) ? <Text className={cn(textClassName)} variant={textVariant}>{"(+" + item.dialCode.ltrim("+") + ")"}</Text> : null}
             </Div>;
         }}
-        /* anchor={({ dropdown, selectedItems, selectedValues, onPress, disabled }) => {
-            const itemsContent = useMemo(() => {
-                return selectedItems.map((item) => {
-                    return <Icon.CountryFlag
-                        key={item.code}
-                        {...countryFlagProps}
-                        countryCode={item.code}
-                        fallback={<Text variant={textVariant} className={textClassName}>[{item.code}]</Text>}
-                    />
-                });
-            }, [selectedItems, countryFlagProps]);
-            return <TouchableOpacity
-                testID={defaultStr(dropdown?.getTestID()) + "-anchor"}
-                {...anchorProps}
-                onPress={onPress}
-                disabled={disabled}
-            >
-                {<Div testID={defaultStr(dropdown?.getTestID()) + "-anchor-label"} disabled={disabled}>
-                    {itemsContent.length ? itemsContent :
-                        <>
-                            <Icon.Font
-                                name={"material-language" as never}
-                                variant={iconVariant}
-                                className={iconClassName}
-                                disabled={disabled}
-                            />
-                            {label}
-                        </>
-                    }
-                    {<Icon.Font variant={{ size: "20px", ...iconVariant }} className={iconClassName} name={"chevron-down" as never}
-                        disabled={disabled}
-                    />}
-                </Div>}
-            </TouchableOpacity>;
-        }} */
         {...props}
         menuProps={Object.assign({}, { minWidth: canDisplayDialCode ? 280 : 260 }, props.menuProps)}
     />

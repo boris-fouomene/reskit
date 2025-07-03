@@ -239,8 +239,10 @@ export default function TextInput({
     const iconClx = cn(computedVariant.icon(), focusedIconClx, errorIconClx, iconClassName);
     const containerClx = cn(computedVariant.container(), containerClassName);
     const phoneDialCodeClx = cn("input-phone-dial-code-label", inputTextClx);
+    const labelTextClx = extractTextClasses(labelClx);
+    const iconTextClx = extractTextClasses(iconClx);
     const phoneDialCodeLabel = phoneDialCodeText ? <Text className={phoneDialCodeClx}>{phoneDialCodeText}</Text> : null;
-    const callOptions: ITextInputCallOptions = { ...inputState, isPhone, phoneDialCodeLabel, labelClassName: labelClx, iconClassName: iconClx, inputClassName: inputClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
+    const callOptions: ITextInputCallOptions = { toCase, ...inputState, isPhone, phoneDialCodeLabel, labelClassName: labelTextClx, iconClassName: iconTextClx, inputClassName: inputTextClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
     const minHeight = useMemo(() => {
         return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbeded ? 30 : 46;
     }, [customMinHeight, isLabelEmbeded]);
@@ -284,7 +286,7 @@ export default function TextInput({
         onPress={() => { setIsSecure(!isSecure); focus(); }} className={iconClx}
     /> : null;
     const labelSuffix = (suffixLabelWithMaskPlaceholder !== false && hasInputMask && !isLabelEmbeded && inputMaskPlaceholder ? ` [${inputMaskPlaceholder}]` : "") + (isLabelEmbeded ? ` : ` : "");
-    label = typeof label === "string" ? `${label}${labelSuffix}` : isValidElement(label) ? <>{label}<Text className={extractTextClasses(labelClx)}>{labelSuffix}</Text></> : null;
+    label = typeof label === "string" ? `${label}${labelSuffix}` : isValidElement(label) ? <>{label}<Text className={labelTextClx}>{labelSuffix}</Text></> : null;
     const labelContent = canRenderLabel && label ? <Text testID={testID + "-label"} onPress={editable ? focus : undefined} className={labelClx} children={label} /> : null;
     const Wrapper = canWrapWithTouchable ? TouchableOpacity : Div;
     const pressableProps = { onPress, onPressIn, onPressOut, testID: `${testID}-dropdown-anchor-container`, className: cn("grouw cursor-pointer px-[5px]") };
@@ -391,7 +393,7 @@ export default function TextInput({
                 <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, cursorDefault, "grow", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
                     {leftContent}
                     {isLabelEmbeded ? labelContent : null}
-                    {phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
+                    {displayPhoneDialCode && phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
                     {isHydrated ? inputElement : <Text className={cn(inputClx, "animate-pulse", cursorDefault)} style={inputStyle}  >{String(inputValue)}</Text>}
                 </Div>
                 {rightContent ? (<Div className="right-content-wrapper self-center grow-0">

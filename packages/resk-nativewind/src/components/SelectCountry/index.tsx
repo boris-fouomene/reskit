@@ -30,10 +30,10 @@ export function SelectCountry({ countryFlagProps: customCountryFlagProps, displa
             return <Div className={cn("flex flex-row items-center justify-start flex-nowrap")}>
                 <Icon.CountryFlag {...countryFlagProps} countryCode={item.code} className={cn("mr-[5px]", countryFlagProps?.className)} />
                 <Text>{item.name}</Text>
-                {canDisplayDialCode && isNonNullString(item.dialCode) ? <Text className={cn(textClassName)} variant={textVariant}>{"(+" + item.dialCode.ltrim("+")}</Text> : null}
+                {canDisplayDialCode && isNonNullString(item.dialCode) ? <Text className={cn(textClassName)} variant={textVariant}>{"(+" + item.dialCode.ltrim("+") + ")"}</Text> : null}
             </Div>;
         }}
-        anchor={({ dropdown, selectedItems, selectedValues, onPress, disabled }) => {
+        /* anchor={({ dropdown, selectedItems, selectedValues, onPress, disabled }) => {
             const itemsContent = useMemo(() => {
                 return selectedItems.map((item) => {
                     return <Icon.CountryFlag
@@ -67,7 +67,7 @@ export function SelectCountry({ countryFlagProps: customCountryFlagProps, displa
                     />}
                 </Div>}
             </TouchableOpacity>;
-        }}
+        }} */
         {...props}
         menuProps={Object.assign({}, { minWidth: canDisplayDialCode ? 280 : 260 }, props.menuProps)}
     />

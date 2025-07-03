@@ -31,6 +31,7 @@ export default function TextInput({
     maxHeight: customMaxHeight,
     affix,
     maxLength,
+    length,
     labelClassName,
     className,
     containerClassName,
@@ -261,7 +262,7 @@ export default function TextInput({
             return affContent;
         }
         return <Text children={affContent} className={cn("mx-[5px]", inputTextClx)} />;
-    }, [focusedValue, isDateOrTime, canValueBeDecimal, error, multiline, inputTextClx, affix, isPasswordField]);
+    }, [focusedValue, isDateOrTime, canValueBeDecimal, error, multiline, inputTextClx, affix, isPasswordField, maxLength, length]);
 
     const inputHeight = useMemo(() => {
         return !inputValue ? minHeight : height;

@@ -16,10 +16,10 @@ const dropdownItem = tv({
         base: value,
       };
     }),
-    background: VariantsFactory.create<typeof VariantsColors.background, IDropdownIconSlots>(VariantsColors.background, (value, colorName) => {
+    colorScheme: VariantsFactory.create<typeof VariantsColors.background, IDropdownIconSlots>(VariantsColors.background, (value, colorName) => {
       return {
         base: value,
-        label: VariantsColors.textForeground[colorName],
+        label: VariantsColors.textForeground[`${colorName}-foreground`],
       };
     }),
     selectedColor: VariantsFactory.create<typeof VariantsColors.icon, IDropdownIconSlots>(VariantsColors.icon, (value, colorName) => {

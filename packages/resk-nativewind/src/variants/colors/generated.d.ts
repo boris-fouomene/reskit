@@ -2,10 +2,10 @@
     import { IVariantsColors } from "./colors";
     type IName = IVariantsColors.ColorName;
     type IName2Foreground = IVariantsColors.ColorName2Foreground;
+    type IForegroundName = IVariantsColors.ForegroundColorName;
     export declare interface IVariantsGeneratedColors {
         button : Record<IName,Record<"base"|"label"|"icon" | "activityIndicator",string>>;
         buttonOutline: Record<IName,Record<"base"|"label"|"icon" | "activityIndicator",string>>;
-        iconButton : Record<IName,Record<"container"|"text"|"icon",string>>;
         surface : Record<IName,string>;
         badge : Record<IName,string>;
         icon : Record<IName2Foreground,string>;
@@ -17,12 +17,12 @@
         background : Record<IName,string>;
         hoverBackground : Record<IName,string>;
         activeBackground : Record<IName,string>;
-        textForeground : Record<IName,string>;
-        hoverTextForeground : Record<IName,string>;
-        activeTextForeground : Record<IName,string>;
-        iconForeground : Record<IName,string>;
-        hoverIconForeground : Record<IName,string>;
-        activeIconForeground : Record<IName,string>;
+        textForeground : Record<IForegroundName,string>;
+        hoverTextForeground : Record<IForegroundName,string>;
+        activeTextForeground : Record<IForegroundName,string>;
+        iconForeground : Record<IForegroundName,string>;
+        hoverIconForeground : Record<IForegroundName,string>;
+        activeIconForeground : Record<IForegroundName,string>;
         shadow : Record<IName,string>;
         hoverShadow : Record<IName,string>;
         activeShadow : Record<IName,string>;

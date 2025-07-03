@@ -30,12 +30,12 @@ const textInput = tv({
             return { contentContainer: value }
         }),
         background: VariantsFactory.create<typeof VariantsColors.background, ITextInputSlots>(VariantsColors.background, (value, colorName) => {
-            const textColor = VariantsColors.textForeground[colorName];
+            const textColor = VariantsColors.textForeground[`${colorName}-foreground`];
             return {
                 contentContainer: value,
                 labelEmbeded: textColor,
                 input: textColor,
-                icon: VariantsColors.icon[colorName],
+                icon: VariantsColors.iconForeground[`${colorName}-foreground`],
             }
         }),
         ...VariantsFactory.createPaddings<ITextInputSlots>((value, colorName) => {

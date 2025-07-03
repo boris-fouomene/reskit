@@ -124,58 +124,6 @@ export const VariantsColors = {
       "activityIndicator": "web:hover:border-t-gray-900-foregund web:dark:hover:border-t-gray-900 web:group-hover:border-t-gray-100 web:dark:group-hover:border-t-gray-900 border-t-gray-900 dark:border-t-gray-100"
     }
   },
-  "iconButton": {
-    "primary": {
-      "container": "bg-primary dark:bg-dark-primary",
-      "icon": "!text-primary-foreground dark:!text-dark-primary-foreground",
-      "text": "text-primary-foreground dark:text-dark-primary-foreground"
-    },
-    "secondary": {
-      "container": "bg-secondary dark:bg-dark-secondary",
-      "icon": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
-      "text": "text-secondary-foreground dark:text-dark-secondary-foreground"
-    },
-    "surface": {
-      "container": "bg-gray-100 dark:bg-gray-800",
-      "icon": "!text-gray-900 dark:!text-gray-100",
-      "text": "text-gray-900 dark:text-gray-100"
-    },
-    "background": {
-      "container": "bg-white dark:bg-gray-900",
-      "icon": "!text-gray-900 dark:!text-gray-100",
-      "text": "text-gray-900 dark:text-gray-100"
-    },
-    "neutral": {
-      "container": "bg-gray-500 dark:bg-gray-600",
-      "icon": "!text-white dark:!text-gray-50",
-      "text": "text-white dark:text-gray-50"
-    },
-    "error": {
-      "container": "bg-red-500 dark:bg-red-600",
-      "icon": "!text-white dark:!text-red-50",
-      "text": "text-white dark:text-red-50"
-    },
-    "info": {
-      "container": "bg-blue-500 dark:bg-blue-600",
-      "icon": "!text-white dark:!text-blue-50",
-      "text": "text-white dark:text-blue-50"
-    },
-    "warning": {
-      "container": "bg-yellow-500 dark:bg-yellow-600",
-      "icon": "!text-yellow-900 dark:!text-yellow-50",
-      "text": "text-yellow-900 dark:text-yellow-50"
-    },
-    "success": {
-      "container": "bg-green-500 dark:bg-green-600",
-      "icon": "!text-white dark:!text-green-50",
-      "text": "text-white dark:text-green-50"
-    },
-    "text": {
-      "container": "bg-gray-900 dark:bg-gray-100",
-      "icon": "!text-gray-100 dark:!text-gray-900",
-      "text": "text-gray-100 dark:text-gray-900"
-    }
-  },
   "surface": {
     "primary": "bg-primary dark:bg-dark-primary text-primary-foreground dark:text-dark-primary-foreground",
     "secondary": "bg-secondary dark:bg-dark-secondary text-secondary-foreground dark:text-dark-secondary-foreground",

@@ -353,6 +353,17 @@ export namespace IVariantsColors {
    */
   export type ColorName = keyof IVariantsColorsMap & string;
 
+  /***
+   * Represents the foreground color variant of a color.
+   *
+   * This type is used to reference a color with a foreground variant (e.g., "primary-foreground").
+   *
+   * @example
+   * ```typescript
+   * const foreground: IVariantsColors.ForegroundColorName = "primary-foreground";
+   * ```
+   */
+  export type ForegroundColorName = `${ColorName}-foreground`;
   /**
    * Represents either a color name or its corresponding foreground variant.
    *
@@ -364,7 +375,7 @@ export namespace IVariantsColors {
    * const foreground: IVariantsColors.ColorName2Foreground = "primary-foreground";
    * ```
    */
-  export type ColorName2Foreground = ColorName | `${ColorName}-foreground`;
+  export type ColorName2Foreground = ColorName | ForegroundColorName;
 
   /**
    * Represents a color object with variant properties.

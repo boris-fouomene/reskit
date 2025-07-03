@@ -14,13 +14,18 @@ const buton = tv({
         label: "",
     },
     variants: {
-        colorScheme: VariantsColors.button,
-        outline: VariantsColors.buttonOutline,
         ...VariantsFactory.createAll<{ base: string }>((value) => {
             return {
                 base: value,
             }
-        })
+        }),
+        colorScheme: VariantsColors.button,
+        outline: VariantsColors.buttonOutline,
+        hoverColor: VariantsFactory.createHoverBackgroundColor<{ base: string }>((value, variantName) => {
+            return {
+                base: value,
+            }
+        }),
     },
     defaultVariants: {}
 });

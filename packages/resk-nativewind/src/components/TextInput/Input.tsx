@@ -247,7 +247,7 @@ export default function TextInput({
     const inputDimensionsRef = useRef({ width: 0, height: minHeight });
     const { height } = inputDimensionsRef.current;
     const affixContent = useMemo(() => {
-        if (affix === false) return null;
+        if (!affix && !isNumber(maxLength) && !isNumber(length)) return null;
         let affContent = typeof affix == "function" ? affix(callOptions) : isValidElement(affix, true) ? affix : null;
         if (!affContent && !isPasswordField) {
             if (!focusedValue || canValueBeDecimal) return null;

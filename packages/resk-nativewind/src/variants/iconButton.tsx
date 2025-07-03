@@ -1,6 +1,8 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
+import { IVariantsColors } from "./colors";
+import { typedEntries } from "@resk/core/utils";
 
 const iconButton = tv({
     slots: {
@@ -16,7 +18,17 @@ const iconButton = tv({
                 text: "",
             }
         }),
-        colorScheme: VariantsColors.iconButton,
+        colorScheme: Object.fromEntries(typedEntries(VariantsColors.iconForeground).map(([key, value]) => {
+            const colorName = key.split("-foreground")[0];
+            return [
+                colorName,
+                {
+                    container: (VariantsColors.background as any)[colorName],
+                    icon: value,
+                    text: value.split("!text-").join("text-"),
+                },
+            ];
+        })) as Record<IVariantsColors.ColorName, { container: string, text: string, icon: string }>,
         size: {
             sm: {
                 container: "w-8 h-8",

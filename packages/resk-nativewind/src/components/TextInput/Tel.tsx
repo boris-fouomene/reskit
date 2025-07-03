@@ -46,14 +46,15 @@ export function TelInput({ phoneCountryCode: customPhoneCountryCode, ...props }:
                             onPress={onPress}
                             disabled={disabled}
                         >
-                            {<Div testID={defaultStr(dropdown?.getTestID()) + "-anchor-label"} className="flex-row items-center self-center justify-start" disabled={disabled}>
+                            {<Div testID={defaultStr(dropdown?.getTestID()) + "-anchor-label"} className="flex flex-row items-center self-center justify-start" disabled={disabled}>
                                 {selectedValue ? <Icon.CountryFlag
                                     countryCode={selectedValue}
                                     fallback={phoneDialCodeLabel ? phoneDialCodeLabel : <Text className={labelClassName}>[{selectedValue}]</Text>}
                                 /> :
                                     <>
                                         <Icon.Font
-                                            name={"language" as never}
+                                            variant={{ size: "25px" }}
+                                            name={"material-language" as never}
                                             className={iconClassName}
                                             disabled={disabled}
                                         />

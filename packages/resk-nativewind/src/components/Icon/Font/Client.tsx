@@ -33,7 +33,7 @@ export default function ClientFontIcon({ name, variant, containerClassName, titl
         nameArray.shift();
         iconName = nameArray.join("-");
     }
-    const iconClassName = cn(iconVariants(variant), className, "font-icon-" + iconName, "font-icon-origin-name-" + nameString, "font-icon-set-" + iconSet);
+    const iconClassName = cn(iconVariants(variant), className, "font-icon", ("font-icon-" + iconName), ("font-icon-raw-name-" + nameString), ("font-icon-set-" + iconSet));
     const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>

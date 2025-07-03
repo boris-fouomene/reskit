@@ -52,20 +52,23 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         return ["number", "string", "boolean"].includes(typeof value) ? String(value) : stableHash(value);
     }
     getItemText(options: Omit<IDropdownCallOptions<ItemType, ValueType>, 'value'> & { value: ValueType, computedLabel: ReactNode }): string {
-        const { getItemLabel } = this.props;
+        const { getItemText } = this.props;
         options = Object.assign({}, options);
-        if (typeof getItemLabel === "function") {
+        if (typeof getItemText === "function") {
             return this.getItemText(options);
         }
         return getTextContent(options.computedLabel);
     }
-    getItemLabel(options: Omit<IDropdownCallOptions<ItemType, ValueType>, 'value'> & { value: ValueType }): ReactNode {
+    getCallOptions(options?: Partial<IDropdownCallOptions<ItemType, ValueType>>): IDropdownCallOptions<ItemType, ValueType> {
+        return Object.assign({}, options, { dropdown: this, isDropdown: true }) as IDropdownCallOptions<ItemType, ValueType>;
+    }
+    getItemLabel(options: IDropdownCallOptions<ItemType, ValueType>): ReactNode {
         const { getItemLabel } = this.props;
-        options = Object.assign({}, options);
+        const opts = this.getCallOptions(options);
         if (typeof getItemLabel === "function") {
-            return getItemLabel(options);
+            return getItemLabel(opts);
         }
-        const { item } = options;
+        const { item } = opts;
         if (item && isObj<ItemType>(item)) {
             if (isNonNullString(this.props.itemLabelField)) {
                 const l = (item as any)[this.props.itemLabelField];
@@ -90,12 +93,12 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         return undefined;
     }
     getItemValue(options: Omit<IDropdownCallOptions<ItemType, ValueType>, 'value'>): ValueType | undefined {
-        options = Object.assign({}, options);
+        const opts = this.getCallOptions(options);
         const { getItemValue } = this.props;
         if (typeof getItemValue === "function") {
-            return getItemValue(options);
+            return getItemValue(opts);
         }
-        const { item, index } = options;
+        const { item, index } = opts;
         if (item && isObj<ItemType>(item)) {
             if (isNonNullString(this.props.valueField)) {
                 const v = (item as any)[this.props.valueField];
@@ -123,7 +126,8 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         const preparedItems: IDropdownPreparedItem<ItemType, ValueType>[] = [];
         const { items: customItems } = this.props;
         (Array.isArray(customItems) ? customItems : []).map((item, index) => {
-            const value = this.getItemValue({ item, index, isDropdown: true });
+            const options = this.getCallOptions({ item, index });
+            const value = this.getItemValue(options);
             if (isEmpty(value) || typeof value === "undefined") {
                 //Logger.warn("invalid dropdown value ", value, " for item ", item, index, " with dropdown className ", this.props.className, " test id ", this.props.testID);
                 return;
@@ -132,14 +136,14 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             if (!isNonNullString(hashKey)) {
                 return;
             }
-            const label = this.getItemLabel({ item, index, value, isDropdown: true });
+            const label = this.getItemLabel({ ...options, value });
             const preparedItem = {
                 value,
                 hashKey,
                 item,
                 index,
                 label,
-                labelText: this.getItemText({ item, index, value, isDropdown: true, computedLabel: label }),
+                labelText: this.getItemText({ ...options, value, computedLabel: label }),
             };
             if (this.filterItem(preparedItem, index)) {
                 items.push(item);
@@ -486,7 +490,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
                 testID={`${testID}-dropdown-search`}
                 autoFocus={visible && !Platform.isTouchDevice()}
                 affix={false}
-                debounceTimeout={preparedItems?.length > 500 ? 1500 : preparedItems?.length > 200 ? 1000 : 0}
+                debounceTimeout={preparedItems?.length > 500 ? 1000 : preparedItems?.length > 200 ? 100 : 0}
                 {...searchProps}
                 containerClassName={(cn("w-full", searchProps.containerClassName))}
                 //variant={{ borderWidth: 1, borderColor: "surface", borderStyle: "solid", rounded: "10px", ...searchProps.variant }}
@@ -859,6 +863,8 @@ export interface IDropdownCallOptions<ItemType = any, ValueType = any> {
     item: ItemType; // The item being interacted with
     index: number; // The index of the item in the dropdown list
     isDropdown: true; // Indicates that the context is within a dropdown
+    dropdown: IDropdownContext<ItemType, ValueType>;
+    value: ValueType;
 }
 
 export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps, "onChange" | "ref" | "multiline"> {
@@ -867,7 +873,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     /***
         Return the value of the item
     */
-    getItemValue?: (options: IDropdownCallOptions<ItemType, ValueType>) => ValueType | undefined;
+    getItemValue?: (options: Omit<IDropdownCallOptions<ItemType, ValueType>, 'value'>) => ValueType | undefined;
     /***
         Return the label of the item.
         The label can be a string or a React node.
@@ -875,7 +881,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
         @param options {IDropdownCallOptions<ItemType, ValueType>} - The options object containing the item and its index.
         @returns {ReactNode} - The label of the item.
     */
-    getItemLabel?: (options: Omit<IDropdownCallOptions<ItemType, ValueType>, 'value'> & { value: ValueType }) => ReactNode;
+    getItemLabel?: (options: IDropdownCallOptions<ItemType, ValueType>) => ReactNode;
     /**
      * Return the text of the item.
      * The returned text will be used to display the selected item in the dropdown anchor
@@ -883,7 +889,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
        @param computedLabel {ReactNode} - The computed label of the item. This is the result of the getItemLabel function.
      * @returns {string} - The text of the item.
      */
-    getItemText?: (options: Omit<IDropdownCallOptions<ItemType, ValueType>, 'value'> & { value: ValueType, computedLabel: ReactNode }) => string;
+    getItemText?: (options: IDropdownCallOptions<ItemType, ValueType> & { computedLabel: ReactNode }) => string;
     multiple?: boolean; // Flag for multiple selections
     onChange?: (options: IDropdownOnChangeOptions<ItemType, ValueType>) => void; // Callback for value changes
     defaultValue?: ValueType | ValueType[]; // Default value(s) for the dropdown

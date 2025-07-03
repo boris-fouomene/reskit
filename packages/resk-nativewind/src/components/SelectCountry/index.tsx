@@ -26,6 +26,7 @@ export function SelectCountry({ countryFlagProps: customCountryFlagProps, displa
         multiple={false}
         label={label}
         getItemValue={({ item }) => item.code}
+        getItemText={({ item }) => `[${item.code}] ${item.name} ( ${item.dialCode.ltrim("+")})`}
         getItemLabel={({ item, index }) => {
             return <Div className={cn("flex flex-row items-center justify-start flex-nowrap")}>
                 <Icon.CountryFlag {...countryFlagProps} countryCode={item.code} className={cn("mr-[5px]", countryFlagProps?.className)} />

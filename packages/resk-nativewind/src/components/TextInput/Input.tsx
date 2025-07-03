@@ -382,7 +382,7 @@ export default function TextInput({
             {right}
             {secureIcon}
         </> : null
-    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, cursorDefault, "input-container input-" + type + "-container")} testID={testID + "-container"}>
+    return <Avoiding className={cn(containerClx, disabledClx, readOnlyClx, cursorDefault, "input-container input-type-" + type + "-container")} testID={testID + "-container"}>
         <Div className={cn(cursorDefault, "w-full relative input-wrapper")} testID={testID + "-wrapper"}>
             {isLabelEmbeded ? null : labelContent}
             <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn(cursorDefault, "input-content-container w-full flex flex-row justify-between self-start items-center", contentContainerClx)}>

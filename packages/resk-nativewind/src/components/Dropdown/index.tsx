@@ -416,7 +416,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
 
 
     return <Menu
-        minWidth={180}
+        minWidth={200}
         disabled={disabled}
         maxHeight={maxDropdownHeight}
         bottomSheetTitle={context.props?.label}
@@ -471,7 +471,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
     const searchProps = Object.assign({}, searchInputProps, { error: error || searchInputProps?.error });
     const divider = <Divider testID={`${testID}-divider`} className="w-full" />;
     const searchInput = canRenderSeach ?
-        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full max-w-full")}>
+        <Div testID={`${testID}-dropdown-search-container`} className={cn("w-full px-[7px] max-w-full")}>
             {canReverse ? divider : null}
             <TextInput
                 testID={`${testID}-dropdown-search`}
@@ -479,7 +479,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
                 affix={false}
                 debounceTimeout={preparedItems?.length > 500 ? 1500 : preparedItems?.length > 200 ? 1000 : 0}
                 {...searchProps}
-                containerClassName={(cn("w-full px-[7px]", searchProps.containerClassName))}
+                containerClassName={(cn("w-full", searchProps.containerClassName))}
                 //variant={{ borderWidth: 1, borderColor: "surface", borderStyle: "solid", rounded: "10px", ...searchProps.variant }}
                 defaultValue={searchText}
                 onChange={({ value }) => {

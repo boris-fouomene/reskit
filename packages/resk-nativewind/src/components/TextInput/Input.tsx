@@ -198,7 +198,9 @@ export default function TextInput({
         setIsFocused(true);
     };
     const handleBlur = () => {
-        setIsFocused(false);
+        if (isFocused) {
+            setIsFocused(false);
+        }
     };
     const focus = () => {
         if (!editable) return;

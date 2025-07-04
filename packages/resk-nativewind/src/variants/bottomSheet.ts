@@ -2,7 +2,6 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 import { classes } from "./classes";
-import appBarVariant from "@variants/appBar";
 
 const bottomSheet = tv({
   slots: {

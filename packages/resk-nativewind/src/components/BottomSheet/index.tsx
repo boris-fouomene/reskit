@@ -20,7 +20,7 @@ export function BottomSheet({ variant, className, dismissable, appBarClassName, 
         return true;
     });
     const renderAppBar = withAppBar && isObj(appBarProps);
-    return <Portal autoMountChildren visible={visible} testID={testID + "-portal"} onPress={dismissable ? onRequestClose : undefined} className={cn("bottom-sheet-portal", computedVariant.portal(), portalClassName)}>
+    return <Portal absoluteFill autoMountChildren visible={visible} testID={testID + "-portal"} onPress={dismissable ? onRequestClose : undefined} className={cn("bottom-sheet-portal", computedVariant.portal(), portalClassName)}>
         <View onAccessibilityEscape={dismissable ? onRequestClose : undefined}
             {...props}
             className={cn("bottom-sheet", computedVariant.base(), className)}

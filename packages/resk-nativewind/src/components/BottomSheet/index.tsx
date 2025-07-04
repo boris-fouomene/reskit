@@ -12,7 +12,7 @@ import { Div } from "@html/Div";
 
 export function BottomSheet({ variant, className, dismissable, appBarClassName, onRequestClose, contentClassName, withAppBar, appBarProps, children, onLayout, testID, portalClassName, visible, ...props }: IBottomSheetProps) {
     testID = defaultStr(testID, "resk-bottom-sheet");
-    const computedVariant = bottomSheetVariant(variant);
+    const computedVariant = bottomSheetVariant({ ...variant, visible });
     useBackHandler(function () {
         if (dismissable && typeof onRequestClose === "function") {
             onRequestClose();

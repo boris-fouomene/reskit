@@ -528,7 +528,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
         disabled={context?.props?.disabled}
         readOnly={!isEditabled}
         testID={testID + "-dropdown-list-container"}
-        className={cn("w-full max-h-full relative flex flex-col", canReverse ? "pt-[10px]" : "pb-[10px]")}
+        className={cn("w-full max-h-full relative flex flex-col web:bg-inherit", canReverse ? "pt-[10px]" : "pb-[10px]")}
         style={fullScreen ? undefined : { maxHeight: maxMenuHeight }}
     >
         {canReverse ? null : searchInput}

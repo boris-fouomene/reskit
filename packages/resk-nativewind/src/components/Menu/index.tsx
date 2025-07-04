@@ -128,10 +128,9 @@ export function Menu<Context = unknown>({
             });
         });
     }
-    /* 
-        useEffect(() => {
-            measureAnchor();
-        }, [windowWidth, windowHeight, anchorRef]); */
+    useEffect(() => {
+        measureAnchor();
+    }, [windowWidth, windowHeight, anchorRef]);
     const open = (callback?: Function) => {
         measureAnchor(false).then((measures) => {
             const cb = () => {

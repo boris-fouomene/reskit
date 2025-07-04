@@ -32,6 +32,7 @@ const menu = tv({
         colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { container: string }>(VariantsColors.surface, (value) => {
             return {
                 container: value,
+                contentContainer: value,
             }
         }),
         ...VariantsFactory.createTransitions<{ container: string }>((value) => {

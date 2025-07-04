@@ -223,9 +223,8 @@ export default function TextInput<ValueType = any>({
         if (canValueBeDecimal && (!valEndsWithDecimal && (String(value).length <= 1 || !String(value).endsWith("0")))) {
             value = InputFormatter.parseDecimal(value);
         }
-        const { phoneCountryCode } = rest;
-        if (isPhone && value && (isNonNullString(phoneCountryCode) || String(value).trim().startsWith("+"))) {
-            value = InputFormatter.formatPhoneNumber(value, phoneCountryCode);
+        if (isPhone && value) {
+            value = InputFormatter.formatPhoneNumber(value, rest.phoneCountryCode);
         }
         const formatOptions = { ...props, ...rest, dateFormat, type, value };
         if (typeof sanitizeValue === "function") {
@@ -233,7 +232,7 @@ export default function TextInput<ValueType = any>({
         }
         return {
             ...(mask ? InputFormatter.formatWithMask({ ...maskOptions, maskAutoComplete: true, value, mask, type }) : {}),
-            ...InputFormatter.formatValue({ ...formatOptions, value, type: isPhone ? "" : type }),
+            ...InputFormatter.formatValue({ ...formatOptions, value }),
             value,
         }
     };

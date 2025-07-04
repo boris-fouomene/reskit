@@ -387,7 +387,7 @@ export interface ITextInputRenderOptions extends TextInputProps {
  *
  * @property labelEmbeded - If `true`, embeds the label inside the input field.
  * @property suffixLabelWithMaskPlaceholder - If `true`, appends the mask placeholder to the label (when mask is provided and not embedded).
- * @property maskOptions - Additional options for {@link InputFormatter.formatWithMask} (when mask is provided).
+ * @property maskOptions - Additional options for {@link IInputFormatterMaskOptions} (when mask is provided).
  * @property handleMaskValidationErrors - If `true`, handles and displays mask validation errors, overriding `error` if mask is invalid.
  * @property withKeyboardAvoidingView - If `true`, wraps the input in a KeyboardAvoidingView (mobile only).  
  *   @default false
@@ -462,11 +462,11 @@ export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInput
      * @default "text"
      */
     type?: ITextInputType;
-    
+
     /***
         Whether the input is required or not
     */
-    required?:boolean;
+    required?: boolean;
 
     /***
      * The country code for phone number

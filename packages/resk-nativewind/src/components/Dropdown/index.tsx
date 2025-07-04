@@ -4,7 +4,7 @@ import stableHash from "stable-hash";
 import { defaultStr, isEmpty, isNonNullString, isObj, areEquals, stringify, isNumber } from "@resk/core/utils";
 import i18n from "@resk/core/i18n";
 import { cn, getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
-import { Dimensions, FlatList, FlatListProps } from 'react-native';
+import { Dimensions, FlatList, FlatListProps, Pressable } from 'react-native';
 import { IMenuContext, IMenuProps, Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { IClassName, IReactNullableElement } from "@src/types";
@@ -285,8 +285,8 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
     }
 
     unselectAll = () => {
-        const { multiple,required } = this.props;
-        if(required){
+        const { multiple, required } = this.props;
+        if (required) {
             return;
         }
         const nState: Partial<IDropdownState<ItemType, ValueType>> = { selectedItemsByHashKey: {}, selectedValues: [] };
@@ -405,13 +405,14 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
                     label: i18n.t("components.dropdown.unselectSingle"),
                     icon: "checkbox-blank-circle-outline",
                     onPress: context.unselectAll.bind(context),
-                }: undefined,
+                } : undefined,
             ];
         }
         return actions;
     }, [dropdownActions, multiple, context.isOpen(), context, anchorSelectedText]);
     const loadingContent = isLoading ? <ProgressBar indeterminate testID={testID + "dropdown-progressbar"} /> : null;
     const anchorProps: ITextInputProps = {
+        numberOfLines: 1,
         ...props,
         containerClassName: cn("mt-0 mb-0", props.containerClassName),
         className: cn("mt-0 mb-0", props?.className),
@@ -450,12 +451,16 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             testID={`${testID}-dropdown-anchor-container`}
             className={cn(anchorContainerClassName)}
         >
-            {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdown: context })
-                :
-                <TextInput
-                    {...anchorProps}
-                />}
-            {loadingContent}
+            <Tooltip title={anchorSelectedText} disabled={disabled} onPress={editable ? () => context?.open() : undefined}>
+                <>
+                    {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdown: context })
+                        :
+                        <TextInput
+                            {...anchorProps}
+                        />}
+                    {loadingContent}
+                </>
+            </Tooltip>
         </Div>}
     >
         <DropdownMenu

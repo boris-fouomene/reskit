@@ -77,30 +77,24 @@ export function TelInput({ type, ...props }: ITelInputProps) {
                         const selectedItem = selectedItems[0];
                         const dialCode = defaultStr(selectedItem?.dialCode).ltrim("+").trim();
                         const dialCodeText = phoneDialCodeText || (dialCode ? `+${dialCode}` : "");
-                        return <TouchableOpacity
-                            testID={defaultStr(dropdown?.getTestID()) + "-anchor"}
-                            onPress={() => dropdown.open()}
-                            disabled={disabled}
-                        >
-                            {<Div testID={defaultStr(dropdown?.getTestID()) + "-anchor-label"} className="flex flex-row items-center self-center justify-start" disabled={disabled}>
-                                {selectedValue ? <Icon.CountryFlag
-                                    countryCode={selectedValue}
-                                    fallback={<Text className={inputTextClassName}>[{dialCodeText}]</Text>}
-                                /> :
-                                    <>
-                                        <Icon.Font
-                                            variant={{ size: "25px" }}
-                                            name={"material-language" as never}
-                                            className={iconTextClassName}
-                                            disabled={disabled}
-                                        />
-                                    </>
-                                }
-                                {<Icon.Font variant={{ size: "20px" }} className={iconTextClassName} name={"chevron-down" as never}
-                                    disabled={disabled}
-                                />}
-                            </Div>}
-                        </TouchableOpacity>;
+                        return <Div testID={defaultStr(dropdown?.getTestID()) + "-anchor-label"} className="flex flex-row items-center self-center justify-start" disabled={disabled}>
+                            {selectedValue ? <Icon.CountryFlag
+                                countryCode={selectedValue}
+                                fallback={<Text className={inputTextClassName}>[{dialCodeText}]</Text>}
+                            /> :
+                                <>
+                                    <Icon.Font
+                                        variant={{ size: "25px" }}
+                                        name={"material-language" as never}
+                                        className={iconTextClassName}
+                                        disabled={disabled}
+                                    />
+                                </>
+                            }
+                            {<Icon.Font variant={{ size: "20px" }} className={iconTextClassName} name={"chevron-down" as never}
+                                disabled={disabled}
+                            />}
+                        </Div>
                     }}
                 />
                 <RNTextInput

@@ -285,7 +285,10 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
     }
 
     unselectAll = () => {
-        const { multiple } = this.props;
+        const { multiple,required } = this.props;
+        if(required){
+            return;
+        }
         const nState: Partial<IDropdownState<ItemType, ValueType>> = { selectedItemsByHashKey: {}, selectedValues: [] };
         if (!multiple) {
             nState.visible = false;
@@ -388,21 +391,21 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
                     icon: "checkbox-multiple-marked",
                     onPress: context.selectAll.bind(context),
                 },
-                {
+                !this.props.required ? {
                     label: i18n.t("components.dropdown.unselectAll"),
                     icon: "checkbox-multiple-blank-outline",
                     onPress: context.unselectAll.bind(context),
-                },
+                } : undefined,
             ];
         } else if (anchorSelectedText) {
             return [
                 ...actions,
                 actions?.length ? { divider: true } : undefined,
-                {
+                !this.props.required ? {
                     label: i18n.t("components.dropdown.unselectSingle"),
                     icon: "checkbox-blank-circle-outline",
                     onPress: context.unselectAll.bind(context),
-                },
+                }: undefined,
             ];
         }
         return actions;

@@ -462,6 +462,11 @@ export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInput
      * @default "text"
      */
     type?: ITextInputType;
+    
+    /***
+        Whether the input is required or not
+    */
+    required?:boolean;
 
     /***
      * The country code for phone number

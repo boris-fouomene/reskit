@@ -68,6 +68,7 @@ export function TelInput({ type, ...props }: ITelInputProps) {
                     multiple={false}
                     defaultValue={phoneCountryCode}
                     menuProps={{ bottomSheetTitle: label }}
+                    required
                     onChange={!editable ? undefined : ({ value }) => {
                         if (isNonNullString(value) && value !== phoneCountryCode) {
                             updateInputState(formatValue({ value: "", phoneCountryCode: Array.isArray(value) ? value[0] : value }));

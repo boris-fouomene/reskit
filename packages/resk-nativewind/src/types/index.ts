@@ -1,10 +1,8 @@
-import { IInputFormatterResult } from "@resk/core/types";
 import { II18nLocale } from "@src/i18n/types";
 import { Component, ComponentClass, ExoticComponent, FunctionComponent, JSXElementConstructor, ReactElement } from "react";
-import { ViewStyle, TextStyle, ImageStyle, StyleProp, NativeSyntheticEvent, TextInputChangeEventData, Animated, PressableProps, TouchableWithoutFeedbackProps } from "react-native";
-import { type ClassValue } from 'clsx';
+import { ViewStyle, TextStyle, ImageStyle, StyleProp, Animated, PressableProps } from "react-native";
+import { type ClassValue } from "clsx";
 import { IVariantPropsAll } from "@variants/all";
-
 
 export type IClassName = ClassValue;
 
@@ -57,12 +55,12 @@ export interface INativewindBaseProps extends Omit<IVariantPropsAll, "disabled">
  * ```
  */
 export type IReactComponent<Props = any, State = any> =
-  FunctionComponent<Props>                                    // Functional Component
+  | FunctionComponent<Props> // Functional Component
   | (new (props: Props) => Component<Props, State>) // Class Component Constructor
-  | ComponentClass<Props, State>                 // Class Component Class
-  | ExoticComponent<Props>                       // Exotic Components (like Memo, Lazy)
-  | ((props: Props) => ReactElement | null)            // Basic Function Component
-  | JSXElementConstructor<Props>                       // Any component that can be used in JSX
+  | ComponentClass<Props, State> // Class Component Class
+  | ExoticComponent<Props> // Exotic Components (like Memo, Lazy)
+  | ((props: Props) => ReactElement | null) // Basic Function Component
+  | JSXElementConstructor<Props>; // Any component that can be used in JSX
 
 /**
  * @typedef ITextStyle
@@ -108,11 +106,11 @@ export type IImageStyle = StyleProp<ImageStyle>;
 /**
  * @typedef IAnimatedViewStyle
  * Represents the style type for an `Animated.View`.
- * 
+ *
  * This type extends the base `ViewStyle` to include support for animated values.
  * It is compatible with both static styles (e.g., `{ opacity: 0.5 }`) and dynamic
  * styles using `Animated.Value` or interpolated values.
- * 
+ *
  * @example
  * const animatedValue = new Animated.Value(0);
  * const viewStyle: IAnimatedViewStyle = {
@@ -126,11 +124,11 @@ export type IAnimatedViewStyle = Animated.WithAnimatedValue<StyleProp<ViewStyle>
 /**
  * @typedef IAnimatedTextStyle
  * Represents the style type for an `Animated.Text`.
- * 
+ *
  * This type extends the base `TextStyle` to include support for animated values.
  * It is compatible with both static styles (e.g., `{ fontSize: 16 }`) and dynamic
  * styles using `Animated.Value` or interpolated values.
- * 
+ *
  * @example
  * const animatedValue = new Animated.Value(0);
  * const textStyle: IAnimatedTextStyle = {
@@ -146,11 +144,11 @@ export type IAnimatedTextStyle = Animated.WithAnimatedValue<StyleProp<TextStyle>
 /**
  * @typedef IAnimatedImageStyle
  * Represents the style type for an `Animated.Image`.
- * 
+ *
  * This type extends the base `ImageStyle` to include support for animated values.
  * It is compatible with both static styles (e.g., `{ width: 100, height: 100 }`)
  * and dynamic styles using `Animated.Value` or interpolated values.
- * 
+ *
  * @example
  * const animatedValue = new Animated.Value(0);
  * const imageStyle: IAnimatedImageStyle = {
@@ -164,8 +162,6 @@ export type IAnimatedTextStyle = Animated.WithAnimatedValue<StyleProp<TextStyle>
  *  @see {@link https://reactnative.dev/docs/animated} for more information about Animated component styles.
  */
 export type IAnimatedImageStyle = Animated.WithAnimatedValue<StyleProp<ImageStyle>>;
-
-
 
 /**
  * @interface IOnChangeOptions
@@ -243,22 +239,20 @@ export interface IOnChangeOptions<OnChangeEventType = unknown | null, ValueType 
   fieldName?: string;
 }
 
-
-
 /**
  * @interface ITouchableEventNames
  * A union type representing the available touchable event names.
- * 
+ *
  * This type includes the standard touch events that can be used in
  * touchable components, allowing developers to specify which events
  * they want to handle in their applications.
- * 
+ *
  * The following events are included:
  * - `'onPress'`: Triggered when the user taps the component.
  * - `'onLongPress'`: Triggered when the user presses and holds the component.
  * - `'onPressIn'`: Triggered when the user touches the component.
  * - `'onPressOut'`: Triggered when the user releases the touch from the component.
- * 
+ *
  * @example
  * // Example usage of ITouchableEventNames
  * const handleEvent = (event: ITouchableEventNames) => {
@@ -277,25 +271,24 @@ export interface IOnChangeOptions<OnChangeEventType = unknown | null, ValueType 
  *       break;
  *   }
  * };
- * 
+ *
  * // Simulating an event
  * handleEvent('onPress'); // Output: Component was pressed.
  */
 export type ITouchableEventNames = keyof ITouchableProps;
 
-
 /**
  * @interface ITouchableProps
  * A type representing an object that can contain optional touch event handlers.
  *
- * The `ITouchableEventObject` type is a partial record where the keys are 
- * the touchable event names defined in `ITouchableEventNames`, and the values 
- * are functions that handle the respective events. Each function receives 
- * a `GestureResponderEvent` as an argument, which contains information 
+ * The `ITouchableEventObject` type is a partial record where the keys are
+ * the touchable event names defined in `ITouchableEventNames`, and the values
+ * are functions that handle the respective events. Each function receives
+ * a `GestureResponderEvent` as an argument, which contains information
  * about the touch event.
  *
- * This type allows developers to specify only the event handlers they 
- * need for their components, making it flexible and convenient for use 
+ * This type allows developers to specify only the event handlers they
+ * need for their components, making it flexible and convenient for use
  * in touchable components.
  *
  * @typedef {Object} ITouchableEventObject
@@ -324,15 +317,15 @@ export type ITouchableEventNames = keyof ITouchableProps;
  * simulatePress(touchableHandlers.onPress); // Output: Pressed!
  */
 export interface ITouchableProps {
-  onPress?: PressableProps['onPress'];
-  onLongPress?: PressableProps['onLongPress'];
-  onPressIn?: PressableProps['onPressIn'];
-  onPressOut?: PressableProps['onPressOut'];
-  onTouchStart?: PressableProps['onTouchStart'];
-  onTouchEnd?: PressableProps['onTouchEnd'];
-  onTouchCancel?: PressableProps['onTouchCancel'];
-  onTouchMove?: PressableProps['onTouchMove'];
-};
+  onPress?: PressableProps["onPress"];
+  onLongPress?: PressableProps["onLongPress"];
+  onPressIn?: PressableProps["onPressIn"];
+  onPressOut?: PressableProps["onPressOut"];
+  onTouchStart?: PressableProps["onTouchStart"];
+  onTouchEnd?: PressableProps["onTouchEnd"];
+  onTouchCancel?: PressableProps["onTouchCancel"];
+  onTouchMove?: PressableProps["onTouchMove"];
+}
 
 /**
  * Represents a React element that can either be a valid React element or null.
@@ -351,36 +344,35 @@ export interface ITouchableProps {
  */
 export type IReactNullableElement = ReactElement | null;
 
-
 /**
  * @group i18n
  * @interface IUseI18nOptions
- * 
+ *
  * An interface that defines options for configuring the internationalization (i18n) instance.
  * This interface allows developers to specify how the i18n library should handle locale settings,
  * including the option to use the device's locale and the ability to set a specific locale.
- * 
- * @property {boolean} [useLocaleFromDevice] - 
+ *
+ * @property {boolean} [useLocaleFromDevice] -
  * A flag indicating whether the locale should be automatically set from the device's locale.
  * If this flag is set to `true`, the i18n instance will attempt to match the device's locale
  * with the supported locales. If a match is found, it will use that locale; otherwise, it will fall back to the default locale.
- * 
- * @property {string} [locale] - 
+ *
+ * @property {string} [locale] -
  * The specific locale to use for the i18n instance. If this property is not provided, the i18n instance will use the default locale.
  * This allows for explicit control over the locale used in the application, regardless of the device settings.
- * 
+ *
  * @example
  * // Example of using IUseI18nOptions to configure i18n
  * const i18nOptions: IUseI18nOptions = {
  *   useLocaleFromDevice: true, // Automatically use the device's locale
  *   locale: 'fr-FR', // Explicitly set the locale to French (France)
  * };
- * 
+ *
  * // Example of using IUseI18nOptions with only the device locale option
  * const deviceLocaleOptions: IUseI18nOptions = {
  *   useLocaleFromDevice: true, // Use the device's locale if supported
  * };
- * 
+ *
  * @note This interface is particularly useful for applications that require localization support,
  * allowing for flexible configuration of locale settings based on user preferences or device settings.
  */

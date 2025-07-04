@@ -4,6 +4,7 @@ import { SetupExpo__DEV__ } from "@components/SetupExpo__DEV__";
 import { GlobalStyles } from "./GlobalStyles";
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
+import { Platform } from "..";
 
 /**
  * Props for the AppRoot component.
@@ -151,7 +152,8 @@ export interface AppRootProps {
  * @public
  */
 export function AppRoot({ children, className }: IAppRootProps) {
-    return (
+    return <>
+        <GlobalStyles />
         <Div
             className={cn("flex flex-col flex-1 h-full w-full relative reskit-app-root", className)}
             id="reskit-app-root"
@@ -160,7 +162,6 @@ export function AppRoot({ children, className }: IAppRootProps) {
                 {children}
             </PortalProvider>
             <SetupExpo__DEV__ />
-            <GlobalStyles />
         </Div>
-    );
+    </>;
 }

@@ -60,7 +60,7 @@ export function TelInput({ type, ...props }: ITelInputProps) {
     return <TextInput<string>
         displayPhoneDialCode={false}
         type={"tel"}
-        renderTextInput={(inputProps, { toCase, setInputState, phoneCountryCode, inputTextClassName, label, labelTextClassName, iconTextClassName, phoneDialCodeText, editable, disabled }) => {
+        renderTextInput={(inputProps, { formatValue, updateInputState, phoneCountryCode, inputTextClassName, label, labelTextClassName, iconTextClassName, phoneDialCodeText, editable, disabled }) => {
             return <>
                 <SelectCountry
                     disabled={disabled}
@@ -70,7 +70,7 @@ export function TelInput({ type, ...props }: ITelInputProps) {
                     menuProps={{ bottomSheetTitle: label }}
                     onChange={!editable ? undefined : ({ value }) => {
                         if (isNonNullString(value) && value !== phoneCountryCode) {
-                            setInputState(toCase("", Array.isArray(value) ? value[0] : value));
+                            updateInputState(formatValue({ value: "", phoneCountryCode: Array.isArray(value) ? value[0] : value }));
                         }
                     }}
                     anchor={({ dropdown, selectedValues, selectedItems, disabled }) => {
@@ -84,7 +84,7 @@ export function TelInput({ type, ...props }: ITelInputProps) {
                             disabled={disabled}
                         >
                             {<Div testID={defaultStr(dropdown?.getTestID()) + "-anchor-label"} className="flex flex-row items-center self-center justify-start" disabled={disabled}>
-                                {dialCodeText ? <Icon.CountryFlag
+                                {selectedValue ? <Icon.CountryFlag
                                     countryCode={selectedValue}
                                     fallback={<Text className={inputTextClassName}>[{dialCodeText}]</Text>}
                                 /> :

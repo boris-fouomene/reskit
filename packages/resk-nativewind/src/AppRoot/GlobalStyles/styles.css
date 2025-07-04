@@ -1,0 +1,113 @@
+/* Custom Scrollbar Styles - Enhanced */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, rgba(243, 244, 246, 0.8) 0%, rgba(229, 231, 235, 0.6) 50%, rgba(243, 244, 246, 0.8) 100%);
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #1e7b1e 0%, #166116 50%, #072d07 100%);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 2px 8px rgba(99, 102, 241, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+  transform: scale(1.05);
+  box-shadow:
+    0 4px 16px rgba(99, 102, 241, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, #3730a3 0%, #5b21b6 50%, #7e22ce 100%);
+  transform: scale(0.98);
+  box-shadow:
+    0 2px 8px rgba(99, 102, 241, 0.5),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode scrollbar */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(31, 41, 55, 0.7) 50%, rgba(17, 24, 39, 0.9) 100%);
+    border: 1px solid rgba(55, 65, 81, 0.5);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    box-shadow:
+      0 2px 12px rgba(99, 102, 241, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+    box-shadow:
+      0 4px 20px rgba(99, 102, 241, 0.5),
+      inset 0 1px 3px rgba(255, 255, 255, 0.2),
+      0 0 25px rgba(139, 92, 246, 0.4);
+  }
+}
+
+/* Firefox Scrollbar - Enhanced */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #8b5cf6 rgba(243, 244, 246, 0.8);
+}
+
+/* For dark mode in Firefox */
+@media (prefers-color-scheme: dark) {
+  * {
+    scrollbar-color: #8b5cf6 rgba(17, 24, 39, 0.9);
+  }
+}
+
+/* Scrollbar corner */
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Additional scrollbar animations */
+@keyframes scrollGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 2px 8px rgba(99, 102, 241, 0.3),
+      inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 4px 16px rgba(99, 102, 241, 0.5),
+      inset 0 1px 3px rgba(255, 255, 255, 0.3),
+      0 0 20px rgba(139, 92, 246, 0.2);
+  }
+}
+
+/* Smooth scrolling behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scroll animations for containers */
+.custom-scroll {
+  scroll-behavior: smooth;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  animation: scrollGlow 3s ease-in-out infinite;
+}

@@ -63,7 +63,7 @@ const textInput = tv({
             return { input: value, labelEmbeded: value }
         }),
         labelWeight: VariantsFactory.createFontWeight<ITextInputSlots>((value, colorName) => {
-            return { label: value, labelEmbeded: value }
+            return { label: value}
         }),
         inputWeight: VariantsFactory.createFontWeight<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
@@ -162,6 +162,8 @@ const textInput = tv({
         paddingX: "5px",
         iconSize: "20px",
         errorColor: "error",
+        inputTextSize: "14px",
+        labelTextSize: "14px",
         focusedColor: "primary",
     },
 });

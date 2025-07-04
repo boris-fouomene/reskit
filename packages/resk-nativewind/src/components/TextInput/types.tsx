@@ -1,12 +1,13 @@
 import { IClassName, IOnChangeOptions } from "../../types";
 import { InputModeOptions, NativeSyntheticEvent, TextInputProps, TextInput, TextInputChangeEventData } from "react-native";
-import React, { Dispatch, ReactNode, SetStateAction } from "react";
-import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult } from "@resk/core/types";
+import React, { ReactNode } from "react";
+import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult } from "@resk/core/inputFormatter";
 import { IFieldBase } from "@resk/core/types";
 import { ICountryCode } from "@resk/core/countries";
 import { IVariantPropsTextInput } from "@variants/textInput";
 import textInputVariant from "@variants/textInput";
 import { IFontIconName } from "@components/Icon";
+import { IInputFormatterOptions } from "@resk/core/inputFormatter";
 /**
  * @interface ITextInputType
  * @description
@@ -75,7 +76,7 @@ type ITextInputComputedVariant = ReturnType<typeof textInputVariant>;
  * @property iconTextClassName - Extracted text classes for the icon (for advanced styling).
  * @property inputTextClassName - Extracted text classes for the input (for advanced styling).
  * @property phoneDialCodeText - The phone dial code text (e.g., "+33 ").
- * @property toCase - Function to format/transform the input value (e.g., uppercase, phone formatting).
+ * @property sanitizeValue - Function to format/transform the input value before it's stored in state. (e.g., uppercase, phone formatting).
  *
  * @example
  * ```tsx
@@ -105,7 +106,7 @@ type ITextInputComputedVariant = ReturnType<typeof textInputVariant>;
  * @remarks
  * - This interface is passed to all custom renderers, affix, left, and right decorators.
  * - Use these properties to implement advanced UI logic, dynamic styling, or context-aware rendering.
- * - The `toCase` function can be used to format or transform the value before display or validation.
+ * - The `sanitizeValue` function can be used to format or transform the value before display or validation.
  *
  * @see {@link ITextInputProps.renderTextInput}
  * @see {@link ITextInputRenderOptions}
@@ -200,13 +201,15 @@ export interface ITextInputCallOptions extends IInputFormatterResult {
     /***
      * A function to set the input state, allowing for updating the value or other properties.
      */
-    setInputState: (newInputState: IInputFormatterResult & { phoneCountryCode?: ICountryCode }) => void;
+    updateInputState: (newInputState: IInputFormatterResult) => void;
 
-    /**
-     * A function to format the input value, allowing for transformation 
-     * of the text (e.g., converting to uppercase, converting to number).
-     */
-    toCase: (value: any, phoneCountryCode?: ICountryCode) => IInputFormatterResult & { phoneCountryCode?: ICountryCode }
+
+    /***
+        A function to format the input value, allowing for transformation 
+        of the text (e.g., converting to uppercase, converting to number).
+        
+    */
+    formatValue: (options: IInputFormatterOptions) => IInputFormatterResult;
 
     /**
      * Whether the label is embeded in the input.
@@ -353,7 +356,7 @@ export interface ITextInputRenderOptions extends TextInputProps {
  *
  * @property onChange - Callback fired when the input value changes. Receives {@link ITextInputOnChangeOptions}.
  *
- * @property toCase - Function to transform the input value (e.g., uppercase, number conversion).
+ * @property valueFormatter - Function to transform the input value (e.g., uppercase, number conversion).
  *
  * @property emptyValue - The value considered as null or empty.  
  *   @default null | ''
@@ -536,10 +539,46 @@ export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInput
     onChange?: (options: ITextInputOnChangeOptions<ValueType>) => any;
 
     /**
-     * A function to format the input value, allowing for transformation 
-     * of the text (e.g., converting to uppercase, converting to number).
+     * Optional function to sanitize and transform the input value before it's stored in state.
+     * 
+     * This function is called whenever the user types or the input value changes, allowing you
+     * to clean, validate, or transform the raw input before it becomes the component's value.
+     * The sanitized result will be passed to the onChange handler and stored as the component state.
+     * 
+     * @param {IInputFormatterOptions} options  - The options object containing the current value, type, and other properties
+     * @returns The sanitized/transformed value that will be stored in state
+     * 
+     * @example
+     * ```tsx
+     * // Convert to uppercase and remove whitespace
+     * <TextInput 
+     *   value={code} 
+     *   sanitizeValue={({value:input}) => String(input).toUpperCase().trim()} 
+     * />
+     * 
+     * // Extract only numeric characters for phone input
+     * <TextInput 
+     *   value={phone} 
+     *   sanitizeValue={({value:input}) => String(input).replace(/\D/g, '')} 
+     * />
+     * 
+     * // Convert to number for numeric inputs
+     * <TextInput 
+     *   value={amount} 
+     *   sanitizeValue={({value:input}) => {
+     *     const num = parseFloat(String(input).replace(/[^\d.-]/g, ''));
+     *     return isNaN(num) ? '' : num;
+     *   }} 
+     * />
+     * ```
+     * 
+     * @remarks
+     * - This function runs on every input change, so keep it lightweight
+     * - Return the same type that your component's `value` prop expects
+     * - If sanitization fails, consider returning the original input or an empty value
+     * - This is different from display formatting - it affects the actual stored value
      */
-    toCase?: (value: any) => any;
+    sanitizeValue?: (options: IInputFormatterOptions) => string | number;
 
     /**
      * The value considered as null or empty. 

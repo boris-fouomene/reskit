@@ -4,7 +4,7 @@ import { Text } from "@html/Text";
 import { NativeSyntheticEvent, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from "react";
 import InputFormatter from "@resk/core/inputFormatter";
-import { IInputFormatterMaskResult, IInputFormatterResult } from "@resk/core/types";
+import { IInputFormatterMaskResult, IInputFormatterOptions, IInputFormatterResult } from "@resk/core/inputFormatter";
 import { ICountryCode } from "@resk/core/countries";
 import { isNumber, isNonNullString, isStringNumber, isEmpty, defaultStr, defaultBool, DateHelper } from "@resk/core/utils";
 import FontIcon from "@components/Icon/Font";
@@ -100,7 +100,7 @@ const isNative = p.isNative();
 export default function TextInput<ValueType = any>({
     readOnly,
     renderTextInput, testID, error: customError, phoneCountryCode: customPhoneCountryCode, handleMaskValidationErrors,
-    defaultValue, toCase: cToCase, inputMode: cInputMode, dateFormat: customDateFormat, emptyValue: cIsEmptyValue,
+    defaultValue, sanitizeValue, inputMode: cInputMode, dateFormat: customDateFormat, emptyValue: cIsEmptyValue,
     mask: customMask, maskOptions: customMaskOptions, secureTextEntry, withKeyboardAvoidingView, type, ref,
     minHeight: customMinHeight,
     maxHeight: customMaxHeight,
@@ -208,7 +208,8 @@ export default function TextInput<ValueType = any>({
             canRenderCalendar: ["datetime", "date"].includes(typeString),
         }
     }, [customMask, customMaskOptions, typeString, customDateFormat, isDateOrTime]);
-    const toCase = (value: any, phoneCountryCode?: ICountryCode): IInputFormatterResult & { phoneCountryCode?: ICountryCode } => {
+    const formatValue = (options?: IInputFormatterOptions): IInputFormatterResult => {
+        let { value, ...rest } = Object.assign({}, options);
         const valString = String(value);
         const valEndsWithDecimal = InputFormatter.endsWithDecimalSeparator(valString);
         if (canValueBeDecimal && isFocused && (valString.length == 1 && valEndsWithDecimal)) {
@@ -217,26 +218,28 @@ export default function TextInput<ValueType = any>({
         if (value === emptyValue && isFocused) {
             value = "";
         }
-        if (cToCase) return cToCase(value);
         if (value == undefined) value = '';
         if (isStringNumber(String(value))) value += "";
         if (canValueBeDecimal && (!valEndsWithDecimal && (String(value).length <= 1 || !String(value).endsWith("0")))) {
             value = InputFormatter.parseDecimal(value);
         }
         if (isPhone && value) {
-            value = InputFormatter.formatPhoneNumber(value, phoneCountryCode);
+            value = InputFormatter.formatPhoneNumber(value, rest.phoneCountryCode);
+        }
+        const formatOptions = { ...props, ...rest, dateFormat, type, value };
+        if (typeof sanitizeValue === "function") {
+            value = sanitizeValue(formatOptions);
         }
         return {
-            phoneCountryCode,
             ...(mask ? InputFormatter.formatWithMask({ ...maskOptions, maskAutoComplete: true, value, mask, type }) : {}),
-            ...InputFormatter.formatValue({ ...props, phoneCountryCode, dateFormat, type, value }),
+            ...InputFormatter.formatValue({ ...formatOptions, value }),
             value,
         }
     };
-    const valCase = useMemo(() => {
-        return toCase(defaultValue, customPhoneCountryCode);
+    const valCase = useMemo<IInputFormatterResult>(() => {
+        return formatValue({ ...props, value: defaultValue, phoneCountryCode: customPhoneCountryCode });
     }, [defaultValue, mask, maskOptions, customPhoneCountryCode])
-    const [inputState, setInputState] = useState<IInputFormatterResult & { phoneCountryCode?: ICountryCode }>(valCase);
+    const [inputState, setInputState] = useState<IInputFormatterResult>(valCase);
     const focusedValue = isFocused ? (inputState.value === emptyValue ? '' : inputState.value) : '';
     useEffect(() => {
         if (areCasesEquals(valCase, inputState)) return;
@@ -318,7 +321,7 @@ export default function TextInput<ValueType = any>({
     const phoneDialCodeClx = cn("input-phone-dial-code-label", inputTextClx);
     const phoneDialCodeLabel = displayPhoneDialCode && phoneDialCodeText ? <Text className={phoneDialCodeClx}>{phoneDialCodeText}</Text> : null;
     const callOptions: ITextInputCallOptions = {
-        toCase, label, renderedWithLabel: withLabel !== false, ...inputState, inputState, setInputState: (newInputState) => (
+        formatValue, label, renderedWithLabel: withLabel !== false, ...inputState, inputState, updateInputState: (newInputState) => (
             setInputState((prev) => ({ ...prev, ...newInputState }))
         ), isPhone, phoneDialCodeText, labelClassName: labelClx, labelTextClassName: labelTextClx, iconClassName: iconClx, iconTextClassName: iconTextClx, inputClassName: inputClx, inputTextClassName: inputTextClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled
     };
@@ -409,7 +412,7 @@ export default function TextInput<ValueType = any>({
         onChange: (event: NativeSyntheticEvent<TextInputChangeEventData>) => {
             const { text: textString } = event.nativeEvent;
             const { phoneCountryCode } = inputState;
-            const valCase2 = toCase(textString, phoneCountryCode);
+            const valCase2 = formatValue({ value: textString, phoneCountryCode });
             const value = inputState.placeholder ? valCase2.masked : valCase2.value;
             if (textString !== inputState.value && inputState.value !== value && !areCasesEquals(valCase2, inputState)) {
                 //Fix repeated input, from native text input in animated mobile input

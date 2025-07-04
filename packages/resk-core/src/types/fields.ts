@@ -1,20 +1,18 @@
 import { IAuthPerm } from "@/auth/types";
 import { IResourceActionName, IResourceActionTupleObject } from "./resources";
-import { IMomentFormat } from "./date";
-import { ICountryCode } from "@countries/index";
-import { ICurrencyFormatterKey } from "@/currency/types";
+import { IInputFormatterOptions } from "../inputFormatter/types";
 
 /**
  * Represents a base field with optional type, label, and name properties.
  * The type property defaults to "text" if not specified.
- * 
+ *
  * @template IFieldType - The type of the field, defaults to "text"
  * @extends IResourceActionTupleObject
  * @extends Omit<IInputFormatterOptions, "value" | "type">
- * 
+ *
  * @description
  * This interface serves as a base for all field types, providing common properties such as type, label, and name.
- * 
+ *
  * @example
  * ```typescript
  * const textField: IFieldBase = {
@@ -29,124 +27,123 @@ import { ICurrencyFormatterKey } from "@/currency/types";
  * @see {@link IInputFormatterOptions} for the `IInputFormatterOptions` type.
  */
 export interface IFieldBase<FieldType extends IFieldType = IFieldType> extends Partial<IResourceActionTupleObject>, Omit<IInputFormatterOptions, "value" | "type"> {
-    /**
-     * The type of the field.
-     * 
-     * @description
-     * This property specifies the type of the field, such as "text", "number", or "date".
-     * 
-     * @default "text"
-     * 
-     * @example
-     * ```typescript
-     * const textField: IFieldBase = {
-     *   type: 'text'
-     * };
-     * ```
-     */
-    type: FieldType;
+  /**
+   * The type of the field.
+   *
+   * @description
+   * This property specifies the type of the field, such as "text", "number", or "date".
+   *
+   * @default "text"
+   *
+   * @example
+   * ```typescript
+   * const textField: IFieldBase = {
+   *   type: 'text'
+   * };
+   * ```
+   */
+  type: FieldType;
 
-    /**
-     * The name of the field.
-     * 
-     * @description
-     * This property specifies the unique name or identifier for the field.
-     * 
-     * @example
-     * ```typescript
-     * const textField: IFieldBase = {
-     *   name: 'textField'
-     * };
-     * ```
-     */
-    name?: string;
+  /**
+   * The name of the field.
+   *
+   * @description
+   * This property specifies the unique name or identifier for the field.
+   *
+   * @example
+   * ```typescript
+   * const textField: IFieldBase = {
+   *   name: 'textField'
+   * };
+   * ```
+   */
+  name?: string;
 
-    /**
-     * The name of the field in the database table.
-     * 
-     * @description
-     * This property specifies the name of the field as it appears in the database table.
-     * 
-     * @example
-     * ```typescript
-     * const textField: IFieldBase = {
-     *   databaseName: 'text_field'
-     * };
-     * ```
-     */
-    databaseName?: string;
+  /**
+   * The name of the field in the database table.
+   *
+   * @description
+   * This property specifies the name of the field as it appears in the database table.
+   *
+   * @example
+   * ```typescript
+   * const textField: IFieldBase = {
+   *   databaseName: 'text_field'
+   * };
+   * ```
+   */
+  databaseName?: string;
 
-    /**
-     * The name of the field's table or collection in the database.
-     * 
-     * @description
-     * This property specifies the name of the table or collection that contains the field in the database.
-     * 
-     * @example
-     * ```typescript
-     * const textField: IFieldBase = {
-     *   databaseTableName: 'text_fields'
-     * };
-     * ```
-     */
-    databaseTableName?: string;
+  /**
+   * The name of the field's table or collection in the database.
+   *
+   * @description
+   * This property specifies the name of the table or collection that contains the field in the database.
+   *
+   * @example
+   * ```typescript
+   * const textField: IFieldBase = {
+   *   databaseTableName: 'text_fields'
+   * };
+   * ```
+   */
+  databaseTableName?: string;
 
-    /***
-     * weatherr the field is a primary key or not
-     */
-    primaryKey?: boolean;
+  /***
+   * weatherr the field is a primary key or not
+   */
+  primaryKey?: boolean;
 
-    /**
-     * weatherr the field is rendable or not
-     * It is used to determine if the field should be rendered or not.
-     */
-    rendable?: boolean;
+  /**
+   * weatherr the field is rendable or not
+   * It is used to determine if the field should be rendered or not.
+   */
+  rendable?: boolean;
 
-    /***
-     * weatherr the field is readonly or not
-     */
-    readOnly?: boolean;
+  /***
+   * weatherr the field is readonly or not
+   */
+  readOnly?: boolean;
 
-    /**
-     * weatherr the field is disabled or not
-     */
-    disabled?: boolean;
+  /**
+   * weatherr the field is disabled or not
+   */
+  disabled?: boolean;
 
-    /***
-     * weatherr the field is unique for the resource or not
-     */
-    unique?: boolean;
+  /***
+   * weatherr the field is unique for the resource or not
+   */
+  unique?: boolean;
 
-    /**
-     * weatherr the field is required or not
-     */
-    required?: boolean;
+  /**
+   * weatherr the field is required or not
+   */
+  required?: boolean;
 
-    /***
-     * the min length of the field
-     */
-    minLength?: number;
-    /**
-     * the max length of the field
-     */
-    maxLength?: number;
+  /***
+   * the min length of the field
+   */
+  minLength?: number;
+  /**
+   * the max length of the field
+   */
+  maxLength?: number;
 
-    /**
-     * the length of the field
-     */
-    length?: number;
+  /**
+   * the length of the field
+   */
+  length?: number;
 
-    /***
-     * whether the field is visible or not
-     */
-    visible?: boolean;
+  /***
+   * whether the field is visible or not
+   */
+  visible?: boolean;
 
-    /***
-     * The permission associated with the field. This permission is used to determine if the field will be rendered or not.
-     */
-    perm?: IAuthPerm;
+  /***
+   * The permission associated with the field. This permission is used to determine if the field will be rendered or not.
+   */
+  perm?: IAuthPerm;
 }
-
 
 /**
  * Represents a map of field types to their corresponding IFieldBase instances.
@@ -186,27 +183,27 @@ export interface IFieldBase<FieldType extends IFieldType = IFieldType> extends P
   ```
  */
 export interface IFieldMap {
-    unknown: IFieldBase<"unknown">;
+  unknown: IFieldBase<"unknown">;
 }
 
 /**
  * @type IField<T extends IFieldType = IFieldType>
  * @extends IFieldBase<T>
- * 
+ *
  * Represents a field with customizable properties in a form or data structure.
  * This type allows for flexible field definitions by leveraging TypeScript's conditional types.
- * 
+ *
  * ### Type Parameters
- * - **T**: The type of the field. Defaults to `"text"`. This parameter determines the specific field type 
+ * - **T**: The type of the field. Defaults to `"text"`. This parameter determines the specific field type
  *   being defined, which can be one of the types specified in the `IFieldMap`.
- * 
+ *
  * ### Description
- * The `IField` type constructs a field definition by combining properties from the base field interface 
- * (`IFieldBase`) and the specific field type defined in the `IFieldMap`. It ensures that the `type` field 
+ * The `IField` type constructs a field definition by combining properties from the base field interface
+ * (`IFieldBase`) and the specific field type defined in the `IFieldMap`. It ensures that the `type` field
  * is included and allows for additional properties such as `form` and `filter` to be specified.
- * 
+ *
  * ### Properties
- * - **form**: An optional property that allows nesting of fields, enabling complex data structures 
+ * - **form**: An optional property that allows nesting of fields, enabling complex data structures
  *   that can represent forms with multiple layers of fields.
  *   - **Type**: `IField<any>`
  *   - **Example**:
@@ -220,8 +217,8 @@ export interface IFieldMap {
  *         }
  *     };
  *     ```
- * 
- * - **filter**: An optional property that allows for defining filter criteria for the field, 
+ *
+ * - **filter**: An optional property that allows for defining filter criteria for the field,
  *   enabling dynamic filtering capabilities in data queries.
  *   - **Type**: `IField<any>`
  *   - **Example**:
@@ -235,10 +232,10 @@ export interface IFieldMap {
  *         }
  *     };
  *     ```
- * 
+ *
  * ### Example Usage
  * Here’s how you might define a text field and a number field using the `IField` type:
- * 
+ *
  * ```typescript
  * const textField: IField<'text'> = {
  *     type: 'text',
@@ -251,7 +248,7 @@ export interface IFieldMap {
  *         label: 'Enter your username',
  *     }
  * };
- * 
+ *
  * const numberField: IField<'number'> = {
  *     type: 'number',
  *     label: 'Age',
@@ -264,23 +261,23 @@ export interface IFieldMap {
  *     }
  * };
  * ```
- * 
+ *
  * @remarks
- * - This type is particularly useful in applications that require dynamic form generation or 
- *   data structure definitions, allowing developers to create fields with varying properties 
+ * - This type is particularly useful in applications that require dynamic form generation or
+ *   data structure definitions, allowing developers to create fields with varying properties
  *   based on the context in which they are used.
- * - The `form` and `filter` properties allow for nesting of fields, enabling complex data 
+ * - The `form` and `filter` properties allow for nesting of fields, enabling complex data
  *   structures that can represent forms with multiple layers of fields or filters.
  * @see {@link IFieldMap} for the `IFieldMap` type.
  */
 export type IField<T extends IFieldType = IFieldType> = IFieldMap[T] & {
-    [key in ("create" | "update" | "createOrUpdate" | "list" | "filter")]?: Partial<IFieldMap[IFieldType]>;
+  [key in "create" | "update" | "createOrUpdate" | "list" | "filter"]?: Partial<IFieldMap[IFieldType]>;
 };
 
 /**
  * Record type representing a collection of fields, where each value
  * is a field of any type from the FullFieldMap.
- * 
+ *
  * @example
  * ```typescript
  * // Create a collection of fields with different types
@@ -295,7 +292,7 @@ export type IField<T extends IFieldType = IFieldType> = IFieldMap[T] & {
  *     min: 18
  *   }
  * };
- * 
+ *
  * // TypeScript knows these are valid operations
  * console.log(formFields.username.type); // 'text'
  * console.log(formFields.age.min);       // 18
@@ -306,7 +303,7 @@ export type IFields = Record<string, IField>;
 /**
  * Type guard to check if a field matches a specific type.
  * Helps with type narrowing when working with fields dynamically.
- * 
+ *
  * @example
  * ```typescript
  * // Using the type guard to narrow types
@@ -323,43 +320,42 @@ export type IFields = Record<string, IField>;
  * ```
  */
 export function isFieldType<T extends IFieldType>(field: IFieldBase, type: T): field is IField<T> {
-    return field.type === type;
+  return field.type === type;
 }
 
 /**
  * Represents the type of field keys that can be used within the `IFieldMap`.
- * This type is derived from the keys of the `IFieldMap` interface, ensuring that 
+ * This type is derived from the keys of the `IFieldMap` interface, ensuring that
  * only valid field types can be referenced when defining fields in forms or data structures.
  *
  * @type IFieldType
- * 
+ *
  * @description
- * The `IFieldType` type serves as a union of string literals that correspond to the 
- * defined field types in the `IFieldMap`. This provides type safety and consistency 
- * when working with field definitions, preventing errors that may arise from using 
+ * The `IFieldType` type serves as a union of string literals that correspond to the
+ * defined field types in the `IFieldMap`. This provides type safety and consistency
+ * when working with field definitions, preventing errors that may arise from using
  * invalid field types.
- * 
+ *
  * @example
  * // Example of using IFieldType to define a field
  * const textFieldType: IFieldType = 'text'; // Valid
  * const numberFieldType: IFieldType = 'number'; // Valid
- * 
+ *
  * // Attempting to assign an invalid field type will result in a TypeScript error
  * // const invalidFieldType: IFieldType = 'invalidType'; // Error: Type '"invalidType"' is not assignable to type 'IFieldType'.
- * 
+ *
  * @remarks
- * This type is particularly useful in scenarios where fields are dynamically defined 
+ * This type is particularly useful in scenarios where fields are dynamically defined
  * or when implementing features that require strict adherence to defined field types.
- * By using `IFieldType`, developers can ensure that only valid field types are used 
+ * By using `IFieldType`, developers can ensure that only valid field types are used
  * throughout the application, enhancing type safety and reducing runtime errors.
  */
 export type IFieldType = keyof IFieldMap;
 
-
 /**
  * Helper function to create a type-safe field instance.
  * Provides autocomplete for properties based on the specified field type.
- * 
+ *
  * @example
  * ```typescript
  * // Create a text field with autocompletion for text-specific properties
@@ -368,7 +364,7 @@ export type IFieldType = keyof IFieldMap;
  *   placeholder: 'Enter your name', // TypeScript suggests text field properties
  *   maxLength: 100
  * });
- * 
+ *
  * // Create a select field with autocompletion for select-specific properties
  * const countryField = createField('select', {
  *   label: 'Country',
@@ -378,153 +374,16 @@ export type IFieldType = keyof IFieldMap;
  *   ],
  *   multiple: true  // TypeScript suggests select field properties
  * });
- * 
+ *
  * // TypeScript would error on invalid properties
  * const invalidField = createField('text', {
  *   items: [] // Error: Property 'items' does not exist on text field
  * });
  * ```
  */
-export function createField<T extends IFieldType>(type: T, props: Omit<IField<T>, 'type'>): IField<T> {
-    return {
-        type,
-        ...props
-    } as IField<T>;
-}
-
-
-
-/**
- * @interface
- * Represents a function that formats a field value according to specified options.
- *
- * The formatting can be customized based on the options provided when 
- * the `format` function of the `IField` interface is called. This type 
- * allows for greater flexibility in defining how field values should 
- * be displayed or manipulated.
- *
- * ### Parameters:
- * - `options`: 
- *   - **Type**: `IInputFormatterOptions`
- *   - An object containing options for formatting the value. The options may 
- *     include the value to be formatted, the expected type of the value, 
- *     and a custom format specification.
- *
- * ### Returns:
- * - **Type**: `string`
- *   - The formatted value as a string, based on the provided options.
- *
- * ### Example Usage:
- * ```typescript
- * const customFormatter: IInputFormatterValueFunc = (options) => {
- *     const { value, format } = options;
- *     if (format === 'money') {
- *         return `$${parseFloat(value).toFixed(2)}`; // Formats value as money
- *     }
- *     return String(value); // Default to string conversion
- * };
- *
- * const formattedValue = customFormatter({
- *     value: 1234.567,
- *     format: 'money'
- * });
- * console.log(formattedValue); // Outputs: "$1234.57"
- * ```
- */
-export type IInputFormatterValueFunc = ((options: IInputFormatterOptions) => string);
-
-
-
-/**
- * Represents the format types for value formatting.
- *
- * This type can be used to specify how values should be formatted in an application, such as:
- * - As a standard number
- * - As a monetary value
- * - Using a custom format defined by the user
- *
- * ### Format Options:
- * - `"number"`: For standard numerical formatting.
- * - `"money"`: For formatting values as monetary amounts, following currency rules.
- * - `"custom"`: For user-defined formatting rules.
- * - `ICurrencyFormatterKey`: Represents a specific currency format that adheres to the structure defined in the `ICurrencyFormatterKey` interface.
- *
- * ### Example Usage:
- * ```typescript
- * // Define a value with a money format
- * const moneyValue: IInputFormatterValueFormat = "money";
- *
- * // Define a custom format
- * const customValue: IInputFormatterValueFormat = "custom";
- *
- * // Define a value using ICurrencyFormatterKey
- * const currencyValue: IInputFormatterValueFormat = "formatUSD" | "formatCAD" | "formatEUR" | "formatAED" | "formatAFN" | "formatALL" | "formatAMD" | "formatARS" |;
- * ```
- */
-export type IInputFormatterValueFormat = "number" | "money" | "custom" | ICurrencyFormatterKey | IInputFormatterValueFunc;
-
-/**
- * Options for formatting a value into a string representation.
- *
- * This interface is used in the `formatValue` function to specify the options 
- * for formatting a given value, allowing for flexible and customizable 
- * output based on the provided settings.
- *
- * ### Properties:
- * - `value?`: The value to be formatted. This can be of any type and is the 
- *   main input for the formatting process.
- * - `type?`: The expected type of the input value, which can help in determining 
- *   the appropriate formatting logic to apply.
- * - `format?`: A predefined or custom format to be used for formatting the parsed 
- *   value. This allows for dynamic formatting based on the specified type.
- *
- * ### Example Usage:
- * ```typescript
- * const options: IInputFormatterOptions = {
- *   value: 1234.56,
- *   type: "number",
- *   format: "money" // Example format for monetary values
- * };
- *
- * const formattedValue = formatValue(options);
- * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
- * ```
- * 
- *  * ```typescript
- * const options: IInputFormatterOptions = {
- *   value: 1234.56,
- *   type: "number",
- *   format: "formatUSD" // Example format for monetary values in $USD
- * };
- *
- * const formattedValue = formatValue(options);
- * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
- * ```
- */
-export interface IInputFormatterOptions {
-    value?: any; // The value to be formatted
-    type?: any; // The expected type of the value
-    /**
-    * This function is used by default to format the parsed or custom value.
-    * In an input field, that function or a string used to format the value displayed in the input field.
-    * ```ts
-    *   format : "moneay", //will format the value to money format
-    *   format : ({value:any,type:ITextInputType,format?:"custom"}) => any; //will format the value to any format
-    * ```
-    */
-    format?: IInputFormatterValueFormat; // The format to be applied
-
-    /***
-     * Format for date types
-     */
-    dateFormat?: IMomentFormat;
-    /***
-     * The phone country code, in case of formatting a phone number, type="tel"
-     */
-    phoneCountryCode?: ICountryCode;
-
-    /***
-     * Whether to abreviate the number
-     */
-    abreviateNumber?: boolean;
+export function createField<T extends IFieldType>(type: T, props: Omit<IField<T>, "type">): IField<T> {
+  return {
+    type,
+    ...props,
+  } as IField<T>;
 }

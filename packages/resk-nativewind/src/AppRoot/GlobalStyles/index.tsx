@@ -25,21 +25,46 @@ export function GlobalStyles() {
             border:opx;
         }
     `;
+    const darkTrackStyle = `::-webkit-scrollbar-track{background-color: ${darkTrackBG};}`;
     const trackstyle = `
         ::-webkit-scrollbar-track{
             -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
             border-radius: 10px;
             background-color: ${trackBG};
-            border:0px;
+            border:1px solid;
         }
-        .dark ::-webkit-scrollbar-track{
-            background-color: ${darkTrackBG};
-        }
+        .dark ${darkTrackStyle}
     `;
+    const darkThumbStyle = `::-webkit-scrollbar-thumb{background-color: ${darkPrimary};}`;
     const thumbStyle = `
-    ::-webkit-scrollbar-thumb{background-color: ${primary};}
-    .dark ::-webkit-scrollbar-thumb{background-color: ${darkPrimary};}
+    ::-webkit-scrollbar-thumb{
+      background-color: ${primary};
+      border: 2px solid;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    .dark ${darkThumbStyle}
     `;
+    const darkCss = [`.tippy-box[data-theme~='${TIPPY_THEME}'] {
+                background-color: ${darkPrimary};
+                color: ${darkPrimaryForeground};
+            }
+        `, `.tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='top']>.tippy-arrow::before {
+                border-top-color: ${darkPrimary};
+            }
+        `,
+    `.tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='bottom']>.tippy-arrow::before {
+                border-bottom-color: ${darkPrimary};
+            }
+        `,
+    `.tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='left']>.tippy-arrow::before {
+            border-left-color: ${darkPrimary};
+        }
+        .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right']>.tippy-arrow::before {
+            border-right-color: ${darkPrimary};
+        }
+    `
+    ];
     return <>
         <BodyClasses />
         <style id="reskit-app-root-global-styles">
@@ -82,37 +107,38 @@ export function GlobalStyles() {
             border-right-color: ${primary};
         }
 
-        /* dark colors for theme*/
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'] {
-            background-color: ${darkPrimary};
-            color: ${darkPrimaryForeground};
-            font-weight: 400;
-            text-shadow: none;
-            box-shadow: none;
-        }
-
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='top']>.tippy-arrow::before {
-            border-top-color: ${darkPrimary};
-        }
-
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='bottom']>.tippy-arrow::before {
-            border-bottom-color: ${darkPrimary};
-        }
-
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='left']>.tippy-arrow::before {
-            border-left-color: ${darkPrimary};
-        }
-
-        .dark .tippy-box[data-theme~='${TIPPY_THEME}'][data-placement^='right']>.tippy-arrow::before {
-            border-right-color: ${darkPrimary};
-        }
-         
         body.desktop ${trackstyle}
         body.desktop ${scrollbarStyle}
         body.desktop ${thumbStyle}
         body.not-touch-device ${trackstyle}
         body.not-touch-device ${scrollbarStyle}
         body.not-touch-device ${thumbStyle}
+        
+        * {
+          scrollbar-width: thin;
+          scrollbar-color: ${primary} rgba(243, 244, 246, 0.8);
+        }
+        
+        .dark * {
+            scrollbar-color: ${darkPrimary} rgba(17, 24, 39, 0.9);
+        }
+        
+        ::-webkit-scrollbar-corner {
+          background: transparent;
+        }
+        
+        /* dark colors for theme*/
+        ${darkCss.map((c) => c.split('.tippy-box').join(".dark .tippy-box")).join("\n")}
+        
+         
+        @media (prefers-color-scheme: dark) {
+            ${darkCss.join("\n")}
+            body.desktop ${darkThumbStyle}
+            body.not-touch-device ${darkTrackBG}
+            * {
+                scrollbar-color: ${darkPrimary} rgba(17, 24, 39, 0.9);
+            }
+        } 
     `}
         </style>
     </>

@@ -10,8 +10,9 @@ import { useBackHandler } from "@components/BackHandler";
 import { AppBar, IAppBarProps } from "@components/AppBar";
 import { Div } from "@html/Div";
 
-export function BottomSheet({ variant, className, dismissable, appBarClassName, onRequestClose, contentClassName, withAppBar, appBarProps, children, onLayout, testID, portalClassName, visible, ...props }: IBottomSheetProps) {
+export function BottomSheet({ variant, className, dismissable: customDismissable, appBarClassName, onRequestClose, contentClassName, withAppBar, appBarProps, children, onLayout, testID, portalClassName, visible, ...props }: IBottomSheetProps) {
     testID = defaultStr(testID, "resk-bottom-sheet");
+    const dismissable = customDismissable !== false;
     const computedVariant = bottomSheetVariant({ ...variant, visible });
     useBackHandler(function () {
         if (dismissable && typeof onRequestClose === "function") {

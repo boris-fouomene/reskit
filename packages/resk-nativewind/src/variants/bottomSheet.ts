@@ -9,7 +9,7 @@ const bottomSheet = tv({
     base: "relative w-full shadow-xl px-2",
     portal: "flex flex-col flex-1 justify-end transform translate-y-full transition",
     content: "w-full h-full",
-    appBar: "", //appBar classes options
+    appBar: "w-full", //appBar classes options
   },
   variants: {
     withBackdrop: {

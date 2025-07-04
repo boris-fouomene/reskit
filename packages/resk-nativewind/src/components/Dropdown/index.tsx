@@ -391,7 +391,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
                     icon: "checkbox-multiple-marked",
                     onPress: context.selectAll.bind(context),
                 },
-                !this.props.required ? {
+                !context.props?.required ? {
                     label: i18n.t("components.dropdown.unselectAll"),
                     icon: "checkbox-multiple-blank-outline",
                     onPress: context.unselectAll.bind(context),
@@ -401,7 +401,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             return [
                 ...actions,
                 actions?.length ? { divider: true } : undefined,
-                !this.props.required ? {
+                !context.props?.required ? {
                     label: i18n.t("components.dropdown.unselectSingle"),
                     icon: "checkbox-blank-circle-outline",
                     onPress: context.unselectAll.bind(context),

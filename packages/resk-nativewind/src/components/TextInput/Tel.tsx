@@ -3,13 +3,11 @@ import TextInput from "./Input";
 import { ITextInputProps } from "./types";
 import { TextInput as RNTextInput, TouchableOpacity } from "react-native";
 import { SelectCountry } from "@components/SelectCountry";
-import useStateCallback from "@utils/stateCallback";
 import { ICountryCode } from "@resk/core/countries";
 import { Div } from "@html/Div";
 import { defaultStr, isNonNullString } from "@resk/core/utils";
 import { Icon } from "@components/Icon";
 import { Text } from "@html/Text";
-import { useMemo } from "react";
 
 /**
  * Specialized phone number input component for React Native and web.

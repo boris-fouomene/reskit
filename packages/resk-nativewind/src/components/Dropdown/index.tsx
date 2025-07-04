@@ -451,7 +451,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             testID={`${testID}-dropdown-anchor-container`}
             className={cn(anchorContainerClassName)}
         >
-            <Tooltip title={anchorSelectedText} disabled={disabled} onPress={editable ? () => context?.open() : undefined}>
+            <Tooltip title={anchorSelectedText} disabled={disabled} onPress={editable !== false ? () => context?.open() : undefined}>
                 <>
                     {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdown: context })
                         :

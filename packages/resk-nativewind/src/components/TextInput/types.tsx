@@ -1,6 +1,6 @@
 import { IClassName, IOnChangeOptions } from "../../types";
 import { InputModeOptions, NativeSyntheticEvent, TextInputProps, TextInput, TextInputChangeEventData } from "react-native";
-import React, { ReactNode } from "react";
+import React, { Dispatch, ReactNode, SetStateAction } from "react";
 import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult } from "@resk/core/types";
 import { IFieldBase } from "@resk/core/types";
 import { ICountryCode } from "@resk/core/countries";
@@ -53,12 +53,93 @@ export type ITextInputType = InputModeOptions | "number" | "password" | "time" |
 
 type ITextInputComputedVariant = ReturnType<typeof textInputVariant>;
 
+/**
+ * Call options and context provided to custom renderers and affix/decoration functions in {@link TextInput}.
+ *
+ * This interface extends {@link IInputFormatterResult} and provides a comprehensive set of properties
+ * describing the current state, styling, and context of the input field. It is passed to custom renderers,
+ * affix functions, and decorators to enable advanced UI logic and dynamic rendering.
+ *
+ * @property isFocused - `true` if the input is currently focused.
+ * @property editable - `true` if the input is editable (not disabled or read-only).
+ * @property disabled - `true` if the input is disabled.
+ * @property error - `true` if the input is in an error state.
+ * @property computedVariant - The computed variant object for the input, as returned by {@link textInputVariant}.
+ * @property labelEmbeded - `true` if the label is embedded inside the input field.
+ * @property focus - Function to imperatively focus the input.
+ * @property labelClassName - The computed class name for the label.
+ * @property inputClassName - The computed class name for the input element.
+ * @property iconClassName - The computed class name for the icon element.
+ * @property isPhone - `true` if the input type is a phone number.
+ * @property labelTextClassName - Extracted text classes for the label (for advanced styling).
+ * @property iconTextClassName - Extracted text classes for the icon (for advanced styling).
+ * @property inputTextClassName - Extracted text classes for the input (for advanced styling).
+ * @property phoneDialCodeText - The phone dial code text (e.g., "+33 ").
+ * @property toCase - Function to format/transform the input value (e.g., uppercase, phone formatting).
+ *
+ * @example
+ * ```tsx
+ * import { TextInput, ITextInputCallOptions } from "@resk/nativewind/components/TextInput";
+ *
+ * // Example: Custom affix showing character count and error state
+ * const charCountAffix = (options: ITextInputCallOptions) => (
+ *   <Text style={{ color: options.error ? "red" : "gray" }}>
+ *     {String(options.value).length}/20
+ *   </Text>
+ * );
+ *
+ * // Example: Custom render function using call options
+ * const customRender = (inputProps, callOptions: ITextInputCallOptions) => (
+ *   <View style={{ borderColor: callOptions.error ? "red" : "gray", borderWidth: 1 }}>
+ *     <RNTextInput {...inputProps} ref={inputProps.ref} />
+ *   </View>
+ * );
+ *
+ * <TextInput
+ *   maxLength={20}
+ *   affix={charCountAffix}
+ *   renderTextInput={customRender}
+ * />
+ * ```
+ *
+ * @remarks
+ * - This interface is passed to all custom renderers, affix, left, and right decorators.
+ * - Use these properties to implement advanced UI logic, dynamic styling, or context-aware rendering.
+ * - The `toCase` function can be used to format or transform the value before display or validation.
+ *
+ * @see {@link ITextInputProps.renderTextInput}
+ * @see {@link ITextInputRenderOptions}
+ * @see {@link IInputFormatterResult}
+ * @see {@link textInputVariant}
+ * @see {@link ICountryCode}
+ *
+ * @public
+ */
 export interface ITextInputCallOptions extends IInputFormatterResult {
+    /**
+     * Indicates if the input is currently focused.
+     */
     isFocused: boolean;
+    /**
+     * Indicates if the input is currently editable.
+     */
     editable: boolean;
+    /**
+     * Indicates if the input is currently disabled.
+     */
     disabled: boolean;
+    /***
+     * Indicates if the input is in an error state.
+     */
     error: boolean;
+
+    /**
+     * The computed variant object for the input, as returned by {@link textInputVariant}.
+     */
     computedVariant: ITextInputComputedVariant;
+
+    /*** The label to be displayed alongside the input. */
+    label?: ReactNode;
     /***
         Whether the label is embeded in the input.
     */
@@ -86,15 +167,51 @@ export interface ITextInputCallOptions extends IInputFormatterResult {
     isPhone: boolean;
 
     /***
-     * The label to be displayed alongside the phone dial code.
+     * The extracted text classes of the label.
      */
-    phoneDialCodeLabel: ReactNode;
+    labelTextClassName: string;
+
+    /***
+     * The extracted text classes of the icon.
+     */
+    iconTextClassName: string;
+
+    /***
+     * The extracted text classes of the input.
+     */
+    inputTextClassName: string;
+
+    /**
+     * The phone dial code text. It can be use to display the dial code in the input.
+     */
+    phoneDialCodeText: string;
+
+
+    /**
+     * The country code for phone number formatting.
+     */
+    phoneCountryCode?: ICountryCode;
+
+    /**
+     * The input state, including the value, formatted value, and other properties.
+     */
+    inputState: IInputFormatterResult;
+
+    /***
+     * A function to set the input state, allowing for updating the value or other properties.
+     */
+    setInputState: (newInputState: IInputFormatterResult & { phoneCountryCode?: ICountryCode }) => void;
 
     /**
      * A function to format the input value, allowing for transformation 
      * of the text (e.g., converting to uppercase, converting to number).
      */
     toCase: (value: any, phoneCountryCode?: ICountryCode) => IInputFormatterResult & { phoneCountryCode?: ICountryCode }
+
+    /**
+     * Whether the label is embeded in the input.
+     */
+    renderedWithLabel: boolean;
 };
 
 
@@ -123,7 +240,8 @@ export interface ITextInputOnChangeEvent extends NativeSyntheticEvent<TextInputC
  * This interface combines multiple other interfaces and includes additional properties
  * specific to text field changes.
  * 
- * @interface ITextInputOnChangeOptions
+ * @template ValueType - The type of the value associated with the text input.
+ *
  * @extends {IInputFormatterResult} Represents the result of a formatted value obtained via the `formatValue` function in the @resk/core package.
  * @extends {IOnChangeOptions<any, ITextInputOnChangeEvent>}
  * 
@@ -141,9 +259,9 @@ export interface ITextInputOnChangeEvent extends NativeSyntheticEvent<TextInputC
  * @property {boolean} [isFocused] - Indicates whether the text field is isFocused at the time of the change.
  * @property {string} [fieldName] - The name of the field if it's part of a form.
  */
-export interface ITextInputOnChangeOptions extends Omit<IOnChangeOptions<ITextInputOnChangeEvent>, "event"> {
+export interface ITextInputOnChangeOptions<ValueType = any> extends Omit<IOnChangeOptions<ITextInputOnChangeEvent>, "event" | "value"> {
     event?: ITextInputOnChangeEvent;
-    value?: any;
+    value: ValueType;
     previousValue?: any;
     isFocused?: boolean;
     fieldName?: string;
@@ -151,11 +269,188 @@ export interface ITextInputOnChangeOptions extends Omit<IOnChangeOptions<ITextIn
     labelEmbeded: boolean;
 }
 
+/**
+ * Props for the custom render function of the {@link TextInput} component.
+ *
+ * This interface extends the standard React Native {@link TextInputProps} and adds a required `ref` property,
+ * allowing you to fully control and customize the rendering of the underlying TextInput element.
+ *
+ * Use this interface when implementing the `renderTextInput` prop of {@link ITextInputProps} to provide
+ * advanced rendering logic, custom wrappers, or additional behaviors.
+ *
+ * @property ref - A React ref to the underlying {@link TextInput} element. This allows for imperative focus, blur, or value access.
+ *
+ * @example
+ * ```tsx
+ * import { TextInput, ITextInputRenderOptions, ITextInputCallOptions } from "@resk/nativewind/components/TextInput";
+ *
+ * // Custom render function for TextInput
+ * const customRender = (inputProps: ITextInputRenderOptions, callOptions: ITextInputCallOptions) => (
+ *   <View style={{ borderColor: callOptions.error ? 'red' : 'gray', borderWidth: 1 }}>
+ *     <RNTextInput {...inputProps} ref={inputProps.ref} />
+ *     {callOptions.error && <Text style={{ color: 'red' }}>Invalid input</Text>}
+ *   </View>
+ * );
+ *
+ * // Usage in the TextInput component
+ * <TextInput
+ *   label="Custom"
+ *   renderTextInput={customRender}
+ * />
+ * ```
+ *
+ * @see {@link ITextInputProps.renderTextInput}
+ * @see {@link TextInputProps}
+ * @see {@link TextInput}
+ * @see {@link ITextInputCallOptions}
+ *
+ * @public
+ */
 export interface ITextInputRenderOptions extends TextInputProps {
     ref: React.Ref<TextInput>;
 }
 
-export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange' | 'defaultValue' | "label" | "ref">, Omit<IFieldBase, "type" | "value" | "label"> {
+/**
+ * @interface ITextInputProps
+ * Props for the universal, highly-configurable {@link TextInput} component.
+ *
+ * This interface defines all configuration options, event handlers, and styling overrides for the TextInput component,
+ * supporting advanced features such as input masking, phone/date formatting, validation, affixes, password visibility toggling,
+ * keyboard avoidance, custom rendering, accessibility, and seamless integration with Tailwind CSS utility classes.
+ *
+ * @extends Partial<TextInputProps>
+ * @extends Omit<IFieldBase, "type" | "value" | "label">
+ * @template ValueType - The type of the value associated with the text input.
+ *
+ * @property type - {@link ITextInputType} The input type (e.g., "text", "password", "number", "tel", "date", "datetime", "email", etc.).  
+ *   Determines keyboard type and formatting logic.  
+ *   @default "text"
+ *
+ * @property phoneCountryCode - {@link ICountryCode} The country code for phone number formatting (used when `type="tel"`).
+ *
+ * @property length - The maximum length of text allowed in the input field. Useful for fixed-length inputs.
+ *
+ * @property defaultValue - The initial value of the text input field.  
+ *   @default ''
+ *
+ * @property containerClassName - {@link IClassName} Class name for the outermost container.
+ * @property contentContainerClassName - {@link IClassName} Class name for the container wrapping left/right fields and the input.
+ * @property inputContainerClassName - {@link IClassName} Class name for the closest parent of the input.
+ * @property rightContainerClassName - {@link IClassName} Class name for the right element's parent.
+ * @property leftContainerClassName - {@link IClassName} Class name for the left element's parent.
+ * @property labelClassName - {@link IClassName} Class name for the label.
+ * @property iconClassName - {@link IClassName} Class name for the input icon.
+ *
+ * @property withLabel - If `true`, displays a label with the input.
+ *
+ * @property affix - Function or node to display fixed text/values alongside the input (e.g., character count).  
+ *   If set to `false`, no affix is displayed.  
+ *   @default false  
+ *   @example
+ *   ```tsx
+ *   <TextInput maxLength={10} affix={({ value }) => `${value.length}/10`} />
+ *   ```
+ *
+ * @property onChange - Callback fired when the input value changes. Receives {@link ITextInputOnChangeOptions}.
+ *
+ * @property toCase - Function to transform the input value (e.g., uppercase, number conversion).
+ *
+ * @property emptyValue - The value considered as null or empty.  
+ *   @default null | ''
+ *
+ * @property debounceTimeout - Debounce interval (ms) for value changes.  
+ *   If set, `onChange` is called after the specified delay.  
+ *   @min 0
+ *
+ * @property disabled - If `true`, disables the input.
+ * @property error - If `true`, marks the input as having an error.
+ * @property opacity - Opacity of the input.
+ * @property isDropdownAnchor - If `true`, marks the input as an anchor for a dropdown.
+ *
+ * @property renderTextInput - Custom render function for the TextInput.  
+ *   Receives {@link ITextInputRenderOptions} and {@link ITextInputCallOptions}.  
+ *   @example
+ *   ```tsx
+ *   <TextInput renderTextInput={(inputProps, callOptions) => (
+ *     <CustomInput {...inputProps} icon={callOptions.isPhone ? <PhoneIcon /> : null} />
+ *   )} />
+ *   ```
+ *
+ * @property mask - Input mask for formatting (array of RegExp/string or function).  
+ *   @example
+ *   ```typescript
+ *   const zipCodeMask = [/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/];
+ *   ```
+ *
+ * @property labelEmbeded - If `true`, embeds the label inside the input field.
+ * @property suffixLabelWithMaskPlaceholder - If `true`, appends the mask placeholder to the label (when mask is provided and not embedded).
+ * @property maskOptions - Additional options for {@link InputFormatter.formatWithMask} (when mask is provided).
+ * @property handleMaskValidationErrors - If `true`, handles and displays mask validation errors, overriding `error` if mask is invalid.
+ * @property withKeyboardAvoidingView - If `true`, wraps the input in a KeyboardAvoidingView (mobile only).  
+ *   @default false
+ *
+ * @property variant - {@link IVariantPropsTextInput} The visual variant of the input.
+ * @property minHeight - Minimum height (for multiline).
+ * @property maxHeight - Maximum height (for multiline).
+ * @property ref - Ref to the underlying TextInput.
+ * @property left - Node or function for left adornment.
+ * @property right - Node or function for right adornment.
+ * @property label - Label text or element.
+ *
+ * @property passwordHiddenIconName - Icon name for "show password" (when hidden).  
+ *   @example "eye", "visibility", "show"
+ * @property passwordVisibleIconName - Icon name for "hide password" (when visible).  
+ *   @example "eye-off", "visibility-off", "hide"
+ *
+ * @property displayPhoneDialCode - If `true`, displays the phone dial code label.  
+ *   @default true
+ *
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <TextInput label="Name" placeholder="Enter your name" />
+ *
+ * // Password input with visibility toggle
+ * <TextInput type="password" label="Password" />
+ *
+ * // Phone input with mask and country code
+ * <TextInput type="tel" mask="+9 (999) 999-9999" phoneCountryCode="US" />
+ *
+ * // Date input with custom format and calendar icon
+ * <TextInput type="date" dateFormat="YYYY-MM-DD" right={<CalendarIcon />} />
+ *
+ * // Multiline input with character counter
+ * <TextInput multiline maxLength={200} affix={({ value }) => `${value.length}/200`} />
+ *
+ * // Custom rendering
+ * <TextInput renderTextInput={(inputProps, callOptions) => (
+ *   <CustomInput {...inputProps} icon={callOptions.isPhone ? <PhoneIcon /> : null} />
+ * )} />
+ * ```
+ *
+ * @see {@link TextInput}
+ * @see {@link ITextInputType}
+ * @see {@link ITextInputCallOptions}
+ * @see {@link ITextInputRenderOptions}
+ * @see {@link IInputFormatterMask}
+ * @see {@link InputFormatter}
+ * @see {@link ICountryCode}
+ * @see {@link IVariantPropsTextInput}
+ * @see {@link InputFormatter.formatWithMask}
+ * @see {@link ITextInputOnChangeOptions}
+ * @see {@link IFieldBase}
+ * @see {@link IClassName}
+ * @see {@link IFontIconName}
+ * @see {@link KeyboardAvoidingView}
+ * @see {@link textInputVariant}
+ * @see {@link allVariants}
+ * @see {@link extractTextClasses}
+ * @see {@link areCasesEquals}
+ * @see {@link isDecimalType}
+ *
+ * @public
+ */
+export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInputProps>, 'onChange' | 'defaultValue' | "label" | "ref">, Omit<IFieldBase, "type" | "value" | "label"> {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 
@@ -238,7 +533,7 @@ export interface ITextInputProps extends Omit<Partial<TextInputProps>, 'onChange
      * of the input changes. The function receives an object of type 
      * `ITextInputOnChangeOptions` as an argument.
      */
-    onChange?: (options: ITextInputOnChangeOptions) => any;
+    onChange?: (options: ITextInputOnChangeOptions<ValueType>) => any;
 
     /**
      * A function to format the input value, allowing for transformation 

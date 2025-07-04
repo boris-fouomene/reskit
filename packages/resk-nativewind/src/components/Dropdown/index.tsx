@@ -867,7 +867,7 @@ export interface IDropdownCallOptions<ItemType = any, ValueType = any> {
     value: ValueType;
 }
 
-export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps, "onChange" | "ref" | "multiline"> {
+export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps<ValueType>, "onChange" | "ref" | "multiline"> {
     items?: ItemType[]; // An optional array of items to be displayed in the dropdown
     testID?: string; // An optional test ID for the dropdown
     /***

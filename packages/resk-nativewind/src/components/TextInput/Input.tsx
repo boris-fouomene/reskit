@@ -21,8 +21,83 @@ import { classes } from "@variants/classes";
 
 const isNative = p.isNative();
 
-
-export default function TextInput({
+/**
+ * Universal, highly-configurable TextInput component for React Native and web.
+ *
+ * This component supports advanced features such as input masking, phone and date formatting, validation, affixes, password visibility toggling, keyboard avoidance, and custom rendering.
+ * It is designed for accessibility, SSR/CSR hydration, and seamless integration with Tailwind CSS utility classes.
+ *
+ * @template ValueType - The type of the value associated with the text input.
+ * @param props - {@link ITextInputProps} All input props and configuration options.
+ * - `type`: Input type (e.g., "text", "password", "number", "tel", "date", "datetime", "email", etc.).
+ * - `mask`, `maskOptions`: Masking pattern and options for formatted inputs (phone, date, custom).
+ * - `secureTextEntry`: If `true`, hides input text (for passwords).
+ * - `withKeyboardAvoidingView`: If `true`, wraps input in a keyboard avoiding view component.
+ * - `affix`, `left`, `right`: Custom affix or icon components/functions for left/right input adornments.
+ * - `label`, `labelEmbeded`: Label text or element, optionally embedded inside the input row.
+ * - `onChange`, `onContentSizeChange`, `onFocus`, `onBlur`, `onKeyPress`: Event handlers for input events.
+ * - `variant`, `className`, `containerClassName`, etc.: Tailwind utility class overrides for styling.
+ * - `debounceTimeout`: Debounce delay for `onChange` callback.
+ * - `maxLength`, `length`: Character count/limit display and enforcement.
+ * - `readOnly`, `disabled`, `editable`: Input state controls.
+ * - `phoneCountryCode`, `displayPhoneDialCode`: Phone formatting and dial code display.
+ * - `placeholder`, `placeholderClassName`: Placeholder text and styling.
+ * - `minHeight`, `maxHeight`: Minimum and maximum input height (for multiline).
+ * - `renderTextInput`: Custom render function for the underlying input.
+ * - ...and many more advanced options.
+ *
+ * @returns The rendered input component, with all configured features and styling.
+ *
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <TextInput label="Name" placeholder="Enter your name" />
+ *
+ * // Password input with visibility toggle
+ * <TextInput type="password" label="Password" />
+ *
+ * // Phone input with mask and country code
+ * <TextInput type="tel" mask="+9 (999) 999-9999" phoneCountryCode="US" />
+ *
+ * // Date input with custom format and calendar icon
+ * <TextInput type="date" dateFormat="YYYY-MM-DD" right={<CalendarIcon />} />
+ *
+ * // Multiline input with character counter
+ * <TextInput multiline maxLength={200} affix={({ value }) => `${value.length}/200`} />
+ *
+ * // Custom rendering
+ * <TextInput renderTextInput={(inputProps, callOptions) => (
+ *   <CustomInput {...inputProps} icon={callOptions.isPhone ? <PhoneIcon /> : null} />
+ * )} />
+ * ```
+ *
+ * @remarks
+ * - Supports SSR/CSR hydration and accessibility best practices.
+ * - Input masking and formatting are handled via {@link InputFormatter}.
+ * - All event handlers receive rich context and validation info.
+ * - Easily style every part of the component with Tailwind utility classes.
+ * - Keyboard avoidance and focus management are built-in for mobile.
+ * - Designed for extensibility and composability in design systems.
+ *
+ * @see {@link ITextInputProps}
+ * @see {@link IInputFormatterResult}
+ * @see {@link InputFormatter}
+ * @see {@link useHydrationStatus}
+ * @see {@link useMergeRefs}
+ * @see {@link KeyboardAvoidingView}
+ * @see {@link textInputVariant}
+ * @see {@link allVariants}
+ * @see {@link extractTextClasses}
+ * @see {@link ITextInputCallOptions}
+ * @see {@link ITextInputRenderOptions}
+ * @see {@link ITextInputType}
+ * @see {@link ICountryCode}
+ * @see {@link areCasesEquals}
+ * @see {@link isDecimalType}
+ *
+ * @public
+ */
+export default function TextInput<ValueType = any>({
     readOnly,
     renderTextInput, testID, error: customError, phoneCountryCode: customPhoneCountryCode, handleMaskValidationErrors,
     defaultValue, toCase: cToCase, inputMode: cInputMode, dateFormat: customDateFormat, emptyValue: cIsEmptyValue,
@@ -59,7 +134,7 @@ export default function TextInput({
     placeholderClassName,
     isDropdownAnchor,
     ...props
-}: ITextInputProps) {
+}: ITextInputProps<ValueType>) {
     const isHydrated = useHydrationStatus();
     const isLabelEmbeded = !!labelEmbeded;
     const [isFocused, setIsFocused] = useState(false);
@@ -232,17 +307,21 @@ export default function TextInput({
 
     const labelClx = cn("flex flex-row self-center justify-start items-center input-label", isLabelEmbeded ? ["input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), !isLabelEmbeded ? [focusedLabelClx, errorLabelClx] : [focusedLabelEmbededClx, errorLabelEmbededClx], labelClassName);
     const inputClx = cn(multiline && "py-[5px]", "outline-none grow border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", canWrapWithTouchable && "cursor-pointer", computedVariant.input(), focusedInputClx, errorInputClx, className);
-    const inputTextClx = extractTextClasses(inputClx);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
     const rightContainerClx = cn(computedVariant.rightContainer(), rightContainerClassName);
     const contentContainerClx = cn(computedVariant.contentContainer(), focusedContentContainerClx, errorContentContainerClx, contentContainerClassName);
     const iconClx = cn(computedVariant.icon(), focusedIconClx, errorIconClx, iconClassName);
     const containerClx = cn(computedVariant.container(), containerClassName);
-    const phoneDialCodeClx = cn("input-phone-dial-code-label", inputTextClx);
+    const inputTextClx = extractTextClasses(inputClx);
     const labelTextClx = extractTextClasses(labelClx);
     const iconTextClx = extractTextClasses(iconClx);
-    const phoneDialCodeLabel = phoneDialCodeText ? <Text className={phoneDialCodeClx}>{phoneDialCodeText}</Text> : null;
-    const callOptions: ITextInputCallOptions = { toCase, ...inputState, isPhone, phoneDialCodeLabel, labelClassName: labelTextClx, iconClassName: iconTextClx, inputClassName: inputTextClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled };
+    const phoneDialCodeClx = cn("input-phone-dial-code-label", inputTextClx);
+    const phoneDialCodeLabel = displayPhoneDialCode && phoneDialCodeText ? <Text className={phoneDialCodeClx}>{phoneDialCodeText}</Text> : null;
+    const callOptions: ITextInputCallOptions = {
+        toCase, label, renderedWithLabel: withLabel !== false, ...inputState, inputState, setInputState: (newInputState) => (
+            setInputState((prev) => ({ ...prev, ...newInputState }))
+        ), isPhone, phoneDialCodeText, labelClassName: labelClx, labelTextClassName: labelTextClx, iconClassName: iconClx, iconTextClassName: iconTextClx, inputClassName: inputClx, inputTextClassName: inputTextClx, focus, labelEmbeded: isLabelEmbeded, error: !!error, isFocused, computedVariant, editable, disabled: !!disabled
+    };
     const minHeight = useMemo(() => {
         return typeof customMinHeight === "number" ? customMinHeight : isLabelEmbeded ? 30 : 46;
     }, [customMinHeight, isLabelEmbeded]);
@@ -393,7 +472,7 @@ export default function TextInput({
                 <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, cursorDefault, "grow", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
                     {leftContent}
                     {isLabelEmbeded ? labelContent : null}
-                    {displayPhoneDialCode && phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
+                    {phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
                     {isHydrated ? inputElement : <Text className={cn(inputClx, "animate-pulse", cursorDefault)} style={inputStyle}  >{String(inputValue)}</Text>}
                 </Div>
                 {rightContent ? (<Div className="right-content-wrapper self-center grow-0">

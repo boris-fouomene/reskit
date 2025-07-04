@@ -1,5 +1,6 @@
 import { IClassName } from "@src/types";
 import { cn } from "./cn";
+import "@resk/core/utils";
 
 /**
  * Represents categorized text styling classes extracted from NativeWind/Tailwind CSS
@@ -107,7 +108,7 @@ export function extractTextClasses(className: IClassName): string {
   const textClasses: string[] = [];
   const classes = className.split(/\s+/).filter(cls => {
     if (!cls.length) return false;
-    if (cls.startsWith("font-") || cls.startsWith("text-") || cls.includes("antialiased") || cls.includes("italic")) {
+    if (cls.startsWith("font-") || cls.startsWith("!font-") || cls.startsWith("!text-") || cls.startsWith("text-") || cls.includes("antialiased") || cls.includes("italic")) {
       textClasses.push(cls);
       return false;
     }
@@ -115,7 +116,7 @@ export function extractTextClasses(className: IClassName): string {
   });
   // Filter classes that match text patterns
   classes.forEach(cls => {
-    if (textPatternsArray.some(pattern => pattern.test(cls))) {
+    if (textPatternsArray.some(pattern => pattern.test(cls) || pattern.test(cls.ltrim("!")))) {
       textClasses.push(cls);
     }
   });

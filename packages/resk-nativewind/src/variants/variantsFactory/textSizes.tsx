@@ -1,9 +1,9 @@
 export const textSizes = {
     xs: "text-xs",
     sm: "text-sm",
-    md: "text-md",
     lg: "text-lg",
     xl: "text-xl",
+    base:"text-base",
     "2xl": "text-2xl",
     "3xl": "text-3xl",
     "4xl": "text-4xl",
@@ -44,9 +44,9 @@ export const textSizes = {
 export const IconSizes = {
     xs: "!text-xs",
     sm: "!text-sm",
-    md: "!text-md",
     lg: "!text-lg",
     xl: "!text-xl",
+    base:"!text-base",
     "2xl": "!text-2xl",
     "3xl": "!text-3xl",
     "4xl": "!text-4xl",

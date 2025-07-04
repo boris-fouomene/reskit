@@ -24,3 +24,4 @@ export * from "./ProgressBar";
 export * from "./TextInput"
 export * from "./Dropdown";
 export * from "./SelectCountry";
+export * from "./BottomSheet";

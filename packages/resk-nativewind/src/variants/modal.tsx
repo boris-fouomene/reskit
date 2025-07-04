@@ -30,8 +30,6 @@ const modal = tv({
     defaultVariants: {
         colorScheme: "surface",
         rounded: "rounded",
-        shadow: "md",
-        shadowColor: "surface"
     }
 });
 

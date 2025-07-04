@@ -352,9 +352,11 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     onRequestOpen?: (menuState: IMenuState) => void;
 
     /***
-     * The class name for the backdrop.
+     * The class name for the portal that wraps the menu.
+     * This is used to customize the appearance of the portal that wraps the menu.
+     * It can be used to change the background color, add padding, or modify the positioning of the portal.
      */
-    backdropClassName?: IClassName;
+    portalClassName?: IClassName;
 
     /***
      * Whether the menu should be rendered as a bottom sheet in full screen mode.

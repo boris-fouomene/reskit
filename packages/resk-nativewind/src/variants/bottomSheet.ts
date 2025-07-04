@@ -5,17 +5,13 @@ import { classes } from "./classes";
 
 const bottomSheet = tv({
   slots: {
-    container: "relative w-full shadow-xl px-2",
-    contentContainer: "w-full h-full",
+    base: "relative w-full shadow-xl px-2",
     portal: "flex flex-col flex-1 justify-end transform translate-y-full transition",
   },
   variants: {
     withBackdrop: {
       true: {
         portal: classes.backdrop,
-      },
-      false: {
-        portal: "",
       },
     },
     visible: {
@@ -26,14 +22,14 @@ const bottomSheet = tv({
         portal: "tranlate-y-full",
       },
     },
-    ...VariantsFactory.createAll<{ container: string }>((value) => {
+    ...VariantsFactory.createAll<{ base: string }>((value) => {
       return {
-        container: value,
+        base: value,
       };
     }),
-    colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { container: string }>(VariantsColors.surface, (value) => {
+    colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { base: string }>(VariantsColors.surface, (value) => {
       return {
-        container: value,
+        base: value,
       };
     }),
     ...VariantsFactory.createTransitions<{ portal: string }>((value) => {

@@ -41,7 +41,7 @@ export function Menu<Context = unknown>({
     renderAsBottomSheetInFullScreen,
     bottomSheetTitle,
     bottomSheetTitleDivider,
-    backdropClassName,
+    portalClassName,
     maxHeight,
     className,
     scrollViewClassName,
@@ -227,13 +227,13 @@ export function Menu<Context = unknown>({
                 {anchor}
             </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal autoMountChildren visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), backdropClassName, "menu-portal")}>
+        {<Portal autoMountChildren visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), portalClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
                 <View
                     testID={testID}
                     {...props}
                     ref={ref}
-                    className={cn("resk-menu absolute", renderedAsBottomSheet ? computedBottomSheetVariant.container() : computedVariant.container(), className)}
+                    className={cn("resk-menu absolute", renderedAsBottomSheet ? computedBottomSheetVariant.base() : computedVariant.container(), className)}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
                             onLayout(event);
@@ -242,7 +242,7 @@ export function Menu<Context = unknown>({
                     }}
                     style={StyleSheet.flatten([!renderedAsBottomSheet && menuStyle, props.style])}
                 >
-                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.contentContainer(), contentContainerClassName)}>
+                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full", renderedAsBottomSheet ? "w-full h-full" : computedVariant.contentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
                                 <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[10px]">

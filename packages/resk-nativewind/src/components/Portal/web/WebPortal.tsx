@@ -36,7 +36,7 @@ export function Portal({ children, onAccessibilityEscape, autoMountChildren, sty
     }, [target]);
     useAccessibilityEscape(target, onAccessibilityEscape, shouldRender);
     useEffect(() => {
-        if (isVisible && !shouldRender) {
+        if (!shouldRender) {
             setShouldRender(true);
         }
     }, []);

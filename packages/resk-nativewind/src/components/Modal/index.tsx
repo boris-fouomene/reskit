@@ -10,7 +10,7 @@ import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
 import modalVariants, { IVariantPropsModal } from "@variants/modal";
 
-export const Modal = ({ visible, testID, backdropClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable: customDismissable, onRequestClose, ...props }: IModalProps) => {
+export const Modal = ({ visible, testID, portalClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable: customDismissable, onRequestClose, ...props }: IModalProps) => {
   const children = useMemo(() => {
     return props.children;
   }, [props.children]);
@@ -24,14 +24,12 @@ export const Modal = ({ visible, testID, backdropClassName, onPress, variant, cl
     return true;
   }
   useBackHandler(dismissable ? handleRequestClose : () => true);
-  if (visible) {
-    console.log("modal visible shouldrender ", props)
-  }
   return (
-    <Portal absoluteFill
+    <Portal
+      absoluteFill
       visible={visible}
       testID={testID + "-modal-portal"}
-      onPress={dismissable ? handleRequestClose : undefined} withBackdrop className={cn("modal-portal-container", modalVariant.container(), backdropClassName)}
+      onPress={dismissable ? handleRequestClose : undefined} withBackdrop className={cn("modal-portal", modalVariant.container(), portalClassName)}
       onAccessibilityEscape={() => {
         if (typeof onAccessibilityEscape === "function") {
           onAccessibilityEscape();
@@ -59,7 +57,7 @@ export interface IModalProps extends IHtmlDivProps {
  * If set to true, the modal will be displayed; otherwise, it will be hidden. */
   visible?: boolean;
 
-  backdropClassName?: IClassName;
+  portalClassName?: IClassName;
   /**
    * A callback function that is called when an attempt is made to close the modal. 
    * The event parameter can be either a GestureResponderEvent or a KeyboardEvent.

@@ -6,7 +6,7 @@ import { useState } from "react";
 
 export function BottomSheetExample() {
     const [visible, setVisible] = useState(false);
-    return <>
+    return <Div className="w-full">
         <HStack>
             <H2>BottomSheet examples</H2>
         </HStack>
@@ -16,5 +16,5 @@ export function BottomSheetExample() {
             </Div>
         </BottomSheet>
         <Button onPress={() => setVisible(true)}>Open Bototm Sheet</Button>
-    </>
+    </Div>
 }

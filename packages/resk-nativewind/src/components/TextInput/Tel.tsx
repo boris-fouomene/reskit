@@ -54,10 +54,9 @@ import { Text } from "@html/Text";
  *
  * @public
  */
-export function TelInput({ type, ...props }: ITelInputProps) {
+export function TelInput(props: ITelInputProps) {
     return <TextInput<string>
         displayPhoneDialCode={false}
-        type={"tel"}
         renderTextInput={(inputProps, { formatValue, updateInputState, phoneCountryCode, inputTextClassName, label, labelTextClassName, iconTextClassName, phoneDialCodeText, editable, disabled }) => {
             return <>
                 <SelectCountry
@@ -103,11 +102,10 @@ export function TelInput({ type, ...props }: ITelInputProps) {
             </>
         }}
         {...props}
+        type={"tel"}
     />
 }
 
 TextInput.displayName = "TextInput.Tel";
 
-export interface ITelInputProps extends Omit<ITextInputProps<string>, "type"> {
-    type: "tel";
-}
+export interface ITelInputProps extends Omit<ITextInputProps<string>, "type"> { }

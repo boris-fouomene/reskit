@@ -2,9 +2,8 @@ import { Div } from '@html/Div';
 import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, useId, JSX } from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { cn } from '@utils/cn';
-import { styles } from './utils';
+import { classes } from '@variants/classes';
 import { IPortalProps } from './types';
-import { classes } from './utils';
 import allVariants from "@variants/all";
 
 /**
@@ -148,16 +147,17 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
 };
 
 function RenderedPortal({ children, autoMountChildren, className, withBackdrop, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
-    const shouldRender = !!visible //|| !!autoMountChildren;
-    if (!shouldRender || true) return null;
+    const shouldRender = !!visible;
+    if (!shouldRender) return null;
     absoluteFill = withBackdrop || absoluteFill;
-    const absoluteFillStyle = absoluteFill ? styles.absoluteFill : undefined;
     const handleBackdrop = withBackdrop || absoluteFill;
+    const absoluteFillStyle = absoluteFill ? { ...StyleSheet.absoluteFillObject, pointerEvents: visible ? "auto" : "none" } : {};
     zIndex = visible ? (1000 + zIndex) : 0;
-    const flattenStyle = StyleSheet.flatten([{ zIndex } as ViewStyle, style] as any);
+    const hiddenClass = !visible && cn(absoluteFill ? classes.absoluteFillHidden : classes.hidden);
+    const flattenStyle = StyleSheet.flatten([{ zIndex } as ViewStyle, absoluteFillStyle, style] as any);
     const backdropClassName = cn(allVariants({ backdrop: withBackdrop }));
-    return <Div {...props} onPress={!handleBackdrop ? onPress : undefined} className={cn(!handleBackdrop && backdropClassName, className, !visible && classes.hidden)} style={Object.assign({}, absoluteFillStyle, flattenStyle)}>
-        {handleBackdrop && visible ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", backdropClassName)} style={absoluteFillStyle} onPress={onPress} /> : null}
+    return <Div {...props} onPress={!handleBackdrop ? onPress : undefined} className={cn(!handleBackdrop && backdropClassName, className, hiddenClass)} style={flattenStyle}>
+        {handleBackdrop && visible ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", backdropClassName, hiddenClass)} style={absoluteFillStyle} onPress={onPress} /> : null}
         {children || null}
     </Div>
 };

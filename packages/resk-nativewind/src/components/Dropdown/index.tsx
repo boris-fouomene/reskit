@@ -408,7 +408,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
                 } : undefined,
             ];
         }
-        return actions;
+        return actions.filter((a) => !!a);
     }, [dropdownActions, multiple, context.isOpen(), context, anchorSelectedText]);
     const loadingContent = isLoading ? <ProgressBar indeterminate testID={testID + "dropdown-progressbar"} /> : null;
     const anchorProps: ITextInputProps = {

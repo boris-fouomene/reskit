@@ -7,12 +7,11 @@ import { IPortalProps } from '../types';
 import { normalizeGestureEvent } from '@html/events';
 import allVariants from '@variants/all';
 import { StyleSheet } from 'react-native';
-import { classes } from '@variants/classes';
 import { Div } from "@html/Div";
 import { useAccessibilityEscape } from '@html/accessibility';
 import useStateCallback from '@utils/stateCallback';
 import { isNextJs } from '@platform/isNext';
-import { classes as utilClasses } from '../utils';
+import { classes } from '@variants/classes';
 
 
 export function Portal({ children, onAccessibilityEscape, autoMountChildren, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
@@ -42,6 +41,8 @@ export function Portal({ children, onAccessibilityEscape, autoMountChildren, sty
     }, []);
     if (!shouldRender || typeof document === "undefined" || !document || !document?.body) return null;
     const hasOnPress = typeof onPress == "function";
+    absoluteFill = withBackdrop || absoluteFill;
+    const hiddenClass = !visible && cn(absoluteFill ? classes.absoluteFillHidden : classes.hidden);
     return createPortal(<Div
         onPress={hasOnPress ? function (event) {
             const element = document.querySelector(target) as HTMLElement;
@@ -51,7 +52,7 @@ export function Portal({ children, onAccessibilityEscape, autoMountChildren, sty
         id={targetId}
         testID={defaultStr(testID, "portal-" + targetId)}
         style={StyleSheet.flatten([{ zIndex: visible ? (Math.max(getMaxZindex(), 1000) + 1) : 0 }, style])}
-        className={cn(absoluteFill && classes.absoluteFill, hasOnPress && "pointer-events-auto", "portal", allVariants({ backdrop: withBackdrop }), className, !visible && utilClasses.hidden)}
+        className={cn(hasOnPress && "pointer-events-auto", "portal", allVariants({ backdrop: withBackdrop }), className, hiddenClass)}
     >
         {children}
     </Div>, document.querySelector("#reskit-app-root") || document.body);

@@ -278,12 +278,16 @@ export interface IMenuState {
 
 export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children" | "style" | "className" | "ref">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
 
-    /** Optional callback that is invoked when the menu opens. */
+    /** Optional callback that is invoked when the menu opens.
+     * It's only considered when the menu is not controlled externally by providing the visible prop.
+     */
     onOpen?: () => void;
 
     ref?: React.Ref<View & IMenuContext<Context>>;
 
-    /** Required callback that is invoked when the menu closes. */
+    /** Required callback that is invoked when the menu closes.
+     * It's only considered when the menu is not controlled externally by providing the visible prop.
+     */
     onClose?: () => void;
 
     /** The anchor element or function associated with the Menu component. */
@@ -332,24 +336,26 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     /***
         The callback function that is called when the menu is dismissed.
         This is considered when the menu is controlled externally by providing the visible prop.
+        @param {IMenuContext<Context>} menuContext The current menu context.
         @remarks
         This function is called when the menu is dismissed, either by clicking outside the menu or by pressing the escape key.
         It is used to update the visible state of the menu.
         This is useful when the menu is controlled externally by providing the visible prop.
         If the menu is not controlled externally, this function is not called.
     */
-    onRequestClose?: (menuState: IMenuState) => void;
+    onRequestClose?: (menuContext: IMenuContext<Context>) => void;
 
     /***
         The callback function that is called when the menu is opened.
         This is considered when the menu is controlled externally by providing the visible prop.
+        @param {IMenuContext<Context>} menuContext The current menu context.
         @remarks
         This function is called when the menu is opened, either by clicking on the anchor element or by pressing the menu button.
         It is used to update the visible state of the menu.
         This is useful when the menu is controlled externally by providing the visible prop.
         If the menu is not controlled externally, this function is not called.
     */
-    onRequestOpen?: (menuState: IMenuState) => void;
+    onRequestOpen?: (menuContext: IMenuContext<Context>) => void;
 
     /***
      * The class name for the portal that wraps the menu.

@@ -249,15 +249,13 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
     open(cb?: Function) {
         const { isLoading, readOnly, disabled } = this.props;
         if (isLoading || readOnly || disabled || this.state.visible) return;
-        this?.menuContext?.menu?.measureAnchor(true).then(() => {
-            this.setState({ visible: true }, () => {
-                this.trigger("open", this);
-                this.trigger("toggleVisibility", this);
-                if (typeof cb == "function") {
-                    cb();
-                }
-            })
-        })
+        this.setState({ visible: true }, () => {
+            this.trigger("open", this);
+            this.trigger("toggleVisibility", this);
+            if (typeof cb == "function") {
+                cb();
+            }
+        });
     }
     close(cb?: Function) {
         if (this.state.visible) {
@@ -441,17 +439,18 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         testID={testID + "-menu"}
         renderAsBottomSheetInFullScreen
         visible={visible}
-        withScrollView={false}
-        onRequestClose={() => context.close()}
+        onRequestClose={() => context?.close?.()}
+        onRequestOpen={() => context?.open?.()}
         sameWidth
         {...Object.assign({}, menuProps)}
+        withScrollView={false}
         ref={context.getMenuRef.bind(context)}
         anchor={<Div
             disabled={disabled}
             testID={`${testID}-dropdown-anchor-container`}
             className={cn(anchorContainerClassName)}
         >
-            <Tooltip title={anchorSelectedText} disabled={disabled} onPress={editable !== false ? () => context?.open() : undefined}>
+            <Tooltip title={anchorSelectedText} disabled={disabled} onPress={editable !== false ? () => context.open?.() : undefined}>
                 <>
                     {typeof anchor == "function" ? anchor({ ...anchorProps, selectedItems, selectedValues, multiple: !!multiple, isLoading, dropdown: context })
                         :

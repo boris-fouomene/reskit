@@ -4,7 +4,7 @@
 
 @keyframes progressbarindeterminate {
     0% {
-        transform: translateX(0) scaleX(0);
+        transform: translateX(-100) scaleX(0);
     }
 
     20% {

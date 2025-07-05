@@ -1,6 +1,6 @@
 "use client";
 import { defaultStr, getMaxZindex } from '@resk/core/utils';
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@utils/cn';
 import { IPortalProps } from '../types';
@@ -9,17 +9,21 @@ import allVariants from '@variants/all';
 import { StyleSheet } from 'react-native';
 import { Div } from "@html/Div";
 import { useAccessibilityEscape } from '@html/accessibility';
-import useStateCallback from '@utils/stateCallback';
+import { getClasses } from '../utils';
 import { isNextJs } from '@platform/isNext';
-import { classes } from '@variants/classes';
 
 
-export function Portal({ children, onAccessibilityEscape, autoMountChildren, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
-    const isVisible = !!visible || !!autoMountChildren;
-    const [shouldRender, setShouldRender] = useStateCallback(isVisible && !isNextJs());
+export function Portal({ children, onAccessibilityEscape, style, className, onPress, withBackdrop, visible, absoluteFill, id, testID }: IPortalProps) {
+    const { visibleClassName, backdropClassName, handleBackdrop } = getClasses({ visible, absoluteFill, withBackdrop });
     const uId = useId();
     const targetId = defaultStr(id, uId);
     const target = `#${targetId}`;
+    const [shouldRender, setShouldRender] = useState(typeof document !== "undefined" && typeof document.body !== "undefined" && !isNextJs());
+    useEffect(() => {
+        if (!shouldRender && typeof document !== "undefined" && typeof document.body !== "undefined") {
+            setShouldRender(true);
+        }
+    }, []);
     useEffect(() => {
         return () => {
             if (typeof document === "undefined" || !document || !document?.body) return;
@@ -33,16 +37,9 @@ export function Portal({ children, onAccessibilityEscape, autoMountChildren, sty
             }
         }
     }, [target]);
-    useAccessibilityEscape(target, onAccessibilityEscape, shouldRender);
-    useEffect(() => {
-        if (!shouldRender) {
-            setShouldRender(true);
-        }
-    }, []);
-    if (!shouldRender || typeof document === "undefined" || !document || !document?.body) return null;
+    useAccessibilityEscape(target, onAccessibilityEscape);
+    if (!shouldRender) return null;
     const hasOnPress = typeof onPress == "function";
-    absoluteFill = withBackdrop || absoluteFill;
-    const hiddenClass = !visible && cn(absoluteFill ? classes.absoluteFillHidden : classes.hidden);
     return createPortal(<Div
         onPress={hasOnPress ? function (event) {
             const element = document.querySelector(target) as HTMLElement;
@@ -52,8 +49,8 @@ export function Portal({ children, onAccessibilityEscape, autoMountChildren, sty
         id={targetId}
         testID={defaultStr(testID, "portal-" + targetId)}
         style={StyleSheet.flatten([{ zIndex: visible ? (Math.max(getMaxZindex(), 1000) + 1) : 0 }, style])}
-        className={cn(hasOnPress && "pointer-events-auto", "portal", allVariants({ backdrop: withBackdrop }), className, hiddenClass)}
+        className={cn(hasOnPress && "pointer-events-auto", "portal", allVariants({ backdrop: withBackdrop }), backdropClassName, className, visibleClassName)}
     >
-        {children}
+        {visible ? children : null}
     </Div>, document.querySelector("#reskit-app-root") || document.body);
 };

@@ -60,7 +60,7 @@ export function Menu<Context = unknown>({
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
-    const openOrCloseCallbackRef = useRef<Function | null>(null);
+    const menuContextRef = useRef<IMenuContext<Context> | null>(null);
     fullScreenOnMobile = typeof fullScreenOnMobile === "boolean" ? fullScreenOnMobile : !!(renderAsBottomSheetInFullScreen);
     fullScreenOnTablet = typeof fullScreenOnTablet === "boolean" ? fullScreenOnTablet : !!(renderAsBottomSheetInFullScreen);
     const [state, setState] = useStateCallback({
@@ -81,13 +81,6 @@ export function Menu<Context = unknown>({
     const isVisible = useMemo(() => {
         return isControlled ? !!visible : state.visible;
     }, [state.visible, isControlled, visible]);
-    const prevVisible = usePrevious(isVisible);
-    useEffect(() => {
-        if (isVisible !== prevVisible && isControlled && typeof openOrCloseCallbackRef.current == "function") {
-            openOrCloseCallbackRef.current();
-        }
-        openOrCloseCallbackRef.current = null;
-    }, [isVisible, isControlled, prevVisible]);
     const { menuPosition, menuStyle, isDesktop, isMobile, isTablet, windowWidth, windowHeight, fullScreen } = useMenuPosition({
         ...props,
         fullScreenOnMobile,
@@ -129,47 +122,56 @@ export function Menu<Context = unknown>({
         });
     }
     useEffect(() => {
-        measureAnchor();
+        if (visible) {
+            measureAnchor(true);
+        }
     }, [windowWidth, windowHeight, anchorRef]);
+    useEffect(() => {
+        if (isControlled && visible !== state.visible) {
+            if (visible) {
+                measureAnchor(false).then((measures) => {
+                    setState((prev) => ({ ...prev, anchorMeasurements: measures, visible }));
+                })
+            } else {
+                setState((prev) => ({ ...prev, visible } as any));
+            }
+        }
+    }, [isControlled, visible, state.visible]);
     const open = (callback?: Function) => {
         measureAnchor(false).then((measures) => {
-            const cb = () => {
+            if (isControlled) {
+                if (typeof onRequestOpen === "function") {
+                    onRequestOpen(menuContextRef.current as any);
+                }
+                return;
+            }
+            setState((prevState) => {
+                return { ...prevState, anchorMeasurements: measures, visible: true }
+            }, () => {
                 if (typeof callback === "function") {
                     callback();
                 }
                 if (typeof onOpen === "function") {
                     onOpen();
                 }
-            };
-            if (isControlled) {
-                (openOrCloseCallbackRef as any).current = cb;
-                setState((prevState) => {
-                    return { ...prevState, anchorMeasurements: measures }
-                }, onRequestOpen);
-                return;
-            }
-            setState((prevState) => {
-                return { ...prevState, anchorMeasurements: measures, visible: true }
-            }, cb);
+            });
         });
     };
     const close = (callback?: Function) => {
-        const cb = () => {
+        if (isControlled) {
+            if (typeof onRequestClose == "function") {
+                onRequestClose(menuContextRef.current as any);
+            }
+            return;
+        }
+        setState((prevState) => ({ ...prevState, visible: false }), () => {
             if (typeof callback === "function") {
                 callback();
             }
             if (typeof onClose === "function") {
                 onClose();
             }
-        };
-        if (isControlled) {
-            (openOrCloseCallbackRef as any).current = cb;
-            if (typeof onRequestClose === "function") {
-                onRequestClose(state);
-            }
-            return;
-        }
-        setState((prevState) => ({ ...prevState, visible: false }), cb);
+        });
     };
     const renderedAsBottomSheet = fullScreen && renderAsBottomSheetInFullScreen !== false;
     const computedBottomSheetVariant = bottomSheetVariant(Object.assign({}, bVariant, { visible: isVisible }));
@@ -177,6 +179,7 @@ export function Menu<Context = unknown>({
     const maxMenuHeight = !renderedAsBottomSheet && isNumber(_maxMenuHeight) && _maxMenuHeight > 0 ? _maxMenuHeight : undefined;
     const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { maxHeight: maxMenuHeight, measureAnchor, renderedAsBottomSheet, windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
     useImperativeHandle(ref, () => context as any);
+    menuContextRef.current = context;
     let anchor = null;
     if (typeof customAnchor === 'function') {
         const a = customAnchor(context);
@@ -226,7 +229,7 @@ export function Menu<Context = unknown>({
                 {anchor}
             </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal autoMountChildren visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), portalClassName, "menu-portal")}>
+        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), portalClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
                 <View
                     testID={testID}

@@ -1,10 +1,9 @@
 import { Div } from '@html/Div';
-import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, useId, JSX } from 'react';
+import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, useId, JSX, useState } from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { cn } from '@utils/cn';
-import { classes } from '@variants/classes';
 import { IPortalProps } from './types';
-import allVariants from "@variants/all";
+import { getClasses } from './utils';
 
 /**
  * @interface IPortalItem
@@ -108,7 +107,7 @@ const InternalPortalContext = createContext<IPortalContext | undefined>(undefine
 export function PortalProvider({ children }: { children?: ReactNode }): JSX.Element {
     const portalRefs = useRef<IPortalItem[]>([]);
     const addPortal = (key: string, children: ReactNode, props?: Omit<IPortalProps, "children">) => {
-        portalRefs.current = [...portalRefs.current.filter(portal => portal?.key !== key), { key, children, props }];
+        portalRefs.current = [...portalRefs.current.filter(portal => portal.key !== key), { key, children, props }];
         updatePortalLayer();
     };
 
@@ -121,10 +120,7 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
         portalRefs.current = portalRefs.current.filter((portal) => portal.key !== key);
         updatePortalLayer();
     };
-    const updatePortalLayer = () => {
-        forceUpdate();
-    };
-    const [, forceUpdate] = useReducer((x) => x + 1, 0);
+    const [, updatePortalLayer] = useReducer((x) => Object.create(null), Object.create(null));
     const testID = "portal";
     return (
         <InternalPortalContext.Provider value={{ addPortal, removePortal, portals: portalRefs.current }}>
@@ -132,7 +128,7 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
                 {children}
                 {portalRefs.current.map(({ key, children, props }, index) => {
                     return (
-                        <RenderedPortal
+                        <PortalItem
                             testID={`${testID}-${index + 1}`}
                             key={key}
                             zIndex={index + 1}
@@ -146,22 +142,16 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     );
 };
 
-function RenderedPortal({ children, autoMountChildren, className, withBackdrop, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
-    const shouldRender = !!visible;
-    if (!shouldRender) return null;
-    absoluteFill = withBackdrop || absoluteFill;
-    const handleBackdrop = withBackdrop || absoluteFill;
-    const absoluteFillStyle = absoluteFill ? { ...StyleSheet.absoluteFillObject, pointerEvents: visible ? "auto" : "none" } : {};
+function PortalItem({ children, className, withBackdrop, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
     zIndex = visible ? (1000 + zIndex) : 0;
-    const hiddenClass = !visible && cn(absoluteFill ? classes.absoluteFillHidden : classes.hidden);
-    const flattenStyle = StyleSheet.flatten([{ zIndex } as ViewStyle, absoluteFillStyle, style] as any);
-    const backdropClassName = cn(allVariants({ backdrop: withBackdrop }));
-    return <Div {...props} onPress={!handleBackdrop ? onPress : undefined} className={cn(!handleBackdrop && backdropClassName, className, hiddenClass)} style={flattenStyle}>
-        {handleBackdrop && visible ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", backdropClassName, hiddenClass)} style={absoluteFillStyle} onPress={onPress} /> : null}
-        {children || null}
+    const flattenStyle = StyleSheet.flatten([{ zIndex } as ViewStyle, style] as any);
+    const { backdropClassName, handleBackdrop, visibleClassName } = getClasses({ visible, absoluteFill, withBackdrop });
+    return <Div {...props} className={cn(backdropClassName, className, visibleClassName)} style={flattenStyle} onPress={handleBackdrop ? undefined : onPress}>
+        {handleBackdrop ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", visibleClassName, "bg-transparent")} onPress={onPress} /> : null}
+        {visible ? children : null}
     </Div>
 };
-RenderedPortal.displayName = "Portal.Rendered";
+PortalItem.displayName = "Portal.Item";
 /**
  * Custom hook to access the portal context and manage adding or removing portals.
  * 
@@ -211,14 +201,11 @@ export function Portal({ children, ...props }: IPortalProps) {
         if (typeof addPortal === "function") {
             addPortal(key, children, props);
         }
-        return () => {
-            typeof removePortal === "function" && removePortal(key);
-        }
-    }, [key, children]);
+    }, [key, children, props.visible, props.absoluteFill]);
     useEffect(() => {
         return () => {
             typeof removePortal === "function" && removePortal(key);
         }
-    }, [])
+    }, [key])
     return null;
 };

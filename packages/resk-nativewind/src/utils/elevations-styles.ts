@@ -1,7 +1,7 @@
 /***@see : https://github.com/Naeemur/react-native-elevation */
 import { IDict } from "@resk/core/types"
 import { isNumber } from "@resk/core/utils"
-import { Platform, ViewStyle } from "react-native"
+import { ImageStyle, Platform, TextStyle, ViewStyle } from "react-native"
 
 const webDepth: IDict = {
     umbra: [
@@ -102,11 +102,11 @@ const parseShadow = (raw: string) => {
     }
 }
 const maxElevation = 24;
-export function generateElevationStyle(depth: number = 0) : ViewStyle {
-    if(!isNumber(depth) ||depth < 0){
+export function generateElevationStyle(depth: number = 0): ViewStyle {
+    if (!isNumber(depth) || depth < 0) {
         depth = 0;
     }
-    depth = Math.min(depth,maxElevation);
+    depth = Math.min(depth, maxElevation);
     if (Platform.OS === "android") {
         return {
             elevation: depth
@@ -139,4 +139,19 @@ export function generateElevationStyle(depth: number = 0) : ViewStyle {
              ${webDepth.ambient[Math.max(0, depth - 1)]} ${webColor.ambient}
          `
     };
+}
+
+
+/**
+ * Computes a style object from the given elevation and style props.
+ * If the elevation prop is a number greater than 0, it will be used to generate a style object with the appropriate elevation.
+ * The style prop will then be merged with the generated style object using StyleSheet.flatten.
+ * If the elevation prop is not a number greater than 0, the style prop will be returned as is.
+ * @param {{ elevation?: number, style?: ViewStyle | TextStyle | ImageStyle }} props
+ * @returns {ViewStyle | TextStyle | ImageStyle}
+ */
+export function computeElevationStyle(props: { elevation?: number, style?: ViewStyle | TextStyle | ImageStyle }) {
+    const { elevation, style } = props;
+    const flattenStyle = isNumber(elevation) && elevation > 0 ? StyleSheet.flatten([generateElevationStyle(elevation), style]) : style;
+    return flattenStyle;
 }

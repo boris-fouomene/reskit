@@ -2,6 +2,9 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 import "@resk/core/utils";
+import Platform from "@platform";
+
+const isWeb = Platform.isWeb();
 
 const textInput = tv({
     slots: {
@@ -20,9 +23,9 @@ const textInput = tv({
         errorLabel: "",
         errorIcon: "",
         errorLabelEmbeded: "",
-        labelEmbeded: "",
+        labelEmbeded: "self-center",
         icon: "",
-        label: "",
+        label: "self-start",
         placeholder: ""
     },
     variants: {
@@ -50,16 +53,25 @@ const textInput = tv({
         rounded: VariantsFactory.createRounded<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
-        iconSize: VariantsFactory.createIconSizes<ITextInputSlots>((value, colorName) => {
+        iconSize: VariantsFactory.createIconSize<ITextInputSlots>((value, colorName) => {
+            return { icon: value }
+        }),
+        nativeIconSize: VariantsFactory.createNativeIconSize<ITextInputSlots>((value, colorName) => {
             return { icon: value }
         }),
         iconColor: VariantsFactory.create<typeof VariantsColors.icon, ITextInputSlots>(VariantsColors.icon, (value, colorName) => {
             return { icon: value }
         }),
-        labelTextSize: VariantsFactory.createTextSizes<ITextInputSlots>((value, colorName) => {
+        labelTextSize: VariantsFactory.createTextSize<ITextInputSlots>((value, colorName) => {
             return { label: value }
         }),
-        inputTextSize: VariantsFactory.createTextSizes<ITextInputSlots>((value, colorName) => {
+        nativeLabelTextSize: VariantsFactory.createNativeTextSize<ITextInputSlots>((value, colorName) => {
+            return { label: value }
+        }),
+        inputTextSize: VariantsFactory.createTextSize<ITextInputSlots>((value, colorName) => {
+            return { input: value, labelEmbeded: value }
+        }),
+        nativeInputTextSize: VariantsFactory.createNativeTextSize<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
         }),
         labelWeight: VariantsFactory.createFontWeight<ITextInputSlots>((value, colorName) => {
@@ -136,14 +148,14 @@ const textInput = tv({
                 errorContentContainer: value,
             }
         }),
-        focusedShadow: VariantsFactory.createShadow<ITextInputSlots>((value, colorName) => {
+        webFocusedShadow: VariantsFactory.createShadow<ITextInputSlots>((value, colorName) => {
             return {
-                focusedContentContainer: value,
+                focusedContentContainer: isWeb ? value : "",
             }
         }),
-        errorShadow: VariantsFactory.createShadow<ITextInputSlots>((value, colorName) => {
+        webErrorShadow: VariantsFactory.createShadow<ITextInputSlots>((value, colorName) => {
             return {
-                errorContentContainer: value,
+                errorContentContainer: isWeb ? value : "",
             }
         }),
         focusedShadowColor: VariantsFactory.createShadowColor<ITextInputSlots>((value, colorName) => {
@@ -153,7 +165,7 @@ const textInput = tv({
         }),
         errorShadowColor: VariantsFactory.createShadowColor<ITextInputSlots>((value, colorName) => {
             return {
-                errorContentContainer: value,
+                errorContentContainer: isWeb ? value : "",
             }
         }),
     },

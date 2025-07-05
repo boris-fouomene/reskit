@@ -12,13 +12,13 @@ const checkbox = tv({
         uncheckedLabelColor: ""
     },
     variants: {
-        iconSize: VariantsFactory.createIconSizes<{ icon: string, label: string }>((value) => {
+        iconSize: VariantsFactory.createIconSize<{ icon: string, label: string }>((value) => {
             return {
                 icon: value,
                 label: "",
             }
         }),
-        labelSize: VariantsFactory.createIconSizes<{ icon: string, label: string }>((value) => {
+        labelSize: VariantsFactory.createTextSize<{ icon: string, label: string }>((value) => {
             return {
                 icon: "",
                 label: value,

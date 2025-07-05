@@ -2,7 +2,8 @@ import { roundeClasses, roundedBottomClasses, roundedBottomLeftRadiusClasses, ro
 import { marginClasses, padding2marginClasses, paddingClasses } from "./padding2margin";
 import { borderClasses } from "./border";
 import { shadowClasses } from "./shadow";
-import { IconSizes, textSizes } from "./textSizes";
+import { textSizes } from "./textSizes";
+import { iconSizes } from "./iconSizes";
 import { fontWeightClasses } from "./fontWeight";
 import { textAlignClasses } from "./textAlignClasses";
 import { VariantsColors } from "@variants/colors/generated";
@@ -13,6 +14,7 @@ import { IClassName } from "@src/types";
 import { transitionEasing, transitions } from "./transitions";
 import { typedEntries } from "@resk/core/utils";
 import { opacityClasses } from "./opacity";
+import { create } from "domain";
 
 type IVariantFactoryMutator<InputType extends Record<IVariantKey, any>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
 type IVariantKey = string | number;
@@ -31,7 +33,6 @@ type IVariantCompositeResult<T extends Record<string, Record<IVariantKey, unknow
  * @remarks
  * - All methods are generic and support custom input and output types.
  * - The `create` method is the core utility, accepting any object and an optional mutator.
- * - Specialized methods (e.g., `createTextSizes`, `createIconSizes`) use predefined variant sets.
  * - Useful for generating design system variants, utility classes, or mapping values in a consistent way.
  *
  * @typeParam InputType - The type of the input object for variant creation.
@@ -102,11 +103,17 @@ export const VariantsFactory = {
       })
     ) as Record<keyof InputType, ResultType>;
   },
-  createTextSizes: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textSizes, ResultType>) {
-    return VariantsFactory.create<typeof textSizes, ResultType>(textSizes, variantMutator);
+  createTextSize: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textSizes.textSize, ResultType>) {
+    return VariantsFactory.create<typeof textSizes.textSize, ResultType>(textSizes.textSize, variantMutator);
   },
-  createIconSizes: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textSizes, ResultType>) {
-    return VariantsFactory.create<typeof IconSizes, ResultType>(IconSizes, variantMutator);
+  createNativeTextSize: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof textSizes.nativeTextSize, ResultType>) {
+    return VariantsFactory.create<typeof textSizes.nativeTextSize, ResultType>(textSizes.nativeTextSize, variantMutator);
+  },
+  createIconSize: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof iconSizes.iconSize, ResultType>) {
+    return VariantsFactory.create<typeof iconSizes.iconSize, ResultType>(iconSizes.iconSize, variantMutator);
+  },
+  createNativeIconSize: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof iconSizes.nativeIconSize, ResultType>) {
+    return VariantsFactory.create<typeof iconSizes.nativeIconSize, ResultType>(iconSizes.nativeIconSize, variantMutator);
   },
   createRounded: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
     return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);

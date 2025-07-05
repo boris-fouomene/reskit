@@ -16,7 +16,8 @@ const text = tv({
         },
         align: textAlignClasses,
         weight: fontWeightClasses,
-        size: VariantsFactory.createTextSizes(),
+        size: VariantsFactory.createTextSize(),
+        nativeSize: VariantsFactory.createNativeTextSize(),
     },
     compoundVariants: [
         {

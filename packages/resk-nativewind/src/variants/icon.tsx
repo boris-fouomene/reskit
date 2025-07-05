@@ -1,6 +1,5 @@
 import { tv, type VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
-import { IconSizes } from "./variantsFactory/textSizes";
 import { VariantsFactory } from "./variantsFactory";
 const icon = tv({
     variants: {
@@ -15,7 +14,8 @@ const icon = tv({
         activeOpacity: VariantsFactory.createActiveOpacity(),
         hoverOpacity: VariantsFactory.createHoverOpacity(),
         color: VariantsColors.icon,
-        size: IconSizes,
+        size: VariantsFactory.createIconSize(),
+        nativeSize: VariantsFactory.createNativeIconSize(),
     }
 });
 

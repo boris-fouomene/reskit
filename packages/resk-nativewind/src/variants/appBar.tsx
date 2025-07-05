@@ -31,10 +31,7 @@ const appBar = tv({
             }]
         })) as Record<IVariantsColors.ColorName, { base: string, title: string, subtitle: string, action: string, icon: string }>,
     },
-    defaultVariants: {
-        shadow: "md",
-        shadowColor: "surface",
-    }
+    defaultVariants: {}
 });
 
 export default appBar;

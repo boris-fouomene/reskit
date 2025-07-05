@@ -8,7 +8,7 @@ node_modules/
 !theme-to-css-vars.js
 !package.json
 !html.js
-
+!variants.json
 # Ignore specific folders
 test/
 src/

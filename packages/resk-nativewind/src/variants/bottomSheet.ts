@@ -5,7 +5,7 @@ import { classes } from "./classes";
 
 const bottomSheet = tv({
   slots: {
-    base: "relative w-full shadow-xl px-2",
+    base: "relative w-full px-2",
     portal: "flex flex-col flex-1 justify-end transform translate-y-full transition",
     content: "w-full h-full",
     appBar: "w-full", //appBar classes options

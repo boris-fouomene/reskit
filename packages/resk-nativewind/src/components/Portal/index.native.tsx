@@ -148,8 +148,8 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
 };
 
 function RenderedPortal({ children, autoMountChildren, className, withBackdrop, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
-    const shouldRender = !!visible || !!autoMountChildren;
-    if (!shouldRender) return null;
+    const shouldRender = !!visible //|| !!autoMountChildren;
+    if (!shouldRender || true) return null;
     absoluteFill = withBackdrop || absoluteFill;
     const absoluteFillStyle = absoluteFill ? styles.absoluteFill : undefined;
     const handleBackdrop = withBackdrop || absoluteFill;

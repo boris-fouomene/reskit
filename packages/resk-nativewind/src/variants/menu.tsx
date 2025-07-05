@@ -49,8 +49,6 @@ const menu = tv({
     defaultVariants: {
         colorScheme: "surface",
         paddingBottom: "4",
-        shadow: "md",
-        shadowColor: "surface",
         transitionDuration: 300,
         transitionEasing: "ease-in-out",
     }

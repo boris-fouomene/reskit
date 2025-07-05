@@ -28,12 +28,12 @@ const dropdownItem = tv({
         selectedIcon: value,
       };
     }),
-    selectedIconSize: VariantsFactory.createIconSizes<IDropdownIconSlots>((value, colorName) => {
+    selectedIconSize: VariantsFactory.createIconSize<IDropdownIconSlots>((value, colorName) => {
       return {
         selectedIcon: value,
       };
     }),
-    textSize: VariantsFactory.createTextSizes<IDropdownIconSlots>((value, colorName) => {
+    textSize: VariantsFactory.createTextSize<IDropdownIconSlots>((value, colorName) => {
       return {
         label: value,
       };
@@ -48,7 +48,7 @@ const dropdownItem = tv({
         label: value,
       };
     }),
-    selectedTextSize: VariantsFactory.createTextSizes<IDropdownIconSlots>((value, colorName) => {
+    selectedTextSize: VariantsFactory.createTextSize<IDropdownIconSlots>((value, colorName) => {
       return {
         selectedLabel: value,
       };

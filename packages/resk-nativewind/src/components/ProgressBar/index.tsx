@@ -34,7 +34,7 @@ import "./style";
  * <ProgressBar
  *   value={45}
  *   max={100}
- *   trackClassName="h-3 w-full bg-gray-800 rounded-full shadow-inner"
+ *   trackClassName="h-3 w-full bg-gray-800 rounded-full "
  *   fillClassName="h-full bg-gradient-to-r from-pink-500 to-yellow-500 rounded-full"
  *   showPercentage={true}
  * />
@@ -110,7 +110,7 @@ export function ProgressBar({
  * const customProps: IProgressBarProps = {
  *   value: 350,
  *   max: 500,
- *   trackClassName: "h-2 w-full bg-gray-200 rounded-full shadow-inner",
+ *   trackClassName: "h-2 w-full bg-gray-200 rounded-full",
  *   fillClassName: "h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all duration-300 ease-out",
  *   showPercentage: true,
  * };
@@ -181,7 +181,7 @@ export interface IProgressBarProps extends Omit<IHtmlDivProps, "children"> {
      * 
      * This className is applied to the outer container Div that represents the full
      * width background of the progress bar. Use this to customize the track's height,
-     * background color, border radius, shadows, and other visual properties.
+     * background color, border radius, and other visual properties.
      * 
      * @type {string}
      * @memberof IProgressBarProps
@@ -191,9 +191,6 @@ export interface IProgressBarProps extends Omit<IHtmlDivProps, "children"> {
      * ```typescript
      * // Thin progress bar with rounded corners
      * trackClassName="h-1 w-full bg-gray-100 rounded-full"
-     * 
-     * // Thick progress bar with shadow
-     * trackClassName="h-4 w-full bg-gray-300 rounded-lg shadow-inner"
      * 
      * // Custom colored track with gradient
      * trackClassName="h-2 w-full bg-gradient-to-r from-gray-100 to-gray-200 rounded"
@@ -225,9 +222,6 @@ export interface IProgressBarProps extends Omit<IHtmlDivProps, "children"> {
      * 
      * // Striped pattern with animation
      * fillClassName="h-full bg-orange-500 bg-stripes bg-stripes-white animate-stripes rounded"
-     * 
-     * // Solid color with glow effect
-     * fillClassName="h-full bg-red-500 shadow-lg shadow-red-500/50 rounded"
      * ```
      */
     fillClassName?: string;

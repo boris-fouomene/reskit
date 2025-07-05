@@ -101,28 +101,42 @@ interface ITextClassesClasses {
  * ```
  */
 export function extractTextClasses(className: IClassName): string {
-  className = cn(className)
-  if (!className || typeof className !== 'string') {
-    return '';
-  }
-  const textClasses: string[] = [];
-  const classes = className.split(/\s+/).filter(cls => {
-    if (!cls.length) return false;
-    if (cls.startsWith("font-") || cls.startsWith("!font-") || cls.startsWith("!text-") || cls.startsWith("text-") || cls.includes("antialiased") || cls.includes("italic")) {
-      textClasses.push(cls);
-      return false;
-    }
-    return true;
-  });
-  // Filter classes that match text patterns
-  classes.forEach(cls => {
-    if (textPatternsArray.some(pattern => pattern.test(cls) || pattern.test(cls.ltrim("!")))) {
-      textClasses.push(cls);
-    }
-  });
-  return textClasses.join(' ');
+  return cn(className).trim().split(/\s+/).filter(isTextClass).join(' ');
 }
-
+const isTextClass = (className: string): boolean => {
+  if (!className || typeof className !== 'string') return false;
+  className = className.trim();
+  if (className.includes("antialiased") || className.includes("italic")) {
+    return true;
+  }
+  for (const textPrefix of TEXT_CLASS_PREFIXES) {
+    if (className.includes(textPrefix)) {
+      return true;
+    }
+  }
+  if (textPatternsArray.some(pattern => pattern.test(className) || pattern.test(className.ltrim("!")))) {
+    return true;
+  }
+  if (className.includes(":")) {
+    const r = className.split(":");
+    for (const c in r) {
+      if (isTextClass(r[c])) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+/**
+ * Comprehensive list of NativeWind text-related class prefixes
+ */
+const TEXT_CLASS_PREFIXES = [
+  'text-', 'font-', 'leading-', 'tracking-', 'indent-',
+  'align-', 'decoration-', 'underline', 'overline', 'line-through',
+  'no-underline', 'uppercase', 'lowercase', 'capitalize', 'normal-case',
+  'truncate', 'text-ellipsis', 'text-clip', 'break-', 'whitespace-',
+  'hyphens-', 'content-'
+];
 
 export const textPatterns = {
   // Font weight

@@ -1,6 +1,6 @@
 {
   "name": "@resk/nativewind",
-  "version": "1.0.1-canary.0",
+  "version": "1.0.1-canary.4",
   "description": "Precompiled TypeScript UI framework built on NativeWind",
   "license": "ISC",
   "author": "",
@@ -61,7 +61,7 @@
     "publish-preview": "npm publish --dry-run",
     "copy-build-to-expo-demo": "node bin/copy-build-to-expo-demo",
     "build:expo-demo": "npm run build && npm run copy-build-to-expo-demo",
-    "generate-padding-margin-variants": "node bin/generate-padding2marginVariants"
+    "publish:canary": "npm publish --tag canary"
   },
   "keywords": [
     "react-native",
@@ -79,7 +79,7 @@
     "tailwind-variants": "^1.0.0"
   },
   "dependencies": {
-    "@resk/core": "^1.20.0",
+    "@resk/core": "^1.20.1",
     "clsx": "^2.1.1",
     "commander": "^14.0.0",
     "tailwind-merge": "^3.2.0",

@@ -286,12 +286,12 @@ export default function TextInput<ValueType = any>({
             innerRef.current.focus();
         }
     };
-
-    useEffect(() => {
-        if (editable && props.autoFocus && isHydrated && !isFocused) {
-            focus();
-        }
-    }, [props.autoFocus, editable, isHydrated, isFocused]);
+    /* 
+        useEffect(() => {
+            if (editable && props.autoFocus && isHydrated && !isFocused) {
+                focus();
+            }
+        }, [props.autoFocus, editable, isHydrated, isFocused]); */
 
     const canToggleSecure = isPasswordField;
     const multiline = !!props.multiline;
@@ -308,7 +308,7 @@ export default function TextInput<ValueType = any>({
     const focusedLabelEmbededClx = isFocusedVariant && isLabelEmbeded && computedVariant.focusedLabelEmbeded();
     const errorLabelEmbededClx = isErrorVariant && isLabelEmbeded && computedVariant.errorLabelEmbeded();
 
-    const labelClx = cn("flex flex-row self-center justify-start items-center input-label", isLabelEmbeded ? ["input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), !isLabelEmbeded ? [focusedLabelClx, errorLabelClx] : [focusedLabelEmbededClx, errorLabelEmbededClx], labelClassName);
+    const labelClx = cn("flex flex-row justify-start items-center input-label", isLabelEmbeded ? ["input-label-embeded mx-[5px]", computedVariant.labelEmbeded()] : computedVariant.label(), !isLabelEmbeded ? [focusedLabelClx, errorLabelClx] : [focusedLabelEmbededClx, errorLabelEmbededClx], labelClassName);
     const inputClx = cn(multiline && "py-[5px]", "outline-none grow border-transparent border-b-transparent border-b-0 border-t-0 border-t-transparent border-l-0 border-l-transparent border-r-0 border-r-transparent", canWrapWithTouchable && "cursor-pointer", computedVariant.input(), focusedInputClx, errorInputClx, className);
     const leftContainerClx = cn(computedVariant.leftContainer(), leftContainerClassName);
     const rightContainerClx = cn(computedVariant.rightContainer(), rightContainerClassName);
@@ -472,12 +472,12 @@ export default function TextInput<ValueType = any>({
         <Div className={cn(cursorDefault, "w-full relative input-wrapper")} testID={testID + "-wrapper"}>
             {isLabelEmbeded ? null : labelContent}
             <Wrapper {...wrapperProps} testID={testID + "-content-container"} className={cn(cursorDefault, "input-content-container w-full flex flex-row justify-between self-start items-center", contentContainerClx)}>
-                <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, cursorDefault, "grow", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
+                <Div testID={testID + "-left-content-container"} className={cn(leftOrRightClassName, cursorDefault, "grow-0", leftContainerClx, leftContainerWrappedWithTouchableClassName)}>
                     {leftContent}
                     {isLabelEmbeded ? labelContent : null}
                     {phoneDialCodeLabel ? <Text className={phoneDialCodeClx} onPress={editable ? focus : undefined}>{phoneDialCodeText}</Text> : null}
-                    {isHydrated ? inputElement : <Text className={cn(inputClx, "animate-pulse", cursorDefault)} style={inputStyle}  >{String(inputValue)}</Text>}
                 </Div>
+                {isHydrated ? inputElement : <Text className={cn(inputClx, "animate-pulse", cursorDefault)} style={inputStyle}  >{String(inputValue)}</Text>}
                 {rightContent ? (<Div className="right-content-wrapper self-center grow-0">
                     <Div testID={testID + "-right-content-container"} className={cn(leftOrRightClassName, cursorDefault, "input-right-content-container self-center", rightContainerClx)}>
                         {rightContent}

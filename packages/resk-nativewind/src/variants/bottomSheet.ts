@@ -5,8 +5,9 @@ import { classes } from "./classes";
 
 const bottomSheet = tv({
   slots: {
-    base: "relative w-full px-2",
-    portal: "flex flex-col flex-1 justify-end transform transition-transform translate-y-full",
+    base: "absolute web:fixed bottom-0 left-0 right-0 transform transition-transform ease-out w-full px-2",
+    portal: "absolute web:fixed inset-0",
+    //portal: "flex flex-col flex-1 justify-end transform transition-transform translate-y-full",
     content: "w-full h-full",
     appBar: "w-full", //appBar classes options
   },
@@ -18,10 +19,10 @@ const bottomSheet = tv({
     },
     visible: {
       true: {
-        portal: "translate-y-0",
+        base: "translate-y-0",
       },
       false: {
-        portal: "tranlate-y-full",
+        base: "tranlate-y-full",
       },
     },
     ...VariantsFactory.createAll<{ base: string }>((value) => {
@@ -50,7 +51,7 @@ const bottomSheet = tv({
     colorScheme: "surface",
     roundedTop: "10px",
     minHeight: "40%",
-    maxHeight: "70%",
+    height: "70%",
     withBackdrop: true,
     transitionDuration: 300,
     transitionEasing: "ease-in-out",

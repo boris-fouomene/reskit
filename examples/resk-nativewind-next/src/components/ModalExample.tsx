@@ -3,7 +3,6 @@
 import { Button, HStack, Modal } from "@resk/nativewind";
 import { Div, H2, Text } from "@resk/nativewind/html";
 import { useState } from "react";
-import { AnimatedVisibility } from "@resk/nativewind";
 
 export function ModalExample() {
     const [visible, setVisible] = useState(false);
@@ -11,7 +10,7 @@ export function ModalExample() {
         <HStack>
             <H2>Modal examples</H2>
         </HStack>
-        <AnimatedVisibility visible={visible}>
+        <Modal visible={visible} onRequestClose={() => setVisible(false)}>
             <Div className="p-5">
                 <H2>Animated Visible example content</H2>
                 <Text>
@@ -23,7 +22,7 @@ export function ModalExample() {
                 </Text>
                 <Button variant={{ colorScheme: "primary" }} onPress={() => setVisible(false)}>Close</Button>
             </Div>
-        </AnimatedVisibility>
+        </Modal>
         <Button onPress={() => setVisible(true)}>Open modal1</Button>
     </>
 }

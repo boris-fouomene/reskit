@@ -1,0 +1,30 @@
+    const onTransitionEnd = useCallback((e?: any) => {
+        if (!isMountedRef.current) return;
+        if (isDOMElement(e?.target) && e.currentTarget !== e.target) {
+            return;
+        }
+        if (shouldRenderRef.current && !visibleRef.current) {
+            setShouldRender(false);
+        }
+    }, []);
+    
+useEffect(() => {
+        if (visible && !shouldRenderRef.current && isMountedRef.current) {
+            setShouldRender(true);
+        }
+    }, [visible]);
+    const interactionRef = useRef(null);
+    useLayoutEffect(() => {
+        if (!isNative || !isMountedRef.current) return;
+        if (interactionRef.current) {
+            InteractionManager.clearInteractionHandle(interactionRef.current);
+        }
+        (interactionRef.current as any) = InteractionManager.createInteractionHandle();
+        // Wait for all interactions to complete
+        InteractionManager.runAfterInteractions(onTransitionEnd);
+        return () => {
+            if (interactionRef.current) {
+                InteractionManager.clearInteractionHandle(interactionRef.current);
+            }
+        };
+    }, [visible, onTransitionEnd]);

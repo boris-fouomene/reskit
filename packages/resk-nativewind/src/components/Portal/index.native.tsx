@@ -1,9 +1,10 @@
 import { Div } from '@html/Div';
-import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, useId, JSX, useState } from 'react';
+import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, useId, JSX } from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { cn } from '@utils/cn';
 import { IPortalProps } from './types';
-import { getClasses } from './utils';
+import { usePortal } from './hooks';
+import { classes } from '@variants/classes';
 
 /**
  * @interface IPortalItem
@@ -142,12 +143,13 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     );
 };
 
-function PortalItem({ children, className, withBackdrop, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
+function PortalItem({ children, onPress, style, visible, absoluteFill, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
     zIndex = visible ? (1000 + zIndex) : 0;
     const flattenStyle = StyleSheet.flatten([{ zIndex } as ViewStyle, style] as any);
-    const { backdropClassName, handleBackdrop, visibleClassName } = getClasses({ visible, absoluteFill, withBackdrop });
-    return <Div {...props} className={cn(backdropClassName, className, visibleClassName)} style={flattenStyle} onPress={handleBackdrop ? undefined : onPress}>
-        {handleBackdrop ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", visibleClassName, "bg-transparent")} onPress={onPress} /> : null}
+    const { shouldRender, backdropClassName, handleBackdrop, className } = usePortal(props);
+    if (!shouldRender) return null;
+    return <Div {...props} className={cn(backdropClassName, className, className)} style={flattenStyle} onPress={handleBackdrop ? undefined : onPress}>
+        {handleBackdrop || typeof onPress === "function" && visible ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", "flex-1 w-full h-full", classes.absoluteFill, "bg-transparent")} onPress={onPress} /> : null}
         {visible ? children : null}
     </Div>
 };

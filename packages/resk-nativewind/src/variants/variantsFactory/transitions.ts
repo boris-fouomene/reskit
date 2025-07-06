@@ -47,11 +47,11 @@ export const transitions = {
     4500: "delay-[4500]",
     5000: "delay-[5000]",
   },
+  transitionEasing: {
+    "ease-linear": "ease-linear",
+    "ease-in": "ease-in",
+    "ease-out": "ease-out",
+    "ease-in-out": "ease-in-out",
+  }
 };
 
-export const transitionEasing = {
-  "ease-linear": "ease-linear",
-  "ease-in": "ease-in",
-  "ease-out": "ease-out",
-  "ease-in-out": "ease-in-out",
-};

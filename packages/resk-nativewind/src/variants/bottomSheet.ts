@@ -5,9 +5,9 @@ import { classes } from "./classes";
 
 const bottomSheet = tv({
   slots: {
-    base: "absolute web:fixed bottom-0 left-0 right-0 transform transition-transform ease-out w-full px-2",
-    portal: "absolute web:fixed inset-0",
-    //portal: "flex flex-col flex-1 justify-end transform transition-transform translate-y-full",
+    portal: "",
+    portalBackdrop: "",
+    base: "absolute bottom-0 left-0 right-0 transform transition-transform ease-out",
     content: "w-full h-full",
     appBar: "w-full", //appBar classes options
   },
@@ -19,11 +19,13 @@ const bottomSheet = tv({
     },
     visible: {
       true: {
-        base: "translate-y-0",
+        portal: "",
+        base: "translate-y-0"
       },
       false: {
-        base: "tranlate-y-full",
-      },
+        portal: "",
+        base: "translate-y-full"
+      }
     },
     ...VariantsFactory.createAll<{ base: string }>((value) => {
       return {
@@ -40,11 +42,11 @@ const bottomSheet = tv({
         appBar: value,
       };
     }),
-    ...VariantsFactory.createTransitions<{ portal: string }>((value) => {
-      return { portal: value };
+    transitionDuration: VariantsFactory.createTransitionDuration<{ base: string, portal: string }>((value) => {
+      return { base: value, portal: value };
     }),
-    transitionEasing: VariantsFactory.createTransitionEasing<{ portal: string }>((value) => {
-      return { portal: value };
+    transitionDelay: VariantsFactory.createTransitionDelay<{ base: string, portal: string }>((value) => {
+      return { base: value, portal: value };
     }),
   },
   defaultVariants: {
@@ -54,7 +56,6 @@ const bottomSheet = tv({
     height: "70%",
     withBackdrop: true,
     transitionDuration: 300,
-    transitionEasing: "ease-in-out",
   },
 });
 export default bottomSheet;

@@ -11,7 +11,7 @@ import { width2heightClasses } from "./width2height";
 import { activeRingWidthClasses, focusRingWidthClasses, hoverRingWidthClasses, ringWidthClasses } from "./ring";
 import { scalesClasses } from "./scales";
 import { IClassName } from "@src/types";
-import { transitionEasing, transitions } from "./transitions";
+import { transitions } from "./transitions";
 import { typedEntries } from "@resk/core/utils";
 import { opacityClasses } from "./opacity";
 import { create } from "domain";
@@ -294,8 +294,14 @@ export const VariantsFactory = {
   createTransitions: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof transitions)[keyof typeof transitions], ResultType>) {
     return VariantsFactory.createComposite<typeof transitions, ResultType>(transitions, variantMutator);
   },
-  createTransitionEasing: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof transitionEasing, ResultType>) {
-    return VariantsFactory.create<typeof transitionEasing, ResultType>(transitionEasing, variantMutator);
+  createTransitionDuration: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof transitions.transitionDuration, ResultType>) {
+    return VariantsFactory.create<typeof transitions.transitionDuration, ResultType>(transitions.transitionDuration, variantMutator);
+  },
+  createTransitionDelay: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof transitions.transitionDelay, ResultType>) {
+    return VariantsFactory.create<typeof transitions.transitionDelay, ResultType>(transitions.transitionDelay, variantMutator);
+  },
+  createTransitionEasing: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof transitions.transitionEasing, ResultType>) {
+    return VariantsFactory.create<typeof transitions.transitionEasing, ResultType>(transitions.transitionEasing, variantMutator);
   },
   createAllOpacity: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof opacityClasses)[keyof typeof opacityClasses], ResultType>) {
     return VariantsFactory.createComposite<typeof opacityClasses, ResultType>(opacityClasses, variantMutator);

@@ -229,7 +229,7 @@ export function Menu<Context = unknown>({
                 {anchor}
             </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => close()} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), portalClassName, "menu-portal")}>
+        {<Portal visible={isVisible} absoluteFill testID={testID + "-portal"} onPress={() => close()} backdropClassName={cn("menu-portal-backdrop", renderedAsBottomSheet ? computedBottomSheetVariant.portalBackdrop() : computedVariant.portalBackdrop())} className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), portalClassName, "menu-portal")}>
             <MenuContext.Provider value={context}>
                 <View
                     testID={testID}

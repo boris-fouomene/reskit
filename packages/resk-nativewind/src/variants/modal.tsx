@@ -5,6 +5,8 @@ import { VariantsFactory } from "./variantsFactory";
 const modal = tv({
     slots: {
         container: "justify-center items-center flex flex-1 flex-col",
+        portal: "",
+        portalBackdrop: "",
         content: "max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
     },
     variants: {

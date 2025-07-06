@@ -5,6 +5,7 @@ import { VariantsFactory } from "./variantsFactory";
 const menu = tv({
     slots: {
         container: "transition-opacity transform",
+        portalBackdrop: "",
         anchorContainer: "",
         portal: "",
         contentContainer: "",
@@ -35,8 +36,11 @@ const menu = tv({
                 contentContainer: value,
             }
         }),
-        ...VariantsFactory.createTransitions<{ container: string }>((value) => {
-            return { container: value };
+        transitionDuration: VariantsFactory.createTransitionDuration<{ container: string, portalBackdrop: string, portal: string }>((value) => {
+            return { container: value, portalBackdrop: value, portal: value };
+        }),
+        transitionDelay: VariantsFactory.createTransitionDelay<{ container: string, portalBackdrop: string, portal: string }>((value) => {
+            return { container: value, portalBackdrop: value, portal: value };
         }),
         transitionEasing: VariantsFactory.createTransitionEasing<{ container: string }>((value) => {
             return { container: value };
@@ -50,7 +54,7 @@ const menu = tv({
         colorScheme: "surface",
         paddingBottom: "4",
         transitionDuration: 300,
-        transitionEasing: "ease-in-out",
+        transitionEasing: "ease-out",
     }
 });
 

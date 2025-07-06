@@ -16,6 +16,10 @@ import { GestureResponderEvent } from "react-native";
 export interface IPortalProps {
     children: IHtmlDivProps["children"];
     className?: IHtmlDivProps["className"];
+    /***
+     * The backdrop class name(s) for the portal
+     */
+    backdropClassName?: IHtmlDivProps["className"];
     testID?: IHtmlDivProps["testID"];
     id?: IHtmlDivProps["id"];
     absoluteFill?: boolean;

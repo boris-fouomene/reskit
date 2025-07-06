@@ -6,3 +6,4 @@ export * from "./types";
 export * from "./components";
 export * from "./variants";
 export * from "./AppRoot";
+export * from "./animations";

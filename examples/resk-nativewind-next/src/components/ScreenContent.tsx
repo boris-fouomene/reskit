@@ -14,17 +14,19 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
       <BottomSheetExample />
       <Div className="p-5">
         <H2>TextInput</H2>
-        <TextInput label="TextInput"
-          variant={{ focusedShadow: "lg", focusedShadowColor: "primary", focusedBorderColor: "primary", focusedBorderWidth: 2 }}
-          left={<>
-            <Icon iconName="phone" size={30} variant={{ color: "primary" }} />
-            <Icon iconName="camera" size={30} variant={{ color: "secondary" }} />
-          </>}
-          right={<>
-            <Icon iconName="material-language" size={30} variant={{ color: "success" }} />
-            <Icon iconName="clock" size={30} variant={{ color: "warning" }} />
-          </>}
-        />
+        <Div className="p-5">
+          <TextInput label="TextInput"
+            variant={{ focusedBorderColor: "primary", shadow: "md", focusedShadowColor: "error", focusedBorderWidth: 2 }}
+            left={<>
+              <Icon iconName="phone" size={30} variant={{ color: "primary" }} />
+              <Icon iconName="camera" size={30} variant={{ color: "secondary" }} />
+            </>}
+            right={<>
+              <Icon iconName="material-language" size={30} variant={{ color: "success" }} />
+              <Icon iconName="clock" size={30} variant={{ color: "warning" }} />
+            </>}
+          />
+        </Div>
         <TelInput label="Tex input Tel example" labelEmbeded />
         <TextInput label="A Success Text Input" variant={{ colorScheme: "success" }} />
         <TextInput variant={{ iconColor: "secondary", labelTextAlign: "right", labelWeight: "semibold", iconSize: "25px", labelTextSize: "15px" }} type="password" label="Password" placeholder="Enter your password" />

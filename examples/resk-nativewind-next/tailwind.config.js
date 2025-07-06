@@ -144,5 +144,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require("@resk/nativewind/theme-to-css-vars")],
+  plugins: [require("@resk/nativewind/theme-to-css-vars"), require("@resk/nativewind/animations")],
 };

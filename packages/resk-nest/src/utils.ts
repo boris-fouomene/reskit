@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import "./modules/resource/interfaces";
-import { defaultStr, isNonNullString, Logger, ResourcesManager, uniqid } from "@resk/core";
+import { defaultStr, isNonNullString, Logger } from "@resk/core";
 import { join } from 'path';
 import { existsSync } from 'fs';
 import {

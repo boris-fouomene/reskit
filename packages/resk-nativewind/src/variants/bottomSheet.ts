@@ -5,9 +5,9 @@ import { classes } from "./classes";
 
 const bottomSheet = tv({
   slots: {
-    portal: "",
+    portal: "flex flex-col flex-1 w-full h-full justify-end",
     portalBackdrop: "",
-    base: "absolute bottom-0 left-0 right-0 transform transition-transform ease-out",
+    base: "relative bottom-0 left-0 w-full transform transition-transform ease-out",
     content: "w-full h-full",
     appBar: "w-full", //appBar classes options
   },
@@ -19,11 +19,9 @@ const bottomSheet = tv({
     },
     visible: {
       true: {
-        portal: "",
         base: "translate-y-0"
       },
       false: {
-        portal: "",
         base: "translate-y-full"
       }
     },

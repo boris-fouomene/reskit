@@ -10,7 +10,7 @@ export function ModalExample() {
         <HStack>
             <H2>Modal examples</H2>
         </HStack>
-        <Modal visible={visible} onRequestClose={() => setVisible(false)}>
+        <Modal visible={visible} variant={{ colorScheme: "error" }} onRequestClose={() => setVisible(false)}>
             <Div className="p-5">
                 <H2>Animated Visible example content</H2>
                 <Text>

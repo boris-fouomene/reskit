@@ -49,9 +49,9 @@ export const useMenuPosition = ({
                 minWidth = Math.max(minWidth, anchorWidth);
             }
             menuHeight = (typeof menuHeight == 'number' && menuHeight > 0 ? menuHeight : 0);
-            const minMenuWidth = Math.max(minWidth, anchorWidth);
+            const minMenuWidth = Math.max(minWidth, anchorWidth, 50);
             if (sameWidth) {
-                menuWidth = Math.max(minWidth, anchorWidth);
+                menuWidth = minMenuWidth;
             } else {
                 menuWidth = Math.max(minWidth, menuWidth);
             }

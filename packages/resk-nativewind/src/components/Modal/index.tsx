@@ -5,18 +5,17 @@ import "./styles.css";
 import { normalizeGestureEvent } from "@html/events";
 import { IClassName } from "@src/types";
 import { classes } from "@variants/classes";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { cn } from "@utils/cn";
 import { defaultStr, getMaxZindex } from "@resk/core/utils";
 import { useAccessibilityEscape } from "@html/accessibility";
 import { Div } from "@html/Div";
-import { isNextJs } from "@platform/isNext";
 import { createPortal } from "react-dom";
 import { Backdrop } from "@components/Backdrop";
 
 
-
-export function Modal({ animationType, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): ReactNode {
+const hiddenStyle = "resk-modal-hidden opacity-0 invisible";
+export function Modal({ animationType, backdropClassName, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): ReactNode {
     const [shouldRender, setShouldRender] = useState(!!(typeof document !== "undefined" && document));
     useEffect(() => {
         if (!shouldRender) {
@@ -72,22 +71,22 @@ export function Modal({ animationType, onAccessibilityEscape, testID, onRequestC
     const rProps = { onAnimationEnd };
     const canRender = isRendering || visible;
     const className = useMemo(() => {
+        if (!isRendering) return [hiddenStyle]
         const animatedStyle = visible ? "resk-modal-animated-in" : "resk-modal-animated-out";
-        const className: IClassName = [];
+        const className: IClassName = [classes.absoluteFill];
         if (animationType === 'slide') {
             className.push(visible ? "resk-modal-slide-in" : "resk-modal-slide-out");
             className.push(animatedStyle);
         } else if (animationType === 'fade') {
             className.push(visible ? "resk-modal-fade-in" : "resk-modal-fade-out");
             className.push(animatedStyle);
-        }
-        if (visible) {
-            className.push(classes.absoluteFill);
         } else {
-            className.push("resk-modal-hidden hidden");
+            if (!visible) {
+                className.push(hiddenStyle);
+            }
         }
         return className;
-    }, [canRender, visible, animationType]);
+    }, [isRendering, visible, animationType]);
     const zIndex = useMemo(() => {
         if (!visible) return 0;
         return Math.max(getMaxZindex(), 1000) + 1;
@@ -100,9 +99,16 @@ export function Modal({ animationType, onAccessibilityEscape, testID, onRequestC
         testID={testID}
         id={modalId}
         role="dialog"
-        className={cn(className, modalClassName, transparent && "bg-transparent", "resk-modal")}
+        className={cn("flex flex-col flex-1", className, modalClassName, transparent && "bg-transparent", "resk-modal")}
         style={StyleSheet.flatten([{ zIndex }, style])}
     >
-        {children}
+        <Div className="relative resk-modal-content flex flex-col flex-1 w-full h-full">
+            <Backdrop
+                testID={testID + "-backdrop"}
+                className={cn("resk-modal-backdrop", backdropClassName)}
+                onPress={onRequestClose}
+            />
+            {children}
+        </Div>
     </Div>, document.querySelector("#reskit-app-root") || document.body);
 }

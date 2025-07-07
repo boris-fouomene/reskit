@@ -15,6 +15,7 @@ import { transitions } from "./transitions";
 import { typedEntries } from "@resk/core/utils";
 import { opacityClasses } from "./opacity";
 import { create } from "domain";
+import { outlineClasses } from "./outline";
 
 type IVariantFactoryMutator<InputType extends Record<IVariantKey, any>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
 type IVariantKey = string | number;
@@ -320,6 +321,7 @@ const allVariantClasses = {
   ...opacityClasses,
   ...shadowClasses,
   ...borderClasses,
+  ...outlineClasses,
   shadowColor: VariantsColors.shadow,
   activeShadowColor: VariantsColors.activeShadow,
   hoverShadowColor: VariantsColors.hoverShadow,

@@ -27,6 +27,9 @@
         hoverShadow : Record<IName,string>;
         activeShadow : Record<IName,string>;
         activityIndicator: Record<IName2Foreground,string>;
+        outlineColor : Record<IName2Foreground,string>;
+        hoverOutlineColor : Record<IName2Foreground,string>;
+        activeOutlineColor : Record<IName2Foreground,string>;
         borderColor : Record<IName2Foreground,string>;
         hoverBorderColor : Record<IName2Foreground,string>;
         activeBorderColor : Record<IName2Foreground,string>;

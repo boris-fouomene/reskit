@@ -48,9 +48,9 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   const textColorsWithImportant = VariantsColorsFactory.buildTextColors(true);
   const iconForeground = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]));
   const textColors = {
-      ...VariantsColorsFactory.buildTextColors(),
-      ...textForeground,
-    },
+    ...VariantsColorsFactory.buildTextColors(),
+    ...textForeground,
+  },
     icon = {
       ...textColorsWithImportant,
       ...iconForeground,
@@ -118,6 +118,21 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
       iconForeground,
       hoverIconForeground: Object.fromEntries(Object.entries(iconForeground).map(([key, value]) => [key, value.split("!text-").join("hover:!text-")])),
       activeIconForeground: Object.fromEntries(Object.entries(iconForeground).map(([key, value]) => [key, value.split("!text-").join("active:!text-")])),
+      outlineColor: Object.fromEntries(
+        Object.entries(textColors).map(([key, value]) => {
+          return [key, value.split("text-").join("outline-")];
+        })
+      ),
+      hoverOutlineColor: Object.fromEntries(
+        Object.entries(textColors).map(([key, value]) => {
+          return [key, value.split("text-").join("hover:outline-")];
+        })
+      ),
+      activeOutlineColor: Object.fromEntries(
+        Object.entries(textColors).map(([key, value]) => {
+          return [key, value.split("text-").join("active:outline-")];
+        })
+      ),
       borderColor: Object.fromEntries(
         Object.entries(textColors).map(([key, value]) => {
           return [key, value.split("text-").join("border-")];
@@ -222,6 +237,9 @@ export const VariantsColors = ${content}
         hoverShadow : Record<IName,string>;
         activeShadow : Record<IName,string>;
         activityIndicator: Record<IName2Foreground,string>;
+        outlineColor : Record<IName2Foreground,string>;
+        hoverOutlineColor : Record<IName2Foreground,string>;
+        activeOutlineColor : Record<IName2Foreground,string>;
         borderColor : Record<IName2Foreground,string>;
         hoverBorderColor : Record<IName2Foreground,string>;
         activeBorderColor : Record<IName2Foreground,string>;

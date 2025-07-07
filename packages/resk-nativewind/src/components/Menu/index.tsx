@@ -238,6 +238,7 @@ export function Menu<Context = unknown>({
             onRequestClose={dismissable !== false ? () => close() : undefined}
             animationType={renderedAsBottomSheet ? "slide" : "fade"} visible={isVisible}
             testID={testID + "-menu-modal"}
+            backdropClassName={cn("menu-backdrop", renderedAsBottomSheet ? computedBottomSheetVariant.modalBackdrop() : computedVariant.modalBackdrop())}
         >
             <MenuContext.Provider value={context}>
                 <View
@@ -256,11 +257,9 @@ export function Menu<Context = unknown>({
                         onMenuLayout(event);
                     }}
                 >
-                    <Backdrop
-                        className={cn("menu-backdrop", renderedAsBottomSheet ? computedBottomSheetVariant.modalBackdrop() : computedVariant.modalBackdrop())}
-                        testID={testID + "-backdrop"}
-                        onPress={dismissable !== false ? () => close() : undefined}
-                    />
+                    {dismissable !== false ? <Div className={cn("resk-menu-backdrop bg-transparent", classes.absoluteFill)}
+                        onPress={() => close()}
+                    /> : null}
                     <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">

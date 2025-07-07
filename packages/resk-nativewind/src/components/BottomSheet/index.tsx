@@ -15,12 +15,12 @@ export function BottomSheet({ variant, className, appBarClassName, contentContai
     const computedVariant = bottomSheetVariant(variant);
     const renderAppBar = withAppBar && isObj(appBarProps);
     return <Modal testID={testID} {...props} className={cn(className, "bottom-sheet")}>
+        <Backdrop
+            className={cn("bottom-sheet-backdrop", computedVariant.modalBackdrop())}
+            testID={testID + "-backdrop"}
+            onPress={props.onRequestClose}
+        />
         <View testID={testID + "-content-container"} className={cn("bottom-sheet-content-container", computedVariant.contentContainer(), contentContainerClassName)}>
-            <Backdrop
-                className={cn("bottom-sheet-backdrop", computedVariant.modalBackdrop())}
-                testID={testID + "-backdrop"}
-                onPress={props.onRequestClose}
-            />
             <View testID={testID + "-content"} className={cn("bottom-sheet-content", contentClassName, computedVariant.content())}>
                 {renderAppBar ? <AppBar testID={testID + "-app-bar"} backAction={false} {...appBarProps} className={cn("bottom-sheet-app-bar", computedVariant.appBar(), appBarClassName)} /> : null}
                 {children}

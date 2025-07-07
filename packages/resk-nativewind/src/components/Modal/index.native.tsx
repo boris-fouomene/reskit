@@ -2,10 +2,17 @@
 import { Modal as RNModal } from "react-native";
 import { IModalProps } from "./types";
 import { defaultStr } from "@resk/core/utils";
+import { Backdrop } from "@components/Backdrop";
+import { cn } from "@utils/cn";
 
-export function Modal({ children, testID, ...props }: IModalProps) {
+export function Modal({ children, testID, backdropClassName, ...props }: IModalProps) {
     testID = defaultStr(testID, "resk-modal");
     return <RNModal transparent {...props}>
+        <Backdrop
+            testID={testID + "-backdrop"}
+            className={cn("resk-modal-backdrop", backdropClassName)}
+            onPress={props.onRequestClose}
+        />
         {children}
     </RNModal>
 }

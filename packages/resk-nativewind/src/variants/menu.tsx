@@ -43,6 +43,7 @@ const menu = tv({
         colorScheme: "surface",
         paddingBottom: "4",
         transitionDuration: 300,
+        shadow: "xl",
         transitionEasing: "ease-out",
     }
 });

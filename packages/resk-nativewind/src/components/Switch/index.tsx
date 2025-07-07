@@ -12,6 +12,17 @@ export { useToggleable };
 export * from "./types";
 
 
+
+const SwitchInterop = cssInterop(RNSwitch, {
+    thumbColorClassName: {
+        target: false,
+        nativeStyleToProp: {
+            color: "thumbColor",
+            backgroundColor: "thumbColor",
+        }
+    },
+});
+
 /**
  * A customizable Switch component that supports tooltip, labels, and toggle functionality.
  *
@@ -114,15 +125,5 @@ export function Switch({ testID, ...props }: ISwitchProps) {
         {!isLabelOnLeftSide ? labelContent : null}
     </Tooltip>
 }
-
-const SwitchInterop = cssInterop(RNSwitch, {
-    thumbColorClassName: {
-        target: false,
-        nativeStyleToProp: {
-            color: "thumbColor",
-            backgroundColor: "thumbColor",
-        }
-    },
-});
 Switch.getToogleableDefaultValues = getToggleableDefaultValues;
 Switch.displayName = "Switch"

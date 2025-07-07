@@ -5,7 +5,7 @@ import { cn } from "@utils/cn";
 import { IVariantPropsProgressBar } from "@variants/progressBar";
 import progressBarVariant from "@variants/progressBar";
 import { Text } from "@html/Text";
-import "./style";
+import { IndeterminateProgressBar } from "./IndeterminateProgressBar";
 
 /**
  * A highly customizable and accessible progress bar component built with React and Tailwind CSS.
@@ -50,6 +50,7 @@ export function ProgressBar({
     testID,
     className,
     indeterminate,
+    indeterminateAnimationDuration,
     ...props
 }: IProgressBarProps) {
     value = isNumber(value) && value >= 0 ? value : 0;
@@ -75,12 +76,17 @@ export function ProgressBar({
             testID={testID + "-track"}
             className={cn("progress-bar-track w-full overflow-hidden min-h-1", computedVariant.track(), trackClassName)}
         >
-            <Div
+            {indeterminate ? <IndeterminateProgressBar
+                className={cn(fillClassName)}
+                testID={testID + "-indeterminate-fill"}
+                indeterminateDuration={indeterminateAnimationDuration}
+                role={"presentation"}
+            /> : <Div
                 role="presentation"
                 testID={testID + "-fill"}
-                className={cn(indeterminate && "progress-bar-indeterminate w-full h-full", fillClassName)}
-                style={indeterminate ? { transformOrigin: "0% 50%" } : { width: `${percentage}%` }}
-            />
+                className={cn(fillClassName)}
+                style={{ width: `${percentage}%` }}
+            />}
         </Div>
         {canShowPercent ? <Text testID={testID + "-percentage-text"} className={cn("progress-bar-percentage-text progress-bar-percentage-container absolute inset-0 ", computedVariant.text())}>{percentage.toFixed(1)}%</Text>
             : null}
@@ -253,4 +259,9 @@ export interface IProgressBarProps extends Omit<IHtmlDivProps, "children"> {
      * If the progress bar will show indeterminate progress.
      */
     indeterminate?: boolean;
+
+    /**
+     * The animation duration when the progress bar is indeterminate
+     */
+    indeterminateAnimationDuration?: number;
 }

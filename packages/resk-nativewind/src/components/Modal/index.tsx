@@ -99,7 +99,7 @@ export function Modal({ animationType, backdropClassName, onAccessibilityEscape,
         testID={testID}
         id={modalId}
         role="dialog"
-        className={cn("flex flex-col flex-1", className, modalClassName, transparent && "bg-transparent", "resk-modal")}
+        className={cn("flex flex-col flex-1", className, modalClassName, "bg-transparent", "resk-modal")}
         style={StyleSheet.flatten([{ zIndex }, style])}
     >
         <Backdrop

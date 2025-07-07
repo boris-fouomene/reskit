@@ -7,7 +7,7 @@ import { cn } from "@utils/cn";
 
 export function Modal({ children, visible, testID, backdropClassName, ...props }: IModalProps) {
     testID = defaultStr(testID, "resk-modal");
-    return <RNModal transparent {...props} visible={!!visible}>
+    return <RNModal  {...props} visible={!!visible} transparent>
         <Backdrop
             testID={testID + "-modal-backdrop"}
             className={cn("resk-modal-backdrop", backdropClassName)}

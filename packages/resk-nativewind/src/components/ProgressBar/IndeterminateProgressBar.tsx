@@ -1,6 +1,5 @@
 "use client";
 import { isNumber } from "@resk/core/utils";
-import { IClassName } from "@src/types";
 import { ComponentProps, useCallback, useEffect, useRef } from "react";
 import { Animated, LayoutChangeEvent, View } from "react-native";
 import Platform from "@platform";
@@ -14,23 +13,15 @@ const useNativeDriver = Platform.canUseNativeDriver();
 const RemaptedAnimated = remapProps(Animated.View, {
     className: "style"
 })
-export function IndeterminateProgressBar({ className, testID, indeterminateDuration }: ComponentProps<typeof Animated.View> & { indeterminateDuration?: number }) {
+export function IndeterminateProgressBar({ className, testID, indeterminateDuration, ...props }: ComponentProps<typeof Animated.View> & { indeterminateDuration?: number }) {
     const indeterminateAnimation = useRef<Animated.CompositeAnimation | null>(null);
     const [width, setWidth] = useStateCallback(0);
-    const { current: fade } = useRef<Animated.Value>(new Animated.Value(0));
     const { current: timer } = useRef<Animated.Value>(
         new Animated.Value(0)
     );
     const animationScale = 1;
     const duration = isNumber(indeterminateDuration) && indeterminateDuration > 100 ? indeterminateDuration : 2000;
     const startAnimation = useCallback(() => {
-        // Show progress bar
-        Animated.timing(fade, {
-            duration: 200 * animationScale,
-            toValue: 1,
-            useNativeDriver: true,
-            isInteraction: false,
-        }).start();
         if (!indeterminateAnimation.current) {
             indeterminateAnimation.current = Animated.timing(timer, {
                 duration,
@@ -43,7 +34,7 @@ export function IndeterminateProgressBar({ className, testID, indeterminateDurat
         // Reset timer to the beginning
         timer.setValue(0);
         Animated.loop(indeterminateAnimation.current).start();
-    }, [fade, animationScale, duration, timer]);
+    }, [animationScale, duration, timer]);
 
     const onLayout = (event: LayoutChangeEvent) => {
         setWidth(event.nativeEvent.layout.width);
@@ -62,6 +53,7 @@ export function IndeterminateProgressBar({ className, testID, indeterminateDurat
         className="h-full w-full resk-progress-bar-indeterminate-container overflow-hidden flex-col flex"
     >
         <RemaptedAnimated
+            {...props}
             testID={`${testID}-fill`}
             className={cn(className, "flex-1 resk-progress-bar-indeterminate-fill")}
             style={[

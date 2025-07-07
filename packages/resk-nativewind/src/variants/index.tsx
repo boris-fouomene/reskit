@@ -9,7 +9,6 @@ import badge from "./badge";
 import all from "./all";
 import button from "./button";
 import activityIndicator from "./activityIndicator";
-import modal from "./modal";
 import menu from "./menu";
 import checkbox from "./checkbox";
 import progressBar from "./progressBar";
@@ -30,7 +29,6 @@ export const variants = {
     divider,
     button,
     activityIndicator,
-    modal,
     checkbox,
     progressBar,
     dropdownItem,

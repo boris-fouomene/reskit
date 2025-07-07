@@ -236,17 +236,15 @@ export function Menu<Context = unknown>({
         </MenuContext.Provider>
         {<Modal
             onRequestClose={dismissable !== false ? () => close() : undefined}
-            backdropClassName={cn("menu-backdrop", renderedAsBottomSheet ? computedBottomSheetVariant.modalBackdrop() : computedVariant.modalBackdrop())}
             animationType={renderedAsBottomSheet ? "slide" : "fade"} visible={isVisible}
             testID={testID + "-menu-modal"}
-            contentClassName={cn(renderedAsBottomSheet ? computedBottomSheetVariant.modalContent() : computedVariant.modalContent(), "menu-modal-content")}
         >
             <MenuContext.Provider value={context}>
                 <View
                     testID={testID}
                     {...props}
                     ref={ref}
-                    className={cn("resk-menu absolute flex-1", renderedAsBottomSheet ? computedBottomSheetVariant.base() : computedVariant.base(), className)}
+                    className={cn("resk-menu absolute flex-1", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.base(), className)}
                     style={[
                         !renderedAsBottomSheet && menuStyle,
                         style,
@@ -258,7 +256,12 @@ export function Menu<Context = unknown>({
                         onMenuLayout(event);
                     }}
                 >
-                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? "w-full h-full" : computedVariant.contentContainer(), contentContainerClassName)}>
+                    <Backdrop
+                        className={cn("menu-backdrop", renderedAsBottomSheet ? computedBottomSheetVariant.modalBackdrop() : computedVariant.modalBackdrop())}
+                        testID={testID + "-backdrop"}
+                        onPress={dismissable !== false ? () => close() : undefined}
+                    />
+                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
                                 <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[10px]">

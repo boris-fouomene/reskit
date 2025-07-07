@@ -12,13 +12,12 @@ import { useAccessibilityEscape } from "@html/accessibility";
 import { Div } from "@html/Div";
 import { isNextJs } from "@platform/isNext";
 import { createPortal } from "react-dom";
-import { usePrepareModal } from "./hook";
 import { Backdrop } from "@components/Backdrop";
 
 
 
-export function Modal({ animationType, backdropClassName, onAccessibilityEscape, testID, contentClassName, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): ReactNode {
-    const [shouldRender, setShouldRender] = useState(!!(!isNextJs() && typeof document !== "undefined" && document));
+export function Modal({ animationType, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): ReactNode {
+    const [shouldRender, setShouldRender] = useState(!!(typeof document !== "undefined" && document));
     useEffect(() => {
         if (!shouldRender) {
             setShouldRender(true);
@@ -40,7 +39,6 @@ export function Modal({ animationType, backdropClassName, onAccessibilityEscape,
     const isAnimated = animationType && animationType !== 'none';
     const onAnimationEnd = useCallback(
         (e: any) => {
-            console.log(e, " is ending animation ", e?.currentTarget)
             if (e && e?.currentTarget && e?.currentTarget !== e?.target) {
                 return;
             }
@@ -86,18 +84,16 @@ export function Modal({ animationType, backdropClassName, onAccessibilityEscape,
         if (visible) {
             className.push(classes.absoluteFill);
         } else {
-            className.push("resk-modal-hidden");
+            className.push("resk-modal-hidden hidden");
         }
         return className;
-    }, [canRender, visible, modalClassName, animationType]);
+    }, [canRender, visible, animationType]);
     const zIndex = useMemo(() => {
         if (!visible) return 0;
         return Math.max(getMaxZindex(), 1000) + 1;
     }, [visible]);
-    const preparedModal = usePrepareModal({ backdropClassName, variant: props.variant, contentClassName });
     if (!shouldRender || !canRender || typeof document === "undefined" || !document) return null;
     testID = defaultStr(testID, "resk-modal");
-
     return createPortal(<Div
         {...props}
         {...rProps}
@@ -107,9 +103,6 @@ export function Modal({ animationType, backdropClassName, onAccessibilityEscape,
         className={cn(className, modalClassName, transparent && "bg-transparent", "resk-modal")}
         style={StyleSheet.flatten([{ zIndex }, style])}
     >
-        {<Backdrop testID={testID + "-modal-backdrop"} className={preparedModal.backdropClassName} onPress={onRequestClose} />}
-        <View className={preparedModal.contentClassName} testID={testID + "-modal-content"}>
-            {children}
-        </View>
+        {children}
     </Div>, document.querySelector("#reskit-app-root") || document.body);
 }

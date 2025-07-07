@@ -7,7 +7,6 @@ type IMenuVariantSlots = {
     container?: string;
     modalBackdrop?: string;
     anchorContainer?: string;
-    modalContent?: string;
     contentContainer?: string;
     items?: string;
     scrollView?: string;
@@ -17,7 +16,6 @@ const menu = tv({
     slots: {
         modalBackdrop: "",
         anchorContainer: "",
-        modalContent: "",
         base: "",
         contentContainer: "",
         items: "",

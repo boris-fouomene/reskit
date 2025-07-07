@@ -5,9 +5,9 @@ import { classes } from "./classes";
 
 const bottomSheet = tv({
   slots: {
-    modalContent: "flex flex-col flex-1 w-full h-full justify-end",
+    contentContainer: "relative flex flex-col flex-1 w-full h-full justify-end",
     modalBackdrop: "",
-    base: "relative w-full h-full",
+    content: "w-full h-full",
     appBar: "w-full", //appBar classes options
   },
   variants: {
@@ -16,14 +16,14 @@ const bottomSheet = tv({
         modalBackdrop: classes.backdrop,
       },
     },
-    ...VariantsFactory.createAll<{ base: string }>((value) => {
+    ...VariantsFactory.createAll<{ content: string }>((value) => {
       return {
-        base: value,
+        content: value,
       };
     }),
-    colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { base: string }>(VariantsColors.surface, (value, colorName) => {
+    colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { content: string }>(VariantsColors.surface, (value, colorName) => {
       return {
-        base: value,
+        content: value,
       };
     }),
     appBarColorScheme: VariantsFactory.create<typeof VariantsColors.surface, { appBar: string }>(VariantsColors.surface, (value, colorName) => {

@@ -8,15 +8,23 @@ import { cn } from "@utils/cn";
 import { AppBar, IAppBarProps } from "@components/AppBar";
 import { IModalProps } from "@components/Modal/types";
 import { View } from "react-native";
+import { Backdrop } from "@components/Backdrop";
 
-export function BottomSheet({ variant, className, appBarClassName, contentClassName, withAppBar, appBarProps, children, onLayout, testID, visible, ...props }: IBottomSheetProps) {
+export function BottomSheet({ variant, className, appBarClassName, contentContainerClassName, contentClassName, withAppBar, appBarProps, children, onLayout, testID, visible, ...props }: IBottomSheetProps) {
     testID = defaultStr(testID, "resk-bottom-sheet");
     const computedVariant = bottomSheetVariant(variant);
     const renderAppBar = withAppBar && isObj(appBarProps);
-    return <Modal {...props} backdropClassName={computedVariant.modalBackdrop()} contentClassName={computedVariant.modalContent()} visible={visible} testID={testID + "-modal"} className={cn("bottom-sheet-modal", computedVariant.base(), className)}>
-        <View testID={testID} className={cn("bottom-sheet", computedVariant.base())}>
-            {renderAppBar ? <AppBar testID={testID + "-app-bar"} backAction={false} {...appBarProps} className={cn("bottom-sheet-app-bar", computedVariant.appBar(), appBarClassName)} /> : null}
-            {children}
+    return <Modal testID={testID} {...props} className={cn(className, "bottom-sheet")}>
+        <View testID={testID + "-content-container"} className={cn("bottom-sheet-content-container", computedVariant.contentContainer(), contentContainerClassName)}>
+            <Backdrop
+                className={cn("bottom-sheet-backdrop", computedVariant.modalBackdrop())}
+                testID={testID + "-backdrop"}
+                onPress={props.onRequestClose}
+            />
+            <View testID={testID + "-content"} className={cn("bottom-sheet-content", contentClassName, computedVariant.content())}>
+                {renderAppBar ? <AppBar testID={testID + "-app-bar"} backAction={false} {...appBarProps} className={cn("bottom-sheet-app-bar", computedVariant.appBar(), appBarClassName)} /> : null}
+                {children}
+            </View>
         </View>
     </Modal>
 }
@@ -38,6 +46,11 @@ export interface IBottomSheetProps<Context = unknown> extends IModalProps {
     */
     appBarProps?: IAppBarProps<Context>;
 
+    /***
+     * The class name of the content container.
+     * The content container is the view that contains the content of the bottom sheet.
+     */
+    contentContainerClassName?: IClassName;
 
     /***
         The class name of the content.

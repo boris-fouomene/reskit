@@ -30,9 +30,7 @@ const modal = tv({
              }
          }, */
     },
-    defaultVariants: {
-        colorScheme: "surface",
-    }
+    defaultVariants: {}
 });
 
 export type IVariantPropsModal = VariantProps<typeof modal>;

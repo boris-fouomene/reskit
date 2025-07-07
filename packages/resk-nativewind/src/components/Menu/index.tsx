@@ -41,7 +41,7 @@ export function Menu<Context = unknown>({
     onRequestClose,
     renderAsBottomSheetInFullScreen,
     bottomSheetTitle,
-    bottomSheetTitleDivider,
+    displayBottomSheetTitleDivider,
     maxHeight,
     className,
     scrollViewClassName,
@@ -58,6 +58,7 @@ export function Menu<Context = unknown>({
     contentContainerClassName,
     ref,
     animationDuration,
+    bottomSheetTitleClassName,
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -123,7 +124,7 @@ export function Menu<Context = unknown>({
         });
     }
     useEffect(() => {
-        measureAnchor();
+        measureAnchor(true);
     }, [windowWidth, windowHeight, anchorRef]);
     useEffect(() => {
         if (isControlled && visible !== state.visible) {
@@ -257,15 +258,19 @@ export function Menu<Context = unknown>({
                         onMenuLayout(event);
                     }}
                 >
-                    {dismissable !== false ? <Div className={cn("resk-menu-backdrop bg-transparent", classes.absoluteFill)}
+                    {dismissable !== false ? <Backdrop testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
                         onPress={() => close()}
                     /> : null}
                     <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
-                                <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[10px]">
-                                    <Div testID={testID + "-bottom-sheet-title-container"} className="flex-wrap px-[10px]" >
-                                        <Text testID={testID + "-bottom-sheet-title"} variant={{ weight: "bold" }}>{bottomSheetTitle}</Text>
+                                <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[15px] px-[20px]">
+                                    <Div testID={testID + "-bottom-sheet-title-container"}
+                                        className="flex-wrap" >
+                                        <Text
+                                            testID={testID + "-bottom-sheet-title"}
+                                            className={cn(computedVariant.bottomSheetTitle(), bottomSheetTitleClassName)}
+                                        >{bottomSheetTitle}</Text>
                                     </Div>
                                     <Icon
                                         iconName={'close' as any}
@@ -276,7 +281,7 @@ export function Menu<Context = unknown>({
                                         }}
                                     />
                                 </Div>
-                                {bottomSheetTitle && bottomSheetTitleDivider !== false ? <Divider testID={testID + "-divider"} className="w-full" /> : null}
+                                {bottomSheetTitle && displayBottomSheetTitleDivider !== false ? <Divider testID={testID + "-divider"} className="w-full" /> : null}
                             </Div> : null}
                             {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                             {child}

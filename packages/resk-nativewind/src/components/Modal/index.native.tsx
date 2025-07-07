@@ -9,7 +9,7 @@ export function Modal({ children, visible, testID, backdropClassName, ...props }
     testID = defaultStr(testID, "resk-modal");
     return <RNModal transparent {...props} visible={!!visible}>
         <Backdrop
-            testID={testID + "-backdrop"}
+            testID={testID + "-modal-backdrop"}
             className={cn("resk-modal-backdrop", backdropClassName)}
             onPress={props.onRequestClose}
         />

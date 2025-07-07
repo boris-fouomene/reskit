@@ -215,6 +215,9 @@ export const VariantsFactory = {
   createAllShadow: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof shadowClasses)[keyof typeof shadowClasses], ResultType>) {
     return VariantsFactory.createComposite<typeof shadowClasses, ResultType>(shadowClasses, variantMutator);
   },
+  createAllShadowColors: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allShadowColors)[keyof typeof allShadowColors], ResultType>) {
+    return VariantsFactory.createComposite<typeof allShadowColors, ResultType>(allShadowColors, variantMutator);
+  },
   createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allVariantClasses)[keyof typeof allVariantClasses], ResultType, keyof typeof allVariantClasses>): IVariantFactoryAll<ResultType> {
     const result: IVariantFactoryAll<ResultType> = {} as any;
     Object.keys(allVariantClasses).forEach((_variantGroupName) => {
@@ -307,7 +310,20 @@ export const VariantsFactory = {
   createAllOpacity: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof opacityClasses)[keyof typeof opacityClasses], ResultType>) {
     return VariantsFactory.createComposite<typeof opacityClasses, ResultType>(opacityClasses, variantMutator);
   },
+  createAllOutline: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof outlineClasses)[keyof typeof outlineClasses], ResultType>) {
+    return VariantsFactory.createComposite<typeof outlineClasses, ResultType>(outlineClasses, variantMutator);
+  },
 };
+
+
+
+const allShadowColors = {
+  shadowColor: VariantsColors.shadow,
+  activeShadowColor: VariantsColors.activeShadow,
+  hoverShadowColor: VariantsColors.hoverShadow,
+  hoverBackground: VariantsColors.hoverBackground,
+  activeBackground: VariantsColors.activeBackground,
+}
 const allVariantClasses = {
   rounded: roundeClasses,
   roundedLeft: roundeLeftClasses,
@@ -322,11 +338,8 @@ const allVariantClasses = {
   ...shadowClasses,
   ...borderClasses,
   ...outlineClasses,
-  shadowColor: VariantsColors.shadow,
-  activeShadowColor: VariantsColors.activeShadow,
-  hoverShadowColor: VariantsColors.hoverShadow,
-  hoverBackground: VariantsColors.hoverBackground,
-  activeBackground: VariantsColors.activeBackground,
+
+  ...allShadowColors,
 
   borderColor: VariantsColors.borderColor,
   borderTopColor: VariantsColors.borderTopColor,

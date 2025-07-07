@@ -7,6 +7,6 @@ export function Backdrop(props: IHtmlDivProps) {
     return <Div
         testID="resk-backdrop"
         {...props}
-        className={cn(classes.absoluteFill, "z-0 resk-backdrop flex-1 w-full h-full", props.className)}
+        className={cn(classes.absoluteFill, "bg-transparent z-0 resk-backdrop flex-1 w-full h-full", props.className)}
     />
 }

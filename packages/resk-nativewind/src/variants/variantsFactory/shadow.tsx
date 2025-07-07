@@ -1,4 +1,3 @@
-import { VariantsColors } from "@variants/colors/generated";
 
 export const shadowClasses = {
     shadow: {

@@ -7,17 +7,31 @@ import { textAlignClasses } from "./variantsFactory/textAlignClasses";
 const text = tv({
     base: "",
     variants: {
+        ...VariantsFactory.createPadding2Margin(),
+        ...VariantsFactory.createAllShadow(),
+        ...VariantsFactory.createAllShadowColors(),
+        ...VariantsFactory.createAllOutline(),
+        ...VariantsFactory.createAllOpacity(),
+
+
         color: VariantsColors.text,
+        hoverColor: VariantsFactory.createHoverTextColor(),
+        activeColor: VariantsFactory.createActiveTextColor(),
+
+        align: textAlignClasses,
+        weight: fontWeightClasses,
+        size: VariantsFactory.createTextSize(),
+        nativeSize: VariantsFactory.createNativeTextSize(),
+
         error: {
             true: "",
         },
         waring: {
             true: ""
         },
-        align: textAlignClasses,
-        weight: fontWeightClasses,
-        size: VariantsFactory.createTextSize(),
-        nativeSize: VariantsFactory.createNativeTextSize(),
+        success: {
+            true: ""
+        },
     },
     compoundVariants: [
         {
@@ -27,6 +41,10 @@ const text = tv({
         {
             color: "warning",
             warning: true,
+        },
+        {
+            color: "success",
+            success: true,
         }
     ]
 });

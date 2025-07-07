@@ -435,7 +435,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         disabled={disabled}
         maxHeight={maxDropdownHeight}
         bottomSheetTitle={context.props?.label}
-        bottomSheetTitleDivider={!canRenderSeach}
+        displayBottomSheetTitleDivider={!canRenderSeach}
         testID={testID + "-menu"}
         renderAsBottomSheetInFullScreen
         visible={visible}

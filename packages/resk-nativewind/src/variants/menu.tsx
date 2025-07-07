@@ -11,6 +11,7 @@ type IMenuVariantSlots = {
     items?: string;
     scrollView?: string;
     scrollViewContentContainer?: string;
+    bottomSheetTitle?: string;
 }
 const menu = tv({
     slots: {
@@ -21,6 +22,7 @@ const menu = tv({
         items: "",
         scrollView: "",
         scrollViewContentContainer: "",
+        bottomSheetTitle: "",
     },
     variants: {
         withBackdrop: {
@@ -38,6 +40,26 @@ const menu = tv({
                 contentContainer: value,
             }
         }),
+        bottomSheetTitleWeight: VariantsFactory.createFontWeight<IMenuVariantSlots>((value) => {
+            return {
+                bottomSheetTitle: value,
+            }
+        }),
+        bottomSheetTitleSize: VariantsFactory.createTextSize<IMenuVariantSlots>((value) => {
+            return {
+                bottomSheetTitle: value,
+            }
+        }),
+        bottomSheetTitleColor: VariantsFactory.createTextColor<IMenuVariantSlots>(value => {
+            return {
+                bottomSheetTitle: value,
+            }
+        }),
+        bottomSheetTitleAlign: VariantsFactory.createTextAlign<IMenuVariantSlots>(value => {
+            return {
+                bottomSheetTitle: value,
+            }
+        }),
     },
     defaultVariants: {
         colorScheme: "surface",
@@ -45,6 +67,7 @@ const menu = tv({
         transitionDuration: 300,
         shadow: "xl",
         transitionEasing: "ease-out",
+        bottomSheetTitleWeight: "bold"
     }
 });
 

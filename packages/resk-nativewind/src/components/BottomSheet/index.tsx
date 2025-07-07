@@ -14,13 +14,12 @@ export function BottomSheet({ variant, visible, className, appBarClassName, cont
     testID = defaultStr(testID, "resk-bottom-sheet");
     const computedVariant = bottomSheetVariant(variant);
     const renderAppBar = withAppBar && isObj(appBarProps);
-    return <Modal visible={!!visible} testID={testID} {...props} className={cn(className, "bottom-sheet")}>
-        <Backdrop
-            className={cn("bottom-sheet-backdrop", computedVariant.modalBackdrop())}
-            testID={testID + "-backdrop"}
-            onPress={props.onRequestClose}
-        />
+    return <Modal animationType="slide" visible={!!visible} testID={testID} {...props} className={cn(className, "bottom-sheet")}>
         <View testID={testID + "-content-container"} className={cn("bottom-sheet-content-container", computedVariant.contentContainer(), contentContainerClassName)}>
+            {<Backdrop className={cn("resk-bottom-sheet-backdrop")}
+                testID={testID + "-bottom-sheet-backdrop"}
+                onPress={props.onRequestClose}
+            />}
             <View testID={testID + "-content"} className={cn("bottom-sheet-content", contentClassName, computedVariant.content())}>
                 {renderAppBar ? <AppBar testID={testID + "-app-bar"} backAction={false} {...appBarProps} className={cn("bottom-sheet-app-bar", computedVariant.appBar(), appBarClassName)} /> : null}
                 {children}

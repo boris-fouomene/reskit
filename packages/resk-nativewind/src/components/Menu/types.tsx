@@ -1,7 +1,7 @@
 
 import { IClassName, IReactNullableElement } from "../../types";
-import { ReactNode, ComponentProps } from "react";
-import { Animated, View, ViewProps } from "react-native";
+import { ReactNode } from "react";
+import { View, ViewProps } from "react-native";
 import { IVariantPropsMenu } from "@variants/menu";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IVariantPropsBottomSheet } from "@variants/bottomSheet";
@@ -371,9 +371,14 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     bottomSheetTitle?: ReactNode;
 
     /***
+     * The className to use for the bottom sheet title.
+     */
+    bottomSheetTitleClassName?: IClassName;
+
+    /***
      * Whether to show a divider between the title and the content when the menu is rendered as a bottom sheet.
      */
-    bottomSheetTitleDivider?: boolean;
+    displayBottomSheetTitleDivider?: boolean;
 
     items?: INavItemsProps<Context>["items"];
 

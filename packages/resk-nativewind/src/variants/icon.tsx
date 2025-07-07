@@ -4,19 +4,41 @@ import { VariantsFactory } from "./variantsFactory";
 const icon = tv({
     variants: {
         ...VariantsFactory.createPadding2Margin(),
-        shadow: VariantsFactory.createShadow(),
-        activeShadow: VariantsFactory.createActiveShadow(),
-        hoverShadow: VariantsFactory.createHoverShadow(),
-        shadowColor: VariantsFactory.createShadowColor(),
-        activeShadowColor: VariantsFactory.createActiveShadowColor(),
-        hoverShadowColor: VariantsFactory.createHoverShadowColor(),
-        opacity: VariantsFactory.createOpacity(),
-        activeOpacity: VariantsFactory.createActiveOpacity(),
-        hoverOpacity: VariantsFactory.createHoverOpacity(),
+        ...VariantsFactory.createAllShadow(),
+        ...VariantsFactory.createAllShadowColors(),
+        ...VariantsFactory.createAllOutline(),
+        ...VariantsFactory.createAllOpacity(),
+
         color: VariantsColors.icon,
         size: VariantsFactory.createIconSize(),
         nativeSize: VariantsFactory.createNativeIconSize(),
-    }
+        hoverColor: VariantsFactory.createHoverIconColor(),
+        activeColor: VariantsFactory.createActiveIconColor(),
+
+        error: {
+            true: "",
+        },
+        waring: {
+            true: ""
+        },
+        success: {
+            true: "",
+        },
+    },
+    compoundVariants: [
+        {
+            color: "error",
+            error: true,
+        },
+        {
+            color: "warning",
+            warning: true,
+        },
+        {
+            color: "success",
+            success: true,
+        }
+    ]
 });
 
 export type IVariantPropsIcon = VariantProps<typeof icon>;

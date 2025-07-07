@@ -7,7 +7,7 @@ import { IClassName } from "@src/types";
 import { classes } from "@variants/classes";
 import { StyleSheet } from "react-native";
 import { cn } from "@utils/cn";
-import { defaultStr, getMaxZindex } from "@resk/core/utils";
+import { addClassName, defaultStr, getMaxZindex } from "@resk/core/utils";
 import { useAccessibilityEscape } from "@html/accessibility";
 import { Div } from "@html/Div";
 import { createPortal } from "react-dom";
@@ -102,13 +102,11 @@ export function Modal({ animationType, backdropClassName, onAccessibilityEscape,
         className={cn("flex flex-col flex-1", className, modalClassName, transparent && "bg-transparent", "resk-modal")}
         style={StyleSheet.flatten([{ zIndex }, style])}
     >
-        <Div className="relative resk-modal-content flex flex-col flex-1 w-full h-full">
-            <Backdrop
-                testID={testID + "-backdrop"}
-                className={cn("resk-modal-backdrop", backdropClassName)}
-                onPress={onRequestClose}
-            />
-            {children}
-        </Div>
+        <Backdrop
+            testID={testID + "-modal-backdrop"}
+            className={cn("resk-modal-backdrop", !visible && "pointer-events-none", backdropClassName)}
+            onPress={onRequestClose}
+        />
+        {children}
     </Div>, document.querySelector("#reskit-app-root") || document.body);
 }

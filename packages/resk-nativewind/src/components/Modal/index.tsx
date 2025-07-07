@@ -107,7 +107,7 @@ export function Modal({ animationType, backdropClassName, onAccessibilityEscape,
         className={cn(className, modalClassName, transparent && "bg-transparent", "resk-modal")}
         style={StyleSheet.flatten([{ zIndex }, style])}
     >
-        {<Backdrop testID={testID + "-modal-backdrop"} className={preparedModal.backdropClassName} onPress={onRequestClose} />}
+        {<Backdrop testID={testID + "-modal-backdrop"} style={{ zIndex }} className={preparedModal.backdropClassName} onPress={onRequestClose} />}
         <View className={preparedModal.contentClassName} style={[{ zIndex }]} testID={testID + "-modal-content"}>
             {children}
         </View>

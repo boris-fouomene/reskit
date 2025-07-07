@@ -1,39 +1,29 @@
+import { IModalBaseProps } from "@components/ModalBase/types";
 import { IHtmlDivProps } from "@html/types";
+import { IClassName } from "@src/types";
 import { IUseAnimatedVisibilityResult } from "@utils/animations";
 import { GestureResponderEvent } from "react-native";
 
-/**
- * Props for the Portal component.
- *
- * @property children - The content to be rendered inside the portal.
- * @property className - Optional CSS class name(s) for the portal container.
- * @property testID - Optional test identifier for testing purposes.
- * @property id - Optional unique identifier for the portal container.
- * @property absoluteFill - If true, the portal will fill its parent absolutely.
- * @property visible - Controls the visibility of the portal content.
- * @property withBackdrop - If true, the portal will have a backdrop.
- */
-export interface IPortalProps {
-    children: IHtmlDivProps["children"];
-    className?: IHtmlDivProps["className"];
+
+export interface IPortalProps extends IModalBaseProps {
     /***
      * The backdrop class name(s) for the portal
      */
-    backdropClassName?: IHtmlDivProps["className"];
+    //backdropClassName?: IHtmlDivProps["className"];
     testID?: IHtmlDivProps["testID"];
     id?: IHtmlDivProps["id"];
-    absoluteFill?: boolean;
+    //absoluteFill?: boolean;
     /***
      * If true, the portal will have a backdrop.
      */
-    withBackdrop?: boolean;
+    //withBackdrop?: boolean;
 
     /**
     * Controls the visibility of the portal content.
     * When `true`, content is mounted immediately.
     * When `false`, content is unmounted after the specified delay.
     */
-    visible?: boolean;
+    //visible?: boolean;
 
     /**
    * Delay in milliseconds before unmounting the portal content when `visible` becomes `false`.
@@ -60,14 +50,18 @@ export interface IPortalProps {
     /***
      * The callback function to be called when the portal is pressed.
      */
-    onPress?: (event: GestureResponderEvent) => void;
+    //onPress?: (event: GestureResponderEvent) => void;
 
     /***
         Additional styles to be applied to the portal container.
     */
     style?: IHtmlDivProps["style"];
 
-    onAccessibilityEscape?: IHtmlDivProps["onAccessibilityEscape"];
+
+    /**
+     * The class name of the portal content.
+     */
+    contentClassName?: IClassName;
 }
 
 export interface IPortalStateContext extends IUseAnimatedVisibilityResult { }

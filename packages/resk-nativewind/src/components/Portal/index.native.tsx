@@ -1,11 +1,9 @@
-import { Div } from '@html/Div';
 import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, useId, JSX } from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
-import { cn } from '@utils/cn';
+import { View } from 'react-native';
 import { IPortalProps } from './types';
-import { usePortal } from './hooks';
-import { classes } from '@variants/classes';
 import { defaultStr } from '@resk/core/utils';
+import { ModalBase } from '@components/ModalBase';
+import { cn } from '@utils/cn';
 
 /**
  * @interface IPortalItem
@@ -144,16 +142,19 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     );
 };
 
-function PortalItem({ children, onPress, style, visible, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
+function PortalItem({ children, style, visible, contentClassName, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
     zIndex = visible ? (1000 + zIndex) : 0;
-    const flattenStyle = StyleSheet.flatten([{ zIndex } as ViewStyle, style] as any);
-    const { shouldRender, backdropClassName, handleBackdrop, className } = usePortal({ ...props, onPress, visible });
-    if (!shouldRender) return null;
-    testID = defaultStr(testID, "resk-portal");
-    return <Div {...props} testID={testID} className={cn("portal", className)} style={flattenStyle}>
-        {handleBackdrop ? <Div testID={testID + "-backdrop"} className={cn("portal-backdrop", backdropClassName)} onPress={onPress} /> : null}
-        {children}
-    </Div>
+    testID = defaultStr(testID, "resk-resk-portal");
+    return <ModalBase
+        transparent
+        visible={visible}
+        {...props}
+        className={cn("resk-portal", props.className)}
+    >
+        <View className={cn("resk-portal-content flex-col flex-1 items-start justify-start self-start", contentClassName)} style={[{ zIndex }]} testID={testID + "-portal-content"}>
+            {children}
+        </View>
+    </ModalBase>
 };
 PortalItem.displayName = "Portal.Item";
 /**
@@ -205,7 +206,7 @@ export function Portal({ children, ...props }: IPortalProps) {
         if (typeof addPortal === "function") {
             addPortal(key, children, props);
         }
-    }, [key, children, props.visible, props.absoluteFill]);
+    }, [key, children, props.visible]);
     useEffect(() => {
         return () => {
             typeof removePortal === "function" && removePortal(key);
@@ -213,3 +214,4 @@ export function Portal({ children, ...props }: IPortalProps) {
     }, [key])
     return null;
 };
+

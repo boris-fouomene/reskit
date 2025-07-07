@@ -7,7 +7,7 @@ const bottomSheet = tv({
   slots: {
     portal: "flex flex-col flex-1 w-full h-full justify-end",
     portalBackdrop: "",
-    base: "relative bottom-0 left-0 w-full transform transition-transform ease-out",
+    base: "absolute left-0 bottom-0 w-full h-full",
     content: "w-full h-full",
     appBar: "w-full", //appBar classes options
   },
@@ -19,11 +19,11 @@ const bottomSheet = tv({
     },
     visible: {
       true: {
-        base: "translate-y-0"
+        base: "translate-y-0",
       },
       false: {
-        base: "translate-y-full"
-      }
+        base: "translate-y-full",
+      },
     },
     ...VariantsFactory.createAll<{ base: string }>((value) => {
       return {
@@ -39,12 +39,6 @@ const bottomSheet = tv({
       return {
         appBar: value,
       };
-    }),
-    transitionDuration: VariantsFactory.createTransitionDuration<{ base: string, portal: string }>((value) => {
-      return { base: value, portal: value };
-    }),
-    transitionDelay: VariantsFactory.createTransitionDelay<{ base: string, portal: string }>((value) => {
-      return { base: value, portal: value };
     }),
   },
   defaultVariants: {

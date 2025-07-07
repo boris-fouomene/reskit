@@ -24,17 +24,17 @@ export const useMenuAnimations = ({ isDesktop, renderedAsBottomSheet, animationD
 
         if (renderedAsBottomSheet) {
             animations.push(
-                Animated.spring(menuScale, {
-                    toValue: 1,
+                Animated.spring(menuTranslateY, {
+                    toValue: 0,
                     tension: 100,
                     friction: 8,
-                    useNativeDriver
+                    useNativeDriver,
                 })
             );
         } else {
             animations.push(
-                Animated.spring(menuTranslateY, {
-                    toValue: 0,
+                Animated.spring(menuScale, {
+                    toValue: 1,
                     tension: 100,
                     friction: 8,
                     useNativeDriver
@@ -53,16 +53,7 @@ export const useMenuAnimations = ({ isDesktop, renderedAsBottomSheet, animationD
                 useNativeDriver
             }),
         ];
-
         if (renderedAsBottomSheet) {
-            animations.push(
-                Animated.timing(menuScale, {
-                    toValue: 0.8,
-                    duration: animationDuration,
-                    useNativeDriver
-                })
-            );
-        } else {
             animations.push(
                 Animated.timing(menuTranslateY, {
                     toValue: windowHeight,
@@ -70,19 +61,26 @@ export const useMenuAnimations = ({ isDesktop, renderedAsBottomSheet, animationD
                     useNativeDriver
                 })
             );
+        } else {
+            animations.push(
+                Animated.timing(menuScale, {
+                    toValue: 0.8,
+                    duration: animationDuration,
+                    useNativeDriver
+                })
+            );
         }
-
         Animated.parallel(animations).start(callback);
     }, [renderedAsBottomSheet, animationDuration, windowHeight, menuTranslateY, menuScale, menuOpacity]);
 
     // Reset animations when desktop/mobile changes
     useEffect(() => {
         if (renderedAsBottomSheet) {
-            menuTranslateY.setValue(0);
-            menuScale.setValue(isVisible ? 1 : 0.8);
-        } else {
             menuTranslateY.setValue(isVisible ? 0 : windowHeight);
             menuScale.setValue(1);
+        } else {
+            menuTranslateY.setValue(0);
+            menuScale.setValue(isVisible ? 1 : 0.8);
         }
     }, [renderedAsBottomSheet, isVisible, menuTranslateY, menuScale, windowHeight]);
 

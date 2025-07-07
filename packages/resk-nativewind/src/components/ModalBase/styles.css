@@ -1,0 +1,66 @@
+@keyframes resk-modal-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes resk-modal-fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes resk-modal-slide-in {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes resk-modal-slide-out {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.resk-modal-fade-in {
+  opacity: 1;
+  animation-name: resk-modal-fade-in;
+}
+.resk-modal-fade-out {
+  opacity: 0;
+  animation-name: resk-modal-fade-out;
+}
+.resk-modal-slide-in {
+  transform: translateY(0%);
+  animation-name: resk-modal-slide-in;
+}
+.resk-modal-slide-out {
+  transform: translateY(100%);
+  animation-name: resk-modal-slide-out;
+}
+
+.resk-modal-animated-in {
+  animation-timing-function: ease-in;
+  animation-duration: 300ms;
+}
+.resk-modal-animated-out {
+  pointer-events: none !important;
+  animation-timing-function: ease-out;
+  animation-duration: 300ms;
+}
+
+.resk-modal-hidden {
+  opacity: 0;
+}

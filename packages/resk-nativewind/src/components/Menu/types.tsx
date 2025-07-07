@@ -1,7 +1,7 @@
 
 import { IClassName, IReactNullableElement } from "../../types";
-import { ReactNode } from "react";
-import { View, ViewProps } from "react-native";
+import { ReactNode, ComponentProps } from "react";
+import { Animated, View, ViewProps } from "react-native";
 import { IVariantPropsMenu } from "@variants/menu";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IVariantPropsBottomSheet } from "@variants/bottomSheet";
@@ -277,7 +277,7 @@ export interface IMenuState {
     visible: boolean
 }
 
-export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children" | "style" | "className" | "ref">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
+export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children" | "className" | "ref">, Omit<IUseMenuPositionProps, "menuWidth" | "menuHeight"> {
 
     /** Optional callback that is invoked when the menu opens.
      * It's only considered when the menu is not controlled externally by providing the visible prop.
@@ -380,8 +380,6 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * Whether to show a divider between the title and the content when the menu is rendered as a bottom sheet.
      */
     bottomSheetTitleDivider?: boolean;
-
-    style?: ViewProps["style"];
 
     items?: INavItemsProps<Context>["items"];
 

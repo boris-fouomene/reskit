@@ -26,10 +26,9 @@ export const Modal = ({ visible, testID, portalClassName, onPress, variant, clas
   useBackHandler(dismissable ? handleRequestClose : () => true);
   return (
     <Portal
-      absoluteFill
       visible={visible}
       testID={testID + "-modal-portal"}
-      onPress={dismissable ? handleRequestClose : undefined} withBackdrop className={cn("modal-portal", modalVariant.container(), portalClassName)}
+      //onPress={dismissable ? handleRequestClose : undefined} withBackdrop className={cn("modal-portal", modalVariant.container(), portalClassName)}
       onAccessibilityEscape={() => {
         if (typeof onAccessibilityEscape === "function") {
           onAccessibilityEscape();

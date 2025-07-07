@@ -2,9 +2,19 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 
+type IMenuVariantSlots = {
+    container?: string;
+    portalBackdrop?: string;
+    anchorContainer?: string;
+    portal?: string;
+    contentContainer?: string;
+    items?: string;
+    scrollView?: string;
+    scrollViewContentContainer?: string;
+}
 const menu = tv({
     slots: {
-        container: "transition-opacity transform",
+        container: "",
         portalBackdrop: "",
         anchorContainer: "",
         portal: "",
@@ -14,42 +24,25 @@ const menu = tv({
         scrollViewContentContainer: "",
     },
     variants: {
-        animation: {
-            scale: {}
-        },
-        ...VariantsFactory.createAll<{ container: string }>((value) => {
+        ...VariantsFactory.createAll<IMenuVariantSlots>((value) => {
             return {
-                container: value,
+                contentContainer: value,
             }
         }),
         visible: {
             true: {
-                container: "opacity-100",
+                //container: "opacity-100",
             },
             false: {
-                container: "opacity-0",
+                //container: "opacity-0",
             }
         },
-        colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { container: string }>(VariantsColors.surface, (value) => {
+        colorScheme: VariantsFactory.create<typeof VariantsColors.surface, IMenuVariantSlots>(VariantsColors.surface, (value) => {
             return {
-                container: value,
                 contentContainer: value,
             }
         }),
-        transitionDuration: VariantsFactory.createTransitionDuration<{ container: string, portalBackdrop: string, portal: string }>((value) => {
-            return { container: value, portalBackdrop: value, portal: value };
-        }),
-        transitionDelay: VariantsFactory.createTransitionDelay<{ container: string, portalBackdrop: string, portal: string }>((value) => {
-            return { container: value, portalBackdrop: value, portal: value };
-        }),
-        transitionEasing: VariantsFactory.createTransitionEasing<{ container: string }>((value) => {
-            return { container: value };
-        }),
     },
-    compoundVariants: [
-        { animation: "scale", visible: false, class: { container: "scale-75 opacity-0" } },
-        { animation: "scale", visible: true, class: { container: "scale-100 opacity-100" } },
-    ],
     defaultVariants: {
         colorScheme: "surface",
         paddingBottom: "4",

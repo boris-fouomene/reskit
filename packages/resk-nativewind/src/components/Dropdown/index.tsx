@@ -1,5 +1,5 @@
 "use client";
-import { ReactElement, ReactNode, useEffect, useMemo, useRef } from "react";
+import { memo, ReactElement, ReactNode, useEffect, useMemo, useRef } from "react";
 import stableHash from "stable-hash";
 import { defaultStr, isEmpty, isNonNullString, isObj, areEquals, stringify, isNumber } from "@resk/core/utils";
 import i18n from "@resk/core/i18n";
@@ -545,7 +545,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
     </Div>;
 }
 
-const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number, context: IDropdownContext }) => {
+const DropdownItem = memo((preparedItem: IDropdownPreparedItem & { index: number, context: IDropdownContext }) => {
     const { label, hashKey, labelText, context } = preparedItem;
     const forceRender = useForceRender();
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
@@ -594,9 +594,9 @@ const DropdownItem = (preparedItem: IDropdownPreparedItem & { index: number, con
             </Div>
         </Tooltip>
     );
-}
+});
 
-DropdownItem.displayName = "DropdownItem";
+DropdownItem.displayName = "Dropdown.Item";
 
 
 

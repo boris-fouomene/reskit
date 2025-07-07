@@ -9,6 +9,7 @@ import { StyleSheet, View } from "react-native";
 import { cn } from "@utils/cn";
 import { defaultStr, getMaxZindex } from "@resk/core/utils";
 import { useAccessibilityEscape } from "@html/accessibility";
+import { Div } from "@html/Div";
 
 
 
@@ -18,7 +19,7 @@ export function ModalBase({ animationType, onAccessibilityEscape, onRequestClose
     const wasRendering = useRef(false);
     const generatedId = useId();
     const modalId = defaultStr(id, generatedId);
-    useAccessibilityEscape(`${modalId}`, function () {
+    useAccessibilityEscape(`#{${modalId}`, function () {
         if (typeof onAccessibilityEscape === "function") {
             onAccessibilityEscape();
         }
@@ -27,10 +28,10 @@ export function ModalBase({ animationType, onAccessibilityEscape, onRequestClose
         }
     });
     const isAnimated = animationType && animationType !== 'none';
-
-    const animationEndCallback = useCallback(
+    const onAnimationEnd = useCallback(
         (e: any) => {
-            if (e && e.currentTarget !== e.target) {
+            console.log(e, " is ending animation ", e?.currentTarget)
+            if (e && e?.currentTarget && e?.currentTarget !== e?.target) {
                 return;
             }
             if (visible) {
@@ -56,12 +57,11 @@ export function ModalBase({ animationType, onAccessibilityEscape, onRequestClose
             setIsRendering(true);
         }
         if (visible !== wasVisible.current && !isAnimated) {
-            // Manually call `animationEndCallback` if no animation is used
-            animationEndCallback(undefined);
+            onAnimationEnd(undefined);
         }
         wasVisible.current = visible as boolean;
-    }, [isAnimated, visible, animationEndCallback]);
-    const rProps = { onAnimationEnd: animationEndCallback };
+    }, [isAnimated, visible, onAnimationEnd]);
+    const rProps = { onAnimationEnd };
     const canRender = isRendering || visible;
     const className = useMemo(() => {
         const animatedStyle = visible ? "resk-modal-animated-in" : "resk-modal-animated-out";
@@ -84,7 +84,7 @@ export function ModalBase({ animationType, onAccessibilityEscape, onRequestClose
         if (!visible) return 0;
         return Math.max(getMaxZindex(), 1000) + 1;
     }, [visible]);
-    return canRender ? <View
+    return canRender ? <Div
         {...props}
         {...rProps}
         id={modalId}
@@ -93,5 +93,5 @@ export function ModalBase({ animationType, onAccessibilityEscape, onRequestClose
         style={StyleSheet.flatten([{ zIndex }, style])}
     >
         {children}
-    </View> : null;
+    </Div> : null;
 }

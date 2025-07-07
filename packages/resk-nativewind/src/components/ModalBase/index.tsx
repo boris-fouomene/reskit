@@ -19,7 +19,7 @@ export function ModalBase({ animationType, onAccessibilityEscape, onRequestClose
     const wasRendering = useRef(false);
     const generatedId = useId();
     const modalId = defaultStr(id, generatedId);
-    useAccessibilityEscape(`#{${modalId}`, function () {
+    useAccessibilityEscape(`#${modalId}`, function () {
         if (typeof onAccessibilityEscape === "function") {
             onAccessibilityEscape();
         }

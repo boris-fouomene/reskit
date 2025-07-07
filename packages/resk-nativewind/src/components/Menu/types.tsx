@@ -6,6 +6,7 @@ import { IVariantPropsMenu } from "@variants/menu";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IVariantPropsBottomSheet } from "@variants/bottomSheet";
 import { IPercentage } from "@resk/core/types";
+import { IVariantPropsText } from "@variants/text";
 
 /**
  * Represents the possible positions where the menu can be displayed
@@ -369,6 +370,11 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
      * The title of the bottom sheet when the menu is rendered as a bottom sheet.
      */
     bottomSheetTitle?: ReactNode;
+
+    /**
+     * The variant for the bottom sheet title
+     */
+    bottomSheetTitleVariant?: IVariantPropsText;
 
     /***
      * The className to use for the bottom sheet title.

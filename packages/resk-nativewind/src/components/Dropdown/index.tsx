@@ -18,7 +18,7 @@ import { Div } from "@html/Div";
 import { TextInput } from "@components/TextInput";
 import { Text } from "@html/Text";
 import { IFontIconName } from "@components/Icon";
-import { INavContext } from "@components/Nav";
+import { INavContext, INavItemProps } from "@components/Nav";
 import dropdownItem, { IVariantPropsDropdownItem } from "@variants/dropdownItem";
 import { IVariantPropsIcon } from "@variants/icon";
 
@@ -281,7 +281,9 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
             this.trigger("selectAll", this);
         });
     }
-
+    getSearchText() {
+        return this.state.searchText;
+    }
     unselectAll = () => {
         const { multiple, required } = this.props;
         if (required) {
@@ -381,32 +383,43 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             }
         }
         if (multiple) {
-            return [
-                ...actions,
-                actions?.length ? { divider: true } : undefined,
-                {
-                    label: i18n.t("components.dropdown.selectAll"),
-                    icon: "checkbox-multiple-marked",
-                    onPress: context.selectAll.bind(context),
-                },
-                !context.props?.required ? {
+            if (actions.length) {
+                actions.push({ divider: true })
+            }
+            actions.push({
+                label: i18n.t("components.dropdown.selectAll"),
+                icon: "checkbox-multiple-marked" as never,
+                onPress: context.selectAll.bind(context),
+            });
+            if (!context.props?.required) {
+                actions.push({
                     label: i18n.t("components.dropdown.unselectAll"),
-                    icon: "checkbox-multiple-blank-outline",
+                    icon: "checkbox-multiple-blank-outline" as never,
                     onPress: context.unselectAll.bind(context),
-                } : undefined,
-            ];
+                });
+            }
         } else if (anchorSelectedText) {
-            return [
-                ...actions,
-                actions?.length ? { divider: true } : undefined,
-                !context.props?.required ? {
+            if (actions.length) {
+                actions.push({ divider: true });
+            }
+            if (!context.props?.required) {
+                actions.push({
                     label: i18n.t("components.dropdown.unselectSingle"),
-                    icon: "checkbox-blank-circle-outline",
+                    icon: "checkbox-blank-circle-outline" as never,
                     onPress: context.unselectAll.bind(context),
-                } : undefined,
-            ];
+                })
+            }
         }
-        return actions.filter((a) => !!a);
+        if (isNonNullString(context?.getSearchText?.())) {
+            actions.push({
+                label: i18n.t("components.dropdown.clearSearchText"),
+                icon: "checkbox-blank-circle-outline" as never,
+                onPress: () => {
+                    context?.onSearch?.({ value: "" })
+                },
+            })
+        }
+        return actions;
     }, [dropdownActions, multiple, context.isOpen(), context, anchorSelectedText]);
     const loadingContent = isLoading ? <ProgressBar indeterminate testID={testID + "dropdown-progressbar"} /> : null;
     const anchorProps: ITextInputProps = {
@@ -718,7 +731,7 @@ export interface IDropdownState<ItemType = any, ValueType = any> {
     filteredItems?: IDropdownPreparedItem<ItemType, ValueType>[];
 };
 
-export interface IDropdownAction extends INavContext<{ dropdown: IDropdownContext }> { }
+export interface IDropdownAction extends INavItemProps<{ dropdown: IDropdownContext }> { }
 
 export type IDropdownComputedAction = (IReactNullableElement | IDropdownAction);
 

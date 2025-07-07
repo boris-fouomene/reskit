@@ -59,6 +59,7 @@ export function Menu<Context = unknown>({
     ref,
     animationDuration,
     bottomSheetTitleClassName,
+    bottomSheetTitleVariant,
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -270,6 +271,7 @@ export function Menu<Context = unknown>({
                                         <Text
                                             testID={testID + "-bottom-sheet-title"}
                                             className={cn(computedVariant.bottomSheetTitle(), bottomSheetTitleClassName)}
+                                            variant={bottomSheetTitleVariant}
                                         >{bottomSheetTitle}</Text>
                                     </Div>
                                     <Icon

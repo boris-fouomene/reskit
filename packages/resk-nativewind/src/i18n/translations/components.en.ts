@@ -33,6 +33,7 @@ I18nClass.RegisterTranslations({
                     "one": ", and one selected.",
                     "other": ", and %{count} selected.",
                 },
+                "clearSearchText": "Clear search"
             },
             "drawer": {
                 "close": "Close",

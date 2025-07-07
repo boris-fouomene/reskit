@@ -217,7 +217,6 @@ export function Menu<Context = unknown>({
             open();
         }
     }
-    const dismissablePress = dismissable !== false ? () => close() : undefined;
     return <>
         <MenuContext.Provider value={context}>
             <AnchorComponent
@@ -236,7 +235,7 @@ export function Menu<Context = unknown>({
             </AnchorComponent>
         </MenuContext.Provider>
         {<Modal
-            onRequestClose={dismissablePress}
+            onRequestClose={dismissable !== false ? () => close() : undefined}
             backdropClassName={cn("menu-backdrop", renderedAsBottomSheet ? computedBottomSheetVariant.modalBackdrop() : computedVariant.modalBackdrop())}
             animationType={renderedAsBottomSheet ? "slide" : "fade"} visible={isVisible}
             testID={testID + "-menu-modal"}

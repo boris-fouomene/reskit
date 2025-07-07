@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { cn } from '@utils/cn';
 import { IPortalProps } from './types';
 import { StyleSheet, View } from 'react-native';
-import { ModalBase } from '@components/ModalBase';
+import { Modal } from '@components/Modal';
 import { isNextJs } from '@platform/isNext';
 
 
@@ -26,7 +26,7 @@ export function Portal({ children, style, visible, id, className, testID, conten
     }, [visible]);
     if (!shouldRender || typeof document === "undefined" || !document) return null;
     testID = defaultStr(testID, "resk-portal");
-    return createPortal(<ModalBase
+    return createPortal(<Modal
         id={targetId}
         testID={testID}
         {...props}
@@ -37,5 +37,5 @@ export function Portal({ children, style, visible, id, className, testID, conten
         <View className={cn("resk-portal-content flex-col flex-1 w-full h-full items-start justify-start self-start", contentClassName)} style={[{ zIndex }]} testID={testID + "-portal-content"}>
             {children}
         </View>
-    </ModalBase>, document.querySelector("#reskit-app-root") || document.body);
+    </Modal>, document.querySelector("#reskit-app-root") || document.body);
 };

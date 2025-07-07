@@ -1,12 +1,13 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
+import { classes } from "./classes";
 
 type IMenuVariantSlots = {
     container?: string;
-    portalBackdrop?: string;
+    modalBackdrop?: string;
     anchorContainer?: string;
-    portal?: string;
+    modalContent?: string;
     contentContainer?: string;
     items?: string;
     scrollView?: string;
@@ -14,29 +15,26 @@ type IMenuVariantSlots = {
 }
 const menu = tv({
     slots: {
-        container: "",
-        portalBackdrop: "",
+        modalBackdrop: "",
         anchorContainer: "",
-        portal: "",
+        modalContent: "",
+        base: "",
         contentContainer: "",
         items: "",
         scrollView: "",
         scrollViewContentContainer: "",
     },
     variants: {
+        withBackdrop: {
+            true: {
+                modalBackdrop: classes.backdrop,
+            }
+        },
         ...VariantsFactory.createAll<IMenuVariantSlots>((value) => {
             return {
                 contentContainer: value,
             }
         }),
-        visible: {
-            true: {
-                //container: "opacity-100",
-            },
-            false: {
-                //container: "opacity-0",
-            }
-        },
         colorScheme: VariantsFactory.create<typeof VariantsColors.surface, IMenuVariantSlots>(VariantsColors.surface, (value) => {
             return {
                 contentContainer: value,

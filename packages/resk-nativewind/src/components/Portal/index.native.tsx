@@ -2,7 +2,7 @@ import { createContext, useRef, useContext, ReactNode, useEffect, useReducer, us
 import { View } from 'react-native';
 import { IPortalProps } from './types';
 import { defaultStr } from '@resk/core/utils';
-import { ModalBase } from '@components/ModalBase';
+import { Modal } from '@components/Modal';
 import { cn } from '@utils/cn';
 
 /**
@@ -105,6 +105,7 @@ const InternalPortalContext = createContext<IPortalContext | undefined>(undefine
  * ```
  */
 export function PortalProvider({ children }: { children?: ReactNode }): JSX.Element {
+    return children as any;
     const portalRefs = useRef<IPortalItem[]>([]);
     const addPortal = (key: string, children: ReactNode, props?: Omit<IPortalProps, "children">) => {
         portalRefs.current = [...portalRefs.current.filter(portal => portal.key !== key), { key, children, props }];
@@ -144,17 +145,19 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
 
 function PortalItem({ children, style, visible, contentClassName, testID, zIndex, ...props }: IPortalProps & { zIndex: number }) {
     zIndex = visible ? (1000 + zIndex) : 0;
+    const portalStyle = visible ? undefined : { zIndex: 0 };
     testID = defaultStr(testID, "resk-resk-portal");
-    return <ModalBase
+    return <Modal
         transparent
         visible={visible}
         {...props}
         className={cn("resk-portal", props.className)}
+        style={[portalStyle, style]}
     >
-        <View className={cn("resk-portal-content flex-col flex-1 items-start justify-start self-start", contentClassName)} style={[{ zIndex }]} testID={testID + "-portal-content"}>
+        <View className={cn("resk-portal-content flex-col flex-1 items-start justify-start self-start", contentClassName)} style={[portalStyle]} testID={testID + "-portal-content"}>
             {children}
         </View>
-    </ModalBase>
+    </Modal>
 };
 PortalItem.displayName = "Portal.Item";
 /**
@@ -200,8 +203,9 @@ const useInternalPortal = (): IPortalContext => {
  * ```
  */
 export function Portal({ children, ...props }: IPortalProps) {
-    const { addPortal, removePortal } = useInternalPortal();
     const key = useId();
+    return <PortalItem zIndex={1} {...props}>{children}</PortalItem>
+    const { addPortal, removePortal } = useInternalPortal();
     useEffect(() => {
         if (typeof addPortal === "function") {
             addPortal(key, children, props);

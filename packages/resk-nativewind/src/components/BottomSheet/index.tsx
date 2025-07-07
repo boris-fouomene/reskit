@@ -1,50 +1,43 @@
 "use client";
 import { IVariantPropsBottomSheet } from "@variants/bottomSheet";
-import { Portal } from "@components/Portal";
+import { Modal } from "@components/Modal";
 import { defaultStr, isObj } from "@resk/core/utils";
 import bottomSheetVariant from "@variants/bottomSheet";
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
-import { ViewProps, View } from "react-native";
-import { useBackHandler } from "@components/BackHandler";
 import { AppBar, IAppBarProps } from "@components/AppBar";
-import { Div } from "@html/Div";
+import { IModalProps } from "@components/Modal/types";
+import { View } from "react-native";
 
-export function BottomSheet({ variant, className, dismissable: customDismissable, appBarClassName, onRequestClose, contentClassName, withAppBar, appBarProps, children, onLayout, testID, portalClassName, visible, ...props }: IBottomSheetProps) {
+export function BottomSheet({ variant, className, appBarClassName, contentClassName, withAppBar, appBarProps, children, onLayout, testID, visible, ...props }: IBottomSheetProps) {
     testID = defaultStr(testID, "resk-bottom-sheet");
-    const dismissable = customDismissable !== false;
-    const computedVariant = bottomSheetVariant({ ...variant, visible });
-    useBackHandler(function () {
-        if (dismissable && typeof onRequestClose === "function") {
-            onRequestClose();
-        }
-        return true;
-    });
+    const computedVariant = bottomSheetVariant(variant);
     const renderAppBar = withAppBar && isObj(appBarProps);
-    return <Portal visible={visible} testID={testID + "-portal"} /* onPress={dismissable ? onRequestClose : undefined} backdropClassName={cn("bottom-sheet-backdrop", computedVariant.portalBackdrop())} */ className={cn("bottom-sheet-portal", computedVariant.portal(), portalClassName)}>
-        <View onAccessibilityEscape={dismissable ? onRequestClose : undefined}
-            {...props}
-            className={cn("bottom-sheet", computedVariant.base(), className)}
-            testID={testID}
-        >
-            <Div testID={testID + "-content"} className={cn("bottom-sheet-content", computedVariant.content())}>
-                {renderAppBar ? <AppBar testID={testID + "-app-bar"} backAction={false} {...appBarProps} className={cn("bottom-sheet-app-bar", computedVariant.appBar(), appBarClassName)} /> : null}
-                {children}
-            </Div>
+    return <Modal {...props} backdropClassName={computedVariant.modalBackdrop()} contentClassName={computedVariant.modalContent()} visible={visible} testID={testID + "-modal"} className={cn("bottom-sheet-modal", computedVariant.base(), className)}>
+        <View testID={testID} className={cn("bottom-sheet", computedVariant.base())}>
+            {renderAppBar ? <AppBar testID={testID + "-app-bar"} backAction={false} {...appBarProps} className={cn("bottom-sheet-app-bar", computedVariant.appBar(), appBarClassName)} /> : null}
+            {children}
         </View>
-    </Portal>
+    </Modal>
 }
 
-export interface IBottomSheetProps<Context = unknown> extends ViewProps {
+export interface IBottomSheetProps<Context = unknown> extends IModalProps {
     /***
         The variant of the bottom sheet.
     */
     variant?: IVariantPropsBottomSheet;
 
+
     /***
-        The class name of the portal wrapper.
+        whether to render the app bar in the bottom sheet
     */
-    portalClassName?: IClassName;
+    withAppBar?: boolean;
+
+    /***
+        The props to be passed to the AppBar component that wraps the bottom sheet content.
+    */
+    appBarProps?: IAppBarProps<Context>;
+
 
     /***
         The class name of the content.
@@ -55,49 +48,4 @@ export interface IBottomSheetProps<Context = unknown> extends ViewProps {
      * The class name of the app bar.
      */
     appBarClassName?: IClassName;
-
-    /**
-     * Whether the bottom sheet is visible.
-     * 
-     * @default false
-     * @example
-     * ```typescript
-     * <BottomSheet visible={true} />
-     * ```
-     */
-    visible?: boolean;
-
-
-    /**
-     * Whether the bottom sheet can be dismissed by the user.
-     * 
-     * @default true
-     * @example
-     * ```typescript
-     * <BottomSheet dismissable={false} />
-     * ```
-     */
-    dismissable?: boolean;
-
-
-    /**
-     * A callback function that is called when the bottom sheet is rquested to be closed.
-     * 
-     * @type Function
-     * @example
-     * ```typescript
-     * <BottomSheet onRequestClose={() => console.log('Bottom sheet requested to be closed')} />
-     * ```
-     */
-    onRequestClose?: () => void;
-
-    /***
-        whether to render the app bar in the bottom sheet
-    */
-    withAppBar?: boolean;
-
-    /***
-        The props to be passed to the AppBar component that wraps the bottom sheet content.
-    */
-    appBarProps?: IAppBarProps<Context>
 }

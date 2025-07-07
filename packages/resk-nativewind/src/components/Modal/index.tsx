@@ -1,171 +1,115 @@
 "use client";
-import { useMemo, createContext, useContext } from "react";
-import { GestureResponderEvent } from "react-native";
-import { Portal } from "@components/Portal";
-import { useBackHandler } from "@components/BackHandler/hooks";
-import { defaultStr } from "@resk/core/utils";
-import { Div } from "@html/Div";
-import { IHtmlDivProps } from "@html/types";
+import { IModalProps } from "./types";
+import { ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import "./styles.css";
+import { normalizeGestureEvent } from "@html/events";
 import { IClassName } from "@src/types";
+import { classes } from "@variants/classes";
+import { StyleSheet, View } from "react-native";
 import { cn } from "@utils/cn";
-import modalVariants, { IVariantPropsModal } from "@variants/modal";
+import { defaultStr, getMaxZindex } from "@resk/core/utils";
+import { useAccessibilityEscape } from "@html/accessibility";
+import { Div } from "@html/Div";
+import { isNextJs } from "@platform/isNext";
+import { createPortal } from "react-dom";
+import { usePrepareModal } from "./hook";
+import { Backdrop } from "@components/Backdrop";
 
-export const Modal = ({ visible, testID, portalClassName, onPress, variant, className, onAccessibilityEscape, containerClassName, dismissable: customDismissable, onRequestClose, ...props }: IModalProps) => {
-  const children = useMemo(() => {
-    return props.children;
-  }, [props.children]);
-  const dismissable = customDismissable !== false;
-  testID = defaultStr(testID, "resk-modal");
-  const modalVariant = modalVariants(variant);
-  const handleRequestClose = (e?: GestureResponderEvent | KeyboardEvent): any => {
-    if (typeof onRequestClose == "function") {
-      onRequestClose(e);
-    }
-    return true;
-  }
-  useBackHandler(dismissable ? handleRequestClose : () => true);
-  return (
-    <Portal
-      visible={visible}
-      testID={testID + "-modal-portal"}
-      //onPress={dismissable ? handleRequestClose : undefined} withBackdrop className={cn("modal-portal", modalVariant.container(), portalClassName)}
-      onAccessibilityEscape={() => {
-        if (typeof onAccessibilityEscape === "function") {
-          onAccessibilityEscape();
+
+
+export function Modal({ animationType, backdropClassName, onAccessibilityEscape, testID, contentClassName, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): ReactNode {
+    const [shouldRender, setShouldRender] = useState(!!(!isNextJs() && typeof document !== "undefined" && document));
+    useEffect(() => {
+        if (!shouldRender) {
+            setShouldRender(true);
         }
-        if (dismissable === false) return;
-        handleRequestClose(undefined as any);
-      }}
-    >
-      <Div
+    }, []);
+    const [isRendering, setIsRendering] = useState(false);
+    const wasVisible = useRef(false);
+    const wasRendering = useRef(false);
+    const generatedId = useId();
+    const modalId = defaultStr(id, generatedId);
+    useAccessibilityEscape(`#${modalId}`, function () {
+        if (typeof onAccessibilityEscape === "function") {
+            onAccessibilityEscape();
+        }
+        if (typeof onRequestClose == "function") {
+            onRequestClose(undefined as any);
+        }
+    });
+    const isAnimated = animationType && animationType !== 'none';
+    const onAnimationEnd = useCallback(
+        (e: any) => {
+            console.log(e, " is ending animation ", e?.currentTarget)
+            if (e && e?.currentTarget && e?.currentTarget !== e?.target) {
+                return;
+            }
+            if (visible) {
+                if (typeof onShow === "function") {
+                    onShow(e && e?.target ? normalizeGestureEvent(e) : undefined);
+                }
+            } else {
+                setIsRendering(false);
+            }
+        },
+        [onShow, visible]
+    );
+
+    useEffect(() => {
+        if (wasRendering.current && !isRendering && typeof onDismiss === "function") {
+            onDismiss();
+        }
+        wasRendering.current = isRendering;
+    }, [isRendering, onDismiss]);
+
+    useEffect(() => {
+        if (visible) {
+            setIsRendering(true);
+        }
+        if (visible !== wasVisible.current && !isAnimated) {
+            onAnimationEnd(undefined);
+        }
+        wasVisible.current = visible as boolean;
+    }, [isAnimated, visible, onAnimationEnd]);
+    const rProps = { onAnimationEnd };
+    const canRender = isRendering || visible;
+    const className = useMemo(() => {
+        const animatedStyle = visible ? "resk-modal-animated-in" : "resk-modal-animated-out";
+        const className: IClassName = [];
+        if (animationType === 'slide') {
+            className.push(visible ? "resk-modal-slide-in" : "resk-modal-slide-out");
+            className.push(animatedStyle);
+        } else if (animationType === 'fade') {
+            className.push(visible ? "resk-modal-fade-in" : "resk-modal-fade-out");
+            className.push(animatedStyle);
+        }
+        if (visible) {
+            className.push(classes.absoluteFill);
+        } else {
+            className.push("resk-modal-hidden");
+        }
+        return className;
+    }, [canRender, visible, modalClassName, animationType]);
+    const zIndex = useMemo(() => {
+        if (!visible) return 0;
+        return Math.max(getMaxZindex(), 1000) + 1;
+    }, [visible]);
+    const preparedModal = usePrepareModal({ backdropClassName, variant: props.variant, contentClassName });
+    if (!shouldRender || !canRender || typeof document === "undefined" || !document) return null;
+    testID = defaultStr(testID, "resk-modal");
+
+    return createPortal(<Div
         {...props}
+        {...rProps}
         testID={testID}
-        className={cn("resk-modal transition-opacity duration-500", modalVariant.content(), className)}
-      >
-        <ModalContext.Provider value={{ isVisible: visible as boolean, isClosed: () => !!!visible, isOpen: () => !!visible, handleRequestClose, dismissable: dismissable !== false }}>
-          {children}
-        </ModalContext.Provider>
-      </Div>
-    </Portal>
-  );
-};
-
-export interface IModalProps extends IHtmlDivProps {
-  /**
-   * Indicates whether the modal is currently visible.
- * If set to true, the modal will be displayed; otherwise, it will be hidden. */
-  visible?: boolean;
-
-  portalClassName?: IClassName;
-  /**
-   * A callback function that is called when an attempt is made to close the modal. 
-   * The event parameter can be either a GestureResponderEvent or a KeyboardEvent.
-   * @param event 
-   * @returns 
-   */
-  onRequestClose?: (event?: GestureResponderEvent | KeyboardEvent) => any;
-
-  /***
-   * When set to true, pressing the backdrop will close the modal. Defaults to true unless specified otherwise.
-   */
-  dismissable?: boolean;
-
-  containerClassName?: IClassName;
-
-  onAccessibilityEscape?: IHtmlDivProps["onAccessibilityEscape"];
-
-  variant?: IVariantPropsModal;
+        id={modalId}
+        role="dialog"
+        className={cn(className, modalClassName, transparent && "bg-transparent", "resk-modal")}
+        style={StyleSheet.flatten([{ zIndex }, style])}
+    >
+        {<Backdrop testID={testID + "-modal-backdrop"} className={preparedModal.backdropClassName} onPress={onRequestClose} />}
+        <View className={preparedModal.contentClassName} style={[{ zIndex }]} testID={testID + "-modal-content"}>
+            {children}
+        </View>
+    </Div>, document.querySelector("#reskit-app-root") || document.body);
 }
-
-export interface IModalContext {
-  isOpen?: () => boolean;
-  isClosed?: () => boolean;
-  isVisible?: boolean;
-  handleRequestClose: (e: GestureResponderEvent | KeyboardEvent) => any;
-  dismissable: boolean;
-}
-
-/**
- * Creates a context for managing modal states and properties in a React application.
- * The ModalContext provides a way to share modal-related data and functions 
- * throughout the component tree without having to pass props down manually at every level.
- *
- * @constant ModalContext
- * @type {React.Context<IModalContext | null>}
- *
- * @example
- * // Example of using ModalContext in a component
- * import React, { useContext } from 'react';
- * import { ModalContext } from './path/to/ModalContext';
- *
- * const ModalConsumerComponent = () => {
- *   const modalContext = useContext(ModalContext);
- *   
- *   if (!modalContext) {
- *     return <div>No Modal Context available</div>;
- *   }
- *   
- *   const { isOpen, handleRequestClose } = modalContext;
- *   
- *   return (
- *     <div>
- *       <button onClick={handleRequestClose}>Dismiss Modal</button>
- *       <p>Is Modal Opened: {isOpen() ? "Yes" : "No"}</p>
- *     </div>
- *   );
- * };
- *
- * @remarks
- * The context is initialized with a value of `null`, indicating that it may not be 
- * provided by a parent component. Components that consume this context should handle 
- * the possibility of it being null and provide a fallback or error handling as needed.
- *
- * It is recommended to wrap components that need access to this context with a 
- * corresponding provider that supplies the necessary modal state and functions.
- *
- * @see IModalContext for details on the properties and methods available in this context.
- */
-const ModalContext = createContext<IModalContext | null>(null);
-
-/**
- * A custom hook that provides access to the modal context. 
- * This hook allows components to easily consume the modal context 
- * without needing to use the `useContext` hook directly.
- *
- * @function useModal
- * @returns {IModalContext | null} The current modal context value, which includes 
- * properties and methods for managing modal state. Returns null if the context 
- * is not available, indicating that the component is not wrapped in a corresponding 
- * provider.
- *
- * @example
- * // Example of using the useModal hook in a component
- * import * as React from 'react';
- * import { useModal } from './path/to/useModal';
-import { disabled } from '../../../../../../frontend-dash/src/decorators/all/index';
- *
- * const ModalComponent = () => {
- *   const modalContext = useModal();
- *   
- *   if (!modalContext) {
- *     return <div>No modal context available</div>;
- *   }
- *   
- *   const { isVisible, handleRequestClose } = modalContext;
- *   
- *   return (
- *     <div>
- *       <h1>{isVisible ? "Modal is Open" : "Modal is Closed"}</h1>
- *       <button onClick={handleRequestClose}>Close Modal</button>
- *     </div>
- *   );
- * };
- *
- * @remarks
- * This hook should be used within components that are descendants of the 
- * `ModalContext.Provider`. If used outside of this provider, it will return null, 
- * and the consuming component should handle this case appropriately.
- *
- * @see ModalContext for more information about the context and its provider.
- */
-export const useModal = (): IModalContext | null => useContext(ModalContext);

@@ -1,8 +1,7 @@
 "use client";
 import MenuItems from './Items';
-import { Portal } from '@components/Portal';
 import { useEffect, useState, useRef, useMemo, Fragment, useImperativeHandle } from 'react';
-import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, TouchableOpacity, Animated } from 'react-native';
+import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, TouchableOpacity } from 'react-native';
 import { IMenuAnchorMeasurements, IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr, i18n } from '@resk/core';
@@ -12,7 +11,6 @@ import { isNumber } from "@resk/core/utils";
 import { measureInWindow } from '@utils/measureLayut';
 import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
-import { useBackHandler } from '@components/BackHandler';
 import menuVariants from '@variants/menu';
 import bottomSheetVariant from '@variants/bottomSheet';
 import { Div } from '@html/Div';
@@ -21,14 +19,10 @@ import allVariants from '@variants/all';
 import { Text } from '@html/Text';
 import { Icon } from '@components/Icon';
 import { Divider } from '@components/Divider';
-import { useMenuAnimations } from './animations';
-import { cssInterop, remapProps } from 'nativewind';
 import { Backdrop } from '@components/Backdrop';
+import { Modal } from '@components/Modal';
 
 
-const AnimatedViewRemaped = remapProps(Animated.View, {
-    className: "style",
-})
 export function Menu<Context = unknown>({
     onClose,
     children,
@@ -48,7 +42,6 @@ export function Menu<Context = unknown>({
     renderAsBottomSheetInFullScreen,
     bottomSheetTitle,
     bottomSheetTitleDivider,
-    portalClassName,
     maxHeight,
     className,
     scrollViewClassName,
@@ -211,10 +204,6 @@ export function Menu<Context = unknown>({
         }
         return children;
     }, [children, context]);
-    useBackHandler(function () {
-        close();
-        return true;
-    });
 
     const maxHeightStyle = maxMenuHeight ? { maxHeight: maxMenuHeight } : undefined;
     const computedVariant = menuVariants(Object.assign({}, variant, { visible: isVisible }));
@@ -246,28 +235,22 @@ export function Menu<Context = unknown>({
                 {anchor}
             </AnchorComponent>
         </MenuContext.Provider>
-        {<Portal onDismiss={dismissablePress} animationType={renderedAsBottomSheet ? "slide" : "fade"} visible={isVisible} testID={testID + "-portal"} /* onPress={() => close()} */ className={cn(renderedAsBottomSheet ? computedBottomSheetVariant.portal() : computedVariant.portal(), portalClassName, "menu-portal")}>
+        {<Modal
+            onRequestClose={dismissablePress}
+            backdropClassName={cn("menu-backdrop", renderedAsBottomSheet ? computedBottomSheetVariant.modalBackdrop() : computedVariant.modalBackdrop())}
+            animationType={renderedAsBottomSheet ? "slide" : "fade"} visible={isVisible}
+            testID={testID + "-menu-modal"}
+            contentClassName={cn(renderedAsBottomSheet ? computedBottomSheetVariant.modalContent() : computedVariant.modalContent(), "menu-modal-content")}
+        >
             <MenuContext.Provider value={context}>
-                <Backdrop
-                    className={cn("menu-backdrop", renderedAsBottomSheet ? computedBottomSheetVariant.portalBackdrop() : computedVariant.portalBackdrop())}
-                    onPress={dismissablePress}
-                />
                 <View
                     testID={testID}
                     {...props}
                     ref={ref}
-                    className={cn("resk-menu absolute flex-1", renderedAsBottomSheet ? computedBottomSheetVariant.base() : computedVariant.container(), className)}
+                    className={cn("resk-menu absolute flex-1", renderedAsBottomSheet ? computedBottomSheetVariant.base() : computedVariant.base(), className)}
                     style={[
                         !renderedAsBottomSheet && menuStyle,
                         style,
-                        /*                         renderedAsBottomSheet ? { width: "100%" } : { opacity: menuOpacity },
-                                                {
-                                                    transform: [
-                                                        { translateY: menuTranslateY },
-                                                        { scale: menuScale },
-                                                    ],
-                                                }
-                         */
                     ]}
                     onLayout={(event) => {
                         if (typeof onLayout === 'function') {
@@ -276,7 +259,7 @@ export function Menu<Context = unknown>({
                         onMenuLayout(event);
                     }}
                 >
-                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), contentContainerClassName)}>
+                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? "w-full h-full" : computedVariant.contentContainer(), contentContainerClassName)}>
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
                                 <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[10px]">
@@ -300,7 +283,7 @@ export function Menu<Context = unknown>({
                     </Div>
                 </View>
             </MenuContext.Provider>
-        </Portal>}
+        </Modal>}
     </>
 };
 

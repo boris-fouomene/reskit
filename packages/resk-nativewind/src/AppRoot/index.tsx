@@ -1,10 +1,8 @@
 import { Div } from "@html/Div";
-import { PortalProvider } from "@components/Portal";
 import { SetupExpo__DEV__ } from "@components/SetupExpo__DEV__";
 import { GlobalStyles } from "./GlobalStyles";
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
-import { Platform } from "..";
 
 /**
  * Props for the AppRoot component.
@@ -49,7 +47,6 @@ export interface AppRootProps {
  * ## Features
  * 
  * - **Cross-platform compatibility**: Works seamlessly in Next.js server-side components and Expo applications
- * - **Portal management**: Provides portal context for modal and overlay rendering using React portals
  *   - On web: Server-side compatible - simply returns children without client-side state
  *   - On mobile: Enables proper modal and overlay rendering within the React Native context
  * - **Development tools**: Includes Expo-specific development utilities when in development mode
@@ -105,7 +102,6 @@ export interface AppRootProps {
  * 
  * The component is structured in layers from outermost to innermost:
  * 1. **Layout Container** (`Div`): Provides the base layout structure and styling
- * 2. **Portal Provider**: Enables portal-based rendering for modals and overlays
  *    - **Web (Next.js)**: Server-side compatible implementation that simply returns children
  *    - **Mobile (Expo)**: Provides React Native portal context for proper modal rendering
  * 3. **Children**: Your application content
@@ -158,9 +154,7 @@ export function AppRoot({ children, className }: IAppRootProps) {
             className={cn("flex flex-col flex-1 h-full w-full relative reskit-app-root", className)}
             id="reskit-app-root"
         >
-            <PortalProvider>
-                {children}
-            </PortalProvider>
+            {children}
             <SetupExpo__DEV__ />
         </Div>
     </>;

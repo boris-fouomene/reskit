@@ -5,24 +5,15 @@ import { classes } from "./classes";
 
 const bottomSheet = tv({
   slots: {
-    portal: "flex flex-col flex-1 w-full h-full justify-end",
-    portalBackdrop: "",
-    base: "absolute left-0 bottom-0 w-full h-full",
-    content: "w-full h-full",
+    modalContent: "flex flex-col flex-1 w-full h-full justify-end",
+    modalBackdrop: "",
+    base: "relative w-full h-full",
     appBar: "w-full", //appBar classes options
   },
   variants: {
     withBackdrop: {
       true: {
-        portal: classes.backdrop,
-      },
-    },
-    visible: {
-      true: {
-        base: "translate-y-0",
-      },
-      false: {
-        base: "translate-y-full",
+        modalBackdrop: classes.backdrop,
       },
     },
     ...VariantsFactory.createAll<{ base: string }>((value) => {

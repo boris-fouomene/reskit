@@ -1,10 +1,11 @@
 "use client";
-import { isNumber, isObj } from "@resk/core/utils";
+import { isNonNullString, isNumber, isObj } from "@resk/core/utils";
 import { IMenuCalculatedPosition, IMenuPosition, IUseMenuPositionProps } from "./types";
 import { useCallback, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { useDimensions } from "@utils/dimensions/hooks";
 import Platform from "@platform";
+import { IPercentage } from "@resk/core/types";
 
 const MENU_MIN_WIDTH = 120;
 export const useMenuPosition = ({
@@ -15,14 +16,18 @@ export const useMenuPosition = ({
     sameWidth,
     preferedPositionAxis,
     anchorMeasurements,
-    minWidth,
     menuWidth,
     menuHeight,
+    minWidth: customMinWidth,
+    minHeight: customMinHeight,
     maxHeight: customMaxHeight,
 }: IUseMenuPositionProps) => {
     const padding = 0;
     const { window: { width: windowWidth, height: windowHeight }, isTablet, isMobile, ...rest } = useDimensions();
     const fullScreen = !!(isMobile && fullScreenOnMobile || isTablet && fullScreenOnTablet);
+    const computedMinWidth = computWidthOrHeight(windowWidth, customMinWidth);
+    const computedMinHeight = computWidthOrHeight(windowHeight, customMinHeight);
+    const computedMaxHeight = Math.max(computWidthOrHeight(windowHeight, customMaxHeight), 0, computedMinHeight);
     const calculatePosition = useCallback((): IMenuCalculatedPosition => {
         const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
         let calculatedPosition: IMenuCalculatedPosition = {
@@ -39,7 +44,7 @@ export const useMenuPosition = ({
         } else {
             const { pageX: pX, pageY: pY, width: anchorWidth, height: anchorHeight } = anchorMeasurements;
             const pageX = Math.max(0, pX), pageY = Math.max(0, pY);
-            minWidth = Math.max((isNumber(minWidth) && minWidth > 0 ? minWidth : anchorWidth), MENU_MIN_WIDTH);
+            let minWidth = Math.max((isNumber(computedMinWidth) && computedMinWidth > 0 ? computedMinWidth : anchorWidth), MENU_MIN_WIDTH);
             if (anchorWidth <= windowWidth - pageX) {
                 minWidth = Math.max(minWidth, anchorWidth);
             }
@@ -83,11 +88,11 @@ export const useMenuPosition = ({
                 right: isNumber(pos.left) && (pos.left + menuWidth <= windowWidth - padding) || isMaxHorizontalSpaceRight,// ,// && isMaxHorizontalSpaceRight,
             });
             let maxHeight = Math.max(spaces.top - 50, spaces.bottom - 50);
-            if ((isNumber(customMaxHeight))) {
-                if (customMaxHeight >= windowHeight * 0.45) {
-                    maxHeight = Math.min(customMaxHeight, maxHeight);
-                } else if (customMaxHeight < 200) {
-                    maxHeight = customMaxHeight;
+            if ((isNumber(computedMaxHeight) && computedMaxHeight > 0)) {
+                if (computedMaxHeight >= windowHeight * 0.45) {
+                    maxHeight = Math.min(computedMaxHeight, maxHeight);
+                } else if (computedMaxHeight < 200) {
+                    maxHeight = computedMaxHeight;
                 }
             }
             if (maxHeight > windowHeight) {
@@ -172,7 +177,7 @@ export const useMenuPosition = ({
             calculatedPosition = bestPosition;
         }
         return calculatedPosition;
-    }, [anchorMeasurements?.width, fullScreen, customMaxHeight, anchorMeasurements?.height, anchorMeasurements?.pageX, anchorMeasurements?.pageY, sameWidth, minWidth, visible, menuWidth, menuHeight, padding, position, windowWidth, windowHeight]);
+    }, [anchorMeasurements?.width, fullScreen, computedMaxHeight, anchorMeasurements?.height, anchorMeasurements?.pageX, anchorMeasurements?.pageY, sameWidth, computedMinWidth, visible, menuWidth, menuHeight, padding, position, windowWidth, windowHeight]);
     const menuPosition = calculatePosition();
     const menuAnchorStyle = useMemo(() => {
         if (!isNumber(anchorMeasurements?.width)) return {};
@@ -202,6 +207,9 @@ export const useMenuPosition = ({
         fullScreen,
         isTablet,
         isMobile,
+        computedMinWidth,
+        computedMinHeight,
+        computedMaxHeight,
         ...rest,
         menuStyle: StyleSheet.flatten({
             ...touchableBackdropStyle,
@@ -212,3 +220,14 @@ export const useMenuPosition = ({
         }),
     };
 };
+
+const computWidthOrHeight = (widthOrHeight: number, value?: number | IPercentage) => {
+    if (isNumber(value)) {
+        return value;
+    }
+    if (isNonNullString(value) && value.trim().endsWith("%")) {
+        const v = widthOrHeight * (parseFloat(value.trim().replace("%", "")) / 100);
+        return v;
+    }
+    return 0;
+}

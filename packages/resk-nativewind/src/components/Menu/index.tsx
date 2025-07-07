@@ -1,9 +1,9 @@
 "use client";
 import MenuItems from './Items';
 import { Portal } from '@components/Portal';
-import { useEffect, useState, useRef, useMemo, RefObject, Fragment, useImperativeHandle } from 'react';
-import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, StyleSheet, TouchableOpacity } from 'react-native';
-import { IMenuAnchorMeasurements, IMenuContext, IMenuProps, IMenuState } from './types';
+import { useEffect, useState, useRef, useMemo, Fragment, useImperativeHandle } from 'react';
+import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { IMenuAnchorMeasurements, IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr, i18n } from '@resk/core';
 import { MenuContext } from './context';
@@ -14,7 +14,6 @@ import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
 import { useBackHandler } from '@components/BackHandler';
 import menuVariants from '@variants/menu';
-import usePrevious from '@utils/usePrevious';
 import bottomSheetVariant from '@variants/bottomSheet';
 import { Div } from '@html/Div';
 import { classes } from '@variants/classes';
@@ -22,6 +21,7 @@ import allVariants from '@variants/all';
 import { Text } from '@html/Text';
 import { Icon } from '@components/Icon';
 import { Divider } from '@components/Divider';
+import { useMenuAnimations } from './animations';
 
 export function Menu<Context = unknown>({
     onClose,
@@ -57,6 +57,7 @@ export function Menu<Context = unknown>({
     disabled,
     contentContainerClassName,
     ref,
+    animationDuration,
     ...props
 }: IMenuProps<Context>) {
     const isControlled = useMemo(() => typeof visible == "boolean", [visible]);
@@ -178,6 +179,16 @@ export function Menu<Context = unknown>({
     const { maxHeight: _maxMenuHeight } = Object.assign({}, menuStyle);
     const maxMenuHeight = !renderedAsBottomSheet && isNumber(_maxMenuHeight) && _maxMenuHeight > 0 ? _maxMenuHeight : undefined;
     const context: IMenuContext<Context> = { ...Object.assign({}, props.context), menu: { maxHeight: maxMenuHeight, measureAnchor, renderedAsBottomSheet, windowHeight, windowWidth, isMobile, isTablet, fullScreen, isDesktop, anchorMeasurements: state.anchorMeasurements, position: menuPosition, testID, isOpen, open, close, isVisible: isVisible } };
+
+    const {
+        menuTranslateY,
+        menuScale,
+        menuOpacity,
+        showMenu,
+        hideMenu,
+        shouldRender,
+    } = useMenuAnimations({ isDesktop, windowHeight, windowWidth, renderedAsBottomSheet, animationDuration, isVisible });
+
     useImperativeHandle(ref, () => context as any);
     menuContextRef.current = context;
     let anchor = null;
@@ -244,7 +255,19 @@ export function Menu<Context = unknown>({
                     }}
                     style={StyleSheet.flatten([!renderedAsBottomSheet && menuStyle, props.style])}
                 >
-                    <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), contentContainerClassName)}>
+                    <Animated.View style={[
+                        maxHeightStyle,
+                        renderedAsBottomSheet ? { maxWidth: "100%" } : {},
+                        {
+                            transform: [
+                                { translateY: menuTranslateY },
+                                { scale: menuScale },
+                            ],
+                        }
+
+                    ]} testID={testID + "-menu-animated-container"}
+                        className={cn("max-h-full", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), contentContainerClassName)}
+                    >
                         <Wrapper {...wrapperProps}>
                             {renderedAsBottomSheet ? <Div className="self-start w-full">
                                 <Div testID={testID + "-close-menu"} className="w-full flex flex-row justify-between items-center py-[10px]">
@@ -265,7 +288,7 @@ export function Menu<Context = unknown>({
                             {items ? <MenuItems context={props.context} testID={testID + "-menu-items"} items={items as any} {...itemsProps} /> : null}
                             {child}
                         </Wrapper>
-                    </Div>
+                    </Animated.View>
                 </View>
             </MenuContext.Provider>
         </Portal>}

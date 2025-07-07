@@ -5,6 +5,7 @@ import { View, ViewProps } from "react-native";
 import { IVariantPropsMenu } from "@variants/menu";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IVariantPropsBottomSheet } from "@variants/bottomSheet";
+import { IPercentage } from "@resk/core/types";
 
 /**
  * Represents the possible positions where the menu can be displayed
@@ -234,17 +235,17 @@ export interface IUseMenuPositionProps {
     /***
      * The minimum width of the menu.
      */
-    minWidth?: number;
+    minWidth?: number | IPercentage;
 
     /**
      * The minimum height of the menu.
      */
-    minHeight?: number;
+    minHeight?: number | IPercentage;
 
     /***
      * The maximum width of the menu.
      */
-    maxHeight?: number;
+    maxHeight?: number | IPercentage;
 
     className?: IClassName;
 
@@ -406,6 +407,12 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
         Whether the menu is disabled or not.
     */
     disabled?: boolean;
+
+    /***
+     * The Bottom Sheet Animation Duration in milli seconds
+     * @default 300
+     */
+    animationDuration?: number;
 }
 
 

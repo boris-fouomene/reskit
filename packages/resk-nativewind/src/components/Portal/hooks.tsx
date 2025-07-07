@@ -4,15 +4,17 @@ import { IPortalProps } from "./types";
 import { cn } from "@utils/cn";
 import { classes } from "@variants/classes";
 import allVariants from "@variants/all";
+import Platform from "@platform";
+import { isNextJs } from "@platform/isNext";
 
 export const usePortal = ({ visible, className, backdropClassName, onPress, absoluteFill, withBackdrop }: Partial<IPortalProps>) => {
-    const [mounted, setMounted] = useState(false);
+    const [shouldRender, setShouldRender] = useState(!!(Platform.isNative() && (!isNextJs() && typeof document !== "undefined" && document)));
     const [isAnimating, setIsAnimating] = useState(false);
     useEffect(() => {
-        setMounted(true);
-        return () => setMounted(false);
+        if (!shouldRender) {
+            setShouldRender(true);
+        }
     }, []);
-
     useEffect(() => {
         if (visible) {
             setIsAnimating(true);
@@ -20,9 +22,9 @@ export const usePortal = ({ visible, className, backdropClassName, onPress, abso
     }, [visible]);
     return {
         className: cn("inset-0 web:transition-all transition ease-in-out duration-300", absoluteFill && classes.absoluteFill, visible ? ["opacity-100 visible pointer-events-auto"] : ["opacity-0 invisible pointer-events-none"], className),
-        backdropClassName: cn("inset-0 flex-1 w-full h-full",/*transition-opacity duration-300 ease-in-out*/visible ? "opacity-50" : "opacity-0", classes.absoluteFill, allVariants({ backdrop: withBackdrop }), backdropClassName),
+        backdropClassName: cn("inset-0 flex-1 w-full h-full transition-opacity duration-300 ease-in-out", visible ? "opacity-50" : "opacity-0", classes.absoluteFill, allVariants({ backdrop: withBackdrop }), backdropClassName),
         visible,
-        shouldRender: mounted,
+        shouldRender: shouldRender && visible,
         handleBackdrop: withBackdrop || absoluteFill || typeof onPress === "function",
     }
 }

@@ -10,11 +10,11 @@ import { IModalProps } from "@components/Modal/types";
 import { View } from "react-native";
 import { Backdrop } from "@components/Backdrop";
 
-export function BottomSheet({ variant, className, appBarClassName, contentContainerClassName, contentClassName, withAppBar, appBarProps, children, onLayout, testID, visible, ...props }: IBottomSheetProps) {
+export function BottomSheet({ variant, visible, className, appBarClassName, contentContainerClassName, contentClassName, withAppBar, appBarProps, children, onLayout, testID, ...props }: IBottomSheetProps) {
     testID = defaultStr(testID, "resk-bottom-sheet");
     const computedVariant = bottomSheetVariant(variant);
     const renderAppBar = withAppBar && isObj(appBarProps);
-    return <Modal testID={testID} {...props} className={cn(className, "bottom-sheet")}>
+    return <Modal visible={!!visible} testID={testID} {...props} className={cn(className, "bottom-sheet")}>
         <Backdrop
             className={cn("bottom-sheet-backdrop", computedVariant.modalBackdrop())}
             testID={testID + "-backdrop"}

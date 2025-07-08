@@ -413,7 +413,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         if (isNonNullString(context?.getSearchText?.())) {
             actions.push({
                 label: i18n.t("components.dropdown.clearSearchText"),
-                icon: "checkbox-blank-circle-outline" as never,
+                icon: "close" as never,
                 onPress: () => {
                     context?.onSearch?.({ value: "" })
                 },

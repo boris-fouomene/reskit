@@ -126,6 +126,11 @@ const alert = tv({
       })
     ) as Record<IVariantsColors.ColorName, IAlertSlot>,
   },
+  defaultVariants: {
+    shadow: "lg",
+    padding: 4,
+    iconSize: "30px",
+  },
 });
 
 export type IVariantPropsAlert = VariantProps<typeof alert>;

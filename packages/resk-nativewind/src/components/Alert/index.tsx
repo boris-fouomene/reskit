@@ -35,7 +35,6 @@ export function Alert({ title, icon, iconClassName, type, titleVariant, iconCont
             iconByType = "material-check-circle" as IIconSource;
             variantByType = { colorScheme: "success" };
             break;
-            break;
     }
     const computedVariant = alertVariant({ ...variantByType, ...variant });
     const iconContent = Icon.getIcon({ icon: icon ?? iconByType, className: cn("resk-alert-icon", computedVariant.icon(), iconVariants(iconVariant), iconClassName), testID: testID + "-icon" });

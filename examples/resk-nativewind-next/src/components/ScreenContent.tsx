@@ -2,6 +2,7 @@ import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
 import { BottomSheetExample } from './BottomSheetExample';
+import { AlertExamples } from './AlertExamples';
 import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack, SelectCountry, TelInput } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
@@ -12,6 +13,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
     <ScrollView testID='main-entry-appp'>
       <ModalExample />
       <BottomSheetExample />
+      <AlertExamples />
       <Div className="p-5">
         <H2>TextInput</H2>
         <Div className="p-5">

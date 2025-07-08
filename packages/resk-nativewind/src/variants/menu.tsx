@@ -63,7 +63,7 @@ const menu = tv({
     },
     defaultVariants: {
         colorScheme: "surface",
-        paddingBottom: "4",
+        paddingBottom: 4,
         transitionDuration: 300,
         shadow: "xl",
         transitionEasing: "ease-out",

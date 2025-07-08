@@ -13,6 +13,7 @@ const alert = tv({
     icon: "",
     iconContainer: "",
     closeIcon: "",
+    closeIconContainer: "",
   },
   variants: {
     ...VariantsFactory.createAll((value) => {
@@ -28,6 +29,7 @@ const alert = tv({
         title: textColor,
         message: textColor,
         icon: iconColor,
+        closeIcon: iconColor,
       };
     }),
     titleSize: VariantsFactory.createTextSize((value) => {
@@ -45,6 +47,17 @@ const alert = tv({
         icon: value,
       };
     }),
+    closeIconSize: VariantsFactory.createIconSize((value) => {
+      return {
+        closeIcon: value,
+      };
+    }),
+    closeIonColor: VariantsFactory.createIconColor((value) => {
+      return {
+        closeIcon: value,
+      };
+    }),
+
     titleColor: VariantsFactory.createTextColor((value) => {
       return {
         title: value,
@@ -85,6 +98,11 @@ const alert = tv({
         iconContainer: value,
       };
     }),
+    closeIconOpactiy: VariantsFactory.createOpacity((value) => {
+      return {
+        iconContainer: value,
+      };
+    }),
     iconContainerPadding: VariantsFactory.createPadding((value) => {
       return {
         iconContainer: value,
@@ -115,6 +133,38 @@ const alert = tv({
         iconContainer: value,
       };
     }),
+
+    closeIconContainerPadding: VariantsFactory.createPadding((value) => {
+      return {
+        closeIconContainer: value,
+      };
+    }),
+    closeIconContainerMargin: VariantsFactory.createMargin((value) => {
+      return {
+        closeIconContainer: value,
+      };
+    }),
+    closeIconContainerMarginRight: VariantsFactory.createMarginRight((value) => {
+      return {
+        closeIconContainer: value,
+      };
+    }),
+    closeIconContainerMarginLeft: VariantsFactory.createMarginLeft((value) => {
+      return {
+        closeIconContainer: value,
+      };
+    }),
+    closeIconContainerMarginTop: VariantsFactory.createMarginTop((value) => {
+      return {
+        closeIconContainer: value,
+      };
+    }),
+    closeIconContainerMarginBottom: VariantsFactory.createMarginBottom((value) => {
+      return {
+        closeIconContainer: value,
+      };
+    }),
+
     messageMargin: VariantsFactory.createMargin((value) => {
       return {
         message: value,

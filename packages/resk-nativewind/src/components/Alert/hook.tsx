@@ -1,9 +1,8 @@
 import { useState } from "react";
+import { IAlertHook } from "./types";
 
-export const useAlert = ({ }: {}) => {
+export const useAlert = (): IAlertHook => {
     return {
-        open: () => { },
-        close: () => { },
         isOpen: true,
     }
 }

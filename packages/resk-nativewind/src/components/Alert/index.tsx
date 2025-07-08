@@ -11,10 +11,11 @@ import textVariant, { IVariantPropsText } from "@variants/text";
 import iconVariants from "@variants/icon";
 import alertVariant, { IVariantPropsAlert } from "@variants/alert";
 import { IHtmlTextProps } from "@html/types";
-import { useAlert } from "./hook.native";
+import { useAlert } from "./hook";
+import { CloseAlert } from "./Close";
 
 export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClassName, closeIconContainerClassName, iconClassName, messageProps, children, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, headerClassName, className, ...rest }: IAlertProps) {
-    const { isOpen, open, close } = useAlert({});
+    const { isOpen, open, close } = useAlert();
     testID = defaultStr(testID, "resk-alert");
     let iconByType: IIconSource | undefined = undefined, variantByType: IVariantPropsAlert | undefined = undefined;
     switch (String(type).toLowerCase()) {
@@ -41,11 +42,11 @@ export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClass
     }
     const computedVariant = alertVariant({ ...variantByType, ...variant });
     const iconContent = Icon.getIcon({ icon: icon ?? iconByType, className: cn("resk-alert-icon", computedVariant.icon(), iconVariants(iconVariant), iconClassName), testID: testID + "-icon" });
-    const closeIContent = Icon.getIcon({ icon: closeIcon ?? undefined, className: cn("resk-alert--close-icon", computedVariant.closeIcon(), iconVariants(closeIconVariant), closeIconClassName), testID: testID + "-close-icon" });
+    const closeIContent = Icon.getIcon({ icon: closeIcon ?? "close" as never, className: cn("resk-alert--close-icon", computedVariant.closeIcon(), iconVariants(closeIconVariant), closeIconClassName), testID: testID + "-close-icon" });
 
     title = isValidElement(title) || isNonNullString(title) ? title : undefined;
     message = isValidElement(message) || isNonNullString(message) ? message : undefined;
-    return <Surface {...rest} testID={testID} className={cn("resk-alert transition-all duration-300 flex flex-col justify-start items-start text-start", isOpen ? "opacity-100" : "opacity-0", computedVariant.base(), className)}>
+    return <Surface {...rest} testID={testID} className={cn("resk-alert transform transition-opacity duration-300 flex flex-col justify-start items-start text-start", isOpen ? ["opacity-100 visible"] : ["opacity-0 invisible"], computedVariant.base(), className)}>
         {<Div className={cn("flex flex-row justify-between items-center w-full resk-alert-header", computedVariant.header(), headerClassName)}>
             {iconContent || title ? <Div className={cn("flex flex-row justify-start items-center self-center grow")}>
                 {iconContent ? <Div className={cn("overflow-hidden align-center items-center justify-center flex flex-col resk-alert-icon-container", iconContainerClassName)} testID={testID + "-icon-container"}>{iconContent}</Div> : null}
@@ -53,9 +54,11 @@ export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClass
                     {title}
                 </Text>
             </Div> : null}
-            {closeIContent ? <Div className={cn("overflow-hidden align-center grow-0 items-center justify-center flex flex-col resk-alert-close-icon-container", closeIconContainerClassName)} testID={testID + "-icon-container"}>
-                {closeIContent}
-            </Div> : null}
+            {closeIContent ? <CloseAlert
+                className={cn("overflow-hidden align-center grow-0 items-center justify-center flex flex-col resk-alert-close-icon-container", closeIconContainerClassName)}
+                children={closeIContent} isOpen={isOpen} open={open} close={close}
+                testID={testID + "-close-icon-container"}
+            /> : null}
         </Div>}
         {message ? <Text numberOfLines={10} {...messageProps} testID={testID + "-message"} className={cn("resk-alert-message w-full", computedVariant.message(), textVariant(messageVariant), messageProps?.className, messageClassName)}>
             {message}

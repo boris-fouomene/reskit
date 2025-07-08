@@ -103,14 +103,14 @@ const alert = tv({
         iconContainer: value,
       };
     }),
-    iconContainerPadding: VariantsFactory.createPadding((value) => {
+    iconContainerBackground: VariantsFactory.createBackgroundColor((value) => {
       return {
         iconContainer: value,
       };
     }),
-    iconContainerMargin: VariantsFactory.createMargin((value) => {
+    closeIconContainerBackground: VariantsFactory.createBackgroundColor((value) => {
       return {
-        iconContainer: value,
+        closeIconContainer: value,
       };
     }),
     iconContainerMarginRight: VariantsFactory.createMarginRight((value) => {
@@ -254,6 +254,7 @@ const alert = tv({
             icon,
             title: label,
             message: label,
+            closeIcon: icon,
           },
         ];
       })
@@ -262,11 +263,12 @@ const alert = tv({
   defaultVariants: {
     shadow: "lg",
     padding: 2,
-    messagePadding: "10px",
     headerMargin: "5px",
     iconContainerMargin: "5px",
+    closeIconContainerMargin: "5px",
     titleMarginLeft: "5px",
     iconSize: "25px",
+    closeIconSize: "25px",
     titleWeight: "bold",
     messageOpacity: 80,
   },

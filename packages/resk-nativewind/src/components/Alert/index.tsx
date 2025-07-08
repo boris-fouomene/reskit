@@ -12,7 +12,7 @@ import iconVariants from "@variants/icon";
 import alertVariant, { IVariantPropsAlert } from "@variants/alert";
 import { IHtmlTextProps } from "@html/types";
 
-export function Alert({ title, icon, iconClassName, messageProps, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, titleContainerClassName, className, ...rest }: IAlertProps) {
+export function Alert({ title, icon, iconClassName, messageProps, children, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, titleContainerClassName, className, ...rest }: IAlertProps) {
     testID = defaultStr(testID, "resk-alert");
     let iconByType: IIconSource | undefined = undefined, variantByType: IVariantPropsAlert | undefined = undefined;
     switch (String(type).toLowerCase()) {
@@ -51,6 +51,7 @@ export function Alert({ title, icon, iconClassName, messageProps, type, titleVar
         {message ? <Text numberOfLines={10} {...messageProps} testID={testID + "-message"} className={cn("resk-alert-message w-full", computedVariant.message(), textVariant(messageVariant), messageProps?.className, messageClassName)}>
             {message}
         </Text> : null}
+        {children ? children : null}
     </Surface>
 }
 

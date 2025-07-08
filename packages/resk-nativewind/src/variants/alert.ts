@@ -12,6 +12,7 @@ const alert = tv({
     titleContainer: "",
     icon: "",
     iconContainer: "",
+    closeIcon: "",
   },
   variants: {
     ...VariantsFactory.createAll((value) => {
@@ -232,4 +233,5 @@ type IAlertSlot = {
   titleContainer?: string;
   icon?: string;
   iconContainer?: string;
+  closeIcon?: string;
 };

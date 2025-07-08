@@ -69,4 +69,7 @@ export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
     variant?: IVariantPropsAlert;
     type?: "info" | "warning" | "error" | "success";
     messageProps?: Omit<IHtmlTextProps, "variant">;
+    closeIcon?: IIconSource;
+    closeIconClassName?: IClassName;
+    closeIconContainerClassName?: IClassName;
 }

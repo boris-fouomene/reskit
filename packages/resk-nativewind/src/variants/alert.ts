@@ -29,6 +29,11 @@ const alert = tv({
         icon: iconColor,
       };
     }),
+    titleSize: VariantsFactory.createTextSize((value) => {
+      return {
+        title: value,
+      };
+    }),
     iconSize: VariantsFactory.createIconSize((value) => {
       return {
         icon: value,
@@ -41,7 +46,6 @@ const alert = tv({
     }),
     titleColor: VariantsFactory.createTextColor((value) => {
       return {
-        "title-container": value,
         title: value,
       };
     }),
@@ -60,9 +64,13 @@ const alert = tv({
         message: value,
       };
     }),
+    messageSize: VariantsFactory.createTextSize((value) => {
+      return {
+        message: value,
+      };
+    }),
     titleOpacity: VariantsFactory.createOpacity((value) => {
       return {
-        "title-container": value,
         title: value,
       };
     }),
@@ -88,12 +96,12 @@ const alert = tv({
     }),
     iconContainerSize: VariantsFactory.createSize((value) => {
       return {
-        iconContainer: `${value} ${value.replaceAll("w-", "h-")}`,
+        iconContainer: value,
       };
     }),
     titleAlign: VariantsFactory.createTextAlign((value) => {
       return {
-        titleContainer: value,
+        title: value,
       };
     }),
     messageAlign: VariantsFactory.createTextAlign((value) => {
@@ -128,8 +136,12 @@ const alert = tv({
   },
   defaultVariants: {
     shadow: "lg",
-    padding: 4,
+    padding: 2,
+    titleContainerMargin: "5px",
+    iconContainerPadding: "5px",
     iconSize: "30px",
+    titleWeight: "bold",
+    messageOpacity: 80,
   },
 });
 

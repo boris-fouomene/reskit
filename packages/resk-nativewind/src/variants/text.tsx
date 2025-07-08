@@ -7,12 +7,7 @@ import { textAlignClasses } from "./variantsFactory/textAlignClasses";
 const text = tv({
     base: "",
     variants: {
-        ...VariantsFactory.createPadding2Margin(),
-        ...VariantsFactory.createAllShadow(),
-        ...VariantsFactory.createAllShadowColors(),
-        ...VariantsFactory.createAllOutline(),
-        ...VariantsFactory.createAllOpacity(),
-
+        ...VariantsFactory.createAll(),
 
         color: VariantsColors.text,
         hoverColor: VariantsFactory.createHoverTextColor(),

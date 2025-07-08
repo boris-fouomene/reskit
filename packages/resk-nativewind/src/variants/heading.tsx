@@ -18,8 +18,15 @@ const heading = tv({
         align: VariantsFactory.createTextAlign,
         textSize: VariantsFactory.createTextSize(),
         nativeTextSize: VariantsFactory.createNativeTextSize(),
-        weight: VariantsFactory.createFontWeight,
+        weight: VariantsFactory.createTextWeight,
+
         color: VariantsColors.text,
+        hoverColor: VariantsFactory.createHoverTextColor(),
+        activeColor: VariantsFactory.createActiveTextColor(),
+
+        size: VariantsFactory.createTextSize(),
+        nativeSize: VariantsFactory.createNativeTextSize(),
+
     },
     defaultVariants: {},
 })

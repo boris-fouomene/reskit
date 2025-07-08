@@ -40,7 +40,7 @@ const menu = tv({
                 contentContainer: value,
             }
         }),
-        bottomSheetTitleWeight: VariantsFactory.createFontWeight<IMenuVariantSlots>((value) => {
+        bottomSheetTitleWeight: VariantsFactory.createTextWeight<IMenuVariantSlots>((value) => {
             return {
                 bottomSheetTitle: value,
             }

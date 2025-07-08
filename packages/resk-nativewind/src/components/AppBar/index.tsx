@@ -60,7 +60,7 @@ function AppBar<Context = any>({
       <Text
         numberOfLines={1}
         testID={`${testID}-title`}
-        className={cn("font-medium text-lg", appVarVariant.title(), textVariant(titleVariant), titleClassName)}
+        className={cn("resk-appbar-title", appVarVariant.title(), textVariant(titleVariant), titleClassName)}
       >
         {title}
       </Text>
@@ -68,7 +68,7 @@ function AppBar<Context = any>({
         <Text
           numberOfLines={1}
           testID={`${testID}-subtitle`}
-          className={cn("text-sm opacity-90", appVarVariant.subtitle(), textVariant(subtitleVariant), subtitleClassName)}
+          className={cn("resk-appbar-subtitle", appVarVariant.subtitle(), textVariant(subtitleVariant), subtitleClassName)}
         >
           {subtitle}
         </Text>

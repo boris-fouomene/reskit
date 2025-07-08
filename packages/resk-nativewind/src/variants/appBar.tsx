@@ -21,6 +21,71 @@ const appBar = tv({
                 base: value,
             }
         }),
+        titleSize: VariantsFactory.createTextSize((value) => {
+            return {
+                title: value,
+            }
+        }),
+        titleWeight: VariantsFactory.createTextWeight((value) => {
+            return {
+                title: value,
+            }
+        }),
+        titleOpacity: VariantsFactory.createOpacity((value) => {
+            return {
+                title: value,
+            }
+        }),
+        hoverTitleOpacity: VariantsFactory.createHoverOpacity((value) => {
+            return {
+                title: value,
+            }
+        }),
+        activeTitleOpacity: VariantsFactory.createActiveOpacity((value) => {
+            return {
+                title: value,
+            }
+        }),
+        subtitleSize: VariantsFactory.createTextSize((value) => {
+            return {
+                subtitle: value,
+            }
+        }),
+        subTitleWeight: VariantsFactory.createTextWeight((value) => {
+            return {
+                subtitle: value,
+            }
+        }),
+        subTitleOpacity: VariantsFactory.createOpacity((value) => {
+            return {
+                subtitle: value,
+            }
+        }),
+        hoverSubTitleOpacity: VariantsFactory.createHoverOpacity((value) => {
+            return {
+                subtitle: value,
+            }
+        }),
+        activeSubTitleOpacity: VariantsFactory.createActiveOpacity((value) => {
+            return {
+                subtitle: value,
+            }
+        }),
+        actionTextSize: VariantsFactory.createTextSize((value) => {
+            return {
+                action: value,
+            }
+        }),
+        iconColor: VariantsFactory.createIconColor((value) => {
+            return {
+                icon: value,
+            }
+        }),
+        iconSize: VariantsFactory.createIconSize((value) => {
+            return {
+                icon: value,
+            }
+        }),
         colorScheme: Object.fromEntries(typedEntries(VariantsColors.surface).map(([key, value]) => {
             return [key, {
                 base: value,
@@ -31,7 +96,12 @@ const appBar = tv({
             }]
         })) as Record<IVariantsColors.ColorName, { base: string, title: string, subtitle: string, action: string, icon: string }>,
     },
-    defaultVariants: {}
+    defaultVariants: {
+        titleSize: "lg",
+        titleWeight: "medium",
+        subtitleSize: "sm",
+        subTitleOpacity: 90
+    }
 });
 
 export default appBar;

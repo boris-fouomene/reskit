@@ -74,10 +74,10 @@ const textInput = tv({
         nativeInputTextSize: VariantsFactory.createNativeTextSize<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
         }),
-        labelWeight: VariantsFactory.createFontWeight<ITextInputSlots>((value, colorName) => {
+        labelWeight: VariantsFactory.createTextWeight<ITextInputSlots>((value, colorName) => {
             return { label: value }
         }),
-        inputWeight: VariantsFactory.createFontWeight<ITextInputSlots>((value, colorName) => {
+        inputWeight: VariantsFactory.createTextWeight<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
         }),
         labelTextAlign: VariantsFactory.createTextAlign<ITextInputSlots>((value, colorName) => {

@@ -43,7 +43,7 @@ const dropdownItem = tv({
         label: value,
       };
     }),
-    textWeight: VariantsFactory.createFontWeight<IDropdownIconSlots>((value, colorName) => {
+    textWeight: VariantsFactory.createTextWeight<IDropdownIconSlots>((value, colorName) => {
       return {
         label: value,
       };
@@ -53,7 +53,7 @@ const dropdownItem = tv({
         selectedLabel: value,
       };
     }),
-    selectedTextWeight: VariantsFactory.createFontWeight<IDropdownIconSlots>((value, colorName) => {
+    selectedTextWeight: VariantsFactory.createTextWeight<IDropdownIconSlots>((value, colorName) => {
       return {
         selectedLabel: value,
       };

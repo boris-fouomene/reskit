@@ -188,7 +188,7 @@ export const VariantsFactory = {
     return VariantsFactory.create<typeof VariantsColors.activeIconForeground, ResultType>(VariantsColors.activeIconForeground, variantMutator);
   },
 
-  createFontWeight: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof fontWeightClasses, ResultType>) {
+  createTextWeight: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof fontWeightClasses, ResultType>) {
     return VariantsFactory.create<typeof fontWeightClasses, ResultType>(fontWeightClasses, variantMutator);
   },
   createBorderStyle: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses.borderStyle, ResultType>) {
@@ -334,11 +334,11 @@ const allVariantClasses = {
   roundedTopRight: roundedTopRightRadiusClasses,
   roundedBottomLeft: roundedBottomLeftRadiusClasses,
   roundedBottomRight: roundedBottomRightRadiusClasses,
+
   ...opacityClasses,
   ...shadowClasses,
   ...borderClasses,
   ...outlineClasses,
-
   ...allShadowColors,
 
   borderColor: VariantsColors.borderColor,
@@ -348,7 +348,9 @@ const allVariantClasses = {
   borderRightColor: VariantsColors.borderRightColor,
   hoverBorderColor: VariantsColors.hoverBorderColor,
   activeBorderColor: VariantsColors.activeBorderColor,
+
   ...width2heightClasses,
+
   ringColor: VariantsColors.ringColors,
   activeRingColor: VariantsColors.activeRingColors,
   hoverRingColor: VariantsColors.hoverRingColors,
@@ -357,6 +359,7 @@ const allVariantClasses = {
   hoverRingWidth: hoverRingWidthClasses,
   activeRingWidth: activeRingWidthClasses,
   focusRingWidth: focusRingWidthClasses,
+
   ...scalesClasses,
   ...borderClasses,
   ...padding2marginClasses,

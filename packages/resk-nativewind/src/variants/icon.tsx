@@ -3,11 +3,7 @@ import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 const icon = tv({
     variants: {
-        ...VariantsFactory.createPadding2Margin(),
-        ...VariantsFactory.createAllShadow(),
-        ...VariantsFactory.createAllShadowColors(),
-        ...VariantsFactory.createAllOutline(),
-        ...VariantsFactory.createAllOpacity(),
+        ...VariantsFactory.createAll(),
 
         color: VariantsColors.icon,
         size: VariantsFactory.createIconSize(),

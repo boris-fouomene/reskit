@@ -9,11 +9,13 @@ import { AppBar, IAppBarProps } from "@components/AppBar";
 import { IModalProps } from "@components/Modal/types";
 import { View } from "react-native";
 import { Backdrop } from "@components/Backdrop";
+import { IVariantPropsAppBar } from "@variants/appBar";
+import appBarVariants from "@variants/appBar";
 
 export function BottomSheet({ variant, visible, className, appBarClassName, contentContainerClassName, contentClassName, withAppBar, appBarProps, children, onLayout, testID, ...props }: IBottomSheetProps) {
     testID = defaultStr(testID, "resk-bottom-sheet");
     const computedVariant = bottomSheetVariant(variant);
-    const renderAppBar = withAppBar && isObj(appBarProps);
+    const renderAppBar = withAppBar !== false && isObj(appBarProps);
     return <Modal animationType="slide" visible={!!visible} testID={testID} {...props}
         className={cn(className, "bottom-sheet")}
         backdropClassName={cn("resk-bottom-sheet-backdrop", computedVariant.modalBackdrop())}

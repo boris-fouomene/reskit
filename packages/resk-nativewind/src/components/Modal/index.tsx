@@ -16,12 +16,6 @@ import { Backdrop } from "@components/Backdrop";
 
 const hiddenStyle = "resk-modal-hidden opacity-0 invisible";
 export function Modal({ animationType, backdropClassName, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): ReactNode {
-    const [shouldRender, setShouldRender] = useState(!!(typeof document !== "undefined" && document));
-    useEffect(() => {
-        if (!shouldRender) {
-            setShouldRender(true);
-        }
-    }, []);
     const [isRendering, setIsRendering] = useState(false);
     const wasVisible = useRef(false);
     const wasRendering = useRef(false);
@@ -91,7 +85,7 @@ export function Modal({ animationType, backdropClassName, onAccessibilityEscape,
         if (!visible) return 0;
         return Math.max(getMaxZindex(), 1000) + 1;
     }, [visible]);
-    if (!shouldRender || !canRender || typeof document === "undefined" || !document) return null;
+    if (!canRender || typeof document === "undefined" || !document) return null;
     testID = defaultStr(testID, "resk-modal");
     return createPortal(<Div
         {...props}

@@ -492,7 +492,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
     const menuContext = useMenu();
     const { menu } = Object.assign({}, menuContext);
     const menuPosition = menu?.position;
-    const isTopPosition = menuPosition?.computedPlacement === "top";
+    const isTopPosition = menuPosition?.yPlacement === "top";
     const fullScreen = !!menu?.fullScreen;
     const canReverse = isTopPosition && !fullScreen;
     const preparedItems = context.getPreparedItems();

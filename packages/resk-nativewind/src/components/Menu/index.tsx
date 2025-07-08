@@ -247,7 +247,7 @@ export function Menu<Context = unknown>({
                     testID={testID}
                     {...props}
                     ref={ref}
-                    className={cn("resk-menu absolute flex-1", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.base(), className)}
+                    className={cn("resk-menu absolute flex-1 flex-col flex", renderedAsBottomSheet ? computedBottomSheetVariant.contentContainer() : computedVariant.base(), className)}
                     style={[
                         !renderedAsBottomSheet && menuStyle,
                         style,

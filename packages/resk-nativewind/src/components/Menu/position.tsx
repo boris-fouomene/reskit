@@ -32,8 +32,8 @@ export const useMenuPosition = ({
         const isValidPosition = position && ["top", "left", "bottom", "right"].includes(String(position));
         let calculatedPosition: IMenuCalculatedPosition = {
             computedPlacement: "bottom",
-            xPosition: "left",
-            yPosition: "top",
+            xPlacement: "left",
+            yPlacement: "top",
             left: 0,
             top: 0,
         };
@@ -114,8 +114,8 @@ export const useMenuPosition = ({
                     bottom,
                     left: canUseAnchorSpace ? pageX : isMaxHorizontalSpaceLeft ? undefined : pageX,
                     right: canUseAnchorSpace ? undefined : isMaxHorizontalSpaceLeft ? spaces.right : undefined,
-                    yPosition: 'top',
-                    xPosition: maxHorizontalPosition,
+                    yPlacement: 'top',
+                    xPlacement: maxHorizontalPosition,
                     maxHeight: spaces.top,
                 },
                 bottom: {
@@ -125,8 +125,8 @@ export const useMenuPosition = ({
                     bottom: undefined,
                     left: canUseAnchorSpace ? pageX : isMaxHorizontalSpaceLeft ? undefined : pageX,
                     right: canUseAnchorSpace ? undefined : isMaxHorizontalSpaceLeft ? spaces.right : undefined,
-                    yPosition: 'bottom',
-                    xPosition: maxHorizontalPosition,
+                    yPlacement: 'bottom',
+                    xPlacement: maxHorizontalPosition,
                     maxHeight: spaces.bottom,
                 },
                 /***
@@ -135,8 +135,8 @@ export const useMenuPosition = ({
                 left: {
                     ...rProps,
                     computedPlacement: "left",
-                    xPosition: 'left',
-                    yPosition: maxVerticalPosition,
+                    xPlacement: 'left',
+                    yPlacement: maxVerticalPosition,
                     left: undefined,//Math.max(0, pageX + anchorWidth - padding),
                     right: spaces.right,
                     top: isMaxVerticalSpaceBottom ? top : undefined,// - (menuHeight / 2),
@@ -150,8 +150,8 @@ export const useMenuPosition = ({
                     right: undefined,
                     top: isMaxVerticalSpaceBottom ? top : undefined,// + (anchorHeight / 2),// - (menuHeight / 2),
                     bottom: isMaxVerticalSpaceBottom ? undefined : bottom,
-                    xPosition: 'right',
-                    yPosition: maxVerticalPosition,
+                    xPlacement: 'right',
+                    yPlacement: maxVerticalPosition,
                     maxHeight: isMaxVerticalSpaceBottom ? spaces.bottom : spaces.top,
                 }
             };
@@ -198,7 +198,7 @@ export const useMenuPosition = ({
             maxHeight: windowHeight - (fullScreen ? 0 : Math.max(sizeToRemove.height, 10)),
         }
     }, [menuPosition, fullScreen, windowWidth, windowHeight, sizeToRemove.width, sizeToRemove.height]);
-    const { xPosition, computedPlacement, yPosition, ...positionStyle } = menuPosition;
+    const { xPlacement, computedPlacement, yPlacement, ...positionStyle } = menuPosition;
     return {
         calculatePosition,
         menuPosition,

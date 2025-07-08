@@ -144,14 +144,47 @@ export interface IMenuAnchorMeasurements {
  * renderMenu(calculatedPosition);
  */
 export interface IMenuCalculatedPosition {
-    xPosition?: IMenuPosition;
-    yPosition?: IMenuPosition;
-    left?: number;
-    top?: number;
-    height?: number;
-    width?: number;
-    bottom?: number;
+    /**
+     * The computed placement of the menu.
+     */
     computedPlacement: IMenuPosition;
+    /**
+     * The placement of the menu along the x-axis.
+     */
+    xPlacement?: IMenuPosition;
+    /**
+     * The placement of the menu along the y-axis.
+     */
+    yPlacement?: IMenuPosition;
+
+    /**
+     * The left position of the menu.
+     */
+    left?: number;
+
+    /**
+     * The top position of the menu.
+     */
+    top?: number;
+
+    /**
+     * The height of the menu.
+     */
+    height?: number;
+
+    /**
+     * The width of the menu.
+     */
+    width?: number;
+
+    /***
+        The bottom position of the menu.
+    */
+    bottom?: number;
+
+    /**
+     * The right position of the menu.
+     */
     right?: number;
     /**
      * The max width of the menu.

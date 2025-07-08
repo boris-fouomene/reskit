@@ -1,7 +1,7 @@
 import isNonNullString from "../isNonNullString";
 import { IDict } from "../../types";
 import "../string";
-import queryString, { IParseBaseOptions, IStringifyBaseOptions } from 'qs';
+import queryString, { IParseBaseOptions, IStringifyBaseOptions } from "qs";
 /**
  * Returns the query string from a given URL.
  *
@@ -29,7 +29,7 @@ export const extractQueryString = (uri?: string, addQuestionSeparator: boolean =
     uri = uri.trim().ltrim("?").rtrim("?");
   }
   return uri;
-}
+};
 /**
  * Returns the query parameters from a given URL as an object.
  *
@@ -47,9 +47,9 @@ export const extractQueryString = (uri?: string, addQuestionSeparator: boolean =
  * ```
  */
 export const getQueryParams = function (uri: string | null | undefined, queryStringOpts: IParseBaseOptions = {}): IDict {
-  if (typeof uri !== 'string') return {};
+  if (typeof uri !== "string") return {};
   return queryString.parse(extractQueryString(uri, false), { allowSparse: true, ...Object.assign({}, queryStringOpts) });
-}
+};
 
 /**
  * Removes the query string from a given URL and returns the resulting URL.
@@ -70,19 +70,18 @@ export const getQueryParams = function (uri: string | null | undefined, queryStr
  */
 export const removeQueryString = function (uri: string | undefined | null, _decodeURIComponent: boolean = false): string {
   if (typeof uri !== "string") return "";
-  uri = uri.replace(/#.*$/, '').replace(/\?.*$/, '');
+  uri = uri.replace(/#.*$/, "").replace(/\?.*$/, "");
   if (_decodeURIComponent === true) {
     return decodeURIComponent(uri);
   }
   return uri;
-}
-
+};
 
 const defaultStringifyOptions: IStringifyBaseOptions = {
   indices: false,
-  arrayFormat: 'brackets',
-  encodeValuesOnly: true
-}
+  arrayFormat: "brackets",
+  encodeValuesOnly: true,
+};
 
 /**
  * Adds query parameters to a given URL.
@@ -112,12 +111,11 @@ export function setQueryParams(url: string | undefined | null, key: any, value?:
   } else if (typeof key == "string") {
     key = { [key]: value };
   }
-  if (typeof key == 'object' && key && !Array.isArray(key)) {
+  if (typeof key == "object" && key && !Array.isArray(key)) {
     Object.assign(params, key);
   }
   return url + "?" + queryString.stringify(params, { ...defaultStringifyOptions, ...Object.assign({}, options) });
 }
-
 
 /**
  * Converts an object to a query string.
@@ -137,28 +135,28 @@ export function setQueryParams(url: string | undefined | null, key: any, value?:
  * ```
  */
 export function objectToQueryString(o: any, encodeURI: boolean = false): string {
-  if (o == null || typeof o !== 'object') return "";
+  if (o == null || typeof o !== "object") return "";
   function iter(o: any, path: string) {
     if (Array.isArray(o)) {
       o.forEach(function (a) {
-        iter(a, path + '[]');
+        iter(a, path + "[]");
       });
       return;
     }
-    if (o !== null && typeof o === 'object') {
+    if (o !== null && typeof o === "object") {
       Object.keys(o).forEach(function (k) {
-        iter(o[k], path + '[' + k + ']');
+        iter(o[k], path + "[" + k + "]");
       });
       return;
     }
-    data.push((encodeURI ? encodeURIComponent(path) : path) + '=' + (encodeURI ? encodeURIComponent(o) : o));
+    data.push((encodeURI ? encodeURIComponent(path) : path) + "=" + (encodeURI ? encodeURIComponent(o) : o));
   }
 
   const data: string[] = [];
   Object.keys(o).forEach(function (k) {
     iter(o[k], k);
   });
-  return data.join('&');
+  return data.join("&");
 }
 /**
  * Parses a URI and returns the parsed object.
@@ -188,34 +186,38 @@ export function objectToQueryString(o: any, encodeURI: boolean = false): string 
  * // }
  * ```
  */
-export const parseURI = (uri: string | null | undefined): {
-  hash?: string, // URL hash
-  host?: string,
-  hostname?: string,
-  href?: string,
-  origin?: string,
-  pathname?: string,
-  port?: string,
-  protocol?: string,
-  search?: string,
-  username?: string,
-  password?: string,
+export const parseURI = (
+  uri: string | null | undefined
+): {
+  hash?: string; // URL hash
+  host?: string;
+  hostname?: string;
+  href?: string;
+  origin?: string;
+  pathname?: string;
+  port?: string;
+  protocol?: string;
+  search?: string;
+  username?: string;
+  password?: string;
 } => {
   if (typeof uri !== "string") return {};
   var m = uri.match(/^(([^:\/?#]+:)?(?:\/\/((?:([^\/?#:]*):([^\/?#:]*)@)?([^\/?#:]*)(?::([^\/?#:]*))?)))?([^?#]*)(\?[^#]*)?(#.*)?$/);
-  let r = !m ? {} : {
-    hash: m[10] || "",                   // #asd
-    host: m[3] || "",                    // localhost:257
-    hostname: m[6] || "",                // localhost
-    href: m[0] || "",                    // http://username:password@localhost:257/deploy/?asd=asd#asd
-    origin: m[1] || "",                  // http://username:password@localhost:257
-    pathname: m[8] || (m[1] ? "/" : ""), // /deploy/
-    port: m[7] || "",                    // 257
-    protocol: m[2] || "",                // http:
-    search: m[9] || "",                  // ?asd=asd
-    username: m[4] || "",                // username
-    password: m[5] || ""                 // password
-  };
+  let r = !m
+    ? {}
+    : {
+        hash: m[10] || "", // #asd
+        host: m[3] || "", // localhost:257
+        hostname: m[6] || "", // localhost
+        href: m[0] || "", // http://username:password@localhost:257/deploy/?asd=asd#asd
+        origin: m[1] || "", // http://username:password@localhost:257
+        pathname: m[8] || (m[1] ? "/" : ""), // /deploy/
+        port: m[7] || "", // 257
+        protocol: m[2] || "", // http:
+        search: m[9] || "", // ?asd=asd
+        username: m[4] || "", // username
+        password: m[5] || "", // password
+      };
   if (r.protocol && r.protocol.length == 2) {
     r.protocol = "file:///" + r.protocol.toUpperCase();
     r.origin = r.protocol + "//" + r.host;
@@ -224,30 +226,30 @@ export const parseURI = (uri: string | null | undefined): {
     r.href = r.origin + r.pathname + r.search + r.hash;
   }
   return r;
-}
+};
 
 /**
  * Checks if the provided value is a valid URL/URI.
  *
- * This function determines whether the string passed as the parameter 
+ * This function determines whether the string passed as the parameter
  * `uri` is a valid URL or URI. It performs the following checks:
  *
- * 1. **Non-null String Check**: The function uses `isNonNullString` to 
+ * 1. **Non-null String Check**: The function uses `isNonNullString` to
  *    ensure that `uri` is a non-null string.
  *
- * 2. **URL/URI Validation**: The function then tests the string against 
- *    a regular expression that checks if the string has the structure 
+ * 2. **URL/URI Validation**: The function then tests the string against
+ *    a regular expression that checks if the string has the structure
  *    of a valid URL. The regular expression verifies the following:
  *    - An optional scheme (like `http://` or `https://`).
- *    - A domain name that can either be a fully qualified domain name 
+ *    - A domain name that can either be a fully qualified domain name
  *      or `localhost`.
  *    - An optional port and other URL components.
  *
- * The function returns `true` if the provided string is a valid URL/URI; 
+ * The function returns `true` if the provided string is a valid URL/URI;
  * otherwise, it returns `false`.
  *
  * @param {any} uri - The string to check as a valid URL/URI.
- * @returns {boolean} - Returns `true` if the string is a valid URL/URI, 
+ * @returns {boolean} - Returns `true` if the string is a valid URL/URI,
  *                      `false` otherwise.
  *
  * @example
@@ -263,6 +265,17 @@ export const parseURI = (uri: string | null | undefined): {
  * console.log(isValidUrl('http://256.256.256.256')); // false (invalid IP address)
  */
 export const isValidUrl = (uri: any): uri is string => {
-  if (!isNonNullString(uri)) return false;
-  return !!/^(?:\w+:)?\/\/([^\s\.]+\.\S{2}|localhost[\:?\d]*)\S*$/.test(uri);
+  if (!isNonNullString(uri) || !uri.trim()) return false;
+  if (!!/^(?:\w+:)?\/\/([^\s\.]+\.\S{2}|localhost[\:?\d]*)\S*$/.test(uri)) {
+    return true;
+  }
+  if (typeof URL !== "undefined" && URL) {
+    try {
+      const urlObj = new URL(uri);
+      return urlObj.protocol === "http:" || urlObj.protocol === "https:";
+    } catch {
+      return false;
+    }
+  }
+  return false;
 };

@@ -15,8 +15,10 @@ import progressBar from "./progressBar";
 import textInput from "./textInput";
 import bottomSheet from "./bottomSheet";
 import dropdownItem from "./dropdownItem";
+import alert from "./alert";
 export const variants = {
     all,
+    alert,
     bottomSheet,
     textInput,
     menu,

@@ -275,7 +275,7 @@ export function Menu<Context = unknown>({
                                         >{bottomSheetTitle}</Text>
                                     </Div>
                                     <Icon
-                                        iconName={'close' as any}
+                                        fontIconName={'close' as any}
                                         title={i18n.t('components.menu.close')}
                                         size={30}
                                         onPress={() => {

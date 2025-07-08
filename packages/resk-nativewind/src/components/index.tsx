@@ -24,3 +24,4 @@ export * from "./TextInput"
 export * from "./Dropdown";
 export * from "./SelectCountry";
 export * from "./BottomSheet";
+export * from "./Alert";

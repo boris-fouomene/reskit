@@ -22,13 +22,13 @@ import ClientFontIcon, { DEFAULT_FONT_ICON_SIZE } from "./Client";
  * 
  * @example
  * ```ts
- * import FontIcon from "$components/Icon/Font";
+ *  import {Icon} from "@resk/nativewind";
  * 
  * export default function MyApp() {
  *   return (
  *     <>
- *       <FontIcon name="camera" />  // Defaults to MaterialCommunityIcons
- *       <FontIcon name="fa6-camera" />  // Uses FontAwesome6 icon set
+ *       <Icon.Font name="camera" />  // Defaults to MaterialCommunityIcons
+ *       <Icon.Font name="fa6-camera" />  // Uses FontAwesome6 icon set
  *     </>
  *   );
  * }

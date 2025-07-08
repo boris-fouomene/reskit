@@ -10,12 +10,13 @@ import { variants } from "@variants/index";
 import { Tooltip } from "@components/Tooltip";
 
 
-function Icon({ iconName, className, variant, resizeMode, title, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
+function Icon({ fontIconName, className, variant, src, resizeMode, title, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
     const isSource = isImageSource(source);
+    const iconSrc = isImageSource(src) ? src : undefined;
     className = cn(isObj(variant) && variants.icon(variant), className);
     testID = testID && typeof testID == "string" ? testID : (isSource ? "resk-image" : "resk-font-icon");
     const iconSize = typeof size == "number" && size > 0 ? size : FontIcon.DEFAULT_SIZE;
-    if (isSource) {
+    if (isSource || iconSrc) {
         const { touchableProps, ...restProps } = pickTouchableProps(normalizeProps({ ...props, className }));
         const disabled = !!props.disabled;
         const isPressable = !disabled && (!!touchableProps || !!title);
@@ -32,6 +33,7 @@ function Icon({ iconName, className, variant, resizeMode, title, source, contain
             <Image
                 accessibilityIgnoresInvertColors
                 resizeMode={resizeMode || "contain"}
+                src={iconSrc}
                 {...restProps}
                 ref={ref as any}
                 testID={testID}
@@ -43,7 +45,7 @@ function Icon({ iconName, className, variant, resizeMode, title, source, contain
     return <FontIcon
         containerClassName={containerClassName}
         testID={testID}
-        name={iconName as never}
+        name={fontIconName as never}
         size={iconSize}
         style={style}
         title={title}
@@ -110,11 +112,11 @@ Icon.getIcon = function getIcon<T = any>({ icon, ...rest }: IGetIconOptions<T>):
     if (isValidElement(icon)) return icon as ReactNode;
     if (!icon) return null;
     const isSource = isImageSource(icon) || isNonNullString(icon) && isImageUrl(icon as string);
-    const iconName = typeof icon == "string" && !isSource ? (icon as any) : undefined;
+    const fontIconName = typeof icon == "string" && !isSource ? (icon as any) : undefined;
     const iconProps: IIconProps = {
         ...rest,
-        iconName,
-        ...(!iconName ? { source: getIconSource(icon) } : {}),
+        fontIconName,
+        ...(!fontIconName ? { source: getIconSource(icon) } : {}),
     }
     return <Icon {...iconProps} />;
 }
@@ -134,7 +136,7 @@ export default Icon;
  *               additional properties specific to the implementation context.
  *
  * @interface IGetIconOptions
- * @extends Omit<IIconProps, "iconName" | "source"> - Excludes the `iconName` and `source` properties
+ * @extends Omit<IIconProps, "fontIconName" | "source"> - Excludes the `fontIconName` and `source` properties
  *                                                from the base icon properties, as they are
  *                                                not needed for this context.
  * 
@@ -229,13 +231,13 @@ type IGetIconOptions<T = any> = Omit<T, keyof IGetIconOptionsBase> & IGetIconOpt
  * 
  * @example
  * // Using in a function
- * function createIcon(options: IGetIconOptionsBase & { iconName: string }) {
+ * function createIcon(options: IGetIconOptionsBase & { fontIconName: string }) {
  *   return {
  *     ...options,
- *     iconName : options.iconName,
+ *     fontIconName : options.fontIconName,
  *   };
  * }
  * 
  * @see {@link IIconProps} For the complete set of icon properties
  */
-type IGetIconOptionsBase = Omit<IIconProps, "iconName" | "source" | "color">;
+type IGetIconOptionsBase = Omit<IIconProps, "fontIconName" | "source" | "color">;

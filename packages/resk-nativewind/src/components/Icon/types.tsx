@@ -39,9 +39,9 @@ export type IFontIconName = keyof IFontIconNameRegistry;
 * @extends React.ComponentProps<typeof MaterialCommunityIcons>
 * @example
 * // Valid icon names
-* const iconName: IFontIconProps['name'] = "home"; // From MaterialCommunityIcons
+* const fontIconName: IFontIconProps['name'] = "home"; // From MaterialCommunityIcons
 * const iconNameAnt: IFontIconProps['name'] = "antd-home"; // From AntDesign
-* <FontIcon name={iconName} />;
+* <FontIcon name={fontIconName} />;
 *
 * @property {number} [size] - The icon size.
 * 
@@ -50,7 +50,7 @@ export type IFontIconName = keyof IFontIconNameRegistry;
 * the icon's size according to your layout needs.
 * 
 * @example
-* <FontIcon iconName="home" size={30} /> // Renders the icon with a size of 30 pixels
+* <FontIcon fontIconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
 export type IFontIconProps = Omit<IconProps, 'name' | 'size' | "ref" | "className"> & INativewindBaseProps & ITooltipBaseProps & IVariantPropsAll & {
@@ -155,7 +155,7 @@ export type IIconSource = IFontIconName | ImageSourcePropType | null | JSX.Eleme
  * @typedef {IIconProps}
  * 
  * @extends {IFontIconProps} - All properties related to font icons, including:
- *   - `iconName`: The name of the icon to display.
+ *   - `fontIconName`: The name of the icon to display.
  *   - `style`: The style object for the icon.
  *   - `size`: The size of the icon.
  * 
@@ -173,7 +173,7 @@ export type IIconSource = IFontIconName | ImageSourcePropType | null | JSX.Eleme
  * @example
  * // Using IIconProps to render a font icon
  * const iconProps: IIconProps = {
- *   iconName : "home" | "material-home",
+ *   fontIconName : "home" | "material-home",
  *   style: { color: 'blue', fontSize: 24 },
  *   size: 30,
  *   resizeMode: 'contain',
@@ -195,7 +195,7 @@ export type IIconProps = Partial<Omit<IFontIconProps, "name" | "color">> & Omit<
      * MaterialCommunityIcons, AntDesign, Feather, Ionicons, Octicons, SimpleLineIcons, 
      * Zocial, MaterialIcons, and FoundationIcons.
      */
-    iconName?: IFontIconName;
+    fontIconName?: IFontIconName;
 
     ref?: any;
 };

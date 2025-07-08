@@ -18,12 +18,12 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <TextInput label="TextInput"
             variant={{ focusedBorderColor: "primary", shadow: "md", focusedShadowColor: "error", focusedBorderWidth: 2 }}
             left={<>
-              <Icon iconName="phone" size={30} variant={{ color: "primary" }} />
-              <Icon iconName="camera" size={30} variant={{ color: "secondary" }} />
+              <Icon fontIconName="phone" size={30} variant={{ color: "primary" }} />
+              <Icon fontIconName="camera" size={30} variant={{ color: "secondary" }} />
             </>}
             right={<>
-              <Icon iconName="material-language" size={30} variant={{ color: "success" }} />
-              <Icon iconName="clock" size={30} variant={{ color: "warning" }} />
+              <Icon fontIconName="material-language" size={30} variant={{ color: "success" }} />
+              <Icon fontIconName="clock" size={30} variant={{ color: "warning" }} />
             </>}
           />
         </Div>
@@ -36,12 +36,12 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <TextInput type="tel" label="Tel" phoneCountryCode='CM' placeholder="Enter your tel"
           labelEmbeded variant={{ marginY: "20px", rounded: "rounded" }}
           left={<>
-            <Icon iconName="phone" size={30} variant={{ color: "primary" }} />
-            <Icon iconName="camera" size={30} variant={{ color: "secondary" }} />
+            <Icon fontIconName="phone" size={30} variant={{ color: "primary" }} />
+            <Icon fontIconName="camera" size={30} variant={{ color: "secondary" }} />
           </>}
           right={<>
-            <Icon iconName="calendar" size={30} variant={{ color: "success" }} />
-            <Icon iconName="clock" size={30} variant={{ color: "warning" }} />
+            <Icon fontIconName="calendar" size={30} variant={{ color: "success" }} />
+            <Icon fontIconName="clock" size={30} variant={{ color: "warning" }} />
           </>}
         />
         <TextInput variant={{ borderStyle: "solid", borderWidth: 1 }} type="number" label="Border" placeholder="Enter your border" />
@@ -151,7 +151,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <Heading level={2}>Icons Buttons examples : </Heading>
         <HStack className="p-5 !gap-x-10">
           <Icon.Button variant={{ colorScheme: "secondary" }}
-            iconName='camera'
+            fontIconName='camera'
             title="secondary color icon camera"
             size={30}
           />
@@ -159,7 +159,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
             title="primary color icon car"
             disabled
             variant={{ colorScheme: "primary", size: "5xl" }}
-            iconName="car"
+            fontIconName="car"
             size={40}
           />
           <Icon.Font title={"A phone icon"} variant={{ color: "secondary", size: "5xl" }} name={"phone"} />

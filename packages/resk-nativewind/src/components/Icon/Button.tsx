@@ -22,7 +22,7 @@ const PADDING = 8;
  * @param {object} [props.style] - The custom styles to apply to the icon.
  * @param {string} [props.testID] - Optional test identifier for the button.
  * @param {boolean} [props.isLoading=false] - Indicates if a loading spinner should be shown instead of the icon.
- * @param {string} [props.iconName] - The name of the font icon to display.
+ * @param {string} [props.fontIconName] - The name of the font icon to display.
  * @param {object} [props.source] - The image source for the icon.
  * @param {string} [props.containerClassName] - Additional class names for the button container.
  * @param {number} [props.containerSize] - The size of the button container.
@@ -39,7 +39,7 @@ export default function IconButton(
         style,
         testID,
         isLoading = false,
-        iconName,
+        fontIconName,
         source,
         variant: buttonVariant,
         containerClassName,
@@ -76,7 +76,7 @@ export default function IconButton(
                     ...restProps,
                     className: cn("self-center", disabled && "pointer-events-none", computedVariant?.icon?.(), className),
                     style,
-                    icon: source || iconName || undefined,
+                    icon: source || fontIconName || undefined,
                     testID,
                     size,
                 }) || (isValidElement(children) ? children : null)}

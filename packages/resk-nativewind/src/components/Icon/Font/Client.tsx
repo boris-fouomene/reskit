@@ -1,12 +1,6 @@
 "use client";
-import Feather from "react-native-vector-icons/Feather";
-import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Foundation from "react-native-vector-icons/Foundation";
-import Octicons from "react-native-vector-icons/Octicons";
+import { fontsObjects } from "./utils";
+
 import { IFontIconProps } from "../types";
 import { pickTouchableProps } from "@utils/touchHandler";
 import { cn, normalizeProps } from "@utils/cn";
@@ -22,17 +16,17 @@ export const DEFAULT_FONT_ICON_SIZE = 20;
 export default function ClientFontIcon({ name, variant, containerClassName, title, ref, ...props }: IFontIconProps) {
     const { touchableProps, size, disabled, className, ...restProps } = pickTouchableProps(normalizeProps(props));
     const nameString = defaultStr(name).trim();
-    let iconName = nameString;
+    let fontIconName = nameString;
     if (!isNonNullString(nameString)) return null;
     const nameArray = nameString.split("-");
-    let IconSet = MaterialCommunityIcons, iconSetName = "";
+    let IconSet = fontsObjects[""], iconSetName = "";
     if ((fontsObjects as any)[nameArray[0]]) {
         iconSetName = nameArray[0];
         IconSet = (fontsObjects as any)[iconSetName];
         nameArray.shift();
-        iconName = nameArray.join("-");
+        fontIconName = nameArray.join("-");
     }
-    const iconClassName = cn(iconVariants(variant), className, "font-icon", ("font-icon-" + iconName), ("font-icon-raw-name-" + nameString), ("font-icon-set-" + iconSetName));
+    const iconClassName = cn(iconVariants(variant), className, "font-icon", ("font-icon-" + fontIconName), ("font-icon-raw-name-" + nameString), ("font-icon-set-" + iconSetName));
     const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>
@@ -48,7 +42,7 @@ export default function ClientFontIcon({ name, variant, containerClassName, titl
                 ref={ref as any}
                 {...rP}
                 className={iconClassName}
-                name={iconName}
+                name={fontIconName}
             />
         </Tooltip>
     }
@@ -57,20 +51,11 @@ export default function ClientFontIcon({ name, variant, containerClassName, titl
         {...rP}
         disabled={disabled}
         ref={ref as any}
-        name={iconName}
+        name={fontIconName}
         className={cn(iconClassName)}
     />;
 }
 
 
-const fontsObjects = {
-    "": MaterialCommunityIcons,
-    antd: AntDesign,
-    fa6: FontAwesome6,
-    ionic: Ionicons,
-    material: MaterialIcons,
-    feather: Feather,
-    foundation: Foundation,
-    octicons: Octicons,
-}
+
 

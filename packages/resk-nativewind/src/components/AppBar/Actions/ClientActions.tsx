@@ -60,7 +60,7 @@ export function AppBarClientActions<Context = unknown>({ context, menuAnchorClas
             anchor={({ menu }) => {
                 return <Icon.Button
                     size={28}
-                    iconName={FONT_ICONS.MORE as any}
+                    fontIconName={FONT_ICONS.MORE as any}
                     {...menuAnchorIconProps}
                     className={cn("flex-none mx-[7px]", menuAnchorClassName, menuAnchorIconProps?.className)}
                     onPress={() => {

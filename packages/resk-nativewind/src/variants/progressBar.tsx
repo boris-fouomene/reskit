@@ -102,7 +102,7 @@ const progressBar = tv({
                 text: value,
             }
         }),
-        rounded: VariantsFactory.createRounded<{ track: string, fillBar: string }>((value) => {
+        ...VariantsFactory.createAllRounded<{ track: string, fillBar: string }>((value) => {
             return {
                 track: "",
                 fillBar: value,

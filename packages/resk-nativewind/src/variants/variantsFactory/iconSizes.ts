@@ -83,4 +83,4 @@ export const iconSizes = {
         "95px": "native:!text-[95px]",
         "100px": "native:!text-[100px]"
     }
-}
+} as const;

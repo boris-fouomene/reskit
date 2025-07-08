@@ -50,9 +50,6 @@ const textInput = tv({
         ...VariantsFactory.createBorders<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
-        rounded: VariantsFactory.createRounded<ITextInputSlots>((value, colorName) => {
-            return { contentContainer: value }
-        }),
         iconSize: VariantsFactory.createIconSize<ITextInputSlots>((value, colorName) => {
             return { icon: value }
         }),

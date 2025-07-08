@@ -53,5 +53,5 @@ export const transitions = {
     "ease-out": "ease-out",
     "ease-in-out": "ease-in-out",
   }
-};
+} as const;
 

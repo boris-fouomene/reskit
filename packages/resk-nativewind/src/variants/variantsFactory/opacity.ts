@@ -73,4 +73,4 @@ export const opacityClasses = {
         95: 'hover:opacity-95',
         100: 'hover:opacity-100'
     }
-};
+} as const;

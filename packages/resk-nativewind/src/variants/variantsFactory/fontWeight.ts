@@ -11,4 +11,4 @@ export const fontWeightClasses = {
   extralight: "font-extralight",
   extrabold: "font-extrabold",
   black: "font-black",
-};
+} as const;

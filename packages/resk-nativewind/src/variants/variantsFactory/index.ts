@@ -1,4 +1,4 @@
-import { roundeClasses, roundedBottomClasses, roundedBottomLeftRadiusClasses, roundedBottomRightRadiusClasses, roundedRightClasses, roundedTopClasses, roundedTopLeftRadiusClasses, roundedTopRightRadiusClasses, roundeLeftClasses } from "./rounded";
+import { roundedClasses, } from "./rounded";
 import { marginClasses, padding2marginClasses, paddingClasses } from "./padding2margin";
 import { borderClasses } from "./border";
 import { shadowClasses } from "./shadow";
@@ -12,15 +12,27 @@ import { ringWidthClasses } from "./ring";
 import { scalesClasses } from "./scales";
 import { IClassName } from "@src/types";
 import { transitions } from "./transitions";
-import { typedEntries } from "@resk/core/utils";
+import { isNonNullString, typedEntries } from "@resk/core/utils";
 import { opacityClasses } from "./opacity";
 import { outlineClasses } from "./outline";
 
+
+// This version maintains the exact key-value mapping
+type IUcFirst<S extends string> = S extends `${infer F}${infer R}`
+  ? `${Uppercase<F>}${R}`
+  : S;
+
+// This version maintains the exact key-value mapping
+type IAddPrefixAndIUcFirst<T, P extends string = any> = P extends "" ? T : Record<`${P}${IUcFirst<keyof T & string>}`, T[keyof T]>;
+
 type IVariantFactoryMutator<InputType extends Record<IVariantKey, any>, ResultType = string, VariantGroupName = any> = (value: InputType[keyof InputType], variantName: keyof InputType, variantGroupName?: VariantGroupName) => ResultType;
 type IVariantKey = string | number;
-type IVariantCompositeResult<T extends Record<string, Record<IVariantKey, unknown>>> = {
+type IVariantCompositeResult<T extends Record<string, Record<IVariantKey, unknown>>, CompositePrefix extends string = any> = {
   [K in keyof T]: T[K] extends Record<IVariantKey, infer V> ? Record<keyof T[K], V> : never;
 };
+/*{
+  [K in keyof T]: T[K] extends Record<IVariantKey, infer V> ? IAddPrefixAndIUcFirst<Record<keyof T[K], V>, CompositePrefix> : never;
+};*/
 
 const allShadowColors = {
   shadowColor: VariantsColors.shadow,
@@ -30,15 +42,7 @@ const allShadowColors = {
   activeBackground: VariantsColors.activeBackground,
 };
 const allVariantsClasses = {
-  rounded: roundeClasses,
-  roundedLeft: roundeLeftClasses,
-  roundedRight: roundedRightClasses,
-  roundedTop: roundedTopClasses,
-  roundedBottom: roundedBottomClasses,
-  roundedTopLeft: roundedTopLeftRadiusClasses,
-  roundedTopRight: roundedTopRightRadiusClasses,
-  roundedBottomLeft: roundedBottomLeftRadiusClasses,
-  roundedBottomRight: roundedBottomRightRadiusClasses,
+  ...roundedClasses,
 
   ...opacityClasses,
   ...shadowClasses,
@@ -65,7 +69,7 @@ const allVariantsClasses = {
   ...scalesClasses,
   ...borderClasses,
   ...padding2marginClasses,
-};
+} as const;
 
 /**
  * A utility factory for generating and transforming variant objects in a type-safe manner.
@@ -151,7 +155,7 @@ export const VariantsFactory = {
   },
   createSize: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof width2heightClasses.width, ResultType>) {
     return VariantsFactory.create<typeof width2heightClasses.width, ResultType>(width2heightClasses.width, (value, variantName, variantGroupName) => {
-      value = `${value} ${value.replaceAll("w-", "h-")}`;
+      value = `${value} ${value.replaceAll("w-", "h-")}` as any;
       if (typeof variantMutator == "function") {
         return variantMutator(value, variantName, variantGroupName);
       }
@@ -161,22 +165,22 @@ export const VariantsFactory = {
   createPadding: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.padding, ResultType>) {
     return VariantsFactory.create<typeof paddingClasses.padding, ResultType>(paddingClasses.padding, variantMutator);
   },
-  createPadingTop: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingTop, ResultType>) {
+  createPaddingTop: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingTop, ResultType>) {
     return VariantsFactory.create<typeof paddingClasses.paddingTop, ResultType>(paddingClasses.paddingTop, variantMutator);
   },
-  createPadingBottom: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingBottom, ResultType>) {
+  createPaddingBottom: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingBottom, ResultType>) {
     return VariantsFactory.create<typeof paddingClasses.paddingBottom, ResultType>(paddingClasses.paddingBottom, variantMutator);
   },
-  createPadingLeft: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingLeft, ResultType>) {
+  createPaddingLeft: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingLeft, ResultType>) {
     return VariantsFactory.create<typeof paddingClasses.paddingLeft, ResultType>(paddingClasses.paddingLeft, variantMutator);
   },
-  createPadingRight: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingRight, ResultType>) {
+  createPaddingRight: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingRight, ResultType>) {
     return VariantsFactory.create<typeof paddingClasses.paddingRight, ResultType>(paddingClasses.paddingRight, variantMutator);
   },
-  createPadingX: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingX, ResultType>) {
+  createPaddingX: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingX, ResultType>) {
     return VariantsFactory.create<typeof paddingClasses.paddingX, ResultType>(paddingClasses.paddingX, variantMutator);
   },
-  createPadingY: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingY, ResultType>) {
+  createPaddingY: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof paddingClasses.paddingY, ResultType>) {
     return VariantsFactory.create<typeof paddingClasses.paddingY, ResultType>(paddingClasses.paddingY, variantMutator);
   },
   createMargin: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof marginClasses.margin, ResultType>) {
@@ -212,33 +216,9 @@ export const VariantsFactory = {
   createNativeIconSize: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof iconSizes.nativeIconSize, ResultType>) {
     return VariantsFactory.create<typeof iconSizes.nativeIconSize, ResultType>(iconSizes.nativeIconSize, variantMutator);
   },
-  createRounded: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof roundeClasses, ResultType>) {
-    return VariantsFactory.create<typeof roundeClasses, ResultType>(roundeClasses, variantMutator);
-  },
-  createComposite: function <T extends Record<string, Record<IVariantKey, IClassName>>, ResultType = string>(composite: T, variantMutator?: IVariantFactoryMutator<T[keyof T], ResultType>): IVariantCompositeResult<T> {
-    const r = {} as any;
-    typedEntries(composite).forEach(([key, value]) => {
-      r[key] = VariantsFactory.create<T[keyof T], ResultType, keyof T>(value, variantMutator, key);
-    });
-    return r;
-  },
-  createPaddings: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>) {
-    return VariantsFactory.createComposite<typeof paddingClasses, ResultType>(paddingClasses, variantMutator);
-  },
-  createScales: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>) {
-    return VariantsFactory.createComposite<typeof scalesClasses, ResultType>(scalesClasses, variantMutator as any);
-  },
-  createMargins: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof marginClasses)[keyof typeof marginClasses], ResultType>) {
-    return VariantsFactory.createComposite<typeof marginClasses, ResultType>(marginClasses, variantMutator as any);
-  },
-  createWidth2Height: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof width2heightClasses)[keyof typeof width2heightClasses], ResultType>) {
-    return VariantsFactory.createComposite<typeof width2heightClasses, ResultType>(width2heightClasses, variantMutator);
-  },
-  createPadding2Margin: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>) {
-    return VariantsFactory.createComposite<typeof padding2marginClasses, ResultType>(padding2marginClasses, variantMutator);
-  },
 
-  createBackgroundColor: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.background, ResultType>) {
+
+  createBackgroundColor: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.background, ResultType>, compositePrefix?: CompositePrefix) {
     return VariantsFactory.create<typeof VariantsColors.background, ResultType>(VariantsColors.background, variantMutator);
   },
   createHoverBackgroundColor: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.hoverBackground, ResultType>) {
@@ -308,20 +288,6 @@ export const VariantsFactory = {
   createHoverShadow: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof shadowClasses.hoverShadow, ResultType>) {
     return VariantsFactory.create<typeof shadowClasses.hoverShadow, ResultType>(shadowClasses.hoverShadow, variantMutator);
   },
-  createAllShadow: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof shadowClasses)[keyof typeof shadowClasses], ResultType>) {
-    return VariantsFactory.createComposite<typeof shadowClasses, ResultType>(shadowClasses, variantMutator);
-  },
-  createAllShadowColors: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allShadowColors)[keyof typeof allShadowColors], ResultType>) {
-    return VariantsFactory.createComposite<typeof allShadowColors, ResultType>(allShadowColors, variantMutator);
-  },
-  createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allVariantsClasses)[keyof typeof allVariantsClasses], ResultType, keyof typeof allVariantsClasses>): IVariantFactoryAll<ResultType> {
-    const result: IVariantFactoryAll<ResultType> = {} as any;
-    Object.keys(allVariantsClasses).forEach((_variantGroupName) => {
-      const variantGroupName = _variantGroupName as keyof typeof allVariantsClasses;
-      (result as any)[variantGroupName] = VariantsFactory.create<(typeof allVariantsClasses)[keyof typeof allVariantsClasses], ResultType, keyof typeof allVariantsClasses>((allVariantsClasses as any)[variantGroupName], variantMutator, variantGroupName);
-    });
-    return result;
-  },
   createOpacity: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof opacityClasses.opacity, ResultType>) {
     return VariantsFactory.create<typeof opacityClasses.opacity, ResultType>(opacityClasses.opacity, variantMutator);
   },
@@ -367,9 +333,6 @@ export const VariantsFactory = {
   createBorderBlockWidth: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses.borderBlockWidth, ResultType>) {
     return VariantsFactory.create<typeof borderClasses.borderBlockWidth, ResultType>(borderClasses.borderBlockWidth, variantMutator);
   },
-  createBorders: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof borderClasses)[keyof typeof borderClasses], ResultType>) {
-    return VariantsFactory.createComposite<typeof borderClasses, ResultType>(borderClasses, variantMutator);
-  },
   createBorderColor: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.borderColor, ResultType>) {
     return VariantsFactory.create<typeof VariantsColors.borderColor, ResultType>(VariantsColors.borderColor, variantMutator);
   },
@@ -391,9 +354,6 @@ export const VariantsFactory = {
   createActiveBorderColor: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.activeBorderColor, ResultType>) {
     return VariantsFactory.create<typeof VariantsColors.activeBorderColor, ResultType>(VariantsColors.activeBorderColor, variantMutator);
   },
-  createTransitions: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof transitions)[keyof typeof transitions], ResultType>) {
-    return VariantsFactory.createComposite<typeof transitions, ResultType>(transitions, variantMutator);
-  },
   createTransitionDuration: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof transitions.transitionDuration, ResultType>) {
     return VariantsFactory.create<typeof transitions.transitionDuration, ResultType>(transitions.transitionDuration, variantMutator);
   },
@@ -403,17 +363,69 @@ export const VariantsFactory = {
   createTransitionEasing: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof transitions.transitionEasing, ResultType>) {
     return VariantsFactory.create<typeof transitions.transitionEasing, ResultType>(transitions.transitionEasing, variantMutator);
   },
-  createAllOpacity: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof opacityClasses)[keyof typeof opacityClasses], ResultType>) {
-    return VariantsFactory.createComposite<typeof opacityClasses, ResultType>(opacityClasses, variantMutator);
-  },
-  createAllOutline: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof outlineClasses)[keyof typeof outlineClasses], ResultType>) {
-    return VariantsFactory.createComposite<typeof outlineClasses, ResultType>(outlineClasses, variantMutator);
-  },
   createOutlineWidth: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof outlineClasses.outlineWidth, ResultType>) {
     return VariantsFactory.create<typeof outlineClasses.outlineWidth, ResultType>(outlineClasses.outlineWidth, variantMutator);
   },
+
+
+
+  createComposite: function <T extends Record<string, Record<IVariantKey, IClassName>>, ResultType = string, CompositePrefix extends string = any>(composite: T, variantMutator?: IVariantFactoryMutator<T[keyof T], ResultType, keyof T>, compositePrefix?: CompositePrefix): IVariantCompositeResult<T, CompositePrefix> {
+    const r = {} as any;
+    typedEntries(composite).forEach(([key, value]) => {
+      r[/* isNonNullString(compositePrefix) ? `${compositePrefix}${String(key).upperFirst()}` :  */key] = VariantsFactory.create<T[keyof T], ResultType, keyof T>(value, variantMutator as any, key);
+    });
+    return r;
+  },
+  createAllRounded: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof roundedClasses)[keyof typeof roundedClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof roundedClasses, ResultType>(roundedClasses, variantMutator, compositePrefix);
+  },
+  createPaddings: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof paddingClasses, ResultType>(paddingClasses, variantMutator, compositePrefix);
+  },
+  createScales: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof scalesClasses, ResultType>(scalesClasses, variantMutator as any, compositePrefix);
+  },
+  createMargins: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof marginClasses)[keyof typeof marginClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof marginClasses, ResultType>(marginClasses, variantMutator as any, compositePrefix);
+  },
+  createWidth2Height: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof width2heightClasses)[keyof typeof width2heightClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof width2heightClasses, ResultType>(width2heightClasses, variantMutator as any, compositePrefix);
+  },
+  createPadding2Margin: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof padding2marginClasses, ResultType>(padding2marginClasses, variantMutator as any, compositePrefix);
+  },
+
+  createAllShadow: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof shadowClasses)[keyof typeof shadowClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof shadowClasses, ResultType, CompositePrefix>(shadowClasses, variantMutator as any, compositePrefix);
+  },
+  createAllShadowColors: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof allShadowColors)[keyof typeof allShadowColors], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof allShadowColors, ResultType, CompositePrefix>(allShadowColors, variantMutator as any, compositePrefix);
+  },
+  createAll: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof allVariantsClasses)[keyof typeof allVariantsClasses], ResultType, keyof typeof allVariantsClasses>, compositePrefix?: CompositePrefix): IVariantFactoryAll<ResultType, CompositePrefix> {
+    const result: IVariantFactoryAll<ResultType, CompositePrefix> = {} as any;
+    Object.keys(allVariantsClasses).forEach((_variantGroupName) => {
+      const variantGroupName = _variantGroupName as keyof typeof allVariantsClasses;
+      (result as any)[/* isNonNullString(compositePrefix) ? `${compositePrefix}${String(variantGroupName).upperFirst()}` : */ variantGroupName] = VariantsFactory.create<(typeof allVariantsClasses)[keyof typeof allVariantsClasses], ResultType, keyof typeof allVariantsClasses>((allVariantsClasses as any)[variantGroupName], variantMutator, variantGroupName);
+    });
+    return result;
+  },
+
+  createAllOpacity: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof opacityClasses)[keyof typeof opacityClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof opacityClasses, ResultType, CompositePrefix>(opacityClasses, variantMutator, compositePrefix);
+  },
+  createAllOutline: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof outlineClasses)[keyof typeof outlineClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof outlineClasses, ResultType, CompositePrefix>(outlineClasses, variantMutator, compositePrefix);
+  },
+
+  createBorders: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof borderClasses)[keyof typeof borderClasses], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof borderClasses, ResultType>(borderClasses, variantMutator as any, compositePrefix);
+  },
+
+  createTransitions: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof transitions)[keyof typeof transitions], ResultType>, compositePrefix?: CompositePrefix) {
+    return VariantsFactory.createComposite<typeof transitions, ResultType>(transitions, variantMutator as any, compositePrefix);
+  },
 };
 
-type IVariantFactoryAll<ResultType = string> = {
+type IVariantFactoryAll<ResultType = string, CompositePrefix extends string = any> = {
   [key in keyof typeof allVariantsClasses]: Record<keyof (typeof allVariantsClasses)[key], ResultType>;
-};
+}

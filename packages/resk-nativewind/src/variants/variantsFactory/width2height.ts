@@ -593,4 +593,4 @@ export const width2heightClasses = {
     "950px": "w-[950px]",
     "1000px": "w-[1000px]",
   },
-};
+} as const;

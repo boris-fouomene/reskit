@@ -36,4 +36,4 @@ export const shadowClasses = {
         shadow: 'active:shadow',
         inner: 'active:shadow-inner'
     }
-}
+} as const;

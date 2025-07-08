@@ -175,6 +175,26 @@ const alert = tv({
         message: value,
       };
     }),
+    messagePaddingTop: VariantsFactory.createPaddingTop((value) => {
+      return {
+        message: value,
+      };
+    }),
+    messagePaddingBottom: VariantsFactory.createPaddingBottom((value) => {
+      return {
+        message: value,
+      };
+    }),
+    messagePaddingLeft: VariantsFactory.createPaddingLeft((value) => {
+      return {
+        message: value,
+      };
+    }),
+    messagePaddingRight: VariantsFactory.createPaddingRight((value) => {
+      return {
+        message: value,
+      };
+    }),
     messageMarginTop: VariantsFactory.createMarginTop((value) => {
       return {
         message: value,
@@ -240,7 +260,47 @@ const alert = tv({
         header: value,
       };
     }),
+    headerPaddingTop: VariantsFactory.createPaddingTop((value) => {
+      return {
+        header: value
+      }
+    }),
+    headerPaddingBottom: VariantsFactory.createPaddingBottom((value) => {
+      return {
+        header: value
+      }
+    }),
+    headerPaddingLeft: VariantsFactory.createPaddingLeft((value) => {
+      return {
+        header: value
+      }
+    }),
+    headerPaddingRight: VariantsFactory.createPaddingRight((value) => {
+      return {
+        "header": value
+      }
+    }),
     headerMargin: VariantsFactory.createMargin((value) => {
+      return {
+        header: value,
+      };
+    }),
+    headerMarginTop: VariantsFactory.createMarginTop((value) => {
+      return {
+        header: value,
+      };
+    }),
+    headerMarginBottom: VariantsFactory.createMarginBottom((value) => {
+      return {
+        header: value,
+      };
+    }),
+    headerMarginLeft: VariantsFactory.createMarginLeft((value) => {
+      return {
+        header: value,
+      };
+    }),
+    headerMarginRight: VariantsFactory.createMarginRight((value) => {
       return {
         header: value,
       };
@@ -263,14 +323,13 @@ const alert = tv({
   defaultVariants: {
     shadow: "lg",
     padding: 2,
-    headerMargin: "5px",
     iconContainerMargin: "5px",
     closeIconContainerMargin: "5px",
     titleMarginLeft: "5px",
     iconSize: "25px",
     closeIconSize: "25px",
     titleWeight: "bold",
-    messageOpacity: 80,
+    messageOpacity: 90,
   },
 });
 

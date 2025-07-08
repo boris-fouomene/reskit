@@ -98,4 +98,4 @@ export const borderClasses = {
     9: "border-y-[9px]",
     10: "border-y-[10px]",
   },
-};
+} as const;

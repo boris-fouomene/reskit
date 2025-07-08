@@ -398,7 +398,7 @@ export const paddingClasses = {
     "195px": "pb-[195px]",
     "200px": "pb-[200px]",
   },
-};
+} as const;
 
 export const marginClasses = {
   margin: {
@@ -800,9 +800,9 @@ export const marginClasses = {
     "195px": "mb-[195px]",
     "200px": "mb-[200px]",
   },
-};
+} as const;
 
 export const padding2marginClasses = {
   ...paddingClasses,
   ...marginClasses,
-};
+} as const;

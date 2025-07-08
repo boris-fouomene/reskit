@@ -70,4 +70,4 @@ export const outlineClasses = {
         4: 'active:outline-offset-4',
         8: 'active:outline-offset-8'
     },
-};
+} as const;

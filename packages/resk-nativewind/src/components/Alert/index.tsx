@@ -55,7 +55,7 @@ export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClass
                 </Text>
             </Div> : null}
             {closeIContent ? <CloseAlert
-                className={cn("overflow-hidden align-center grow-0 items-center justify-center flex flex-col resk-alert-close-icon-container", closeIconContainerClassName)}
+                className={cn("overflow-hidden align-center grow-0 items-center justify-center flex flex-col resk-alert-close-icon-container", computedVariant.closeIconContainer(), closeIconContainerClassName)}
                 children={closeIContent} isOpen={isOpen} open={open} close={close}
                 testID={testID + "-close-icon-container"}
             /> : null}

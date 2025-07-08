@@ -170,4 +170,4 @@ export const scalesClasses = {
     145: "active:scale-y-[1.45]",
     150: "active:scale-y-150",
   },
-};
+} as const;

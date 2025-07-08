@@ -28,7 +28,7 @@
  * @returns A new type where the prefix is combined with each key of the dictionary.
  */
 export type IDictPrefixWithKey<Prefix extends string, Dict extends Record<string, any>> =
-    `${Prefix}${keyof Dict & string}`;
+  `${Prefix}${keyof Dict & string}`;
 
 
 /**

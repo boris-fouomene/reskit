@@ -3,4 +3,4 @@ export const textAlignClasses = {
   center: "text-center",
   right: "text-right",
   justify: "text-justify",
-};
+} as const;

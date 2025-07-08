@@ -31,4 +31,4 @@ export const ringWidthClasses = {
     4: "focus:ring-4",
     8: "focus:ring-8",
   },
-};
+} as const;

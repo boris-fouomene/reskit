@@ -25,3 +25,5 @@ export * from "./Dropdown";
 export * from "./SelectCountry";
 export * from "./BottomSheet";
 export * from "./Alert";
+export { Portal } from "./Portal";
+export * from "./Portal/types";

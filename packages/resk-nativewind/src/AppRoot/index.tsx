@@ -3,7 +3,7 @@ import { SetupExpo__DEV__ } from "@components/SetupExpo__DEV__";
 import { GlobalStyles } from "./GlobalStyles";
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
-
+import { PortalProvider } from "@components/Portal";
 /**
  * Props for the AppRoot component.
  * 
@@ -150,12 +150,14 @@ export interface AppRootProps {
 export function AppRoot({ children, className }: IAppRootProps) {
     return <>
         <GlobalStyles />
+        <SetupExpo__DEV__ />
         <Div
             className={cn("flex flex-col flex-1 h-full w-full relative reskit-app-root", className)}
             id="reskit-app-root"
         >
-            {children}
-            <SetupExpo__DEV__ />
+            <PortalProvider>
+                {children}
+            </PortalProvider>
         </Div>
     </>;
 }

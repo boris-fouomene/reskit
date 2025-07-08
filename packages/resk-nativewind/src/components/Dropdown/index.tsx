@@ -21,6 +21,7 @@ import { IFontIconName } from "@components/Icon";
 import { INavItemProps } from "@components/Nav";
 import dropdownItem, { IVariantPropsDropdownItem } from "@variants/dropdownItem";
 import { IVariantPropsIcon } from "@variants/icon";
+import { IVariantPropsProgressBar } from "@variants/progressBar";
 
 
 export class Dropdown<ItemType = any, ValueType = any> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
@@ -330,7 +331,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
 }
 
 function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
-    let { anchorContainerClassName, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = context.props;
+    let { anchorContainerClassName, loadingProgressBarVariant, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = context.props;
     const { visible } = context.state;
     const isLoading = !!props.isLoading;
     testID = context.getTestID();
@@ -421,7 +422,6 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         }
         return actions;
     }, [dropdownActions, multiple, context.isOpen(), context, anchorSelectedText]);
-    const loadingContent = isLoading ? <ProgressBar indeterminate testID={testID + "dropdown-progressbar"} /> : null;
     const anchorProps: ITextInputProps = {
         numberOfLines: 1,
         ...props,
@@ -470,7 +470,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
                         <TextInput
                             {...anchorProps}
                         />}
-                    {loadingContent}
+                    {isLoading ? <ProgressBar variant={loadingProgressBarVariant} indeterminate testID={testID + "dropdown-progressbar"} /> : null}
                 </>
             </Tooltip>
         </Div>}
@@ -900,8 +900,11 @@ export interface IDropdownCallOptions<ItemType = any, ValueType = any> {
 }
 
 export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps<ValueType>, "onChange" | "ref" | "multiline"> {
+    /**
+     * List of dropdown items
+     */
     items?: ItemType[]; // An optional array of items to be displayed in the dropdown
-    testID?: string; // An optional test ID for the dropdown
+
     /***
         Return the value of the item
     */
@@ -1029,6 +1032,11 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
      * It represent the field of the item to be used as value when ItemType is an object
      */
     valueField?: keyof ItemType | string;
+
+    /**
+     * The variants for the progress bar that is displayed when the dropdown is loading
+     */
+    loadingProgressBarVariant?: IVariantPropsProgressBar;
 };
 
 /**

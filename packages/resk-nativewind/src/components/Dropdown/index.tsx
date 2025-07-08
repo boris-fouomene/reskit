@@ -1,10 +1,10 @@
 "use client";
-import { memo, ReactElement, ReactNode, useEffect, useMemo, useRef } from "react";
+import { memo, ReactElement, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
 import { defaultStr, isEmpty, isNonNullString, isObj, areEquals, stringify, isNumber } from "@resk/core/utils";
 import i18n from "@resk/core/i18n";
-import { cn, getTextContent, isReactNode, ObservableComponent, useForceRender } from "@utils/index";
-import { Dimensions, FlatList, FlatListProps, Pressable } from 'react-native';
+import { cn, getTextContent, isReactNode, ObservableComponent } from "@utils/index";
+import { Dimensions, FlatList, FlatListProps } from 'react-native';
 import { IMenuContext, IMenuProps, Menu, useMenu } from "@components/Menu";
 import { Tooltip } from "@components/Tooltip";
 import { IClassName, IReactNullableElement } from "@src/types";
@@ -18,7 +18,7 @@ import { Div } from "@html/Div";
 import { TextInput } from "@components/TextInput";
 import { Text } from "@html/Text";
 import { IFontIconName } from "@components/Icon";
-import { INavContext, INavItemProps } from "@components/Nav";
+import { INavItemProps } from "@components/Nav";
 import dropdownItem, { IVariantPropsDropdownItem } from "@variants/dropdownItem";
 import { IVariantPropsIcon } from "@variants/icon";
 
@@ -558,37 +558,48 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
     </Div>;
 }
 
-const DropdownItem = memo((preparedItem: IDropdownPreparedItem & { index: number, context: IDropdownContext }) => {
+const DropdownItem = memo(function DropdownItem(preparedItem: IDropdownPreparedItem & { index: number, context: IDropdownContext }) {
     const { label, hashKey, labelText, context } = preparedItem;
-    const forceRender = useForceRender();
+    const [state, dispatch] = useState(Object.create(null));
+    const forceRender = useCallback(() => {
+        dispatch(Object.create(null));
+    }, []);
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
     const { multiple, selectedIconName, itemClassName, itemVariant, itemContainerClassName } = context.props;
     const testID = context.getTestID();
     const computedVariant = dropdownItem(itemVariant);
     const isSelected = useMemo(() => {
         return context.isSelectedByHashKey(hashKey);
-    }, [selectedItemsByHashKey, hashKey]);
+    }, [selectedItemsByHashKey, hashKey, state]);
+    const bindEventRefs = useRef<({ remove?: Function })[]>([]);
+    const clearEvents = () => {
+        bindEventRefs.current.map((ob) => {
+            ob?.remove?.();
+        });
+    }
     useEffect(() => {
+        clearEvents();
         if (typeof context.on !== "function") {
             return;
         }
-        const bindedOn = context.on("toggleItem", (options: any) => {
-            if (options?.hashKey === hashKey) {
-                forceRender();
-            }
-        });
-        const bindOnSelectAll = context.on("selectAll", () => {
-            forceRender();
-        });
-        const bindOnUnselectAll = context.on("unselectAll", () => {
-            forceRender();
-        });
+        bindEventRefs.current = [
+            context.on("toggleItem", (options: any) => {
+                if (options?.hashKey === hashKey) {
+                    forceRender();
+                }
+            }),
+            context.on("selectAll", forceRender),
+            context.on("unselectAll", forceRender),
+        ];
         return () => {
-            bindedOn?.remove();
-            bindOnSelectAll?.remove();
-            bindOnUnselectAll?.remove();
+            clearEvents();
         }
     }, [hashKey, context]);
+    useEffect(() => {
+        return () => {
+            clearEvents();
+        }
+    }, [])
     if (!label) {
         return null;
     }
@@ -608,6 +619,7 @@ const DropdownItem = memo((preparedItem: IDropdownPreparedItem & { index: number
         </Tooltip>
     );
 });
+
 
 DropdownItem.displayName = "Dropdown.Item";
 

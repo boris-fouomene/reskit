@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import useIsMounted from "./useIsMounted";
 
 /***
@@ -15,9 +15,9 @@ import useIsMounted from "./useIsMounted";
 export default function useForceRender() {
     const isMounted = useIsMounted();
     const [, dispatch] = useState(Object.create(null));
-    return () => {
+    return useCallback(() => {
         if (isMounted()) {
             dispatch(Object.create(null)); // Trigger a re-render by updating state
         }
-    };
+    }, []);
 }

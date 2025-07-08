@@ -1,6 +1,6 @@
 "use client";
 import { IModalProps } from "./types";
-import { ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { JSX, ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import "./styles.css";
 import { normalizeGestureEvent } from "@html/events";
 import { IClassName } from "@src/types";
@@ -15,7 +15,7 @@ import { Backdrop } from "@components/Backdrop";
 
 
 const hiddenStyle = "resk-modal-hidden opacity-0 invisible";
-export function Modal({ animationType, backdropClassName, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): ReactNode {
+export function Modal({ animationType, backdropClassName, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): JSX.Element | null {
     const [isRendering, setIsRendering] = useState(false);
     const wasVisible = useRef(false);
     const wasRendering = useRef(false);

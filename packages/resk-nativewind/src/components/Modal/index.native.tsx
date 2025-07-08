@@ -4,8 +4,9 @@ import { IModalProps } from "./types";
 import { defaultStr } from "@resk/core/utils";
 import { Backdrop } from "@components/Backdrop";
 import { cn } from "@utils/cn";
+import { JSX } from "react";
 
-export function Modal({ children, visible, testID, backdropClassName, ...props }: IModalProps) {
+export function Modal({ children, visible, testID, backdropClassName, ...props }: IModalProps): JSX.Element {
     testID = defaultStr(testID, "resk-modal");
     return <RNModal  {...props} visible={!!visible} transparent>
         <Backdrop

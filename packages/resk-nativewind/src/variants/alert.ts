@@ -9,7 +9,7 @@ const alert = tv({
     title: "",
     message: "",
     base: "",
-    titleContainer: "",
+    header: "",
     icon: "",
     iconContainer: "",
     closeIcon: "",
@@ -235,14 +235,14 @@ const alert = tv({
         message: value,
       };
     }),
-    titleContainerPadding: VariantsFactory.createPadding((value) => {
+    headerPadding: VariantsFactory.createPadding((value) => {
       return {
-        titleContainer: value,
+        header: value,
       };
     }),
-    titleContainerMargin: VariantsFactory.createMargin((value) => {
+    headerMargin: VariantsFactory.createMargin((value) => {
       return {
-        titleContainer: value,
+        header: value,
       };
     }),
     outline: Object.fromEntries(
@@ -263,7 +263,7 @@ const alert = tv({
     shadow: "lg",
     padding: 2,
     messagePadding: "10px",
-    titleContainerMargin: "5px",
+    headerMargin: "5px",
     iconContainerMargin: "5px",
     titleMarginLeft: "5px",
     iconSize: "25px",
@@ -280,7 +280,7 @@ type IAlertSlot = {
   title?: string;
   message?: string;
   base?: string;
-  titleContainer?: string;
+  header?: string;
   icon?: string;
   iconContainer?: string;
   closeIcon?: string;

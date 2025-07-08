@@ -12,7 +12,7 @@ import iconVariants from "@variants/icon";
 import alertVariant, { IVariantPropsAlert } from "@variants/alert";
 import { IHtmlTextProps } from "@html/types";
 
-export function Alert({ title, icon, iconClassName, messageProps, children, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, titleContainerClassName, className, ...rest }: IAlertProps) {
+export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClassName, closeIconContainerClassName, iconClassName, messageProps, children, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, headerClassName, className, ...rest }: IAlertProps) {
     testID = defaultStr(testID, "resk-alert");
     let iconByType: IIconSource | undefined = undefined, variantByType: IVariantPropsAlert | undefined = undefined;
     switch (String(type).toLowerCase()) {
@@ -39,15 +39,22 @@ export function Alert({ title, icon, iconClassName, messageProps, children, type
     }
     const computedVariant = alertVariant({ ...variantByType, ...variant });
     const iconContent = Icon.getIcon({ icon: icon ?? iconByType, className: cn("resk-alert-icon", computedVariant.icon(), iconVariants(iconVariant), iconClassName), testID: testID + "-icon" });
+    const closeIContent = Icon.getIcon({ icon: closeIcon ?? undefined, className: cn("resk-alert--close-icon", computedVariant.closeIcon(), iconVariants(closeIconVariant), closeIconClassName), testID: testID + "-close-icon" });
+
     title = isValidElement(title) || isNonNullString(title) ? title : undefined;
     message = isValidElement(message) || isNonNullString(message) ? message : undefined;
     return <Surface {...rest} testID={testID} className={cn("resk-alert flex flex-col justify-start items-start text-start", computedVariant.base(), className)}>
-        {iconContent || title ? <Div className={cn("flex flex-row justify-start items-center w-full resk-alert-title-container", computedVariant.titleContainer(), titleContainerClassName)}>
-            {iconContent ? <Div className={cn("overflow-hidden align-center items-center justify-center flex flex-col resk-alert-icon-container", iconContainerClassName)} testID={testID + "-icon-container"}>{iconContent}</Div> : null}
-            <Text testID={testID + "-title"} className={cn("resk-alert-title", computedVariant.title(), textVariant(titleVariant), titleClassName)}>
-                {title}
-            </Text>
-        </Div> : null}
+        {<Div className={cn("flex flex-row justify-between items-center w-full resk-alert-header", computedVariant.header(), headerClassName)}>
+            {iconContent || title ? <Div className={cn("flex flex-row justify-start items-center self-center grow")}>
+                {iconContent ? <Div className={cn("overflow-hidden align-center items-center justify-center flex flex-col resk-alert-icon-container", iconContainerClassName)} testID={testID + "-icon-container"}>{iconContent}</Div> : null}
+                <Text testID={testID + "-title"} className={cn("resk-alert-title", computedVariant.title(), textVariant(titleVariant), titleClassName)}>
+                    {title}
+                </Text>
+            </Div> : null}
+            {closeIContent ? <Div className={cn("overflow-hidden align-center grow-0 items-center justify-center flex flex-col resk-alert-close-icon-container", closeIconContainerClassName)} testID={testID + "-icon-container"}>
+                {closeIContent}
+            </Div> : null}
+        </Div>}
         {message ? <Text numberOfLines={10} {...messageProps} testID={testID + "-message"} className={cn("resk-alert-message w-full", computedVariant.message(), textVariant(messageVariant), messageProps?.className, messageClassName)}>
             {message}
         </Text> : null}
@@ -60,7 +67,7 @@ export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
     iconVariant?: IVariantPropsIcon;
     titleVariant?: IVariantPropsIcon;
     titleClassName?: IClassName;
-    titleContainerClassName?: IClassName;
+    headerClassName?: IClassName;
     message?: ReactNode;
     messageClassName?: IClassName;
     messageVariant?: IVariantPropsText;
@@ -73,4 +80,5 @@ export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
     closeIcon?: IIconSource;
     closeIconClassName?: IClassName;
     closeIconContainerClassName?: IClassName;
+    closeIconVariant?: IVariantPropsIcon;
 }

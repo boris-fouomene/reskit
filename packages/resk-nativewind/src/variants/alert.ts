@@ -94,12 +94,87 @@ const alert = tv({
         iconContainer: value,
       };
     }),
-    iconContainerSize: VariantsFactory.createSize((value) => {
+    iconContainerMarginRight: VariantsFactory.createMarginRight((value) => {
       return {
         iconContainer: value,
       };
     }),
+    iconContainerMarginLeft: VariantsFactory.createMarginLeft((value) => {
+      return {
+        iconContainer: value,
+      };
+    }),
+    iconContainerMarginTop: VariantsFactory.createMarginTop((value) => {
+      return {
+        iconContainer: value,
+      };
+    }),
+    iconContainerMarginBottom: VariantsFactory.createMarginBottom((value) => {
+      return {
+        iconContainer: value,
+      };
+    }),
+    messageMargin: VariantsFactory.createMargin((value) => {
+      return {
+        message: value,
+      };
+    }),
+    messagePadding: VariantsFactory.createPadding((value) => {
+      return {
+        message: value,
+      };
+    }),
+    messageMarginTop: VariantsFactory.createMarginTop((value) => {
+      return {
+        message: value,
+      };
+    }),
+    messageMarginBottom: VariantsFactory.createMarginBottom((value) => {
+      return {
+        message: value,
+      };
+    }),
+    messageMarginLeft: VariantsFactory.createMarginLeft((value) => {
+      return {
+        message: value,
+      };
+    }),
+    messageMarginRigth: VariantsFactory.createMarginRight((value) => {
+      return {
+        message: value,
+      };
+    }),
     titleAlign: VariantsFactory.createTextAlign((value) => {
+      return {
+        title: value,
+      };
+    }),
+    titleMargin: VariantsFactory.createMargin((value) => {
+      return {
+        title: value,
+      };
+    }),
+    titlePadding: VariantsFactory.createPadding((value) => {
+      return {
+        title: value,
+      };
+    }),
+    titleMarginTop: VariantsFactory.createMarginTop((value) => {
+      return {
+        title: value,
+      };
+    }),
+    titleMarginBottom: VariantsFactory.createMarginBottom((value) => {
+      return {
+        title: value,
+      };
+    }),
+    titleMarginLeft: VariantsFactory.createMarginLeft((value) => {
+      return {
+        title: value,
+      };
+    }),
+    titleMarginRight: VariantsFactory.createMarginRight((value) => {
       return {
         title: value,
       };
@@ -120,15 +195,14 @@ const alert = tv({
       };
     }),
     outline: Object.fromEntries(
-      typedEntries(VariantsColors.iconForeground).map(([key, value]) => {
-        const colorName = key.split("-foreground")[0];
+      typedEntries(VariantsColors.buttonOutline).map(([colorName, { icon, activityIndicator, label, base }]) => {
         return [
           colorName,
           {
-            base: `${(VariantsColors.background as any)[colorName]} border-${colorName}`,
-            icon: value,
-            title: value.split("!text-").join("text-"),
-            message: value.split("!text-").join("text-"),
+            base,
+            icon,
+            title: label,
+            message: label,
           },
         ];
       })
@@ -137,8 +211,10 @@ const alert = tv({
   defaultVariants: {
     shadow: "lg",
     padding: 2,
+    messagePadding: "10px",
     titleContainerMargin: "5px",
     iconContainerMargin: "5px",
+    titleMarginLeft: "5px",
     iconSize: "25px",
     titleWeight: "bold",
     messageOpacity: 80,

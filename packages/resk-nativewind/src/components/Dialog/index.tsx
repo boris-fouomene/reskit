@@ -53,7 +53,7 @@ export function Dialog<Context = unknown>({
     }
   }, [onRequestClose]);
   const { context, appBar, titleContent } = useMemo(() => {
-    const titleClx = cn("resk-dialog-title", computedVariant.title(), appBarProps?.titleClassName, titleClassName);
+    const titleClx = cn("resk-dialog-title", computedVariant.title(), !isFullScreen && computedVariant.modalTitle(), appBarProps?.titleClassName, titleClassName);
     const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
     const context = Object.assign({}, customContext, { dialog: { close: handleRequestClose, isMobile, isTablet, isDesktop, isFullScreen, windowWidth, windowHeight } });
     const appBarActions: IAppBarActionProps<IDialogContext<Context>>[] = [];
@@ -76,7 +76,7 @@ export function Dialog<Context = unknown>({
     }
     return {
       context,
-      titleContent: isFullScreen && title ? null : <Text className={cn("resk-dialog-modal-title my-[10px] font-bold", titleClx)} testID={testID + "-title"}>{title}</Text>,
+      titleContent: isFullScreen && title ? null : <Text className={cn("resk-dialog-modal-title", titleClx)} testID={testID + "-title"}>{title}</Text>,
       appBar: <AppBar<IDialogContext<Context>>
         maxVisibleActions={isFullScreen ? undefined : 2}
         backAction={!isFullScreen ? false : undefined}

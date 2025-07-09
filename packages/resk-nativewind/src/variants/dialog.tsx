@@ -20,6 +20,7 @@ export const dialogVariant = tv({
         contentContainer: cn(fullScreen, "absolute left-0 top-0 right-0 bottom-0 items-center justify-center"),
         contentContainerFullScreen: "items-start justify-start-start",
         contentFullScreen: fullScreen,
+        modalTitle: "",
     },
     variants: {
         ...VariantsOptionsFactory.createAll<{ content: string }>((value) => {
@@ -54,6 +55,12 @@ export const dialogVariant = tv({
         ...VariantsOptionsFactory.createAllPadding2Margin<IDialogVariantSlot, "fullScreen">((value, colorName) => {
             return { contentFullScreen: value }
         }, "fullScreen"),
+        ...VariantsOptionsFactory.createTextVariants<IDialogVariantSlot, "modalTitle">((value, colorName) => {
+            return { modalTitle: value }
+        }, "modalTitle"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IDialogVariantSlot, "modalTitle">((value, colorName) => {
+            return { modalTitle: value }
+        }, "modalTitle"),
         fullScreen: {
             true: {
                 content: fullScreen,
@@ -75,6 +82,9 @@ export const dialogVariant = tv({
         withBackdrop: true,
         background: "surface",
         shadow: "lg",
+        modalTitleMarginY: "10px",
+        modalTitleWeight: "bold"
+
     }
 });
 
@@ -94,4 +104,5 @@ type IDialogVariantSlot = {
     contentFullScreen?: string,
     contentcontainerFullScreen?: string;
     contentContainer?: string,
+    modalTitle?: string;
 }

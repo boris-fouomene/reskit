@@ -12,6 +12,7 @@ import { defaultStr, isObj } from "@resk/core/utils";
 import { Backdrop } from "@components/Backdrop";
 import { dialogVariant } from "@variants/dialog";
 import { Div } from "@html/Div";
+import { Text } from "@html/Text";
 
 
 export function Dialog<Context = unknown>({
@@ -51,7 +52,8 @@ export function Dialog<Context = unknown>({
       return onRequestClose(event);
     }
   }, [onRequestClose]);
-  const { context, appBar } = useMemo(() => {
+  const { context, appBar, titleContent } = useMemo(() => {
+    const titleClx = cn("resk-dialog-title", computedVariant.title(), appBarProps?.titleClassName, titleClassName);
     const { width: windowWidth, height: windowHeight } = Dimensions.get("window");
     const context = Object.assign({}, customContext, { dialog: { close: handleRequestClose, isMobile, isTablet, isDesktop, isFullScreen, windowWidth, windowHeight } });
     const appBarActions: IAppBarActionProps<IDialogContext<Context>>[] = [];
@@ -74,6 +76,7 @@ export function Dialog<Context = unknown>({
     }
     return {
       context,
+      titleContent: isFullScreen && title ? null : <Text className={cn("resk-dialog-modal-title my-[10px] font-bold", titleClx)} testID={testID + "-title"}>{title}</Text>,
       appBar: <AppBar<IDialogContext<Context>>
         maxVisibleActions={isFullScreen ? undefined : 2}
         backAction={!isFullScreen ? false : undefined}
@@ -81,10 +84,10 @@ export function Dialog<Context = unknown>({
         actionsProps={{ ...appBarProps?.actionsProps, actionClassName: cn("resk-dialog-actions", computedVariant.action(), appBarProps?.actionsProps?.actionClassName) }}
         context={context}
         actions={appBarActions}
-        title={title}
-        subtitle={subtitle}
+        title={isFullScreen ? title : undefined}
+        subtitle={isFullScreen ? subtitle : undefined}
         className={cn("resk-dialog-app-bar", computedVariant.appBar(), appBarProps?.className, appBarClassName)}
-        titleClassName={cn("resk-dialog-title", computedVariant.title(), appBarProps?.titleClassName, titleClassName)}
+        titleClassName={titleClx}
         subtitleClassName={cn("resk-dialog-subtitle", computedVariant.subtitle(), appBarProps?.subtitleClassName, subtitleClassName)}
       />
     }
@@ -114,7 +117,7 @@ export function Dialog<Context = unknown>({
           testID={testID + "-dialog-content"}
           className={cn("resk-dialog-content", computedVariant.content(), isFullScreen && computedVariant.contentFullScreen(), contentClassName)}
         >
-          {fullScreen ? appBar : null}
+          {fullScreen ? appBar : titleContent}
           <Wrapper {...wrapperProps}>
             {children}
           </Wrapper>

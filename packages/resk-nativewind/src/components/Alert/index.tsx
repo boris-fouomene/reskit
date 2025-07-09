@@ -15,7 +15,7 @@ import { useAlert } from "./hook";
 import { CloseAlert } from "./Close";
 
 export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClassName, closeIconContainerClassName, iconClassName, messageProps, children, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, headerClassName, className, ...rest }: IAlertProps) {
-    const { isOpen, open, close } = useAlert();
+    const { isOpen, open, close, shouldRender, className: alertClassName } = useAlert();
     testID = defaultStr(testID, "resk-alert");
     let iconByType: IIconSource | undefined = undefined, variantByType: IVariantPropsAlert | undefined = undefined;
     switch (String(type).toLowerCase()) {
@@ -46,7 +46,8 @@ export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClass
 
     title = isValidElement(title) || isNonNullString(title) ? title : undefined;
     message = isValidElement(message) || isNonNullString(message) ? message : undefined;
-    return <Surface {...rest} testID={testID} className={cn("resk-alert transform transition-opacity duration-300 flex flex-col justify-start items-start text-start", isOpen ? ["opacity-100 visible"] : ["opacity-0 invisible"], computedVariant.base(), className)}>
+    if (!shouldRender) return null;
+    return <Surface {...rest} testID={testID} className={cn("resk-alert transform transition-opacity duration-300 flex flex-col justify-start items-start text-start", isOpen ? ["opacity-100 visible"] : ["opacity-0 invisible"], alertClassName, computedVariant.base(), className)}>
         {<Div className={cn("flex flex-row justify-between items-center w-full resk-alert-header", computedVariant.header(), headerClassName)}>
             {iconContent || title ? <Div className={cn("flex flex-row justify-start items-center self-center grow")}>
                 {iconContent ? <Div className={cn("overflow-hidden align-center items-center justify-center flex flex-col resk-alert-icon-container", iconContainerClassName)} testID={testID + "-icon-container"}>{iconContent}</Div> : null}

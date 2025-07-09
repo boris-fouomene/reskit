@@ -1,17 +1,14 @@
 "use client";
-import { Div } from "@html/Div";
 import { IAlertHook } from "./types";
-import { IHtmlDivProps } from "@html/types";
-import { useHydrationStatus } from "@utils/useHydrationStatus";
 import { ActivityIndicator } from "@components/ActivityIndicator";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { View } from "react-native";
 import { addClassName, isDOMElement, removeClassName } from "@resk/core/utils";
 import { TouchableOpacity } from "react-native";
 import { TouchableOpacityProps } from "react-native";
 
-export function CloseAlert({ children, isOpen, open, close, ...props }: TouchableOpacityProps & IAlertHook) {
-    const hydrationStatus = useHydrationStatus();
+export function CloseAlert({ children, isOpen, open, close, ...props }: TouchableOpacityProps & Partial<IAlertHook>) {
+    const hydrationStatus = true;//useHydrationStatus();
     const isDocumentAvailable = typeof document !== "undefined" && document;
     const elementRef = useRef<View>(null);
     const closeAlert = useCallback(() => {

@@ -13,7 +13,7 @@ import { Backdrop } from "@components/Backdrop";
 import { dialogVariant } from "@variants/dialog";
 
 
-export default function Dialog<Context = unknown>({
+export function Dialog<Context = unknown>({
   appBarProps,
   context: customContext,
   actions,
@@ -105,7 +105,7 @@ export default function Dialog<Context = unknown>({
       {!isFullScreen ? <Backdrop testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop", computedVariant.modalbackdrop())} onPress={handleRequestClose} /> : null}
       <View
         testID={testID + "-dialog-content"}
-        className={cn("resk-dialog-content", computedVariant.content(), contentClassName)}
+        className={cn("resk-dialog-content", computedVariant.content(), isFullScreen && computedVariant.contentFullScreen(), contentClassName)}
       >
         {fullScreen ? appBar : null}
         <Wrapper {...wrapperProps}>

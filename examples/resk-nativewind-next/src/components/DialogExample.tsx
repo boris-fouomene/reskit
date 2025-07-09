@@ -1,16 +1,16 @@
 "use client";
 
-import { Button, HStack, Modal } from "@resk/nativewind";
+import { Button, HStack, Dialog } from "@resk/nativewind";
 import { Div, H2, Text } from "@resk/nativewind/html";
 import { useState } from "react";
 
-export function ModalExample() {
+export function DialogExample() {
     const [visible, setVisible] = useState(false);
     return <>
         <HStack>
-            <H2>Modal examples</H2>
+            <H2>Dialog examples</H2>
         </HStack>
-        <Modal visible={visible} variant={{ colorScheme: "error" }} onRequestClose={() => setVisible(false)}>
+        <Dialog visible={visible} onRequestClose={() => setVisible(false)}>
             <Div className="p-5">
                 <H2>Animated Visible example content</H2>
                 <Text>
@@ -22,7 +22,7 @@ export function ModalExample() {
                 </Text>
                 <Button variant={{ colorScheme: "primary" }} onPress={() => setVisible(false)}>Close</Button>
             </Div>
-        </Modal>
+        </Dialog>
         <Button onPress={() => setVisible(true)}>Open modal1</Button>
     </>
 }

@@ -1,6 +1,6 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
 import { ScrollView } from 'react-native';
-import { ModalExample } from './ModalExample';
+import { DialogExample } from './DialogExample';
 import { BottomSheetExample } from './BottomSheetExample';
 import { AlertExamples } from './AlertExamples';
 import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, buttonVariant, SelectCountry, TelInput } from "@resk/nativewind";
@@ -11,7 +11,7 @@ type ScreenContentProps = {
 export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   return (
     <ScrollView testID='main-entry-appp'>
-      <ModalExample />
+      <DialogExample />
       <BottomSheetExample />
       <AlertExamples />
       <Div className="p-5">
@@ -31,7 +31,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         </Div>
         <TelInput label="Tex input Tel example" labelEmbeded />
         <TextInput label="A Success Text Input" variant={{ colorScheme: "success" }} />
-        <TextInput variant={{ iconColor: "secondary", labelTextAlign: "right", labelWeight: "semibold", iconSize: "25px", labelTextSize: "15px" }} type="password" label="Password" placeholder="Enter your password" />
+        <TextInput variant={{ iconColor: "secondary", labelAlign: "right", labelWeight: "semibold", iconSize: "25px", labelSize: "15px" }} type="password" label="Password" placeholder="Enter your password" error />
         <TextInput type="date" label="Date" placeholder="Enter your date" />
         <TextInput type="time" label="Time" placeholder="Enter your time" />
         <TextInput type="datetime" label="DateTime" placeholder="Enter your datetime" />

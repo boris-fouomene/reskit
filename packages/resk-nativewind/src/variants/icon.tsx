@@ -4,9 +4,7 @@ import { iconVariants } from "./variantsFactory/text2icons";
 export const iconVariant = tv({
     variants: {
         ...VariantsOptionsFactory.createAll(),
-
         ...iconVariants,
-
         error: {
             true: "",
         },

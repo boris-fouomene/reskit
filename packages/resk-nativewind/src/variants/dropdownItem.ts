@@ -22,45 +22,18 @@ export const dropdownItemVariant = tv({
         label: VariantsColors.textForeground[`${colorName}-foreground`],
       };
     }),
-    selectedColor: VariantsOptionsFactory.create<typeof VariantsColors.icon, IDropdownIconSlots>(VariantsColors.icon, (value, colorName) => {
-      return {
-        selectedLabel: value.split("!text-").join("text-"),
-        selectedIcon: value,
-      };
-    }),
-    selectedIconSize: VariantsOptionsFactory.createIconSize<IDropdownIconSlots>((value, colorName) => {
-      return {
-        selectedIcon: value,
-      };
-    }),
-    textSize: VariantsOptionsFactory.createTextSize<IDropdownIconSlots>((value, colorName) => {
-      return {
-        label: value,
-      };
-    }),
-    textAlign: VariantsOptionsFactory.createTextAlign<IDropdownIconSlots>((value, colorName) => {
-      return {
-        label: value,
-      };
-    }),
-    textWeight: VariantsOptionsFactory.createTextWeight<IDropdownIconSlots>((value, colorName) => {
-      return {
-        label: value,
-      };
-    }),
-    selectedTextSize: VariantsOptionsFactory.createTextSize<IDropdownIconSlots>((value, colorName) => {
-      return {
-        selectedLabel: value,
-      };
-    }),
-    selectedTextWeight: VariantsOptionsFactory.createTextWeight<IDropdownIconSlots>((value, colorName) => {
-      return {
-        selectedLabel: value,
-      };
-    }),
+    ...VariantsOptionsFactory.createIconVariants<IDropdownIconSlots, "selectedIcon">((value, colorName) => {
+      return { selectedIcon: value };
+    }, "selectedIcon"),
+    ...VariantsOptionsFactory.createTextVariants<IDropdownIconSlots, "text">((value, colorName) => {
+      return { label: value };
+    }, "text"),
+    ...VariantsOptionsFactory.createTextVariants<IDropdownIconSlots, "selectedText">((value, colorName) => {
+      return { label: value };
+    }, "selectedText"),
   },
   defaultVariants: {
-    selectedColor: "primary",
+    selectedTextColor: "primary",
     selectedIconSize: "20px",
   },
 });

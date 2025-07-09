@@ -40,33 +40,14 @@ export const menuVariant = tv({
                 contentContainer: value,
             }
         }),
-        bottomSheetTitleWeight: VariantsOptionsFactory.createTextWeight<IMenuVariantSlots>((value) => {
-            return {
-                bottomSheetTitle: value,
-            }
-        }),
-        bottomSheetTitleSize: VariantsOptionsFactory.createTextSize<IMenuVariantSlots>((value) => {
-            return {
-                bottomSheetTitle: value,
-            }
-        }),
-        bottomSheetTitleColor: VariantsOptionsFactory.createTextColor<IMenuVariantSlots>(value => {
-            return {
-                bottomSheetTitle: value,
-            }
-        }),
-        bottomSheetTitleAlign: VariantsOptionsFactory.createTextAlign<IMenuVariantSlots>(value => {
-            return {
-                bottomSheetTitle: value,
-            }
-        }),
+        ...VariantsOptionsFactory.createTextVariants<IMenuVariantSlots, "bottomSheetTitle">((value) => {
+            return { bottomSheetTitle: value }
+        }, "bottomSheetTitle"),
     },
     defaultVariants: {
         colorScheme: "surface",
         paddingBottom: 4,
-        transitionDuration: 300,
         shadow: "xl",
-        transitionEasing: "ease-out",
         bottomSheetTitleWeight: "bold"
     }
 });

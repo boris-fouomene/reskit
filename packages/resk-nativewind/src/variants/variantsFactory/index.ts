@@ -209,7 +209,7 @@ export const VariantsOptionsFactory = {
     return VariantsOptionsFactory.create<typeof iconSizes.nativeSize, ResultType>(iconSizes.nativeSize, variantMutator);
   },
 
-  createBackgroundColor: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.background, ResultType>, compositePrefix?: CompositePrefix) {
+  createBackgroundColor: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.background, ResultType>) {
     return VariantsOptionsFactory.create<typeof VariantsColors.background, ResultType>(VariantsColors.background, variantMutator);
   },
   createHoverBackgroundColor: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.hoverBackground, ResultType>) {

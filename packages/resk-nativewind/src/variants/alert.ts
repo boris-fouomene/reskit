@@ -81,6 +81,18 @@ export const alertVariant = tv({
     ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "title">((value, colorName) => {
       return { title: value };
     }, "title"),
+    ...VariantsOptionsFactory.createAllRounded<IAlertSlot, "iconContainer">((value, colorName) => {
+      return { iconContainer: value };
+    }, "iconContainer"),
+    ...VariantsOptionsFactory.createAllRounded<IAlertSlot, "closeIconContainer">((value, colorName) => {
+      return { closeIconContainer: value };
+    }, "closeIconContainer"),
+    iconContainerBackground: VariantsOptionsFactory.createBackgroundColor((value, colorName) => {
+      return { iconContainer: value };
+    }),
+    closeIconContainerBackground: VariantsOptionsFactory.createBackgroundColor((value, colorName) => {
+      return { closeIconContainer: value };
+    }),
   },
   defaultVariants: {
     shadow: "lg",

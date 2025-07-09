@@ -41,54 +41,15 @@ export const textInputVariant = tv({
                 icon: VariantsColors.iconForeground[`${colorName}-foreground`],
             }
         }),
-        ...VariantsOptionsFactory.createAllPaddings<ITextInputSlots>((value, colorName) => {
-            return { contentContainer: value }
-        }),
-        ...VariantsOptionsFactory.createAllMargins<ITextInputSlots>((value, colorName) => {
-            return { container: value }
-        }),
-        ...VariantsOptionsFactory.createAllBorders<ITextInputSlots>((value, colorName) => {
-            return { contentContainer: value }
-        }),
-        iconSize: VariantsOptionsFactory.createIconSize<ITextInputSlots>((value, colorName) => {
+        ...VariantsOptionsFactory.createIconVariants<ITextInputSlots, "icon">((value, colorName) => {
             return { icon: value }
-        }),
-        nativeIconSize: VariantsOptionsFactory.createNativeIconSize<ITextInputSlots>((value, colorName) => {
-            return { icon: value }
-        }),
-        iconColor: VariantsOptionsFactory.create<typeof VariantsColors.icon, ITextInputSlots>(VariantsColors.icon, (value, colorName) => {
-            return { icon: value }
-        }),
-        labelTextSize: VariantsOptionsFactory.createTextSize<ITextInputSlots>((value, colorName) => {
+        }, "icon"),
+        ...VariantsOptionsFactory.createTextVariants<ITextInputSlots, "label">((value, colorName) => {
             return { label: value }
-        }),
-        nativeLabelTextSize: VariantsOptionsFactory.createNativeTextSize<ITextInputSlots>((value, colorName) => {
-            return { label: value }
-        }),
-        inputTextSize: VariantsOptionsFactory.createTextSize<ITextInputSlots>((value, colorName) => {
+        }, "label"),
+        ...VariantsOptionsFactory.createTextVariants<ITextInputSlots, "input">((value, colorName) => {
             return { input: value, labelEmbeded: value }
-        }),
-        nativeInputTextSize: VariantsOptionsFactory.createNativeTextSize<ITextInputSlots>((value, colorName) => {
-            return { input: value, labelEmbeded: value }
-        }),
-        labelWeight: VariantsOptionsFactory.createTextWeight<ITextInputSlots>((value, colorName) => {
-            return { label: value }
-        }),
-        inputWeight: VariantsOptionsFactory.createTextWeight<ITextInputSlots>((value, colorName) => {
-            return { input: value, labelEmbeded: value }
-        }),
-        labelTextAlign: VariantsOptionsFactory.createTextAlign<ITextInputSlots>((value, colorName) => {
-            return { label: value }
-        }),
-        inputTextAlign: VariantsOptionsFactory.createTextAlign<ITextInputSlots>((value, colorName) => {
-            return { input: value, labelEmbeded: value }
-        }),
-        borderStyle: VariantsOptionsFactory.createBorderStyle<ITextInputSlots>((value, colorName) => {
-            return { contentContainer: value }
-        }),
-        borderColor: VariantsOptionsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
-            return { contentContainer: value }
-        }),
+        }, "input"),
         focusedColor: VariantsOptionsFactory.create<typeof VariantsColors.text, ITextInputSlots>(VariantsColors.text, (value, colorName) => {
             return {
                 focusedLabel: value,

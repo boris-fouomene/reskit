@@ -3,7 +3,7 @@ import { ScrollView } from 'react-native';
 import { ModalExample } from './ModalExample';
 import { BottomSheetExample } from './BottomSheetExample';
 import { AlertExamples } from './AlertExamples';
-import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, variants, VStack, SelectCountry, TelInput } from "@resk/nativewind";
+import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, buttonVariant, SelectCountry, TelInput } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
@@ -201,7 +201,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10 gap-y-5">
           <Button label="Button base example1 with left icon" icon={"camera"} variant={{ colorScheme: "primary", padding: "5px" }}
-            left={<Icon.Font name="ph" size={30} className={variants.button({ colorScheme: "primary" }).icon()} />}
+            left={<Icon.Font name="ph" size={30} className={buttonVariant({ colorScheme: "primary" }).icon()} />}
           />
           <Button label="Button example2" icon="radio" variant={{ colorScheme: "secondary", padding: "10px" }} />
           <Button loading label="Outline Button 1" variant={{ outline: "primary" }} className="p-[2px] rounded-lg" />

@@ -41,13 +41,13 @@ const textInput = tv({
                 icon: VariantsColors.iconForeground[`${colorName}-foreground`],
             }
         }),
-        ...VariantsFactory.createPaddings<ITextInputSlots>((value, colorName) => {
+        ...VariantsFactory.createAllPaddings<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
-        ...VariantsFactory.createMargins<ITextInputSlots>((value, colorName) => {
+        ...VariantsFactory.createAllMargins<ITextInputSlots>((value, colorName) => {
             return { container: value }
         }),
-        ...VariantsFactory.createBorders<ITextInputSlots>((value, colorName) => {
+        ...VariantsFactory.createAllBorders<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
         iconSize: VariantsFactory.createIconSize<ITextInputSlots>((value, colorName) => {

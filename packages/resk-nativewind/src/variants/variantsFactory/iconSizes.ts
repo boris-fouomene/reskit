@@ -1,5 +1,5 @@
 export const iconSizes = {
-    iconSize: {
+    size: {
         xs: "!text-xs",
         sm: "!text-sm",
         lg: "!text-lg",
@@ -41,7 +41,7 @@ export const iconSizes = {
         "95px": "!text-[95px]",
         "100px": "!text-[100px]",
     },
-    nativeIconSize: {
+    nativeSize: {
         xs: "native:!text-xs",
         sm: "native:!text-sm",
         lg: "native:!text-lg",

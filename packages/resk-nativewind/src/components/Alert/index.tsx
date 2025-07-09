@@ -3,7 +3,7 @@ import { isValidElement, ReactNode } from "react";
 import { Icon, IIconSource } from "@components/Icon";
 import { IVariantPropsIcon } from "@variants/icon";
 import { IClassName } from "@src/types";
-import { defaultStr, isNonNullString } from "@resk/core/utils";
+import { defaultStr, isNonNullString, isObj } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { Text } from "@html/Text";
 import { Div } from "@html/Div";
@@ -13,8 +13,11 @@ import alertVariant, { IVariantPropsAlert } from "@variants/alert";
 import { IHtmlTextProps } from "@html/types";
 import { useAlert } from "./hook";
 import { CloseAlert } from "./Close";
+import { INavItemsProps, Nav } from "@components/Nav";
+import { IAlertHook } from "./types";
+import { I } from "@html/text-elements";
 
-export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClassName, closeIconContainerClassName, iconClassName, messageProps, children, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, headerClassName, className, ...rest }: IAlertProps) {
+export function Alert({ title, icon, closeIcon, actions, closeIconVariant, closeIconClassName, closeIconContainerClassName, iconClassName, messageProps, children, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, headerClassName, className, ...rest }: IAlertProps) {
     const { isOpen, open, close, shouldRender, className: alertClassName } = useAlert();
     testID = defaultStr(testID, "resk-alert");
     let iconByType: IIconSource | undefined = undefined, variantByType: IVariantPropsAlert | undefined = undefined;
@@ -43,7 +46,13 @@ export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClass
     const computedVariant = alertVariant({ ...variantByType, ...variant });
     const iconContent = Icon.getIcon({ icon: icon ?? iconByType, className: cn("resk-alert-icon", computedVariant.icon(), iconVariants(iconVariant), iconClassName), testID: testID + "-icon" });
     const closeIContent = Icon.getIcon({ icon: closeIcon ?? "close" as never, className: cn("resk-alert--close-icon", computedVariant.closeIcon(), iconVariants(closeIconVariant), closeIconClassName), testID: testID + "-close-icon" });
-
+    const navItems: INavItemsProps<IAlertHook>["items"] = [];
+    (Array.isArray(actions) ? actions : []).map((act) => {
+        if (!isObj(act)) return;
+        const newAct = Object.clone(act);
+        newAct.context = { ...act.context, isOpen, open, close };
+        navItems.push(newAct);
+    });
     title = isValidElement(title) || isNonNullString(title) ? title : undefined;
     message = isValidElement(message) || isNonNullString(message) ? message : undefined;
     if (!shouldRender) return null;
@@ -65,6 +74,10 @@ export function Alert({ title, icon, closeIcon, closeIconVariant, closeIconClass
             {message}
         </Text> : null}
         {children ? children : null}
+        {navItems?.length ? <Nav.Items<IAlertHook>
+            items={navItems}
+            className={cn("resk-alert-actions flex flex-row w-full flex-wrap items-start", computedVariant.actionsContainer(), actions?.className)}
+        /> : null}
     </Surface>
 }
 
@@ -87,4 +100,8 @@ export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
     closeIconClassName?: IClassName;
     closeIconContainerClassName?: IClassName;
     closeIconVariant?: IVariantPropsIcon;
+    /**
+     * Actions to display in the alert
+     */
+    actions?: INavItemsProps<IAlertHook>;
 }

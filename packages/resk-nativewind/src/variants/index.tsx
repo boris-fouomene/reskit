@@ -1,40 +1,21 @@
 export * from "./colors/generated";
-import surface from "./surface";
-import text from "./text";
-import iconButton from "./iconButton";
-import heading from "./heading";
-import divider from "./divider";
-import icon from "./icon";
-import badge from "./badge";
-import all from "./all";
-import button from "./button";
-import activityIndicator from "./activityIndicator";
-import menu from "./menu";
-import checkbox from "./checkbox";
-import progressBar from "./progressBar";
-import textInput from "./textInput";
-import bottomSheet from "./bottomSheet";
-import dropdownItem from "./dropdownItem";
-import alert from "./alert";
-export const variants = {
-    all,
-    alert,
-    bottomSheet,
-    textInput,
-    menu,
-    icon,
-    heading,
-    iconButton,
-    surface,
-    badge,
-    text,
-    divider,
-    button,
-    activityIndicator,
-    checkbox,
-    progressBar,
-    dropdownItem,
-}
+export { default as surfaceVariant } from "./surface";
+export { default as textVariant } from "./text";
+export { default as iconButtonVariant } from "./iconButton";
+export { default as headingVariant } from "./heading";
+export { default as dividerVariant } from "./divider";
+export { default as iconVariant } from "./icon";
+export { default as badgeVariant } from "./badge";
+export { default as commonVariant } from "./all";
+export { default as buttonVariant } from "./button";
+export { default as activityIndicatorVariant } from "./activityIndicator";
+export { default as menuVariant } from "./menu";
+export { default as checkboxVariant } from "./checkbox";
+export { default as progressBarVariant } from "./progressBar";
+export { default as textInputVariant } from "./textInput";
+export { default as bottomSheetVariant } from "./bottomSheet";
+export { default as dropdownItemVariant } from "./dropdownItem";
+export { default as alertVariant } from "./alert";
 
 export * from "./types";
 

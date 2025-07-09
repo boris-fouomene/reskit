@@ -16,6 +16,9 @@
       ],
       "html": [
         "./build/html/index.d.ts"
+      ],
+      "variants": [
+        "./build/variants/index.d.ts"
       ]
     }
   },
@@ -25,6 +28,7 @@
     "readme.md",
     "package.json",
     "html.js",
+    "variants.js",
     "theme-to-css-vars.js",
     "animations.js",
     "variants.json"

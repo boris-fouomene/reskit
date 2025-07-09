@@ -1,15 +1,12 @@
 import { tv, type VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
+import { iconVariants } from "./variantsFactory/text2icons";
 const icon = tv({
     variants: {
         ...VariantsFactory.createAll(),
 
-        color: VariantsColors.icon,
-        size: VariantsFactory.createIconSize(),
-        nativeSize: VariantsFactory.createNativeIconSize(),
-        hoverColor: VariantsFactory.createHoverIconColor(),
-        activeColor: VariantsFactory.createActiveIconColor(),
+        ...iconVariants,
 
         error: {
             true: "",

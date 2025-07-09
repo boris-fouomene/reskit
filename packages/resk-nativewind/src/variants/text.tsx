@@ -3,21 +3,13 @@ import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 import { fontWeightClasses } from "./variantsFactory/fontWeight";
 import { textAlignClasses } from "./variantsFactory/textAlignClasses";
+import { textVariants } from "./variantsFactory/text2icons";
 
 const text = tv({
     base: "",
     variants: {
         ...VariantsFactory.createAll(),
-
-        color: VariantsColors.text,
-        hoverColor: VariantsFactory.createHoverTextColor(),
-        activeColor: VariantsFactory.createActiveTextColor(),
-
-        align: textAlignClasses,
-        weight: fontWeightClasses,
-        size: VariantsFactory.createTextSize(),
-        nativeSize: VariantsFactory.createNativeTextSize(),
-
+        ...textVariants,
         error: {
             true: "",
         },
@@ -45,5 +37,7 @@ const text = tv({
 });
 
 export default text;
+
+const allT = VariantsFactory.createTextVariants();
 
 export type IVariantPropsText = VariantProps<typeof text>

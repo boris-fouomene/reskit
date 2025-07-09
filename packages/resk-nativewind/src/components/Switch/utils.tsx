@@ -3,7 +3,7 @@ import { getTextContent, useStateCallback } from "@utils";
 import { useEffect, useRef } from "react";
 import { IToggleableProps } from "./types";
 import { cn } from "@utils/cn";
-import { variants } from "@variants/index";
+import { commonVariant } from "@variants/index";
 
 export * from "./types";
 
@@ -81,8 +81,8 @@ export function useToggleable({ disabled, className, checkedTitle, onValueChange
   uncheckedTitle = getTextContent(uncheckedTitle) && uncheckedTitle || title;
   return {
     ...rest,
-    className: cn(variants.all({ disabled, readOnly }), className),
-    containerClassName: cn(variants.all({ disabled, readOnly }), "flex flex-row self-start items-center justify-start", containerClassName),
+    className: cn(commonVariant({ disabled, readOnly }), className),
+    containerClassName: cn(commonVariant({ disabled, readOnly }), "flex flex-row self-start items-center justify-start", containerClassName),
     labelClassName: cn(!disabled && "select-text", "mx-[7px]", className),
     checked,
     labelPosition,

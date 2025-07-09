@@ -2,7 +2,7 @@ import { defaultStr } from "@resk/core";
 import { IHtmlTextProps, Text } from "@html";
 import { cn } from "@utils/cn";
 import { IVariantPropsText } from "@variants/text";
-import { variants } from "@variants/index";
+import { commonVariant, textVariant } from "@variants/index";
 
 
 /**
@@ -20,7 +20,7 @@ export function HelperText({ visible = true, error, className, testID, ...rest }
     testID = defaultStr(testID, "resk-helper-text");
     return <Text
         {...rest}
-        className={cn(variants.all({ hidden: visible === false }), variants.text({ error: !!error }), className)}
+        className={cn(commonVariant({ hidden: visible === false }), textVariant({ error: !!error }), className)}
     />
 }
 

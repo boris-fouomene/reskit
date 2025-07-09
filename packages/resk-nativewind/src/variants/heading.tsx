@@ -2,6 +2,7 @@
 import { tv, type VariantProps } from 'tailwind-variants'
 import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from './variantsFactory';
+import { textVariants } from './variantsFactory/text2icons';
 
 const heading = tv({
     base: '',
@@ -15,18 +16,7 @@ const heading = tv({
             h5: 'text-lg font-medium',
             h6: 'text-base font-normal',
         },
-        align: VariantsFactory.createTextAlign,
-        textSize: VariantsFactory.createTextSize(),
-        nativeTextSize: VariantsFactory.createNativeTextSize(),
-        weight: VariantsFactory.createTextWeight,
-
-        color: VariantsColors.text,
-        hoverColor: VariantsFactory.createHoverTextColor(),
-        activeColor: VariantsFactory.createActiveTextColor(),
-
-        size: VariantsFactory.createTextSize(),
-        nativeSize: VariantsFactory.createNativeTextSize(),
-
+        ...textVariants
     },
     defaultVariants: {},
 })

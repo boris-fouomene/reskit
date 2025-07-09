@@ -1,7 +1,7 @@
 import { Div, IHtmlDivProps } from "@html";
 import { isObj } from "@resk/core/utils";
 import { cn } from "@utils/cn";
-import { variants } from "@variants/index";
+import { surfaceVariant } from "@variants/index";
 import { IVariantPropsSurface } from "@variants/surface";
 
 /**
@@ -9,7 +9,7 @@ import { IVariantPropsSurface } from "@variants/surface";
  * background for cards, modals, and other UI elements.
  *
  * The background color can be changed by setting the `className` prop to one
- * @see {@link variants.surface} for more information about the surface variants.
+ * @see {@link surfaceVariant} for more information about the surface variants.
  * @see {@link Div} for more information about the Div component.
  * @see {@link IHtmlDivProps} for more information about the Div props.
  */
@@ -17,7 +17,7 @@ export function Surface({ variant, className, ...props }: ISurfaceProps) {
     return <Div
         testID={"resk-surface"}
         {...props}
-        className={cn(isObj(variant) && variants.surface(variant), className)}
+        className={cn(isObj(variant) && surfaceVariant(variant), className)}
     />
 }
 

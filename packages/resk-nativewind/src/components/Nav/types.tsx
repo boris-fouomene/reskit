@@ -56,14 +56,14 @@ export interface INavItemsProps<Context = unknown> extends IHtmlDivProps, INavCo
     * standard menu item. This function receives the item properties and is responsible for generating
     * the corresponding JSX.
      */
-    renderItem: INavRenderItemFunc<Context>,
+    renderItem?: INavRenderItemFunc<Context>,
 
     /**
      * The function used to
     * render expandable menu items. Similar to the render function, this handles the rendering of
     * items that can expand to show additional content.
      */
-    renderExpandableItem: INavRenderItemFunc<Context>,
+    renderExpandableItem?: INavRenderItemFunc<Context>,
 }
 
 

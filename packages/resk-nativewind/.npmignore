@@ -8,6 +8,7 @@ node_modules/
 !theme-to-css-vars.js
 !package.json
 !html.js
+!variants.js
 !variants.json
 !animations.js
 # Ignore specific folders

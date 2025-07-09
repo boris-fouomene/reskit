@@ -6,14 +6,14 @@ import { isImageSource, isImageUrl } from "./utils";
 import FontIcon from "./Font";
 import { StyleSheet } from "react-native";
 import { isNonNullString, isObj } from "@resk/core/utils";
-import { variants } from "@variants/index";
+import { iconVariant } from "@variants/index";
 import { Tooltip } from "@components/Tooltip";
 
 
 function Icon({ fontIconName, className, variant, src, resizeMode, title, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
     const isSource = isImageSource(source);
     const iconSrc = isImageSource(src) ? src : undefined;
-    className = cn(isObj(variant) && variants.icon(variant), className);
+    className = cn(isObj(variant) && iconVariant(variant), className);
     testID = testID && typeof testID == "string" ? testID : (isSource ? "resk-image" : "resk-font-icon");
     const iconSize = typeof size == "number" && size > 0 ? size : FontIcon.DEFAULT_SIZE;
     if (isSource || iconSrc) {

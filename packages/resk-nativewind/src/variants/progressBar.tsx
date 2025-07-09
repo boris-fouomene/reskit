@@ -1,5 +1,5 @@
 import { tv, VariantProps } from 'tailwind-variants';
-import { VariantsFactory } from './variantsFactory';
+import { VariantsOptionsFactory } from './variantsFactory';
 import { VariantsColors } from './colors/generated';
 
 export const progressBarVariant = tv({
@@ -87,22 +87,22 @@ export const progressBarVariant = tv({
                 track: "h-12"
             },
         },
-        trackColor: VariantsFactory.create<typeof VariantsColors.background, { track: string }>(VariantsColors.background, (value, colorName) => {
+        trackColor: VariantsOptionsFactory.create<typeof VariantsColors.background, { track: string }>(VariantsColors.background, (value, colorName) => {
             return {
                 track: value,
             }
         }),
-        fillColor: VariantsFactory.create<typeof VariantsColors.background, { fillBar: string }>(VariantsColors.background, (value, colorName) => {
+        fillColor: VariantsOptionsFactory.create<typeof VariantsColors.background, { fillBar: string }>(VariantsColors.background, (value, colorName) => {
             return {
                 fillBar: value,
             }
         }),
-        textColor: VariantsFactory.create<typeof VariantsColors.text, { text: string }>(VariantsColors.text, (value, colorName) => {
+        textColor: VariantsOptionsFactory.create<typeof VariantsColors.text, { text: string }>(VariantsColors.text, (value, colorName) => {
             return {
                 text: value,
             }
         }),
-        ...VariantsFactory.createAllRounded<{ track: string, fillBar: string }>((value) => {
+        ...VariantsOptionsFactory.createAllRounded<{ track: string, fillBar: string }>((value) => {
             return {
                 track: "",
                 fillBar: value,

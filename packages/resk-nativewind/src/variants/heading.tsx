@@ -1,11 +1,11 @@
 import { tv, type VariantProps } from 'tailwind-variants'
-import { VariantsFactory } from './variantsFactory';
+import { VariantsOptionsFactory } from './variantsFactory';
 import { textVariants } from './variantsFactory/text2icons';
 
 export const headingVariant = tv({
     base: '',
     variants: {
-        ...VariantsFactory.createAll(),
+        ...VariantsOptionsFactory.createAll(),
         level: {
             h1: 'text-4xl font-bold',
             h2: 'text-3xl font-semibold',

@@ -1,6 +1,6 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 import { IVariantsColors } from "./colors";
 import { typedEntries } from "@resk/core/utils";
 
@@ -11,7 +11,7 @@ export const iconButtonVariant = tv({
         text: "",
     },
     variants: {
-        ...VariantsFactory.createAll<{ icon: string, container: string, text: string }>((value, iconName) => {
+        ...VariantsOptionsFactory.createAll<{ icon: string, container: string, text: string }>((value, iconName) => {
             return {
                 container: value,
                 icon: "",

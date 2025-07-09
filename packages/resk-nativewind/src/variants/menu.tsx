@@ -1,6 +1,6 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 import { classes } from "./classes";
 
 type IMenuVariantSlots = {
@@ -30,32 +30,32 @@ export const menuVariant = tv({
                 modalBackdrop: classes.backdrop,
             }
         },
-        ...VariantsFactory.createAll<IMenuVariantSlots>((value) => {
+        ...VariantsOptionsFactory.createAll<IMenuVariantSlots>((value) => {
             return {
                 contentContainer: value,
             }
         }),
-        colorScheme: VariantsFactory.create<typeof VariantsColors.surface, IMenuVariantSlots>(VariantsColors.surface, (value) => {
+        colorScheme: VariantsOptionsFactory.create<typeof VariantsColors.surface, IMenuVariantSlots>(VariantsColors.surface, (value) => {
             return {
                 contentContainer: value,
             }
         }),
-        bottomSheetTitleWeight: VariantsFactory.createTextWeight<IMenuVariantSlots>((value) => {
+        bottomSheetTitleWeight: VariantsOptionsFactory.createTextWeight<IMenuVariantSlots>((value) => {
             return {
                 bottomSheetTitle: value,
             }
         }),
-        bottomSheetTitleSize: VariantsFactory.createTextSize<IMenuVariantSlots>((value) => {
+        bottomSheetTitleSize: VariantsOptionsFactory.createTextSize<IMenuVariantSlots>((value) => {
             return {
                 bottomSheetTitle: value,
             }
         }),
-        bottomSheetTitleColor: VariantsFactory.createTextColor<IMenuVariantSlots>(value => {
+        bottomSheetTitleColor: VariantsOptionsFactory.createTextColor<IMenuVariantSlots>(value => {
             return {
                 bottomSheetTitle: value,
             }
         }),
-        bottomSheetTitleAlign: VariantsFactory.createTextAlign<IMenuVariantSlots>(value => {
+        bottomSheetTitleAlign: VariantsOptionsFactory.createTextAlign<IMenuVariantSlots>(value => {
             return {
                 bottomSheetTitle: value,
             }

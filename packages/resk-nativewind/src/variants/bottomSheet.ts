@@ -1,5 +1,5 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 import { classes } from "./classes";
 
@@ -16,17 +16,17 @@ export const bottomSheetVariant = tv({
         modalBackdrop: classes.backdrop,
       },
     },
-    ...VariantsFactory.createAll<{ content: string }>((value) => {
+    ...VariantsOptionsFactory.createAll<{ content: string }>((value) => {
       return {
         content: value,
       };
     }),
-    colorScheme: VariantsFactory.create<typeof VariantsColors.surface, { content: string }>(VariantsColors.surface, (value, colorName) => {
+    colorScheme: VariantsOptionsFactory.create<typeof VariantsColors.surface, { content: string }>(VariantsColors.surface, (value, colorName) => {
       return {
         content: value,
       };
     }),
-    appBarColorScheme: VariantsFactory.create<typeof VariantsColors.surface, { appBar: string }>(VariantsColors.surface, (value, colorName) => {
+    appBarColorScheme: VariantsOptionsFactory.create<typeof VariantsColors.surface, { appBar: string }>(VariantsColors.surface, (value, colorName) => {
       return {
         appBar: value,
       };

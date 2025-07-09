@@ -1,11 +1,11 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 
 export const surfaceVariant = tv({
     base: "",
     variants: {
-        ...VariantsFactory.createAll(),
+        ...VariantsOptionsFactory.createAll(),
         colorScheme: VariantsColors.surface,
     },
     defaultVariants: {

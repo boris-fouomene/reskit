@@ -1,6 +1,6 @@
 import { tv, VariantProps } from 'tailwind-variants';
 import { VariantsColors } from "./colors/generated";
-import { VariantsFactory } from './variantsFactory';
+import { VariantsOptionsFactory } from './variantsFactory';
 
 export const buttonVariant = tv({
     slots: {
@@ -14,14 +14,14 @@ export const buttonVariant = tv({
         label: "",
     },
     variants: {
-        ...VariantsFactory.createAll<{ base: string }>((value) => {
+        ...VariantsOptionsFactory.createAll<{ base: string }>((value) => {
             return {
                 base: value,
             }
         }),
         colorScheme: VariantsColors.button,
         outline: VariantsColors.buttonOutline,
-        hoverColor: VariantsFactory.createHoverBackgroundColor<{ base: string }>((value, variantName) => {
+        hoverColor: VariantsOptionsFactory.createHoverBackgroundColor<{ base: string }>((value, variantName) => {
             return {
                 base: value,
             }

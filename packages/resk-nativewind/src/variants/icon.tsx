@@ -1,9 +1,9 @@
 import { tv, type VariantProps } from "tailwind-variants";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 import { iconVariants } from "./variantsFactory/text2icons";
 export const iconVariant = tv({
     variants: {
-        ...VariantsFactory.createAll(),
+        ...VariantsOptionsFactory.createAll(),
 
         ...iconVariants,
 

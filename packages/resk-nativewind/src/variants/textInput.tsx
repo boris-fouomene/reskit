@@ -1,5 +1,5 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 import "@resk/core/utils";
 import Platform from "@platform";
@@ -29,10 +29,10 @@ export const textInputVariant = tv({
         placeholder: ""
     },
     variants: {
-        ...VariantsFactory.createAll<{ contentContainer: string }>((value, colorName) => {
+        ...VariantsOptionsFactory.createAll<{ contentContainer: string }>((value, colorName) => {
             return { contentContainer: value }
         }),
-        colorScheme: VariantsFactory.create<typeof VariantsColors.background, ITextInputSlots>(VariantsColors.background, (value, colorName) => {
+        colorScheme: VariantsOptionsFactory.create<typeof VariantsColors.background, ITextInputSlots>(VariantsColors.background, (value, colorName) => {
             const textColor = VariantsColors.textForeground[`${colorName}-foreground`];
             return {
                 contentContainer: value,
@@ -41,55 +41,55 @@ export const textInputVariant = tv({
                 icon: VariantsColors.iconForeground[`${colorName}-foreground`],
             }
         }),
-        ...VariantsFactory.createAllPaddings<ITextInputSlots>((value, colorName) => {
+        ...VariantsOptionsFactory.createAllPaddings<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
-        ...VariantsFactory.createAllMargins<ITextInputSlots>((value, colorName) => {
+        ...VariantsOptionsFactory.createAllMargins<ITextInputSlots>((value, colorName) => {
             return { container: value }
         }),
-        ...VariantsFactory.createAllBorders<ITextInputSlots>((value, colorName) => {
+        ...VariantsOptionsFactory.createAllBorders<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
-        iconSize: VariantsFactory.createIconSize<ITextInputSlots>((value, colorName) => {
+        iconSize: VariantsOptionsFactory.createIconSize<ITextInputSlots>((value, colorName) => {
             return { icon: value }
         }),
-        nativeIconSize: VariantsFactory.createNativeIconSize<ITextInputSlots>((value, colorName) => {
+        nativeIconSize: VariantsOptionsFactory.createNativeIconSize<ITextInputSlots>((value, colorName) => {
             return { icon: value }
         }),
-        iconColor: VariantsFactory.create<typeof VariantsColors.icon, ITextInputSlots>(VariantsColors.icon, (value, colorName) => {
+        iconColor: VariantsOptionsFactory.create<typeof VariantsColors.icon, ITextInputSlots>(VariantsColors.icon, (value, colorName) => {
             return { icon: value }
         }),
-        labelTextSize: VariantsFactory.createTextSize<ITextInputSlots>((value, colorName) => {
+        labelTextSize: VariantsOptionsFactory.createTextSize<ITextInputSlots>((value, colorName) => {
             return { label: value }
         }),
-        nativeLabelTextSize: VariantsFactory.createNativeTextSize<ITextInputSlots>((value, colorName) => {
+        nativeLabelTextSize: VariantsOptionsFactory.createNativeTextSize<ITextInputSlots>((value, colorName) => {
             return { label: value }
         }),
-        inputTextSize: VariantsFactory.createTextSize<ITextInputSlots>((value, colorName) => {
+        inputTextSize: VariantsOptionsFactory.createTextSize<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
         }),
-        nativeInputTextSize: VariantsFactory.createNativeTextSize<ITextInputSlots>((value, colorName) => {
+        nativeInputTextSize: VariantsOptionsFactory.createNativeTextSize<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
         }),
-        labelWeight: VariantsFactory.createTextWeight<ITextInputSlots>((value, colorName) => {
+        labelWeight: VariantsOptionsFactory.createTextWeight<ITextInputSlots>((value, colorName) => {
             return { label: value }
         }),
-        inputWeight: VariantsFactory.createTextWeight<ITextInputSlots>((value, colorName) => {
+        inputWeight: VariantsOptionsFactory.createTextWeight<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
         }),
-        labelTextAlign: VariantsFactory.createTextAlign<ITextInputSlots>((value, colorName) => {
+        labelTextAlign: VariantsOptionsFactory.createTextAlign<ITextInputSlots>((value, colorName) => {
             return { label: value }
         }),
-        inputTextAlign: VariantsFactory.createTextAlign<ITextInputSlots>((value, colorName) => {
+        inputTextAlign: VariantsOptionsFactory.createTextAlign<ITextInputSlots>((value, colorName) => {
             return { input: value, labelEmbeded: value }
         }),
-        borderStyle: VariantsFactory.createBorderStyle<ITextInputSlots>((value, colorName) => {
+        borderStyle: VariantsOptionsFactory.createBorderStyle<ITextInputSlots>((value, colorName) => {
             return { contentContainer: value }
         }),
-        borderColor: VariantsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
+        borderColor: VariantsOptionsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
             return { contentContainer: value }
         }),
-        focusedColor: VariantsFactory.create<typeof VariantsColors.text, ITextInputSlots>(VariantsColors.text, (value, colorName) => {
+        focusedColor: VariantsOptionsFactory.create<typeof VariantsColors.text, ITextInputSlots>(VariantsColors.text, (value, colorName) => {
             return {
                 focusedLabel: value,
                 focusedInput: value,
@@ -97,7 +97,7 @@ export const textInputVariant = tv({
                 focusedIcon: value.replaceAll("text-", "!text-")
             }
         }),
-        errorColor: VariantsFactory.create<typeof VariantsColors.text, ITextInputSlots>(VariantsColors.text, (value, colorName) => {
+        errorColor: VariantsOptionsFactory.create<typeof VariantsColors.text, ITextInputSlots>(VariantsColors.text, (value, colorName) => {
             return {
                 errorLabel: value,
                 errorInput: value,
@@ -105,62 +105,62 @@ export const textInputVariant = tv({
                 errorIcon: value.replaceAll("text-", "!text-")
             }
         }),
-        focusedRingColor: VariantsFactory.create<typeof VariantsColors.ringColors, ITextInputSlots>(VariantsColors.ringColors, (value, colorName) => {
+        focusedRingColor: VariantsOptionsFactory.create<typeof VariantsColors.ringColors, ITextInputSlots>(VariantsColors.ringColors, (value, colorName) => {
             return {
                 focusedContentContainer: value,
             }
         }),
-        errorRingColor: VariantsFactory.create<typeof VariantsColors.ringColors, ITextInputSlots>(VariantsColors.ringColors, (value, colorName) => {
+        errorRingColor: VariantsOptionsFactory.create<typeof VariantsColors.ringColors, ITextInputSlots>(VariantsColors.ringColors, (value, colorName) => {
             return {
                 errorContentContainer: value,
             }
         }),
-        focusedBorderWidth: VariantsFactory.createBorderWidth<ITextInputSlots>((value, colorName) => {
+        focusedBorderWidth: VariantsOptionsFactory.createBorderWidth<ITextInputSlots>((value, colorName) => {
             return {
                 focusedContentContainer: value,
             }
         }),
-        errorBorderWidth: VariantsFactory.createBorderWidth<ITextInputSlots>((value, colorName) => {
+        errorBorderWidth: VariantsOptionsFactory.createBorderWidth<ITextInputSlots>((value, colorName) => {
             return {
                 errorContentContainer: value,
             }
         }),
-        focusedRingWidth: VariantsFactory.createRingWidth<ITextInputSlots>((value, colorName) => {
+        focusedRingWidth: VariantsOptionsFactory.createRingWidth<ITextInputSlots>((value, colorName) => {
             return {
                 focusedContentContainer: value,
             }
         }),
-        errorRingWidth: VariantsFactory.createRingWidth<ITextInputSlots>((value, colorName) => {
+        errorRingWidth: VariantsOptionsFactory.createRingWidth<ITextInputSlots>((value, colorName) => {
             return {
                 errorContentContainer: value,
             }
         }),
-        focusedBorderColor: VariantsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
+        focusedBorderColor: VariantsOptionsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
             return {
                 focusedContentContainer: value,
             }
         }),
-        errorBorderColor: VariantsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
+        errorBorderColor: VariantsOptionsFactory.create<typeof VariantsColors.borderColor, ITextInputSlots>(VariantsColors.borderColor, (value, colorName) => {
             return {
                 errorContentContainer: value,
             }
         }),
-        webFocusedShadow: VariantsFactory.createShadow<ITextInputSlots>((value, colorName) => {
+        webFocusedShadow: VariantsOptionsFactory.createShadow<ITextInputSlots>((value, colorName) => {
             return {
                 focusedContentContainer: isWeb ? value : "",
             }
         }),
-        webErrorShadow: VariantsFactory.createShadow<ITextInputSlots>((value, colorName) => {
+        webErrorShadow: VariantsOptionsFactory.createShadow<ITextInputSlots>((value, colorName) => {
             return {
                 errorContentContainer: isWeb ? value : "",
             }
         }),
-        focusedShadowColor: VariantsFactory.createShadowColor<ITextInputSlots>((value, colorName) => {
+        focusedShadowColor: VariantsOptionsFactory.createShadowColor<ITextInputSlots>((value, colorName) => {
             return {
                 focusedContentContainer: value,
             }
         }),
-        errorShadowColor: VariantsFactory.createShadowColor<ITextInputSlots>((value, colorName) => {
+        errorShadowColor: VariantsOptionsFactory.createShadowColor<ITextInputSlots>((value, colorName) => {
             return {
                 errorContentContainer: isWeb ? value : "",
             }

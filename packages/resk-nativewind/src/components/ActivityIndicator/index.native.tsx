@@ -5,6 +5,17 @@ import { ActivityIndicator as RNPActivityIndicator } from "react-native";
 import { IActivityIndicatorProps } from "./types";
 import { activityIndicatorVariant } from "@variants/activityIndicator";
 
+const RNActivityIndicator = cssInterop(RNPActivityIndicator as any, {
+  className: {
+    target: false,
+    nativeStyleToProp: {
+      borderTopColor: "color",
+      width: "size",
+      height: "size",
+    }
+  }
+})
+
 /**
  * A custom `ActivityIndicator` component that wraps the standard 
  * `ActivityIndicator` from React Native. This component integrates 
@@ -44,17 +55,7 @@ import { ComponentType } from 'react';
  * Ensure that the theme provider is correctly set up in your application 
  * for the color to be applied.
  */
-export function ActivityIndicator({ className, variant, style, ...props }: IActivityIndicatorProps) {
-  return <RNActivityIndicator className={cn(activityIndicatorVariant(variant), className)} testID="resk-activity-indicator" {...props} />;
+export function ActivityIndicator({ className, variant, ...props }: IActivityIndicatorProps) {
+  return <RNActivityIndicator className={cn("resk-activity-indicator", activityIndicatorVariant(variant), className)} testID="resk-activity-indicator" {...props} />;
 }
 
-const RNActivityIndicator = cssInterop(RNPActivityIndicator as any, {
-  className: {
-    target: false,
-    nativeStyleToProp: {
-      borderTopColor: "color",
-      width: "size",
-      height: "size",
-    }
-  }
-})

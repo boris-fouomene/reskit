@@ -1,5 +1,5 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 
 export const dropdownItemVariant = tv({
@@ -11,49 +11,49 @@ export const dropdownItemVariant = tv({
     selectedLabel: "",
   },
   variants: {
-    ...VariantsFactory.createAll<IDropdownIconSlots>((value, variantName, varantGroupName) => {
+    ...VariantsOptionsFactory.createAll<IDropdownIconSlots>((value, variantName, varantGroupName) => {
       return {
         base: value,
       };
     }),
-    colorScheme: VariantsFactory.create<typeof VariantsColors.background, IDropdownIconSlots>(VariantsColors.background, (value, colorName) => {
+    colorScheme: VariantsOptionsFactory.create<typeof VariantsColors.background, IDropdownIconSlots>(VariantsColors.background, (value, colorName) => {
       return {
         base: value,
         label: VariantsColors.textForeground[`${colorName}-foreground`],
       };
     }),
-    selectedColor: VariantsFactory.create<typeof VariantsColors.icon, IDropdownIconSlots>(VariantsColors.icon, (value, colorName) => {
+    selectedColor: VariantsOptionsFactory.create<typeof VariantsColors.icon, IDropdownIconSlots>(VariantsColors.icon, (value, colorName) => {
       return {
         selectedLabel: value.split("!text-").join("text-"),
         selectedIcon: value,
       };
     }),
-    selectedIconSize: VariantsFactory.createIconSize<IDropdownIconSlots>((value, colorName) => {
+    selectedIconSize: VariantsOptionsFactory.createIconSize<IDropdownIconSlots>((value, colorName) => {
       return {
         selectedIcon: value,
       };
     }),
-    textSize: VariantsFactory.createTextSize<IDropdownIconSlots>((value, colorName) => {
+    textSize: VariantsOptionsFactory.createTextSize<IDropdownIconSlots>((value, colorName) => {
       return {
         label: value,
       };
     }),
-    textAlign: VariantsFactory.createTextAlign<IDropdownIconSlots>((value, colorName) => {
+    textAlign: VariantsOptionsFactory.createTextAlign<IDropdownIconSlots>((value, colorName) => {
       return {
         label: value,
       };
     }),
-    textWeight: VariantsFactory.createTextWeight<IDropdownIconSlots>((value, colorName) => {
+    textWeight: VariantsOptionsFactory.createTextWeight<IDropdownIconSlots>((value, colorName) => {
       return {
         label: value,
       };
     }),
-    selectedTextSize: VariantsFactory.createTextSize<IDropdownIconSlots>((value, colorName) => {
+    selectedTextSize: VariantsOptionsFactory.createTextSize<IDropdownIconSlots>((value, colorName) => {
       return {
         selectedLabel: value,
       };
     }),
-    selectedTextWeight: VariantsFactory.createTextWeight<IDropdownIconSlots>((value, colorName) => {
+    selectedTextWeight: VariantsOptionsFactory.createTextWeight<IDropdownIconSlots>((value, colorName) => {
       return {
         selectedLabel: value,
       };

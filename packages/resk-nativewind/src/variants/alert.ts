@@ -1,5 +1,5 @@
 import { tv, type VariantProps } from "tailwind-variants";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 import { typedEntries } from "@resk/core/utils";
 import { IVariantsColors } from "./colors";
@@ -18,12 +18,12 @@ export const alertVariant = tv({
     action: "",
   },
   variants: {
-    ...VariantsFactory.createAll((value) => {
+    ...VariantsOptionsFactory.createAll((value) => {
       return {
         base: value,
       };
     }),
-    colorScheme: VariantsFactory.createBackgroundColor((bgColor, colorName) => {
+    colorScheme: VariantsOptionsFactory.createBackgroundColor((bgColor, colorName) => {
       const textColor = VariantsColors.textForeground[`${colorName}-foreground`],
         iconColor = VariantsColors.iconForeground[`${colorName}-foreground`];
       return {
@@ -48,31 +48,31 @@ export const alertVariant = tv({
         ];
       })
     ) as Record<IVariantsColors.ColorName, IAlertSlot>,
-    ...VariantsFactory.createTextVariants<IAlertSlot, "title">((value, colorName) => {
+    ...VariantsOptionsFactory.createTextVariants<IAlertSlot, "title">((value, colorName) => {
       return { title: value };
     }),
-    ...VariantsFactory.createTextVariants<IAlertSlot, "message">((value, colorName) => {
+    ...VariantsOptionsFactory.createTextVariants<IAlertSlot, "message">((value, colorName) => {
       return { message: value };
     }),
-    ...VariantsFactory.createIconVariants<IAlertSlot, "icon">((value, colorName) => {
+    ...VariantsOptionsFactory.createIconVariants<IAlertSlot, "icon">((value, colorName) => {
       return { icon: value };
     }),
-    ...VariantsFactory.createIconVariants<IAlertSlot, "closeIcon">((value, colorName) => {
+    ...VariantsOptionsFactory.createIconVariants<IAlertSlot, "closeIcon">((value, colorName) => {
       return { closeIcon: value };
     }),
-    ...VariantsFactory.createAllPadding2Margin<IAlertSlot, "iconContainer">((value, colorName) => {
+    ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "iconContainer">((value, colorName) => {
       return { iconContainer: value };
     }),
-    ...VariantsFactory.createAllPadding2Margin<IAlertSlot, "closeIconContainer">((value, colorName) => {
+    ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "closeIconContainer">((value, colorName) => {
       return { closeIconContainer: value };
     }),
-    ...VariantsFactory.createAllPadding2Margin<IAlertSlot, "actionsContainer">((value, colorName) => {
+    ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "actionsContainer">((value, colorName) => {
       return { actionsContainer: value };
     }),
-    ...VariantsFactory.createAllFlex<IAlertSlot, "actionsContainer">((value, colorName) => {
+    ...VariantsOptionsFactory.createAllFlex<IAlertSlot, "actionsContainer">((value, colorName) => {
       return { actionsContainer: value };
     }),
-    ...VariantsFactory.createAllPadding2Margin<IAlertSlot, "header">((value, colorName) => {
+    ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "header">((value, colorName) => {
       return { header: value };
     }),
   },

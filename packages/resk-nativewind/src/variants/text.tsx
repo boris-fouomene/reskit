@@ -1,11 +1,11 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 import { textVariants } from "./variantsFactory/text2icons";
 
 export const textVariant = tv({
     base: "",
     variants: {
-        ...VariantsFactory.createAll(),
+        ...VariantsOptionsFactory.createAll(),
         ...textVariants,
         error: {
             true: "",

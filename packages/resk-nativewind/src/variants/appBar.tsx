@@ -1,6 +1,6 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
-import { VariantsFactory } from "./variantsFactory";
+import { VariantsOptionsFactory } from "./variantsFactory";
 import { IVariantsColors } from "./colors";
 import { cn } from "@utils/cn";
 import { typedEntries } from "@resk/core/utils";
@@ -16,72 +16,72 @@ export const appBarVariant = tv({
         content: "",//the content of the appBarVariant
     },
     variants: {
-        ...VariantsFactory.createAll<{ base: string }>((value) => {
+        ...VariantsOptionsFactory.createAll<{ base: string }>((value) => {
             return {
                 base: value,
             }
         }),
-        titleSize: VariantsFactory.createTextSize((value) => {
+        titleSize: VariantsOptionsFactory.createTextSize((value) => {
             return {
                 title: value,
             }
         }),
-        titleWeight: VariantsFactory.createTextWeight((value) => {
+        titleWeight: VariantsOptionsFactory.createTextWeight((value) => {
             return {
                 title: value,
             }
         }),
-        titleOpacity: VariantsFactory.createOpacity((value) => {
+        titleOpacity: VariantsOptionsFactory.createOpacity((value) => {
             return {
                 title: value,
             }
         }),
-        hoverTitleOpacity: VariantsFactory.createHoverOpacity((value) => {
+        hoverTitleOpacity: VariantsOptionsFactory.createHoverOpacity((value) => {
             return {
                 title: value,
             }
         }),
-        activeTitleOpacity: VariantsFactory.createActiveOpacity((value) => {
+        activeTitleOpacity: VariantsOptionsFactory.createActiveOpacity((value) => {
             return {
                 title: value,
             }
         }),
-        subtitleSize: VariantsFactory.createTextSize((value) => {
+        subtitleSize: VariantsOptionsFactory.createTextSize((value) => {
             return {
                 subtitle: value,
             }
         }),
-        subTitleWeight: VariantsFactory.createTextWeight((value) => {
+        subTitleWeight: VariantsOptionsFactory.createTextWeight((value) => {
             return {
                 subtitle: value,
             }
         }),
-        subTitleOpacity: VariantsFactory.createOpacity((value) => {
+        subTitleOpacity: VariantsOptionsFactory.createOpacity((value) => {
             return {
                 subtitle: value,
             }
         }),
-        hoverSubTitleOpacity: VariantsFactory.createHoverOpacity((value) => {
+        hoverSubTitleOpacity: VariantsOptionsFactory.createHoverOpacity((value) => {
             return {
                 subtitle: value,
             }
         }),
-        activeSubTitleOpacity: VariantsFactory.createActiveOpacity((value) => {
+        activeSubTitleOpacity: VariantsOptionsFactory.createActiveOpacity((value) => {
             return {
                 subtitle: value,
             }
         }),
-        actionTextSize: VariantsFactory.createTextSize((value) => {
+        actionTextSize: VariantsOptionsFactory.createTextSize((value) => {
             return {
                 action: value,
             }
         }),
-        iconColor: VariantsFactory.createIconColor((value) => {
+        iconColor: VariantsOptionsFactory.createIconColor((value) => {
             return {
                 icon: value,
             }
         }),
-        iconSize: VariantsFactory.createIconSize((value) => {
+        iconSize: VariantsOptionsFactory.createIconSize((value) => {
             return {
                 icon: value,
             }

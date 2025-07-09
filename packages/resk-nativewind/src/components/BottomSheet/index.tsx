@@ -1,8 +1,7 @@
 "use client";
-import { IVariantPropsBottomSheet } from "@variants/bottomSheet";
+import { bottomSheetVariant, IVariantPropsBottomSheet } from "@variants/bottomSheet";
 import { Modal } from "@components/Modal";
 import { defaultStr, isObj } from "@resk/core/utils";
-import bottomSheetVariant from "@variants/bottomSheet";
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
 import { AppBar, IAppBarProps } from "@components/AppBar";

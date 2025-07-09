@@ -13,7 +13,7 @@ type IMenuVariantSlots = {
     scrollViewContentContainer?: string;
     bottomSheetTitle?: string;
 }
-const menu = tv({
+export const menuVariant = tv({
     slots: {
         modalBackdrop: "",
         anchorContainer: "",
@@ -71,6 +71,4 @@ const menu = tv({
     }
 });
 
-export default menu;
-
-export type IVariantPropsMenu = VariantProps<typeof menu>;
+export type IVariantPropsMenu = VariantProps<typeof menuVariant>;

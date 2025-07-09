@@ -19,7 +19,7 @@ import { TextInput } from "@components/TextInput";
 import { Text } from "@html/Text";
 import { IFontIconName } from "@components/Icon";
 import { INavItemProps } from "@components/Nav";
-import dropdownItem, { IVariantPropsDropdownItem } from "@variants/dropdownItem";
+import { dropdownItemVariant, IVariantPropsDropdownItem } from "@variants/dropdownItem";
 import { IVariantPropsIcon } from "@variants/icon";
 import { IVariantPropsProgressBar } from "@variants/progressBar";
 
@@ -538,7 +538,6 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
         </Div> : null;
     return <Div
         disabled={context?.props?.disabled}
-        readOnly={!isEditabled}
         testID={testID + "-dropdown-list-container"}
         className={cn("w-full max-h-full relative flex flex-col web:bg-inherit", canReverse ? "pt-[10px]" : "pb-[10px]")}
         style={fullScreen ? undefined : { maxHeight: maxMenuHeight }}
@@ -567,7 +566,7 @@ const DropdownItem = memo(function DropdownItem(preparedItem: IDropdownPreparedI
     const selectedItemsByHashKey = context.getSelectedItemsByHashKey();
     const { multiple, selectedIconName, itemClassName, itemVariant, itemContainerClassName } = context.props;
     const testID = context.getTestID();
-    const computedVariant = dropdownItem(itemVariant);
+    const computedVariant = dropdownItemVariant(itemVariant);
     const isSelected = useMemo(() => {
         return context.isSelectedByHashKey(hashKey);
     }, [selectedItemsByHashKey, hashKey, state]);

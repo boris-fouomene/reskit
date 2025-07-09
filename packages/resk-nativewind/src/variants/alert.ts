@@ -4,7 +4,7 @@ import { VariantsColors } from "./colors/generated";
 import { typedEntries } from "@resk/core/utils";
 import { IVariantsColors } from "./colors";
 
-const alert = tv({
+export const alertVariant = tv({
   slots: {
     title: "",
     message: "",
@@ -49,31 +49,31 @@ const alert = tv({
       })
     ) as Record<IVariantsColors.ColorName, IAlertSlot>,
     ...VariantsFactory.createTextVariants<IAlertSlot, "title">((value, colorName) => {
-      return { title: value }
+      return { title: value };
     }),
     ...VariantsFactory.createTextVariants<IAlertSlot, "message">((value, colorName) => {
-      return { message: value }
+      return { message: value };
     }),
     ...VariantsFactory.createIconVariants<IAlertSlot, "icon">((value, colorName) => {
-      return { icon: value }
+      return { icon: value };
     }),
     ...VariantsFactory.createIconVariants<IAlertSlot, "closeIcon">((value, colorName) => {
-      return { closeIcon: value }
+      return { closeIcon: value };
     }),
     ...VariantsFactory.createAllPadding2Margin<IAlertSlot, "iconContainer">((value, colorName) => {
-      return { iconContainer: value }
+      return { iconContainer: value };
     }),
     ...VariantsFactory.createAllPadding2Margin<IAlertSlot, "closeIconContainer">((value, colorName) => {
-      return { closeIconContainer: value }
+      return { closeIconContainer: value };
     }),
     ...VariantsFactory.createAllPadding2Margin<IAlertSlot, "actionsContainer">((value, colorName) => {
-      return { actionsContainer: value }
+      return { actionsContainer: value };
     }),
     ...VariantsFactory.createAllFlex<IAlertSlot, "actionsContainer">((value, colorName) => {
-      return { actionsContainer: value }
+      return { actionsContainer: value };
     }),
     ...VariantsFactory.createAllPadding2Margin<IAlertSlot, "header">((value, colorName) => {
-      return { header: value }
+      return { header: value };
     }),
   },
   defaultVariants: {
@@ -92,9 +92,7 @@ const alert = tv({
   },
 });
 
-export type IVariantPropsAlert = VariantProps<typeof alert>;
-
-export default alert;
+export type IVariantPropsAlert = VariantProps<typeof alertVariant>;
 
 type IAlertSlot = {
   title?: string;
@@ -108,8 +106,3 @@ type IAlertSlot = {
   actionsContainer?: string;
   action?: string;
 };
-
-
-const t = VariantsFactory.createTextVariants<IAlertSlot, "title">((value, colorName) => {
-  return { title: value }
-})

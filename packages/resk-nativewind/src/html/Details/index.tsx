@@ -1,7 +1,7 @@
 import { cn } from "@utils/cn";
 import { Div } from "../Div";
 import { defaultStr } from "@resk/core/utils";
-import allVariants from "@variants/all"
+import { commonVariant } from "@variants/common"
 import { useDetailsState } from "./state";
 import { IHtmlDetailsProps } from "./types";
 import { DetailsIcon } from "./Icon";
@@ -41,7 +41,7 @@ export function Details({ className, iconProps, iconPosition, disabled, testID, 
             {summary}
             {!isIconOnLeft ? icon : null}
         </Div>
-        <Div className={cn("w-100 px-[20px] py-[7px]", disabled && "pointer-events-none", contentClassName, toggleOpen && allVariants({ hidden: !isOpen }))} testID={testID + "-content"}>
+        <Div className={cn("w-100 px-[20px] py-[7px]", disabled && "pointer-events-none", contentClassName, toggleOpen && commonVariant({ hidden: !isOpen }))} testID={testID + "-content"}>
             {children}
         </Div>
     </Div>

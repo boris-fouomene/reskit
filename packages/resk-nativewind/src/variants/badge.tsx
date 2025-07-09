@@ -1,11 +1,11 @@
 import { tv, type VariantProps } from 'tailwind-variants';
-import surface from "./surface";
 import { VariantsColors } from './colors/generated';
 import { VariantsFactory } from './variantsFactory';
+import { surfaceVariant } from "./surface";
 
-const badge = tv({
+export const badgeVariant = tv({
     base: "inline-flex items-center rounded-md px-2 py-1 text-xs ring-inset",
-    extend: surface,
+    extend: surfaceVariant,
     variants: {
         ...VariantsFactory.createAll(),
         colorScheme: VariantsColors.badge,
@@ -31,6 +31,4 @@ const badge = tv({
     }
 });
 
-export type IVariantPropsBadge = VariantProps<typeof badge>;
-
-export default badge;
+export type IVariantPropsBadge = VariantProps<typeof badgeVariant>;

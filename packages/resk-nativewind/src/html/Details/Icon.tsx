@@ -4,7 +4,7 @@ import FontIcon from "@components/Icon/Font";
 import { useEffect, useId } from "react";
 import { Div } from "../Div";
 import { cn } from "@utils/cn";
-import allVariants from "@variants/all";
+import { commonVariant } from "@variants/common";
 import { addClassName, removeClassName, defaultStr } from "@resk/core/utils";
 import { IFontIconName } from "@components/Icon/types";
 
@@ -24,7 +24,7 @@ export function DetailsIcon({ openedIcon, closedIcon, toggleOpen, open, testID, 
     const isNative = typeof toggleOpen == "function";
     const iconId = useId();
     const iconClassName = cn(className, "details-icon");
-    const hiddenClassName = cn("opacity-0", "hidden", allVariants({ hidden: true }));
+    const hiddenClassName = cn("opacity-0", "hidden", commonVariant({ hidden: true }));
     useEffect(() => {
         if (typeof document !== "undefined" && document) {
             const openIcon = document.querySelector(`#${iconId}-opened`);

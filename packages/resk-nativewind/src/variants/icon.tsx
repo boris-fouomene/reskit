@@ -1,8 +1,7 @@
 import { tv, type VariantProps } from "tailwind-variants";
-import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 import { iconVariants } from "./variantsFactory/text2icons";
-const icon = tv({
+export const iconVariant = tv({
     variants: {
         ...VariantsFactory.createAll(),
 
@@ -34,6 +33,4 @@ const icon = tv({
     ]
 });
 
-export type IVariantPropsIcon = VariantProps<typeof icon>;
-
-export default icon;
+export type IVariantPropsIcon = VariantProps<typeof iconVariant>;

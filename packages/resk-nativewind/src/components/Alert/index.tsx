@@ -7,15 +7,14 @@ import { defaultStr, isNonNullString, isObj } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { Text } from "@html/Text";
 import { Div } from "@html/Div";
-import textVariant, { IVariantPropsText } from "@variants/text";
-import iconVariants from "@variants/icon";
-import alertVariant, { IVariantPropsAlert } from "@variants/alert";
+import { textVariant, IVariantPropsText } from "@variants/text";
+import { iconVariant as iconVariants } from "@variants/icon";
+import { alertVariant, IVariantPropsAlert } from "@variants/alert";
 import { IHtmlTextProps } from "@html/types";
 import { useAlert } from "./hook";
 import { CloseAlert } from "./Close";
 import { INavItemsProps, Nav } from "@components/Nav";
 import { IAlertHook } from "./types";
-import { I } from "@html/text-elements";
 
 export function Alert({ title, icon, closeIcon, actions, closeIconVariant, closeIconClassName, closeIconContainerClassName, iconClassName, messageProps, children, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, headerClassName, className, ...rest }: IAlertProps) {
     const { isOpen, open, close, shouldRender, className: alertClassName } = useAlert();

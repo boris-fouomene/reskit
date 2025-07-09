@@ -4,7 +4,7 @@ import { VariantsFactory } from "./variantsFactory";
 import { IVariantsColors } from "./colors";
 import { typedEntries } from "@resk/core/utils";
 
-const iconButton = tv({
+export const iconButtonVariant = tv({
     slots: {
         icon: "",
         container: "",
@@ -99,6 +99,4 @@ const iconButton = tv({
     }
 });
 
-export default iconButton;
-
-export type IVariantPropsIconButton = VariantProps<typeof iconButton>;
+export type IVariantPropsIconButton = VariantProps<typeof iconButtonVariant>;

@@ -4,7 +4,7 @@ import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IClassName } from "@src/types";
 import { IVariantPropsText } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
-import appBarVariant, { IVariantPropsAppBar } from "@variants/appBar";
+import { IVariantPropsAppBar } from "@variants/appBar";
 
 
 export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "title" | "variant"> {

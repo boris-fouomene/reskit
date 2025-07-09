@@ -6,7 +6,7 @@ import { cn } from '@utils/cn';
 import { IPortalProps } from './types';
 import { StyleSheet } from 'react-native';
 import { Div } from '@html/Div';
-import allVariants from '@variants/all';
+import { commonVariant } from '@variants/common';
 import { useAccessibilityEscape } from '@html/accessibility';
 
 
@@ -51,12 +51,12 @@ import { useAccessibilityEscape } from '@html/accessibility';
  * - Z-index is automatically managed to ensure the portal appears above other content.
  * - Accessibility escape is handled via {@link useAccessibilityEscape}.
  * - The portal will not render on the server or if `document` is unavailable.
- * - Backdrop styling is controlled by the `withBackdrop` prop and the `allVariants` utility.
+ * - Backdrop styling is controlled by the `withBackdrop` prop and the `commonVariant` utility.
  *
  * @see {@link IPortalProps}
  * @see {@link useAccessibilityEscape}
  * @see {@link createPortal}
- * @see {@link allVariants}
+ * @see {@link commonVariant}
  *
  * @public
  */
@@ -80,7 +80,7 @@ export function Portal({ children, onAccessibilityEscape, style, withBackdrop, i
         testID={testID}
         {...props}
         style={StyleSheet.flatten([{ zIndex }, style])}
-        className={cn("resk-portal", allVariants({ backdrop: withBackdrop }), className)}
+        className={cn("resk-portal", commonVariant({ backdrop: withBackdrop }), className)}
     >
         {children}
     </Div>, document.querySelector("#reskit-app-root") || document.body);

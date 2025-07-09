@@ -2,7 +2,7 @@ import { isNumber, isObj } from '@resk/core/utils';
 import { INativewindBaseProps } from '@src/types';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import variantsAll from '@variants/all';
+import { commonVariant } from '@variants/common';
 import { computeElevationStyle } from './elevations-styles';
 /**
  * A function that takes in any number of class names and returns a single class name string
@@ -60,8 +60,8 @@ export function normalizeProps<T extends INativewindBaseProps = any>({ className
     return {
         ...defaultProps, ...props,
         className: cn(defaultProps.className,
-            variantsAll({ disabled: !!((props as any).disabled || (defaultProps as any)?.disabled) }),
-            variantsAll({ readOnly: !!((props as any).readonly || (defaultProps as any)?.readonly) }),
+            commonVariant({ disabled: !!((props as any).disabled || (defaultProps as any)?.disabled) }),
+            commonVariant({ readOnly: !!((props as any).readonly || (defaultProps as any)?.readonly) }),
             className
         )
     }

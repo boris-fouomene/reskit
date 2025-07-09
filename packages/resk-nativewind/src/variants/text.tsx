@@ -1,11 +1,8 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
-import { fontWeightClasses } from "./variantsFactory/fontWeight";
-import { textAlignClasses } from "./variantsFactory/textAlignClasses";
 import { textVariants } from "./variantsFactory/text2icons";
 
-const text = tv({
+export const textVariant = tv({
     base: "",
     variants: {
         ...VariantsFactory.createAll(),
@@ -36,8 +33,4 @@ const text = tv({
     ]
 });
 
-export default text;
-
-const allT = VariantsFactory.createTextVariants();
-
-export type IVariantPropsText = VariantProps<typeof text>
+export type IVariantPropsText = VariantProps<typeof textVariant>

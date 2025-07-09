@@ -3,7 +3,7 @@ import { IHtmlDivProps } from "@html/types";
 import { defaultStr, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { IVariantPropsProgressBar } from "@variants/progressBar";
-import progressBarVariant from "@variants/progressBar";
+import { progressBarVariant } from "@variants/progressBar";
 import { Text } from "@html/Text";
 import "./style";
 import { isRTL } from "@utils/i18nManager";

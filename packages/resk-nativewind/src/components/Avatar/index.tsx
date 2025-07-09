@@ -4,7 +4,7 @@ import { Text } from "@html/Text";
 import IconButton from "@components/Icon/Button";
 import { cn } from '@utils/cn';
 import { StyleSheet } from 'react-native';
-import iconButtonVariants from "@variants/iconButton";
+import { iconButtonVariant } from "@variants/iconButton";
 
 export interface IAvatarProps extends Omit<IIconButtonProps, "size"> {
   /** Renders text in the avatar.
@@ -30,6 +30,6 @@ export function Avatar({
     testID={testID}
     {...rest}
   >
-    {avatarText ? <Text testID={`${testID}-avatar-text`} style={StyleSheet.flatten(style) as any} className={cn("text-center", iconButtonVariants(rest?.variant)?.text?.(), className)}>{avatarText}</Text> : null}
+    {avatarText ? <Text testID={`${testID}-avatar-text`} style={StyleSheet.flatten(style) as any} className={cn("text-center", iconButtonVariant(rest?.variant)?.text?.(), className)}>{avatarText}</Text> : null}
   </IconButton>
 };

@@ -3,7 +3,7 @@ import { cn } from "@utils/cn";
 import { cssInterop } from "nativewind";
 import { ActivityIndicator as RNPActivityIndicator } from "react-native";
 import { IActivityIndicatorProps } from "./types";
-import activityIndicatorVariant from "@variants/activityIndicator";
+import { activityIndicatorVariant } from "@variants/activityIndicator";
 
 /**
  * A custom `ActivityIndicator` component that wraps the standard 

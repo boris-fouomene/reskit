@@ -1,21 +1,24 @@
-export * from "./colors/generated";
-export { default as surfaceVariant } from "./surface";
-export { default as textVariant } from "./text";
-export { default as iconButtonVariant } from "./iconButton";
-export { default as headingVariant } from "./heading";
-export { default as dividerVariant } from "./divider";
-export { default as iconVariant } from "./icon";
-export { default as badgeVariant } from "./badge";
-export { default as commonVariant } from "./all";
-export { default as buttonVariant } from "./button";
-export { default as activityIndicatorVariant } from "./activityIndicator";
-export { default as menuVariant } from "./menu";
-export { default as checkboxVariant } from "./checkbox";
-export { default as progressBarVariant } from "./progressBar";
-export { default as textInputVariant } from "./textInput";
-export { default as bottomSheetVariant } from "./bottomSheet";
-export { default as dropdownItemVariant } from "./dropdownItem";
-export { default as alertVariant } from "./alert";
+
+export * from "./activityIndicator";
+export * from "./alert";
+export * from "./appBar";
+export * from "./badge";
+export * from "./bottomSheet";
+export * from "./button";
+export * from "./checkbox";
+export * from "./common";
+export * from "./dialog";
+export * from "./divider";
+export * from "./dropdownItem";
+export * from "./heading";
+export * from "./icon";
+export * from "./iconButton";
+export * from "./menu";
+export * from "./progressBar";
+export * from "./surface";
+export * from "./text";
+export * from "./textInput";
+
 
 export * from "./types";
 

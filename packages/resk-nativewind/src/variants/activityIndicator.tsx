@@ -1,7 +1,7 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
 
-const activityIndicator = tv({
+export const activityIndicatorVariant = tv({
     variants: {
         color: VariantsColors.activityIndicator,
     },
@@ -10,6 +10,4 @@ const activityIndicator = tv({
     }
 });
 
-export default activityIndicator;
-
-export type IVariantPropsActivityIndicator = VariantProps<typeof activityIndicator>;
+export type IVariantPropsActivityIndicator = VariantProps<typeof activityIndicatorVariant>;

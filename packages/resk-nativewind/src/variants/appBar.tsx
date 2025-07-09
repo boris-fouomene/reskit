@@ -5,7 +5,7 @@ import { IVariantsColors } from "./colors";
 import { cn } from "@utils/cn";
 import { typedEntries } from "@resk/core/utils";
 
-const appBar = tv({
+export const appBarVariant = tv({
     slots: {
         base: "",
         title: "",
@@ -13,7 +13,7 @@ const appBar = tv({
         action: "",
         actionMenuItem: "",
         icon: "",
-        content: "",//the content of the appBar
+        content: "",//the content of the appBarVariant
     },
     variants: {
         ...VariantsFactory.createAll<{ base: string }>((value) => {
@@ -104,6 +104,4 @@ const appBar = tv({
     }
 });
 
-export default appBar;
-
-export type IVariantPropsAppBar = VariantProps<typeof appBar>;
+export type IVariantPropsAppBar = VariantProps<typeof appBarVariant>;

@@ -2,7 +2,7 @@ import { tv, VariantProps } from 'tailwind-variants';
 import { VariantsFactory } from './variantsFactory';
 import { VariantsColors } from './colors/generated';
 
-const progressBar = tv({
+export const progressBarVariant = tv({
     slots: {
         base: "",
         track: "",
@@ -127,6 +127,4 @@ const progressBar = tv({
     }
 })
 
-export type IVariantPropsProgressBar = VariantProps<typeof progressBar>;
-
-export default progressBar;
+export type IVariantPropsProgressBar = VariantProps<typeof progressBarVariant>;

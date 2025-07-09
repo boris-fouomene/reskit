@@ -2,7 +2,7 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 
-const surface = tv({
+export const surfaceVariant = tv({
     base: "",
     variants: {
         ...VariantsFactory.createAll(),
@@ -13,6 +13,4 @@ const surface = tv({
     }
 });
 
-export default surface;
-
-export type IVariantPropsSurface = VariantProps<typeof surface>;
+export type IVariantPropsSurface = VariantProps<typeof surfaceVariant>;

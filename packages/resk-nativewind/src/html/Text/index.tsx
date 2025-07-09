@@ -5,16 +5,16 @@ import { cn } from "@utils/cn";
 import { IClassName } from "@src/types";
 import { isNumber } from "@resk/core/utils";
 import { StyleSheet } from "react-native";
-import variantText from "@variants/text";
+import { textVariant } from "@variants/text";
 
-export const Text = withAsChild(function Text({ numberOfLines,selectable, variant, allowFontScaling, style: cStyle, ellipsizeMode, lineBreakMode, maxFontSizeMultiplier, minimumFontScale, ...props }: IHtmlTextProps) {
+export const Text = withAsChild(function Text({ numberOfLines, selectable, variant, allowFontScaling, style: cStyle, ellipsizeMode, lineBreakMode, maxFontSizeMultiplier, minimumFontScale, ...props }: IHtmlTextProps) {
     const classes: IClassName = [];
     const style = {} as any;
     classes.push(selectable === false ? "select-none" : "select-text")
     if (isNumber(numberOfLines) && numberOfLines >= 1) {
-        classes.push("max-w-full","text-ellipsis");
-        if(numberOfLines> 1){
-            Object.assign(style,{
+        classes.push("max-w-full", "text-ellipsis");
+        if (numberOfLines > 1) {
+            Object.assign(style, {
                 display: '-webkit-box',
                 overflow: 'clip',
                 WebkitBoxOrient: 'vertical',
@@ -42,5 +42,5 @@ export const Text = withAsChild(function Text({ numberOfLines,selectable, varian
         style.MozTextSizeAdjust = 'none';
         style.msTextSizeAdjust = 'none';
     }
-    return <Div {...props} style={StyleSheet.flatten([style, cStyle])} className={cn(classes, variantText(variant), props.className)} />;
+    return <Div {...props} style={StyleSheet.flatten([style, cStyle])} className={cn(classes, textVariant(variant), props.className)} />;
 }, "Html.Text");

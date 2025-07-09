@@ -10,7 +10,7 @@ import { isNonNullString } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import getTextContent from "@utils/getTextContent";
 import { pickTouchableProps } from "@utils/touchHandler";
-import checkboxVariant from "@variants/checkbox";
+import { checkboxVariant } from "@variants/checkbox";
 
 export * from "./types";
 

@@ -11,11 +11,11 @@ import { isNumber } from "@resk/core/utils";
 import { measureInWindow } from '@utils/measureLayut';
 import { useMenuPosition } from './position';
 import { cn } from '@utils/cn';
-import menuVariants from '@variants/menu';
-import bottomSheetVariant from '@variants/bottomSheet';
+import { menuVariant } from '@variants/menu';
+import { bottomSheetVariant } from '@variants/bottomSheet';
 import { Div } from '@html/Div';
 import { classes } from '@variants/classes';
-import allVariants from '@variants/all';
+import { commonVariant } from '@variants/common';
 import { Text } from '@html/Text';
 import { Icon } from '@components/Icon';
 import { Divider } from '@components/Divider';
@@ -208,7 +208,7 @@ export function Menu<Context = unknown>({
     }, [children, context]);
 
     const maxHeightStyle = maxMenuHeight ? { maxHeight: maxMenuHeight } : undefined;
-    const computedVariant = menuVariants(Object.assign({}, variant, { visible: isVisible }));
+    const computedVariant = menuVariant(Object.assign({}, variant, { visible: isVisible }));
     const Wrapper = !withScrollView ? Fragment : ScrollView;
     const wrapperProps = !withScrollView ? {} : { testID: testID + "-scroll-view", style: maxHeightStyle, className: cn("max-w-full flex-1", computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn(computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } as ScrollViewProps;
     itemsProps = Object.assign({}, itemsProps);
@@ -224,7 +224,7 @@ export function Menu<Context = unknown>({
             <AnchorComponent
                 testID={testID + "-anchor-container"}
                 ref={anchorRef}
-                className={cn(classes.cursorPointed, allVariants({ disabled }), computedVariant.anchorContainer(), anchorContainerClassName, "relative menu-anchor-container")}
+                className={cn(classes.cursorPointed, commonVariant({ disabled }), computedVariant.anchorContainer(), anchorContainerClassName, "relative menu-anchor-container")}
                 onAccessibilityEscape={dismissable !== false ? () => {
                     close();
                 } : undefined}

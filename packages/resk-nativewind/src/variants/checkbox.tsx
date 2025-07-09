@@ -2,7 +2,7 @@ import { tv, VariantProps } from 'tailwind-variants';
 import { VariantsFactory } from './variantsFactory';
 import { VariantsColors } from './colors/generated';
 
-const checkbox = tv({
+export const checkboxVariant = tv({
     slots: {
         icon: "",
         label: "",
@@ -43,6 +43,4 @@ const checkbox = tv({
     }
 })
 
-export type IVariantPropsCheckbox = VariantProps<typeof checkbox>;
-
-export default checkbox;
+export type IVariantPropsCheckbox = VariantProps<typeof checkboxVariant>;

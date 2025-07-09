@@ -3,7 +3,7 @@ import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from "./variantsFactory";
 import { classes } from "./classes";
 
-const dialog = tv({
+export const dialogVariant = tv({
     slots: {
         backdrop: "",
         content: "",//"max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
@@ -33,6 +33,4 @@ const dialog = tv({
     defaultVariants: {}
 });
 
-export type IVariantPropsModal = VariantProps<typeof dialog>;
-
-export default dialog;
+export type IVariantPropsModal = VariantProps<typeof dialogVariant>;

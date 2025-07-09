@@ -1,12 +1,11 @@
 import { ActivityIndicator } from '@components/ActivityIndicator';
-import { Surface } from '@components/Surface';
 import FontIcon from "./Font";
 import { defaultStr, isNonNullString, isNumber } from '@resk/core/utils';
 import { IIconButtonProps } from './types';
 import Icon from "./Icon";
 import { cn } from '@utils/cn';
 import { pickTouchableProps } from '@utils/touchHandler';
-import iconButton from '@variants/iconButton';
+import { iconButtonVariant } from '@variants/iconButton';
 import { isValidElement } from 'react';
 import { Tooltip } from '@components/Tooltip';
 
@@ -51,7 +50,7 @@ export default function IconButton(
     }: IIconButtonProps) {
     testID = defaultStr(testID, "resk-icon-button");
     size = isNumber(size) ? size : FontIcon.DEFAULT_SIZE;
-    const computedVariant = iconButton(buttonVariant);
+    const computedVariant = iconButtonVariant(buttonVariant);
     const { touchableProps, ...restProps } = pickTouchableProps(rest);
     containerSize = isNumber(containerSize) && containerSize > size ? containerSize : (size + 2 * PADDING);
     return (

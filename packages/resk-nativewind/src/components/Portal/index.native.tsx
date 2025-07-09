@@ -4,7 +4,7 @@ import { IPortalProps } from './types';
 import { defaultStr } from '@resk/core/utils';
 import { cn } from '@utils/cn';
 import { Div } from '@html/Div';
-import allVariants from "@variants/all";
+import { commonVariant } from "@variants/common";
 
 /**
  * @interface IPortalItem
@@ -149,7 +149,7 @@ function PortalItem({ children, style, testID, withBackdrop, zIndex, ...props }:
     testID = defaultStr(testID, "resk-resk-portal");
     return <Div
         {...props}
-        className={cn("resk-portal", allVariants({ backdrop: withBackdrop }), props.className)}
+        className={cn("resk-portal", commonVariant({ backdrop: withBackdrop }), props.className)}
         style={StyleSheet.flatten([portalStyle, style])}
     >
         {children}

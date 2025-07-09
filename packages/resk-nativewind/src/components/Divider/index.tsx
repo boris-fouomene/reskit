@@ -2,7 +2,7 @@ import { IHtmlDivProps } from "@html/types";
 import { Div } from "@html/Div";
 import { cn } from "@utils/cn";
 import { IVariantPropsDivider } from "@variants/divider";
-import dividerVariant from "@variants/divider";
+import { dividerVariant } from "@variants/divider";
 /**
  * The `Divider` component renders a horizontal separation line on the page.
  * It can be customized with styles and className

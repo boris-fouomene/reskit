@@ -2,7 +2,7 @@ import { tv, VariantProps } from 'tailwind-variants';
 import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from './variantsFactory';
 
-const buton = tv({
+export const buttonVariant = tv({
     slots: {
         base: "",
         content: "",
@@ -31,5 +31,4 @@ const buton = tv({
         activeOpacity: 80
     }
 });
-export default buton;
-export type IVariantPropsButton = VariantProps<typeof buton>;
+export type IVariantPropsButton = VariantProps<typeof buttonVariant>;

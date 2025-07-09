@@ -6,7 +6,7 @@ import Platform from "@platform";
 
 const isWeb = Platform.isWeb();
 
-const textInput = tv({
+export const textInputVariant = tv({
     slots: {
         input: "",
         container: "",
@@ -177,7 +177,7 @@ const textInput = tv({
     },
 });
 
-export type IVariantPropsTextInput = VariantProps<typeof textInput>;
+export type IVariantPropsTextInput = VariantProps<typeof textInputVariant>;
 
 type ITextInputSlots = {
     input?: string;
@@ -196,5 +196,3 @@ type ITextInputSlots = {
     errorInput?: string;
     errorLabel?: string;
 }
-
-export default textInput;

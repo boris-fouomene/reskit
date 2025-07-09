@@ -1,6 +1,6 @@
 import { tv, VariantProps } from "tailwind-variants";
 import { classes } from "./classes";
-const all = tv({
+export const commonVariant = tv({
     base: "",
     variants: {
         disabled: {
@@ -17,7 +17,6 @@ const all = tv({
         }
     },
 });
-export default all;
 
 
-export type IVariantPropsAll = VariantProps<typeof all>;
+export type IVariantPropsAll = VariantProps<typeof commonVariant>;

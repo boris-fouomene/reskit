@@ -1,4 +1,4 @@
-import iconVariants from "@variants/icon";
+import { iconVariant } from "@variants/icon";
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import { Text } from '@html/Text';
@@ -8,9 +8,9 @@ import { Divider } from '@components/Divider';
 import { cn } from '@utils/cn';
 import { Icon } from '@components/Icon';
 import { Div } from '@html/Div';
-import buttonVariant from "@variants/button";
+import { buttonVariant } from "@variants/button";
 import { IButtonBaseContext, IButtonProps } from "./types";
-import allVariants from "@variants/all";
+import { commonVariant } from "@variants/common";
 import { GestureResponderEvent } from "react-native";
 import Auth from '@resk/core/auth';
 
@@ -61,7 +61,7 @@ export function ButtonBase<Context = unknown>({
     const iconSize = 18;
     iconProps = Object.assign({}, iconProps);
     const disabledClass = disabled && "pointer-events-none";
-    iconProps.className = cn("button-icon", computedVariant.icon(), iconProps?.variant && iconVariants(iconProps.variant), disabledClass, iconClassName, iconProps.className);
+    iconProps.className = cn("button-icon", computedVariant.icon(), iconProps?.variant && iconVariant(iconProps.variant), disabledClass, iconClassName, iconProps.className);
     const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps, variant: undefined });
     const iconContent = isLoading ? (
         <ActivityIndicator
@@ -82,7 +82,7 @@ export function ButtonBase<Context = unknown>({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("group/btn btn relative  button select-text cursor-pointer", rippleContent ? "overflow-hidden" : "", allVariants({ disabled }), computedVariant.base(), className)}
+            className={cn("group/btn btn relative  button select-text cursor-pointer", rippleContent ? "overflow-hidden" : "", commonVariant({ disabled }), computedVariant.base(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}

@@ -5,7 +5,7 @@ import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult 
 import { IFieldBase } from "@resk/core/types";
 import { ICountryCode } from "@resk/core/countries";
 import { IVariantPropsTextInput } from "@variants/textInput";
-import textInputVariant from "@variants/textInput";
+import { textInputVariant } from "@variants/textInput";
 import { IFontIconName } from "@components/Icon";
 import { IInputFormatterOptions } from "@resk/core/inputFormatter";
 /**

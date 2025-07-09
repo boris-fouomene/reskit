@@ -5,7 +5,7 @@ import { IFontIconProps } from "../types";
 import { pickTouchableProps } from "@utils/touchHandler";
 import { cn, normalizeProps } from "@utils/cn";
 import { defaultStr, isNonNullString, isNumber } from "@resk/core/utils";
-import iconVariants from "@variants/icon";
+import { iconVariant } from "@variants/icon";
 import { FC } from "react";
 import { IconProps } from "react-native-vector-icons/Icon";
 import { Tooltip } from "@components/Tooltip";
@@ -26,7 +26,7 @@ export default function ClientFontIcon({ name, variant, containerClassName, titl
         nameArray.shift();
         fontIconName = nameArray.join("-");
     }
-    const iconClassName = cn(iconVariants(variant), className, "font-icon", ("font-icon-" + fontIconName), ("font-icon-raw-name-" + nameString), ("font-icon-set-" + iconSetName));
+    const iconClassName = cn(iconVariant(variant), className, "font-icon", ("font-icon-" + fontIconName), ("font-icon-raw-name-" + nameString), ("font-icon-set-" + iconSetName));
     const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>

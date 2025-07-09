@@ -2,11 +2,9 @@ import { II18nLocale } from "@src/i18n/types";
 import { Component, ComponentClass, ExoticComponent, FunctionComponent, JSXElementConstructor, ReactElement } from "react";
 import { ViewStyle, TextStyle, ImageStyle, StyleProp, Animated, PressableProps } from "react-native";
 import { type ClassValue } from "clsx";
-import { IVariantPropsAll } from "@variants/all";
-
 export type IClassName = ClassValue;
 
-export interface INativewindBaseProps extends Omit<IVariantPropsAll, "disabled"> {
+export interface INativewindBaseProps {
   className?: IClassName;
   disabled?: PressableProps["disabled"];
 }

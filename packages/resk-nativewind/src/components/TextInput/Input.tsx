@@ -12,8 +12,8 @@ import { ITextInputCallOptions, ITextInputProps, ITextInputRenderOptions, ITextI
 import p from "@platform";
 import { TouchableOpacity } from "react-native";
 import { KeyboardAvoidingView } from "@components/KeyboardAvoidingView";
-import textInputVariant from "@variants/textInput";
-import allVariants from "@variants/all";
+import { textInputVariant } from "@variants/textInput";
+import { commonVariant } from "@variants/common";
 import { extractTextClasses } from "@utils/textClasses";
 import { Div } from "@html/Div";
 import { classes } from "@variants/classes";
@@ -86,7 +86,7 @@ const isNative = p.isNative();
  * @see {@link useMergeRefs}
  * @see {@link KeyboardAvoidingView}
  * @see {@link textInputVariant}
- * @see {@link allVariants}
+ * @see {@link commonVariant}
  * @see {@link extractTextClasses}
  * @see {@link ITextInputCallOptions}
  * @see {@link ITextInputRenderOptions}
@@ -361,8 +361,8 @@ export default function TextInput<ValueType = any>({
     const canRenderLabel = withLabel !== false;
     const left = typeof customLeft === "function" ? customLeft(callOptions) : customLeft;
     const right = typeof customRight === "function" ? customRight(callOptions) : customRight;
-    const disabledClx = cn(allVariants({ disabled }));
-    const readOnlyClx = cn(allVariants({ readOnly }));
+    const disabledClx = cn(commonVariant({ disabled }));
+    const readOnlyClx = cn(commonVariant({ readOnly }));
     const secureIcon = isPasswordField && editable ? <FontIcon
         name={(isSecure ? defaultStr(passwordHiddenIconName, "eye") : defaultStr(passwordVisibleIconName, "eye-off")) as never}
         onPress={() => { setIsSecure(!isSecure); focus(); }} className={iconClx}

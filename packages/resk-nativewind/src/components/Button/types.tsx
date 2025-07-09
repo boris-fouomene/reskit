@@ -5,7 +5,7 @@ import { IAuthPerm } from "@resk/core/auth";
 import { IClassName } from "@src/types";
 import { JSX, ReactNode, Ref } from "react";
 import { IDict, IResourceName } from '@resk/core/types';
-import buttonVariant, { IVariantPropsButton } from "@variants/button";
+import { buttonVariant, IVariantPropsButton } from "@variants/button";
 
 
 export type IButtonBaseContext<Context = unknown> = Context & {

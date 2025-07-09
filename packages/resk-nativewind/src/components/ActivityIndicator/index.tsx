@@ -3,7 +3,7 @@ import { pickHtmlProps } from "@html/utils";
 import { defaultStr, isNonNullString, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { StyleSheet } from "react-native";
-import activityIndicatorVariant from "@variants/activityIndicator";
+import { activityIndicatorVariant } from "@variants/activityIndicator";
 import { IActivityIndicatorProps } from "./types";
 
 /**

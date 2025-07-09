@@ -3,7 +3,7 @@ import { VariantsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 import { classes } from "./classes";
 
-const bottomSheet = tv({
+export const bottomSheetVariant = tv({
   slots: {
     contentContainer: "absolute flex-1 flex w-full h-full flex-col-reverse",
     modalBackdrop: "",
@@ -41,6 +41,5 @@ const bottomSheet = tv({
     transitionDuration: 300,
   },
 });
-export default bottomSheet;
 
-export type IVariantPropsBottomSheet = VariantProps<typeof bottomSheet>;
+export type IVariantPropsBottomSheet = VariantProps<typeof bottomSheetVariant>;

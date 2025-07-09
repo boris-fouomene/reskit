@@ -5,10 +5,8 @@ import { GestureResponderEvent } from 'react-native';
 import { ButtonBase } from './base';
 import { IButtonContext, IButtonInteractiveProps, IButtonProps } from './types';
 import { defaultStr } from '@resk/core/utils';
-import { cn } from '@utils/cn';
-import { useGetRippleContent } from './ripple';
 import useStateCallback from '@utils/stateCallback';
-import buttonVariants from "@variants/button";
+import { buttonVariant } from "@variants/button";
 
 
 export function Button<IButtonExtendContext = unknown>({
@@ -63,7 +61,7 @@ export function Button<IButtonExtendContext = unknown>({
         disable,
         isEnabled,
         loading: isLoading,
-        computedVariant: buttonVariants(rest.variant),
+        computedVariant: buttonVariant(rest.variant),
         disabled,
         get id() { return buttonId },
         setIsLoading,
@@ -81,7 +79,7 @@ export function Button<IButtonExtendContext = unknown>({
     const aRipple = Object.assign({}, android_ripple);
     const isRippleDisabled = disableRipple || disabled;
     const rProps = isRippleDisabled ? {} : { android_ripple: { color: rippleColor || undefined, ...aRipple } };
-    /* rippleClassName = cn(rest?.variant && buttonVariants(rest.variant)?.ripple?.(), rippleClassName);
+    /* rippleClassName = cn(rest?.variant && buttonVariant(rest.variant)?.ripple?.(), rippleClassName);
     const { rippleContent, startRipple } = useGetRippleContent({
         rippleColor,
         disabled,
@@ -89,7 +87,7 @@ export function Button<IButtonExtendContext = unknown>({
         disableRipple: !!isRippleDisabled,
         rippleClassName,
     }); */
-    
+
     return (<ButtonBase
         {...rest as any}
         {...rProps}

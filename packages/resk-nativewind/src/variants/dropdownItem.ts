@@ -2,7 +2,7 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsFactory } from "./variantsFactory";
 import { VariantsColors } from "./colors/generated";
 
-const dropdownItem = tv({
+export const dropdownItemVariant = tv({
   slots: {
     base: "",
     container: "",
@@ -72,6 +72,4 @@ type IDropdownIconSlots = {
   selectedLabel?: string;
   label?: string;
 };
-export type IVariantPropsDropdownItem = VariantProps<typeof dropdownItem>;
-
-export default dropdownItem;
+export type IVariantPropsDropdownItem = VariantProps<typeof dropdownItemVariant>;

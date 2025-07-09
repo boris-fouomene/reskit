@@ -1,10 +1,8 @@
-// heading.ts
 import { tv, type VariantProps } from 'tailwind-variants'
-import { VariantsColors } from "./colors/generated";
 import { VariantsFactory } from './variantsFactory';
 import { textVariants } from './variantsFactory/text2icons';
 
-const heading = tv({
+export const headingVariant = tv({
     base: '',
     variants: {
         ...VariantsFactory.createAll(),
@@ -21,6 +19,4 @@ const heading = tv({
     defaultVariants: {},
 })
 
-export type IVariantPropsHeading = VariantProps<typeof heading>;
-
-export default heading;
+export type IVariantPropsHeading = VariantProps<typeof headingVariant>;

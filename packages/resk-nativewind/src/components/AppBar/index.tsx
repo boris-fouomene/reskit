@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { Surface } from '@components/Surface';
-import { IAppBarActionsProps, IAppBarProps } from './types';
+import { IAppBarProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import ExpandableAppBarAction from './ExpandableAction';
 import { AppBarAction } from './Action';
@@ -10,9 +10,9 @@ import { defaultStr } from '@resk/core/utils';
 import { cn } from '@utils/cn';
 import { Div } from '@html/Div';
 import { Text } from '@html/Text';
-import textVariant from "@variants/text";
+import { textVariant } from "@variants/text";
 import { AppBarActions } from './Actions';
-import appBarVariants from "@variants/appBar";
+import { appBarVariant as appBarVariants } from "@variants/appBar";
 
 
 function AppBar<Context = any>({

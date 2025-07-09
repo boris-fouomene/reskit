@@ -2,8 +2,9 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
 import { VariantsOptionsFactory } from "./variantsFactory";
 import { classes } from "./classes";
+import { cn } from "@utils/cn";
 
-const fullScreenContent = "flex-1 max-w-full min-h-full max-h-full w-full h-full sm:w-full items-start justify-start "
+const fullScreen = "flex-1 flex flex-col max-w-full min-h-full max-h-full w-full h-full sm:w-full items-start justify-start "
 
 export const dialogVariant = tv({
     slots: {
@@ -13,10 +14,12 @@ export const dialogVariant = tv({
         action: "",
         appBar: "",
         subtitle: "",
-        scrollView: "",
+        scrollView: "flex-1 grow",
         scrollViewContentContainer: "",
-        content: "flex flex-col flex-1 items-center justify-center max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
-        contentFullScreen: fullScreenContent,
+        content: "flex flex-col max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
+        contentContainer: cn(fullScreen, "absolute left-0 top-0 right-0 bottom-0 items-center justify-center"),
+        contentContainerFullScreen: "items-start justify-start-start",
+        contentFullScreen: fullScreen,
     },
     variants: {
         ...VariantsOptionsFactory.createAll<{ content: string }>((value) => {
@@ -27,6 +30,7 @@ export const dialogVariant = tv({
         background: VariantsOptionsFactory.createBackgroundColor((value, variantName) => {
             return {
                 content: value,
+                contentFullScreen: value,
             }
         }),
         ...VariantsOptionsFactory.createTextVariants<IDialogVariantSlot, "title">((value, colorName) => {
@@ -52,7 +56,8 @@ export const dialogVariant = tv({
         }, "fullScreen"),
         fullScreen: {
             true: {
-                content: fullScreenContent
+                content: fullScreen,
+                contentContainer: fullScreen,
             }
         },
         withBackdrop: {
@@ -87,4 +92,6 @@ type IDialogVariantSlot = {
     scrollView?: string,
     scrollViewContentContainer?: string,
     contentFullScreen?: string,
+    contentcontainerFullScreen?: string;
+    contentContainer?: string,
 }

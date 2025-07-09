@@ -22,6 +22,11 @@ export interface IDialogProps<Context = unknown> extends IModalProps {
    */
   contentClassName?: IClassName;
 
+  /**
+   * The class name of the content container.
+   */
+  contentContainerClassName?: IClassName;
+
   context?: Context;
 
   /**

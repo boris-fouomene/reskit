@@ -23,6 +23,6 @@ export function DialogExample() {
                 <Button variant={{ colorScheme: "primary" }} onPress={() => setVisible(false)}>Close</Button>
             </Div>
         </Dialog>
-        <Button onPress={() => setVisible(true)}>Open modal1</Button>
+        <Button onPress={() => setVisible(true)}>Open Dialog 1</Button>
     </>
 }

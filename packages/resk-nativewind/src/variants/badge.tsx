@@ -12,7 +12,6 @@ export const badgeVariant = tv({
     defaultVariants: {
         colorScheme: "surface",
         activeOpacity: 80,
-        size: "eeeddddd"
     }
 });
 

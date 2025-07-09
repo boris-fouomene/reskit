@@ -11,6 +11,7 @@ import { IDialogContext, IDialogProps } from "./types";
 import { defaultStr, isObj } from "@resk/core/utils";
 import { Backdrop } from "@components/Backdrop";
 import { dialogVariant } from "@variants/dialog";
+import { Div } from "@html/Div";
 
 
 export function Dialog<Context = unknown>({
@@ -35,6 +36,7 @@ export function Dialog<Context = unknown>({
   contentClassName,
   appBarClassName,
   variant,
+  contentContainerClassName,
   ...props
 }: IDialogProps<Context>) {
   testID = defaultStr(testID, "resk-dialog");
@@ -44,6 +46,7 @@ export function Dialog<Context = unknown>({
   }, [fullScreen, isMobile, isTablet]);
   const computedVariant = dialogVariant({ ...variant, fullScreen: isFullScreen });
   const handleRequestClose = useCallback((event: any) => {
+    console.log("handleRequestClose", onRequestClose);
     if (typeof onRequestClose == "function") {
       return onRequestClose(event);
     }
@@ -98,21 +101,25 @@ export function Dialog<Context = unknown>({
     }
   }, [withScrollView, scrollViewClassName, testID, scrollViewContentContainerClassName]);
   return (
-    <Modal animationType="fade" {...props} testID={testID} onRequestClose={handleRequestClose}
+    <Modal animationType="fade" {...props} testID={testID}
+      onRequestClose={handleRequestClose}
       backdropClassName={cn("resk-dialog-backdrop", computedVariant.modalbackdrop())}
       className={cn("resk-dialog", computedVariant.modal())}
     >
-      {!isFullScreen ? <Backdrop testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop", computedVariant.modalbackdrop())} onPress={handleRequestClose} /> : null}
-      <View
-        testID={testID + "-dialog-content"}
-        className={cn("resk-dialog-content", computedVariant.content(), isFullScreen && computedVariant.contentFullScreen(), contentClassName)}
-      >
-        {fullScreen ? appBar : null}
-        <Wrapper {...wrapperProps}>
-          {children}
-        </Wrapper>
-        {!fullScreen ? appBar : null}
-      </View>
+      <Div className={cn("resk-dialog-content-continer", computedVariant.contentContainer(), isFullScreen && computedVariant.contentContainerFullScreen(), contentContainerClassName)}>
+        {!isFullScreen ? <Backdrop testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop")} onPress={handleRequestClose} /> : null}
+
+        <Div
+          testID={testID + "-dialog-content"}
+          className={cn("resk-dialog-content", computedVariant.content(), isFullScreen && computedVariant.contentFullScreen(), contentClassName)}
+        >
+          {fullScreen ? appBar : null}
+          <Wrapper {...wrapperProps}>
+            {children}
+          </Wrapper>
+          {!fullScreen ? appBar : null}
+        </Div>
+      </Div>
     </Modal>
   );
 }

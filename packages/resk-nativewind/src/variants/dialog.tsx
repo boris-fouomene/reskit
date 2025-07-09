@@ -5,8 +5,15 @@ import { classes } from "./classes";
 
 export const dialogVariant = tv({
     slots: {
-        backdrop: "",
-        content: "",//"max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
+        modalbackdrop: "",
+        title: "",
+        modal: "",
+        action: "",
+        appBar: "",
+        subtitle: "",
+        scrollView: "",
+        scrollViewContentContainer: "",
+        content: "flex flex-col flex-1 max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
     },
     variants: {
         ...VariantsOptionsFactory.createAll<{ content: string }>((value) => {
@@ -14,9 +21,14 @@ export const dialogVariant = tv({
                 content: value,
             }
         }),
+        fullScreen: {
+            true: {
+                content: "flex-1 max-w-full min-h-full max-h-full w-full h-full sm:w-full"
+            }
+        },
         withBackdrop: {
             true: {
-                backdrop: classes.backdrop
+                modalbackdrop: classes.backdrop
             }
         },
         colorScheme: VariantsOptionsFactory.create<typeof VariantsColors.surface, { content: string }>(VariantsColors.surface, (value) => {
@@ -24,13 +36,10 @@ export const dialogVariant = tv({
                 content: value,
             }
         }),
-        /*  responsive: {
-             true: {
-                 content: "max-w-full sm:max-w-full w-screen h-screen max-w-full max-h-full lg:max-h[50%] lg:max-w-[600%]",
-             }
-         }, */
     },
-    defaultVariants: {}
+    defaultVariants: {
+        withBackdrop: true,
+    }
 });
 
 export type IDialogVariant = VariantProps<typeof dialogVariant>;

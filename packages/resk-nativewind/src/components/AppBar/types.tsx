@@ -40,15 +40,20 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
 
     right?: ReactNode;
 
-    actions?: IAppBarActionsProps<Context>["actions"];
+    actions?: IAppBarActionProps<Context>[];
 
 
     actionsProps?: IAppBarActionsProps<Context>;
 
-
-    context?: IAppBarActionsProps<Context>["context"];
+    context?: Context;
 
     variant?: IAppBarVariant;
+
+    /** The maximum visible number of actions to display directly on the AppBar. 
+     * This value is used to determine the number of actions that can be displayed on the AppBar.
+     * The rest of the actions will be displayed in a menu.
+    */
+    maxVisibleActions?: number;
 }
 
 export interface IAppBarActionsProps<Context = unknown> {
@@ -127,6 +132,7 @@ export interface IAppBarActionsProps<Context = unknown> {
         When the actions items are rendered as a menu, this icon is used to render the menu anchor.
     */
     menuAnchorIconProps?: IIconButtonProps;
+
 }
 export type IAppBarContext<Context = unknown> = Context & {
     appBarVariant: IAppBarVariant;

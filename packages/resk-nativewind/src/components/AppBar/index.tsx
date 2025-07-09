@@ -6,7 +6,7 @@ import ExpandableAppBarAction from './ExpandableAction';
 import { AppBarAction } from './Action';
 import { BackAction } from "./BackAction";
 import { ReactNode } from 'react';
-import { defaultStr } from '@resk/core/utils';
+import { defaultStr, isNumber } from '@resk/core/utils';
 import { cn } from '@utils/cn';
 import { Div } from '@html/Div';
 import { Text } from '@html/Text';
@@ -15,7 +15,7 @@ import { AppBarActions } from './Actions';
 import { appBarVariant as appBarVariants } from "@variants/appBar";
 
 
-function AppBar<Context = any>({
+function AppBar<Context = unknown>({
   actions,
   actionsProps,
   title,
@@ -33,12 +33,13 @@ function AppBar<Context = any>({
   right,
   contentClassName,
   className,
+  maxVisibleActions,
   context,
   variant,
   ...appBarProps
 }: IAppBarProps<Context>) {
   testID = defaultStr(testID, 'resk-appbar');
-  const appVarVariant = appBarVariants(variant);
+  const appBarVariant = appBarVariants(variant);
   subtitle = subtitle === false ? null : subtitle;
   const backAction: ReactNode | false = typeof customBackAction == "function" ? customBackAction({
     ...context as any,
@@ -49,18 +50,18 @@ function AppBar<Context = any>({
     }
   }) : customBackAction;
   return (<Surface
-    className={cn(`appbar px-[7px] px-[7px] z-1 overflow-hidden flex flex-row items-center max-w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", appVarVariant.base(), className)}
+    className={cn(`appbar px-[7px] z-1 overflow-hidden flex flex-row items-center max-w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", appBarVariant.base(), className)}
     {...appBarProps}
     testID={testID}
   >
     {(backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
-      <BackAction testID={`${testID}-back-action`} className={cn(appVarVariant.icon(), backActionClassName)} onPress={onBackActionPress} /> : null}
+      <BackAction testID={`${testID}-back-action`} className={cn(appBarVariant.icon(), backActionClassName)} onPress={onBackActionPress} /> : null}
     {isValidElement(left) ? left as any : null}
-    <Div testID={`${testID}-content`} className={cn("px-[12px] flex-1 basis-0 min-w-0 native:flex-1", appVarVariant.content(), contentClassName)}>
+    <Div testID={`${testID}-content`} className={cn("px-[12px] flex-1 basis-0 min-w-0 native:flex-1", appBarVariant.content(), contentClassName)}>
       <Text
         numberOfLines={1}
         testID={`${testID}-title`}
-        className={cn("resk-appbar-title", appVarVariant.title(), textVariant(titleVariant), titleClassName)}
+        className={cn("resk-appbar-title", appBarVariant.title(), textVariant(titleVariant), titleClassName)}
       >
         {title}
       </Text>
@@ -68,7 +69,7 @@ function AppBar<Context = any>({
         <Text
           numberOfLines={1}
           testID={`${testID}-subtitle`}
-          className={cn("resk-appbar-subtitle", appVarVariant.subtitle(), textVariant(subtitleVariant), subtitleClassName)}
+          className={cn("resk-appbar-subtitle", appBarVariant.subtitle(), textVariant(subtitleVariant), subtitleClassName)}
         >
           {subtitle}
         </Text>
@@ -76,12 +77,13 @@ function AppBar<Context = any>({
     </Div>
     {isValidElement(children) ? children : null}
     <AppBarActions<Context> testID={testID + "-actions"}
-      context={Object.assign({}, context, { appVarVariant: Object.assign({}, variant) })}
+      context={{ ...Object.assign({}, context), appBarVariant: Object.assign({}, variant) }}
       {...actionsProps}
       actions={actions}
-      actionClassName={cn(appVarVariant.action(), actionsProps?.actionClassName)}
-      actionMenuItemClassName={cn(appVarVariant.actionMenuItem(), actionsProps?.actionMenuItemClassName)}
-      menuAnchorClassName={cn(appVarVariant.icon(), actionsProps?.menuAnchorClassName)}
+      maxVisibleActions={isNumber(maxVisibleActions) && maxVisibleActions > 0 ? maxVisibleActions : actionsProps?.maxVisibleActions}
+      actionClassName={cn(appBarVariant.action(), actionsProps?.actionClassName)}
+      actionMenuItemClassName={cn(appBarVariant.actionMenuItem(), actionsProps?.actionMenuItemClassName)}
+      menuAnchorClassName={cn(appBarVariant.icon(), actionsProps?.menuAnchorClassName)}
     />
     {isValidElement(right) ? right : null}
   </Surface>);

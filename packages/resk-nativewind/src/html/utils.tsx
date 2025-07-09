@@ -92,6 +92,7 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
             }
         }
     }
+    delete (r as any).closeOnPress;
     return r;
 }
 

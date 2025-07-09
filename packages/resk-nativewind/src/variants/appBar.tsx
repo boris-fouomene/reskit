@@ -12,6 +12,7 @@ export const appBarVariant = tv({
         subtitle: "",
         action: "",
         actionMenuItem: "",
+        actions: "",
         icon: "",
         content: "",//the content of the appBarVariant
     },
@@ -41,6 +42,15 @@ export const appBarVariant = tv({
         ...VariantsOptionsFactory.createAllOpacity<IAppBarVariantSlot, "subtitle">((value, colorName) => {
             return { subtitle: value }
         }, "subtitle"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<IAppBarVariantSlot, "actions">((value, colorName) => {
+            return { actions: value }
+        }, "actions"),
+        ...VariantsOptionsFactory.createAllFlex<IAppBarVariantSlot, "actions">((value, colorName) => {
+            return { actions: value }
+        }, "actions"),
+        ...VariantsOptionsFactory.createAllGaps<IAppBarVariantSlot, "actions">((value) => {
+            return { actions: value }
+        }, "actions"),
         colorScheme: Object.fromEntries(typedEntries(VariantsColors.surface).map(([key, value]) => {
             return [key, {
                 base: value,
@@ -56,6 +66,7 @@ export const appBarVariant = tv({
         titleWeight: "medium",
         subtitleSize: "sm",
         subtitleOpacity: 80,
+        actionsGapX: 2,
     }
 });
 
@@ -69,4 +80,5 @@ type IAppBarVariantSlot = {
     icon?: string;
     actionMenuItem?: string;
     content?: string;
+    actions?: string;
 }

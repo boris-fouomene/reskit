@@ -9,8 +9,9 @@ import { renderActions } from "./utils";
 import { cn } from "@utils/cn";
 import { isValidElement, useMemo } from "react";
 import { ActivityIndicator } from "@components/ActivityIndicator";
+import { Div } from "@html/Div";
 
-export function AppBarClientActions<Context = unknown>({ context, menuAnchorClassName, menuAnchorIconProps, renderAction, renderExpandableAction, hydrationFallback, testID, actionClassName, actionMenuItemClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
+export function AppBarClientActions<Context = unknown>({ context, className, menuAnchorClassName, menuAnchorIconProps, renderAction, renderExpandableAction, hydrationFallback, testID, actionClassName, actionMenuItemClassName, actions: items, viewportWidth, maxVisibleActions, ...props }: IAppBarActionsProps<Context>) {
     const { window: { width: windowWidth }, isHydrated } = useDimensions();
     const mAction: number = typeof maxVisibleActions === "number" && maxVisibleActions ? Math.trunc(maxVisibleActions) : getAppBarMaxActions(windowWidth, viewportWidth);
     const { actions, menuItems } = useMemo(() => {
@@ -51,7 +52,7 @@ export function AppBarClientActions<Context = unknown>({ context, menuAnchorClas
         }
         return <ActivityIndicator size="small" className="flex-none" />;
     }
-    return <>
+    return <Div className={cn("appbar-actions", className, "flex flex-row items-center grow-0 justify-start")}>
         {actions}
         {menuItems.length ? <Menu
             preferedPositionAxis='vertical'
@@ -70,7 +71,7 @@ export function AppBarClientActions<Context = unknown>({ context, menuAnchorClas
             }}
             items={menuItems}
         /> : null}
-    </>;
+    </Div>;
 }
 
 const getAppBarMaxActions = (windowWidth: number, viewportWidth?: number): number => {

@@ -15,7 +15,7 @@ export class Nav {
     static renderItems({ items, renderItem, renderExpandableItem, ...rest }: INavItemsProps) {
         return renderNavItems({ ...rest, items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem });
     };
-    static Item<Context = unknown>({ className, ...props }: INavItemProps<Context>) {
+    static Item<Context = unknown>({ className, closeOnPress, ...props }: INavItemProps<Context>) {
         return <Button
             testID="nav-item"
             {...props}
@@ -34,7 +34,7 @@ export class Nav {
             {items}
         </Div>
     }
-    static ExpandableItem<Context = unknown>({ testID, as, dividerClassName, items, divider, expandableProps, children, ref, ...props }: INavItemProps<Context> & { as?: IReactComponent<INavItemProps<Context>> }) {
+    static ExpandableItem<Context = unknown>({ testID, closeOnPress, as, dividerClassName, items, divider, expandableProps, children, ref, ...props }: INavItemProps<Context> & { as?: IReactComponent<INavItemProps<Context>> }) {
         testID = defaultStr(testID, "resk-nav-expandable-item");
         expandableProps = Object.assign({}, expandableProps);
         return <Details
@@ -49,7 +49,7 @@ export class Nav {
         />
     }
 }
-function renderExpandableNavItem<Context = unknown>(props: INavItemProps<Context>, index: number) {
+function renderExpandableNavItem<Context = unknown>({ ...props }: INavItemProps<Context>, index: number) {
     return <Nav.ExpandableItem {...props} key={index} />;
 }
 function renderNavItem<Context = unknown>(props: INavItemProps<Context>, index: number) {

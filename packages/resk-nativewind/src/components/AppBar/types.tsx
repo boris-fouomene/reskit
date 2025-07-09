@@ -54,10 +54,19 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
      * The rest of the actions will be displayed in a menu.
     */
     maxVisibleActions?: number;
+    /**
+     * The class name to apply to the AppBar actions container.
+     */
+    actionsClassName?: IClassName;
 }
 
 export interface IAppBarActionsProps<Context = unknown> {
     testID?: string;
+
+    /**
+     * The class name to apply to the AppBar actions container.
+     */
+    className?: IClassName;
 
     /** The width of the viewport, used to calculate the maximum number of actions to display. */
     viewportWidth?: number;

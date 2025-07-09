@@ -10,7 +10,27 @@ export function DialogExample() {
         <HStack>
             <H2>Dialog examples</H2>
         </HStack>
-        <Dialog visible={visible} onRequestClose={() => setVisible(false)}>
+        <Dialog
+            visible={visible} onRequestClose={() => setVisible(false)}
+            actions={[
+                {
+                    label: "Close me",
+                    variant: { colorScheme: "primary" },
+                    closeOnPress: false,
+                    onPress: ((event) => {
+                        console.log(event, " is pressed")
+                    })
+                },
+                {
+                    label: "Close",
+                    icon: "close",
+                    variant: { colorScheme: "secondary" },
+                    onPress: ((event) => {
+                        setVisible(false)
+                    })
+                }
+            ]}
+        >
             <Div className="p-5">
                 <H2>Animated Visible example content</H2>
                 <Text>
@@ -23,6 +43,6 @@ export function DialogExample() {
                 <Button variant={{ colorScheme: "primary" }} onPress={() => setVisible(false)}>Close</Button>
             </Div>
         </Dialog>
-        <Button onPress={() => setVisible(true)}>Open Dialog 1</Button>
+        <Button variant={{ colorScheme: "info", rounded: "rounded", padding: "10px", alignSelf: "start", margin: 6 }} icon="lock" onPress={() => setVisible(true)}>Open Dialog 1</Button>
     </>
 }

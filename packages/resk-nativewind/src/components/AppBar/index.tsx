@@ -12,7 +12,7 @@ import { Div } from '@html/Div';
 import { Text } from '@html/Text';
 import { textVariant } from "@variants/text";
 import { AppBarActions } from './Actions';
-import { appBarVariant as appBarVariants } from "@variants/appBar";
+import { appBarVariant } from "@variants/appBar";
 
 
 function AppBar<Context = unknown>({
@@ -36,10 +36,11 @@ function AppBar<Context = unknown>({
   maxVisibleActions,
   context,
   variant,
+  actionsClassName,
   ...appBarProps
 }: IAppBarProps<Context>) {
   testID = defaultStr(testID, 'resk-appbar');
-  const appBarVariant = appBarVariants(variant);
+  const computedVariant = appBarVariant(variant);
   subtitle = subtitle === false ? null : subtitle;
   const backAction: ReactNode | false = typeof customBackAction == "function" ? customBackAction({
     ...context as any,
@@ -50,18 +51,18 @@ function AppBar<Context = unknown>({
     }
   }) : customBackAction;
   return (<Surface
-    className={cn(`appbar px-[7px] z-1 overflow-hidden flex flex-row items-center max-w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", appBarVariant.base(), className)}
+    className={cn(`appbar px-[7px] z-1 overflow-hidden flex flex-row items-center max-w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", computedVariant.base(), className)}
     {...appBarProps}
     testID={testID}
   >
     {(backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
-      <BackAction testID={`${testID}-back-action`} className={cn(appBarVariant.icon(), backActionClassName)} onPress={onBackActionPress} /> : null}
+      <BackAction testID={`${testID}-back-action`} className={cn(computedVariant.icon(), backActionClassName)} onPress={onBackActionPress} /> : null}
     {isValidElement(left) ? left as any : null}
-    <Div testID={`${testID}-content`} className={cn("px-[12px] flex-1 basis-0 min-w-0 native:flex-1", appBarVariant.content(), contentClassName)}>
+    <Div testID={`${testID}-content`} className={cn("px-[12px] flex-1 basis-0 min-w-0 native:flex-1", computedVariant.content(), contentClassName)}>
       <Text
         numberOfLines={1}
         testID={`${testID}-title`}
-        className={cn("resk-appbar-title", appBarVariant.title(), textVariant(titleVariant), titleClassName)}
+        className={cn("resk-appbar-title", computedVariant.title(), textVariant(titleVariant), titleClassName)}
       >
         {title}
       </Text>
@@ -69,7 +70,7 @@ function AppBar<Context = unknown>({
         <Text
           numberOfLines={1}
           testID={`${testID}-subtitle`}
-          className={cn("resk-appbar-subtitle", appBarVariant.subtitle(), textVariant(subtitleVariant), subtitleClassName)}
+          className={cn("resk-appbar-subtitle", computedVariant.subtitle(), textVariant(subtitleVariant), subtitleClassName)}
         >
           {subtitle}
         </Text>
@@ -80,10 +81,11 @@ function AppBar<Context = unknown>({
       context={{ ...Object.assign({}, context), appBarVariant: Object.assign({}, variant) }}
       {...actionsProps}
       actions={actions}
+      className={cn("resk-app-bar-actions", computedVariant.actions(), actionsProps?.className, actionsClassName)}
       maxVisibleActions={isNumber(maxVisibleActions) && maxVisibleActions > 0 ? maxVisibleActions : actionsProps?.maxVisibleActions}
-      actionClassName={cn(appBarVariant.action(), actionsProps?.actionClassName)}
-      actionMenuItemClassName={cn(appBarVariant.actionMenuItem(), actionsProps?.actionMenuItemClassName)}
-      menuAnchorClassName={cn(appBarVariant.icon(), actionsProps?.menuAnchorClassName)}
+      actionClassName={cn(computedVariant.action(), actionsProps?.actionClassName)}
+      actionMenuItemClassName={cn(computedVariant.actionMenuItem(), actionsProps?.actionMenuItemClassName)}
+      menuAnchorClassName={cn(computedVariant.icon(), actionsProps?.menuAnchorClassName)}
     />
     {isValidElement(right) ? right : null}
   </Surface>);

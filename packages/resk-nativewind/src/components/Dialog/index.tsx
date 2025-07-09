@@ -61,11 +61,12 @@ export function Dialog<Context = unknown>({
           return;
         }
         const cloned = Object.clone(act);
-        const { onPress } = cloned;
+        const { onPress, closeOnPress } = cloned;
         cloned.onPress = async (event: any, context) => {
           if (typeof onPress == "function" && await onPress(event, context) === false) {
             return;
           }
+          if (closeOnPress === false) return;
           handleRequestClose(event);
         }
         appBarActions.push(cloned);

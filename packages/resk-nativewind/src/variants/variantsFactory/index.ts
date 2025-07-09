@@ -318,11 +318,11 @@ export const VariantsOptionsFactory = {
   createBorderRightWidth: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses.borderRightWidth, ResultType>) {
     return VariantsOptionsFactory.create<typeof borderClasses.borderRightWidth, ResultType>(borderClasses.borderRightWidth, variantMutator);
   },
-  createBorderInlineWidth: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses.borderInlineWidth, ResultType>) {
-    return VariantsOptionsFactory.create<typeof borderClasses.borderInlineWidth, ResultType>(borderClasses.borderInlineWidth, variantMutator);
+  createBorderXWidth: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses.borderXWidth, ResultType>) {
+    return VariantsOptionsFactory.create<typeof borderClasses.borderXWidth, ResultType>(borderClasses.borderXWidth, variantMutator);
   },
-  createBorderBlockWidth: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses.borderBlockWidth, ResultType>) {
-    return VariantsOptionsFactory.create<typeof borderClasses.borderBlockWidth, ResultType>(borderClasses.borderBlockWidth, variantMutator);
+  createBorderYWidth: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof borderClasses.borderYWidth, ResultType>) {
+    return VariantsOptionsFactory.create<typeof borderClasses.borderYWidth, ResultType>(borderClasses.borderYWidth, variantMutator);
   },
   createBorderColor: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<typeof VariantsColors.borderColor, ResultType>) {
     return VariantsOptionsFactory.create<typeof VariantsColors.borderColor, ResultType>(VariantsColors.borderColor, variantMutator);

@@ -133,6 +133,9 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
             <ActivityIndicator size={90} variant={{ color: "warning" }} />
             <ActivityIndicator variant={{ color: "info" }} />
             <ActivityIndicator variant={{ color: "neutral" }} />
+            <ActivityIndicator
+              variant={{ size: 80, thickness: "20px" }}
+            />
           </HStack>
         </Surface>
       </Div>

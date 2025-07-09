@@ -396,7 +396,7 @@ export const VariantsOptionsFactory = {
   createAllShadowColors: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof allShadowColors)[keyof typeof allShadowColors], ResultType>, compositePrefix?: CompositePrefix) {
     return VariantsOptionsFactory.createComposite<typeof allShadowColors, ResultType, CompositePrefix>(allShadowColors, variantMutator, compositePrefix);
   },
-  createAll: function <ResultType = string, CompositePrefix extends string = any>(variantMutator?: IVariantFactoryMutator<(typeof allVariantsOptions)[keyof typeof allVariantsOptions], ResultType, keyof typeof allVariantsOptions>): IVariantFactoryAll<ResultType> {
+  createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allVariantsOptions)[keyof typeof allVariantsOptions], ResultType, keyof typeof allVariantsOptions>): IVariantFactoryAll<ResultType> {
     const result: IVariantFactoryAll<ResultType> = {} as any;
     Object.keys(allVariantsOptions).forEach((_compositeKey) => {
       const compositeKey = _compositeKey as keyof typeof allVariantsOptions;

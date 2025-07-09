@@ -50,35 +50,42 @@ export const alertVariant = tv({
     ) as Record<IVariantsColors.ColorName, IAlertSlot>,
     ...VariantsOptionsFactory.createTextVariants<IAlertSlot, "title">((value, colorName) => {
       return { title: value };
-    }),
+    }, "title"),
     ...VariantsOptionsFactory.createTextVariants<IAlertSlot, "message">((value, colorName) => {
       return { message: value };
-    }),
+    }, "message"),
     ...VariantsOptionsFactory.createIconVariants<IAlertSlot, "icon">((value, colorName) => {
       return { icon: value };
-    }),
+    }, "icon"),
     ...VariantsOptionsFactory.createIconVariants<IAlertSlot, "closeIcon">((value, colorName) => {
       return { closeIcon: value };
-    }),
+    }, "closeIcon"),
     ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "iconContainer">((value, colorName) => {
       return { iconContainer: value };
-    }),
+    }, "iconContainer"),
     ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "closeIconContainer">((value, colorName) => {
       return { closeIconContainer: value };
-    }),
+    }, "closeIconContainer"),
     ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "actionsContainer">((value, colorName) => {
       return { actionsContainer: value };
     }),
     ...VariantsOptionsFactory.createAllFlex<IAlertSlot, "actionsContainer">((value, colorName) => {
       return { actionsContainer: value };
-    }),
+    }, "actionsContainer"),
     ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "header">((value, colorName) => {
       return { header: value };
-    }),
+    }, "header"),
+    ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "message">((value, colorName) => {
+      return { message: value };
+    }, "message"),
+    ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "title">((value, colorName) => {
+      return { title: value };
+    }, "title"),
   },
   defaultVariants: {
     shadow: "lg",
     padding: 2,
+    messagePaddingX: 5,
     iconContainerMargin: "5px",
     closeIconContainerMargin: "5px",
     titleMarginLeft: "5px",

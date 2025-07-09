@@ -177,7 +177,7 @@ export const textInputVariant = tv({
     },
 });
 
-export type IVariantPropsTextInput = VariantProps<typeof textInputVariant>;
+export type ITextInputVariant = VariantProps<typeof textInputVariant>;
 
 type ITextInputSlots = {
     input?: string;

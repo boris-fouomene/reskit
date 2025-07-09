@@ -127,4 +127,4 @@ export const progressBarVariant = tv({
     }
 })
 
-export type IVariantPropsProgressBar = VariantProps<typeof progressBarVariant>;
+export type IProgressBarVariant = VariantProps<typeof progressBarVariant>;

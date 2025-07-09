@@ -33,4 +33,4 @@ export const dialogVariant = tv({
     defaultVariants: {}
 });
 
-export type IVariantPropsModal = VariantProps<typeof dialogVariant>;
+export type IDialogVariant = VariantProps<typeof dialogVariant>;

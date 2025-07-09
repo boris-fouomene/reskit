@@ -92,7 +92,7 @@ export const alertVariant = tv({
   },
 });
 
-export type IVariantPropsAlert = VariantProps<typeof alertVariant>;
+export type IAlertVariant = VariantProps<typeof alertVariant>;
 
 type IAlertSlot = {
   title?: string;

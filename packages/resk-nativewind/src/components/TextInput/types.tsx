@@ -4,7 +4,7 @@ import React, { ReactNode } from "react";
 import { IInputFormatterMask, IInputFormatterMaskOptions, IInputFormatterResult } from "@resk/core/inputFormatter";
 import { IFieldBase } from "@resk/core/types";
 import { ICountryCode } from "@resk/core/countries";
-import { IVariantPropsTextInput } from "@variants/textInput";
+import { ITextInputVariant } from "@variants/textInput";
 import { textInputVariant } from "@variants/textInput";
 import { IFontIconName } from "@components/Icon";
 import { IInputFormatterOptions } from "@resk/core/inputFormatter";
@@ -392,7 +392,7 @@ export interface ITextInputRenderOptions extends TextInputProps {
  * @property withKeyboardAvoidingView - If `true`, wraps the input in a KeyboardAvoidingView (mobile only).  
  *   @default false
  *
- * @property variant - {@link IVariantPropsTextInput} The visual variant of the input.
+ * @property variant - {@link ITextInputVariant} The visual variant of the input.
  * @property minHeight - Minimum height (for multiline).
  * @property maxHeight - Maximum height (for multiline).
  * @property ref - Ref to the underlying TextInput.
@@ -438,7 +438,7 @@ export interface ITextInputRenderOptions extends TextInputProps {
  * @see {@link IInputFormatterMask}
  * @see {@link InputFormatter}
  * @see {@link ICountryCode}
- * @see {@link IVariantPropsTextInput}
+ * @see {@link ITextInputVariant}
  * @see {@link InputFormatter.formatWithMask}
  * @see {@link ITextInputOnChangeOptions}
  * @see {@link IFieldBase}
@@ -675,7 +675,7 @@ export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInput
     /**
      * The variant of the text input
      */
-    variant?: IVariantPropsTextInput;
+    variant?: ITextInputVariant;
 
     /**
      * The minimum height of the text input in case of multiline.

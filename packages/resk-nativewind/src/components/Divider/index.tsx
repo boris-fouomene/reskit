@@ -1,7 +1,7 @@
 import { IHtmlDivProps } from "@html/types";
 import { Div } from "@html/Div";
 import { cn } from "@utils/cn";
-import { IVariantPropsDivider } from "@variants/divider";
+import { IDividerVariant } from "@variants/divider";
 import { dividerVariant } from "@variants/divider";
 /**
  * The `Divider` component renders a horizontal separation line on the page.
@@ -31,7 +31,7 @@ import { dividerVariant } from "@variants/divider";
  * The color of the `Divider` is determined by the baground color from the class name
  * in your application for the color to be applied.
  */
-export function Divider({ disabled, variant, className, ...rest }: IHtmlDivProps & { variant?: IVariantPropsDivider }) {
+export function Divider({ disabled, variant, className, ...rest }: IHtmlDivProps & { variant?: IDividerVariant }) {
   return (
     <Div
       testID="resk-divider"

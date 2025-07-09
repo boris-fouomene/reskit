@@ -31,4 +31,4 @@ export const buttonVariant = tv({
         activeOpacity: 80
     }
 });
-export type IVariantPropsButton = VariantProps<typeof buttonVariant>;
+export type IButtonVariant = VariantProps<typeof buttonVariant>;

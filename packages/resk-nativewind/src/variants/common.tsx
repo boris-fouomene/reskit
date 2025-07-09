@@ -19,4 +19,4 @@ export const commonVariant = tv({
 });
 
 
-export type IVariantPropsAll = VariantProps<typeof commonVariant>;
+export type ICommonVariant = VariantProps<typeof commonVariant>;

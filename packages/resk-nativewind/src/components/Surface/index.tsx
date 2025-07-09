@@ -2,7 +2,7 @@ import { Div, IHtmlDivProps } from "@html";
 import { isObj } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { surfaceVariant } from "@variants/index";
-import { IVariantPropsSurface } from "@variants/surface";
+import { ISurfaceVariant } from "@variants/surface";
 
 /**
  * A Div with a background color defined by the surface variants, suitable as a
@@ -22,5 +22,5 @@ export function Surface({ variant, className, ...props }: ISurfaceProps) {
 }
 
 export interface ISurfaceProps extends IHtmlDivProps {
-    variant?: IVariantPropsSurface;
+    variant?: ISurfaceVariant;
 }

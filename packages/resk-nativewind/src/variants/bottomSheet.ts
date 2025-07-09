@@ -42,4 +42,4 @@ export const bottomSheetVariant = tv({
   },
 });
 
-export type IVariantPropsBottomSheet = VariantProps<typeof bottomSheetVariant>;
+export type IBottomSheetVariant = VariantProps<typeof bottomSheetVariant>;

@@ -19,4 +19,4 @@ export const headingVariant = tv({
     defaultVariants: {},
 })
 
-export type IVariantPropsHeading = VariantProps<typeof headingVariant>;
+export type IHeadingVariant = VariantProps<typeof headingVariant>;

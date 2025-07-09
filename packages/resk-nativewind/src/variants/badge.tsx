@@ -31,4 +31,4 @@ export const badgeVariant = tv({
     }
 });
 
-export type IVariantPropsBadge = VariantProps<typeof badgeVariant>;
+export type IBadgeVariant = VariantProps<typeof badgeVariant>;

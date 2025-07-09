@@ -1,5 +1,5 @@
 "use client";
-import { bottomSheetVariant, IVariantPropsBottomSheet } from "@variants/bottomSheet";
+import { bottomSheetVariant, IBottomSheetVariant } from "@variants/bottomSheet";
 import { Modal } from "@components/Modal";
 import { defaultStr, isObj } from "@resk/core/utils";
 import { IClassName } from "@src/types";
@@ -34,7 +34,7 @@ export interface IBottomSheetProps<Context = unknown> extends IModalProps {
     /***
         The variant of the bottom sheet.
     */
-    variant?: IVariantPropsBottomSheet;
+    variant?: IBottomSheetVariant;
 
 
     /***

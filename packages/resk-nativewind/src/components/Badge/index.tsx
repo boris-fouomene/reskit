@@ -3,7 +3,7 @@ import { Text } from "@html/Text";
 import { cn } from "@utils/cn";
 import { badgeVariant } from "@variants/badge";
 import { IHtmlTextProps } from '@html/types';
-import { IVariantPropsBadge } from '@variants/badge';
+import { IBadgeVariant } from '@variants/badge';
 
 
 export interface IBadgeProps extends Omit<IHtmlTextProps, "variant"> {
@@ -15,7 +15,7 @@ export interface IBadgeProps extends Omit<IHtmlTextProps, "variant"> {
     /***
      * Badge variants
      */
-    variant?: IVariantPropsBadge;
+    variant?: IBadgeVariant;
 };
 
 /**

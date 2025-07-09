@@ -7,4 +7,4 @@ export const dividerVariant = tv({
         color: VariantsColors.background
     }
 });
-export type IVariantPropsDivider = VariantProps<typeof dividerVariant>;
+export type IDividerVariant = VariantProps<typeof dividerVariant>;

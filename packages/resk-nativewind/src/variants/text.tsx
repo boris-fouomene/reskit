@@ -33,4 +33,4 @@ export const textVariant = tv({
     ]
 });
 
-export type IVariantPropsText = VariantProps<typeof textVariant>
+export type ITextVariant = VariantProps<typeof textVariant>

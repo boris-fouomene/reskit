@@ -2,11 +2,11 @@
 import { IClassName, IReactNullableElement } from "../../types";
 import { ReactNode } from "react";
 import { View, ViewProps } from "react-native";
-import { IVariantPropsMenu } from "@variants/menu";
+import { IMenuVariant } from "@variants/menu";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
-import { IVariantPropsBottomSheet } from "@variants/bottomSheet";
+import { IBottomSheetVariant } from "@variants/bottomSheet";
 import { IPercentage } from "@resk/core/types";
-import { IVariantPropsText } from "@variants/text";
+import { ITextVariant } from "@variants/text";
 
 /**
  * Represents the possible positions where the menu can be displayed
@@ -407,7 +407,7 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     /**
      * The variant for the bottom sheet title
      */
-    bottomSheetTitleVariant?: IVariantPropsText;
+    bottomSheetTitleVariant?: ITextVariant;
 
     /***
      * The className to use for the bottom sheet title.
@@ -426,13 +426,13 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     /***
      * The variant to use for the menu.
      */
-    variant?: IVariantPropsMenu;
+    variant?: IMenuVariant;
 
     /***
         The variant to use for the bottom sheet.
         It will be used only if the menu is rendered as a bottom sheet.
     */
-    bottomSheetVariant?: IVariantPropsBottomSheet;
+    bottomSheetVariant?: IBottomSheetVariant;
 
     /***
      * Additional context options to pass to each item, enabling customization of the properties passed to item.

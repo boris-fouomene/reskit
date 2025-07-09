@@ -19,9 +19,9 @@ import { TextInput } from "@components/TextInput";
 import { Text } from "@html/Text";
 import { IFontIconName } from "@components/Icon";
 import { INavItemProps } from "@components/Nav";
-import { dropdownItemVariant, IVariantPropsDropdownItem } from "@variants/dropdownItem";
-import { IVariantPropsIcon } from "@variants/icon";
-import { IVariantPropsProgressBar } from "@variants/progressBar";
+import { dropdownItemVariant, IDropdownItemVariant } from "@variants/dropdownItem";
+import { IIconVariant } from "@variants/icon";
+import { IProgressBarVariant } from "@variants/progressBar";
 
 
 export class Dropdown<ItemType = any, ValueType = any> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
@@ -963,7 +963,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     /***
         The variants for the dropdown actions menu icon
     */
-    dropdownActionsMenuIconVariant?: IVariantPropsIcon;
+    dropdownActionsMenuIconVariant?: IIconVariant;
 
     /***
         The icon name for the dropdown actions menu icon
@@ -996,7 +996,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     /***
         The variants for the item
     */
-    itemVariant?: IVariantPropsDropdownItem;
+    itemVariant?: IDropdownItemVariant;
 
     /***
      * The class name for the item container, The Div that wrap each list item
@@ -1035,7 +1035,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     /**
      * The variants for the progress bar that is displayed when the dropdown is loading
      */
-    loadingProgressBarVariant?: IVariantPropsProgressBar;
+    loadingProgressBarVariant?: IProgressBarVariant;
 };
 
 /**

@@ -43,4 +43,4 @@ export const checkboxVariant = tv({
     }
 })
 
-export type IVariantPropsCheckbox = VariantProps<typeof checkboxVariant>;
+export type ICheckboxVariant = VariantProps<typeof checkboxVariant>;

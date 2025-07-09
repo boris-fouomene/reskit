@@ -2,7 +2,7 @@ import { Div } from "@html/Div";
 import { IHtmlDivProps } from "@html/types";
 import { defaultStr, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
-import { IVariantPropsProgressBar } from "@variants/progressBar";
+import { IProgressBarVariant } from "@variants/progressBar";
 import { progressBarVariant } from "@variants/progressBar";
 import { Text } from "@html/Text";
 import "./style";
@@ -124,10 +124,10 @@ export interface IProgressBarProps extends Omit<IHtmlDivProps, "children"> {
      * This prop allows you to customize the appearance of the progress bar based on the
      * variant you choose. It accepts a string value that corresponds to the variant name.
      * 
-     * @type {IVariantPropsProgressBar}
+     * @type {IProgressBarVariant}
      * @memberof IProgressBarProps
      */
-    variant?: IVariantPropsProgressBar;
+    variant?: IProgressBarVariant;
     /**
      * The current progress value.
      * 

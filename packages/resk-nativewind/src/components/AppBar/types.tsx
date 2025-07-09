@@ -2,9 +2,9 @@ import { JSX, ReactNode } from "react";
 import { IIconButtonProps } from "@components/Icon/types";
 import { INavItemProps, INavItemsProps } from "@components/Nav/types";
 import { IClassName } from "@src/types";
-import { IVariantPropsText } from "@variants/text";
+import { ITextVariant } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
-import { IVariantPropsAppBar } from "@variants/appBar";
+import { IAppBarVariant } from "@variants/appBar";
 
 
 export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "title" | "variant"> {
@@ -15,11 +15,11 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
 
     titleClassName?: IClassName;
     /** The variant to use for the title. */
-    titleVariant?: IVariantPropsText;
+    titleVariant?: ITextVariant;
     /** Additional properties for the subtitle label. */
     subtitleClassName?: IClassName;
     /** The variant to use for the subtitle. */
-    subtitleVariant?: IVariantPropsText;
+    subtitleVariant?: ITextVariant;
 
 
     /** Callback invoked when the back action button is pressed. */
@@ -48,7 +48,7 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
 
     context?: IAppBarActionsProps<Context>["context"];
 
-    variant?: IVariantPropsAppBar;
+    variant?: IAppBarVariant;
 }
 
 export interface IAppBarActionsProps<Context = unknown> {
@@ -129,7 +129,7 @@ export interface IAppBarActionsProps<Context = unknown> {
     menuAnchorIconProps?: IIconButtonProps;
 }
 export type IAppBarContext<Context = unknown> = Context & {
-    appBarVariant: IVariantPropsAppBar;
+    appBarVariant: IAppBarVariant;
 }
 
 /**

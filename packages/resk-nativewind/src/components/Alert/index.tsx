@@ -1,15 +1,15 @@
 import { ISurfaceProps, Surface } from "@components/Surface";
 import { isValidElement, ReactNode } from "react";
 import { Icon, IIconSource } from "@components/Icon";
-import { IVariantPropsIcon } from "@variants/icon";
+import { IIconVariant } from "@variants/icon";
 import { IClassName } from "@src/types";
 import { defaultStr, isNonNullString, isObj } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { Text } from "@html/Text";
 import { Div } from "@html/Div";
-import { textVariant, IVariantPropsText } from "@variants/text";
+import { textVariant, ITextVariant } from "@variants/text";
 import { iconVariant as iconVariants } from "@variants/icon";
-import { alertVariant, IVariantPropsAlert } from "@variants/alert";
+import { alertVariant, IAlertVariant } from "@variants/alert";
 import { IHtmlTextProps } from "@html/types";
 import { useAlert } from "./hook";
 import { CloseAlert } from "./Close";
@@ -19,7 +19,7 @@ import { IAlertHook } from "./types";
 export function Alert({ title, icon, closeIcon, actions, closeIconVariant, closeIconClassName, closeIconContainerClassName, iconClassName, messageProps, children, type, titleVariant, iconContainerClassName, iconVariant, variant, messageVariant, titleClassName, testID, message, messageClassName, headerClassName, className, ...rest }: IAlertProps) {
     const { isOpen, open, close, shouldRender, className: alertClassName } = useAlert();
     testID = defaultStr(testID, "resk-alert");
-    let iconByType: IIconSource | undefined = undefined, variantByType: IVariantPropsAlert | undefined = undefined;
+    let iconByType: IIconSource | undefined = undefined, variantByType: IAlertVariant | undefined = undefined;
     switch (String(type).toLowerCase()) {
         case "info":
             type = "info";
@@ -82,23 +82,23 @@ export function Alert({ title, icon, closeIcon, actions, closeIconVariant, close
 
 export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
     title?: ReactNode;
-    iconVariant?: IVariantPropsIcon;
-    titleVariant?: IVariantPropsIcon;
+    iconVariant?: IIconVariant;
+    titleVariant?: IIconVariant;
     titleClassName?: IClassName;
     headerClassName?: IClassName;
     message?: ReactNode;
     messageClassName?: IClassName;
-    messageVariant?: IVariantPropsText;
+    messageVariant?: ITextVariant;
     icon?: IIconSource;
     iconClassName?: IClassName;
     iconContainerClassName?: IClassName;
-    variant?: IVariantPropsAlert;
+    variant?: IAlertVariant;
     type?: "info" | "warning" | "error" | "success";
     messageProps?: Omit<IHtmlTextProps, "variant">;
     closeIcon?: IIconSource;
     closeIconClassName?: IClassName;
     closeIconContainerClassName?: IClassName;
-    closeIconVariant?: IVariantPropsIcon;
+    closeIconVariant?: IIconVariant;
     /**
      * Actions to display in the alert
      */

@@ -13,4 +13,4 @@ export const surfaceVariant = tv({
     }
 });
 
-export type IVariantPropsSurface = VariantProps<typeof surfaceVariant>;
+export type ISurfaceVariant = VariantProps<typeof surfaceVariant>;

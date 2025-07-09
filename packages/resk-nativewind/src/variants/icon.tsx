@@ -33,4 +33,4 @@ export const iconVariant = tv({
     ]
 });
 
-export type IVariantPropsIcon = VariantProps<typeof iconVariant>;
+export type IIconVariant = VariantProps<typeof iconVariant>;

@@ -72,4 +72,4 @@ type IDropdownIconSlots = {
   selectedLabel?: string;
   label?: string;
 };
-export type IVariantPropsDropdownItem = VariantProps<typeof dropdownItemVariant>;
+export type IDropdownItemVariant = VariantProps<typeof dropdownItemVariant>;

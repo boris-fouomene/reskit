@@ -1,7 +1,7 @@
 import { defaultStr } from "@resk/core";
 import { IHtmlTextProps, Text } from "@html";
 import { cn } from "@utils/cn";
-import { IVariantPropsText } from "@variants/text";
+import { ITextVariant } from "@variants/text";
 import { commonVariant, textVariant } from "@variants/index";
 
 
@@ -16,7 +16,7 @@ import { commonVariant, textVariant } from "@variants/index";
  * 
  * @returns A styled `Text` component displaying helper information or error messages.
  */
-export function HelperText({ visible = true, error, className, testID, ...rest }: IHelperTextProps & IVariantPropsText) {
+export function HelperText({ visible = true, error, className, testID, ...rest }: IHelperTextProps & ITextVariant) {
     testID = defaultStr(testID, "resk-helper-text");
     return <Text
         {...rest}

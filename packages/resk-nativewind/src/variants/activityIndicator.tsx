@@ -10,4 +10,4 @@ export const activityIndicatorVariant = tv({
     }
 });
 
-export type IVariantPropsActivityIndicator = VariantProps<typeof activityIndicatorVariant>;
+export type IActivityIndicatorVariant = VariantProps<typeof activityIndicatorVariant>;

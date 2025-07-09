@@ -71,4 +71,4 @@ export const menuVariant = tv({
     }
 });
 
-export type IVariantPropsMenu = VariantProps<typeof menuVariant>;
+export type IMenuVariant = VariantProps<typeof menuVariant>;

@@ -104,4 +104,4 @@ export const appBarVariant = tv({
     }
 });
 
-export type IVariantPropsAppBar = VariantProps<typeof appBarVariant>;
+export type IAppBarVariant = VariantProps<typeof appBarVariant>;

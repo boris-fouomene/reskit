@@ -99,4 +99,4 @@ export const iconButtonVariant = tv({
     }
 });
 
-export type IVariantPropsIconButton = VariantProps<typeof iconButtonVariant>;
+export type IIconVariantButton = VariantProps<typeof iconButtonVariant>;

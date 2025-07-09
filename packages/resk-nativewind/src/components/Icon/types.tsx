@@ -2,9 +2,9 @@ import { IClassName, INativewindBaseProps, ITextStyle, ITouchableProps } from ".
 import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
 import { JSX } from "react";
-import { IVariantPropsAll } from "@variants/common";
-import { IVariantPropsIconButton } from '@variants/iconButton';
-import { IVariantPropsIcon } from "@variants/icon";
+import { ICommonVariant } from "@variants/common";
+import { IIconVariantButton } from '@variants/iconButton';
+import { IIconVariant } from "@variants/icon";
 import { ITooltipBaseProps } from "@components/Tooltip/types";
 import { IFontIconNameRegistry } from "./font.types";
 
@@ -53,7 +53,7 @@ export type IFontIconName = keyof IFontIconNameRegistry;
 * <FontIcon fontIconName="home" size={30} /> // Renders the icon with a size of 30 pixels
     
 */
-export type IFontIconProps = Omit<IconProps, 'name' | 'size' | "ref" | "className"> & INativewindBaseProps & ITooltipBaseProps & IVariantPropsAll & {
+export type IFontIconProps = Omit<IconProps, 'name' | 'size' | "ref" | "className"> & INativewindBaseProps & ITooltipBaseProps & ICommonVariant & {
     /**
      * The style object for the icon.
      * 
@@ -105,7 +105,7 @@ export type IFontIconProps = Omit<IconProps, 'name' | 'size' | "ref" | "classNam
     /***
      * Variant for the icon
      */
-    variant?: IVariantPropsIcon;
+    variant?: IIconVariant;
 };
 
 /***
@@ -279,5 +279,5 @@ export interface IIconButtonProps extends Omit<IIconProps, "variant"> {
     isLoading?: boolean;
     containerClassName?: IClassName;
     containerSize?: number;
-    variant?: IVariantPropsIconButton;
+    variant?: IIconVariantButton;
 };

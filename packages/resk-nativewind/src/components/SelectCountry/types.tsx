@@ -1,7 +1,7 @@
 import { IDropdownProps } from "@components/Dropdown";
 import { ICountryFlagProps } from "@components/Icon/CountryFlag";
 import { ICountry, ICountryCode } from "@resk/core";
-import { IVariantPropsText } from "@variants/text";
+import { ITextVariant } from "@variants/text";
 import { TouchableOpacityProps } from 'react-native';
 
 /***

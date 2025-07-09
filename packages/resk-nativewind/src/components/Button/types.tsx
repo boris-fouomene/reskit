@@ -5,7 +5,7 @@ import { IAuthPerm } from "@resk/core/auth";
 import { IClassName } from "@src/types";
 import { JSX, ReactNode, Ref } from "react";
 import { IDict, IResourceName } from '@resk/core/types';
-import { buttonVariant, IVariantPropsButton } from "@variants/button";
+import { buttonVariant, IButtonVariant } from "@variants/button";
 
 
 export type IButtonBaseContext<Context = unknown> = Context & {
@@ -130,7 +130,7 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
     /***
      * The variant of the button
      */
-    variant?: IVariantPropsButton;
+    variant?: IButtonVariant;
 
     /***
      * The content of the ripple effect

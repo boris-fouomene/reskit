@@ -1,6 +1,6 @@
 import { INativewindBaseProps } from "@src/types";
-import { IVariantPropsHeading } from "@variants/heading";
-import { IVariantPropsText } from "@variants/text";
+import { IHeadingVariant } from "@variants/heading";
+import { ITextVariant } from "@variants/text";
 import { JSX, Ref } from "react";
 import { ImageProps, ImageStyle, PressableProps, TextProps, TextStyle, ViewProps, ViewStyle } from "react-native";
 
@@ -54,7 +54,7 @@ export interface IHtmlTextProps extends Omit<IHtmlDivProps, "style" | "onPress" 
     maxFontSizeMultiplier?: TextProps["maxFontSizeMultiplier"];
     /**@platform native */
     testID?: TextProps["testID"];
-    variant?: IVariantPropsText;
+    variant?: ITextVariant;
 }
 /**
  * Converts React Native accessibility props to corresponding DOM accessibility props.
@@ -129,7 +129,7 @@ export interface IHtmlAprops extends Omit<IHtmlTextProps, "asHtmlTag"> {
 }
 
 export interface IHtmlHeadingProps extends Omit<IHtmlTextProps, "asHtmlTag" | "variant"> {
-    variant?: IVariantPropsHeading;
+    variant?: IHeadingVariant;
 }
 
 

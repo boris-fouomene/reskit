@@ -8,7 +8,7 @@ import { IDialogVariant } from "@variants/dialog";
 
 
 export interface IDialogProps<Context = unknown> extends IModalProps {
-  actions?: IAppBarActionProps<IDialogContext<Context>>[];
+  actions?: IDialogActionProps<Context>[];
   titleProps?: IDialogTitleProps;
   title?: ReactNode;
   titleClassName?: IClassName;
@@ -66,6 +66,36 @@ export interface IDialogProps<Context = unknown> extends IModalProps {
   variant?: IDialogVariant;
 }
 
+export interface IDialogActionProps<Context = unknown> extends IAppBarActionProps<IDialogContext<Context>> {
+  /**
+    * Whether the action should be visible when the dialog is in full screen mode.
+    * 
+    * When set to `false`, the action will be hidden when the dialog is displayed
+    * in full screen mode. This is useful for actions that are not relevant or
+    * take up unnecessary space in full screen layouts.
+    * 
+    * @example
+    * ```tsx
+    * // Action only visible in windowed mode
+    * {
+    *   label: "Minimize",
+    *   onPress: handleMinimize,
+    *   showInFullScreen: false
+    * }
+    * 
+    * // Action visible in both modes (default)
+    * {
+    *   label: "Save",
+    *   onPress: handleSave,
+    *   showInFullScreen: true // or omit (default)
+    * }
+    * ```
+    * 
+    * @defaultValue true
+    * @since 1.0.0
+    */
+  showInFullScreen?: boolean;
+};
 
 export type IDialogContext<Context = unknown> = Context & {
   dialog: { close: (event: any) => void, isFullScreen?: boolean, windowWidth: number, windowHeight: number, isTablet: boolean, isDesktop: boolean, isMobile: boolean }

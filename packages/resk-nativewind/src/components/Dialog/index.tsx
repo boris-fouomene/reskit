@@ -58,11 +58,12 @@ export function Dialog<Context = unknown>({
     const appBarActions: IAppBarActionProps<IDialogContext<Context>>[] = [];
     if (Array.isArray(actions) && actions.length) {
       actions.map((act) => {
-        if (!act || !isObj(act)) {
+        if (!act || !isObj(act) || isFullScreen && act.showInFullScreen === false) {
           return;
         }
         const cloned = Object.clone(act);
-        const { onPress, closeOnPress } = cloned;
+        const { onPress, showInFullScreen, closeOnPress } = cloned;
+        delete cloned.showInFullScreen;
         cloned.onPress = async (event: any, context) => {
           if (typeof onPress == "function" && await onPress(event, context) === false) {
             return;

@@ -15,7 +15,12 @@ import { IClassName } from "@src/types";
 import { IDialogVariant } from "@variants/dialog";
 
 
-export function Dialog<Context = unknown, IsControlled extends boolean = false>({
+export function Dialog<Context = unknown>(props: IDialogControllableProps<Context, false>) {
+  return <DialogControllable<Context, false>{...props} />
+}
+
+
+function DialogControllable<Context = unknown, IsControlled extends boolean = false>({
   appBarProps,
   context: customContext,
   actions,
@@ -40,7 +45,7 @@ export function Dialog<Context = unknown, IsControlled extends boolean = false>(
   dialogControlledContext,
   ref,
   ...props
-}: IDialogProps<Context, IsControlled>) {
+}: IDialogControllableProps<Context, IsControlled>) {
   testID = defaultStr(testID, "resk-dialog");
   const { isTablet, isDesktop, isMobile, isMobileOrTablet } = useDimensions(useDimensionsOptions);
   const isFullScreen = useMemo(() => {
@@ -135,8 +140,7 @@ export function Dialog<Context = unknown, IsControlled extends boolean = false>(
   );
 }
 
-
-class DialogControlled<Context = unknown> extends Component<IDialogControlledProps<Context>, IDialogControlledState<Context>> {
+export class DialogControlled<Context = unknown> extends Component<IDialogControlledProps<Context>, IDialogControlledState<Context>> {
   constructor(props: IDialogControlledProps<Context>) {
     super(props);
     this.state = {
@@ -208,7 +212,7 @@ class DialogControlled<Context = unknown> extends Component<IDialogControlledPro
   }
   render() {
     const { onRequestClose, ...props } = this.getOptions();
-    return <Dialog<Context, true>
+    return <DialogControllable<Context, true>
       {...props}
       testID={this.getTestID()}
       dialogControlledContext={this}
@@ -223,18 +227,16 @@ class DialogControlled<Context = unknown> extends Component<IDialogControlledPro
 
 
 
-class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled, {}) { }
+export class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled, {}) { }
 
 
 
-Dialog.Controlled = DialogControlled;
 Dialog.Provider = DialogProvider;
+Dialog.Controlled = DialogControlled;
 
 
-type IDialogControlledCallback<Context = unknown> = (dialog: DialogControlled<Context>) => void;
 
-
-export interface IDialogProps<Context = unknown, IsControlled extends boolean = false> extends Omit<IModalProps, "ref"> {
+export interface IDialogControllableProps<Context = unknown, IsControlled extends boolean = false> extends Omit<IModalProps, "ref"> {
   actions?: IDialogActionProps<Context, IsControlled>[];
   title?: ReactNode;
   titleClassName?: IClassName;
@@ -372,7 +374,7 @@ export type IDialogContext<Context = unknown, IsControlled extends boolean = fal
 
 
 
-export interface IDialogControlledProps<Context = unknown> extends Omit<IDialogProps<Context, true>, "visible" | 'dialogControlledContext'> {
+export interface IDialogControlledProps<Context = unknown> extends Omit<IDialogControllableProps<Context, true>, "visible" | 'dialogControlledContext'> {
 
 }
 
@@ -391,3 +393,8 @@ export interface IDialogControlledState<Context = unknown> {
    */
   controlledProps: Omit<IDialogControlledProps<Context>, "ref">;
 }
+
+
+type IDialogControlledCallback<Context = unknown> = (dialog: DialogControlled<Context>) => void;
+
+

@@ -1,7 +1,7 @@
 "use client";
 
-import { Button, HStack, Dialog } from "@resk/nativewind";
-import { Div, H2, Text } from "@resk/nativewind/html";
+import { Button, HStack, Dialog, Alert } from "@resk/nativewind";
+import { B, Div, H2, Text } from "@resk/nativewind/html";
 import { useState } from "react";
 
 
@@ -61,5 +61,24 @@ export function DialogExample() {
         })}>
             open Dialog Provider
         </Button>
+        <Button className="m-5" onPress={(e) => {
+            Dialog.Alert.open({
+                title: "Close an example",
+                message: "Are you sure you want to delete this item?",
+                onCancel: () => {
+                    console.log("Cancel button pressed");
+                }
+            })
+        }}>Simple Alert</Button>
+
+        <Button className="m-5" onPress={(e) => {
+            Dialog.Alert.open({
+                title: "Close an example",
+                message: "Are you sure you want to delete this item?",
+                onCancel: () => {
+                    console.log("Cancel button pressed");
+                }
+            })
+        }}>Simple Alert</Button>
     </>
 }

@@ -14,6 +14,7 @@ import { IUseDimensionsOptons } from "@utils/dimensions";
 import { IClassName } from "@src/types";
 import { IDialogVariant } from "@variants/dialog";
 import i18n from "@resk/core/i18n";
+import { ITextVariant, textVariant } from "@variants/text";
 
 
 export function Dialog<Context = unknown>(props: IDialogProps<Context>) {
@@ -228,14 +229,14 @@ class DialogControlled<Context = unknown> extends Component<IDialogControlledPro
 
 
 
-class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled, { dismissible: false }) { }
+class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled) { }
 
 
 class DialogAlert extends createProvider<IDialogControlledProps, DialogControlled>(DialogControlled, { dismissible: false, fullScreen: false }) {
-  static open<Context = unknown>(props: IDialogControlledProps<Context> & { message?: ReactNode, onOk?: IDialogControlledActionProps<Context>["onPress"], okButton?: false | IDialogControlledActionProps<Context>, cancelButtonBefore?: boolean, cancelButton?: false | IDialogActionProps<Context, true>, onCancel?: IDialogControlledActionProps<Context>["onPress"] }, innerProviderRef?: Ref<DialogControlled<Context>>, callback?: IDialogControlledCallback<Context>) {
+  static open<Context = unknown>(props: IDialogControlledProps<Context> & { message?: ReactNode, onOk?: IDialogControlledActionProps<Context>["onPress"], okButton?: false | IDialogControlledActionProps<Context>, cancelButtonBefore?: boolean, cancelButton?: false | IDialogActionProps<Context, true>, onCancel?: IDialogControlledActionProps<Context>["onPress"], messageVariant?: ITextVariant; messageClassName?: IClassName; }, innerProviderRef?: Ref<DialogControlled<Context>>, callback?: IDialogControlledCallback<Context>) {
     const instance = DialogAlert.getProviderInstance(innerProviderRef as any);
     if (!instance || typeof instance?.open !== "function") return;
-    const { okButton: oButton, message, cancelButton: cButton, onOk, onCancel, cancelButtonBefore, children, ...rest } = Object.assign({}, props);
+    const { okButton: oButton, messageClassName, messageVariant, message, cancelButton: cButton, onOk, onCancel, cancelButtonBefore, children, ...rest } = Object.assign({}, props);
     const okButton = oButton === false ? undefined : Object.assign({}, oButton);
     if (okButton) {
       const { onPress: onOkPress } = okButton;
@@ -257,12 +258,13 @@ class DialogAlert extends createProvider<IDialogControlledProps, DialogControlle
       if (typeof cancelButton.onPress !== "function" && typeof onCancel === "function") {
         cancelButton.onPress = onCancel;
       }
+      cancelButton.showInFullScreen = typeof cancelButton.showInFullScreen === "boolean" ? cancelButton.showInFullScreen : false;
       cancelButton.variant = { colorScheme: "error", padding: 2, ...cancelButton.variant }
     }
     const actions: IDialogControlledActionProps<Context>[] = Array.isArray(props?.actions) && props.actions.length ? props?.actions : [cancelButtonBefore ? cancelButton : okButton, cancelButtonBefore ? okButton : cancelButton] as any;
     return (instance as DialogControlled<Context>).open({
       ...rest,
-      children: <Text testID="resk-dialog-alert-label" children={message} />,
+      children: <Text testID="resk-dialog-alert-label" className={cn("resk-dialog-alert-message", textVariant(messageVariant), messageClassName)} children={message} />,
       actions,
     }, callback);
   };

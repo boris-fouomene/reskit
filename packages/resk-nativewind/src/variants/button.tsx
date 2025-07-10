@@ -19,6 +19,21 @@ export const buttonVariant = tv({
                 base: value,
             }
         }),
+        activityIndicatorColor: VariantsOptionsFactory.create<typeof VariantsColors.activityIndicator, { activityIndicator: string }>(VariantsColors.activityIndicator, (value, colorName) => {
+            return {
+                activityIndicator: value,
+            }
+        }),
+        ...VariantsOptionsFactory.createIconVariants<{ icon: string }, "icon">((value) => {
+            return {
+                icon: value,
+            }
+        }, "icon"),
+        ...VariantsOptionsFactory.createTextVariants<{ label: string }, "label">((value) => {
+            return {
+                label: value,
+            }
+        }, "label"),
         colorScheme: VariantsColors.button,
         outline: VariantsColors.buttonOutline,
         hoverColor: VariantsOptionsFactory.createHoverBackgroundColor<{ base: string }>((value, variantName) => {

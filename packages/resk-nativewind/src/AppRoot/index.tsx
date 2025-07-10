@@ -4,7 +4,8 @@ import { GlobalStyles } from "./GlobalStyles";
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
 import { PortalProvider } from "@components/Portal";
-import { DialogProvider } from "@components/Dialog";
+import { Providers } from "./Providers";
+
 /**
  * Props for the AppRoot component.
  * 
@@ -158,7 +159,7 @@ export function AppRoot({ children, className }: IAppRootProps) {
         >
             <PortalProvider>
                 {children}
-                <DialogProvider />
+                <Providers />
             </PortalProvider>
         </Div>
     </>;

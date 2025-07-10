@@ -13,6 +13,7 @@ import { IModalProps } from "@components/Modal/types";
 import { IUseDimensionsOptons } from "@utils/dimensions";
 import { IClassName } from "@src/types";
 import { IDialogVariant } from "@variants/dialog";
+import i18n from "@resk/core/i18n";
 
 
 export function Dialog<Context = unknown>(props: IDialogProps<Context>) {
@@ -140,7 +141,7 @@ function DialogControllable<Context = unknown, IsControlled extends boolean = fa
   );
 }
 
-export class DialogControlled<Context = unknown> extends Component<IDialogControlledProps<Context>, IDialogControlledState<Context>> {
+class DialogControlled<Context = unknown> extends Component<IDialogControlledProps<Context>, IDialogControlledState<Context>> {
   constructor(props: IDialogControlledProps<Context>) {
     super(props);
     this.state = {
@@ -227,12 +228,49 @@ export class DialogControlled<Context = unknown> extends Component<IDialogContro
 
 
 
-export class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled, {}) { }
+class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled, { dismissible: false }) { }
 
+
+class DialogAlert extends createProvider<IDialogControlledProps, DialogControlled>(DialogControlled, { dismissible: false, fullScreen: false }) {
+  static open<Context = unknown>(props: IDialogControlledProps<Context> & { message?: ReactNode, onOk?: IDialogControlledActionProps<Context>["onPress"], okButton?: false | IDialogControlledActionProps<Context>, cancelButtonBefore?: boolean, cancelButton?: false | IDialogActionProps<Context, true>, onCancel?: IDialogControlledActionProps<Context>["onPress"] }, innerProviderRef?: Ref<DialogControlled<Context>>, callback?: IDialogControlledCallback<Context>) {
+    const instance = DialogAlert.getProviderInstance(innerProviderRef as any);
+    if (!instance || typeof instance?.open !== "function") return;
+    const { okButton: oButton, message, cancelButton: cButton, onOk, onCancel, cancelButtonBefore, children, ...rest } = Object.assign({}, props);
+    const okButton = oButton === false ? undefined : Object.assign({}, oButton);
+    if (okButton) {
+      const { onPress: onOkPress } = okButton;
+      okButton.onPress = async (event, context) => {
+        try {
+          const r = typeof onOkPress == "function" ? await onOkPress(event, context) : typeof onOk == "function" ? await onOk(event, context) : undefined;
+          if (r !== false) {
+            instance.close();
+          }
+          return r;
+        } catch (e) { }
+      }
+      okButton.label = isValidElement(okButton.label, true) ? okButton.label : i18n.t("components.dialog.alertOkButton");
+      okButton.variant = { colorScheme: "primary", padding: 2, ...okButton.variant }
+    }
+    const cancelButton = cButton === false ? undefined : Object.assign({}, cButton);
+    if (cancelButton) {
+      cancelButton.label = isValidElement(cancelButton.label, true) ? cancelButton.label : i18n.t("components.dialog.alertCancelButton");
+      if (typeof cancelButton.onPress !== "function" && typeof onCancel === "function") {
+        cancelButton.onPress = onCancel;
+      }
+      cancelButton.variant = { colorScheme: "error", padding: 2, ...cancelButton.variant }
+    }
+    const actions: IDialogControlledActionProps<Context>[] = Array.isArray(props?.actions) && props.actions.length ? props?.actions : [cancelButtonBefore ? cancelButton : okButton, cancelButtonBefore ? okButton : cancelButton] as any;
+    return (instance as DialogControlled<Context>).open({
+      ...rest,
+      children: <Text testID="resk-dialog-alert-label" children={message} />,
+      actions,
+    }, callback);
+  };
+}
 
 Dialog.Provider = DialogProvider;
 Dialog.Controlled = DialogControlled;
-
+Dialog.Alert = DialogAlert;
 
 type IDialogControlledCallback<Context = unknown> = (dialog: DialogControlled<Context>) => void;
 
@@ -375,8 +413,7 @@ export type IDialogContext<Context = unknown, IsControlled extends boolean = fal
 };
 
 
-
-
+export interface IDialogControlledActionProps<Context = unknown> extends IDialogActionProps<Context, true> { }
 
 export interface IDialogControlledProps<Context = unknown> extends Omit<IDialogControllableProps<Context, true>, "visible" | 'dialogControlledContext'> {
 

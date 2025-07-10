@@ -4,6 +4,7 @@ import { Button, HStack, Dialog } from "@resk/nativewind";
 import { Div, H2, Text } from "@resk/nativewind/html";
 import { useState } from "react";
 
+
 export function DialogExample() {
     const [visible, setVisible] = useState(false);
     return <>
@@ -47,5 +48,18 @@ export function DialogExample() {
             </Div>
         </Dialog>
         <Button variant={{ colorScheme: "info", rounded: "rounded", padding: "10px", alignSelf: "start", margin: 6 }} icon="lock" onPress={() => setVisible(true)}>Open Dialog 1</Button>
+        <Button variant={{ colorScheme: "secondary" }} onPress={((e) => {
+            Dialog.Provider.open({
+                title: "DialogProvider",
+                children: <Text>DialogProvider</Text>,
+                actions: [{
+                    label: "Close", onPress: (event, { dialog }) => {
+                        console.log("want to close dialog heein");
+                    }
+                }]
+            })
+        })}>
+            open Dialog Provider
+        </Button>
     </>
 }

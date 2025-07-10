@@ -1,5 +1,5 @@
 "use client";
-import { isObj } from "@resk/core";
+import { extendObj, isObj } from "@resk/core";
 import { ComponentClass, ReactElement, Ref, RefObject, useEffect, useRef } from "react";
 
 /**
@@ -34,7 +34,7 @@ function useCreateProviderRef<T>(cb?: (context: RefObject<T>) => RefObject<T>) {
  * @template ComponentInstance - The instance type of the wrapped component.
  * @template ProviderOpenProps - The type of the props passed to the open method of the provider.
  * @param Component - The React component class to be wrapped as a provider.
- * @param defaultRenderProps - Optional default props to be passed to the component.
+ * @param overrideProps - Optional props used to override the default props of the component.
  * @param openProviderOptionMutator - Optional function to mutate the open options before passing them to the provider.
  * 
  * @returns A new provider class that extends the original component.
@@ -46,7 +46,7 @@ function useCreateProviderRef<T>(cb?: (context: RefObject<T>) => RefObject<T>) {
  * <MyProvider someProp={value} />
  * MyProvider.getProviderInstance(myRef)?.someMethod();
  */
-export function createProvider<ComponentProps = unknown, ComponentInstance = unknown, ProviderOpenProps = ComponentProps>(Component: ComponentClass<ComponentProps>, defaultRenderProps?: ComponentProps, openProviderOptionMutator?: (options: ProviderOpenProps) => ProviderOpenProps) {
+export function createProvider<ComponentProps = unknown, ComponentInstance = unknown, ProviderOpenProps = ComponentProps>(Component: ComponentClass<ComponentProps>, overrideProps?: ComponentProps, openProviderOptionMutator?: (options: ProviderOpenProps) => ProviderOpenProps) {
     return class ProviderClass extends Component {
         static _innerClassProviderRef?: RefObject<ComponentInstance>;
 
@@ -68,8 +68,12 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
          * });
          */
         static open(options: ProviderOpenProps, innerProviderRef?: any, callback?: Function) {
-            const instance = this.getProviderInstance(innerProviderRef);
+            const instance = ProviderClass.getProviderInstance(innerProviderRef);
             if (!instance || typeof (instance as any)?.open !== "function") return;
+            if (isObj(overrideProps)) {
+                options = isObj(options) ? options : {} as ProviderOpenProps;
+                extendObj(options, overrideProps);
+            }
             if (typeof openProviderOptionMutator === "function") {
                 options = openProviderOptionMutator((isObj(options) ? options : {}) as ProviderOpenProps);
             }
@@ -93,7 +97,7 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
          * });
          */
         static close(callback?: Function, innerProviderRef?: any) {
-            const instance = this.getProviderInstance(innerProviderRef);
+            const instance = ProviderClass.getProviderInstance(innerProviderRef);
             if (!instance || typeof (instance as any)?.close !== "function") return;
             return (instance as any).close(callback);
         }
@@ -102,12 +106,12 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
         static Component({ ref, ...props }: Omit<ComponentProps, "ref"> & { ref?: Ref<ComponentInstance> }): ReactElement {
             const hasRef = !!ref;
             const innerRef = useCreateProviderRef<ComponentInstance>((ref) => {
-                if (!hasRef || !this._innerClassProviderRef) {
-                    this._innerClassProviderRef = ref;
+                if (!hasRef || !ProviderClass._innerClassProviderRef) {
+                    ProviderClass._innerClassProviderRef = ref;
                 }
                 return ref;
             });
-            return <Component {...defaultRenderProps as any} {...props} ref={(ref || innerRef) as any} />;
+            return <Component {...props} {...overrideProps as any} ref={(ref || innerRef) as any} />;
         };
 
         /**
@@ -132,8 +136,8 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
                     return (innerProviderRef as RefObject<ComponentInstance>).current as ComponentInstance;
                 }
             } catch (e) { }
-            if (this._innerClassProviderRef && this._innerClassProviderRef?.current instanceof Component) {
-                return this._innerClassProviderRef.current as ComponentInstance;
+            if (ProviderClass._innerClassProviderRef && ProviderClass._innerClassProviderRef?.current instanceof Component) {
+                return ProviderClass._innerClassProviderRef.current as ComponentInstance;
             }
             return null;
         }

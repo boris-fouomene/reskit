@@ -15,8 +15,8 @@ import { IClassName } from "@src/types";
 import { IDialogVariant } from "@variants/dialog";
 
 
-export function Dialog<Context = unknown>(props: IDialogControllableProps<Context, false>) {
-  return <DialogControllable<Context, false>{...props} />
+export function Dialog<Context = unknown>(props: IDialogProps<Context>) {
+  return <DialogControllable<Context, false>  {...props} dialogControlledContext={undefined} />
 }
 
 

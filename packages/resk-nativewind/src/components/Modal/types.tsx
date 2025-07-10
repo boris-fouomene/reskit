@@ -10,4 +10,10 @@ export interface IModalProps extends Omit<ModalProps, "onShow" | "onRequestClose
      * The class name of the backdrop
      */
     backdropClassName?: IClassName;
+
+    /**
+     * Whether the modal can be dismissed by the user.
+     * @default : true
+     */
+    dismissible?: boolean;
 }

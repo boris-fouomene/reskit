@@ -82,9 +82,9 @@ export const dialogVariant = tv({
         withBackdrop: true,
         background: "surface",
         shadow: "lg",
-        modalTitleMarginY: "10px",
-        modalTitleWeight: "bold"
-
+        modalTitleWeight: "bold",
+        modalTitleSize: "lg",
+        modalTitleMargin: 4,
     }
 });
 

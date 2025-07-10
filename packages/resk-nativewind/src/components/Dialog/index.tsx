@@ -47,7 +47,6 @@ export function Dialog<Context = unknown>({
   }, [fullScreen, isMobile, isTablet]);
   const computedVariant = dialogVariant({ ...variant, fullScreen: isFullScreen });
   const handleRequestClose = useCallback((event: any) => {
-    console.log("handleRequestClose", onRequestClose);
     if (typeof onRequestClose == "function") {
       return onRequestClose(event);
     }
@@ -80,6 +79,7 @@ export function Dialog<Context = unknown>({
       appBar: <AppBar<IDialogContext<Context>>
         maxVisibleActions={isFullScreen ? undefined : 2}
         backAction={!isFullScreen ? false : undefined}
+        onBackActionPress={handleRequestClose}
         {...appBarProps}
         actionsProps={{ ...appBarProps?.actionsProps, actionClassName: cn("resk-dialog-actions", computedVariant.action(), appBarProps?.actionsProps?.actionClassName) }}
         context={context}

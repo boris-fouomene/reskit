@@ -37,7 +37,7 @@ export function Menu<Context = unknown>({
     minWidth,
     preferedPositionAxis,
     style,
-    dismissable,
+    dismissible,
     onRequestClose,
     renderAsBottomSheetInFullScreen,
     bottomSheetTitle,
@@ -225,7 +225,7 @@ export function Menu<Context = unknown>({
                 testID={testID + "-anchor-container"}
                 ref={anchorRef}
                 className={cn(classes.cursorPointed, commonVariant({ disabled }), computedVariant.anchorContainer(), anchorContainerClassName, "relative menu-anchor-container")}
-                onAccessibilityEscape={dismissable !== false ? () => {
+                onAccessibilityEscape={dismissible !== false ? () => {
                     close();
                 } : undefined}
                 onLayout={(event) => {
@@ -237,7 +237,7 @@ export function Menu<Context = unknown>({
             </AnchorComponent>
         </MenuContext.Provider>
         {<Modal
-            onRequestClose={dismissable !== false ? () => close() : undefined}
+            onRequestClose={dismissible !== false ? () => close() : undefined}
             animationType={renderedAsBottomSheet ? "slide" : "fade"} visible={isVisible}
             testID={testID + "-menu-modal"}
             backdropClassName={cn("menu-backdrop", renderedAsBottomSheet ? computedBottomSheetVariant.modalBackdrop() : computedVariant.modalBackdrop())}
@@ -259,7 +259,7 @@ export function Menu<Context = unknown>({
                         onMenuLayout(event);
                     }}
                 >
-                    {dismissable !== false ? <Backdrop testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
+                    {dismissible !== false ? <Backdrop testID={testID + "-menu-backdrop"} className={cn("resk-menu-backdrop")}
                         onPress={() => close()}
                     /> : null}
                     <Div style={maxHeightStyle} testID={testID + "-menu-content-container"} className={cn("max-h-full flex flex-col", renderedAsBottomSheet ? computedBottomSheetVariant.content() : computedVariant.contentContainer(), contentContainerClassName)}>

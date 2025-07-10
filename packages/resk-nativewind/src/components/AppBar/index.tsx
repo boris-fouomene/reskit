@@ -51,7 +51,7 @@ function AppBar<Context = unknown>({
     }
   }) : customBackAction;
   return (<Surface
-    className={cn(`appbar px-[7px] z-1 overflow-hidden flex flex-row items-center max-w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", computedVariant.base(), className)}
+    className={cn(`appbar px-[7px] z-1 overflow-hidden flex flex-row items-center max-w-full w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", computedVariant.base(), className)}
     {...appBarProps}
     testID={testID}
   >

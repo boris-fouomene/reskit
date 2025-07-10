@@ -12,6 +12,8 @@ export function DialogExample() {
         </HStack>
         <Dialog
             visible={visible} onRequestClose={() => setVisible(false)}
+            title={"A dialog example"}
+            fullScreen
             actions={[
                 {
                     label: "Close me",

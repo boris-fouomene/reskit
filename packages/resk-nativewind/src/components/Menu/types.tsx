@@ -364,9 +364,9 @@ export interface IMenuProps<Context = unknown> extends Omit<ViewProps, "children
     scrollViewContentContainerClassName?: IClassName;
 
     /***
-     * Whether the menu should be dismissable
+     * Whether the menu should be dismissible
      */
-    dismissable?: boolean;
+    dismissible?: boolean;
 
     /***
         The callback function that is called when the menu is dismissed.

@@ -15,16 +15,18 @@ import { Backdrop } from "@components/Backdrop";
 
 
 const hiddenStyle = "resk-modal-hidden opacity-0 invisible";
-export function Modal({ animationType = "fade", backdropClassName, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): JSX.Element | null {
+export function Modal({ animationType = "fade", dismissible, backdropClassName, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): JSX.Element | null {
     const [isRendering, setIsRendering] = useState(false);
     const wasVisible = useRef(false);
     const wasRendering = useRef(false);
     const generatedId = useId();
+    const dismissibleRef = useRef(dismissible !== false);
     const modalId = defaultStr(id, generatedId);
     useAccessibilityEscape(`#${modalId}`, function () {
         if (typeof onAccessibilityEscape === "function") {
             onAccessibilityEscape();
         }
+        if (!dismissibleRef.current) return;
         if (typeof onRequestClose == "function") {
             onRequestClose(undefined as any);
         }
@@ -99,7 +101,7 @@ export function Modal({ animationType = "fade", backdropClassName, onAccessibili
         <Backdrop
             testID={testID + "-modal-backdrop"}
             className={cn("resk-modal-backdrop", !visible && "pointer-events-none", backdropClassName)}
-            onPress={onRequestClose}
+            onPress={dismissibleRef.current ? onRequestClose : undefined}
         />
         {children}
     </Div>, document.querySelector("#reskit-app-root") || document.body);

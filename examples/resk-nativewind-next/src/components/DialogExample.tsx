@@ -27,6 +27,7 @@ export function DialogExample() {
                     label: "Close",
                     icon: "close",
                     variant: { colorScheme: "secondary" },
+                    showInFullScreen: false,
                     onPress: (() => {
                         setVisible(false)
                     })

@@ -14,7 +14,7 @@ export const alertVariant = tv({
     iconContainer: "",
     closeIcon: "",
     closeIconContainer: "",
-    actionsContainer: "",
+    actions: "items-center",
     action: "",
   },
   variants: {
@@ -23,6 +23,22 @@ export const alertVariant = tv({
         base: value,
       };
     }),
+    centered: {
+      true: {
+        base: "justify-center items-center text-center",
+        header: "",
+        title: "text-center",
+        message: "text-center",
+        actions: "justify-center"
+      },
+      false: {
+        base: "justify-start items-start text-start",
+        header: "flex flex-row justify-between items-center",
+        title: "text-start",
+        message: "text-start",
+        actions: "justify-start"
+      }
+    },
     colorScheme: VariantsOptionsFactory.createBackgroundColor((bgColor, colorName) => {
       const textColor = VariantsColors.textForeground[`${colorName}-foreground`],
         iconColor = VariantsColors.iconForeground[`${colorName}-foreground`];
@@ -66,12 +82,9 @@ export const alertVariant = tv({
     ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "closeIconContainer">((value, colorName) => {
       return { closeIconContainer: value };
     }, "closeIconContainer"),
-    ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "actionsContainer">((value, colorName) => {
-      return { actionsContainer: value };
-    }),
-    ...VariantsOptionsFactory.createAllFlex<IAlertSlot, "actionsContainer">((value, colorName) => {
-      return { actionsContainer: value };
-    }, "actionsContainer"),
+    ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "actions">((value, colorName) => {
+      return { actions: value };
+    }, "actions"),
     ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "header">((value, colorName) => {
       return { header: value };
     }, "header"),
@@ -81,12 +94,27 @@ export const alertVariant = tv({
     ...VariantsOptionsFactory.createAllPadding2Margin<IAlertSlot, "title">((value, colorName) => {
       return { title: value };
     }, "title"),
+    ...VariantsOptionsFactory.createAllFlex<IAlertSlot, "actions">((value, colorName) => {
+      return { actions: value };
+    }, "actions"),
+    ...VariantsOptionsFactory.createAllGaps<IAlertSlot, "actions">((value, colorName) => {
+      return { actions: value };
+    }, "actions"),
     ...VariantsOptionsFactory.createAllRounded<IAlertSlot, "iconContainer">((value, colorName) => {
       return { iconContainer: value };
     }, "iconContainer"),
     ...VariantsOptionsFactory.createAllRounded<IAlertSlot, "closeIconContainer">((value, colorName) => {
       return { closeIconContainer: value };
     }, "closeIconContainer"),
+    ...VariantsOptionsFactory.createAllFlex<IAlertSlot, "header">((value, colorName) => {
+      return { header: value };
+    }, "header"),
+    ...VariantsOptionsFactory.createAllOpacity<IAlertSlot, "message">((value, colorName) => {
+      return { message: value };
+    }, "message"),
+    ...VariantsOptionsFactory.createAllOpacity<IAlertSlot, "title">((value, colorName) => {
+      return { title: value };
+    }, "title"),
     iconContainerBackground: VariantsOptionsFactory.createBackgroundColor((value, colorName) => {
       return { iconContainer: value };
     }),
@@ -97,19 +125,19 @@ export const alertVariant = tv({
   defaultVariants: {
     shadow: "lg",
     padding: 2,
-    messagePaddingX: 5,
-    iconContainerMargin: "5px",
-    closeIconContainerMargin: "5px",
-    titleMarginLeft: "5px",
     iconSize: "25px",
     closeIconSize: "25px",
+    iconContainerMarginX: 2,
+    closeIconContainerMarginX: 2,
     titleSize: "lg",
     titleWeight: "bold",
-    messageSize: "base",
-    messageWeight: "normal",
-    messageOpacity: 90,
+    messageSize: "sm",
+    messageWeight: "thin",
+    actionsGap: 2,
+    actionsPaddingX: 2,
   },
 });
+
 
 export type IAlertVariant = VariantProps<typeof alertVariant>;
 
@@ -122,6 +150,6 @@ type IAlertSlot = {
   iconContainer?: string;
   closeIcon?: string;
   closeIconContainer?: string;
-  actionsContainer?: string;
+  actions?: string;
   action?: string;
 };

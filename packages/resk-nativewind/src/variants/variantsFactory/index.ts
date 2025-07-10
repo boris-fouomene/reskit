@@ -18,6 +18,8 @@ import { outlineClasses } from "./outline";
 import { gapClasses } from "./gap";
 import { flexClasses } from "./flex";
 import { iconVariants, textVariants } from "./text2icons";
+import { positionClasses } from "./position";
+import { create } from "domain";
 
 const allShadowColors = {
   shadowColor: VariantsColors.shadow,
@@ -55,82 +57,13 @@ const allVariantsOptions = {
   ...scalesClasses,
   ...borderClasses,
   ...padding2marginClasses,
+  ...positionClasses,
 } as const;
 
-/**
- * A utility factory for generating and transforming variant objects in a type-safe manner.
- *
- * `VariantsOptionsFactory` provides generic methods to create, mutate, and compose variant mappings,
- * such as style or class variants for design systems (e.g., Tailwind or NativeWind).
- * It supports custom mutator functions for flexible value transformation, and includes
- * specialized helpers for common variant categories (text sizes, icon sizes, rounded, etc.).
- *
- * @remarks
- * - All methods are generic and support custom input and output types.
- * - The `create` method is the core utility, accepting any object and an optional mutator.
- * - Useful for generating design system variants, utility classes, or mapping values in a consistent way.
- *
- * @typeParam InputType - The type of the input object for variant creation.
- * @typeParam ResultType - The type of the result values after applying the mutator (defaults to `string`).
- *
- * @example
- * ```typescript
- * // Basic usage with default mutator (identity)
- * const variants = VariantsOptionsFactory.create({ primary: "bg-blue-500", secondary: "bg-gray-500" });
- * // Result: { primary: "bg-blue-500", secondary: "bg-gray-500" }
- *
- * // Using a custom mutator to append a prefix
- * const computed = VariantsOptionsFactory.create(
- *   { small: "p-2", large: "p-6" },
- *   (value, key) => `tw-${value}`
- * );
- * // Result: { small: "tw-p-2", large: "tw-p-6" }
- * ```
- */
+
 export const VariantsOptionsFactory = {
   allVariantsOptions,
-  /**
-   * Creates a new variants object by applying a mutator function to each value in the input object.
-   *
-   * This utility is useful for generating style or class variants in a type-safe way, such as for Tailwind or NativeWind.
-   * You can provide a custom mutator function to transform each variant value, or omit it to return the original values.
-   *
-   * @typeParam InputType - The type of the input object, where each key is a variant name and each value is the variant value.
-   * @typeParam ResultType - The type of the result values after applying the mutator (defaults to `string`).
-   *
-   * @param input - The input object containing variant definitions.
-   * @param variantMutator - Optional. A function that receives each value and its key, and returns a transformed value.
-   *                         If not provided, the identity function is used (returns the value as-is).
-   *
-   * @returns A new object with the same keys as `input`, where each value is the result of the `variantMutator`.
-   *
-   * @example
-   * ```typescript
-   * // Basic usage with default mutator (identity)
-   * const variants = VariantsOptionsFactory.create({ primary: "bg-blue-500", secondary: "bg-gray-500" });
-   * // Result: { primary: "bg-blue-500", secondary: "bg-gray-500" }
-   *
-   * // Using a custom mutator to append a prefix
-   * const computed = VariantsOptionsFactory.create(
-   *   { small: "p-2", large: "p-6" },
-   *   (value, key) => `tw-${value}`
-   * );
-   * // Result: { small: "tw-p-2", large: "tw-p-6" }
-   *
-   * // Using with a type-safe input and custom result type
-   * const input = { rounded: "rounded-full", square: "rounded-none" } as const;
-   * const result = VariantsOptionsFactory.create<typeof input, number>(
-   *   input,
-   *   (value, key) => value.length
-   * );
-   * // Result: { rounded: 12, square: 12 }
-   * ```
-   *
-   * @remarks
-   * - This function is generic and works with any object shape.
-   * - The mutator function receives both the value and the key for maximum flexibility.
-   * - Useful for generating design system variants, utility classes, or mapping values.
-   */
+
   create: function <InputType extends Record<IVariantKey, any>, ResultType = string, VariantGroupName = unknown>(input: InputType, variantMutator?: IVariantFactoryMutator<InputType, ResultType, VariantGroupName>, compositeKey?: VariantGroupName) {
     variantMutator = typeof variantMutator == "function" ? variantMutator : (value) => value as ResultType;
     return Object.fromEntries(
@@ -358,43 +291,47 @@ export const VariantsOptionsFactory = {
     return VariantsOptionsFactory.create<typeof outlineClasses.outlineWidth, ResultType>(outlineClasses.outlineWidth, variantMutator);
   },
 
-  createComposite: function <T extends Record<string, Record<IVariantKey, IClassName>>, ResultType = string, CompositePrefix extends string = "">(composite: T, variantMutator?: IVariantFactoryMutator<T[keyof T], ResultType, keyof T>, compositePrefix?: CompositePrefix): IVariantCompositeResult<T, CompositePrefix> {
+  createComposite: function <T extends Record<string, Record<IVariantKey, IClassName>>, ResultType = string, CompositePrefix extends string = "">(composite: T, variantMutator?: IVariantFactoryMutator<T[keyof T], ResultType, keyof T>, ...args: IConditionalCompositePrefix<CompositePrefix>): IVariantCompositeResult<T, CompositePrefix> {
     const r = {} as any;
+    const compositePrefix = args[0];
     typedEntries(composite).forEach(([key, value]) => {
       r[isNonNullString(compositePrefix) ? `${compositePrefix}${String(key).upperFirst()}` : key] = VariantsOptionsFactory.create<T[keyof T], ResultType, keyof T>(value, variantMutator, key);
     });
     return r;
   },
-  createAllRounded: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof roundedClasses)[keyof typeof roundedClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof roundedClasses, ResultType, CompositePrefix>(roundedClasses, variantMutator, compositePrefix);
+  createAllRounded: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof roundedClasses)[keyof typeof roundedClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof roundedClasses, ResultType, CompositePrefix>(roundedClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createAllPaddings: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof paddingClasses, ResultType, CompositePrefix>(paddingClasses, variantMutator, compositePrefix);
+  createAllPosition: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof positionClasses)[keyof typeof positionClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof positionClasses, ResultType, CompositePrefix>(positionClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createAllGaps: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof gapClasses)[keyof typeof gapClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof gapClasses, ResultType, CompositePrefix>(gapClasses, variantMutator, compositePrefix);
+  createAllPaddings: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof paddingClasses)[keyof typeof paddingClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof paddingClasses, ResultType, CompositePrefix>(paddingClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createAllFlex: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof flexClasses)[keyof typeof flexClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof flexClasses, ResultType, CompositePrefix>(flexClasses, variantMutator, compositePrefix);
+  createAllGaps: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof gapClasses)[keyof typeof gapClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof gapClasses, ResultType, CompositePrefix>(gapClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createAllScales: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof scalesClasses, ResultType, CompositePrefix>(scalesClasses, variantMutator, compositePrefix);
+  createAllFlex: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof flexClasses)[keyof typeof flexClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof flexClasses, ResultType, CompositePrefix>(flexClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createAllMargins: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof marginClasses)[keyof typeof marginClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof marginClasses, ResultType, CompositePrefix>(marginClasses, variantMutator, compositePrefix);
+  createAllScales: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof scalesClasses)[keyof typeof scalesClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof scalesClasses, ResultType, CompositePrefix>(scalesClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createAllWidth2Height: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof width2heightClasses)[keyof typeof width2heightClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof width2heightClasses, ResultType, CompositePrefix>(width2heightClasses, variantMutator, compositePrefix);
+  createAllMargins: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof marginClasses)[keyof typeof marginClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof marginClasses, ResultType, CompositePrefix>(marginClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createAllPadding2Margin: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof padding2marginClasses, ResultType, CompositePrefix>(padding2marginClasses, variantMutator, compositePrefix);
+  createAllWidth2Height: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof width2heightClasses)[keyof typeof width2heightClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof width2heightClasses, ResultType, CompositePrefix>(width2heightClasses, variantMutator, args[0] as CompositePrefix);
+  },
+  createAllPadding2Margin: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof padding2marginClasses)[keyof typeof padding2marginClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof padding2marginClasses, ResultType, CompositePrefix>(padding2marginClasses, variantMutator, args[0] as CompositePrefix);
   },
 
-  createAllShadow: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof shadowClasses)[keyof typeof shadowClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof shadowClasses, ResultType, CompositePrefix>(shadowClasses, variantMutator, compositePrefix);
+  createAllShadow: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof shadowClasses)[keyof typeof shadowClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof shadowClasses, ResultType, CompositePrefix>(shadowClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createAllShadowColors: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof allShadowColors)[keyof typeof allShadowColors], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof allShadowColors, ResultType, CompositePrefix>(allShadowColors, variantMutator, compositePrefix);
+  createAllShadowColors: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof allShadowColors)[keyof typeof allShadowColors], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof allShadowColors, ResultType, CompositePrefix>(allShadowColors, variantMutator, args[0] as CompositePrefix);
   },
   createAll: function <ResultType = string>(variantMutator?: IVariantFactoryMutator<(typeof allVariantsOptions)[keyof typeof allVariantsOptions], ResultType, keyof typeof allVariantsOptions>): IVariantFactoryAll<ResultType> {
     const result: IVariantFactoryAll<ResultType> = {} as any;
@@ -405,25 +342,25 @@ export const VariantsOptionsFactory = {
     return result;
   },
 
-  createAllOpacity: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof opacityClasses)[keyof typeof opacityClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof opacityClasses, ResultType, CompositePrefix>(opacityClasses, variantMutator, compositePrefix);
+  createAllOpacity: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof opacityClasses)[keyof typeof opacityClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof opacityClasses, ResultType, CompositePrefix>(opacityClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createAllOutline: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof outlineClasses)[keyof typeof outlineClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof outlineClasses, ResultType, CompositePrefix>(outlineClasses, variantMutator, compositePrefix);
-  },
-
-  createAllBorders: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof borderClasses)[keyof typeof borderClasses], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof borderClasses, ResultType, CompositePrefix>(borderClasses, variantMutator, compositePrefix);
+  createAllOutline: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof outlineClasses)[keyof typeof outlineClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof outlineClasses, ResultType, CompositePrefix>(outlineClasses, variantMutator, args[0] as CompositePrefix);
   },
 
-  createAllTransitions: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof transitions)[keyof typeof transitions], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof transitions, ResultType, CompositePrefix>(transitions, variantMutator, compositePrefix);
+  createAllBorders: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof borderClasses)[keyof typeof borderClasses], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof borderClasses, ResultType, CompositePrefix>(borderClasses, variantMutator, args[0] as CompositePrefix);
   },
-  createTextVariants: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof textVariants)[keyof typeof textVariants], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof textVariants, ResultType, CompositePrefix>(textVariants, variantMutator, compositePrefix);
+
+  createAllTransitions: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof transitions)[keyof typeof transitions], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof transitions, ResultType, CompositePrefix>(transitions, variantMutator, args[0] as CompositePrefix);
   },
-  createIconVariants: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof iconVariants)[keyof typeof iconVariants], ResultType>, compositePrefix?: CompositePrefix) {
-    return VariantsOptionsFactory.createComposite<typeof iconVariants, ResultType, CompositePrefix>(iconVariants, variantMutator, compositePrefix);
+  createTextVariants: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof textVariants)[keyof typeof textVariants], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof textVariants, ResultType, CompositePrefix>(textVariants, variantMutator, args[0] as CompositePrefix);
+  },
+  createIconVariants: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof iconVariants)[keyof typeof iconVariants], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof iconVariants, ResultType, CompositePrefix>(iconVariants, variantMutator, args[0] as CompositePrefix);
   },
 };
 
@@ -443,3 +380,48 @@ export type IVariantCompositeResult<T extends Record<string, Record<IVariantKey,
 type IPrefixKeys<T extends Record<string, any>, P extends string> = {
   [K in keyof T as `${P}${IUcFirst<K & string>}`]: T[K];
 };
+
+
+/**
+ * Conditional parameter type that makes a parameter required when a generic extends a non-empty string.
+ * 
+ * @typeParam T - The generic parameter to check
+ * @typeParam ParamType - The type of the parameter when required
+ * 
+ * @example
+ * ```typescript
+ * function myFunction<T extends string = "">(
+ *   required: string,
+ *   ...args: IConditionalParameter<T, T>
+ * ) {
+ *   const optional = args[0];
+ * }
+ * 
+ * // Usage:
+ * myFunction("test"); // OK - T defaults to "", parameter is optional
+ * myFunction<"">("test"); // OK - T is "", parameter is optional
+ * myFunction<"prefix">("test", "prefix"); // OK - T is "prefix", parameter is required
+ * myFunction<"prefix">("test"); // Error - missing required parameter
+ * ```
+ */
+type IConditionalParameter<T extends string, ParamType = T> = T extends ""
+  ? [] | [param?: ParamType]
+  : [param: ParamType];
+
+/**
+ * Conditional parameter type specifically for composite prefix.
+ * 
+ * @typeParam CompositePrefix - The prefix string type
+ * 
+ * @example
+ * ```typescript
+ * function createComposite<CompositePrefix extends string = "">(
+ *   data: any,
+ *   mutator?: Function,
+ *   ...args: IConditionalCompositePrefix<CompositePrefix>
+ * ) {
+ *   const compositePrefix = args[0];
+ * }
+ * ```
+ */
+type IConditionalCompositePrefix<CompositePrefix extends string> = IConditionalParameter<CompositePrefix, CompositePrefix>;

@@ -115,7 +115,7 @@ export function Dialog<Context = unknown>({
 
         <Div
           testID={testID + "-dialog-content"}
-          className={cn("resk-dialog-content", computedVariant.content(), isFullScreen && computedVariant.contentFullScreen(), contentClassName)}
+          className={cn("resk-dialog-content", computedVariant.content(), isFullScreen && computedVariant.fullScreenContent(), contentClassName)}
         >
           {fullScreen ? appBar : titleContent}
           <Wrapper {...wrapperProps}>

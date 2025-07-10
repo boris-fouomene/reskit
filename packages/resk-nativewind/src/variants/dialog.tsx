@@ -19,7 +19,7 @@ export const dialogVariant = tv({
         content: "flex flex-col max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
         contentContainer: cn(fullScreen, "absolute left-0 top-0 right-0 bottom-0 items-center justify-center"),
         contentContainerFullScreen: "items-start justify-start-start",
-        contentFullScreen: fullScreen,
+        fullScreenContent: fullScreen,
         modalTitle: "",
     },
     variants: {
@@ -31,7 +31,7 @@ export const dialogVariant = tv({
         background: VariantsOptionsFactory.createBackgroundColor((value, variantName) => {
             return {
                 content: value,
-                contentFullScreen: value,
+                fullScreenContent: value,
             }
         }),
         ...VariantsOptionsFactory.createTextVariants<IDialogVariantSlot, "title">((value, colorName) => {
@@ -53,7 +53,7 @@ export const dialogVariant = tv({
             return { subtitle: value }
         }, "subtitle"),
         ...VariantsOptionsFactory.createAllPadding2Margin<IDialogVariantSlot, "fullScreen">((value, colorName) => {
-            return { contentFullScreen: value }
+            return { fullScreenContent: value }
         }, "fullScreen"),
         ...VariantsOptionsFactory.createTextVariants<IDialogVariantSlot, "modalTitle">((value, colorName) => {
             return { modalTitle: value }
@@ -101,7 +101,7 @@ type IDialogVariantSlot = {
     appBar?: string,
     scrollView?: string,
     scrollViewContentContainer?: string,
-    contentFullScreen?: string,
+    fullScreenContent?: string,
     contentcontainerFullScreen?: string;
     contentContainer?: string,
     modalTitle?: string;

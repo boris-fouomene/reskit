@@ -230,13 +230,17 @@ export class DialogControlled<Context = unknown> extends Component<IDialogContro
 export class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled, {}) { }
 
 
-
 Dialog.Provider = DialogProvider;
 Dialog.Controlled = DialogControlled;
 
 
+type IDialogControlledCallback<Context = unknown> = (dialog: DialogControlled<Context>) => void;
 
-export interface IDialogControllableProps<Context = unknown, IsControlled extends boolean = false> extends Omit<IModalProps, "ref"> {
+
+export interface IDialogProps<Context = unknown> extends Omit<IDialogControllableProps<Context, false>, "dialogControlledContext"> { }
+
+
+interface IDialogControllableProps<Context = unknown, IsControlled extends boolean = false> extends Omit<IModalProps, "ref"> {
   actions?: IDialogActionProps<Context, IsControlled>[];
   title?: ReactNode;
   titleClassName?: IClassName;
@@ -378,7 +382,6 @@ export interface IDialogControlledProps<Context = unknown> extends Omit<IDialogC
 
 }
 
-
 export interface IDialogControlledOptions<Context = unknown> extends Omit<IDialogControlledProps<Context>, "ref"> { }
 
 
@@ -393,8 +396,3 @@ export interface IDialogControlledState<Context = unknown> {
    */
   controlledProps: Omit<IDialogControlledProps<Context>, "ref">;
 }
-
-
-type IDialogControlledCallback<Context = unknown> = (dialog: DialogControlled<Context>) => void;
-
-

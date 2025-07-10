@@ -6,22 +6,10 @@ import { Tooltip } from "@components/Tooltip";
 import { Text } from "@html/Text";
 import { cn } from "@utils/cn";
 import { pickTouchableProps } from "@utils/touchHandler";
-import { cssInterop } from "nativewind";
 
 export { useToggleable };
 export * from "./types";
 
-
-
-const SwitchInterop = cssInterop(RNSwitch, {
-    thumbColorClassName: {
-        target: false,
-        nativeStyleToProp: {
-            color: "thumbColor",
-            backgroundColor: "thumbColor",
-        }
-    },
-});
 
 /**
  * A customizable Switch component that supports tooltip, labels, and toggle functionality.
@@ -114,7 +102,7 @@ export function Switch({ testID, ...props }: ISwitchProps) {
         className={cn(containerClassName)}
     >
         {isLabelOnLeftSide ? labelContent : null}
-        <SwitchInterop
+        <RNSwitch
             {...nonTouchableProps}
             className={cn(className)}
             value={checked}

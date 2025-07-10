@@ -85,6 +85,7 @@ export class VariantsColorsFactory {
   public static buildColors<TailwindClassPrefix extends string = any, ClassNameBuilderResult = IClassName>(tailwindClassPrefix: TailwindClassPrefix, withImportantAttribute?: boolean, colorClassNameBuilder?: IVariantsColors.ClassNameBuilder<TailwindClassPrefix, ClassNameBuilderResult>, isForeground: boolean = false): Record<IVariantsColors.ColorName, ClassNameBuilderResult> {
     const r = Object.create({}) as Record<IVariantsColors.ColorName, ClassNameBuilderResult>;
     const importantPrefix = withImportantAttribute ? "!" : "";
+    tailwindClassPrefix = defaultStr(tailwindClassPrefix) as any;
     const colorBuilder: IVariantsColors.ClassNameBuilder<TailwindClassPrefix> = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightComputedColor, darkComputedColor }) => `${lightComputedColor} ${darkComputedColor}` as any;
     Object.entries(VariantsColorsFactory.colors).map(([color, value]) => {
       const { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground, ...rest } = Object.assign({}, value);
@@ -103,6 +104,7 @@ export class VariantsColorsFactory {
         lightForeground,
         lightComputedForeground: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`,
         darkComputedForeground: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`,
+        colorName: color as any,
       });
     });
     return r;
@@ -201,7 +203,7 @@ export class VariantsColorsFactory {
    * @param withImportantAttribute - If `true`, prepends `!` to each class name to mark it as important.
    * @param colorClassNameBuilder - (Optional) A custom builder function to generate the class name(s) for each color variant.
    *   If not provided, the default builder returns a string combining the light and dark class names.
-   * 
+   *
    * @returns A record mapping each registered color name to the generated border class name or object, as defined by the builder.
    *
    * @example
@@ -384,7 +386,7 @@ export namespace IVariantsColors {
    *
    * @see {@link IVariantColor}
    */
-  export interface Color extends IVariantColor { }
+  export interface Color extends IVariantColor {}
 
   /**
    * Options for building Tailwind CSS class names for color variants.
@@ -431,6 +433,11 @@ export namespace IVariantsColors {
      * Whether the class name that is being generated is a foreground class name or not
      */
     isForeground: boolean;
+
+    /**
+     * The color name of the current color variant.
+     */
+    colorName: IVariantsColors.ColorName;
   }
   /**
    * Function type for building a class name string or object from color options.

@@ -96,6 +96,7 @@ class VariantsColorsFactory {
     static buildColors(tailwindClassPrefix, withImportantAttribute, colorClassNameBuilder, isForeground = false) {
         const r = Object.create({});
         const importantPrefix = withImportantAttribute ? "!" : "";
+        tailwindClassPrefix = defaultStr(tailwindClassPrefix);
         const colorBuilder = typeof colorClassNameBuilder == "function" ? colorClassNameBuilder : ({ lightComputedColor, darkComputedColor }) => `${lightComputedColor} ${darkComputedColor}`;
         Object.entries(VariantsColorsFactory.colors).map(([color, value]) => {
             const _a = Object.assign({}, value), { lightColor: light, lightForeground: _lightForeground, darkColor: dark, darkForeground: _darkForeground } = _a, rest = __rest(_a, ["lightColor", "lightForeground", "darkColor", "darkForeground"]);
@@ -105,7 +106,7 @@ class VariantsColorsFactory {
             const darkForeground = defaultStr(isForeground ? dark : _darkForeground);
             r[color] = colorBuilder(Object.assign(Object.assign({}, rest), { isForeground: !!isForeground, lightColor,
                 darkColor, lightComputedColor: `${importantPrefix}${tailwindClassPrefix}-${lightColor}`, darkComputedColor: `dark:${importantPrefix}${tailwindClassPrefix}-${darkColor}`, darkForeground,
-                lightForeground, lightComputedForeground: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkComputedForeground: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}` }));
+                lightForeground, lightComputedForeground: `${importantPrefix}${tailwindClassPrefix}-${lightForeground}`, darkComputedForeground: `dark:${importantPrefix}${tailwindClassPrefix}-${darkForeground}`, colorName: color }));
         });
         return r;
     }

@@ -97,18 +97,9 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
             if (!instance || typeof (instance as any)?.close !== "function") return;
             return (instance as any).close(callback);
         }
-        /**
-         * A forward ref component that allows access to the provider's instance.
-         * 
-         * @param props - The props passed to the wrapped component.
-         * @param ref - A ref that can be used to access the component instance.
-         * 
-         * @returns A React element with the passed props and ref.
-         * 
-         * @example
-         * <this.Provider ref={myRef} someProp={value} />
-         */
-        static Provider(props?: ComponentProps, ref?: Ref<ComponentInstance>): ReactElement {
+
+
+        static Component({ ref, ...props }: Omit<ComponentProps, "ref"> & { ref?: Ref<ComponentInstance> }): ReactElement {
             const hasRef = !!ref;
             const innerRef = useCreateProviderRef<ComponentInstance>((ref) => {
                 if (!hasRef || !this._innerClassProviderRef) {

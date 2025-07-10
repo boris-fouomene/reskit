@@ -167,8 +167,8 @@ class DialogControlled<Context = unknown> extends Component<IDialogControlledPro
       callback(this);
     }
   }
-  toggle(options?: IDialogControlledOptions<Context>, callback?: IDialogControlledCallback<Context>) {
-    const newState: IDialogControlledState<Context> = { visible: !this.state.visible } as any;
+  openOrClose(visible: boolean, options?: IDialogControlledOptions<Context>, callback?: IDialogControlledCallback<Context>) {
+    const newState: IDialogControlledState<Context> = { visible } as any;
     if (options && isObj(options)) {
       newState.controlledProps = options;
     }
@@ -177,12 +177,14 @@ class DialogControlled<Context = unknown> extends Component<IDialogControlledPro
     });
     return this;
   }
-
+  toggle(options?: IDialogControlledOptions<Context>, callback?: IDialogControlledCallback<Context>) {
+    return this.openOrClose(!this.state.visible, options, callback);
+  }
   open(options?: IDialogControlledOptions<Context>, callback?: IDialogControlledCallback<Context>) {
-    return this.toggle(options, callback);
+    return this.openOrClose(true, options, callback);
   }
   close(callback?: IDialogControlledCallback<Context>) {
-    return this.toggle(undefined, callback);
+    return this.openOrClose(false, undefined, callback);
   }
   /**
    * Checks if the dialog is currently open.
@@ -239,18 +241,9 @@ class DialogAlert extends createProvider<IDialogControlledProps, DialogControlle
     const { okButton: oButton, messageClassName, messageVariant, message, cancelButton: cButton, onOk, onCancel, cancelButtonBefore, children, ...rest } = Object.assign({}, props);
     const okButton = oButton === false ? undefined : Object.assign({}, oButton);
     if (okButton) {
-      const { onPress: onOkPress } = okButton;
-      okButton.onPress = async (event, context) => {
-        try {
-          const r = typeof onOkPress == "function" ? await onOkPress(event, context) : typeof onOk == "function" ? await onOk(event, context) : undefined;
-          if (r !== false) {
-            instance.close();
-          }
-          return r;
-        } catch (e) { }
-      }
       okButton.label = isValidElement(okButton.label, true) ? okButton.label : i18n.t("components.dialog.alertOkButton");
-      okButton.variant = { colorScheme: "primary", padding: 2, ...okButton.variant }
+      okButton.variant = { colorScheme: "primary", paddingX: 5, paddingY: 2, ...okButton.variant }
+      okButton.onPress = typeof okButton.onPress === "function" ? okButton.onPress : onOk;
     }
     const cancelButton = cButton === false ? undefined : Object.assign({}, cButton);
     if (cancelButton) {

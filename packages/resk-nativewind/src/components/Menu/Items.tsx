@@ -24,14 +24,14 @@ function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Elemen
   return <Nav.Item
     {...props}
     className={cn("w-full", props.className)}
-    onPress={(event, context) => {
+    onPress={async (event, context) => {
       if (typeof event?.stopPropagation == "function") {
         event.stopPropagation();
       }
       if (typeof event?.preventDefault == "function") {
         event.preventDefault();
       }
-      if (typeof props.onPress == "function" && props.onPress(event, context) === false) {
+      if (typeof props.onPress == "function" && await props.onPress(event, context) === false) {
         return;
       }
       if (closeOnPress !== false && typeof menu?.close == "function") {

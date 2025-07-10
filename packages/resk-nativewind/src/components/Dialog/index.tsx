@@ -110,9 +110,8 @@ export function Dialog<Context = unknown>({
       backdropClassName={cn("resk-dialog-backdrop", computedVariant.modalbackdrop())}
       className={cn("resk-dialog", computedVariant.modal())}
     >
-      <Div className={cn("resk-dialog-content-continer", computedVariant.contentContainer(), isFullScreen && computedVariant.contentContainerFullScreen(), contentContainerClassName)}>
+      <Div className={cn("resk-dialog-content-continer", computedVariant.contentContainer(), contentContainerClassName)}>
         {!isFullScreen ? <Backdrop testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop")} onPress={handleRequestClose} /> : null}
-
         <Div
           testID={testID + "-dialog-content"}
           className={cn("resk-dialog-content", computedVariant.content(), isFullScreen && computedVariant.fullScreenContent(), contentClassName)}

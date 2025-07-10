@@ -13,7 +13,7 @@ export function DialogExample() {
         <Dialog
             visible={visible} onRequestClose={() => setVisible(false)}
             title={"A dialog example"}
-            fullScreen
+            fullScreenOnMobile
             actions={[
                 {
                     label: "Close me",

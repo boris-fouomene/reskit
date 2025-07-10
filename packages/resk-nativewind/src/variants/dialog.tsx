@@ -2,7 +2,6 @@ import { tv, VariantProps } from "tailwind-variants";
 import { VariantsColors } from "./colors/generated";
 import { VariantsOptionsFactory } from "./variantsFactory";
 import { classes } from "./classes";
-import { cn } from "@utils/cn";
 
 const fullScreen = "flex-1 flex flex-col max-w-full min-h-full max-h-full w-full h-full sm:w-full items-start justify-start "
 
@@ -16,9 +15,8 @@ export const dialogVariant = tv({
         subtitle: "",
         scrollView: "flex-1 grow",
         scrollViewContentContainer: "",
-        content: "flex flex-col max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
-        contentContainer: cn(fullScreen, "absolute left-0 top-0 right-0 bottom-0 items-center justify-center"),
-        contentContainerFullScreen: "items-start justify-start-start",
+        content: "flex flex-col",
+        contentContainer: "absolute left-0 top-0 right-0 bottom-0 w-full h-full flex flex-1 flex-col overflow-hidden",
         fullScreenContent: fullScreen,
         modalTitle: "",
     },
@@ -65,6 +63,10 @@ export const dialogVariant = tv({
             true: {
                 content: fullScreen,
                 contentContainer: fullScreen,
+            },
+            false: {
+                content: "max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
+                contentContainer: "items-center justify-center"
             }
         },
         withBackdrop: {

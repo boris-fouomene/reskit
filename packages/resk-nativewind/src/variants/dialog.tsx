@@ -17,7 +17,6 @@ export const dialogVariant = tv({
         scrollViewContentContainer: "",
         content: "flex flex-col",
         contentContainer: "absolute left-0 top-0 right-0 bottom-0 w-full h-full flex flex-1 flex-col overflow-hidden",
-        fullScreenContent: fullScreen,
         modalTitle: "",
     },
     variants: {
@@ -29,7 +28,6 @@ export const dialogVariant = tv({
         background: VariantsOptionsFactory.createBackgroundColor((value, variantName) => {
             return {
                 content: value,
-                fullScreenContent: value,
             }
         }),
         ...VariantsOptionsFactory.createTextVariants<IDialogVariantSlot, "title">((value, colorName) => {
@@ -50,9 +48,6 @@ export const dialogVariant = tv({
         ...VariantsOptionsFactory.createAllOpacity<IDialogVariantSlot, "subtitle">((value, colorName) => {
             return { subtitle: value }
         }, "subtitle"),
-        ...VariantsOptionsFactory.createAllPadding2Margin<IDialogVariantSlot, "fullScreen">((value, colorName) => {
-            return { fullScreenContent: value }
-        }, "fullScreen"),
         ...VariantsOptionsFactory.createTextVariants<IDialogVariantSlot, "modalTitle">((value, colorName) => {
             return { modalTitle: value }
         }, "modalTitle"),
@@ -103,7 +98,6 @@ type IDialogVariantSlot = {
     appBar?: string,
     scrollView?: string,
     scrollViewContentContainer?: string,
-    fullScreenContent?: string,
     contentcontainerFullScreen?: string;
     contentContainer?: string,
     modalTitle?: string;

@@ -12,6 +12,7 @@ export const appBarVariant = tv({
         subtitle: "",
         action: "",
         actionMenuItem: "",
+        backAction: "",
         actions: "",
         icon: "",
         content: "",//the content of the appBarVariant
@@ -36,6 +37,9 @@ export const appBarVariant = tv({
         ...VariantsOptionsFactory.createIconVariants<IAppBarVariantSlot, "icon">((value, colorName) => {
             return { icon: value }
         }, "icon"),
+        ...VariantsOptionsFactory.createIconVariants<IAppBarVariantSlot, "backAction">((value, colorName) => {
+            return { backAction: value }
+        }, "backAction"),
         ...VariantsOptionsFactory.createAllOpacity<IAppBarVariantSlot, "title">((value, colorName) => {
             return { title: value }
         }, "title"),
@@ -58,8 +62,9 @@ export const appBarVariant = tv({
                 subtitle: cn((VariantsColors.textForeground as any)[key], "opacity-95"),
                 action: cn((VariantsColors.textForeground as any)[key]),
                 icon: cn((VariantsColors.iconForeground as any)[key]),
+                backAction: cn((VariantsColors.iconForeground as any)[key]),
             }]
-        })) as Record<IVariantsColors.ColorName, { base: string, title: string, subtitle: string, action: string, icon: string }>,
+        })) as Record<IVariantsColors.ColorName, IAppBarVariantSlot>,
     },
     defaultVariants: {
         titleSize: "lg",
@@ -67,6 +72,7 @@ export const appBarVariant = tv({
         subtitleSize: "sm",
         subtitleOpacity: 80,
         actionsGapX: 2,
+        paddingX: 2
     }
 });
 
@@ -81,4 +87,5 @@ type IAppBarVariantSlot = {
     actionMenuItem?: string;
     content?: string;
     actions?: string;
+    backAction?: string;
 }

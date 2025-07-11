@@ -80,23 +80,17 @@ export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDime
     const debounceTimer = useRef<NodeJS.Timeout | null>(null);
     const optionsRef = useRef<Required<Omit<IUseDimensionsOptons, "breakpoints">>>(options as any);
     optionsRef.current = { widthThreshold, heightThreshold, debounceTimeout, ignoreKeyboard };
-    const breakpoints = {
-        mobileMaxWidth: Breakpoints.mobileMaxWidth,
-        tabletMaxWidth: Breakpoints.tabletMaxWidth,
-        ...options.breakpoints,
-    };
+
     const prevWindowRef = useRef(state.window);
     const prevKeyboardVisible = usePrevious(keyboard.isKeyboardVisible);
     prevWindowRef.current = useMemo(() => {
         if ((prevKeyboardVisible !== keyboard.isKeyboardVisible || keyboard.isKeyboardVisible) && ignoreKeyboard || (state.window.width == prevWindowRef.current.width && state.window.height == prevWindowRef.current.height)) return prevWindowRef.current;
         return state.window;
     }, [state.window.width, state.window.height, keyboard.isKeyboardVisible, ignoreKeyboard, prevKeyboardVisible]);
-    breakpoints.mobileMaxWidth = isNumber(breakpoints.mobileMaxWidth) && breakpoints.mobileMaxWidth > 0 ? breakpoints.mobileMaxWidth : Breakpoints.mobileMaxWidth;
-    breakpoints.tabletMaxWidth = isNumber(breakpoints.tabletMaxWidth) && breakpoints.tabletMaxWidth > 0 ? breakpoints.tabletMaxWidth : Breakpoints.tabletMaxWidth;
+
     const { width } = prevWindowRef.current;
-    const isMobile = width <= breakpoints.mobileMaxWidth;
-    const isTablet = width > breakpoints.mobileMaxWidth && width <= breakpoints.tabletMaxWidth;
-    const isDesktop = width > breakpoints.tabletMaxWidth;
+
+    const { isMobile, isTablet, isDesktop } = Breakpoints.getDeviceLayout({ windowWidth: width });
     useEffect(() => {
         const applyUpdate = (newDimensions: IUseDimensionsResult) => {
             if (previousDimensions.current && !exceedsThreshold(newDimensions, previousDimensions.current as any, optionsRef.current.widthThreshold as number, optionsRef.current.heightThreshold as number)) {

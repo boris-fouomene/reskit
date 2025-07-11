@@ -42,8 +42,11 @@ function AppBar<Context = unknown>({
   testID = defaultStr(testID, 'resk-appbar');
   const computedVariant = appBarVariant(variant);
   subtitle = subtitle === false ? null : subtitle;
+  const backActionClx = cn(computedVariant.backAction(), backActionClassName);
   const backAction: ReactNode | false = typeof customBackAction == "function" ? customBackAction({
-    ...context as any,
+    ...context as Context,
+    className: backActionClx,
+    computedAppBarVariant: computedVariant,
     handleBackPress: (event: any) => {
       if (typeof onBackActionPress == "function") {
         onBackActionPress(event);
@@ -51,12 +54,12 @@ function AppBar<Context = unknown>({
     }
   }) : customBackAction;
   return (<Surface
-    className={cn(`appbar px-[7px] z-1 overflow-hidden flex flex-row items-center max-w-full w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", computedVariant.base(), className)}
+    className={cn(`resk-app-bar overflow-hidden flex flex-row items-center max-w-full w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", computedVariant.base(), className)}
     {...appBarProps}
     testID={testID}
   >
     {(backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
-      <BackAction testID={`${testID}-back-action`} className={cn(computedVariant.icon(), backActionClassName)} onPress={onBackActionPress} /> : null}
+      <BackAction testID={`${testID}-back-action`} className={backActionClx} onPress={onBackActionPress} /> : null}
     {isValidElement(left) ? left as any : null}
     <Div testID={`${testID}-content`} className={cn("px-[12px] flex-1 basis-0 min-w-0 native:flex-1", computedVariant.content(), contentClassName)}>
       <Text

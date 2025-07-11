@@ -4,7 +4,7 @@ import { INavItemProps, INavItems, INavItemsProps } from "@components/Nav/types"
 import { IClassName } from "@src/types";
 import { ITextVariant } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
-import { IAppBarVariant } from "@variants/appBar";
+import { appBarVariant, IAppBarVariant } from "@variants/appBar";
 
 
 export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "title" | "variant"> {
@@ -26,7 +26,7 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
     onBackActionPress?: (event: any) => any;
 
     /** If backAction is a string, it is the name of the FontIcon to render for the back action. */
-    backAction?: JSX.Element | null | false | ((context: Context & { handleBackPress: (event: any) => void }) => ReactNode);
+    backAction?: JSX.Element | null | false | ((context: Context & { className: string, computedAppBarVariant: ReturnType<typeof appBarVariant>, handleBackPress: (event: any) => void }) => ReactNode);
 
     /** class name for the BackAction component when rendered. */
     backActionClassName?: IClassName;

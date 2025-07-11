@@ -15,6 +15,7 @@ import { IClassName } from "@src/types";
 import { IDialogVariant } from "@variants/dialog";
 import i18n from "@resk/core/i18n";
 import { ITextVariant, textVariant } from "@variants/text";
+import { INavItems } from "@components/Nav";
 
 /**
  * Dialog component for displaying modal dialogs with flexible configuration.
@@ -553,11 +554,48 @@ Dialog.Alert = DialogAlert;
 type IDialogControlledCallback<Context = unknown> = (dialog: DialogControlled<Context>) => void;
 
 
+
+/**
+ * Represents the properties for an uncontrolled (declarative) Dialog component.
+ *
+ * This interface extends {@link IDialogControllableProps} with `IsControlled` set to `false`,
+ * and omits the `dialogControlledContext` property, as it is only used for controlled dialogs.
+ *
+ * Use this interface when rendering dialogs declaratively via the {@link Dialog} component,
+ * where dialog visibility and state are managed by React state or props.
+ *
+ * @typeParam Context - The type of the custom context object passed to the dialog.
+ *
+ * @example
+ * ```tsx
+ * // Example: Render a simple dialog with title, subtitle, and actions
+ * <Dialog
+ *   title="Welcome"
+ *   subtitle="Please confirm your action"
+ *   actions={[
+ *     { label: "Cancel", onPress: () => setOpen(false) },
+ *     { label: "Confirm", onPress: handleConfirm }
+ *   ]}
+ *   fullScreenOnMobile
+ * >
+ *   <Text>This is a dialog body.</Text>
+ * </Dialog>
+ * ```
+ *
+ * @remarks
+ * - Use this interface for dialogs that are managed declaratively (uncontrolled).
+ * - All dialog configuration options (title, actions, content, etc.) are supported.
+ * - The `dialogControlledContext` property is omitted, as it is only relevant for controlled dialogs.
+ *
+ * @see Dialog
+ * @see IDialogControllableProps
+ * @see DialogControlled
+ */
 export interface IDialogProps<Context = unknown> extends Omit<IDialogControllableProps<Context, false>, "dialogControlledContext"> { }
 
 
 interface IDialogControllableProps<Context = unknown, IsControlled extends boolean = false> extends Omit<IModalProps, "ref"> {
-  actions?: IDialogActionProps<Context, IsControlled>[];
+  actions?: INavItems<IDialogActionProps<Context, IsControlled>>;
   title?: ReactNode;
   titleClassName?: IClassName;
   subtitle?: ReactNode;

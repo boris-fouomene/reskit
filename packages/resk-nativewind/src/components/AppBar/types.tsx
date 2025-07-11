@@ -1,6 +1,6 @@
 import { JSX, ReactNode } from "react";
 import { IIconButtonProps } from "@components/Icon/types";
-import { INavItemProps, INavItemsProps } from "@components/Nav/types";
+import { INavItemProps, INavItems, INavItemsProps } from "@components/Nav/types";
 import { IClassName } from "@src/types";
 import { ITextVariant } from "@variants/text";
 import { ISurfaceProps } from "@components/Surface";
@@ -40,7 +40,7 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
 
     right?: ReactNode;
 
-    actions?: IAppBarActionProps<Context>[];
+    actions?: INavItems<IAppBarActionProps<Context>>;
 
 
     actionsProps?: IAppBarActionsProps<Context>;
@@ -72,7 +72,7 @@ export interface IAppBarActionsProps<Context = unknown> {
     viewportWidth?: number;
 
     /** an array of actions to display in the AppBar. These actions can be buttons or other interactive elements that respond to user interactions. */
-    actions?: IAppBarActionProps<Context>[];
+    actions?: INavItems<IAppBarActionProps<Context>>;
 
     /** The maximum visible number of actions to display directly on the AppBar. 
      * This value is used to determine the number of actions that can be displayed on the AppBar.

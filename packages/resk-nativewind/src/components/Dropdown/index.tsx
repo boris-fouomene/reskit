@@ -18,7 +18,7 @@ import { Div } from "@html/Div";
 import { TextInput } from "@components/TextInput";
 import { Text } from "@html/Text";
 import { IFontIconName } from "@components/Icon";
-import { INavItemProps } from "@components/Nav";
+import { INavItemProps, INavItems } from "@components/Nav";
 import { dropdownItemVariant, IDropdownItemVariant } from "@variants/dropdownItem";
 import { IIconVariant } from "@variants/icon";
 import { IProgressBarVariant } from "@variants/progressBar";
@@ -744,9 +744,6 @@ export interface IDropdownState<ItemType = any, ValueType = any> {
 
 export interface IDropdownAction extends INavItemProps<{ dropdown: IDropdownContext }> { }
 
-export type IDropdownComputedAction = (IReactNullableElement | IDropdownAction);
-
-export type IDropdownActions = IDropdownComputedAction[] | ((options: IDropdownContext<any, any>) => IDropdownComputedAction[]);
 /**
  * Represents a collection of prepared items in a dropdown component.
  * 
@@ -958,7 +955,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     /***
         optional actions for the dropdown
     */
-    dropdownActions?: IDropdownActions;
+    dropdownActions?: INavItems<IDropdownAction> | ((options: IDropdownContext<any, any>) => INavItems<IDropdownAction>);
 
     /***
         The variants for the dropdown actions menu icon

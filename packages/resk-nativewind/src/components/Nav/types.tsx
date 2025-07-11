@@ -32,6 +32,26 @@ export interface INavItemProps<Context = unknown> extends IButtonProps<Context> 
     dividerClassName?: IClassName;
 };
 
+/**
+ * Represents a list of navigation items for the navigation menu.
+ *
+ * @typeParam ItemType - The type of each navigation item. Defaults to `unknown`.
+ *
+ * @example
+ * // Example usage with INavItemProps:
+ * const navItems: INavItems<INavItemProps> = [
+ *   { label: "Home", onPress: () => navigate("/") },
+ *   { label: "About", onPress: () => navigate("/about") },
+ *   undefined, // Allows for optional or conditional items
+ *   null,      // Allows for optional or conditional items
+ * ];
+ *
+ * @remarks
+ * This type allows for arrays containing navigation items, as well as `undefined` or `null` values.
+ * This is useful when conditionally rendering menu items or when mapping over data that may include
+ * optional entries.
+ */
+export type INavItems<ItemType = unknown> = (ItemType | undefined | null)[];
 
 export interface INavContext<Context = unknown> {
     /**
@@ -44,7 +64,7 @@ export interface INavContext<Context = unknown> {
 }
 export interface INavItemsProps<Context = unknown> extends IHtmlDivProps, INavContext<Context> {
 
-    items?: (INavItemProps<Context> | undefined | null)[];
+    items?: INavItems<INavItemProps<Context>>;
 
     /****
      * The class name to apply to each nav item.

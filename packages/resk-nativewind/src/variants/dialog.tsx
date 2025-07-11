@@ -60,7 +60,7 @@ export const dialogVariant = tv({
                 contentContainer: fullScreen,
             },
             false: {
-                content: "max-w-[80%] sm:max-w-[600px] min-h-[250px] max-h-[50%]",
+                content: "max-w-[80%] sm:max-w-[600px] min-h-[200px] max-h-[50%]",
                 contentContainer: "items-center justify-center"
             }
         },

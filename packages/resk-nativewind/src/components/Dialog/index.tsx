@@ -172,10 +172,11 @@ function DialogControllable<Context = unknown, IsControlled extends boolean = fa
         appBarActions.push(cloned);
       });
     }
+    const canRenderAppBar = isFullScreen || appBarActions.length;
     return {
       context,
       titleContent: isFullScreen && title ? null : <Text className={cn("resk-dialog-modal-title", titleClx)} testID={testID + "-title"}>{title}</Text>,
-      appBar: <AppBar<IDialogContext<Context, IsControlled>>
+      appBar: !canRenderAppBar ? null : <AppBar<IDialogContext<Context, IsControlled>>
         maxVisibleActions={isFullScreen ? undefined : 2}
         backAction={!isFullScreen ? false : undefined}
         onBackActionPress={handleRequestClose}
@@ -215,7 +216,7 @@ function DialogControllable<Context = unknown, IsControlled extends boolean = fa
         {!isFullScreen && props.dismissible !== false ? <Backdrop testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop")} onPress={handleRequestClose} /> : null}
         <Div
           testID={testID}
-          className={cn("resk-dialog", computedVariant.base(), className)}
+          className={cn("resk-dialog", computedVariant.base(), isFullScreen && computedVariant.fullScreen(), className)}
         >
           {isFullScreen ? appBar : titleContent}
           <Wrapper {...wrapperProps}>
@@ -464,7 +465,7 @@ class DialogAlert extends createProvider<IDialogControlledProps, DialogControlle
 export class Preloader extends createProvider<Omit<IDialogControlledProps, "children"> & { content?: ReactNode, textClassName?: IClassName; textVariant?: ITextVariant; contentContainerClassName?: IClassName; activityIndicatorPosition?: "left" | "right", withActivityIndicator?: boolean, activityIndicatorVariant?: IActivityIndicatorVariant; activityIndicatorClassName?: IClassName }, DialogControlled>(DialogControlled, { dismissible: false, fullScreen: false },
   (options) => {
     options.withScrollView = typeof options.withScrollView === "boolean" ? options.withScrollView : false;
-    options.variant = { minHeight: "150px", ...options.variant };
+    options.variant = { paddingX: 2, ...options.variant };
     const testID = options.testID = defaultStr(options.testID, "resk-dialog-preloader");
     const { content: children, activityIndicatorVariant, textClassName, textVariant: tVariant, withActivityIndicator, activityIndicatorClassName, contentContainerClassName, activityIndicatorPosition, ...rest } = options;
     const content = isValidElement(children, false) ? children : <Text numberOfLines={10} testID={testID + "-content"} variant={{ marginX: 2, ...tVariant }} className={cn("resk-preloader-content", textClassName)}>{children as ReactNode || 'Loading...'}</Text>;

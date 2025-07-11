@@ -15,6 +15,7 @@ export const dialogVariant = tv({
         subtitle: "",
         scrollView: "flex-1 grow",
         scrollViewContentContainer: "",
+        fullScreen: fullScreen,
         base: "flex flex-col",
         container: "absolute left-0 top-0 right-0 bottom-0 w-full h-full flex flex-1 flex-col overflow-hidden",
         modalTitle: "",
@@ -58,10 +59,11 @@ export const dialogVariant = tv({
             true: {
                 base: fullScreen,
                 container: fullScreen,
+                fullScreen: fullScreen,
             },
             false: {
-                base: "max-w-[80%] sm:max-w-[600px] min-h-[200px] max-h-[50%]",
-                container: "items-center justify-center"
+                base: "max-w-[80%] sm:max-w-[600px]",
+                container: "items-center justify-center",
             }
         },
         withBackdrop: {
@@ -82,6 +84,8 @@ export const dialogVariant = tv({
         modalTitleWeight: "bold",
         modalTitleSize: "lg",
         modalTitleMargin: 4,
+        minHeight: "150px",
+        maxHeight: "half",
     }
 });
 

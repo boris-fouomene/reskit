@@ -15,10 +15,11 @@ export class Nav {
     static renderItems({ items, renderItem, renderExpandableItem, ...rest }: INavItemsProps) {
         return renderNavItems({ ...rest, items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem });
     };
-    static Item<Context = unknown>({ className, ...props }: INavItemProps<Context>) {
+    static Item<Context = unknown>({ className, variant, ...props }: INavItemProps<Context>) {
         return <Button
             testID="nav-item"
             {...props}
+            variant={{ paddingX: 2, ...variant }}
             className={cn(className)}
         />
     }

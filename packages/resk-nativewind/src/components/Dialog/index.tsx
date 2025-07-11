@@ -342,7 +342,7 @@ class DialogControlled<Context = unknown> extends Component<IDialogControlledPro
  * @see Dialog
  * @see DialogAlert
  */
-class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled) { }
+class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled, { dismissible: false }) { }
 
 /**
  * DialogAlert is a specialized dialog provider for displaying alert dialogs with confirm and cancel actions.

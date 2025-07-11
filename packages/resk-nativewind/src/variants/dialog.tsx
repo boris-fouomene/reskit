@@ -15,19 +15,19 @@ export const dialogVariant = tv({
         subtitle: "",
         scrollView: "flex-1 grow",
         scrollViewContentContainer: "",
-        content: "flex flex-col",
-        contentContainer: "absolute left-0 top-0 right-0 bottom-0 w-full h-full flex flex-1 flex-col overflow-hidden",
+        base: "flex flex-col",
+        container: "absolute left-0 top-0 right-0 bottom-0 w-full h-full flex flex-1 flex-col overflow-hidden",
         modalTitle: "",
     },
     variants: {
-        ...VariantsOptionsFactory.createAll<{ content: string }>((value) => {
+        ...VariantsOptionsFactory.createAll<{ base: string }>((value) => {
             return {
-                content: value,
+                base: value,
             }
         }),
         background: VariantsOptionsFactory.createBackgroundColor((value, variantName) => {
             return {
-                content: value,
+                base: value,
             }
         }),
         ...VariantsOptionsFactory.createTextVariants<IDialogVariantSlot, "title">((value, colorName) => {
@@ -56,12 +56,12 @@ export const dialogVariant = tv({
         }, "modalTitle"),
         fullScreen: {
             true: {
-                content: fullScreen,
-                contentContainer: fullScreen,
+                base: fullScreen,
+                container: fullScreen,
             },
             false: {
-                content: "max-w-[80%] sm:max-w-[600px] min-h-[200px] max-h-[50%]",
-                contentContainer: "items-center justify-center"
+                base: "max-w-[80%] sm:max-w-[600px] min-h-[200px] max-h-[50%]",
+                container: "items-center justify-center"
             }
         },
         withBackdrop: {
@@ -69,9 +69,9 @@ export const dialogVariant = tv({
                 modalbackdrop: classes.backdrop
             }
         },
-        colorScheme: VariantsOptionsFactory.create<typeof VariantsColors.surface, { content: string }>(VariantsColors.surface, (value) => {
+        colorScheme: VariantsOptionsFactory.create<typeof VariantsColors.surface, { base: string }>(VariantsColors.surface, (value) => {
             return {
-                content: value,
+                base: value,
             }
         }),
     },
@@ -91,14 +91,13 @@ export type IDialogVariant = VariantProps<typeof dialogVariant>;
 type IDialogVariantSlot = {
     title?: string;
     subtitle?: string;
-    content?: string;
+    base?: string;
     modalbackdrop?: string,
     modal?: string,
     action?: string,
     appBar?: string,
     scrollView?: string,
     scrollViewContentContainer?: string,
-    contentcontainerFullScreen?: string;
-    contentContainer?: string,
+    container?: string,
     modalTitle?: string;
 }

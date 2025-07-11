@@ -1,9 +1,10 @@
 "use client";
-import { Dialog } from "@components/Dialog";
+import { Dialog, Preloader } from "@components/Dialog";
 
 export function Providers() {
     return <>
-        <Dialog.Provider.Component />
-        <Dialog.Alert.Component />
+        <Dialog.Provider.Component testID={"resk-dialog-provider"} />
+        <Dialog.Alert.Component testID={"resk-dialog-alert-provider"} />
+        <Preloader.Component testID={"resk-preloader-provider"} />
     </>
 }

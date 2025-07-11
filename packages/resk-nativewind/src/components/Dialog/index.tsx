@@ -3,7 +3,7 @@ import { Modal } from "@components/Modal";
 import { AppBar, IAppBarActionProps, IAppBarProps } from "@components/AppBar";
 import { Fragment, ReactNode, useCallback, useMemo, Context, useImperativeHandle, Ref } from 'react';
 import { cn, Component, createProvider, isValidElement, useDimensions } from "@utils";
-import { Dimensions, ScrollView, View } from "react-native";
+import { Dimensions, ScrollView } from "react-native";
 import { defaultStr, isObj } from "@resk/core/utils";
 import { Backdrop } from "@components/Backdrop";
 import { dialogVariant } from "@variants/dialog";
@@ -16,12 +16,14 @@ import { IDialogVariant } from "@variants/dialog";
 import i18n from "@resk/core/i18n";
 import { ITextVariant, textVariant } from "@variants/text";
 import { INavItems } from "@components/Nav";
+import { ActivityIndicator } from "@components/ActivityIndicator";
+import { IActivityIndicatorVariant } from "@variants/activityIndicator";
 
 /**
  * Dialog component for displaying modal dialogs with flexible configuration.
  *
  * This is the main entry point for rendering a dialog. It supports both controlled and uncontrolled usage,
- * and provides a consistent API for displaying dialogs with titles, subtitles, actions, and custom content.
+ * and provides a consistent API for displaying dialogs with titles, subtitles, actions, and custom base.
  *
  * @typeParam Context - The type of the custom context object passed to the dialog.
  *
@@ -29,8 +31,8 @@ import { INavItems } from "@components/Nav";
  * @returns The rendered dialog component.
  * 
  * This component is responsible for rendering the dialog UI, including the app bar,
- * title, subtitle, actions, and content. It supports both full-screen and modal modes,
- * and can be customized with various props for responsive layouts, scrollable content,
+ * title, subtitle, actions, and base. It supports both full-screen and modal modes,
+ * and can be customized with various props for responsive layouts, scrollable base,
  * and custom actions.
  *
  * @param props - The properties used to configure the dialog.
@@ -41,20 +43,20 @@ import { INavItems } from "@components/Nav";
  * @param props.subtitle - The subtitle of the dialog.
  * @param props.titleClassName - Custom class name for the title.
  * @param props.subtitleClassName - Custom class name for the subtitle.
- * @param props.children - The content to display inside the dialog.
+ * @param props.children - The children to display inside the dialog.
  * @param props.testID - Test identifier for the dialog (for testing purposes).
  * @param props.useDimensionsOptions - Options for the useDimensions hook to control responsive behavior.
  * @param props.fullScreen - If true, the dialog will be displayed in full-screen mode.
  * @param props.fullScreenOnMobile - If true, the dialog will be full-screen on mobile devices.
  * @param props.fullScreenOnTablet - If true, the dialog will be full-screen on tablets.
  * @param props.onRequestClose - Callback invoked when the dialog requests to close.
- * @param props.withScrollView - If true, wraps the content in a ScrollView for scrollable content.
+ * @param props.withScrollView - If true, wraps the content in a ScrollView for scrollable base.
  * @param props.scrollViewClassName - Custom class name for the ScrollView.
  * @param props.scrollViewContentContainerClassName - Custom class name for the ScrollView content container.
- * @param props.contentClassName - Custom class name for the dialog content.
+ * @param props.contentClassName - Custom class name for the dialog base.
  * @param props.appBarClassName - Custom class name for the app bar.
  * @param props.variant - Variant configuration for dialog styling.
- * @param props.contentContainerClassName - Custom class name for the content container.
+ * @param props.containerClassName - Custom class name for the content container.
  * @param props.dialogControlledContext - Reference to the controlled dialog context (if controlled).
  * @param props.ref - Ref to access the dialog context imperatively.
  * @returns The rendered dialog component.
@@ -70,7 +72,7 @@ import { INavItems } from "@components/Nav";
  *   fullScreenOnMobile
  *   withScrollView
  * >
- *   <Text>This is the dialog content.</Text>
+ *   <Text>This is the dialog base.</Text>
  * </DialogControllable>
  * ```
  *
@@ -123,10 +125,10 @@ function DialogControllable<Context = unknown, IsControlled extends boolean = fa
   withScrollView,
   scrollViewClassName,
   scrollViewContentContainerClassName,
-  contentClassName,
   appBarClassName,
   variant,
-  contentContainerClassName,
+  className,
+  containerClassName,
   dialogControlledContext,
   ref,
   ...props
@@ -198,21 +200,22 @@ function DialogControllable<Context = unknown, IsControlled extends boolean = fa
     const canRenderScrollView = withScrollView !== false;
     return {
       Component: canRenderScrollView ? ScrollView : Fragment,
-      props: canRenderScrollView ? { testID: testID + "-scrollview", className: cn("resk-dialog-scroll-view", computedVariant.scrollView(), scrollViewClassName), contentContainerClassName: cn("resk-dialog-scroll-view-content-container", computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } : {}
+      props: canRenderScrollView ? { testID: testID + "-scrollview", className: cn("resk-dialog-scroll-view", computedVariant.scrollView(), scrollViewClassName), containerClassName: cn("resk-dialog-scroll-view-container", computedVariant.scrollViewContentContainer(), scrollViewContentContainerClassName) } : {}
     }
   }, [withScrollView, scrollViewClassName, testID, scrollViewContentContainerClassName]);
   useImperativeHandle(ref, () => context);
   return (
-    <Modal animationType="fade" {...props} testID={testID}
+    <Modal animationType="fade" {...props}
+      testID={testID + "-modal"}
       onRequestClose={handleRequestClose}
       backdropClassName={cn("resk-dialog-backdrop", computedVariant.modalbackdrop())}
-      className={cn("resk-dialog", computedVariant.modal())}
+      className={cn("resk-dialog-modal", computedVariant.modal())}
     >
-      <Div className={cn("resk-dialog-content-continer", computedVariant.contentContainer(), contentContainerClassName)}>
+      <Div className={cn("resk-dialog-container", computedVariant.container(), containerClassName)}>
         {!isFullScreen && props.dismissible !== false ? <Backdrop testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop")} onPress={handleRequestClose} /> : null}
         <Div
-          testID={testID + "-dialog-content"}
-          className={cn("resk-dialog-content", computedVariant.content(), contentClassName)}
+          testID={testID}
+          className={cn("resk-dialog", computedVariant.base(), className)}
         >
           {isFullScreen ? appBar : titleContent}
           <Wrapper {...wrapperProps}>
@@ -374,7 +377,7 @@ class DialogProvider extends createProvider<IDialogControlledProps, DialogContro
  * ```
  *
  * @remarks
- * - Use `message` to provide the main alert content.
+ * - Use `message` to provide the main alert base.
  * - Customize the confirm and cancel buttons using `confirmButton` and `cancelButton` props.
  * - The `buttonsOrder` prop controls the order of the action buttons.
  * - You can pass a `messageVariant` or `messageClassName` to style the alert message.
@@ -457,6 +460,24 @@ class DialogAlert extends createProvider<IDialogControlledProps, DialogControlle
     }, callback);
   }
 }
+
+export class Preloader extends createProvider<Omit<IDialogControlledProps, "children"> & { content?: ReactNode, textClassName?: IClassName; textVariant?: ITextVariant; contentContainerClassName?: IClassName; activityIndicatorPosition?: "left" | "right", withActivityIndicator?: boolean, activityIndicatorVariant?: IActivityIndicatorVariant; activityIndicatorClassName?: IClassName }, DialogControlled>(DialogControlled, { dismissible: false, fullScreen: false },
+  (options) => {
+    options.withScrollView = typeof options.withScrollView === "boolean" ? options.withScrollView : false;
+    options.variant = { minHeight: "150px", ...options.variant };
+    const testID = options.testID = defaultStr(options.testID, "resk-dialog-preloader");
+    const { content: children, activityIndicatorVariant, textClassName, textVariant: tVariant, withActivityIndicator, activityIndicatorClassName, contentContainerClassName, activityIndicatorPosition, ...rest } = options;
+    const content = isValidElement(children, false) ? children : <Text numberOfLines={10} testID={testID + "-content"} variant={{ marginX: 2, ...tVariant }} className={cn("resk-preloader-content", textClassName)}>{children as ReactNode || 'Loading...'}</Text>;
+    const indicator = withActivityIndicator === false ? null : <ActivityIndicator size={"large"} variant={activityIndicatorVariant} className={cn("resk-dialog-preloader-indicator", activityIndicatorClassName)} />;
+    const indicatorOnRight = activityIndicatorPosition === "right";
+    (rest as any).children = indicator ? <Div testID={testID + "-content-container"} className={cn("resk-dialog-preloader-container flex flex-row items-center justify-start py-1 flex-wrap", contentContainerClassName)}>
+      {!indicatorOnRight ? indicator : null}
+      {content as ReactNode}
+      {indicatorOnRight ? indicator : null}
+    </Div> : content;
+    return rest;
+  }) { }
+
 /**
  * Exposes static members for Dialog-related components and providers.
  *
@@ -584,7 +605,7 @@ type IDialogControlledCallback<Context = unknown> = (dialog: DialogControlled<Co
  *
  * @remarks
  * - Use this interface for dialogs that are managed declaratively (uncontrolled).
- * - All dialog configuration options (title, actions, content, etc.) are supported.
+ * - All dialog configuration options (title, actions, base, etc.) are supported.
  * - The `dialogControlledContext` property is omitted, as it is only relevant for controlled dialogs.
  *
  * @see Dialog
@@ -603,15 +624,11 @@ interface IDialogControllableProps<Context = unknown, IsControlled extends boole
   appBarClassName?: IClassName;
   appBarProps?: Omit<IAppBarProps<IDialogContext<Context, IsControlled>>, "title" | "subtitle" | "actions" | "context">;
 
-  /**
-   * The class name of the content container.
-   */
-  contentClassName?: IClassName;
 
   /**
    * The class name of the content container.
    */
-  contentContainerClassName?: IClassName;
+  containerClassName?: IClassName;
 
   context?: Context;
 
@@ -645,7 +662,7 @@ interface IDialogControllableProps<Context = unknown, IsControlled extends boole
   scrollViewClassName?: IClassName;
   /**
    * The class name of the scroll view content container.
-   * This is used to apply contentContainerStyle to the scroll view.
+   * This is used to apply containerStyle to the scroll view.
    */
   scrollViewContentContainerClassName?: IClassName;
 
@@ -729,10 +746,10 @@ export interface IDialogActionProps<Context = unknown, IsControlled extends bool
 };
 
 /**
- * Represents the context object passed to dialog actions, app bar, and content.
+ * Represents the context object passed to dialog actions, app bar, and base.
  *
  * This type combines a custom context (if provided) with device layout information and dialog control methods.
- * It is used to provide contextual data and imperative dialog controls to actions, app bar, and dialog content.
+ * It is used to provide contextual data and imperative dialog controls to actions, app bar, and dialog base.
  *
  * @typeParam Context - The type of the custom context object passed to the dialog.
  * @typeParam IsControlled - Indicates whether the dialog is controlled (true) or uncontrolled (false).
@@ -760,7 +777,7 @@ export interface IDialogActionProps<Context = unknown, IsControlled extends bool
  *
  * @example
  * ```tsx
- * // Using device layout information in dialog content
+ * // Using device layout information in dialog base
  * function CustomDialogContent({ context }: { context: IDialogContext }) {
  *   return (
  *     <View>
@@ -773,7 +790,7 @@ export interface IDialogActionProps<Context = unknown, IsControlled extends bool
  *
  * @remarks
  * - Use `deviceLayout` to adapt dialog content or actions based on device type or screen size.
- * - Use `dialog.close()` to programmatically close the dialog from within actions or content.
+ * - Use `dialog.close()` to programmatically close the dialog from within actions or base.
  * - When using a controlled dialog, `dialog` is a {@link DialogControlled} instance, providing advanced control methods.
  *
  * @see DialogControlled
@@ -886,7 +903,7 @@ export type IDialogContext<Context = unknown, IsControlled extends boolean = fal
  * <Dialog.Controlled
  *   actions={[confirmAction, cancelAction]}
  *   title="Controlled Dialog"
- *   children={<Text>Dialog content</Text>}
+ *   children={<Text>Dialog base</Text>}
  * />
  * ```
  *
@@ -916,7 +933,7 @@ export interface IDialogControlledActionProps<Context = unknown> extends IDialog
  *
  * @example
  * ```tsx
- * // Example: Open a controlled dialog with custom actions and content
+ * // Example: Open a controlled dialog with custom actions and base
  * Dialog.Controlled.open({
  *   title: "Controlled Dialog",
  *   actions: [
@@ -942,7 +959,7 @@ export interface IDialogControlledActionProps<Context = unknown> extends IDialog
  *
  * @remarks
  * - Use this interface for dialogs that require programmatic control over visibility and state.
- * - All dialog configuration options (title, actions, content, etc.) are supported.
+ * - All dialog configuration options (title, actions, base, etc.) are supported.
  * - The `visible` and `dialogControlledContext` properties are omitted, as they are managed by the dialog controller.
  *
  * @see DialogControlled
@@ -983,7 +1000,7 @@ export interface IDialogControlledProps<Context = unknown> extends Omit<IDialogC
  *
  * @remarks
  * - Use this interface to specify dialog properties when opening or updating a controlled dialog.
- * - All dialog configuration options (title, actions, content, etc.) are supported.
+ * - All dialog configuration options (title, actions, base, etc.) are supported.
  * - The `ref` property is omitted, as it is managed internally by the dialog controller.
  *
  * @see DialogControlled
@@ -1012,7 +1029,7 @@ export interface IDialogControlledOptions<Context = unknown> extends Omit<IDialo
  *   visible: false,
  *   controlledProps: {
  *     title: "My Dialog",
- *     children: <Text>Dialog content</Text>
+ *     children: <Text>Dialog base</Text>
  *   }
  * });
  *

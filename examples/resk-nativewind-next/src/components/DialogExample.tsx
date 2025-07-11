@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, HStack, Dialog, Alert } from "@resk/nativewind";
+import { Button, HStack, Dialog, Alert, Preloader } from "@resk/nativewind";
 import { B, Div, H2, Text } from "@resk/nativewind/html";
 import { useState } from "react";
 
@@ -80,5 +80,12 @@ export function DialogExample() {
                 }
             })
         }}>Simple Alert</Button>
+
+        <Button variant={{ outline: "primary" }} onPress={(e) => {
+            Preloader.open({
+                title: "Loading example",
+                children: <Text>Loading example</Text>
+            })
+        }}>Simple Preloader</Button>
     </>
 }

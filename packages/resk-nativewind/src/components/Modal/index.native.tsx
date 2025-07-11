@@ -9,11 +9,10 @@ import { JSX } from "react";
 export function Modal({ children, dismissible, visible, onRequestClose, testID, backdropClassName, ...props }: IModalProps): JSX.Element {
     testID = defaultStr(testID, "resk-modal");
     return <RNModal animationType="fade"  {...props} visible={!!visible} transparent>
-        <Backdrop
+        {backdropClassName ? <Backdrop
             testID={testID + "-modal-backdrop"}
             className={cn("resk-modal-backdrop", backdropClassName)}
-            onPress={dismissible != false ? onRequestClose : undefined}
-        />
+        /> : null}
         {children}
     </RNModal>
 }

@@ -16,7 +16,89 @@ import { IDialogVariant } from "@variants/dialog";
 import i18n from "@resk/core/i18n";
 import { ITextVariant, textVariant } from "@variants/text";
 
-
+/**
+ * Dialog component for displaying modal dialogs with flexible configuration.
+ *
+ * This is the main entry point for rendering a dialog. It supports both controlled and uncontrolled usage,
+ * and provides a consistent API for displaying dialogs with titles, subtitles, actions, and custom content.
+ *
+ * @typeParam Context - The type of the custom context object passed to the dialog.
+ *
+ * @param props - The dialog properties.
+ * @returns The rendered dialog component.
+ * 
+ * This component is responsible for rendering the dialog UI, including the app bar,
+ * title, subtitle, actions, and content. It supports both full-screen and modal modes,
+ * and can be customized with various props for responsive layouts, scrollable content,
+ * and custom actions.
+ *
+ * @param props - The properties used to configure the dialog.
+ * @param props.appBarProps - Additional props for the AppBar component.
+ * @param props.context - Custom context object to be passed to the dialog.
+ * @param props.actions - Array of action objects to display in the app bar.
+ * @param props.title - The title of the dialog.
+ * @param props.subtitle - The subtitle of the dialog.
+ * @param props.titleClassName - Custom class name for the title.
+ * @param props.subtitleClassName - Custom class name for the subtitle.
+ * @param props.children - The content to display inside the dialog.
+ * @param props.testID - Test identifier for the dialog (for testing purposes).
+ * @param props.useDimensionsOptions - Options for the useDimensions hook to control responsive behavior.
+ * @param props.fullScreen - If true, the dialog will be displayed in full-screen mode.
+ * @param props.fullScreenOnMobile - If true, the dialog will be full-screen on mobile devices.
+ * @param props.fullScreenOnTablet - If true, the dialog will be full-screen on tablets.
+ * @param props.onRequestClose - Callback invoked when the dialog requests to close.
+ * @param props.withScrollView - If true, wraps the content in a ScrollView for scrollable content.
+ * @param props.scrollViewClassName - Custom class name for the ScrollView.
+ * @param props.scrollViewContentContainerClassName - Custom class name for the ScrollView content container.
+ * @param props.contentClassName - Custom class name for the dialog content.
+ * @param props.appBarClassName - Custom class name for the app bar.
+ * @param props.variant - Variant configuration for dialog styling.
+ * @param props.contentContainerClassName - Custom class name for the content container.
+ * @param props.dialogControlledContext - Reference to the controlled dialog context (if controlled).
+ * @param props.ref - Ref to access the dialog context imperatively.
+ * @returns The rendered dialog component.
+ *
+ * @example
+ * ```tsx
+ * <DialogControllable
+ *   title="My Dialog"
+ *   subtitle="Dialog Subtitle"
+ *   actions={[
+ *     { label: "Close", onPress: () => console.log("Closed") }
+ *   ]}
+ *   fullScreenOnMobile
+ *   withScrollView
+ * >
+ *   <Text>This is the dialog content.</Text>
+ * </DialogControllable>
+ * ```
+ *
+ * @remarks
+ * - The dialog adapts its layout based on device type (mobile, tablet, desktop).
+ * - Actions can be conditionally shown in full-screen mode using `showInFullScreen`.
+ * - Use the `variant` prop to customize the dialog's appearance.
+ * - The dialog can be controlled externally via the `dialogControlledContext` prop.
+ *
+ *
+ * @example
+ * ```tsx
+ * <Dialog
+ *   title="Welcome"
+ *   subtitle="Please confirm your action"
+ *   actions={[
+ *     { label: "Cancel", onPress: () => setOpen(false) },
+ *     { label: "Confirm", onPress: handleConfirm }
+ *   ]}
+ *   fullScreenOnMobile
+ * >
+ *   <Text>This is a dialog body.</Text>
+ * </Dialog>
+ * ```
+ *
+ * @see DialogControllable
+ * @see DialogControlled
+ * @see DialogAlert
+ */
 export function Dialog<Context = unknown>(props: IDialogProps<Context>) {
   return <DialogControllable<Context, false>  {...props} dialogControlledContext={undefined} />
 }
@@ -126,7 +208,7 @@ function DialogControllable<Context = unknown, IsControlled extends boolean = fa
       className={cn("resk-dialog", computedVariant.modal())}
     >
       <Div className={cn("resk-dialog-content-continer", computedVariant.contentContainer(), contentContainerClassName)}>
-        {!isFullScreen ? <Backdrop testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop")} onPress={handleRequestClose} /> : null}
+        {!isFullScreen && props.dismissible !== false ? <Backdrop testID={testID + "-dialog-backdrop"} className={cn("resk-dialog-backdrop")} onPress={handleRequestClose} /> : null}
         <Div
           testID={testID + "-dialog-content"}
           className={cn("resk-dialog-content", computedVariant.content(), contentClassName)}
@@ -230,41 +312,242 @@ class DialogControlled<Context = unknown> extends Component<IDialogControlledPro
 }
 
 
-
+/**
+ * DialogProvider is a context provider for managing dialog state and access throughout the component tree.
+ *
+ * This class extends a generic provider utility, allowing consumers to open, close, and control dialogs
+ * from anywhere within the React tree. It is especially useful for applications that require global dialog
+ * management, such as notifications, confirmations, or alerts.
+ *
+ * @example
+ * ```tsx
+ * // Wrap your app with the DialogProvider
+ * <Dialog.Provider>
+ *   <App />
+ * </Dialog.Provider>
+ *
+ * // Open a dialog from anywhere using the provider instance
+ * Dialog.Provider.getProviderInstance()?.open({
+ *   title: "Global Dialog",
+ *   children: <Text>This dialog is managed by the provider.</Text>
+ * });
+ * ```
+ *
+ * @see DialogControlled
+ * @see Dialog
+ * @see DialogAlert
+ */
 class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled) { }
 
-
+/**
+ * DialogAlert is a specialized dialog provider for displaying alert dialogs with confirm and cancel actions.
+ *
+ * This class extends the generic dialog provider and preconfigures it for alert-style dialogs, making it easy to show
+ * confirmation or warning dialogs with customizable buttons and messages.
+ *
+ * @example
+ * ```tsx
+ * // Show a simple alert dialog with confirm and cancel buttons
+ * Dialog.Alert.open({
+ *   title: "Delete Item",
+ *   message: "Are you sure you want to delete this item?",
+ *   onConfirm: () => {
+ *     // Handle confirm action
+ *   },
+ *   onCancel: () => {
+ *     // Handle cancel action
+ *   }
+ * });
+ * ```
+ *
+ * @example
+ * ```tsx
+ * // Customize button labels and order
+ * Dialog.Alert.open({
+ *   title: "Sign Out",
+ *   message: "Do you really want to sign out?",
+ *   confirmButton: { title: "Yes, sign out", variant: { colorScheme: "danger" } },
+ *   cancelButton: { title: "No, stay logged in" },
+ *   buttonsOrder: "confirm-cancel"
+ * });
+ * ```
+ *
+ * @remarks
+ * - Use `message` to provide the main alert content.
+ * - Customize the confirm and cancel buttons using `confirmButton` and `cancelButton` props.
+ * - The `buttonsOrder` prop controls the order of the action buttons.
+ * - You can pass a `messageVariant` or `messageClassName` to style the alert message.
+ *
+ * @see Dialog
+ * @see DialogControlled
+ * @see DialogProvider
+ */
 class DialogAlert extends createProvider<IDialogControlledProps, DialogControlled>(DialogControlled, { dismissible: false, fullScreen: false }) {
-  static open<Context = unknown>(props: IDialogControlledProps<Context> & { message?: ReactNode, onOk?: IDialogControlledActionProps<Context>["onPress"], okButton?: false | IDialogControlledActionProps<Context>, cancelButtonBefore?: boolean, cancelButton?: false | IDialogActionProps<Context, true>, onCancel?: IDialogControlledActionProps<Context>["onPress"], messageVariant?: ITextVariant; messageClassName?: IClassName; }, innerProviderRef?: Ref<DialogControlled<Context>>, callback?: IDialogControlledCallback<Context>) {
+  static open<Context = unknown>(props: IDialogControlledProps<Context> & {
+    message?: ReactNode;
+
+    // Primary action (usually positive/confirm action)
+    confirmButton?: false | IDialogControlledActionProps<Context>;
+
+    // Secondary action (usually negative/cancel action)  
+    cancelButton?: false | IDialogControlledActionProps<Context>;
+
+    // Layout control
+    buttonsOrder?: "confirm-cancel" | "cancel-confirm";
+
+    // Convenience event handlers
+    onConfirm?: IDialogControlledActionProps<Context>["onPress"];
+    onCancel?: IDialogControlledActionProps<Context>["onPress"];
+
+    // Message styling
+    messageVariant?: ITextVariant;
+    messageClassName?: IClassName;
+  }, innerProviderRef?: Ref<DialogControlled<Context>>, callback?: IDialogControlledCallback<Context>) {
     const instance = DialogAlert.getProviderInstance(innerProviderRef as any);
     if (!instance || typeof instance?.open !== "function") return;
-    const { okButton: oButton, messageClassName, messageVariant, message, cancelButton: cButton, onOk, onCancel, cancelButtonBefore, children, ...rest } = Object.assign({}, props);
-    const okButton = oButton === false ? undefined : Object.assign({}, oButton);
-    if (okButton) {
-      okButton.label = isValidElement(okButton.label, true) ? okButton.label : i18n.t("components.dialog.alertOkButton");
-      okButton.variant = { colorScheme: "primary", paddingX: 5, paddingY: 2, ...okButton.variant }
-      okButton.onPress = typeof okButton.onPress === "function" ? okButton.onPress : onOk;
-    }
-    const cancelButton = cButton === false ? undefined : Object.assign({}, cButton);
-    if (cancelButton) {
-      cancelButton.label = isValidElement(cancelButton.label, true) ? cancelButton.label : i18n.t("components.dialog.alertCancelButton");
-      if (typeof cancelButton.onPress !== "function" && typeof onCancel === "function") {
-        cancelButton.onPress = onCancel;
-      }
-      cancelButton.showInFullScreen = typeof cancelButton.showInFullScreen === "boolean" ? cancelButton.showInFullScreen : false;
-      cancelButton.variant = { colorScheme: "error", padding: 2, ...cancelButton.variant }
-    }
-    const actions: IDialogControlledActionProps<Context>[] = Array.isArray(props?.actions) && props.actions.length ? props?.actions : [cancelButtonBefore ? cancelButton : okButton, cancelButtonBefore ? okButton : cancelButton] as any;
+    const {
+      confirmButton: confirmConfig,
+      cancelButton: cancelConfig,
+      onConfirm,
+      onCancel,
+      buttonsOrder = "cancel-confirm",
+      message,
+      messageClassName,
+      messageVariant,
+      children,
+      ...rest
+    } = Object.assign({}, props);
+    const testID = defaultStr(rest.testID, "resk-dialog-alert");
+    // Configure confirm button
+    const confirmButton: IDialogControlledActionProps<Context> | undefined = confirmConfig === false ? undefined : {
+      label: i18n.t("components.dialog.alert.confirmButton"),
+      variant: { colorScheme: "primary", padding: 2 },
+      testID: testID + "-confirm-button",
+      ...confirmConfig,
+      onPress: typeof confirmConfig?.onPress === "function" ? confirmConfig?.onPress : onConfirm
+    };
+
+    // Configure cancel button  
+    const cancelButton: IDialogControlledActionProps<Context> | undefined = cancelConfig === false ? undefined : {
+      label: i18n.t("components.dialog.alert.cancelButton"),
+      variant: { colorScheme: "error", padding: 2 },
+      showInFullScreen: false,
+      testID: testID + "-cancel-button",
+      ...cancelConfig,
+      onPress: typeof cancelConfig?.onPress == "function" ? cancelConfig?.onPress : onCancel
+    };
+
+    // Arrange buttons based on order preference
+    const actions = String(buttonsOrder).toLowerCase() === "confirm-cancel" ? [confirmButton, cancelButton] : [cancelButton, confirmButton];
+
     return (instance as DialogControlled<Context>).open({
       ...rest,
-      children: <Text testID="resk-dialog-alert-label" className={cn("resk-dialog-alert-message", textVariant(messageVariant), messageClassName)} children={message} />,
-      actions,
+      dismissible: false,
+      testID,
+      children: (
+        <Text
+          testID={testID + "-message"}
+          className={cn("resk-dialog-alert-message", textVariant({ padding: 4, ...messageVariant }), messageClassName)}
+        >
+          {message}
+        </Text>
+      ),
+      actions: (Array.isArray(props?.actions) && props.actions.length ? props.actions : actions) as IDialogControlledActionProps<Context>[],
     }, callback);
-  };
+  }
 }
-
+/**
+ * Exposes static members for Dialog-related components and providers.
+ *
+ * @property Provider - The DialogProvider class for global dialog management.
+ * @property Controlled - The DialogControlled class for imperative dialog control.
+ * @property Alert - The DialogAlert class for alert/confirmation dialogs.
+ *
+ * @example
+ * ```tsx
+ * // Access the Dialog provider to open dialogs globally
+ * Dialog.Provider.getProviderInstance()?.open({
+ *   title: "Global Dialog",
+ *   children: <Text>This dialog is managed by the provider.</Text>
+ * });
+ *
+ * // Use Dialog.Alert for quick alert dialogs
+ * Dialog.Alert.open({
+ *   title: "Delete Item",
+ *   message: "Are you sure you want to delete this item?",
+ *   onConfirm: () => { },
+ *   onCancel: () => { }
+ * });
+ * ```
+ *
+ * @remarks
+ * - Use `Dialog.Provider` to wrap your application for global dialog access.
+ * - Use `Dialog.Controlled` for advanced, imperative dialog control.
+ * - Use `Dialog.Alert` for simple confirmation or alert dialogs.
+ */
 Dialog.Provider = DialogProvider;
+
+
+/**
+ * The DialogControlled class provides imperative control over dialog visibility and state.
+ *
+ * This static property exposes the DialogControlled class, allowing advanced usage such as
+ * programmatically opening, closing, or toggling dialogs from outside the React render tree.
+ * Use this for scenarios where you need to manage dialog state outside of typical React state flows,
+ * such as in service layers, event handlers, or global managers.
+ *
+ * @see DialogControlled
+ * @see Dialog.Provider
+ * @see Dialog.Alert
+ *
+ * @example
+ * ```tsx
+ * // Create a ref to the controlled dialog instance
+ * const dialogRef = useRef<DialogControlled>(null);
+ *
+ * // Open the dialog imperatively
+ * dialogRef.current?.open({
+ *   title: "Controlled Dialog",
+ *   children: <Text>This dialog is controlled programmatically.</Text>
+ * });
+ *
+ * // Close the dialog
+ * dialogRef.current?.close();
+ * ```
+ *
+ * @remarks
+ * - Use Dialog.Controlled for advanced dialog management scenarios.
+ * - For most use cases, prefer Dialog or Dialog.Provider for declarative usage.
+ */
 Dialog.Controlled = DialogControlled;
+
+
+/**
+ * The DialogAlert class provides a static interface for displaying alert dialogs with confirm and cancel actions.
+ *
+ * This static property exposes the DialogAlert class, which is a specialized dialog provider for alert and confirmation dialogs.
+ * Use this for quick, user-friendly dialogs that require user confirmation or cancellation, such as delete confirmations or warnings.
+ *
+ * @see DialogAlert
+ * @see Dialog
+ * @see Dialog.Provider
+ *
+ * @example
+ * ```tsx
+ * // Show a confirmation dialog
+ * Dialog.Alert.open({
+ *   title: "Delete Item",
+ *   message: "Are you sure you want to delete this item?",
+ *   onConfirm: () => { },
+ *   onCancel: () => { }
+ * });
+ * ```
+ *
+ * @remarks
+ * - Use Dialog.Alert for simple, preconfigured alert dialogs.
+ * - Customize button labels, order, and appearance using the `confirmButton`, `cancelButton`, and `buttonsOrder` props.
+ * - The alert dialog can be styled using `messageVariant` and `messageClassName`.
+ */
 Dialog.Alert = DialogAlert;
 
 type IDialogControlledCallback<Context = unknown> = (dialog: DialogControlled<Context>) => void;
@@ -335,51 +618,150 @@ interface IDialogControllableProps<Context = unknown, IsControlled extends boole
   ref?: Ref<IDialogContext<Context, IsControlled>>;
 }
 
+/**
+ * Represents an action button or item that can be displayed in the dialog's app bar or action area.
+ *
+ * This interface extends {@link IAppBarActionProps} and adds dialog-specific options, such as controlling
+ * the visibility of the action in full screen mode.
+ *
+ * @typeParam Context - The type of the custom context object passed to the dialog.
+ * @typeParam IsControlled - Indicates whether the dialog is controlled (true) or uncontrolled (false).
+ *
+ * @property showInFullScreen - Controls whether the action is visible when the dialog is in full screen mode.
+ *
+ * @example
+ * ```tsx
+ * // Example: Hide an action in full screen mode
+ * const actions = [
+ *   {
+ *     label: "Close",
+ *     icon: "close",
+ *     onPress: handleClose,
+ *     showInFullScreen: false // Only show when NOT in full screen
+ *   },
+ *   {
+ *     label: "Save",
+ *     icon: "save",
+ *     onPress: handleSave
+ *     // showInFullScreen defaults to true, so this action is always visible
+ *   }
+ * ];
+ * 
+ * <Dialog actions={actions} />
+ * ```
+ *
+ * @remarks
+ * - Use `showInFullScreen: false` for actions that should only appear in modal (windowed) dialogs.
+ * - By default, actions are shown in both full screen and modal dialogs.
+ * - This is useful for minimizing clutter in mobile or tablet full screen dialogs.
+ *
+ * @see IAppBarActionProps
+ * @see Dialog
+ * @see DialogControllable
+ */
 export interface IDialogActionProps<Context = unknown, IsControlled extends boolean = false> extends IAppBarActionProps<IDialogContext<Context, IsControlled>> {
   /**
-    * Whether the action should be visible when the dialog is in full screen mode.
-    * 
-    * When set to `false`, the action will be hidden when the dialog is displayed
-    * in full screen mode. This is useful for actions that are not relevant or
-    * take up unnecessary space in full screen layouts.
-    * 
-    * @example
-    * ```tsx
-    * // Action only visible in windowed mode
-    * {
-    *   label: "Minimize",
-    *   onPress: handleMinimize,
-    *   showInFullScreen: false
-    * }
-    * 
-    * // Action visible in both modes (default)
-    * {
-    *   label: "Save",
-    *   onPress: handleSave,
-    *   showInFullScreen: true // or omit (default)
-    * }
-    * ```
-    * 
-    * @defaultValue true
-    * @since 1.0.0
-    */
+   * Whether the action should be visible when the dialog is in full screen mode.
+   * 
+   * When set to `false`, the action will be hidden when the dialog is displayed
+   * in full screen mode. This is useful for actions that are not relevant or
+   * take up unnecessary space in full screen layouts.
+   * 
+   * @example
+   * ```tsx
+   * // Action only visible in windowed mode
+   * {
+   *   label: "Minimize",
+   *   onPress: handleMinimize,
+   *   showInFullScreen: false
+   * }
+   * 
+   * // Action visible in both modes (default)
+   * {
+   *   label: "Save",
+   *   onPress: handleSave,
+   *   showInFullScreen: true // or omit (default)
+   * }
+   * ```
+   * 
+   * @defaultValue true
+   * @since 1.0.0
+   */
   showInFullScreen?: boolean;
 };
 
+/**
+ * Represents the context object passed to dialog actions, app bar, and content.
+ *
+ * This type combines a custom context (if provided) with device layout information and dialog control methods.
+ * It is used to provide contextual data and imperative dialog controls to actions, app bar, and dialog content.
+ *
+ * @typeParam Context - The type of the custom context object passed to the dialog.
+ * @typeParam IsControlled - Indicates whether the dialog is controlled (true) or uncontrolled (false).
+ *
+ * @property deviceLayout - Information about the current device's layout and type (mobile, tablet, desktop).
+ * @property dialog - Provides imperative dialog control methods, such as `close`, `isFullScreen`, and `isControlled`.
+ *   - If the dialog is controlled, this is an instance of {@link DialogControlled}.
+ *   - Otherwise, it is an object with imperative methods for dialog control.
+ *
+ * @example
+ * ```tsx
+ * // Accessing dialog context in an action
+ * const actions = [
+ *   {
+ *     label: "Close",
+ *     onPress: (event, context) => {
+ *       if (context.deviceLayout.isMobile) {
+ *         // Do something specific for mobile
+ *       }
+ *       context.dialog.close(event); // Imperatively close the dialog
+ *     }
+ *   }
+ * ];
+ * ```
+ *
+ * @example
+ * ```tsx
+ * // Using device layout information in dialog content
+ * function CustomDialogContent({ context }: { context: IDialogContext }) {
+ *   return (
+ *     <View>
+ *       {context.deviceLayout.isTablet && <Text>This is a tablet!</Text>}
+ *       <Button onPress={() => context.dialog.close()}>Close</Button>
+ *     </View>
+ *   );
+ * }
+ * ```
+ *
+ * @remarks
+ * - Use `deviceLayout` to adapt dialog content or actions based on device type or screen size.
+ * - Use `dialog.close()` to programmatically close the dialog from within actions or content.
+ * - When using a controlled dialog, `dialog` is a {@link DialogControlled} instance, providing advanced control methods.
+ *
+ * @see DialogControlled
+ * @see IDialogActionProps
+ * @see IDialogControllableProps
+ */
 export type IDialogContext<Context = unknown, IsControlled extends boolean = false> = Context & {
   /**
    * Current device layout information and device type detection.
-   * 
+   *
    * Contains responsive layout data used to determine how the dialog should be
    * rendered and positioned based on the current device dimensions and device type.
-   * 
-   * 
+   *
    * @remarks
    * This data is typically used to:
    * - Determine dialog sizing and positioning
    * - Apply responsive styles and layouts
    * - Control fullscreen behavior on mobile devices
    * - Adjust spacing and padding based on screen real estate
+   *
+   * @example
+   * ```tsx
+   * if (context.deviceLayout.isMobile) {
+   *   // Render mobile-specific UI
+   * }
+   * ```
    */
   deviceLayout: {
     /** Current device window width in pixels */
@@ -402,29 +784,244 @@ export type IDialogContext<Context = unknown, IsControlled extends boolean = fal
      */
     screenHeight: number;
   };
+
+  /**
+   * Provides imperative dialog control methods.
+   *
+   * - If the dialog is controlled, this is an instance of {@link DialogControlled}.
+   * - Otherwise, it is an object with imperative methods for dialog control.
+   *
+   * @example
+   * ```tsx
+   * // Close the dialog from an action
+   * context.dialog.close();
+   * ```
+   */
   dialog: IsControlled extends true ? DialogControlled<Context> : {
-    close: (event: any) => void, isFullScreen: () => boolean; isControlled: () => boolean
+    /**
+     * Closes the dialog.
+     * @param event - The event that triggered the close action.
+     */
+    close: (event: any) => void;
+    /**
+     * Returns true if the dialog is currently in full screen mode.
+     */
+    isFullScreen: () => boolean;
+    /**
+     * Returns true if the dialog is controlled.
+     */
+    isControlled: () => boolean;
   };
 };
 
 
+/**
+ * Represents an action button or item specifically for controlled dialogs.
+ *
+ * This interface extends {@link IDialogActionProps} with `IsControlled` set to `true`,
+ * and is used for defining actions in dialogs that are managed imperatively via {@link DialogControlled}.
+ *
+ * @typeParam Context - The type of the custom context object passed to the dialog.
+ *
+ * @example
+ * ```tsx
+ * // Example: Define confirm and cancel actions for a controlled dialog
+ * const confirmAction: IDialogControlledActionProps = {
+ *   label: "Confirm",
+ *   icon: "check",
+ *   onPress: (event, context) => {
+ *     // Handle confirm logic
+ *     context.dialog.close();
+ *   }
+ * };
+ * 
+ * const cancelAction: IDialogControlledActionProps = {
+ *   label: "Cancel",
+ *   icon: "close",
+ *   showInFullScreen: false, // Only show in modal mode
+ *   onPress: (event, context) => {
+ *     // Handle cancel logic
+ *     context.dialog.close();
+ *   }
+ * };
+ * 
+ * <Dialog.Controlled
+ *   actions={[confirmAction, cancelAction]}
+ *   title="Controlled Dialog"
+ *   children={<Text>Dialog content</Text>}
+ * />
+ * ```
+ *
+ * @remarks
+ * - Use this type for actions passed to controlled dialogs, such as those managed by {@link DialogControlled}, {@link DialogProvider}, or {@link DialogAlert}.
+ * - Supports all properties of {@link IDialogActionProps}, including `showInFullScreen`.
+ * - Enables advanced dialog control scenarios, such as programmatic open/close and dynamic action configuration.
+ *
+ * @see IDialogActionProps
+ * @see DialogControlled
+ * @see DialogProvider
+ * @see DialogAlert
+ */
 export interface IDialogControlledActionProps<Context = unknown> extends IDialogActionProps<Context, true> { }
 
+/**
+ * Represents the properties for a controlled dialog instance.
+ *
+ * This interface extends {@link IDialogControllableProps} with `IsControlled` set to `true`,
+ * omitting the `visible` and `dialogControlledContext` properties, as these are managed internally
+ * by the controlled dialog logic.
+ *
+ * Use this interface when creating or configuring dialogs that are managed imperatively via
+ * {@link DialogControlled}, {@link DialogProvider}, or {@link DialogAlert}.
+ *
+ * @typeParam Context - The type of the custom context object passed to the dialog.
+ *
+ * @example
+ * ```tsx
+ * // Example: Open a controlled dialog with custom actions and content
+ * Dialog.Controlled.open({
+ *   title: "Controlled Dialog",
+ *   actions: [
+ *     {
+ *       label: "Confirm",
+ *       onPress: (event, context) => {
+ *         // Handle confirm logic
+ *         context.dialog.close();
+ *       }
+ *     },
+ *     {
+ *       label: "Cancel",
+ *       showInFullScreen: false,
+ *       onPress: (event, context) => {
+ *         // Handle cancel logic
+ *         context.dialog.close();
+ *       }
+ *     }
+ *   ],
+ *   children: <Text>This dialog is controlled programmatically.</Text>
+ * });
+ * ```
+ *
+ * @remarks
+ * - Use this interface for dialogs that require programmatic control over visibility and state.
+ * - All dialog configuration options (title, actions, content, etc.) are supported.
+ * - The `visible` and `dialogControlledContext` properties are omitted, as they are managed by the dialog controller.
+ *
+ * @see DialogControlled
+ * @see DialogProvider
+ * @see DialogAlert
+ * @see IDialogControllableProps
+ */
 export interface IDialogControlledProps<Context = unknown> extends Omit<IDialogControllableProps<Context, true>, "visible" | 'dialogControlledContext'> {
 
 }
 
+/**
+ * Represents the options for configuring a controlled dialog instance.
+ *
+ * This interface extends {@link IDialogControlledProps} (excluding the `ref` property)
+ * and is used for providing dialog configuration when opening or updating a controlled dialog
+ * via {@link DialogControlled}, {@link DialogProvider}, or {@link DialogAlert}.
+ *
+ * @typeParam Context - The type of the custom context object passed to the dialog.
+ *
+ * @example
+ * ```tsx
+ * // Open a controlled dialog with custom options
+ * Dialog.Controlled.open({
+ *   title: "My Controlled Dialog",
+ *   actions: [
+ *     {
+ *       label: "OK",
+ *       onPress: (event, context) => {
+ *         // Handle OK action
+ *         context.dialog.close();
+ *       }
+ *     }
+ *   ],
+ *   children: <Text>This dialog is opened with options.</Text>
+ * });
+ * ```
+ *
+ * @remarks
+ * - Use this interface to specify dialog properties when opening or updating a controlled dialog.
+ * - All dialog configuration options (title, actions, content, etc.) are supported.
+ * - The `ref` property is omitted, as it is managed internally by the dialog controller.
+ *
+ * @see DialogControlled
+ * @see DialogProvider
+ * @see DialogAlert
+ * @see IDialogControlledProps
+ */
 export interface IDialogControlledOptions<Context = unknown> extends Omit<IDialogControlledProps<Context>, "ref"> { }
 
 
+/**
+ * Represents the state of a controlled dialog instance.
+ *
+ * This interface is used internally by {@link DialogControlled} and dialog providers
+ * to manage the visibility and configuration of a dialog that is controlled imperatively.
+ *
+ * @typeParam Context - The type of the custom context object passed to the dialog.
+ *
+ * @property visible - Indicates whether the dialog is currently visible (open).
+ * @property controlledProps - The properties currently applied to the dialog instance.
+ *
+ * @example
+ * ```tsx
+ * // Example usage in a DialogControlled component
+ * const [state, setState] = useState<IDialogControlledState>({
+ *   visible: false,
+ *   controlledProps: {
+ *     title: "My Dialog",
+ *     children: <Text>Dialog content</Text>
+ *   }
+ * });
+ *
+ * // Open the dialog
+ * setState({ ...state, visible: true });
+ *
+ * // Update dialog properties
+ * setState({
+ *   visible: true,
+ *   controlledProps: {
+ *     ...state.controlledProps,
+ *     title: "Updated Title"
+ *   }
+ * });
+ * ```
+ *
+ * @see DialogControlled
+ * @see DialogProvider
+ */
 export interface IDialogControlledState<Context = unknown> {
   /**
-   * Indicates whether the dialog is currently visible.
+   * Indicates whether the dialog is currently visible (open).
+   *
+   * @remarks
+   * Set to `true` to show the dialog, or `false` to hide it.
+   *
+   * @example
+   * ```tsx
+   * if (state.visible) {
+   *   // Render dialog
+   * }
+   * ```
    */
   visible: boolean;
 
   /**
    * The properties passed to the dialog provider.
+   *
+   * @remarks
+   * These are the current dialog props (such as title, actions, children, etc.)
+   * that are applied to the dialog instance.
+   *
+   * @example
+   * ```tsx
+   * // Access the dialog title
+   * const title = state.controlledProps.title;
+   * ```
    */
   controlledProps: Omit<IDialogControlledProps<Context>, "ref">;
 }

@@ -21,6 +21,7 @@ export function Modal({ animationType = "fade", dismissible, backdropClassName, 
     const wasRendering = useRef(false);
     const generatedId = useId();
     const dismissibleRef = useRef(dismissible !== false);
+    dismissibleRef.current = dismissible !== false;
     const modalId = defaultStr(id, generatedId);
     useAccessibilityEscape(`#${modalId}`, function () {
         if (typeof onAccessibilityEscape === "function") {
@@ -98,11 +99,10 @@ export function Modal({ animationType = "fade", dismissible, backdropClassName, 
         className={cn("flex flex-col flex-1", className, modalClassName, "bg-transparent", "resk-modal")}
         style={StyleSheet.flatten([{ zIndex }, style])}
     >
-        <Backdrop
+        {backdropClassName ? <Backdrop
             testID={testID + "-modal-backdrop"}
             className={cn("resk-modal-backdrop", !visible && "pointer-events-none", backdropClassName)}
-            onPress={dismissibleRef.current ? onRequestClose : undefined}
-        />
+        /> : null}
         {children}
     </Div>, document.querySelector("#reskit-app-root") || document.body);
 }

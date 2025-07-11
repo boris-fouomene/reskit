@@ -152,8 +152,10 @@ I18nClass.RegisterTranslations({
         } as Record<IMongoOperatorName, string>,
       },
       dialog: {
-        alertOkButton: "Ok",
-        alertCancelButton: "Cancel",
+        alert: {
+          confirmButton: "Ok",
+          cancelButton: "Cancel",
+        }
       },
       notify: {
         errorTitle: "Error",

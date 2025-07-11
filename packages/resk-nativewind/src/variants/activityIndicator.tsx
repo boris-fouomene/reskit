@@ -1,17 +1,7 @@
 import { tv, VariantProps } from "tailwind-variants";
-import { VariantsColors } from "./colors/generated";
-import { VariantsOptionsFactory } from "./variantsFactory";
 import { borderClasses } from "./variantsFactory/border";
-import { Platform } from "react-native";
+import { activityIndicatorVariantOptions } from "./variantsFactory/activityIndicator";
 
-export const activityIndicatorVariantOptions = {
-    color: VariantsColors.activityIndicator,
-    size: VariantsOptionsFactory.createSize(),
-    thickness: Platform.select({
-        web: borderClasses.borderWidth,
-        native: {} as typeof borderClasses.borderWidth
-    }) as typeof borderClasses.borderWidth,
-}
 
 export const activityIndicatorVariant = tv({
     variants: activityIndicatorVariantOptions,

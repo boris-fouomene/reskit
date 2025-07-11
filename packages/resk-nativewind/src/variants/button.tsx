@@ -19,11 +19,9 @@ export const buttonVariant = tv({
                 base: value,
             }
         }),
-        activityIndicatorColor: VariantsOptionsFactory.create<typeof VariantsColors.activityIndicator, { activityIndicator: string }>(VariantsColors.activityIndicator, (value, colorName) => {
-            return {
-                activityIndicator: value,
-            }
-        }),
+        ...VariantsOptionsFactory.createActivityIndicatorVariants<{ activityIndicator: string }, "activityIndicator">((value) => {
+            return { activityIndicator: value }
+        }, "activityIndicator"),
         ...VariantsOptionsFactory.createIconVariants<{ icon: string }, "icon">((value) => {
             return {
                 icon: value,
@@ -34,6 +32,18 @@ export const buttonVariant = tv({
                 label: value,
             }
         }, "label"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<{ label: string }, "label">((value) => {
+            return { label: value }
+        }, "label"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<{ icon: string }, "icon">((value) => {
+            return { icon: value }
+        }, "icon"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<{ leftContainer: string }, "leftContainer">((value) => {
+            return { leftContainer: value }
+        }, "leftContainer"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<{ rightContainer: string }, "rightContainer">((value) => {
+            return { rightContainer: value }
+        }, "rightContainer"),
         colorScheme: VariantsColors.button,
         outline: VariantsColors.buttonOutline,
         hoverColor: VariantsOptionsFactory.createHoverBackgroundColor<{ base: string }>((value, variantName) => {

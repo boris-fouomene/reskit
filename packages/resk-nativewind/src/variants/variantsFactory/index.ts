@@ -20,6 +20,7 @@ import { flexClasses } from "./flex";
 import { iconVariants, textVariants } from "./text2icons";
 import { positionClasses } from "./position";
 import { create } from "domain";
+import { activityIndicatorVariantOptions } from "./activityIndicator";
 
 const allShadowColors = {
   shadowColor: VariantsColors.shadow,
@@ -358,6 +359,9 @@ export const VariantsOptionsFactory = {
   },
   createTextVariants: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof textVariants)[keyof typeof textVariants], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
     return VariantsOptionsFactory.createComposite<typeof textVariants, ResultType, CompositePrefix>(textVariants, variantMutator, args[0] as CompositePrefix);
+  },
+  createActivityIndicatorVariants: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof activityIndicatorVariantOptions)[keyof typeof activityIndicatorVariantOptions], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
+    return VariantsOptionsFactory.createComposite<typeof activityIndicatorVariantOptions, ResultType, CompositePrefix>(activityIndicatorVariantOptions, variantMutator, args[0] as CompositePrefix);
   },
   createIconVariants: function <ResultType = string, CompositePrefix extends string = "">(variantMutator?: IVariantFactoryMutator<(typeof iconVariants)[keyof typeof iconVariants], ResultType>, ...args: IConditionalCompositePrefix<CompositePrefix>) {
     return VariantsOptionsFactory.createComposite<typeof iconVariants, ResultType, CompositePrefix>(iconVariants, variantMutator, args[0] as CompositePrefix);

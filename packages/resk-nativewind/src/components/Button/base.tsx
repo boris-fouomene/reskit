@@ -82,7 +82,7 @@ export function ButtonBase<Context = unknown>({
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("group/btn btn relative  button select-text cursor-pointer", rippleContent ? "overflow-hidden" : "", commonVariant({ disabled }), computedVariant.base(), className)}
+            className={cn("group/btn btn relative resk-btn  button select-text cursor-pointer", rippleContent ? "overflow-hidden" : "", commonVariant({ disabled }), computedVariant.base(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}
@@ -107,7 +107,7 @@ export function ButtonBase<Context = unknown>({
                         {isValidElement(children, true) && children || label}
                     </Text>
                 </Div>
-                {(hasRightContent) ? <Div testID={testID + "-right-content-wrapper"} id={`${buttonId}-right-content-wrapper`} className={cn("button-right-container", rowClassName, computedVariant.rightContainer(), rightContainerClassName)}>
+                {(hasRightContent) ? <Div testID={testID + "-right-contentainer"} id={`${buttonId}-right-container`} className={cn("button-right-container", rowClassName, computedVariant.rightContainer(), rightContainerClassName)}>
                     {iconPosition == "right" ? iconContent : null}
                     {rightContent}
                 </Div> : null}

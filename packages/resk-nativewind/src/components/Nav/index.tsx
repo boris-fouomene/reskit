@@ -19,7 +19,7 @@ export class Nav {
         return <Button
             testID="nav-item"
             {...props}
-            className={cn("p-[7px]", className)}
+            className={cn(className)}
         />
     }
     static Items<Context = unknown>({ items: customItems, renderItem, renderExpandableItem, testID, ...rest }: INavItemsProps<Context>) {

@@ -96,7 +96,12 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
       minimized,
       permanent,
     };
-    Object.assign(this.state, { children: this.prepareChildrenState(props) });
+    const children = this.prepareChildrenState(props);
+    if (this.isProvider()) {
+      this.setState({ providerOptions: { ...this.state.providerOptions, children: this.prepareChildrenState(props) } });
+    } else {
+      Object.assign(this.state, { children });
+    }
   }
   /**
    * Determines if the drawer component is minimizable.
@@ -403,11 +408,12 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     return Session.set(key, value);
   }
   render() {
-    const { contentClassName, style, className } = this.getComponentProps();
+    const { containerClassName, children, className } = this.getComponentProps();
     const { accessibilityViewIsModal, drawerShown, openValue } = this.state;
     const testID = this.getTestID();
     const permanent = this.isPermanent();
     const drawerWidth = this.getDrawerWidth();
+    const isProvider = this.isProvider();
 
     const posRight = this.isPositionRight();
     const outputRange = permanent ? [0, 0] : this.getDrawerPosition() === "left" ? [-drawerWidth, 0] : [drawerWidth, 0];
@@ -416,19 +422,20 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
       outputRange,
       extrapolate: "clamp",
     });
-    const Wrapper = this.isProvider() ? Modal : Fragment;
-    const wrapperProps = this.isProvider() || !permanent ? { backdropClassName: cn("resk-drawer-backdrop"), className: "resk-drawer-modal", withBackdrop: true, testID: testID + "-modal", animationType: "none", visible: this.isOpen() } as IModalProps : {};
+    const canRenderTemp = isProvider || !permanent;
+    const Wrapper = canRenderTemp ? Modal : Fragment;
+    const wrapperProps = canRenderTemp ? { backdropClassName: cn("resk-drawer-backdrop"), className: "resk-drawer-modal", withBackdrop: true, testID: testID + "-modal", animationType: "none", visible: this.isOpen() } as IModalProps : {};
     return (
       <Wrapper {...wrapperProps} onRequestClose={this.close.bind(this)}>
-        {!permanent ? (<Backdrop onPress={() => this.close.bind(this)} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
         <DrawerContext.Provider value={{ drawer: this }}>
-          <View testID={testID} className={cn("h-full flex-col", className)} {...this._panResponder.panHandlers} style={StyleSheet.flatten([{ maxWidth: drawerWidth }, style])}>
+          <View testID={testID + "-container"} className={cn("resk-drawer-container relative  h-full flex-col", isProvider && "resk-drawer-provider-container", containerClassName)} {...this._panResponder.panHandlers}>
+            {!permanent ? (<Backdrop onPress={() => this.close.bind(this)} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
             <Animated.View
               testID={testID + "-animated-content"}
               accessibilityViewIsModal={accessibilityViewIsModal}
               className={cn("resk-drawer-animated")}
               style={[
-                permanent ? { position: "relative" } : { position: "absolute", top: 0, bottom: 0, left: 0, right: 0 },
+                permanent ? { position: "relative" } : { position: "absolute", zIndex: 10, top: 0, bottom: 0, left: 0, right: 0 },
                 {
 
                   pointerEvents: "auto",
@@ -440,9 +447,9 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
                 }
               ]}
             >
-              <Div className={cn("flex-1 w-full h-full flex-col", contentClassName)} testID={testID + "drawer-content"}>
+              <Div className={cn("flex-1 w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", className)} testID={testID + "drawer-content"}>
                 {this.renderHeader()}
-                {this.isProvider() && this.state.providerOptions ? this.state.providerOptions.children : this.state.children}
+                {isProvider ? (this.state.providerOptions ? this.state.providerOptions.children : null) : this.state.children}
               </Div>
             </Animated.View>
           </View>
@@ -973,7 +980,7 @@ export interface IDrawerProps extends Omit<ViewProps, "ref" | "children"> {
 
   withAppBar?: boolean;
 
-  contentClassName?: IClassName;
+  containerClassName?: IClassName;
 }
 
 

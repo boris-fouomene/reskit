@@ -13,7 +13,7 @@ import { isValidElement } from "@utils";
 import Breakpoints from "@breakpoints";
 import { Animated, Dimensions, Keyboard, PanResponder, StyleSheet, TouchableWithoutFeedback, GestureResponderEvent, PanResponderGestureState, I18nManager } from "react-native";
 import { Portal } from "@components/Portal";
-import {View} from "@components/View";
+import { View } from "@components/View";
 import { Colors, useTheme } from "@theme";
 import { getDrawerWidth } from "./utils";
 import FontIcon from "@components/Icon/Font";

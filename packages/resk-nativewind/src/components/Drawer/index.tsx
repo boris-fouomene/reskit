@@ -428,7 +428,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
               accessibilityViewIsModal={accessibilityViewIsModal}
               className={cn("resk-drawer-animated")}
               style={[
-                permanent ? { position: "relative" } : { pointerEvents: "auto", cursor: "pointer", position: "absolute", zIndex: 10, top: 0, bottom: 0, left: 0, right: 0 },
+                permanent ? { position: "relative" } : { position: "absolute", zIndex: 10, top: 0, bottom: 0, left: 0, right: 0 },
                 {
 
                   pointerEvents: "auto",

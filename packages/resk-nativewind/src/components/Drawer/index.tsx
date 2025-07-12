@@ -904,7 +904,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
       <Wrapper {...wrapperProps}>
         <DrawerContext.Provider value={{ drawer: this }}>
           <Div testID={testID + "-container"} className={cn("resk-drawer-container relative h-full flex-col items-start justify-start", isProvider && "resk-drawer-provider-container", computedVariant.container(), containerClassName)}>
-            {!permanent ? (<Backdrop onPress={() => this.close()} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
+            {!permanent && this.isOpen() ? (<Backdrop onPress={() => this.close()} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
             {<Animated.View
               {...(canRenderTemp ? this._panResponder.panHandlers : {})}
               testID={testID + "-animated-content"}

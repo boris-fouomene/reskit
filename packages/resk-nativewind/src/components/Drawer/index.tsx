@@ -429,7 +429,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
       <Wrapper {...wrapperProps} onRequestClose={this.close.bind(this)}>
         <DrawerContext.Provider value={{ drawer: this }}>
           <View testID={testID + "-container"} className={cn("resk-drawer-container relative  h-full flex-col", isProvider && "resk-drawer-provider-container", containerClassName)} {...this._panResponder.panHandlers}>
-            {!permanent ? (<Backdrop onPress={() => this.close.bind(this)} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
+            {!permanent ? (<Backdrop onPress={() => this.close()} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
             <Animated.View
               testID={testID + "-animated-content"}
               accessibilityViewIsModal={accessibilityViewIsModal}

@@ -5,13 +5,14 @@ import { defaultStr } from "@resk/core/utils";
 import { Backdrop } from "@components/Backdrop";
 import { cn } from "@utils/cn";
 import { JSX } from "react";
+import { commonVariant } from "@variants/common";
 
-export function Modal({ children, dismissible, visible, onRequestClose, testID, backdropClassName, ...props }: IModalProps): JSX.Element {
+export function Modal({ children, dismissible, withBackdrop, visible, onRequestClose, testID, backdropClassName, ...props }: IModalProps): JSX.Element {
     testID = defaultStr(testID, "resk-modal");
     return <RNModal animationType="fade"  {...props} visible={!!visible} transparent>
-        {backdropClassName ? <Backdrop
+        {backdropClassName && withBackdrop !== false ? <Backdrop
             testID={testID + "-modal-backdrop"}
-            className={cn("resk-modal-backdrop", backdropClassName)}
+            className={cn("resk-modal-backdrop", commonVariant({ backdrop: withBackdrop }), backdropClassName)}
         /> : null}
         {children}
     </RNModal>

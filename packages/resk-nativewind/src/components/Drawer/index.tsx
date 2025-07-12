@@ -403,7 +403,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     return Session.set(key, value);
   }
   render() {
-    const { contentClassName, className } = this.getComponentProps();
+    const { contentClassName, style, className } = this.getComponentProps();
     const { accessibilityViewIsModal, drawerShown, openValue } = this.state;
     const testID = this.getTestID();
     const permanent = this.isPermanent();
@@ -417,11 +417,12 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
       extrapolate: "clamp",
     });
     const Wrapper = this.isProvider() ? Modal : Fragment;
-    const wrapperProps = this.isProvider() ? { testID: testID + "-portal", animationType: "none", visible: this.isOpen() } as IModalProps : {};
+    const wrapperProps = this.isProvider() || !permanent ? { backdropClassName: cn("resk-drawer-backdrop"), className: "resk-drawer-modal", withBackdrop: true, testID: testID + "-modal", animationType: "none", visible: this.isOpen() } as IModalProps : {};
     return (
-      <Wrapper {...wrapperProps}>
+      <Wrapper {...wrapperProps} onRequestClose={this.close.bind(this)}>
+        {!permanent ? (<Backdrop onPress={() => this.close.bind(this)} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
         <DrawerContext.Provider value={{ drawer: this }}>
-          <View testID={testID} className={cn("h-full flex-1 flex-col", className)} {...this._panResponder.panHandlers}>
+          <View testID={testID} className={cn("h-full flex-col", className)} {...this._panResponder.panHandlers} style={StyleSheet.flatten([{ maxWidth: drawerWidth }, style])}>
             <Animated.View
               testID={testID + "-animated-content"}
               accessibilityViewIsModal={accessibilityViewIsModal}
@@ -439,7 +440,6 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
                 }
               ]}
             >
-              {!permanent ? (<Backdrop onPress={() => this.close.bind(this)} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop", commonVariant({ backdrop: true }))} />) : null}
               <Div className={cn("flex-1 w-full h-full flex-col", contentClassName)} testID={testID + "drawer-content"}>
                 {this.renderHeader()}
                 {this.isProvider() && this.state.providerOptions ? this.state.providerOptions.children : this.state.children}
@@ -503,6 +503,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
   }
 
   close(callback?: IDrawerCallback): Drawer {
+    console.log("closing me ", this);
     this._emitStateChanged(SETTLING);
     callback = typeof callback == "function" ? callback : undefined;
     const callOptions = this.getCallOptions();

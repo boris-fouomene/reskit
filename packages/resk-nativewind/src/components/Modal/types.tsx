@@ -16,4 +16,7 @@ export interface IModalProps extends Omit<ModalProps, "onShow" | "onRequestClose
      * @default : true
      */
     dismissible?: boolean;
+
+
+    withBackdrop?: boolean;
 }

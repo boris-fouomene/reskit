@@ -12,10 +12,11 @@ import { useAccessibilityEscape } from "@html/accessibility";
 import { Div } from "@html/Div";
 import { createPortal } from "react-dom";
 import { Backdrop } from "@components/Backdrop";
+import { commonVariant } from "@variants/common";
 
 
 const hiddenStyle = "resk-modal-hidden opacity-0 invisible";
-export function Modal({ animationType = "fade", dismissible, backdropClassName, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): JSX.Element | null {
+export function Modal({ animationType = "fade", dismissible, withBackdrop, backdropClassName, onAccessibilityEscape, testID, onRequestClose, className: modalClassName, id, transparent = true, style, children, onDismiss, onShow, visible, ...props }: IModalProps): JSX.Element | null {
     const [isRendering, setIsRendering] = useState(false);
     const wasVisible = useRef(false);
     const wasRendering = useRef(false);
@@ -99,9 +100,9 @@ export function Modal({ animationType = "fade", dismissible, backdropClassName, 
         className={cn("flex flex-col flex-1", className, modalClassName, "bg-transparent", "resk-modal")}
         style={StyleSheet.flatten([{ zIndex }, style])}
     >
-        {backdropClassName ? <Backdrop
+        {backdropClassName && withBackdrop !== false ? <Backdrop
             testID={testID + "-modal-backdrop"}
-            className={cn("resk-modal-backdrop", !visible && "pointer-events-none", backdropClassName)}
+            className={cn("resk-modal-backdrop", commonVariant({ backdrop: withBackdrop }), !visible && "pointer-events-none", backdropClassName)}
         /> : null}
         {children}
     </Div>, document.querySelector("#reskit-app-root") || document.body);

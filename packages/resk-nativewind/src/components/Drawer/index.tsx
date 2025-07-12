@@ -17,7 +17,7 @@ import { INavItemProps, INavItemsProps, Nav } from "@components/Nav";
 import { Modal } from "@components/Modal";
 import { IModalProps } from "@components/Modal/types";
 import { IIconVariant } from "@variants/icon";
-import { commonVariant } from "@variants/common";
+import { drawerVariant, IDrawerVariant } from "@variants/drawer";
 
 const useNativeDriver = Platform.canUseNativeDriver();
 const MIN_SWIPE_DISTANCE = 3;
@@ -311,20 +311,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     return this.isProvider() && !this.canBeMinimizedOrPermanent();
   }
 
-  /**
-   * Toggles the full-screen mode of the drawer component.
-   * 
-   * This method animates the `openValue` state using a spring animation to transition
-   * to the full-screen mode. The animation configuration includes properties such as
-   * `bounciness`, `restSpeedThreshold`, and `useNativeDriver`.
-   * 
-   * Once the animation completes, the `fullScreen` state is toggled, and the `_isTogglingFullScreen`
-   * flag is reset to `false`.
-   * 
-   * @remarks
-   * This method sets the `_isTogglingFullScreen` flag to `true` at the start to indicate
-   * that the full-screen toggle process is in progress.
-   */
+
   toggleFullScreen(): void {
     this._isTogglingFullScreen = true;
     Animated.spring(this.state.openValue, {
@@ -407,9 +394,14 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
   setSession(key: string, value?: any): any {
     return Session.set(key, value);
   }
+  computeVariant(): ReturnType<typeof drawerVariant> {
+    const { variant } = this.getComponentProps();
+    return drawerVariant({ ...variant, permanent: this.isPermanent() });
+  }
   render() {
     const { containerClassName, children, className } = this.getComponentProps();
     const { accessibilityViewIsModal, drawerShown, openValue } = this.state;
+    const computedVariant = this.computeVariant();
     const testID = this.getTestID();
     const permanent = this.isPermanent();
     const drawerWidth = this.getDrawerWidth();
@@ -424,13 +416,14 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     });
     const canRenderTemp = isProvider || !permanent;
     const Wrapper = canRenderTemp ? Modal : Fragment;
-    const wrapperProps = canRenderTemp ? { backdropClassName: cn("resk-drawer-backdrop"), className: "resk-drawer-modal", withBackdrop: true, testID: testID + "-modal", animationType: "none", visible: this.isOpen() } as IModalProps : {};
+    const wrapperProps = canRenderTemp ? { backdropClassName: cn("resk-drawer-backdrop"), className: "resk-drawer-modal", withBackdrop: true, testID: testID + "-modal", animationType: "fade", visible: this.isOpen() } as IModalProps : {};
     return (
       <Wrapper {...wrapperProps} onRequestClose={this.close.bind(this)}>
         <DrawerContext.Provider value={{ drawer: this }}>
-          <View testID={testID + "-container"} className={cn("resk-drawer-container relative  h-full flex-col", isProvider && "resk-drawer-provider-container", containerClassName)} {...this._panResponder.panHandlers}>
+          <View testID={testID + "-container"} className={cn("resk-drawer-container relative  h-full flex-col", isProvider && "resk-drawer-provider-container", computedVariant.container(), containerClassName)}>
             {!permanent ? (<Backdrop onPress={() => this.close()} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
             <Animated.View
+              {...(canRenderTemp ? this._panResponder.panHandlers : {})}
               testID={testID + "-animated-content"}
               accessibilityViewIsModal={accessibilityViewIsModal}
               className={cn("resk-drawer-animated")}
@@ -447,7 +440,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
                 }
               ]}
             >
-              <Div className={cn("flex-1 w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", className)} testID={testID + "drawer-content"}>
+              <Div className={cn("flex-1 w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", computedVariant.base(), className)} testID={testID + "drawer-content"}>
                 {this.renderHeader()}
                 {isProvider ? (this.state.providerOptions ? this.state.providerOptions.children : null) : this.state.children}
               </Div>
@@ -510,7 +503,6 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
   }
 
   close(callback?: IDrawerCallback): Drawer {
-    console.log("closing me ", this);
     this._emitStateChanged(SETTLING);
     callback = typeof callback == "function" ? callback : undefined;
     const callOptions = this.getCallOptions();
@@ -904,7 +896,7 @@ export interface IDrawerProps extends Omit<ViewProps, "ref" | "children"> {
 
   /**
    * Determines if the drawer should close when clicking on the overlay.
-   * This is only applicable when the drawer is in temporary mode.
+   * This is only applicable when the drawer is in permanent mode.
    * @default false
    */
   closeOnOverlayClick?: boolean;
@@ -981,6 +973,8 @@ export interface IDrawerProps extends Omit<ViewProps, "ref" | "children"> {
   withAppBar?: boolean;
 
   containerClassName?: IClassName;
+
+  variant?: IDrawerVariant;
 }
 
 

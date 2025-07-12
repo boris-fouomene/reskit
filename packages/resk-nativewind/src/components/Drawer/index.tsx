@@ -416,7 +416,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
   render() {
     const { containerClassName, items, itemsProps, style, children, className, hydrationFallback } = this.getComponentProps();
     if (!this.isHydrated()) {
-      return hydrationFallback || <VStack className={cn("p-10 h-full resk-drawer-no-hydration-fallback items-center justify-center", className)}>
+      return hydrationFallback || <VStack className={cn("p-4 h-full resk-drawer-no-hydration-fallback items-center justify-center", className)}>
         <ActivityIndicator variant={{ color: "primary" }} />
       </VStack>;
     }

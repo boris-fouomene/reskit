@@ -454,6 +454,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
                   pointerEvents: "auto",
                   flex: 1,
                   width: drawerWidth,
+                  height: "100%",
                   left: !posRight ? 0 : null,
                   right: posRight ? 0 : null,
                   transform: [{ translateX: drawerTranslateX }],

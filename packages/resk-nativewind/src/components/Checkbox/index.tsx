@@ -111,18 +111,18 @@ export function Checkbox({ testID, variant, checkedIconName, uncheckedIconName, 
         className={cn(containerClassName)}
     >
         {isLabelOnLeftSide ? labelContent : null}
-        <TouchableWithoutFeedback disabled={disabled} onPress={handleOnPress} testID={testID + "-checkbox-container"}>
-            <FontIcon
-                {...nonTouchableProps}
-                disabled={disabled}
-                accessibilityRole="checkbox"
-                className={cn(iconClx, computedVariant.icon(), checked ? checkedClassName : uncheckedClassName)}
-                variant={checked ? checkedVariant : uncheckedVariant}
-                name={(checked ? iconChecked as never : iconUnchecked as never)}
-                testID={checkboxTestID}
-                title={undefined}
-            />
-        </TouchableWithoutFeedback>
+        <FontIcon
+            {...nonTouchableProps}
+            disabled={disabled}
+            onPress={handleOnPress}
+            //testID={testID + "-checkbox-container"}
+            accessibilityRole="checkbox"
+            className={cn(iconClx, computedVariant.icon(), checked ? checkedClassName : uncheckedClassName)}
+            variant={checked ? checkedVariant : uncheckedVariant}
+            name={(checked ? iconChecked as never : iconUnchecked as never)}
+            testID={checkboxTestID}
+            title={undefined}
+        />
         {!isLabelOnLeftSide ? labelContent : null}
     </Tooltip>
 }

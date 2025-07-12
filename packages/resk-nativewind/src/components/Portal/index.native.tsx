@@ -125,7 +125,7 @@ export function PortalProvider({ children }: { children?: ReactNode }): JSX.Elem
     const testID = "portal";
     return (
         <InternalPortalContext.Provider value={{ addPortal, removePortal, portals: portalRefs.current }}>
-            <View testID={testID + "-container"} style={{ flex: 1 }} pointerEvents="box-none">
+            <View testID={testID + "-container"} style={{ flex: 1 }}>
                 {children}
                 {portalRefs.current.map(({ key, children, props }, index) => {
                     return (

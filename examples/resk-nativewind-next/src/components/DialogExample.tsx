@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, HStack, Dialog, Alert, Preloader, Drawer } from "@resk/nativewind";
+import { Button, HStack, Dialog, Alert, Preloader, Drawer, useDrawer } from "@resk/nativewind";
 import { B, Div, H2, Text } from "@resk/nativewind/html";
 import { useState } from "react";
 
@@ -90,10 +90,25 @@ export function DialogExample() {
 
         <Button onPress={() => {
             Drawer.Provider.open({
-                children: <Text>A Drawer Children</Text>
+                children: <Text>Tallll</Text>,
+                position: "left"
             })
         }} variant={{ colorScheme: "primary" }}>
             Open Drawer
         </Button>
+    </>
+}
+
+export function DrawerChildren() {
+    const drawerContext = useDrawer();
+    if (!drawerContext) return null;
+    const { drawer } = drawerContext;
+    return <>
+        <Div className="p-5">
+            <Div className="flex flex-row justify-between items-center">
+                <Button variant={{ colorScheme: "primary" }} onPress={() => drawer.close()}>Close</Button>
+                <Text>Drawer Children</Text>
+            </Div>
+        </Div>
     </>
 }

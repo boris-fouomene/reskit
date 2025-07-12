@@ -3,6 +3,7 @@ import { ScrollView } from 'react-native';
 import { DialogExample } from './DialogExample';
 import { BottomSheetExample } from './BottomSheetExample';
 import { AlertExamples } from './AlertExamples';
+import { DrawerChildren } from './DialogExample';
 import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, buttonVariant, SelectCountry, TelInput, Drawer } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
@@ -12,7 +13,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   return (
     <Div className="flex flex-1 flex-row justify-start items-start">
       <Drawer>
-
+        <DrawerChildren />
       </Drawer>
       <ScrollView testID='main-entry-appp' style={{ flex: 1 }}>
         <DialogExample />

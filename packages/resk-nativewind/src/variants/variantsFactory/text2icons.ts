@@ -3,6 +3,7 @@ import { textAlignClasses } from "./textAlignClasses";
 import { fontWeightClasses } from "./fontWeight";
 import { textSizes } from "./textSizes";
 import { iconSizes } from "./iconSizes";
+import { sizesClasses } from "./sizes";
 
 export const textVariants = {
     color: VariantsColors.text,
@@ -19,4 +20,5 @@ export const iconVariants = {
     hoverColor: VariantsColors.hoverIcon,
     activeColor: VariantsColors.activeIcon,
     ...iconSizes,
+    imageSize: sizesClasses,
 } as const;

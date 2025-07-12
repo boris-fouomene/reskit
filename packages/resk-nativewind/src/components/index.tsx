@@ -28,3 +28,4 @@ export * from "./Alert";
 export { Portal } from "./Portal";
 export * from "./Portal/types";
 export * from "./Dialog";
+export * from "./Drawer";

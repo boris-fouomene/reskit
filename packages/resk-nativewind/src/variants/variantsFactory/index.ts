@@ -20,6 +20,7 @@ import { flexClasses } from "./flex";
 import { iconVariants, textVariants } from "./text2icons";
 import { positionClasses } from "./position";
 import { activityIndicatorVariantOptions } from "./activityIndicator";
+import { sizesClasses } from "./sizes";
 
 const breakpoints: IVariantOptionResponsiveBreakpoint[] = ["sm", "md", "lg", "xl", "2xl"];
 
@@ -82,11 +83,8 @@ export const VariantsOptionsFactory = {
       return value as any;
     });
   },
-  createSize: function <ResultType = string>(variantMutator?: IVariantOptionMutator<typeof width2heightClasses.width, ResultType>) {
-    return VariantsOptionsFactory.create<typeof width2heightClasses.width, ResultType>(width2heightClasses.width, (value, compositeKey) => {
-      value = `${value} ${value.replaceAll("w-", "h-")}` as any;
-      return typeof variantMutator == "function" ? variantMutator(value, compositeKey) : (value as any);
-    });
+  createSize: function <ResultType = string>(variantMutator?: IVariantOptionMutator<typeof sizesClasses, ResultType>) {
+    return VariantsOptionsFactory.create<typeof sizesClasses, ResultType>(sizesClasses, variantMutator);
   },
   createPadding: function <ResultType = string>(variantMutator?: IVariantOptionMutator<typeof paddingClasses.padding, ResultType>) {
     return VariantsOptionsFactory.create<typeof paddingClasses.padding, ResultType>(paddingClasses.padding, variantMutator);

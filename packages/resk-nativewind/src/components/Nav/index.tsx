@@ -37,11 +37,10 @@ export class Nav {
     }
     static ExpandableItem<Context = unknown>({ testID, as, dividerClassName, items, divider, expandableProps, children, ref, ...props }: INavItemProps<Context> & { as?: IReactComponent<INavItemProps<Context>> }) {
         testID = defaultStr(testID, "resk-nav-expandable-item");
-        expandableProps = Object.assign({}, expandableProps);
         return <Details
             testID={testID + "-expandable-item"}
             {...expandableProps}
-            className={cn("w-full", expandableProps.className)}
+            className={cn("w-full", expandableProps?.className)}
             summary={<ExpandableItemLabel as={as} {...props} ref={ref} />}
             children={<>
                 {children}

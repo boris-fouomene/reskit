@@ -469,7 +469,7 @@ export class Preloader extends createProvider<Omit<IDialogControlledProps, "chil
     const testID = options.testID = defaultStr(options.testID, "resk-dialog-preloader");
     const { content: children, activityIndicatorVariant, textClassName, textVariant: tVariant, withActivityIndicator, activityIndicatorClassName, contentContainerClassName, activityIndicatorPosition, ...rest } = options;
     const content = isValidElement(children, false) ? children : <Text numberOfLines={10} testID={testID + "-content"} variant={{ marginX: 2, ...tVariant }} className={cn("resk-preloader-content", textClassName)}>{children as ReactNode || 'Loading...'}</Text>;
-    const indicator = withActivityIndicator === false ? null : <ActivityIndicator size={"large"} variant={activityIndicatorVariant} className={cn("resk-dialog-preloader-indicator", activityIndicatorClassName)} />;
+    const indicator = withActivityIndicator === false ? null : <ActivityIndicator size={"large"} variant={{ marginX: 2, ...activityIndicatorVariant }} className={cn("resk-dialog-preloader-indicator", activityIndicatorClassName)} />;
     const indicatorOnRight = activityIndicatorPosition === "right";
     (rest as any).children = indicator ? <Div testID={testID + "-content-container"} className={cn("resk-dialog-preloader-container flex flex-row items-center justify-start py-1 flex-wrap", contentContainerClassName)}>
       {!indicatorOnRight ? indicator : null}

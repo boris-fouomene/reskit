@@ -1,11 +1,11 @@
 "use client";
 import { createContext, createRef, Fragment, ReactElement, ReactNode, Ref, RefObject, useContext } from "react";
-import { Breakpoints, cn, createProvider, ObservableComponent } from "@utils/index";
+import { Breakpoints, cn, createProvider, getInitialHydrationStatus, ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";
 import { defaultStr, isNumber, isObj } from "@resk/core/utils";
 import i18n from "@resk/core/i18n";
 import { isValidElement } from "react";
-import { Animated, Dimensions, Keyboard, PanResponder, GestureResponderEvent, PanResponderGestureState, I18nManager, ViewProps, View } from "react-native";
+import { Animated, Dimensions, Keyboard, PanResponder, GestureResponderEvent, PanResponderGestureState, I18nManager, ViewProps, StyleSheet, EmitterSubscription } from "react-native";
 import FontIcon from "@components/Icon/Font";
 import { Tooltip } from "@components/Tooltip";
 import Platform from "@platform";
@@ -18,6 +18,9 @@ import { Modal } from "@components/Modal";
 import { IModalProps } from "@components/Modal/types";
 import { IIconVariant } from "@variants/icon";
 import { drawerVariant, IDrawerVariant } from "@variants/drawer";
+import { VStack } from "@components/Stack";
+import { ActivityIndicator } from "@components/ActivityIndicator";
+
 
 const useNativeDriver = Platform.canUseNativeDriver();
 const MIN_SWIPE_DISTANCE = 3;
@@ -79,7 +82,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
    * @private
    */
   _navigationViewRef: any = createRef();
-  readonly _dimensionChangedListener = Dimensions.addEventListener('change', this._onDimensionsChanged.bind(this));
+  private _dimensionChangedListener: EmitterSubscription | undefined;
   constructor(props: IDrawerProps) {
     super(props);
     const permSession = this.getSession("permanent");
@@ -95,6 +98,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
       openValue: new Animated.Value(drawerShown ? 1 : 0) as Animated.Value,
       minimized,
       permanent,
+      isHydrated: getInitialHydrationStatus(),
     };
     const children = this.prepareChildrenState(props);
     if (this.isProvider()) {
@@ -261,23 +265,34 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     super.componentWillUnmount();
     this._dimensionChangedListener?.remove();
   }
+  isHydrated() {
+    return this.state.isHydrated;
+  }
   componentDidMount() {
     super.componentDidMount();
-    const { openValue } = this.state;
-    openValue.addListener(({ value }) => {
-      const drawerShown = value > 0;
-      const accessibilityViewIsModal = drawerShown;
-      if (drawerShown !== this.state.drawerShown) {
-        this.setState({ drawerShown, accessibilityViewIsModal });
-      }
-      if (this.props.keyboardDismissMode === "on-drag") {
-        Keyboard.dismiss();
-      }
-      this._lastOpenValue = value;
-      if (this.props.onDrawerSlide) {
-        this.props.onDrawerSlide(this.getCallOptions());
-      }
-    });
+    const callback = () => {
+      this._dimensionChangedListener = Dimensions.addEventListener('change', this._onDimensionsChanged.bind(this));
+      const { openValue } = this.state;
+      openValue?.addListener(({ value }) => {
+        const drawerShown = value > 0;
+        const accessibilityViewIsModal = drawerShown;
+        if (drawerShown !== this.state.drawerShown) {
+          this.setState({ drawerShown, accessibilityViewIsModal });
+        }
+        if (this.props.keyboardDismissMode === "on-drag") {
+          Keyboard.dismiss();
+        }
+        this._lastOpenValue = value;
+        if (this.props.onDrawerSlide) {
+          this.props.onDrawerSlide(this.getCallOptions());
+        }
+      });
+    }
+    if (!this.state.isHydrated) {
+      this.setState({ isHydrated: true }, callback);
+    } else {
+      callback();
+    }
   }
 
   /**
@@ -399,7 +414,12 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     return drawerVariant({ ...variant, permanent: this.isPermanent() });
   }
   render() {
-    const { containerClassName, items, itemsProps, children, className } = this.getComponentProps();
+    const { containerClassName, items, itemsProps, style, children, className, hydrationFallback } = this.getComponentProps();
+    if (!this.isHydrated()) {
+      return hydrationFallback || <VStack className={cn("p-10 h-full resk-drawer-no-hydration-fallback items-center justify-center", className)}>
+        <ActivityIndicator variant={{ color: "primary" }} />
+      </VStack>;
+    }
     const { accessibilityViewIsModal, drawerShown, openValue } = this.state;
     const computedVariant = this.computeVariant();
     const testID = this.getTestID();
@@ -416,13 +436,13 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     });
     const canRenderTemp = isProvider || !permanent;
     const Wrapper = canRenderTemp ? Modal : Fragment;
-    const wrapperProps = canRenderTemp ? { backdropClassName: cn("resk-drawer-backdrop"), className: "resk-drawer-modal", withBackdrop: true, testID: testID + "-modal", animationType: "fade", visible: this.isOpen() } as IModalProps : {};
+    const wrapperProps = canRenderTemp ? { backdropClassName: cn("resk-drawer-backdrop"), onRequestClose: this.close.bind(this), className: "resk-drawer-modal", withBackdrop: true, testID: testID + "-modal", animationType: "fade", visible: this.isOpen() } as IModalProps : {};
     return (
-      <Wrapper {...wrapperProps} onRequestClose={this.close.bind(this)}>
+      <Wrapper {...wrapperProps}>
         <DrawerContext.Provider value={{ drawer: this }}>
-          <View testID={testID + "-container"} className={cn("resk-drawer-container relative  h-full flex-col", isProvider && "resk-drawer-provider-container", computedVariant.container(), containerClassName)}>
+          <Div testID={testID + "-container"} className={cn("resk-drawer-container relative h-full flex-col items-start justify-start", isProvider && "resk-drawer-provider-container", computedVariant.container(), containerClassName)}>
             {!permanent ? (<Backdrop onPress={() => this.close()} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
-            <Animated.View
+            {<Animated.View
               {...(canRenderTemp ? this._panResponder.panHandlers : {})}
               testID={testID + "-animated-content"}
               accessibilityViewIsModal={accessibilityViewIsModal}
@@ -440,16 +460,16 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
                 }
               ]}
             >
-              <Div className={cn("flex-1 pointer-events-auto w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", computedVariant.base(), className)} testID={testID + "drawer-content"}>
+              {<Div style={StyleSheet.flatten(style)} className={cn("flex-1 pointer-events-auto w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", computedVariant.base(), className)} testID={testID + "drawer-content"}>
                 {this.renderHeader()}
                 {Array.isArray(items) && items.length > 0 ? <DrawerItems
                   {...itemsProps}
                   items={items}
                 /> : null}
                 {isProvider ? (this.state.providerOptions ? this.state.providerOptions.children : null) : this.state.children}
-              </Div>
-            </Animated.View>
-          </View>
+              </Div>}
+            </Animated.View>}
+          </Div>
         </DrawerContext.Provider>
       </Wrapper>
     );
@@ -465,7 +485,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     }
   }
   _onDimensionsChanged() {
-    if (this.props.bindResizeEvent !== false && !this.canBeMinimizedOrPermanent() && this.isPermanent()) {
+    if (this.props.bindResizeEvent !== false && !this.canBeMinimizedOrPermanent() && this.isPermanent() && this.isMounted()) {
       this.unpin();
     }
   }
@@ -856,6 +876,9 @@ export interface IDrawerState {
   providerOptions?: Omit<IDrawerProps, "children"> & { children?: IReactNullableElement };
 
   children?: IReactNullableElement;
+
+
+  isHydrated: boolean;
 }
 
 
@@ -987,6 +1010,8 @@ export interface IDrawerProps extends Omit<ViewProps, "ref" | "children"> {
   containerClassName?: IClassName;
 
   variant?: IDrawerVariant;
+
+  hydrationFallback?: ReactNode;
 }
 
 

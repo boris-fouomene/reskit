@@ -532,28 +532,11 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
       });
     };
     if (permanent) {
-      this.open(undefined, cb2);
+      if (!this.isOpen()) {
+        this.open(undefined, cb2);
+      }
     } else {
-      // When unpinning (setting permanent to false), we need to properly handle the transition
-      // First update the permanent state, then handle the drawer animation
-      this.setState({ permanent: false }, () => {
-        this.trigger("permanent", this);
-        if (persist !== false) {
-          this.setSession("permanent", permanent);
-        }
-        // If the drawer was shown due to permanent mode, we need to close it
-        if (this.state.drawerShown) {
-          this.close(() => {
-            if (typeof callback == "function") {
-              callback(options);
-            }
-          });
-        } else {
-          if (typeof callback == "function") {
-            callback(options);
-          }
-        }
-      });
+      cb2();
     }
   }
 
@@ -951,7 +934,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
           //this.close();
         }, false);
       } else if (canBeMinimizedOrPermanent && !isPermanent) {
-        this.pin();
+        this.pin(undefined, false);
       }
     }
   }

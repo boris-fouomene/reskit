@@ -1,5 +1,5 @@
 export const flexClasses = {
-    // Flex Direction
+    // Base Flex Direction
     flexDirection: {
         row: "flex-row",
         "row-reverse": "flex-row-reverse",
@@ -7,14 +7,14 @@ export const flexClasses = {
         "col-reverse": "flex-col-reverse",
     },
 
-    // Flex Wrap
+    // Base Flex Wrap
     flexWrap: {
         wrap: "flex-wrap",
         "wrap-reverse": "flex-wrap-reverse",
         nowrap: "flex-nowrap",
     },
 
-    // Flex (grow, shrink, basis combined)
+    // Base Flex (grow, shrink, basis combined)
     flex: {
         1: "flex-1",
         auto: "flex-auto",
@@ -22,19 +22,19 @@ export const flexClasses = {
         none: "flex-none",
     },
 
-    // Flex Grow
+    // Base Flex Grow
     flexGrow: {
         0: "grow-0",
         1: "grow",
     },
 
-    // Flex Shrink
+    // Base Flex Shrink
     flexShrink: {
         0: "shrink-0",
         1: "shrink",
     },
 
-    // Flex Basis
+    // Base Flex Basis
     flexBasis: {
         0: "basis-0",
         1: "basis-1",
@@ -101,7 +101,7 @@ export const flexClasses = {
         "11/12": "basis-11/12",
     },
 
-    // Justify Content
+    // Base Justify Content
     justifyContent: {
         normal: "justify-normal",
         start: "justify-start",
@@ -113,7 +113,7 @@ export const flexClasses = {
         stretch: "justify-stretch",
     },
 
-    // Justify Items
+    // Base Justify Items
     justifyItems: {
         start: "justify-items-start",
         end: "justify-items-end",
@@ -121,7 +121,7 @@ export const flexClasses = {
         stretch: "justify-items-stretch",
     },
 
-    // Justify Self
+    // Base Justify Self
     justifySelf: {
         auto: "justify-self-auto",
         start: "justify-self-start",
@@ -130,7 +130,7 @@ export const flexClasses = {
         stretch: "justify-self-stretch",
     },
 
-    // Align Content
+    // Base Align Content
     alignContent: {
         normal: "content-normal",
         center: "content-center",
@@ -143,7 +143,7 @@ export const flexClasses = {
         stretch: "content-stretch",
     },
 
-    // Align Items
+    // Base Align Items
     alignItems: {
         start: "items-start",
         end: "items-end",
@@ -152,7 +152,7 @@ export const flexClasses = {
         stretch: "items-stretch",
     },
 
-    // Align Self
+    // Base Align Self
     alignSelf: {
         auto: "self-auto",
         start: "self-start",
@@ -162,7 +162,7 @@ export const flexClasses = {
         baseline: "self-baseline",
     },
 
-    // Place Content
+    // Base Place Content
     placeContent: {
         center: "place-content-center",
         start: "place-content-start",
@@ -174,7 +174,7 @@ export const flexClasses = {
         stretch: "place-content-stretch",
     },
 
-    // Place Items
+    // Base Place Items
     placeItems: {
         start: "place-items-start",
         end: "place-items-end",
@@ -183,12 +183,907 @@ export const flexClasses = {
         stretch: "place-items-stretch",
     },
 
-    // Place Self
+    // Base Place Self
     placeSelf: {
         auto: "place-self-auto",
         start: "place-self-start",
         end: "place-self-end",
         center: "place-self-center",
         stretch: "place-self-stretch",
+    },
+
+    // SM Responsive Breakpoint
+    "sm:flexDirection": {
+        row: "sm:flex-row",
+        "row-reverse": "sm:flex-row-reverse",
+        col: "sm:flex-col",
+        "col-reverse": "sm:flex-col-reverse",
+    },
+
+    "sm:flexWrap": {
+        wrap: "sm:flex-wrap",
+        "wrap-reverse": "sm:flex-wrap-reverse",
+        nowrap: "sm:flex-nowrap",
+    },
+
+    "sm:flex": {
+        1: "sm:flex-1",
+        auto: "sm:flex-auto",
+        initial: "sm:flex-initial",
+        none: "sm:flex-none",
+    },
+
+    "sm:flexGrow": {
+        0: "sm:grow-0",
+        1: "sm:grow",
+    },
+
+    "sm:flexShrink": {
+        0: "sm:shrink-0",
+        1: "sm:shrink",
+    },
+
+    "sm:flexBasis": {
+        0: "sm:basis-0",
+        1: "sm:basis-1",
+        2: "sm:basis-2",
+        3: "sm:basis-3",
+        4: "sm:basis-4",
+        5: "sm:basis-5",
+        6: "sm:basis-6",
+        7: "sm:basis-7",
+        8: "sm:basis-8",
+        9: "sm:basis-9",
+        10: "sm:basis-10",
+        11: "sm:basis-11",
+        12: "sm:basis-12",
+        14: "sm:basis-14",
+        16: "sm:basis-16",
+        20: "sm:basis-20",
+        24: "sm:basis-24",
+        28: "sm:basis-28",
+        32: "sm:basis-32",
+        36: "sm:basis-36",
+        40: "sm:basis-40",
+        44: "sm:basis-44",
+        48: "sm:basis-48",
+        52: "sm:basis-52",
+        56: "sm:basis-56",
+        60: "sm:basis-60",
+        64: "sm:basis-64",
+        72: "sm:basis-72",
+        80: "sm:basis-80",
+        96: "sm:basis-96",
+        auto: "sm:basis-auto",
+        px: "sm:basis-px",
+        0.5: "sm:basis-0.5",
+        1.5: "sm:basis-1.5",
+        2.5: "sm:basis-2.5",
+        3.5: "sm:basis-3.5",
+        full: "sm:basis-full",
+        "1/2": "sm:basis-1/2",
+        "1/3": "sm:basis-1/3",
+        "2/3": "sm:basis-2/3",
+        "1/4": "sm:basis-1/4",
+        "2/4": "sm:basis-2/4",
+        "3/4": "sm:basis-3/4",
+        "1/5": "sm:basis-1/5",
+        "2/5": "sm:basis-2/5",
+        "3/5": "sm:basis-3/5",
+        "4/5": "sm:basis-4/5",
+        "1/6": "sm:basis-1/6",
+        "2/6": "sm:basis-2/6",
+        "3/6": "sm:basis-3/6",
+        "4/6": "sm:basis-4/6",
+        "5/6": "sm:basis-5/6",
+        "1/12": "sm:basis-1/12",
+        "2/12": "sm:basis-2/12",
+        "3/12": "sm:basis-3/12",
+        "4/12": "sm:basis-4/12",
+        "5/12": "sm:basis-5/12",
+        "6/12": "sm:basis-6/12",
+        "7/12": "sm:basis-7/12",
+        "8/12": "sm:basis-8/12",
+        "9/12": "sm:basis-9/12",
+        "10/12": "sm:basis-10/12",
+        "11/12": "sm:basis-11/12",
+    },
+
+    "sm:justifyContent": {
+        normal: "sm:justify-normal",
+        start: "sm:justify-start",
+        end: "sm:justify-end",
+        center: "sm:justify-center",
+        between: "sm:justify-between",
+        around: "sm:justify-around",
+        evenly: "sm:justify-evenly",
+        stretch: "sm:justify-stretch",
+    },
+
+    "sm:justifyItems": {
+        start: "sm:justify-items-start",
+        end: "sm:justify-items-end",
+        center: "sm:justify-items-center",
+        stretch: "sm:justify-items-stretch",
+    },
+
+    "sm:justifySelf": {
+        auto: "sm:justify-self-auto",
+        start: "sm:justify-self-start",
+        end: "sm:justify-self-end",
+        center: "sm:justify-self-center",
+        stretch: "sm:justify-self-stretch",
+    },
+
+    "sm:alignContent": {
+        normal: "sm:content-normal",
+        center: "sm:content-center",
+        start: "sm:content-start",
+        end: "sm:content-end",
+        between: "sm:content-between",
+        around: "sm:content-around",
+        evenly: "sm:content-evenly",
+        baseline: "sm:content-baseline",
+        stretch: "sm:content-stretch",
+    },
+
+    "sm:alignItems": {
+        start: "sm:items-start",
+        end: "sm:items-end",
+        center: "sm:items-center",
+        baseline: "sm:items-baseline",
+        stretch: "sm:items-stretch",
+    },
+
+    "sm:alignSelf": {
+        auto: "sm:self-auto",
+        start: "sm:self-start",
+        end: "sm:self-end",
+        center: "sm:self-center",
+        stretch: "sm:self-stretch",
+        baseline: "sm:self-baseline",
+    },
+
+    "sm:placeContent": {
+        center: "sm:place-content-center",
+        start: "sm:place-content-start",
+        end: "sm:place-content-end",
+        between: "sm:place-content-between",
+        around: "sm:place-content-around",
+        evenly: "sm:place-content-evenly",
+        baseline: "sm:place-content-baseline",
+        stretch: "sm:place-content-stretch",
+    },
+
+    "sm:placeItems": {
+        start: "sm:place-items-start",
+        end: "sm:place-items-end",
+        center: "sm:place-items-center",
+        baseline: "sm:place-items-baseline",
+        stretch: "sm:place-items-stretch",
+    },
+
+    "sm:placeSelf": {
+        auto: "sm:place-self-auto",
+        start: "sm:place-self-start",
+        end: "sm:place-self-end",
+        center: "sm:place-self-center",
+        stretch: "sm:place-self-stretch",
+    },
+
+    // MD Responsive Breakpoint
+    "md:flexDirection": {
+        row: "md:flex-row",
+        "row-reverse": "md:flex-row-reverse",
+        col: "md:flex-col",
+        "col-reverse": "md:flex-col-reverse",
+    },
+
+    "md:flexWrap": {
+        wrap: "md:flex-wrap",
+        "wrap-reverse": "md:flex-wrap-reverse",
+        nowrap: "md:flex-nowrap",
+    },
+
+    "md:flex": {
+        1: "md:flex-1",
+        auto: "md:flex-auto",
+        initial: "md:flex-initial",
+        none: "md:flex-none",
+    },
+
+    "md:flexGrow": {
+        0: "md:grow-0",
+        1: "md:grow",
+    },
+
+    "md:flexShrink": {
+        0: "md:shrink-0",
+        1: "md:shrink",
+    },
+
+    "md:flexBasis": {
+        0: "md:basis-0",
+        1: "md:basis-1",
+        2: "md:basis-2",
+        3: "md:basis-3",
+        4: "md:basis-4",
+        5: "md:basis-5",
+        6: "md:basis-6",
+        7: "md:basis-7",
+        8: "md:basis-8",
+        9: "md:basis-9",
+        10: "md:basis-10",
+        11: "md:basis-11",
+        12: "md:basis-12",
+        14: "md:basis-14",
+        16: "md:basis-16",
+        20: "md:basis-20",
+        24: "md:basis-24",
+        28: "md:basis-28",
+        32: "md:basis-32",
+        36: "md:basis-36",
+        40: "md:basis-40",
+        44: "md:basis-44",
+        48: "md:basis-48",
+        52: "md:basis-52",
+        56: "md:basis-56",
+        60: "md:basis-60",
+        64: "md:basis-64",
+        72: "md:basis-72",
+        80: "md:basis-80",
+        96: "md:basis-96",
+        auto: "md:basis-auto",
+        px: "md:basis-px",
+        0.5: "md:basis-0.5",
+        1.5: "md:basis-1.5",
+        2.5: "md:basis-2.5",
+        3.5: "md:basis-3.5",
+        full: "md:basis-full",
+        "1/2": "md:basis-1/2",
+        "1/3": "md:basis-1/3",
+        "2/3": "md:basis-2/3",
+        "1/4": "md:basis-1/4",
+        "2/4": "md:basis-2/4",
+        "3/4": "md:basis-3/4",
+        "1/5": "md:basis-1/5",
+        "2/5": "md:basis-2/5",
+        "3/5": "md:basis-3/5",
+        "4/5": "md:basis-4/5",
+        "1/6": "md:basis-1/6",
+        "2/6": "md:basis-2/6",
+        "3/6": "md:basis-3/6",
+        "4/6": "md:basis-4/6",
+        "5/6": "md:basis-5/6",
+        "1/12": "md:basis-1/12",
+        "2/12": "md:basis-2/12",
+        "3/12": "md:basis-3/12",
+        "4/12": "md:basis-4/12",
+        "5/12": "md:basis-5/12",
+        "6/12": "md:basis-6/12",
+        "7/12": "md:basis-7/12",
+        "8/12": "md:basis-8/12",
+        "9/12": "md:basis-9/12",
+        "10/12": "md:basis-10/12",
+        "11/12": "md:basis-11/12",
+    },
+
+    "md:justifyContent": {
+        normal: "md:justify-normal",
+        start: "md:justify-start",
+        end: "md:justify-end",
+        center: "md:justify-center",
+        between: "md:justify-between",
+        around: "md:justify-around",
+        evenly: "md:justify-evenly",
+        stretch: "md:justify-stretch",
+    },
+
+    "md:justifyItems": {
+        start: "md:justify-items-start",
+        end: "md:justify-items-end",
+        center: "md:justify-items-center",
+        stretch: "md:justify-items-stretch",
+    },
+
+    "md:justifySelf": {
+        auto: "md:justify-self-auto",
+        start: "md:justify-self-start",
+        end: "md:justify-self-end",
+        center: "md:justify-self-center",
+        stretch: "md:justify-self-stretch",
+    },
+
+    "md:alignContent": {
+        normal: "md:content-normal",
+        center: "md:content-center",
+        start: "md:content-start",
+        end: "md:content-end",
+        between: "md:content-between",
+        around: "md:content-around",
+        evenly: "md:content-evenly",
+        baseline: "md:content-baseline",
+        stretch: "md:content-stretch",
+    },
+
+    "md:alignItems": {
+        start: "md:items-start",
+        end: "md:items-end",
+        center: "md:items-center",
+        baseline: "md:items-baseline",
+        stretch: "md:items-stretch",
+    },
+
+    "md:alignSelf": {
+        auto: "md:self-auto",
+        start: "md:self-start",
+        end: "md:self-end",
+        center: "md:self-center",
+        stretch: "md:self-stretch",
+        baseline: "md:self-baseline",
+    },
+
+    "md:placeContent": {
+        center: "md:place-content-center",
+        start: "md:place-content-start",
+        end: "md:place-content-end",
+        between: "md:place-content-between",
+        around: "md:place-content-around",
+        evenly: "md:place-content-evenly",
+        baseline: "md:place-content-baseline",
+        stretch: "md:place-content-stretch",
+    },
+
+    "md:placeItems": {
+        start: "md:place-items-start",
+        end: "md:place-items-end",
+        center: "md:place-items-center",
+        baseline: "md:place-items-baseline",
+        stretch: "md:place-items-stretch",
+    },
+
+    "md:placeSelf": {
+        auto: "md:place-self-auto",
+        start: "md:place-self-start",
+        end: "md:place-self-end",
+        center: "md:place-self-center",
+        stretch: "md:place-self-stretch",
+    },
+
+    // LG Responsive Breakpoint
+    "lg:flexDirection": {
+        row: "lg:flex-row",
+        "row-reverse": "lg:flex-row-reverse",
+        col: "lg:flex-col",
+        "col-reverse": "lg:flex-col-reverse",
+    },
+
+    "lg:flexWrap": {
+        wrap: "lg:flex-wrap",
+        "wrap-reverse": "lg:flex-wrap-reverse",
+        nowrap: "lg:flex-nowrap",
+    },
+
+    "lg:flex": {
+        1: "lg:flex-1",
+        auto: "lg:flex-auto",
+        initial: "lg:flex-initial",
+        none: "lg:flex-none",
+    },
+
+    "lg:flexGrow": {
+        0: "lg:grow-0",
+        1: "lg:grow",
+    },
+
+    "lg:flexShrink": {
+        0: "lg:shrink-0",
+        1: "lg:shrink",
+    },
+
+    "lg:flexBasis": {
+        0: "lg:basis-0",
+        1: "lg:basis-1",
+        2: "lg:basis-2",
+        3: "lg:basis-3",
+        4: "lg:basis-4",
+        5: "lg:basis-5",
+        6: "lg:basis-6",
+        7: "lg:basis-7",
+        8: "lg:basis-8",
+        9: "lg:basis-9",
+        10: "lg:basis-10",
+        11: "lg:basis-11",
+        12: "lg:basis-12",
+        14: "lg:basis-14",
+        16: "lg:basis-16",
+        20: "lg:basis-20",
+        24: "lg:basis-24",
+        28: "lg:basis-28",
+        32: "lg:basis-32",
+        36: "lg:basis-36",
+        40: "lg:basis-40",
+        44: "lg:basis-44",
+        48: "lg:basis-48",
+        52: "lg:basis-52",
+        56: "lg:basis-56",
+        60: "lg:basis-60",
+        64: "lg:basis-64",
+        72: "lg:basis-72",
+        80: "lg:basis-80",
+        96: "lg:basis-96",
+        auto: "lg:basis-auto",
+        px: "lg:basis-px",
+        0.5: "lg:basis-0.5",
+        1.5: "lg:basis-1.5",
+        2.5: "lg:basis-2.5",
+        3.5: "lg:basis-3.5",
+        full: "lg:basis-full",
+        "1/2": "lg:basis-1/2",
+        "1/3": "lg:basis-1/3",
+        "2/3": "lg:basis-2/3",
+        "1/4": "lg:basis-1/4",
+        "2/4": "lg:basis-2/4",
+        "3/4": "lg:basis-3/4",
+        "1/5": "lg:basis-1/5",
+        "2/5": "lg:basis-2/5",
+        "3/5": "lg:basis-3/5",
+        "4/5": "lg:basis-4/5",
+        "1/6": "lg:basis-1/6",
+        "2/6": "lg:basis-2/6",
+        "3/6": "lg:basis-3/6",
+        "4/6": "lg:basis-4/6",
+        "5/6": "lg:basis-5/6",
+        "1/12": "lg:basis-1/12",
+        "2/12": "lg:basis-2/12",
+        "3/12": "lg:basis-3/12",
+        "4/12": "lg:basis-4/12",
+        "5/12": "lg:basis-5/12",
+        "6/12": "lg:basis-6/12",
+        "7/12": "lg:basis-7/12",
+        "8/12": "lg:basis-8/12",
+        "9/12": "lg:basis-9/12",
+        "10/12": "lg:basis-10/12",
+        "11/12": "lg:basis-11/12",
+    },
+
+    "lg:justifyContent": {
+        normal: "lg:justify-normal",
+        start: "lg:justify-start",
+        end: "lg:justify-end",
+        center: "lg:justify-center",
+        between: "lg:justify-between",
+        around: "lg:justify-around",
+        evenly: "lg:justify-evenly",
+        stretch: "lg:justify-stretch",
+    },
+
+    "lg:justifyItems": {
+        start: "lg:justify-items-start",
+        end: "lg:justify-items-end",
+        center: "lg:justify-items-center",
+        stretch: "lg:justify-items-stretch",
+    },
+
+    "lg:justifySelf": {
+        auto: "lg:justify-self-auto",
+        start: "lg:justify-self-start",
+        end: "lg:justify-self-end",
+        center: "lg:justify-self-center",
+        stretch: "lg:justify-self-stretch",
+    },
+
+    "lg:alignContent": {
+        normal: "lg:content-normal",
+        center: "lg:content-center",
+        start: "lg:content-start",
+        end: "lg:content-end",
+        between: "lg:content-between",
+        around: "lg:content-around",
+        evenly: "lg:content-evenly",
+        baseline: "lg:content-baseline",
+        stretch: "lg:content-stretch",
+    },
+
+    "lg:alignItems": {
+        start: "lg:items-start",
+        end: "lg:items-end",
+        center: "lg:items-center",
+        baseline: "lg:items-baseline",
+        stretch: "lg:items-stretch",
+    },
+
+    "lg:alignSelf": {
+        auto: "lg:self-auto",
+        start: "lg:self-start",
+        end: "lg:self-end",
+        center: "lg:self-center",
+        stretch: "lg:self-stretch",
+        baseline: "lg:self-baseline",
+    },
+
+    "lg:placeContent": {
+        center: "lg:place-content-center",
+        start: "lg:place-content-start",
+        end: "lg:place-content-end",
+        between: "lg:place-content-between",
+        around: "lg:place-content-around",
+        evenly: "lg:place-content-evenly",
+        baseline: "lg:place-content-baseline",
+        stretch: "lg:place-content-stretch",
+    },
+
+    "lg:placeItems": {
+        start: "lg:place-items-start",
+        end: "lg:place-items-end",
+        center: "lg:place-items-center",
+        baseline: "lg:place-items-baseline",
+        stretch: "lg:place-items-stretch",
+    },
+
+    "lg:placeSelf": {
+        auto: "lg:place-self-auto",
+        start: "lg:place-self-start",
+        end: "lg:place-self-end",
+        center: "lg:place-self-center",
+        stretch: "lg:place-self-stretch",
+    },
+
+    // XL Responsive Breakpoint
+    "xl:flexDirection": {
+        row: "xl:flex-row",
+        "row-reverse": "xl:flex-row-reverse",
+        col: "xl:flex-col",
+        "col-reverse": "xl:flex-col-reverse",
+    },
+
+    "xl:flexWrap": {
+        wrap: "xl:flex-wrap",
+        "wrap-reverse": "xl:flex-wrap-reverse",
+        nowrap: "xl:flex-nowrap",
+    },
+
+    "xl:flex": {
+        1: "xl:flex-1",
+        auto: "xl:flex-auto",
+        initial: "xl:flex-initial",
+        none: "xl:flex-none",
+    },
+
+    "xl:flexGrow": {
+        0: "xl:grow-0",
+        1: "xl:grow",
+    },
+
+    "xl:flexShrink": {
+        0: "xl:shrink-0",
+        1: "xl:shrink",
+    },
+
+    "xl:flexBasis": {
+        0: "xl:basis-0",
+        1: "xl:basis-1",
+        2: "xl:basis-2",
+        3: "xl:basis-3",
+        4: "xl:basis-4",
+        5: "xl:basis-5",
+        6: "xl:basis-6",
+        7: "xl:basis-7",
+        8: "xl:basis-8",
+        9: "xl:basis-9",
+        10: "xl:basis-10",
+        11: "xl:basis-11",
+        12: "xl:basis-12",
+        14: "xl:basis-14",
+        16: "xl:basis-16",
+        20: "xl:basis-20",
+        24: "xl:basis-24",
+        28: "xl:basis-28",
+        32: "xl:basis-32",
+        36: "xl:basis-36",
+        40: "xl:basis-40",
+        44: "xl:basis-44",
+        48: "xl:basis-48",
+        52: "xl:basis-52",
+        56: "xl:basis-56",
+        60: "xl:basis-60",
+        64: "xl:basis-64",
+        72: "xl:basis-72",
+        80: "xl:basis-80",
+        96: "xl:basis-96",
+        auto: "xl:basis-auto",
+        px: "xl:basis-px",
+        0.5: "xl:basis-0.5",
+        1.5: "xl:basis-1.5",
+        2.5: "xl:basis-2.5",
+        3.5: "xl:basis-3.5",
+        full: "xl:basis-full",
+        "1/2": "xl:basis-1/2",
+        "1/3": "xl:basis-1/3",
+        "2/3": "xl:basis-2/3",
+        "1/4": "xl:basis-1/4",
+        "2/4": "xl:basis-2/4",
+        "3/4": "xl:basis-3/4",
+        "1/5": "xl:basis-1/5",
+        "2/5": "xl:basis-2/5",
+        "3/5": "xl:basis-3/5",
+        "4/5": "xl:basis-4/5",
+        "1/6": "xl:basis-1/6",
+        "2/6": "xl:basis-2/6",
+        "3/6": "xl:basis-3/6",
+        "4/6": "xl:basis-4/6",
+        "5/6": "xl:basis-5/6",
+        "1/12": "xl:basis-1/12",
+        "2/12": "xl:basis-2/12",
+        "3/12": "xl:basis-3/12",
+        "4/12": "xl:basis-4/12",
+        "5/12": "xl:basis-5/12",
+        "6/12": "xl:basis-6/12",
+        "7/12": "xl:basis-7/12",
+        "8/12": "xl:basis-8/12",
+        "9/12": "xl:basis-9/12",
+        "10/12": "xl:basis-10/12",
+        "11/12": "xl:basis-11/12",
+    },
+
+    "xl:justifyContent": {
+        normal: "xl:justify-normal",
+        start: "xl:justify-start",
+        end: "xl:justify-end",
+        center: "xl:justify-center",
+        between: "xl:justify-between",
+        around: "xl:justify-around",
+        evenly: "xl:justify-evenly",
+        stretch: "xl:justify-stretch",
+    },
+
+    "xl:justifyItems": {
+        start: "xl:justify-items-start",
+        end: "xl:justify-items-end",
+        center: "xl:justify-items-center",
+        stretch: "xl:justify-items-stretch",
+    },
+
+    "xl:justifySelf": {
+        auto: "xl:justify-self-auto",
+        start: "xl:justify-self-start",
+        end: "xl:justify-self-end",
+        center: "xl:justify-self-center",
+        stretch: "xl:justify-self-stretch",
+    },
+
+    "xl:alignContent": {
+        normal: "xl:content-normal",
+        center: "xl:content-center",
+        start: "xl:content-start",
+        end: "xl:content-end",
+        between: "xl:content-between",
+        around: "xl:content-around",
+        evenly: "xl:content-evenly",
+        baseline: "xl:content-baseline",
+        stretch: "xl:content-stretch",
+    },
+
+    "xl:alignItems": {
+        start: "xl:items-start",
+        end: "xl:items-end",
+        center: "xl:items-center",
+        baseline: "xl:items-baseline",
+        stretch: "xl:items-stretch",
+    },
+
+    "xl:alignSelf": {
+        auto: "xl:self-auto",
+        start: "xl:self-start",
+        end: "xl:self-end",
+        center: "xl:self-center",
+        stretch: "xl:self-stretch",
+        baseline: "xl:self-baseline",
+    },
+
+    "xl:placeContent": {
+        center: "xl:place-content-center",
+        start: "xl:place-content-start",
+        end: "xl:place-content-end",
+        between: "xl:place-content-between",
+        around: "xl:place-content-around",
+        evenly: "xl:place-content-evenly",
+        baseline: "xl:place-content-baseline",
+        stretch: "xl:place-content-stretch",
+    },
+
+    "xl:placeItems": {
+        start: "xl:place-items-start",
+        end: "xl:place-items-end",
+        center: "xl:place-items-center",
+        baseline: "xl:place-items-baseline",
+        stretch: "xl:place-items-stretch",
+    },
+
+    "xl:placeSelf": {
+        auto: "xl:place-self-auto",
+        start: "xl:place-self-start",
+        end: "xl:place-self-end",
+        center: "xl:place-self-center",
+        stretch: "xl:place-self-stretch",
+    },
+
+    // 2XL Responsive Breakpoint
+    "2xl:flexDirection": {
+        row: "2xl:flex-row",
+        "row-reverse": "2xl:flex-row-reverse",
+        col: "2xl:flex-col",
+        "col-reverse": "2xl:flex-col-reverse",
+    },
+
+    "2xl:flexWrap": {
+        wrap: "2xl:flex-wrap",
+        "wrap-reverse": "2xl:flex-wrap-reverse",
+        nowrap: "2xl:flex-nowrap",
+    },
+
+    "2xl:flex": {
+        1: "2xl:flex-1",
+        auto: "2xl:flex-auto",
+        initial: "2xl:flex-initial",
+        none: "2xl:flex-none",
+    },
+
+    "2xl:flexGrow": {
+        0: "2xl:grow-0",
+        1: "2xl:grow",
+    },
+
+    "2xl:flexShrink": {
+        0: "2xl:shrink-0",
+        1: "2xl:shrink",
+    },
+
+    "2xl:flexBasis": {
+        0: "2xl:basis-0",
+        1: "2xl:basis-1",
+        2: "2xl:basis-2",
+        3: "2xl:basis-3",
+        4: "2xl:basis-4",
+        5: "2xl:basis-5",
+        6: "2xl:basis-6",
+        7: "2xl:basis-7",
+        8: "2xl:basis-8",
+        9: "2xl:basis-9",
+        10: "2xl:basis-10",
+        11: "2xl:basis-11",
+        12: "2xl:basis-12",
+        14: "2xl:basis-14",
+        16: "2xl:basis-16",
+        20: "2xl:basis-20",
+        24: "2xl:basis-24",
+        28: "2xl:basis-28",
+        32: "2xl:basis-32",
+        36: "2xl:basis-36",
+        40: "2xl:basis-40",
+        44: "2xl:basis-44",
+        48: "2xl:basis-48",
+        52: "2xl:basis-52",
+        56: "2xl:basis-56",
+        60: "2xl:basis-60",
+        64: "2xl:basis-64",
+        72: "2xl:basis-72",
+        80: "2xl:basis-80",
+        96: "2xl:basis-96",
+        auto: "2xl:basis-auto",
+        px: "2xl:basis-px",
+        0.5: "2xl:basis-0.5",
+        1.5: "2xl:basis-1.5",
+        2.5: "2xl:basis-2.5",
+        3.5: "2xl:basis-3.5",
+        full: "2xl:basis-full",
+        "1/2": "2xl:basis-1/2",
+        "1/3": "2xl:basis-1/3",
+        "2/3": "2xl:basis-2/3",
+        "1/4": "2xl:basis-1/4",
+        "2/4": "2xl:basis-2/4",
+        "3/4": "2xl:basis-3/4",
+        "1/5": "2xl:basis-1/5",
+        "2/5": "2xl:basis-2/5",
+        "3/5": "2xl:basis-3/5",
+        "4/5": "2xl:basis-4/5",
+        "1/6": "2xl:basis-1/6",
+        "2/6": "2xl:basis-2/6",
+        "3/6": "2xl:basis-3/6",
+        "4/6": "2xl:basis-4/6",
+        "5/6": "2xl:basis-5/6",
+        "1/12": "2xl:basis-1/12",
+        "2/12": "2xl:basis-2/12",
+        "3/12": "2xl:basis-3/12",
+        "4/12": "2xl:basis-4/12",
+        "5/12": "2xl:basis-5/12",
+        "6/12": "2xl:basis-6/12",
+        "7/12": "2xl:basis-7/12",
+        "8/12": "2xl:basis-8/12",
+        "9/12": "2xl:basis-9/12",
+        "10/12": "2xl:basis-10/12",
+        "11/12": "2xl:basis-11/12",
+    },
+
+    "2xl:justifyContent": {
+        normal: "2xl:justify-normal",
+        start: "2xl:justify-start",
+        end: "2xl:justify-end",
+        center: "2xl:justify-center",
+        between: "2xl:justify-between",
+        around: "2xl:justify-around",
+        evenly: "2xl:justify-evenly",
+        stretch: "2xl:justify-stretch",
+    },
+
+    "2xl:justifyItems": {
+        start: "2xl:justify-items-start",
+        end: "2xl:justify-items-end",
+        center: "2xl:justify-items-center",
+        stretch: "2xl:justify-items-stretch",
+    },
+
+    "2xl:justifySelf": {
+        auto: "2xl:justify-self-auto",
+        start: "2xl:justify-self-start",
+        end: "2xl:justify-self-end",
+        center: "2xl:justify-self-center",
+        stretch: "2xl:justify-self-stretch",
+    },
+
+    "2xl:alignContent": {
+        normal: "2xl:content-normal",
+        center: "2xl:content-center",
+        start: "2xl:content-start",
+        end: "2xl:content-end",
+        between: "2xl:content-between",
+        around: "2xl:content-around",
+        evenly: "2xl:content-evenly",
+        baseline: "2xl:content-baseline",
+        stretch: "2xl:content-stretch",
+    },
+
+    "2xl:alignItems": {
+        start: "2xl:items-start",
+        end: "2xl:items-end",
+        center: "2xl:items-center",
+        baseline: "2xl:items-baseline",
+        stretch: "2xl:items-stretch",
+    },
+
+    "2xl:alignSelf": {
+        auto: "2xl:self-auto",
+        start: "2xl:self-start",
+        end: "2xl:self-end",
+        center: "2xl:self-center",
+        stretch: "2xl:self-stretch",
+        baseline: "2xl:self-baseline",
+    },
+
+    "2xl:placeContent": {
+        center: "2xl:place-content-center",
+        start: "2xl:place-content-start",
+        end: "2xl:place-content-end",
+        between: "2xl:place-content-between",
+        around: "2xl:place-content-around",
+        evenly: "2xl:place-content-evenly",
+        baseline: "2xl:place-content-baseline",
+        stretch: "2xl:place-content-stretch",
+    },
+
+    "2xl:placeItems": {
+        start: "2xl:place-items-start",
+        end: "2xl:place-items-end",
+        center: "2xl:place-items-center",
+        baseline: "2xl:place-items-baseline",
+        stretch: "2xl:place-items-stretch",
+    },
+
+    "2xl:placeSelf": {
+        auto: "2xl:place-self-auto",
+        start: "2xl:place-self-start",
+        end: "2xl:place-self-end",
+        center: "2xl:place-self-center",
+        stretch: "2xl:place-self-stretch",
     },
 } as const;

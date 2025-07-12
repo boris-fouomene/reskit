@@ -399,7 +399,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     return drawerVariant({ ...variant, permanent: this.isPermanent() });
   }
   render() {
-    const { containerClassName, children, className } = this.getComponentProps();
+    const { containerClassName, items, itemsProps, children, className } = this.getComponentProps();
     const { accessibilityViewIsModal, drawerShown, openValue } = this.state;
     const computedVariant = this.computeVariant();
     const testID = this.getTestID();
@@ -442,6 +442,10 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
             >
               <Div className={cn("flex-1 pointer-events-auto w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", computedVariant.base(), className)} testID={testID + "drawer-content"}>
                 {this.renderHeader()}
+                {Array.isArray(items) && items.length > 0 ? <DrawerItems
+                  {...itemsProps}
+                  items={items}
+                /> : null}
                 {isProvider ? (this.state.providerOptions ? this.state.providerOptions.children : null) : this.state.children}
               </Div>
             </Animated.View>
@@ -752,12 +756,17 @@ function ExpandableDrawerItem({ testID, context, items, divider, expandableProps
 
 
 function DrawerItems(props: IDrawerItemsProps) {
+  const drawerContext = useDrawer();
+  if (!drawerContext) return null;
+  const { drawer } = drawerContext;
+  const computedVariant = drawer.computeVariant();
   return <Nav.Items
     testID="resk-drawer-items"
     {...props}
+    itemClassName={cn("resk-drawer-item", computedVariant.item(), props.itemClassName)}
+    className={cn("resk-drawer-items", computedVariant.items(), props.className)}
     renderExpandableItem={renderExpandableDrawerItem}
     renderItem={renderDrawerItem}
-    className={cn(props.className, "resk-drawer-items")}
   />
 };
 
@@ -856,6 +865,10 @@ export interface IDrawerProps extends Omit<ViewProps, "ref" | "children"> {
    * @default false
    */
   minimizable?: boolean;
+
+  items?: IDrawerItemsProps["items"];
+
+  itemsProps?: Omit<IDrawerItemsProps, "items">;
 
 
   children?: IReactNullableElement | ((options: IDrawerCallbackOptions) => IReactNullableElement);

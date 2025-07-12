@@ -423,7 +423,6 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
           <View testID={testID + "-container"} className={cn("resk-drawer-container relative  h-full flex-col", isProvider && "resk-drawer-provider-container", computedVariant.container(), containerClassName)}>
             {!permanent ? (<Backdrop onPress={() => this.close()} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
             <Animated.View
-              {...(canRenderTemp ? this._panResponder.panHandlers : {})}
               testID={testID + "-animated-content"}
               accessibilityViewIsModal={accessibilityViewIsModal}
               className={cn("resk-drawer-animated")}
@@ -440,7 +439,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
                 }
               ]}
             >
-              <Div className={cn("flex-1 w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", computedVariant.base(), className)} testID={testID + "drawer-content"}>
+              <Div {...(canRenderTemp ? this._panResponder.panHandlers : {})} className={cn("flex-1 pointer-events-auto w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", computedVariant.base(), className)} testID={testID + "drawer-content"}>
                 {this.renderHeader()}
                 {isProvider ? (this.state.providerOptions ? this.state.providerOptions.children : null) : this.state.children}
               </Div>

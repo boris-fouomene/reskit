@@ -35,8 +35,8 @@ export const bottomSheetVariant = tv({
   defaultVariants: {
     colorScheme: "surface",
     roundedTop: "10px",
-    minHeight: "40%",
-    height: "70%",
+    minHeight: "half",
+    maxHeight: "threeQuarters",
     withBackdrop: true,
     transitionDuration: 300,
   },

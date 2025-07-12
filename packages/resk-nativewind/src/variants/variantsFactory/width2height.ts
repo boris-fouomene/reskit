@@ -2,50 +2,50 @@ export const width2heightClasses = {
   // Base Classes
   maxHeight: {
     // Fixed Heights - Pixel Values (0-10)
-    0: "max-h-0", // 0px
-    px: "max-h-px", // 1px
-    0.5: "max-h-0.5", // 2px
-    1: "max-h-1", // 4px
-    1.5: "max-h-1.5", // 6px
-    2: "max-h-2", // 8px
-    2.5: "max-h-2.5", // 10px
-    3: "max-h-3", // 12px
-    3.5: "max-h-3.5", // 14px
-    4: "max-h-4", // 16px
-    5: "max-h-5", // 20px
-    6: "max-h-6", // 24px
-    7: "max-h-7", // 28px
-    8: "max-h-8", // 32px
-    9: "max-h-9", // 36px
-    10: "max-h-10", // 40px
+    0: "max-h-0",
+    px: "max-h-px",
+    0.5: "max-h-0.5",
+    1: "max-h-1",
+    1.5: "max-h-1.5",
+    2: "max-h-2",
+    2.5: "max-h-2.5",
+    3: "max-h-3",
+    3.5: "max-h-3.5",
+    4: "max-h-4",
+    5: "max-h-5",
+    6: "max-h-6",
+    7: "max-h-7",
+    8: "max-h-8",
+    9: "max-h-9",
+    10: "max-h-10",
 
     // Medium Heights (44-96px)
-    11: "max-h-11", // 44px
-    12: "max-h-12", // 48px
-    13: "max-h-13", // 52px
-    14: "max-h-14", // 56px
-    15: "max-h-15", // 60px
-    16: "max-h-16", // 64px
-    17: "max-h-17", // 68px
-    18: "max-h-18", // 72px
-    19: "max-h-19", // 76px
-    20: "max-h-20", // 80px
-    24: "max-h-24", // 96px
+    11: "max-h-11",
+    12: "max-h-12",
+    13: "max-h-13",
+    14: "max-h-14",
+    15: "max-h-15",
+    16: "max-h-16",
+    17: "max-h-17",
+    18: "max-h-18",
+    19: "max-h-19",
+    20: "max-h-20",
+    24: "max-h-24",
 
-    // Large Heights (112-384px)
-    28: "max-h-28", // 112px
-    32: "max-h-32", // 128px
-    36: "max-h-36", // 144px
-    40: "max-h-40", // 160px
-    44: "max-h-44", // 176px
-    48: "max-h-48", // 192px
-    52: "max-h-52", // 208px
-    56: "max-h-56", // 224px
-    60: "max-h-60", // 240px
-    64: "max-h-64", // 256px
-    72: "max-h-72", // 288px
-    80: "max-h-80", // 320px
-    96: "max-h-96", // 384px
+
+    28: "max-h-28",
+    32: "max-h-32",
+    36: "max-h-36",
+    40: "max-h-40",
+    44: "max-h-44",
+    48: "max-h-48",
+    52: "max-h-52",
+    56: "max-h-56",
+    60: "max-h-60",
+    64: "max-h-64",
+    72: "max-h-72",
+    80: "max-h-80",
+    96: "max-h-96",
 
     // Percentage-Based Heights (Cross-platform compatible)
     half: "max-h-1/2", // 50%
@@ -69,54 +69,69 @@ export const width2heightClasses = {
     min: "max-h-min", // min-content
     max: "max-h-max", // max-content
     fit: "max-h-fit",
+
+    "3xs": "max-h-3xs",
+    "2xs": "max-h-2xs",
+    "xs": "max-h-xs",
+    sm: "max-h-sm",
+    md: "max-h-md",
+    lg: "max-h-lg",
+    xl: "max-h-xl",
+    "2xl": "max-h -2xl",
+    "3xl": "max-h-3xl",
+    "4xl": "max-h-4xl",
+    "5xl": "max-h-5xl",
+    "6xl": "max-h-6xl",
+    "7xl": "max-h-7xl"
+
   },
 
   minHeight: {
     // Fixed Heights - Pixel Values (0-10)
-    0: "min-h-0", // 0px
-    px: "min-h-px", // 1px
-    0.5: "min-h-0.5", // 2px
-    1: "min-h-1", // 4px
-    1.5: "min-h-1.5", // 6px
-    2: "min-h-2", // 8px
-    2.5: "min-h-2.5", // 10px
-    3: "min-h-3", // 12px
-    3.5: "min-h-3.5", // 14px
-    4: "min-h-4", // 16px
-    5: "min-h-5", // 20px
-    6: "min-h-6", // 24px
-    7: "min-h-7", // 28px
-    8: "min-h-8", // 32px
-    9: "min-h-9", // 36px
-    10: "min-h-10", // 40px
+    0: "min-h-0",
+    px: "min-h-px",
+    0.5: "min-h-0.5",
+    1: "min-h-1",
+    1.5: "min-h-1.5",
+    2: "min-h-2",
+    2.5: "min-h-2.5",
+    3: "min-h-3",
+    3.5: "min-h-3.5",
+    4: "min-h-4",
+    5: "min-h-5",
+    6: "min-h-6",
+    7: "min-h-7",
+    8: "min-h-8",
+    9: "min-h-9",
+    10: "min-h-10",
 
     // Medium Heights (44-96px)
-    11: "min-h-11", // 44px
-    12: "min-h-12", // 48px
-    13: "min-h-13", // 52px
-    14: "min-h-14", // 56px
-    15: "min-h-15", // 60px
-    16: "min-h-16", // 64px
-    17: "min-h-17", // 68px
-    18: "min-h-18", // 72px
-    19: "min-h-19", // 76px
-    20: "min-h-20", // 80px
-    24: "min-h-24", // 96px
+    11: "min-h-11",
+    12: "min-h-12",
+    13: "min-h-13",
+    14: "min-h-14",
+    15: "min-h-15",
+    16: "min-h-16",
+    17: "min-h-17",
+    18: "min-h-18",
+    19: "min-h-19",
+    20: "min-h-20",
+    24: "min-h-24",
 
-    // Large Heights (112-384px)
-    28: "min-h-28", // 112px
-    32: "min-h-32", // 128px
-    36: "min-h-36", // 144px
-    40: "min-h-40", // 160px
-    44: "min-h-44", // 176px
-    48: "min-h-48", // 192px
-    52: "min-h-52", // 208px
-    56: "min-h-56", // 224px
-    60: "min-h-60", // 240px
-    64: "min-h-64", // 256px
-    72: "min-h-72", // 288px
-    80: "min-h-80", // 320px
-    96: "min-h-96", // 384px
+
+    28: "min-h-28",
+    32: "min-h-32",
+    36: "min-h-36",
+    40: "min-h-40",
+    44: "min-h-44",
+    48: "min-h-48",
+    52: "min-h-52",
+    56: "min-h-56",
+    60: "min-h-60",
+    64: "min-h-64",
+    72: "min-h-72",
+    80: "min-h-80",
+    96: "min-h-96",
 
     // Percentage-Based Heights (Cross-platform compatible)
     half: "min-h-1/2", // 50%
@@ -140,54 +155,68 @@ export const width2heightClasses = {
     min: "min-h-min", // min-content
     max: "min-h-max", // max-content
     fit: "min-h-fit",
+
+    "3xs": "min-h-3xs",
+    "2xs": "min-h-2xs",
+    "xs": "min-h-xs",
+    sm: "min-h-sm",
+    md: "min-h-md",
+    lg: "min-h-lg",
+    xl: "min-h-xl",
+    "2xl": "min-h -2xl",
+    "3xl": "min-h-3xl",
+    "4xl": "min-h-4xl",
+    "5xl": "min-h-5xl",
+    "6xl": "min-h-6xl",
+    "7xl": "min-h-7xl"
   },
 
   height: {
     // Fixed Heights - Pixel Values (0-10)
-    0: "h-0", // 0px
-    px: "h-px", // 1px
-    0.5: "h-0.5", // 2px
-    1: "h-1", // 4px
-    1.5: "h-1.5", // 6px
-    2: "h-2", // 8px
-    2.5: "h-2.5", // 10px
-    3: "h-3", // 12px
-    3.5: "h-3.5", // 14px
-    4: "h-4", // 16px
-    5: "h-5", // 20px
-    6: "h-6", // 24px
-    7: "h-7", // 28px
-    8: "h-8", // 32px
-    9: "h-9", // 36px
-    10: "h-10", // 40px
+    0: "h-0",
+    px: "h-px",
+    0.5: "h-0.5",
+    1: "h-1",
+    1.5: "h-1.5",
+    2: "h-2",
+    2.5: "h-2.5",
+    3: "h-3",
+    3.5: "h-3.5",
+    4: "h-4",
+    5: "h-5",
+    6: "h-6",
+    7: "h-7",
+    8: "h-8",
+    9: "h-9",
+    10: "h-10",
 
     // Medium Heights (44-96px)
-    11: "h-11", // 44px
-    12: "h-12", // 48px
-    13: "h-13", // 52px
-    14: "h-14", // 56px
-    15: "h-15", // 60px
-    16: "h-16", // 64px
-    17: "h-17", // 68px
-    18: "h-18", // 72px
-    19: "h-19", // 76px
-    20: "h-20", // 80px
-    24: "h-24", // 96px
+    11: "h-11",
+    12: "h-12",
+    13: "h-13",
+    14: "h-14",
+    15: "h-15",
+    16: "h-16",
+    17: "h-17",
+    18: "h-18",
+    19: "h-19",
+    20: "h-20",
+    24: "h-24",
 
-    // Large Heights (112-384px)
-    28: "h-28", // 112px
-    32: "h-32", // 128px
-    36: "h-36", // 144px
-    40: "h-40", // 160px
-    44: "h-44", // 176px
-    48: "h-48", // 192px
-    52: "h-52", // 208px
-    56: "h-56", // 224px
-    60: "h-60", // 240px
-    64: "h-64", // 256px
-    72: "h-72", // 288px
-    80: "h-80", // 320px
-    96: "h-96", // 384px
+
+    28: "h-28",
+    32: "h-32",
+    36: "h-36",
+    40: "h-40",
+    44: "h-44",
+    48: "h-48",
+    52: "h-52",
+    56: "h-56",
+    60: "h-60",
+    64: "h-64",
+    72: "h-72",
+    80: "h-80",
+    96: "h-96",
 
     // Percentage-Based Heights (Cross-platform compatible)
     half: "h-1/2", // 50%
@@ -211,54 +240,68 @@ export const width2heightClasses = {
     min: "h-min", // min-content
     max: "h-max", // max-content
     fit: "h-fit",
+
+    "3xs": "h-3xs",
+    "2xs": "h-2xs",
+    "xs": "h-xs",
+    sm: "h-sm",
+    md: "h-md",
+    lg: "h-lg",
+    xl: "h-xl",
+    "2xl": "h -2xl",
+    "3xl": "h-3xl",
+    "4xl": "h-4xl",
+    "5xl": "h-5xl",
+    "6xl": "h-6xl",
+    "7xl": "h-7xl"
   },
 
   maxWidth: {
     // Fixed Widths - Pixel Values (0-10)
-    0: "max-w-0", // 0px
-    px: "max-w-px", // 1px
-    0.5: "max-w-0.5", // 2px
-    1: "max-w-1", // 4px
-    1.5: "max-w-1.5", // 6px
-    2: "max-w-2", // 8px
-    2.5: "max-w-2.5", // 10px
-    3: "max-w-3", // 12px
-    3.5: "max-w-3.5", // 14px
-    4: "max-w-4", // 16px
-    5: "max-w-5", // 20px
-    6: "max-w-6", // 24px
-    7: "max-w-7", // 28px
-    8: "max-w-8", // 32px
-    9: "max-w-9", // 36px
-    10: "max-w-10", // 40px
+    0: "max-w-0",
+    px: "max-w-px",
+    0.5: "max-w-0.5",
+    1: "max-w-1",
+    1.5: "max-w-1.5",
+    2: "max-w-2",
+    2.5: "max-w-2.5",
+    3: "max-w-3",
+    3.5: "max-w-3.5",
+    4: "max-w-4",
+    5: "max-w-5",
+    6: "max-w-6",
+    7: "max-w-7",
+    8: "max-w-8",
+    9: "max-w-9",
+    10: "max-w-10",
 
     // Medium Widths (44-96px)
-    11: "max-w-11", // 44px
-    12: "max-w-12", // 48px
-    13: "max-w-13", // 52px
-    14: "max-w-14", // 56px
-    15: "max-w-15", // 60px
-    16: "max-w-16", // 64px
-    17: "max-w-17", // 68px
-    18: "max-w-18", // 72px
-    19: "max-w-19", // 76px
-    20: "max-w-20", // 80px
-    24: "max-w-24", // 96px
+    11: "max-w-11",
+    12: "max-w-12",
+    13: "max-w-13",
+    14: "max-w-14",
+    15: "max-w-15",
+    16: "max-w-16",
+    17: "max-w-17",
+    18: "max-w-18",
+    19: "max-w-19",
+    20: "max-w-20",
+    24: "max-w-24",
 
     // Large Widths (112-384px)
-    28: "max-w-28", // 112px
-    32: "max-w-32", // 128px
-    36: "max-w-36", // 144px
-    40: "max-w-40", // 160px
-    44: "max-w-44", // 176px
-    48: "max-w-48", // 192px
-    52: "max-w-52", // 208px
-    56: "max-w-56", // 224px
-    60: "max-w-60", // 240px
-    64: "max-w-64", // 256px
-    72: "max-w-72", // 288px
-    80: "max-w-80", // 320px
-    96: "max-w-96", // 384px
+    28: "max-w-28",
+    32: "max-w-32",
+    36: "max-w-36",
+    40: "max-w-40",
+    44: "max-w-44",
+    48: "max-w-48",
+    52: "max-w-52",
+    56: "max-w-56",
+    60: "max-w-60",
+    64: "max-w-64",
+    72: "max-w-72",
+    80: "max-w-80",
+    96: "max-w-96",
 
     // Percentage-Based Widths (Cross-platform compatible)
     half: "max-w-1/2", // 50%
@@ -282,54 +325,68 @@ export const width2heightClasses = {
     min: "max-w-min", // min-content
     max: "max-w-max", // max-content
     fit: "max-w-fit",
+
+    "3xs": "max-w-3xs",
+    "2xs": "max-w-2xs",
+    "xs": "max-w-xs",
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+    xl: "max-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "max-w-3xl",
+    "4xl": "max-w-4xl",
+    "5xl": "max-w-5xl",
+    "6xl": "max-w-6xl",
+    "7xl": "max-w-7xl"
   },
 
   minWidth: {
     // Fixed Widths - Pixel Values (0-10)
-    0: "min-w-0", // 0px
-    px: "min-w-px", // 1px
-    0.5: "min-w-0.5", // 2px
-    1: "min-w-1", // 4px
-    1.5: "min-w-1.5", // 6px
-    2: "min-w-2", // 8px
-    2.5: "min-w-2.5", // 10px
-    3: "min-w-3", // 12px
-    3.5: "min-w-3.5", // 14px
-    4: "min-w-4", // 16px
-    5: "min-w-5", // 20px
-    6: "min-w-6", // 24px
-    7: "min-w-7", // 28px
-    8: "min-w-8", // 32px
-    9: "min-w-9", // 36px
-    10: "min-w-10", // 40px
+    0: "min-w-0",
+    px: "min-w-px",
+    0.5: "min-w-0.5",
+    1: "min-w-1",
+    1.5: "min-w-1.5",
+    2: "min-w-2",
+    2.5: "min-w-2.5",
+    3: "min-w-3",
+    3.5: "min-w-3.5",
+    4: "min-w-4",
+    5: "min-w-5",
+    6: "min-w-6",
+    7: "min-w-7",
+    8: "min-w-8",
+    9: "min-w-9",
+    10: "min-w-10",
 
     // Medium Widths (44-96px)
-    11: "min-w-11", // 44px
-    12: "min-w-12", // 48px
-    13: "min-w-13", // 52px
-    14: "min-w-14", // 56px
-    15: "min-w-15", // 60px
-    16: "min-w-16", // 64px
-    17: "min-w-17", // 68px
-    18: "min-w-18", // 72px
-    19: "min-w-19", // 76px
-    20: "min-w-20", // 80px
-    24: "min-w-24", // 96px
+    11: "min-w-11",
+    12: "min-w-12",
+    13: "min-w-13",
+    14: "min-w-14",
+    15: "min-w-15",
+    16: "min-w-16",
+    17: "min-w-17",
+    18: "min-w-18",
+    19: "min-w-19",
+    20: "min-w-20",
+    24: "min-w-24",
 
     // Large Widths (112-384px)
-    28: "min-w-28", // 112px
-    32: "min-w-32", // 128px
-    36: "min-w-36", // 144px
-    40: "min-w-40", // 160px
-    44: "min-w-44", // 176px
-    48: "min-w-48", // 192px
-    52: "min-w-52", // 208px
-    56: "min-w-56", // 224px
-    60: "min-w-60", // 240px
-    64: "min-w-64", // 256px
-    72: "min-w-72", // 288px
-    80: "min-w-80", // 320px
-    96: "min-w-96", // 384px
+    28: "min-w-28",
+    32: "min-w-32",
+    36: "min-w-36",
+    40: "min-w-40",
+    44: "min-w-44",
+    48: "min-w-48",
+    52: "min-w-52",
+    56: "min-w-56",
+    60: "min-w-60",
+    64: "min-w-64",
+    72: "min-w-72",
+    80: "min-w-80",
+    96: "min-w-96",
 
     // Percentage-Based Widths (Cross-platform compatible)
     half: "min-w-1/2", // 50%
@@ -353,54 +410,68 @@ export const width2heightClasses = {
     min: "min-w-min", // min-content
     max: "min-w-max", // max-content
     fit: "min-w-fit",
+
+    "3xs": "min-w-3xs",
+    "2xs": "min-w-2xs",
+    "xs": "min-w-xs",
+    sm: "min-w-sm",
+    md: "min-w-md",
+    lg: "min-w-lg",
+    xl: "min-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "min-w-3xl",
+    "4xl": "min-w-4xl",
+    "5xl": "min-w-5xl",
+    "6xl": "min-w-6xl",
+    "7xl": "min-w-7xl"
   },
 
   width: {
     // Fixed Widths - Pixel Values (0-10)
-    0: "w-0", // 0px
-    px: "w-px", // 1px
-    0.5: "w-0.5", // 2px
-    1: "w-1", // 4px
-    1.5: "w-1.5", // 6px
-    2: "w-2", // 8px
-    2.5: "w-2.5", // 10px
-    3: "w-3", // 12px
-    3.5: "w-3.5", // 14px
-    4: "w-4", // 16px
-    5: "w-5", // 20px
-    6: "w-6", // 24px
-    7: "w-7", // 28px
-    8: "w-8", // 32px
-    9: "w-9", // 36px
-    10: "w-10", // 40px
+    0: "w-0",
+    px: "w-px",
+    0.5: "w-0.5",
+    1: "w-1",
+    1.5: "w-1.5",
+    2: "w-2",
+    2.5: "w-2.5",
+    3: "w-3",
+    3.5: "w-3.5",
+    4: "w-4",
+    5: "w-5",
+    6: "w-6",
+    7: "w-7",
+    8: "w-8",
+    9: "w-9",
+    10: "w-10",
 
     // Medium Widths (44-96px)
-    11: "w-11", // 44px
-    12: "w-12", // 48px
-    13: "w-13", // 52px
-    14: "w-14", // 56px
-    15: "w-15", // 60px
-    16: "w-16", // 64px
-    17: "w-17", // 68px
-    18: "w-18", // 72px
-    19: "w-19", // 76px
-    20: "w-20", // 80px
-    24: "w-24", // 96px
+    11: "w-11",
+    12: "w-12",
+    13: "w-13",
+    14: "w-14",
+    15: "w-15",
+    16: "w-16",
+    17: "w-17",
+    18: "w-18",
+    19: "w-19",
+    20: "w-20",
+    24: "w-24",
 
     // Large Widths (112-384px)
-    28: "w-28", // 112px
-    32: "w-32", // 128px
-    36: "w-36", // 144px
-    40: "w-40", // 160px
-    44: "w-44", // 176px
-    48: "w-48", // 192px
-    52: "w-52", // 208px
-    56: "w-56", // 224px
-    60: "w-60", // 240px
-    64: "w-64", // 256px
-    72: "w-72", // 288px
-    80: "w-80", // 320px
-    96: "w-96", // 384px
+    28: "w-28",
+    32: "w-32",
+    36: "w-36",
+    40: "w-40",
+    44: "w-44",
+    48: "w-48",
+    52: "w-52",
+    56: "w-56",
+    60: "w-60",
+    64: "w-64",
+    72: "w-72",
+    80: "w-80",
+    96: "w-96",
 
     // Percentage-Based Widths (Cross-platform compatible)
     half: "w-1/2", // 50%
@@ -424,6 +495,20 @@ export const width2heightClasses = {
     min: "w-min", // min-content
     max: "w-max", // max-content
     fit: "w-fit",
+
+    "3xs": "w-3xs",
+    "2xs": "w-2xs",
+    "xs": "w-xs",
+    sm: "w-sm",
+    md: "w-md",
+    lg: "w-lg",
+    xl: "w-xl",
+    "2xl": "h -2xl",
+    "3xl": "w-3xl",
+    "4xl": "w-4xl",
+    "5xl": "w-5xl",
+    "6xl": "w-6xl",
+    "7xl": "w-7xl"
   },
 
   // SM Responsive Breakpoint
@@ -485,6 +570,20 @@ export const width2heightClasses = {
     min: "sm:max-h-min",
     max: "sm:max-h-max",
     fit: "sm:max-h-fit",
+
+    "3xs": "sm:max-h-3xs",
+    "2xs": "sm:max-h-2xs",
+    "xs": "sm:max-h-xs",
+    sm: "sm:max-h-sm",
+    md: "sm:max-h-md",
+    lg: "sm:max-h-lg",
+    xl: "sm:max-h-xl",
+    "2xl": "h -2xl",
+    "3xl": "sm:max-h-3xl",
+    "4xl": "sm:max-h-4xl",
+    "5xl": "sm:max-h-5xl",
+    "6xl": "sm:max-h-6xl",
+    "7xl": "sm:max-h-7xl"
   },
 
   "sm:minHeight": {
@@ -545,6 +644,20 @@ export const width2heightClasses = {
     min: "sm:min-h-min",
     max: "sm:min-h-max",
     fit: "sm:min-h-fit",
+
+    "3xs": "sm:min-h-3xs",
+    "2xs": "sm:min-h-2xs",
+    "xs": "sm:min-h-xs",
+    sm: "sm:min-h-sm",
+    md: "sm:min-h-md",
+    lg: "sm:min-h-lg",
+    xl: "sm:min-h-xl",
+    "2xl": "h -2xl",
+    "3xl": "sm:min-h-3xl",
+    "4xl": "sm:min-h-4xl",
+    "5xl": "sm:min-h-5xl",
+    "6xl": "sm:min-h-6xl",
+    "7xl": "sm:min-h-7xl"
   },
 
   "sm:height": {
@@ -605,6 +718,20 @@ export const width2heightClasses = {
     min: "sm:h-min",
     max: "sm:h-max",
     fit: "sm:h-fit",
+
+    "3xs": "sm:h-3xs",
+    "2xs": "sm:h-2xs",
+    "xs": "sm:h-xs",
+    sm: "sm:h-sm",
+    md: "sm:h-md",
+    lg: "sm:h-lg",
+    xl: "sm:h-xl",
+    "2xl": "h -2xl",
+    "3xl": "sm:h-3xl",
+    "4xl": "sm:h-4xl",
+    "5xl": "sm:h-5xl",
+    "6xl": "sm:h-6xl",
+    "7xl": "sm:h-7xl"
   },
 
   "sm:maxWidth": {
@@ -665,6 +792,20 @@ export const width2heightClasses = {
     min: "sm:max-w-min",
     max: "sm:max-w-max",
     fit: "sm:max-w-fit",
+
+    "3xs": "sm:max-w-3xs",
+    "2xs": "sm:max-w-2xs",
+    "xs": "sm:max-w-xs",
+    sm: "sm:max-w-sm",
+    md: "sm:max-w-md",
+    lg: "sm:max-w-lg",
+    xl: "sm:max-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "sm:max-w-3xl",
+    "4xl": "sm:max-w-4xl",
+    "5xl": "sm:max-w-5xl",
+    "6xl": "sm:max-w-6xl",
+    "7xl": "sm:max-w-7xl"
   },
 
   "sm:minWidth": {
@@ -725,6 +866,20 @@ export const width2heightClasses = {
     min: "sm:min-w-min",
     max: "sm:min-w-max",
     fit: "sm:min-w-fit",
+
+    "3xs": "sm:min-w-3xs",
+    "2xs": "sm:min-w-2xs",
+    "xs": "sm:min-w-xs",
+    sm: "sm:min-w-sm",
+    md: "sm:min-w-md",
+    lg: "sm:min-w-lg",
+    xl: "sm:min-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "sm:min-w-3xl",
+    "4xl": "sm:min-w-4xl",
+    "5xl": "sm:min-w-5xl",
+    "6xl": "sm:min-w-6xl",
+    "7xl": "sm:min-w-7xl"
   },
 
   "sm:width": {
@@ -785,6 +940,20 @@ export const width2heightClasses = {
     min: "sm:w-min",
     max: "sm:w-max",
     fit: "sm:w-fit",
+
+    "3xs": "sm:w-3xs",
+    "2xs": "sm:w-2xs",
+    "xs": "sm:w-xs",
+    sm: "sm:w-sm",
+    md: "sm:w-md",
+    lg: "sm:w-lg",
+    xl: "sm:w-xl",
+    "2xl": "h -2xl",
+    "3xl": "sm:w-3xl",
+    "4xl": "sm:w-4xl",
+    "5xl": "sm:w-5xl",
+    "6xl": "sm:w-6xl",
+    "7xl": "sm:w-7xl"
   },
 
   // MD Responsive Breakpoint
@@ -846,6 +1015,20 @@ export const width2heightClasses = {
     min: "md:max-h-min",
     max: "md:max-h-max",
     fit: "md:max-h-fit",
+
+    "3xs": "md:max-h-3xs",
+    "2xs": "md:max-h-2xs",
+    "xs": "md:max-h-xs",
+    sm: "md:max-h-sm",
+    md: "md:max-h-md",
+    lg: "md:max-h-lg",
+    xl: "md:max-h-xl",
+    "2xl": "h -2xl",
+    "3xl": "md:max-h-3xl",
+    "4xl": "md:max-h-4xl",
+    "5xl": "md:max-h-5xl",
+    "6xl": "md:max-h-6xl",
+    "7xl": "md:max-h-7xl"
   },
 
   "md:minHeight": {
@@ -906,6 +1089,20 @@ export const width2heightClasses = {
     min: "md:min-h-min",
     max: "md:min-h-max",
     fit: "md:min-h-fit",
+
+    "3xs": "md:min-h-3xs",
+    "2xs": "md:min-h-2xs",
+    "xs": "md:min-h-xs",
+    sm: "md:min-h-sm",
+    md: "md:min-h-md",
+    lg: "md:min-h-lg",
+    xl: "md:min-h-xl",
+    "2xl": "h -2xl",
+    "3xl": "md:min-h-3xl",
+    "4xl": "md:min-h-4xl",
+    "5xl": "md:min-h-5xl",
+    "6xl": "md:min-h-6xl",
+    "7xl": "md:min-h-7xl"
   },
 
   "md:height": {
@@ -966,6 +1163,20 @@ export const width2heightClasses = {
     min: "md:h-min",
     max: "md:h-max",
     fit: "md:h-fit",
+
+    "3xs": "md:h-3xs",
+    "2xs": "md:h-2xs",
+    "xs": "md:h-xs",
+    sm: "md:h-sm",
+    md: "md:h-md",
+    lg: "md:h-lg",
+    xl: "md:h-xl",
+    "2xl": "h -2xl",
+    "3xl": "md:h-3xl",
+    "4xl": "md:h-4xl",
+    "5xl": "md:h-5xl",
+    "6xl": "md:h-6xl",
+    "7xl": "md:h-7xl"
   },
 
   "md:maxWidth": {
@@ -1026,6 +1237,20 @@ export const width2heightClasses = {
     min: "md:max-w-min",
     max: "md:max-w-max",
     fit: "md:max-w-fit",
+
+    "3xs": "md:max-w-3xs",
+    "2xs": "md:max-w-2xs",
+    "xs": "md:max-w-xs",
+    sm: "md:max-w-sm",
+    md: "md:max-w-md",
+    lg: "md:max-w-lg",
+    xl: "md:max-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "md:max-w-3xl",
+    "4xl": "md:max-w-4xl",
+    "5xl": "md:max-w-5xl",
+    "6xl": "md:max-w-6xl",
+    "7xl": "md:max-w-7xl"
   },
 
   "md:minWidth": {
@@ -1086,6 +1311,20 @@ export const width2heightClasses = {
     min: "md:min-w-min",
     max: "md:min-w-max",
     fit: "md:min-w-fit",
+
+    "3xs": "md:min-w-3xs",
+    "2xs": "md:min-w-2xs",
+    "xs": "md:min-w-xs",
+    sm: "md:min-w-sm",
+    md: "md:min-w-md",
+    lg: "md:min-w-lg",
+    xl: "md:min-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "md:min-w-3xl",
+    "4xl": "md:min-w-4xl",
+    "5xl": "md:min-w-5xl",
+    "6xl": "md:min-w-6xl",
+    "7xl": "md:min-w-7xl"
   },
 
   "md:width": {
@@ -1146,6 +1385,20 @@ export const width2heightClasses = {
     min: "md:w-min",
     max: "md:w-max",
     fit: "md:w-fit",
+
+    "3xs": "md:w-3xs",
+    "2xs": "md:w-2xs",
+    "xs": "md:w-xs",
+    sm: "md:w-sm",
+    md: "md:w-md",
+    lg: "md:w-lg",
+    xl: "md:w-xl",
+    "2xl": "h -2xl",
+    "3xl": "md:w-3xl",
+    "4xl": "md:w-4xl",
+    "5xl": "md:w-5xl",
+    "6xl": "md:w-6xl",
+    "7xl": "md:w-7xl"
   },
 
   // LG Responsive Breakpoint
@@ -1207,6 +1460,20 @@ export const width2heightClasses = {
     min: "lg:max-h-min",
     max: "lg:max-h-max",
     fit: "lg:max-h-fit",
+
+    "3xs": "lg:max-h-3xs",
+    "2xs": "lg:max-h-2xs",
+    "xs": "lg:max-h-xs",
+    sm: "lg:max-h-sm",
+    md: "lg:max-h-md",
+    lg: "lg:max-h-lg",
+    xl: "lg:max-h-xl",
+    "2xl": "h -2xl",
+    "3xl": "lg:max-h-3xl",
+    "4xl": "lg:max-h-4xl",
+    "5xl": "lg:max-h-5xl",
+    "6xl": "lg:max-h-6xl",
+    "7xl": "lg:max-h-7xl"
   },
   "lg:minHeight": {
     0: "lg:min-h-0",
@@ -1266,6 +1533,20 @@ export const width2heightClasses = {
     min: "lg:min-h-min",
     max: "lg:min-h-max",
     fit: "lg:min-h-fit",
+
+    "3xs": "lg:min-h-3xs",
+    "2xs": "lg:min-h-2xs",
+    "xs": "lg:min-h-xs",
+    sm: "lg:min-h-sm",
+    md: "lg:min-h-md",
+    lg: "lg:min-h-lg",
+    xl: "lg:min-h-xl",
+    "2xl": "h -2xl",
+    "3xl": "lg:min-h-3xl",
+    "4xl": "lg:min-h-4xl",
+    "5xl": "lg:min-h-5xl",
+    "6xl": "lg:min-h-6xl",
+    "7xl": "lg:min-h-7xl"
   },
 
   "lg:height": {
@@ -1326,6 +1607,20 @@ export const width2heightClasses = {
     min: "lg:h-min",
     max: "lg:h-max",
     fit: "lg:h-fit",
+
+    "3xs": "lg:h-3xs",
+    "2xs": "lg:h-2xs",
+    "xs": "lg:h-xs",
+    sm: "lg:h-sm",
+    md: "lg:h-md",
+    lg: "lg:h-lg",
+    xl: "lg:h-xl",
+    "2xl": "h -2xl",
+    "3xl": "lg:h-3xl",
+    "4xl": "lg:h-4xl",
+    "5xl": "lg:h-5xl",
+    "6xl": "lg:h-6xl",
+    "7xl": "lg:h-7xl"
   },
 
   "lg:maxWidth": {
@@ -1386,6 +1681,20 @@ export const width2heightClasses = {
     min: "lg:max-w-min",
     max: "lg:max-w-max",
     fit: "lg:max-w-fit",
+
+    "3xs": "lg:max-w-3xs",
+    "2xs": "lg:max-w-2xs",
+    "xs": "lg:max-w-xs",
+    sm: "lg:max-w-sm",
+    md: "lg:max-w-md",
+    lg: "lg:max-w-lg",
+    xl: "lg:max-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "lg:max-w-3xl",
+    "4xl": "lg:max-w-4xl",
+    "5xl": "lg:max-w-5xl",
+    "6xl": "lg:max-w-6xl",
+    "7xl": "lg:max-w-7xl"
   },
 
   "lg:minWidth": {
@@ -1446,6 +1755,20 @@ export const width2heightClasses = {
     min: "lg:min-w-min",
     max: "lg:min-w-max",
     fit: "lg:min-w-fit",
+
+    "3xs": "lg:min-w-3xs",
+    "2xs": "lg:min-w-2xs",
+    "xs": "lg:min-w-xs",
+    sm: "lg:min-w-sm",
+    md: "lg:min-w-md",
+    lg: "lg:min-w-lg",
+    xl: "lg:min-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "lg:min-w-3xl",
+    "4xl": "lg:min-w-4xl",
+    "5xl": "lg:min-w-5xl",
+    "6xl": "lg:min-w-6xl",
+    "7xl": "lg:min-w-7xl"
   },
 
   "lg:width": {
@@ -1506,6 +1829,20 @@ export const width2heightClasses = {
     min: "lg:w-min",
     max: "lg:w-max",
     fit: "lg:w-fit",
+
+    "3xs": "lg:w-3xs",
+    "2xs": "lg:w-2xs",
+    "xs": "lg:w-xs",
+    sm: "lg:w-sm",
+    md: "lg:w-md",
+    lg: "lg:w-lg",
+    xl: "lg:w-xl",
+    "2xl": "h -2xl",
+    "3xl": "lg:w-3xl",
+    "4xl": "lg:w-4xl",
+    "5xl": "lg:w-5xl",
+    "6xl": "lg:w-6xl",
+    "7xl": "lg:w-7xl"
   },
 
   // XL Responsive Breakpoint
@@ -1567,6 +1904,20 @@ export const width2heightClasses = {
     min: "xl:max-h-min",
     max: "xl:max-h-max",
     fit: "xl:max-h-fit",
+
+    "3xs": "xl:max-h-3xs",
+    "2xs": "xl:max-h-2xs",
+    "xs": "xl:max-h-xs",
+    sm: "xl:max-h-sm",
+    md: "xl:max-h-md",
+    lg: "xl:max-h-lg",
+    xl: "xl:max-h-xl",
+    "2xl": "h -2xl",
+    "3xl": "xl:max-h-3xl",
+    "4xl": "xl:max-h-4xl",
+    "5xl": "xl:max-h-5xl",
+    "6xl": "xl:max-h-6xl",
+    "7xl": "xl:max-h-7xl"
   },
 
   "xl:minHeight": {
@@ -1627,6 +1978,20 @@ export const width2heightClasses = {
     min: "xl:min-h-min",
     max: "xl:min-h-max",
     fit: "xl:min-h-fit",
+
+    "3xs": "xl:min-h-3xs",
+    "2xs": "xl:min-h-2xs",
+    "xs": "xl:min-h-xs",
+    sm: "xl:min-h-sm",
+    md: "xl:min-h-md",
+    lg: "xl:min-h-lg",
+    xl: "xl:min-h-xl",
+    "2xl": "h -2xl",
+    "3xl": "xl:min-h-3xl",
+    "4xl": "xl:min-h-4xl",
+    "5xl": "xl:min-h-5xl",
+    "6xl": "xl:min-h-6xl",
+    "7xl": "xl:min-h-7xl"
   },
 
   "xl:height": {
@@ -1687,6 +2052,20 @@ export const width2heightClasses = {
     min: "xl:h-min",
     max: "xl:h-max",
     fit: "xl:h-fit",
+
+    "3xs": "xl:h-3xs",
+    "2xs": "xl:h-2xs",
+    "xs": "xl:h-xs",
+    sm: "xl:h-sm",
+    md: "xl:h-md",
+    lg: "xl:h-lg",
+    xl: "xl:h-xl",
+    "2xl": "h -2xl",
+    "3xl": "xl:h-3xl",
+    "4xl": "xl:h-4xl",
+    "5xl": "xl:h-5xl",
+    "6xl": "xl:h-6xl",
+    "7xl": "xl:h-7xl"
   },
 
   "xl:maxWidth": {
@@ -1747,6 +2126,20 @@ export const width2heightClasses = {
     min: "xl:max-w-min",
     max: "xl:max-w-max",
     fit: "xl:max-w-fit",
+
+    "3xs": "xl:max-w-3xs",
+    "2xs": "xl:max-w-2xs",
+    "xs": "xl:max-w-xs",
+    sm: "xl:max-w-sm",
+    md: "xl:max-w-md",
+    lg: "xl:max-w-lg",
+    xl: "xl:max-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "xl:max-w-3xl",
+    "4xl": "xl:max-w-4xl",
+    "5xl": "xl:max-w-5xl",
+    "6xl": "xl:max-w-6xl",
+    "7xl": "xl:max-w-7xl"
   },
 
   "xl:minWidth": {
@@ -1807,6 +2200,20 @@ export const width2heightClasses = {
     min: "xl:min-w-min",
     max: "xl:min-w-max",
     fit: "xl:min-w-fit",
+
+    "3xs": "xl:min-w-3xs",
+    "2xs": "xl:min-w-2xs",
+    "xs": "xl:min-w-xs",
+    sm: "xl:min-w-sm",
+    md: "xl:min-w-md",
+    lg: "xl:min-w-lg",
+    xl: "xl:min-w-xl",
+    "2xl": "h -2xl",
+    "3xl": "xl:min-w-3xl",
+    "4xl": "xl:min-w-4xl",
+    "5xl": "xl:min-w-5xl",
+    "6xl": "xl:min-w-6xl",
+    "7xl": "xl:min-w-7xl"
   },
 
   "xl:width": {
@@ -1867,5 +2274,19 @@ export const width2heightClasses = {
     min: "xl:w-min",
     max: "xl:w-max",
     fit: "xl:w-fit",
+
+    "3xs": "xl:w-3xs",
+    "2xs": "xl:w-2xs",
+    "xs": "xl:w-xs",
+    sm: "xl:w-sm",
+    md: "xl:w-md",
+    lg: "xl:w-lg",
+    xl: "xl:w-xl",
+    "2xl": "h -2xl",
+    "3xl": "xl:w-3xl",
+    "4xl": "xl:w-4xl",
+    "5xl": "xl:w-5xl",
+    "6xl": "xl:w-6xl",
+    "7xl": "xl:w-7xl"
   },
 } as const;

@@ -18,7 +18,7 @@ export function SelectCountry({ countryFlagProps: customCountryFlagProps, displa
     anchorProps = Object.assign({}, anchorProps);
     props.menuProps = Object.assign({}, props.menuProps);
     props.menuProps.bottomSheetVariant = Object.assign({}, props.menuProps.variant);
-    props.menuProps.bottomSheetVariant = { minHeight: "70%", ...props.menuProps.bottomSheetVariant }
+    props.menuProps.bottomSheetVariant = { minHeight: "threeQuarters", ...props.menuProps.bottomSheetVariant }
     const canDisplayDialCode = displayDialCode !== false;
 
     return <Dropdown<ICountry, ICountryCode>

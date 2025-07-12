@@ -90,7 +90,7 @@ export const useDimensions = (options?: Partial<IUseDimensionsOptons>): IUseDime
 
     const { width } = prevWindowRef.current;
 
-    const { isMobile, isTablet, isDesktop } = Breakpoints.getDeviceLayout({ windowWidth: width });
+    const { isMobile, isTablet, isDesktop } = Breakpoints.getDeviceLayout({ viewportWidth: width });
     useEffect(() => {
         const applyUpdate = (newDimensions: IUseDimensionsResult) => {
             if (previousDimensions.current && !exceedsThreshold(newDimensions, previousDimensions.current as any, optionsRef.current.widthThreshold as number, optionsRef.current.heightThreshold as number)) {

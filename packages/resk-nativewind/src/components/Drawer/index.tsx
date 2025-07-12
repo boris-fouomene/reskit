@@ -17,6 +17,7 @@ import { INavItemProps, INavItemsProps, Nav } from "@components/Nav";
 import { Modal } from "@components/Modal";
 import { IModalProps } from "@components/Modal/types";
 import { IIconVariant } from "@variants/icon";
+import { commonVariant } from "@variants/common";
 
 const useNativeDriver = Platform.canUseNativeDriver();
 const MIN_SWIPE_DISTANCE = 3;
@@ -345,7 +346,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
   }
   renderHeader(): ReactNode {
     const { appBarProps, withAppBar } = this.getComponentProps();
-    if (withAppBar === false || !isObj(appBarProps)) return null;
+    if (withAppBar === false || (!isObj(appBarProps) || this.isProvider())) return null;
     const testID = this.getTestID();
     return <AppBar
       testID={testID + "drawer-header"}
@@ -375,14 +376,17 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
   }
 
   getDrawerWidth(): number {
-    if (this.isProvider()) {
-      const fullScreen = this.state.fullScreen;
-      if (fullScreen || (this.isProvider() && Breakpoints.getDeviceLayout().isMobile)) {
-        return Dimensions.get("window").width;
-      }
+    const { isMobile, isDesktop, windowWidth, ...rest } = Breakpoints.getDeviceLayout();
+    const isProvider = this.isProvider();
+    const fullScreen = this.state.fullScreen;
+    if (fullScreen || (isProvider && isMobile)) {
+      return windowWidth;
     }
-    const props = this.getComponentProps();
-    return Math.min(isNumber(props.drawerWidth) && props.drawerWidth > 0 ? props?.drawerWidth : this.getDrawerWidth());
+    const { drawerWidth } = this.getComponentProps();
+    if (isNumber(drawerWidth) && drawerWidth > 50) return drawerWidth;
+    const W = isProvider ? 400 : 280;
+    if (windowWidth > W + 100) return W;
+    return Math.floor((isDesktop ? 82 : 80) * windowWidth / 100);
   }
 
   /**
@@ -418,9 +422,8 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
       <Wrapper {...wrapperProps}>
         <DrawerContext.Provider value={{ drawer: this }}>
           <View testID={testID} className={cn("h-full flex-1 flex-col", className)} {...this._panResponder.panHandlers}>
-            {!permanent ? (<Backdrop testID={testID + "-backdrop"} />) : null}
             <Animated.View
-              testID={testID + "animated-content"}
+              testID={testID + "-animated-content"}
               accessibilityViewIsModal={accessibilityViewIsModal}
               className={cn("resk-drawer-animated")}
               style={[
@@ -436,6 +439,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
                 }
               ]}
             >
+              {!permanent ? (<Backdrop onPress={() => this.close.bind(this)} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop", commonVariant({ backdrop: true }))} />) : null}
               <Div className={cn("flex-1 w-full h-full flex-col", contentClassName)} testID={testID + "drawer-content"}>
                 {this.renderHeader()}
                 {this.isProvider() && this.state.providerOptions ? this.state.providerOptions.children : this.state.children}

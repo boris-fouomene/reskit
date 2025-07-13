@@ -40,10 +40,10 @@ import { IIconProps } from "@components/Icon";
  *   }}
  *   open={true}
  * >
- *   <View>
+ *   <Div>
  *     <Text>Advanced configuration options</Text>
  *     <Button title="Save Settings" />
- *   </View>
+ *   </Div>
  * </Details>
  * 
  * // Controlled component usage
@@ -75,11 +75,11 @@ export interface IHtmlDetailsProps extends IHtmlDivProps, IHtmlDetailsIcons {
      * 
      * // Complex summary with icons and styling
      * summary={
-     *   <View className="flex-row items-center gap-2">
+     *   <Div className="flex-row items-center gap-2">
      *     <Icon fontIconName="settings" size={16} />
      *     <Text className="font-semibold">Settings</Text>
      *     <Badge text="New" />
-     *   </View>
+     *   </Div>
      * }
      * 
      * // Interactive summary with custom styling
@@ -134,12 +134,12 @@ export interface IHtmlDetailsProps extends IHtmlDivProps, IHtmlDetailsIcons {
      * 
      * // Complex layout with multiple elements
      * children={
-     *   <View className="space-y-4">
+     *   <Div className="space-y-4">
      *     <Text className="text-lg font-semibold">Content Title</Text>
      *     <Text>Detailed description goes here...</Text>
      *     <Button title="Action Button" onPress={handleAction} />
      *     <Image source={{ uri: 'https://example.com/image.jpg' }} />
-     *   </View>
+     *   </Div>
      * }
      * 
      * // Conditional content rendering

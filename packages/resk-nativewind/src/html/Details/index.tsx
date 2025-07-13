@@ -54,11 +54,11 @@ import { DetailsIcon } from "./Icon";
  *   open={true}
  *   className="border border-gray-300 rounded"
  * >
- *   <View className="space-y-4">
+ *   <Div className="space-y-4">
  *     <Text className="text-gray-700">Advanced configuration options:</Text>
  *     <Switch label="Enable notifications" />
  *     <Button title="Save Settings" onPress={handleSave} />
- *   </View>
+ *   </Div>
  * </Details>
  * 
  * // Controlled component with external state management
@@ -67,10 +67,10 @@ import { DetailsIcon } from "./Icon";
  * 
  * <Details
  *   summary={
- *     <View className="flex-row items-center gap-2">
+ *     <Div className="flex-row items-center gap-2">
  *       <Text>Form Settings</Text>
  *       {hasUnsavedChanges && <Badge text="•" color="red" />}
- *     </View>
+ *     </Div>
  *   }
  *   open={isOpen}
  *   onPress={() => setIsOpen(!isOpen)}
@@ -136,12 +136,12 @@ import { DetailsIcon } from "./Icon";
  * 
  * <Details
  *   summary={
- *     <View className="flex-row items-center justify-between">
+ *     <Div className="flex-row items-center justify-between">
  *       <Text>Validation Errors</Text>
  *       {errors.length > 0 && (
  *         <Badge text={errors.length.toString()} color="red" />
  *       )}
- *     </View>
+ *     </Div>
  *   }
  *   open={errors.length > 0}
  *   summaryClassName={cn(
@@ -150,13 +150,13 @@ import { DetailsIcon } from "./Icon";
  *   )}
  *   contentClassName="bg-red-25 border-red-100 border-t"
  * >
- *   <View className="space-y-2">
+ *   <Div className="space-y-2">
  *     {errors.map((error, index) => (
  *       <Text key={index} className="text-red-700 text-sm">
  *         • {error}
  *       </Text>
  *     ))}
- *   </View>
+ *   </Div>
  * </Details>
  * ```
  * 

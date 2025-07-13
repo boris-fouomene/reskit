@@ -135,13 +135,13 @@ export interface INavLinkProps {
      *
      * export default function Route() {
      *  return (
-     *   <View>
+     *   <Div>
      *    <Link href="/home" asChild>
      *      <Pressable>
      *       <Text>Home</Text>
      *      </Pressable>
      *    </Link>
-     *   </View>
+     *   </Div>
      *  );
      *}
      * This is equivalent to props passHref on Next.js Link

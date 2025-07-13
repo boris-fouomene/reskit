@@ -13,14 +13,13 @@ import { dividerVariant } from "@variants/divider";
  * Here’s an example of how to use the `Divider` component:
  *
  * ```tsx
- * import {View} from "react-native";
  * import Divider from '@resk/nativewind'; // Adjust the import path as necessary 
  * const MyComponent = () => {
  *   return (
- *     <View>
+ *     <Div>
  *       <Divider style={{ height: 2 }} />
  *       <Divider disabled style={{ height: 1 }} />
- *     </View>
+ *     </Div>
  *   );
  * };
  * 

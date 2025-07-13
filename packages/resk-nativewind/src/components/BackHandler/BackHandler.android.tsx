@@ -14,7 +14,7 @@ import { BackHandler } from "react-native";
  * 
  * ```tsx
  * import React, { useEffect } from 'react';
- * import { View, Text, BackHandler, Alert } from 'react-native';
+ * import { Div, Text, BackHandler, Alert } from 'react-native';
  * 
  * const MyComponent = () => {
  *   useEffect(() => {
@@ -39,9 +39,9 @@ import { BackHandler } from "react-native";
  *   }, []);
  * 
  *   return (
- *     <View>
+ *     <Div>
  *       <Text>Press the back button to see the alert!</Text>
- *     </View>
+ *     </Div>
  *   );
  * };
  * 

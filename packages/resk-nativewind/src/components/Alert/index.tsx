@@ -95,13 +95,13 @@ import { IAlertHook } from "./types";
  *   centered={true}
  *   headerContent={<Badge variant="info">v2.1.0</Badge>}
  *   message={
- *     <View>
+ *     <Div>
  *       <Text className="mb-2">New features in this update:</Text>
  *       <Text>• Enhanced performance and stability</Text>
  *       <Text>• New dark mode theme</Text>
  *       <Text>• Improved accessibility features</Text>
  *       <Text>• Bug fixes and security updates</Text>
- *     </View>
+ *     </Div>
  *   }
  *   actions={{
  *     items: [
@@ -128,12 +128,12 @@ import { IAlertHook } from "./types";
  *   type="info"
  *   icon="material-cloud-upload"
  *   headerContent={
- *     <View className="flex-1 mx-4">
+ *     <Div className="flex-1 mx-4">
  *       <ProgressBar progress={uploadProgress} />
  *       <Text className="text-xs text-center mt-1">
  *         {Math.round(uploadProgress * 100)}% Complete
  *       </Text>
- *     </View>
+ *     </Div>
  *   }
  *   message="Please wait while we process your files..."
  *   dismissible={false}
@@ -260,10 +260,10 @@ export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
      * // With JSX content
      * <Alert 
      *   title={
-     *     <View className="flex-row items-center">
+     *     <Div className="flex-row items-center">
      *       <Text>Upload Complete</Text>
      *       <Badge>New</Badge>
-     *     </View>
+     *     </Div>
      *   } 
      * />
      * ```
@@ -372,12 +372,12 @@ export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
      * <Alert 
      *   title="Update Available"
      *   message={
-     *     <View>
+     *     <Div>
      *       <Text>A new version is available with the following features:</Text>
      *       <Text>• Improved performance</Text>
      *       <Text>• Bug fixes</Text>
      *       <Text>• New UI components</Text>
-     *     </View>
+     *     </Div>
      *   }
      * />
      * ```
@@ -789,7 +789,7 @@ export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
      *   title="File Upload"
      *   headerContent={
      *     <Button size="sm" variant="ghost">
-     *       View Details
+     *       Div Details
      *     </Button>
      *   }
      * />
@@ -798,10 +798,10 @@ export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
      * <Alert 
      *   title="Task Complete"
      *   headerContent={
-     *     <View className="flex-row items-center space-x-2">
+     *     <Div className="flex-row items-center space-x-2">
      *       <Badge variant="success">Done</Badge>
      *       <Text className="text-xs text-gray-500">2 min ago</Text>
-     *     </View>
+     *     </Div>
      *   }
      * />
      * 
@@ -809,9 +809,9 @@ export interface IAlertProps extends Omit<ISurfaceProps, "title" | "variant"> {
      * <Alert 
      *   title="Uploading..."
      *   headerContent={
-     *     <View className="flex-1 mx-4">
+     *     <Div className="flex-1 mx-4">
      *       <ProgressBar progress={0.7} />
-     *     </View>
+     *     </Div>
      *   }
      * />
      * ```

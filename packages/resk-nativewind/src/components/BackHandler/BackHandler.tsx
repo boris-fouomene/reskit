@@ -14,7 +14,6 @@ import { BackPressEventName } from "react-native";
  * 
  * ```tsx
  * import React, { useEffect } from 'react';
- * import { View, Text } from 'react-native';
  * import BackHandler from './BackHandler'; // Adjust the import path as necessary
  * 
  * const MyComponent = () => {
@@ -31,9 +30,9 @@ import { BackPressEventName } from "react-native";
  *   }, []);
  * 
  *   return (
- *     <View>
+ *     <Div>
  *       <Text>Press the back button to see the log!</Text>
- *     </View>
+ *     </Div>
  *   );
  * };
  * 

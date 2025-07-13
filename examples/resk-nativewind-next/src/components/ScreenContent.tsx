@@ -11,11 +11,8 @@ type ScreenContentProps = {
 };
 export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   return (
-    <Div className="flex flex-1 flex-row justify-start items-start">
-      <Drawer>
-        <DrawerChildren />
-      </Drawer>
-      <ScrollView testID='main-entry-appp' style={{ flex: 1 }}>
+    <Div className="flex flex-1 flex-col justify-start items-start grow h-screen w-screen">
+      <ScrollView testID='main-entry-appp flex-1 main-scrollview' contentContainerStyle={{}}>
         <DialogExample />
         <BottomSheetExample />
         <AlertExamples />

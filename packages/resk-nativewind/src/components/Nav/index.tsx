@@ -1,7 +1,7 @@
 import { Button } from "@components/Button";
 import { INavItemProps, INavItemsProps, INavLinkComponent, INavLinkProps } from "./types";
 import { FC } from "react";
-import { defaultStr } from "@resk/core/utils";
+import { defaultStr, isObj } from "@resk/core/utils";
 import { Details } from "@html/Details";
 import { Divider } from "@components/Divider";
 import { IReactComponent } from "@src/types";
@@ -9,7 +9,8 @@ import { Div } from "@html/Div";
 import { useRenderNavItems } from "./hooks";
 import { renderNavItems } from "./utils";
 import { cn } from "@utils/cn";
-
+import Platform from "@platform";
+import { normalizeHtmlProps, normalizeNativeProps } from "@html/utils";
 
 export class Nav {
     static readonly linkMetaData = Symbol("link-meta-data");
@@ -29,7 +30,7 @@ export class Nav {
         return renderNavItems({ ...rest, items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem });
     };
     static Item<Context = unknown>({ className, linkProps, variant, ...props }: INavItemProps<Context>) {
-        return <Nav.Link testID={"resk-nav-link"} asChild {...linkProps}>
+        return <Nav.Link asChild {...(isObj(linkProps) ? (Platform.isNative() ? normalizeNativeProps(linkProps as any) : normalizeHtmlProps(linkProps as any)) : {})}>
             <Button
                 testID="nav-item"
                 {...props}

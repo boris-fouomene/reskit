@@ -1,8 +1,8 @@
 "use client";
-import { Pressable, TouchableOpacity, PressableProps } from "react-native";
+import { TouchableOpacity, PressableProps } from "react-native";
 import { useId, useMemo, useRef } from "react";
 import { ITooltipProps } from './types';
-import { defaultStr, uniqid } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 import { useMergeRefs } from "@utils/mergeRefs";
 import { cn, isValidElement } from "@utils";
 import { ITouchableProps } from "@src/types";

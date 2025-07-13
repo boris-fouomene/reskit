@@ -1,4 +1,4 @@
-import { defaultStr } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 import { IHtmlTextProps, Text } from "@html";
 import { cn } from "@utils/cn";
 import { ITextVariant } from "@variants/text";

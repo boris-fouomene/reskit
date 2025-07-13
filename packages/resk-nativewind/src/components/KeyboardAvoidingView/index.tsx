@@ -1,6 +1,6 @@
 import { Div } from "@html/Div";
 import { IKeyboardAvoidingViewProps } from "./types";
-import { defaultStr } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 
 export * from "./types";
 

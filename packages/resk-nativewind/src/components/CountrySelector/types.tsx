@@ -1,16 +1,15 @@
 import { IDropdownProps } from "@components/Dropdown";
 import { ICountryFlagProps } from "@components/Icon/CountryFlag";
-import { ICountry, ICountryCode } from "@resk/core";
-import { ITextVariant } from "@variants/text";
+import { ICountry, ICountryCode } from "@resk/core/countries";
 import { TouchableOpacityProps } from 'react-native';
 
 /***
  * The props for the country selector component.
  * 
- * @interface ISelectCountryProps
+ * @interface ICountrySelectorProps
  * @extends IDropdownProps<ICountry, ICountryCode>
  */
-export interface ISelectCountryProps extends IDropdownProps<ICountry, ICountryCode> {
+export interface ICountrySelectorProps extends IDropdownProps<ICountry, ICountryCode> {
     /***
      * The props for the country flag component.
      * This is an object that defines the props for the country flag component.

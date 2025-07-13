@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { TouchableOpacityProps } from 'react-native';
-import { ICountryCode } from '@resk/core';
+import { ICountryCode } from '@resk/core/countries';
 import { IClassName } from '@src/types';
 import { IIconProps } from '../types';
 import { IHtmlTextProps } from '@html/types';

@@ -4,7 +4,8 @@ import { useEffect, useState, useRef, useMemo, Fragment, useImperativeHandle } f
 import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, TouchableOpacity } from 'react-native';
 import { IMenuAnchorMeasurements, IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
-import { defaultStr, i18n } from '@resk/core';
+import { defaultStr } from '@resk/core/utils';
+import i18n from "@resk/core/i18n";
 import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
 import { isNumber } from "@resk/core/utils";

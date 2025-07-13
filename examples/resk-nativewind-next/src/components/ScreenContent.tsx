@@ -4,7 +4,7 @@ import { DialogExample } from './DialogExample';
 import { BottomSheetExample } from './BottomSheetExample';
 import { AlertExamples } from './AlertExamples';
 import { DrawerChildren } from './DialogExample';
-import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, buttonVariant, SelectCountry, TelInput, Drawer } from "@resk/nativewind";
+import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, buttonVariant, CountrySelector, TelInput, Drawer } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
@@ -77,8 +77,8 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
               multiple
               items={Array.from({ length: 10000 }).map((_, index) => ({ label: `Option ${index}`, value: index }))}
             />
-            <SelectCountry
-              label="SelectCountry"
+            <CountrySelector
+              label="CountrySelector"
             />
           </HStack>
         </Div>

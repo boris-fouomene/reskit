@@ -1,7 +1,8 @@
 "use client";
 import { useMemo } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { CountriesManager, defaultStr } from '@resk/core';
+import { CountriesManager } from '@resk/core/countries';
+import { defaultStr } from "@resk/core/utils";
 import { isImageSource } from '../utils';
 import Icon from '../Icon';
 import { isValidElement } from 'react';

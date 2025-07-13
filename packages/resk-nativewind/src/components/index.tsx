@@ -22,7 +22,7 @@ export * from "./AppBar";
 export * from "./ProgressBar";
 export * from "./TextInput"
 export * from "./Dropdown";
-export * from "./SelectCountry";
+export * from "./CountrySelector";
 export * from "./BottomSheet";
 export * from "./Alert";
 export { Portal } from "./Portal";

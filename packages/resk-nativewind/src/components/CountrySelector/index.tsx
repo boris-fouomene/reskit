@@ -1,16 +1,16 @@
 "use client";
 import { Dropdown } from "@components/Dropdown";
-import { CountriesManager, defaultStr, ICountry, ICountryCode, isNonNullString } from "@resk/core";
-import { TouchableOpacity } from "react-native";
+import { isNonNullString } from "@resk/core/utils";
+import { CountriesManager, ICountry, ICountryCode, } from "@resk/core/countries";
 import { useMemo } from "react";
 import { Icon } from "@components/Icon";
 import { Div } from "@html/Div";
 import { Text } from "@html/Text";
 import { cn } from "@utils/cn";
-import { ISelectCountryProps } from "./types";
+import { ICountrySelectorProps } from "./types";
 
 
-export function SelectCountry({ countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }: ISelectCountryProps) {
+export function CountrySelector({ countryFlagProps: customCountryFlagProps, displayDialCode, label, anchorProps, ...props }: ICountrySelectorProps) {
     const countries = useMemo(() => {
         return Object.values(CountriesManager.getCountries());
     }, []);
@@ -39,9 +39,9 @@ export function SelectCountry({ countryFlagProps: customCountryFlagProps, displa
     />
 };
 
-SelectCountry.displayName = "SelectCountry";
+CountrySelector.displayName = "CountrySelector";
 
 
-SelectCountry.displayName = "SelectCountry";
+CountrySelector.displayName = "CountrySelector";
 
 export * from "./types";

@@ -254,8 +254,6 @@ describe("i18n translateObject", () => {
 
         const result = i18n.translateObject(formLabels);
 
-        console.log(i18n.getLocale(), i18n.getTranslations(), result, " is locale")
-
         expect(result).toEqual({
             name: "Nom",
             email: "Adresse Email"

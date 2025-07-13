@@ -1,8 +1,8 @@
 "use client";
 import TextInput from "./Input";
 import { ITextInputProps } from "./types";
-import { TextInput as RNTextInput, TouchableOpacity } from "react-native";
-import { SelectCountry } from "@components/SelectCountry";
+import { TextInput as RNTextInput } from "react-native";
+import { CountrySelector } from "@components/CountrySelector";
 import { ICountryCode } from "@resk/core/countries";
 import { Div } from "@html/Div";
 import { defaultStr, isNonNullString } from "@resk/core/utils";
@@ -41,7 +41,7 @@ import { Text } from "@html/Text";
  * ```
  *
  * @remarks
- * - The country selector is rendered using {@link SelectCountry} and displays a flag or dial code.
+ * - The country selector is rendered using {@link CountrySelector} and displays a flag or dial code.
  * - The input field is always set to `type="tel"` and disables the default dial code display (handled by the selector).
  * - All styling and behavior can be customized via standard {@link TextInput} props.
  * - The component manages its own country code state and updates the input formatting accordingly.
@@ -49,7 +49,7 @@ import { Text } from "@html/Text";
  *
  * @see {@link TextInput}
  * @see {@link ITelInputProps}
- * @see {@link SelectCountry}
+ * @see {@link CountrySelector}
  * @see {@link ICountryCode}
  *
  * @public
@@ -59,7 +59,7 @@ export function TelInput(props: ITelInputProps) {
         displayPhoneDialCode={false}
         renderTextInput={(inputProps, { formatValue, updateInputState, phoneCountryCode, inputTextClassName, label, labelTextClassName, iconTextClassName, phoneDialCodeText, editable, disabled }) => {
             return <>
-                <SelectCountry
+                <CountrySelector
                     disabled={disabled}
                     readOnly={!editable}
                     multiple={false}

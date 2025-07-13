@@ -1,5 +1,5 @@
 "use client";
-import { extendObj, isObj } from "@resk/core";
+import { extendObj, isObj } from "@resk/core/utils";
 import { ComponentClass, ReactElement, Ref, RefObject, useEffect, useRef } from "react";
 
 /**

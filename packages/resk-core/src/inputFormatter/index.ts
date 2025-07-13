@@ -11,7 +11,7 @@ const phoneUtil = libPhoneNumber.PhoneNumberUtil.getInstance();
 const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
 import { CountriesManager, ICountryCode } from "@countries/index";
 import isEmpty from "@utils/isEmpty";
-import Logger from "@logger";
+import { Logger } from "@logger";
 import isPrimitive from "@utils/isPrimitive";
 import stringify from "@utils/stringify";
 import { isNullable } from "@utils/isNullable";
@@ -158,7 +158,7 @@ export default class InputFormatter {
       if (countryCallingCode !== 0) {
         return countryCallingCode.toString();
       }
-    } catch (error) {}
+    } catch (error) { }
     return "";
   }
   /**
@@ -485,7 +485,7 @@ export default class InputFormatter {
           // Check if the parsed date matches the input exactly
           // This ensures that the input is not only valid but also logically correct
           return date.isValid() && date.format(momentDateFormat) === value;
-        } catch (e) {}
+        } catch (e) { }
         return false;
       },
     };
@@ -781,7 +781,7 @@ export default class InputFormatter {
         // Get dial code
         return parsedNumber.getCountryCode() + "";
       }
-    } catch (e) {}
+    } catch (e) { }
     return "";
   }
 
@@ -873,7 +873,7 @@ function handleMaskAtIndex({ maskChar, valueChar, nonRegexReplacedChars, obfusca
           });
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   } else if (isNonNullString(maskChar)) {
     // it's a fixed maskChar: add to maskedResult and advance on mask index
     masked = maskChar;
@@ -913,7 +913,7 @@ function genPhoneNumberMask(parsedNumber: PhoneNumber | null, format?: PhoneNumb
         };
       }
     }
-  } catch (error) {}
+  } catch (error) { }
   return {
     mask: [],
     validate: () => false,

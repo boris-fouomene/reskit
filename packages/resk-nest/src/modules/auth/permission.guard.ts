@@ -1,6 +1,8 @@
-import { CanActivate, ExecutionContext, SetMetadata, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { Auth, defaultObj, i18n, IAuthPerm, IResourceName, isNonNullString, isObj, ResourcesManager, createPropertyDecorator, getDecoratedProperty, getDecoratedProperties } from '@resk/core';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { Auth, IAuthPerm, } from '@resk/core/auth';
+import { defaultObj, isObj, } from "@resk/core/utils";
+import { createPropertyDecorator, getDecoratedProperty } from "@resk/core/resources";
+import { i18n } from '@resk/core/i18n';
 
 /**
  * Unique symbol used as the key for storing permissions metadata.
@@ -96,13 +98,13 @@ export class PermissionsGuard implements CanActivate {
          * This means that the user is not authenticated or does not have the required permissions.
          */
         if (!isObj(user) || !Object.getSize(user, true)) {
-            throw new UnauthorizedException(i18n.t('auth.unauthorized'));
+            throw new UnauthorizedException(i18n.translate('auth.unauthorized'));
         }
         const canActivate = requiredPermissions.some(perm => {
             return Auth.isAllowed(perm, user);
         });
         if (!canActivate) {
-            throw new ForbiddenException(i18n.t("auth.guards.permissions.forbiddenError"));
+            throw new ForbiddenException(i18n.translate("auth.guards.permissions.forbiddenError"));
         }
         return true;
     }

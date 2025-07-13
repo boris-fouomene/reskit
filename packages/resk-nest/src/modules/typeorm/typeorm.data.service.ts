@@ -1,8 +1,10 @@
 
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { defaultStr, i18n, IClassConstructor, IMongoComparisonOperatorName, IMongoComparisonOperators, IMongoLogicalOperators, IMongoQuery, IResourceData, IResourceDataService, IResourceManyCriteria, IResourcePrimaryKey, IResourceQueryOptions, isEmpty, isNonNullString, isNumber, isObj, ResourcePaginationHelper } from "@resk/core";
+import { IMongoComparisonOperatorName, IResourceData, IResourceDataService, IResourceManyCriteria, IResourcePrimaryKey, IResourceQueryOptions, ResourcePaginationHelper } from "@resk/core/resources";
+import { defaultStr, isEmpty, isNonNullString, isNumber, isObj } from "@resk/core/utils"
+import { IClassConstructor } from "@resk/core/types";
 import { DataSource, DeepPartial, EntityManager, In, QueryRunner, Repository, FindOptionsWhere, FindManyOptions, MoreThan, MoreThanOrEqual, LessThan, LessThanOrEqual, Not, ILike, IsNull, Like, ArrayContains, Raw, Equal, FindOperator } from "typeorm";
-
+import { i18n } from "@resk/core/i18n";
 
 /***
  * The `TypeOrmDataService` class is an implementation of the `IResourceDataService` interface that uses TypeORM as the underlying data storage. It provides methods for performing CRUD operations on entities within a transaction, ensuring atomicity and consistency of the database operations.

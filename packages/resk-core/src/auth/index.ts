@@ -1,13 +1,13 @@
 
-import i18n from "../i18n";
-import $session from "../session";
+import { i18n } from "../i18n";
+import { Session as $session } from "../session";
 import { IDict, IResourceActionName, IResourceActionTupleArray, IResourceActionTupleObject, IResourceName } from "../types";
 import { isObj, JsonHelper, isNonNullString, stringify } from "../utils";
 import { IObservable, observable } from "@/observable";
 import { IAuthSessionStorage, IAuthUser, IAuthPerm, IAuthPerms, IAuthEvent, IAuthRole } from "./types";
 import "./types";
 import CryptoJS from "crypto-js";
-import Logger from "../logger";
+import { Logger } from "../logger";
 
 
 export * from "./types";
@@ -232,7 +232,7 @@ class Session {
 }
 
 
-export default class Auth {
+export class Auth {
     /**
     * Authentication event handler.
     * Initializes an observable event handler for authentication Auth.events.

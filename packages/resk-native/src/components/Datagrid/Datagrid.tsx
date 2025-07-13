@@ -27,7 +27,7 @@ import { Divider } from '@components/Divider';
 import { FontIcon, IIconSource, Icon } from '@components/Icon';
 import Theme, { Colors, useTheme } from "@theme";
 import { useDimensions } from '@dimensions/index';
-import i18n from '@resk/core/i18n';
+import { i18n } from '@resk/core/i18n';
 import { IPreloaderProps } from '@components/Dialog/Preloader';
 import { IProgressBarProps, ProgressBar } from '@components/ProgressBar';
 import { Button, IButtonProps } from '@components/Button';

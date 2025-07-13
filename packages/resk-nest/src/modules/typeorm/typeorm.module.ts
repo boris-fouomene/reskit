@@ -1,5 +1,5 @@
 import { DynamicModule, Provider } from "@nestjs/common";
-import { defaultStr } from "@resk/core";
+import { defaultStr } from "@resk/core/utils";
 import { DataSource, DataSourceOptions } from "typeorm";
 
 /**

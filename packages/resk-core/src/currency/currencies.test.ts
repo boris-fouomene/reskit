@@ -1,11 +1,11 @@
 import "reflect-metadata"
-import Currency from "./index";
+import { Currency } from "./index";
 import session from "./session";
 import "../utils/numbers";
 import { ICurrency } from "./types";
 import "../translations";
 import { _abreviateNumber, abreviateNumber, IAbreviateNumberResult } from "../utils/numbers";
-import i18n from "@/i18n";
+import { i18n } from "@/i18n";
 
 describe("Currency Utils", () => {
   beforeEach(() => {

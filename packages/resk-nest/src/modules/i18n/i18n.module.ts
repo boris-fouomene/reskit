@@ -1,6 +1,8 @@
-import { I18nClass, II18nTranslation, isObj } from '@resk/core';
+import { I18n } from '@resk/core/i18n';
 import { DynamicModule, Inject, Injectable } from '@nestjs/common';
+import { isObj } from '@resk/core/utils';
 
+interface II18nTranslation extends Record<string, any> { }
 /**
  * A dynamic NestJS module for managing internationalization (i18n) within the application.
  * This module allows registering namespace resolvers and loading namespaces dynamically.
@@ -71,16 +73,16 @@ export class I18nModule {
          * The namespaces to register for the module.
          * If provided, the namespaces will be registered for the module.
          */
-        namespaces?: { [key: string]: Parameters<typeof I18nClass.RegisterNamespaceResolver>[1]; }
+        namespaces?: { [key: string]: Parameters<typeof I18n.RegisterNamespaceResolver>[1]; }
         /***
          * The translations to load for the module.
          * If provided, the translations will be loaded for the module.
          */
         translations?: II18nTranslation | II18nTranslation[];
         /**
-         * Whether to create a new instance of the I18nClass class for the module.
-         * If set to `true`, the I18nClass class will be created once for the module.
-         * If set to `false`, the I18nClass class will use the default instance, obtained by calling I18N.getInstance().
+         * Whether to create a new instance of the I18n class for the module.
+         * If set to `true`, the I18n class will be created once for the module.
+         * If set to `false`, the I18n class will use the default instance, obtained by calling I18N.getInstance().
          * Default value is `false`.
          */
         createNewInstance?: boolean;
@@ -100,8 +102,8 @@ export class I18nModule {
         options = Object.assign({}, options);
         // Create a copy of the namespacesToResolve object to avoid mutation
         const namespacesToResolve = Object.assign({}, options.namespaces);
-        // Create an instance of the I18nClass class
-        const i18n = !!options.createNewInstance ? new I18nClass() : I18nClass.getInstance();
+        // Create an instance of the I18n class
+        const i18n = !!options.createNewInstance ? new I18n() : I18n.getInstance();
         // Register each namespace resolver with the i18n instance
         for (let namespace in namespacesToResolve) {
             i18n.registerNamespaceResolver(namespace, namespacesToResolve[namespace]);

@@ -1,4 +1,4 @@
-import i18n, { Translate } from "../../i18n";
+import { i18n, Translate } from "../../i18n";
 import "../../translations";
 import {
     Validator, ValidatorHasLength, ValidatorIsEmail, ValidatorIsFileName, ValidatorIsNonNullString, ValidatorIsNumber,

@@ -1,6 +1,10 @@
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
-import { ResourcePaginationHelper } from "@resk/core";
-import { flattenObject, IDict, IResourceData, IResourceQueryOptions, isNonNullString, isObj } from "@resk/core";
+import { ResourcePaginationHelper } from "@resk/core/resources";
+import { IResourceData, IResourceQueryOptions } from "@resk/core/resources";
+
+import { flattenObject, isNonNullString, isObj } from "@resk/core/utils";
+
+interface IDict extends Record<string, any> { }
 
 /**
  * @interface IParseRequestConfigMap

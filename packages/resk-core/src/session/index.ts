@@ -1,15 +1,11 @@
-import Platform from "../platform";
+import { Platform } from "../platform";
 import { JsonHelper } from "../utils/json";
 import { IClassConstructor, IDict } from '../types/index';
 import isNonNullString from '../utils/isNonNullString';
 
 
-/**
- * Session manager class.
- * 
- * This class provides a way to manage sessions using a storage object.
- */
-class SessionManager {
+
+class Manager {
   static readonly sessionStorageMetaData = Symbol("sessionStorage");
   /**
    * The storage object used by the session manager.
@@ -35,7 +31,7 @@ class SessionManager {
    * @returns {ISessionStorage} The storage object used by the session manager.
    */
   public static get storage(): ISessionStorage {
-    const storage = Reflect.getMetadata(SessionManager.sessionStorageMetaData, SessionManager);
+    const storage = Reflect.getMetadata(Manager.sessionStorageMetaData, Manager);
     if (isValidStorage(storage)) {
       this._storage = storage;
     }
@@ -69,7 +65,7 @@ class SessionManager {
    */
   public static set storage(storage: ISessionStorage) {
     if (isValidStorage(storage)) {
-      Reflect.defineMetadata(SessionManager.sessionStorageMetaData, storage, SessionManager);
+      Reflect.defineMetadata(Manager.sessionStorageMetaData, storage, Manager);
     }
   }
 
@@ -112,7 +108,7 @@ class SessionManager {
  * This function trims and removes whitespace from the key, and adds the prefix if set.
  * \nExample
  * ```typescript
-    SessionManager.allKeyPrefix = "my-prefix-";
+    Manager.allKeyPrefix = "my-prefix-";
     const prefixedKey = sanitizeKey("my-key");
     console.log(prefixedKey); // "my-prefix-my-key"
  * ````
@@ -120,7 +116,7 @@ class SessionManager {
  * @returns {string} The sanitized key.
  */
 function sanitizeKey(key: string): string {
-  return SessionManager.sanitizeKey(key);
+  return Manager.sanitizeKey(key);
 }
 
 /***
@@ -150,7 +146,7 @@ const handleGetValue: any = (value: any) => {
  * Set the value to session key ${key}
  */
 const set: any = (key: string, value: any, decycle: boolean = true) => {
-  SessionManager?.storage?.set(key, handleSetValue(value, decycle));
+  Manager?.storage?.set(key, handleSetValue(value, decycle));
 }
 
 /**
@@ -170,11 +166,11 @@ const get = (key: string) => {
   /**
    * Check if the session storage is available and the key is valid.
    */
-  if (SessionManager.storage && key && typeof key === 'string') {
+  if (Manager.storage && key && typeof key === 'string') {
     /**
      * Retrieve the value from the session storage using the sanitized key.
      */
-    const value = SessionManager.storage.get(key);
+    const value = Manager.storage.get(key);
 
     /**
      * Handle the retrieved value accordingly.
@@ -204,11 +200,11 @@ const remove = (key: string) => {
   /**
    * Check if the session storage is available and the key is valid.
    */
-  if (SessionManager.storage && key && typeof key === 'string') {
+  if (Manager.storage && key && typeof key === 'string') {
     /**
      * Remove the value from the session storage using the sanitized key.
      */
-    return SessionManager.storage.remove(key);
+    return Manager.storage.remove(key);
   }
 
   /**
@@ -228,11 +224,11 @@ const removeAll = () => {
   /**
    * Check if the session storage is available and the key is valid.
    */
-  if (SessionManager.storage) {
+  if (Manager.storage) {
     /**
      * Remove all values from the session storage.
      */
-    return SessionManager.storage.removeAll();
+    return Manager.storage.removeAll();
   }
 
   /**
@@ -313,15 +309,14 @@ const isValidStorage = (storage?: ISessionStorage): boolean => {
   }
 };
 
-export default { get, set, remove, handleGetValue, sanitizeKey, handleSetValue, isValidStorage, SessionManager, removeAll }
-
+export const Session = { get, set, remove, handleGetValue, sanitizeKey, handleSetValue, isValidStorage, Manager, removeAll }
 
 
 /**
  * Decorator to set the session storage object.
  * 
- * This decorator is used to set the session storage object for the SessionManager.
- * It creates a new instance of the target class and assigns it to the SessionManager's storage property.
+ * This decorator is used to set the session storage object for the Manager.
+ * It creates a new instance of the target class and assigns it to the Manager's storage property.
  * 
  * @example
  * ```typescript
@@ -352,7 +347,7 @@ export function SessionStorage() {
       if (!isValidStorage(storage)) {
         return;
       }
-      SessionManager.storage = storage;
+      Manager.storage = storage;
     } catch (error) {
       console.error(error, " registering session storage");
     }

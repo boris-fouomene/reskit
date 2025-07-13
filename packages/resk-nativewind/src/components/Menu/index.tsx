@@ -5,7 +5,7 @@ import { View, LayoutChangeEvent, LayoutRectangle, ScrollView, ScrollViewProps, 
 import { IMenuAnchorMeasurements, IMenuContext, IMenuProps } from './types';
 import isValidElement from '@utils/isValidElement';
 import { defaultStr } from '@resk/core/utils';
-import i18n from "@resk/core/i18n";
+import { i18n } from "@resk/core/i18n";
 import { MenuContext } from './context';
 import useStateCallback from '@utils/stateCallback';
 import { isNumber } from "@resk/core/utils";

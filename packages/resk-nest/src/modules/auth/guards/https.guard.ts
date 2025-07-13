@@ -1,5 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { i18n } from '@resk/core';
+import { i18n } from '@resk/core/i18n';
 
 /**
  * A guard that checks if the incoming request is using HTTPS protocol.

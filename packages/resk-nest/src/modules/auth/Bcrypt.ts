@@ -1,7 +1,7 @@
-import { isNonNullString } from "@resk/core";
+import { isNonNullString } from "@resk/core/utils";
 import * as bcrypt from "bcryptjs";
 import { BadRequestException } from "@nestjs/common";
-import { i18n } from "@resk/core";
+import { i18n } from "@resk/core/i18n";
 export class Bcrypt {
     /***
      * Hash the password

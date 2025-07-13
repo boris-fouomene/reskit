@@ -1,4 +1,4 @@
-import i18n from "@resk/core/i18n";
+import { i18n } from "@resk/core/i18n";
 import { areEquals, DateHelper, defaultNumber, defaultStr, isEmpty, isNonNullString, isObj, uniqid } from "@resk/core/utils";
 import { ScrollView, ScrollViewProps, StyleSheet, View } from "react-native";
 import { IDict, IFields, IFieldType, IMongoOperatorName, IMongoQuery } from "@resk/core/types";

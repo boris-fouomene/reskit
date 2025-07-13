@@ -1,4 +1,4 @@
-import Logger from "@resk/core/logger";
+import { Logger } from "@resk/core/logger";
 import { defaultStr, isObj } from "@resk/core/utils";
 import { isValidElement, ComponentType, ReactNode, FC, cloneElement, JSX } from "react";
 import { StyleSheet } from "nativewind";

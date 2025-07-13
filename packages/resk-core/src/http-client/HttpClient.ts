@@ -2,7 +2,7 @@ import defaultStr from "@utils/defaultStr";
 import isNonNullString from "@utils/isNonNullString";
 import { isNumber } from "@utils/isNumber";
 import { isValidUrl, setQueryParams } from "@utils/uri";
-import { I18nClass } from "../i18n";
+import { I18n } from "../i18n";
 import { JsonHelper } from "@utils/json";
 
 export class HttpClient {
@@ -67,7 +67,7 @@ export class HttpClient {
     options = Object.assign({}, options);
     const token = await this.getBeearToken();
     const { xFilter } = options;
-    const locale = await I18nClass.getInstance().getLocale();
+    const locale = await I18n.getInstance().getLocale();
     options.headers = Object.assign(
       {
         Accept: "application/json",
@@ -126,7 +126,7 @@ export class HttpClient {
     if (options?.handleErrors !== false) {
       let message = typeof error == "object" && error ? defaultStr(error.message, error.ExceptionMessage, error.Message, error.MessageDetail, error.msg, error.error) : null;
       if (defaultStr(Object.prototype.toString.call(error?.target)).includes("XMLHttpRequest") && error.target.status === 0) {
-        message = defaultStr(error.message, error.msg, I18nClass.getInstance().t("httpClient.serverUnreachable"));
+        message = defaultStr(error.message, error.msg, I18n.getInstance().t("httpClient.serverUnreachable"));
       }
       if (!message) {
         message = error?.toString();
@@ -196,7 +196,7 @@ export class HttpClient {
     delay = isNumber(delay) && delay > 1000 ? delay : this.getFetchDelay();
     return new Promise(function (resolve, reject) {
       const tt = setTimeout(function () {
-        reject({ message: I18nClass.getInstance().t("httpClient.runTimeoutError") });
+        reject({ message: I18n.getInstance().t("httpClient.runTimeoutError") });
       }, delay);
       return promise
         .then(resolve)

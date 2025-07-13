@@ -1,7 +1,7 @@
 import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { applyLanguage } from './utils';
-import { I18nClass } from '@resk/core';
+import { I18n } from '@resk/core/i18n';
 
 /**
  * A NestJS middleware class that handles internationalization (i18n) for incoming requests.
@@ -27,9 +27,9 @@ export class I18nMiddleware implements NestMiddleware {
     /**
      * Creates an instance of I18nMiddleware.
      * 
-     * @param i18n The I18nClass instance injected through the 'I18N' token.
+     * @param i18n The I18n instance injected through the 'I18N' token.
      */
-    constructor(@Inject("I18N") private readonly i18n: I18nClass) { }
+    constructor(@Inject("I18N") private readonly i18n: I18n) { }
 
     /**
      * Handles incoming requests and sets the locale based on the 'Accept-Language' header.
@@ -42,7 +42,7 @@ export class I18nMiddleware implements NestMiddleware {
      */
     async use(req: Request, res: Response, next: NextFunction) {
         /**
-         * Applies the language to the I18nClass instance based on the 'Accept-Language' header in the request.
+         * Applies the language to the I18n instance based on the 'Accept-Language' header in the request.
          */
         await applyLanguage(this.i18n, req);
 

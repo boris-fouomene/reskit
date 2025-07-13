@@ -12,7 +12,7 @@ import { buttonVariant } from "@variants/button";
 import { IButtonBaseContext, IButtonProps } from "./types";
 import { commonVariant } from "@variants/common";
 import { GestureResponderEvent } from "react-native";
-import Auth from '@resk/core/auth';
+import { Auth } from '@resk/core/auth';
 
 
 export function ButtonBase<Context = unknown>({

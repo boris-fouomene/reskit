@@ -4,7 +4,7 @@ import { mergeRefs } from "@utils/mergeRefs";
 import { ObservableComponent } from "@utils/index";
 import { AppBar, IAppBarProps } from "@components/AppBar";
 import { defaultStr, isNumber, isObj, uniqid } from "@resk/core/utils";
-import i18n from "@resk/core/i18n";
+import { i18n } from "@resk/core/i18n";
 import Auth from "@resk/core/auth";
 import { IAuthSessionStorage } from "@resk/core/auth";
 import { IDict } from "@resk/core/types";

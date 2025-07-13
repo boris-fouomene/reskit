@@ -1,16 +1,21 @@
-import { IDict, IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionName, IResourceAction, IResourceDataService, IResourceQueryOptions, IResourcePaginatedResult, IResourcePrimaryKey, IResourceManyCriteria, IResourceActionTupleArray } from '../types';
-import { getFields } from '../fields';
+import { IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionName, IResourceAction, IResourceDataService, IResourceQueryOptions, IResourcePaginatedResult, IResourcePrimaryKey, IResourceManyCriteria, IResourceActionTupleArray } from '../types/resources';
+import { getFields } from './fields';
 import { isEmpty, defaultStr, isObj, isNonNullString, stringify, extendObj } from '../utils/index';
 import { ObservableClass, observableFactory } from "@/observable";
 import { IClassConstructor } from '../types/index';
 import { IAuthUser } from '@/auth/types';
-import Auth from "../auth";
-import i18n from '@/i18n';
+import { Auth } from "../auth";
+import { i18n } from '@/i18n';
 import { Scope, TranslateOptions } from 'i18n-js';
 import { ResourcePaginationHelper } from './ResourcePaginationHelper';
 import { IResourceActions } from '../types/resources';
-import Logger from "../logger";
+import { Logger } from "../logger";
+
 export * from './ResourcePaginationHelper';
+export * from "./fields";
+export * from "../types/resources";
+export * from "./decorators";
+
 const resourcesMetaDataKey = Symbol('resources');
 const resourcesClassNameMetaData = Symbol('resourceFromClassName');
 
@@ -497,7 +502,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * Retrieves the i18n translations for the resource.
    * 
    * @param {string} [locale] - The locale to use for the translations. If not provided, the default locale from the i18n instance will be used.
-   * @returns {IDict} - An object containing the translations for the resource, keyed by the property names.
+   * @returns {Record<string,any>} - An object containing the translations for the resource, keyed by the property names.
    * @example
    * // Register translations for the "en" locale.
    * i18n.registerTranslations({
@@ -522,11 +527,11 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * //   title: "User Information",   
    * // }
    */
-  getTranslations(locale?: string): IDict {
+  getTranslations(locale?: string): Record<string, any> {
     locale = defaultStr(locale, i18n.getLocale());
     const nameStr = String(this.getName()).trim();
     if (!isNonNullString(nameStr)) return {};
-    const t = i18n.getNestedTranslation(["resources", nameStr], locale) as IDict;
+    const t = i18n.getNestedTranslation(["resources", nameStr], locale) as any;
     return isObj(t) && t ? t : {};
   }
 
@@ -1016,7 +1021,7 @@ export class ResourcesManager {
    */
   public static addResource<DataType extends IResourceData = any>(name: IResourceName, resource: Resource<DataType>) {
     if (typeof name === "string" && name && resource && resource instanceof Resource) {
-      (this.resources as IDict)[name] = resource;
+      (this.resources as any)[name] = resource;
     }
   }
 
@@ -1042,7 +1047,7 @@ export class ResourcesManager {
    */
   public static removeResource(name: IResourceName): Record<IResourceName, Resource> {
     if (typeof name === "string") {
-      delete (this.resources as IDict)[name];
+      delete (this.resources as any)[name];
     }
     return this.resources;
   }

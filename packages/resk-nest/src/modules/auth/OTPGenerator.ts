@@ -1,4 +1,4 @@
-import { defaultBool } from "@resk/core";
+import { defaultBool } from "@resk/core/utils";
 
 /**
  * Represents options for customizing OTP generation.

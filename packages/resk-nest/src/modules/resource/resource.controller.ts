@@ -1,7 +1,8 @@
 import { Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { ResourceService } from './resource.service';
-import { IClassConstructor, IResourceData, IResourceQueryOptions, ResourcePaginationHelper } from '@resk/core';
-import { ParseRequest, RequestParser, UseValidatorParam, ValidatorParam } from './pipes';
+import { IResourceData, IResourceQueryOptions, ResourcePaginationHelper } from '@resk/core/resources';
+import { ParseRequest, UseValidatorParam, ValidatorParam } from './pipes';
+import { IClassConstructor, } from "@resk/core/types";
 
 class EmptyDtoClass { }
 

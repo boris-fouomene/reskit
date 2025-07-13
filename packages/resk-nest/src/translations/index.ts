@@ -1,6 +1,6 @@
-import { I18nClass } from "@resk/core";
+import { I18n } from "@resk/core/i18n";
 
-I18nClass.RegisterTranslations({
+I18n.RegisterTranslations({
     en: {
         "validator": {
             "invalidFieldRule": "Invalid rule  %{rule} for field  %{fieldName} in controller  %{controllerName} with ruleName  %{ruleName} and rawRuleName  %{rawRuleName}",

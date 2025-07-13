@@ -1,6 +1,6 @@
 import { IBreakpoints } from "@src/breakpoints/types";
 import { ITheme } from "@theme/types";
-import { I18nClass } from "@resk/core/i18n";
+import { I18n } from "@resk/core/i18n";
 import { IUseI18nOptions } from "@src/types";
 import { IAuthProviderProps } from "@auth/types";
 import { ReactElement } from "react";
@@ -109,7 +109,7 @@ export interface IReskNativeContext extends Omit<IReskNativeProviderProps, "type
     /***
      * i18n instance library
      */
-    i18n: I18nClass;
+    i18n: I18n;
 }
 
 

@@ -1,6 +1,6 @@
 import "reflect-metadata";
-import defaultStr from '../utils/defaultStr';
-import { IClassConstructor, ITypeRegistryRenderer } from '../types';
+import defaultStr from '../../utils/defaultStr';
+import { IClassConstructor, ITypeRegistryRenderer } from '../../types';
 import { extendObj } from "@utils/object";
 
 

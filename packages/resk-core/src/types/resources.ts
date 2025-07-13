@@ -1,6 +1,10 @@
 import { IDict } from "./dictionary";
 import { IMongoQuery, IResourceQueryOptionsOrderBy } from "./filters";
 
+export * from "./fields";
+
+export * from "./filters";
+
 /**
  * A global declaration for all resource names. This is the exported name of the IResourceName type.
  * Represents a type for all resource names.

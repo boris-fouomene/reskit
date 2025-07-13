@@ -13,7 +13,7 @@ import { IModalProps } from "@components/Modal/types";
 import { IUseDimensionsOptons } from "@utils/dimensions";
 import { IClassName } from "@src/types";
 import { IDialogVariant } from "@variants/dialog";
-import i18n from "@resk/core/i18n";
+import { i18n } from "@resk/core/i18n";
 import { ITextVariant, textVariant } from "@variants/text";
 import { INavItems } from "@components/Nav";
 import { ActivityIndicator } from "@components/ActivityIndicator";

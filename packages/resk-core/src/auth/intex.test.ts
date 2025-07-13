@@ -1,13 +1,12 @@
-import i18n from "../i18n";
+import { i18n } from "../i18n";
 import "../translations";
-import Auth from "./index";
-import $session from "../session";
+import { Auth } from "./index";
+import { Session } from "../session";
 import { IAuthUser, IAuthPerms, IAuthPerm } from "./types";
-import { IResource, IResourceAction, IResourceActionName, IResourceName } from "@/types";
-import "../index";
+import { IResourceActionName, IResourceName } from "@/types";
 
 
-declare module "../index" {
+declare module "../types/resources" {
     interface IResources {
         documents: {
             actions: {
@@ -26,7 +25,7 @@ describe("Auth", () => {
     });
 
     beforeEach(() => {
-        $session.removeAll();
+        Session.removeAll();
         Auth.setSignedUser(null);
     });
 

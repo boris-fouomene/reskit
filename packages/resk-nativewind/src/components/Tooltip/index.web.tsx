@@ -4,7 +4,7 @@ import 'tippy.js/dist/tippy.css';
 import { useEffect, useId, useMemo, useRef } from "react";
 import { cn, getTextContent, isValidElement, useMergeRefs } from '@utils';
 import { getMaxZindex, isDOMElement, defaultStr } from "@resk/core/utils";
-import Platform from "@resk/core/platform";
+import { Platform } from "@resk/core/platform";
 import { TouchableOpacity, PressableProps } from "react-native";
 import { ITooltipProps } from './types';
 import { ITouchableProps } from '@src/types';

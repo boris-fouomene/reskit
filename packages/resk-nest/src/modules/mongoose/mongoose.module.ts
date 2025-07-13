@@ -1,5 +1,5 @@
 import { DynamicModule } from '@nestjs/common';
-import { defaultStr } from '@resk/core';
+import { defaultStr } from '@resk/core/utils';
 import * as mongoose from 'mongoose';
 
 export type IMongooseModuleOptions = mongoose.ConnectOptions & {

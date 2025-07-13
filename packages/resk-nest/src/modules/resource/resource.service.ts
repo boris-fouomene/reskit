@@ -1,5 +1,5 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { IResourceData, IResourceDataService, IResourcePrimaryKey, Resource } from '@resk/core';
+import { IResourceData, IResourceDataService, IResourcePrimaryKey, Resource } from '@resk/core/resources';
 /**
  * The `ResourceService` class is an injectable service that extends the `Resource` class.
  * It provides a generic implementation for managing resources in a NestJS application.

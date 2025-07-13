@@ -1,4 +1,4 @@
-import Currency from "../currency";
+import { Currency } from "../currency";
 import { ICurrency, ICurrencyAbreviate2FormatKey, ICurrencyFormatterKey, ICurrencyFormatters } from "../currency/types";
 import defaultStr from "./defaultStr";
 import { isNumber } from "./isNumber";

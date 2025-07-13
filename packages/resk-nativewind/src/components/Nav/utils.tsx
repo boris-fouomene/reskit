@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { Divider } from "@components/Divider";
 import { INavItemProps, INavRenderItemOptions, INavItemsProps } from "./types";
 import { IReactNullableElement } from "../../types";
-import Auth from "@resk/core/auth";
+import { Auth } from "@resk/core/auth";
 import { cloneObject, isObj } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 

@@ -2,7 +2,7 @@
 import { addClassName, isDOMElement, removeClassName } from "@resk/core/utils";
 import { useDimensions } from "@utils/dimensions";
 import { useEffect } from "react";
-import Platform from "@resk/core/platform";
+import { Platform } from "@resk/core/platform";
 
 export function BodyClasses() {
     const { isMobile, isTablet, isDesktop } = useDimensions({ debounceTimeout: 0 });

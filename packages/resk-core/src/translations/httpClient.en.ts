@@ -1,6 +1,6 @@
-import { I18nClass } from "@/i18n";
+import { I18n } from "@/i18n";
 
-I18nClass.RegisterTranslations({
+I18n.RegisterTranslations({
   en: {
     /***
      * @param {string} resourceLabel - The label of the resource.

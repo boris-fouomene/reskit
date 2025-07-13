@@ -1,4 +1,4 @@
-import ReskPlatform from "@resk/core/platform";
+import { Platform as ReskPlatform } from "@resk/core/platform";
 import { Dimensions, Platform, StatusBar } from 'react-native';
 import { isNextJs } from "./isNext";
 /**

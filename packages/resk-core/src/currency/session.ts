@@ -1,9 +1,9 @@
-import session from "../session";
+import { Session } from "../session";
 import currencies from "./currencies";
 import { ICurrency } from "./types";
 import isNonNullString from "../utils/isNonNullString";
 import { isValidCurrency } from "./utils";
-import i18n from "../i18n";
+import { i18n } from "../i18n";
 import defaultStr from "@utils/defaultStr";
 
 /**
@@ -16,16 +16,16 @@ import defaultStr from "@utils/defaultStr";
 const defaultCurrencyFormat = "%v %s";
 
 /**
- * Retrieves the persisted currency format from the session storage.
+ * Retrieves the persisted currency format from the Session storage.
  * 
  * @param force If true, returns the default currency format if the persisted format is not available.
  * @returns The persisted currency format if available, otherwise an empty string or the default format.
  */
 const getCurrencyFormat = (force?: boolean): string => {
   /**
-   * Retrieve the currency format from the session storage.
+   * Retrieve the currency format from the Session storage.
    */
-  const r = session.get("currencyFormat");
+  const r = Session.get("currencyFormat");
 
   /**
    * If the retrieved format is a string and includes "%v", return it.
@@ -36,16 +36,16 @@ const getCurrencyFormat = (force?: boolean): string => {
 }
 
 /**
- * Persists the currency format in the session storage.
+ * Persists the currency format in the Session storage.
  * 
  * @param format The currency format to persist.
- * @returns The result of setting the currency format in the session storage.
+ * @returns The result of setting the currency format in the Session storage.
  * 
  * Example:
  * ```ts
- * setCurrencyFormat("%v %s"); // Persists the currency format in the session storage
- * setCurrencyFormat("   %v %s   "); // Trims the format string and persists it in the session storage
- * setCurrencyFormat(null); // Sets an empty string as the currency format in the session storage
+ * setCurrencyFormat("%v %s"); // Persists the currency format in the Session storage
+ * setCurrencyFormat("   %v %s   "); // Trims the format string and persists it in the Session storage
+ * setCurrencyFormat(null); // Sets an empty string as the currency format in the Session storage
  * ```
  */
 const setCurrencyFormat = (format: string): any => {
@@ -56,9 +56,9 @@ const setCurrencyFormat = (format: string): any => {
   format = format && typeof format === "string" ? format.trim() : "";
 
   /**
-   * Set the currency format in the session storage.
+   * Set the currency format in the Session storage.
    */
-  return session.set("currencyFormat", format);
+  return Session.set("currencyFormat", format);
 }
 
 /**
@@ -123,14 +123,14 @@ const setCurrency = (currency: ICurrency | string): ICurrency => {
   }
 
   /**
-   * Persist the currency object in the session.
+   * Persist the currency object in the Session.
    */
-  session.set("appConfigCurrency", currencyObject);
+  Session.set("appConfigCurrency", currencyObject);
   return currencyObject as ICurrency;
 }
 
 /**
- * Retrieves the currently persisted currency from the session variables.
+ * Retrieves the currently persisted currency from the Session variables.
  * 
  * @returns {ICurrency} The currently persisted currency.
  * 
@@ -142,14 +142,14 @@ const setCurrency = (currency: ICurrency | string): ICurrency => {
  */
 const getCurrency: () => ICurrency = (): ICurrency => {
   /**
-   * Get the currency object from the session.
+   * Get the currency object from the Session.
    */
-  let currency = Object.assign({}, session.get("appConfigCurrency"));
+  let currency = Object.assign({}, Session.get("appConfigCurrency"));
 
   /**
-   * Get the currency code from the session.
+   * Get the currency code from the Session.
    */
-  const currencyCode = session.get("currencyCode");
+  const currencyCode = Session.get("currencyCode");
 
   /**
    * If the currency code is valid, merge the corresponding currency object with the existing currency object.

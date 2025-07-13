@@ -4,10 +4,11 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common';
-import { defaultStr, IResourcePaginatedResult } from '@resk/core';
+import { defaultStr } from '@resk/core/utils';
+import { IResourcePaginatedResult } from "@resk/core/resources";
 import { ResourceController } from '@resource/resource.controller';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { IResourceControllerInferDataType } from '@resource/interfaces';
 
 

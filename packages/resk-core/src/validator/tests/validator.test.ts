@@ -1,5 +1,5 @@
 import { IValidatorRuleFunction, IValidatorRuleName } from "../types";
-import i18n from "../../i18n";
+import { i18n } from "../../i18n";
 import "../../translations";
 import { Validator } from "../index";
 

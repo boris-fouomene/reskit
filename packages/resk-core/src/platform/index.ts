@@ -438,4 +438,4 @@ const isLinux: () => boolean = (): boolean => {
   return isNode() && process.platform === 'linux';
 }
 
-export default { isWeb, isLinux, isDarwin, isWin32, isNode, isElectron, isTouchDevice, isServerSide, isClientSide, isMobileBrowser, isAndroidMobileBrowser, isReactNativeWebview }
+export const Platform = { isWeb, isLinux, isDarwin, isWin32, isNode, isElectron, isTouchDevice, isServerSide, isClientSide, isMobileBrowser, isAndroidMobileBrowser, isReactNativeWebview }

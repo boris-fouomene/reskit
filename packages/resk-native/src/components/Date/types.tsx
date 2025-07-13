@@ -1,7 +1,7 @@
 import { IModalProps } from "@components/Modal";
 import { ISurfaceProps } from "@components/Surface";
 import { IMomentFormat } from "@resk/core/types";
-import { I18nClass } from "@resk/core/i18n";
+import { I18n } from "@resk/core/i18n";
 import useStateCallback from "@utils/stateCallback";
 import { Moment } from "moment";
 import { ReactElement, ReactNode } from "react";
@@ -498,7 +498,7 @@ export type ICalendarContext<T extends ICalendarBaseProps = ICalendarBaseProps> 
     /***
      * The i18n instance for the calendar.
      */
-    i18n: I18nClass;
+    i18n: I18n;
 
     /***
      * The moment instance corresponding to the minDate prop.

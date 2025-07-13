@@ -528,4 +528,4 @@ const formatDescription: string = `Display format for numerical values: a charac
 	for example, the format %v %s .## returns: 12.35 $ for the value 12.357777 converted into dollard.  
 `;
 
-export default { parse: unformat, session, formatMoney, currencies, isValidCurrency, formatNumber, formatMoneyAsObject, unformat, toFixed, formatDescription, prepareOptions }
+export const Currency = { parse: unformat, session, formatMoney, currencies, isValidCurrency, formatNumber, formatMoneyAsObject, unformat, toFixed, formatDescription, prepareOptions }

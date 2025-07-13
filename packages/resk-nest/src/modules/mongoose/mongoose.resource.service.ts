@@ -1,4 +1,4 @@
-import { IResourceData, IResourceDataService, IResourcePrimaryKey } from "@resk/core";
+import { IResourceData, IResourcePrimaryKey } from "@resk/core/resources";
 import { MongooseDataService } from "./mongoose.data.service";
 import { ObjectId, Schema, Connection, ClientSession } from "mongoose";
 import { ResourceService } from "../resource";

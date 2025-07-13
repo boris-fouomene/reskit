@@ -1,25 +1,25 @@
-import {PureComponent, Ref} from "react";
+import { PureComponent, Ref } from "react";
 import { ReactNode } from "react";
-import {View, IViewProps } from "@components/View";
+import { View, IViewProps } from "@components/View";
 import { Portal } from "@components/Portal";
 import Theme, { Colors } from "@theme";
 import Platform from "@platform/index";
 import { getTextContent } from "@utils";
-import {IFontIconProps } from "@components/Icon/types";
+import { IFontIconProps } from "@components/Icon/types";
 import { IFontIconName } from "@resk/native-icon-types";
 import Font from "@components/Icon/Font";
 import { INotifyState, INotifyMessage, INotifyPostion, INotifyAction, INotifyType } from "./types";
 import { ILabelProps } from "@components/Label";
 import { StyleSheet, Dimensions, Pressable, Animated, StatusBar, PanResponder, Keyboard, PanResponderInstance, EmitterSubscription, GestureResponderEvent, PanResponderGestureState, LayoutChangeEvent } from "react-native";
 import { Surface } from "@components/Surface";
-import {Label} from "@components/Label";
+import { Label } from "@components/Label";
 import Queue from "./Queue";
 import { DEFAULT_IMAGE_DIMENSIONS } from "./utils";
 import { ITextStyle } from "../types";
 import { defaultStr, isNonNullString, isObj, stringify } from "@resk/core/utils";
 import { IDict } from "@resk/core/types";
 import { IDimensions } from "@dimensions/types";
-import i18n from "@resk/core/i18n";
+import { i18n } from "@resk/core/i18n";
 
 const IS_ANDROID = Platform.isAndroid();
 const compareQueues = (a: any, b: any): boolean => {
@@ -50,7 +50,7 @@ export default class Notify extends PureComponent<INotifyProps, INotifyState> {
   closeTimeoutID?: any;
   alertData: INotifyOptions = {};
   activeData?: IDict;
-  notifyRef?:Notify;
+  notifyRef?: Notify;
   static defaultProps: INotifyProps = {
     closeInterval: 4000,
     startDelta: -100,
@@ -1138,7 +1138,7 @@ export interface INotifyRenderOptions {
  *     ```
 
  */
-export interface INotifyProps extends Omit<IViewProps,"ref">,
+export interface INotifyProps extends Omit<IViewProps, "ref">,
   INotifyRenderOptions {
   closeInterval?: number;
   startDelta?: number;
@@ -1164,7 +1164,7 @@ export interface INotifyProps extends Omit<IViewProps,"ref">,
   warnTextColor?: string;
   errorTextColor?: string;
   positon?: INotifyPostion;
-  ref?:Ref<Notify>;
+  ref?: Ref<Notify>;
 };
 
 const styles = StyleSheet.create({

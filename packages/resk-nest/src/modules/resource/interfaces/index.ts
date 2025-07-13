@@ -1,13 +1,11 @@
-import { ApiOperationOptions } from '@nestjs/swagger';
 import {
-  IResourceData, IResourceName, IResourcePrimaryKey, isNonNullString, isObj, ResourcesManager
-  , IResourceQueryOptions, IResourceManyCriteria,
-} from "@resk/core";
+  IResourceData, IResourceName, IResourcePrimaryKey, IResourceQueryOptions, IResourceManyCriteria
+} from "@resk/core/resources";
 import { ResourceController } from '../resource.controller';
 import { Injectable } from "@nestjs/common";
 
 
-declare module "@resk/core" {
+declare module "@resk/core/resources" {
   export interface IResource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, ClassType extends ResourceController<any> = ResourceController<any>> {
     /***
      * The name of the controller class for the resource service

@@ -2,7 +2,7 @@
 import { memo, ReactElement, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import stableHash from "stable-hash";
 import { defaultStr, isEmpty, isNonNullString, isObj, areEquals, stringify, isNumber } from "@resk/core/utils";
-import i18n from "@resk/core/i18n";
+import { i18n } from "@resk/core/i18n";
 import { cn, getTextContent, isReactNode, ObservableComponent } from "@utils/index";
 import { Dimensions, FlatList, FlatListProps } from 'react-native';
 import { IMenuContext, IMenuProps, Menu, useMenu } from "@components/Menu";

@@ -13,7 +13,7 @@ import { cn } from "@utils/cn";
 
 export class Nav {
     static readonly linkMetaData = Symbol("link-meta-data");
-    static set Link(component: INavLinkComponent) {
+    static attachLinkComponent(component: INavLinkComponent) {
         if (isValidLinkComponent(component)) {
             Reflect.defineMetadata(Nav.linkMetaData, component, Nav);
         }
@@ -97,8 +97,56 @@ export * from "./hooks";
 
 
 
+/**
+ * A decorator factory function that creates a decorator to attach a navigation link component to the Nav class.
+ * 
+ * This decorator allows you to register custom link components that will be used by the Nav class
+ * for rendering navigation links. The attached component becomes the default link component
+ * accessible via `Nav.Link`.
+ * 
+ * @example
+ * ```tsx
+ * // Using with a custom Next.js Link component
+ * @AttachLinkComponent()
+ * function NextLink({ href, children, ...props }: INavLinkProps) {
+ *   return (
+ *     <Link href={href} {...props}>
+ *       {children}
+ *     </Link>
+ *   );
+ * }
+ * 
+ * // Now Nav.Link will use NextLink component
+ * <Nav.Item linkProps={{ href: "/dashboard" }}>
+ *   Dashboard
+ * </Nav.Item>
+ * ```
+ * 
+ * @example
+ * ```tsx
+ * // Using with React Router Link
+ * @AttachLinkComponent()
+ * function RouterLink({ to, children, ...props }: INavLinkProps) {
+ *   return (
+ *     <Link to={to} {...props}>
+ *       {children}
+ *     </Link>
+ *   );
+ * }
+ * ```
+ * 
+ * @returns A decorator function that accepts a navigation link component and registers it with the Nav class
+ * 
+ * @decorator
+ * @see {@link Nav.attachLinkComponent} - The underlying method used to attach the component
+ * @see {@link Nav.Link} - The property that returns the attached link component
+ * @see {@link INavLinkComponent} - The interface that the target component must implement
+ * 
+ * @since 1.0.0
+ * @public
+ */
 export function AttachLinkComponent() {
     return function (target: INavLinkComponent) {
-        Nav.Link = target;
+        Nav.attachLinkComponent(target);
     };
 }

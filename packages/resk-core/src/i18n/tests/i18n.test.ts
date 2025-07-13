@@ -145,3 +145,209 @@ describe('I18nClass', () => {
         expect(translations).toEqual({ en: { greeting: 'Hello, %{name}!' } });
     });
 });
+
+
+describe("i18n translateObject", () => {
+    const i18n = I18nClass.getInstance();
+    beforeAll(async () => {
+        i18n.registerTranslations({
+            en: {
+                "user": {
+                    "name": "Name",
+                    "email": "Email Address",
+                    "phone": "Phone Number",
+                },
+                actions: {
+                    "save": "Save",
+                    "cancel": "Cancel"
+                },
+                "nested": {
+                    deep: {
+                        value: "Deep nested value",
+                    }
+                },
+                validation: {
+                    "required": "This field is required",
+                    "email": {
+                        "invalid": "Please enter a valid email",
+                    },
+                    "minLength": "Minimum length required",
+                    "maxLength": "Maximum length exceeded",
+                }
+            },
+            fr: {
+                user: {
+                    "name": "Nom",
+                    "email": "Adresse Email",
+                    "phone": "Numéro de Téléphone",
+                },
+                action: {
+                    "actions.save": "Enregistrer",
+                    "actions.cancel": "Annuler",
+                },
+                validation: {
+                    "required": "Ce champ est requis",
+                    "email": {
+                        "invalid": "Veuillez saisir un email valide"
+                    },
+                    "minLength": "Longueur minimale requise",
+                    "maxLength": "Longueur maximale dépassée"
+                }
+            }
+        });
+        i18n.setLocales(["env", "fr"]);
+        await i18n.setLocale("en");
+    });
+
+    it("should translate an object with translation keys as values", () => {
+        const formLabels = {
+            name: "user.name",
+            email: "user.email",
+            phone: "user.phone"
+        };
+        const result = i18n.translateObject(formLabels);
+        expect(result).toEqual({
+            name: "Name",
+            email: "Email Address",
+            phone: "Phone Number"
+        });
+    });
+
+    it("should translate button configuration object", () => {
+        const buttonConfig = {
+            saveButton: "actions.save",
+            cancelButton: "actions.cancel"
+        };
+
+        const result = i18n.translateObject(buttonConfig);
+
+        expect(result).toEqual({
+            saveButton: "Save",
+            cancelButton: "Cancel"
+        });
+    });
+
+    it("should translate validation messages object", () => {
+        const validationMessages = {
+            required: "validation.required",
+            email: "validation.email.invalid",
+            minLength: "validation.minLength",
+            maxLength: "validation.maxLength"
+        };
+
+        const result = i18n.translateObject(validationMessages);
+
+        expect(result).toEqual({
+            required: "This field is required",
+            email: "Please enter a valid email",
+            minLength: "Minimum length required",
+            maxLength: "Maximum length exceeded"
+        });
+    });
+
+    it("should work with different locales", async () => {
+        await i18n.setLocale("fr");
+        const formLabels = {
+            name: "user.name",
+            email: "user.email"
+        };
+
+        const result = i18n.translateObject(formLabels);
+
+        console.log(i18n.getLocale(), i18n.getTranslations(), result, " is locale")
+
+        expect(result).toEqual({
+            name: "Nom",
+            email: "Adresse Email"
+        });
+
+        await i18n.setLocale("en");
+    });
+
+    it("should return empty object when input is not a valid object", () => {
+        expect(i18n.translateObject(null as any)).toEqual({});
+        expect(i18n.translateObject(undefined as any)).toEqual({});
+        expect(i18n.translateObject("string" as any)).toEqual({});
+        expect(i18n.translateObject(123 as any)).toEqual({});
+        expect(i18n.translateObject([] as any)).toEqual({});
+    });
+
+    it("should skip non-string values", () => {
+        const mixedObject = {
+            validKey: "user.name",
+            nullValue: null,
+            undefinedValue: undefined,
+            numberValue: 123,
+            emptyString: ""
+        };
+
+        const result = i18n.translateObject(mixedObject as any);
+
+        expect(result).toEqual({
+            validKey: "Name"
+        });
+    });
+
+    it("should handle missing translation keys gracefully", async () => {
+        const objectWithMissingKeys = {
+            existing: "user.name",
+            missing: "non.existent.key"
+        };
+        await i18n.setLocale("en");
+        const result = i18n.translateObject(objectWithMissingKeys);
+
+        expect(result.existing).toBe("Name");
+        expect(result.missing).toBeDefined();
+    });
+
+    it("should pass through translate options", () => {
+        i18n.registerTranslations({
+            en: {
+                "greeting": "Hello, %{name}!"
+            }
+        });
+
+        const objectWithParams = {
+            greeting: "greeting"
+        };
+
+        const result = i18n.translateObject(objectWithParams, { name: "John" });
+
+        expect(result).toEqual({
+            greeting: "Hello, John!"
+        });
+    });
+
+    it("should handle nested translation keys", () => {
+        const nestedObject = {
+            deepValue: "nested.deep.value"
+        };
+
+        const result = i18n.translateObject(nestedObject);
+
+        expect(result).toEqual({
+            deepValue: "Deep nested value"
+        });
+    });
+
+    it("should preserve object structure with complex keys", () => {
+        const complexObject = {
+            "user-name": "user.name",
+            "user_email": "user.email",
+            "123key": "user.phone"
+        };
+
+        const result = i18n.translateObject(complexObject);
+
+        expect(result).toEqual({
+            "user-name": "Name",
+            "user_email": "Email Address",
+            "123key": "Phone Number"
+        });
+    });
+
+    it("should handle empty object", () => {
+        const result = i18n.translateObject({});
+        expect(result).toEqual({});
+    });
+});

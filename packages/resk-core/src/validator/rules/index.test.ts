@@ -1,4 +1,3 @@
-import exp from "constants";
 import i18n, { Translate } from "../../i18n";
 import "../../translations";
 import {
@@ -13,8 +12,8 @@ import {
 
 
 describe("Validator Rules", () => {
-    beforeAll(() => {
-        i18n.setLocale("en");
+    beforeAll(async () => {
+        await i18n.setLocale("en");
     });
 
     describe("numberLessThanOrEquals 5, and 10", () => {

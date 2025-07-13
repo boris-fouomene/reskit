@@ -255,8 +255,8 @@ export class Validator {
     let count = 0;
     //const errorsDetails: ({ translatedPropertyName: string, error: string, ruleName: string, ruleParams: any[], value: any, separators: { multiple: string, single: string, and: string, or: string }, data: Partial<Record<keyof InstanceType<T>, any>> })[] = [];
     const translatedKeys = i18n.translateTarget(target, { data });
-    for (let i in rulesObject) {
-      const translatedPropertyName: string = (isNonNullString(translatedKeys[i]) ? translatedKeys[i] : i) as string;
+    for (const i in rulesObject) {
+      const translatedPropertyName: string = (isNonNullString((translatedKeys as any)[i]) ? (translatedKeys as any)[i] : i);
       promises.push(Validator.validate({ value: data[i], translatedPropertyName, fieldName: i, propertyName: i, rules: rulesObject[i] }).catch((error) => {
         const errorField = stringify(defaultVal(error?.message, error));
         //errorsDetails.push(error);

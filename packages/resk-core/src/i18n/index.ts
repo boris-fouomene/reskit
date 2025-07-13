@@ -61,7 +61,7 @@ export function Translate(key: string): PropertyDecorator & MethodDecorator {
  *     farewell: "Goodbye!",
  *   },
  * });
- * console.log(i18nInstance.t("greeting", { name: "John" })); // Outputs: Hello, John!
+ * console.log(i18nInstance.translate("greeting", { name: "John" })); // Outputs: Hello, John!
  * @see https://www.npmjs.com/package/i18n-js?activeTab=readme for more information on i18n-js library.
  */
 export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
@@ -109,14 +109,102 @@ export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
      * @param options The translation options.
      * @returns The translated keys.
      */
-    translateTarget<T extends { new(...args: any[]): {} } = any>(target: T, options?: TranslateOptions): Record<string, string> {
+    translateTarget<T extends { new(...args: any[]): {} } = any>(target: T, options?: TranslateOptions): Record<keyof T, string> {
         const translationKeys = I18nClass.getTargetTanslationKeys(target);
         for (let i in translationKeys) {
             if (isNonNullString(translationKeys[i])) {
-                translationKeys[i] = this.t(translationKeys[i], options);
+                translationKeys[i] = this.translate(translationKeys[i], options);
             }
         }
         return translationKeys;
+    }
+    /**
+     * Translates an object containing translation keys as values.
+     * This method takes an object where each property value is expected to be a translation key,
+     * and returns a new object with the same structure but with translated values.
+     * 
+     * @template T - The type of the input object, extending Record<string, string>
+     * @param object - The object containing translation keys as values to be translated
+     * @param {TranslateOptions} options - additional options to pass to the i18n.translate function
+     * @returns A new object with the same keys but translated values
+     * 
+     * @example
+     * ```typescript
+     * // Register translations first
+     * i18n.registerTranslations({
+     *   en: {
+     *     'user.name': 'Name',
+     *     'user.email': 'Email Address',
+     *     'user.phone': 'Phone Number',
+     *     'actions.save': 'Save',
+     *     'actions.cancel': 'Cancel'
+     *   },
+     *   fr: {
+     *     'user.name': 'Nom',
+     *     'user.email': 'Adresse Email',
+     *     'user.phone': 'Numéro de Téléphone',
+     *     'actions.save': 'Enregistrer',
+     *     'actions.cancel': 'Annuler'
+     *   }
+     * });
+     * 
+     * // Define an object with translation keys
+     * const formLabels = {
+     *   name: 'user.name',
+     *   email: 'user.email',
+     *   phone: 'user.phone'
+     * };
+     * 
+     * // Translate the object
+     * const translatedLabels = i18n.translateObject(formLabels);
+     * console.log(translatedLabels);
+     * // Output (for 'en' locale): { name: 'Name', email: 'Email Address', phone: 'Phone Number' }
+     * // Output (for 'fr' locale): { name: 'Nom', email: 'Adresse Email', phone: 'Numéro de Téléphone' }
+     * 
+     * // Can also be used with button configurations
+     * const buttonConfig = {
+     *   saveButton: 'actions.save',
+     *   cancelButton: 'actions.cancel'
+     * };
+     * const translatedButtons = i18n.translateObject(buttonConfig);
+     * // Output (for 'en' locale): { saveButton: 'Save', cancelButton: 'Cancel' }
+     * ```
+     * 
+     * @example
+     * ```typescript
+     * // Advanced usage with form validation messages
+     * const validationMessages = {
+     *   required: 'validation.required',
+     *   email: 'validation.email.invalid',
+     *   minLength: 'validation.minLength',
+     *   maxLength: 'validation.maxLength'
+     * };
+     * 
+     * // Assuming you have registered validation translations
+     * const translatedValidation = i18n.translateObject(validationMessages);
+     * // This allows you to easily get all validation messages in the current locale
+     * ```
+     * 
+     * @note If the input object is not a valid object, an empty object of type T is returned.
+     * @note Only string values that are non-null and non-empty are translated; other values are skipped.
+     * @note This method is particularly useful for translating configuration objects, form labels, 
+     *       button texts, or any structured data containing translation keys.
+     * 
+     * @see {@link translateTarget} for translating class properties decorated with @Translate
+     * @see {@link t} for translating individual keys with interpolation support
+     * 
+     * @since 1.20.3
+     */
+    translateObject<T extends Record<string, string> = any>(object: T, options?: TranslateOptions): T {
+        if (!isObj(object)) return {} as T;
+        const translatedKeys: T = {} as T;
+        for (const key in object) {
+            const i18nKey = object[key];
+            if (isNonNullString(i18nKey)) {
+                (translatedKeys as any)[key] = i18n.translate(i18nKey, options);
+            }
+        }
+        return translatedKeys;
     }
     /***
      * returns the translation keys for the target class
@@ -415,7 +503,7 @@ export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
      */
     static setMomentLocale(locale: string): boolean {
         try {
-            moment.locale(locale, this.getMomentLocale(locale));
+            moment.updateLocale(locale, this.getMomentLocale(locale));
             return true;
         } catch (error) {
             console.error(error, " setting moment locale : ", locale);
@@ -469,7 +557,7 @@ export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
                 const metadataKey = Reflect.getMetadata(TRANSLATION_KEY, target, key);
                 if (metadataKey) {
                     try {
-                        (target as any)[key] = this.t(metadataKey);
+                        (target as any)[key] = this.translate(metadataKey);
                     } catch (error) {
                         console.error(error, " resolving translation for key : ", metadataKey);
                     }
@@ -492,9 +580,6 @@ export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
             return this.missingPlaceholder(this, placeholder, defaultStr(message), Object.assign({}, options));
         }
         return placeholder;
-    }
-    get locale() {
-        return super.locale;
     }
     /**
      * Gets the current locale for the i18n instance.
@@ -557,55 +642,26 @@ export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
     isLoading() {
         return this._isLoading;
     }
-    /**
-     * Sets the locale for the i18n instance.
-     * If the provided locale is the same as the current locale, this method will return without doing anything.
-     * Otherwise, it will load the translations for the new locale and trigger a "locale-changed" event.
-     * If this is the default i18n instance, it will also set the locale in the session.
-     * @param locale - The new locale to set.
-     */
-    private set locale(locale: string) {
-        if (this.locale == locale) {
-            return;
+
+    private _namespacesLoaded: Record<string, any> = {};
+    setLocale(locale: string, forceUpdate: boolean = false): Promise<string> {
+        if (super.locale === locale && forceUpdate !== true && this._namespacesLoaded[locale]) {
+            return Promise.resolve(this.getLocale())
         }
-        this._isLoading = true;
-        I18nClass.setMomentLocale(locale);
-        this.trigger("namespaces-before-load", locale);
-        this.loadNamespaces(locale).then((translations) => {
-            if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {
-                I18nClass.setLocaleToSession(locale);
-            }
-            super.locale = locale;
-            this.trigger("locale-changed", locale, translations);
-        });
-    }
-    /**
-     * Sets the locale for the i18n instance.
-     * If the provided locale is the same as the current locale, this method will return without doing anything.
-     * Otherwise, it will load the translations for the new locale and trigger a "locale-changed" event.
-     * If this is the default i18n instance, it will also set the locale in the session.
-     * @param locale - The new locale to set.
-     */
-    setLocale(locale: string): Promise<II18nTranslation> {
-        this.locale = locale;
         return new Promise((resolve, reject) => {
-            let hasResolved = false;
-            const _resolve = (translations: II18nTranslation) => {
-                if (!hasResolved) {
-                    hasResolved = true;
-                    resolve(this.getTranslations());
+            this._isLoading = true;
+            this.trigger("namespaces-before-load", locale);
+            return this.loadNamespaces(locale).then((translations) => {
+                if (this.isDefaultInstance() && this.isLocaleSupported(locale)) {
+                    I18nClass.setLocaleToSession(locale);
                 }
-            };
-            if (!this.isLoading()) {
-                resolve(this.getTranslations());
-            } else {
-                this.once("locale-changed", (locale, translations) => {
-                    _resolve(translations);
-                });
-                /* this.once("namespace-loaded", (namespace, locale, translations) => {
-                    _resolve(translations);
-                }); */
-            };
+                super.locale = locale;
+                I18nClass.setMomentLocale(locale);
+                this.trigger("locale-changed", locale, translations);
+                resolve(locale);
+            }).catch(reject).finally(() => {
+                this._isLoading = false;
+            });
         });
     }
     /**
@@ -642,16 +698,7 @@ export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
         return I18nClass.getInstance().registerNamespaceResolver(namespace, resolver);
     }
 
-    /***
-     * Load a namespace for the current locale.
-     * @param namespace The namespace to load.
-     * @param locale optional locale to load the namespace for
-     * @param updateTranslations optional boolean to update the translations
-     * @example
-     * // Load the "common" namespace for the current locale. 
-     * i18n.loadNamespace("common");      
-     * @returns A promise that resolves to the loaded namespace.
-     */
+
     loadNamespace(namespace: string, locale?: string, updateTranslations: boolean = true): Promise<II18nTranslation> {
         if (!isNonNullString(namespace) || !this.namespaceResolvers[namespace]) {
             return Promise.reject(new Error(`Invalid namespace or resolver for namespace "${namespace}".`));
@@ -672,28 +719,12 @@ export class I18nClass extends I18nJs implements IObservable<I18nEvent> {
             return dict;
         }));
     }
-    /**
-     * load a namespace for the current locale on the I18nClass default instance.
-     * @param namespace, namespace to load
-     * @param locale, optional locale to load the namespace for
-     * @param updateTranslations optional boolean to update the translations
-     * @returns 
-     */
+
     static LoadNamespace(namespace: string, locale?: string, updateTranslations: boolean = true): Promise<II18nTranslation> {
         return I18nClass.getInstance().loadNamespace(namespace, locale, updateTranslations);
     }
 
-    /**
-     * Loads all registered namespaces for the current locale and returns the combined translations as an II18nTranslation.
-     * @param locale optional locale to load the namespaces for
-     * @param updateTranslations optional boolean to update the translations
-     * @returns {Promise<II18nTranslation>} A promise that resolves to the combined translations for the current locale.
-     * @example
-     * // Load all namespaces for the current locale and return the combined translations.
-     * i18n.loadNamespaces().then((translations) => {
-     *   console.log(translations);
-     * });
-     */
+
     loadNamespaces(locale?: string, updateTranslations: boolean = true): Promise<II18nTranslation> {
         const namespaces = [];
         const translations: II18nTranslation = {};

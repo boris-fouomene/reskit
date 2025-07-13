@@ -1,5 +1,5 @@
 import { Button } from "@components/Button";
-import { INavItemProps, INavItemsProps } from "./types";
+import { INavItemProps, INavItemsProps, INavLinkComponent, INavLinkProps } from "./types";
 import { FC } from "react";
 import { defaultStr } from "@resk/core/utils";
 import { Details } from "@html/Details";
@@ -12,16 +12,31 @@ import { cn } from "@utils/cn";
 
 
 export class Nav {
+    static readonly linkMetaData = Symbol("link-meta-data");
+    static set Link(component: INavLinkComponent) {
+        if (isValidLinkComponent(component)) {
+            Reflect.defineMetadata(Nav.linkMetaData, component, Nav);
+        }
+    }
+    static get Link(): INavLinkComponent {
+        const component = Reflect.getMetadata(Nav.linkMetaData, Nav);
+        if (isValidLinkComponent(component)) {
+            return component;
+        }
+        return NavDefaultLink;
+    }
     static renderItems({ items, renderItem, renderExpandableItem, ...rest }: INavItemsProps) {
         return renderNavItems({ ...rest, items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem });
     };
-    static Item<Context = unknown>({ className, variant, ...props }: INavItemProps<Context>) {
-        return <Button
-            testID="nav-item"
-            {...props}
-            variant={{ paddingX: 2, ...variant }}
-            className={cn(className)}
-        />
+    static Item<Context = unknown>({ className, linkProps, variant, ...props }: INavItemProps<Context>) {
+        return <Nav.Link testID={"resk-nav-link"} asChild {...linkProps}>
+            <Button
+                testID="nav-item"
+                {...props}
+                variant={{ paddingX: 2, ...variant }}
+                className={cn(className)}
+            />
+        </Nav.Link>
     }
     static Items<Context = unknown>({ items: customItems, renderItem, renderExpandableItem, testID, ...rest }: INavItemsProps<Context>) {
         testID = defaultStr(testID, "resk-nav-item");
@@ -62,11 +77,28 @@ function ExpandableItemLabel({ as, ...rest }: INavItemProps<any> & { as?: IReact
         {...rest}
     />
 };
+
+function NavDefaultLink({ children }: INavLinkProps) {
+    return <>{children}</>
+}
+NavDefaultLink.displayName = "Nav.DefaultLink";
+
 ExpandableItemLabel.displayName = "Nav.ExpandableItemLabel";
 
-
+function isValidLinkComponent(component: INavLinkComponent) {
+    return typeof component === "function";
+}
 (Nav.Item as FC<INavItemProps>).displayName = "MenuItem";
+
 
 
 export * from "./types";
 export * from "./hooks";
+
+
+
+export function AttachLinkComponent() {
+    return function (target: INavLinkComponent) {
+        Nav.Link = target;
+    };
+}

@@ -52,7 +52,7 @@ export interface INativewindBaseProps {
  * );
  * ```
  */
-export type IReactComponent<Props = any, State = any> =
+export type IReactComponent<Props = unknown, State = unknown> =
   | FunctionComponent<Props> // Functional Component
   | (new (props: Props) => Component<Props, State>) // Class Component Constructor
   | ComponentClass<Props, State> // Class Component Class

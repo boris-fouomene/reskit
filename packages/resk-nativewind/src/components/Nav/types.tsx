@@ -1,7 +1,8 @@
 import { IButtonProps } from "@components/Button/types";
 import { IHtmlDetailsProps } from "@html/Details";
 import { IHtmlDivProps } from "@html/types";
-import { IClassName, IReactNullableElement } from "@src/types";
+import { IClassName, IReactComponent, IReactNullableElement } from "@src/types";
+import { ReactNode } from "react";
 
 export interface INavItemProps<Context = unknown> extends IButtonProps<Context> {
     /***
@@ -30,6 +31,8 @@ export interface INavItemProps<Context = unknown> extends IButtonProps<Context> 
     closeOnPress?: boolean;
 
     dividerClassName?: IClassName;
+
+    linkProps?: INavLinkProps;
 };
 
 /**
@@ -117,3 +120,45 @@ export interface INavRenderItemOptions<Context = unknown> extends Omit<INavItems
 
 export type INavRenderItemFunc<Context = unknown> = (props: INavItemProps<Context>, index: number) => IReactNullableElement;
 
+
+export interface INavLinkProps {
+    /**
+     * Used to customize the `Link` component. It will forward all props to the
+     * first child of the `Link`. Note that the child component must accept
+     * `onPress` or `onClick` props. The `href` and `role` are also
+     * passed to the child.
+     *
+     * @example
+     * ```tsx
+     * import { Link } from 'expo-router';
+     * import { Pressable, Text } from 'react-native';
+     *
+     * export default function Route() {
+     *  return (
+     *   <View>
+     *    <Link href="/home" asChild>
+     *      <Pressable>
+     *       <Text>Home</Text>
+     *      </Pressable>
+     *    </Link>
+     *   </View>
+     *  );
+     *}
+     * This is equivalent to props passHref on Next.js Link
+     * @see {@link https://nextjs.org/docs/pages/api-reference/components/link}
+     * ```
+     */
+    asChild?: boolean;
+
+    /**
+     * The children of the link
+     */
+    children?: ReactNode;
+
+    /**
+     * The testID of the link
+     */
+    testID?: string;
+}
+
+export type INavLinkComponent<NavState = unknown> = IReactComponent<INavLinkProps, NavState>;

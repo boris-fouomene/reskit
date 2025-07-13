@@ -517,7 +517,6 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * });
    * 
    * // Retrieve the translations for the "user" resource.  
-   * import {ResourcesManager} from "@resk/core";
    * const userResource = ResourcesManager.getResource("user");
    * const userTranslations = userResource.getTranslations();
    * console.log(userTranslations);

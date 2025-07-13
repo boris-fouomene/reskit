@@ -283,7 +283,6 @@ export const observableFactory = function <EventType extends string = string>():
  * 
  * @example
  * ```typescript
- * import observable from "@resk/core";
  * const context = observable({});
  * const testCb = (e) => console.log("test");
  * context.on("test", testCb);

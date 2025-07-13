@@ -1,4 +1,4 @@
-import { IClassConstructor } from "@resk/core";
+import { IClassConstructor } from "@resk/core/types";
 import { ResourceController } from "@resk/nest";
 import { CatDto } from "./cats.dto";
 import { Controller } from "@nestjs/common";

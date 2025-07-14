@@ -3,7 +3,7 @@ import { ImageProps, ImageSourcePropType, View } from "react-native";
 import { IconProps } from "react-native-vector-icons/Icon";
 import { JSX } from "react";
 import { ICommonVariant } from "@variants/common";
-import { IIconVariantButton } from '@variants/iconButton';
+import { IIconButtonVariant } from '@variants/iconButton';
 import { IIconVariant } from "@variants/icon";
 import { ITooltipBaseProps } from "@components/Tooltip/types";
 import { IFontIconNameRegistry } from "./font.types";
@@ -279,5 +279,5 @@ export interface IIconButtonProps extends Omit<IIconProps, "variant"> {
     isLoading?: boolean;
     containerClassName?: IClassName;
     containerSize?: number;
-    variant?: IIconVariantButton;
+    variant?: IIconButtonVariant;
 };

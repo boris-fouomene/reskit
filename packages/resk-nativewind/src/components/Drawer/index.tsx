@@ -858,11 +858,11 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
         return false;
       }}
       backAction={(opts) => {
-        const { className, handleBackPress, computedAppBarVariant } = opts;
+        const { className, variant, handleBackPress, computedAppBarVariant } = opts;
         const elt = typeof appBarProps?.backAction == "function" ? appBarProps.backAction(opts as any) : appBarProps?.backAction;
         return (
           <>
-            {isValidElement(elt) ? elt : <AppBar.BackAction onPress={handleBackPress} className={className} fontIconName={(this.getDrawerPosition() == "left" ? "chevron-left" : "chevron-right") as never} />}
+            {isValidElement(elt) ? elt : <AppBar.BackAction variant={variant} onPress={handleBackPress} className={className} fontIconName={(this.getDrawerPosition() == "left" ? "chevron-left" : "chevron-right") as never} />}
             {this.canToggleFullScren() ? <Tooltip onPress={this.toggleFullScreen.bind(this)} title={i18n.t("components.drawer.toggleFullScreen")} children={<FontIcon className={computedAppBarVariant.icon()} name={(this.isFullScreen() ? "fullscreen-exit" : "fullscreen") as never} size={20} />} /> : null}
           </>
         );

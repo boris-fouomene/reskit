@@ -132,10 +132,6 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
      */
     variant?: IButtonVariant;
 
-    /***
-     * The content of the ripple effect
-     */
-    rippleContent?: JSX.Element | null;
 
     /** Duration of the ripple effect, in milliseconds
      * Default value is 500 (ms)
@@ -169,6 +165,24 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
      */
     resourceName?: IResourceName;
 
+
+    /***
+    * The class name for the ripple effect.
+    * @remarks
+     * This property is only available on web platforms.
+     * On mobile, ripple effect is handled using android_ripple property.
+    */
+    rippleClassName?: IClassName;
+
+    /**
+     * This property allows you to customize the ripple effect behavior on web platforms.
+     * The duration of the ripple effect, in milliseconds
+     * Default value is 600 (ms)
+     @remarks
+     * This property is only available on web platforms.
+     * On mobile, ripple effect is handled using android_ripple property.
+     */
+    rippleDuration?: number;
 }
 
 export interface IButtonInteractiveProps<Context = unknown> extends Omit<IButtonProps<IButtonContext<Context>>, "ref"> {
@@ -200,10 +214,7 @@ export interface IButtonInteractiveProps<Context = unknown> extends Omit<IButton
      */
     rippleColor?: string | null;
 
-    /***
-     * The class name for the ripple effect.
-     */
-    rippleClassName?: IClassName;
+
 }
 
 export type IButtonContext<Context = unknown> = Readonly<{

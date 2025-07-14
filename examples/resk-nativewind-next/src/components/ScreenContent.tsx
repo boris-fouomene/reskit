@@ -14,6 +14,29 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
     <ScrollView testID='main-entry-appp flex-1 main-scrollview' style={{ maxHeight: "100%", maxWidth: "100%" }} contentContainerStyle={{}}>
       <DialogExample />
       <BottomSheetExample />
+
+      <Div className="p-5">
+        <Heading level={1}>Button examples</Heading>
+        <HStack className="p-5 !gap-x-10 gap-y-5">
+          <Button label="Button base example1 with left icon" icon={"camera"} variant={{ colorScheme: "primary", padding: "5px" }}
+            left={<Icon.Font name="ph" size={30} className={buttonVariant({ colorScheme: "primary" }).icon()} />}
+          />
+          <Button variant={{ colorScheme: "primary", rippleColor: "secondary" }}> Ripple effect </Button>
+          <Button label="Button example2" icon="radio" variant={{ colorScheme: "secondary", padding: "10px" }} />
+          <Button loading label="Outline Button 1" variant={{ outline: "primary" }} className="p-[2px] rounded-lg" />
+          <Button icon={"camera"} label="Outline Button 2" variant={{ outline: "secondary" }} />
+          <Button icon="abacus" label="Outline Button 3" variant={{ outline: "info" }} />
+          <Button icon="phone" label="Outline Button 4" variant={{ outline: "success", rounded: "sm" }} />
+          <Button icon="telescope" label="Outline Button 5" variant={{ outline: "warning" }} />
+          <Button label="Outline Button 6" variant={{ outline: "error" }} />
+          <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ colorScheme: "error" }} />
+          <Button label="Button example4 - loading" loading variant={{ colorScheme: "success" }} className="px-[10px] py-[5px] rounded-full" />
+          <Button label="Neutral" variant={{ colorScheme: "neutral" }} />
+          <Button label="Surface" variant={{ outline: "surface" }} />
+          <Button label="Info Button" variant={{ outline: "info" }} icon="camera" />
+        </HStack>
+      </Div>
+
       <AlertExamples />
       <Div className="p-5">
         <H2>TextInput</H2>
@@ -199,26 +222,6 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Checkbox label={"Example 1"} title="Checkbox example1" checkedVariant={{ color: "primary", size: "4xl" }} />
           <Checkbox label={"Example 2"} title="Checkbox example2" checkedVariant={{ color: "secondary", size: "40px" }} />
           <Checkbox label={"Example 3"} title="Checkbox example3 - disabled" disabled />
-        </HStack>
-      </Div>
-      <Div className="p-5">
-        <Heading level={1}>Button examples</Heading>
-        <HStack className="p-5 !gap-x-10 gap-y-5">
-          <Button label="Button base example1 with left icon" icon={"camera"} variant={{ colorScheme: "primary", padding: "5px" }}
-            left={<Icon.Font name="ph" size={30} className={buttonVariant({ colorScheme: "primary" }).icon()} />}
-          />
-          <Button label="Button example2" icon="radio" variant={{ colorScheme: "secondary", padding: "10px" }} />
-          <Button loading label="Outline Button 1" variant={{ outline: "primary" }} className="p-[2px] rounded-lg" />
-          <Button icon={"camera"} label="Outline Button 2" variant={{ outline: "secondary" }} />
-          <Button icon="abacus" label="Outline Button 3" variant={{ outline: "info" }} />
-          <Button icon="phone" label="Outline Button 4" variant={{ outline: "success", rounded: "sm" }} />
-          <Button icon="telescope" label="Outline Button 5" variant={{ outline: "warning" }} />
-          <Button label="Outline Button 6" variant={{ outline: "error" }} />
-          <Button label="Button example3 - disabled" icon={"alpha-w-circle"} disabled variant={{ colorScheme: "error" }} />
-          <Button label="Button example4 - loading" loading variant={{ colorScheme: "success" }} className="px-[10px] py-[5px] rounded-full" />
-          <Button label="Neutral" variant={{ colorScheme: "neutral" }} />
-          <Button label="Surface" variant={{ outline: "surface" }} />
-          <Button label="Info Button" variant={{ outline: "info" }} icon="camera" />
         </HStack>
       </Div>
       <Div className="p-5">

@@ -2,7 +2,7 @@ import { iconVariant } from "@variants/icon";
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import { Text } from '@html/Text';
-import { defaultStr } from '@resk/core/utils';
+import { defaultStr, isNumber } from '@resk/core/utils';
 import isValidElement from '@utils/isValidElement';
 import { Divider } from '@components/Divider';
 import { cn } from '@utils/cn';
@@ -11,8 +11,11 @@ import { Div } from '@html/Div';
 import { buttonVariant } from "@variants/button";
 import { IButtonBaseContext, IButtonProps } from "./types";
 import { commonVariant } from "@variants/common";
-import { GestureResponderEvent } from "react-native";
+import { GestureResponderEvent, PressableProps } from "react-native";
 import { Auth } from '@resk/core/auth';
+import { RippleContent } from "./RippleContent";
+import Platform from "@platform";
+
 
 
 export function ButtonBase<Context = unknown>({
@@ -43,12 +46,14 @@ export function ButtonBase<Context = unknown>({
     activityIndicatorClassName,
     variant,
     disableRipple,
-    rippleContent,
+    rippleClassName,
     context,
     perm,
     iconClassName,
     resourceName,
     onPress,
+    rippleDuration,
+    android_ripple,
     ...rest
 }: IButtonProps<Context>) {
     if (perm !== undefined && !Auth.isAllowed(perm)) return null;
@@ -63,6 +68,8 @@ export function ButtonBase<Context = unknown>({
     const disabledClass = disabled && "pointer-events-none";
     iconProps.className = cn("button-icon", computedVariant.icon(), iconProps?.variant && iconVariant(iconProps.variant), disabledClass, iconClassName, iconProps.className);
     const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps, variant: undefined });
+    const isRippleEnabled = disableRipple !== false && !disabled;
+    const canRenderRipple = isRippleEnabled && Platform.isWeb();
     const iconContent = isLoading ? (
         <ActivityIndicator
             size={iconProps?.size || "small"}
@@ -75,14 +82,18 @@ export function ButtonBase<Context = unknown>({
     const rightContent = typeof right === "function" ? right(buttonContext) : right;
     const hasRightContent = isValidElement(right) && !!right;
     const rowClassName = cn("flex flex-row items-center self-center justify-center", disabledClass);
+    const restProps = Platform.OS === 'android' && isRippleEnabled ? {
+        android_ripple
+    } : {};
     return (<>
         <Surface
             role="none"
             {...rest}
+            {...restProps}
             id={buttonId}
             testID={`${testID}`}
             ref={ref}
-            className={cn("group/btn btn relative resk-btn  button select-text cursor-pointer", rippleContent ? "overflow-hidden" : "", commonVariant({ disabled }), computedVariant.base(), className)}
+            className={cn(canRenderRipple && "resk-btn-ripple", "group/btn btn relative resk-btn   button select-text cursor-pointer", commonVariant({ disabled }), computedVariant.base(), className)}
             accessibilityLabel={accessibilityLabel}
             accessibilityHint={accessibilityHint}
             accessibilityRole={accessibilityRole}
@@ -112,7 +123,7 @@ export function ButtonBase<Context = unknown>({
                     {rightContent}
                 </Div> : null}
             </Div>
-            {disableRipple || !isValidElement(rippleContent) ? null : rippleContent}
+            {canRenderRipple ? <RippleContent rippleDuration={rippleDuration} targetSelector=".resk-btn-ripple" className={cn("resk-ripple", computedVariant.ripple(), rippleClassName)} /> : null}
         </Surface>
         {divider ? <Divider id={buttonId + "-divider"} testID={testID + "-button-divider"} className={cn("button-divider", disabledClass, dividerClassName)} /> : null}
     </>);

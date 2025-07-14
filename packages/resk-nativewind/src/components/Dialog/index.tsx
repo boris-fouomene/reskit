@@ -2,7 +2,7 @@
 import { Modal } from "@components/Modal";
 import { AppBar, IAppBarActionProps, IAppBarProps } from "@components/AppBar";
 import { Fragment, ReactNode, useCallback, useMemo, Context, useImperativeHandle, Ref } from 'react';
-import { cn, Component, createProvider, isValidElement, useDimensions } from "@utils";
+import { cn, Component as AppComponent, createProvider, isValidElement, useDimensions } from "@utils";
 import { Dimensions, ScrollView } from "react-native";
 import { defaultStr, isObj } from "@resk/core/utils";
 import { Backdrop } from "@components/Backdrop";
@@ -229,7 +229,7 @@ function DialogControllable<Context = unknown, IsControlled extends boolean = fa
   );
 }
 
-class DialogControlled<Context = unknown> extends Component<IDialogControlledProps<Context>, IDialogControlledState<Context>> {
+class DialogControlled<Context = unknown> extends AppComponent<IDialogControlledProps<Context>, IDialogControlledState<Context>> {
   constructor(props: IDialogControlledProps<Context>) {
     super(props);
     this.state = {
@@ -317,152 +317,83 @@ class DialogControlled<Context = unknown> extends Component<IDialogControlledPro
 }
 
 
-/**
- * DialogProvider is a context provider for managing dialog state and access throughout the component tree.
- *
- * This class extends a generic provider utility, allowing consumers to open, close, and control dialogs
- * from anywhere within the React tree. It is especially useful for applications that require global dialog
- * management, such as notifications, confirmations, or alerts.
- *
- * @example
- * ```tsx
- * // Wrap your app with the DialogProvider
- * <Dialog.Provider>
- *   <App />
- * </Dialog.Provider>
- *
- * // Open a dialog from anywhere using the provider instance
- * Dialog.Provider.getProviderInstance()?.open({
- *   title: "Global Dialog",
- *   children: <Text>This dialog is managed by the provider.</Text>
- * });
- * ```
- *
- * @see DialogControlled
- * @see Dialog
- * @see DialogAlert
- */
-class DialogProvider extends createProvider<IDialogControlledProps, DialogControlled, IDialogControlledProps>(DialogControlled, { dismissible: false }) { }
+const DialogProvider = createProvider<IDialogControlledProps, DialogControlled>(DialogControlled, { dismissible: false });
 
-/**
- * DialogAlert is a specialized dialog provider for displaying alert dialogs with confirm and cancel actions.
- *
- * This class extends the generic dialog provider and preconfigures it for alert-style dialogs, making it easy to show
- * confirmation or warning dialogs with customizable buttons and messages.
- *
- * @example
- * ```tsx
- * // Show a simple alert dialog with confirm and cancel buttons
- * Dialog.Alert.open({
- *   title: "Delete Item",
- *   message: "Are you sure you want to delete this item?",
- *   onConfirm: () => {
- *     // Handle confirm action
- *   },
- *   onCancel: () => {
- *     // Handle cancel action
- *   }
- * });
- * ```
- *
- * @example
- * ```tsx
- * // Customize button labels and order
- * Dialog.Alert.open({
- *   title: "Sign Out",
- *   message: "Do you really want to sign out?",
- *   confirmButton: { title: "Yes, sign out", variant: { colorScheme: "danger" } },
- *   cancelButton: { title: "No, stay logged in" },
- *   buttonsOrder: "confirm-cancel"
- * });
- * ```
- *
- * @remarks
- * - Use `message` to provide the main alert base.
- * - Customize the confirm and cancel buttons using `confirmButton` and `cancelButton` props.
- * - The `buttonsOrder` prop controls the order of the action buttons.
- * - You can pass a `messageVariant` or `messageClassName` to style the alert message.
- *
- * @see Dialog
- * @see DialogControlled
- * @see DialogProvider
- */
-class DialogAlert extends createProvider<IDialogControlledProps, DialogControlled>(DialogControlled, { dismissible: false, fullScreen: false }) {
-  static open<Context = unknown>(props: IDialogControlledProps<Context> & {
-    message?: ReactNode;
+const DialogAlert = createProvider<IDialogControlledProps, DialogControlled, IDialogControlledCallback>(DialogControlled, { dismissible: false, fullScreen: false });
+const { open } = DialogAlert;
 
-    // Primary action (usually positive/confirm action)
-    confirmButton?: false | IDialogControlledActionProps<Context>;
+DialogAlert.open = function <Context = unknown>(props: IDialogControlledProps<Context> & {
+  message?: ReactNode;
 
-    // Secondary action (usually negative/cancel action)  
-    cancelButton?: false | IDialogControlledActionProps<Context>;
+  // Primary action (usually positive/confirm action)
+  confirmButton?: false | IDialogControlledActionProps<Context>;
 
-    // Layout control
-    buttonsOrder?: "confirm-cancel" | "cancel-confirm";
+  // Secondary action (usually negative/cancel action)  
+  cancelButton?: false | IDialogControlledActionProps<Context>;
 
-    // Convenience event handlers
-    onConfirm?: IDialogControlledActionProps<Context>["onPress"];
-    onCancel?: IDialogControlledActionProps<Context>["onPress"];
+  // Layout control
+  buttonsOrder?: "confirm-cancel" | "cancel-confirm";
 
-    // Message styling
-    messageVariant?: ITextVariant;
-    messageClassName?: IClassName;
-  }, innerProviderRef?: Ref<DialogControlled<Context>>, callback?: IDialogControlledCallback<Context>) {
-    const instance = DialogAlert.getProviderInstance(innerProviderRef as any);
-    if (!instance || typeof instance?.open !== "function") return;
-    const {
-      confirmButton: confirmConfig,
-      cancelButton: cancelConfig,
-      onConfirm,
-      onCancel,
-      buttonsOrder = "cancel-confirm",
-      message,
-      messageClassName,
-      messageVariant,
-      children,
-      ...rest
-    } = Object.assign({}, props);
-    const testID = defaultStr(rest.testID, "resk-dialog-alert");
-    // Configure confirm button
-    const confirmButton: IDialogControlledActionProps<Context> | undefined = confirmConfig === false ? undefined : {
-      label: i18n.t("components.dialog.alert.confirmButton"),
-      variant: { colorScheme: "primary", padding: 2 },
-      testID: testID + "-confirm-button",
-      ...confirmConfig,
-      onPress: typeof confirmConfig?.onPress === "function" ? confirmConfig?.onPress : onConfirm
-    };
+  // Convenience event handlers
+  onConfirm?: IDialogControlledActionProps<Context>["onPress"];
+  onCancel?: IDialogControlledActionProps<Context>["onPress"];
 
-    // Configure cancel button  
-    const cancelButton: IDialogControlledActionProps<Context> | undefined = cancelConfig === false ? undefined : {
-      label: i18n.t("components.dialog.alert.cancelButton"),
-      variant: { colorScheme: "error", padding: 2 },
-      showInFullScreen: false,
-      testID: testID + "-cancel-button",
-      ...cancelConfig,
-      onPress: typeof cancelConfig?.onPress == "function" ? cancelConfig?.onPress : onCancel
-    };
+  // Message styling
+  messageVariant?: ITextVariant;
+  messageClassName?: IClassName;
+}, innerProviderRef?: Ref<DialogControlled<Context>>, callback?: IDialogControlledCallback<Context>) {
+  const {
+    confirmButton: confirmConfig,
+    cancelButton: cancelConfig,
+    onConfirm,
+    onCancel,
+    buttonsOrder = "cancel-confirm",
+    message,
+    messageClassName,
+    messageVariant,
+    children,
+    ...rest
+  } = Object.assign({}, props);
+  const testID = defaultStr(rest.testID, "resk-dialog-alert");
+  // Configure confirm button
+  const confirmButton: IDialogControlledActionProps<Context> | undefined = confirmConfig === false ? undefined : {
+    label: i18n.t("components.dialog.alert.confirmButton"),
+    variant: { colorScheme: "primary", padding: 2 },
+    testID: testID + "-confirm-button",
+    ...confirmConfig,
+    onPress: typeof confirmConfig?.onPress === "function" ? confirmConfig?.onPress : onConfirm
+  };
 
-    // Arrange buttons based on order preference
-    const actions = String(buttonsOrder).toLowerCase() === "confirm-cancel" ? [confirmButton, cancelButton] : [cancelButton, confirmButton];
+  // Configure cancel button  
+  const cancelButton: IDialogControlledActionProps<Context> | undefined = cancelConfig === false ? undefined : {
+    label: i18n.t("components.dialog.alert.cancelButton"),
+    variant: { colorScheme: "error", padding: 2 },
+    showInFullScreen: false,
+    testID: testID + "-cancel-button",
+    ...cancelConfig,
+    onPress: typeof cancelConfig?.onPress == "function" ? cancelConfig?.onPress : onCancel
+  };
 
-    return (instance as DialogControlled<Context>).open({
-      ...rest,
-      dismissible: false,
-      testID,
-      children: (
-        <Text
-          testID={testID + "-message"}
-          className={cn("resk-dialog-alert-message", textVariant({ padding: 4, ...messageVariant }), messageClassName)}
-        >
-          {message}
-        </Text>
-      ),
-      actions: (Array.isArray(props?.actions) && props.actions.length ? props.actions : actions) as IDialogControlledActionProps<Context>[],
-    }, callback);
-  }
+  // Arrange buttons based on order preference
+  const actions = String(buttonsOrder).toLowerCase() === "confirm-cancel" ? [confirmButton, cancelButton] : [cancelButton, confirmButton];
+
+  return open({
+    ...rest,
+    dismissible: false,
+    testID,
+    children: (
+      <Text
+        testID={testID + "-message"}
+        className={cn("resk-dialog-alert-message", textVariant({ padding: 4, ...messageVariant }), messageClassName)}
+      >
+        {message}
+      </Text>
+    ),
+    actions: (Array.isArray(props?.actions) && props.actions.length ? props.actions : actions) as IDialogControlledActionProps<Context>[],
+  } as any, innerProviderRef, callback as any);
 }
 
-export class Preloader extends createProvider<Omit<IDialogControlledProps, "children"> & { content?: ReactNode, textClassName?: IClassName; textVariant?: ITextVariant; contentContainerClassName?: IClassName; activityIndicatorPosition?: "left" | "right", withActivityIndicator?: boolean, activityIndicatorVariant?: IActivityIndicatorVariant; activityIndicatorClassName?: IClassName }, DialogControlled>(DialogControlled, { dismissible: false, fullScreen: false },
+export const Preloader = createProvider<Omit<IDialogControlledProps, "children"> & { content?: ReactNode, textClassName?: IClassName; textVariant?: ITextVariant; contentContainerClassName?: IClassName; activityIndicatorPosition?: "left" | "right", withActivityIndicator?: boolean, activityIndicatorVariant?: IActivityIndicatorVariant; activityIndicatorClassName?: IClassName }, DialogControlled>(DialogControlled, { dismissible: false, fullScreen: false },
   (options) => {
     options.withScrollView = typeof options.withScrollView === "boolean" ? options.withScrollView : false;
     options.variant = { paddingX: 2, ...options.variant };
@@ -477,7 +408,7 @@ export class Preloader extends createProvider<Omit<IDialogControlledProps, "chil
       {indicatorOnRight ? indicator : null}
     </Div> : content;
     return rest;
-  }) { }
+  });
 
 /**
  * Exposes static members for Dialog-related components and providers.

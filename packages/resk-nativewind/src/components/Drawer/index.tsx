@@ -1238,12 +1238,11 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
 
 
 class _DrawerProvider extends Drawer { isProvider(): boolean { return true; } }
-class DrawerProvider extends createProvider<IDrawerProps, _DrawerProvider, IDrawerProps>(_DrawerProvider, { permanent: false }, (options) => {
+const DrawerProvider = createProvider<IDrawerProps, _DrawerProvider>(_DrawerProvider, { permanent: false }, (options) => {
   options.permanent = typeof options.permanent === 'boolean' ? options.permanent : false;
   return options;
-}) { }
+});
 
-DrawerProvider.displayName = "Drawer.Provider";
 
 const DrawerContext = createContext<IDrawerContext>({} as IDrawerContext);
 

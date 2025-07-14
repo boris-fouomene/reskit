@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
+const appName = "resk-nativewind-expo";
 function copyToExpoDemoPackage(demoPath) {
     const dir = path.resolve(__dirname, "..");
-    const nativewindDemoPath = path.resolve(dir, "..", "..", "..", "resk-nativewind-expo", "node_modules", "@resk", "nativewind");
+    const nativewindDemoPath = path.resolve(dir, "..", "..", "..", appName, "node_modules", "@resk", "nativewind");
     const buildPath = path.resolve(dir, "build")
     if (typeof demoPath === 'string' && fs.existsSync(demoPath) && fs.existsSync(path.resolve(demoPath, "package.json"))) {
 

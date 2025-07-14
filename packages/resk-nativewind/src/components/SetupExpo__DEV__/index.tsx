@@ -42,8 +42,8 @@ import { useEffect } from "react";
  * - Useful for conditional logging, debugging, or enabling development-only features.
  */
 export function SetupExpo__DEV__() {
-    const __DEV__ = (process.env.NODE_ENV === "development") || (process.env.NEXT_PUBLIC_NODE_ENV === "development");
     const setupDev = () => {
+        const __DEV__ = (process.env.NODE_ENV === "development") || (process.env.NEXT_PUBLIC_NODE_ENV === "development");
         const globalObj = getGlobal();
         (globalObj as any).__DEV__ = __DEV__;
         if (typeof window !== "undefined") {

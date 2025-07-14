@@ -4,7 +4,7 @@ import { DialogExample } from './DialogExample';
 import { BottomSheetExample } from './BottomSheetExample';
 import { AlertExamples } from './AlertExamples';
 import { DrawerChildren } from './DialogExample';
-import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, buttonVariant, CountrySelector, TelInput, Drawer } from "@resk/nativewind";
+import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, buttonVariant, CountrySelector, TelInput, Drawer, Expandable } from "@resk/nativewind";
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
@@ -36,7 +36,12 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Button label="Info Button" variant={{ outline: "info" }} icon="camera" />
         </HStack>
       </Div>
-
+      <Div className="p-5">
+        <H2>Expandable examples</H2>
+        <Expandable label="My expandable">
+          An expndable example
+        </Expandable>
+      </Div>
       <AlertExamples />
       <Div className="p-5">
         <H2>TextInput</H2>

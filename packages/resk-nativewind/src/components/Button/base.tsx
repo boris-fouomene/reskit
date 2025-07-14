@@ -16,8 +16,6 @@ import { Auth } from '@resk/core/auth';
 import { RippleContent } from "./RippleContent";
 import Platform from "@platform";
 import { useId } from "react";
-//import { useId, useState } from "react";
-
 
 
 export function ButtonBase<Context = unknown>({
@@ -56,18 +54,10 @@ export function ButtonBase<Context = unknown>({
     onPress,
     rippleDuration,
     android_ripple,
-    expandable,
-    expanded: controlledExpanded,
-    onExpandChange,
-    //expandedIcon = "chevron-up",
-    //collapsedIcon = "chevron-down",
     ...rest
 }: IButtonProps<Context>) {
-    const generatedId = useId();
-
-
     if (perm !== undefined && !Auth.isAllowed(perm)) return null;
-    const buttonId = defaultStr(id, generatedId);
+    const buttonId = defaultStr(id);
     testID = defaultStr(testID, "resk-button-base");
     const isLoading = !!customIsLoading;
     const disabled: boolean = !!customDisabled || isLoading;
@@ -76,8 +66,6 @@ export function ButtonBase<Context = unknown>({
     const iconSize = 18;
     iconProps = Object.assign({}, iconProps);
 
-    // For expandable buttons, default icon position to right if not specified
-    const effectiveIconPosition = expandable && !iconPosition ? "right" : iconPosition;
     const disabledClass = disabled && "pointer-events-none";
     iconProps.className = cn("button-icon", computedVariant.icon(), iconProps?.variant && iconVariant(iconProps.variant), disabledClass, iconClassName, iconProps.className);
 
@@ -99,34 +87,11 @@ export function ButtonBase<Context = unknown>({
         />
     ) : icon || null;
     const buttonContext = Object.assign({}, context, { loading: isLoading, computedVariant }) as IButtonBaseContext<Context>;
-
-    /* const buttonContext = Object.assign({}, context, {
-        loading: isLoading,
-        disabled,
-        computedVariant,
-        expanded: expandable ? expanded : undefined
-    }) as IButtonBaseContext<Context>; */
     const leftContent = typeof left === "function" ? left(buttonContext) : left;
     const rightContent = typeof right === "function" ? right(buttonContext) : right;
     const hasRightContent = isValidElement(right) && !!right;
     const rowClassName = cn("flex flex-row items-center self-center justify-center", disabledClass);
-
-    // Handle expandable button press
-    /* const handlePress = (event: GestureResponderEvent) => {
-        if (expandable) {
-            const newExpanded = !expanded;
-            if (!isControlled) {
-                setInternalExpanded(newExpanded);
-            }
-            if (onExpandChange) {
-                onExpandChange(newExpanded);
-            }
-        }
-
-        if (typeof onPress === "function") {
-            return onPress(event, buttonContext);
-        }
-    }; */
+    const displayIconAtRight = iconPosition == "right";
     return (<>
         <Surface
             role="button"
@@ -147,12 +112,12 @@ export function ButtonBase<Context = unknown>({
                 return r;
             } : undefined}
         >
-            <Div id={`${buttonId}-content`} testID={testID + "-button-content"} className={cn("button-content w-full flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
+            <Div id={buttonId ? `${buttonId}-content` : undefined} testID={testID + "-button-content"} className={cn("button-content w-full flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>
                 <Div className={cn("button-left-container", rowClassName, computedVariant.leftContainer(), leftContainerClassName)} testID={testID + "-button-left-container"}>
                     {leftContent}
-                    {effectiveIconPosition != "right" ? iconContent : null}
+                    {!displayIconAtRight ? iconContent : null}
                     <Text
-                        id={`${buttonId}-label`}
+                        id={buttonId ? `${buttonId}-label` : undefined}
                         selectable={false}
                         testID={`${testID}-button-label`}
                         className={cn("button-label", computedVariant.label(), disabledClass, labelClassName)}
@@ -160,14 +125,14 @@ export function ButtonBase<Context = unknown>({
                         {isValidElement(children, true) && children || label}
                     </Text>
                 </Div>
-                {(hasRightContent || (expandable && effectiveIconPosition === "right")) ? <Div testID={testID + "-right-contentainer"} id={`${buttonId}-right-container`} className={cn("button-right-container", rowClassName, computedVariant.rightContainer(), rightContainerClassName)}>
-                    {effectiveIconPosition == "right" ? iconContent : null}
+                {(hasRightContent || (displayIconAtRight)) ? <Div testID={testID + "-right-contentainer"} id={buttonId ? `${buttonId}-right-container` : undefined} className={cn("button-right-container", rowClassName, computedVariant.rightContainer(), rightContainerClassName)}>
+                    {displayIconAtRight ? iconContent : null}
                     {rightContent}
                 </Div> : null}
             </Div>
-            {canRenderRipple ? <RippleContent id={`${id}-ripple`} rippleDuration={rippleDuration} targetSelector={`#${id}`} className={cn("resk-ripple", computedVariant.ripple(), rippleClassName)} /> : null}
+            {canRenderRipple ? <RippleContent id={buttonId ? `${id}-ripple` : undefined} rippleDuration={rippleDuration} targetSelector={`.resk-btn-ripple`} className={cn("resk-ripple", computedVariant.ripple(), rippleClassName)} /> : null}
         </Surface>
-        {divider ? <Divider id={buttonId + "-divider"} testID={testID + "-button-divider"} className={cn("button-divider", disabledClass, dividerClassName)} /> : null}
+        {divider ? <Divider id={buttonId ? buttonId + "-divider" : undefined} testID={testID + "-button-divider"} className={cn("button-divider", disabledClass, dividerClassName)} /> : null}
     </>);
 };
 

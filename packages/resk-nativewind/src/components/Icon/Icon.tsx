@@ -8,6 +8,7 @@ import { StyleSheet } from "react-native";
 import { isNonNullString, isObj } from "@resk/core/utils";
 import { iconVariant } from "@variants/index";
 import { Tooltip } from "@components/Tooltip";
+import { Div } from "@html/Div";
 
 
 function Icon({ fontIconName, className, variant, src, resizeMode, title, source, containerClassName, testID, size, style, ref, ...props }: IIconProps) {
@@ -15,7 +16,7 @@ function Icon({ fontIconName, className, variant, src, resizeMode, title, source
     const iconSrc = isImageSource(src) ? src : undefined;
     className = cn(isObj(variant) && iconVariant(variant), className);
     testID = testID && typeof testID == "string" ? testID : (isSource ? "resk-image" : "resk-font-icon");
-    const iconSize = typeof size == "number" && size > 0 ? size : FontIcon.DEFAULT_SIZE;
+    const iconSize = typeof size == "number" && size > 0 ? size : undefined//FontIcon.DEFAULT_SIZE;
     if (isSource || iconSrc) {
         const { touchableProps, ...restProps } = pickTouchableProps(normalizeProps({ ...props, className }));
         const disabled = !!props.disabled;
@@ -100,7 +101,7 @@ Icon.getIconSource = getIconSource;
  * 
  * @param {Object} params - The parameters for retrieving the icon.
  * @param {IIconSource} params.icon - The source of the icon (string, ImageSource, or function).
- * @param {...any} rest - Additional properties to pass to the icon component.
+ * @param {...unknown} rest - Additional properties to pass to the icon component.
  * 
  * @returns {ReactNode} The rendered icon component.
  * @see {@link IGetIconOptions} for the options of the function.
@@ -108,8 +109,10 @@ Icon.getIconSource = getIconSource;
  * @example
  * const myIcon = getIcon({ icon: "material-home", color: "blue", theme: customTheme });
  */
-Icon.getIcon = function getIcon<T = any>({ icon, ...rest }: IGetIconOptions<T>): ReactNode {
-    if (isValidElement(icon)) return icon as ReactNode;
+Icon.getIcon = function getIcon<T = unknown>({ icon, ...rest }: IGetIconOptions<T>): ReactNode {
+    if (isValidElement(icon)) {
+        return <Div asHtmlTag="span" {...rest as any}>{icon}</Div>;
+    }
     if (!icon) return null;
     const isSource = isImageSource(icon) || isNonNullString(icon) && isImageUrl(icon as string);
     const fontIconName = typeof icon == "string" && !isSource ? (icon as any) : undefined;
@@ -208,7 +211,7 @@ export default Icon;
  * @category Icons
  * @since 1.0.0
  */
-type IGetIconOptions<T = any> = Omit<T, keyof IGetIconOptionsBase> & IGetIconOptionsBase & { icon?: IIconSource };
+export type IGetIconOptions<T = unknown> = Omit<T, keyof IGetIconOptionsBase> & IGetIconOptionsBase & { icon?: IIconSource };
 /**
  * Represents the base options for retrieving icons, excluding essential properties like name, source, and color.
  * This type is used as a foundation for icon configuration options while allowing specific icon properties to be

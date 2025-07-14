@@ -48,9 +48,9 @@ function generateColorVariants(colors, { outputRootDir, isDev }) {
   const textColorsWithImportant = VariantsColorsFactory.buildTextColors(true);
   const iconForeground = Object.fromEntries(Object.entries(VariantsColorsFactory.buildTextForegroundColors(true)).map(([key, value]) => [`${key}-foreground`, value]));
   const textColors = {
-      ...VariantsColorsFactory.buildTextColors(),
-      ...textForeground,
-    },
+    ...VariantsColorsFactory.buildTextColors(),
+    ...textForeground,
+  },
     icon = {
       ...textColorsWithImportant,
       ...iconForeground,

@@ -166,13 +166,14 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
     rippleClassName?: IClassName;
 
     /**
-     * Disables the ripple effect on button press.
-     * If set to true, the ripple effect will not be shown when the button is pressed.
+     * Enables the ripple effect on button press.
+     * If set to false, the ripple effect will not be shown when the button is pressed.
+     * On android, this property is ignored unless it is set to true or false.
      * @default false
      * @example
-     * <Button anableRipple={true} />
+     * <Button enableRipple={true} />
      */
-    disableRipple?: boolean;
+    enableRipple?: boolean;
 
     /**
      * This property allows you to customize the ripple effect behavior on web platforms.

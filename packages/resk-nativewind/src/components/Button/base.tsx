@@ -45,7 +45,7 @@ export function ButtonBase<Context = unknown>({
     className,
     activityIndicatorClassName,
     variant,
-    disableRipple,
+    enableRipple,
     rippleClassName,
     context,
     perm,
@@ -68,8 +68,12 @@ export function ButtonBase<Context = unknown>({
     const disabledClass = disabled && "pointer-events-none";
     iconProps.className = cn("button-icon", computedVariant.icon(), iconProps?.variant && iconVariant(iconProps.variant), disabledClass, iconClassName, iconProps.className);
     const icon = Icon.getIcon({ icon: iconProp, size: iconSize, ...iconProps, variant: undefined });
-    const isRippleEnabled = disableRipple !== false && !disabled;
+    const isAndroid = Platform.OS === 'android';
+    const isRippleEnabled = (typeof enableRipple === "boolean" ? enableRipple : isAndroid) && !disabled;
     const canRenderRipple = isRippleEnabled && Platform.isWeb();
+    const restProps = isAndroid && isRippleEnabled ? {
+        android_ripple
+    } : {};
     const iconContent = isLoading ? (
         <ActivityIndicator
             size={iconProps?.size || "small"}
@@ -82,9 +86,7 @@ export function ButtonBase<Context = unknown>({
     const rightContent = typeof right === "function" ? right(buttonContext) : right;
     const hasRightContent = isValidElement(right) && !!right;
     const rowClassName = cn("flex flex-row items-center self-center justify-center", disabledClass);
-    const restProps = Platform.OS === 'android' && isRippleEnabled ? {
-        android_ripple
-    } : {};
+
     return (<>
         <Surface
             role="none"

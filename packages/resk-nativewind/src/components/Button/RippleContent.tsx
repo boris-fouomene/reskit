@@ -1,11 +1,12 @@
 "use client";
+import { IHtmlDivProps } from "@html/types";
 import { defaultStr, isNumber } from "@resk/core/utils";
 import { IClassName } from "@src/types";
 import { cn } from "@utils/cn";
 import useStateCallback from "@utils/stateCallback";
 import { MouseEvent, useCallback, useEffect, useId, useRef } from "react";
 
-interface IWebRipplePops {
+interface IWebRipplePops extends IHtmlDivProps {
     rippleDuration?: number
     color?: string
     className?: IClassName,

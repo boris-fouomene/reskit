@@ -12,6 +12,7 @@ export type IButtonBaseContext<Context = unknown> = Context & {
     loading: boolean;
     disabled: boolean;
     computedVariant: ReturnType<typeof buttonVariant>;
+    expanded?: boolean;
 }
 export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "variant" | "onPress"> {
     /***
@@ -111,6 +112,41 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
      * The right content of the button
      */
     right?: ReactNode | ((options: IButtonBaseContext<Context>) => ReactNode);
+
+    /**
+     * Makes the button expandable/collapsible with automatic state management.
+     * When true, the button will show expand/collapse indicators and handle state.
+     * 
+     * @example
+     * <Button expandable expanded={isOpen} onExpandChange={setIsOpen}>
+     *   Show Details
+     * </Button>
+     */
+    expandable?: boolean;
+
+    /**
+     * Controls the expanded state when expandable is true.
+     * If not provided, the button will manage its own internal state.
+     */
+    expanded?: boolean;
+
+    /**
+     * Callback fired when the expansion state changes.
+     * Only relevant when expandable is true.
+     */
+    onExpandChange?: (expanded: boolean) => void;
+
+    /**
+     * Icon to show when expanded. Defaults to "chevron-up".
+     * Only relevant when expandable is true.
+     */
+    expandedIcon?: IIconSource;
+
+    /**
+     * Icon to show when collapsed. Defaults to "chevron-down".
+     * Only relevant when expandable is true.
+     */
+    collapsedIcon?: IIconSource;
 
     /***
      * @platform android

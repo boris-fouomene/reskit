@@ -2,7 +2,6 @@ import { Button } from "@components/Button";
 import { INavItemProps, INavItemsProps, INavLinkComponent, INavLinkProps } from "./types";
 import { FC } from "react";
 import { defaultStr, isObj } from "@resk/core/utils";
-import { Details } from "@html/Details";
 import { Divider } from "@components/Divider";
 import { IReactComponent } from "@src/types";
 import { Div } from "@html/Div";
@@ -11,6 +10,7 @@ import { renderNavItems } from "./utils";
 import { cn } from "@utils/cn";
 import Platform from "@platform";
 import { normalizeHtmlProps, normalizeNativeProps } from "@html/utils";
+import { Expandable } from "@components/Expandable";
 
 export class Nav {
     static readonly linkMetaData = Symbol("link-meta-data");
@@ -54,12 +54,12 @@ export class Nav {
     }
     static ExpandableItem<Context = unknown>({ testID, as, dividerClassName, items, divider, expandableProps, children, ref, ...props }: INavItemProps<Context> & { as?: IReactComponent<INavItemProps<Context>> }) {
         testID = defaultStr(testID, "resk-nav-expandable-item");
-        return <Details
+        return <Expandable
             testID={testID + "-expandable-item"}
             iconPosition="right"
             {...expandableProps}
             className={cn("w-full", expandableProps?.className)}
-            summary={<ExpandableItemLabel as={as} {...props} ref={ref} />}
+            label={<ExpandableItemLabel as={as} {...props} ref={ref} />}
             children={<>
                 {children}
                 {divider && <Divider testID={testID + "-divider"} className={dividerClassName} />}

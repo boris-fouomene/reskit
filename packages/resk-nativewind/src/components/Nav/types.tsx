@@ -1,5 +1,5 @@
 import { IButtonProps } from "@components/Button/types";
-import { IHtmlDetailsProps } from "@html/Details";
+import { IExpandableProps } from "@components/Expandable/types";
 import { IHtmlDivProps } from "@html/types";
 import { IClassName, IReactComponent, IReactNullableElement } from "@src/types";
 import { ReactNode } from "react";
@@ -16,7 +16,7 @@ export interface INavItemProps<Context = unknown> extends IButtonProps<Context> 
     /**
      * Props for the expandable component that will be used to expand the menu item. In case of existance of sub items.
      */
-    expandableProps?: Omit<IHtmlDetailsProps, "summary">;
+    expandableProps?: IExpandableProps;
 
     /***
      * level of the menu item in the hierarchy. 

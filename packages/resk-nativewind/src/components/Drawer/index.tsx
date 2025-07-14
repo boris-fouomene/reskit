@@ -1317,17 +1317,16 @@ function ExpandableDrawerItem({ testID, context, items, divider, expandableProps
   testID = defaultStr(testID, "resk-drawer-expandable-item")
   const minimized = drawer.isMinimized();
   expandableProps = Object.assign({}, expandableProps);
-  const { expandedIconProps: customExpandedIconProps, collapsedIconProps: customCollapsedIconProps, ...restExpandableProps } = expandableProps;
-  const expandedIconProps = Object.assign({}, customCollapsedIconProps),
-    collapsedIconProps = Object.assign({}, customExpandedIconProps);
-  expandedIconProps.variant = Object.assign({}, expandedIconProps.variant);
-  collapsedIconProps.variant = Object.assign({}, collapsedIconProps.variant);
-  expandedIconProps.variant.size = minimized ? MINIMIZED_ICON_SIZE : expandedIconProps.variant.size || ICON_SIZE_VARIANT;
-  collapsedIconProps.variant.size = minimized ? ICON_SIZE_VARIANT : collapsedIconProps.variant.size || ICON_SIZE_VARIANT;
+  const { iconVariant, ...restExpandableProps } = expandableProps;
   return <Nav.ExpandableItem
     {...rest}
     context={Object.assign({}, context, { drawer })}
-    expandableProps={{ ...restExpandableProps, expandedIconProps, collapsedIconProps }}
+    expandableProps={{
+      ...restExpandableProps, iconVariant: {
+        ...iconVariant,
+        size: minimized ? MINIMIZED_ICON_SIZE : iconVariant?.size || ICON_SIZE_VARIANT,
+      }
+    }}
     as={DrawerItem}
     testID={testID}
   />

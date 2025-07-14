@@ -26,22 +26,36 @@ export interface IAppBarProps<Context = unknown> extends Omit<ISurfaceProps, "ti
     /** Callback invoked when the back action button is pressed. */
     onBackActionPress?: (event: any) => any;
 
-    /** If backAction is a string, it is the name of the FontIcon to render for the back action. */
-    backAction?: JSX.Element | null | false | ((context: Context & { className: string, variant?: IIconButtonVariant, computedAppBarVariant: ReturnType<typeof appBarVariant>, handleBackPress: (event: any) => void }) => ReactNode);
+
+    /**
+     * The position of the back action.
+     * 
+     * This property determines the position of the back action in the AppBar.
+     * If set to "left", the back action is positioned on the left side of the AppBar.
+     * If set to "right", the back action is positioned on the right side of the AppBar.
+     * 
+     * @defaultValue "left"
+     * @since 1.0.0
+     */
+    backActionPosition?: "left" | "right";
 
     /** class name for the BackAction component when rendered. */
     backActionClassName?: IClassName;
 
-    backActionVariant?: IIconButtonVariant;
+
+    backActionProps?: Omit<IIconButtonProps, "onPress">;
+
+    /** If backAction is a string, it is the name of the FontIcon to render for the back action. */
+    backAction?: JSX.Element | null | false | ((context: Context & { backActionProps?: Omit<IIconButtonProps, "onPress">, className: string, variant?: IIconButtonVariant, computedAppBarVariant: ReturnType<typeof appBarVariant>, handleBackPress: (event: any) => void }) => ReactNode);
 
     /***
      * Class name for the content of the AppBar.
      */
     contentClassName?: IClassName;
 
-    left?: ReactNode;
+    left?: ReactNode | ((context: Context & { computedAppBarVariant: ReturnType<typeof appBarVariant>, handleBackPress: (event: any) => void }) => ReactNode);
 
-    right?: ReactNode;
+    right?: ReactNode | ((context: Context & { computedAppBarVariant: ReturnType<typeof appBarVariant>, handleBackPress: (event: any) => void }) => ReactNode);
 
     actions?: INavItems<IAppBarActionProps<Context>>;
 

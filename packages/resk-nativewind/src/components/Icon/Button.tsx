@@ -1,7 +1,7 @@
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import FontIcon from "./Font";
 import { defaultStr, isNonNullString, isNumber } from '@resk/core/utils';
-import { IIconButtonProps } from './types';
+import { IFontIconName, IIconButtonProps } from './types';
 import Icon from "./Icon";
 import { cn } from '@utils/cn';
 import { pickTouchableProps } from '@utils/touchHandler';
@@ -21,7 +21,7 @@ const PADDING = 8;
  * @param {object} [props.style] - The custom styles to apply to the icon.
  * @param {string} [props.testID] - Optional test identifier for the button.
  * @param {boolean} [props.isLoading=false] - Indicates if a loading spinner should be shown instead of the icon.
- * @param {string} [props.fontIconName] - The name of the font icon to display.
+ * @param {IFontIconName} [props.fontIconName] - The name of the font icon to display.
  * @param {object} [props.source] - The image source for the icon.
  * @param {string} [props.containerClassName] - Additional class names for the button container.
  * @param {number} [props.containerSize] - The size of the button container.

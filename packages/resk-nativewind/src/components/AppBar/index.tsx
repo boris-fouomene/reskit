@@ -37,32 +37,40 @@ function AppBar<Context = unknown>({
   context,
   variant,
   actionsClassName,
-  backActionVariant,
+  backActionProps,
+  backActionPosition,
   ...appBarProps
 }: IAppBarProps<Context>) {
   testID = defaultStr(testID, 'resk-appbar');
   const computedVariant = appBarVariant(variant);
   subtitle = subtitle === false ? null : subtitle;
-  const backActionClx = cn(computedVariant.backAction(), backActionClassName);
-  const backAction: ReactNode | false = typeof customBackAction == "function" ? customBackAction({
+  const backActionClx = cn(computedVariant.backAction(), backActionProps?.className, backActionClassName);
+  const callOptions = {
     ...context as Context,
-    className: backActionClx,
-    variant: backActionVariant,
     computedAppBarVariant: computedVariant,
     handleBackPress: (event: any) => {
       if (typeof onBackActionPress == "function") {
         onBackActionPress(event);
       }
     }
+  };
+  const isBackActionLeft = backActionPosition !== "right";
+  const backAction: ReactNode | false = typeof customBackAction == "function" ? customBackAction({
+    ...callOptions,
+    backActionProps: { ...backActionProps, className: backActionClx },
+    className: backActionClx,
   }) : customBackAction;
+  const leftContent = typeof left == "function" ? left(callOptions) : left;
+  const rightContent = typeof right == "function" ? right(callOptions) : right;
+  const backActionContent = (backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
+    <BackAction testID={`${testID}-back-action`} className={backActionClx}  {...backActionProps} onPress={onBackActionPress} /> : null;
   return (<Surface
     className={cn(`resk-app-bar overflow-hidden flex flex-row items-center max-w-full w-full`, Platform.OS === 'ios' ? "h-[44px]" : "h-[56px]", computedVariant.base(), className)}
     {...appBarProps}
     testID={testID}
   >
-    {(backAction as any) != false ? isValidElement(backAction) ? (backAction as any) :
-      <BackAction testID={`${testID}-back-action`} className={backActionClx} onPress={onBackActionPress} variant={backActionVariant} /> : null}
-    {isValidElement(left) ? left as any : null}
+    {isBackActionLeft ? backActionContent : null}
+    {isValidElement(leftContent) ? leftContent : null}
     <Div testID={`${testID}-content`} className={cn("px-[12px] flex-1 basis-0 min-w-0 native:flex-1", computedVariant.content(), contentClassName)}>
       <Text
         numberOfLines={1}
@@ -92,7 +100,8 @@ function AppBar<Context = unknown>({
       actionMenuItemClassName={cn(computedVariant.actionMenuItem(), actionsProps?.actionMenuItemClassName)}
       menuAnchorClassName={cn(computedVariant.icon(), actionsProps?.menuAnchorClassName)}
     />
-    {isValidElement(right) ? right : null}
+    {isValidElement(rightContent) ? rightContent : null}
+    {!isBackActionLeft ? backActionContent : null}
   </Surface>);
 };
 

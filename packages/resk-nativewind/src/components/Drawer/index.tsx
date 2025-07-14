@@ -819,7 +819,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
 
 
   canToggleFullScren(): boolean {
-    return this.isProvider() && !this.canBeMinimizedOrPermanent();
+    return this.isProvider() && this.canBeMinimizedOrPermanent();
   }
 
 
@@ -851,24 +851,34 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     const { appBarProps, withAppBar } = this.getComponentProps();
     if (withAppBar === false || (!isObj(appBarProps) && !this.isProvider())) return null;
     const testID = this.getTestID();
+    const isRightPosition = this.isPositionRight();
     return <AppBar
       testID={testID + "drawer-header"}
       onBackActionPress={(event: GestureResponderEvent) => {
         this.close();
         return false;
       }}
+      backActionPosition={isRightPosition ? "left" : "right"}
+      {...appBarProps}
+      actionsProps={{
+        ...appBarProps?.actionsProps,
+        viewportWidth: this.getDrawerWidth(),
+      }}
       backAction={(opts) => {
-        const { className, variant, handleBackPress, computedAppBarVariant } = opts;
+        const { className, variant, handleBackPress, computedAppBarVariant, backActionProps } = opts;
         const elt = typeof appBarProps?.backAction == "function" ? appBarProps.backAction(opts as any) : appBarProps?.backAction;
+
+        const canToggleFullScreen = this.canToggleFullScren();
+
+        const togglePosition = canToggleFullScreen ? <Tooltip onPress={this.toggleFullScreen.bind(this)} title={i18n.t("components.drawer.toggleFullScreen")} children={<FontIcon className={computedAppBarVariant.icon()} name={(this.isFullScreen() ? "fullscreen-exit" : "fullscreen") as never} size={20} />} /> : null;
         return (
           <>
-            {isValidElement(elt) ? elt : <AppBar.BackAction variant={variant} onPress={handleBackPress} className={className} fontIconName={(this.getDrawerPosition() == "left" ? "chevron-left" : "chevron-right") as never} />}
-            {this.canToggleFullScren() ? <Tooltip onPress={this.toggleFullScreen.bind(this)} title={i18n.t("components.drawer.toggleFullScreen")} children={<FontIcon className={computedAppBarVariant.icon()} name={(this.isFullScreen() ? "fullscreen-exit" : "fullscreen") as never} size={20} />} /> : null}
+            {isRightPosition ? togglePosition : null}
+            {isValidElement(elt) ? elt : <AppBar.BackAction variant={variant} {...backActionProps} onPress={handleBackPress} className={className} fontIconName={(!isRightPosition ? "chevron-left" : "chevron-right") as never} />}
+            {!isRightPosition ? togglePosition : null}
           </>
         );
       }}
-      actionsProps={{ ...appBarProps?.actionsProps, viewportWidth: this.getDrawerWidth() }}
-      {...appBarProps}
       context={{ ...appBarProps?.context, drawer: this }}
     />;
   }

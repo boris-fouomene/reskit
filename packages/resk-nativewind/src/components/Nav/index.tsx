@@ -91,7 +91,7 @@ ExpandableItemLabel.displayName = "Nav.ExpandableItemLabel";
 function isValidLinkComponent(component: INavLinkComponent) {
     return typeof component === "function";
 }
-(Nav.Item as FC<INavItemProps>).displayName = "MenuItem";
+(Nav.Item as FC<INavItemProps>).displayName = "Nav.Item";
 
 
 

@@ -124,6 +124,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
         <H2>Menu with sub items</H2>
         <Menu
           anchor={<Text>Open Menu with sub items</Text>}
+          sameWidth
           items={[
             { label: "Home", icon: "home", items: [{ label: "1" }, { label: "2" }, { label: "3", items: [{ label: " 3.1" }] }] },
             { label: "Settings", icon: "star-settings" },

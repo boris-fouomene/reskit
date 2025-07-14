@@ -22,6 +22,7 @@ function MenuItem<Context = unknown>(props: IMenuItemProps<Context>): JSX.Elemen
   const { closeOnPress } = props;
   const { menu } = Object.assign({}, props.context);
   return <Nav.Item
+    role='menuitem'
     {...props}
     className={cn("w-full", props.className)}
     onPress={async (event, context) => {

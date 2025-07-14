@@ -96,6 +96,14 @@ export function DialogExample() {
         }} variant={{ colorScheme: "primary" }}>
             Open Drawer
         </Button>
+        <Button onPress={() => {
+            Drawer.Provider.open({
+                appBarProps: { title: "Drawer Right" },
+                children: <Text>Drawer right position</Text>,
+            })
+        }} variant={{ colorScheme: "primary" }}>
+            Open Drawer Right
+        </Button>
     </>
 }
 

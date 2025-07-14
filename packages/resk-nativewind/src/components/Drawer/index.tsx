@@ -849,7 +849,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
   }
   renderHeader(): ReactNode {
     const { appBarProps, withAppBar } = this.getComponentProps();
-    if (withAppBar === false || (!isObj(appBarProps) && !this.isProvider())) return null;
+    if (withAppBar === false || (!isObj(appBarProps) && !this.isProvider() && this.isPermanent())) return null;
     const testID = this.getTestID();
     const isRightPosition = this.isPositionRight();
     return <AppBar

@@ -319,29 +319,10 @@ class DialogControlled<Context = unknown> extends AppComponent<IDialogControlled
 
 const DialogProvider = createProvider<IDialogControlledProps, DialogControlled>(DialogControlled, { dismissible: false });
 
-const DialogAlert = createProvider<IDialogControlledProps, DialogControlled, IDialogControlledCallback>(DialogControlled, { dismissible: false, fullScreen: false });
+const DialogAlert = createProvider<IDialogControlledProps, DialogControlled, IDialogControlledCallback, IDialogAlertOpenOptions>(DialogControlled, { dismissible: false, fullScreen: false });
 const { open } = DialogAlert;
 
-DialogAlert.open = function <Context = unknown>(props: IDialogControlledProps<Context> & {
-  message?: ReactNode;
-
-  // Primary action (usually positive/confirm action)
-  confirmButton?: false | IDialogControlledActionProps<Context>;
-
-  // Secondary action (usually negative/cancel action)  
-  cancelButton?: false | IDialogControlledActionProps<Context>;
-
-  // Layout control
-  buttonsOrder?: "confirm-cancel" | "cancel-confirm";
-
-  // Convenience event handlers
-  onConfirm?: IDialogControlledActionProps<Context>["onPress"];
-  onCancel?: IDialogControlledActionProps<Context>["onPress"];
-
-  // Message styling
-  messageVariant?: ITextVariant;
-  messageClassName?: IClassName;
-}, innerProviderRef?: Ref<DialogControlled<Context>>, callback?: IDialogControlledCallback<Context>) {
+DialogAlert.open = function (props: IDialogAlertOpenOptions, innerProviderRef?: Ref<DialogControlled>, callback?: IDialogControlledCallback) {
   const {
     confirmButton: confirmConfig,
     cancelButton: cancelConfig,
@@ -351,12 +332,11 @@ DialogAlert.open = function <Context = unknown>(props: IDialogControlledProps<Co
     message,
     messageClassName,
     messageVariant,
-    children,
     ...rest
   } = Object.assign({}, props);
   const testID = defaultStr(rest.testID, "resk-dialog-alert");
   // Configure confirm button
-  const confirmButton: IDialogControlledActionProps<Context> | undefined = confirmConfig === false ? undefined : {
+  const confirmButton: IDialogControlledActionProps | undefined = confirmConfig === false ? undefined : {
     label: i18n.t("components.dialog.alert.confirmButton"),
     variant: { colorScheme: "primary", padding: 2 },
     testID: testID + "-confirm-button",
@@ -365,7 +345,7 @@ DialogAlert.open = function <Context = unknown>(props: IDialogControlledProps<Co
   };
 
   // Configure cancel button  
-  const cancelButton: IDialogControlledActionProps<Context> | undefined = cancelConfig === false ? undefined : {
+  const cancelButton: IDialogControlledActionProps | undefined = cancelConfig === false ? undefined : {
     label: i18n.t("components.dialog.alert.cancelButton"),
     variant: { colorScheme: "error", padding: 2 },
     showInFullScreen: false,
@@ -389,7 +369,7 @@ DialogAlert.open = function <Context = unknown>(props: IDialogControlledProps<Co
         {message}
       </Text>
     ),
-    actions: (Array.isArray(props?.actions) && props.actions.length ? props.actions : actions) as IDialogControlledActionProps<Context>[],
+    actions: (Array.isArray(props?.actions) && props.actions.length ? props.actions : actions) as IDialogControlledActionProps[],
   } as any, innerProviderRef, callback as any);
 }
 
@@ -941,6 +921,28 @@ export interface IDialogControlledProps<Context = unknown> extends Omit<IDialogC
  * @see IDialogControlledProps
  */
 export interface IDialogControlledOptions<Context = unknown> extends Omit<IDialogControlledProps<Context>, "ref"> { }
+
+
+export interface IDialogAlertOpenOptions<Context = unknown> extends Omit<IDialogControlledProps<Context>, "ref" | "children"> {
+  message?: ReactNode;
+
+  // Primary action (usually positive/confirm action)
+  confirmButton?: false | IDialogControlledActionProps;
+
+  // Secondary action (usually negative/cancel action)  
+  cancelButton?: false | IDialogControlledActionProps;
+
+  // Layout control
+  buttonsOrder?: "confirm-cancel" | "cancel-confirm";
+
+  // Convenience event handlers
+  onConfirm?: IDialogControlledActionProps["onPress"];
+  onCancel?: IDialogControlledActionProps["onPress"];
+
+  // Message styling
+  messageVariant?: ITextVariant;
+  messageClassName?: IClassName;
+}
 
 
 /**

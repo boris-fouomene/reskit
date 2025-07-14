@@ -54,7 +54,7 @@ export function Expandable({
                 {displayIconAtRight ? icon : null}
             </Div>
         </Div>
-        <Div testID={testID + "-content"} className={cn("w-full resk-expandable-content overflow-hidden transition-all duration-500 ease-in-out ", computedVariant.content(), contentClassName, toggleExpand && commonVariant({ hidden: !expanded }))}>
+        <Div testID={testID + "-content"} className={cn("w-full resk-expandable-content overflow-hidden transition-all duration-500 ease-in-out ", computedVariant.content(), contentClassName, commonVariant({ hidden: !expanded }))}>
             {children}
         </Div>
     </Div>

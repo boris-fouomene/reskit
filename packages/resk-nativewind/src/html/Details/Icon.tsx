@@ -233,13 +233,14 @@ export function DetailsIcon({ expandedIconProps, collapsedIconProps, toggleOpen,
             }
         }
     }, []);
-    const stateIcon: IIconProps = open ? {
+    const openedIcon: IIconProps = {
         fontIconName: "chevron-down" as never,
         ...expandedIconProps
-    } : {
+    }, closedIcon = {
         fontIconName: "chevron-right" as never,
         ...collapsedIconProps
     };
+    const stateIcon = (open ? openedIcon : closedIcon);
     const iconProps: IIconProps = {
         testID,
         ...stateIcon,
@@ -255,14 +256,14 @@ export function DetailsIcon({ expandedIconProps, collapsedIconProps, toggleOpen,
     }
     return <Div asHtmlTag="span" testID={testID + "-icons-container"} id={iconId} className={cn("details-icon-container")}>
         {<Icon
-            {...iconProps}
-            className={cn(iconProps.className, "resk-details-expanded-icon", !open && hiddenClassName)}
+            {...openedIcon}
+            className={cn(openedIcon.className, "resk-details-expanded-icon", !open && hiddenClassName)}
             id={iconId + "-expanded"}
             testID={testID + "-expanded"}
         />}
         {<Icon
-            {...iconProps}
-            className={cn(iconProps.className, "resk-details-collapsed-icon", open && hiddenClassName)}
+            {...closedIcon}
+            className={cn(closedIcon.className, "resk-details-collapsed-icon", open && hiddenClassName)}
             id={iconId + "-collapsed"}
             testID={testID + "-collapsed"}
         />}

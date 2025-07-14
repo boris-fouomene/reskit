@@ -150,6 +150,20 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
    */
   _closingAnchorValue: number = 0;
 
+  private _inMemomerySession: Record<string, any> = {};
+
+  public setInMemorySession(key: string, value: any) {
+    if (isNonNullString(key)) {
+      this._inMemomerySession[key] = value;
+    }
+  }
+  public getInMemorySession(key: string) {
+    if (isNonNullString(key)) {
+      return this._inMemomerySession[key];
+    }
+    return undefined;
+  }
+
   private _dimensionChangedListener: EmitterSubscription | undefined;
   constructor(props: IDrawerProps) {
     super(props);
@@ -634,8 +648,46 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     });
   }
 
+  /**
+   * Determines if the drawer can be minimized or set to permanent mode.
+   * 
+   * This method checks the current device layout capabilities to determine
+   * if the drawer supports advanced features like permanent mode or minimization.
+   * These features are typically available on desktop layouts where there's
+   * sufficient screen real estate.
+   * 
+   * @returns {boolean} True if the current device layout supports permanent/minimized modes
+   * 
+   * @example
+   * ```tsx
+   * if (drawer.canBeMinimizedOrPermanent()) {
+   *   // Enable permanent mode toggle
+   *   showPinButton();
+   * } else {
+   *   // Hide permanent mode options on mobile
+   *   hidePinButton();
+   * }
+   * ```
+   * 
+   * @example
+   * ```tsx
+   * // Responsive drawer configuration
+   * const drawerConfig = {
+   *   permanent: drawer.canBeMinimizedOrPermanent(),
+   *   gesturesEnabled: !drawer.canBeMinimizedOrPermanent()
+   * };
+   * ```
+   * 
+   * @see {@link Breakpoints.getDeviceLayout} - The underlying breakpoint detection
+   * @see {@link canBePinned} - Alias method with same functionality
+   * @see {@link isMinimizable} - Check if specific drawer instance supports minimization
+   * 
+   * @since 1.0.0
+   */
   canBeMinimizedOrPermanent(): boolean {
-    return !!Breakpoints.getDeviceLayout()?.isDesktop;
+    const layout = Breakpoints.getDeviceLayout();
+    // Consider both desktop and large tablet as capable of permanent/minimized modes
+    return !!(layout?.isDesktop || (layout?.windowWidth > 1024));
   }
   isMinimized(): boolean {
     if (!this.isProvider() && !this.canBeMinimizedOrPermanent()) return false;
@@ -846,12 +898,15 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
   }
   getSession(key: string): any {
     const sessKey = this.getSessionKey(key);
-    if (!sessKey) return undefined;
-    return Session.get(sessKey);
+    const inMomValue = this.getInMemorySession(key);
+    if (!sessKey) return inMomValue;
+    const v = Session.get(sessKey);
+    return v !== undefined ? v : inMomValue;
   }
 
   setSession(key: string, value?: any): any {
     const sessKey = this.getSessionKey(key);
+    this.setInMemorySession(key, value);
     if (!sessKey) return undefined;
     return Session.set(sessKey, value);
   }
@@ -922,19 +977,74 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     );
   }
 
+  /**
+   * Handles responsive behavior when device dimensions change.
+   * 
+   * This method automatically adjusts the drawer's behavior based on the current
+   * device layout capabilities:
+   * 
+   * **Desktop → Mobile/Tablet:**
+   * - Converts permanent drawer to temporary (overlay) mode
+   * - Closes the drawer to prevent blocking mobile content
+   * - Maintains user's manual state preferences when possible
+   * 
+   * **Mobile/Tablet → Desktop:**
+   * - Converts temporary drawer to permanent mode
+   * - Opens the drawer automatically for better desktop UX
+   * - Restores previous permanent state if available
+   * 
+   * @private
+   * @returns {void}
+   * 
+   * @example
+   * // This method is called automatically when screen orientation or size changes
+   * // No manual invocation needed - handled by Dimensions.addEventListener
+   * 
+   * @since 1.0.0
+   */
   _onDimensionsChanged() {
     if (!this.isMounted()) return;
+
     const canBeMinimizedOrPermanent = this.canBeMinimizedOrPermanent();
     const isPermanent = this.isPermanent();
+    const isOpen = this.isOpen();
+
+    // Only proceed if responsive resize is enabled
     if (this.props.responsiveResize !== false) {
+
+      // Desktop → Mobile/Tablet transition
       if (!canBeMinimizedOrPermanent && isPermanent) {
-        // When unpinning due to dimension change, we need to close the drawer and reset the animation state
+        // Store the fact that user had it permanent for potential restoration
+        this.setSession("wasPermanentBeforeMobile", true);
+
+        // Convert to temporary mode and close for mobile UX
         this.unpin(() => {
-          // Force close the drawer to reset the openValue and drawerShown state
-          //this.close();
-        }, false);
-      } else if (canBeMinimizedOrPermanent && !isPermanent) {
-        this.pin(undefined, false);
+          // Close drawer on mobile to prevent content blocking
+          // But preserve provider drawers for app-level navigation
+          if (!this.isProvider() && isOpen) {
+            this.close();
+          }
+        }, false); // Don't persist the unpin since it's responsive, not user choice
+      }
+
+      // Mobile/Tablet → Desktop transition
+      else if (canBeMinimizedOrPermanent && !isPermanent) {
+        // Check if user previously had it permanent before going mobile
+        const wasPreviouslyPermanent = this.getSession("wasPermanentBeforeMobile");
+
+        // Auto-pin on desktop for better UX, unless user explicitly unpinned
+        const shouldAutoPermanent = wasPreviouslyPermanent !== false;
+
+        if (shouldAutoPermanent) {
+          this.pin(() => {
+            // Ensure drawer is visible on desktop
+            if (!this.isOpen()) {
+              this.open();
+            }
+            // Clear the temporary session flag
+            this.setSession("wasPermanentBeforeMobile", undefined);
+          }, false); // Don't persist since this is responsive behavior
+        }
       }
     }
   }

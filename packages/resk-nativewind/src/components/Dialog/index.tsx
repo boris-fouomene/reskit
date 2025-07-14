@@ -396,7 +396,7 @@ DialogAlert.open = function <Context = unknown>(props: IDialogControlledProps<Co
 export const Preloader = createProvider<Omit<IDialogControlledProps, "children"> & { content?: ReactNode, textClassName?: IClassName; textVariant?: ITextVariant; contentContainerClassName?: IClassName; activityIndicatorPosition?: "left" | "right", withActivityIndicator?: boolean, activityIndicatorVariant?: IActivityIndicatorVariant; activityIndicatorClassName?: IClassName }, DialogControlled>(DialogControlled, { dismissible: false, fullScreen: false },
   (options) => {
     options.withScrollView = typeof options.withScrollView === "boolean" ? options.withScrollView : false;
-    options.variant = { paddingX: 2, ...options.variant };
+    options.variant = { padding: 2, ...options.variant };
     const testID = options.testID = defaultStr(options.testID, "resk-dialog-preloader");
     const { content: children, activityIndicatorVariant, textClassName, textVariant: tVariant, withActivityIndicator, activityIndicatorClassName, contentContainerClassName, activityIndicatorPosition, ...rest } = options;
     const content = isValidElement(children, false) ? children : <Text numberOfLines={10} testID={testID + "-content"} variant={{ marginX: 2, ...tVariant }} className={cn("resk-preloader-content", textClassName)}>{children as ReactNode || 'Loading...'}</Text>;

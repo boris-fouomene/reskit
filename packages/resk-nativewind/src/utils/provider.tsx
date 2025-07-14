@@ -160,7 +160,7 @@ export function createProvider<ComponentProps = unknown, ComponentInstance = unk
      * 
      * @internal
      */
-    function WrappedComponent({ ref, ...props }: ComponentProps & { ref?: any }) {
+    function WrappedComponent({ ref, ...props }: ComponentProps & { ref?: Ref<ComponentInstance> }) {
         const innerRef = useCreateProviderRef<ComponentInstance>((refObject) => {
             // Only set global ref if no external ref is provided
             if (!ref && !globalProviderRef) {

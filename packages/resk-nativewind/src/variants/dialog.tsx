@@ -84,7 +84,6 @@ export const dialogVariant = tv({
         modalTitleWeight: "bold",
         modalTitleSize: "lg",
         modalTitleMargin: 4,
-        minHeight: "twoFifths",
         maxHeight: "half",
     }
 });

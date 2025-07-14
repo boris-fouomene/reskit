@@ -33,6 +33,7 @@ export class Nav {
         return <Nav.Link asChild {...(isObj(linkProps) ? (Platform.isNative() ? normalizeNativeProps(linkProps as any) : normalizeHtmlProps(linkProps as any)) : {})}>
             <Button
                 testID="nav-item"
+                role="navigation"
                 {...props}
                 variant={{ paddingX: 2, ...variant }}
                 className={cn(className)}
@@ -55,6 +56,7 @@ export class Nav {
         testID = defaultStr(testID, "resk-nav-expandable-item");
         return <Details
             testID={testID + "-expandable-item"}
+            iconPosition="right"
             {...expandableProps}
             className={cn("w-full", expandableProps?.className)}
             summary={<ExpandableItemLabel as={as} {...props} ref={ref} />}

@@ -89,7 +89,7 @@ export function ButtonBase<Context = unknown>({
 
     return (<>
         <Surface
-            role="none"
+            role="button"
             {...rest}
             {...restProps}
             id={buttonId}

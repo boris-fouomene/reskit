@@ -21,7 +21,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Button label="Button base example1 with left icon" icon={"camera"} variant={{ colorScheme: "primary", padding: "5px" }}
             left={<Icon.Font name="ph" size={30} className={buttonVariant({ colorScheme: "primary" }).icon()} />}
           />
-          <Button variant={{ colorScheme: "primary", rippleColor: "secondary" }}> Ripple effect </Button>
+          <Button enableRipple variant={{ colorScheme: "primary", rippleColor: "primary-foreground" }}> Ripple effect </Button>
           <Button label="Button example2" icon="radio" variant={{ colorScheme: "secondary", padding: "10px" }} />
           <Button loading label="Outline Button 1" variant={{ outline: "primary" }} className="p-[2px] rounded-lg" />
           <Button icon={"camera"} label="Outline Button 2" variant={{ outline: "secondary" }} />
@@ -120,6 +120,18 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Text>Bottom Sheet Menu Opened with</Text>
         </Menu>
       </HStack>
+      <Div className="p-5">
+        <H2>Menu with sub items</H2>
+        <Menu
+          anchor={<Text>Open Menu with sub items</Text>}
+          items={[
+            { label: "Home", icon: "home", items: [{ label: "1" }, { label: "2" }, { label: "3", items: [{ label: " 3.1" }] }] },
+            { label: "Settings", icon: "star-settings" },
+            { label: "Profile", icon: "star-settings" },
+            { label: "Profile", icon: "star-settings" },
+          ]}
+        />
+      </Div>
       <Div className="p-5">
         <H2> AppBar Example</H2>
         <AppBar

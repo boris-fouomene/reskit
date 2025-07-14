@@ -112,15 +112,6 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
      */
     right?: ReactNode | ((options: IButtonBaseContext<Context>) => ReactNode);
 
-    /**
-     * Disables the ripple effect on button press.
-     * If set to true, the ripple effect will not be shown when the button is pressed.
-     * 
-     * @example
-     * <Button disableRipple={true} />
-     */
-    disableRipple?: boolean;
-
     /***
      * @platform android
      */
@@ -173,6 +164,15 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
      * On mobile, ripple effect is handled using android_ripple property.
     */
     rippleClassName?: IClassName;
+
+    /**
+     * Disables the ripple effect on button press.
+     * If set to true, the ripple effect will not be shown when the button is pressed.
+     * @default false
+     * @example
+     * <Button anableRipple={true} />
+     */
+    disableRipple?: boolean;
 
     /**
      * This property allows you to customize the ripple effect behavior on web platforms.

@@ -1,8 +1,11 @@
 "use client";
 
-import { Button, HStack, Dialog, Alert, Preloader, Drawer, useDrawer } from "@resk/nativewind";
-import { B, Div, H2, Text } from "@resk/nativewind/html";
+import { HStack, Dialog, Alert, Preloader, Drawer, useDrawer } from "@resk/nativewind";
+import { Div, H2, Text } from "@resk/nativewind/html";
+import dynamic from "next/dynamic";
 import { useState } from "react";
+
+const Button = dynamic(() => import('@resk/nativewind/components/button').then(mod => mod.Button), { ssr: false });
 
 
 export function DialogExample() {
@@ -62,6 +65,7 @@ export function DialogExample() {
             open Dialog Provider
         </Button>
         <Button className="m-5" onPress={(e) => {
+            console.log("will open alert ", Dialog.Alert.open, " is opeeeed");
             Dialog.Alert.open({
                 title: "Close an example",
                 message: "Are you sure you want to delete this item?",
@@ -69,7 +73,7 @@ export function DialogExample() {
                     console.log("Cancel button pressed");
                 }
             })
-        }}>Simple Alert</Button>
+        }}>Alert Example 1</Button>
 
         <Button className="m-5" onPress={(e) => {
             Dialog.Alert.open({

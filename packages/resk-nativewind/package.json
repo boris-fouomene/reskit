@@ -9,7 +9,56 @@
   "bin": {
     "@resk/nativewind": "bin/index.js"
   },
-  "typesVersions": {
+  "files": [
+    "build",
+    "bin",
+    "readme.md",
+    "package.json",
+    "html.js",
+    "components",
+    "theme-to-css-vars.js",
+    "animations.js"
+  ],
+  "exports": {
+    ".": "./build/index.js",
+    "./components/activityIndicator": "./components/activityIndicator.js",
+    "./components/alert": "./components/alert.js",
+    "./components/avatar": "./components/avatar.js",
+    "./components/backdrop": "./components/backdrop.js",
+    "./components/backHandler": "./components/backHandler.js",
+    "./components/badge": "./components/badge.js",
+    "./components/bottomSheet": "./components/bottomSheet.js",
+    "./components/button": "./components/button.js",
+    "./components/checkbox": "./components/checkbox.js",
+    "./components/countrySelector": "./components/countrySelector.js",
+    "./components/dialog": "./components/dialog.js",
+    "./components/divider": "./components/divider.js",
+    "./components/drawer": "./components/drawer.js",
+    "./components/expandable": "./components/expandable.js",
+    "./components/helperText": "./components/helperText.js",
+    "./components/icon": "./components/icon.js",
+    "./components/keyboardAvoidingView": "./components/keyboardAvoidingView.js",
+    "./components/keyboardEventHandler": "./components/keyboardEventHandler.js",
+    "./components/menu": "./components/menu.js",
+    "./components/modal": "./components/modal.js",
+    "./components/nav": "./components/nav.js",
+    "./components/portal": "./components/portal.js",
+    "./components/progressBar": "./components/progressBar.js",
+    "./components/slot": "./components/slot.js",
+    "./components/stack": "./components/stack.js",
+    "./components/surface": "./components/surface.js",
+    "./components/switch": "./components/switch.js",
+    "./components/textInput": "./components/textInput.js",
+    "./components/tooltip": "./components/tooltip.js",
+    "./html": "./build/html/index.js",
+    "./variants": "./build/variants/index.js",
+    "./utils": "./build/utils/index.js",
+    "./i18n": "./build/i18n/index.js",
+    "./platform": "./build/platform/index.js",
+    "./theme-to-css-vars": "./theme-to-css-vars.js",
+    "./*": "./build/*"
+  },
+  "typesVersions11": {
     "*": {
       ".": [
         "./build/index.d.ts"
@@ -18,35 +67,6 @@
         "./build/html/index.d.ts"
       ]
     }
-  },
-  "files": [
-    "build",
-    "bin",
-    "readme.md",
-    "package.json",
-    "html.js",
-    "theme-to-css-vars.js",
-    "animations.js"
-  ],
-  "exports": {
-    ".": "./build/index.js",
-    "./components/*": "./build/components/*",
-    "./hooks/*": "./build/hooks/*",
-    "./i18n/*": "./build/i18n/*",
-    "./platform/*": "./build/platform/*",
-    "./html": "./build/html/index.js",
-    "./components": "./build/components/index.js",
-    "./variants": "./build/variants/index.js",
-    "./dimensions": "./build/dimensions/index.js",
-    "./utils": "./build/utils/index.js",
-    "./hooks": "./build/hooks/index.js",
-    "./i18n": "./build/i18n/index.js",
-    "./platform": "./build/platform/index.js",
-    "./types": "./build/types/index.js",
-    "./schemas/*": "./schemas/*",
-    "./theme-to-css-vars": "./theme-to-css-vars.js",
-    "./animations": "./animations.js",
-    "./*": "./build/*"
   },
   "scripts": {
     "build": "npm run build-color-variants && npm run generate-variants && tsc && npx tsc-alias -p tsconfig.json && npm run build:dts && npm run generate-icon-types && npm run copy-css",

@@ -7,6 +7,8 @@ import { IButtonContext, IButtonProps } from './types';
 import { defaultStr } from '@resk/core/utils';
 import useStateCallback from '@utils/stateCallback';
 import { buttonVariant } from "@variants/button";
+import { cn } from '@utils/cn';
+
 
 
 export function InteractiveButton<Context = unknown>({
@@ -20,10 +22,9 @@ export function InteractiveButton<Context = unknown>({
     resourceName,
     perm,
     ref,
-    android_ripple,
-    rippleClassName,
     testID,
     context: customContext,
+    className,
     ...rest
 }: IButtonProps<Context>) {
     const [isLoading, _setIsLoading] = useStateCallback(typeof customIsLoading == "boolean" ? customIsLoading : false);
@@ -78,6 +79,7 @@ export function InteractiveButton<Context = unknown>({
 
     return (<ButtonBase<Context>
         {...rest}
+        className={cn("resk-button-interactive btn-interactive", className)}
         context={Object.assign({}, customContext, context)}
         disabled={disabled}
         loading={isLoading}

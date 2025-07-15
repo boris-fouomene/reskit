@@ -260,7 +260,7 @@ import { col } from '../../../../../../frontend-dash/src/theme/grid';
    * @see {@link IVariantColor}
    */
   static generateColorsMapTypes() {
-    const generateText = ["import { IVariantsColorsMapBase } from './types';", "export interface IVariantsColorsMap extends IVariantsColorsMapBase {"];
+    const generateText = ["import {IVariantsColorsMapBase,IVariantColor} from './types';", "export interface IVariantsColorsMap extends IVariantsColorsMapBase {"];
     Object.entries(VariantsColorsFactory.colors).forEach(([color, value]) => {
       if (VariantsColorsFactory.defaultColorsNames.includes(color)) return;
       generateText.push(`\t"${color}": IVariantColor;`);

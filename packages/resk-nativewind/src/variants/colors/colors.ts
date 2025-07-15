@@ -263,7 +263,7 @@ import { col } from '../../../../../../frontend-dash/src/theme/grid';
     const generateText = ["import { IVariantsColorsMapBase } from './types';", "export interface IVariantsColorsMap extends IVariantsColorsMapBase {"];
     Object.entries(VariantsColorsFactory.colors).forEach(([color, value]) => {
       if (VariantsColorsFactory.defaultColorsNames.includes(color)) return;
-      generateText.push(`\t${color}: IVariantColor;`);
+      generateText.push(`\t"${color}": IVariantColor;`);
     });
     generateText.push("}");
     return generateText.join("\n");
@@ -386,7 +386,7 @@ export namespace IVariantsColors {
    *
    * @see {@link IVariantColor}
    */
-  export interface Color extends IVariantColor {}
+  export interface Color extends IVariantColor { }
 
   /**
    * Options for building Tailwind CSS class names for color variants.

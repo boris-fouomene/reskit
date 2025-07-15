@@ -263,7 +263,7 @@ class VariantsColorsFactory {
         Object.entries(VariantsColorsFactory.colors).forEach(([color, value]) => {
             if (VariantsColorsFactory.defaultColorsNames.includes(color))
                 return;
-            generateText.push(`\t${color}: IVariantColor;`);
+            generateText.push(`\t"${color}": IVariantColor;`);
         });
         generateText.push("}");
         return generateText.join("\n");

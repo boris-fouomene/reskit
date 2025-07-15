@@ -6,19 +6,19 @@ import { iconSizes } from "./iconSizes";
 import { sizesClasses } from "./sizes";
 
 export const textVariants = {
-    color: VariantsColors.text,
-    hoverColor: VariantsColors.hoverText,
-    activeColor: VariantsColors.activeText,
+  color: VariantsColors.text,
+  hoverColor: VariantsColors.hoverText,
+  activeColor: VariantsColors.activeText,
 
-    align: textAlignClasses,
-    weight: fontWeightClasses,
-    ...textSizes,
+  align: textAlignClasses,
+  weight: fontWeightClasses,
+  ...textSizes,
 } as const;
 
 export const iconVariants = {
-    color: VariantsColors.icon,
-    hoverColor: VariantsColors.hoverIcon,
-    activeColor: VariantsColors.activeIcon,
-    ...iconSizes,
-    imageSize: sizesClasses,
+  color: VariantsColors.icon,
+  hoverColor: VariantsColors.hoverIcon,
+  activeColor: VariantsColors.activeIcon,
+  ...iconSizes,
+  imageSize: sizesClasses,
 } as const;

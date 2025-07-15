@@ -32,7 +32,6 @@ export const width2heightClasses = {
     20: "max-h-20",
     24: "max-h-24",
 
-
     28: "max-h-28",
     32: "max-h-32",
     36: "max-h-36",
@@ -72,7 +71,7 @@ export const width2heightClasses = {
 
     "3xs": "max-h-3xs",
     "2xs": "max-h-2xs",
-    "xs": "max-h-xs",
+    xs: "max-h-xs",
     sm: "max-h-sm",
     md: "max-h-md",
     lg: "max-h-lg",
@@ -82,8 +81,38 @@ export const width2heightClasses = {
     "4xl": "max-h-4xl",
     "5xl": "max-h-5xl",
     "6xl": "max-h-6xl",
-    "7xl": "max-h-7xl"
+    "7xl": "max-h-7xl",
 
+    "5px": "max-h-[5px]",
+    "10px": "max-h-[10px]",
+    "15px": "max-h-[15px]",
+    "20px": "max-h-[20px]",
+    "25px": "max-h-[25px]",
+    "30px": "max-h-[30px]",
+    "35px": "max-h-[35px]",
+    "40px": "max-h-[40px]",
+    "45px": "max-h-[45px]",
+    "50px": "max-h-[50px]",
+    "55px": "max-h-[55px]",
+    "60px": "max-h-[60px]",
+    "65px": "max-h-[65px]",
+    "70px": "max-h-[70px]",
+    "75px": "max-h-[75px]",
+    "80px": "max-h-[80px]",
+    "85px": "max-h-[85px]",
+    "90px": "max-h-[90px]",
+    "95px": "max-h-[95px]",
+    "100px": "max-h-[100px]",
+    "110px": "max-h-[110px]",
+    "120px": "max-h-[120px]",
+    "130px": "max-h-[130px]",
+    "140px": "max-h-[140px]",
+    "150px": "max-h-[150px]",
+    "160px": "max-h-[160px]",
+    "170px": "max-h-[170px]",
+    "180px": "max-h-[180px]",
+    "190px": "max-h-[190px]",
+    "200px": "max-h-[200px]",
   },
 
   minHeight: {
@@ -117,7 +146,6 @@ export const width2heightClasses = {
     19: "min-h-19",
     20: "min-h-20",
     24: "min-h-24",
-
 
     28: "min-h-28",
     32: "min-h-32",
@@ -158,7 +186,7 @@ export const width2heightClasses = {
 
     "3xs": "min-h-3xs",
     "2xs": "min-h-2xs",
-    "xs": "min-h-xs",
+    xs: "min-h-xs",
     sm: "min-h-sm",
     md: "min-h-md",
     lg: "min-h-lg",
@@ -168,7 +196,38 @@ export const width2heightClasses = {
     "4xl": "min-h-4xl",
     "5xl": "min-h-5xl",
     "6xl": "min-h-6xl",
-    "7xl": "min-h-7xl"
+    "7xl": "min-h-7xl",
+
+    "5px": "min-h-[5px]",
+    "10px": "min-h-[10px]",
+    "15px": "min-h-[15px]",
+    "20px": "min-h-[20px]",
+    "25px": "min-h-[25px]",
+    "30px": "min-h-[30px]",
+    "35px": "min-h-[35px]",
+    "40px": "min-h-[40px]",
+    "45px": "min-h-[45px]",
+    "50px": "min-h-[50px]",
+    "55px": "min-h-[55px]",
+    "60px": "min-h-[60px]",
+    "65px": "min-h-[65px]",
+    "70px": "min-h-[70px]",
+    "75px": "min-h-[75px]",
+    "80px": "min-h-[80px]",
+    "85px": "min-h-[85px]",
+    "90px": "min-h-[90px]",
+    "95px": "min-h-[95px]",
+    "100px": "min-h-[100px]",
+    "110px": "min-h-[110px]",
+    "120px": "min-h-[120px]",
+    "130px": "min-h-[130px]",
+    "140px": "min-h-[140px]",
+    "150px": "min-h-[150px]",
+    "160px": "min-h-[160px]",
+    "170px": "min-h-[170px]",
+    "180px": "min-h-[180px]",
+    "190px": "min-h-[190px]",
+    "200px": "min-h-[200px]",
   },
 
   height: {
@@ -202,7 +261,6 @@ export const width2heightClasses = {
     19: "h-19",
     20: "h-20",
     24: "h-24",
-
 
     28: "h-28",
     32: "h-32",
@@ -243,7 +301,7 @@ export const width2heightClasses = {
 
     "3xs": "h-3xs",
     "2xs": "h-2xs",
-    "xs": "h-xs",
+    xs: "h-xs",
     sm: "h-sm",
     md: "h-md",
     lg: "h-lg",
@@ -253,7 +311,38 @@ export const width2heightClasses = {
     "4xl": "h-4xl",
     "5xl": "h-5xl",
     "6xl": "h-6xl",
-    "7xl": "h-7xl"
+    "7xl": "h-7xl",
+
+    "5px": "h-[5px]",
+    "10px": "h-[10px]",
+    "15px": "h-[15px]",
+    "20px": "h-[20px]",
+    "25px": "h-[25px]",
+    "30px": "h-[30px]",
+    "35px": "h-[35px]",
+    "40px": "h-[40px]",
+    "45px": "h-[45px]",
+    "50px": "h-[50px]",
+    "55px": "h-[55px]",
+    "60px": "h-[60px]",
+    "65px": "h-[65px]",
+    "70px": "h-[70px]",
+    "75px": "h-[75px]",
+    "80px": "h-[80px]",
+    "85px": "h-[85px]",
+    "90px": "h-[90px]",
+    "95px": "h-[95px]",
+    "100px": "h-[100px]",
+    "110px": "h-[110px]",
+    "120px": "h-[120px]",
+    "130px": "h-[130px]",
+    "140px": "h-[140px]",
+    "150px": "h-[150px]",
+    "160px": "h-[160px]",
+    "170px": "h-[170px]",
+    "180px": "h-[180px]",
+    "190px": "h-[190px]",
+    "200px": "h-[200px]",
   },
 
   maxWidth: {
@@ -328,7 +417,7 @@ export const width2heightClasses = {
 
     "3xs": "max-w-3xs",
     "2xs": "max-w-2xs",
-    "xs": "max-w-xs",
+    xs: "max-w-xs",
     sm: "max-w-sm",
     md: "max-w-md",
     lg: "max-w-lg",
@@ -338,7 +427,38 @@ export const width2heightClasses = {
     "4xl": "max-w-4xl",
     "5xl": "max-w-5xl",
     "6xl": "max-w-6xl",
-    "7xl": "max-w-7xl"
+    "7xl": "max-w-7xl",
+
+    "5px": "max-w-[5px]",
+    "10px": "max-w-[10px]",
+    "15px": "max-w-[15px]",
+    "20px": "max-w-[20px]",
+    "25px": "max-w-[25px]",
+    "30px": "max-w-[30px]",
+    "35px": "max-w-[35px]",
+    "40px": "max-w-[40px]",
+    "45px": "max-w-[45px]",
+    "50px": "max-w-[50px]",
+    "55px": "max-w-[55px]",
+    "60px": "max-w-[60px]",
+    "65px": "max-w-[65px]",
+    "70px": "max-w-[70px]",
+    "75px": "max-w-[75px]",
+    "80px": "max-w-[80px]",
+    "85px": "max-w-[85px]",
+    "90px": "max-w-[90px]",
+    "95px": "max-w-[95px]",
+    "100px": "max-w-[100px]",
+    "110px": "max-w-[110px]",
+    "120px": "max-w-[120px]",
+    "130px": "max-w-[130px]",
+    "140px": "max-w-[140px]",
+    "150px": "max-w-[150px]",
+    "160px": "max-w-[160px]",
+    "170px": "max-w-[170px]",
+    "180px": "max-w-[180px]",
+    "190px": "max-w-[190px]",
+    "200px": "max-w-[200px]",
   },
 
   minWidth: {
@@ -413,7 +533,7 @@ export const width2heightClasses = {
 
     "3xs": "min-w-3xs",
     "2xs": "min-w-2xs",
-    "xs": "min-w-xs",
+    xs: "min-w-xs",
     sm: "min-w-sm",
     md: "min-w-md",
     lg: "min-w-lg",
@@ -423,7 +543,38 @@ export const width2heightClasses = {
     "4xl": "min-w-4xl",
     "5xl": "min-w-5xl",
     "6xl": "min-w-6xl",
-    "7xl": "min-w-7xl"
+    "7xl": "min-w-7xl",
+
+    "5px": "min-w-[5px]",
+    "10px": "min-w-[10px]",
+    "15px": "min-w-[15px]",
+    "20px": "min-w-[20px]",
+    "25px": "min-w-[25px]",
+    "30px": "min-w-[30px]",
+    "35px": "min-w-[35px]",
+    "40px": "min-w-[40px]",
+    "45px": "min-w-[45px]",
+    "50px": "min-w-[50px]",
+    "55px": "min-w-[55px]",
+    "60px": "min-w-[60px]",
+    "65px": "min-w-[65px]",
+    "70px": "min-w-[70px]",
+    "75px": "min-w-[75px]",
+    "80px": "min-w-[80px]",
+    "85px": "min-w-[85px]",
+    "90px": "min-w-[90px]",
+    "95px": "min-w-[95px]",
+    "100px": "min-w-[100px]",
+    "110px": "min-w-[110px]",
+    "120px": "min-w-[120px]",
+    "130px": "min-w-[130px]",
+    "140px": "min-w-[140px]",
+    "150px": "min-w-[150px]",
+    "160px": "min-w-[160px]",
+    "170px": "min-w-[170px]",
+    "180px": "min-w-[180px]",
+    "190px": "min-w-[190px]",
+    "200px": "min-w-[200px]",
   },
 
   width: {
@@ -498,7 +649,7 @@ export const width2heightClasses = {
 
     "3xs": "w-3xs",
     "2xs": "w-2xs",
-    "xs": "w-xs",
+    xs: "w-xs",
     sm: "w-sm",
     md: "w-md",
     lg: "w-lg",
@@ -508,7 +659,38 @@ export const width2heightClasses = {
     "4xl": "w-4xl",
     "5xl": "w-5xl",
     "6xl": "w-6xl",
-    "7xl": "w-7xl"
+    "7xl": "w-7xl",
+
+    "5px": "w-[5px]",
+    "10px": "w-[10px]",
+    "15px": "w-[15px]",
+    "20px": "w-[20px]",
+    "25px": "w-[25px]",
+    "30px": "w-[30px]",
+    "35px": "w-[35px]",
+    "40px": "w-[40px]",
+    "45px": "w-[45px]",
+    "50px": "w-[50px]",
+    "55px": "w-[55px]",
+    "60px": "w-[60px]",
+    "65px": "w-[65px]",
+    "70px": "w-[70px]",
+    "75px": "w-[75px]",
+    "80px": "w-[80px]",
+    "85px": "w-[85px]",
+    "90px": "w-[90px]",
+    "95px": "w-[95px]",
+    "100px": "w-[100px]",
+    "110px": "w-[110px]",
+    "120px": "w-[120px]",
+    "130px": "w-[130px]",
+    "140px": "w-[140px]",
+    "150px": "w-[150px]",
+    "160px": "w-[160px]",
+    "170px": "w-[170px]",
+    "180px": "w-[180px]",
+    "190px": "w-[190px]",
+    "200px": "w-[200px]",
   },
 
   // SM Responsive Breakpoint
@@ -573,7 +755,7 @@ export const width2heightClasses = {
 
     "3xs": "sm:max-h-3xs",
     "2xs": "sm:max-h-2xs",
-    "xs": "sm:max-h-xs",
+    xs: "sm:max-h-xs",
     sm: "sm:max-h-sm",
     md: "sm:max-h-md",
     lg: "sm:max-h-lg",
@@ -583,7 +765,7 @@ export const width2heightClasses = {
     "4xl": "sm:max-h-4xl",
     "5xl": "sm:max-h-5xl",
     "6xl": "sm:max-h-6xl",
-    "7xl": "sm:max-h-7xl"
+    "7xl": "sm:max-h-7xl",
   },
 
   "sm:minHeight": {
@@ -647,7 +829,7 @@ export const width2heightClasses = {
 
     "3xs": "sm:min-h-3xs",
     "2xs": "sm:min-h-2xs",
-    "xs": "sm:min-h-xs",
+    xs: "sm:min-h-xs",
     sm: "sm:min-h-sm",
     md: "sm:min-h-md",
     lg: "sm:min-h-lg",
@@ -657,7 +839,7 @@ export const width2heightClasses = {
     "4xl": "sm:min-h-4xl",
     "5xl": "sm:min-h-5xl",
     "6xl": "sm:min-h-6xl",
-    "7xl": "sm:min-h-7xl"
+    "7xl": "sm:min-h-7xl",
   },
 
   "sm:height": {
@@ -721,7 +903,7 @@ export const width2heightClasses = {
 
     "3xs": "sm:h-3xs",
     "2xs": "sm:h-2xs",
-    "xs": "sm:h-xs",
+    xs: "sm:h-xs",
     sm: "sm:h-sm",
     md: "sm:h-md",
     lg: "sm:h-lg",
@@ -731,7 +913,7 @@ export const width2heightClasses = {
     "4xl": "sm:h-4xl",
     "5xl": "sm:h-5xl",
     "6xl": "sm:h-6xl",
-    "7xl": "sm:h-7xl"
+    "7xl": "sm:h-7xl",
   },
 
   "sm:maxWidth": {
@@ -795,7 +977,7 @@ export const width2heightClasses = {
 
     "3xs": "sm:max-w-3xs",
     "2xs": "sm:max-w-2xs",
-    "xs": "sm:max-w-xs",
+    xs: "sm:max-w-xs",
     sm: "sm:max-w-sm",
     md: "sm:max-w-md",
     lg: "sm:max-w-lg",
@@ -805,7 +987,7 @@ export const width2heightClasses = {
     "4xl": "sm:max-w-4xl",
     "5xl": "sm:max-w-5xl",
     "6xl": "sm:max-w-6xl",
-    "7xl": "sm:max-w-7xl"
+    "7xl": "sm:max-w-7xl",
   },
 
   "sm:minWidth": {
@@ -869,7 +1051,7 @@ export const width2heightClasses = {
 
     "3xs": "sm:min-w-3xs",
     "2xs": "sm:min-w-2xs",
-    "xs": "sm:min-w-xs",
+    xs: "sm:min-w-xs",
     sm: "sm:min-w-sm",
     md: "sm:min-w-md",
     lg: "sm:min-w-lg",
@@ -879,7 +1061,7 @@ export const width2heightClasses = {
     "4xl": "sm:min-w-4xl",
     "5xl": "sm:min-w-5xl",
     "6xl": "sm:min-w-6xl",
-    "7xl": "sm:min-w-7xl"
+    "7xl": "sm:min-w-7xl",
   },
 
   "sm:width": {
@@ -943,7 +1125,7 @@ export const width2heightClasses = {
 
     "3xs": "sm:w-3xs",
     "2xs": "sm:w-2xs",
-    "xs": "sm:w-xs",
+    xs: "sm:w-xs",
     sm: "sm:w-sm",
     md: "sm:w-md",
     lg: "sm:w-lg",
@@ -953,7 +1135,7 @@ export const width2heightClasses = {
     "4xl": "sm:w-4xl",
     "5xl": "sm:w-5xl",
     "6xl": "sm:w-6xl",
-    "7xl": "sm:w-7xl"
+    "7xl": "sm:w-7xl",
   },
 
   // MD Responsive Breakpoint
@@ -1018,7 +1200,7 @@ export const width2heightClasses = {
 
     "3xs": "md:max-h-3xs",
     "2xs": "md:max-h-2xs",
-    "xs": "md:max-h-xs",
+    xs: "md:max-h-xs",
     sm: "md:max-h-sm",
     md: "md:max-h-md",
     lg: "md:max-h-lg",
@@ -1028,7 +1210,7 @@ export const width2heightClasses = {
     "4xl": "md:max-h-4xl",
     "5xl": "md:max-h-5xl",
     "6xl": "md:max-h-6xl",
-    "7xl": "md:max-h-7xl"
+    "7xl": "md:max-h-7xl",
   },
 
   "md:minHeight": {
@@ -1092,7 +1274,7 @@ export const width2heightClasses = {
 
     "3xs": "md:min-h-3xs",
     "2xs": "md:min-h-2xs",
-    "xs": "md:min-h-xs",
+    xs: "md:min-h-xs",
     sm: "md:min-h-sm",
     md: "md:min-h-md",
     lg: "md:min-h-lg",
@@ -1102,7 +1284,7 @@ export const width2heightClasses = {
     "4xl": "md:min-h-4xl",
     "5xl": "md:min-h-5xl",
     "6xl": "md:min-h-6xl",
-    "7xl": "md:min-h-7xl"
+    "7xl": "md:min-h-7xl",
   },
 
   "md:height": {
@@ -1166,7 +1348,7 @@ export const width2heightClasses = {
 
     "3xs": "md:h-3xs",
     "2xs": "md:h-2xs",
-    "xs": "md:h-xs",
+    xs: "md:h-xs",
     sm: "md:h-sm",
     md: "md:h-md",
     lg: "md:h-lg",
@@ -1176,7 +1358,7 @@ export const width2heightClasses = {
     "4xl": "md:h-4xl",
     "5xl": "md:h-5xl",
     "6xl": "md:h-6xl",
-    "7xl": "md:h-7xl"
+    "7xl": "md:h-7xl",
   },
 
   "md:maxWidth": {
@@ -1240,7 +1422,7 @@ export const width2heightClasses = {
 
     "3xs": "md:max-w-3xs",
     "2xs": "md:max-w-2xs",
-    "xs": "md:max-w-xs",
+    xs: "md:max-w-xs",
     sm: "md:max-w-sm",
     md: "md:max-w-md",
     lg: "md:max-w-lg",
@@ -1250,7 +1432,7 @@ export const width2heightClasses = {
     "4xl": "md:max-w-4xl",
     "5xl": "md:max-w-5xl",
     "6xl": "md:max-w-6xl",
-    "7xl": "md:max-w-7xl"
+    "7xl": "md:max-w-7xl",
   },
 
   "md:minWidth": {
@@ -1314,7 +1496,7 @@ export const width2heightClasses = {
 
     "3xs": "md:min-w-3xs",
     "2xs": "md:min-w-2xs",
-    "xs": "md:min-w-xs",
+    xs: "md:min-w-xs",
     sm: "md:min-w-sm",
     md: "md:min-w-md",
     lg: "md:min-w-lg",
@@ -1324,7 +1506,7 @@ export const width2heightClasses = {
     "4xl": "md:min-w-4xl",
     "5xl": "md:min-w-5xl",
     "6xl": "md:min-w-6xl",
-    "7xl": "md:min-w-7xl"
+    "7xl": "md:min-w-7xl",
   },
 
   "md:width": {
@@ -1388,7 +1570,7 @@ export const width2heightClasses = {
 
     "3xs": "md:w-3xs",
     "2xs": "md:w-2xs",
-    "xs": "md:w-xs",
+    xs: "md:w-xs",
     sm: "md:w-sm",
     md: "md:w-md",
     lg: "md:w-lg",
@@ -1398,7 +1580,7 @@ export const width2heightClasses = {
     "4xl": "md:w-4xl",
     "5xl": "md:w-5xl",
     "6xl": "md:w-6xl",
-    "7xl": "md:w-7xl"
+    "7xl": "md:w-7xl",
   },
 
   // LG Responsive Breakpoint
@@ -1463,7 +1645,7 @@ export const width2heightClasses = {
 
     "3xs": "lg:max-h-3xs",
     "2xs": "lg:max-h-2xs",
-    "xs": "lg:max-h-xs",
+    xs: "lg:max-h-xs",
     sm: "lg:max-h-sm",
     md: "lg:max-h-md",
     lg: "lg:max-h-lg",
@@ -1473,7 +1655,7 @@ export const width2heightClasses = {
     "4xl": "lg:max-h-4xl",
     "5xl": "lg:max-h-5xl",
     "6xl": "lg:max-h-6xl",
-    "7xl": "lg:max-h-7xl"
+    "7xl": "lg:max-h-7xl",
   },
   "lg:minHeight": {
     0: "lg:min-h-0",
@@ -1536,7 +1718,7 @@ export const width2heightClasses = {
 
     "3xs": "lg:min-h-3xs",
     "2xs": "lg:min-h-2xs",
-    "xs": "lg:min-h-xs",
+    xs: "lg:min-h-xs",
     sm: "lg:min-h-sm",
     md: "lg:min-h-md",
     lg: "lg:min-h-lg",
@@ -1546,7 +1728,7 @@ export const width2heightClasses = {
     "4xl": "lg:min-h-4xl",
     "5xl": "lg:min-h-5xl",
     "6xl": "lg:min-h-6xl",
-    "7xl": "lg:min-h-7xl"
+    "7xl": "lg:min-h-7xl",
   },
 
   "lg:height": {
@@ -1610,7 +1792,7 @@ export const width2heightClasses = {
 
     "3xs": "lg:h-3xs",
     "2xs": "lg:h-2xs",
-    "xs": "lg:h-xs",
+    xs: "lg:h-xs",
     sm: "lg:h-sm",
     md: "lg:h-md",
     lg: "lg:h-lg",
@@ -1620,7 +1802,7 @@ export const width2heightClasses = {
     "4xl": "lg:h-4xl",
     "5xl": "lg:h-5xl",
     "6xl": "lg:h-6xl",
-    "7xl": "lg:h-7xl"
+    "7xl": "lg:h-7xl",
   },
 
   "lg:maxWidth": {
@@ -1684,7 +1866,7 @@ export const width2heightClasses = {
 
     "3xs": "lg:max-w-3xs",
     "2xs": "lg:max-w-2xs",
-    "xs": "lg:max-w-xs",
+    xs: "lg:max-w-xs",
     sm: "lg:max-w-sm",
     md: "lg:max-w-md",
     lg: "lg:max-w-lg",
@@ -1694,7 +1876,7 @@ export const width2heightClasses = {
     "4xl": "lg:max-w-4xl",
     "5xl": "lg:max-w-5xl",
     "6xl": "lg:max-w-6xl",
-    "7xl": "lg:max-w-7xl"
+    "7xl": "lg:max-w-7xl",
   },
 
   "lg:minWidth": {
@@ -1758,7 +1940,7 @@ export const width2heightClasses = {
 
     "3xs": "lg:min-w-3xs",
     "2xs": "lg:min-w-2xs",
-    "xs": "lg:min-w-xs",
+    xs: "lg:min-w-xs",
     sm: "lg:min-w-sm",
     md: "lg:min-w-md",
     lg: "lg:min-w-lg",
@@ -1768,7 +1950,7 @@ export const width2heightClasses = {
     "4xl": "lg:min-w-4xl",
     "5xl": "lg:min-w-5xl",
     "6xl": "lg:min-w-6xl",
-    "7xl": "lg:min-w-7xl"
+    "7xl": "lg:min-w-7xl",
   },
 
   "lg:width": {
@@ -1832,7 +2014,7 @@ export const width2heightClasses = {
 
     "3xs": "lg:w-3xs",
     "2xs": "lg:w-2xs",
-    "xs": "lg:w-xs",
+    xs: "lg:w-xs",
     sm: "lg:w-sm",
     md: "lg:w-md",
     lg: "lg:w-lg",
@@ -1842,7 +2024,7 @@ export const width2heightClasses = {
     "4xl": "lg:w-4xl",
     "5xl": "lg:w-5xl",
     "6xl": "lg:w-6xl",
-    "7xl": "lg:w-7xl"
+    "7xl": "lg:w-7xl",
   },
 
   // XL Responsive Breakpoint
@@ -1907,7 +2089,7 @@ export const width2heightClasses = {
 
     "3xs": "xl:max-h-3xs",
     "2xs": "xl:max-h-2xs",
-    "xs": "xl:max-h-xs",
+    xs: "xl:max-h-xs",
     sm: "xl:max-h-sm",
     md: "xl:max-h-md",
     lg: "xl:max-h-lg",
@@ -1917,7 +2099,7 @@ export const width2heightClasses = {
     "4xl": "xl:max-h-4xl",
     "5xl": "xl:max-h-5xl",
     "6xl": "xl:max-h-6xl",
-    "7xl": "xl:max-h-7xl"
+    "7xl": "xl:max-h-7xl",
   },
 
   "xl:minHeight": {
@@ -1981,7 +2163,7 @@ export const width2heightClasses = {
 
     "3xs": "xl:min-h-3xs",
     "2xs": "xl:min-h-2xs",
-    "xs": "xl:min-h-xs",
+    xs: "xl:min-h-xs",
     sm: "xl:min-h-sm",
     md: "xl:min-h-md",
     lg: "xl:min-h-lg",
@@ -1991,7 +2173,7 @@ export const width2heightClasses = {
     "4xl": "xl:min-h-4xl",
     "5xl": "xl:min-h-5xl",
     "6xl": "xl:min-h-6xl",
-    "7xl": "xl:min-h-7xl"
+    "7xl": "xl:min-h-7xl",
   },
 
   "xl:height": {
@@ -2055,7 +2237,7 @@ export const width2heightClasses = {
 
     "3xs": "xl:h-3xs",
     "2xs": "xl:h-2xs",
-    "xs": "xl:h-xs",
+    xs: "xl:h-xs",
     sm: "xl:h-sm",
     md: "xl:h-md",
     lg: "xl:h-lg",
@@ -2065,7 +2247,7 @@ export const width2heightClasses = {
     "4xl": "xl:h-4xl",
     "5xl": "xl:h-5xl",
     "6xl": "xl:h-6xl",
-    "7xl": "xl:h-7xl"
+    "7xl": "xl:h-7xl",
   },
 
   "xl:maxWidth": {
@@ -2129,7 +2311,7 @@ export const width2heightClasses = {
 
     "3xs": "xl:max-w-3xs",
     "2xs": "xl:max-w-2xs",
-    "xs": "xl:max-w-xs",
+    xs: "xl:max-w-xs",
     sm: "xl:max-w-sm",
     md: "xl:max-w-md",
     lg: "xl:max-w-lg",
@@ -2139,7 +2321,7 @@ export const width2heightClasses = {
     "4xl": "xl:max-w-4xl",
     "5xl": "xl:max-w-5xl",
     "6xl": "xl:max-w-6xl",
-    "7xl": "xl:max-w-7xl"
+    "7xl": "xl:max-w-7xl",
   },
 
   "xl:minWidth": {
@@ -2203,7 +2385,7 @@ export const width2heightClasses = {
 
     "3xs": "xl:min-w-3xs",
     "2xs": "xl:min-w-2xs",
-    "xs": "xl:min-w-xs",
+    xs: "xl:min-w-xs",
     sm: "xl:min-w-sm",
     md: "xl:min-w-md",
     lg: "xl:min-w-lg",
@@ -2213,7 +2395,7 @@ export const width2heightClasses = {
     "4xl": "xl:min-w-4xl",
     "5xl": "xl:min-w-5xl",
     "6xl": "xl:min-w-6xl",
-    "7xl": "xl:min-w-7xl"
+    "7xl": "xl:min-w-7xl",
   },
 
   "xl:width": {
@@ -2277,7 +2459,7 @@ export const width2heightClasses = {
 
     "3xs": "xl:w-3xs",
     "2xs": "xl:w-2xs",
-    "xs": "xl:w-xs",
+    xs: "xl:w-xs",
     sm: "xl:w-sm",
     md: "xl:w-md",
     lg: "xl:w-lg",
@@ -2287,6 +2469,6 @@ export const width2heightClasses = {
     "4xl": "xl:w-4xl",
     "5xl": "xl:w-5xl",
     "6xl": "xl:w-6xl",
-    "7xl": "xl:w-7xl"
+    "7xl": "xl:w-7xl",
   },
 } as const;

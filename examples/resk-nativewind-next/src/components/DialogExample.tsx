@@ -2,10 +2,11 @@
 
 import { HStack, Dialog, Alert, Preloader, Drawer, useDrawer } from "@resk/nativewind";
 import { Div, H2, Text } from "@resk/nativewind/html";
+import { Button } from "@resk/nativewind/components/button";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
-const Button = dynamic(() => import('@resk/nativewind/components/button').then(mod => mod.Button), { ssr: false });
+//const Button = dynamic(() => import('@resk/nativewind/components/button').then(mod => mod.Button), { ssr: false });
 
 
 export function DialogExample() {
@@ -51,7 +52,7 @@ export function DialogExample() {
             </Div>
         </Dialog>
         <Button variant={{ colorScheme: "info", rounded: "rounded", padding: "10px", alignSelf: "start", margin: 6 }} icon="lock" onPress={() => setVisible(true)}>Open Dialog 1</Button>
-        <Button variant={{ colorScheme: "secondary" }} onPress={((e) => {
+        <Button.Interactive variant={{ colorScheme: "secondary" }} onPress={((e, context) => {
             Dialog.Provider.open({
                 title: "DialogProvider",
                 children: <Text>DialogProvider</Text>,
@@ -63,7 +64,7 @@ export function DialogExample() {
             })
         })}>
             open Dialog Provider
-        </Button>
+        </Button.Interactive>
         <Button className="m-5" onPress={(e) => {
             console.log("will open alert ", Dialog.Alert.open, " is opeeeed");
             Dialog.Alert.open({

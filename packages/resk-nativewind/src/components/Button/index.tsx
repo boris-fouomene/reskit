@@ -1,17 +1,17 @@
-import { isNonNullString } from "@resk/core/utils";
-import { ButtonBase } from "./base";
-import { InteractiveButton } from './button';
-import { IButtonProps } from "./types";
-import { pickTouchableProps } from "@utils/touchHandler";
+import { Button as ButtonBase } from "./base";
+import { InteractiveButton as ButtonInteractive } from './button';
+import { IButtonInteractiveProps, IButtonProps } from "./types";
 
 
-export function Button<Context = unknown>({ formName, ref, ...props }: IButtonProps<Context>) {
-    const isInteractive = isNonNullString(formName) || ref || !!pickTouchableProps(props as any)?.touchableProps;
-    if (isInteractive) {
-        return <InteractiveButton formName={formName} ref={ref} {...props} />
-    }
+export function Button<Context = unknown>({ ref, ...props }: IButtonProps<Context>) {
     return <ButtonBase {...props} />
 }
 
-Button.Interactive = InteractiveButton;
+Button.Interactive = function InteractiveButton<Context = unknown>(props: IButtonInteractiveProps<Context>) {
+    //const isInteractive = isNonNullString(formName) || ref || !!pickTouchableProps(props as any)?.touchableProps;
+    return <>
+        <ButtonInteractive {...props} />
+    </>
+}
+
 Button.displayName = "Button";

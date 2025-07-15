@@ -2,8 +2,8 @@
 import { useImperativeHandle, useEffect, useId } from 'react';
 //import { FormsManager } from '@components/Form/FormsManager';
 import { GestureResponderEvent } from 'react-native';
-import { ButtonBase } from './base';
-import { IButtonContext, IButtonProps } from './types';
+import { Button } from './base';
+import { IButtonContext, IButtonInteractiveContext, IButtonInteractiveProps, IButtonProps } from './types';
 import { defaultStr } from '@resk/core/utils';
 import useStateCallback from '@utils/stateCallback';
 import { buttonVariant } from "@variants/button";
@@ -15,7 +15,6 @@ export function InteractiveButton<Context = unknown>({
     disabled: customDisabled,
     loading: customIsLoading,
     id,
-    context: extendContext,
     onPress,
     submitFormOnPress,
     formName,
@@ -26,7 +25,7 @@ export function InteractiveButton<Context = unknown>({
     context: customContext,
     className,
     ...rest
-}: IButtonProps<Context>) {
+}: IButtonInteractiveProps<Context>) {
     const [isLoading, _setIsLoading] = useStateCallback(typeof customIsLoading == "boolean" ? customIsLoading : false);
     const [isDisabled, setIsDisabled] = useStateCallback(typeof customDisabled == "boolean" ? customDisabled : false);
     const uId = useId();
@@ -55,8 +54,8 @@ export function InteractiveButton<Context = unknown>({
             setIsLoading(customIsLoading);
         }
     }, [customIsLoading]);
-    const context: IButtonContext<Context> = {
-        ...Object.assign({}, extendContext),
+    const context: IButtonInteractiveContext<Context> = {
+        ...Object.assign({}, customContext),
         enable,
         disable,
         isEnabled,
@@ -75,9 +74,9 @@ export function InteractiveButton<Context = unknown>({
          return () => {
              FormsManager.unmountAction(context.id, formName);
          }; */
-    }, [formName, buttonId, context.id]);
+    }, [formName, buttonId, id]);
 
-    return (<ButtonBase<Context>
+    return (<Button<IButtonInteractiveContext<Context>>
         {...rest}
         className={cn("resk-button-interactive btn-interactive", className)}
         context={Object.assign({}, customContext, context)}

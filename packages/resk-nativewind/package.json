@@ -21,6 +21,8 @@
   ],
   "exports": {
     ".": "./build/index.js",
+    "./*": "./build/*",
+    "./components/*": "./components/*.js",
     "./components/activityIndicator": "./components/activityIndicator.js",
     "./components/alert": "./components/alert.js",
     "./components/avatar": "./components/avatar.js",
@@ -55,8 +57,7 @@
     "./utils": "./build/utils/index.js",
     "./i18n": "./build/i18n/index.js",
     "./platform": "./build/platform/index.js",
-    "./theme-to-css-vars": "./theme-to-css-vars.js",
-    "./*": "./build/*"
+    "./theme-to-css-vars": "./theme-to-css-vars.js"
   },
   "typesVersions11": {
     "*": {

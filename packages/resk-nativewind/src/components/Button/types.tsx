@@ -8,7 +8,7 @@ import { IDict, IResourceName } from '@resk/core/types';
 import { buttonVariant, IButtonVariant } from "@variants/button";
 
 
-export interface IButtonBaseProps<Context = unknown> extends Omit<ISurfaceProps, "variant" | "onPress"> {
+export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "variant" | "onPress"> {
     /***
      * The class name for the label
      */
@@ -182,7 +182,7 @@ export interface IButtonBaseProps<Context = unknown> extends Omit<ISurfaceProps,
     rippleDuration?: number;
 }
 
-export interface IButtonProps<Context = unknown> extends Omit<IButtonBaseProps<Context>, "ref"> {
+export interface IButtonInteractiveProps<Context = unknown> extends Omit<IButtonProps<IButtonInteractiveContext<Context>>, "ref" | "context"> {
     /***
      * The name of the form associated with the button in case of button representing a form action.
      * when this property is set, the button listens dynamically to the state of the form and is activated or deactivated according to the validated state or name of the form. 
@@ -199,7 +199,9 @@ export interface IButtonProps<Context = unknown> extends Omit<IButtonBaseProps<C
     /***
      * The réf of the button component.
      */
-    ref?: Ref<IButtonContext<Context> & View>;
+    ref?: Ref<IButtonInteractiveContext<Context> & View>;
+
+    context?: Context;
 }
 
 export type IButtonContext<Context = unknown> = {
@@ -207,26 +209,29 @@ export type IButtonContext<Context = unknown> = {
     disabled: boolean;
     computedVariant: ReturnType<typeof buttonVariant>;
     expanded?: boolean;
+} & Context;
+
+export type IButtonInteractiveContext<Context = unknown> = IButtonContext<Context> & {
     /*
         Enables the button, allowing it to respond to user interactions.
         This method is implemented only for interactive buttons.
     */
-    enable?: (callback?: () => void) => void;
+    enable: (callback?: () => void) => void;
     /**
      * disable the button, preventing it from responding to user interactions.
      * This method is implemented only for interactive buttons.
      */
-    disable?: (callback?: () => void) => void;
+    disable: (callback?: () => void) => void;
     /***
      * Returns a boolean indicating whether the button is currently enabled.
        This method is implemented only for interactive buttons.
      */
-    isEnabled?: () => boolean;
+    isEnabled: () => boolean;
     /**
      * 
      * represent the unique identifier of the button. This can be useful for tracking, logging, or other purposes.
      */
-    id?: string;
+    id: string;
     /**
      * Sets the loading state of the button. When loading is true, the button will show a loading indicator.
      * @param isLoading {boolean} - Sets the loading state of the button. When loading is true, the button will show a loading indicator.
@@ -240,4 +245,4 @@ export type IButtonContext<Context = unknown> = {
      * This method is implemented only for interactive buttons.
      */
     formData?: IDict;
-} & Context;
+}

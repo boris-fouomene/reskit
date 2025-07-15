@@ -9,7 +9,7 @@ import { cn } from '@utils/cn';
 import { Icon } from '@components/Icon';
 import { Div } from '@html/Div';
 import { buttonVariant } from "@variants/button";
-import { IButtonContext, IButtonBaseProps } from "./types";
+import { IButtonContext, IButtonProps } from "./types";
 import { commonVariant } from "@variants/common";
 import { GestureResponderEvent } from "react-native";
 import { Auth } from '@resk/core/auth';
@@ -17,7 +17,7 @@ import { RippleContent } from "./RippleContent";
 import Platform from "@platform";
 
 
-export function ButtonBase<Context = unknown>({
+export function Button<Context = unknown>({
     disabled: customDisabled,
     loading: customIsLoading,
     icon: iconProp,
@@ -54,7 +54,7 @@ export function ButtonBase<Context = unknown>({
     rippleDuration,
     android_ripple,
     ...rest
-}: IButtonBaseProps<Context>) {
+}: IButtonProps<Context>) {
     if (perm !== undefined && !Auth.isAllowed(perm)) return null;
     const buttonId = defaultStr(id);
     testID = defaultStr(testID, "resk-button-base");
@@ -134,4 +134,4 @@ export function ButtonBase<Context = unknown>({
     </>);
 };
 
-ButtonBase.displayName = "Button.Base";
+Button.displayName = "Button.Base";

@@ -2,20 +2,19 @@ import { iconVariant } from "@variants/icon";
 import { ActivityIndicator } from '@components/ActivityIndicator';
 import { Surface } from '@components/Surface';
 import { Text } from '@html/Text';
-import { defaultStr, isNumber } from '@resk/core/utils';
+import { defaultStr } from '@resk/core/utils';
 import isValidElement from '@utils/isValidElement';
 import { Divider } from '@components/Divider';
 import { cn } from '@utils/cn';
 import { Icon } from '@components/Icon';
 import { Div } from '@html/Div';
 import { buttonVariant } from "@variants/button";
-import { IButtonBaseContext, IButtonProps } from "./types";
+import { IButtonContext, IButtonBaseProps } from "./types";
 import { commonVariant } from "@variants/common";
-import { GestureResponderEvent, PressableProps } from "react-native";
+import { GestureResponderEvent } from "react-native";
 import { Auth } from '@resk/core/auth';
 import { RippleContent } from "./RippleContent";
 import Platform from "@platform";
-import { useId } from "react";
 
 
 export function ButtonBase<Context = unknown>({
@@ -55,7 +54,7 @@ export function ButtonBase<Context = unknown>({
     rippleDuration,
     android_ripple,
     ...rest
-}: IButtonProps<Context>) {
+}: IButtonBaseProps<Context>) {
     if (perm !== undefined && !Auth.isAllowed(perm)) return null;
     const buttonId = defaultStr(id);
     testID = defaultStr(testID, "resk-button-base");
@@ -86,7 +85,7 @@ export function ButtonBase<Context = unknown>({
             testID={testID + "-button-activity-indicator"}
         />
     ) : icon || null;
-    const buttonContext = Object.assign({}, context, { loading: isLoading, computedVariant }) as IButtonBaseContext<Context>;
+    const buttonContext: IButtonContext<Context> = Object.assign({}, context, { disabled, loading: isLoading, computedVariant });
     const leftContent = typeof left === "function" ? left(buttonContext) : left;
     const rightContent = typeof right === "function" ? right(buttonContext) : right;
     const hasRightContent = isValidElement(right) && !!right;
@@ -108,8 +107,7 @@ export function ButtonBase<Context = unknown>({
             accessible={accessible}
             disabled={disabled}
             onPress={typeof onPress === "function" ? (event: GestureResponderEvent) => {
-                const r = onPress(event, buttonContext);
-                return r;
+                return onPress(event, buttonContext);
             } : undefined}
         >
             <Div id={buttonId ? `${buttonId}-content` : undefined} testID={testID + "-button-content"} className={cn("button-content w-full flex flex-row items-center self-center", computedVariant.content?.(), contentClassName)}>

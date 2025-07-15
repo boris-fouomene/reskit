@@ -3,17 +3,15 @@ import { useImperativeHandle, useEffect, useId } from 'react';
 //import { FormsManager } from '@components/Form/FormsManager';
 import { GestureResponderEvent } from 'react-native';
 import { ButtonBase } from './base';
-import { IButtonContext, IButtonInteractiveProps, IButtonProps } from './types';
+import { IButtonContext, IButtonProps } from './types';
 import { defaultStr } from '@resk/core/utils';
 import useStateCallback from '@utils/stateCallback';
 import { buttonVariant } from "@variants/button";
 
 
-export function Button<IButtonExtendContext = unknown>({
+export function InteractiveButton<Context = unknown>({
     disabled: customDisabled,
     loading: customIsLoading,
-    rippleColor,
-    disableRipple,
     id,
     context: extendContext,
     onPress,
@@ -25,13 +23,14 @@ export function Button<IButtonExtendContext = unknown>({
     android_ripple,
     rippleClassName,
     testID,
+    context: customContext,
     ...rest
-}: IButtonInteractiveProps<IButtonExtendContext>) {
+}: IButtonProps<Context>) {
     const [isLoading, _setIsLoading] = useStateCallback(typeof customIsLoading == "boolean" ? customIsLoading : false);
     const [isDisabled, setIsDisabled] = useStateCallback(typeof customDisabled == "boolean" ? customDisabled : false);
     const uId = useId();
     const buttonId = defaultStr(id, uId);
-    testID = defaultStr(testID, "resk-button");
+    testID = defaultStr(testID, "resk-button-interactive");
     const disabled: boolean = isDisabled || isLoading;
     const disable = (cb?: () => void) => { setIsDisabled(true, cb); },
         enable = (cb?: () => void) => {
@@ -55,7 +54,7 @@ export function Button<IButtonExtendContext = unknown>({
             setIsLoading(customIsLoading);
         }
     }, [customIsLoading]);
-    const context: IButtonContext<IButtonExtendContext> = {
+    const context: IButtonContext<Context> = {
         ...Object.assign({}, extendContext),
         enable,
         disable,
@@ -76,47 +75,29 @@ export function Button<IButtonExtendContext = unknown>({
              FormsManager.unmountAction(context.id, formName);
          }; */
     }, [formName, buttonId, context.id]);
-    const aRipple = Object.assign({}, android_ripple);
-    const isRippleDisabled = disableRipple || disabled;
-    const rProps = isRippleDisabled ? {} : { android_ripple: { color: rippleColor || undefined, ...aRipple } };
-    /* rippleClassName = cn(rest?.variant && buttonVariant(rest.variant)?.ripple?.(), rippleClassName);
-    const { rippleContent, startRipple } = useGetRippleContent({
-        rippleColor,
-        disabled,
-        testID,
-        disableRipple: !!isRippleDisabled,
-        rippleClassName,
-    }); */
 
-    return (<ButtonBase
-        {...rest as any}
-        {...rProps}
-        context={context}
-        disableRipple={isRippleDisabled}
+    return (<ButtonBase<Context>
+        {...rest}
+        context={Object.assign({}, customContext, context)}
         disabled={disabled}
         loading={isLoading}
         id={buttonId}
         testID={`${testID}`}
         ref={ref}
-        onPress={(event: GestureResponderEvent) => {
-            /* if (typeof startRipple === "function") {
-                startRipple(event);
-            } */
+        onPress={(event: GestureResponderEvent, context) => {
             const form = null;//formName ? FormsManager.getForm(formName) : null;
             const hasForm = false;//form && (form as any).isValid();
-            const context2: IButtonContext<IButtonExtendContext> = context as IButtonContext<IButtonExtendContext>;
             if (hasForm && typeof (form as any).getData == "function") {
-                (context2 as any).formData = (form as any).getData();
+                context.formData = (form as any).getData();
             }
-            const r = typeof onPress === 'function' ? onPress(event, context2) : true;
+            const r = typeof onPress === 'function' ? onPress(event, context) : true;
             if (r === false || submitFormOnPress === false) return;
             if (form && typeof (form as any)?.submit === 'function') {
                 (form as any).submit();
             }
             return r
         }}
-        rippleContent={null}
     />);
 };
 
-Button.displayName = "Button";
+InteractiveButton.displayName = "Button.Interactive";

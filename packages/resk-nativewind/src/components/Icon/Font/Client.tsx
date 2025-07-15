@@ -19,14 +19,14 @@ export default function ClientFontIcon({ name, variant, containerClassName, titl
     let fontIconName = nameString;
     if (!isNonNullString(nameString)) return null;
     const nameArray = nameString.split("-");
-    let IconSet = fontsObjects[""], iconSetName = "";
+    let IconSet = fontsObjects[""], iconSetName = "MaterialCommunityIcons";
     if ((fontsObjects as any)[nameArray[0]]) {
         iconSetName = nameArray[0];
         IconSet = (fontsObjects as any)[iconSetName];
         nameArray.shift();
         fontIconName = nameArray.join("-");
     }
-    const iconClassName = cn(iconVariant(variant), className, "font-icon", ("font-icon-" + fontIconName), ("font-icon-raw-name-" + nameString), ("font-icon-set-" + iconSetName));
+    const iconClassName = cn(iconVariant(variant), className, "resk-font-icon", "font-icon-set-" + iconSetName, "font-icon-" + fontIconName, "font-icon-real-name-" + nameString,);
     const iconSize = isNumber(size) && size > 0 ? size : DEFAULT_FONT_ICON_SIZE;
     const rP = iconSize ? { size } : {};
     const Component: FC<IconProps & { ref?: any }> = IconSet as unknown as FC<IconProps>

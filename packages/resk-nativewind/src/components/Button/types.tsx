@@ -8,13 +8,7 @@ import { IDict, IResourceName } from '@resk/core/types';
 import { buttonVariant, IButtonVariant } from "@variants/button";
 
 
-export type IButtonBaseContext<Context = unknown> = Context & {
-    loading: boolean;
-    disabled: boolean;
-    computedVariant: ReturnType<typeof buttonVariant>;
-    expanded?: boolean;
-}
-export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "variant" | "onPress"> {
+export interface IButtonBaseProps<Context = unknown> extends Omit<ISurfaceProps, "variant" | "onPress"> {
     /***
      * The class name for the label
      */
@@ -106,12 +100,12 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
     /***
      * The left content of the button
      */
-    left?: ReactNode | ((options: IButtonBaseContext<Context>) => ReactNode);
+    left?: ReactNode | ((options: IButtonContext<Context>) => ReactNode);
 
     /***
      * The right content of the button
      */
-    right?: ReactNode | ((options: IButtonBaseContext<Context>) => ReactNode);
+    right?: ReactNode | ((options: IButtonContext<Context>) => ReactNode);
 
 
     /***
@@ -144,7 +138,7 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
     /***
         The callback function to be called when the button is pressed.
     */
-    onPress?: (event: GestureResponderEvent, context: IButtonBaseContext<Context>) => any;
+    onPress?: (event: GestureResponderEvent, context: IButtonContext<Context>) => any;
 
     /***
  * The permission associated with the button. This permission is used to determine if the button will be rendered or not.
@@ -188,7 +182,7 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
     rippleDuration?: number;
 }
 
-export interface IButtonInteractiveProps<Context = unknown> extends Omit<IButtonProps<IButtonContext<Context>>, "ref"> {
+export interface IButtonProps<Context = unknown> extends Omit<IButtonBaseProps<Context>, "ref"> {
     /***
      * The name of the form associated with the button in case of button representing a form action.
      * when this property is set, the button listens dynamically to the state of the form and is activated or deactivated according to the validated state or name of the form. 
@@ -206,48 +200,44 @@ export interface IButtonInteractiveProps<Context = unknown> extends Omit<IButton
      * The réf of the button component.
      */
     ref?: Ref<IButtonContext<Context> & View>;
-
-
-    /**
-     * Color of the ripple effect when the button is pressed.
-     * This can enhance the visual feedback of the button interaction.
-     * 
-     * @example
-     * <Button rippleColor="#0000ff" label="Ripple Effect" />
-     */
-    rippleColor?: string | null;
-
-
 }
 
-export type IButtonContext<Context = unknown> = Readonly<{
+export type IButtonContext<Context = unknown> = {
+    loading: boolean;
+    disabled: boolean;
+    computedVariant: ReturnType<typeof buttonVariant>;
+    expanded?: boolean;
     /*
         Enables the button, allowing it to respond to user interactions.
+        This method is implemented only for interactive buttons.
     */
-    enable: (callback?: () => void) => void;
+    enable?: (callback?: () => void) => void;
     /**
      * disable the button, preventing it from responding to user interactions.
+     * This method is implemented only for interactive buttons.
      */
-    disable: (callback?: () => void) => void;
+    disable?: (callback?: () => void) => void;
     /***
      * Returns a boolean indicating whether the button is currently enabled.
+       This method is implemented only for interactive buttons.
      */
-    isEnabled: () => boolean;
+    isEnabled?: () => boolean;
     /**
      * 
      * represent the unique identifier of the button. This can be useful for tracking, logging, or other purposes.
      */
-    id: string;
+    id?: string;
     /**
      * Sets the loading state of the button. When loading is true, the button will show a loading indicator.
      * @param isLoading {boolean} - Sets the loading state of the button. When loading is true, the button will show a loading indicator.
      * @param callback {(newIsLoading: boolean) => void} - Optional callback function to be called when the loading state changes.
      * @returns 
      */
-    setIsLoading: (isLoading: boolean, callback?: (newIsLoading: boolean) => void) => void;
+    setIsLoading?: (isLoading: boolean, callback?: (newIsLoading: boolean) => void) => void;
 
     /***
      * The data associated with the form if the button is representing a form action.
+     * This method is implemented only for interactive buttons.
      */
     formData?: IDict;
-}> & Omit<IButtonBaseContext<Context>, "context">;
+} & Context;

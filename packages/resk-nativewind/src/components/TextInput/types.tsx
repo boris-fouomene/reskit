@@ -453,7 +453,7 @@ export interface ITextInputRenderOptions extends TextInputProps {
  *
  * @public
  */
-export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInputProps>, 'onChange' | 'defaultValue' | "label" | "ref">, Omit<IFieldBase, "type" | "value" | "label"> {
+export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInputProps>, 'onChange' | 'defaultValue' | "label" | "ref" | "className">, Omit<IFieldBase, "type" | "value" | "label"> {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 
@@ -462,6 +462,11 @@ export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInput
      * @default "text"
      */
     type?: ITextInputType;
+
+    /**
+     * The text input class name
+     */
+    className?: IClassName;
 
     /***
         Whether the input is required or not

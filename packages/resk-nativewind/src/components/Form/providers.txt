@@ -1,0 +1,53 @@
+class FormDialogProvider extends createProvider<IFormDialogProps, DialogControlled>(DialogControlled, { isProvider: true, dismissable: false }, (options) => {
+    const { data, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = options;
+    //rest.dismissable = typeof rest.dismissable == "boolean" ? rest.dismissable : false;
+    rest.children = <Form withScrollView={false} responsive={false} name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+    return rest;
+}) { }
+
+
+
+class FormDrawerProvider extends createProvider<IFormDrawerProps & IDrawerProps, Drawer>(Drawer, { permanent: false }, (options) => {
+    const { data, withScrollView, scrollViewProps, fields, onSubmit, beforeSubmit, onValidate, onNoValidate, formName, formProps, ...rest } = options;
+    rest.children = <Form withScrollView={withScrollView} scrollViewProps={scrollViewProps} name={formName} data={data} fields={fields} onSubmit={onSubmit} beforeSubmit={beforeSubmit} onValidate={onValidate} onNoValidate={onNoValidate} {...formProps} />;
+    return rest;
+}) { }
+
+
+interface IFormProviderProps {
+    data?: IFormProps["data"];
+    withScrollView?: IFormProps["withScrollView"];
+    scrollViewProps?: IFormProps["scrollViewProps"];
+    fields?: IFormProps["fields"];
+    onSubmit?: IFormProps["onSubmit"];
+    beforeSubmit?: IFormProps["beforeSubmit"];
+    onValidate?: IFormProps["onValidate"];
+    onNoValidate?: IFormProps["onNoValidate"];
+    formName?: IFormProps["name"];
+    formProps?: Omit<IFormProps, 'data' | 'fields' | 'onSubmit' | 'beforeSubmit' | 'onValidate' | 'onNoValidate' | 'name'>;
+}
+
+/**
+ * Props for the `FormDialog` component.
+ *
+ * This interface extends `IDialogControlledProps` and includes all properties
+ * from `IFormProps` except those that overlap with `ViewProps`.
+ *
+ * @extends IDialogControlledProps
+ * @extends IFormProviderProps
+ * @template IFormProps - The base form properties.
+ * @template ViewProps - The view properties to omit from `IFormProps`.
+ * @see {@link IDialogControlledProps} for more information about dialog controlled props.
+ * @see {@link IFormProps} for more information about the base form properties.
+ * @see {@link ViewProps} for more information about the view properties.
+ */
+export interface IFormDialogProps extends IDialogControlledProps, IFormProviderProps { }
+
+
+/**
+ * Props for the `FormDrawer` component, combining properties from `IDrawerProps` and `IFormProviderProps`.
+ *
+ * @extends IDrawerProps - Properties related to the drawer functionality.
+ * @extends IFormProviderProps - Properties related to the form provider functionality.
+ */
+export interface IFormDrawerProps extends IDrawerProps, IFormProviderProps { }

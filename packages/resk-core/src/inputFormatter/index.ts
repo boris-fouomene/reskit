@@ -21,10 +21,8 @@ const DIGIT_REGEX = /\d/;
 const LETTER_REGEX = /[a-zA-Z]/;
 
 export * from "./types";
-/***
-    InputFormatter class is used to format the value to the desired format
-*/
-export default class InputFormatter {
+
+export class InputFormatter {
   /**
    * @description
    * Formats a value according to the provided options defined in the IInputFormatterOptions interface.
@@ -158,7 +156,7 @@ export default class InputFormatter {
       if (countryCallingCode !== 0) {
         return countryCallingCode.toString();
       }
-    } catch (error) { }
+    } catch (error) {}
     return "";
   }
   /**
@@ -485,7 +483,7 @@ export default class InputFormatter {
           // Check if the parsed date matches the input exactly
           // This ensures that the input is not only valid but also logically correct
           return date.isValid() && date.format(momentDateFormat) === value;
-        } catch (e) { }
+        } catch (e) {}
         return false;
       },
     };
@@ -781,7 +779,7 @@ export default class InputFormatter {
         // Get dial code
         return parsedNumber.getCountryCode() + "";
       }
-    } catch (e) { }
+    } catch (e) {}
     return "";
   }
 
@@ -873,7 +871,7 @@ function handleMaskAtIndex({ maskChar, valueChar, nonRegexReplacedChars, obfusca
           });
         }
       }
-    } catch (e) { }
+    } catch (e) {}
   } else if (isNonNullString(maskChar)) {
     // it's a fixed maskChar: add to maskedResult and advance on mask index
     masked = maskChar;
@@ -913,7 +911,7 @@ function genPhoneNumberMask(parsedNumber: PhoneNumber | null, format?: PhoneNumb
         };
       }
     }
-  } catch (error) { }
+  } catch (error) {}
   return {
     mask: [],
     validate: () => false,

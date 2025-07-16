@@ -1,5 +1,5 @@
 import { isNonNullString, isValidEmail } from "@resk/core/utils";
-import InputFormatter from "@resk/core/inputFormatter";
+import { InputFormatter } from "@resk/core/inputFormatter";
 /**
  * Sanitizes and formats a given href string.
  *

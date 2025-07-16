@@ -40,9 +40,9 @@ import { ICountryCode } from "@countries/types";
  * console.log(formattedValue); // Outputs: "$1,234.56" or similar, depending on the format
  * ```
  */
-export interface IInputFormatterOptions {
-  value?: any; // The value to be formatted
-  type?: any; // The expected type of the value
+export interface IInputFormatterOptions<InputType = any, ValueType = any> {
+  value?: ValueType; // The value to be formatted
+  type?: InputType; // The expected type of the value
   /**
    * This function is used by default to format the parsed or custom value.
    * In an input field, that function or a string used to format the value displayed in the input field.

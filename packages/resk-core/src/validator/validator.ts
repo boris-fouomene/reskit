@@ -4,14 +4,13 @@ import { i18n } from "../i18n";
 import { IClassConstructor, IDict } from "@/types";
 import { createPropertyDecorator, getDecoratedProperties } from "@/resources/decorators";
 
-
 const validatorTargetRulesMetaKey = Symbol("validatorIsMetaData");
 const validatorValidateTargetOptionsMetaKey = Symbol("validatorValidateTargetOptions");
 
 /**
  * @class Validator
  * A class that provides methods for validating elements based on defined rules.
- * 
+ *
  * The `Validator` class allows you to define validation rules, sanitize them,
  * and validate values against those rules. It supports both synchronous and asynchronous
  * validation, making it flexible for various use cases.
@@ -26,57 +25,41 @@ export class Validator {
    * @param name The name of the rule.
    * @param handler The validation function.
    */
-  static registerRule<ParamType extends Array<any> = Array<any>>(name: IValidatorRuleName, handler: IValidatorRuleFunction<ParamType>): void {
+  static registerRule<ParamType extends Array<any> = Array<any>, Context = unknown>(name: IValidatorRuleName, handler: IValidatorRuleFunction<ParamType, Context>): void {
     const rules = Validator.getRules();
     if (typeof handler == "function") {
-      (rules as any)[name] = handler as IValidatorRuleFunction<ParamType>;
+      (rules as any)[name] = handler as IValidatorRuleFunction<ParamType, Context>;
     }
     Reflect.defineMetadata(Validator.RULES_METADATA_KEY, rules, Validator);
   }
   /**
    * A static getter that returns a record of validation rules.
-   * 
+   *
    * @returns {IValidatorRuleMap} An object containing validation rules.
    */
   static getRules(): IValidatorRuleMap {
     const rules = Reflect.getMetadata(Validator.RULES_METADATA_KEY, Validator);
-    return isObj(rules) ? rules : {} as IValidatorRuleMap;
+    return isObj(rules) ? rules : ({} as IValidatorRuleMap);
   }
   /***
    * returns the separators for the validation errors.
    * @returns {IDict} the separators for the validation errors.
    */
-  static get separators(): { multiple: string, single: string } {
-    const translatedSeparator: IDict = (Object.assign({}, i18n.getNestedTranslation("validator.separators")) as IDict);
+  static get separators(): { multiple: string; single: string } {
+    const translatedSeparator: IDict = Object.assign({}, i18n.getNestedTranslation("validator.separators")) as IDict;
     return {
       multiple: defaultStr(translatedSeparator.multiple, ", "),
       single: defaultStr(translatedSeparator.single, ", "),
-    }
+    };
   }
 
-  /**
-   * Retrieves a validation rule by its name.
-   * 
-   * @param {IValidatorRuleName} rulesName - The name of the validation rule to retrieve.
-   * @returns {IValidatorRuleFunction | undefined} The validation rule if found, otherwise undefined.
-   */
-  static getRule<ParamType extends Array<any> = Array<any>>(rulesName: IValidatorRuleName): IValidatorRuleFunction<ParamType> | undefined {
+  static getRule<ParamType extends Array<any> = Array<any>, Context = unknown>(rulesName: IValidatorRuleName): IValidatorRuleFunction<ParamType, Context> | undefined {
     if (!isNonNullString(rulesName)) return undefined;
     const rules = Validator.getRules();
-    return rules[rulesName] as IValidatorRuleFunction<ParamType> | undefined;
+    return rules[rulesName] as IValidatorRuleFunction<ParamType, Context> | undefined;
   }
-  /**
-   * Sanitizes a set of validation rules and returns an array of rules.
-   * 
-   * This method takes a list of validation rules, which can be in various formats,
-   * and returns an array of sanitized rules ready for validation.
-   * 
-   * @param {IValidatorValidateOptions["rules"]} rules - The list of validation rules. The rules can be:
-   * - An array of rules (e.g., ["required", "minLength[2]", "maxLength[10]"]).
-   * 
-   * @returns {{sanitizedRules:IValidatorSanitizedRules,invalidRules:IValidatorRule[]}}
-   */
-  static sanitizeRules(rules?: IValidatorValidateOptions["rules"]): { sanitizedRules: IValidatorSanitizedRules, invalidRules: IValidatorRule[] } {
+
+  static sanitizeRules(rules?: IValidatorValidateOptions["rules"]): { sanitizedRules: IValidatorSanitizedRules; invalidRules: IValidatorRule[] } {
     const result: IValidatorSanitizedRules = [];
     const allRules = this.getRules();
     const invalidRules: IValidatorRule[] = [];
@@ -99,7 +82,7 @@ export class Validator {
             ruleName: ruleName as unknown as IValidatorRuleName,
             params: ruleParams,
             ruleFunction: allRules[ruleName as IValidatorRuleName] as IValidatorRuleFunction,
-            rawRuleName: String(rule)
+            rawRuleName: String(rule),
           });
         } else {
           invalidRules.push(rule);
@@ -115,7 +98,7 @@ export class Validator {
                 ruleName: key as unknown as IValidatorRuleName,
                 params: Array.isArray(rulesParams) ? rulesParams : [],
                 ruleFunction: ruleFunction,
-                rawRuleName: String(key)
+                rawRuleName: String(key),
               });
             } else {
               invalidRules.push(key as IValidatorRule);
@@ -127,37 +110,11 @@ export class Validator {
     return { sanitizedRules: result, invalidRules };
   }
 
-  /**
-   * Validates a value against the specified validation rules.
-   * 
-   * This method takes a value and a set of validation rules, and performs validation.
-   * It returns a promise that resolves if the validation passes, or rejects with an error
-   * message if the validation fails.
-   * 
-   * @param {IValidatorValidateOptions} options - The options for validation, including:
-   * - `value`: The value to validate.
-   * - `rules`: An array of validation rules to apply.
-   * - `...extra`: Any additional options that may be applied.
-   * 
-   * @returns {Promise<any>} A promise that resolves with the validation result or rejects with an error.
-   * 
-   * ### Example:
-   * ```typescript
-   * Validator.validate({
-   *     rules: "minLength[5]|maxLength[10]",
-   *     value: "test",
-   * }).then(result => {
-   *     console.log("Validation passed:", result);
-   * }).catch(error => {
-   *     console.error("Validation failed:", error);
-   * });
-   * ```
-   */
-  static validate({ rules, value, ...extra }: IValidatorValidateOptions): Promise<IValidatorValidateOptions> {
+  static validate<Context = unknown>({ rules, value, ...extra }: IValidatorValidateOptions<Array<any>, Context>): Promise<IValidatorValidateOptions<Array<any>, Context>> {
     const { sanitizedRules, invalidRules } = Validator.sanitizeRules(rules);
     const separators = Validator.separators;
     if (invalidRules.length) {
-      const message = invalidRules.map(rule => i18n.t("validator.invalidRule", { rule: isNonNullString(rule) ? rule : "unamed rule" })).join(separators.multiple);
+      const message = invalidRules.map((rule) => i18n.t("validator.invalidRule", { rule: isNonNullString(rule) ? rule : "unamed rule" })).join(separators.multiple);
       return Promise.reject({ rules, value, ...extra, message });
     }
     if (!sanitizedRules.length) return Promise.resolve({ rules, value, ...extra });
@@ -180,7 +137,7 @@ export class Validator {
           let ruleName = undefined;
           let rawRuleName = undefined;
           let ruleParams: any[] = [];
-          let ruleFunc: IValidatorRule | undefined = typeof rule === "function" ? rule : undefined;
+          let ruleFunc: IValidatorRule<Array<any>, Context> | undefined = typeof rule === "function" ? rule : undefined;
           if (typeof rule === "object" && isObj(rule)) {
             ruleFunc = rule.ruleFunction;
             ruleParams = Array.isArray(rule.params) ? rule.params : [];
@@ -204,7 +161,7 @@ export class Validator {
             return reject({ ...valResult, message: i18n.t("validator.invalidRule", i18nRuleOptions) });
           }
           try {
-            const result = await ruleFunc({ ...extra, ruleName, rawRuleName, rules, ruleParams, value });
+            const result = await ruleFunc({ ...extra, ruleName, rawRuleName, rules, ruleParams, value } as any);
             return handleResult(result);
           } catch (e) {
             return handleResult(typeof e === "string" ? e : (e as any)?.message || e?.toString() || stringify(e));
@@ -215,7 +172,7 @@ export class Validator {
     });
   }
   /***
-   * Validate a target decorated using the ValidatorDecorator. 
+   * Validate a target decorated using the ValidatorDecorator.
    * @param {IClassConstructor} target - The target class.
    * @param {Partial<Record<keyof InstanceType<T>, any>>} data - The data to validate.
    * @param {IValidatorValidateTargetOptions} options - The options for validating the target.
@@ -225,61 +182,66 @@ export class Validator {
    * const validatedData = await Validator.validateTarget(MyClass, data);
    * console.log(validatedData);
    */
-  static validateTarget<T extends IClassConstructor = any>(target: T, data: Partial<Record<keyof InstanceType<T>, any>>, options?: {
-    errorMessageBuilder?: (
-      translatedPropertyName: string,
-      error: string,
-      builderOptions: {
-        propertyName: string,
+  static validateTarget<T extends IClassConstructor = any, Context = unknown>(
+    target: T,
+    data: Partial<Record<keyof InstanceType<T>, any>>,
+    options?: {
+      errorMessageBuilder?: (
         translatedPropertyName: string,
-        message: string,
-        ruleName: string,
-        ruleParams: any[],
-        value: any,
-        separators: {
-          multiple: string,
-          single: string,
+        error: string,
+        builderOptions: {
+          propertyName: string;
+          translatedPropertyName: string;
+          message: string;
+          ruleName: string;
+          ruleParams: any[];
+          value: any;
+          separators: {
+            multiple: string;
+            single: string;
+          };
+          data: Partial<Record<keyof InstanceType<T>, any>>;
         }
-        data: Partial<Record<keyof InstanceType<T>, any>>,
-      },
-    ) => string
-  }
+      ) => string;
+    }
   ): Promise<{ data: Partial<Record<keyof InstanceType<T>, any>> }> {
     const rulesObject = Validator.getTargetRules<T>(target);
     const separators = Validator.separators;
     options = extendObj({}, Validator.getValidateTargetOptions(target), options);
     data = Object.assign({}, data);
-    const errorMessageBuilder = typeof options?.errorMessageBuilder === 'function' ? options.errorMessageBuilder : (translatedPropertyName: string, error: string) => `[${String(translatedPropertyName)}] : ${error}`;
-    const errors: { fieldName: string, propertyName: string, message: string }[] = [];
+    const errorMessageBuilder = typeof options?.errorMessageBuilder === "function" ? options.errorMessageBuilder : (translatedPropertyName: string, error: string) => `[${String(translatedPropertyName)}] : ${error}`;
+    const errors: { fieldName: string; propertyName: string; message: string }[] = [];
     const promises: Promise<any>[] = [];
     let count = 0;
     //const errorsDetails: ({ translatedPropertyName: string, error: string, ruleName: string, ruleParams: any[], value: any, separators: { multiple: string, single: string, and: string, or: string }, data: Partial<Record<keyof InstanceType<T>, any>> })[] = [];
     const translatedKeys = i18n.translateTarget(target, { data });
     for (const i in rulesObject) {
-      const translatedPropertyName: string = (isNonNullString((translatedKeys as any)[i]) ? (translatedKeys as any)[i] : i);
-      promises.push(Validator.validate({ value: data[i], translatedPropertyName, fieldName: i, propertyName: i, rules: rulesObject[i] }).catch((error) => {
-        const errorField = stringify(defaultVal(error?.message, error));
-        //errorsDetails.push(error);
-        count++;
-        const message = errorMessageBuilder(translatedPropertyName, errorField, {
-          ...Object.assign({}, error),
-          separators,
-          data,
-          propertyName: i,
-          translatedPropertyName: translatedPropertyName,
-        });
-        errors.push({
-          fieldName: i,
-          propertyName: i,
-          message: message,
-        });
-      }));
+      const translatedPropertyName: string = isNonNullString((translatedKeys as any)[i]) ? (translatedKeys as any)[i] : i;
+      promises.push(
+        Validator.validate<Context>({ value: data[i], translatedPropertyName, fieldName: i, propertyName: i, rules: rulesObject[i] }).catch((error) => {
+          const errorField = stringify(defaultVal(error?.message, error));
+          //errorsDetails.push(error);
+          count++;
+          const message = errorMessageBuilder(translatedPropertyName, errorField, {
+            ...Object.assign({}, error),
+            separators,
+            data,
+            propertyName: i,
+            translatedPropertyName: translatedPropertyName,
+          });
+          errors.push({
+            fieldName: i,
+            propertyName: i,
+            message: message,
+          });
+        })
+      );
     }
     return new Promise<{ data: Partial<Record<keyof InstanceType<T>, any>> }>((resolve, reject) => {
       return Promise.all(promises).then(() => {
         const success = !errors.length;
         if (success) {
-          resolve({ data })
+          resolve({ data });
         } else {
           reject({
             //rulesByField: rulesObject,
@@ -289,9 +251,9 @@ export class Validator {
             errors,
             success,
             //errorsDetails,
-          })
+          });
         }
-      })
+      });
     });
   }
   static getTargetRules<T extends IClassConstructor = any>(target: T): Record<keyof InstanceType<T>, IValidatorRule[]> {
@@ -305,10 +267,10 @@ export class Validator {
       const validatorDynamicFunction: IValidatorRuleFunction<RuleParamsType> = function (options) {
         const validationOptions: IValidatorValidateOptions<RuleParamsType> = Object.assign({}, options);
         validationOptions.ruleParams = (Array.isArray(params) ? params : [params]) as RuleParamsType;
-        return ruleFunction(validationOptions)
-      }
+        return ruleFunction(validationOptions);
+      };
       return Validator.createPropertyDecorator<RuleParamsType>(validatorDynamicFunction);
-    }
+    };
   }
   static createPropertyDecorator<RuleParamsType extends Array<any> = Array<any>>(rule: IValidatorRule<RuleParamsType> | IValidatorRule<RuleParamsType>[]): PropertyDecorator {
     return createPropertyDecorator<IValidatorRule<RuleParamsType>[]>(validatorTargetRulesMetaKey, (oldRules) => {
@@ -327,5 +289,5 @@ export const ValidatorIsNonNullString = Validator.createPropertyDecorator("nonNu
 export function ValidatorValidateTargetOptions(options: Parameters<typeof Validator.validateTarget>[2]): ClassDecorator {
   return function (target: Function) {
     Reflect.defineMetadata(validatorValidateTargetOptionsMetaKey, options, target);
-  }
+  };
 }

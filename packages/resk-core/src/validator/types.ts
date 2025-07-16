@@ -1,71 +1,6 @@
-/**
- * @interface IValidatorRule
- * Represents a validation  rule that can be used within the validation system.
- * This type can either be a function that implements custom validation logic or a string
- * that specifies a predefined validation rule or a dictionary where the key is the rule name and the value is the parameters.
- *
- * A validation rule can be one of the following:
- *
- * - A string: For example, `"minLength[1]|required"` specifies multiple rules to apply for validation,
- *   where the `|` character separates different rules.
- *
- * - A function: A function that takes an object with the value to validate and returns either:
- *   - A boolean indicating success (`true`) or failure (`false`).
- *   - A string containing an error message if the validation fails.
- *   - An exception can also be thrown if the validation is not effective.
- *   Example:
- *   ```typescript
- *   ({ value }) => {
- *       return value?.includes("a") || "This field is invalid";
- *   }
- *   ```
- *
- * - An array of validation rules: This can include a mix of strings and functions.
- *   Example:
- *   ```typescript
- *   [
- *       "required",
- *       "maxLength[50]",
- *       "minLength[10]",
- *       ({ value }) => boolean | string | Promise<IValidatorResult>,
- *
- *   ]
- *   ```
- *
- * @template ParamType The type of the parameters that the rule function accepts.
- * ### Examples:
- *
- * - Multiple rules defined as a string:
- *   ```typescript
- *   const rule: IValidatorRule = "required|minLength[2]|maxLength[10]";
- *   ```
- *
- * - A validation rule defined as a function:
- *   ```typescript
- *   const rule: IValidatorRule = ({ value }) => {
- *       return value?.length === 2 || "This field must have exactly two characters";
- *   };
- *   ```
- *
- * - An array of rules:
- *   ```typescript
- *   const rules: IValidatorRule = [
- *       "required",
- *       "minLength[2]",
- *       "maxLength[10]",
- *       { minLength: [2] },
- *       { maxLength: [10] },
- *       ({ value }) => value?.length === 2 || "This field must have exactly two characters"
- *   ];
- *   ```
- *
- * Note: When a function is used as a validation rule, it can either return a string specifying the error message,
- * or it can throw an exception of type string or return an object of the form `{ message: string }`.
- */
-
 import { IInputFormatterResult } from "@/inputFormatter/types";
 
-export type IValidatorRule<ParamType extends Array<any> = Array<any>> = IValidatorRuleFunction<ParamType> | IValidatorRuleName | `${IValidatorRuleName}[${string}]` | Record<IValidatorRuleName, ParamType>;
+export type IValidatorRule<ParamType extends Array<any> = Array<any>, Context = unknown> = IValidatorRuleFunction<ParamType, Context> | IValidatorRuleName | `${IValidatorRuleName}[${string}]` | Record<IValidatorRuleName, ParamType>;
 
 /**
  * @typedef IValidatorSanitizedRule
@@ -88,8 +23,8 @@ export type IValidatorRule<ParamType extends Array<any> = Array<any>> = IValidat
  *     ruleFunction: minLengthRule,
  * };
  */
-export type IValidatorSanitizedRule =
-  | IValidatorRuleFunction
+export type IValidatorSanitizedRule<ParamType extends Array<any> = Array<any>, Context = unknown> =
+  | IValidatorRuleFunction<ParamType, Context>
   | {
       /**
        * The name of the validation rule.
@@ -109,11 +44,11 @@ export type IValidatorSanitizedRule =
        * This array contains the values that are necessary for the rule's
        * execution, such as minimum or maximum lengths, or other criteria.
        *
-       * @type {Array<any>}
+       * @type {ParamType}
        * @example
        * const params = sanitizedRule.params; // [5]
        */
-      params: Array<any>;
+      params: ParamType;
 
       /**
        * The function that implements the validation logic.
@@ -125,7 +60,7 @@ export type IValidatorSanitizedRule =
        * @example
        * const ruleFunction = ``sanitizedRule``.ruleFunction; // Function reference
        */
-      ruleFunction: IValidatorRuleFunction;
+      ruleFunction: IValidatorRuleFunction<ParamType, Context>;
 
       /***
        * The rule with parameters.
@@ -206,7 +141,7 @@ export type IValidatorSanitizedRules = IValidatorSanitizedRule[];
  * - This type is essential for defining custom validation logic in forms, allowing developers to create reusable and flexible validation rules.
  * - The function can be synchronous or asynchronous, depending on the validation logic implemented.
  */
-export type IValidatorRuleFunction<ParamType extends Array<any> = Array<any>> = (options: IValidatorValidateOptions<ParamType>) => IValidatorResult;
+export type IValidatorRuleFunction<ParamType extends Array<any> = Array<any>, Context = unknown> = (options: IValidatorValidateOptions<ParamType, Context>) => IValidatorResult;
 
 /**
  * @interface IValidatorRuleName
@@ -785,8 +720,9 @@ export type IValidatorResult = Promise<boolean | string> | string | boolean;
  *
  *
  * @template ParamType The type of the parameters that the rule function accepts.
+ * @template Context The type of the context that the rule function accepts.
  */
-export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<any>> extends Partial<IInputFormatterResult> {
+export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<any>, Context = unknown> extends Partial<IInputFormatterResult> {
   /**
    * The list of validation rules to apply that have been passed through the `Validator.validate` method.
    *
@@ -818,7 +754,7 @@ export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<
    * };
    * ```
    */
-  rule?: IValidatorRule;
+  rule?: IValidatorRule<ParamType, Context>;
 
   /**
    * The value to use for performing the validation.
@@ -905,4 +841,6 @@ export interface IValidatorValidateOptions<ParamType extends Array<any> = Array<
    * It is used to provide a clearer error message for the property.
    */
   translatedPropertyName?: string;
+
+  context?: Context;
 }

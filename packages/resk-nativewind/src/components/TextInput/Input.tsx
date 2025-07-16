@@ -3,7 +3,7 @@ import { cn, isValidElement, useHydrationStatus, useMergeRefs } from "@utils";
 import { Text } from "@html/Text";
 import { NativeSyntheticEvent, TextInput as RNTextInput, StyleSheet, TextInputChangeEventData, TextInputFocusEventData, TextInputKeyPressEventData } from 'react-native';
 import { useEffect, useMemo, useRef, useState } from "react";
-import InputFormatter from "@resk/core/inputFormatter";
+import { InputFormatter } from "@resk/core/inputFormatter";
 import { IInputFormatterMaskResult, IInputFormatterOptions, IInputFormatterResult } from "@resk/core/inputFormatter";
 import { ICountryCode } from "@resk/core/countries";
 import { isNumber, isNonNullString, isStringNumber, isEmpty, defaultStr, defaultBool, DateHelper } from "@resk/core/utils";

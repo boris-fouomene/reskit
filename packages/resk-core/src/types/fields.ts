@@ -2,7 +2,7 @@ import { IAuthPerm } from "@/auth/types";
 import { IResourceActionTupleObject } from "./resources";
 import { IInputFormatterOptions } from "../inputFormatter/types";
 
-export interface IFieldBase<FieldType extends IFieldType = IFieldType> extends Partial<IResourceActionTupleObject>, Omit<IInputFormatterOptions, "value" | "type"> {
+export interface IFieldBase<FieldType extends IFieldType = IFieldType, ValueType = any> extends Partial<IResourceActionTupleObject>, Omit<IInputFormatterOptions<FieldType, ValueType>, "value" | "type"> {
   /**
    * The type of the field.
    *
@@ -119,6 +119,11 @@ export interface IFieldBase<FieldType extends IFieldType = IFieldType> extends P
    * The permission associated with the field. This permission is used to determine if the field will be rendered or not.
    */
   perm?: IAuthPerm;
+
+  /**
+   * The default value of the field.
+   */
+  defaultValue?: ValueType;
 }
 // Mapped type that ensures all values in IFieldMap extend IFieldBase
 export interface IFieldMap {}
@@ -131,14 +136,13 @@ export interface IFieldActionsMap {
   filter: string;
 }
 
-export type IField<T extends IFieldType = IFieldType> =
-  IFieldMap[T] extends IFieldBase<T>
-    ? IFieldMap[T] & {
+type IFieldFromMap<T extends IFieldType = IFieldType> = IFieldType extends never ? IFieldBase<never> : IFieldMap[T] extends IFieldBase<T> ? IFieldMap[T] : never;
+export type IField<T extends IFieldType = IFieldType, ValueType = any> =
+  IFieldFromMap<T> extends never
+    ? never
+    : IFieldFromMap<T> & {
         [key in keyof IFieldActionsMap]?: Partial<IFieldMap[IFieldType]>;
-      }
-    : keyof IFieldMap extends never
-      ? IFieldBase<T>
-      : never;
+      };
 
 export type IFields = Record<string, IField>;
 

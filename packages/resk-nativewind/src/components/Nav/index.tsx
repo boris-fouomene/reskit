@@ -14,8 +14,8 @@ import { Expandable } from "@components/Expandable";
 
 export class Nav {
     static readonly linkMetaData = Symbol("link-meta-data");
-    static attachLinkComponent(component: INavLinkComponent) {
-        if (isValidLinkComponent(component)) {
+    static attachLinkComponent<Props extends INavLinkProps = INavLinkProps,State = unknown>(component: INavLinkComponent<Props,State>) {
+        if (isValidLinkComponent(component as any)) {
             Reflect.defineMetadata(Nav.linkMetaData, component, Nav);
         }
     }
@@ -148,8 +148,8 @@ export * from "./hooks";
  * @since 1.0.0
  * @public
  */
-export function AttachLinkComponent() {
-    return function (target: INavLinkComponent) {
+export function AttachLinkComponent<Props extends INavLinkProps = INavLinkProps,State = unknown>() {
+    return function (target: INavLinkComponent<Props,State>) {
         Nav.attachLinkComponent(target);
     };
 }

@@ -161,4 +161,4 @@ export interface INavLinkProps {
     testID?: string;
 }
 
-export type INavLinkComponent<NavState = unknown> = IReactComponent<INavLinkProps, NavState>;
+export type INavLinkComponent<Props extends INavLinkProps = INavLinkProps,State = unknown> = IReactComponent<Props, State>;

@@ -1,5 +1,5 @@
 import { ICurrencyFormatterKey } from "@/currency/types";
-import { IMomentFormat } from "../types/date";
+import { IDateFormat } from "../types/date";
 import { ICountryCode } from "@countries/types";
 
 /**
@@ -56,7 +56,7 @@ export interface IInputFormatterOptions {
   /***
    * Format for date types
    */
-  dateFormat?: IMomentFormat;
+  dateFormat?: IDateFormat;
   /***
    * The phone country code, in case of formatting a phone number, type="tel"
    */
@@ -352,7 +352,7 @@ export interface IInputFormatterResult extends IInputFormatterOptions, Partial<I
   /****
     there dateFormat used to format the value
   */
-  dateFormat?: IMomentFormat;
+  dateFormat?: IDateFormat;
   /***
    * The dial code of the phone number in case of formatting a phone number
    */

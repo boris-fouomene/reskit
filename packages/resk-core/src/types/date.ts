@@ -1,11 +1,11 @@
 /**
- * @type IMomentFormat
+ * @type IDateFormat
  * @description
  * A comprehensive type representing all valid Moment.js format strings.
  * This type serves as a unified reference for various date/time formatting options,
  * accommodating various combinations of date, time, and day of the week components.
  * ### Supported Tokens:
- *  monts : 
+ *  monts :
  *   M : Month number, without leading zeros (1-12).
  * - **`'MM'`**: 2-digit month (e.g., `10` for October).
  * - **`'MMM'`**: Abbreviated month name (e.g., `Oct` for October).
@@ -35,10 +35,10 @@
  * - **`'ss'`**: 2-digit seconds (e.g., `00` to `59`).
  * - **`'S'`**: Milliseconds (e.g., `0` to `999`).
  * - **`'SS'`**: 3-digit milliseconds (e.g., `00` to `999`).
- * - **`'SSS'`**: 4-digit milliseconds (e.g., `000` to `9999`). 
+ * - **`'SSS'`**: 4-digit milliseconds (e.g., `000` to `9999`).
  * - Q : Quarter of the year (1-4) : 1 2 3 4.
  * - Qo : Quarter of the year (1-4) : 1st 2nd 3rd 4th.
- * 
-   * @see https://momentjs.com/docs/#/displaying/format for more information about the supported tokens.
+ *
+ * @see https://momentjs.com/docs/#/displaying/format for more information about the supported tokens.
  */
-export type IMomentFormat = string;
+export type IDateFormat = string;

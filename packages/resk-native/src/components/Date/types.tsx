@@ -1,6 +1,6 @@
 import { IModalProps } from "@components/Modal";
 import { ISurfaceProps } from "@components/Surface";
-import { IMomentFormat } from "@resk/core/types";
+import { IDateFormat } from "@resk/core/types";
 import { I18n } from "@resk/core/i18n";
 import useStateCallback from "@utils/stateCallback";
 import { Moment } from "moment";
@@ -47,9 +47,9 @@ export interface ICalendarBaseProps extends Omit<ISurfaceProps, "ref"> {
      * The format of the date to be displayed in the calendar.
      * @default DEFAULT_DATE_FORMATS.date
      * @example
-     * const dateFormat: IMomentFormat = 'YYYY-MM-DD';
+     * const dateFormat: IDateFormat = 'YYYY-MM-DD';
      */
-    dateFormat?: IMomentFormat;
+    dateFormat?: IDateFormat;
 
     /**
      * The test ID for the calendar component.

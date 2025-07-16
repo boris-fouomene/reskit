@@ -1,5 +1,5 @@
-import 'reflect-metadata'
-import { IClassConstructor, IField, IFieldBase, IFieldType } from '../../types';
+import "reflect-metadata";
+import { IClassConstructor, IField, IFieldBase, IFieldType } from "../../types";
 export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
 
 /**
@@ -31,35 +31,13 @@ export const fieldsMetaData = Symbol("fieldsResourcesMetadata");
  * ```
  */
 export function Field<T extends IFieldType = IFieldType>(options: IField<T>): PropertyDecorator {
-  /**
-   * Returns a decorator function that sets metadata on the target property.
-   */
   return function (target: any, propertyKey: string | symbol) {
-    /**
-     * Get existing fields metadata or initialize an empty object.
-     */
     const fields = Object.assign({}, Reflect.getMetadata(fieldsMetaData, target) || {});
-
-    /**
-     * Retrieve the type of the property from metadata.
-     */
-    const reflecType = String(Reflect.getMetadata('design:type', target, propertyKey)?.name).toLowerCase();
-
-    /**
-     * Assign a default type if none is specified and the type is primitive.
-     */
-    if ((options as Record<string, any>).label === undefined) {
-      (options as Record<string, any>).type = ['string', 'number', 'boolean', 'date'].includes(reflecType) ? reflecType : "text";
+    const reflecType = String(Reflect.getMetadata("design:type", target, propertyKey)?.name).toLowerCase();
+    if ((options as any).type === undefined) {
+      (options as any).type = ["string", "number", "boolean", "date"].includes(reflecType) ? reflecType : "text";
     }
-
-    /**
-     * Store the options in the fields object using propertyKey as the key.
-     */
-    fields[propertyKey] = { name: propertyKey, ...Object.assign({}, options) as IFieldBase };
-
-    /**
-     * Define the updated metadata on the target constructor.
-     */
+    fields[propertyKey] = { name: propertyKey, ...(Object.assign({}, options) as IFieldBase) };
     Reflect.defineMetadata(fieldsMetaData, fields, target);
   };
 }
@@ -80,16 +58,8 @@ export function Field<T extends IFieldType = IFieldType>(options: IField<T>): Pr
  * console.log(fields); // Output: { myField: { name: 'myField', type: 'string' } }
  * ```
  */
-export function getFieldsFromTarget(target: IClassConstructor): Record<string, ({ name: string } & IField)> {
-  /**
-   * Use Reflect.getMetadata to retrieve the metadata stored under the fieldsMetaData key.
-   * If no metadata is found, it will return undefined.
-   */
+export function getFieldsFromTarget(target: IClassConstructor): Record<string, { name: string } & IField> {
   const fields = Reflect.getMetadata(fieldsMetaData, target.prototype);
-  /**
-   * Merge the retrieved metadata into a new object using Object.assign.
-   * This creates a new object that contains the fields metadata, effectively cloning it.
-   */
   return Object.assign({}, fields);
 }
 
@@ -98,15 +68,7 @@ export function getFieldsFromTarget(target: IClassConstructor): Record<string, (
  * @param {T} instance - The instance of the class from which to retrieve the metadata.
  * @returns {Record<string, ({ name: string } & IField)>} An object mapping property names to their corresponding metadata, which includes the type and other options.
  */
-export function getFields<T extends IClassConstructor = any>(instance: InstanceType<T>): Record<string, ({ name: string } & IField)> {
-  /**
-   * Use Reflect.getMetadata to retrieve the metadata stored under the fieldsMetaData key.
-   * If no metadata is found, it will return undefined.
-   */
-  const fields = Reflect.getMetadata(fieldsMetaData, instance.constructor);;
-  /**
-   * Merge the retrieved metadata into a new object using Object.assign.
-   * This creates a new object that contains the fields metadata, effectively cloning it.
-   */
+export function getFields<T extends IClassConstructor = any>(instance: InstanceType<T>): Record<string, { name: string } & IField> {
+  const fields = Reflect.getMetadata(fieldsMetaData, instance.constructor);
   return Object.assign({}, fields);
 }

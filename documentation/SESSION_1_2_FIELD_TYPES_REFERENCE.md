@@ -11,18 +11,18 @@ Reskit's field system is built on a flexible, extensible architecture that provi
 ```typescript
 // Core field architecture
 export interface IFieldBase<FieldType extends IFieldType = IFieldType> {
-  type: FieldType;                    // Field type (string, number, etc.)
-  name?: string;                      // Field identifier
-  label?: string;                     // Display label
-  required?: boolean;                 // Validation: required field
-  unique?: boolean;                   // Database: unique constraint
-  readOnly?: boolean;                 // UI: read-only display
-  disabled?: boolean;                 // UI: disabled state
-  visible?: boolean;                  // UI: visibility control
-  primaryKey?: boolean;               // Database: primary key
-  minLength?: number;                 // Validation: minimum length
-  maxLength?: number;                 // Validation: maximum length
-  length?: number;                    // Validation: exact length
+  type: FieldType; // Field type (string, number, etc.)
+  name?: string; // Field identifier
+  label?: string; // Display label
+  required?: boolean; // Validation: required field
+  unique?: boolean; // Database: unique constraint
+  readOnly?: boolean; // UI: read-only display
+  disabled?: boolean; // UI: disabled state
+  visible?: boolean; // UI: visibility control
+  primaryKey?: boolean; // Database: primary key
+  minLength?: number; // Validation: minimum length
+  maxLength?: number; // Validation: maximum length
+  length?: number; // Validation: exact length
   // ... 20+ additional properties
 }
 ```
@@ -36,55 +36,58 @@ export interface IFieldBase<FieldType extends IFieldType = IFieldType> {
 The most basic field type for string inputs.
 
 #### **Configuration Options:**
+
 ```typescript
 interface ITextFieldOptions extends IFieldBase<"text"> {
-  minLength?: number;           // Minimum character length
-  maxLength?: number;           // Maximum character length
-  length?: number;              // Exact character length
-  placeholder?: string;         // Input placeholder text
-  multiline?: boolean;          // Multi-line text area
+  minLength?: number; // Minimum character length
+  maxLength?: number; // Maximum character length
+  length?: number; // Exact character length
+  placeholder?: string; // Input placeholder text
+  multiline?: boolean; // Multi-line text area
   format?: IInputFormatterValueFormat; // Text formatting
 }
 ```
 
 #### **Usage Examples:**
+
 ```typescript
-import { Resource, Field } from '@resk/core';
+import { Resource, Field } from "@resk/core";
 
 export class User extends Resource {
   // Basic text field
-  @Field({ type: 'text', required: true })
+  @Field({ type: "text", required: true })
   username: string;
-  
+
   // Text with length validation
-  @Field({ 
-    type: 'text', 
-    required: true, 
-    minLength: 2, 
+  @Field({
+    type: "text",
+    required: true,
+    minLength: 2,
     maxLength: 50,
-    label: 'First Name'
+    label: "First Name",
   })
   firstName: string;
-  
+
   // Multi-line text area
-  @Field({ 
-    type: 'text', 
-    multiline: true, 
+  @Field({
+    type: "text",
+    multiline: true,
     maxLength: 500,
-    placeholder: 'Enter your bio...'
+    placeholder: "Enter your bio...",
   })
   bio: string;
-  
+
   // Text with custom formatting
-  @Field({ 
-    type: 'text',
-    format: (options) => options.value?.toUpperCase()
+  @Field({
+    type: "text",
+    format: (options) => options.value?.toUpperCase(),
   })
   countryCode: string;
 }
 ```
 
 #### **Automatic Features:**
+
 - ✅ **Type Inference**: Automatically detects `string` properties
 - ✅ **Validation**: Length constraints, required validation
 - ✅ **UI Generation**: Text inputs, text areas for multiline
@@ -97,61 +100,64 @@ export class User extends Resource {
 Handles numeric inputs with extensive validation and formatting options.
 
 #### **Configuration Options:**
+
 ```typescript
 interface INumberFieldOptions extends IFieldBase<"number"> {
-  min?: number;                 // Minimum value
-  max?: number;                 // Maximum value
-  step?: number;                // Input step increment
-  precision?: number;           // Decimal precision
+  min?: number; // Minimum value
+  max?: number; // Maximum value
+  step?: number; // Input step increment
+  precision?: number; // Decimal precision
   format?: "number" | "money" | ICurrencyFormatterKey; // Number formatting
-  abreviateNumber?: boolean;    // Abbreviate large numbers (1K, 1M)
+  abreviateNumber?: boolean; // Abbreviate large numbers (1K, 1M)
 }
 ```
 
 #### **Usage Examples:**
+
 ```typescript
 export class Product extends Resource {
   // Basic number field
-  @Field({ type: 'number', required: true, min: 0 })
+  @Field({ type: "number", required: true, min: 0 })
   price: number;
-  
+
   // Integer with range
-  @Field({ 
-    type: 'number', 
-    min: 1, 
-    max: 100, 
+  @Field({
+    type: "number",
+    min: 1,
+    max: 100,
     step: 1,
-    label: 'Quantity'
+    label: "Quantity",
   })
   quantity: number;
-  
+
   // Decimal with precision
-  @Field({ 
-    type: 'number', 
-    min: 0, 
+  @Field({
+    type: "number",
+    min: 0,
     precision: 2,
-    format: 'money'
+    format: "money",
   })
   totalAmount: number;
-  
+
   // Large numbers with abbreviation
-  @Field({ 
-    type: 'number',
+  @Field({
+    type: "number",
     abreviateNumber: true,
-    format: 'number'
+    format: "number",
   })
   views: number; // Displays as "1.2K", "5.5M", etc.
-  
+
   // Currency-specific formatting
-  @Field({ 
-    type: 'number',
-    format: 'formatUSD' // Uses currency formatter
+  @Field({
+    type: "number",
+    format: "formatUSD", // Uses currency formatter
   })
   priceUSD: number;
 }
 ```
 
 #### **Built-in Validation:**
+
 - ✅ **Range Validation**: `min`, `max` constraints
 - ✅ **Step Validation**: Increment validation
 - ✅ **Type Validation**: Ensures numeric input
@@ -164,10 +170,12 @@ export class Product extends Resource {
 Handles true/false values with various UI representations.
 
 #### **Configuration Options:**
+
 ```typescript
 interface IBooleanFieldOptions extends IFieldBase<"boolean"> {
-  default?: boolean;            // Default value
-  labels?: {                   // Custom labels for true/false
+  default?: boolean; // Default value
+  labels?: {
+    // Custom labels for true/false
     true: string;
     false: string;
   };
@@ -175,34 +183,36 @@ interface IBooleanFieldOptions extends IFieldBase<"boolean"> {
 ```
 
 #### **Usage Examples:**
+
 ```typescript
 export class User extends Resource {
   // Basic boolean field
-  @Field({ type: 'boolean', default: false })
+  @Field({ type: "boolean", default: false })
   isActive: boolean;
-  
+
   // Boolean with custom labels
-  @Field({ 
-    type: 'boolean',
+  @Field({
+    type: "boolean",
     default: true,
     labels: {
-      true: 'Enabled',
-      false: 'Disabled'
-    }
+      true: "Enabled",
+      false: "Disabled",
+    },
   })
   emailNotifications: boolean;
-  
+
   // Required boolean (for agreements)
-  @Field({ 
-    type: 'boolean', 
+  @Field({
+    type: "boolean",
     required: true,
-    label: 'Accept Terms and Conditions'
+    label: "Accept Terms and Conditions",
   })
   acceptTerms: boolean;
 }
 ```
 
 #### **UI Representations:**
+
 - ✅ **Checkbox**: Standard checkbox input
 - ✅ **Switch**: Toggle switch component
 - ✅ **Radio Buttons**: Yes/No radio options
@@ -215,51 +225,54 @@ export class User extends Resource {
 Comprehensive date and time handling with formatting and validation.
 
 #### **Configuration Options:**
+
 ```typescript
 interface IDateFieldOptions extends IFieldBase<"date"> {
-  dateFormat?: IMomentFormat;   // Date display format
-  minDate?: Date | string;      // Minimum allowed date
-  maxDate?: Date | string;      // Maximum allowed date
-  includeTime?: boolean;        // Include time component
-  timezone?: string;            // Timezone handling
+  dateFormat?: IDateFormat; // Date display format
+  minDate?: Date | string; // Minimum allowed date
+  maxDate?: Date | string; // Maximum allowed date
+  includeTime?: boolean; // Include time component
+  timezone?: string; // Timezone handling
 }
 ```
 
 #### **Usage Examples:**
+
 ```typescript
 export class Event extends Resource {
   // Basic date field
-  @Field({ type: 'date', required: true })
+  @Field({ type: "date", required: true })
   eventDate: Date;
-  
+
   // Date with time
-  @Field({ 
-    type: 'date',
+  @Field({
+    type: "date",
     includeTime: true,
-    label: 'Event Start Time'
+    label: "Event Start Time",
   })
   startDateTime: Date;
-  
+
   // Date with range validation
-  @Field({ 
-    type: 'date',
+  @Field({
+    type: "date",
     minDate: new Date(),
     maxDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // +1 year
-    dateFormat: 'DD/MM/YYYY'
+    dateFormat: "DD/MM/YYYY",
   })
   registrationDeadline: Date;
-  
+
   // Auto-populated timestamps
-  @Field({ 
-    type: 'date',
+  @Field({
+    type: "date",
     readOnly: true,
-    default: () => new Date()
+    default: () => new Date(),
   })
   createdAt: Date;
 }
 ```
 
 #### **Format Options:**
+
 - ✅ **Standard Formats**: `DD/MM/YYYY`, `MM/DD/YYYY`, `YYYY-MM-DD`
 - ✅ **Time Formats**: `HH:mm`, `HH:mm:ss`, `hh:mm A`
 - ✅ **Relative Formats**: "2 days ago", "in 3 hours"
@@ -275,21 +288,21 @@ Specialized text field with email validation and formatting.
 
 ```typescript
 export class Contact extends Resource {
-  @Field({ 
-    type: 'email', 
+  @Field({
+    type: "email",
     required: true,
     unique: true,
-    label: 'Email Address'
+    label: "Email Address",
   })
   email: string;
-  
+
   // Email with custom validation
-  @Field({ 
-    type: 'email',
+  @Field({
+    type: "email",
     validate: (value) => {
       // Custom domain validation
-      return value.endsWith('@company.com');
-    }
+      return value.endsWith("@company.com");
+    },
   })
   workEmail: string;
 }
@@ -301,14 +314,14 @@ Secure password input with strength validation.
 
 ```typescript
 export class User extends Resource {
-  @Field({ 
-    type: 'password',
+  @Field({
+    type: "password",
     required: true,
     minLength: 8,
     validate: (value) => {
       // Password strength validation
       return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(value);
-    }
+    },
   })
   password: string;
 }
@@ -320,10 +333,10 @@ Phone number input with international formatting.
 
 ```typescript
 export class Contact extends Resource {
-  @Field({ 
-    type: 'tel',
-    phoneCountryCode: 'US', // Default country code
-    format: 'international'
+  @Field({
+    type: "tel",
+    phoneCountryCode: "US", // Default country code
+    format: "international",
   })
   phoneNumber: string;
 }
@@ -335,12 +348,12 @@ URL input with validation and formatting.
 
 ```typescript
 export class Website extends Resource {
-  @Field({ 
-    type: 'url',
+  @Field({
+    type: "url",
     required: true,
     validate: (value) => {
       return /^https?:\/\//.test(value); // Require http/https
-    }
+    },
   })
   websiteUrl: string;
 }
@@ -360,11 +373,11 @@ declare module "@resk/core" {
   interface IFieldMap {
     // Color picker field
     color: IFieldBase<"color"> & {
-      colorFormat?: 'hex' | 'rgb' | 'hsl';
+      colorFormat?: "hex" | "rgb" | "hsl";
       palette?: string[];
       allowAlpha?: boolean;
     };
-    
+
     // Rich text editor field
     richText: IFieldBase<"richText"> & {
       toolbar?: string[];
@@ -372,15 +385,15 @@ declare module "@resk/core" {
       allowImages?: boolean;
       allowLinks?: boolean;
     };
-    
+
     // File upload field
     file: IFieldBase<"file"> & {
-      accept?: string[];          // Allowed file types
-      maxSize?: number;           // Max file size in bytes
-      multiple?: boolean;         // Allow multiple files
-      uploadPath?: string;        // Upload directory
+      accept?: string[]; // Allowed file types
+      maxSize?: number; // Max file size in bytes
+      multiple?: boolean; // Allow multiple files
+      uploadPath?: string; // Upload directory
     };
-    
+
     // Select dropdown field
     select: IFieldBase<"select"> & {
       options: Array<{
@@ -397,39 +410,39 @@ declare module "@resk/core" {
 
 // 2. Use the custom field types
 export class BlogPost extends Resource {
-  @Field({ 
-    type: 'richText',
+  @Field({
+    type: "richText",
     required: true,
-    toolbar: ['bold', 'italic', 'link', 'image'],
+    toolbar: ["bold", "italic", "link", "image"],
     allowImages: true,
-    maxLength: 10000
+    maxLength: 10000,
   })
   content: string;
-  
-  @Field({ 
-    type: 'color',
-    colorFormat: 'hex',
-    palette: ['#FF0000', '#00FF00', '#0000FF'],
-    allowAlpha: false
+
+  @Field({
+    type: "color",
+    colorFormat: "hex",
+    palette: ["#FF0000", "#00FF00", "#0000FF"],
+    allowAlpha: false,
   })
   accentColor: string;
-  
-  @Field({ 
-    type: 'select',
+
+  @Field({
+    type: "select",
     required: true,
     options: [
-      { value: 'draft', label: 'Draft' },
-      { value: 'published', label: 'Published' },
-      { value: 'archived', label: 'Archived' }
-    ]
+      { value: "draft", label: "Draft" },
+      { value: "published", label: "Published" },
+      { value: "archived", label: "Archived" },
+    ],
   })
-  status: 'draft' | 'published' | 'archived';
-  
-  @Field({ 
-    type: 'file',
-    accept: ['image/jpeg', 'image/png', 'image/webp'],
+  status: "draft" | "published" | "archived";
+
+  @Field({
+    type: "file",
+    accept: ["image/jpeg", "image/png", "image/webp"],
     maxSize: 5 * 1024 * 1024, // 5MB
-    uploadPath: '/uploads/blog-images'
+    uploadPath: "/uploads/blog-images",
   })
   featuredImage: string;
 }
@@ -444,35 +457,27 @@ export class BlogPost extends Resource {
 Every field type comes with comprehensive validation decorators:
 
 ```typescript
-import { 
-  ValidatorIsRequired,
-  ValidatorHasMinLength,
-  ValidatorHasMaxLength,
-  ValidatorIsEmail,
-  ValidatorIsUrl,
-  ValidatorIsNumberGreaterThan,
-  ValidatorIsNumberLessThan
-} from '@resk/core';
+import { ValidatorIsRequired, ValidatorHasMinLength, ValidatorHasMaxLength, ValidatorIsEmail, ValidatorIsUrl, ValidatorIsNumberGreaterThan, ValidatorIsNumberLessThan } from "@resk/core";
 
 export class Product extends Resource {
-  @Field({ type: 'text' })
+  @Field({ type: "text" })
   @ValidatorIsRequired()
   @ValidatorHasMinLength([3])
   @ValidatorHasMaxLength([50])
   name: string;
-  
-  @Field({ type: 'number' })
+
+  @Field({ type: "number" })
   @ValidatorIsRequired()
   @ValidatorIsNumberGreaterThan([0])
   @ValidatorIsNumberLessThan([10000])
   price: number;
-  
-  @Field({ type: 'email' })
+
+  @Field({ type: "email" })
   @ValidatorIsRequired()
   @ValidatorIsEmail()
   contactEmail: string;
-  
-  @Field({ type: 'url' })
+
+  @Field({ type: "url" })
   @ValidatorIsUrl()
   websiteUrl: string;
 }
@@ -482,28 +487,28 @@ export class Product extends Resource {
 
 ```typescript
 export class User extends Resource {
-  @Field({ 
-    type: 'text',
+  @Field({
+    type: "text",
     validate: async (value, context) => {
       // Async validation example
       const isUnique = await checkUsernameUnique(value);
       if (!isUnique) {
-        throw new Error('Username already exists');
+        throw new Error("Username already exists");
       }
       return true;
-    }
+    },
   })
   username: string;
-  
-  @Field({ 
-    type: 'number',
+
+  @Field({
+    type: "number",
     validate: (value, context) => {
       // Cross-field validation
-      if (context.data.userType === 'premium' && value < 100) {
-        throw new Error('Premium users must have a value of at least 100');
+      if (context.data.userType === "premium" && value < 100) {
+        throw new Error("Premium users must have a value of at least 100");
       }
       return true;
-    }
+    },
   })
   creditLimit: number;
 }
@@ -520,44 +525,44 @@ Fields support extensive formatting options through the `IInputFormatterOptions`
 ```typescript
 export class Financial extends Resource {
   // Currency formatting
-  @Field({ 
-    type: 'number',
-    format: 'formatUSD', // Predefined currency formatter
-    precision: 2
+  @Field({
+    type: "number",
+    format: "formatUSD", // Predefined currency formatter
+    precision: 2,
   })
   amount: number;
-  
+
   // Custom number formatting
-  @Field({ 
-    type: 'number',
+  @Field({
+    type: "number",
     format: (options) => {
       const { value } = options;
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
       }).format(value);
-    }
+    },
   })
   formattedPrice: number;
-  
+
   // Phone number formatting
-  @Field({ 
-    type: 'tel',
-    phoneCountryCode: 'US',
-    format: 'international',
-    mask: ['(', /\d/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]
+  @Field({
+    type: "tel",
+    phoneCountryCode: "US",
+    format: "international",
+    mask: ["(", /\d/, /\d/, /\d/, ")", " ", /\d/, /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/],
   })
   phoneNumber: string;
-  
+
   // Date formatting
-  @Field({ 
-    type: 'date',
-    dateFormat: 'DD/MM/YYYY HH:mm',
+  @Field({
+    type: "date",
+    dateFormat: "DD/MM/YYYY HH:mm",
     format: (options) => {
       const { value, dateFormat } = options;
       return moment(value).format(dateFormat);
-    }
+    },
   })
   appointmentDate: Date;
 }
@@ -568,19 +573,19 @@ export class Financial extends Resource {
 ```typescript
 export class Secure extends Resource {
   // Credit card number with masking
-  @Field({ 
-    type: 'text',
-    mask: [/\d/, /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/],
-    obfuscationCharacter: '*',
-    placeholderCharacter: '_'
+  @Field({
+    type: "text",
+    mask: [/\d/, /\d/, /\d/, /\d/, " ", /\d/, /\d/, /\d/, /\d/, " ", /\d/, /\d/, /\d/, /\d/, " ", /\d/, /\d/, /\d/, /\d/],
+    obfuscationCharacter: "*",
+    placeholderCharacter: "_",
   })
   creditCardNumber: string;
-  
+
   // Social Security Number with validation
-  @Field({ 
-    type: 'text',
-    mask: [/\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/],
-    validate: (value) => value.replace(/-/g, '').length === 9
+  @Field({
+    type: "text",
+    mask: [/\d/, /\d/, /\d/, "-", /\d/, /\d/, "-", /\d/, /\d/, /\d/, /\d/],
+    validate: (value) => value.replace(/-/g, "").length === 9,
   })
   ssn: string;
 }
@@ -594,16 +599,16 @@ export class Secure extends Resource {
 
 ```typescript
 export class User extends Resource {
-  @Field({ 
-    type: 'text',
-    label: 'user.fields.firstName', // i18n key
-    required: true
+  @Field({
+    type: "text",
+    label: "user.fields.firstName", // i18n key
+    required: true,
   })
   firstName: string;
-  
+
   // Labels are automatically translated based on current locale
   // EN: "First Name"
-  // FR: "Prénom" 
+  // FR: "Prénom"
   // ES: "Nombre"
 }
 ```
@@ -612,26 +617,26 @@ export class User extends Resource {
 
 ```typescript
 export class Order extends Resource {
-  @Field({ 
-    type: 'number',
+  @Field({
+    type: "number",
     format: (options, locale) => {
       return new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency: getCurrencyForLocale(locale)
+        style: "currency",
+        currency: getCurrencyForLocale(locale),
       }).format(options.value);
-    }
+    },
   })
   totalAmount: number;
-  
-  @Field({ 
-    type: 'date',
+
+  @Field({
+    type: "date",
     format: (options, locale) => {
       return new Intl.DateTimeFormat(locale, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       }).format(options.value);
-    }
+    },
   })
   orderDate: Date;
 }
@@ -647,45 +652,45 @@ Fields can behave differently in different contexts (create, update, list, filte
 
 ```typescript
 export class Product extends Resource {
-  @Field({ 
-    type: 'text',
+  @Field({
+    type: "text",
     required: true,
     // Context-specific configurations
     create: {
-      placeholder: 'Enter product name...',
-      maxLength: 100
+      placeholder: "Enter product name...",
+      maxLength: 100,
     },
     update: {
       readOnly: false,
-      maxLength: 150
+      maxLength: 150,
     },
     list: {
       visible: true,
-      format: (options) => options.value?.substring(0, 30) + '...'
+      format: (options) => options.value?.substring(0, 30) + "...",
     },
     filter: {
       searchable: true,
-      type: 'text'
-    }
+      type: "text",
+    },
   })
   name: string;
-  
-  @Field({ 
-    type: 'number',
+
+  @Field({
+    type: "number",
     min: 0,
     create: {
       required: true,
-      default: 0
+      default: 0,
     },
     update: {
-      required: false
+      required: false,
     },
     list: {
-      format: 'money'
+      format: "money",
     },
     filter: {
-      type: 'range' // Special filter type for numbers
-    }
+      type: "range", // Special filter type for numbers
+    },
   })
   price: number;
 }
@@ -699,59 +704,59 @@ export class Product extends Resource {
 
 ```typescript
 export class Product extends Resource {
-  @Field({ 
-    type: 'text', 
-    required: true, 
+  @Field({
+    type: "text",
+    required: true,
     maxLength: 100,
-    unique: true 
+    unique: true,
   })
   name: string;
-  
-  @Field({ 
-    type: 'text', 
+
+  @Field({
+    type: "text",
     maxLength: 500,
-    multiline: true 
+    multiline: true,
   })
   description: string;
-  
-  @Field({ 
-    type: 'number', 
-    required: true, 
+
+  @Field({
+    type: "number",
+    required: true,
     min: 0,
-    format: 'formatUSD' 
+    format: "formatUSD",
   })
   price: number;
-  
-  @Field({ 
-    type: 'select',
+
+  @Field({
+    type: "select",
     required: true,
     options: [
-      { value: 'electronics', label: 'Electronics' },
-      { value: 'clothing', label: 'Clothing' },
-      { value: 'books', label: 'Books' },
-      { value: 'home', label: 'Home & Garden' }
-    ]
+      { value: "electronics", label: "Electronics" },
+      { value: "clothing", label: "Clothing" },
+      { value: "books", label: "Books" },
+      { value: "home", label: "Home & Garden" },
+    ],
   })
   category: string;
-  
-  @Field({ 
-    type: 'boolean', 
-    default: true 
+
+  @Field({
+    type: "boolean",
+    default: true,
   })
   inStock: boolean;
-  
-  @Field({ 
-    type: 'file',
-    accept: ['image/jpeg', 'image/png'],
+
+  @Field({
+    type: "file",
+    accept: ["image/jpeg", "image/png"],
     multiple: true,
-    maxSize: 2 * 1024 * 1024 // 2MB
+    maxSize: 2 * 1024 * 1024, // 2MB
   })
   images: string[];
-  
-  @Field({ 
-    type: 'date',
+
+  @Field({
+    type: "date",
     readOnly: true,
-    default: () => new Date()
+    default: () => new Date(),
   })
   createdAt: Date;
 }
@@ -761,76 +766,76 @@ export class Product extends Resource {
 
 ```typescript
 export class UserProfile extends Resource {
-  @Field({ 
-    type: 'text', 
-    required: true, 
-    minLength: 2, 
-    maxLength: 50 
+  @Field({
+    type: "text",
+    required: true,
+    minLength: 2,
+    maxLength: 50,
   })
   firstName: string;
-  
-  @Field({ 
-    type: 'text', 
-    required: true, 
-    minLength: 2, 
-    maxLength: 50 
+
+  @Field({
+    type: "text",
+    required: true,
+    minLength: 2,
+    maxLength: 50,
   })
   lastName: string;
-  
-  @Field({ 
-    type: 'email', 
-    required: true, 
-    unique: true 
+
+  @Field({
+    type: "email",
+    required: true,
+    unique: true,
   })
   email: string;
-  
-  @Field({ 
-    type: 'tel',
-    phoneCountryCode: 'US'
+
+  @Field({
+    type: "tel",
+    phoneCountryCode: "US",
   })
   phoneNumber: string;
-  
-  @Field({ 
-    type: 'date',
-    maxDate: new Date() // Cannot be in the future
+
+  @Field({
+    type: "date",
+    maxDate: new Date(), // Cannot be in the future
   })
   dateOfBirth: Date;
-  
-  @Field({ 
-    type: 'select',
+
+  @Field({
+    type: "select",
     options: [
-      { value: 'male', label: 'Male' },
-      { value: 'female', label: 'Female' },
-      { value: 'other', label: 'Other' },
-      { value: 'prefer-not-to-say', label: 'Prefer not to say' }
-    ]
+      { value: "male", label: "Male" },
+      { value: "female", label: "Female" },
+      { value: "other", label: "Other" },
+      { value: "prefer-not-to-say", label: "Prefer not to say" },
+    ],
   })
   gender: string;
-  
-  @Field({ 
-    type: 'text',
+
+  @Field({
+    type: "text",
     multiline: true,
     maxLength: 1000,
-    placeholder: 'Tell us about yourself...'
+    placeholder: "Tell us about yourself...",
   })
   bio: string;
-  
-  @Field({ 
-    type: 'file',
-    accept: ['image/jpeg', 'image/png'],
-    maxSize: 1024 * 1024 // 1MB
+
+  @Field({
+    type: "file",
+    accept: ["image/jpeg", "image/png"],
+    maxSize: 1024 * 1024, // 1MB
   })
   profilePicture: string;
-  
-  @Field({ 
-    type: 'boolean',
-    default: true
+
+  @Field({
+    type: "boolean",
+    default: true,
   })
   emailNotifications: boolean;
-  
-  @Field({ 
-    type: 'boolean',
-    default: false
+
+  @Field({
+    type: "boolean",
+    default: false,
   })
   smsNotifications: boolean;
 }
@@ -844,8 +849,8 @@ export class UserProfile extends Resource {
 
 ```typescript
 // ✅ Good: Efficient field definition
-@Field({ 
-  type: 'text', 
+@Field({
+  type: 'text',
   required: true,
   maxLength: 100,
   // Pre-computed validation rules
@@ -854,7 +859,7 @@ export class UserProfile extends Resource {
 productName: string;
 
 // ❌ Avoid: Heavy computation in field definition
-@Field({ 
+@Field({
   type: 'text',
   validate: async (value) => {
     // Avoid heavy async operations in field validation
@@ -870,16 +875,16 @@ inefficientField: string;
 ```typescript
 export class Product extends Resource {
   // Basic fields load immediately
-  @Field({ type: 'text', required: true })
+  @Field({ type: "text", required: true })
   name: string;
-  
+
   // Complex fields can be lazy-loaded
-  @Field({ 
-    type: 'select',
+  @Field({
+    type: "select",
     lazy: true, // Load options on demand
     optionsLoader: async () => {
       return await fetchCategoriesFromAPI();
-    }
+    },
   })
   category: string;
 }
@@ -890,6 +895,7 @@ export class Product extends Resource {
 ## 🎯 Best Practices
 
 ### 1. **Field Naming**
+
 ```typescript
 // ✅ Good: Descriptive, consistent naming
 @Field({ type: 'text' }) firstName: string;
@@ -903,12 +909,13 @@ export class Product extends Resource {
 ```
 
 ### 2. **Validation Strategy**
+
 ```typescript
 // ✅ Good: Combine declarative and functional validation
-@Field({ 
+@Field({
   type: 'text',
   required: true,        // Declarative
-  minLength: 3,         // Declarative  
+  minLength: 3,         // Declarative
   maxLength: 50,        // Declarative
   validate: validateUsername // Functional for complex logic
 })
@@ -916,6 +923,7 @@ username: string;
 ```
 
 ### 3. **Type Safety**
+
 ```typescript
 // ✅ Good: Strict typing
 @Field({ type: 'select' })
@@ -924,7 +932,7 @@ status: 'active' | 'inactive' | 'pending'; // Union type
 // ✅ Good: Enum usage
 enum ProductStatus {
   ACTIVE = 'active',
-  INACTIVE = 'inactive', 
+  INACTIVE = 'inactive',
   PENDING = 'pending'
 }
 
@@ -933,9 +941,10 @@ status: ProductStatus;
 ```
 
 ### 4. **Performance Optimization**
+
 ```typescript
 // ✅ Good: Efficient field configuration
-@Field({ 
+@Field({
   type: 'text',
   debounce: 300,        // Debounce validation
   validateOnBlur: true, // Validate only on blur
@@ -957,9 +966,10 @@ This completes **SESSION 1.2: Complete Field Types Reference**. You now have:
 ✅ **Formatting and masking** capabilities  
 ✅ **Internationalization** support  
 ✅ **Performance optimization** guidelines  
-✅ **Best practices** for field design  
+✅ **Best practices** for field design
 
 **Ready for Session 1.3?** Next we'll cover:
+
 - **Resource Relationships** (@OneToMany, @ManyToOne, etc.)
 - **Advanced Resource Patterns** (inheritance, composition)
 - **Resource Actions** and lifecycle management

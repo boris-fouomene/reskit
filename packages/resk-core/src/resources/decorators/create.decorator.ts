@@ -1,4 +1,3 @@
-
 /**
  * Creates a decorator that can be applied to class properties or methods.
  *
@@ -18,25 +17,10 @@
  * }
  * ```
  */
-export function createDecorator<ValueType = any, KeyType = any>(key: KeyType) {
-    /**
-     * The function that takes a value to associate with the specified key.
-     *
-     * @param {ValueType} value - The value to be stored as metadata.
-     * @returns {(target: Object, propertyKey: string) => void} The actual decorator function.
-     */
-    return (value: ValueType) => {
-        /**
-         * The decorator function that will be called when the decorator is applied.
-         *
-         * @param {Object} target - The target object (class) containing the property being decorated.
-         * @param {string} propertyKey - The name of the property being decorated.
-         */
-        return (target: Object, propertyKey: string | symbol) => {
-            /**
-             * Define the metadata on the target object for the specified property key.
-             */
-            Reflect.defineMetadata(key, value, target, propertyKey);
-        }
-    }
+export function createDecorator<ValueType = unknown, KeyType = unknown>(key: KeyType): (value: ValueType) => (target: Object, propertyKey: string | symbol) => void {
+  return (value: ValueType) => {
+    return (target: Object, propertyKey: string | symbol) => {
+      Reflect.defineMetadata(key, value, target, propertyKey);
+    };
+  };
 }

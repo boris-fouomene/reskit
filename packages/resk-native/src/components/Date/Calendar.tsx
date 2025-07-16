@@ -3,7 +3,7 @@ import { View, StyleSheet, GestureResponderEvent } from "react-native";
 import moment, { Moment } from "moment";
 import { DateHelper, defaultStr, isEmpty, isNonNullString } from "@resk/core/utils";
 import { I18n } from "@resk/core/i18n";
-import { IMomentFormat } from "@resk/core/types"
+import { IDateFormat } from "@resk/core/types"
 import { ICalendarBaseProps, ICalendarDate, CalendarModalContext, ICalendarDayItem, ICalendarDayViewProps, ICalendarDisplayView, ICalendarHourItem, ICalendarModalDayViewProps, ICalendarMonthItem, ICalendarMonthViewProps, ICalendarYearItem, ICalendarYearViewProps, ICalendarContext, ICalendarState, ICalendarItem, ICalendarItemsContainerProps } from "./types";
 import { Icon } from "@components/Icon";
 import { Label } from "@components/Label";
@@ -514,7 +514,7 @@ function CalendarWithContext<T extends ICalendarBaseProps = ICalendarBaseProps>(
     const momentDefaultValue = useMemo(() => {
         return state?.defaultValue ? getMomentDate(state?.defaultValue) : undefined;
     }, [state?.defaultValue]);
-    const dateFormat = defaultStr(props?.dateFormat, DateHelper.DEFAULT_DATE_FORMAT) as IMomentFormat;
+    const dateFormat = defaultStr(props?.dateFormat, DateHelper.DEFAULT_DATE_FORMAT) as IDateFormat;
     useEffect(() => {
         const newState = { ...state };
         const minDateE = areEquals(props?.minDate, newState.minDate, state.displayView), maxDateE = areEquals(props?.maxDate, newState.maxDate, state.displayView),

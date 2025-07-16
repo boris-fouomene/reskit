@@ -1,38 +1,38 @@
-import { IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionName, IResourceAction, IResourceDataService, IResourceQueryOptions, IResourcePaginatedResult, IResourcePrimaryKey, IResourceManyCriteria, IResourceActionTupleArray } from '../types/resources';
-import { getFields } from './fields';
-import { isEmpty, defaultStr, isObj, isNonNullString, stringify, extendObj } from '../utils/index';
+import { IResourceName, IResourceData, IField, IResourceDefaultEvent, IResource, IResourceActionName, IResourceAction, IResourceDataService, IResourceQueryOptions, IResourcePaginatedResult, IResourcePrimaryKey, IResourceManyCriteria, IResourceActionTupleArray } from "../types/resources";
+import { getFields } from "./fields";
+import { isEmpty, defaultStr, isObj, isNonNullString, stringify, extendObj } from "../utils/index";
 import { ObservableClass, observableFactory } from "@/observable";
-import { IClassConstructor } from '../types/index';
-import { IAuthUser } from '@/auth/types';
+import { IClassConstructor } from "../types/index";
+import { IAuthUser } from "@/auth/types";
 import { Auth } from "../auth";
-import { i18n } from '@/i18n';
-import { Scope, TranslateOptions } from 'i18n-js';
-import { ResourcePaginationHelper } from './ResourcePaginationHelper';
-import { IResourceActions } from '../types/resources';
+import { i18n } from "@/i18n";
+import { Scope, TranslateOptions } from "i18n-js";
+import { ResourcePaginationHelper } from "./ResourcePaginationHelper";
+import { IResourceActions } from "../types/resources";
 import { Logger } from "../logger";
 
-export * from './ResourcePaginationHelper';
+export * from "./ResourcePaginationHelper";
 export * from "./fields";
 export * from "../types/resources";
 export * from "./decorators";
 
-const resourcesMetaDataKey = Symbol('resources');
-const resourcesClassNameMetaData = Symbol('resourceFromClassName');
+const resourcesMetaDataKey = Symbol("resources");
+const resourcesClassNameMetaData = Symbol("resourceFromClassName");
 
 /**
  * Represents the base class for any resource.
- * 
- * The `Resource` class provides a flexible structure for defining resource instances with optional metadata such as 
+ *
+ * The `Resource` class provides a flexible structure for defining resource instances with optional metadata such as
  * `name`, `label`, `title`. Additionally, it manages dynamic fields associated with the resource.
- * 
+ *
  * This class can be extended to implement specific resources, and it automatically handles merging metaData passed into
  * the constructor with the instance properties. It also retrieves and manages resource fields using the `getFields` method.
- * 
+ *
  * @template DataType - The type of data the resource is expected to handle. By default, it accepts any type (`DataType=any`).
  * @template EventType - The type of event that the resource can emit. Defaults to `IResourceActionName`.
- * 
+ *
  * @extends ObservableClass<EventType> - Extends the `ObservableClass` to enable event-based communication.
- * 
+ *
  * @example
  * // Create a new resource with basic properties
  * const resource = new Resource({
@@ -40,11 +40,11 @@ const resourcesClassNameMetaData = Symbol('resourceFromClassName');
  *    label: 'User',
  *    title: 'User Information'
  * });
- * 
+ *
  * console.log(resource.getLabel()); // Output: 'User'
  * console.log(resource.getTitle()); // Output: 'User Information'
  * console.log(resource.getTooltip()); // Output: 'Contains user-related data'
- * 
+ *
  * @example
  * // Create a resource with dynamic fields
  * const dynamicResource = new Resource({
@@ -54,8 +54,8 @@ const resourcesClassNameMetaData = Symbol('resourceFromClassName');
  *      price: { type: 'number', label: 'Product Price' }
  *    }
  * });
- * 
- * console.log(dynamicResource.getFields()); 
+ *
+ * console.log(dynamicResource.getFields());
  * // Output: { name: { type: 'string', label: 'Product Name' }, price: { type: 'number', label: 'Product Price' } }
  */
 export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey, EventType extends Partial<IResourceDefaultEvent> = IResourceDefaultEvent> extends ObservableClass<EventType> {
@@ -77,12 +77,12 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    *
    * This name is used within the system for referencing the resource programmatically.
    * It is often a short, unique identifier for the resource.
-   * 
+   *
    * @example
    * ```typescript
    * const userResource: IResource = { name: "user" };
    * ```
-  */
+   */
   name?: IResourceName;
 
   /**
@@ -99,16 +99,16 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   label?: string;
 
   /**
-  * A short text that appears when the user hovers over the resource.
-  * The tooltip provides additional context or information about the resource.
-  * 
-  * Typically used in user interfaces to clarify what a particular resource represents or to give instructions.
-  *
-  * @example
-  * ```typescript
-  * const userResource: IResource = { title : "This resource manages user information." };
-  * ```
-  */
+   * A short text that appears when the user hovers over the resource.
+   * The tooltip provides additional context or information about the resource.
+   *
+   * Typically used in user interfaces to clarify what a particular resource represents or to give instructions.
+   *
+   * @example
+   * ```typescript
+   * const userResource: IResource = { title : "This resource manages user information." };
+   * ```
+   */
   title?: string;
 
   /**
@@ -143,17 +143,17 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   /**
    * returns the i18n params for the resource. this is used to translate the error messages.
    * @param params - The options object containing the properties to initialize the resource with.
-   * @returns 
+   * @returns
    */
   getTranslateParams(params?: Record<string, any>): Record<string, any> {
     return {
       resourceLabel: this.getLabel(),
       resourceName: this.getName(),
-      ...Object.assign({}, params)
+      ...Object.assign({}, params),
     };
   }
   /**
-   * 
+   *
    * @returns {string} the message to display when the DataProvider for the resource is invalid
    */
   get INVALID_DATA_PROVIDER_ERROR(): string {
@@ -204,11 +204,13 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    */
   find(options?: IResourceQueryOptions<DataType>) {
     return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
-      return this.getDataService()?.find(options).then((result) => {
-        this._trigger("find" as EventType, result);
-        return result;
-      });
-    })
+      return this.getDataService()
+        ?.find(options)
+        .then((result) => {
+          this._trigger("find" as EventType, result);
+          return result;
+        });
+    });
   }
   /***
    * fetches a single record from the resource.
@@ -216,13 +218,14 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the list operation.
    */
   findOne(options: PrimaryKeyType | IResourceQueryOptions<DataType>) {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
-      .then(() => {
-        return this.getDataService().findOne(options).then((result) => {
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+      return this.getDataService()
+        .findOne(options)
+        .then((result) => {
           this._trigger("findOne" as EventType, result);
           return result;
         });
-      })
+    });
   }
   /***
    * fetches a single record from the resource.
@@ -241,20 +244,20 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @param record {Partial<DataType>} The record to be created.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async beforeCreate(record: Partial<DataType>): Promise<void> { }
+  protected async beforeCreate(record: Partial<DataType>): Promise<void> {}
   /***
    * trigger called after the create operation.
    * @param {DataType} record - The created record.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async afterCreate(record: DataType): Promise<void> { }
+  protected async afterCreate(record: DataType): Promise<void> {}
   /**
    * Trigger called before the update operation.
    * @param primaryKey {PrimaryKeyType}, the primary key of the record to be updated.
    * @param dataToUpdate {Partial<DataType>} - The updated data for the record.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async beforeUpdate(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>): Promise<void> { }
+  protected async beforeUpdate(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>): Promise<void> {}
   /**
    * Triggers called after the update operation.
    * @param {DataType} updatedData  - The updated record.
@@ -262,42 +265,42 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @param {Partial<DataType>} dataToUpdate - The data that was used to update the record.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async afterUpdate(updatedData: DataType, primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>): Promise<void> { }
+  protected async afterUpdate(updatedData: DataType, primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>): Promise<void> {}
 
   /**
    * Trigger called before the delete operation.
    * @param primaryKey {PrimaryKeyType} - The primary key of the record to be deleted.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async beforeDelete(primaryKey: PrimaryKeyType): Promise<void> { }
+  protected async beforeDelete(primaryKey: PrimaryKeyType): Promise<void> {}
   /***
    * Triggers called after the delete operation.
    * @param {boolean} result - The result of the delete operation.
    * @param {PrimaryKeyType} primaryKey - The primary key of the deleted record.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async afterDelete(result: boolean, primaryKey: PrimaryKeyType): Promise<void> { }
+  protected async afterDelete(result: boolean, primaryKey: PrimaryKeyType): Promise<void> {}
 
   /***
    * trigger called before the createMany operation.
    * @param {Partial<DataType>[]} records - The records to be created.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async beforeCreateMany(records: Partial<DataType>[]) { }
+  protected async beforeCreateMany(records: Partial<DataType>[]) {}
   /***
    * trigger called after the createMany operation.
    * @param {DataType[]} records - The created records.
    * @param {Partial<DataType>[]} data - The data used to create the records.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async afterCreateMany(records: DataType[], data: Partial<DataType>[]) { }
+  protected async afterCreateMany(records: DataType[], data: Partial<DataType>[]) {}
   /***
    * Trigger called before the updateMany operation.
    * @param {IResourceManyCriteria} criteria - The criteria for the update operation.
    * @param {Partial<DataType>} data - The data for the update operation.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async beforeUpdateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>) { }
+  protected async beforeUpdateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>) {}
   /**
    * Triggers called after the updateMany operation.
    * @param affectedRows {number} The number of records updated
@@ -305,13 +308,13 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @param {Partial<DataType>[]} records The records updated
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async afterUpdateMany(affectedRows: number, criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, records: Partial<DataType>) { }
+  protected async afterUpdateMany(affectedRows: number, criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, records: Partial<DataType>) {}
   /***
    * Trigger called before the deleteMany operation.
    * @param {IResourceManyCriteria} criteria - The criteria for the delete operation.
    * @return {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async beforeDeleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) { }
+  protected async beforeDeleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) {}
 
   /**
    * Trigger called after the deleteMany operation.
@@ -319,43 +322,45 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @param {IResourceManyCriteria<DataType,PrimaryKeyType>} criteria The criteria for the delete operation.
    * @returns {Promise<void>} A promise that resolves when the operation is complete.
    */
-  protected async afterDeleteMany(affectedRows: number, criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) { }
+  protected async afterDeleteMany(affectedRows: number, criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) {}
   /***
    * creates a new record in the resource.
    * @param {DataType} record - The data for the new record.
    * @returns {Promise<IResourceOperationResult<DataType>>} A promise that resolves to the result of the create operation.
    */
   create(record: Partial<DataType>) {
-    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
-      .then(() => {
-        return this.beforeCreate(record).then(() => {
-          return this.getDataService().create(record).then((result) => {
+    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError").then(() => {
+      return this.beforeCreate(record).then(() => {
+        return this.getDataService()
+          .create(record)
+          .then((result) => {
             return this.afterCreate(result).then(() => {
               this._trigger("create" as EventType, result);
               return result;
-            })
+            });
           });
-        });
       });
+    });
   }
   /**
    * updates a record in the resource.
    * @param key {PrimaryKeyType} The primary key of the resource to update.
    * @param dataToUpdate
-   * @returns 
+   * @returns
    */
   update(primaryKey: PrimaryKeyType, dataToUpdate: Partial<DataType>) {
-    return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
-      .then(async () => {
-        return this.beforeUpdate(primaryKey, dataToUpdate).then(() => {
-          return this.getDataService()?.update(primaryKey, dataToUpdate).then((result) => {
+    return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError").then(async () => {
+      return this.beforeUpdate(primaryKey, dataToUpdate).then(() => {
+        return this.getDataService()
+          ?.update(primaryKey, dataToUpdate)
+          .then((result) => {
             return this.afterUpdate(result, primaryKey, dataToUpdate).then(() => {
               this._trigger("update" as EventType, result, primaryKey, dataToUpdate);
               return result;
-            })
+            });
           });
-        });
-      })
+      });
+    });
   }
   /***
    * deletes a record from the resource.
@@ -363,17 +368,18 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns Promise<number> A promise that resolves to the result of the delete operation.
    */
   delete(primaryKey: PrimaryKeyType) {
-    return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
-      .then(() => {
-        return this.beforeDelete(primaryKey).then(() => {
-          return this.getDataService()?.delete(primaryKey).then((result) => {
+    return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError").then(() => {
+      return this.beforeDelete(primaryKey).then(() => {
+        return this.getDataService()
+          ?.delete(primaryKey)
+          .then((result) => {
             return this.afterDelete(result, primaryKey).then(() => {
               this._trigger("delete" as EventType, result, primaryKey);
               return result;
-            })
+            });
           });
-        });
-      })
+      });
+    });
   }
 
   /**
@@ -382,13 +388,14 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns A promise that resolves to an object containing the list of records and the total count.
    */
   findAndCount(options?: IResourceQueryOptions<DataType>) {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
-      .then(() => {
-        return this.getDataService().findAndCount(options).then((result) => {
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+      return this.getDataService()
+        .findAndCount(options)
+        .then((result) => {
           this._trigger("findAndCount" as EventType, result);
           return result;
         });
-      })
+    });
   }
   async findAndPaginate(options?: IResourceQueryOptions<DataType> | undefined): Promise<IResourcePaginatedResult<DataType>> {
     options = Object.assign({}, options);
@@ -401,17 +408,18 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns A promise that resolves to the result of the create operation.
    */
   createMany(data: Partial<DataType>[]) {
-    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError")
-      .then(() => {
-        return this.beforeCreateMany(data).then(() => {
-          return this.getDataService().createMany(data).then((result) => {
+    return this.checkPermissionAction(this.canUserCreate.bind(this), "resources.createForbiddenError").then(() => {
+      return this.beforeCreateMany(data).then(() => {
+        return this.getDataService()
+          .createMany(data)
+          .then((result) => {
             return this.afterCreateMany(result, data).then(() => {
               this._trigger("createMany" as EventType, result, data);
               return result;
-            })
+            });
           });
-        });
       });
+    });
   }
   /**
    * Updates multiple records in the resource.
@@ -420,17 +428,18 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns A promise that resolves to the result of the update operation.
    */
   updateMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>, data: Partial<DataType>) {
-    return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError")
-      .then(() => {
-        return this.beforeUpdateMany(criteria, data).then(() => {
-          return this.getDataService().updateMany(criteria, data).then((affectedRows) => {
+    return this.checkPermissionAction(this.canUserUpdate.bind(this), "resources.updateForbiddenError").then(() => {
+      return this.beforeUpdateMany(criteria, data).then(() => {
+        return this.getDataService()
+          .updateMany(criteria, data)
+          .then((affectedRows) => {
             return this.afterUpdateMany(affectedRows, criteria, data).then(() => {
               this._trigger("updateMany" as EventType, affectedRows, criteria, data);
               return affectedRows;
-            })
+            });
           });
-        });
       });
+    });
   }
   /**
    * Deletes multiple records from the resource based on the provided criteria.
@@ -438,17 +447,18 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns A promise that resolves to the result of the delete operation.
    */
   deleteMany(criteria: IResourceManyCriteria<DataType, PrimaryKeyType>) {
-    return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError")
-      .then(() => {
-        return this.beforeDeleteMany(criteria).then(() => {
-          return this.getDataService().deleteMany(criteria).then((affectedRows) => {
+    return this.checkPermissionAction(this.canUserDelete.bind(this), "resources.deleteForbiddenError").then(() => {
+      return this.beforeDeleteMany(criteria).then(() => {
+        return this.getDataService()
+          .deleteMany(criteria)
+          .then((affectedRows) => {
             return this.afterDeleteMany(affectedRows, criteria).then(() => {
               this._trigger("deleteMany" as EventType, affectedRows, criteria);
               return affectedRows;
-            })
+            });
           });
-        });
       });
+    });
   }
   /**
    * Counts the number of records in the resource.
@@ -456,13 +466,14 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns {Promise<number>} A promise that resolves to the result of the count operation.
    */
   count(options?: IResourceQueryOptions<DataType>) {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
-      .then(() => {
-        return this.getDataService().count(options).then((result) => {
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+      return this.getDataService()
+        .count(options)
+        .then((result) => {
           this._trigger("read" as EventType, result);
           return result;
         });
-      })
+    });
   }
   /***
    * checks if the resource has the record
@@ -470,25 +481,26 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    * @returns {Promise<boolean>} A promise that resolves to the result of the exists operation.
    */
   exists(primaryKey: PrimaryKeyType): Promise<boolean> {
-    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError")
-      .then(() => {
-        return this.getDataService().exists(primaryKey).then((result) => {
+    return this.checkPermissionAction(this.canUserRead.bind(this), "resources.readForbiddenError").then(() => {
+      return this.getDataService()
+        .exists(primaryKey)
+        .then((result) => {
           this._trigger("exits" as EventType, result);
           return result;
         });
-      });
+    });
   }
   updateMetadata(options: IResource<DataType>): IResource<DataType> {
     options = Object.assign({}, options);
-    const metadata = extendObj({}, this.getMetaData(), options)
+    const metadata = extendObj({}, this.getMetaData(), options);
     Reflect.defineMetadata(ResourcesManager.resourceMetaData, metadata, this.constructor);
     return metadata;
   }
   /**
    * Initializes the resource with the provided metaData.
-   * 
+   *
    * @param metaData - An object implementing the IResource interface, containing the data to initialize the resource with.
-   * 
+   *
    * This method assigns the provided metaData to the resource, ensuring that any empty properties
    * on the resource are filled with the corresponding values from the metaData object. It skips
    * properties that are functions. After assigning the metaData, it calls the `getFields` method
@@ -500,7 +512,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   }
   /**
    * Retrieves the i18n translations for the resource.
-   * 
+   *
    * @param {string} [locale] - The locale to use for the translations. If not provided, the default locale from the i18n instance will be used.
    * @returns {Record<string,any>} - An object containing the translations for the resource, keyed by the property names.
    * @example
@@ -515,15 +527,15 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    *     }
    *   }
    * });
-   * 
-   * // Retrieve the translations for the "user" resource.  
+   *
+   * // Retrieve the translations for the "user" resource.
    * const userResource = ResourcesManager.getResource("user");
    * const userTranslations = userResource.getTranslations();
    * console.log(userTranslations);
    * // Output:
    * // {
    * //   label: "User",
-   * //   title: "User Information",   
+   * //   title: "User Information",
    * // }
    */
   getTranslations(locale?: string): Record<string, any> {
@@ -550,20 +562,20 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
    *         title: "User Information",  // The title property
    *         create: {
    *            label: "Create User",
-   *            title: "Create a new user", 
+   *            title: "Create a new user",
    *         },
    *         read: {
    *            label: "View User",
    *            title: "View a specific user",
    *         },
-   *       }   
+   *       }
    *     }
    *   }
    * });
    * // Translate the "label" property of the "user" resource.
    * const userResource = ResourcesManager.getResource("user");
    * const label = userResource.translate("label"); // "User"
-   * 
+   *
    * // Translate the "title" property of the "user" resource.
    * const title = userResource.translate("title"); // "Manage user data"
    */
@@ -593,7 +605,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
   }
   /**
    * Retrieves the actions associated with the resource.
-   * If the actions are not already defined or not an object, 
+   * If the actions are not already defined or not an object,
    * it initializes them as an empty object of type `IResourceActions`.
    *
    * @returns  The map of resource actions.
@@ -644,7 +656,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
       });
     }
     return Auth.isAllowed(perms, user);
-  }  /**
+  } /**
    * Determines if the specified user has read access.
    *
    * @param user - The user whose read access is being checked. If no user is provided, the method will use default permissions.
@@ -682,8 +694,6 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
     return this.isAllowed(`delete`, user);
   }
 
-
-
   /**
    * Retrieves the translated value of the specified property, using the resource's translations.
    * If the property is not found in the translations, it returns the fallback value or the property name.
@@ -708,9 +718,9 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
 
   /**
    * Retrieves the label of the resource.
-   * 
+   *
    * If the label is not defined, it returns a default empty string.
-   * 
+   *
    * @returns {string} The label of the resource.
    */
   getLabel(): string {
@@ -721,22 +731,21 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
 
   /**
    * Retrieves the title of the resource.
-   * 
+   *
    * If the title is not defined, it returns a default empty string.
-   * 
+   *
    * @returns {string} The title of the resource.
    */
   getTitle(): string {
     return this.translateProperty("title", defaultStr(this.getMetaData().title, this.title, this.getLabel()));
   }
 
-
   /**
    * Retrieves the fields associated with the resource.
-   * 
-   * This method populates the `fields` property by invoking an external `getFields` function, 
+   *
+   * This method populates the `fields` property by invoking an external `getFields` function,
    * which dynamically retrieves and returns all the fields related to the resource.
-   * 
+   *
    * @returns {Record<string, IField>} A record containing all the fields of the resource.
    */
   getFields(): Record<string, IField> {
@@ -809,7 +818,7 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
     const primaryKeys: IField[] = [];
     if (isObj(this.fields)) {
       for (let i in this.fields) {
-        if (isObj(this.fields[i]) && this.fields[i].primaryKey) {
+        if (isObj(this.fields[i]) && (this.fields[i] as any).primaryKey) {
           primaryKeys.push(this.fields[i]);
         }
       }
@@ -820,20 +829,20 @@ export abstract class Resource<DataType extends IResourceData = any, PrimaryKeyT
 
 /**
  * Manages a collection of resources within the application.
- * 
+ *
  * The `ResourcesManager` class provides static methods to store, retrieve, and manage resource instances.
  * It maintains a global record of all instantiated resources, allowing for easy access and management.
  * Each resource is identified by a unique name, which is derived from the `IResourceName` type.
- * 
+ *
  * @example
  * // Instantiate and add resources to the manager
  * const userResource = new UserResource();
  * ResourcesManager.addResource('userResource', userResource);
- * 
+ *
  * // Retrieve the names of all resources
- * const resourceNames = ResourcesManager.getAllNames(); 
+ * const resourceNames = ResourcesManager.getAllNames();
  * console.log(resourceNames); // Output: ['userResource']
- * 
+ *
  * // Retrieve a specific resource
  * const retrievedResource = ResourcesManager.getResource<UserResource>('userResource');
  * if (retrievedResource) {
@@ -844,10 +853,10 @@ export class ResourcesManager {
   static resourceMetaData = Symbol("resource");
   /**
    * A global constant storing a record of all instantiated resources.
-   * 
+   *
    * This represents a record of all resources, where the keys are derived from `IResourceName`
    * and the values are instances of `Resource`.
-   * 
+   *
    * @example
    * const allResources: IAllResource = {
    *   userResource: new UserResource()
@@ -857,10 +866,10 @@ export class ResourcesManager {
 
   /**
    * Retrieves the global record of all resource metaData managed by the `ResourcesManager`.
-   * 
+   *
    * This method returns a copy of the internal record of resource metaData, which can be used to access
    * the configuration and settings for each registered resource.
-   * 
+   *
    * @returns {Record<IResourceName, IResource<any,any>>} A copy of the resource metaData record.
    */
   public static getAllMetaData(): Record<IResourceName, IResource<any>> {
@@ -868,10 +877,10 @@ export class ResourcesManager {
   }
   /**
    * Adds resource metaData to the global record managed by the `ResourcesManager`.
-   * 
+   *
    * This method updates the internal record of resource metaData with the provided `metaData` for the given `resourceName`.
    * The updated record is then stored as metadata on the `ResourcesManager` class.
-   * 
+   *
    * @param {IResourceName} resourceName - The unique name of the resource.
    * @param {IResource<any>} metaData - The resource metaData to be associated with the given `resourceName`.
    */
@@ -890,10 +899,10 @@ export class ResourcesManager {
   }
   /**
    * Retrieves the global record of resource class names managed by the `ResourcesManager`.
-   * 
+   *
    * This method returns a copy of the internal record of resource class names, which can be used to access
    * the class name associated with each registered resource.
-   * 
+   *
    * @returns {Record<string,IResourceName>} A copy of the resource class names record.
    */
   public static getAllClassNames(): Record<string, IResourceName> {
@@ -931,14 +940,14 @@ export class ResourcesManager {
   }
 
   /**
- * Retrieves the resource metadata associated with the given target class.
- *
- * This function uses reflection to access the metadata stored on the target class using the `@ResourceMetadata` decorator.
- * It returns a new object that is a copy of the metadata, which includes properties like `name`, `label`, `title`, and `tooltip`.
- *
- * @param {any} target - The target class or instance from which to retrieve the metadata.
- * @returns {Resource} An object containing the resource metadata for the given target.
- */
+   * Retrieves the resource metadata associated with the given target class.
+   *
+   * This function uses reflection to access the metadata stored on the target class using the `@ResourceMetadata` decorator.
+   * It returns a new object that is a copy of the metadata, which includes properties like `name`, `label`, `title`, and `tooltip`.
+   *
+   * @param {any} target - The target class or instance from which to retrieve the metadata.
+   * @returns {Resource} An object containing the resource metadata for the given target.
+   */
   public static getMetaDataFromTarget(target: IClassConstructor): IResource<any> | undefined {
     return Object.assign({}, Reflect.getMetadata(ResourcesManager.resourceMetaData, target.prototype));
   }
@@ -961,11 +970,11 @@ export class ResourcesManager {
 
   /**
    * Retrieves the names of all registered resources.
-   * 
+   *
    * This method returns an array of resource names that are currently managed by the `ResourcesManager`.
-   * 
+   *
    * @returns {string[]} An array of resource names.
-   * 
+   *
    * @example
    * const names = ResourcesManager.getAllNames();
    * console.log(names); // Output: ['userResource', 'productResource']
@@ -976,11 +985,11 @@ export class ResourcesManager {
 
   /**
    * Retrieves a resource instance by its name from the `resources` record.
-   * 
+   *
    * @template ResourceInstanceType The type extending `Resource` for the resource being returned.
    * @param {IResourceName} name - The name of the resource to retrieve, as defined in `IResourceName`.
    * @returns {(ResourceInstanceType | null)} The resource instance if it exists, or `null` if the resource is not found.
-   * 
+   *
    * @example
    * const userResource = ResourcesManager.getResource<UserResource>('userResource');
    * if (userResource) {
@@ -1008,11 +1017,11 @@ export class ResourcesManager {
   }
   /**
    * Adds a new resource instance to the manager.
-   * 
+   *
    * @param {IResourceName} name - The unique name of the resource to add.
    * @param {Resource<DataType>} resource - The resource instance to be added.
    * @template DataType The type of data associated with the resource.
-   * 
+   *
    * @example
    * const productResource = new ProductResource();
    * ResourcesManager.addResource('productResource', productResource);
@@ -1026,21 +1035,21 @@ export class ResourcesManager {
 
   /**
    * Removes a resource instance from the manager by its name.
-   * 
-   * This method deletes the specified resource from the `resources` record. 
+   *
+   * This method deletes the specified resource from the `resources` record.
    * If the resource exists, it will be removed, and the updated list of resources will be returned.
-   * 
+   *
    * @param {IResourceName} name - The name of the resource to be removed from the manager.
-   * 
+   *
    * @returns {Record<IResourceName, Resource>} The updated record of all remaining resources after the removal.
-   * 
+   *
    * @example
    * // Assuming a resource named 'userResource' has been previously added
    * console.log(ResourcesManager.getAllNames()); // Output: ['userResource', 'productResource']
-   * 
+   *
    * // Remove the user resource
    * ResourcesManager.removeResource('userResource');
-   * 
+   *
    * // Check the remaining resources
    * console.log(ResourcesManager.getAllNames()); // Output: ['productResource']
    */
@@ -1051,21 +1060,20 @@ export class ResourcesManager {
     return this.resources;
   }
 
-
   /**
    * Retrieves all resource instances managed by the manager.
-   * 
+   *
    * This method returns a record of all resources currently stored in the `ResourcesManager`.
    * The keys are derived from `IResourceName`, and the values are instances of `Resource`.
    * This allows for easy access to all registered resources.
-   * 
+   *
    * @returns {Record<IResourceName, Resource>} A record containing all resource instances, where each key is a resource name.
-   * 
+   *
    * @example
    * // Retrieve all registered resources
    * const allResources = ResourcesManager.getResources();
-   * console.log(allResources); 
-   * // Output: 
+   * console.log(allResources);
+   * // Output:
    * // {
    * //   userResource: UserResourceInstance,
    * //   productResource: ProductResourceInstance
@@ -1078,12 +1086,12 @@ export class ResourcesManager {
 
 /**
  * A decorator function that adds resource metadata to a class that implements `Resource`
- * 
+ *
  * This decorator stores the resource properties (`name`, `label`, `title`) using Reflect metadata.
  *
  * @typeParam Datatype - An optional type representing the data that this resource holds. Defaults to `any`.
  * @param metaData - The properties to be set as metadata on the class.
- * 
+ *
  * @example
  * ```typescript
  * @ResourceMetadata({
@@ -1092,15 +1100,17 @@ export class ResourcesManager {
  *   title: "User Management",
  * })
  * class User {}
- * 
+ *
  * ```
  */
-export function ResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(metaData?: IResource<DataType, PrimaryKeyType> & {
-  /***
-   * whether the resource should be instanciated or not
-   */
-  instanciate?: boolean;
-}) {
+export function ResourceMetadata<DataType extends IResourceData = any, PrimaryKeyType extends IResourcePrimaryKey = IResourcePrimaryKey>(
+  metaData?: IResource<DataType, PrimaryKeyType> & {
+    /***
+     * whether the resource should be instanciated or not
+     */
+    instanciate?: boolean;
+  }
+) {
   return function (target: typeof Resource<DataType, PrimaryKeyType>) {
     metaData = Object.assign({}, metaData);
     metaData.className = defaultStr(metaData.className, target?.name);
@@ -1109,8 +1119,8 @@ export function ResourceMetadata<DataType extends IResourceData = any, PrimaryKe
         try {
           const resource = new (target as any)() as Resource<DataType>;
           resource.updateMetadata(metaData);
-          ResourcesManager.addResource<DataType>((metaData.name as IResourceName), resource);
-        } catch { }
+          ResourcesManager.addResource<DataType>(metaData.name as IResourceName, resource);
+        } catch {}
       }
     }
     Reflect.defineMetadata(ResourcesManager.resourceMetaData, metaData, target);
@@ -1121,23 +1131,23 @@ export function ResourceMetadata<DataType extends IResourceData = any, PrimaryKe
 /**
  * @interface {IResourceInferDataType}
  * Infers the data type of a resource.
- * 
+ *
  * This type is used to extract the data type from a resource.
  * It uses the `infer` keyword to infer the type of the data.
- * 
+ *
  * @template ResourceType The type of the resource.
  * @description
  * This type is useful when you need to access the data type of a resource
  * without having to manually specify it.
- * 
+ *
  * @example
  * ```typescript
  * class MyResource extends Resource<MyData, MyPrimaryKey> {}
- * 
+ *
  * type MyDataType = IResourceInferDataType<typeof MyResource>;
  * // MyDataType is now MyData
  * ```
- * 
+ *
  * @returns The inferred data type of the resource.
  */
 export type IResourceInferDataType<ResourceType extends Resource<any, any>> = ResourceType extends Resource<infer D, any> ? D : IResourceData;
@@ -1145,23 +1155,23 @@ export type IResourceInferDataType<ResourceType extends Resource<any, any>> = Re
 /**
  * @interface {IResourceInferPrimaryKey}
  * Infers the primary key type of a resource.
- * 
+ *
  * This type is used to extract the primary key type from a resource.
  * It uses the `infer` keyword to infer the type of the primary key.
- * 
+ *
  * @template ResourceType The type of the resource.
  * @description
  * This type is useful when you need to access the primary key type of a resource
  * without having to manually specify it.
- * 
+ *
  * @example
  * ```typescript
  * class MyResource extends Resource<MyData, MyPrimaryKey> {}
- * 
+ *
  * type MyPrimaryKeyType = IResourceInferPrimaryKey<typeof MyResource>;
  * // MyPrimaryKeyType is now MyPrimaryKey
  * ```
- * 
+ *
  * @returns The inferred primary key type of the resource.
  */
 export type IResourceInferPrimaryKey<ResourceType extends Resource<any, any>> = ResourceType extends Resource<any, infer S> ? S : IResourcePrimaryKey;

@@ -1,6 +1,6 @@
 {
   "name": "@resk/nativewind",
-  "version": "1.0.1-canary.27",
+  "version": "1.0.1-canary.28",
   "description": "Precompiled TypeScript UI framework built on NativeWind",
   "license": "ISC",
   "author": "",
@@ -21,119 +21,116 @@
   ],
   "typesVersions": {
     "*": {
-      "./components/activityIndicator": [
+      "components/activityIndicator": [
         "./build/components/ActivityIndicator/index.d.ts"
       ],
-      "./components/alert": [
+      "components/alert": [
         "./build/components/Alert/index.d.ts"
       ],
-      "./components/avatar": [
+      "components/avatar": [
         "./build/components/Avatar/index.d.ts"
       ],
-      "./components/backdrop": [
+      "components/backdrop": [
         "./build/components/Backdrop/index.d.ts"
       ],
-      "./components/backHandler": [
+      "components/backHandler": [
         "./build/components/BackHandler/index.d.ts"
       ],
-      "./components/badge": [
+      "components/badge": [
         "./build/components/Badge/index.d.ts"
       ],
-      "./components/bottomSheet": [
+      "components/bottomSheet": [
         "./build/components/BottomSheet/index.d.ts"
       ],
-      "./components/button": [
+      "components/button": [
         "./build/components/Button/index.d.ts"
       ],
-      "./components/checkbox": [
+      "components/checkbox": [
         "./build/components/Checkbox/index.d.ts"
       ],
-      "./components/countrySelector": [
+      "components/countrySelector": [
         "./build/components/CountrySelector/index.d.ts"
       ],
-      "./components/dialog": [
+      "components/dialog": [
         "./build/components/Dialog/index.d.ts"
       ],
-      "./components/divider": [
+      "components/divider": [
         "./build/components/Divider/index.d.ts"
       ],
-      "./components/drawer": [
+      "components/drawer": [
         "./build/components/Drawer/index.d.ts"
       ],
-      "./components/expandable": [
+      "components/expandable": [
         "./build/components/Expandable/index.d.ts"
       ],
-      "./components/helperText": [
+      "components/helperText": [
         "./build/components/HelperText/index.d.ts"
       ],
-      "./components/icon": [
+      "components/icon": [
         "./build/components/Icon/index.d.ts"
       ],
-      "./components/keyboardAvoidingView": [
+      "components/keyboardAvoidingView": [
         "./build/components/KeyboardAvoidingView/index.d.ts"
       ],
-      "./components/keyboardEventHandler": [
+      "components/keyboardEventHandler": [
         "./build/components/KeyboardEventHandler/index.d.ts"
       ],
-      "./components/menu": [
+      "components/menu": [
         "./build/components/Menu/index.d.ts"
       ],
-      "./components/modal": [
+      "components/modal": [
         "./build/components/Modal/index.d.ts"
       ],
-      "./components/nav": [
+      "components/nav": [
         "./build/components/Nav/index.d.ts"
       ],
-      "./components/portal": [
+      "components/portal": [
         "./build/components/Portal/index.d.ts"
       ],
-      "./components/progressBar": [
+      "components/progressBar": [
         "./build/components/ProgressBar/index.d.ts"
       ],
-      "./components/slot": [
+      "components/slot": [
         "./build/components/Slot/index.d.ts"
       ],
-      "./components/stack": [
+      "components/stack": [
         "./build/components/Stack/index.d.ts"
       ],
-      "./components/surface": [
+      "components/surface": [
         "./build/components/Surface/index.d.ts"
       ],
-      "./components/switch": [
+      "components/switch": [
         "./build/components/Switch/index.d.ts"
       ],
-      "./components/textInput": [
+      "components/textInput": [
         "./build/components/TextInput/index.d.ts"
       ],
-      "./components/tooltip": [
+      "components/tooltip": [
         "./build/components/Tooltip/index.d.ts"
       ],
-      "./components/form": [
+      "components/form": [
         "./build/components/Form/index.d.ts"
       ],
-      "./components/*": [
+      "components/*": [
         "./build/components/index.d.ts"
       ],
-      "./html": [
+      "html": [
         "./build/html/index.d.ts"
       ],
-      "./variants": [
+      "variants": [
         "./build/variants/index.d.ts"
       ],
-      "./utils": [
+      "utils": [
         "./build/utils/index.d.ts"
       ],
-      "./i18n": [
+      "i18n": [
         "./build/i18n/index.d.ts"
       ],
-      "./platform": [
+      "platform": [
         "./build/platform/index.d.ts"
       ],
       "*" : [
         "./build/index.d.ts"
-      ],
-      "./theme-to-css-vars": [
-        "./theme-to-css-vars.js"
       ]
     }
   },

@@ -1,6 +1,5 @@
 import { Alert } from "@resk/nativewind";
 import { Div, H2 } from "@resk/nativewind/html";
-import { iconVariant } from "@resk/nativewind/variants";
 export function AlertExamples() {
     return <Div className="p-5">
         <H2>Alert Examples</H2>

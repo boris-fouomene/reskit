@@ -27,14 +27,14 @@ const VALIDATOR_TARGET_OPTIONS_METADATA_KEY = Symbol("validatorTargetOptions");
  * ## Basic Usage
  * ```typescript
  * // Register a custom validation rule
- * Validator.registerRule('customRule', ({ value }) => {
+ * Validator.registerRule('CustomRule', ({ value }) => {
  *   return value > 10 || 'Value must be greater than 10';
  * });
  * 
  * // Validate a single value
  * const result = await Validator.validate({
  *   value: 15,
- *   rules: ['required', 'customRule']
+ *   rules: ['Required', 'CustomRule']
  * });
  * 
  * // Use with decorators
@@ -126,31 +126,31 @@ export class Validator {
    * @example
    * ```typescript
    * // Simple synchronous rule
-   * Validator.registerRule('minValue', ({ value, ruleParams }) => {
-   *   const [minValue] = ruleParams;
-   *   return value >= minValue || `Value must be at least ${minValue}`;
-   * });
-   * 
-   * // Async rule with database check
-   * Validator.registerRule('uniqueEmail', async ({ value, context }) => {
-   *   const exists = await database.user.findByEmail(value);
-   *   return !exists || 'Email address is already taken';
-   * });
-   * 
-   * // Rule with multiple parameters
-   * Validator.registerRule('between', ({ value, ruleParams }) => {
-   *   const [min, max] = ruleParams;
-   *   return (value >= min && value <= max) || 
-   *          `Value must be between ${min} and ${max}`;
-   * });
-   * 
-   * // Rule with context
-   * Validator.registerRule('differentFrom', ({ value, ruleParams, context }) => {
-   *   const [fieldName] = ruleParams;
-   *   const otherValue = context?.data?.[fieldName];
-   *   return value !== otherValue || 
-   *          `Must be different from ${fieldName}`;
-   * });
+ * Validator.registerRule('MinValue', ({ value, ruleParams }) => {
+ *   const [minValue] = ruleParams;
+ *   return value >= minValue || `Value must be at least ${minValue}`;
+ * });
+ * 
+ * // Async rule with database check
+ * Validator.registerRule('UniqueEmail', async ({ value, context }) => {
+ *   const exists = await database.user.findByEmail(value);
+ *   return !exists || 'Email address is already taken';
+ * });
+ * 
+ * // Rule with multiple parameters
+ * Validator.registerRule('Between', ({ value, ruleParams }) => {
+ *   const [min, max] = ruleParams;
+ *   return (value >= min && value <= max) || 
+ *          `Value must be between ${min} and ${max}`;
+ * });
+ * 
+ * // Rule with context
+ * Validator.registerRule('DifferentFrom', ({ value, ruleParams, context }) => {
+ *   const [fieldName] = ruleParams;
+ *   const otherValue = context?.data?.[fieldName];
+ *   return value !== otherValue || 
+ *          `Must be different from ${fieldName}`;
+ * });
    * ```
    * 
    * @template ParamType - Array type for rule parameters
@@ -200,14 +200,14 @@ export class Validator {
    * @example
    * ```typescript
    * // Get all registered rules
-   * const allRules = Validator.getRules();
-   * console.log('Available rules:', Object.keys(allRules));
-   * 
-   * // Check if a specific rule exists
-   * const hasEmailRule = 'email' in Validator.getRules();
-   * 
-   * // Get rule function directly (not recommended, use findRegisteredRule instead)
-   * const emailRule = Validator.getRules()['email'];
+ * const allRules = Validator.getRules();
+ * console.log('Available rules:', Object.keys(allRules));
+ * 
+ * // Check if a specific rule exists
+ * const hasEmailRule = 'Email' in Validator.getRules();
+ * 
+ * // Get rule function directly (not recommended, use findRegisteredRule instead)
+ * const emailRule = Validator.getRules()['Email'];
    * ```
    * 
    * @returns An immutable copy of all registered validation rules
@@ -288,41 +288,41 @@ export class Validator {
    * @example
    * ```typescript
    * // Find a simple rule
-   * const emailRule = Validator.findRegisteredRule('email');
-   * if (emailRule) {
-   *   const result = await emailRule({ 
-   *     value: 'test@example.com',
-   *     ruleParams: []
-   *   });
-   * }
-   * 
-   * // Find a rule with specific parameter types
-   * const minLengthRule = Validator.findRegisteredRule<[number]>('minLength');
-   * if (minLengthRule) {
-   *   const result = await minLengthRule({
-   *     value: 'hello',
-   *     ruleParams: [5]
-   *   });
-   * }
-   * 
-   * // Find a rule with context
-   * interface UserContext {
-   *   userId: number;
-   *   permissions: string[];
-   * }
-   * 
-   * const permissionRule = Validator.findRegisteredRule<string[], UserContext>('hasPermission');
-   * if (permissionRule) {
-   *   const result = await permissionRule({
-   *     value: 'admin',
-   *     ruleParams: ['admin', 'moderator'],
-   *     context: { userId: 123, permissions: ['user', 'admin'] }
-   *   });
-   * }
-   * 
-   * // Safe rule checking
-   * const unknownRule = Validator.findRegisteredRule('nonExistentRule');
-   * console.log(unknownRule); // undefined
+ * const emailRule = Validator.findRegisteredRule('Email');
+ * if (emailRule) {
+ *   const result = await emailRule({ 
+ *     value: 'test@example.com',
+ *     ruleParams: []
+ *   });
+ * }
+ * 
+ * // Find a rule with specific parameter types
+ * const minLengthRule = Validator.findRegisteredRule<[number]>('MinLength');
+ * if (minLengthRule) {
+ *   const result = await minLengthRule({
+ *     value: 'hello',
+ *     ruleParams: [5]
+ *   });
+ * }
+ * 
+ * // Find a rule with context
+ * interface UserContext {
+ *   userId: number;
+ *   permissions: string[];
+ * }
+ * 
+ * const permissionRule = Validator.findRegisteredRule<string[], UserContext>('HasPermission');
+ * if (permissionRule) {
+ *   const result = await permissionRule({
+ *     value: 'admin',
+ *     ruleParams: ['admin', 'moderator'],
+ *     context: { userId: 123, permissions: ['user', 'admin'] }
+ *   });
+ * }
+ * 
+ * // Safe rule checking
+ * const unknownRule = Validator.findRegisteredRule('NonExistentRule');
+ * console.log(unknownRule); // undefined
    * ```
    * 
    * @template ParamType - Array type specifying the rule parameter types
@@ -356,21 +356,21 @@ export class Validator {
    * 
    * #### 1. Function Rules
    * ```typescript
-   * const functionRule = ({ value }) => value > 0 || 'Must be positive';
+ * const functionRule = ({ value }) => value > 0 || 'Must be positive';
    * ```
    * 
    * #### 2. String Rules
    * ```typescript
-   * 'required'                    // Simple rule
-   * 'minLength[5]'               // Rule with single parameter
-   * 'between[10,20]'             // Rule with multiple parameters
+ * 'Required'                    // Simple rule
+ * 'MinLength[5]'               // Rule with single parameter
+ * 'Between[10,20]'             // Rule with multiple parameters
    * ```
    * 
    * #### 3. Object Rules
    * ```typescript
-   * { required: [] }              // Rule without parameters
-   * { minLength: [5] }           // Rule with parameters
-   * { between: [10, 20] }        // Rule with multiple parameters
+ * { Required: [] }              // Rule without parameters
+ * { MinLength: [5] }           // Rule with parameters
+ * { Between: [10, 20] }        // Rule with multiple parameters
    * ```
    * 
    * ### Processing Logic
@@ -383,31 +383,31 @@ export class Validator {
    * @example
    * ```typescript
    * // Mixed rule formats
-   * const mixedRules = [
-   *   'required',
-   *   'minLength[3]',
-   *   { maxLength: [50] },
-   *   ({ value }) => value.includes('@') || 'Must contain @',
-   *   'invalidRule'  // This will be reported as invalid
-   * ];
-   * 
-   * const { sanitizedRules, invalidRules } = Validator.parseAndValidateRules(mixedRules);
-   * 
-   * console.log('Valid rules:', sanitizedRules.length);        // 4
-   * console.log('Invalid rules:', invalidRules);               // ['invalidRule']
-   * 
-   * // Empty or undefined input
-   * const { sanitizedRules: empty } = Validator.parseAndValidateRules();
-   * console.log(empty.length); // 0
-   * 
-   * // Complex rule with parameters
-   * const complexRules = [
-   *   'between[1,100]',
-   *   { customRule: ['param1', 'param2'] }
-   * ];
-   * 
-   * const result = Validator.parseAndValidateRules(complexRules);
-   * // Each sanitized rule will have: ruleName, params, ruleFunction, rawRuleName
+ * const mixedRules = [
+ *   'Required',
+ *   'MinLength[3]',
+ *   { MaxLength: [50] },
+ *   ({ value }) => value.includes('@') || 'Must contain @',
+ *   'InvalidRule'  // This will be reported as invalid
+ * ];
+ * 
+ * const { sanitizedRules, invalidRules } = Validator.parseAndValidateRules(mixedRules);
+ * 
+ * console.log('Valid rules:', sanitizedRules.length);        // 4
+ * console.log('Invalid rules:', invalidRules);               // ['InvalidRule']
+ * 
+ * // Empty or undefined input
+ * const { sanitizedRules: empty } = Validator.parseAndValidateRules();
+ * console.log(empty.length); // 0
+ * 
+ * // Complex rule with parameters
+ * const complexRules = [
+ *   'Between[1,100]',
+ *   { CustomRule: ['param1', 'param2'] }
+ * ];
+ * 
+ * const result = Validator.parseAndValidateRules(complexRules);
+ * // Each sanitized rule will have: ruleName, params, ruleFunction, rawRuleName
    * ```
    * 
    * @param inputRules - Array of validation rules in various formats, or undefined
@@ -474,16 +474,16 @@ export class Validator {
    * ```typescript
    * // These calls demonstrate the parsing logic (internal method)
    * // Simple rule
-   * parseStringRule("required", registeredRules)
-   * // Returns: { ruleName: "required", params: [], ruleFunction: fn, rawRuleName: "required" }
-   * 
-   * // Rule with single parameter
-   * parseStringRule("minLength[5]", registeredRules)
-   * // Returns: { ruleName: "minLength", params: ["5"], ruleFunction: fn, rawRuleName: "minLength[5]" }
-   * 
-   * // Rule with multiple parameters
-   * parseStringRule("between[10, 20]", registeredRules)
-   * // Returns: { ruleName: "between", params: ["10", "20"], ruleFunction: fn, rawRuleName: "between[10, 20]" }
+ * parseStringRule("Required", registeredRules)
+ * // Returns: { ruleName: "Required", params: [], ruleFunction: fn, rawRuleName: "Required" }
+ * 
+ * // Rule with single parameter
+ * parseStringRule("MinLength[5]", registeredRules)
+ * // Returns: { ruleName: "MinLength", params: ["5"], ruleFunction: fn, rawRuleName: "MinLength[5]" }
+ * 
+ * // Rule with multiple parameters
+ * parseStringRule("Between[10, 20]", registeredRules)
+ * // Returns: { ruleName: "Between", params: ["10", "20"], ruleFunction: fn, rawRuleName: "Between[10, 20]" }
    * ```
    * 
    * @internal
@@ -554,17 +554,17 @@ export class Validator {
    * @example
    * ```typescript
    * // Object rules input
-   * const objectRules = {
-   *   required: [],
-   *   minLength: [5],
-   *   between: [10, 20],
-   *   customRule: 'singleParam',
-   *   invalidRule: []  // Will be marked as invalid if not registered
-   * };
-   * 
-   * const result = parseObjectRules(objectRules, registeredRules);
-   * // result.valid contains standardized rule objects
-   * // result.invalid contains ['invalidRule'] if not registered
+ * const objectRules = {
+ *   Required: [],
+ *   MinLength: [5],
+ *   Between: [10, 20],
+ *   CustomRule: 'singleParam',
+ *   InvalidRule: []  // Will be marked as invalid if not registered
+ * };
+ * 
+ * const result = parseObjectRules(objectRules, registeredRules);
+ * // result.valid contains standardized rule objects
+ * // result.invalid contains ['InvalidRule'] if not registered
    * ```
    * 
    * @internal
@@ -633,49 +633,49 @@ export class Validator {
    * @example
    * ```typescript
    * // Basic validation
-   * try {
-   *   const result = await Validator.validate({
-   *     value: 'user@example.com',
-   *     rules: ['required', 'email'],
-   *     fieldName: 'email'
-   *   });
-   *   console.log('Validation passed!', result);
-   * } catch (error) {
-   *   console.error('Validation failed:', error.message);
-   * }
-   * 
-   * // Complex validation with context
-   * const validationOptions = {
-   *   value: 'newPassword123',
-   *   rules: [
-   *     'required',
-   *     'minLength[8]',
-   *     { strongPassword: [] },
-   *     async ({ value, context }) => {
-   *       const isUsed = await checkPasswordHistory(value, context.userId);
-   *       return !isUsed || 'Password was recently used';
-   *     }
-   *   ],
-   *   fieldName: 'password',
-   *   translatedPropertyName: 'Password',
-   *   context: { userId: 123 }
-   * };
-   * 
-   * try {
-   *   await Validator.validate(validationOptions);
-   * } catch (error) {
-   *   // Error contains: message, status, rule, ruleName, ruleParams, etc.
-   *   console.log('Failed rule:', error.ruleName);
-   *   console.log('Error message:', error.message);
-   * }
-   * 
-   * // Validation with custom parameters
-   * const numericValidation = await Validator.validate({
-   *   value: 25,
-   *   rules: ['required', 'number', 'between[18,65]'],
-   *   fieldName: 'age',
-   *   propertyName: 'userAge'
-   * });
+ * try {
+ *   const result = await Validator.validate({
+ *     value: 'user@example.com',
+ *     rules: ['Required', 'Email'],
+ *     fieldName: 'email'
+ *   });
+ *   console.log('Validation passed!', result);
+ * } catch (error) {
+ *   console.error('Validation failed:', error.message);
+ * }
+ * 
+ * // Complex validation with context
+ * const validationOptions = {
+ *   value: 'newPassword123',
+ *   rules: [
+ *     'Required',
+ *     'MinLength[8]',
+ *     { StrongPassword: [] },
+ *     async ({ value, context }) => {
+ *       const isUsed = await checkPasswordHistory(value, context.userId);
+ *       return !isUsed || 'Password was recently used';
+ *     }
+ *   ],
+ *   fieldName: 'password',
+ *   translatedPropertyName: 'Password',
+ *   context: { userId: 123 }
+ * };
+ * 
+ * try {
+ *   await Validator.validate(validationOptions);
+ * } catch (error) {
+ *   // Error contains: message, status, rule, ruleName, ruleParams, etc.
+ *   console.log('Failed rule:', error.ruleName);
+ *   console.log('Error message:', error.message);
+ * }
+ * 
+ * // Validation with custom parameters
+ * const numericValidation = await Validator.validate({
+ *   value: 25,
+ *   rules: ['Required', 'Number', 'Between[18,65]'],
+ *   fieldName: 'age',
+ *   propertyName: 'userAge'
+ * });
    * ```
    * 
    * ### Advanced Usage
@@ -690,9 +690,9 @@ export class Validator {
    *   value: 'admin-action',
    *   rules: [
    *     'required',
-   *     ({ value, context }) => {
-   *       return context.currentUser.role === 'admin' || 'Admin access required';
-   *     }
+ *     ({ value, context }) => {
+ *       return context.currentUser.role === 'admin' || 'Admin access required';
+ *     }
    *   ],
    *   context: {
    *     currentUser: { id: 1, role: 'user' },
@@ -817,24 +817,24 @@ export class Validator {
    * ```typescript
    * // Define a class with validation decorators
    * class UserRegistration {
-   *   @IsRequired
-   *   @IsEmail
-   *   email: string;
-   * 
-   *   @IsRequired
-   *   @MinLength([8])
-   *   @HasPattern([/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Must contain uppercase, lowercase and number'])
-   *   password: string;
-   * 
-   *   @IsRequired
-   *   @MinLength([2])
-   *   @MaxLength([50])
-   *   name: string;
-   * 
-   *   @IsOptional
-   *   @IsNumber
-   *   @Between([18, 120])
-   *   age?: number;
+ *   @IsRequired
+ *   @IsEmail
+ *   email: string;
+ * 
+ *   @IsRequired
+ *   @MinLength([8])
+ *   @HasPattern([/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Must contain uppercase, lowercase and number'])
+ *   password: string;
+ * 
+ *   @IsRequired
+ *   @MinLength([2])
+ *   @MaxLength([50])
+ *   name: string;
+ * 
+ *   @IsOptional
+ *   @IsNumber
+ *   @Between([18, 120])
+ *   age?: number;
    * }
    * 
    * // Validate user data
@@ -876,16 +876,16 @@ export class Validator {
    * ```typescript
    * // Class with context-dependent validation
    * class AdminUser {
-   *   @IsRequired
-   *   @IsEmail
-   *   email: string;
-   * 
-   *   @CustomRule([
-   *     ({ value, context }) => {
-   *       return context.isAdmin || 'Admin privileges required';
-   *     }
-   *   ])
-   *   adminAction: string;
+ *   @IsRequired
+ *   @IsEmail
+ *   email: string;
+ * 
+ *   @CustomRule([
+ *     ({ value, context }) => {
+ *       return context.isAdmin || 'Admin privileges required';
+ *     }
+ *   ])
+ *   adminAction: string;
    * }
    * 
    * const adminData = {
@@ -1597,15 +1597,15 @@ export const IsNonNullString = Validator.createPropertyDecorator(["NonNullString
  * @ValidationTargetOptions({
  *   errorMessageBuilder: (fieldName, error) => {
  *     return `🚫 ${fieldName.toUpperCase()}: ${error}`;
- *   }
- * })
- * class StyledUser {
- *   @IsRequired
- *   @IsEmail
- *   email: string;
+ * // {
+ * //   email: ['Required', 'Email'],
+ * //   name: ['Required', 'MinLength', 'MaxLength'],
+ * //   age: ['Number']  // IsOptional doesn't add a rule
+ * // }
  * 
- *   @IsRequired
- *   @MinLength([3])
+ * // Check if a property has specific rules
+ * const emailRules = rules.email;
+ * const hasEmailValidation = emailRules.includes('Email');
  *   name: string;
  * }
  * 

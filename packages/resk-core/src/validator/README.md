@@ -51,8 +51,8 @@ import {
 
 Rules can be defined in multiple formats:
 
-1. **String Format**: `'required'`, `'minLength[5]'`, `'between[10,20]'`
-2. **Object Format**: `{ required: [], minLength: [5], between: [10, 20] }`
+1. **String Format**: `'Required'`, `'MinLength[5]'`, `'Between[10,20]'`
+2. **Object Format**: `{ Required: [], MinLength: [5], Between: [10, 20] }`
 3. **Function Format**: `({ value }) => value > 0 || 'Must be positive'`
 
 ### Rule Execution
@@ -76,7 +76,7 @@ import { Validator } from '@resk/core/validator';
 try {
   const result = await Validator.validate({
     value: 'user@example.com',
-    rules: ['required', 'email'],
+    rules: ['Required', 'Email'],
     fieldName: 'email'
   });
   console.log('Validation passed!');
@@ -107,10 +107,10 @@ const passwordValidation = await Validator.validate({
 
 ```typescript
 const validationRules = {
-  required: [],
-  minLength: [8],
-  maxLength: [50],
-  alpha_num: []
+  Required: [],
+  MinLength: [8],
+  MaxLength: [50],
+  AlphaNum: []
 };
 
 const result = await Validator.validate({
@@ -131,24 +131,26 @@ The `Validator` class is the core of the validation system, providing static met
 Registers a new custom validation rule that can be used throughout the application.
 
 **Parameters:**
+
 - `ruleName: string` - Unique identifier for the validation rule
 - `ruleHandler: IValidatorRuleFunction` - Function that performs the validation logic
 
 **Example:**
+
 ```typescript
 // Register a simple custom rule
-Validator.registerRule('positiveNumber', ({ value }) => {
-  return value > 0 || 'Must be a positive number';
+Validator.registerRule('PositiveNumber', ({ value }) => {
+  return value > 0 || 'Value must be a positive number';
 });
 
 // Register an async rule with database check
-Validator.registerRule('uniqueEmail', async ({ value, context }) => {
+Validator.registerRule('UniqueEmail', async ({ value, context }) => {
   const user = await database.findUserByEmail(value);
   return !user || 'Email address is already taken';
 });
 
 // Register a rule with multiple parameters
-Validator.registerRule('betweenDates', ({ value, ruleParams }) => {
+Validator.registerRule('BetweenDates', ({ value, ruleParams }) => {
   const [startDate, endDate] = ruleParams;
   const date = new Date(value);
   const start = new Date(startDate);
@@ -164,6 +166,7 @@ Validator.registerRule('betweenDates', ({ value, ruleParams }) => {
 Performs comprehensive validation of a single value against a set of validation rules.
 
 **Parameters:**
+
 - `options.value: any` - The value to validate
 - `options.rules: IValidatorRule[]` - Array of validation rules
 - `options.fieldName?: string` - Name of the field being validated
@@ -173,6 +176,7 @@ Performs comprehensive validation of a single value against a set of validation 
 **Returns:** `Promise<IValidatorValidateOptions>` - Resolves on success, rejects on failure
 
 **Example:**
+
 ```typescript
 // Basic validation
 const emailValidation = await Validator.validate({
@@ -213,6 +217,7 @@ Retrieves an immutable copy of all currently registered validation rules.
 **Returns:** `IValidatorRuleMap` - Object containing all registered rules
 
 **Example:**
+
 ```typescript
 const allRules = Validator.getRules();
 console.log('Available rules:', Object.keys(allRules));
@@ -227,11 +232,13 @@ console.log('Email rule available:', hasEmailRule);
 Locates and returns a specific validation rule by its name.
 
 **Parameters:**
+
 - `ruleName: string` - The name of the rule to find
 
 **Returns:** `IValidatorRuleFunction | undefined` - The rule function if found
 
 **Example:**
+
 ```typescript
 // Find and use a rule directly
 const emailRule = Validator.findRegisteredRule('email');
@@ -257,11 +264,13 @@ if (minLengthRule) {
 Converts various input rule formats into a standardized, executable format.
 
 **Parameters:**
+
 - `inputRules: IValidatorRule[]` - Array of rules in various formats
 
 **Returns:** `{ sanitizedRules: IValidatorSanitizedRules, invalidRules: IValidatorRule[] }`
 
 **Example:**
+
 ```typescript
 const mixedRules = [
   'required',
@@ -282,6 +291,7 @@ Retrieves the configured separators used for formatting validation error message
 **Returns:** `{ multiple: string, single: string }` - Separator configuration
 
 **Example:**
+
 ```typescript
 const separators = Validator.getErrorMessageSeparators();
 const errors = ['Field is required', 'Must be an email'];
@@ -295,6 +305,7 @@ The module includes 69+ Laravel-compatible validation rules organized into six c
 ### Boolean Rules
 
 #### `Accepted`
+
 Field must be "yes", "on", 1, "1", true, or "true".
 
 ```typescript
@@ -306,6 +317,7 @@ await Validator.validate({
 ```
 
 #### `AcceptedIf`
+
 Conditionally accepted based on another field's value.
 
 ```typescript
@@ -318,6 +330,7 @@ await Validator.validate({
 ```
 
 #### `Boolean`
+
 Field must be castable to boolean (true, false, 1, 0, "1", "0").
 
 ```typescript
@@ -329,6 +342,7 @@ await Validator.validate({
 ```
 
 #### `Declined`
+
 Field must be "no", "off", 0, "0", false, or "false".
 
 ```typescript
@@ -340,6 +354,7 @@ await Validator.validate({
 ```
 
 #### `DeclinedIf`
+
 Conditionally declined based on another field's value.
 
 ```typescript
@@ -354,6 +369,7 @@ await Validator.validate({
 ### String Rules
 
 #### `Alpha`
+
 Only alphabetic characters allowed.
 
 ```typescript
@@ -365,6 +381,7 @@ await Validator.validate({
 ```
 
 #### `AlphaDash`
+
 Alpha-numeric characters, dashes, and underscores.
 
 ```typescript
@@ -376,6 +393,7 @@ await Validator.validate({
 ```
 
 #### `AlphaNum`
+
 Only alpha-numeric characters.
 
 ```typescript
@@ -387,6 +405,7 @@ await Validator.validate({
 ```
 
 #### `Email`
+
 Valid email address with multiple validation styles.
 
 ```typescript
@@ -400,63 +419,68 @@ await Validator.validate({
 // Email with specific validation (RFC, DNS, etc.)
 await Validator.validate({
   value: 'user@example.com',
-  rules: ['email[rfc]'],
+  rules: ['Email[rfc]'],
   fieldName: 'email'
 });
 ```
 
 #### `Confirmed`
+
 Must have matching confirmation field.
 
 ```typescript
 await Validator.validate({
   value: 'password123',
-  rules: ['confirmed'],
+  rules: ['Confirmed'],
   fieldName: 'password',
   context: { password_confirmation: 'password123' }
 });
 ```
 
 #### `Json`
+
 Valid JSON string.
 
 ```typescript
 await Validator.validate({
   value: '{"name": "John", "age": 30}',
-  rules: ['json'],
+  rules: ['Json'],
   fieldName: 'metadata'
 });
 ```
 
 #### `Regex`
+
 Must match regular expression.
 
 ```typescript
 await Validator.validate({
   value: 'ABC-123',
-  rules: ['regex[/^[A-Z]{3}-\\d{3}$/]'],
+  rules: ['Regex[/^[A-Z]{3}-\\d{3}$/]'],
   fieldName: 'code'
 });
 ```
 
 #### `Url`
+
 Valid URL with protocol support.
 
 ```typescript
 await Validator.validate({
   value: 'https://example.com',
-  rules: ['url'],
+  rules: ['Url'],
   fieldName: 'website'
 });
 ```
 
 #### `Uuid`
+
 Valid UUID (versions 1-8).
 
 ```typescript
 await Validator.validate({
   value: '550e8400-e29b-41d4-a716-446655440000',
-  rules: ['uuid'],
+  rules: ['Uuid'],
   fieldName: 'id'
 });
 ```
@@ -464,61 +488,65 @@ await Validator.validate({
 ### Numeric Rules
 
 #### `Between`
+
 Value must be between minimum and maximum.
 
 ```typescript
 // Numeric between
 await Validator.validate({
   value: 25,
-  rules: ['between[18,65]'],
+  rules: ['Between[18,65]'],
   fieldName: 'age'
 });
 
 // String length between
 await Validator.validate({
   value: 'hello',
-  rules: ['between[3,10]'],
+  rules: ['Between[3,10]'],
   fieldName: 'message'
 });
 ```
 
 #### `Min` / `Max`
+
 Minimum or maximum value/length.
 
 ```typescript
 // Numeric minimum
 await Validator.validate({
   value: 18,
-  rules: ['min[18]'],
+  rules: ['Min[18]'],
   fieldName: 'age'
 });
 
 // String minimum length
 await Validator.validate({
   value: 'password123',
-  rules: ['min[8]'],
+  rules: ['Min[8]'],
   fieldName: 'password'
 });
 ```
 
 #### `Integer`
+
 Must be an integer.
 
 ```typescript
 await Validator.validate({
   value: 42,
-  rules: ['integer'],
+  rules: ['Integer'],
   fieldName: 'count'
 });
 ```
 
 #### `Decimal`
+
 Specific number of decimal places.
 
 ```typescript
 await Validator.validate({
   value: 19.99,
-  rules: ['decimal[2]'],
+  rules: ['Decimal[2]'],
   fieldName: 'price'
 });
 ```
@@ -526,34 +554,37 @@ await Validator.validate({
 ### Array Rules
 
 #### `Array`
+
 Value must be an array.
 
 ```typescript
 await Validator.validate({
   value: [1, 2, 3],
-  rules: ['array'],
+  rules: ['Array'],
   fieldName: 'items'
 });
 ```
 
 #### `In`
+
 Value must be in the specified list.
 
 ```typescript
 await Validator.validate({
   value: 'red',
-  rules: ['in[red,green,blue]'],
+  rules: ['In[red,green,blue]'],
   fieldName: 'color'
 });
 ```
 
 #### `NotIn`
+
 Value must not be in the specified list.
 
 ```typescript
 await Validator.validate({
   value: 'purple',
-  rules: ['notIn[red,green,blue]'],
+  rules: ['NotIn[red,green,blue]'],
   fieldName: 'color'
 });
 ```
@@ -561,70 +592,76 @@ await Validator.validate({
 ### Conditional Rules
 
 #### `Required`
+
 Field must be present and not empty.
 
 ```typescript
 await Validator.validate({
   value: 'John Doe',
-  rules: ['required'],
+  rules: ['Required'],
   fieldName: 'name'
 });
 ```
 
 #### `RequiredIf`
+
 Required if another field equals a specific value.
 
 ```typescript
 await Validator.validate({
   value: 'Spouse Name',
-  rules: ['requiredIf[maritalStatus,married]'],
+  rules: ['RequiredIf[maritalStatus,married]'],
   fieldName: 'spouseName',
   context: { maritalStatus: 'married' }
 });
 ```
 
 #### `RequiredUnless`
+
 Required unless another field equals a specific value.
 
 ```typescript
 await Validator.validate({
   value: 'Business Email',
-  rules: ['requiredUnless[accountType,personal]'],
+  rules: ['RequiredUnless[accountType,personal]'],
   fieldName: 'businessEmail',
   context: { accountType: 'business' }
 });
 ```
 
 #### `RequiredWith`
+
 Required if any of the specified fields are present.
 
 ```typescript
 await Validator.validate({
   value: 'Last Name',
-  rules: ['requiredWith[firstName]'],
+  rules: ['RequiredWith[firstName]'],
   fieldName: 'lastName',
   context: { firstName: 'John' }
 });
 ```
 
 #### `Nullable`
+
 Field can be null or undefined.
 
 ```typescript
 await Validator.validate({
   value: null,
-  rules: ['nullable', 'string'],
+  rules: ['Nullable', 'String'],
   fieldName: 'middleName'
 });
 ```
 
 #### `Sometimes`
+
 Only validate if field is present.
 
 ```typescript
 await Validator.validate({
   value: undefined,
-  rules: ['sometimes', 'email'],
+  rules: ['Sometimes', 'Email'],
   fieldName: 'optionalEmail'
 });
 ```
@@ -632,46 +669,50 @@ await Validator.validate({
 ### Utility Rules
 
 #### `Present`
+
 Field must be present (but can be empty).
 
 ```typescript
 await Validator.validate({
   value: '',
-  rules: ['present'],
+  rules: ['Present'],
   fieldName: 'emptyField'
 });
 ```
 
 #### `Filled`
+
 Field must be present and not empty when present.
 
 ```typescript
 await Validator.validate({
   value: 'content',
-  rules: ['filled'],
+  rules: ['Filled'],
   fieldName: 'description'
 });
 ```
 
 #### `Same`
+
 Field must be the same as another field.
 
 ```typescript
 await Validator.validate({
   value: 'password123',
-  rules: ['same[password]'],
+  rules: ['Same[password]'],
   fieldName: 'passwordConfirmation',
   context: { password: 'password123' }
 });
 ```
 
 #### `Different`
+
 Field must be different from another field.
 
 ```typescript
 await Validator.validate({
   value: 'newPassword456',
-  rules: ['different[currentPassword]'],
+  rules: ['Different[currentPassword]'],
   fieldName: 'newPassword',
   context: { currentPassword: 'oldPassword123' }
 });
@@ -682,6 +723,7 @@ await Validator.validate({
 ### Core Types
 
 #### `IValidatorRule<ParamType, Context>`
+
 Represents various formats a validation rule can take.
 
 ```typescript
@@ -693,6 +735,7 @@ type IValidatorRule<ParamType extends Array<any> = Array<any>, Context = unknown
 ```
 
 #### `IValidatorRuleFunction<ParamType, Context>`
+
 Type definition for validation rule functions.
 
 ```typescript
@@ -701,6 +744,7 @@ type IValidatorRuleFunction<ParamType extends Array<any> = Array<any>, Context =
 ```
 
 #### `IValidatorValidateOptions<ParamType, Context>`
+
 Configuration object for validation operations.
 
 ```typescript
@@ -717,6 +761,7 @@ interface IValidatorValidateOptions<ParamType extends Array<any> = Array<any>, C
 ```
 
 #### `IValidatorResult`
+
 Possible return types from validation functions.
 
 ```typescript
@@ -726,6 +771,7 @@ type IValidatorResult = boolean | string | Promise<boolean | string>;
 ### Sanitized Rule Types
 
 #### `IValidatorSanitizedRule<ParamType, Context>`
+
 Standardized format for processed validation rules.
 
 ```typescript
@@ -750,16 +796,16 @@ The validation system supports translations for all Laravel validation rules:
 ```typescript
 // Example translation structure
 const laravelValidationTranslations = {
-  accepted: "The {propertyName} must be accepted.",
-  acceptedIf: "The {propertyName} must be accepted when {other} is {value}.",
-  alpha: "The {propertyName} may only contain letters.",
-  alphaDash: "The {propertyName} may only contain letters, numbers, dashes and underscores.",
-  alphaNum: "The {propertyName} may only contain letters and numbers.",
-  email: "The {propertyName} must be a valid email address.",
-  required: "The {propertyName} field is required.",
-  minLength: "The {propertyName} must be at least {min} characters.",
-  maxLength: "The {propertyName} may not be greater than {max} characters.",
-  between: "The {propertyName} must be between {min} and {max}.",
+  Accepted: "The {propertyName} must be accepted.",
+  AcceptedIf: "The {propertyName} must be accepted when {other} is {value}.",
+  Alpha: "The {propertyName} may only contain letters.",
+  AlphaDash: "The {propertyName} may only contain letters, numbers, dashes and underscores.",
+  AlphaNum: "The {propertyName} may only contain letters and numbers.",
+  Email: "The {propertyName} must be a valid email address.",
+  Required: "The {propertyName} field is required.",
+  MinLength: "The {propertyName} must be at least {min} characters.",
+  MaxLength: "The {propertyName} may not be greater than {max} characters.",
+  Between: "The {propertyName} must be between {min} and {max}.",
   // ... and 40+ more translations
 };
 ```
@@ -770,7 +816,7 @@ const laravelValidationTranslations = {
 // Field name will be automatically translated
 await Validator.validate({
   value: '',
-  rules: ['required'],
+  rules: ['Required'],
   fieldName: 'email',
   translatedPropertyName: 'Email Address' // Custom translated name
 });
@@ -782,7 +828,7 @@ await Validator.validate({
 
 ```typescript
 // Register custom validation with translation support
-Validator.registerRule('customRule', ({ value, translatedPropertyName }) => {
+Validator.registerRule('CustomRule', ({ value, translatedPropertyName }) => {
   if (!isValid(value)) {
     return i18n.t('validation.customRule', { 
       propertyName: translatedPropertyName || 'field' 
@@ -799,23 +845,23 @@ The validation system provides property decorators for class-based validation.
 ### Using Validation Decorators
 
 ```typescript
-import { validate, required, email, minLength } from '@resk/core/validator';
+import { validate, Required, Email, MinLength } from '@resk/core/validator';
 
 class UserRegistration {
-  @required()
-  @minLength(2)
+  @Required()
+  @MinLength(2)
   firstName: string;
 
-  @required()
-  @minLength(2)
+  @Required()
+  @MinLength(2)
   lastName: string;
 
-  @required()
-  @email()
+  @Required()
+  @Email()
   email: string;
 
-  @required()
-  @minLength(8)
+  @Required()
+  @MinLength(8)
   password: string;
 
   constructor(data: Partial<UserRegistration>) {
@@ -845,33 +891,33 @@ All Laravel validation rules are available as decorators:
 
 ```typescript
 class ProductModel {
-  @required()
-  @string()
-  @minLength(3)
-  @maxLength(100)
+  @Required()
+  @String()
+  @MinLength(3)
+  @MaxLength(100)
   name: string;
 
-  @required()
-  @numeric()
-  @min(0)
-  @decimal(2)
+  @Required()
+  @Numeric()
+  @Min(0)
+  @Decimal(2)
   price: number;
 
-  @required()
-  @array()
-  @minSize(1)
+  @Required()
+  @Array()
+  @MinSize(1)
   categories: string[];
 
-  @nullable()
-  @string()
-  @maxLength(500)
+  @Nullable()
+  @String()
+  @MaxLength(500)
   description?: string;
 
-  @boolean()
+  @Boolean()
   isActive: boolean = true;
 
-  @url()
-  @nullable()
+  @Url()
+  @Nullable()
   website?: string;
 }
 ```
@@ -884,7 +930,7 @@ The validator fully supports asynchronous validation rules:
 
 ```typescript
 // Async database validation
-Validator.registerRule('uniqueUsername', async ({ value, context }) => {
+Validator.registerRule('UniqueUsername', async ({ value, context }) => {
   const existingUser = await database.users.findOne({ username: value });
   if (existingUser && existingUser.id !== context?.currentUserId) {
     return 'Username is already taken';
@@ -895,7 +941,7 @@ Validator.registerRule('uniqueUsername', async ({ value, context }) => {
 // Usage
 await Validator.validate({
   value: 'newuser123',
-  rules: ['required', 'alphaNum', 'uniqueUsername'],
+  rules: ['Required', 'AlphaNum', 'UniqueUsername'],
   fieldName: 'username',
   context: { currentUserId: 456 }
 });
@@ -918,7 +964,7 @@ interface FormValidationContext {
 }
 
 // Permission-based validation
-Validator.registerRule('requiresPermission', ({ value, ruleParams, context }) => {
+Validator.registerRule('RequiresPermission', ({ value, ruleParams, context }) => {
   const [requiredPermission] = ruleParams;
   const userPermissions = context?.user?.permissions || [];
   
@@ -929,7 +975,7 @@ Validator.registerRule('requiresPermission', ({ value, ruleParams, context }) =>
 });
 
 // Age range validation with context
-Validator.registerRule('ageInRange', ({ value, context }) => {
+Validator.registerRule('AgeInRange', ({ value, context }) => {
   const age = parseInt(value);
   const { minAge, maxAge } = context?.settings || { minAge: 18, maxAge: 100 };
   
@@ -955,7 +1001,7 @@ const validationContext: FormValidationContext = {
 
 await Validator.validate<FormValidationContext>({
   value: 'user.create',
-  rules: ['required', 'requiresPermission[user.create]'],
+  rules: ['Required', 'RequiresPermission[user.create]'],
   fieldName: 'action',
   context: validationContext
 });
@@ -966,16 +1012,16 @@ await Validator.validate<FormValidationContext>({
 ```typescript
 // Complex conditional validation
 const validateUserProfile = async (userData: any) => {
-  const rules = ['required', 'string'];
+  const rules = ['Required', 'String'];
   
   // Add email validation if email is provided
   if (userData.email) {
-    rules.push('email');
+    rules.push('Email');
   }
   
   // Add phone validation for premium users
   if (userData.accountType === 'premium') {
-    rules.push('requiredWith[email]');
+    rules.push('RequiredWith[Email]');
   }
   
   return await Validator.validate({
@@ -994,7 +1040,7 @@ const validateUserForm = async (formData: Record<string, any>) => {
   const validationTasks = [
     Validator.validate({
       value: formData.firstName,
-      rules: ['required', 'string', 'minLength[2]'],
+      rules: ['Required', 'String', 'MinLength[2]'],
       fieldName: 'firstName'
     }),
     Validator.validate({
@@ -1085,19 +1131,19 @@ Validator.registerRule('creditCard', ({ value, ruleParams }) => {
   const luhnCheck = (num: string) => {
     let sum = 0;
     let isEven = false;
-    
+  
     for (let i = num.length - 1; i >= 0; i--) {
       let digit = parseInt(num[i]);
-      
+    
       if (isEven) {
         digit *= 2;
         if (digit > 9) digit -= 9;
       }
-      
+    
       sum += digit;
       isEven = !isEven;
     }
-    
+  
     return sum % 10 === 0;
   };
   
@@ -1112,7 +1158,7 @@ Validator.registerRule('creditCard', ({ value, ruleParams }) => {
       mastercard: /^5[1-5]/,
       amex: /^3[47]/
     };
-    
+  
     const pattern = patterns[cardType.toLowerCase()];
     if (pattern && !pattern.test(cleanNumber)) {
       return `Invalid ${cardType} card number`;
@@ -1127,11 +1173,11 @@ Validator.registerRule('creditCard', ({ value, ruleParams }) => {
 
 ```typescript
 // Domain validation with DNS lookup
-Validator.registerRule('validDomain', async ({ value }) => {
+Validator.registerRule('ValidDomain', async ({ value }) => {
   try {
     const response = await fetch(`https://dns.google/resolve?name=${value}&type=A`);
     const data = await response.json();
-    
+  
     return (data.Status === 0 && data.Answer?.length > 0) || 
            'Domain does not exist or is not reachable';
   } catch (error) {
@@ -1140,7 +1186,7 @@ Validator.registerRule('validDomain', async ({ value }) => {
 });
 
 // Password strength with external service
-Validator.registerRule('passwordStrength', async ({ value, ruleParams }) => {
+Validator.registerRule('PasswordStrength', async ({ value, ruleParams }) => {
   const [minimumScore] = ruleParams || [3];
   
   try {
@@ -1149,9 +1195,9 @@ Validator.registerRule('passwordStrength', async ({ value, ruleParams }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: value })
     });
-    
+  
     const { score } = await response.json();
-    
+  
     return (score >= minimumScore) || 
            `Password strength must be at least ${minimumScore}/5`;
   } catch (error) {
@@ -1171,7 +1217,7 @@ The validator provides detailed error information for effective debugging and us
 try {
   await Validator.validate({
     value: '',
-    rules: ['required'],
+    rules: ['Required'],
     fieldName: 'email'
   });
 } catch (error) {
@@ -1186,7 +1232,7 @@ try {
 try {
   await Validator.validate({
     value: 'test',
-    rules: ['nonExistentRule'],
+    rules: ['NonExistentRule'],
     fieldName: 'field'
   });
 } catch (error) {
@@ -1220,7 +1266,7 @@ Validator.registerRule('ageRequirement', ({ value, ruleParams, context, translat
       employee: `Employees must be at least ${minimumAge} years old`,
       customer: `Customers must be at least ${minimumAge} years old`
     };
-    
+  
     return messages[userType] || `${translatedPropertyName} must be at least ${minimumAge}`;
   }
   
@@ -1240,7 +1286,7 @@ const validateWithFallback = async (value: any, primaryRules: string[], fallback
     });
   } catch (primaryError) {
     console.warn('Primary validation failed, trying fallback:', primaryError.message);
-    
+  
     try {
       return await Validator.validate({
         value,
@@ -1354,8 +1400,8 @@ const getCachedRules = (ruleKey: string, ruleFactory: () => string[]) => {
 };
 
 // Use for frequently validated fields
-const emailRules = getCachedRules('email', () => ['required', 'email']);
-const passwordRules = getCachedRules('password', () => ['required', 'string', 'minLength[8]']);
+const emailRules = getCachedRules('Email', () => ['Required', 'Email']);
+const passwordRules = getCachedRules('Password', () => ['Required', 'String', 'MinLength[8]']);
 ```
 
 ### 5. Testing Custom Rules
@@ -1364,7 +1410,7 @@ const passwordRules = getCachedRules('password', () => ['required', 'string', 'm
 // Comprehensive testing for custom rules
 describe('Custom Validation Rules', () => {
   beforeAll(() => {
-    Validator.registerRule('positiveNumber', ({ value }) => {
+    Validator.registerRule('PositiveNumber', ({ value }) => {
       return (typeof value === 'number' && value > 0) || 
              'Value must be a positive number';
     });
@@ -1374,20 +1420,20 @@ describe('Custom Validation Rules', () => {
     // Test valid cases
     await expect(Validator.validate({
       value: 5,
-      rules: ['positiveNumber'],
+      rules: ['PositiveNumber'],
       fieldName: 'test'
     })).resolves.toBeTruthy();
 
     // Test invalid cases
     await expect(Validator.validate({
       value: -5,
-      rules: ['positiveNumber'],
+      rules: ['PositiveNumber'],
       fieldName: 'test'
     })).rejects.toThrow('Value must be a positive number');
 
     await expect(Validator.validate({
       value: 'not a number',
-      rules: ['positiveNumber'],
+      rules: ['PositiveNumber'],
       fieldName: 'test'
     })).rejects.toThrow('Value must be a positive number');
   });
@@ -1415,14 +1461,14 @@ const validateRegistrationForm = async (formData: RegistrationForm) => {
     // Name validation
     Validator.validate({
       value: formData.firstName,
-      rules: ['required', 'string', 'minLength[2]', 'maxLength[50]', 'alpha'],
+      rules: ['Required', 'String', 'MinLength[2]', 'MaxLength[50]', 'Alpha'],
       fieldName: 'firstName',
       translatedPropertyName: 'First Name'
     }),
 
     Validator.validate({
       value: formData.lastName,
-      rules: ['required', 'string', 'minLength[2]', 'maxLength[50]', 'alpha'],
+      rules: ['Required', 'String', 'MinLength[2]', 'MaxLength[50]', 'Alpha'],
       fieldName: 'lastName',
       translatedPropertyName: 'Last Name'
     }),
@@ -1430,7 +1476,7 @@ const validateRegistrationForm = async (formData: RegistrationForm) => {
     // Email validation
     Validator.validate({
       value: formData.email,
-      rules: ['required', 'email'],
+      rules: ['Required', 'Email'],
       fieldName: 'email',
       translatedPropertyName: 'Email Address'
     }),
@@ -1439,10 +1485,10 @@ const validateRegistrationForm = async (formData: RegistrationForm) => {
     Validator.validate({
       value: formData.password,
       rules: [
-        'required',
-        'string',
-        'minLength[8]',
-        'regex[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]/]'
+        'Required',
+        'String',
+        'MinLength[8]',
+        'Regex[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/]'
       ],
       fieldName: 'password',
       translatedPropertyName: 'Password'
@@ -1451,7 +1497,7 @@ const validateRegistrationForm = async (formData: RegistrationForm) => {
     // Password confirmation
     Validator.validate({
       value: formData.confirmPassword,
-      rules: ['required', 'same[password]'],
+      rules: ['Required', 'Same[password]'],
       fieldName: 'confirmPassword',
       translatedPropertyName: 'Password Confirmation',
       context: { password: formData.password }
@@ -1460,7 +1506,7 @@ const validateRegistrationForm = async (formData: RegistrationForm) => {
     // Age validation
     Validator.validate({
       value: formData.age,
-      rules: ['required', 'integer', 'min[18]', 'max[120]'],
+      rules: ['Required', 'Integer', 'Min[18]', 'Max[120]'],
       fieldName: 'age',
       translatedPropertyName: 'Age'
     }),
@@ -1468,7 +1514,7 @@ const validateRegistrationForm = async (formData: RegistrationForm) => {
     // Terms acceptance
     Validator.validate({
       value: formData.terms,
-      rules: ['accepted'],
+      rules: ['Accepted'],
       fieldName: 'terms',
       translatedPropertyName: 'Terms and Conditions'
     }),
@@ -1476,7 +1522,7 @@ const validateRegistrationForm = async (formData: RegistrationForm) => {
     // Optional newsletter subscription
     Validator.validate({
       value: formData.newsletter,
-      rules: ['nullable', 'boolean'],
+      rules: ['Nullable', 'Boolean'],
       fieldName: 'newsletter',
       translatedPropertyName: 'Newsletter Subscription'
     })
@@ -1516,31 +1562,31 @@ const validateProduct = async (product: Product) => {
       rules: ['required', 'string', 'minLength[3]', 'maxLength[100]'],
       translatedPropertyName: 'Product Name'
     },
-    
+  
     description: {
       value: product.description,
       rules: ['required', 'string', 'minLength[10]', 'maxLength[1000]'],
       translatedPropertyName: 'Description'
     },
-    
+  
     price: {
       value: product.price,
       rules: ['required', 'numeric', 'min[0.01]', 'decimal[2]'],
       translatedPropertyName: 'Price'
     },
-    
+  
     category: {
       value: product.category,
       rules: ['required', 'in[electronics,clothing,books,home,sports]'],
       translatedPropertyName: 'Category'
     },
-    
+  
     tags: {
       value: product.tags,
       rules: ['required', 'array', 'minSize[1]', 'maxSize[10]'],
       translatedPropertyName: 'Tags'
     },
-    
+  
     sku: {
       value: product.sku,
       rules: ['required', 'string', 'regex[/^[A-Z]{2}-\\d{4}$/]'],
@@ -1605,12 +1651,12 @@ const validateProfileUpdate = async (profile: UserProfile, context: ProfileUpdat
       Validator.validate({
         value: profile.username,
         rules: [
-          'required',
-          'string',
-          'minLength[3]',
-          'maxLength[30]',
-          'alphaDash',
-          'uniqueUsername'
+          'Required',
+          'String',
+          'MinLength[3]',
+          'MaxLength[30]',
+          'AlphaDash',
+          'UniqueUsername'
         ],
         fieldName: 'username',
         context
@@ -1620,13 +1666,13 @@ const validateProfileUpdate = async (profile: UserProfile, context: ProfileUpdat
 
   // Email validation (only if changed)
   if (profile.email !== context.currentUser.email) {
-    const emailRules = ['required', 'email'];
-    
+    const emailRules = ['Required', 'Email'];
+  
     // Add domain restriction for certain roles
     if (context.currentUser.role === 'employee') {
-      emailRules.push(`emailDomain[${context.allowedDomains.join(',')}]`);
+      emailRules.push(`EmailDomain[${context.allowedDomains.join(',')}]`);
     }
-    
+  
     validations.push(
       Validator.validate({
         value: profile.email,
@@ -1642,19 +1688,19 @@ const validateProfileUpdate = async (profile: UserProfile, context: ProfileUpdat
     validations.push(
       Validator.validate({
         value: profile.currentPassword,
-        rules: ['required', 'currentPassword'],
+        rules: ['Required', 'CurrentPassword'],
         fieldName: 'currentPassword',
         context
       }),
-      
+    
       Validator.validate({
         value: profile.newPassword,
         rules: [
-          'required',
-          'string',
-          'minLength[8]',
-          'different[currentPassword]',
-          'strongPassword'
+          'Required',
+          'String',
+          'MinLength[8]',
+          'Different[currentPassword]',
+          'StrongPassword'
         ],
         fieldName: 'newPassword',
         context: { ...context, currentPassword: profile.currentPassword }
@@ -1666,7 +1712,7 @@ const validateProfileUpdate = async (profile: UserProfile, context: ProfileUpdat
   validations.push(
     Validator.validate({
       value: profile.bio,
-      rules: ['nullable', 'string', 'maxLength[500]'],
+      rules: ['Nullable', 'String', 'MaxLength[500]'],
       fieldName: 'bio'
     })
   );
@@ -1676,7 +1722,7 @@ const validateProfileUpdate = async (profile: UserProfile, context: ProfileUpdat
     validations.push(
       Validator.validate({
         value: profile.website,
-        rules: ['url'],
+      rules: ['Url'],
         fieldName: 'website'
       })
     );
@@ -1688,7 +1734,7 @@ const validateProfileUpdate = async (profile: UserProfile, context: ProfileUpdat
       validations.push(
         Validator.validate({
           value: url,
-          rules: ['url', `${platform}Url`],
+      rules: ['Url', `${platform}Url`],
           fieldName: `socialLinks.${platform}`
         })
       );
@@ -1712,84 +1758,91 @@ const validateProfileUpdate = async (profile: UserProfile, context: ProfileUpdat
 
 ### Validator Class Methods
 
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `registerRule` | `ruleName: string, ruleHandler: Function` | `void` | Register a custom validation rule |
-| `validate` | `options: IValidatorValidateOptions` | `Promise<IValidatorValidateOptions>` | Validate a value against rules |
-| `getRules` | None | `IValidatorRuleMap` | Get all registered rules |
-| `findRegisteredRule` | `ruleName: string` | `IValidatorRuleFunction \| undefined` | Find a specific rule |
-| `parseAndValidateRules` | `inputRules: IValidatorRule[]` | `Object` | Parse and validate rule definitions |
-| `getErrorMessageSeparators` | None | `Object` | Get error message formatting separators |
-| `validateTarget` | `target: Object, options?: Object` | `Promise<Object>` | Validate a class instance using decorators |
+
+| Method                      | Parameters                                | Returns                              | Description                                |
+| --------------------------- | ----------------------------------------- | ------------------------------------ | ------------------------------------------ |
+| `registerRule`              | `ruleName: string, ruleHandler: Function` | `void`                               | Register a custom validation rule          |
+| `validate`                  | `options: IValidatorValidateOptions`      | `Promise<IValidatorValidateOptions>` | Validate a value against rules             |
+| `getRules`                  | None                                      | `IValidatorRuleMap`                  | Get all registered rules                   |
+| `findRegisteredRule`        | `ruleName: string`                        | `IValidatorRuleFunction | undefined` | Find a specific rule                       |
+| `parseAndValidateRules`     | `inputRules: IValidatorRule[]`            | `Object`                             | Parse and validate rule definitions        |
+| `getErrorMessageSeparators` | None                                      | `Object`                             | Get error message formatting separators    |
+| `validateTarget`            | `target: Object, options?: Object`        | `Promise<Object>`                    | Validate a class instance using decorators |
 
 ### Laravel Validation Rules
 
 #### Boolean Rules
-- `accepted` - Must be accepted (yes, on, 1, true)
-- `acceptedIf` - Conditionally accepted
-- `boolean` - Must be boolean
-- `declined` - Must be declined (no, off, 0, false)
-- `declinedIf` - Conditionally declined
+
+ - `Accepted` - Must be accepted (yes, on, 1, true)
+ - `AcceptedIf` - Conditionally accepted
+ - `Boolean` - Must be boolean
+ - `Declined` - Must be declined (no, off, 0, false)
+ - `DeclinedIf` - Conditionally declined
 
 #### String Rules
-- `alpha` - Only letters
-- `alphaDash` - Letters, numbers, dashes, underscores
-- `alphaNum` - Letters and numbers only
-- `ascii` - 7-bit ASCII characters
-- `confirmed` - Must have matching confirmation field
-- `email` - Valid email address
-- `endsWidth` - Must end with specified values
-- `hexColor` - Valid hex color
-- `json` - Valid JSON string
-- `lowercase` - Must be lowercase
-- `regex` - Must match regex pattern
-- `startsWith` - Must start with specified values
-- `string` - Must be a string
-- `uppercase` - Must be uppercase
-- `url` - Valid URL
-- `uuid` - Valid UUID
-- `ulid` - Valid ULID
+
+ - `Alpha` - Only letters
+ - `AlphaDash` - Letters, numbers, dashes, underscores
+ - `AlphaNum` - Letters and numbers only
+ - `Ascii` - 7-bit ASCII characters
+ - `Confirmed` - Must have matching confirmation field
+ - `Email` - Valid email address
+ - `EndsWidth` - Must end with specified values
+ - `HexColor` - Valid hex color
+ - `Json` - Valid JSON string
+ - `Lowercase` - Must be lowercase
+ - `Regex` - Must match regex pattern
+ - `StartsWith` - Must start with specified values
+ - `String` - Must be a string
+ - `Uppercase` - Must be uppercase
+ - `Url` - Valid URL
+ - `Uuid` - Valid UUID
+ - `Ulid` - Valid ULID
 
 #### Numeric Rules
-- `between` - Value between min and max
-- `decimal` - Specific decimal places
-- `digits` - Exact number of digits
-- `digitsBetween` - Digits count within range
-- `integer` - Must be integer
-- `max` - Maximum value
-- `min` - Minimum value
-- `multipleOf` - Must be multiple of value
-- `numeric` - Must be numeric
+
+ - `Between` - Value between min and max
+ - `Decimal` - Specific decimal places
+ - `Digits` - Exact number of digits
+ - `DigitsBetween` - Digits count within range
+ - `Integer` - Must be integer
+ - `Max` - Maximum value
+ - `Min` - Minimum value
+ - `MultipleOf` - Must be multiple of value
+ - `Numeric` - Must be numeric
 
 #### Array Rules
-- `array` - Must be array
-- `distinct` - Array values must be unique
-- `in` - Must be in specified list
-- `inArray` - Must exist in another array
-- `maxSize` - Maximum array size
-- `minSize` - Minimum array size
-- `notIn` - Must not be in specified list
-- `size` - Exact array size
+
+ - `Array` - Must be array
+ - `Distinct` - Array values must be unique
+ - `In` - Must be in specified list
+ - `InArray` - Must exist in another array
+ - `MaxSize` - Maximum array size
+ - `MinSize` - Minimum array size
+ - `NotIn` - Must not be in specified list
+ - `Size` - Exact array size
 
 #### Conditional Rules
-- `filled` - Must be present and not empty
-- `nullable` - Can be null
-- `present` - Must be present
-- `prohibited` - Must not be present
-- `prohibitedIf` - Conditionally prohibited
-- `prohibitedUnless` - Prohibited unless condition
-- `required` - Must be present and not empty
-- `requiredIf` - Required if condition
-- `requiredUnless` - Required unless condition
-- `requiredWith` - Required with other fields
-- `requiredWithAll` - Required with all other fields
-- `requiredWithout` - Required without other fields
-- `requiredWithoutAll` - Required without all other fields
-- `sometimes` - Only validate if present
+
+ - `Filled` - Must be present and not empty
+ - `Nullable` - Can be null
+ - `Present` - Must be present
+ - `Prohibited` - Must not be present
+ - `ProhibitedIf` - Conditionally prohibited
+ - `ProhibitedUnless` - Prohibited unless condition
+ - `Required` - Must be present and not empty
+ - `RequiredIf` - Required if condition
+ - `RequiredUnless` - Required unless condition
+ - `RequiredWith` - Required with other fields
+ - `RequiredWithAll` - Required with all other fields
+ - `RequiredWithout` - Required without other fields
+ - `RequiredWithoutAll` - Required without all other fields
+ - `Sometimes` - Only validate if present
 
 #### Utility Rules
-- `different` - Must be different from another field
-- `same` - Must be same as another field
+
+ - `Different` - Must be different from another field
+ - `Same` - Must be same as another field
 
 ### Type Definitions Summary
 

@@ -66,7 +66,7 @@ export function ProgressBar({
         aria-valuemax={max}
         aria-valuemin={0}
         aria-valuenow={value}
-        role="progressbar"{...props} className={cn("w-full progress-bar relative", indeterminate && "progressbar-indeterminate", computedVariant.base(), className)}
+        {...props} role="progressbar" className={cn("w-full progress-bar relative", indeterminate && "progressbar-indeterminate", computedVariant.base(), className)}
         testID={testID}
     >
         <Div

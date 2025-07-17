@@ -23,19 +23,19 @@ describe("Validator", () => {
 
             Validator.registerRule(ruleName, ruleFunction);
 
-            const retrievedRule = Validator.getRule(ruleName);
+            const retrievedRule = Validator.findRegisteredRule(ruleName);
             expect(retrievedRule).toBe(ruleFunction);
         });
 
         it("should return undefined for a non-existent rule", () => {
-            const retrievedRule = Validator.getRule("nonExistentRule" as IValidatorRuleName);
+            const retrievedRule = Validator.findRegisteredRule("nonExistentRule" as IValidatorRuleName);
             expect(retrievedRule).toBeUndefined();
         });
     });
 
     describe("sanitizeRules", () => {
         it("should sanitize an array of rules", () => {
-            const sanitizedRules = Validator.sanitizeRules(["required", "minLength[2]", "maxLength[10]"]);
+            const sanitizedRules = Validator.parseAndValidateRules(["required", "minLength[2]", "maxLength[10]"]);
             expect(sanitizedRules).toEqual({
                 invalidRules: [],
                 sanitizedRules: [{
@@ -60,12 +60,12 @@ describe("Validator", () => {
 
         it("should sanitize a function rule", () => {
             const ruleFunction: IValidatorRuleFunction = ({ value }) => value !== null || "Value cannot be null";
-            const sanitizedRules = Validator.sanitizeRules([ruleFunction]);
+            const sanitizedRules = Validator.parseAndValidateRules([ruleFunction]);
             expect(sanitizedRules).toEqual({ sanitizedRules: [ruleFunction], invalidRules: [] });
         });
 
         it("should return an empty array for undefined rules", () => {
-            const sanitizedRules = Validator.sanitizeRules(undefined);
+            const sanitizedRules = Validator.parseAndValidateRules(undefined);
 
             expect(sanitizedRules).toEqual({ sanitizedRules: [], invalidRules: [] });
         });

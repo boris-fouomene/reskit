@@ -1,13 +1,16 @@
 import { i18n, Translate } from "../../i18n";
 import "../../translations";
 import {
-    Validator, ValidatorHasLength, ValidatorIsEmail, ValidatorIsFileName, ValidatorIsNonNullString, ValidatorIsNumber,
-    ValidatorIsNumberGreaterThan,
-    ValidatorIsNumberLessThan,
-    ValidatorIsRequired,
-    ValidatorIsUrl,
+    Validator,
+    ValidatorHasLength,
+    IsEmail,
+    IsNonNullString,
+    IsNumber,
+    IsNumberGreaterThan,
+    IsNumberLessThan,
+    IsRequired,
+    IsUrl,
     ValidatorNumberIsDifferentFrom,
-    ValidatorValidateTargetOptions
 } from "../index";
 
 
@@ -143,11 +146,6 @@ describe("Validator Rules", () => {
     });
 
     describe('Test valdidator rules with decorators ', () => {
-        @ValidatorValidateTargetOptions({
-            /* errorMessageBuilder: (propertyName: string, error: string) => {
-                return `property : ${propertyName},  error : ${error}`;
-            } */
-        })
         class Entity {
             constructor(options?: Entity) {
                 try {
@@ -161,33 +159,33 @@ describe("Validator Rules", () => {
                     //console.log(error, " instance of Entity");
                 }
             }
-            @ValidatorIsNumber
+            @IsNumber
             @Translate("validator.tests.entity.id")
             @ValidatorNumberIsDifferentFrom([10])
             id?: number;
 
-            @ValidatorIsRequired
-            @ValidatorIsNonNullString
+            @IsRequired
+            @IsNonNullString
             @Translate("validator.tests.entity.name")
             name?: string;
 
             @Translate("validator.tests.entity.email")
-            @ValidatorIsEmail
-            @ValidatorIsRequired
+            @IsEmail
+            @IsRequired
             email?: string;
 
             @Translate("validator.tests.entity.url")
-            @ValidatorIsUrl
+            @IsUrl
             url?: string;
 
-            @ValidatorIsRequired
-            @ValidatorIsNumberLessThan([10])
-            @ValidatorIsNumberGreaterThan([5])
+            @IsRequired
+            @IsNumberLessThan([10])
+            @IsNumberGreaterThan([5])
             @Translate(("validator.tests.entity.note"))
             note?: number;
 
             @Translate("validator.tests.entity.aString")
-            @ValidatorIsRequired
+            @IsRequired
             @ValidatorHasLength([10])
             @ValidatorHasLength([5, 20])
             aString?: string;

@@ -72,7 +72,7 @@ function numberLessThanOrEquals(options: IValidatorValidateOptions) {
 
 Validator.registerRule("numberLessThanOrEquals", numberLessThanOrEquals);
 /**
- * @decorator ValidatorIsNumberLestThanOrEquals
+ * @decorator IsNumberLestThanOrEquals
  *
  * Validator rule that checks if a number is less than or equal to a specified value.
  *
@@ -85,12 +85,12 @@ Validator.registerRule("numberLessThanOrEquals", numberLessThanOrEquals);
  * ### Example Usage:
  * ```typescript
  *  class MyClass {
- *      @ValidatorIsNumberLestThanOrEquals([5])
+ *      @IsNumberLestThanOrEquals([5])
  *      myNumber: number;
  *  }
  * ```
  */
-export const ValidatorIsNumberLestThanOrEquals = Validator.createDecorator<[param: number]>(numberLessThanOrEquals);
+export const IsNumberLestThanOrEquals = Validator.createRuleDecorator<[param: number]>(numberLessThanOrEquals);
 
 /**
  * @function numberLessThan
@@ -135,7 +135,7 @@ function numberLessThan(options: IValidatorValidateOptions) {
 Validator.registerRule("numberLessThan", numberLessThan);
 
 /**
- * @decorator ValidatorIsNumberLessThan
+ * @decorator IsNumberLessThan
  *
  * Validator rule that checks if a given number is less than a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -152,7 +152,7 @@ Validator.registerRule("numberLessThan", numberLessThan);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @ValidatorIsNumberLessThan([10])
+ *     @IsNumberLessThan([10])
  *     myNumber: number;
  * }
  * ```
@@ -161,7 +161,7 @@ Validator.registerRule("numberLessThan", numberLessThan);
  * - This rule is useful for scenarios where you need to ensure that a numeric input is strictly less than a specified limit.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const ValidatorIsNumberLessThan = Validator.createDecorator<[param: number]>(numberLessThan);
+export const IsNumberLessThan = Validator.createRuleDecorator<[param: number]>(numberLessThan);
 
 /**
  * @function numberGreaterThanOrEquals
@@ -206,7 +206,7 @@ function numberGreaterThanOrEquals(options: IValidatorValidateOptions) {
 Validator.registerRule("numberGreaterThanOrEquals", numberGreaterThanOrEquals);
 
 /**
- * @decorator ValidatorIsNumberGreaterThanOrEquals
+ * @decorator IsNumberGreaterThanOrEquals
  *
  * Validator rule that checks if a given number is greater than or equal to a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -223,7 +223,7 @@ Validator.registerRule("numberGreaterThanOrEquals", numberGreaterThanOrEquals);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @ValidatorIsNumberGreaterThanOrEquals([5])
+ *     @IsNumberGreaterThanOrEquals([5])
  *     myNumber: number;
  * }
  * ```
@@ -232,7 +232,7 @@ Validator.registerRule("numberGreaterThanOrEquals", numberGreaterThanOrEquals);
  * - This rule is useful for scenarios where you need to ensure that a numeric input meets or exceeds a specified limit.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const ValidatorIsNumberGreaterThanOrEquals = Validator.createDecorator<[param: number]>(numberGreaterThanOrEquals);
+export const IsNumberGreaterThanOrEquals = Validator.createRuleDecorator<[param: number]>(numberGreaterThanOrEquals);
 
 /**
  * @function numberGreaterThan
@@ -276,7 +276,7 @@ function numberGreaterThan(options: IValidatorValidateOptions) {
 Validator.registerRule("numberGreaterThan", numberGreaterThan);
 
 /**
- * @decorator ValidatorIsNumberGreaterThan
+ * @decorator IsNumberGreaterThan
  *
  * Validator rule that checks if a given number is greater than a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -293,7 +293,7 @@ Validator.registerRule("numberGreaterThan", numberGreaterThan);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @ValidatorIsNumberGreaterThan([10])
+ *     @IsNumberGreaterThan([10])
  *     myNumber: number;
  * }
  * ```
@@ -302,7 +302,7 @@ Validator.registerRule("numberGreaterThan", numberGreaterThan);
  * - This rule is useful for scenarios where you need to ensure that a numeric input exceeds a specified limit.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const ValidatorIsNumberGreaterThan = Validator.createDecorator<[param: number]>(numberGreaterThan);
+export const IsNumberGreaterThan = Validator.createRuleDecorator<[param: number]>(numberGreaterThan);
 
 /**
  * @function numberEquals
@@ -347,7 +347,7 @@ function numberEqualsTo(options: IValidatorValidateOptions) {
 Validator.registerRule("numberEquals", numberEqualsTo);
 
 /**
- * @decorator ValidatorIsNumberEquals
+ * @decorator IsNumberEquals
  *
  * Validator rule that checks if a given number is equal to a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
@@ -364,7 +364,7 @@ Validator.registerRule("numberEquals", numberEqualsTo);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @ValidatorIsNumberEquals([10])
+ *     @IsNumberEquals([10])
  *     myNumber: number;
  * }
  * ```
@@ -373,7 +373,7 @@ Validator.registerRule("numberEquals", numberEqualsTo);
  * - This rule is useful for scenarios where you need to ensure that a numeric input matches a specified value exactly.
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-export const ValidatorIsNumberEquals = Validator.createDecorator<[param: number]>(numberEqualsTo);
+export const IsNumberEquals = Validator.createRuleDecorator<[param: number]>(numberEqualsTo);
 
 /**
  * @function numberIsDifferentFrom
@@ -445,7 +445,7 @@ Validator.registerRule("numberIsDifferentFrom", numberIsDifferentFromTo);
  * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
 
-export const ValidatorNumberIsDifferentFrom = Validator.createDecorator<[param: number]>(numberIsDifferentFromTo);
+export const ValidatorNumberIsDifferentFrom = Validator.createRuleDecorator<[param: number]>(numberIsDifferentFromTo);
 
 /**
  * @function required
@@ -574,7 +574,7 @@ Validator.registerRule("length", numberHasLength);
  * - The error messages can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `defaultStr` utility function is used to ensure that the value is treated as a string, even if it is `null` or `undefined`.
  */
-export const ValidatorHasLength = Validator.createDecorator<[minOrLength: number, maxLength?: number]>(numberHasLength);
+export const ValidatorHasLength = Validator.createRuleDecorator<[minOrLength: number, maxLength?: number]>(numberHasLength);
 
 /**
  * @function email
@@ -725,7 +725,7 @@ Validator.registerRule("minLength", minLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const ValidatorHasMinLength = Validator.createDecorator<[minLength: string]>(minLength);
+export const ValidatorHasMinLength = Validator.createRuleDecorator<[minLength: string]>(minLength);
 
 /**
  * @function maxLength
@@ -798,7 +798,7 @@ Validator.registerRule("maxLength", maxLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const ValidatorHasMaxLength = Validator.createDecorator<[maxLength: number]>(maxLength);
+export const ValidatorHasMaxLength = Validator.createRuleDecorator<[maxLength: number]>(maxLength);
 
 /**
  * @function fileName
@@ -871,12 +871,12 @@ Validator.registerRule("phoneNumber", phoneNumber);
  * @example
  * ```typescript
  * class User {
- *   @ValidatorIsPhoneNumber
+ *   @IsPhoneNumber
  *   phoneNumber: string;
  * }
  * ```
  */
-export const ValidatorIsPhoneNumber = Validator.createPropertyDecorator("phoneNumber");
+export const IsPhoneNumber = Validator.createPropertyDecorator("phoneNumber");
 
 function emailOrPhoneNumber(options: IValidatorValidateOptions) {
   const { value, phoneCountryCode } = options;
@@ -892,9 +892,9 @@ Validator.registerRule("emailOrPhoneNumber", emailOrPhoneNumber);
  * @example
  * ```typescript
  * class User {
- *   @ValidatorIsEmailOrPhoneNumber
+ *   @IsEmailOrPhoneNumber
  *   emailOrPhoneNumber : string;
  * }
  * ```
  */
-export const ValidatorIsEmailOrPhoneNumber = Validator.createPropertyDecorator("emailOrPhoneNumber");
+export const IsEmailOrPhoneNumber = Validator.createPropertyDecorator("emailOrPhoneNumber");

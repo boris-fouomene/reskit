@@ -1,5 +1,4 @@
 "use client";
-import "./types";
 import { cn, Component, getTextContent, useMergeRefs, useStateCallback } from "@utils/index";
 import { IFieldType, IField, IFields, IFieldBase } from "@resk/core/resources";
 import { IValidatorRule, IValidatorValidateOptions, Validator, } from "@resk/core/validator";

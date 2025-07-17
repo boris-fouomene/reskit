@@ -19,14 +19,10 @@ export class Nav {
             Reflect.defineMetadata(Nav.linkMetaData, component, Nav);
         }
     }
-    static get Link(): INavLinkComponent {
-        return function NavLink(props: INavLinkProps) {
-            const component = Reflect.getMetadata(Nav.linkMetaData, Nav);
-            const C = isValidLinkComponent(component) ? component : NavDefaultLink;
-            return <C
-                {...(Platform.isNative() ? normalizeNativeProps(props) : normalizeHtmlProps(props))}
-            />
-        }
+    static Link(props: INavLinkProps) {
+        const component = Reflect.getMetadata(Nav.linkMetaData, Nav);
+        const C = isValidLinkComponent(component) ? component : NavDefaultLink;
+        return <C {...(Platform.isNative() ? normalizeNativeProps(props) : normalizeHtmlProps(props))} />
     }
     static renderItems({ items, renderItem, renderExpandableItem, ...rest }: INavItemsProps) {
         return renderNavItems({ ...rest, items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem });

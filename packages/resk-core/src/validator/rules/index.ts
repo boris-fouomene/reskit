@@ -72,25 +72,19 @@ function numberLessThanOrEquals(options: IValidatorValidateOptions) {
 
 Validator.registerRule("NumberLessThanOrEquals", numberLessThanOrEquals);
 /**
- * @decorator IsNumberLestThanOrEquals
+ * @decorator IsNumberLessThanOrEquals
  *
  * Validator rule that checks if a number is less than or equal to a specified value.
- *
- * ### Parameters:
- * - **options**: `IValidatorValidateOptions` - Contains the value to validate and the rule parameters.
- *
- * ### Return Value:
- * - `IValidatorResult`: Resolves to `true` if the value is less than or equal to the specified value, otherwise rejects with an error message.
  *
  * ### Example Usage:
  * ```typescript
  *  class MyClass {
- *      @IsNumberLestThanOrEquals([5])
+ *      @IsNumberLessThanOrEquals([5])
  *      myNumber: number;
  *  }
  * ```
  */
-export const IsNumberLestThanOrEquals = Validator.createRuleDecorator<[param: number]>(numberLessThanOrEquals);
+export const IsNumberLessThanOrEquals = Validator.createRuleDecorator<[param: number]>(numberLessThanOrEquals);
 
 /**
  * @function numberLessThan
@@ -418,34 +412,20 @@ function numberIsDifferentFromTo(options: IValidatorValidateOptions) {
 Validator.registerRule("NumberIsDifferentFrom", numberIsDifferentFromTo);
 
 /**
- * @decorator ValidatorNumberIsDifferentFrom
+ * @decorator IsNumberIsDifferentFrom
  *
  * Validator rule that checks if a given number is not equal to a specified value.
  * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
  *
- * ### Parameters:
- * - **options**: `IValidatorValidateOptions` - An object containing:
- *   - `value`: The number to validate.
- *   - `ruleParams`: An array where the first element is the value to compare against.
- *
- * ### Return Value:
- * - `IValidatorResult`: Resolves to `true` if the value is not equal to the specified comparison value,
- *   otherwise rejects with an error message indicating the validation failure.
- *
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @ValidatorNumberIsDifferentFrom([10])
+ *     @IsNumberIsDifferentFrom([10])
  *     myNumber: number;
  * }
  * ```
- *
- * ### Notes:
- * - This rule is useful for scenarios where you need to ensure that a numeric input does not match a specified value.
- * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
  */
-
-export const ValidatorNumberIsDifferentFrom = Validator.createRuleDecorator<[param: number]>(numberIsDifferentFromTo);
+export const IsNumberIsDifferentFrom = Validator.createRuleDecorator<[param: number]>(numberIsDifferentFromTo);
 
 /**
  * @function required
@@ -876,7 +856,7 @@ Validator.registerRule("PhoneNumber", phoneNumber);
  * }
  * ```
  */
-export const IsPhoneNumber = Validator.createPropertyDecorator("PhoneNumber");
+export const IsPhoneNumber = Validator.createPropertyDecorator(["PhoneNumber"]);
 
 function emailOrPhoneNumber(options: IValidatorValidateOptions) {
   const { value, phoneCountryCode } = options;
@@ -897,4 +877,4 @@ Validator.registerRule("EmailOrPhoneNumber", emailOrPhoneNumber);
  * }
  * ```
  */
-export const IsEmailOrPhoneNumber = Validator.createPropertyDecorator("EmailOrPhoneNumber");
+export const IsEmailOrPhoneNumber = Validator.createPropertyDecorator(["EmailOrPhoneNumber"]);

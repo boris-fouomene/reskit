@@ -1,3 +1,8 @@
+/**
+ * Represents the result of a validation rule.
+ * Can be boolean (success/failure), string (error message), or a Promise resolving to either.
+ */
+export type IValidatorResult = boolean | string | Promise<boolean | string>;
 import { IInputFormatterResult } from "@/inputFormatter/types";
 
 export type IValidatorRule<ParamType extends Array<any> = Array<any>, Context = unknown> = IValidatorRuleFunction<ParamType, Context> | IValidatorRuleName | `${IValidatorRuleName}[${string}]` | Record<IValidatorRuleName, ParamType>;
@@ -206,440 +211,88 @@ export type IValidatorRuleName = keyof IValidatorRuleMap;
  * making it easier to apply and reference them in  validation scenarios.
  */
 export interface IValidatorRuleMap {
+  /**
+   * Validator rule that checks if a number is less than or equals a specified value.
+   */
   NumberLessThanOrEquals: IValidatorRuleFunction;
 
   /**
-   * @function numberLessThan
-   *
-   * Validator rule that checks if a given number is less than a specified value.
-   * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The number to validate.
-   *   - `ruleParams`: An array where the first element is the value to compare against.
-   *
-   * ### Return Value:
-   * - `IValidatorResult`: Resolves to `true` if the value is less than the specified comparison value,
-   *   otherwise rejects with an error message indicating the validation failure.
-   *
-   * ### Example Usage:
-   * ```typescript
-   *
-   * // Example of using the validation rule
-   * const result = numberLessThan({ value: 5, ruleParams: [10] });
-   * result.then(() => {
-   *     console.log("Validation passed."); // Output: "Validation passed."
-   * }).catch(error => {
-   *     console.error(error); // Output: "Entrez un nombre inférieure 10" if validation fails
-   * });
-   * ```
-   *
-   * ### Notes:
-   * - This rule is useful for scenarios where you need to ensure that a numeric input is strictly less than a specified limit.
-   * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
+   * Validator rule that checks if a number is less than a specified value.
    */
   NumberLessThan: IValidatorRuleFunction;
 
   /**
-   * @function numberGreaterThanOrEquals
-   *
-   * Validator rule that checks if a given number is greater than or equal to a specified value.
-   * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The number to validate.
-   *   - `ruleParams`: An array where the first element is the value to compare against.
-   *
-   * ### Return Value:
-   * - `IValidatorResult`: Resolves to `true` if the value is greater than or equal to the specified comparison value,
-   *   otherwise rejects with an error message indicating the validation failure.
-   *
-   * ### Example Usage:
-   * ```typescript
-   *
-   * // Example of using the validation rule
-   * const result = numberGreaterThanOrEquals({ value: 10, ruleParams: [5] });
-   * result.then(() => {
-   *     console.log("Validation passed."); // Output: "Validation passed."
-   * }).catch(error => {
-   *     console.error(error); // Output: "Entrez un nombre supérieure ou égal à 5" if validation fails
-   * });
-   * ```
-   *
-   * ### Notes:
-   * - This rule is useful for scenarios where you need to ensure that a numeric input meets or exceeds a specified limit.
-   * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
+   * Validator rule that checks if a number is greater than or equals a specified value.
    */
   NumberGreaterThanOrEquals: IValidatorRuleFunction;
 
   /**
-   * @function numberGreaterThan
-   *
-   * Validator rule that checks if a given number is greater than a specified value.
-   * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The number to validate.
-   *   - `ruleParams`: An array where the first element is the value to compare against.
-   *
-   * ### Return Value:
-   * - `IValidatorResult`: Resolves to `true` if the value is greater than the specified comparison value,
-   *   otherwise rejects with an error message indicating the validation failure.
-   *
-   * ### Example Usage:
-   * ```typescript
-   * // Example of using the validation rule
-   * const result = numberGreaterThan({ value: 15, ruleParams: [10] });
-   * result.then(() => {
-   *     console.log("Validation passed."); // Output: "Validation passed."
-   * }).catch(error => {
-   *     console.error(error); // Output: "Entrez un nombre supérieure à 10" if validation fails
-   * });
-   * ```
-   *
-   * ### Notes:
-   * - This rule is useful for scenarios where you need to ensure that a numeric input exceeds a specified limit.
-   * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
+   * Validator rule that checks if a number is greater than a specified value.
    */
   NumberGreaterThan: IValidatorRuleFunction;
 
   /**
-   * @function numberEquals
-   *
-   * Validator rule that checks if a given number is equal to a specified value.
-   * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The number to validate.
-   *   - `ruleParams`: An array where the first element is the value to compare against.
-   *
-   * ### Return Value:
-   * - `IValidatorResult`: Resolves to `true` if the value is equal to the specified comparison value,
-   *   otherwise rejects with an error message indicating the validation failure.
-   *
-   * ### Example Usage:
-   * ```typescript
-   *
-   * // Example of using the validation rule
-   * const result = numberEquals({ value: 10, ruleParams: [10] });
-   * result.then(() => {
-   *     console.log("Validation passed."); // Output: "Validation passed."
-   * }).catch(error => {
-   *     console.error(error); // Output: "Entrez un nombre égal à 10" if validation fails
-   * });
-   * ```
-   *
-   * ### Notes:
-   * - This rule is useful for scenarios where you need to ensure that a numeric input matches a specified value exactly.
-   * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
+   * Validator rule that checks if a number is equal to a specified value.
    */
   NumberEquals: IValidatorRuleFunction;
 
   /**
-   * @function numberIsDifferentFrom
-   *
-   * Validator rule that checks if a given number is not equal to a specified value.
-   * This rule utilizes the `compareNumer` function to perform the comparison and return the result.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The number to validate.
-   *   - `ruleParams`: An array where the first element is the value to compare against.
-   *
-   * ### Return Value:
-   * - `IValidatorResult`: Resolves to `true` if the value is not equal to the specified comparison value,
-   *   otherwise rejects with an error message indicating the validation failure.
-   *
-   * ### Example Usage:
-   * ```typescript
-   *
-   * // Example of using the validation rule
-   * const result = numberIsDifferentFrom({ value: 5, ruleParams: [10] });
-   * result.then(() => {
-   *     console.log("Validation passed."); // Output: "Validation passed."
-   * }).catch(error => {
-   *     console.error(error); // Output: "Entrez un différent de 10" if validation fails
-   * });
-   * ```
-   *
-   * ### Notes:
-   * - This rule is useful for scenarios where you need to ensure that a numeric input does not match a specified value.
-   * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
+   * Validator rule that checks if a number is different from a specified value.
    */
   NumberIsDifferentFrom: IValidatorRuleFunction;
 
   /**
-   * @function required
-   *
    * Validator rule that checks if a value is present and not empty.
-   * This rule ensures that a field is filled out before submission.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The value to validate for presence.
-   *
-   * ### Return Value:
-   * - `boolean | string`: Returns `true` if the value is not empty; otherwise, returns an error message indicating that the field is required.
-   *
-   * ### Example Usage:
-   * ```typescript
-   *
-   * // Example of using the validation rule
-   * const result = required({ value: "" });
-   * console.log(result); // Output: "This field is required." if the value is empty
-   *
-   * const result2 = required({ value: "Hello" });
-   * console.log(result2); // Output: true if the value is not empty
-   * ```
-   *
-   * ### Notes:
-   * - This rule is essential for form validation, ensuring that users provide necessary information before proceeding.
-   * - The error message can be customized by modifying the translation key used in `i18n.t`.
-   * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
    */
   Required: IValidatorRuleFunction;
 
   /**
-   * @function length
-   *
-   * Validator rule that validates the length of a string. This rule checks if the length of the input string
-   * falls within a specified range or matches a specific length.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The string value to validate.
-   *   - `ruleParams`: An array where:
-   *     - The first element specifies the minimum length (optional).
-   *     - The second element specifies the maximum length (optional).
-   *
-   * ### Return Value:
-   * - `boolean | string`: Returns `true` if the string length is valid according to the specified rules;
-   *   otherwise, returns an error message indicating the validation failure.
-   *
-   * ### Example Usage:
-   * ```typescript
-   *
-   * // Example of using the validation rule
-   * const result1 = length({ value: "Hello", ruleParams: [3, 10] });
-   * console.log(result1); // Output: true (valid length)
-   *
-   * const result2 = length({ value: "Hi", ruleParams: [3, 10] });
-   * console.log(result2); // Output: "Ce champ doit avoir une longueur comprise entre 3 et 10 caractere(s)"
-   *
-   * const result3 = length({ value: "Test", ruleParams: [4] });
-   * console.log(result3); // Output: true (valid length)
-   *
-   * const result4 = length({ value: "Test", ruleParams: [5] });
-   * console.log(result4); // Output: "ce champ doit avoir 5 caractere(s)"
-   * ```
-   *
-   * ### Notes:
-   * - This rule is useful for validating user input in forms, ensuring that the input meets specific length requirements.
-   * - The error messages can be customized based on the parameters provided, allowing for clear feedback to users.
-   * - The `defaultStr` utility function is used to ensure that the value is treated as a string, even if it is `null` or `undefined`.
+   * Validator rule that validates the length of a string.
    */
   Length: IValidatorRuleFunction;
 
   /**
-   * @function minLength
-   *
-   * Validator rule that checks if a given string meets a minimum length requirement.
-   * This rule ensures that the input string has at least the specified number of characters.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The string value to validate.
-   *   - `ruleParams`: An array where the first element specifies the minimum length required.
-   *
-   * ### Return Value:
-   * - `boolean | string`: Returns `true` if the value is empty or meets the minimum length requirement;
-   *   otherwise, returns an error message indicating that the minimum length is not met.
-   *
-   * ### Example Usage:
-   * ```typescript
-   *
-   * // Example of using the validation rule
-   * const result1 = minLength({ value: "Hello", ruleParams: [3] });
-   * console.log(result1); // Output: true (valid length)
-   *
-   * const result2 = minLength({ value: "Hi", ruleParams: [3] });
-   * console.log(result2); // Output: "Ce champ doit avoir au minimum 3 caractère(s)"
-   *
-   * const result3 = minLength({ value: "", ruleParams: [3] });
-   * console.log(result3); // Output: true (no validation needed for empty value)
-   * ```
-   *
-   * ### Notes:
-   * - This rule is useful for validating user input in forms, ensuring that the input meets a minimum length requirement.
-   * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
-   * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
+   * Validator rule that checks if a string meets a minimum length requirement.
    */
   MinLength: IValidatorRuleFunction;
 
   /**
-   * @function maxLength
-   *
-   * Validator rule that checks if a given string does not exceed a maximum length.
-   * This rule ensures that the input string has at most the specified number of characters.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The string value to validate.
-   *   - `ruleParams`: An array where the first element specifies the maximum length allowed.
-   *
-   * ### Return Value:
-   * - `boolean | string`: Returns `true` if the value is empty or meets the maximum length requirement;
-   *   otherwise, returns an error message indicating that the maximum length is exceeded.
-   *
-   * ### Example Usage:
-   * ```typescript
-   * // Example of using the validation rule
-   * const result1 = maxLength({ value: "Hello", ruleParams: [10] });
-   * console.log(result1); // Output: true (valid length)
-   *
-   * const result2 = maxLength({ value: "Hello, World!", ruleParams: [10] });
-   * console.log(result2); // Output: "Ce champ doit avoir au maximum 10 caractère(s)"
-   *
-   * const result3 = maxLength({ value: "", ruleParams: [10] });
-   * console.log(result3); // Output: true (no validation needed for empty value)
-   * ```
-   *
-   * ### Notes:
-   * - This rule is useful for validating user input in forms, ensuring that the input does not exceed a specified length.
-   * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
-   * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
+   * Validator rule that checks if a string does not exceed a maximum length.
    */
   MaxLength: IValidatorRuleFunction;
 
   /**
-   * @function email
-   *
-   * Validator rule that checks if a given value is a valid email address format.
-   * This rule utilizes the `isValidEmail` utility function to perform the validation.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The value to validate as an email address.
-   *
-   * ### Return Value:
-   * - `boolean | string`: Returns `true` if the value is not provided or is not a string;
-   *   otherwise, returns `true` if the email format is valid, or an error message indicating that the email is invalid.
-   *
-   * ### Example Usage:
-   * ```typescript
-   *
-   * // Example of using the validation rule
-   * const result1 = email({ value: "test@example.com" });
-   * console.log(result1); // Output: true (valid email)
-   *
-   * const result2 = email({ value: "invalid-email" });
-   * console.log(result2); // Output: "Invalid email format." if the translation key is set up correctly
-   *
-   * const result3 = email({ value: null });
-   * console.log(result3); // Output: true (no validation needed)
-   * ```
-   *
-   * ### Notes:
-   * - This rule is essential for validating email input in forms, ensuring that users provide a correctly formatted email address.
-   * - The error message can be customized by modifying the translation key used in `i18n.t`.
-   * - The rule allows for `null` or non-string values to pass through without validation, which can be useful for optional email fields.
+   * Validator rule that checks if a value is a valid email address format.
    */
   Email: IValidatorRuleFunction;
 
   /**
-   * @function url
-   *
-   * Validator rule that checks if a given value is a valid URL format.
-   * This rule utilizes the `isValidUrl` utility function to perform the validation.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The value to validate as a URL.
-   *
-   * ### Return Value:
-   * - `boolean | string`: Returns `true` if the value is not provided or is not a string;
-   *   otherwise, returns `true` if the URL format is valid, or an error message indicating that the URL is invalid.
-   *
-   * ### Example Usage:
-   * ```typescript
-   * // Example of using the validation rule
-   * const result1 = url({ value: "https://example.com" });
-   * console.log(result1); // Output: true (valid URL)
-   *
-   * const result2 = url({ value: "invalid-url" });
-   * console.log(result2); // Output: "Invalid URL format." if the translation key is set up correctly
-   *
-   * const result3 = url({ value: null });
-   * console.log(result3); // Output: true (no validation needed)
-   * ```
-   *
-   * ### Notes:
-   * - This rule is essential for validating URL input in forms, ensuring that users provide a correctly formatted URL.
-   * - The error message can be customized by modifying the translation key used in `i18n.t`.
-   * - The rule allows for `null` or non-string values to pass through without validation, which can be useful for optional URL fields.
+   * Validator rule that checks if a value is a valid URL format.
    */
   Url: IValidatorRuleFunction;
 
   /**
-   * @function fileName
-   *
-   * Validator rule that checks if a given value is a valid file name.
-   * This rule ensures that the file name does not contain forbidden characters,
-   * does not start with a dot, and is not a reserved file name.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - An object containing:
-   *   - `value`: The file name to validate.
-   *
-   * ### Return Value:
-   * - `boolean | string`: Returns `true` if the file name is valid;
-   *   otherwise, returns an error message indicating that the file name is invalid.
-   *
-   * ### Example Usage:
-   * ```typescript
-   *
-   * // Example of using the validation rule
-   * const result1 = fileName({ value: "validFileName.txt" });
-   * console.log(result1); // Output: true (valid file name)
-   *
-   * const result2 = fileName({ value: "invalid/file:name.txt" });
-   * console.log(result2); // Output: "Veuillez entrer une nom de fichier valide" (invalid characters)
-   *
-   * const result3 = fileName({ value: ".hiddenFile" });
-   * console.log(result3); // Output: "Veuillez entrer une nom de fichier valide" (starts with dot)
-   *
-   * const result4 = fileName({ value: "nul" });
-   * console.log(result4); // Output: "Veuillez entrer une nom de fichier valide" (reserved name)
-   * ```
-   *
-   * ### Notes:
-   * - This rule is essential for validating file names in forms, ensuring that users provide valid and acceptable file names.
-   * - The error message can be customized as needed.
-   * - The `isNonNullString` utility function is used to check that the value is a non-null string before performing further validation.
+   * Validator rule that checks if a value is a valid file name.
    */
   FileName: IValidatorRuleFunction;
 
-  /***
-   * Validator rule that checks if a given value is a number
+  /**
+   * Validator rule that checks if a value is a number.
    */
   Number: IValidatorRuleFunction;
 
-  /***
-   * Validator rule that checks if a given value is a non null string
+  /**
+   * Validator rule that checks if a value is a non-null string.
    */
   NonNullString: IValidatorRuleFunction;
 
-  /***
-   * Validator rule that checks if a given value is a valid phone number
+  /**
+   * Validator rule that checks if a value is a valid phone number.
    */
   PhoneNumber: IValidatorRuleFunction;
 
   /**
-   * Validator rule that checks if a given value is a valid email or phone number
+   * Validator rule that checks if a value is a valid email or phone number.
    */
   EmailOrPhoneNumber: IValidatorRuleFunction;
 }
@@ -670,29 +323,33 @@ export interface IValidatorRuleMap {
  * function validateUsername(username: string): IValidatorResult {
  *     if (username.length < 5) {
  *         return "Username must be at least 5 characters long."; // Invalid validation
- *     }
- *     return true; // Valid validation
- * }
+/**
+ * Represents a mapping of validation rule names to their corresponding validation rules.
  *
- * // Example of an asynchronous validation function
- * async function validatePassword(password: string): IValidatorResult {
- *     const isValid = await checkPasswordStrength(password);
- *     if (!isValid) {
- *         return "Password must contain at least one uppercase letter."; // Invalid validation
- *     }
- *     return true; // Valid validation
- * }
+ * The `IValidatorRuleMap` interface defines an object where each key is a PascalCase string
+ * representing the name of a validation rule, and the value is the corresponding validation rule
+ * of type `IValidatorRule`. This allows for easy retrieval and management of validation rules
+ * by name.
  *
- * // Example of handling the validation result
- * const result = validateUsername("Jo");
- * if (typeof result === "string") {
- *     console.error(result); // Output: "Username must be at least 5 characters long."
- * } else if (result === true) {
- *     console.log("Validation passed.");
- * }
+ * ### Structure:
+ * - **Key**: A PascalCase string representing the name of the validation rule.
+ * - **Value**: An `IValidatorRule`, which can be a string, a function, or an array of rules.
+ *
+ * ### Example:
+ *
+ * ```typescript
+ * const validationRules: IValidatorRuleMap = {
+ *     Required: "Required",
+ *     MinLength: ({ value }) => value.length >= 5 || "Minimum length is 5 characters.",
+ *     MaxLength: ({ value }) => value.length <= 10 || "Maximum length is 10 characters.",
+ * };
+ *
+ * // Usage
+ * const rule = validationRules.Required;
+ * const minLengthRule = validationRules.MinLength;
+ * const maxLengthRule = validationRules.MaxLength;
  * ```
  */
-export type IValidatorResult = Promise<boolean | string> | string | boolean;
 
 /**
  * @interface IValidatorValidateOptions

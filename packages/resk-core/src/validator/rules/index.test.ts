@@ -1,16 +1,25 @@
 import { i18n, Translate } from "../../i18n";
 import "../../translations";
+
 import {
     Validator,
     HasLength,
+    HasMinLength,
+    HasMaxLength,
     IsEmail,
     IsNonNullString,
     IsNumber,
     IsNumberGreaterThan,
     IsNumberLessThan,
+    IsNumberLessThanOrEquals,
+    IsNumberGreaterThanOrEquals,
+    IsNumberEquals,
+    IsNumberIsDifferentFrom,
     IsRequired,
     IsUrl,
-    ValidatorNumberIsDifferentFrom,
+    IsFileName,
+    IsPhoneNumber,
+    IsEmailOrPhoneNumber,
 } from "../index";
 
 
@@ -161,7 +170,7 @@ describe("Validator Rules", () => {
             }
             @IsNumber
             @Translate("validator.tests.entity.id")
-            @ValidatorNumberIsDifferentFrom([10])
+            @IsNumberIsDifferentFrom([10])
             id?: number;
 
             @IsRequired

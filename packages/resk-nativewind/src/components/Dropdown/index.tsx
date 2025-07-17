@@ -422,7 +422,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         }
         return actions;
     }, [dropdownActions, multiple, context.isOpen(), context, anchorSelectedText]);
-    const anchorProps: ITextInputProps = {
+    const anchorProps: ITextInputProps<"text"> = {
         numberOfLines: 1,
         ...props,
         containerClassName: cn("mt-0 mb-0", props.containerClassName),
@@ -431,9 +431,9 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         testID,
         isDropdownAnchor: true,
         disabled,
-        defaultValue: anchorSelectedText,
+        defaultValue: anchorSelectedText as any,
         onPress: isLoading ? undefined : context.toggle.bind(context),
-    }
+    } as any;
     const { height: screenHeight } = Dimensions.get("window");
     const maxDropdownHeight = useMemo(() => {
         return isNumber(maxHeight) && maxHeight > 0 ? maxHeight : Math.max(screenHeight * 0.5, 300);

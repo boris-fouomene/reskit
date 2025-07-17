@@ -265,7 +265,7 @@ export interface ITextInputOnChangeEvent extends NativeSyntheticEvent<TextInputC
 export interface ITextInputOnChangeOptions<ValueType = any> extends Omit<IOnChangeOptions<ITextInputOnChangeEvent>, "event" | "value"> {
     event?: ITextInputOnChangeEvent;
     value: ValueType;
-    previousValue?: any;
+    previousValue?: ValueType;
     isFocused?: boolean;
     fieldName?: string;
     computedVariant: ITextInputComputedVariant;
@@ -453,7 +453,7 @@ export interface ITextInputRenderOptions extends TextInputProps {
  *
  * @public
  */
-export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInputProps>, 'onChange' | 'defaultValue' | "label" | "ref" | "className">, Omit<IFieldBase, "onChange" | "type" | "value" | "label"> {
+export interface ITextInputProps<Type extends ITextInputType = ITextInputType, ValueType = any> extends Omit<Partial<TextInputProps>, 'onChange' | 'defaultValue' | "label" | "ref" | "className">, Omit<IFieldBase, "onChange" | "type" | "value" | "label"> {
     /**
      * @type  {ITextInputType}
      * An optional property that specifies the type of input, 
@@ -461,7 +461,7 @@ export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInput
      * `ITextInputType`.
      * @default "text"
      */
-    type?: ITextInputType;
+    type?: Type;
 
     /**
      * The text input class name
@@ -491,7 +491,7 @@ export interface ITextInputProps<ValueType = any> extends Omit<Partial<TextInput
      * The initial value of the text input field. 
      * @default ''
      */
-    defaultValue?: any; // The default value of the input field.
+    defaultValue?: ValueType; // The default value of the input field.
 
     containerClassName?: IClassName;
 

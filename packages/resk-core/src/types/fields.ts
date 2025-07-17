@@ -136,13 +136,11 @@ export interface IFieldActionsMap {
   filter: string;
 }
 
-type IFieldFromMap<T extends IFieldType = IFieldType> = IFieldType extends never ? IFieldBase<never> : IFieldMap[T] extends IFieldBase<T> ? IFieldMap[T] : never;
-export type IField<T extends IFieldType = IFieldType, ValueType = any> =
-  IFieldFromMap<T> extends never
-    ? never
-    : IFieldFromMap<T> & {
-        [key in keyof IFieldActionsMap]?: Partial<IFieldMap[IFieldType]>;
-      };
+export type IField<T extends IFieldType = IFieldType, ValueType = any> = IFieldMap[T] extends IFieldBase
+  ? IFieldMap[T] & {
+      [key in keyof IFieldActionsMap]?: Partial<IFieldMap[keyof IFieldMap]>;
+    }
+  : never;
 
 export type IFields = Record<string, IField>;
 

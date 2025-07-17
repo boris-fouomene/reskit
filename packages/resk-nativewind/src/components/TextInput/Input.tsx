@@ -97,7 +97,7 @@ const isNative = p.isNative();
  *
  * @public
  */
-export default function TextInput<ValueType = any>({
+export default function TextInput<Type extends ITextInputType = ITextInputType, ValueType = any>({
     readOnly,
     renderTextInput, testID, error: customError, phoneCountryCode: customPhoneCountryCode, handleMaskValidationErrors,
     defaultValue, sanitizeValue, inputMode: cInputMode, dateFormat: customDateFormat, emptyValue: cIsEmptyValue,
@@ -134,11 +134,11 @@ export default function TextInput<ValueType = any>({
     placeholderClassName,
     isDropdownAnchor,
     ...props
-}: ITextInputProps<ValueType>) {
+}: ITextInputProps<Type, ValueType>) {
     const isHydrated = useHydrationStatus();
     const isLabelEmbeded = !!labelEmbeded;
     const [isFocused, setIsFocused] = useState(false);
-    type = defaultStr(type, "text") as ITextInputType;
+    type = defaultStr(type, "text") as any;
     const { isPhone, isDateOrTime, typeString } = useMemo(() => {
         const t = String(type).toLowerCase();
         return {

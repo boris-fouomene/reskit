@@ -30,3 +30,4 @@ export * from "./Portal/types";
 export * from "./Dialog";
 export * from "./Drawer";
 export * from "./Expandable";
+export * from "./Form";

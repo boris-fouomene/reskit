@@ -539,7 +539,7 @@ function numberHasLength({ value, ruleParams }: IValidatorValidateOptions) {
 Validator.registerRule("length", numberHasLength);
 
 /**
- * @decorator ValidatorHasLength
+ * @decorator HasLength
  *
  * Validator rule that validates the length of a string. This rule checks if the length of the input string
  * falls within a specified range or matches a specific length.
@@ -559,12 +559,12 @@ Validator.registerRule("length", numberHasLength);
  * ```typescript
  *
  * class MyClass {
- *     @ValidatorHasLength([3, 10]) //"This field must be between 3 and 10 characters long"
+ *     @HasLength([3, 10]) //"This field must be between 3 and 10 characters long"
  *     myString: string;
  * }
  *
  * class MyClass {
- *     @ValidatorHasLength([4]) //"This field must be exactly 4 characters long"
+ *     @HasLength([4]) //"This field must be exactly 4 characters long"
  *     myString: string;
  * }
  * ```
@@ -574,7 +574,7 @@ Validator.registerRule("length", numberHasLength);
  * - The error messages can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `defaultStr` utility function is used to ensure that the value is treated as a string, even if it is `null` or `undefined`.
  */
-export const ValidatorHasLength = Validator.createRuleDecorator<[minOrLength: number, maxLength?: number]>(numberHasLength);
+export const HasLength = Validator.createRuleDecorator<[minOrLength: number, maxLength?: number]>(numberHasLength);
 
 /**
  * @function email
@@ -698,7 +698,7 @@ function minLength(options: IValidatorValidateOptions) {
 Validator.registerRule("minLength", minLength);
 
 /**
- * @decorator ValidatorHasMinLength
+ * @decorator HasMinLength
  *
  * Validator rule that checks if a given string meets a minimum length requirement.
  * This rule ensures that the input string has at least the specified number of characters.
@@ -715,7 +715,7 @@ Validator.registerRule("minLength", minLength);
  * ### Example Usage:
  * ```typescript
  * class MyClass {
- *     @ValidatorHasMinLength([3]) //"This field must have a minimum of 3 characters"
+ *     @HasMinLength([3]) //"This field must have a minimum of 3 characters"
  *     myString: string;
  * }
  * ```
@@ -725,7 +725,7 @@ Validator.registerRule("minLength", minLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const ValidatorHasMinLength = Validator.createRuleDecorator<[minLength: string]>(minLength);
+export const HasMinLength = Validator.createRuleDecorator<[minLength: string]>(minLength);
 
 /**
  * @function maxLength
@@ -770,7 +770,7 @@ function maxLength(options: IValidatorValidateOptions) {
 Validator.registerRule("maxLength", maxLength);
 
 /**
- * @decorator ValidatorHasMaxLength
+ * @decorator HasMaxLength
  * 
  * Validator rule that checks if a given string does not exceed a maximum length.
  * This rule ensures that the input string has at most the specified number of characters.
@@ -786,9 +786,9 @@ Validator.registerRule("maxLength", maxLength);
  * 
  * ### Example Usage:
  * ```typescript
-    import { ValidatorHasMaxLength } from '@resk/core';
+    import { HasMaxLength } from '@resk/core';
     class MyClass {
-        @ValidatorHasMaxLength([10])
+        @HasMaxLength([10])
         myProperty: string;
     }
  * ```
@@ -798,7 +798,7 @@ Validator.registerRule("maxLength", maxLength);
  * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-export const ValidatorHasMaxLength = Validator.createRuleDecorator<[maxLength: number]>(maxLength);
+export const HasMaxLength = Validator.createRuleDecorator<[maxLength: number]>(maxLength);
 
 /**
  * @function fileName

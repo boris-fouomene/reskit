@@ -20,7 +20,7 @@ import { IActivityIndicatorProps } from "./types";
  * Here’s an example of how to use the custom `ActivityIndicator`:
  * 
  */
-export function ActivityIndicator({ size, borderWidth, style, variant, testID, id, color, className, children, role, ...props }: IActivityIndicatorProps) {
+export function ActivityIndicator({ size, borderWidth, style, variant, testID, id, color, className, children, ...props }: IActivityIndicatorProps) {
     const clx = [];
     if (isNumber(size) && size > 0) {
         const hasBorderWidth = isNumber(borderWidth) && borderWidth > 0;
@@ -36,7 +36,7 @@ export function ActivityIndicator({ size, borderWidth, style, variant, testID, i
         style = [{ borderTopColor: color }, style];
     }
     testID = defaultStr(testID, "resk-activity-indicator");
-    return <Div {...props} role={defaultStr(role, "progressbar") as any} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("resk-activity-indicator animate-spin rounded-full", clx, activityIndicatorVariant(variant), className)} />
+    return <Div role="progressbar" {...props} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("resk-activity-indicator animate-spin rounded-full", clx, activityIndicatorVariant(variant), className)} />
 }
 
 export * from "./types";

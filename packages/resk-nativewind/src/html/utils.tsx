@@ -297,7 +297,7 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({
     (domProps as any)["aria-description"] = defaultStr((domProps as any)["aria-description"], domProps["aria-describedby"]);
 
     // Role mapping
-    (domProps as any).role = defaultStr(domProps.role, role, accessibilityRole && mapRoleToDOM(accessibilityRole));
+    (domProps as any).role = defaultStr(role, accessibilityRole && mapRoleToDOM(accessibilityRole));
 
     // Accessible/hidden state
     if (accessible === false) {

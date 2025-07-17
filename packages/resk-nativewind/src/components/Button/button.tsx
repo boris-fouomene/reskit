@@ -1,9 +1,8 @@
 "use client";
 import { useImperativeHandle, useEffect, useId } from 'react';
-//import { FormsManager } from '@components/Form/FormsManager';
 import { GestureResponderEvent } from 'react-native';
 import { Button } from './base';
-import { IButtonContext, IButtonInteractiveContext, IButtonInteractiveProps, IButtonProps } from './types';
+import { IButtonInteractiveContext, IButtonInteractiveProps } from './types';
 import { defaultStr } from '@resk/core/utils';
 import useStateCallback from '@utils/stateCallback';
 import { buttonVariant } from "@variants/button";
@@ -16,8 +15,6 @@ export function InteractiveButton<Context = unknown>({
     loading: customIsLoading,
     id,
     onPress,
-    submitFormOnPress,
-    formName,
     resourceName,
     perm,
     ref,
@@ -67,14 +64,6 @@ export function InteractiveButton<Context = unknown>({
     }
     // Expose methods using useImperativeHandle
     useImperativeHandle(ref, () => (context as any));
-    useEffect(() => {
-        /*  if (isNonNullString(formName)) {
-             FormsManager.mountAction(context, formName);
-         }
-         return () => {
-             FormsManager.unmountAction(context.id, formName);
-         }; */
-    }, [formName, buttonId, id]);
 
     return (<Button<IButtonInteractiveContext<Context>>
         {...rest}
@@ -86,17 +75,7 @@ export function InteractiveButton<Context = unknown>({
         testID={`${testID}`}
         ref={ref}
         onPress={(event: GestureResponderEvent, context) => {
-            const form = null;//formName ? FormsManager.getForm(formName) : null;
-            const hasForm = false;//form && (form as any).isValid();
-            if (hasForm && typeof (form as any).getData == "function") {
-                context.formData = (form as any).getData();
-            }
-            const r = typeof onPress === 'function' ? onPress(event, context) : true;
-            if (r === false || submitFormOnPress === false) return;
-            if (form && typeof (form as any)?.submit === 'function') {
-                (form as any).submit();
-            }
-            return r
+            return typeof onPress === 'function' ? onPress(event, context) : true;
         }}
     />);
 };

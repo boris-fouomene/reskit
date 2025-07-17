@@ -1,6 +1,6 @@
 {
   "name": "@resk/nativewind",
-  "version": "1.0.1-canary.33",
+  "version": "1.0.1-canary.34",
   "description": "Precompiled TypeScript UI framework built on NativeWind",
   "license": "ISC",
   "author": "",
@@ -148,7 +148,7 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "css:dev": "npx tailwindcss -i ./global-src.css -o ./global.css --watch",
     "css:build": "npx tailwindcss -i ./global-src.css -o ./global.css",
-    "generate-icon-types": "node generate-icon-types",
+    "generate-icon-types": "node bin/generate-icon-types",
     "generate-variants": "node bin/generate-variants-dev",
     "build-color-variants": "tsc -p tsconfig.color-variants.json",
     "publish-preview": "npm publish --dry-run",

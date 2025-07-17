@@ -1,1 +1,0 @@
-require("./bin/generate-icon-types")();

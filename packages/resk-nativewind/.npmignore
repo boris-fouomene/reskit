@@ -2,19 +2,19 @@
 node_modules/
 
 # Ignore everything
-*
-# Except the build directory
-!build/
-!theme-to-css-vars.js
-!package.json
-!html.js
-!variants.js
-!variants.json
-!animations.js
-!utils.js
-!platform.js
-!appRoot.js
-!i18n.js
+# *
+# # Except the build directory
+# !build/
+# !theme-to-css-vars.js
+# !package.json
+# !html.js
+# !variants.js
+# !variants.json
+# !animations.js
+# !utils.js
+# !platform.js
+# !appRoot.js
+# !i18n.js
 # Ignore specific folders
 test/
 src/
@@ -24,11 +24,8 @@ jest.config.js
 vite.config.*
 # Ignore specific files
 .env
-*.log
-.rollup.cache
-.rename-mjs.js
-rollup*
 tsconfig*
+tests/
 # Ignore test files
 **/*.test.ts
 **/*.test.js

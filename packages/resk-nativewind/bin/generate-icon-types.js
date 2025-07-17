@@ -102,3 +102,5 @@ module.exports = function generateIconTypes(iconSetsPrefixesOrNames, options) {
     }
     console.log("icon types generated at : ", outputPath);
 }
+
+module.exports();

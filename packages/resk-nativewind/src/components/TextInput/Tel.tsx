@@ -55,7 +55,7 @@ import { Text } from "@html/Text";
  * @public
  */
 export function TelInput(props: ITelInputProps) {
-    return <TextInput<string>
+    return <TextInput<string, "tel">
         displayPhoneDialCode={false}
         renderTextInput={(inputProps, { formatValue, updateInputState, phoneCountryCode, inputTextClassName, label, labelTextClassName, iconTextClassName, phoneDialCodeText, editable, disabled }) => {
             return <>

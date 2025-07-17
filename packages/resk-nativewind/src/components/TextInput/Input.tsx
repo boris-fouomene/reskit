@@ -97,7 +97,7 @@ const isNative = p.isNative();
  *
  * @public
  */
-export default function TextInput<Type extends ITextInputType = ITextInputType, ValueType = any>({
+export default function TextInput<ValueType = any, Type extends ITextInputType = ITextInputType>({
     readOnly,
     renderTextInput, testID, error: customError, phoneCountryCode: customPhoneCountryCode, handleMaskValidationErrors,
     defaultValue, sanitizeValue, inputMode: cInputMode, dateFormat: customDateFormat, emptyValue: cIsEmptyValue,
@@ -134,7 +134,7 @@ export default function TextInput<Type extends ITextInputType = ITextInputType, 
     placeholderClassName,
     isDropdownAnchor,
     ...props
-}: ITextInputProps<Type, ValueType>) {
+}: ITextInputProps<ValueType, Type>) {
     const isHydrated = useHydrationStatus();
     const isLabelEmbeded = !!labelEmbeded;
     const [isFocused, setIsFocused] = useState(false);

@@ -21,12 +21,7 @@ import { IObservable, observableFactory } from "@resk/core/observable";
 import { useImperativeHandle } from "react";
 import { IButtonInteractiveContext, IButtonInteractiveProps } from "@components/Button/types";
 import { Button } from "@components/Button";
-import { ISwitchProps, IToggleableOnChangeOptions } from "@components/Switch";
 
-
-const t: IField<"text"> = {
-    type: "text",
-}
 
 export class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> extends Component<IField<FieldType, ValueType>, IFormFieldState<FieldType, ValueType>> {
     /** 
@@ -986,7 +981,7 @@ export function Form<Fields extends IFields = IFields>({ name, testID, onValid, 
                 }
             };
             field.onValid = (options: IFormFieldValidatorOptions) => {
-                const r = typeof onValid === "function" ? onValid(options) : undefined;
+                const r = typeof onValid === "function" ? onValid(options as any) : undefined;
                 if (typeof onValidateField == "function") {
                     onValidateField(options);
                 }
@@ -1004,10 +999,10 @@ export function Form<Fields extends IFields = IFields>({ name, testID, onValid, 
                     formRef.current?.trigger?.(isValid ? "onValid" : "onInvalid", formRef.current);
                     if (isValid) {
                         if (typeof onValid === "function") {
-                            onValid(options);
+                            onValid(options as any);
                         }
                     } else if (typeof onInvalid === "function") {
-                        onInvalid(options);
+                        onInvalid(options as any);
                     }
                     //enable and disable form actions
                     const actions = FormsManager.getActions(formName);
@@ -1029,7 +1024,7 @@ export function Form<Fields extends IFields = IFields>({ name, testID, onValid, 
             field.onInvalid = (options: IFormFieldValidatorOptions) => {
                 const r = typeof onInvalid === "function" ? onInvalid(options) : undefined;
                 if (typeof onInvalidateField == "function") {
-                    onInvalidateField(options);
+                    onInvalidateField(options as any);
                 }
                 formRef.current?.trigger("onInvalid", formRef.current);
                 return r;
@@ -1507,7 +1502,7 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
      *
      * @param value - The current valid value of the field
      */
-    onValid?: (options: IFormFieldValidatorOptions<FieldType, ValueType>) => any;
+    onValid?: (options: IFormFieldValidatorOptions) => any;
 
     /**
      * ❌ Called when **this specific field becomes invalid** after validation.
@@ -1516,7 +1511,7 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
      *
      * @param error - The validation error message or object
      */
-    onInvalid?: (options: IFormFieldValidatorOptions<FieldType, ValueType>) => any;
+    onInvalid?: (options: IFormFieldValidatorOptions) => any;
 
     containerProps?: IKeyboardEventHandlerProps;
 
@@ -1532,9 +1527,9 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
     isFormSubmitting?: boolean;
     renderSkeleton?: (context: FormField<FieldType, ValueType>) => ReactNode;
 
-    onMount?: (context: FormField<FieldType, ValueType>) => any;
+    onMount?: (context: FormField) => any;
 
-    onUnmount?: (context: FormField<FieldType, ValueType>) => any;
+    onUnmount?: (context: FormField) => any;
 
     displayErrors?: boolean;
 

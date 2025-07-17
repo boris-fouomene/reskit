@@ -72,17 +72,17 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         const { item } = opts;
         if (item && isObj<ItemType>(item)) {
             if (isNonNullString(this.props.itemLabelField)) {
-                const l = (item as any)[this.props.itemLabelField];
+                const l = (item)[this.props.itemLabelField];
                 if (!isEmpty(l)) {
                     return stringify(l, { escapeString: false });
                 }
             }
-            const { label } = (item as any);
+            const { label } = (item);
             if (isReactNode(label)) {
                 return label;
             }
         }
-        if (isReactNode(item as any)) {
+        if (isReactNode(item)) {
             return (item as ReactNode);
         }
         if (["string", "number", "boolean"].includes(typeof item)) {
@@ -102,12 +102,12 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         const { item, index } = opts;
         if (item && isObj<ItemType>(item)) {
             if (isNonNullString(this.props.valueField)) {
-                const v = (item as any)[this.props.valueField];
+                const v = (item)[this.props.valueField];
                 if (!isEmpty(v)) {
                     return v as ValueType;
                 }
             }
-            const { value } = (item as any);
+            const { value } = (item);
             if (!isEmpty(value)) {
                 return value;
             }
@@ -170,7 +170,7 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         const searchText = defaultStr(value);
         const state = this.applySearchFilter(searchText);
         if (state) {
-            this.setState(state as any);
+            this.setState(state);
         }
     }
     getSelectedValuesAndHashKey(defaultValue?: ValueType | ValueType[], itemsByHashKey?: IDropdownPreparedItems<ItemType, ValueType>): { selectedValues: ValueType[], selectedItemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>> } {
@@ -422,7 +422,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         }
         return actions;
     }, [dropdownActions, multiple, context.isOpen(), context, anchorSelectedText]);
-    const anchorProps: ITextInputProps<"text"> = {
+    const anchorProps: ITextInputProps = {
         numberOfLines: 1,
         ...props,
         containerClassName: cn("mt-0 mb-0", props.containerClassName),
@@ -431,9 +431,9 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
         testID,
         isDropdownAnchor: true,
         disabled,
-        defaultValue: anchorSelectedText as any,
+        defaultValue: anchorSelectedText,
         onPress: isLoading ? undefined : context.toggle.bind(context),
-    } as any;
+    };
     const { height: screenHeight } = Dimensions.get("window");
     const maxDropdownHeight = useMemo(() => {
         return isNumber(maxHeight) && maxHeight > 0 ? maxHeight : Math.max(screenHeight * 0.5, 300);
@@ -479,7 +479,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             maxHeight={maxDropdownHeight}
             context={context}
             canRenderSeach={canRenderSeach}
-            actions={actions as any}
+            actions={actions}
         />
     </Menu>
 }
@@ -521,7 +521,7 @@ function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, can
                 placeholder={i18n.t("components.dropdown.searchPlaceholder", { count: filteredItems?.length })}
                 right={!actions?.length ? null : (
                     <Menu
-                        items={actions as any}
+                        items={actions}
                         testID={`${testID}-dropdown-menu-actions`}
                         minWidth={150}
                         preferedPositionAxis="vertical"
@@ -895,7 +895,7 @@ export interface IDropdownCallOptions<ItemType = any, ValueType = any> {
     value: ValueType;
 }
 
-export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps<ValueType>, "onChange" | "ref" | "multiline"> {
+export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps, "onChange" | "ref" | "multiline"> {
     /**
      * List of dropdown items
      */

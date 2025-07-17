@@ -19,18 +19,16 @@ export class Nav {
             Reflect.defineMetadata(Nav.linkMetaData, component, Nav);
         }
     }
-    static get Link(): INavLinkComponent {
+    static Link(props: INavLinkProps) {
         const component = Reflect.getMetadata(Nav.linkMetaData, Nav);
-        if (isValidLinkComponent(component)) {
-            return component;
-        }
-        return NavDefaultLink;
+        const C = isValidLinkComponent(component) ? component : NavDefaultLink;
+        return <C {...(Platform.isNative() ? normalizeNativeProps(props) : normalizeHtmlProps(props))} />
     }
     static renderItems({ items, renderItem, renderExpandableItem, ...rest }: INavItemsProps) {
         return renderNavItems({ ...rest, items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem });
     };
     static Item<Context = unknown>({ className, linkProps, variant, ...props }: INavItemProps<Context>) {
-        return <Nav.Link asChild {...(isObj(linkProps) ? (Platform.isNative() ? normalizeNativeProps(linkProps as any) : normalizeHtmlProps(linkProps as any)) : {})}>
+        return <Nav.Link asChild {...linkProps}>
             <Button
                 testID="nav-item"
                 role="navigation"

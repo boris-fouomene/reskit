@@ -1,5 +1,4 @@
 import { Div } from "@html/Div";
-import { pickHtmlProps } from "@html/utils";
 import { defaultStr, isNonNullString, isNumber } from "@resk/core/utils";
 import { cn } from "@utils/cn";
 import { StyleSheet } from "react-native";
@@ -37,7 +36,7 @@ export function ActivityIndicator({ size, borderWidth, style, variant, testID, i
         style = [{ borderTopColor: color }, style];
     }
     testID = defaultStr(testID, "resk-activity-indicator");
-    return <Div {...pickHtmlProps(props)} role={defaultStr(role, "progressbar") as any} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("resk-activity-indicator animate-spin rounded-full", clx, activityIndicatorVariant(variant), className)} />
+    return <Div {...props} role={defaultStr(role, "progressbar") as any} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("resk-activity-indicator animate-spin rounded-full", clx, activityIndicatorVariant(variant), className)} />
 }
 
 export * from "./types";

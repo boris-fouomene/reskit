@@ -1,6 +1,6 @@
 import { defaultStr, isEmpty, isNonNullString } from "@resk/core/utils";
 import { IHtmlAccessibilityProps, IHtmlDivProps, INativeAccessibilityProps } from "./types";
-import { cn, getTextContent, normalizeProps } from "@utils";
+import { cn, getTextContent, normalizeProps as baseNormalizeProps } from "@utils";
 import { StyleSheet, Platform, PressableProps } from "react-native";
 import { normalizeGestureEvent } from "./events";
 import { MouseEvent, TouchEvent } from "react";
@@ -14,37 +14,61 @@ function isObj(value: any): value is Record<string, any> {
 }
 
 /**
- * Normalizes props for React Native elements.
- *
- * This function takes all the props that can be passed to a React Native component,
- * and normalizes them into a format that can be passed to the component.
- *
- * The following props are normalized:
- * - `testID` is converted to `testID` (no change)
- * - `nativeID` is converted to `id` (for accessibility)
- * - `asHtmlTag` is not passed to the component
- *
- * @param props - The props to normalize
- * @param defaultProps - The default props to use if `props` is undefined
- * @returns The normalized props
+ * Platform-aware props normalization function.
+ * 
+ * Automatically chooses the appropriate normalization function based on the platform:
+ * - On web: Uses `normalizeHtmlProps` with React Native to DOM/ARIA conversion
+ * - On native: Uses `normalizeNativeProps` preserving React Native accessibility props
+ * 
+ * @param props The props to normalize
+ * @param defaultProps The default props to normalize
+ * @returns Normalized props appropriate for the current platform
  */
-export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, nativeID, asHtmlTag, ...props }: T, defaultProps?: T) {
-    delete (props as any).colSpan;
-    delete (props as any).rowSpan;
-    return {
-        ...normalizeProps(props, defaultProps),
-        id: defaultStr(props.id, nativeID),
-        nativeID,
-        testID: defaultStr(testID, defaultProps?.testID),
+export function normalizePlatformProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>(
+    props: T & { android_ripple?: PressableProps["android_ripple"] },
+    defaultProps?: T
+): Record<string, any> {
+    if (Platform.OS === "web") {
+        return normalizeHtmlProps(props, defaultProps);
+    } else {
+        return normalizeNativeProps(props, defaultProps);
     }
 }
 
 /**
- * Normalizes props for HTML elements.
+ * Normalize props for React Native elements preserving accessibility props for native platform.
+ * This function is optimized for native platform usage where React Native accessibility props are preserved.
+ * 
+ * @param props The props to normalize
+ * @param defaultProps The default props to normalize
+ * @returns Normalized props suitable for React Native components
+ */
+export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, nativeID, asHtmlTag, ...props }: T, defaultProps?: T): Record<string, any> {
+    // Clean up web-specific props that shouldn't reach React Native
+    delete (props as any).colSpan;
+    delete (props as any).rowSpan;
+
+    // On native, preserve React Native accessibility props and don't convert them
+    const result: Record<string, any> = {
+        ...baseNormalizeProps(props, defaultProps),
+        id: defaultStr(props.id, nativeID),
+        nativeID,
+        testID: defaultStr(testID, defaultProps?.testID),
+    };
+
+    // Ensure React Native accessibility props are preserved for native platform
+    // These will be handled by React Native's accessibility system
+    return result;
+}
+
+/**
+ * Normalizes props for HTML elements on web platform.
  *
  * This function takes all the props that can be passed to a React Native component,
  * and converts them into props that can be passed to an equivalent HTML element.
+ * React Native accessibility props are converted to proper DOM/ARIA attributes.
  *
+ * Web-specific transformations:
  * - `testID` is converted to `data-test-id`
  * - `ref` is converted to a function that normalizes the ref and calls the original ref function
  * - `android_ripple` is ignored
@@ -57,9 +81,9 @@ export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<
  * - `className` is set to `"cursor-pointer"` if the element is not disabled and has an `onClick`, `onMouseDown`, or `onMouseUp` prop
  * - React Native accessibility props are converted to proper DOM/ARIA attributes
  *
- * @param props The props to normalize
+ * @param props The props to normalize for web/HTML
  * @param defaultProps The default props to normalize
- * @returns The normalized props
+ * @returns The normalized props for HTML/DOM elements
  */
 export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({
     testID,
@@ -86,11 +110,20 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
     accessibilityActions,
     accessibilityIgnoresInvertColors,
     importantForAccessibility,
+    // Extract additional React Native accessibility props
+    accessibilityLabelledBy,
+    accessibilityShowsLargeContentViewer,
+    accessibilityLargeContentTitle,
+    accessibilityRespondsToUserInteraction,
+    onAccessibilityTap,
+    onAccessibilityMagicTap,
+    onAccessibilityAction,
+    screenReaderFocusable,
     ...props
-}: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
+}: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T): Record<string, any> {
     const disabled = !!(props as any).disabled || !!(props as any).readOnly || !!(props as any).readonly;
 
-    // Convert accessibility props to DOM attributes first
+    // Convert React Native accessibility props to DOM attributes for web platform
     const accessibilityPropsConverted = convertAccessibilityPropsToDOM({
         accessible,
         accessibilityLabel,
@@ -105,14 +138,22 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
         accessibilityActions,
         accessibilityIgnoresInvertColors,
         importantForAccessibility,
+        accessibilityLabelledBy,
+        accessibilityShowsLargeContentViewer,
+        accessibilityLargeContentTitle,
+        accessibilityRespondsToUserInteraction,
         onAccessibilityEscape,
+        onAccessibilityTap,
+        onAccessibilityMagicTap,
+        onAccessibilityAction,
+        screenReaderFocusable,
         ...props
     } as any);
 
-    const r = {
+    const r: Record<string, any> = {
         style: style ? StyleSheet.flatten(style) : undefined as any,
         title: title ? getTextContent(title) : undefined,
-        ...normalizeProps(accessibilityPropsConverted, defaultProps),
+        ...baseNormalizeProps(accessibilityPropsConverted, defaultProps),
         ref: ref !== undefined && ref ? function (personalizedRef: any) {
             UIManager.normalizeRef(personalizedRef);
             if (typeof ref == "function") {
@@ -133,10 +174,12 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
         } : undefined
     }
 
+    // Add cursor pointer for web interactivity
     if (Platform.OS === "web" && !(r as any).disabled && !(r as any).readOnly && !(r as any).readonly && (r.onClick || r.onMouseDown || r.onMouseUp)) {
         r.className = cn("cursor-pointer", r.className);
     }
 
+    // Handle accessibility escape key for web
     if (typeof onAccessibilityEscape == "function") {
         (r as any).onKeyDown = function (event: KeyboardEvent) {
             if (event?.key === "Escape") {
@@ -148,9 +191,12 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
         }
     }
 
+    // Clean up platform-specific props
     delete (r as any).closeOnPress;
+    delete (r as any).android_ripple;
 
     // Ensure React Native accessibility props are completely removed from DOM output
+    // These have been converted to ARIA attributes by convertAccessibilityPropsToDOM
     delete (r as any).accessible;
     delete (r as any).accessibilityLabel;
     delete (r as any).accessibilityHint;
@@ -164,7 +210,15 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
     delete (r as any).accessibilityActions;
     delete (r as any).accessibilityIgnoresInvertColors;
     delete (r as any).importantForAccessibility;
+    delete (r as any).accessibilityLabelledBy;
+    delete (r as any).accessibilityShowsLargeContentViewer;
+    delete (r as any).accessibilityLargeContentTitle;
+    delete (r as any).accessibilityRespondsToUserInteraction;
     delete (r as any).onAccessibilityEscape;
+    delete (r as any).onAccessibilityTap;
+    delete (r as any).onAccessibilityMagicTap;
+    delete (r as any).onAccessibilityAction;
+    delete (r as any).screenReaderFocusable;
 
     return r;
 }
@@ -342,34 +396,6 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({
     return domProps as any;
 }
 
-
-/**
- * Picks and returns only the valid HTML-related properties from the given props object.
- *
- * This function creates a shallow copy of the input props, then filters out only the properties
- * that are relevant for HTML elements (such as accessibility, ARIA, and DOM props).
- * The returned object is normalized before being returned.
- *
- * @typeParam T - The type extending `IHtmlDivProps` from which to pick HTML props.
- * @param props - The props object to filter.
- * @param normalize - If `true`, normalizes the returned props object.
- * @returns A partial object containing only the valid HTML-related properties from the input.
- */
-export function pickHtmlProps<T extends IHtmlDivProps>(props: T, normalize?: boolean): any {
-    props = Object.assign({}, props);
-    const r = {} as any;
-    const domProps: (keyof IHtmlDivProps)[] = [
-        "id", "role", "nativeID", "tabIndex", "aria-label", "aria-busy", "aria-checked", "aria-disabled", "aria-expanded", "aria-hidden", "aria-selected", "aria-valuemax", "aria-valuemin", "aria-valuenow", "aria-valuetext", "collapsable", "title", "onPress", "onPressIn", "onPressOut", "ref", "asHtmlTag",
-        //accessibility props : 
-        "accessible", "accessibilityLabel", "accessibilityHint", "accessibilityRole", "accessibilityState", "accessibilityLiveRegion", "accessibilityValue", "accessibilityElementsHidden", "importantForAccessibility", "onAccessibilityEscape", "accessibilityLanguage", "accessibilityViewIsModal", "accessibilityActions", "accessibilityIgnoresInvertColors",
-    ];
-    domProps.map((p) => {
-        if (!isEmpty(props[p])) {
-            r[p] = props[p];
-        }
-    });
-    return normalize ? normalizeHtmlProps(r as any) : r;
-}
 /**
  * Maps React Native live region values to ARIA live region values
  */

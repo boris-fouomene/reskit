@@ -12,19 +12,58 @@ export interface IHtmlDivProps extends INativewindBaseProps, INativeAccessibilit
     role?: ViewProps["role"];
     nativeID?: ViewProps["nativeID"];
     tabIndex?: ViewProps["tabIndex"];
-    "aria-label"?: ViewProps["aria-label"];
-    "aria-busy"?: ViewProps["aria-busy"];
-    "aria-checked"?: ViewProps["aria-checked"];
-    "aria-disabled"?: ViewProps["aria-disabled"];
-    "aria-expanded"?: ViewProps["aria-expanded"];
-    "aria-hidden"?: ViewProps["aria-hidden"];
-    "aria-selected"?: ViewProps["aria-selected"];
-    "aria-valuemax"?: ViewProps["aria-valuemax"];
-    "aria-valuemin"?: ViewProps["aria-valuemin"];
-    "aria-valuenow"?: ViewProps["aria-valuenow"];
-    "aria-valuetext"?: ViewProps["aria-valuetext"];
+    // Core ARIA attributes
+    "aria-label"?: string;
+    "aria-labelledby"?: string;
+    "aria-describedby"?: string;
+    "aria-description"?: string;
+    // State ARIA attributes
+    "aria-disabled"?: boolean;
+    "aria-selected"?: boolean;
+    "aria-checked"?: boolean | 'mixed';
+    "aria-busy"?: boolean;
+    "aria-expanded"?: boolean;
+    "aria-hidden"?: boolean | 'true' | 'false';
+    // Live region attributes
+    "aria-live"?: 'off' | 'polite' | 'assertive';
+    "aria-modal"?: boolean | 'true' | 'false';
+    // Value attributes
+    "aria-valuemin"?: number;
+    "aria-valuemax"?: number;
+    "aria-valuenow"?: number;
+    "aria-valuetext"?: string;
+    // Additional ARIA attributes that may be output by convertAccessibilityPropsToDOM
+    "aria-atomic"?: boolean;
+    "aria-autocomplete"?: 'none' | 'inline' | 'list' | 'both';
+    "aria-controls"?: string;
+    "aria-current"?: boolean | 'false' | 'true' | 'page' | 'step' | 'location' | 'date' | 'time';
+    "aria-details"?: string;
+    "aria-errormessage"?: string;
+    "aria-flowto"?: string;
+    "aria-haspopup"?: boolean | 'false' | 'true' | 'menu' | 'listbox' | 'tree' | 'grid' | 'dialog';
+    "aria-invalid"?: boolean | 'false' | 'true' | 'grammar' | 'spelling';
+    "aria-keyshortcuts"?: string;
+    "aria-level"?: number;
+    "aria-multiline"?: boolean;
+    "aria-multiselectable"?: boolean;
+    "aria-orientation"?: 'horizontal' | 'vertical' | 'undefined';
+    "aria-owns"?: string;
+    "aria-placeholder"?: string;
+    "aria-posinset"?: number;
+    "aria-pressed"?: boolean | 'false' | 'mixed' | 'true';
+    "aria-readonly"?: boolean;
+    "aria-relevant"?: 'additions' | 'additions text' | 'all' | 'removals' | 'text';
+    "aria-required"?: boolean;
+    "aria-roledescription"?: string;
+    "aria-setsize"?: number;
+    "aria-sort"?: 'none' | 'ascending' | 'descending' | 'other';
+    // Language support
+    lang?: string;
+    // Other attributes
     "collapsable"?: ViewProps["collapsable"];
     "title"?: string;
+    // Selectable prop (common in React Native, handled by conversion function)
+    selectable?: boolean | string;
     /**@platform native */
     testID?: ViewProps["testID"];
     onPress?: PressableProps["onPress"];

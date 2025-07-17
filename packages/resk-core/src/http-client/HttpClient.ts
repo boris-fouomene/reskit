@@ -5,14 +5,54 @@ import { isValidUrl, setQueryParams } from "@utils/uri";
 import { I18n } from "../i18n";
 import { JsonHelper } from "@utils/json";
 
+/**
+ * The `HttpClient` class provides a robust, extensible API for making HTTP requests in TypeScript/JavaScript applications.
+ *
+ * It supports advanced features such as authentication, custom headers, request/response transformation, error handling,
+ * timeouts, and built-in support for RESTful methods (GET, POST, PUT, PATCH, DELETE). The class is designed for easy extension,
+ * allowing you to override methods for custom authentication, request options, or error handling.
+ *
+ * ## Key Features
+ * - Automatic Bearer token support (override `getBeearToken` for dynamic tokens)
+ * - Customizable request headers and options
+ * - Built-in support for JSON and RESTful APIs
+ * - Timeout and delay management for requests
+ * - Comprehensive error handling and transformation
+ * - Type-safe response transformation
+ * - Extensible for custom authentication, logging, or request/response hooks
+ *
+ * ## Example Usage
+ * ```typescript
+ * const client = new HttpClient();
+ * // GET request
+ * const users = await client.fetchJSon<User[]>("/users");
+ * // POST request
+ * const result = await client.post<{ id: number }>("/users", { body: JSON.stringify({ name: "John" }) });
+ * // Custom authentication
+ * class MyClient extends HttpClient {
+ *   async getBeearToken() { return await getTokenFromStorage(); }
+ * }
+ * ```
+ *
+ * @see IHttpClient.FetchOptions for request options
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+ * @see https://restfulapi.net/http-status-codes/
+ */
 export class HttpClient {
   /**
-   * Retrieves the base URL for the HTTP client.
+   * Gets the base URL for all HTTP requests.
    *
-   * This method obtains the value of the `HTTP_CLIENT_BASE_URL` environment variable,
-   * ensures it is a string (using `defaultStr`), and removes any trailing backslashes.
+   * This method reads the `HTTP_CLIENT_BASE_URL` environment variable, sanitizes it,
+   * and removes any trailing backslashes for consistency.
    *
-   * @returns {string} The sanitized base URL without trailing backslashes.
+   * @returns {string} The sanitized base URL string.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const baseUrl = client.getBaseUrl();
+   * // baseUrl might be "https://api.example.com"
+   * ```
    */
   getBaseUrl(): string {
     return defaultStr(process.env.HTTP_CLIENT_BASE_URL).replace(/\\+$/, "");
@@ -21,30 +61,70 @@ export class HttpClient {
   /**
    * Retrieves a Bearer token for authentication.
    *
-   * @returns The Bearer token as a string, or a Promise that resolves to a string.
+   * Override this method to provide dynamic authentication tokens for requests.
+   *
+   * @returns {string | Promise<string>} The Bearer token string or a promise resolving to it.
+   *
+   * @example
+   * ```typescript
+   * // Override in a subclass
+   * class MyClient extends HttpClient {
+   *   async getBeearToken() {
+   *     return await getTokenFromStorage();
+   *   }
+   * }
+   * ```
    */
-  getBeearToken(): string | Promise<string> {
+  /**
+   * Retrieves a Bearer token for authentication.
+   *
+   * Override this method to provide dynamic authentication tokens for requests.
+   *
+   * @returns {string | Promise<string>} The Bearer token string or a promise resolving to it.
+   *
+   * @example
+   * ```typescript
+   * // Override in a subclass
+   * class MyClient extends HttpClient {
+   *   async getBearerToken() {
+   *     return await getTokenFromStorage();
+   *   }
+   * }
+   * ```
+   */
+  getBearerToken(): string | Promise<string> {
     return "";
   }
   /**
-   * Transforms the provided headers into a `Headers` instance.
+   * Converts various header formats into a standardized `Headers` instance.
    *
-   * @param headers - The headers to transform. Can be an instance of `Headers`, an object, or undefined.
-   * @returns A `Headers` instance containing the provided headers.
+   * @param headers - The headers to transform. Accepts an object, `Headers` instance, or undefined.
+   * @returns {Headers} A standardized `Headers` instance.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const headers = client.transformRequestHeader({ Authorization: "Bearer token" });
+   * // headers instanceof Headers === true
+   * ```
    */
   transformRequestHeader(headers?: any): Headers {
     return headers instanceof Headers ? headers : new Headers(headers || {});
   }
   /**
-   * Transforms the request options before making an HTTP request.
+   * Prepares and transforms fetch options before sending an HTTP request.
    *
-   * This method modifies the provided `options` object, typically by transforming its headers
-   * using the `transformRequestHeader` method. It returns the modified options, either synchronously
-   * or as a Promise.
+   * This method is useful for customizing headers, authentication, or other options before each request.
    *
-   * @param options - The original fetch options for the HTTP request.
-   * @param path - The request path or endpoint being called.
-   * @returns The transformed fetch options, either directly or wrapped in a Promise.
+   * @param options - The original fetch options object.
+   * @param path - The endpoint path being requested.
+   * @returns {IHttpClient.FetchOptions | Promise<IHttpClient.FetchOptions>} The transformed options.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const opts = await client.transformRequestOptions({ headers: { Accept: "application/json" } }, "/users");
+   * ```
    */
   transformRequestOptions(options: IHttpClient.FetchOptions, path: string): IHttpClient.FetchOptions | Promise<IHttpClient.FetchOptions> {
     options.headers = this.transformRequestHeader(options.headers);
@@ -53,19 +133,21 @@ export class HttpClient {
   /**
    * Performs an authenticated HTTP fetch request with enhanced headers and optional filtering.
    *
-   * @param path - The endpoint path to request.
-   * @param options - Optional fetch options, including headers, query parameters, body, and delay.
-   * @returns A promise that resolves to the fetch Response object.
+   * Automatically attaches an authorization token, sets default headers, and supports advanced filtering.
    *
-   * @remarks
-   * - Automatically attaches an authorization token if available.
-   * - Sets default headers for JSON content and localization.
-   * - Supports an `xFilter` option for advanced filtering, serialized as JSON if necessary.
-   * - Uses a timeout wrapper to optionally delay the request.
+   * @param path - The endpoint path to request (e.g., "/users").
+   * @param options - Optional fetch options (headers, query params, body, delay, etc.).
+   * @returns {Promise<Response>} Resolves to the fetch Response object.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const response = await client.fetch("/users", { headers: { "X-Custom": "value" } });
+   * ```
    */
   async fetch(path: string, options: IHttpClient.FetchOptions | null = null): Promise<Response> {
     options = Object.assign({}, options);
-    const token = await this.getBeearToken();
+    const token = await this.getBearerToken();
     const { xFilter } = options;
     const locale = await I18n.getInstance().getLocale();
     options.headers = Object.assign(
@@ -99,28 +181,56 @@ export class HttpClient {
     );
   }
   /**
-   * Sends an HTTP request to the specified path and parses the response body as JSON.
+   * Sends an HTTP request and parses the response body as JSON.
    *
-   * @typeParam T - The expected type of the parsed JSON response. Defaults to `Response`.
-   * @param path - The URL or path to which the request is sent.
-   * @param options - Optional fetch options to customize the request.
-   * @returns A promise that resolves to the parsed JSON response of type `T`.
+   * @typeParam T - The expected type of the parsed JSON response.
+   * @param path - The URL or endpoint to request.
+   * @param options - Optional fetch options.
+   * @returns {Promise<T>} Resolves to the parsed JSON response.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const data = await client.fetchJSon<{ users: User[] }>("/users");
+   * ```
    */
-  async fetchJSon<T = Response>(path: string, options: IHttpClient.FetchOptions = {}): Promise<T> {
+  /**
+   * Sends an HTTP request and parses the response body as JSON.
+   *
+   * @typeParam T - The expected type of the parsed JSON response.
+   * @param path - The URL or endpoint to request.
+   * @param options - Optional fetch options.
+   * @returns {Promise<T>} Resolves to the parsed JSON response.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const data = await client.fetchJson<{ users: User[] }>("/users");
+   * ```
+   */
+  async fetchJson<T = Response>(path: string, options: IHttpClient.FetchOptions = {}): Promise<T> {
     return this.fetch(path, options).then((res: Response) => {
       return res.json();
     });
   }
   /**
-   * Handles errors that occur during a fetch operation, formats the error message,
-   * and throws a standardized error object. If error handling is disabled via options,
-   * the original error is re-thrown.
+   * Handles errors that occur during a fetch operation and throws a standardized error object.
+   *
+   * If error handling is disabled via options, the original error is re-thrown.
    *
    * @param error - The error object thrown by the fetch operation.
-   * @param path - The request path or endpoint associated with the error.
+   * @param path - The endpoint path associated with the error.
    * @param options - Fetch options, which may include an error handling flag.
-   * @throws An object containing a formatted error message, the request path, and the original error,
-   *         or re-throws the original error if error handling is disabled.
+   * @throws An object containing a formatted error message, the request path, and the original error.
+   *
+   * @example
+   * ```typescript
+   * try {
+   *   await client.fetch("/bad-endpoint");
+   * } catch (err) {
+   *   console.error(err.message, err.path);
+   * }
+   * ```
    */
   async handleFetchError(error: any, path: string, options: IHttpClient.FetchOptions) {
     if (options?.handleErrors !== false) {
@@ -136,14 +246,21 @@ export class HttpClient {
     throw error;
   }
   /**
-   * Builds a complete URL by combining the provided URL with an API host and optional query parameters.
-   * If the given URL is not valid, it constructs the URL using the API host from the environment variable `_HTTP_CLIENT_BASE_URL`.
+   * Builds a complete URL by combining the provided endpoint with the base API host and query parameters.
+   *
    * Throws an error if the API host is not set or invalid.
    *
-   * @param url - The base URL or endpoint to build upon.
-   * @param queryParams - Optional query parameters to append to the URL.
-   * @returns The fully constructed URL with query parameters if provided.
+   * @param url - The endpoint or base URL to build upon.
+   * @param queryParams - Optional query parameters to append.
+   * @returns {string} The fully constructed URL.
    * @throws Error if the API host environment variable is not set or invalid.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const fullUrl = client.buildUrl("/users", { page: 2 });
+   * // fullUrl might be "https://api.example.com/users?page=2"
+   * ```
    */
   buildUrl(url: string, queryParams?: Record<string, any>) {
     if (!isValidUrl(url)) {
@@ -159,13 +276,16 @@ export class HttpClient {
   }
 
   /**
-   * Determines whether the provided HTTP status code represents a successful response.
+   * Checks if the provided HTTP status code is considered a successful response.
    *
-   * Converts the status to a number if it is provided as a string, checks if it is a valid number,
-   * and then verifies if it is included in the list of successful status codes defined by `HttpClient.SUCCESS_STATUSES`.
+   * @param status - The HTTP status code (string or number).
+   * @returns {boolean} True if the status code is successful, false otherwise.
    *
-   * @param status - The HTTP status code to check, as a string or number.
-   * @returns `true` if the status code is considered successful; otherwise, `false`.
+   * @example
+   * ```typescript
+   * client.isSuccessStatus(200); // true
+   * client.isSuccessStatus("404"); // false
+   * ```
    */
   isSuccessStatus(status: string | number): boolean {
     if (typeof status == "string") {
@@ -176,9 +296,14 @@ export class HttpClient {
   }
 
   /**
-   * Returns the delay duration (in milliseconds) to be used for fetch operations.
+   * Gets the default delay (in milliseconds) for fetch operations.
    *
-   * @returns {number} The fetch delay in milliseconds. Default is 120000 (2 minutes).
+   * @returns {number} The default fetch delay (120000 ms = 2 minutes).
+   *
+   * @example
+   * ```typescript
+   * const delay = client.getFetchDelay(); // 120000
+   * ```
    */
   getFetchDelay(): number {
     return 120000;
@@ -187,10 +312,15 @@ export class HttpClient {
   /**
    * Wraps a promise with a timeout, rejecting if the promise does not resolve within the specified delay.
    *
-   * @template T - The type of the resolved value of the promise.
-   * @param promise - The promise to wrap with a timeout.
-   * @param delay - Optional timeout in milliseconds. If not provided or less than or equal to 1000, a default delay is used.
-   * @returns A promise that resolves or rejects with the original promise, or rejects with a timeout error if the delay is exceeded.
+   * @typeParam T - The type of the resolved value.
+   * @param promise - The promise to wrap.
+   * @param delay - Optional timeout in milliseconds. Uses default if not provided or too short.
+   * @returns {Promise<T>} Resolves or rejects with the original promise, or rejects with a timeout error.
+   *
+   * @example
+   * ```typescript
+   * await client.timeout(fetch("/slow"), 5000);
+   * ```
    */
   async timeout<T = Response>(promise: Promise<T>, delay?: number): Promise<T> {
     delay = isNumber(delay) && delay > 1000 ? delay : this.getFetchDelay();
@@ -208,16 +338,20 @@ export class HttpClient {
   }
 
   /**
-   * Transforms the given HTTP response based on its content type.
+   * Transforms the HTTP response based on its content type.
    *
-   * If the response has a "Content-Type" header indicating "application/json",
-   * the response body is parsed as JSON and returned as type `T`.
-   * Otherwise, the raw `Response` object is returned as type `T`.
+   * If the response is JSON, parses and returns it as type `T`. Otherwise, returns the raw response.
    *
-   * @typeParam T - The expected return type, defaults to `Response`.
+   * @typeParam T - The expected return type.
    * @param response - The HTTP response to transform.
-   * @param options - Additional fetch options (not used in this method, but provided for extensibility).
-   * @returns A promise resolving to the transformed response as type `T`.
+   * @param options - Additional fetch options (for extensibility).
+   * @returns {Promise<T>} Resolves to the transformed response.
+   *
+   * @example
+   * ```typescript
+   * const res = await client.fetch("/data");
+   * const json = await client.transformResponse(res, {});
+   * ```
    */
   async transformResponse<T = Response>(response: Response, options: IHttpClient.FetchOptions): Promise<T> {
     if (response instanceof Response) {
@@ -232,12 +366,18 @@ export class HttpClient {
   }
 
   /**
-   * Sends an HTTP POST request to the specified URL with the provided options.
+   * Sends an HTTP POST request to the specified URL.
    *
    * @typeParam T - The expected response type after transformation.
-   * @param url - The endpoint URL to which the POST request is sent.
-   * @param options - Optional fetch options to customize the request. If not provided, defaults are used.
-   * @returns A promise that resolves to the transformed response of type `T`.
+   * @param url - The endpoint URL for the POST request.
+   * @param options - Optional fetch options.
+   * @returns {Promise<T>} Resolves to the transformed response.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const result = await client.post<{ id: number }>("/users", { body: JSON.stringify({ name: "John" }) });
+   * ```
    */
   post<T>(url: string, options: IHttpClient.FetchOptions = {}) {
     options = Object.assign({}, options);
@@ -248,12 +388,18 @@ export class HttpClient {
   }
 
   /**
-   * Sends an HTTP PATCH request to the specified URL with the provided options.
+   * Sends an HTTP PATCH request to the specified URL.
    *
    * @typeParam T - The expected response type after transformation.
-   * @param url - The endpoint URL to send the PATCH request to.
-   * @param options - Optional fetch options to customize the request.
-   * @returns A promise that resolves to the transformed response of type `T`.
+   * @param url - The endpoint URL for the PATCH request.
+   * @param options - Optional fetch options.
+   * @returns {Promise<T>} Resolves to the transformed response.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const result = await client.patch("/users/1", { body: JSON.stringify({ name: "Jane" }) });
+   * ```
    */
   patch<T>(url: string, options: IHttpClient.FetchOptions = {}) {
     options = Object.assign({}, options);
@@ -264,12 +410,18 @@ export class HttpClient {
   }
 
   /**
-   * Sends an HTTP PUT request to the specified URL with the provided options.
+   * Sends an HTTP PUT request to the specified URL.
    *
-   * @template T - The expected response type after transformation.
-   * @param url - The endpoint URL to send the PUT request to.
-   * @param options - Optional fetch options to customize the request. Defaults to an empty object.
-   * @returns A promise that resolves to the transformed response of type `T`.
+   * @typeParam T - The expected response type after transformation.
+   * @param url - The endpoint URL for the PUT request.
+   * @param options - Optional fetch options.
+   * @returns {Promise<T>} Resolves to the transformed response.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const result = await client.put("/users/1", { body: JSON.stringify({ name: "Jane" }) });
+   * ```
    */
   put<T>(url: string, options: IHttpClient.FetchOptions = {}) {
     options = Object.assign({}, options);
@@ -282,10 +434,16 @@ export class HttpClient {
   /**
    * Sends an HTTP DELETE request to the specified URL.
    *
-   * @template T - The expected response type.
-   * @param url - The endpoint URL to send the DELETE request to.
-   * @param options - Optional fetch options to customize the request.
-   * @returns A promise that resolves to the transformed response of type `T`.
+   * @typeParam T - The expected response type.
+   * @param url - The endpoint URL for the DELETE request.
+   * @param options - Optional fetch options.
+   * @returns {Promise<T>} Resolves to the transformed response.
+   *
+   * @example
+   * ```typescript
+   * const client = new HttpClient();
+   * const result = await client.delete("/users/1");
+   * ```
    */
   delete<T>(url: string, options: IHttpClient.FetchOptions = {}) {
     options = Object.assign({}, options);
@@ -298,7 +456,6 @@ export class HttpClient {
   /**
    * Collection of standard HTTP status codes used to indicate the result of an HTTP request.
    *
-   * @remarks
    * This object provides named constants for commonly used HTTP status codes, including success, client error, and server error responses.
    *
    * @example
@@ -307,9 +464,11 @@ export class HttpClient {
    *   // Handle successful response
    * }
    * ```
-   * @see : https://www.restapitutorial.com/httpstatuscodes.html.
-   * @see : https://developer.mozilla.org/fr/docs/Web/HTTP/Status#r%C3%A9ponses_derreur_c%C3%B4t%C3%A9_client
-   * @see : https://restfulapi.net/http-status-codes/
+   *
+   * @see https://www.restapitutorial.com/httpstatuscodes.html
+   * @see https://developer.mozilla.org/fr/docs/Web/HTTP/Status#r%C3%A9ponses_derreur_c%C3%B4t%C3%A9_client
+   * @see https://restfulapi.net/http-status-codes/
+   *
    * @property SUCCESS - 200: Indicates that the request has succeeded.
    * @property CREATED - 201: Indicates that the request has succeeded and a new resource has been created as a result.
    * @property ACCEPTED - 202: Indicates that the request has been received but not completed yet, typically used in long-running requests and batch processing.
@@ -412,20 +571,50 @@ export class HttpClient {
   /**
    * List of HTTP status codes considered as successful responses.
    *
-   * This array includes standard success codes such as 200 (OK), 201 (Created),
-   * 202 (Accepted), and others that indicate a successful or partially successful
-   * HTTP request. Used to determine if a response should be treated as a success.
+   * Includes standard success codes such as 200 (OK), 201 (Created), 202 (Accepted), and more.
+   * Used to determine if a response should be treated as a success.
+   *
+   * @example
+   * ```typescript
+   * if (HttpClient.SUCCESS_STATUSES.includes(response.status)) {
+   *   // Success!
+   * }
+   * ```
    */
   static SUCCESS_STATUSES = [HttpClient.STATUSES.SUCCESS, HttpClient.STATUSES.CREATED, HttpClient.STATUSES.ACCEPTED, HttpClient.STATUSES.NON_AUTHORITATIVE_INFORMATION, HttpClient.STATUSES.NO_CONTENT, HttpClient.STATUSES.RESET_CONTENT, HttpClient.STATUSES.PARTIAL_CONTENT, HttpClient.STATUSES.MULTI_STATUS, HttpClient.STATUSES.ALREADY_REPORTED, HttpClient.STATUSES.IM_USED];
 }
 
 export namespace IHttpClient {
+  /**
+   * Options for configuring HTTP requests made by `HttpClient`.
+   *
+   * Extends the standard `RequestInit` options from the Fetch API, adding support for delays, error handling,
+   * query parameters, advanced filtering, and custom behaviors.
+   *
+   * @property delay - Optional timeout in milliseconds before the request is considered failed.
+   * @property handleErrors - If false, disables automatic error transformation and throws raw errors.
+   * @property queryParams - Object containing query parameters to append to the request URL.
+   * @property xFilter - Advanced filter object, serialized as JSON for the `X-filter` header.
+   * @property redirectToSigninPageOn401Response - If true, automatically redirects to sign-in page on 401 responses.
+   * @property body - The request body (string, object, or FormData).
+   *
+   * @example
+   * ```typescript
+   * const options: IHttpClient.FetchOptions = {
+   *   method: "POST",
+   *   body: JSON.stringify({ name: "John" }),
+   *   queryParams: { page: 2 },
+   *   delay: 5000,
+   *   handleErrors: true,
+   * };
+   * ```
+   */
   export interface FetchOptions extends RequestInit {
     delay?: number;
     handleErrors?: boolean;
     queryParams?: Record<string, any>;
     xFilter?: any;
-    redirectToSigninPageOn401Response?: boolean;
+    redirectToSignInOn401?: boolean;
     body?: any;
   }
 }

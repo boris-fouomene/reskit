@@ -1,7 +1,7 @@
 import React from 'react';
 import { Div } from '@html/Div';
-import { cn } from '@resk/nativewind/utils';
-import type { IClassName } from '@resk/nativewind/types';
+import { cn } from '@utils';
+import { IClassName } from '@src/types';
 
 /**
  * Props interface for the SSRScrollView component optimized for server-side rendering.

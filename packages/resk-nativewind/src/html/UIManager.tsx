@@ -103,6 +103,7 @@ export const UIManager = {
                     hostNode.measureInWindow = (callback: MeasureInWindowOnSuccessCallback) => UIManager.measureInWindow(hostNode, callback);
                 }
             }
+            return hostNode;
         } catch (e) {
             console.log(e, " normalizing native ref");
         }

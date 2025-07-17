@@ -1,4 +1,4 @@
-import { defaultStr, isEmpty, isNonNullString, isObj } from "@resk/core/utils";
+import { defaultStr, isEmpty, isNonNullString } from "@resk/core/utils";
 import { IHtmlAccessibilityProps, IHtmlDivProps, INativeAccessibilityProps } from "./types";
 import { cn, getTextContent, normalizeProps } from "@utils";
 import { StyleSheet, Platform, PressableProps } from "react-native";
@@ -7,6 +7,11 @@ import { MouseEvent, TouchEvent } from "react";
 import { UIManager } from "./UIManager";
 
 export * from "./events";
+
+// Helper function to check if a value is an object
+function isObj(value: any): value is Record<string, any> {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
 
 /**
  * Normalizes props for React Native elements.
@@ -113,6 +118,7 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
             if (typeof ref == "function") {
                 return ref(personalizedRef);
             }
+            return ref;
         } as any : undefined,
         "data-test-id": defaultStr(testID, defaultProps?.testID),
         id: defaultStr(props.id, nativeID),
@@ -188,54 +194,151 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
  * @param props.accessibilityState - Maps state values to ARIA attributes such as `aria-disabled`, `aria-selected`, `aria-checked`, `aria-busy`, and `aria-expanded`.
  * @param props.accessibilityValue - Maps value props to ARIA attributes such as `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-valuetext`.
  * @param props.accessibilityHint - Sets the `aria-describedby` and `aria-description` attributes.
+ * @param props.accessibilityLabelledBy - Maps to `aria-labelledby` attribute.
+ * @param props.accessibilityShowsLargeContentViewer - Not mapped; iOS specific.
+ * @param props.accessibilityLargeContentTitle - Not mapped; iOS specific.
+ * @param props.accessibilityRespondsToUserInteraction - Not mapped; iOS specific.
+ * @param props.onAccessibilityTap - Not mapped; included for compatibility.
+ * @param props.onAccessibilityMagicTap - Not mapped; included for compatibility.
+ * @param props.onAccessibilityAction - Not mapped; included for compatibility.
  * @param rnProps - Remaining props passed through to the DOM element.
  * @returns The props object with React Native accessibility props converted to DOM/ARIA attributes, omitting the original native accessibility props.
  */
-export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ accessible, onAccessibilityEscape, accessibilityLanguage, accessibilityActions, accessibilityIgnoresInvertColors, accessibilityViewIsModal, importantForAccessibility, accessibilityElementsHidden, role, accessibilityLiveRegion, accessibilityRole, accessibilityLabel, accessibilityState, accessibilityValue, accessibilityHint, ...rnProps }: T): Omit<T, keyof INativeAccessibilityProps> {
+export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({
+    accessible,
+    onAccessibilityEscape,
+    accessibilityLanguage,
+    accessibilityActions,
+    accessibilityIgnoresInvertColors,
+    accessibilityViewIsModal,
+    importantForAccessibility,
+    accessibilityElementsHidden,
+    role,
+    accessibilityLiveRegion,
+    accessibilityRole,
+    accessibilityLabel,
+    accessibilityState,
+    accessibilityValue,
+    accessibilityHint,
+    // Additional React Native accessibility props that were missing
+    accessibilityLabelledBy,
+    accessibilityShowsLargeContentViewer,
+    accessibilityLargeContentTitle,
+    accessibilityRespondsToUserInteraction,
+    onAccessibilityTap,
+    onAccessibilityMagicTap,
+    onAccessibilityAction,
+    // Android specific
+    screenReaderFocusable,
+    // Event handlers that need to be filtered out
+    ...rnProps
+}: T): Omit<T, keyof INativeAccessibilityProps> {
     const domProps: Partial<T> & IHtmlAccessibilityProps = rnProps as any;
+
+    // Primary accessibility label
     domProps['aria-label'] = defaultStr(rnProps["aria-label"], accessibilityLabel);
+
+    // Accessibility description/hint
     domProps['aria-describedby'] = defaultStr(domProps["aria-describedby"], accessibilityHint);
     (domProps as any)["aria-description"] = defaultStr((domProps as any)["aria-description"], domProps["aria-describedby"]);
-    (domProps as any).role = defaultStr(domProps.role, accessibilityRole && mapRoleToDOM(accessibilityRole));
+
+    // Role mapping
+    (domProps as any).role = defaultStr(domProps.role, role, accessibilityRole && mapRoleToDOM(accessibilityRole));
+
+    // Accessible/hidden state
     if (accessible === false) {
         (domProps as any)["aria-hidden"] = "true";
     } else if (accessibilityElementsHidden !== undefined) {
         domProps["aria-hidden"] = String(accessibilityElementsHidden) as any;
     }
+
+    // Important for accessibility handling
+    if (importantForAccessibility === "no" || importantForAccessibility === "no-hide-descendants") {
+        (domProps as any)["aria-hidden"] = "true";
+    }
+
+    // Live regions
     (domProps as any)['aria-live'] = defaultStr(domProps["aria-live"], accessibilityLiveRegion && mapLiveRegionToDOM(accessibilityLiveRegion));
+
+    // Accessibility state mapping
     if (isObj(accessibilityState)) {
         const value = accessibilityState;
-        if (value.disabled !== undefined) domProps['aria-disabled'] = value.disabled;
-        if (value.selected !== undefined) domProps['aria-selected'] = value.selected;
-        if (value.checked !== undefined) {
+        if (value && value.disabled !== undefined) domProps['aria-disabled'] = value.disabled;
+        if (value && value.selected !== undefined) domProps['aria-selected'] = value.selected;
+        if (value && value.checked !== undefined) {
             if (value.checked === 'mixed') {
                 domProps['aria-checked'] = 'mixed';
             } else {
                 domProps['aria-checked'] = String(value.checked) as any;
             }
         }
-        if (value.busy !== undefined) domProps['aria-busy'] = String(value.busy) as any;
-        if (value.expanded !== undefined) domProps['aria-expanded'] = String(value.expanded) as any;
+        if (value && value.busy !== undefined) domProps['aria-busy'] = String(value.busy) as any;
+        if (value && value.expanded !== undefined) domProps['aria-expanded'] = String(value.expanded) as any;
     }
+
+    // Accessibility value mapping
     if (isObj(accessibilityValue)) {
         const val = accessibilityValue;
-        if ('min' in val) domProps['aria-valuemin'] = val.min;
-        if ('max' in val) domProps['aria-valuemax'] = val.max;
-        if ('now' in val) domProps['aria-valuenow'] = val.now;
-        if ('text' in val) domProps['aria-valuetext'] = val.text;
+        if (val && 'min' in val && val.min !== undefined) domProps['aria-valuemin'] = val.min;
+        if (val && 'max' in val && val.max !== undefined) domProps['aria-valuemax'] = val.max;
+        if (val && 'now' in val && val.now !== undefined) domProps['aria-valuenow'] = val.now;
+        if (val && 'text' in val && val.text !== undefined) domProps['aria-valuetext'] = val.text;
     }
-    if (importantForAccessibility === "no-hide-descendants") {
-        domProps['aria-hidden'] = "true" as any;
-    }
+
+    // Language support
     if (isNonNullString(accessibilityLanguage)) {
         (domProps as any)["lang"] = accessibilityLanguage;
     }
+
+    // Modal state
     if (accessibilityViewIsModal !== undefined) {
         (domProps as any)['aria-modal'] = String(accessibilityViewIsModal);
     }
+
+    // Labelled by relationship (Android specific but has web equivalent)
+    if (accessibilityLabelledBy !== undefined) {
+        if (Array.isArray(accessibilityLabelledBy)) {
+            (domProps as any)['aria-labelledby'] = accessibilityLabelledBy.join(' ');
+        } else if (isNonNullString(accessibilityLabelledBy)) {
+            (domProps as any)['aria-labelledby'] = accessibilityLabelledBy;
+        }
+    }
+
+    // Screen reader focusable (Android specific)
+    if (screenReaderFocusable !== undefined) {
+        // This doesn't have a direct web equivalent, but we can use tabindex
+        (domProps as any).tabIndex = screenReaderFocusable ? 0 : -1;
+    }
+
+    // Handle selectable prop (common in React Native)
     if ((domProps as any)["selectable"] !== undefined) {
         (domProps as any)["selectable"] = String((domProps as any)["selectable"]);
     }
+
+    // Clean up any remaining React Native specific props that shouldn't reach DOM
+    delete (domProps as any).accessible;
+    delete (domProps as any).accessibilityLabel;
+    delete (domProps as any).accessibilityHint;
+    delete (domProps as any).accessibilityRole;
+    delete (domProps as any).accessibilityState;
+    delete (domProps as any).accessibilityValue;
+    delete (domProps as any).accessibilityLiveRegion;
+    delete (domProps as any).accessibilityElementsHidden;
+    delete (domProps as any).accessibilityViewIsModal;
+    delete (domProps as any).accessibilityLanguage;
+    delete (domProps as any).accessibilityActions;
+    delete (domProps as any).accessibilityIgnoresInvertColors;
+    delete (domProps as any).importantForAccessibility;
+    delete (domProps as any).accessibilityLabelledBy;
+    delete (domProps as any).accessibilityShowsLargeContentViewer;
+    delete (domProps as any).accessibilityLargeContentTitle;
+    delete (domProps as any).accessibilityRespondsToUserInteraction;
+    delete (domProps as any).onAccessibilityEscape;
+    delete (domProps as any).onAccessibilityTap;
+    delete (domProps as any).onAccessibilityMagicTap;
+    delete (domProps as any).onAccessibilityAction;
+    delete (domProps as any).screenReaderFocusable;
+
     return domProps as any;
 }
 

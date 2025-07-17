@@ -1002,6 +1002,20 @@ export function Form<Fields extends IFields = IFields>({ name, testID, onValid, 
                     } else if (typeof onInvalid === "function") {
                         onInvalid(options);
                     }
+                    //enable and disable form actions
+                    const actions = FormsManager.getActions(formName);
+                    for (var k in actions) {
+                        const action = actions[k];
+                        if (action) {
+                            if (isValid) {
+                                if (typeof action?.enable === "function") {
+                                    action.enable();
+                                }
+                            } else if (typeof action?.disable === "function") {
+                                action.disable();
+                            }
+                        }
+                    }
                 }
                 return r;
             };
@@ -1217,7 +1231,7 @@ export class FormsManager {
      */
     private static actions: {
         [fommName: string]: {
-            [actionId: string]: IFormActionProps;
+            [actionId: string]: IFormActionContext;
         };
     } = {};
 
@@ -1276,7 +1290,7 @@ export class FormsManager {
      * const action = { id: "submit", handler: () => { } };
      * FormsManager.mountAction(action, "myForm"); // Mounts the action to "myForm"
      */
-    static mountAction(action: IFormActionProps, formName: string) {
+    static mountAction<Context = unknown>(action: IFormActionContext<Context>, formName: string) {
         if (!action || !formName || !isNonNullString(action?.id)) return;
         this.actions[formName] = this.actions[formName] || {};
         this.actions[formName][action?.id] = action;
@@ -1348,6 +1362,8 @@ const FormContext = createContext<IFormContext>({} as IFormContext);
 
 export const useForm = () => useContext(FormContext);
 
+export type IFormActionContext<Context = unknown> = IButtonInteractiveContext<Context> & {
+}
 
 Form.Field = FormField;
 Form.Manager = FormsManager;

@@ -4,10 +4,10 @@ import { cn } from '@resk/nativewind/utils';
 import type { IClassName } from '@resk/nativewind/types';
 
 /**
- * ScrollView component props optimized for SSR
+ * SSRScrollView component props optimized for SSR
  * Provides a simple, clean API focused on essential scrolling functionality
  */
-export interface IScrollViewProps {
+export interface ISSRScrollViewProps {
     /** Content to be scrolled */
     children?: React.ReactNode;
 
@@ -58,7 +58,7 @@ export interface IScrollViewProps {
 }
 
 /**
- * SSR-optimized ScrollView component
+ * SSR-optimized SSRScrollView component
  * 
  * This component renders pure HTML/CSS with no client-side JavaScript dependencies,
  * making it perfect for server-side rendering. It provides smooth scrolling using
@@ -67,15 +67,15 @@ export interface IScrollViewProps {
  * @example
  * ```tsx
  * // Basic vertical scrolling
- * <ScrollView className="h-96 border rounded-lg">
+ * <SSRScrollView className="h-96 border rounded-lg">
  *   <Div className="h-[1000px] p-6 bg-gradient-to-b from-blue-50 to-blue-100">
  *     <h2>Long scrollable content</h2>
  *     <p>This content will scroll vertically...</p>
  *   </Div>
- * </ScrollView>
+ * </SSRScrollView>
  * 
  * // Horizontal scrolling gallery
- * <ScrollView 
+ * <SSRScrollView 
  *   horizontal 
  *   className="w-full border rounded-lg" 
  *   containerClassName="flex flex-row gap-4 p-4"
@@ -84,23 +84,23 @@ export interface IScrollViewProps {
  *   <Div className="min-w-72 h-48 bg-red-500 rounded-lg flex-shrink-0" />
  *   <Div className="min-w-72 h-48 bg-green-500 rounded-lg flex-shrink-0" />
  *   <Div className="min-w-72 h-48 bg-blue-500 rounded-lg flex-shrink-0" />
- * </ScrollView>
+ * </SSRScrollView>
  * 
  * // Smooth scrolling with custom styling
- * <ScrollView 
+ * <SSRScrollView 
  *   smoothScrolling={true}
  *   bounces={false}
  *   className="h-64 bg-gray-50 rounded-xl shadow-inner"
  *   containerClassName="p-6 space-y-4"
  * >
  *   {items.map(item => <ItemComponent key={item.id} {...item} />)}
- * </ScrollView>
+ * </SSRScrollView>
  * ```
  * 
- * @param props - ScrollView component props
+ * @param props - SSRScrollView component props
  * @returns JSX element representing the scrollable container
  */
-export const ScrollView: React.FC<IScrollViewProps> = ({
+export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
     children,
     horizontal = false,
     scrollEnabled = true,
@@ -208,6 +208,6 @@ export const ScrollView: React.FC<IScrollViewProps> = ({
     );
 };
 
-ScrollView.displayName = 'ScrollView';
+SSRScrollView.displayName = 'SSRScrollView';
 
-export default ScrollView;
+export default SSRScrollView;

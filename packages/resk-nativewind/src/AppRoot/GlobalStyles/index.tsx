@@ -70,15 +70,14 @@ export function GlobalStyles() {
         <style id="reskit-app-root-global-styles">
             {`
         html,body,#root { 
-            -ms-overflow-style: none; 
             -webkit-text-size-adjust: none;
             position: relative;
             z-index: 1;
-            overflow: hidden;
             margin: 0px; 
             width: 100vw; 
             height: -webkit-fill-available;   
-            overflow:hidden;
+            /*-ms-overflow-style: none;*/ 
+            /*overflow:hidden;*/
             margin:0;
             padding:0;
         }

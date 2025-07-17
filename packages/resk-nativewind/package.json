@@ -1,6 +1,6 @@
 {
   "name": "@resk/nativewind",
-  "version": "1.0.1-canary.35",
+  "version": "1.0.1-canary.36",
   "description": "Precompiled TypeScript UI framework built on NativeWind",
   "license": "ISC",
   "author": "",
@@ -17,7 +17,12 @@
     "html.js",
     "components",
     "theme-to-css-vars.js",
-    "animations.js"
+    "appRoot.js",
+    "variants.js",
+    "variants.json",
+    "utils.js",
+    "i18n.js",
+    "platform.js"
   ],
   "typesVersions": {
     "*": {

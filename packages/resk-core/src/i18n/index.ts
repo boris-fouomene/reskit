@@ -93,14 +93,14 @@ export class I18n extends I18nJs implements IObservable<I18nEvent> {
      * // Translate the "farewell" scope.
      * i18n.translate("farewell"); // "Goodbye!"    
      */
-    translate<T = string>(scope: Scope, options?: TranslateOptions): string | T {
+    translate<T = string>(scope: Scope, options?: TranslateOptions) {
         if (this.isPluralizeOptions(options) && this.canPluralize(scope)) {
             if (typeof options.count === "number") {
                 options.countStr = (options.count).formatNumber();
             }
             return this.pluralize(options.count as number, scope, options);
         }
-        return super.translate(scope, options);
+        return super.translate<T>(scope, options);
     }
     /***
      * Translates the keys of the given target class.

@@ -14,17 +14,19 @@ import { Expandable } from "@components/Expandable";
 
 export class Nav {
     static readonly linkMetaData = Symbol("link-meta-data");
-    static attachLinkComponent<Props extends INavLinkProps = INavLinkProps,State = unknown>(component: INavLinkComponent<Props,State>) {
+    static attachLinkComponent<Props extends INavLinkProps = INavLinkProps, State = unknown>(component: INavLinkComponent<Props, State>) {
         if (isValidLinkComponent(component as any)) {
             Reflect.defineMetadata(Nav.linkMetaData, component, Nav);
         }
     }
     static get Link(): INavLinkComponent {
-        const component = Reflect.getMetadata(Nav.linkMetaData, Nav);
-        if (isValidLinkComponent(component)) {
-            return component;
+        return function NavLink(props: INavLinkProps) {
+            const component = Reflect.getMetadata(Nav.linkMetaData, Nav);
+            const C = isValidLinkComponent(component) ? component : NavDefaultLink;
+            return <C
+                {...(Platform.isNative() ? normalizeNativeProps(props) : normalizeHtmlProps(props))}
+            />
         }
-        return NavDefaultLink;
     }
     static renderItems({ items, renderItem, renderExpandableItem, ...rest }: INavItemsProps) {
         return renderNavItems({ ...rest, items, renderItem: typeof renderItem === "function" ? renderItem : renderNavItem, renderExpandableItem: typeof renderExpandableItem === "function" ? renderExpandableItem : renderExpandableNavItem });
@@ -148,8 +150,8 @@ export * from "./hooks";
  * @since 1.0.0
  * @public
  */
-export function AttachLinkComponent<Props extends INavLinkProps = INavLinkProps,State = unknown>() {
-    return function (target: INavLinkComponent<Props,State>) {
+export function AttachLinkComponent<Props extends INavLinkProps = INavLinkProps, State = unknown>() {
+    return function (target: INavLinkComponent<Props, State>) {
         Nav.attachLinkComponent(target);
     };
 }

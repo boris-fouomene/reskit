@@ -369,30 +369,6 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({
         (domProps as any)["selectable"] = String((domProps as any)["selectable"]);
     }
 
-    // Clean up any remaining React Native specific props that shouldn't reach DOM
-    delete (domProps as any).accessible;
-    delete (domProps as any).accessibilityLabel;
-    delete (domProps as any).accessibilityHint;
-    delete (domProps as any).accessibilityRole;
-    delete (domProps as any).accessibilityState;
-    delete (domProps as any).accessibilityValue;
-    delete (domProps as any).accessibilityLiveRegion;
-    delete (domProps as any).accessibilityElementsHidden;
-    delete (domProps as any).accessibilityViewIsModal;
-    delete (domProps as any).accessibilityLanguage;
-    delete (domProps as any).accessibilityActions;
-    delete (domProps as any).accessibilityIgnoresInvertColors;
-    delete (domProps as any).importantForAccessibility;
-    delete (domProps as any).accessibilityLabelledBy;
-    delete (domProps as any).accessibilityShowsLargeContentViewer;
-    delete (domProps as any).accessibilityLargeContentTitle;
-    delete (domProps as any).accessibilityRespondsToUserInteraction;
-    delete (domProps as any).onAccessibilityEscape;
-    delete (domProps as any).onAccessibilityTap;
-    delete (domProps as any).onAccessibilityMagicTap;
-    delete (domProps as any).onAccessibilityAction;
-    delete (domProps as any).screenReaderFocusable;
-
     return domProps as any;
 }
 

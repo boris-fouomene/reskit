@@ -50,17 +50,64 @@ export function normalizeNativeProps<T extends Partial<IHtmlDivProps> = Partial<
  * - `style` is flattened using `StyleSheet.flatten`
  * - `disabled`, `readOnly`, and `readonly` are converted to `disabled` and `readOnly`
  * - `className` is set to `"cursor-pointer"` if the element is not disabled and has an `onClick`, `onMouseDown`, or `onMouseUp` prop
+ * - React Native accessibility props are converted to proper DOM/ARIA attributes
  *
  * @param props The props to normalize
  * @param defaultProps The default props to normalize
  * @returns The normalized props
  */
-export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({ testID, onAccessibilityEscape, title, ref, android_ripple, nativeID, onPress, onPressIn, onPressOut, style, ...props }: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
+export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IHtmlDivProps>>({
+    testID,
+    onAccessibilityEscape,
+    title,
+    ref,
+    android_ripple,
+    nativeID,
+    onPress,
+    onPressIn,
+    onPressOut,
+    style,
+    // Extract React Native accessibility props to prevent them from being passed to DOM
+    accessible,
+    accessibilityLabel,
+    accessibilityHint,
+    accessibilityRole,
+    accessibilityState,
+    accessibilityValue,
+    accessibilityLiveRegion,
+    accessibilityElementsHidden,
+    accessibilityViewIsModal,
+    accessibilityLanguage,
+    accessibilityActions,
+    accessibilityIgnoresInvertColors,
+    importantForAccessibility,
+    ...props
+}: T & { android_ripple?: PressableProps["android_ripple"] }, defaultProps?: T) {
     const disabled = !!(props as any).disabled || !!(props as any).readOnly || !!(props as any).readonly;
+
+    // Convert accessibility props to DOM attributes first
+    const accessibilityPropsConverted = convertAccessibilityPropsToDOM({
+        accessible,
+        accessibilityLabel,
+        accessibilityHint,
+        accessibilityRole,
+        accessibilityState,
+        accessibilityValue,
+        accessibilityLiveRegion,
+        accessibilityElementsHidden,
+        accessibilityViewIsModal,
+        accessibilityLanguage,
+        accessibilityActions,
+        accessibilityIgnoresInvertColors,
+        importantForAccessibility,
+        onAccessibilityEscape,
+        ...props
+    } as any);
+
     const r = {
         style: style ? StyleSheet.flatten(style) : undefined as any,
         title: title ? getTextContent(title) : undefined,
-        ...convertAccessibilityPropsToDOM(normalizeProps(props, defaultProps)),
+        ...normalizeProps(accessibilityPropsConverted, defaultProps),
         ref: ref !== undefined && ref ? function (personalizedRef: any) {
             UIManager.normalizeRef(personalizedRef);
             if (typeof ref == "function") {
@@ -79,9 +126,11 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
             return onPressOut(normalizeGestureEvent(event));
         } : undefined
     }
-    if (Platform.OS === "web" && !r.disabled && !(r as any).readOnly && !(r as any).readonly && (r.onClick || r.onMouseDown || r.onMouseUp)) {
+
+    if (Platform.OS === "web" && !(r as any).disabled && !(r as any).readOnly && !(r as any).readonly && (r.onClick || r.onMouseDown || r.onMouseUp)) {
         r.className = cn("cursor-pointer", r.className);
     }
+
     if (typeof onAccessibilityEscape == "function") {
         (r as any).onKeyDown = function (event: KeyboardEvent) {
             if (event?.key === "Escape") {
@@ -92,7 +141,25 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
             }
         }
     }
+
     delete (r as any).closeOnPress;
+
+    // Ensure React Native accessibility props are completely removed from DOM output
+    delete (r as any).accessible;
+    delete (r as any).accessibilityLabel;
+    delete (r as any).accessibilityHint;
+    delete (r as any).accessibilityRole;
+    delete (r as any).accessibilityState;
+    delete (r as any).accessibilityValue;
+    delete (r as any).accessibilityLiveRegion;
+    delete (r as any).accessibilityElementsHidden;
+    delete (r as any).accessibilityViewIsModal;
+    delete (r as any).accessibilityLanguage;
+    delete (r as any).accessibilityActions;
+    delete (r as any).accessibilityIgnoresInvertColors;
+    delete (r as any).importantForAccessibility;
+    delete (r as any).onAccessibilityEscape;
+
     return r;
 }
 
@@ -185,7 +252,7 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({ access
  * @param normalize - If `true`, normalizes the returned props object.
  * @returns A partial object containing only the valid HTML-related properties from the input.
  */
-export function pickHtmlProps<T extends IHtmlDivProps>(props: T, normalize?: boolean): Partial<T> {
+export function pickHtmlProps<T extends IHtmlDivProps>(props: T, normalize?: boolean): any {
     props = Object.assign({}, props);
     const r = {} as any;
     const domProps: (keyof IHtmlDivProps)[] = [
@@ -198,7 +265,7 @@ export function pickHtmlProps<T extends IHtmlDivProps>(props: T, normalize?: boo
             r[p] = props[p];
         }
     });
-    return normalize ? normalizeHtmlProps(r) : r;
+    return normalize ? normalizeHtmlProps(r as any) : r;
 }
 /**
  * Maps React Native live region values to ARIA live region values

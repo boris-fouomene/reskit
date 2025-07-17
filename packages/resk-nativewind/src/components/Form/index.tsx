@@ -44,7 +44,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         const value = this.sanitizeValue(props.defaultValue);
         this.state = {
             error: false,
-            hasPerformedValidation: false,
+            hasValidated: false,
             isEditable: false,
             value,
             prevValue: value,
@@ -68,10 +68,10 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
      * @returns {boolean} - Returns true if validation has been performed, otherwise false.
      * 
      * @example
-     * const hasValidated = this.hasPerformedValidation(); // true or false
+     * const hasValidated = this.hasValidated(); // true or false
      */
-    hasPerformedValidation(): boolean {
-        return !!this.state.hasPerformedValidation;
+    hasValidated(): boolean {
+        return !!this.state.hasValidated;
     }
 
     canDisplayError(): boolean {
@@ -79,7 +79,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         return (
             !this.isFilter() &&
             this.state.error &&
-            this.hasPerformedValidation() &&
+            this.hasValidated() &&
             (form?.getInvalidSubmitCount() || 0) > 0
         );
     }
@@ -91,9 +91,9 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
      * @returns {Promise<IFormFieldValidatorOptions<FieldType,ValueType>>} - A promise that resolves with validation options.
      * 
      * @example
-     * this.setValue("new value"); // Sets the field value
+     * this.setFieldValue("new value"); // Sets the field value
      */
-    setValue(value: any) {
+    setFieldValue(value: any) {
         return this.validate({ value } as IFormFieldValidatorOptions<FieldType, ValueType>);
     }
 
@@ -134,7 +134,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         this.onChangeOptionsMutator(options);
         options.value = this.sanitizeValue(options.value);
         const areValueEquals = this.compareValues(options.value, this.state.validatedValue);
-        if (this.hasPerformedValidation() && force !== true && areValueEquals) {
+        if (this.hasValidated() && force !== true && areValueEquals) {
             return Promise.resolve(options);
         }
         const { value } = options;
@@ -144,7 +144,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
                     {
                         error: false,
                         validatedValue: value,
-                        hasPerformedValidation: true,
+                        hasValidated: true,
                         prevValue: this.state.value,
                         value,
                         errorText: "",
@@ -168,7 +168,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         if ((this.getType() as any) == "url" && options.value && !options.rules.includes("url")) {
             options.rules.push("url");
         }
-        const hasPerformedValidation = true;
+        const hasValidated = true;
         return Promise.resolve(this.beforeValidate(options)).then(() => {
             return new Promise((resolve, reject) => {
                 return Validator.validate<FormField<FieldType, ValueType>>(options).then(() => {
@@ -176,7 +176,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
                         this.setState(
                             {
                                 error: false,
-                                hasPerformedValidation,
+                                hasValidated,
                                 validatedValue: value,
                                 value,
                                 prevValue: this.state.value,
@@ -193,7 +193,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
                     this.setState(
                         {
                             error: true,
-                            hasPerformedValidation,
+                            hasValidated,
                             validatedValue: value,
                             value,
                             errorText: error?.message || stringify(error),
@@ -209,9 +209,9 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
      * @returns {boolean} - Returns true if validation should occur on blur, otherwise false.
      * 
      * @example
-     * const shouldValidateOnBlur = this.canValidateOnBlur(); // true or false
+     * const shouldValidateOnBlur = this.shouldValidateOnBlur(); // true or false
      */
-    canValidateOnBlur(): boolean {
+    shouldValidateOnBlur(): boolean {
         return this.props.validateOnBlur !== false;
     }
     /**
@@ -220,9 +220,9 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
      * @returns {boolean} - Returns true if validation should occur on mount, otherwise false.
      * 
      * @example
-     * const canValidateOnMount = this.canValidateOnMount(); // true or false
+     * const shouldValidateOnMount = this.shouldValidateOnMount(); // true or false
      */
-    canValidateOnMount() {
+    shouldValidateOnMount() {
         return !!this.props.validateOnMount;
     }
     /**
@@ -411,7 +411,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
      * const isValid = this.isValid(); // Checks if the field is valid
      */
     isValid(): boolean {
-        return (this.hasPerformedValidation() && !this.state.error) || false;
+        return (this.hasValidated() && !this.state.error) || false;
     }
     /**
      * Retrieves the name of the field.
@@ -817,7 +817,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
                                                     if (onBlur) {
                                                         onBlur(event);
                                                     }
-                                                    if (this.canValidateOnBlur()) {
+                                                    if (this.shouldValidateOnBlur()) {
                                                         this.validateOnChange({
                                                             value: this.getValue(),
                                                         } as IFormFieldValidatorOptions<FieldType, ValueType>);
@@ -1793,7 +1793,7 @@ export interface IFormFieldState<FielType extends IFieldType = IFieldType, Value
     isEditable: boolean;
     isDisabled: boolean;
     validatedValue?: ValueType;
-    hasPerformedValidation?: boolean;
+    hasValidated?: boolean;
     value: ValueType;
     prevValue?: ValueType;
     errorText: string;

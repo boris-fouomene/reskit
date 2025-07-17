@@ -11,6 +11,10 @@ node_modules/
 !variants.js
 !variants.json
 !animations.js
+!utils.js
+!platform.js
+!appRoot.js
+!i18n.js
 # Ignore specific folders
 test/
 src/

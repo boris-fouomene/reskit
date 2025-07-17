@@ -1,6 +1,6 @@
 {
   "name": "@resk/nativewind",
-  "version": "1.0.1-canary.31",
+  "version": "1.0.1-canary.32",
   "description": "Precompiled TypeScript UI framework built on NativeWind",
   "license": "ISC",
   "author": "",
@@ -21,6 +21,9 @@
   ],
   "typesVersions": {
     "*": {
+      "appRoot": [
+        "./build/AppRoot/index.d.ts"
+      ],
       "components/activityIndicator": [
         "./build/components/ActivityIndicator/index.d.ts"
       ],
@@ -132,7 +135,7 @@
       "types": [
         "./build/types/index.d.ts"
       ],
-      "*" : [
+      "*": [
         "./build/index.d.ts"
       ]
     }

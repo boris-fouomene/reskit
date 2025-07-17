@@ -36,7 +36,7 @@ export function ActivityIndicator({ size, borderWidth, style, variant, testID, i
         style = [{ borderTopColor: color }, style];
     }
     testID = defaultStr(testID, "resk-activity-indicator");
-    return <Div  {...props} role="progressbar" testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("resk-activity-indicator animate-spin rounded-full", clx, activityIndicatorVariant(variant), className)} />
+    return <Div role="progressbar" {...props} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("resk-activity-indicator animate-spin rounded-full", clx, activityIndicatorVariant(variant), className)} />
 }
 
 export * from "./types";

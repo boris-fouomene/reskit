@@ -183,18 +183,6 @@ export interface IButtonProps<Context = unknown> extends Omit<ISurfaceProps, "va
 }
 
 export interface IButtonInteractiveProps<Context = unknown> extends Omit<IButtonProps<IButtonInteractiveContext<Context>>, "ref" | "context"> {
-    /***
-     * The name of the form associated with the button in case of button representing a form action.
-     * when this property is set, the button listens dynamically to the state of the form and is activated or deactivated according to the validated state or name of the form. 
-     */
-    formName?: string;
-
-    /***
-     * If true, the button will submit the form when pressed in case the formName is set.
-     * This can be useful for creating buttons that submit the form when pressed if the form is valid.
-     */
-    submitFormOnPress?: boolean;
-
 
     /***
      * The réf of the button component.

@@ -1,15 +1,12 @@
 "use client";
 import "./types";
-import { cn, getTextContent, ObservableComponent, useStateCallback } from "@utils/index";
-import { IFieldType, IField, IFields, } from "@resk/core/resources";
+import { cn, Component, getTextContent, ObservableComponent, useMergeRefs, useStateCallback } from "@utils/index";
+import { IFieldType, IField, IFields } from "@resk/core/resources";
 import { IValidatorRule, IValidatorValidateOptions, Validator, } from "@resk/core/validator";
 import { InputFormatter } from "@resk/core/inputFormatter";
 import { defaultStr, extendObj, areEquals, isEmpty, isNonNullString, isObj, stringify } from "@resk/core/utils";
-import { Logger } from "@resk/core/logger";
-import { IFormEvent } from "./types";
-import { createRef, ReactNode, isValidElement, useId, useRef, useMemo, useCallback, useEffect } from 'react';
-import { View as RNView, NativeSyntheticEvent, TextInputFocusEventData } from "react-native";
-import { FormsManager } from "./FormsManager";
+import { createRef, ReactNode, isValidElement, useId, useRef, useMemo, useCallback, useEffect, ReactElement, createContext, useContext, Fragment, Ref } from 'react';
+import { View as RNView, NativeSyntheticEvent, TextInputFocusEventData, View, ViewProps, GestureResponderEvent } from 'react-native';
 import { ITextInputProps } from "@components/TextInput/types";
 import KeyboardEventHandler, { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler";
 import { HelperText } from "@components/HelperText";
@@ -22,34 +19,12 @@ import { commonVariant } from "@variants/common";
 import { typedEntries } from "@resk/core/build/utils/object";
 import { Auth, IAuthPerm } from "@resk/core/auth";
 import { IObservable, observableFactory } from "@resk/core/observable";
-import { IHtmlDivProps } from "@html/types";
+import { useImperativeHandle } from "react";
+import { IButtonInteractiveProps } from "@components/Button/types";
+import { Button } from "@components/Button";
 
 
-export class Field<Type extends IFieldType = IFieldType, ValueType = any> extends ObservableComponent<IField<Type>, IFormFieldState<Type, ValueType>, IFormEvent> {
-
-    /** 
-     * Symbol used to indicate if the field is editable.
-     * 
-     * @readonly
-     * @type {symbol}
-     */
-    readonly isEditableSymbol = Symbol("isEditableSymbol");
-
-    /** 
-     * Symbol used to indicate if the field is visible.
-     * 
-     * @readonly
-     * @type {symbol}
-     */
-    readonly isVisibleSymbol = Symbol("isVisibleSymbol");
-
-    /** 
-    * Symbol used to indicate if the field is editable by another component.
-    * 
-    * @readonly
-    * @type {symbol}
-    */
-    readonly isEditableBySymbol = Symbol("isEditableBySymbol");
+export class FormField<Type extends IFieldType = IFieldType, ValueType = any> extends Component<IField<Type>, IFormFieldState<Type, ValueType>> {
     /** 
      * Reference to the wrapper view of the field.
      * 
@@ -79,8 +54,8 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
         this.validate({ value: this.state.value }).catch((e) => { });
     }
     componentDidUpdate(prevProps: IField<Type>): void {
-        if (!this.compareValues(prevProps.defaultValue, this.props.defaultValue)) {
-            this.validate({ value: "defaultValue" in this.props ? this.props.defaultValue : this.state.value }, true).catch((e) => { });
+        if (!this.compareValues(prevProps.defaultValue, this.props.defaultValue && "defaultValue" in this.props)) {
+            this.validate({ value: this.props.defaultValue }, true).catch((e) => { });
         }
     }
 
@@ -99,50 +74,32 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
     hasPerformedValidation(): boolean {
         return !!this.state.hasPerformedValidation;
     }
-    /**
-     * Determines if the field can display an error message.
-     * 
-     * @returns {boolean} - Returns true if the field can display an error, otherwise false.
-     * 
-     * @example
-     * const canShowError = this.canDisplayError(); // true or false
-     */
+
     canDisplayError(): boolean {
+        const form = this.getForm();
         return (
             !this.isFilter() &&
             this.state.error &&
             this.hasPerformedValidation() &&
-            (this.state.formTriedTobeSubmitted || !!this.getForm()?.hasTriedTobeSubmitted())
+            (form?.getInvalidSubmitCount() || 0) > 0
         );
     }
-    /**
-     * Sets the form's submission status for validation.
-     * 
-     * @param {boolean} [formTriedTobeSubmitted] - Indicates if the form has been submitted.
-     * 
-     * @example
-     * this.setFormTriedTobeSubmitted(true); // Sets the submission status
-     */
-    setFormTriedTobeSubmitted(formTriedTobeSubmitted?: boolean) {
-        formTriedTobeSubmitted = formTriedTobeSubmitted || this.getForm()?.hasTriedTobeSubmitted();
-        if (!formTriedTobeSubmitted) return;
-        this.setState({ formTriedTobeSubmitted: true } as IFormFieldState);
-    }
+
     /**
      * Sets the value of the field and triggers validation.
      * 
      * @param {any} value - The new value for the field.
-     * @returns {Promise<IFormFieldValidatorOptions<Type>>} - A promise that resolves with validation options.
+     * @returns {Promise<IFormFieldValidatorOptions<Type,ValueType>>} - A promise that resolves with validation options.
      * 
      * @example
      * this.setValue("new value"); // Sets the field value
      */
     setValue(value: any) {
-        return this.validate({ value } as IFormFieldValidatorOptions<Type>);
+        return this.validate({ value } as IFormFieldValidatorOptions<Type, ValueType>);
     }
 
-    getField<Type extends IFieldType = IFieldType, ValueType = any>(fieldName: string): Field<Type, ValueType> | null {
-        return FormsManager.getField<Type>(this.getFormName(), fieldName) as any;
+    getFieldInstance<Type extends IFieldType = IFieldType, ValueType = any>(fieldName: string): FormField<Type, ValueType> | null {
+        return FormsManager.getFieldInstance<Type>(this.getFormName(), fieldName) as any;
     }
     isEmail() {
         return defaultStr(this.getType()).toLowerCase().trim() === "email";
@@ -150,27 +107,24 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
     isPhone() {
         return ["tel", "phone"].includes(defaultStr(this.getType()).toLowerCase().trim());
     }
-    /***
-        A mutator function that is called to mutate the options to use in the validation process.
-        @param {IFormFieldValidatorOptions<Type>} options - The validation options.
-    */
+
     protected onChangeOptionsMutator(options: IFormFieldValidatorOptions<Type, ValueType>) {
         return options;
     }
-    getCallOptions<T>(options: T): T & { context: Field<Type, ValueType> } {
+    getCallOptions<T>(options: T): T & { context: FormField<Type, ValueType> } {
         return Object.assign({}, options, { context: this });
     }
     /**
      * Validates the field based on the provided options.
      * 
-     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type,ValueType>} options - The validation options.
      * @param {boolean} [force=false] - Whether to force validation.
-     * @returns {Promise<IFormFieldValidatorOptions<Type>>} - A promise that resolves with validation options.
+     * @returns {Promise<IFormFieldValidatorOptions<Type,ValueType>>} - A promise that resolves with validation options.
      * 
      * @example
      * this.validate({ value: "test" }); // Validates the field with the value "test"
      */
-    validate(options: IFormFieldValidatorOptions<Type, ValueType>, force: boolean = false): Promise<IFormFieldValidatorOptions<Type>> {
+    validate(options: IFormFieldValidatorOptions<Type, ValueType>, force: boolean = false): Promise<IFormFieldValidatorOptions<Type, ValueType>> {
         options = this.getCallOptions(options);
         options.fieldName = defaultStr(options.fieldName, this.getName());
         if (this.isPhone() && isNonNullString(options.phoneNumber) && InputFormatter.isValidPhoneNumber(options.phoneNumber)) {
@@ -218,8 +172,8 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
         const hasPerformedValidation = true;
         return Promise.resolve(this.beforeValidate(options)).then(() => {
             return new Promise((resolve, reject) => {
-                return Validator.validate<Field<Type, ValueType>>(options).then(() => {
-                    return Promise.resolve(this.onValidate(options)).then(() => {
+                return Validator.validate<FormField<Type, ValueType>>(options).then(() => {
+                    return Promise.resolve(this.onValid(options)).then(() => {
                         this.setState(
                             {
                                 error: false,
@@ -230,7 +184,6 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
                                 errorText: "",
                             } as any,
                             () => {
-                                this.getForm()?.toggleValidationStatus();
                                 this.callOnChange(options as IFormFieldOnChangeOptions);
                             }
                         );
@@ -245,11 +198,7 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
                             validatedValue: value,
                             value,
                             errorText: error?.message || stringify(error),
-                        } as any,
-                        () => {
-                            this.getForm()?.toggleValidationStatus(false);
-                        }
-                    );
+                        });
                     reject(error);
                 });
             })
@@ -307,13 +256,13 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
      * @example
      * const fieldType = this.getType(); // Retrieves the field type
      */
-    getType(): string {
+    getType(): Type | IFieldType {
         return defaultStr(
             (this.isFilter() && (this.props as any)?.filter?.type) || undefined,
             this.props.type,
             this.props.type,
             "text"
-        );
+        ) as Type;
     }
 
     /**
@@ -347,13 +296,13 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
      * 
      ```typescript
      * 
-     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
-     * @returns {IFormFieldValidatorOptions<Type>} - The options after any pre-validation logic.
+     * @param {IFormFieldValidatorOptions<Type,ValueType>} options - The validation options.
+     * @returns {IFormFieldValidatorOptions<Type,ValueType>} - The options after any pre-validation logic.
      * 
      * @example
      * const preValidatedOptions = this.beforeValidate(options); // Executes pre-validation logic
      */
-    beforeValidate(options: IFormFieldValidatorOptions<Type>) {
+    beforeValidate(options: IFormFieldValidatorOptions<Type, ValueType>) {
         return options;
     }
     /**
@@ -379,25 +328,17 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
     /**
      * This function is called when the field is validated.
      * 
-     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type,ValueType>} options - The validation options.
      * @returns {boolean} - Returns true if validation is successful, otherwise throws an error.
      * 
      * @example
-     * this.onValidate(options); // Validates the field
+     * this.onValid(options); // Validates the field
      * 
      */
-    onValidate(options: IFormFieldValidatorOptions<Type>) {
+    onValid(options: IFormFieldValidatorOptions<Type, ValueType>) {
         options.context = this;
-        const cb = () => {
-            if (!this.isFilter()) {
-                const form = this.getForm();
-                if (form && form?.props?.onValidateField) {
-                    form.props.onValidateField(options as any);
-                }
-            }
-        };
-        if (typeof this.props.onValidate == "function") {
-            const r = this.props.onValidate(options as any);
+        if (typeof this.props.onValid == "function") {
+            const r = this.props.onValid(options as any);
             if (typeof r == "string") {
                 throw {
                     ...Object.assign({}, options),
@@ -416,40 +357,24 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
                         "]",
                 };
             }
-            cb();
             return r;
-        } else if (this.props.onValidate) {
-            Logger.error(
-                this.props.onValidate,
-                " is not valid onValidate props (fonction) for form field  component ",
-                this.getName(),
-                " formName = ",
-                this.getFormName()
-            );
         }
-        cb();
         return true;
     }
     /**
      * Handles the case where validation does not occur.
      * 
-     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
+     * @param {IFormFieldValidatorOptions<Type,ValueType>} options - The validation options.
      * @returns {boolean} - Returns false if no validation occurred.
      * 
      * @example
-     * this.onNoValidate(options); // Handles no validation case
+     * this.onInvalid(options); // Handles no validation case
      * this function is called when the field is not validated
      */
-    onNoValidate(options: IFormFieldValidatorOptions<Type>) {
+    onInvalid(options: IFormFieldValidatorOptions<Type, ValueType>) {
         options.context = this;
-        if (!this.isFilter()) {
-            const form = this.getForm();
-            if (form && form?.props?.onNoValidateField) {
-                form.props.onNoValidateField(options as any);
-            }
-        }
-        if (this.props.onNoValidate) {
-            return this.props.onNoValidate(options as any);
+        if (typeof this.props.onInvalid === "function") {
+            return this.props.onInvalid(options as any);
         }
         return false;
     }
@@ -462,7 +387,7 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
      * const label = this.getLabel(); // Retrieves the field label
      */
     getLabel(): string {
-        return getTextContent(this.props.label || this.props.label || this.getName());
+        return getTextContent(this.props.label || this.getName());
     }
     /**
      * Called when a field is registered by its form.
@@ -565,17 +490,6 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
         return !!this.props?.isFilter || !!this.props?.isFilter;
     }
     /**
-     * Checks if the field is a filter group item.
-     * 
-     * @returns {boolean} - Returns true if the field is a filter group item, otherwise false.
-     * 
-     * @example
-     * const isFilterGroupItem = this.isFilterGroupItem(); // Checks if the field is a filter group item
-     */
-    isFilterGroupItem(): boolean {
-        return this.props?.isFilterGroupItem || !!this.props?.isFilterGroupItem;
-    }
-    /**
      * Checks if the field is editable.
      * 
      * @returns {boolean} - Returns true if the field is editable, otherwise false.
@@ -629,13 +543,13 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
     /**
      * Validates the field on change.
      * 
-     * @param {IFormFieldValidatorOptions<Type>} options - The validation options.
-     * @returns {Promise<IFormFieldValidatorOptions<Type>>} - A promise that resolves with validation options.
+     * @param {IFormFieldValidatorOptions<Type,ValueType>} options - The validation options.
+     * @returns {Promise<IFormFieldValidatorOptions<Type,ValueType>>} - A promise that resolves with validation options.
      * 
      * @example
      * this.validateOnChange({ value: "new value" }); // Validates the field on change
      */
-    validateOnChange(options: IFormFieldValidatorOptions<Type>) {
+    validateOnChange(options: IFormFieldValidatorOptions<Type, ValueType>) {
         return this.validate(options).then((r) => {
             return r;
         }).catch((e) => {
@@ -682,7 +596,7 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
         return events;
     }
 
-    getForm<Context>(): IFormContext<Context> | null {
+    getForm<Fields extends IFields = IFields>(): IFormContext<Fields> | null {
         return FormsManager.getForm(this.getFormName()) || null;
     }
     /**
@@ -742,23 +656,22 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
      * this.onKeyEvent("enter", event); // Handles the enter key event
      */
     onKeyEvent(key: IKeyboardEventHandlerKey, event: IKeyboardEventHandlerEvent) {
-        const form = this.getForm();
         if (!this.canValidate()) return;
-        const data = form?.getData() || ({} as IFormData);
-        const arg = {
-            key,
-            event,
-            form,
-            formName: this.getFormName(),
-            value: this.getValue(),
-            validValue: this.getValidValue(data),
-            formData: data,
-            context: this,
-            isFormField: true,
-        };
-        if (form) {
-            arg.form = form;
-            form.handleKeyboardEvent(arg);
+        const form = this.getForm();
+        if (form && typeof this.props.onKeyEvent === "function") {
+            const data = form?.getData() || ({} as IFormData);
+            const arg = {
+                key,
+                event,
+                form,
+                formName: this.getFormName(),
+                value: this.getValue(),
+                validValue: this.getValidValue(data),
+                formData: data,
+                context: this,
+                isFormField: true,
+            };
+            this.props.onKeyEvent(arg);
         }
         switch (key) {
             case "down":
@@ -779,46 +692,27 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
                 break;
         }
     }
-
-    /**
-     * Triggers the mount lifecycle for the field.
-     * 
-     * @example
-     * this.triggerMount(); // Triggers the mount lifecycle
-     */
-    triggerMount() {
-        this.onRegister();
-    }
-    /**
-     * Triggers the unmount lifecycle for the field.
-     * 
-     * @example
-     * this.triggerUnmount(); // Triggers the unmount lifecycle
-     */
-    triggerUnmount() {
-        this.onUnregister();
-    }
     /**
      * Lifecycle method called when the component mounts.
      * 
      * @example
      * componentDidMount() {
      *     super.componentDidMount();
-     *     this.triggerMount();
+     *     this.onRegister();
      * }
      */
     componentDidMount(): void {
         super.componentDidMount();
-        this.triggerMount();
+        this.onRegister();
         if (this.props.onMount) {
-            this.props.onMount(this as any);
+            this.props.onMount(this);
         }
     }
     componentWillUnmount(): void {
         super.componentWillUnmount();
-        this.triggerUnmount();
+        this.onUnregister();
         if (this.props.onUnmount) {
-            this.props.onUnmount(this as any);
+            this.props.onUnmount(this);
         }
     }
     /**
@@ -877,7 +771,7 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
         } = this.overrideProps(this.props as IField<Type, ValueType>);
         const isFilter = this.isFilter() || cIsFilter;
         if (isFilter) {
-            if ((rest as any).rendable === false) return null;
+            if ((rest).rendable === false) return null;
         }
         const visibleClassName = !this.isFilter() && visible === false ? commonVariant({ hidden: true }) : "";
         const disabled = rest.disabled || this.isDisabled();
@@ -924,7 +818,7 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
                                                     if (this.canValidateOnBlur()) {
                                                         this.validateOnChange({
                                                             value: this.getValue(),
-                                                        } as IFormFieldValidatorOptions<Type>);
+                                                        } as IFormFieldValidatorOptions<Type, ValueType>);
                                                     }
                                                 },
                                         disabled,
@@ -954,11 +848,11 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
 
     private static readonly FIELDS_COMPONENTS_METADATA_KEY = Symbol("formFieldsComponent");
 
-    static registerComponent(type: IFieldType, component: typeof Field) {
+    static registerComponent(type: IFieldType, component: typeof FormField) {
         if (!isNonNullString(type) || typeof (component) !== "function") return;
-        const components = Field.getRegisteredComponents();
+        const components = FormField.getRegisteredComponents();
         (components as any)[type] = component;
-        Reflect.defineMetadata(Field.FIELDS_COMPONENTS_METADATA_KEY, components, Field);
+        Reflect.defineMetadata(FormField.FIELDS_COMPONENTS_METADATA_KEY, components, FormField);
     }
     /**
      * Retrieves all registered field components.
@@ -966,14 +860,14 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
      * with their corresponding field types.
      * 
      * @static
-     * @returns {Record<IFieldType, typeof Field>} - An object mapping field types to their registered components.
+     * @returns {Record<IFieldType, typeof FormField>} - An object mapping field types to their registered components.
      * 
      * @example
-     * const registeredComponents = Field.getRegisteredComponents();
+     * const registeredComponents = FormField.getRegisteredComponents();
      * console.log(registeredComponents); // Logs all registered field components
      */
-    static getRegisteredComponents(): Record<IFieldType, typeof Field> {
-        const components = Reflect.getMetadata(Field.FIELDS_COMPONENTS_METADATA_KEY, Field);
+    static getRegisteredComponents(): Record<IFieldType, typeof FormField> {
+        const components = Reflect.getMetadata(FormField.FIELDS_COMPONENTS_METADATA_KEY, FormField);
         return isObj(components) ? components : {} as any;
     }
     /**
@@ -982,17 +876,17 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
      * 
      * @static
      * @param {IFieldType} type - The name of the field type to retrieve the component for.
-     * @returns {typeof Field | null} - The registered field component if found, otherwise null.
+     * @returns {typeof FormField | null} - The registered field component if found, otherwise null.
      * 
      * @example
-     * const textFieldComponent = Field.getRegisteredComponent("text");
+     * const textFieldComponent = FormField.getRegisteredComponent("text");
      * if (textFieldComponent) {
      *     // Use the retrieved text field component
      * }
      */
-    static getRegisteredComponent(type: IFieldType): typeof Field | null {
+    static getRegisteredComponent(type: IFieldType): typeof FormField | null {
         if (!isNonNullString(type)) return null;
-        const components = Field.getRegisteredComponents();
+        const components = FormField.getRegisteredComponents();
         if (!components) return null;
         return components[type];
     }
@@ -1003,35 +897,40 @@ export class Field<Type extends IFieldType = IFieldType, ValueType = any> extend
 
 /******************* Form Implementation  ******************/
 
-export function Form<Context = unknown>({ name, fields, context, onSubmit, renderSkeleton, isLoading, disabled, beforeSubmit: customBeforeSubmit, onKeyboardEvent, onEnterKeyPress, prepareField, readOnly, header, isEditingData, data: customData, ...props }: IFormProps<Context>) {
-    const generatedId = useId();
+export function Form<Fields extends IFields = IFields>({ name, testID, onValid, onInvalid, fields, ref, isUpdate: customIsUpdate, renderField, renderFields, children, onValidateField, onInvalidateField, onSubmit, renderSkeleton, isLoading, disabled, beforeSubmit: customBeforeSubmit, onKeyEvent, onEnterKeyPress, prepareField, readOnly, header, isEditingData, data: customData, ...props }: IFormProps<Fields>) {
+    const generatedFormName = useId();
+    testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
+    const formRef = useRef<IFormContext | null>(null);
+    const submitCountRef = useRef<number>(0);
+    const invalidSubmitCount = useRef<number>(0);
     const [isSubmitting, setIsSubmitting] = useStateCallback<boolean>(false);
     const formName = useMemo(() => {
-        return defaultStr(name, "form-" + generatedId);
-    }, [name, generatedId]);
+        return defaultStr(name, "form-" + generatedFormName);
+    }, [name, generatedFormName]);
     const data = useMemo(() => {
         return isObj(customData) ? customData : {};
     }, [customData]);
     const { fields: prePreparedFields, primaryKeys } = useMemo(() => {
-        const preparedFields: IFields = {} as IFields;
-        const primaryKeys: string[] = [];
+        const preparedFields: IFormFields<Fields> = {} as IFormFields<Fields>;
+        const primaryKeys: IFieldName<Fields>[] = [];
         if (fields && isObj(fields)) {
-            typedEntries(fields).map(([name, _field]) => {
+            typedEntries(fields as IFormFields<Fields>).map(([name, _field]) => {
                 if (!_field || !isObj(_field) || _field.rendable === false) return;
                 if (_field.perm !== undefined && !Auth.isAllowed(_field.perm)) return;
                 const field = Object.clone(_field);
                 delete field.rendable;
                 field.name = defaultStr(field.name, name);
                 if (field.primaryKey === true) {
-                    primaryKeys.push(name);
+                    primaryKeys.push(name as string);
                 }
-                preparedFields[field.name] = field;
+                preparedFields[name] = field;
             })
         }
         return { fields: preparedFields, primaryKeys };
     }, [formName, fields]);
     const isUpdate = useMemo(() => {
+        if (typeof customIsUpdate === "boolean") return customIsUpdate;
         if (typeof isEditingData === "function") {
             return isEditingData({
                 data,
@@ -1043,10 +942,9 @@ export function Form<Context = unknown>({ name, fields, context, onSubmit, rende
             if (!isEmpty((data as any)[key])) return true;
         }
         return false;
-    }, [data, isEditingData, primaryKeys]);
-    const { preparedFields, renderableFields } = useMemo(() => {
-        const preparedFields: IFields = {} as IFields;
-        const renderableFields: IField[] = [];
+    }, [data, isEditingData, primaryKeys, customIsUpdate]);
+    const preparedFields = useMemo(() => {
+        const preparedFields: IFormFields<Fields> = {} as IFormFields<Fields>;
         typedEntries(prePreparedFields).map(([name, field]) => {
             if (isObj(field.createOrUpdate)) {
                 extendObj(field, field.createOrUpdate);
@@ -1065,6 +963,75 @@ export function Form<Context = unknown>({ name, fields, context, onSubmit, rende
             if (readOnly) {
                 field.readOnly = true;
             }
+            field.formName = formName;
+            field.testID = defaultStr(field.testID, `resk-form-field-${String(name)}`);
+            const { onValid, onInvalid, onKeyEvent: onFieldKeyboardEvent, onMount, onUnmount } = field;
+            field.onMount = (formField) => {
+                contextRef.current.fieldsInstances[name as IFieldName<Fields>] = formField;
+                if (typeof onMount === "function") {
+                    onMount(formField);
+                }
+            };
+            field.onUnmount = (formField) => {
+                delete contextRef.current.fieldsInstances[name as IFieldName<Fields>];
+                if (typeof onUnmount === "function") {
+                    onUnmount(formField);
+                }
+            };
+            field.onValid = (options: IFormFieldValidatorOptions) => {
+                const r = typeof onValid === "function" ? onValid(options) : undefined;
+                if (typeof onValidateField == "function") {
+                    onValidateField(options);
+                }
+                if (formRef.current) {
+                    let isValid = true;
+                    const fields = formRef.current?.getFieldInstances?.();
+                    if (isObj(fields)) {
+                        for (const name in fields) {
+                            const f = fields[name];
+                            if (f instanceof FormField && !f.isValid()) {
+                                isValid = false;
+                            }
+                        }
+                    }
+                    formRef.current?.trigger?.(isValid ? "onValid" : "onInvalid", formRef.current);
+                    if (isValid) {
+                        if (typeof onValid === "function") {
+                            onValid(options);
+                        }
+                    } else if (typeof onInvalid === "function") {
+                        onInvalid(options);
+                    }
+                }
+                return r;
+            };
+            field.onInvalid = (options: IFormFieldValidatorOptions) => {
+                const r = typeof onInvalid === "function" ? onInvalid(options) : undefined;
+                if (typeof onInvalidateField == "function") {
+                    onInvalidateField(options);
+                }
+                formRef.current?.trigger("onInvalid", formRef.current);
+                return r;
+            };
+
+            if (typeof onKeyEvent === "function" || typeof onEnterKeyPress === "function") {
+                field.onKeyEvent = (options: IFormKeyboardEventHandlerOptions) => {
+                    const r = typeof onFieldKeyboardEvent === "function" ? onFieldKeyboardEvent(options) : undefined;
+                    if (typeof onKeyEvent === "function") {
+                        onKeyEvent(options);
+                    }
+                    if (typeof onEnterKeyPress == "function" && options?.key === "enter" && (formRef?.current?.isValid?.() || options?.form?.isValid?.())) {
+                        if (onEnterKeyPress(options) === false) {
+                            return;
+                        }
+                        const func = typeof formRef?.current?.submit === "function" ? formRef?.current?.submit : options?.form?.submit;
+                        if (typeof func === "function") {
+                            func();
+                        }
+                    }
+                    return r;
+                };
+            }
             if (typeof prepareField == "function") {
                 const prepared = prepareField({
                     fields: preparedFields,
@@ -1073,30 +1040,31 @@ export function Form<Context = unknown>({ name, fields, context, onSubmit, rende
                     data,
                 });
                 if (!isObj(prepared)) return;
-                preparedFields[name] = prepared;
-                renderableFields.push(prepared);
+                preparedFields[name] = prepared as any;
             }
         });
-        return { preparedFields, renderableFields };
-    }, [disabled, readOnly, isUpdate, data, stableHash(prepareField)]);
+        return prePreparedFields;
+    }, [testID, formName, prePreparedFields, stableHash(onValid), stableHash(onInvalid), disabled, readOnly, isUpdate, data, stableHash(prepareField), stableHash(onKeyEvent), stableHash(onValidateField), stableHash(onInvalidateField)]);
     const contextRef = useRef<{
-        isSubmitting: boolean, fieldsInstances: Record<string, Field>, data: IFormData,
-        isLoading: boolean, primaryKeys: string[], isUpdate: boolean, errors: string[],
+        isSubmitting: boolean, fieldsInstances: Record<IFieldName<Fields>, FormField>, data: IFormData,
+        isLoading: boolean, primaryKeys: IFieldName<Fields>[], isUpdate: boolean, errors: string[],
+        preparedFields: IFormFields<Fields>,
     }>({
         isSubmitting,
-        fieldsInstances: {},
+        fieldsInstances: {} as Record<IFieldName<Fields>, FormField>,
         data,
         isLoading,
         primaryKeys,
         isUpdate,
         errors: [],
+        preparedFields,
     });
     contextRef.current.isSubmitting = isSubmitting;
     contextRef.current.data = data;
     contextRef.current.isLoading = isLoading;
     contextRef.current.primaryKeys = primaryKeys;
     contextRef.current.isUpdate = isUpdate;
-    const formRef = useRef<IFormContext | null>(null);
+    contextRef.current.preparedFields = preparedFields;
     const onSubmitRef = useRef(onSubmit);
     onSubmitRef.current = onSubmit;
 
@@ -1114,15 +1082,17 @@ export function Form<Context = unknown>({ name, fields, context, onSubmit, rende
     }, [customBeforeSubmit]);
     const beforeSubmitRef = useRef(beforeSubmit);
     beforeSubmitRef.current = beforeSubmit;
-    const form = useMemo<IFormContext<Context>>(() => {
+    const form = useMemo<IFormContext<Fields>>(() => {
+        submitCountRef.current = 0;
+        invalidSubmitCount.current = 0;
         const isValid = () => {
             const fields = contextRef.current.fieldsInstances;
             contextRef.current.errors = [];
             if (isObj(fields)) {
                 for (let j in fields) {
                     const f = fields[j];
-                    if (f instanceof Field && !f.isValid()) {
-                        contextRef.current.errors.push(`[${getTextContent(f.getLabel())}] : ${defaultStr(f.getErrorText())}`);
+                    if (f instanceof FormField && !f.isValid()) {
+                        contextRef.current.errors.push(`[${f.getLabel()}] : ${defaultStr(f.getErrorText())}`);
                     }
                 }
             }
@@ -1134,8 +1104,8 @@ export function Form<Context = unknown>({ name, fields, context, onSubmit, rende
             if (!isObj(fields)) return data;
             for (let i in fields) {
                 const field = fields[i];
-                if (!FormsManager.isField(field)) continue;
-                const fName: string = field.getName(), fValue = field.isValid() ? field.getValidValue(data) : field.getValue();
+                if (!(field instanceof FormField)) continue;
+                const fName: IFieldName<Fields> = field.getName(), fValue = field.isValid() ? field.getValidValue(data) : field.getValue();
                 data[fName] = fValue;
                 if (fValue === undefined) {
                     delete data[fName];
@@ -1145,7 +1115,10 @@ export function Form<Context = unknown>({ name, fields, context, onSubmit, rende
         }
         const getErrors = () => Array.isArray(contextRef.current.errors) ? contextRef.current.errors : [];
         const getErrorText = () => getErrors().join("\n") || "";
-        const form = observableFactory<IFormEvent, IForm & Context>(Object.assign({}, context, {
+        const form = observableFactory<IFormEvent, Omit<IFormContext<Fields>, keyof IObservable>>({
+            getSubmitCount: () => submitCountRef.current,
+            getInvalidSubmitCount: () => invalidSubmitCount.current,
+            getFields: () => contextRef.current.preparedFields,
             isValid,
             getData,
             getName: () => formName,
@@ -1154,24 +1127,25 @@ export function Form<Context = unknown>({ name, fields, context, onSubmit, rende
             isEditing: () => contextRef.current.isUpdate,
             isSubmitting: () => contextRef.current.isSubmitting,
             getPrimaryKeys: () => contextRef.current.primaryKeys,
-            getFields: () => contextRef.current.fieldsInstances,
+            getFieldInstances: () => contextRef.current.fieldsInstances,
             isLoading: () => contextRef.current.isLoading,
 
             submit: () => {
+                submitCountRef.current++;
                 if (!isValid()) {
                     const message = getErrorText();
-                    const fields = contextRef.current.fieldsInstances;
+                    invalidSubmitCount.current++;
                     return Promise.reject(new Error(message));
                 }
                 return new Promise((resolve, reject) => {
                     const data = getData();
                     const { isUpdate, primaryKeys } = contextRef.current;
-                    const options: IFormSubmitOptions<Context> = {
+                    const options: IFormSubmitOptions<Fields> = {
                         data,
                         isUpdate,
                         form: formRef.current as any,
                     };
-                    const onSubmit = typeof onSubmitRef.current == "function" ? onSubmitRef.current : (options: IFormSubmitOptions<Context>) => options;
+                    const onSubmit = typeof onSubmitRef.current == "function" ? onSubmitRef.current : (options: IFormSubmitOptions<Fields>) => options;
                     return beforeSubmitRef.current(options).then(() => {
                         setIsSubmitting(true, () => {
                             () => {
@@ -1184,55 +1158,292 @@ export function Form<Context = unknown>({ name, fields, context, onSubmit, rende
                     });
                 });
             },
-        }));
+        });
         formRef.current = form;
         return form;
-    }, [formName, context]);
+    }, [formName]);
     useEffect(() => {
+        form?.trigger?.("mount", form);
+        FormsManager.mountForm(form);
         return () => {
+            form?.trigger?.("unmount", form);
+            FormsManager.unmountForm(formName);
             form?.offAll?.();
         }
     }, [form]);
-    const handleKeyboardEvent = useCallback(function (options: IFormKeyboardEventHandlerOptions) {
-        options = Object.assign({}, options);
-        options.formData = form.getData();
-        options.form = form;
-        if (typeof onKeyboardEvent == "function") {
-            onKeyboardEvent(options);
-        }
-        if (options?.key === "enter" && form.isValid()) {
-            if (typeof onEnterKeyPress == "function" && onEnterKeyPress(options) === false) {
-                return;
-            }
-            form.submit();
-        }
-    }, [onKeyboardEvent, onEnterKeyPress]);
     const skeleton = useMemo(() => {
         return isLoading && typeof renderSkeleton == "function" ? renderSkeleton(form) : null;
     }, [form, isLoading])
     const headerContent = useMemo(() => {
-        if (isLoading) return null;
-        const h = typeof header == "function" ? header() : header;;
+        const h = typeof header == "function" ? header(form) : header;
         return isValidElement(h) ? h : null;
-    }, [header, isLoading]);
+    }, [header, form]);
+    const childrenContent = useMemo(() => {
+        if (isLoading) return null;
+        const c = typeof children == "function" ? children(form) : children;
+        return isValidElement(c) ? c : null;
+    }, [children, form]);
+    const hasRenderFields = typeof renderFields == "function";
+    const formFields = useMemo(() => {
+        const options = { form, data, isUpdate, fields: preparedFields };
+        if (typeof renderFields == "function") {
+            return renderFields(options);
+        }
+        const _renderField = typeof renderField == "function" ? renderField : (field: IField, options: IFormSubmitOptions<Fields>) => <FormField {...field} key={field.name} />;
+        return typedEntries(preparedFields).map(([name, _field]) => {
+            return <Fragment key={String(name)}>
+                {_renderField(_field, options)}
+            </Fragment>
+        })
+    }, [stableHash(renderFields), form, data, isUpdate, stableHash(renderField)]);
+    useImperativeHandle(ref, () => (form));
+    return <FormContext.Provider value={form}>
+        {headerContent}
+        {skeleton ?? !hasRenderFields ? <View testID={testID} role="form"  {...props} className={cn("resk-form", `resk-form-${formName}`, props.className)}>{formFields}</View> : formFields}
+        {childrenContent}
+    </FormContext.Provider>;
 }
 
-interface IForm {
-    getName(): string;
+
+export class FormsManager {
+
+    private static forms: { [fommName: string]: IFormContext } = {};
+
+    /**
+     * A collection of actions associated with forms, indexed by form names and action IDs.
+     * 
+     * @private
+     * @type { { [formName: string]: { [actionId: string]: IFormActionProps } } }
+     */
+    private static actions: {
+        [fommName: string]: {
+            [actionId: string]: IFormActionProps;
+        };
+    } = {};
+
+    static isField(field: any): field is FormField {
+        return field instanceof FormField;
+    }
+
+    static isForm(form: any): boolean {
+        if (!form) return false;
+        return isObj(form) && typeof form.getData === "function" && typeof form.getFields === "function" && typeof form.isValid === "function" && typeof form.getName === "function";
+    }
+
+    static isFormValid(formName?: string): boolean {
+        return this.getForm(formName)?.isValid() || false;
+    }
+    static mountForm(formInstance?: IFormContext) {
+        if (!formInstance || this.isForm(this.forms[formInstance.getName()])) return;
+        this.forms[formInstance.getName()] = formInstance;
+    }
+
+    static unmountForm(formName?: string): void {
+        if (!formName) return;
+        delete this.forms[formName];
+    }
+    static mountField(field: FormField) {
+        if (!field || this.isField(field)) return;
+    }
+    static unmountField(field: FormField) {
+        if (!field || this.isField(field)) return;
+    }
+
+    static getForm<Fields extends IFields = IFields>(formName?: string): IFormContext<Fields> | null {
+        if (!formName) return null;
+        return this.forms[formName] as any || null;
+    }
+
+    static getFieldInstances<Fields extends IFields = IFields>(formName: string): Record<IFieldName<Fields>, FormField> {
+        return this.getForm<Fields>(formName)?.getFieldInstances?.() || {} as any;
+    }
+
+    static getFieldInstance<T extends IFieldType = IFieldType, ValueType = any>(formName?: string, fieldName?: string): FormField<T, ValueType> | null {
+        if (!isNonNullString(formName) || !isNonNullString(fieldName)) return null;
+        const fields = this.getFieldInstances(formName);
+        if (isObj(fields) && fieldName) {
+            return fields[fieldName as string] as FormField<T> || null;
+        }
+        return null;
+    }
+    /**
+     * Mounts an action associated with a specified form.
+     * 
+     * @param action - The action to mount.
+     * @param formName - The name of the form to associate the action with.
+     * 
+     * @example
+     * const action = { id: "submit", handler: () => { } };
+     * FormsManager.mountAction(action, "myForm"); // Mounts the action to "myForm"
+     */
+    static mountAction(action: IFormActionProps, formName: string) {
+        if (!action || !formName || !isNonNullString(action?.id)) return;
+        this.actions[formName] = this.actions[formName] || {};
+        this.actions[formName][action?.id] = action;
+    }
+    /**
+     * Unmounts an action from a specified form.
+     * 
+     * @param actionId - The ID of the action to unmount.
+     * @param formName - The name of the form to disassociate the action from.
+     * 
+     * @example
+     * FormsManager.unmountAction("submit", "myForm"); // Unmounts the action from "myForm"
+     */
+    static unmountAction(actionId: string, formName?: string) {
+        if (!formName || !isNonNullString(actionId)) return;
+        if (!isObj(this.actions[formName])) return;
+        delete this.actions[formName][actionId];
+    }
+
+    static getActions(formName: string) {
+        if (!isNonNullString(formName)) return {};
+        return this.actions[formName] || {};
+    }
+}
+
+export function FormAction<FormFields extends IFields = IFields, Context = unknown>({ formName, id, className, ref, onPress, context, ...props }: IFormActionProps<FormFields, Context>) {
+    const innerRef = useRef(null);
+    const mergedRef = useMergeRefs(innerRef, ref);
+    const generatedId = useId();
+    id = defaultStr(id, generatedId);
+    useEffect(() => {
+        if (isNonNullString(formName) && innerRef.current) {
+            FormsManager.mountAction(innerRef.current, formName);
+        }
+        return () => {
+            FormsManager.unmountAction(id, formName);
+        };
+    }, [innerRef, formName]);
+    useEffect(() => {
+        return () => {
+            FormsManager.unmountAction(id, formName);
+        };
+    }, [formName, id]);
+    return <Button.Interactive<Context>
+        testID={"resk-form-action-" + String(formName)}
+        {...props}
+        context={context}
+        id={id}
+        className={cn(className, "resk-form-action ", "resk-form-action-" + String(formName))}
+        ref={mergedRef}
+        onPress={(event, context) => {
+            const form = FormsManager.getForm<FormFields>(formName);
+            const options = Object.assign({}, context, form ? { form, formData: form.getData() } : {});
+            if (typeof onPress == "function") {
+                onPress(event, options as any);
+            }
+        }}
+    />
+}
+
+const FormContext = createContext<IFormContext>({} as IFormContext);
+
+export const useForm = () => useContext(FormContext);
+
+
+Form.Field = FormField;
+Form.Manager = FormsManager;
+
+export interface IFormActionProps<FormFields extends IFields = IFields, Context = unknown> extends Omit<IButtonInteractiveProps<Context>, "onPress"> {
+
+    onPress?: (event: GestureResponderEvent, context: Context & { form?: IFormContext<FormFields>, formData?: IFormData<FormFields> }) => any;
+
+    /***
+     * The name of the form associated.
+     * The form action uses this property to dynamically listen to the state of the form and is activated or deactivated according to the validated state or name of the form. 
+     */
+    formName: string;
+
+    /***
+     * If true, the button action will submit the form when pressed in case the formName is set.
+     * This can be useful for creating buttons that submit the form when pressed if the form is valid.
+     */
+    submitFormOnPress?: boolean;
+};
+
+export interface IFormContext<Fields extends IFields = IFields> extends IObservable<IFormEvent> {
+    getName(): IFieldName<Fields>;
     isValid(): boolean;
     isEditing(): boolean;
     getData(): IFormData;
-    getFields(): Record<string, Field>;
+    /**
+     * Returns an object containing **field instances** keyed by field name.
+     *
+     * Each instance may include internal methods, refs, focus control, etc.
+     *
+     * Example:
+     * ```ts
+     * const instances = getFieldInstances();
+     * instances?.email.isValid(); // manually focus email input
+     * ```
+     */
+    getFieldInstances(): Record<IFieldName<Fields>, FormField>;
+
+    /**
+     * Returns an object containing **field state/properties** keyed by field name.
+     *
+     * Each entry typically includes value, touched, error, isValid, etc.
+     *
+     * Example:
+     * ```ts
+     * const props = getFieldProps();
+     * console.log(props.email.error); // shows error for email field
+     * ```
+     */
+    getFields(): IFormFields<Fields>;
     isSubmitting(): boolean;
-    getPrimaryKeys(): string[];
+    getPrimaryKeys(): IFieldName<Fields>[];
     isLoading(): boolean;
     submit(): Promise<any>;
     isValid(): boolean;
     getErrors(): string[];
     getErrorText(): string;
-}
+    /**
+  * ✅ Returns the number of **successful form submission attempts**.
+  *
+  * This function should be called to get the **current count** of
+  * valid submissions — i.e., times the form was submitted
+  * successfully (passed validation and triggered submit logic).
+  *
+  * ---
+  * ### Example:
+  * ```tsx
+  * const count = formContext.getSubmitCount();
+  * console.log(`The form was submitted ${count} times.`);
+  * ```
+  *
+  * ---
+  * 💡 Use cases:
+  * - Show confirmation message after first submit
+  * - Disable submit button after N submissions
+  * - Track analytics around valid user interaction
+  */
+    getSubmitCount(): number;
 
-export type IFormContext<Context = unknown> = IObservable<IFormEvent, IForm & Context>;
+    /**
+     * ⚠️ Returns the number of **blocked form submission attempts** due to invalid fields.
+     *
+     * Call this function to get the count of times the user **tried** to submit
+     * the form, but the submission was prevented because **validation failed**.
+     *
+     * ---
+     * ### Example:
+     * ```tsx
+     * const invalidAttempts = formContext.getInvalidSubmitCount();
+     * if (invalidAttempts > 0) {
+     *   showErrorToast("Please correct the highlighted fields before submitting.");
+     * }
+     * ```
+     *
+     * ---
+     * 💡 Use cases:
+     * - Highlight invalid fields after repeated attempts
+     * - Show a banner or toast encouraging field correction
+     * - Log or report user frustration in analytics
+     */
+    getInvalidSubmitCount(): number;
+}
 
 export interface IFormKeyboardEventHandlerOptions {
     key: IKeyboardEventHandlerKey;
@@ -1245,51 +1456,93 @@ export interface IFormKeyboardEventHandlerOptions {
 
 
 
+type IFormFields<Fields extends IFields = IFields> = {
+    [K in keyof Fields]: Fields[K] extends IField ? Fields[K] : never;
+};
+type IFieldName<Fields extends IFields = IFields> = keyof IFormFields<Fields> & string;
+export type IFormData<Fields extends IFields = IFields> = Record<keyof IFormFields<Fields> | string | number | symbol, any>;
 
-export interface IFormProps<Context = unknown> extends Omit<IHtmlDivProps, "children" | "ref"> {
+export interface IFormProps<Fields extends IFields = IFields> extends Omit<ViewProps, "children" | "ref"> {
 
-    context?: Context;
-
-    renderSkeleton?: (context: IFormContext<Context>) => ReactNode;
+    renderSkeleton?: (context: IFormContext<Fields>) => ReactNode;
 
     prepareField?: (options: {
         field: IField;
         isUpdate: boolean;
-        fields: IFields;
-        data: IFormData;
-    }) => IField;
+        fields: IFormFields<Fields>;
+        data: IFormData<Fields>;
+    }) => IField | null | undefined;
+
     data?: IFormData;
 
     perm?: IAuthPerm;
 
-    beforeSubmit?: (options: IFormSubmitOptions<Context>) => any;
+    renderFields?: (options: IFormSubmitOptions<Fields> & {
+        fields: IFormFields<Fields>;
+    }) => ReactNode;
 
-    onSubmit?: (options: IFormSubmitOptions<Context>) => any;
+    /***
+        A function used to render a specific field
+        @param {IField} field - The field to render
+        @param {IFormSubmitOptions<Fields>} options - The options for the form submission
+        @returns {ReactNode} - The rendered field
+        @remarks
+            This function is used to render a specific field in the form.
+            It's only used when the `renderFields` prop is not provided.
+            It allows for customization of the rendering process for individual fields.
+            The function takes two parameters: the field to render and the options for the form submission.
+            It returns a ReactNode, which is the rendered field.
+    */
+    renderField?: (field: IField, options: IFormSubmitOptions<Fields>) => ReactNode;
+
+    beforeSubmit?: (options: IFormSubmitOptions<Fields>) => any;
+
+    onSubmit?: (options: IFormSubmitOptions<Fields>) => any;
 
     name?: string;
 
-    onValidate?: (options: IFormFieldValidatorOptions) => any;
+    /**
+     * Called when the entire form is validated and determined to be **valid**.
+     *
+     * You can use this to trigger final preparation before submission,
+     * enable the submit button, or track success state.
+     */
+    onValid?: (options: IFormFieldValidatorOptions) => any;
 
-    onNoValidate?: (options: IFormFieldValidatorOptions) => any;
+    /**
+     * Called when the form is validated and determined to be **invalid**,
+     * meaning **one or more fields** have validation errors.
+     *
+     * Useful for displaying a global error banner, scrolling to the first error,
+     * or disabling further interactions.
+     */
+    onInvalid?: (options: IFormFieldValidatorOptions) => any;
 
+    /**
+     * 🔁 Called **every time a field becomes valid** after validation,
+     * no matter which field it is. Can be used to track global form health.
+     *
+     * @param {IFormFieldValidatorOptions} options - The options for the field validator
+     */
     onValidateField?: (options: IFormFieldValidatorOptions) => any;
 
-
-    onNoValidateField?: (options: IFormFieldValidatorOptions) => any;
-
-
-    keyboardEvents?: IKeyboardEventHandlerKey[];
+    /**
+     * ⚠️ Called **every time a field becomes invalid** after validation.
+     * Useful for triggering centralized error handling, summaries, etc.
+     *
+     * @param {IFormFieldValidatorOptions} options - The options for the field validator
+     */
+    onInvalidateField?: (options: IFormFieldValidatorOptions) => any;
 
     onEnterKeyPress?: (options: IFormKeyboardEventHandlerOptions) => any;
 
-    onKeyboardEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
+    onKeyEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
 
-    fields?: IFields;
-
+    fields?: Fields;
 
     isEditingData?: (options: {
-        data: IFormData;
-        primaryKeys: string[];
+        data: IFormData<Fields>;
+        primaryKeys: IFieldName<Fields>[];
     }) => boolean;
 
     /**
@@ -1328,30 +1581,6 @@ export interface IFormProps<Context = unknown> extends Omit<IHtmlDivProps, "chil
      * isUpdate: true, // Indicates that the form is in update mode
      */
     isUpdate?: boolean;
-
-    /**
-     * Specify if the form items will be responsive.
-     * 
-     * When this property is true, the form will adjust its layout based on the screen size.
-     * 
-     * @type {boolean}
-     * 
-     * @example
-     * responsive: true, // Form items will be responsive
-     */
-    responsive?: boolean;
-
-    /**
-     * Names of the fields that will be rendered by the form.
-     * 
-     * This property allows you to specify which fields should be rendered by default.
-     * 
-     * @type {string[]}
-     * 
-     * @example
-     * renderableFieldsNames: ['username', 'email'], // Only these fields will be rendered
-     */
-    renderableFieldsNames?: string[];
 
     /**
      * Function to determine if a field should be rendered by the form.
@@ -1398,29 +1627,10 @@ export interface IFormProps<Context = unknown> extends Omit<IHtmlDivProps, "chil
      */
     isSubmitting?: boolean;
 
-    /**
-     * React node that serves as the header for the form.
-     * 
-     * This property allows you to customize the header of the form.
-     * 
-     * @type {((options: IFormProps) => ReactElement) | ReactElement}
-     * 
-     * @example
-     * header: <h1>User Form</h1>, // Custom header for the form
-     */
-    header?: ((options: IFormProps) => ReactElement) | ReactElement;
 
-    /**
-     * Element node that will be rendered as children of the form.
-     * 
-     * This property allows you to pass additional content to be rendered within the form.
-     * 
-     * @type {((options: IFormProps) => ReactElement) | ReactElement}
-     * 
-     * @example
-     * children: <p>Please fill out the form below:</p>, // Additional content
-     */
-    children?: ((options: IFormProps) => ReactElement) | ReactElement;
+    header?: ((options: IFormContext<Fields>) => ReactElement) | ReactElement;
+
+    children?: ((context: IFormContext<Fields>) => ReactElement) | ReactElement;
 
 
     /**
@@ -1469,9 +1679,11 @@ export interface IFormProps<Context = unknown> extends Omit<IHtmlDivProps, "chil
      * Default is false
      */
     renderAsTable?: boolean;
+
+    ref?: Ref<IFormContext<Fields>>;
 };
 
-export interface IFormFieldValidatorOptions<Type extends IFieldType = IFieldType, ValueType = any> extends IValidatorValidateOptions<Array<any>, Field<Type, ValueType>> {
+export interface IFormFieldValidatorOptions<Type extends IFieldType = IFieldType, ValueType = any> extends IValidatorValidateOptions<Array<any>, FormField<Type, ValueType>> {
     prevValue?: ValueType;
 
     /**
@@ -1502,35 +1714,12 @@ export type IFormFieldState<FielType extends IFieldType = IFieldType, ValueType 
     value: ValueType;
     prevValue?: ValueType;
     errorText: string;
-    formTriedTobeSubmitted?: boolean;
 }
 
 
-export interface IFormData extends Record<any, any> { }
+export interface IFormSubmitOptions<Fields extends IFields = IFields> {
 
-export interface IFormSubmitOptions<Context = unknown> {
-    /**
-     * The data being submitted through the form.
-     * 
-     * This property contains the structured data that the user has filled out
-     * in the form. It is essential for processing the submission, whether it
-     * is for creating a new entry or updating an existing one.
-     * 
-     * @type {IFormData}
-     * 
-     * @example
-     * const formData: IFormData = {
-     *     name: 'Jane Doe',
-     *     email: 'jane.doe@example.com',
-     * };
-     * 
-     * const options: IFormSubmitOptions = {
-     *     data: formData,
-     *     isUpdate: true,
-     *     // Other context properties
-     * };
-     */
-    data: IFormData;
+    data: IFormData<Fields>;
 
     /**
      * Indicates whether the form submission is for an update.
@@ -1559,12 +1748,12 @@ export interface IFormSubmitOptions<Context = unknown> {
      */
     isUpdate: boolean;
 
-    form: IFormContext<Context
+    form: IFormContext<Fields>;
 };
 
 export interface IFormFieldOnChangeOptions<FieldType extends IFieldType = IFieldType, ValueType = any> extends IOnChangeOptions {
 
-    context: Field<FieldType>;
+    context: FormField<FieldType>;
 
     prevValue: ValueType;
 };
@@ -1572,8 +1761,8 @@ export interface IFormFieldOnChangeOptions<FieldType extends IFieldType = IField
 
 
 export function AttachFormField<Type extends IFieldType = IFieldType>(type: Type) {
-    return (target: typeof Field<Type>) => {
-        Field.registerComponent(type, target as typeof Field);
+    return (target: typeof FormField<Type>) => {
+        FormField.registerComponent(type, target as typeof FormField);
     };
 }
 
@@ -1582,17 +1771,32 @@ function compareValues(a: any, b: any) {
     return areEquals(a, b);
 }
 
-FormsManager.isFieldInstance = (field: any) => {
-    return field instanceof Field;
+
+export interface IFormEventMap {
+    mount: string;
+    unmount: string;
+    submit: string;
+    beforeSubmit: string;
+    afterSubmit: string;
+    onValid: string;
+    onInvalid: string;
+    beforeValidate: string;
+    afterValidate: string;
+    validate: string;
+    noValidate: string;
+    validationStatusChanged: string;
 }
+
+export type IFormEvent = keyof IFormEventMap;
 
 
 declare module "@resk/core/resources" {
     export interface IFieldBase<FieldType extends IFieldType = IFieldType, ValueType = any> {
-        getValidValue?: (options: { value: any; context: Field<FieldType, ValueType>; data: IFormData }) => any;
+        testID?: string;
+        className?: IClassName;
+        onKeyEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
+        getValidValue?: (options: { value: any; context: FormField<FieldType, ValueType>; data: IFormData }) => any;
         isFilter?: boolean;
-        isFilterGroupItem?: boolean;
-
         validateOnMount?: boolean;
 
         validateOnBlur?: boolean;
@@ -1602,15 +1806,29 @@ declare module "@resk/core/resources" {
 
         responsive?: boolean;
 
-        onValidate?: (options: IFormFieldValidatorOptions<FieldType>) => any;
+        /**
+         * ✅ Called when **this specific field becomes valid**.
+         *
+         * Useful for triggering success UI feedback, enabling submit button, etc.
+         *
+         * @param value - The current valid value of the field
+         */
+        onValid?: (options: IFormFieldValidatorOptions<FieldType, ValueType>) => any;
 
-        onNoValidate?: (options: IFormFieldValidatorOptions<FieldType>) => any;
+        /**
+         * ❌ Called when **this specific field becomes invalid** after validation.
+         *
+         * Useful for showing local error messages or triggering a visual error state.
+         *
+         * @param error - The validation error message or object
+         */
+        onInvalid?: (options: IFormFieldValidatorOptions<FieldType, ValueType>) => any;
 
         containerProps?: IKeyboardEventHandlerProps;
 
         formName?: string;
 
-        onChange?: (options: IFormFieldOnChangeOptions<FieldType>) => void;
+        onChange?: (options: IFormFieldOnChangeOptions<FieldType, ValueType>) => void;
 
         errorText?: string;
 
@@ -1620,11 +1838,11 @@ declare module "@resk/core/resources" {
         isFormLoading?: boolean;
 
         isFormSubmitting?: boolean;
-        renderSkeleton?: (context: Field<FieldType, ValueType>) => ReactNode;
+        renderSkeleton?: (context: FormField<FieldType, ValueType>) => ReactNode;
 
-        onMount?: (context: Field<FieldType, ValueType>) => any;
+        onMount?: (context: FormField<FieldType, ValueType>) => any;
 
-        onUnmount?: (context: Field<FieldType, ValueType>) => any;
+        onUnmount?: (context: FormField<FieldType, ValueType>) => any;
 
         displayErrors?: boolean;
 

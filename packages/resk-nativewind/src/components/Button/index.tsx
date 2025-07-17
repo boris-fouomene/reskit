@@ -8,7 +8,6 @@ export function Button<Context = unknown>({ ref, ...props }: IButtonProps<Contex
 }
 
 Button.Interactive = function InteractiveButton<Context = unknown>(props: IButtonInteractiveProps<Context>) {
-    //const isInteractive = isNonNullString(formName) || ref || !!pickTouchableProps(props as any)?.touchableProps;
     return <>
         <ButtonInteractive {...props} />
     </>

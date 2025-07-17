@@ -17,7 +17,7 @@ import { isNonNullString } from "../../../utils";
  * - `declined_if` - Conditionally declined based on another field value
  * 
  * @author Resk Framework Team
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-accepted | Laravel Boolean Rules}
  * @public
  */
@@ -67,7 +67,7 @@ import { isNonNullString } from "../../../utils";
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-accepted | Laravel accepted Rule}
  * @public
  */
@@ -149,7 +149,7 @@ export function Accepted({ value, fieldName, translatedPropertyName, ...rest }: 
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-accepted-if | Laravel accepted_if Rule}
  * @public
  */
@@ -244,7 +244,7 @@ export function AcceptedIf({ value, ruleParams, context, fieldName, translatedPr
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-boolean | Laravel boolean Rule}
  * @public
  */
@@ -327,7 +327,7 @@ export function Boolean({ value, fieldName, translatedPropertyName, ...rest }: I
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-declined | Laravel declined Rule}
  * @public
  */
@@ -409,7 +409,7 @@ export function Declined({ value, fieldName, translatedPropertyName, ...rest }: 
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-declined-if | Laravel declined_if Rule}
  * @public
  */

@@ -32,7 +32,7 @@ import { i18n } from "../../../i18n";
  * - `sometimes` - Only validate if field is present
  * 
  * @author Resk Framework Team
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#available-validation-rules | Laravel Conditional Rules}
  * @public
  */
@@ -73,7 +73,7 @@ import { i18n } from "../../../i18n";
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true (bail doesn't validate the value itself)
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-bail | Laravel bail Rule}
  * @public
  */
@@ -125,7 +125,7 @@ export function Bail({ }: IValidatorValidateOptions): IValidatorResult {
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true (exclude doesn't validate the value itself)
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-exclude | Laravel exclude Rule}
  * @public
  */
@@ -177,7 +177,7 @@ export function Exclude({ }: IValidatorValidateOptions): IValidatorResult {
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true (exclude_if doesn't validate the value itself)
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-exclude-if | Laravel exclude_if Rule}
  * @public
  */
@@ -229,7 +229,7 @@ export function ExcludeIf({ ruleParams, context }: IValidatorValidateOptions<str
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true (exclude_unless doesn't validate the value itself)
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-exclude-unless | Laravel exclude_unless Rule}
  * @public
  */
@@ -285,7 +285,7 @@ export function ExcludeUnless({ ruleParams, context }: IValidatorValidateOptions
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if value is null, false to continue validation
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-nullable | Laravel nullable Rule}
  * @public
  */
@@ -347,7 +347,7 @@ export function Nullable({ value }: IValidatorValidateOptions): IValidatorResult
  * @param options.context - Should contain fieldExists property indicating presence
  * @returns Promise resolving to true if field is present, rejecting if missing
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-present | Laravel present Rule}
  * @public
  */
@@ -417,7 +417,7 @@ export function Present({ context, fieldName, translatedPropertyName, ...rest }:
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if field is prohibited (empty), rejecting if present
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-prohibited | Laravel prohibited Rule}
  * @public
  */
@@ -498,7 +498,7 @@ export function Prohibited({ value, fieldName, translatedPropertyName, ...rest }
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting if prohibited field has value
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-prohibited-if | Laravel prohibited_if Rule}
  * @public
  */
@@ -601,7 +601,7 @@ export function ProhibitedIf({ value, ruleParams, context, fieldName, translated
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting if prohibited field has value
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-prohibited-unless | Laravel prohibited_unless Rule}
  * @public
  */
@@ -707,7 +707,7 @@ export function ProhibitedUnless({ value, ruleParams, context, fieldName, transl
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting if required field is missing
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-unless | Laravel required_unless Rule}
  * @public
  */
@@ -808,7 +808,7 @@ export function RequiredUnless({ value, ruleParams, context, fieldName, translat
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting if required field is missing
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-with | Laravel required_with Rule}
  * @public
  */
@@ -913,7 +913,7 @@ export function RequiredWith({ value, ruleParams, context, fieldName, translated
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting if required field is missing
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-with-all | Laravel required_with_all Rule}
  * @public
  */
@@ -1014,7 +1014,7 @@ export function RequiredWithAll({ value, ruleParams, context, fieldName, transla
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting if required field is missing
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-without | Laravel required_without Rule}
  * @public
  */
@@ -1119,7 +1119,7 @@ export function RequiredWithout({ value, ruleParams, context, fieldName, transla
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting if required field is missing
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-without-all | Laravel required_without_all Rule}
  * @public
  */
@@ -1211,7 +1211,7 @@ export function RequiredWithoutAll({ value, ruleParams, context, fieldName, tran
  * @param options.context - Should contain fieldExists property
  * @returns Promise resolving to true if field should be validated, or skipped
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-sometimes | Laravel sometimes Rule}
  * @public
  */
@@ -1271,7 +1271,7 @@ export function Sometimes({ context }: IValidatorValidateOptions): IValidatorRes
  * @param options.context - Validation context with fieldExists and data
  * @returns Promise resolving to true if correctly missing, rejecting if present when should be missing
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-if | Laravel missing_if Rule}
  * @public
  */
@@ -1336,7 +1336,7 @@ export function MissingIf({ ruleParams, context, fieldName, translatedPropertyNa
  * @param options - Validation options with rule parameters and context
  * @returns Promise resolving to true if correctly missing, rejecting if present inappropriately
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-unless | Laravel missing_unless Rule}
  * @public
  */
@@ -1400,7 +1400,7 @@ export function MissingUnless({ ruleParams, context, fieldName, translatedProper
  * @param options - Validation options with rule parameters and context
  * @returns Promise resolving to true if correctly missing, rejecting if present inappropriately
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-with | Laravel missing_with Rule}
  * @public
  */
@@ -1464,7 +1464,7 @@ export function MissingWith({ ruleParams, context, fieldName, translatedProperty
  * @param options - Validation options with rule parameters and context
  * @returns Promise resolving to true if correctly missing, rejecting if present inappropriately
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-with-all | Laravel missing_with_all Rule}
  * @public
  */
@@ -1527,7 +1527,7 @@ export function MissingWithAll({ ruleParams, context, fieldName, translatedPrope
  * @param options - Validation options with rule parameters and context
  * @returns Promise resolving to true if correctly missing, rejecting if present inappropriately
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-without | Laravel missing_without Rule}
  * @public
  */
@@ -1590,7 +1590,7 @@ export function MissingWithout({ ruleParams, context, fieldName, translatedPrope
  * @param options - Validation options with rule parameters and context
  * @returns Promise resolving to true if correctly missing, rejecting if present inappropriately
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing-without-all | Laravel missing_without_all Rule}
  * @public
  */

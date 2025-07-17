@@ -30,7 +30,7 @@ import { i18n } from "../../../i18n";
  * - `ipv6` - Must be valid IPv6 address
  * 
  * @author Resk Framework Team
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#available-validation-rules | Laravel Utility Rules}
  * @public
  */
@@ -90,7 +90,7 @@ import { i18n } from "../../../i18n";
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if different, rejecting if same
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-different | Laravel different Rule}
  * @public
  */
@@ -175,7 +175,7 @@ export function Different({ value, ruleParams, context, fieldName, translatedPro
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if same, rejecting if different
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-same | Laravel same Rule}
  * @public
  */
@@ -243,7 +243,7 @@ export function Same({ value, ruleParams, context, fieldName, translatedProperty
  * @param options.context - Should contain fieldExists property
  * @returns Promise resolving to true if missing, rejecting if present
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-missing | Laravel missing Rule}
  * @public
  */
@@ -306,7 +306,7 @@ export function Missing({ context, fieldName, translatedPropertyName, ...rest }:
  * @param options.ruleParams - Array containing [pattern, flags?]
  * @returns Promise resolving to true if matches, rejecting if doesn't match
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-regex | Laravel regex Rule}
  * @public
  */
@@ -402,7 +402,7 @@ export function Regex({ value, ruleParams, fieldName, translatedPropertyName, ..
  * @param options.ruleParams - Array containing [pattern, flags?]
  * @returns Promise resolving to true if doesn't match, rejecting if matches
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-not-regex | Laravel not_regex Rule}
  * @public
  */
@@ -502,7 +502,7 @@ export function NotRegex({ value, ruleParams, fieldName, translatedPropertyName,
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid JSON, rejecting if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-json | Laravel json Rule}
  * @public
  */
@@ -574,7 +574,7 @@ export function Json({ value, fieldName, translatedPropertyName, ...rest }: IVal
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if lowercase, rejecting if not
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-lowercase | Laravel lowercase Rule}
  * @public
  */
@@ -645,7 +645,7 @@ export function Lowercase({ value, fieldName, translatedPropertyName, ...rest }:
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if uppercase, rejecting if not
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-uppercase | Laravel uppercase Rule}
  * @public
  */
@@ -721,7 +721,7 @@ export function Uppercase({ value, fieldName, translatedPropertyName, ...rest }:
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid hex color, rejecting if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-hex-color | Laravel hex_color Rule}
  * @public
  */
@@ -803,7 +803,7 @@ export function HexColor({ value, fieldName, translatedPropertyName, ...rest }: 
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid MAC address, rejecting if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-mac-address | Laravel mac_address Rule}
  * @public
  */
@@ -887,7 +887,7 @@ export function MacAddress({ value, fieldName, translatedPropertyName, ...rest }
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid IP, rejecting if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-ip | Laravel ip Rule}
  * @public
  */
@@ -970,7 +970,7 @@ export function Ip({ value, fieldName, translatedPropertyName, ...rest }: IValid
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid IPv4, rejecting if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-ipv4 | Laravel ipv4 Rule}
  * @public
  */
@@ -1047,7 +1047,7 @@ export function Ipv4({ value, fieldName, translatedPropertyName, ...rest }: IVal
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid IPv6, rejecting if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-ipv6 | Laravel ipv6 Rule}
  * @public
  */

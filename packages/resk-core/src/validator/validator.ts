@@ -416,7 +416,7 @@ export class Validator {
    * @returns returns.sanitizedRules - Array of standardized, executable rule objects
    * @returns returns.invalidRules - Array of rules that couldn't be processed (unregistered)
    * 
-   * @since 2.0.0
+   * @since 1.22.0
    * @see {@link parseStringRule} - Internal string rule parser
    * @see {@link parseObjectRules} - Internal object rule parser
    * @see {@link validate} - Uses this method for rule processing
@@ -496,7 +496,7 @@ export class Validator {
    * @returns returns.ruleFunction - The actual validation function
    * @returns returns.rawRuleName - The original unparsed rule string
    * 
-   * @since 2.0.0
+   * @since 1.22.0
    * @see {@link parseAndValidateRules} - Public method that uses this parser
    * @private
    */
@@ -575,7 +575,7 @@ export class Validator {
    * @returns returns.valid - Array of successfully parsed and validated rule objects
    * @returns returns.invalid - Array of rule names that couldn't be processed
    * 
-   * @since 2.0.0
+   * @since 1.22.0
    * @see {@link parseAndValidateRules} - Public method that uses this parser
    * @private
    */
@@ -1262,7 +1262,7 @@ export class Validator {
    * 
    * @returns Decorator factory function that accepts parameters and returns a property decorator
    * 
-   * @since 2.0.0
+   * @since 1.22.0
    * @see {@link createPropertyDecorator} - Lower-level decorator creation
    * @see {@link registerRule} - Alternative way to create reusable rules
    * @public
@@ -1378,7 +1378,7 @@ export class Validator {
  * @see {@link IsRequired} - Often used together
  * @public
  */
-export const IsNumber = Validator.createPropertyDecorator("number");
+export const IsNumber = Validator.createPropertyDecorator(["Number"]);
 
 /**
  * ### IsRequired Decorator
@@ -1414,7 +1414,7 @@ export const IsNumber = Validator.createPropertyDecorator("number");
  * @see {@link IsOptional} - For optional fields
  * @public
  */
-export const IsRequired = Validator.createPropertyDecorator("required");
+export const IsRequired = Validator.createPropertyDecorator(["Required"]);
 
 /**
  * ### IsEmail Decorator
@@ -1453,7 +1453,7 @@ export const IsRequired = Validator.createPropertyDecorator("required");
  * @see {@link IsRequired} - Often used together
  * @public
  */
-export const IsEmail = Validator.createPropertyDecorator("email");
+export const IsEmail = Validator.createPropertyDecorator(["Email"]);
 
 /**
  * ### IsUrl Decorator
@@ -1493,7 +1493,7 @@ export const IsEmail = Validator.createPropertyDecorator("email");
  * @since 1.0.0
  * @public
  */
-export const IsUrl = Validator.createPropertyDecorator("url");
+export const IsUrl = Validator.createPropertyDecorator(["Url"]);
 
 /**
  * ### IsFileName Decorator
@@ -1529,7 +1529,7 @@ export const IsUrl = Validator.createPropertyDecorator("url");
  * @since 1.0.0
  * @public
  */
-export const IsFileName = Validator.createPropertyDecorator("fileName");
+export const IsFileName = Validator.createPropertyDecorator(["FileName"]);
 
 /**
  * ### IsNonNullString Decorator
@@ -1571,7 +1571,7 @@ export const IsFileName = Validator.createPropertyDecorator("fileName");
  * @see {@link IsRequired} - Less strict alternative
  * @public
  */
-export const IsNonNullString = Validator.createPropertyDecorator("nonNullString");
+export const IsNonNullString = Validator.createPropertyDecorator(["NonNullString"]);
 
 /**
  * ## ValidationTargetOptions Class Decorator
@@ -1704,7 +1704,7 @@ export const IsNonNullString = Validator.createPropertyDecorator("nonNullString"
  * 
  * @returns Class decorator function that applies the validation configuration
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link validateTarget} - Method that uses these options
  * @see {@link getValidateTargetOptions} - Retrieves configured options
  * @decorator

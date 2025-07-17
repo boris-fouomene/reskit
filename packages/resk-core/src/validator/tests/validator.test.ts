@@ -35,22 +35,22 @@ describe("Validator", () => {
 
     describe("sanitizeRules", () => {
         it("should sanitize an array of rules", () => {
-            const sanitizedRules = Validator.parseAndValidateRules(["required", "minLength[2]", "maxLength[10]"]);
+            const sanitizedRules = Validator.parseAndValidateRules(["Required", "MinLength[2]", "MaxLength[10]"]);
             expect(sanitizedRules).toEqual({
                 invalidRules: [],
                 sanitizedRules: [{
-                    ruleName: "required",
-                    rawRuleName: "required",
+                    ruleName: "Required",
+                    rawRuleName: "Required",
                     params: [],
                     ruleFunction: expect.any(Function),
                 }, {
-                    ruleName: "minLength",
-                    rawRuleName: "minLength[2]",
+                    ruleName: "MinLength",
+                    rawRuleName: "MinLength[2]",
                     params: ["2"],
                     ruleFunction: expect.any(Function),
                 }, {
-                    ruleName: "maxLength",
-                    rawRuleName: "maxLength[10]",
+                    ruleName: "MaxLength",
+                    rawRuleName: "MaxLength[10]",
                     params: ["10"],
                     ruleFunction: expect.any(Function),
                 }],
@@ -120,7 +120,7 @@ describe("Validator", () => {
         });
         it("should throw an error for invalid numberLessThanOrEquals rule", async () => {
             const options = {
-                rules: ["numberLessThanOrEquals[10]" as IValidatorRuleName],
+                rules: ["NumberLessThanOrEquals[10]" as IValidatorRuleName],
                 value: "test",
             };
             await expect(
@@ -130,7 +130,7 @@ describe("Validator", () => {
         it("should throw an error for invalid numberLessThan rule", async () => {
             await expect(
                 Validator.validate({
-                    rules: ["numberLessThan[10]"],
+                    rules: ["NumberLessThan[10]"],
                     value: "test",
                 })
             ).rejects.toMatchObject({ message: "This field must be less than 10" });
@@ -138,7 +138,7 @@ describe("Validator", () => {
         it("should throw an error for invalid numberGreaterThanOrEquals rule", async () => {
             await expect(
                 Validator.validate({
-                    rules: ["numberGreaterThanOrEquals[10]"],
+                    rules: ["NumberGreaterThanOrEquals[10]"],
                     value: "test",
                 })
             ).rejects.toMatchObject({ message: "This field must be greater than or equal to 10" });
@@ -146,7 +146,7 @@ describe("Validator", () => {
         it("should throw an error for invalid numberGreaterThan rule", async () => {
             await expect(
                 Validator.validate({
-                    rules: ["numberGreaterThan[10]"],
+                    rules: ["NumberGreaterThan[10]"],
                     value: "test",
                 })
             ).rejects.toMatchObject({ message: "This field must be greater than 10" });
@@ -154,7 +154,7 @@ describe("Validator", () => {
         it("should throw an error for invalid numberEquals rule", async () => {
             await expect(
                 Validator.validate({
-                    rules: ["numberEquals[10]"],
+                    rules: ["NumberEquals[10]"],
                     value: "test",
                 })
             ).rejects.toMatchObject({ message: "This field must be equal to 10" });

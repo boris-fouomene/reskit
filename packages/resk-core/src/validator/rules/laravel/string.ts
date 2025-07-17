@@ -29,7 +29,7 @@ import { isNonNullString, isValidEmail, isValidUrl } from "../../../utils";
  * - `ulid` - Valid ULID format
  * 
  * @author Resk Framework Team
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#available-validation-rules | Laravel String Rules}
  * @public
  */
@@ -77,7 +77,7 @@ import { isNonNullString, isValidEmail, isValidUrl } from "../../../utils";
  * @param options.ruleParams - Optional array containing 'ascii' to restrict to ASCII
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-alpha | Laravel alpha Rule}
  * @public
  */
@@ -165,7 +165,7 @@ export function Alpha({ value, ruleParams, fieldName, translatedPropertyName, ..
  * @param options.ruleParams - Optional array containing 'ascii' to restrict to ASCII
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-alpha-dash | Laravel alpha_dash Rule}
  * @public
  */
@@ -252,7 +252,7 @@ export function AlphaDash({ value, ruleParams, fieldName, translatedPropertyName
  * @param options.ruleParams - Optional array containing 'ascii' to restrict to ASCII
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-alpha-num | Laravel alpha_num Rule}
  * @public
  */
@@ -334,7 +334,7 @@ export function AlphaNum({ value, ruleParams, fieldName, translatedPropertyName,
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-ascii | Laravel ascii Rule}
  * @public
  */
@@ -424,7 +424,7 @@ export function Ascii({ value, fieldName, translatedPropertyName, ...rest }: IVa
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-confirmed | Laravel confirmed Rule}
  * @public
  */
@@ -513,7 +513,7 @@ export function Confirmed({ value, ruleParams, context, fieldName, translatedPro
  * @param options.ruleParams - Optional array of validation styles
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-email | Laravel email Rule}
  * @public
  */
@@ -586,7 +586,7 @@ export function Email({ value, ruleParams, fieldName, translatedPropertyName, ..
  * @param options.ruleParams - Array of valid ending values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-ends-with | Laravel ends_with Rule}
  * @public
  */
@@ -668,7 +668,7 @@ export function EndsWith({ value, ruleParams, fieldName, translatedPropertyName,
  * @param options.ruleParams - Array of valid starting values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-starts-with | Laravel starts_with Rule}
  * @public
  */
@@ -760,7 +760,7 @@ export function StartsWith({ value, ruleParams, fieldName, translatedPropertyNam
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-string | Laravel string Rule}
  * @public
  */
@@ -829,7 +829,7 @@ export function String({ value, fieldName, translatedPropertyName, ...rest }: IV
  * @param options.ruleParams - Optional array of allowed protocols
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-url | Laravel url Rule}
  * @public
  */

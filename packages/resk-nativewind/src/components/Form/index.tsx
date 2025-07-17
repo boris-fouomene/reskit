@@ -159,14 +159,14 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
             });
         }
         options.rules = Array.isArray(options.rules) && options.rules.length ? options.rules : this.getValidationRules();
-        if (this.isEmail() && this.props.validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("email")) {
-            options.rules.push("email");
+        if (this.isEmail() && this.props.validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("Email")) {
+            options.rules.push("Email");
         }
-        if (this.props.validatePhoneNumber !== false && this.isPhone() && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("phoneNumber")) {
-            options.rules.push("phoneNumber");
+        if (this.props.validatePhoneNumber !== false && this.isPhone() && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("PhoneNumber")) {
+            options.rules.push("PhoneNumber");
         }
-        if ((this.getType() as any) == "url" && options.value && !options.rules.includes("url")) {
-            options.rules.push("url");
+        if ((this.getType() as any) == "url" && options.value && !options.rules.includes("Url")) {
+            options.rules.push("Url");
         }
         const hasValidated = true;
         return Promise.resolve(this.beforeValidate(options)).then(() => {
@@ -236,7 +236,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
     getValidationRules(): IValidatorRule[] {
         const rules: IValidatorRule[] = Array.isArray(this.props.validationRules) ? this.props.validationRules : [];
         if (this.props?.required) {
-            rules.unshift("required");
+            rules.unshift("Required");
         }
         ["minLength", "length", "maxLength"].map((r: string) => {
             const k: keyof IField<FieldType, ValueType> = r as keyof IField<FieldType, ValueType>;

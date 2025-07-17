@@ -26,48 +26,48 @@ export type IValidatorRule<ParamType extends Array<any> = Array<any>, Context = 
 export type IValidatorSanitizedRule<ParamType extends Array<any> = Array<any>, Context = unknown> =
   | IValidatorRuleFunction<ParamType, Context>
   | {
-      /**
-       * The name of the validation rule.
-       *
-       * This property specifies the rule's identifier, which can be used
-       * to reference the rule in validation scenarios.
-       *
-       * @type {IValidatorRuleName}
-       * @example
-       * const ruleName = sanitizedRule.ruleName; // 'minLength'
-       */
-      ruleName: IValidatorRuleName;
+    /**
+     * The name of the validation rule.
+     *
+     * This property specifies the rule's identifier, which can be used
+     * to reference the rule in validation scenarios.
+     *
+     * @type {IValidatorRuleName}
+     * @example
+     * const ruleName = sanitizedRule.ruleName; // 'minLength'
+     */
+    ruleName: IValidatorRuleName;
 
-      /**
-       * The parameters required for the validation rule.
-       *
-       * This array contains the values that are necessary for the rule's
-       * execution, such as minimum or maximum lengths, or other criteria.
-       *
-       * @type {ParamType}
-       * @example
-       * const params = sanitizedRule.params; // [5]
-       */
-      params: ParamType;
+    /**
+     * The parameters required for the validation rule.
+     *
+     * This array contains the values that are necessary for the rule's
+     * execution, such as minimum or maximum lengths, or other criteria.
+     *
+     * @type {ParamType}
+     * @example
+     * const params = sanitizedRule.params; // [5]
+     */
+    params: ParamType;
 
-      /**
-       * The function that implements the validation logic.
-       *
-       * This function is called to perform the actual validation based on
-       * the provided parameters and the value being validated.
-       *
-       * @type {IValidatorRuleFunction}
-       * @example
-       * const ruleFunction = ``sanitizedRule``.ruleFunction; // Function reference
-       */
-      ruleFunction: IValidatorRuleFunction<ParamType, Context>;
+    /**
+     * The function that implements the validation logic.
+     *
+     * This function is called to perform the actual validation based on
+     * the provided parameters and the value being validated.
+     *
+     * @type {IValidatorRuleFunction}
+     * @example
+     * const ruleFunction = ``sanitizedRule``.ruleFunction; // Function reference
+     */
+    ruleFunction: IValidatorRuleFunction<ParamType, Context>;
 
-      /***
-       * The rule with parameters.
-       * it represents the rule with parameters, for example "minLength[5]" that has been passed to the validator.
-       */
-      rawRuleName: string;
-    };
+    /***
+     * The rule with parameters.
+     * it represents the rule with parameters, for example "minLength[5]" that has been passed to the validator.
+     */
+    rawRuleName: string;
+  };
 
 /**
  * @typedef IValidatorSanitizedRules
@@ -206,22 +206,7 @@ export type IValidatorRuleName = keyof IValidatorRuleMap;
  * making it easier to apply and reference them in  validation scenarios.
  */
 export interface IValidatorRuleMap {
-  /**
-   * @function numberLessThanOrEquals
-   *
-   * Validator rule that checks if a number is less than or equal to a specified value.
-   *
-   * ### Parameters:
-   * - **options**: `IValidatorValidateOptions` - Contains the value to validate and the rule parameters.
-   *
-   * ### Return Value:
-   * - `IValidatorResult`: Resolves to `true` if the value is less than or equal to the specified value, otherwise rejects with an error message.
-   *
-   * ### Example Usage:
-   * ```typescript
-   * ```
-   */
-  numberLessThanOrEquals: IValidatorRuleFunction;
+  NumberLessThanOrEquals: IValidatorRuleFunction;
 
   /**
    * @function numberLessThan
@@ -254,7 +239,7 @@ export interface IValidatorRuleMap {
    * - This rule is useful for scenarios where you need to ensure that a numeric input is strictly less than a specified limit.
    * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
    */
-  numberLessThan: IValidatorRuleFunction;
+  NumberLessThan: IValidatorRuleFunction;
 
   /**
    * @function numberGreaterThanOrEquals
@@ -287,7 +272,7 @@ export interface IValidatorRuleMap {
    * - This rule is useful for scenarios where you need to ensure that a numeric input meets or exceeds a specified limit.
    * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
    */
-  numberGreaterThanOrEquals: IValidatorRuleFunction;
+  NumberGreaterThanOrEquals: IValidatorRuleFunction;
 
   /**
    * @function numberGreaterThan
@@ -319,7 +304,7 @@ export interface IValidatorRuleMap {
    * - This rule is useful for scenarios where you need to ensure that a numeric input exceeds a specified limit.
    * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
    */
-  numberGreaterThan: IValidatorRuleFunction;
+  NumberGreaterThan: IValidatorRuleFunction;
 
   /**
    * @function numberEquals
@@ -352,7 +337,7 @@ export interface IValidatorRuleMap {
    * - This rule is useful for scenarios where you need to ensure that a numeric input matches a specified value exactly.
    * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
    */
-  numberEquals: IValidatorRuleFunction;
+  NumberEquals: IValidatorRuleFunction;
 
   /**
    * @function numberIsDifferentFrom
@@ -385,7 +370,7 @@ export interface IValidatorRuleMap {
    * - This rule is useful for scenarios where you need to ensure that a numeric input does not match a specified value.
    * - The error message can be customized by modifying the second parameter of the `compareNumer` function.
    */
-  numberIsDifferentFrom: IValidatorRuleFunction;
+  NumberIsDifferentFrom: IValidatorRuleFunction;
 
   /**
    * @function required
@@ -416,7 +401,7 @@ export interface IValidatorRuleMap {
    * - The error message can be customized by modifying the translation key used in `i18n.t`.
    * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
    */
-  required: IValidatorRuleFunction;
+  Required: IValidatorRuleFunction;
 
   /**
    * @function length
@@ -457,7 +442,7 @@ export interface IValidatorRuleMap {
    * - The error messages can be customized based on the parameters provided, allowing for clear feedback to users.
    * - The `defaultStr` utility function is used to ensure that the value is treated as a string, even if it is `null` or `undefined`.
    */
-  length: IValidatorRuleFunction;
+  Length: IValidatorRuleFunction;
 
   /**
    * @function minLength
@@ -493,7 +478,7 @@ export interface IValidatorRuleMap {
    * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
    * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
    */
-  minLength: IValidatorRuleFunction;
+  MinLength: IValidatorRuleFunction;
 
   /**
    * @function maxLength
@@ -528,7 +513,7 @@ export interface IValidatorRuleMap {
    * - The error message can be customized based on the parameters provided, allowing for clear feedback to users.
    * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
    */
-  maxLength: IValidatorRuleFunction;
+  MaxLength: IValidatorRuleFunction;
 
   /**
    * @function email
@@ -563,7 +548,7 @@ export interface IValidatorRuleMap {
    * - The error message can be customized by modifying the translation key used in `i18n.t`.
    * - The rule allows for `null` or non-string values to pass through without validation, which can be useful for optional email fields.
    */
-  email: IValidatorRuleFunction;
+  Email: IValidatorRuleFunction;
 
   /**
    * @function url
@@ -597,7 +582,7 @@ export interface IValidatorRuleMap {
    * - The error message can be customized by modifying the translation key used in `i18n.t`.
    * - The rule allows for `null` or non-string values to pass through without validation, which can be useful for optional URL fields.
    */
-  url: IValidatorRuleFunction;
+  Url: IValidatorRuleFunction;
 
   /**
    * @function fileName
@@ -636,27 +621,27 @@ export interface IValidatorRuleMap {
    * - The error message can be customized as needed.
    * - The `isNonNullString` utility function is used to check that the value is a non-null string before performing further validation.
    */
-  fileName: IValidatorRuleFunction;
+  FileName: IValidatorRuleFunction;
 
   /***
    * Validator rule that checks if a given value is a number
    */
-  number: IValidatorRuleFunction;
+  Number: IValidatorRuleFunction;
 
   /***
    * Validator rule that checks if a given value is a non null string
    */
-  nonNullString: IValidatorRuleFunction;
+  NonNullString: IValidatorRuleFunction;
 
   /***
    * Validator rule that checks if a given value is a valid phone number
    */
-  phoneNumber: IValidatorRuleFunction;
+  PhoneNumber: IValidatorRuleFunction;
 
   /**
    * Validator rule that checks if a given value is a valid email or phone number
    */
-  emailOrPhoneNumber: IValidatorRuleFunction;
+  EmailOrPhoneNumber: IValidatorRuleFunction;
 }
 
 /**

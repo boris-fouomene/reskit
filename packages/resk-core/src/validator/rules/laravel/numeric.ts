@@ -24,7 +24,7 @@ import { i18n } from "../../../i18n";
  * - `lte` - Must be less than or equal to field or value
  * 
  * @author Resk Framework Team
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#available-validation-rules | Laravel Numeric Rules}
  * @public
  */
@@ -82,7 +82,7 @@ import { i18n } from "../../../i18n";
  * @param options.ruleParams - Array containing [min, max] values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-between | Laravel between Rule}
  * @public
  */
@@ -191,7 +191,7 @@ export function Between({ value, ruleParams, fieldName, translatedPropertyName, 
  * @param options.ruleParams - Array with decimal places specification
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-decimal | Laravel decimal Rule}
  * @public
  */
@@ -303,7 +303,7 @@ export function Decimal({ value, ruleParams, fieldName, translatedPropertyName, 
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-integer | Laravel integer Rule}
  * @public
  */
@@ -377,7 +377,7 @@ export function Integer({ value, fieldName, translatedPropertyName, ...rest }: I
  * @param options.ruleParams - Array containing the maximum value
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-max | Laravel max Rule}
  * @public
  */
@@ -479,7 +479,7 @@ export function Max({ value, ruleParams, fieldName, translatedPropertyName, ...r
  * @param options.ruleParams - Array containing the minimum value
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-min | Laravel min Rule}
  * @public
  */
@@ -579,7 +579,7 @@ export function Min({ value, ruleParams, fieldName, translatedPropertyName, ...r
  * @param options.ruleParams - Array containing the multiple value
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-multiple-of | Laravel multiple_of Rule}
  * @public
  */
@@ -691,7 +691,7 @@ export function MultipleOf({ value, ruleParams, fieldName, translatedPropertyNam
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-numeric | Laravel numeric Rule}
  * @public
  */
@@ -767,7 +767,7 @@ export function Numeric({ value, fieldName, translatedPropertyName, ...rest }: I
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-gt | Laravel gt Rule}
  * @public
  */
@@ -877,7 +877,7 @@ export function Gt({ value, ruleParams, context, fieldName, translatedPropertyNa
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-gte | Laravel gte Rule}
  * @public
  */
@@ -986,7 +986,7 @@ export function Gte({ value, ruleParams, context, fieldName, translatedPropertyN
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-lt | Laravel lt Rule}
  * @public
  */
@@ -1095,7 +1095,7 @@ export function Lt({ value, ruleParams, context, fieldName, translatedPropertyNa
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-lte | Laravel lte Rule}
  * @public
  */

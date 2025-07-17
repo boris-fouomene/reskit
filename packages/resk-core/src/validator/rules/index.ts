@@ -70,7 +70,7 @@ function numberLessThanOrEquals(options: IValidatorValidateOptions) {
   );
 }
 
-Validator.registerRule("numberLessThanOrEquals", numberLessThanOrEquals);
+Validator.registerRule("NumberLessThanOrEquals", numberLessThanOrEquals);
 /**
  * @decorator IsNumberLestThanOrEquals
  *
@@ -132,7 +132,7 @@ function numberLessThan(options: IValidatorValidateOptions) {
     options
   );
 }
-Validator.registerRule("numberLessThan", numberLessThan);
+Validator.registerRule("NumberLessThan", numberLessThan);
 
 /**
  * @decorator IsNumberLessThan
@@ -203,7 +203,7 @@ function numberGreaterThanOrEquals(options: IValidatorValidateOptions) {
     options
   );
 }
-Validator.registerRule("numberGreaterThanOrEquals", numberGreaterThanOrEquals);
+Validator.registerRule("NumberGreaterThanOrEquals", numberGreaterThanOrEquals);
 
 /**
  * @decorator IsNumberGreaterThanOrEquals
@@ -273,7 +273,7 @@ function numberGreaterThan(options: IValidatorValidateOptions) {
     options
   );
 }
-Validator.registerRule("numberGreaterThan", numberGreaterThan);
+Validator.registerRule("NumberGreaterThan", numberGreaterThan);
 
 /**
  * @decorator IsNumberGreaterThan
@@ -344,7 +344,7 @@ function numberEqualsTo(options: IValidatorValidateOptions) {
     options
   );
 }
-Validator.registerRule("numberEquals", numberEqualsTo);
+Validator.registerRule("NumberEquals", numberEqualsTo);
 
 /**
  * @decorator IsNumberEquals
@@ -415,7 +415,7 @@ function numberIsDifferentFromTo(options: IValidatorValidateOptions) {
     options
   );
 }
-Validator.registerRule("numberIsDifferentFrom", numberIsDifferentFromTo);
+Validator.registerRule("NumberIsDifferentFrom", numberIsDifferentFromTo);
 
 /**
  * @decorator ValidatorNumberIsDifferentFrom
@@ -476,7 +476,7 @@ export const ValidatorNumberIsDifferentFrom = Validator.createRuleDecorator<[par
  * - The error message can be customized by modifying the translation key used in `i18n.t`.
  * - The `isEmpty` utility function is used to check for empty values, which may include `null`, `undefined`, or empty strings.
  */
-Validator.registerRule("required", function required(options) {
+Validator.registerRule("Required", function Required(options) {
   const value = options?.value;
   return !isEmpty(value) || i18n.t("validator.required");
 });
@@ -536,7 +536,7 @@ function numberHasLength({ value, ruleParams }: IValidatorValidateOptions) {
   }
   return true;
 }
-Validator.registerRule("length", numberHasLength);
+Validator.registerRule("Length", numberHasLength);
 
 /**
  * @decorator HasLength
@@ -609,7 +609,7 @@ export const HasLength = Validator.createRuleDecorator<[minOrLength: number, max
  * - The error message can be customized by modifying the translation key used in `i18n.t`.
  * - The rule allows for `null` or non-string values to pass through without validation, which can be useful for optional email fields.
  */
-Validator.registerRule("email", function email(options) {
+Validator.registerRule("Email", function Email(options) {
   const value = options?.value;
   if (!value || typeof value !== "string") {
     return true;
@@ -649,7 +649,7 @@ Validator.registerRule("email", function email(options) {
  * - The error message can be customized by modifying the translation key used in `i18n.t`.
  * - The rule allows for `null` or non-string values to pass through without validation, which can be useful for optional URL fields.
  */
-Validator.registerRule("url", function url(options) {
+Validator.registerRule("Url", function Url(options) {
   const value = options?.value;
   return !value || typeof value !== "string" ? true : isValidUrl(value) || i18n.t("validator.url", options);
 });
@@ -695,7 +695,7 @@ function minLength(options: IValidatorValidateOptions) {
   const message = i18n.t("validator.minLength", { ...options, minLength: mLength });
   return isEmpty(value) || (value && typeof value === "string" && String(value).length >= mLength) || message;
 }
-Validator.registerRule("minLength", minLength);
+Validator.registerRule("MinLength", minLength);
 
 /**
  * @decorator HasMinLength
@@ -767,7 +767,7 @@ function maxLength(options: IValidatorValidateOptions) {
   const message = i18n.t("validator.maxLength", { ...options, maxLength: mLength });
   return isEmpty(value) || (value && typeof value === "string" && String(value).length <= mLength) || message;
 }
-Validator.registerRule("maxLength", maxLength);
+Validator.registerRule("MaxLength", maxLength);
 
 /**
  * @decorator HasMaxLength
@@ -837,22 +837,22 @@ export const HasMaxLength = Validator.createRuleDecorator<[maxLength: number]>(m
  * - The error message can be customized as needed.
  * - The `isNonNullString` utility function is used to check that the value is a non-null string before performing further validation.
  */
-Validator.registerRule("fileName", function fileName(options) {
+Validator.registerRule("FileName", function FileName(options) {
   const { value } = options;
   const message = i18n.t("validator.fileName", options);
   if (!isNonNullString(value)) return message;
-  const rg1 = /^[^\\/:\*\?"<>\|]+$/; // forbidden characters \ / : * ? " < > |
+  const rg1 = /^[^\\/:*?"<>|]+$/; // forbidden characters \ / : * ? " < > |
   const rg2 = /^\./; // cannot start with dot (.)
   const rg3 = /^(nul|prn|con|lpt[0-9]|com[0-9])(\.|$)/i; // forbidden file names
   return (rg1.test(String(value)) && !rg2.test(value) && !rg3.test(value)) || message;
 });
 
-Validator.registerRule("number", function number(options) {
+Validator.registerRule("Number", function Number(options) {
   const { value } = options;
   return typeof value === "number" || i18n.t("validator.isNumber", options);
 });
 
-Validator.registerRule("nonNullString", function nonNullString(options) {
+Validator.registerRule("NonNullString", function NonNullString(options) {
   const { value } = options;
   return isNonNullString(value) || i18n.t("validator.isNonNullString", options);
 });
@@ -861,7 +861,7 @@ function phoneNumber(options: IValidatorValidateOptions) {
   const { value, phoneCountryCode } = options;
   return InputFormatter.isValidPhoneNumber(value, phoneCountryCode) || i18n.t("validator.phoneNumber", options);
 }
-Validator.registerRule("phoneNumber", phoneNumber);
+Validator.registerRule("PhoneNumber", phoneNumber);
 
 /**
  * A validator decorator to check if a phone number is valid.
@@ -876,13 +876,13 @@ Validator.registerRule("phoneNumber", phoneNumber);
  * }
  * ```
  */
-export const IsPhoneNumber = Validator.createPropertyDecorator("phoneNumber");
+export const IsPhoneNumber = Validator.createPropertyDecorator("PhoneNumber");
 
 function emailOrPhoneNumber(options: IValidatorValidateOptions) {
   const { value, phoneCountryCode } = options;
   return isValidEmail(value) || InputFormatter.isValidPhoneNumber(value, phoneCountryCode) || i18n.t("validator.emailOrPhoneNumber", options);
 }
-Validator.registerRule("emailOrPhoneNumber", emailOrPhoneNumber);
+Validator.registerRule("EmailOrPhoneNumber", emailOrPhoneNumber);
 
 /**
  * A validator decorator to check if value is a valid email or phone number.
@@ -897,4 +897,4 @@ Validator.registerRule("emailOrPhoneNumber", emailOrPhoneNumber);
  * }
  * ```
  */
-export const IsEmailOrPhoneNumber = Validator.createPropertyDecorator("emailOrPhoneNumber");
+export const IsEmailOrPhoneNumber = Validator.createPropertyDecorator("EmailOrPhoneNumber");

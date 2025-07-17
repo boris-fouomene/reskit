@@ -28,7 +28,7 @@ import { i18n } from "../../../i18n";
  * - `prohibited_unless` - Prohibited unless another field equals value
  * 
  * @author Resk Framework Team
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#available-validation-rules | Laravel Array Rules}
  * @public
  */
@@ -91,7 +91,7 @@ import { i18n } from "../../../i18n";
  * @param options.ruleParams - Optional array of allowed keys
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-array | Laravel array Rule}
  * @public
  */
@@ -194,7 +194,7 @@ export function ArrayRule({ value, ruleParams, fieldName, translatedPropertyName
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-Filled | Laravel Filled Rule}
  * @public
  */
@@ -280,7 +280,7 @@ export function Filled({ value, fieldName, translatedPropertyName, ...rest }: IV
  * @param options.ruleParams - Array of allowed values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-in | Laravel in Rule}
  * @public
  */
@@ -364,7 +364,7 @@ export function InRule({ value, ruleParams, fieldName, translatedPropertyName, .
  * @param options.ruleParams - Array of forbidden values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-not-in | Laravel not_in Rule}
  * @public
  */
@@ -458,7 +458,7 @@ export function NotIn({ value, ruleParams, fieldName, translatedPropertyName, ..
  * @param options - Validation options containing value and context
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required | Laravel required Rule}
  * @public
  */
@@ -541,7 +541,7 @@ export function Required({ value, fieldName, translatedPropertyName, ...rest }: 
  * @param options.context - Validation context containing other field values
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-required-if | Laravel required_if Rule}
  * @public
  */
@@ -644,7 +644,7 @@ export function RequiredIf({ value, ruleParams, context, fieldName, translatedPr
  * @param options.ruleParams - Array with size specification
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-size | Laravel size Rule}
  * @public
  */
@@ -764,7 +764,7 @@ export function Size({ value, ruleParams, fieldName, translatedPropertyName, ...
  * @param options.ruleParams - Optional array with comparison options
  * @returns Promise resolving to true if valid, rejecting with error message if invalid
  * 
- * @since 2.0.0
+ * @since 1.22.0
  * @see {@link https://laravel.com/docs/11.x/validation#rule-distinct | Laravel distinct Rule}
  * @public
  */

@@ -180,7 +180,7 @@
  * ```
  * 
  * @author Resk Framework Team
- * @since 2.0.0
+ * @since 1.22.0
  * @version 1.0.0
  * @see {@link https://laravel.com/docs/11.x/validation | Laravel Validation Documentation}
  * @public

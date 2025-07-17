@@ -1,6 +1,6 @@
 {
   "name": "@resk/nativewind",
-  "version": "1.0.1-canary.25",
+  "version": "1.0.1-canary.27",
   "description": "Precompiled TypeScript UI framework built on NativeWind",
   "license": "ISC",
   "author": "",
@@ -19,53 +19,121 @@
     "theme-to-css-vars.js",
     "animations.js"
   ],
-  "exports": {
-    ".": "./build/index.js",
-    "./*": "./build/*",
-    "./components/*": "./components/*.js",
-    "./components/activityIndicator": "./components/activityIndicator.js",
-    "./components/alert": "./components/alert.js",
-    "./components/avatar": "./components/avatar.js",
-    "./components/backdrop": "./components/backdrop.js",
-    "./components/backHandler": "./components/backHandler.js",
-    "./components/badge": "./components/badge.js",
-    "./components/bottomSheet": "./components/bottomSheet.js",
-    "./components/button": "./components/button.js",
-    "./components/checkbox": "./components/checkbox.js",
-    "./components/countrySelector": "./components/countrySelector.js",
-    "./components/dialog": "./components/dialog.js",
-    "./components/divider": "./components/divider.js",
-    "./components/drawer": "./components/drawer.js",
-    "./components/expandable": "./components/expandable.js",
-    "./components/helperText": "./components/helperText.js",
-    "./components/icon": "./components/icon.js",
-    "./components/keyboardAvoidingView": "./components/keyboardAvoidingView.js",
-    "./components/keyboardEventHandler": "./components/keyboardEventHandler.js",
-    "./components/menu": "./components/menu.js",
-    "./components/modal": "./components/modal.js",
-    "./components/nav": "./components/nav.js",
-    "./components/portal": "./components/portal.js",
-    "./components/progressBar": "./components/progressBar.js",
-    "./components/slot": "./components/slot.js",
-    "./components/stack": "./components/stack.js",
-    "./components/surface": "./components/surface.js",
-    "./components/switch": "./components/switch.js",
-    "./components/textInput": "./components/textInput.js",
-    "./components/tooltip": "./components/tooltip.js",
-    "./html": "./build/html/index.js",
-    "./variants": "./build/variants/index.js",
-    "./utils": "./build/utils/index.js",
-    "./i18n": "./build/i18n/index.js",
-    "./platform": "./build/platform/index.js",
-    "./theme-to-css-vars": "./theme-to-css-vars.js"
-  },
-  "typesVersions11": {
+  "typesVersions": {
     "*": {
-      ".": [
+      "./components/activityIndicator": [
+        "./build/components/ActivityIndicator/index.d.ts"
+      ],
+      "./components/alert": [
+        "./build/components/Alert/index.d.ts"
+      ],
+      "./components/avatar": [
+        "./build/components/Avatar/index.d.ts"
+      ],
+      "./components/backdrop": [
+        "./build/components/Backdrop/index.d.ts"
+      ],
+      "./components/backHandler": [
+        "./build/components/BackHandler/index.d.ts"
+      ],
+      "./components/badge": [
+        "./build/components/Badge/index.d.ts"
+      ],
+      "./components/bottomSheet": [
+        "./build/components/BottomSheet/index.d.ts"
+      ],
+      "./components/button": [
+        "./build/components/Button/index.d.ts"
+      ],
+      "./components/checkbox": [
+        "./build/components/Checkbox/index.d.ts"
+      ],
+      "./components/countrySelector": [
+        "./build/components/CountrySelector/index.d.ts"
+      ],
+      "./components/dialog": [
+        "./build/components/Dialog/index.d.ts"
+      ],
+      "./components/divider": [
+        "./build/components/Divider/index.d.ts"
+      ],
+      "./components/drawer": [
+        "./build/components/Drawer/index.d.ts"
+      ],
+      "./components/expandable": [
+        "./build/components/Expandable/index.d.ts"
+      ],
+      "./components/helperText": [
+        "./build/components/HelperText/index.d.ts"
+      ],
+      "./components/icon": [
+        "./build/components/Icon/index.d.ts"
+      ],
+      "./components/keyboardAvoidingView": [
+        "./build/components/KeyboardAvoidingView/index.d.ts"
+      ],
+      "./components/keyboardEventHandler": [
+        "./build/components/KeyboardEventHandler/index.d.ts"
+      ],
+      "./components/menu": [
+        "./build/components/Menu/index.d.ts"
+      ],
+      "./components/modal": [
+        "./build/components/Modal/index.d.ts"
+      ],
+      "./components/nav": [
+        "./build/components/Nav/index.d.ts"
+      ],
+      "./components/portal": [
+        "./build/components/Portal/index.d.ts"
+      ],
+      "./components/progressBar": [
+        "./build/components/ProgressBar/index.d.ts"
+      ],
+      "./components/slot": [
+        "./build/components/Slot/index.d.ts"
+      ],
+      "./components/stack": [
+        "./build/components/Stack/index.d.ts"
+      ],
+      "./components/surface": [
+        "./build/components/Surface/index.d.ts"
+      ],
+      "./components/switch": [
+        "./build/components/Switch/index.d.ts"
+      ],
+      "./components/textInput": [
+        "./build/components/TextInput/index.d.ts"
+      ],
+      "./components/tooltip": [
+        "./build/components/Tooltip/index.d.ts"
+      ],
+      "./components/form": [
+        "./build/components/Form/index.d.ts"
+      ],
+      "./components/*": [
+        "./build/components/index.d.ts"
+      ],
+      "./html": [
+        "./build/html/index.d.ts"
+      ],
+      "./variants": [
+        "./build/variants/index.d.ts"
+      ],
+      "./utils": [
+        "./build/utils/index.d.ts"
+      ],
+      "./i18n": [
+        "./build/i18n/index.d.ts"
+      ],
+      "./platform": [
+        "./build/platform/index.d.ts"
+      ],
+      "*" : [
         "./build/index.d.ts"
       ],
-      "html": [
-        "./build/html/index.d.ts"
+      "./theme-to-css-vars": [
+        "./theme-to-css-vars.js"
       ]
     }
   },
@@ -101,7 +169,7 @@
     "tailwind-variants": "^1.0.0"
   },
   "dependencies": {
-    "@resk/core": "^1.21.4",
+    "@resk/core": "^1.21.7",
     "clsx": "^2.1.1",
     "commander": "^14.0.0",
     "tailwind-merge": "^3.2.0",

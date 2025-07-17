@@ -1,6 +1,6 @@
 "use client";
 import "./types";
-import { cn, Component, getTextContent, ObservableComponent, useMergeRefs, useStateCallback } from "@utils/index";
+import { cn, Component, getTextContent, useMergeRefs, useStateCallback } from "@utils/index";
 import { IFieldType, IField, IFields } from "@resk/core/resources";
 import { IValidatorRule, IValidatorValidateOptions, Validator, } from "@resk/core/validator";
 import { InputFormatter } from "@resk/core/inputFormatter";
@@ -20,7 +20,7 @@ import { typedEntries } from "@resk/core/build/utils/object";
 import { Auth, IAuthPerm } from "@resk/core/auth";
 import { IObservable, observableFactory } from "@resk/core/observable";
 import { useImperativeHandle } from "react";
-import { IButtonInteractiveProps } from "@components/Button/types";
+import { IButtonInteractiveContext, IButtonInteractiveProps } from "@components/Button/types";
 import { Button } from "@components/Button";
 
 
@@ -1302,19 +1302,19 @@ export class FormsManager {
     }
 }
 
-export function FormAction<FormFields extends IFields = IFields, Context = unknown>({ formName, id, className, ref, onPress, context, ...props }: IFormActionProps<FormFields, Context>) {
-    const innerRef = useRef(null);
+export function FormAction<FormFields extends IFields = IFields, Context = unknown>({ formName, submitFormOnPress, id, className, ref, onPress, context, ...props }: IFormActionProps<FormFields, Context>) {
+    const innerRef = useRef<IButtonInteractiveContext<Context> & View>(null);
     const mergedRef = useMergeRefs(innerRef, ref);
     const generatedId = useId();
     id = defaultStr(id, generatedId);
     useEffect(() => {
         if (isNonNullString(formName) && innerRef.current) {
-            FormsManager.mountAction(innerRef.current, formName);
+            FormsManager.mountAction({ ...innerRef.current, formName }, formName);
         }
         return () => {
             FormsManager.unmountAction(id, formName);
         };
-    }, [innerRef, formName]);
+    }, [innerRef, formName, id]);
     useEffect(() => {
         return () => {
             FormsManager.unmountAction(id, formName);
@@ -1329,9 +1329,16 @@ export function FormAction<FormFields extends IFields = IFields, Context = unkno
         ref={mergedRef}
         onPress={(event, context) => {
             const form = FormsManager.getForm<FormFields>(formName);
+            if (!form?.isValid?.()) {
+                innerRef?.current?.disable();
+                return;
+            }
             const options = Object.assign({}, context, form ? { form, formData: form.getData() } : {});
-            if (typeof onPress == "function") {
-                onPress(event, options as any);
+            if (typeof onPress == "function" && onPress(event, options) === false) {
+                return;
+            }
+            if (form && submitFormOnPress !== false) {
+                form.submit();
             }
         }}
     />

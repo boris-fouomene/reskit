@@ -1,7 +1,7 @@
-
 import { ISwitchProps, IToggleableProps, Switch } from "@components/Switch";
 import { getToggleableDefaultValues } from "@components/Switch/utils";
-import { FormField, AttachFormField, IFormFieldProps } from "../base";
+import { FormField, IFormFieldProps } from "../base";
+import { AttachFormField } from "../attachFormField";
 import { IField, IFieldType } from "@resk/core/resources";
 
 @AttachFormField<"switch">("switch")

@@ -1,8 +1,7 @@
 import { IField } from "@resk/core/types";
-import { IFormFieldProps } from "../base";
-import { FormField, AttachFormField } from "../base";
+import { FormField, IFormFieldProps } from "../base";
+import { AttachFormField } from "../attachFormField";
 import { Dropdown, IDropdownProps } from "@components/Dropdown";
-import { ITextInputProps } from "@components/TextInput";
 
 @AttachFormField("select")
 export class FormFieldSelect extends FormField<"select"> {

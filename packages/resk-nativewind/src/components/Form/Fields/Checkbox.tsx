@@ -1,6 +1,6 @@
 import { FormFieldSwitch } from "./Switch";
 import { Checkbox, ICheckboxProps } from "@components/Checkbox";
-import { AttachFormField } from "../index";
+import { AttachFormField } from "../attachFormField";
 import { IField } from "@resk/core/types";
 import { ReactElement } from "react";
 import { IFormFieldProps } from "../base";

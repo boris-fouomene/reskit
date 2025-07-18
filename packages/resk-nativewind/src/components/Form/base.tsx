@@ -478,7 +478,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
      * const isFilterField = this.isFilter(); // Checks if the field is a filter
      */
     isFilter(): boolean {
-        return !!this.props?.isFilter || !!this.props?.isFilter;
+        return !!this.props.isFilter;
     }
     /**
      * Checks if the field is editable.

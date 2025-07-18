@@ -1,20 +1,22 @@
 import { Text, Div, Heading, Table, H2, Details } from '@resk/nativewind/html';
-import { ScrollView } from 'react-native';
 import { DialogExample } from './DialogExample';
 import { BottomSheetExample } from './BottomSheetExample';
 import { AlertExamples } from './AlertExamples';
-import { DrawerChildren } from './DialogExample';
-import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, buttonVariant, CountrySelector, TelInput, Drawer, Expandable } from "@resk/nativewind";
+import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, CountrySelector, TelInput, Expandable, SSRScrollView, cn } from "@resk/nativewind";
+import { buttonVariant } from "@resk/nativewind/variants";
+
 type ScreenContentProps = {
   title: string;
   children?: React.ReactNode;
 };
 export const ScreenContent = ({ title, children }: ScreenContentProps) => {
   return (
-    <ScrollView testID='main-entry-appp flex-1 main-scrollview' style={{ maxHeight: "100%", maxWidth: "100%" }} contentContainerStyle={{}}>
+    <SSRScrollView>
       <DialogExample />
       <BottomSheetExample />
-
+      <VStack className={cn("p-4 resk-drawer-no-hydration-fallback items-center justify-center")}>
+        <ActivityIndicator variant={{ color: "primary" }} />
+      </VStack>;
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10 gap-y-5">
@@ -272,7 +274,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           </Table.TFoot>
         </Table>
       </Div>
-    </ScrollView>
+    </SSRScrollView>
   );
 };
 

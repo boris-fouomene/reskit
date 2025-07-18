@@ -36,7 +36,22 @@ export function ActivityIndicator({ size, borderWidth, style, variant, testID, i
         style = [{ borderTopColor: color }, style];
     }
     testID = defaultStr(testID, "resk-activity-indicator");
-    return <Div role="progressbar" {...props} testID={testID} id={id} style={StyleSheet.flatten(style) as any} className={cn("resk-activity-indicator animate-spin rounded-full", clx, activityIndicatorVariant(variant), className)} />
+    // Remove any role from props to avoid SSR hydration errors
+    const { role: _role, ...restProps } = props;
+    // Accessibility attributes for a loading spinner
+    return (
+        <Div
+            role="progressbar"
+            aria-busy
+            aria-label="loading"
+            aria-valuetext="Loading..."
+            {...restProps}
+            testID={testID}
+            id={id}
+            style={StyleSheet.flatten(style) as any}
+            className={cn("resk-activity-indicator animate-spin rounded-full", clx, activityIndicatorVariant(variant), className)}
+        />
+    );
 }
 
 export * from "./types";

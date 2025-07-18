@@ -926,11 +926,6 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
   }
   render() {
     const { containerClassName, items, itemsProps, style, children, className, hydrationFallback } = this.getComponentProps();
-    if (!this.isHydrated()) {
-      return hydrationFallback || <VStack className={cn("p-4 resk-drawer-no-hydration-fallback items-center justify-center", className)}>
-        <ActivityIndicator variant={{ color: "primary" }} />
-      </VStack>;
-    }
     const { accessibilityViewIsModal, drawerShown, openValue } = this.state;
     const computedVariant = this.computeVariant();
     const testID = this.getTestID();
@@ -951,37 +946,42 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
     return (
       <Wrapper {...wrapperProps}>
         <DrawerContext.Provider value={{ drawer: this }}>
-          <Div testID={testID + "-container"} className={cn("resk-drawer-container relative h-full flex-col items-start justify-start", isProvider && "resk-drawer-provider-container", computedVariant.container(), containerClassName)}>
-            {!permanent && this.isOpen() ? (<Backdrop onPress={() => this.close()} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
-            {<Animated.View
-              {...(canRenderTemp ? this._panResponder.panHandlers : {})}
-              testID={testID + "-animated-content"}
-              accessibilityViewIsModal={accessibilityViewIsModal}
-              className={cn("resk-drawer-animated")}
-              style={[
-                permanent ? { position: "relative" } : { position: "absolute", zIndex: 10, top: 0, bottom: 0, left: 0, right: 0 },
-                {
+          {!this.isHydrated() ? <>
+            {hydrationFallback || <VStack testID={testID + "-no-hydrated"} className={cn("p-4 resk-drawer-no-hydration-fallback items-center justify-center", className)}>
+              <ActivityIndicator testID={testID + "-no-hydrated-indicator"} variant={{ color: "primary" }} />
+            </VStack>}
+          </> :
+            <Div testID={testID + "-container"} className={cn("resk-drawer-container relative h-full flex-col items-start justify-start", isProvider && "resk-drawer-provider-container", computedVariant.container(), containerClassName)}>
+              {!permanent && this.isOpen() ? (<Backdrop onPress={() => this.close()} testID={testID + "-backdrop"} className={cn("resk-drawer-backdrop")} />) : null}
+              {<Animated.View
+                {...(canRenderTemp ? this._panResponder.panHandlers : {})}
+                testID={testID + "-animated-content"}
+                accessibilityViewIsModal={accessibilityViewIsModal}
+                className={cn("resk-drawer-animated")}
+                style={[
+                  permanent ? { position: "relative" } : { position: "absolute", zIndex: 10, top: 0, bottom: 0, left: 0, right: 0 },
+                  {
 
-                  pointerEvents: "auto",
-                  flex: 1,
-                  width: drawerWidth,
-                  height: "100%",
-                  left: !posRight ? 0 : null,
-                  right: posRight ? 0 : null,
-                  transform: [{ translateX: drawerTranslateX }],
-                }
-              ]}
-            >
-              {<Div style={StyleSheet.flatten(style)} className={cn("flex-1 pointer-events-auto w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", computedVariant.base(), className)} testID={testID + "drawer-content"}>
-                {this.renderHeader()}
-                {Array.isArray(items) && items.length > 0 ? <DrawerItems
-                  {...itemsProps}
-                  items={items}
-                /> : null}
-                {isProvider ? (this.state.providerOptions ? this.state.providerOptions.children : null) : this.state.children}
-              </Div>}
-            </Animated.View>}
-          </Div>
+                    pointerEvents: "auto",
+                    flex: 1,
+                    width: drawerWidth,
+                    height: "100%",
+                    left: !posRight ? 0 : null,
+                    right: posRight ? 0 : null,
+                    transform: [{ translateX: drawerTranslateX }],
+                  }
+                ]}
+              >
+                {<Div style={StyleSheet.flatten(style)} className={cn("flex-1 pointer-events-auto w-full h-full flex-col resk-drawer", isProvider && "resk-drawer-provider", computedVariant.base(), className)} testID={testID + "drawer-content"}>
+                  {this.renderHeader()}
+                  {Array.isArray(items) && items.length > 0 ? <DrawerItems
+                    {...itemsProps}
+                    items={items}
+                  /> : null}
+                  {isProvider ? (this.state.providerOptions ? this.state.providerOptions.children : null) : this.state.children}
+                </Div>}
+              </Animated.View>}
+            </Div>}
         </DrawerContext.Provider>
       </Wrapper>
     );

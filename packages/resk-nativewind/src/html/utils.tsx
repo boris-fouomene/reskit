@@ -1,4 +1,4 @@
-import { defaultStr, isEmpty, isNonNullString } from "@resk/core/utils";
+import { defaultStr, isEmpty, isNonNullString, typedEntries } from "@resk/core/utils";
 import { IHtmlAccessibilityProps, IHtmlDivProps, INativeAccessibilityProps } from "./types";
 import { cn, getTextContent, normalizeProps as baseNormalizeProps } from "@utils";
 import { StyleSheet, Platform, PressableProps } from "react-native";
@@ -149,7 +149,6 @@ export function normalizeHtmlProps<T extends Partial<IHtmlDivProps> = Partial<IH
         screenReaderFocusable,
         ...props
     } as any);
-
     const r: Record<string, any> = {
         style: style ? StyleSheet.flatten(style) : undefined as any,
         title: title ? getTextContent(title) : undefined,
@@ -287,7 +286,8 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({
     // Event handlers that need to be filtered out
     ...rnProps
 }: T): Omit<T, keyof INativeAccessibilityProps> {
-    const domProps: Partial<T> & IHtmlAccessibilityProps = rnProps as any;
+    const domProps: Partial<T> & IHtmlAccessibilityProps = {};
+
 
     // Primary accessibility label
     domProps['aria-label'] = defaultStr(rnProps["aria-label"], accessibilityLabel);
@@ -368,8 +368,12 @@ export function convertAccessibilityPropsToDOM<T extends IHtmlDivProps>({
     if ((domProps as any)["selectable"] !== undefined) {
         (domProps as any)["selectable"] = String((domProps as any)["selectable"]);
     }
-
-    return domProps as any;
+    for (const i in domProps) {
+        if (isEmpty((domProps as any)[i])) {
+            delete (domProps as any)[i];
+        }
+    }
+    return { ...rnProps, ...domProps } as any;
 }
 
 /**

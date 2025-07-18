@@ -18,7 +18,7 @@ export class FormFieldSelect extends FormField<"select"> {
     }
 }
 
-interface IFormFieldSelectProps extends IFormFieldProps<"select", any>, Omit<IDropdownProps<any, any>, "defaultValue"> { }
+interface IFormFieldSelectProps extends IFormFieldProps<"select", any, IDropdownProps["onChange"]>, Omit<IDropdownProps<any, any>, "defaultValue" | "onChange"> { }
 
 declare module "@resk/core/resources" {
     export interface IFieldMap {

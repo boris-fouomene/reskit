@@ -1511,7 +1511,7 @@ export type IFormData<Fields extends IFields = IFields> = {
     [K in (keyof Fields | string | number | symbol)]: any;
 };
 
-export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, ValueType = any> extends IFieldBase<FieldType, ValueType> {
+export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, ValueType = any, TOnChangeOptions = unknown> extends IFieldBase<FieldType, ValueType> {
     testID?: string;
     className?: IClassName;
     onKeyEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
@@ -1567,11 +1567,13 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
     isRendable?: boolean;
 
     ref?: any;
+
+    onChange?: (options: IFormFieldOnChangeOptions<FieldType, ValueType, TOnChangeOptions>) => void;
 }
 
 export interface IFormFieldTextProps<FieldType extends IFieldType = IFieldType, ValueType = any>
     extends IFormFieldProps<FieldType, ValueType>, Omit<ITextInputProps<ValueType>, "onChange" | "ref" | "type"> {
-    onChange?: (options: IFormFieldOnChangeOptions<FieldType, ValueType>) => void;
+
 }
 
 export interface IFormProps<Fields extends IFields = IFields> extends Omit<ViewProps, "children" | "ref"> {
@@ -1863,12 +1865,12 @@ export interface IFormSubmitOptions<Fields extends IFields = IFields> {
     form: IFormContext<Fields>;
 };
 
-export interface IFormFieldOnChangeOptions<FieldType extends IFieldType = IFieldType, ValueType = any> extends IOnChangeOptions {
+export type IFormFieldOnChangeOptions<FieldType extends IFieldType = IFieldType, ValueType = any, TOnChangeOptions = unknown> = IOnChangeOptions & {
 
     context: FormField<FieldType>;
 
     prevValue: ValueType;
-};
+} & TOnChangeOptions;
 
 
 export function AttachFormField<FieldType extends IFieldType = IFieldType, ValueType = any, TState extends IFormFieldState<FieldType, any> = IFormFieldState<FieldType, any>>(type: FieldType) {

@@ -19,7 +19,7 @@ export class SelectCountryField extends FormField<"selectCountry"> {
     }
 }
 
-interface IFormFieldSelectCountryProps extends IFormFieldProps<"selectCountry", ICountrySelectorProps["defaultValue"]>, ICountrySelectorProps { }
+interface IFormFieldSelectCountryProps extends IFormFieldProps<"selectCountry", ICountrySelectorProps["defaultValue"], ICountrySelectorProps["onChange"]>, Omit<ICountrySelectorProps, "onChange"> { }
 
 declare module "@resk/core/resources" {
     export interface IFieldMap {

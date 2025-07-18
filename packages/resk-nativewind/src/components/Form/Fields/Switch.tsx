@@ -21,7 +21,7 @@ export class FormFieldSwitch<Type extends IFieldType = "switch"> extends FormFie
     }
 }
 
-interface IFormFieldSwitchProps extends IFormFieldProps<"switch">, ISwitchProps { }
+interface IFormFieldSwitchProps extends IFormFieldProps<"switch", any, ISwitchProps["onChange"]>, Omit<ISwitchProps, "onChange"> { }
 
 declare module "@resk/core/resources" {
     export interface IFieldMap {

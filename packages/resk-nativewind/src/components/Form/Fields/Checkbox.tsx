@@ -12,7 +12,7 @@ export class FormFieldCheckbox extends FormFieldSwitch<"checkbox"> {
 }
 
 
-interface IFormFieldCheckboxProps extends IFormFieldProps<"checkbox">, Omit<ICheckboxProps, "ref"> { }
+interface IFormFieldCheckboxProps extends IFormFieldProps<"checkbox", any, ICheckboxProps["onChange"]>, Omit<ICheckboxProps, "ref" | "onChange"> { }
 
 declare module "@resk/core/resources" {
     export interface IFieldMap {

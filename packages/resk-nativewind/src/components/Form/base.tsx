@@ -50,22 +50,73 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         }
     }
 
+    /**
+     * Compares two values to determine if they are equal.
+     *
+     * This method is used to check if the current value and the previous value of the field are considered equal.
+     * It uses a utility function to handle deep equality and empty value checks.
+     *
+     * @param {any} a - The first value to compare.
+     * @param {any} b - The second value to compare.
+     * @returns {boolean} - Returns true if the values are equal or both are empty, otherwise false.
+     *
+     * @example
+     * // Compare two numbers
+     * const isEqual = this.compareValues(5, 5); // true
+     *
+     * // Compare two strings
+     * const isEqual = this.compareValues("abc", "abc"); // true
+     *
+     * // Compare empty values
+     * const isEqual = this.compareValues(undefined, null); // true
+     *
+     * // Compare objects
+     * const isEqual = this.compareValues({ a: 1 }, { a: 1 }); // true
+     */
     compareValues(a: any, b: any): boolean {
         return compareValues(a, b);
     }
 
+
     /**
-     * Checks if validation has been performed on the field.
-     * 
-     * @returns {boolean} - Returns true if validation has been performed, otherwise false.
-     * 
+     * Indicates whether the field has been validated.
+     *
+     * This method returns a boolean value representing whether the field has undergone validation.
+     * It is useful for determining if validation logic has already been executed for this field.
+     *
+     * @returns {boolean} - Returns true if the field has been validated, otherwise false.
+     *
      * @example
-     * const hasValidated = this.hasValidated(); // true or false
+     * if (this.hasValidated()) {
+     *   // Show validation feedback or error messages
+     * }
      */
     hasValidated(): boolean {
         return !!this.state.hasValidated;
     }
-
+    /**
+     * Determines whether the error message for the form field should be displayed.
+     *
+     * This method checks several conditions to decide if an error should be shown:
+     * - The field is not a filter field (`isFilter()` returns false).
+     * - The component's state contains an error (`this.state.error` is truthy).
+     * - The field has been validated (`hasValidated()` returns true).
+     * - The form has at least one invalid submission (`form?.getInvalidSubmitCount() > 0`).
+     *
+     * @returns {boolean} Returns `true` if all conditions are met and the error message should be displayed; otherwise, returns `false`.
+     *
+     * @example
+     * ```tsx
+     * // Example usage within a form component
+     * if (this.canDisplayError()) {
+     *   return <span className="error">{this.state.error}</span>;
+     * }
+     * ```
+     *
+     * @remarks
+     * This method is typically used to control the rendering of error messages in form components,
+     * ensuring that errors are only shown after validation and failed submissions.
+     */
     canDisplayError(): boolean {
         const form = this.getForm();
         return (
@@ -89,31 +140,156 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         return this.validate({ value } as IFormFieldValidatorOptions<FieldType, ValueType>);
     }
 
+    /**
+     * Retrieves the instance of a specific field within the current form.
+     *
+     * This method allows you to access the FormField instance for a given field name,
+     * enabling direct interaction with its state, validation, and methods.
+     *
+     * @template FieldType - The type of the field (default: IFieldType).
+     * @template ValueType - The value type of the field (default: any).
+     * @param {string} fieldName - The name of the field to retrieve.
+     * @returns {FormField<FieldType, ValueType> | null} - The FormField instance if found, otherwise null.
+     *
+     * @example
+     * ```tsx
+     * // Access the "email" field instance and focus it
+     * const emailField = form.getFieldInstance<"email">("email");
+     * emailField?.focus();
+     *
+     * // Check if a field is valid
+     * const phoneField = form.getFieldInstance<"phone">("phone");
+     * if (phoneField?.isValid()) {
+     *   // Do something with the valid phone field
+     * }
+     * ```
+     *
+     * @remarks
+     * This is useful for advanced form logic, such as programmatically focusing fields,
+     * reading their values, or triggering validation outside of the normal flow.
+     */
     getFieldInstance<FieldType extends IFieldType = IFieldType, ValueType = any>(fieldName: string): FormField<FieldType, ValueType> | null {
         return FormsManager.getFieldInstance<FieldType>(this.getFormName(), fieldName) as any;
     }
+    /**
+     * Determines if the current field is of type "email".
+     *
+     * This method checks the field type and returns true if it matches "email".
+     * Useful for applying email-specific validation rules or rendering logic.
+     *
+     * @returns {boolean} Returns true if the field type is "email", otherwise false.
+     *
+     * @example
+     * // Example usage in a form field
+     * if (this.isEmail()) {
+     *   // Apply email validation or show email-specific UI
+     * }
+     *
+     * @remarks
+     * This method is typically used internally to conditionally add email validation rules
+     * or to customize the rendering of email fields.
+     */
     isEmail() {
         return defaultStr(this.getType()).toLowerCase().trim() === "email";
     }
+    /**
+     * Determines if the current field is of type "phone" or "tel".
+     *
+     * This method checks the field type and returns true if it matches either "phone" or "tel".
+     * Useful for applying phone-specific validation rules or rendering logic.
+     *
+     * @returns {boolean} Returns true if the field type is "phone" or "tel", otherwise false.
+     *
+     * @example
+     * // Example usage in a form field
+     * if (this.isPhone()) {
+     *   // Apply phone validation or show phone-specific UI
+     * }
+     *
+     * @remarks
+     * This method is typically used internally to conditionally add phone validation rules
+     * or to customize the rendering of phone fields.
+     */
     isPhone() {
         return ["tel", "phone"].includes(defaultStr(this.getType()).toLowerCase().trim());
     }
 
+    /**
+     * Mutates the options object before validation or change events.
+     *
+     * This protected method allows you to customize or transform the validation options
+     * before they are used in validation or change handlers. Override this method in a subclass
+     * to inject additional properties, modify values, or apply business logic.
+     *
+     * @param {IFormFieldValidatorOptions<FieldType, ValueType>} options - The options object to mutate.
+     * @returns {IFormFieldValidatorOptions<FieldType, ValueType>} - The mutated options object.
+     *
+     * @example
+     * // Example: Add a custom property before validation
+     * protected onChangeOptionsMutator(options) {
+     *   options.customFlag = true;
+     *   return options;
+     * }
+     *
+     * @remarks
+     * This method is called internally before validation and change events.
+     * It is useful for advanced scenarios where you need to inject context, flags,
+     * or transform values before validation logic runs.
+     */
     protected onChangeOptionsMutator(options: IFormFieldValidatorOptions<FieldType, ValueType>) {
         return options;
     }
+    /**
+     * Returns a copy of the provided options object, attaching the current FormField instance as the `context` property.
+     *
+     * This utility method is used internally to ensure that validation and change handlers receive a reference
+     * to the current field instance, enabling advanced logic and access to field methods.
+     *
+     * @template T - The type of the options object.
+     * @param {T} options - The options object to augment.
+     * @returns {T & { context: FormField<FieldType, ValueType> }} - The augmented options object with the `context` property.
+     *
+     * @example
+     * // Attach context to validation options
+     * const optionsWithContext = this.getCallOptions({ value: "abc" });
+     * // optionsWithContext.context === this
+     *
+     * @remarks
+     * This method is typically used before calling validation or change handlers to ensure
+     * the field instance is available in the options.
+     */
     getCallOptions<T>(options: T): T & { context: FormField<FieldType, ValueType> } {
         return Object.assign({}, options, { context: this });
     }
+
     /**
-     * Validates the field based on the provided options.
-     * 
-     * @param {IFormFieldValidatorOptions<FieldType,ValueType>} options - The validation options.
-     * @param {boolean} [force=false] - Whether to force validation.
-     * @returns {Promise<IFormFieldValidatorOptions<FieldType,ValueType>>} - A promise that resolves with validation options.
-     * 
+     * Validates the current field value according to its rules and updates the field state.
+     *
+     * This method performs validation using the provided options and the field's own rules.
+     * It supports asynchronous validation and updates the field's error state, validated value,
+     * and triggers change events as needed.
+     *
+     * @param {IFormFieldValidatorOptions<FieldType, ValueType>} options - The validation options, including value, rules, and context.
+     * @param {boolean} [force=false] - If true, forces validation even if the value hasn't changed.
+     * @returns {Promise<IFormFieldValidatorOptions<FieldType, ValueType>>} - Resolves with the validation options after validation.
+     *
      * @example
-     * this.validate({ value: "test" }); // Validates the field with the value "test"
+     * // Basic usage: validate a field value
+     * field.validate({ value: "user@example.com" }).then((result) => {
+     *   if (!result.error) {
+     *     console.log("Field is valid!");
+     *   }
+     * });
+     *
+     * @example
+     * // Force validation even if value hasn't changed
+     * field.validate({ value: "12345" }, true);
+     *
+     * @remarks
+     * - Automatically adds rules for email, phone, and URL fields if needed.
+     * - Calls `onValid` or `onInvalid` handlers based on validation result.
+     * - Updates field state and triggers `onChange` if the value changes.
+     * - Returns a promise that resolves with the validation options or rejects with an error.
      */
     validate(options: IFormFieldValidatorOptions<FieldType, ValueType>, force: boolean = false): Promise<IFormFieldValidatorOptions<FieldType, ValueType>> {
         options = this.getCallOptions(options);
@@ -256,14 +432,31 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         ) as FieldType;
     }
 
+
     /**
-     * Sanitizes the value for the field to ensure it is in the correct format.
-     * 
+     * Sanitizes the input value based on the field type.
+     *
+     * This method transforms the provided value according to the field's type.
+     * - For numeric fields, it parses the value as a float and returns 0 if parsing fails.
+     * - For phone fields, it strips all non-digit characters.
+     * - For other types, it returns the value as-is.
+     *
      * @param {any} value - The value to sanitize.
-     * @returns {any} - The sanitized value.
-     * 
+     * @returns {any} - The sanitized value, formatted according to the field type.
+     *
      * @example
-     * const sanitizedValue = this.sanitizeValue("123.45"); // Sanitizes the value
+     * // For a number field:
+     * const sanitized = this.sanitizeValue("42.5"); // returns 42.5
+     *
+     * // For a phone field:
+     * const sanitized = this.sanitizeValue("(555) 123-4567"); // returns "5551234567"
+     *
+     * // For a text field:
+     * const sanitized = this.sanitizeValue("Hello World"); // returns "Hello World"
+     *
+     * @remarks
+     * This method is useful for ensuring consistent value formatting before validation or submission.
+     * It is called internally during value changes and validation.
      */
     sanitizeValue(value: any): any {
         const type = String(this.getType()).toLowerCase();
@@ -282,28 +475,54 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         }
         return value;
     }
+
     /**
-     * Executes any logic before validation occurs.
-     * 
-     ```typescript
-     * 
-     * @param {IFormFieldValidatorOptions<FieldType,ValueType>} options - The validation options.
-     * @returns {IFormFieldValidatorOptions<FieldType,ValueType>} - The options after any pre-validation logic.
-     * 
+     * Hook called before field validation.
+     *
+     * This method allows you to perform custom logic or transformations on the validation options
+     * before the actual validation process begins. Override this method in a subclass to inject
+     * additional properties, modify values, or apply business rules.
+     *
+     * @param {IFormFieldValidatorOptions<FieldType, ValueType>} options - The validation options for the field.
+     * @returns {IFormFieldValidatorOptions<FieldType, ValueType>} - The (possibly mutated) validation options.
+     *
      * @example
-     * const preValidatedOptions = this.beforeValidate(options); // Executes pre-validation logic
+     * // Example: Add a timestamp before validation
+     * beforeValidate(options) {
+     *   options.timestamp = Date.now();
+     *   return options;
+     * }
+     *
+     * @remarks
+     * This method is called internally before validation rules are applied.
+     * It is useful for advanced scenarios such as logging, analytics, or dynamic rule injection.
      */
     beforeValidate(options: IFormFieldValidatorOptions<FieldType, ValueType>) {
         return options;
     }
+
     /**
-    * Calls the onChange handler for the field.
-    * 
-    * @param {IFormFieldOnChangeOptions<FieldType>} options - The validation options.
-    * 
-    * @example
-    * this.callOnChange(options); // Calls the onChange handler
-    */
+     * Triggers the `onChange` event for the field when its value changes.
+     *
+     * This method checks if the current value differs from the previous value.
+     * If so, it prepares the change options and calls the `onChange` handler provided in the field's props.
+     *
+     * @param {IFormFieldOnChangeOptions<FieldType, ValueType>} options - The options for the change event, including context, previous value, and field name.
+     * @returns {void}
+     *
+     * @example
+     * // Example usage: manually trigger change event after updating value
+     * this.callOnChange({
+     *   value: "new value",
+     *   prevValue: "old value",
+     *   context: this,
+     *   fieldName: this.getName(),
+     * });
+     *
+     * @remarks
+     * - The method will not trigger the event if the value has not changed.
+     * - Useful for custom field implementations or advanced form logic.
+     */
     callOnChange(options: IFormFieldOnChangeOptions<FieldType, ValueType>) {
         if (this.compareValues(this.state.value, this.state.prevValue)) {
             return;

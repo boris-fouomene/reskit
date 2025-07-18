@@ -2,6 +2,7 @@ import { IField } from "@resk/core/types";
 import { IFormFieldProps } from "../base";
 import { FormField, AttachFormField } from "../base";
 import { Dropdown, IDropdownProps } from "@components/Dropdown";
+import { ITextInputProps } from "@components/TextInput";
 
 @AttachFormField("select")
 export class FormFieldSelect extends FormField<"select"> {
@@ -17,7 +18,7 @@ export class FormFieldSelect extends FormField<"select"> {
     }
 }
 
-interface IFormFieldSelectProps extends IFormFieldProps<"select", any, IDropdownProps> { }
+interface IFormFieldSelectProps extends IFormFieldProps<"select", any, Omit<IDropdownProps, "defaultValue" | "filter">> { }
 
 declare module "@resk/core/resources" {
     export interface IFieldMap {

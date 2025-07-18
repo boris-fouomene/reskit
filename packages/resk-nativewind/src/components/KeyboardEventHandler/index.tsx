@@ -85,14 +85,6 @@ export default class KeyboardEventHandler<T = TextInputKeyPressEventData> extend
 
   }
   /**
-  * Checks if the component is a filter.
-  * 
-  * @returns A boolean indicating whether the component is a filter.
-  */
-  isFilter() {
-    return this.props.isFilter;
-  }
-  /**
    * Lifecycle method that is called after the component updates.
    * 
    * @param prevProps - The previous properties of the component.
@@ -156,22 +148,23 @@ export default class KeyboardEventHandler<T = TextInputKeyPressEventData> extend
 
     return false;
   }
+
   /**
    * Renders the component and attaches keyboard event handlers.
    * 
    * @returns A React element representing the keyboard event handler.
    */
   render() {
-    let { children, isFilter, innerRef, handleKeys, disabled, readOnly, onKeyEvent, handleEventType, handleFocusableElements, ...rest } = this.props;
+    let { children, handleKeys, disabled, readOnly, onKeyEvent, handleEventType, handleFocusableElements, ...rest } = this.props;
     rest = Object.assign({}, rest);
-    const events = disabled || readOnly || isFilter ? {} : {
+    const events = disabled || readOnly ? {} : {
       onKeyPress: this.handleKeyboardEvent.bind(this),
     }
     if (typeof children == 'function') {
       children = children(events);
     }
     if (!isValidElement(children)) return null;
-    return <Div {...rest} style={StyleSheet.flatten([[styles.content, rest.style]]) as any} ref={mergeRefs(this.childRef, innerRef)}>
+    return <Div {...rest} style={StyleSheet.flatten([[styles.content, rest.style]]) as any} ref={this.childRef}>
       {children}
     </Div>
   }

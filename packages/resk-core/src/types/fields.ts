@@ -1,6 +1,7 @@
 import { IAuthPerm } from "@/auth/types";
 import { IResourceActionTupleObject } from "./resources";
 import { IInputFormatterOptions } from "../inputFormatter/types";
+import { IUcFirst } from "./dictionary";
 
 export interface IFieldBase<FieldType extends IFieldType = IFieldType, ValueType = any> extends Partial<IResourceActionTupleObject>, Omit<IInputFormatterOptions<FieldType, ValueType>, "value" | "type"> {
   /**
@@ -138,7 +139,7 @@ export interface IFieldActionsMap {
 
 export type IField<T extends IFieldType = IFieldType, ValueType = any> = IFieldMap[T] extends IFieldBase
   ? IFieldMap[T] & {
-      [key in keyof IFieldActionsMap]?: Partial<IFieldMap[keyof IFieldMap]>;
+      [key in keyof IFieldActionsMap as `for${IUcFirst<key>}`]?: Partial<IFieldMap[keyof IFieldMap]>;
     }
   : never;
 

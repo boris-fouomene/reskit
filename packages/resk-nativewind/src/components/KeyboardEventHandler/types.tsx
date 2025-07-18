@@ -56,11 +56,6 @@ export interface IKeyboardEventHandlerProps<T = TextInputKeyPressEventData> exte
     children?: ReactNode | ((options: { onKeyPress?: (event: IKeyboardEventHandlerEvent<T>) => any }) => ReactNode);
 
     /** 
-     * Reference to the child view component.
-     */
-    innerRef?: React.RefObject<RNView | null>,
-
-    /** 
      * Indicates if the component is read-only.
      */
     readOnly?: boolean;
@@ -69,11 +64,6 @@ export interface IKeyboardEventHandlerProps<T = TextInputKeyPressEventData> exte
      * Indicates if keyboard event handling is disabled.
      */
     disabled?: boolean;
-
-    /** 
-     * Indicates if the component is a filter type.
-     */
-    isFilter?: boolean;
 }
 
 /**

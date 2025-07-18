@@ -4,14 +4,14 @@ import { IFieldType, IField, IFields, IFieldBase } from "@resk/core/resources";
 import { IValidatorRule, IValidatorValidateOptions, Validator, } from "@resk/core/validator";
 import { InputFormatter } from "@resk/core/inputFormatter";
 import { defaultStr, extendObj, areEquals, isEmpty, isNonNullString, isObj, stringify } from "@resk/core/utils";
-import { createRef, ReactNode, isValidElement, useId, useRef, useMemo, useCallback, useEffect, ReactElement, createContext, useContext, Fragment, Ref, ComponentClass } from 'react';
-import { View as RNView, NativeSyntheticEvent, TextInputFocusEventData, View, ViewProps, GestureResponderEvent } from 'react-native';
+import { ReactNode, isValidElement, useId, useRef, useMemo, useCallback, useEffect, ReactElement, createContext, useContext, Fragment, Ref } from 'react';
+import { NativeSyntheticEvent, TextInputFocusEventData, View, ViewProps, GestureResponderEvent } from 'react-native';
 import KeyboardEventHandler, { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler";
 import { HelperText } from "@components/HelperText";
 import { IKeyboardEventHandlerKey } from "@components/KeyboardEventHandler/keyEvents";
 import { IClassName, IOnChangeOptions } from "@src/types";
 import stableHash from 'stable-hash';
-import { TextInput } from "@components/TextInput";
+import { ITextInputProps, TextInput } from "@components/TextInput";
 import { Text } from "@html/Text";
 import { commonVariant } from "@variants/common";
 import { typedEntries } from "@resk/core/build/utils/object";
@@ -23,13 +23,6 @@ import { Button } from "@components/Button";
 
 
 export class FormField<FieldType extends IFieldType = IFieldType, ValueType = any, TState extends IFormFieldState<FieldType, ValueType> = IFormFieldState<FieldType, ValueType>> extends Component<IField<FieldType, ValueType>, TState> {
-    /** 
-     * Reference to the wrapper view of the field.
-     * 
-     * @readonly
-     * @type {React.Ref<RNView>}
-     */
-    readonly wrapperRef = createRef<RNView>();
     /** 
      * Reference to the field component.
      * 
@@ -158,10 +151,10 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
             });
         }
         options.rules = Array.isArray(options.rules) && options.rules.length ? options.rules : this.getValidationRules();
-        if (this.isEmail() && this.props.validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("Email")) {
+        if (this.isEmail() && (this.props as any).validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("Email")) {
             options.rules.push("Email");
         }
-        if (this.props.validatePhoneNumber !== false && this.isPhone() && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("PhoneNumber")) {
+        if ((this.props as any).validatePhoneNumber !== false && this.isPhone() && isNonNullString(options.value) && options.value.length > 4 && !options.rules.includes("PhoneNumber")) {
             options.rules.push("PhoneNumber");
         }
         if ((this.getType() as any) == "url" && options.value && !options.rules.includes("Url")) {
@@ -319,8 +312,8 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         options.value = this.state.value;
         options.context = this;
         options.fieldName = this.getName();
-        if (this.props.onChange) {
-            this.props.onChange(options as any);
+        if ((this.props as any).onChange) {
+            (this.props as any).onChange(options as any);
         }
     }
     /**
@@ -760,7 +753,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
     render() {
         let {
             data,
-            containerProps,
+            keyEventHandlerProps,
             formName,
             isFilter: cIsFilter,
             visible,
@@ -784,10 +777,9 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
         const canShowErrors = this.canDisplayError();
         return (
             <KeyboardEventHandler
-                {...containerProps}
+                {...keyEventHandlerProps}
                 testID={"resk-form-field-container-" + this.getName()}
-                innerRef={this.wrapperRef}
-                handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(containerProps)}
+                handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(keyEventHandlerProps)}
                 onKeyEvent={this.onKeyEvent.bind(this)}
                 disabled={disabled || readOnly}
                 className={cn("resk-form-field-container", visibleClassName, commonVariant({ disabled, readOnly }))}
@@ -947,13 +939,13 @@ export function Form<Fields extends IFields = IFields>({ name, testID, onFormVal
     const preparedFields = useMemo(() => {
         const preparedFields: Fields = {} as Fields;
         typedEntries(prePreparedFields).map(([name, field]) => {
-            if (isObj(field.createOrUpdate)) {
-                extendObj(field, field.createOrUpdate);
+            if (isObj(field.forCreateOrUpdate)) {
+                extendObj(field, field.forCreateOrUpdate);
             }
-            if (isUpdate && isObj(field.update)) {
-                extendObj(field, field.update);
-            } else if (!isUpdate && isObj(field.create)) {
-                extendObj(field, field.create);
+            if (isUpdate && isObj(field.forUpdate)) {
+                extendObj(field, field.forUpdate);
+            } else if (!isUpdate && isObj(field.forCreate)) {
+                extendObj(field, field.forCreate);
             }
             if (field.primaryKey === true && isUpdate) {
                 field.readOnly = true;
@@ -1225,7 +1217,7 @@ export type IFormFieldComponent<FieldType extends IFieldType = IFieldType, Value
 ) => FormField<FieldType, ValueType, TState>;
 
 
-export function FieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>({ onMount, onUnmount, filter, isFilter, ...field }: Omit<IField, "ref"> & { ref?: Ref<FormField<FieldType, ValueType>> }) {
+export function FieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>({ onMount, onUnmount, ...field }: Omit<IField, "ref"> & { ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
     const { form } = formContext ?? {};
     const isFormField = !!form;
@@ -1237,7 +1229,6 @@ export function FieldRenderer<FieldType extends IFieldType = IFieldType, ValueTy
         }
     }, [field.name, form])
     return <Component
-        isFilter={isFilter}
         {...field as any}
         key={field.name}
         onMount={isFormField ? (context) => {
@@ -1520,8 +1511,7 @@ export type IFormData<Fields extends IFields = IFields> = {
     [K in (keyof Fields | string | number | symbol)]: any;
 };
 
-export interface IFormFieldBase<FieldType extends IFieldType = IFieldType, ValueType = any> extends IFieldBase<FieldType, ValueType> {
-    onChange?: (options: IFormFieldOnChangeOptions<FieldType, ValueType>) => void;
+export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, ValueType = any> extends IFieldBase<FieldType, ValueType> {
     testID?: string;
     className?: IClassName;
     onKeyEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
@@ -1552,7 +1542,7 @@ export interface IFormFieldBase<FieldType extends IFieldType = IFieldType, Value
      */
     onFieldInvalid?: (options: IFormFieldValidatorOptions) => any;
 
-    containerProps?: IKeyboardEventHandlerProps;
+    keyEventHandlerProps?: IKeyboardEventHandlerProps;
 
     formName?: string;
 
@@ -1572,20 +1562,17 @@ export interface IFormFieldBase<FieldType extends IFieldType = IFieldType, Value
 
     displayErrors?: boolean;
 
-    validateEmail?: boolean;
-
-    validatePhoneNumber?: boolean;
-
-    windowWidth?: number;
-
     label?: ReactNode;
 
     isRendable?: boolean;
+
+    ref?: any;
 }
 
-export type IFormFieldProps<FieldType extends IFieldType = IFieldType, ValueType = any, TProps = unknown, TState extends IFormFieldState<FieldType, ValueType> = IFormFieldState<FieldType, ValueType>> =
-    Omit<IFormFieldBase<FieldType, ValueType>, keyof TProps> &
-    TProps & { ref?: Ref<FormField<FieldType, ValueType, TState>> };
+export interface IFormFieldTextProps<FieldType extends IFieldType = IFieldType, ValueType = any>
+    extends IFormFieldProps<FieldType, ValueType>, Omit<ITextInputProps<ValueType>, "onChange" | "ref" | "type"> {
+    onChange?: (options: IFormFieldOnChangeOptions<FieldType, ValueType>) => void;
+}
 
 export interface IFormProps<Fields extends IFields = IFields> extends Omit<ViewProps, "children" | "ref"> {
 
@@ -1884,7 +1871,6 @@ export interface IFormFieldOnChangeOptions<FieldType extends IFieldType = IField
 };
 
 
-
 export function AttachFormField<FieldType extends IFieldType = IFieldType, ValueType = any, TState extends IFormFieldState<FieldType, any> = IFormFieldState<FieldType, any>>(type: FieldType) {
     return (target: IFormFieldComponent<FieldType, ValueType, TState>) => {
         FormField.registerComponent<FieldType, ValueType, TState>(type, target as typeof FormField);
@@ -1914,8 +1900,6 @@ export interface IFormEventMap {
 
 export type IFormEvent = keyof IFormEventMap;
 
-
-
 declare module "@resk/core/resources" {
 
     /**
@@ -1923,28 +1907,27 @@ declare module "@resk/core/resources" {
      * @interface IFieldMap
      */
     export interface IFieldMap {
-        text: IFormFieldProps<"text">;
+        text: IFormFieldTextProps<"text">;
 
         number: IFormFieldProps<"number", "number">;
 
-        date: IFormFieldProps<"date">;
+        date: IFormFieldTextProps<"date">;
 
-        datetime: IFormFieldProps<"datetime">;
-
-
-        time: IFormFieldProps<"time">;
+        datetime: IFormFieldTextProps<"datetime">;
 
 
-        tel: IFormFieldProps<"tel">;
+        time: IFormFieldTextProps<"time">;
 
 
-        password: IFormFieldProps<"password">;
+        tel: IFormFieldTextProps<"tel"> & { validatePhoneNumber?: boolean };
 
 
-        email: IFormFieldProps<"email">;
+        password: IFormFieldTextProps<"password">;
 
 
-        url: IFormFieldProps<"url">;
+        email: IFormFieldTextProps<"email"> & { validateEmail?: boolean };
+
+
+        url: IFormFieldTextProps<"url">;
     }
 }
-

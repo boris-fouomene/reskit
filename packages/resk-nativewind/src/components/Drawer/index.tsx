@@ -947,7 +947,7 @@ export class Drawer extends ObservableComponent<IDrawerProps, IDrawerState, IDra
       <Wrapper {...wrapperProps}>
         <DrawerContext.Provider value={{ drawer: this }}>
           {!this.isHydrated() ? <>
-            {hydrationFallback || <VStack testID={testID + "-no-hydrated"} className={cn("p-4 resk-drawer-no-hydration-fallback items-center justify-center", className)}>
+            {hydrationFallback || <VStack testID={testID + "-no-hydrated-fallback"} className={cn("p-4 resk-drawer-no-hydrated-fallback items-center justify-center", className)}>
               <ActivityIndicator testID={testID + "-no-hydrated-indicator"} variant={{ color: "primary" }} />
             </VStack>}
           </> :

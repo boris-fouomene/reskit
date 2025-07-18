@@ -1,6 +1,6 @@
 "use client";
 
-import { HStack, Dialog, Alert, Preloader, Drawer, useDrawer } from "@resk/nativewind";
+import { HStack, Dialog, Alert, Preloader, Drawer, useDrawer, ActivityIndicator } from "@resk/nativewind";
 import { Div, H2, Text } from "@resk/nativewind/html";
 import { Button } from "@resk/nativewind/components/button";
 import dynamic from "next/dynamic";

@@ -14,9 +14,6 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
     <SSRScrollView>
       <DialogExample />
       <BottomSheetExample />
-      <VStack className={cn("p-4 resk-drawer-no-hydration-fallback items-center justify-center")}>
-        <ActivityIndicator variant={{ color: "primary" }} />
-      </VStack>;
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10 gap-y-5">

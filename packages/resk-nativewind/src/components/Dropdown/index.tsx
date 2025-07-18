@@ -24,7 +24,7 @@ import { IIconVariant } from "@variants/icon";
 import { IProgressBarVariant } from "@variants/progressBar";
 
 
-export class Dropdown<ItemType = any, ValueType = any> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
+export class Dropdown<ItemType = unknown, ValueType = unknown> extends ObservableComponent<IDropdownProps<ItemType, ValueType>, IDropdownState<ItemType, ValueType>, IDropdownEvent> implements IDropdownContext<ItemType, ValueType> {
     constructor(props: IDropdownProps<ItemType, ValueType>) {
         super(props);
         this.isSelectedByHashKey = this.isSelectedByHashKey.bind(this);
@@ -326,11 +326,11 @@ export class Dropdown<ItemType = any, ValueType = any> extends ObservableCompone
         return defaultStr(this.props.testID, "resk-dropdown");
     }
     renderItem<ItemType, ValueType>({ item, index }: { item: IDropdownPreparedItem<ItemType, ValueType>, index: number }) {
-        return <DropdownItem {...item} index={index} context={this} />;
+        return <DropdownItem {...item} index={index} context={this as any} />;
     };
 }
 
-function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
+function DropdownRenderer<ItemType = unknown, ValueType = unknown>({ context }: { context: IDropdownContext<ItemType, ValueType> }) {
     let { anchorContainerClassName, loadingProgressBarVariant, searchInputProps, menuProps, anchor, error, defaultValue, maxHeight, disabled, dropdownActions, readOnly, editable, testID, multiple, value, ...props } = context.props;
     const { visible } = context.state;
     const isLoading = !!props.isLoading;
@@ -366,9 +366,9 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     }, [selectedItemsByHashKey]);
     context.anchorSelectedText = anchorSelectedText;
     const actions = useMemo(() => {
-        const actions: IDropdownAction[] = [];
+        const actions: IDropdownAction<ItemType, ValueType>[] = [];
         if (dropdownActions) {
-            const actProps = (typeof dropdownActions === "function" ? dropdownActions(context) : dropdownActions) as IDropdownAction[];
+            const actProps = (typeof dropdownActions === "function" ? dropdownActions(context) : dropdownActions);
             if (Array.isArray(actProps)) {
                 actProps.map((act) => {
                     if (!act || !isObj(act)) {
@@ -475,7 +475,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
             </Tooltip>
         </Div>}
     >
-        <DropdownMenu
+        <DropdownMenu<ItemType, ValueType>
             maxHeight={maxDropdownHeight}
             context={context}
             canRenderSeach={canRenderSeach}
@@ -484,7 +484,7 @@ function DropdownRenderer<ItemType = any, ValueType = any>({ context }: { contex
     </Menu>
 }
 
-function DropdownMenu<ItemType = any, ValueType = any>({ maxHeight, actions, canRenderSeach, context }: { maxHeight: number, actions: IDropdownAction[], canRenderSeach: boolean, context: IDropdownContext<ItemType, ValueType> }) {
+function DropdownMenu<ItemType = unknown, ValueType = unknown>({ maxHeight, actions, canRenderSeach, context }: { maxHeight: number, actions: IDropdownAction<ItemType, ValueType>[], canRenderSeach: boolean, context: IDropdownContext<ItemType, ValueType> }) {
     const isEditabled = context?.props?.editable !== false && !(context?.props?.disabled) && !(context?.props?.readOnly);
     const { searchInputProps, error, dropdownActionsMenuClassName, dropdownActionsMenuIconName, dropdownActionsMenuIconVariant } = context.props;
     const listProps = Object.assign({}, context.props.listProps);
@@ -631,7 +631,7 @@ DropdownItem.displayName = "Dropdown.Item";
 
 
 
-export interface IDropdownContext<ItemType = any, ValueType = any> extends Dropdown<ItemType, ValueType> {
+export interface IDropdownContext<ItemType = unknown, ValueType = unknown> extends Dropdown<ItemType, ValueType> {
     /***
      * the corresponding selected text calculated from selected items
      */
@@ -724,7 +724,7 @@ export interface IDropdownContext<ItemType = any, ValueType = any> extends Dropd
  * - Ensure that the `itemsByHashKey` and `selectedItemsByHashKey` are kept 
  *   in sync to avoid inconsistencies in the dropdown state.
  */
-export interface IDropdownState<ItemType = any, ValueType = any> {
+export interface IDropdownState<ItemType = unknown, ValueType = unknown> {
     itemsByHashKey: Record<string, IDropdownPreparedItem<ItemType, ValueType>>,
     selectedValues: ValueType[]
     visible: boolean;
@@ -742,7 +742,7 @@ export interface IDropdownState<ItemType = any, ValueType = any> {
     filteredItems?: IDropdownPreparedItem<ItemType, ValueType>[];
 };
 
-export interface IDropdownAction extends INavItemProps<{ dropdown: IDropdownContext }> { }
+export interface IDropdownAction<ItemType = unknown, ValueType = unknown> extends INavItemProps<{ dropdown: IDropdownContext<ItemType, ValueType> }> { }
 
 /**
  * Represents a collection of prepared items in a dropdown component.
@@ -795,7 +795,7 @@ export interface IDropdownAction extends INavItemProps<{ dropdown: IDropdownCont
  * - Ensure that the keys used in the record are unique to avoid conflicts and 
  * rendering issues.
  */
-export type IDropdownPreparedItems<ItemType = any, ValueType = any> = Record<string, IDropdownPreparedItem<ItemType, ValueType>>;
+export type IDropdownPreparedItems<ItemType = unknown, ValueType = unknown> = Record<string, IDropdownPreparedItem<ItemType, ValueType>>;
 
 /**
  * Represents the options provided to callback functions when the dropdown value changes.
@@ -840,7 +840,7 @@ export type IDropdownPreparedItems<ItemType = any, ValueType = any> = Record<str
  * - Ensure that the `dropdown` is properly passed to access the necessary methods 
  *   and state related to the dropdown.
  */
-export interface IDropdownOnChangeOptions<ItemType = any, ValueType = any> extends Omit<Partial<IDropdownPreparedItem<ItemType, ValueType>>, 'value'> {
+export interface IDropdownOnChangeOptions<ItemType = unknown, ValueType = unknown> extends Omit<Partial<IDropdownPreparedItem<ItemType, ValueType>>, 'value'> {
     value: ValueType | ValueType[] | undefined;
     dropdown: IDropdownContext<ItemType, ValueType>;
 };
@@ -887,7 +887,7 @@ export interface IDropdownOnChangeOptions<ItemType = any, ValueType = any> exten
  * - Ensure that the `isDropdown` property is consistently set to `true` when using this 
  * interface in dropdown-related callbacks.
  */
-export interface IDropdownCallOptions<ItemType = any, ValueType = any> {
+export interface IDropdownCallOptions<ItemType = unknown, ValueType = unknown> {
     item: ItemType; // The item being interacted with
     index: number; // The index of the item in the dropdown list
     isDropdown: true; // Indicates that the context is within a dropdown
@@ -895,7 +895,7 @@ export interface IDropdownCallOptions<ItemType = any, ValueType = any> {
     value: ValueType;
 }
 
-export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<ITextInputProps, "onChange" | "ref" | "multiline"> {
+export interface IDropdownProps<ItemType = unknown, ValueType = unknown> extends Omit<ITextInputProps, "onChange" | "ref" | "multiline"> {
     /**
      * List of dropdown items
      */
@@ -955,7 +955,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
     /***
         optional actions for the dropdown
     */
-    dropdownActions?: INavItems<IDropdownAction> | ((options: IDropdownContext<any, any>) => INavItems<IDropdownAction>);
+    dropdownActions?: INavItems<IDropdownAction<ItemType, ValueType>> | ((options: IDropdownContext<any, any>) => INavItems<IDropdownAction<ItemType, ValueType>>);
 
     /***
         The variants for the dropdown actions menu icon
@@ -1091,7 +1091,7 @@ export interface IDropdownProps<ItemType = any, ValueType = any> extends Omit<IT
  * - The `label` can be customized to include icons or other components for enhanced 
  * user experience.
  */
-export interface IDropdownPreparedItem<ItemType = any, ValueType = any> {
+export interface IDropdownPreparedItem<ItemType = unknown, ValueType = unknown> {
     value: ValueType; // The value associated with the dropdown item
     hashKey: string; // A unique key for the item
     item: ItemType; // The original item data

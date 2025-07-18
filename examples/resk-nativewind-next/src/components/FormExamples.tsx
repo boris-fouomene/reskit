@@ -7,7 +7,7 @@ export function FormExamples() {
         <Div>
             <Form
                 fields={{
-                    name: { label: "Nom" },
+                    name: { label: "Nom", type: "email", required: true },
                     email: { type: "email" },
                     password: { type: "password" },
                 }}

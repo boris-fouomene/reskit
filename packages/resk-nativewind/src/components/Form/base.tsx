@@ -2092,6 +2092,12 @@ export type IFormFieldOnChangeOptions<FieldType extends IFieldType = IFieldType,
 } & TOnChangeOptions;
 
 
+export function AttachFormField<FieldType extends IFieldType = IFieldType, ValueType = any, TState extends IFormFieldState<FieldType, any> = IFormFieldState<FieldType, any>>(type: FieldType) {
+    return (target: IFormFieldComponent<FieldType, ValueType, TState>) => {
+        FormField.registerComponent<FieldType, ValueType, TState>(type, target as typeof FormField);
+    };
+}
+
 function compareValues(a: any, b: any) {
     if (isEmpty(a) && isEmpty(b)) return true;
     return areEquals(a, b);

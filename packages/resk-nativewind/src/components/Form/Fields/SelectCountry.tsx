@@ -1,5 +1,5 @@
-import { FormField, IFormFieldProps } from "../base";
-import { AttachFormField } from "../attachFormField";
+"use client";
+import { FormField, IFormFieldProps, AttachFormField } from "../base";
 import { CountrySelector, ICountrySelectorProps } from "@components/CountrySelector";
 
 @AttachFormField("selectCountry")

@@ -1,6 +1,6 @@
+"use client";
 import { IField } from "@resk/core/types";
-import { FormField, IFormFieldProps } from "../base";
-import { AttachFormField } from "../attachFormField";
+import { FormField, IFormFieldProps, AttachFormField } from "../base";
 import { Dropdown, IDropdownProps } from "@components/Dropdown";
 
 @AttachFormField("select")

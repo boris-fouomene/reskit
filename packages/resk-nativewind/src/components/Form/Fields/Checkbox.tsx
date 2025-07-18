@@ -1,9 +1,9 @@
+"use client";
 import { FormFieldSwitch } from "./Switch";
 import { Checkbox, ICheckboxProps } from "@components/Checkbox";
-import { AttachFormField } from "../attachFormField";
 import { IField } from "@resk/core/types";
 import { ReactElement } from "react";
-import { IFormFieldProps } from "../base";
+import { IFormFieldProps, AttachFormField } from "../base";
 @AttachFormField<"checkbox">("checkbox")
 export class FormFieldCheckbox extends FormFieldSwitch<"checkbox"> {
     _render(props: IField<"checkbox">, innerRef: any): ReactElement {

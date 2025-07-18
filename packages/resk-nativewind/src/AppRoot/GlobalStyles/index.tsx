@@ -66,7 +66,6 @@ export function GlobalStyles() {
     `
     ];
     return <>
-        <BodyClasses />
         <style id="reskit-app-root-global-styles">
             {`
         html,body,#root { 
@@ -140,5 +139,6 @@ export function GlobalStyles() {
         } 
     `}
         </style>
+        <BodyClasses />
     </>
 }

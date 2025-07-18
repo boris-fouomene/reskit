@@ -68,17 +68,31 @@ export function GlobalStyles() {
     return <>
         <style id="reskit-app-root-global-styles">
             {`
-        html,body,#root { 
-            -webkit-text-size-adjust: none;
+        html, body, #root {
+            box-sizing: border-box;
             position: relative;
             z-index: 1;
-            margin: 0px; 
-            width: 100vw; 
-            height: -webkit-fill-available;   
-            /*-ms-overflow-style: none;*/ 
-            /*overflow:hidden;*/
-            margin:0;
-            padding:0;
+            margin: 0;
+            padding: 0;
+            min-width: 0;
+            min-height: 0;
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+            /* Modern fill available */
+            width: fill-available;
+            height: fill-available;
+            /* WebKit fallback */
+            width: -webkit-fill-available;
+            height: -webkit-fill-available;
+            /* Mozilla fallback */
+            width: -moz-available;
+            height: -moz-available;
+            /* Edge fallback */
+            width: stretch;
+            height: stretch;
+            -webkit-text-size-adjust: none;
         }
 
         .tippy-box[data-theme~='${TIPPY_THEME}'] {

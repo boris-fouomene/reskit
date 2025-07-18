@@ -2,6 +2,7 @@ import React from 'react';
 import { Div } from '@html/Div';
 import { cn } from '@utils';
 import { IClassName } from '@src/types';
+import { defaultStr } from '@resk/core/utils';
 
 /**
  * Props interface for the SSRScrollView component optimized for server-side rendering.
@@ -733,8 +734,10 @@ export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
     snapScrolling = false,
     id,
     'aria-label': ariaLabel,
+    testID,
     ...htmlProps
 }) => {
+    testID = defaultStr(testID, "resk-ssr-scroll-view");
     // Generate CSS classes for scroll behavior
     const scrollClasses = cn(
         // Base scroll styles
@@ -808,7 +811,8 @@ export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
     return (
         <Div
             id={id}
-            className={scrollClasses}
+            testID={testID}
+            className={cn(scrollClasses, "resk-ssr-scrollview")}
             style={containerStyle as any}
             aria-label={ariaLabel || (horizontal ? 'Horizontal scroll area' : 'Vertical scroll area')}
             role="region"
@@ -816,8 +820,9 @@ export const SSRScrollView: React.FC<ISSRScrollViewProps> = ({
             {...htmlProps}
         >
             <Div
-                className={contentClasses}
+                className={cn(contentClasses, "resk-ssr-scrollview-content")}
                 style={contentStyle as any}
+                testID={`${testID}-content`}
             >
                 {children}
             </Div>

@@ -895,7 +895,7 @@ export interface IDropdownCallOptions<ItemType = unknown, ValueType = unknown> {
     value: ValueType;
 }
 
-export interface IDropdownProps<ItemType = unknown, ValueType = unknown> extends Omit<ITextInputProps, "onChange" | "ref" | "multiline"> {
+export interface IDropdownProps<ItemType = unknown, ValueType = unknown> extends Omit<ITextInputProps, "onChange" | "type" | "ref" | "multiline"> {
     /**
      * List of dropdown items
      */

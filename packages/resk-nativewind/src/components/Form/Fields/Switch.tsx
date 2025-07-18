@@ -16,12 +16,12 @@ export class FormFieldSwitch<Type extends IFieldType = "switch"> extends FormFie
         const { checkedValue, uncheckedValue } = this.getDefaultValues(this.props as any);
         return value === checkedValue ? checkedValue : uncheckedValue;
     }
-    _render({ containerProps, ...props }: IField<Type>, innerRef: any) {
+    _render(props: IField<Type>, innerRef: any) {
         return <Switch  {...(props as ISwitchProps)} />;
     }
 }
 
-interface IFormFieldSwitchProps extends IFormFieldProps<"switch", any, ISwitchProps> { }
+interface IFormFieldSwitchProps extends IFormFieldProps<"switch">, ISwitchProps { }
 
 declare module "@resk/core/resources" {
     export interface IFieldMap {

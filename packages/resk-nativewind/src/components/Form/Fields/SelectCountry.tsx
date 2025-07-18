@@ -1,0 +1,28 @@
+import { FormField, AttachFormField, IFormFieldProps } from "../base";
+import { CountrySelector, ICountrySelectorProps } from "@components/CountrySelector";
+
+@AttachFormField("selectCountry")
+export class SelectCountryField extends FormField<"selectCountry"> {
+    isTextField(): boolean {
+        return false;
+    }
+    getType() {
+        return "selectCountry" as 'selectCountry';
+    }
+    _render(props: any, innerRef?: any) {
+        return <CountrySelector
+            ref={innerRef}
+            displayDialCode={false}
+            anchor={undefined}
+            {...props}
+        />;
+    }
+}
+
+interface IFormFieldSelectCountryProps extends IFormFieldProps<"selectCountry", ICountrySelectorProps["defaultValue"]>, ICountrySelectorProps { }
+
+declare module "@resk/core/resources" {
+    export interface IFieldMap {
+        selectCountry: IFormFieldSelectCountryProps;
+    }
+}

@@ -3,10 +3,11 @@ import { Form } from "@resk/nativewind/components/form";
 import { Div } from "@resk/nativewind/html";
 
 export function FormExamples() {
+    const formName = "example-form";
     return (
         <Div className="p-4">
             <Form
-                name="example-form"
+                name={formName}
                 className=""
                 fields={{
                     name: { label: "Nom", type: "email", required: true },
@@ -15,9 +16,16 @@ export function FormExamples() {
                     checked: { type: "switch", checkedLabel: "Checked", uncheckedLabel: "unchecked", defaultValue: 1 }
                 }}
             >
+                <Form.FieldRenderer
+                    formName={formName}
+                    type="checkbox"
+                    label={"Field Renderer example"}
+                    checkedValue={"Yes"}
+                    uncheckedValue={"No"}
+                />
                 <Form.Action
                     label={"Send"}
-                    formName="example-form"
+                    formName={formName}
                 />
             </Form>
         </Div>

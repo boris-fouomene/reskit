@@ -1047,7 +1047,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any, TSta
                             {canValidate && !this.isFilter() ? (
                                 <HelperText
                                     error={canShowErrors}
-                                    className={cn("resk-form-field-helper-text", isLoading || !canShowErrors && "opacity-0")}
+                                    className={cn("resk-form-field-helper-text duration-300 transition-opacity", (isLoading || !canShowErrors) ? "opacity-0 z-0 text-transparent" : "opacity-100")}
                                 >
                                     {errorText || `the field ${this.getName()} has not error`}
                                 </HelperText>
@@ -1282,18 +1282,6 @@ export function Form<Fields extends IFields = IFields>({ name, style, testID, as
             form?.offAll?.();
         }
     }, [form]);
-    const skeleton = useMemo(() => {
-        return isLoading && typeof renderSkeleton == "function" ? renderSkeleton(form) : null;
-    }, [form, isLoading])
-    const headerContent = useMemo(() => {
-        const h = typeof header == "function" ? header(form) : header;
-        return isValidElement(h) ? h : null;
-    }, [header, form]);
-    const childrenContent = useMemo(() => {
-        if (isLoading) return null;
-        const c = typeof children == "function" ? children(form) : children;
-        return isValidElement(c) ? c : null;
-    }, [children, form]);
     const hasRenderFields = typeof renderFields == "function";
     disabled = !!disabled; readOnly = !!readOnly;
     const formFields = useMemo(() => {
@@ -1356,14 +1344,15 @@ export function Form<Fields extends IFields = IFields>({ name, style, testID, as
         form
     };
     useImperativeHandle(ref, () => (formContext));
+    const skeleton = isLoading && typeof renderSkeleton == "function" ? renderSkeleton(formContext) : null
     return <FormContext.Provider value={formContext}>
-        {headerContent}
+        {typeof header == "function" ? header(formContext) : header}
         {skeleton ?? !hasRenderFields ? <Div style={style} asHtmlTag={asHtmlTag} id={formName} testID={testID} role="form" accessibilityState={{ disabled: !!disabled }} className={cn("resk-form", `resk-form-${formName}`, className)}>{formFields}</Div> : formFields}
-        {childrenContent}
+        {typeof children == "function" ? children(formContext) : children}
     </FormContext.Provider>;
 }
 
-function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref"> & { ref?: Ref<FormField<FieldType, ValueType>> }) {
+function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref"> & { type: FieldType, ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
     const { form, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
     const isFormField = FormsManager.isForm(form);
@@ -1809,6 +1798,7 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
     isFormLoading?: boolean;
 
     isFormSubmitting?: boolean;
+
     renderSkeleton?: (context: FormField<FieldType, ValueType>) => ReactNode;
 
     onMount?: (context: FormField) => any;
@@ -1887,7 +1877,7 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
     className?: IClassName;
     asHtmlTag?: IHtmlDivProps["asHtmlTag"];
 
-    renderSkeleton?: (context: IForm<Fields>) => ReactNode;
+    renderSkeleton?: (context: IFormContext<Fields>) => ReactNode;
 
 
     data?: IFormData;
@@ -2006,9 +1996,9 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
     isSubmitting?: boolean;
 
 
-    header?: ((options: IForm<Fields>) => ReactElement) | ReactElement;
+    header?: ((options: IFormContext<Fields>) => ReactNode) | ReactNode;
 
-    children?: ((context: IForm<Fields>) => ReactElement) | ReactElement;
+    children?: ((context: IFormContext<Fields>) => ReactNode) | ReactNode;
 
 
     /**

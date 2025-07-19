@@ -986,7 +986,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
 
 /******************* Form Implementation  ******************/
 
-export function Form<Fields extends IFields = IFields>({ name, style, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField }: IFormProps<Fields>) {
+export function Form<Fields extends IFields = IFields>({ name, style, validateBeforeFirstSubmit, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField }: IFormProps<Fields>) {
     const generatedFormName = useId();
     testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
@@ -1034,13 +1034,15 @@ export function Form<Fields extends IFields = IFields>({ name, style, testID, as
     const contextRef = useRef<{
         isSubmitting: boolean,
         isLoading: boolean, primaryKeys: IFieldName<Fields>[], data: IFormData<Fields>,
-        isUpdate: boolean, submitCount: number, invalidSubmitCount: number, errors: string[]
-    }>({ primaryKeys, isSubmitting, isLoading, isUpdate, data, submitCount: 0, invalidSubmitCount: 0, errors: [] });
+        isUpdate: boolean, submitCount: number, invalidSubmitCount: number, errors: string[],
+        validateBeforeFirstSubmit: boolean;
+    }>({ primaryKeys, isSubmitting, isLoading, isUpdate, data, submitCount: 0, invalidSubmitCount: 0, errors: [], validateBeforeFirstSubmit: !!validateBeforeFirstSubmit });
     contextRef.current.isSubmitting = isSubmitting;
     contextRef.current.isLoading = isLoading;
     contextRef.current.primaryKeys = primaryKeys;
     contextRef.current.isUpdate = isUpdate;
     contextRef.current.data = data;
+    contextRef.current.validateBeforeFirstSubmit = !!validateBeforeFirstSubmit;
 
     const onSubmitRef = useRef(onSubmit);
     onSubmitRef.current = onSubmit;
@@ -1092,6 +1094,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, testID, as
         const getErrors = () => Array.isArray(contextRef.current.errors) ? contextRef.current.errors : [];
         const getErrorText = () => getErrors().join("\n") || "";
         const form = observableFactory<IFormEvent, Omit<IForm<Fields>, keyof IObservable>>({
+            shouldValidateBeforeFirstSubmit: () => contextRef.current.validateBeforeFirstSubmit,
             getSubmitCount: () => contextRef.current.submitCount,
             getInvalidSubmitCount: () => contextRef.current.invalidSubmitCount,
             mountField: (field) => {
@@ -1443,7 +1446,7 @@ class FormsManager {
         const form = FormsManager.getForm(formName);
         if (!form) return;
         const isValid = form.isValid();
-        if (form.getSubmitCount() > 0) {
+        if (form.shouldValidateBeforeFirstSubmit() || (form.getSubmitCount() > 0)) {
             const actions = FormsManager.getActions(formName);
             for (var k in actions) {
                 const action = actions[k];
@@ -1622,6 +1625,8 @@ export interface IForm<Fields extends IFields = IFields> extends IObservable<IFo
      * - Log or report user frustration in analytics
      */
     getInvalidSubmitCount(): number;
+
+    shouldValidateBeforeFirstSubmit(): boolean;
 }
 
 export interface IFormContext<Fields extends IFields = IFields> extends IFormContextProps<Fields> {
@@ -1947,6 +1952,20 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      * Default is false
      */
     renderAsTable?: boolean;
+
+    /**
+     * Controls whether form validation should toggle action statuses before the first submission.
+     * 
+     * When true, form actions will be enabled/disabled based on validation state
+     * even when the form hasn't been submitted yet (submitCount = 0).
+     * When false, actions will only be toggled after the first submission attempt.
+     * 
+     * @default false
+     * 
+     * @example
+     * validateBeforeFirstSubmit: true, // Actions will be disabled if form is invalid from the start
+     */
+    validateBeforeFirstSubmit?: boolean;
 
     ref?: Ref<IFormContext<Fields>>;
 };

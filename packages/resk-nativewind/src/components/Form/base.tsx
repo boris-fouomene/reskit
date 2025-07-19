@@ -3,7 +3,7 @@ import { cn, Component, getTextContent, useMergeRefs, useStateCallback } from "@
 import { IFieldType, IField, IFields, IFieldBase } from "@resk/core/resources";
 import { IValidatorRule, IValidatorValidateOptions, Validator, } from "@resk/core/validator";
 import { InputFormatter } from "@resk/core/inputFormatter";
-import { defaultStr, extendObj, areEquals, isEmpty, isNonNullString, isObj, stringify } from "@resk/core/utils";
+import { defaultStr, defaultObj, typedEntries, areEquals, isEmpty, isNonNullString, isObj, stringify } from "@resk/core/utils";
 import { ReactNode, isValidElement, useId, useRef, useMemo, useCallback, useEffect, ReactElement, createContext, useContext, Fragment, Ref } from 'react';
 import { NativeSyntheticEvent, TextInputFocusEventData, View, ViewProps, GestureResponderEvent } from 'react-native';
 import KeyboardEventHandler, { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler";
@@ -14,7 +14,6 @@ import stableHash from 'stable-hash';
 import { ITextInputProps, TextInput } from "@components/TextInput";
 import { Text } from "@html/Text";
 import { commonVariant } from "@variants/common";
-import { defaultObj, typedEntries } from "@resk/core/build/utils/object";
 import { Auth, IAuthPerm } from "@resk/core/auth";
 import { IObservable, observableFactory } from "@resk/core/observable";
 import { useImperativeHandle } from "react";
@@ -1111,7 +1110,7 @@ export class FormField<FieldType extends IFieldType = IFieldType, ValueType = an
 
 /******************* Form Implementation  ******************/
 
-export function Form<Fields extends IFields = IFields>({ name, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onKeyEvent, onEnterKeyPress, prepareField }: IFormProps<Fields>) {
+export function Form<Fields extends IFields = IFields>({ name, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField }: IFormProps<Fields>) {
     const generatedFormName = useId();
     testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
@@ -1351,9 +1350,9 @@ export function Form<Fields extends IFields = IFields>({ name, testID, asHtmlTag
         onFormInvalid,
         onValidateField,
         onInvalidateField,
-        onKeyEvent,
+        onFormKeyEvent,
         onEnterKeyPress,
-        prepareField,
+        prepareFormField,
         form
     };
     useImperativeHandle(ref, () => (formContext));
@@ -1747,7 +1746,7 @@ interface IFormRenderFieldOptions<Fields extends IFields = IFields> extends IFor
 
 export interface IFormContextProps<Fields extends IFields = IFields> {
 
-    prepareField?: (formContext: IFormContext<Fields> & { field: IField }) => IField | null | undefined;
+    prepareFormField?: (formContext: IFormContext<Fields> & { field: IField }) => IField | null | undefined;
     /**
      * Called when the entire form is validated and determined to be **valid**.
      *
@@ -1785,7 +1784,7 @@ export interface IFormContextProps<Fields extends IFields = IFields> {
 
     onEnterKeyPress?: (options: IFormKeyboardEventHandlerOptions) => any;
 
-    onKeyEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
+    onFormKeyEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
 }
 
 export interface IFormProps<Fields extends IFields = IFields> extends IFormContextProps<Fields> {

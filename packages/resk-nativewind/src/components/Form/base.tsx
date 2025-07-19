@@ -215,28 +215,6 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         return ["tel", "phone"].includes(defaultStr(this.getType()).toLowerCase().trim());
     }
 
-    /**
-     * Mutates the options object before validation or change events.
-     *
-     * This protected method allows you to customize or transform the validation options
-     * before they are used in validation or change handlers. Override this method in a subclass
-     * to inject additional properties, modify values, or apply business logic.
-     *
-     * @param {IFormFieldValidateOptions<FieldType, ValueType>} options - The options object to mutate.
-     * @returns {IFormFieldValidateOptions<FieldType, ValueType>} - The mutated options object.
-     *
-     * @example
-     * // Example: Add a custom property before validation
-     * protected onChangeOptionsMutator(options) {
-     *   options.customFlag = true;
-     *   return options;
-     * }
-     *
-     * @remarks
-     * This method is called internally before validation and change events.
-     * It is useful for advanced scenarios where you need to inject context, flags,
-     * or transform values before validation logic runs.
-     */
     protected onChangeOptionsMutator(options: IFormFieldValidateOptions<FieldType, ValueType>) {
         return options;
     }
@@ -263,35 +241,6 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         return Object.assign({}, options, { context: this });
     }
 
-    /**
-     * Validates the current field value according to its rules and updates the field state.
-     *
-     * This method performs validation using the provided options and the field's own rules.
-     * It supports asynchronous validation and updates the field's error state, validated value,
-     * and triggers change events as needed.
-     *
-     * @param {IFormFieldValidateOptions<FieldType, ValueType>} options - The validation options, including value, rules, and context.
-     * @param {boolean} [force=false] - If true, forces validation even if the value hasn't changed.
-     * @returns {Promise<IFormFieldValidateOptions<FieldType, ValueType>>} - Resolves with the validation options after validation.
-     *
-     * @example
-     * // Basic usage: validate a field value
-     * field.validate({ value: "user@example.com" }).then((result) => {
-     *   if (!result.error) {
-     *     console.log("Field is valid!");
-     *   }
-     * });
-     *
-     * @example
-     * // Force validation even if value hasn't changed
-     * field.validate({ value: "12345" }, true);
-     *
-     * @remarks
-     * - Automatically adds rules for email, phone, and URL fields if needed.
-     * - Calls `onValid` or `onInvalid` handlers based on validation result.
-     * - Updates field state and triggers `onChange` if the value changes.
-     * - Returns a promise that resolves with the validation options or rejects with an error.
-     */
     validate(validateOptions: Omit<IFormFieldValidateOptions<FieldType, ValueType>, "context">, force: boolean = false): Promise<IFormFieldValidateOptions<FieldType, ValueType>> {
         const options = this.getCallOptions(validateOptions);
         options.fieldName = defaultStr(options.fieldName, this.getName());
@@ -477,27 +426,6 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         return value;
     }
 
-    /**
-     * Hook called before field validation.
-     *
-     * This method allows you to perform custom logic or transformations on the validation options
-     * before the actual validation process begins. Override this method in a subclass to inject
-     * additional properties, modify values, or apply business rules.
-     *
-     * @param {IFormFieldValidateOptions<FieldType, ValueType>} options - The validation options for the field.
-     * @returns {IFormFieldValidateOptions<FieldType, ValueType>} - The (possibly mutated) validation options.
-     *
-     * @example
-     * // Example: Add a timestamp before validation
-     * beforeValidate(options) {
-     *   options.timestamp = Date.now();
-     *   return options;
-     * }
-     *
-     * @remarks
-     * This method is called internally before validation rules are applied.
-     * It is useful for advanced scenarios such as logging, analytics, or dynamic rule injection.
-     */
     beforeValidate(options: IFormFieldValidateOptions<FieldType, ValueType>) {
         return options;
     }
@@ -536,16 +464,6 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
             (this.props).onChange(options as any);
         }
     }
-    /**
-     * This function is called when the field is validated.
-     * 
-     * @param {IFormFieldValidateOptions<FieldType,ValueType>} options - The validation options.
-     * @returns {boolean} - Returns true if validation is successful, otherwise throws an error.
-     * 
-     * @example
-     * this.onValid(options); // Validates the field
-     * 
-     */
     onValid(options: IFormFieldValidateOptions<FieldType, ValueType>) {
         options.context = this;
         if (typeof this.props.onFieldValid == "function") {
@@ -572,20 +490,10 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         }
         return true;
     }
-    /**
-     * Handles the case where validation does not occur.
-     * 
-     * @param {IFormFieldValidateOptions<FieldType,ValueType>} options - The validation options.
-     * @returns {boolean} - Returns false if no validation occurred.
-     * 
-     * @example
-     * this.onInvalid(options); // Handles no validation case
-     * this function is called when the field is not validated
-     */
     onInvalid(options: IFormFieldValidateOptions<FieldType, ValueType>) {
         options.context = this;
         if (typeof this.props.onFieldInvalid === "function") {
-            return this.props.onFieldInvalid(options);
+            return this.props.onFieldInvalid(options as any);
         }
         return false;
     }
@@ -751,15 +659,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
     isTextField(): boolean {
         return !this.isRaw();
     }
-    /**
-     * Validates the field on change.
-     * 
-     * @param {IFormFieldValidateOptions<FieldType,ValueType>} options - The validation options.
-     * @returns {Promise<IFormFieldValidateOptions<FieldType,ValueType>>} - A promise that resolves with validation options.
-     * 
-     * @example
-     * this.validateOnChange({ value: "new value" }); // Validates the field on change
-     */
+
     validateOnChange(options: IFormFieldValidateOptions<FieldType, ValueType>) {
         return this.validate(options).then((r) => {
             return r;
@@ -1410,10 +1310,10 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
         onUnmount={isFormField ? (context) => {
             form?.unmountField?.(field.name as string, context);
         } : onUnmount}
-        onFieldValid={(options: IFormFieldValidateOptions<FieldType>) => {
-            const r = typeof onFieldValid === "function" ? onFieldValid(options) : undefined;
+        onFieldValid={(options: IFormFieldValidateOptions<IFieldType, ValueType>) => {
+            const r = typeof onFieldValid === "function" ? onFieldValid(options as any) : undefined;
             if (typeof onValidateField == "function") {
-                onValidateField(options);
+                onValidateField(options as any);
             }
             if (isFormField) {
                 const isValid = !!form?.isValid?.();
@@ -1442,7 +1342,7 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
             }
             return r;
         }}
-        onFieldInvalid={(options: IFormFieldValidateOptions<FieldType>) => {
+        onFieldInvalid={(options: IFormFieldValidateOptions<IFieldType, ValueType>) => {
             const r = typeof onFieldInvalid === "function" ? onFieldInvalid(options as any) : undefined;
             if (isFormField) {
                 if (typeof onInvalidateField == "function") {
@@ -1776,7 +1676,7 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
      *
      * @param value - The current valid value of the field
      */
-    onFieldValid?: (options: IFormFieldValidateOptions<FieldType>) => any;
+    onFieldValid?: (options: IFormFieldValidateOptions<IFieldType, ValueType>) => any;
 
     /**
      * ❌ Called when **this specific field becomes invalid** after validation.
@@ -1785,7 +1685,7 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
      *
      * @param error - The validation error message or object
      */
-    onFieldInvalid?: (options: IFormFieldValidateOptions<FieldType>) => any;
+    onFieldInvalid?: (options: IFormFieldValidateOptions<IFieldType, ValueType>) => any;
 
     keyEventHandlerProps?: IKeyboardEventHandlerProps;
 
@@ -1838,7 +1738,7 @@ export interface IFormContextProps<Fields extends IFields = IFields> {
      * You can use this to trigger final preparation before submission,
      * enable the submit button, or track success state.
      */
-    onFormValid?: (options: IFormFieldValidateOptions) => any;
+    onFormValid?: (options: IFormFieldValidateOptions<IFieldType>) => any;
 
     /**
      * Called when the form is validated and determined to be **invalid**,
@@ -1847,17 +1747,15 @@ export interface IFormContextProps<Fields extends IFields = IFields> {
      * Useful for displaying a global error banner, scrolling to the first error,
      * or disabling further interactions.
      */
-    onFormInvalid?: (options: IFormFieldValidateOptions) => any;
-
-    onFormValidationStatusChange?: (options: IFormFieldValidateOptions & { isValid: boolean }) => any;
+    onFormInvalid?: (options: IFormFieldValidateOptions<IFieldType>) => any;
 
     /**
      * 🔁 Called **every time a field becomes valid** after validation,
      * no matter which field it is. Can be used to track global form health.
      *
-     * @param {IFormFieldValidateOptions} options - The options for the field validator
+     * @param {IFormFieldValidateOptions<IFieldType>} options - The options for the field validator
      */
-    onValidateField?: (options: IFormFieldValidateOptions) => any;
+    onValidateField?: (options: IFormFieldValidateOptions<IFieldType>) => any;
 
     /**
      * ⚠️ Called **every time a field becomes invalid** after validation.
@@ -1865,7 +1763,7 @@ export interface IFormContextProps<Fields extends IFields = IFields> {
      *
      * @param {IFormFieldValidateOptions} options - The options for the field validator
      */
-    onInvalidateField?: (options: IFormFieldValidateOptions) => any;
+    onInvalidateField?: (options: IFormFieldValidateOptions<IFieldType>) => any;
 
     onEnterKeyPress?: (options: IFormKeyboardEventHandlerOptions) => any;
 

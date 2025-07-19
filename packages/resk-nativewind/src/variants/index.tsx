@@ -18,7 +18,7 @@ export * from "./progressBar";
 export * from "./surface";
 export * from "./text";
 export * from "./textInput";
-
+export * from "./form";
 
 export * from "./types";
 

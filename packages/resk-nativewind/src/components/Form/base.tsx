@@ -21,6 +21,7 @@ import { IButtonInteractiveContext, IButtonInteractiveProps } from "@components/
 import { Button } from "@components/Button";
 import { Div } from "@html/Div";
 import { IHtmlDivProps } from "@html/types";
+import { formVariant, IFormVariant } from "@variants/form";
 
 
 class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> extends Component<IField<FieldType, ValueType>, IFormFieldState<FieldType, ValueType>> {
@@ -1007,10 +1008,11 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
 
 /******************* Form Implementation  ******************/
 
-export function Form<Fields extends IFields = IFields>({ name, style, validateBeforeFirstSubmit, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField }: IFormProps<Fields>) {
+export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldClassName }: IFormProps<Fields>) {
     const generatedFormName = useId();
     testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
+    const computedVariant = formVariant(variant);
     const [isSubmitting, setIsSubmitting] = useStateCallback<boolean>(false);
     const formName = useMemo(() => {
         return defaultStr(name, "form-" + generatedFormName);
@@ -1230,6 +1232,9 @@ export function Form<Fields extends IFields = IFields>({ name, style, validateBe
         get testID() {
             return testID;
         },
+        get fieldClassName() {
+            return cn(computedVariant.field(), fieldClassName);
+        },
         onFormValid,
         onFormInvalid,
         onValidateField,
@@ -1243,14 +1248,14 @@ export function Form<Fields extends IFields = IFields>({ name, style, validateBe
     const skeleton = isLoading && typeof renderSkeleton == "function" ? renderSkeleton(formContext) : null
     return <FormContext.Provider value={formContext}>
         {typeof header == "function" ? header(formContext) : header}
-        {skeleton ?? !hasRenderFields ? <Div style={style} asHtmlTag={asHtmlTag} id={formName} testID={testID} role="form" accessibilityState={{ disabled: !!disabled }} className={cn("resk-form", `resk-form-${formName}`, className)}>{formFields}</Div> : formFields}
+        {skeleton ?? !hasRenderFields ? <Div style={style} asHtmlTag={asHtmlTag} id={formName} testID={testID} role="form" accessibilityState={{ disabled: !!disabled }} className={cn("resk-form", `resk-form-${formName}`, computedVariant.base(), className)}>{formFields}</Div> : formFields}
         {typeof children == "function" ? children(formContext) : children}
     </FormContext.Provider>;
 }
 
 function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref"> & { type: FieldType, ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
-    const { form, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
+    const { form, fieldClassName, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
     const isFormField = FormsManager.isForm(form);
     const { ref, ...fieldProps } = props;
     const isFilter = !!fieldProps.isFilter;
@@ -1304,6 +1309,7 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
     const Component = FormField.getRegisteredComponent<FieldType, ValueType>(field.type);
     return <Component
         {...field as any}
+        className={cn("resk-form-field-renderer", fieldClassName, field.className)}
         formName={formName}
         ref={ref}
         key={field.name}
@@ -1656,6 +1662,7 @@ export interface IFormContext<Fields extends IFields = IFields> extends IFormCon
     readonly errors: string[];
     readonly submitCount: number;
     readonly invalidSubmitCount: number;
+    readonly fieldClassName?: IClassName;
 }
 
 export interface IFormKeyboardEventHandlerOptions {
@@ -1791,9 +1798,16 @@ export interface IFormContextProps<Fields extends IFields = IFields> {
 
 export interface IFormProps<Fields extends IFields = IFields> extends IFormContextProps<Fields> {
     testID?: string;
+    variant?: IFormVariant;
     style?: IHtmlDivProps["style"];
     className?: IClassName;
     asHtmlTag?: IHtmlDivProps["asHtmlTag"];
+    /**
+     * The class name for the form field container.
+     * The Keyboard event Handler that wraps each Form field.
+     */
+    fieldClassName?: IClassName;
+
     renderSkeleton?: (context: IFormContext<Fields>) => ReactNode;
 
     data?: IFormData;

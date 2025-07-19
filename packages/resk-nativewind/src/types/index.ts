@@ -161,78 +161,11 @@ export type IAnimatedTextStyle = Animated.WithAnimatedValue<StyleProp<TextStyle>
  */
 export type IAnimatedImageStyle = Animated.WithAnimatedValue<StyleProp<ImageStyle>>;
 
-/**
- * @interface IOnChangeOptions
- * Represents the options for an onChange event handler with extended capabilities.
- * It represents the extended options for onChange events, typically used in TextInput components.
- * This type allows for further customization and extension of the base onChange options.
 
- * @template OnChangeEventType - The type of the event that triggered the change. 
- *                        Defaults to The type of the event object, defaults to React Native's text input event `NativeSyntheticEvent<TextInputChangeEventData> | null`.
- * @template ValueType - The type of the value being changed. Defaults to `any`. 
- * This extends the base options
- *
- * @example
- * // Example usage of IOnChangeOptions
- * interface CustomOptions {
- *   customField: string;
- *   timestamp: number;
- * }
- *
- * const handleChange = (options: IOnChangeOptions<CustomOptions>) => {
- *   console.log(`Custom Field: ${options.customField}`);
- *   console.log(`Timestamp: ${options.timestamp}`);
- *   console.log(`Field: ${options.fieldName}`);
- *   console.log(`Previous Value: ${options.previousValue}`);
- *   console.log(`Current Value: ${options.value}`);
- *   console.log(`Event Type: ${options.event?.type}`);
- *   console.log(`Is Focused: ${options.focused}`);
- * };
- *
- * // Simulating a change event with custom options
- * handleChange({
- *   customField: 'example',
- *   timestamp: Date.now(),
- *   event: { type: 'change', target: { value: 'Hello World' } },
- *   value: 'Hello World',
- *   previousValue: 'Hello',
- *   focused: true,
- *   fieldName: 'greeting'
- * });
- *
- *  * @example
- * // Using IOnChangeOptions with custom extensions
- * interface CustomExtension {
- *   timestamp: number;
- * }
- * 
- * const handleExtendedChange = (options: IOnChangeOptions<CustomExtension, string>) => {
- *   console.log('New value:', options.value);
- *   console.log('Timestamp:', options.timestamp);
- * };
- * 
- * @example
- * // Using IOnChangeOptions in a React component
- * const TextInput: React.FC<{ onChange: (options: IOnChangeOptions) => void }> = ({ onChange }) => {
- *   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
- *     onChange({
- *       event: e,
- *       value: e.target.value,
- *       fieldName: 'customField',
- *       focused: true
- *     });
- *   };
- *   
- *   return <input onChange={handleInputChange} />;
- * };
- * 
- * @returns {void} - This type does not return any value, as it is typically used 
- *                   as an argument for an event handler function.
- */
-export interface IOnChangeOptions<OnChangeEventType = unknown | null, ValueType = unknown> {
+export interface IOnChangeOptions<ValueType = unknown, OnChangeEventType = unknown | null> {
   event?: OnChangeEventType;
   value?: ValueType;
-  previousValue?: any;
+  prevValue?: ValueType;
   focused?: boolean;
   fieldName?: string;
 }

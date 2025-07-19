@@ -262,7 +262,7 @@ export interface ITextInputOnChangeEvent extends NativeSyntheticEvent<TextInputC
  * @property {boolean} [isFocused] - Indicates whether the text field is isFocused at the time of the change.
  * @property {string} [fieldName] - The name of the field if it's part of a form.
  */
-export interface ITextInputOnChangeOptions<ValueType = any> extends Omit<IOnChangeOptions<ITextInputOnChangeEvent>, "event" | "value"> {
+export interface ITextInputOnChangeOptions<ValueType = any> extends Omit<IOnChangeOptions<ValueType, ITextInputOnChangeEvent>, "event" | "value"> {
     event?: ITextInputOnChangeEvent;
     value: ValueType;
     previousValue?: ValueType;

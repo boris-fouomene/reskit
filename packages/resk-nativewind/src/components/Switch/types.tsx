@@ -4,68 +4,6 @@ import { ITooltipBaseProps } from "@components/Tooltip/types";
 import { IClassName, IOnChangeOptions } from "@src/types";
 
 
-/**
- * Represents the options for the onChange function in a toggleable component.
- * This type extends the generic IOnChangeOptions interface and includes
- * specific properties relevant to toggleable components.
- * This type is specifically designed for scenarios where an input can be toggled
- * between two states (e.g., checked/unchecked) and includes methods for managing
- * the state of the input.
- *
- * @template EventType - The type of the event that triggered the change. 
- *                       Defaults to `GestureResponderEvent`, which is commonly used
- *                       in touch interactions in React Native.
- * 
- * @property {EventType} [event] - An optional event object 
- * that represents the event that triggered the onChange action. 
- * This can be useful for handling touch events in mobile applications.
- * 
- * @property {boolean} checked - A boolean value indicating whether the 
- * toggleable component is currently checked (true) or unchecked (false).
- * This property is crucial for determining the current state of the 
- * toggleable component.
- *
- * @extends {IOnChangeOptions} 
-* This type extends the `IOnChangeOptions` with specific properties for toggleable inputs.
-*
-* @example
-* // Example usage of IToggleableOnChangeOptions
-* const handleToggleChange = (options: IToggleableOnChangeOptions) => {
-*   console.log(`Checked: ${options.checked}`);
-*   options.setChecked(!options.checked); // Toggle the checked state
-*   console.log(`New Checked State: ${options.checked}`);
-*   options.setValue('New Value'); // Update the associated value
-* };
-*
-* // Simulating a toggle change event
-* handleToggleChange({
-*   checked: false,
-*   fieldName: 'toggleSwitch',
-*   focused: true,
-*   previousValue: 'Previous Value',
-*   value: 'New Value'
-* });
-* 
-*  * @example
- * const handleToggleChange: IToggleableOnChangeOptions<someGestureEvent> = {
- *     event?: someGestureEvent, // Optional gesture event
- *     checked: true,            // The toggle is currently checked
- *     setChecked: (value: boolean) => {
- *         console.log(`Checked state set to: ${value}`);
- *     },
- *     setValue: (value: any) => {
- *         console.log(`Value updated to: ${value}`);
- *         return value; // Return the updated value
- *     }
- * };
- * 
- * This example demonstrates how to implement the IToggleableOnChangeOptions 
- * type, providing a clear structure for handling changes in a toggleable 
- * component's state.
-*
-* @returns {void} - This type does not return any value, as it is typically used 
-*                   as an argument for an event handler function.
-*/
 export interface IToggleableOnChangeOptions extends IOnChangeOptions {
     checked: boolean;
     checkedValue?: any;

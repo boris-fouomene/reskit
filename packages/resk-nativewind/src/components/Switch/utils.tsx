@@ -62,7 +62,7 @@ export function useToggleable({ disabled, className, checkedTitle, onValueChange
       if (typeof onValueChange === "function") {
         onValueChange(isChecked);
       }
-      if (typeof onChange === "function" && eventRef.current) {
+      if (typeof onChange === "function") {
         onChange({ checked: isChecked, checkedValue, uncheckedValue, event: eventRef.current, value });
       }
     });

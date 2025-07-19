@@ -1,9 +1,9 @@
 "use client";
-import { FormField, IFormFieldProps, AttachFormField } from "../base";
+import { Form, IFormFieldProps, AttachFormField } from "../base";
 import { CountrySelector, ICountrySelectorProps } from "@components/CountrySelector";
 
 @AttachFormField("selectCountry")
-export class SelectCountryField extends FormField<"selectCountry"> {
+export class SelectCountryField extends Form.Field<"selectCountry"> {
     isTextField(): boolean {
         return false;
     }

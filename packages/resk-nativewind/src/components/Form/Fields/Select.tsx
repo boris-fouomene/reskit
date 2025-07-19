@@ -1,10 +1,10 @@
 "use client";
 import { IField } from "@resk/core/types";
-import { FormField, IFormFieldProps, AttachFormField } from "../base";
+import { Form, IFormFieldProps, AttachFormField } from "../base";
 import { Dropdown, IDropdownProps } from "@components/Dropdown";
 
 @AttachFormField("select")
-export class FormFieldSelect extends FormField<"select"> {
+export class FormFieldSelect extends Form.Field<"select"> {
     isTextField(): boolean {
         return false;
     }

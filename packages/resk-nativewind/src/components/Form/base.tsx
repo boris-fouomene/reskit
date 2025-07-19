@@ -23,7 +23,7 @@ import { Div } from "@html/Div";
 import { IHtmlDivProps } from "@html/types";
 
 
-export class FormField<FieldType extends IFieldType = IFieldType, ValueType = any, TState extends IFormFieldState<FieldType, ValueType> = IFormFieldState<FieldType, ValueType>> extends Component<IField<FieldType, ValueType>, TState> {
+class FormField<FieldType extends IFieldType = IFieldType, ValueType = any, TState extends IFormFieldState<FieldType, ValueType> = IFormFieldState<FieldType, ValueType>> extends Component<IField<FieldType, ValueType>, TState> {
     /** 
      * Reference to the field component.
      * 
@@ -1301,7 +1301,7 @@ export function Form<Fields extends IFields = IFields>({ name, testID, asHtmlTag
         if (typeof renderFields == "function") {
             return renderFields(options);
         }
-        const _renderField = typeof renderField == "function" ? renderField : (field: IField) => <FieldRenderer {...field} key={field.name} />;
+        const _renderField = typeof renderField == "function" ? renderField : (field: IField) => <FormFieldRenderer {...field} key={field.name} />;
         return typedEntries(preparedFields).map(([name, _field]) => {
             return <Fragment key={String(name)}>
                 {_renderField(_field, options)}
@@ -1363,12 +1363,9 @@ export function Form<Fields extends IFields = IFields>({ name, testID, asHtmlTag
     </FormContext.Provider>;
 }
 
-export type IFormFieldComponent<FieldType extends IFieldType = IFieldType, ValueType = any, TState extends IFormFieldState<FieldType, ValueType> = IFormFieldState<FieldType, ValueType>> = new (
-    props: IField<FieldType, ValueType>
-) => FormField<FieldType, ValueType, TState>;
 
 
-export function FieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>({ onMount, onUnmount, ...field }: Omit<IField, "ref"> & { ref?: Ref<FormField<FieldType, ValueType>> }) {
+function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>({ onMount, onUnmount, ...field }: Omit<IField, "ref"> & { ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
     const { form } = formContext ?? {};
     const isFormField = !!form;
@@ -1390,8 +1387,9 @@ export function FieldRenderer<FieldType extends IFieldType = IFieldType, ValueTy
         } : onUnmount}
     />;
 }
+FormFieldRenderer.displayName = "Form.FieldRenderer";
 
-export class FormsManager {
+class FormsManager {
 
     private static forms: { [fommName: string]: IForm } = {};
 
@@ -1484,7 +1482,7 @@ export class FormsManager {
     }
 }
 
-export function FormAction<FormFields extends IFields = IFields, Context = unknown>({ formName, submitFormOnPress, id, className, ref, onPress, context, ...props }: IFormActionProps<FormFields, Context>) {
+function FormAction<FormFields extends IFields = IFields, Context = unknown>({ formName, submitFormOnPress, id, className, ref, onPress, context, ...props }: IFormActionProps<FormFields, Context>) {
     const innerRef = useRef<IButtonInteractiveContext<Context> & View>(null);
     const mergedRef = useMergeRefs(innerRef, ref);
     const generatedId = useId();
@@ -1525,6 +1523,7 @@ export function FormAction<FormFields extends IFields = IFields, Context = unkno
         }}
     />
 }
+FormAction.displayName = "Form.Action";
 
 const FormContext = createContext<IFormContext<any> | null>(null);
 
@@ -1534,13 +1533,10 @@ export function useForm<Fields extends IFields = IFields>() {
     return context as IFormContext<Fields>;
 }
 
-FormAction.displayName = "Form.Action";
-FieldRenderer.displayName = "Form.FieldRenderer";
-
 Form.Field = FormField;
 Form.Manager = FormsManager;
 Form.Action = FormAction;
-Form.FieldRenderer = FieldRenderer;
+Form.FieldRenderer = FormFieldRenderer;
 
 
 
@@ -1733,7 +1729,6 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
 
 export interface IFormFieldTextProps<FieldType extends IFieldType = IFieldType, ValueType = any>
     extends IFormFieldProps<FieldType, ValueType>, Omit<ITextInputProps<ValueType>, "onChange" | "ref" | "type"> {
-
 }
 
 interface IFormRenderFieldOptions<Fields extends IFields = IFields> extends IFormSubmitOptions<Fields> {
@@ -2000,6 +1995,10 @@ export interface IFormFieldState<FielType extends IFieldType = IFieldType, Value
 }
 
 
+export type IFormFieldComponent<FieldType extends IFieldType = IFieldType, ValueType = any, TState extends IFormFieldState<FieldType, ValueType> = IFormFieldState<FieldType, ValueType>> = new (
+    props: IField<FieldType, ValueType>
+) => FormField<FieldType, ValueType, TState>;
+
 export interface IFormSubmitOptions<Fields extends IFields = IFields> {
 
     data: IFormData<Fields>;
@@ -2062,7 +2061,6 @@ export type IFormEvent =
     | 'validationStatusChanged';
 
 declare module "@resk/core/resources" {
-
     /**
      * Maps form field types to their respective properties.
      * @interface IFieldMap
@@ -2076,18 +2074,13 @@ declare module "@resk/core/resources" {
 
         datetime: IFormFieldTextProps<"datetime">;
 
-
         time: IFormFieldTextProps<"time">;
-
 
         tel: IFormFieldTextProps<"tel"> & { validatePhoneNumber?: boolean };
 
-
         password: IFormFieldTextProps<"password">;
 
-
         email: IFormFieldTextProps<"email"> & { validateEmail?: boolean };
-
 
         url: IFormFieldTextProps<"url">;
     }

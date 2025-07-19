@@ -1,11 +1,11 @@
 "use client";
 import { ISwitchProps, IToggleableProps, Switch } from "@components/Switch";
 import { getToggleableDefaultValues } from "@components/Switch/utils";
-import { FormField, IFormFieldProps, AttachFormField } from "../base";
+import { Form, IFormFieldProps, AttachFormField } from "../base";
 import { IField, IFieldType } from "@resk/core/resources";
 
 @AttachFormField<"switch">("switch")
-export class FormFieldSwitch<Type extends IFieldType = "switch"> extends FormField<Type, any> {
+export class FormFieldSwitch<Type extends IFieldType = "switch"> extends Form.Field<Type, any> {
     isTextField(): boolean {
         return false;
     }

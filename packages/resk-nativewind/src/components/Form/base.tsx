@@ -3,7 +3,7 @@ import { cn, Component, getTextContent, useMergeRefs, useStateCallback } from "@
 import { IFieldType, IField, IFields, IFieldBase } from "@resk/core/resources";
 import { IValidatorRule, IValidatorValidateOptions, Validator, } from "@resk/core/validator";
 import { InputFormatter } from "@resk/core/inputFormatter";
-import { defaultStr, defaultObj, typedEntries, areEquals, isEmpty, isNonNullString, isObj, stringify } from "@resk/core/utils";
+import { defaultStr, defaultObj, typedEntries, areEquals, isEmpty, isNonNullString, isObj, stringify, extendObj } from "@resk/core/utils";
 import { ReactNode, isValidElement, useId, useRef, useMemo, useCallback, useEffect, ReactElement, createContext, useContext, Fragment, Ref } from 'react';
 import { NativeSyntheticEvent, TextInputFocusEventData, View, ViewProps, GestureResponderEvent } from 'react-native';
 import KeyboardEventHandler, { IKeyboardEventHandlerEvent, IKeyboardEventHandlerProps } from "@components/KeyboardEventHandler";
@@ -1363,19 +1363,53 @@ export function Form<Fields extends IFields = IFields>({ name, testID, asHtmlTag
     </FormContext.Provider>;
 }
 
-
-
-function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>({ onMount, onUnmount, ...field }: Omit<IField, "ref"> & { ref?: Ref<FormField<FieldType, ValueType>> }) {
+function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>({ ref, ...fieldProps }: Omit<IField<FieldType, ValueType>, "ref"> & { ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
-    const { form } = formContext ?? {};
-    const isFormField = !!form;
-    const Component = FormField.getRegisteredComponent<FieldType, ValueType>(field.type);
-    useEffect(() => {
-        if (!form) return;
-        return () => {
-            form?.unmountField?.(field.name as string);
+    const { form, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
+    const isFormField = FormsManager.isForm(form);
+    const isFilter = !!fieldProps.isFilter;
+    const preparedField = useMemo(() => {
+        const p = Object.assign({}, fieldProps);
+        if (isFormField) {
+            if (isObj(fieldProps.forCreateOrUpdate)) {
+                extendObj(p, fieldProps.forCreateOrUpdate);
+            }
+            if (isObj(fieldProps.forUpdate) && isUpdate) {
+                extendObj(p, fieldProps.forUpdate);
+            } else if (isObj(fieldProps.forCreate) && !isUpdate) {
+                extendObj(p, fieldProps.forCreate);
+            }
+            if (isUpdate && fieldProps.primaryKey == true) {
+                p.readOnly = true;
+            }
+            if (isReadOnly) {
+                p.readOnly = true;
+            }
+            if (isDisabled) {
+                p.disabled = true;
+            }
+            p.formName = formName;
+        } else if (isFilter) {
+            if (isObj(fieldProps.forFilter)) {
+                extendObj(p, fieldProps.forFilter);
+            }
         }
-    }, [field.name, form])
+        delete p.forCreate;
+        delete p.forCreateOrUpdate;
+        delete p.forUpdate;
+        delete p.forFilter;
+        return p;
+    }, [isFormField, isFilter, fieldProps, formName, isUpdate, isDisabled, isReadOnly])
+    const field = isFormField && typeof prepareFormField === "function" ? prepareFormField({ ...formContext, field: preparedField } as any) : fieldProps;
+    useEffect(() => {
+        if (!isFormField || !isObj(field) || !isNonNullString(field?.name)) return;
+        return () => {
+            form?.unmountField?.(field?.name as string);
+        }
+    }, [field?.name, isFormField, form]);
+    if (!field) return null;
+    const { onMount, onUnmount, onFieldValid, onKeyEvent, onFieldInvalid, onKeyEvent: onFieldKeyboardEvent } = field;
+    const Component = FormField.getRegisteredComponent<FieldType, ValueType>(field.type);
     return <Component
         {...field as any}
         key={field.name}
@@ -1385,6 +1419,70 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
         onUnmount={isFormField ? (context) => {
             form?.unmountField?.(field.name as string, context);
         } : onUnmount}
+        onFieldValid={(options) => {
+            const r = typeof onFieldValid === "function" ? onFieldValid(options) : undefined;
+            if (typeof onValidateField == "function") {
+                onValidateField(options);
+            }
+            if (isFormField) {
+                const isValid = !!form?.isValid?.();
+                form?.trigger?.(isValid ? "onValid" : "onInvalid", form);
+                if (isValid) {
+                    if (typeof onFormValid === "function") {
+                        onFormValid(options);
+                    }
+                } else if (typeof onFormInvalid === "function") {
+                    onFormInvalid(options);
+                }
+                //enable and disable form actions
+                const actions = FormsManager.getActions(formName);
+                for (var k in actions) {
+                    const action = actions[k];
+                    if (action) {
+                        if (isValid) {
+                            if (typeof action?.enable === "function") {
+                                action.enable();
+                            }
+                        } else if (typeof action?.disable === "function") {
+                            action.disable();
+                        }
+                    }
+                }
+            }
+            return r;
+        }}
+        onFieldInvalid={(options) => {
+            const r = typeof onFieldInvalid === "function" ? onFieldInvalid(options) : undefined;
+            if (isFormField) {
+                if (typeof onInvalidateField == "function") {
+                    onInvalidateField(options);
+                }
+                if (typeof onFormInvalid === "function") {
+                    onFormInvalid(options);
+                }
+                form?.trigger("onInvalid", form);
+            }
+            return r;
+        }}
+        onKeyEvent={(options) => {
+            const r = typeof onFieldKeyboardEvent === "function" ? onFieldKeyboardEvent(options) : undefined;
+            if (typeof onKeyEvent === "function") {
+                onKeyEvent(options);
+            }
+            if (typeof onFormKeyEvent === "function") {
+                onFormKeyEvent(options);
+            }
+            if (typeof onEnterKeyPress == "function" && options?.key === "enter" && (form?.isValid?.())) {
+                if (onEnterKeyPress(options) === false) {
+                    return;
+                }
+                if (typeof form?.submit === "function") {
+                    form.submit();
+                    form.trigger("submit", form);
+                }
+            }
+            return r;
+        }}
     />;
 }
 FormFieldRenderer.displayName = "Form.FieldRenderer";
@@ -1405,11 +1503,11 @@ class FormsManager {
         };
     } = {};
 
-    static isField(field: any): field is FormField {
+    static isField<FieldType extends IFieldType = IFieldType, ValueType = any>(field: any): field is FormField<FieldType, ValueType> {
         return field instanceof FormField;
     }
 
-    static isForm(form: any): boolean {
+    static isForm<Fields extends IFields = IFields>(form: any): form is IForm<Fields> {
         if (!form) return false;
         return isObj(form) && typeof form.getData === "function" && typeof form.isValid === "function" && typeof form.getName === "function" && typeof form.getFieldInstances === "function";
     }
@@ -1741,7 +1839,7 @@ interface IFormRenderFieldOptions<Fields extends IFields = IFields> extends IFor
 
 export interface IFormContextProps<Fields extends IFields = IFields> {
 
-    prepareFormField?: (formContext: IFormContext<Fields> & { field: IField }) => IField | null | undefined;
+    prepareFormField?: <FieldType extends IFieldType, ValueType = any>(formContext: IFormContext<Fields> & { field: Omit<IField<FieldType, ValueType>, "ref"> }) => Omit<IField<FieldType, ValueType>, "ref"> | null | undefined;
     /**
      * Called when the entire form is validated and determined to be **valid**.
      *

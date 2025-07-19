@@ -879,6 +879,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
             disabled: customDisabled,
             readOnly: customReadOnly,
             displayErrors,
+            containerClassName,
             ...rest
         } = this.overrideProps(this.props as IField<FieldType, ValueType>);
         const isFilter = this.isFilter() || cIsFilter;
@@ -900,7 +901,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
                 handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(keyEventHandlerProps)}
                 onKeyEvent={this.onKeyEvent.bind(this)}
                 disabled={disabled || readOnly}
-                className={cn("resk-form-field-container", visibleClassName, commonVariant({ disabled, readOnly }))}
+                className={cn("resk-form-field-container", visibleClassName, commonVariant({ disabled, readOnly }), keyEventHandlerProps?.className, containerClassName)}
             >
                 {(kProps) => {
                     return (
@@ -1008,7 +1009,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
 
 /******************* Form Implementation  ******************/
 
-export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldClassName }: IFormProps<Fields>) {
+export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldContainerClassName }: IFormProps<Fields>) {
     const generatedFormName = useId();
     testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
@@ -1232,8 +1233,8 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
         get testID() {
             return testID;
         },
-        get fieldClassName() {
-            return cn(computedVariant.field(), fieldClassName);
+        get fieldContainerClassName() {
+            return cn(computedVariant.field(), fieldContainerClassName);
         },
         onFormValid,
         onFormInvalid,
@@ -1255,7 +1256,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
 
 function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref"> & { type: FieldType, ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
-    const { form, fieldClassName, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
+    const { form, fieldContainerClassName, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
     const isFormField = FormsManager.isForm(form);
     const { ref, ...fieldProps } = props;
     const isFilter = !!fieldProps.isFilter;
@@ -1309,7 +1310,7 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
     const Component = FormField.getRegisteredComponent<FieldType, ValueType>(field.type);
     return <Component
         {...field as any}
-        className={cn("resk-form-field-renderer", fieldClassName, field.className)}
+        className={cn("resk-form-field-renderer", fieldContainerClassName, field.className)}
         formName={formName}
         ref={ref}
         key={field.name}
@@ -1662,7 +1663,7 @@ export interface IFormContext<Fields extends IFields = IFields> extends IFormCon
     readonly errors: string[];
     readonly submitCount: number;
     readonly invalidSubmitCount: number;
-    readonly fieldClassName?: IClassName;
+    readonly fieldContainerClassName?: IClassName;
 }
 
 export interface IFormKeyboardEventHandlerOptions {
@@ -1683,6 +1684,10 @@ export type IFormData<Fields extends IFields = IFields> = {
 export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, ValueType = any, TOnChangeOptions = unknown> extends IFieldBase<FieldType, ValueType> {
     testID?: string;
     className?: IClassName;
+    /***
+     * The className of the container
+     */
+    containerClassName?: IClassName;
     onKeyEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
     getValidValue?: (options: { value: any; context: FormField<FieldType, ValueType>; data: IFormData }) => any;
     isFilter?: boolean;
@@ -1806,7 +1811,7 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      * The class name for the form field container.
      * The Keyboard event Handler that wraps each Form field.
      */
-    fieldClassName?: IClassName;
+    fieldContainerClassName?: IClassName;
 
     renderSkeleton?: (context: IFormContext<Fields>) => ReactNode;
 

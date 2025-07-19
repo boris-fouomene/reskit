@@ -1100,7 +1100,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any, TSta
     static getRegisteredComponent<FieldType extends IFieldType = IFieldType, ValueType = any>(type: IFieldType): IFormFieldComponent<FieldType, ValueType> {
         if (!isNonNullString(type)) return FormField<FieldType, ValueType>;
         const components = FormField.getRegisteredComponents();
-        if (!components) return FormField<FieldType, ValueType>;
+        if (!components || !components[type]) return FormField<FieldType, ValueType>;
         return components[type];
     }
 }
@@ -1110,7 +1110,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any, TSta
 
 /******************* Form Implementation  ******************/
 
-export function Form<Fields extends IFields = IFields>({ name, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField }: IFormProps<Fields>) {
+export function Form<Fields extends IFields = IFields>({ name, style, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField }: IFormProps<Fields>) {
     const generatedFormName = useId();
     testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
@@ -1358,15 +1358,16 @@ export function Form<Fields extends IFields = IFields>({ name, testID, asHtmlTag
     useImperativeHandle(ref, () => (formContext));
     return <FormContext.Provider value={formContext}>
         {headerContent}
-        {skeleton ?? !hasRenderFields ? <Div asHtmlTag={asHtmlTag} id={formName} testID={testID} role="form" accessibilityState={{ disabled: !!disabled }} className={cn("resk-form", `resk-form-${formName}`, className)}>{formFields}</Div> : formFields}
+        {skeleton ?? !hasRenderFields ? <Div style={style} asHtmlTag={asHtmlTag} id={formName} testID={testID} role="form" accessibilityState={{ disabled: !!disabled }} className={cn("resk-form", `resk-form-${formName}`, className)}>{formFields}</Div> : formFields}
         {childrenContent}
     </FormContext.Provider>;
 }
 
-function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>({ ref, ...fieldProps }: Omit<IField<FieldType, ValueType>, "ref"> & { ref?: Ref<FormField<FieldType, ValueType>> }) {
+function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref"> & { ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
     const { form, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
     const isFormField = FormsManager.isForm(form);
+    const { ref, ...fieldProps } = props;
     const isFilter = !!fieldProps.isFilter;
     const preparedField = useMemo(() => {
         const p = Object.assign({}, fieldProps);
@@ -1399,7 +1400,7 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
         delete p.forUpdate;
         delete p.forFilter;
         return p;
-    }, [isFormField, isFilter, fieldProps, formName, isUpdate, isDisabled, isReadOnly])
+    }, [isFormField, isFilter, props, formName, isUpdate, isDisabled, isReadOnly])
     const field = isFormField && typeof prepareFormField === "function" ? prepareFormField({ ...formContext, field: preparedField } as any) : fieldProps;
     useEffect(() => {
         if (!isFormField || !isObj(field) || !isNonNullString(field?.name)) return;
@@ -1882,6 +1883,7 @@ export interface IFormContextProps<Fields extends IFields = IFields> {
 
 export interface IFormProps<Fields extends IFields = IFields> extends IFormContextProps<Fields> {
     testID?: string;
+    style?: IHtmlDivProps["style"];
     className?: IClassName;
     asHtmlTag?: IHtmlDivProps["asHtmlTag"];
 

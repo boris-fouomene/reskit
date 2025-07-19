@@ -1,1 +1,1 @@
-export * from "./build/components/Form";
+export * from "../build/components/Form";

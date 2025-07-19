@@ -4,6 +4,7 @@ import { BottomSheetExample } from './BottomSheetExample';
 import { AlertExamples } from './AlertExamples';
 import { Icon, Menu, AppBar, TextInput, Dropdown, ActivityIndicator, ProgressBar, HelperText, Surface, Avatar, Divider, Badge, Button, HStack, Tooltip, Switch, Checkbox, VStack, CountrySelector, TelInput, Expandable, SSRScrollView, cn } from "@resk/nativewind";
 import { buttonVariant } from "@resk/nativewind/variants";
+import { FormExamples } from './FormExamples';
 
 type ScreenContentProps = {
   title: string;
@@ -14,6 +15,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
     <SSRScrollView>
       <DialogExample />
       <BottomSheetExample />
+      <FormExamples />
       <Div className="p-5">
         <Heading level={1}>Button examples</Heading>
         <HStack className="p-5 !gap-x-10 gap-y-5">

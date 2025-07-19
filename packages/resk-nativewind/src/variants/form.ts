@@ -21,9 +21,9 @@ export const formVariant = tv({
         }, "field"),
     },
     defaultVariants: {
-        fieldMarginY: "10px",
         flexDirection: "row",
-        gapX: 4,
+        gapX: 2,
+        gapY: 2,
         width: "full",
         "fieldLg:width": "third"
     }

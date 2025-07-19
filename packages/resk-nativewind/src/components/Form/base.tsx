@@ -532,8 +532,8 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any, TSta
         options.value = this.state.value;
         options.context = this;
         options.fieldName = this.getName();
-        if ((this.props as any).onChange) {
-            (this.props as any).onChange(options as any);
+        if ((this.props).onChange) {
+            (this.props).onChange(options as any);
         }
     }
     /**
@@ -1359,36 +1359,36 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
     const { ref, ...fieldProps } = props;
     const isFilter = !!fieldProps.isFilter;
     const preparedField = useMemo(() => {
-        const p = Object.assign({}, fieldProps);
+        const field = Object.assign({}, fieldProps);
         if (isFormField) {
             if (isObj(fieldProps.forCreateOrUpdate)) {
-                extendObj(p, fieldProps.forCreateOrUpdate);
+                extendObj(field, fieldProps.forCreateOrUpdate);
             }
             if (isObj(fieldProps.forUpdate) && isUpdate) {
-                extendObj(p, fieldProps.forUpdate);
+                extendObj(field, fieldProps.forUpdate);
             } else if (isObj(fieldProps.forCreate) && !isUpdate) {
-                extendObj(p, fieldProps.forCreate);
+                extendObj(field, fieldProps.forCreate);
             }
             if (isUpdate && fieldProps.primaryKey == true) {
-                p.readOnly = true;
+                field.readOnly = true;
             }
             if (isReadOnly) {
-                p.readOnly = true;
+                field.readOnly = true;
             }
             if (isDisabled) {
-                p.disabled = true;
+                field.disabled = true;
             }
-            p.formName = formName;
+            field.formName = formName;
         } else if (isFilter) {
             if (isObj(fieldProps.forFilter)) {
-                extendObj(p, fieldProps.forFilter);
+                extendObj(field, fieldProps.forFilter);
             }
         }
-        delete p.forCreate;
-        delete p.forCreateOrUpdate;
-        delete p.forUpdate;
-        delete p.forFilter;
-        return p;
+        delete field.forCreate;
+        delete field.forCreateOrUpdate;
+        delete field.forUpdate;
+        delete field.forFilter;
+        return field;
     }, [isFormField, isFilter, props, formName, isUpdate, isDisabled, isReadOnly])
     const field = isFormField && typeof prepareFormField === "function" ? prepareFormField({ ...formContext, field: preparedField } as any) : fieldProps;
     useEffect(() => {
@@ -1402,6 +1402,7 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
     const Component = FormField.getRegisteredComponent<FieldType, ValueType>(field.type);
     return <Component
         {...field as any}
+        ref={ref}
         key={field.name}
         onMount={isFormField ? (context) => {
             form?.mountField?.(context);

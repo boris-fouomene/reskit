@@ -22,6 +22,7 @@ export function FormExamples() {
                     label={"Field Renderer example"}
                     checkedValue={"Yes"}
                     uncheckedValue={"No"}
+                    onChange={(value) => console.log("Checkbox changed:", value)}
                 />
                 <Form.Action
                     label={"Send"}

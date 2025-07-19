@@ -10,7 +10,7 @@ export function FormExamples() {
                 name={formName}
                 className=""
                 fields={{
-                    name: { label: "Nom", type: "email", required: true },
+                    name: { label: "Nom", type: "text", required: true },
                     email: { type: "email", label: "Email" },
                     password: { type: "password", label: "Password" },
                     checked: { type: "switch", checkedLabel: "Checked", uncheckedLabel: "unchecked", defaultValue: 1 }

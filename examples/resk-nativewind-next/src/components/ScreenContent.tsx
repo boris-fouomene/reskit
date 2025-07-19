@@ -188,6 +188,7 @@ export const ScreenContent = ({ title, children }: ScreenContentProps) => {
           <Text className={[styles.separator]} testID='example-of-children-slot'  >Example of slot</Text>
         </Div>
         <HelperText error>An example of helper text</HelperText>
+        <HelperText error>Helper text with error</HelperText>
         <Div className="p-5">
           <Heading level={1} variant={{ color: "background" }}>Heading 1 - Background</Heading>
           <Heading level={2} variant={{ color: "neutral" }}>Heading 2 - neutral</Heading>

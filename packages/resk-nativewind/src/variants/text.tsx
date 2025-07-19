@@ -7,30 +7,7 @@ export const textVariant = tv({
     variants: {
         ...VariantsOptionsFactory.createAll(),
         ...textVariants,
-        error: {
-            true: "",
-        },
-        waring: {
-            true: ""
-        },
-        success: {
-            true: ""
-        },
     },
-    compoundVariants: [
-        {
-            color: "error",
-            error: true,
-        },
-        {
-            color: "warning",
-            warning: true,
-        },
-        {
-            color: "success",
-            success: true,
-        }
-    ]
 });
 
 export type ITextVariant = VariantProps<typeof textVariant>

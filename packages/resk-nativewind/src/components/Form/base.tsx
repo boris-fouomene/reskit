@@ -43,7 +43,9 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
             prevValue: value,
             isDisabled: false,
         } as any;
-        this.validate({ value: this.state.value }).catch((e) => { });
+        if (this.shouldValidateOnMount()) {
+            this.validate({ value: this.state.value }).catch((e) => { });
+        }
     }
     componentDidUpdate(prevProps: IField<FieldType, ValueType>): void {
         if (!this.compareValues(prevProps.defaultValue, this.props.defaultValue)) {
@@ -150,7 +152,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
      * reading their values, or triggering validation outside of the normal flow.
      */
     getFieldInstance<FieldType extends IFieldType = IFieldType, ValueType = any>(fieldName: string): FormField<FieldType, ValueType> | null {
-        return FormsManager.getFieldInstance<FieldType>(this.getFormName(), fieldName) as any;
+        return FormsManager.getFieldInstance<FieldType>(this.getFormName(), fieldName);
     }
     /**
      * Determines if the current field is of type "email".
@@ -295,7 +297,10 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
                             validatedValue: value,
                             value,
                             errorText: error?.message || stringify(error),
+                        }, () => {
+                            this.onInvalid(options);
                         });
+
                     reject(error);
                 });
             })
@@ -321,7 +326,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
      * const shouldValidateOnMount = this.shouldValidateOnMount(); // true or false
      */
     shouldValidateOnMount() {
-        return !!this.props.validateOnMount;
+        return this.props.validateOnMount !== false;
     }
     /**
      * Retrieves the validation rules for the field.
@@ -443,6 +448,22 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         if (typeof this.props.onChange === "function") {
             this.props.onChange(options as any);
         }
+    }
+    private validateOtherFields() {
+        const fields = FormsManager.getFieldInstances(this.getFormName());
+        if (!isObj(fields) || !fields) return;
+        let canEnable = true;
+        typedEntries(fields).map(([name, field]) => {
+            if (!(field instanceof FormField) || name === this.getName()) return;
+            /* const matchF = field.getMatchField();
+            if (matchF && matchF.getName() === this.getName()) {
+                field.validate({ value: fK.getValue() });
+            } */
+            if (!field.isValid()) {
+                canEnable = false;
+                return;
+            }
+        });
     }
     onValid(options: IFormFieldValidateOptions<FieldType, ValueType>) {
         options.context = this;
@@ -1097,18 +1118,6 @@ export function Form<Fields extends IFields = IFields>({ name, style, validateBe
             shouldValidateBeforeFirstSubmit: () => contextRef.current.validateBeforeFirstSubmit,
             getSubmitCount: () => contextRef.current.submitCount,
             getInvalidSubmitCount: () => contextRef.current.invalidSubmitCount,
-            mountField: (field) => {
-                const fieldName = field?.getName();
-                if (!fieldName) return;
-                fieldsInstancesRef.current[name as IFieldName<Fields>] = field;
-            },
-            unmountField: (fieldName, field) => {
-                if (!isNonNullString(fieldName)) return;
-                if (!fieldsInstancesRef.current[fieldName]) {
-                    return;
-                }
-                delete fieldsInstancesRef.current[fieldName];
-            },
             isValid,
             getData,
             getName: () => formName,
@@ -1121,12 +1130,18 @@ export function Form<Fields extends IFields = IFields>({ name, style, validateBe
             isLoading: () => contextRef.current.isLoading,
 
             submit: () => {
+                const prevSubmitCount = contextRef.current.submitCount;
                 contextRef.current.submitCount++;
-                console.log("want to sumbit count teeee ", contextRef);
                 if (!isValid()) {
-                    const message = getErrorText();
                     contextRef.current.invalidSubmitCount++;
-                    console.log("form validation wrong ", message);
+                    if (!prevSubmitCount) {
+                        typedEntries(fieldsInstancesRef.current).map(([name, field]) => {
+                            if (field instanceof FormField) {
+                                field.validate({ value: field.getValue() });
+                            }
+                        });
+                    }
+                    const message = getErrorText();
                     return Promise.reject(new Error(message));
                 }
                 return new Promise((resolve, reject) => {
@@ -1272,12 +1287,18 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
         return field;
     }, [isFormField, isFilter, props, formName, isUpdate, isDisabled, isReadOnly])
     const field = isFormField && typeof prepareFormField === "function" ? prepareFormField({ ...formContext, field: preparedField } as any) : fieldProps;
+    const unmountField = useCallback((fieldName: string) => {
+        if (!isNonNullString(fieldName)) return;
+        if (isObj(fieldsInstances)) {
+            delete fieldsInstances[fieldName];
+        }
+    }, [fieldsInstances]);
     useEffect(() => {
         if (!isFormField || !isObj(field) || !isNonNullString(field?.name)) return;
         return () => {
-            form?.unmountField?.(field?.name as string);
+            unmountField(field?.name as string);
         }
-    }, [field?.name, isFormField, form]);
+    }, [field?.name, isFormField, unmountField]);
     if (!field) return null;
     const { onMount, onUnmount, onFieldValid, onKeyEvent, onFieldInvalid, onKeyEvent: onFieldKeyboardEvent } = field;
     const Component = FormField.getRegisteredComponent<FieldType, ValueType>(field.type);
@@ -1286,11 +1307,11 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
         formName={formName}
         ref={ref}
         key={field.name}
-        onMount={isFormField ? (context) => {
-            form?.mountField?.(context);
+        onMount={isFormField ? (field) => {
+            fieldsInstances[field.getName()] = field;
         } : onMount}
         onUnmount={isFormField ? (context) => {
-            form?.unmountField?.(field.name as string, context);
+            unmountField(field.name as string);
         } : onUnmount}
         onFieldValid={(options: IFormFieldValidateOptions<IFieldType, ValueType>) => {
             const r = typeof onFieldValid === "function" ? onFieldValid(options as any) : undefined;
@@ -1298,7 +1319,6 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
                 onValidateField(options as any);
             }
             if (isFormField) {
-                const isValid = !!form?.isValid?.();
                 FormsManager.toggleFormStatus(formName, ({ isValid, form }) => {
                     form.trigger(isValid ? "onValid" : "onInvalid", form);
                     if (isValid) {
@@ -1383,13 +1403,6 @@ class FormsManager {
         if (!formName) return;
         delete this.forms[formName];
     }
-    static mountField(field: FormField) {
-        if (!field || this.isField(field)) return;
-    }
-    static unmountField(field: FormField) {
-        if (!field || this.isField(field)) return;
-    }
-
     static getForm<Fields extends IFields = IFields>(formName?: string): IForm<Fields> | null {
         if (!formName) return null;
         return this.forms[formName] as any || null;
@@ -1559,8 +1572,6 @@ export interface IForm<Fields extends IFields = IFields> extends IObservable<IFo
     isValid(): boolean;
     isEditing(): boolean;
     getData(): IFormData;
-    mountField(field: FormField): void;
-    unmountField(fieldName: string, field?: FormField): void;
     /**
      * Returns an object containing **field instances** keyed by field name.
      *

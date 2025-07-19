@@ -2,25 +2,15 @@ import { defaultStr } from "@resk/core/utils";
 import { IHtmlTextProps, Text } from "@html";
 import { cn } from "@utils/cn";
 import { ITextVariant } from "@variants/text";
-import { commonVariant, textVariant } from "@variants/index";
+import { commonVariant } from "@variants/common";
 
 
-/**
- * Renders a helper text component, typically used for displaying validation messages or additional information.
- *
- * @param visible - Controls the visibility of the helper text. Defaults to `true`.
- * @param error - If provided, styles the text to indicate an error state.
- * @param className - Additional class names to apply to the component.
- * @param testID - Optional test identifier for testing purposes. Defaults to `"resk-helper-text"`.
- * @param rest - Additional props passed to the underlying `Text` component.
- * 
- * @returns A styled `Text` component displaying helper information or error messages.
- */
-export function HelperText({ visible = true, error, className, testID, ...rest }: IHelperTextProps & ITextVariant) {
+export function HelperText({ visible = true, error, variant, className, testID, ...rest }: IHelperTextProps) {
     testID = defaultStr(testID, "resk-helper-text");
     return <Text
         {...rest}
-        className={cn(commonVariant({ hidden: visible === false }), textVariant({ error: !!error }), className)}
+        variant={{ ...variant, color: error ? "error" : variant?.color }}
+        className={cn("resk-helper-text", error && "resk-text-helper-error", commonVariant({ hidden: visible === false }), className)}
     />
 }
 
@@ -40,8 +30,5 @@ export interface IHelperTextProps extends IHtmlTextProps {
      */
     error?: boolean;
 
-    /**
-     * Optional custom color for the helper text.
-     */
-    color?: string;
+    variant?: ITextVariant;
 };

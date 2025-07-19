@@ -94,9 +94,13 @@ export function Switch({ testID, ...props }: ISwitchProps) {
     const { touchableProps, ...nonTouchableProps } = pickTouchableProps(rest as any);
     const MTestID = typeof testID === 'string' && testID || "resk-switch";
     const labelContent = <Text testID={`${MTestID}-label`} children={label} className={labelClassName} />;
-    return <Tooltip<TouchableOpacityProps> disabled={disabled || readOnly} title={title} testID={`${MTestID}-container`}
+    return <Tooltip<TouchableOpacityProps>
+        disabled={disabled || readOnly}
+        title={title}
+        testID={`${MTestID}-container`}
         {...touchableProps as any}
         onPress={(event: GestureResponderEvent) => {
+            event.stopPropagation();
             toggleStatus();
         }}
         className={cn(containerClassName)}

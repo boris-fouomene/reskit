@@ -30,6 +30,9 @@ export function FormExamples() {
                 <Form.Action
                     label={"Send"}
                     formName={formName}
+                    onPress={(event, { form, formData }) => {
+                        console.log("Form submitted with data:", formData);
+                    }}
                 />
             </Form>
         </Div>

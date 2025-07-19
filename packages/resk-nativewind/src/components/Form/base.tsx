@@ -46,35 +46,15 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         this.validate({ value: this.state.value }).catch((e) => { });
     }
     componentDidUpdate(prevProps: IField<FieldType, ValueType>): void {
-        if (!this.compareValues(prevProps.defaultValue, this.props.defaultValue && "defaultValue" in this.props)) {
+        if (!this.compareValues(prevProps.defaultValue, this.props.defaultValue)) {
             this.validate({ value: this.props.defaultValue }, true).catch((e) => { });
         }
     }
 
-    /**
-     * Compares two values to determine if they are equal.
-     *
-     * This method is used to check if the current value and the previous value of the field are considered equal.
-     * It uses a utility function to handle deep equality and empty value checks.
-     *
-     * @param {any} a - The first value to compare.
-     * @param {any} b - The second value to compare.
-     * @returns {boolean} - Returns true if the values are equal or both are empty, otherwise false.
-     *
-     * @example
-     * // Compare two numbers
-     * const isEqual = this.compareValues(5, 5); // true
-     *
-     * // Compare two strings
-     * const isEqual = this.compareValues("abc", "abc"); // true
-     *
-     * // Compare empty values
-     * const isEqual = this.compareValues(undefined, null); // true
-     *
-     * // Compare objects
-     * const isEqual = this.compareValues({ a: 1 }, { a: 1 }); // true
-     */
-    compareValues(a: any, b: any): boolean {
+    compareValues(a: ValueType | undefined, b: ValueType | undefined): boolean {
+        if (typeof this.props.compareValues === "function") {
+            return this.props.compareValues(a, b, this as any);
+        }
         return compareValues(a, b);
     }
 
@@ -460,8 +440,8 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         options.value = this.state.value;
         options.context = this;
         options.fieldName = this.getName();
-        if ((this.props).onChange) {
-            (this.props).onChange(options as any);
+        if (typeof this.props.onChange === "function") {
+            this.props.onChange(options as any);
         }
     }
     onValid(options: IFormFieldValidateOptions<FieldType, ValueType>) {
@@ -661,11 +641,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
     }
 
     validateOnChange(options: IFormFieldValidateOptions<FieldType, ValueType>) {
-        return this.validate(options).then((r) => {
-            return r;
-        }).catch((e) => {
-            return e;
-        });
+        return this.validate(options);
     }
 
     _render(props: IField<FieldType, ValueType>, innerRef?: any): ReactNode {
@@ -1089,12 +1065,12 @@ export function Form<Fields extends IFields = IFields>({ name, style, testID, as
             const fields = fieldsInstancesRef.current;
             contextRef.current.errors = [];
             if (isObj(fields)) {
-                for (let j in fields) {
-                    const f = fields[j];
-                    if (f instanceof FormField && !f.isValid()) {
-                        contextRef.current.errors.push(`[${f.getLabel()}] : ${defaultStr(f.getErrorText())}`);
+                typedEntries(fields).map(([name, field]) => {
+                    if (!FormsManager.isField(field)) return;
+                    if (!field.isValid()) {
+                        contextRef.current.errors.push(`[${field.getLabel()}] : ${defaultStr(field.getErrorText())}`);
                     }
-                }
+                });
             }
             return contextRef.current.errors.length === 0;
         }
@@ -1143,9 +1119,11 @@ export function Form<Fields extends IFields = IFields>({ name, style, testID, as
 
             submit: () => {
                 contextRef.current.submitCount++;
+                console.log("want to sumbit count teeee ", contextRef);
                 if (!isValid()) {
                     const message = getErrorText();
                     contextRef.current.invalidSubmitCount++;
+                    console.log("form validation wrong ", message);
                     return Promise.reject(new Error(message));
                 }
                 return new Promise((resolve, reject) => {
@@ -1302,6 +1280,7 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
     const Component = FormField.getRegisteredComponent<FieldType, ValueType>(field.type);
     return <Component
         {...field as any}
+        formName={formName}
         ref={ref}
         key={field.name}
         onMount={isFormField ? (context) => {
@@ -1317,28 +1296,16 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
             }
             if (isFormField) {
                 const isValid = !!form?.isValid?.();
-                form?.trigger?.(isValid ? "onValid" : "onInvalid", form);
-                if (isValid) {
-                    if (typeof onFormValid === "function") {
-                        onFormValid(options);
-                    }
-                } else if (typeof onFormInvalid === "function") {
-                    onFormInvalid(options);
-                }
-                //enable and disable form actions
-                const actions = FormsManager.getActions(formName);
-                for (var k in actions) {
-                    const action = actions[k];
-                    if (action) {
-                        if (isValid) {
-                            if (typeof action?.enable === "function") {
-                                action.enable();
-                            }
-                        } else if (typeof action?.disable === "function") {
-                            action.disable();
+                FormsManager.toggleFormStatus(formName, ({ isValid, form }) => {
+                    form.trigger(isValid ? "onValid" : "onInvalid", form);
+                    if (isValid) {
+                        if (typeof onFormValid === "function") {
+                            onFormValid(options);
                         }
+                    } else if (typeof onFormInvalid === "function") {
+                        onFormInvalid(options);
                     }
-                }
+                })
             }
             return r;
         }}
@@ -1351,7 +1318,9 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
                 if (typeof onFormInvalid === "function") {
                     onFormInvalid(options);
                 }
-                form?.trigger("onInvalid", form);
+                FormsManager.toggleFormStatus(formName, ({ isValid, form }) => {
+                    form.trigger(isValid ? "onValid" : "onInvalid", form);
+                });
             }
             return r;
         }}
@@ -1469,6 +1438,30 @@ class FormsManager {
         if (!isNonNullString(formName)) return {};
         return this.actions[formName] || {};
     }
+    static toggleFormStatus(formName: string, callback?: (options: { isValid: boolean, form: IForm }) => void) {
+        if (!isNonNullString(formName)) return;
+        const form = FormsManager.getForm(formName);
+        if (!form) return;
+        const isValid = form.isValid();
+        if (form.getSubmitCount() > 0) {
+            const actions = FormsManager.getActions(formName);
+            for (var k in actions) {
+                const action = actions[k];
+                if (action) {
+                    if (isValid) {
+                        if (typeof action?.enable === "function") {
+                            action.enable();
+                        }
+                    } else if (typeof action?.disable === "function") {
+                        action.disable();
+                    }
+                }
+            }
+        }
+        if (typeof callback === "function") {
+            callback({ isValid, form });
+        }
+    }
 }
 
 function FormAction<FormFields extends IFields = IFields, Context = unknown>({ formName, submitFormOnPress, id, className, ref, onPress, context, ...props }: IFormActionProps<FormFields, Context>) {
@@ -1483,7 +1476,7 @@ function FormAction<FormFields extends IFields = IFields, Context = unknown>({ f
         return () => {
             FormsManager.unmountAction(id, formName);
         };
-    }, [innerRef, formName, id]);
+    }, [innerRef.current, formName, id]);
     useEffect(() => {
         return () => {
             FormsManager.unmountAction(id, formName);
@@ -1498,16 +1491,24 @@ function FormAction<FormFields extends IFields = IFields, Context = unknown>({ f
         ref={mergedRef}
         onPress={(event, context) => {
             const form = FormsManager.getForm<FormFields>(formName);
-            if (!form?.isValid?.()) {
-                innerRef?.current?.disable();
-                return;
-            }
-            const options = Object.assign({}, context, form ? { form, formData: form.getData() } : {});
+            const options = Object.assign({}, context, form ? { form, formData: form?.getData?.() } : {});
             if (typeof onPress == "function" && onPress(event, options) === false) {
                 return;
             }
-            if (form && submitFormOnPress !== false) {
-                form.submit();
+            if (form) {
+                const isValid = form.isValid();
+                const cb = !isValid ? innerRef.current?.disable : undefined;
+                if (submitFormOnPress !== false) {
+                    if (typeof cb == "function") {
+                        cb(() => {
+                            form.submit();
+                        });
+                    } else {
+                        form.submit();
+                    }
+                } else {
+                    cb?.();
+                }
             }
         }}
     />
@@ -1715,6 +1716,8 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
     ref?: any;
 
     onChange?: (options: IFormFieldOnChangeOptions<FieldType, ValueType, TOnChangeOptions>) => void;
+
+    compareValues?: (a: ValueType | undefined, b: ValueType | undefined, context: FormField<FieldType, ValueType>) => boolean;
 }
 
 export interface IFormFieldTextProps<FieldType extends IFieldType = IFieldType, ValueType = any>
@@ -1775,9 +1778,7 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
     style?: IHtmlDivProps["style"];
     className?: IClassName;
     asHtmlTag?: IHtmlDivProps["asHtmlTag"];
-
     renderSkeleton?: (context: IFormContext<Fields>) => ReactNode;
-
 
     data?: IFormData;
 

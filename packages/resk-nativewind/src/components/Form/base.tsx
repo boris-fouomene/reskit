@@ -2015,20 +2015,156 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
 
     perm?: IAuthPerm;
 
+    /**
+     * Custom function to render all form fields with complete control over the layout and structure.
+     * 
+     * When provided, this function takes full responsibility for rendering all form fields,
+     * bypassing the default field rendering logic. This gives you maximum flexibility to create
+     * custom layouts, groupings, conditional rendering, and complex field arrangements.
+     * 
+     * @param {IFormRenderFieldOptions<Fields>} options - Comprehensive context object containing form state, field definitions, and rendering options
+     * @returns {ReactNode} - The complete rendered form fields structure
+     * 
+     * @example
+     * ```tsx
+     * // Custom two-column layout with grouped fields
+     * const MyForm = () => (
+     *   <Form
+     *     renderFields={({ fields, isUpdate, data, disabled }) => (
+     *       <div className="grid grid-cols-2 gap-6">
+     *         <div className="space-y-4">
+     *           <h3 className="text-lg font-semibold">Personal Information</h3>
+     *           <FormFieldRenderer {...fields.firstName} />
+     *           <FormFieldRenderer {...fields.lastName} />
+     *           <FormFieldRenderer {...fields.email} />
+     *         </div>
+     *         <div className="space-y-4">
+     *           <h3 className="text-lg font-semibold">Account Settings</h3>
+     *           <FormFieldRenderer {...fields.username} />
+     *           {!isUpdate && <FormFieldRenderer {...fields.password} />}
+     *           <FormFieldRenderer {...fields.role} disabled={disabled} />
+     *         </div>
+     *         {data.role === 'admin' && (
+     *           <div className="col-span-2">
+     *             <FormFieldRenderer {...fields.permissions} />
+     *           </div>
+     *         )}
+     *       </div>
+     *     )}
+     *   />
+     * );
+     * 
+     * // Table row rendering for inline editing
+     * const TableRowForm = () => (
+     *   <Form
+     *     asFragment={true}
+     *     renderFields={({ fields }) => (
+     *       <React.Fragment>
+     *         <td><FormFieldRenderer {...fields.name} /></td>
+     *         <td><FormFieldRenderer {...fields.email} /></td>
+     *         <td><FormFieldRenderer {...fields.status} /></td>
+     *       </React.Fragment>
+     *     )}
+     *   />
+     * );
+     * ```
+     * 
+     * @remarks
+     * - When renderFields is provided, the renderField prop is completely ignored
+     * - You must manually render each field using FormFieldRenderer or your custom field components
+     * - The function receives all necessary context including form state, field definitions, and validation status
+     * - Use this for complex layouts, conditional field rendering, or when you need complete control over the form structure
+     * - Works seamlessly with asFragment prop for table/grid rendering scenarios
+     * - All form functionality (validation, submission, state management) remains intact regardless of custom rendering
+     * 
+     * @see {@link IFormRenderFieldOptions} for complete options interface
+     * @see {@link FormFieldRenderer} for the recommended component to render individual fields
+     * @see {@link renderField} for individual field customization when you don't need complete layout control
+     * 
+     * @since v1.0.0
+     */
     renderFields?: (options: IFormRenderFieldOptions<Fields>) => ReactNode;
 
-    /***
-        A function used to render a specific field
-        @param {IField} field - The field to render
-        @param {IFormSubmitOptions<Fields>} options - The options for the form submission
-        @returns {ReactNode} - The rendered field
-        @remarks
-            This function is used to render a specific field in the form.
-            It's only used when the `renderFields` prop is not provided.
-            It allows for customization of the rendering process for individual fields.
-            The function takes two parameters: the field to render and the options for the form submission.
-            It returns a ReactNode, which is the rendered field.
-    */
+    /**
+     * Custom function to render individual form fields while maintaining the default form layout structure.
+     * 
+     * This function is called for each field when renderFields is not provided, allowing you to customize
+     * how individual fields are rendered while keeping the overall form structure intact. Perfect for
+     * adding consistent field decorations, conditional rendering, or field-specific enhancements.
+     * 
+     * @param {IField} field - The field definition object containing all field properties and configuration
+     * @param {IFormRenderFieldOptions<Fields>} options - Form context and rendering options including form state, validation status, and field collection
+     * @returns {ReactNode} - The rendered field component
+     * 
+     * @example
+     * ```tsx
+     * // Add icons and validation indicators to fields
+     * const EnhancedForm = () => (
+     *   <Form
+     *     renderField={(field, { form, isUpdate }) => (
+     *       <div className="field-wrapper">
+     *         {field.type === 'email' && <EmailIcon />}
+     *         {field.type === 'password' && <LockIcon />}
+     *         {field.type === 'tel' && <PhoneIcon />}
+     *         
+     *         <label className="field-label">
+     *           {field.label}
+     *           {field.required && <span className="text-red-500">*</span>}
+     *         </label>
+     *         
+     *         <FormFieldRenderer {...field} />
+     *         
+     *         {form.getFieldInstances()[field.name]?.isValid() && (
+     *           <CheckIcon className="text-green-500" />
+     *         )}
+     *         
+     *         {field.helpText && (
+     *           <span className="text-sm text-gray-500">{field.helpText}</span>
+     *         )}
+     *       </div>
+     *     )}
+     *   />
+     * );
+     * 
+     * // Conditional field rendering based on form mode
+     * const ConditionalForm = () => (
+     *   <Form
+     *     renderField={(field, { isUpdate, disabled }) => {
+     *       if (isUpdate && field.createOnly) return null;
+     *       
+     *       const fieldClassName = field.type === 'password' 
+     *         ? 'password-field-container' 
+     *         : 'standard-field-container';
+     *       
+     *       return (
+     *         <div className={fieldClassName}>
+     *           <FormFieldRenderer 
+     *             {...field} 
+     *             disabled={disabled || (field.readOnlyInUpdate && isUpdate)}
+     *           />
+     *         </div>
+     *       );
+     *     }}
+     *   />
+     * );
+     * ```
+     * 
+     * @remarks
+     * - Only called when renderFields prop is not provided
+     * - Maintains the default form container structure while customizing individual field rendering
+     * - Called once for each field in the form fields object
+     * - Use FormFieldRenderer component to render the actual field to maintain all field functionality
+     * - Perfect for adding consistent field decorations, validation indicators, or help text
+     * - The field parameter contains all original field properties plus computed form context
+     * - Field order follows the order defined in the fields object
+     * 
+     * @see {@link IField} for complete field definition interface
+     * @see {@link IFormRenderFieldOptions} for complete options interface
+     * @see {@link FormFieldRenderer} for the recommended component to render the actual field
+     * @see {@link renderFields} for complete form layout customization
+     * 
+     * @since v1.0.0
+     */
     renderField?: (field: IField, options: IFormRenderFieldOptions<Fields>) => ReactNode;
 
     beforeSubmit?: (options: IFormSubmitOptions<Fields>) => any;
@@ -2172,12 +2308,6 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
     scrollViewClassName?: IClassName;
 
     scrollViewContainerClassName?: IClassName;
-
-    /***
-     * If true, the form will be rendered as a table
-     * Default is false
-     */
-    renderAsTable?: boolean;
 
     /**
      * Controls whether form validation should toggle action statuses before the first submission.

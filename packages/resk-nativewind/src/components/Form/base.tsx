@@ -692,11 +692,11 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         if (el) this._fieldRef = el;
     }
 
-    getKeyboardEvents(keyboardEventHandlerOptions?: IKeyboardEventHandlerProps): IKeyboardEventHandlerKey[] {
+    getKeyboardEvents(keyboardOptions?: IKeyboardEventHandlerProps): IKeyboardEventHandlerKey[] {
         const sanitizeKeyEvent = "ctrl+m";
         const events = [sanitizeKeyEvent, "enter", "up", "down", "left", "right"];
-        if (Array.isArray(keyboardEventHandlerOptions?.handleKeys)) {
-            keyboardEventHandlerOptions?.handleKeys.map((key) => {
+        if (Array.isArray(keyboardOptions?.handleKeys)) {
+            keyboardOptions?.handleKeys.map((key) => {
                 if (!events.includes(key)) {
                     events.push(key);
                 }
@@ -871,7 +871,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
     render() {
         let {
             data,
-            keyEventHandlerProps,
+            keyboardProps,
             formName,
             isFilter: cIsFilter,
             visible,
@@ -879,7 +879,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
             disabled: customDisabled,
             readOnly: customReadOnly,
             displayErrors,
-            containerClassName,
+            keyboardClassName,
             ...rest
         } = this.overrideProps(this.props as IField<FieldType, ValueType>);
         const isFilter = this.isFilter() || cIsFilter;
@@ -896,12 +896,12 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         const canShowErrors = this.canDisplayError();
         return (
             <KeyboardEventHandler
-                {...keyEventHandlerProps}
+                {...keyboardProps}
                 testID={"resk-form-field-container-" + this.getName()}
-                handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(keyEventHandlerProps)}
+                handleKeys={this.isFilter() ? [] : this.getKeyboardEvents(keyboardProps)}
                 onKeyEvent={this.onKeyEvent.bind(this)}
                 disabled={disabled || readOnly}
-                className={cn("resk-form-field-container", visibleClassName, commonVariant({ disabled, readOnly }), keyEventHandlerProps?.className, containerClassName)}
+                className={cn("resk-form-field-container", visibleClassName, commonVariant({ disabled, readOnly }), keyboardProps?.className, keyboardClassName)}
             >
                 {(kProps) => {
                     return (
@@ -1009,7 +1009,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
 
 /******************* Form Implementation  ******************/
 
-export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldContainerClassName }: IFormProps<Fields>) {
+export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldClassName }: IFormProps<Fields>) {
     const generatedFormName = useId();
     testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
@@ -1233,8 +1233,8 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
         get testID() {
             return testID;
         },
-        get fieldContainerClassName() {
-            return cn(computedVariant.field(), fieldContainerClassName);
+        get fieldClassName() {
+            return cn(computedVariant.field(), fieldClassName);
         },
         onFormValid,
         onFormInvalid,
@@ -1256,7 +1256,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
 
 function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref"> & { type: FieldType, ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
-    const { form, fieldContainerClassName, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
+    const { form, fieldClassName, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
     const isFormField = FormsManager.isForm(form);
     const { ref, ...fieldProps } = props;
     const isFilter = !!fieldProps.isFilter;
@@ -1310,7 +1310,7 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
     const Component = FormField.getRegisteredComponent<FieldType, ValueType>(field.type);
     return <Component
         {...field as any}
-        className={cn("resk-form-field-renderer", fieldContainerClassName, field.className)}
+        className={cn("resk-form-field-renderer", fieldClassName, field.className)}
         formName={formName}
         ref={ref}
         key={field.name}
@@ -1663,7 +1663,7 @@ export interface IFormContext<Fields extends IFields = IFields> extends IFormCon
     readonly errors: string[];
     readonly submitCount: number;
     readonly invalidSubmitCount: number;
-    readonly fieldContainerClassName?: IClassName;
+    readonly fieldClassName?: IClassName;
 }
 
 export interface IFormKeyboardEventHandlerOptions {
@@ -1687,7 +1687,7 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
     /***
      * The className of the container
      */
-    containerClassName?: IClassName;
+    keyboardClassName?: IClassName;
     onKeyEvent?: (options: IFormKeyboardEventHandlerOptions) => any;
     getValidValue?: (options: { value: any; context: FormField<FieldType, ValueType>; data: IFormData }) => any;
     isFilter?: boolean;
@@ -1716,7 +1716,59 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
      */
     onFieldInvalid?: (options: IFormFieldValidateOptions<IFieldType, ValueType>) => any;
 
-    keyEventHandlerProps?: IKeyboardEventHandlerProps;
+    /**
+     * Configuration options for keyboard event handling on the form field container.
+     * 
+     * This prop allows you to customize how the form field responds to keyboard events
+     * such as key presses, key combinations, and navigation keys. The configuration
+     * is passed directly to the underlying KeyboardEventHandler component that wraps
+     * each form field.
+     * 
+     * @type {IKeyboardEventHandlerProps}
+     * 
+     * @example
+     * ```tsx
+     * // Basic keyboard configuration
+     * <FormField
+     *   keyboardProps={{
+     *     handleKeys: ['enter', 'tab', 'escape'],
+     *     handleEventType: 'keydown'
+     *   }}
+     * />
+     * 
+     * // Advanced keyboard configuration with custom styling
+     * <FormField
+     *   keyboardProps={{
+     *     handleKeys: ['ctrl+s', 'ctrl+enter'],
+     *     className: 'custom-keyboard-handler',
+     *     disabled: false,
+     *     isExclusive: true
+     *   }}
+     * />
+     * 
+     * // Disable specific keys for certain field types
+     * <FormField
+     *   type="number"
+     *   keyboardProps={{
+     *     handleKeys: ['up', 'down'], // Only allow arrow keys
+     *     handleEventType: 'keypress'
+     *   }}
+     * />
+     * ```
+     * 
+     * @remarks
+     * - The keyboard configuration affects the field's container, not the input element directly
+     * - Key combinations follow the format: 'ctrl+key', 'alt+key', 'shift+key'
+     * - Filter fields (isFilter: true) automatically disable keyboard event handling
+     * - The className from keyboardProps is merged with the field's container className
+     * - Disabled or read-only fields automatically disable keyboard event handling
+     * 
+     * @see {@link IKeyboardEventHandlerProps} for complete configuration options
+     * @see {@link KeyboardEventHandler} for the underlying component implementation
+     * 
+     * @since v1.0.0
+     */
+    keyboardProps?: IKeyboardEventHandlerProps;
 
     formName?: string;
 
@@ -1811,7 +1863,7 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      * The class name for the form field container.
      * The Keyboard event Handler that wraps each Form field.
      */
-    fieldContainerClassName?: IClassName;
+    fieldClassName?: IClassName;
 
     renderSkeleton?: (context: IFormContext<Fields>) => ReactNode;
 

@@ -226,7 +226,7 @@ export type IButtonInteractiveContext<Context = unknown> = IButtonContext<Contex
      * @param callback {(newIsLoading: boolean) => void} - Optional callback function to be called when the loading state changes.
      * @returns 
      */
-    setIsLoading?: (isLoading: boolean, callback?: (newIsLoading: boolean) => void) => void;
+    setIsLoading: (isLoading: boolean, callback?: (newIsLoading: boolean) => void) => void;
 
     /***
      * The data associated with the form if the button is representing a form action.

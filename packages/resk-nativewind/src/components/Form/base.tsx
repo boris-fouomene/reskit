@@ -1793,22 +1793,35 @@ function FormAction<FormFields extends IFields = IFields, Context = unknown>({ f
         id={id}
         className={cn(className, "resk-form-action ", "resk-form-action-" + String(formName))}
         ref={mergedRef}
-        onPress={(event, context) => {
+        onPress={async (event, context) => {
             const form = FormsManager.getForm<FormFields>(formName);
-            const options = Object.assign({}, context, form ? { form, formData: form?.getData?.() } : {});
-            if (typeof onPress == "function" && onPress(event, options) === false) {
+            const isFormField = form && form?.isValid() || false;
+            const options = Object.assign({}, context, { isFormField }, form ? { form, formData: form?.getData?.() } : {});
+            if (typeof onPress == "function" && await onPress(event, options) === false) {
                 return;
             }
             if (form) {
-                const isValid = form.isValid();
-                const cb = !isValid ? innerRef.current?.disable : undefined;
+                const cb = !isFormField ? innerRef.current?.disable : undefined;
                 if (submitFormOnPress !== false) {
-                    if (typeof cb == "function") {
-                        cb(() => {
+                    const submitForm = () => {
+                        if (isFormField && context && typeof context?.setIsLoading == "function") {
+                            context.setIsLoading(true, async () => {
+                                try {
+                                    await form.submit();
+                                    context?.setIsLoading(false);
+                                } catch (err) {
+                                    context?.setIsLoading(false);
+                                    throw err;
+                                }
+                            })
+                        } else {
                             form.submit();
-                        });
+                        }
+                    }
+                    if (typeof cb == "function") {
+                        cb(submitForm);
                     } else {
-                        form.submit();
+                        submitForm();
                     }
                 } else {
                     cb?.();
@@ -1838,7 +1851,7 @@ export type IFormActionContext<Context = unknown> = IButtonInteractiveContext<Co
 
 export interface IFormActionProps<FormFields extends IFields = IFields, Context = unknown> extends Omit<IButtonInteractiveProps<Context>, "onPress"> {
 
-    onPress?: (event: GestureResponderEvent, context: Context & { form?: IForm<FormFields>, formData?: IFormData<FormFields> }) => any;
+    onPress?: (event: GestureResponderEvent, context: Context & { form?: IForm<FormFields>, isFormValid?: boolean, formData?: IFormData<FormFields> }) => any;
 
     /***
      * The name of the form associated.

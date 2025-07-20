@@ -1014,7 +1014,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
     testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
     const computedVariant = formVariant(variant);
-    fieldContainerClassName = cn(computedVariant.field(), fieldContainerClassName);
+    fieldContainerClassName = cn(computedVariant.fieldContainer(), fieldContainerClassName);
     const [isSubmitting, setIsSubmitting] = useStateCallback<boolean>(false);
     const formName = useMemo(() => {
         return defaultStr(name, "form-" + generatedFormName);

@@ -30,7 +30,7 @@ class VariantsColorsFactory {
         Object.entries(Object.assign({}, colors)).map(([color, value]) => {
             if (!value || typeof value !== "object" || !isNonNullString(value === null || value === void 0 ? void 0 : value.lightColor) || !isNonNullString(value === null || value === void 0 ? void 0 : value.darkColor))
                 return;
-            this._colors[color] = Object.assign({}, VariantsColorsFactory.defaultColors[color], value);
+            this._colors[color] = Object.assign({}, this.defaultColors[color], value);
         });
         return VariantsColorsFactory._colors;
     }

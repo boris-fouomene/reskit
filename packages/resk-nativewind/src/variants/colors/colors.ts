@@ -19,7 +19,7 @@ export class VariantsColorsFactory {
   static registerColor(colors: IVariantsColorsMap) {
     Object.entries(Object.assign({}, colors)).map(([color, value]) => {
       if (!value || typeof value !== "object" || !isNonNullString(value?.lightColor) || !isNonNullString(value?.darkColor)) return;
-      this._colors[color] = Object.assign({}, VariantsColorsFactory.defaultColors[color], value);
+      (this._colors as any)[color] = Object.assign({}, (this.defaultColors as any)[color], value);
     });
     return VariantsColorsFactory._colors;
   }
@@ -262,13 +262,13 @@ import { col } from '../../../../../../frontend-dash/src/theme/grid';
   static generateColorsMapTypes() {
     const generateText = ["import {IVariantsColorsMapBase,IVariantColor} from './types';", "export interface IVariantsColorsMap extends IVariantsColorsMapBase {"];
     Object.entries(VariantsColorsFactory.colors).forEach(([color, value]) => {
-      if (VariantsColorsFactory.defaultColorsNames.includes(color)) return;
+      if (VariantsColorsFactory.defaultColorsNames.includes(color as any)) return;
       generateText.push(`\t"${color}": IVariantColor;`);
     });
     generateText.push("}");
     return generateText.join("\n");
   }
-  private static defaultColors: Record<string, IVariantsColors.Color> = {
+  private static defaultColors: Record<IVariantsColors.ColorName, IVariantsColors.Color> = {
     primary: {
       lightColor: "primary",
       darkColor: "dark-primary",
@@ -342,8 +342,8 @@ import { col } from '../../../../../../frontend-dash/src/theme/grid';
       darkForeground: "white",
     }
   };
-  private static defaultColorsNames: string[] = Object.keys(VariantsColorsFactory.defaultColors);
-  private static _colors: Record<string, IVariantsColors.Color> = Object.assign({}, VariantsColorsFactory.defaultColors);
+  private static defaultColorsNames: IVariantsColors.ColorName[] = Object.keys(VariantsColorsFactory.defaultColors) as any;
+  private static _colors: Record<IVariantsColors.ColorName, IVariantsColors.Color> = Object.assign({}, VariantsColorsFactory.defaultColors);
 }
 const defaultStr = (...args: any[]) => {
   for (const arg of args) {

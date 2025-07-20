@@ -1892,6 +1892,61 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
     className?: IClassName;
     asHtmlTag?: IHtmlDivProps["asHtmlTag"];
 
+    /**
+     * Additional CSS class name applied to all form field container wrappers.
+     * 
+     * This className is applied to the KeyboardEventHandler container that wraps
+     * each form field in the entire form, providing a consistent way to style
+     * all field containers at the form level. It is merged with individual field
+     * container classes and other styling options.
+     * 
+     * @type {IClassName}
+     * 
+     * @example
+     * ```tsx
+     * // Apply consistent styling to all field containers in the form
+     * <Form
+     *   fieldContainerClassName="form-field-spacing border-gray-200"
+     *   fields={{
+     *     email: { type: 'email', name: 'email' },
+     *     password: { type: 'password', name: 'password' }
+     *   }}
+     * />
+     * 
+     * // Combine with individual field container styling
+     * <Form
+     *   fieldContainerClassName="mb-4" // Applied to all fields
+     *   fields={{
+     *     email: { 
+     *       type: 'email', 
+     *       name: 'email',
+     *       fieldContainerClassName: "border-blue-500" // Additional styling for this field
+     *     }
+     *   }}
+     * />
+     * 
+     * // Use with form variants for consistent theming
+     * <Form
+     *   variant="compact"
+     *   fieldContainerClassName="compact-field-spacing"
+     *   fields={myFields}
+     * />
+     * ```
+     * 
+     * @remarks
+     * - Applied to every KeyboardEventHandler container in the form
+     * - Merged with form variant fieldContainer styles and individual field styling
+     * - Useful for consistent spacing, borders, and layout across all form fields
+     * - Takes precedence over form variant styles but can be overridden by individual field styles
+     * - This affects the field container wrapper, not the underlying input components
+     * - Different from individual field `fieldContainerClassName` which applies to specific fields
+     * 
+     * @see {@link IFormFieldProps.fieldContainerClassName} for individual field container styling
+     * @see {@link IFormVariant} for form-wide theming options
+     * @see {@link KeyboardEventHandler} for the container component being styled
+     * 
+     * @since v1.0.0
+     */
     fieldContainerClassName?: IClassName;
 
     renderSkeleton?: (context: IFormContext<Fields>) => ReactNode;

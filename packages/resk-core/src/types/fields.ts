@@ -127,20 +127,19 @@ export interface IFieldBase<FieldType extends IFieldType = IFieldType, ValueType
   defaultValue?: ValueType;
 }
 // Mapped type that ensures all values in IFieldMap extend IFieldBase
-export interface IFieldMap {}
+export interface IFieldMap { }
 
 export interface IFieldActionsMap {
   create: string;
   update: string;
   createOrUpdate: string;
-  list: string;
   filter: string;
 }
 
 export type IField<T extends IFieldType = IFieldType, ValueType = any> = IFieldMap[T] extends IFieldBase
   ? IFieldMap[T] & {
-      [key in keyof IFieldActionsMap as `for${IUcFirst<key>}`]?: Partial<IFieldMap[keyof IFieldMap]>;
-    }
+    [key in keyof IFieldActionsMap as `for${IUcFirst<key>}`]?: Partial<IFieldMap[keyof IFieldMap]>;
+  }
   : never;
 
 export type IFields = Record<string, IField>;

@@ -3,6 +3,7 @@ import { Div } from "@html/Div";
 import { cn } from "@utils/cn";
 import { IDividerVariant } from "@variants/divider";
 import { dividerVariant } from "@variants/divider";
+import { VariantsColors } from "@variants/index";
 /**
  * The `Divider` component renders a horizontal separation line on the page.
  * It can be customized with styles and className
@@ -35,7 +36,7 @@ export function Divider({ disabled, variant, className, ...rest }: IHtmlDivProps
     <Div
       testID="resk-divider"
       {...rest}
-      className={cn("bg-outline dark:bg-dark-outline w-full h-[1px]", dividerVariant(variant), className)}
+      className={cn(VariantsColors.background.outline, " w-full h-[1px]", dividerVariant(variant), className)}
     />
   );
 };

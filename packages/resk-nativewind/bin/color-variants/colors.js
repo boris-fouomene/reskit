@@ -30,7 +30,7 @@ class VariantsColorsFactory {
         Object.entries(Object.assign({}, colors)).map(([color, value]) => {
             if (!value || typeof value !== "object" || !isNonNullString(value === null || value === void 0 ? void 0 : value.lightColor) || !isNonNullString(value === null || value === void 0 ? void 0 : value.darkColor))
                 return;
-            this._colors[color] = value;
+            this._colors[color] = Object.assign({}, VariantsColorsFactory.defaultColors[color], value);
         });
         return VariantsColorsFactory._colors;
     }
@@ -331,6 +331,18 @@ VariantsColorsFactory.defaultColors = {
         darkColor: "gray-100",
         darkForeground: "gray-900",
     },
+    outline: {
+        lightColor: "gray-300",
+        lightForeground: "gray-900",
+        darkColor: "gray-700",
+        darkForeground: "gray-100",
+    },
+    backdrop: {
+        lightColor: "neutral-900/50",
+        darkColor: "neutral-900/80",
+        lightForeground: "white",
+        darkForeground: "white",
+    }
 };
 VariantsColorsFactory.defaultColorsNames = Object.keys(VariantsColorsFactory.defaultColors);
 VariantsColorsFactory._colors = Object.assign({}, VariantsColorsFactory.defaultColors);

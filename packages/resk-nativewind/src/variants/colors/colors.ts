@@ -19,7 +19,7 @@ export class VariantsColorsFactory {
   static registerColor(colors: IVariantsColorsMap) {
     Object.entries(Object.assign({}, colors)).map(([color, value]) => {
       if (!value || typeof value !== "object" || !isNonNullString(value?.lightColor) || !isNonNullString(value?.darkColor)) return;
-      this._colors[color] = value;
+      this._colors[color] = Object.assign({}, VariantsColorsFactory.defaultColors[color], value);
     });
     return VariantsColorsFactory._colors;
   }
@@ -329,6 +329,18 @@ import { col } from '../../../../../../frontend-dash/src/theme/grid';
       darkColor: "gray-100",
       darkForeground: "gray-900",
     },
+    outline: {
+      lightColor: "gray-300",
+      lightForeground: "gray-900",
+      darkColor: "gray-700",
+      darkForeground: "gray-100",
+    },
+    backdrop: {
+      lightColor: "neutral-900/50",
+      darkColor: "neutral-900/80",
+      lightForeground: "white",
+      darkForeground: "white",
+    }
   };
   private static defaultColorsNames: string[] = Object.keys(VariantsColorsFactory.defaultColors);
   private static _colors: Record<string, IVariantsColors.Color> = Object.assign({}, VariantsColorsFactory.defaultColors);

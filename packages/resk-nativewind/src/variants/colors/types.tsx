@@ -73,4 +73,17 @@ export interface IVariantsColorsMapBase {
    * @description A pure gray that's completely neutral
    */
     neutral: IVariantColor;
+
+    /**
+     * * The backdrop color, used for modal backdrops or overlays.
+     * @description Provides a semi-transparent background for overlays, modals, or backdrops.
+     */
+    backdrop: IVariantColor;
+
+    /**
+     * The outline color, used for borders or outlines.
+     * @description Provides a consistent outline color for elements that require a border or outline.
+     * This is useful for buttons, inputs, and other interactive elements that need a clear boundary
+     */
+    outline: IVariantColor;
 }

@@ -1265,7 +1265,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
  * @see {@link FormField} - Base field component for creating custom field types
  * @see {@link FormsManager} - Global form management utilities
  * @see {@link IField} - Field definition interface
- * @see {@link FormFieldRenderer} - Default field renderer component
+ * @see {@link Form.FieldRenderer} - Default field renderer component
  * 
  * @since 1.0.0
  * @author Resk Development Team
@@ -1530,6 +1530,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
         {typeof children == "function" ? children(formContext) : children}
     </FormContext.Provider>;
 }
+
 
 function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref"> & { type: FieldType, ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
@@ -1828,8 +1829,6 @@ Form.Field = FormField;
 Form.Manager = FormsManager;
 Form.Action = FormAction;
 Form.FieldRenderer = FormFieldRenderer;
-
-
 
 export type IFormActionContext<Context = unknown> = IButtonInteractiveContext<Context> & {}
 
@@ -2335,14 +2334,14 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      * 
      * @remarks
      * - When renderFields is provided, the renderField prop is completely ignored
-     * - You must manually render each field using FormFieldRenderer or your custom field components
+     * - You must manually render each field using Form.FieldRenderer or your custom field components
      * - The function receives all necessary context including form state, field definitions, and validation status
      * - Use this for complex layouts, conditional field rendering, or when you need complete control over the form structure
      * - Works seamlessly with asFragment prop for table/grid rendering scenarios
      * - All form functionality (validation, submission, state management) remains intact regardless of custom rendering
      * 
      * @see {@link IFormRenderFieldOptions} for complete options interface
-     * @see {@link FormFieldRenderer} for the recommended component to render individual fields
+     * @see {@link Form.FieldRenderer} for the recommended component to render individual fields
      * @see {@link renderField} for individual field customization when you don't need complete layout control
      * 
      * @since v1.0.0
@@ -2417,14 +2416,14 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
      * - Only called when renderFields prop is not provided
      * - Maintains the default form container structure while customizing individual field rendering
      * - Called once for each field in the form fields object
-     * - Use FormFieldRenderer component to render the actual field to maintain all field functionality
+     * - Use Form.FieldRenderer component to render the actual field to maintain all field functionality
      * - Perfect for adding consistent field decorations, validation indicators, or help text
      * - The field parameter contains all original field properties plus computed form context
      * - Field order follows the order defined in the fields object
      * 
      * @see {@link IField} for complete field definition interface
      * @see {@link IFormRenderFieldOptions} for complete options interface
-     * @see {@link FormFieldRenderer} for the recommended component to render the actual field
+     * @see {@link Form.FieldRenderer} for the recommended component to render the actual field
      * @see {@link renderFields} for complete form layout customization
      * 
      * @since v1.0.0

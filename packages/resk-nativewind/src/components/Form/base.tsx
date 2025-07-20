@@ -1273,13 +1273,18 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
  * 
  * @public
  */
-export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, asFragment, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldContainerClassName }: IFormProps<Fields>) {
+export function Form<Fields extends IFields = IFields>({ name, style, variant, validateBeforeFirstSubmit, testID, asHtmlTag, asFragment, className, isLoading, disabled, readOnly, fields, ref, isUpdate: customIsUpdate, isSubmitting: customIsSubmitting, header, children, isEditingData, data: customData, onSubmit, renderSkeleton, beforeSubmit: customBeforeSubmit, renderField, renderFields, onFormValid, onFormInvalid, onValidateField, onInvalidateField, onFormKeyEvent, onEnterKeyPress, prepareFormField, fieldContainerClassName }: IFormProps<Fields>) {
     const generatedFormName = useId();
     testID = defaultStr(testID, "resk-form");
     isLoading = !!isLoading;
     const computedVariant = formVariant(variant);
     fieldContainerClassName = cn(computedVariant.fieldContainer(), fieldContainerClassName);
-    const [isSubmitting, setIsSubmitting] = useStateCallback<boolean>(false);
+    const [isSubmitting, setIsSubmitting] = useStateCallback<boolean>(!!customIsSubmitting);
+    useEffect(() => {
+        if (typeof customIsSubmitting === "boolean" && customIsSubmitting !== isSubmitting) {
+            setIsSubmitting(customIsSubmitting);
+        }
+    }, [customIsSubmitting, isSubmitting]);
     const formName = useMemo(() => {
         return defaultStr(name, "form-" + generatedFormName);
     }, [name, generatedFormName]);
@@ -1534,7 +1539,7 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
 
 function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType = any>(props: Omit<IField<FieldType, ValueType>, "ref"> & { type: FieldType, ref?: Ref<FormField<FieldType, ValueType>> }) {
     const formContext = useForm();
-    const { form, fieldContainerClassName, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
+    const { form, fieldContainerClassName, isSubmitting, isLoading, prepareFormField, onFormValid, onFormKeyEvent, onEnterKeyPress, onFormInvalid, fieldsInstances, onValidateField, onInvalidateField, formName, isDisabled, isReadOnly, isUpdate, data } = (isObj(formContext) ? formContext : {}) as IFormContext<IFields>;
     const isFormField = FormsManager.isForm(form);
     const { ref, ...fieldProps } = props;
     const isFilter = !!fieldProps.isFilter;
@@ -1552,12 +1557,6 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
             if (isUpdate && fieldProps.primaryKey == true) {
                 field.readOnly = true;
             }
-            if (isReadOnly) {
-                field.readOnly = true;
-            }
-            if (isDisabled) {
-                field.disabled = true;
-            }
             field.formName = formName;
         } else if (isFilter) {
             if (isObj(fieldProps.forFilter)) {
@@ -1569,7 +1568,7 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
         delete field.forUpdate;
         delete field.forFilter;
         return field;
-    }, [isFormField, isFilter, props, formName, isUpdate, isDisabled, isReadOnly])
+    }, [isFormField, isFilter, props, formName, isUpdate]);
     const field = isFormField && typeof prepareFormField === "function" ? prepareFormField({ ...formContext, field: preparedField } as any) : fieldProps;
     const unmountField = useCallback((fieldName: string) => {
         if (!isNonNullString(fieldName)) return;
@@ -1588,6 +1587,8 @@ function FormFieldRenderer<FieldType extends IFieldType = IFieldType, ValueType 
     const Component = FormField.getRegisteredComponent<FieldType, ValueType>(field.type);
     return <Component
         {...field as any}
+        disabled={isDisabled || !!field.disabled}
+        readOnly={isReadOnly || !!field.readOnly || isSubmitting || isLoading}
         fieldContainerClassName={cn("resk-form-field-renderer-container", field.fieldContainerClassName)}
         className={cn("resk-form-field-renderer", field.className)}
         formName={formName}
@@ -1717,7 +1718,7 @@ class FormsManager {
      * FormsManager.mountAction(action, "myForm"); // Mounts the action to "myForm"
      */
     static mountAction<Context = unknown>(action: IFormActionContext<Context>, formName: string) {
-        if (!action || !formName || !isNonNullString(action?.id)) return;
+        if (!action || !formName || !isNonNullString(action?.id) || typeof action?.enable !== "function" || typeof action?.disable !== "function") return;
         this.actions[formName] = this.actions[formName] || {};
         this.actions[formName][action?.id] = action;
     }
@@ -2481,27 +2482,6 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
     isUpdate?: boolean;
 
     /**
-     * Function to determine if a field should be rendered by the form.
-     * 
-     * This property returns a boolean indicating whether the field will be rendered.
-     * 
-     * @param options - Options related to rendering fields.
-     * @returns {boolean} - Return true if the field should be rendered.
-     * 
-     * @example
-     * canRenderField: (options) => {
-     *     return options.isUpdate; // Render field only if in update mode
-     * }
-     */
-    canRenderField?(
-        options: IFormProps & {
-            field: IField;
-            fieldName: string;
-            isUpdate: boolean;
-        }
-    ): boolean;
-
-    /**
      * Indicates the loading state of the form.
      * 
      * This property can be used to show a loading indicator while the form is being processed.
@@ -2529,48 +2509,6 @@ export interface IFormProps<Fields extends IFields = IFields> extends IFormConte
     header?: ((options: IFormContext<Fields>) => ReactNode) | ReactNode;
 
     children?: ((context: IFormContext<Fields>) => ReactNode) | ReactNode;
-
-
-    /**
-     * Props representing the components to render for displaying tab content in the form.
-     * 
-     * This property allows you to define tab items for the form.
-     * 
-     * @type {IFormTabItemsProp}
-     * 
-     * @example
-     * tabItems: [{ title: 'Tab 1', content: <Tab1Content /> }, { title: 'Tab 2', content: <Tab2Content /> }],
-     */
-    sessionName?: string;
-
-
-    /**
-     * Specifies whether error messages will be displayed by the form fields.
-     * 
-     * @type {boolean}
-     * 
-     * @example
-     * displayErrors: true, // Error messages will be displayed
-     */
-    displayErrors?: boolean;
-
-    /***
-     * Specifies whether errors should be displayed when the form is submitting.
-     * When form is submitting, the form check if it's valid, if not, it display the errors in the form 
-     * if this property is set to true
-     * @default false
-     */
-    displayErrorsWhenSubmitting?: boolean;
-
-    /**
-     * If true, the form will be wrapped in a ScrollView
-     * Default is false
-     */
-    withScrollView?: boolean;
-
-    scrollViewClassName?: IClassName;
-
-    scrollViewContainerClassName?: IClassName;
 
     /**
      * Controls whether form validation should toggle action statuses before the first submission.

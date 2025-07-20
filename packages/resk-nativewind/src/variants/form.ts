@@ -3,29 +3,29 @@ import { VariantsOptionsFactory } from './variantsFactory';
 export const formVariant = tv({
     slots: {
         base: "",
-        field: "",
+        fieldContainer: "",
     },
     variants: {
         ...VariantsOptionsFactory.createAll<{ base: string }>((value) => ({ base: value })),
-        ...VariantsOptionsFactory.createAllWidth2Height<{ field: string }, "field">((value) => {
-            return { field: value };
-        }, "field"),
-        ...VariantsOptionsFactory.createAllPadding2Margin<{ field: string }, "field">((value) => {
-            return { field: value };
-        }, "field"),
-        ...VariantsOptionsFactory.createAllFlex<{ field: string }, "field">((value) => {
-            return { field: value };
-        }, "field"),
-        ...VariantsOptionsFactory.createAllGaps<{ field: string }, "field">((value) => {
-            return { field: value };
-        }, "field"),
+        ...VariantsOptionsFactory.createAllWidth2Height<{ fieldContainer: string }, "fieldContainer">((value) => {
+            return { fieldContainer: value };
+        }, "fieldContainer"),
+        ...VariantsOptionsFactory.createAllPadding2Margin<{ fieldContainer: string }, "fieldContainer">((value) => {
+            return { fieldContainer: value };
+        }, "fieldContainer"),
+        ...VariantsOptionsFactory.createAllFlex<{ fieldContainer: string }, "fieldContainer">((value) => {
+            return { fieldContainer: value };
+        }, "fieldContainer"),
+        ...VariantsOptionsFactory.createAllGaps<{ fieldContainer: string }, "fieldContainer">((value) => {
+            return { fieldContainer: value };
+        }, "fieldContainer"),
     },
     defaultVariants: {
         flexDirection: "row",
         gapX: 2,
         gapY: 2,
         width: "full",
-        "fieldLg:width": "third"
+        "fieldContainer:lg:width": "third",
     }
 });
 

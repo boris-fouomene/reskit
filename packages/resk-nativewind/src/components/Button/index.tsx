@@ -13,4 +13,6 @@ Button.Interactive = function InteractiveButton<Context = unknown>(props: IButto
     </>
 }
 
+export * from "./types";
+
 Button.displayName = "Button";

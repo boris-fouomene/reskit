@@ -68,7 +68,7 @@ export const VariantsColors = {
       "activityIndicator": "border-t-gray-900 dark:border-t-gray-100"
     },
     "backdrop": {
-      "base": "bg-neutral-900/50 dark:bg-neutral-900/80 focus-visible:outline-neutral-900/50 dark:focus-visible:outline-neutral-900/80",
+      "base": "bg-gray-900/50 dark:bg-gray-900/80 focus-visible:outline-gray-900/50 dark:focus-visible:outline-gray-900/80",
       "label": "text-white dark:text-white",
       "icon": "!text-white dark:!text-white",
       "activityIndicator": "border-t-white dark:border-t-white"
@@ -142,10 +142,10 @@ export const VariantsColors = {
       "activityIndicator": "web:hover:border-t-gray-300-foregund web:dark:hover:border-t-gray-100 web:group-hover:border-t-gray-900 web:dark:group-hover:border-t-gray-100 border-t-gray-300 dark:border-t-gray-700"
     },
     "backdrop": {
-      "base": "group web:hover:bg-neutral-900/50 web:dark:hover:bg-neutral-900/80 p-[5px] border-2 border-neutral-900/50 dark:border-neutral-900/80 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
-      "label": "web:hover:text-white web:dark:hover:text-white web:group-hover:text-white web:dark:group-hover:text-white text-neutral-900/50 dark:text-neutral-900/80",
-      "icon": "web:hover:!text-white web:dark:hover:!text-white web:group-hover:!text-white web:dark:group-hover:!text-white !text-neutral-900/50 dark:!text-neutral-900/80",
-      "activityIndicator": "web:hover:border-t-neutral-900/50-foregund web:dark:hover:border-t-white web:group-hover:border-t-white web:dark:group-hover:border-t-white border-t-neutral-900/50 dark:border-t-neutral-900/80"
+      "base": "group web:hover:bg-gray-900/50 web:dark:hover:bg-gray-900/80 p-[5px] border-2 border-gray-900/50 dark:border-gray-900/80 bg-transparent web:transition-[transform,color,background-color,border-color,text-decoration-color,fill,stroke]",
+      "label": "web:hover:text-white web:dark:hover:text-white web:group-hover:text-white web:dark:group-hover:text-white text-gray-900/50 dark:text-gray-900/80",
+      "icon": "web:hover:!text-white web:dark:hover:!text-white web:group-hover:!text-white web:dark:group-hover:!text-white !text-gray-900/50 dark:!text-gray-900/80",
+      "activityIndicator": "web:hover:border-t-gray-900/50-foregund web:dark:hover:border-t-white web:group-hover:border-t-white web:dark:group-hover:border-t-white border-t-gray-900/50 dark:border-t-gray-900/80"
     }
   },
   "surface": {
@@ -160,7 +160,7 @@ export const VariantsColors = {
     "success": "bg-green-500 dark:bg-green-600 text-white dark:text-green-50",
     "text": "bg-gray-900 dark:bg-gray-100 text-gray-100 dark:text-gray-900",
     "outline": "bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-100",
-    "backdrop": "bg-neutral-900/50 dark:bg-neutral-900/80 text-white dark:text-white"
+    "backdrop": "bg-gray-900/50 dark:bg-gray-900/80 text-white dark:text-white"
   },
   "hoverBackground": {
     "primary": "hover:bg-primary dark:bg-dark-primary",
@@ -174,7 +174,7 @@ export const VariantsColors = {
     "success": "hover:bg-green-500 dark:bg-green-600",
     "text": "hover:bg-gray-900 dark:bg-gray-100",
     "outline": "hover:bg-gray-300 dark:bg-gray-700",
-    "backdrop": "hover:bg-neutral-900/50 dark:bg-neutral-900/80"
+    "backdrop": "hover:bg-gray-900/50 dark:bg-gray-900/80"
   },
   "activeBackground": {
     "primary": "active:bg-primary dark:active:bg-dark-primary",
@@ -188,7 +188,7 @@ export const VariantsColors = {
     "success": "active:bg-green-500 dark:active:bg-green-600",
     "text": "active:bg-gray-900 dark:active:bg-gray-100",
     "outline": "active:bg-gray-300 dark:active:bg-gray-700",
-    "backdrop": "active:bg-neutral-900/50 dark:active:bg-neutral-900/80"
+    "backdrop": "active:bg-gray-900/50 dark:active:bg-gray-900/80"
   },
   "shadow": {
     "primary": "shadow-primary dark:shadow-dark-primary",
@@ -202,7 +202,7 @@ export const VariantsColors = {
     "success": "shadow-green-500 dark:shadow-green-600",
     "text": "shadow-gray-900 dark:shadow-gray-100",
     "outline": "shadow-gray-300 dark:shadow-gray-700",
-    "backdrop": "shadow-neutral-900/50 dark:shadow-neutral-900/80"
+    "backdrop": "shadow-gray-900/50 dark:shadow-gray-900/80"
   },
   "hoverShadow": {
     "primary": "hover:shadow-primary dark:hover:shadow-dark-primary",
@@ -216,7 +216,7 @@ export const VariantsColors = {
     "success": "hover:shadow-green-500 dark:hover:shadow-green-600",
     "text": "hover:shadow-gray-900 dark:hover:shadow-gray-100",
     "outline": "hover:shadow-gray-300 dark:hover:shadow-gray-700",
-    "backdrop": "hover:shadow-neutral-900/50 dark:hover:shadow-neutral-900/80"
+    "backdrop": "hover:shadow-gray-900/50 dark:hover:shadow-gray-900/80"
   },
   "activeShadow": {
     "primary": "active:shadow-primary dark:active:shadow-dark-primary",
@@ -230,7 +230,7 @@ export const VariantsColors = {
     "success": "active:shadow-green-500 dark:active:shadow-green-600",
     "text": "active:shadow-gray-900 dark:active:shadow-gray-100",
     "outline": "active:shadow-gray-300 dark:active:shadow-gray-700",
-    "backdrop": "active:shadow-neutral-900/50 dark:active:shadow-neutral-900/80"
+    "backdrop": "active:shadow-gray-900/50 dark:active:shadow-gray-900/80"
   },
   "hoverText": {
     "primary": "hover:text-primary dark:hover:text-dark-primary",
@@ -244,7 +244,7 @@ export const VariantsColors = {
     "success": "hover:text-green-500 dark:hover:text-green-600",
     "text": "hover:text-gray-900 dark:hover:text-gray-100",
     "outline": "hover:text-gray-300 dark:hover:text-gray-700",
-    "backdrop": "hover:text-neutral-900/50 dark:hover:text-neutral-900/80",
+    "backdrop": "hover:text-gray-900/50 dark:hover:text-gray-900/80",
     "primary-foreground": "hover:text-primary-foreground dark:hover:text-dark-primary-foreground",
     "secondary-foreground": "hover:text-secondary-foreground dark:hover:text-dark-secondary-foreground",
     "surface-foreground": "hover:text-gray-900 dark:hover:text-gray-100",
@@ -270,7 +270,7 @@ export const VariantsColors = {
     "success": "active:text-green-500 dark:active:text-green-600",
     "text": "active:text-gray-900 dark:active:text-gray-100",
     "outline": "active:text-gray-300 dark:active:text-gray-700",
-    "backdrop": "active:text-neutral-900/50 dark:active:text-neutral-900/80",
+    "backdrop": "active:text-gray-900/50 dark:active:text-gray-900/80",
     "primary-foreground": "active:text-primary-foreground dark:active:text-dark-primary-foreground",
     "secondary-foreground": "active:text-secondary-foreground dark:active:text-dark-secondary-foreground",
     "surface-foreground": "active:text-gray-900 dark:active:text-gray-100",
@@ -296,7 +296,7 @@ export const VariantsColors = {
     "success": "text-green-500 dark:text-green-600",
     "text": "text-gray-900 dark:text-gray-100",
     "outline": "text-gray-300 dark:text-gray-700",
-    "backdrop": "text-neutral-900/50 dark:text-neutral-900/80",
+    "backdrop": "text-gray-900/50 dark:text-gray-900/80",
     "primary-foreground": "text-primary-foreground dark:text-dark-primary-foreground",
     "secondary-foreground": "text-secondary-foreground dark:text-dark-secondary-foreground",
     "surface-foreground": "text-gray-900 dark:text-gray-100",
@@ -322,7 +322,7 @@ export const VariantsColors = {
     "success": "!text-green-500 dark:!text-green-600",
     "text": "!text-gray-900 dark:!text-gray-100",
     "outline": "!text-gray-300 dark:!text-gray-700",
-    "backdrop": "!text-neutral-900/50 dark:!text-neutral-900/80",
+    "backdrop": "!text-gray-900/50 dark:!text-gray-900/80",
     "primary-foreground": "!text-primary-foreground dark:!text-dark-primary-foreground",
     "secondary-foreground": "!text-secondary-foreground dark:!text-dark-secondary-foreground",
     "surface-foreground": "!text-gray-900 dark:!text-gray-100",
@@ -348,7 +348,7 @@ export const VariantsColors = {
     "success": "hover:!text-green-500 dark:hover:!text-green-600",
     "text": "hover:!text-gray-900 dark:hover:!text-gray-100",
     "outline": "hover:!text-gray-300 dark:hover:!text-gray-700",
-    "backdrop": "hover:!text-neutral-900/50 dark:hover:!text-neutral-900/80",
+    "backdrop": "hover:!text-gray-900/50 dark:hover:!text-gray-900/80",
     "primary-foreground": "hover:!text-primary-foreground dark:hover:!text-dark-primary-foreground",
     "secondary-foreground": "hover:!text-secondary-foreground dark:hover:!text-dark-secondary-foreground",
     "surface-foreground": "hover:!text-gray-900 dark:hover:!text-gray-100",
@@ -374,7 +374,7 @@ export const VariantsColors = {
     "success": "active:!text-green-500 dark:active:!text-green-600",
     "text": "active:!text-gray-900 dark:active:!text-gray-100",
     "outline": "active:!text-gray-300 dark:active:!text-gray-700",
-    "backdrop": "active:!text-neutral-900/50 dark:active:!text-neutral-900/80",
+    "backdrop": "active:!text-gray-900/50 dark:active:!text-gray-900/80",
     "primary-foreground": "active:!text-primary-foreground dark:active:!text-dark-primary-foreground",
     "secondary-foreground": "active:!text-secondary-foreground dark:active:!text-dark-secondary-foreground",
     "surface-foreground": "active:!text-gray-900 dark:active:!text-gray-100",
@@ -400,7 +400,7 @@ export const VariantsColors = {
     "success": "bg-green-500 dark:bg-green-600",
     "text": "bg-gray-900 dark:bg-gray-100",
     "outline": "bg-gray-300 dark:bg-gray-700",
-    "backdrop": "bg-neutral-900/50 dark:bg-neutral-900/80"
+    "backdrop": "bg-gray-900/50 dark:bg-gray-900/80"
   },
   "textForeground": {
     "primary-foreground": "text-primary-foreground dark:text-dark-primary-foreground",
@@ -498,7 +498,7 @@ export const VariantsColors = {
     "success": "outline-green-500 dark:outline-green-600",
     "text": "outline-gray-900 dark:outline-gray-100",
     "outline": "outline-gray-300 dark:outline-gray-700",
-    "backdrop": "outline-neutral-900/50 dark:outline-neutral-900/80",
+    "backdrop": "outline-gray-900/50 dark:outline-gray-900/80",
     "primary-foreground": "outline-primary-foreground dark:outline-dark-primary-foreground",
     "secondary-foreground": "outline-secondary-foreground dark:outline-dark-secondary-foreground",
     "surface-foreground": "outline-gray-900 dark:outline-gray-100",
@@ -524,7 +524,7 @@ export const VariantsColors = {
     "success": "hover:outline-green-500 dark:hover:outline-green-600",
     "text": "hover:outline-gray-900 dark:hover:outline-gray-100",
     "outline": "hover:outline-gray-300 dark:hover:outline-gray-700",
-    "backdrop": "hover:outline-neutral-900/50 dark:hover:outline-neutral-900/80",
+    "backdrop": "hover:outline-gray-900/50 dark:hover:outline-gray-900/80",
     "primary-foreground": "hover:outline-primary-foreground dark:hover:outline-dark-primary-foreground",
     "secondary-foreground": "hover:outline-secondary-foreground dark:hover:outline-dark-secondary-foreground",
     "surface-foreground": "hover:outline-gray-900 dark:hover:outline-gray-100",
@@ -550,7 +550,7 @@ export const VariantsColors = {
     "success": "active:outline-green-500 dark:active:outline-green-600",
     "text": "active:outline-gray-900 dark:active:outline-gray-100",
     "outline": "active:outline-gray-300 dark:active:outline-gray-700",
-    "backdrop": "active:outline-neutral-900/50 dark:active:outline-neutral-900/80",
+    "backdrop": "active:outline-gray-900/50 dark:active:outline-gray-900/80",
     "primary-foreground": "active:outline-primary-foreground dark:active:outline-dark-primary-foreground",
     "secondary-foreground": "active:outline-secondary-foreground dark:active:outline-dark-secondary-foreground",
     "surface-foreground": "active:outline-gray-900 dark:active:outline-gray-100",
@@ -576,7 +576,7 @@ export const VariantsColors = {
     "success": "border-green-500 dark:border-green-600",
     "text": "border-gray-900 dark:border-gray-100",
     "outline": "border-gray-300 dark:border-gray-700",
-    "backdrop": "border-neutral-900/50 dark:border-neutral-900/80",
+    "backdrop": "border-gray-900/50 dark:border-gray-900/80",
     "primary-foreground": "border-primary-foreground dark:border-dark-primary-foreground",
     "secondary-foreground": "border-secondary-foreground dark:border-dark-secondary-foreground",
     "surface-foreground": "border-gray-900 dark:border-gray-100",
@@ -602,7 +602,7 @@ export const VariantsColors = {
     "success": "hover:border-green-500 dark:hover:border-green-600",
     "text": "hover:border-gray-900 dark:hover:border-gray-100",
     "outline": "hover:border-gray-300 dark:hover:border-gray-700",
-    "backdrop": "hover:border-neutral-900/50 dark:hover:border-neutral-900/80",
+    "backdrop": "hover:border-gray-900/50 dark:hover:border-gray-900/80",
     "primary-foreground": "hover:border-primary-foreground dark:hover:border-dark-primary-foreground",
     "secondary-foreground": "hover:border-secondary-foreground dark:hover:border-dark-secondary-foreground",
     "surface-foreground": "hover:border-gray-900 dark:hover:border-gray-100",
@@ -628,7 +628,7 @@ export const VariantsColors = {
     "success": "active:border-green-500 dark:active:border-green-600",
     "text": "active:border-gray-900 dark:active:border-gray-100",
     "outline": "active:border-gray-300 dark:active:border-gray-700",
-    "backdrop": "active:border-neutral-900/50 dark:active:border-neutral-900/80",
+    "backdrop": "active:border-gray-900/50 dark:active:border-gray-900/80",
     "primary-foreground": "active:border-primary-foreground dark:active:border-dark-primary-foreground",
     "secondary-foreground": "active:border-secondary-foreground dark:active:border-dark-secondary-foreground",
     "surface-foreground": "active:border-gray-900 dark:active:border-gray-100",
@@ -654,7 +654,7 @@ export const VariantsColors = {
     "success": "border-t-green-500 dark:border-t-green-600",
     "text": "border-t-gray-900 dark:border-t-gray-100",
     "outline": "border-t-gray-300 dark:border-t-gray-700",
-    "backdrop": "border-t-neutral-900/50 dark:border-t-neutral-900/80",
+    "backdrop": "border-t-gray-900/50 dark:border-t-gray-900/80",
     "primary-foreground": "border-t-primary-foreground dark:border-t-dark-primary-foreground",
     "secondary-foreground": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground",
     "surface-foreground": "border-t-gray-900 dark:border-t-gray-100",
@@ -680,7 +680,7 @@ export const VariantsColors = {
     "success": "border-b-green-500 dark:border-b-green-600",
     "text": "border-b-gray-900 dark:border-b-gray-100",
     "outline": "border-b-gray-300 dark:border-b-gray-700",
-    "backdrop": "border-b-neutral-900/50 dark:border-b-neutral-900/80",
+    "backdrop": "border-b-gray-900/50 dark:border-b-gray-900/80",
     "primary-foreground": "border-b-primary-foreground dark:border-b-dark-primary-foreground",
     "secondary-foreground": "border-b-secondary-foreground dark:border-b-dark-secondary-foreground",
     "surface-foreground": "border-b-gray-900 dark:border-b-gray-100",
@@ -706,7 +706,7 @@ export const VariantsColors = {
     "success": "border-l-green-500 dark:border-l-green-600",
     "text": "border-l-gray-900 dark:border-l-gray-100",
     "outline": "border-l-gray-300 dark:border-l-gray-700",
-    "backdrop": "border-l-neutral-900/50 dark:border-l-neutral-900/80",
+    "backdrop": "border-l-gray-900/50 dark:border-l-gray-900/80",
     "primary-foreground": "border-l-primary-foreground dark:border-l-dark-primary-foreground",
     "secondary-foreground": "border-l-secondary-foreground dark:border-l-dark-secondary-foreground",
     "surface-foreground": "border-l-gray-900 dark:border-l-gray-100",
@@ -732,7 +732,7 @@ export const VariantsColors = {
     "success": "border-r-green-500 dark:border-r-green-600",
     "text": "border-r-gray-900 dark:border-r-gray-100",
     "outline": "border-r-gray-300 dark:border-r-gray-700",
-    "backdrop": "border-r-neutral-900/50 dark:border-r-neutral-900/80",
+    "backdrop": "border-r-gray-900/50 dark:border-r-gray-900/80",
     "primary-foreground": "border-r-primary-foreground dark:border-r-dark-primary-foreground",
     "secondary-foreground": "border-r-secondary-foreground dark:border-r-dark-secondary-foreground",
     "surface-foreground": "border-r-gray-900 dark:border-r-gray-100",
@@ -758,7 +758,7 @@ export const VariantsColors = {
     "success": "border-t-green-500 dark:border-t-green-600",
     "text": "border-t-gray-900 dark:border-t-gray-100",
     "outline": "border-t-gray-300 dark:border-t-gray-700",
-    "backdrop": "border-t-neutral-900/50 dark:border-t-neutral-900/80",
+    "backdrop": "border-t-gray-900/50 dark:border-t-gray-900/80",
     "primary-foreground": "border-t-primary-foreground dark:border-t-dark-primary-foreground",
     "secondary-foreground": "border-t-secondary-foreground dark:border-t-dark-secondary-foreground",
     "surface-foreground": "border-t-gray-900 dark:border-t-gray-100",
@@ -784,7 +784,7 @@ export const VariantsColors = {
     "success": "ring-green-500 dark:ring-green-600",
     "text": "ring-gray-900 dark:ring-gray-100",
     "outline": "ring-gray-300 dark:ring-gray-700",
-    "backdrop": "ring-neutral-900/50 dark:ring-neutral-900/80",
+    "backdrop": "ring-gray-900/50 dark:ring-gray-900/80",
     "primary-foreground": "ring-primary-foreground dark:ring-dark-primary-foreground",
     "secondary-foreground": "ring-secondary-foreground dark:ring-dark-secondary-foreground",
     "surface-foreground": "ring-gray-900 dark:ring-gray-100",
@@ -810,7 +810,7 @@ export const VariantsColors = {
     "success": "hover:ring-green-500 dark:hover:ring-green-600",
     "text": "hover:ring-gray-900 dark:hover:ring-gray-100",
     "outline": "hover:ring-gray-300 dark:hover:ring-gray-700",
-    "backdrop": "hover:ring-neutral-900/50 dark:hover:ring-neutral-900/80",
+    "backdrop": "hover:ring-gray-900/50 dark:hover:ring-gray-900/80",
     "primary-foreground": "hover:ring-primary-foreground dark:hover:ring-dark-primary-foreground",
     "secondary-foreground": "hover:ring-secondary-foreground dark:hover:ring-dark-secondary-foreground",
     "surface-foreground": "hover:ring-gray-900 dark:hover:ring-gray-100",
@@ -836,7 +836,7 @@ export const VariantsColors = {
     "success": "active:ring-green-500 dark:active:ring-green-600",
     "text": "active:ring-gray-900 dark:active:ring-gray-100",
     "outline": "active:ring-gray-300 dark:active:ring-gray-700",
-    "backdrop": "active:ring-neutral-900/50 dark:active:ring-neutral-900/80",
+    "backdrop": "active:ring-gray-900/50 dark:active:ring-gray-900/80",
     "primary-foreground": "active:ring-primary-foreground dark:active:ring-dark-primary-foreground",
     "secondary-foreground": "active:ring-secondary-foreground dark:active:ring-dark-secondary-foreground",
     "surface-foreground": "active:ring-gray-900 dark:active:ring-gray-100",
@@ -862,7 +862,7 @@ export const VariantsColors = {
     "success": "focus:ring-green-500 dark:focus:ring-green-600",
     "text": "focus:ring-gray-900 dark:focus:ring-gray-100",
     "outline": "focus:ring-gray-300 dark:focus:ring-gray-700",
-    "backdrop": "focus:ring-neutral-900/50 dark:focus:ring-neutral-900/80",
+    "backdrop": "focus:ring-gray-900/50 dark:focus:ring-gray-900/80",
     "primary-foreground": "focus:ring-primary-foreground dark:focus:ring-dark-primary-foreground",
     "secondary-foreground": "focus:ring-secondary-foreground dark:focus:ring-dark-secondary-foreground",
     "surface-foreground": "focus:ring-gray-900 dark:focus:ring-gray-100",

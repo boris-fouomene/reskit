@@ -338,8 +338,8 @@ VariantsColorsFactory.defaultColors = {
         darkForeground: "gray-100",
     },
     backdrop: {
-        lightColor: "neutral-900/50",
-        darkColor: "neutral-900/80",
+        lightColor: "gray-900/50",
+        darkColor: "gray-900/80",
         lightForeground: "white",
         darkForeground: "white",
     }

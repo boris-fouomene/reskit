@@ -163,6 +163,11 @@ I18n.RegisterTranslations({
         infoTitle: "Info",
         warningTitle: "Warning",
       },
+      form: {
+        validator: {
+          matchField: "Field %{fieldName} must match %{matchFieldName}",
+        }
+      }
     },
   },
 });

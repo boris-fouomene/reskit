@@ -22,6 +22,7 @@ import { Button } from "@components/Button";
 import { Div } from "@html/Div";
 import { IHtmlDivProps } from "@html/types";
 import { formVariant, IFormVariant } from "@variants/form";
+import { i18n } from "@resk/core/i18n";
 
 
 class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> extends Component<IField<FieldType, ValueType>, IFormFieldState<FieldType, ValueType>> {
@@ -224,7 +225,7 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         return Object.assign({}, options, { context: this });
     }
 
-    validate(validateOptions: Omit<IFormFieldValidateOptions<FieldType, ValueType>, "context">, force: boolean = false): Promise<IFormFieldValidateOptions<FieldType, ValueType>> {
+    async validate(validateOptions: Omit<IFormFieldValidateOptions<FieldType, ValueType>, "context">, force: boolean = false): Promise<IFormFieldValidateOptions<FieldType, ValueType>> {
         const options = this.getCallOptions(validateOptions);
         options.fieldName = defaultStr(options.fieldName, this.getName());
         if (this.isPhone() && isNonNullString(options.phoneNumber) && InputFormatter.isValidPhoneNumber(options.phoneNumber)) {
@@ -236,28 +237,26 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
         options.value = this.sanitizeValue(options.value);
         const areValueEquals = this.compareValues(options.value, this.state.validatedValue);
         if (this.hasValidated() && force !== true && areValueEquals) {
-            return Promise.resolve(options);
+            return options;
         }
         const { value } = options;
         if (!this.canValidate()) {
-            return Promise.resolve(options).then((options) => {
-                this.setState(
-                    {
-                        error: false,
-                        validatedValue: value,
-                        hasValidated: true,
-                        prevValue: this.state.value,
-                        value,
-                        errorText: "",
-                    } as any,
-                    () => {
-                        if (!areValueEquals) {
-                            this.callOnChange(options);
-                        }
+            this.setState(
+                {
+                    error: false,
+                    validatedValue: value,
+                    hasValidated: true,
+                    prevValue: this.state.value,
+                    value,
+                    errorText: "",
+                } as any,
+                () => {
+                    if (!areValueEquals) {
+                        this.callOnChange(options);
                     }
-                );
-                return options;
-            });
+                }
+            );
+            return options;
         }
         options.rules = Array.isArray(options.rules) && options.rules.length ? options.rules : this.getValidationRules();
         if (this.isEmail() && (this.props as any).validateEmail !== false && isNonNullString(options.value) && !options.rules.includes("Email")) {
@@ -270,42 +269,35 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
             options.rules.push("Url");
         }
         const hasValidated = true;
-        return Promise.resolve(this.beforeValidate(options)).then(() => {
-            return new Promise((resolve, reject) => {
-                return Validator.validate<FormField<FieldType, ValueType>>(options).then(() => {
-                    return Promise.resolve(this.onValid(options)).then(() => {
-                        this.setState(
-                            {
-                                error: false,
-                                hasValidated,
-                                validatedValue: value,
-                                value,
-                                prevValue: this.state.value,
-                                errorText: "",
-                            } as any,
-                            () => {
-                                this.callOnChange(options as any);
-                            }
-                        );
-                        resolve(options);
-                        return options;
-                    });
-                }).catch((error) => {
-                    this.setState(
-                        {
-                            error: true,
-                            hasValidated,
-                            validatedValue: value,
-                            value,
-                            errorText: error?.message || stringify(error),
-                        }, () => {
-                            this.onInvalid(options);
-                        });
-
-                    reject(error);
+        try {
+            await this.beforeValidate(options);
+            await Validator.validate<FormField<FieldType, ValueType>>(options);
+            await this.onValid(options);
+            this.setState(
+                {
+                    error: false,
+                    hasValidated,
+                    validatedValue: value,
+                    value,
+                    prevValue: this.state.value,
+                    errorText: "",
+                } as any, () => { this.callOnChange(options as any); }
+            );
+        } catch (error) {
+            const errorText = isNonNullString((error as any)?.message) ? (error as any).message : stringify(error);
+            this.setState(
+                {
+                    error: true,
+                    hasValidated,
+                    validatedValue: value,
+                    value,
+                    errorText,
+                }, () => {
+                    this.onInvalid(options);
                 });
-            })
-        });
+            throw error;
+        }
+        return options;
     }
     /**
      * Determines if validation should occur on blur.
@@ -450,24 +442,26 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
             this.props.onChange(options as any);
         }
     }
-    private validateOtherFields() {
-        const fields = FormsManager.getFieldInstances(this.getFormName());
-        if (!isObj(fields) || !fields) return;
-        let canEnable = true;
-        typedEntries(fields).map(([name, field]) => {
-            if (!(field instanceof FormField) || name === this.getName()) return;
-            /* const matchF = field.getMatchField();
-            if (matchF && matchF.getName() === this.getName()) {
-                field.validate({ value: fK.getValue() });
-            } */
-            if (!field.isValid()) {
-                canEnable = false;
-                return;
-            }
-        });
-    }
     onValid(options: IFormFieldValidateOptions<FieldType, ValueType>) {
         options.context = this;
+        const matchField = this.getMatchField();
+        if (isNonNullString(matchField)) {
+            const targetField = this.getFieldInstance(matchField);
+            if (targetField instanceof FormField) {
+                const targetValue = targetField.getValue();
+                const currentValue = options.value;
+                // Use compareValues if available, otherwise strict equality
+                const areEqual = this.compareValues(currentValue, targetValue);
+                if (!areEqual) {
+                    throw {
+                        message: i18n.t("form.validator.matchField", {
+                            fieldName: this.getLabel(),
+                            matchFieldName: targetField.getLabel(),
+                        })
+                    }
+                }
+            }
+        }
         if (typeof this.props.onFieldValid == "function") {
             const r = this.props.onFieldValid(options as any);
             if (typeof r == "string") {
@@ -477,21 +471,77 @@ class FormField<FieldType extends IFieldType = IFieldType, ValueType = any> exte
                 };
             }
             if (r === false) {
-                throw {
-                    ...Object.assign({}, options),
-                    message:
-                        options?.message ||
-                        "Validation échouée; la raison n'a pas été spécifiée dans le message d'erreur associé au champ [" +
-                        this.getLabel() +
-                        "]:\n la fonction de validation a rétourné faux pour la valeur [" +
-                        stringify(options?.value) +
-                        "]",
-                };
+                throw options;
             }
             return r;
         }
+        // Trigger validation on fields that match this field
+        this.validateDependentMatchFields();
         return true;
     }
+
+    getFieldInstances<Fields extends IFields = IFields>() {
+        return FormsManager.getFieldInstances<Fields>(this.getFormName());
+    }
+
+    getMatchField() {
+        return this.props.matchField;
+    }
+    hasMatchField() {
+        return isNonNullString(this.getMatchField());
+    }
+
+    /**
+     * 🔄 **Cross-Field Validation Trigger** - Validates fields that depend on this field's value
+     * 
+     * This method automatically finds and re-validates any fields in the same form that have
+     * their `matchField` property set to this field's name. This ensures that dependent fields
+     * (like "confirm password") are re-validated whenever the target field (like "password") changes.
+     * 
+     * @private
+     * @returns {void}
+     * 
+     * @example
+     * ```tsx
+     * // When password field changes, it will automatically trigger validation
+     * // on any field that has matchField: 'password'
+     * 
+     * const fields = {
+     *   password: { type: 'password', name: 'password' },
+     *   confirmPassword: { 
+     *     type: 'password', 
+     *     name: 'confirmPassword', 
+     *     matchField: 'password' // This field will be auto-validated when password changes
+     *   }
+     * };
+     * ```
+     * 
+     * @remarks
+     * - Only validates fields within the same form
+     * - Uses a timeout to avoid immediate validation loops
+     * - Silently ignores fields that don't exist or can't be validated
+     * - This is automatically called when a field becomes valid
+     * 
+     * @see {@link matchField} for configuring field matching
+     * @see {@link validate} for the validation method used on dependent fields
+     * 
+     * @since v1.0.0
+     */
+    protected validateDependentMatchFields(): void {
+        const fieldInstances = this.getFieldInstances();
+        if (!fieldInstances) return;
+        const currentFieldName = this.getName();
+        // Find all fields that have matchField pointing to this field
+        Object.values(fieldInstances).forEach((field) => {
+            if (field instanceof FormField && field.getMatchField() === currentFieldName) {
+                // Use setTimeout to avoid immediate validation loops and allow state to settle
+                setTimeout(() => {
+                    field.validate({ value: field.getValue() });
+                }, 0);
+            }
+        });
+    }
+
     onInvalid(options: IFormFieldValidateOptions<FieldType, ValueType>) {
         options.context = this;
         if (typeof this.props.onFieldInvalid === "function") {
@@ -1428,12 +1478,16 @@ export function Form<Fields extends IFields = IFields>({ name, style, variant, v
                     };
                     const onSubmit = typeof onSubmitRef.current == "function" ? onSubmitRef.current : (options: IFormSubmitOptions<Fields>) => options;
                     return beforeSubmitRef.current(options).then(() => {
-                        setIsSubmitting(true, () => {
+                        setIsSubmitting(true, async () => {
                             () => {
-                                return Promise.resolve(onSubmit(options))
-                                    .then(resolve)
-                                    .catch(reject)
-                                    .finally(() => { setIsSubmitting(false) });
+                                try {
+                                    const r = Promise.resolve(onSubmit(options));
+                                    resolve(r);
+                                } catch (err) {
+                                    reject(err);
+                                } finally {
+                                    setIsSubmitting(false)
+                                }
                             }
                         })
                     });
@@ -2019,6 +2073,66 @@ export interface IFormFieldProps<FieldType extends IFieldType = IFieldType, Valu
 
     validateOnBlur?: boolean;
     validationRules?: IValidatorRule[];
+
+    /**
+     * 🔗 **Field Matching Validation** - Ensures this field's value matches another field
+     * 
+     * Specifies the name of another field that this field must match in value.
+     * When validation occurs, the field will check that its value equals the target field's value.
+     * This is commonly used for "confirm password" fields, "confirm email" fields, etc.
+     * 
+     * @type {string}
+     * 
+     * @example
+     * ```tsx
+     * // Password confirmation field
+     * const fields = {
+     *   password: { 
+     *     type: 'password', 
+     *     name: 'password', 
+     *     label: 'Password',
+     *     required: true 
+     *   },
+     *   confirmPassword: { 
+     *     type: 'password', 
+     *     name: 'confirmPassword', 
+     *     label: 'Confirm Password',
+     *     required: true,
+     *     matchField: 'password' // Must match the password field
+     *   }
+     * };
+     * 
+     * // Email confirmation field
+     * const emailFields = {
+     *   email: { 
+     *     type: 'email', 
+     *     name: 'email', 
+     *     label: 'Email Address' 
+     *   },
+     *   confirmEmail: { 
+     *     type: 'email', 
+     *     name: 'confirmEmail', 
+     *     label: 'Confirm Email Address',
+     *     matchField: 'email' // Must match the email field
+     *   }
+     * };
+     * ```
+     * 
+     * @remarks
+     * - The target field must exist in the same form
+     * - Validation occurs whenever this field's value changes
+     * - Also triggers validation when the target field's value changes
+     * - If the target field doesn't exist, validation will fail
+     * - The comparison uses the field's compareValues method if available, otherwise strict equality
+     * - This validation runs after all other validation rules
+     * - Error message will indicate which field this field should match
+     * 
+     * @see {@link compareValues} for custom value comparison logic
+     * @see {@link validationRules} for additional validation rules
+     * 
+     * @since v1.0.0
+     */
+    matchField?: string;
 
     data?: IFormData;
 
